@@ -15,9 +15,6 @@
  */
 package android.graphics.cts;
 
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
 
 import android.graphics.Bitmap;
 import android.graphics.BlurMaskFilter;
@@ -30,7 +27,6 @@ import android.util.Log;
 
 import junit.framework.TestCase;
 
-@TestTargetClass(BlurMaskFilter.class)
 public class BlurMaskFilterTest extends TestCase {
     private static final int OFFSET = 10;
     private static final int RADIUS = 5;
@@ -38,11 +34,6 @@ public class BlurMaskFilterTest extends TestCase {
     private static final int BITMAP_HEIGHT = 100;
     private static final int CENTER = BITMAP_HEIGHT / 2;
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "BlurMaskFilter",
-        args = {float.class, android.graphics.BlurMaskFilter.Blur.class}
-    )
     public void testBlurMaskFilter(){
         BlurMaskFilter filter = new BlurMaskFilter(RADIUS, Blur.NORMAL);
         Paint paint = new Paint();

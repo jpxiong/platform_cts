@@ -18,11 +18,6 @@ package android.text.method.cts;
 
 import com.android.cts.stub.R;
 
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
-import dalvik.annotation.ToBeFixed;
 
 import android.app.Activity;
 import android.app.Instrumentation;
@@ -41,7 +36,6 @@ import android.widget.TextView.BufferType;
 /**
  * Test the main functionalities of the BaseKeyListener.
  */
-@TestTargetClass(BaseKeyListener.class)
 public class BaseKeyListenerTest extends
         ActivityInstrumentationTestCase2<KeyListenerStubActivity> {
     private static final CharSequence TEST_STRING = "123456";
@@ -153,20 +147,6 @@ public class BaseKeyListenerTest extends
      * 2. Set a selection and press DEL key, the selection is deleted.
      * 3. ACTION_MULTIPLE KEYCODE_UNKNOWN by inserting the event's text into the content.
      */
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "onKeyDown",
-            args = {View.class, Editable.class, int.class, KeyEvent.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "onKeyOther",
-            args = {View.class, Editable.class, KeyEvent.class}
-        )
-    })
-    @ToBeFixed(bug = "1731439", explanation = "onKeyOther doesn't inserts the" +
-            " event's text into content.")
     public void testPressKey() {
         final CharSequence str = "123456";
         final MockBaseKeyListener baseKeyListener = new MockBaseKeyListener();

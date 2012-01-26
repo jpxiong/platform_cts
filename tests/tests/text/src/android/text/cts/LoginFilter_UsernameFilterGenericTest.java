@@ -16,44 +16,19 @@
 
 package android.text.cts;
 
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
-import dalvik.annotation.ToBeFixed;
 
 import android.text.LoginFilter.UsernameFilterGeneric;
 
 import junit.framework.TestCase;
 
-@TestTargetClass(UsernameFilterGeneric.class)
 public class LoginFilter_UsernameFilterGenericTest extends TestCase {
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "LoginFilter.UsernameFilterGeneric",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "LoginFilter.UsernameFilterGeneric",
-            args = {boolean.class}
-        )
-    })
-    @ToBeFixed(bug = "1695243", explanation = "miss javadoc")
     public void testConstructor() {
         new UsernameFilterGeneric();
         new UsernameFilterGeneric(true);
         new UsernameFilterGeneric(false);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test isAllowed(char c).",
-        method = "isAllowed",
-        args = {char.class}
-    )
     public void testIsAllowed() {
         UsernameFilterGeneric usernameFilterGeneric = new UsernameFilterGeneric();
 

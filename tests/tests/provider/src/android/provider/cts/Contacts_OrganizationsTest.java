@@ -19,19 +19,8 @@ package android.provider.cts;
 import android.content.Context;
 import android.provider.Contacts.Organizations;
 import android.test.AndroidTestCase;
-import dalvik.annotation.TestTargets;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
 
-@TestTargetClass(android.provider.Contacts.Organizations.class)
 public class Contacts_OrganizationsTest extends AndroidTestCase {
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test getDisplayLabel(Context context, int type, CharSequence label",
-        method = "getDisplayLabel",
-        args = {android.content.Context.class, int.class, java.lang.CharSequence.class}
-    )
     public void testGetDisplayLabel() {
         String label = "label";
         String display = Organizations.getDisplayLabel(getContext(),

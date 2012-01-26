@@ -18,11 +18,6 @@ package android.database.cts;
 
 import com.google.android.collect.Lists;
 
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
-import dalvik.annotation.ToBeFixed;
 
 import android.database.AbstractCursor;
 import android.database.CharArrayBuffer;
@@ -36,49 +31,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Random;
 
-@TestTargetClass(android.database.CursorWindow.class)
 public class CursorWindowTest extends AndroidTestCase {
 
     private static final String TEST_STRING = "Test String";
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "This is a test from unittest of CursorWindowTest.",
-            method = "clear",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "This is a test from unittest of CursorWindowTest.",
-            method = "setStartPosition",
-            args = {int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "This is a test from unittest of CursorWindowTest.",
-            method = "putString",
-            args = {java.lang.String.class, int.class, int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "This is a test from unittest of CursorWindowTest.",
-            method = "putNull",
-            args = {int.class, int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "This is a test from unittest of CursorWindowTest.",
-            method = "setNumColumns",
-            args = {int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "This is a test from unittest of CursorWindowTest.",
-            method = "freeLastRow",
-            args = {}
-        )
-    })
     public void testWriteCursorToWindow() throws Exception {
         // create cursor
         String[] colNames = new String[]{"_id", "name", "number", "profit"};
@@ -123,38 +79,6 @@ public class CursorWindowTest extends AndroidTestCase {
         assertEquals(0, window.getNumRows());
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "This is a test from unittest of CursorWindowTest.",
-            method = "putNull",
-            args = {int.class, int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "This is a test from unittest of CursorWindowTest.",
-            method = "getString",
-            args = {int.class, int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "This is a test from unittest of CursorWindowTest.",
-            method = "getBlob",
-            args = {int.class, int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "This is a test from unittest of CursorWindowTest.",
-            method = "getDouble",
-            args = {int.class, int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "This is a test from unittest of CursorWindowTest.",
-            method = "getLong",
-            args = {int.class, int.class}
-        )
-    })
     public void testNull() {
         CursorWindow window = getOneByOneWindow();
 
@@ -166,32 +90,6 @@ public class CursorWindowTest extends AndroidTestCase {
         assertNull(window.getBlob(0, 0));
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "This is a test from unittest of CursorWindowTest.",
-            method = "putString",
-            args = {java.lang.String.class, int.class, int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "This is a test from unittest of CursorWindowTest.",
-            method = "getString",
-            args = {int.class, int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "This is a test from unittest of CursorWindowTest.",
-            method = "getLong",
-            args = {int.class, int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "This is a test from unittest of CursorWindowTest.",
-            method = "getDouble",
-            args = {int.class, int.class}
-        )
-    })
     public void testEmptyString() {
         CursorWindow window = getOneByOneWindow();
 
@@ -202,28 +100,6 @@ public class CursorWindowTest extends AndroidTestCase {
         assertEquals(0.0, window.getDouble(0, 0));
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "CursorWindow",
-            args = {boolean.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getStartPosition",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "createFromParcel",
-            args = {android.os.Parcel.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "writeToParcel",
-            args = {android.os.Parcel.class, int.class}
-        )
-    })
     public void testConstructors() {
         int TEST_NUMBER = 5;
         CursorWindow cursorWindow;
@@ -251,33 +127,6 @@ public class CursorWindowTest extends AndroidTestCase {
         assertEquals(TEST_STRING, cursorWindow.getString(TEST_NUMBER, 0));
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setNumColumns",
-            args = {int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getNumRows",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "allocRow",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "freeLastRow",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "close",
-            args = {}
-        )
-    })
     public void testDataStructureOperations() {
         CursorWindow cursorWindow = new CursorWindow(true);
 
@@ -330,78 +179,6 @@ public class CursorWindowTest extends AndroidTestCase {
         }
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "putString",
-            args = {java.lang.String.class, int.class, int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "putNull",
-            args = {int.class, int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "putLong",
-            args = {long.class, int.class, int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "putDouble",
-            args = {double.class, int.class, int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "putBlob",
-            args = {byte[].class, int.class, int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getString",
-            args = {int.class, int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getShort",
-            args = {int.class, int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getLong",
-            args = {int.class, int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getInt",
-            args = {int.class, int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getFloat",
-            args = {int.class, int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getDouble",
-            args = {int.class, int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getBlob",
-            args = {int.class, int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "isNull",
-            args = {int.class, int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "isBlob",
-            args = {int.class, int.class}
-        )
-    })
     public void testAccessDataValues() {
         final long NUMBER_LONG_INTEGER = (long) 0xaabbccddffL;
         final long NUMBER_INTEGER = (int) NUMBER_LONG_INTEGER;
@@ -506,11 +283,6 @@ public class CursorWindowTest extends AndroidTestCase {
         assertTrue(cursorWindow.isBlob(0, 4));
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "copyStringToBuffer",
-        args = {int.class, int.class, android.database.CharArrayBuffer.class}
-    )
     public void testCopyStringToBuffer() {
         int DEFAULT_ARRAY_LENGTH = 64;
         String baseString = "0123456789";
@@ -546,18 +318,6 @@ public class CursorWindowTest extends AndroidTestCase {
         assertEquals(expectedString.length(), charArrayBuffer.data.length);
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setStartPosition",
-            args = {int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getStartPosition",
-            args = {}
-        )
-    })
     public void testAccessStartPosition() {
         final int TEST_POSITION_1 = 0;
         final int TEST_POSITION_2 = 3;
@@ -587,18 +347,6 @@ public class CursorWindowTest extends AndroidTestCase {
         }
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "clear",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "onAllReferencesReleased",
-            args = {}
-        )
-    })
     public void testClearAndOnAllReferencesReleased() {
         MockCursorWindow cursorWindow = new MockCursorWindow(true);
 
@@ -625,11 +373,6 @@ public class CursorWindowTest extends AndroidTestCase {
         assertTrue(cursorWindow.hasReleasedAllReferences());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "describeContents",
-        args = {}
-    )
     public void testDescribeContents() {
         CursorWindow cursorWindow = new CursorWindow(true);
         assertEquals(0, cursorWindow.describeContents());

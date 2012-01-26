@@ -19,12 +19,7 @@ package android.text.cts;
 import android.os.Parcel;
 import android.test.AndroidTestCase;
 import android.text.Annotation;
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
 
-@TestTargetClass(Annotation.class)
 public class AnnotationTest extends AndroidTestCase {
 
     private static final String KEY1 = "name";
@@ -41,21 +36,11 @@ public class AnnotationTest extends AndroidTestCase {
         mAnnotation = null;
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "Annotation",
-        args = {java.lang.String.class, java.lang.String.class}
-    )
     public void testConstructor() {
         // new the Annotation instance
         new Annotation(KEY1, VALUE1);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "getValue",
-        args = {}
-    )
     public void testGetValue() {
         // new the Annotation instance
         mAnnotation = new Annotation(KEY1, VALUE1);
@@ -64,11 +49,6 @@ public class AnnotationTest extends AndroidTestCase {
         assertEquals(VALUE2, mAnnotation.getValue());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "getKey",
-        args = {}
-    )
     public void testGetKey() {
         // new the Annotation instance
         mAnnotation = new Annotation(KEY1, VALUE1);
@@ -77,34 +57,12 @@ public class AnnotationTest extends AndroidTestCase {
         assertEquals(KEY2, mAnnotation.getKey());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "getSpanTypeId",
-        args = {}
-    )
     public void testGetSpanTypeId() {
         mAnnotation = new Annotation(KEY1, VALUE1);
         // Because of the return value is a hide value, we only can assert the return value isn't 0.
         assertTrue(mAnnotation.getSpanTypeId() != 0);
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "writeToParcel",
-            args = {Parcel.class, int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "Annotation",
-            args = {Parcel.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "describeContents",
-            args = {}
-        )
-    })
     public void testWriteToParcel() {
         Parcel dest = Parcel.obtain();
         try {

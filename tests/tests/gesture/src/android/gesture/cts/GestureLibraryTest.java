@@ -15,7 +15,6 @@
  */
 package android.gesture.cts;
 
-import dalvik.annotation.TestTargetClass;
 
 import android.gesture.Gesture;
 import android.gesture.GestureLibrary;
@@ -29,7 +28,6 @@ import java.util.Set;
  * <p/>
  * Most {@link GestureLibrary} methods are tested by {@link GestureStorageTester}
  */
-@TestTargetClass(GestureLibrary.class)
 public class GestureLibraryTest extends GestureStorageTester {
 
     private GestureLibrary mLibrary = null;

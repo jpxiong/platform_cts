@@ -18,10 +18,6 @@ package android.media.cts;
 
 import com.android.cts.stub.R;
 
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
 
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -29,7 +25,6 @@ import android.media.FaceDetector;
 import android.media.FaceDetector.Face;
 import android.test.InstrumentationTestCase;
 
-@TestTargetClass(FaceDetector.class)
 public class FaceDetectorTest extends InstrumentationTestCase {
 
     private FaceDetectorStub mActivity;
@@ -50,18 +45,6 @@ public class FaceDetectorTest extends InstrumentationTestCase {
         mActivity.finish();
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "findFaces",
-            args = {Bitmap.class, Face[].class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "FaceDetector",
-            args = {int.class, int.class, int.class}
-        )
-    })
     public void testFindFaces() throws Exception {
         long waitMsec = 5000;
         Thread.sleep(waitMsec);

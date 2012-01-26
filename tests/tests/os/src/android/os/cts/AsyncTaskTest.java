@@ -16,10 +16,6 @@
 
 package android.os.cts;
 
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
 
 import android.cts.util.PollingCheck;
 import android.os.AsyncTask;
@@ -27,7 +23,6 @@ import android.test.InstrumentationTestCase;
 
 import java.util.concurrent.TimeUnit;
 
-@TestTargetClass(AsyncTask.class)
 public class AsyncTaskTest extends InstrumentationTestCase {
     private static final long COMPUTE_TIME = 1000;
     private static final long RESULT = 1000;
@@ -37,64 +32,10 @@ public class AsyncTaskTest extends InstrumentationTestCase {
 
     private static MyAsyncTask mAsyncTask;
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "AsyncTask",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "execute",
-            args = {Object[].class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "get",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "doInBackground",
-            args = {Object[].class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "onPreExecute",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getStatus",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "onProgressUpdate",
-            args = {Object[].class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "onPostExecute",
-            args = {Object.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "publishProgress",
-            args = {Object[].class}
-        )
-    })
     public void testAsyncTask() throws Throwable {
         doTestAsyncTask(0);
     }
 
-    @TestTargets({
-        @TestTargetNew(
-                level = TestLevel.COMPLETE,
-                method = "get",
-                args = {long.class, TimeUnit.class}
-            )
-    })
     public void testAsyncTaskWithTimeout() throws Throwable {
         doTestAsyncTask(DURATION);
     }
@@ -155,23 +96,6 @@ public class AsyncTaskTest extends InstrumentationTestCase {
         });
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.PARTIAL_COMPLETE,
-            method = "cancel",
-            args = {boolean.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.PARTIAL_COMPLETE,
-            method = "isCancelled",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.PARTIAL_COMPLETE,
-            method = "onCancelled",
-            args = {}
-        )
-    })
     public void testCancelWithInterrupt() throws Throwable {
         startAsyncTask();
         Thread.sleep(COMPUTE_TIME / 2);
@@ -185,23 +109,6 @@ public class AsyncTaskTest extends InstrumentationTestCase {
         assertTrue(mAsyncTask.exception instanceof InterruptedException);
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.PARTIAL_COMPLETE,
-            method = "cancel",
-            args = {boolean.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.PARTIAL_COMPLETE,
-            method = "isCancelled",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.PARTIAL_COMPLETE,
-            method = "onCancelled",
-            args = {}
-        )
-    })
     public void testCancel() throws Throwable {
         startAsyncTask();
         Thread.sleep(COMPUTE_TIME / 2);
@@ -214,23 +121,6 @@ public class AsyncTaskTest extends InstrumentationTestCase {
         assertNull(mAsyncTask.exception);
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.PARTIAL_COMPLETE,
-            method = "cancel",
-            args = {boolean.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.PARTIAL_COMPLETE,
-            method = "isCancelled",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.PARTIAL_COMPLETE,
-            method = "onCancelled",
-            args = {}
-        )
-    })
     public void testCancelTooLate() throws Throwable {
         startAsyncTask();
         Thread.sleep(DURATION);

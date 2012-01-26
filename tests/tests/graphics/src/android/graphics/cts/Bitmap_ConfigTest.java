@@ -18,18 +18,9 @@ package android.graphics.cts;
 import junit.framework.TestCase;
 import android.graphics.Bitmap;
 import android.graphics.Bitmap.Config;
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
 
-@TestTargetClass(Bitmap.Config.class)
 public class Bitmap_ConfigTest extends TestCase {
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "valueOf",
-        args = {java.lang.String.class}
-    )
     public void testValueOf(){
         assertEquals(Config.ALPHA_8, Config.valueOf("ALPHA_8"));
         assertEquals(Config.RGB_565, Config.valueOf("RGB_565"));
@@ -37,11 +28,6 @@ public class Bitmap_ConfigTest extends TestCase {
         assertEquals(Config.ARGB_8888, Config.valueOf("ARGB_8888"));
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "values",
-        args = {}
-    )
     public void testValues(){
         Config[] config = Config.values();
 

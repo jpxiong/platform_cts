@@ -22,12 +22,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.CountDownTimer;
 import android.test.InstrumentationTestCase;
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
 
-@TestTargetClass(CountDownTimer.class)
 public class CountDownTimerTest extends InstrumentationTestCase {
     private Context mContext;
     private CountDownTimerTestStub mActivity;
@@ -45,32 +40,6 @@ public class CountDownTimerTest extends InstrumentationTestCase {
         mActivity.countDownTimer.start();
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "",
-            method = "CountDownTimer",
-            args = {long.class, long.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "",
-            method = "start",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "",
-            method = "onTick",
-            args = {long.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "",
-            method = "onFinish",
-            args = {}
-        )
-    })
     public void testCountDownTimer() {
         int count = (int) (mActivity.MILLISINFUTURE / mActivity.INTERVAL);
         final long TIMEOUT_MSEC = mActivity.MILLISINFUTURE + mActivity.INTERVAL + OFFSET * count;
@@ -79,38 +48,6 @@ public class CountDownTimerTest extends InstrumentationTestCase {
         assertEqualsTickTime(mActivity.tickTimes, OFFSET);
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "",
-            method = "start",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "",
-            method = "CountDownTimer",
-            args = {long.class, long.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "",
-            method = "onTick",
-            args = {long.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "",
-            method = "onFinish",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "",
-            method = "cancel",
-            args = {}
-        )
-    })
     public void testCountDownTimerCancel() {
         final long DELAY_MSEC = mActivity.INTERVAL + OFFSET;
         assertTrue(DELAY_MSEC < mActivity.MILLISINFUTURE);

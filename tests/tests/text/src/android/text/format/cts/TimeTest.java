@@ -23,41 +23,9 @@ import android.test.AndroidTestCase;
 import android.text.format.Time;
 import android.util.Log;
 import android.util.TimeFormatException;
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
 
-@TestTargetClass(Time.class)
 public class TimeTest extends AndroidTestCase {
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "Time",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "Time",
-            args = {String.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "Time",
-            args = {Time.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "toString",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getCurrentTimezone",
-            args = {}
-        )
-    })
     public void testConstructor() {
         Time time = new Time();
         new Time(Time.getCurrentTimezone());
@@ -66,11 +34,6 @@ public class TimeTest extends AndroidTestCase {
         assertTime(time, anotherTime);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "normalize",
-        args = {boolean.class}
-    )
     public void testNormalize() {
         final int expectedMonth = 3;
         final int expectedDate = 1;
@@ -96,11 +59,6 @@ public class TimeTest extends AndroidTestCase {
         assertEquals(expectedDate, time.monthDay);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "switchTimezone",
-        args = {String.class}
-    )
     public void testSwitchTimezone() {
         String timeZone = "US/Pacific";
         String anotherTimeZone = "Asia/Chongqing";
@@ -110,18 +68,6 @@ public class TimeTest extends AndroidTestCase {
         assertEquals(anotherTimeZone, time.timezone);
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "set",
-            args = {int.class, int.class, int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "set",
-            args = {Time.class}
-        )
-    })
     public void testSet() {
         final int year = 2008;
         final int month = 5;
@@ -152,28 +98,6 @@ public class TimeTest extends AndroidTestCase {
         assertEquals(time.gmtoff, anotherTime.gmtoff);
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getWeekNumber",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "format2445",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "format3339",
-            args = {boolean.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "parse3339",
-            args = {String.class}
-        )
-    })
     public void testGetWeekNumber() {
         Time time = new Time();
         time.normalize(false);
@@ -200,11 +124,6 @@ public class TimeTest extends AndroidTestCase {
         }
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "isEpoch",
-        args = {Time.class}
-    )
     public void testIsEpoch() {
         Time time = new Time();
         assertTrue(Time.isEpoch(time));
@@ -213,18 +132,6 @@ public class TimeTest extends AndroidTestCase {
         assertFalse(Time.isEpoch(time));
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "after",
-            args = {Time.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "before",
-            args = {Time.class}
-        )
-    })
     public void testAfterBefore() {
         Time a = new Time(Time.TIMEZONE_UTC);
         Time b = new Time("America/Los_Angeles");
@@ -370,23 +277,6 @@ public class TimeTest extends AndroidTestCase {
             new DateTest(2007, 10, 5, 2, 0, 60, 2007, 10, 5, 3, 0),
     };
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "normalize",
-            args = {boolean.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "set",
-            args = {int.class, int.class, int.class, int.class, int.class, int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "toMillis",
-            args = {boolean.class}
-        )
-    })
     public void testNormalize1() throws Exception {
         Time local = new Time("America/Los_Angeles");
 
@@ -477,11 +367,6 @@ public class TimeTest extends AndroidTestCase {
         }
     }
 
-    @TestTargetNew(
-         level = TestLevel.COMPLETE,
-         method = "switchTimezone",
-         args = {String.class}
-    )
     public void testSwitchTimezone0() throws Exception {
         final String timeZone = "America/Los_Angeles";
         Time t = new Time(Time.TIMEZONE_UTC);
@@ -490,21 +375,11 @@ public class TimeTest extends AndroidTestCase {
         assertEquals(timeZone, t.timezone);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "Time",
-        args = {String.class}
-    )
     public void testCtor0() throws Exception {
         Time t = new Time(Time.TIMEZONE_UTC);
         assertEquals(Time.TIMEZONE_UTC, t.timezone);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "getActualMaximum",
-        args = {int.class}
-    )
     public void testGetActualMaximum0() throws Exception {
         Time t = new Time(Time.TIMEZONE_UTC);
         assertEquals(59, t.getActualMaximum(Time.SECOND));
@@ -548,11 +423,6 @@ public class TimeTest extends AndroidTestCase {
         }
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "clear",
-        args = {String.class}
-    )
     public void testClear0() throws Exception {
         Time t = new Time(Time.getCurrentTimezone());
         t.clear(Time.TIMEZONE_UTC);
@@ -570,11 +440,6 @@ public class TimeTest extends AndroidTestCase {
         assertEquals(-1, t.isDst);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "compare",
-        args = {Time.class, Time.class}
-    )
     public void testCompare0() throws Exception {
         Time a = new Time(Time.TIMEZONE_UTC);
         Time b = new Time("America/Los_Angeles");
@@ -609,22 +474,12 @@ public class TimeTest extends AndroidTestCase {
         }
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "format",
-        args = {String.class}
-    )
     public void testFormat0() throws Exception {
         Time t = new Time(Time.TIMEZONE_UTC);
         String r = t.format("%Y%m%dT%H%M%S");
         assertEquals("19700101T000000", r);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "setToNow",
-        args = {}
-    )
     public void testSetToNow0() throws Exception {
         Time t = new Time(Time.TIMEZONE_UTC);
         t.setToNow();
@@ -633,11 +488,6 @@ public class TimeTest extends AndroidTestCase {
         assertEquals(currentTime, time, 500);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "toMillis",
-        args = {boolean.class}
-    )
     public void testMillis0() throws Exception {
         Time t = new Time(Time.TIMEZONE_UTC);
         t.set(0, 0, 0, 1, 1, 2006);
@@ -653,11 +503,6 @@ public class TimeTest extends AndroidTestCase {
         assertEquals(1000, r);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "parse",
-        args = {String.class}
-    )
     public void testParse0() throws Exception {
         Time t = new Time(Time.TIMEZONE_UTC);
         assertFalse(t.parse("12345678T901234"));
@@ -671,11 +516,6 @@ public class TimeTest extends AndroidTestCase {
 
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "set",
-        args = {long.class}
-    )
     public void testSet0() throws Exception {
         Time t = new Time(Time.TIMEZONE_UTC);
         long time = System.currentTimeMillis();
@@ -690,11 +530,6 @@ public class TimeTest extends AndroidTestCase {
         assertEquals(date.get(Calendar.SECOND), t.second);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "set",
-        args = {int.class, int.class, int.class, int.class, int.class, int.class}
-    )
     public void testSet1() throws Exception {
         final int year = 2008;
         final int month = 6;
@@ -775,18 +610,6 @@ public class TimeTest extends AndroidTestCase {
         "Pacific/Midway",
     };
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "set",
-            args = {int.class, int.class, int.class, int.class, int.class, int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "normalize",
-            args = {boolean.class}
-        )
-    })
     public void testGetJulianDay() throws Exception {
         Time time = new Time();
 
@@ -827,28 +650,6 @@ public class TimeTest extends AndroidTestCase {
         }
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "set",
-            args = {int.class, int.class, int.class, int.class, int.class, int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "normalize",
-            args = {boolean.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setJulianDay",
-            args = {int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getJulianDay",
-            args = {long.class, long.class}
-        )
-    })
     public void testSetJulianDay() throws Exception {
         Time time = new Time();
 

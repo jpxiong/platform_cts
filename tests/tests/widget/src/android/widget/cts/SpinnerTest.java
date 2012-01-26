@@ -18,11 +18,6 @@ package android.widget.cts;
 
 import com.android.cts.stub.R;
 
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
-import dalvik.annotation.ToBeFixed;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -36,7 +31,6 @@ import android.widget.Spinner;
 /**
  * Test {@link Spinner}.
  */
-@TestTargetClass(Spinner.class)
 public class SpinnerTest extends ActivityInstrumentationTestCase2<RelativeLayoutStubActivity> {
     private Context mTargetContext;
 
@@ -50,23 +44,6 @@ public class SpinnerTest extends ActivityInstrumentationTestCase2<RelativeLayout
         mTargetContext = getInstrumentation().getTargetContext();
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "Spinner",
-            args = {android.content.Context.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "Spinner",
-            args = {android.content.Context.class, android.util.AttributeSet.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "Spinner",
-            args = {android.content.Context.class, android.util.AttributeSet.class, int.class}
-        )
-    })
     public void testConstructor() {
         new Spinner(mTargetContext);
 
@@ -78,11 +55,6 @@ public class SpinnerTest extends ActivityInstrumentationTestCase2<RelativeLayout
         assertEquals(mTargetContext.getString(R.string.text_view_hello), spinner.getPrompt());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "getBaseline",
-        args = {}
-    )
     @UiThreadTest
     public void testGetBaseline() {
         Spinner spinner = new Spinner(mTargetContext);
@@ -97,13 +69,6 @@ public class SpinnerTest extends ActivityInstrumentationTestCase2<RelativeLayout
         assertTrue(spinner.getBaseline() > 0);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "setOnItemClickListener",
-        args = {android.widget.AdapterView.OnItemClickListener.class}
-    )
-    @ToBeFixed( bug = "1695243", explanation = "setOnItemClickListener() always throws" +
-            " RuntimeException, but does not mentioned in javadoc.")
     public void testSetOnItemClickListener() {
         Spinner spinner = new Spinner(mTargetContext);
 
@@ -114,11 +79,6 @@ public class SpinnerTest extends ActivityInstrumentationTestCase2<RelativeLayout
         }
     }
 
-    @TestTargetNew(
-        level = TestLevel.PARTIAL,
-        method = "performClick",
-        args = {}
-    )
     @UiThreadTest
     public void testPerformClick() {
         final Spinner spinner = (Spinner) getActivity().findViewById(R.id.spinner1);
@@ -129,11 +89,6 @@ public class SpinnerTest extends ActivityInstrumentationTestCase2<RelativeLayout
         // Or do UI check?
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "onClick",
-        args = {android.content.DialogInterface.class, int.class}
-    )
     public void testOnClick() {
         Spinner spinner = new Spinner(mTargetContext);
         // normal value
@@ -159,18 +114,6 @@ public class SpinnerTest extends ActivityInstrumentationTestCase2<RelativeLayout
         assertFalse(dialog.isShowing());
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.PARTIAL,
-            method = "setPrompt",
-            args = {java.lang.CharSequence.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getPrompt",
-            args = {}
-        )
-    })
     @UiThreadTest
     public void testAccessPrompt() {
         final String promptText = "prompt text";
@@ -186,13 +129,6 @@ public class SpinnerTest extends ActivityInstrumentationTestCase2<RelativeLayout
         // TODO: find the dialog and get its title to assert whether setPrompt() takes effect?
     }
 
-    @TestTargetNew(
-        level = TestLevel.PARTIAL,
-        method = "setPromptId",
-        args = {int.class}
-    )
-    @ToBeFixed(bug = "1695243", explanation = "the javadoc for setInterpolator() is incomplete." +
-            "not clear what is supposed to happen if promptId is exceptional.")
     public void testsetPromptId() {
         Spinner spinner = new Spinner(mTargetContext);
 
@@ -216,11 +152,6 @@ public class SpinnerTest extends ActivityInstrumentationTestCase2<RelativeLayout
         // TODO: find the dialog and get its title to assert whether setPromptId() takes effect?
     }
 
-    @TestTargetNew(
-        level = TestLevel.NOT_NECESSARY,
-        method = "onLayout",
-        args = {boolean.class, int.class, int.class, int.class, int.class}
-    )
     public void testOnLayout() {
         // onLayout() is implementation details, do NOT test
     }

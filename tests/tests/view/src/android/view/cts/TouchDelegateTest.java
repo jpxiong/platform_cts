@@ -16,10 +16,6 @@
 
 package android.view.cts;
 
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
 
 import android.app.Activity;
 import android.app.Instrumentation;
@@ -34,7 +30,6 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.LinearLayout;
 
-@TestTargetClass(TouchDelegate.class)
 public class TouchDelegateTest extends ActivityInstrumentationTestCase2<MockActivity> {
     private static final int WRAP_CONTENT = ViewGroup.LayoutParams.WRAP_CONTENT;
     private static final int ACTION_DOWN = MotionEvent.ACTION_DOWN;
@@ -85,20 +80,6 @@ public class TouchDelegateTest extends ActivityInstrumentationTestCase2<MockActi
         mButton.getHitRect(mRect);
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test constructor(s) of {@link TouchDelegate}",
-            method = "TouchDelegate",
-            args = {Rect.class, View.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test method: MotionEvent",
-            method = "onTouchEvent",
-            args = {MotionEvent.class}
-        )
-    })
     @UiThreadTest
     public void testOnTouchEvent() {
         // test callback of onTouchEvent

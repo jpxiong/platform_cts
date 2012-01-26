@@ -16,10 +16,6 @@
 
 package android.provider.cts;
 
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.ToBeFixed;
 
 import android.content.ContentResolver;
 import android.content.ContentValues;
@@ -31,7 +27,6 @@ import android.provider.cts.MediaStoreAudioTestHelper.Audio1;
 import android.provider.cts.MediaStoreAudioTestHelper.Audio2;
 import android.test.InstrumentationTestCase;
 
-@TestTargetClass(Media.class)
 public class MediaStore_Audio_MediaTest extends InstrumentationTestCase {
     private ContentResolver mContentResolver;
 
@@ -42,11 +37,6 @@ public class MediaStore_Audio_MediaTest extends InstrumentationTestCase {
         mContentResolver = getInstrumentation().getContext().getContentResolver();
     }
 
-    @TestTargetNew(
-      level = TestLevel.COMPLETE,
-      method = "getContentUri",
-      args = {String.class}
-    )
     public void testGetContentUri() {
         assertNotNull(mContentResolver.query(
                 Media.getContentUri(MediaStoreAudioTestHelper.INTERNAL_VOLUME_NAME), null, null,
@@ -60,11 +50,6 @@ public class MediaStore_Audio_MediaTest extends InstrumentationTestCase {
         assertNull(mContentResolver.query(Media.getContentUri(volume), null, null, null, null));
     }
 
-    @TestTargetNew(
-      level = TestLevel.COMPLETE,
-      method = "getContentUriForPath",
-      args = {String.class}
-    )
     public void testGetContentUriForPath() {
         String externalPath = Environment.getExternalStorageDirectory().getPath();
         assertNotNull(mContentResolver.query(Media.getContentUriForPath(externalPath), null, null,

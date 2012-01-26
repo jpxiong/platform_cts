@@ -16,9 +16,6 @@
 
 package android.graphics.cts;
 
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
 
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
@@ -31,7 +28,6 @@ import android.graphics.Bitmap.Config;
 
 import junit.framework.TestCase;
 
-@TestTargetClass(EmbossMaskFilter.class)
 public class EmbossMaskFilterTest extends TestCase {
     private static final int BITMAP_WIDTH = 100;
     private static final int BITMAP_HEIGHT = 100;
@@ -41,12 +37,6 @@ public class EmbossMaskFilterTest extends TestCase {
     private static final int CENTER_Y = BITMAP_HEIGHT / 2;
     private static final int STROKE_WIDTH = 10;
 
-    @TestTargetNew(
-        level = TestLevel.SUFFICIENT,
-        notes = "Javadoc is incomplete, cannot test all parameters",
-        method = "EmbossMaskFilter",
-        args = {float[].class, float.class, float.class, float.class}
-    )
     public void testEmbossMaskFilter() {
         EmbossMaskFilter filter = new EmbossMaskFilter(new float[] { 1, 1, 1 }, 0.5f, 8, 3);
 

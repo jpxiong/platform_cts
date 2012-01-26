@@ -17,10 +17,6 @@ package android.media.cts;
 
 import com.android.cts.stub.R;
 
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
 
 import android.app.Activity;
 import android.app.Instrumentation;
@@ -33,7 +29,6 @@ import android.net.Uri;
 import android.provider.Settings;
 import android.test.ActivityInstrumentationTestCase2;
 
-@TestTargetClass(RingtoneManager.class)
 public class RingtoneManagerTest
         extends ActivityInstrumentationTestCase2<RingtonePickerActivity> {
 
@@ -79,90 +74,11 @@ public class RingtoneManagerTest
         super.tearDown();
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "RingtoneManager",
-            args = {Activity.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "RingtoneManager",
-            args = {Context.class}
-        )
-    })
     public void testConstructors() {
         new RingtoneManager(mActivity);
         new RingtoneManager(mContext);
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setIncludeDrm",
-            args = {boolean.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getIncludeDrm",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getRingtoneUri",
-            args = {int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getRingtone",
-            args = {int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getRingtone",
-            args = {Context.class, Uri.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getCursor",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getRingtonePosition",
-            args = {Uri.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getActualDefaultRingtoneUri",
-            args = {Context.class, int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setActualDefaultRingtoneUri",
-            args = {Context.class, int.class, Uri.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getDefaultType",
-            args = {Uri.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getValidRingtoneUri",
-            args = {Context.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "isDefault",
-            args = {Uri.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getDefaultUri",
-            args = {int.class}
-        )
-    })
     public void testAccessMethods() {
         Cursor c = mRingtoneManager.getCursor();
         assertTrue("Must have at least one ring tone available", c.getCount() > 0);
@@ -194,18 +110,6 @@ public class RingtoneManagerTest
         assertTrue(RingtoneManager.isDefault(Settings.System.DEFAULT_RINGTONE_URI));
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setType",
-            args = {int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "inferStreamType",
-            args = {}
-        )
-    })
     public void testSetType() {
         mRingtoneManager.setType(RingtoneManager.TYPE_ALARM);
         assertEquals(AudioManager.STREAM_ALARM, mRingtoneManager.inferStreamType());
@@ -215,23 +119,6 @@ public class RingtoneManagerTest
         assertEquals(RingtoneManager.TYPE_ALARM, r.getStreamType());
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "stopPreviousRingtone",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setStopPreviousRingtone",
-            args = {boolean.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getStopPreviousRingtone",
-            args = {}
-        )
-    })
     public void testStopPreviousRingtone() {
         Cursor c = mRingtoneManager.getCursor();
         assertTrue("Must have at least one ring tone available", c.getCount() > 0);

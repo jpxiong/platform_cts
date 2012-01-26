@@ -18,11 +18,6 @@ package android.graphics.drawable.cts;
 
 import com.android.cts.stub.R;
 
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
-import dalvik.annotation.ToBeFixed;
 
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
@@ -41,7 +36,6 @@ import android.widget.cts.ImageViewStubActivity;
 
 import java.io.IOException;
 
-@TestTargetClass(AnimationDrawable.class)
 public class AnimationDrawableTest extends ActivityInstrumentationTestCase2<ImageViewStubActivity> {
     private static final int FRAMES_COUNT        = 3;
     private static final int FIRST_FRAME_INDEX   = 0;
@@ -77,12 +71,6 @@ public class AnimationDrawableTest extends ActivityInstrumentationTestCase2<Imag
         }
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "AnimationDrawable",
-        args = {}
-    )
-    @ToBeFixed(bug = "1695243", explanation = "Android API javadocs are incomplete")
     public void testConstructor() {
         mAnimationDrawable = new AnimationDrawable();
         // Check the values set in the constructor
@@ -91,11 +79,6 @@ public class AnimationDrawableTest extends ActivityInstrumentationTestCase2<Imag
         assertTrue(mAnimationDrawable.isOneShot());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "setVisible",
-        args = {boolean.class, boolean.class}
-    )
     public void testSetVisible() throws Throwable {
         assertTrue(mAnimationDrawable.isVisible());
         runTestOnUiThread(new Runnable() {
@@ -129,23 +112,6 @@ public class AnimationDrawableTest extends ActivityInstrumentationTestCase2<Imag
         assertStoppedAnimation(FIRST_FRAME_INDEX, FIRST_FRAME_DURATION);
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "start",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "stop",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "isRunning",
-            args = {}
-        )
-    })
     public void testStart() throws Throwable {
         // animation should play repeat if do not stop it.
         assertFalse(mAnimationDrawable.isOneShot());
@@ -187,20 +153,10 @@ public class AnimationDrawableTest extends ActivityInstrumentationTestCase2<Imag
         assertStoppedAnimation(THIRD_FRAME_INDEX, THIRD_FRAME_DURATION);
     }
 
-    @TestTargetNew(
-        level = TestLevel.NOT_NECESSARY,
-        method = "run",
-        args = {}
-    )
     public void testRun() {
         // This method should not be called directly.
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "unscheduleSelf",
-        args = {java.lang.Runnable.class}
-    )
     public void testUnscheduleSelf() throws Throwable {
         assertFalse(mAnimationDrawable.isRunning());
         runTestOnUiThread(new Runnable() {
@@ -221,20 +177,6 @@ public class AnimationDrawableTest extends ActivityInstrumentationTestCase2<Imag
         assertStoppedAnimation(SECOND_FRAME_INDEX, SECOND_FRAME_DURATION);
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getNumberOfFrames",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "addFrame",
-            args = {android.graphics.drawable.Drawable.class, int.class}
-        )
-    })
-    @ToBeFixed(bug = "1695243", explanation = "should add @throws clause into javadoc of "
-        + "AnimationDrawable#addFrame(Drawable, int) when param frame is null")
     public void testGetNumberOfFrames() {
         assertEquals(FRAMES_COUNT, mAnimationDrawable.getNumberOfFrames());
 
@@ -254,13 +196,6 @@ public class AnimationDrawableTest extends ActivityInstrumentationTestCase2<Imag
         }
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "getFrame",
-        args = {int.class}
-    )
-    @ToBeFixed(bug = "1695243", explanation = "should add @throws clause into javadoc of "
-            + "AnimationDrawable#getFrame(int) when param index is out of bounds")
     public void testGetFrame() {
         Drawable frame = mAnimationDrawable.getFrame(FIRST_FRAME_INDEX);
         Drawable drawable = mResources.getDrawable(R.drawable.testimage);
@@ -294,13 +229,6 @@ public class AnimationDrawableTest extends ActivityInstrumentationTestCase2<Imag
         }
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "getDuration",
-        args = {int.class}
-    )
-    @ToBeFixed(bug = "1695243", explanation = "should add @throws clause into javadoc of "
-            + "AnimationDrawable#getDuration(int) when param index is out of bounds")
     public void testGetDuration() {
         assertEquals(FIRST_FRAME_DURATION, mAnimationDrawable.getDuration(FIRST_FRAME_INDEX));
         assertEquals(SECOND_FRAME_DURATION, mAnimationDrawable.getDuration(SECOND_FRAME_INDEX));
@@ -322,18 +250,6 @@ public class AnimationDrawableTest extends ActivityInstrumentationTestCase2<Imag
         }
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "isOneShot",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setOneShot",
-            args = {boolean.class}
-        )
-    })
     public void testAccessOneShot() throws Throwable {
         // animation should play repeat if do not stop it.
         assertFalse(mAnimationDrawable.isOneShot());
@@ -361,13 +277,6 @@ public class AnimationDrawableTest extends ActivityInstrumentationTestCase2<Imag
         assertStoppedAnimation(THIRD_FRAME_INDEX, THIRD_FRAME_DURATION);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "inflate",
-        args = {android.content.res.Resources.class, org.xmlpull.v1.XmlPullParser.class,
-                android.util.AttributeSet.class}
-    )
-    @ToBeFixed(bug = "1695243", explanation = "Android API javadocs are incomplete")
     public void testInflate() throws XmlPullParserException, IOException {
         mAnimationDrawable = new AnimationDrawable();
         DrawableContainerState drawableContainerState =
@@ -412,15 +321,6 @@ public class AnimationDrawableTest extends ActivityInstrumentationTestCase2<Imag
         }
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "inflate",
-        args = {android.content.res.Resources.class, org.xmlpull.v1.XmlPullParser.class,
-                android.util.AttributeSet.class}
-    )
-    @ToBeFixed(bug = "1695243", explanation = "should add @throws clause into javadoc of "
-            + "AnimationDrawable#inflate(Resources, XmlPullParser, AttributeSet) "
-            + "when param r, parser or attrs is null")
     public void testInflateWithNullParameters() throws XmlPullParserException, IOException {
         XmlResourceParser parser = getResourceParser(R.drawable.animationdrawable);
         try {
@@ -445,12 +345,6 @@ public class AnimationDrawableTest extends ActivityInstrumentationTestCase2<Imag
         }
     }
 
-    @TestTargetNew(
-        level = TestLevel.SUFFICIENT,
-        method = "mutate",
-        args = {}
-    )
-    @ToBeFixed(bug = "", explanation = "mutate always throws out NullPointerException")
     public void testMutate() {
         AnimationDrawable d1 = (AnimationDrawable) mResources
                 .getDrawable(R.drawable.animationdrawable);

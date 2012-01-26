@@ -18,10 +18,6 @@ package android.text.method.cts;
 
 import com.android.cts.stub.R;
 
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.ToBeFixed;
 
 import android.app.Activity;
 import android.app.Instrumentation;
@@ -37,7 +33,6 @@ import android.view.KeyEvent;
 import android.widget.TextView;
 import android.widget.TextView.BufferType;
 
-@TestTargetClass(QwertyKeyListener.class)
 public class QwertyKeyListenerTest extends
         ActivityInstrumentationTestCase2<KeyListenerStubActivity> {
     private Activity mActivity;
@@ -56,11 +51,6 @@ public class QwertyKeyListenerTest extends
         mTextView = (TextView) mActivity.findViewById(R.id.keylistener_textview);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "QwertyKeyListener",
-        args = {TextKeyListener.Capitalize.class, boolean.class}
-    )
     public void testConstructor() {
         new QwertyKeyListener(Capitalize.NONE, false);
 
@@ -186,11 +176,6 @@ public class QwertyKeyListenerTest extends
         mInstrumentation.waitForIdleSync();
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "getInstance",
-        args = {boolean.class, TextKeyListener.Capitalize.class}
-    )
     public void testGetInstance() {
         QwertyKeyListener listener1 = QwertyKeyListener.getInstance(true, Capitalize.WORDS);
         QwertyKeyListener listener2 = QwertyKeyListener.getInstance(true, Capitalize.WORDS);
@@ -206,13 +191,6 @@ public class QwertyKeyListenerTest extends
         assertNotSame(listener4, listener3);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "markAsReplaced",
-        args = {Spannable.class, int.class, int.class, String.class}
-    )
-    @ToBeFixed(bug = "1695243", explanation = "Android API javadocs are incomplete, " +
-            "should add NPE description in javadoc.")
     public void testMarkAsReplaced() {
         SpannableStringBuilder content = new SpannableStringBuilder("123456");
 
@@ -246,11 +224,6 @@ public class QwertyKeyListenerTest extends
         }
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "getInputType",
-        args = {}
-    )
     public void testGetInputType() {
         QwertyKeyListener listener = QwertyKeyListener.getInstance(false, Capitalize.NONE);
         int expected = InputType.TYPE_CLASS_TEXT;

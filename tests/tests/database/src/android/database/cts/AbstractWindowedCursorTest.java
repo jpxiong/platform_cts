@@ -24,12 +24,7 @@ import android.database.CursorIndexOutOfBoundsException;
 import android.database.CursorWindow;
 import android.database.StaleDataException;
 import android.test.InstrumentationTestCase;
-import dalvik.annotation.TestTargets;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
 
-@TestTargetClass(AbstractWindowedCursor.class)
 public class AbstractWindowedCursorTest extends InstrumentationTestCase {
     private static final String TEST_STRING = "TESTSTRING";
     private static final int COLUMN_INDEX0 = 0;
@@ -54,11 +49,6 @@ public class AbstractWindowedCursorTest extends InstrumentationTestCase {
         super.tearDown();
     }
     
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "isNull",
-        args = {int.class}
-    )
     public void testIsNull() {
         mCursor.setWindow(mWindow);
 
@@ -72,11 +62,6 @@ public class AbstractWindowedCursorTest extends InstrumentationTestCase {
         assertFalse(mCursor.isNull(COLUMN_INDEX0));
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "isBlob",
-        args = {int.class}
-    )
     public void testIsBlob() {
         mCursor.setWindow(mWindow);
         assertTrue(mWindow.setNumColumns(TEST_COLUMN_COUNT));
@@ -91,23 +76,6 @@ public class AbstractWindowedCursorTest extends InstrumentationTestCase {
         assertTrue(mCursor.isBlob(COLUMN_INDEX1));
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "hasWindow",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setWindow",
-            args = {android.database.CursorWindow.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getWindow",
-            args = {}
-        )
-    })
     public void testHasWindow() {
         assertFalse(mCursor.hasWindow());
         assertNull(mCursor.getWindow());
@@ -121,11 +89,6 @@ public class AbstractWindowedCursorTest extends InstrumentationTestCase {
         assertNull(mCursor.getWindow());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "getString",
-        args = {int.class}
-    )
     public void testGetString() {
         mCursor.setWindow(mWindow);
         assertTrue(mWindow.setNumColumns(TEST_COLUMN_COUNT));
@@ -137,11 +100,6 @@ public class AbstractWindowedCursorTest extends InstrumentationTestCase {
         assertEquals(str, mCursor.getString(COLUMN_INDEX0));
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "getShort",
-        args = {int.class}
-    )
     public void testGetShort() {
         mCursor.setWindow(mWindow);
         assertTrue(mWindow.setNumColumns(TEST_COLUMN_COUNT));
@@ -153,11 +111,6 @@ public class AbstractWindowedCursorTest extends InstrumentationTestCase {
         assertEquals(shortNumber, mCursor.getShort(COLUMN_INDEX0));
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "getLong",
-        args = {int.class}
-    )
     public void testGetLong() {
         mCursor.setWindow(mWindow);
         assertTrue(mWindow.setNumColumns(TEST_COLUMN_COUNT));
@@ -169,11 +122,6 @@ public class AbstractWindowedCursorTest extends InstrumentationTestCase {
         assertEquals(longNumber, mCursor.getLong(COLUMN_INDEX0));
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "getInt",
-        args = {int.class}
-    )
     public void testGetInt() {
         mCursor.setWindow(mWindow);
         assertTrue(mWindow.setNumColumns(TEST_COLUMN_COUNT));
@@ -185,11 +133,6 @@ public class AbstractWindowedCursorTest extends InstrumentationTestCase {
         assertEquals(intNumber, mCursor.getInt(COLUMN_INDEX0));
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "getFloat",
-        args = {int.class}
-    )
     public void testGetFloat() {
         mCursor.setWindow(mWindow);
         assertTrue(mWindow.setNumColumns(TEST_COLUMN_COUNT));
@@ -201,11 +144,6 @@ public class AbstractWindowedCursorTest extends InstrumentationTestCase {
         assertEquals(f1oatNumber, mCursor.getFloat(COLUMN_INDEX0));
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "getDouble",
-        args = {int.class}
-    )
     public void testGetDouble() {
         mCursor.setWindow(mWindow);
         assertTrue(mWindow.setNumColumns(TEST_COLUMN_COUNT));
@@ -222,11 +160,6 @@ public class AbstractWindowedCursorTest extends InstrumentationTestCase {
         assertEquals(db1, cd);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "getBlob",
-        args = {int.class}
-    )
     public void testGetBlob() {
         byte TEST_VALUE = 3;
         byte BLOB_SIZE = 100;
@@ -246,11 +179,6 @@ public class AbstractWindowedCursorTest extends InstrumentationTestCase {
         assertTrue(Arrays.equals(blob, targetBuffer));
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "copyStringToBuffer",
-        args = {int.class, android.database.CharArrayBuffer.class}
-    )
     public void testCopyStringToBuffer() {
         assertTrue(mWindow.setNumColumns(TEST_COLUMN_COUNT));
         assertTrue(mWindow.allocRow());
@@ -271,11 +199,6 @@ public class AbstractWindowedCursorTest extends InstrumentationTestCase {
         assertEquals(0, charArrayBuffer.sizeCopied);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "checkPosition",
-        args = {}
-    )
     public void testCheckPosition() {
         try {
             mCursor.checkPosition();

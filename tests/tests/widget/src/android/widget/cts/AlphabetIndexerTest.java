@@ -16,17 +16,12 @@
 
 package android.widget.cts;
 
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
 
 import android.database.Cursor;
 import android.database.MatrixCursor;
 import android.test.AndroidTestCase;
 import android.widget.AlphabetIndexer;
 
-@TestTargetClass(AlphabetIndexer.class)
 public class AlphabetIndexerTest extends AndroidTestCase {
     private static final String[] COUNTRIES_LIST = new String[]
         {"Argentina", "Australia", "China", "France", "Germany", "Italy", "Japan", "United States"};
@@ -43,33 +38,6 @@ public class AlphabetIndexerTest extends AndroidTestCase {
     private static final int INDEX_OF_MESSI = 5;
     private static final int INDEX_OF_STEVEN = 7;
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "AlphabetIndexer",
-            args = {android.database.Cursor.class, int.class, java.lang.CharSequence.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getPositionForSection",
-            args = {int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getSectionForPosition",
-            args = {int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getSections",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setCursor",
-            args = {android.database.Cursor.class}
-        )
-    })
     public void testAlphabetIndexer() {
         Cursor c1 = createCursor("Country", COUNTRIES_LIST);
 
@@ -132,11 +100,6 @@ public class AlphabetIndexerTest extends AndroidTestCase {
         assertEquals(NAMES_LIST.length, indexer.getPositionForSection(index));
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "compare",
-        args = {java.lang.String.class, java.lang.String.class}
-    )
     public void testCompare() {
         Cursor cursor = createCursor("Country", COUNTRIES_LIST);
 

@@ -16,10 +16,6 @@
 
 package android.app.cts;
 
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
 
 import android.app.Service;
 import android.content.ComponentName;
@@ -33,7 +29,6 @@ import android.os.Parcel;
 import android.os.RemoteException;
 import android.test.suitebuilder.annotation.MediumTest;
 
-@TestTargetClass(Service.class)
 public class ServiceTest extends ActivityTestsBase {
     private static final int STATE_START_1 = 0;
     private static final int STATE_START_2 = 1;
@@ -392,444 +387,67 @@ public class ServiceTest extends ActivityTestsBase {
         mContext.stopService(mLocalService_ApplicationHasPermission);
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "onStart",
-            args = {android.content.Intent.class, int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "onDestroy",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getApplication",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "Service",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "onConfigurationChanged",
-            args = {android.content.res.Configuration.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "onLowMemory",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "stopSelf",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "stopSelf",
-            args = {int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "stopSelfResult",
-            args = {int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setForeground",
-            args = {boolean.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "dump",
-            args = {java.io.FileDescriptor.class, java.io.PrintWriter.class,
-                    java.lang.String[].class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "finalize",
-            args = {}
-        )
-    })
     public void testLocalStartClass() throws Exception {
         startExpectResult(mLocalService);
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "onStart",
-            args = {android.content.Intent.class, int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "onDestroy",
-            args = {}
-        )
-    })
     public void testLocalStartAction() throws Exception {
         startExpectResult(new Intent(LocalService.SERVICE_LOCAL));
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "onStart",
-            args = {android.content.Intent.class, int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "onDestroy",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "onBind",
-            args = {android.content.Intent.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "onRebind",
-            args = {android.content.Intent.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "onUnbind",
-            args = {android.content.Intent.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "onCreate",
-            args = {}
-        )
-    })
     public void testLocalBindClass() throws Exception {
         bindExpectResult(mLocalService);
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "onStart",
-            args = {android.content.Intent.class, int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "onDestroy",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "onBind",
-            args = {android.content.Intent.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "onRebind",
-            args = {android.content.Intent.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "onUnbind",
-            args = {android.content.Intent.class}
-        )
-    })
     @MediumTest
     public void testLocalBindAction() throws Exception {
         bindExpectResult(new Intent(LocalService.SERVICE_LOCAL));
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "onStart",
-            args = {android.content.Intent.class, int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "onDestroy",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "onBind",
-            args = {android.content.Intent.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "onRebind",
-            args = {android.content.Intent.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "onUnbind",
-            args = {android.content.Intent.class}
-        )
-    })
     @MediumTest
     public void testLocalBindAutoClass() throws Exception {
         bindAutoExpectResult(mLocalService);
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "onStart",
-            args = {android.content.Intent.class, int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "onDestroy",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "onBind",
-            args = {android.content.Intent.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "onRebind",
-            args = {android.content.Intent.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "onUnbind",
-            args = {android.content.Intent.class}
-        )
-    })
     @MediumTest
     public void testLocalBindAutoAction() throws Exception {
         bindAutoExpectResult(new Intent(LocalService.SERVICE_LOCAL));
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "onStart",
-            args = {android.content.Intent.class, int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "onDestroy",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "onBind",
-            args = {android.content.Intent.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "onRebind",
-            args = {android.content.Intent.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "onUnbind",
-            args = {android.content.Intent.class}
-        )
-    })
     @MediumTest
     public void testLocalStartClassPermissions() throws Exception {
         startExpectResult(mLocalGrantedService);
         startExpectResult(mLocalDeniedService);
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "onStart",
-            args = {android.content.Intent.class, int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "onDestroy",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "onBind",
-            args = {android.content.Intent.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "onRebind",
-            args = {android.content.Intent.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "onUnbind",
-            args = {android.content.Intent.class}
-        )
-    })
     @MediumTest
     public void testLocalStartActionPermissions() throws Exception {
         startExpectResult(mLocalService_ApplicationHasPermission);
         startExpectResult(mLocalService_ApplicationDoesNotHavePermission);
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "onStart",
-            args = {android.content.Intent.class, int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "onDestroy",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "onBind",
-            args = {android.content.Intent.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "onRebind",
-            args = {android.content.Intent.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "onUnbind",
-            args = {android.content.Intent.class}
-        )
-    })
     @MediumTest
     public void testLocalBindClassPermissions() throws Exception {
         bindExpectResult(mLocalGrantedService);
         bindExpectResult(mLocalDeniedService);
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "onStart",
-            args = {android.content.Intent.class, int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "onDestroy",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "onBind",
-            args = {android.content.Intent.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "onRebind",
-            args = {android.content.Intent.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "onUnbind",
-            args = {android.content.Intent.class}
-        )
-    })
     @MediumTest
     public void testLocalBindActionPermissions() throws Exception {
         bindExpectResult(mLocalService_ApplicationHasPermission);
         bindExpectResult(mLocalService_ApplicationDoesNotHavePermission);
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "onStart",
-            args = {android.content.Intent.class, int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "onDestroy",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "onBind",
-            args = {android.content.Intent.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "onRebind",
-            args = {android.content.Intent.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "onUnbind",
-            args = {android.content.Intent.class}
-        )
-    })
     @MediumTest
     public void testLocalBindAutoClassPermissionGranted() throws Exception {
         bindAutoExpectResult(mLocalGrantedService);
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "onStart",
-            args = {android.content.Intent.class, int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "onDestroy",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "onBind",
-            args = {android.content.Intent.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "onRebind",
-            args = {android.content.Intent.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "onUnbind",
-            args = {android.content.Intent.class}
-        )
-    })
     @MediumTest
     public void testLocalBindAutoActionPermissionGranted() throws Exception {
         bindAutoExpectResult(mLocalService_ApplicationHasPermission);
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "onStart",
-            args = {android.content.Intent.class, int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "onDestroy",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "onBind",
-            args = {android.content.Intent.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "onRebind",
-            args = {android.content.Intent.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "onUnbind",
-            args = {android.content.Intent.class}
-        )
-    })
     @MediumTest
     public void testLocalUnbindTwice() throws Exception {
         EmptyConnection conn = new EmptyConnection();

@@ -16,11 +16,6 @@
 
 package android.graphics.drawable.cts;
 
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
-import dalvik.annotation.ToBeFixed;
 
 import android.graphics.Canvas;
 import android.graphics.ColorFilter;
@@ -33,7 +28,6 @@ import android.graphics.drawable.DrawableContainer.DrawableContainerState;
 
 import junit.framework.TestCase;
 
-@TestTargetClass(DrawableContainerState.class)
 public class DrawableContainerStateTest extends TestCase{
     private DrawableContainerState mDrawableContainerState;
 
@@ -50,25 +44,6 @@ public class DrawableContainerStateTest extends TestCase{
         assertNotNull(mDrawableContainerState);
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "addChild",
-            args = {android.graphics.drawable.Drawable.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getChildCount",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getChildren",
-            args = {}
-        )
-    })
-    @ToBeFixed(bug = "1417734", explanation = "should add @throws clause into javadoc of "
-            + "DrawableContainerState#addChild(int) when param dr is null")
     public void testAddChild() {
         try {
             mDrawableContainerState.addChild(null);
@@ -113,12 +88,6 @@ public class DrawableContainerStateTest extends TestCase{
         assertSame(dr1, children[2]);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Drawables should not dynamically change statefulness",
-        method = "isStateful",
-        args = {}
-    )
     public void testIsStateFul() {
         assertEquals(0, mDrawableContainerState.getChildCount());
         assertFalse(mDrawableContainerState.isStateful());
@@ -148,18 +117,6 @@ public class DrawableContainerStateTest extends TestCase{
         assertTrue(mDrawableContainerState.isStateful());
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "isConstantSize",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setConstantSize",
-            args = {boolean.class}
-        )
-    })
     public void testAccessConstantSize() {
         mDrawableContainerState.setConstantSize(true);
         assertTrue(mDrawableContainerState.isConstantSize());
@@ -168,19 +125,6 @@ public class DrawableContainerStateTest extends TestCase{
         assertFalse(mDrawableContainerState.isConstantSize());
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.PARTIAL_COMPLETE,
-            method = "setVariablePadding",
-            args = {boolean.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.PARTIAL_COMPLETE,
-            notes = "Dynamically changing a child's padding does not change this value",
-            method = "getConstantPadding",
-            args = {}
-        )
-    })
     public void testAccessConstantPadding() {
         mDrawableContainerState.setVariablePadding(true);
         assertNull(mDrawableContainerState.getConstantPadding());
@@ -213,32 +157,6 @@ public class DrawableContainerStateTest extends TestCase{
         */
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Dynamically changing a child's height does not change this value",
-            method = "getConstantHeight",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Dynamically changing a child's width does not change this value",
-            method = "getConstantWidth",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Dynamically changing a child's minimum height does not change this value",
-            method = "getConstantMinimumHeight",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Dynamically changing a child's minimum width does not change this value",
-            method = "getConstantMinimumWidth",
-            args = {}
-        )
-    })
     public void testConstantHeightsAndWidths() {
         assertEquals(0, mDrawableContainerState.getChildCount());
         assertEquals(-1, mDrawableContainerState.getConstantHeight());
@@ -283,12 +201,6 @@ public class DrawableContainerStateTest extends TestCase{
         assertEquals(5, mDrawableContainerState.getConstantMinimumWidth());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Dynamically changing a child's opacity does not change this value",
-        method = "getOpacity",
-        args = {}
-    )
     public void testGetOpacity() {
         assertEquals(0, mDrawableContainerState.getChildCount());
         assertEquals(PixelFormat.TRANSPARENT, mDrawableContainerState.getOpacity());
@@ -324,36 +236,12 @@ public class DrawableContainerStateTest extends TestCase{
         assertEquals(PixelFormat.UNKNOWN, mDrawableContainerState.getOpacity());
     }
 
-    @TestTargetNew(
-        level = TestLevel.NOT_FEASIBLE,
-        method = "canConstantState",
-        args = {}
-    )
-    @ToBeFixed(bug = "", explanation = "This method is not final. It is not guaranteed that the "
-            + "subclass has exactly the same behavior as super class. Can not use the object of "
-            + "subclass of DrawableContainerState to test.")
     public void testCanConstantState(){
     }
 
-    @TestTargetNew(
-        level = TestLevel.NOT_FEASIBLE,
-        method = "getChangingConfigurations",
-        args = {}
-    )
-    @ToBeFixed(bug = "", explanation = "This method is not final. It is not guaranteed that the "
-            + "subclass has exactly the same behavior as super class. Can not use the object of "
-            + "subclass of DrawableContainerState to test.")
     public void testGetChangingConfigurations(){
     }
 
-    @TestTargetNew(
-        level = TestLevel.NOT_FEASIBLE,
-        method = "growArray",
-        args = {int.class, int.class}
-    )
-    @ToBeFixed(bug = "", explanation = "This method is not final. It is not guaranteed that the "
-            + "subclass has exactly the same behavior as super class. Can not use the object of "
-            + "subclass of DrawableContainerState to test.")
     public void testGrowArray(){
     }
 

@@ -16,10 +16,6 @@
 
 package android.text.style.cts;
 
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.ToBeFixed;
 
 import android.graphics.Color;
 import android.text.TextPaint;
@@ -28,16 +24,7 @@ import android.view.View;
 
 import junit.framework.TestCase;
 
-@TestTargetClass(ClickableSpan.class)
 public class ClickableSpanTest extends TestCase {
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test {@link ClickableSpan#updateDrawState(TextPaint)}",
-        method = "updateDrawState",
-        args = {android.text.TextPaint.class}
-    )
-    @ToBeFixed(bug = "1695243", explanation = "should add @throws clause into javadoc of " +
-            "ClickableSpan#updateDrawState(TextPaint) when the input TextPaint is null")
     public void testUpdateDrawState() {
         ClickableSpan clickableSpan = new MyClickableSpan();
 

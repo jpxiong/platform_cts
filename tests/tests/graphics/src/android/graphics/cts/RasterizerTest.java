@@ -16,30 +16,11 @@
 
 package android.graphics.cts;
 
-import dalvik.annotation.TestTargets;
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargetClass;
 import android.graphics.Rasterizer;
 import android.test.AndroidTestCase;
 
-@TestTargetClass(Rasterizer.class)
 public class RasterizerTest extends AndroidTestCase {
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test finalize function",
-            method = "finalize",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test finalize function",
-            method = "Rasterizer",
-            args = {}
-        )
-    })
     public void testFinalize() {
         MockRasterizer mr = new MockRasterizer();
         try {

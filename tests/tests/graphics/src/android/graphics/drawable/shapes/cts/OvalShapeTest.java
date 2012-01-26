@@ -16,9 +16,6 @@
 
 package android.graphics.drawable.shapes.cts;
 
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
 
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
@@ -29,7 +26,6 @@ import android.graphics.drawable.shapes.OvalShape;
 
 import junit.framework.TestCase;
 
-@TestTargetClass(android.graphics.drawable.shapes.OvalShape.class)
 public class OvalShapeTest extends TestCase {
     private static final int TEST_WIDTH  = 100;
     private static final int TEST_HEIGHT = 200;
@@ -39,20 +35,10 @@ public class OvalShapeTest extends TestCase {
 
     private static final int TOLERANCE = 4; // tolerance in pixels
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "OvalShape",
-        args = {}
-    )
     public void testConstructor() {
         new OvalShape();
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "draw",
-        args = {android.graphics.Canvas.class, android.graphics.Paint.class}
-    )
     public void testDraw() {
         OvalShape ovalShape = new OvalShape();
         Bitmap bitmap = Bitmap.createBitmap(TEST_WIDTH, TEST_HEIGHT, Config.ARGB_8888);

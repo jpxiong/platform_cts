@@ -21,25 +21,8 @@ import java.io.IOException;
 import android.os.ParcelFileDescriptor;
 import android.os.ParcelFileDescriptor.AutoCloseInputStream;
 import android.test.AndroidTestCase;
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
 
-@TestTargetClass(ParcelFileDescriptor.AutoCloseInputStream.class)
 public class ParcelFileDescriptor_AutoCloseInputStreamTest extends AndroidTestCase {
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "AutoCloseInputStream",
-            args = {android.os.ParcelFileDescriptor.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "close",
-            args = {}
-        )
-    })
     public void testAutoCloseInputStream() throws Exception {
         ParcelFileDescriptor pf = ParcelFileDescriptorTest.makeParcelFileDescriptor(getContext());
 

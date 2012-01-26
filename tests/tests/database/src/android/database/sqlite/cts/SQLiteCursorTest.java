@@ -16,11 +16,6 @@
 
 package android.database.sqlite.cts;
 
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
-import dalvik.annotation.ToBeFixed;
 
 import android.content.Context;
 import android.database.AbstractCursor;
@@ -38,7 +33,6 @@ import java.util.Arrays;
 /**
  * Test {@link AbstractCursor}.
  */
-@TestTargetClass(SQLiteCursor.class)
 public class SQLiteCursorTest extends AndroidTestCase {
     private SQLiteDatabase mDatabase;
     private static final String[] COLUMNS = new String[] { "_id", "number_1", "number_2" };
@@ -65,16 +59,6 @@ public class SQLiteCursorTest extends AndroidTestCase {
         super.tearDown();
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "SQLiteCursor",
-        args = {android.database.sqlite.SQLiteDatabase.class,
-                android.database.sqlite.SQLiteCursorDriver.class, java.lang.String.class,
-                android.database.sqlite.SQLiteQuery.class}
-    )
-    @ToBeFixed(bug = "1686574", explanation = "can not get an instance of SQLiteQuery" +
-            " or construct it directly for testing, and if SQLiteQuery is null, SQLiteCursor" +
-            " constructor should throw NullPointerException")
     public void testConstructor() {
         SQLiteDirectCursorDriver cursorDriver = new SQLiteDirectCursorDriver(mDatabase,
                 TEST_SQL, TABLE_NAME);
@@ -89,18 +73,6 @@ public class SQLiteCursorTest extends AndroidTestCase {
         assertNotNull(cursor);
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "close",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "requery",
-            args = {}
-        )
-    })
     public void testClose() {
         SQLiteCursor cursor = getCursor();
         assertTrue(cursor.moveToFirst());
@@ -116,23 +88,6 @@ public class SQLiteCursorTest extends AndroidTestCase {
         assertTrue(cursor.isClosed());
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "deactivate",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setWindow",
-            args = {android.database.CursorWindow.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "registerDataSetObserver",
-            args = {android.database.DataSetObserver.class}
-        )
-    })
     public void testRegisterDataSetObserver() {
         SQLiteCursor cursor = getCursor();
         MockCursorWindow cursorWindow = new MockCursorWindow(false);
@@ -184,18 +139,6 @@ public class SQLiteCursorTest extends AndroidTestCase {
         assertFalse(observer.hasInvalidated());
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "requery",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getCount",
-            args = {}
-        )
-    })
     public void testRequery() {
         final String DELETE = "DELETE FROM " + TABLE_NAME + " WHERE number_1 =";
         final String DELETE_1 = DELETE + "1;";
@@ -219,13 +162,6 @@ public class SQLiteCursorTest extends AndroidTestCase {
         assertTrue(observer.hasChanged());
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "requery",
-            args = {}
-        )
-    })
     public void testRequery2() {
         mDatabase.disableWriteAheadLogging();
         mDatabase.execSQL("create table testRequery2 (i int);");
@@ -252,18 +188,6 @@ public class SQLiteCursorTest extends AndroidTestCase {
         assertFalse(c.requery());
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getColumnIndex",
-            args = {java.lang.String.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getColumnNames",
-            args = {}
-        )
-    })
     public void testGetColumnIndex() {
         SQLiteCursor cursor = getCursor();
 
@@ -274,11 +198,6 @@ public class SQLiteCursorTest extends AndroidTestCase {
         assertTrue(Arrays.equals(COLUMNS, cursor.getColumnNames()));
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "setSelectionArguments",
-        args = {java.lang.String[].class}
-    )
     public void testSetSelectionArguments() {
         final String SELECTION = "_id > ?";
         int TEST_ARG1 = 2;
@@ -291,11 +210,6 @@ public class SQLiteCursorTest extends AndroidTestCase {
         assertEquals(TEST_COUNT - TEST_ARG2, cursor.getCount());
     }
 
-    @TestTargetNew(
-        level = TestLevel.NOT_NECESSARY,
-        method = "onMove",
-        args = {int.class, int.class}
-    )
     public void testOnMove() {
         // Do not test this API. It is callback which:
         // 1. The callback mechanism has been tested in super class

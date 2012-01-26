@@ -18,11 +18,6 @@ package android.text.style.cts;
 
 import com.android.cts.stub.R;
 
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
-import dalvik.annotation.ToBeFixed;
 
 import android.graphics.Canvas;
 import android.graphics.Rect;
@@ -31,29 +26,7 @@ import android.graphics.drawable.Drawable;
 import android.test.AndroidTestCase;
 import android.text.style.DynamicDrawableSpan;
 
-@TestTargetClass(DynamicDrawableSpan.class)
 public class DynamicDrawableSpanTest extends AndroidTestCase {
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test constructor(s) of DynamicDrawableSpan.",
-            method = "DynamicDrawableSpan",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test constructor(s) of DynamicDrawableSpan.",
-            method = "DynamicDrawableSpan",
-            args = {int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test getVerticalAlignment().",
-            method = "getVerticalAlignment",
-            args = {}
-        )
-    })
-    @ToBeFixed(bug = "1695243", explanation = "miss javadoc for constructor DynamicDrawableSpan()")
     public void testConstructor() {
         DynamicDrawableSpan d = new MyDynamicDrawableSpan();
         assertEquals(DynamicDrawableSpan.ALIGN_BOTTOM, d.getVerticalAlignment());
@@ -65,16 +38,6 @@ public class DynamicDrawableSpanTest extends AndroidTestCase {
         assertEquals(DynamicDrawableSpan.ALIGN_BOTTOM, d.getVerticalAlignment());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test getSize(Paint paint, CharSequence text, int start, int end," +
-                " FontMetricsInt fm). And the following parameters are never used in" +
-                " this method: paint, text, start, end",
-        method = "getSize",
-        args = {android.graphics.Paint.class, java.lang.CharSequence.class, int.class,
-                int.class, android.graphics.Paint.FontMetricsInt.class}
-    )
-    @ToBeFixed(bug = "1695243", explanation = "miss javadoc")
     public void testGetSize() {
         DynamicDrawableSpan dynamicDrawableSpan = new MyDynamicDrawableSpan();
         FontMetricsInt fm = new FontMetricsInt();
@@ -97,16 +60,6 @@ public class DynamicDrawableSpanTest extends AndroidTestCase {
         assertEquals(rect.right, dynamicDrawableSpan.getSize(null, null, 0, 0, null));
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test draw(Canvas canvas, CharSequence text, int start, int end, float x," +
-                " int top, int y, int bottom, Paint paint). And the following parameters are" +
-                " never used in this method: text, start, end, top, y, paint",
-        method = "draw",
-        args = {android.graphics.Canvas.class, java.lang.CharSequence.class, int.class, int.class,
-                float.class, int.class, int.class, int.class, android.graphics.Paint.class}
-    )
-    @ToBeFixed(bug = "1695243", explanation = "miss javadoc")
     public void testDraw() {
         DynamicDrawableSpan dynamicDrawableSpan = new MyDynamicDrawableSpan();
         Canvas canvas = new Canvas();

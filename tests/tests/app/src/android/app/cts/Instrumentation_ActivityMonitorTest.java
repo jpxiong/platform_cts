@@ -24,12 +24,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.test.InstrumentationTestCase;
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
 
-@TestTargetClass(Instrumentation.ActivityMonitor.class)
 public class Instrumentation_ActivityMonitorTest extends InstrumentationTestCase {
 
     private static final long WAIT_TIMEOUT = 100;
@@ -40,53 +35,6 @@ public class Instrumentation_ActivityMonitorTest extends InstrumentationTestCase
      * 2 waitForActivity with timeout and no timeout
      * 3 get info about ActivityMonitor
      */
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "Instrumentation.ActivityMonitor",
-            args = {IntentFilter.class, ActivityResult.class, boolean.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "Instrumentation.ActivityMonitor",
-            args = {String.class, ActivityResult.class, boolean.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getFilter",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getResult",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "isBlocking",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "waitForActivity",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getHits",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getLastActivity",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "waitForActivityWithTimeout",
-            args = {long.class}
-        )
-    })
     public void testActivityMonitor() throws Exception {
         ActivityResult result = new ActivityResult(Activity.RESULT_OK, new Intent());
         Instrumentation instrumentation = getInstrumentation();

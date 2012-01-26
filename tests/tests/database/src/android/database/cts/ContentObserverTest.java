@@ -16,11 +16,6 @@
 
 package android.database.cts;
 
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
-import dalvik.annotation.ToBeFixed;
 
 import android.database.ContentObserver;
 import android.net.Uri;
@@ -29,27 +24,9 @@ import android.os.HandlerThread;
 import android.os.Looper;
 import android.test.InstrumentationTestCase;
 
-@TestTargetClass(ContentObserver.class)
 public class ContentObserverTest extends InstrumentationTestCase {
     private static final Uri CONTENT_URI = Uri.parse("content://uri");
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "ContentObserver",
-            args = {android.os.Handler.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "dispatchChange",
-            args = {boolean.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "onChange",
-            args = {boolean.class}
-        )
-    })
     public void testContentObserver() throws InterruptedException {
         // Test constructor with null handler, dispatchChange will directly invoke onChange.
         MyContentObserver contentObserver;
@@ -138,11 +115,6 @@ public class ContentObserverTest extends InstrumentationTestCase {
         looper.quit();
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "deliverSelfNotifications",
-        args = {}
-    )
     public void testDeliverSelfNotifications() {
         MyContentObserver contentObserver = new MyContentObserver(null);
         assertFalse(contentObserver.deliverSelfNotifications());

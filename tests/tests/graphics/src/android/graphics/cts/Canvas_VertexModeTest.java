@@ -21,32 +21,15 @@ import android.graphics.Paint;
 import android.graphics.Bitmap.Config;
 import android.graphics.Canvas.VertexMode;
 import android.test.AndroidTestCase;
-import dalvik.annotation.TestTargets;
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargetClass;
 
-@TestTargetClass(Canvas.VertexMode.class)
 public class Canvas_VertexModeTest extends AndroidTestCase {
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "valueOf",
-        args = {java.lang.String.class}
-    )
     public void testValueOf(){
         assertEquals(VertexMode.TRIANGLES, VertexMode.valueOf("TRIANGLES"));
         assertEquals(VertexMode.TRIANGLE_STRIP, VertexMode.valueOf("TRIANGLE_STRIP"));
         assertEquals(VertexMode.TRIANGLE_FAN, VertexMode.valueOf("TRIANGLE_FAN"));
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "values",
-            args = {}
-        )
-    })
     public void testValues(){
         VertexMode[] verMode = VertexMode.values();
 

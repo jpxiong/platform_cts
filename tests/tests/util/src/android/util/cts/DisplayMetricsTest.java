@@ -20,12 +20,7 @@ import android.test.AndroidTestCase;
 import android.util.DisplayMetrics;
 import android.view.Display;
 import android.view.WindowManager;
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
 
-@TestTargetClass(DisplayMetrics.class)
 public class DisplayMetricsTest extends AndroidTestCase {
     private Display initDisplay() {
         WindowManager windowManager = (WindowManager) getContext()
@@ -36,26 +31,6 @@ public class DisplayMetricsTest extends AndroidTestCase {
         return display;
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test constructor(s) of {@link DisplayMetrics}",
-            method = "DisplayMetrics",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test method: setTo",
-            method = "setTo",
-            args = {DisplayMetrics.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test method: setToDefaults",
-            method = "setToDefaults",
-            args = {}
-        )
-    })
     public void testDisplayMetricsOp() {
         DisplayMetrics outMetrics = new DisplayMetrics();
         outMetrics.setToDefaults();

@@ -22,12 +22,7 @@ import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
 import android.os.Parcel;
 import android.test.AndroidTestCase;
-import dalvik.annotation.TestTargets;
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargetClass;
 
-@TestTargetClass(Configuration.class)
 public class ConfigurationTest extends AndroidTestCase {
 
     private Configuration mConfigDefault;
@@ -52,28 +47,11 @@ public class ConfigurationTest extends AndroidTestCase {
         mConfig.orientation = Configuration.ORIENTATION_PORTRAIT;
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "Configuration",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "Configuration",
-            args = {android.content.res.Configuration.class}
-        )
-    })
     public void testConstructor() {
         new Configuration();
         new Configuration(mConfigDefault);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "compareTo",
-        args = {android.content.res.Configuration.class}
-    )
     public void testCompareTo() {
         final Configuration cfg1 = new Configuration();
         final Configuration cfg2 = new Configuration();
@@ -157,11 +135,6 @@ public class ConfigurationTest extends AndroidTestCase {
         assertEquals(1, cfg1.compareTo(cfg2));
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "describeContents",
-        args = {}
-    )
     public void testDescribeContents() {
         assertEquals(0, mConfigDefault.describeContents());
     }
@@ -173,11 +146,6 @@ public class ConfigurationTest extends AndroidTestCase {
         assertEquals(0, tmpc1.diff(c2));
     }
     
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "diff",
-        args = {android.content.res.Configuration.class}
-    )
     public void testDiff() {
         Configuration config = new Configuration();
         config.mcc = 1;
@@ -277,44 +245,15 @@ public class ConfigurationTest extends AndroidTestCase {
                 | ActivityInfo.CONFIG_FONT_SCALE, mConfigDefault, config);
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "equals",
-            args = {android.content.res.Configuration.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "equals",
-            args = {java.lang.Object.class}
-        )
-    })
     public void testEquals() {
         assertFalse(mConfigDefault.equals(mConfig));
         assertFalse(mConfigDefault.equals(new Object()));
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "hashCode",
-        args = {}
-    )
     public void testHashCode() {
         assertFalse(mConfigDefault.hashCode() == mConfig.hashCode());
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "needNewResources",
-            args = {int.class, int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "updateFrom",
-            args = {android.content.res.Configuration.class}
-        )
-    })
     public void testNeedNewResources() {
         assertTrue(Configuration.needNewResources(ActivityInfo.CONFIG_MCC,
                 ActivityInfo.CONFIG_MCC));
@@ -325,11 +264,6 @@ public class ConfigurationTest extends AndroidTestCase {
                 ActivityInfo.CONFIG_MCC));
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "setToDefaults",
-        args = {}
-    )
     public void testSetToDefaults() {
         final Configuration temp = new Configuration(mConfig);
         assertFalse(temp.equals(mConfigDefault));
@@ -337,20 +271,10 @@ public class ConfigurationTest extends AndroidTestCase {
         assertTrue(temp.equals(mConfigDefault));
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "toString",
-        args = {}
-    )
     public void testToString() {
         assertNotNull(mConfigDefault.toString());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "writeToParcel",
-        args = {android.os.Parcel.class, int.class}
-    )
     public void testWriteToParcel() {
         assertWriteToParcel(createConfig(null), Parcel.obtain());
         assertWriteToParcel(createConfig(Locale.JAPAN), Parcel.obtain());

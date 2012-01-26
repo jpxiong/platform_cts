@@ -19,10 +19,6 @@ package android.widget.cts;
 import com.android.cts.stub.R;
 import com.android.internal.util.XmlUtils;
 
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
 
 import org.xmlpull.v1.XmlPullParserException;
 
@@ -34,40 +30,7 @@ import android.widget.LinearLayout;
 
 import java.io.IOException;
 
-@TestTargetClass(LinearLayout.LayoutParams.class)
 public class LinearLayout_LayoutParamsTest extends AndroidTestCase {
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test constructors",
-            method = "LinearLayout.LayoutParams",
-            args = {android.content.Context.class, android.util.AttributeSet.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test constructors",
-            method = "LinearLayout.LayoutParams",
-            args = {int.class, int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test constructors",
-            method = "LinearLayout.LayoutParams",
-            args = {android.view.ViewGroup.LayoutParams.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test constructors",
-            method = "LinearLayout.LayoutParams",
-            args = {int.class, int.class, float.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test constructors",
-            method = "LinearLayout.LayoutParams",
-            args = {android.view.ViewGroup.MarginLayoutParams.class}
-        )
-    })
     public void testConstructor() throws XmlPullParserException, IOException {
         XmlResourceParser p = mContext.getResources().getLayout(R.layout.linearlayout_layout);
 
@@ -85,11 +48,6 @@ public class LinearLayout_LayoutParamsTest extends AndroidTestCase {
         new LinearLayout.LayoutParams(marginLayoutParams);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "debug",
-        args = {java.lang.String.class}
-    )
     public void testDebug() {
         LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(320, 240);
         assertNotNull(layoutParams.debug("test: "));

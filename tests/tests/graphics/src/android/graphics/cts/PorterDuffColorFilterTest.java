@@ -23,20 +23,11 @@ import android.graphics.PorterDuff;
 import android.graphics.PorterDuffColorFilter;
 import android.graphics.Bitmap.Config;
 import android.test.AndroidTestCase;
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
 
-@TestTargetClass(PorterDuffColorFilter.class)
 public class PorterDuffColorFilterTest extends AndroidTestCase {
 
     private static final int TOLERANCE = 5;
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "PorterDuffColorFilter",
-        args = {int.class, PorterDuff.Mode.class}
-    )
     public void testPorterDuffColorFilter() {
         int width = 100;
         int height = 100;

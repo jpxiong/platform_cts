@@ -18,11 +18,6 @@ package android.widget.cts;
 
 import com.android.cts.stub.R;
 
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
-import dalvik.annotation.ToBeFixed;
 
 import org.xmlpull.v1.XmlPullParser;
 
@@ -42,7 +37,6 @@ import android.widget.MultiAutoCompleteTextView;
 import android.widget.MultiAutoCompleteTextView.CommaTokenizer;
 import android.widget.MultiAutoCompleteTextView.Tokenizer;
 
-@TestTargetClass(MultiAutoCompleteTextView.class)
 public class MultiAutoCompleteTextViewTest extends ActivityInstrumentationTestCase2
         <MultiAutoCompleteTextViewStubActivity> {
     private MultiAutoCompleteTextView mMultiAutoCompleteTextView_country;
@@ -65,24 +59,6 @@ public class MultiAutoCompleteTextViewTest extends ActivityInstrumentationTestCa
                 .findViewById(R.id.name_edit);
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "MultiAutoCompleteTextView",
-            args = {android.content.Context.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "MultiAutoCompleteTextView",
-            args = {android.content.Context.class, android.util.AttributeSet.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "MultiAutoCompleteTextView",
-            args = {android.content.Context.class, android.util.AttributeSet.class, int.class}
-        )
-    })
-    @ToBeFixed(bug = "1695243", explanation = "Android API javadocs are incomplete")
     public void testConstructor() {
         XmlPullParser parser = mActivity.getResources()
                 .getXml(R.layout.multi_auto_complete_text_view_layout);
@@ -120,26 +96,7 @@ public class MultiAutoCompleteTextViewTest extends ActivityInstrumentationTestCa
         m.setSelection(0, c.length());
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setTokenizer",
-            args = {Tokenizer.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "enoughToFilter",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.NOT_FEASIBLE,
-            method = "performValidation",
-            args = {}
-        )
-    })
     @UiThreadTest
-    @ToBeFixed(bug = "", explanation = "There will be an endless loop when call performValidation" +
-            " if using CommaTokenizer as the Tokenizer.")
     public void testMultiAutoCompleteTextView() {
         mMultiAutoCompleteTextView_country.setTokenizer(new CommaTokenizer());
         mMultiAutoCompleteTextView_name.setTokenizer(new CommaTokenizer());
@@ -177,11 +134,6 @@ public class MultiAutoCompleteTextViewTest extends ActivityInstrumentationTestCa
         mMultiAutoCompleteTextView_name.setValidator(null);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "performValidation",
-        args = {}
-    )
     @UiThreadTest
     public void testPerformValidation() {
         MockValidator v = new MockValidator();
@@ -199,20 +151,6 @@ public class MultiAutoCompleteTextViewTest extends ActivityInstrumentationTestCa
         assertEquals(str + ", ", mMultiAutoCompleteTextView_country.getText().toString());
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "performFiltering",
-            args = {java.lang.CharSequence.class, int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "performFiltering",
-            args = {java.lang.CharSequence.class, int.class, int.class, int.class}
-        )
-    })
-    @ToBeFixed(bug = "1400249", explanation = "it's hard to do unit test, should be tested by" +
-               " functional test.")
     public void testPerformFiltering() {
         MyMultiAutoCompleteTextView multiAutoCompleteTextView =
             new MyMultiAutoCompleteTextView(mActivity);
@@ -237,11 +175,6 @@ public class MultiAutoCompleteTextViewTest extends ActivityInstrumentationTestCa
         assertNotNull(multiAutoCompleteTextView.getFilter());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "replaceText",
-        args = {java.lang.CharSequence.class}
-    )
     public void testReplaceText() {
         MyMultiAutoCompleteTextView multiAutoCompleteTextView =
             new MyMultiAutoCompleteTextView(mActivity);

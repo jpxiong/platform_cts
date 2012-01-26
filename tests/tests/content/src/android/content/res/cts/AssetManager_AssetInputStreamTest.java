@@ -19,12 +19,7 @@ import java.io.IOException;
 
 import android.content.res.AssetManager;
 import android.test.AndroidTestCase;
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
 
-@TestTargetClass(AssetManager.AssetInputStream.class)
 public class AssetManager_AssetInputStreamTest extends AndroidTestCase {
     private AssetManager.AssetInputStream mAssetInputStream;
     private final String CONTENT_STRING = "OneTwoThreeFourFiveSixSevenEightNineTen";
@@ -35,12 +30,6 @@ public class AssetManager_AssetInputStreamTest extends AndroidTestCase {
         mAssetInputStream = (AssetManager.AssetInputStream)mContext.getAssets().open("text.txt");
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "",
-        method = "close",
-        args = {}
-    )
     public void testClose() throws IOException {
         mAssetInputStream.close();
 
@@ -52,37 +41,11 @@ public class AssetManager_AssetInputStreamTest extends AndroidTestCase {
         }
     }
 
-    @TestTargetNew(
-        level = TestLevel.NOT_FEASIBLE,
-        notes = "",
-        method = "getAssetInt",
-        args = {}
-    )
     public void testGetAssetInt() {
         // the return value of getAssetInt is a random number
         mAssetInputStream.getAssetInt();
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "",
-            method = "mark",
-            args = {int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "",
-            method = "reset",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "",
-            method = "markSupported",
-            args = {}
-        )
-    })
     public void testMarkReset() throws IOException {
         assertTrue(mAssetInputStream.markSupported());
         final int readlimit = 10;
@@ -97,44 +60,6 @@ public class AssetManager_AssetInputStreamTest extends AndroidTestCase {
         }
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "",
-            method = "read",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test read method.",
-            method = "read",
-            args = {byte[].class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "",
-            method = "read",
-            args = {byte[].class, int.class, int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "",
-            method = "skip",
-            args = {long.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "",
-            method = "available",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "",
-            method = "reset",
-            args = {}
-        )
-    })
     public void testReadMethods() throws IOException {
         // test available()
         final byte[] bytes = CONTENT_STRING.getBytes();

@@ -16,10 +16,6 @@
 
 package android.media.cts;
 
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
 
 import android.content.Context;
 import android.media.AudioManager;
@@ -28,7 +24,6 @@ import android.media.RingtoneManager;
 import android.provider.Settings;
 import android.test.AndroidTestCase;
 
-@TestTargetClass(Ringtone.class)
 public class RingtoneTest extends AndroidTestCase {
 
     private Context mContext;
@@ -71,38 +66,6 @@ public class RingtoneTest extends AndroidTestCase {
         super.tearDown();
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "isPlaying",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "play",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "stop",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setStreamType",
-            args = {int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getStreamType",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getTitle",
-            args = {Context.class}
-        )
-    })
     public void testRingtone() {
 
         assertNotNull(mRingtone.getTitle(mContext));

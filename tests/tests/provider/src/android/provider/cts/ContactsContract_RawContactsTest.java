@@ -16,9 +16,6 @@
 
 package android.provider.cts;
 
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
 
 import android.content.ContentResolver;
 import android.content.IContentProvider;
@@ -30,7 +27,6 @@ import android.provider.cts.ContactsContract_TestDataBuilder.TestContact;
 import android.provider.cts.ContactsContract_TestDataBuilder.TestRawContact;
 import android.test.InstrumentationTestCase;
 
-@TestTargetClass(ContactsContract.RawContacts.class)
 public class ContactsContract_RawContactsTest extends InstrumentationTestCase {
     private ContentResolver mResolver;
     private ContactsContract_TestDataBuilder mBuilder;
@@ -49,13 +45,6 @@ public class ContactsContract_RawContactsTest extends InstrumentationTestCase {
         mBuilder.cleanup();
     }
 
-    @TestTargetNew(
-            level = TestLevel.PARTIAL_COMPLETE,
-            notes = "Test RawContacts#getContactLookupUri(ContentResolver resolver, Uri " +
-                    "rawContactUri) using source id",
-            method = "RawContacts#getContactLookupUri",
-            args = {android.content.ContentResolver.class, Uri.class}
-    )
     public void testGetLookupUriBySourceId() throws Exception {
         TestRawContact rawContact = mBuilder.newRawContact()
                 .with(RawContacts.ACCOUNT_TYPE, "test_type")
@@ -77,13 +66,6 @@ public class ContactsContract_RawContactsTest extends InstrumentationTestCase {
                 lookupContact.getId(), rawContact.load().getContactId());
     }
 
-    @TestTargetNew(
-            level = TestLevel.PARTIAL_COMPLETE,
-            notes = "Test RawContacts#getContactLookupUri(ContentResolver resolver, Uri " +
-                    "rawContactUri) using display name",
-            method = "RawContacts#getContactLookupUri",
-            args = {android.content.ContentResolver.class, Uri.class}
-    )
     public void testGetLookupUriByDisplayName() throws Exception {
         TestRawContact rawContact = mBuilder.newRawContact()
                 .with(RawContacts.ACCOUNT_TYPE, "test_type")

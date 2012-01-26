@@ -18,27 +18,10 @@ package android.content.res.cts;
 
 import android.content.res.Resources;
 import android.content.res.Resources.NotFoundException;
-import dalvik.annotation.TestTargets;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
 import junit.framework.TestCase;
 
-@TestTargetClass(Resources.NotFoundException.class)
 public class Resources_NotFoundExceptionTest extends TestCase {
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "Resources.NotFoundException",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "Resources.NotFoundException",
-            args = {java.lang.String.class}
-        )
-    })
     public void testNotFoundException() {
         NotFoundException ne = null;
         boolean isThrowed = false;

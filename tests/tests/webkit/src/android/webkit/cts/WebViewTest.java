@@ -58,11 +58,6 @@ import android.webkit.cts.WebViewOnUiThread.WaitForLoadedClient;
 import android.webkit.cts.WebViewOnUiThread.WaitForProgressClient;
 import android.widget.LinearLayout;
 
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
-import dalvik.annotation.ToBeFixed;
 
 import junit.framework.Assert;
 
@@ -70,7 +65,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.util.Date;
 
-@TestTargetClass(android.webkit.WebView.class)
 public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubActivity> {
     private static final String LOGTAG = "WebViewTest";
     private static final int INITIAL_PROGRESS = 100;
@@ -110,23 +104,6 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
         mWebServer = new CtsTestServer(getActivity(), secure);
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "WebView",
-            args = {Context.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "WebView",
-            args = {Context.class, AttributeSet.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "WebView",
-            args = {Context.class, AttributeSet.class, int.class}
-        )
-    })
     @UiThreadTest
     public void testConstructor() {
         new WebView(getActivity());
@@ -134,11 +111,6 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
         new WebView(getActivity(), null, 0);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "findAddress",
-        args = {String.class}
-    )
     @UiThreadTest
     public void testFindAddress() {
         /*
@@ -165,18 +137,6 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
         assertNull(WebView.findAddress("455 LARKSPUR DR"));
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.SUFFICIENT,
-            method = "getZoomControls",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getSettings",
-            args = {}
-        )
-    })
     @SuppressWarnings("deprecation")
     @UiThreadTest
     public void testGetZoomControls() {
@@ -191,12 +151,6 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
          assertNull(mWebView.getZoomControls());
     }
 
-    @TestTargetNew(
-        level = TestLevel.SUFFICIENT,
-        method = "invokeZoomPicker",
-        args = {},
-        notes = "Cannot test the effect of this method"
-    )
     @UiThreadTest
     public void testInvokeZoomPicker() throws Exception {
         WebSettings settings = mWebView.getSettings();
@@ -207,28 +161,6 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
         mWebView.invokeZoomPicker();
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "zoomIn",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "zoomOut",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getScale",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getSettings",
-            args = {}
-        )
-    })
     @UiThreadTest
     public void testZoom() {
         WebSettings settings = mWebView.getSettings();
@@ -291,23 +223,6 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
         assertEquals(currScale, previousScale);
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setScrollBarStyle",
-            args = {int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "overlayHorizontalScrollbar",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "overlayVerticalScrollbar",
-            args = {}
-        )
-    })
     @UiThreadTest
     public void testSetScrollBarStyle() {
         mWebView.setScrollBarStyle(View.SCROLLBARS_INSIDE_INSET);
@@ -327,28 +242,6 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
         assertTrue(mWebView.overlayVerticalScrollbar());
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setHorizontalScrollbarOverlay",
-            args = {boolean.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setVerticalScrollbarOverlay",
-            args = {boolean.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "overlayHorizontalScrollbar",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "overlayVerticalScrollbar",
-            args = {}
-        )
-    })
     @UiThreadTest
     public void testScrollBarOverlay() throws Throwable {
         mWebView.setHorizontalScrollbarOverlay(true);
@@ -362,28 +255,6 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
         assertTrue(mWebView.overlayVerticalScrollbar());
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "loadUrl",
-            args = {String.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getUrl",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getOriginalUrl",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getProgress",
-            args = {}
-        )
-    })
     @UiThreadTest
     public void testLoadUrl() throws Exception {
         assertNull(mWebView.getUrl());
@@ -399,18 +270,6 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
         assertEquals(TestHtmlConstants.HELLO_WORLD_TITLE, mWebView.getTitle());
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getUrl",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getOriginalUrl",
-            args = {}
-        )
-    })
     @UiThreadTest
     public void testGetOriginalUrl() throws Throwable {
         startWebServer(false);
@@ -432,11 +291,6 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
         assertEquals(redirectUrl, mWebView.getOriginalUrl());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "stopLoading",
-        args = {}
-    )
     @UiThreadTest
     public void testStopLoading() throws Exception {
         assertNull(mWebView.getUrl());
@@ -455,38 +309,6 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
         assertNull(mWebView.getUrl());
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "canGoBack",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "canGoForward",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "canGoBackOrForward",
-            args = {int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "goBack",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "goForward",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "goBackOrForward",
-            args = {int.class}
-        )
-    })
     @UiThreadTest
     public void testGoBackAndForward() throws Exception {
         assertGoBackOrForwardBySteps(false, -1);
@@ -533,11 +355,6 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
         assertGoBackOrForwardBySteps(false, 1);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "addJavascriptInterface",
-        args = {Object.class, String.class}
-    )
     @UiThreadTest
     public void testAddJavascriptInterface() throws Exception {
         WebSettings settings = mWebView.getSettings();
@@ -583,11 +400,6 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
         assertEquals("Original title", obj.waitForResult());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "addJavascriptInterface",
-        args = {Object.class, String.class}
-    )
     @UiThreadTest
     public void testAddJavascriptInterfaceNullObject() throws Exception {
         WebSettings settings = mWebView.getSettings();
@@ -620,11 +432,6 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
         assertEquals("object", mWebView.getTitle());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "removeJavascriptInterface",
-        args = {String.class}
-    )
     @UiThreadTest
     public void testRemoveJavascriptInterface() throws Exception {
         WebSettings settings = mWebView.getSettings();
@@ -645,11 +452,6 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
         assertEquals("undefined", mWebView.getTitle());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "removeJavascriptInterface",
-        args = {String.class}
-    )
     public void testUseRemovedJavascriptInterface() throws Throwable {
         class RemovedObject {
             @Override
@@ -693,23 +495,6 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
         assertEquals("removedObject", resultObject.getResult());
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setBackgroundColor",
-            args = {int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "capturePicture",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "reload",
-            args = {}
-        )
-    })
     public void testCapturePicture() throws Exception, Throwable {
         startWebServer(false);
         final String url = mWebServer.getAssetUrl(TestHtmlConstants.BLANK_PAGE_URL);
@@ -757,11 +542,6 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
         });
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "setPictureListener",
-        args = {PictureListener.class}
-    )
     public void testSetPictureListener() throws Exception, Throwable {
         final class MyPictureListener implements PictureListener {
             public int callCount;
@@ -804,24 +584,6 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
         }.run();
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "savePicture",
-            args = {Bundle.class, File.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.SUFFICIENT,
-            notes = "Cannot test whether picture has been restored correctly.",
-            method = "restorePicture",
-            args = {Bundle.class, File.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "reload",
-            args = {}
-        )
-    })
     public void testSaveAndRestorePicture() throws Throwable {
         mWebView.setBackgroundColor(Color.CYAN);
         startWebServer(false);
@@ -882,18 +644,6 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
         }
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setHttpAuthUsernamePassword",
-            args = {String.class, String.class, String.class, String.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getHttpAuthUsernamePassword",
-            args = {String.class, String.class}
-        )
-    })
     @UiThreadTest
     public void testAccessHttpAuthUsernamePassword() {
         try {
@@ -956,11 +706,6 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
         }
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "savePassword",
-        args = {String.class, String.class, String.class}
-    )
     @UiThreadTest
     public void testSavePassword() {
         WebViewDatabase db = WebViewDatabase.getInstance(getActivity());
@@ -978,28 +723,6 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
         }
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "loadData",
-            args = {String.class, String.class, String.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getTitle",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "capturePicture",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "capturePicture",
-            args = {}
-        )
-    })
     public void testLoadData() throws Throwable {
         final String HTML_CONTENT =
                 "<html><head><title>Hello,World!</title></head><body></body>" +
@@ -1054,23 +777,6 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
         assertEquals(ConsoleMessage.MessageLevel.ERROR, webChromeClient.getMessageLevel());
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "loadDataWithBaseURL",
-            args = {String.class, String.class, String.class, String.class, String.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getTitle",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getUrl",
-            args = {}
-        )
-    })
     @UiThreadTest
     public void testLoadDataWithBaseUrl() throws Exception {
         assertNull(mWebView.getTitle());
@@ -1115,12 +821,6 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
         assertTrue(mWebView.getUrl().indexOf("bar") > 0);
     }
 
-    @TestTargetNew(
-        level = TestLevel.SUFFICIENT,
-        method = "findAll",
-        args = {String.class},
-        notes = "Cannot check highlighting"
-    )
     @UiThreadTest
     public void testFindAll() {
         String p = "<p>Find all instances of find on the page and highlight them.</p>";
@@ -1131,23 +831,6 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
         assertEquals(2, mWebView.findAll("find"));
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "findNext",
-            args = {boolean.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "findAll",
-            args = {String.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "clearMatches",
-            args = {}
-        )
-    })
     public void testFindNext() throws Throwable {
         final class StopScrollingPollingCheck extends PollingCheck {
             private int mPreviousScrollY = -1;
@@ -1217,11 +900,6 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
         assertTrue(mOnUiThread.getScrollY() == previousScrollY);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "documentHasImages",
-        args = {android.os.Message.class}
-    )
     public void testDocumentHasImages() throws Exception, Throwable {
         final class DocumentHasImageCheckHandler extends Handler {
             private boolean mReceived;
@@ -1271,18 +949,6 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
         assertEquals(1, handler.getMsgArg1());
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "pageDown",
-            args = {boolean.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "pageUp",
-            args = {boolean.class}
-        )
-    })
     public void testPageScroll() throws Throwable {
         DisplayMetrics metrics = mOnUiThread.getDisplayMetrics();
         int dimension = 2 * Math.max(metrics.widthPixels, metrics.heightPixels);
@@ -1321,11 +987,6 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
         assertEquals(topScrollY, mOnUiThread.getScrollY());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "getContentHeight",
-        args = {}
-    )
     public void testGetContentHeight() throws Throwable {
         mOnUiThread.loadDataAndWaitForCompletion(
                 "<html><body></body></html>", "text/html", null);
@@ -1350,11 +1011,6 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
                 mOnUiThread.getContentHeight());
     }
 
-    @TestTargetNew(
-        level = TestLevel.SUFFICIENT,
-        method = "clearCache",
-        args = {boolean.class}
-    )
     @UiThreadTest
     public void testClearCache() throws Exception {
         final File cacheFileBaseDir = CacheManager.getCacheFileBaseDir();
@@ -1389,38 +1045,12 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
         }.run();
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.SUFFICIENT,
-            method = "enablePlatformNotifications",
-            args = {},
-            notes = "Cannot simulate data state or proxy changes"
-        ),
-        @TestTargetNew(
-            level = TestLevel.SUFFICIENT,
-            method = "disablePlatformNotifications",
-            args = {},
-            notes = "Cannot simulate data state or proxy changes"
-        )
-    })
     @UiThreadTest
     public void testPlatformNotifications() {
         WebView.enablePlatformNotifications();
         WebView.disablePlatformNotifications();
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.SUFFICIENT,
-            method = "getPluginList",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.SUFFICIENT,
-            method = "refreshPlugins",
-            args = {boolean.class}
-        )
-    })
     @UiThreadTest
     public void testAccessPluginList() {
         assertNotNull(WebView.getPluginList());
@@ -1429,11 +1059,6 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
         mWebView.refreshPlugins(false);
     }
 
-    @TestTargetNew(
-        level = TestLevel.SUFFICIENT,
-        method = "destroy",
-        args = {}
-    )
     @UiThreadTest
     public void testDestroy() {
         // Create a new WebView, since we cannot call destroy() on a view in the hierarchy
@@ -1441,11 +1066,6 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
         localWebView.destroy();
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "flingScroll",
-        args = {int.class, int.class}
-    )
     public void testFlingScroll() throws Throwable {
         DisplayMetrics metrics = mOnUiThread.getDisplayMetrics();
         int dimension = 2 * Math.max(metrics.widthPixels, metrics.heightPixels);
@@ -1478,11 +1098,6 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
         assertTrue(mOnUiThread.getScrollY() >= previousScrollY);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "requestFocusNodeHref",
-        args = {android.os.Message.class}
-    )
     public void testRequestFocusNodeHref() throws Throwable {
         final String links = "<DL><p><DT><A HREF=\"" + TestHtmlConstants.HTML_URL1
                 + "\">HTML_URL1</A><DT><A HREF=\"" + TestHtmlConstants.HTML_URL2
@@ -1523,11 +1138,6 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
         mOnUiThread.requestFocusNodeHref(null);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "requestImageRef",
-        args = {android.os.Message.class}
-    )
     public void testRequestImageRef() throws Exception, Throwable {
         AssetManager assets = getActivity().getAssets();
         Bitmap bitmap = BitmapFactory.decodeStream(assets.open(TestHtmlConstants.LARGE_IMG_URL));
@@ -1565,21 +1175,11 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
         assertEquals(imgUrl, handler.mResultUrl);
     }
 
-    @TestTargetNew(
-        level = TestLevel.SUFFICIENT,
-        method = "debugDump",
-        args = {}
-    )
     @UiThreadTest
     public void testDebugDump() {
         mWebView.debugDump();
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "getHitTestResult",
-        args = {}
-    )
     public void testGetHitTestResult() throws Throwable {
         final String anchor = "<p><a href=\"" + TestHtmlConstants.EXT_WEB_URL1
                 + "\">normal anchor</a></p>";
@@ -1641,11 +1241,6 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
         assertEquals(location, hitTestResult.getExtra());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "setInitialScale",
-        args = {int.class}
-    )
     public void testSetInitialScale() throws Throwable {
         final String p = "<p style=\"height:1000px;width:1000px\">Test setInitialScale.</p>";
         final float defaultScale =
@@ -1680,13 +1275,6 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
         assertEquals(defaultScale, mOnUiThread.getScale(), .01f);
     }
 
-    @TestTargetNew(
-        level = TestLevel.SUFFICIENT,
-        notes = "No API to trigger receiving an icon. Favicon not loaded automatically.",
-        method = "getFavicon",
-        args = {}
-    )
-    @ToBeFixed(explanation = "Favicon is not loaded automatically.")
     @UiThreadTest
     public void testGetFavicon() throws Exception {
         startWebServer(false);
@@ -1697,11 +1285,6 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
         // assertNotNull(mWebView.getFavicon());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "clearHistory",
-        args = {}
-    )
     @UiThreadTest
     public void testClearHistory() throws Exception {
         startWebServer(false);
@@ -1724,24 +1307,6 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
         pollingCheckWebBackForwardList(url3, 0, 1);
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "saveState",
-            args = {Bundle.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "restoreState",
-            args = {Bundle.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "copyBackForwardList",
-            args = {}
-        )
-    })
-    @ToBeFixed(explanation="Web history items do not get inflated after restore.")
     @UiThreadTest
     public void testSaveAndRestoreState() throws Throwable {
         // nothing to save
@@ -1806,11 +1371,6 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
         */
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "setWebViewClient",
-        args = {WebViewClient.class}
-    )
     public void testSetWebViewClient() throws Throwable {
         final class MockWebViewClient extends WaitForLoadedClient {
             private boolean mOnScaleChangedCalled = false;
@@ -1837,18 +1397,6 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
         assertTrue(webViewClient.onScaleChangedCalled());
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setCertificate",
-            args = {SslCertificate.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getCertificate",
-            args = {}
-        )
-    })
     @UiThreadTest
     public void testSetAndGetCertificate() {
         assertNull(mWebView.getCertificate());
@@ -1857,18 +1405,6 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
         assertEquals(certificate, mWebView.getCertificate());
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setCertificate",
-            args = {SslCertificate.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getCertificate",
-            args = {}
-        )
-    })
     @UiThreadTest
     public void testInsecureSiteClearsCertificate() throws Throwable {
         final SslCertificate certificate =
@@ -1880,18 +1416,6 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
         assertNull(mWebView.getCertificate());
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setCertificate",
-            args = {SslCertificate.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getCertificate",
-            args = {}
-        )
-    })
     @UiThreadTest
     public void testSecureSiteSetsCertificate() throws Throwable {
         final class MockWebViewClient extends WaitForLoadedClient {
@@ -1914,22 +1438,12 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
         assertEquals("Android", cert.getIssuedTo().getUName());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "clearSslPreferences",
-        args = {}
-    )
     @UiThreadTest
     public void testClearSslPreferences() {
         // FIXME: Implement this. See http://b/5378046.
         mWebView.clearSslPreferences();
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "WebViewClient.onReceivedSslError",
-        args = {}
-    )
     public void testOnReceivedSslError() throws Throwable {
         final class MockWebViewClient extends WaitForLoadedClient {
             private String mErrorUrl;
@@ -1963,11 +1477,6 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
         assertEquals(errorUrl, webViewClient.errorUrl());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "WebViewClient.onReceivedSslError",
-        args = {}
-    )
     public void testOnReceivedSslErrorProceed() throws Throwable {
         final class MockWebViewClient extends WaitForLoadedClient {
             public MockWebViewClient() {
@@ -1986,11 +1495,6 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
         assertEquals(TestHtmlConstants.HELLO_WORLD_TITLE, mOnUiThread.getTitle());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "WebViewClient.onReceivedSslError",
-        args = {}
-    )
     public void testOnReceivedSslErrorCancel() throws Throwable {
         final class MockWebViewClient extends WaitForLoadedClient {
             public MockWebViewClient() {
@@ -2010,11 +1514,6 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
         assertFalse(TestHtmlConstants.HELLO_WORLD_TITLE.equals(mOnUiThread.getTitle()));
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "WebViewClient.onReceivedSslError",
-        args = {}
-    )
     public void testSslErrorProceedResponseReusedForSameHost() throws Throwable {
         // Load the first page. We expect a call to
         // WebViewClient.onReceivedSslError().
@@ -2035,11 +1534,6 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
         assertEquals("Second page", mOnUiThread.getTitle());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "WebViewClient.onReceivedSslError",
-        args = {}
-    )
     public void testSslErrorProceedResponseNotReusedForDifferentHost() throws Throwable {
         // Load the first page. We expect a call to
         // WebViewClient.onReceivedSslError().
@@ -2063,11 +1557,6 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
         assertEquals("Second page", mOnUiThread.getTitle());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "requestChildRectangleOnScreen",
-        args = {View.class, Rect.class, boolean.class}
-    )
     public void testRequestChildRectangleOnScreen() throws Throwable {
         DisplayMetrics metrics = mOnUiThread.getDisplayMetrics();
         int dimension = 2 * Math.max(metrics.widthPixels, metrics.heightPixels);
@@ -2088,19 +1577,6 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
         assertTrue(mOnUiThread.getScrollY() > origY);
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setDownloadListener",
-            args = {DownloadListener.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.SUFFICIENT,
-            method = "requestFocus",
-            args = {int.class, Rect.class}
-        )
-    })
-    @ToBeFixed(explanation="Mime type and content length passed to listener are incorrect.")
     public void testSetDownloadListener() throws Throwable {
         final class MyDownloadListener implements DownloadListener {
             public String url;
@@ -2154,12 +1630,6 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
         // assertEquals(length, listener.contentLength);
     }
 
-    @TestTargetNew(
-        level = TestLevel.PARTIAL,
-        method = "setLayoutParams",
-        args = {android.view.ViewGroup.LayoutParams.class}
-    )
-    @ToBeFixed(bug = "1695243", explanation = "the javadoc for setLayoutParams() is incomplete.")
     @UiThreadTest
     public void testSetLayoutParams() {
         LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(600, 800);
@@ -2167,22 +1637,11 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
         assertSame(params, mWebView.getLayoutParams());
     }
 
-    @TestTargetNew(
-        level = TestLevel.NOT_FEASIBLE,
-        notes = "No documentation",
-        method = "setMapTrackballToArrowKeys",
-        args = {boolean.class}
-    )
     @UiThreadTest
     public void testSetMapTrackballToArrowKeys() {
         mWebView.setMapTrackballToArrowKeys(true);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "setNetworkAvailable",
-        args = {boolean.class}
-    )
     @UiThreadTest
     public void testSetNetworkAvailable() throws Exception {
         WebSettings settings = mWebView.getSettings();
@@ -2201,11 +1660,6 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
         assertEquals("ONLINE", mWebView.getTitle());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "setWebChromeClient",
-        args = {WebChromeClient.class}
-    )
     public void testSetWebChromeClient() throws Throwable {
         final class MockWebChromeClient extends WaitForProgressClient {
             private boolean mOnProgressChanged = false;
@@ -2243,18 +1697,6 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
         }.run();
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "pauseTimers",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "resumeTimers",
-            args = {}
-        )
-    })
     public void testPauseResumeTimers() throws Throwable {
         class Monitor {
             private boolean mIsUpdated;
@@ -2307,103 +1749,6 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
         assertTrue(monitor.waitForUpdate());
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.NOT_NECESSARY,
-            method = "dispatchKeyEvent",
-            args = {KeyEvent.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.NOT_NECESSARY,
-            method = "onAttachedToWindow",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.NOT_NECESSARY,
-            method = "onDetachedFromWindow",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.NOT_NECESSARY,
-            method = "onChildViewAdded",
-            args = {View.class, View.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.NOT_NECESSARY,
-            method = "onChildViewRemoved",
-            args = {View.class, View.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.NOT_NECESSARY,
-            method = "onDraw",
-            args = {Canvas.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.NOT_NECESSARY,
-            method = "onFocusChanged",
-            args = {boolean.class, int.class, Rect.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.NOT_NECESSARY,
-            method = "onGlobalFocusChanged",
-            args = {View.class, View.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.NOT_NECESSARY,
-            method = "onKeyDown",
-            args = {int.class, KeyEvent.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.NOT_NECESSARY,
-            method = "onKeyUp",
-            args = {int.class, KeyEvent.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.NOT_NECESSARY,
-            method = "onMeasure",
-            args = {int.class, int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.NOT_NECESSARY,
-            method = "onScrollChanged",
-            args = {int.class, int.class, int.class, int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.NOT_NECESSARY,
-            method = "onSizeChanged",
-            args = {int.class, int.class, int.class, int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.NOT_NECESSARY,
-            method = "onTouchEvent",
-            args = {MotionEvent.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.NOT_NECESSARY,
-            method = "onTrackballEvent",
-            args = {MotionEvent.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.NOT_NECESSARY,
-            method = "onWindowFocusChanged",
-            args = {boolean.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.NOT_FEASIBLE,
-            method = "computeScroll",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.NOT_FEASIBLE,
-            method = "computeHorizontalScrollRange",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.NOT_FEASIBLE,
-            method = "computeVerticalScrollRange",
-            args = {}
-        )
-    })
     @UiThreadTest
     public void testInternals() {
         // Do not test these APIs. They are implementation details.

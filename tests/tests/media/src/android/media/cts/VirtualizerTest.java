@@ -23,12 +23,7 @@ import android.media.audiofx.Virtualizer;
 import android.os.Looper;
 import android.test.AndroidTestCase;
 import android.util.Log;
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
 
-@TestTargetClass(Virtualizer.class)
 public class VirtualizerTest extends AndroidTestCase {
 
     private String TAG = "VirtualizerTest";
@@ -55,23 +50,6 @@ public class VirtualizerTest extends AndroidTestCase {
     //----------------------------------
 
     //Test case 0.0: test constructor and release
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "Virtualizer",
-            args = {int.class, int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getId",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "release",
-            args = {}
-        )
-    })
     public void test0_0ConstructorAndRelease() throws Exception {
         Virtualizer eq = null;
         try {
@@ -99,23 +77,6 @@ public class VirtualizerTest extends AndroidTestCase {
     //----------------------------------
 
     //Test case 1.0: test strength
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getStrengthSupported",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setStrength",
-            args = {short.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getRoundedStrength",
-            args = {}
-        )
-    })
     public void test1_0Strength() throws Exception {
         getVirtualizer(0);
         try {
@@ -144,18 +105,6 @@ public class VirtualizerTest extends AndroidTestCase {
     }
 
     //Test case 1.1: test properties
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getProperties",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setProperties",
-            args = {Virtualizer.Settings.class}
-        )
-    })
     public void test1_1Properties() throws Exception {
         getVirtualizer(0);
         try {
@@ -189,18 +138,6 @@ public class VirtualizerTest extends AndroidTestCase {
     }
 
     //Test case 1.2: test setStrength() throws exception after release
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "release",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setStrength",
-            args = {short.class}
-        )
-    })
     public void test1_2SetStrengthAfterRelease() throws Exception {
         getVirtualizer(0);
         mVirtualizer.release();
@@ -218,18 +155,6 @@ public class VirtualizerTest extends AndroidTestCase {
     //----------------------------------
 
     //Test case 2.0: test setEnabled() and getEnabled() in valid state
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setEnabled",
-            args = {boolean.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getEnabled",
-            args = {}
-        )
-    })
     public void test2_0SetEnabledGetEnabled() throws Exception {
         getVirtualizer(0);
         try {
@@ -245,18 +170,6 @@ public class VirtualizerTest extends AndroidTestCase {
     }
 
     //Test case 2.1: test setEnabled() throws exception after release
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "release",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setEnabled",
-            args = {boolean.class}
-        )
-    })
     public void test2_1SetEnabledAfterRelease() throws Exception {
         getVirtualizer(0);
         mVirtualizer.release();
@@ -274,13 +187,6 @@ public class VirtualizerTest extends AndroidTestCase {
     //----------------------------------
 
     //Test case 3.0: test control status listener
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setControlStatusListener",
-            args = {AudioEffect.OnControlStatusChangeListener.class}
-        )
-    })
     public void test3_0ControlStatusListener() throws Exception {
         mHasControl = true;
         createListenerLooper(true, false, false);
@@ -307,13 +213,6 @@ public class VirtualizerTest extends AndroidTestCase {
     }
 
     //Test case 3.1: test enable status listener
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setEnableStatusListener",
-            args = {AudioEffect.OnEnableStatusChangeListener.class}
-        )
-    })
     public void test3_1EnableStatusListener() throws Exception {
         createListenerLooper(false, true, false);
         synchronized(mLock) {
@@ -342,13 +241,6 @@ public class VirtualizerTest extends AndroidTestCase {
     }
 
     //Test case 3.2: test parameter changed listener
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setParameterListener",
-            args = {Virtualizer.OnParameterChangeListener.class}
-        )
-    })
     public void test3_2ParameterChangedListener() throws Exception {
         createListenerLooper(false, false, true);
         synchronized(mLock) {

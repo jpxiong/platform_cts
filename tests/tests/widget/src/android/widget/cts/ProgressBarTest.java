@@ -18,11 +18,6 @@ package android.widget.cts;
 
 import com.android.cts.stub.R;
 
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
-import dalvik.annotation.ToBeFixed;
 
 import android.content.Context;
 import android.graphics.Canvas;
@@ -36,7 +31,6 @@ import android.view.animation.Interpolator;
 import android.view.animation.LinearInterpolator;
 import android.widget.ProgressBar;
 
-@TestTargetClass(ProgressBar.class)
 public class ProgressBarTest extends InstrumentationTestCase {
     // The target context.
     private Context mContext;
@@ -47,23 +41,6 @@ public class ProgressBarTest extends InstrumentationTestCase {
         mContext = getInstrumentation().getTargetContext();
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "ProgressBar",
-            args = {android.content.Context.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "ProgressBar",
-            args = {android.content.Context.class, android.util.AttributeSet.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "ProgressBar",
-            args = {android.content.Context.class, android.util.AttributeSet.class, int.class}
-        )
-    })
     public void testConstructor() {
         new ProgressBar(mContext);
 
@@ -72,18 +49,6 @@ public class ProgressBarTest extends InstrumentationTestCase {
         new ProgressBar(mContext, null, android.R.attr.progressBarStyle);
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setIndeterminate",
-            args = {boolean.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "isIndeterminate",
-            args = {}
-        )
-    })
     public void testSetIndeterminate() {
         ProgressBar progressBar = new ProgressBar(mContext);
         assertTrue(progressBar.isIndeterminate());
@@ -105,18 +70,6 @@ public class ProgressBarTest extends InstrumentationTestCase {
         assertFalse(progressBar.isIndeterminate());
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getIndeterminateDrawable",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setIndeterminateDrawable",
-            args = {android.graphics.drawable.Drawable.class}
-        )
-    })
     public void testAccessIndeterminateDrawable() {
         ProgressBar progressBar = new ProgressBar(mContext);
 
@@ -134,18 +87,6 @@ public class ProgressBarTest extends InstrumentationTestCase {
         assertNull(progressBar.getIndeterminateDrawable());
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getProgressDrawable",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setProgressDrawable",
-            args = {android.graphics.drawable.Drawable.class}
-        )
-    })
     public void testAccessProgressDrawable() {
         ProgressBar progressBar = new ProgressBar(mContext, null,
                 android.R.attr.progressBarStyleHorizontal);
@@ -164,18 +105,6 @@ public class ProgressBarTest extends InstrumentationTestCase {
         assertNull(progressBar.getProgressDrawable());
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getProgress",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setProgress",
-            args = {int.class}
-        )
-    })
     public void testAccessProgress() {
         ProgressBar progressBar = new ProgressBar(mContext, null,
                 android.R.attr.progressBarStyleHorizontal);
@@ -203,18 +132,6 @@ public class ProgressBarTest extends InstrumentationTestCase {
         assertEquals(0, progressBar.getProgress());
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getSecondaryProgress",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setSecondaryProgress",
-            args = {int.class}
-        )
-    })
     public void testAccessSecondaryProgress() {
         ProgressBar progressBar = new ProgressBar(mContext, null,
                 android.R.attr.progressBarStyleHorizontal);
@@ -242,11 +159,6 @@ public class ProgressBarTest extends InstrumentationTestCase {
         assertEquals(0, progressBar.getSecondaryProgress());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "incrementProgressBy",
-        args = {int.class}
-    )
     public void testIncrementProgressBy() {
         ProgressBar progressBar = new ProgressBar(mContext, null,
                 android.R.attr.progressBarStyleHorizontal);
@@ -272,11 +184,6 @@ public class ProgressBarTest extends InstrumentationTestCase {
         assertEquals(0, progressBar.getProgress());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "incrementSecondaryProgressBy",
-        args = {int.class}
-    )
     public void testIncrementSecondaryProgressBy() {
         ProgressBar progressBar = new ProgressBar(mContext, null,
                 android.R.attr.progressBarStyleHorizontal);
@@ -302,18 +209,6 @@ public class ProgressBarTest extends InstrumentationTestCase {
         assertEquals(0, progressBar.getSecondaryProgress());
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.PARTIAL_COMPLETE,
-            method = "setInterpolator",
-            args = {android.view.animation.Interpolator.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.PARTIAL_COMPLETE,
-            method = "getInterpolator",
-            args = {}
-        )
-    })
     public void testAccessInterpolator() {
         ProgressBar progressBar = new ProgressBar(mContext);
 
@@ -326,13 +221,6 @@ public class ProgressBarTest extends InstrumentationTestCase {
         assertEquals(i, progressBar.getInterpolator());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "setVisibility",
-        args = {int.class}
-    )
-    @ToBeFixed(bug = "1695243", explanation = "the javadoc for setVisibility() is incomplete." +
-            "1. not clear what is supposed result if visibility isn't VISIBLE, INVISIBLE or GONE.")
     public void testSetVisibility() {
         ProgressBar progressBar = new ProgressBar(mContext, null,
                 android.R.attr.progressBarStyleHorizontal);
@@ -360,13 +248,6 @@ public class ProgressBarTest extends InstrumentationTestCase {
         assertEquals(expected, progressBar.getVisibility());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "invalidateDrawable",
-        args = {android.graphics.drawable.Drawable.class}
-    )
-    @ToBeFixed(bug = "1695243", explanation = "the javadoc for invalidateDrawable() is incomplete." +
-            "1. not clear what is supposed to happen if drawable is null.")
     public void testInvalidateDrawable() {
         MockProgressBar mockProgressBar = new MockProgressBar(mContext);
 
@@ -395,28 +276,11 @@ public class ProgressBarTest extends InstrumentationTestCase {
         assertFalse(mockProgressBar.hasCalledInvalidate());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "postInvalidate",
-        args = {}
-    )
     public void testPostInvalidate() {
         MockProgressBar mockProgressBar = new MockProgressBar(mContext);
         mockProgressBar.postInvalidate();
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getMax",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setMax",
-            args = {int.class}
-        )
-    })
     public void testAccessMax() {
         ProgressBar progressBar = new ProgressBar(mContext, null,
                 android.R.attr.progressBarStyleHorizontal);
@@ -446,11 +310,6 @@ public class ProgressBarTest extends InstrumentationTestCase {
         assertEquals(0, progressBar.getProgress());
     }
 
-    @TestTargetNew(
-        level = TestLevel.NOT_NECESSARY,
-        method = "onDraw",
-        args = {android.graphics.Canvas.class}
-    )
     public void testOnDraw() {
         // Do not test, it's controlled by View. Implementation details
     }
@@ -486,29 +345,14 @@ public class ProgressBarTest extends InstrumentationTestCase {
 
     }
 
-    @TestTargetNew(
-        level = TestLevel.NOT_NECESSARY,
-        method = "onMeasure",
-        args = {int.class, int.class}
-    )
     public void testOnMeasure() {
         // onMeasure() is implementation details, do NOT test
     }
 
-    @TestTargetNew(
-        level = TestLevel.NOT_NECESSARY,
-        method = "onSizeChanged",
-        args = {int.class, int.class, int.class, int.class}
-    )
     public void testOnSizeChange() {
         // onSizeChanged() is implementation details, do NOT test
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "verifyDrawable",
-        args = {android.graphics.drawable.Drawable.class}
-    )
     public void testVerifyDrawable() {
         MockProgressBar mockProgressBar = new MockProgressBar(mContext);
         assertTrue(mockProgressBar.verifyDrawable(null));
@@ -536,27 +380,10 @@ public class ProgressBarTest extends InstrumentationTestCase {
         assertTrue(mockProgressBar.verifyDrawable(d3));
     }
 
-    @TestTargetNew(
-        level = TestLevel.NOT_NECESSARY,
-        method = "drawableStateChanged",
-        args = {}
-    )
     public void testDrawableStateChanged() {
         // drawableStateChanged() is implementation details, do NOT test
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "onRestoreInstanceState",
-            args = {android.os.Parcelable.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "onSaveInstanceState",
-            args = {}
-        )
-    })
     public void testOnSaveAndRestoreInstanceState() {
         ProgressBar progressBar = new ProgressBar(mContext, null,
                 android.R.attr.progressBarStyleHorizontal);

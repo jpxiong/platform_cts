@@ -19,12 +19,7 @@ import android.app.ActivityManager;
 import android.os.Parcel;
 import android.os.Process;
 import android.test.AndroidTestCase;
-import dalvik.annotation.TestTargets;
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargetClass;
 
-@TestTargetClass(ActivityManager.MemoryInfo.class)
 public class ActivityManagerMemoryInfoTest extends AndroidTestCase {
     protected ActivityManager.MemoryInfo mMemory;
 
@@ -34,27 +29,10 @@ public class ActivityManagerMemoryInfoTest extends AndroidTestCase {
         mMemory = new ActivityManager.MemoryInfo();
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "describeContents",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "ActivityManager.MemoryInfo",
-            args = {}
-        )
-    })
     public void testDescribeContents() {
         assertEquals(0, mMemory.describeContents());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "writeToParcel",
-        args = {android.os.Parcel.class, int.class}
-    )
     public void testWriteToParcel() throws Exception {
         final long AVAILMEM = Process.getFreeMemory();
         mMemory.availMem = AVAILMEM;
@@ -80,11 +58,6 @@ public class ActivityManagerMemoryInfoTest extends AndroidTestCase {
         }
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "readFromParcel",
-        args = {android.os.Parcel.class}
-    )
     public void testReadFromParcel() throws Exception {
         final long AVAILMEM = Process.getFreeMemory();
         mMemory.availMem = AVAILMEM;

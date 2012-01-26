@@ -16,32 +16,13 @@
 
 package android.content.pm.cts;
 
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
 
 import android.content.pm.PackageManager;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.test.AndroidTestCase;
 
-@TestTargetClass(PackageManager.NameNotFoundException.class)
 public class PackageManager_NameNotFoundExceptionTest extends AndroidTestCase {
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test NameNotFoundException",
-            method = "PackageManager.NameNotFoundException",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test NameNotFoundException",
-            method = "PackageManager.NameNotFoundException",
-            args = {java.lang.String.class}
-        )
-    })
     public void testNameNotFoundException() {
         PackageManager.NameNotFoundException exception = new PackageManager.NameNotFoundException();
         try {

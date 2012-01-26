@@ -42,10 +42,6 @@ import android.test.suitebuilder.annotation.LargeTest;
 import android.util.Log;
 import android.view.SurfaceHolder;
 
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -61,7 +57,6 @@ import java.util.List;
  * This test case must run with hardware. It can't be tested in emulator
  */
 @LargeTest
-@TestTargetClass(Camera.class)
 public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActivity> {
     private String TAG = "CameraTest";
     private static final String PACKAGE = "com.android.cts.stub";
@@ -307,40 +302,6 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
      * Test case 1: Take a picture and verify all the callback
      * functions are called properly.
      */
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "startPreview",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setPreviewDisplay",
-            args = {android.view.SurfaceHolder.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "open",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "release",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "takePicture",
-            args = {android.hardware.Camera.ShutterCallback.class,
-                    android.hardware.Camera.PictureCallback.class,
-                    android.hardware.Camera.PictureCallback.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "autoFocus",
-            args = {android.hardware.Camera.AutoFocusCallback.class}
-        )
-    })
     @UiThreadTest
     public void testTakePicture() throws Exception {
         int nCameras = Camera.getNumberOfCameras();
@@ -371,43 +332,6 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
         assertEquals(pictureSize.height, bmpOptions.outHeight);
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "stopPreview",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setPreviewCallback",
-            args = {android.hardware.Camera.PreviewCallback.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "open",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "release",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "startPreview",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setPreviewDisplay",
-            args = {android.view.SurfaceHolder.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setErrorCallback",
-            args = {android.hardware.Camera.ErrorCallback.class}
-        )
-    })
     @UiThreadTest
     public void testPreviewCallback() throws Exception {
         int nCameras = Camera.getNumberOfCameras();
@@ -452,11 +376,6 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
         terminateMessageLooper();
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "setOneShotPreviewCallback",
-        args = {PreviewCallback.class}
-    )
     @UiThreadTest
     public void testSetOneShotPreviewCallback() throws Exception {
         int nCameras = Camera.getNumberOfCameras();
@@ -480,11 +399,6 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
         assertEquals(PREVIEW_CALLBACK_NOT_RECEIVED, mPreviewCallbackResult);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "setPreviewDisplay",
-        args = {SurfaceHolder.class}
-    )
     @UiThreadTest
     public void testSetPreviewDisplay() throws Exception {
         int nCameras = Camera.getNumberOfCameras();
@@ -528,11 +442,6 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
         assertEquals(PREVIEW_CALLBACK_RECEIVED, mPreviewCallbackResult);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "setDisplayOrientation",
-        args = {int.class}
-    )
     @UiThreadTest
     public void testDisplayOrientation() throws Exception {
         int nCameras = Camera.getNumberOfCameras();
@@ -571,18 +480,6 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
         terminateMessageLooper();
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getParameters",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setParameters",
-            args = {android.hardware.Camera.Parameters.class}
-        )
-    })
     @UiThreadTest
     public void testParameters() throws Exception {
         int nCameras = Camera.getNumberOfCameras();
@@ -790,23 +687,6 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
                 || (format == ImageFormat.JPEG) || (format == ImageFormat.YUY2);
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setJpegThumbnailSize",
-            args = {android.hardware.Camera.Size.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getJpegThumbnailSize",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getJpegSupportedThumbnailSizes",
-            args = {}
-        )
-    })
     @UiThreadTest
     public void testJpegThumbnailSize() throws Exception {
         int nCameras = Camera.getNumberOfCameras();
@@ -946,18 +826,6 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
         assertNull(exif.getAttribute(ExifInterface.TAG_GPS_PROCESSING_METHOD));
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "lock",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "unlock",
-            args = {}
-        )
-    })
     @UiThreadTest
     public void testLockUnlock() throws Exception {
         int nCameras = Camera.getNumberOfCameras();
@@ -1069,18 +937,6 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
         }
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "addCallbackBuffer",
-            args = {byte[].class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setPreviewCallbackWithBuffer",
-            args = {android.hardware.Camera.PreviewCallback.class}
-        )
-    })
     @UiThreadTest
     public void testPreviewCallbackWithBuffer() throws Exception {
         int nCameras = Camera.getNumberOfCameras();
@@ -1232,23 +1088,6 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
         terminateMessageLooper();
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "startSmoothZoom",
-            args = {int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "stopSmoothZoom",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setZoomChangeListener",
-            args = {android.hardware.Camera.OnZoomChangeListener.class}
-        )
-    })
     @UiThreadTest
     public void testSmoothZoom() throws Exception {
         int nCameras = Camera.getNumberOfCameras();
@@ -1482,13 +1321,6 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
         }
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "cancelAutofocus",
-            args = {}
-        )
-    })
     @UiThreadTest
     public void testCancelAutofocus() throws Exception {
         int nCameras = Camera.getNumberOfCameras();
@@ -1566,23 +1398,6 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
                      distances2[Parameters.FOCUS_DISTANCE_FAR_INDEX]);
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getNumberOfCameras",
-            args = {int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getCameraInfo",
-            args = {int.class, CameraInfo.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "open",
-            args = {int.class}
-        )
-    })
     @UiThreadTest
     public void testMultipleCameras() throws Exception {
         int nCameras = Camera.getNumberOfCameras();

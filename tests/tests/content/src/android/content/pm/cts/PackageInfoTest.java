@@ -16,10 +16,6 @@
 
 package android.content.pm.cts;
 
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
 
 import android.content.pm.ApplicationInfo;
 import android.content.pm.ConfigurationInfo;
@@ -32,7 +28,6 @@ import android.test.AndroidTestCase;
 
 import java.util.Arrays;
 
-@TestTargetClass(PackageInfo.class)
 public class PackageInfoTest extends AndroidTestCase {
     private PackageManager mPackageManager;
     private PackageInfo mPackageInfo;
@@ -51,32 +46,6 @@ public class PackageInfoTest extends AndroidTestCase {
                 | PackageManager.GET_UNINSTALLED_PACKAGES);
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test describeContents",
-            method = "describeContents",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test writeToParcel",
-            method = "writeToParcel",
-            args = {android.os.Parcel.class, int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test toString",
-            method = "toString",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test PackageInfo",
-            method = "PackageInfo",
-            args = {}
-        )
-    })
     public void testPackageInfoOp() {
         // Test constructor, describeContents, toString
         new PackageInfo();

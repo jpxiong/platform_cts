@@ -19,36 +19,9 @@ package android.media.cts;
 import android.media.AudioManager;
 import android.media.ToneGenerator;
 import android.test.AndroidTestCase;
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
 
-@TestTargetClass(ToneGenerator.class)
 public class ToneGeneratorTest extends AndroidTestCase {
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "ToneGenerator",
-            args = {int.class, int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "startTone",
-            args = {int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "stopTone",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "release",
-            args = {}
-        )
-    })
     public void testSyncGenerate() throws Exception {
         ToneGenerator toneGen = new ToneGenerator(AudioManager.STREAM_RING,
                                                   ToneGenerator.MAX_VOLUME);

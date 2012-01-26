@@ -16,22 +16,13 @@
 
 package android.view.animation.cts;
 
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
 
 import android.test.AndroidTestCase;
 import android.view.animation.GridLayoutAnimationController;
 import android.view.animation.GridLayoutAnimationController.AnimationParameters;
 
-@TestTargetClass(AnimationParameters.class)
 public class GridLayoutAnimationController_AnimationParametersTest extends AndroidTestCase {
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "GridLayoutAnimationController.AnimationParameters",
-        args = {}
-    )
     public void testConstructor() {
         new GridLayoutAnimationController.AnimationParameters();
     }

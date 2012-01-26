@@ -16,11 +16,6 @@
 
 package android.view.cts;
 
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
-import dalvik.annotation.ToBeFixed;
 
 import android.test.AndroidTestCase;
 import android.view.View;
@@ -29,36 +24,12 @@ import android.view.ViewDebug.HierarchyTraceType;
 import android.view.ViewDebug.RecyclerTraceType;
 import android.widget.TextView;
 
-@TestTargetClass(ViewDebug.class)
 public class ViewDebugTest extends AndroidTestCase {
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "ViewDebug",
-        args = {}
-    )
     public void testConstructor() {
         new ViewDebug();
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.NOT_FEASIBLE,
-            method = "startRecyclerTracing",
-            args = {String.class, View.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.NOT_FEASIBLE,
-            method = "trace",
-            args = {View.class, RecyclerTraceType.class, int[].class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.NOT_FEASIBLE,
-            method = "stopRecyclerTracing",
-            args = {}
-        )
-    })
-    @ToBeFixed(bug = "1852451", explanation = "compiling error when set TRACE_RECYCLER to true")
     public void testRecyclerTracing() {
         final String recyclerTracePrefix = "ViewDebugTest";
         View ownerView = new View(getContext());
@@ -73,30 +44,6 @@ public class ViewDebugTest extends AndroidTestCase {
         ViewDebug.stopRecyclerTracing();
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.NOT_FEASIBLE,
-            method = "startHierarchyTracing",
-            args = {String.class, View.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.NOT_FEASIBLE,
-            method = "trace",
-            args = {View.class, HierarchyTraceType.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.NOT_FEASIBLE,
-            method = "stopHierarchyTracing",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.NOT_FEASIBLE,
-            method = "dumpCapturedView",
-            args = {String.class, Object.class}
-        )
-    })
-    @ToBeFixed(bug = "1852451", explanation = "throw IllegalStateException when set"
-              + "TRACE_HIERARCHY to true")
     public void testHierarchyTracing() {
         final String hierarchyTracePrefix = "ViewDebugTest";
         View v1 = new View(getContext());

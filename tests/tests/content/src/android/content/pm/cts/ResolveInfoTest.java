@@ -16,10 +16,6 @@
 
 package android.content.pm.cts;
 
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
 
 import android.content.ComponentName;
 import android.content.Intent;
@@ -29,51 +25,12 @@ import android.os.Parcel;
 import android.test.AndroidTestCase;
 import android.util.Printer;
 
-@TestTargetClass(ResolveInfo.class)
 public class ResolveInfoTest extends AndroidTestCase {
     private static final String PACKAGE_NAME = "com.android.cts.stub";
     private static final String MAIN_ACTION_NAME = "android.intent.action.MAIN";
     private static final String ACTIVITY_NAME = "android.content.pm.cts.TestPmActivity";
     private static final String SERVICE_NAME = "android.content.pm.cts.activity.PMTEST_SERVICE";
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test describeContents",
-            method = "describeContents",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test getIconResource",
-            method = "getIconResource",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test loadIcon",
-            method = "loadIcon",
-            args = {android.content.pm.PackageManager.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test loadLabel",
-            method = "loadLabel",
-            args = {android.content.pm.PackageManager.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test constructor",
-            method = "ResolveInfo",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test toString",
-            method = "toString",
-            args = {}
-        )
-    })
     public final void testResolveInfo() {
         // Test constructor
         new ResolveInfo();
@@ -91,20 +48,6 @@ public class ResolveInfoTest extends AndroidTestCase {
         assertEquals(0, resolveInfo.describeContents());
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test dump",
-            method = "dump",
-            args = {android.util.Printer.class, java.lang.String.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test writeToParcel",
-            method = "writeToParcel",
-            args = {android.os.Parcel.class, int.class}
-        )
-    })
     public final void testDump() {
         PackageManager pm = getContext().getPackageManager();
         Intent intent = new Intent(SERVICE_NAME);

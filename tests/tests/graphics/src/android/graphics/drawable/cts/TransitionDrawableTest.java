@@ -25,13 +25,7 @@ import android.graphics.Canvas;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.TransitionDrawable;
 import android.test.InstrumentationTestCase;
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
-import dalvik.annotation.ToBeFixed;
 
-@TestTargetClass(TransitionDrawable.class)
 public class TransitionDrawableTest extends InstrumentationTestCase {
     private static final int COLOR1 = 0xff0000ff;
 
@@ -58,11 +52,6 @@ public class TransitionDrawableTest extends InstrumentationTestCase {
         mCanvas = new Canvas(mBitmap);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "TransitionDrawable",
-        args = {Drawable[].class}
-    )
     public void testConstructor() {
         Resources resources = getInstrumentation().getTargetContext().getResources();
         Drawable[] drawables = new Drawable[] {
@@ -72,19 +61,6 @@ public class TransitionDrawableTest extends InstrumentationTestCase {
         new TransitionDrawable(drawables);
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "startTransition",
-            args = {int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "draw",
-            args = {android.graphics.Canvas.class}
-        )
-    })
-    @ToBeFixed(explanation = "The method should not accept negative duration.")
     public void testStartTransition() {
         MockCallBack cb = new MockCallBack();
         mTransitionDrawable.setCallback(cb);
@@ -113,18 +89,6 @@ public class TransitionDrawableTest extends InstrumentationTestCase {
         mTransitionDrawable.startTransition(-1);
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "resetTransition",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "draw",
-            args = {android.graphics.Canvas.class}
-        )
-    })
     public void testResetTransition() {
         MockCallBack cb = new MockCallBack();
         mTransitionDrawable.setCallback(cb);
@@ -151,19 +115,6 @@ public class TransitionDrawableTest extends InstrumentationTestCase {
         assertTransitionEnd(COLOR0, 2000);
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "reverseTransition",
-            args = {int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "draw",
-            args = {android.graphics.Canvas.class}
-        )
-    })
-    @ToBeFixed(explanation = "The method should not accept negative duration.")
     public void testReverseTransition() {
         MockCallBack cb = new MockCallBack();
         mTransitionDrawable.setCallback(cb);
@@ -200,15 +151,6 @@ public class TransitionDrawableTest extends InstrumentationTestCase {
         mTransitionDrawable.reverseTransition(-1);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test the method with null canvas. This method is tested in directly with real "
-                + "canvas in other tests of this case.",
-        method = "draw",
-        args = {android.graphics.Canvas.class}
-    )
-    @ToBeFixed(bug = "1417734", explanation = "should add @throws clause into javadoc of "
-            + "TransitionDrawable#draw(Canvas) when param canvas is null")
     public void testDrawWithNUllCanvas() {
         try {
             mTransitionDrawable.draw(null);
@@ -217,18 +159,6 @@ public class TransitionDrawableTest extends InstrumentationTestCase {
         }
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setCrossFadeEnabled",
-            args = {boolean.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "isCrossFadeEnabled",
-            args = {}
-        )
-    })
     //  This boolean takes effect when the drawable is drawn and the effect can not be tested.
     public void testAccessCrossFadeEnabled() {
         assertFalse(mTransitionDrawable.isCrossFadeEnabled());

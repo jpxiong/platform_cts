@@ -16,22 +16,13 @@
 
 package android.widget.cts;
 
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
 
 import android.test.AndroidTestCase;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.AdapterContextMenuInfo;
 
-@TestTargetClass(AdapterContextMenuInfo.class)
 public class AdapterView_AdapterContextMenuInfoTest extends AndroidTestCase {
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "AdapterView.AdapterContextMenuInfo",
-        args = {android.view.View.class, int.class, long.class}
-    )
     public void testConstructor() {
         AdapterView.AdapterContextMenuInfo menuInfo;
         View testView = new View(getContext());

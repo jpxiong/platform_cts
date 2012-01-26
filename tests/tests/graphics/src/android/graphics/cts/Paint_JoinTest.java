@@ -17,44 +17,17 @@
 package android.graphics.cts;
 
 import junit.framework.TestCase;
-import dalvik.annotation.TestTargets;
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargetClass;
 import android.graphics.Paint.Join;
 import android.graphics.Paint;
 
-@TestTargetClass(Paint.Join.class)
 public class Paint_JoinTest extends TestCase {
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "valueOf",
-        args = {java.lang.String.class}
-    )
     public void testValueOf() {
         assertEquals(Join.BEVEL, Join.valueOf("BEVEL"));
         assertEquals(Join.MITER, Join.valueOf("MITER"));
         assertEquals(Join.ROUND, Join.valueOf("ROUND"));
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "values",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setStrokeJoin",
-            args = {android.graphics.Paint.Join.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getStrokeJoin",
-            args = {}
-        )
-    })
     public void testValues() {
         // set the actual value
         Join[] actual = Join.values();

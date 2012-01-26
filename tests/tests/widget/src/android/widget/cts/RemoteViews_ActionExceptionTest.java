@@ -16,10 +16,6 @@
 
 package android.widget.cts;
 
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
 
 import android.test.InstrumentationTestCase;
 import android.widget.RemoteViews;
@@ -28,20 +24,7 @@ import android.widget.RemoteViews.ActionException;
 /**
  * Test {@link ActionException}.
  */
-@TestTargetClass(ActionException.class)
 public class RemoteViews_ActionExceptionTest extends InstrumentationTestCase {
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "RemoteViews.ActionException",
-            args = {java.lang.String.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "RemoteViews.ActionException",
-            args = {java.lang.Exception.class}
-        )
-    })
     public void testConstructor() {
         String message = "This is exception message";
         new RemoteViews.ActionException(message);

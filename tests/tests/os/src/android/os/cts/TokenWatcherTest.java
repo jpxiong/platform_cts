@@ -27,12 +27,7 @@ import android.os.Message;
 import android.os.RemoteException;
 import android.os.TokenWatcher;
 import android.test.AndroidTestCase;
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
 
-@TestTargetClass(TokenWatcher.class)
 public class TokenWatcherTest extends AndroidTestCase {
 
     private static final String TAG = "TokenWatcherTest";
@@ -111,49 +106,6 @@ public class TokenWatcherTest extends AndroidTestCase {
         }
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test constructor TokenWatcher(Handler h, String tag) throuth mock class",
-            method = "TokenWatcher",
-            args = {android.os.Handler.class, java.lang.String.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "isAcquired",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "acquire",
-            args = {android.os.IBinder.class, java.lang.String.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "acquired",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "cleanup",
-            args = {android.os.IBinder.class, boolean.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "release",
-            args = {android.os.IBinder.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "released",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "dump",
-            args = {}
-        )
-    })
     public void testTokenWatcher() throws RemoteException, InterruptedException {
         // new the MockTokenWatcher instance, test constructor
         IBinder token = mEmptyService.getToken();
@@ -185,18 +137,6 @@ public class TokenWatcherTest extends AndroidTestCase {
         assertFalse(waitUntilReleased());
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "cleanup",
-            args = {android.os.IBinder.class, boolean.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "dump",
-            args = {}
-        )
-    })
     public void testCleanUp() throws RemoteException, InterruptedException {
         IBinder token = mEmptyService.getToken();
         mMockTokenWatcher = new MockTokenWatcher(mHandler, TAG);

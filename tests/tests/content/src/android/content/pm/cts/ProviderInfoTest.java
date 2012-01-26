@@ -16,10 +16,6 @@
 
 package android.content.pm.cts;
 
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
 
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
@@ -31,43 +27,10 @@ import android.test.AndroidTestCase;
 import java.util.Iterator;
 import java.util.List;
 
-@TestTargetClass(ProviderInfo.class)
 public class ProviderInfoTest extends AndroidTestCase {
     private static final String PACKAGE_NAME = "com.android.cts.stub";
     private static final String PROVIDER_NAME = "android.content.cts.MockContentProvider";
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test describeContents",
-            method = "describeContents",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test constructors",
-            method = "ProviderInfo",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test constructors",
-            method = "ProviderInfo",
-            args = {android.content.pm.ProviderInfo.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test toString",
-            method = "toString",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test writeToParcel",
-            method = "writeToParcel",
-            args = {android.os.Parcel.class, int.class}
-        )
-    })
     public void testProviderInfo() throws NameNotFoundException {
         PackageManager pm = getContext().getPackageManager();
         Parcel p = Parcel.obtain();

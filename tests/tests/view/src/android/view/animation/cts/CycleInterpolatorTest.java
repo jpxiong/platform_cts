@@ -31,15 +31,10 @@ import android.view.animation.Transformation;
 
 import com.android.cts.stub.R;
 
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
 
 /**
  * Test {@link CycleInterpolator}.
  */
-@TestTargetClass(CycleInterpolator.class)
 public class CycleInterpolatorTest
         extends ActivityInstrumentationTestCase2<AnimationTestStubActivity> {
 
@@ -59,18 +54,6 @@ public class CycleInterpolatorTest
         mActivity = getActivity();
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "CycleInterpolator",
-            args = {float.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "CycleInterpolator",
-            args = {android.content.Context.class, android.util.AttributeSet.class}
-        )
-    })
     public void testConstructors() {
         new CycleInterpolator(1.0f);
 
@@ -209,11 +192,6 @@ public class CycleInterpolatorTest
         assertEquals(delta12, delta4, ALPHA_DELTA);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "getInterpolation",
-        args = {float.class}
-    )
     public void testGetInterpolation() {
         CycleInterpolator cycleInterpolator = new CycleInterpolator(2.0f);
         final float out1 = cycleInterpolator.getInterpolation(0.0f);

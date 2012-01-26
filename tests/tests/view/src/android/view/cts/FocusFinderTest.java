@@ -16,9 +16,6 @@
 
 package android.view.cts;
 
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
 
 import android.graphics.Rect;
 import android.test.ActivityInstrumentationTestCase2;
@@ -27,7 +24,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 
-@TestTargetClass(FocusFinder.class)
 public class FocusFinderTest extends ActivityInstrumentationTestCase2<FocusFinderStubActivity> {
 
     private FocusFinder mFocusFinder;
@@ -52,24 +48,12 @@ public class FocusFinderTest extends ActivityInstrumentationTestCase2<FocusFinde
         mBottomRight = getActivity().bottomRightButton;
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "test method getInstance",
-        method = "getInstance",
-        args = {}
-    )
     public void testGetInstance() {
         mFocusFinder = null;
         mFocusFinder = FocusFinder.getInstance();
         assertNotNull(mFocusFinder);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "test method findNextFocus",
-        method = "findNextFocus",
-        args = {ViewGroup.class, View.class, int.class}
-    )
     public void testFindNextFocus() {
         /*
          * Go clockwise around the buttons from the top left searching for focus.
@@ -96,12 +80,6 @@ public class FocusFinderTest extends ActivityInstrumentationTestCase2<FocusFinde
         assertEquals(expectedNextFocus, actualNextFocus);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "test method findNextFocusFromRect",
-        method = "findNextFocusFromRect",
-        args = {ViewGroup.class, Rect.class, int.class}
-    )
     public void testFindNextFocusFromRect() {
         /*
          * Create a small rectangle on the border between the top left and top right buttons.
@@ -142,12 +120,6 @@ public class FocusFinderTest extends ActivityInstrumentationTestCase2<FocusFinde
         assertEquals(expectedNextFocus, actualNextFocus);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "test findNearestTouchable",
-        method = "findNearestTouchable",
-        args = {ViewGroup.class, int.class, int.class, int.class, int[].class}
-    )
     public void testFindNearestTouchable() {
         /*
          * Table layout with two rows and coordinates are relative to those parent rows.

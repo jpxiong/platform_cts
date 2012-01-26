@@ -16,10 +16,6 @@
 
 package android.graphics.cts;
 
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
 
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
@@ -30,23 +26,8 @@ import android.graphics.Bitmap.Config;
 import android.graphics.Shader.TileMode;
 import android.test.AndroidTestCase;
 
-@TestTargetClass(LinearGradient.class)
 public class LinearGradientTest extends AndroidTestCase {
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "LinearGradient",
-            args = {float.class, float.class, float.class, float.class, int[].class, float[].class,
-                    android.graphics.Shader.TileMode.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "LinearGradient",
-            args = {float.class, float.class, float.class, float.class, int.class, int.class,
-                    android.graphics.Shader.TileMode.class}
-        )
-    })
     public void testLinearGradient() {
         Bitmap b;
         LinearGradient lg;

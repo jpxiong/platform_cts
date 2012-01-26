@@ -20,38 +20,13 @@ import android.graphics.Color;
 import android.graphics.Typeface;
 import android.test.AndroidTestCase;
 import android.text.TextPaint;
-import dalvik.annotation.TestTargets;
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.ToBeFixed;
 
 /**
  * Test {@link TextPaint}.
  */
-@TestTargetClass(TextPaint.class)
 public class TextPaintTest extends AndroidTestCase {
     private static final int DEFAULT_PAINT_FLAGS = TextPaint.DEV_KERN_TEXT_FLAG;
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "TextPaint",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "TextPaint",
-            args = {int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "TextPaint",
-            args = {android.graphics.Paint.class}
-        )
-    })
-    @ToBeFixed(bug="1417734", explanation="should add @throws clause for" +
-            " TextPaint#TextPaint(Paint) when the input Paint is null")
     public void testConstructor() {
         TextPaint textPaint;
 
@@ -63,13 +38,6 @@ public class TextPaintTest extends AndroidTestCase {
                 textPaint.getFlags());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "set",
-        args = {android.text.TextPaint.class}
-    )
-    @ToBeFixed(bug="1417734", explanation="should add @throws clause for" +
-            " TextPaint#set(TextPaint) when the input TextPaint is null")
     public void testSet() {
         TextPaint textPaintSrc = new TextPaint(TextPaint.DITHER_FLAG);
         int[] drawableState = new int[] { 0, 1 };

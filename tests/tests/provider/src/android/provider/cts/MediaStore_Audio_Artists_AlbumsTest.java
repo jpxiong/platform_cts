@@ -16,10 +16,6 @@
 
 package android.provider.cts;
 
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.ToBeFixed;
 
 import android.content.ContentResolver;
 import android.content.ContentValues;
@@ -32,7 +28,6 @@ import android.provider.cts.MediaStoreAudioTestHelper.Audio1;
 import android.provider.cts.MediaStoreAudioTestHelper.Audio2;
 import android.test.InstrumentationTestCase;
 
-@TestTargetClass(Albums.class)
 public class MediaStore_Audio_Artists_AlbumsTest extends InstrumentationTestCase {
     private ContentResolver mContentResolver;
 
@@ -43,13 +38,6 @@ public class MediaStore_Audio_Artists_AlbumsTest extends InstrumentationTestCase
         mContentResolver = getInstrumentation().getContext().getContentResolver();
     }
 
-    @TestTargetNew(
-      level = TestLevel.COMPLETE,
-      method = "getContentUri",
-      args = {String.class, long.class}
-    )
-    @ToBeFixed(bug = "1695243", explanation = "Android API javadocs are incomplete. This is no "
-            + "document which describs possible values of the param volumeName.")
     public void testGetContentUri() {
         Uri contentUri = MediaStore.Audio.Artists.Albums.getContentUri(
                 MediaStoreAudioTestHelper.INTERNAL_VOLUME_NAME, 1);
@@ -64,14 +52,10 @@ public class MediaStore_Audio_Artists_AlbumsTest extends InstrumentationTestCase
                 null, null, null, null));
     }
 
-    @ToBeFixed(bug = "", explanation = "The result cursor of query for all columns does not "
-            + "contain the column Albums.ALBUM_ID.")
     public void testStoreAudioArtistsAlbumsInternal() {
         testStoreAudioArtistsAlbums(true);
     }
 
-    @ToBeFixed(bug = "", explanation = "The result cursor of query for all columns does not "
-            + "contain the column Albums.ALBUM_ID.")
     public void testStoreAudioArtistsAlbumsExternal() {
         testStoreAudioArtistsAlbums(false);
     }

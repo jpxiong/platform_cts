@@ -18,10 +18,6 @@ package android.view.animation.cts;
 
 import com.android.cts.stub.R;
 
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
 
 import android.app.Activity;
 import android.content.res.XmlResourceParser;
@@ -36,7 +32,6 @@ import android.view.animation.AnimationUtils;
 import android.view.animation.Interpolator;
 import android.view.animation.Transformation;
 
-@TestTargetClass(AccelerateDecelerateInterpolator.class)
 public class AccelerateDecelerateInterpolatorTest
         extends ActivityInstrumentationTestCase2<AnimationTestStubActivity> {
 
@@ -55,18 +50,6 @@ public class AccelerateDecelerateInterpolatorTest
         mActivity = getActivity();
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "AccelerateDecelerateInterpolator",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "AccelerateDecelerateInterpolator",
-            args = {android.content.Context.class, android.util.AttributeSet.class}
-        )
-    })
     public void testConstructor() {
         new AccelerateDecelerateInterpolator();
 
@@ -76,14 +59,6 @@ public class AccelerateDecelerateInterpolatorTest
         new AccelerateDecelerateInterpolator(mActivity, attrs);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test case will accelerate then decelerate AlphaAnimation. It will change"
-              + " alpha from 0.0 to 1.0, the rate of changing alpha starts out slowly, then"
-              + " accelerates to the middle, and then decelerates to the end",
-        method = "getInterpolation",
-        args = {float.class}
-    )
     public void testAccelerateDecelerateInterpolator() {
         final View animWindow = mActivity.findViewById(R.id.anim_window);
 
@@ -130,12 +105,6 @@ public class AccelerateDecelerateInterpolatorTest
         assertTrue(delta3 > delta4);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test getInterpolation(float), call it directly.",
-        method = "getInterpolation",
-        args = {float.class}
-    )
     public void testGetInterpolation() {
         Interpolator interpolator = new AccelerateDecelerateInterpolator();
 

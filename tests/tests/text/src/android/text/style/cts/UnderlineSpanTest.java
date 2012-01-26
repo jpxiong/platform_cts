@@ -16,11 +16,6 @@
 
 package android.text.style.cts;
 
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
-import dalvik.annotation.ToBeFixed;
 
 import android.os.Parcel;
 import android.text.TextPaint;
@@ -28,23 +23,7 @@ import android.text.style.UnderlineSpan;
 
 import junit.framework.TestCase;
 
-@TestTargetClass(UnderlineSpan.class)
 public class UnderlineSpanTest extends TestCase {
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test constructor(s) of UnderlineSpan.",
-            method = "UnderlineSpan",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test constructor(s) of UnderlineSpan.",
-            method = "UnderlineSpan",
-            args = {android.os.Parcel.class}
-        )
-    })
-    @ToBeFixed(bug = "1695243", explanation = "miss javadoc")
     public void testConstructor() {
         new UnderlineSpan();
 
@@ -56,14 +35,6 @@ public class UnderlineSpanTest extends TestCase {
         }
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test {@link UnderlineSpan#updateDrawState(TextPaint)}",
-        method = "updateDrawState",
-        args = {android.text.TextPaint.class}
-    )
-    @ToBeFixed(bug = "1695243", explanation = "should add @throws NullPointerException clause" +
-        " into javadoc when input TextPaint is null")
     public void testUpdateDrawState() {
         UnderlineSpan underlineSpan = new UnderlineSpan();
 
@@ -82,34 +53,16 @@ public class UnderlineSpanTest extends TestCase {
         }
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test describeContents().",
-        method = "describeContents",
-        args = {}
-    )
     public void testDescribeContents() {
         UnderlineSpan underlineSpan = new UnderlineSpan();
         underlineSpan.describeContents();
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test getSpanTypeId().",
-        method = "getSpanTypeId",
-        args = {}
-    )
     public void testGetSpanTypeId() {
         UnderlineSpan underlineSpan = new UnderlineSpan();
         underlineSpan.getSpanTypeId();
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test writeToParcel(Parcel dest, int flags).",
-        method = "writeToParcel",
-        args = {Parcel.class, int.class}
-    )
     public void testWriteToParcel() {
         Parcel p = Parcel.obtain();
         try {

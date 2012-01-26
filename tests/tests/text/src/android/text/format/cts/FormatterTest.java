@@ -21,18 +21,9 @@ import java.math.MathContext;
 
 import android.test.AndroidTestCase;
 import android.text.format.Formatter;
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
 
-@TestTargetClass(Formatter.class)
 public class FormatterTest extends AndroidTestCase {
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "formatFileSize",
-        args = {android.content.Context.class, long.class}
-    )
     public void testFormatFileSize() {
         // test null Context
         assertEquals("", Formatter.formatFileSize(null, 0));
@@ -61,11 +52,6 @@ public class FormatterTest extends AndroidTestCase {
         assertEquals("-1.00B", Formatter.formatFileSize(mContext, -1));
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "formatIpAddress",
-        args = {int.class}
-    )
     public void testFormatIpAddress() {
         assertEquals("1.0.168.192", Formatter.formatIpAddress(0xC0A80001));
         assertEquals("1.0.0.127", Formatter.formatIpAddress(0x7F000001));

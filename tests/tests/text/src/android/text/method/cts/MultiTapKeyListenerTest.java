@@ -18,10 +18,6 @@ package android.text.method.cts;
 
 import com.android.cts.stub.R;
 
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.ToBeFixed;
 
 import android.app.Activity;
 import android.app.Instrumentation;
@@ -38,7 +34,6 @@ import android.widget.TextView.BufferType;
 
 import java.util.concurrent.TimeUnit;
 
-@TestTargetClass(MultiTapKeyListener.class)
 public class MultiTapKeyListenerTest extends
         ActivityInstrumentationTestCase2<KeyListenerStubActivity> {
     /**
@@ -61,11 +56,6 @@ public class MultiTapKeyListenerTest extends
         mTextView = (TextView) mActivity.findViewById(R.id.keylistener_textview);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "MultiTapKeyListener",
-        args = {android.text.method.TextKeyListener.Capitalize.class, boolean.class}
-    )
     public void testConstructor() {
         new MultiTapKeyListener(Capitalize.NONE, true);
 
@@ -74,12 +64,6 @@ public class MultiTapKeyListenerTest extends
         new MultiTapKeyListener(null, false);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "it is a non-operation method",
-        method = "onSpanAdded",
-        args = {Spannable.class, Object.class, int.class, int.class}
-    )
     public void testOnSpanAdded() {
         final MockMultiTapKeyListener multiTapKeyListener
                 = new MockMultiTapKeyListener(Capitalize.CHARACTERS, true);
@@ -97,13 +81,6 @@ public class MultiTapKeyListenerTest extends
         assertTrue(multiTapKeyListener.hadAddedSpan());
     }
 
-    @TestTargetNew(
-        level = TestLevel.PARTIAL,
-        method = "onSpanChanged",
-        args = {Spannable.class, Object.class, int.class, int.class, int.class, int.class}
-    )
-    @ToBeFixed(bug = "1695243", explanation = "Android API javadocs are incomplete, " +
-            "should add @throws clause into javadoc")
     public void testOnSpanChanged() {
         final MultiTapKeyListener multiTapKeyListener
                 = MultiTapKeyListener.getInstance(true, Capitalize.CHARACTERS);
@@ -252,11 +229,6 @@ public class MultiTapKeyListenerTest extends
         mInstrumentation.waitForIdleSync();
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "getInstance",
-        args = {boolean.class, android.text.method.TextKeyListener.Capitalize.class}
-    )
     public void testGetInstance() {
         MultiTapKeyListener listener1 = MultiTapKeyListener.getInstance(false, Capitalize.NONE);
         MultiTapKeyListener listener2 = MultiTapKeyListener.getInstance(false, Capitalize.NONE);
@@ -272,12 +244,6 @@ public class MultiTapKeyListenerTest extends
         assertNotSame(listener4, listener1);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "it is a non-operation method.",
-        method = "onSpanRemoved",
-        args = {android.text.Spannable.class, java.lang.Object.class, int.class, int.class}
-    )
     public void testOnSpanRemoved() {
         MultiTapKeyListener multiTapKeyListener =
                 new MultiTapKeyListener(Capitalize.CHARACTERS, true);
@@ -285,11 +251,6 @@ public class MultiTapKeyListenerTest extends
         multiTapKeyListener.onSpanRemoved(text, new Object(), 0, 0);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "getInputType",
-        args = {}
-    )
     public void testGetInputType() {
         MultiTapKeyListener listener = MultiTapKeyListener.getInstance(false, Capitalize.NONE);
         int expected = InputType.TYPE_CLASS_TEXT;

@@ -18,11 +18,6 @@ package android.widget.cts;
 
 import com.android.cts.stub.R;
 
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
-import dalvik.annotation.ToBeFixed;
 
 import org.xmlpull.v1.XmlPullParser;
 
@@ -31,30 +26,7 @@ import android.util.AttributeSet;
 import android.util.Xml;
 import android.widget.ImageButton;
 
-@TestTargetClass(ImageButton.class)
 public class ImageButtonTest extends AndroidTestCase {
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test constructors",
-            method = "ImageButton",
-            args = {android.content.Context.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test constructors",
-            method = "ImageButton",
-            args = {android.content.Context.class, android.util.AttributeSet.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test constructors",
-            method = "ImageButton",
-            args = {android.content.Context.class, android.util.AttributeSet.class, int.class}
-        )
-    })
-    @ToBeFixed(bug = "1695243", explanation = "javadoc does not declare the corner case " +
-            "behavior when context is null")
     public void testConstructor() {
         XmlPullParser parser = getContext().getResources().getXml(R.layout.imagebutton_test);
         AttributeSet attrs = Xml.asAttributeSet(parser);
@@ -85,14 +57,6 @@ public class ImageButtonTest extends AndroidTestCase {
         }
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.PARTIAL_COMPLETE,
-            notes = "Test {@link ImageButton#onSetAlpha(int)}.",
-            method = "onSetAlpha",
-            args = {int.class}
-        )
-    })
     public void testOnSetAlpha() {
         // Do not test, it's controlled by View. Implementation details.
     }

@@ -19,11 +19,6 @@ package android.view.cts;
 import com.android.cts.stub.R;
 
 import dalvik.annotation.KnownFailure;
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
-import dalvik.annotation.ToBeFixed;
 
 import org.xmlpull.v1.XmlPullParser;
 
@@ -42,7 +37,6 @@ import android.widget.LinearLayout;
 /**
  * Test {@link ViewStub}.
  */
-@TestTargetClass(ViewStub.class)
 public class ViewStubTest extends ActivityInstrumentationTestCase<ViewStubStubActivity> {
     private Context mContext;
     private Activity mActivity;
@@ -58,32 +52,6 @@ public class ViewStubTest extends ActivityInstrumentationTestCase<ViewStubStubAc
         mActivity = getActivity();
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test constructor(s) of {@link ViewStub}",
-            method = "ViewStub",
-            args = {android.content.Context.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test constructor(s) of {@link ViewStub}",
-            method = "ViewStub",
-            args = {android.content.Context.class, android.util.AttributeSet.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test constructor(s) of {@link ViewStub}",
-            method = "ViewStub",
-            args = {android.content.Context.class, android.util.AttributeSet.class, int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test constructor(s) of {@link ViewStub}",
-            method = "ViewStub",
-            args = {android.content.Context.class, int.class}
-        )
-    })
     public void testConstructor() {
         XmlPullParser parser = mActivity.getResources().getXml(R.layout.viewstub_layout);
         AttributeSet attrs = Xml.asAttributeSet(parser);
@@ -98,12 +66,6 @@ public class ViewStubTest extends ActivityInstrumentationTestCase<ViewStubStubAc
         new ViewStub(mContext, attrs, 30);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test {@link ViewStub#draw(Canvas)}",
-        method = "draw",
-        args = {android.graphics.Canvas.class}
-    )
     public void testDraw() {
         ViewStub viewStub = new ViewStub(mContext);
         // if the function draw() does not throw any exception,
@@ -111,12 +73,6 @@ public class ViewStubTest extends ActivityInstrumentationTestCase<ViewStubStubAc
         viewStub.draw(null);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test {@link ViewStub#setVisibility(int)}",
-        method = "setVisibility",
-        args = {int.class}
-    )
     @UiThreadTest
     public void testSetVisibility() {
         final ViewStub viewStub1 = (ViewStub) mActivity.findViewById(R.id.viewstub);
@@ -150,18 +106,6 @@ public class ViewStubTest extends ActivityInstrumentationTestCase<ViewStubStubAc
         assertEquals(View.INVISIBLE, viewStub2.getVisibility());
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getLayoutResource",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setLayoutResource",
-            args = {int.class}
-        )
-    })
     public void testAccessLayoutResource() {
         ViewStub viewStub = new ViewStub(mContext);
 
@@ -175,12 +119,6 @@ public class ViewStubTest extends ActivityInstrumentationTestCase<ViewStubStubAc
         assertEquals(-1, viewStub.getLayoutResource());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test {@link ViewStub#onMeasure(int, int)}",
-        method = "onMeasure",
-        args = {int.class, int.class}
-    )
     public void testViewStubHasNoDimensions() {
         ViewStub viewStub = new ViewStub(mContext);
 
@@ -194,12 +132,6 @@ public class ViewStubTest extends ActivityInstrumentationTestCase<ViewStubStubAc
         assertEquals(0, viewStub.getMeasuredHeight());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test {@link ViewStub#setOnInflateListener(OnInflateListener)}",
-        method = "setOnInflateListener",
-        args = {android.view.ViewStub.OnInflateListener.class}
-    )
     @UiThreadTest
     public void testSetOnInflateListener() {
         final ViewStub viewStub = (ViewStub) mActivity.findViewById(R.id.viewstub);
@@ -211,11 +143,6 @@ public class ViewStubTest extends ActivityInstrumentationTestCase<ViewStubStubAc
         assertTrue(listener.hasCalledOnInflate());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "setOnInflateListener",
-        args = {android.view.ViewStub.OnInflateListener.class}
-    )
     @UiThreadTest
     public void testSetOnInflateListenerError() {
         final ViewStub viewStub = (ViewStub) mActivity.findViewById(R.id.viewstub);
@@ -228,20 +155,6 @@ public class ViewStubTest extends ActivityInstrumentationTestCase<ViewStubStubAc
         }
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test {@link ViewStub#getInflatedId()} and {@link ViewStub#setInflatedId(int)}",
-            method = "getInflatedId",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test {@link ViewStub#getInflatedId()} and {@link ViewStub#setInflatedId(int)}",
-            method = "setInflatedId",
-            args = {int.class}
-        )
-    })
     public void testAccessInflatedId() {
         ViewStub viewStub = new ViewStub(mContext);
         assertEquals(0, viewStub.getInflatedId());
@@ -253,12 +166,6 @@ public class ViewStubTest extends ActivityInstrumentationTestCase<ViewStubStubAc
         assertEquals(-1, viewStub.getInflatedId());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test {@link ViewStub#inflate()}",
-        method = "inflate",
-        args = {}
-    )
     @UiThreadTest
     public void testInflate() {
         final ViewStub viewStub = (ViewStub) mActivity.findViewById(R.id.viewstub);
@@ -280,15 +187,6 @@ public class ViewStubTest extends ActivityInstrumentationTestCase<ViewStubStubAc
         assertTrue(listener.hasCalledOnInflate());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test abnormal condition of {@link ViewStub#inflate()}",
-        method = "inflate",
-        args = {}
-    )
-    @ToBeFixed(bug="", explanation="should add javadoc for ViewStub#inflate(): it will" +
-            " throw IllegalArgumentException when resource is invalid and " +
-            " throw IllegalStateException when parent is null")
     public void testInflateError() {
         final ViewStub viewStub = (ViewStub) mActivity.findViewById(R.id.viewstub);
 

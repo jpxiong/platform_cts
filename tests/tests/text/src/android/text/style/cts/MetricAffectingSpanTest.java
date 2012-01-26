@@ -16,9 +16,6 @@
 
 package android.text.style.cts;
 
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
 
 import android.text.TextPaint;
 import android.text.style.CharacterStyle;
@@ -27,14 +24,7 @@ import android.text.style.SuperscriptSpan;
 
 import junit.framework.TestCase;
 
-@TestTargetClass(MetricAffectingSpan.class)
 public class MetricAffectingSpanTest extends TestCase {
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test {@link MetricAffectingSpan#getUnderlying()}",
-        method = "getUnderlying",
-        args = {}
-    )
     public void testGetUnderlying() {
         MetricAffectingSpan metricAffectingSpan = new MyMetricAffectingSpan();
         assertSame(metricAffectingSpan, metricAffectingSpan.getUnderlying());

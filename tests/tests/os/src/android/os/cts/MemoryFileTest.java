@@ -22,13 +22,7 @@ import java.io.OutputStream;
 
 import junit.framework.TestCase;
 import android.os.MemoryFile;
-import dalvik.annotation.TestTargets;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.ToBeFixed;
 
-@TestTargetClass(MemoryFile.class)
 public class MemoryFileTest extends TestCase {
     MemoryFile mMemoryFile;
 
@@ -38,31 +32,11 @@ public class MemoryFileTest extends TestCase {
         mMemoryFile = null;
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test constructor",
-            method = "MemoryFile",
-            args = {java.lang.String.class, int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test constructor",
-            method = "finalize",
-            args = {}
-        )
-    })
     public void testConstructor() throws IOException {
         // new the MemoryFile instance
         new MemoryFile("Test File", 1024);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test writeBytes",
-        method = "writeBytes",
-        args = {byte[].class, int.class, int.class, int.class}
-    )
     public void testWriteBytes() throws IOException {
         byte[] data = new byte[512];
         // new the MemoryFile instance
@@ -89,20 +63,6 @@ public class MemoryFileTest extends TestCase {
         }
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test getOutputStream and getInputStream function",
-            method = "getOutputStream",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test getOutputStream and getInputStream function",
-            method = "getInputStream",
-            args = {}
-        )
-    })
     public void testGetOutputStream() throws IOException {
         byte[] bs = new byte[] { 1, 2, 3, 4 };
         // new the MemoryFile instance
@@ -118,22 +78,6 @@ public class MemoryFileTest extends TestCase {
         assertEquals(4, in.read());
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test allowPurging and isPurgingAllowed",
-            method = "allowPurging",
-            args = {boolean.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test allowPurging and isPurgingAllowed",
-            method = "isPurgingAllowed",
-            args = {}
-        )
-    })
-    @ToBeFixed(bug = "1537041", explanation = "When set mAllowPurging to true, writeBytes"
-                     + "should throw out exception")
     public void testAllowPurging() throws IOException {
         // new the MemoryFile instance
         mMemoryFile = new MemoryFile("Test File", 1024);
@@ -152,12 +96,6 @@ public class MemoryFileTest extends TestCase {
         assertFalse(mMemoryFile.isPurgingAllowed());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test length",
-        method = "length",
-        args = {}
-    )
     public void testLength() throws IOException {
         mMemoryFile = new MemoryFile("Test File", 1024);
         assertEquals(1024, mMemoryFile.length());
@@ -172,12 +110,6 @@ public class MemoryFileTest extends TestCase {
         assertEquals(Integer.MIN_VALUE, mMemoryFile.length());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test readBytes",
-        method = "readBytes",
-        args = {byte[].class, int.class, int.class, int.class}
-    )
     public void testReadBytes() throws IOException {
         // new the MemoryFile instance
         mMemoryFile = new MemoryFile("Test File", 1024);
@@ -214,12 +146,6 @@ public class MemoryFileTest extends TestCase {
         }
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test close function",
-        method = "close",
-        args = {}
-    )
     public void testClose() throws IOException {
         // new the MemoryFile instance
         mMemoryFile = new MemoryFile("Test File", 1024);

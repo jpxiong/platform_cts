@@ -18,10 +18,6 @@ package android.widget.cts;
 
 import com.android.cts.stub.R;
 
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
 
 import android.app.Activity;
 import android.content.Context;
@@ -39,7 +35,6 @@ import android.widget.SeekBar;
 /**
  * Test {@link AbsSeekBar}.
  */
-@TestTargetClass(AbsSeekBar.class)
 public class AbsSeekBarTest extends ActivityInstrumentationTestCase2<ProgressBarStubActivity> {
     public AbsSeekBarTest() {
         super("com.android.cts.stub", ProgressBarStubActivity.class);
@@ -55,23 +50,6 @@ public class AbsSeekBarTest extends ActivityInstrumentationTestCase2<ProgressBar
         mResources = mActivity.getResources();
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "AbsSeekBar",
-            args = {android.content.Context.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "AbsSeekBar",
-            args = {android.content.Context.class, android.util.AttributeSet.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "AbsSeekBar",
-            args = {android.content.Context.class, android.util.AttributeSet.class, int.class}
-        )
-    })
     public void testConstructor() {
         new MyAbsSeekBar(mActivity);
 
@@ -80,18 +58,6 @@ public class AbsSeekBarTest extends ActivityInstrumentationTestCase2<ProgressBar
         new MyAbsSeekBar(mActivity, null, com.android.internal.R.attr.progressBarStyle);
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setThumbOffset",
-            args = {int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getThumbOffset",
-            args = {}
-        )
-    })
     public void testAccessThumbOffset() {
         AbsSeekBar myAbsSeekBar = new MyAbsSeekBar(mActivity);
         final int positive = 5;
@@ -108,11 +74,6 @@ public class AbsSeekBarTest extends ActivityInstrumentationTestCase2<ProgressBar
         assertEquals(negative, myAbsSeekBar.getThumbOffset());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "setThumb",
-        args = {android.graphics.drawable.Drawable.class}
-    )
     public void testSetThumb() {
         MyAbsSeekBar myAbsSeekBar = new MyAbsSeekBar(mActivity);
         Drawable drawable1 = mResources.getDrawable(R.drawable.scenery);
@@ -130,11 +91,6 @@ public class AbsSeekBarTest extends ActivityInstrumentationTestCase2<ProgressBar
         assertTrue(myAbsSeekBar.verifyDrawable(drawable2));
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "drawableStateChanged",
-        args = {}
-    )
     public void testDrawableStateChanged() {
         MyAbsSeekBar myAbsSeekBar = new MyAbsSeekBar(mActivity);
         MockDrawable drawable = new MockDrawable();
@@ -149,18 +105,6 @@ public class AbsSeekBarTest extends ActivityInstrumentationTestCase2<ProgressBar
         assertEquals(0xFF, drawable.getAlpha());
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setThumb",
-            args = {android.graphics.drawable.Drawable.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "verifyDrawable",
-            args = {android.graphics.drawable.Drawable.class}
-        )
-    })
     public void testVerifyDrawable() {
         MyAbsSeekBar myAbsSeekBar = new MyAbsSeekBar(mActivity);
         Drawable drawable1 = mResources.getDrawable(R.drawable.scenery);
@@ -198,18 +142,6 @@ public class AbsSeekBarTest extends ActivityInstrumentationTestCase2<ProgressBar
         assertFalse(myAbsSeekBar.verifyDrawable(null));
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getKeyProgressIncrement",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setKeyProgressIncrement",
-            args = {int.class}
-        )
-    })
     public void testAccessKeyProgressIncrement() throws Throwable {
         // AbsSeekBar is an abstract class, use its subclass: SeekBar to do this test.
         runTestOnUiThread(new Runnable() {
@@ -241,11 +173,6 @@ public class AbsSeekBarTest extends ActivityInstrumentationTestCase2<ProgressBar
         assertEquals(oldProgress - keyProgressIncrement, seekBar.getProgress());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "setMax",
-        args = {int.class}
-    )
     public void testSetMax() {
         MyAbsSeekBar myAbsSeekBar = new MyAbsSeekBar(mActivity, null, R.style.TestProgressBar);
 
@@ -274,33 +201,6 @@ public class AbsSeekBarTest extends ActivityInstrumentationTestCase2<ProgressBar
         assertEquals(keyProgressIncrement + 1, myAbsSeekBar.getKeyProgressIncrement());
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.NOT_NECESSARY,
-            method = "onSizeChanged",
-            args = {int.class, int.class, int.class, int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.NOT_NECESSARY,
-            method = "onDraw",
-            args = {Canvas.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.NOT_NECESSARY,
-            method = "onKeyDown",
-            args = {int.class, KeyEvent.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.NOT_NECESSARY,
-            method = "onMeasure",
-            args = {int.class, int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.NOT_NECESSARY,
-            method = "onTouchEvent",
-            args = {MotionEvent.class}
-        )
-    })
     public void testFoo() {
         // Do not test these APIs. They are callbacks which:
         // 1. The callback machanism has been tested in super class

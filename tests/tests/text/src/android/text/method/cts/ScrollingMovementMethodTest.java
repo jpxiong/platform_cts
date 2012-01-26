@@ -17,11 +17,6 @@
 package android.text.method.cts;
 
 import dalvik.annotation.KnownFailure;
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
-import dalvik.annotation.ToBeFixed;
 
 import android.os.SystemClock;
 import android.test.ActivityInstrumentationTestCase2;
@@ -48,7 +43,6 @@ import android.widget.cts.WidgetTestUtils;
  *
  * @see android.widget.cts.TextViewTest
  */
-@TestTargetClass(ScrollingMovementMethod.class)
 public class ScrollingMovementMethodTest extends ActivityInstrumentationTestCase2<StubActivity> {
     private static final int LITTLE_SPACE = 20;
 
@@ -73,20 +67,10 @@ public class ScrollingMovementMethodTest extends ActivityInstrumentationTestCase
         mScaledTouchSlop = ViewConfiguration.get(getActivity()).getScaledTouchSlop();
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "ScrollingMovementMethod",
-        args = {}
-    )
     public void testConstructor() {
         new ScrollingMovementMethod();
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "getInstance",
-        args = {}
-    )
     public void testGetInstance() {
         MovementMethod method0 = ScrollingMovementMethod.getInstance();
         assertTrue(method0 instanceof ScrollingMovementMethod);
@@ -95,14 +79,6 @@ public class ScrollingMovementMethodTest extends ActivityInstrumentationTestCase
         assertSame(method0, method1);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test the method wtih horizontal motion event.",
-        method = "onTouchEvent",
-        args = {TextView.class, Spannable.class, MotionEvent.class}
-    )
-    @ToBeFixed(bug = "1695243", explanation = "Android API javadocs are incomplete. There is no "
-            + "document about the behaviour of this method.")
     public void testOnTouchEventHorizontalMotion() throws Throwable {
         /*
          * All these assertions depends on whether the TextView has a layout.The text view will not
@@ -209,14 +185,6 @@ public class ScrollingMovementMethodTest extends ActivityInstrumentationTestCase
         }));
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test the method wtih vertical motion event.",
-        method = "onTouchEvent",
-        args = {TextView.class, Spannable.class, MotionEvent.class}
-    )
-    @ToBeFixed(bug = "1695243", explanation = "Android API javadocs are incomplete. There is no "
-            + "document about the behaviour of this method.")
     public void testOnTouchEventVerticalMotion() throws Throwable {
         /*
          * All these assertions depends on whether the TextView has a layout.The text view will not
@@ -320,16 +288,6 @@ public class ScrollingMovementMethodTest extends ActivityInstrumentationTestCase
         }));
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test the method with null parameters.",
-        method = "onTouchEvent",
-        args = {TextView.class, Spannable.class, MotionEvent.class}
-    )
-    @ToBeFixed(bug = "1695243", explanation = "Android API javadocs are incomplete. @throws clause "
-            + "should be added into javadoc of "
-            + "ScrollingMovementMethod#onTouchEvent(TextView, Spannable, MotionEvent) "
-            + "when the param widget, buffer or text is null")
     public void testOnTouchEventExceptional() throws Throwable {
         /*
          * All these assertions depends on whether the TextView has a layout.The text view will not
@@ -404,23 +362,10 @@ public class ScrollingMovementMethodTest extends ActivityInstrumentationTestCase
         });
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "It always returns false.",
-        method = "canSelectArbitrarily",
-        args = {}
-    )
     public void testCanSelectArbitrarily() {
         assertFalse(new ScrollingMovementMethod().canSelectArbitrarily());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test {@link ScrollingMovementMethod#onKeyDown(TextView, Spannable, int, "
-                + "KeyEvent)}. The params event and buffer are never read.",
-        method = "onKeyDown",
-        args = {TextView.class, Spannable.class, int.class, KeyEvent.class}
-    )
     public void testOnKeyDownVerticalMovement() throws Throwable {
         /*
          * All these assertions depends on whether the TextView has a layout.The text view will not
@@ -456,12 +401,6 @@ public class ScrollingMovementMethodTest extends ActivityInstrumentationTestCase
         assertVisibleLineInTextView(0);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "The params event and buffer are never read.",
-        method = "onKeyDown",
-        args = {TextView.class, Spannable.class, int.class, KeyEvent.class}
-    )
     public void testOnKeyDownHorizontalMovement() throws Throwable {
         /*
          * All these assertions depends on whether the TextView has a layout.The text view will not
@@ -515,16 +454,6 @@ public class ScrollingMovementMethodTest extends ActivityInstrumentationTestCase
         assertVisibleLineInTextView(0);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "The params event and buffer are never read.",
-        method = "onKeyDown",
-        args = {TextView.class, Spannable.class, int.class, KeyEvent.class}
-    )
-    @ToBeFixed(bug = "1695243", explanation = "Android API javadocs are incomplete. @throws clause "
-            + "should be added into javadoc of "
-            + "ScrollingMovementMethod#onKeyDown(TextView, Spannable, int, KeyEvent) "
-            + "when the param widget, buffer or text is null")
     public void testOnKeyDownExceptions() throws Throwable {
         /*
          * All these assertions depends on whether the TextView has a layout.The text view will not
@@ -567,25 +496,6 @@ public class ScrollingMovementMethodTest extends ActivityInstrumentationTestCase
         });
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "The parameter buffer is never read.",
-            method = "down",
-            args = {android.widget.TextView.class, android.text.Spannable.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "The parameter buffer is never read.",
-            method = "up",
-            args = {android.widget.TextView.class, android.text.Spannable.class}
-        )
-    })
-    @ToBeFixed(bug = "1695243", explanation = "Android API javadocs are incomplete. @throws clause "
-            + "should be added into javadoc of "
-            + "ScrollingMovementMethod#down(TextView, Spannable) and "
-            + "ScrollingMovementMethod#up(TextView, Spannable)"
-            + "when the param widget or buffer is null")
     public void testVerticalMovement() throws Throwable {
         /*
          * All these assertions depends on whether the TextView has a layout.The text view will not
@@ -676,41 +586,6 @@ public class ScrollingMovementMethodTest extends ActivityInstrumentationTestCase
         });
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "onKeyDown",
-            args = {TextView.class, Spannable.class, int.class, KeyEvent.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "onTouchEvent",
-            args = {TextView.class, Spannable.class, MotionEvent.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "up",
-            args = {TextView.class, Spannable.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "down",
-            args = {TextView.class, Spannable.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "left",
-            args = {TextView.class, Spannable.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "right",
-            args = {TextView.class, Spannable.class}
-        )
-    })
-    @ToBeFixed(bug = "1695243", explanation = "Android API javadocs are incomplete. @throws clause "
-            + "should be added into javadoc of all these methods when the widget does not get "
-            + "layout")
     public void testMovementWithNullLayout() {
         assertNull(mTextView.getLayout());
         try {
@@ -756,24 +631,10 @@ public class ScrollingMovementMethodTest extends ActivityInstrumentationTestCase
         }
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "This is a blank method.",
-        method = "initialize",
-        args = {TextView.class, Spannable.class}
-    )
-    @ToBeFixed(bug = "1695243", explanation = "Android API javadocs are incomplete.")
     public void testInitialize() {
         new ScrollingMovementMethod().initialize(null, null);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "This method always returns false.",
-        method = "onTrackballEvent",
-        args = {TextView.class, Spannable.class, MotionEvent.class}
-    )
-    @ToBeFixed(bug = "1695243", explanation = "Android API javadocs are incomplete.")
     public void testOnTrackballEvent() {
         long now = SystemClock.uptimeMillis();
         MotionEvent event = MotionEvent.obtain(now, now, 0, 2, -2, 0);
@@ -785,13 +646,6 @@ public class ScrollingMovementMethodTest extends ActivityInstrumentationTestCase
         assertFalse(mockMethod.onTrackballEvent(mTextView, null, event));
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "It always returns false.",
-        method = "onKeyUp",
-        args = {TextView.class, Spannable.class, int.class, KeyEvent.class}
-    )
-    @ToBeFixed(bug = "1695243", explanation = "Android API javadocs are incomplete.")
     public void testOnKeyUp() {
         ScrollingMovementMethod method = new ScrollingMovementMethod();
         SpannableString spannable = new SpannableString("Test Content");
@@ -806,16 +660,6 @@ public class ScrollingMovementMethodTest extends ActivityInstrumentationTestCase
         assertFalse(method.onKeyUp(view, spannable, KeyEvent.KEYCODE_0, null));
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "The parameter text is never read.",
-        method = "onTakeFocus",
-        args = {TextView.class, Spannable.class, int.class}
-    )
-    @ToBeFixed(bug = "1695243", explanation = "Android API javadocs are incomplete. @throws clause "
-            + "should be added into javadoc of "
-            + "ScrollingMovementMethod#onTakeFocus(TextView, Spannable, int) "
-            + "when the param text is null")
     public void testOnTakeFocus() throws Throwable {
         /*
          * All these assertions depends on whether the TextView has a layout.The text view will not
@@ -880,20 +724,6 @@ public class ScrollingMovementMethodTest extends ActivityInstrumentationTestCase
         });
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "The parameter buffer is never read.",
-            method = "left",
-            args = {TextView.class, Spannable.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "The parameter buffer is never read.",
-            method = "right",
-            args = {TextView.class, Spannable.class}
-        )
-    })
     public void testHorizontalMovement() throws Throwable {
         /*
          * All these assertions depends on whether the TextView has a layout.The text view will not
@@ -949,13 +779,6 @@ public class ScrollingMovementMethodTest extends ActivityInstrumentationTestCase
         assertEquals(previousScrollX, mTextView.getScrollX());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "onKeyOther",
-        args = {TextView.class, Spannable.class, KeyEvent.class}
-    )
-    @ToBeFixed(bug = "1695243", explanation = "Android API javadocs are incomplete. There is no "
-            + "document about the behaviour of this method.")
     public void testOnKeyOther() throws Throwable {
         runActionOnUiThread(new Runnable() {
             public void run() {

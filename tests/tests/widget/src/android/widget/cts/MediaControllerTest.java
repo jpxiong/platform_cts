@@ -18,11 +18,6 @@ package android.widget.cts;
 
 import com.android.cts.stub.R;
 
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
-import dalvik.annotation.ToBeFixed;
 
 import org.xmlpull.v1.XmlPullParser;
 
@@ -47,7 +42,6 @@ import java.io.OutputStream;
 /**
  * Test {@link MediaController}.
  */
-@TestTargetClass(MediaController.class)
 public class MediaControllerTest extends
         ActivityInstrumentationTestCase2<MediaControllerStubActivity> {
     private MediaController mMediaController;
@@ -66,26 +60,6 @@ public class MediaControllerTest extends
         mInstrumentation = getInstrumentation();
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test constructor(s) of {@link MediaController}",
-            method = "MediaController",
-            args = {android.content.Context.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test constructor(s) of {@link MediaController}",
-            method = "MediaController",
-            args = {android.content.Context.class, android.util.AttributeSet.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test constructor(s) of {@link MediaController}",
-            method = "MediaController",
-            args = {android.content.Context.class, boolean.class}
-        )
-    })
     public void testConstructor() {
         new MediaController(mActivity, null);
 
@@ -99,35 +73,12 @@ public class MediaControllerTest extends
         new MediaController(mActivity, attrs);
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test {@link MediaController#onFinishInflate()}",
-            method = "onFinishInflate",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test {@link MediaController#onFinishInflate()}",
-            method = "setAnchorView",
-            args = {android.view.View.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test {@link MediaController#onFinishInflate()}",
-            method = "setMediaPlayer",
-            args = {android.widget.MediaController.MediaPlayerControl.class}
-        )
-    })
     /**
      * scenario description:
      * 1. Show the MediaController.
      *
      */
     @UiThreadTest
-    @ToBeFixed(bug = "1695243", explanation = "setAnchorView() must be called before show(), " +
-            "javadoc does not declare the preconditions for showing. " +
-            "And javadoc does not declare the default status is paused.")
     public void testMediaController() {
         mMediaController = new MediaController(mActivity);
         final MockMediaPlayerControl mediaPlayerControl = new MockMediaPlayerControl();
@@ -157,34 +108,6 @@ public class MediaControllerTest extends
         assertTrue(mMediaController.isShowing());
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test {@link MediaController#isShowing()}",
-            method = "isShowing",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test {@link MediaController#isShowing()}",
-            method = "hide",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test {@link MediaController#isShowing()}",
-            method = "show",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test {@link MediaController#isShowing()}",
-            method = "show",
-            args = {int.class}
-        )
-    })
-    @ToBeFixed(bug = "1559790", explanation = "isShowing() should return false after time out, " +
-            "but MediaController still shows, this may be a bug.")
     public void testShow() {
         mMediaController = new MediaController(mActivity, true);
         assertFalse(mMediaController.isShowing());
@@ -261,15 +184,6 @@ public class MediaControllerTest extends
         return mActivity.getFileStreamPath(VIDEO_NAME).getAbsolutePath();
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test {@link MediaController#onTrackballEvent(MotionEvent)}, " +
-                "this function always returns false",
-        method = "onTrackballEvent",
-        args = {android.view.MotionEvent.class}
-    )
-    @ToBeFixed(bug = "1559790", explanation = "MediaController does not show after " +
-            "a track ball event is processed.")
     public void testOnTrackballEvent() {
         mMediaController = new MediaController(mActivity);
         final MockMediaPlayerControl mediaPlayerControl = new MockMediaPlayerControl();
@@ -302,12 +216,6 @@ public class MediaControllerTest extends
         mInstrumentation.waitForIdleSync();
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test {@link MediaController#setEnabled(boolean)}",
-        method = "setEnabled",
-        args = {boolean.class}
-    )
     @UiThreadTest
     public void testSetEnabled() {
         final View videoView = mActivity.findViewById(R.id.mediacontroller_videoview);
@@ -330,12 +238,6 @@ public class MediaControllerTest extends
         assertFalse(mMediaController.isEnabled());
     }
 
-    @TestTargetNew(
-        level = TestLevel.SUFFICIENT,
-        notes = "no way to trigger next/prev press",
-        method = "setPrevNextListeners",
-        args = {android.view.View.OnClickListener.class, android.view.View.OnClickListener.class}
-    )
     public void testSetPrevNextListeners() {
         final View videoView = mActivity.findViewById(R.id.mediacontroller_videoview);
         final MockMediaPlayerControl mediaPlayerControl = new MockMediaPlayerControl();

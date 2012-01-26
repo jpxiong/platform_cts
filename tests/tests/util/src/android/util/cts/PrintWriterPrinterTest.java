@@ -27,12 +27,7 @@ import java.io.PrintWriter;
 import android.content.Context;
 import android.test.AndroidTestCase;
 import android.util.PrintWriterPrinter;
-import dalvik.annotation.TestTargets;
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargetClass;
 
-@TestTargetClass(PrintWriterPrinter.class)
 public class PrintWriterPrinterTest extends AndroidTestCase {
     private File mFile;
     @Override
@@ -44,12 +39,6 @@ public class PrintWriterPrinterTest extends AndroidTestCase {
             mFile.createNewFile();
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test constructor(s) of PrintWriterPrinter.",
-        method = "PrintWriterPrinter",
-        args = {java.io.PrintWriter.class}
-    )
     public void testConstructor() {
 
         PrintWriterPrinter printWriterPrinter = null;
@@ -62,12 +51,6 @@ public class PrintWriterPrinterTest extends AndroidTestCase {
         }
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test println(String x).",
-        method = "println",
-        args = {java.lang.String.class}
-    )
     public void testPrintln() {
         PrintWriterPrinter printWriterPrinter = null;
         String mMessage = "testMessage";

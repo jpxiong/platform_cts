@@ -15,10 +15,6 @@
  */
 package android.graphics.cts;
 
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.ToBeFixed;
 
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
@@ -35,7 +31,6 @@ import android.graphics.PorterDuff.Mode;
 
 import junit.framework.TestCase;
 
-@TestTargetClass(CornerPathEffect.class)
 public class CornerPathEffectTest extends TestCase {
     private static final int BITMAP_WIDTH = 100;
     private static final int BITMAP_HEIGHT = 100;
@@ -43,13 +38,6 @@ public class CornerPathEffectTest extends TestCase {
     private static final int RADIUS = 20;
     private static final int TOLERANCE = 5;
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "CornerPathEffect",
-        args = {float.class}
-    )
-    @ToBeFixed(bug = "2037365", explanation = "CornerPathEffect ends the path prematurely it " +
-            "is not closed.")
     public void testCornerPathEffect() {
         Path path = new Path();
         path.moveTo(0, PADDING);

@@ -16,11 +16,6 @@
 
 package android.net.cts;
 
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
-import dalvik.annotation.ToBeFixed;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -40,7 +35,6 @@ import java.util.Set;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
-@TestTargetClass(ConnectivityManager.class)
 public class ConnectivityManagerTest extends AndroidTestCase {
 
     private static final String TAG = ConnectivityManagerTest.class.getSimpleName();
@@ -66,11 +60,6 @@ public class ConnectivityManagerTest extends AndroidTestCase {
         mPackageManager = getContext().getPackageManager();
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "getNetworkInfo",
-        args = {int.class}
-    )
     public void testGetNetworkInfo() {
         assertTrue(mCm.getAllNetworkInfo().length >= MIN_NUM_NETWORK_TYPES);
         NetworkInfo ni = mCm.getNetworkInfo(TYPE_WIFI);
@@ -95,18 +84,6 @@ public class ConnectivityManagerTest extends AndroidTestCase {
         assertNull(ni);
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "isNetworkTypeValid",
-            args = {int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getAllNetworkInfo",
-            args = {}
-        )
-    })
     public void testIsNetworkTypeValid() {
 
         NetworkInfo[] ni = mCm.getAllNetworkInfo();
@@ -117,29 +94,11 @@ public class ConnectivityManagerTest extends AndroidTestCase {
         assertFalse(ConnectivityManager.isNetworkTypeValid(-1));
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test getAllNetworkInfo().",
-        method = "getAllNetworkInfo",
-        args = {}
-    )
     public void testGetAllNetworkInfo() {
         NetworkInfo[] ni = mCm.getAllNetworkInfo();
         assertTrue(ni.length >= MIN_NUM_NETWORK_TYPES);
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "startUsingNetworkFeature",
-            args = {int.class, java.lang.String.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "stopUsingNetworkFeature",
-            args = {int.class, java.lang.String.class}
-        )
-    })
     public void testStartUsingNetworkFeature() {
 
         final String invalidateFeature = "invalidateFeature";
@@ -166,11 +125,6 @@ public class ConnectivityManagerTest extends AndroidTestCase {
         assertEquals(failureCode, mCm.stopUsingNetworkFeature(TYPE_WIFI, mmsFeature));
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "requestRouteToHost",
-        args = {int.class, int.class}
-    )
     public void testRequestRouteToHost() {
         Set<Integer> exceptionFreeTypes = new HashSet<Integer>();
         exceptionFreeTypes.add(ConnectivityManager.TYPE_BLUETOOTH);
@@ -192,12 +146,6 @@ public class ConnectivityManagerTest extends AndroidTestCase {
         assertFalse(mCm.requestRouteToHost(-1, HOST_ADDRESS));
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "getActiveNetworkInfo",
-        args = {}
-    )
-    @ToBeFixed(bug="1695243", explanation="No Javadoc")
     public void testGetActiveNetworkInfo() {
         NetworkInfo ni = mCm.getActiveNetworkInfo();
 
@@ -206,11 +154,6 @@ public class ConnectivityManagerTest extends AndroidTestCase {
         }
     }
 
-    @TestTargetNew(
-        level = TestLevel.SUFFICIENT,
-        method = "getBackgroundDataSetting",
-        args = {}
-    )
     public void testTest() {
         mCm.getBackgroundDataSetting();
     }

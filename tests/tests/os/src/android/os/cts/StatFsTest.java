@@ -20,45 +20,8 @@ import java.io.File;
 import junit.framework.TestCase;
 import android.os.Environment;
 import android.os.StatFs;
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
 
-@TestTargetClass(StatFs.class)
 public class StatFsTest extends TestCase {
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "StatFs",
-            args = {String.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "restat",
-            args = {String.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getBlockSize",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getBlockCount",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getFreeBlocks",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getAvailableBlocks",
-            args = {}
-        )
-    })
     public void testStatFs(){
         File path = Environment.getDataDirectory();
         StatFs stat = new StatFs(path.getPath());

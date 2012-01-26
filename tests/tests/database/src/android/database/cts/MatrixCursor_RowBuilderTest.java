@@ -16,9 +16,6 @@
 
 package android.database.cts;
 
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
 
 import android.database.CursorIndexOutOfBoundsException;
 import android.database.MatrixCursor;
@@ -26,7 +23,6 @@ import android.database.MatrixCursor.RowBuilder;
 
 import junit.framework.TestCase;
 
-@TestTargetClass(RowBuilder.class)
 public class MatrixCursor_RowBuilderTest extends TestCase {
     private static final int COLUMN0_INDEX = 0;
 
@@ -34,11 +30,6 @@ public class MatrixCursor_RowBuilderTest extends TestCase {
 
     private static final int COLUMN2_INDEX = 2;
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "add",
-        args = {java.lang.Object.class}
-    )
     public void testAdd() {
         MatrixCursor cursor = new MatrixCursor(new String[] { "column0", "column1", "column2" });
         assertEquals(0, cursor.getCount());

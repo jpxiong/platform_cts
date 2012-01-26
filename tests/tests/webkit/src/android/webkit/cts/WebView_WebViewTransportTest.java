@@ -21,25 +21,8 @@ import android.test.UiThreadTest;
 import android.webkit.WebView;
 import android.webkit.WebView.WebViewTransport;
 
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
 
-@TestTargetClass(WebViewTransport.class)
 public class WebView_WebViewTransportTest extends AndroidTestCase {
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setWebView",
-            args = {WebView.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getWebView",
-            args = {}
-        )
-    })
     @UiThreadTest
     public void testAccessWebView() {
         WebView webView = new WebView(mContext);

@@ -16,10 +16,6 @@
 
 package android.text.util.cts;
 
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.ToBeFixed;
 
 import android.test.AndroidTestCase;
 import android.text.util.Rfc822Token;
@@ -28,24 +24,11 @@ import android.text.util.Rfc822Tokenizer;
 /**
  * Test {@link Rfc822Tokenizer}.
  */
-@TestTargetClass(Rfc822Tokenizer.class)
 public class Rfc822TokenizerTest extends AndroidTestCase {
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "Rfc822Tokenizer",
-        args = {}
-    )
     public void testConstructor() {
         new Rfc822Tokenizer();
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "findTokenStart",
-        args = {java.lang.CharSequence.class, int.class}
-    )
-    @ToBeFixed(bug = "1695243", explanation = "the javadoc for findTokenStart() is incomplete." +
-            "1. not clear what is supposed to happen if text is null.")
     public void testFindTokenStart() {
         Rfc822Tokenizer rfc822Tokenizer = new Rfc822Tokenizer();
 
@@ -78,14 +61,6 @@ public class Rfc822TokenizerTest extends AndroidTestCase {
         }
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "findTokenEnd",
-        args = {java.lang.CharSequence.class, int.class}
-    )
-    @ToBeFixed(bug = "1695243", explanation = "the javadoc for findTokenEnd() is incomplete." +
-            "1. not clear what is supposed to happen if text is null." +
-            "2. not clear whether it is supposed result if cursor is exceptional value.")
     public void testFindTokenEnd() {
         Rfc822Tokenizer rfc822Tokenizer = new Rfc822Tokenizer();
 
@@ -121,13 +96,6 @@ public class Rfc822TokenizerTest extends AndroidTestCase {
         }
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "terminateToken",
-        args = {java.lang.CharSequence.class}
-    )
-    @ToBeFixed(bug = "1695243", explanation = "the javadoc for terminateToken() is incomplete." +
-            "1. not clear what is supposed result if text is null.")
     public void testTerminateToken() {
         Rfc822Tokenizer rfc822Tokenizer = new Rfc822Tokenizer();
 
@@ -142,16 +110,6 @@ public class Rfc822TokenizerTest extends AndroidTestCase {
         assertEquals(text + comma + space, rfc822Tokenizer.terminateToken(null));
     }
 
-    @TestTargetNew(
-        level = TestLevel.SUFFICIENT ,
-        notes = "Broken syntax tolerance is hard to specify",
-        method = "tokenize",
-        args = {java.lang.CharSequence.class}
-    )
-    @ToBeFixed(bug = "", explanation = "" +
-            "1. the comment doesn't be cleaned before find next token." +
-            "2. the javadoc for findTokenEnd() is incomplete." +
-            "   - not clear what is supposed result if text is null.")
     public void testTokenize() {
         Rfc822Token[] tokens = Rfc822Tokenizer.tokenize("");
         assertEquals(0, tokens.length);

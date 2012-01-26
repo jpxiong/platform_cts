@@ -18,11 +18,6 @@ package android.widget.cts;
 
 import com.android.cts.stub.R;
 
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
-import dalvik.annotation.ToBeFixed;
 
 import org.xmlpull.v1.XmlPullParser;
 
@@ -45,24 +40,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
-@TestTargetClass(ImageSwitcher.class)
 public class ImageSwitcherTest extends AndroidTestCase {
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test constructors",
-            method = "ImageSwitcher",
-            args = {android.content.Context.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test constructors",
-            method = "ImageSwitcher",
-            args = {android.content.Context.class, android.util.AttributeSet.class}
-        )
-    })
-    @ToBeFixed(bug="1417734", explanation="ImageSwitcher#ImageSwitcher(Context, AttributeSet)" +
-            " should check whether the input Context is null")
     public void testConstructor() {
         new ImageSwitcher(getContext());
 
@@ -74,12 +52,6 @@ public class ImageSwitcherTest extends AndroidTestCase {
         new ImageSwitcher(getContext(), attrs);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test setImageResource(int)",
-        method = "setImageResource",
-        args = {int.class}
-    )
     public void testSetImageResource() {
         // new the ImageSwitcher instance
         ImageSwitcher imageSwitcher = new ImageSwitcher(getContext());
@@ -110,12 +82,6 @@ public class ImageSwitcherTest extends AndroidTestCase {
         assertNull(((ImageView) imageSwitcher.getCurrentView()).getDrawable());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test setImageURI(Uri)",
-        method = "setImageURI",
-        args = {android.net.Uri.class}
-    )
     public void testSetImageURI() {
         // new the ImageSwitcher instance
         ImageSwitcher imageSwitcher = new ImageSwitcher(getContext());
@@ -159,12 +125,6 @@ public class ImageSwitcherTest extends AndroidTestCase {
         imageSwitcher.setImageURI(null);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test setImageDrawable(Drawable)",
-        method = "setImageDrawable",
-        args = {android.graphics.drawable.Drawable.class}
-    )
     public void testSetImageDrawable() {
         ImageSwitcher imageSwitcher = new ImageSwitcher(getContext());
         ImageView iv = new ImageView(getContext());

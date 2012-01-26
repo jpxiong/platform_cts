@@ -18,10 +18,6 @@ package android.view.animation.cts;
 
 import com.android.cts.stub.R;
 
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
 
 import android.content.Context;
 import android.test.ActivityInstrumentationTestCase2;
@@ -33,7 +29,6 @@ import android.view.animation.GridLayoutAnimationController;
 import android.view.animation.Interpolator;
 import android.view.animation.LayoutAnimationController;
 
-@TestTargetClass(AnimationUtils.class)
 public class AnimationUtilsTest extends
         ActivityInstrumentationTestCase2<AnimationTestStubActivity> {
 
@@ -49,23 +44,6 @@ public class AnimationUtilsTest extends
         mActivity = (AnimationTestStubActivity) getActivity();
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "loadAnimation",
-            args = {Context.class, int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "loadInterpolator",
-            args = {Context.class, int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "loadLayoutAnimation",
-            args = {Context.class, int.class}
-        )
-    })
     public void testLoad() {
         // XML file of com.android.cts.stub.R.anim.anim_alpha
         // <alpha xmlns:android="http://schemas.android.com/apk/res/android"
@@ -96,23 +74,6 @@ public class AnimationUtilsTest extends
         assertEquals(0.1f, controller.getDelay(), 0.001f);
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.NOT_FEASIBLE,
-            method = "makeInAnimation",
-            args = {Context.class, boolean.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.NOT_FEASIBLE,
-            method = "makeOutAnimation",
-            args = {Context.class, boolean.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.NOT_FEASIBLE,
-            method = "makeInChildBottomAnimation",
-            args = {Context.class}
-        )
-    })
     public void testMakeAnimation() {
         Animation inAnimation = AnimationUtils.makeInAnimation(mActivity, true);
         assertNotNull(inAnimation);
@@ -123,11 +84,6 @@ public class AnimationUtilsTest extends
         // TODO: How to assert these Animations.
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "currentAnimationTimeMillis",
-        args = {}
-    )
     public void testCurrentAnimationTimeMillis() {
         long time1 = AnimationUtils.currentAnimationTimeMillis();
         assertTrue(time1 > 0);

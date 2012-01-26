@@ -21,12 +21,7 @@ import android.app.Instrumentation;
 import android.app.LocalActivityManager;
 import android.content.Intent;
 import android.test.InstrumentationTestCase;
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
 
-@TestTargetClass(LocalActivityManager.class)
 public class LocalActivityManagerTest extends InstrumentationTestCase implements CTSResult {
 
     private Instrumentation mInstrumentation;
@@ -51,12 +46,6 @@ public class LocalActivityManagerTest extends InstrumentationTestCase implements
         mInstrumentation.getTargetContext().startActivity(intent);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test constructor of LocalActivityManager",
-        method = "LocalActivityManager",
-        args = {android.app.Activity.class, boolean.class}
-    )
     public void testConstructor() {
         new LocalActivityManager(new Activity(), true);
         new LocalActivityManager(new Activity(), false);
@@ -64,11 +53,6 @@ public class LocalActivityManagerTest extends InstrumentationTestCase implements
         new LocalActivityManager(null, true);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "dispatchResume",
-        args = {}
-    )
     public void testDispatchResume() throws InterruptedException {
         LocalActivityManagerTestHelper.setResult(this);
         setupActivity(LocalActivityManagerTestHelper.ACTION_DISPATCH_RESUME);
@@ -83,117 +67,48 @@ public class LocalActivityManagerTest extends InstrumentationTestCase implements
         }
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "startActivity",
-            args = {java.lang.String.class, android.content.Intent.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getCurrentId",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getActivity",
-            args = {java.lang.String.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getCurrentActivity",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "destroyActivity",
-            args = {java.lang.String.class, boolean.class}
-        )
-    })
     public void testStartActivity() throws InterruptedException {
         LocalActivityManagerTestHelper.setResult(this);
         setupActivity(LocalActivityManagerTestHelper.ACTION_START_ACTIVITY);
         waitForResult();
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "dispatchCreate",
-            args = {android.os.Bundle.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "saveInstanceState",
-            args = {}
-        )
-    })
     public void testDispatchCreate() throws InterruptedException {
         LocalActivityManagerTestHelper.setResult(this);
         setupActivity(LocalActivityManagerTestHelper.ACTION_DISPATCH_CREATE);
         waitForResult();
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "dispatchStop",
-        args = {}
-    )
     public void testDispatchStop() throws InterruptedException {
         LocalActivityManagerTestHelper.setResult(this);
         setupActivity(LocalActivityManagerTestHelper.ACTION_DISPATCH_STOP);
         waitForResult();
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "dispatchPause",
-        args = {boolean.class}
-    )
     public void testDispatchPauseTrue() throws InterruptedException {
         LocalActivityManagerTestHelper.setResult(this);
         setupActivity(LocalActivityManagerTestHelper.ACTION_DISPATCH_PAUSE_TRUE);
         waitForResult();
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "dispatchPause",
-        args = {boolean.class}
-    )
     public void testDispatchPauseFalse() throws InterruptedException {
         LocalActivityManagerTestHelper.setResult(this);
         setupActivity(LocalActivityManagerTestHelper.ACTION_DISPATCH_PAUSE_FALSE);
         waitForResult();
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "saveInstanceState",
-        args = {}
-    )
     public void testSaveInstanceState() throws InterruptedException {
         LocalActivityManagerTestHelper.setResult(this);
         setupActivity(LocalActivityManagerTestHelper.ACTION_SAVE_INSTANCE_STATE);
         waitForResult();
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "dispatchDestroy",
-        args = {boolean.class}
-    )
     public void testDispatchDestroy() throws InterruptedException {
         LocalActivityManagerTestHelper.setResult(this);
         setupActivity(LocalActivityManagerTestHelper.ACTION_DISPATCH_DESTROY);
         waitForResult();
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "removeAllActivities",
-        args = {}
-    )
     public void testRemoveAllActivities() throws InterruptedException {
         LocalActivityManagerTestHelper.setResult(this);
         setupActivity(LocalActivityManagerTestHelper.ACTION_REMOVE_ALL_ACTIVITY);

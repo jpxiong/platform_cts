@@ -18,10 +18,6 @@ package android.content.pm.cts;
 
 import com.android.cts.stub.R;
 
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
 
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager.NameNotFoundException;
@@ -32,7 +28,6 @@ import android.util.StringBuilderPrinter;
 /**
  * Test {@link ApplicationInfo}.
  */
-@TestTargetClass(ApplicationInfo.class)
 public class ApplicationInfoTest extends AndroidTestCase {
     private ApplicationInfo mApplicationInfo;
     private String mPackageName;
@@ -43,18 +38,6 @@ public class ApplicationInfoTest extends AndroidTestCase {
         mPackageName = getContext().getPackageName();
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "ApplicationInfo",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "ApplicationInfo",
-            args = {android.content.pm.ApplicationInfo.class}
-        )
-    })
     public void testConstructor() {
         ApplicationInfo info = new ApplicationInfo();
         // simple test to ensure packageName is copied by copy constructor
@@ -64,11 +47,6 @@ public class ApplicationInfoTest extends AndroidTestCase {
         assertEquals(info.packageName, copy.packageName);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "writeToParcel",
-        args = {android.os.Parcel.class, int.class}
-    )
     public void testWriteToParcel() throws NameNotFoundException {
         mApplicationInfo = mContext.getPackageManager().getApplicationInfo(mPackageName, 0);
 
@@ -93,32 +71,17 @@ public class ApplicationInfoTest extends AndroidTestCase {
         assertEquals(mApplicationInfo.descriptionRes, info.descriptionRes);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "toString",
-        args = {}
-    )
     public void testToString() {
         mApplicationInfo = new ApplicationInfo();
         assertNotNull(mApplicationInfo.toString());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "describeContents",
-        args = {}
-    )
     public void testDescribeContents() throws NameNotFoundException {
        mApplicationInfo = mContext.getPackageManager().getApplicationInfo(mPackageName, 0);
 
         assertEquals(0, mApplicationInfo.describeContents());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "dump",
-        args = {android.util.Printer.class, java.lang.String.class}
-    )
     public void testDump() {
         mApplicationInfo = new ApplicationInfo();
 
@@ -132,11 +95,6 @@ public class ApplicationInfoTest extends AndroidTestCase {
         assertTrue(sb.length() > 0);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "loadDescription",
-        args = {android.content.pm.PackageManager.class}
-    )
     public void testLoadDescription() throws NameNotFoundException {
         mApplicationInfo = mContext.getPackageManager().getApplicationInfo(mPackageName, 0);
 

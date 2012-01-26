@@ -18,11 +18,6 @@ package android.view.animation.cts;
 
 import com.android.cts.stub.R;
 
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
-import dalvik.annotation.ToBeFixed;
 
 import android.app.ListActivity;
 import android.content.Context;
@@ -44,7 +39,6 @@ import android.view.animation.LayoutAnimationController.AnimationParameters;
 import android.widget.AbsListView;
 import android.widget.ListView;
 
-@TestTargetClass(LayoutAnimationController.class)
 public class LayoutAnimationControllerTest
         extends ActivityInstrumentationTestCase2<LayoutAnimStubActivity> {
 
@@ -77,18 +71,6 @@ public class LayoutAnimationControllerTest
         mController = new LayoutAnimationController(mDefaultAnimation, DEFAULT_DELAY);
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getOrder",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setOrder",
-            args = {int.class}
-        )
-    })
     public void testAccessOrder() throws InterruptedException {
 
         mController.setOrder(LayoutAnimationController.ORDER_NORMAL);
@@ -177,18 +159,6 @@ public class LayoutAnimationControllerTest
         assertEquals(1.0f, transformation3.getAlpha(), DELTA);
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getDelay",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setDelay",
-            args = {float.class}
-        )
-    })
     public void testAccessDelay() throws InterruptedException {
         mController.setOrder(LayoutAnimationController.ORDER_NORMAL);
         float delay = 1.5f;
@@ -259,23 +229,6 @@ public class LayoutAnimationControllerTest
         assertTrue(alpha < 1.0f);
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getAnimation",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setAnimation",
-            args = {Animation.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setAnimation",
-            args = {Context.class, int.class}
-        )
-    })
     public void testAccessAnimation() throws InterruptedException {
         Animation animation = AnimationUtils.loadAnimation(mActivity, R.anim.decelerate_alpha);
         animation.setFillAfter(true);
@@ -347,23 +300,6 @@ public class LayoutAnimationControllerTest
         }
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getInterpolator",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setInterpolator",
-            args = {Interpolator.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setInterpolator",
-            args = {Context.class, int.class}
-        )
-    })
     public void testAccessInterpolator() throws InterruptedException {
         DecelerateInterpolator interpolator = new DecelerateInterpolator(1.0f);
         mController.setInterpolator(interpolator);
@@ -393,23 +329,6 @@ public class LayoutAnimationControllerTest
         assertTrue(delta2 > delta1);
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "LayoutAnimationController",
-            args = {Context.class, AttributeSet.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "LayoutAnimationController",
-            args = {Animation.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "LayoutAnimationController",
-            args = {Animation.class, float.class}
-        )
-    })
     public void testConstructor() {
         XmlResourceParser parser = mActivity.getResources().getAnimation(
                 R.anim.accelerate_decelerate_alpha);
@@ -420,11 +339,6 @@ public class LayoutAnimationControllerTest
         assertEquals(DEFAULT_DELAY, controller.getDelay());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "getDelayForView",
-        args = {View.class}
-    )
     public void testGetDelayForView() throws Throwable {
         Animation animation = AnimationUtils.loadAnimation(mActivity, R.anim.decelerate_alpha);
         animation.setFillAfter(true);
@@ -466,11 +380,6 @@ public class LayoutAnimationControllerTest
         return layoutParams;
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "getTransformedIndex",
-        args = {AnimationParameters.class}
-    )
     public void testGetTransformedIndex() {
         Animation animation = AnimationUtils.loadAnimation(mActivity, R.anim.decelerate_alpha);
         animation.setFillAfter(true);
@@ -497,11 +406,6 @@ public class LayoutAnimationControllerTest
         assertEquals(0, controller.getTransformedIndex(animationParams));
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "start",
-        args = {}
-    )
     public void testStart() {
         Animation animation = new ScaleAnimation(0.0f, 10.0f, 0.0f, 20.0f);
         animation.setStartTime(500);
@@ -513,23 +417,12 @@ public class LayoutAnimationControllerTest
         assertEquals(Animation.START_ON_FIRST_FRAME, controller.getAnimation().getStartTime());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "isDone",
-        args = {}
-    )
-    @ToBeFixed(bug = "1799434", explanation = "isDone() always return true")
     public void testIsDone() throws InterruptedException {
         AnimationTestUtils.assertRunController(getInstrumentation(), mListView, mController,
                 DEFAULT_MAX_DURATION);
         assertTrue(mController.isDone());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "getAnimationForView",
-        args = {View.class}
-    )
     public void testGetAnimationForView() throws InterruptedException {
         Animation animation = AnimationUtils.loadAnimation(mActivity, R.anim.decelerate_alpha);
         animation.setFillAfter(true);
@@ -549,11 +442,6 @@ public class LayoutAnimationControllerTest
         assertEquals(2000, childAnimation3.getStartOffset());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "willOverlap",
-        args = {}
-    )
     public void testWillOverlap() {
         LayoutAnimationController controller = new LayoutAnimationController(mDefaultAnimation);
 

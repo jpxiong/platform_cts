@@ -21,15 +21,10 @@ import android.content.pm.PackageManager;
 import android.content.pm.ApplicationInfo.DisplayNameComparator;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.test.AndroidTestCase;
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.ToBeFixed;
 
 /**
  * Test {@link DisplayNameComparator}.
  */
-@TestTargetClass(DisplayNameComparator.class)
 public class ApplicationInfo_DisplayNameComparatorTest extends AndroidTestCase {
     private static final String PACKAGE_NAME = "com.android.cts.stub";
     DisplayNameComparator mDisplayNameComparator;
@@ -40,12 +35,6 @@ public class ApplicationInfo_DisplayNameComparatorTest extends AndroidTestCase {
         mDisplayNameComparator = null;
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test constructor(s) of {@link ApplicationInfo.DisplayNameComparator}",
-        method = "ApplicationInfo.DisplayNameComparator",
-        args = {android.content.pm.PackageManager.class}
-    )
     public void testConstructor() {
         PackageManager pm = getContext().getPackageManager();
         new DisplayNameComparator(pm);
@@ -53,13 +42,6 @@ public class ApplicationInfo_DisplayNameComparatorTest extends AndroidTestCase {
         new DisplayNameComparator(null);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test compare(ApplicationInfo, ApplicationInfo)",
-        method = "compare",
-        args = {android.content.pm.ApplicationInfo.class, android.content.pm.ApplicationInfo.class}
-    )
-    @ToBeFixed(bug = "1417734", explanation = "NPE is not expected.")
     public void testCompare() throws NameNotFoundException {
         PackageManager pm = getContext().getPackageManager();
         mDisplayNameComparator = new ApplicationInfo.DisplayNameComparator(pm);

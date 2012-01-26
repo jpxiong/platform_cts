@@ -16,9 +16,6 @@
 
 package android.graphics.cts;
 
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
 
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
@@ -34,17 +31,11 @@ import android.graphics.Path.Direction;
 
 import junit.framework.TestCase;
 
-@TestTargetClass(SumPathEffect.class)
 public class SumPathEffectTest extends TestCase {
 
     private static final int WIDTH = 100;
     private static final int HEIGHT = 100;
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "SumPathEffect",
-        args = {android.graphics.PathEffect.class, android.graphics.PathEffect.class}
-    )
     public void testSumPathEffect() {
         Bitmap bitmap = Bitmap.createBitmap(WIDTH, HEIGHT, Config.ARGB_8888);
         bitmap.eraseColor(Color.BLACK);

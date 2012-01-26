@@ -16,7 +16,6 @@
 
 package android.renderscript.cts;
 
-import dalvik.annotation.TestTargetClass;
 import android.renderscript.*;
 import android.test.ActivityInstrumentationTestCase2;
 import android.test.UiThreadTest;
@@ -25,7 +24,6 @@ import android.util.Log;
 /**
  * Tests for the RenderScriptGL class.
  */
-@TestTargetClass(RenderScriptGL.class)
 public class ContextCreationTest extends
         ActivityInstrumentationTestCase2<RenderscriptGLStubActivity> {
 

@@ -16,15 +16,11 @@
 
 package android.provider.cts;
 
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
 
 import android.provider.MediaStore.Audio;
 
 import junit.framework.TestCase;
 
-@TestTargetClass(Audio.class)
 public class MediaStore_AudioTest extends TestCase {
     private String mKeyForBeatles;
 
@@ -34,11 +30,6 @@ public class MediaStore_AudioTest extends TestCase {
         mKeyForBeatles = Audio.keyFor("beatles");
     }
 
-    @TestTargetNew(
-      level = TestLevel.COMPLETE,
-      method = "keyFor",
-      args = {String.class}
-    )
     public void testKeyFor() {
         assertEquals(mKeyForBeatles, Audio.keyFor("[beatles]"));
         assertEquals(mKeyForBeatles, Audio.keyFor("(beatles)"));

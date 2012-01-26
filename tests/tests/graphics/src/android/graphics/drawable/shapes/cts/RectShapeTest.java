@@ -16,10 +16,6 @@
 
 package android.graphics.drawable.shapes.cts;
 
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
 
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
@@ -31,7 +27,6 @@ import android.graphics.drawable.shapes.RectShape;
 
 import junit.framework.TestCase;
 
-@TestTargetClass(android.graphics.drawable.shapes.RectShape.class)
 public class RectShapeTest extends TestCase {
     private static final int TEST_WIDTH  = 100;
     private static final int TEST_HEIGHT = 200;
@@ -39,11 +34,6 @@ public class RectShapeTest extends TestCase {
     private static final int TEST_COLOR_1 = 0xFF00FF00;
     private static final int TEST_COLOR_2 = 0xFFFF0000;
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "RectShape",
-        args = {}
-    )
     public void testConstructor() {
         new RectShape();
     }
@@ -56,11 +46,6 @@ public class RectShapeTest extends TestCase {
         }
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "draw",
-        args = {android.graphics.Canvas.class, android.graphics.Paint.class}
-    )
     public void testDraw() {
         RectShape rectShape = new RectShape();
         Bitmap bitmap = Bitmap.createBitmap(TEST_WIDTH, TEST_HEIGHT, Config.ARGB_8888);
@@ -78,11 +63,6 @@ public class RectShapeTest extends TestCase {
         assertDrawSuccessfully(bitmap, TEST_WIDTH, TEST_HEIGHT, TEST_COLOR_2);
     }
 
-    @TestTargetNew(
-        level = TestLevel.SUFFICIENT,
-        method = "clone",
-        args = {}
-    )
     public void testClone() throws CloneNotSupportedException {
         RectShape rectShape = new RectShape();
         rectShape.resize(100f, 200f);
@@ -95,18 +75,6 @@ public class RectShapeTest extends TestCase {
         assertEquals(rectShape.getHeight(), clonedShape.getHeight());
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "rect",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "onResize",
-            args = {float.class, float.class}
-        )
-    })
     public void testRect() {
         MyRectShape rectShape = new MyRectShape();
         RectF rect = rectShape.myRect();

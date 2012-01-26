@@ -16,10 +16,6 @@
 
 package android.provider.cts;
 
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.ToBeFixed;
 
 import android.content.ContentResolver;
 import android.content.ContentValues;
@@ -32,7 +28,6 @@ import android.test.InstrumentationTestCase;
 
 import java.util.regex.Pattern;
 
-@TestTargetClass(Playlists.class)
 public class MediaStore_Audio_PlaylistsTest extends InstrumentationTestCase {
     private ContentResolver mContentResolver;
 
@@ -43,13 +38,6 @@ public class MediaStore_Audio_PlaylistsTest extends InstrumentationTestCase {
         mContentResolver = getInstrumentation().getContext().getContentResolver();
     }
 
-    @TestTargetNew(
-      level = TestLevel.COMPLETE,
-      method = "getContentUri",
-      args = {String.class}
-    )
-    @ToBeFixed(bug = "1695243", explanation = "Android API javadocs are incomplete. @throw clause "
-            + "should be added in to javadoc when getting uri for internal volume.")
     public void testGetContentUri() {
         assertNotNull(mContentResolver.query(
                 Playlists.getContentUri(MediaStoreAudioTestHelper.EXTERNAL_VOLUME_NAME), null, null,

@@ -18,19 +18,8 @@ package android.content.cts;
 
 import android.content.ReceiverCallNotAllowedException;
 import android.test.AndroidTestCase;
-import dalvik.annotation.TestTargets;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
 
-@TestTargetClass(android.content.ReceiverCallNotAllowedException.class)
 public class ReceiverCallNotAllowedExceptionTest extends AndroidTestCase {
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test constructor of ReceiverCallNotAllowedException.",
-        method = "ReceiverCallNotAllowedException",
-        args = {java.lang.String.class}
-    )
     public void testConstructor() {
         new ReceiverCallNotAllowedException("TEST_STRING");
     }

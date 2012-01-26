@@ -31,13 +31,7 @@ import android.os.IInterface;
 import android.os.Parcel;
 import android.os.Process;
 import android.os.RemoteException;
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
-import dalvik.annotation.ToBeFixed;
 
-@TestTargetClass(Binder.class)
 public class BinderTest extends ActivityTestsBase {
     private static final String DESCRIPTOR_GOOGLE = "google";
     private static final String DESCRIPTOR_ANDROID = "android";
@@ -206,20 +200,6 @@ public class BinderTest extends ActivityTestsBase {
         }
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "test transact",
-            method = "transact",
-            args = {int.class, android.os.Parcel.class, android.os.Parcel.class, int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "test onTransact",
-            method = "onTransact",
-            args = {int.class, android.os.Parcel.class, android.os.Parcel.class, int.class}
-        )
-    })
     public void testTransact() {
         MockServiceConnection conn1 = new MockServiceConnection(true, false);
         MockServiceConnection conn2 = new MockServiceConnection(false, false);
@@ -330,60 +310,6 @@ public class BinderTest extends ActivityTestsBase {
         getContext().unbindService(conn1);
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getCallingPid",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getCallingUid",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "dump",
-            args = {java.io.FileDescriptor.class, java.io.PrintWriter.class,
-                    java.lang.String[].class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "dump",
-            args = {java.io.FileDescriptor.class, java.lang.String[].class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "isBinderAlive",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "linkToDeath",
-            args = {android.os.IBinder.DeathRecipient.class, int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "unlinkToDeath",
-            args = {android.os.IBinder.DeathRecipient.class, int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "pingBinder",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "test constructor",
-            method = "Binder",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "finalize",
-            args = {}
-        )
-    })
     public void testSimpleMethods() {
         new Binder();
 
@@ -405,66 +331,21 @@ public class BinderTest extends ActivityTestsBase {
         assertTrue(mBinder.pingBinder());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "flushPendingCommands",
-        args = {}
-    )
-    @ToBeFixed(bug = "1393825", explanation = "it is native function "
-        + "and we cannot get the state change")
     public void testFlushPendingCommands() {
         Binder.flushPendingCommands();
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "joinThreadPool won't be return until the current process is exiting."
-            + "so not suitable to test it in unit test",
-        method = "joinThreadPool",
-        args = {}
-    )
-    @ToBeFixed(bug = "1709683", explanation = "it always throws UnsatisfiedLinkError "
-        + "when calling method: joinThreadPool")
     public void testJoinThreadPool() {
         //from java doc this function won't be return until the current process is exiting.
         //so not suitable to test it in unit test
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "clearCallingIdentity",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "restoreCallingIdentity",
-            args = {long.class}
-        )
-    })
     public void testClearCallingIdentity() {
         long token = Binder.clearCallingIdentity();
         assertTrue(token > 0);
         Binder.restoreCallingIdentity(token);
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "attachInterface",
-            args = {android.os.IInterface.class, java.lang.String.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getInterfaceDescriptor",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "queryLocalInterface",
-            args = {java.lang.String.class}
-        )
-    })
     public void testInterfaceRelatedMethods() {
         assertNull(mBinder.getInterfaceDescriptor());
         mBinder.attachInterface(new MockIInterface(), DESCRIPTOR_GOOGLE);

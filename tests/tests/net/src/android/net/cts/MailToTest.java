@@ -19,12 +19,7 @@ package android.net.cts;
 import android.net.MailTo;
 import android.test.AndroidTestCase;
 import android.util.Log;
-import dalvik.annotation.TestTargets;
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargetClass;
 
-@TestTargetClass(MailTo.class)
 public class MailToTest extends AndroidTestCase {
     private static final String MAILTOURI_1 = "mailto:chris@example.com";
     private static final String MAILTOURI_2 = "mailto:infobot@example.com?subject=current-issue";
@@ -42,56 +37,6 @@ public class MailToTest extends AndroidTestCase {
         super.setUp();
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test parse mailto URI.",
-            method = "parse",
-            args = {java.lang.String.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test parse mailto URI.",
-            method = "isMailTo",
-            args = {java.lang.String.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test parse mailto URI.",
-            method = "getTo",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test parse mailto URI.",
-            method = "getSubject",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test parse mailto URI.",
-            method = "getBody",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test parse mailto URI.",
-            method = "getCc",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test parse mailto URI.",
-            method = "toString",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test parse mailto URI.",
-            method = "getHeaders",
-            args = {}
-        )
-    })
     public void testParseMailToURI() {
         assertFalse(MailTo.isMailTo(null));
         assertFalse(MailTo.isMailTo(""));

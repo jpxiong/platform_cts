@@ -16,9 +16,6 @@
 
 package android.text.util.cts;
 
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
 
 import android.test.AndroidTestCase;
 import android.text.Spannable;
@@ -35,7 +32,6 @@ import java.util.regex.Pattern;
 /**
  * Test {@link Linkify}.
  */
-@TestTargetClass(Linkify.class)
 public class LinkifyTest extends AndroidTestCase {
     private static final Pattern LINKIFY_TEST_PATTERN = Pattern.compile(
             "(test:)?[a-zA-Z0-9]+(\\.pattern)?");
@@ -71,22 +67,10 @@ public class LinkifyTest extends AndroidTestCase {
         }
     };
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test constructor of {@link Linkify}",
-        method = "Linkify",
-        args = {}
-    )
     public void testConstructor() {
         new Linkify();
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test {@link Linkify#addLinks(Spannable, int)}",
-        method = "addLinks",
-        args = {android.text.Spannable.class, int.class}
-    )
     public void testAddLinks1() {
         SpannableString spannable = new SpannableString("name@gmail.com, "
                 + "123456789, tel:(0812)1234567 "
@@ -119,12 +103,6 @@ public class LinkifyTest extends AndroidTestCase {
         assertFalse(Linkify.addLinks((Spannable) null, 0));
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test {@link Linkify#addLinks(TextView, int)}",
-        method = "addLinks",
-        args = {android.widget.TextView.class, int.class}
-    )
     public void testAddLinks2() {
         String text = "www.google.com, name@gmail.com";
         TextView tv = new TextView(mContext);
@@ -152,13 +130,6 @@ public class LinkifyTest extends AndroidTestCase {
         assertFalse(Linkify.addLinks((TextView)null, 0));
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test {@link Linkify#addLinks(TextView, Pattern, String)}",
-        method = "addLinks",
-        args = {android.widget.TextView.class, java.util.regex.Pattern.class,
-                java.lang.String.class}
-    )
     public void testAddLinks3() {
         String text = "Alan, Charlie";
         TextView tv = new TextView(mContext);
@@ -201,15 +172,6 @@ public class LinkifyTest extends AndroidTestCase {
         assertEquals("test:AZ0101.pattern", spans[1].getURL());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test {@link Linkify#addLinks(TextView, Pattern, String, MatchFilter,"
-                + " TransformFilter)}",
-        method = "addLinks",
-        args = {android.widget.TextView.class, java.util.regex.Pattern.class,
-                java.lang.String.class, android.text.util.Linkify.MatchFilter.class,
-                android.text.util.Linkify.TransformFilter.class}
-    )
     public void testAddLinks4() {
         TextView tv = new TextView(mContext);
 
@@ -262,12 +224,6 @@ public class LinkifyTest extends AndroidTestCase {
         assertEquals("test:12", spans[1].getURL());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test {@link Linkify#addLinks(Spannable, Pattern, String)}",
-        method = "addLinks",
-        args = {android.text.Spannable.class, java.util.regex.Pattern.class, java.lang.String.class}
-    )
     public void testAddLinks5() {
         String text = "google.pattern, test:AZ0101.pattern";
 
@@ -298,15 +254,6 @@ public class LinkifyTest extends AndroidTestCase {
         assertEquals("test:AZ0101.pattern", spans[1].getURL());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test {@link Linkify#addLinks(Spannable, Pattern, String, MatchFilter,"
-            + " TransformFilter)}",
-        method = "addLinks",
-        args = {android.text.Spannable.class, java.util.regex.Pattern.class, java.lang.String.class,
-                android.text.util.Linkify.MatchFilter.class,
-                android.text.util.Linkify.TransformFilter.class}
-    )
     public void testAddLinks6() {
         String text = "FilterUpperCase.pattern, 12.345.pattern";
 

@@ -16,9 +16,6 @@
 
 package android.location.cts;
 
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
 
 import android.content.Context;
 import android.location.Criteria;
@@ -26,7 +23,6 @@ import android.location.LocationManager;
 import android.location.LocationProvider;
 import android.test.AndroidTestCase;
 
-@TestTargetClass(LocationProvider.class)
 public class LocationProviderTest extends AndroidTestCase {
     private static final String PROVIDER_NAME = "location_provider_test";
 
@@ -64,21 +60,11 @@ public class LocationProviderTest extends AndroidTestCase {
         mLocationManager.setTestProviderEnabled(providerName, true);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "getName",
-        args = {}
-    )
     public void testGetName() {
         LocationProvider locationProvider = mLocationManager.getProvider(PROVIDER_NAME);
         assertEquals(PROVIDER_NAME, locationProvider.getName());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "meetsCriteria",
-        args = {android.location.Criteria.class}
-    )
     public void testMeetsCriteria() {
         LocationProvider locationProvider = mLocationManager.getProvider(PROVIDER_NAME);
 

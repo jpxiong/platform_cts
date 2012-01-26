@@ -16,10 +16,6 @@
 
 package android.content.pm.cts;
 
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
 
 import android.content.pm.ConfigurationInfo;
 import android.content.pm.PackageInfo;
@@ -28,40 +24,7 @@ import android.content.pm.PackageManager.NameNotFoundException;
 import android.os.Parcel;
 import android.test.AndroidTestCase;
 
-@TestTargetClass(ConfigurationInfo.class)
 public class ConfigurationInfoTest extends AndroidTestCase {
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test constructors",
-            method = "ConfigurationInfo",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test constructors",
-            method = "ConfigurationInfo",
-            args = {android.content.pm.ConfigurationInfo.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test toString",
-            method = "toString",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test writeToParcel",
-            method = "writeToParcel",
-            args = {android.os.Parcel.class, int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test describeContents",
-            method = "describeContents",
-            args = {}
-        )
-    })
     public void testConfigPreferences() throws NameNotFoundException {
         PackageManager pm = getContext().getPackageManager();
 

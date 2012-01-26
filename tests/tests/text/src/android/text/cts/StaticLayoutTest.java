@@ -23,13 +23,7 @@ import android.text.TextDirectionHeuristics;
 import android.text.TextPaint;
 import android.text.TextUtils;
 import android.text.Layout.Alignment;
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
-import dalvik.annotation.ToBeFixed;
 
-@TestTargetClass(StaticLayout.class)
 public class StaticLayoutTest extends AndroidTestCase {
     private static final float SPACE_MULTI = 1.0f;
     private static final float SPACE_ADD = 0.0f;
@@ -93,31 +87,6 @@ public class StaticLayoutTest extends AndroidTestCase {
     /**
      * Constructor test
      */
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "StaticLayout",
-            args = {java.lang.CharSequence.class, int.class, int.class,
-                    android.text.TextPaint.class, int.class, android.text.Layout.Alignment.class,
-                    float.class, float.class, boolean.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "StaticLayout",
-            args = {java.lang.CharSequence.class, int.class, int.class,
-                    android.text.TextPaint.class, int.class, android.text.Layout.Alignment.class,
-                    float.class, float.class, boolean.class,
-                    android.text.TextUtils.TruncateAt.class, int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "StaticLayout",
-            args = {java.lang.CharSequence.class, android.text.TextPaint.class, int.class,
-            android.text.Layout.Alignment.class, float.class, float.class, boolean.class}
-        )
-    })
-    @ToBeFixed(bug = "1695243", explanation = "should add @throws clause into javadoc "
-        + " of StaticLayout constructors when input null parameters")
     public void testConstructor() {
         new StaticLayout(LAYOUT_TEXT, mDefaultPaint, DEFAULT_OUTER_WIDTH,
                 DEFAULT_ALIGN, SPACE_MULTI, SPACE_ADD, true);
@@ -142,12 +111,6 @@ public class StaticLayoutTest extends AndroidTestCase {
      *  if you ask for a position below the bottom of the text, you get the last line.
      *  Test 4 values containing -1, 0, normal number and > count
      */
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "getLineForVertical",
-        args = {int.class}
-    )
-     @ToBeFixed(bug = "1695243", explanation = "Android API javadocs are incomplete")
     public void testGetLineForVertical() {
         assertEquals(0, mDefaultLayout.getLineForVertical(-1));
         assertEquals(0, mDefaultLayout.getLineForVertical(0));
@@ -158,11 +121,6 @@ public class StaticLayoutTest extends AndroidTestCase {
     /**
      * Return the number of lines of text in this layout.
      */
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "getLineCount",
-        args = {}
-    )
     public void testGetLineCount() {
         assertEquals(LINE_COUNT, mDefaultLayout.getLineCount());
     }
@@ -173,13 +131,6 @@ public class StaticLayoutTest extends AndroidTestCase {
      * A line of text contains top and bottom in height. this method just get the top of a line
      * Test 4 values containing -1, 0, normal number and > count
      */
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "getLineTop",
-        args = {int.class}
-    )
-    @ToBeFixed(bug = "1695243", explanation = "should add @throws clause into javadoc "
-        +    " of StaticLayout#getLineTop(int) when line is out of bound")
     public void testGetLineTop() {
         assertTrue(mDefaultLayout.getLineTop(0) >= 0);
         assertTrue(mDefaultLayout.getLineTop(1) > mDefaultLayout.getLineTop(0));
@@ -202,13 +153,6 @@ public class StaticLayoutTest extends AndroidTestCase {
      * This method just like getLineTop, descent means the bottom pixel of the line
      * Test 4 values containing -1, 0, normal number and > count
      */
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "getLineDescent",
-        args = {int.class}
-    )
-    @ToBeFixed(bug = "1695243", explanation = "should add @throws clause into javadoc "
-        + " of StaticLayout#getLineDescent(int) when line is out of bound")
     public void testGetLineDescent() {
         assertTrue(mDefaultLayout.getLineDescent(0) > 0);
         assertTrue(mDefaultLayout.getLineDescent(1) > 0);
@@ -230,13 +174,6 @@ public class StaticLayoutTest extends AndroidTestCase {
      * Returns the primary directionality of the paragraph containing the specified line.
      * By default, each line should be same
      */
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "getParagraphDirection",
-        args = {int.class}
-    )
-    @ToBeFixed(bug = "1695243", explanation = "should add @throws clause into javadoc "
-        + " of StaticLayout#getParagraphDirection(int) when line is out of bound")
     public void testGetParagraphDirection() {
         assertEquals(mDefaultLayout.getParagraphDirection(0),
                 mDefaultLayout.getParagraphDirection(1));
@@ -259,13 +196,6 @@ public class StaticLayoutTest extends AndroidTestCase {
      * Test 4 values containing -1, 0, normal number and > count
      * Each line's offset must >= 0
      */
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "getLineStart",
-        args = {int.class}
-    )
-    @ToBeFixed(bug = "1695243", explanation = "should add @throws clause into javadoc "
-        + " of StaticLayout#getLineStart(int) when line is out of bound")
     public void testGetLineStart() {
         assertTrue(mDefaultLayout.getLineStart(0) >= 0);
         assertTrue(mDefaultLayout.getLineStart(1) >= 0);
@@ -286,13 +216,6 @@ public class StaticLayoutTest extends AndroidTestCase {
     /*
      * Returns whether the specified line contains one or more tabs.
      */
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "getLineContainsTab",
-        args = {int.class}
-    )
-    @ToBeFixed(bug = "1695243", explanation = "should add @throws clause into javadoc "
-        + " of StaticLayout#getLineContainsTab(int) when line is out of bound")
     public void testGetContainsTab() {
         assertTrue(mDefaultLayout.getLineContainsTab(0));
         assertFalse(mDefaultLayout.getLineContainsTab(1));
@@ -317,13 +240,6 @@ public class StaticLayoutTest extends AndroidTestCase {
      * We can not check the return value, for Directions's field is package private
      * So only check it not null
      */
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "getLineDirections",
-        args = {int.class}
-    )
-    @ToBeFixed(bug = "1695243", explanation = "should add @throws clause into javadoc "
-        + " of StaticLayout#getLineDirections(int) when line is out of bound")
     public void testGetLineDirections() {
         assertNotNull(mDefaultLayout.getLineDirections(0));
         assertNotNull(mDefaultLayout.getLineDirections(1));
@@ -345,11 +261,6 @@ public class StaticLayoutTest extends AndroidTestCase {
      * Returns the (negative) number of extra pixels of ascent padding
      * in the top line of the Layout.
      */
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "getTopPadding",
-        args = {}
-    )
     public void testGetTopPadding() {
         assertTrue(mDefaultLayout.getTopPadding() < 0);
     }
@@ -357,11 +268,6 @@ public class StaticLayoutTest extends AndroidTestCase {
     /**
      * Returns the number of extra pixels of descent padding in the bottom line of the Layout.
      */
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "getBottomPadding",
-        args = {}
-    )
     public void testGetBottomPadding() {
         assertTrue(mDefaultLayout.getBottomPadding() > 0);
     }
@@ -370,13 +276,6 @@ public class StaticLayoutTest extends AndroidTestCase {
      * Returns the number of characters to be ellipsized away, or 0 if no ellipsis is to take place.
      * So each line must >= 0
      */
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "getEllipsisCount",
-        args = {int.class}
-    )
-    @ToBeFixed(bug = "1695243", explanation = "should add @throws clause into javadoc "
-        + " of StaticLayout#getEllipsisCount(int) when line is out of bound")
     public void testGetEllipsisCount() {
         // Multilines (6 lines) and TruncateAt.START so no ellipsis at all
         mDefaultLayout = createEllipsizeStaticLayout(LAYOUT_TEXT,
@@ -468,13 +367,6 @@ public class StaticLayoutTest extends AndroidTestCase {
      * relative to the start of the line.
      * (So 0 if the beginning of the line is ellipsized, not getLineStart().)
      */
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "getEllipsisStart",
-        args = {int.class}
-    )
-    @ToBeFixed(bug = "1695243", explanation = "should add @throws clause into javadoc "
-        + " of StaticLayout#getEllipsisStart(int) when line is out of bound")
     public void testGetEllipsisStart() {
         mDefaultLayout = createEllipsizeStaticLayout();
         assertTrue(mDefaultLayout.getEllipsisStart(0) >= 0);
@@ -500,11 +392,6 @@ public class StaticLayoutTest extends AndroidTestCase {
      * ellipsizedWidth if argument is not null
      * outerWidth if argument is null
      */
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "getEllipsizedWidth",
-        args = {}
-    )
     public void testGetEllipsizedWidth() {
         int ellipsizedWidth = 60;
         int outerWidth = 100;

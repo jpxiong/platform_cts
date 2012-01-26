@@ -19,11 +19,6 @@ package android.widget.cts;
 import com.android.cts.stub.R;
 import com.google.android.collect.Lists;
 
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
-import dalvik.annotation.ToBeFixed;
 
 import org.xmlpull.v1.XmlPullParser;
 
@@ -53,7 +48,6 @@ import java.util.List;
 
 import junit.framework.Assert;
 
-@TestTargetClass(ListView.class)
 public class ListViewTest extends ActivityInstrumentationTestCase2<ListViewStubActivity> {
     private final String[] mCountryList = new String[] {
         "Argentina", "Australia", "China", "France", "Germany", "Italy", "Japan", "United States"
@@ -93,24 +87,6 @@ public class ListViewTest extends ActivityInstrumentationTestCase2<ListViewStubA
         mListView = (ListView) mActivity.findViewById(R.id.listview_default);
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "ListView",
-            args = {android.content.Context.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "ListView",
-            args = {android.content.Context.class, android.util.AttributeSet.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "ListView",
-            args = {android.content.Context.class, android.util.AttributeSet.class, int.class}
-        )
-    })
-    @ToBeFixed(bug = "1695243", explanation = "Android API javadocs are incomplete")
     public void testConstructor() {
         new ListView(mActivity);
         new ListView(mActivity, mAttributeSet);
@@ -138,18 +114,6 @@ public class ListViewTest extends ActivityInstrumentationTestCase2<ListViewStubA
         }
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setAdapter",
-            args = {android.widget.ListAdapter.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getMaxScrollAmount",
-            args = {}
-        )
-    })
     public void testGetMaxScrollAmount() {
         setAdapter(mAdapter_empty);
         int scrollAmount = mListView.getMaxScrollAmount();
@@ -169,23 +133,6 @@ public class ListViewTest extends ActivityInstrumentationTestCase2<ListViewStubA
         mInstrumentation.waitForIdleSync();
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setDividerHeight",
-            args = {int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getDividerHeight",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getDivider",
-            args = {}
-        )
-    })
     public void testAccessDividerHeight() {
         mInstrumentation.runOnMainSync(new Runnable() {
             public void run() {
@@ -217,18 +164,6 @@ public class ListViewTest extends ActivityInstrumentationTestCase2<ListViewStubA
         assertEquals(10, r.bottom - r.top);
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.PARTIAL,
-            method = "setItemsCanFocus",
-            args = {boolean.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.PARTIAL,
-            method = "getItemsCanFocus",
-            args = {}
-        )
-    })
     public void testAccessItemsCanFocus() {
         mListView.setItemsCanFocus(true);
         assertTrue(mListView.getItemsCanFocus());
@@ -239,18 +174,6 @@ public class ListViewTest extends ActivityInstrumentationTestCase2<ListViewStubA
         // TODO: how to check?
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setAdapter",
-            args = {android.widget.ListAdapter.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getAdapter",
-            args = {}
-        )
-    })
     public void testAccessAdapter() {
         mInstrumentation.runOnMainSync(new Runnable() {
             public void run() {
@@ -273,45 +196,7 @@ public class ListViewTest extends ActivityInstrumentationTestCase2<ListViewStubA
         assertEquals(mNameList.length, mListView.getCount());
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setItemChecked",
-            args = {int.class, boolean.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setChoiceMode",
-            args = {int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getChoiceMode",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getCheckedItemPosition",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "isItemChecked",
-            args = {int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getCheckedItemPositions",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "clearChoices",
-            args = {}
-        )
-    })
     @UiThreadTest
-    @ToBeFixed(bug="2031502", explanation="setItemChecked(i,false) always unchecks all items")
     public void testAccessItemChecked() {
         // NONE mode
         mListView.setChoiceMode(ListView.CHOICE_MODE_NONE);
@@ -384,33 +269,6 @@ public class ListViewTest extends ActivityInstrumentationTestCase2<ListViewStubA
         assertFalse(mListView.isItemChecked(4));
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setFooterDividersEnabled",
-            args = {boolean.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "addFooterView",
-            args = {android.view.View.class, java.lang.Object.class, boolean.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "addFooterView",
-            args = {android.view.View.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getFooterViewsCount",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "removeFooterView",
-            args = {android.view.View.class}
-        )
-    })
     public void testAccessFooterView() {
         final TextView footerView1 = new TextView(mActivity);
         footerView1.setText("footerview1");
@@ -466,35 +324,6 @@ public class ListViewTest extends ActivityInstrumentationTestCase2<ListViewStubA
         assertEquals(0, mListView.getFooterViewsCount());
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setHeaderDividersEnabled",
-            args = {boolean.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "addHeaderView",
-            args = {android.view.View.class, java.lang.Object.class, boolean.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "addHeaderView",
-            args = {android.view.View.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getHeaderViewsCount",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "removeHeaderView",
-            args = {android.view.View.class}
-        )
-    })
-    @ToBeFixed(bug = "", explanation = "After add two header views, the setAdapter will fail, " +
-            "and throws out an java.lang.ClassCastException.")
     public void testAccessHeaderView() {
         final TextView headerView1 = (TextView) mActivity.findViewById(R.id.headerview1);
         final TextView headerView2 = (TextView) mActivity.findViewById(R.id.headerview2);
@@ -524,18 +353,6 @@ public class ListViewTest extends ActivityInstrumentationTestCase2<ListViewStubA
         assertEquals(2, mListView.getHeaderViewsCount());
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setDivider",
-            args = {android.graphics.drawable.Drawable.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getDivider",
-            args = {}
-        )
-    })
     public void testAccessDivider() {
         mInstrumentation.runOnMainSync(new Runnable() {
             public void run() {
@@ -569,23 +386,6 @@ public class ListViewTest extends ActivityInstrumentationTestCase2<ListViewStubA
         assertEquals(10, r.bottom - r.top);
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setSelection",
-            args = {int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setSelectionFromTop",
-            args = {int.class, int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setSelectionAfterHeaderView",
-            args = {}
-        )
-    })
     public void testSetSelection() {
         mInstrumentation.runOnMainSync(new Runnable() {
             public void run() {
@@ -622,32 +422,10 @@ public class ListViewTest extends ActivityInstrumentationTestCase2<ListViewStubA
         assertEquals(mCountryList[0], item);
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.NOT_NECESSARY,
-            method = "onKeyDown",
-            args = {int.class, android.view.KeyEvent.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.NOT_NECESSARY,
-            method = "onKeyUp",
-            args = {int.class, android.view.KeyEvent.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.NOT_NECESSARY,
-            method = "onKeyMultiple",
-            args = {int.class, int.class, android.view.KeyEvent.class}
-        )
-    })
     public void testOnKeyUpDown() {
         // implementation details, do NOT test
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "performItemClick",
-        args = {android.view.View.class, int.class, long.class}
-    )
     public void testPerformItemClick() {
         mInstrumentation.runOnMainSync(new Runnable() {
             public void run() {
@@ -696,27 +474,10 @@ public class ListViewTest extends ActivityInstrumentationTestCase2<ListViewStubA
         assertEquals(2, onClickListener.getID());
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.NOT_NECESSARY,
-            method = "onRestoreInstanceState",
-            args = {android.os.Parcelable.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.NOT_NECESSARY,
-            method = "onSaveInstanceState",
-            args = {}
-        )
-    })
     public void testSaveAndRestoreInstanceState() {
         // implementation details, do NOT test
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "dispatchKeyEvent",
-        args = {android.view.KeyEvent.class}
-    )
     public void testDispatchKeyEvent() {
         mInstrumentation.runOnMainSync(new Runnable() {
             public void run() {
@@ -757,11 +518,6 @@ public class ListViewTest extends ActivityInstrumentationTestCase2<ListViewStubA
         assertEquals(mCountryList[4], item);
     }
 
-    @TestTargetNew(
-        level = TestLevel.PARTIAL,
-        method = "requestChildRectangleOnScreen",
-        args = {android.view.View.class, android.graphics.Rect.class, boolean.class}
-    )
     public void testRequestChildRectangleOnScreen() {
         mInstrumentation.runOnMainSync(new Runnable() {
             public void run() {
@@ -780,27 +536,10 @@ public class ListViewTest extends ActivityInstrumentationTestCase2<ListViewStubA
         // TODO: how to check?
     }
 
-    @TestTargetNew(
-        level = TestLevel.NOT_NECESSARY,
-        method = "onTouchEvent",
-        args = {android.view.MotionEvent.class}
-    )
     public void testOnTouchEvent() {
         // implementation details, do NOT test
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "canAnimate",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setAdapter",
-            args = {android.widget.ListAdapter.class}
-        )
-    })
     @UiThreadTest
     public void testCanAnimate() {
         MyListView listView = new MyListView(mActivity, mAttributeSet);
@@ -816,28 +555,11 @@ public class ListViewTest extends ActivityInstrumentationTestCase2<ListViewStubA
         assertTrue(listView.canAnimate());
     }
 
-    @TestTargetNew(
-        level = TestLevel.NOT_NECESSARY,
-        method = "dispatchDraw",
-        args = {android.graphics.Canvas.class}
-    )
     @UiThreadTest
     public void testDispatchDraw() {
         // implementation details, do NOT test
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "findViewTraversal",
-            args = {int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "addHeaderView",
-            args = {android.view.View.class}
-        )
-    })
     @UiThreadTest
     public void testFindViewTraversal() {
         MyListView listView = new MyListView(mActivity, mAttributeSet);
@@ -850,18 +572,6 @@ public class ListViewTest extends ActivityInstrumentationTestCase2<ListViewStubA
         assertSame(headerView, listView.findViewTraversal(R.id.headerview1));
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "findViewWithTagTraversal",
-            args = {java.lang.Object.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "addHeaderView",
-            args = {android.view.View.class}
-        )
-    })
     @UiThreadTest
     public void testFindViewWithTagTraversal() {
         MyListView listView = new MyListView(mActivity, mAttributeSet);
@@ -875,39 +585,18 @@ public class ListViewTest extends ActivityInstrumentationTestCase2<ListViewStubA
         assertSame(headerView, listView.findViewWithTagTraversal("header"));
     }
 
-    @TestTargetNew(
-        level = TestLevel.TODO,
-        method = "layoutChildren",
-        args = {}
-    )
-    @ToBeFixed(bug = "1695243", explanation = "Android API javadocs are incomplete")
     public void testLayoutChildren() {
         // TODO: how to test?
     }
 
-    @TestTargetNew(
-        level = TestLevel.NOT_NECESSARY,
-        method = "onFinishInflate",
-        args = {}
-    )
     public void testOnFinishInflate() {
         // implementation details, do NOT test
     }
 
-    @TestTargetNew(
-        level = TestLevel.NOT_NECESSARY,
-        method = "onFocusChanged",
-        args = {boolean.class, int.class, android.graphics.Rect.class}
-    )
     public void testOnFocusChanged() {
         // implementation details, do NOT test
     }
 
-    @TestTargetNew(
-        level = TestLevel.NOT_NECESSARY,
-        method = "onMeasure",
-        args = {int.class, int.class}
-    )
     public void testOnMeasure() {
         // implementation details, do NOT test
     }
@@ -973,18 +662,6 @@ public class ListViewTest extends ActivityInstrumentationTestCase2<ListViewStubA
     /**
      * The following functions are merged from frameworktest.
      */
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "layoutChildren",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setAdapter",
-            args = {android.widget.ListAdapter.class}
-        )
-    })
     @MediumTest
     public void testRequestLayout() throws Exception {
         ListView listView = new ListView(mActivity);
@@ -1007,18 +684,6 @@ public class ListViewTest extends ActivityInstrumentationTestCase2<ListViewStubA
         Assert.assertTrue(childView.onMeasureCalled);
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setSelection",
-            args = {int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setAdapter",
-            args = {android.widget.ListAdapter.class}
-        )
-    })
     @MediumTest
     public void testNoSelectableItems() throws Exception {
         ListView listView = new ListView(mActivity);

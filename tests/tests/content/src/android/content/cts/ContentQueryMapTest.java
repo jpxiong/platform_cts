@@ -16,11 +16,6 @@
 
 package android.content.cts;
 
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
-import dalvik.annotation.ToBeFixed;
 
 import android.content.ContentQueryMap;
 import android.content.ContentResolver;
@@ -38,7 +33,6 @@ import java.util.Observer;
 /**
  * Test {@link ContentQueryMap}.
  */
-@TestTargetClass(ContentQueryMap.class)
 public class ContentQueryMapTest extends AndroidTestCase {
     private static final int TEST_TIME_OUT = 5000;
 
@@ -94,14 +88,6 @@ public class ContentQueryMapTest extends AndroidTestCase {
         super.tearDown();
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "ContentQueryMap",
-        args = {android.database.Cursor.class, java.lang.String.class, boolean.class,
-        android.os.Handler.class}
-    )
-    @ToBeFixed(bug = "1695243", explanation = "should add @throws clause into javadoc of "
-            + "constructor when param cursor or columnNameOfKey is null")
     public void testConstructor() {
         new ContentQueryMap(mCursor, DummyProvider.NAME, true, null);
 
@@ -120,18 +106,6 @@ public class ContentQueryMapTest extends AndroidTestCase {
         }
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getRows",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "close",
-            args = {}
-        )
-    })
     public void testGetRows() {
         // handler can be null
         mContentQueryMap = new ContentQueryMap(mCursor, DummyProvider.NAME, true, null);
@@ -152,18 +126,6 @@ public class ContentQueryMapTest extends AndroidTestCase {
         assertFalse(rows.containsKey(NAME0));
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "requery",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getValues",
-            args = {java.lang.String.class}
-        )
-    })
     public void testRequery() {
         // Disable the keepUpdated to make sure requery() will not be called
         // from somewhere else
@@ -199,23 +161,6 @@ public class ContentQueryMapTest extends AndroidTestCase {
         assertEquals(VALUE2, contentValues.getAsString(DummyProvider.VALUE));
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setKeepUpdated",
-            args = {boolean.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getValues",
-            args = {java.lang.String.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "requery",
-            args = {}
-        )
-    })
     public void testSetKeepUpdated() throws InterruptedException {
         MockObserver observer = new MockObserver();
 
@@ -316,18 +261,6 @@ public class ContentQueryMapTest extends AndroidTestCase {
         assertEquals(VALUE3, contentValues.getAsString(DummyProvider.VALUE));
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setKeepUpdated",
-            args = {boolean.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getValues",
-            args = {java.lang.String.class}
-        )
-    })
     public void testSetKeepUpdatedWithHandler() throws InterruptedException {
         MockObserver observer = new MockObserver();
         HandlerThread thread = new HandlerThread("testSetKeepUpdatedWithHandler");
@@ -404,11 +337,6 @@ public class ContentQueryMapTest extends AndroidTestCase {
         assertEquals(VALUE3, contentValues.getAsString(DummyProvider.VALUE));
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "getValues",
-        args = {java.lang.String.class}
-    )
     public void testGetValuesBoundary() {
         mContentQueryMap = new ContentQueryMap(mCursor, DummyProvider.NAME, false, null);
         assertNull(mContentQueryMap.getValues(null));

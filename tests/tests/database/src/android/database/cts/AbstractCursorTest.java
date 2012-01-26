@@ -16,11 +16,6 @@
 
 package android.database.cts;
 
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
-import dalvik.annotation.ToBeFixed;
 
 import android.content.Context;
 import android.database.AbstractCursor;
@@ -41,7 +36,6 @@ import java.util.Random;
 /**
  * Test {@link AbstractCursor}.
  */
-@TestTargetClass(AbstractCursor.class)
 public class AbstractCursorTest extends InstrumentationTestCase {
     private static final int POSITION0 = 0;
     private static final int POSITION1 = 1;
@@ -79,21 +73,11 @@ public class AbstractCursorTest extends InstrumentationTestCase {
         super.tearDown();
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "AbstractCursor",
-        args = {}
-    )
     public void testConstructor() {
         TestAbstractCursor abstractCursor = new TestAbstractCursor();
         assertEquals(-1, abstractCursor.getPosition());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "getBlob",
-        args = {int.class}
-    )
     public void testGetBlob() {
         try {
             mTestAbstractCursor.getBlob(0);
@@ -103,18 +87,6 @@ public class AbstractCursorTest extends InstrumentationTestCase {
         }
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "registerDataSetObserver",
-            args = {android.database.DataSetObserver.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "unregisterDataSetObserver",
-            args = {android.database.DataSetObserver.class}
-        )
-    })
     public void testRegisterDataSetObserver() {
         MockDataSetObserver datasetObserver = new MockDataSetObserver();
 
@@ -138,18 +110,6 @@ public class AbstractCursorTest extends InstrumentationTestCase {
         mDatabaseCursor.registerDataSetObserver(datasetObserver);
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "registerContentObserver",
-            args = {android.database.ContentObserver.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "unregisterContentObserver",
-            args = {android.database.ContentObserver.class}
-        )
-    })
     public void testRegisterContentObserver() {
         MockContentObserver contentObserver = new MockContentObserver();
 
@@ -173,22 +133,12 @@ public class AbstractCursorTest extends InstrumentationTestCase {
         mDatabaseCursor.registerContentObserver(contentObserver);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "setNotificationUri",
-        args = {android.content.ContentResolver.class, android.net.Uri.class}
-    )
     public void testSetNotificationUri() {
         String MOCK_URI = "content://abstractrcursortest/testtable";
         mDatabaseCursor.setNotificationUri(getInstrumentation().getContext().getContentResolver(),
                 Uri.parse(MOCK_URI));
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "respond",
-        args = {android.os.Bundle.class}
-    )
     public void testRespond() {
         Bundle b = new Bundle();
         Bundle bundle = mDatabaseCursor.respond(b);
@@ -198,11 +148,6 @@ public class AbstractCursorTest extends InstrumentationTestCase {
         assertSame(Bundle.EMPTY, bundle);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "requery",
-        args = {}
-    )
     public void testRequery() {
         MockDataSetObserver mock = new MockDataSetObserver();
         mDatabaseCursor.registerDataSetObserver(mock);
@@ -211,13 +156,6 @@ public class AbstractCursorTest extends InstrumentationTestCase {
         assertTrue(mock.hadCalledOnChanged());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test onChange().Subclasses must call this method when they finish committing" +
-                " updates to notify all observers.",
-        method = "onChange",
-        args = {boolean.class}
-    )
     public void testOnChange() throws InterruptedException {
         MockContentObserver mock = new MockContentObserver();
         mTestAbstractCursor.registerContentObserver(mock);
@@ -231,18 +169,6 @@ public class AbstractCursorTest extends InstrumentationTestCase {
         assertTrue(mock.hadCalledOnChange());
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "onMove",
-            args = {int.class, int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "moveToFirst",
-            args = {}
-        )
-    })
     public void testOnMove() {
         mTestAbstractCursor.resetOnMoveRet();
         assertFalse(mTestAbstractCursor.getOnMoveRet());
@@ -253,63 +179,6 @@ public class AbstractCursorTest extends InstrumentationTestCase {
         assertEquals(5, mTestAbstractCursor.getNewPos());
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "moveToPrevious",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "moveToPosition",
-            args = {int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getPosition",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "moveToNext",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "isFirst",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "moveToLast",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "isLast",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "isBeforeFirst",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "isAfterLast",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "moveToFirst",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "move",
-            args = {int.class}
-        )
-    })
     public void testMoveToPrevious() {
         // Test moveToFirst, isFirst, moveToNext, getPosition
         assertTrue(mDatabaseCursor.moveToFirst());
@@ -380,36 +249,12 @@ public class AbstractCursorTest extends InstrumentationTestCase {
         assertFalse(mDatabaseCursor.isAfterLast());
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "isClosed",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "close",
-            args = {}
-        )
-    })
     public void testIsClosed() {
         assertFalse(mDatabaseCursor.isClosed());
         mDatabaseCursor.close();
         assertTrue(mDatabaseCursor.isClosed());
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getWindow",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "fillWindow",
-            args = {int.class, android.database.CursorWindow.class}
-        )
-    })
     public void testGetWindow() {
         CursorWindow window = new CursorWindow(false);
         assertEquals(0, window.getNumRows());
@@ -426,61 +271,28 @@ public class AbstractCursorTest extends InstrumentationTestCase {
         window.clear();
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test getWantsAllOnMoveCalls(), it always returns false.",
-        method = "getWantsAllOnMoveCalls",
-        args = {}
-    )
     public void testGetWantsAllOnMoveCalls() {
         assertFalse(mDatabaseCursor.getWantsAllOnMoveCalls());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "isFieldUpdated",
-        args = {int.class}
-    )
-    @ToBeFixed(bug = "1569265", explanation = "All other updating-related methods are 'hide' and "
-        + "'deprecated.")
     public void testIsFieldUpdated() {
         mTestAbstractCursor.moveToFirst();
         assertFalse(mTestAbstractCursor.isFieldUpdated(0));
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "getUpdatedField",
-        args = {int.class}
-    )
     public void testGetUpdatedField() {
         mTestAbstractCursor.moveToFirst();
         assertNull(mTestAbstractCursor.getUpdatedField(0));
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "getExtras",
-        args = {}
-    )
     public void testGetExtras() {
         assertSame(Bundle.EMPTY, mDatabaseCursor.getExtras());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "getCount",
-        args = {}
-    )
     public void testGetCount() {
         assertEquals(DATA_COUNT, mDatabaseCursor.getCount());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "getColumnNames",
-        args = {}
-    )
     public void testGetColumnNames() {
         String[] names = mDatabaseCursor.getColumnNames();
         assertEquals(COLUMN_NAMES1.length, names.length);
@@ -490,28 +302,11 @@ public class AbstractCursorTest extends InstrumentationTestCase {
         }
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "getColumnName",
-        args = {int.class}
-    )
     public void testGetColumnName() {
         assertEquals(COLUMN_NAMES1[0], mDatabaseCursor.getColumnName(0));
         assertEquals(COLUMN_NAMES1[1], mDatabaseCursor.getColumnName(1));
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getColumnIndexOrThrow",
-            args = {java.lang.String.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getColumnIndex",
-            args = {java.lang.String.class}
-        )
-    })
     public void testGetColumnIndexOrThrow() {
         final String COLUMN_FAKE = "fake_name";
         assertEquals(POSITION0, mDatabaseCursor.getColumnIndex(COLUMN_NAMES1[POSITION0]));
@@ -527,37 +322,15 @@ public class AbstractCursorTest extends InstrumentationTestCase {
         }
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "getColumnIndex.",
-        args = {java.lang.String.class}
-    )
     public void testGetColumnIndex() {
         assertEquals(POSITION0, mDatabaseCursor.getColumnIndex(COLUMN_NAMES1[POSITION0]));
         assertEquals(POSITION1, mDatabaseCursor.getColumnIndex(COLUMN_NAMES1[POSITION1]));
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "getColumnCount",
-        args = {}
-    )
     public void testGetColumnCount() {
         assertEquals(COLUMN_NAMES1.length, mDatabaseCursor.getColumnCount());
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "deactivate",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "registerDataSetObserver",
-            args = {android.database.DataSetObserver.class}
-        )
-    })
     public void testDeactivate() {
         MockDataSetObserver mock = new MockDataSetObserver();
         mDatabaseCursor.registerDataSetObserver(mock);
@@ -566,11 +339,6 @@ public class AbstractCursorTest extends InstrumentationTestCase {
         assertTrue(mock.hadCalledOnInvalid());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "copyStringToBuffer",
-        args = {int.class, android.database.CharArrayBuffer.class}
-    )
     public void testCopyStringToBuffer() {
         CharArrayBuffer ca = new CharArrayBuffer(1000);
         mTestAbstractCursor.moveToFirst();
@@ -585,11 +353,6 @@ public class AbstractCursorTest extends InstrumentationTestCase {
         assertEquals(sb.toString(), new String(ca.data, 0, ca.sizeCopied));
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "checkPosition",
-        args = {}
-    )
     public void testCheckPosition() {
         // Test with position = -1.
         try {

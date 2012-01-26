@@ -27,12 +27,7 @@ import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
 import android.test.AndroidTestCase;
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
 
-@TestTargetClass(AudioRecord.class)
 public class AudioRecordTest extends AndroidTestCase {
 
     private AudioRecord mAudioRecord;
@@ -97,53 +92,6 @@ public class AudioRecordTest extends AndroidTestCase {
         mIsHandleMessageCalled = false;
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "AudioRecord",
-            args = {int.class, int.class, int.class, int.class, int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getAudioFormat",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getAudioSource",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getState",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getSampleRate",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getRecordingState",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getMinBufferSize",
-            args = {int.class, int.class, int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getChannelCount",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getChannelConfiguration",
-            args = {}
-        )
-    })
     public void testAudioRecordProperties() throws Exception {
         if (!hasMicrophone()) {
             return;
@@ -162,78 +110,6 @@ public class AudioRecordTest extends AndroidTestCase {
         assertTrue(bufferSize > 0);
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "AudioRecord",
-            args = {int.class, int.class, int.class, int.class, int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "release",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "startRecording",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "stop",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setNotificationMarkerPosition",
-            args = {int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setPositionNotificationPeriod",
-            args = {int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getNotificationMarkerPosition",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getPositionNotificationPeriod",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.PARTIAL,
-            method = "read",
-            args = {byte[].class, int.class, int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.PARTIAL,
-            method = "read",
-            args = {short[].class, int.class, int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.PARTIAL,
-            method = "read",
-            args = {ByteBuffer.class, int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getRecordingState",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setRecordPositionUpdateListener",
-            args = {OnRecordPositionUpdateListener.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setRecordPositionUpdateListener",
-            args = {OnRecordPositionUpdateListener.class, Handler.class}
-        )
-    })
     public void testAudioRecordOP() throws Exception {
         if (!hasMicrophone()) {
             return;

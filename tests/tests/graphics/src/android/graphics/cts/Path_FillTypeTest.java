@@ -19,18 +19,9 @@ package android.graphics.cts;
 import android.graphics.Path;
 import android.graphics.Path.FillType;
 import android.test.AndroidTestCase;
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
 
-@TestTargetClass(Path.FillType.class)
 public class Path_FillTypeTest extends AndroidTestCase {
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "valueOf",
-        args = {java.lang.String.class}
-    )
     public void testValueOf() {
         assertEquals(FillType.WINDING, FillType.valueOf("WINDING"));
         assertEquals(FillType.EVEN_ODD, FillType.valueOf("EVEN_ODD"));
@@ -39,11 +30,6 @@ public class Path_FillTypeTest extends AndroidTestCase {
         // Every FillType element will be tested somewhere else.
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "values",
-        args = {}
-    )
     public void testValues() {
         // set the expected value
         FillType[] expected = {

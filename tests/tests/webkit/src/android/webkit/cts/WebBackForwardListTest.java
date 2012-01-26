@@ -21,12 +21,7 @@ import android.test.ActivityInstrumentationTestCase2;
 import android.webkit.WebBackForwardList;
 import android.webkit.WebHistoryItem;
 
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
 
-@TestTargetClass(WebBackForwardList.class)
 public class WebBackForwardListTest extends ActivityInstrumentationTestCase2<WebViewStubActivity> {
 
     private static final int TEST_TIMEOUT = 10000;
@@ -42,28 +37,6 @@ public class WebBackForwardListTest extends ActivityInstrumentationTestCase2<Web
         mOnUiThread = new WebViewOnUiThread(this, getActivity().getWebView());
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getCurrentItem",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getCurrentIndex",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getSize",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getItemAtIndex",
-            args = {int.class}
-        )
-    })
     public void testGetCurrentItem() throws Exception {
         WebBackForwardList list = mOnUiThread.copyBackForwardList();
 
@@ -118,12 +91,6 @@ public class WebBackForwardListTest extends ActivityInstrumentationTestCase2<Web
         }.run();
     }
 
-    @TestTargetNew(
-        level = TestLevel.NOT_FEASIBLE,
-        notes = "clone() is protected and WebBackForwardList cannot be subclassed here",
-        method = "clone",
-        args = {}
-    )
     public void testClone() {
     }
 

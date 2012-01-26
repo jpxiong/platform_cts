@@ -16,10 +16,6 @@
 
 package android.database.sqlite.cts;
 
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
 
 import android.content.ContentValues;
 import android.content.Context;
@@ -36,7 +32,6 @@ import android.test.MoreAsserts;
 import java.io.IOException;
 import java.io.InputStream;
 
-@TestTargetClass(android.database.sqlite.SQLiteStatement.class)
 public class SQLiteStatementTest extends AndroidTestCase {
     private static final String STRING1 = "this is a test";
     private static final String STRING2 = "another test";
@@ -86,11 +81,6 @@ public class SQLiteStatementTest extends AndroidTestCase {
         }
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "executeUpdateDelete",
-        args = {}
-    )
     public void testExecute() {
         mDatabase.disableWriteAheadLogging();
         populateDefaultTable();
@@ -134,18 +124,6 @@ public class SQLiteStatementTest extends AndroidTestCase {
         }
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "executeInsert",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "execute",
-            args = {}
-        )
-    })
     public void testExecuteInsert() {
         populateDefaultTable();
 
@@ -185,11 +163,6 @@ public class SQLiteStatementTest extends AndroidTestCase {
         }
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "simpleQueryForLong",
-        args = {}
-    )
     public void testSimpleQueryForLong() {
         mDatabase.execSQL("CREATE TABLE test (num INTEGER NOT NULL, str TEXT NOT NULL);");
         mDatabase.execSQL("INSERT INTO test VALUES (1234, 'hello');");
@@ -214,11 +187,6 @@ public class SQLiteStatementTest extends AndroidTestCase {
         statement.close();
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "simpleQueryForString",
-        args = {}
-    )
     public void testSimpleQueryForString() {
         mDatabase.execSQL("CREATE TABLE test (num INTEGER NOT NULL, str TEXT NOT NULL);");
         mDatabase.execSQL("INSERT INTO test VALUES (1234, 'hello');");
@@ -243,29 +211,14 @@ public class SQLiteStatementTest extends AndroidTestCase {
         statement.close();
     }
 
-    @TestTargetNew(
-        level = TestLevel.PARTIAL_COMPLETE,
-        method = "simpleQueryForBlobFileDescriptor",
-        args = {}
-    )
     public void testSimpleQueryForBlobFileDescriptorSuccessNormal() throws IOException {
         doTestSimpleQueryForBlobFileDescriptorSuccess(0);
     }
 
-    @TestTargetNew(
-        level = TestLevel.PARTIAL_COMPLETE,
-        method = "simpleQueryForBlobFileDescriptor",
-        args = {}
-    )
     public void testSimpleQueryForBlobFileDescriptorSuccessEmpty() throws IOException {
         doTestSimpleQueryForBlobFileDescriptorSuccess(1);
     }
 
-    @TestTargetNew(
-        level = TestLevel.PARTIAL_COMPLETE,
-        method = "simpleQueryForBlobFileDescriptor",
-        args = {}
-    )
     public void testSimpleQueryForBlobFileDescriptorSuccessNull() {
         populateBlobTable();
 
@@ -274,29 +227,14 @@ public class SQLiteStatementTest extends AndroidTestCase {
         assertNull(stm.simpleQueryForBlobFileDescriptor());
     }
 
-    @TestTargetNew(
-        level = TestLevel.PARTIAL_COMPLETE,
-        method = "simpleQueryForBlobFileDescriptor",
-        args = {}
-    )
     public void testSimpleQueryForBlobFileDescriptorSuccess00() throws IOException {
         doTestSimpleQueryForBlobFileDescriptorSuccess(3);
     }
 
-    @TestTargetNew(
-        level = TestLevel.PARTIAL_COMPLETE,
-        method = "simpleQueryForBlobFileDescriptor",
-        args = {}
-    )
     public void testSimpleQueryForBlobFileDescriptorSuccessFF() throws IOException {
         doTestSimpleQueryForBlobFileDescriptorSuccess(4);
     }
 
-    @TestTargetNew(
-        level = TestLevel.PARTIAL_COMPLETE,
-        method = "simpleQueryForBlobFileDescriptor",
-        args = {}
-    )
     public void testSimpleQueryForBlobFileDescriptorSuccessEmbeddedNul() throws IOException {
         doTestSimpleQueryForBlobFileDescriptorSuccess(5);
     }
@@ -310,11 +248,6 @@ public class SQLiteStatementTest extends AndroidTestCase {
         assertFileDescriptorContent(BLOBS[i], fd);
     }
 
-    @TestTargetNew(
-        level = TestLevel.PARTIAL_COMPLETE,
-        method = "simpleQueryForBlobFileDescriptor",
-        args = {}
-    )
     public void testSimpleQueryForBlobFileDescriptorSuccessParam() throws IOException {
         populateBlobTable();
 
@@ -325,11 +258,6 @@ public class SQLiteStatementTest extends AndroidTestCase {
         assertFileDescriptorContent(BLOBS[0], fd);
     }
 
-    @TestTargetNew(
-        level = TestLevel.PARTIAL_COMPLETE,
-        method = "simpleQueryForBlobFileDescriptor",
-        args = {}
-    )
     public void testGetBlobFailureNoParam() throws Exception {
         populateBlobTable();
 
@@ -350,11 +278,6 @@ public class SQLiteStatementTest extends AndroidTestCase {
         assertNotNull("Should have thrown SQLiteDoneException", expectedException);
     }
 
-    @TestTargetNew(
-        level = TestLevel.PARTIAL_COMPLETE,
-        method = "simpleQueryForBlobFileDescriptor",
-        args = {}
-    )
     public void testGetBlobFailureParam() throws Exception {
         populateBlobTable();
 

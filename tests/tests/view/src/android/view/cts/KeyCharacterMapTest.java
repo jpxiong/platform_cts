@@ -16,10 +16,6 @@
 
 package android.view.cts;
 
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
 
 import android.test.AndroidTestCase;
 import android.text.TextUtils;
@@ -27,7 +23,6 @@ import android.view.KeyCharacterMap;
 import android.view.KeyEvent;
 import android.view.KeyCharacterMap.KeyData;
 
-@TestTargetClass(KeyCharacterMap.class)
 public class KeyCharacterMapTest extends AndroidTestCase {
 
     private KeyCharacterMap mKeyCharacterMap;
@@ -39,11 +34,6 @@ public class KeyCharacterMapTest extends AndroidTestCase {
         mKeyCharacterMap = KeyCharacterMap.load(KeyCharacterMap.VIRTUAL_KEYBOARD);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "isPrintingKey",
-        args = {int.class}
-    )
     public void testIsPrintingKey() throws Exception {
 
         assertFalse(mKeyCharacterMap.isPrintingKey(KeyEvent.KEYCODE_UNKNOWN));
@@ -261,22 +251,12 @@ public class KeyCharacterMapTest extends AndroidTestCase {
         assertFalse(mKeyCharacterMap.isPrintingKey(KeyEvent.KEYCODE_PROG_BLUE));
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "load",
-        args = {int.class}
-    )
     public void testLoad() throws Exception {
         mKeyCharacterMap = null;
         mKeyCharacterMap = KeyCharacterMap.load(KeyCharacterMap.BUILT_IN_KEYBOARD);
         assertNotNull(mKeyCharacterMap);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "getNumber",
-        args = {int.class}
-    )
     public void testGetNumber() throws Exception {
         assertEquals('0', mKeyCharacterMap.getNumber(KeyEvent.KEYCODE_0));
         assertEquals('1', mKeyCharacterMap.getNumber(KeyEvent.KEYCODE_1));
@@ -292,11 +272,6 @@ public class KeyCharacterMapTest extends AndroidTestCase {
         assertEquals('#', mKeyCharacterMap.getNumber(KeyEvent.KEYCODE_POUND));
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "getMatch",
-        args = {int.class, char[].class}
-    )
     public void testGetMatch1() throws Exception {
         try {
             mKeyCharacterMap.getMatch(KeyEvent.KEYCODE_0, null);
@@ -316,11 +291,6 @@ public class KeyCharacterMapTest extends AndroidTestCase {
         return events[0].getKeyCode();
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "getMatch",
-        args = {int.class, char[].class, int.class}
-    )
     public void testGetMatch2() throws Exception {
         try {
             mKeyCharacterMap.getMatch(KeyEvent.KEYCODE_0, null, 1);
@@ -334,27 +304,10 @@ public class KeyCharacterMapTest extends AndroidTestCase {
         assertEquals('B', mKeyCharacterMap.getMatch(getCharacterKeyCode('B'), chars));
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "getKeyboardType",
-        args = {}
-    )
     public void testGetKeyboardType() throws Exception {
         mKeyCharacterMap.getKeyboardType();
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getEvents",
-            args = {char[].class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.NOT_FEASIBLE,
-            method = "getDisplayLabel",
-            args = {int.class}
-        )
-    })
     public void testGetEvents() {
         try {
             mKeyCharacterMap.getEvents(null);
@@ -368,38 +321,6 @@ public class KeyCharacterMapTest extends AndroidTestCase {
         mKeyCharacterMap.getEvents(charsArray);
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getKeyData",
-            args = {int.class, android.view.KeyCharacterMap.KeyData.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.NOT_FEASIBLE,
-            method = "get",
-            args = {int.class, int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.NOT_FEASIBLE,
-            method = "finalize",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.NOT_FEASIBLE,
-            method = "getDeadChar",
-            args = {int.class, int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.SUFFICIENT,
-            method = "deviceHasKey",
-            args = {int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.SUFFICIENT,
-            method = "deviceHasKeys",
-            args = {int[].class}
-        )
-    })
     public void testGetKeyData() throws Exception {
         KeyData result = new KeyData();
         result.meta = new char[2];

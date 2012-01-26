@@ -15,7 +15,6 @@
  */
 package android.gesture.cts;
 
-import dalvik.annotation.TestTargetClass;
 
 import android.gesture.GesturePoint;
 
@@ -24,7 +23,6 @@ import junit.framework.TestCase;
 /**
  * A (very) simple compatibility test for {@link GesturePoint}
  */
-@TestTargetClass(GesturePoint.class)
 public class GesturePointTest extends TestCase {
 
     /**

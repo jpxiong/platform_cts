@@ -18,27 +18,8 @@ package android.database.cts;
 
 import android.database.Observable;
 import android.test.AndroidTestCase;
-import dalvik.annotation.TestTargets;
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargetClass;
 
-@TestTargetClass(android.database.Observable.class)
 public class ObservableTest extends AndroidTestCase {
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test registerObserver(Object.class) and unregisterObserver(Object.class).",
-            method = "registerObserver",
-            args = {java.lang.Object.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test registerObserver(Object.class) and unregisterObserver(Object.class).",
-            method = "unregisterObserver",
-            args = {java.lang.Object.class}
-        )
-    })
     public void testRegisterUnRegisterObserver() {
         MockObservable observable = new MockObservable();
 
@@ -86,12 +67,6 @@ public class ObservableTest extends AndroidTestCase {
         observable.registerObserver(observer);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test unregisterAll method.",
-        method = "unregisterAll",
-        args = {}
-    )
     public void testUnregisterAll() {
         MockObservable observable = new MockObservable();
         Object observer1 = new Object();

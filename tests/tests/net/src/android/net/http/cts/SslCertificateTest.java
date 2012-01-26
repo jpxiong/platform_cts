@@ -33,32 +33,12 @@ import java.util.Date;
 import java.util.Set;
 
 import junit.framework.TestCase;
-import dalvik.annotation.TestTargets;
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargetClass;
 import android.net.http.SslCertificate;
 import android.net.http.SslCertificate.DName;
 import android.os.Bundle;
 
-@TestTargetClass(SslCertificate.class)
 public class SslCertificateTest extends TestCase {
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test constructor(s) of SslCertificate.",
-            method = "SslCertificate",
-            args = {java.lang.String.class, java.lang.String.class, java.lang.String.class, 
-                    java.lang.String.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test constructor(s) of SslCertificate.",
-            method = "SslCertificate",
-            args = {java.security.cert.X509Certificate.class}
-        )
-    })
     public void testConstructor() {
         // new the SslCertificate instance
         String date = DateFormat.getInstance().format(new Date());
@@ -204,20 +184,6 @@ public class SslCertificateTest extends TestCase {
         }
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test saveState and restoreState(SslCertificate certificate).",
-            method = "saveState",
-            args = {android.net.http.SslCertificate.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test saveState and restoreState(SslCertificate certificate).",
-            method = "restoreState",
-            args = {android.os.Bundle.class}
-        )
-    })
     public void testState() {
         // set the expected value
 
@@ -238,38 +204,6 @@ public class SslCertificateTest extends TestCase {
         assertEquals(ssl.getValidNotBefore(), restored.getValidNotBefore());
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test getIssuedTo().",
-            method = "getIssuedTo",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test getIssuedTo().",
-            method = "getIssuedBy",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test getIssuedTo().",
-            method = "getValidNotAfterDate",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test getIssuedTo().",
-            method = "getValidNotBeforeDate",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test getIssuedTo().",
-            method = "toString",
-            args = {}
-        )
-    })
     public void testSslCertificate() {
 
         final String TO = "c=ccc,o=testOName,ou=testUName,cn=testCName";

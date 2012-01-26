@@ -16,11 +16,6 @@
 
 package android.view.cts;
 
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
-import dalvik.annotation.ToBeFixed;
 
 import android.content.Context;
 import android.hardware.SensorManager;
@@ -30,7 +25,6 @@ import android.view.OrientationListener;
 /**
  * Test {@link OrientationListener}.
  */
-@TestTargetClass(OrientationListener.class)
 public class OrientationListenerTest extends AndroidTestCase {
     private Context mContext;
 
@@ -40,47 +34,12 @@ public class OrientationListenerTest extends AndroidTestCase {
         mContext = getContext();
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test constructor OrientationListener#OrientationListener(Context).",
-            method = "OrientationListener",
-            args = {Context.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test constructor OrientationListener#OrientationListener(Context, int).",
-            method = "OrientationListener",
-            args = {Context.class, int.class}
-        )
-    })
     public void testConstructor() {
         new MockOrientationListener(mContext);
 
         new MockOrientationListener(mContext, SensorManager.SENSOR_DELAY_UI);
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test {@link OrientationListener#enable()}. "
-                    + "This method is simply called to make sure that no exception is thrown. "
-                    + "The registeration of the listener can not be tested becuase there is no way "
-                    + "to simulate sensor events on the emulator",
-            method = "enable",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test {@link OrientationListener#disable()}. "
-                    + "This method is simply called to make sure that no exception is thrown. "
-                    + "The registeration of the listener can not be tested becuase there is no way "
-                    + "to simulate sensor events on the emulator",
-            method = "disable",
-            args = {}
-        )
-    })
-    @ToBeFixed(explanation = "Can not simulate sensor events on the emulator.")
     public void testRegisterationOfOrientationListener() {
         // these methods are called to assure that no exception is thrown
         MockOrientationListener listener = new MockOrientationListener(mContext);
@@ -88,12 +47,6 @@ public class OrientationListenerTest extends AndroidTestCase {
         listener.enable();
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test {@link OrientationListener#onAccuracyChanged(int, int)}.",
-        method = "onAccuracyChanged",
-        args = {int.class, int.class}
-    )
     public void testOnAccuracyChanged() {
         // this method is called to assure that no exception is thrown
         new MockOrientationListener(mContext).onAccuracyChanged(SensorManager.SENSOR_ACCELEROMETER,
@@ -103,12 +56,6 @@ public class OrientationListenerTest extends AndroidTestCase {
                 SensorManager.SENSOR_STATUS_ACCURACY_MEDIUM);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test {@link OrientationListener#onSensorChanged(int , float[])}.",
-        method = "onSensorChanged",
-        args = {int.class, float[].class}
-    )
     public void testOnSensorChanged() {
         // this method is called to assure that no exception is thrown
         MockOrientationListener listener = new MockOrientationListener(mContext);
@@ -127,16 +74,6 @@ public class OrientationListenerTest extends AndroidTestCase {
                 mockData);
     }
 
-    @TestTargetNew(
-        level = TestLevel.TODO,
-        notes = "Test {@link OrientationListener#onOrientationChanged(int)}. "
-                + "This test does not check callback of the "
-                + "{@link OrientationListener#onOrientationChanged(int)} "
-                + "because there is no way to simulate the sensor events on the emulator.",
-        method = "onSensorChanged",
-        args = {int.class, float[].class}
-    )
-    @ToBeFixed(explanation = "Can not simulate sensor events on the emulator.")
     public void testOnOrientationChanged() {
         MockOrientationListener listener = new MockOrientationListener(mContext);
         listener.enable();

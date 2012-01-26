@@ -19,27 +19,10 @@ package android.view.cts;
 import android.test.AndroidTestCase;
 import android.view.Surface;
 import android.view.Surface.OutOfResourcesException;
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
 
-@TestTargetClass(OutOfResourcesException.class)
 public class Surface_OutOfResourcesExceptionTest extends AndroidTestCase {
     private static final String NAME = "Test_Surface_OutOfResourcesException";
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "Surface.OutOfResourcesException",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "Surface.OutOfResourcesException",
-            args = {java.lang.String.class}
-        )
-    })
     public void testConstructor() {
         new Surface.OutOfResourcesException();
         new Surface.OutOfResourcesException(NAME);

@@ -18,22 +18,10 @@ package android.telephony.gsm.cts;
 
 import android.telephony.gsm.SmsMessage;
 import android.test.AndroidTestCase;
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
 
 @SuppressWarnings("deprecation")
-@TestTargetClass(SmsMessage.SubmitPdu.class)
 public class SmsMessage_SubmitPduTest extends AndroidTestCase {
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "toString",
-            args = {}
-        )
-    })
     public void testToString() {
         SmsMessage.SubmitPdu sp = new SmsMessage.SubmitPdu();
         assertNotNull(sp.toString());

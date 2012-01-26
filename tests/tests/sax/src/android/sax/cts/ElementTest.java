@@ -16,10 +16,6 @@
 
 package android.sax.cts;
 
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
 
 import org.xml.sax.Attributes;
 import org.xml.sax.InputSource;
@@ -39,7 +35,6 @@ import java.io.StringReader;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
-@TestTargetClass(Element.class)
 public class ElementTest extends AndroidTestCase {
     private static final String ATOM_NAMESPACE = "http://www.w3.org/2005/Atom";
     private static final String FEED = "feed";
@@ -73,54 +68,6 @@ public class ElementTest extends AndroidTestCase {
         mEntry2ListenersCalled = 0;
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test Element",
-            method = "getChild",
-            args = {java.lang.String.class, java.lang.String.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getChild",
-            args = {java.lang.String.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setElementListener",
-            args = {android.sax.ElementListener.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setEndTextElementListener",
-            args = {android.sax.EndTextElementListener.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "requireChild",
-            args = {java.lang.String.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "requireChild",
-            args = {java.lang.String.class, java.lang.String.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setEndElementListener",
-            args = {android.sax.EndElementListener.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setStartElementListener",
-            args = {android.sax.StartElementListener.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setTextElementListener",
-            args = {android.sax.TextElementListener.class}
-        )
-    })
     public void testParse() throws Exception {
         RootElement root = new RootElement(ATOM_NAMESPACE, FEED);
         assertNotNull(root);

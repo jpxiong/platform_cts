@@ -15,10 +15,6 @@
  */
 package android.telephony.cts;
 
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
 
 import android.content.Context;
 import android.os.Looper;
@@ -29,7 +25,6 @@ import android.telephony.TelephonyManager;
 import android.telephony.gsm.GsmCellLocation;
 import android.test.AndroidTestCase;
 
-@TestTargetClass(CellLocation.class)
 public class CellLocationTest extends AndroidTestCase {
     private boolean mOnCellLocationChangedCalled;
     private final Object mLock = new Object();
@@ -56,18 +51,6 @@ public class CellLocationTest extends AndroidTestCase {
         super.tearDown();
     }
 
-    @TestTargets({
-      @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "getEmpty",
-        args = {}
-      ),
-      @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "requestLocationUpdate",
-        args = {}
-      )
-    })
     public void testCellLocation() throws Throwable {
         CellLocation cl = CellLocation.getEmpty();
         if (cl instanceof GsmCellLocation) {

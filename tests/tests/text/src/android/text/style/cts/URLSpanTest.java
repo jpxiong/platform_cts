@@ -18,11 +18,6 @@ package android.text.style.cts;
 
 import com.android.cts.stub.R;
 
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
-import dalvik.annotation.ToBeFixed;
 
 import android.app.Activity;
 import android.app.Instrumentation;
@@ -32,7 +27,6 @@ import android.test.ActivityInstrumentationTestCase2;
 import android.text.style.URLSpan;
 import android.widget.TextView;
 
-@TestTargetClass(URLSpan.class)
 public class URLSpanTest extends ActivityInstrumentationTestCase2<URLSpanStubActivity> {
     // The scheme of TEST_URL must be "ctstest" to launch MockURLSpanTestActivity
     private static final String TEST_URL = "ctstest://urlSpan/test";
@@ -48,21 +42,6 @@ public class URLSpanTest extends ActivityInstrumentationTestCase2<URLSpanStubAct
         mActivity = getActivity();
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test constructor(s) of URLSpan.",
-            method = "URLSpan",
-            args = {java.lang.String.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test constructor(s) of URLSpan.",
-            method = "URLSpan",
-            args = {android.os.Parcel.class}
-        )
-    })
-    @ToBeFixed(bug = "1695243", explanation = "miss javadoc")
     public void testConstructor() {
         URLSpan urlSpan = new URLSpan(TEST_URL);
 
@@ -76,24 +55,11 @@ public class URLSpanTest extends ActivityInstrumentationTestCase2<URLSpanStubAct
         }
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test getURL().",
-        method = "getURL",
-        args = {}
-    )
-    @ToBeFixed(bug = "1695243", explanation = "miss javadoc")
     public void testGetURL() {
         URLSpan urlSpan = new URLSpan(TEST_URL);
         assertEquals(TEST_URL, urlSpan.getURL());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test onClick(View widget).",
-        method = "onClick",
-        args = {android.view.View.class}
-    )
     public void testOnClick() {
         final URLSpan urlSpan = new URLSpan(TEST_URL);
         final TextView textView = (TextView) mActivity.findViewById(R.id.url);
@@ -117,14 +83,6 @@ public class URLSpanTest extends ActivityInstrumentationTestCase2<URLSpanStubAct
         newActivity.finish();
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test onClick(View widget).",
-        method = "onClick",
-        args = {android.view.View.class}
-    )
-    @ToBeFixed(bug = "1695243", explanation = "should add @throws NullPointerException clause" +
-            " into javadoc when input View is null")
     public void testOnClickFailure() {
         URLSpan urlSpan = new URLSpan(TEST_URL);
 
@@ -136,34 +94,16 @@ public class URLSpanTest extends ActivityInstrumentationTestCase2<URLSpanStubAct
         }
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test describeContents().",
-        method = "describeContents",
-        args = {}
-    )
     public void testDescribeContents() {
         URLSpan urlSpan = new URLSpan(TEST_URL);
         urlSpan.describeContents();
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test getSpanTypeId().",
-        method = "getSpanTypeId",
-        args = {}
-    )
     public void testGetSpanTypeId() {
         URLSpan urlSpan = new URLSpan(TEST_URL);
         urlSpan.getSpanTypeId();
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test writeToParcel(Parcel dest, int flags).",
-        method = "writeToParcel",
-        args = {Parcel.class, int.class}
-    )
     public void testWriteToParcel() {
         Parcel p = Parcel.obtain();
         try {

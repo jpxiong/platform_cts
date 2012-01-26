@@ -16,9 +16,6 @@
 
 package android.text.method.cts;
 
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
 
 import android.text.method.HideReturnsTransformationMethod;
 
@@ -27,36 +24,16 @@ import junit.framework.TestCase;
 /**
  * Test {@link HideReturnsTransformationMethod}.
  */
-@TestTargetClass(HideReturnsTransformationMethod.class)
 public class HideReturnsTransformationMethodTest extends TestCase {
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test constructor "
-                + "HideReturnsTransformationMethod#HideReturnsTransformationMethod().",
-        method = "HideReturnsTransformationMethod",
-        args = {}
-    )
     public void testConstructor() {
         new HideReturnsTransformationMethod();
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test {@link HideReturnsTransformationMethod#getOriginal()}.",
-        method = "getOriginal",
-        args = {}
-    )
     public void testGetOriginal() {
         MyHideReturnsTranformationMethod method = new MyHideReturnsTranformationMethod();
         TextMethodUtils.assertEquals(new char[] { '\r' }, method.getOriginal());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test {@link HideReturnsTransformationMethod#getInstance()}.",
-        method = "getInstance",
-        args = {}
-    )
     public void testGetInstance() {
         HideReturnsTransformationMethod method0 = HideReturnsTransformationMethod.getInstance();
         assertNotNull(method0);
@@ -65,12 +42,6 @@ public class HideReturnsTransformationMethodTest extends TestCase {
         assertSame(method0, method1);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test {@link HideReturnsTransformationMethod#getReplacement()}.",
-        method = "getReplacement",
-        args = {}
-    )
     public void testGetReplacement() {
         MyHideReturnsTranformationMethod method = new MyHideReturnsTranformationMethod();
         TextMethodUtils.assertEquals(new char[] { '\uFEFF' }, method.getReplacement());

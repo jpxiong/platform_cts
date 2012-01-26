@@ -18,11 +18,6 @@ package android.widget.cts;
 
 import com.android.cts.stub.R;
 
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
-import dalvik.annotation.ToBeFixed;
 
 import org.xmlpull.v1.XmlPullParser;
 
@@ -46,7 +41,6 @@ import android.widget.TextView;
 /**
  * Test {@link ScrollView}.
  */
-@TestTargetClass(ScrollView.class)
 public class ScrollViewTest extends ActivityInstrumentationTestCase2<ScrollViewStubActivity> {
     // view dpi constants. Must match those defined in scroll_view layout
     private static final int ITEM_WIDTH_DPI  = 250;
@@ -87,23 +81,6 @@ public class ScrollViewTest extends ActivityInstrumentationTestCase2<ScrollViewS
         mScrollRight = mItemWidth - mPageWidth;
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "ScrollView",
-            args = {Context.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "ScrollView",
-            args = {Context.class, AttributeSet.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "ScrollView",
-            args = {Context.class, AttributeSet.class, int.class}
-        )
-    })
     public void testConstructor() {
         XmlPullParser parser = mActivity.getResources().getLayout(R.layout.scrollview_layout);
         AttributeSet attrs = Xml.asAttributeSet(parser);
@@ -114,11 +91,6 @@ public class ScrollViewTest extends ActivityInstrumentationTestCase2<ScrollViewS
         new ScrollView(mActivity, attrs, 0);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "getMaxScrollAmount",
-        args = {}
-    )
     public void testGetMaxScrollAmount() {
         // the value is half of total layout height
         ScrollView scrollView = new ScrollView(mActivity);
@@ -129,14 +101,6 @@ public class ScrollViewTest extends ActivityInstrumentationTestCase2<ScrollViewS
         assertEquals((100 - 0) / 2, scrollView.getMaxScrollAmount());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "addView",
-        args = {View.class}
-    )
-    @ToBeFixed(bug = "1695243", explanation = "Android API javadocs are incomplete."
-            + " @throws clause should be added into javadoc of "
-            + "ScrollView#addView(View) when there is already one child in the view.")
     public void testAddView() {
         ScrollView scrollView = new ScrollView(mActivity);
         TextView child0 = new TextView(mActivity);
@@ -154,14 +118,6 @@ public class ScrollViewTest extends ActivityInstrumentationTestCase2<ScrollViewS
         assertEquals(1, scrollView.getChildCount());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "addView",
-        args = {View.class, int.class}
-    )
-    @ToBeFixed(bug = "1695243", explanation = "Android API javadocs are incomplete."
-            + " @throws clause should be added into javadoc of "
-            + "ScrollView#addView(View, int) when there is already one child in the view.")
     public void testAddViewWithIndex() {
         ScrollView scrollView = new ScrollView(mActivity);
         TextView child0 = new TextView(mActivity);
@@ -203,15 +159,6 @@ public class ScrollViewTest extends ActivityInstrumentationTestCase2<ScrollViewS
         }
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "addView",
-        args = {View.class, LayoutParams.class}
-    )
-    @ToBeFixed(bug = "1695243", explanation = "Android API javadocs are incomplete."
-            + " @throws clause should be added into javadoc of "
-            + "ScrollView#addView(View, LayoutParams) when there is already"
-            + " one child in the view or the layoutparams is null")
     public void testAddViewWithLayoutParams() {
         ScrollView scrollView = new ScrollView(mActivity);
         TextView child0 = new TextView(mActivity);
@@ -241,15 +188,6 @@ public class ScrollViewTest extends ActivityInstrumentationTestCase2<ScrollViewS
         }
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "addView",
-        args = {View.class, int.class, LayoutParams.class}
-    )
-    @ToBeFixed(bug = "1695243", explanation = "Android API javadocs are incomplete."
-            + " @throws clause should be added into javadoc of "
-            + "ScrollView#addView(View, int, LayoutParams) when there is already"
-            + " one child in the view or the layoutparams is null")
     public void testAddViewWithIndexAndLayoutParams() {
         ScrollView scrollView = new ScrollView(mActivity);
         TextView child0 = new TextView(mActivity);
@@ -305,18 +243,6 @@ public class ScrollViewTest extends ActivityInstrumentationTestCase2<ScrollViewS
         }
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "isFillViewport",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setFillViewport",
-            args = {boolean.class}
-        )
-    })
     public void testAccessFillViewport() {
         ScrollView scrollView = new ScrollView(mActivity);
         assertFalse(scrollView.isFillViewport());
@@ -339,18 +265,6 @@ public class ScrollViewTest extends ActivityInstrumentationTestCase2<ScrollViewS
         assertTrue(scrollView.isLayoutRequested());
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "isSmoothScrollingEnabled",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setSmoothScrollingEnabled",
-            args = {boolean.class}
-        )
-    })
     public void testAccessSmoothScrollingEnabled() throws Throwable {
         assertTrue(mScrollView.isSmoothScrollingEnabled());
 
@@ -394,11 +308,6 @@ public class ScrollViewTest extends ActivityInstrumentationTestCase2<ScrollViewS
         assertEquals(0, mScrollView.getScrollY());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "measureChild",
-        args = {View.class, int.class, int.class}
-    )
     public void testMeasureChild() {
         MyScrollView scrollView = new MyScrollView(mActivity);
 
@@ -420,11 +329,6 @@ public class ScrollViewTest extends ActivityInstrumentationTestCase2<ScrollViewS
         assertEquals(100, child.getMeasuredWidth());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "measureChildWithMargins",
-        args = {View.class, int.class, int.class, int.class, int.class}
-    )
     public void testMeasureChildWithMargins() {
         MyScrollView mockScrollView = new MyScrollView(mActivity);
 
@@ -447,11 +351,6 @@ public class ScrollViewTest extends ActivityInstrumentationTestCase2<ScrollViewS
         assertEquals(100, child.getMeasuredWidth());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "pageScroll",
-        args = {int.class}
-    )
     @UiThreadTest
     public void testPageScroll() {
         mScrollView.setSmoothScrollingEnabled(false);
@@ -478,11 +377,6 @@ public class ScrollViewTest extends ActivityInstrumentationTestCase2<ScrollViewS
         assertEquals(0, mScrollView.getScrollY());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "fullScroll",
-        args = {int.class}
-    )
     @UiThreadTest
     public void testFullScroll() {
         mScrollView.setSmoothScrollingEnabled(false);
@@ -501,11 +395,6 @@ public class ScrollViewTest extends ActivityInstrumentationTestCase2<ScrollViewS
         assertEquals(0, mScrollView.getScrollY());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "arrowScroll",
-        args = {int.class}
-    )
     @UiThreadTest
     public void testArrowScroll() {
         mScrollView.setSmoothScrollingEnabled(false);
@@ -532,11 +421,6 @@ public class ScrollViewTest extends ActivityInstrumentationTestCase2<ScrollViewS
         assertEquals(0, mScrollView.getScrollY());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "smoothScrollBy",
-        args = {int.class, int.class}
-    )
     public void testSmoothScrollBy() throws Throwable {
         assertEquals(0, mScrollView.getScrollX());
         assertEquals(0, mScrollView.getScrollY());
@@ -561,11 +445,6 @@ public class ScrollViewTest extends ActivityInstrumentationTestCase2<ScrollViewS
         assertEquals(0, mScrollView.getScrollY());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "smoothScrollTo",
-        args = {int.class, int.class}
-    )
     public void testSmoothScrollTo() throws Throwable {
         assertEquals(0, mScrollView.getScrollX());
         assertEquals(0, mScrollView.getScrollY());
@@ -590,11 +469,6 @@ public class ScrollViewTest extends ActivityInstrumentationTestCase2<ScrollViewS
         assertEquals(mPageHeight, mScrollView.getScrollY());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "computeScrollDeltaToGetChildRectOnScreen",
-        args = {android.graphics.Rect.class}
-    )
     public void testComputeScrollDeltaToGetChildRectOnScreen() {
         mScrollView.setSmoothScrollingEnabled(false);
         int edge = mScrollView.getVerticalFadingEdgeLength();
@@ -611,11 +485,6 @@ public class ScrollViewTest extends ActivityInstrumentationTestCase2<ScrollViewS
         assertEquals(edge, mScrollView.computeScrollDeltaToGetChildRectOnScreen(rect));
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "computeVerticalScrollRange",
-        args = {}
-    )
     public void testComputeVerticalScrollRange() {
         assertTrue(mScrollView.getChildCount() > 0);
         assertEquals(mItemHeight * ITEM_COUNT,
@@ -626,11 +495,6 @@ public class ScrollViewTest extends ActivityInstrumentationTestCase2<ScrollViewS
         assertEquals(0, myScrollView.computeVerticalScrollRange());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "requestChildFocus",
-        args = {View.class, View.class}
-    )
     @UiThreadTest
     public void testRequestChildFocus() {
         mScrollView.setSmoothScrollingEnabled(false);
@@ -650,11 +514,6 @@ public class ScrollViewTest extends ActivityInstrumentationTestCase2<ScrollViewS
         assertTrue(mScrollView.getScrollY() < scrollY);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "requestChildRectangleOnScreen",
-        args = {View.class, Rect.class, boolean.class}
-    )
     @UiThreadTest
     public void testRequestChildRectangleOnScreen() {
         mScrollView.setSmoothScrollingEnabled(false);
@@ -676,12 +535,6 @@ public class ScrollViewTest extends ActivityInstrumentationTestCase2<ScrollViewS
         assertEquals(edge, mScrollView.getScrollY());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "The method is simply called to make sure no exception is thrown.",
-        method = "requestLayout",
-        args = {}
-    )
     @UiThreadTest
     public void testRequestLayout() {
         mScrollView.requestLayout();
@@ -689,13 +542,6 @@ public class ScrollViewTest extends ActivityInstrumentationTestCase2<ScrollViewS
         assertTrue(mScrollView.isLayoutRequested());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "fling",
-        args = {int.class}
-    )
-    @ToBeFixed(bug = "1695243", explanation = "As javadoc says, scrolls towards the top "
-            + "when velocityY is positive. But it scrolls to bottom actually.")
     public void testFling() throws Throwable {
         mScrollView.setSmoothScrollingEnabled(true);
         assertEquals(0, mScrollView.getScrollY());
@@ -718,11 +564,6 @@ public class ScrollViewTest extends ActivityInstrumentationTestCase2<ScrollViewS
         pollingCheckFling(currentY, false);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "scrollTo",
-        args = {int.class, int.class}
-    )
     @UiThreadTest
     public void testScrollTo() {
         mScrollView.setSmoothScrollingEnabled(false);
@@ -745,18 +586,6 @@ public class ScrollViewTest extends ActivityInstrumentationTestCase2<ScrollViewS
         assertEquals(0, mScrollView.getScrollX());
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getTopFadingEdgeStrength",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getBottomFadingEdgeStrength",
-            args = {}
-        )
-    })
     public void testGetVerticalFadingEdgeStrengths() {
         assertTrue(mScrollView.getChildCount() > 0);
         assertTrue(mScrollView.getTopFadingEdgeStrength() <= 1.0f);
@@ -772,83 +601,38 @@ public class ScrollViewTest extends ActivityInstrumentationTestCase2<ScrollViewS
         assertTrue(mScrollView.getBottomFadingEdgeStrength() >= 0.0f);
     }
 
-    @TestTargetNew(
-        level = TestLevel.NOT_NECESSARY,
-        method = "onLayout",
-        args = {boolean.class, int.class, int.class, int.class, int.class}
-    )
     public void testOnLayout() {
         // onLayout() is implementation details, do NOT test
     }
 
-    @TestTargetNew(
-        level = TestLevel.NOT_NECESSARY,
-        method = "onMeasure",
-        args = {int.class, int.class}
-    )
     public void testOnMeasure() {
         // onMeasure() is implementation details, do NOT test
     }
 
-    @TestTargetNew(
-        level = TestLevel.NOT_NECESSARY,
-        method = "executeKeyEvent",
-        args = {KeyEvent.class}
-    )
     public void testExecuteKeyEvent() {
         // executeKeyEvent() is implementation details, do NOT test
     }
 
-    @TestTargetNew(
-        level = TestLevel.NOT_NECESSARY,
-        method = "onRequestFocusInDescendants",
-        args = {int.class, Rect.class}
-    )
     public void testOnRequestFocusInDescendants() {
         // onRequestFocusInDescendants() is implementation details, do NOT test
     }
 
-    @TestTargetNew(
-        level = TestLevel.NOT_NECESSARY,
-        method = "onSizeChanged",
-        args = {int.class, int.class, int.class, int.class}
-    )
     public void testOnSizeChanged() {
         // onSizeChanged() is implementation details, do NOT test
     }
 
-    @TestTargetNew(
-        level = TestLevel.NOT_NECESSARY,
-        method = "dispatchKeyEvent",
-        args = {KeyEvent.class}
-    )
     public void testDispatchKeyEvent() {
         // dispatchKeyEvent() is implementation details, do NOT test
     }
 
-    @TestTargetNew(
-        level = TestLevel.NOT_NECESSARY,
-        method = "onInterceptTouchEvent",
-        args = {MotionEvent.class}
-    )
     public void testOnInterceptTouchEvent() {
         // onInterceptTouchEvent() is implementation details, do NOT test
     }
 
-    @TestTargetNew(
-        level = TestLevel.NOT_NECESSARY,
-        method = "onTouchEvent",
-        args = {MotionEvent.class}
-    )
     public void testOnTouchEvent() {
         // onTouchEvent() is implementation details, do NOT test
     }
 
-    @TestTargetNew(
-        level = TestLevel.NOT_NECESSARY,
-        method = "computeScroll",
-        args = {}
-    )
     public void testComputeScroll() {
         // computeScroll() is implementation details, do NOT test
     }

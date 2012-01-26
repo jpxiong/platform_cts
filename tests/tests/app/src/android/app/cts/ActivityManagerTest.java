@@ -33,12 +33,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ConfigurationInfo;
 import android.test.InstrumentationTestCase;
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.ToBeFixed;
 
-@TestTargetClass(ActivityManager.class)
 public class ActivityManagerTest extends InstrumentationTestCase {
     private static final String STUB_PACKAGE_NAME = "com.android.cts.stub";
     private static final int WAITFOR_MSEC = 5000;
@@ -75,11 +70,6 @@ public class ActivityManagerTest extends InstrumentationTestCase {
         }
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "getRecentTasks",
-        args = {int.class, int.class}
-    )
     public void testGetRecentTasks() throws Exception {
         int maxNum = 0;
         int flags = 0;
@@ -137,11 +127,6 @@ public class ActivityManagerTest extends InstrumentationTestCase {
         mStartedActivityList.add(monitor.waitForActivity());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "getRunningTasks",
-        args = {int.class}
-    )
     public void testGetRunningTasks() {
         // Test illegal parameter
         List<RunningTaskInfo> runningTaskList;
@@ -183,11 +168,6 @@ public class ActivityManagerTest extends InstrumentationTestCase {
         assertTrue(indexRecentTwo < indexRecentOne);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "getRunningServices",
-        args = {int.class}
-    )
     public void testGetRunningServices() throws Exception {
         // Test illegal parameter
         List<RunningServiceInfo> runningServiceInfo;
@@ -218,22 +198,12 @@ public class ActivityManagerTest extends InstrumentationTestCase {
         Thread.sleep(WAIT_TIME);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "getMemoryInfo",
-        args = {android.app.ActivityManager.MemoryInfo.class}
-    )
     public void testGetMemoryInfo() {
         ActivityManager.MemoryInfo outInfo = new ActivityManager.MemoryInfo();
         mActivityManager.getMemoryInfo(outInfo);
         assertTrue(outInfo.lowMemory == (outInfo.availMem <= outInfo.threshold));
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "getRunningAppProcesses",
-        args = {}
-    )
     public void testGetRunningAppProcesses() throws Exception {
         List<RunningAppProcessInfo> list = mActivityManager.getRunningAppProcesses();
         assertNotNull(list);
@@ -272,35 +242,14 @@ public class ActivityManagerTest extends InstrumentationTestCase {
         fail("com.android.cts.stub:remote process should be available");
     }
 
-    @TestTargetNew(
-        level = TestLevel.PARTIAL_COMPLETE,
-        method = "getProcessesInErrorState",
-        notes="No known way to force activity into error state",
-        args = {}
-    )
     public void testGetProcessInErrorState() throws Exception {
         List<ActivityManager.ProcessErrorStateInfo> errList = null;
         errList = mActivityManager.getProcessesInErrorState();
     }
 
-    @TestTargetNew(
-        level = TestLevel.NOT_FEASIBLE,
-        notes = "Test restartPackage function of ActivityManager.It is  not supported that"
-                + "running more than 2 apks at the same time by CTS framework.Howerver,the purpuse"
-                + "of this method is to restart a package located in another apk.",
-        method = "restartPackage",
-        args = {}
-    )
     public void testRestartPackage() {
     }
 
-    @TestTargetNew(
-        level = TestLevel.PARTIAL_COMPLETE,
-        notes = "Test getDeviceConfigurationInfo function of ActivityManager",
-        method = "getDeviceConfigurationInfo",
-        args = {}
-    )
-    @ToBeFixed(bug="1713051", explanation="no other way to get the device configuration info")
     public void testGetDeviceConfigurationInfo() {
         ConfigurationInfo conInf = mActivityManager.getDeviceConfigurationInfo();
         assertNotNull(conInf);

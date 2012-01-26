@@ -16,7 +16,6 @@
 
 package android.provider.cts;
 
-import dalvik.annotation.TestTargetClass;
 
 import android.content.ContentResolver;
 import android.content.ContentValues;
@@ -29,7 +28,6 @@ import android.provider.Settings;
 import android.test.AndroidTestCase;
 import android.util.Log;
 
-@TestTargetClass(android.provider.Settings.class)
 public class SettingsTest extends AndroidTestCase {
     public void testSystemTable() throws RemoteException {
         final String[] SYSTEM_PROJECTION = new String[] {

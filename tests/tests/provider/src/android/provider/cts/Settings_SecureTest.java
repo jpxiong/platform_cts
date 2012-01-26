@@ -16,10 +16,6 @@
 
 package android.provider.cts;
 
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
 
 import android.content.ContentResolver;
 import android.net.Uri;
@@ -28,7 +24,6 @@ import android.provider.Settings.Secure;
 import android.provider.Settings.SettingNotFoundException;
 import android.test.AndroidTestCase;
 
-@TestTargetClass(android.provider.Settings.Secure.class)
 public class Settings_SecureTest extends AndroidTestCase {
 
     private static final String NO_SUCH_SETTING = "NoSuchSetting";
@@ -63,23 +58,6 @@ public class Settings_SecureTest extends AndroidTestCase {
         }
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getInt",
-            args = {android.content.ContentResolver.class, java.lang.String.class, int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getLong",
-            args = {android.content.ContentResolver.class, java.lang.String.class, long.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getFloat",
-            args = {android.content.ContentResolver.class, java.lang.String.class, float.class}
-        )
-    })
     public void testGetDefaultValues() {
         assertEquals(10, Secure.getInt(cr, "int", 10));
         assertEquals(20, Secure.getLong(cr, "long", 20));
@@ -166,11 +144,6 @@ public class Settings_SecureTest extends AndroidTestCase {
         assertNull(Secure.getString(cr, NO_SUCH_SETTING));
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "getUriFor",
-        args = {java.lang.String.class}
-    )
     public void testGetUriFor() {
         String name = "table";
 

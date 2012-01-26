@@ -16,18 +16,12 @@
 
 package android.database.cts;
 
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
-import dalvik.annotation.ToBeFixed;
 
 import android.database.ContentObservable;
 import android.database.ContentObserver;
 import android.net.Uri;
 import android.test.InstrumentationTestCase;
 
-@TestTargetClass(ContentObservable.class)
 public class ContentObservableTest extends InstrumentationTestCase {
     private static final Uri CONTENT_URI = Uri.parse("content://uri");
 
@@ -42,19 +36,6 @@ public class ContentObservableTest extends InstrumentationTestCase {
         mObserver = new MyContentObserver();
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "registerObserver",
-            args = {android.database.ContentObserver.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "notifyChange",
-            args = {boolean.class}
-        )
-    })
-    @ToBeFixed(bug = "1486189", explanation = "registerObserver is a redundant override method")
     public void testNotifyChange() {
         mContentObservable.registerObserver(mObserver);
         mObserver.resetStatus();
@@ -87,11 +68,6 @@ public class ContentObservableTest extends InstrumentationTestCase {
         assertTrue(second.hasChanged());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "dispatchChange",
-        args = {boolean.class}
-    )
     public void testDispatchChange() {
         mContentObservable.registerObserver(mObserver);
         mObserver.resetStatus();

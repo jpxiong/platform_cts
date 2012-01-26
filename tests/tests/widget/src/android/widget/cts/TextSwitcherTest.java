@@ -16,11 +16,6 @@
 
 package android.widget.cts;
 
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
-import dalvik.annotation.ToBeFixed;
 
 import android.content.Context;
 import android.test.InstrumentationTestCase;
@@ -32,7 +27,6 @@ import android.widget.TextView;
 /**
  * Test {@link TextSwitcher}.
  */
-@TestTargetClass(TextSwitcher.class)
 public class TextSwitcherTest extends InstrumentationTestCase {
     private Context mContext;
 
@@ -51,29 +45,12 @@ public class TextSwitcherTest extends InstrumentationTestCase {
         mContext = getInstrumentation().getContext();
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "TextSwitcher",
-            args = {android.content.Context.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "TextSwitcher",
-            args = {android.content.Context.class, android.util.AttributeSet.class}
-        )
-    })
     public void testConstructor() {
         new TextSwitcher(mContext);
 
         new TextSwitcher(mContext, null);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "setText",
-        args = {java.lang.CharSequence.class}
-    )
     public void testSetText() {
         final String viewText1 = "Text 1";
         final String viewText2 = "Text 2";
@@ -113,11 +90,6 @@ public class TextSwitcherTest extends InstrumentationTestCase {
         assertSame(tv2, textSwitcher.getCurrentView());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "setCurrentText",
-        args = {java.lang.CharSequence.class}
-    )
     public void testSetCurrentText() {
         final String viewText1 = "Text 1";
         final String viewText2 = "Text 2";
@@ -158,13 +130,6 @@ public class TextSwitcherTest extends InstrumentationTestCase {
         assertSame(tv1, textSwitcher.getCurrentView());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "addView",
-        args = {android.view.View.class, int.class, android.view.ViewGroup.LayoutParams.class}
-    )
-    @ToBeFixed(bug = "1695243", explanation = "the javadoc for addView() is incomplete." +
-            "1. not clear what is supposed to happen if the LayoutParams is null.")
     public void testAddView() {
         TextSwitcher textSwitcher = new TextSwitcher(mContext);
 

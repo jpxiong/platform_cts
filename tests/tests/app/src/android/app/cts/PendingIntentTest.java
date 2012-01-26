@@ -26,12 +26,7 @@ import android.os.Looper;
 import android.os.Message;
 import android.os.Parcel;
 import android.test.AndroidTestCase;
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
 
-@TestTargetClass(PendingIntent.class)
 public class PendingIntentTest extends AndroidTestCase {
 
     private static final int WAIT_TIME = 5000;
@@ -99,11 +94,6 @@ public class PendingIntentTest extends AndroidTestCase {
         mLooper.quit();
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "getActivity",
-        args = {android.content.Context.class, int.class, android.content.Intent.class, int.class}
-    )
     public void testGetActivity() throws InterruptedException, CanceledException {
         PendingIntentStubActivity.status = PendingIntentStubActivity.INVALIDATE;
         mPendingIntent = null;
@@ -146,11 +136,6 @@ public class PendingIntentTest extends AndroidTestCase {
         }
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "getBroadcast",
-        args = {android.content.Context.class, int.class, android.content.Intent.class, int.class}
-    )
     public void testGetBroadcast() throws InterruptedException, CanceledException {
         MockReceiver.sAction = null;
         mIntent = new Intent(MockReceiver.MOCKACTION);
@@ -175,11 +160,6 @@ public class PendingIntentTest extends AndroidTestCase {
         pendingIntentSendError(mPendingIntent);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "getService",
-        args = {android.content.Context.class, int.class, android.content.Intent.class, int.class}
-    )
     public void testGetService() throws InterruptedException, CanceledException {
         MockService.result = false;
         mIntent = new Intent();
@@ -204,11 +184,6 @@ public class PendingIntentTest extends AndroidTestCase {
         pendingIntentSendError(mPendingIntent);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "cancel",
-        args = {}
-    )
     public void testCancel() throws CanceledException {
         mIntent = new Intent();
         mIntent.setClass(mContext, MockService.class);
@@ -230,11 +205,6 @@ public class PendingIntentTest extends AndroidTestCase {
         }
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "send",
-        args = {}
-    )
     public void testSend() throws InterruptedException, CanceledException {
         MockReceiver.sAction = null;
         MockReceiver.sResultCode = -1;
@@ -256,11 +226,6 @@ public class PendingIntentTest extends AndroidTestCase {
         pendingIntentSendShouldFail(mPendingIntent);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "send",
-        args = {int.class}
-    )
     public void testSendWithParamInt() throws InterruptedException, CanceledException {
         mIntent = new Intent(MockReceiver.MOCKACTION);
         mIntent.setClass(mContext, MockReceiver.class);
@@ -293,11 +258,6 @@ public class PendingIntentTest extends AndroidTestCase {
         pendingIntentSendShouldFail(mPendingIntent);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "send",
-        args = {android.content.Context.class, int.class, android.content.Intent.class}
-    )
     public void testSendWithParamContextIntIntent() throws InterruptedException, CanceledException {
         mIntent = new Intent(MockReceiver.MOCKACTION);
         mIntent.setClass(mContext, MockReceiver.class);
@@ -325,11 +285,6 @@ public class PendingIntentTest extends AndroidTestCase {
         mPendingIntent.cancel();
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "send",
-        args = {int.class, android.app.PendingIntent.OnFinished.class, android.os.Handler.class}
-    )
     public void testSendWithParamIntOnFinishedHandler() throws InterruptedException,
             CanceledException {
         mIntent = new Intent(MockReceiver.MOCKACTION);
@@ -382,12 +337,6 @@ public class PendingIntentTest extends AndroidTestCase {
         mPendingIntent.cancel();
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "send",
-        args = {Context.class, int.class, Intent.class,
-                PendingIntent.OnFinished.class, Handler.class}
-    )
     public void testSendWithParamContextIntIntentOnFinishedHandler() throws InterruptedException,
             CanceledException {
         mIntent = new Intent(MockReceiver.MOCKACTION);
@@ -427,11 +376,6 @@ public class PendingIntentTest extends AndroidTestCase {
         mPendingIntent.cancel();
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "getTargetPackage",
-        args = {}
-    )
     public void testGetTargetPackage() {
         mIntent = new Intent();
         mPendingIntent = PendingIntent.getActivity(mContext, 1, mIntent,
@@ -439,18 +383,6 @@ public class PendingIntentTest extends AndroidTestCase {
         assertEquals(mContext.getPackageName(), mPendingIntent.getTargetPackage());
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "equals",
-            args = {java.lang.Object.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "hashCode",
-           args = {}
-        )
-    })
     public void testEquals() {
         mIntent = new Intent();
         mPendingIntent = PendingIntent.getActivity(mContext, 1, mIntent,
@@ -478,11 +410,6 @@ public class PendingIntentTest extends AndroidTestCase {
         assertEquals(mPendingIntent.hashCode(), target.hashCode());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "describeContents",
-        args = {}
-    )
     public void testDescribeContents() {
         mIntent = new Intent();
         mPendingIntent = PendingIntent.getActivity(mContext, 1, mIntent,
@@ -491,11 +418,6 @@ public class PendingIntentTest extends AndroidTestCase {
         assertEquals(expected, mPendingIntent.describeContents());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "writeToParcel",
-        args = {android.os.Parcel.class, int.class}
-    )
     public void testWriteToParcel() {
         mIntent = new Intent();
         mPendingIntent = PendingIntent.getActivity(mContext, 1, mIntent,
@@ -508,23 +430,6 @@ public class PendingIntentTest extends AndroidTestCase {
         assertTrue(mPendingIntent.equals(pendingIntent));
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "writePendingIntentOrNullToParcel",
-            args = {android.app.PendingIntent.class, android.os.Parcel.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "readPendingIntentOrNullFromParcel",
-            args = {android.os.Parcel.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "toString",
-            args = {}
-        )
-    })
     public void testReadAndWritePendingIntentOrNullToParcel() {
         mIntent = new Intent();
         mPendingIntent = PendingIntent.getActivity(mContext, 1, mIntent,

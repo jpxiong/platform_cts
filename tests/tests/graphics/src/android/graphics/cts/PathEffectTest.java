@@ -18,18 +18,9 @@ package android.graphics.cts;
 
 import android.graphics.PathEffect;
 import android.test.AndroidTestCase;
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargetClass;
 
-@TestTargetClass(PathEffect.class)
 public class PathEffectTest extends AndroidTestCase {
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "PathEffect",
-        args = {}
-    )
     public void testConstructor() {
         new PathEffect();
     }

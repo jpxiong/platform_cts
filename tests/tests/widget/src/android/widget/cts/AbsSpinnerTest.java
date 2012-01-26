@@ -18,11 +18,6 @@ package android.widget.cts;
 
 import com.android.cts.stub.R;
 
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
-import dalvik.annotation.ToBeFixed;
 
 import org.xmlpull.v1.XmlPullParser;
 
@@ -44,7 +39,6 @@ import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.SpinnerAdapter;
 
-@TestTargetClass(AbsSpinner.class)
 public class AbsSpinnerTest extends ActivityInstrumentationTestCase2<RelativeLayoutStubActivity> {
     private Context mContext;
 
@@ -58,30 +52,7 @@ public class AbsSpinnerTest extends ActivityInstrumentationTestCase2<RelativeLay
         mContext = getInstrumentation().getTargetContext();
     }
 
-    @ToBeFixed(bug="1448885", explanation="AbsSpinner is an abstract class and its abstract " +
-            "method layout(int, boolean) is package private, we can not extends it directly " +
-            "to test. So, we use its subclass Spinner and Gallery to test")
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "",
-            method = "AbsSpinner",
-            args = {android.content.Context.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "",
-            method = "AbsSpinner",
-            args = {android.content.Context.class, android.util.AttributeSet.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "",
-            method = "AbsSpinner",
-            args = {android.content.Context.class, android.util.AttributeSet.class, int.class}
-        )
-    })
     public void testConstructor() {
         new Spinner(mContext);
 
@@ -99,16 +70,6 @@ public class AbsSpinnerTest extends ActivityInstrumentationTestCase2<RelativeLay
         new Gallery(mContext, attrs, 0);
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "",
-            method = "setSelection",
-            args = {int.class, boolean.class}
-        )
-    })
-    @ToBeFixed(bug = "1695243", explanation = "the javadoc for setSelection() is incomplete." +
-            "1. no description about the @param and @return.")
     @UiThreadTest
     /**
      * Check points:
@@ -132,16 +93,6 @@ public class AbsSpinnerTest extends ActivityInstrumentationTestCase2<RelativeLay
         // It is not meaningful to check it.
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "",
-            method = "setSelection",
-            args = {int.class}
-        )
-    })
-    @ToBeFixed(bug = "1695243", explanation = "the javadoc for setSelection() is incomplete." +
-            "1. no description about the @param and @return.")
     @UiThreadTest
     /**
      * Check points:
@@ -162,22 +113,6 @@ public class AbsSpinnerTest extends ActivityInstrumentationTestCase2<RelativeLay
         assertEquals(absSpinner.getCount() - 1, absSpinner.getSelectedItemPosition());
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "",
-            method = "setAdapter",
-            args = {android.widget.SpinnerAdapter.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "",
-            method = "getAdapter",
-            args = {}
-        )
-    })
-    @ToBeFixed(bug = "1695243", explanation = "the javadoc for setAdapter() is incomplete." +
-            "1. no description about the situation that adapter is null.")
     @UiThreadTest
     /**
      * Check points:
@@ -204,12 +139,6 @@ public class AbsSpinnerTest extends ActivityInstrumentationTestCase2<RelativeLay
         // There is neither limit in code nor description about it in javadoc.
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "",
-        method = "requestLayout",
-        args = {}
-    )
     public void testRequestLayout() {
         AbsSpinner absSpinner = new Spinner(mContext);
         absSpinner.layout(0, 0, 200, 300);
@@ -219,12 +148,6 @@ public class AbsSpinnerTest extends ActivityInstrumentationTestCase2<RelativeLay
         assertTrue(absSpinner.isLayoutRequested());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "",
-        method = "getCount",
-        args = {}
-    )
     @UiThreadTest
     /**
      * Check points:
@@ -248,12 +171,6 @@ public class AbsSpinnerTest extends ActivityInstrumentationTestCase2<RelativeLay
         assertEquals(anotherStringArray.length, absSpinner.getCount());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "",
-        method = "pointToPosition",
-        args = {int.class, int.class}
-    )
     /**
      * Check points:
      * 1. Should return the position of the item which contains the specified point.
@@ -288,12 +205,6 @@ public class AbsSpinnerTest extends ActivityInstrumentationTestCase2<RelativeLay
 
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "",
-        method = "getSelectedView",
-        args = {}
-    )
     /**
      * Check points:
      * 1. Should return the view corresponding to the currently selected item.
@@ -313,20 +224,6 @@ public class AbsSpinnerTest extends ActivityInstrumentationTestCase2<RelativeLay
 
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "",
-            method = "onSaveInstanceState",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "",
-            method = "onRestoreInstanceState",
-            args = {android.os.Parcelable.class}
-        )
-    })
     @UiThreadTest
     /**
      * Check points:
@@ -355,17 +252,6 @@ public class AbsSpinnerTest extends ActivityInstrumentationTestCase2<RelativeLay
         assertEquals(adapter.getItemId(0), absSpinner.getSelectedItemId());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "",
-        method = "generateDefaultLayoutParams",
-        args = {}
-    )
-    @ToBeFixed(bug = "1448885", explanation = "AbsSpinner#generateDefaultLayoutParams() is" +
-            " protected method, we have to test it in MockSpinner which extends from" +
-            " AbsSpinner. class MockSpinner must implement the inherited abstract method" +
-            " AbsSpinner.layout(int, boolean), but cannot override it since it is not" +
-            " visible from MockSpinner. So we cannot test this method.")
     public void testGenerateDefaultLayoutParams() {
 //        final MockSpinner absSpinner = new MockSpinner(mContext);
 //        LayoutParams layoutParams = (LayoutParams) absSpinner.generateDefaultLayoutParams();
@@ -373,12 +259,6 @@ public class AbsSpinnerTest extends ActivityInstrumentationTestCase2<RelativeLay
 //        assertEquals(LayoutParams.WRAP_CONTENT, layoutParams.height);
     }
 
-    @TestTargetNew(
-        level = TestLevel.NOT_NECESSARY,
-        notes = "Test onMeasure(int, int) function.",
-        method = "onMeasure",
-        args = {int.class, int.class}
-    )
     public void testOnMeasure() {
         // onMeasure() is implementation details, do NOT test
     }

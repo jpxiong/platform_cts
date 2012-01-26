@@ -18,10 +18,6 @@ package android.content.pm.cts;
 
 import com.android.cts.stub.R;
 
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
 
 import android.content.ComponentName;
 import android.content.pm.ActivityInfo;
@@ -33,7 +29,6 @@ import android.os.Parcel;
 import android.test.AndroidTestCase;
 import android.util.Printer;
 
-@TestTargetClass(PackageItemInfo.class)
 public class PackageItemInfoTest extends AndroidTestCase {
     private static final String PACKAGE_NAME = "com.android.cts.stub";
     private static final String ACTIVITY_NAME = "android.content.pm.cts.TestPmActivity";
@@ -46,38 +41,6 @@ public class PackageItemInfoTest extends AndroidTestCase {
         mPackageManager = getContext().getPackageManager();
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test loadIcon",
-            method = "loadIcon",
-            args = {android.content.pm.PackageManager.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test loadLabel",
-            method = "loadLabel",
-            args = {android.content.pm.PackageManager.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test loadXmlMetaData",
-            method = "loadXmlMetaData",
-            args = {android.content.pm.PackageManager.class, java.lang.String.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test constructors",
-            method = "PackageItemInfo",
-            args = {android.content.pm.PackageItemInfo.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test constructors",
-            method = "PackageItemInfo",
-            args = {}
-        )
-    })
     public void testLoadMethods() throws NameNotFoundException {
         // Test constructors
         ActivityInfo activityInfo = (ActivityInfo) getTestItemInfo();
@@ -94,20 +57,6 @@ public class PackageItemInfoTest extends AndroidTestCase {
         assertNotNull(parser);
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test dumpBack",
-            method = "dumpBack",
-            args = {android.util.Printer.class, java.lang.String.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test dumpFront",
-            method = "dumpFront",
-            args = {android.util.Printer.class, java.lang.String.class}
-        )
-    })
     public void testDump() {
         MockPackageItemInfo pkgItemInfo = new MockPackageItemInfo();
         MockPrinter printer = new MockPrinter();
@@ -119,20 +68,6 @@ public class PackageItemInfoTest extends AndroidTestCase {
         pkgItemInfo.dumpFront(printer, prefix);
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test writeToParcel",
-            method = "writeToParcel",
-            args = {android.os.Parcel.class, int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test constructors",
-            method = "PackageItemInfo",
-            args = {Parcel.class}
-        )
-    })
     public void testWriteToParcel() throws NameNotFoundException {
         ActivityInfo activityInfo = (ActivityInfo) getTestItemInfo();
         PackageItemInfo expectedInfo = new PackageItemInfo(activityInfo);

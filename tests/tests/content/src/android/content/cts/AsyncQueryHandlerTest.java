@@ -16,11 +16,6 @@
 
 package android.content.cts;
 
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
-import dalvik.annotation.ToBeFixed;
 
 import android.content.AsyncQueryHandler;
 import android.content.ContentResolver;
@@ -37,7 +32,6 @@ import android.test.AndroidTestCase;
  *
  * @see DummyProvider
  */
-@TestTargetClass(AsyncQueryHandler.class)
 public class AsyncQueryHandlerTest extends AndroidTestCase {
     private static final long TEST_TIME_OUT = DummyProvider.MOCK_OPERATION_SLEEP_TIME + 5000;
 
@@ -102,40 +96,12 @@ public class AsyncQueryHandlerTest extends AndroidTestCase {
         super.tearDown();
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "AsyncQueryHandler",
-        args = {android.content.ContentResolver.class}
-    )
     public void testConstructor() {
         new AsyncQueryHandler(mResolver) {};
 
         new AsyncQueryHandler(null) {};
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "startInsert",
-            args = {int.class, java.lang.Object.class, android.net.Uri.class,
-                    android.content.ContentValues.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "onInsertComplete",
-            args = {int.class, java.lang.Object.class, android.net.Uri.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "cancelOperation",
-            args = {int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "handleMessage",
-            args = {android.os.Message.class}
-        )
-    })
     public void testStartInsert() throws InterruptedException {
         final ContentValues values1 = new ContentValues();
         values1.put(DummyProvider.NAME, NAME3);
@@ -173,30 +139,6 @@ public class AsyncQueryHandlerTest extends AndroidTestCase {
         }
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "startQuery",
-            args = {int.class, java.lang.Object.class, android.net.Uri.class,
-                    java.lang.String[].class, java.lang.String.class, java.lang.String[].class,
-                    java.lang.String.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "onQueryComplete",
-            args = {int.class, java.lang.Object.class, android.database.Cursor.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "cancelOperation",
-            args = {int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "handleMessage",
-            args = {android.os.Message.class}
-        )
-    })
     public void testStartQuery() throws InterruptedException {
         mAsyncHandler = createAsyncQueryHandlerSync();
         assertFalse(mAsyncHandler.hadQueried(0));
@@ -233,30 +175,6 @@ public class AsyncQueryHandlerTest extends AndroidTestCase {
         assertFalse(mAsyncHandler.hadQueried(TEST_TIME_OUT));
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "startUpdate",
-            args = {int.class, java.lang.Object.class, android.net.Uri.class,
-                    android.content.ContentValues.class, java.lang.String.class,
-                    java.lang.String[].class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "onUpdateComplete",
-            args = {int.class, java.lang.Object.class, int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "cancelOperation",
-            args = {int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "handleMessage",
-            args = {android.os.Message.class}
-        )
-    })
     public void testStartUpdate() throws InterruptedException {
         final ContentValues values1 = new ContentValues();
         values1.put(DummyProvider.NAME, NAME3);
@@ -302,29 +220,6 @@ public class AsyncQueryHandlerTest extends AndroidTestCase {
         }
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "startDelete",
-            args = {int.class, java.lang.Object.class, android.net.Uri.class,
-                    java.lang.String.class, java.lang.String[].class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "onDeleteComplete",
-            args = {int.class, java.lang.Object.class, int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "cancelOperation",
-            args = {int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "handleMessage",
-            args = {android.os.Message.class}
-        )
-    })
     public void testStartDelete() throws InterruptedException {
         mAsyncHandler = createAsyncQueryHandlerSync();
         assertFalse(mAsyncHandler.hadDeleted(0));
@@ -362,13 +257,6 @@ public class AsyncQueryHandlerTest extends AndroidTestCase {
         }
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "createHandler",
-        args = {android.os.Looper.class}
-    )
-    @ToBeFixed(bug = "1695243", explanation = "should add @throws clause into javadoc of "
-            + "AsyncQueryHandlerWrapper#createHandler(Looper) when param looper is null")
     public void testCreateHandler() {
         MockAsyncQueryHandler wrapper = new MockAsyncQueryHandler(mResolver);
         Handler result = wrapper.createHandler(Looper.myLooper());

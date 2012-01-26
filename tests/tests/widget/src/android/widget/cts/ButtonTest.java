@@ -26,36 +26,8 @@ import android.widget.Button;
 
 import com.android.cts.stub.R;
 
-import dalvik.annotation.TestTargets;
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.ToBeFixed;
 
-@TestTargetClass(Button.class)
 public class ButtonTest extends AndroidTestCase {
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test constructor(s) of {@link Button}",
-            method = "Button",
-            args = {android.content.Context.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test constructor(s) of {@link Button}",
-            method = "Button",
-            args = {android.content.Context.class, android.util.AttributeSet.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test constructor(s) of {@link Button}",
-            method = "Button",
-            args = {android.content.Context.class, android.util.AttributeSet.class, int.class}
-        )
-    })
-    @ToBeFixed(bug="1417734", explanation="should add @throws clause into javadoc of " +
-            "Button's constructors when the input AttributeSet or Context is null")
     public void testConstructor() {
         XmlPullParser parser = mContext.getResources().getXml(R.layout.togglebutton_layout);
         AttributeSet attrs = Xml.asAttributeSet(parser);

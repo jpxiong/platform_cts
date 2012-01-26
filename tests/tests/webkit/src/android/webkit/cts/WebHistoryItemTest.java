@@ -21,12 +21,7 @@ import android.test.ActivityInstrumentationTestCase2;
 import android.webkit.WebBackForwardList;
 import android.webkit.WebHistoryItem;
 
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
 
-@TestTargetClass(android.webkit.WebHistoryItem.class)
 public class WebHistoryItemTest extends ActivityInstrumentationTestCase2<WebViewStubActivity> {
     private final static long TEST_TIMEOUT = 10000;
     private CtsTestServer mWebServer;
@@ -49,28 +44,6 @@ public class WebHistoryItemTest extends ActivityInstrumentationTestCase2<WebView
         super.tearDown();
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.SUFFICIENT,
-            method = "getId",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getTitle",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getUrl",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getFavicon",
-            args = {}
-        )
-    })
     public void testWebHistoryItem() {
         WebBackForwardList list = mOnUiThread.copyBackForwardList();
         assertEquals(0, list.getSize());

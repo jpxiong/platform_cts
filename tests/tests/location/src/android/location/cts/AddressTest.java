@@ -23,23 +23,11 @@ import android.location.Address;
 import android.os.Bundle;
 import android.os.Parcel;
 import android.os.Parcelable;
-import dalvik.annotation.TestTargets;
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.ToBeFixed;
 
 /**
  * Test the main functionalities of the AddressTest.
  */
-@TestTargetClass(Address.class)
 public class AddressTest extends TestCase {
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test constructor",
-        method = "Address",
-        args = {java.util.Locale.class}
-    )
     public void testConstructor() {
         new Address(Locale.ENGLISH);
 
@@ -48,12 +36,6 @@ public class AddressTest extends TestCase {
         new Address(null);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test describeContents()",
-        method = "describeContents",
-        args = {}
-    )
     public void testDescribeContents() {
         Address address = new Address(Locale.GERMAN);
 
@@ -66,20 +48,6 @@ public class AddressTest extends TestCase {
         assertEquals(extras.describeContents(), address.describeContents());
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test setAdminArea(String) and getAdminArea()",
-            method = "setAdminArea",
-            args = {java.lang.String.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test setAdminArea(String) and getAdminArea()",
-            method = "getAdminArea",
-            args = {}
-        )
-    })
     public void testAccessAdminArea() {
         Address address = new Address(Locale.ITALY);
 
@@ -91,20 +59,6 @@ public class AddressTest extends TestCase {
         assertNull(address.getAdminArea());
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test setCountryCode(String) and getCountryCode()",
-            method = "setCountryCode",
-            args = {java.lang.String.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test setCountryCode(String) and getCountryCode()",
-            method = "getCountryCode",
-            args = {}
-        )
-    })
     public void testAccessCountryCode() {
         Address address = new Address(Locale.JAPAN);
 
@@ -116,20 +70,6 @@ public class AddressTest extends TestCase {
         assertNull(address.getCountryCode());
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test setCountryName(String) and getCountryName()",
-            method = "setCountryName",
-            args = {java.lang.String.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test setCountryName(String) and getCountryName()",
-            method = "getCountryName",
-            args = {}
-        )
-    })
     public void testAccessCountryName() {
         Address address = new Address(Locale.KOREA);
 
@@ -141,20 +81,6 @@ public class AddressTest extends TestCase {
         assertNull(address.getCountryName());
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test setExtras(Bundle) and getExtras()",
-            method = "setExtras",
-            args = {android.os.Bundle.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test setExtras(Bundle) and getExtras()",
-            method = "getExtras",
-            args = {}
-        )
-    })
     public void testAccessExtras() {
         Address address = new Address(Locale.TAIWAN);
 
@@ -172,20 +98,6 @@ public class AddressTest extends TestCase {
         assertNull(address.getExtras());
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test setFeatureName(String) and getFeatureName()",
-            method = "setFeatureName",
-            args = {java.lang.String.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test setFeatureName(String) and getFeatureName()",
-            method = "getFeatureName",
-            args = {}
-        )
-    })
     public void testAccessFeatureName() {
         Address address = new Address(Locale.SIMPLIFIED_CHINESE);
 
@@ -197,32 +109,6 @@ public class AddressTest extends TestCase {
         assertNull(address.getFeatureName());
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test setLatitude(double) and getLatitude(), clearLatitude(), hasLatitude()",
-            method = "setLatitude",
-            args = {double.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test setLatitude(double) and getLatitude(), clearLatitude(), hasLatitude()",
-            method = "getLatitude",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test setLatitude(double) and getLatitude(), clearLatitude(), hasLatitude()",
-            method = "clearLatitude",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test setLatitude(double) and getLatitude(), clearLatitude(), hasLatitude()",
-            method = "hasLatitude",
-            args = {}
-        )
-    })
     public void testAccessLatitude() {
         Address address = new Address(Locale.CHINA);
         assertFalse(address.hasLatitude());
@@ -241,32 +127,6 @@ public class AddressTest extends TestCase {
         }
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "",
-            method = "setLongitude",
-            args = {double.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "",
-            method = "getLongitude",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "",
-            method = "clearLongitude",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "",
-            method = "hasLongitude",
-            args = {}
-        )
-    })
     public void testAccessLongitude() {
         Address address = new Address(Locale.CHINA);
         assertFalse(address.hasLongitude());
@@ -285,22 +145,6 @@ public class AddressTest extends TestCase {
         }
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test setPhone(String) and getPhone()",
-            method = "setPhone",
-            args = {java.lang.String.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test setPhone(String) and getPhone()",
-            method = "getPhone",
-            args = {}
-        )
-    })
-    @ToBeFixed(bug = "", explanation = "getPhone() should never throw IllegalStateException. " +
-            "Should remove @throws clause from its javadoc")
     public void testAccessPhone() {
         Address address = new Address(Locale.CHINA);
 
@@ -312,20 +156,6 @@ public class AddressTest extends TestCase {
         assertNull(address.getPhone());
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test setPostalCode(String) and getPostalCode()",
-            method = "setPostalCode",
-            args = {java.lang.String.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test setPostalCode(String) and getPostalCode()",
-            method = "getPostalCode",
-            args = {}
-        )
-    })
     public void testAccessPostalCode() {
         Address address = new Address(Locale.CHINA);
 
@@ -337,20 +167,6 @@ public class AddressTest extends TestCase {
         assertNull(address.getPostalCode());
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test setThoroughfare(String) and getThoroughfare()",
-            method = "setThoroughfare",
-            args = {java.lang.String.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test setThoroughfare(String) and getThoroughfare()",
-            method = "getThoroughfare",
-            args = {}
-        )
-    })
     public void testAccessThoroughfare() {
         Address address = new Address(Locale.CHINA);
 
@@ -362,20 +178,6 @@ public class AddressTest extends TestCase {
         assertNull(address.getThoroughfare());
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test setUrl(String) and getUrl()",
-            method = "setUrl",
-            args = {java.lang.String.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test setUrl(String) and getUrl()",
-            method = "getUrl",
-            args = {}
-        )
-    })
     public void testAccessUrl() {
         Address address = new Address(Locale.CHINA);
 
@@ -387,20 +189,6 @@ public class AddressTest extends TestCase {
         assertNull(address.getUrl());
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test setSubAdminArea(String) and getSubAdminArea()",
-            method = "setSubAdminArea",
-            args = {java.lang.String.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test setSubAdminArea(String) and getSubAdminArea()",
-            method = "getSubAdminArea",
-            args = {}
-        )
-    })
     public void testAccessSubAdminArea() {
         Address address = new Address(Locale.CHINA);
 
@@ -412,12 +200,6 @@ public class AddressTest extends TestCase {
         assertNull(address.getSubAdminArea());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test toString()",
-        method = "toString",
-        args = {}
-    )
     public void testToString() {
         Address address = new Address(Locale.CHINA);
 
@@ -430,26 +212,6 @@ public class AddressTest extends TestCase {
         assertEquals(expected, address.toString());
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "",
-            method = "setAddressLine",
-            args = {int.class, java.lang.String.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "",
-            method = "getMaxAddressLineIndex",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "",
-            method = "getAddressLine",
-            args = {int.class}
-        )
-    })
     public void testAddressLine() {
         Address address = new Address(Locale.CHINA);
 
@@ -484,12 +246,6 @@ public class AddressTest extends TestCase {
         assertEquals(5, address.getMaxAddressLineIndex());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test getLocale()",
-        method = "getLocale",
-        args = {}
-    )
     public void testGetLocale() {
         Locale locale = Locale.US;
         Address address = new Address(locale);
@@ -503,20 +259,6 @@ public class AddressTest extends TestCase {
         assertNull(address.getLocale());
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test setLocality(String) and getLocality()",
-            method = "setLocality",
-            args = {java.lang.String.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test setLocality(String) and getLocality()",
-            method = "getLocality",
-            args = {}
-        )
-    })
     public void testAccessLocality() {
         Address address = new Address(Locale.PRC);
 
@@ -528,12 +270,6 @@ public class AddressTest extends TestCase {
         assertNull(address.getLocality());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test writeToParcel(Parcel, int), this function ignores the parameter 'flag'.",
-        method = "writeToParcel",
-        args = {android.os.Parcel.class, int.class}
-    )
     public void testWriteToParcel() {
         Locale locale = Locale.KOREA;
         Address address = new Address(locale);

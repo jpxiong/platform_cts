@@ -19,13 +19,7 @@ package android.content.cts;
 import android.content.UriMatcher;
 import android.net.Uri;
 import android.test.AndroidTestCase;
-import dalvik.annotation.TestTargets;
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.ToBeFixed;
 
-@TestTargetClass(UriMatcher.class)
 public class UriMatcherTest extends AndroidTestCase {
     UriMatcher mUriMatcher;
 
@@ -51,22 +45,10 @@ public class UriMatcherTest extends AndroidTestCase {
         mUriMatcher = new UriMatcher(UriMatcher.NO_MATCH);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test constructor(s) of UriMatcher.",
-        method = "UriMatcher",
-        args = {int.class}
-    )
     public void testConstructor() {
         new UriMatcher(UriMatcher.NO_MATCH);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test match(Uri uri).",
-        method = "match",
-        args = {android.net.Uri.class}
-    )
     public void testMatch() {
         mUriMatcher.addURI(sAuthority, sPath1, sCode1);
         mUriMatcher.addURI(sAuthority, sPath2, sCode2);
@@ -83,13 +65,6 @@ public class UriMatcherTest extends AndroidTestCase {
         assertEquals(-1, mUriMatcher.match(unknown));
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test match(Uri uri).",
-        method = "match",
-        args = {android.net.Uri.class}
-    )
-    @ToBeFixed(bug = "1417734", explanation = "Unexpected NullPointerException")
     public void testMatchFailure() {
         try {
             mUriMatcher.match(null);
@@ -99,12 +74,6 @@ public class UriMatcherTest extends AndroidTestCase {
         }
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test addURI(String authority, String path, int code).",
-        method = "addURI",
-        args = {java.lang.String.class, java.lang.String.class, int.class}
-    )
     public void testAddURI() {
         assertEquals(-1, mUriMatcher.match(uri1));
         assertEquals(-1, mUriMatcher.match(uri2));
@@ -122,13 +91,6 @@ public class UriMatcherTest extends AndroidTestCase {
         assertEquals(sCode4, mUriMatcher.match(uri4));
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test addURI(String authority, String path, int code).",
-        method = "addURI",
-        args = {java.lang.String.class, java.lang.String.class, int.class}
-    )
-    @ToBeFixed(bug = "1417734", explanation = "Unexpected IllegalArgumentException")
     public void testAddURIFailure() {
         try {
             mUriMatcher.addURI(null, null, -1);

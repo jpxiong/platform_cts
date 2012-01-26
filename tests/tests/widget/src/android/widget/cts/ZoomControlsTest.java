@@ -16,11 +16,6 @@
 
 package android.widget.cts;
 
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
-import dalvik.annotation.ToBeFixed;
 
 import android.content.Context;
 import android.test.InstrumentationTestCase;
@@ -32,7 +27,6 @@ import android.widget.ZoomControls;
 /**
  * Test {@link ZoomControls}.
  */
-@TestTargetClass(ZoomControls.class)
 public class ZoomControlsTest extends InstrumentationTestCase {
     private Context mContext;
 
@@ -42,31 +36,12 @@ public class ZoomControlsTest extends InstrumentationTestCase {
         mContext = getInstrumentation().getContext();
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "ZoomControls",
-            args = {android.content.Context.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "ZoomControls",
-            args = {android.content.Context.class, android.util.AttributeSet.class}
-        )
-    })
     public void testConstructor() {
         new ZoomControls(mContext);
 
         new ZoomControls(mContext, null);
     }
 
-    @TestTargetNew(
-        level = TestLevel.SUFFICIENT,
-        method = "setOnZoomInClickListener",
-        args = {android.view.View.OnClickListener.class},
-        notes = "not possible to trigger a zoom button click programmatically using public API"
-    )
-    @ToBeFixed(bug = "1695243", explanation = "Android API javadocs are incomplete.")
     public void testSetOnZoomInClickListener() {
         ZoomControls zoomControls = new ZoomControls(mContext);
 
@@ -84,13 +59,6 @@ public class ZoomControlsTest extends InstrumentationTestCase {
         }
     }
 
-    @TestTargetNew(
-        level = TestLevel.SUFFICIENT,
-        method = "setOnZoomOutClickListener",
-        args = {android.view.View.OnClickListener.class},
-        notes = "not possible to trigger a zoom button click programmatically using public API"
-    )
-    @ToBeFixed(bug = "1695243", explanation = "Android API javadocs are incomplete.")
     public void testSetOnZoomOutClickListener() {
         ZoomControls zoomControls = new ZoomControls(mContext);
 
@@ -102,12 +70,6 @@ public class ZoomControlsTest extends InstrumentationTestCase {
         zoomControls.setOnZoomOutClickListener(null);
     }
 
-    @TestTargetNew(
-        level = TestLevel.PARTIAL_COMPLETE,
-        method = "setZoomSpeed",
-        args = {long.class}
-    )
-    @ToBeFixed(bug = "1400249", explanation = "how to check zoom speed after set.")
     public void testSetZoomSpeed() {
         ZoomControls zoomControls = new ZoomControls(mContext);
 
@@ -116,29 +78,10 @@ public class ZoomControlsTest extends InstrumentationTestCase {
         // TODO: how to check?
     }
 
-    @TestTargetNew(
-        level = TestLevel.NOT_NECESSARY,
-        notes = "this method always return true",
-        method = "onTouchEvent",
-        args = {android.view.MotionEvent.class}
-    )
     public void testOnTouchEvent() {
         // onTouchEvent() is implementation details, do NOT test
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "show",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "hide",
-            args = {}
-        )
-    })
-    @ToBeFixed(bug = "1695243", explanation = "Android API javadocs are incomplete.")
     public void testShowAndHide() {
         final ZoomControls zoomControls = new ZoomControls(mContext);
         assertEquals(View.VISIBLE, zoomControls.getVisibility());
@@ -150,37 +93,18 @@ public class ZoomControlsTest extends InstrumentationTestCase {
         assertEquals(View.VISIBLE, zoomControls.getVisibility());
     }
 
-    @TestTargetNew(
-        level = TestLevel.SUFFICIENT,
-        method = "setIsZoomInEnabled",
-        args = {boolean.class},
-        notes="not feasible to test effect of calling this method"
-    )
-    @ToBeFixed(bug = "1695243", explanation = "Android API javadocs are incomplete.")
     public void testSetIsZoomInEnabled() {
         ZoomControls zoomControls = new ZoomControls(mContext);
         zoomControls.setIsZoomInEnabled(false);
         zoomControls.setIsZoomInEnabled(true);
     }
 
-    @TestTargetNew(
-        level = TestLevel.SUFFICIENT,
-        method = "setIsZoomOutEnabled",
-        args = {boolean.class},
-        notes="not feasible to test effect of calling this method"
-    )
-    @ToBeFixed(bug = "1695243", explanation = "Android API javadocs are incomplete.")
     public void testSetIsZoomOutEnabled() {
         ZoomControls zoomControls = new ZoomControls(mContext);
         zoomControls.setIsZoomOutEnabled(false);
         zoomControls.setIsZoomOutEnabled(true);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "hasFocus",
-        args = {}
-    )
     @UiThreadTest
     public void testHasFocus() {
         ZoomControls zoomControls = new ZoomControls(mContext);

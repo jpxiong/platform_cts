@@ -18,27 +18,8 @@ package android.database.sqlite.cts;
 
 import android.database.sqlite.SQLiteDoneException;
 import android.test.AndroidTestCase;
-import dalvik.annotation.TestTargets;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
 
-@TestTargetClass(android.database.sqlite.SQLiteDoneException.class)
 public class SQLiteDoneExceptionTest extends AndroidTestCase {
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test constructor",
-            method = "SQLiteDoneException",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test constructor",
-            method = "SQLiteDoneException",
-            args = {java.lang.String.class}
-        )
-    })
     public void testConstructor() {
         new SQLiteDoneException();
 

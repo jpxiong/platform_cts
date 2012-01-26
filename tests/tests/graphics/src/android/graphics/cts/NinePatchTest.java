@@ -18,10 +18,6 @@ package android.graphics.cts;
 
 import com.android.cts.stub.R;
 
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
 
 import android.content.res.Resources;
 import android.graphics.Bitmap;
@@ -35,7 +31,6 @@ import android.graphics.RectF;
 import android.graphics.Region;
 import android.test.AndroidTestCase;
 
-@TestTargetClass(NinePatch.class)
 public class NinePatchTest extends AndroidTestCase {
     private static int ALPHA_OPAQUE = 0xFF;
 
@@ -61,11 +56,6 @@ public class NinePatchTest extends AndroidTestCase {
         mNinePatch = new NinePatch(mBitmap, mChunk, NAME);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "NinePatch",
-        args = {android.graphics.Bitmap.class, byte[].class, java.lang.String.class}
-    )
     public void testConstructor() {
         mNinePatch = null;
         try {
@@ -76,11 +66,6 @@ public class NinePatchTest extends AndroidTestCase {
         mNinePatch = new NinePatch(mBitmap, mChunk, NAME);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "isNinePatchChunk",
-        args = {byte[].class}
-    )
     public void testIsNinePatchChunk() {
         assertTrue(NinePatch.isNinePatchChunk(mChunk));
         Bitmap bitmap = Bitmap.createBitmap(COLOR, 10, 10, Bitmap.Config.ARGB_4444);
@@ -89,28 +74,6 @@ public class NinePatchTest extends AndroidTestCase {
 
     }
 
-    @TestTargets(value = {
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "draw",
-            args = {android.graphics.Canvas.class, android.graphics.RectF.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "draw",
-            args = {android.graphics.Canvas.class, android.graphics.Rect.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "draw",
-            args = {android.graphics.Canvas.class, android.graphics.Rect.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setPaint",
-            args = {android.graphics.Paint.class}
-        )
-    })
     public void testDraw() {
         Bitmap expected = BitmapFactory.decodeResource(mRes, R.drawable.scaled1, mOptNoScale);
 
@@ -168,11 +131,6 @@ public class NinePatchTest extends AndroidTestCase {
         }
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "hasAlpha",
-        args = {}
-    )
     public void testHasAlpha() {
         assertFalse(mNinePatch.hasAlpha());
         assertEquals(mNinePatch.hasAlpha(), mBitmap.hasAlpha());
@@ -185,31 +143,16 @@ public class NinePatchTest extends AndroidTestCase {
         assertEquals(ninePatch.hasAlpha(), bitmap.hasAlpha());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "getHeight",
-        args = {}
-    )
     public void testGetHeight() {
         assertEquals(5, mNinePatch.getHeight());
         assertEquals(mNinePatch.getHeight(), mBitmap.getHeight());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "getWidth",
-        args = {}
-    )
     public void testGetWidth() {
         assertEquals(5, mNinePatch.getHeight());
         assertEquals(mNinePatch.getWidth(), mBitmap.getWidth());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "getDensity",
-        args = {}
-    )
     public void testGetDensity() {
         mBitmap.setDensity(11);
         assertEquals(11, mNinePatch.getDensity());
@@ -217,11 +160,6 @@ public class NinePatchTest extends AndroidTestCase {
         assertEquals(mNinePatch.getDensity(), mBitmap.getDensity());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "getTransparentRegion",
-        args = {android.graphics.Rect.class}
-    )
     public void testGetTransparentRegion() {
         // no transparency in opaque bitmap
         Rect location = new Rect(0, 0, mBitmap.getWidth(), mBitmap.getHeight());

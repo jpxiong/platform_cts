@@ -16,10 +16,6 @@
 
 package android.content.pm.cts;
 
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
 
 import android.content.pm.Signature;
 import android.os.Parcel;
@@ -27,7 +23,6 @@ import android.test.AndroidTestCase;
 
 import java.util.Arrays;
 
-@TestTargetClass(Signature.class)
 public class SignatureTest extends AndroidTestCase {
 
     private static final String SIGNATURE_STRING = "1234567890abcdef";

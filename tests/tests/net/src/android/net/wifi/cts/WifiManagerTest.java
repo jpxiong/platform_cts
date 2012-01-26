@@ -16,10 +16,6 @@
 
 package android.net.wifi.cts;
 
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -37,7 +33,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-@TestTargetClass(WifiManager.class)
 public class WifiManagerTest extends AndroidTestCase {
     private static class MySync {
         int expectedState = STATE_NULL;
@@ -177,58 +172,6 @@ public class WifiManagerTest extends AndroidTestCase {
      * 4.pingSupplicant
      * 5.satrtScan
      */
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "isWifiEnabled",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setWifiEnabled",
-            args = {boolean.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "startScan",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getScanResults",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "pingSupplicant",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "reassociate",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "reconnect",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "disconnect",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "createWifiLock",
-            args = {int.class, String.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "createWifiLock",
-            args = {String.class}
-        )
-    })
     public void testWifiManagerActions() throws Exception {
         assertTrue(mWifiManager.reconnect());
         assertTrue(mWifiManager.reassociate());
@@ -250,33 +193,6 @@ public class WifiManagerTest extends AndroidTestCase {
      * 3.wifi state
      * 4.ConnectionInfo
      */
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "isWifiEnabled",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getWifiState",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setWifiEnabled",
-            args = {boolean.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getConnectionInfo",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getDhcpInfo",
-            args = {}
-        )
-    })
     public void testWifiManagerProperties() throws Exception {
         setWifiEnabled(true);
         assertTrue(mWifiManager.isWifiEnabled());
@@ -297,53 +213,6 @@ public class WifiManagerTest extends AndroidTestCase {
      * 6.configured Networks
      * 7.save configure;
      */
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "isWifiEnabled",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setWifiEnabled",
-            args = {boolean.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getConfiguredNetworks",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "addNetwork",
-            args = {android.net.wifi.WifiConfiguration.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "updateNetwork",
-            args = {android.net.wifi.WifiConfiguration.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "removeNetwork",
-            args = {int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "enableNetwork",
-            args = {int.class, boolean.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "disableNetwork",
-            args = {int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "saveConfiguration",
-            args = {}
-        )
-    })
     public void testWifiManagerNetWork() throws Exception {
         // store the list of enabled networks, so they can be re-enabled after test completes
         Set<String> enabledSsids = getEnabledNetworks(mWifiManager.getConfiguredNetworks());
@@ -428,18 +297,6 @@ public class WifiManagerTest extends AndroidTestCase {
         }
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "compareSignalLevel",
-            args = {int.class, int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "calculateSignalLevel",
-            args = {int.class, int.class}
-        )
-    })
     public void testSignal() {
         final int numLevels = 9;
         int expectLevel = 0;

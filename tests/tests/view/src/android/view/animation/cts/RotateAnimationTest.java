@@ -30,12 +30,7 @@ import android.view.animation.Transformation;
 
 import com.android.cts.stub.R;
 
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
 
-@TestTargetClass(android.view.animation.RotateAnimation.class)
 public class RotateAnimationTest
         extends ActivityInstrumentationTestCase2<AnimationTestStubActivity> {
 
@@ -56,33 +51,6 @@ public class RotateAnimationTest
         mActivity = getActivity();
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "RotateAnimation",
-            args = {android.content.Context.class, android.util.AttributeSet.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "RotateAnimation",
-            args = {float.class, float.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "RotateAnimation",
-            args = {float.class, float.class, float.class, float.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "RotateAnimation",
-            args = {float.class, float.class, int.class, float.class, int.class, float.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "RotateAnimation",
-            args = {float.class, float.class}
-        )
-    })
     public void testConstructors() {
 
         // Test with null AttributeSet
@@ -111,18 +79,6 @@ public class RotateAnimationTest
         new RotateAnimation(-0.6f, -0.6f, Animation.ABSOLUTE, -0.6f, Animation.ABSOLUTE, -0.6f);
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "applyTransformation",
-            args = {float.class, android.view.animation.Transformation.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "initialize",
-            args = {int.class, int.class, int.class, int.class}
-        )
-    })
     public void testRotateAgainstOrigin(){
         final View animWindowParent = mActivity.findViewById(R.id.anim_window_parent);
         final View animWindow = mActivity.findViewById(R.id.anim_window);
@@ -174,18 +130,6 @@ public class RotateAnimationTest
         }
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "applyTransformation",
-            args = {float.class, android.view.animation.Transformation.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "initialize",
-            args = {int.class, int.class, int.class, int.class}
-        )
-    })
     public void testRotateAgainstPoint(){
         final View animWindowParent = mActivity.findViewById(R.id.anim_window_parent);
         final View animWindow = mActivity.findViewById(R.id.anim_window);

@@ -21,12 +21,7 @@ import android.graphics.Rect;
 import android.graphics.Region;
 import android.os.Parcel;
 import android.test.AndroidTestCase;
-import dalvik.annotation.TestTargets;
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargetClass;
 
-@TestTargetClass(Region.class)
 public class RegionTest extends AndroidTestCase {
 
     // DIFFERENCE
@@ -116,28 +111,6 @@ public class RegionTest extends AndroidTestCase {
         }
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "Region",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "Region",
-            args = {android.graphics.Region.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "Region",
-            args = {android.graphics.Rect.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "Region",
-            args = {int.class, int.class, int.class, int.class}
-        )
-    })
     public void testConstructor() {
         // Test Region()
         new Region();
@@ -154,18 +127,6 @@ public class RegionTest extends AndroidTestCase {
         new Region(0, 0, 100, 100);
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "set",
-            args = {android.graphics.Region.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getBounds",
-            args = {}
-        )
-    })
     public void testSet1() {
 
         mRegion = new Region();
@@ -178,18 +139,6 @@ public class RegionTest extends AndroidTestCase {
         assertEquals(4, mRegion.getBounds().bottom);
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "set",
-            args = {android.graphics.Rect.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getBounds",
-            args = {}
-        )
-    })
     public void testSet2() {
 
         mRegion = new Region();
@@ -201,18 +150,6 @@ public class RegionTest extends AndroidTestCase {
         assertEquals(4, mRegion.getBounds().bottom);
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "set",
-            args = {int.class, int.class, int.class, int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getBounds",
-            args = {}
-        )
-    })
     public void testSet3() {
 
         mRegion = new Region();
@@ -223,11 +160,6 @@ public class RegionTest extends AndroidTestCase {
         assertEquals(4, mRegion.getBounds().bottom);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "isRect",
-        args = {}
-    )
     public void testIsRect() {
 
         mRegion = new Region();
@@ -236,18 +168,6 @@ public class RegionTest extends AndroidTestCase {
         assertTrue(mRegion.isRect());
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "isComplex",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "set",
-            args = {int.class, int.class, int.class, int.class}
-        )
-    })
     public void testIsComplex() {
 
         // Region is null
@@ -266,11 +186,6 @@ public class RegionTest extends AndroidTestCase {
         assertTrue(mRegion.isComplex());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "quickContains",
-        args = {android.graphics.Rect.class}
-    )
     public void testQuickContains1() {
 
         mRegion = new Region();
@@ -285,11 +200,6 @@ public class RegionTest extends AndroidTestCase {
         assertFalse(mRegion.quickContains(rect));
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "quickContains",
-        args = {int.class, int.class, int.class, int.class}
-    )
     public void testQuickContains2() {
 
         mRegion = new Region();
@@ -303,11 +213,6 @@ public class RegionTest extends AndroidTestCase {
         assertFalse(mRegion.quickContains(1, 2, 3, 4));
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "union",
-        args = {android.graphics.Rect.class}
-    )
     public void testUnion() {
 
         Rect rect1 = new Rect();
@@ -350,11 +255,6 @@ public class RegionTest extends AndroidTestCase {
         assertPointsOutsideRegion(UNION_WITHOUT3);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "contains",
-        args = {int.class, int.class}
-    )
     public void testContains() {
 
         mRegion = new Region();
@@ -388,18 +288,6 @@ public class RegionTest extends AndroidTestCase {
         assertTrue(mRegion.contains(7, 7));
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setEmpty",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "isEmpty",
-            args = {}
-        )
-    })
     public void testEmpty() {
 
         mRegion = new Region();
@@ -411,11 +299,6 @@ public class RegionTest extends AndroidTestCase {
         assertTrue(mRegion.isEmpty());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "getBounds",
-        args = {android.graphics.Rect.class}
-    )
     public void testGetBounds() {
 
         // Exception
@@ -436,11 +319,6 @@ public class RegionTest extends AndroidTestCase {
         assertFalse(mRegion.getBounds(rect2));
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "op",
-        args = {android.graphics.Rect.class, android.graphics.Region.Op.class}
-    )
     public void testOp1() {
 
         Rect rect1 = new Rect();
@@ -666,11 +544,6 @@ public class RegionTest extends AndroidTestCase {
         assertEquals(rect5, mRegion.getBounds());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "op",
-        args = {int.class, int.class, int.class, int.class, android.graphics.Region.Op.class}
-    )
     public void testOp2() {
 
         Rect rect2 = new Rect(0, 0, 20, 20);
@@ -886,11 +759,6 @@ public class RegionTest extends AndroidTestCase {
         assertEquals(rect5, mRegion.getBounds());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "op",
-        args = {android.graphics.Region.class, android.graphics.Region.Op.class}
-    )
     public void testOp3() {
 
         Region region1 = new Region();
@@ -1116,12 +984,6 @@ public class RegionTest extends AndroidTestCase {
         assertEquals(region5.getBounds(), mRegion.getBounds());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "op",
-        args = {android.graphics.Rect.class, android.graphics.Region.class,
-                android.graphics.Region.Op.class}
-    )
     public void testOp4() {
 
         Rect rect1 = new Rect();
@@ -1324,12 +1186,6 @@ public class RegionTest extends AndroidTestCase {
         assertEquals(region5.getBounds(), mRegion.getBounds());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "op",
-        args = {android.graphics.Region.class, android.graphics.Region.class,
-                android.graphics.Region.Op.class}
-    )
     public void testOp5() {
 
         Region region1 = new Region();
@@ -1527,11 +1383,6 @@ public class RegionTest extends AndroidTestCase {
         assertEquals(region5.getBounds(), mRegion.getBounds());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "getBoundaryPath",
-        args = {}
-    )
     public void testGetBoundaryPath1() {
         mRegion = new Region();
         assertTrue(mRegion.getBoundaryPath().isEmpty());
@@ -1544,11 +1395,6 @@ public class RegionTest extends AndroidTestCase {
         assertFalse(mRegion.getBoundaryPath().isEmpty());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "getBoundaryPath",
-        args = {android.graphics.Path.class}
-    )
     public void testGetBoundaryPath2() {
 
         mRegion = new Region();
@@ -1573,11 +1419,6 @@ public class RegionTest extends AndroidTestCase {
         assertTrue(mRegion.getBoundaryPath(path));
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "setPath",
-        args = {android.graphics.Path.class, android.graphics.Region.class}
-    )
     public void testSetPath() {
 
         mRegion = new Region();
@@ -1627,11 +1468,6 @@ public class RegionTest extends AndroidTestCase {
         assertNotSame(unexpected.right, actual.right);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "translate",
-        args = {int.class, int.class}
-    )
     public void testTranslate1() {
 
         Rect rect1 = new Rect(0, 0, 20, 20);
@@ -1642,11 +1478,6 @@ public class RegionTest extends AndroidTestCase {
         assertEquals(rect2, mRegion.getBounds());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "translate",
-        args = {int.class, int.class, android.graphics.Region.class}
-    )
     public void testTranslate2() {
 
         Region dst = new Region();
@@ -1660,11 +1491,6 @@ public class RegionTest extends AndroidTestCase {
         assertEquals(rect2, dst.getBounds());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "writeToParcel",
-        args = {android.os.Parcel.class, int.class}
-    )
     public void testWriteToParcel() {
 
         int flags = 0;
@@ -1688,11 +1514,6 @@ public class RegionTest extends AndroidTestCase {
         assertEquals(oriRect.right, dst.getBounds().right);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "describeContents",
-        args = {}
-    )
     public void testDescribeContents() {
 
         mRegion = new Region();
@@ -1700,11 +1521,6 @@ public class RegionTest extends AndroidTestCase {
         assertEquals(0, actual);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "quickReject",
-        args = {android.graphics.Rect.class}
-    )
     public void testQuickReject1() {
         Rect oriRect = new Rect(0, 0, 20, 20);
         Rect rect1 = new Rect();
@@ -1723,11 +1539,6 @@ public class RegionTest extends AndroidTestCase {
         assertFalse(mRegion.quickReject(rect4));
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "quickReject",
-        args = {int.class, int.class, int.class, int.class}
-    )
     public void testQuickReject2() {
         mRegion = new Region();
         // Return true if the region is empty
@@ -1740,11 +1551,6 @@ public class RegionTest extends AndroidTestCase {
         assertFalse(mRegion.quickReject(10, 10, 30, 30));
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "quickReject",
-        args = {android.graphics.Region.class}
-    )
     public void testQuickReject3() {
         Region oriRegion = new Region(0, 0, 20, 20);
         Region region1 = new Region();

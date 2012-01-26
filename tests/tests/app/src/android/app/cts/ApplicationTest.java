@@ -16,10 +16,6 @@
 
 package android.app.cts;
 
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
 
 import android.app.Activity;
 import android.app.Application;
@@ -31,39 +27,8 @@ import android.test.InstrumentationTestCase;
 /**
  * Test {@link Application}.
  */
-@TestTargetClass(Application.class)
 public class ApplicationTest extends InstrumentationTestCase {
 
-    @TestTargets({
-      @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "Application",
-        args = {}
-      ),
-      @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "onConfigurationChanged",
-        args = {android.content.res.Configuration.class}
-      ),
-      @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "onCreate",
-        args = {}
-      ),
-      @TestTargetNew(
-        level = TestLevel.NOT_FEASIBLE,
-        notes = "According to issue 1653192, a Java app can't allocate memory without" +
-                " restriction, thus it's hard to test this callback.",
-        method = "onLowMemory",
-        args = {}
-      ),
-      @TestTargetNew(
-        level = TestLevel.NOT_FEASIBLE,
-        notes = "The documentation states that one cannot rely on this method being called.",
-        method = "onTerminate",
-        args = {}
-      )
-    })
     public void testApplication() throws Throwable {
         final Instrumentation instrumentation = getInstrumentation();
         final Context targetContext = instrumentation.getTargetContext();

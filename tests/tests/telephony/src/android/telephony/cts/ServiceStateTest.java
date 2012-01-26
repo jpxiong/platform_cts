@@ -18,124 +18,12 @@ package android.telephony.cts;
 import android.os.Parcel;
 import android.telephony.ServiceState;
 import android.test.AndroidTestCase;
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
 
-@TestTargetClass(ServiceState.class)
 public class ServiceStateTest extends AndroidTestCase {
     private static final String OPERATOR_ALPHA_LONG = "CtsOperatorLong";
     private static final String OPERATOR_ALPHA_SHORT = "CtsOp";
     private static final String OPERATOR_NUMERIC = "02871";
 
-    @TestTargets({
-      @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "describeContents",
-        args = {}
-      ),
-      @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "equals",
-        args = {Object.class}
-      ),
-      @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "getIsManualSelection",
-        args = {}
-      ),
-      @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "getOperatorAlphaLong",
-        args = {}
-      ),
-      @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "getOperatorAlphaShort",
-        args = {}
-      ),
-      @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "getOperatorNumeric",
-        args = {}
-      ),
-      @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "getRoaming",
-        args = {}
-      ),
-      @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "getState",
-        args = {}
-      ),
-      @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "hashCode",
-        args = {}
-      ),
-      @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "ServiceState",
-        args = {}
-      ),
-      @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "ServiceState",
-        args = {Parcel.class}
-      ),
-      @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "ServiceState",
-        args = {ServiceState.class}
-      ),
-      @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "copyFrom",
-        args = {ServiceState.class}
-      ),
-      @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "setIsManualSelection",
-        args = {boolean.class}
-      ),
-      @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "setOperatorName",
-        args = {String.class, String.class, String.class}
-      ),
-      @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "setRoaming",
-        args = {boolean.class}
-      ),
-      @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "setState",
-        args = {int.class}
-      ),
-      @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "setStateOff",
-        args = {}
-      ),
-      @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "setStateOutOfService",
-        args = {}
-      ),
-      @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "toString",
-        args = {}
-      ),
-      @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "writeToParcel",
-        args = {Parcel.class, int.class}
-      )
-    })
     public void testServiceState() {
         ServiceState serviceState = new ServiceState();
 

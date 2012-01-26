@@ -18,10 +18,6 @@ package android.text.method.cts;
 
 import com.android.cts.stub.R;
 
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.ToBeFixed;
 
 import android.app.Activity;
 import android.app.Instrumentation;
@@ -35,7 +31,6 @@ import android.widget.TextView;
 /**
  * Test {@link DateTimeKeyListener}.
  */
-@TestTargetClass(DateTimeKeyListener.class)
 public class DateTimeKeyListenerTest extends
         ActivityInstrumentationTestCase2<KeyListenerStubActivity> {
     private Activity mActivity;
@@ -55,20 +50,10 @@ public class DateTimeKeyListenerTest extends
         mTextView = (TextView) mActivity.findViewById(R.id.keylistener_textview);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "DateTimeKeyListener",
-        args = {}
-    )
     public void testConstructor() {
         new DateTimeKeyListener();
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "getInstance",
-        args = {}
-    )
     public void testGetInstance() {
         DateTimeKeyListener listener1 = DateTimeKeyListener.getInstance();
         DateTimeKeyListener listener2 = DateTimeKeyListener.getInstance();
@@ -78,11 +63,6 @@ public class DateTimeKeyListenerTest extends
         assertSame(listener1, listener2);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "getAcceptedChars",
-        args = {}
-    )
     public void testGetAcceptedChars() {
         MyDateTimeKeyListener dataTimeKeyListener = new MyDateTimeKeyListener();
 
@@ -90,12 +70,6 @@ public class DateTimeKeyListenerTest extends
                 dataTimeKeyListener.getAcceptedChars());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "getInputType",
-        args = {}
-    )
-    @ToBeFixed(bug = "1695243", explanation = "Android API javadocs are incomplete.")
     public void testGetInputType() {
         DateTimeKeyListener listener = DateTimeKeyListener.getInstance();
 

@@ -20,48 +20,11 @@ import android.content.Context;
 import android.net.wifi.WifiManager;
 import android.net.wifi.WifiManager.WifiLock;
 import android.test.AndroidTestCase;
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
 
-@TestTargetClass(WifiManager.WifiLock.class)
 public class WifiManager_WifiLockTest extends AndroidTestCase {
 
     private static final String WIFI_TAG = "WifiManager_WifiLockTest";
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "acquire",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "finalize",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "isHeld",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "release",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setReferenceCounted",
-            args = {boolean.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "toString",
-            args = {}
-        )
-    })
     public void testWifiLock() {
         WifiManager wm = (WifiManager) getContext().getSystemService(Context.WIFI_SERVICE);
         WifiLock wl = wm.createWifiLock(WIFI_TAG);

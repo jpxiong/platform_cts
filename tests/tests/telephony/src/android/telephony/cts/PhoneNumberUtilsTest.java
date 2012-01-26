@@ -15,10 +15,6 @@
  */
 package android.telephony.cts;
 
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
 
 import android.content.ContentResolver;
 import android.content.ContentValues;
@@ -36,24 +32,11 @@ import android.text.SpannableStringBuilder;
 
 import java.util.Locale;
 
-@TestTargetClass(PhoneNumberUtils.class)
 public class PhoneNumberUtilsTest extends AndroidTestCase {
     // mPhoneNumber ~ "+17005550020", length == 7.
     private byte[] mPhoneNumber = { (byte) 0x91, (byte) 0x71, (byte) 0x00, (byte) 0x55,
             (byte) 0x05, (byte) 0x20, (byte) 0xF0 };
 
-    @TestTargets({
-      @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "extractNetworkPortion",
-        args = {String.class}
-      ),
-      @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "extractPostDialPortion",
-        args = {String.class}
-      )
-    })
     public void testExtractMethods() {
 
         // Test extractNetworkPortion
@@ -83,38 +66,6 @@ public class PhoneNumberUtilsTest extends AndroidTestCase {
                                 PhoneNumberUtils.WAIT)));
     }
 
-    @TestTargets({
-      @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "calledPartyBCDToString",
-        args = {byte[].class, int.class, int.class}
-      ),
-      @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "toCallerIDMinMatch",
-        args = {String.class}
-      ),
-      @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "networkPortionToCalledPartyBCD",
-        args = {String.class}
-      ),
-      @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "calledPartyBCDFragmentToString",
-        args = {byte[].class, int.class, int.class}
-      ),
-      @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "networkPortionToCalledPartyBCDWithLength",
-        args = {String.class}
-      ),
-      @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "numberToCalledPartyBCD",
-        args = {String.class}
-      )
-    })
     public void testCallMethods() {
         // Test calledPartyBCDToString
         assertEquals("+17005550020", PhoneNumberUtils.calledPartyBCDToString(mPhoneNumber, 0, 7));
@@ -159,24 +110,6 @@ public class PhoneNumberUtilsTest extends AndroidTestCase {
         }
     }
 
-    @TestTargets({
-      @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "getStrippedReversed",
-        args = {String.class}
-      ),
-      @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "getFormatTypeForLocale",
-        args = {Locale.class}
-      ),
-      @TestTargetNew(
-        level = TestLevel.PARTIAL,
-        notes = "partial, null branch is ok, non-null has a insert fail",
-        method = "getNumberFromIntent",
-        args = {Intent.class, Context.class}
-      )
-    })
     public void testGetMethods() throws RemoteException {
         // Test getStrippedReversed
         assertNull(PhoneNumberUtils.getStrippedReversed(null));
@@ -231,48 +164,6 @@ public class PhoneNumberUtilsTest extends AndroidTestCase {
         }
     }
 
-    @TestTargets({
-      @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "formatNanpNumber",
-        args = {Editable.class}
-      ),
-      @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "convertKeypadLettersToDigits",
-        args = {String.class}
-      ),
-      @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "stringFromStringAndTOA",
-        args = {String.class, int.class}
-      ),
-      @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "formatJapaneseNumber",
-        args = {Editable.class}
-       ),
-      @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "formatNumber",
-        args = {String.class}
-      ),
-      @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "formatNumber",
-        args = {Editable.class, int.class}
-      ),
-      @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "stripSeparators",
-        args = {String.class}
-      ),
-      @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "toaFromString",
-        args = {String.class}
-      )
-    })
     public void testFormatMethods() {
         // Test formatNanpNumber
         SpannableStringBuilder builderNumber = new SpannableStringBuilder();
@@ -352,53 +243,6 @@ public class PhoneNumberUtilsTest extends AndroidTestCase {
         assertEquals(PhoneNumberUtils.TOA_Unknown, PhoneNumberUtils.toaFromString("88888888"));
     }
 
-    @TestTargets({
-      @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "is12Key",
-        args = {char.class}
-      ),
-      @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "isDialable",
-        args = {char.class}
-      ),
-      @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "isEmergencyNumber",
-        args = {String.class}
-      ),
-      @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "isGlobalPhoneNumber",
-        args = {String.class}
-      ),
-      @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "isISODigit",
-        args = {char.class}
-      ),
-      @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "isReallyDialable",
-        args = {char.class}
-      ),
-      @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "isStartsPostDial",
-        args = {char.class}
-      ),
-      @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "isWellFormedSmsAddress",
-        args = {String.class}
-      ),
-      @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "isNonSeparator",
-        args = {char.class}
-      )
-    })
     public void testJudgeMethods() {
         // Test is12Key, isDialable, isISODigit, isReallyDialable, isStartsPostDial
         for (char c = '0'; c <= '9'; c++) {

@@ -18,11 +18,6 @@ package android.widget.cts;
 
 import com.android.cts.stub.R;
 
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
-import dalvik.annotation.ToBeFixed;
 
 import android.app.Activity;
 import android.app.ActivityGroup;
@@ -39,7 +34,6 @@ import android.widget.TabHost.TabSpec;
 /**
  * Test {@link TabHost}.
  */
-@TestTargetClass(TabHost.class)
 public class TabHostTest extends ActivityInstrumentationTestCase2<TabHostStubActivity> {
     private static final String TAG_TAB1 = "tab 1";
     private static final String TAG_TAB2 = "tab 2";
@@ -57,29 +51,12 @@ public class TabHostTest extends ActivityInstrumentationTestCase2<TabHostStubAct
         mActivity = getActivity();
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "TabHost",
-            args = {android.content.Context.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "TabHost",
-            args = {android.content.Context.class, android.util.AttributeSet.class}
-        )
-    })
     public void testConstructor() {
         new TabHost(mActivity);
 
         new TabHost(mActivity, null);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "newTabSpec",
-        args = {java.lang.String.class}
-    )
     public void testNewTabSpec() {
         TabHost tabHost = new TabHost(mActivity);
 
@@ -93,12 +70,6 @@ public class TabHostTest extends ActivityInstrumentationTestCase2<TabHostStubAct
      * 1. the tabWidget view and tabContent view associated with tabHost are created.
      * 2. no exception occurs when doing normal operation after setup().
      */
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test setup()",
-        method = "setup",
-        args = {}
-    )
     public void testSetup1() throws Throwable {
         final Activity activity = launchActivity("com.android.cts.stub", StubActivity.class, null);
 
@@ -130,11 +101,6 @@ public class TabHostTest extends ActivityInstrumentationTestCase2<TabHostStubAct
      * 1. the tabWidget view and tabContent view associated with tabHost are created.
      * 2. no exception occurs when uses TabSpec.setContent(android.content.Intent) after setup().
      */
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "setup",
-        args = {android.app.LocalActivityManager.class}
-    )
     public void testSetup2() throws Throwable {
         final ActivityGroup activity = launchActivity("com.android.cts.stub",
                 ActivityGroup.class, null);
@@ -165,23 +131,10 @@ public class TabHostTest extends ActivityInstrumentationTestCase2<TabHostStubAct
         activity.finish();
     }
 
-    @TestTargetNew(
-        level = TestLevel.NOT_NECESSARY,
-        method = "onTouchModeChanged",
-        args = {boolean.class}
-    )
     public void testOnTouchModeChanged() {
         // implementation details
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "addTab",
-        args = {android.widget.TabHost.TabSpec.class}
-    )
-    @ToBeFixed(bug = "1695243", explanation = "the javadoc for addTab() is incomplete." +
-            "1. not clear what is supposed to happen if tabSpec is null." +
-            "2. no description about the IllegalArgumentException thrown from this method.")
     @UiThreadTest
     public void testAddTab() {
         TabHost tabHost = mActivity.getTabHost();
@@ -216,13 +169,6 @@ public class TabHostTest extends ActivityInstrumentationTestCase2<TabHostStubAct
         }
     }
 
-    @TestTargetNew(
-        level = TestLevel.NOT_FEASIBLE,
-        method = "clearAllTabs",
-        args = {}
-    )
-    @ToBeFixed(explanation = "clearAllTabs() cannot be called on a TabHost that's currently being"
-            + " displayed. After doing so, NPE is thrown in the UI thread and the process dies.")
     @UiThreadTest
     public void testClearAllTabs() {
         TabHost tabHost = mActivity.getTabHost();
@@ -249,12 +195,6 @@ public class TabHostTest extends ActivityInstrumentationTestCase2<TabHostStubAct
         */
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "getTabWidget",
-        args = {}
-    )
-    @ToBeFixed(bug = "1695243", explanation = "Android API javadocs are incomplete.")
     public void testGetTabWidget() {
         TabHost tabHost = mActivity.getTabHost();
 
@@ -268,19 +208,6 @@ public class TabHostTest extends ActivityInstrumentationTestCase2<TabHostStubAct
                 getActivity());
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getCurrentTab",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setCurrentTab",
-            args = {int.class}
-        )
-    })
-    @ToBeFixed(bug = "1695243", explanation = "Android API javadocs are incomplete.")
     @UiThreadTest
     public void testAccessCurrentTab() {
         TabHost tabHost = mActivity.getTabHost();
@@ -303,12 +230,6 @@ public class TabHostTest extends ActivityInstrumentationTestCase2<TabHostStubAct
         assertEquals(0, tabHost.getCurrentTab());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "getCurrentTabView",
-        args = {}
-    )
-    @ToBeFixed(bug = "1695243", explanation = "Android API javadocs are incomplete.")
     @UiThreadTest
     public void testGetCurrentTabView() {
         TabHost tabHost = mActivity.getTabHost();
@@ -324,12 +245,6 @@ public class TabHostTest extends ActivityInstrumentationTestCase2<TabHostStubAct
         assertSame(tabHost.getTabWidget().getChildAt(1), tabHost.getCurrentTabView());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "getCurrentView",
-        args = {}
-    )
-    @ToBeFixed(bug = "1695243", explanation = "Android API javadocs are incomplete.")
     @UiThreadTest
     public void testGetCurrentView() {
         TabHost tabHost = mActivity.getTabHost();
@@ -344,12 +259,6 @@ public class TabHostTest extends ActivityInstrumentationTestCase2<TabHostStubAct
         assertTrue(tabHost.getCurrentView() instanceof ListView);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "setCurrentTabByTag",
-        args = {java.lang.String.class}
-    )
-    @ToBeFixed(bug = "1695243", explanation = "Android API javadocs are incomplete.")
     @UiThreadTest
     public void testSetCurrentTabByTag() {
         TabHost tabHost = mActivity.getTabHost();
@@ -374,11 +283,6 @@ public class TabHostTest extends ActivityInstrumentationTestCase2<TabHostStubAct
         assertEquals(0, tabHost.getCurrentTab());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "getTabContentView",
-        args = {}
-    )
     @UiThreadTest
     public void testGetTabContentView() {
         TabHost tabHost = mActivity.getTabHost();
@@ -409,21 +313,11 @@ public class TabHostTest extends ActivityInstrumentationTestCase2<TabHostStubAct
         assertEquals(TabHostStubActivity.INITIAL_VIEW_TEXT, child2.getText().toString());
     }
 
-    @TestTargetNew(
-        level = TestLevel.NOT_NECESSARY,
-        method = "dispatchKeyEvent",
-        args = {android.view.KeyEvent.class}
-    )
     @UiThreadTest
     public void testDispatchKeyEvent() {
         // Implementation details.
     }
 
-    @TestTargetNew(
-        level = TestLevel.NOT_NECESSARY,
-        method = "dispatchWindowFocusChanged",
-        args = {boolean.class}
-    )
     @UiThreadTest
     public void testDispatchWindowFocusChanged() {
         // Implementation details
@@ -434,11 +328,6 @@ public class TabHostTest extends ActivityInstrumentationTestCase2<TabHostStubAct
      * 1. the specified callback should be invoked when the selected state of any of the items
      * in this list changes
      */
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "setOnTabChangedListener",
-        args = {android.widget.TabHost.OnTabChangeListener.class}
-    )
     @UiThreadTest
     public void testSetOnTabChangedListener() {
         TabHost tabHost = mActivity.getTabHost();
@@ -465,13 +354,6 @@ public class TabHostTest extends ActivityInstrumentationTestCase2<TabHostStubAct
         assertFalse(listener.hasCalledOnTabChanged());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test getCurrentTabTag()",
-        method = "getCurrentTabTag",
-        args = {}
-    )
-    @ToBeFixed(bug = "1695243", explanation = "Android API javadocs are incomplete.")
     @UiThreadTest
     public void testGetCurrentTabTag() {
         TabHost tabHost = mActivity.getTabHost();
@@ -485,18 +367,6 @@ public class TabHostTest extends ActivityInstrumentationTestCase2<TabHostStubAct
         assertEquals(TAG_TAB2, tabHost.getCurrentTabTag());
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.NOT_NECESSARY,
-            method = "onDetachedFromWindow",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.NOT_NECESSARY,
-            method = "onAttachedToWindow",
-            args = {}
-        )
-    })
     @UiThreadTest
     public void testOnAttachedToAndDetachedFromWindow() {
         // implementation details

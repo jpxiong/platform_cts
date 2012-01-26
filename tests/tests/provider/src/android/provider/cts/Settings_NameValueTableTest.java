@@ -16,9 +16,6 @@
 
 package android.provider.cts;
 
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
 
 import android.content.ContentResolver;
 import android.database.Cursor;
@@ -27,14 +24,7 @@ import android.provider.Settings;
 import android.provider.Settings.NameValueTable;
 import android.test.AndroidTestCase;
 
-@TestTargetClass(android.provider.Settings.NameValueTable.class)
 public class Settings_NameValueTableTest extends AndroidTestCase {
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "putString",
-        args = {android.content.ContentResolver.class, android.net.Uri.class,
-                java.lang.String.class, java.lang.String.class}
-    )
     public void testPutString() {
         ContentResolver cr = mContext.getContentResolver();
         Uri uri = Settings.System.CONTENT_URI;
@@ -75,11 +65,6 @@ public class Settings_NameValueTableTest extends AndroidTestCase {
         }
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "getUriFor",
-        args = {android.net.Uri.class, java.lang.String.class}
-    )
     public void testGetUriFor() {
         Uri uri = Uri.parse("content://authority/path");
         String name = "table";

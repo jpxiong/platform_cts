@@ -17,11 +17,6 @@
 package android.view.cts;
 
 import android.view.View;
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
-import dalvik.annotation.ToBeFixed;
 
 import android.graphics.Rect;
 import android.test.AndroidTestCase;
@@ -30,7 +25,6 @@ import android.view.Gravity;
 /**
  * Test {@link Gravity}.
  */
-@TestTargetClass(Gravity.class)
 public class GravityTest extends AndroidTestCase {
     private Rect mInRect;
     private Rect mOutRect;
@@ -42,12 +36,6 @@ public class GravityTest extends AndroidTestCase {
         mOutRect = new Rect();
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test constructor(s) of {@link Gravity}",
-        method = "Gravity",
-        args = {}
-    )
     public void testConstructor() {
         new Gravity();
     }
@@ -57,22 +45,6 @@ public class GravityTest extends AndroidTestCase {
         Gravity.apply(gravity, w, h, mInRect, mOutRect, layoutDirection);
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "apply",
-            args = {int.class, int.class, int.class, android.graphics.Rect.class,
-                    android.graphics.Rect.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "apply",
-            args = {int.class, int.class, int.class, android.graphics.Rect.class, int.class,
-                    int.class, android.graphics.Rect.class}
-        )
-    })
-    @ToBeFixed(bug = "1695243", explanation = "Incorrect javadoc for apply. FILL gravities also" +
-            "respect the adjustment parameters.")
     public void testApply() {
         mInRect = new Rect(10, 20, 30, 40);
         Gravity.apply(Gravity.TOP, 2, 3, mInRect, mOutRect);
@@ -286,24 +258,12 @@ public class GravityTest extends AndroidTestCase {
         assertEquals(35, mOutRect.bottom);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test {@link Gravity#isVertical(int)}",
-        method = "isVertical",
-        args = {int.class}
-    )
     public void testIsVertical() {
         assertFalse(Gravity.isVertical(-1));
         assertTrue(Gravity.isVertical(Gravity.VERTICAL_GRAVITY_MASK));
         assertFalse(Gravity.isVertical(Gravity.NO_GRAVITY));
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test {@link Gravity#isHorizontal(int)}",
-        method = "isHorizontal",
-        args = {int.class}
-    )
     public void testIsHorizontal() {
         assertFalse(Gravity.isHorizontal(-1));
         assertTrue(Gravity.isHorizontal(Gravity.HORIZONTAL_GRAVITY_MASK));
@@ -311,11 +271,6 @@ public class GravityTest extends AndroidTestCase {
         assertFalse(Gravity.isHorizontal(Gravity.NO_GRAVITY));
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "applyDisplay",
-        args = {int.class, android.graphics.Rect.class, android.graphics.Rect.class}
-    )
     public void testApplyDisplay() {
         Rect display = new Rect(20, 30, 40, 50);
         Rect inoutRect = new Rect(10, 10, 30, 60);

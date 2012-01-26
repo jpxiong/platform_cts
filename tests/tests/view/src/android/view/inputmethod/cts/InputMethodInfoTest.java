@@ -16,10 +16,6 @@
 
 package android.view.inputmethod.cts;
 
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
 
 import android.content.ComponentName;
 import android.content.Intent;
@@ -37,7 +33,6 @@ import org.xmlpull.v1.XmlPullParserException;
 import java.io.IOException;
 import java.util.List;
 
-@TestTargetClass(InputMethodInfo.class)
 public class InputMethodInfoTest extends AndroidTestCase {
     private InputMethodInfo mInputMethodInfo;
     private String mPackageName;
@@ -55,70 +50,6 @@ public class InputMethodInfoTest extends AndroidTestCase {
         mInputMethodInfo = new InputMethodInfo(mPackageName, mClassName, mLabel, mSettingsActivity);
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "describeContents",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getComponent",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getId",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.PARTIAL,
-            notes = "Can't make sure how to make the default id non-0",
-            method = "getIsDefaultResourceId",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getPackageName",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getServiceInfo",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getServiceName",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getSettingsActivity",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "loadIcon",
-            args = {android.content.pm.PackageManager.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "InputMethodInfo",
-            args = {android.content.Context.class, android.content.pm.ResolveInfo.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "InputMethodInfo",
-            args = {java.lang.String.class, java.lang.String.class, java.lang.CharSequence.class,
-                    java.lang.String.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "toString",
-            args = {}
-        )
-    })
     public void testInputMethodInfoProperties() throws XmlPullParserException, IOException {
         assertEquals(0, mInputMethodInfo.describeContents());
         assertNotNull(mInputMethodInfo.toString());
@@ -156,54 +87,29 @@ public class InputMethodInfoTest extends AndroidTestCase {
         assertEquals(mClassName, info.getServiceName());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "dump",
-        args = {android.util.Printer.class, java.lang.String.class}
-    )
     public void testDump() {
         MockPrinter printer = new MockPrinter();
         String prefix = "test";
         mInputMethodInfo.dump(printer, prefix);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "loadIcon",
-        args = {android.content.pm.PackageManager.class}
-    )
     public void testLoadIcon() {
         PackageManager pm = mContext.getPackageManager();
         assertNotNull(mInputMethodInfo.loadIcon(pm));
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "equals",
-        args = {java.lang.Object.class}
-    )
     public void testEquals() {
         InputMethodInfo inputMethodInfo = new InputMethodInfo(mPackageName, mClassName, mLabel,
                 mSettingsActivity);
         assertTrue(inputMethodInfo.equals(mInputMethodInfo));
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "loadLabel",
-        args = {android.content.pm.PackageManager.class}
-    )
     public void testLoadLabel() {
         CharSequence expected = "test";
         PackageManager pm = mContext.getPackageManager();
         assertEquals(expected.toString(), mInputMethodInfo.loadLabel(pm).toString());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "writeToParcel",
-        args = {android.os.Parcel.class, int.class}
-    )
     public void testWriteToParcel() {
         Parcel p = Parcel.obtain();
         mInputMethodInfo.writeToParcel(p, 0);

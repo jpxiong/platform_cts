@@ -18,28 +18,9 @@ package android.database.cts;
 
 import android.database.CursorIndexOutOfBoundsException;
 import android.test.AndroidTestCase;
-import dalvik.annotation.TestTargets;
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargetClass;
 
-@TestTargetClass(android.database.CursorIndexOutOfBoundsException.class)
 public class CursorIndexOutOfBoundsExceptionTest extends AndroidTestCase {
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test constructors of CursorIndexOutOfBoundsException.",
-            method = "CursorIndexOutOfBoundsException",
-            args = {java.lang.String.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test constructors of CursorIndexOutOfBoundsException.",
-            method = "CursorIndexOutOfBoundsException",
-            args = {int.class, int.class}
-        )
-    })
     public void testConstructors() {
         int INDEX = 100;
         int SIZE = 99;

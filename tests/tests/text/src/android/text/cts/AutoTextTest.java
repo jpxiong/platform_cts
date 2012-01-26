@@ -20,18 +20,9 @@ import java.util.Locale;
 import android.test.AndroidTestCase;
 import android.text.AutoText;
 import android.view.View;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
 
-@TestTargetClass(AutoText.class)
 public class AutoTextTest extends AndroidTestCase {
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "get",
-        args = {java.lang.CharSequence.class, int.class, int.class, android.view.View.class}
-    )
     public void testGet() {
         // Define the necessary sources.
         CharSequence src;
@@ -78,11 +69,6 @@ public class AutoTextTest extends AndroidTestCase {
         assertEquals("can", actual);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "getSize",
-        args = {android.view.View.class}
-    )
     public void testGetSize() {
         Locale.setDefault(Locale.ENGLISH);
         View view = new View(getContext());

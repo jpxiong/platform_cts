@@ -16,10 +16,6 @@
 
 package android.view.inputmethod.cts;
 
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
 
 import android.os.Bundle;
 import android.os.Parcel;
@@ -29,26 +25,8 @@ import android.util.Printer;
 import android.view.inputmethod.EditorInfo;
 
 
-@TestTargetClass(EditorInfo.class)
 public class EditorInfoTest extends AndroidTestCase {
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "describeContents",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "writeToParcel",
-            args = {Parcel.class, int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "dump",
-            args = {Printer.class, String.class}
-        )
-    })
     public void testEditorInfo() {
         EditorInfo info = new EditorInfo();
 

@@ -20,21 +20,9 @@ import android.test.AndroidTestCase;
 import android.text.InputFilter;
 import android.text.SpannableStringBuilder;
 import android.text.InputFilter.AllCaps;
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
 
-@TestTargetClass(InputFilter.AllCaps.class)
 public class InputFilter_AllCapsTest extends AndroidTestCase {
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test filter. Implicitly invoked by SpannableStringBuilder#replace and explicitly" +
-                " test to make sure its functionality",
-        method = "filter",
-        args = {java.lang.CharSequence.class, int.class, int.class, android.text.Spanned.class,
-                int.class, int.class}
-    )
     public void testFilter() {
 
         // Implicitly invoked

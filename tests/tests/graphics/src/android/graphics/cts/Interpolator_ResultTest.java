@@ -20,29 +20,15 @@ import junit.framework.TestCase;
 import android.graphics.Interpolator.Result;
 import android.graphics.Shader.TileMode;
 
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
 
-@TestTargetClass(Result.class)
 public class Interpolator_ResultTest extends TestCase {
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "valueOf",
-        args = {java.lang.String.class}
-    )
     public void testValueOf() {
         assertEquals(Result.FREEZE_START, Result.valueOf("FREEZE_START"));
         assertEquals(Result.FREEZE_END, Result.valueOf("FREEZE_END"));
         assertEquals(Result.NORMAL, Result.valueOf("NORMAL"));
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "values",
-        args = {}
-    )
     public void testValues() {
         Result[] result = Result.values();
         assertEquals(3, result.length);

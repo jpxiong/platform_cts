@@ -16,7 +16,6 @@
 
 package android.opengl.cts;
 
-import dalvik.annotation.TestTargetClass;
 
 import android.opengl.GLSurfaceView;
 import android.test.ActivityInstrumentationTestCase2;
@@ -26,7 +25,6 @@ import android.util.Log;
 /**
  * Tests for the GLSurfaceView class.
  */
-@TestTargetClass(GLSurfaceView.class)
 public class GLSurfaceViewTest extends
         ActivityInstrumentationTestCase2<GLSurfaceViewStubActivity> {
 

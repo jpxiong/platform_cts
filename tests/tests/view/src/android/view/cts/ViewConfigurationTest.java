@@ -19,15 +19,10 @@ package android.view.cts;
 import android.content.Context;
 import android.test.InstrumentationTestCase;
 import android.view.ViewConfiguration;
-import dalvik.annotation.TestTargets;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
 
 /**
  * Test {@link ViewConfiguration}.
  */
-@TestTargetClass(ViewConfiguration.class)
 public class ViewConfigurationTest extends InstrumentationTestCase {
 
     @Override
@@ -35,83 +30,6 @@ public class ViewConfigurationTest extends InstrumentationTestCase {
         super.setUp();
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.SUFFICIENT,
-            method = "getScrollBarSize",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.SUFFICIENT,
-            method = "getFadingEdgeLength",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.SUFFICIENT,
-            method = "getPressedStateDuration",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.SUFFICIENT,
-            method = "getLongPressTimeout",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.SUFFICIENT,
-            method = "getTapTimeout",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.SUFFICIENT,
-            method = "getJumpTapTimeout",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.SUFFICIENT,
-            method = "getEdgeSlop",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.SUFFICIENT,
-            method = "getTouchSlop",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.SUFFICIENT,
-            method = "getWindowTouchSlop",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.SUFFICIENT,
-            method = "getMinimumFlingVelocity",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.SUFFICIENT,
-            method = "getMaximumDrawingCacheSize",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.SUFFICIENT,
-            method = "getZoomControlsTimeout",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.SUFFICIENT,
-            method = "getGlobalActionKeyTimeout",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.SUFFICIENT,
-            method = "getScrollFriction",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.SUFFICIENT,
-            method = "getDoubleTapTimeout",
-            args = {}
-        )
-    })
     @SuppressWarnings("deprecation")
     public void testStaticValues() {
         ViewConfiguration.getScrollBarSize();
@@ -131,65 +49,11 @@ public class ViewConfigurationTest extends InstrumentationTestCase {
         ViewConfiguration.getDoubleTapTimeout();
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.SUFFICIENT,
-            method = "ViewConfiguration",
-            args = {}
-        )
-    })
     @SuppressWarnings("deprecation")
     public void testConstructor() {
         new ViewConfiguration();
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.SUFFICIENT,
-            method = "get",
-            args = {Context.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.SUFFICIENT,
-            method = "getScaledDoubleTapSlop",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.SUFFICIENT,
-            method = "getScaledEdgeSlop",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.SUFFICIENT,
-            method = "getScaledFadingEdgeLength",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.SUFFICIENT,
-            method = "getScaledMaximumDrawingCacheSize",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.SUFFICIENT,
-            method = "getScaledMinimumFlingVelocity",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.SUFFICIENT,
-            method = "getScaledScrollBarSize",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.SUFFICIENT,
-            method = "getScaledTouchSlop",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.SUFFICIENT,
-            method = "getScaledWindowTouchSlop",
-            args = {}
-        )
-    })
     public void testInstanceValues() {
         ViewConfiguration vc = ViewConfiguration.get(getInstrumentation().getTargetContext());
         assertNotNull(vc);

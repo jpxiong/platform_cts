@@ -18,11 +18,6 @@ package android.widget.cts;
 
 import com.android.internal.R;
 
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
-import dalvik.annotation.ToBeFixed;
 
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -44,7 +39,6 @@ import java.util.Map;
 /**
  * Test {@link SimpleAdapter}.
  */
-@TestTargetClass(SimpleAdapter.class)
 public class SimpleAdapterTest extends InstrumentationTestCase {
     private static final int DEFAULT_ROW_COUNT = 20;
 
@@ -103,24 +97,11 @@ public class SimpleAdapterTest extends InstrumentationTestCase {
                 R.layout.simple_list_item_1, COLUMNS_FROM, VIEWS_TO);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test constructor",
-        method = "SimpleAdapter",
-        args = {android.content.Context.class, java.util.List.class, int.class,
-                java.lang.String[].class, int[].class}
-    )
     public void testConstructor() {
         new SimpleAdapter(mContext, createTestList(DEFAULT_COLUMN_COUNT, DEFAULT_ROW_COUNT),
                 R.layout.simple_list_item_1, COLUMNS_FROM, VIEWS_TO);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test {@link SimpleAdapter#getCount()}",
-        method = "getCount",
-        args = {}
-    )
     public void testGetCount() {
         mSimpleAdapter = new SimpleAdapter(mContext,
                 createTestList(DEFAULT_COLUMN_COUNT, DEFAULT_ROW_COUNT),
@@ -132,14 +113,6 @@ public class SimpleAdapterTest extends InstrumentationTestCase {
         assertEquals(10, mSimpleAdapter.getCount());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test {@link SimpleAdapter#getItem(int)}",
-        method = "getItem",
-        args = {int.class}
-    )
-    @ToBeFixed(bug = "1417734", explanation = "should add @throws clause into javadoc of "
-            + "SimpleAdapter#getItem(int) if the param position is out of index")
     public void testGetItem() {
         assertEquals("01", ((Map<?, ?>) mSimpleAdapter.getItem(0)).get("column1"));
         assertEquals("191", ((Map<?, ?>) mSimpleAdapter.getItem(19)).get("column1"));
@@ -157,14 +130,6 @@ public class SimpleAdapterTest extends InstrumentationTestCase {
         }
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test {@link SimpleAdapter#getItemId(int)}",
-        method = "getItemId",
-        args = {int.class}
-    )
-    @ToBeFixed(explanation = "SimpleAdapter#getItemId(int) should check whether "
-            + "the param position is out of index")
     public void testGetItemId() {
         assertEquals(0, mSimpleAdapter.getItemId(0));
 
@@ -176,14 +141,6 @@ public class SimpleAdapterTest extends InstrumentationTestCase {
         assertEquals(20, mSimpleAdapter.getItemId(20));
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test {@link SimpleAdapter#getView(int, View, ViewGroup)}",
-        method = "getView",
-        args = {int.class, android.view.View.class, android.view.ViewGroup.class}
-    )
-    @ToBeFixed(bug = "1417734", explanation = "should add @throws clause into javadoc of "
-            + "SimpleAdapter#getView(int, View, ViewGroup) if the param position is out of index")
     public void testGetView() {
         // use the layout passed in to constructor
         View result = mSimpleAdapter.getView(0, null, mAdapterHost);
@@ -233,12 +190,6 @@ public class SimpleAdapterTest extends InstrumentationTestCase {
         }
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test {@link SimpleAdapter#setDropDownViewResource(int)}",
-        method = "setDropDownViewResource",
-        args = {int.class}
-    )
     public void testSetDropDownViewResource() {
         mSimpleAdapter.setDropDownViewResource(R.layout.simple_list_item_2);
         View result = mSimpleAdapter.getDropDownView(0, null, mAdapterHost);
@@ -259,15 +210,6 @@ public class SimpleAdapterTest extends InstrumentationTestCase {
         assertEquals("191", ((TextView) result).getText().toString());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test {@link SimpleAdapter#getDropDownView(int, View, ViewGroup)}",
-        method = "getDropDownView",
-        args = {int.class, android.view.View.class, android.view.ViewGroup.class}
-    )
-    @ToBeFixed(bug = "1417734", explanation = "should add @throws clause into j"
-            + "avadoc of SimpleAdapter#getDropDownView(int, View, ViewGroup) if "
-            + "the param position is out of index")
     public void testGetDropDownView() {
         View result = mSimpleAdapter.getDropDownView(0, null, mAdapterHost);
         assertTrue(result instanceof TextView);
@@ -316,18 +258,6 @@ public class SimpleAdapterTest extends InstrumentationTestCase {
         }
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setViewBinder",
-            args = {android.widget.SimpleAdapter.ViewBinder.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getViewBinder",
-            args = {}
-        )
-    })
     public void testAccessViewBinder() {
         // no binder default
         assertNull(mSimpleAdapter.getViewBinder());
@@ -346,22 +276,6 @@ public class SimpleAdapterTest extends InstrumentationTestCase {
         assertNull(mSimpleAdapter.getViewBinder());
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test {@link SimpleAdapter#setViewImage(ImageView, String)",
-            method = "setViewImage",
-            args = {android.widget.ImageView.class, java.lang.String.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test {@link SimpleAdapter#setViewImage(ImageView, String)",
-            method = "setViewImage",
-            args = {android.widget.ImageView.class, int.class}
-        )
-    })
-    @ToBeFixed(bug = "1417734", explanation = "should add @throws clause into javadoc of "
-            + "SimpleAdapter#setViewImage(ImageView, String) if the param String is null")
     public void testSetViewImage() {
         // String represents resId
         ImageView view = new ImageView(mContext);
@@ -419,12 +333,6 @@ public class SimpleAdapterTest extends InstrumentationTestCase {
         }
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test {@link SimpleAdapter#setViewText(TextView, String)}",
-        method = "setViewText",
-        args = {android.widget.TextView.class, java.lang.String.class}
-    )
     public void testSetViewText() {
         TextView view = new TextView(mContext);
         mSimpleAdapter.setViewText(view, "expected");
@@ -434,12 +342,6 @@ public class SimpleAdapterTest extends InstrumentationTestCase {
         assertEquals("", view.getText().toString());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test {@link SimpleAdapter#getFilter()}",
-        method = "getFilter",
-        args = {}
-    )
     public void testGetFilter() {
         assertNotNull(mSimpleAdapter.getFilter());
     }

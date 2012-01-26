@@ -16,11 +16,6 @@
 
 package android.location.cts;
 
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
-import dalvik.annotation.ToBeFixed;
 
 import android.location.Location;
 import android.os.Bundle;
@@ -31,7 +26,6 @@ import android.util.StringBuilderPrinter;
 
 import java.text.DecimalFormat;
 
-@TestTargetClass(Location.class)
 public class LocationTest extends AndroidTestCase {
     private static final float DELTA = 0.1f;
     private final float TEST_ACCURACY = 1.0f;
@@ -47,20 +41,6 @@ public class LocationTest extends AndroidTestCase {
     private final boolean TEST_KEY1VALUE = false;
     private final byte TEST_KEY2VALUE = 10;
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "Location",
-            args = {android.location.Location.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "Location",
-            args = {java.lang.String.class}
-        )
-    })
-    @ToBeFixed(bug = "1695243", explanation = "Android API javadocs are incomplete, " +
-            "should add @throw NullPointerException into javadoc")
     public void testConstructor() {
         new Location("LocationProvider");
 
@@ -76,11 +56,6 @@ public class LocationTest extends AndroidTestCase {
         }
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "dump",
-        args = {Printer.class, String.class}
-    )
     public void testDump() {
         StringBuilder sb = new StringBuilder();
         StringBuilderPrinter printer = new StringBuilderPrinter(sb);
@@ -89,14 +64,6 @@ public class LocationTest extends AndroidTestCase {
         assertNotNull(sb.toString());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test bearingTo(Location)",
-        method = "bearingTo",
-        args = {android.location.Location.class}
-    )
-    @ToBeFixed(bug = "1695243", explanation = "should add @throws IllegalArgumentException " +
-            "clause into javadoc of setPowerRequirement() when input is valid.")
     public void testBearingTo() {
         Location location = new Location("");
         Location dest = new Location("");
@@ -137,11 +104,6 @@ public class LocationTest extends AndroidTestCase {
         }
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "convert",
-        args = {double.class, int.class}
-    )
     public void testConvert_CoordinateToRepresentation() {
         DecimalFormat df = new DecimalFormat("###.#####");
         String result;
@@ -186,11 +148,6 @@ public class LocationTest extends AndroidTestCase {
         }
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "convert",
-        args = {java.lang.String.class}
-    )
     public void testConvert_RepresentationToCoordinate() {
         double result;
 
@@ -242,22 +199,11 @@ public class LocationTest extends AndroidTestCase {
         }
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "this function always returns 0",
-        method = "describeContents",
-        args = {}
-    )
     public void testDescribeContents() {
         Location location = new Location("");
         location.describeContents();
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "distanceBetween",
-        args = {double.class, double.class, double.class, double.class, float[].class}
-    )
     public void testDistanceBetween() {
         float[] result = new float[3];
         Location.distanceBetween(0, 0, 0, 0, result);
@@ -285,11 +231,6 @@ public class LocationTest extends AndroidTestCase {
         }
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "distanceTo",
-        args = {android.location.Location.class}
-    )
     public void testDistanceTo() {
         float distance;
         Location zeroLocation = new Location("");
@@ -307,28 +248,6 @@ public class LocationTest extends AndroidTestCase {
         assertEquals(6244139.0, distance, 1);
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getAccuracy",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "hasAccuracy",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setAccuracy",
-            args = {float.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "removeAccuracy",
-            args = {}
-        )
-    })
     public void testAccessAccuracy() {
         Location location = new Location("");
         assertFalse(location.hasAccuracy());
@@ -342,28 +261,6 @@ public class LocationTest extends AndroidTestCase {
         assertFalse(location.hasAccuracy());
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getAltitude",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "hasAltitude",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "removeAltitude",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setAltitude",
-            args = {double.class}
-        )
-    })
     public void testAccessAltitude() {
         Location location = new Location("");
         assertFalse(location.hasAltitude());
@@ -377,28 +274,6 @@ public class LocationTest extends AndroidTestCase {
         assertFalse(location.hasAltitude());
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getBearing",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "hasBearing",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "removeBearing",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setBearing",
-            args = {float.class}
-        )
-    })
     public void testAccessBearing() {
         Location location = new Location("");
         assertFalse(location.hasBearing());
@@ -420,18 +295,6 @@ public class LocationTest extends AndroidTestCase {
         assertFalse(location.hasBearing());
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getExtras",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setExtras",
-            args = {android.os.Bundle.class}
-        )
-    })
     public void testAccessExtras() {
         Location location = createTestLocation();
 
@@ -441,18 +304,6 @@ public class LocationTest extends AndroidTestCase {
         assertNull(location.getExtras());
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getLatitude",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setLatitude",
-            args = {double.class}
-        )
-    })
     public void testAccessLatitude() {
         Location location = new Location("");
 
@@ -466,18 +317,6 @@ public class LocationTest extends AndroidTestCase {
         assertEquals(-90, location.getLatitude(), DELTA);
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getLongitude",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setLongitude",
-            args = {double.class}
-        )
-    })
     public void testAccessLongitude() {
         Location location = new Location("");
 
@@ -491,18 +330,6 @@ public class LocationTest extends AndroidTestCase {
         assertEquals(-180, location.getLongitude(), DELTA);
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getProvider",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setProvider",
-            args = {java.lang.String.class}
-        )
-    })
     public void testAccessProvider() {
         Location location = new Location("");
 
@@ -514,28 +341,6 @@ public class LocationTest extends AndroidTestCase {
         assertNull(location.getProvider());
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getSpeed",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "hasSpeed",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "removeSpeed",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setSpeed",
-            args = {float.class}
-        )
-    })
     public void testAccessSpeed() {
         Location location = new Location("");
         assertFalse(location.hasSpeed());
@@ -549,18 +354,6 @@ public class LocationTest extends AndroidTestCase {
         assertFalse(location.hasSpeed());
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getTime",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setTime",
-            args = {long.class}
-        )
-    })
     public void testAccessTime() {
         Location location = new Location("");
 
@@ -574,18 +367,6 @@ public class LocationTest extends AndroidTestCase {
         assertEquals(12000, location.getTime());
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "reset",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "set",
-            args = {android.location.Location.class}
-        )
-    })
     public void testSet() {
         Location location = new Location("");
 
@@ -610,22 +391,12 @@ public class LocationTest extends AndroidTestCase {
         assertNull(location.getExtras());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "toString",
-        args = {}
-    )
     public void testToString() {
         Location location = createTestLocation();
 
         assertNotNull(location.toString());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "writeToParcel",
-        args = {android.os.Parcel.class, int.class}
-    )
     public void testWriteToParcel() {
         Location location = createTestLocation();
 

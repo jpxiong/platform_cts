@@ -39,11 +39,6 @@ import static android.provider.Settings.System.SOUND_EFFECTS_ENABLED;
 
 import com.android.cts.stub.R;
 
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
-import dalvik.annotation.ToBeFixed;
 
 import android.content.Context;
 import android.media.AudioManager;
@@ -54,7 +49,6 @@ import android.test.AndroidTestCase;
 import android.view.SoundEffectConstants;
 
 
-@TestTargetClass(AudioManager.class)
 public class AudioManagerTest extends AndroidTestCase {
 
     private final static int MP3_TO_PLAY = R.raw.testmp3;
@@ -67,18 +61,6 @@ public class AudioManagerTest extends AndroidTestCase {
         mAudioManager = (AudioManager) mContext.getSystemService(Context.AUDIO_SERVICE);
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setMicrophoneMute",
-            args = {boolean.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "isMicrophoneMute",
-            args = {}
-        )
-    })
     public void testMicrophoneMute() throws Exception {
         mAudioManager.setMicrophoneMute(true);
         assertTrue(mAudioManager.isMicrophoneMute());
@@ -86,33 +68,6 @@ public class AudioManagerTest extends AndroidTestCase {
         assertFalse(mAudioManager.isMicrophoneMute());
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "unloadSoundEffects",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "playSoundEffect",
-            args = {int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "playSoundEffect",
-            args = {int.class, float.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "loadSoundEffects",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setRingerMode",
-            args = {int.class}
-        )
-    })
     public void testSoundEffects() throws Exception {
         // set relative setting
         mAudioManager.setRingerMode(AudioManager.RINGER_MODE_NORMAL);
@@ -147,13 +102,6 @@ public class AudioManagerTest extends AndroidTestCase {
         mAudioManager.playSoundEffect(AudioManager.FX_FOCUS_NAVIGATION_RIGHT, volume);
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "isMusicActive",
-            args = {}
-        )
-    })
     public void testMusicActive() throws Exception {
         MediaPlayer mp = MediaPlayer.create(mContext, MP3_TO_PLAY);
         mp.setAudioStreamType(AudioManager.STREAM_MUSIC);
@@ -167,18 +115,6 @@ public class AudioManagerTest extends AndroidTestCase {
         assertFalse(mAudioManager.isMusicActive());
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setMode",
-            args = {int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getMode",
-            args = {}
-        )
-    })
     public void testAccessMode() throws Exception {
         mAudioManager.setMode(MODE_RINGTONE);
         assertEquals(MODE_RINGTONE, mAudioManager.getMode());
@@ -191,50 +127,6 @@ public class AudioManagerTest extends AndroidTestCase {
     }
 
     @SuppressWarnings("deprecation")
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setBluetoothA2dpOn",
-            args = {boolean.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setBluetoothScoOn",
-            args = {boolean.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getRouting",
-            args = {int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "isBluetoothA2dpOn",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "isBluetoothScoOn",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.NOT_FEASIBLE,
-            method = "setRouting",
-            args = {int.class, int.class, int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setSpeakerphoneOn",
-            args = {boolean.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "isSpeakerphoneOn",
-            args = {}
-        )
-    })
-    @ToBeFixed(bug="1713090", explanation="setRouting() has not only been deprecated, but is no"
-        + " longer having any effect.")
     public void testRouting() throws Exception {
         // setBluetoothA2dpOn is a no-op, and getRouting should always return -1
         // AudioManager.MODE_CURRENT
@@ -273,28 +165,6 @@ public class AudioManagerTest extends AndroidTestCase {
         assertEquals(AudioManager.MODE_CURRENT, mAudioManager.getRouting(MODE_IN_COMMUNICATION));
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "shouldVibrate",
-            args = {int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setVibrateSetting",
-            args = {int.class, int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getVibrateSetting",
-            args = {int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setRingerMode",
-            args = {int.class}
-        )
-    })
     public void testVibrateNotification() throws Exception {
         // VIBRATE_SETTING_ON
         mAudioManager.setVibrateSetting(VIBRATE_TYPE_NOTIFICATION, VIBRATE_SETTING_ON);
@@ -350,28 +220,6 @@ public class AudioManagerTest extends AndroidTestCase {
                 mAudioManager.getVibrateSetting(VIBRATE_TYPE_NOTIFICATION));
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "shouldVibrate",
-            args = {int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setVibrateSetting",
-            args = {int.class, int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getVibrateSetting",
-            args = {int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setRingerMode",
-            args = {int.class}
-        )
-    })
     public void testVibrateRinger() throws Exception {
         // VIBRATE_TYPE_RINGER
         mAudioManager.setVibrateSetting(VIBRATE_TYPE_RINGER, VIBRATE_SETTING_ON);
@@ -426,23 +274,6 @@ public class AudioManagerTest extends AndroidTestCase {
                 mAudioManager.getVibrateSetting(VIBRATE_TYPE_RINGER));
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "unloadSoundEffects",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getRingerMode",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setRingerMode",
-            args = {int.class}
-        )
-    })
     public void testAccessRingMode() throws Exception {
         mAudioManager.setRingerMode(RINGER_MODE_NORMAL);
         assertEquals(RINGER_MODE_NORMAL, mAudioManager.getRingerMode());
@@ -454,38 +285,6 @@ public class AudioManagerTest extends AndroidTestCase {
         assertEquals(RINGER_MODE_VIBRATE, mAudioManager.getRingerMode());
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setStreamVolume",
-            args = {int.class, int.class, int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getStreamMaxVolume",
-            args = {int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getStreamVolume",
-            args = {int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-             method = "adjustStreamVolume",
-            args = {int.class, int.class, int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "adjustSuggestedStreamVolume",
-            args = {int.class, int.class, int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "adjustVolume",
-            args = {int.class, int.class}
-        )
-    })
     public void testVolume() throws Exception {
         int[] streams = { AudioManager.STREAM_ALARM,
                           AudioManager.STREAM_MUSIC,

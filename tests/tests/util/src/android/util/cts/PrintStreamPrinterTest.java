@@ -26,11 +26,7 @@ import java.io.InputStreamReader;
 import java.io.PrintStream;
 import android.test.AndroidTestCase;
 import android.util.PrintStreamPrinter;
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
 
-@TestTargetClass(PrintStreamPrinter.class)
 public class PrintStreamPrinterTest extends AndroidTestCase {
     private File mFile;
     @Override
@@ -42,20 +38,10 @@ public class PrintStreamPrinterTest extends AndroidTestCase {
         }
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "PrintStreamPrinter",
-        args = {PrintStream.class}
-    )
     public void testConstructor() throws FileNotFoundException {
         new PrintStreamPrinter(new PrintStream(mFile));
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "println",
-        args = {String.class}
-    )
     public void testPrintln() throws FileNotFoundException, SecurityException, IOException {
         PrintStreamPrinter printStreamPrinter = null;
         final String message = "testMessageOfPrintStreamPrinter";

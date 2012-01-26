@@ -16,10 +16,6 @@
 
 package android.net.wifi.cts;
 
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -31,7 +27,6 @@ import android.net.wifi.WifiManager;
 import android.net.wifi.WifiManager.WifiLock;
 import android.test.AndroidTestCase;
 
-@TestTargetClass(WifiInfo.class)
 public class WifiInfoTest extends AndroidTestCase {
     private static class MySync {
         int expectedState = STATE_NULL;
@@ -103,63 +98,6 @@ public class WifiInfoTest extends AndroidTestCase {
         }
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.PARTIAL,
-            method = "getMacAddress",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.PARTIAL,
-            method = "getIpAddress",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.PARTIAL,
-            method = "getDetailedStateOf",
-            args = {android.net.wifi.SupplicantState.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.PARTIAL,
-            method = "getNetworkId",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.PARTIAL,
-            method = "getSSID",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.PARTIAL,
-            method = "getBSSID",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.PARTIAL,
-            method = "getSupplicantState",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.PARTIAL,
-            method = "getLinkSpeed",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "toString",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.PARTIAL,
-            method = "getRssi",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.PARTIAL,
-            method = "getHiddenSSID",
-            args = {}
-        )
-    })
     public void testWifiInfoProperties() throws Exception {
         // this test case should in Wifi environment
         WifiInfo wifiInfo = mWifiManager.getConnectionInfo();

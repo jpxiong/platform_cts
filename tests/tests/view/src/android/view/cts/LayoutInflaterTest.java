@@ -19,10 +19,6 @@ package android.view.cts;
 import com.android.cts.stub.R;
 import com.android.internal.util.XmlUtils;
 
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
 
 import org.xmlpull.v1.XmlPullParser;
 
@@ -45,7 +41,6 @@ import android.view.LayoutInflater.Factory;
 import android.view.LayoutInflater.Filter;
 import android.widget.LinearLayout;
 
-@TestTargetClass(LayoutInflater.class)
 public class LayoutInflaterTest extends AndroidTestCase {
 
     private LayoutInflater mLayoutInflater;
@@ -76,26 +71,6 @@ public class LayoutInflaterTest extends AndroidTestCase {
                 .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "",
-            method = "from",
-            args = {android.content.Context.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "",
-            method = "LayoutInflater",
-            args = {android.content.Context.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "",
-            method = "LayoutInflater",
-            args = {android.view.LayoutInflater.class, android.content.Context.class}
-        )
-    })
     public void testFrom() {
         mLayoutInflater = null;
         mLayoutInflater = LayoutInflater.from(mContext);
@@ -109,44 +84,6 @@ public class LayoutInflaterTest extends AndroidTestCase {
         assertNotNull(layoutInflater);
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "",
-            method = "setFilter",
-            args = {android.view.LayoutInflater.Filter.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "",
-            method = "getFilter",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "",
-            method = "setFactory",
-            args = {android.view.LayoutInflater.Factory.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "",
-            method = "getFactory",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "",
-            method = "getContext",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "",
-            method = "cloneInContext",
-            args = {android.content.Context.class}
-        )
-    })
     public void testAccessLayoutInflaterProperties() {
         mLayoutInflater.setFilter(mFilter);
         assertSame(mFilter, mLayoutInflater.getFilter());
@@ -193,12 +130,6 @@ public class LayoutInflaterTest extends AndroidTestCase {
         return attrs;
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "",
-        method = "createView",
-        args = {java.lang.String.class, java.lang.String.class, android.util.AttributeSet.class}
-    )
     public void testCreateView() {
 
         AttributeSet attrs = getAttrs();
@@ -275,20 +206,6 @@ public class LayoutInflaterTest extends AndroidTestCase {
         }
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "",
-            method = "inflate",
-            args = {int.class, android.view.ViewGroup.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "",
-            method = "onCreateView",
-            args = {java.lang.String.class, android.util.AttributeSet.class}
-        )
-    })
     public void testInflate() {
         View view = mLayoutInflater.inflate(
                 com.android.cts.stub.R.layout.inflater_layout, null);
@@ -313,20 +230,6 @@ public class LayoutInflaterTest extends AndroidTestCase {
         assertEquals(1, mLayout.getChildCount());
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "",
-            method = "inflate",
-            args = {int.class, android.view.ViewGroup.class, boolean.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "",
-            method = "onCreateView",
-            args = {java.lang.String.class, android.util.AttributeSet.class}
-        )
-    })
     public void testInflate2() {
         View view = mLayoutInflater.inflate(
                 R.layout.inflater_layout, null, false);
@@ -358,20 +261,6 @@ public class LayoutInflaterTest extends AndroidTestCase {
         assertEquals(1, mLayout.getChildCount());
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "",
-            method = "inflate",
-            args = {org.xmlpull.v1.XmlPullParser.class, android.view.ViewGroup.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "",
-            method = "onCreateView",
-            args = {java.lang.String.class, android.util.AttributeSet.class}
-        )
-    })
     public void testInflate3() {
         XmlResourceParser parser = getContext().getResources().getLayout(
                 R.layout.inflater_layout);
@@ -417,20 +306,6 @@ public class LayoutInflaterTest extends AndroidTestCase {
         assertEquals(3, mLayout.getChildCount());
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "",
-            method = "inflate",
-            args = {org.xmlpull.v1.XmlPullParser.class, android.view.ViewGroup.class, boolean.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "",
-            method = "onCreateView",
-            args = {java.lang.String.class, android.util.AttributeSet.class}
-        )
-    })
     public void testInflate4() {
        XmlResourceParser parser = getContext().getResources().getLayout(
                R.layout.inflater_layout);

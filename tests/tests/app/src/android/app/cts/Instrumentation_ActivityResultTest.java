@@ -21,31 +21,9 @@ import android.app.Instrumentation;
 import android.app.Instrumentation.ActivityResult;
 import android.content.Intent;
 import android.test.AndroidTestCase;
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
 
-@TestTargetClass(Instrumentation.ActivityResult.class)
 public class Instrumentation_ActivityResultTest extends AndroidTestCase {
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "Instrumentation.ActivityResult",
-            args = {int.class, Intent.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getResultCode",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getResultData",
-            args = {}
-        )
-    })
     public void testActivityResultOp() {
         Intent intent = new Intent();
         ActivityResult result = new ActivityResult(Activity.RESULT_OK, intent);

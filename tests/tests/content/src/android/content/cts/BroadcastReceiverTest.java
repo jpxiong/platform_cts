@@ -16,10 +16,6 @@
 
 package android.content.cts;
 
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
 
 import android.app.Service;
 import android.app.cts.MockActivity;
@@ -38,7 +34,6 @@ import android.test.ActivityInstrumentationTestCase2;
  * Test {@link BroadcastReceiver}.
  * TODO:  integrate the existing tests.
  */
-@TestTargetClass(BroadcastReceiver.class)
 public class BroadcastReceiverTest extends ActivityInstrumentationTestCase2<MockActivity> {
     private static final int RESULT_INITIAL_CODE = 1;
     private static final String RESULT_INITIAL_DATA = "initial data";
@@ -65,27 +60,10 @@ public class BroadcastReceiverTest extends ActivityInstrumentationTestCase2<Mock
         super.setUp();
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "BroadcastReceiver",
-        args = {}
-    )
     public void testConstructor() {
         new MockReceiverInternal();
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getDebugUnregister",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setDebugUnregister",
-            args = {boolean.class}
-        )
-    })
     public void testAccessDebugUnregister() {
         MockReceiverInternal mockReceiver = new MockReceiverInternal();
         assertFalse(mockReceiver.getDebugUnregister());
@@ -97,11 +75,6 @@ public class BroadcastReceiverTest extends ActivityInstrumentationTestCase2<Mock
         assertFalse(mockReceiver.getDebugUnregister());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "setOrderedHint",
-        args = {boolean.class}
-    )
     public void testSetOrderedHint() {
         MockReceiverInternal mockReceiver = new MockReceiverInternal();
 
@@ -156,18 +129,6 @@ public class BroadcastReceiverTest extends ActivityInstrumentationTestCase2<Mock
         }
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "onReceive",
-            args = {android.content.Context.class, android.content.Intent.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getResultCode",
-            args = {}
-        )
-    })
     public void testOnReceive () throws InterruptedException {
         final MockActivity activity = getActivity();
 
@@ -186,48 +147,6 @@ public class BroadcastReceiverTest extends ActivityInstrumentationTestCase2<Mock
         activity.unregisterReceiver(internalReceiver);
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getResultCode",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getResultData",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getResultExtras",
-            args = {boolean.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setResultCode",
-            args = {int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setResultData",
-            args = {java.lang.String.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setResultExtras",
-            args = {android.os.Bundle.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setResult",
-            args = {int.class, java.lang.String.class, android.os.Bundle.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "onReceive",
-            args = {android.content.Context.class, android.content.Intent.class}
-        )
-    })
     public void testOnReceiverOrdered() throws InterruptedException {
         MockReceiverInternalOrder internalOrderReceiver = new MockReceiverInternalOrder();
 
@@ -252,38 +171,6 @@ public class BroadcastReceiverTest extends ActivityInstrumentationTestCase2<Mock
         assertNull(resultExtras.getString(MockReceiver.RESULT_EXTRAS_REMOVE_KEY));
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "abortBroadcast",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setResult",
-            args = {int.class, java.lang.String.class, android.os.Bundle.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "onReceive",
-            args = {android.content.Context.class, android.content.Intent.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getResultCode",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getResultData",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getResultExtras",
-            args = {boolean.class}
-        )
-    })
     public void testAbortBroadcast() throws InterruptedException {
         MockReceiverInternalOrder internalOrderReceiver = new MockReceiverInternalOrder();
 
@@ -317,11 +204,6 @@ public class BroadcastReceiverTest extends ActivityInstrumentationTestCase2<Mock
                 resultExtras.getString(MockReceiverAbort.RESULT_EXTRAS_ABORT_KEY));
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "peekService",
-        args = {android.content.Context.class, android.content.Intent.class}
-    )
     public void testPeekService() throws InterruptedException {
         final MockActivity activity = getActivity();
 

@@ -16,32 +16,12 @@
 
 package android.location.cts;
 
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
-import dalvik.annotation.ToBeFixed;
 
 import android.location.Criteria;
 import android.os.Parcel;
 import android.test.AndroidTestCase;
 
-@TestTargetClass(Criteria.class)
 public class CriteriaTest extends AndroidTestCase {
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "Criteria",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "Criteria",
-            args = {android.location.Criteria.class}
-        )
-    })
-    @ToBeFixed(bug = "1695243", explanation = "Android API javadocs are incomplete, " +
-            "should add @throw NullPointerException into javadoc when the parameter is null.")
     public void testConstructor() {
         new Criteria();
 
@@ -68,30 +48,11 @@ public class CriteriaTest extends AndroidTestCase {
         }
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "describeContents",
-        args = {}
-    )
     public void testDescribeContents() {
         Criteria criteria = new Criteria();
         criteria.describeContents();
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setAccuracy",
-            args = {int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getAccuracy",
-            args = {}
-        )
-    })
-    @ToBeFixed(bug = "1728526", explanation = "setAccuracy did not throw " +
-            "IllegalArgumentException when argument is negative.")
     public void testAccessAccuracy() {
         Criteria criteria = new Criteria();
 
@@ -118,20 +79,6 @@ public class CriteriaTest extends AndroidTestCase {
         }
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setPowerRequirement",
-            args = {int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getPowerRequirement",
-            args = {}
-        )
-    })
-    @ToBeFixed(bug = "1695243", explanation = "should add @throws IllegalArgumentException " +
-            "clause into javadoc of setPowerRequirement() when input is valid.")
     public void testAccessPowerRequirement() {
         Criteria criteria = new Criteria();
 
@@ -156,18 +103,6 @@ public class CriteriaTest extends AndroidTestCase {
         }
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setAltitudeRequired",
-            args = {boolean.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "isAltitudeRequired",
-            args = {}
-        )
-    })
     public void testAccessAltitudeRequired() {
         Criteria criteria = new Criteria();
 
@@ -178,18 +113,6 @@ public class CriteriaTest extends AndroidTestCase {
         assertTrue(criteria.isAltitudeRequired());
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setBearingRequired",
-            args = {boolean.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "isBearingRequired",
-            args = {}
-        )
-    })
     public void testAccessBearingRequired() {
         Criteria criteria = new Criteria();
 
@@ -200,18 +123,6 @@ public class CriteriaTest extends AndroidTestCase {
         assertTrue(criteria.isBearingRequired());
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setCostAllowed",
-            args = {boolean.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "isCostAllowed",
-            args = {}
-        )
-    })
     public void testAccessCostAllowed() {
         Criteria criteria = new Criteria();
 
@@ -222,18 +133,6 @@ public class CriteriaTest extends AndroidTestCase {
         assertTrue(criteria.isCostAllowed());
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setSpeedRequired",
-            args = {boolean.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "isSpeedRequired",
-            args = {}
-        )
-    })
     public void testAccessSpeedRequired() {
         Criteria criteria = new Criteria();
 
@@ -244,12 +143,6 @@ public class CriteriaTest extends AndroidTestCase {
         assertTrue(criteria.isSpeedRequired());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "this function does not read parameter 'flag'.",
-        method = "writeToParcel",
-        args = {android.os.Parcel.class, int.class}
-    )
     public void testWriteToParcel() {
         Criteria criteria = new Criteria();
         criteria.setAltitudeRequired(true);

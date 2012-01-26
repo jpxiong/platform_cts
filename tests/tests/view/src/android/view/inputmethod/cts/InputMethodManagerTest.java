@@ -17,10 +17,6 @@ package android.view.inputmethod.cts;
 
 import com.android.cts.stub.R;
 
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
 
 import android.app.Instrumentation;
 import android.content.Context;
@@ -39,7 +35,6 @@ import android.widget.EditText;
 
 import java.util.List;
 
-@TestTargetClass(InputMethodManager.class)
 public class InputMethodManagerTest
                   extends ActivityInstrumentationTestCase2<InputMethodStubActivity> {
 
@@ -64,88 +59,6 @@ public class InputMethodManagerTest
         super.tearDown();
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.PARTIAL,
-            method = "hideSoftInputFromInputMethod",
-            args = {IBinder.class, int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.PARTIAL,
-            method = "hideSoftInputFromWindow",
-            args = {IBinder.class, int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.PARTIAL,
-            method = "hideSoftInputFromWindow",
-            args = {IBinder.class, int.class, ResultReceiver.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.PARTIAL,
-            method = "isAcceptingText",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.PARTIAL,
-            method = "isActive",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.PARTIAL,
-            method = "isActive",
-            args = {View.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "isFullscreenMode",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "isWatchingCursor",
-            args = {View.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.NOT_FEASIBLE,
-            method = "restartInput",
-            args = {View.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.SUFFICIENT,
-            method = "getEnabledInputMethodList",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.SUFFICIENT,
-            method = "getInputMethodList",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.SUFFICIENT,
-            method = "setInputMethod",
-            args = {IBinder.class, String.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.PARTIAL,
-            method = "showSoftInput",
-            args = {View.class, int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.PARTIAL,
-            method = "showSoftInput",
-            args = {View.class, int.class, ResultReceiver.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.PARTIAL,
-            method = "showSoftInputFromInputMethod",
-            args = {IBinder.class, int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.PARTIAL,
-            method = "toggleSoftInputFromWindow",
-            args = {IBinder.class, int.class, int.class}
-        )
-    })
     @UiThreadTest
     public void testInputMethodManager() {
         Window window = mActivity.getWindow();

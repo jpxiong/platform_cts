@@ -26,12 +26,7 @@ import android.text.Layout;
 import android.text.TextPaint;
 import android.text.TextUtils;
 import android.text.Layout.Alignment;
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
 
-@TestTargetClass(BoringLayout.class)
 public class BoringLayoutTest extends AndroidTestCase {
     private static final float SPACING_MULT_NO_SCALE = 1.0f;
     private static final float SPACING_ADD_NO_SCALE = 0.0f;
@@ -62,23 +57,6 @@ public class BoringLayoutTest extends AndroidTestCase {
         mBoringLayout = makeDefaultBoringLayout();
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "BoringLayout",
-            args = {java.lang.CharSequence.class, android.text.TextPaint.class, int.class,
-                    android.text.Layout.Alignment.class, float.class, float.class,
-                    android.text.BoringLayout.Metrics.class, boolean.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "BoringLayout",
-            args = {java.lang.CharSequence.class, android.text.TextPaint.class, int.class,
-                    android.text.Layout.Alignment.class, float.class, float.class,
-                    android.text.BoringLayout.Metrics.class, boolean.class,
-                    android.text.TextUtils.TruncateAt.class, int.class}
-        )
-    })
     public void testConstructors() {
         new BoringLayout(DEFAULT_CHAR_SEQUENCE,
                 DEFAULT_PAINT,
@@ -101,30 +79,6 @@ public class BoringLayoutTest extends AndroidTestCase {
                 DEFAULT_OUTER_WIDTH);
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test the scalibility of BoringLayout."
-                  + " 1. No scale."
-                  + " 2. Enlarge to 2/1.5 times of the font size."
-                  + " 3. Reduce to 0.5 times of the font size."
-                  + " 4. Add 1.5/1.4/3.0 to the original font."
-                  + " 5. Minus 1.6/1.4/3.0 from the original font.",
-            method = "getHeight",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test the scalibility of BoringLayout."
-                  + " 1. No scale."
-                  + " 2. Enlarge to 2/1.5 times of the font size."
-                  + " 3. Reduce to 0.5 times of the font size."
-                  + " 4. Add 1.5/1.4/3.0 to the original font."
-                  + " 5. Minus 1.6/1.4/3.0 from the original font.",
-            method = "getLineDirections",
-            args = {int.class}
-        )
-    })
     public void testScale() {
         final int metricsBottomToTop = METRICS_BOTTOM - METRICS_TOP;
 
@@ -190,73 +144,6 @@ public class BoringLayoutTest extends AndroidTestCase {
         assertEquals(boringLayout.getHeight() + METRICS_TOP, boringLayout.getLineDescent(0));
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test the precondition of a BoringLayout according to the definition."
-                  + " The preconditions include:"
-                  + " 1. One line text layout."
-                  + " 2. Left to right text direction."
-                  + " 3. Won't be ellipsis. Use default parameters to construct the BoringLayout."
-                  + " Test getLineCount, and followed methods are in same condition",
-            method = "getLineCount",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test getLineTop",
-            method = "getLineTop",
-            args = {int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test getHeight",
-            method = "getHeight",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test getLineStart",
-            method = "getLineStart",
-            args = {int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test getParagraphDirection",
-            method = "getParagraphDirection",
-            args = {int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test getLineContainsTab",
-            method = "getLineContainsTab",
-            args = {int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test getEllipsisCount",
-            method = "getEllipsisCount",
-            args = {int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test getEllipsisStart",
-            method = "getEllipsisStart",
-            args = {int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test getLineMax",
-            method = "getLineMax",
-            args = {int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test ellipsized",
-            method = "ellipsized",
-            args = {int.class, int.class}
-        )
-    })
     public void testPreconditions() {
         assertEquals(1, mBoringLayout.getLineCount());
         assertEquals(0, mBoringLayout.getLineTop(0));
@@ -276,38 +163,6 @@ public class BoringLayoutTest extends AndroidTestCase {
         assertEquals(1, mBoringLayout.getEllipsisStart(0));
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test the static maker method of BoringLayout. This method will return a"
-                  + " suitable instance of BoringLayout according  to the specific parameters."
-                  + " 1. Alignment is {@link android.text.Layout.Alignment#ALIGN_CENTER} and the"
-                  + " source string is a {@link android.text.Spanned}."
-                  + " 2. Alignment is {@link android.text.Layout.Alignment#ALIGN_NORMAL} and the"
-                  + " source string is not a {@link android.text.Spanned}also test"
-                  + " getEllipsizedWidth. Test replaceOrMake, and followed methods are in same"
-                  + " condition",
-            method = "replaceOrMake",
-            args = {java.lang.CharSequence.class, android.text.TextPaint.class, int.class,
-                    android.text.Layout.Alignment.class, float.class, float.class,
-                    android.text.BoringLayout.Metrics.class, boolean.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test replaceOrMake",
-            method = "replaceOrMake",
-            args = {java.lang.CharSequence.class, android.text.TextPaint.class, int.class,
-                    android.text.Layout.Alignment.class, float.class, float.class,
-                    android.text.BoringLayout.Metrics.class, boolean.class,
-                    android.text.TextUtils.TruncateAt.class, int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test getEllipsizedWidth",
-            method = "getEllipsizedWidth",
-            args = {}
-        )
-    })
     public void testReplaceOrMake() {
         String source = "This is a SpannableString.";
         BoringLayout layout_1 = mBoringLayout.replaceOrMake(
@@ -337,24 +192,6 @@ public class BoringLayoutTest extends AndroidTestCase {
     }
 
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test the alignment of BoringLayout."
-                  + " 1. {@link android.text.Layout.Alignment#ALIGN_NORMAL}."
-                  + " 2. {@link android.text.Layout.Alignment#ALIGN_CENTER}."
-                  + " 3. {@link android.text.Layout.Alignment#ALIGN_OPPOSITE}."
-                  + " Also the getLineLeft and getLineRight method",
-            method = "getLineLeft",
-            args = {int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test getLineRight",
-            method = "getLineRight",
-            args = {int.class}
-        )
-    })
     public void testAlignment() {
         BoringLayout boringLayout = makeBoringLayoutAlign(Layout.Alignment.ALIGN_NORMAL);
         assertEquals(0.0f, boringLayout.getLineLeft(0));
@@ -372,27 +209,6 @@ public class BoringLayoutTest extends AndroidTestCase {
         assertEquals((float) DEFAULT_OUTER_WIDTH, boringLayout.getLineRight(0));
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test whether include the padding to calculate the layout."
-                  + " 1. Include padding while calculate the layout."
-                  + " 2. Don't include padding while calculate the layout."
-                  + " Also test other related methods",
-            method = "getTopPadding",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getBottomPadding",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getLineDescent",
-            args = {int.class}
-        )
-    })
     public void testIncludePadding() {
         assertEquals(METRICS_TOP - METRICS_ASCENT, mBoringLayout.getTopPadding());
         assertEquals(METRICS_BOTTOM - METRICS_DESCENT, mBoringLayout.getBottomPadding());
@@ -415,25 +231,6 @@ public class BoringLayoutTest extends AndroidTestCase {
         assertEquals(boringLayout.getHeight() + METRICS_ASCENT, boringLayout.getLineDescent(0));
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test the static method which is to verify whether the given source string is"
-                  + " suitable for BoringLayout or not."
-                  + " 1. A normal simple string."
-                  + " 2. Exceptional strings, including:"
-                  + "   2.1 Hebrew characters, which are read from right to left."
-                  + "   2.2 Strings with whitespaces in it.",
-            method = "isBoring",
-            args = {java.lang.CharSequence.class, android.text.TextPaint.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "isBoring",
-            args = {java.lang.CharSequence.class, android.text.TextPaint.class,
-                    android.text.BoringLayout.Metrics.class}
-        )
-    })
     public void testIsBoringString() {
         TextPaint paint = new TextPaint();
         assertNotNull(BoringLayout.isBoring("hello android", paint));
@@ -450,33 +247,11 @@ public class BoringLayoutTest extends AndroidTestCase {
         assertNull(BoringLayout.isBoring("hello android\n\n\n", paint));
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "getLineDirections",
-        args = {int.class}
-    )
     public void testGetLineDirections() {
         assertNotNull(mBoringLayout.getLineDirections(0));
         assertNotNull(mBoringLayout.getLineDirections(2));
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "make",
-            args = {java.lang.CharSequence.class, android.text.TextPaint.class, int.class,
-                    android.text.Layout.Alignment.class, float.class, float.class,
-                    android.text.BoringLayout.Metrics.class, boolean.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "make",
-            args = {java.lang.CharSequence.class, android.text.TextPaint.class, int.class,
-                    android.text.Layout.Alignment.class, float.class, float.class,
-                    android.text.BoringLayout.Metrics.class, boolean.class,
-                    android.text.TextUtils.TruncateAt.class, int.class}
-        )
-    })
     public void testMake() {
         BoringLayout boringLayout = BoringLayout.make(DEFAULT_CHAR_SEQUENCE,
                 DEFAULT_PAINT,
@@ -502,12 +277,6 @@ public class BoringLayoutTest extends AndroidTestCase {
         assertNotNull(boringLayout);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "draw",
-        args = {android.graphics.Canvas.class, android.graphics.Path.class,
-                android.graphics.Paint.class, int.class}
-    )
     public void testDraw() {
         BoringLayout boringLayout = BoringLayout.make((String)DEFAULT_CHAR_SEQUENCE,
                 DEFAULT_PAINT,

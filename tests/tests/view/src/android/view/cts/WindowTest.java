@@ -18,11 +18,6 @@ package android.view.cts;
 
 import com.android.cts.stub.R;
 
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
-import dalvik.annotation.ToBeFixed;
 
 import android.app.Instrumentation;
 import android.content.Context;
@@ -53,7 +48,6 @@ import android.view.WindowManager;
 import android.view.accessibility.AccessibilityEvent;
 import android.widget.TextView;
 
-@TestTargetClass(Window.class)
 public class WindowTest extends ActivityInstrumentationTestCase2<WindowStubActivity> {
     private Window mWindow;
     private Context mContext;
@@ -84,18 +78,6 @@ public class WindowTest extends ActivityInstrumentationTestCase2<WindowStubActiv
         super.tearDown();
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "Window",
-            args = {android.content.Context.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getContext",
-            args = {}
-        )
-    })
     public void testConstructor() throws Exception {
         mWindow = new MockWindow(mContext);
         assertSame(mContext, mWindow.getContext());
@@ -109,23 +91,6 @@ public class WindowTest extends ActivityInstrumentationTestCase2<WindowStubActiv
      *              _2. test invocation of Window.Callback#onWindowAttributesChanged.
      * 3. clearFlags: clear the flag bits as specified in flags.
      */
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "addFlags",
-            args = {int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "clearFlags",
-            args = {int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setFlags",
-            args = {int.class, int.class}
-        )
-    })
    public void testOpFlags() throws Exception {
         mWindow = new MockWindow(mContext);
         final WindowManager.LayoutParams attrs = mWindow.getAttributes();
@@ -157,11 +122,6 @@ public class WindowTest extends ActivityInstrumentationTestCase2<WindowStubActiv
         mWindow.clearFlags(WindowManager.LayoutParams.FLAG_DITHER);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "findViewById",
-        args = {int.class}
-    )
     public void testFindViewById() throws Exception {
         TextView v = (TextView) mWindow.findViewById(R.id.listview_window);
         assertNotNull(v);
@@ -179,28 +139,6 @@ public class WindowTest extends ActivityInstrumentationTestCase2<WindowStubActiv
      *    there is just one method, onWindowAttributesChanged, used.
      * getCallback: Return the current Callback interface for this window.
      */
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getAttributes",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setCallback",
-            args = {android.view.Window.Callback.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getCallback",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setAttributes",
-            args = {android.view.WindowManager.LayoutParams.class}
-        )
-    })
     public void testAccessAttributes() throws Exception {
         mWindow = new MockWindow(mContext);
 
@@ -235,23 +173,6 @@ public class WindowTest extends ActivityInstrumentationTestCase2<WindowStubActiv
      * container is false;
      * Otherwise, it will display itself meanwhile container's mHasChildren is true.
      */
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getContainer",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setContainer",
-            args = {android.view.Window.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "hasChildren",
-            args = {}
-        )
-    })
     public void testAccessContainer() throws Exception {
         mWindow = new MockWindow(mContext);
         assertNull(mWindow.getContainer());
@@ -270,18 +191,6 @@ public class WindowTest extends ActivityInstrumentationTestCase2<WindowStubActiv
      * getLayoutInflater: Quick access to the {@link LayoutInflater} instance that this Window
      *    retrieved from its Context.
      */
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "addContentView",
-            args = {android.view.View.class, android.view.ViewGroup.LayoutParams.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getLayoutInflater",
-            args = {}
-        )
-    })
     public void testAddContentView() throws Throwable {
         final ViewGroup.LayoutParams lp = new ViewGroup.LayoutParams(VIEWGROUP_LAYOUT_WIDTH,
                 VIEWGROUP_LAYOUT_HEIGHT);
@@ -305,11 +214,6 @@ public class WindowTest extends ActivityInstrumentationTestCase2<WindowStubActiv
         mInstrumentation.waitForIdleSync();
     }
 
-    @TestTargetNew(
-        level = TestLevel.NOT_NECESSARY,
-        method = "closeAllPanels",
-        args = {}
-    )
     public void testCloseAllPanels() throws Throwable {
     }
 
@@ -320,11 +224,6 @@ public class WindowTest extends ActivityInstrumentationTestCase2<WindowStubActiv
      * 1. Set focus view to null, get current focus, it should be null
      * 2. Set listview_window as focus view, get it and compare.
      */
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "getCurrentFocus",
-        args = {}
-    )
     public void testGetCurrentFocus() throws Throwable {
         runTestOnUiThread(new Runnable() {
             public void run() {
@@ -351,18 +250,6 @@ public class WindowTest extends ActivityInstrumentationTestCase2<WindowStubActiv
      *    ontext is same as Window's context.
      * 2. Return null if decor view is not created, else the same with detDecorView.
      */
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getDecorView",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "peekDecorView",
-            args = {}
-        )
-    })
     public void testDecorView() throws Exception {
         mInstrumentation.waitForIdleSync();
         View decor = mWindow.getDecorView();
@@ -391,18 +278,6 @@ public class WindowTest extends ActivityInstrumentationTestCase2<WindowStubActiv
      * getVolumeControlStream: Gets the suggested audio stream whose volume should be changed by
      *    the harwdare volume controls.
      */
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getVolumeControlStream",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setVolumeControlStream",
-            args = {int.class}
-        )
-    })
     public void testAccessVolumeControlStream() throws Exception {
         // Default value is AudioManager.USE_DEFAULT_STREAM_TYPE, see javadoc of
         // {@link Activity#setVolumeControlStream}.
@@ -416,19 +291,6 @@ public class WindowTest extends ActivityInstrumentationTestCase2<WindowStubActiv
      * getWindowManager: Return the window manager allowing this Window to display its own
      *    windows.
      */
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.NOT_FEASIBLE,
-            method = "getWindowManager",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.NOT_FEASIBLE,
-            method = "setWindowManager",
-            args = {android.view.WindowManager.class, android.os.IBinder.class,
-                    java.lang.String.class}
-        )
-    })
     public void testAccessWindowManager() throws Exception {
         mWindow = new MockWindow(getActivity());
         WindowManager expected = (WindowManager) getActivity().getSystemService(
@@ -444,13 +306,6 @@ public class WindowTest extends ActivityInstrumentationTestCase2<WindowStubActiv
      * Return the {@link android.R.styleable#Window} attributes from this
      * window's theme. It's invisible.
      */
-    @TestTargetNew(
-        level = TestLevel.NOT_FEASIBLE,
-        notes = "the windowStyle is obtained from com.android.internal.R.styleable.Window whose"
-              + " details are invisible for user",
-        method = "getWindowStyle",
-        args = {}
-    )
     public void testGetWindowStyle() throws Exception {
         mWindow = new MockWindow(mContext);
         final TypedArray windowStyle = mWindow.getWindowStyle();
@@ -460,23 +315,6 @@ public class WindowTest extends ActivityInstrumentationTestCase2<WindowStubActiv
         assertNotNull(windowStyle);
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "isActive",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "makeActive",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "onActive",
-            args = {}
-        )
-    })
     public void testIsActive() throws Exception {
         MockWindow window = new MockWindow(mContext);
         assertFalse(window.isActive());
@@ -490,51 +328,14 @@ public class WindowTest extends ActivityInstrumentationTestCase2<WindowStubActiv
      * isFloating: Return whether this window is being displayed with a floating style
      * (based on the {@link android.R.attr#windowIsFloating} attribute in the style/theme).
      */
-    @TestTargetNew(
-        level = TestLevel.PARTIAL,
-        notes = "Now can only get the unfloating status",
-        method = "isFloating",
-        args = {}
-    )
     public void testIsFloating() throws Exception {
         // Default system theme defined by themes.xml, the windowIsFloating is set false.
         assertFalse(mWindow.isFloating());
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.NOT_NECESSARY,
-            method = "performContextMenuIdentifierAction",
-            args = {int.class, int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.NOT_NECESSARY,
-            method = "performPanelIdentifierAction",
-            args = {int.class, int.class, int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.NOT_NECESSARY,
-            method = "performPanelShortcut",
-            args = {int.class, int.class, android.view.KeyEvent.class, int.class}
-        )
-    })
-    @ToBeFixed(bug = "1695243", explanation = "miss javadoc, hard to get known about its"
-        + " functionality")
     public void testPerformMethods() throws Exception {
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.NOT_NECESSARY,
-             method = "restoreHierarchyState",
-            args = {android.os.Bundle.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.NOT_NECESSARY,
-            method = "saveHierarchyState",
-            args = {}
-        )
-    })
     public void testKeepHierarchyState() throws Exception {
     }
 
@@ -544,18 +345,6 @@ public class WindowTest extends ActivityInstrumentationTestCase2<WindowStubActiv
      *  attribute of PixelFormat to check if the window is opaque). To make the window
      * transparent, you can use an empty drawable(eg. ColorDrawable with the color 0).
      */
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setBackgroundDrawable",
-            args = {android.graphics.drawable.Drawable.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setBackgroundDrawableResource",
-            args = {int.class}
-        )
-    })
     public void testSetBackgroundDrawable() throws Throwable {
         // DecorView holds the background
         View decor = mWindow.getDecorView();
@@ -592,20 +381,6 @@ public class WindowTest extends ActivityInstrumentationTestCase2<WindowStubActiv
         assertNull(decor.getBackground());
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.NOT_NECESSARY,
-            method = "setChildDrawable",
-            args = {int.class, android.graphics.drawable.Drawable.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.NOT_NECESSARY,
-            method = "setChildInt",
-            args = {int.class, int.class}
-        )
-    })
-    @ToBeFixed(bug = "1695243", explanation = "miss javadoc, hard to get known about its"
-        + " functionality")
     public void testSetChild() throws Exception {
     }
 
@@ -622,23 +397,6 @@ public class WindowTest extends ActivityInstrumentationTestCase2<WindowStubActiv
      *   1. can't get the features requested because the getter is protected final.
      *   2. certain window flags are not clear to concrete one.
      */
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.NOT_NECESSARY,
-            method = "setContentView",
-            args = {int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.PARTIAL,
-            method = "setContentView",
-            args = {android.view.View.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.PARTIAL,
-            method = "setContentView",
-            args = {android.view.View.class, android.view.ViewGroup.LayoutParams.class}
-        )
-    })
     public void testSetContentView() throws Throwable {
         final ViewGroup.LayoutParams lp = new ViewGroup.LayoutParams(VIEWGROUP_LAYOUT_WIDTH,
                 VIEWGROUP_LAYOUT_HEIGHT);
@@ -687,48 +445,9 @@ public class WindowTest extends ActivityInstrumentationTestCase2<WindowStubActiv
      *
      * the set views exist, and no getter way to check.
      */
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.NOT_NECESSARY,
-            method = "setFeatureDrawable",
-            args = {int.class, android.graphics.drawable.Drawable.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.NOT_NECESSARY,
-            method = "setFeatureDrawableAlpha",
-            args = {int.class, int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.NOT_NECESSARY,
-            method = "setFeatureDrawableResource",
-            args = {int.class, int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.NOT_NECESSARY,
-            method = "setFeatureDrawableUri",
-            args = {int.class, android.net.Uri.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.NOT_NECESSARY,
-            method = "setFeatureInt",
-            args = {int.class, int.class}
-        )
-    })
     public void testSetFeature() throws Throwable {
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.NOT_NECESSARY,
-            method = "setTitle",
-            args = {java.lang.CharSequence.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.NOT_NECESSARY,
-            method = "setTitleColor",
-            args = {int.class}
-        )
-    })
     public void testSetTitle() throws Throwable {
         final String title = "Android Window Test";
         runTestOnUiThread(new Runnable() {
@@ -746,25 +465,6 @@ public class WindowTest extends ActivityInstrumentationTestCase2<WindowStubActiv
      * further down the view hierarchy. Application developers should not need to implement or
      * call this.
      */
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.NOT_NECESSARY,
-            method = "superDispatchTouchEvent",
-            args = {android.view.MotionEvent.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.NOT_NECESSARY,
-            method = "superDispatchTrackballEvent",
-            args = {android.view.MotionEvent.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.NOT_NECESSARY,
-            method = "superDispatchKeyEvent",
-            args = {android.view.KeyEvent.class}
-        )
-    })
-    @ToBeFixed(bug = "1719667", explanation = "In javadoc, it is not recommended for developer"
-        + " to call these methods, they are used by custom windows.")
     public void testSuperDispatchEvent() throws Exception {
     }
 
@@ -772,14 +472,6 @@ public class WindowTest extends ActivityInstrumentationTestCase2<WindowStubActiv
      * takeKeyEvents: Request that key events come to this activity. Use this if your activity
      * has no views with focus, but the activity still wants a chance to process key events.
      */
-    @TestTargetNew(
-        level = TestLevel.PARTIAL,
-        method = "takeKeyEvents",
-        args = {boolean.class}
-    )
-    @ToBeFixed(bug = "1728604", explanation = "Clear all focused view, use takeKeyEvents(false)"
-        + " It's expected that the activity can't process key events, But when we send a key,"
-        + " Acitivity#onKeyDown is still called by system.")
     public void testTakeKeyEvents() throws Throwable {
         runTestOnUiThread(new Runnable() {
             public void run() {
@@ -797,27 +489,12 @@ public class WindowTest extends ActivityInstrumentationTestCase2<WindowStubActiv
     /**
      * onConfigurationChanged: Should be called when the configuration is changed.
      */
-    @TestTargetNew(
-        level = TestLevel.NOT_FEASIBLE,
-        notes = "Test onConfigurationChanged, because the Window#onConfigurationChanged is"
-              + " abstract and we can't let system call our own MockWindow#onConfigurationChanged"
-              + " and can't check if the system call this callback method",
-        method = "onConfigurationChanged",
-        args = {android.content.res.Configuration.class}
-    )
     public void testOnConfigurationChanged() throws Exception {
     }
 
     /**
      * requestFeature: Enable extended screen features.
      */
-    @TestTargetNew(
-        level = TestLevel.NOT_FEASIBLE,
-        notes = "Because getFeatures is final protected, we can't get the request Features and"
-              + " no way to check the request result.",
-        method = "requestFeature",
-        args = {int.class}
-    )
     public void testRequestFeature() throws Exception {
     }
 
@@ -830,18 +507,6 @@ public class WindowTest extends ActivityInstrumentationTestCase2<WindowStubActiv
      *                          PixelFormat.UNKNOWN to allow the Window to select
      *                          the format.
      */
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setDefaultWindowFormat",
-            args = {int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setFormat",
-            args = {int.class}
-        )
-    })
     public void testSetDefaultWindowFormat() throws Exception {
         MockWindowCallback callback;
         MockWindow window = new MockWindow(mContext);
@@ -870,12 +535,6 @@ public class WindowTest extends ActivityInstrumentationTestCase2<WindowStubActiv
     /**
      * Set the gravity of the window
      */
-    @TestTargetNew(
-        level = TestLevel.PARTIAL,
-        notes = "Lack of getter to obtain the gravity of window manager positioned in window",
-        method = "setGravity",
-        args = {int.class}
-    )
     public void testSetGravity() throws Exception {
         mWindow = new MockWindow(mContext);
         WindowManager.LayoutParams attrs = mWindow.getAttributes();
@@ -895,11 +554,6 @@ public class WindowTest extends ActivityInstrumentationTestCase2<WindowStubActiv
      *    1.The default for both of these is MATCH_PARENT;
      *    2.You can change them to WRAP_CONTENT to make a window that is not full-screen.
      */
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "setLayout",
-        args = {int.class, int.class}
-    )
     public void testSetLayout() throws Exception {
         mWindow = new MockWindow(mContext);
         WindowManager.LayoutParams attrs = mWindow.getAttributes();
@@ -920,11 +574,6 @@ public class WindowTest extends ActivityInstrumentationTestCase2<WindowStubActiv
     /**
      * Set the type of the window, as per the WindowManager.LayoutParams types.
      */
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "setType",
-        args = {int.class}
-    )
     public void testSetType() throws Exception {
         mWindow = new MockWindow(mContext);
         WindowManager.LayoutParams attrs = mWindow.getAttributes();
@@ -945,11 +594,6 @@ public class WindowTest extends ActivityInstrumentationTestCase2<WindowStubActiv
      *    1.Providing "unspecified" here will NOT override the input mode the window.
      *    2.Providing "unspecified" here will override the input mode the window.
      */
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "setSoftInputMode",
-        args = {int.class}
-    )
     public void testSetSoftInputMode() throws Exception {
         mWindow = new MockWindow(mContext);
         assertEquals(WindowManager.LayoutParams.SOFT_INPUT_STATE_UNSPECIFIED,
@@ -969,11 +613,6 @@ public class WindowTest extends ActivityInstrumentationTestCase2<WindowStubActiv
      *    it because the getter is in WindowManagerService and is private)
      *    2.Providing 0 here will override the animations the window.
      */
-    @TestTargetNew(
-        level = TestLevel.PARTIAL,
-        method = "setWindowAnimations",
-        args = {int.class}
-    )
     public void testSetWindowAnimations() throws Exception {
         mWindow = new MockWindow(mContext);
 
@@ -986,32 +625,6 @@ public class WindowTest extends ActivityInstrumentationTestCase2<WindowStubActiv
         assertTrue(callback.isOnWindowAttributesChangedCalled());
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.NOT_FEASIBLE,
-            notes = "Test getFeatures, protected final method, can't call it",
-            method = "getFeatures",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.NOT_FEASIBLE,
-            notes = "Test getLocalFeatures, protected final method, can't call it",
-            method = "getLocalFeatures",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.NOT_FEASIBLE,
-            notes = "Test getForcedWindowFlags, protected final method, can't call it",
-            method = "getForcedWindowFlags",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.NOT_FEASIBLE,
-            notes = "Test hasSoftInputMode, protected final method, can't call it",
-            method = "hasSoftInputMode",
-            args = {}
-        )
-    })
     public void testFinalMethod() throws Exception {
         // No way to test protected final method
     }

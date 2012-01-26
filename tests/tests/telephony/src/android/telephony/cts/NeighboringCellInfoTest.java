@@ -21,82 +21,15 @@ import static android.telephony.TelephonyManager.NETWORK_TYPE_EDGE;
 import static android.telephony.TelephonyManager.NETWORK_TYPE_GPRS;
 import static android.telephony.TelephonyManager.NETWORK_TYPE_UMTS;
 
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
 
 import android.os.Parcel;
 import android.telephony.NeighboringCellInfo;
 import android.test.AndroidTestCase;
 
-@TestTargetClass(NeighboringCellInfo.class)
 public class NeighboringCellInfoTest extends AndroidTestCase{
     private static final int RSSI = 20;
     private static final int CID = 0xffff;
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "NeighboringCellInfo",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "NeighboringCellInfo",
-            args = {int.class, int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "NeighboringCellInfo",
-            args = {Parcel.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getRssi",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getLac",
-            args = {}
-        ),
-        @TestTargetNew(
-                level = TestLevel.COMPLETE,
-                method = "getCid",
-                args = {}
-        ),
-        @TestTargetNew(
-                level = TestLevel.COMPLETE,
-                method = "getPsc",
-                args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setRssi",
-            args = {int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setCid",
-            args = {int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "describeContents",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "toString",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "writeToParcel",
-            args = {Parcel.class, int.class}
-        )
-    })
     public void testNeighboringCellInfo() {
         int rssi = 31;
         String location = "ffffffff";

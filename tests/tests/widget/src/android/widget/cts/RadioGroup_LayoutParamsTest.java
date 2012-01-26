@@ -18,11 +18,6 @@ package android.widget.cts;
 
 import com.android.internal.R;
 
-import dalvik.annotation.TestTargets;
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.ToBeFixed;
 
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
@@ -43,7 +38,6 @@ import java.io.IOException;
 /**
  * Test {@link LayoutParams}.
  */
-@TestTargetClass(LayoutParams.class)
 public class RadioGroup_LayoutParamsTest extends AndroidTestCase {
     private LayoutParams mLayoutParams;
 
@@ -53,45 +47,6 @@ public class RadioGroup_LayoutParamsTest extends AndroidTestCase {
         mLayoutParams = null;
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test constructors",
-            method = "RadioGroup.LayoutParams",
-            args = {android.content.Context.class, android.util.AttributeSet.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test constructors",
-            method = "RadioGroup.LayoutParams",
-            args = {int.class, int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test constructors",
-            method = "RadioGroup.LayoutParams",
-            args = {int.class, int.class, float.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test constructors",
-            method = "RadioGroup.LayoutParams",
-            args = {android.view.ViewGroup.LayoutParams.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test constructors",
-            method = "RadioGroup.LayoutParams",
-            args = {android.view.ViewGroup.MarginLayoutParams.class}
-        )
-    })
-    @ToBeFixed(bug = "1417734", explanation = "should add @throws clause into javadoc of "
-            + "RadioGroup.LayoutParams#RadioGroup.LayoutParams(ViewGroup.LayoutParams) "
-            + "when ViewGroup.LayoutParams is null "
-            + "and RadioGroup.LayoutParams#RadioGroup.LayoutParams(MarginLayoutParams) "
-            + "when param MarginLayoutParams is null "
-            + "and RadioGroup.LayoutParams#RadioGroup.LayoutParams(Context, AttributeSet) "
-            + "when param Context is null")
     public void testConstructor() {
         mLayoutParams = new RadioGroup.LayoutParams(Integer.MIN_VALUE, Integer.MAX_VALUE);
         assertEquals(Integer.MIN_VALUE, mLayoutParams.width);
@@ -182,11 +137,6 @@ public class RadioGroup_LayoutParamsTest extends AndroidTestCase {
         }
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "setBaseAttributes",
-        args = {android.content.res.TypedArray.class, int.class, int.class}
-    )
     public void testSetBaseAttributes() {
         MockLayoutParams layoutParams = new MockLayoutParams(getContext(), null);
         // default values

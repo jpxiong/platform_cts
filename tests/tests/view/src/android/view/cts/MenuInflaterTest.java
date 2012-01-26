@@ -19,11 +19,6 @@ package android.view.cts;
 import com.android.cts.stub.R;
 import com.android.internal.view.menu.MenuBuilder;
 
-import dalvik.annotation.TestTargets;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.ToBeFixed;
 
 import android.app.Activity;
 import android.content.Context;
@@ -40,7 +35,6 @@ import android.widget.cts.WidgetTestUtils;
 /**
  * Test {@link MenuInflater}.
  */
-@TestTargetClass(MenuInflater.class)
 public class MenuInflaterTest extends ActivityInstrumentationTestCase2<MenuInflaterStubActivity> {
     private MenuInflater mMenuInflater;
 
@@ -57,24 +51,10 @@ public class MenuInflaterTest extends ActivityInstrumentationTestCase2<MenuInfla
         mMenuInflater = mActivity.getMenuInflater();
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test constructor.",
-        method = "MenuInflater",
-        args = {android.content.Context.class}
-    )
     public void testConstructor() {
         new MenuInflater(mActivity);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test {@link MenuInflater#inflate(int, Menu)}",
-        method = "inflate",
-        args = {int.class, android.view.Menu.class}
-    )
-    @ToBeFixed(bug = "1417734", explanation = "should add @throws clause into javadoc of "
-            + "MenuInflater#inflate(int, Menu) when param menu is null")
     public void testInflate() {
         Menu menu = new MenuBuilder(mActivity);
         assertEquals(0, menu.size());
@@ -96,11 +76,6 @@ public class MenuInflaterTest extends ActivityInstrumentationTestCase2<MenuInfla
         }
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "inflate",
-        args = {int.class, android.view.Menu.class}
-    )
     // Check wheher the objects are created correctly from xml files
     public void testInflateFromXml(){
         // the visibility and shortcut

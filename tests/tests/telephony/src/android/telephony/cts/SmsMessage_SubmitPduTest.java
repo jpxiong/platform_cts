@@ -18,21 +18,9 @@ package android.telephony.cts;
 
 import android.telephony.SmsMessage;
 import android.test.AndroidTestCase;
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
 
-@TestTargetClass(SmsMessage.SubmitPdu.class)
 public class SmsMessage_SubmitPduTest extends AndroidTestCase {
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.NOT_NECESSARY,
-            method = "toString",
-            args = {}
-        )
-    })
     // SmsMessage.SubmitPdu constructor is not public, so no need to test its methods
     public void testToString() {
     }

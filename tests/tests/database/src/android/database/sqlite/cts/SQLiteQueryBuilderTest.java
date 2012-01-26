@@ -16,10 +16,6 @@
 
 package android.database.sqlite.cts;
 
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
 
 import android.content.Context;
 import android.database.Cursor;
@@ -33,7 +29,6 @@ import android.test.AndroidTestCase;
 import java.util.HashMap;
 import java.util.Map;
 
-@TestTargetClass(android.database.sqlite.SQLiteQueryBuilder.class)
 public class SQLiteQueryBuilderTest extends AndroidTestCase {
     private SQLiteDatabase mDatabase;
     private final String TEST_TABLE_NAME = "test";
@@ -56,42 +51,10 @@ public class SQLiteQueryBuilderTest extends AndroidTestCase {
         super.tearDown();
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "SQLiteQueryBuilder",
-        args = {}
-    )
     public void testConstructor() {
         new SQLiteQueryBuilder();
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setDistinct",
-            args = {boolean.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setTables",
-            args = {java.lang.String.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getTables",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "appendWhere",
-            args = {java.lang.CharSequence.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "appendWhereEscapeString",
-            args = {java.lang.String.class}
-        )
-    })
     public void testSetDistinct() {
         String expected;
         SQLiteQueryBuilder sqliteQueryBuilder = new SQLiteQueryBuilder();
@@ -126,11 +89,6 @@ public class SQLiteQueryBuilderTest extends AndroidTestCase {
         assertEquals(expected, sql);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "setProjectionMap",
-        args = {java.util.Map.class}
-    )
     public void testSetProjectionMap() {
         String expected;
         Map<String, String> projectMap = new HashMap<String, String>();
@@ -159,11 +117,6 @@ public class SQLiteQueryBuilderTest extends AndroidTestCase {
         assertEquals(expected, sql);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "setCursorFactory",
-        args = {android.database.sqlite.SQLiteDatabase.CursorFactory.class}
-    )
     public void testSetCursorFactory() {
         mDatabase.execSQL("CREATE TABLE test (_id INTEGER PRIMARY KEY, " +
                 "name TEXT, age INTEGER, address TEXT);");
@@ -198,13 +151,6 @@ public class SQLiteQueryBuilderTest extends AndroidTestCase {
         }
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "buildQueryString",
-        args = {boolean.class, java.lang.String.class, java.lang.String[].class,
-                java.lang.String.class, java.lang.String.class, java.lang.String.class,
-                java.lang.String.class, java.lang.String.class}
-    )
     public void testBuildQueryString() {
         String expected;
         final String[] DEFAULT_TEST_PROJECTION = new String [] { "name", "age", "sum(salary)" };
@@ -223,13 +169,6 @@ public class SQLiteQueryBuilderTest extends AndroidTestCase {
         assertEquals(expected, sql);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "buildQuery",
-        args = {java.lang.String[].class, java.lang.String.class, java.lang.String[].class,
-                java.lang.String.class, java.lang.String.class, java.lang.String.class,
-                java.lang.String.class}
-    )
     public void testBuildQuery() {
         final String[] DEFAULT_TEST_PROJECTION = new String[] { "name", "sum(salary)" };
         final String DEFAULT_TEST_WHERE = "age > 25";
@@ -246,11 +185,6 @@ public class SQLiteQueryBuilderTest extends AndroidTestCase {
         assertEquals(expected, sql);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "appendColumns",
-        args = {java.lang.StringBuilder.class, java.lang.String[].class}
-    )
     public void testAppendColumns() {
         StringBuilder sb = new StringBuilder();
         String[] columns = new String[] { "name", "age" };
@@ -260,22 +194,6 @@ public class SQLiteQueryBuilderTest extends AndroidTestCase {
         assertEquals("name, age ", sb.toString());
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "query",
-            args = {android.database.sqlite.SQLiteDatabase.class, java.lang.String[].class,
-                    java.lang.String.class, java.lang.String[].class, java.lang.String.class,
-                    java.lang.String.class, java.lang.String.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "query",
-            args = {android.database.sqlite.SQLiteDatabase.class, java.lang.String[].class,
-                    java.lang.String.class, java.lang.String[].class, java.lang.String.class,
-                    java.lang.String.class, java.lang.String.class, java.lang.String.class}
-        )
-    })
     public void testQuery() {
         mDatabase.execSQL("CREATE TABLE employee (_id INTEGER PRIMARY KEY, " +
                 "name TEXT, month INTEGER, salary INTEGER);");
@@ -328,20 +246,6 @@ public class SQLiteQueryBuilderTest extends AndroidTestCase {
         assertEquals(4000, cursor.getInt(COLUMN_SALARY_INDEX));
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "buildUnionQuery",
-            args = {java.lang.String[].class, java.lang.String.class, java.lang.String.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "buildUnionSubQuery",
-            args = {java.lang.String.class, java.lang.String[].class, java.util.Set.class,
-                    int.class, java.lang.String.class, java.lang.String.class,
-                    java.lang.String[].class, java.lang.String.class, java.lang.String.class}
-        )
-    })
     public void testUnionQuery() {
         String expected;
         String[] innerProjection = new String[] {"name", "age", "location"};

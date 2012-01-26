@@ -22,12 +22,7 @@ import android.content.Context;
 import android.net.wifi.WifiConfiguration;
 import android.net.wifi.WifiManager;
 import android.test.AndroidTestCase;
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
 
-@TestTargetClass(WifiConfiguration.class)
 public class WifiConfigurationTest extends AndroidTestCase {
     private  WifiManager mWifiManager;
     @Override
@@ -37,18 +32,6 @@ public class WifiConfigurationTest extends AndroidTestCase {
                 .getSystemService(Context.WIFI_SERVICE);
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.PARTIAL,
-            method = "WifiConfiguration",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.PARTIAL,
-            method = "toString",
-            args = {}
-        )
-    })
     public void testWifiConfiguration() {
         List<WifiConfiguration> wifiConfigurations = mWifiManager.getConfiguredNetworks();
         for (int i = 0; i < wifiConfigurations.size(); i++) {

@@ -16,20 +16,11 @@
 
 package android.provider.cts;
 
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
 
 import android.provider.Settings.SettingNotFoundException;
 import android.test.AndroidTestCase;
 
-@TestTargetClass(android.provider.Settings.SettingNotFoundException.class)
 public class Settings_SettingNotFoundExceptionTest extends AndroidTestCase {
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "Settings.SettingNotFoundException",
-        args = {java.lang.String.class}
-    )
     public void testConstructor() {
         new SettingNotFoundException("Setting not found exception.");
         new SettingNotFoundException(null);

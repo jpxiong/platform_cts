@@ -21,45 +21,16 @@ import android.test.InstrumentationTestCase;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseExpandableListAdapter;
-import dalvik.annotation.TestTargets;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.ToBeFixed;
 
 /**
  * Test {@link BaseExpandableListAdapter}.
  */
-@TestTargetClass(BaseExpandableListAdapter.class)
 public class BaseExpandableListAdapterTest extends InstrumentationTestCase {
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test areAllItemsEnabled(), this function always returns true.",
-        method = "areAllItemsEnabled",
-        args = {}
-    )
     public void testAreAllItemsEnabled() {
         MockBaseExpandableListAdapter adapter = new MockBaseExpandableListAdapter();
         assertTrue(adapter.areAllItemsEnabled());
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test getCombinedChildId(long, long) function.",
-            method = "getCombinedChildId",
-            args = {long.class, long.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test getCombinedChildId(long, long) function.",
-            method = "getCombinedGroupId",
-            args = {long.class}
-        )
-    })
-    @ToBeFixed(bug = "1502158", explanation = "getCombinedChildId() always returns a group id, " +
-            "it never returns a child id; because bit 0 always be 1; getCombinedGroupId() " +
-            "always returns a child id, it never returns a group id; because bit 0 always be 0")
     public void testGetCombinedId() {
         MockBaseExpandableListAdapter adapter = new MockBaseExpandableListAdapter();
 
@@ -74,12 +45,6 @@ public class BaseExpandableListAdapterTest extends InstrumentationTestCase {
         assertTrue(childID != groupID);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test isEmpty() function.",
-        method = "isEmpty",
-        args = {}
-    )
     public void testIsEmpty() {
         MockBaseExpandableListAdapter adapter = new MockBaseExpandableListAdapter();
         assertTrue(adapter.isEmpty());
@@ -87,12 +52,6 @@ public class BaseExpandableListAdapterTest extends InstrumentationTestCase {
         assertFalse(adapter.isEmpty());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test notifyDataSetChanged() function.",
-        method = "notifyDataSetChanged",
-        args = {}
-    )
     public void testNotifyDataSetChanged() {
         MockBaseExpandableListAdapter adapter = new MockBaseExpandableListAdapter();
         MockDataSetObserver dataSetObserver = new MockDataSetObserver();
@@ -103,12 +62,6 @@ public class BaseExpandableListAdapterTest extends InstrumentationTestCase {
         assertTrue(dataSetObserver.hasCalledOnChanged());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test notifyDataSetInvalidated() function.",
-        method = "notifyDataSetInvalidated",
-        args = {}
-    )
     public void testNotifyDataSetInvalidated() {
         MockBaseExpandableListAdapter adapter = new MockBaseExpandableListAdapter();
         MockDataSetObserver dataSetObserver = new MockDataSetObserver();
@@ -119,42 +72,18 @@ public class BaseExpandableListAdapterTest extends InstrumentationTestCase {
         assertTrue(dataSetObserver.hasCalledOnInvalidated());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test onGroupCollapsed(int), this function is non-operation.",
-        method = "onGroupCollapsed",
-        args = {int.class}
-    )
     public void testOnGroupCollapsed() {
         MockBaseExpandableListAdapter adapter = new MockBaseExpandableListAdapter();
         // this function is non-operation.
         adapter.onGroupCollapsed(0);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test onGroupExpanded(int), this function is non-operation.",
-        method = "onGroupExpanded",
-        args = {int.class}
-    )
     public void testOnGroupExpanded() {
         MockBaseExpandableListAdapter adapter = new MockBaseExpandableListAdapter();
         // this function is non-operation.
         adapter.onGroupExpanded(0);
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "registerDataSetObserver",
-            args = {android.database.DataSetObserver.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "unregisterDataSetObserver",
-            args = {android.database.DataSetObserver.class}
-        )
-    })
     public void testDataSetObserver() {
         MockBaseExpandableListAdapter adapter = new MockBaseExpandableListAdapter();
         MockDataSetObserver dataSetObserver = new MockDataSetObserver();

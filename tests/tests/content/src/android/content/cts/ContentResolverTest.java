@@ -18,11 +18,6 @@ package android.content.cts;
 
 import com.android.cts.stub.R;
 
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
-import dalvik.annotation.ToBeFixed;
 
 import android.accounts.Account;
 import android.content.ContentResolver;
@@ -42,7 +37,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
-@TestTargetClass(ContentResolver.class)
 public class ContentResolverTest extends AndroidTestCase {
     private final static String COLUMN_ID_NAME = "_id";
     private final static String COLUMN_KEY_NAME = "key";
@@ -99,23 +93,10 @@ public class ContentResolverTest extends AndroidTestCase {
         super.tearDown();
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "ContentResolver",
-        args = {android.content.Context.class}
-    )
-    @ToBeFixed(bug = "1695243", explanation = "Android API javadocs are incomplete")
     public void testConstructor() {
         assertNotNull(mContentResolver);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "getType",
-        args = {android.net.Uri.class}
-    )
-    @ToBeFixed(bug = "1695243", explanation = "should add @throws clause into javadoc of " +
-            "ContentResolver#getType(Uri) when the input Uri is null")
     public void testGetType() {
         String type1 = mContentResolver.getType(TABLE1_URI);
         assertTrue(type1.startsWith(ContentResolver.CURSOR_DIR_BASE_TYPE, 0));
@@ -134,15 +115,6 @@ public class ContentResolverTest extends AndroidTestCase {
         }
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "query",
-        args = {android.net.Uri.class, java.lang.String[].class, java.lang.String.class,
-                java.lang.String[].class, java.lang.String.class}
-    )
-    @ToBeFixed(bug = "1695243", explanation = "should add @throws clause into javadoc of " +
-            "ContentResolver#query(Uri, String[], String, String[], String) when the input " +
-            "param Uri is null")
     public void testQuery() {
         mCursor = mContentResolver.query(TABLE1_URI, null, null, null, null);
 
@@ -193,11 +165,6 @@ public class ContentResolverTest extends AndroidTestCase {
         }
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "openInputStream",
-        args = {android.net.Uri.class}
-    )
     public void testOpenInputStream() throws IOException {
         final Uri uri = Uri.parse(ContentResolver.SCHEME_ANDROID_RESOURCE +
                 "://" + TEST_PACKAGE_NAME + "/" + R.drawable.pass);
@@ -215,18 +182,6 @@ public class ContentResolverTest extends AndroidTestCase {
         }
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "openOutputStream",
-            args = {android.net.Uri.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "openOutputStream",
-            args = {android.net.Uri.class, java.lang.String.class}
-        )
-    })
     public void testOpenOutputStream() throws IOException {
         Uri uri = Uri.parse(ContentResolver.SCHEME_FILE + "://" +
                 getContext().getCacheDir().getAbsolutePath() +
@@ -271,11 +226,6 @@ public class ContentResolverTest extends AndroidTestCase {
         }
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "openAssetFileDescriptor",
-        args = {android.net.Uri.class, java.lang.String.class}
-    )
     public void testOpenAssetFileDescriptor() throws IOException {
         Uri uri = Uri.parse(ContentResolver.SCHEME_ANDROID_RESOURCE +
                 "://" + TEST_PACKAGE_NAME + "/" + R.raw.testimage);
@@ -300,11 +250,6 @@ public class ContentResolverTest extends AndroidTestCase {
         }
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "openFileDescriptor",
-        args = {android.net.Uri.class, java.lang.String.class}
-    )
     public void testOpenFileDescriptor() throws IOException {
         Uri uri = Uri.parse(ContentResolver.SCHEME_FILE + "://" +
                 getContext().getCacheDir().getAbsolutePath() +
@@ -338,13 +283,6 @@ public class ContentResolverTest extends AndroidTestCase {
         }
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "insert",
-        args = {android.net.Uri.class, android.content.ContentValues.class}
-    )
-    @ToBeFixed(bug = "1695243", explanation = "should add @throws clause into javadoc of " +
-            "ContentResolver#insert(Uri, ContentValues) when the input Uri are null")
     public void testInsert() {
         String key4 = "key4";
         String key5 = "key5";
@@ -396,13 +334,6 @@ public class ContentResolverTest extends AndroidTestCase {
         }
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "bulkInsert",
-        args = {android.net.Uri.class, android.content.ContentValues[].class}
-    )
-    @ToBeFixed(bug = "1695243", explanation = "should add @throws clause into javadoc of " +
-            "ContentResolver#bulkInsert(Uri, ContentValues[]) when the input Uri are null")
     public void testBulkInsert() {
         String key4 = "key4";
         String key5 = "key5";
@@ -447,13 +378,6 @@ public class ContentResolverTest extends AndroidTestCase {
         }
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "delete",
-        args = {android.net.Uri.class, java.lang.String.class, java.lang.String[].class}
-    )
-    @ToBeFixed(bug = "1695243", explanation = "should add @throws clause into javadoc of " +
-            "ContentResolver#delete(Uri, String, String[]) when the input Uri are null")
     public void testDelete() {
         mCursor = mContentResolver.query(TABLE1_URI, null, null, null, null);
         assertNotNull(mCursor);
@@ -528,14 +452,6 @@ public class ContentResolverTest extends AndroidTestCase {
         }
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "update",
-        args = {android.net.Uri.class, android.content.ContentValues.class,
-                java.lang.String.class, java.lang.String[].class}
-    )
-    @ToBeFixed(bug = "1695243", explanation = "The javadoc says \"return the URL of the " +
-            "newly created row\", but actually it return an integer.")
     public void testUpdate() {
         ContentValues values = new ContentValues();
         String key10 = "key10";
@@ -611,22 +527,6 @@ public class ContentResolverTest extends AndroidTestCase {
         }
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "registerContentObserver",
-            args = {android.net.Uri.class, boolean.class, android.database.ContentObserver.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "unregisterContentObserver",
-            args = {android.database.ContentObserver.class}
-        )
-    })
-    @ToBeFixed(bug = "1695243", explanation = "should add @throws clause into javadoc of " +
-            "ContentResolver#registerContentObserver(Uri, boolean, ContentObserver) and " +
-            "ContentResolver#unregisterContentObserver(ContentObserver) when the input " +
-            "params are null")
     public void testRegisterContentObserver() {
         final MockContentObserver mco = new MockContentObserver();
 
@@ -675,13 +575,6 @@ public class ContentResolverTest extends AndroidTestCase {
         }
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "notifyChange",
-        args = {android.net.Uri.class, android.database.ContentObserver.class}
-    )
-    @ToBeFixed(bug = "1695243", explanation = "should add @throws clause into javadoc of " +
-            "ContentResolver#notifyChange(Uri, ContentObserver) when uri is null")
     public void testNotifyChange1() {
         final MockContentObserver mco = new MockContentObserver();
 
@@ -699,13 +592,6 @@ public class ContentResolverTest extends AndroidTestCase {
         mContentResolver.unregisterContentObserver(mco);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "notifyChange",
-        args = {android.net.Uri.class, android.database.ContentObserver.class, boolean.class}
-    )
-    @ToBeFixed(bug = "1695243", explanation = "should add @throws clause into javadoc of " +
-            "ContentResolver#notifyChange(Uri, ContentObserver, boolean) when uri is null ")
     public void testNotifyChange2() {
         final MockContentObserver mco = new MockContentObserver();
 
@@ -723,20 +609,6 @@ public class ContentResolverTest extends AndroidTestCase {
         mContentResolver.unregisterContentObserver(mco);
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.NOT_FEASIBLE,
-            method = "startSync",
-            args = {android.net.Uri.class, android.os.Bundle.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.NOT_FEASIBLE,
-            method = "cancelSync",
-            args = {android.net.Uri.class}
-        )
-    })
-    @ToBeFixed(bug = "1400231", explanation = "the key is SyncObserver class is deleted" +
-            " under currently enviroment(but still exists in doc)")
     public void testStartCancelSync() {
         Bundle extras = new Bundle();
 
@@ -749,13 +621,6 @@ public class ContentResolverTest extends AndroidTestCase {
         //FIXME: how to assert.
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "startSync",
-        args = {android.net.Uri.class, android.os.Bundle.class}
-    )
-    @ToBeFixed(bug = "1695243", explanation = "should add @throws clause into javadoc of " +
-            "ContentResolver#startSync(Uri, Bundle) when extras is null")
     public void testStartSyncFailure() {
         try {
             ContentResolver.requestSync(null, null, null);
@@ -765,11 +630,6 @@ public class ContentResolverTest extends AndroidTestCase {
         }
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "validateSyncExtrasBundle",
-        args = {android.os.Bundle.class}
-    )
     public void testValidateSyncExtrasBundle() {
         Bundle extras = new Bundle();
         extras.putInt("Integer", 20);

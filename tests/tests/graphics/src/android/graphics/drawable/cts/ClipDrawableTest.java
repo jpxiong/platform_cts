@@ -38,19 +38,8 @@ import android.util.AttributeSet;
 import android.util.StateSet;
 import android.util.Xml;
 import android.view.Gravity;
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.ToBeFixed;
 
-@TestTargetClass(android.graphics.drawable.ClipDrawable.class)
 public class ClipDrawableTest extends AndroidTestCase {
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test Constructor",
-        method = "ClipDrawable",
-        args = {android.graphics.drawable.Drawable.class, int.class, int.class}
-    )
     @SuppressWarnings("deprecation")
     public void testClipDrawable() {
         new ClipDrawable((Drawable) null, Gravity.BOTTOM, ClipDrawable.HORIZONTAL);
@@ -59,14 +48,6 @@ public class ClipDrawableTest extends AndroidTestCase {
         new ClipDrawable(bmpDrawable, Gravity.BOTTOM, ClipDrawable.HORIZONTAL);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test draw(Canvas)",
-        method = "draw",
-        args = {android.graphics.Canvas.class}
-    )
-    @ToBeFixed(bug = "1400249", explanation = "It will be tested by functional test, " +
-            "and NPE is not expected.")
     public void testDraw() {
         MockDrawable mockDrawable = new MockDrawable();
         mockDrawable.setLevel(5000);
@@ -85,12 +66,6 @@ public class ClipDrawableTest extends AndroidTestCase {
         }
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test getChangingConfigurations()",
-        method = "getChangingConfigurations",
-        args = {}
-    )
     public void testGetChangingConfigurations() {
         MockDrawable mockDrawable = new MockDrawable();
         ClipDrawable clipDrawable = new ClipDrawable(mockDrawable,
@@ -107,12 +82,6 @@ public class ClipDrawableTest extends AndroidTestCase {
         assertEquals(3, clipDrawable.getChangingConfigurations());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test getConstantState()",
-        method = "getConstantState",
-        args = {}
-    )
     public void testGetConstantState() {
         MockDrawable mockDrawable = new MockDrawable();
         ClipDrawable clipDrawable = new ClipDrawable(mockDrawable,
@@ -126,12 +95,6 @@ public class ClipDrawableTest extends AndroidTestCase {
         assertEquals(1, clipDrawable.getConstantState().getChangingConfigurations());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test getIntrinsicHeight()",
-        method = "getIntrinsicHeight",
-        args = {}
-    )
     @SuppressWarnings("deprecation")
     public void testGetIntrinsicHeight() {
         MockDrawable mockDrawable = new MockDrawable();
@@ -146,12 +109,6 @@ public class ClipDrawableTest extends AndroidTestCase {
         assertEquals(50, clipDrawable.getIntrinsicHeight());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test getIntrinsicWidth()",
-        method = "getIntrinsicWidth",
-        args = {}
-    )
     @SuppressWarnings("deprecation")
     public void testGetIntrinsicWidth() {
         MockDrawable mockDrawable = new MockDrawable();
@@ -166,12 +123,6 @@ public class ClipDrawableTest extends AndroidTestCase {
         assertEquals(100, clipDrawable.getIntrinsicWidth());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test getOpacity()",
-        method = "getOpacity",
-        args = {}
-    )
     @SuppressWarnings("deprecation")
     public void testGetOpacity() {
         BitmapDrawable bmpDrawable =
@@ -186,13 +137,6 @@ public class ClipDrawableTest extends AndroidTestCase {
         assertEquals(PixelFormat.TRANSLUCENT, clipDrawable.getOpacity());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test getPadding(Rect)",
-        method = "getPadding",
-        args = {android.graphics.Rect.class}
-    )
-    @ToBeFixed(bug = "1417734", explanation = "NPE is not expected.")
     public void testGetPadding() {
         MockDrawable mockDrawable = new MockDrawable();
         ClipDrawable clipDrawable = new ClipDrawable(mockDrawable,
@@ -211,13 +155,6 @@ public class ClipDrawableTest extends AndroidTestCase {
         }
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test inflate(Resources, XmlPullParser, AttributeSet)",
-        method = "inflate",
-        args = {android.content.res.Resources.class, org.xmlpull.v1.XmlPullParser.class,
-                android.util.AttributeSet.class}
-    )
     @SuppressWarnings("deprecation")
     public void testInflate() throws XmlPullParserException, IOException {
         BitmapDrawable bmpDrawable = new BitmapDrawable();
@@ -229,12 +166,6 @@ public class ClipDrawableTest extends AndroidTestCase {
         clipDrawable.inflate(mContext.getResources(), parser, attrs);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test invalidateDrawable(Drawable)",
-        method = "invalidateDrawable",
-        args = {android.graphics.drawable.Drawable.class}
-    )
     public void testInvalidateDrawable() {
         MockDrawable mockDrawable = new MockDrawable();
         ClipDrawable clipDrawable = new ClipDrawable(mockDrawable,
@@ -247,12 +178,6 @@ public class ClipDrawableTest extends AndroidTestCase {
         clipDrawable.invalidateDrawable(null);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test isStateful()",
-        method = "isStateful",
-        args = {}
-    )
     @SuppressWarnings("deprecation")
     public void testIsStateful() {
         MockDrawable mockDrawable = new MockDrawable();
@@ -266,13 +191,6 @@ public class ClipDrawableTest extends AndroidTestCase {
         assertFalse(clipDrawable.isStateful());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test onBoundsChange(Rect)",
-        method = "onBoundsChange",
-        args = {android.graphics.Rect.class}
-    )
-    @ToBeFixed(bug = "1417734", explanation = "NPE is not expected.")
     public void testOnBoundsChange() {
         MockDrawable mockDrawable = new MockDrawable();
         MockClipDrawable mockClipDrawable = new MockClipDrawable(mockDrawable,
@@ -294,12 +212,6 @@ public class ClipDrawableTest extends AndroidTestCase {
         }
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test onLevelChange(int)",
-        method = "onLevelChange",
-        args = {int.class}
-    )
     public void testOnLevelChange() {
         MockDrawable mockDrawable = new MockDrawable();
         MockClipDrawable mockClipDrawable = new MockClipDrawable(mockDrawable,
@@ -319,12 +231,6 @@ public class ClipDrawableTest extends AndroidTestCase {
         assertEquals(10000, mockDrawable.getLevel());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test onStateChange(int[])",
-        method = "onStateChange",
-        args = {int[].class}
-    )
     public void testOnStateChange() {
         MockDrawable mockDrawable = new MockDrawable();
         MockClipDrawable mockClipDrawable = new MockClipDrawable(mockDrawable,
@@ -338,12 +244,6 @@ public class ClipDrawableTest extends AndroidTestCase {
         mockClipDrawable.onStateChange(null);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test scheduleDrawable(Drawable, Runnable, long)",
-        method = "scheduleDrawable",
-        args = {android.graphics.drawable.Drawable.class, java.lang.Runnable.class, long.class}
-    )
     public void testScheduleDrawable() {
         MockDrawable mockDrawable = new MockDrawable();
         ClipDrawable clipDrawable = new ClipDrawable(mockDrawable,
@@ -356,12 +256,6 @@ public class ClipDrawableTest extends AndroidTestCase {
         assertEquals(1000L, callback.getWhen());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test setAlpha(int)",
-        method = "setAlpha",
-        args = {int.class}
-    )
     public void testSetAlpha() {
         MockDrawable mockDrawable = new MockDrawable();
         ClipDrawable clipDrawable = new ClipDrawable(mockDrawable,
@@ -377,12 +271,6 @@ public class ClipDrawableTest extends AndroidTestCase {
         assertEquals(255, mockDrawable.getAlpha());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test setColorFilter(ColorFilter)",
-        method = "setColorFilter",
-        args = {android.graphics.ColorFilter.class}
-    )
     public void testSetColorFilter() {
         MockDrawable mockDrawable = new MockDrawable();
         ClipDrawable clipDrawable = new ClipDrawable(mockDrawable,
@@ -396,12 +284,6 @@ public class ClipDrawableTest extends AndroidTestCase {
         assertNull(mockDrawable.getColorFilter());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test setVisible(boolean, boolean)",
-        method = "setVisible",
-        args = {boolean.class, boolean.class}
-    )
     public void testSetVisible() {
         MockDrawable mockDrawable = new MockDrawable();
         ClipDrawable clipDrawable = new ClipDrawable(mockDrawable,
@@ -418,12 +300,6 @@ public class ClipDrawableTest extends AndroidTestCase {
         assertTrue(clipDrawable.isVisible());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test unscheduleDrawable(Drawable, Runnable)",
-        method = "unscheduleDrawable",
-        args = {android.graphics.drawable.Drawable.class, java.lang.Runnable.class}
-    )
     public void testUnscheduleDrawable() {
         MockDrawable mockDrawable = new MockDrawable();
         ClipDrawable clipDrawable = new ClipDrawable(mockDrawable,

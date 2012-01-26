@@ -21,12 +21,7 @@ import android.os.Handler;
 import android.os.Message;
 import android.os.Parcel;
 import android.test.AndroidTestCase;
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
 
-@TestTargetClass(Message.class)
 public class MessageTest extends AndroidTestCase {
     public static final int SLEEP_TIME = 300;
     public static final int WHAT = 1;
@@ -57,60 +52,10 @@ public class MessageTest extends AndroidTestCase {
         mMessage = new Message();
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test constructor(s) of {@link Message}",
-        method = "Message",
-        args = {}
-    )
     public void testConstructor() {
         new Message();
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test method: getWhen",
-            method = "getWhen",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test method: getTarget",
-            method = "getTarget",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test method: setTarget",
-            method = "setTarget",
-            args = {android.os.Handler.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test method: getCallback",
-            method = "getCallback",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test method: describeContents",
-            method = "describeContents",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test method: setData",
-            method = "setData",
-            args = {Bundle.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test method: getData",
-            method = "getData",
-            args = {}
-        )
-    })
     public void testAccessMessageProperties() {
         assertEquals(0, mMessage.getWhen());
         mMessage.setTarget(mHandler);
@@ -131,12 +76,6 @@ public class MessageTest extends AndroidTestCase {
         assertEquals(0, mMessage.describeContents());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test method: obtain",
-        method = "obtain",
-        args = {}
-    )
     public void testObtain() {
         Message message = Message.obtain();
         assertNotNull(message);
@@ -150,12 +89,6 @@ public class MessageTest extends AndroidTestCase {
         assertNull(message.peekData());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test method: obtain",
-        method = "obtain",
-        args = {Message.class}
-    )
     public void testObtain2() {
         Message message = Message.obtain(mHandler, WHAT, ARG1, ARG2, OBJ);
         Message expected = Message.obtain(message);
@@ -167,47 +100,23 @@ public class MessageTest extends AndroidTestCase {
         assertEquals(message.obj, expected.obj);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test method: obtain",
-        method = "obtain",
-        args = {Handler.class}
-    )
     public void testObtain3() {
         Message expected = Message.obtain(mHandler);
         assertEquals(mHandler, expected.getTarget());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test method: obtain",
-        method = "obtain",
-        args = {Handler.class, Runnable.class}
-    )
     public void testObtain4() {
         Message expected = Message.obtain(mHandler, mRunnable);
         assertEquals(mHandler, expected.getTarget());
         assertEquals(mRunnable, expected.getCallback());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test method: obtain",
-        method = "obtain",
-        args = {Handler.class, int.class}
-    )
     public void testObtain5() {
         Message expected = Message.obtain(mHandler, WHAT);
         assertEquals(mHandler, expected.getTarget());
         assertEquals(WHAT, expected.what);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test method: obtain",
-        method = "obtain",
-        args = {Handler.class, int.class, Object.class}
-    )
     public void testObtain6() {
         Message expected = Message.obtain(mHandler, WHAT, OBJ);
         assertEquals(mHandler, expected.getTarget());
@@ -215,12 +124,6 @@ public class MessageTest extends AndroidTestCase {
         assertEquals(OBJ, expected.obj);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test method: obtain",
-        method = "obtain",
-        args = {Handler.class, int.class, int.class, int.class}
-    )
     public void testObtain7() {
         Message expected = Message.obtain(mHandler, WHAT, ARG1, ARG2);
         assertEquals(mHandler, expected.getTarget());
@@ -229,12 +132,6 @@ public class MessageTest extends AndroidTestCase {
         assertEquals(ARG2, expected.arg2);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test method: obtain",
-        method = "obtain",
-        args = {Handler.class, int.class, int.class, int.class, Object.class}
-    )
     public void testObtain8() {
         Message expected = Message.obtain(mHandler, WHAT, ARG1, ARG2, OBJ);
         assertEquals(mHandler, expected.getTarget());
@@ -244,22 +141,10 @@ public class MessageTest extends AndroidTestCase {
         assertEquals(OBJ, expected.obj);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test method: toString",
-        method = "toString",
-        args = {}
-    )
     public void testToString() {
         assertNotNull(mMessage.toString());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test method: peekData",
-        method = "peekData",
-        args = {}
-    )
     public void testPeekData() {
         Bundle expected = new Bundle();
         assertNull(mMessage.peekData());
@@ -268,12 +153,6 @@ public class MessageTest extends AndroidTestCase {
         assertEquals(expected, mMessage.peekData());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test method: copyFrom",
-        method = "copyFrom",
-        args = {Message.class}
-    )
     public void testCopyFrom() {
         Message message = Message.obtain(mHandler, WHAT, ARG1, ARG2, OBJ);
         Bundle bundle = new Bundle();
@@ -287,12 +166,6 @@ public class MessageTest extends AndroidTestCase {
         assertEquals(VALUE, mMessage.getData().getInt(KEY));
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test method: recycle",
-        method = "recycle",
-        args = {}
-    )
     public void testRecycle() {
         Message message = Message.obtain(mHandler, WHAT, ARG1, ARG2, OBJ);
         message.recycle();
@@ -306,12 +179,6 @@ public class MessageTest extends AndroidTestCase {
         assertNull(message.peekData());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test method: writeToParcel",
-        method = "writeToParcel",
-        args = {Parcel.class, int.class}
-    )
     public void testWriteToParcel() {
         Message message = Message.obtain(mHandler, WHAT, ARG1, ARG2);
         Bundle bundle = new Bundle();
@@ -336,12 +203,6 @@ public class MessageTest extends AndroidTestCase {
         }
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test method: sendToTarget",
-        method = "sendToTarget",
-        args = {}
-    )
     public void testSendToTarget() {
         try {
             mMessage.sendToTarget();

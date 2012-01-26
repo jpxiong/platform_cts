@@ -18,11 +18,6 @@ package android.media.cts;
 
 import com.android.cts.stub.R;
 
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
-import dalvik.annotation.ToBeFixed;
 
 import android.content.Context;
 import android.content.res.AssetFileDescriptor;
@@ -35,7 +30,6 @@ import java.io.FileDescriptor;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 
-@TestTargetClass(SoundPool.class)
 abstract class SoundPoolTest extends AndroidTestCase {
 
     private static final int SOUNDPOOL_STREAMS = 4;
@@ -91,39 +85,6 @@ abstract class SoundPoolTest extends AndroidTestCase {
         }
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "load",
-            args = {AssetFileDescriptor.class, int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "load",
-            args = {Context.class, int.class, int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "load",
-            args = {FileDescriptor.class, long.class, long.class, int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "load",
-            args = {String.class, int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.SUFFICIENT,
-            method = "unload",
-            args = {int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "release",
-            args = {}
-        )
-    })
-    @ToBeFixed(explanation = "unload() does not return true as specified")
     public void testLoad() throws Exception {
         int srcQuality = 100;
         mSoundPool = new SoundPool(SOUNDPOOL_STREAMS, AudioManager.STREAM_MUSIC, srcQuality);
@@ -173,58 +134,6 @@ abstract class SoundPoolTest extends AndroidTestCase {
         }
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "load",
-            args = {Context.class, int.class, int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "pause",
-            args = {int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "play",
-            args = {int.class, float.class, float.class, int.class, int.class, float.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "resume",
-            args = {int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setLoop",
-            args = {int.class, int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setPriority",
-            args = {int.class, int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setRate",
-            args = {int.class, float.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setVolume",
-            args = {int.class, float.class, float.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "SoundPool",
-            args = {int.class, int.class, int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "stop",
-            args = {int.class}
-        )
-    })
     public void testSoundPoolOp() throws Exception {
         int srcQuality = 100;
         mSoundPool = new SoundPool(SOUNDPOOL_STREAMS, AudioManager.STREAM_MUSIC, srcQuality);
@@ -268,28 +177,6 @@ abstract class SoundPoolTest extends AndroidTestCase {
         mSoundPool.unload(sampleID);
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "load",
-            args = {Context.class, int.class, int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "play",
-            args = {int.class, float.class, float.class, int.class, int.class, float.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "SoundPool",
-            args = {int.class, int.class, int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "stop",
-            args = {int.class}
-        )
-    })
     public void testMultiSound() throws Exception {
         int srcQuality = 100;
         mSoundPool = new SoundPool(SOUNDPOOL_STREAMS, AudioManager.STREAM_MUSIC, srcQuality);
@@ -320,18 +207,6 @@ abstract class SoundPoolTest extends AndroidTestCase {
         mSoundPool = null;
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "load",
-            args = {Context.class, int.class, int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "SoundPool",
-            args = {int.class, int.class, int.class}
-        )
-    })
     public void testLoadMore() throws Exception {
         mSoundPool = new SoundPool(SOUNDPOOL_STREAMS, AudioManager.STREAM_MUSIC, 0);
         int[] sounds = getSounds();

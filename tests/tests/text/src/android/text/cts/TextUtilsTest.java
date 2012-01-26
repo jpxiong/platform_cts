@@ -16,10 +16,6 @@
 
 package android.text.cts;
 
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.ToBeFixed;
 
 import android.content.res.ColorStateList;
 import android.graphics.Canvas;
@@ -52,7 +48,6 @@ import java.util.regex.Pattern;
 /**
  * Test {@link TextUtils}.
  */
-@TestTargetClass(TextUtils.class)
 public class TextUtilsTest extends AndroidTestCase {
     private static String mEllipsis;
     private int mStart;
@@ -82,13 +77,6 @@ public class TextUtilsTest extends AndroidTestCase {
         return re.substring(0, re.indexOf("x"));
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "commaEllipsize",
-        args = {CharSequence.class, TextPaint.class, float.class, String.class, String.class}
-    )
-    @ToBeFixed(bug = "1688347 ", explanation = "The javadoc for commaEllipsize() " +
-            "does not discuss any of the corner cases")
     public void testCommaEllipsize() {
         TextPaint p = new TextPaint();
         String text = "long, string, to, truncate";
@@ -141,15 +129,6 @@ public class TextUtilsTest extends AndroidTestCase {
         }
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "concat",
-        args = {CharSequence[].class}
-    )
-    @ToBeFixed(bug = "1695243", explanation = "the javadoc for concat() is incomplete." +
-            "1. doesn't explain @param and @return" +
-            "2. doesn't describe the expected result when parameter is empty" +
-            "3. doesn't discuss the case that parameter is expectional.")
     public void testConcat() {
         // issue 1695243
         // the javadoc for concat() doesn't describe the expected result when parameter is empty.
@@ -195,12 +174,6 @@ public class TextUtilsTest extends AndroidTestCase {
         }
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "copySpansFrom",
-        args = {Spanned.class, int.class, int.class, Class.class, Spannable.class, int.class}
-    )
-    @ToBeFixed(bug = "1688347", explanation = "the javadoc for copySpansFrom() does not exist.")
     public void testCopySpansFrom() {
         Object[] spans;
         String text = "content";
@@ -343,18 +316,6 @@ public class TextUtilsTest extends AndroidTestCase {
         }
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "ellipsize",
-        args = {CharSequence.class, TextPaint.class, float.class, TruncateAt.class}
-    )
-    @ToBeFixed(bug = "1688347", explanation = "" +
-            "1. the javadoc for ellipsize() is incomplete." +
-            "   - doesn't explain @param and @return" +
-            "   - doesn't describe expected behavior if user pass an exceptional argument." +
-            "2. ellipsize() is not defined for TruncateAt.MARQUEE. " +
-            "   In the code it looks like this does the same as MIDDLE. " +
-            "   In other methods, MARQUEE is equivalent to END, except for the first line.")
     public void testEllipsize() {
         TextPaint p = new TextPaint();
 
@@ -407,19 +368,6 @@ public class TextUtilsTest extends AndroidTestCase {
         }
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "ellipsize",
-        args = {CharSequence.class, TextPaint.class, float.class, TruncateAt.class,
-                boolean.class, EllipsizeCallback.class}
-    )
-    @ToBeFixed(bug = "1688347", explanation = "" +
-            "1. the javadoc for ellipsize() is incomplete." +
-            "   - doesn't explain @param and @return" +
-            "   - doesn't describe expected behavior if user pass an exceptional argument." +
-            "2. ellipsize() is not defined for TruncateAt.MARQUEE. " +
-            "   In the code it looks like this does the same as MIDDLE. " +
-            "   In other methods, MARQUEE is equivalent to END, except for the first line.")
     public void testEllipsizeCallback() {
         TextPaint p = new TextPaint();
 
@@ -570,11 +518,6 @@ public class TextUtilsTest extends AndroidTestCase {
         return buf.toString();
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "equals",
-        args = {CharSequence.class, CharSequence.class}
-    )
     public void testEquals() {
         // compare with itself.
         // String is a subclass of CharSequence and overrides equals().
@@ -614,15 +557,6 @@ public class TextUtilsTest extends AndroidTestCase {
         assertFalse(TextUtils.equals(null, string));
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "expandTemplate",
-        args = {CharSequence.class, CharSequence[].class}
-    )
-    @ToBeFixed(bug = "1695243", explanation =
-            "the javadoc for expandTemplate() is incomplete." +
-            "1. not clear what is supposed to happen if template or values is null." +
-            "2. doesn't discuss the case that ^0 in template string.")
     public void testExpandTemplate() {
         // ^1 at the start of template string.
         assertEquals("value1 template to be expanded",
@@ -751,12 +685,6 @@ public class TextUtilsTest extends AndroidTestCase {
         return array;
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "getChars",
-        args = {CharSequence.class, int.class, int.class, char[].class, int.class}
-    )
-    @ToBeFixed(bug = "1695243", explanation = "the javadoc for getChars() does not exist.")
     public void testGetChars() {
         char[] destOriginal = "destination".toCharArray();
         char[] destResult = destOriginal.clone();
@@ -980,12 +908,6 @@ public class TextUtilsTest extends AndroidTestCase {
         }
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "getOffsetAfter",
-        args = {CharSequence.class, int.class}
-    )
-    @ToBeFixed(bug = "1695243", explanation = "the javadoc for getOffsetAfter() does not exist.")
     public void testGetOffsetAfter() {
         // the first '\uD800' is index 9, the second 'uD800' is index 16
         // the '\uDBFF' is index 26
@@ -1047,12 +969,6 @@ public class TextUtilsTest extends AndroidTestCase {
         }
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "getOffsetBefore",
-        args = {CharSequence.class, int.class}
-    )
-    @ToBeFixed(bug = "1695243", explanation = "the javadoc for getOffsetBefore() does not exist.")
     public void testGetOffsetBefore() {
         // the first '\uDC00' is index 10, the second 'uDC00' is index 17
         // the '\uDFFF' is index 27
@@ -1099,12 +1015,6 @@ public class TextUtilsTest extends AndroidTestCase {
         }
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "getReverse",
-        args = {CharSequence.class, int.class, int.class}
-    )
-    @ToBeFixed(bug = "1695243", explanation = "the javadoc for getReverse() does not exist.")
     public void testGetReverse() {
         String source = "string to be reversed";
         assertEquals("gnirts", TextUtils.getReverse(source, 0, "string".length()).toString());
@@ -1159,14 +1069,6 @@ public class TextUtilsTest extends AndroidTestCase {
         }
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "getTrimmedLength",
-        args = {CharSequence.class}
-    )
-    @ToBeFixed(bug = "1695243", explanation = "the javadoc for getReverse() is incomplete." +
-            "1. doesn't explain @param and @return." +
-            "2. doesn't discuss the case that parameter is expectional.")
     public void testGetTrimmedLength() {
         assertEquals("normalstring".length(), TextUtils.getTrimmedLength("normalstring"));
         assertEquals("normal string".length(), TextUtils.getTrimmedLength("normal string"));
@@ -1189,13 +1091,6 @@ public class TextUtilsTest extends AndroidTestCase {
         }
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "htmlEncode",
-        args = {String.class}
-    )
-    @ToBeFixed(bug = "1695243", explanation = "the javadoc for htmlEncode() is incomplete." +
-            "1. doesn't discuss the case that parameter is expectional.")
     public void testHtmlEncode() {
         assertEquals("&lt;_html_&gt;\\ &amp;&quot;&apos;string&apos;&quot;",
                 TextUtils.htmlEncode("<_html_>\\ &\"'string'\""));
@@ -1208,12 +1103,6 @@ public class TextUtilsTest extends AndroidTestCase {
          }
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "indexOf",
-        args = {CharSequence.class, char.class}
-    )
-    @ToBeFixed(bug = "1695243", explanation = "the javadoc for indexOf() does not exist.")
     public void testIndexOf1() {
         String searchString = "string to be searched";
         final int INDEX_OF_FIRST_R = 2;     // first occurrence of 'r'
@@ -1240,12 +1129,6 @@ public class TextUtilsTest extends AndroidTestCase {
         assertEquals(INDEX_OF_FIRST_R, TextUtils.indexOf(mockCharSequence, 'r'));
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "indexOf",
-        args = {CharSequence.class, char.class, int.class}
-    )
-    @ToBeFixed(bug = "1695243", explanation = "the javadoc for indexOf() does not exist.")
     public void testIndexOf2() {
         String searchString = "string to be searched";
         final int INDEX_OF_FIRST_R = 2;
@@ -1280,12 +1163,6 @@ public class TextUtilsTest extends AndroidTestCase {
                 INDEX_OF_FIRST_R + 1));
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "indexOf",
-        args = {CharSequence.class, char.class, int.class, int.class}
-    )
-    @ToBeFixed(bug = "1695243", explanation = "the javadoc for indexOf() does not exist.")
     public void testIndexOf3() {
         String searchString = "string to be searched";
         final int INDEX_OF_FIRST_R = 2;
@@ -1331,12 +1208,6 @@ public class TextUtilsTest extends AndroidTestCase {
                 INDEX_OF_FIRST_R + 1, searchString.length()));
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "indexOf",
-        args = {CharSequence.class, CharSequence.class}
-    )
-    @ToBeFixed(bug = "1695243", explanation = "the javadoc for indexOf() does not exist.")
     public void testIndexOf4() {
         String searchString = "string to be searched by string";
         final int SEARCH_INDEX = 13;
@@ -1360,12 +1231,6 @@ public class TextUtilsTest extends AndroidTestCase {
         assertEquals(SEARCH_INDEX, TextUtils.indexOf(mockCharSequence, "search"));
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "indexOf",
-        args = {CharSequence.class, CharSequence.class, int.class}
-    )
-    @ToBeFixed(bug = "1695243", explanation = "the javadoc for indexOf() does not exist.")
     public void testIndexOf5() {
         String searchString = "string to be searched by string";
         final int INDEX_OF_FIRST_STRING = 0;
@@ -1410,12 +1275,6 @@ public class TextUtilsTest extends AndroidTestCase {
                 INDEX_OF_FIRST_STRING + 1));
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "indexOf",
-        args = {CharSequence.class, CharSequence.class, int.class, int.class}
-    )
-    @ToBeFixed(bug = "1695243", explanation = "the javadoc for indexOf() does not exist.")
     public void testIndexOf6() {
         String searchString = "string to be searched by string";
         final int INDEX_OF_FIRST_STRING = 0;
@@ -1467,12 +1326,6 @@ public class TextUtilsTest extends AndroidTestCase {
                 INDEX_OF_FIRST_STRING + 1, searchString.length()));
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "isDigitsOnly",
-        args = {CharSequence.class}
-    )
-    @ToBeFixed(bug = "1695243", explanation = "the javadoc for isDigitsOnly() is incomplete.")
     public void testIsDigitsOnly() {
         assertFalse(TextUtils.isDigitsOnly("no digit"));
         assertFalse(TextUtils.isDigitsOnly("character and 56 digits"));
@@ -1487,11 +1340,6 @@ public class TextUtilsTest extends AndroidTestCase {
         }
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "isEmpty",
-        args = {CharSequence.class}
-    )
     public void testIsEmpty() {
         assertFalse(TextUtils.isEmpty("not empty"));
         assertFalse(TextUtils.isEmpty("    "));
@@ -1499,12 +1347,6 @@ public class TextUtilsTest extends AndroidTestCase {
         assertTrue(TextUtils.isEmpty(null));
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "isGraphic",
-        args = {char.class}
-    )
-    @ToBeFixed(bug = "1695243", explanation = "the javadoc for isGraphic() is incomplete.")
     public void testIsGraphicChar() {
         assertTrue(TextUtils.isGraphic('a'));
         assertTrue(TextUtils.isGraphic("\uBA00"));
@@ -1535,12 +1377,6 @@ public class TextUtilsTest extends AndroidTestCase {
         }
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "isGraphic",
-        args = {CharSequence.class}
-    )
-    @ToBeFixed(bug = "1695243", explanation = "the javadoc for isGraphic() is incomplete.")
     public void testIsGraphicCharSequence() {
         assertTrue(TextUtils.isGraphic("printable characters"));
 
@@ -1557,12 +1393,6 @@ public class TextUtilsTest extends AndroidTestCase {
     }
 
     @SuppressWarnings("unchecked")
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "join",
-        args = {CharSequence.class, Iterable.class}
-    )
-    @ToBeFixed(bug = "1695243", explanation = "the javadoc for join() is incomplete.")
     public void testJoin1() {
         ArrayList<CharSequence> charTokens = new ArrayList<CharSequence>();
         charTokens.add("string1");
@@ -1588,12 +1418,6 @@ public class TextUtilsTest extends AndroidTestCase {
         assertEquals("span 1;span 2;span 3", TextUtils.join(";", spannableStringTokens));
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "join",
-        args = {CharSequence.class, Object[].class}
-    )
-    @ToBeFixed(bug = "1695243", explanation = "the javadoc for join() is incomplete.")
     public void testJoin2() {
         CharSequence[] charTokens = new CharSequence[] { "string1", "string2", "string3" };
         assertEquals("string1|string2|string3", TextUtils.join("|", charTokens));
@@ -1616,12 +1440,6 @@ public class TextUtilsTest extends AndroidTestCase {
         assertEquals("span 1;span 2;span 3", TextUtils.join(";", spannableStringTokens));
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "lastIndexOf",
-        args = {CharSequence.class, char.class}
-    )
-    @ToBeFixed(bug = "1695243", explanation = "the javadoc for lastIndexOf() does not exist.")
     public void testLastIndexOf1() {
         String searchString = "string to be searched";
         final int INDEX_OF_LAST_R = 16;
@@ -1647,12 +1465,6 @@ public class TextUtilsTest extends AndroidTestCase {
         assertEquals(INDEX_OF_LAST_R, TextUtils.lastIndexOf(mockCharSequence, 'r'));
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "lastIndexOf",
-        args = {CharSequence.class, char.class, int.class}
-    )
-    @ToBeFixed(bug = "1695243", explanation = "the javadoc for lastIndexOf() does not exist.")
     public void testLastIndexOf2() {
         String searchString = "string to be searched";
         final int INDEX_OF_FIRST_R = 2;
@@ -1687,12 +1499,6 @@ public class TextUtilsTest extends AndroidTestCase {
                 TextUtils.lastIndexOf(mockCharSequence, 'r', INDEX_OF_FIRST_R));
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "lastIndexOf",
-        args = {CharSequence.class, char.class, int.class, int.class}
-    )
-    @ToBeFixed(bug = "1695243", explanation = "the javadoc for lastIndexOf() does not exist.")
     public void testLastIndexOf3() {
         String searchString = "string to be searched";
         final int INDEX_OF_FIRST_R = 2;
@@ -1733,12 +1539,6 @@ public class TextUtilsTest extends AndroidTestCase {
                 INDEX_OF_SECOND_R - 1));
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "regionMatches",
-        args = {CharSequence.class, int.class, CharSequence.class, int.class, int.class}
-    )
-    @ToBeFixed(bug = "1695243", explanation = "the javadoc for regionMatches() does not exist.")
     public void testRegionMatches() {
         assertFalse(TextUtils.regionMatches("one", 0, "two", 0, "one".length()));
         assertTrue(TextUtils.regionMatches("one", 0, "one", 0, "one".length()));
@@ -1809,12 +1609,6 @@ public class TextUtilsTest extends AndroidTestCase {
         }
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "replace",
-        args = {CharSequence.class, String[].class, CharSequence[].class}
-    )
-    @ToBeFixed(bug = "1695243", explanation = "the javadoc for replace() is incomplete.")
     public void testReplace() {
         String template = "this is a string to be as the template for replacement";
 
@@ -1865,13 +1659,6 @@ public class TextUtilsTest extends AndroidTestCase {
         }
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "split",
-        args = {String.class, Pattern.class}
-    )
-    @ToBeFixed(bug = "1695243", explanation = "the javadoc for split() is incomplete." +
-            "1. not clear what is supposed result if the pattern string is empty.")
     public void testSplitPattern() {
         String testString = "abccbadecdebz";
         assertEquals(calculateCharsCount(testString, "c") + 1,
@@ -1919,13 +1706,6 @@ public class TextUtilsTest extends AndroidTestCase {
         return count;
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "split",
-        args = {String.class, String.class}
-    )
-    @ToBeFixed(bug = "1695243", explanation = "the javadoc for split() is incomplete." +
-            "1. not clear what is supposed result if the pattern string is empty.")
     public void testSplitString() {
         String testString = "abccbadecdebz";
         assertEquals(calculateCharsCount(testString, "c") + 1,
@@ -1955,13 +1735,6 @@ public class TextUtilsTest extends AndroidTestCase {
         }
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "stringOrSpannedString",
-        args = {CharSequence.class}
-    )
-    @ToBeFixed(bug = "1695243", explanation = "the javadoc for" +
-            " stringOrSpannedString() does not exist.")
     public void testStringOrSpannedString() {
         assertNull(TextUtils.stringOrSpannedString(null));
 
@@ -1981,15 +1754,6 @@ public class TextUtilsTest extends AndroidTestCase {
                 TextUtils.stringOrSpannedString(stringBuffer).getClass());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "substring",
-        args = {CharSequence.class, int.class, int.class}
-    )
-    @ToBeFixed(bug = "1695243", explanation = "the javadoc for substring() is incomplete." +
-            "1. doesn't explain @param and @return" +
-            "2. not clear what is supposed to happen if source is null." +
-            "3. doesn't explain the thrown IndexOutOfBoundsException")
     public void testSubString() {
         String string = "String";
         assertSame(string, TextUtils.substring(string, 0, string.length()));
@@ -2047,14 +1811,6 @@ public class TextUtilsTest extends AndroidTestCase {
         assertTrue(mockGetChars.hasCalledGetChars());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "writeToParcel",
-        args = {CharSequence.class, Parcel.class, int.class}
-    )
-    @ToBeFixed(bug = "1695243", explanation = "the javadoc for writeToParcel() is incomplete." +
-            "1. doesn't explain @param and @return" +
-            "2. not clear is it the supposed result when the CharSequence is null.")
     public void testWriteToParcel() {
         Parcelable.Creator<CharSequence> creator = TextUtils.CHAR_SEQUENCE_CREATOR;
         String string = "String";
@@ -2142,12 +1898,6 @@ public class TextUtilsTest extends AndroidTestCase {
         }
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "getCapsMode",
-        args = {CharSequence.class, int.class, int.class}
-    )
-    @ToBeFixed(bug = "1586346", explanation = "return cap mode which is NOT set in reqModes")
     public void testGetCapsMode() {
         final int CAP_MODE_ALL = TextUtils.CAP_MODE_CHARACTERS
                 | TextUtils.CAP_MODE_WORDS | TextUtils.CAP_MODE_SENTENCES;
@@ -2232,13 +1982,6 @@ public class TextUtilsTest extends AndroidTestCase {
                 TextUtils.getCapsMode(testString, offset, CAP_MODE_ALL));
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "getCapsMode",
-        args = {CharSequence.class, int.class, int.class}
-    )
-    @ToBeFixed(bug = "1695243", explanation = "the javadoc for substring() is incomplete." +
-            "1. doesn't describe the expected result when parameter is exceptional.")
     public void testGetCapsModeException() {
         String testString = "Start. Sentence word!No space before\n\t" +
                 "Paragraph? (\"\'skip begin\'\"). skip end";
@@ -2265,11 +2008,6 @@ public class TextUtilsTest extends AndroidTestCase {
         }
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "dumpSpans",
-        args = {java.lang.CharSequence.class, android.util.Printer.class, java.lang.String.class}
-    )
     public void testDumpSpans() {
         StringBuilder builder = new StringBuilder();
         StringBuilderPrinter printer = new StringBuilderPrinter(builder);

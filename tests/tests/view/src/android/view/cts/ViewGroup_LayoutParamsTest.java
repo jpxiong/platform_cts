@@ -31,32 +31,10 @@ import android.view.ViewGroup.LayoutParams;
 import com.android.cts.stub.R;
 import com.android.internal.util.XmlUtils;
 
-import dalvik.annotation.TestTargets;
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargetClass;
 
-@TestTargetClass(ViewGroup.LayoutParams.class)
 public class ViewGroup_LayoutParamsTest extends AndroidTestCase {
     private ViewGroup.LayoutParams mLayoutParams;
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "ViewGroup.LayoutParams",
-            args = {int.class, int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "ViewGroup.LayoutParams",
-            args = {android.content.Context.class, android.util.AttributeSet.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "ViewGroup.LayoutParams",
-            args = {android.view.ViewGroup.LayoutParams.class}
-        )
-    })
     public void testConstructor() throws XmlPullParserException, IOException {
         // new the MarginLayoutParams instance
         XmlResourceParser parser = mContext.getResources().getLayout(
@@ -70,12 +48,6 @@ public class ViewGroup_LayoutParamsTest extends AndroidTestCase {
         new ViewGroup.LayoutParams(temp);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test setBaseAttributes(TypedArray, int, int)",
-        method = "setBaseAttributes",
-        args = {android.content.res.TypedArray.class, int.class, int.class}
-    )
     public void testSetBaseAttributes() throws XmlPullParserException, IOException {
         MockLayoutParams mockLayoutParams = new MockLayoutParams(240, 320);
 

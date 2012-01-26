@@ -20,53 +20,10 @@ import android.content.Context;
 import android.os.PowerManager;
 import android.os.PowerManager.WakeLock;
 import android.test.AndroidTestCase;
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
 
-@TestTargetClass(PowerManager.WakeLock.class)
 public class PowerManager_WakeLockTest extends AndroidTestCase {
     private static final String TAG = "PowerManager_WakeLockTest";
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test method: acquire",
-            method = "acquire",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test method: setReferenceCounted",
-            method = "setReferenceCounted",
-            args = {boolean.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test method: isHeld",
-            method = "isHeld",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test method: toString",
-            method = "toString",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.SUFFICIENT,
-            notes = "Test method: release",
-            method = "release",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.SUFFICIENT,
-            notes = "Test method: acquire",
-            method = "acquire",
-            args = {long.class}
-        )
-    })
     /**
      * Test points:
      * 1 Makes sure the device is on at the level you asked when you created the wake lock

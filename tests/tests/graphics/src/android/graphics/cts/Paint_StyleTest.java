@@ -17,44 +17,17 @@
 package android.graphics.cts;
 
 import junit.framework.TestCase;
-import dalvik.annotation.TestTargets;
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargetClass;
 import android.graphics.Paint;
 import android.graphics.Paint.Style;
 
-@TestTargetClass(Paint.Style.class)
 public class Paint_StyleTest extends TestCase {
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "valueOf",
-        args = {java.lang.String.class}
-    )
     public void testValueOf() {
         assertEquals(Style.FILL, Style.valueOf("FILL"));
         assertEquals(Style.STROKE, Style.valueOf("STROKE"));
         assertEquals(Style.FILL_AND_STROKE, Style.valueOf("FILL_AND_STROKE"));
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "values",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setStyle",
-            args = {android.graphics.Paint.Style.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getStyle",
-            args = {}
-        )
-    })
     public void testValues() {
         // set the actual value
         Style[] actual = Style.values();

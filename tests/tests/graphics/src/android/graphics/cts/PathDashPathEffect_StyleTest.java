@@ -19,19 +19,10 @@ package android.graphics.cts;
 import android.graphics.PathDashPathEffect;
 import android.graphics.PathDashPathEffect.Style;
 import android.test.AndroidTestCase;
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
 
-@TestTargetClass(PathDashPathEffect.Style.class)
 public class PathDashPathEffect_StyleTest extends AndroidTestCase {
 
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "valueOf",
-        args = {java.lang.String.class}
-    )
     public void testValueOf() {
         assertEquals(Style.TRANSLATE, Style.valueOf("TRANSLATE"));
         assertEquals(Style.ROTATE, Style.valueOf("ROTATE"));
@@ -39,11 +30,6 @@ public class PathDashPathEffect_StyleTest extends AndroidTestCase {
         // Every Style element will be tested somewhere else.
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "values",
-        args = {}
-    )
     public void testValues() {
         // set the expected value
         Style[] expected = {

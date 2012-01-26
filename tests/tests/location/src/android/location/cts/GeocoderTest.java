@@ -16,11 +16,6 @@
 
 package android.location.cts;
 
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
-import dalvik.annotation.ToBeFixed;
 
 import android.location.Address;
 import android.location.Geocoder;
@@ -30,20 +25,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Locale;
 
-@TestTargetClass(Geocoder.class)
 public class GeocoderTest extends AndroidTestCase {
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "Geocoder",
-            args = {android.content.Context.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "Geocoder",
-            args = {android.content.Context.class, java.util.Locale.class}
-        )
-    })
     public void testConstructor() {
         new Geocoder(getContext());
 
@@ -57,11 +39,6 @@ public class GeocoderTest extends AndroidTestCase {
         }
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "getFromLocation",
-        args = {double.class, double.class, int.class}
-    )
     public void testGetFromLocation() throws IOException {
         Geocoder geocoder = new Geocoder(getContext());
 
@@ -101,20 +78,6 @@ public class GeocoderTest extends AndroidTestCase {
         }
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getFromLocationName",
-            args = {String.class, int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getFromLocationName",
-            args = {String.class, int.class, double.class, double.class, double.class,
-                    double.class}
-        )
-    })
-    @ToBeFixed(bug = "", explanation = "getFromLocationName always returns a empty List.")
     public void testGetFromLocationName() throws IOException {
         Geocoder geocoder = new Geocoder(getContext(), Locale.US);
 

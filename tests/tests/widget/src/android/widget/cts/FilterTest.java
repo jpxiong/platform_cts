@@ -16,16 +16,12 @@
 
 package android.widget.cts;
 
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
 
 import android.cts.util.PollingCheck;
 import android.test.ActivityInstrumentationTestCase2;
 import android.widget.Filter;
 import android.widget.Filter.FilterListener;
 
-@TestTargetClass(Filter.class)
 public class FilterTest extends ActivityInstrumentationTestCase2<StubActivity> {
     private static final long TIME_OUT = 10000;
     private static final String TEST_CONSTRAINT = "filter test";
@@ -35,20 +31,10 @@ public class FilterTest extends ActivityInstrumentationTestCase2<StubActivity> {
         super("com.android.cts.stub", StubActivity.class);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "Filter",
-        args = {}
-    )
     public void testConstructor() {
         new MockFilter();
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "convertResultToString",
-        args = {java.lang.Object.class}
-    )
     public void testConvertResultToString() {
         final MockFilter filter = new MockFilter();
         assertEquals("", filter.convertResultToString(null));
@@ -57,11 +43,6 @@ public class FilterTest extends ActivityInstrumentationTestCase2<StubActivity> {
         assertEquals(testStr, filter.convertResultToString(testStr));
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "filter",
-        args = {java.lang.CharSequence.class}
-    )
     public void testFilter1() {
         getActivity().runOnUiThread(new Runnable() {
             public void run() {
@@ -88,11 +69,6 @@ public class FilterTest extends ActivityInstrumentationTestCase2<StubActivity> {
         assertSame(mMockFilter.getExpectResults(), mMockFilter.getResults());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "filter",
-        args = {java.lang.CharSequence.class, android.widget.Filter.FilterListener.class}
-    )
     public void testFilter2() {
         final MockFilterListener mockFilterListener = new MockFilterListener();
         getActivity().runOnUiThread(new Runnable() {

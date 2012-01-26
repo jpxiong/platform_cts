@@ -22,10 +22,6 @@ import android.webkit.CacheManager;
 import android.webkit.CacheManager.CacheResult;
 import android.webkit.WebView;
 
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
 
 import org.apache.http.HttpStatus;
 import org.apache.http.impl.cookie.DateUtils;
@@ -33,7 +29,6 @@ import org.apache.http.impl.cookie.DateUtils;
 import java.io.File;
 import java.io.InputStream;
 
-@TestTargetClass(android.webkit.CacheManager.CacheResult.class)
 public class CacheManager_CacheResultTest
         extends ActivityInstrumentationTestCase2<WebViewStubActivity> {
     private static final long NETWORK_OPERATION_TIMEOUT = 10000L;
@@ -59,73 +54,6 @@ public class CacheManager_CacheResultTest
         super.tearDown();
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getInputStream",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getContentLength",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getETag",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getLastModified",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getLocalPath",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getLocation",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getMimeType",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getOutputStream",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getExpires",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getHttpStatusCode",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getEncoding",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setEncoding",
-            args = {String.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setInputStream",
-            args = {InputStream.class}
-        )
-    })
     public void testCacheResult() throws Exception {
         final long validity = 5 * 50 * 1000; // 5 min
         final long age = 30 * 60 * 1000; // 30 min

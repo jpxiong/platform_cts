@@ -17,45 +17,8 @@ package android.util.cts;
 
 import junit.framework.TestCase;
 import android.util.FloatMath;
-import dalvik.annotation.TestTargets;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
 
-@TestTargetClass(FloatMath.class)
 public class FloatMathTest extends TestCase {
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test float math related methods",
-            method = "ceil",
-            args = {float.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test float math related methods",
-            method = "floor",
-            args = {float.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test float math related methods",
-            method = "cos",
-            args = {float.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test float math related methods",
-            method = "sin",
-            args = {float.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test float math related methods",
-            method = "sqrt",
-            args = {float.class}
-        )
-    })
     public void testFloatMathMethods() {
         // ceil
         assertEquals(8.0f, FloatMath.ceil(7.2f));

@@ -18,11 +18,6 @@ package android.content.pm.cts;
 
 import com.android.cts.stub.R;
 
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
-import dalvik.annotation.ToBeFixed;
 
 import android.content.ComponentName;
 import android.content.Intent;
@@ -47,7 +42,6 @@ import java.util.List;
  * in AndroidManifest.xml just for test of PackageManager, and there are no corresponding parts
  * of these declarations in test project.
  */
-@TestTargetClass(PackageManager.class)
 public class PackageManagerTest extends AndroidTestCase {
     private PackageManager mPackageManager;
     private static final String PACKAGE_NAME = "com.android.cts.stub";
@@ -70,51 +64,6 @@ public class PackageManagerTest extends AndroidTestCase {
         mPackageManager = getContext().getPackageManager();
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test queryIntentActivityOptions",
-            method = "queryIntentActivityOptions",
-            args = {android.content.ComponentName.class, android.content.Intent[].class,
-                    android.content.Intent.class, int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test queryIntentActivities",
-            method = "queryIntentActivities",
-            args = {android.content.Intent.class, int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test queryInstrumentation",
-            method = "queryInstrumentation",
-            args = {java.lang.String.class, int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test queryBroadcastReceivers",
-            method = "queryBroadcastReceivers",
-            args = {android.content.Intent.class, int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test queryPermissionsByGroup",
-            method = "queryPermissionsByGroup",
-            args = {java.lang.String.class, int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test queryContentProviders",
-            method = "queryContentProviders",
-            args = {java.lang.String.class, int.class, int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test queryIntentServices",
-            method = "queryIntentServices",
-            args = {android.content.Intent.class, int.class}
-        )
-    })
     public void testQuery() throws NameNotFoundException {
         // Test query Intent Activity related methods
 
@@ -241,130 +190,6 @@ public class PackageManagerTest extends AndroidTestCase {
         assertTrue(isContained);
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test getPackageInfo",
-            method = "getPackageInfo",
-            args = {java.lang.String.class, int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test getApplicationInfo",
-            method = "getApplicationInfo",
-            args = {java.lang.String.class, int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test getApplicationInfo",
-            method = "getApplicationLabel",
-            args = {android.content.pm.ApplicationInfo.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test getServiceInfo",
-            method = "getServiceInfo",
-            args = {android.content.ComponentName.class, int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test getPackageArchiveInfo",
-            method = "getPackageArchiveInfo",
-            args = {java.lang.String.class, int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test getPackagesForUid",
-            method = "getPackagesForUid",
-            args = {int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test getNameForUid",
-            method = "getNameForUid",
-            args = {int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test getActivityInfo",
-            method = "getActivityInfo",
-            args = {android.content.ComponentName.class, int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test getPackageGids",
-            method = "getPackageGids",
-            args = {java.lang.String.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test getPermissionInfo",
-            method = "getPermissionInfo",
-            args = {java.lang.String.class, int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test getPermissionGroupInfo",
-            method = "getPermissionGroupInfo",
-            args = {java.lang.String.class, int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test getAllPermissionGroups",
-            method = "getAllPermissionGroups",
-            args = {int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test getInstalledApplications",
-            method = "getInstalledApplications",
-            args = {int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test getInstalledPackages",
-            method = "getInstalledPackages",
-            args = {int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test getInstrumentationInfo",
-            method = "getInstrumentationInfo",
-            args = {android.content.ComponentName.class, int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test getReceiverInfo",
-            method = "getReceiverInfo",
-            args = {android.content.ComponentName.class, int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test getText",
-            method = "getText",
-            args = {java.lang.String.class, int.class, android.content.pm.ApplicationInfo.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.SUFFICIENT,
-            notes = "Test getSystemSharedLibraryNames",
-            method = "getSystemSharedLibraryNames",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test getLaunchIntentForPackage",
-            method = "getLaunchIntentForPackage",
-            args = {String.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test isSafeMode",
-            method = "isSafeMode",
-            args = {}
-        )
-    })
-    @ToBeFixed(bug="1686810", explanation="From the doc of function getSystemSharedLibraryNames()."
-        + " It will return an String array or null(both are Ok).")
     public void testGetInfo() throws NameNotFoundException {
         // Test getApplicationInfo, getText
         ApplicationInfo appInfo = mPackageManager.getApplicationInfo(PACKAGE_NAME, 0);
@@ -555,32 +380,6 @@ public class PackageManagerTest extends AndroidTestCase {
         assertTrue(isContained);
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test setApplicationEnabledSetting",
-            method = "setApplicationEnabledSetting",
-            args = {java.lang.String.class, int.class, int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test getApplicationEnabledSetting",
-            method = "getApplicationEnabledSetting",
-            args = {java.lang.String.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test setComponentEnabledSetting",
-            method = "setComponentEnabledSetting",
-            args = {android.content.ComponentName.class, int.class, int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test getComponentEnabledSetting",
-            method = "getComponentEnabledSetting",
-            args = {android.content.ComponentName.class}
-        )
-    })
     public void testAccessEnabledSetting() {
         mPackageManager.setApplicationEnabledSetting(PACKAGE_NAME,
                 PackageManager.COMPONENT_ENABLED_STATE_ENABLED, PackageManager.DONT_KILL_APP);
@@ -594,32 +393,6 @@ public class PackageManagerTest extends AndroidTestCase {
                 mPackageManager.getComponentEnabledSetting(componentName));
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test addPermission",
-            method = "addPermission",
-            args = {android.content.pm.PermissionInfo.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test removePermission",
-            method = "removePermission",
-            args = {java.lang.String.class}
-        )
-    })
-    @ToBeFixed(bug="1561181", explanation="According to javadoc of these two methods," +
-            " we created a permission-tree and permission under this tree in our" +
-            " AndroidManifest.xml, then invoked addPermission method, but there was" +
-            " 'java.lang.SecurityException: Not allowed to modify non-dynamic permission'" +
-            " exception. We found that" +
-            " {@link com.android.server# PackageManagerService.addPermission" +
-            " (also removePermission) is the very method with function same to our target" +
-            " method, and in PackageManagerService.addPermission, there is a if-branch to check" +
-            " whether 'type' equals to BasePermission.TYPE_DYNAMIC(L1004), and the 'type' is" +
-            " parsed from /data/system/packages.xml in emulator, but we found no 'type'" +
-            " tag in packages.xml, as well as no other explicit ways to add this 'type' tag," +
-            " so we can't add permission in dynamic way.")
     public void testOpPermission() {
         PermissionInfo permissionInfo = new PermissionInfo();
         String permissionName = "com.android.cts.stub.permission.TEST_DYNAMIC.ADD";
@@ -631,44 +404,6 @@ public class PackageManagerTest extends AndroidTestCase {
         // Can't add permission in dynamic way
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test getActivityIcon",
-            method = "getActivityIcon",
-            args = {android.content.ComponentName.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test getActivityIcon",
-            method = "getActivityIcon",
-            args = {android.content.Intent.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test getDrawable",
-            method = "getDrawable",
-            args = {java.lang.String.class, int.class, android.content.pm.ApplicationInfo.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test getDefaultActivityIcon",
-            method = "getDefaultActivityIcon",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test getApplicationIcon",
-            method = "getApplicationIcon",
-            args = {android.content.pm.ApplicationInfo.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test getApplicationIcon",
-            method = "getApplicationIcon",
-            args = {java.lang.String.class}
-        )
-    })
     public void testGetIcon() throws NameNotFoundException {
         assertNotNull(mPackageManager.getApplicationIcon(PACKAGE_NAME));
         assertNotNull(mPackageManager.getApplicationIcon(mPackageManager.getApplicationInfo(
@@ -685,20 +420,6 @@ public class PackageManagerTest extends AndroidTestCase {
         assertNotNull(mPackageManager.getDrawable(PACKAGE_NAME, iconRes, appInfo));
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test checkSignatures",
-            method = "checkSignatures",
-            args = {java.lang.String.class, java.lang.String.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test checkPermission",
-            method = "checkPermission",
-            args = {java.lang.String.class, java.lang.String.class}
-        )
-    })
     public void testCheckMethods() {
         assertEquals(PackageManager.SIGNATURE_MATCH, mPackageManager.checkSignatures(PACKAGE_NAME,
                 CONTENT_PKG_NAME));
@@ -706,26 +427,6 @@ public class PackageManagerTest extends AndroidTestCase {
                 mPackageManager.checkPermission(PERMISSION_NAME, PACKAGE_NAME));
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test resolveActivity",
-            method = "resolveActivity",
-            args = {android.content.Intent.class, int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test resolveContentProvider",
-            method = "resolveContentProvider",
-            args = {java.lang.String.class, int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test resolveService",
-            method = "resolveService",
-            args = {android.content.Intent.class, int.class}
-        )
-    })
     public void testResolveMethods() {
         // Test resolveActivity
         Intent intent = new Intent(ACTIVITY_ACTION_NAME);
@@ -746,32 +447,6 @@ public class PackageManagerTest extends AndroidTestCase {
                 mPackageManager.resolveContentProvider(providerAuthorities, 0).name);
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test getResourcesForApplication",
-            method = "getResourcesForApplication",
-            args = {android.content.pm.ApplicationInfo.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test getResourcesForApplication",
-            method = "getResourcesForApplication",
-            args = {java.lang.String.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test getResourcesForActivity",
-            method = "getResourcesForActivity",
-            args = {android.content.ComponentName.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test getXml",
-            method = "getXml",
-            args = {java.lang.String.class, int.class, android.content.pm.ApplicationInfo.class}
-        )
-    })
     public void testGetResources() throws NameNotFoundException {
         ComponentName componentName = new ComponentName(PACKAGE_NAME, ACTIVITY_NAME);
         int resourceId = R.xml.pm_test;

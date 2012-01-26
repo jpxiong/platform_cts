@@ -18,10 +18,6 @@ package android.view.animation.cts;
 
 import com.android.cts.stub.R;
 
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
 
 import android.app.Activity;
 import android.content.res.XmlResourceParser;
@@ -36,7 +32,6 @@ import android.view.animation.AnimationUtils;
 import android.view.animation.Interpolator;
 import android.view.animation.Transformation;
 
-@TestTargetClass(AccelerateInterpolator.class)
 public class AccelerateInterpolatorTest
         extends ActivityInstrumentationTestCase2<AnimationTestStubActivity> {
 
@@ -56,23 +51,6 @@ public class AccelerateInterpolatorTest
         mActivity = getActivity();
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "AccelerateInterpolator",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "AccelerateInterpolator",
-            args = {float.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "AccelerateInterpolator",
-            args = {android.content.Context.class, android.util.AttributeSet.class}
-        )
-    })
     public void testConstructor() {
         new AccelerateInterpolator();
 
@@ -83,13 +61,6 @@ public class AccelerateInterpolatorTest
         new AccelerateInterpolator(mActivity, attrs);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test case will accelerate AlphaAnimation. It will change alpha from 0.1 to"
-              + " 0.9, the rate of change alpha starts out slowly and then accelerates.",
-        method = "getInterpolation",
-        args = {float.class}
-    )
     public void testAccelerateInterpolator() {
         final View animWindow = mActivity.findViewById(R.id.anim_window);
 
@@ -177,12 +148,6 @@ public class AccelerateInterpolatorTest
         assertTrue(delta5 < delta1);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test getInterpolation(float), call it directly",
-        method = "getInterpolation",
-        args = {float.class}
-    )
     public void testGetInterpolation() {
         final float input = 0.25f;
         Interpolator interpolator1 = new AccelerateInterpolator(1.0f);

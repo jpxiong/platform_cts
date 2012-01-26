@@ -23,12 +23,7 @@ import android.media.audiofx.Visualizer;
 import android.os.Looper;
 import android.test.AndroidTestCase;
 import android.util.Log;
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
 
-@TestTargetClass(Visualizer.class)
 public class VisualizerTest extends AndroidTestCase {
 
     private String TAG = "VisualizerTest";
@@ -55,18 +50,6 @@ public class VisualizerTest extends AndroidTestCase {
     //----------------------------------
 
     //Test case 0.0: test constructor and release
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "Visualizer",
-            args = {int.class, int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "release",
-            args = {}
-        )
-    })
     public void test0_0ConstructorAndRelease() throws Exception {
         Visualizer visualizer = null;
          try {
@@ -89,18 +72,6 @@ public class VisualizerTest extends AndroidTestCase {
     //----------------------------------
 
     //Test case 1.0: capture rates
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getMaxCaptureRate",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getSamplingRate",
-            args = {}
-        )
-    })
     public void test1_0CaptureRates() throws Exception {
         getVisualizer(0);
         try {
@@ -120,23 +91,6 @@ public class VisualizerTest extends AndroidTestCase {
     }
 
     //Test case 1.1: test capture size
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getCaptureSizeRange",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setCaptureSize",
-            args = {int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getCaptureSize",
-            args = {}
-        )
-    })
     public void test1_1CaptureSize() throws Exception {
         getVisualizer(0);
         try {
@@ -167,28 +121,6 @@ public class VisualizerTest extends AndroidTestCase {
     //----------------------------------
 
     //Test case 2.0: test cature in polling mode
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setEnabled",
-            args = {boolean.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getEnabled",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getWaveForm",
-            args = {byte[].class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getFft",
-            args = {byte[].class}
-        )
-    })
     public void test2_0PollingCapture() throws Exception {
         try {
             getVisualizer(0);
@@ -221,24 +153,6 @@ public class VisualizerTest extends AndroidTestCase {
     }
 
     //Test case 2.1: test capture with listener
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setEnabled",
-            args = {boolean.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getEnabled",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setDataCaptureListener",
-            args = {Visualizer.OnDataCaptureListener.class,
-                    int.class, boolean.class, boolean.class}
-        )
-    })
     public void test2_1ListenerCapture() throws Exception {
         try {
             getVisualizer(0);

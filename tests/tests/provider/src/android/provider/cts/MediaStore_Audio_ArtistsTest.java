@@ -16,10 +16,6 @@
 
 package android.provider.cts;
 
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.ToBeFixed;
 
 import android.content.ContentResolver;
 import android.content.ContentValues;
@@ -30,7 +26,6 @@ import android.provider.cts.MediaStoreAudioTestHelper.Audio1;
 import android.provider.cts.MediaStoreAudioTestHelper.Audio2;
 import android.test.InstrumentationTestCase;
 
-@TestTargetClass(Artists.class)
 public class MediaStore_Audio_ArtistsTest extends InstrumentationTestCase {
     private ContentResolver mContentResolver;
 
@@ -41,13 +36,6 @@ public class MediaStore_Audio_ArtistsTest extends InstrumentationTestCase {
         mContentResolver = getInstrumentation().getContext().getContentResolver();
     }
 
-    @TestTargetNew(
-      level = TestLevel.COMPLETE,
-      method = "getContentUri",
-      args = {String.class}
-    )
-    @ToBeFixed(bug = "1695243", explanation = "Android API javadocs are incomplete. This is no "
-            + "document which describs possible values of the param volumeName.")
     public void testGetContentUri() {
         assertNotNull(mContentResolver.query(
                 Artists.getContentUri(MediaStoreAudioTestHelper.INTERNAL_VOLUME_NAME), null, null,

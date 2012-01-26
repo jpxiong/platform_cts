@@ -16,10 +16,6 @@
 
 package android.database.cts;
 
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
 
 import android.database.CursorIndexOutOfBoundsException;
 import android.database.MatrixCursor;
@@ -29,7 +25,6 @@ import java.util.ArrayList;
 
 import junit.framework.TestCase;
 
-@TestTargetClass(MatrixCursor.class)
 public class MatrixCursorTest extends TestCase {
     private static final String COLUMN0_NAME = "column0";
 
@@ -51,36 +46,12 @@ public class MatrixCursorTest extends TestCase {
         mMatrixCursor = new MatrixCursor(new String[] { COLUMN0_NAME, COLUMN1_NAME, COLUMN2_NAME });
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "MatrixCursor",
-            args = {java.lang.String[].class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "MatrixCursor",
-            args = {java.lang.String[].class, int.class}
-        )
-    })
     public void testMatrixCursor() {
         new MatrixCursor(new String[0]);
 
         new MatrixCursor(new String[] { COLUMN0_NAME }, 10);
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "newRow",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "isNull",
-            args = {int.class}
-        )
-    })
     public void testNewRow() {
         assertEquals(0, mMatrixCursor.getCount());
         RowBuilder builder = mMatrixCursor.newRow();
@@ -123,23 +94,6 @@ public class MatrixCursorTest extends TestCase {
         assertEquals(2, mMatrixCursor.getCount());
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "addRow",
-            args = {java.lang.Object[].class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "addRow",
-            args = {java.lang.Iterable.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getCount",
-            args = {}
-        )
-    })
     public void testAddRow() {
         assertEquals(0, mMatrixCursor.getCount());
 
@@ -201,11 +155,6 @@ public class MatrixCursorTest extends TestCase {
         }
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "getColumnNames",
-        args = {}
-    )
     public void testGetColumnNames() {
         String[] names = mMatrixCursor.getColumnNames();
         assertEquals(3, names.length);
@@ -219,38 +168,6 @@ public class MatrixCursorTest extends TestCase {
         assertEquals(COLUMN2_INDEX, mMatrixCursor.getColumnIndex(COLUMN2_NAME));
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getString",
-            args = {int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getShort",
-            args = {int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getInt",
-            args = {int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getLong",
-            args = {int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getFloat",
-            args = {int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getDouble",
-            args = {int.class}
-        )
-    })
     public void testGetters() {
         mMatrixCursor.addRow(new Short[] { Short.MIN_VALUE, 0, Short.MAX_VALUE });
         mMatrixCursor.moveToLast();

@@ -20,21 +20,11 @@ import android.test.AndroidTestCase;
 import android.text.Editable;
 import android.text.SpannableStringBuilder;
 import android.text.Editable.Factory;
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
 
-@TestTargetClass(Editable.Factory.class)
 public class Editable_FactoryTest extends AndroidTestCase {
 
     Factory mFactory;
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test newEditable(CharSequence source)",
-        method = "newEditable",
-        args = {java.lang.CharSequence.class}
-    )
     public void testNewEditable() {
 
         CharSequence source = "abc";
@@ -48,12 +38,6 @@ public class Editable_FactoryTest extends AndroidTestCase {
 
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test getInstance()",
-        method = "getInstance",
-        args = {}
-    )
     public void testGetInstance() {
 
         // new the Factory instance

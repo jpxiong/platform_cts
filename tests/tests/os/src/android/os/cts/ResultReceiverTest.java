@@ -17,10 +17,6 @@
 package android.os.cts;
 
 
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
 
 import android.os.Bundle;
 import android.os.Handler;
@@ -28,38 +24,10 @@ import android.os.Parcel;
 import android.os.ResultReceiver;
 import android.test.AndroidTestCase;
 
-@TestTargetClass(ResultReceiver.class)
 public class ResultReceiverTest extends AndroidTestCase {
     private Handler mHandler = new Handler();
     private static final long DURATION = 100l;
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "send",
-            args = {int.class, Bundle.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "onReceiveResult",
-            args = {int.class, Bundle.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "ResultReceiver",
-            args = {Handler.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "describeContents",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.PARTIAL,
-            method = "writeToParcel",
-            args = {Parcel.class, int.class}
-        )
-    })
     public void testResultReceiver() throws InterruptedException {
         MockResultReceiver sender = new MockResultReceiver(mHandler);
         Bundle bundle = new Bundle();

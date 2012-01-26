@@ -19,12 +19,7 @@ package android.os.cts;
 import junit.framework.TestCase;
 import android.os.Parcel;
 import android.os.PatternMatcher;
-import dalvik.annotation.TestTargets;
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargetClass;
 
-@TestTargetClass(PatternMatcher.class)
 public class PatternMatcherTest extends TestCase {
 
     private PatternMatcher mPatternMatcher;
@@ -36,20 +31,6 @@ public class PatternMatcherTest extends TestCase {
         mPatternMatcher = null;
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test constructor",
-            method = "PatternMatcher",
-            args = {android.os.Parcel.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test constructor",
-            method = "PatternMatcher",
-            args = {java.lang.String.class, int.class}
-        )
-    })
     public void testConstructor() {
 
         // new the PatternMatcher instance
@@ -66,12 +47,6 @@ public class PatternMatcherTest extends TestCase {
 
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test getType",
-        method = "getType",
-        args = {}
-    )
     public void testGetType() {
 
         mPatternMatcher = new PatternMatcher("test", PatternMatcher.PATTERN_LITERAL);
@@ -84,12 +59,6 @@ public class PatternMatcherTest extends TestCase {
         assertEquals(PatternMatcher.PATTERN_SIMPLE_GLOB, mPatternMatcher.getType());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test getPath",
-        method = "getPath",
-        args = {}
-    )
     public void testGetPath() {
 
         // set the expected value
@@ -104,12 +73,6 @@ public class PatternMatcherTest extends TestCase {
         assertEquals(expected2, mPatternMatcher.getPath());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test toString",
-        method = "toString",
-        args = {}
-    )
     public void testToString() {
 
         // set the expected value
@@ -129,12 +92,6 @@ public class PatternMatcherTest extends TestCase {
 
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test writeToParcel",
-        method = "writeToParcel",
-        args = {android.os.Parcel.class, int.class}
-    )
     public void testWriteToParcel() {
 
         String expected = "test1";
@@ -148,12 +105,6 @@ public class PatternMatcherTest extends TestCase {
         assertEquals(PatternMatcher.PATTERN_LITERAL, p.readInt());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test describeContents",
-        method = "describeContents",
-        args = {}
-    )
     public void testDescribeContents() {
 
         // set the expected value
@@ -161,12 +112,6 @@ public class PatternMatcherTest extends TestCase {
         assertEquals(0, mPatternMatcher.describeContents());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test match",
-        method = "match",
-        args = {java.lang.String.class}
-    )
     public void testMatch() {
 
         // set the expected value

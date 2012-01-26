@@ -18,18 +18,9 @@ package android.graphics.cts;
 
 import junit.framework.TestCase;
 import android.graphics.MaskFilter;
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
 
-@TestTargetClass(MaskFilter.class)
 public class MaskFilterTest extends TestCase {
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "MaskFilter",
-        args = {}
-    )
     public void testConstructor() {
         // new the MaskFilter instance
         new MaskFilter();

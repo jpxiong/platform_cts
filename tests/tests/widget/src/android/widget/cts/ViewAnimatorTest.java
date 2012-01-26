@@ -18,10 +18,6 @@ package android.widget.cts;
 
 import com.android.cts.stub.R;
 
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
 
 import org.xmlpull.v1.XmlPullParser;
 
@@ -39,7 +35,6 @@ import android.view.animation.AnimationSet;
 import android.widget.RelativeLayout;
 import android.widget.ViewAnimator;
 
-@TestTargetClass(ViewAnimator.class)
 public class ViewAnimatorTest extends
         ActivityInstrumentationTestCase2<ViewAnimatorStubActivity> {
     private ViewAnimator mViewAnimator;
@@ -67,40 +62,11 @@ public class ViewAnimatorTest extends
         assertNotNull(mViewAnimator);
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "ViewAnimator",
-            args = {android.content.Context.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "ViewAnimator",
-            args = {android.content.Context.class, android.util.AttributeSet.class}
-        )
-    })
     public void testConstructor() {
         new ViewAnimator(mActivity);
         new ViewAnimator(mActivity, mAttributeSet);
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setInAnimation",
-            args = {android.view.animation.Animation.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setInAnimation",
-            args = {android.content.Context.class, int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getInAnimation",
-            args = {}
-        )
-    })
     public void testAccessInAnimation() {
         AnimationSet expected = new AnimationSet(mActivity, mAttributeSet);
         assertNull(mViewAnimator.getInAnimation());
@@ -118,11 +84,6 @@ public class ViewAnimatorTest extends
         assertEquals(500, animation.getDuration());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "showNext",
-        args = {}
-    )
     @UiThreadTest
     public void testShowNext() {
         final View v1 = mActivity.findViewById(R.id.ok);
@@ -161,11 +122,6 @@ public class ViewAnimatorTest extends
         assertEquals(0, mViewAnimator.getChildCount());
     }
 
-    @TestTargetNew(
-        level = TestLevel.PARTIAL,
-        method = "setAnimateFirstView",
-        args = {boolean.class}
-    )
     public void testSetAnimateFirstView() {
         mViewAnimator.setAnimateFirstView(true);
         mViewAnimator.setAnimateFirstView(false);
@@ -173,18 +129,6 @@ public class ViewAnimatorTest extends
         // TODO: how to check
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setDisplayedChild",
-            args = {int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getDisplayedChild",
-            args = {}
-        )
-    })
     @UiThreadTest
     public void testAccessDisplayedChild() {
         final View v1 = mActivity.findViewById(R.id.ok);
@@ -219,18 +163,6 @@ public class ViewAnimatorTest extends
         assertEquals(0, mViewAnimator.getChildCount());
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setDisplayedChild",
-            args = {int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getDisplayedChild",
-            args = {}
-        )
-    })
     @UiThreadTest
     public void testAccessDisplayedChildBoundary() {
         final View v1 = mActivity.findViewById(R.id.ok);
@@ -259,11 +191,6 @@ public class ViewAnimatorTest extends
         assertEquals(0, mViewAnimator.getChildCount());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "getBaseline",
-        args = {}
-    )
     @UiThreadTest
     public void testGetBaseline() {
         final View v1 = mActivity.findViewById(R.id.ok);
@@ -290,11 +217,6 @@ public class ViewAnimatorTest extends
         assertEquals(0, mViewAnimator.getChildCount());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "showPrevious",
-        args = {}
-    )
     @UiThreadTest
     public void testShowPrevious() {
         final View v1 = mActivity.findViewById(R.id.ok);
@@ -334,11 +256,6 @@ public class ViewAnimatorTest extends
         assertEquals(0, mViewAnimator.getChildCount());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "getCurrentView",
-        args = {}
-    )
     @UiThreadTest
     public void testGetCurrentView() {
         final View v = mActivity.findViewById(R.id.label);
@@ -358,18 +275,6 @@ public class ViewAnimatorTest extends
         assertEquals(0, mViewAnimator.getChildCount());
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "addView",
-            args = {android.view.View.class, int.class, android.view.ViewGroup.LayoutParams.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "removeAllViews",
-            args = {}
-        )
-    })
     @UiThreadTest
     public void testAddView() {
         final View v1 = mActivity.findViewById(R.id.ok);
@@ -394,23 +299,6 @@ public class ViewAnimatorTest extends
         assertEquals(0, mViewAnimator.getChildCount());
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setOutAnimation",
-            args = {android.view.animation.Animation.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setOutAnimation",
-            args = {android.content.Context.class, int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getOutAnimation",
-            args = {}
-        )
-    })
     public void testAccessOutAnimation() {
         AnimationSet expected = new AnimationSet(mActivity, mAttributeSet);
         assertNull(mViewAnimator.getOutAnimation());
@@ -427,38 +315,6 @@ public class ViewAnimatorTest extends
         assertEquals(500, animation.getDuration());
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "removeView",
-            args = {android.view.View.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "removeViewAt",
-            args = {int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "removeViewInLayout",
-            args = {android.view.View.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "removeViews",
-            args = {int.class, int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "removeViewsInLayout",
-            args = {int.class, int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "removeAllViews",
-            args = {}
-        )
-    })
     @UiThreadTest
     public void testRemoveViews() {
         final View v1 = mActivity.findViewById(R.id.ok);

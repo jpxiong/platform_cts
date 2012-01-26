@@ -19,31 +19,13 @@ package android.view.animation.cts;
 import android.graphics.Matrix;
 import android.test.AndroidTestCase;
 import android.view.animation.Transformation;
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
-import dalvik.annotation.ToBeFixed;
 
-@TestTargetClass(Transformation.class)
 public class TransformationTest extends AndroidTestCase {
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "Transformation",
-        args = {}
-    )
     public void testConstructor() {
         new Transformation();
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "compose",
-        args = {Transformation.class}
-    )
-    @ToBeFixed(bug = "1695243", explanation = "{@link Transformation#compose(Transformation t)}"
-            + "needs to update Javadoc to declare how it composed.")
     public void testCompose() {
         final Transformation t1 = new Transformation();
         final Transformation t2 = new Transformation();
@@ -70,11 +52,6 @@ public class TransformationTest extends AndroidTestCase {
         assertEquals(Transformation.TYPE_ALPHA, t2.getTransformationType());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "clear",
-        args = {}
-    )
     public void testClear() {
         final Transformation t1 = new Transformation();
         final Transformation t2 = new Transformation();
@@ -104,18 +81,6 @@ public class TransformationTest extends AndroidTestCase {
         assertEquals(expected.getTransformationType(), actual.getTransformationType());
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setTransformationType",
-            args = {int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getTransformationType",
-            args = {}
-        )
-    })
     public void testAccessTransformationType() {
         final Transformation transformation = new Transformation();
 
@@ -135,11 +100,6 @@ public class TransformationTest extends AndroidTestCase {
         assertEquals(Transformation.TYPE_BOTH, transformation.getTransformationType());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "set",
-        args = {Transformation.class}
-    )
     public void testSet() {
         final Transformation t1 = new Transformation();
         t1.setAlpha(0.0f);
@@ -148,18 +108,6 @@ public class TransformationTest extends AndroidTestCase {
         assertTransformationEquals(t1, t2);
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setAlpha",
-            args = {float.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getAlpha",
-            args = {}
-        )
-    })
     public void testAccessAlpha() {
         final Transformation transformation = new Transformation();
 
@@ -173,28 +121,11 @@ public class TransformationTest extends AndroidTestCase {
         assertEquals(1.0f, transformation.getAlpha());
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "toString",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "toShortString",
-            args = {}
-        )
-    })
     public void testToString() {
         assertNotNull(new Transformation().toString());
         assertNotNull(new Transformation().toShortString());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "getMatrix",
-        args = {}
-    )
     public void testGetMatrix() {
         final Matrix expected = new Matrix();
         final Transformation transformation = new Transformation();

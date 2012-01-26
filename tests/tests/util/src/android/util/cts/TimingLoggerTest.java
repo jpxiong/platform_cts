@@ -15,51 +15,14 @@
  */
 package android.util.cts;
 
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
 
 import android.test.AndroidTestCase;
 import android.util.TimingLogger;
 
-@TestTargetClass(TimingLogger.class)
 public class TimingLoggerTest extends AndroidTestCase{
     private static final String LOG_TAG = "TimingLoggerTest";
     private static final int SLEEPING_MSEC = 100;
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "test TimingLogger",
-            method = "TimingLogger",
-            args = {java.lang.String.class, java.lang.String.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "test TimingLogger",
-            method = "addSplit",
-            args = {java.lang.String.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "test TimingLogger",
-            method = "dumpToLog",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "test TimingLogger",
-            method = "reset",
-            args = {java.lang.String.class, java.lang.String.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "test TimingLogger",
-            method = "reset",
-            args = {}
-        )
-    })
     public void testTimingLogger() {
         TimingLogger timings = new TimingLogger(LOG_TAG, "testTimingLogger");
 

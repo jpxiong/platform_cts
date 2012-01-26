@@ -30,12 +30,7 @@ import android.view.ContextThemeWrapper;
 import com.android.cts.stub.R;
 import com.android.internal.util.XmlUtils;
 
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
 
-@TestTargetClass(TypedArray.class)
 public class TypedArrayTest extends AndroidTestCase{
     private TypedArray mTypedArray;
     private static final int DEFINT = -1;
@@ -77,143 +72,6 @@ public class TypedArrayTest extends AndroidTestCase{
     /*
      * Test all get attrs methods, all test value are in styles.xml and attrs.xml.
      */
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getBoolean",
-            args = {int.class, boolean.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getColor",
-            args = {int.class, int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getColorStateList",
-            args = {int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getDimension",
-            args = {int.class, float.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getDimensionPixelOffset",
-            args = {int.class, int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getDimensionPixelSize",
-            args = {int.class, int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getDrawable",
-            args = {int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getFloat",
-            args = {int.class, float.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getFraction",
-            args = {int.class, int.class, int.class, float.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getIndex",
-            args = {int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getIndexCount",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getInt",
-            args = {int.class, int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getInteger",
-            args = {int.class, int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getLayoutDimension",
-            args = {int.class, java.lang.String.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getLayoutDimension",
-            args = {int.class, int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getNonResourceString",
-            args = {int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getPositionDescription",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getResourceId",
-            args = {int.class, int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getResources",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getString",
-            args = {int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getText",
-            args = {int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getTextArray",
-            args = {int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getValue",
-            args = {int.class, android.util.TypedValue.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "hasValue",
-            args = {int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "length",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "peekValue",
-            args = {int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "toString",
-            args = {}
-        )
-    })
     public void testAttrsMethod() {
         // getBoolean test
         assertTrue(mTypedArray.getBoolean(R.styleable.style1_type1, false));
@@ -292,11 +150,6 @@ public class TypedArrayTest extends AndroidTestCase{
         assertNotNull(mTypedArray.toString());
     }
 
-    @TestTargetNew(
-        level = TestLevel.NOT_FEASIBLE,
-        method = "recycle",
-        args = {}
-    )
     public void testRecycle() {
         final ContextThemeWrapper contextThemeWrapper = new ContextThemeWrapper(getContext(), 0);
         contextThemeWrapper.setTheme(R.style.TextAppearance);
@@ -305,12 +158,6 @@ public class TypedArrayTest extends AndroidTestCase{
         test.recycle();
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test getNonResourceString with xml file directly.",
-        method = "getNonResourceString",
-        args = {int.class}
-    )
     public void testNonResourceString() throws XmlPullParserException, IOException {
         final XmlResourceParser parser = getContext().getResources().getXml(R.xml.test_color);
         XmlUtils.beginDocument(parser, XML_BEGIN);

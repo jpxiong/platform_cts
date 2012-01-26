@@ -22,30 +22,13 @@ import android.graphics.Paint;
 import android.graphics.Paint.FontMetricsInt;
 import android.text.TextPaint;
 import android.text.style.ReplacementSpan;
-import dalvik.annotation.TestTargets;
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargetClass;
 
-@TestTargetClass(ReplacementSpan.class)
 public class ReplacementSpanTest extends TestCase {
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test updateMeasureState(TextPaint p). this method does nothing",
-        method = "updateMeasureState",
-        args = {android.text.TextPaint.class}
-    )
     public void testUpdateMeasureState() {
         ReplacementSpan replacementSpan = new MockReplacementSpan();
         replacementSpan.updateMeasureState(null);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test updateDrawState(TextPaint ds). this method does nothing",
-        method = "updateDrawState",
-        args = {android.text.TextPaint.class}
-    )
     public void testUpdateDrawState() {
         ReplacementSpan replacementSpan = new MockReplacementSpan();
         replacementSpan.updateDrawState(null);

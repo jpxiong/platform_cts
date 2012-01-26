@@ -24,12 +24,7 @@ import android.content.ServiceConnection;
 import android.cts.util.PollingCheck;
 import android.os.IBinder;
 
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
 
-@TestTargetClass(IntentService.class)
 public class IntentServiceTest extends ActivityTestsBase {
 
     private Intent mIntent;
@@ -71,38 +66,6 @@ public class IntentServiceTest extends ActivityTestsBase {
 
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "onStart",
-            args = {android.content.Intent.class, int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "onDestroy",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "onHandleIntent",
-            args = {Intent.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "onBind",
-            args = {Intent.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "onCreate",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "IntentService",
-            args = {String.class}
-        )
-    })
     public void testIntentServiceLifeCycle() throws Throwable {
         // start service
         mContext.startService(mIntent);

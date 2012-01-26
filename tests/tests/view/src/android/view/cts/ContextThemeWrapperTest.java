@@ -25,13 +25,7 @@ import android.view.ContextThemeWrapper;
 
 import com.android.cts.stub.R;
 
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
-import dalvik.annotation.ToBeFixed;
 
-@TestTargetClass(ContextThemeWrapper.class)
 public class ContextThemeWrapperTest extends AndroidTestCase {
     private static final int SYSTEM_DEFAULT_THEME = 0;
 
@@ -48,21 +42,6 @@ public class ContextThemeWrapperTest extends AndroidTestCase {
         }
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test constructors.",
-            method = "ContextThemeWrapper",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test constructors.",
-            method = "ContextThemeWrapper",
-            args = {android.content.Context.class, int.class}
-        )
-    })
-    @ToBeFixed(bug="1695243", explanation="Javadocs need update for the constructors.")
     public void testConstructor() {
         // new the ContextThemeWrapper instance
         new ContextThemeWrapper();
@@ -71,20 +50,6 @@ public class ContextThemeWrapperTest extends AndroidTestCase {
         new ContextThemeWrapper(getContext(), R.style.TextAppearance);
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test setTheme.",
-            method = "setTheme",
-            args = {int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test getTheme.",
-            method = "getTheme",
-            args = {}
-        )
-    })
     public void testAccessTheme() {
         Context context = getContext();
         ContextThemeWrapper contextThemeWrapper = new ContextThemeWrapper(
@@ -98,20 +63,6 @@ public class ContextThemeWrapperTest extends AndroidTestCase {
         assertEqualsTextAppearanceStyle(ta);
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test getSystemService.",
-            method = "getSystemService",
-            args = {java.lang.String.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test onApplyThemeResource.",
-            method = "onApplyThemeResource",
-            args = {android.content.res.Resources.Theme.class, int.class, boolean.class}
-        )
-    })
     public void testGetSystemService() {
         // new the ContextThemeWrapper instance
         Context context = getContext();
@@ -127,12 +78,6 @@ public class ContextThemeWrapperTest extends AndroidTestCase {
                 contextThemeWrapper.getSystemService(Context.LAYOUT_INFLATER_SERVICE));
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test attachBaseContext.",
-        method = "attachBaseContext",
-        args = {android.content.Context.class}
-    )
     public void testAttachBaseContext() {
         assertTrue((new ContextThemeWrapper() {
             public boolean test() {

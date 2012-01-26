@@ -20,12 +20,7 @@ import java.util.Calendar;
 
 import android.test.AndroidTestCase;
 import android.util.MonthDisplayHelper;
-import dalvik.annotation.TestTargets;
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargetClass;
 
-@TestTargetClass(MonthDisplayHelper.class)
 public class MonthDisplayHelperTest extends AndroidTestCase {
     private MonthDisplayHelper mHelper;
     @Override
@@ -33,20 +28,6 @@ public class MonthDisplayHelperTest extends AndroidTestCase {
         super.setUp();
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test constructor(s) of MonthDisplayHelper.",
-            method = "MonthDisplayHelper",
-            args = {int.class, int.class, int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test constructor(s) of MonthDisplayHelper.",
-            method = "MonthDisplayHelper",
-            args = {int.class, int.class}
-        )
-    })
     public void testConstructor() {
 
         try {
@@ -84,20 +65,6 @@ public class MonthDisplayHelperTest extends AndroidTestCase {
 
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test getNumberOfDaysInMonth().",
-            method = "getNumberOfDaysInMonth",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test getNumberOfDaysInMonth().",
-            method = "MonthDisplayHelper",
-            args = {int.class, int.class}
-        )
-    })
     public void testNumberOfDaysInCurrentMonth() {
         assertEquals(30, new MonthDisplayHelper(2007, Calendar.SEPTEMBER)
                 .getNumberOfDaysInMonth());
@@ -107,26 +74,6 @@ public class MonthDisplayHelperTest extends AndroidTestCase {
         .getNumberOfDaysInMonth());
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test nextMonth().",
-            method = "nextMonth",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test nextMonth().",
-            method = "getDigitsForRow",
-            args = {int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test nextMonth().",
-            method = "getMonth",
-            args = {}
-        )
-    })
     public void testNextMonth() {
         mHelper = new MonthDisplayHelper(2007, Calendar.AUGUST, Calendar.SUNDAY);
 
@@ -140,20 +87,6 @@ public class MonthDisplayHelperTest extends AndroidTestCase {
                 .getDigitsForRow(0));
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test getRowOf(int day).",
-            method = "getRowOf",
-            args = {int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test getRowOf(int day).",
-            method = "MonthDisplayHelper",
-            args = {int.class, int.class}
-        )
-    })
     public void testGetRowOf() {
         mHelper = new MonthDisplayHelper(2007,
                 Calendar.AUGUST, Calendar.SUNDAY);
@@ -165,32 +98,6 @@ public class MonthDisplayHelperTest extends AndroidTestCase {
         assertEquals(3, mHelper.getRowOf(19));
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test getWeekStartDay().",
-            method = "getWeekStartDay",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test getWeekStartDay().",
-            method = "getOffset",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test getWeekStartDay().",
-            method = "MonthDisplayHelper",
-            args = {int.class, int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test getWeekStartDay().",
-            method = "MonthDisplayHelper",
-            args = {int.class, int.class, int.class}
-        )
-    })
     public void testHelperProperties() {
         mHelper = new MonthDisplayHelper(2007, Calendar.AUGUST, Calendar.SUNDAY);
 
@@ -201,26 +108,6 @@ public class MonthDisplayHelperTest extends AndroidTestCase {
         assertEquals(3, mHelper.getOffset());
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test getDigitsForRow(int row).",
-            method = "getDigitsForRow",
-            args = {int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test getDigitsForRow(int row).",
-            method = "MonthDisplayHelper",
-            args = {int.class, int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test getDigitsForRow(int row).",
-            method = "MonthDisplayHelper",
-            args = {int.class, int.class, int.class}
-        )
-    })
     public void testMonthRows() {
         mHelper = new MonthDisplayHelper(2007, Calendar.SEPTEMBER);
 
@@ -244,20 +131,6 @@ public class MonthDisplayHelperTest extends AndroidTestCase {
                 .getDigitsForRow(5));
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test getFirstDayOfMonth().",
-            method = "getFirstDayOfMonth",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test getFirstDayOfMonth().",
-            method = "MonthDisplayHelper",
-            args = {int.class, int.class}
-        )
-    })
     public void testFirstDayOfMonth() {
 
         assertEquals("august 2007", Calendar.WEDNESDAY, new MonthDisplayHelper(
@@ -268,20 +141,6 @@ public class MonthDisplayHelperTest extends AndroidTestCase {
                         .getFirstDayOfMonth());
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test getColumnOf(int day).",
-            method = "getColumnOf",
-            args = {int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test getColumnOf(int day).",
-            method = "MonthDisplayHelper",
-            args = {int.class, int.class}
-        )
-    })
     public void testGetColumnOf() {
         mHelper= new MonthDisplayHelper(2007,
                 Calendar.AUGUST, Calendar.SUNDAY);
@@ -293,12 +152,6 @@ public class MonthDisplayHelperTest extends AndroidTestCase {
         assertEquals(0, mHelper.getColumnOf(26));
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test getDayAt(int row, int column).",
-        method = "getDayAt",
-        args = {int.class, int.class}
-    )
     public void testGetDayAt() {
         mHelper = new MonthDisplayHelper(2007,
                 Calendar.AUGUST, Calendar.SUNDAY);
@@ -306,32 +159,6 @@ public class MonthDisplayHelperTest extends AndroidTestCase {
         assertEquals(30, mHelper.getDayAt(0, 1));
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test previousMonth().",
-            method = "previousMonth",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test previousMonth().",
-            method = "getDigitsForRow",
-            args = {int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test previousMonth().",
-            method = "getYear",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test previousMonth().",
-            method = "getMonth",
-            args = {}
-        )
-    })
     public void testPrevMonth() {
         mHelper = new MonthDisplayHelper(2007, Calendar.SEPTEMBER,
                 Calendar.SUNDAY);
@@ -353,12 +180,6 @@ public class MonthDisplayHelperTest extends AndroidTestCase {
         assertEquals(Calendar.DECEMBER, mHelper.getMonth());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test isWithinCurrentMonth(int row, int column).",
-        method = "isWithinCurrentMonth",
-        args = {int.class, int.class}
-    )
     public void testIsWithinCurrentMonth() {
         mHelper = new MonthDisplayHelper(2007, Calendar.SEPTEMBER,
                 Calendar.SUNDAY);

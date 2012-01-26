@@ -32,16 +32,10 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.android.cts.stub.R;
-import dalvik.annotation.TestTargets;
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.ToBeFixed;
 
 /**
  * Test {@link LinearLayout}.
  */
-@TestTargetClass(LinearLayout.class)
 public class LinearLayoutTest extends ActivityInstrumentationTestCase<LinearLayoutStubActivity> {
     private Context mContext;
     private Activity mActivity;
@@ -57,22 +51,6 @@ public class LinearLayoutTest extends ActivityInstrumentationTestCase<LinearLayo
         mContext = getInstrumentation().getTargetContext();
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test constructor(s) of {@link LinearLayout}",
-            method = "LinearLayout",
-            args = {android.content.Context.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test constructor(s) of {@link LinearLayout}",
-            method = "LinearLayout",
-            args = {android.content.Context.class, android.util.AttributeSet.class}
-        )
-    })
-    @ToBeFixed(bug="1417734", explanation="LinearLayout#LinearLayout(Context, AttributeSet)" +
-            " should check whether the input Context is null")
     public void testConstructor() {
         new LinearLayout(mContext);
 
@@ -89,18 +67,6 @@ public class LinearLayoutTest extends ActivityInstrumentationTestCase<LinearLayo
         }
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "isBaselineAligned",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setBaselineAligned",
-            args = {boolean.class}
-        )
-    })
     public void testAccessBaselineAligned() {
         LinearLayout linearLayout = new LinearLayout(mContext);
         linearLayout.setBaselineAligned(true);
@@ -123,12 +89,6 @@ public class LinearLayoutTest extends ActivityInstrumentationTestCase<LinearLayo
         assertTrue(linearLayout.isBaselineAligned());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test {@link LinearLayout#getBaseline()}",
-        method = "getBaseline",
-        args = {}
-    )
     public void testGetBaseline() {
         LinearLayout linearLayout = new LinearLayout(mContext);
 
@@ -151,18 +111,6 @@ public class LinearLayoutTest extends ActivityInstrumentationTestCase<LinearLayo
         assertEquals(lv3.getBaseline(), linearLayout.getBaseline());
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getBaselineAlignedChildIndex",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setBaselineAlignedChildIndex",
-            args = {int.class}
-        )
-    })
     public void testAccessBaselineAlignedChildIndex() {
         LinearLayout linearLayout = new LinearLayout(mContext);
         // set BaselineAlignedChildIndex
@@ -193,18 +141,6 @@ public class LinearLayoutTest extends ActivityInstrumentationTestCase<LinearLayo
         assertEquals(1, linearLayout.getBaselineAlignedChildIndex());
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setWeightSum",
-            args = {float.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getWeightSum",
-            args = {}
-        )
-    })
     /**
      * weightsum is a horizontal LinearLayout. There are three children in it.
      */
@@ -235,22 +171,6 @@ public class LinearLayoutTest extends ActivityInstrumentationTestCase<LinearLayo
         assertEquals(Math.ceil(parentWidth * 0.3), weight03.getWidth(), 1.0);
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "generateLayoutParams",
-            args = {android.util.AttributeSet.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "generateLayoutParams",
-            args = {android.view.ViewGroup.LayoutParams.class}
-        )
-    })
-    @ToBeFixed(bug="1417734", explanation="generateLayoutParams(AttributeSet)" +
-            " will throw a RuntimeException:" +
-            " Binary XML file line #-1: You must supply a layout_width attribute." +
-            " But 'layout_width' attribute have been assigned to be 'match_parent'.")
     public void testGenerateLayoutParams() {
         ViewGroup.LayoutParams lp = new ViewGroup.LayoutParams(320, 240);
         MockLinearLayout mockLinearLayout = new MockLinearLayout(mContext);
@@ -267,12 +187,6 @@ public class LinearLayoutTest extends ActivityInstrumentationTestCase<LinearLayo
 //        assertEquals(LayoutParams.WRAP_CONTENT, layoutParams2.height);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test {@link LinearLayout#checkLayoutParams(ViewGroup.LayoutParams)}",
-        method = "checkLayoutParams",
-        args = {android.view.ViewGroup.LayoutParams.class}
-    )
     public void testCheckLayoutParams() {
         MockLinearLayout mockLinearLayout = new MockLinearLayout(mContext);
 
@@ -283,12 +197,6 @@ public class LinearLayoutTest extends ActivityInstrumentationTestCase<LinearLayo
         assertTrue(mockLinearLayout.checkLayoutParams(params));
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test {@link LinearLayout#generateDefaultLayoutParams()}",
-        method = "generateDefaultLayoutParams",
-        args = {}
-    )
     public void testGenerateDefaultLayoutParams() {
         MockLinearLayout mockLinearLayout = new MockLinearLayout(mContext);
 
@@ -310,44 +218,6 @@ public class LinearLayoutTest extends ActivityInstrumentationTestCase<LinearLayo
         assertNull(mockLinearLayout.generateDefaultLayoutParams());
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "test layout three horizontal children",
-            method = "setGravity",
-            args = {int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "test layout three horizontal children",
-            method = "setVerticalGravity",
-            args = {int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "test layout three horizontal children",
-            method = "setOrientation",
-            args = {int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "test layout three horizontal children",
-            method = "getOrientation",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "test layout three horizontal children",
-            method = "onMeasure",
-            args = {int.class, int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "test layout three horizontal children",
-            method = "onLayout",
-            args = {boolean.class, int.class, int.class, int.class, int.class}
-        )
-    })
     /**
      * layout of horizontal LinearLayout.
      * ----------------------------------------------------
@@ -400,44 +270,6 @@ public class LinearLayoutTest extends ActivityInstrumentationTestCase<LinearLayo
         assertEquals(parent.getWidth(), bottomView.getRight());
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "test layout three vertical children",
-            method = "setGravity",
-            args = {int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "test layout three vertical children",
-            method = "setHorizontalGravity",
-            args = {int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "test layout three vertical children",
-            method = "setOrientation",
-            args = {int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "test layout three vertical children",
-            method = "getOrientation",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "test layout three vertical children",
-            method = "onMeasure",
-            args = {int.class, int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "test layout three vertical children",
-            method = "onLayout",
-            args = {boolean.class, int.class, int.class, int.class, int.class}
-        )
-    })
     /**
      * layout of vertical LinearLayout.
      * -----------------------------------

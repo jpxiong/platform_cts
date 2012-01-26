@@ -16,10 +16,6 @@
 
 package android.provider.cts;
 
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
 
 import android.content.ContentResolver;
 import android.content.res.Configuration;
@@ -29,7 +25,6 @@ import android.provider.Settings.SettingNotFoundException;
 import android.provider.Settings.System;
 import android.test.AndroidTestCase;
 
-@TestTargetClass(android.provider.Settings.System.class)
 public class Settings_SystemTest extends AndroidTestCase {
     private ContentResolver cr;
 
@@ -41,69 +36,6 @@ public class Settings_SystemTest extends AndroidTestCase {
         assertNotNull(cr);
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "putInt",
-            args = {android.content.ContentResolver.class, java.lang.String.class, int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "putLong",
-            args = {android.content.ContentResolver.class, java.lang.String.class, long.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "putFloat",
-            args = {android.content.ContentResolver.class, java.lang.String.class, float.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "putString",
-            args = {android.content.ContentResolver.class, java.lang.String.class,
-                    java.lang.String.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "putConfiguration",
-            args = {android.content.ContentResolver.class, android.content.res.Configuration.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setShowGTalkServiceStatus",
-            args = {android.content.ContentResolver.class, boolean.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getInt",
-            args = {android.content.ContentResolver.class, java.lang.String.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getLong",
-            args = {android.content.ContentResolver.class, java.lang.String.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getFloat",
-            args = {android.content.ContentResolver.class, java.lang.String.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getString",
-            args = {android.content.ContentResolver.class, java.lang.String.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getConfiguration",
-            args = {android.content.ContentResolver.class, android.content.res.Configuration.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getShowGTalkServiceStatus",
-            args = {android.content.ContentResolver.class}
-        )
-    })
     public void testSystemSettings() throws SettingNotFoundException {
         /**
          * first query the exist settings in System table, and then insert six
@@ -186,34 +118,12 @@ public class Settings_SystemTest extends AndroidTestCase {
         }
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getInt",
-            args = {android.content.ContentResolver.class, java.lang.String.class, int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getLong",
-            args = {android.content.ContentResolver.class, java.lang.String.class, long.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getFloat",
-            args = {android.content.ContentResolver.class, java.lang.String.class, float.class}
-        )
-    })
     public void testGetDefaultValues() {
         assertEquals(10, System.getInt(cr, "int", 10));
         assertEquals(20, System.getLong(cr, "long", 20l));
         assertEquals(30.0f, System.getFloat(cr, "float", 30.0f), 0.001);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "getUriFor",
-        args = {java.lang.String.class}
-    )
     public void testGetUriFor() {
         String name = "table";
 

@@ -16,9 +16,6 @@
 
 package android.graphics.cts;
 
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
 
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
@@ -31,7 +28,6 @@ import android.graphics.Bitmap.Config;
 
 import junit.framework.TestCase;
 
-@TestTargetClass(SweepGradient.class)
 public class SweepGradientTest extends TestCase {
 
     private Paint mPaint;
@@ -53,11 +49,6 @@ public class SweepGradientTest extends TestCase {
         mCanvas = new Canvas(mBitmap);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "SweepGradient",
-        args = {float.class, float.class, int.class, int.class}
-    )
     public void test2Colors() {
         final int[] colors = new int[] { Color.GREEN, Color.RED };
         final float[] positions = new float[] { 0f, 1f };
@@ -67,11 +58,6 @@ public class SweepGradientTest extends TestCase {
         checkColors(colors, positions, TOLERANCE);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "SweepGradient",
-        args = {float.class, float.class, int[].class, float[].class}
-    )
     public void testColorArray() {
         final int[] colors = new int[] { Color.GREEN, Color.RED, Color.BLUE };
         final float[] positions = new float[] { 0f, 0.3f, 1f };
@@ -82,11 +68,6 @@ public class SweepGradientTest extends TestCase {
         checkColors(colors, positions, TOLERANCE);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "SweepGradient",
-        args = {float.class, float.class, int[].class, float[].class}
-    )
     public void testMultiColor() {
         final int[] colors = new int[] { Color.GREEN, Color.RED, Color.BLUE, Color.GREEN };
         final float[] positions = new float[] { 0f, 0.25f, 0.5f, 1f };

@@ -16,9 +16,6 @@
 
 package android.provider.cts;
 
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
 
 import android.content.ContentResolver;
 import android.content.Context;
@@ -30,7 +27,6 @@ import android.test.AndroidTestCase;
 
 import java.util.ArrayList;
 
-@TestTargetClass(android.provider.UserDictionary.Words.class)
 public class UserDictionary_WordsTest extends AndroidTestCase {
 
     private Context mContext;
@@ -68,11 +64,6 @@ public class UserDictionary_WordsTest extends AndroidTestCase {
         super.tearDown();
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "addWord",
-        args = {Context.class, String.class, int.class, int.class}
-    )
     public void testAddWord() throws RemoteException {
         Cursor cursor;
 

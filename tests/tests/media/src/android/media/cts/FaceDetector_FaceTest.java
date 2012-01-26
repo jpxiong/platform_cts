@@ -18,10 +18,6 @@ package android.media.cts;
 
 import com.android.cts.stub.R;
 
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
 
 import android.content.Intent;
 import android.graphics.PointF;
@@ -31,7 +27,6 @@ import android.test.InstrumentationTestCase;
 
 import java.util.List;
 
-@TestTargetClass(Face.class)
 public class FaceDetector_FaceTest extends InstrumentationTestCase {
     private FaceDetectorStub mActivity;
 
@@ -51,29 +46,6 @@ public class FaceDetector_FaceTest extends InstrumentationTestCase {
         mActivity.finish();
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "eyesDistance",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "confidence",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getMidPoint",
-            args = {PointF.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.SUFFICIENT,
-            notes = "This method is not currently implemented (returns 0)",
-            method = "pose",
-            args = {int.class}
-        )
-    })
     public void testFaceProperties() throws Exception {
         long waitMsec = 5000;
         Thread.sleep(waitMsec);

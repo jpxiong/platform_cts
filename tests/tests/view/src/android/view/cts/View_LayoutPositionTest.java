@@ -18,10 +18,6 @@ package android.view.cts;
 
 import com.android.cts.stub.R;
 
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
 
 import android.app.Activity;
 import android.graphics.Canvas;
@@ -34,7 +30,6 @@ import android.view.View;
  * For the view test is too big, we divide the test cases into several parts.
  * This part contains size, padding, margin, layout and drawing
  */
-@TestTargetClass(View.class)
 public class View_LayoutPositionTest
         extends ActivityInstrumentationTestCase2<ViewLayoutPositionTestStubActivity> {
 
@@ -50,78 +45,6 @@ public class View_LayoutPositionTest
         mActivity = getActivity();
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getTop",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getBottom",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getRight",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getLeft",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "offsetTopAndBottom",
-            args = {int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "offsetLeftAndRight",
-            args = {int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getWidth",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getHeight",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getBaseLine",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "draw",
-            args = {Canvas.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "layout",
-            args = {int.class, int.class, int.class, int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getMeasuredWidth",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getMeasuredHeight",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getLocationOnScreen",
-            args = {int[].class}
-        )
-    })
     @UiThreadTest
     public void testPositionInParent() {
         View parent = mActivity.findViewById(R.id.testparent);
@@ -178,33 +101,6 @@ public class View_LayoutPositionTest
         assertEquals(bottom + v_offset, nbottom);
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getPaddingLeft",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getPaddingTop",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getPaddingRight",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getPaddingBottom",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setPadding",
-            args = {int.class, int.class, int.class, int.class}
-        )
-    })
     public void testPadding() {
         View view = new View(mActivity);
 

@@ -16,10 +16,6 @@
 
 package android.graphics.cts;
 
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
 
 import android.graphics.Matrix;
 import android.graphics.Path;
@@ -27,7 +23,6 @@ import android.graphics.PathMeasure;
 import android.graphics.Path.Direction;
 import android.test.AndroidTestCase;
 
-@TestTargetClass(PathMeasure.class)
 public class PathMeasureTest extends AndroidTestCase {
     private PathMeasure mPathMeasure;
     private Path mPath;
@@ -40,18 +35,6 @@ public class PathMeasureTest extends AndroidTestCase {
 
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "PathMeasure",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "PathMeasure",
-            args = {android.graphics.Path.class, boolean.class}
-        )
-    })
     public void testConstructor() {
         mPathMeasure = new PathMeasure();
 
@@ -63,11 +46,6 @@ public class PathMeasureTest extends AndroidTestCase {
         mPathMeasure = new PathMeasure(path, false);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "getPosTan",
-        args = {float.class, float[].class, float[].class}
-    )
     public void testGetPosTan() {
         float distance = 1f;
         float[] pos = { 1f };
@@ -90,11 +68,6 @@ public class PathMeasureTest extends AndroidTestCase {
         assertTrue(mPathMeasure.getPosTan(0f, pos3, tan3));
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "nextContour",
-        args = {}
-    )
     public void testNextContour() {
         assertFalse(mPathMeasure.nextContour());
         mPath.addRect(1, 2, 3, 4, Path.Direction.CW);
@@ -102,11 +75,6 @@ public class PathMeasureTest extends AndroidTestCase {
         assertTrue(mPathMeasure.nextContour());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "getLength",
-        args = {}
-    )
     public void testGetLength() {
         assertEquals(0f, mPathMeasure.getLength());
         mPath.addRect(1, 2, 3, 4, Path.Direction.CW);
@@ -114,11 +82,6 @@ public class PathMeasureTest extends AndroidTestCase {
         assertEquals(8.0f, mPathMeasure.getLength());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "isClosed",
-        args = {}
-    )
     public void testIsClosed() {
         Path circle = new Path();
         circle.addCircle(0, 0, 1, Direction.CW);
@@ -137,21 +100,11 @@ public class PathMeasureTest extends AndroidTestCase {
         assertTrue(measure.isClosed());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "setPath",
-        args = {android.graphics.Path.class, boolean.class}
-    )
     public void testSetPath() {
         mPathMeasure.setPath(mPath, true);
         //There is no getter and we can't obtain any status about it.
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "getSegment",
-        args = {float.class, float.class, android.graphics.Path.class, boolean.class}
-    )
     public void testGetSegment() {
         assertEquals(0f, mPathMeasure.getLength());
         mPath.addRect(1, 2, 3, 4, Path.Direction.CW);
@@ -162,11 +115,6 @@ public class PathMeasureTest extends AndroidTestCase {
         assertFalse(mPathMeasure.getSegment(mPathMeasure.getLength(), 0, dst, true));
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "getMatrix",
-        args = {float.class, android.graphics.Matrix.class, int.class}
-    )
     public void testGetMatrix() {
         Matrix matrix = new Matrix();
         assertFalse(mPathMeasure.getMatrix(1f, matrix, PathMeasure.POSITION_MATRIX_FLAG));

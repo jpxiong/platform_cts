@@ -18,11 +18,7 @@ package android.app.cts;
 import android.app.ActivityManager;
 import android.os.Parcel;
 import android.test.AndroidTestCase;
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
 
-@TestTargetClass(ActivityManager.ProcessErrorStateInfo.class)
 public class ActivityManagerProcessErrorStateInfoTest extends AndroidTestCase {
     protected ActivityManager.ProcessErrorStateInfo mErrorStateInfo;
 
@@ -32,30 +28,14 @@ public class ActivityManagerProcessErrorStateInfoTest extends AndroidTestCase {
         mErrorStateInfo = new ActivityManager.ProcessErrorStateInfo();
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test constructor",
-        method = "ActivityManager.ProcessErrorStateInfo",
-        args = {}
-    )
     public void testConstructor() {
         new ActivityManager.ProcessErrorStateInfo();
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "describeContents",
-        args = {}
-    )
     public void testDescribeContents() {
         assertEquals(0, mErrorStateInfo.describeContents());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "writeToParcel",
-        args = {android.os.Parcel.class, int.class}
-    )
     public void testWriteToParcel() throws Exception {
         int condition = 1;
         String processName = "processName";
@@ -90,12 +70,6 @@ public class ActivityManagerProcessErrorStateInfoTest extends AndroidTestCase {
         assertNull(values.crashData);  // Deprecated field: always null
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test readFromParcel method",
-        method = "readFromParcel",
-        args = {android.os.Parcel.class}
-    )
     public void testReadFromParcel() throws Exception {
         int condition = 1;
         String processName = "processName";

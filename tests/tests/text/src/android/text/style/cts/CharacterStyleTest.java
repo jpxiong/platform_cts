@@ -16,9 +16,6 @@
 
 package android.text.style.cts;
 
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
 
 import android.text.TextPaint;
 import android.text.style.CharacterStyle;
@@ -27,14 +24,7 @@ import android.text.style.SuperscriptSpan;
 
 import junit.framework.TestCase;
 
-@TestTargetClass(CharacterStyle.class)
 public class CharacterStyleTest extends TestCase {
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test {@link CharacterStyle#wrap(CharacterStyle)}",
-        method = "wrap",
-        args = {android.text.style.CharacterStyle.class}
-    )
     public void testWrap() {
         // use a MetricAffectingSpan
         MetricAffectingSpan metricAffectingSpan = new SuperscriptSpan();
@@ -61,12 +51,6 @@ public class CharacterStyleTest extends TestCase {
         assertTrue(result instanceof CharacterStyle);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test {@link CharacterStyle#getUnderlying()}",
-        method = "getUnderlying",
-        args = {}
-    )
     public void testGetUnderlying() {
         CharacterStyle expected = new MyCharacterStyle();
         assertSame(expected, expected.getUnderlying());

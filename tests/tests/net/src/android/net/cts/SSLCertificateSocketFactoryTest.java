@@ -27,13 +27,7 @@ import android.net.SSLCertificateSocketFactory;
 import android.test.AndroidTestCase;
 
 import dalvik.annotation.BrokenTest;
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
-import dalvik.annotation.ToBeFixed;
 
-@TestTargetClass(SSLCertificateSocketFactory.class)
 public class SSLCertificateSocketFactoryTest extends AndroidTestCase {
     private SSLCertificateSocketFactory mFactory;
     private int mTimeout;
@@ -45,24 +39,6 @@ public class SSLCertificateSocketFactoryTest extends AndroidTestCase {
         mFactory = (SSLCertificateSocketFactory) SSLCertificateSocketFactory.getDefault(mTimeout);
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.PARTIAL,
-            method = "getSupportedCipherSuites",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getDefault",
-            args = {int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.PARTIAL,
-            method = "getDefaultCipherSuites",
-            args = {}
-        )
-    })
-    @ToBeFixed(bug="1695243", explanation="Android API javadocs are incomplete")
     public void testAccessProperties() throws Exception {
         mFactory.getSupportedCipherSuites();
         mFactory.getDefaultCipherSuites();
@@ -70,38 +46,6 @@ public class SSLCertificateSocketFactoryTest extends AndroidTestCase {
         assertNotNull(sf);
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "createSocket",
-            args = {java.net.InetAddress.class, int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "createSocket",
-            args = {java.net.Socket.class, java.lang.String.class, int.class, boolean.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "createSocket",
-            args = {java.lang.String.class, int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.NOT_FEASIBLE,
-            method = "createSocket",
-            args = {java.lang.String.class, int.class, java.net.InetAddress.class, int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "createSocket",
-            args = {java.net.InetAddress.class, int.class, java.net.InetAddress.class, int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "SSLCertificateSocketFactory",
-            args = {int.class}
-        )
-    })
     public void testCreateSocket() throws Exception {
         new SSLCertificateSocketFactory(100);
         int port = 443;
@@ -153,11 +97,6 @@ public class SSLCertificateSocketFactoryTest extends AndroidTestCase {
      *
      * NOTE: Test will fail if external server is not available.
      */
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "createSocket",
-        args = {String.class, int.class}
-    )
     public void test_createSocket_simple() throws Exception {
         try {
             mFactory.createSocket(TEST_CREATE_SOCKET_HOST, TEST_CREATE_SOCKET_PORT);
@@ -174,11 +113,6 @@ public class SSLCertificateSocketFactoryTest extends AndroidTestCase {
      *
      * NOTE: Test will fail if external server is not available.
      */
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "createSocket",
-        args = {Socket.class, String.class, int.class, boolean.class}
-    )
     public void test_createSocket_wrapping() throws Exception {
         try {
             Socket underlying = new Socket(TEST_CREATE_SOCKET_HOST, TEST_CREATE_SOCKET_PORT);
@@ -197,11 +131,6 @@ public class SSLCertificateSocketFactoryTest extends AndroidTestCase {
      *
      * NOTE: Test will fail if external server is not available.
      */
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "createSocket",
-        args = {String.class, int.class, InetAddress.class, int.class}
-    )
     public void test_createSocket_bind() throws Exception {
         try {
             mFactory.createSocket(TEST_CREATE_SOCKET_HOST, TEST_CREATE_SOCKET_PORT, null, 0);

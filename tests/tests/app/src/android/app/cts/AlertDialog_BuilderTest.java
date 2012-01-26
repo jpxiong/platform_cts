@@ -44,11 +44,7 @@ import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.AdapterView.OnItemSelectedListener;
 
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
 
-@TestTargetClass(Builder.class)
 public class AlertDialog_BuilderTest extends ActivityInstrumentationTestCase2<DialogStubActivity> {
     private Builder mBuilder;
     private Context mContext;
@@ -125,20 +121,10 @@ public class AlertDialog_BuilderTest extends ActivityInstrumentationTestCase2<Di
         super("com.android.cts.stub", DialogStubActivity.class);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "AlertDialog.Builder",
-        args = {Context.class}
-    )
     public void testConstructor() {
         new AlertDialog.Builder(mContext);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "setIcon",
-        args = {int.class}
-    )
     public void testSetIconWithParamInt() throws Throwable {
         runTestOnUiThread(new Runnable() {
             public void run() {
@@ -151,11 +137,6 @@ public class AlertDialog_BuilderTest extends ActivityInstrumentationTestCase2<Di
         mInstrumentation.waitForIdleSync();
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "setIcon",
-        args = {Drawable.class}
-    )
     public void testSetIconWithParamDrawable() throws Throwable {
         runTestOnUiThread(new Runnable() {
             public void run() {
@@ -168,11 +149,6 @@ public class AlertDialog_BuilderTest extends ActivityInstrumentationTestCase2<Di
         mInstrumentation.waitForIdleSync();
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "setPositiveButton",
-        args = {int.class, OnClickListener.class}
-    )
     public void testSetPositiveButtonWithParamInt() throws Throwable {
        runTestOnUiThread(new Runnable() {
             public void run() {
@@ -189,11 +165,6 @@ public class AlertDialog_BuilderTest extends ActivityInstrumentationTestCase2<Di
         assertTrue(mResult);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "setPositiveButton",
-        args = {CharSequence.class, OnClickListener.class}
-    )
     public void testSetPositiveButtonWithParamCharSequence() throws Throwable {
         runTestOnUiThread(new Runnable() {
             public void run() {
@@ -209,11 +180,6 @@ public class AlertDialog_BuilderTest extends ActivityInstrumentationTestCase2<Di
         assertTrue(mResult);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "setNegativeButton",
-        args = {CharSequence.class, OnClickListener.class}
-    )
     public void testSetNegativeButtonWithParamCharSequence() throws Throwable {
         runTestOnUiThread(new Runnable() {
             public void run() {
@@ -229,11 +195,6 @@ public class AlertDialog_BuilderTest extends ActivityInstrumentationTestCase2<Di
         assertTrue(mResult);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "setNegativeButton",
-        args = {int.class, OnClickListener.class}
-    )
     public void testSetNegativeButtonWithParamInt() throws Throwable {
         runTestOnUiThread(new Runnable() {
             public void run() {
@@ -249,11 +210,6 @@ public class AlertDialog_BuilderTest extends ActivityInstrumentationTestCase2<Di
         assertTrue(mResult);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "setNeutralButton",
-        args = {int.class, OnClickListener.class}
-    )
     public void testSetNeutralButtonWithParamInt() throws Throwable {
         runTestOnUiThread(new Runnable() {
             public void run() {
@@ -269,11 +225,6 @@ public class AlertDialog_BuilderTest extends ActivityInstrumentationTestCase2<Di
         assertTrue(mResult);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "setNeutralButton",
-        args = {CharSequence.class, OnClickListener.class}
-    )
     public void testSetNeutralButtonWithParamCharSequence() throws Throwable {
         runTestOnUiThread(new Runnable() {
             public void run() {
@@ -300,33 +251,18 @@ public class AlertDialog_BuilderTest extends ActivityInstrumentationTestCase2<Di
         mInstrumentation.waitForIdleSync();
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "setCancelable",
-        args = {boolean.class}
-    )
     public void testSetCancelable() throws Throwable {
         setCancelable(true);
         mInstrumentation.sendKeyDownUpSync(KeyEvent.KEYCODE_BACK);
         assertFalse(mDialog.isShowing());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "setCancelable",
-        args = {boolean.class}
-    )
     public void testDisableCancelable() throws Throwable {
         setCancelable(false);
         mInstrumentation.sendKeyDownUpSync(KeyEvent.KEYCODE_BACK);
         assertTrue(mDialog.isShowing());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "setOnCancelListener",
-        args = {OnCancelListener.class}
-    )
     public void testSetOnCancelListener() throws Throwable {
         runTestOnUiThread(new Runnable() {
             public void run() {
@@ -340,11 +276,6 @@ public class AlertDialog_BuilderTest extends ActivityInstrumentationTestCase2<Di
         assertTrue(mResult);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "setOnKeyListener",
-        args = {OnKeyListener.class}
-    )
     public void testSetOnKeyListener() throws Throwable {
         runTestOnUiThread(new Runnable() {
             public void run() {
@@ -358,11 +289,6 @@ public class AlertDialog_BuilderTest extends ActivityInstrumentationTestCase2<Di
         assertTrue(mResult);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "setItems",
-        args = {int.class, OnClickListener.class}
-    )
     public void testSetItemsWithParamInt() throws Throwable {
         runTestOnUiThread(new Runnable() {
             public void run() {
@@ -379,11 +305,6 @@ public class AlertDialog_BuilderTest extends ActivityInstrumentationTestCase2<Di
         assertEquals(levels[0], mListView.getItemAtPosition(0));
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "setItems",
-        args = {CharSequence[].class, OnClickListener.class}
-    )
     public void testSetItemsWithParamCharSequence() throws Throwable {
         final CharSequence[] expect = mContext.getResources().getTextArray(
                 com.android.cts.stub.R.array.difficultyLevel);
@@ -400,11 +321,6 @@ public class AlertDialog_BuilderTest extends ActivityInstrumentationTestCase2<Di
         assertEquals(expect[0], mListView.getItemAtPosition(0));
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "setAdapter",
-        args = {ListAdapter.class, OnClickListener.class}
-    )
     public void testSetAdapter() throws Throwable {
         final ListAdapter adapter = new AdapterTest();
         runTestOnUiThread(new Runnable() {
@@ -419,11 +335,6 @@ public class AlertDialog_BuilderTest extends ActivityInstrumentationTestCase2<Di
         assertEquals(adapter, mListView.getAdapter());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "setCursor",
-        args = {Cursor.class, OnClickListener.class, String.class}
-    )
     public void testSetCursor() throws Throwable {
         preparePeople();
         final Cursor c = mContext.getContentResolver().query(People.CONTENT_URI, mPROJECTION, null,
@@ -444,11 +355,6 @@ public class AlertDialog_BuilderTest extends ActivityInstrumentationTestCase2<Di
         assertTrue(mResult);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "setMultiChoiceItems",
-        args = {int.class, boolean[].class, OnMultiChoiceClickListener.class}
-    )
     public void testSetMultiChoiceItemsWithParamInt() throws Throwable {
 
         final CharSequence[] items = mContext.getResources().getTextArray(
@@ -473,11 +379,6 @@ public class AlertDialog_BuilderTest extends ActivityInstrumentationTestCase2<Di
         assertTrue(mResult);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "setMultiChoiceItems",
-        args = {CharSequence[].class, boolean[].class, OnMultiChoiceClickListener.class}
-    )
     public void testSetMultiChoiceItemsWithParamCharSequence() throws Throwable {
         final CharSequence[] items = mContext.getResources().getTextArray(
                 com.android.cts.stub.R.array.difficultyLevel);
@@ -500,11 +401,6 @@ public class AlertDialog_BuilderTest extends ActivityInstrumentationTestCase2<Di
         assertTrue(mResult);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "setMultiChoiceItems",
-        args = {Cursor.class, String.class, String.class, OnMultiChoiceClickListener.class}
-    )
     public void testSetMultiChoiceItemsWithParamCursor() throws Throwable {
         preparePeople();
         final Cursor c = mContext.getContentResolver().query(People.CONTENT_URI, mPROJECTION, null,
@@ -528,11 +424,6 @@ public class AlertDialog_BuilderTest extends ActivityInstrumentationTestCase2<Di
         assertTrue(mResult);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "setSingleChoiceItems",
-        args = {int.class, int.class, OnClickListener.class}
-    )
     public void testSetSingleChoiceItemsWithParamInt() throws Throwable {
         final CharSequence[] items = mContext.getResources().getTextArray(
                 com.android.cts.stub.R.array.difficultyLevel);
@@ -563,11 +454,6 @@ public class AlertDialog_BuilderTest extends ActivityInstrumentationTestCase2<Di
         mResolver.insert(People.CONTENT_URI, valuse);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "setSingleChoiceItems",
-        args = {Cursor.class, int.class, String.class, OnClickListener.class}
-    )
     public void testSetSingleChoiceItemsWithParamCursor() throws Throwable {
         final String[] PROJECTION = new String[] {
                 People._ID, People.NAME
@@ -591,11 +477,6 @@ public class AlertDialog_BuilderTest extends ActivityInstrumentationTestCase2<Di
         assertTrue(mResult);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "setSingleChoiceItems",
-        args = {CharSequence[].class, int.class, OnClickListener.class}
-    )
     public void testSetSingleChoiceItemsWithParamCharSequence() throws Throwable {
         final CharSequence[] items = mContext.getResources().getTextArray(
                 com.android.cts.stub.R.array.difficultyLevel);
@@ -616,11 +497,6 @@ public class AlertDialog_BuilderTest extends ActivityInstrumentationTestCase2<Di
         assertTrue(mResult);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "setSingleChoiceItems",
-        args = {ListAdapter.class, int.class, OnClickListener.class}
-    )
     public void testSetSingleChoiceItems() throws Throwable {
         final CharSequence[] items = mContext.getResources().getTextArray(
                 com.android.cts.stub.R.array.difficultyLevel);
@@ -643,11 +519,6 @@ public class AlertDialog_BuilderTest extends ActivityInstrumentationTestCase2<Di
         assertTrue(mResult);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "setOnItemSelectedListener",
-        args = {AdapterView.OnItemSelectedListener.class}
-    )
     public void testSetOnItemSelectedListener() throws Throwable {
         runTestOnUiThread(new Runnable() {
             public void run() {
@@ -663,11 +534,6 @@ public class AlertDialog_BuilderTest extends ActivityInstrumentationTestCase2<Di
         assertTrue(mItemSelected);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "setView",
-        args = {View.class}
-    )
     public void testSetView() throws Throwable {
         final View view = new View(mContext);
         view.setId(100);
@@ -683,11 +549,6 @@ public class AlertDialog_BuilderTest extends ActivityInstrumentationTestCase2<Di
         assertEquals(view, mView);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "setView",
-        args = {View.class, int.class, int.class, int.class, int.class}
-    )
     public void testSetViewCustom() throws Throwable {
         final int viewSpacingLeft = 10;
         final int viewSpacingTop = 20;
@@ -708,11 +569,6 @@ public class AlertDialog_BuilderTest extends ActivityInstrumentationTestCase2<Di
         assertEquals(view, mView);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "setInverseBackgroundForced",
-        args = {boolean.class}
-    )
     public void testSetInverseBackgroundForced() throws Throwable {
         runTestOnUiThread(new Runnable() {
             public void run() {
@@ -725,11 +581,6 @@ public class AlertDialog_BuilderTest extends ActivityInstrumentationTestCase2<Di
         mInstrumentation.waitForIdleSync();
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "create",
-        args = {}
-    )
     public void testCreate() throws Throwable {
         runTestOnUiThread(new Runnable() {
             public void run() {
@@ -743,11 +594,6 @@ public class AlertDialog_BuilderTest extends ActivityInstrumentationTestCase2<Di
         assertTrue(mDialog.isShowing());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "show",
-        args = {}
-    )
     public void testShow() throws Throwable {
         runTestOnUiThread(new Runnable() {
             public void run() {

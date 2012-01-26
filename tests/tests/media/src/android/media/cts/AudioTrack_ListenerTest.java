@@ -16,11 +16,6 @@
 
 package android.media.cts;
 
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
-import dalvik.annotation.ToBeFixed;
 
 import android.media.AudioFormat;
 import android.media.AudioManager;
@@ -30,7 +25,6 @@ import android.os.Handler;
 import android.os.Message;
 import android.test.AndroidTestCase;
 
-@TestTargetClass(AudioTrack.class)
 public class AudioTrack_ListenerTest extends AndroidTestCase {
     private boolean mOnMarkerReachedCalled;
     private boolean mOnPeriodicNotificationCalled;
@@ -53,37 +47,11 @@ public class AudioTrack_ListenerTest extends AndroidTestCase {
     private OnPlaybackPositionUpdateListener mListener =
                                 new MockOnPlaybackPositionUpdateListener();
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getMinBufferSize",
-            args = {int.class, int.class, int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setPlaybackPositionUpdateListener",
-            args = {OnPlaybackPositionUpdateListener.class}
-        )
-    })
     public void testAudioTrackCallback() throws Exception {
         mAudioTrack.setPlaybackPositionUpdateListener(mListener);
         doTest();
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getMinBufferSize",
-            args = {int.class, int.class, int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setPlaybackPositionUpdateListener",
-            args = {OnPlaybackPositionUpdateListener.class, Handler.class}
-        )
-    })
-    @ToBeFixed(explanation="The handler argument is only used to find the correct Looper." +
-            "The AudioTrack instance creates its own handler instance internally.")
     public void testAudioTrackCallbackWithHandler() throws Exception {
         mAudioTrack.setPlaybackPositionUpdateListener(mListener, mHandler);
         doTest();

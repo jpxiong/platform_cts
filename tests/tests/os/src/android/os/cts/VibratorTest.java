@@ -20,12 +20,7 @@ import android.content.Context;
 import android.os.Vibrator;
 import android.test.AndroidTestCase;
 import android.util.Log;
-import dalvik.annotation.TestTargets;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
 
-@TestTargetClass(Vibrator.class)
 public class VibratorTest extends AndroidTestCase {
 
     private Vibrator mVibrator;
@@ -36,12 +31,6 @@ public class VibratorTest extends AndroidTestCase {
         mVibrator = (Vibrator) getContext().getSystemService(Context.VIBRATOR_SERVICE);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test cancel()",
-        method = "cancel",
-        args = {}
-    )
     public void testVibratorCancel() {
         try {
             mVibrator.vibrate(1000);
@@ -56,20 +45,6 @@ public class VibratorTest extends AndroidTestCase {
         }
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test vibrate",
-            method = "vibrate",
-            args = {long[].class, int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test vibrate",
-            method = "vibrate",
-            args = {long.class}
-        )
-    })
     public void testVibratePattern() {
         long[] pattern = {100, 200, 400, 800, 1600};
         try {
@@ -85,12 +60,6 @@ public class VibratorTest extends AndroidTestCase {
         sleep();
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test vibrator with multi thread.",
-        method = "vibrate",
-        args = {long.class}
-    )
     public void testVibrateMultiThread() {
         Log.d("*******VibratorTest", "MultiTreadTest");
         new Thread(new Runnable() {

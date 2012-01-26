@@ -23,12 +23,7 @@ import android.os.Message;
 import android.os.SystemClock;
 import android.os.Handler.Callback;
 import android.util.Printer;
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
 
-@TestTargetClass(Handler.class)
 public class HandlerTest extends TestCase {
 
     public static final int MESSAGE_WHAT = 3;
@@ -49,38 +44,6 @@ public class HandlerTest extends TestCase {
         super.tearDown();
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test constructor(s) of {@link Handler}",
-            method = "Handler",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test constructor(s) of {@link Handler}",
-            method = "Handler",
-            args = {android.os.Looper.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test constructor(s) of {@link Handler}",
-            method = "Handler",
-            args = {Callback.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test constructor(s) of {@link Handler}",
-            method = "Handler",
-            args = {Looper.class, Callback.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "test constructor of Handler",
-            method = "toString",
-            args = {}
-        )
-    })
     public void testConstructor() {
         Callback cb = new Callback() {
             public boolean handleMessage(Message msg) {
@@ -95,12 +58,6 @@ public class HandlerTest extends TestCase {
         new Handler(Looper.myLooper(), cb);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "test postAtTime with params Runnable, uptimeMillis",
-        method = "postAtTime",
-        args = {Runnable.class, long.class}
-    )
     public void testPostAtTime1() {
         MockRunnable r = new MockRunnable();
         assertTrue(mHandler.postAtTime(r, SystemClock.uptimeMillis() + RUNTIME));
@@ -110,12 +67,6 @@ public class HandlerTest extends TestCase {
         mHandler.removeCallbacks(r);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "test postAtTime with params Runnable, Object, uptimeMillis",
-        method = "postAtTime",
-        args = {Runnable.class, Object.class, long.class}
-    )
     public void testPostAtTime2() {
         MockRunnable r = new MockRunnable();
         Object token = new Object();
@@ -126,12 +77,6 @@ public class HandlerTest extends TestCase {
         mHandler.removeCallbacks(r);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "test sendMessageAtTime with params Message, uptimeMillis",
-        method = "sendMessageAtTime",
-        args = {Message.class, long.class}
-    )
     public void testSendMessageAtTime() {
         Message msg = mHandler1.obtainMessage();
         assertTrue(mHandler1.sendMessageAtTime(msg, SystemClock.uptimeMillis() + RUNTIME));
@@ -141,32 +86,12 @@ public class HandlerTest extends TestCase {
         mHandler1.removeMessages(msg.what);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test dump function",
-        method = "dump",
-        args = {Printer.class, String.class}
-    )
     public void testDump() {
         final String prefix = "AndroidTest";
         MockPrinter pw = new MockPrinter();
         mHandler.dump(pw, prefix);
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "test hasMessages with params int",
-            method = "hasMessages",
-            args = {int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "test hasMessages with params int",
-            method = "removeMessages",
-            args = {int.class}
-        )
-    })
     public void testHasMessagesWithInt() {
         Message msg = mHandler.obtainMessage();
         assertFalse(mHandler.hasMessages(msg.what));
@@ -176,12 +101,6 @@ public class HandlerTest extends TestCase {
         assertFalse(mHandler.hasMessages(msg.what));
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "test hasMessages with params int, Object",
-        method = "hasMessages",
-        args = {int.class, Object.class}
-    )
     public void testHasMessagesWithObject() {
         Message msg = mHandler.obtainMessage();
         msg.obj = new Object();
@@ -192,12 +111,6 @@ public class HandlerTest extends TestCase {
         assertFalse(mHandler.hasMessages(msg.what, msg.obj));
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "test removeCallbacksAndMessages with null Object",
-        method = "removeCallbacksAndMessages",
-        args = {Object.class}
-    )
     public void testRemoveCallbacksAndMessages() {
         Message msg = mHandler1.obtainMessage();
         mHandler1.sendMessageAtTime(msg, SystemClock.uptimeMillis() + RUNTIME);
@@ -238,12 +151,6 @@ public class HandlerTest extends TestCase {
         assertTrue(mr1.isRun());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "test sendEmptyMessageAtTime with param Message and uptimeMillis",
-        method = "sendEmptyMessageAtTime",
-        args = {int.class, long.class}
-    )
     public void testSendEmptyMessageAtTime() {
         long uptime = SystemClock.uptimeMillis() + RUNTIME;
         assertTrue(mHandler1.sendEmptyMessageAtTime(MESSAGE_WHAT, uptime));
@@ -253,12 +160,6 @@ public class HandlerTest extends TestCase {
         mHandler1.removeMessages(MESSAGE_WHAT);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "test getLooper",
-        method = "getLooper",
-        args = {}
-    )
     public void testGetLooper() {
         // new the Handler instance
         Looper looper = Looper.myLooper();
@@ -266,12 +167,6 @@ public class HandlerTest extends TestCase {
         assertSame(looper, mHandler.getLooper());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "test removeCallbacks with param Runnable",
-        method = "removeCallbacks",
-        args = {Runnable.class}
-    )
     public void testRemoveCallbacks() {
         // test remove right object.
         MockRunnable r = new MockRunnable();
@@ -291,12 +186,6 @@ public class HandlerTest extends TestCase {
         assertTrue(r.isRun());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "test removeCallbacks with params Runnable and Object",
-        method = "removeCallbacks",
-        args = {Runnable.class, Object.class}
-    )
     public void testRemoveCallbacksWithObject() {
         // test remove right object.
         MockRunnable r1 = new MockRunnable();
@@ -326,12 +215,6 @@ public class HandlerTest extends TestCase {
         assertTrue(r1.isRun());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "test removeMessages with params Message",
-        method = "removeMessages",
-        args = {int.class}
-    )
     public void testRemoveMessages() {
         // test remove right message
         Message msg = mHandler1.obtainMessage();
@@ -354,12 +237,6 @@ public class HandlerTest extends TestCase {
         assertEquals(100, mHandler1.what);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "test removeMessages with params Message, and uptimeMillis",
-        method = "removeMessages",
-        args = {int.class, Object.class}
-    )
     public void testRemoveMessagesWithObject() {
         // test remove right message
         Message msg = mHandler1.obtainMessage();
@@ -387,12 +264,6 @@ public class HandlerTest extends TestCase {
         assertEquals(100, mHandler1.what);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "test sendMessage with param Message",
-        method = "sendMessage",
-        args = {Message.class}
-    )
     public void testSendMessage() {
         Message msg = mHandler1.obtainMessage();
         assertTrue(mHandler1.sendMessage(msg));
@@ -401,24 +272,12 @@ public class HandlerTest extends TestCase {
         mHandler1.removeMessages(msg.what);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "test obtainMessage",
-        method = "obtainMessage",
-        args = {}
-    )
     public void testObtainMessage() {
          Message msg = mHandler.obtainMessage();
          assertNotNull(msg);
          assertEquals(mHandler, msg.getTarget());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test obtainMessage function",
-        method = "obtainMessage",
-        args = {int.class}
-    )
     public void testObtainMessageWithInt() {
          // new the Handler instance
          Handler handler = new Handler();
@@ -430,12 +289,6 @@ public class HandlerTest extends TestCase {
          assertEquals(msg.what, msg1.what);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "test obtainMessage with params Message and Object",
-        method = "obtainMessage",
-        args = {int.class, java.lang.Object.class}
-    )
     public void testObtainMessageWithIntObject() {
         // new the Handler instance
         Handler handler = new Handler();
@@ -449,12 +302,6 @@ public class HandlerTest extends TestCase {
         assertSame(msg.obj, msg1.obj);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "test obtainMessage with params Message,arg1 and arg2",
-        method = "obtainMessage",
-        args = {int.class, int.class, int.class}
-    )
     public void testObtainMessageWithMutiInt() {
         // new the Handler instance
         Handler handler = new Handler();
@@ -470,12 +317,6 @@ public class HandlerTest extends TestCase {
         assertEquals(msg.arg2, msg1.arg2);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "test obtainMessage with params Message, Object,arg1 and arg2",
-        method = "obtainMessage",
-        args = {int.class, int.class, int.class, Object.class}
-    )
     public void testObtainMessageWithMutiIntObject() {
         // new the Handler instance
         Handler handler = new Handler();
@@ -492,12 +333,6 @@ public class HandlerTest extends TestCase {
         assertSame(msg.obj, msg1.obj);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "test sendMessageAtFrontOfQueue with param Message",
-        method = "sendMessageAtFrontOfQueue",
-        args = {Message.class}
-    )
     public void testSendMessageAtFrontOfQueue() {
         Message lateMsg = mHandler1.obtainMessage();
         mHandler1.sendEmptyMessageAtTime(lateMsg.what, SystemClock.uptimeMillis() + RUNTIME * 5);
@@ -509,12 +344,6 @@ public class HandlerTest extends TestCase {
         mHandler1.removeMessages(msg.what);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "test postDelayed with params Runnable, delaytime",
-        method = "postDelayed",
-        args = {Runnable.class, long.class}
-    )
     public void testPostDelayed() {
         MockRunnable r = new MockRunnable();
         assertTrue(mHandler.postDelayed(r, DELAYED));
@@ -524,12 +353,6 @@ public class HandlerTest extends TestCase {
         mHandler.removeCallbacks(r);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "test postAtFrontOfQueue with param Runnable",
-        method = "postAtFrontOfQueue",
-        args = {Runnable.class}
-    )
     public void testPostAtFrontOfQueue() {
         MockRunnable r = new MockRunnable();
         MockRunnable mr = new MockRunnable();
@@ -541,12 +364,6 @@ public class HandlerTest extends TestCase {
         mHandler.removeCallbacks(r);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "test sendMessageDelayed with params Message, delaytime",
-        method = "sendMessageDelayed",
-        args = {Message.class, long.class}
-    )
     public void testSendMessageDelayed() {
         Message msg = mHandler1.obtainMessage();
         assertTrue(mHandler1.sendMessageDelayed(msg, DELAYED));
@@ -556,12 +373,6 @@ public class HandlerTest extends TestCase {
         mHandler1.removeMessages(msg.what);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "test post with param Runnalbe",
-        method = "post",
-        args = {Runnable.class}
-    )
     public void testPost() {
         MockRunnable r = new MockRunnable();
         assertFalse(r.isRun());
@@ -571,12 +382,6 @@ public class HandlerTest extends TestCase {
         mHandler.removeCallbacks(r);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "test sendEmptyMessageDelayed with params Message,delaytime",
-        method = "sendEmptyMessageDelayed",
-        args = {int.class, long.class}
-    )
     public void testSendEmptyMessageDelayed() {
         Message msg = mHandler1.obtainMessage();
         msg.what = 100;
@@ -586,12 +391,6 @@ public class HandlerTest extends TestCase {
         mHandler1.removeMessages(msg.what);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "test dispatchMessage with params Message, test its if branch",
-        method = "dispatchMessage",
-        args = {android.os.Message.class}
-    )
     public void testDispatchMessage1() {
         // new the Handler instance
         MockHandler handler = new MockHandler();
@@ -604,20 +403,6 @@ public class HandlerTest extends TestCase {
         assertTrue(callback.isRun());
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "test dispatchMessage with params Message, test its elsebranch",
-            method = "dispatchMessage",
-            args = {Message.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "test dispatchMessage with params Message, test its elsebranch",
-            method = "handleMessage",
-            args = {Message.class}
-        )
-    })
     public void testDispatchMessage2() {
         // new the Handler instance
         MockHandler handler = new MockHandler();
@@ -628,12 +413,6 @@ public class HandlerTest extends TestCase {
         assertSame(msg, handler.message);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "test sendEmptyMessage with param int what",
-        method = "sendEmptyMessage",
-        args = {int.class}
-    )
     public void testSendEmptyMessage() {
         Message msg = mHandler1.obtainMessage();
         msg.what = 100;
@@ -643,12 +422,6 @@ public class HandlerTest extends TestCase {
         mHandler1.removeMessages(msg.what);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test toString",
-        method = "toString",
-        args = {}
-    )
     public void testToString() {
         assertNotNull(mHandler1.toString());
     }

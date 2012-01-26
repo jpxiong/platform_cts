@@ -19,40 +19,9 @@ package android.net.cts;
 import android.net.LocalSocketAddress;
 import android.net.LocalSocketAddress.Namespace;
 import android.test.AndroidTestCase;
-import dalvik.annotation.TestTargets;
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargetClass;
 
-@TestTargetClass(LocalSocketAddress.class)
 public class LocalSocketAddressTest extends AndroidTestCase {
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test LocalSocketAddress",
-            method = "LocalSocketAddress",
-            args = {java.lang.String.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test LocalSocketAddress",
-            method = "LocalSocketAddress",
-            args = {java.lang.String.class, android.net.LocalSocketAddress.Namespace.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test LocalSocketAddress",
-            method = "getName",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test LocalSocketAddress",
-            method = "getNamespace",
-            args = {}
-        )
-    })
     public void testNewLocalSocketAddressWithDefaultNamespace() {
         // default namespace
         LocalSocketAddress localSocketAddress = new LocalSocketAddress("name");

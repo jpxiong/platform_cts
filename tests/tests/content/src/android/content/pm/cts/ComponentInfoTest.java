@@ -30,39 +30,14 @@ import android.widget.cts.WidgetTestUtils;
 
 import com.android.cts.stub.R;
 
-import dalvik.annotation.TestTargets;
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.ToBeFixed;
 
 /**
  * Test {@link ComponentInfo}.
  */
-@TestTargetClass(ComponentInfo.class)
 public class ComponentInfoTest extends AndroidTestCase {
     private final String PACKAGE_NAME = "com.android.cts.stub";
     private ComponentInfo mComponentInfo;
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "ComponentInfo",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "ComponentInfo",
-            args = {android.content.pm.ComponentInfo.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "ComponentInfo",
-            args = {android.os.Parcel.class}
-        )
-    })
-    @ToBeFixed(bug = "1695243", explanation = "ComponentInfo#ComponentInfo(ComponentInfo), " +
-            "ComponentInfo#ComponentInfo(Parcel), should check whether the input is null")
     public void testConstructor() {
         Parcel p = Parcel.obtain();
         ComponentInfo componentInfo = new ComponentInfo();
@@ -91,12 +66,6 @@ public class ComponentInfoTest extends AndroidTestCase {
         }
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "loadIcon",
-        args = {android.content.pm.PackageManager.class}
-    )
-    @ToBeFixed(bug = "1695243", explanation = "NullPointerException is not expected.")
     public void testLoadIcon() {
         mComponentInfo = new ComponentInfo();
         mComponentInfo.applicationInfo = new ApplicationInfo();
@@ -127,12 +96,6 @@ public class ComponentInfoTest extends AndroidTestCase {
         }
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "dumpBack",
-        args = {android.util.Printer.class, java.lang.String.class}
-    )
-    @ToBeFixed(bug = "1695243", explanation = "NullPointerException is not expected.")
     public void testDumpBack() {
         MyComponentInfo ci = new MyComponentInfo();
 
@@ -162,11 +125,6 @@ public class ComponentInfoTest extends AndroidTestCase {
         }
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "getIconResource",
-        args = {}
-    )
     public void testGetIconResource() {
         mComponentInfo = new ComponentInfo();
         mComponentInfo.applicationInfo = new ApplicationInfo();
@@ -179,11 +137,6 @@ public class ComponentInfoTest extends AndroidTestCase {
         assertEquals(mComponentInfo.applicationInfo.icon, mComponentInfo.getIconResource());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "isEnabled",
-        args = {}
-    )
     public void testIsEnabled() {
         mComponentInfo = new ComponentInfo();
         mComponentInfo.applicationInfo = new ApplicationInfo();
@@ -197,12 +150,6 @@ public class ComponentInfoTest extends AndroidTestCase {
         assertFalse(mComponentInfo.isEnabled());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "dumpFront",
-        args = {android.util.Printer.class, java.lang.String.class}
-    )
-    @ToBeFixed(bug = "1695243", explanation = "NullPointerException is not expected.")
     public void testDumpFront() {
         MyComponentInfo ci = new MyComponentInfo();
 
@@ -233,12 +180,6 @@ public class ComponentInfoTest extends AndroidTestCase {
         }
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "loadLabel",
-        args = {android.content.pm.PackageManager.class}
-    )
-    @ToBeFixed(bug = "1695243", explanation = "NullPointerException is not expected.")
     public void testLoadLabel() throws NameNotFoundException {
         mComponentInfo = new ComponentInfo();
         mComponentInfo.applicationInfo = new ApplicationInfo();
@@ -270,12 +211,6 @@ public class ComponentInfoTest extends AndroidTestCase {
         }
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "writeToParcel",
-        args = {android.os.Parcel.class, int.class}
-    )
-    @ToBeFixed(bug = "1695243", explanation = "NullPointerException is not expected.")
     public void testWriteToParcel() {
         Parcel p = Parcel.obtain();
         mComponentInfo = new ComponentInfo();

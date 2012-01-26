@@ -16,9 +16,6 @@
 
 package android.graphics.cts;
 
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
 
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
@@ -33,7 +30,6 @@ import android.graphics.PorterDuff.Mode;
 
 import junit.framework.TestCase;
 
-@TestTargetClass(DiscretePathEffect.class)
 public class DiscretePathEffectTest extends TestCase {
     private static final int BITMAP_WIDTH = 200;
     private static final int BITMAP_HEIGHT = 100;
@@ -43,11 +39,6 @@ public class DiscretePathEffectTest extends TestCase {
     private static final int SEGMENT_LENGTH = 10; // must be < BITMAP_WIDTH
     private static final int DEVIATION = 10; // must be < BITMAP_HEIGHT
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "DiscretePathEffect",
-        args = {float.class, float.class}
-    )
     public void testDiscretePathEffect() {
         DiscretePathEffect effect = new DiscretePathEffect(SEGMENT_LENGTH, DEVIATION);
 

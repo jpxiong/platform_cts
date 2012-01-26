@@ -20,40 +20,11 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.os.Parcel;
 import android.test.AndroidTestCase;
-import dalvik.annotation.TestTargets;
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.ToBeFixed;
 
 /**
  * Test {@link ComponentName}.
  */
-@TestTargetClass(ComponentName.class)
 public class ComponentNameTest extends AndroidTestCase {
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "ComponentName",
-            args = {android.content.Context.class, java.lang.Class.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "ComponentName",
-            args = {java.lang.String.class, java.lang.String.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "ComponentName",
-            args = {android.content.Context.class, java.lang.String.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "ComponentName",
-            args = {android.os.Parcel.class}
-        )
-    })
-    @ToBeFixed(bug = "1417734", explanation = "NullPointerException is not expected.")
     public void testConstructor() {
         // new the ComponentName instance
         new ComponentName("com.android.app", "com.android.app.InstrumentationTestActivity");
@@ -113,21 +84,11 @@ public class ComponentNameTest extends AndroidTestCase {
         new ComponentName(parcel);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "flattenToString",
-        args = {}
-    )
     public void testFlattenToString() {
         assertEquals("com.android.cts.stub/android.content.cts.ComponentNameTest",
                 getComponentName().flattenToString());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "getShortClassName",
-        args = {}
-    )
     public void testGetShortClassName() {
         // set the expected value, test normal value
         String actual = getComponentName().getShortClassName();
@@ -144,18 +105,6 @@ public class ComponentNameTest extends AndroidTestCase {
         assertEquals(".View", actual);
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "readFromParcel",
-            args = {android.os.Parcel.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "writeToParcel",
-            args = {android.os.Parcel.class, int.class}
-        )
-    })
     public void testReadFromParcel() {
         ComponentName expected = getComponentName();
         final Parcel parcel1 = Parcel.obtain();
@@ -170,21 +119,11 @@ public class ComponentNameTest extends AndroidTestCase {
         assertNull(expected);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "getPackageName",
-        args = {}
-    )
     public void testGetPackageName() {
         final String actual = getComponentName().getPackageName();
         assertEquals("com.android.cts.stub", actual);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "unflattenFromString",
-        args = {java.lang.String.class}
-    )
     public void testUnflattenFromString() {
         final ComponentName componentName = getComponentName();
         final String flattenString = getComponentName().flattenToString();
@@ -193,11 +132,6 @@ public class ComponentNameTest extends AndroidTestCase {
         assertEquals(componentName, actual);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "flattenToShortString",
-        args = {}
-    )
     public void testFlattenToShortString() {
         // Test normal
         String actual = getComponentName().flattenToShortString();
@@ -214,11 +148,6 @@ public class ComponentNameTest extends AndroidTestCase {
         assertEquals("com.android.view/.View", actual);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "equals",
-        args = {java.lang.Object.class}
-    )
     public void testEquals() {
         // new the ComponentName instances, both are the same.
         final ComponentName componentName1 = getComponentName();
@@ -232,42 +161,22 @@ public class ComponentNameTest extends AndroidTestCase {
         assertFalse(componentName1.equals(componentName2));
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "toString",
-        args = {}
-    )
     public void testToString() {
         assertNotNull(getComponentName().toString());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "toShortString",
-        args = {}
-    )
     public void testToShortString() {
         // Test normal string
         final String shortString = getComponentName().toShortString();
         assertEquals("{com.android.cts.stub/android.content.cts.ComponentNameTest}", shortString);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "getClassName",
-        args = {}
-    )
     public void testGetClassName() {
         // set the expected value
         final String className = getComponentName().getClassName();
         assertEquals("android.content.cts.ComponentNameTest", className);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "hashCode",
-        args = {}
-    )
     public void testHashCode() {
         final ComponentName componentName = getComponentName();
 
@@ -280,11 +189,6 @@ public class ComponentNameTest extends AndroidTestCase {
         assertEquals(hashCode1, hashCode2);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "writeToParcel",
-        args = {android.content.ComponentName.class, android.os.Parcel.class}
-    )
     public void testWriteToParcel() {
         // Test normal status
         final ComponentName componentName = getComponentName();
@@ -301,11 +205,6 @@ public class ComponentNameTest extends AndroidTestCase {
         assertEquals(0, parcel.dataAvail());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "describeContents",
-        args = {}
-    )
     public void testDescribeContents() {
         assertEquals(0, getComponentName().describeContents());
     }

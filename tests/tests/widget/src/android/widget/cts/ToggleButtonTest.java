@@ -28,16 +28,10 @@ import android.widget.ToggleButton;
 
 import com.android.cts.stub.R;
 
-import dalvik.annotation.TestTargets;
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.ToBeFixed;
 
 /**
  * Test {@link ToggleButton}.
  */
-@TestTargetClass(ToggleButton.class)
 public class ToggleButtonTest extends AndroidTestCase {
     private static final String TEXT_OFF = "text off";
     private static final String TEXT_ON = "text on";
@@ -55,28 +49,6 @@ public class ToggleButtonTest extends AndroidTestCase {
         mToggleButton = new ToggleButton(mContext, mAttrSet);
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "test constructors",
-            method = "ToggleButton",
-            args = {android.content.Context.class, android.util.AttributeSet.class, int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "test constructors",
-            method = "ToggleButton",
-            args = {android.content.Context.class, android.util.AttributeSet.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "test constructors",
-            method = "ToggleButton",
-            args = {android.content.Context.class}
-        )
-    })
-    @ToBeFixed(bug = "1371108",
-            explanation = "There should not be a NullPointerException thrown out.")
     public void testConstructor() {
         new ToggleButton(mContext, mAttrSet, 0);
         new ToggleButton(mContext, mAttrSet);
@@ -104,20 +76,6 @@ public class ToggleButtonTest extends AndroidTestCase {
         }
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "test setTextOff and getTextOff",
-            method = "setTextOff",
-            args = {java.lang.CharSequence.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "test setTextOff and getTextOff",
-            method = "getTextOff",
-            args = {}
-        )
-    })
     public void testAccessTextOff() {
         mToggleButton.setTextOff("android");
         assertEquals("android", mToggleButton.getTextOff());
@@ -130,12 +88,6 @@ public class ToggleButtonTest extends AndroidTestCase {
         assertEquals("", mToggleButton.getTextOff());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "test drawableStateChanged",
-        method = "drawableStateChanged",
-        args = {}
-    )
     public void testDrawableStateChanged() {
         MockToggleButton toggleButton = new MockToggleButton(mContext);
 
@@ -154,25 +106,11 @@ public class ToggleButtonTest extends AndroidTestCase {
         assertEquals(toggleButton.getDrawableState(), drawable.getState());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "test onFinishInflate",
-        method = "onFinishInflate",
-        args = {}
-    )
-    @ToBeFixed(bug = "1400085", explanation = "This method will effect the UI. "
-            + "The best way to test this is looking at the actual view.")
     public void testOnFinishInflate() {
         MockToggleButton toggleButton = new MockToggleButton(mContext);
         toggleButton.onFinishInflate();
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "test setChecked",
-        method = "setChecked",
-        args = {boolean.class}
-    )
     public void testSetChecked() {
         assertFalse(mToggleButton.isChecked());
 
@@ -183,26 +121,6 @@ public class ToggleButtonTest extends AndroidTestCase {
         assertFalse(mToggleButton.isChecked());
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Check the text of button when change button status",
-            method = "setChecked",
-            args = {boolean.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Check the text of button when change button status",
-            method = "setTextOff",
-            args = {java.lang.CharSequence.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Check the text of button when change button status",
-            method = "setTextOn",
-            args = {java.lang.CharSequence.class}
-        )
-    })
     public void testToggleText() {
         mToggleButton.setText("default text");
         mToggleButton.setTextOn(TEXT_ON);
@@ -230,12 +148,6 @@ public class ToggleButtonTest extends AndroidTestCase {
         assertEquals(TEXT_ON, mToggleButton.getText().toString());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "test setBackgroundDrawable",
-        method = "setBackgroundDrawable",
-        args = {android.graphics.drawable.Drawable.class}
-    )
     public void testSetBackgroundDrawable() {
         Drawable drawable = mContext.getResources().getDrawable(R.drawable.scenery);
 
@@ -247,20 +159,6 @@ public class ToggleButtonTest extends AndroidTestCase {
         assertNull(mToggleButton.getBackground());
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "test setTextOn and getTextOn",
-            method = "setTextOn",
-            args = {java.lang.CharSequence.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "test setTextOn and getTextOn",
-            method = "getTextOn",
-            args = {}
-        )
-    })
     public void testAccessTextOn() {
         mToggleButton.setTextOn("cts");
         assertEquals("cts", mToggleButton.getTextOn());

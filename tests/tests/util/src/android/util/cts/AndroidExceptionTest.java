@@ -18,37 +18,12 @@ package android.util.cts;
 
 import android.util.AndroidException;
 import android.test.AndroidTestCase;
-import dalvik.annotation.TestTargets;
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargetClass;
 
-@TestTargetClass(AndroidException.class)
 public class AndroidExceptionTest extends AndroidTestCase {
 
     private static final String NAME = "Test_AndroidException";
     private static final Exception CAUSE = new Exception();
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test exception methods",
-            method = "AndroidException",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test exception methods",
-            method = "AndroidException",
-            args = {java.lang.String.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test exception methods",
-            method = "AndroidException",
-            args = {java.lang.Exception.class}
-        )
-    })
     public void testAndroidException() {
         try {
             throw new AndroidException();

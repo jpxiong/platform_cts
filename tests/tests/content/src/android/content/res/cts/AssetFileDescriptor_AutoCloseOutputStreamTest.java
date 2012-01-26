@@ -22,12 +22,7 @@ import java.io.IOException;
 import android.content.res.AssetFileDescriptor;
 import android.os.ParcelFileDescriptor;
 import android.test.AndroidTestCase;
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
 
-@TestTargetClass(AssetFileDescriptor.AutoCloseOutputStream.class)
 public class AssetFileDescriptor_AutoCloseOutputStreamTest extends AndroidTestCase {
 
     private static final String FILE_NAME = "testAssertFileDescriptorAutoCloseOutputStream";
@@ -56,28 +51,6 @@ public class AssetFileDescriptor_AutoCloseOutputStreamTest extends AndroidTestCa
      * Test AutoCloseOutputStream life circle.
      * 1. Write file data into test file.
      */
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "AssetFileDescriptor.AutoCloseOutputStream",
-            args = {AssetFileDescriptor.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "write",
-            args = {int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "write",
-            args = {byte[].class, int.class, int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "write",
-            args = {byte[].class}
-        )
-    })
     public void testAutoCloseOutputStream() throws IOException {
         File file = new File(getContext().getFilesDir(), FILE_NAME);
         file.createNewFile();

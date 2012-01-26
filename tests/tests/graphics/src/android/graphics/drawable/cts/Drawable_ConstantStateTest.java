@@ -18,29 +18,12 @@ package android.graphics.drawable.cts;
 
 import junit.framework.TestCase;
 import android.graphics.drawable.Drawable;
-import dalvik.annotation.TestTargets;
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargetClass;
 
-@TestTargetClass(Drawable.ConstantState.class)
 public class Drawable_ConstantStateTest extends TestCase {
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test getChangingConfigurations()",
-        method = "getChangingConfigurations",
-        args = {}
-    )
     public void testGetChangingConfigurations() {
         // getChangingConfigurations is an abstract function.
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test newDrawable()",
-        method = "newDrawable",
-        args = {}
-    )
     public void testNewDrawable() {
         // newDrawable is an abstract function.
     }

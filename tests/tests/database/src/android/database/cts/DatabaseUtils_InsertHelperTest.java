@@ -16,11 +16,6 @@
 
 package android.database.cts;
 
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
-import dalvik.annotation.ToBeFixed;
 
 import android.content.ContentValues;
 import android.content.Context;
@@ -30,7 +25,6 @@ import android.database.sqlite.SQLiteDatabase;
 import android.test.AndroidTestCase;
 import android.test.MoreAsserts;
 
-@TestTargetClass(InsertHelper.class)
 public class DatabaseUtils_InsertHelperTest extends AndroidTestCase {
     private static final String TEST_TABLE_NAME = "test";
     private static final String DATABASE_NAME = "database_test.db";
@@ -55,30 +49,14 @@ public class DatabaseUtils_InsertHelperTest extends AndroidTestCase {
         super.tearDown();
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "InsertHelper",
-        args = {android.database.sqlite.SQLiteDatabase.class, java.lang.String.class}
-    )
     public void testConstructor() {
         new InsertHelper(mDatabase, TEST_TABLE_NAME);
     }
 
-    @TestTargetNew(
-        level = TestLevel.SUFFICIENT,
-        method = "close",
-        args = {}
-    )
     public void testClose() {
         mInsertHelper.close();
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "getColumnIndex",
-        args = {String.class}
-    )
-    @ToBeFixed(bug = "1695243", explanation = "Javadoc does not specify exceptions thrown.")
     public void testGetColumnIndex() {
         mDatabase.execSQL("CREATE TABLE " + TEST_TABLE_NAME + " (_id INTEGER PRIMARY KEY, " +
                 "name TEXT, age INTEGER, address TEXT);");
@@ -94,64 +72,6 @@ public class DatabaseUtils_InsertHelperTest extends AndroidTestCase {
         }
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.SUFFICIENT,
-            method = "prepareForInsert",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.SUFFICIENT,
-            method = "execute",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.SUFFICIENT,
-            method = "bind",
-            args = {int.class, boolean.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.SUFFICIENT,
-            method = "bind",
-            args = {int.class, int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.SUFFICIENT,
-            method = "bind",
-            args = {int.class, long.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.SUFFICIENT,
-            method = "bind",
-            args = {int.class, double.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.SUFFICIENT,
-            method = "bind",
-            args = {int.class, float.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.SUFFICIENT,
-            method = "bind",
-            args = {int.class, java.lang.String.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.SUFFICIENT,
-            method = "bind",
-            args = {int.class, byte[].class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.SUFFICIENT,
-            method = "bindNull",
-            args = {int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.SUFFICIENT,
-            method = "insert",
-            args = {android.content.ContentValues.class}
-        )
-    })
-    @ToBeFixed(bug = "1695243", explanation = "Javadoc does not specify exceptions thrown.")
     public void testInsert() {
         mDatabase.execSQL("CREATE TABLE " + TEST_TABLE_NAME + "(_id INTEGER PRIMARY KEY," +
                 " boolean_value INTEGER, int_value INTEGER, long_value INTEGER," +
@@ -254,64 +174,6 @@ public class DatabaseUtils_InsertHelperTest extends AndroidTestCase {
         assertEquals(-1, mInsertHelper.insert(values));
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.SUFFICIENT,
-            method = "prepareForReplace",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.SUFFICIENT,
-            method = "execute",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.SUFFICIENT,
-            method = "bind",
-            args = {int.class, boolean.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.SUFFICIENT,
-            method = "bind",
-            args = {int.class, int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.SUFFICIENT,
-            method = "bind",
-            args = {int.class, long.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.SUFFICIENT,
-            method = "bind",
-            args = {int.class, double.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.SUFFICIENT,
-            method = "bind",
-            args = {int.class, float.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.SUFFICIENT,
-            method = "bind",
-            args = {int.class, java.lang.String.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.SUFFICIENT,
-            method = "bind",
-            args = {int.class, byte[].class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.SUFFICIENT,
-            method = "bindNull",
-            args = {int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.SUFFICIENT,
-            method = "replace",
-            args = {android.content.ContentValues.class}
-        )
-    })
-    @ToBeFixed(bug = "1695243", explanation = "Javadoc does not specify exceptions thrown.")
     public void testReplace() {
         mDatabase.execSQL("CREATE TABLE " + TEST_TABLE_NAME + "(_id INTEGER PRIMARY KEY," +
                 " boolean_value INTEGER, int_value INTEGER, long_value INTEGER," +

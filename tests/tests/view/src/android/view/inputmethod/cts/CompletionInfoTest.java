@@ -16,69 +16,17 @@
 
 package android.view.inputmethod.cts;
 
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
 
 import android.os.Parcel;
 import android.test.AndroidTestCase;
 import android.view.inputmethod.CompletionInfo;
 
-@TestTargetClass(CompletionInfo.class)
 public class CompletionInfoTest extends AndroidTestCase {
     private static final int ID = 1;
     private static final int POSITION = 1;
     private static final String TEXT = "CompletionInfoText";
     private static final String LABEL = "CompletionInfoLabel";
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "describeContents",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "writeToParcel",
-            args = {Parcel.class, int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "CompletionInfo",
-            args = {long.class, int.class, CharSequence.class, CharSequence.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "CompletionInfo",
-            args = {long.class, int.class, CharSequence.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getId",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getPosition",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getText",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getLabel",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "toString",
-            args = {}
-        )
-    })
     public void testCompletionInfo() {
         new CompletionInfo(ID, POSITION, TEXT);
         CompletionInfo info = new CompletionInfo(ID, POSITION, TEXT, LABEL);

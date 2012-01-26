@@ -16,11 +16,6 @@
 
 package android.content.pm.cts;
 
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
-import dalvik.annotation.ToBeFixed;
 
 import android.app.cts.MockActivity;
 import android.content.ComponentName;
@@ -34,24 +29,9 @@ import android.util.StringBuilderPrinter;
 /**
  * Test {@link ActivityInfo}.
  */
-@TestTargetClass(ActivityInfo.class)
 public class ActivityInfoTest extends AndroidTestCase {
     ActivityInfo mActivityInfo;
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "ActivityInfo",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "ActivityInfo",
-            args = {android.content.pm.ActivityInfo.class}
-        )
-    })
-    @ToBeFixed(bug = "1695243", explanation = "ActivityInfo#ActivityInfo(ActivityInfo), " +
-            " should check whether the input ActivityInfo is null")
     public void testConstructor() {
         new ActivityInfo();
 
@@ -66,12 +46,6 @@ public class ActivityInfoTest extends AndroidTestCase {
         }
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "writeToParcel",
-        args = {android.os.Parcel.class, int.class}
-    )
-    @ToBeFixed(bug = "1695243", explanation = "NPE is not expected.")
     public void testWriteToParcel() throws NameNotFoundException {
         ComponentName componentName = new ComponentName(mContext, MockActivity.class);
 
@@ -99,11 +73,6 @@ public class ActivityInfoTest extends AndroidTestCase {
         }
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "getThemeResource",
-        args = {}
-    )
     public void testGetThemeResource() throws NameNotFoundException {
         ComponentName componentName = new ComponentName(mContext, MockActivity.class);
 
@@ -115,21 +84,11 @@ public class ActivityInfoTest extends AndroidTestCase {
         assertEquals(mActivityInfo.theme, mActivityInfo.getThemeResource());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "toString",
-        args = {}
-    )
     public void testToString() throws NameNotFoundException {
         mActivityInfo = new ActivityInfo();
         assertNotNull(mActivityInfo.toString());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "describeContents",
-        args = {}
-    )
     public void testDescribeContents() throws NameNotFoundException {
         mActivityInfo = new ActivityInfo();
         assertEquals(0, mActivityInfo.describeContents());
@@ -142,12 +101,6 @@ public class ActivityInfoTest extends AndroidTestCase {
         assertEquals(0, mActivityInfo.describeContents());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "dump",
-        args = {android.util.Printer.class, java.lang.String.class}
-    )
-    @ToBeFixed(bug = "1695243", explanation = "NPE is not expected.")
     public void testDump() {
         mActivityInfo = new ActivityInfo();
 

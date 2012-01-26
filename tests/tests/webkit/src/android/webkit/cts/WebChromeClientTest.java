@@ -27,12 +27,7 @@ import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.cts.WebViewOnUiThread.WaitForProgressClient;
 
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
 
-@TestTargetClass(android.webkit.WebChromeClient.class)
 public class WebChromeClientTest extends ActivityInstrumentationTestCase2<WebViewStubActivity> {
     private static final long TEST_TIMEOUT = 5000L;
 
@@ -65,13 +60,6 @@ public class WebChromeClientTest extends ActivityInstrumentationTestCase2<WebVie
         super.tearDown();
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "onProgressChanged",
-            args = {WebView.class, int.class}
-        )
-    })
     public void testOnProgressChanged() {
         final MockWebChromeClient webChromeClient = new MockWebChromeClient();
         mOnUiThread.setWebChromeClient(webChromeClient);
@@ -87,13 +75,6 @@ public class WebChromeClientTest extends ActivityInstrumentationTestCase2<WebVie
         }.run();
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "onReceivedTitle",
-            args = {WebView.class, String.class}
-        )
-    })
     public void testOnReceivedTitle() throws Exception {
         final MockWebChromeClient webChromeClient = new MockWebChromeClient();
         mOnUiThread.setWebChromeClient(webChromeClient);
@@ -112,13 +93,6 @@ public class WebChromeClientTest extends ActivityInstrumentationTestCase2<WebVie
         assertEquals(TestHtmlConstants.HELLO_WORLD_TITLE, webChromeClient.getPageTitle());
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "onReceivedIcon",
-            args = {WebView.class, Bitmap.class}
-        )
-    })
     public void testOnReceivedIcon() throws Throwable {
         final MockWebChromeClient webChromeClient = new MockWebChromeClient();
         mOnUiThread.setWebChromeClient(webChromeClient);
@@ -148,23 +122,6 @@ public class WebChromeClientTest extends ActivityInstrumentationTestCase2<WebVie
         }.run();
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "onCreateWindow",
-            args = {WebView.class, boolean.class, boolean.class, Message.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "onRequestFocus",
-            args = {WebView.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "onCloseWindow",
-            args = {WebView.class}
-        )
-    })
     public void testWindows() throws Exception {
         final MockWebChromeClient webChromeClient = new MockWebChromeClient();
         mOnUiThread.setWebChromeClient(webChromeClient);
@@ -196,13 +153,6 @@ public class WebChromeClientTest extends ActivityInstrumentationTestCase2<WebVie
         }.run();
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "onJsBeforeUnload",
-            args = {WebView.class, String.class, String.class, JsResult.class}
-        )
-    })
     public void testOnJsBeforeUnload() throws Exception {
         final MockWebChromeClient webChromeClient = new MockWebChromeClient();
         mOnUiThread.setWebChromeClient(webChromeClient);
@@ -226,13 +176,6 @@ public class WebChromeClientTest extends ActivityInstrumentationTestCase2<WebVie
         assertEquals(webChromeClient.getMessage(), "testOnJsBeforeUnload");
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "onJsAlert",
-            args = {WebView.class, String.class, String.class, JsResult.class}
-        )
-    })
     public void testOnJsAlert() throws Exception {
         final MockWebChromeClient webChromeClient = new MockWebChromeClient();
         mOnUiThread.setWebChromeClient(webChromeClient);
@@ -255,13 +198,6 @@ public class WebChromeClientTest extends ActivityInstrumentationTestCase2<WebVie
         assertEquals(webChromeClient.getMessage(), "testOnJsAlert");
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "onJsConfirm",
-            args = {WebView.class, String.class, String.class, JsResult.class}
-        )
-    })
     public void testOnJsConfirm() throws Exception {
         final MockWebChromeClient webChromeClient = new MockWebChromeClient();
         mOnUiThread.setWebChromeClient(webChromeClient);
@@ -284,13 +220,6 @@ public class WebChromeClientTest extends ActivityInstrumentationTestCase2<WebVie
         assertEquals(webChromeClient.getMessage(), "testOnJsConfirm");
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "onJsPrompt",
-            args = {WebView.class, String.class, String.class, String.class, JsPromptResult.class}
-        )
-    })
     public void testOnJsPrompt() throws Exception {
         final MockWebChromeClient webChromeClient = new MockWebChromeClient();
         mOnUiThread.setWebChromeClient(webChromeClient);

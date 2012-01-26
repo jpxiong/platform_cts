@@ -18,11 +18,6 @@ package android.widget.cts;
 
 import com.android.cts.stub.R;
 
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
-import dalvik.annotation.ToBeFixed;
 
 import android.app.Activity;
 import android.app.Instrumentation;
@@ -42,7 +37,6 @@ import android.widget.ListView;
 
 import java.util.Arrays;
 
-@TestTargetClass(CheckedTextView.class)
 public class CheckedTextViewTest extends
         ActivityInstrumentationTestCase2<CheckedTextViewStubActivity> {
     private Resources mResources;
@@ -61,26 +55,6 @@ public class CheckedTextViewTest extends
         mResources = mActivity.getResources();
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "CheckedTextView",
-            args = {android.content.Context.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "CheckedTextView",
-            args = {android.content.Context.class, android.util.AttributeSet.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "CheckedTextView",
-            args = {android.content.Context.class, android.util.AttributeSet.class, int.class}
-        )
-    })
-    @ToBeFixed(bug = "1695243", explanation = "Android API javadocs are incomplete, "
-            + "should add @throws clause into javadoc of "
-            + "CheckedTextView's constructors when the input Context is null")
     public void testConstructor() {
         new MockCheckedTextView(mActivity, null, 0);
         new MockCheckedTextView(mActivity, null);
@@ -108,18 +82,6 @@ public class CheckedTextViewTest extends
         }
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "isChecked",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setChecked",
-            args = {boolean.class}
-        )
-    })
     public void testChecked() {
         final ListView lv = (ListView) mActivity.findViewById(R.id.checkedtextview_listview);
 
@@ -164,11 +126,6 @@ public class CheckedTextViewTest extends
         assertFalse(view2.isChecked());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "toggle",
-        args = {}
-    )
     public void testToggle() {
         CheckedTextView checkedTextView = new MockCheckedTextView(mActivity);
         assertFalse(checkedTextView.isChecked());
@@ -184,11 +141,6 @@ public class CheckedTextViewTest extends
         assertFalse(checkedTextView.isChecked());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "drawableStateChanged",
-        args = {}
-    )
     public void testDrawableStateChanged() {
         MockCheckedTextView checkedTextView = new MockCheckedTextView(mActivity);
 
@@ -198,11 +150,6 @@ public class CheckedTextViewTest extends
         assertTrue(checkedTextView.hasDrawableStateChanged());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "setPadding",
-        args = {int.class, int.class, int.class, int.class}
-    )
     public void testSetPadding() {
         final CheckedTextView lv
                 = (CheckedTextView) mActivity.findViewById(R.id.checkedtextview_test);
@@ -240,11 +187,6 @@ public class CheckedTextViewTest extends
         }
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "setCheckMarkDrawable",
-        args = {android.graphics.drawable.Drawable.class}
-    )
     public void testSetCheckMarkDrawableByDrawable() {
         CheckedTextView checkedTextView;
         int basePaddingRight = 10;
@@ -285,11 +227,6 @@ public class CheckedTextViewTest extends
         assertTrue(checkedTextView.isLayoutRequested());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "setCheckMarkDrawable",
-        args = {int.class}
-    )
     public void testSetCheckMarkDrawableById() {
         CheckedTextView checkedTextView;
         int basePaddingRight = 10;
@@ -329,20 +266,10 @@ public class CheckedTextViewTest extends
         assertFalse(checkedTextView.isLayoutRequested());
     }
 
-    @TestTargetNew(
-        level = TestLevel.NOT_NECESSARY,
-        method = "onDraw",
-        args = {android.graphics.Canvas.class}
-    )
     public void testOnDraw() {
         // Do not test. Implementation details.
     }
 
-    @TestTargetNew(
-        level = TestLevel.NOT_NECESSARY,
-        method = "onCreateDrawableState",
-        args = {int.class}
-    )
     public void testOnCreateDrawableState() {
         // Do not test. Implementation details.
     }

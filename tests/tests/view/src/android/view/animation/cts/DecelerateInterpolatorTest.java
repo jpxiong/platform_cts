@@ -18,10 +18,6 @@ package android.view.animation.cts;
 
 import com.android.cts.stub.R;
 
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
 
 import android.app.Activity;
 import android.content.res.XmlResourceParser;
@@ -39,7 +35,6 @@ import android.view.animation.Transformation;
 /**
  * Test {@link DecelerateInterpolator}.
  */
-@TestTargetClass(DecelerateInterpolator.class)
 public class DecelerateInterpolatorTest
         extends ActivityInstrumentationTestCase2<AnimationTestStubActivity> {
 
@@ -59,26 +54,6 @@ public class DecelerateInterpolatorTest
         mActivity = getActivity();
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test constructor(s) of {@link DecelerateInterpolator}",
-            method = "DecelerateInterpolator",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test constructor(s) of {@link DecelerateInterpolator}",
-            method = "DecelerateInterpolator",
-            args = {float.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test constructor(s) of {@link DecelerateInterpolator}",
-            method = "DecelerateInterpolator",
-            args = {android.content.Context.class, android.util.AttributeSet.class}
-        )
-    })
     public void testConstructor() {
         new DecelerateInterpolator();
 
@@ -89,13 +64,6 @@ public class DecelerateInterpolatorTest
         new DecelerateInterpolator(mActivity, attrs);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "test case will decelerate AlphaAnimation. It will change alpha from 0.0 to"
-                + " 1.0, the rate of change alpha starts out quickly and then decelerates.",
-        method = "getInterpolation",
-        args = {float.class}
-    )
     public void testDecelerateInterpolator() {
         final View animWindow = mActivity.findViewById(R.id.anim_window);
 
@@ -183,12 +151,6 @@ public class DecelerateInterpolatorTest
         assertTrue(delta5 > delta1);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test {@link DecelerateInterpolator#getInterpolation(float)}.",
-        method = "getInterpolation",
-        args = {float.class}
-    )
     public void testGetInterpolation() {
         final float input = 0.25f;
         Interpolator interpolator1 = new DecelerateInterpolator(1.0f);

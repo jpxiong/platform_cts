@@ -16,10 +16,6 @@
 
 package android.app.cts;
 
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
 
 import android.app.TimePickerDialog;
 import android.app.TimePickerDialog.OnTimeSetListener;
@@ -31,7 +27,6 @@ import android.widget.TimePicker;
 /**
  * Test {@link TimePickerDialog}.
  */
-@TestTargetClass(TimePickerDialog.class)
 public class TimePickerDialogTest extends ActivityInstrumentationTestCase2<DialogStubActivity> {
     private static final String HOUR = "hour";
     private static final String MINUTE = "minute";
@@ -68,27 +63,6 @@ public class TimePickerDialogTest extends ActivityInstrumentationTestCase2<Dialo
                 TARGET_MINUTE, true);
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "TimePickerDialog",
-            args = {android.content.Context.class,
-                    android.app.TimePickerDialog.OnTimeSetListener.class, int.class, int.class,
-                    boolean.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "TimePickerDialog",
-            args = {android.content.Context.class,
-                    int.class, android.app.TimePickerDialog.OnTimeSetListener.class,
-                    int.class, int.class, boolean.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "onSaveInstanceState",
-            args = {}
-        )
-    })
     public void testSaveInstanceState(){
         TimePickerDialog tD = new TimePickerDialog( mContext, mOnTimeSetListener, TARGET_HOUR,
                 TARGET_MINUTE, true);
@@ -110,11 +84,6 @@ public class TimePickerDialogTest extends ActivityInstrumentationTestCase2<Dialo
         assertFalse(b.getBoolean(IS_24_HOUR));
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "onClick",
-        args = {android.content.DialogInterface.class, int.class}
-    )
     public void testOnClick(){
         mTimePickerDialog.onClick(null, 0);
 
@@ -122,11 +91,6 @@ public class TimePickerDialogTest extends ActivityInstrumentationTestCase2<Dialo
         assertEquals(TARGET_MINUTE, mCallbackMinute);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "onTimeChanged",
-        args = {android.widget.TimePicker.class, int.class, int.class}
-    )
     public void testOnTimeChanged() throws Throwable {
         final int minute = 34;
         startDialogActivity(DialogStubActivity.TEST_TIMEPICKERDIALOG);
@@ -141,11 +105,6 @@ public class TimePickerDialogTest extends ActivityInstrumentationTestCase2<Dialo
 
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "updateTime",
-        args = {int.class, int.class}
-    )
     public void testUpdateTime(){
         int minute = 18;
         mTimePickerDialog.updateTime(TARGET_HOUR, minute);
@@ -157,11 +116,6 @@ public class TimePickerDialogTest extends ActivityInstrumentationTestCase2<Dialo
         assertEquals(minute, b.getInt(MINUTE));
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "onRestoreInstanceState",
-        args = {android.os.Bundle.class}
-    )
     public void testOnRestoreInstanceState(){
         int minute = 27;
         Bundle b1 = new Bundle();

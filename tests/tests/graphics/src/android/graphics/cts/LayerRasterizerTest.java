@@ -19,29 +19,15 @@ package android.graphics.cts;
 import junit.framework.TestCase;
 import android.graphics.LayerRasterizer;
 import android.graphics.Paint;
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
 
-@TestTargetClass(LayerRasterizer.class)
 public class LayerRasterizerTest extends TestCase {
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "LayerRasterizer",
-        args = {}
-    )
     public void testConstructor() {
 
         // new the LayerRasterizer instance
         new LayerRasterizer();
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "addLayer",
-        args = {android.graphics.Paint.class, float.class, float.class}
-    )
     public void testAddLayer1() {
         // new the LayerRasterizer instance
         LayerRasterizer layerRasterizer = new LayerRasterizer();
@@ -51,11 +37,6 @@ public class LayerRasterizerTest extends TestCase {
         // it doesn't throw out any exception.
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "addLayer",
-        args = {android.graphics.Paint.class}
-    )
     public void testAddLayer2() {
         // new the LayerRasterizer instance
         LayerRasterizer layerRasterizer = new LayerRasterizer();

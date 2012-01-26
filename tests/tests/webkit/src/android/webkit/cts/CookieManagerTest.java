@@ -22,17 +22,11 @@ import android.webkit.CookieManager;
 import android.webkit.CookieSyncManager;
 import android.webkit.WebView;
 
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
-import dalvik.annotation.ToBeFixed;
 
 import java.util.Date;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-@TestTargetClass(android.webkit.CookieManager.class)
 public class CookieManagerTest extends
         ActivityInstrumentationTestCase2<CookieSyncManagerStubActivity> {
 
@@ -54,11 +48,6 @@ public class CookieManagerTest extends
         assertNotNull(mCookieManager);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "getInstance",
-        args = {}
-    )
     public void testGetInstance() {
         CookieManager c1 = CookieManager.getInstance();
         CookieManager c2 = CookieManager.getInstance();
@@ -66,42 +55,9 @@ public class CookieManagerTest extends
         assertSame(c1, c2);
     }
 
-    @TestTargetNew(
-        level = TestLevel.NOT_FEASIBLE,
-        method = "clone",
-        notes = "clone() is protected and CookieManager cannot be subclassed",
-        args = {}
-    )
     public void testClone() {
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setAcceptCookie",
-            args = {boolean.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "acceptCookie",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setCookie",
-            args = {String.class, String.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getCookie",
-            args = {String.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "removeAllCookie",
-            args = {}
-        )
-    })
     public void testAcceptCookie() throws Exception {
         mCookieManager.removeAllCookie();
         mCookieManager.setAcceptCookie(false);
@@ -155,19 +111,6 @@ public class CookieManagerTest extends
         mCookieManager.removeAllCookie();
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "hasCookies",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "removeAllCookie",
-            args = {}
-        )
-    })
-    @ToBeFixed(explanation = "CookieManager.hasCookies() should also count cookies in RAM cache")
     public void testCookieManager() {
         // enable cookie
         mCookieManager.setAcceptCookie(true);
@@ -200,18 +143,6 @@ public class CookieManagerTest extends
         }.run();
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "removeSessionCookie",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "removeExpiredCookie",
-            args = {}
-        )
-    })
     @SuppressWarnings("deprecation")
     public void testRemoveCookies() throws InterruptedException {
         // enable cookie

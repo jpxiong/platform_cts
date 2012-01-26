@@ -19,11 +19,7 @@ package android.content.cts;
 import android.content.Intent;
 import android.content.Intent.FilterComparison;
 import android.test.AndroidTestCase;
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
 
-@TestTargetClass(Intent.FilterComparison.class)
 public class Intent_FilterComparisonTest extends AndroidTestCase {
 
     FilterComparison mFilterComparison;
@@ -36,11 +32,6 @@ public class Intent_FilterComparisonTest extends AndroidTestCase {
         mIntent = new Intent();
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "Intent.FilterComparison",
-        args = {android.content.Intent.class}
-    )
     public void testConstructor() {
         mFilterComparison = null;
         // new the FilterComparison instance
@@ -49,22 +40,12 @@ public class Intent_FilterComparisonTest extends AndroidTestCase {
 
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "hashCode",
-        args = {}
-    )
     public void testHashCode() {
         mFilterComparison = new Intent.FilterComparison(mIntent);
         assertNotNull(mFilterComparison);
         assertEquals(mIntent.filterHashCode(), mFilterComparison.hashCode());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "equals",
-        args = {java.lang.Object.class}
-    )
     public void testEquals() {
         mFilterComparison = new Intent.FilterComparison(mIntent);
         assertNotNull(mFilterComparison);
@@ -75,11 +56,6 @@ public class Intent_FilterComparisonTest extends AndroidTestCase {
         assertFalse(mFilterComparison.equals(target));
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "getIntent",
-        args = {}
-    )
     public void testGetIntent() {
         mFilterComparison = new Intent.FilterComparison(mIntent);
         assertNotNull(mFilterComparison);

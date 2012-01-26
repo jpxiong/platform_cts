@@ -21,31 +21,14 @@ import android.text.LoginFilter;
 import android.text.SpannableString;
 import android.text.Spanned;
 import android.text.SpannedString;
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.ToBeFixed;
 
-@TestTargetClass(LoginFilter.class)
 public class LoginFilterTest extends TestCase {
 
-    @ToBeFixed(bug="1448885", explanation="LoginFilter is an abstract class and its" +
-            " constructors are all package private, we can not extends it directly" +
-            " to test. So, we try to extends its subclass UsernameFilterGeneric to test")
     @Override
     protected void setUp() throws Exception {
         super.setUp();
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "filter",
-        args = {java.lang.CharSequence.class, int.class, int.class, android.text.Spanned.class,
-                int.class, int.class}
-    )
-    @ToBeFixed(bug="1417734", explanation="should add @throws clause into javadoc " +
-        " of LoginFilter#filter(CharSequence, int, int, Spanned, int, int) when" +
-        " the source or dest is null")
     public void testFilter() {
         CharSequence result;
         MockLoginFilter loginFilter = new MockLoginFilter();
@@ -133,11 +116,6 @@ public class LoginFilterTest extends TestCase {
 
     // This method does nothing. we only test onInvalidCharacter function here,
     // the callback should be tested in testFilter()
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "onInvalidCharacter",
-        args = {char.class}
-    )
     public void testOnInvalidCharacter() {
         LoginFilter loginFilter = new MockLoginFilter();
         loginFilter.onInvalidCharacter('a');
@@ -145,11 +123,6 @@ public class LoginFilterTest extends TestCase {
 
     // This method does nothing. we only test onStop function here,
     // the callback should be tested in testFilter()
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "onStop",
-        args = {}
-    )
     public void testOnStop() {
         LoginFilter loginFilter = new MockLoginFilter();
         loginFilter.onStop();
@@ -157,11 +130,6 @@ public class LoginFilterTest extends TestCase {
 
     // This method does nothing. we only test onStart function here,
     // the callback should be tested in testFilter()
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "onStart",
-        args = {}
-    )
     public void testOnStart() {
         LoginFilter loginFilter = new LoginFilter.UsernameFilterGeneric();
         loginFilter.onStart();

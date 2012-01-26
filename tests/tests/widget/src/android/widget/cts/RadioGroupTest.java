@@ -18,11 +18,6 @@ package android.widget.cts;
 
 import com.android.cts.stub.R;
 
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
-import dalvik.annotation.ToBeFixed;
 
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
@@ -48,7 +43,6 @@ import java.util.Vector;
 /**
  * Test {@link RadioGroup}.
  */
-@TestTargetClass(RadioGroup.class)
 public class RadioGroupTest extends InstrumentationTestCase {
     private static final int BUTTON_ID_0 = 0;
 
@@ -71,22 +65,6 @@ public class RadioGroupTest extends InstrumentationTestCase {
         mDefaultRadioGroup = createDefaultRadioGroup();
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test constructors.",
-            method = "RadioGroup",
-            args = {android.content.Context.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test constructors.",
-            method = "RadioGroup",
-            args = {android.content.Context.class, android.util.AttributeSet.class}
-        )
-    })
-    @ToBeFixed(bug = "1417734", explanation = "should add @throws clause into javadoc of "
-            + "RadioGroup#RadioGroup(Context, AttributeSet) when param Context is null")
     public void testConstructors() {
         new RadioGroup(mContext);
 
@@ -95,12 +73,6 @@ public class RadioGroupTest extends InstrumentationTestCase {
         new RadioGroup(mContext, null);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test {@link RadioGroup#setOnHierarchyChangeListener(OnHierarchyChangeListener)",
-        method = "setOnHierarchyChangeListener",
-        args = {android.view.ViewGroup.OnHierarchyChangeListener.class}
-    )
     public void testSetOnHierarchyChangeListener() {
         MockOnHierarchyChangeListener listener = new MockOnHierarchyChangeListener();
         mDefaultRadioGroup.setOnHierarchyChangeListener(listener);
@@ -123,12 +95,6 @@ public class RadioGroupTest extends InstrumentationTestCase {
         mDefaultRadioGroup.addView(button3);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "test PassThroughHierarchyChangeListener which is initialized in constructor",
-        method = "RadioGroup",
-        args = {android.content.Context.class}
-    )
     public void testInternalPassThroughHierarchyChangeListener() {
         mDefaultRadioGroup = new RadioGroup(mContext);
         RadioButton newButton = new RadioButton(mContext);
@@ -141,12 +107,6 @@ public class RadioGroupTest extends InstrumentationTestCase {
         assertEquals(newButton.hashCode(), newButton.getId());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test call back of OnCheckedChangeListener",
-        method = "setOnCheckedChangeListener",
-        args = {android.widget.RadioGroup.OnCheckedChangeListener.class}
-    )
     public void testInternalCheckedStateTracker() {
         mDefaultRadioGroup = new RadioGroup(mContext);
         RadioButton newButton = new RadioButton(mContext);
@@ -178,12 +138,6 @@ public class RadioGroupTest extends InstrumentationTestCase {
         assertHaveNotCalledOnCheckedChanged(listener);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test {@link RadioGroup#getCheckedRadioButtonId()}",
-        method = "getCheckedRadioButtonId",
-        args = {}
-    )
     public void testGetCheckedRadioButtonId() {
         assertEquals(-1, mDefaultRadioGroup.getCheckedRadioButtonId());
 
@@ -204,14 +158,6 @@ public class RadioGroupTest extends InstrumentationTestCase {
         assertEquals(-3, mDefaultRadioGroup.getCheckedRadioButtonId());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test {@link RadioGroup#clearCheck()}",
-        method = "clearCheck",
-        args = {}
-    )
-    @ToBeFixed(explanation = "Should not call OnCheckedChangeListener's method if "
-            + "none of the inside buttons checked state is changed.")
     public void testClearCheck() {
         MockOnCheckedChangeListener listener = new MockOnCheckedChangeListener();
         mDefaultRadioGroup.setOnCheckedChangeListener(listener);
@@ -248,14 +194,6 @@ public class RadioGroupTest extends InstrumentationTestCase {
         assertOnCheckedChangedParams(listener, 0, mDefaultRadioGroup, -1);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test {@link RadioGroup#check(int)}",
-        method = "check",
-        args = {int.class}
-    )
-    @ToBeFixed(explanation = "Should not call OnCheckedChangeListener's method if "
-            + "none of the inside buttons checked state is changed.")
     public void testCheck() {
         MockOnCheckedChangeListener listener = new MockOnCheckedChangeListener();
         mDefaultRadioGroup.setOnCheckedChangeListener(listener);
@@ -300,12 +238,6 @@ public class RadioGroupTest extends InstrumentationTestCase {
         mDefaultRadioGroup.check(0);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test {@link RadioGroup#setOnCheckedChangeListener(OnCheckedChangeListener)}",
-        method = "setOnCheckedChangeListener",
-        args = {android.widget.RadioGroup.OnCheckedChangeListener.class}
-    )
     public void testSetOnCheckedChangeListener() {
         MockOnCheckedChangeListener listener = new MockOnCheckedChangeListener();
         mDefaultRadioGroup.setOnCheckedChangeListener(listener);
@@ -345,12 +277,6 @@ public class RadioGroupTest extends InstrumentationTestCase {
         mDefaultRadioGroup.check(0);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test {@link RadioGroup#generateLayoutParams(AttributeSet)}",
-        method = "generateLayoutParams",
-        args = {android.util.AttributeSet.class}
-    )
     public void testGenerateLayoutParams() {
         mDefaultRadioGroup = new RadioGroup(mContext);
         RadioGroup.LayoutParams layoutParams =
@@ -380,12 +306,6 @@ public class RadioGroupTest extends InstrumentationTestCase {
         assertEquals(LayoutParams.MATCH_PARENT, layoutParams.height);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test {@link RadioGroup#checkLayoutParams(android.view.ViewGroup.LayoutParams)}",
-        method = "checkLayoutParams",
-        args = {android.view.ViewGroup.LayoutParams.class}
-    )
     public void testCheckLayoutParams() {
         MockRadioGroup mRadioGroupWrapper = new MockRadioGroup(mContext);
 
@@ -404,12 +324,6 @@ public class RadioGroupTest extends InstrumentationTestCase {
         assertTrue(mRadioGroupWrapper.checkLayoutParams(radioParams));
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test {@link RadioGroup#generateDefaultLayoutParams()}",
-        method = "generateDefaultLayoutParams",
-        args = {}
-    )
     public void testGenerateDefaultLayoutParams() {
         MockRadioGroup radioGroupWrapper = new MockRadioGroup(mContext);
         LinearLayout.LayoutParams p = radioGroupWrapper.generateDefaultLayoutParams();
@@ -419,12 +333,6 @@ public class RadioGroupTest extends InstrumentationTestCase {
         assertEquals(RadioGroup.LayoutParams.WRAP_CONTENT, p.height);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test {@link RadioGroup#onFinishInflate()}",
-        method = "onFinishInflate",
-        args = {}
-    )
     public void testOnFinishInflate() {
         MockRadioGroup radioGroup = new MockRadioGroup(mContext);
         int checkId = 100;
@@ -463,11 +371,6 @@ public class RadioGroupTest extends InstrumentationTestCase {
         assertFalse(button.isChecked());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "addView",
-        args = {android.view.View.class, int.class, android.view.ViewGroup.LayoutParams.class}
-    )
     public void testAddView() {
         mDefaultRadioGroup.check(BUTTON_ID_0);
         assertEquals(BUTTON_ID_0, mDefaultRadioGroup.getCheckedRadioButtonId());

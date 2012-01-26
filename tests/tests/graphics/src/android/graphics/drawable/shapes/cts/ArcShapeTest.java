@@ -16,9 +16,6 @@
 
 package android.graphics.drawable.shapes.cts;
 
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
 
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
@@ -29,7 +26,6 @@ import android.graphics.drawable.shapes.ArcShape;
 
 import junit.framework.TestCase;
 
-@TestTargetClass(android.graphics.drawable.shapes.ArcShape.class)
 public class ArcShapeTest extends TestCase {
     private static final int TEST_WIDTH  = 100;
     private static final int TEST_HEIGHT = 200;
@@ -39,11 +35,6 @@ public class ArcShapeTest extends TestCase {
 
     private static final int TOLERANCE = 4; // tolerance in pixels
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "ArcShape",
-        args = {float.class, float.class}
-    )
     public void testConstructor() {
         new ArcShape(1f, 5f);
 
@@ -52,11 +43,6 @@ public class ArcShapeTest extends TestCase {
         new ArcShape(-1f, -1f);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "draw",
-        args = {android.graphics.Canvas.class, android.graphics.Paint.class}
-    )
     public void testDraw() {
         // draw completely.
         ArcShape arcShape = new ArcShape(0.0f, 360.0f);

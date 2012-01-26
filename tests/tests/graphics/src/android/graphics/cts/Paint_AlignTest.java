@@ -17,44 +17,17 @@
 package android.graphics.cts;
 
 import junit.framework.TestCase;
-import dalvik.annotation.TestTargets;
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargetClass;
 import android.graphics.Paint.Align;
 import android.graphics.Paint;
 
-@TestTargetClass(Paint.Align.class)
 public class Paint_AlignTest extends TestCase {
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "valueOf",
-        args = {java.lang.String.class}
-    )
     public void testValueOf() {
         assertEquals(Align.LEFT, Align.valueOf("LEFT"));
         assertEquals(Align.CENTER, Align.valueOf("CENTER"));
         assertEquals(Align.RIGHT, Align.valueOf("RIGHT"));
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "values",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setTextAlign",
-            args = {android.graphics.Paint.Align.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getTextAlign",
-            args = {}
-        )
-    })
     public void testValues() {
         // set the actual value
         Align[] actual = Align.values();

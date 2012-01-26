@@ -19,21 +19,12 @@ package android.text.cts;
 import android.test.AndroidTestCase;
 import android.text.AlteredCharSequence;
 import android.text.Spanned;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
 
-@TestTargetClass(AlteredCharSequence.class)
 public class AlteredCharSequenceTest extends AndroidTestCase {
 
     private static final String SOURCE_STR = "This is a char sequence.";
     private AlteredCharSequence mAlteredCharSequence;
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "charAt",
-        args = {int.class}
-    )
     public void testCharAt() {
         mAlteredCharSequence = null;
         char[] sub = { 'i', 's' };
@@ -61,11 +52,6 @@ public class AlteredCharSequenceTest extends AndroidTestCase {
         }
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "getChars",
-        args = {int.class, int.class, char[].class, int.class}
-    )
     public void testGetChars() {
         mAlteredCharSequence = null;
         char[] sub = { 'i', 's' };
@@ -98,11 +84,6 @@ public class AlteredCharSequenceTest extends AndroidTestCase {
         }
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "length",
-        args = {}
-    )
     public void testLength() {
         char[] sub = { 'i', 's' };
 
@@ -114,11 +95,6 @@ public class AlteredCharSequenceTest extends AndroidTestCase {
         }
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "make",
-        args = {java.lang.CharSequence.class, char[].class, int.class, int.class}
-    )
     public void testMake() {
         mAlteredCharSequence = null;
         char[] sub = { 'i', 's' };
@@ -137,11 +113,6 @@ public class AlteredCharSequenceTest extends AndroidTestCase {
         assertFalse(0 == acsClassName.compareTo(spanClassName));
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "subSequence",
-        args = {int.class, int.class}
-    )
     public void testSubSequence() {
         mAlteredCharSequence = null;
         char[] sub = { 'i', 's' };
@@ -158,11 +129,6 @@ public class AlteredCharSequenceTest extends AndroidTestCase {
         }
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "toString",
-        args = {}
-    )
     public void testToString() {
         mAlteredCharSequence = null;
         char[] sub = { 'i', 's' };

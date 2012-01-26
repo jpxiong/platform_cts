@@ -21,34 +21,12 @@ import android.graphics.BitmapShader;
 import android.graphics.Matrix;
 import android.graphics.Shader;
 import android.test.AndroidTestCase;
-import dalvik.annotation.TestTargets;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
 
-@TestTargetClass(android.graphics.Shader.class)
 public class ShaderTest extends AndroidTestCase {
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "Shader",
-        args = {}
-    )
     public void testConstructor() {
         new Shader();
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setLocalMatrix",
-            args = {android.graphics.Matrix.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getLocalMatrix",
-            args = {android.graphics.Matrix.class}
-        )
-    })
     public void testAccessLocalMatrix() {
         int width = 80;
         int height = 120;

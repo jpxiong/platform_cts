@@ -18,12 +18,7 @@ package android.database.sqlite.cts;
 
 import android.database.sqlite.SQLiteClosable;
 import android.test.AndroidTestCase;
-import dalvik.annotation.TestTargets;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
 
-@TestTargetClass(android.database.sqlite.SQLiteClosable.class)
 public class SQLiteClosableTest extends AndroidTestCase {
     private class MockSQLiteClosable extends SQLiteClosable {
         private boolean mOnAllReferencesReleasedCalled = false;
@@ -47,26 +42,6 @@ public class SQLiteClosableTest extends AndroidTestCase {
         }
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test acquireReference(), releaseReference() and onAllReferencesReleased()",
-            method = "acquireReference",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test acquireReference(), releaseReference() and onAllReferencesReleased()",
-            method = "releaseReference",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test acquireReference(), releaseReference() and onAllReferencesReleased()",
-            method = "onAllReferencesReleased",
-            args = {}
-        )
-    })
     public void testAcquireReference() {
         MockSQLiteClosable closable = new MockSQLiteClosable();
 
@@ -85,20 +60,6 @@ public class SQLiteClosableTest extends AndroidTestCase {
         }
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test releaseReferenceFromContainer(), onAllReferencesReleasedFromContainer()",
-            method = "releaseReferenceFromContainer",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test releaseReferenceFromContainer(), onAllReferencesReleasedFromContainer()",
-            method = "onAllReferencesReleasedFromContainer",
-            args = {}
-        )
-    })
     public void testReleaseReferenceFromContainer() {
         MockSQLiteClosable closable = new MockSQLiteClosable();
 

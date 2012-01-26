@@ -18,12 +18,7 @@ package android.util.cts;
 
 import android.test.AndroidTestCase;
 import android.util.SparseArray;
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
 
-@TestTargetClass(SparseArray.class)
 public class SparseArrayTest extends AndroidTestCase {
     private static final int[] KEYS = {12, 23, 4, 6, 8, 1, 3, -12, 0, -3, 11, 14, -23};
     private static final Integer[] VALUES = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12};
@@ -31,78 +26,6 @@ public class SparseArrayTest extends AndroidTestCase {
     private static final int NON_EXISTED_KEY = 123;
     private static final Integer VALUE_FOR_NON_EXISTED_KEY = -1;
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "SparseArray",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "append",
-            args = {int.class, java.lang.Object.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "clear",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "delete",
-            args = {int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "remove",
-            args = {int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "get",
-            args = {int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "get",
-            args = {int.class, java.lang.Object.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "indexOfKey",
-            args = {int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "indexOfValue",
-            args = {java.lang.Object.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "keyAt",
-            args = {int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "put",
-            args = {int.class, java.lang.Object.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setValueAt",
-            args = {int.class, java.lang.Object.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "size",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "valueAt",
-            args = {int.class}
-        )
-    })
     public void testSparseArrayWithDefaultCapacity() {
         SparseArray<Integer> sparseArray = new SparseArray<Integer>();
         assertEquals(0, sparseArray.size());
@@ -168,78 +91,6 @@ public class SparseArrayTest extends AndroidTestCase {
         assertEquals(0, sparseArray.size());
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "SparseArray",
-            args = {int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "append",
-            args = {int.class, java.lang.Object.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "clear",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "delete",
-            args = {int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "remove",
-            args = {int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "get",
-            args = {int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "get",
-            args = {int.class, java.lang.Object.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "indexOfKey",
-            args = {int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "indexOfValue",
-            args = {java.lang.Object.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "keyAt",
-            args = {int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "put",
-            args = {int.class, java.lang.Object.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setValueAt",
-            args = {int.class, java.lang.Object.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "size",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "valueAt",
-            args = {int.class}
-        )
-    })
     public void testSparseArrayWithSpecifiedCapacity() {
         SparseArray<Integer> sparseArray = new SparseArray<Integer>(5);
         assertEquals(0, sparseArray.size());

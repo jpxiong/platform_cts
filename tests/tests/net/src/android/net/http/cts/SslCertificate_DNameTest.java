@@ -20,48 +20,11 @@ import java.text.DateFormat;
 import java.util.Date;
 
 import junit.framework.TestCase;
-import dalvik.annotation.TestTargets;
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargetClass;
 import android.net.http.SslCertificate;
 import android.net.http.SslCertificate.DName;
 
-@TestTargetClass(DName.class)
 public class SslCertificate_DNameTest extends TestCase {
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test DName.",
-            method = "SslCertificate.DName",
-            args = {java.lang.String.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test DName.",
-            method = "getCName",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test DName.",
-            method = "getDName",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test DName.",
-            method = "getOName",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test DName.",
-            method = "getUName",
-            args = {}
-        )
-    })
     public void testDName() {
         final String TO = "c=ccc,o=testOName,ou=testUName,cn=testCName";
         final String BY = "e=aeei,c=adb,o=testOName,ou=testUName,cn=testCName";

@@ -20,37 +20,12 @@ import android.os.Parcel;
 import android.os.Parcelable;
 import android.test.InstrumentationTestCase;
 import android.view.AbsSavedState;
-import dalvik.annotation.TestTargets;
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargetClass;
 
-@TestTargetClass(AbsSavedState.class)
 public class AbsSavedStateTest extends InstrumentationTestCase {
 
     // constant for test of writeToParcel
     public static final int TEST_NUMBER = 1;
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test constructor and describeContents of AbsSavedState",
-            method = "AbsSavedState",
-            args = {android.os.Parcelable.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test constructor and describeContents of AbsSavedState",
-            method = "AbsSavedState",
-            args = {android.os.Parcel.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test constructor and describeContents of AbsSavedState",
-            method = "describeContents",
-            args = {}
-        )
-    })
     public void testConstructor() {
         MockParcelable superState = new MockParcelable();
         assertNotNull(superState);
@@ -63,12 +38,6 @@ public class AbsSavedStateTest extends InstrumentationTestCase {
         assertEquals(0, savedState.describeContents());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test getSuperState function",
-        method = "getSuperState",
-        args = {}
-    )
     public void testGetSuperState() {
         MockParcelable superState = new MockParcelable();
         assertNotNull(superState);
@@ -77,12 +46,6 @@ public class AbsSavedStateTest extends InstrumentationTestCase {
         assertSame(superState, savedState.getSuperState());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test writeToParcel function",
-        method = "writeToParcel",
-        args = {android.os.Parcel.class, int.class}
-    )
     public void testWriteToParcel() {
         MockParcelable superState = new MockParcelable();
         assertNotNull(superState);

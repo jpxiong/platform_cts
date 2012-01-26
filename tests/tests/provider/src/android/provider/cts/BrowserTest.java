@@ -32,17 +32,11 @@ import android.provider.BrowserContract;
 import android.provider.BrowserContract.Bookmarks;
 import android.provider.BrowserContract.History;
 import android.test.ActivityInstrumentationTestCase2;
-import dalvik.annotation.TestTargets;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.ToBeFixed;
 
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-@TestTargetClass(android.provider.Browser.class)
 public class BrowserTest extends ActivityInstrumentationTestCase2<BrowserStubActivity> {
     public BrowserTest() {
         super("com.android.cts.stub", BrowserStubActivity.class);
@@ -164,20 +158,6 @@ public class BrowserTest extends ActivityInstrumentationTestCase2<BrowserStubAct
         }
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test methods to access the search string in the searches database",
-            method = "addSearchUrl",
-            args = {android.content.ContentResolver.class, java.lang.String.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test methods to access the search string in the searches database",
-            method = "clearSearches",
-            args = {android.content.ContentResolver.class}
-        )
-    })
     public void testAccessSearches() {
         final String searchString = "search string";
         final String searchStringAnother = "another search string";
@@ -232,12 +212,6 @@ public class BrowserTest extends ActivityInstrumentationTestCase2<BrowserStubAct
         }
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "test getAllBookmarks(ContentResolver cr)",
-        method = "getAllBookmarks",
-        args = {android.content.ContentResolver.class}
-    )
     public void testGetAllBookmarks() {
         Cursor cursor;
         final String bookmarkUrl1 = "www.bookmark1.com";
@@ -270,12 +244,6 @@ public class BrowserTest extends ActivityInstrumentationTestCase2<BrowserStubAct
         }
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "test getAllVisitedUrls(ContentResolver cr)",
-        method = "getAllVisitedUrls",
-        args = {android.content.ContentResolver.class}
-    )
     public void testGetAllVisitedUrls() {
         Cursor cursor;
         final String visitedUrl1 = "www.visited1.com";
@@ -313,12 +281,6 @@ public class BrowserTest extends ActivityInstrumentationTestCase2<BrowserStubAct
         }
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "test updateVisitedHistory(ContentResolver cr, String url, boolean real)",
-        method = "updateVisitedHistory",
-        args = {android.content.ContentResolver.class, java.lang.String.class, boolean.class}
-    )
     public void testUpdateVisitedHistory() {
         Cursor cursor;
         final String visitedHistoryUrl = "www.visited-history.com";
@@ -365,38 +327,6 @@ public class BrowserTest extends ActivityInstrumentationTestCase2<BrowserStubAct
         }
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "test methods which help user to access the history table",
-            method = "truncateHistory",
-            args = {android.content.ContentResolver.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "test methods which help user to access the history table",
-            method = "clearHistory",
-            args = {android.content.ContentResolver.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "test methods which help user to access the history table",
-            method = "canClearHistory",
-            args = {android.content.ContentResolver.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "test methods which help user to access the history table",
-            method = "deleteFromHistory",
-            args = {android.content.ContentResolver.class, java.lang.String.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "test methods which help user to access the history table",
-            method = "deleteHistoryTimeFrame",
-            args = {android.content.ContentResolver.class, long.class, long.class}
-        )
-    })
     public void testAccessHistory() {
         Cursor cursor;
         // NOTE: this value must keep same with the Browser.MAX_HISTORY_COUNT.
@@ -571,25 +501,10 @@ public class BrowserTest extends ActivityInstrumentationTestCase2<BrowserStubAct
         }
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "test requestAllIcons(ContentResolver, String, WebIconDatabase.IconListener).",
-        method = "requestAllIcons",
-        args = {android.content.ContentResolver.class, java.lang.String.class,
-                android.webkit.WebIconDatabase.IconListener.class}
-    )
     public void testRequestAllIcons() {
         Browser.requestAllIcons(mContentResolver, null, null);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "test saveBookmark(Context c, String title,  String url)",
-        method = "saveBookmark",
-        args = {android.content.Context.class, java.lang.String.class, java.lang.String.class}
-    )
-    @ToBeFixed( bug = "1558560", explanation = "Can not select activity item in ResolverActivity" +
-            " by getInstrumentation().sendKeyDownUpSync(KeyEvent.KEYCODE_DPAD_CENTER)")
     public void testSaveBookmark() {
         // TODO: send KEYCODE_DPAD_CENTER to skip the resolve page, but no effect.
 //        assertFalse(isRunning(ADD_BOOKMARK_CLASS_NAME));
@@ -605,14 +520,6 @@ public class BrowserTest extends ActivityInstrumentationTestCase2<BrowserStubAct
         // TODO: how to finish the activity.
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "test sendString(Context c, String s)",
-        method = "sendString",
-        args = {android.content.Context.class, java.lang.String.class}
-    )
-    @ToBeFixed( bug = "1558273", explanation = "android.provider.Browser#" +
-            "sendString(Context c, String s) does not return")
     public void testSendString() {
         // assertFalse(isRunning(COMPOSE_MESSAGE_CLASS_NAME));
         // Browser.sendString(mActivity, "string to be sent");

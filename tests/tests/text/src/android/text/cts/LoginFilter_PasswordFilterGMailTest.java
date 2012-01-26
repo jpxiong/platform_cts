@@ -16,43 +16,19 @@
 
 package android.text.cts;
 
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
-import dalvik.annotation.ToBeFixed;
 
 import android.text.LoginFilter.PasswordFilterGMail;
 
 import junit.framework.TestCase;
 
-@TestTargetClass(PasswordFilterGMail.class)
 public class LoginFilter_PasswordFilterGMailTest extends TestCase {
 
-@TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "LoginFilter.PasswordFilterGMail",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "LoginFilter.PasswordFilterGMail",
-            args = {boolean.class}
-        )
-    })
-    @ToBeFixed(bug = "1695243", explanation = "miss javadoc")
     public void testConstructor() {
         new PasswordFilterGMail();
         new PasswordFilterGMail(true);
         new PasswordFilterGMail(false);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "isAllowed",
-        args = {char.class}
-    )
     public void testIsAllowed() {
         PasswordFilterGMail passwordFilterGMail = new PasswordFilterGMail();
 

@@ -18,19 +18,9 @@ package android.os.cts;
 
 import android.os.SystemClock;
 import android.test.AndroidTestCase;
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
 
-@TestTargetClass(SystemClock.class)
 public class SystemClockTest extends AndroidTestCase {
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test currentThreadTimeMillis(), the sleep() will not affect the thread",
-        method = "currentThreadTimeMillis",
-        args = {}
-    )
     public void testCurrentThreadTimeMillis() throws InterruptedException {
 
         long start = SystemClock.currentThreadTimeMillis();
@@ -40,11 +30,6 @@ public class SystemClockTest extends AndroidTestCase {
 
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "elapsedRealtime",
-        args = {}
-    )
     public void testElapsedRealtime() throws InterruptedException {
 
         long start = SystemClock.elapsedRealtime();
@@ -54,11 +39,6 @@ public class SystemClockTest extends AndroidTestCase {
 
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "setCurrentTimeMillis",
-        args = {long.class}
-    )
     public void testSetCurrentTimeMillis() {
 
         long start = SystemClock.currentThreadTimeMillis();
@@ -68,12 +48,6 @@ public class SystemClockTest extends AndroidTestCase {
 
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test sleep(long), it is similar to Thread.sleep().",
-        method = "sleep",
-        args = {long.class}
-    )
     public void testSleep() {
 
         long start = SystemClock.currentThreadTimeMillis();
@@ -93,11 +67,6 @@ public class SystemClockTest extends AndroidTestCase {
 
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "uptimeMillis",
-        args = {}
-    )
     public void testUptimeMillis() throws InterruptedException {
 
         long start = SystemClock.uptimeMillis();

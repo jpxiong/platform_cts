@@ -18,11 +18,6 @@ package android.widget.cts;
 
 import com.android.cts.stub.R;
 
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
-import dalvik.annotation.ToBeFixed;
 
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
@@ -39,7 +34,6 @@ import android.widget.AbsoluteLayout.LayoutParams;
 import java.io.IOException;
 
 @SuppressWarnings("deprecation")
-@TestTargetClass(AbsoluteLayout.class)
 public class AbsoluteLayoutTest extends ActivityInstrumentationTestCase2<StubActivity> {
     private static final int DEFAULT_X      = 5;
     private static final int DEFAULT_Y      = 10;
@@ -69,24 +63,6 @@ public class AbsoluteLayoutTest extends ActivityInstrumentationTestCase2<StubAct
         return Xml.asAttributeSet(parser);
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "AbsoluteLayout",
-            args = {android.content.Context.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "AbsoluteLayout",
-            args = {android.content.Context.class, android.util.AttributeSet.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "AbsoluteLayout",
-            args = {android.content.Context.class, android.util.AttributeSet.class, int.class}
-        )
-    })
-    @ToBeFixed(bug = "1695243", explanation = "Android API javadocs are incomplete")
     public void testConstructor() throws XmlPullParserException, IOException {
         AttributeSet attrs = getAttributeSet();
 
@@ -97,29 +73,14 @@ public class AbsoluteLayoutTest extends ActivityInstrumentationTestCase2<StubAct
         new AbsoluteLayout(mActivity, attrs, -1);
     }
 
-    @TestTargetNew(
-        level = TestLevel.NOT_NECESSARY,
-        method = "onMeasure",
-        args = {int.class, int.class}
-    )
     public void testOnMeasure() {
         // onMeasure() is implementation details, do NOT test
     }
 
-    @TestTargetNew(
-        level = TestLevel.NOT_NECESSARY,
-        method = "onLayout",
-        args = {boolean.class, int.class, int.class, int.class, int.class}
-    )
     public void testOnLayout() {
         // onMeasure() is implementation details, do NOT test
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "checkLayoutParams",
-        args = {android.view.ViewGroup.LayoutParams.class}
-    )
     public void testCheckLayoutParams() {
         assertTrue(mMyAbsoluteLayout.checkLayoutParams(mAbsoluteLayoutParams));
 
@@ -128,11 +89,6 @@ public class AbsoluteLayoutTest extends ActivityInstrumentationTestCase2<StubAct
         assertFalse(mMyAbsoluteLayout.checkLayoutParams(null));
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "generateLayoutParams",
-        args = {android.util.AttributeSet.class}
-    )
     public void testGenerateLayoutParams1() throws Throwable {
         runTestOnUiThread(new Runnable() {
             public void run() {
@@ -157,14 +113,6 @@ public class AbsoluteLayoutTest extends ActivityInstrumentationTestCase2<StubAct
         }
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "generateLayoutParams",
-        args = {android.view.ViewGroup.LayoutParams.class}
-    )
-    @ToBeFixed(bug = "1695243", explanation = "should add @throws clause into javadoc of " +
-            "AbsoluteLayout#generateLayoutParams(ViewGroup.LayoutParams) when the input " +
-            "ViewGroup.LayoutParams is null")
     public void testGenerateLayoutParams2() {
         LayoutParams params =
             (LayoutParams) mMyAbsoluteLayout.generateLayoutParams(mAbsoluteLayoutParams);
@@ -182,11 +130,6 @@ public class AbsoluteLayoutTest extends ActivityInstrumentationTestCase2<StubAct
         }
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "generateDefaultLayoutParams",
-        args = {}
-    )
     public void testGenerateDefaultLayoutParams() {
         LayoutParams params = (LayoutParams) mMyAbsoluteLayout.generateDefaultLayoutParams();
 

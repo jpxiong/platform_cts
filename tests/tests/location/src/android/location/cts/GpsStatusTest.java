@@ -16,10 +16,6 @@
 
 package android.location.cts;
 
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
 
 import android.content.Context;
 import android.location.GpsSatellite;
@@ -29,7 +25,6 @@ import android.test.AndroidTestCase;
 
 import java.util.Iterator;
 
-@TestTargetClass(GpsStatus.class)
 public class GpsStatusTest extends AndroidTestCase {
     private GpsStatus mGpsStatus;
 
@@ -41,18 +36,6 @@ public class GpsStatusTest extends AndroidTestCase {
         mGpsStatus = lm.getGpsStatus(null);
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getSatellites",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getMaxSatellites",
-            args = {}
-        )
-    })
     public void testGetSatellites() {
         Iterable<GpsSatellite> satellites = mGpsStatus.getSatellites();
         assertNotNull(satellites);
@@ -70,11 +53,6 @@ public class GpsStatusTest extends AndroidTestCase {
         assertTrue(count <= maxSatellites);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "getTimeToFirstFix",
-        args = {}
-    )
     public void testGetTimeToFirstFix() {
         // make sure there is no exception.
         mGpsStatus.getTimeToFirstFix();

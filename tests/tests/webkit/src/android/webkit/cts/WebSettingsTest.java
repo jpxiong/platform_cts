@@ -26,11 +26,6 @@ import android.webkit.WebSettings.LayoutAlgorithm;
 import android.webkit.WebSettings.RenderPriority;
 import android.webkit.WebSettings.TextSize;
 
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
-import dalvik.annotation.ToBeFixed;
 
 import java.util.Locale;
 import java.util.regex.Matcher;
@@ -39,7 +34,6 @@ import java.util.regex.Pattern;
 /**
  * Tests for {@link android.webkit.WebSettings}
  */
-@TestTargetClass(android.webkit.WebSettings.class)
 public class WebSettingsTest extends ActivityInstrumentationTestCase2<WebViewStubActivity> {
 
     private static final int WEBVIEW_TIMEOUT = 5000;
@@ -70,11 +64,6 @@ public class WebSettingsTest extends ActivityInstrumentationTestCase2<WebViewStu
         super.tearDown();
     }
 
-    @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getUserAgentString",
-            args = {}
-    )
     /**
      * Verifies that the default user agent string follows the format defined in Android
      * compatibility definition:
@@ -106,18 +95,6 @@ public class WebSettingsTest extends ActivityInstrumentationTestCase2<WebViewStu
         assertEquals(Build.ID, patternMatcher.group(5));
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getUserAgentString",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setUserAgentString",
-            args = {String.class}
-        )
-    })
     public void testAccessUserAgentString() throws Exception {
         startWebServer();
         String url = mWebServer.getUserAgentUrl();
@@ -146,18 +123,6 @@ public class WebSettingsTest extends ActivityInstrumentationTestCase2<WebViewStu
         assertEquals(customUserAgent, mOnUiThread.getTitle());
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getUserAgent",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.SUFFICIENT,
-            method = "setUserAgent",
-            args = {int.class}
-        )
-    })
     @SuppressWarnings("deprecation")
     public void testAccessUserAgent() throws Exception {
         startWebServer();
@@ -199,18 +164,6 @@ public class WebSettingsTest extends ActivityInstrumentationTestCase2<WebViewStu
     }
 
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getAllowFileAccess",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.SUFFICIENT,
-            method = "setAllowFileAccess",
-            args = {boolean.class}
-        )
-    })
     public void testAccessAllowFileAccess() {
         assertTrue(mSettings.getAllowFileAccess());
 
@@ -231,18 +184,6 @@ public class WebSettingsTest extends ActivityInstrumentationTestCase2<WebViewStu
         assertEquals(TestHtmlConstants.WEBPAGE_NOT_AVAILABLE_TITLE, mOnUiThread.getTitle());
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getBlockNetworkImage",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setBlockNetworkImage",
-            args = {boolean.class}
-        )
-    })
     public void testAccessBlockNetworkImage() throws Exception {
         String url = TestHtmlConstants.EMBEDDED_IMG_URL;
         final String ext = MimeTypeMap.getFileExtensionFromUrl(url);
@@ -265,18 +206,6 @@ public class WebSettingsTest extends ActivityInstrumentationTestCase2<WebViewStu
         assertTrue(mWebServer.getLastRequestUrl().endsWith(ext));
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getCacheMode",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setCacheMode",
-            args = {int.class}
-        )
-    })
     public void testAccessCacheMode() throws Exception {
         assertEquals(WebSettings.LOAD_DEFAULT, mSettings.getCacheMode());
 
@@ -305,20 +234,6 @@ public class WebSettingsTest extends ActivityInstrumentationTestCase2<WebViewStu
         assertEquals(thirdFetch, mWebServer.getRequestCount());
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getCursiveFontFamily",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.SUFFICIENT,
-            method = "setCursiveFontFamily",
-            args = {String.class}
-        )
-    })
-    @ToBeFixed( bug = "1665811", explanation = "Can not check whether methods " +
-            "take effect by automatic testing")
     public void testAccessCursiveFontFamily() throws Exception {
         assertNotNull(mSettings.getCursiveFontFamily());
 
@@ -327,20 +242,6 @@ public class WebSettingsTest extends ActivityInstrumentationTestCase2<WebViewStu
         assertEquals(newCusiveFamily, mSettings.getCursiveFontFamily());
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getFantasyFontFamily",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.SUFFICIENT,
-            method = "setFantasyFontFamily",
-            args = {String.class}
-        )
-    })
-    @ToBeFixed( bug = "1665811", explanation = "Can not check whether methods " +
-            "take effect by automatic testing")
     public void testAccessFantasyFontFamily() {
         assertNotNull(mSettings.getFantasyFontFamily());
 
@@ -349,20 +250,6 @@ public class WebSettingsTest extends ActivityInstrumentationTestCase2<WebViewStu
         assertEquals(newFantasyFamily, mSettings.getFantasyFontFamily());
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getFixedFontFamily",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.SUFFICIENT,
-            method = "setFixedFontFamily",
-            args = {String.class}
-        )
-    })
-    @ToBeFixed( bug = "1665811", explanation = "Can not check whether methods " +
-            "take effect by automatic testing")
     public void testAccessFixedFontFamily() {
         assertNotNull(mSettings.getFixedFontFamily());
 
@@ -371,20 +258,6 @@ public class WebSettingsTest extends ActivityInstrumentationTestCase2<WebViewStu
         assertEquals(newFixedFamily, mSettings.getFixedFontFamily());
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getSansSerifFontFamily",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.SUFFICIENT,
-            method = "setSansSerifFontFamily",
-            args = {String.class}
-        )
-    })
-    @ToBeFixed( bug = "1665811", explanation = "Can not check whether methods " +
-            "take effect by automatic testing")
     public void testAccessSansSerifFontFamily() {
         assertNotNull(mSettings.getSansSerifFontFamily());
 
@@ -393,20 +266,6 @@ public class WebSettingsTest extends ActivityInstrumentationTestCase2<WebViewStu
         assertEquals(newFixedFamily, mSettings.getSansSerifFontFamily());
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getSerifFontFamily",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.SUFFICIENT,
-            method = "setSerifFontFamily",
-            args = {String.class}
-        )
-    })
-    @ToBeFixed( bug = "1665811", explanation = "Can not check whether methods " +
-            "take effect by automatic testing")
     public void testAccessSerifFontFamily() {
         assertNotNull(mSettings.getSerifFontFamily());
 
@@ -415,20 +274,6 @@ public class WebSettingsTest extends ActivityInstrumentationTestCase2<WebViewStu
         assertEquals(newSerifFamily, mSettings.getSerifFontFamily());
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getStandardFontFamily",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.SUFFICIENT,
-            method = "setStandardFontFamily",
-            args = {String.class}
-        )
-    })
-    @ToBeFixed( bug = "1665811", explanation = "Can not check whether methods " +
-            "take effect by automatic testing")
     public void testAccessStandardFontFamily() {
         assertNotNull(mSettings.getStandardFontFamily());
 
@@ -437,20 +282,6 @@ public class WebSettingsTest extends ActivityInstrumentationTestCase2<WebViewStu
         assertEquals(newStandardFamily, mSettings.getStandardFontFamily());
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getDefaultFontSize",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.SUFFICIENT,
-            method = "setDefaultFontSize",
-            args = {int.class}
-        )
-    })
-    @ToBeFixed( bug = "1665811", explanation = "Can not check whether methods " +
-            "take effect by automatic testing")
     public void testAccessDefaultFontSize() {
         int defaultSize = mSettings.getDefaultFontSize();
         assertTrue(defaultSize > 0);
@@ -469,20 +300,6 @@ public class WebSettingsTest extends ActivityInstrumentationTestCase2<WebViewStu
         assertEquals(10, mSettings.getDefaultFontSize());
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getDefaultFixedFontSize",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.SUFFICIENT,
-            method = "setDefaultFixedFontSize",
-            args = {int.class}
-        )
-    })
-    @ToBeFixed( bug = "1665811", explanation = "Can not check whether methods " +
-            "take effect by automatic testing")
     public void testAccessDefaultFixedFontSize() {
         int defaultSize = mSettings.getDefaultFixedFontSize();
         assertTrue(defaultSize > 0);
@@ -501,20 +318,6 @@ public class WebSettingsTest extends ActivityInstrumentationTestCase2<WebViewStu
         assertEquals(10, mSettings.getDefaultFixedFontSize());
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getDefaultTextEncodingName",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.SUFFICIENT,
-            method = "setDefaultTextEncodingName",
-            args = {String.class}
-        )
-    })
-    @ToBeFixed( bug = "1665811", explanation = "Can not check whether methods " +
-            "take effect by automatic testing")
     public void testAccessDefaultTextEncodingName() {
         assertNotNull(mSettings.getDefaultTextEncodingName());
 
@@ -523,18 +326,6 @@ public class WebSettingsTest extends ActivityInstrumentationTestCase2<WebViewStu
         assertEquals(newEncodingName, mSettings.getDefaultTextEncodingName());
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getJavaScriptCanOpenWindowsAutomatically",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setJavaScriptCanOpenWindowsAutomatically",
-            args = {boolean.class}
-        )
-    })
     public void testAccessJavaScriptCanOpenWindowsAutomatically() throws Exception {
         mSettings.setJavaScriptEnabled(true);
 
@@ -563,18 +354,6 @@ public class WebSettingsTest extends ActivityInstrumentationTestCase2<WebViewStu
         assertEquals("Popup allowed", mOnUiThread.getTitle());
 }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getJavaScriptEnabled",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setJavaScriptEnabled",
-            args = {boolean.class}
-        )
-    })
     public void testAccessJavaScriptEnabled() throws Exception {
         mSettings.setJavaScriptEnabled(true);
         assertTrue(mSettings.getJavaScriptEnabled());
@@ -599,20 +378,6 @@ public class WebSettingsTest extends ActivityInstrumentationTestCase2<WebViewStu
         assertEquals("javascript off", mOnUiThread.getTitle());
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getLayoutAlgorithm",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.SUFFICIENT,
-            method = "setLayoutAlgorithm",
-            args = {LayoutAlgorithm.class}
-        )
-    })
-    @ToBeFixed( bug = "1665811", explanation = "Can not check whether methods " +
-            "take effect by automatic testing")
     public void testAccessLayoutAlgorithm() {
         assertEquals(WebSettings.LayoutAlgorithm.NARROW_COLUMNS, mSettings.getLayoutAlgorithm());
 
@@ -623,20 +388,6 @@ public class WebSettingsTest extends ActivityInstrumentationTestCase2<WebViewStu
         assertEquals(WebSettings.LayoutAlgorithm.SINGLE_COLUMN, mSettings.getLayoutAlgorithm());
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getLightTouchEnabled",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.SUFFICIENT,
-            method = "setLightTouchEnabled",
-            args = {boolean.class}
-        )
-    })
-    @ToBeFixed( bug = "1665811", explanation = "Can not check whether methods " +
-            "take effect by automatic testing")
     public void testAccessLightTouchEnabled() {
         assertFalse(mSettings.getLightTouchEnabled());
 
@@ -644,20 +395,6 @@ public class WebSettingsTest extends ActivityInstrumentationTestCase2<WebViewStu
         assertTrue(mSettings.getLightTouchEnabled());
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getLoadsImagesAutomatically",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.SUFFICIENT,
-            method = "setLoadsImagesAutomatically",
-            args = {boolean.class}
-        )
-    })
-    @ToBeFixed( bug = "1665811", explanation = "Can not check whether methods " +
-            "take effect by automatic testing")
     public void testAccessLoadsImagesAutomatically() throws Exception {
         mOnUiThread.clearCache(true);
         assertTrue(mSettings.getLoadsImagesAutomatically());
@@ -675,20 +412,6 @@ public class WebSettingsTest extends ActivityInstrumentationTestCase2<WebViewStu
         assertTrue(mWebServer.getLastRequestUrl().endsWith(ext));
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getMinimumFontSize",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.SUFFICIENT,
-            method = "setMinimumFontSize",
-            args = {int.class}
-        )
-    })
-    @ToBeFixed( bug = "1665811", explanation = "Can not check whether methods " +
-            "take effect by automatic testing")
     public void testAccessMinimumFontSize() {
         assertEquals(8, mSettings.getMinimumFontSize());
 
@@ -702,20 +425,6 @@ public class WebSettingsTest extends ActivityInstrumentationTestCase2<WebViewStu
         assertEquals(10, mSettings.getMinimumFontSize());
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getMinimumLogicalFontSize",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.SUFFICIENT,
-            method = "setMinimumLogicalFontSize",
-            args = {int.class}
-        )
-    })
-    @ToBeFixed( bug = "1665811", explanation = "Can not check whether methods " +
-            "take effect by automatic testing")
     public void testAccessMinimumLogicalFontSize() {
         assertEquals(8, mSettings.getMinimumLogicalFontSize());
 
@@ -729,19 +438,6 @@ public class WebSettingsTest extends ActivityInstrumentationTestCase2<WebViewStu
         assertEquals(10, mSettings.getMinimumLogicalFontSize());
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getNavDump",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.SUFFICIENT,
-            method = "setNavDump",
-            args = {boolean.class}
-        )
-    })
-    @ToBeFixed(explanation = "NavDump feature is not documented")
     public void testAccessNavDump() {
         assertFalse(mSettings.getNavDump());
 
@@ -749,20 +445,6 @@ public class WebSettingsTest extends ActivityInstrumentationTestCase2<WebViewStu
         assertTrue(mSettings.getNavDump());
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getPluginsEnabled",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.SUFFICIENT,
-            method = "setPluginsEnabled",
-            args = {boolean.class}
-        )
-    })
-    @ToBeFixed( bug = "1665811", explanation = "Can not check whether methods " +
-            "take effect by automatic testing")
     public void testAccessPluginsEnabled() {
         assertFalse(mSettings.getPluginsEnabled());
 
@@ -770,20 +452,6 @@ public class WebSettingsTest extends ActivityInstrumentationTestCase2<WebViewStu
         assertTrue(mSettings.getPluginsEnabled());
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getPluginsPath",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.SUFFICIENT,
-            method = "setPluginsPath",
-            args = {String.class}
-        )
-    })
-    @ToBeFixed( bug = "1665811", explanation = "Can not check whether methods " +
-            "take effect by automatic testing")
     public void testAccessPluginsPath() {
         assertNotNull(mSettings.getPluginsPath());
 
@@ -793,20 +461,6 @@ public class WebSettingsTest extends ActivityInstrumentationTestCase2<WebViewStu
         assertEquals("", mSettings.getPluginsPath());
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getSaveFormData",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.SUFFICIENT,
-            method = "setSaveFormData",
-            args = {boolean.class}
-        )
-    })
-    @ToBeFixed( bug = "1665811", explanation = "Can not check whether methods " +
-            "take effect by automatic testing")
     public void testAccessSaveFormData() {
         assertTrue(mSettings.getSaveFormData());
 
@@ -814,20 +468,6 @@ public class WebSettingsTest extends ActivityInstrumentationTestCase2<WebViewStu
         assertFalse(mSettings.getSaveFormData());
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getSavePassword",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.SUFFICIENT,
-            method = "setSavePassword",
-            args = {boolean.class}
-        )
-    })
-    @ToBeFixed( bug = "1665811", explanation = "Can not check whether methods " +
-            "take effect by automatic testing")
     public void testAccessSavePassword() {
         assertTrue(mSettings.getSavePassword());
 
@@ -835,20 +475,6 @@ public class WebSettingsTest extends ActivityInstrumentationTestCase2<WebViewStu
         assertFalse(mSettings.getSavePassword());
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getTextSize",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.SUFFICIENT,
-            method = "setTextSize",
-            args = {TextSize.class}
-        )
-    })
-    @ToBeFixed( bug = "1665811", explanation = "Can not check whether methods " +
-            "take effect by automatic testing")
     public void testAccessTextSize() {
         assertEquals(TextSize.NORMAL, mSettings.getTextSize());
 
@@ -865,19 +491,6 @@ public class WebSettingsTest extends ActivityInstrumentationTestCase2<WebViewStu
         assertEquals(TextSize.SMALLEST, mSettings.getTextSize());
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getUseDoubleTree",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.SUFFICIENT,
-            method = "setUseDoubleTree",
-            args = {boolean.class}
-        )
-    })
-    @ToBeFixed( bug = "1665811", explanation = "Can not check whether methods take effect")
     public void testAccessUseDoubleTree() {
         assertFalse(mSettings.getUseDoubleTree());
 
@@ -886,20 +499,6 @@ public class WebSettingsTest extends ActivityInstrumentationTestCase2<WebViewStu
         assertFalse(mSettings.getUseDoubleTree());
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getUseWideViewPort",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.SUFFICIENT,
-            method = "setUseWideViewPort",
-            args = {boolean.class}
-        )
-    })
-    @ToBeFixed( bug = "1665811", explanation = "Can not check whether methods " +
-            "take effect by automatic testing")
     public void testAccessUseWideViewPort() {
         assertFalse(mSettings.getUseWideViewPort());
 
@@ -907,25 +506,12 @@ public class WebSettingsTest extends ActivityInstrumentationTestCase2<WebViewStu
         assertTrue(mSettings.getUseWideViewPort());
     }
 
-    @TestTargetNew(
-        level = TestLevel.SUFFICIENT,
-        method = "setNeedInitialFocus",
-        args = {boolean.class}
-    )
-    @ToBeFixed( bug = "1665811", explanation = "Can not check whether methods " +
-            "take effect by automatic testing")
     public void testSetNeedInitialFocus() {
         mSettings.setNeedInitialFocus(false);
 
         mSettings.setNeedInitialFocus(true);
     }
 
-    @TestTargetNew(
-        level = TestLevel.SUFFICIENT,
-        method = "setRenderPriority",
-        args = {RenderPriority.class}
-    )
-    @ToBeFixed( bug = "1665811", explanation = "Can not check whether methods take effect")
     public void testSetRenderPriority() {
         mSettings.setRenderPriority(WebSettings.RenderPriority.HIGH);
 
@@ -934,20 +520,6 @@ public class WebSettingsTest extends ActivityInstrumentationTestCase2<WebViewStu
         mSettings.setRenderPriority(WebSettings.RenderPriority.NORMAL);
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "supportMultipleWindows",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.SUFFICIENT,
-            method = "setSupportMultipleWindows",
-            args = {boolean.class}
-        )
-    })
-    @ToBeFixed( bug = "1665811", explanation = "Can not check whether methods " +
-            "take effect by automatic testing")
     public void testAccessSupportMultipleWindows() {
         assertFalse(mSettings.supportMultipleWindows());
 
@@ -955,20 +527,6 @@ public class WebSettingsTest extends ActivityInstrumentationTestCase2<WebViewStu
         assertTrue(mSettings.supportMultipleWindows());
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "supportZoom",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setSupportZoom",
-            args = {boolean.class}
-        )
-    })
-    @ToBeFixed( bug = "1665811", explanation = "Can not check whether methods " +
-            "take effect by automatic testing")
     public void testAccessSupportZoom() throws Throwable {
         assertTrue(mSettings.supportZoom());
 
@@ -981,20 +539,6 @@ public class WebSettingsTest extends ActivityInstrumentationTestCase2<WebViewStu
         assertFalse(mSettings.supportZoom());
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getBuiltInZoomControls",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.SUFFICIENT,
-            method = "setBuiltInZoomControls",
-            args = {boolean.class}
-        )
-    })
-    @ToBeFixed( bug = "1665811", explanation = "Can not check whether methods " +
-            "take effect by automatic testing")
     public void testAccessBuiltInZoomControls() throws Throwable {
         assertFalse(mSettings.getBuiltInZoomControls());
 
@@ -1007,13 +551,6 @@ public class WebSettingsTest extends ActivityInstrumentationTestCase2<WebViewStu
         assertTrue(mSettings.getBuiltInZoomControls());
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setAppCacheEnabled",
-            args = {}
-        )
-    })
     public void testAppCacheDisabled() throws Throwable {
         // Test that when AppCache is disabled, we don't get any AppCache
         // callbacks.
@@ -1033,18 +570,6 @@ public class WebSettingsTest extends ActivityInstrumentationTestCase2<WebViewStu
         assertEquals("Loaded", mOnUiThread.getTitle());
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setAppCacheEnabled",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setAppCachePath",
-            args = {}
-        )
-    })
     public void testAppCacheEnabled() throws Throwable {
         // Note that the AppCache path can only be set once. This limits the
         // amount of testing we can do, and means that we must test all aspects

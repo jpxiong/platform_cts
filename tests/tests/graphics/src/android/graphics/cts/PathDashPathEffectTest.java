@@ -16,9 +16,6 @@
 
 package android.graphics.cts;
 
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
 
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
@@ -32,7 +29,6 @@ import android.graphics.Path.Direction;
 
 import junit.framework.TestCase;
 
-@TestTargetClass(PathDashPathEffect.class)
 public class PathDashPathEffectTest extends TestCase {
 
     private static final int SQUARE = 10;
@@ -40,12 +36,6 @@ public class PathDashPathEffectTest extends TestCase {
     private static final int WIDTH = 100;
     private static final int HEIGHT = 100;
 
-    @TestTargetNew(
-        level = TestLevel.SUFFICIENT,
-        method = "PathDashPathEffect",
-        args = {android.graphics.Path.class, float.class, float.class,
-                android.graphics.PathDashPathEffect.Style.class}
-    )
     public void testPathDashPathEffect() {
         Bitmap b = Bitmap.createBitmap(WIDTH, HEIGHT, Config.ARGB_8888);
         b.eraseColor(Color.BLACK);

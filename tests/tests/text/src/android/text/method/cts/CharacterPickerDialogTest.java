@@ -16,10 +16,6 @@
 
 package android.text.method.cts;
 
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.ToBeFixed;
 
 import android.app.Activity;
 import android.content.Context;
@@ -33,7 +29,6 @@ import android.widget.AdapterView;
 import android.widget.Gallery;
 import android.widget.TextView;
 
-@TestTargetClass(CharacterPickerDialog.class)
 public class CharacterPickerDialogTest extends
         ActivityInstrumentationTestCase2<StubActivity> {
     private Activity mActivity;
@@ -48,13 +43,6 @@ public class CharacterPickerDialogTest extends
         mActivity = getActivity();
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "CharacterPickerDialog",
-        args = {Context.class, View.class, Editable.class, String.class, boolean.class}
-    )
-    @ToBeFixed(bug = "1695243", explanation = "Android API javadocs are incomplete, " +
-            "should add @throw in the javadoc.")
     public void testConstructor() {
         final CharSequence str = "123456";
         final Editable content = Editable.Factory.getInstance().newEditable(str);
@@ -69,21 +57,10 @@ public class CharacterPickerDialogTest extends
         }
     }
 
-    @TestTargetNew(
-        level = TestLevel.NOT_NECESSARY,
-        method = "onCreate",
-        args = {Bundle.class}
-    )
     public void testOnCreate() {
         // Do not test. Implementation details.
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "only position is read in this method",
-        method = "onItemClick",
-        args = {AdapterView.class, View.class, int.class, long.class}
-    )
     public void testOnItemClick() {
         final Gallery parent = new Gallery(mActivity);
         final CharSequence str = "123456";
@@ -125,11 +102,6 @@ public class CharacterPickerDialogTest extends
         assertFalse(insertPickerDialog.isShowing());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "onClick",
-        args = {View.class}
-    )
     public void testOnClick() {
         final CharSequence str = "123456";
         final Editable content = Editable.Factory.getInstance().newEditable(str);

@@ -16,11 +16,6 @@
 
 package android.text.method.cts;
 
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
-import dalvik.annotation.ToBeFixed;
 
 import android.app.Activity;
 import android.os.SystemClock;
@@ -34,7 +29,6 @@ import android.util.DisplayMetrics;
 import android.view.MotionEvent;
 import android.widget.TextView;
 
-@TestTargetClass(Touch.class)
 public class TouchTest extends ActivityInstrumentationTestCase2<StubActivity> {
     private Activity mActivity;
     private static final String LONG_TEXT = "Scrolls the specified widget to the specified " +
@@ -54,11 +48,6 @@ public class TouchTest extends ActivityInstrumentationTestCase2<StubActivity> {
         mActivity = getActivity();
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "scrollTo",
-        args = {TextView.class, Layout.class, int.class, int.class}
-    )
     public void testScrollTo() throws Throwable {
         final TextView tv = new TextView(mActivity);
         runTestOnUiThread(new Runnable() {
@@ -111,25 +100,6 @@ public class TouchTest extends ActivityInstrumentationTestCase2<StubActivity> {
         assertEquals(5, tv.getScrollY());
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getInitialScrollX",
-            args = {TextView.class, Spannable.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getInitialScrollY",
-            args = {TextView.class, Spannable.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "onTouchEvent",
-            args = {TextView.class, Spannable.class, MotionEvent.class}
-        )
-    })
-    @ToBeFixed(bug = "1695243", explanation = "Android API javadocs are incomplete, " +
-            "should add @throws clause into javadoc.")
     public void testOnTouchEvent() throws Throwable {
         final TextView tv = new TextView(mActivity);
 

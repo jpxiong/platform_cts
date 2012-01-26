@@ -16,10 +16,6 @@
 
 package android.database.sqlite.cts;
 
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
 
 import android.content.Context;
 import android.database.Cursor;
@@ -31,7 +27,6 @@ import android.database.sqlite.SQLiteStatement;
 import android.test.AndroidTestCase;
 import android.test.MoreAsserts;
 
-@TestTargetClass(android.database.sqlite.SQLiteProgram.class)
 public class SQLiteProgramTest extends AndroidTestCase {
     private static final String DATABASE_NAME = "database_test.db";
 
@@ -54,33 +49,6 @@ public class SQLiteProgramTest extends AndroidTestCase {
         super.tearDown();
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "bindLong",
-            args = {int.class, long.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "bindDouble",
-            args = {int.class, double.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "bindString",
-            args = {int.class, String.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "clearBindings",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.SUFFICIENT,
-            method = "close",
-            args = {}
-        )
-    })
     public void testBind() {
         mDatabase.execSQL("CREATE TABLE test (_id INTEGER PRIMARY KEY, text1 TEXT, text2 TEXT, " +
                 "num1 INTEGER, num2 INTEGER, image BLOB);");
@@ -151,12 +119,6 @@ public class SQLiteProgramTest extends AndroidTestCase {
         statement.close();
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test bindNull()",
-        method = "bindNull",
-        args = {int.class}
-    )
     public void testBindNull() {
         mDatabase.execSQL("CREATE TABLE test (_id INTEGER PRIMARY KEY, text1 TEXT, text2 TEXT, " +
                 "num1 INTEGER, num2 INTEGER, image BLOB);");
@@ -187,12 +149,6 @@ public class SQLiteProgramTest extends AndroidTestCase {
         cursor.close();
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test bindBlob()",
-        method = "bindBlob",
-        args = {int.class, byte[].class}
-    )
     public void testBindBlob() {
         mDatabase.execSQL("CREATE TABLE test (_id INTEGER PRIMARY KEY, text1 TEXT, text2 TEXT, " +
                 "num1 INTEGER, num2 INTEGER, image BLOB);");

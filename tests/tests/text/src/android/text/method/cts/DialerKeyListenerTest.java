@@ -22,34 +22,15 @@ import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.method.DialerKeyListener;
 import android.view.KeyEvent;
-import dalvik.annotation.TestTargets;
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.ToBeFixed;
 
 /**
  * Test {@link DialerKeyListener}.
  */
-@TestTargetClass(DialerKeyListener.class)
 public class DialerKeyListenerTest extends TestCase {
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test constructor(s) of {@link DialerKeyListener}",
-        method = "DialerKeyListener",
-        args = {}
-    )
     public void testConstructor() {
         new DialerKeyListener();
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test {@link DialerKeyListener#lookup(KeyEvent, Spannable)}",
-        method = "lookup",
-        args = {android.view.KeyEvent.class, android.text.Spannable.class}
-    )
-    @ToBeFixed(bug="1371108", explanation="NPE is not expected.")
     public void testLookup() {
         MockDialerKeyListener mockDialerKeyListener = new MockDialerKeyListener();
         final int[] events = { KeyEvent.KEYCODE_0, KeyEvent.KEYCODE_N, KeyEvent.KEYCODE_A };
@@ -71,12 +52,6 @@ public class DialerKeyListenerTest extends TestCase {
         }
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test {@link DialerKeyListener#getInstance()}",
-        method = "getInstance",
-        args = {}
-    )
     public void testGetInstance() {
         assertNotNull(DialerKeyListener.getInstance());
 
@@ -88,12 +63,6 @@ public class DialerKeyListenerTest extends TestCase {
         assertSame(listener1, listener2);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test {@link DialerKeyListener#getAcceptedChars()}",
-        method = "getAcceptedChars",
-        args = {}
-    )
     public void testGetAcceptedChars() {
         MockDialerKeyListener mockDialerKeyListener = new MockDialerKeyListener();
 
@@ -101,12 +70,6 @@ public class DialerKeyListenerTest extends TestCase {
                 mockDialerKeyListener.getAcceptedChars());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test {@link DialerKeyListener#getInputType()}",
-        method = "getInputType",
-        args = {}
-    )
     public void testGetInputType() {
         DialerKeyListener listener = DialerKeyListener.getInstance();
 

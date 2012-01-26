@@ -19,28 +19,14 @@ package android.graphics.cts;
 import junit.framework.TestCase;
 import android.graphics.Paint;
 import android.graphics.Paint.FontMetricsInt;
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
 
-@TestTargetClass(Paint.FontMetricsInt.class)
 public class Paint_FontMetricsIntTest extends TestCase {
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "Paint.FontMetricsInt",
-        args = {}
-    )
     public void testConstructor() {
         // new the FontMetricsInt instance
         new Paint.FontMetricsInt();
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "toString",
-        args = {}
-    )
     public void testToString() {
         // set the expected value
         int top = 1;

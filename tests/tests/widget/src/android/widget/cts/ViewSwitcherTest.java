@@ -30,16 +30,10 @@ import android.widget.ViewSwitcher.ViewFactory;
 
 import com.android.cts.stub.R;
 
-import dalvik.annotation.TestTargets;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.ToBeFixed;
 
 /**
  * Test {@link ViewSwitcher}.
  */
-@TestTargetClass(ViewSwitcher.class)
 public class ViewSwitcherTest extends AndroidTestCase {
     private ViewSwitcher mViewSwitcher;
 
@@ -49,22 +43,6 @@ public class ViewSwitcherTest extends AndroidTestCase {
         mViewSwitcher = null;
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test constructor(s) of {@link ViewSwitcher}",
-            method = "ViewSwitcher",
-            args = {android.content.Context.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test constructor(s) of {@link ViewSwitcher}",
-            method = "ViewSwitcher",
-            args = {android.content.Context.class, android.util.AttributeSet.class}
-        )
-    })
-    @ToBeFixed(bug = "1417734", explanation = "ViewSwitcher#ViewSwitcher(Context, AttributeSet)" +
-            " should check whether the input Context is null")
     public void testConstructor() {
         new ViewSwitcher(getContext());
 
@@ -75,12 +53,6 @@ public class ViewSwitcherTest extends AndroidTestCase {
         new ViewSwitcher(getContext(), attrs);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test {@link ViewSwitcher#setFactory(ViewFactory)}",
-        method = "setFactory",
-        args = {android.widget.ViewSwitcher.ViewFactory.class}
-    )
     public void testSetFactory() {
         mViewSwitcher = new ViewSwitcher(getContext());
 
@@ -89,12 +61,6 @@ public class ViewSwitcherTest extends AndroidTestCase {
         assertTrue(factory.hasMakeViewCalled());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test {@link ViewSwitcher#reset()}",
-        method = "reset",
-        args = {}
-    )
     public void testReset() {
         mViewSwitcher = new ViewSwitcher(getContext());
 
@@ -110,20 +76,6 @@ public class ViewSwitcherTest extends AndroidTestCase {
         assertEquals(View.GONE, lv2.getVisibility());
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test {@link ViewSwitcher#getNextView()}",
-            method = "getNextView",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test {@link ViewSwitcher#getNextView()}",
-            method = "addView",
-            args = {android.view.View.class, int.class, android.view.ViewGroup.LayoutParams.class}
-        )
-    })
     public void testGetNextView() {
         mViewSwitcher = new ViewSwitcher(getContext());
 

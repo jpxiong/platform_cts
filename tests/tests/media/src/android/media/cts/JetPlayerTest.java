@@ -18,10 +18,6 @@ package android.media.cts;
 
 import com.android.cts.stub.R;
 
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
 
 import android.content.res.AssetFileDescriptor;
 import android.media.JetPlayer;
@@ -36,7 +32,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
-@TestTargetClass(JetPlayer.class)
 public class JetPlayerTest extends AndroidTestCase {
     private OnJetEventListener mOnJetEventListener;
     private boolean mOnJetUserIdUpdateCalled;
@@ -73,79 +68,6 @@ public class JetPlayerTest extends AndroidTestCase {
         super.tearDown();
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setEventListener",
-            args = {OnJetEventListener.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "loadJetFile",
-            args = {String.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "play",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.NOT_FEASIBLE,
-            notes = "if call release , process will crash.",
-            method = "release",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "pause",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "clearQueue",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "closeJetFile",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setMuteArray",
-            args = {boolean[].class, boolean.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setMuteFlag",
-            args = {int.class, boolean.class, boolean.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setMuteFlags",
-            args = {int.class, boolean.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "queueJetSegment",
-            args = {int.class, int.class, int.class, int.class, int.class, byte.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "triggerClip",
-            args = {int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getMaxTracks",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getJetPlayer",
-            args = {}
-        )
-    })
     public void testLoadJetFromPath() throws Throwable {
         mJetPlayer.clearQueue();
         prepareFile();
@@ -154,79 +76,6 @@ public class JetPlayerTest extends AndroidTestCase {
         runJet();
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setEventListener",
-            args = {OnJetEventListener.class, Handler.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "loadJetFile",
-            args = {AssetFileDescriptor.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "play",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.NOT_FEASIBLE,
-            notes = "if call release , process will crash.",
-            method = "release",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "pause",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "clearQueue",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "closeJetFile",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setMuteArray",
-            args = {boolean[].class, boolean.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setMuteFlag",
-            args = {int.class, boolean.class, boolean.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setMuteFlags",
-            args = {int.class, boolean.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "queueJetSegment",
-            args = {int.class, int.class, int.class, int.class, int.class, byte.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "triggerClip",
-            args = {int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getMaxTracks",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getJetPlayer",
-            args = {}
-        )
-    })
     public void testLoadJetFromFd() throws Throwable {
         mJetPlayer.clearQueue();
         mJetPlayer.setEventListener(mOnJetEventListener, mHandler);
@@ -234,11 +83,6 @@ public class JetPlayerTest extends AndroidTestCase {
         runJet();
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "queueJetSegmentMuteArray",
-        args = {int.class, int.class, int.class, int.class, boolean[].class, byte.class}
-    )
     public void testQueueJetSegmentMuteArray() throws Throwable {
         mJetPlayer.clearQueue();
         mJetPlayer.setEventListener(mOnJetEventListener, mHandler);
@@ -319,11 +163,6 @@ public class JetPlayerTest extends AndroidTestCase {
         assertTrue(mOnJetUserIdUpdateCalled);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "clone",
-        args = {}
-    )
     public void testClone() throws Exception {
         try {
             mJetPlayer.clone();

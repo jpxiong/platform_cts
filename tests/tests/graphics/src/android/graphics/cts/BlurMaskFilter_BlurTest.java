@@ -18,18 +18,9 @@ package android.graphics.cts;
 import junit.framework.TestCase;
 import android.graphics.BlurMaskFilter;
 import android.graphics.BlurMaskFilter.Blur;
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
 
-@TestTargetClass(BlurMaskFilter.Blur.class)
 public class BlurMaskFilter_BlurTest extends TestCase {
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "valueOf",
-        args = {java.lang.String.class}
-    )
     public void testValueOf(){
         assertEquals(Blur.NORMAL, Blur.valueOf("NORMAL"));
         assertEquals(Blur.SOLID, Blur.valueOf("SOLID"));
@@ -37,11 +28,6 @@ public class BlurMaskFilter_BlurTest extends TestCase {
         assertEquals(Blur.INNER, Blur.valueOf("INNER"));
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "values",
-        args = {}
-    )
     public void testValues(){
         Blur[] bulr = Blur.values();
 

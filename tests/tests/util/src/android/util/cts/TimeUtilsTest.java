@@ -16,10 +16,6 @@
 package android.util.cts;
 
 import dalvik.annotation.KnownFailure;
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
 
 import android.util.TimeUtils;
 
@@ -28,16 +24,7 @@ import java.util.TimeZone;
 
 import junit.framework.TestCase;
 
-@TestTargetClass(TimeUtils.class)
 public class TimeUtilsTest extends TestCase {
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test method: getTimeZone",
-            method = "getTimeZone",
-            args = {int.class, boolean.class, long.class, String.class}
-        )
-    })
     public void testUnitedStates() throws Exception {
         String[] mainstream = new String[] {
             "America/New_York", // Eastern
@@ -63,14 +50,6 @@ public class TimeUtilsTest extends TestCase {
         }
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test method: getTimeZone",
-            method = "getTimeZone",
-            args = {int.class, boolean.class, long.class, String.class}
-        )
-    })
     public void testWeirdUnitedStates() throws Exception {
         String[] weird = new String[] {
             "America/Phoenix", // Mountain, no DST
@@ -88,14 +67,6 @@ public class TimeUtilsTest extends TestCase {
         }
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test method: getTimeZone",
-            method = "getTimeZone",
-            args = {int.class, boolean.class, long.class, String.class}
-        )
-    })
     public void testOld() throws Exception {
         String[] old = new String[] {
             "America/Indiana/Indianapolis", // Eastern, formerly no DST
@@ -112,14 +83,6 @@ public class TimeUtilsTest extends TestCase {
         }
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test method: getTimeZone",
-            method = "getTimeZone",
-            args = {int.class, boolean.class, long.class, String.class}
-        )
-    })
     @KnownFailure(value="bug 2323433, needs investigation")
     public void testWorld() throws Exception {
         String[] world = new String[] {
@@ -443,14 +406,6 @@ public class TimeUtilsTest extends TestCase {
         }
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test method: getTimeZone",
-            method = "getTimeZone",
-            args = {int.class, boolean.class, long.class, String.class}
-        )
-    })
     public void testWorldWeird() throws Exception {
         String[] world = new String[] {
             // Distinguisable from Sydney only when DST not in effect

@@ -15,28 +15,11 @@
  */
 package android.database.cts;
 
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
 
 import android.database.CharArrayBuffer;
 import android.test.AndroidTestCase;
 
-@TestTargetClass(android.database.CharArrayBuffer.class)
 public class CharArrayBufferTest extends AndroidTestCase {
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "CharArrayBuffer",
-            args = {int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "CharArrayBuffer",
-            args = {char[].class}
-        )
-    })
     public void testCharArrayBuffer() {
         CharArrayBuffer charArrayBuffer;
 

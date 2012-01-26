@@ -19,15 +19,10 @@ package android.util.cts;
 import android.R;
 import android.test.AndroidTestCase;
 import android.util.StateSet;
-import dalvik.annotation.TestTargets;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
 
 /**
  * Test StateSet
  */
-@TestTargetClass(StateSet.class)
 public class StateSetTest extends AndroidTestCase {
 
     @Override
@@ -35,12 +30,6 @@ public class StateSetTest extends AndroidTestCase {
         super.setUp();
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test trim state set.",
-        method = "trimStateSet",
-        args = {int[].class, int.class}
-    )
     public void testTrimStateSet() {
         // state set's old size is equal to new size
         int[] stateSet = {1, 2, 3};
@@ -53,12 +42,6 @@ public class StateSetTest extends AndroidTestCase {
         }
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "test dump state set",
-        method = "dump",
-        args = {int[].class}
-    )
     public void testDump() {
         int[] stateSet = {R.attr.state_window_focused,
                           R.attr.state_pressed,
@@ -70,26 +53,6 @@ public class StateSetTest extends AndroidTestCase {
         assertEquals("W P S F E ", string);
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "",
-            method = "stateSetMatches",
-            args = {int[].class, int[].class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "",
-            method = "isWildCard",
-            args = {int[].class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "",
-            method = "stateSetMatches",
-            args = {int[].class, int.class}
-        )
-    })
     public void testStateSetMatches() throws Exception {
          int[] stateSpec1 = new int[2];
          int[] stateSet1 = new int[3];

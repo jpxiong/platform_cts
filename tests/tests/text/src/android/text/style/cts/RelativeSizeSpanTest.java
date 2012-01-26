@@ -16,11 +16,6 @@
 
 package android.text.style.cts;
 
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
-import dalvik.annotation.ToBeFixed;
 
 import android.os.Parcel;
 import android.text.TextPaint;
@@ -28,20 +23,7 @@ import android.text.style.RelativeSizeSpan;
 
 import junit.framework.TestCase;
 
-@TestTargetClass(RelativeSizeSpan.class)
 public class RelativeSizeSpanTest extends TestCase {
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "RelativeSizeSpan",
-            args = {float.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "RelativeSizeSpan",
-            args = {android.os.Parcel.class}
-        )
-    })
     public void testConstructor() {
         RelativeSizeSpan relativeSizeSpan = new RelativeSizeSpan(1.0f);
 
@@ -57,11 +39,6 @@ public class RelativeSizeSpanTest extends TestCase {
         }
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "getSizeChange",
-        args = {}
-    )
     public void testGetSizeChange() {
         RelativeSizeSpan relativeSizeSpan = new RelativeSizeSpan(2.0f);
         assertEquals(2.0f, relativeSizeSpan.getSizeChange());
@@ -70,12 +47,6 @@ public class RelativeSizeSpanTest extends TestCase {
         assertEquals(-2.0f, relativeSizeSpan.getSizeChange());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "updateMeasureState",
-        args = {android.text.TextPaint.class}
-    )
-    @ToBeFixed(bug="1695243", explanation="miss javadoc")
     public void testUpdateMeasureState() {
         float proportion = 3.0f;
         RelativeSizeSpan relativeSizeSpan = new RelativeSizeSpan(proportion);
@@ -100,12 +71,6 @@ public class RelativeSizeSpanTest extends TestCase {
         }
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "updateDrawState",
-        args = {android.text.TextPaint.class}
-    )
-    @ToBeFixed(bug="1695243", explanation="miss javadoc")
     public void testUpdateDrawState() {
         float proportion = 3.0f;
         RelativeSizeSpan relativeSizeSpan = new RelativeSizeSpan(proportion);
@@ -130,31 +95,16 @@ public class RelativeSizeSpanTest extends TestCase {
         }
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "describeContents",
-        args = {}
-    )
     public void testDescribeContents() {
         RelativeSizeSpan relativeSizeSpan = new RelativeSizeSpan(2.0f);
         relativeSizeSpan.describeContents();
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "getSpanTypeId",
-        args = {}
-    )
     public void testGetSpanTypeId() {
         RelativeSizeSpan relativeSizeSpan = new RelativeSizeSpan(2.0f);
         relativeSizeSpan.getSpanTypeId();
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "writeToParcel",
-        args = {Parcel.class, int.class}
-    )
     public void testWriteToParcel() {
         Parcel p = Parcel.obtain();
         try {

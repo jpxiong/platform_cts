@@ -23,12 +23,7 @@ import android.media.audiofx.EnvironmentalReverb;
 import android.os.Looper;
 import android.test.AndroidTestCase;
 import android.util.Log;
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
 
-@TestTargetClass(EnvironmentalReverb.class)
 public class EnvReverbTest extends AndroidTestCase {
 
     private String TAG = "EnvReverbTest";
@@ -56,23 +51,6 @@ public class EnvReverbTest extends AndroidTestCase {
     //----------------------------------
 
     //Test case 0.0: test constructor and release
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "EnvironmentalReverb",
-            args = {int.class, int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getId",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "release",
-            args = {}
-        )
-    })
     public void test0_0ConstructorAndRelease() throws Exception {
         EnvironmentalReverb envReverb = null;
          try {
@@ -100,28 +78,6 @@ public class EnvReverbTest extends AndroidTestCase {
     //----------------------------------
 
     //Test case 1.0: test room level and room HF level
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setRoomLevel",
-            args = {short.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getRoomLevel",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setRoomHFLevel",
-            args = {short.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getRoomHFLevel",
-            args = {}
-        )
-    })
     public void test1_0Room() throws Exception {
         getReverb(0);
         try {
@@ -153,28 +109,6 @@ public class EnvReverbTest extends AndroidTestCase {
     }
 
     //Test case 1.1: test decay time and ratio
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setDecayTime",
-            args = {int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getDecayTime",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setDecayHFRatio",
-            args = {short.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getDecayHFRatio",
-            args = {}
-        )
-    })
     public void test1_1Decay() throws Exception {
         getReverb(0);
         try {
@@ -206,28 +140,6 @@ public class EnvReverbTest extends AndroidTestCase {
 
 
     //Test case 1.2: test reverb level and delay
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setReverbLevel",
-            args = {short.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getReverbLevel",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setReverbDelay",
-            args = {int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getReverbDelay",
-            args = {}
-        )
-    })
     public void test1_2Reverb() throws Exception {
         getReverb(0);
         try {
@@ -261,28 +173,6 @@ public class EnvReverbTest extends AndroidTestCase {
     }
 
     //Test case 1.3: test early reflections level and delay
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setReflectionsLevel",
-            args = {short.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getReflectionsLevel",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setReflectionsDelay",
-            args = {int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getReflectionsDelay",
-            args = {}
-        )
-    })
     public void test1_3Reflections() throws Exception {
         getReverb(0);
         try {
@@ -321,28 +211,6 @@ public class EnvReverbTest extends AndroidTestCase {
     }
 
     //Test case 1.4: test diffusion and density
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setDiffusion",
-            args = {short.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getDiffusion",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setDensity",
-            args = {short.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getDensity",
-            args = {}
-        )
-    })
     public void test1_4DiffusionAndDensity() throws Exception {
         getReverb(0);
         try {
@@ -374,18 +242,6 @@ public class EnvReverbTest extends AndroidTestCase {
     }
 
     //Test case 1.5: test properties
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getProperties",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setProperties",
-            args = {EnvironmentalReverb.Settings.class}
-        )
-    })
     public void test1_5Properties() throws Exception {
         getReverb(0);
         try {
@@ -415,18 +271,6 @@ public class EnvReverbTest extends AndroidTestCase {
     //----------------------------------
 
     //Test case 2.0: test setEnabled() and getEnabled() in valid state
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setEnabled",
-            args = {boolean.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getEnabled",
-            args = {}
-        )
-    })
     public void test2_0SetEnabledGetEnabled() throws Exception {
         getReverb(0);
         try {
@@ -442,18 +286,6 @@ public class EnvReverbTest extends AndroidTestCase {
     }
 
     //Test case 2.1: test setEnabled() throws exception after release
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "release",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setEnabled",
-            args = {boolean.class}
-        )
-    })
     public void test2_1SetEnabledAfterRelease() throws Exception {
         getReverb(0);
         mReverb.release();
@@ -472,13 +304,6 @@ public class EnvReverbTest extends AndroidTestCase {
     //----------------------------------
 
     //Test case 3.0: test control status listener
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setControlStatusListener",
-            args = {AudioEffect.OnControlStatusChangeListener.class}
-        )
-    })
     public void test3_0ControlStatusListener() throws Exception {
         mHasControl = true;
         createListenerLooper(true, false, false);
@@ -505,13 +330,6 @@ public class EnvReverbTest extends AndroidTestCase {
     }
 
     //Test case 3.1: test enable status listener
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setEnableStatusListener",
-            args = {AudioEffect.OnEnableStatusChangeListener.class}
-        )
-    })
     public void test3_1EnableStatusListener() throws Exception {
         createListenerLooper(false, true, false);
         synchronized(mLock) {
@@ -540,13 +358,6 @@ public class EnvReverbTest extends AndroidTestCase {
     }
 
     //Test case 3.2: test parameter changed listener
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setParameterListener",
-            args = {EnvironmentalReverb.OnParameterChangeListener.class}
-        )
-    })
     public void test3_2ParameterChangedListener() throws Exception {
         createListenerLooper(false, false, true);
         synchronized(mLock) {

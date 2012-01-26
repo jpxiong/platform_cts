@@ -28,13 +28,7 @@ import android.widget.TextView;
 
 import com.android.cts.stub.R;
 
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
-import dalvik.annotation.ToBeFixed;
 
-@TestTargetClass(ArrayAdapter.class)
 public class ArrayAdapterTest extends AndroidTestCase {
 
     private static final int INVALD_ID = -1;
@@ -49,40 +43,6 @@ public class ArrayAdapterTest extends AndroidTestCase {
           mArrayAdapter = new ArrayAdapter<String>(mContext, R.layout.simple_dropdown_item_1line);
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "ArrayAdapter",
-            args = {android.content.Context.class, int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "ArrayAdapter",
-            args = {android.content.Context.class, int.class, int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "ArrayAdapter",
-            args = {android.content.Context.class, int.class, int.class, java.util.List.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "ArrayAdapter",
-            args = {android.content.Context.class, int.class, java.util.List.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "ArrayAdapter",
-            args = {android.content.Context.class, int.class, int.class, java.lang.Object[].class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "ArrayAdapter",
-            args = {android.content.Context.class, int.class, java.lang.Object[].class}
-        )
-    })
-    @ToBeFixed(bug = "1695243", explanation = "should add NullPointerException @throws"
-        + " clause into javadoc.")
     public void testConstructor() {
 
         new ArrayAdapter<String>(mContext, R.layout.simple_dropdown_item_1line);
@@ -114,29 +74,6 @@ public class ArrayAdapterTest extends AndroidTestCase {
         }
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setNotifyOnChange",
-            args = {boolean.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "notifyDataSetChanged",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "add",
-            args = {java.lang.Object.class}
-        ),
-        @TestTargetNew(
-                level = TestLevel.COMPLETE,
-                method = "clear",
-                args = {}
-        )
-
-    })
     public void testDataChangeEvent() {
         final MockDataSetObserver mockDataSetObserver = new MockDataSetObserver();
         mArrayAdapter.registerDataSetObserver(mockDataSetObserver);
@@ -180,30 +117,6 @@ public class ArrayAdapterTest extends AndroidTestCase {
         assertEquals(3, mockDataSetObserver.getCalledOnChangedCount());
     }
 
-    @TestTargets({
-        @TestTargetNew(
-                level = TestLevel.COMPLETE,
-                method = "getContext",
-                args = {}
-            ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getCount",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getView",
-            args = {int.class, android.view.View.class, android.view.ViewGroup.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getDropDownView",
-            args = {int.class, android.view.View.class, android.view.ViewGroup.class}
-        )
-    })
-    @ToBeFixed(bug = "1695243", explanation = "should add NullPointerException @throws"
-        + " clause into javadoc.")
     public void testAccessView() {
         final TextView textView = new TextView(mContext);
         textView.setText(STR3);
@@ -254,12 +167,6 @@ public class ArrayAdapterTest extends AndroidTestCase {
         }
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "getFilter",
-        args = {}
-    )
-    @ToBeFixed(bug = "", explanation = "Can not check the filter's filting result.")
     public void testGetFilter() {
         Filter filter = mArrayAdapter.getFilter();
 
@@ -272,11 +179,6 @@ public class ArrayAdapterTest extends AndroidTestCase {
      * we set a xml that not contain a textview, so exception should throw to lete us know
      * sucessfully change the dropdown xml, but should not affect the normal view by getview
      */
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "setDropDownViewResource",
-        args = {int.class}
-    )
     public void testSetDropDownViewResouce() {
         mArrayAdapter.add(STR1);
 
@@ -300,13 +202,6 @@ public class ArrayAdapterTest extends AndroidTestCase {
      * insert the item to the specific position, notify data changed
      * check -1, normal, > count
      */
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "insert",
-            args = {java.lang.Object.class, int.class}
-        )
-    })
     public void testInsert() {
         mArrayAdapter.setNotifyOnChange(true);
         final MockDataSetObserver mockDataSetObserver = new MockDataSetObserver();
@@ -347,11 +242,6 @@ public class ArrayAdapterTest extends AndroidTestCase {
      * return the given position obj
      * test range: -1, normal, > count
      */
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "getItem",
-        args = {int.class}
-    )
     public void testGetItem() {
         mArrayAdapter.add(STR1);
         mArrayAdapter.add(STR2);
@@ -380,11 +270,6 @@ public class ArrayAdapterTest extends AndroidTestCase {
     /**
      * just return the given position
      */
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "getItemId",
-        args = {int.class}
-    )
     public void testGetItemId() {
         mArrayAdapter.add(STR1);
         mArrayAdapter.add(STR2);
@@ -403,11 +288,6 @@ public class ArrayAdapterTest extends AndroidTestCase {
     /*
      * return the obj position that in the array, if there are same objs, return the first one
      */
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "getPosition",
-        args = {java.lang.Object.class}
-    )
     public void testGetPosition() {
         mArrayAdapter.add(STR1);
         mArrayAdapter.add(STR2);
@@ -428,11 +308,6 @@ public class ArrayAdapterTest extends AndroidTestCase {
      * Removes the specified object from the array. notify data changed
      * remove first one if duplicated string in the array
      */
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "remove",
-        args = {java.lang.Object.class}
-    )
     public void testRemove() {
         final MockDataSetObserver mockDataSetObserver = new MockDataSetObserver();
         mArrayAdapter.registerDataSetObserver(mockDataSetObserver);
@@ -476,13 +351,6 @@ public class ArrayAdapterTest extends AndroidTestCase {
      * Creates a new ArrayAdapter from external resources. The content of the array is
      * obtained through {@link android.content.res.Resources#getTextArray(int)}.
      */
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "createFromResource",
-        args = {android.content.Context.class, int.class, int.class}
-    )
-    @ToBeFixed(bug = "1695243", explanation = "should add NullPointerException @throws"
-        + " clause into javadoc.")
     public void testCreateFromResource() {
         ArrayAdapter.createFromResource(mContext, R.array.string, R.layout.simple_spinner_item);
 
@@ -504,11 +372,6 @@ public class ArrayAdapterTest extends AndroidTestCase {
        ArrayAdapter.createFromResource(mContext, R.array.string, INVALD_ID);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "createFromResource",
-        args = {android.content.Context.class, int.class, int.class}
-    )
     public void testSort() {
         final MockDataSetObserver mockDataSetObserver = new MockDataSetObserver();
         mArrayAdapter.registerDataSetObserver(mockDataSetObserver);
@@ -530,13 +393,6 @@ public class ArrayAdapterTest extends AndroidTestCase {
      * insert multiple items via add, notify data changed
      * check count and content
      */
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "add",
-            args = {Object.class}
-        )
-    })
     public void testAdd() {
         mArrayAdapter.setNotifyOnChange(true);
         final MockDataSetObserver mockDataSetObserver = new MockDataSetObserver();
@@ -556,13 +412,6 @@ public class ArrayAdapterTest extends AndroidTestCase {
      * insert multiple items via addAll, notify data changed
      * check count and content
      */
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "addAll",
-            args = {java.util.Collection.class}
-        )
-    })
     public void testAddAllCollection() {
         mArrayAdapter.setNotifyOnChange(true);
         final MockDataSetObserver mockDataSetObserver = new MockDataSetObserver();
@@ -590,13 +439,6 @@ public class ArrayAdapterTest extends AndroidTestCase {
      * insert multiple items via addAll, notify data changed
      * check count and content
      */
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "addAll",
-            args = {Object[].class}
-        )
-    })
     public void testAddAllParams() {
         mArrayAdapter.setNotifyOnChange(true);
         final MockDataSetObserver mockDataSetObserver = new MockDataSetObserver();

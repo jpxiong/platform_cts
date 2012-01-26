@@ -18,10 +18,6 @@ package android.widget.cts;
 
 import com.android.cts.stub.R;
 
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
 
 import org.xmlpull.v1.XmlPullParser;
 
@@ -31,7 +27,6 @@ import android.util.Xml;
 import android.widget.AbsListView;
 import android.widget.AbsListView.LayoutParams;
 
-@TestTargetClass(LayoutParams.class)
 public class AbsListView_LayoutParamsTest extends AndroidTestCase {
     private AttributeSet mAttributeSet;
 
@@ -44,28 +39,6 @@ public class AbsListView_LayoutParamsTest extends AndroidTestCase {
         mAttributeSet = Xml.asAttributeSet(parser);
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "AbsListView.LayoutParams",
-            args = {android.content.Context.class, android.util.AttributeSet.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "AbsListView.LayoutParams",
-            args = {int.class, int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "AbsListView.LayoutParams",
-            args = {int.class, int.class, int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "AbsListView.LayoutParams",
-            args = {android.view.ViewGroup.LayoutParams.class}
-        )
-    })
     public void testConstructors() {
         int TEST_WIDTH = 25;
         int TEST_HEIGHT = 25;

@@ -18,31 +18,15 @@ package android.net.cts;
 
 import android.net.LocalSocketAddress.Namespace;
 import android.test.AndroidTestCase;
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
 
-@TestTargetClass(Namespace.class)
 public class LocalSocketAddress_NamespaceTest extends AndroidTestCase {
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test valueOf(String name).",
-        method = "valueOf",
-        args = {java.lang.String.class}
-    )
     public void testValueOf() {
         assertEquals(Namespace.ABSTRACT, Namespace.valueOf("ABSTRACT"));
         assertEquals(Namespace.RESERVED, Namespace.valueOf("RESERVED"));
         assertEquals(Namespace.FILESYSTEM, Namespace.valueOf("FILESYSTEM"));
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test values().",
-        method = "values",
-        args = {}
-    )
     public void testValues() {
         Namespace[] expected = Namespace.values();
         assertEquals(Namespace.ABSTRACT, expected[0]);

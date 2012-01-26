@@ -18,27 +18,8 @@ package android.database.sqlite.cts;
 
 import android.database.sqlite.SQLiteAbortException;
 import android.test.AndroidTestCase;
-import dalvik.annotation.TestTargets;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
 
-@TestTargetClass(android.database.sqlite.SQLiteAbortException.class)
 public class SQLiteAbortExceptionTest extends AndroidTestCase {
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test constructors",
-            method = "SQLiteAbortException",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test constructors",
-            method = "SQLiteAbortException",
-            args = {java.lang.String.class}
-        )
-    })
     public void testConstructor() {
         new SQLiteAbortException();
 

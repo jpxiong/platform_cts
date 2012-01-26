@@ -18,19 +18,9 @@ package android.net.cts;
 
 import android.net.NetworkInfo.State;
 import android.test.AndroidTestCase;
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
 
-@TestTargetClass(State.class)
 public class NetworkInfo_StateTest extends AndroidTestCase {
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test valueOf(String name).",
-        method = "valueOf",
-        args = {java.lang.String.class}
-    )
     public void testValueOf() {
         assertEquals(State.CONNECTED, State.valueOf("CONNECTED"));
         assertEquals(State.CONNECTING, State.valueOf("CONNECTING"));
@@ -40,12 +30,6 @@ public class NetworkInfo_StateTest extends AndroidTestCase {
         assertEquals(State.UNKNOWN, State.valueOf("UNKNOWN"));
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test values().",
-        method = "values",
-        args = {}
-    )
     public void testValues() {
         State[] expected = State.values();
         assertEquals(6, expected.length);

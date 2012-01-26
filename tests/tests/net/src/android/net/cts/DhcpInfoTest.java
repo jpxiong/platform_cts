@@ -18,29 +18,13 @@ package android.net.cts;
 
 import android.net.DhcpInfo;
 import android.test.AndroidTestCase;
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
 
-@TestTargetClass(DhcpInfo.class)
 public class DhcpInfoTest extends AndroidTestCase {
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test DhcpInfo's constructor.",
-        method = "DhcpInfo",
-        args = {}
-    )
     public void testConstructor() {
         new DhcpInfo();
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test toString function.",
-        method = "toString",
-        args = {}
-    )
     public void testToString() {
         String expectedDefault = "ipaddr 0.0.0.0 gateway 0.0.0.0 netmask 0.0.0.0 dns1 0.0.0.0 "
                 + "dns2 0.0.0.0 DHCP server 0.0.0.0 lease 0 seconds";

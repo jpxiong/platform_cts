@@ -18,19 +18,10 @@ package android.graphics.cts;
 
 import android.graphics.Matrix.ScaleToFit;
 import android.test.AndroidTestCase;
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
 
-@TestTargetClass(ScaleToFit.class)
 public class Matrix_ScaleToFitTest extends AndroidTestCase {
 
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "values",
-        args = {}
-    )
     public void testValues() {
         ScaleToFit[] scaleToFits = ScaleToFit.values();
         assertEquals(ScaleToFit.FILL,scaleToFits[0]);
@@ -39,11 +30,6 @@ public class Matrix_ScaleToFitTest extends AndroidTestCase {
         assertEquals( ScaleToFit.END,scaleToFits[3]);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "valueOf",
-        args = {java.lang.String.class}
-    )
     public void testValueOf() {
         assertEquals(ScaleToFit.FILL,ScaleToFit.valueOf("FILL"));
         assertEquals( ScaleToFit.START,ScaleToFit.valueOf("START"));
@@ -51,11 +37,6 @@ public class Matrix_ScaleToFitTest extends AndroidTestCase {
         assertEquals(ScaleToFit.END,ScaleToFit.valueOf("END") );
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "valueOf",
-        args = {android.graphics.Matrix.ScaleToFit.class, java.lang.String.class}
-    )
     public void testValueOf2() {
         assertEquals(ScaleToFit.FILL, ScaleToFit.valueOf(ScaleToFit.class,
                 "FILL"));

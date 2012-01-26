@@ -29,16 +29,11 @@ import org.xml.sax.ContentHandler;
 import org.xml.sax.Locator;
 import org.xml.sax.SAXException;
 
-import dalvik.annotation.TestTargets;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
 
 /**
  * TestCases for android.util.Xml.Encoding.
  */
 //FIXME: This is a duplicated testcase. Need to improve the coverage tool in future.
-@TestTargetClass(Xml.Encoding.class)
 public class XmlEncodingTest extends TestCase {
 
     private static final String STR_ISO_8859_1 = "ISO-8859-1";
@@ -73,20 +68,6 @@ public class XmlEncodingTest extends TestCase {
     private static final String STR_START_TAG = "start:";
     private static final String STR_CHARACTERS_TAG = "characters:";
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test valueOf(String name).",
-            method = "valueOf",
-            args = {java.lang.String.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test valueOf(String name).",
-            method = "values",
-            args = {}
-        )
-    })
     public void testValueOf() {
 
         // test US-ASCII

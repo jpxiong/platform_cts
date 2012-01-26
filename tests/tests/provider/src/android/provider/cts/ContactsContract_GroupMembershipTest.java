@@ -16,10 +16,6 @@
 
 package android.provider.cts;
 
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
 
 import android.content.ContentResolver;
 import android.content.IContentProvider;
@@ -32,7 +28,6 @@ import android.provider.cts.ContactsContract_TestDataBuilder.TestGroup;
 import android.provider.cts.ContactsContract_TestDataBuilder.TestRawContact;
 import android.test.InstrumentationTestCase;
 
-@TestTargetClass(GroupMembership.class)
 public class ContactsContract_GroupMembershipTest extends InstrumentationTestCase {
     private ContactsContract_TestDataBuilder mBuilder;
 
@@ -51,12 +46,6 @@ public class ContactsContract_GroupMembershipTest extends InstrumentationTestCas
         mBuilder.cleanup();
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.PARTIAL_COMPLETE,
-            notes = "Tests INSERT operation for group membership using group row ID"
-        )
-    })
     public void testAddGroupMembershipWithGroupRowId() throws Exception {
         TestRawContact rawContact = mBuilder.newRawContact().insert();
         TestGroup group = mBuilder.newGroup().insert();
@@ -69,12 +58,6 @@ public class ContactsContract_GroupMembershipTest extends InstrumentationTestCas
         groupMembership.assertColumn(GroupMembership.GROUP_ROW_ID, group.getId());
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.PARTIAL_COMPLETE,
-            notes = "Tests INSERT operation for group membership using group source ID"
-        )
-    })
     public void testAddGroupMembershipWithGroupSourceId() throws Exception {
         TestRawContact rawContact = mBuilder.newRawContact()
                 .with(RawContacts.ACCOUNT_TYPE, "test_type")
@@ -95,12 +78,6 @@ public class ContactsContract_GroupMembershipTest extends InstrumentationTestCas
         groupMembership.assertColumn(GroupMembership.GROUP_ROW_ID, group.getId());
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.PARTIAL_COMPLETE,
-            notes = "Tests INSERT operation for group membership using an unknown group source ID"
-        )
-    })
     public void testAddGroupMembershipWithUnknownGroupSourceId() throws Exception {
         TestRawContact rawContact = mBuilder.newRawContact()
                 .with(RawContacts.ACCOUNT_TYPE, "test_type")

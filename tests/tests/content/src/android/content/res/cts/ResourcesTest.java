@@ -19,11 +19,6 @@ package android.content.res.cts;
 import com.android.cts.stub.R;
 import com.android.internal.util.XmlUtils;
 
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
-import dalvik.annotation.ToBeFixed;
 
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
@@ -50,7 +45,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Locale;
 
-@TestTargetClass(Resources.class)
 public class ResourcesTest extends AndroidTestCase {
     private static final String CONFIG_VARYING = "configVarying";
     private static final String SIMPLE = "simple";
@@ -67,28 +61,6 @@ public class ResourcesTest extends AndroidTestCase {
         mResources = getContext().getResources();
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "Resources",
-            args = {AssetManager.class, DisplayMetrics.class, Configuration.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "startPreloading",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "finishPreloading",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "flushLayoutCache",
-            args = {}
-        )
-    })
     public void testResources() {
         final AssetManager am = new AssetManager();
         final Configuration cfg = new Configuration();
@@ -101,11 +73,6 @@ public class ResourcesTest extends AndroidTestCase {
         assertEquals(Configuration.KEYBOARDHIDDEN_YES, c.keyboard);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "getString",
-        args = {int.class, java.lang.Object[].class}
-    )
     public void testGetString() {
         try {
             mResources.getString(-1, "%s");
@@ -118,18 +85,6 @@ public class ResourcesTest extends AndroidTestCase {
         assertEquals("Go", strGo);
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "obtainAttributes",
-            args = {AttributeSet.class, int[].class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getXml",
-            args = {int.class}
-        )
-    })
     public void testObtainAttributes() throws XmlPullParserException, IOException {
         final XmlPullParser parser = mResources.getXml(R.xml.test_color);
         XmlUtils.beginDocument(parser, "resources");
@@ -143,11 +98,6 @@ public class ResourcesTest extends AndroidTestCase {
         testTypedArray.recycle();
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "obtainTypedArray",
-        args = {int.class}
-    )
     public void testObtainTypedArray() {
         try {
             mResources.obtainTypedArray(-1);
@@ -206,12 +156,6 @@ public class ResourcesTest extends AndroidTestCase {
                 expectedValue, actual);
     }
 
-    @TestTargetNew(
-        level = TestLevel.PARTIAL,
-        method = "getMovie",
-        args = {int.class}
-    )
-    @ToBeFixed(bug = "1790416", explanation = "Movie object is null in Resources#getMovie(id)")
     public void testGetMovie() {
         try {
             mResources.getMovie(-1);
@@ -221,11 +165,6 @@ public class ResourcesTest extends AndroidTestCase {
         }
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "getDimension",
-        args = {int.class}
-    )
     public void testGetDimension() {
         try {
             mResources.getDimension(-1);
@@ -239,11 +178,6 @@ public class ResourcesTest extends AndroidTestCase {
         assertEquals(48.0f, dim);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "getDimensionPixelOffset",
-        args = {int.class}
-    )
     public void testGetDimensionPixelOffset() {
         try {
             mResources.getDimensionPixelOffset(-1);
@@ -257,11 +191,6 @@ public class ResourcesTest extends AndroidTestCase {
         assertEquals(48, dim);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "getColorStateList",
-        args = {int.class}
-    )
     public void testGetColorStateList() {
         try {
             mResources.getColorStateList(-1);
@@ -276,11 +205,6 @@ public class ResourcesTest extends AndroidTestCase {
         assertEquals(mResources.getColor(R.color.testcolor1), focusColor);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "getColor",
-        args = {int.class}
-    )
     public void testGetColor() {
         try {
             mResources.getColor(-1);
@@ -293,18 +217,6 @@ public class ResourcesTest extends AndroidTestCase {
         assertEquals(0xff00ff00, color);
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "updateConfiguration",
-            args = {Configuration.class, DisplayMetrics.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getConfiguration",
-            args = {}
-        )
-    })
     public void testUpdateConfiguration() {
         final Configuration cfg = mResources.getConfiguration();
         assertTrue(cfg.fontScale != 5);
@@ -315,11 +227,6 @@ public class ResourcesTest extends AndroidTestCase {
         assertEquals(5.0f, cfgNew.fontScale, 0.001f);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "getDimensionPixelSize",
-        args = {int.class}
-    )
     public void testGetDimensionPixelSize() {
         try {
             mResources.getDimensionPixelSize(-1);
@@ -333,11 +240,6 @@ public class ResourcesTest extends AndroidTestCase {
         assertEquals(48, size);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "getDrawable",
-        args = {int.class}
-    )
     public void testGetDrawable() {
         try {
             mResources.getDrawable(-1);
@@ -355,11 +257,6 @@ public class ResourcesTest extends AndroidTestCase {
         assertEquals(142 * targetDensity / defaultDensity, draw.getIntrinsicHeight(), 1);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "getAnimation",
-        args = {int.class}
-    )
     public void testGetAnimation() throws Exception {
         try {
             mResources.getAnimation(-1);
@@ -377,11 +274,6 @@ public class ResourcesTest extends AndroidTestCase {
         assertEquals("@17432582", ani.getAttributeValue(0));
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "getQuantityString",
-        args = {int.class, int.class, Object[].class}
-    )
     public void testGetQuantityString1() {
         try {
             mResources.getQuantityString(-1, 1, "");
@@ -394,11 +286,6 @@ public class ResourcesTest extends AndroidTestCase {
         assertEquals("A dog", strGo);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "getQuantityString",
-        args = {int.class, int.class}
-    )
     public void testGetQuantityString2() {
         try {
             mResources.getQuantityString(-1, 1);
@@ -411,11 +298,6 @@ public class ResourcesTest extends AndroidTestCase {
         assertEquals("A dog", strGo);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "getInteger",
-        args = {int.class}
-    )
     public void testGetInteger() {
         try {
             mResources.getInteger(-1);
@@ -428,11 +310,6 @@ public class ResourcesTest extends AndroidTestCase {
         assertEquals(10, i);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "getValue",
-        args = {String.class, TypedValue.class, boolean.class}
-    )
     public void testGetValue() {
         final TypedValue tv = new TypedValue();
 
@@ -448,31 +325,16 @@ public class ResourcesTest extends AndroidTestCase {
         assertEquals("res/raw/text.txt", tv.coerceToString());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "getAssets",
-        args = {}
-    )
     public void testGetAssets() {
         final AssetManager aM = mResources.getAssets();
         assertNotNull(aM);
         assertTrue(aM.isUpToDate());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "getSystem",
-        args = {}
-    )
     public void testGetSystem() {
         assertNotNull(Resources.getSystem());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "getLayout",
-        args = {int.class}
-    )
     public void testGetLayout() throws Exception {
         try {
             mResources.getLayout(-1);
@@ -489,11 +351,6 @@ public class ResourcesTest extends AndroidTestCase {
         assertEquals("@" + R.id.abslistview_root, layout.getAttributeValue(0));
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "getBoolean",
-        args = {int.class}
-    )
     public void testGetBoolean() {
         try {
             mResources.getBoolean(-1);
@@ -506,28 +363,11 @@ public class ResourcesTest extends AndroidTestCase {
         assertTrue(b);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "getFraction",
-        args = {int.class, int.class, int.class}
-    )
     public void testgetFraction() {
         assertEquals(1, (int)mResources.getFraction(R.dimen.frac100perc, 1, 1));
         assertEquals(100, (int)mResources.getFraction(R.dimen.frac100perc, 100, 1));
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "parseBundleExtras",
-            args = {XmlResourceParser.class, Bundle.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getXml",
-            args = {int.class}
-        )
-    })
     public void testParseBundleExtras() throws XmlPullParserException, IOException {
         final Bundle b = new Bundle();
         XmlResourceParser parser = mResources.getXml(R.xml.extra);
@@ -539,18 +379,6 @@ public class ResourcesTest extends AndroidTestCase {
         assertEquals("android", b.getString("google"));
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "parseBundleExtra",
-            args = {String.class, AttributeSet.class,Bundle.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getXml",
-            args = {int.class}
-        )
-    })
     public void testParseBundleExtra() throws XmlPullParserException, IOException {
         final Bundle b = new Bundle();
         XmlResourceParser parser = mResources.getXml(R.xml.extra);
@@ -562,11 +390,6 @@ public class ResourcesTest extends AndroidTestCase {
         assertEquals("Lee", b.getString("Bruce"));
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "getIdentifier",
-        args = {String.class, String.class, String.class}
-    )
     public void testGetIdentifier() {
 
         int resid = mResources.getIdentifier(COM_ANDROID_CTS_STUB_IDENTIFIER, null, null);
@@ -579,11 +402,6 @@ public class ResourcesTest extends AndroidTestCase {
         assertEquals(R.configVarying.simple, resid);
     }
 
-    @TestTargetNew(
-        level = TestLevel.PARTIAL,
-        method = "getIntArray",
-        args = {int.class}
-    )
     public void testGetIntArray() {
         final int NO_EXIST_ID = -1;
         try {
@@ -615,11 +433,6 @@ public class ResourcesTest extends AndroidTestCase {
         }
     }
 
-    @TestTargetNew(
-        level = TestLevel.PARTIAL,
-        method = "getQuantityText",
-        args = {int.class, int.class}
-    )
     public void testGetQuantityText() {
         CharSequence cs;
         final Resources res = resourcesForLanguage("cs");
@@ -648,32 +461,10 @@ public class ResourcesTest extends AndroidTestCase {
         return new Resources(mResources.getAssets(), mResources.getDisplayMetrics(), config);
     }
 
-    @TestTargetNew(
-        level = TestLevel.PARTIAL,
-        method = "getResourceEntryName",
-        args = {int.class}
-    )
     public void testGetResourceEntryName() {
         assertEquals(SIMPLE, mResources.getResourceEntryName(R.configVarying.simple));
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.PARTIAL,
-            method = "getResourceName",
-            args = {int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getResourcePackageName",
-            args = {int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getResourceTypeName",
-            args = {int.class}
-        )
-    })
     public void testGetResourceName() {
         final String fullName = mResources.getResourceName(R.configVarying.simple);
         assertEquals(COM_ANDROID_CTS_STUB_IDENTIFIER, fullName);
@@ -685,11 +476,6 @@ public class ResourcesTest extends AndroidTestCase {
         assertEquals(CONFIG_VARYING, typeName);
     }
 
-    @TestTargetNew(
-        level = TestLevel.PARTIAL,
-        method = "getString",
-        args = {int.class}
-    )
     public void testGetStringWithIntParam() {
         checkString(R.string.formattedStringNone,
                 mResources.getString(R.string.formattedStringNone),
@@ -717,18 +503,6 @@ public class ResourcesTest extends AndroidTestCase {
                 expected, actual);
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.PARTIAL,
-            method = "getStringArray",
-            args = {int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getTextArray",
-            args = {int.class}
-        )
-    })
     public void testGetStringArray() {
         checkStringArray(R.array.strings, new String[] {
                 "zero", "1", "here"
@@ -766,11 +540,6 @@ public class ResourcesTest extends AndroidTestCase {
         }
     }
 
-    @TestTargetNew(
-        level = TestLevel.PARTIAL,
-        method = "getValue",
-        args = {int.class, TypedValue.class, boolean.class}
-    )
     public void testGetValueWithID() {
         tryBoolean(R.bool.trueRes, true);
         tryBoolean(R.bool.falseRes, false);
@@ -804,28 +573,6 @@ public class ResourcesTest extends AndroidTestCase {
                 expected, v.string);
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "newTheme",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "openRawResource",
-            args = {int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "openRawResource",
-            args = {int.class, TypedValue.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "openRawResourceFd",
-            args = {int.class}
-        )
-    })
     public void testRawResource() throws Exception {
         assertNotNull(mResources.newTheme());
 

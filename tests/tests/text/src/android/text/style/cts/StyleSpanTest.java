@@ -16,11 +16,6 @@
 
 package android.text.style.cts;
 
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
-import dalvik.annotation.ToBeFixed;
 
 import android.graphics.Typeface;
 import android.os.Parcel;
@@ -29,20 +24,7 @@ import android.text.style.StyleSpan;
 
 import junit.framework.TestCase;
 
-@TestTargetClass(StyleSpan.class)
 public class StyleSpanTest extends TestCase {
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "StyleSpan",
-            args = {int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "StyleSpan",
-            args = {android.os.Parcel.class}
-        )
-    })
     public void testConstructor() {
         StyleSpan styleSpan = new StyleSpan(2);
 
@@ -58,11 +40,6 @@ public class StyleSpanTest extends TestCase {
         }
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "getStyle",
-        args = {}
-    )
     public void testGetStyle() {
         StyleSpan styleSpan = new StyleSpan(2);
         assertEquals(2, styleSpan.getStyle());
@@ -71,12 +48,6 @@ public class StyleSpanTest extends TestCase {
         assertEquals(-2, styleSpan.getStyle());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "updateMeasureState",
-        args = {android.text.TextPaint.class}
-    )
-    @ToBeFixed(bug="1695243", explanation="miss javadoc")
     public void testUpdateMeasureState() {
         StyleSpan styleSpan = new StyleSpan(Typeface.BOLD);
 
@@ -100,12 +71,6 @@ public class StyleSpanTest extends TestCase {
         }
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "updateDrawState",
-        args = {android.text.TextPaint.class}
-    )
-    @ToBeFixed(bug="1695243", explanation="miss javadoc")
     public void testUpdateDrawState() {
         StyleSpan styleSpan = new StyleSpan(Typeface.BOLD);
 
@@ -128,31 +93,16 @@ public class StyleSpanTest extends TestCase {
             // expected, test success.
         }
     }
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "describeContents",
-        args = {}
-    )
     public void testDescribeContents() {
         StyleSpan styleSpan = new StyleSpan(Typeface.BOLD);
         styleSpan.describeContents();
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "getSpanTypeId",
-        args = {}
-    )
     public void testGetSpanTypeId() {
         StyleSpan styleSpan = new StyleSpan(Typeface.BOLD);
         styleSpan.getSpanTypeId();
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "writeToParcel",
-        args = {Parcel.class, int.class}
-    )
     public void testWriteToParcel() {
         Parcel p = Parcel.obtain();
         try {

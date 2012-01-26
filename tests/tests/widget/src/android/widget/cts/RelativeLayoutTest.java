@@ -19,11 +19,6 @@ package android.widget.cts;
 import com.android.cts.stub.R;
 import com.android.internal.util.XmlUtils;
 
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
-import dalvik.annotation.ToBeFixed;
 
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
@@ -47,7 +42,6 @@ import java.io.IOException;
 /**
  * Test {@link RelativeLayout}.
  */
-@TestTargetClass(RelativeLayout.class)
 public class RelativeLayoutTest extends
         ActivityInstrumentationTestCase2<RelativeLayoutStubActivity> {
     private Activity mActivity;
@@ -62,24 +56,6 @@ public class RelativeLayoutTest extends
         mActivity = getActivity();
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "RelativeLayout",
-            args = {android.content.Context.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "RelativeLayout",
-            args = {android.content.Context.class, android.util.AttributeSet.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "RelativeLayout",
-            args = {android.content.Context.class, android.util.AttributeSet.class, int.class}
-        )
-    })
-    @ToBeFixed(bug = "1695243", explanation = "the javadoc for constructors does not exist.")
     public void testConstructor() {
         new RelativeLayout(mActivity);
 
@@ -98,11 +74,6 @@ public class RelativeLayoutTest extends
         }
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "setIgnoreGravity",
-        args = {int.class}
-    )
     public void testSetIgnoreGravity() {
         // Initial gravity for this RelativeLayout is Gravity.Right.
         final RelativeLayout relativeLayout = (RelativeLayout) mActivity.findViewById(
@@ -136,11 +107,6 @@ public class RelativeLayoutTest extends
         ViewAsserts.assertRightAligned(relativeLayout, view13);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "setGravity",
-        args = {int.class}
-    )
     public void testSetGravity() {
         final RelativeLayout relativeLayout = (RelativeLayout) mActivity.findViewById(
                 R.id.relative_sublayout_gravity);
@@ -205,13 +171,6 @@ public class RelativeLayoutTest extends
         assertEquals(view11.getTop(), view10.getBottom());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "setHorizontalGravity",
-        args = {int.class}
-    )
-    @ToBeFixed(bug = "1695243", explanation = "the javadoc for setHorizontalGravity()" +
-            " does not exist.")
     public void testSetHorizontalGravity() {
         final RelativeLayout relativeLayout = (RelativeLayout) mActivity.findViewById(
                 R.id.relative_sublayout_gravity);
@@ -250,13 +209,6 @@ public class RelativeLayoutTest extends
         assertEquals(view11.getTop(), view10.getBottom());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "setVerticalGravity",
-        args = {int.class}
-    )
-    @ToBeFixed(bug = "1695243", explanation = "the javadoc for setVerticalGravity()" +
-            " does not exist.")
     public void testSetVerticalGravity() {
         final RelativeLayout relativeLayout = (RelativeLayout) mActivity.findViewById(
                 R.id.relative_sublayout_gravity);
@@ -297,11 +249,6 @@ public class RelativeLayoutTest extends
         assertEquals(view11.getTop(), view10.getBottom());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "getBaseline",
-        args = {}
-    )
     public void testGetBaseline() {
         RelativeLayout relativeLayout = new RelativeLayout(mActivity);
         assertEquals(-1, relativeLayout.getBaseline());
@@ -311,13 +258,6 @@ public class RelativeLayoutTest extends
         assertEquals(view.getBaseline(), relativeLayout.getBaseline());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "generateLayoutParams",
-        args = {android.util.AttributeSet.class}
-    )
-    @ToBeFixed(bug = "1695243", explanation = "the javadoc for generateLayoutParams() is" +
-            " incomplete, not clear what is supposed to happen when attrs is null.")
     public void testGenerateLayoutParams1() throws XmlPullParserException, IOException {
         RelativeLayout relativeLayout = new RelativeLayout(mActivity);
 
@@ -336,13 +276,6 @@ public class RelativeLayoutTest extends
         }
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "generateLayoutParams",
-        args = {android.view.ViewGroup.LayoutParams.class}
-    )
-    @ToBeFixed(bug = "1695243", explanation = "the javadoc for generateLayoutParams() is" +
-            " incomplete, not clear what is supposed to happen when the LayoutParam is null.")
     public void testGenerateLayoutParams2() {
         RelativeLayout.LayoutParams p = new RelativeLayout.LayoutParams(200, 300);
 
@@ -362,11 +295,6 @@ public class RelativeLayoutTest extends
          }
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "generateDefaultLayoutParams",
-        args = {}
-    )
     public void testGenerateDefaultLayoutParams() {
         MyRelativeLayout myRelativeLayout = new MyRelativeLayout(mActivity);
 
@@ -376,30 +304,14 @@ public class RelativeLayoutTest extends
         assertEquals(ViewGroup.LayoutParams.WRAP_CONTENT, layoutParams.height);
     }
 
-    @TestTargetNew(
-        level = TestLevel.NOT_NECESSARY,
-        method = "onMeasure",
-        args = {int.class, int.class}
-    )
     public void testOnMeasure() {
         // onMeasure() is implementation details, do NOT test
     }
 
-    @TestTargetNew(
-        level = TestLevel.NOT_NECESSARY,
-        method = "onLayout",
-        args = {boolean.class, int.class, int.class, int.class, int.class}
-    )
     public void testOnLayout() {
         // onLayout() is implementation details, do NOT test
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "checkLayoutParams",
-        args = {android.view.ViewGroup.LayoutParams.class}
-    )
-    @ToBeFixed(bug = "1695243", explanation = "the javadoc for checkLayoutParams() does not exist.")
     public void testCheckLayoutParams() {
         MyRelativeLayout myRelativeLayout = new MyRelativeLayout(mActivity);
 

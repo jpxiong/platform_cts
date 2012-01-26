@@ -16,9 +16,6 @@
 
 package android.provider.cts;
 
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
 
 import android.content.ContentResolver;
 import android.content.IContentProvider;
@@ -32,7 +29,6 @@ import android.provider.cts.ContactsContract_TestDataBuilder.TestData;
 import android.provider.cts.ContactsContract_TestDataBuilder.TestRawContact;
 import android.test.InstrumentationTestCase;
 
-@TestTargetClass(ContactsContract.Data.class)
 public class ContactsContract_DataTest extends InstrumentationTestCase {
     private ContentResolver mResolver;
     private ContactsContract_TestDataBuilder mBuilder;
@@ -51,13 +47,6 @@ public class ContactsContract_DataTest extends InstrumentationTestCase {
         mBuilder.cleanup();
     }
 
-    @TestTargetNew(
-            level = TestLevel.PARTIAL_COMPLETE,
-            notes = "Test Data#getContactLookupUri(ContentResolver resolver, Uri dataUri) " +
-                    "using source id",
-            method = "Data#getContactLookupUri",
-            args = {android.content.ContentResolver.class, Uri.class}
-    )
     public void testGetLookupUriBySourceId() throws Exception {
         TestRawContact rawContact = mBuilder.newRawContact()
                 .with(RawContacts.ACCOUNT_TYPE, "test_type")
@@ -79,13 +68,6 @@ public class ContactsContract_DataTest extends InstrumentationTestCase {
                 lookupContact.getId(), data.load().getRawContact().load().getContactId());
     }
 
-    @TestTargetNew(
-            level = TestLevel.PARTIAL_COMPLETE,
-            notes = "Test Data#getContactLookupUri(ContentResolver resolver, Uri dataUri) " +
-                    "using display name",
-            method = "Data#getContactLookupUri",
-            args = {android.content.ContentResolver.class, Uri.class}
-    )
     public void testGetLookupUriByDisplayName() throws Exception {
         TestRawContact rawContact = mBuilder.newRawContact()
                 .with(RawContacts.ACCOUNT_TYPE, "test_type")

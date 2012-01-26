@@ -18,11 +18,6 @@ package android.media.cts;
 
 import com.android.cts.stub.R;
 
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
-import dalvik.annotation.ToBeFixed;
 
 import android.content.ComponentName;
 import android.content.Context;
@@ -37,7 +32,6 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 
-@TestTargetClass(MediaScannerConnection.class)
 public class MediaScannerConnectionTest extends AndroidTestCase {
 
     private static final String MEDIA_TYPE = "audio/mpeg";
@@ -88,44 +82,6 @@ public class MediaScannerConnectionTest extends AndroidTestCase {
         }
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "MediaScannerConnection",
-            args = {Context.class, MediaScannerConnectionClient.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "connect",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "disconnect",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "isConnected",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "onServiceConnected",
-            args = {ComponentName.class, IBinder.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.NOT_FEASIBLE,
-            method = "onServiceDisconnected",
-            args = {ComponentName.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "scanFile",
-            args = {String.class, String.class}
-        )
-    })
-    @ToBeFixed(bug = "1567087", explanation = "onServiceDisconnected is not called")
     public void testMediaScannerConnection() throws InterruptedException {
         mMediaScannerConnectionClient = new MockMediaScannerConnectionClient();
         mMediaScannerConnection = new MockMediaScannerConnection(getContext(),

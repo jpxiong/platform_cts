@@ -19,18 +19,8 @@ package android.net.cts;
 import android.net.UrlQuerySanitizer;
 import android.net.UrlQuerySanitizer.ParameterValuePair;
 import android.test.AndroidTestCase;
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
 
-@TestTargetClass(UrlQuerySanitizer.ParameterValuePair.class)
 public class UrlQuerySanitizer_ParameterValuePairTest extends AndroidTestCase {
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test constructor(s) of {@link ParameterValuePair}",
-        method = "ParameterValuePair",
-        args = {String.class, String.class}
-    )
     public void testConstructor() {
         final String parameter = "name";
         final String vaule = "Joe_user";

@@ -20,11 +20,7 @@ import android.content.ComponentName;
 import android.content.Intent;
 import android.os.Parcel;
 import android.test.AndroidTestCase;
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
 
-@TestTargetClass(ActivityManager.RecentTaskInfo.class)
 public class ActivityManagerRecentTaskInfoTest extends AndroidTestCase {
     protected ActivityManager.RecentTaskInfo mRecentTaskInfo;
 
@@ -34,30 +30,14 @@ public class ActivityManagerRecentTaskInfoTest extends AndroidTestCase {
         mRecentTaskInfo = new ActivityManager.RecentTaskInfo();
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test constructor",
-        method = "ActivityManager.RecentTaskInfo",
-        args = {}
-    )
     public void testConstructor() {
         new ActivityManager.RecentTaskInfo();
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "describeContents",
-        args = {}
-    )
     public void testDescribeContents() {
         assertEquals(0, mRecentTaskInfo.describeContents());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "writeToParcel",
-        args = {android.os.Parcel.class, int.class}
-    )
     public void testWriteToParcel() throws Exception {
         int id = 1;
         Intent baseIntent = null;
@@ -92,11 +72,6 @@ public class ActivityManagerRecentTaskInfoTest extends AndroidTestCase {
         assertEquals(origActivity, values.origActivity);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "readFromParcel",
-        args = {android.os.Parcel.class}
-    )
     public void testReadFromParcel() throws Exception {
         int id = 1;
         Intent baseIntent = null;

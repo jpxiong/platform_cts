@@ -15,9 +15,6 @@
  */
 package android.graphics.cts;
 
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
 
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
@@ -31,7 +28,6 @@ import android.graphics.Bitmap.Config;
 
 import junit.framework.TestCase;
 
-@TestTargetClass(ComposePathEffect.class)
 public class ComposePathEffectTest extends TestCase {
     private static final int BITMAP_WIDTH = 110;
     private static final int BITMAP_HEIGHT = 20;
@@ -39,11 +35,6 @@ public class ComposePathEffectTest extends TestCase {
     private static final int END_X = BITMAP_WIDTH - 10;
     private static final int CENTER = BITMAP_HEIGHT / 2;
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "ComposePathEffect",
-        args = {PathEffect.class, PathEffect.class}
-    )
     public void testComposePathEffect() {
         Path path = new Path();
         path.moveTo(START_X, CENTER);

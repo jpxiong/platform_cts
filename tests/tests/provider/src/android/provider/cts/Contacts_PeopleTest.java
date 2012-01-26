@@ -16,10 +16,6 @@
 
 package android.provider.cts;
 
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
 
 import android.content.ContentResolver;
 import android.content.ContentUris;
@@ -41,7 +37,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 
-@TestTargetClass(android.provider.Contacts.People.class)
 public class Contacts_PeopleTest extends InstrumentationTestCase {
     private ContentResolver mContentResolver;
     private IContentProvider mProvider;
@@ -114,38 +109,6 @@ public class Contacts_PeopleTest extends InstrumentationTestCase {
         super.tearDown();
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test methods which add person to a group",
-            method = "addToMyContactsGroup",
-            args = {android.content.ContentResolver.class, long.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test methods which add person to a group",
-            method = "addToGroup",
-            args = {android.content.ContentResolver.class, long.class, long.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test methods which add person to a group",
-            method = "addToGroup",
-            args = {android.content.ContentResolver.class, long.class, java.lang.String.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test methods which add person to a group",
-            method = "queryGroups",
-            args = {android.content.ContentResolver.class, long.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test methods which add person to a group",
-            method = "createPersonInMyContactsGroup",
-            args = {android.content.ContentResolver.class, android.content.ContentValues.class}
-        )
-    })
     public void testAddToGroup() {
         Cursor cursor;
         try {
@@ -237,12 +200,6 @@ public class Contacts_PeopleTest extends InstrumentationTestCase {
         }
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test markAsContacted(ContentResolver resolver, long personId)",
-        method = "markAsContacted",
-        args = {android.content.ContentResolver.class, long.class}
-    )
     public void testMarkAsContacted() {
         Cursor cursor;
         try {
@@ -273,27 +230,6 @@ public class Contacts_PeopleTest extends InstrumentationTestCase {
         }
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test methods access the photo data of person",
-            method = "setPhotoData",
-            args = {android.content.ContentResolver.class, android.net.Uri.class, byte[].class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test methods access the photo data of person",
-            method = "loadContactPhoto",
-            args = {android.content.Context.class, android.net.Uri.class, int.class,
-                    android.graphics.BitmapFactory.Options.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test methods access the photo data of person",
-            method = "openContactPhotoInputStream",
-            args = {android.content.ContentResolver.class, android.net.Uri.class}
-        )
-    })
     public void testAccessPhotoData() {
         Context context = getInstrumentation().getTargetContext();
         try {

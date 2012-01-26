@@ -21,14 +21,10 @@ import android.content.Intent;
 import android.content.Intent.ShortcutIconResource;
 import android.os.Parcel;
 import android.test.AndroidTestCase;
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
 
 /**
  * Test {@link ShortcutIconResource}.
  */
-@TestTargetClass(ShortcutIconResource.class)
 public class Intent_ShortcutIconResourceTest extends AndroidTestCase {
 
     ShortcutIconResource mShortcutIconResource;
@@ -42,11 +38,6 @@ public class Intent_ShortcutIconResourceTest extends AndroidTestCase {
         mContext = getContext();
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "toString",
-        args = {}
-    )
     public void testToString() {
         String resourceName = mContext.getResources().getResourceName(
                 resourceId);
@@ -56,11 +47,6 @@ public class Intent_ShortcutIconResourceTest extends AndroidTestCase {
         assertNotNull(mShortcutIconResource.toString());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "fromContext",
-        args = {android.content.Context.class, int.class}
-    )
     public void testFromContext() {
 
         String resourceName = mContext.getResources().getResourceName(
@@ -74,11 +60,6 @@ public class Intent_ShortcutIconResourceTest extends AndroidTestCase {
                 mShortcutIconResource.packageName);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "writeToParcel",
-        args = {android.os.Parcel.class, int.class}
-    )
     public void testWriteToParcel() {
 
         mShortcutIconResource = ShortcutIconResource.fromContext(mContext,
@@ -93,11 +74,6 @@ public class Intent_ShortcutIconResourceTest extends AndroidTestCase {
         assertEquals(mShortcutIconResource.resourceName, target.resourceName);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "describeContents",
-        args = {}
-    )
     public void testDescribeContents() {
         int expected = 0;
         mShortcutIconResource = new Intent.ShortcutIconResource();

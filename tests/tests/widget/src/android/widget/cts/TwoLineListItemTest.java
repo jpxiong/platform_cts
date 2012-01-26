@@ -18,11 +18,6 @@ package android.widget.cts;
 
 import com.android.cts.stub.R;
 
-import dalvik.annotation.TestTargets;
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.ToBeFixed;
 
 import android.app.Activity;
 import android.content.Context;
@@ -36,7 +31,6 @@ import android.widget.RelativeLayout.LayoutParams;
 /**
  * Test {@link TwoLineListItem}.
  */
-@TestTargetClass(TwoLineListItem.class)
 public class TwoLineListItemTest extends
         ActivityInstrumentationTestCase<TwoLineListItemStubActivity> {
     private Activity mActivity;
@@ -51,31 +45,6 @@ public class TwoLineListItemTest extends
         mActivity = getActivity();
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test constructors.",
-            method = "TwoLineListItem",
-            args = {android.content.Context.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test constructors.",
-            method = "TwoLineListItem",
-            args = {android.content.Context.class, android.util.AttributeSet.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test constructors.",
-            method = "TwoLineListItem",
-            args = {android.content.Context.class, android.util.AttributeSet.class, int.class}
-        )
-    })
-    @ToBeFixed(bug = "1417734", explanation = "should add @throws clause into javadoc of "
-            + "TwoLineListItem#TwoLineListItem(Context), "
-            + "TwoLineListItem#TwoLineListItem(Context, AttributeSet) "
-            + "and TwoLineListItem#TwoLineListItem(Context, AttributeSet, int) "
-            + "when param Context is null")
     public void testConstructor() {
         AttributeSet attrs = mActivity.getResources().getLayout(R.layout.twolinelistitem);
         assertNotNull(attrs);
@@ -106,18 +75,6 @@ public class TwoLineListItemTest extends
         new TwoLineListItem(mActivity, attrs, Integer.MIN_VALUE);
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getText1",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getText2",
-            args = {}
-        )
-    })
     public void testGetTexts() {
         TwoLineListItem twoLineListItem =
             (TwoLineListItem) mActivity.findViewById(R.id.twoLineListItem);
@@ -131,11 +88,6 @@ public class TwoLineListItemTest extends
                 twoLineListItem.getText2().getText().toString());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "onFinishInflate",
-        args = {}
-    )
     public void testOnFinishInflate() {
         MockTwoLineListItem twoLineListItem = new MockTwoLineListItem(mActivity);
         TextView text1 = new TextView(mActivity);

@@ -18,11 +18,6 @@ package android.widget.cts;
 
 import com.android.cts.stub.R;
 
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
-import dalvik.annotation.ToBeFixed;
 
 import org.xmlpull.v1.XmlPullParser;
 
@@ -37,7 +32,6 @@ import android.widget.ViewFlipper;
 /**
  * Test {@link ViewFlipper}.
  */
-@TestTargetClass(ViewFlipper.class)
 public class ViewFlipperTest extends ActivityInstrumentationTestCase<ViewFlipperStubActivity> {
     private Activity mActivity;
 
@@ -51,22 +45,6 @@ public class ViewFlipperTest extends ActivityInstrumentationTestCase<ViewFlipper
         assertNotNull(mActivity);
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test constructor(s) of {@link ViewFlipper}",
-            method = "ViewFlipper",
-            args = {android.content.Context.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test constructor(s) of {@link ViewFlipper}",
-            method = "ViewFlipper",
-            args = {android.content.Context.class, android.util.AttributeSet.class}
-        )
-    })
-    @ToBeFixed(bug="1417734", explanation="ViewFlipper#ViewFlipper(Context, AttributeSet)" +
-            " should check whether the input Context is null")
     public void testConstructor() {
         new ViewFlipper(mActivity);
 
@@ -83,36 +61,12 @@ public class ViewFlipperTest extends ActivityInstrumentationTestCase<ViewFlipper
         }
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test {@link ViewFlipper#setFlipInterval(int)}",
-        method = "setFlipInterval",
-        args = {int.class}
-    )
-    @ToBeFixed(bug="1386429", explanation="No getter and can't check indirectly")
     public void testSetFlipInterval() {
         ViewFlipper viewFlipper = new ViewFlipper(mActivity);
         viewFlipper.setFlipInterval(0);
         viewFlipper.setFlipInterval(-1);
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "startFlipping",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "stopFlipping",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "isFlipping",
-            args = {}
-        )
-    })
     public void testViewFlipper() throws Throwable {
         // NOTE: This value needs to be kept in sync with the value set in
         // layout/viewflipper_layout.xml

@@ -18,11 +18,6 @@ package android.widget.cts;
 
 import com.android.internal.R;
 
-import dalvik.annotation.TestTargets;
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.ToBeFixed;
 
 import android.content.Context;
 import android.test.InstrumentationTestCase;
@@ -41,7 +36,6 @@ import java.util.List;
 /**
  * Test {@link SimpleExpandableListAdapter}.
  */
-@TestTargetClass(SimpleExpandableListAdapter.class)
 public class SimpleExpandableListAdapterTest extends InstrumentationTestCase {
     private static final int EXPANDED_GROUP_LAYOUT = R.layout.simple_expandable_list_item_2;
 
@@ -107,32 +101,6 @@ public class SimpleExpandableListAdapterTest extends InstrumentationTestCase {
                 com.android.cts.stub.R.layout.cursoradapter_host, null);
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test constructors",
-            method = "SimpleExpandableListAdapter",
-            args = {android.content.Context.class, java.util.List.class, int.class, int.class, 
-                    java.lang.String[].class, int[].class, java.util.List.class, int.class, 
-                    int.class, java.lang.String[].class, int[].class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test constructors",
-            method = "SimpleExpandableListAdapter",
-            args = {android.content.Context.class, java.util.List.class, int.class, int.class, 
-                    java.lang.String[].class, int[].class, java.util.List.class, int.class, 
-                    java.lang.String[].class, int[].class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test constructors",
-            method = "SimpleExpandableListAdapter",
-            args = {android.content.Context.class, java.util.List.class, int.class, 
-                    java.lang.String[].class, int[].class, java.util.List.class, int.class, 
-                    java.lang.String[].class, int[].class}
-        )
-    })
     public void testConstructor() {
         new SimpleExpandableListAdapter(mContext,
                 mGroupList, GROUP_LAYOUT, COLUMNS_GROUP_FROM, VIEWS_GROUP_TO,
@@ -150,15 +118,6 @@ public class SimpleExpandableListAdapterTest extends InstrumentationTestCase {
                 COLUMNS_CHILD_FROM, VIEWS_CHILD_TO);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test {@link SimpleExpandableListAdapter#getChild(int, int)}",
-        method = "getChild",
-        args = {int.class, int.class}
-    )
-    @ToBeFixed(bug = "1417734", explanation = "should add @throws clause into javadoc of "
-            + "SimpleExpandableListAdapter#getChild(int, int) if the param groupPosition or "
-            + "childPosition is out of index.")
     public void testGetChild() {
         HashMap<String, String> expected = new HashMap<String, String>();
         expected.put("column0", "child00");
@@ -193,14 +152,6 @@ public class SimpleExpandableListAdapterTest extends InstrumentationTestCase {
         }
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test {@link SimpleExpandableListAdapter#getChildId(int, int)}",
-        method = "getChildId",
-        args = {int.class, int.class}
-    )
-    @ToBeFixed(explanation = "Should throw IndexOutOfBoundsException if groupPosition "
-        + "or childPosition is out of bounds")
     public void testGetChildId() {
         assertEquals(0, mSimpleExpandableListAdapter.getChildId(0, 0));
         assertEquals(3, mSimpleExpandableListAdapter.getChildId(3, 3));
@@ -212,15 +163,6 @@ public class SimpleExpandableListAdapterTest extends InstrumentationTestCase {
         assertEquals(4, mSimpleExpandableListAdapter.getChildId(0, 4));
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "getChildView",
-        args = {int.class, int.class, boolean.class, android.view.View.class, 
-                android.view.ViewGroup.class}
-    )
-    @ToBeFixed(bug = "1417734", explanation = "should add @throws clause into javadoc of "
-            + "SimpleExpandableListAdapter#getChildView(int, int, boolean, View, ViewGroup if "
-            + "the param groupPosition or childPosition is out of index.")
     public void testGetChildView() {
         // the normal and last use same layout
         View result = mSimpleExpandableListAdapter.getChildView(0, 0, false, null, mAdapterHost);
@@ -285,12 +227,6 @@ public class SimpleExpandableListAdapterTest extends InstrumentationTestCase {
         }
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test {@link SimpleExpandableListAdapter#newChildView(boolean, ViewGroup)}",
-        method = "newChildView",
-        args = {boolean.class, android.view.ViewGroup.class}
-    )
     public void testNewChildView() {
         // the normal and last use same layout
         View result = mSimpleExpandableListAdapter.newChildView(false, mAdapterHost);
@@ -317,15 +253,6 @@ public class SimpleExpandableListAdapterTest extends InstrumentationTestCase {
         assertNotNull(result.findViewById(R.id.text1));
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test {@link SimpleExpandableListAdapter#getChildrenCount(int)}",
-        method = "getChildrenCount",
-        args = {int.class}
-    )
-    @ToBeFixed(bug = "1417734", explanation = "should add @throws clause into javadoc of "
-            + "SimpleExpandableListAdapter#getChildrenCount(int) if "
-            + "the param groupPosition is out of index.")
     public void testGetChildrenCount() {
         assertEquals(1, mSimpleExpandableListAdapter.getChildrenCount(0));
         assertEquals(2, mSimpleExpandableListAdapter.getChildrenCount(1));
@@ -345,15 +272,6 @@ public class SimpleExpandableListAdapterTest extends InstrumentationTestCase {
         }
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test {@link SimpleExpandableListAdapter#getGroup(int)}",
-        method = "getGroup",
-        args = {int.class}
-    )
-    @ToBeFixed(bug = "1417734", explanation = "should add @throws clause into javadoc of "
-            + "SimpleExpandableListAdapter#getGroup(int) if "
-            + "the param groupPosition is out of index.")
     public void testGetGroup() {
         HashMap<String, String> expected = new HashMap<String, String>();
         expected.put("column0", "group00");
@@ -376,12 +294,6 @@ public class SimpleExpandableListAdapterTest extends InstrumentationTestCase {
         }
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test {@link SimpleExpandableListAdapter#getGroupCount()}",
-        method = "getGroupCount",
-        args = {}
-    )
     public void testGetGroupCount() {
         assertEquals(4, mSimpleExpandableListAdapter.getGroupCount());
 
@@ -391,14 +303,6 @@ public class SimpleExpandableListAdapterTest extends InstrumentationTestCase {
         assertEquals(9, mSimpleExpandableListAdapter.getGroupCount());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test {@link SimpleExpandableListAdapter#getGroupId(int)}",
-        method = "getGroupId",
-        args = {int.class}
-    )
-    @ToBeFixed(explanation = "Should throw IndexOutOfBoundsException if groupPosition "
-            + "is out of bounds")
     public void testGetGroupId() {
         assertEquals(0, mSimpleExpandableListAdapter.getGroupId(0));
         assertEquals(3, mSimpleExpandableListAdapter.getGroupId(3));
@@ -408,14 +312,6 @@ public class SimpleExpandableListAdapterTest extends InstrumentationTestCase {
         assertEquals(4, mSimpleExpandableListAdapter.getGroupId(4));
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "getGroupView",
-        args = {int.class, boolean.class, android.view.View.class, android.view.ViewGroup.class}
-    )
-    @ToBeFixed(bug = "1417734", explanation = "should add @throws clause into javadoc of "
-            + "SimpleExpandableListAdapter#getGroupView(int, boolean, View, ViewGroup if "
-            + "the param groupPosition is out of index.")
     public void testGetGroupView() {
         // the collapsed and expanded use same layout
         View result = mSimpleExpandableListAdapter.getGroupView(0, false, null, mAdapterHost);
@@ -468,12 +364,6 @@ public class SimpleExpandableListAdapterTest extends InstrumentationTestCase {
         }
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test {@link SimpleExpandableListAdapter#newGroupView(boolean, ViewGroup)}",
-        method = "newGroupView",
-        args = {boolean.class, android.view.ViewGroup.class}
-    )
     public void testNewGroupView() {
         // the collapsed and expanded use same layout
         View result = mSimpleExpandableListAdapter.newGroupView(false, mAdapterHost);
@@ -500,13 +390,6 @@ public class SimpleExpandableListAdapterTest extends InstrumentationTestCase {
         assertNotNull(result.findViewById(R.id.text1));
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "isChildSelectable",
-        args = {int.class, int.class}
-    )
-    @ToBeFixed(explanation = "Should throw IndexOutOfBoundsException if groupPosition "
-            + "or childPosition is out of bounds")
     public void testIsChildSelectable() {
         assertTrue(mSimpleExpandableListAdapter.isChildSelectable(0, 0));
         assertTrue(mSimpleExpandableListAdapter.isChildSelectable(3, 3));
@@ -518,11 +401,6 @@ public class SimpleExpandableListAdapterTest extends InstrumentationTestCase {
         assertTrue(mSimpleExpandableListAdapter.isChildSelectable(0, 1));
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "hasStableIds",
-        args = {}
-    )
     public void testHasStableIds() {
         assertTrue(mSimpleExpandableListAdapter.hasStableIds());
     }

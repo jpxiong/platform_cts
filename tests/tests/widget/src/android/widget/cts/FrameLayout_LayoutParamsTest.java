@@ -18,11 +18,6 @@ package android.widget.cts;
 
 import com.android.cts.stub.R;
 
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
-import dalvik.annotation.ToBeFixed;
 
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
@@ -37,7 +32,6 @@ import android.widget.FrameLayout.LayoutParams;
 
 import java.io.IOException;
 
-@TestTargetClass(FrameLayout.LayoutParams.class)
 public class FrameLayout_LayoutParamsTest extends AndroidTestCase {
 
     private AttributeSet getAttributeSet() throws XmlPullParserException, IOException {
@@ -46,34 +40,6 @@ public class FrameLayout_LayoutParamsTest extends AndroidTestCase {
         return Xml.asAttributeSet(parser);
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "FrameLayout.LayoutParams",
-            args = {android.content.Context.class, android.util.AttributeSet.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "FrameLayout.LayoutParams",
-            args = {int.class, int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "FrameLayout.LayoutParams",
-            args = {int.class, int.class, int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "FrameLayout.LayoutParams",
-            args = {android.view.ViewGroup.LayoutParams.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "FrameLayout.LayoutParams",
-            args = {android.view.ViewGroup.MarginLayoutParams.class}
-        )
-    })
-    @ToBeFixed(bug = "1695243", explanation = "Android API javadocs are incomplete")
     public void testConstructor() throws XmlPullParserException, IOException {
         AttributeSet attrs = getAttributeSet();
 

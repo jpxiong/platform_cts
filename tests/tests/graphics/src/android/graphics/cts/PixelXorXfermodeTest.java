@@ -23,18 +23,9 @@ import android.graphics.Paint;
 import android.graphics.PixelXorXfermode;
 import android.graphics.Bitmap.Config;
 import android.test.AndroidTestCase;
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
 
-@TestTargetClass(PixelXorXfermode.class)
 public class PixelXorXfermodeTest extends AndroidTestCase {
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "PixelXorXfermode",
-        args = {int.class}
-    )
     public void testPixelXorXfermode() {
         int width = 100;
         int height = 100;

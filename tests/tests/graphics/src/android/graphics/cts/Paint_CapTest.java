@@ -17,21 +17,11 @@
 package android.graphics.cts;
 
 import junit.framework.TestCase;
-import dalvik.annotation.TestTargets;
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargetClass;
 import android.graphics.Paint;
 import android.graphics.Paint.Cap;
 
-@TestTargetClass(Paint.Cap.class)
 public class Paint_CapTest extends TestCase {
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "valueOf",
-        args = {java.lang.String.class}
-    )
     public void testValueOf() {
 
         assertEquals(Cap.BUTT, Cap.valueOf("BUTT"));
@@ -39,23 +29,6 @@ public class Paint_CapTest extends TestCase {
         assertEquals(Cap.SQUARE, Cap.valueOf("SQUARE"));
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "values",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setStrokeCap",
-            args = {android.graphics.Paint.Cap.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getStrokeCap",
-            args = {}
-        )
-    })
     public void testValues() {
         // set the actual value
         Cap[] actual = Cap.values();

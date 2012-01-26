@@ -26,13 +26,7 @@ import android.test.AndroidTestCase;
 
 import com.android.cts.stub.R;
 
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
-import dalvik.annotation.ToBeFixed;
 
-@TestTargetClass(NotificationManager.class)
 public class NotificationManagerTest extends AndroidTestCase {
 
     private NotificationManager mNotificationManager;
@@ -50,59 +44,17 @@ public class NotificationManagerTest extends AndroidTestCase {
         mNotificationManager.cancelAll();
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.NOT_FEASIBLE,
-            method = "notify",
-            args = {int.class, android.app.Notification.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.NOT_FEASIBLE,
-            method = "cancel",
-            args = {int.class}
-        )
-    })
-    @ToBeFixed(bug = "1716929", explanation = "NotificationManager#notify(int, Notification) "
-            + "find a way to get ticker from status bar")
     public void testNotify() {
         final int id = 1;
         sendNotification(id, R.drawable.black);
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.NOT_FEASIBLE,
-            method = "notify",
-            args = {int.class, android.app.Notification.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.NOT_FEASIBLE,
-            method = "cancel",
-            args = {int.class}
-        )
-    })
-    @ToBeFixed(bug = "1716929", explanation = "NotificationManager#cancel(int) find a way "
-            + "to get ticker from status bar")
     public void testCancel() {
         final int id = 9;
         sendNotification(id, R.drawable.black);
         mNotificationManager.cancel(id);
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.NOT_FEASIBLE,
-            method = "notify",
-            args = {int.class, android.app.Notification.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.NOT_FEASIBLE,
-            method = "cancelAll",
-            args = {}
-        )
-    })
-    @ToBeFixed(bug = "1716929", explanation = "NotificationManager#cancelAll() find a way to "
-            + "get ticker from status bar")
     public void testCancelAll() {
         sendNotification(1, R.drawable.black);
         sendNotification(2, R.drawable.blue);

@@ -16,10 +16,6 @@
 
 package android.media.cts;
 
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
 
 import android.content.pm.PackageManager;
 import android.hardware.Camera;
@@ -31,7 +27,6 @@ import android.util.Log;
 
 import java.util.List;
 
-@TestTargetClass(CamcorderProfile.class)
 public class CamcorderProfileTest extends AndroidTestCase {
 
     private static final String TAG = "CamcorderProfileTest";
@@ -230,13 +225,6 @@ public class CamcorderProfileTest extends AndroidTestCase {
                 specificTimeLapseProfileQualities, null);
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "get",
-            args = {int.class}
-        )
-    })
     public void testGet() {
         /*
          * Device may not have rear camera for checkGet(-1).
@@ -251,13 +239,6 @@ public class CamcorderProfileTest extends AndroidTestCase {
         checkGet(-1);
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "get",
-            args = {int.class, int.class}
-        )
-    })
     public void testGetWithId() {
         int nCamera = Camera.getNumberOfCameras();
         for (int cameraId = 0; cameraId < nCamera; cameraId++) {

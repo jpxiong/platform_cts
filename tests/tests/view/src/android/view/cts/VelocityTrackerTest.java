@@ -16,10 +16,6 @@
 
 package android.view.cts;
 
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
 
 import android.test.AndroidTestCase;
 import android.view.MotionEvent;
@@ -27,7 +23,6 @@ import android.view.VelocityTracker;
 /**
  * Test {@link VelocityTracker}.
  */
-@TestTargetClass(VelocityTracker.class)
 public class VelocityTrackerTest extends AndroidTestCase {
     private static final float ERROR_TOLERANCE = 0.0001f;
 
@@ -36,22 +31,12 @@ public class VelocityTrackerTest extends AndroidTestCase {
         super.setUp();
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "obtain",
-        args = {}
-    )
     public void testObtain() {
         VelocityTracker vt = VelocityTracker.obtain();
         assertNotNull(vt);
         vt.recycle();
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "recycle",
-        args = {}
-    )
     public void testRecycle() {
         VelocityTracker vt = VelocityTracker.obtain();
         assertNotNull(vt);
@@ -61,33 +46,6 @@ public class VelocityTrackerTest extends AndroidTestCase {
         assertEquals(vt, vt2);
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "computeCurrentVelocity",
-            args = {int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getXVelocity",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getYVelocity",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "addMovement",
-            args = {android.view.MotionEvent.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "clear",
-            args = {}
-        )
-    })
     public void testComputeCurrentVelocity() {
         // XVelocity & YVelocity calculated by the original algorithm from android
         float XVelocity;

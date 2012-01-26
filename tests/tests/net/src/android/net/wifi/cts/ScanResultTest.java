@@ -26,11 +26,7 @@ import android.net.wifi.ScanResult;
 import android.net.wifi.WifiManager;
 import android.net.wifi.WifiManager.WifiLock;
 import android.test.AndroidTestCase;
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
 
-@TestTargetClass(ScanResult.class)
 public class ScanResultTest extends AndroidTestCase {
     private static class MySync {
         int expectedState = STATE_NULL;
@@ -109,11 +105,6 @@ public class ScanResultTest extends AndroidTestCase {
         }
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "toString",
-        args = {}
-    )
     public void testScanResultProperties() {
         List<ScanResult> scanResults = mWifiManager.getScanResults();
         // this test case should in Wifi environment

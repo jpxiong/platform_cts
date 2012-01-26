@@ -19,29 +19,15 @@ package android.graphics.cts;
 import android.graphics.Path;
 import android.graphics.Path.Direction;
 import android.test.AndroidTestCase;
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
 
-@TestTargetClass(Path.Direction.class)
 public class Path_DirectionTest extends AndroidTestCase {
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "valueOf",
-        args = {java.lang.String.class}
-    )
     public void testValueOf() {
         assertEquals(Direction.CW, Direction.valueOf("CW"));
         assertEquals(Direction.CCW, Direction.valueOf("CCW"));
         // Every Direction element will be tested somewhere else.
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "values",
-        args = {}
-    )
     public void testValues() {
         // set the expected value
         Direction[] expected = {

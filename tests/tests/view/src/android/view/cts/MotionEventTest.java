@@ -16,11 +16,6 @@
 
 package android.view.cts;
 
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
-import dalvik.annotation.ToBeFixed;
 
 import android.graphics.Matrix;
 import android.os.Parcel;
@@ -36,7 +31,6 @@ import android.view.MotionEvent.PointerProperties;
 /**
  * Test {@link MotionEvent}.
  */
-@TestTargetClass(MotionEvent.class)
 public class MotionEventTest extends AndroidTestCase {
     private MotionEvent mMotionEvent1;
     private MotionEvent mMotionEvent2;
@@ -77,78 +71,6 @@ public class MotionEventTest extends AndroidTestCase {
         super.tearDown();
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "obtain",
-            args = {long.class, long.class, int.class, float.class, float.class, int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getX",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getDownTime",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getEventTime",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getX",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getY",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getRawX",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getRawY",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getMetaState",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getDeviceId",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getPressure",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getSize",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getXPrecision",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getYPrecision",
-            args = {}
-        )
-    })
     public void testObtain1() {
         mMotionEvent1 = MotionEvent.obtain(mDownTime, mEventTime,
                 MotionEvent.ACTION_DOWN, X_3F, Y_4F, META_STATE);
@@ -169,11 +91,6 @@ public class MotionEventTest extends AndroidTestCase {
         assertEquals(1.0f, mMotionEvent1.getYPrecision(), DELTA);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "obtain",
-        args = {MotionEvent.class}
-    )
     public void testObtain2() {
         MotionEvent motionEvent = MotionEvent.obtain(mDownTime, mEventTime,
                 MotionEvent.ACTION_DOWN, X_3F, Y_4F, META_STATE);
@@ -195,12 +112,6 @@ public class MotionEventTest extends AndroidTestCase {
         assertEquals(motionEvent.getYPrecision(), mMotionEvent1.getYPrecision(), DELTA);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "obtain",
-        args = {long.class, long.class, int.class, float.class, float.class, float.class,
-                float.class, int.class, float.class, float.class, int.class, int.class}
-    )
     public void testObtain3() {
         mMotionEvent1 = null;
         mMotionEvent1 = MotionEvent.obtain(mDownTime, mEventTime,
@@ -223,18 +134,6 @@ public class MotionEventTest extends AndroidTestCase {
         assertEquals(Y_PRECISION_4F, mMotionEvent1.getYPrecision(), DELTA);
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getAction",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setAction",
-            args = {int.class}
-        )
-    })
     public void testAccessAction() {
         assertEquals(MotionEvent.ACTION_MOVE, mMotionEvent1.getAction());
 
@@ -251,29 +150,11 @@ public class MotionEventTest extends AndroidTestCase {
         assertEquals(MotionEvent.ACTION_DOWN, mMotionEvent1.getAction());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "describeContents",
-        args = {}
-    )
-    @ToBeFixed(bug = "1695243", explanation = "Android API javadocs are incomplete")
     public void testDescribeContents() {
         // make sure this method never throw any exception.
         mMotionEvent2.describeContents();
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getEdgeFlags",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setEdgeFlags",
-            args = {int.class}
-        )
-    })
     public void testAccessEdgeFlags() {
         assertEquals(EDGE_FLAGS, mMotionEvent2.getEdgeFlags());
 
@@ -282,11 +163,6 @@ public class MotionEventTest extends AndroidTestCase {
         assertEquals(edgeFlags, mMotionEvent2.getEdgeFlags());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "writeToParcel",
-        args = {Parcel.class, int.class}
-    )
     public void testWriteToParcel() {
         Parcel parcel = Parcel.obtain();
         mMotionEvent2.writeToParcel(parcel, Parcelable.PARCELABLE_WRITE_RETURN_VALUE);
@@ -304,21 +180,11 @@ public class MotionEventTest extends AndroidTestCase {
         assertEquals(mMotionEvent2.getDeviceId(), motionEvent.getDeviceId());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "toString",
-        args = {}
-    )
     public void testToString() {
         // make sure this method never throw exception.
         mMotionEvent2.toString();
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "offsetLocation",
-        args = {float.class, float.class}
-    )
     public void testOffsetLocation() {
         assertEquals(X_3F, mMotionEvent2.getX(), DELTA);
         assertEquals(Y_4F, mMotionEvent2.getY(), DELTA);
@@ -330,11 +196,6 @@ public class MotionEventTest extends AndroidTestCase {
         assertEquals(Y_4F + offsetY, mMotionEvent2.getY(), DELTA);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "setLocation",
-        args = {float.class, float.class}
-    )
     public void testSetLocation() {
         assertEquals(X_3F, mMotionEvent2.getX(), DELTA);
         assertEquals(Y_4F, mMotionEvent2.getY(), DELTA);
@@ -352,11 +213,6 @@ public class MotionEventTest extends AndroidTestCase {
         assertEquals(newLocationY, mMotionEvent2.getY(), DELTA);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "getHistoricalX",
-        args = {int.class}
-    )
     public void testGetHistoricalX() {
         float x = X_3F + 5.0f;
         mMotionEvent2.addBatch(mEventTime, x, 5.0f, 1.0f, 0.0f, 0);
@@ -366,11 +222,6 @@ public class MotionEventTest extends AndroidTestCase {
         assertEquals(x, mMotionEvent2.getHistoricalX(1), DELTA);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "getHistoricalY",
-        args = {int.class}
-    )
     public void testGetHistoricalY() {
         float y = Y_4F + 5.0f;
         mMotionEvent2.addBatch(mEventTime, 5.0f, y, 1.0f, 0.0f, 0);
@@ -380,11 +231,6 @@ public class MotionEventTest extends AndroidTestCase {
         assertEquals(y, mMotionEvent2.getHistoricalY(1), DELTA);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "getHistoricalSize",
-        args = {int.class}
-    )
     public void testGetHistoricalSize() {
         float size = 0.5f;
         mMotionEvent2.addBatch(mEventTime, 5.0f, 5.0f, 1.0f, size, 0);
@@ -394,11 +240,6 @@ public class MotionEventTest extends AndroidTestCase {
         assertEquals(size, mMotionEvent2.getHistoricalSize(1), DELTA);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "getHistoricalPressure",
-        args = {int.class}
-    )
     public void testGetHistoricalPressure() {
         float pressure = 0.5f;
         mMotionEvent2.addBatch(mEventTime, 5.0f, 5.0f, pressure, 0.0f, 0);
@@ -408,11 +249,6 @@ public class MotionEventTest extends AndroidTestCase {
         assertEquals(pressure, mMotionEvent2.getHistoricalPressure(1), DELTA);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "getHistoricalEventTime",
-        args = {int.class}
-    )
     public void testGetHistoricalEventTime() {
         long eventTime = mEventTime + 5l;
         mMotionEvent2.addBatch(eventTime, 5.0f, 5.0f, 0.0f, 1.0f, 0);
@@ -422,12 +258,6 @@ public class MotionEventTest extends AndroidTestCase {
         assertEquals(eventTime, mMotionEvent2.getHistoricalEventTime(1));
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "addBatch",
-        args = {long.class, float.class, float.class, float.class, float.class, int.class}
-    )
-    @ToBeFixed(bug = "1695243", explanation = "Android API javadocs are incomplete")
     public void testAddBatch() {
         long eventTime = SystemClock.uptimeMillis();
         float x = 10.0f;
@@ -460,11 +290,6 @@ public class MotionEventTest extends AndroidTestCase {
         assertEquals(size, mMotionEvent2.getHistoricalSize(1), DELTA);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "getHistorySize",
-        args = {}
-    )
     public void testGetHistorySize() {
         long eventTime = SystemClock.uptimeMillis();
         float x = 10.0f;
@@ -480,11 +305,6 @@ public class MotionEventTest extends AndroidTestCase {
         assertEquals(1, mMotionEvent2.getHistorySize());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "recycle",
-        args = {}
-    )
     public void testRecycle() {
         mMotionEvent2.setAction(MotionEvent.ACTION_MOVE);
         assertEquals(0, mMotionEvent2.getHistorySize());
@@ -502,11 +322,6 @@ public class MotionEventTest extends AndroidTestCase {
         mMotionEvent2 = null; // since it was recycled, don't try to recycle again in tear down
     }
 
-    @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "transform",
-            args = {}
-        )
     public void testTransformShouldThrowWhenMatrixIsNull() {
         try {
             mMotionEvent1.transform(null);
@@ -515,11 +330,6 @@ public class MotionEventTest extends AndroidTestCase {
         }
     }
 
-    @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "transform",
-            args = {}
-        )
     public void testTransformShouldApplyMatrixToPointsAndPreserveRawPosition() {
         // Generate some points on a circle.
         // Each point 'i' is a point on a circle of radius ROTATION centered at (3,2) at an angle

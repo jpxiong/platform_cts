@@ -33,15 +33,10 @@ import android.widget.LinearLayout;
 import com.android.cts.stub.R;
 import com.android.internal.util.XmlUtils;
 
-import dalvik.annotation.TestTargets;
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargetClass;
 
 /**
  * Test {@link DigitalClock}.
  */
-@TestTargetClass(DigitalClock.class)
 public class DigitalClockTest extends ActivityInstrumentationTestCase<DigitalClockStubActivity> {
     private Activity mActivity;
     private Context mContext;
@@ -57,20 +52,6 @@ public class DigitalClockTest extends ActivityInstrumentationTestCase<DigitalClo
         mContext = getInstrumentation().getContext();
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "",
-            method = "DigitalClock",
-            args = {android.content.Context.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "",
-            method = "DigitalClock",
-            args = {android.content.Context.class, android.util.AttributeSet.class}
-        )
-    })
     public void testConstructor() {
         // new the DigitalClock instance
         new DigitalClock(mContext);
@@ -91,12 +72,6 @@ public class DigitalClockTest extends ActivityInstrumentationTestCase<DigitalClo
         }
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test {@link DigitalClock#onDetachedFromWindow()}.",
-        method = "onDetachedFromWindow",
-        args = {}
-    )
     @UiThreadTest
     public void testOnDetachedFromWindow() {
         final MockDigitalClock digitalClock = createDigitalClock();
@@ -111,12 +86,6 @@ public class DigitalClockTest extends ActivityInstrumentationTestCase<DigitalClo
         linearLayout.removeView(digitalClock);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test {@link DigitalClock#onAttachedToWindow()}.",
-        method = "onAttachedToWindow",
-        args = {}
-    )
     @UiThreadTest
     public void testOnAttachedToWindow() {
         final MockDigitalClock digitalClock = createDigitalClock();

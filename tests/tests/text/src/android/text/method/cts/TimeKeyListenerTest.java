@@ -18,9 +18,6 @@ package android.text.method.cts;
 
 import com.android.cts.stub.R;
 
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
 
 import android.app.Activity;
 import android.app.Instrumentation;
@@ -31,7 +28,6 @@ import android.view.KeyCharacterMap;
 import android.view.KeyEvent;
 import android.widget.TextView;
 
-@TestTargetClass(TimeKeyListener.class)
 public class TimeKeyListenerTest extends
         ActivityInstrumentationTestCase2<KeyListenerStubActivity> {
     private Activity mActivity;
@@ -51,20 +47,10 @@ public class TimeKeyListenerTest extends
         mTextView = (TextView) mActivity.findViewById(R.id.keylistener_textview);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "TimeKeyListener",
-        args = {}
-    )
     public void testConstructor() {
         new TimeKeyListener();
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "getInstance",
-        args = {}
-    )
     public void testGetInstance() {
         TimeKeyListener listener1 = TimeKeyListener.getInstance();
         TimeKeyListener listener2 = TimeKeyListener.getInstance();
@@ -74,22 +60,12 @@ public class TimeKeyListenerTest extends
         assertSame(listener1, listener2);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "getAcceptedChars",
-        args = {}
-    )
     public void testGetAcceptedChars() {
         MyTimeKeyListener timeKeyListener = new MyTimeKeyListener();
         TextMethodUtils.assertEquals(TimeKeyListener.CHARACTERS,
                 timeKeyListener.getAcceptedChars());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "getInputType",
-        args = {}
-    )
     public void testGetInputType() {
         TimeKeyListener listener = TimeKeyListener.getInstance();
         int expected = InputType.TYPE_CLASS_DATETIME

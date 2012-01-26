@@ -19,27 +19,10 @@ package android.telephony.gsm.cts;
 import junit.framework.TestCase;
 import android.telephony.gsm.SmsMessage;
 
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
 
 @SuppressWarnings("deprecation")
-@TestTargetClass(SmsMessage.MessageClass.class)
 public class SmsMessage_MessageClassTest extends TestCase {
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.NOT_NECESSARY,
-            method = "valueOf",
-            args = {String.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.NOT_NECESSARY,
-            method = "values",
-            args = {}
-        )
-    })
     public void testMessageClass() {
     }
 }

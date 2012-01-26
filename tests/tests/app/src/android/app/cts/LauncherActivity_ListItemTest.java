@@ -16,21 +16,11 @@
 
 package android.app.cts;
 
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
 
 import android.app.LauncherActivity;
 import android.test.AndroidTestCase;
 
-@TestTargetClass(LauncherActivity.ListItem.class)
 public class LauncherActivity_ListItemTest extends AndroidTestCase {
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test ListItem",
-        method = "LauncherActivity.ListItem",
-        args = {}
-    )
     public void testConstructor() {
         // Test public constructor
         new LauncherActivity.ListItem();

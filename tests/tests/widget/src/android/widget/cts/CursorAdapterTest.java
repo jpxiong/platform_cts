@@ -37,15 +37,10 @@ import android.widget.TextView;
 
 import com.android.cts.stub.R;
 
-import dalvik.annotation.TestTargets;
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargetClass;
 
 /**
  * Test {@link CursorAdapter}.
  */
-@TestTargetClass(CursorAdapter.class)
 public class CursorAdapterTest extends AndroidTestCase {
     private static final long TEST_TIME_OUT = 5000;
     private static final int NUMBER_INDEX = 1;
@@ -95,20 +90,6 @@ public class CursorAdapterTest extends AndroidTestCase {
         super.tearDown();
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test constructor(s) of {@link CursorAdapter}",
-            method = "CursorAdapter",
-            args = {android.content.Context.class, android.database.Cursor.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test constructor(s) of {@link CursorAdapter}",
-            method = "CursorAdapter",
-            args = {android.content.Context.class, android.database.Cursor.class, boolean.class}
-        )
-    })
     public void testConstructor() {
         new MockCursorAdapter(mContext, mCursor);
 
@@ -119,12 +100,6 @@ public class CursorAdapterTest extends AndroidTestCase {
         new MockCursorAdapter(null, null, false);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test {@link CursorAdapter#init(Context, Cursor, boolean)}",
-        method = "init",
-        args = {android.content.Context.class, android.database.Cursor.class, boolean.class}
-    )
     public void testInit() {
         MockCursorAdapter cursorAdapter = new MockCursorAdapter(null, null, false);
         cursorAdapter.init(null, null, false);
@@ -169,12 +144,6 @@ public class CursorAdapterTest extends AndroidTestCase {
         }
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test {@link CursorAdapter#getCount()}",
-        method = "getCount",
-        args = {}
-    )
     public void testGetCount() {
         CursorAdapter cursorAdapter = new MockCursorAdapter(mContext, null);
         assertEquals(0, cursorAdapter.getCount());
@@ -183,20 +152,6 @@ public class CursorAdapterTest extends AndroidTestCase {
         assertEquals(mCursor.getCount(), cursorAdapter.getCount());
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test {@link CursorAdapter#changeCursor(Cursor)}",
-            method = "changeCursor",
-            args = {android.database.Cursor.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test {@link CursorAdapter#changeCursor(Cursor)}",
-            method = "getCursor",
-            args = {}
-        )
-    })
     public void testAccessCursor() {
         CursorAdapter cursorAdapter = new MockCursorAdapter(mContext, null);
         assertNull(cursorAdapter.getCursor());
@@ -208,12 +163,6 @@ public class CursorAdapterTest extends AndroidTestCase {
         assertNull(cursorAdapter.getCursor());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test {@link CursorAdapter#convertToString(Cursor)}",
-        method = "convertToString",
-        args = {android.database.Cursor.class}
-    )
     public void testConvertToString() {
         CursorAdapter cursorAdapter = new MockCursorAdapter(mContext, null);
         assertEquals("", cursorAdapter.convertToString(null));
@@ -221,12 +170,6 @@ public class CursorAdapterTest extends AndroidTestCase {
         assertEquals(mCursor.toString(), cursorAdapter.convertToString(mCursor));
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test {@link CursorAdapter#hasStableIds()}, this method always return true",
-        method = "hasStableIds",
-        args = {}
-    )
     public void testHasStableIds() {
         CursorAdapter cursorAdapter = new MockCursorAdapter(mContext, mCursor);
         assertTrue(cursorAdapter.hasStableIds());
@@ -235,12 +178,6 @@ public class CursorAdapterTest extends AndroidTestCase {
         assertTrue(cursorAdapter.hasStableIds());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test {@link CursorAdapter#getView(int, View, ViewGroup)}",
-        method = "getView",
-        args = {int.class, android.view.View.class, android.view.ViewGroup.class}
-    )
     public void testGetView() {
         TextView textView = new TextView(mContext);
         textView.setText("getView test");
@@ -272,13 +209,6 @@ public class CursorAdapterTest extends AndroidTestCase {
         assertEquals(SECOND_NUMBER, retView.getText().toString());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test {@link CursorAdapter#newDropDownView(Context, Cursor, ViewGroup)}",
-        method = "newDropDownView",
-        args = {android.content.Context.class, android.database.Cursor.class,
-                android.view.ViewGroup.class}
-    )
     public void testNewDropDownView() {
         CursorAdapter cursorAdapter = new MockCursorAdapter(mContext, mCursor);
         // null cursor
@@ -288,12 +218,6 @@ public class CursorAdapterTest extends AndroidTestCase {
         assertEquals(FIRST_NUMBER, textView.getText().toString());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test {@link CursorAdapter#getDropDownView(int, View, ViewGroup)}",
-        method = "getDropDownView",
-        args = {int.class, android.view.View.class, android.view.ViewGroup.class}
-    )
     public void testGetDropDownView() {
         MockCursorAdapter cursorAdapter = new MockCursorAdapter(mContext, null);
         // null cursor
@@ -315,24 +239,12 @@ public class CursorAdapterTest extends AndroidTestCase {
         assertEquals(SECOND_NUMBER, retView.getText().toString());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test {@link CursorAdapter#getFilter()}",
-        method = "getFilter",
-        args = {}
-    )
     public void testGetFilter() {
         CursorAdapter cursorAdapter = new MockCursorAdapter(mContext, mCursor);
         Filter filter = cursorAdapter.getFilter();
         assertNotNull(filter);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test {@link CursorAdapter#getItem(int)}",
-        method = "getItem",
-        args = {int.class}
-    )
     public void testGetItem() {
         CursorAdapter cursorAdapter = new MockCursorAdapter(mContext, null);
         // cursor is null
@@ -350,12 +262,6 @@ public class CursorAdapterTest extends AndroidTestCase {
         assertEquals(SECOND_NUMBER, c.getString(NUMBER_INDEX));
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test {@link CursorAdapter#getItemId(int)}",
-        method = "getItemId",
-        args = {int.class}
-    )
     public void testGetItemId() {
         CursorAdapter cursorAdapter = new MockCursorAdapter(mContext, null);
         // cursor is null
@@ -370,18 +276,6 @@ public class CursorAdapterTest extends AndroidTestCase {
         assertEquals(0, cursorAdapter.getItemId(2));
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getFilterQueryProvider",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setFilterQueryProvider",
-            args = {android.widget.FilterQueryProvider.class}
-        )
-    })
     public void testAccessFilterQueryProvider() {
         CursorAdapter cursorAdapter = new MockCursorAdapter(mContext, mCursor);
         FilterQueryProvider filterProvider = new MockFilterQueryProvider();
@@ -393,12 +287,6 @@ public class CursorAdapterTest extends AndroidTestCase {
         assertSame(filterProvider, cursorAdapter.getFilterQueryProvider());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test {@link CursorAdapter#runQueryOnBackgroundThread(CharSequence)}",
-        method = "runQueryOnBackgroundThread",
-        args = {java.lang.CharSequence.class}
-    )
     public void testRunQueryOnBackgroundThread() {
         CursorAdapter cursorAdapter = new MockCursorAdapter(mContext, mCursor);
         final String constraint = "constraint";
@@ -412,11 +300,6 @@ public class CursorAdapterTest extends AndroidTestCase {
         assertNull(cursorAdapter.runQueryOnBackgroundThread(constraint));
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "onContentChanged",
-        args = {}
-    )
     public void testOnContentChanged() throws Throwable {
         TestThread testThread = new TestThread(new Runnable() {
             public void run() {

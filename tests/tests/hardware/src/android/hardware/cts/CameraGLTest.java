@@ -39,8 +39,6 @@ import android.test.UiThreadTest;
 import android.test.suitebuilder.annotation.LargeTest;
 import android.util.Log;
 
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -62,7 +60,6 @@ import javax.microedition.khronos.opengles.GL10;
  * This test case must run with hardware. It can't be tested in emulator
  */
 @LargeTest
-@TestTargetClass(Camera.class)
 public class CameraGLTest extends ActivityInstrumentationTestCase2<GLSurfaceViewStubActivity> {
     private static final String TAG = "CameraGLTest";
     private static final String PACKAGE = "com.android.cts.stub";

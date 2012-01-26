@@ -16,10 +16,6 @@
 
 package android.widget.cts;
 
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
 
 import android.test.ActivityInstrumentationTestCase2;
 import android.test.suitebuilder.annotation.MediumTest;
@@ -33,7 +29,6 @@ import android.widget.cts.util.ExpandableListScenario.MyGroup;
 
 import java.util.List;
 
-@TestTargetClass(ExpandableListView.class)
 public class ExpandableListViewBasicTest extends
         ActivityInstrumentationTestCase2<ExpandableListSimple> {
     private ExpandableListScenario mActivity;
@@ -75,23 +70,11 @@ public class ExpandableListViewBasicTest extends
         return groupPos;
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test {@link ExpandableListView#expandGroup(int)}",
-        method = "expandGroup",
-        args = {int.class}
-    )
     @MediumTest
     public void testExpandGroup() {
         expandGroup(-1, true);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test {@link ExpandableListView#collapseGroup(int)}",
-        method = "collapseGroup",
-        args = {int.class}
-    )
     @MediumTest
     public void testCollapseGroup() {
         final int groupPos = expandGroup(-1, true);
@@ -101,20 +84,6 @@ public class ExpandableListViewBasicTest extends
         assertFalse("Group did not collapse", mExpandableListView.isGroupExpanded(groupPos));
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test {@link ExpandableListView#expandGroup(int)}",
-            method = "expandGroup",
-            args = {int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test {@link ExpandableListView#expandGroup(int)}",
-            method = "isGroupExpanded",
-            args = {int.class}
-        )
-    })
     @MediumTest
     public void testExpandedGroupMovement() {
         // Expand the first group

@@ -16,11 +16,6 @@
 
 package android.widget.cts;
 
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
-import dalvik.annotation.ToBeFixed;
 
 import android.app.Activity;
 import android.content.Context;
@@ -37,7 +32,6 @@ import android.widget.LinearLayout.LayoutParams;
 /**
  * Test {@link TabWidget}.
  */
-@TestTargetClass(TabWidget.class)
 public class TabWidgetTest extends ActivityInstrumentationTestCase2<TabHostStubActivity> {
     private Activity mActivity;
 
@@ -51,23 +45,6 @@ public class TabWidgetTest extends ActivityInstrumentationTestCase2<TabHostStubA
         mActivity = getActivity();
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "TabWidget",
-            args = {android.content.Context.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "TabWidget",
-            args = {android.content.Context.class, android.util.AttributeSet.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "TabWidget",
-            args = {android.content.Context.class, android.util.AttributeSet.class, int.class}
-        )
-    })
     public void testConstructor() {
         new TabWidget(mActivity);
 
@@ -76,11 +53,6 @@ public class TabWidgetTest extends ActivityInstrumentationTestCase2<TabHostStubA
         new TabWidget(mActivity, null, 0);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "childDrawableStateChanged",
-        args = {android.view.View.class}
-    )
     public void testChildDrawableStateChanged() {
         MockTabWidget mockTabWidget = new MockTabWidget(mActivity);
         TextView tv0 = new TextView(mActivity);
@@ -101,20 +73,10 @@ public class TabWidgetTest extends ActivityInstrumentationTestCase2<TabHostStubA
         assertFalse(mockTabWidget.hasCalledInvalidate());
     }
 
-    @TestTargetNew(
-        level = TestLevel.NOT_NECESSARY,
-        method = "dispatchDraw",
-        args = {android.graphics.Canvas.class}
-    )
     public void testDispatchDraw() {
         // implementation details
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "setCurrentTab",
-        args = {int.class}
-    )
     @UiThreadTest
     public void testSetCurrentTab() {
         TabHostStubActivity activity = getActivity();
@@ -133,13 +95,6 @@ public class TabWidgetTest extends ActivityInstrumentationTestCase2<TabHostStubA
         assertFalse(tabWidget.getChildAt(1).isFocused());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "focusCurrentTab",
-        args = {int.class}
-    )
-    @ToBeFixed(bug = "1695243", explanation = "the javadoc for focusCurrentTab() is incomplete." +
-            " not clear what is supposed to happen if a wrong index passed to this method.")
     @UiThreadTest
     public void testFocusCurrentTab() {
         TabHostStubActivity activity = getActivity();
@@ -183,11 +138,6 @@ public class TabWidgetTest extends ActivityInstrumentationTestCase2<TabHostStubA
         }
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "setEnabled",
-        args = {boolean.class}
-    )
     public void testSetEnabled() {
         TabWidget tabWidget = new TabWidget(mActivity);
         tabWidget.addView(new TextView(mActivity));
@@ -207,17 +157,6 @@ public class TabWidgetTest extends ActivityInstrumentationTestCase2<TabHostStubA
         assertTrue(tabWidget.getChildAt(1).isEnabled());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "addView",
-        args = {android.view.View.class}
-    )
-    @ToBeFixed(bug = "1695243", explanation = "the javadoc for addView() is incomplete." +
-            "1. not clear what is supposed to happen if child is null." +
-            "2. not clear what is supposed to happen if child is a kind of AdapterView." +
-            "3. In javadoc, it says that the default parameters are set on the child " +
-            "   if no layout parameters are already set on the child, but the default width " +
-            "   and weight is not equals what returned from generateDefaultLayoutParams().")
     public void testAddView() {
         MockTabWidget mockTabWidget = new MockTabWidget(mActivity);
 
@@ -255,20 +194,10 @@ public class TabWidgetTest extends ActivityInstrumentationTestCase2<TabHostStubA
         }
     }
 
-    @TestTargetNew(
-        level = TestLevel.NOT_NECESSARY,
-        method = "onFocusChange",
-        args = {android.view.View.class, boolean.class}
-    )
     public void testOnFocusChange() {
         // onFocusChange() is implementation details, do NOT test
     }
 
-    @TestTargetNew(
-        level = TestLevel.NOT_NECESSARY,
-        method = "onSizeChanged",
-        args = {int.class, int.class, int.class, int.class}
-    )
     public void testOnSizeChanged() {
         // implementation details
     }

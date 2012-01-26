@@ -16,10 +16,6 @@
 
 package android.os.cts;
 
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
 
 import android.app.cts.ISecondary;
 import android.content.ComponentName;
@@ -32,7 +28,6 @@ import android.os.RemoteCallbackList;
 import android.os.RemoteException;
 import android.test.AndroidTestCase;
 
-@TestTargetClass(RemoteCallbackList.class)
 public class RemoteCallbackListTest extends AndroidTestCase {
     private static final String SERVICE_ACTION = "android.app.REMOTESERVICE";
 
@@ -86,41 +81,6 @@ public class RemoteCallbackListTest extends AndroidTestCase {
         }
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "onCallbackDied",
-            args = {android.os.IInterface.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test register(IInterface), when"
-                  + " 1. Register successfully, it will return true;"
-                  + " 2. Register null, it will throw NPE.",
-            method = "register",
-            args = {android.os.IInterface.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "unregister",
-            args = {android.os.IInterface.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "beginBroadcast",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.PARTIAL,
-            method = "finishBroadcast",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getBroadcastItem",
-            args = {int.class}
-        )
-    })
     public void testRemoteCallbackList() throws Exception {
         // Test constructor(default one).
         MockRemoteCallbackList<IInterface> rc = new MockRemoteCallbackList<IInterface>();
@@ -172,11 +132,6 @@ public class RemoteCallbackListTest extends AndroidTestCase {
         assertTrue(rc.isOnCallbackDiedCalled);
     }
 
-    @TestTargetNew(
-        level = TestLevel.NOT_FEASIBLE,
-        method = "kill",
-        args = {}
-    )
     public void testKill() {
         MockRemoteCallbackList<IInterface> rc = new MockRemoteCallbackList<IInterface>();
         synchronized (mSync) {

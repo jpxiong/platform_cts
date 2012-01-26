@@ -16,38 +16,16 @@
 
 package android.net.cts;
 
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
 
 import android.net.Proxy;
 import android.test.AndroidTestCase;
 
-@TestTargetClass(Proxy.class)
 public class ProxyTest extends AndroidTestCase {
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "Proxy",
-        args = {}
-    )
     public void testConstructor() {
         new Proxy();
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getDefaultPort",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getDefaultHost",
-            args = {}
-        )
-    })
     public void testAccessProperties() {
         final int minValidPort = 0;
         final int maxValidPort = 65535;

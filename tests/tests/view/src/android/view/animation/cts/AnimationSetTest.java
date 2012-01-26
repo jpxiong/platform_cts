@@ -35,13 +35,7 @@ import android.view.animation.TranslateAnimation;
 
 import com.android.cts.stub.R;
 
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
-import dalvik.annotation.ToBeFixed;
 
-@TestTargetClass(AnimationSet.class)
 public class AnimationSetTest
         extends ActivityInstrumentationTestCase2<AnimationTestStubActivity> {
 
@@ -66,18 +60,6 @@ public class AnimationSetTest
         mActivity = getActivity();
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "AnimationSet",
-            args = {boolean.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "AnimationSet",
-            args = {Context.class, AttributeSet.class}
-        )
-    })
     public void testConstructor() {
         new AnimationSet(true);
 
@@ -89,13 +71,6 @@ public class AnimationSetTest
         new AnimationSet(mActivity, attr);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "initialize",
-        args = {int.class, int.class, int.class, int.class}
-    )
-    @ToBeFixed( bug = "1695243", explanation = "Android API javadocs are incomplete."
-            +"It does not only initialize this animation with the dimensions.")
     public void testInitialize() {
         final AnimationSet animationSet = createAnimationSet();
         animationSet.setDuration(ANIMATIONSET_DURATION);
@@ -133,11 +108,6 @@ public class AnimationSetTest
         return animationSet;
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "setFillAfter",
-        args = {boolean.class}
-    )
     public void testSetFillAfter() {
         final AnimationSet animationSet = createAnimationSet();
         assertFalse(animationSet.getFillAfter());
@@ -155,11 +125,6 @@ public class AnimationSetTest
         }
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "setFillBefore",
-        args = {boolean.class}
-    )
     public void testSetFillBefore() {
         final AnimationSet animationSet = createAnimationSet();
         assertTrue(animationSet.getFillBefore());
@@ -177,18 +142,6 @@ public class AnimationSetTest
         }
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setDuration",
-            args = {long.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getDuration",
-            args = {}
-        )
-    })
     public void testAccessDuration() {
         final AnimationSet animationSet = createAnimationSet();
         assertEquals(LONG_CHILD_DURATION, animationSet.getDuration());
@@ -203,11 +156,6 @@ public class AnimationSetTest
         }
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "restrictDuration",
-        args = {long.class}
-    )
     public void testRestrictDuration() {
         final AnimationSet animationSet = new AnimationSet(false);
         Animation child = null;
@@ -240,11 +188,6 @@ public class AnimationSetTest
         assertTrue(originChildRepeatCount[2] > children.get(2).getRepeatCount());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "computeDurationHint",
-        args = {}
-    )
     public void testComputeDurationHint() {
         final AnimationSet animationSet = createAnimationSet();
         final List<Animation> children = animationSet.getAnimations();
@@ -255,11 +198,6 @@ public class AnimationSetTest
         assertEquals(expectedDuration, animationSet.computeDurationHint());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "scaleCurrentDuration",
-        args = {float.class}
-    )
     public void testScaleCurrentDuration() {
         final AnimationSet animationSet = createAnimationSet();
         List<Animation> children = animationSet.getAnimations();
@@ -276,18 +214,6 @@ public class AnimationSetTest
         }
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setRepeatMode",
-            args = {int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getRepeatMode",
-            args = {}
-        )
-    })
     public void testAccessRepeatMode() {
         final AnimationSet animationSet = createAnimationSet();
         animationSet.setRepeatMode(Animation.RESTART);
@@ -307,23 +233,6 @@ public class AnimationSetTest
         }
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setStartOffset",
-            args = {long.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getStartOffset",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "reset",
-            args = {}
-        )
-    })
     public void testAccessStartOffset() {
         final AnimationSet animationSet = createAnimationSet();
         assertEquals(0, animationSet.getStartOffset());
@@ -351,18 +260,6 @@ public class AnimationSetTest
         }
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setStartTime",
-            args = {long.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getStartTime",
-            args = {}
-        )
-    })
     public void testAccessStartTime() {
         final AnimationSet animationSet = createAnimationSet();
         final long[] originChildStartTime = {1000, 2000, 3000};
@@ -384,11 +281,6 @@ public class AnimationSetTest
         }
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "getTransformation",
-        args = {long.class, Transformation.class}
-    )
     public void testGetTransformation() {
         final View animWindowParent = mActivity.findViewById(R.id.anim_window_parent);
         final View animWindow = mActivity.findViewById(R.id.anim_window);
@@ -433,18 +325,6 @@ public class AnimationSetTest
         }
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "addAnimation",
-            args = {Animation.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getAnimations",
-            args = {}
-        )
-    })
     public void testAccessAnimations() {
         final AnimationSet animationSet = new AnimationSet(true);
         final Animation animation1 = new AlphaAnimation(0.0f, 1.0f);
@@ -461,18 +341,6 @@ public class AnimationSetTest
         assertSame(animation3, children.get(2));
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "willChangeTransformationMatrix",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "willChangeBounds",
-            args = {}
-        )
-    })
     public void testWillChangeTransformationMatrix() {
         final AnimationSet animationSet = new AnimationSet(true);
         assertFalse(animationSet.willChangeTransformationMatrix());
@@ -490,11 +358,6 @@ public class AnimationSetTest
         assertTrue(animationSet.willChangeBounds());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "clone",
-        args = {}
-    )
     public void testClone() throws CloneNotSupportedException {
         final MyAnimationSet animationSet = new MyAnimationSet(false);
         final Animation alpha = new AlphaAnimation(0.0f, 1.0f);

@@ -18,11 +18,6 @@ package android.graphics.drawable.cts;
 
 import com.android.cts.stub.R;
 
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
-import dalvik.annotation.ToBeFixed;
 
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
@@ -45,20 +40,7 @@ import android.util.Xml;
 
 import java.io.IOException;
 
-@TestTargetClass(android.graphics.drawable.ShapeDrawable.class)
 public class ShapeDrawableTest extends AndroidTestCase {
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "ShapeDrawable",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "ShapeDrawable",
-            args = {android.graphics.drawable.shapes.Shape.class}
-        )
-    })
     public void testConstructors() {
         new ShapeDrawable();
 
@@ -67,13 +49,6 @@ public class ShapeDrawableTest extends AndroidTestCase {
         new ShapeDrawable(new RectShape());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "draw",
-        args = {android.graphics.Canvas.class}
-    )
-    @ToBeFixed(bug = "1400249", explanation = "It will be tested by functional test, " +
-            "and NPE is not expected.")
     public void testDraw() {
         ShapeDrawable shapeDrawable = new ShapeDrawable();
 
@@ -84,11 +59,6 @@ public class ShapeDrawableTest extends AndroidTestCase {
         }
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "getChangingConfigurations",
-        args = {}
-    )
     public void testGetChangingConfigurations() {
         ShapeDrawable shapeDrawable = new ShapeDrawable();
         assertEquals(0, shapeDrawable.getChangingConfigurations());
@@ -108,11 +78,6 @@ public class ShapeDrawableTest extends AndroidTestCase {
         assertEquals(3, shapeDrawable.getChangingConfigurations());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "getConstantState",
-        args = {}
-    )
     public void testGetConstantState() {
         ShapeDrawable shapeDrawable = new ShapeDrawable();
 
@@ -122,18 +87,6 @@ public class ShapeDrawableTest extends AndroidTestCase {
         assertEquals(1, constantState.getChangingConfigurations());
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setIntrinsicHeight",
-            args = {int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getIntrinsicHeight",
-            args = {}
-        )
-    })
     public void testAccessIntrinsicHeight() {
         ShapeDrawable shapeDrawable = new ShapeDrawable();
         assertEquals(0, shapeDrawable.getIntrinsicHeight());
@@ -148,18 +101,6 @@ public class ShapeDrawableTest extends AndroidTestCase {
         assertEquals(Integer.MAX_VALUE, shapeDrawable.getIntrinsicHeight());
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setIntrinsicWidth",
-            args = {int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getIntrinsicWidth",
-            args = {}
-        )
-    })
     public void testAccessIntrinsicWidth() {
         ShapeDrawable shapeDrawable = new ShapeDrawable();
         assertEquals(0, shapeDrawable.getIntrinsicWidth());
@@ -174,11 +115,6 @@ public class ShapeDrawableTest extends AndroidTestCase {
         assertEquals(Integer.MAX_VALUE, shapeDrawable.getIntrinsicWidth());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "getOpacity",
-        args = {}
-    )
     public void testGetOpacity() {
         ShapeDrawable shapeDrawable = new ShapeDrawable(new RectShape());
         assertEquals(PixelFormat.TRANSLUCENT, shapeDrawable.getOpacity());
@@ -194,24 +130,6 @@ public class ShapeDrawableTest extends AndroidTestCase {
         assertEquals(PixelFormat.TRANSLUCENT, shapeDrawable.getOpacity());
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setPadding",
-            args = {int.class, int.class, int.class, int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setPadding",
-            args = {android.graphics.Rect.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getPadding",
-            args = {android.graphics.Rect.class}
-        )
-    })
-    @ToBeFixed(bug = "1417734", explanation = "NPE is not expected.")
     public void testAccessPadding() {
         ShapeDrawable shapeDrawable = new ShapeDrawable();
         Rect padding = new Rect();
@@ -256,11 +174,6 @@ public class ShapeDrawableTest extends AndroidTestCase {
         }
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "getPaint",
-        args = {}
-    )
     public void testGetPaint() {
         ShapeDrawable shapeDrawable = new ShapeDrawable();
         assertNotNull(shapeDrawable.getPaint());
@@ -268,18 +181,6 @@ public class ShapeDrawableTest extends AndroidTestCase {
                 shapeDrawable.getPaint().getFlags());
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setShaderFactory",
-            args = {android.graphics.drawable.ShapeDrawable.ShaderFactory.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getShaderFactory",
-            args = {}
-        )
-    })
     public void testAccessShaderFactory() {
         ShapeDrawable shapeDrawable = new ShapeDrawable();
         assertNull(shapeDrawable.getShaderFactory());
@@ -298,18 +199,6 @@ public class ShapeDrawableTest extends AndroidTestCase {
         }
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getShape",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setShape",
-            args = {android.graphics.drawable.shapes.Shape.class}
-        )
-    })
     public void testAccessShape() {
         ShapeDrawable shapeDrawable = new ShapeDrawable();
         assertNull(shapeDrawable.getShape());
@@ -322,20 +211,6 @@ public class ShapeDrawableTest extends AndroidTestCase {
         assertNull(shapeDrawable.getShape());
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "inflate",
-            args = {android.content.res.Resources.class, org.xmlpull.v1.XmlPullParser.class,
-                    android.util.AttributeSet.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "inflateTag",
-            args = {java.lang.String.class, android.content.res.Resources.class,
-                    org.xmlpull.v1.XmlPullParser.class, android.util.AttributeSet.class}
-        )
-    })
     public void testInflate() throws XmlPullParserException, IOException {
         final Resources res = mContext.getResources();
 
@@ -359,11 +234,6 @@ public class ShapeDrawableTest extends AndroidTestCase {
         assertTrue(shapeDrawable.extendedAttrsSet);
     }
 
-    @TestTargetNew(
-        level = TestLevel.NOT_NECESSARY,
-        method = "onBoundsChange",
-        args = {android.graphics.Rect.class}
-    )
     public void testOnBoundsChange() {
         // implementation details, do not test.
     }
@@ -395,13 +265,6 @@ public class ShapeDrawableTest extends AndroidTestCase {
         }
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "onDraw",
-        args = {android.graphics.drawable.shapes.Shape.class, android.graphics.Canvas.class,
-                android.graphics.Paint.class}
-    )
-    @ToBeFixed(bug = "1417734", explanation = "NPE is not expected.")
     public void testOnDraw() {
         MockShape mockShape = new MockShape();
         MockShapeDrawable shapeDrawable = new MockShapeDrawable(mockShape);
@@ -432,12 +295,6 @@ public class ShapeDrawableTest extends AndroidTestCase {
         }
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "setAlpha",
-        args = {int.class}
-    )
-    @ToBeFixed(bug = "1386429", explanation = "no getter can not be tested")
     public void testSetAlpha() {
         ShapeDrawable shapeDrawable = new ShapeDrawable();
         shapeDrawable.setAlpha(0);
@@ -446,11 +303,6 @@ public class ShapeDrawableTest extends AndroidTestCase {
         shapeDrawable.setAlpha(256);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "setColorFilter",
-        args = {android.graphics.ColorFilter.class}
-    )
     public void testSetColorFilter() {
         ShapeDrawable shapeDrawable = new ShapeDrawable();
 
@@ -462,11 +314,6 @@ public class ShapeDrawableTest extends AndroidTestCase {
         assertNull(shapeDrawable.getPaint().getColorFilter());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "setDither",
-        args = {boolean.class}
-    )
     public void testSetDither() {
         ShapeDrawable shapeDrawable = new ShapeDrawable();
 
@@ -477,11 +324,6 @@ public class ShapeDrawableTest extends AndroidTestCase {
         assertFalse(shapeDrawable.getPaint().isDither());
     }
 
-    @TestTargetNew(
-        level = TestLevel.NOT_FEASIBLE,
-        method = "mutate",
-        args = {}
-    )
     public void testMutate() {
         // How to load a ShapeDrawable from resources.
     }

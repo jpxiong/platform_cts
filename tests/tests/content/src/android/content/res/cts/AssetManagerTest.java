@@ -33,12 +33,7 @@ import android.util.TypedValue;
 import com.android.cts.stub.R;
 import com.android.internal.util.XmlUtils;
 
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
 
-@TestTargetClass(AssetManager.class)
 public class AssetManagerTest extends AndroidTestCase{
     private AssetManager mAssets;
 
@@ -48,60 +43,6 @@ public class AssetManagerTest extends AndroidTestCase{
         mAssets = mContext.getAssets();
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "open",
-            args = {java.lang.String.class, int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "open",
-            args = {java.lang.String.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "openFd",
-            args = {java.lang.String.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "openNonAssetFd",
-            args = {int.class, java.lang.String.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "openNonAssetFd",
-            args = {java.lang.String.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "openXmlResourceParser",
-            args = {int.class, java.lang.String.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "openXmlResourceParser",
-            args = {java.lang.String.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getLocales",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "list",
-            args = {java.lang.String.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.NOT_FEASIBLE,
-            notes = "Cannot close. Because when it is closed, it won't be opened again."
-                     + " This will cause other testcases fail",
-            method = "close",
-            args = {}
-        )
-    })
     public void testAssetOperations() throws IOException, XmlPullParserException {
         final Resources res = getContext().getResources();
         final TypedValue value = new TypedValue();

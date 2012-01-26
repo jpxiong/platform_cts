@@ -16,10 +16,6 @@
 
 package android.text.cts;
 
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
 
 import android.content.Context;
 import android.test.AndroidTestCase;
@@ -28,7 +24,6 @@ import android.text.ClipboardManager;
 /**
  * Test {@link ClipboardManager}.
  */
-@TestTargetClass(ClipboardManager.class)
 public class ClipboardManagerTest extends AndroidTestCase {
     private ClipboardManager mClipboardManager;
 
@@ -38,18 +33,6 @@ public class ClipboardManagerTest extends AndroidTestCase {
         mClipboardManager = (ClipboardManager) mContext.getSystemService(Context.CLIPBOARD_SERVICE);
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setText",
-            args = {CharSequence.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getText",
-            args = {}
-        )
-    })
     public void testAccessText() {
         // set the expected value
         CharSequence expected = "test";
@@ -57,11 +40,6 @@ public class ClipboardManagerTest extends AndroidTestCase {
         assertEquals(expected, mClipboardManager.getText());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "hasText",
-        args = {}
-    )
     public void testHasText() {
         mClipboardManager.setText("");
         assertFalse(mClipboardManager.hasText());

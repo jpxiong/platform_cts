@@ -18,27 +18,8 @@ package android.database.sqlite.cts;
 
 import android.database.sqlite.SQLiteConstraintException;
 import android.test.AndroidTestCase;
-import dalvik.annotation.TestTargets;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
 
-@TestTargetClass(android.database.sqlite.SQLiteConstraintException.class)
 public class SQLiteConstraintExceptionTest extends AndroidTestCase {
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test constructors",
-            method = "SQLiteConstraintException",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test constructors",
-            method = "SQLiteConstraintException",
-            args = {java.lang.String.class}
-        )
-    })
     public void testConstructor() {
         new SQLiteConstraintException();
 

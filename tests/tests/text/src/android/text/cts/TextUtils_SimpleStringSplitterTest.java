@@ -20,23 +20,11 @@ import java.util.Iterator;
 
 import android.test.AndroidTestCase;
 import android.text.TextUtils.SimpleStringSplitter;
-import dalvik.annotation.TestTargets;
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.ToBeFixed;
 
 /**
  * Test {@link SimpleStringSplitter}.
  */
-@TestTargetClass(SimpleStringSplitter.class)
 public class TextUtils_SimpleStringSplitterTest extends AndroidTestCase {
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test constructor",
-        method = "TextUtils.SimpleStringSplitter",
-        args = {char.class}
-    )
     public void testConstructor() {
         new SimpleStringSplitter('|');
 
@@ -45,12 +33,6 @@ public class TextUtils_SimpleStringSplitterTest extends AndroidTestCase {
         new SimpleStringSplitter(Character.MIN_VALUE);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test hasNext method",
-        method = "hasNext",
-        args = {}
-    )
     public void testHasNext() {
         SimpleStringSplitter simpleStringSplitter = new SimpleStringSplitter('|');
         assertFalse(simpleStringSplitter.hasNext());
@@ -68,12 +50,6 @@ public class TextUtils_SimpleStringSplitterTest extends AndroidTestCase {
         assertFalse(simpleStringSplitter.hasNext());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test iterator method",
-        method = "iterator",
-        args = {}
-    )
     public void testIterator() {
         SimpleStringSplitter simpleStringSplitter = new SimpleStringSplitter('|');
 
@@ -91,14 +67,6 @@ public class TextUtils_SimpleStringSplitterTest extends AndroidTestCase {
         assertFalse(iterator.hasNext());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test next method",
-        method = "next",
-        args = {}
-    )
-    @ToBeFixed(bug="1436930", explanation="should throw NoSuchElementException " +
-            "when there are no more elements")
     public void testNext1() {
         SimpleStringSplitter simpleStringSplitter = new SimpleStringSplitter(',');
 
@@ -112,15 +80,6 @@ public class TextUtils_SimpleStringSplitterTest extends AndroidTestCase {
         }
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test next method",
-        method = "next",
-        args = {}
-    )
-    @ToBeFixed(bug="1448860", explanation="The comments on SimpleStringSplitter are quite" +
-            " specific that if the final char of the string to split is a delimiter then" +
-            " no empty string should be returned for the text after the delimiter")
     public void testNext2() {
         SimpleStringSplitter simpleStringSplitter = new SimpleStringSplitter(',');
 
@@ -137,12 +96,6 @@ public class TextUtils_SimpleStringSplitterTest extends AndroidTestCase {
         assertEquals("", simpleStringSplitter.next());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test remove method",
-        method = "remove",
-        args = {}
-    )
     public void testRemove() {
         SimpleStringSplitter simpleStringSplitter = new SimpleStringSplitter(',');
 
@@ -153,13 +106,6 @@ public class TextUtils_SimpleStringSplitterTest extends AndroidTestCase {
         }
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test setString method",
-        method = "setString",
-        args = {java.lang.String.class}
-    )
-    @ToBeFixed( bug = "1371108", explanation = "NullPointerException issue")
     public void testSetString() {
         SimpleStringSplitter simpleStringSplitter = new SimpleStringSplitter(',');
 

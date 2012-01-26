@@ -18,10 +18,6 @@ package android.widget.cts;
 
 import com.android.cts.stub.R;
 
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
 
 import org.xmlpull.v1.XmlPullParserException;
 
@@ -34,28 +30,7 @@ import java.io.IOException;
 /**
  * Test {@link LayoutParams}.
  */
-@TestTargetClass(LayoutParams.class)
 public class Gallery_LayoutParamsTest extends AndroidTestCase {
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test constructor(s) of {@link LayoutParams}",
-            method = "LayoutParams",
-            args = {android.content.Context.class, android.util.AttributeSet.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test constructor(s) of {@link LayoutParams}",
-            method = "LayoutParams",
-            args = {int.class, int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test constructor(s) of {@link LayoutParams}",
-            method = "LayoutParams",
-            args = {android.view.ViewGroup.LayoutParams.class}
-        )
-    })
     public void testConstructor() throws XmlPullParserException, IOException {
         XmlResourceParser p = mContext.getResources().getLayout(R.layout.gallery_test);
         WidgetTestUtils.beginDocument(p, "LinearLayout");

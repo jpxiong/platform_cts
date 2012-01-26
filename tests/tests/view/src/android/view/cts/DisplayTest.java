@@ -21,53 +21,9 @@ import android.test.AndroidTestCase;
 import android.util.DisplayMetrics;
 import android.view.Display;
 import android.view.WindowManager;
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
-import dalvik.annotation.ToBeFixed;
 
-@TestTargetClass(Display.class)
 public class DisplayTest extends AndroidTestCase {
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getDisplayId",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getHeight",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getWidth",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.NOT_FEASIBLE,
-            notes = "don't know what orientation the default display has",
-            method = "getOrientation",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getMetrics",
-            args = {DisplayMetrics.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getPixelFormat",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getRefreshRate",
-            args = {}
-        )
-    })
     /**
      * Test the properties of Display, they are:
      * 1 index of this display
@@ -78,7 +34,6 @@ public class DisplayTest extends AndroidTestCase {
      * 6 refresh rate of this display in frames per second
      * 7 Initialize a DisplayMetrics object from this display's data
      */
-    @ToBeFixed(bug="1695243", explanation="don't know what orientation the default display has")
     public void testGetDisplayAttrs() {
         Context con = getContext();
         WindowManager windowManager = (WindowManager) con.getSystemService(Context.WINDOW_SERVICE);

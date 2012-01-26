@@ -16,10 +16,6 @@
 
 package android.widget.cts;
 
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.ToBeFixed;
 
 import android.database.DataSetObserver;
 import android.test.AndroidTestCase;
@@ -37,7 +33,6 @@ import java.util.ArrayList;
 /**
  * Test {@link HeaderViewListAdapter}.
  */
-@TestTargetClass(HeaderViewListAdapter.class)
 public class HeaderViewListAdapterTest extends AndroidTestCase {
 
     @Override
@@ -45,12 +40,6 @@ public class HeaderViewListAdapterTest extends AndroidTestCase {
         super.setUp();
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test constructor(s) of {@link HeaderViewListAdapter}",
-        method = "HeaderViewListAdapter",
-        args = {ArrayList.class, ArrayList.class, ListAdapter.class}
-    )
     public void testConstructor() {
         ArrayList<ListView.FixedViewInfo> header = new ArrayList<ListView.FixedViewInfo>();
         ArrayList<ListView.FixedViewInfo> footer = new ArrayList<ListView.FixedViewInfo>(5);
@@ -59,12 +48,6 @@ public class HeaderViewListAdapterTest extends AndroidTestCase {
         new HeaderViewListAdapter(header, footer, new HeaderViewEmptyAdapter());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test {@link HeaderViewListAdapter#getHeadersCount()}",
-        method = "getHeadersCount",
-        args = {}
-    )
     public void testGetHeadersCount() {
         HeaderViewListAdapter headerViewListAdapter = new HeaderViewListAdapter(null, null, null);
         assertEquals(0, headerViewListAdapter.getHeadersCount());
@@ -76,12 +59,6 @@ public class HeaderViewListAdapterTest extends AndroidTestCase {
         assertEquals(1, headerViewListAdapter.getHeadersCount());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test {@link HeaderViewListAdapter#getFootersCount()}",
-        method = "getFootersCount",
-        args = {}
-    )
     public void testGetFootersCount() {
         HeaderViewListAdapter headerViewListAdapter = new HeaderViewListAdapter(null, null, null);
         assertEquals(0, headerViewListAdapter.getFootersCount());
@@ -93,12 +70,6 @@ public class HeaderViewListAdapterTest extends AndroidTestCase {
         assertEquals(1, headerViewListAdapter.getFootersCount());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test {@link HeaderViewListAdapter#isEmpty()}",
-        method = "isEmpty",
-        args = {}
-    )
     public void testIsEmpty() {
         HeaderViewListAdapter headerViewListAdapter = new HeaderViewListAdapter(null, null, null);
         assertTrue(headerViewListAdapter.isEmpty());
@@ -112,13 +83,6 @@ public class HeaderViewListAdapterTest extends AndroidTestCase {
         assertFalse(headerViewListAdapter.isEmpty());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test {@link HeaderViewListAdapter#removeHeader(View)}",
-        method = "removeHeader",
-        args = {android.view.View.class}
-    )
-    @ToBeFixed(bug = "1695243", explanation = "Android API javadocs are incomplete.")
     public void testRemoveHeader() {
         ListView lv = new ListView(getContext());
         ArrayList<ListView.FixedViewInfo> header = new ArrayList<ListView.FixedViewInfo>(4);
@@ -145,13 +109,6 @@ public class HeaderViewListAdapterTest extends AndroidTestCase {
         }
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test {@link HeaderViewListAdapter#removeFooter(View)}",
-        method = "removeFooter",
-        args = {android.view.View.class}
-    )
-    @ToBeFixed(bug = "1695243", explanation = "Android API javadocs are incomplete.")
     public void testRemoveFooter() {
         ListView lv = new ListView(getContext());
         ArrayList<ListView.FixedViewInfo> footer = new ArrayList<ListView.FixedViewInfo>(4);
@@ -178,12 +135,6 @@ public class HeaderViewListAdapterTest extends AndroidTestCase {
         }
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test {@link HeaderViewListAdapter#getCount()}",
-        method = "getCount",
-        args = {}
-    )
     public void testGetCount() {
         HeaderViewListAdapter headerViewListAdapter = new HeaderViewListAdapter(null, null, null);
         assertEquals(0, headerViewListAdapter.getCount());
@@ -219,12 +170,6 @@ public class HeaderViewListAdapterTest extends AndroidTestCase {
         assertEquals(5, headerViewListAdapter.getCount());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test {@link HeaderViewListAdapter#areAllItemsEnabled()}",
-        method = "areAllItemsEnabled",
-        args = {}
-    )
     public void testAreAllItemsEnabled() {
         HeaderViewListAdapter headerViewListAdapter = new HeaderViewListAdapter(null, null, null);
         assertTrue(headerViewListAdapter.areAllItemsEnabled());
@@ -238,12 +183,6 @@ public class HeaderViewListAdapterTest extends AndroidTestCase {
         assertFalse(headerViewListAdapter.areAllItemsEnabled());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test {@link HeaderViewListAdapter#isEnabled(int)}",
-        method = "isEnabled",
-        args = {int.class}
-    )
     public void testIsEnabled() {
         HeaderViewFullAdapter fullAdapter = new HeaderViewFullAdapter();
         HeaderViewListAdapter headerViewListAdapter =
@@ -272,12 +211,6 @@ public class HeaderViewListAdapterTest extends AndroidTestCase {
         assertFalse(headerViewListAdapter.isEnabled(2));
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test {@link HeaderViewListAdapter#getItem(int)}",
-        method = "getItem",
-        args = {int.class}
-    )
     public void testGetItem() {
         ListView lv = new ListView(getContext());
         ArrayList<ListView.FixedViewInfo> header = new ArrayList<ListView.FixedViewInfo>(4);
@@ -309,12 +242,6 @@ public class HeaderViewListAdapterTest extends AndroidTestCase {
         assertSame(data4, headerViewListAdapter.getItem(4));
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test {@link HeaderViewListAdapter#getItemId(int)}",
-        method = "getItemId",
-        args = {int.class}
-    )
     public void testGetItemId() {
         ListView lv = new ListView(getContext());
         ArrayList<ListView.FixedViewInfo> header = new ArrayList<ListView.FixedViewInfo>(4);
@@ -334,12 +261,6 @@ public class HeaderViewListAdapterTest extends AndroidTestCase {
         assertEquals(fullAdapter.getItemId(0), headerViewListAdapter.getItemId(2));
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "",
-        method = "hasStableIds",
-        args = {}
-    )
     public void testHasStableIds() {
         HeaderViewListAdapter headerViewListAdapter = new HeaderViewListAdapter(null, null, null);
         assertFalse(headerViewListAdapter.hasStableIds());
@@ -349,14 +270,6 @@ public class HeaderViewListAdapterTest extends AndroidTestCase {
         assertTrue(headerViewListAdapter.hasStableIds());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test {@link HeaderViewListAdapter#getView(int, View, ViewGroup)}",
-        method = "getView",
-        args = {int.class, android.view.View.class, android.view.ViewGroup.class}
-    )
-    @ToBeFixed(bug = "1695243", explanation = "Android API javadocs are incomplete, " +
-            "should add @throw into javadoc.")
     public void testGetView() {
         ListView lv = new ListView(getContext());
         ArrayList<ListView.FixedViewInfo> header = new ArrayList<ListView.FixedViewInfo>(4);
@@ -387,12 +300,6 @@ public class HeaderViewListAdapterTest extends AndroidTestCase {
         assertSame(expected, headerViewListAdapter.getView(2, null, null));
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test {@link HeaderViewListAdapter#getItemViewType(int)}",
-        method = "getItemViewType",
-        args = {int.class}
-    )
     public void testGetItemViewType() {
         HeaderViewListAdapter headerViewListAdapter = new HeaderViewListAdapter(null, null, null);
         assertEquals(AdapterView.ITEM_VIEW_TYPE_HEADER_OR_FOOTER,
@@ -407,12 +314,6 @@ public class HeaderViewListAdapterTest extends AndroidTestCase {
                 headerViewListAdapter.getItemViewType(2));
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test {@link HeaderViewListAdapter#getViewTypeCount()}",
-        method = "getViewTypeCount",
-        args = {}
-    )
     public void testGetViewTypeCount() {
         HeaderViewListAdapter headerViewListAdapter = new HeaderViewListAdapter(null, null, null);
         assertEquals(1, headerViewListAdapter.getViewTypeCount());
@@ -422,12 +323,6 @@ public class HeaderViewListAdapterTest extends AndroidTestCase {
         assertEquals(fullAdapter.getViewTypeCount(), headerViewListAdapter.getViewTypeCount());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test {@link HeaderViewListAdapter#registerDataSetObserver(DataSetObserver)}",
-        method = "registerDataSetObserver",
-        args = {android.database.DataSetObserver.class}
-    )
     public void testRegisterDataSetObserver() {
         HeaderViewFullAdapter fullAdapter = new HeaderViewFullAdapter();
         HeaderViewListAdapter headerViewListAdapter =
@@ -437,12 +332,6 @@ public class HeaderViewListAdapterTest extends AndroidTestCase {
         assertSame(observer, fullAdapter.getDataSetObserver());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test {@link HeaderViewListAdapter#unregisterDataSetObserver(DataSetObserver)}",
-        method = "unregisterDataSetObserver",
-        args = {android.database.DataSetObserver.class}
-    )
     public void testUnregisterDataSetObserver() {
         HeaderViewFullAdapter fullAdapter = new HeaderViewFullAdapter();
         HeaderViewListAdapter headerViewListAdapter =
@@ -456,12 +345,6 @@ public class HeaderViewListAdapterTest extends AndroidTestCase {
         assertNull(fullAdapter.getDataSetObserver());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test {@link HeaderViewListAdapter#getFilter()}",
-        method = "getFilter",
-        args = {}
-    )
     public void testGetFilter() {
         HeaderViewListAdapter headerViewListAdapter = new HeaderViewListAdapter(null, null, null);
         assertNull(headerViewListAdapter.getFilter());
@@ -475,12 +358,6 @@ public class HeaderViewListAdapterTest extends AndroidTestCase {
         assertSame(emptyAdapter.getFilter(), headerViewListAdapter.getFilter());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test {@link HeaderViewListAdapter#getWrappedAdapter()}",
-        method = "getWrappedAdapter",
-        args = {}
-    )
     public void testGetWrappedAdapter() {
         HeaderViewListAdapter headerViewListAdapter = new HeaderViewListAdapter(null, null, null);
         assertNull(headerViewListAdapter.getWrappedAdapter());

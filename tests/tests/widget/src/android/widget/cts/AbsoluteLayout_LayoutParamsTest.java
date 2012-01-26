@@ -18,10 +18,6 @@ package android.widget.cts;
 
 import com.android.cts.stub.R;
 
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
 
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
@@ -35,7 +31,6 @@ import android.widget.AbsoluteLayout.LayoutParams;
 import java.io.IOException;
 
 @SuppressWarnings("deprecation")
-@TestTargetClass(LayoutParams.class)
 public class AbsoluteLayout_LayoutParamsTest extends AndroidTestCase {
 
     private AttributeSet getAttributeSet() throws XmlPullParserException, IOException {
@@ -44,23 +39,6 @@ public class AbsoluteLayout_LayoutParamsTest extends AndroidTestCase {
         return Xml.asAttributeSet(parser);
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "AbsoluteLayout.LayoutParams",
-            args = {int.class, int.class, int.class, int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "AbsoluteLayout.LayoutParams",
-            args = {android.content.Context.class, android.util.AttributeSet.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "AbsoluteLayout.LayoutParams",
-            args = {android.view.ViewGroup.LayoutParams.class}
-        )
-    })
     public void testConstructor() throws XmlPullParserException, IOException {
         LayoutParams layoutParams;
 
@@ -79,11 +57,6 @@ public class AbsoluteLayout_LayoutParamsTest extends AndroidTestCase {
         new AbsoluteLayout.LayoutParams(mContext, getAttributeSet());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "debug",
-        args = {java.lang.String.class}
-    )
     public void testDebug() {
         LayoutParams layoutParams = new AbsoluteLayout.LayoutParams(1, 2, 3, 4);
         assertNotNull(layoutParams.debug("test: "));

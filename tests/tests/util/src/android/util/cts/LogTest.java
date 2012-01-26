@@ -18,106 +18,15 @@ package android.util.cts;
 
 import android.test.AndroidTestCase;
 import android.util.Log;
-import dalvik.annotation.TestTargets;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
 
 /**
  * 
  * Test Log
  *
  */
-@TestTargetClass(Log.class)
 public class LogTest extends AndroidTestCase{
     private static final String TAG = "LogTest";
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test Log operations.",
-            method = "d",
-            args = {java.lang.String.class, java.lang.String.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test Log operations.",
-            method = "d",
-            args = {java.lang.String.class, java.lang.String.class, java.lang.Throwable.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test Log operations.",
-            method = "e",
-            args = {java.lang.String.class, java.lang.String.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test Log operations.",
-            method = "e",
-            args = {java.lang.String.class, java.lang.String.class, java.lang.Throwable.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test Log operations.",
-            method = "getStackTraceString",
-            args = {java.lang.Throwable.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test Log operations.",
-            method = "i",
-            args = {java.lang.String.class, java.lang.String.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test Log operations.",
-            method = "i",
-            args = {java.lang.String.class, java.lang.String.class, java.lang.Throwable.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test Log operations.",
-            method = "isLoggable",
-            args = {java.lang.String.class, int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test Log operations.",
-            method = "println",
-            args = {int.class, java.lang.String.class, java.lang.String.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test Log operations.",
-            method = "v",
-            args = {java.lang.String.class, java.lang.String.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test Log operations.",
-            method = "v",
-            args = {java.lang.String.class, java.lang.String.class, java.lang.Throwable.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test Log operations.",
-            method = "w",
-            args = {java.lang.String.class, java.lang.String.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test Log operations.",
-            method = "w",
-            args = {java.lang.String.class, java.lang.String.class, java.lang.Throwable.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test Log operations.",
-            method = "w",
-            args = {java.lang.String.class, java.lang.Throwable.class}
-        )
-    })
     public void testLogOperations() {
         final String msg = "Test Log operations.";
         Exception tr = null;

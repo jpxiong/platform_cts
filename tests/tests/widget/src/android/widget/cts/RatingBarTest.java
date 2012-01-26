@@ -18,10 +18,6 @@ package android.widget.cts;
 
 import com.android.cts.stub.R;
 
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
 
 import android.content.Context;
 import android.test.ActivityInstrumentationTestCase2;
@@ -32,7 +28,6 @@ import android.widget.RatingBar.OnRatingBarChangeListener;
 /**
  * Test {@link RatingBar}.
  */
-@TestTargetClass(RatingBar.class)
 public class RatingBarTest extends ActivityInstrumentationTestCase2<RatingBarStubActivity> {
     private Context mContext;
     private RatingBarStubActivity mActivity;
@@ -49,26 +44,6 @@ public class RatingBarTest extends ActivityInstrumentationTestCase2<RatingBarStu
         mContext = getInstrumentation().getContext();
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test constructor(s) of {@link RatingBar}",
-            method = "RatingBar",
-            args = {android.content.Context.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test constructor(s) of {@link RatingBar}",
-            method = "RatingBar",
-            args = {android.content.Context.class, android.util.AttributeSet.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test constructor(s) of {@link RatingBar}",
-            method = "RatingBar",
-            args = {android.content.Context.class, android.util.AttributeSet.class, int.class}
-        )
-    })
     public void testConstructor() {
         new RatingBar(mContext, null, com.android.internal.R.attr.ratingBarStyle);
 
@@ -84,20 +59,6 @@ public class RatingBarTest extends ActivityInstrumentationTestCase2<RatingBarStu
         assertEquals(0.2f, ratingBar.getStepSize());
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test methods which access OnRatingBarChangeListener",
-            method = "getOnRatingBarChangeListener",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test methods which access OnRatingBarChangeListener",
-            method = "setOnRatingBarChangeListener",
-            args = {android.widget.RatingBar.OnRatingBarChangeListener.class}
-        )
-    })
     @UiThreadTest
     public void testAccessOnRatingBarChangeListener() {
         RatingBar ratingBar = (RatingBar)mActivity.findViewById(R.id.ratingbar_constructor);
@@ -119,20 +80,6 @@ public class RatingBarTest extends ActivityInstrumentationTestCase2<RatingBarStu
         assertFalse(listener.hasCalledOnRatingChanged());
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test methods which access isIndicator",
-            method = "isIndicator",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test methods which access isIndicator",
-            method = "setIsIndicator",
-            args = {boolean.class}
-        )
-    })
     public void testAccessIndicator() {
         RatingBar ratingBar = new RatingBar(mContext);
 
@@ -143,20 +90,6 @@ public class RatingBarTest extends ActivityInstrumentationTestCase2<RatingBarStu
         assertFalse(ratingBar.isIndicator());
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test methods which access NumStars",
-            method = "setNumStars",
-            args = {int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test methods which access NumStars",
-            method = "getNumStars",
-            args = {}
-        )
-    })
     public void testAccessNumStars() {
         MockRatingBar mockRatingBar = new MockRatingBar(mContext);
 
@@ -179,20 +112,6 @@ public class RatingBarTest extends ActivityInstrumentationTestCase2<RatingBarStu
         assertEquals(Integer.MAX_VALUE, mockRatingBar.getNumStars());
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test methods which access Rating",
-            method = "getRating",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test methods which access Rating",
-            method = "setRating",
-            args = {float.class}
-        )
-    })
     public void testAccessRating() {
         RatingBar ratingBar = new RatingBar(mContext);
 
@@ -209,12 +128,6 @@ public class RatingBarTest extends ActivityInstrumentationTestCase2<RatingBarStu
         assertEquals((float) ratingBar.getNumStars(), ratingBar.getRating());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test setMax(int max)",
-        method = "setMax",
-        args = {int.class}
-    )
     public void testSetMax() {
         RatingBar ratingBar = new RatingBar(mContext);
 
@@ -233,20 +146,6 @@ public class RatingBarTest extends ActivityInstrumentationTestCase2<RatingBarStu
         assertEquals(Integer.MAX_VALUE, ratingBar.getMax());
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test methods which access StepSize",
-            method = "getStepSize",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test methods which access StepSize",
-            method = "setStepSize",
-            args = {float.class}
-        )
-    })
     public void testAccessStepSize() {
         RatingBar ratingBar = new RatingBar(mContext);
 

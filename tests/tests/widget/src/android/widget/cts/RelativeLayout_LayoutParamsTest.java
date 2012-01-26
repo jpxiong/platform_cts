@@ -18,11 +18,6 @@ package android.widget.cts;
 
 import com.android.cts.stub.R;
 
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
-import dalvik.annotation.ToBeFixed;
 
 import android.test.ActivityInstrumentationTestCase2;
 import android.test.ViewAsserts;
@@ -33,7 +28,6 @@ import android.widget.RelativeLayout;
 /**
  * Test {@link RelativeLayout.LayoutParams}.
  */
-@TestTargetClass(RelativeLayout.LayoutParams.class)
 public class RelativeLayout_LayoutParamsTest extends
         ActivityInstrumentationTestCase2<RelativeLayoutStubActivity> {
 
@@ -41,28 +35,6 @@ public class RelativeLayout_LayoutParamsTest extends
         super("com.android.cts.stub", RelativeLayoutStubActivity.class);
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "RelativeLayout.LayoutParams",
-            args = {android.content.Context.class, android.util.AttributeSet.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "RelativeLayout.LayoutParams",
-            args = {int.class, int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "RelativeLayout.LayoutParams",
-            args = {android.view.ViewGroup.LayoutParams.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "RelativeLayout.LayoutParams",
-            args = {android.view.ViewGroup.MarginLayoutParams.class}
-        )
-    })
     public void testConstructor() {
         try {
             new RelativeLayout.LayoutParams(getActivity(), null);
@@ -188,24 +160,6 @@ public class RelativeLayout_LayoutParamsTest extends
         assertEquals(R.id.relative_view3, rules[RelativeLayout.ALIGN_BOTTOM]);
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "addRule",
-            args = {int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getRules",
-            args = {}
-        )
-    })
-     @ToBeFixed(bug = "1695243", explanation =
-             "the javadoc for getRules() or addRule(int) is incomplete." +
-             "1. not clear what is actual value for 'false' mentioned in javadoc of getRules()." +
-             "2. not clear what '-' means in '- for false' in javadoc of addRules()." +
-             "3. not clear what is supposed to happen when verb is exceptional." +
-             "4. not clear what is supposed to happen if verb is must refer to another sibling.")
     public void testAccessRule1() {
         RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(200, 300);
         int rules[]= layoutParams.getRules();
@@ -237,20 +191,6 @@ public class RelativeLayout_LayoutParamsTest extends
         }
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "addRule",
-            args = {int.class, int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getRules",
-            args = {}
-        )
-    })
-    @ToBeFixed(bug = "1695243", explanation = "the javadoc for addRule(int, int) is incomplete." +
-            "1. not clear what is supposed to happen when verb is exceptional.")
     public void testAccessRule2() {
         int rules[];
         RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(200, 300);
@@ -304,11 +244,6 @@ public class RelativeLayout_LayoutParamsTest extends
         assertEquals(Integer.MIN_VALUE, rules[RelativeLayout.ALIGN_LEFT]);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "debug",
-        args = {java.lang.String.class}
-    )
     public void testDebug() {
         RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(200, 300);
         assertNotNull(layoutParams.debug("test: "));

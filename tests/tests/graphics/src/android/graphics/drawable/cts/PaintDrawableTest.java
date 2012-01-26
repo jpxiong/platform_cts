@@ -18,11 +18,6 @@ package android.graphics.drawable.cts;
 
 import com.android.cts.stub.R;
 
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
-import dalvik.annotation.ToBeFixed;
 
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
@@ -38,32 +33,13 @@ import android.util.Xml;
 
 import java.io.IOException;
 
-@TestTargetClass(android.graphics.drawable.PaintDrawable.class)
 public class PaintDrawableTest extends AndroidTestCase {
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "PaintDrawable",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "PaintDrawable",
-            args = {int.class}
-        )
-    })
-    @ToBeFixed(bug = "1695243", explanation = "Android API javadocs are incomplete")
     public void testConstructor() {
         new PaintDrawable();
         new PaintDrawable(0x0);
         new PaintDrawable(0xffffffff);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "setCornerRadius",
-        args = {float.class}
-    )
     public void testSetCornerRadius() {
         PaintDrawable paintDrawable;
 
@@ -88,12 +64,6 @@ public class PaintDrawableTest extends AndroidTestCase {
         assertNull(paintDrawable.getShape());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "setCornerRadii",
-        args = {float[].class}
-    )
-    @ToBeFixed(bug = "1695243", explanation = "Android API javadocs are incomplete")
     public void testSetCornerRadii() {
         PaintDrawable paintDrawable;
 
@@ -130,12 +100,6 @@ public class PaintDrawableTest extends AndroidTestCase {
         assertTrue(paintDrawable.getShape() instanceof RoundRectShape);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "inflateTag",
-        args = {java.lang.String.class, android.content.res.Resources.class,
-                org.xmlpull.v1.XmlPullParser.class, android.util.AttributeSet.class}
-    )
     public void testInflateTag() throws XmlPullParserException, IOException {
         // Test name is not 'corners', and default executing path will load super's method.
         XmlResourceParser parser = getParser();

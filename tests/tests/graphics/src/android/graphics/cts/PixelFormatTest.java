@@ -18,11 +18,7 @@ package android.graphics.cts;
 
 import junit.framework.TestCase;
 import android.graphics.PixelFormat;
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
 
-@TestTargetClass(PixelFormat.class)
 public class PixelFormatTest extends TestCase {
 
     private PixelFormat mPixelFormat;
@@ -33,22 +29,12 @@ public class PixelFormatTest extends TestCase {
         mPixelFormat = null;
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "PixelFormat",
-        args = {}
-    )
     public void testConstructor() {
         mPixelFormat = null;
         // new the PixelFormat instance
         mPixelFormat = new PixelFormat();
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "getPixelFormatInfo",
-        args = {int.class, android.graphics.PixelFormat.class}
-    )
     public void testGetPixelFormatInfo() {
 
         // new the PixelFormat instance
@@ -130,11 +116,6 @@ public class PixelFormatTest extends TestCase {
         }
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "formatHasAlpha",
-        args = {int.class}
-    )
     public void testFormatHasAlpha() {
 
         assertTrue(PixelFormat.formatHasAlpha(PixelFormat.RGBA_8888));

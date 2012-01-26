@@ -18,27 +18,8 @@ package android.database.cts;
 
 import android.database.StaleDataException;
 import android.test.AndroidTestCase;
-import dalvik.annotation.TestTargets;
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargetClass;
 
-@TestTargetClass(android.database.StaleDataException.class)
 public class StaleDataExceptionTest extends AndroidTestCase {
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test constructors of StaleDataException.",
-            method = "StaleDataException",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test constructors of StaleDataException.",
-            method = "StaleDataException",
-            args = {java.lang.String.class}
-        )
-    })
     public void testConstructors() {
         String expected1 = "Expected exception message";
 

@@ -16,10 +16,6 @@
 
 package android.net.cts;
 
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
 
 import android.net.TrafficStats;
 import android.os.Process;
@@ -31,14 +27,7 @@ import java.io.OutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
 
-@TestTargetClass(TrafficStats.class)
 public class TrafficStatsTest extends AndroidTestCase {
-    @TestTargets({
-        @TestTargetNew(level = TestLevel.SUFFICIENT, method = "getMobileTxPackets"),
-        @TestTargetNew(level = TestLevel.SUFFICIENT, method = "getMobileRxPackets"),
-        @TestTargetNew(level = TestLevel.SUFFICIENT, method = "getMobileTxBytes"),
-        @TestTargetNew(level = TestLevel.SUFFICIENT, method = "getMobileRxBytes")
-    })
     public void testGetMobileStats() {
         // We can't assume a mobile network is even present in this test, so
         // we simply assert that a valid value is returned.
@@ -53,18 +42,6 @@ public class TrafficStatsTest extends AndroidTestCase {
                    TrafficStats.getMobileRxBytes() >= 0);
     }
 
-    @TestTargets({
-        @TestTargetNew(level = TestLevel.PARTIAL_COMPLETE, method = "getMobileTxPackets"),
-        @TestTargetNew(level = TestLevel.PARTIAL_COMPLETE, method = "getMobileRxPackets"),
-        @TestTargetNew(level = TestLevel.PARTIAL_COMPLETE, method = "getMobileTxBytes"),
-        @TestTargetNew(level = TestLevel.PARTIAL_COMPLETE, method = "getMobileRxBytes"),
-        @TestTargetNew(level = TestLevel.PARTIAL_COMPLETE, method = "getTotalTxPackets"),
-        @TestTargetNew(level = TestLevel.PARTIAL_COMPLETE, method = "getTotalRxPackets"),
-        @TestTargetNew(level = TestLevel.PARTIAL_COMPLETE, method = "getTotalTxBytes"),
-        @TestTargetNew(level = TestLevel.PARTIAL_COMPLETE, method = "getTotalRxBytes"),
-        @TestTargetNew(level = TestLevel.PARTIAL_COMPLETE, method = "getUidTxBytes"),
-        @TestTargetNew(level = TestLevel.PARTIAL_COMPLETE, method = "getUidRxBytes")
-    })
     public void testTrafficStatsForLocalhost() throws IOException {
         long mobileTxPacketsBefore = TrafficStats.getTotalTxPackets();
         long mobileRxPacketsBefore = TrafficStats.getTotalRxPackets();

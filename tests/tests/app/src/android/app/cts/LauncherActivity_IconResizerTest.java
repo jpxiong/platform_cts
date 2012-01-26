@@ -18,17 +18,12 @@ package android.app.cts;
 
 import com.android.cts.stub.R;
 
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
 
 import android.app.LauncherActivity;
 import android.app.LauncherActivity.IconResizer;
 import android.graphics.drawable.Drawable;
 import android.test.ActivityInstrumentationTestCase2;
 
-@TestTargetClass(LauncherActivity.IconResizer.class)
 public class LauncherActivity_IconResizerTest extends
         ActivityInstrumentationTestCase2<LauncherActivityStub> {
 
@@ -45,18 +40,6 @@ public class LauncherActivity_IconResizerTest extends
         mActivity = getActivity();
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "createIconThumbnail",
-            args = {Drawable.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "LauncherActivity.IconResizer",
-            args = {}
-        )
-    })
     public void testIconResizer() throws Throwable {
         final IconResizer ir = mActivity.new IconResizer();
         final Drawable d = mActivity.getResources().getDrawable(R.drawable.pass);

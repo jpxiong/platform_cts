@@ -28,13 +28,7 @@ import android.graphics.drawable.Drawable;
 import android.graphics.drawable.DrawableContainer;
 import android.graphics.drawable.DrawableContainer.DrawableContainerState;
 import android.graphics.drawable.LevelListDrawable;
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
-import dalvik.annotation.ToBeFixed;
 
-@TestTargetClass(DrawableContainer.class)
 public class DrawableContainerTest extends TestCase {
     private DrawableContainerState mDrawableContainerState;
 
@@ -52,11 +46,6 @@ public class DrawableContainerTest extends TestCase {
         mDrawableContainer = new MockDrawableContainer();
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "draw",
-        args = {android.graphics.Canvas.class}
-    )
     public void testDraw() {
         assertConstantStateNotSet();
         assertNull(mDrawableContainer.getCurrent());
@@ -77,13 +66,6 @@ public class DrawableContainerTest extends TestCase {
         assertTrue(dr.hasDrawCalled());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "getChangingConfigurations",
-        args = {}
-    )
-    @ToBeFixed(bug = "1417734", explanation = "should add @throws clause into javadoc of "
-            + "DrawableContainer#getChangingConfigurations() when the constant state is not set.")
     public void testGetChangingConfigurations() {
         assertConstantStateNotSet();
 
@@ -109,14 +91,6 @@ public class DrawableContainerTest extends TestCase {
                 mDrawableContainer.getChangingConfigurations());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "getPadding",
-        args = {android.graphics.Rect.class}
-    )
-    @ToBeFixed(bug = "1417734", explanation = "should add @throws clause into javadoc of "
-            + "DrawableContainer#getPadding(Rect) when the constant state is not set "
-            + "or the param padding is null.")
     public void testGetPadding() {
         assertConstantStateNotSet();
         assertNull(mDrawableContainer.getCurrent());
@@ -165,11 +139,6 @@ public class DrawableContainerTest extends TestCase {
         }
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "setAlpha",
-        args = {int.class}
-    )
     public void testSetAlpha() {
         assertConstantStateNotSet();
         assertNull(mDrawableContainer.getCurrent());
@@ -191,11 +160,6 @@ public class DrawableContainerTest extends TestCase {
         assertFalse(dr.hasSetAlphaCalled());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "setDither",
-        args = {boolean.class}
-    )
     public void testSetDither() {
         assertConstantStateNotSet();
         assertNull(mDrawableContainer.getCurrent());
@@ -218,11 +182,6 @@ public class DrawableContainerTest extends TestCase {
         assertTrue(dr.hasSetDitherCalled());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "setColorFilter",
-        args = {android.graphics.ColorFilter.class}
-    )
     public void testSetColorFilter() {
         assertConstantStateNotSet();
         assertNull(mDrawableContainer.getCurrent());
@@ -245,13 +204,6 @@ public class DrawableContainerTest extends TestCase {
         assertTrue(dr.hasSetColorFilterCalled());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "onBoundsChange",
-        args = {android.graphics.Rect.class}
-    )
-    @ToBeFixed(bug = "1417734", explanation = "should add @throws clause into javadoc of "
-            + "DrawableContainer#onBoundsChange(Rect) when the param bounds is null.")
     public void testOnBoundsChange() {
         assertConstantStateNotSet();
         assertNull(mDrawableContainer.getCurrent());
@@ -283,13 +235,6 @@ public class DrawableContainerTest extends TestCase {
         }
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "isStateful",
-        args = {}
-    )
-    @ToBeFixed(bug = "1417734", explanation = "should add @throws clause into javadoc of "
-            + "DrawableContainer#isStateful() when the constant state is not set.")
     public void testIsStateful() {
         assertConstantStateNotSet();
 
@@ -316,11 +261,6 @@ public class DrawableContainerTest extends TestCase {
         assertEquals(true, mDrawableContainer.isStateful());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "onStateChange",
-        args = {int[].class}
-    )
     public void testOnStateChange() {
         assertConstantStateNotSet();
         assertNull(mDrawableContainer.getCurrent());
@@ -351,11 +291,6 @@ public class DrawableContainerTest extends TestCase {
         assertTrue(Arrays.equals(new int[] { 0 }, dr.getState()));
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "onLevelChange",
-        args = {int.class}
-    )
     public void testOnLevelChange() {
         assertConstantStateNotSet();
         assertNull(mDrawableContainer.getCurrent());
@@ -388,13 +323,6 @@ public class DrawableContainerTest extends TestCase {
         assertFalse(dr.hasOnLevelChangedCalled());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "getIntrinsicWidth",
-        args = {}
-    )
-    @ToBeFixed(bug = "1417734", explanation = "should add @throws clause into javadoc of "
-            + "DrawableContainer#getIntrinsicWidth() when the constant state is not set.")
     public void testGetIntrinsicWidth() {
         assertConstantStateNotSet();
 
@@ -429,13 +357,6 @@ public class DrawableContainerTest extends TestCase {
         assertEquals(1, mDrawableContainer.getIntrinsicWidth());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "getIntrinsicHeight",
-        args = {}
-    )
-    @ToBeFixed(bug = "1417734", explanation = "should add @throws clause into javadoc of "
-            + "DrawableContainer#getIntrinsicHeight() when the constant state is not set.")
     public void testGetIntrinsicHeight() {
         assertConstantStateNotSet();
 
@@ -470,13 +391,6 @@ public class DrawableContainerTest extends TestCase {
         assertEquals(1, mDrawableContainer.getIntrinsicHeight());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "getMinimumWidth",
-        args = {}
-    )
-    @ToBeFixed(bug = "1417734", explanation = "should add @throws clause into javadoc of "
-            + "DrawableContainer#getMinimumWidth() when the constant state is not set.")
     public void testGetMinimumWidth() {
         assertConstantStateNotSet();
 
@@ -511,13 +425,6 @@ public class DrawableContainerTest extends TestCase {
         assertEquals(1, mDrawableContainer.getMinimumWidth());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "getMinimumHeight",
-        args = {}
-    )
-    @ToBeFixed(bug = "1417734", explanation = "should add @throws clause into javadoc of "
-            + "DrawableContainer#getMinimumHeight() when the constant state is not set.")
     public void testGetMinimumHeight() {
         assertConstantStateNotSet();
 
@@ -552,11 +459,6 @@ public class DrawableContainerTest extends TestCase {
         assertEquals(1, mDrawableContainer.getMinimumHeight());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "invalidateDrawable",
-        args = {android.graphics.drawable.Drawable.class}
-    )
     public void testInvalidateDrawable() {
         assertConstantStateNotSet();
         assertNull(mDrawableContainer.getCurrent());
@@ -596,11 +498,6 @@ public class DrawableContainerTest extends TestCase {
         assertTrue(callback.hasInvalidateDrawableCalled());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "scheduleDrawable",
-        args = {android.graphics.drawable.Drawable.class, java.lang.Runnable.class, long.class}
-    )
     public void testScheduleDrawable() {
         assertConstantStateNotSet();
         assertNull(mDrawableContainer.getCurrent());
@@ -649,11 +546,6 @@ public class DrawableContainerTest extends TestCase {
         assertTrue(callback.hasScheduleDrawableCalled());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "unscheduleDrawable",
-        args = {android.graphics.drawable.Drawable.class, java.lang.Runnable.class}
-    )
     public void testUnscheduleDrawable() {
         assertConstantStateNotSet();
         assertNull(mDrawableContainer.getCurrent());
@@ -702,11 +594,6 @@ public class DrawableContainerTest extends TestCase {
         assertTrue(callback.hasUnscheduleDrawableCalled());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "setVisible",
-        args = {boolean.class, boolean.class}
-    )
     public void testSetVisible() {
         assertConstantStateNotSet();
         assertNull(mDrawableContainer.getCurrent());
@@ -729,13 +616,6 @@ public class DrawableContainerTest extends TestCase {
         assertFalse(dr.isVisible());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "getOpacity",
-        args = {}
-    )
-    @ToBeFixed(bug = "1417734", explanation = "Should document default return value"
-        + " when the container is empty")
     public void testGetOpacity() {
         assertConstantStateNotSet();
 
@@ -762,20 +642,6 @@ public class DrawableContainerTest extends TestCase {
         assertEquals(PixelFormat.TRANSLUCENT, mDrawableContainer.getOpacity());
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getCurrent",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "selectDrawable",
-            args = {int.class}
-        )
-    })
-    @ToBeFixed(bug = "1417734", explanation = "should add @throws clause into javadoc of "
-            + "DrawableContainer#selectDrawable(int) when the constant state is not set.")
     public void testAccessCurrentDrawable() {
         assertConstantStateNotSet();
 
@@ -820,20 +686,6 @@ public class DrawableContainerTest extends TestCase {
         assertFalse(dr1.isVisible());
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setConstantState",
-            args = {android.graphics.drawable.DrawableContainer.DrawableContainerState.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getConstantState",
-            args = {}
-        )
-    })
-    @ToBeFixed(bug = "1417734", explanation = "should add @throws clause into javadoc of "
-            + "DrawableContainer#getConstantState() when the constant state is not set.")
     public void testAccessConstantState() {
         try {
             mDrawableContainer.getConstantState();
@@ -848,11 +700,6 @@ public class DrawableContainerTest extends TestCase {
         assertConstantStateNotSet();
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "mutate",
-        args = {}
-    )
     public void testMutate() {
         assertConstantStateNotSet();
         try {

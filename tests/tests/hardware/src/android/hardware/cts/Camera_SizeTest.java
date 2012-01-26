@@ -16,9 +16,6 @@
 
 package android.hardware.cts;
 
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
 
 import android.hardware.Camera;
 import android.hardware.Camera.Parameters;
@@ -26,7 +23,6 @@ import android.test.suitebuilder.annotation.LargeTest;
 
 import junit.framework.TestCase;
 
-@TestTargetClass(Camera.Size.class)
 @LargeTest
 public class Camera_SizeTest extends TestCase {
 
@@ -37,11 +33,6 @@ public class Camera_SizeTest extends TestCase {
     private final int HEIGHT3 = 640;
     private final int WIDTH3 = 480;
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "Camera.Size",
-        args = {int.class, int.class}
-    )
     public void testConstructor() {
         if (Camera.getNumberOfCameras() < 1) {
             return;

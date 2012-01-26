@@ -30,12 +30,7 @@ import android.view.animation.TranslateAnimation;
 
 import com.android.cts.stub.R;
 
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
 
-@TestTargetClass(android.view.animation.TranslateAnimation.class)
 public class TranslateAnimationTest
         extends ActivityInstrumentationTestCase2<AnimationTestStubActivity> {
 
@@ -62,29 +57,6 @@ public class TranslateAnimationTest
         mActivity = getActivity();
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "TranslateAnimation",
-            args = {android.content.Context.class, android.util.AttributeSet.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "TranslateAnimation",
-            args = {float.class, float.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "TranslateAnimation",
-            args = {float.class, float.class, float.class, float.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "TranslateAnimation",
-            args = {int.class, float.class, int.class, float.class,
-                    int.class, float.class, int.class, float.class}
-        )
-    })
     public void testConstructors() {
 
         // Test with null AttributeSet
@@ -111,19 +83,6 @@ public class TranslateAnimationTest
                 Animation.RELATIVE_TO_SELF, -0.6f, Animation.RELATIVE_TO_SELF, -0.6f);
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "applyTransformation",
-                args = {float.class, android.view.animation.Transformation.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test initialize wiht delta type Animation#ABSOLUTE",
-            method = "initialize",
-            args = {int.class, int.class, int.class, int.class}
-        )
-    })
     public void testApplyTransformation(){
         final View animWindow = mActivity.findViewById(R.id.anim_window);
         final Transformation transformation = new Transformation();
@@ -182,11 +141,6 @@ public class TranslateAnimationTest
         assertEquals(TO_Y_DELTA, values[Matrix.MTRANS_Y], POSITION_DELTA);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "initialize",
-        args = {int.class, int.class, int.class, int.class}
-    )
     public void testInitialize() {
         final View parent = mActivity.findViewById(R.id.anim_window_parent);
         final View animWindow = mActivity.findViewById(R.id.anim_window);

@@ -20,27 +20,9 @@ import android.test.AndroidTestCase;
 import android.text.InputFilter;
 import android.text.SpannableStringBuilder;
 import android.text.InputFilter.LengthFilter;
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
 
-@TestTargetClass(InputFilter.LengthFilter.class)
 public class InputFilter_LengthFilterTest extends AndroidTestCase {
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "filter",
-            args = {java.lang.CharSequence.class, int.class, int.class, android.text.Spanned.class,
-                    int.class, int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "InputFilter.LengthFilter",
-            args = {int.class}
-        )
-    })
     public void testFilter() {
         // Define the variables
         CharSequence source;

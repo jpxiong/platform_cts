@@ -27,12 +27,7 @@ import android.view.ViewGroup.MarginLayoutParams;
 import com.android.internal.util.XmlUtils;
 import com.android.cts.stub.R;
 
-import dalvik.annotation.TestTargets;
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargetClass;
 
-@TestTargetClass(ViewGroup.MarginLayoutParams.class)
 public class ViewGroup_MarginLayoutParamsTest extends AndroidTestCase {
 
     private ViewGroup.MarginLayoutParams mMarginLayoutParams;
@@ -43,32 +38,6 @@ public class ViewGroup_MarginLayoutParamsTest extends AndroidTestCase {
         mMarginLayoutParams = null;
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test MarginLayoutParams constructor",
-            method = "ViewGroup.MarginLayoutParams",
-            args = {android.content.Context.class, android.util.AttributeSet.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test MarginLayoutParams constructor",
-            method = "ViewGroup.MarginLayoutParams",
-            args = {int.class, int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test MarginLayoutParams constructor",
-            method = "ViewGroup.MarginLayoutParams",
-            args = {android.view.ViewGroup.LayoutParams.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test MarginLayoutParams constructor",
-            method = "ViewGroup.MarginLayoutParams",
-            args = {android.view.ViewGroup.MarginLayoutParams.class}
-        )
-    })
     public void testConstructor() {
         mMarginLayoutParams = null;
         // new the MarginLayoutParams instance
@@ -101,12 +70,6 @@ public class ViewGroup_MarginLayoutParamsTest extends AndroidTestCase {
 
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test setMargins function",
-        method = "setMargins",
-        args = {int.class, int.class, int.class, int.class}
-    )
     public void testSetMargins() {
 
         // new the MarginLayoutParams instance

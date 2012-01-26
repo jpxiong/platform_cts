@@ -19,11 +19,6 @@ package android.widget.cts;
 import com.android.cts.stub.R;
 import com.android.internal.view.menu.ContextMenuBuilder;
 
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
-import dalvik.annotation.ToBeFixed;
 
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
@@ -58,7 +53,6 @@ import java.io.IOException;
 /**
  * Test {@link Gallery}.
  */
-@TestTargetClass(Gallery.class)
 public class GalleryTest extends ActivityInstrumentationTestCase2<GalleryStubActivity>  {
     private Gallery mGallery;
     private Activity mActivity;
@@ -79,24 +73,6 @@ public class GalleryTest extends ActivityInstrumentationTestCase2<GalleryStubAct
         mGallery = (Gallery) mActivity.findViewById(R.id.gallery_test);
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "Gallery",
-            args = {android.content.Context.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "Gallery",
-            args = {android.content.Context.class, android.util.AttributeSet.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "Gallery",
-            args = {android.content.Context.class, android.util.AttributeSet.class, int.class}
-        )
-    })
-    @ToBeFixed(bug = "1695243", explanation = "Android API javadocs are incomplete")
     public void testConstructor() {
         new Gallery(mContext);
 
@@ -131,21 +107,9 @@ public class GalleryTest extends ActivityInstrumentationTestCase2<GalleryStubAct
         }
     }
 
-    @TestTargetNew(
-        level = TestLevel.NOT_FEASIBLE,
-        method = "setAnimationDuration",
-        args = {int.class}
-    )
-    @ToBeFixed(bug = "1386429", explanation = "No getter and can't check indirectly. "
-            + "It is hard to get transition animation to check if the duration is right.")
     public void testSetAnimationDuration() {
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "setSpacing",
-        args = {int.class}
-    )
     public void testSetSpacing() throws Throwable {
         setSpacingAndCheck(0);
 
@@ -168,18 +132,6 @@ public class GalleryTest extends ActivityInstrumentationTestCase2<GalleryStubAct
         assertEquals(v0.getRight() + spacing, v1.getLeft());
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setUnselectedAlpha",
-            args = {float.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getChildStaticTransformation",
-            args = {android.view.View.class, android.view.animation.Transformation.class}
-        )
-    })
     public void testSetUnselectedAlpha() {
         final MyGallery gallery = (MyGallery) mActivity.findViewById(R.id.gallery_test);
 
@@ -202,18 +154,6 @@ public class GalleryTest extends ActivityInstrumentationTestCase2<GalleryStubAct
         assertEquals(alpha, t.getAlpha(), DELTA);
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "generateLayoutParams",
-            args = {android.util.AttributeSet.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "generateLayoutParams",
-            args = {android.view.ViewGroup.LayoutParams.class}
-        )
-    })
     public void testGenerateLayoutParams() throws XmlPullParserException, IOException {
         final int width = 320;
         final int height = 240;
@@ -233,77 +173,20 @@ public class GalleryTest extends ActivityInstrumentationTestCase2<GalleryStubAct
         assertEquals(LayoutParams.MATCH_PARENT, layoutParams.height);
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.NOT_NECESSARY,
-            method = "onSingleTapUp",
-            args = {MotionEvent.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.NOT_NECESSARY,
-            method = "onScroll",
-            args = {MotionEvent.class, MotionEvent.class, float.class, float.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.NOT_NECESSARY,
-            method = "onLongPress",
-            args = {android.view.MotionEvent.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.NOT_NECESSARY,
-            method = "onShowPress",
-            args = {android.view.MotionEvent.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.NOT_NECESSARY,
-            method = "onKeyDown",
-            args = {int.class, android.view.KeyEvent.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.NOT_NECESSARY,
-            method = "onKeyUp",
-            args = {int.class, android.view.KeyEvent.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.NOT_NECESSARY,
-            method = "onFocusChanged",
-            args = {boolean.class, int.class, android.graphics.Rect.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.NOT_NECESSARY,
-            method = "onLayout",
-            args = {boolean.class, int.class, int.class, int.class, int.class}
-        )
-    })
     public void testFoo() {
         // Do not test these APIs. They are callbacks which:
         // 1. The callback machanism has been tested in super class
         // 2. The functionality is implmentation details, no need to test
     }
 
-    @TestTargetNew(
-        level = TestLevel.NOT_FEASIBLE,
-        method = "showContextMenuForChild",
-        args = {android.view.View.class}
-    )
     public void testShowContextMenuForChild() {
         // how to check whether the context menu for child is showing.
     }
 
-    @TestTargetNew(
-        level = TestLevel.NOT_FEASIBLE,
-        method = "showContextMenu",
-        args = {}
-    )
     public void testShowContextMenu() {
         // how to check whether the context menu is showing.
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "dispatchKeyEvent",
-        args = {android.view.KeyEvent.class}
-    )
     public void testDispatchKeyEvent() {
         mGallery = new Gallery(mContext);
         final KeyEvent validKeyEvent = new KeyEvent(KeyEvent.ACTION_UP, KeyEvent.KEYCODE_ENTER);
@@ -314,11 +197,6 @@ public class GalleryTest extends ActivityInstrumentationTestCase2<GalleryStubAct
         assertFalse(mGallery.dispatchKeyEvent(invalidKeyEvent));
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "setGravity",
-        args = {int.class}
-    )
     public void testSetGravity() throws Throwable {
         setGalleryGravity(Gravity.CENTER_HORIZONTAL);
         View v0 = mGallery.getChildAt(0);
@@ -344,12 +222,6 @@ public class GalleryTest extends ActivityInstrumentationTestCase2<GalleryStubAct
         mInstrumentation.waitForIdleSync();
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "checkLayoutParams",
-        args = {android.view.ViewGroup.LayoutParams.class}
-    )
-    @ToBeFixed(bug = "1695243", explanation = "Android API javadocs are incomplete")
     public void testCheckLayoutParams() {
         MyGallery gallery = new MyGallery(mContext);
         ViewGroup.LayoutParams p1 = new ViewGroup.LayoutParams(320, 480);
@@ -359,11 +231,6 @@ public class GalleryTest extends ActivityInstrumentationTestCase2<GalleryStubAct
         assertTrue(gallery.checkLayoutParams(p2));
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "computeHorizontalScrollExtent",
-        args = {}
-    )
     public void testComputeHorizontalScrollExtent() {
         MyGallery gallery = new MyGallery(mContext);
 
@@ -371,11 +238,6 @@ public class GalleryTest extends ActivityInstrumentationTestCase2<GalleryStubAct
         assertEquals(1, gallery.computeHorizontalScrollExtent());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "computeHorizontalScrollOffset",
-        args = {}
-    )
     public void testComputeHorizontalScrollOffset() {
         MyGallery gallery = new MyGallery(mContext);
         assertEquals(AdapterView.INVALID_POSITION, gallery.computeHorizontalScrollOffset());
@@ -385,11 +247,6 @@ public class GalleryTest extends ActivityInstrumentationTestCase2<GalleryStubAct
         assertEquals(gallery.getSelectedItemPosition(), gallery.computeHorizontalScrollOffset());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "computeHorizontalScrollRange",
-        args = {}
-    )
     public void testComputeHorizontalScrollRange() {
         MyGallery gallery = new MyGallery(mContext);
         ImageAdapter adapter = new ImageAdapter(mActivity);
@@ -399,14 +256,6 @@ public class GalleryTest extends ActivityInstrumentationTestCase2<GalleryStubAct
         assertEquals(adapter.getCount(), gallery.computeHorizontalScrollRange());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "dispatchSetPressed",
-        args = {boolean.class}
-    )
-    @ToBeFixed(bug = "1695243", explanation = "Android API javadocs are not right, "
-            + "dispatchSetPressed did not dispatch setPressed to "
-            + "all of this View's children, but only the selected view")
     @UiThreadTest
     public void testDispatchSetPressed() {
         final MyGallery gallery = (MyGallery) getActivity().findViewById(R.id.gallery_test);
@@ -421,11 +270,6 @@ public class GalleryTest extends ActivityInstrumentationTestCase2<GalleryStubAct
         assertFalse(gallery.getChildAt(1).isPressed());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "generateDefaultLayoutParams",
-        args = {}
-    )
     public void testGenerateDefaultLayoutParams() {
         MyGallery gallery = new MyGallery(mContext);
         ViewGroup.LayoutParams p = gallery.generateDefaultLayoutParams();
@@ -435,12 +279,6 @@ public class GalleryTest extends ActivityInstrumentationTestCase2<GalleryStubAct
         assertEquals(ViewGroup.LayoutParams.WRAP_CONTENT, p.height);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "getChildDrawingOrder",
-        args = {int.class, int.class}
-    )
-    @ToBeFixed(bug = "1695243", explanation = "Android API javadocs are incomplete")
     public void testGetChildDrawingOrder() {
         final MyGallery gallery = (MyGallery) getActivity().findViewById(R.id.gallery_test);
 
@@ -458,11 +296,6 @@ public class GalleryTest extends ActivityInstrumentationTestCase2<GalleryStubAct
         assertEquals(index + 1, gallery.getChildDrawingOrder(childCount, index));
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "getContextMenuInfo",
-        args = {}
-    )
     public void testGetContextMenuInfo() {
         MockOnCreateContextMenuListener listener = new MockOnCreateContextMenuListener();
         MyGallery gallery = new MyGallery(mContext);

@@ -18,10 +18,6 @@ package android.widget.cts;
 
 import com.android.cts.stub.R;
 
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
 
 import android.app.Activity;
 import android.app.Instrumentation;
@@ -34,7 +30,6 @@ import android.widget.SeekBar.OnSeekBarChangeListener;
 /**
  * Test {@link SeekBar}.
  */
-@TestTargetClass(SeekBar.class)
 public class SeekBarTest extends ActivityInstrumentationTestCase2<SeekBarStubActivity> {
     private SeekBar mSeekBar;
 
@@ -54,23 +49,6 @@ public class SeekBarTest extends ActivityInstrumentationTestCase2<SeekBarStubAct
         mSeekBar = (SeekBar) mActivity.findViewById(R.id.seekBar);
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "SeekBar",
-            args = {android.content.Context.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "SeekBar",
-            args = {android.content.Context.class, android.util.AttributeSet.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "SeekBar",
-            args = {android.content.Context.class, android.util.AttributeSet.class, int.class}
-        )
-    })
     public void testConstructor() {
         new SeekBar(mActivity);
 
@@ -79,11 +57,6 @@ public class SeekBarTest extends ActivityInstrumentationTestCase2<SeekBarStubAct
         new SeekBar(mActivity, null, com.android.internal.R.attr.seekBarStyle);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "setOnSeekBarChangeListener",
-        args = {android.widget.SeekBar.OnSeekBarChangeListener.class}
-    )
     public void testSetOnSeekBarChangeListener() {
         MockOnSeekBarListener listener = new MockOnSeekBarListener();
 

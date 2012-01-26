@@ -16,10 +16,6 @@
 
 package android.text.method.cts;
 
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.ToBeFixed;
 
 import android.graphics.Rect;
 import android.test.ActivityInstrumentationTestCase2;
@@ -30,7 +26,6 @@ import android.widget.EditText;
 /**
  * Test {@link ReplacementTransformationMethod}.
  */
-@TestTargetClass(ReplacementTransformationMethod.class)
 public class ReplacementTransformationMethodTest extends
         ActivityInstrumentationTestCase2<StubActivity> {
     private final char[] ORIGINAL = new char[] { '0', '1' };
@@ -51,11 +46,6 @@ public class ReplacementTransformationMethodTest extends
         mEditText = new EditText(getActivity());
     }
 
-    @TestTargetNew(
-        level = TestLevel.PARTIAL_COMPLETE,
-        method = "getTransformation",
-        args = {java.lang.CharSequence.class, android.view.View.class}
-    )
     public void testGetTransformation() {
         MyReplacementTransformationMethod method =
             new MyReplacementTransformationMethod(ORIGINAL, REPLACEMENT);
@@ -67,15 +57,6 @@ public class ReplacementTransformationMethodTest extends
         // TODO cannot get transformed text from the view
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "getTransformation",
-        args = {CharSequence.class, View.class}
-    )
-    @ToBeFixed(bug = "1695243", explanation = "Android API javadocs are incomplete. @throws clause "
-            + "should be added into javadoc of "
-            + "ReplacementTransformationMethod#getTransformation(CharSequence, android.view.View)"
-            + "when the params source is null")
     public void testGetTransformationWithAbnormalCharSequence() {
         ReplacementTransformationMethod method = new MyReplacementTransformationMethod(ORIGINAL,
                 REPLACEMENT);
@@ -90,11 +71,6 @@ public class ReplacementTransformationMethodTest extends
         assertEquals("", method.getTransformation("", null).toString());
     }
 
-    @TestTargetNew(
-        level = TestLevel.PARTIAL_COMPLETE,
-        method = "getTransformation",
-        args = {CharSequence.class, View.class}
-    )
     public void testGetTransformationWithAbmornalReplacement() {
         // replacement has same chars
         ReplacementTransformationMethod method =
@@ -114,15 +90,6 @@ public class ReplacementTransformationMethodTest extends
         // TODO cannot get transformed text from the view
     }
 
-    @TestTargetNew(
-        level = TestLevel.PARTIAL_COMPLETE,
-        method = "getTransformation",
-        args = {CharSequence.class, View.class}
-    )
-    @ToBeFixed(bug = "1695243", explanation = "Android API javadocs are incomplete. @throws clause "
-            + "should be added into javadoc of "
-            + "ReplacementTransformationMethod#getTransformation(CharSequence, android.view.View)"
-            + "when threre is more chars in the original than replacement.")
     public void testGetTransformationWithAbmornalOriginal() {
         // original has same chars
         ReplacementTransformationMethod method =
@@ -143,12 +110,6 @@ public class ReplacementTransformationMethodTest extends
         }
     }
 
-    @TestTargetNew(
-        level = TestLevel.NOT_NECESSARY,
-        notes = "This is a blank method",
-        method = "onFocusChanged",
-        args = {View.class, CharSequence.class, boolean.class, int.class, Rect.class}
-    )
     public void testOnFocusChanged() {
         ReplacementTransformationMethod method = new MyReplacementTransformationMethod(ORIGINAL,
                 REPLACEMENT);

@@ -33,12 +33,7 @@ import android.util.Xml;
 
 import com.android.cts.stub.R;
 
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.ToBeFixed;
 
-@TestTargetClass(LevelListDrawable.class)
 public class LevelListDrawableTest extends InstrumentationTestCase {
     private MockLevelListDrawable mLevelListDrawable;
 
@@ -54,11 +49,6 @@ public class LevelListDrawableTest extends InstrumentationTestCase {
         mResources = getInstrumentation().getTargetContext().getResources();
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "LevelListDrawable",
-        args = {}
-    )
     public void testLevelListDrawable() {
         new LevelListDrawable();
         // Check the values set in the constructor
@@ -66,11 +56,6 @@ public class LevelListDrawableTest extends InstrumentationTestCase {
         assertTrue(new MockLevelListDrawable().hasCalledOnLevelChanged());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "addLevel",
-        args = {int.class, int.class, android.graphics.drawable.Drawable.class}
-    )
     public void testAddLevel() {
         assertEquals(0, mDrawableContainerState.getChildCount());
 
@@ -92,11 +77,6 @@ public class LevelListDrawableTest extends InstrumentationTestCase {
         assertTrue(mLevelListDrawable.hasCalledOnLevelChanged());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "onLevelChange",
-        args = {int.class}
-    )
     public void testOnLevelChange() {
         mLevelListDrawable.addLevel(0, 0, new MockDrawable());
         mLevelListDrawable.addLevel(0, 0, new MockDrawable());
@@ -129,12 +109,6 @@ public class LevelListDrawableTest extends InstrumentationTestCase {
         assertNull(mLevelListDrawable.getCurrent());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "inflate",
-        args = {android.content.res.Resources.class, org.xmlpull.v1.XmlPullParser.class,
-                android.util.AttributeSet.class}
-    )
     public void testInflate() throws XmlPullParserException, IOException {
         XmlResourceParser parser = getResourceParser(R.xml.level_list_correct);
 
@@ -168,15 +142,6 @@ public class LevelListDrawableTest extends InstrumentationTestCase {
         }
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "inflate",
-        args = {android.content.res.Resources.class, org.xmlpull.v1.XmlPullParser.class,
-                android.util.AttributeSet.class}
-    )
-    @ToBeFixed(bug = "1417734", explanation = "should add @throws clause into javadoc of "
-            + "LevelListDrawable#inflate(Resources, XmlPullParser, AttributeSet) when param r,"
-            + "parser or attrs is out of bounds")
     public void testInflateWithNullParameters() throws XmlPullParserException, IOException{
         XmlResourceParser parser = getResourceParser(R.xml.level_list_correct);
         try {
@@ -198,11 +163,6 @@ public class LevelListDrawableTest extends InstrumentationTestCase {
         }
     }
 
-    @TestTargetNew(
-        level = TestLevel.SUFFICIENT,
-        method = "mutate",
-        args = {}
-    )
     public void testMutate() throws InterruptedException {
         Resources resources = getInstrumentation().getTargetContext().getResources();
         LevelListDrawable d1 =

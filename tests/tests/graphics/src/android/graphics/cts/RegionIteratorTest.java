@@ -20,27 +20,13 @@ import android.graphics.Rect;
 import android.graphics.Region;
 import android.graphics.RegionIterator;
 import android.test.AndroidTestCase;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
 
-@TestTargetClass(RegionIterator.class)
 public class RegionIteratorTest extends AndroidTestCase {
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "RegionIterator",
-        args = {android.graphics.Region.class}
-    )
     public void testConstructor() {
         new RegionIterator(new Region());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "next",
-        args = {android.graphics.Rect.class}
-    )
     public void testNext() {
         Region region = new Region();
         region.set(1, 1, 10, 10);

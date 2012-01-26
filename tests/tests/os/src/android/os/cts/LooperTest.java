@@ -24,12 +24,7 @@ import android.os.SystemClock;
 import android.test.AndroidTestCase;
 import android.util.Printer;
 import android.util.StringBuilderPrinter;
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
 
-@TestTargetClass(Looper.class)
 public class LooperTest extends AndroidTestCase {
 
     public static final long WAIT_TIME = 1000;
@@ -40,32 +35,17 @@ public class LooperTest extends AndroidTestCase {
     private boolean mHasQuit;
     private Handler mLoopHandler;
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "dump",
-        args = {Printer.class, String.class}
-    )
     public void testDump() {
         StringBuilderPrinter printer = new StringBuilderPrinter(new StringBuilder());
         final String prefix = "LooperTest";
         Looper.myLooper().dump(printer, prefix);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "getMainLooper",
-        args = {}
-    )
     public void testGetMainLooper() {
         Looper looper = Looper.getMainLooper();
         assertNotNull(looper);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "loop",
-        args = {}
-    )
     public void testLoop() {
         MockRunnable run = new MockRunnable();
 
@@ -78,11 +58,6 @@ public class LooperTest extends AndroidTestCase {
         assertTrue(run.runCalled);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "myLooper",
-        args = {}
-    )
     public void testMyLooper() throws Throwable {
         TestThread t = new TestThread(new Runnable() {
             public void run() {
@@ -95,11 +70,6 @@ public class LooperTest extends AndroidTestCase {
         t.runTest(WAIT_TIME);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "myQueue",
-        args = {}
-    )
     public void testMyQueue() throws Throwable {
         MessageQueue mq = Looper.myQueue();
         assertNotNull(mq);
@@ -118,11 +88,6 @@ public class LooperTest extends AndroidTestCase {
         t.runTest(WAIT_TIME);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "prepare",
-        args = {}
-    )
     public void testPrepare() throws Throwable {
         try {
             Looper.prepare();
@@ -147,11 +112,6 @@ public class LooperTest extends AndroidTestCase {
         t.runTest(WAIT_TIME);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "prepareMainLooper",
-        args = {}
-    )
     public void testPrepareMainLooper() throws Throwable {
         try {
             Looper.prepareMainLooper();
@@ -176,18 +136,6 @@ public class LooperTest extends AndroidTestCase {
         t.runTest(WAIT_TIME);
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "quit",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getThread",
-            args = {}
-        )
-    })
     public void testQuit() throws Throwable {
         TestThread t = new TestThread(new Runnable() {
             public void run() {
@@ -219,11 +167,6 @@ public class LooperTest extends AndroidTestCase {
         t.joinAndCheck(WAIT_TIME);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "setMessageLogging",
-        args = {Printer.class}
-    )
     public void testSetMessageLogging() throws Throwable {
         mHasRun = false;
 
@@ -249,11 +192,6 @@ public class LooperTest extends AndroidTestCase {
         assertTrue(mHasRun);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "toString",
-        args = {}
-    )
     public void testToString() {
         assertNotNull(Looper.myLooper().toString());
     }

@@ -23,12 +23,7 @@ import android.telephony.PhoneStateListener;
 import android.telephony.ServiceState;
 import android.telephony.TelephonyManager;
 import android.test.AndroidTestCase;
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
 
-@TestTargetClass(PhoneStateListener.class)
 public class PhoneStateListenerTest extends AndroidTestCase {
 
     public static final long WAIT_TIME = 1000;
@@ -65,14 +60,6 @@ public class PhoneStateListenerTest extends AndroidTestCase {
         }
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test constructor(s) of {@link PhoneStateListener}",
-            method = "PhoneStateListener",
-            args = {}
-        )
-    })
     public void testPhoneStateListener() {
         new PhoneStateListener();
     }
@@ -82,14 +69,6 @@ public class PhoneStateListenerTest extends AndroidTestCase {
      * registration. There is no simple way to emulate state changes for testing the listeners.
      */
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test method: onServiceStateChanged ",
-            method = "onServiceStateChanged",
-            args = {ServiceState.class}
-        )
-    })
     public void testOnServiceStateChanged() throws Throwable {
         TestThread t = new TestThread(new Runnable() {
             public void run() {
@@ -128,14 +107,6 @@ public class PhoneStateListenerTest extends AndroidTestCase {
         mLooper = null;
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test method: onSignalStrengthChanged ",
-            method = "onSignalStrengthChanged",
-            args = {int.class}
-        )
-    })
     public void testOnSignalStrengthChanged() throws Throwable {
         TestThread t = new TestThread(new Runnable() {
             public void run() {
@@ -170,14 +141,6 @@ public class PhoneStateListenerTest extends AndroidTestCase {
         assertTrue(mOnSignalStrengthChangedCalled);
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test method: onMessageWaitingIndicatorChanged ",
-            method = "onMessageWaitingIndicatorChanged",
-            args = {boolean.class}
-        )
-    })
     public void testOnMessageWaitingIndicatorChanged() throws Throwable {
         TestThread t = new TestThread(new Runnable() {
             public void run() {
@@ -213,14 +176,6 @@ public class PhoneStateListenerTest extends AndroidTestCase {
         assertTrue(mOnMessageWaitingIndicatorChangedCalled);
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test method: onCallForwardingIndicatorChanged ",
-            method = "onCallForwardingIndicatorChanged",
-            args = {boolean.class}
-        )
-    })
     public void testOnCallForwardingIndicatorChanged() throws Throwable {
         TestThread t = new TestThread(new Runnable() {
             public void run() {
@@ -256,14 +211,6 @@ public class PhoneStateListenerTest extends AndroidTestCase {
         assertTrue(mOnCallForwardingIndicatorChangedCalled);
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test method: onCellLocationChanged ",
-            method = "onCellLocationChanged",
-            args = {CellLocation.class}
-        )
-    })
     public void testOnCellLocationChanged() throws Throwable {
         TestThread t = new TestThread(new Runnable() {
             public void run() {
@@ -298,14 +245,6 @@ public class PhoneStateListenerTest extends AndroidTestCase {
         assertTrue(mOnCellLocationChangedCalled);
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test method: onCallStateChanged ",
-            method = "onCallStateChanged",
-            args = {int.class, String.class}
-        )
-    })
     public void testOnCallStateChanged() throws Throwable {
         TestThread t = new TestThread(new Runnable() {
             public void run() {
@@ -340,14 +279,6 @@ public class PhoneStateListenerTest extends AndroidTestCase {
         assertTrue(mOnCallStateChangedCalled);
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test method: onDataConnectionStateChanged ",
-            method = "onDataConnectionStateChanged",
-            args = {int.class}
-        )
-    })
     public void testOnDataConnectionStateChanged() throws Throwable {
         TestThread t = new TestThread(new Runnable() {
             public void run() {
@@ -383,14 +314,6 @@ public class PhoneStateListenerTest extends AndroidTestCase {
         assertTrue(mOnDataConnectionStateChangedCalled);
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test method: onDataActivity ",
-            method = "onDataActivity",
-            args = {int.class}
-        )
-    })
     public void testOnDataActivity() throws Throwable {
         TestThread t = new TestThread(new Runnable() {
             public void run() {

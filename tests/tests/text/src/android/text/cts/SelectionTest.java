@@ -16,10 +16,6 @@
 
 package android.text.cts;
 
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.ToBeFixed;
 
 import android.test.AndroidTestCase;
 import android.text.Selection;
@@ -27,13 +23,7 @@ import android.text.SpannableStringBuilder;
 import android.text.StaticLayout;
 import android.text.TextPaint;
 
-@TestTargetClass(Selection.class)
 public class SelectionTest extends AndroidTestCase {
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "getSelectionStart",
-        args = {java.lang.CharSequence.class}
-    )
     public void testGetSelectionStart() {
         CharSequence text = "hello, world";
         SpannableStringBuilder builder = new SpannableStringBuilder(text);
@@ -51,11 +41,6 @@ public class SelectionTest extends AndroidTestCase {
         assertEquals(-1, Selection.getSelectionStart(null));
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "getSelectionEnd",
-        args = {java.lang.CharSequence.class}
-    )
     public void testGetSelectionEnd() {
         CharSequence text = "hello, world";
         SpannableStringBuilder builder = new SpannableStringBuilder(text);
@@ -73,13 +58,6 @@ public class SelectionTest extends AndroidTestCase {
         assertEquals(-1, Selection.getSelectionStart(null));
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "setSelection",
-        args = {android.text.Spannable.class, int.class, int.class}
-    )
-    @ToBeFixed(bug = "1417734",explanation = "throw unexpected IndexOutOfBoundsException" +
-            "and NullPointerException")
     public void testSetSelection1() {
         CharSequence text = "hello, world";
         SpannableStringBuilder builder = new SpannableStringBuilder(text);
@@ -109,13 +87,6 @@ public class SelectionTest extends AndroidTestCase {
         }
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "setSelection",
-        args = {android.text.Spannable.class, int.class}
-    )
-    @ToBeFixed(bug = "1417734",explanation = "throw unexpected IndexOutOfBoundsException" +
-            "and NullPointerException")
     public void testSetSelection2() {
         SpannableStringBuilder builder = new SpannableStringBuilder("hello, world");
         assertEquals(-1, Selection.getSelectionStart(builder));
@@ -142,11 +113,6 @@ public class SelectionTest extends AndroidTestCase {
         }
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "removeSelection",
-        args = {android.text.Spannable.class}
-    )
     public void testRemoveSelection() {
         CharSequence text = "hello, world";
         SpannableStringBuilder builder = new SpannableStringBuilder(text);
@@ -166,11 +132,6 @@ public class SelectionTest extends AndroidTestCase {
         assertEquals(-1, Selection.getSelectionEnd(builder));
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "selectAll",
-        args = {android.text.Spannable.class}
-    )
     public void testSelectAll() {
         CharSequence text = "hello, world";
         SpannableStringBuilder builder = new SpannableStringBuilder(text);
@@ -197,11 +158,6 @@ public class SelectionTest extends AndroidTestCase {
         assertEquals(0, Selection.getSelectionEnd(empty));
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "moveLeft",
-        args = {android.text.Spannable.class, android.text.Layout.class}
-    )
     public void testMoveLeft() {
         CharSequence text = "hello\nworld";
         SpannableStringBuilder builder = new SpannableStringBuilder(text);
@@ -229,11 +185,6 @@ public class SelectionTest extends AndroidTestCase {
         assertEquals(0, Selection.getSelectionEnd(builder));
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "moveRight",
-        args = {android.text.Spannable.class, android.text.Layout.class}
-    )
     public void testMoveRight() {
         CharSequence text = "hello\nworld";
         SpannableStringBuilder builder = new SpannableStringBuilder(text);
@@ -265,11 +216,6 @@ public class SelectionTest extends AndroidTestCase {
         assertEquals(text.length(), Selection.getSelectionEnd(builder));
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "moveUp",
-        args = {android.text.Spannable.class, android.text.Layout.class}
-    )
     public void testMoveUp() {
         CharSequence text = "Google\nhello,world";
         SpannableStringBuilder builder = new SpannableStringBuilder(text);
@@ -304,11 +250,6 @@ public class SelectionTest extends AndroidTestCase {
         assertEquals(5, Selection.getSelectionEnd(builder));
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "moveDown",
-        args = {android.text.Spannable.class, android.text.Layout.class}
-    )
     public void testMoveDown() {
         CharSequence text = "hello,world\nGoogle";
         SpannableStringBuilder builder = new SpannableStringBuilder(text);
@@ -341,11 +282,6 @@ public class SelectionTest extends AndroidTestCase {
         assertEquals(18, Selection.getSelectionEnd(builder));
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "extendSelection",
-        args = {android.text.Spannable.class, int.class}
-    )
     public void testExtendSelection() {
         CharSequence text = "hello, world";
         SpannableStringBuilder builder = new SpannableStringBuilder(text);
@@ -392,11 +328,6 @@ public class SelectionTest extends AndroidTestCase {
         }
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "extendLeft",
-        args = {android.text.Spannable.class, android.text.Layout.class}
-    )
     public void testExtendLeft() {
         CharSequence text = "Google\nhello, world";
         SpannableStringBuilder builder = new SpannableStringBuilder(text);
@@ -423,11 +354,6 @@ public class SelectionTest extends AndroidTestCase {
         assertEquals(0, Selection.getSelectionEnd(builder));
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "extendRight",
-        args = {android.text.Spannable.class, android.text.Layout.class}
-    )
     public void testExtendRight() {
         CharSequence text = "Google\nhello, world";
         SpannableStringBuilder builder = new SpannableStringBuilder(text);
@@ -450,11 +376,6 @@ public class SelectionTest extends AndroidTestCase {
         assertEquals(text.length(), Selection.getSelectionEnd(builder));
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "extendUp",
-        args = {android.text.Spannable.class, android.text.Layout.class}
-    )
     public void testExtendUp() {
         CharSequence text = "Google\nhello, world";
         SpannableStringBuilder builder = new SpannableStringBuilder(text);
@@ -485,11 +406,6 @@ public class SelectionTest extends AndroidTestCase {
         assertEquals(0, Selection.getSelectionEnd(builder));
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "extendDown",
-        args = {android.text.Spannable.class, android.text.Layout.class}
-    )
     public void testExtendDown() {
         CharSequence text = "Google\nhello, world";
         SpannableStringBuilder builder = new SpannableStringBuilder(text);
@@ -511,11 +427,6 @@ public class SelectionTest extends AndroidTestCase {
         assertEquals(text.length(), Selection.getSelectionEnd(builder));
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "extendToLeftEdge",
-        args = {android.text.Spannable.class, android.text.Layout.class}
-    )
     public void testExtendToLeftEdge() {
         CharSequence text = "hello\nworld";
         SpannableStringBuilder builder = new SpannableStringBuilder(text);
@@ -551,11 +462,6 @@ public class SelectionTest extends AndroidTestCase {
         assertEquals(0, Selection.getSelectionEnd(builder));
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "extendToRightEdge",
-        args = {android.text.Spannable.class, android.text.Layout.class}
-    )
     public void testExtendToRightEdge() {
         CharSequence text = "hello\nworld";
         SpannableStringBuilder builder = new SpannableStringBuilder(text);
@@ -582,11 +488,6 @@ public class SelectionTest extends AndroidTestCase {
         assertEquals(text.length(), Selection.getSelectionEnd(builder));
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "moveToLeftEdge",
-        args = {android.text.Spannable.class, android.text.Layout.class}
-    )
     public void testMoveToLeftEdge() {
         CharSequence text = "hello\nworld";
         SpannableStringBuilder builder = new SpannableStringBuilder(text);
@@ -618,11 +519,6 @@ public class SelectionTest extends AndroidTestCase {
         assertEquals(0, Selection.getSelectionEnd(builder));
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "moveToRightEdge",
-        args = {android.text.Spannable.class, android.text.Layout.class}
-    )
     public void testMoveToRightEdge() {
         CharSequence text = "hello\nworld";
         SpannableStringBuilder builder = new SpannableStringBuilder(text);

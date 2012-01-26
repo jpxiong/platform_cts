@@ -22,22 +22,11 @@ import android.view.View;
 import android.widget.ExpandableListView;
 import android.widget.ListView;
 import android.widget.ExpandableListView.ExpandableListContextMenuInfo;
-import dalvik.annotation.TestTargets;
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargetClass;
 
 /**
  * Test {@link ExpandableListContextMenuInfo}.
  */
-@TestTargetClass(ExpandableListContextMenuInfo.class)
 public class ExpandableListView_ExpandableListContextMenuInfoTest extends AndroidTestCase {
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test constructor(s) of {@link ExpandableListContextMenuInfo}",
-        method = "ExpandableListView.ExpandableListContextMenuInfo",
-        args = {android.view.View.class, long.class, long.class}
-    )
     public void testConstructor() {
         ListView listview = new ListView(getContext());
         ExpandableListContextMenuInfo expandableListContextMenuInfo =

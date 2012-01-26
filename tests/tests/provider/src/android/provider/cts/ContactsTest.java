@@ -17,7 +17,6 @@
 package android.provider.cts;
 
 
-import dalvik.annotation.TestTargetClass;
 
 import android.content.ContentResolver;
 import android.content.ContentValues;
@@ -48,7 +47,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Date;
 
-@TestTargetClass(android.provider.Contacts.class)
 public class ContactsTest extends InstrumentationTestCase {
     private ContentResolver mContentResolver;
     private IContentProvider mProvider;

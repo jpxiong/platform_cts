@@ -26,16 +26,10 @@ import android.view.animation.cts.AnimationTestUtils;
 
 import com.android.cts.stub.R;
 
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
-import dalvik.annotation.ToBeFixed;
 
 /**
  * Test {@link View}.
  */
-@TestTargetClass(View.class)
 public class View_AnimationTest extends ActivityInstrumentationTestCase2<ViewTestStubActivity> {
 
     private static final int TIME_OUT = 5000;
@@ -57,13 +51,6 @@ public class View_AnimationTest extends ActivityInstrumentationTestCase2<ViewTes
         mAnimation.setDuration(DURATION);
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setAnimation",
-            args = {Animation.class}
-        )
-    })
     public void testAnimation() throws Throwable {
         final View view = mActivity.findViewById(R.id.mock_view);
         // set null animation
@@ -80,14 +67,6 @@ public class View_AnimationTest extends ActivityInstrumentationTestCase2<ViewTes
         AnimationTestUtils.assertRunAnimation(getInstrumentation(), view, mAnimation, TIME_OUT);
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "startAnimation",
-            args = {Animation.class}
-        )
-    })
-    @ToBeFixed(bug = "1695243", explanation = "Android API javadocs are incomplete")
     public void testStartAnimation() throws Throwable {
         final View view = mActivity.findViewById(R.id.mock_view);
         // start null animation
@@ -107,18 +86,6 @@ public class View_AnimationTest extends ActivityInstrumentationTestCase2<ViewTes
         AnimationTestUtils.assertRunAnimation(getInstrumentation(), view, mAnimation, TIME_OUT);
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "clearAnimation",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getAnimation",
-            args = {}
-        )
-    })
     public void testClearBeforeAnimation() throws Throwable {
         final View view = mActivity.findViewById(R.id.mock_view);
         assertFalse(mAnimation.hasStarted());
@@ -139,13 +106,6 @@ public class View_AnimationTest extends ActivityInstrumentationTestCase2<ViewTes
         assertNull(view.getAnimation());
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "View.clearAnimation",
-            args = {}
-        )
-    })
     public void testClearDuringAnimation() throws Throwable {
         final View view = mActivity.findViewById(R.id.mock_view);
         runTestOnUiThread(new Runnable() {

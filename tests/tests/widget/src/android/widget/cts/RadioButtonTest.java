@@ -18,11 +18,6 @@ package android.widget.cts;
 
 import com.android.cts.stub.R;
 
-import dalvik.annotation.TestTargets;
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.ToBeFixed;
 
 import android.content.Context;
 import android.test.InstrumentationTestCase;
@@ -32,7 +27,6 @@ import android.widget.RadioButton;
 /**
  * Test {@link RadioButton}.
  */
-@TestTargetClass(RadioButton.class)
 public class RadioButtonTest extends InstrumentationTestCase {
     private Context mContext;
 
@@ -42,31 +36,6 @@ public class RadioButtonTest extends InstrumentationTestCase {
         mContext = getInstrumentation().getTargetContext();
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test constructors",
-            method = "RadioButton",
-            args = {android.content.Context.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test constructors",
-            method = "RadioButton",
-            args = {android.content.Context.class, android.util.AttributeSet.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test constructors",
-            method = "RadioButton",
-            args = {android.content.Context.class, android.util.AttributeSet.class, int.class}
-        )
-    })
-    @ToBeFixed(bug = "1417734", explanation = "should add @throws clause into javadoc of "
-            + "RadioButton#RadioButton(Context), "
-            + "RadioButton#RadioButton(Context, AttributeSet) "
-            + "and RadioButton#RadioButton(Context, AttributeSet, int) "
-            + "when param Context is null")
     public void testConstructor() {
         AttributeSet attrs = mContext.getResources().getLayout(R.layout.radiogroup_1);
         assertNotNull(attrs);
@@ -97,12 +66,6 @@ public class RadioButtonTest extends InstrumentationTestCase {
         new RadioButton(mContext, attrs, Integer.MIN_VALUE);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test {@link RadioButton#toggle()}",
-        method = "toggle",
-        args = {}
-    )
     public void testToggle() {
         RadioButton button = new RadioButton(mContext);
         assertFalse(button.isChecked());

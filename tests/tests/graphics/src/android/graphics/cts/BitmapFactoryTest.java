@@ -18,9 +18,6 @@ package android.graphics.cts;
 
 import com.android.cts.stub.R;
 
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
 
 import android.content.res.Resources;
 import android.graphics.Bitmap;
@@ -44,7 +41,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
-@TestTargetClass(BitmapFactory.class)
 public class BitmapFactoryTest extends InstrumentationTestCase {
     private Resources mRes;
     // opt for non-null
@@ -90,22 +86,11 @@ public class BitmapFactoryTest extends InstrumentationTestCase {
         mOpt2.inJustDecodeBounds = true;
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "BitmapFactory",
-        args = {}
-    )
     public void testConstructor() {
         // new the BitmapFactory instance
         new BitmapFactory();
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "decodeResource",
-        args = {android.content.res.Resources.class, int.class,
-                android.graphics.BitmapFactory.Options.class}
-    )
     public void testDecodeResource1() {
         Bitmap b = BitmapFactory.decodeResource(mRes, R.drawable.start,
                 mOpt1);
@@ -117,11 +102,6 @@ public class BitmapFactoryTest extends InstrumentationTestCase {
         assertNull(BitmapFactory.decodeResource(mRes, R.drawable.start, mOpt2));
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "decodeResource",
-        args = {android.content.res.Resources.class, int.class}
-    )
     public void testDecodeResource2() {
         Bitmap b = BitmapFactory.decodeResource(mRes, R.drawable.start);
         assertNotNull(b);
@@ -130,13 +110,6 @@ public class BitmapFactoryTest extends InstrumentationTestCase {
         assertEquals(START_WIDTH * mTargetDensity / mDefaultDensity, b.getWidth(), 1.1);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "decodeResourceStream",
-        args = {android.content.res.Resources.class, android.util.TypedValue.class,
-                java.io.InputStream.class, android.graphics.Rect.class,
-                android.graphics.BitmapFactory.Options.class}
-    )
     public void testDecodeResourceStream() {
         InputStream is = obtainInputStream();
         Rect r = new Rect(1, 1, 1, 1);
@@ -148,11 +121,6 @@ public class BitmapFactoryTest extends InstrumentationTestCase {
         assertEquals(START_WIDTH, b.getWidth());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "decodeByteArray",
-        args = {byte[].class, int.class, int.class, android.graphics.BitmapFactory.Options.class}
-    )
     public void testDecodeByteArray1() {
         byte[] array = obtainArray();
         Bitmap b = BitmapFactory.decodeByteArray(array, 0, array.length, mOpt1);
@@ -164,11 +132,6 @@ public class BitmapFactoryTest extends InstrumentationTestCase {
         assertNull(BitmapFactory.decodeByteArray(array, 0, array.length, mOpt2));
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "decodeByteArray",
-        args = {byte[].class, int.class, int.class}
-    )
     public void testDecodeByteArray2() {
         byte[] array = obtainArray();
         Bitmap b = BitmapFactory.decodeByteArray(array, 0, array.length);
@@ -178,12 +141,6 @@ public class BitmapFactoryTest extends InstrumentationTestCase {
         assertEquals(START_WIDTH, b.getWidth());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "decodeStream",
-        args = {java.io.InputStream.class, android.graphics.Rect.class,
-                android.graphics.BitmapFactory.Options.class}
-    )
     public void testDecodeStream1() {
         InputStream is = obtainInputStream();
         Rect r = new Rect(1, 1, 1, 1);
@@ -196,11 +153,6 @@ public class BitmapFactoryTest extends InstrumentationTestCase {
         assertNull(BitmapFactory.decodeStream(is, r, mOpt2));
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "decodeStream",
-        args = {java.io.InputStream.class}
-    )
     public void testDecodeStream2() {
         InputStream is = obtainInputStream();
         Bitmap b = BitmapFactory.decodeStream(is);
@@ -210,11 +162,6 @@ public class BitmapFactoryTest extends InstrumentationTestCase {
         assertEquals(START_WIDTH, b.getWidth());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "decodeStream",
-        args = {java.io.InputStream.class}
-    )
     public void testDecodeStream3() throws IOException {
         for (int i = 0; i < RES_IDS.length; ++i) {
             InputStream is = obtainInputStream(RES_IDS[i]);
@@ -226,11 +173,6 @@ public class BitmapFactoryTest extends InstrumentationTestCase {
         }
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "decodeStream",
-        args = {java.io.InputStream.class}
-    )
     public void testDecodeStream4() throws IOException {
         BitmapFactory.Options options = new BitmapFactory.Options();
         for (int k = 0; k < COLOR_CONFIGS.length; ++k) {
@@ -259,12 +201,6 @@ public class BitmapFactoryTest extends InstrumentationTestCase {
         }
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "decodeFileDescriptor",
-        args = {java.io.FileDescriptor.class, android.graphics.Rect.class,
-                android.graphics.BitmapFactory.Options.class}
-    )
     public void testDecodeFileDescriptor1() throws IOException {
         ParcelFileDescriptor pfd = obtainParcelDescriptor(obtainPath());
         FileDescriptor input = pfd.getFileDescriptor();
@@ -278,11 +214,6 @@ public class BitmapFactoryTest extends InstrumentationTestCase {
         assertNull(BitmapFactory.decodeFileDescriptor(input, r, mOpt2));
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "decodeFileDescriptor",
-        args = {java.io.FileDescriptor.class}
-    )
     public void testDecodeFileDescriptor2() throws IOException {
         ParcelFileDescriptor pfd = obtainParcelDescriptor(obtainPath());
         FileDescriptor input = pfd.getFileDescriptor();
@@ -293,11 +224,6 @@ public class BitmapFactoryTest extends InstrumentationTestCase {
         assertEquals(START_WIDTH, b.getWidth());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "decodeFile",
-        args = {java.lang.String.class, android.graphics.BitmapFactory.Options.class}
-    )
     public void testDecodeFile1() throws IOException {
         Bitmap b = BitmapFactory.decodeFile(obtainPath(), mOpt1);
         assertNotNull(b);
@@ -308,11 +234,6 @@ public class BitmapFactoryTest extends InstrumentationTestCase {
         assertNull(BitmapFactory.decodeFile(obtainPath(), mOpt2));
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "decodeFile",
-        args = {java.lang.String.class}
-    )
     public void testDecodeFile2() throws IOException {
         Bitmap b = BitmapFactory.decodeFile(obtainPath());
         assertNotNull(b);

@@ -18,28 +18,9 @@ package android.database.cts;
 
 import android.database.SQLException;
 import android.test.AndroidTestCase;
-import dalvik.annotation.TestTargets;
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargetClass;
 
-@TestTargetClass(android.database.SQLException.class)
 public class SQLExceptionTest extends AndroidTestCase {
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test constructors of SQLException.",
-            method = "SQLException",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test constructors of SQLException.",
-            method = "SQLException",
-            args = {java.lang.String.class}
-        )
-    })
     public void testConstructors() {
         String expected1 = "Expected exception message";
 

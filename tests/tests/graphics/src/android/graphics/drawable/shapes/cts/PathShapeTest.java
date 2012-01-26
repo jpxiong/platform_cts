@@ -16,10 +16,6 @@
 
 package android.graphics.drawable.shapes.cts;
 
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
 
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
@@ -31,18 +27,12 @@ import android.graphics.drawable.shapes.PathShape;
 
 import junit.framework.TestCase;
 
-@TestTargetClass(android.graphics.drawable.shapes.PathShape.class)
 public class PathShapeTest extends TestCase {
     private static final int TEST_COLOR_1 = 0xFF00FF00;
     private static final int TEST_COLOR_2 = 0xFFFF0000;
 
     private static final int TOLERANCE = 4;
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "PathShape",
-        args = {android.graphics.Path.class, float.class, float.class}
-    )
     public void testConstructor() {
         new PathShape(new Path(), 1f, 5f);
 
@@ -51,18 +41,6 @@ public class PathShapeTest extends TestCase {
         new PathShape(null, 0f, 0f);
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "draw",
-            args = {android.graphics.Canvas.class, android.graphics.Paint.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.SUFFICIENT,
-            method = "onResize",
-            args = {float.class, float.class}
-        )
-    })
     public void testDraw() {
         final int SHAPE_SIZE = 200;
 
@@ -109,11 +87,6 @@ public class PathShapeTest extends TestCase {
         assertEquals(25, diagonal, TOLERANCE);
     }
 
-    @TestTargetNew(
-        level = TestLevel.SUFFICIENT,
-        method = "clone",
-        args = {}
-    )
     public void testClone() throws CloneNotSupportedException {
         PathShape pathShape = new PathShape(new Path(), 1f, 5f);
         pathShape.resize(100f, 200f);

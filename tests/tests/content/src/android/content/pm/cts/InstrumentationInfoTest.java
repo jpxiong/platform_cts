@@ -16,10 +16,6 @@
 
 package android.content.pm.cts;
 
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
 
 import android.content.ComponentName;
 import android.content.pm.InstrumentationInfo;
@@ -28,44 +24,11 @@ import android.content.pm.PackageManager.NameNotFoundException;
 import android.os.Parcel;
 import android.test.AndroidTestCase;
 
-@TestTargetClass(InstrumentationInfo.class)
 public class InstrumentationInfoTest extends AndroidTestCase {
     private static final String PACKAGE_NAME = "com.android.cts.stub";
     private static final String INSTRUMENTATION_NAME =
             "android.content.pm.cts.TestPmInstrumentation";
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test describeContents",
-            method = "describeContents",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test constructors",
-            method = "InstrumentationInfo",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test constructors",
-            method = "InstrumentationInfo",
-            args = {android.content.pm.InstrumentationInfo.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test toString",
-            method = "toString",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test writeToParcel",
-            method = "writeToParcel",
-            args = {android.os.Parcel.class, int.class}
-        )
-    })
     public void testInstrumentationInfo() throws NameNotFoundException {
         PackageManager pm = getContext().getPackageManager();
         ComponentName componentName = new ComponentName(PACKAGE_NAME, INSTRUMENTATION_NAME);

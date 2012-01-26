@@ -16,10 +16,6 @@
 
 package android.view.inputmethod.cts;
 
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
 
 import android.os.Binder;
 import android.os.Parcel;
@@ -28,58 +24,8 @@ import android.view.View;
 import android.view.inputmethod.BaseInputConnection;
 import android.view.inputmethod.InputBinding;
 
-@TestTargetClass(InputBinding.class)
 public class InputBindingTest extends AndroidTestCase {
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "describeContents",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getConnection",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getConnectionToken",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getPid",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getUid",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "InputBinding",
-            args = {android.view.inputmethod.InputConnection.class,
-                    android.view.inputmethod.InputBinding.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "InputBinding",
-            args = {android.view.inputmethod.InputConnection.class, android.os.IBinder.class,
-                    int.class, int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "toString",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "writeToParcel",
-            args = {android.os.Parcel.class, int.class}
-        )
-    })
     public void testInputBinding() {
         View view = new View(getContext());
         BaseInputConnection bic = new BaseInputConnection(view, false);

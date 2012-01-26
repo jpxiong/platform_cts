@@ -18,27 +18,8 @@ package android.content.cts;
 
 import android.content.ActivityNotFoundException;
 import android.test.AndroidTestCase;
-import dalvik.annotation.TestTargets;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
 
-@TestTargetClass(android.content.ActivityNotFoundException.class)
 public class ActivityNotFoundExceptionTest extends AndroidTestCase {
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test constructors of ActivityNotFoundException.",
-            method = "ActivityNotFoundException",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test constructors of ActivityNotFoundException.",
-            method = "ActivityNotFoundException",
-            args = {java.lang.String.class}
-        )
-    })
     public void testConstructors() {
         new ActivityNotFoundException();
 

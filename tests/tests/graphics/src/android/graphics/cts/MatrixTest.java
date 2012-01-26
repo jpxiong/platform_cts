@@ -19,12 +19,7 @@ import android.graphics.Matrix;
 import android.graphics.RectF;
 import android.graphics.Matrix.ScaleToFit;
 import android.test.AndroidTestCase;
-import dalvik.annotation.TestTargets;
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargetClass;
 
-@TestTargetClass(Matrix.class)
 public class MatrixTest extends AndroidTestCase {
     private Matrix mMatrix;
     private float[] mValues;
@@ -36,55 +31,23 @@ public class MatrixTest extends AndroidTestCase {
         mValues = new float[9];
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "Matrix",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "Matrix",
-            args = {android.graphics.Matrix.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "finalize",
-            args = {}
-        )
-    })
     public void testConstractor() {
         new Matrix();
         new Matrix(mMatrix);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "isIdentity",
-        args = {}
-    )
     public void testIsIdentity() {
         assertTrue(mMatrix.isIdentity());
         mMatrix.setScale(0f, 0f);
         assertFalse(mMatrix.isIdentity());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "rectStaysRect",
-        args = {}
-    )
     public void testRectStaysRect() {
         assertTrue(mMatrix.rectStaysRect());
         mMatrix.postRotate(80);
         assertFalse(mMatrix.rectStaysRect());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "set",
-        args = {android.graphics.Matrix.class}
-    )
     public void testSet() {
         mValues[0] = 1000;
         mMatrix.getValues(mValues);
@@ -96,11 +59,6 @@ public class MatrixTest extends AndroidTestCase {
         assertEquals(1f, mValues[0]);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "equals",
-        args = {java.lang.Object.class}
-    )
     public void testEquals() {
         mMatrix.setScale(1f, 2f);
         Matrix matrix = new Matrix();
@@ -110,11 +68,6 @@ public class MatrixTest extends AndroidTestCase {
         assertTrue(mMatrix.equals(matrix));
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "reset",
-        args = {}
-    )
     public void testReset() {
         mMatrix.setScale(1f, 2f, 3f, 4f);
         String expect = "[1.0, 0.0, 0.0][0.0, 2.0, -4.0][0.0, 0.0, 1.0]";
@@ -124,11 +77,6 @@ public class MatrixTest extends AndroidTestCase {
         assertEquals(expect, mMatrix.toShortString());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "setScale",
-        args = {float.class, float.class}
-    )
     public void testSetScale() {
         String expect = "[1.0, 0.0, 0.0][0.0, 1.0, 0.0][0.0, 0.0, 1.0]";
         assertEquals(expect, mMatrix.toShortString());
@@ -137,11 +85,6 @@ public class MatrixTest extends AndroidTestCase {
         assertEquals(expect, mMatrix.toShortString());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "setScale",
-        args = {float.class, float.class, float.class, float.class}
-    )
     public void testSetScale2() {
         String expect = "[1.0, 0.0, 0.0][0.0, 1.0, 0.0][0.0, 0.0, 1.0]";
         assertEquals(expect, mMatrix.toShortString());
@@ -151,11 +94,6 @@ public class MatrixTest extends AndroidTestCase {
         assertEquals(expect, mMatrix.toShortString());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "setRotate",
-        args = {float.class}
-    )
     public void testSetRotate() {
         mMatrix.setRotate(1f);
         String expect = "[0.9998477, -0.017452406, 0.0]"
@@ -163,11 +101,6 @@ public class MatrixTest extends AndroidTestCase {
         assertEquals(expect, mMatrix.toShortString());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "setRotate",
-        args = {float.class, float.class, float.class}
-    )
     public void testSetRotate2() {
         mMatrix.setRotate(1f, 2f, 3f);
         String expect = "[0.9998477, -0.017452406, 0.0526618]"
@@ -175,55 +108,30 @@ public class MatrixTest extends AndroidTestCase {
         assertEquals(expect, mMatrix.toShortString());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "setSinCos",
-        args = {float.class, float.class}
-    )
     public void testSetSinCos() {
         mMatrix.setSinCos(1f, 2f);
         String expect = "[2.0, -1.0, 0.0][1.0, 2.0, 0.0][0.0, 0.0, 1.0]";
         assertEquals(expect, mMatrix.toShortString());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "setSinCos",
-        args = {float.class, float.class, float.class, float.class}
-    )
     public void testSetSinCos2() {
         mMatrix.setSinCos(1f, 2f, 3f, 4f);
         String expect = "[2.0, -1.0, 1.0][1.0, 2.0, -7.0][0.0, 0.0, 1.0]";
         assertEquals(expect, mMatrix.toShortString());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "setSkew",
-        args = {float.class, float.class}
-    )
     public void testSetSkew() {
         mMatrix.setSkew(1f, 2f);
         String expect = "[1.0, 1.0, 0.0][2.0, 1.0, 0.0][0.0, 0.0, 1.0]";
         assertEquals(expect, mMatrix.toShortString());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "setSkew",
-        args = {float.class, float.class, float.class, float.class}
-    )
     public void testSetSkew2() {
         mMatrix.setSkew(1f, 2f, 3f, 4f);
         String expect = "[1.0, 1.0, -4.0][2.0, 1.0, -6.0][0.0, 0.0, 1.0]";
         assertEquals(expect, mMatrix.toShortString());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "setConcat",
-        args = {android.graphics.Matrix.class, android.graphics.Matrix.class}
-    )
     public void testSetConcat() {
         Matrix a = new Matrix();
         Matrix b = new Matrix();
@@ -243,44 +151,24 @@ public class MatrixTest extends AndroidTestCase {
         assertEquals(expect, mMatrix.toShortString());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "preTranslate",
-        args = {float.class, float.class}
-    )
     public void testPreTranslate() {
         assertTrue(mMatrix.preTranslate(1f, 2f));
         String expect = "[1.0, 0.0, 1.0][0.0, 1.0, 2.0][0.0, 0.0, 1.0]";
         assertEquals(expect, mMatrix.toShortString());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "preScale",
-        args = {float.class, float.class}
-    )
     public void testPreScale() {
         assertTrue(mMatrix.preScale(1f, 2f));
         String expect = "[1.0, 0.0, 0.0][0.0, 2.0, 0.0][0.0, 0.0, 1.0]";
         assertEquals(expect, mMatrix.toShortString());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "preScale",
-        args = {float.class, float.class, float.class, float.class}
-    )
     public void testPreScale2() {
         assertTrue(mMatrix.preScale(1f, 2f, 3f, 4f));
         String expect = "[1.0, 0.0, 0.0][0.0, 2.0, -4.0][0.0, 0.0, 1.0]";
         assertEquals(expect, mMatrix.toShortString());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "preRotate",
-        args = {float.class}
-    )
     public void testPreRotate() {
         assertTrue(mMatrix.preRotate(1f));
         String expect = "[0.9998477, -0.017452406, 0.0][0.017452406, 0.9998477, "
@@ -288,11 +176,6 @@ public class MatrixTest extends AndroidTestCase {
         assertEquals(expect, mMatrix.toShortString());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "preRotate",
-        args = {float.class, float.class, float.class}
-    )
     public void testPreRotate2() {
         assertTrue(mMatrix.preRotate(1f, 2f, 3f));
         float[] values = new float[9];
@@ -302,33 +185,18 @@ public class MatrixTest extends AndroidTestCase {
         assertEquals(expect, mMatrix.toShortString());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "preSkew",
-        args = {float.class, float.class}
-    )
     public void testPreSkew() {
         assertTrue(mMatrix.preSkew(1f, 2f));
         String expect = "[1.0, 1.0, 0.0][2.0, 1.0, 0.0][0.0, 0.0, 1.0]";
         assertEquals(expect, mMatrix.toShortString());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "preSkew",
-        args = {float.class, float.class, float.class, float.class}
-    )
     public void testPreSkew2() {
         assertTrue(mMatrix.preSkew(1f, 2f, 3f, 4f));
         String expect = "[1.0, 1.0, -4.0][2.0, 1.0, -6.0][0.0, 0.0, 1.0]";
         assertEquals(expect, mMatrix.toShortString());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "preConcat",
-        args = {android.graphics.Matrix.class}
-    )
     public void testPreConcat() {
         float[] values = new float[9];
         values[0] = 1000;
@@ -339,44 +207,24 @@ public class MatrixTest extends AndroidTestCase {
         assertEquals(expect, mMatrix.toShortString());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "postTranslate",
-        args = {float.class, float.class}
-    )
     public void testPostTranslate() {
         assertTrue(mMatrix.postTranslate(1f, 2f));
         String expect = "[1.0, 0.0, 1.0][0.0, 1.0, 2.0][0.0, 0.0, 1.0]";
         assertEquals(expect, mMatrix.toShortString());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "postScale",
-        args = {float.class, float.class}
-    )
     public void testPostScale() {
         assertTrue(mMatrix.postScale(1f, 2f));
         String expect = "[1.0, 0.0, 0.0][0.0, 2.0, 0.0][0.0, 0.0, 1.0]";
         assertEquals(expect, mMatrix.toShortString());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "postScale",
-        args = {float.class, float.class, float.class, float.class}
-    )
     public void testPostScale2() {
         assertTrue(mMatrix.postScale(1f, 2f, 3f, 4f));
         String expect = "[1.0, 0.0, 0.0][0.0, 2.0, -4.0][0.0, 0.0, 1.0]";
         assertEquals(expect, mMatrix.toShortString());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "postRotate",
-        args = {float.class}
-    )
     public void testPostRotate() {
         assertTrue(mMatrix.postRotate(1f));
         String expect = "[0.9998477, -0.017452406, 0.0]" +
@@ -384,11 +232,6 @@ public class MatrixTest extends AndroidTestCase {
         assertEquals(expect, mMatrix.toShortString());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "postRotate",
-        args = {float.class, float.class, float.class}
-    )
     public void testPostRotate2() {
         assertTrue(mMatrix.postRotate(1f, 2f, 3f));
         String expect = "[0.9998477, -0.017452406, 0.0526618]" +
@@ -396,33 +239,18 @@ public class MatrixTest extends AndroidTestCase {
         assertEquals(expect, mMatrix.toShortString());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "postSkew",
-        args = {float.class, float.class}
-    )
     public void testPostSkew() {
         assertTrue(mMatrix.postSkew(1f, 2f));
         String expect = "[1.0, 1.0, 0.0][2.0, 1.0, 0.0][0.0, 0.0, 1.0]";
         assertEquals(expect, mMatrix.toShortString());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "postSkew",
-        args = {float.class, float.class, float.class, float.class}
-    )
     public void testPostSkew2() {
         assertTrue(mMatrix.postSkew(1f, 2f, 3f, 4f));
         String expect = "[1.0, 1.0, -4.0][2.0, 1.0, -6.0][0.0, 0.0, 1.0]";
         assertEquals(expect, mMatrix.toShortString());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "postConcat",
-        args = {android.graphics.Matrix.class}
-    )
     public void testPostConcat() {
         Matrix matrix = new Matrix();
         float[] values = new float[9];
@@ -434,12 +262,6 @@ public class MatrixTest extends AndroidTestCase {
         assertEquals(expect, mMatrix.toShortString());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "setRectToRect",
-        args = {android.graphics.RectF.class, android.graphics.RectF.class,
-                android.graphics.Matrix.ScaleToFit.class}
-    )
     public void testSetRectToRect() {
         RectF r1 = new RectF();
         r1.set(1f, 2f, 3f, 3f);
@@ -474,11 +296,6 @@ public class MatrixTest extends AndroidTestCase {
         }
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "invert",
-        args = {android.graphics.Matrix.class}
-    )
     public void testInvert() {
         Matrix matrix = new Matrix();
         float[] values = new float[9];
@@ -498,11 +315,6 @@ public class MatrixTest extends AndroidTestCase {
         assertFalse(result);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "setPolyToPoly",
-        args = {float[].class, int.class, float[].class, int.class, int.class}
-    )
     public void testSetPolyToPoly() {
         float[] src = new float[9];
         src[0] = 100f;
@@ -519,11 +331,6 @@ public class MatrixTest extends AndroidTestCase {
         }
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "mapPoints",
-        args = {float[].class}
-    )
     public void testMapPoints() {
         float[] value = new float[9];
         value[0] = 100f;
@@ -536,11 +343,6 @@ public class MatrixTest extends AndroidTestCase {
         }
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "mapPoints",
-        args = {float[].class, float[].class}
-    )
     public void testMapPoints2() {
         float[] dst = new float[9];
         dst[0] = 100f;
@@ -555,11 +357,6 @@ public class MatrixTest extends AndroidTestCase {
         }
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "mapPoints",
-        args = {float[].class, int.class, float[].class, int.class, int.class}
-    )
     public void testMapPoints3() {
         float[] dst = new float[9];
         dst[0] = 100f;
@@ -574,11 +371,6 @@ public class MatrixTest extends AndroidTestCase {
         }
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "mapVectors",
-        args = {float[].class}
-    )
     public void testMapVectors() {
         float[] values = new float[9];
         values = new float[9];
@@ -592,11 +384,6 @@ public class MatrixTest extends AndroidTestCase {
         }
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "mapVectors",
-        args = {float[].class, float[].class}
-    )
     public void testMapVectors2() {
         float[] src = new float[9];
         src[0] = 100f;
@@ -612,11 +399,6 @@ public class MatrixTest extends AndroidTestCase {
         }
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "mapVectors",
-        args = {float[].class, int.class, float[].class, int.class, int.class}
-    )
     public void testMapVectors3() {
         float[] src = new float[9];
         src[0] = 100f;
@@ -631,11 +413,6 @@ public class MatrixTest extends AndroidTestCase {
         }
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "mapRadius",
-        args = {float.class}
-    )
     public void testMapRadius() {
         assertEquals(mMatrix.mapRadius(100f), 100f);
         assertEquals(mMatrix.mapRadius(Float.MAX_VALUE),
@@ -643,11 +420,6 @@ public class MatrixTest extends AndroidTestCase {
         assertEquals(mMatrix.mapRadius(Float.MIN_VALUE), 0f);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "mapRect",
-        args = {android.graphics.RectF.class}
-    )
     public void testMapRect() {
         RectF r = new RectF();
         r.set(1f, 2f, 3f, 4f);
@@ -664,11 +436,6 @@ public class MatrixTest extends AndroidTestCase {
         }
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "mapRect",
-        args = {android.graphics.RectF.class, android.graphics.RectF.class}
-    )
     public void testMapRect2() {
         RectF dst = new RectF();
         dst.set(100f, 100f, 200f, 200f);
@@ -692,18 +459,6 @@ public class MatrixTest extends AndroidTestCase {
         }
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setValues",
-            args = {float[].class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getValues",
-            args = {float[].class}
-        )
-    })
     public void testAccessValues() {
         Matrix matrix = new Matrix();
         mMatrix.invert(matrix);
@@ -723,30 +478,15 @@ public class MatrixTest extends AndroidTestCase {
                 + values[6] + ", " + values[7] + ", " + values[8] + "]";
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "toString",
-        args = {}
-    )
     public void testToString() {
         assertNotNull(mMatrix.toString());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "toShortString",
-        args = {}
-    )
     public void testToShortString() {
         String expect = "[1.0, 0.0, 0.0][0.0, 1.0, 0.0][0.0, 0.0, 1.0]";
         assertEquals(expect, mMatrix.toShortString());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "setTranslate",
-        args = {float.class, float.class}
-    )
     public void testSetTranslate() {
         mMatrix.setTranslate(2f, 3f);
         String expect = "[1.0, 0.0, 2.0][0.0, 1.0, 3.0][0.0, 0.0, 1.0]";

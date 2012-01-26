@@ -16,11 +16,6 @@
 
 package android.view.cts;
 
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
-import dalvik.annotation.ToBeFixed;
 
 import android.os.Parcel;
 import android.os.Parcelable;
@@ -36,7 +31,6 @@ import junit.framework.Assert;
 /**
  * Test {@link KeyEvent}.
  */
-@TestTargetClass(KeyEvent.class)
 public class KeyEventTest extends AndroidTestCase {
     private KeyEvent mKeyEvent;
     private long mDownTime;
@@ -51,58 +45,6 @@ public class KeyEventTest extends AndroidTestCase {
         mEventTime = SystemClock.uptimeMillis();
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test constructor(s) of {@link KeyEvent}",
-            method = "KeyEvent",
-            args = {int.class, int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test constructor(s) of {@link KeyEvent}",
-            method = "KeyEvent",
-            args = {android.view.KeyEvent.class, long.class, int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test constructor(s) of {@link KeyEvent}",
-            method = "KeyEvent",
-            args = {long.class, long.class, int.class, int.class, int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test constructor(s) of {@link KeyEvent}",
-            method = "KeyEvent",
-            args = {long.class, long.class, int.class, int.class, int.class, int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test constructor(s) of {@link KeyEvent}",
-            method = "KeyEvent",
-            args = {long.class, long.class, int.class, int.class, int.class, int.class,
-                    int.class, int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test constructor(s) of {@link KeyEvent}",
-            method = "KeyEvent",
-            args = {long.class, long.class, int.class, int.class, int.class, int.class,
-                    int.class, int.class, int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test constructor(s) of {@link KeyEvent}",
-            method = "KeyEvent",
-            args = {long.class, String.class, int.class, int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test constructor(s) of {@link KeyEvent}",
-            method = "KeyEvent",
-            args = {android.view.KeyEvent.class}
-        )
-    })
     public void testConstructor() {
         new KeyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_0);
 
@@ -124,12 +66,6 @@ public class KeyEventTest extends AndroidTestCase {
         new KeyEvent(mDownTime, "test", 0, KeyEvent.FLAG_SOFT_KEYBOARD);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test {@link KeyEvent#getCharacters()}",
-        method = "getCharacters",
-        args = {}
-    )
     public void testGetCharacters() {
         String characters = "android_test";
         mKeyEvent = new KeyEvent(mDownTime, characters, 0, KeyEvent.FLAG_SOFT_KEYBOARD);
@@ -141,22 +77,10 @@ public class KeyEventTest extends AndroidTestCase {
         assertNull(mKeyEvent.getCharacters());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test {@link KeyEvent#getMaxKeyCode()}",
-        method = "getMaxKeyCode",
-        args = {}
-    )
     public void testGetMaxKeyCode() {
         assertTrue(KeyEvent.getMaxKeyCode() > 0);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test {@link KeyEvent#isShiftPressed()}",
-        method = "isShiftPressed",
-        args = {}
-    )
     public void testIsShiftPressed() {
         assertFalse(mKeyEvent.isShiftPressed());
         mKeyEvent = new KeyEvent(mDownTime, mEventTime, KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_0, 5,
@@ -167,23 +91,11 @@ public class KeyEventTest extends AndroidTestCase {
         assertFalse(mKeyEvent.isShiftPressed());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test {@link KeyEvent#getDeadChar(int, int)}",
-        method = "getDeadChar",
-        args = {int.class, int.class}
-    )
     public void testGetDeadChar() {
         // decimal number of &egrave; is 232.
         assertEquals(232, KeyEvent.getDeadChar('`', 'e'));
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test {@link KeyEvent#getKeyData(KeyData)}",
-        method = "getKeyData",
-        args = {android.view.KeyCharacterMap.KeyData.class}
-    )
     public void testGetKeyData() {
         KeyEvent keyEvent = new KeyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_Z);
         KeyData keyData = new KeyData();
@@ -197,12 +109,6 @@ public class KeyEventTest extends AndroidTestCase {
         assertEquals(0, keyData.meta[3]);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test {@link KeyEvent#dispatch(Callback)}",
-        method = "dispatch",
-        args = {android.view.KeyEvent.Callback.class}
-    )
     public void testDispatch() {
         MockCallback callback = new MockCallback();
         mKeyEvent = new KeyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_0);
@@ -244,12 +150,6 @@ public class KeyEventTest extends AndroidTestCase {
         assertEquals(KeyEvent.KEYCODE_0, callback.getKeyCode());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test {@link KeyEvent#getMetaState()}",
-        method = "getMetaState",
-        args = {}
-    )
     public void testGetMetaState() {
         int metaState = KeyEvent.META_ALT_ON;
         mKeyEvent = new KeyEvent(mDownTime, mEventTime, KeyEvent.ACTION_MULTIPLE,
@@ -257,36 +157,18 @@ public class KeyEventTest extends AndroidTestCase {
         assertEquals(metaState, mKeyEvent.getMetaState());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test {@link KeyEvent#getEventTime()}",
-        method = "getEventTime",
-        args = {}
-    )
     public void testGetEventTime() {
         mKeyEvent = new KeyEvent(mDownTime, mEventTime, KeyEvent.ACTION_DOWN,
                 KeyEvent.KEYCODE_0, 5);
         assertEquals(mEventTime, mKeyEvent.getEventTime());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test {@link KeyEvent#getDownTime()}",
-        method = "getDownTime",
-        args = {}
-    )
     public void testGetDownTime() {
         mKeyEvent = new KeyEvent(mDownTime, mEventTime, KeyEvent.ACTION_DOWN,
                 KeyEvent.KEYCODE_0, 5);
         assertEquals(mDownTime, mKeyEvent.getDownTime());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test {@link KeyEvent#getUnicodeChar()}",
-        method = "getUnicodeChar",
-        args = {}
-    )
     public void testGetUnicodeChar1() {
         // 48 is Unicode character of '0'
         assertEquals(48, mKeyEvent.getUnicodeChar());
@@ -302,12 +184,6 @@ public class KeyEventTest extends AndroidTestCase {
         assertEquals(0, mKeyEvent.getUnicodeChar());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test {@link KeyEvent#getUnicodeChar(int)}",
-        method = "getUnicodeChar",
-        args = {int.class}
-    )
     public void testGetUnicodeChar2() {
         // 48 is Unicode character of '0'
         assertEquals(48, mKeyEvent.getUnicodeChar(MetaKeyKeyListener.META_CAP_LOCKED));
@@ -323,12 +199,6 @@ public class KeyEventTest extends AndroidTestCase {
         assertEquals(0, mKeyEvent.getUnicodeChar(0));
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test {@link KeyEvent#getNumber()}",
-        method = "getNumber",
-        args = {}
-    )
     public void testGetNumber() {
         // 48 is associated with key '0'
         assertEquals(48, mKeyEvent.getNumber());
@@ -338,12 +208,6 @@ public class KeyEventTest extends AndroidTestCase {
         assertEquals(51, mKeyEvent.getNumber());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test {@link KeyEvent#isSymPressed()}",
-        method = "isSymPressed",
-        args = {}
-    )
     public void testIsSymPressed() {
         mKeyEvent = new KeyEvent(mDownTime, mEventTime, KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_0, 5,
                 KeyEvent.META_SYM_ON);
@@ -354,12 +218,6 @@ public class KeyEventTest extends AndroidTestCase {
         assertFalse(mKeyEvent.isSymPressed());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test {@link KeyEvent#getDeviceId()}",
-        method = "getDeviceId",
-        args = {}
-    )
     public void testGetDeviceId() {
         int deviceId = 1;
         mKeyEvent = new KeyEvent(mDownTime, mEventTime, KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_0, 5,
@@ -367,23 +225,11 @@ public class KeyEventTest extends AndroidTestCase {
         assertEquals(deviceId, mKeyEvent.getDeviceId());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test {@link KeyEvent#toString()}",
-        method = "toString",
-        args = {}
-    )
     public void testToString() {
         // make sure it does not throw any exception.
         mKeyEvent.toString();
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test {@link KeyEvent#isAltPressed()}",
-        method = "isAltPressed",
-        args = {}
-    )
     public void testIsAltPressed() {
         mKeyEvent = new KeyEvent(mDownTime, mEventTime, KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_0, 5,
                 KeyEvent.META_ALT_ON);
@@ -593,25 +439,10 @@ public class KeyEventTest extends AndroidTestCase {
         assertFalse(ev.hasModifiers(KeyEvent.META_SHIFT_LEFT_ON));
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test {@link KeyEvent#getDisplayLabel()}",
-        method = "getDisplayLabel",
-        args = {}
-    )
-    @ToBeFixed(bug = "1695243", explanation = "Android API javadocs are incomplete")
     public void testGetDisplayLabel() {
         assertTrue(mKeyEvent.getDisplayLabel() > 0);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test {@link KeyEvent#isSystem()}",
-        method = "isSystem",
-        args = {}
-    )
-    @ToBeFixed(bug = "1695243", explanation = "Android API javadocs are incomplete, " +
-            "javadoc does not tell user the system key set.")
     public void testIsSystem() {
         mKeyEvent = new KeyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_MENU);
         assertTrue(mKeyEvent.isSystem());
@@ -656,14 +487,6 @@ public class KeyEventTest extends AndroidTestCase {
         assertFalse(mKeyEvent.isSystem());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test {@link KeyEvent#isPrintingKey()}",
-        method = "isPrintingKey",
-        args = {}
-    )
-    @ToBeFixed(bug = "1695243", explanation = "Android API javadocs are incomplete, " +
-            "javadoc does not tell user the printing key set.")
     public void testIsPrintingKey() {
         mKeyEvent = new KeyEvent(KeyEvent.ACTION_DOWN, Character.SPACE_SEPARATOR);
         assertTrue(mKeyEvent.isPrintingKey());
@@ -684,12 +507,6 @@ public class KeyEventTest extends AndroidTestCase {
         assertTrue(mKeyEvent.isPrintingKey());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test {@link KeyEvent#getMatch(char[])}",
-        method = "getMatch",
-        args = {char[].class}
-    )
     public void testGetMatch1() {
         char[] codes1 = new char[] { '0', '1', '2' };
         assertEquals('0', mKeyEvent.getMatch(codes1));
@@ -702,22 +519,10 @@ public class KeyEventTest extends AndroidTestCase {
         assertEquals('S', mKeyEvent.getMatch(codes3));
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test {@link KeyEvent#getAction()}",
-        method = "getAction",
-        args = {}
-    )
     public void testGetAction() {
         assertEquals(KeyEvent.ACTION_DOWN, mKeyEvent.getAction());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test {@link KeyEvent#getRepeatCount()}",
-        method = "getRepeatCount",
-        args = {}
-    )
     public void testGetRepeatCount() {
         int repeatCount = 1;
         mKeyEvent = new KeyEvent(mDownTime, mEventTime, KeyEvent.ACTION_MULTIPLE,
@@ -725,12 +530,6 @@ public class KeyEventTest extends AndroidTestCase {
         assertEquals(repeatCount, mKeyEvent.getRepeatCount());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test {@link KeyEvent#writeToParcel(Parcel, int)}",
-        method = "writeToParcel",
-        args = {android.os.Parcel.class, int.class}
-    )
     public void testWriteToParcel() {
         Parcel parcel = Parcel.obtain();
         mKeyEvent.writeToParcel(parcel, Parcelable.PARCELABLE_WRITE_RETURN_VALUE);
@@ -750,34 +549,15 @@ public class KeyEventTest extends AndroidTestCase {
         assertEquals(mKeyEvent.getEventTime(), keyEvent.getEventTime());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test {@link KeyEvent#describeContents()}, this function always returns 0",
-        method = "describeContents",
-        args = {}
-    )
-    @ToBeFixed(bug = "1695243", explanation = "Android API javadocs are incomplete.")
     public void testDescribeContents() {
         // make sure it never shrow any exception.
         mKeyEvent.describeContents();
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test {@link KeyEvent#getKeyCode()}",
-        method = "getKeyCode",
-        args = {}
-    )
     public void testGetKeyCode() {
         assertEquals(KeyEvent.KEYCODE_0, mKeyEvent.getKeyCode());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test {@link KeyEvent#getFlags()}",
-        method = "getFlags",
-        args = {}
-    )
     public void testGetFlags() {
         mKeyEvent = new KeyEvent(mDownTime, mEventTime, KeyEvent.ACTION_DOWN,
                 KeyEvent.KEYCODE_0, 5, KeyEvent.META_SHIFT_ON, 1, 1, KeyEvent.FLAG_WOKE_HERE);
@@ -788,12 +568,6 @@ public class KeyEventTest extends AndroidTestCase {
         assertEquals(KeyEvent.FLAG_SOFT_KEYBOARD, mKeyEvent.getFlags());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test {@link KeyEvent#getScanCode()}",
-        method = "getScanCode",
-        args = {}
-    )
     public void testGetScanCode() {
         int scanCode = 1;
         mKeyEvent = new KeyEvent(mDownTime, mEventTime, KeyEvent.ACTION_DOWN,
@@ -801,11 +575,6 @@ public class KeyEventTest extends AndroidTestCase {
         assertEquals(scanCode, mKeyEvent.getScanCode());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "changeAction",
-        args = {android.view.KeyEvent.class, int.class}
-    )
     public void testChangeAction() {
         mKeyEvent = new KeyEvent(mDownTime, mEventTime, KeyEvent.ACTION_DOWN,
                 KeyEvent.KEYCODE_0, 5, KeyEvent.META_SHIFT_ON, 1, 1, KeyEvent.FLAG_WOKE_HERE);
@@ -822,11 +591,6 @@ public class KeyEventTest extends AndroidTestCase {
         assertEquals(mKeyEvent.getRepeatCount(), newEvent.getRepeatCount());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "changeFlags",
-        args = {android.view.KeyEvent.class, int.class}
-    )
     public void testChangeFlags() {
         mKeyEvent = new KeyEvent(mDownTime, mEventTime, KeyEvent.ACTION_DOWN,
                 KeyEvent.KEYCODE_0, 5, KeyEvent.META_SHIFT_ON, 1, 1, KeyEvent.FLAG_WOKE_HERE);
@@ -843,11 +607,6 @@ public class KeyEventTest extends AndroidTestCase {
         assertEquals(mKeyEvent.getRepeatCount(), newEvent.getRepeatCount());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "changeTimeRepeat",
-        args = {android.view.KeyEvent.class, long.class, int.class}
-    )
     public void testChangeTimeRepeat() {
         mKeyEvent = new KeyEvent(mDownTime, mEventTime, KeyEvent.ACTION_DOWN,
                 KeyEvent.KEYCODE_0, 5, KeyEvent.META_SHIFT_ON, 1, 1, KeyEvent.FLAG_WOKE_HERE);

@@ -28,64 +28,12 @@ import android.graphics.Paint;
 import android.graphics.Picture;
 import android.graphics.Paint.Style;
 
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
 
-@TestTargetClass(Picture.class)
 public class PictureTest extends TestCase {
 
     private static final int TEST_WIDTH = 4; // must be >= 2
     private static final int TEST_HEIGHT = 3; // must >= 2
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "Picture",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "Picture",
-            args = {android.graphics.Picture.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "beginRecording",
-            args = {int.class, int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "endRecording",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getHeight",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getWidth",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "writeToStream",
-            args = {java.io.OutputStream.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "createFromStream",
-            args = {java.io.InputStream.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "draw",
-            args = {android.graphics.Canvas.class}
-        )
-    })
     public void testPicture() throws Exception {
 
         Picture picture = new Picture();

@@ -16,10 +16,6 @@
 
 package android.webkit.cts;
 
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
 
 import android.content.Context;
 import android.test.AndroidTestCase;
@@ -27,7 +23,6 @@ import android.webkit.DateSorter;
 
 import java.util.HashSet;
 
-@TestTargetClass(android.webkit.DateSorter.class)
 public class DateSorterTest extends AndroidTestCase {
     private Context mContext;
 
@@ -38,13 +33,6 @@ public class DateSorterTest extends AndroidTestCase {
         mContext = getContext();
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "DateSorter",
-            args = {android.content.Context.class}
-        )
-    })
     public void testConstructor() {
         new DateSorter(mContext);
     }
@@ -54,14 +42,6 @@ public class DateSorterTest extends AndroidTestCase {
         assertTrue(DateSorter.DAY_COUNT >= 3);
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.SUFFICIENT,
-            notes = "Resource Strings used for creating the labels are not public",
-            method = "getLabel",
-            args = {int.class}
-        )
-    })
     public void testGetLabel() {
         DateSorter dateSorter = new DateSorter(mContext);
         HashSet<String> set = new HashSet<String>();
@@ -76,13 +56,6 @@ public class DateSorterTest extends AndroidTestCase {
         }
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getIndex",
-            args = {long.class}
-        )
-    })
     public void testGetIndex() {
         DateSorter dateSorter = new DateSorter(mContext);
 
@@ -97,13 +70,6 @@ public class DateSorterTest extends AndroidTestCase {
         }
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getBoundary",
-            args = {int.class}
-        )
-    })
     public void testGetBoundary() {
         DateSorter dateSorter = new DateSorter(mContext);
 

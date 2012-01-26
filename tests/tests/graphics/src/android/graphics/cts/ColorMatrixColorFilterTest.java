@@ -15,10 +15,6 @@
  */
 package android.graphics.cts;
 
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
 
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
@@ -30,23 +26,10 @@ import android.graphics.Bitmap.Config;
 
 import junit.framework.TestCase;
 
-@TestTargetClass(ColorMatrixColorFilter.class)
 public class ColorMatrixColorFilterTest extends TestCase {
 
     private static final int TOLERANCE = 1;
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "ColorMatrixColorFilter",
-            args = {ColorMatrix.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "ColorMatrixColorFilter",
-            args = {float[].class}
-        )
-    })
     public void testColorMatrixColorFilter() {
         ColorMatrixColorFilter filter;
 

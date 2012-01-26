@@ -16,45 +16,13 @@
 
 package android.os.cts;
 
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
 
 import android.os.Debug;
 
 import junit.framework.TestCase;
 
-@TestTargetClass(Debug.InstructionCount.class)
 public class Debug_InstructionCountTest extends TestCase {
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "Debug.InstructionCount",
-            args = {}
-            ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "resetAndStart",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "collect",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "globalTotal",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "globalMethodInvocations",
-            args = {}
-        )
-    })
     public void testDebugInstructionCount() {
         Debug.InstructionCount instructionCount = new Debug.InstructionCount();
 

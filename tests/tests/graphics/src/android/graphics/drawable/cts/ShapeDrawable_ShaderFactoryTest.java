@@ -18,19 +18,8 @@ package android.graphics.drawable.cts;
 
 import junit.framework.TestCase;
 import android.graphics.drawable.ShapeDrawable;
-import dalvik.annotation.TestTargets;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
 
-@TestTargetClass(ShapeDrawable.ShaderFactory.class)
 public class ShapeDrawable_ShaderFactoryTest extends TestCase {
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test resize(int, int)",
-        method = "resize",
-        args = {int.class, int.class}
-    )
     public void testResize() {
         // resize is an abstract function.
     }

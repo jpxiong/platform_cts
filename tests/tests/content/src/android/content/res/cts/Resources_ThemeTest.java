@@ -28,12 +28,7 @@ import android.util.Xml;
 
 import com.android.cts.stub.R;
 
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
 
-@TestTargetClass(Resources.Theme.class)
 public class Resources_ThemeTest extends AndroidTestCase {
 
     private Resources.Theme mResTheme;
@@ -44,23 +39,6 @@ public class Resources_ThemeTest extends AndroidTestCase {
         mResTheme = getContext().getResources().newTheme();
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "applyStyle",
-            args = {int.class, boolean.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "dump",
-            args = {int.class, java.lang.String.class, java.lang.String.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setTo",
-            args = {android.content.res.Resources.Theme.class}
-        )
-    })
     public void testSetMethods() {
         // call a native method, and have no way to get the style
         mResTheme.applyStyle(R.raw.testmp3, false);
@@ -71,23 +49,6 @@ public class Resources_ThemeTest extends AndroidTestCase {
         mResTheme.setTo(other);
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "obtainStyledAttributes",
-            args = {android.util.AttributeSet.class, int[].class, int.class, int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "obtainStyledAttributes",
-            args = {int.class, int[].class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "obtainStyledAttributes",
-            args = {int[].class}
-        )
-    })
     public void testObtainStyledAttributes() {
         final int[] attrs = new int[1];
         attrs[0] = R.raw.testmp3;
@@ -111,11 +72,6 @@ public class Resources_ThemeTest extends AndroidTestCase {
         testTypedArray.recycle();
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "resolveAttribute",
-        args = {int.class, android.util.TypedValue.class, boolean.class}
-    )
     public void testResolveAttribute() {
         final TypedValue value = new TypedValue();
         getContext().getResources().getValue(R.raw.testmp3, value, true);

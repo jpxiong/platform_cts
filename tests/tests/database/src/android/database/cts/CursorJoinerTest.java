@@ -16,10 +16,6 @@
 
 package android.database.cts;
 
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
 
 import android.content.Context;
 import android.database.Cursor;
@@ -30,7 +26,6 @@ import android.test.AndroidTestCase;
 
 import java.io.File;
 
-@TestTargetClass(android.database.CursorJoiner.class)
 public class CursorJoinerTest extends AndroidTestCase {
 
     private static final int TEST_ITEM_COUNT = 10;
@@ -62,25 +57,6 @@ public class CursorJoinerTest extends AndroidTestCase {
         super.tearDown();
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "CursorJoiner",
-            args = {android.database.Cursor.class, java.lang.String[].class,
-                    android.database.Cursor.class, java.lang.String[].class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "iterator",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "it always throws UnsupportedOperationException.",
-            method = "remove",
-            args = {}
-        )
-    })
     public void testCursorJoinerAndIterator() {
         Cursor cursor1 = getCursor(TABLE_NAME_1, null, null);
         Cursor cursor2 = getCursor(TABLE_NAME_2, null, null);
@@ -155,22 +131,6 @@ public class CursorJoinerTest extends AndroidTestCase {
         closeCursor(cursor1);
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Fisrt UNIQUE_COUNT 'next' operations, the joiner controls cursor1 to move;" +
-                    " and the second UNIQUE_COUNT 'next' ops, the joiner controlscursor2" +
-                    " to move, the last EQUAL_VALUE_COUNT 'next' ops, the joiner control" +
-                    " bothcursor1 and cursor2 to move.",
-            method = "next",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "hasNext",
-            args = {}
-        )
-    })
     public void testNext() {
         String[] columnNames = new String[] { "number" };
         Cursor cursor1 = getCursor(TABLE_NAME_1, null, columnNames);

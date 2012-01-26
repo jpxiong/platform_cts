@@ -25,13 +25,7 @@ import android.os.IBinder;
 import android.os.Process;
 import android.test.AndroidTestCase;
 import android.util.Log;
-import dalvik.annotation.TestTargets;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.ToBeFixed;
 
-@TestTargetClass(Process.class)
 public class ProcessTest extends AndroidTestCase {
 
     public static final int THREAD_PRIORITY_HIGHEST = -20;
@@ -98,51 +92,6 @@ public class ProcessTest extends AndroidTestCase {
         }
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.PARTIAL,
-            notes = "The documentation states that this will throw a  SecurityException" +
-                    " if the process does not have permission to set the requested priority " +
-                    "for the given thread. However, setting the current Thread's priority " +
-                    "does not throw a SecurityException, regardless of the priority value.",
-            method = "setThreadPriority",
-            args = {int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.PARTIAL,
-            notes = "The documentation states that this will throw a  SecurityException" +
-                    " if the process does not have permission to set the requested priority " +
-                    "for the given thread. However, setting the current Thread's priority " +
-                    "does not throw a SecurityException, regardless of the priority value.",
-            method = "setThreadPriority",
-            args = {int.class, int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getUidForName",
-            args = {java.lang.String.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "myTid",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getGidForName",
-            args = {java.lang.String.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getThreadPriority",
-            args = {int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "myUid",
-            args = {}
-        )
-    })
     public void testMiscMethods() {
         /*
          * Test setThreadPriority(int) and setThreadPriority(int, int)
@@ -202,26 +151,6 @@ public class ProcessTest extends AndroidTestCase {
      * Only the process running the caller's packages/application
      * and any additional processes created by that app be able to kill each other's processes.
      */
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.PARTIAL,
-            notes = "We can't run multi-apks under current CTS framework, "
-                + "so CTS will not test kill process of shared UID.",
-            method = "killProcess",
-            args = {int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.PARTIAL,
-            method = "supportsProcesses",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "test the time since this process has been started",
-            method = "getElapsedCpuTime",
-            args = {}
-        )
-    })
     public void testKillProcess() throws Exception {
         long time = 0;
         int servicePid = 0;
@@ -248,18 +177,6 @@ public class ProcessTest extends AndroidTestCase {
         assertTrue(mHasDisconnected);
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "sendSignal",
-            args = {int.class, int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "myPid",
-            args = {}
-        )
-    })
     /**
      * Test myPid() point.
      * Returns the identifier of this process, which can be used with

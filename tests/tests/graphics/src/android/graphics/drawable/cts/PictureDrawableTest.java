@@ -16,10 +16,6 @@
 
 package android.graphics.drawable.cts;
 
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
 
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
@@ -29,23 +25,12 @@ import android.graphics.PixelFormat;
 import android.graphics.drawable.PictureDrawable;
 import android.test.AndroidTestCase;
 
-@TestTargetClass(android.graphics.drawable.PictureDrawable.class)
 public class PictureDrawableTest extends AndroidTestCase {
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "PictureDrawable",
-        args = {android.graphics.Picture.class}
-    )
     public void testConstructor() {
         assertNull((new PictureDrawable(null)).getPicture());
         assertNotNull((new PictureDrawable(new Picture())).getPicture());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "draw",
-        args = {android.graphics.Canvas.class}
-    )
     public void testDraw() {
         PictureDrawable pictureDrawable = new PictureDrawable(null);
 
@@ -72,18 +57,6 @@ public class PictureDrawableTest extends AndroidTestCase {
         assertEquals(0xff0a0c0b, destBitmap.getPixel(10, 10));
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getIntrinsicWidth",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getIntrinsicHeight",
-            args = {}
-        )
-    })
     public void testGetIntrinsicSize() {
         PictureDrawable pictureDrawable = new PictureDrawable(null);
         // Test with null Picture object
@@ -98,31 +71,16 @@ public class PictureDrawableTest extends AndroidTestCase {
         assertEquals(101, pictureDrawable.getIntrinsicHeight());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "getOpacity",
-        args = {}
-    )
     public void testGetOpacity() {
         PictureDrawable pictureDrawable = new PictureDrawable(null);
         assertEquals(PixelFormat.TRANSLUCENT, pictureDrawable.getOpacity());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "setAlpha",
-        args = {int.class}
-    )
     public void testSetAlpha() {
         PictureDrawable pictureDrawable = new PictureDrawable(null);
         pictureDrawable.setAlpha(0);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "setColorFilter",
-        args = {android.graphics.ColorFilter.class}
-    )
     public void testSetColorFilter() {
         PictureDrawable pictureDrawable = new PictureDrawable(null);
 
@@ -130,38 +88,16 @@ public class PictureDrawableTest extends AndroidTestCase {
         pictureDrawable.setColorFilter(colorFilter);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "setDither",
-        args = {boolean.class}
-    )
     public void testSetDither() {
         PictureDrawable pictureDrawable = new PictureDrawable(null);
         pictureDrawable.setDither(true);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "setFilterBitmap",
-        args = {boolean.class}
-    )
     public void testSetFilterBitmap() {
         PictureDrawable pictureDrawable = new PictureDrawable(null);
         pictureDrawable.setFilterBitmap(true);
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getPicture",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setPicture",
-            args = {android.graphics.Picture.class}
-        )
-    })
     public void testAccessPicture() {
         PictureDrawable pictureDrawable = new PictureDrawable(null);
         assertNull(pictureDrawable.getPicture());

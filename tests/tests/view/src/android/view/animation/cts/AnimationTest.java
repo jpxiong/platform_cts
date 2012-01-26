@@ -18,11 +18,6 @@ package android.view.animation.cts;
 
 import com.android.cts.stub.R;
 
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
-import dalvik.annotation.ToBeFixed;
 
 import android.app.Activity;
 import android.content.res.XmlResourceParser;
@@ -43,7 +38,6 @@ import android.view.animation.Animation.AnimationListener;
 /**
  * Test {@link Animation}.
  */
-@TestTargetClass(Animation.class)
 public class AnimationTest extends ActivityInstrumentationTestCase2<AnimationTestStubActivity> {
     private static final float ALPHA_DELTA = 0.001f;
 
@@ -66,20 +60,6 @@ public class AnimationTest extends ActivityInstrumentationTestCase2<AnimationTes
         mActivity = getActivity();
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test constructor(s) of {@link Animation}",
-            method = "Animation",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test constructor(s) of {@link Animation}",
-            method = "Animation",
-            args = {android.content.Context.class, android.util.AttributeSet.class}
-        )
-    })
     public void testConstructor() {
         XmlResourceParser parser = mActivity.getResources().getAnimation(R.anim.alpha);
         AttributeSet attrs = Xml.asAttributeSet(parser);
@@ -90,35 +70,6 @@ public class AnimationTest extends ActivityInstrumentationTestCase2<AnimationTes
         };
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test {@link Animation#ensureInterpolator()}",
-            method = "ensureInterpolator",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test {@link Animation#getInterpolator()}",
-            method = "getInterpolator",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test {@link Animation#setInterpolator(Context, int)}",
-            method = "setInterpolator",
-            args = {android.content.Context.class, int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test {@link Animation#setInterpolator(Interpolator)}",
-            method = "setInterpolator",
-            args = {android.view.animation.Interpolator.class}
-        )
-    })
-    @ToBeFixed(bug = "1561186", explanation = "javadoc of setInterpolator(Interpolator) " +
-            "conflicts with ensureInterpolator()'s. can not get the specific default " +
-            "Interpolator type")
     public void testAccessInterpolator() {
         // check default interpolator
         MyAnimation myAnimation = new MyAnimation();
@@ -145,20 +96,6 @@ public class AnimationTest extends ActivityInstrumentationTestCase2<AnimationTes
         assertTrue(interpolator instanceof AccelerateInterpolator);
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "check default fillAfter",
-            method = "getFillAfter",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "check default fillBefore",
-            method = "getFillBefore",
-            args = {}
-        )
-    })
     public void testDefaultFill() {
         Animation animation = new Animation() {
         };
@@ -166,48 +103,6 @@ public class AnimationTest extends ActivityInstrumentationTestCase2<AnimationTes
         assertFalse(animation.getFillAfter());
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test {@link Animation#getFillAfter()}",
-            method = "getFillAfter",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test {@link Animation#setFillAfter(boolean)}",
-            method = "setFillAfter",
-            args = {boolean.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test {@link Animation#getFillBefore()}",
-            method = "getFillBefore",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test {@link Animation#setFillBefore(boolean)}",
-            method = "setFillBefore",
-            args = {boolean.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test {@link Animation#isFillEnabled()}",
-            method = "isFillEnabled",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test {@link Animation#setFillEnabled(boolean)}",
-            method = "setFillEnabled",
-            args = {boolean.class}
-        )
-    })
-    @ToBeFixed(bug = "1698355", explanation = "When isFillEnabled() is false," +
-            " it's the same as setting fillBefore and fillAfter to true. But javadoc of" +
-            " setFillEnabled(boolean) says \"fillBefore and fillAfter are ignored\"," +
-            " it's unclear.")
     public void testAccessFill() {
         View animWindow = mActivity.findViewById(R.id.anim_window);
         // XML file of R.anim.accelerate_alpha
@@ -274,12 +169,6 @@ public class AnimationTest extends ActivityInstrumentationTestCase2<AnimationTes
         assertEquals(0.9f, alpha, ALPHA_DELTA);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test {@link Animation#computeDurationHint()}",
-        method = "computeDurationHint",
-        args = {}
-    )
     public void testComputeDurationHint() {
         // start offset is 0, duration is 2000, repeat count is 0.
         Animation animation = AnimationUtils.loadAnimation(mActivity, R.anim.decelerate_alpha);
@@ -294,44 +183,6 @@ public class AnimationTest extends ActivityInstrumentationTestCase2<AnimationTes
         assertEquals(8400, animation.computeDurationHint());
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test {@link Animation#getRepeatMode()}. It cannot be set in XML",
-            method = "getRepeatMode",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test {@link Animation#setRepeatMode(int)}. It cannot be set in XML",
-            method = "setRepeatMode",
-            args = {int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test {@link Animation#getRepeatCount()}.",
-            method = "getRepeatCount",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test {@link Animation#setRepeatCount(int)}.",
-            method = "setRepeatCount",
-            args = {int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test {@link Animation#getDuration()}",
-            method = "getDuration",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test {@link Animation#setDuration(long)}.",
-            method = "setDuration",
-            args = {long.class}
-        )
-    })
     public void testRepeatAnimation() {
         // check default repeatMode
         Animation animation = new Animation() {
@@ -473,20 +324,6 @@ public class AnimationTest extends ActivityInstrumentationTestCase2<AnimationTes
         assertTrue(delta3 > delta4);
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test {@link Animation#getStartOffset()}",
-            method = "getStartOffset",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test {@link Animation#setStartOffset(long)}",
-            method = "setStartOffset",
-            args = {long.class}
-        )
-    })
     public void testAccessStartOffset() {
         final long startOffset = 800;
         // check default startOffset
@@ -530,50 +367,6 @@ public class AnimationTest extends ActivityInstrumentationTestCase2<AnimationTes
         assertTrue(alpha4 > 0.1f);
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "test run an accelerate alpha animation",
-            method = "getStartTime",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "test run an accelerate alpha animation",
-            method = "setStartTime",
-            args = {long.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "test run an accelerate alpha animation",
-            method = "hasStarted",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "test run an accelerate alpha animation",
-            method = "hasEnded",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "test run an accelerate alpha animation",
-            method = "reset",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "test run an accelerate alpha animation",
-            method = "startNow",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "test run an accelerate alpha animation",
-            method = "getTransformation",
-            args = {long.class, android.view.animation.Transformation.class}
-        )
-    })
     public void testRunAccelerateAlpha() {
         // check default startTime
         Animation animation = new Animation() {
@@ -601,21 +394,6 @@ public class AnimationTest extends ActivityInstrumentationTestCase2<AnimationTes
         assertEquals(currentTime, anim.getStartTime(), 100);
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test {@link Animation#getTransformation(long, Transformation)}",
-            method = "getTransformation",
-            args = {long.class, android.view.animation.Transformation.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test {@link Animation#applyTransformation(float, Transformation)}",
-            method = "applyTransformation",
-            args = {float.class, android.view.animation.Transformation.class}
-        )
-    })
-    @ToBeFixed(bug = "1698355", explanation = "getTransformation is very poorly documented.")
     public void testGetTransformation() {
         final View animWindow = mActivity.findViewById(R.id.anim_window);
 
@@ -684,20 +462,6 @@ public class AnimationTest extends ActivityInstrumentationTestCase2<AnimationTes
         assertTrue(delta3 < delta4);
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test {@link Animation#getZAdjustment()}",
-            method = "getZAdjustment",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test {@link Animation#setZAdjustment(int)}",
-            method = "setZAdjustment",
-            args = {int.class}
-        )
-    })
     public void testAccessZAdjustment() {
         // check default zAdjustment
         Animation animation = new Animation() {
@@ -714,20 +478,6 @@ public class AnimationTest extends ActivityInstrumentationTestCase2<AnimationTes
         assertEquals(Animation.ZORDER_BOTTOM, animation.getZAdjustment());
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test {@link Animation#initialize(int, int, int, int)}}",
-            method = "initialize",
-            args = {int.class, int.class, int.class, int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test {@link Animation#isInitialized()}",
-            method = "isInitialized",
-            args = {}
-        )
-    })
     public void testInitialize() {
         Animation animation = new Animation() {
         };
@@ -737,12 +487,6 @@ public class AnimationTest extends ActivityInstrumentationTestCase2<AnimationTes
         assertTrue(animation.isInitialized());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test {@link Animation#resolveSize(int, float, int, int)}",
-        method = "resolveSize",
-        args = {int.class, float.class, int.class, int.class}
-    )
     public void testResolveSize() {
         MyAnimation myAnimation = new MyAnimation();
 
@@ -760,12 +504,6 @@ public class AnimationTest extends ActivityInstrumentationTestCase2<AnimationTes
         assertEquals(10.0f, myAnimation.resolveSize(unknownType, 10.0f, 3, 4));
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test {@link Animation#restrictDuration(long)}",
-        method = "restrictDuration",
-        args = {long.class}
-    )
     public void testRestrictDuration() {
         Animation animation = new Animation() {
         };
@@ -788,12 +526,6 @@ public class AnimationTest extends ActivityInstrumentationTestCase2<AnimationTes
         assertEquals(1, animation.getRepeatCount());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test {@link Animation#scaleCurrentDuration(float)}",
-        method = "scaleCurrentDuration",
-        args = {float.class}
-    )
     public void testScaleCurrentDuration() {
         Animation animation = new Animation() {
         };
@@ -811,20 +543,6 @@ public class AnimationTest extends ActivityInstrumentationTestCase2<AnimationTes
         assertEquals(-10, animation.getDuration());
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test {@link Animation#setAnimationListener(AnimationListener)}",
-            method = "setAnimationListener",
-            args = {android.view.animation.Animation.AnimationListener.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test {@link Animation#getTransformation(long, Transformation)}",
-            method = "getTransformation",
-            args = {long.class, android.view.animation.Transformation.class}
-        )
-    })
     public void testSetAnimationListener() {
         final View animWindow = mActivity.findViewById(R.id.anim_window);
 
@@ -877,12 +595,6 @@ public class AnimationTest extends ActivityInstrumentationTestCase2<AnimationTes
         assertFalse(listener.hasAnimationEnded());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test {@link Animation#start()}",
-        method = "start",
-        args = {}
-    )
     public void testStart() {
         Animation animation = AnimationUtils.loadAnimation(mActivity, R.anim.accelerate_alpha);
         animation.setStartTime(0);
@@ -891,12 +603,6 @@ public class AnimationTest extends ActivityInstrumentationTestCase2<AnimationTes
         assertEquals(Animation.START_ON_FIRST_FRAME, animation.getStartTime());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test {@link Animation#startNow()}",
-        method = "startNow",
-        args = {}
-    )
     public void testStartNow() {
         Animation animation = AnimationUtils.loadAnimation(mActivity, R.anim.accelerate_alpha);
         animation.setStartTime(0);
@@ -906,12 +612,6 @@ public class AnimationTest extends ActivityInstrumentationTestCase2<AnimationTes
         assertEquals(currentTime, animation.getStartTime(), 100);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test {@link Animation#willChangeBounds()}, this method always returns true",
-        method = "willChangeBounds",
-        args = {}
-    )
     public void testWillChangeBounds() {
         Animation animation = new Animation() {
         };
@@ -919,13 +619,6 @@ public class AnimationTest extends ActivityInstrumentationTestCase2<AnimationTes
         assertTrue(animation.willChangeBounds());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test {@link Animation#willChangeTransformationMatrix()}," +
-                " this method always returns true",
-        method = "willChangeTransformationMatrix",
-        args = {}
-    )
     public void testWillChangeTransformationMatrix() {
         Animation animation = new Animation() {
         };
@@ -933,11 +626,6 @@ public class AnimationTest extends ActivityInstrumentationTestCase2<AnimationTes
         assertTrue(animation.willChangeTransformationMatrix());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "clone",
-        args = {}
-    )
     public void testClone() throws CloneNotSupportedException {
         MyAnimation myAnimation = new MyAnimation();
         myAnimation.setDuration(3000);

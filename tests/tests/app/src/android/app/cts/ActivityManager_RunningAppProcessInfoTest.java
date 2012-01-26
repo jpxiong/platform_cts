@@ -23,41 +23,9 @@ import android.content.Context;
 import android.os.Parcel;
 import android.test.AndroidTestCase;
 
-import dalvik.annotation.TestTargets;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
 
-@TestTargetClass(ActivityManager.RunningAppProcessInfo.class)
 public class ActivityManager_RunningAppProcessInfoTest extends AndroidTestCase {
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "describeContents",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "readFromParcel",
-            args = {android.os.Parcel.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "ActivityManager.RunningAppProcessInfo",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "ActivityManager.RunningAppProcessInfo",
-            args = {java.lang.String.class, int.class, java.lang.String[].class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "writeToParcel",
-            args = {android.os.Parcel.class, int.class}
-        )
-    })
     public void testRunningAppProcessInfo() {
         // test constructor
         new RunningAppProcessInfo();

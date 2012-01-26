@@ -16,10 +16,6 @@
 
 package android.app.cts;
 
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
 
 import android.app.Instrumentation;
 import android.app.ProgressDialog;
@@ -37,7 +33,6 @@ import android.widget.ProgressBar;
 /**
  * Test {@link ProgressDialog}.
  */
-@TestTargetClass(ProgressDialog.class)
 public class ProgressDialogTest extends ActivityInstrumentationTestCase2<MockActivity> {
     private final CharSequence TITLE = "title";
     private final CharSequence MESSAGE = "message";
@@ -72,41 +67,14 @@ public class ProgressDialogTest extends ActivityInstrumentationTestCase2<MockAct
                 com.android.cts.stub.R.drawable.yellow);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "ProgressDialog",
-        args = {android.content.Context.class}
-    )
     public void testProgressDialog1(){
         new ProgressDialog(mContext);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "ProgressDialog",
-        args = {android.content.Context.class, int.class}
-    )
     public void testProgressDialog2(){
         new ProgressDialog(mContext, com.android.cts.stub.R.style.Theme_AlertDialog);
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "onCreate",
-            args = {android.os.Bundle.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "onStart",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "onStop",
-            args = {}
-        )
-    })
     public void testOnStartCreateStop() {
         MockProgressDialog pd = new MockProgressDialog(mContext);
 
@@ -121,23 +89,11 @@ public class ProgressDialogTest extends ActivityInstrumentationTestCase2<MockAct
         assertTrue(pd.mIsOnStopCalled);
     }
 
-    @TestTargetNew(
-        level = TestLevel.SUFFICIENT,
-        method = "show",
-        args = {android.content.Context.class, java.lang.CharSequence.class,
-                java.lang.CharSequence.class}
-    )
     @UiThreadTest
     public void testShow1() {
         mProgressDialog = ProgressDialog.show(mContext, TITLE, MESSAGE);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "show",
-        args = {android.content.Context.class, java.lang.CharSequence.class,
-                java.lang.CharSequence.class, boolean.class}
-    )
     @UiThreadTest
     public void testShow2() {
         mProgressDialog = ProgressDialog.show(mContext, TITLE, MESSAGE, false);
@@ -152,12 +108,6 @@ public class ProgressDialogTest extends ActivityInstrumentationTestCase2<MockAct
         assertTrue(mProgressDialog.isIndeterminate());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "show",
-        args = {android.content.Context.class, java.lang.CharSequence.class,
-                java.lang.CharSequence.class, boolean.class, boolean.class}
-    )
     public void testShow3() throws Throwable {
         final OnCancelListener cL = new OnCancelListener(){
             public void onCancel(DialogInterface dialog) {
@@ -193,13 +143,6 @@ public class ProgressDialogTest extends ActivityInstrumentationTestCase2<MockAct
         assertTrue(mCanceled);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "show",
-        args = {android.content.Context.class, java.lang.CharSequence.class,
-                java.lang.CharSequence.class, boolean.class, boolean.class,
-                android.content.DialogInterface.OnCancelListener.class}
-    )
     public void testShow4() throws Throwable {
         final OnCancelListener cL = new OnCancelListener(){
             public void onCancel(DialogInterface dialog) {
@@ -233,18 +176,6 @@ public class ProgressDialogTest extends ActivityInstrumentationTestCase2<MockAct
         assertTrue(mCanceled);
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setMax",
-            args = {int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getMax",
-            args = {}
-        )
-    })
     @UiThreadTest
     public void testAccessMax() {
         // mProgress is null
@@ -257,18 +188,6 @@ public class ProgressDialogTest extends ActivityInstrumentationTestCase2<MockAct
         assertEquals(2009, mProgressDialog.getMax());
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setProgress",
-            args = {int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getProgress",
-            args = {}
-        )
-    })
     @UiThreadTest
     public void testAccessProgress() {
         // mProgress is null
@@ -284,18 +203,6 @@ public class ProgressDialogTest extends ActivityInstrumentationTestCase2<MockAct
         assertEquals(0, mProgressDialog.getProgress());
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setSecondaryProgress",
-            args = {int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getSecondaryProgress",
-            args = {}
-        )
-    })
     @UiThreadTest
     public void testAccessSecondaryProgress() {
         // mProgress is null
@@ -311,18 +218,6 @@ public class ProgressDialogTest extends ActivityInstrumentationTestCase2<MockAct
         assertEquals(0, mProgressDialog.getSecondaryProgress());
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setIndeterminate",
-            args = {boolean.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "isIndeterminate",
-            args = {}
-        )
-    })
     @UiThreadTest
     public void testSetIndeterminate() {
         // mProgress is null
@@ -342,11 +237,6 @@ public class ProgressDialogTest extends ActivityInstrumentationTestCase2<MockAct
         assertTrue(mProgressDialog.isIndeterminate());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "incrementProgressBy",
-        args = {int.class}
-    )
     public void testIncrementProgressBy() throws Throwable {
         runTestOnUiThread(new Runnable() {
             public void run() {
@@ -366,11 +256,6 @@ public class ProgressDialogTest extends ActivityInstrumentationTestCase2<MockAct
         assertEquals(70, mProgress2);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "incrementSecondaryProgressBy",
-        args = {int.class}
-    )
     public void testIncrementSecondaryProgressBy() throws Throwable {
         runTestOnUiThread(new Runnable() {
             public void run() {
@@ -389,11 +274,6 @@ public class ProgressDialogTest extends ActivityInstrumentationTestCase2<MockAct
         assertEquals(70, mProgress2);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "setProgressDrawable",
-        args = {android.graphics.drawable.Drawable.class}
-    )
     public void testSetProgressDrawable() throws Throwable {
         runTestOnUiThread(new Runnable() {
             public void run() {
@@ -413,11 +293,6 @@ public class ProgressDialogTest extends ActivityInstrumentationTestCase2<MockAct
         assertEquals(null, mActualDrawableNull);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "setIndeterminateDrawable",
-        args = {android.graphics.drawable.Drawable.class}
-    )
     public void testSetIndeterminateDrawable() throws Throwable {
         runTestOnUiThread(new Runnable() {
             public void run() {
@@ -437,12 +312,6 @@ public class ProgressDialogTest extends ActivityInstrumentationTestCase2<MockAct
         mInstrumentation.waitForIdleSync();
     }
 
-    @TestTargetNew(
-        level = TestLevel.SUFFICIENT,
-        method = "setMessage",
-        args = {java.lang.CharSequence.class},
-        notes= "no way to verify dialog contents"
-    )
     public void testSetMessage() throws Throwable {
         runTestOnUiThread(new Runnable() {
             public void run() {
@@ -464,12 +333,6 @@ public class ProgressDialogTest extends ActivityInstrumentationTestCase2<MockAct
         mInstrumentation.waitForIdleSync();
     }
 
-    @TestTargetNew(
-        level = TestLevel.SUFFICIENT,
-        method = "setProgressStyle",
-        args = {int.class},
-        notes="no way to verify dialog conteents"
-    )
     public void testSetProgressStyle() throws Throwable {
         setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
 

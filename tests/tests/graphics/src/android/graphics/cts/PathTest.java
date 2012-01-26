@@ -20,13 +20,7 @@ import junit.framework.TestCase;
 import android.graphics.Matrix;
 import android.graphics.Path;
 import android.graphics.RectF;
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
-import dalvik.annotation.ToBeFixed;
 
-@TestTargetClass(Path.class)
 public class PathTest extends TestCase {
 
     // Test constants
@@ -37,18 +31,6 @@ public class PathTest extends TestCase {
     private static final float XCOORD = 40.0f;
     private static final float YCOORD = 40.0f;
 
-	@TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "Path",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "Path",
-            args = {android.graphics.Path.class}
-        )
-    })
     public void testConstructor() {
         // new the Path instance
         new Path();
@@ -57,18 +39,6 @@ public class PathTest extends TestCase {
         new Path(new Path());
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "addRect",
-            args = {android.graphics.RectF.class, android.graphics.Path.Direction.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "isEmpty",
-            args = {}
-        )
-    })
     public void testAddRect1() {
 
         // new the Path instance
@@ -79,19 +49,6 @@ public class PathTest extends TestCase {
         assertFalse(path.isEmpty());
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "addRect",
-            args = {float.class, float.class, float.class, float.class,
-                    android.graphics.Path.Direction.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "isEmpty",
-            args = {}
-        )
-    })
     public void testAddRect2() {
 
         // new the Path instance
@@ -101,33 +58,12 @@ public class PathTest extends TestCase {
         assertFalse(path.isEmpty());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "moveTo",
-        args = {float.class, float.class}
-    )
-    @ToBeFixed(bug = "1451096", explanation = "Test moveTo(float x, float y)." +
-            "When this method called, the current point will move to the" +
-            "appointed coordinate, but there is no more way to get known" +
-            "about whether current point is just in that coordinate correctly")
     public void testMoveTo() {
         // new the Path instance
         Path path = new Path();
         path.moveTo(10.0f, 10.0f);
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "set",
-            args = {android.graphics.Path.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "isEmpty",
-            args = {}
-        )
-    })
     public void testSet() {
         // new the Path instance
         Path path = new Path();
@@ -138,18 +74,6 @@ public class PathTest extends TestCase {
         assertFalse(path.isEmpty());
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setFillType",
-            args = {android.graphics.Path.FillType.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getFillType",
-            args = {}
-        )
-    })
     public void testAccessFillType() {
         // set the expected value
         Path.FillType expected1 = Path.FillType.EVEN_ODD;
@@ -170,18 +94,6 @@ public class PathTest extends TestCase {
         assertEquals(expected4, path.getFillType());
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "rQuadTo",
-            args = {float.class, float.class, float.class, float.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "isEmpty",
-            args = {}
-        )
-    })
     public void testRQuadTo() {
         // new the Path instance
         Path path = new Path();
@@ -190,18 +102,6 @@ public class PathTest extends TestCase {
         assertFalse(path.isEmpty());
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "transform",
-            args = {android.graphics.Matrix.class, android.graphics.Path.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "isEmpty",
-            args = {}
-        )
-    })
     public void testTransform1() {
         // new the Path instance
         Path path = new Path();
@@ -212,31 +112,10 @@ public class PathTest extends TestCase {
         assertFalse(dst.isEmpty());
     }
 
-    @TestTargetNew(
-        level = TestLevel.NOT_FEASIBLE,
-        method = "transform",
-        args = {android.graphics.Matrix.class}
-    )
-    @ToBeFixed(bug = "1451096", explanation = "The function of this method is" +
-              "almost the same as transform(Matrix matrix, Path dst) but no dst" +
-              "to show if it works when called, and we can't get any information" +
-              "in this method when called" )
     public void testTransform2() {
 
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "lineTo",
-            args = {float.class, float.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "isEmpty",
-            args = {}
-        )
-    })
     public void testLineTo() {
         // new the Path instance
         Path path = new Path();
@@ -245,14 +124,6 @@ public class PathTest extends TestCase {
         assertFalse(path.isEmpty());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "close",
-        args = {}
-    )
-    @ToBeFixed(bug = "1451096", explanation = "What does 'close' mean, clear the " +
-            "contour or others? If clear, why the path is not empty when" +
-            "there is just one path.")
     public void testClose() {
         // new the Path instance
         Path path = new Path();
@@ -261,18 +132,6 @@ public class PathTest extends TestCase {
         path.close();
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "quadTo",
-            args = {float.class, float.class, float.class, float.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "isEmpty",
-            args = {}
-        )
-    })
     public void testQuadTo() {
         // new the Path instance
         Path path = new Path();
@@ -281,18 +140,6 @@ public class PathTest extends TestCase {
         assertFalse(path.isEmpty());
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "addCircle",
-            args = {float.class, float.class, float.class, android.graphics.Path.Direction.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "isEmpty",
-            args = {}
-        )
-    })
     public void testAddCircle() {
         // new the Path instance
         Path path = new Path();
@@ -301,18 +148,6 @@ public class PathTest extends TestCase {
         assertFalse(path.isEmpty());
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "arcTo",
-            args = {android.graphics.RectF.class, float.class, float.class, boolean.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "isEmpty",
-            args = {}
-        )
-    })
     public void testArcTo1() {
         // new the Path instance
         Path path = new Path();
@@ -322,18 +157,6 @@ public class PathTest extends TestCase {
         assertFalse(path.isEmpty());
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "arcTo",
-            args = {android.graphics.RectF.class, float.class, float.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "isEmpty",
-            args = {}
-        )
-    })
     public void testArcTo2() {
         // new the Path instance
         Path path = new Path();
@@ -343,11 +166,6 @@ public class PathTest extends TestCase {
         assertFalse(path.isEmpty());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "computeBounds",
-        args = {android.graphics.RectF.class, boolean.class}
-    )
     public void testComputeBounds1() {
 
         RectF expected = new RectF(0.0f, 0.0f, 0.0f, 0.0f);
@@ -363,18 +181,6 @@ public class PathTest extends TestCase {
         assertEquals(expected.height(), bounds.height());
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "computeBounds",
-            args = {android.graphics.RectF.class, boolean.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "addRect",
-            args = {android.graphics.RectF.class, android.graphics.Path.Direction.class}
-        )
-    })
     public void testComputeBounds2() {
 
         RectF expected = new RectF(LEFT, TOP, RIGHT, BOTTOM);
@@ -391,45 +197,16 @@ public class PathTest extends TestCase {
         assertEquals(expected.height(), bounds.height());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "rMoveTo",
-        args = {float.class, float.class}
-    )
-    @ToBeFixed(bug = "1451096", explanation = "When this method called, the current" +
-            "point will move to the appointed coordinate, but there is no more" +
-            "way to get known about whether current point is just in that" +
-            "coordinate correctly")
     public void testRMoveTo() {
         // new the Path instance
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "setLastPoint",
-        args = {float.class, float.class}
-    )
-    @ToBeFixed(bug = "1451096", explanation = "When called, we can't" +
-              "get any useful information to make sure the point has been" +
-              "correctly set")
     public void testSetLastPoint() {
         // new the Path instance
         Path path = new Path();
         path.setLastPoint(10.0f, 10.0f);
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "rLineTo",
-            args = {float.class, float.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "isEmpty",
-            args = {}
-        )
-    })
     public void testRLineTo() {
         // new the Path instance
         Path path = new Path();
@@ -438,11 +215,6 @@ public class PathTest extends TestCase {
         assertFalse(path.isEmpty());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "isEmpty",
-        args = {}
-    )
     public void testIsEmpty() {
 
         // new the Path instance
@@ -452,18 +224,6 @@ public class PathTest extends TestCase {
         assertFalse(path.isEmpty());
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "rewind",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "isEmpty",
-            args = {}
-        )
-    })
     public void testRewind() {
 
         // set the expected value
@@ -479,11 +239,6 @@ public class PathTest extends TestCase {
         assertEquals(expected, path.getFillType());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "addOval",
-        args = {android.graphics.RectF.class, android.graphics.Path.Direction.class}
-    )
     public void testAddOval() {
         // new the Path instance
         Path path = new Path();
@@ -493,13 +248,6 @@ public class PathTest extends TestCase {
         assertFalse(path.isEmpty());
     }
 
-    @TestTargetNew(
-        level = TestLevel.PARTIAL,
-        method = "isRect",
-        args = {android.graphics.RectF.class}
-    )
-    @ToBeFixed(bug = "1451096", explanation = "what does 'specify' in the note of " +
-              "this method mean? The return always is false, is it correct?")
     public void testIsRect() {
 
         // new the Path instance
@@ -508,28 +256,9 @@ public class PathTest extends TestCase {
         setPath(path);
     }
 
-    @TestTargetNew(
-        level = TestLevel.NOT_FEASIBLE,
-        method = "incReserve",
-        args = {int.class}
-    )
-    @ToBeFixed(bug = "1451096", explanation = "Maybe this method has little" +
-              "obvious behavior to test")
     public void testIncReserve() {
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "addPath",
-            args = {android.graphics.Path.class, float.class, float.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "isEmpty",
-            args = {}
-        )
-    })
     public void testAddPath1() {
         // new the Path instance
         Path path = new Path();
@@ -540,18 +269,6 @@ public class PathTest extends TestCase {
         assertFalse(path.isEmpty());
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "addPath",
-            args = {android.graphics.Path.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "isEmpty",
-            args = {}
-        )
-    })
     public void testAddPath2() {
         // new the Path instance
         Path path = new Path();
@@ -562,18 +279,6 @@ public class PathTest extends TestCase {
         assertFalse(path.isEmpty());
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "addPath",
-            args = {android.graphics.Path.class, android.graphics.Matrix.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "isEmpty",
-            args = {}
-        )
-    })
     public void testAddPath3() {
         // new the Path instance
         Path path = new Path();
@@ -585,19 +290,6 @@ public class PathTest extends TestCase {
         assertFalse(path.isEmpty());
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "addRoundRect",
-            args = {android.graphics.RectF.class, float.class, float.class,
-                    android.graphics.Path.Direction.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "isEmpty",
-            args = {}
-        )
-    })
     public void testAddRoundRect1() {
         // new the Path instance
         Path path = new Path();
@@ -607,19 +299,6 @@ public class PathTest extends TestCase {
         assertFalse(path.isEmpty());
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "addRoundRect",
-            args = {android.graphics.RectF.class, float[].class,
-                    android.graphics.Path.Direction.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "isEmpty",
-            args = {}
-        )
-    })
     public void testAddRoundRect2() {
         // new the Path instance
         Path path = new Path();
@@ -633,18 +312,6 @@ public class PathTest extends TestCase {
         assertFalse(path.isEmpty());
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "isInverseFillType",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setFillType",
-            args = {android.graphics.Path.FillType.class}
-        )
-    })
     public void testIsInverseFillType() {
 
         // new the Path instance
@@ -654,11 +321,6 @@ public class PathTest extends TestCase {
         assertTrue(path.isInverseFillType());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "offset",
-        args = {float.class, float.class, android.graphics.Path.class}
-    )
     public void testOffset1() {
         // new the Path instance
         Path path = new Path();
@@ -669,31 +331,10 @@ public class PathTest extends TestCase {
         assertFalse(dst.isEmpty());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "offset",
-        args = {float.class, float.class}
-    )
-    @ToBeFixed(bug = "1451096", explanation = "The function of this method is" +
-              "almost the same as offset(float dx, float dy, Path dst) but no dst" +
-              "to show if it works when called, and we can't get any information" +
-              "in this method when called")
     public void testOffset2() {
         // new the Path instance
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "cubicTo",
-            args = {float.class, float.class, float.class, float.class, float.class, float.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "isEmpty",
-            args = {}
-        )
-    })
     public void testCubicTo() {
         // new the Path instance
         Path path = new Path();
@@ -702,28 +343,6 @@ public class PathTest extends TestCase {
         assertFalse(path.isEmpty());
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "reset",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "addRect",
-            args = {android.graphics.RectF.class, android.graphics.Path.Direction.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "set",
-            args = {android.graphics.Path.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "isEmpty",
-            args = {}
-        )
-    })
     public void testReset() {
         // new the Path instance
         Path path = new Path();
@@ -736,18 +355,6 @@ public class PathTest extends TestCase {
         assertTrue(path.isEmpty());
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "toggleInverseFillType",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "isInverseFillType",
-            args = {}
-        )
-    })
     public void testToggleInverseFillType() {
         // new the Path instance
         Path path = new Path();
@@ -756,18 +363,6 @@ public class PathTest extends TestCase {
         assertTrue(path.isInverseFillType());
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "addArc",
-            args = {android.graphics.RectF.class, float.class, float.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "isEmpty",
-            args = {}
-        )
-    })
     public void testAddArc() {
         // new the Path instance
         Path path = new Path();
@@ -777,18 +372,6 @@ public class PathTest extends TestCase {
         assertFalse(path.isEmpty());
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "rCubicTo",
-            args = {float.class, float.class, float.class, float.class, float.class, float.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "isEmpty",
-            args = {}
-        )
-    })
     public void testRCubicTo() {
         // new the Path instance
         Path path = new Path();

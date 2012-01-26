@@ -16,10 +16,6 @@
 
 package android.webkit.cts;
 
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
 
 import android.test.AndroidTestCase;
 import android.webkit.PluginData;
@@ -29,23 +25,10 @@ import android.webkit.CacheManager.CacheResult;
 
 import java.util.Map;
 
-@TestTargetClass(android.webkit.UrlInterceptRegistry.class)
 @SuppressWarnings("deprecation")
 public class UrlInterceptRegistryTest extends AndroidTestCase {
     private int mService;
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "registerHandler",
-            args = {android.webkit.UrlInterceptHandler.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "unregisterHandler",
-            args = {android.webkit.UrlInterceptHandler.class}
-        )
-    })
     public void testRegisterHandler() {
         UrlInterceptHandler handler1 = new MockUrlInterceptHandler();
         UrlInterceptHandler handler2 = new MockUrlInterceptHandler();
@@ -61,28 +44,6 @@ public class UrlInterceptRegistryTest extends AndroidTestCase {
         assertFalse(UrlInterceptRegistry.unregisterHandler(handler1));
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getSurrogate",
-            args = {java.lang.String.class, java.util.Map.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setUrlInterceptDisabled",
-            args = {boolean.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "urlInterceptDisabled",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getPluginData",
-            args = {java.lang.String.class, java.util.Map.class}
-        )
-    })
     public void testGetSurrogate() {
         mService = 0;
 

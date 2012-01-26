@@ -22,15 +22,9 @@ import android.content.IContentProvider;
 import android.provider.Contacts;
 import android.provider.Contacts.Settings;
 import android.test.InstrumentationTestCase;
-import dalvik.annotation.TestTargets;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.ToBeFixed;
 
 import java.util.ArrayList;
 
-@TestTargetClass(android.provider.Contacts.Settings.class)
 public class Contacts_SettingsTest extends InstrumentationTestCase {
     private ContentResolver mContentResolver;
     private IContentProvider mProvider;
@@ -38,8 +32,6 @@ public class Contacts_SettingsTest extends InstrumentationTestCase {
     // the backup for the setting tables which we will modified in test cases
     private ArrayList<ContentValues> mSettingBackup;
 
-    @ToBeFixed(explanation = "The URL: content://contacts/settings does not support" +
-            " deleting operation, that makes the table's status can't be recovered.")
     @Override
     protected void setUp() throws Exception {
         super.setUp();
@@ -80,22 +72,6 @@ public class Contacts_SettingsTest extends InstrumentationTestCase {
         super.tearDown();
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test methods which access setting",
-            method = "getSetting",
-            args = {android.content.ContentResolver.class, java.lang.String.class, 
-                    java.lang.String.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test methods which access setting",
-            method = "setSetting",
-            args = {android.content.ContentResolver.class, java.lang.String.class, 
-                    java.lang.String.class, java.lang.String.class}
-        )
-    })
     public void testAccessSetting() {
         String key1 = "key 1";
         String value1 = "value 1";

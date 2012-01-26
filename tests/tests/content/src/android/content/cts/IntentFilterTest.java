@@ -53,13 +53,7 @@ import android.util.StringBuilderPrinter;
 
 import com.android.internal.util.FastXmlSerializer;
 
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
-import dalvik.annotation.ToBeFixed;
 
-@TestTargetClass(IntentFilter.class)
 public class IntentFilterTest extends AndroidTestCase {
 
     private IntentFilter mIntentFilter;
@@ -78,28 +72,6 @@ public class IntentFilterTest extends AndroidTestCase {
         mIntentFilter = new IntentFilter();
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "IntentFilter",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "IntentFilter",
-            args = {android.content.IntentFilter.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "IntentFilter",
-            args = {java.lang.String.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "IntentFilter",
-            args = {java.lang.String.class, java.lang.String.class}
-        )
-    })
     public void testConstructor() throws MalformedMimeTypeException {
 
         IntentFilter filter = new IntentFilter();
@@ -143,33 +115,6 @@ public class IntentFilterTest extends AndroidTestCase {
         }
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "categoriesIterator",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "addCategory",
-            args = {java.lang.String.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getCategory",
-            args = {int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "hasCategory",
-            args = {java.lang.String.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "countCategories",
-            args = {}
-        )
-    })
     public void testCategories() {
         for (int i = 0; i < 10; i++) {
             mIntentFilter.addCategory(CATEGORY + i);
@@ -211,20 +156,6 @@ public class IntentFilterTest extends AndroidTestCase {
                         "category1", "category2", "category3" }, null, null), });
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "match",
-            args = {android.content.ContentResolver.class, android.content.Intent.class,
-                    boolean.class, java.lang.String.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "match",
-            args = {java.lang.String.class, java.lang.String.class, java.lang.String.class,
-                    android.net.Uri.class, java.util.Set.class, java.lang.String.class}
-        )
-    })
     public void testMimeTypes() throws Exception {
         IntentFilter filter = new Match(null, null, new String[] { "which1/what1" }, null, null,
                 null);
@@ -284,51 +215,12 @@ public class IntentFilterTest extends AndroidTestCase {
                         null), });
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setPriority",
-            args = {int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getPriority",
-            args = {}
-        )
-    })
     public void testAccessPriority() {
         final int expected = 1;
         mIntentFilter.setPriority(expected);
         assertEquals(expected, mIntentFilter.getPriority());
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "schemesIterator",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getDataScheme",
-            args = {int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "addDataScheme",
-            args = {java.lang.String.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "countDataSchemes",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "hasDataScheme",
-            args = {java.lang.String.class}
-        )
-    })
     public void testDataSchemes() {
         for (int i = 0; i < 10; i++) {
             mIntentFilter.addDataScheme(DATA_SCHEME + i);
@@ -362,44 +254,12 @@ public class IntentFilterTest extends AndroidTestCase {
                 new MatchCondition(IntentFilter.NO_MATCH_DATA, null, null, null, "scheme3:foo"), });
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "create",
-        args = {java.lang.String.class, java.lang.String.class}
-    )
     public void testCreate() {
         IntentFilter filter = IntentFilter.create(ACTION, DATA_TYPE);
         assertNotNull(filter);
         verifyContent(filter, ACTION, DATA_TYPE);
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "authoritiesIterator",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "countDataAuthorities",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "hasDataAuthority",
-            args = {android.net.Uri.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "addDataAuthority",
-            args = {java.lang.String.class, java.lang.String.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getDataAuthority",
-            args = {int.class}
-        )
-    })
     public void testAuthorities() {
         for (int i = 0; i < 10; i++) {
             mIntentFilter.addDataAuthority(HOST + i, String.valueOf(PORT + i));
@@ -463,33 +323,6 @@ public class IntentFilterTest extends AndroidTestCase {
                         "scheme1://authority1:200/"), });
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "hasDataType",
-            args = {java.lang.String.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "addDataType",
-            args = {java.lang.String.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getDataType",
-            args = {int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "typesIterator",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "countDataTypes",
-            args = {}
-        )
-    })
     public void testDataTypes() throws MalformedMimeTypeException {
         for (int i = 0; i < 10; i++) {
             mIntentFilter.addDataType(DATA_TYPE + i);
@@ -508,11 +341,6 @@ public class IntentFilterTest extends AndroidTestCase {
         }
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "matchData",
-        args = {java.lang.String.class, java.lang.String.class, android.net.Uri.class}
-    )
     public void testMatchData() throws MalformedMimeTypeException {
         int expected = IntentFilter.MATCH_CATEGORY_EMPTY + IntentFilter.MATCH_ADJUSTMENT_NORMAL;
         assertEquals(expected, mIntentFilter.matchData(null, null, null));
@@ -544,38 +372,6 @@ public class IntentFilterTest extends AndroidTestCase {
         assertEquals(IntentFilter.NO_MATCH_DATA, mIntentFilter.matchData(null, DATA_SCHEME, uri));
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "countActions",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "addAction",
-            args = {java.lang.String.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "actionsIterator",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "hasAction",
-            args = {java.lang.String.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "matchAction",
-            args = {java.lang.String.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getAction",
-            args = {int.class}
-        )
-    })
     public void testActions() {
         for (int i = 0; i < 10; i++) {
             mIntentFilter.addAction(ACTION + i);
@@ -608,18 +404,6 @@ public class IntentFilterTest extends AndroidTestCase {
                 new MatchCondition(IntentFilter.NO_MATCH_ACTION, "action3", null, null, null), });
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "writeToXml",
-            args = {org.xmlpull.v1.XmlSerializer.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "readFromXml",
-            args = {org.xmlpull.v1.XmlPullParser.class}
-        )
-    })
     public void testWriteToXml() throws IllegalArgumentException, IllegalStateException,
             IOException, MalformedMimeTypeException, XmlPullParserException {
         XmlSerializer xml;
@@ -651,11 +435,6 @@ public class IntentFilterTest extends AndroidTestCase {
         out.close();
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "matchCategories",
-        args = {java.util.Set.class}
-    )
     public void testMatchCategories() {
         assertNull(mIntentFilter.matchCategories(null));
         Set<String> cat = new HashSet<String>();
@@ -673,11 +452,6 @@ public class IntentFilterTest extends AndroidTestCase {
         assertEquals(expected, mIntentFilter.matchCategories(cat));
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "matchDataAuthority",
-        args = {android.net.Uri.class}
-    )
     public void testMatchDataAuthority() {
         assertEquals(IntentFilter.NO_MATCH_DATA, mIntentFilter.matchDataAuthority(null));
         mIntentFilter.addDataAuthority(HOST, String.valueOf(PORT));
@@ -685,27 +459,10 @@ public class IntentFilterTest extends AndroidTestCase {
         assertEquals(IntentFilter.MATCH_CATEGORY_PORT, mIntentFilter.matchDataAuthority(uri));
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "describeContents",
-        args = {}
-    )
     public void testDescribeContents() {
         assertEquals(0, mIntentFilter.describeContents());
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "readFromXml",
-            args = {org.xmlpull.v1.XmlPullParser.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getDataScheme",
-            args = {int.class}
-        )
-    })
     public void testReadFromXml() throws NameNotFoundException, XmlPullParserException, IOException {
         XmlPullParser parser = null;
         ActivityInfo ai = null;
@@ -741,38 +498,6 @@ public class IntentFilterTest extends AndroidTestCase {
         assertEquals("test", mIntentFilter.getDataPath(2).getPath());
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "pathsIterator",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "addDataPath",
-            args = {java.lang.String.class, int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "hasDataPath",
-            args = {java.lang.String.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getDataPath",
-            args = {int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "addDataPath",
-            args = {java.lang.String.class, int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "countDataPaths",
-            args = {}
-        )
-    })
     public void testDataPaths() {
         for (int i = 0; i < 10; i++) {
             mIntentFilter.addDataPath(DATA_PATH + i, PatternMatcher.PATTERN_PREFIX);
@@ -874,12 +599,6 @@ public class IntentFilterTest extends AndroidTestCase {
                         "scheme1://authority1:200/"), });
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "match",
-        args = {android.content.ContentResolver.class, android.content.Intent.class, boolean.class,
-                java.lang.String.class}
-    )
     public void testMatchWithIntent() throws MalformedMimeTypeException {
         final ContentResolver resolver = mContext.getContentResolver();
 
@@ -916,12 +635,6 @@ public class IntentFilterTest extends AndroidTestCase {
 
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "match",
-        args = {java.lang.String.class, java.lang.String.class, java.lang.String.class,
-                android.net.Uri.class, java.util.Set.class, java.lang.String.class}
-    )
     public void testMatchWithIntentData() throws MalformedMimeTypeException {
         Set<String> cat = new HashSet<String>();
         assertEquals(IntentFilter.NO_MATCH_ACTION, mIntentFilter.match(ACTION, null, null, null,
@@ -981,11 +694,6 @@ public class IntentFilterTest extends AndroidTestCase {
                 DATA_SCHEME, URI, cat, null));
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "writeToParcel",
-        args = {android.os.Parcel.class, int.class}
-    )
     public void testWriteToParcel() throws MalformedMimeTypeException {
         mIntentFilter.addAction(ACTION);
         mIntentFilter.addCategory(CATEGORY);
@@ -1007,11 +715,6 @@ public class IntentFilterTest extends AndroidTestCase {
         assertEquals(mIntentFilter.getDataScheme(0), target.getDataScheme(0));
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "addDataType",
-        args = {java.lang.String.class}
-    )
     public void testAddDataType() throws MalformedMimeTypeException {
         try {
             mIntentFilter.addDataType("test");
@@ -1128,28 +831,6 @@ public class IntentFilterTest extends AndroidTestCase {
         }
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "addDataPath",
-            args = {java.lang.String.class, int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "countDataPaths",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getDataPath",
-            args = {int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "hasDataPath",
-            args = {java.lang.String.class}
-        )
-    })
     public void testPaths() throws Exception {
         IntentFilter filter = new Match(null, null, null,
                 new String[]{"scheme"}, new String[]{"authority"}, null,
@@ -1317,12 +998,6 @@ public class IntentFilterTest extends AndroidTestCase {
                         "scheme://authority/a1b"), });
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "dump",
-        args = {Printer.class, String.class}
-    )
-    @ToBeFixed(explanation = "new IntentFilter().dump(...) does not print anything at all")
     public void testDump() throws MalformedMimeTypeException {
         TestPrinter printer = new TestPrinter();
         String prefix = "TestIntentFilter";

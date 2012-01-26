@@ -17,51 +17,8 @@ package android.os.cts;
 
 import junit.framework.TestCase;
 import android.os.Environment;
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
 
-@TestTargetClass(Environment.class)
 public class EnvironmentTest extends TestCase {
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test constructor(s) of {@link Environment}",
-            method = "Environment",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test method: getExternalStorageState",
-            method = "getExternalStorageState",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test method: getExternalStorageDirectory",
-            method = "getExternalStorageDirectory",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test method: getRootDirectory",
-            method = "getRootDirectory",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test method: getDownloadCacheDirectory",
-            method = "getDownloadCacheDirectory",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test method: getDataDirectory",
-            method = "getDataDirectory",
-            args = {}
-        )
-    })
     public void testEnvironment() {
         new Environment();
         assertNotNull(Environment.getExternalStorageState());

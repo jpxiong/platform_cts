@@ -18,34 +18,12 @@ package android.sax.cts;
 
 import android.sax.RootElement;
 import android.test.AndroidTestCase;
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
 
-@TestTargetClass(RootElement.class)
 public class RootElementTest extends AndroidTestCase {
 
     private static final String ATOM_NAMESPACE = "http://www.w3.org/2005/Atom";
     private static final String FEED = "feed";
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getContentHandler",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "RootElement",
-            args = {java.lang.String.class, java.lang.String.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "RootElement",
-            args = {java.lang.String.class}
-        )
-    })
     public void testRoot() throws Exception {
         RootElement root = new RootElement(ATOM_NAMESPACE, FEED);
         assertNotNull(root.getContentHandler());

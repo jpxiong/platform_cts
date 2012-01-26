@@ -16,10 +16,6 @@
 
 package android.graphics.cts;
 
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
 
 import android.graphics.ColorFilter;
 import android.graphics.MaskFilter;
@@ -37,7 +33,6 @@ import android.graphics.Xfermode;
 import android.test.AndroidTestCase;
 import android.text.SpannedString;
 
-@TestTargetClass(Paint.class)
 public class PaintTest extends AndroidTestCase {
 
     private static final Typeface[] TYPEFACES = new Typeface[] {
@@ -48,23 +43,6 @@ public class PaintTest extends AndroidTestCase {
             Typeface.SERIF,
     };
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "Paint",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "Paint",
-            args = {int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "Paint",
-            args = {android.graphics.Paint.class}
-        )
-    })
     public void testConstructor() {
         new Paint();
 
@@ -162,11 +140,6 @@ public class PaintTest extends AndroidTestCase {
         }
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "set",
-        args = {android.graphics.Paint.class}
-    )
     public void testSet() {
         Paint p  = new Paint();
         Paint p2 = new Paint();
@@ -229,18 +202,6 @@ public class PaintTest extends AndroidTestCase {
         assertNull(p2.getXfermode());
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setStrokeCap",
-            args = {android.graphics.Paint.Cap.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getStrokeCap",
-            args = {}
-        )
-    })
     public void testAccessStrokeCap() {
         Paint p = new Paint();
 
@@ -261,18 +222,6 @@ public class PaintTest extends AndroidTestCase {
         }
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setXfermode",
-            args = {android.graphics.Xfermode.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getXfermode",
-            args = {}
-        )
-    })
     public void testAccessXfermode() {
         Paint p = new Paint();
         Xfermode x = new Xfermode();
@@ -284,18 +233,6 @@ public class PaintTest extends AndroidTestCase {
         assertNull(p.getXfermode());
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setShader",
-            args = {android.graphics.Shader.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getShader",
-            args = {}
-        )
-    })
     public void testAccessShader() {
         Paint p = new Paint();
         Shader s = new Shader();
@@ -307,18 +244,6 @@ public class PaintTest extends AndroidTestCase {
         assertNull(p.getShader());
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setAntiAlias",
-            args = {boolean.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "isAntiAlias",
-            args = {}
-        )
-    })
     public void testSetAntiAlias() {
         Paint p = new Paint();
 
@@ -330,18 +255,6 @@ public class PaintTest extends AndroidTestCase {
 
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setTypeface",
-            args = {android.graphics.Typeface.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getTypeface",
-            args = {}
-        )
-    })
 
     public void testAccessTypeface() {
         Paint p = new Paint();
@@ -359,18 +272,6 @@ public class PaintTest extends AndroidTestCase {
         assertNull(p.getTypeface());
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setPathEffect",
-            args = {android.graphics.PathEffect.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getPathEffect",
-            args = {}
-        )
-    })
     public void testAccessPathEffect() {
         Paint p = new Paint();
         PathEffect e = new PathEffect();
@@ -382,18 +283,6 @@ public class PaintTest extends AndroidTestCase {
         assertNull(p.getPathEffect());
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setFakeBoldText",
-            args = {boolean.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "isFakeBoldText",
-            args = {}
-        )
-    })
     public void testSetFakeBoldText() {
         Paint p = new Paint();
 
@@ -404,18 +293,6 @@ public class PaintTest extends AndroidTestCase {
         assertFalse(p.isFakeBoldText());
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setStrokeJoin",
-            args = {android.graphics.Paint.Join.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getStrokeJoin",
-            args = {}
-        )
-    })
     public void testAccessStrokeJoin() {
         Paint p = new Paint();
 
@@ -436,18 +313,6 @@ public class PaintTest extends AndroidTestCase {
         }
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setStyle",
-            args = {android.graphics.Paint.Style.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getStyle",
-            args = {}
-        )
-    })
     public void testAccessStyle() {
         Paint p = new Paint();
 
@@ -468,11 +333,6 @@ public class PaintTest extends AndroidTestCase {
         }
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "getFontSpacing",
-        args = {}
-    )
     public void testGetFontSpacing() {
         Paint p = new Paint();
 
@@ -489,18 +349,6 @@ public class PaintTest extends AndroidTestCase {
         }
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "isSubpixelText",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setSubpixelText",
-            args = {boolean.class}
-        )
-    })
     public void testSetSubpixelText() {
         Paint p = new Paint();
 
@@ -511,18 +359,6 @@ public class PaintTest extends AndroidTestCase {
         assertFalse(p.isSubpixelText());
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setTextScaleX",
-            args = {float.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getTextScaleX",
-            args = {}
-        )
-    })
     public void testAccessTextScaleX() {
         Paint p = new Paint();
 
@@ -537,18 +373,6 @@ public class PaintTest extends AndroidTestCase {
 
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setMaskFilter",
-            args = {android.graphics.MaskFilter.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getMaskFilter",
-            args = {}
-        )
-    })
     public void testAccessMaskFilter() {
         Paint p = new Paint();
         MaskFilter m = new MaskFilter();
@@ -560,18 +384,6 @@ public class PaintTest extends AndroidTestCase {
         assertNull(p.getMaskFilter());
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setColorFilter",
-            args = {android.graphics.ColorFilter.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getColorFilter",
-            args = {}
-        )
-    })
     public void testAccessColorFilter() {
         Paint p = new Paint();
         ColorFilter c = new ColorFilter();
@@ -583,18 +395,6 @@ public class PaintTest extends AndroidTestCase {
         assertNull(p.getColorFilter());
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setRasterizer",
-            args = {android.graphics.Rasterizer.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getRasterizer",
-            args = {}
-        )
-    })
     public void testAccessRasterizer() {
         Paint p = new Paint();
         Rasterizer r = new Rasterizer();
@@ -606,11 +406,6 @@ public class PaintTest extends AndroidTestCase {
         assertNull(p.getRasterizer());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "setARGB",
-        args = {int.class, int.class, int.class, int.class}
-    )
     public void testSetARGB() {
         Paint p = new Paint();
 
@@ -622,11 +417,6 @@ public class PaintTest extends AndroidTestCase {
 
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "ascent",
-        args = {}
-    )
     public void testAscent() {
         Paint p = new Paint();
 
@@ -643,18 +433,6 @@ public class PaintTest extends AndroidTestCase {
         }
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setTextSkewX",
-            args = {float.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getTextSkewX",
-            args = {}
-        )
-    })
     public void testAccessTextSkewX() {
         Paint p = new Paint();
 
@@ -668,18 +446,6 @@ public class PaintTest extends AndroidTestCase {
         assertEquals(-0.25f, p.getTextSkewX());
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setTextSize",
-            args = {float.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getTextSize",
-            args = {}
-        )
-    })
     public void testAccessTextSize() {
         Paint p = new Paint();
 
@@ -744,18 +510,6 @@ public class PaintTest extends AndroidTestCase {
         }
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "isStrikeThruText",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setStrikeThruText",
-            args = {boolean.class}
-        )
-    })
     public void testSetStrikeThruText() {
         Paint p = new Paint();
 
@@ -766,18 +520,6 @@ public class PaintTest extends AndroidTestCase {
         assertFalse(p.isStrikeThruText());
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setTextAlign",
-            args = {android.graphics.Paint.Align.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getTextAlign",
-            args = {}
-        )
-    })
     public void testAccessTextAlign() {
         Paint p = new Paint();
 
@@ -791,11 +533,6 @@ public class PaintTest extends AndroidTestCase {
         assertEquals(Align.RIGHT, p.getTextAlign());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "getFillPath",
-        args = {android.graphics.Path.class, android.graphics.Path.class}
-    )
     public void testGetFillPath() {
         Paint p = new Paint();
         Path path1 = new Path();
@@ -811,18 +548,6 @@ public class PaintTest extends AndroidTestCase {
 
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setAlpha",
-            args = {int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getAlpha",
-            args = {}
-        )
-    })
     public void testAccessAlpha() {
         Paint p = new Paint();
 
@@ -841,18 +566,6 @@ public class PaintTest extends AndroidTestCase {
         assertEquals(236, p.getAlpha());
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "isFilterBitmap",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setFilterBitmap",
-            args = {boolean.class}
-        )
-    })
     public void testSetFilterBitmap() {
         Paint p = new Paint();
 
@@ -863,18 +576,6 @@ public class PaintTest extends AndroidTestCase {
         assertFalse(p.isFilterBitmap());
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setColor",
-            args = {int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getColor",
-            args = {}
-        )
-    })
     public void testAccessColor() {
         Paint p = new Paint();
 
@@ -894,20 +595,10 @@ public class PaintTest extends AndroidTestCase {
         assertEquals(256, p.getColor());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "setShadowLayer",
-        args = {float.class, float.class, float.class, int.class}
-    )
     public void testSetShadowLayer() {
         new Paint().setShadowLayer(10, 1, 1, 0);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "getFontMetrics",
-        args = {android.graphics.Paint.FontMetrics.class}
-    )
     public void testGetFontMetrics1() {
         Paint p = new Paint();
         Paint.FontMetrics fm = new Paint.FontMetrics();
@@ -927,11 +618,6 @@ public class PaintTest extends AndroidTestCase {
         }
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "getFontMetrics",
-        args = {}
-    )
     public void testGetFontMetrics2() {
         Paint p = new Paint();
 
@@ -950,18 +636,6 @@ public class PaintTest extends AndroidTestCase {
         }
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setStrokeMiter",
-            args = {float.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getStrokeMiter",
-            args = {}
-        )
-    })
     public void testAccessStrokeMiter() {
         Paint p = new Paint();
 
@@ -976,27 +650,10 @@ public class PaintTest extends AndroidTestCase {
         assertEquals(10.0f, p.getStrokeMiter());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "clearShadowLayer",
-        args = {}
-    )
     public void testClearShadowLayer() {
         new Paint().clearShadowLayer();
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setUnderlineText",
-            args = {boolean.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "isUnderlineText",
-            args = {}
-        )
-    })
     public void testSetUnderlineText() {
         Paint p = new Paint();
 
@@ -1007,18 +664,6 @@ public class PaintTest extends AndroidTestCase {
         assertFalse(p.isUnderlineText());
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setDither",
-            args = {boolean.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "isDither",
-            args = {}
-        )
-    })
     public void testSetDither() {
         Paint p = new Paint();
 
@@ -1029,11 +674,6 @@ public class PaintTest extends AndroidTestCase {
         assertFalse(p.isDither());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "descent",
-        args = {}
-    )
     public void testDescent() {
         Paint p = new Paint();
 
@@ -1050,18 +690,6 @@ public class PaintTest extends AndroidTestCase {
         }
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setFlags",
-            args = {int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getFlags",
-            args = {}
-        )
-    })
     public void testAccessFlags() {
         Paint p = new Paint();
 
@@ -1072,18 +700,6 @@ public class PaintTest extends AndroidTestCase {
         assertEquals(Paint.DEV_KERN_TEXT_FLAG, p.getFlags());
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setStrokeWidth",
-            args = {float.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getStrokeWidth",
-            args = {}
-        )
-    })
     public void testAccessStrokeWidth() {
         Paint p = new Paint();
 
@@ -1098,11 +714,6 @@ public class PaintTest extends AndroidTestCase {
         assertEquals(10.0f, p.getStrokeWidth());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "reset",
-        args = {}
-    )
     public void testReset() {
 
         Paint p  = new Paint();
@@ -1143,18 +754,6 @@ public class PaintTest extends AndroidTestCase {
 
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "isLinearText",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setLinearText",
-            args = {boolean.class}
-        )
-    })
     public void testSetLinearText() {
         Paint p = new Paint();
 
@@ -1165,11 +764,6 @@ public class PaintTest extends AndroidTestCase {
         assertFalse(p.isLinearText());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "getFontMetricsInt",
-        args = {android.graphics.Paint.FontMetricsInt.class}
-    )
     public void testGetFontMetricsInt1() {
         Paint p = new Paint();
         Paint.FontMetricsInt fmi = new Paint.FontMetricsInt();
@@ -1189,11 +783,6 @@ public class PaintTest extends AndroidTestCase {
         }
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "getFontMetricsInt",
-        args = {}
-    )
     public void testGetFontMetricsInt2() {
         Paint p = new Paint();
         Paint.FontMetricsInt fmi;
@@ -1283,12 +872,6 @@ public class PaintTest extends AndroidTestCase {
         assertEquals(widths[3], expectedWidth);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "getTextPath",
-        args = {char[].class, int.class, int.class, float.class, float.class,
-                android.graphics.Path.class}
-    )
     public void testGetTextPath1() {
         Paint p = new Paint();
         char[] chars = {'H', 'I', 'J', 'K', 'L', 'M', 'N'};
@@ -1318,12 +901,6 @@ public class PaintTest extends AndroidTestCase {
 
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "getTextPath",
-        args = {java.lang.String.class, int.class, int.class, float.class, float.class,
-                android.graphics.Path.class}
-    )
     public void testGetTextPath2() {
         Paint p = new Paint();
         String string = "HIJKLMN";

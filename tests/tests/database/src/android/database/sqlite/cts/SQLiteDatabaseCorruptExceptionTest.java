@@ -18,27 +18,8 @@ package android.database.sqlite.cts;
 
 import android.database.sqlite.SQLiteDatabaseCorruptException;
 import android.test.AndroidTestCase;
-import dalvik.annotation.TestTargets;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
 
-@TestTargetClass(android.database.sqlite.SQLiteDatabaseCorruptException.class)
 public class SQLiteDatabaseCorruptExceptionTest extends AndroidTestCase {
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test constructor",
-            method = "SQLiteDatabaseCorruptException",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test constructor",
-            method = "SQLiteDatabaseCorruptException",
-            args = {java.lang.String.class}
-        )
-    })
     public void testConstructor() {
         new SQLiteDatabaseCorruptException();
 

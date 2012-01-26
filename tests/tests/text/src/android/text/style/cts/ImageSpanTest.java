@@ -18,11 +18,6 @@ package android.text.style.cts;
 
 import com.android.cts.stub.R;
 
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
-import dalvik.annotation.ToBeFixed;
 
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -34,71 +29,7 @@ import android.text.style.DynamicDrawableSpan;
 import android.text.style.ImageSpan;
 import android.widget.cts.WidgetTestUtils;
 
-@TestTargetClass(ImageSpan.class)
 public class ImageSpanTest extends AndroidTestCase {
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test constructor(s) of ImageSpan.",
-            method = "ImageSpan",
-            args = {android.graphics.Bitmap.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test constructor(s) of ImageSpan.",
-            method = "ImageSpan",
-            args = {android.graphics.Bitmap.class, int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test constructor(s) of ImageSpan.",
-            method = "ImageSpan",
-            args = {android.graphics.drawable.Drawable.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test constructor(s) of ImageSpan.",
-            method = "ImageSpan",
-            args = {android.graphics.drawable.Drawable.class, int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test constructor(s) of ImageSpan.",
-            method = "ImageSpan",
-            args = {android.graphics.drawable.Drawable.class, java.lang.String.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test constructor(s) of ImageSpan.",
-            method = "ImageSpan",
-            args = {android.graphics.drawable.Drawable.class, java.lang.String.class, int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test constructor(s) of ImageSpan.",
-            method = "ImageSpan",
-            args = {android.content.Context.class, android.net.Uri.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test constructor(s) of ImageSpan.",
-            method = "ImageSpan",
-            args = {android.content.Context.class, android.net.Uri.class, int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test constructor(s) of ImageSpan.",
-            method = "ImageSpan",
-            args = {android.content.Context.class, int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test constructor(s) of ImageSpan.",
-            method = "ImageSpan",
-            args = {android.content.Context.class, int.class, int.class}
-        )
-    })
-    @ToBeFixed(bug = "1695243", explanation = "some constructors miss javadoc")
     public void testConstructor() {
         int width = 80;
         int height = 120;
@@ -138,12 +69,6 @@ public class ImageSpanTest extends AndroidTestCase {
         new ImageSpan((Context) null, -1, -1);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test getSource().",
-        method = "getSource",
-        args = {}
-    )
     public void testGetSource() {
         Drawable d = mContext.getResources().getDrawable(R.drawable.pass);
 
@@ -159,12 +84,6 @@ public class ImageSpanTest extends AndroidTestCase {
         assertEquals(source, imageSpan.getSource());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test getDrawable().",
-        method = "getDrawable",
-        args = {}
-    )
     public void testGetDrawable() {
         Drawable drawable = mContext.getResources().getDrawable(R.drawable.pass);
 

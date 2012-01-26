@@ -16,21 +16,12 @@
 
 package android.view.animation.cts;
 
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
 
 import android.test.AndroidTestCase;
 import android.view.animation.LayoutAnimationController;
 
-@TestTargetClass(LayoutAnimationController.AnimationParameters.class)
 public class LayoutAnimationController_AnimationParametersTest extends AndroidTestCase {
 
-    @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "LayoutAnimationController.AnimationParameters",
-            args = {}
-        )
     public void testConstructor() {
         new LayoutAnimationController.AnimationParameters();
     }

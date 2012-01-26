@@ -16,7 +16,6 @@
 
 package android.os.cts;
 
-import dalvik.annotation.TestTargetClass;
 
 import android.os.Handler;
 import android.os.HandlerThread;
@@ -30,7 +29,6 @@ import android.test.AndroidTestCase;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
-@TestTargetClass(MessageQueue.class)
 public class MessageQueueTest extends AndroidTestCase {
 
     private static final long TIMEOUT = 1000;

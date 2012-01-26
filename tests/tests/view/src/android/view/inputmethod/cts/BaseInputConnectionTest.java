@@ -18,10 +18,6 @@ package android.view.inputmethod.cts;
 
 import com.android.cts.stub.R;
 
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
 
 import android.app.Instrumentation;
 import android.content.Context;
@@ -42,7 +38,6 @@ import android.view.inputmethod.ExtractedTextRequest;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 
-@TestTargetClass(BaseInputConnection.class)
 public class BaseInputConnectionTest extends
         ActivityInstrumentationTestCase2<InputMethodStubActivity> {
 
@@ -66,43 +61,6 @@ public class BaseInputConnectionTest extends
         mConnection = new BaseInputConnection(mView, true);
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "beginBatchEdit",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "commitCompletion",
-            args = {CompletionInfo.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "endBatchEdit",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getExtractedText",
-            args = {ExtractedTextRequest.class, int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "performContextMenuAction",
-            args = {int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "performEditorAction",
-            args = {int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "performPrivateCommand",
-            args = {String.class, Bundle.class}
-        )
-    })
     public void testDefaultMethods() {
         // These methods are default to return fixed result.
 
@@ -126,28 +84,6 @@ public class BaseInputConnectionTest extends
         assertFalse(mConnection.performPrivateCommand(action, new Bundle()));
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.NOT_FEASIBLE,
-            method = "getComposingSpanEnd",
-            args = {Spannable.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.NOT_FEASIBLE,
-            method = "getComposingSpanStart",
-            args = {Spannable.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.NOT_FEASIBLE,
-            method = "removeComposingSpans",
-            args = {Spannable.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.NOT_FEASIBLE,
-            method = "setComposingSpans",
-            args = {Spannable.class}
-        )
-    })
     public void testOpComposingSpans() {
         Spannable text = new SpannableString("Test ComposingSpans");
         BaseInputConnection.setComposingSpans(text);
@@ -178,53 +114,6 @@ public class BaseInputConnectionTest extends
      *                          around the current selection position of the editable text.
      * setSelection: changes the selection position in the current editable text.
      */
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "BaseInputConnection",
-            args = {View.class, boolean.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "clearMetaKeyStates",
-            args = {int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "commitText",
-            args = {CharSequence.class, int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "deleteSurroundingText",
-            args = {int.class, int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getCursorCapsMode",
-            args = {int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getEditable",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setSelection",
-            args = {int.class, int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getTextAfterCursor",
-            args = {int.class, int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getTextBeforeCursor",
-            args = {int.class, int.class}
-        )
-    })
     public void testOpTextMethods() throws Throwable {
         // return is an default Editable instance with empty source
         final Editable text = mConnection.getEditable();
@@ -287,18 +176,6 @@ public class BaseInputConnectionTest extends
      * setComposingText: The default implementation places the given text into the editable,
      *                  replacing any existing composing text
      */
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "finishComposingText",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setComposingText",
-            args = {CharSequence.class, int.class}
-        )
-    })
     public void testFinishComposingText() throws Throwable {
         CharSequence str = "TestFinish";
         Editable inputText = Editable.Factory.getInstance().newEditable(str);
@@ -335,11 +212,6 @@ public class BaseInputConnectionTest extends
      * Provides standard implementation for sending a key event to the window
      * attached to the input connection's view
      */
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "sendKeyEvent",
-        args = {KeyEvent.class}
-    )
     public void testSendKeyEvent() throws Throwable {
         runTestOnUiThread(new Runnable() {
             public void run() {
@@ -370,11 +242,6 @@ public class BaseInputConnectionTest extends
     /**
      * Updates InputMethodManager with the current fullscreen mode.
      */
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "reportFullscreenMode",
-        args = {boolean.class}
-    )
     public void testReportFullscreenMode() {
         InputMethodManager imManager = (InputMethodManager) mInstrumentation.getTargetContext()
                 .getSystemService(Context.INPUT_METHOD_SERVICE);

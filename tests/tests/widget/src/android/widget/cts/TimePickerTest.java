@@ -16,11 +16,6 @@
 
 package android.widget.cts;
 
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
-import dalvik.annotation.ToBeFixed;
 
 import android.app.Activity;
 import android.app.Instrumentation;
@@ -34,7 +29,6 @@ import android.widget.TimePicker.OnTimeChangedListener;
 /**
  * Test {@link TimePicker}.
  */
-@TestTargetClass(TimePicker.class)
 public class TimePickerTest extends ActivityInstrumentationTestCase2<StubActivity> {
     private TimePicker mTimePicker;
 
@@ -56,27 +50,6 @@ public class TimePickerTest extends ActivityInstrumentationTestCase2<StubActivit
         mActivity = getActivity();
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "TimePicker",
-            args = {Context.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "TimePicker",
-            args = {Context.class, AttributeSet.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "TimePicker",
-            args = {Context.class, AttributeSet.class, int.class}
-        )
-    })
-    @ToBeFixed(bug = "1695243", explanation = "Android API javadocs are incomplete."
-            + " @throws clause should be added into javadoc of "
-            + "TimePicker#TimePicker(Context), TimePicker#TimePicker(Context, AttributeSet)"
-            + "and TimePicker#TimePicker(Context, AttributeSet, int) when param Context is null")
     public void testConstructors() {
         AttributeSet attrs =
             mContext.getResources().getLayout(com.android.cts.stub.R.layout.timepicker);
@@ -111,11 +84,6 @@ public class TimePickerTest extends ActivityInstrumentationTestCase2<StubActivit
         new TimePicker(mContext, attrs, Integer.MIN_VALUE);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "setEnabled",
-        args = {boolean.class}
-    )
     public void testSetEnabled() {
         mTimePicker = new TimePicker(mContext);
         assertTrue(mTimePicker.isEnabled());
@@ -127,11 +95,6 @@ public class TimePickerTest extends ActivityInstrumentationTestCase2<StubActivit
         assertTrue(mTimePicker.isEnabled());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "setOnTimeChangedListener",
-        args = {OnTimeChangedListener.class}
-    )
     public void testSetOnTimeChangedListener() {
         int initialHour = 13;
         int initialMinute = 50;
@@ -173,19 +136,6 @@ public class TimePickerTest extends ActivityInstrumentationTestCase2<StubActivit
         assertFalse(listener.hasCalledOnTimeChanged());
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setCurrentHour",
-            args = {Integer.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getCurrentHour",
-            args = {}
-        )
-    })
-    @ToBeFixed(bug = "1695243", explanation = "setCurrentHour should be in range 0~23")
     public void testAccessCurrentHour() {
         mTimePicker = new TimePicker(mContext);
 
@@ -217,18 +167,6 @@ public class TimePickerTest extends ActivityInstrumentationTestCase2<StubActivit
         assertEquals(Integer.valueOf(23), mTimePicker.getCurrentHour());
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "is24HourView",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setIs24HourView",
-            args = {java.lang.Boolean.class}
-        )
-    })
     public void testAccessIs24HourView() {
         mTimePicker = new TimePicker(mContext);
         assertFalse(mTimePicker.is24HourView());
@@ -240,18 +178,6 @@ public class TimePickerTest extends ActivityInstrumentationTestCase2<StubActivit
         assertFalse(mTimePicker.is24HourView());
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setCurrentMinute",
-            args = {Integer.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getCurrentMinute",
-            args = {}
-        )
-    })
     public void testAccessCurrentMinute() {
         mTimePicker = new TimePicker(mContext);
 
@@ -268,28 +194,11 @@ public class TimePickerTest extends ActivityInstrumentationTestCase2<StubActivit
         assertEquals(Integer.valueOf(59), mTimePicker.getCurrentMinute());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "getBaseline",
-        args = {}
-    )
     public void testGetBaseline() {
         mTimePicker = new TimePicker(mContext);
         assertEquals(-1, mTimePicker.getBaseline());
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "onSaveInstanceState",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "onRestoreInstanceState",
-            args = {Parcelable.class}
-        )
-    })
     public void testOnSaveInstanceStateAndOnRestoreInstanceState() {
         MyTimePicker source = new MyTimePicker(mContext);
         MyTimePicker dest = new MyTimePicker(mContext);

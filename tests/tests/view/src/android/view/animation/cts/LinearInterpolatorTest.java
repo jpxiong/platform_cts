@@ -28,15 +28,10 @@ import android.view.animation.Transformation;
 
 import com.android.cts.stub.R;
 
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
 
 /**
  * Test {@link LinearInterpolator}.
  */
-@TestTargetClass(LinearInterpolator.class)
 public class LinearInterpolatorTest extends ActivityInstrumentationTestCase2<AnimationTestStubActivity> {
 
     private Activity mActivity;
@@ -56,28 +51,11 @@ public class LinearInterpolatorTest extends ActivityInstrumentationTestCase2<Ani
         mActivity = getActivity();
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "LinearInterpolator",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "LinearInterpolator",
-            args = {android.content.Context.class, android.util.AttributeSet.class}
-        )
-    })
     public void testConstructor() {
         new LinearInterpolator();
         new LinearInterpolator(mActivity, null);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "getInterpolation",
-        args = {float.class}
-    )
     public void testGetInterpolation() {
         LinearInterpolator interpolator = new LinearInterpolator();
         final float delta1 = interpolator.getInterpolation(0.1f)

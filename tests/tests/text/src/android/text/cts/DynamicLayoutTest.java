@@ -22,13 +22,7 @@ import android.text.DynamicLayout;
 import android.text.Layout;
 import android.text.TextPaint;
 import android.text.TextUtils;
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
-import dalvik.annotation.ToBeFixed;
 
-@TestTargetClass(DynamicLayout.class)
 public class DynamicLayoutTest extends AndroidTestCase {
 
     protected static final float SPACING_MULT_NO_SCALE = 1.0f;
@@ -63,30 +57,6 @@ public class DynamicLayoutTest extends AndroidTestCase {
                 true);
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "DynamicLayout",
-            args = {java.lang.CharSequence.class, java.lang.CharSequence.class,
-                    android.text.TextPaint.class, int.class, android.text.Layout.Alignment.class,
-                    float.class, float.class, boolean.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "DynamicLayout",
-            args = {java.lang.CharSequence.class, java.lang.CharSequence.class,
-                    android.text.TextPaint.class, int.class, android.text.Layout.Alignment.class,
-                    float.class, float.class, boolean.class,
-                    android.text.TextUtils.TruncateAt.class, int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "DynamicLayout",
-            args = {java.lang.CharSequence.class, android.text.TextPaint.class,
-                    int.class, android.text.Layout.Alignment.class,
-                    float.class, float.class, boolean.class}
-        )
-    })
     public void testConstructors() {
         new DynamicLayout(SINGLELINE_CHAR_SEQUENCE,
                 MULTLINE_CHAR_SEQUENCE,
@@ -115,24 +85,6 @@ public class DynamicLayoutTest extends AndroidTestCase {
                 true);
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.PARTIAL,
-            method = "getEllipsisCount",
-            args = {int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.PARTIAL,
-            method = "getEllipsisStart",
-            args = {int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.PARTIAL,
-            method = "getEllipsizedWidth",
-            args = {}
-        )
-    })
-    @ToBeFixed(bug = "1695243", explanation = "DynamicLayout javadoc is incomplete.")
     public void testEllipsis() {
         final DynamicLayout dynamicLayout = new DynamicLayout(SINGLELINE_CHAR_SEQUENCE,
                 MULTLINE_CHAR_SEQUENCE,
@@ -154,19 +106,6 @@ public class DynamicLayoutTest extends AndroidTestCase {
      * 1. Include padding while calculate the layout.
      * 2. Don't include padding while calculate the layout.
      */
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getTopPadding",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getBottomPadding",
-            args = {}
-        )
-    })
-    @ToBeFixed(bug = "1695243", explanation = "DynamicLayout javadoc is incomplete.")
     public void testIncludePadding() {
         final FontMetricsInt fontMetricsInt = mDefaultPaint.getFontMetricsInt();
 
@@ -198,43 +137,6 @@ public class DynamicLayoutTest extends AndroidTestCase {
      * Test the line top
      * 1. the Y-coordinate of line top.2. the Y-coordinate of baseline.
      */
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getLineContainsTab",
-            args = {int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getLineCount",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getLineDescent",
-            args = {int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getLineTop",
-            args = {int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getLineDirections",
-            args = {int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getParagraphDirection",
-            args = {int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getLineStart",
-            args = {int.class}
-        )
-    })
     public void testLineLayout() {
         assertEquals(TEXT.length, mDynamicLayout.getLineCount());
         assertFalse(mDynamicLayout.getLineContainsTab(LINE0));

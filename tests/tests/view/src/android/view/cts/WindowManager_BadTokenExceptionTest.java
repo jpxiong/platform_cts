@@ -17,28 +17,9 @@ package android.view.cts;
 
 import android.test.AndroidTestCase;
 import android.view.WindowManager.BadTokenException;
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
 
-@TestTargetClass(BadTokenException.class)
 public class WindowManager_BadTokenExceptionTest extends AndroidTestCase {
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "test BadTokenException constructor",
-            method = "WindowManager.BadTokenException",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "test BadTokenException constructor",
-            method = "WindowManager.BadTokenException",
-            args = {String.class}
-        )
-    })
     public void testBadTokenException(){
         BadTokenException badTokenException = new BadTokenException();
         try {

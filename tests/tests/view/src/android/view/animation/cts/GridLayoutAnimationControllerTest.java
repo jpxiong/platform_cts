@@ -18,10 +18,6 @@ package android.view.animation.cts;
 
 import com.android.cts.stub.R;
 
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
 
 import android.content.Context;
 import android.content.res.XmlResourceParser;
@@ -38,7 +34,6 @@ import android.view.animation.GridLayoutAnimationController.AnimationParameters;
 import android.widget.AbsListView;
 import android.widget.GridView;
 
-@TestTargetClass(GridLayoutAnimationController.class)
 public class GridLayoutAnimationControllerTest
     extends ActivityInstrumentationTestCase2<GridLayoutAnimStubActivity> {
 
@@ -77,23 +72,6 @@ public class GridLayoutAnimationControllerTest
         mGridView = mActivity.getGridView();
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "GridLayoutAnimationController",
-            args = {Context.class, AttributeSet.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "GridLayoutAnimationController",
-            args = {Animation.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "GridLayoutAnimationController",
-            args = {Animation.class, float.class, float.class}
-        )
-    })
     public void testConstructor() {
         XmlResourceParser parser = mActivity.getResources().getAnimation(
                 R.anim.accelerate_decelerate_alpha);
@@ -107,28 +85,6 @@ public class GridLayoutAnimationControllerTest
         new GridLayoutAnimationController(mDefaultAnimation, 0.5f, 0.5f);
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getColumnDelay",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setColumnDelay",
-            args = {float.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getRowDelay",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setRowDelay",
-            args = {float.class}
-        )
-    })
     public void testAccessDelay() throws InterruptedException {
         float delay = 1.5f;
         long maxDuration = 13000;
@@ -218,18 +174,6 @@ public class GridLayoutAnimationControllerTest
         assertTrue(alpha < 1.0f);
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getDirection",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setDirection",
-            args = {int.class}
-        )
-    })
     public void testAccessDirection() throws InterruptedException {
         mController.setDirection(GridLayoutAnimationController.DIRECTION_BOTTOM_TO_TOP);
         assertEquals(GridLayoutAnimationController.DIRECTION_BOTTOM_TO_TOP,
@@ -322,11 +266,6 @@ public class GridLayoutAnimationControllerTest
         assertIsRunningAnimation(transformation3.getAlpha());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "getDelayForView",
-        args = {View.class}
-    )
     public void testGetDelayForView() throws Throwable {
         Animation animation = AnimationUtils.loadAnimation(mActivity, R.anim.decelerate_alpha);
         animation.setFillAfter(true);
@@ -398,18 +337,6 @@ public class GridLayoutAnimationControllerTest
         return layoutParams;
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getDirectionPriority",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setDirectionPriority",
-            args = {int.class}
-        )
-    })
     public void testAccessDirectionPriority() throws InterruptedException {
         // Before setting DirectionPriority, childAnimation7 will be later than childAnimation2,
         // and childAnimation8 will be later than childAnimation3
@@ -474,11 +401,6 @@ public class GridLayoutAnimationControllerTest
         assertIsRunningAnimation(transformation2.getAlpha());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "willOverlap",
-        args = {}
-    )
     public void testWillOverlap() {
         GridLayoutAnimationController controller = new GridLayoutAnimationController(
                 mDefaultAnimation);

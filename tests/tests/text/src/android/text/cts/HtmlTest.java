@@ -33,27 +33,10 @@ import android.text.style.SuperscriptSpan;
 import android.text.style.TypefaceSpan;
 import android.text.style.URLSpan;
 import android.text.style.UnderlineSpan;
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
 
-@TestTargetClass(Html.class)
 public class HtmlTest extends AndroidTestCase {
     private final static int SPAN_EXCLUSIVE_INCLUSIVE = Spannable.SPAN_EXCLUSIVE_INCLUSIVE;
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.PARTIAL_COMPLETE,
-            method = "fromHtml",
-            args = {String.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.PARTIAL_COMPLETE,
-            method = "fromHtml",
-            args = {String.class, ImageGetter.class, TagHandler.class}
-        )
-    })
     public void testSingleTagOnWhileString() {
         final String source = "<b>hello</b>";
 
@@ -76,18 +59,6 @@ public class HtmlTest extends AndroidTestCase {
         assertEquals(expectEnd, spanned.getSpanEnd(spans[0]));
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.PARTIAL_COMPLETE,
-            method = "fromHtml",
-            args = {String.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.PARTIAL_COMPLETE,
-            method = "fromHtml",
-            args = {String.class, ImageGetter.class, TagHandler.class}
-        )
-    })
     public void testBadHtml() {
         final String source = "Hello <b>b<i>bi</b>i</i>";
 
@@ -106,18 +77,6 @@ public class HtmlTest extends AndroidTestCase {
         assertEquals(spansLen, spans.length);
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.PARTIAL_COMPLETE,
-            method = "fromHtml",
-            args = {String.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.PARTIAL_COMPLETE,
-            method = "fromHtml",
-            args = {String.class, ImageGetter.class, TagHandler.class}
-        )
-    })
     public void testSymbols() {
         final String source = "&copy; &gt; &lt";
         final String expected = "\u00a9 > <";
@@ -128,18 +87,6 @@ public class HtmlTest extends AndroidTestCase {
         assertEquals(expected, spanned);
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.PARTIAL_COMPLETE,
-            method = "fromHtml",
-            args = {String.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.PARTIAL_COMPLETE,
-            method = "fromHtml",
-            args = {String.class, ImageGetter.class, TagHandler.class}
-        )
-    })
     public void testColor() throws Exception {
         final int start = 0;
 
@@ -163,11 +110,6 @@ public class HtmlTest extends AndroidTestCase {
         assertEquals(0, colors.length);
     }
 
-    @TestTargetNew(
-        level = TestLevel.PARTIAL_COMPLETE,
-        method = "toHtml",
-        args = {Spanned.class}
-    )
     public void testParagraphs() throws Exception {
         SpannableString s = new SpannableString("Hello world");
         assertEquals("<p>Hello world</p>\n", Html.toHtml(s));
@@ -182,11 +124,6 @@ public class HtmlTest extends AndroidTestCase {
         assertEquals("<p>Hello world<br></p>\n<p>or something</p>\n", Html.toHtml(s));
     }
 
-    @TestTargetNew(
-        level = TestLevel.PARTIAL_COMPLETE,
-        method = "toHtml",
-        args = {Spanned.class}
-    )
     public void testBlockquote() throws Exception {
         final int start = 0;
 
@@ -201,11 +138,6 @@ public class HtmlTest extends AndroidTestCase {
         assertEquals("<blockquote><p>Hello</p>\n</blockquote>\n<p>world</p>\n", Html.toHtml(s));
     }
 
-    @TestTargetNew(
-        level = TestLevel.PARTIAL_COMPLETE,
-        method = "toHtml",
-        args = {Spanned.class}
-    )
     public void testEntities() throws Exception {
         SpannableString s = new SpannableString("Hello <&> world");
         assertEquals("<p>Hello &lt;&amp;&gt; world</p>\n", Html.toHtml(s));
@@ -217,11 +149,6 @@ public class HtmlTest extends AndroidTestCase {
         assertEquals("<p>Hello&nbsp; world</p>\n", Html.toHtml(s));
     }
 
-    @TestTargetNew(
-        level = TestLevel.PARTIAL_COMPLETE,
-        method = "toHtml",
-        args = {Spanned.class}
-    )
     public void testMarkup() throws Exception {
         final int start = 6;
 
@@ -267,22 +194,11 @@ public class HtmlTest extends AndroidTestCase {
         assertEquals("<p>Hello <a href=\"http://www.google.com\">linky</a> world</p>\n", ret);
     }
 
-    @TestTargetNew(
-        level = TestLevel.PARTIAL_COMPLETE,
-        method = "toHtml",
-        args = {Spanned.class}
-    )
     public void testImg() throws Exception {
         Spanned s = Html.fromHtml("yes<img src=\"http://example.com/foo.gif\">no");
         assertEquals("<p>yes<img src=\"http://example.com/foo.gif\">no</p>\n", Html.toHtml(s));
     }
 
-    @TestTargetNew(
-        level = TestLevel.PARTIAL_COMPLETE,
-        notes = "Test method: toHtml",
-        method = "toHtml",
-        args = {Spanned.class}
-    )
     public void testUtf8() throws Exception {
         Spanned s = Html.fromHtml("<p>\u0124\u00eb\u0142\u0142o, world!</p>");
         assertEquals("<p>&#292;&#235;&#322;&#322;o, world!</p>\n", Html.toHtml(s));

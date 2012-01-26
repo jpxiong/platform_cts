@@ -33,13 +33,8 @@ import android.media.MediaRecorder;
 import android.os.Looper;
 import android.test.AndroidTestCase;
 import android.util.Log;
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
 import java.util.UUID;
 
-@TestTargetClass(AudioEffect.class)
 public class AudioEffectTest extends AndroidTestCase {
 
     private String TAG = "AudioEffectTest";
@@ -75,13 +70,6 @@ public class AudioEffectTest extends AndroidTestCase {
 
     //Test case 0.0: test queryEffects() and platfrom at least provides Equalizer, Bass Boost,
     // Virtualizer, Environmental reverb and Preset reverb effects
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "queryEffects",
-            args = {}
-        )
-    })
     public void test0_0QueryEffects() throws Exception {
 
         AudioEffect.Descriptor[] desc = AudioEffect.queryEffects();
@@ -139,23 +127,6 @@ public class AudioEffectTest extends AndroidTestCase {
     }
 
     //Test case 1.0: test constructor from effect type and get effect ID
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "AudioEffect",
-            args = {UUID.class, UUID.class, int.class, int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getId",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "release",
-            args = {}
-        )
-    })
     public void test1_0ConstructorFromType() throws Exception {
         AudioEffect.Descriptor[] desc = AudioEffect.queryEffects();
         assertTrue("no effects found", (desc.length != 0));
@@ -196,23 +167,6 @@ public class AudioEffectTest extends AndroidTestCase {
     }
 
     //Test case 1.1: test constructor from effect uuid
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "AudioEffect",
-            args = {UUID.class, UUID.class, int.class, int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getId",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "release",
-            args = {}
-        )
-    })
     public void test1_1ConstructorFromUuid() throws Exception {
         AudioEffect.Descriptor[] desc = AudioEffect.queryEffects();
         assertTrue("no effects found", (desc.length != 0));
@@ -250,18 +204,6 @@ public class AudioEffectTest extends AndroidTestCase {
     }
 
     //Test case 1.2: test constructor failure from unknown type
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "AudioEffect",
-            args = {UUID.class, UUID.class, int.class, int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "release",
-            args = {}
-        )
-    })
     public void test1_2ConstructorUnknownType() throws Exception {
 
         try {
@@ -281,23 +223,6 @@ public class AudioEffectTest extends AndroidTestCase {
     }
 
     //Test case 1.3: test getEnabled() failure when called on released effect
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "AudioEffect",
-            args = {UUID.class, UUID.class, int.class, int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getEnabled",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "release",
-            args = {}
-        )
-    })
     public void test1_3GetEnabledAfterRelease() throws Exception {
 
         try {
@@ -321,18 +246,6 @@ public class AudioEffectTest extends AndroidTestCase {
     }
 
     //Test case 1.4: test contructor on mediaPlayer audio session
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setEnabled",
-            args = {boolean.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "MediaPlayer.getAudioSessionId",
-            args = {}
-        )
-    })
     public void test1_4InsertOnMediaPlayer() throws Exception {
         MediaPlayer mp = new MediaPlayer();
         assertNotNull("could not create mediaplayer", mp);
@@ -352,23 +265,6 @@ public class AudioEffectTest extends AndroidTestCase {
     }
 
     //Test case 1.5: test auxiliary effect attachement on MediaPlayer
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getId",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "MediaPlayer.attachAuxEffect",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "MediaPlayer.setAuxEffectSendLevel",
-            args = {}
-        )
-    })
     public void test1_5AuxiliaryOnMediaPlayer() throws Exception {
         createMediaPlayerLooper();
         synchronized(mLock) {
@@ -406,23 +302,6 @@ public class AudioEffectTest extends AndroidTestCase {
     }
 
     //Test case 1.6: test auxiliary effect attachement failure before setDatasource
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getId",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "MediaPlayer.attachAuxEffect",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "MediaPlayer.setAuxEffectSendLevel",
-            args = {}
-        )
-    })
     public void test1_6AuxiliaryOnMediaPlayerFailure() throws Exception {
         createMediaPlayerLooper();
         synchronized(mLock) {
@@ -457,23 +336,6 @@ public class AudioEffectTest extends AndroidTestCase {
 
 
     //Test case 1.7: test auxiliary effect attachement on AudioTrack
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getId",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "AudioTrack.attachAuxEffect",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "AudioTrack.setAuxEffectSendLevel",
-            args = {}
-        )
-    })
     public void test1_7AuxiliaryOnAudioTrack() throws Exception {
         AudioTrack track = null;
         getEffect(AudioEffect.EFFECT_TYPE_PRESET_REVERB, 0);
@@ -515,18 +377,6 @@ public class AudioEffectTest extends AndroidTestCase {
 
 
     //Test case 2.0: test setEnabled() and getEnabled() in valid state
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setEnabled",
-            args = {boolean.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getEnabled",
-            args = {}
-        )
-    })
     public void test2_0SetEnabledGetEnabled() throws Exception {
 
         try {
@@ -555,18 +405,6 @@ public class AudioEffectTest extends AndroidTestCase {
     }
 
     //Test case 2.1: test setEnabled() throws exception after release
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setEnabled",
-            args = {boolean.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getEnabled",
-            args = {}
-        )
-    })
     public void test2_1SetEnabledAfterRelease() throws Exception {
 
         try {
@@ -594,18 +432,6 @@ public class AudioEffectTest extends AndroidTestCase {
     //----------------------------------
 
     //Test case 3.0: test setParameter(byte[], byte[]) / getParameter(byte[], byte[])
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setParameter",
-            args = {byte[].class, byte[].class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getParameter",
-            args = {byte[].class, byte[].class}
-        )
-    })
     public void test3_0SetParameterByteArrayByteArray() throws Exception {
         getEffect(AudioEffect.EFFECT_TYPE_PRESET_REVERB, 0);
         try {
@@ -637,18 +463,6 @@ public class AudioEffectTest extends AndroidTestCase {
     }
 
     //Test case 3.1: test setParameter(int, int) / getParameter(int, int[])
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setParameter",
-            args = {int.class, int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getParameter",
-            args = {int.class, int[].class}
-        )
-    })
     public void test3_1SetParameterIntInt() throws Exception {
         getEffect(AudioEffect.EFFECT_TYPE_ENV_REVERB, 0);
         try {
@@ -680,18 +494,6 @@ public class AudioEffectTest extends AndroidTestCase {
     }
 
     //Test case 3.2: test setParameter(int, short) / getParameter(int, short[])
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setParameter",
-            args = {int.class, short.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getParameter",
-            args = {int.class, short[].class}
-        )
-    })
     public void test3_2SetParameterIntShort() throws Exception {
         getEffect(AudioEffect.EFFECT_TYPE_PRESET_REVERB, 0);
         try {
@@ -721,18 +523,6 @@ public class AudioEffectTest extends AndroidTestCase {
     }
 
     //Test case 3.3: test setParameter(int, byte[]) / getParameter(int, byte[])
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setParameter",
-            args = {int.class, byte[].class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getParameter",
-            args = {int.class, byte[].class}
-        )
-    })
     public void test3_3SetParameterIntByteArray() throws Exception {
         getEffect(AudioEffect.EFFECT_TYPE_ENV_REVERB, 0);
         try {
@@ -766,18 +556,6 @@ public class AudioEffectTest extends AndroidTestCase {
     }
 
     //Test case 3.4: test setParameter(int[], int[]) / getParameter(int[], int[])
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setParameter",
-            args = {int[].class, int[].class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getParameter",
-            args = {int[].class, int[].class}
-        )
-    })
     public void test3_4SetParameterIntArrayIntArray() throws Exception {
         getEffect(AudioEffect.EFFECT_TYPE_ENV_REVERB, 0);
         try {
@@ -811,18 +589,6 @@ public class AudioEffectTest extends AndroidTestCase {
     }
 
     //Test case 3.5: test setParameter(int[], short[]) / getParameter(int[], short[])
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setParameter",
-            args = {int[].class, short[].class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getParameter",
-            args = {int[].class, short[].class}
-        )
-    })
 
     public void test3_5SetParameterIntArrayShortArray() throws Exception {
         getEffect(AudioEffect.EFFECT_TYPE_PRESET_REVERB, 0);
@@ -855,18 +621,6 @@ public class AudioEffectTest extends AndroidTestCase {
     }
 
     //Test case 3.6: test setParameter(int[], byte[]) / getParameter(int[], byte[])
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setParameter",
-            args = {int[].class, byte[].class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getParameter",
-            args = {int[].class, byte[].class}
-        )
-    })
     public void test3_6SetParameterIntArrayByteArray() throws Exception {
         getEffect(AudioEffect.EFFECT_TYPE_ENV_REVERB, 0);
         try {
@@ -901,13 +655,6 @@ public class AudioEffectTest extends AndroidTestCase {
     }
 
     //Test case 3.7: test setParameter() throws exception after release()
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setParameter",
-            args = {int.class, short.class}
-        )
-    })
     public void test3_7SetParameterAfterRelease() throws Exception {
         AudioEffect effect = null;
         try {
@@ -933,13 +680,6 @@ public class AudioEffectTest extends AndroidTestCase {
     }
 
     //Test case 3.8: test getParameter() throws exception after release()
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setParameter",
-            args = {int.class, short[].class}
-        )
-    })
     public void test3_8GetParameterAfterRelease() throws Exception {
         AudioEffect effect = null;
         try {
@@ -970,23 +710,6 @@ public class AudioEffectTest extends AndroidTestCase {
     //----------------------------------
 
     //Test case 4.0: test control passed to higher priority client
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "hasControl",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setEnabled",
-            args = {boolean.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getEnabled",
-            args = {}
-        )
-    })
     public void test4_0setEnabledLowerPriority() throws Exception {
         AudioEffect effect1 = null;
         AudioEffect effect2 = null;
@@ -1024,18 +747,6 @@ public class AudioEffectTest extends AndroidTestCase {
     }
 
     //Test case 4.1: test control passed to higher priority client
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setParameter",
-            args = {int.class, short.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getParameter",
-            args = {int.class, short[].class}
-        )
-    })
     public void test4_1setParameterLowerPriority() throws Exception {
         AudioEffect effect1 = null;
         AudioEffect effect2 = null;
@@ -1085,13 +796,6 @@ public class AudioEffectTest extends AndroidTestCase {
     }
 
     //Test case 4.2: test control status listener
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setControlStatusListener",
-            args = {AudioEffect.OnControlStatusChangeListener.class}
-        )
-    })
     public void test4_2ControlStatusListener() throws Exception {
 
         mHasControl = true;
@@ -1119,23 +823,6 @@ public class AudioEffectTest extends AndroidTestCase {
     }
 
     //Test case 4.3: test enable status listener
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setEnableStatusListener",
-            args = {AudioEffect.OnEnableStatusChangeListener.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setEnabled",
-            args = {boolean.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getEnabled",
-            args = {}
-        )
-    })
     public void test4_3EnableStatusListener() throws Exception {
 
         createListenerLooper(false, true, false);
@@ -1167,18 +854,6 @@ public class AudioEffectTest extends AndroidTestCase {
     }
 
     //Test case 4.4: test parameter changed listener
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setParameterListener",
-            args = {AudioEffect.OnParameterChangeListener.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setParameter",
-            args = {int.class, short.class}
-        )
-    })
     public void test4_4ParameterChangedListener() throws Exception {
 
         createListenerLooper(false, false, true);
@@ -1218,13 +893,6 @@ public class AudioEffectTest extends AndroidTestCase {
 
 
     //Test case 5.0: test command method
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "command",
-            args = {int.class, byte[].class, byte[].class}
-        )
-    })
     public void test5_0Command() throws Exception {
         getEffect(AudioEffect.EFFECT_TYPE_PRESET_REVERB, 0);
         try {

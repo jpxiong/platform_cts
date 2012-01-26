@@ -16,10 +16,6 @@
 
 package android.widget.cts;
 
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.ToBeFixed;
 
 import android.text.SpannableString;
 import android.text.Spanned;
@@ -28,7 +24,6 @@ import android.widget.MultiAutoCompleteTextView.CommaTokenizer;
 
 import junit.framework.TestCase;
 
-@TestTargetClass(CommaTokenizer.class)
 public class MultiAutoCompleteTextView_CommaTokenizerTest extends TestCase {
     private static final String TEST_TEXT = "first token, second token";
     CommaTokenizer mCommaTokenizer;
@@ -39,22 +34,10 @@ public class MultiAutoCompleteTextView_CommaTokenizerTest extends TestCase {
         mCommaTokenizer = new CommaTokenizer();
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "MultiAutoCompleteTextView.CommaTokenizer",
-        args = {}
-    )
     public void testConstructor() {
         new CommaTokenizer();
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "findTokenStart",
-        args = {java.lang.CharSequence.class, int.class}
-    )
-    @ToBeFixed(bug = "1695243", explanation = "does not declare the corner cases." +
-            " 1. cursor is out of bound. 2. text is null.")
     public void testFindTokenStart() {
         int indexOfSecondToken = TEST_TEXT.indexOf("second");
         assertEquals(indexOfSecondToken,
@@ -89,13 +72,6 @@ public class MultiAutoCompleteTextView_CommaTokenizerTest extends TestCase {
         }
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "findTokenEnd",
-        args = {java.lang.CharSequence.class, int.class}
-    )
-    @ToBeFixed(bug = "1695243", explanation = "does not declare the corner cases." +
-            " 1. cursor is out of bound. 2. text is null.")
     public void testFindTokenEnd() {
         int indexOfComma = TEST_TEXT.indexOf(",");
 
@@ -125,15 +101,6 @@ public class MultiAutoCompleteTextView_CommaTokenizerTest extends TestCase {
         }
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "terminateToken",
-        args = {java.lang.CharSequence.class}
-    )
-    @ToBeFixed(bug = "1695243", explanation = "does not declare the corner cases." +
-            " 1. text is null." +
-            " 2. javadoc says ends with a token terminator (for example a space or comma)," +
-            " but actually ends with both comma and space")
     public void testTerminateToken() {
         String text = "end with comma,";
         assertEquals(text, mCommaTokenizer.terminateToken(text));

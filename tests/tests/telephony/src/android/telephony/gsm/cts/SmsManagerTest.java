@@ -20,20 +20,11 @@ import java.util.ArrayList;
 
 import android.app.PendingIntent;
 import android.telephony.gsm.SmsManager;
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
 
 @SuppressWarnings("deprecation")
-@TestTargetClass(SmsManager.class)
 public class SmsManagerTest extends android.telephony.cts.SmsManagerTest {
 
     @Override
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "getDefault",
-        args = {}
-    )
     public void testGetDefault() {
         assertNotNull(getSmsManager());
     }

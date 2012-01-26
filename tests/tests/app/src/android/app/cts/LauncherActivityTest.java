@@ -16,10 +16,6 @@
 
 package android.app.cts;
 
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
 
 import android.app.Instrumentation;
 import android.app.LauncherActivity;
@@ -30,7 +26,6 @@ import android.view.KeyEvent;
 
 import java.util.List;
 
-@TestTargetClass(LauncherActivity.class)
 public class LauncherActivityTest extends InstrumentationTestCase {
     private Instrumentation mInstrumentation;
     private LauncherActivityStub mActivity;
@@ -51,38 +46,6 @@ public class LauncherActivityTest extends InstrumentationTestCase {
         super.tearDown();
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "LauncherActivity",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getTargetIntent",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "makeListItems",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "onCreate",
-            args = {android.os.Bundle.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "onListItemClick",
-            args = {android.widget.ListView.class, android.view.View.class, int.class, long.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "intentForPosition",
-            args = {int.class}
-        )
-    })
     public void testLaunchActivity() {
         // Constructor of LaunchActivity can't be invoked directly.
         new LauncherActivityStub();

@@ -16,10 +16,6 @@
 package android.graphics.cts;
 
 import dalvik.annotation.KnownFailure;
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.ToBeFixed;
 
 import android.graphics.AvoidXfermode;
 import android.graphics.Bitmap;
@@ -30,7 +26,6 @@ import android.graphics.Bitmap.Config;
 
 import junit.framework.TestCase;
 
-@TestTargetClass(AvoidXfermode.class)
 public class AvoidXfermodeTest extends TestCase {
     /*
      * ToBeFixed: This test ought to work with a TOLERANCE of 0. See bug 2034547.
@@ -40,13 +35,6 @@ public class AvoidXfermodeTest extends TestCase {
     private static final int BITMAP_HEIGHT = BASE_SIZE * 2;
     private static final int BITMAP_WIDTH = BASE_SIZE * 2;
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "AvoidXfermode",
-        args = {int.class, int.class, android.graphics.AvoidXfermode.Mode.class}
-    )
-    @ToBeFixed(bug = "2034547",
-               explanation = "AvoidXfermode does not work as expected with tolerance 0.")
     public void testAvoidXfermode() {
         Paint greenPaint;
         Paint redAvoidingGreenPaint;

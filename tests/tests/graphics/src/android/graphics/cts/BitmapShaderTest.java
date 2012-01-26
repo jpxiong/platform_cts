@@ -15,9 +15,6 @@
  */
 package android.graphics.cts;
 
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapShader;
@@ -30,7 +27,6 @@ import android.graphics.Shader.TileMode;
 
 import junit.framework.TestCase;
 
-@TestTargetClass(BitmapShader.class)
 public class BitmapShaderTest extends TestCase {
     private static final int TILE_WIDTH = 20;
     private static final int TILE_HEIGHT = 20;
@@ -39,11 +35,6 @@ public class BitmapShaderTest extends TestCase {
     private static final int CENTER_COLOR = Color.RED;
     private static final int NUM_TILES = 4;
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "BitmapShader",
-        args = {Bitmap.class, TileMode.class, TileMode.class}
-    )
     public void testBitmapShader() {
         Bitmap tile = Bitmap.createBitmap(TILE_WIDTH, TILE_HEIGHT, Config.ARGB_8888);
         tile.eraseColor(BORDER_COLOR);

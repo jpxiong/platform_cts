@@ -19,11 +19,6 @@ package android.content.cts;
 import com.android.cts.stub.R;
 import com.android.internal.util.XmlUtils;
 
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
-import dalvik.annotation.ToBeFixed;
 
 import org.xmlpull.v1.XmlPullParserException;
 
@@ -38,7 +33,6 @@ import android.util.Xml;
 
 import java.io.IOException;
 
-@TestTargetClass(Context.class)
 public class ContextTest extends AndroidTestCase {
     private Context mContext;
 
@@ -49,21 +43,6 @@ public class ContextTest extends AndroidTestCase {
         mContext.setTheme(R.style.Test_Theme);
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test getString(int, Object...) and getString(int).",
-            method = "getString",
-            args = {int.class, java.lang.Object[].class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test getString(int, Object...) and getString(int).",
-            method = "getString",
-            args = {int.class}
-        )
-    })
-    @ToBeFixed(bug = "1417734", explanation = "Unexpected NotFoundException")
     public void testGetString() {
         String testString = mContext.getString(R.string.context_test_string1);
         assertEquals("This is %s string.", testString);
@@ -89,13 +68,6 @@ public class ContextTest extends AndroidTestCase {
         }
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test getText(int).",
-        method = "getText",
-        args = {int.class}
-    )
-    @ToBeFixed(bug = "1417734", explanation = "Unexpected NotFoundException")
     public void testGetText() {
         CharSequence testCharSequence = mContext.getText(R.string.context_test_string2);
         assertEquals("This is test string.", testCharSequence.toString());
@@ -108,18 +80,6 @@ public class ContextTest extends AndroidTestCase {
         }
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getTheme",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setTheme",
-            args = {int.class}
-        )
-    })
     public void testAccessTheme() {
         mContext.setTheme(R.style.Test_Theme);
         final Theme testTheme = mContext.getTheme();
@@ -148,32 +108,6 @@ public class ContextTest extends AndroidTestCase {
         assertSame(testTheme, mContext.getTheme());
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "",
-            method = "obtainStyledAttributes",
-            args = {int[].class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "",
-            method = "obtainStyledAttributes",
-            args = {int.class, int[].class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "",
-            method = "obtainStyledAttributes",
-            args = {android.util.AttributeSet.class, int[].class, int.class, int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "",
-            method = "obtainStyledAttributes",
-            args = {android.util.AttributeSet.class, int[].class}
-        )
-    })
     public void testObtainStyledAttributes() {
         // Test obtainStyledAttributes(int[])
         TypedArray testTypedArray = mContext

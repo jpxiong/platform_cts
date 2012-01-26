@@ -21,43 +21,12 @@ import android.os.PowerManager;
 import android.os.SystemClock;
 import android.os.PowerManager.WakeLock;
 import android.test.AndroidTestCase;
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
 
-@TestTargetClass(PowerManager.class)
 public class PowerManagerTest extends AndroidTestCase {
     private static final String TAG = "PowerManagerTest";
     public static final long TIME = 3000;
     public static final int MORE_TIME = 300;
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test constructor(s) of {@link PowerManager}",
-            method = "PowerManager",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test method: newWakeLock",
-            method = "newWakeLock",
-            args = {int.class, String.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.SUFFICIENT ,
-            notes = "Test method: userActivity",
-            method = "userActivity",
-            args = {long.class, boolean.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.SUFFICIENT ,
-            notes = "Test method: goToSleep",
-            method = "goToSleep",
-            args = {long.class}
-        )
-    })
     /**
      * test points:
      * 1 Get a wake lock at the level of the flags parameter

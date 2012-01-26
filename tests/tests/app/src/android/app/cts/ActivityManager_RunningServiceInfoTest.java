@@ -19,11 +19,7 @@ import android.app.ActivityManager;
 import android.content.ComponentName;
 import android.os.Parcel;
 import android.test.AndroidTestCase;
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
 
-@TestTargetClass(ActivityManager.RunningServiceInfo.class)
 public class ActivityManager_RunningServiceInfoTest extends AndroidTestCase {
     private ActivityManager.RunningServiceInfo mRunningServiceInfo;
     private ComponentName mService;
@@ -47,29 +43,14 @@ public class ActivityManager_RunningServiceInfoTest extends AndroidTestCase {
         mRunningServiceInfo.restarting = 1l;
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "ActivityManager.RunningServiceInfo",
-        args = {}
-    )
     public void testConstructor() {
         new ActivityManager.RunningServiceInfo();
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "describeContents",
-        args = {}
-    )
     public void testDescribeContents() {
         assertEquals(0, mRunningServiceInfo.describeContents());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "writeToParcel",
-        args = {android.os.Parcel.class, int.class}
-    )
     public void testWriteToParcel() throws Exception {
 
         Parcel parcel = Parcel.obtain();
@@ -89,11 +70,6 @@ public class ActivityManager_RunningServiceInfoTest extends AndroidTestCase {
         assertEquals(1l, values.restarting);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "readFromParcel",
-        args = {android.os.Parcel.class}
-    )
     public void testReadFromParcel() throws Exception {
 
         Parcel parcel = Parcel.obtain();

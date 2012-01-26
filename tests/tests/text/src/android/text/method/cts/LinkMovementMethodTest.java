@@ -16,11 +16,6 @@
 
 package android.text.method.cts;
 
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
-import dalvik.annotation.ToBeFixed;
 
 import android.os.SystemClock;
 import android.test.ActivityInstrumentationTestCase2;
@@ -46,7 +41,6 @@ import android.widget.TextView.BufferType;
  *
  * @see android.widget.cts.TextViewTest
  */
-@TestTargetClass(LinkMovementMethod.class)
 public class LinkMovementMethodTest extends
         ActivityInstrumentationTestCase2<StubActivity> {
     private static final String CONTENT = "clickable\nunclickable\nclickable";
@@ -87,23 +81,10 @@ public class LinkMovementMethodTest extends
         mClickable1 = markClickable(CONTENT.lastIndexOf('\n'), CONTENT.length());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test constructor LinkMovementMethod#LinkMovementMethod().",
-        method = "LinkMovementMethod",
-        args = {}
-    )
     public void testConstructor() {
         new LinkMovementMethod();
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test {@link LinkMovementMethod#getInstance()}. "
-                + "This is a method for creating singleton.",
-        method = "getInstance",
-        args = {}
-    )
     public void testGetInstance() {
         MovementMethod method0 = LinkMovementMethod.getInstance();
         assertTrue(method0 instanceof LinkMovementMethod);
@@ -113,16 +94,6 @@ public class LinkMovementMethodTest extends
         assertSame(method0, method1);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test {@link LinkMovementMethod#onTakeFocus(TextView, Spannable, int)}. "
-                + "The parameter textView is useless.",
-        method = "onTakeFocus",
-        args = {TextView.class, Spannable.class, int.class}
-    )
-    @ToBeFixed(bug = "1695243", explanation = "Android API javadocs are incomplete. @throws clause "
-            + "should be added into javadoc of LinkMovementMethod#onTakeFocus(TextView, Spannable, "
-            + "int) when the params text is null")
     public void testOnTakeFocus() {
         LinkMovementMethod method = new LinkMovementMethod();
         Spannable spannable = new SpannableString("test sequence");
@@ -165,16 +136,7 @@ public class LinkMovementMethodTest extends
         }
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test {@link LinkMovementMethod#onKeyDown(TextView, Spannable, int, KeyEvent)}.",
-        method = "onKeyDown",
-        args = {TextView.class, Spannable.class, int.class, KeyEvent.class}
-    )
     @UiThreadTest
-    @ToBeFixed(bug = "1695243", explanation = "Android API javadocs are incomplete. @throws clause "
-            + "should be added into javadoc of LinkMovementMethod#onKeyDown(TextView, Spannable, "
-            + "int, KeyEvent) when the params widget, buffer or event is null")
     public void testOnKeyDown() {
         // no selection
         assertSelection(mSpannable, -1);
@@ -262,15 +224,6 @@ public class LinkMovementMethodTest extends
         }
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test {@link LinkMovementMethod#onKeyUp(TextView, Spannable, int, KeyEvent)}. "
-                + "It always returns false, and all parameters are never read.",
-        method = "onKeyUp",
-        args = {TextView.class, Spannable.class, int.class, KeyEvent.class}
-    )
-    @ToBeFixed(bug = "1695243", explanation = "Android API javadocs are incomplete. There is no "
-            + "document about the behaviour of this method.")
     public void testOnKeyUp() {
         LinkMovementMethod method = new LinkMovementMethod();
         // always returns false
@@ -281,16 +234,7 @@ public class LinkMovementMethodTest extends
                 new KeyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_0)));
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test {@link LinkMovementMethod#onTouchEvent(TextView, Spannable, MotionEvent)} ",
-        method = "onTouchEvent",
-        args = {TextView.class, Spannable.class, MotionEvent.class}
-    )
     @UiThreadTest
-    @ToBeFixed(bug = "1695243", explanation = "Android API javadocs are incomplete. @throws clause "
-            + "should be added into javadoc of LinkMovementMethod#onTouchEvent(TextView, "
-            + "Spannable, MotionEvent) when the params widget, buffer or event is null")
     public void testOnTouchEvent() {
         assertSelection(mSpannable, -1);
 
@@ -351,17 +295,7 @@ public class LinkMovementMethodTest extends
         }
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test {@link LinkMovementMethod#up(TextView, Spannable)}. It is protected. "
-                + "Use extended class to test.",
-        method = "up",
-        args = {TextView.class, Spannable.class}
-    )
     @UiThreadTest
-    @ToBeFixed(bug = "1695243", explanation = "Android API javadocs are incomplete. @throws clause "
-            + "should be added into javadoc of LinkMovementMethod#up(TextView, Spannable) "
-            + "when the params widget or buffer or is null")
     public void testUp() {
         final MyLinkMovementMethod method = new MyLinkMovementMethod();
         assertSelection(mSpannable, -1);
@@ -391,17 +325,7 @@ public class LinkMovementMethodTest extends
         }
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test {@link LinkMovementMethod#down(TextView, Spannable)}. It is protected. "
-                + "Use extended class to test.",
-        method = "down",
-        args = {TextView.class, Spannable.class}
-    )
     @UiThreadTest
-    @ToBeFixed(bug = "1695243", explanation = "Android API javadocs are incomplete. @throws clause "
-            + "should be added into javadoc of LinkMovementMethod#down(TextView, Spannable) "
-            + "when the params widget or buffer or is null")
     public void testDown() {
         final MyLinkMovementMethod method = new MyLinkMovementMethod();
         assertSelection(mSpannable, -1);
@@ -431,17 +355,7 @@ public class LinkMovementMethodTest extends
         }
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test {@link LinkMovementMethod#left(TextView, Spannable)}. It is protected. "
-                + "Use extended class to test.",
-        method = "left",
-        args = {TextView.class, Spannable.class}
-    )
     @UiThreadTest
-    @ToBeFixed(bug = "1695243", explanation = "Android API javadocs are incomplete. @throws clause "
-            + "should be added into javadoc of LinkMovementMethod#left(TextView, Spannable) "
-            + "when the params widget or buffer or is null")
     public void testLeft() {
         final MyLinkMovementMethod method = new MyLinkMovementMethod();
         assertSelection(mSpannable, -1);
@@ -471,17 +385,7 @@ public class LinkMovementMethodTest extends
         }
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test {@link LinkMovementMethod#right(TextView, Spannable)}. It is protected. "
-                + "Use extended class to test.",
-        method = "right",
-        args = {TextView.class, Spannable.class}
-    )
     @UiThreadTest
-    @ToBeFixed(bug = "1695243", explanation = "Android API javadocs are incomplete. @throws clause "
-            + "should be added into javadoc of LinkMovementMethod#right(TextView, Spannable) "
-            + "when the params widget or buffer or is null")
     public void testRight() {
         final MyLinkMovementMethod method = new MyLinkMovementMethod();
         assertSelection(mSpannable, -1);
@@ -511,36 +415,7 @@ public class LinkMovementMethodTest extends
         }
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test {@link LinkMovementMethod#up(TextView, Spannable)}.",
-            method = "up",
-            args = {TextView.class, Spannable.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test {@link LinkMovementMethod#down(TextView, Spannable)}.",
-            method = "down",
-            args = {TextView.class, Spannable.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test {@link LinkMovementMethod#right(TextView, Spannable)}.",
-            method = "left",
-            args = {TextView.class, Spannable.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test {@link LinkMovementMethod#left(TextView, Spannable)}.",
-            method = "right",
-            args = {TextView.class, Spannable.class}
-        )
-    })
     @UiThreadTest
-    @ToBeFixed(bug = "1695243", explanation = "Android API javadocs are incomplete. There is no "
-            + "document about the behaviour of these methods when the spannable text is not "
-            + "clickcable.")
     public void testMoveAroundUnclickable() {
         final MyLinkMovementMethod method = new MyLinkMovementMethod();
         mSpannable.removeSpan(mClickable0);
@@ -560,15 +435,6 @@ public class LinkMovementMethodTest extends
         assertSelection(mSpannable, -1);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test {@link LinkMovementMethod#initialize(TextView, Spannable)}.",
-        method = "initialize",
-        args = {TextView.class, Spannable.class}
-    )
-    @ToBeFixed(bug = "1695243", explanation = "Android API javadocs are incomplete. @throws clause "
-            + "should be added into javadoc of LinkMovementMethod#initialize(TextView, Spannable) "
-            + "when the params text is null")
     public void testInitialize() {
         LinkMovementMethod method = new LinkMovementMethod();
         Spannable spannable = new SpannableString("test sequence");

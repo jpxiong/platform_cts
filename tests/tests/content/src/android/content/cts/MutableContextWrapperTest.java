@@ -20,11 +20,7 @@ import android.app.cts.MockActivity;
 import android.content.Context;
 import android.content.MutableContextWrapper;
 import android.test.AndroidTestCase;
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
 
-@TestTargetClass(MutableContextWrapper.class)
 public class MutableContextWrapperTest extends AndroidTestCase {
 
     MutableContextWrapper mMutableContextWrapper;
@@ -37,22 +33,12 @@ public class MutableContextWrapperTest extends AndroidTestCase {
         mContext = getContext();
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "MutableContextWrapper",
-        args = {android.content.Context.class}
-    )
     public void testConstructor() {
 
         mMutableContextWrapper = new MutableContextWrapper(mContext);
         assertNotNull(mMutableContextWrapper);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "setBaseContext",
-        args = {android.content.Context.class}
-    )
     public void testSetBaseContext() {
         mMutableContextWrapper = new MutableContextWrapper(mContext);
         assertTrue(mContext.equals(mMutableContextWrapper.getBaseContext()));

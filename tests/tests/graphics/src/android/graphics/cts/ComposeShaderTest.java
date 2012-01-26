@@ -15,9 +15,6 @@
  */
 package android.graphics.cts;
 
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapShader;
@@ -36,17 +33,11 @@ import android.util.Log;
 
 import junit.framework.TestCase;
 
-@TestTargetClass(ComposeShader.class)
 public class ComposeShaderTest extends TestCase {
 
     private static final int SIZE = 255;
     private static final int TOLERANCE = 5;
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "ComposeShader",
-        args = {Shader.class, Shader.class, PorterDuff.Mode.class}
-    )
     public void testPorterDuff() {
         LinearGradient blueGradient = new LinearGradient(0, 0, SIZE, 0,
                 Color.GREEN, Color.BLUE, Shader.TileMode.CLAMP);
@@ -79,11 +70,6 @@ public class ComposeShaderTest extends TestCase {
         }
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "ComposeShader",
-        args = {Shader.class, Shader.class, Xfermode.class}
-    )
     public void testXfermode() {
         Bitmap greenBitmap = Bitmap.createBitmap(1, 1, Config.ARGB_8888);
         greenBitmap.eraseColor(Color.GREEN);

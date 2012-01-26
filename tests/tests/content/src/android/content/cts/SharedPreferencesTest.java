@@ -19,11 +19,6 @@ package android.content.cts;
 import com.android.cts.stub.R;
 
 import dalvik.annotation.BrokenTest;
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
-import dalvik.annotation.ToBeFixed;
 
 import android.app.QueuedWork;
 import android.content.Context;
@@ -45,7 +40,6 @@ import java.util.Random;
 /**
  * Test {@link SharedPreferences}.
  */
-@TestTargetClass(SharedPreferences.class)
 public class SharedPreferencesTest extends AndroidTestCase {
     private static final String TAG = "SharedPreferencesTest";
 

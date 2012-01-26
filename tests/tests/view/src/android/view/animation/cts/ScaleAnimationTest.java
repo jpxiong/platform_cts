@@ -18,10 +18,6 @@ package android.view.animation.cts;
 
 import com.android.cts.stub.R;
 
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
 
 import android.content.res.XmlResourceParser;
 import android.graphics.Matrix;
@@ -33,7 +29,6 @@ import android.view.animation.Animation;
 import android.view.animation.ScaleAnimation;
 import android.view.animation.Transformation;
 
-@TestTargetClass(android.view.animation.ScaleAnimation.class)
 public class ScaleAnimationTest
         extends ActivityInstrumentationTestCase2<AnimationTestStubActivity> {
     private static long DURATION = 1000;
@@ -58,29 +53,6 @@ public class ScaleAnimationTest
         mActivity = getActivity();
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "ScaleAnimation",
-            args = {android.content.Context.class, android.util.AttributeSet.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "ScaleAnimation",
-            args = {float.class, float.class, float.class, float.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "ScaleAnimation",
-            args = {float.class, float.class, float.class, float.class, float.class, float.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "ScaleAnimation",
-            args = {float.class, float.class, float.class, float.class, int.class, float.class,
-                    int.class, float.class}
-        )
-    })
     public void testConstructors() {
         final XmlResourceParser parser = mActivity.getResources().getAnimation(
                 R.anim.anim_scale);
@@ -96,19 +68,6 @@ public class ScaleAnimationTest
         new ScaleAnimation(FROM_X, TO_X, FROM_Y, TO_Y, PIVOT_X, PIVOT_Y);
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Use applyTransformation directly",
-            method = "applyTransformation",
-            args = {float.class, android.view.animation.Transformation.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "initialize",
-            args = {int.class, int.class, int.class, int.class}
-        )
-    })
     public void testApplyTransformation() {
         final Transformation transformation = new Transformation();
         transformation.setTransformationType(Transformation.TYPE_MATRIX);
@@ -143,12 +102,6 @@ public class ScaleAnimationTest
         assertTrue(Math.abs(trans2Y) < Math.abs(trans3Y));
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Use applyTransformation indirectly with Animation#getTransformation",
-        method = "applyTransformation",
-        args = {float.class, android.view.animation.Transformation.class}
-    )
     public void testApplyTransformationIndirectly() {
         final View animWindow = mActivity.findViewById(R.id.anim_window);
         final Transformation transformation = new Transformation();

@@ -19,15 +19,10 @@ package android.view.cts;
 import android.test.AndroidTestCase;
 import android.view.View;
 import android.view.View.MeasureSpec;
-import dalvik.annotation.TestTargets;
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargetClass;
 
 /**
  * Test {@link MeasureSpec}.
  */
-@TestTargetClass(View.MeasureSpec.class)
 public class View_MeasureSpecTest extends AndroidTestCase {
     private static final int MEASURE_SPEC_SIZE = 1;
 
@@ -46,21 +41,9 @@ public class View_MeasureSpecTest extends AndroidTestCase {
                 View.MeasureSpec.AT_MOST);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "This is a foo test, just add annotation for constructor, to make nooser pass",
-        method = "View.MeasureSpec",
-        args = {}
-    )
     public void testConstructor() {
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test View.MeasureSpec#getSize(int)",
-        method = "getSize",
-        args = {int.class}
-    )
     public void testGetSize() {
         assertEquals(MEASURE_SPEC_SIZE,
                 View.MeasureSpec.getSize(mUnspecifiedMeasureSpec));
@@ -70,12 +53,6 @@ public class View_MeasureSpecTest extends AndroidTestCase {
                 View.MeasureSpec.getSize(mAtMostMeasureSpec));
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test View.MeasureSpec#toString(int)",
-        method = "toString",
-        args = {int.class}
-    )
     public void testToString() {
         assertEquals("MeasureSpec: UNSPECIFIED " + MEASURE_SPEC_SIZE,
                 View.MeasureSpec.toString(mUnspecifiedMeasureSpec));
@@ -85,12 +62,6 @@ public class View_MeasureSpecTest extends AndroidTestCase {
                 View.MeasureSpec.toString(mAtMostMeasureSpec));
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test View.MeasureSpec#getMode(int)",
-        method = "getMode",
-        args = {int.class}
-    )
     public void testGetMode() {
         assertEquals(View.MeasureSpec.UNSPECIFIED,
                 View.MeasureSpec.getMode(mUnspecifiedMeasureSpec));
@@ -100,12 +71,6 @@ public class View_MeasureSpecTest extends AndroidTestCase {
                 View.MeasureSpec.getMode(mAtMostMeasureSpec));
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test View.MeasureSpec#makeMeasureSpec(int, int)",
-        method = "makeMeasureSpec",
-        args = {int.class, int.class}
-    )
     public void testMakeMeasureSpec() {
         assertEquals(MEASURE_SPEC_SIZE + View.MeasureSpec.UNSPECIFIED,
                 mUnspecifiedMeasureSpec);

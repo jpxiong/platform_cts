@@ -16,11 +16,6 @@
 
 package android.text.util.cts;
 
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
-import dalvik.annotation.ToBeFixed;
 
 import android.test.AndroidTestCase;
 import android.text.util.Rfc822Token;
@@ -28,13 +23,7 @@ import android.text.util.Rfc822Token;
 /**
  * Test {@link Rfc822Token}.
  */
-@TestTargetClass(Rfc822Token.class)
 public class Rfc822TokenTest extends AndroidTestCase {
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "Rfc822Token",
-        args = {java.lang.String.class, java.lang.String.class, java.lang.String.class}
-    )
     public void testConstructor() {
         final String name = "John Doe";
         final String address = "jdoe@example.net";
@@ -60,18 +49,6 @@ public class Rfc822TokenTest extends AndroidTestCase {
         assertNull(rfc822Token4.getComment());
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getName",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setName",
-            args = {java.lang.String.class}
-        )
-    })
     public void testAccessName() {
         String name = "John Doe";
         final String address = "jdoe@example.net";
@@ -91,13 +68,6 @@ public class Rfc822TokenTest extends AndroidTestCase {
         assertNull(rfc822Token.getName());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "quoteComment",
-        args = {java.lang.String.class}
-    )
-    @ToBeFixed(bug = "1695243", explanation = "the javadoc for quoteComment() is incomplete." +
-            "1. not clear what is supposed to happen if comment is null.")
     public void testQuoteComment() {
         assertEquals("work", Rfc822Token.quoteComment("work"));
 
@@ -111,18 +81,6 @@ public class Rfc822TokenTest extends AndroidTestCase {
         }
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getComment",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setComment",
-            args = {java.lang.String.class}
-        )
-    })
     public void testAccessComment() {
         final String name = "John Doe";
         final String address = "jdoe@example.net";
@@ -142,18 +100,6 @@ public class Rfc822TokenTest extends AndroidTestCase {
         assertNull(rfc822Token.getComment());
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getAddress",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setAddress",
-            args = {java.lang.String.class}
-        )
-    })
     public void testAccessAddress() {
         final String name = "John Doe";
         String address = "jdoe@example.net";
@@ -173,11 +119,6 @@ public class Rfc822TokenTest extends AndroidTestCase {
         assertNull(rfc822Token.getAddress());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "toString",
-        args = {}
-    )
     public void testToString() {
         Rfc822Token rfc822Token1 = new Rfc822Token("John Doe", "jdoe@example.net", "work");
         assertEquals("John Doe (work) <jdoe@example.net>", rfc822Token1.toString());
@@ -200,15 +141,6 @@ public class Rfc822TokenTest extends AndroidTestCase {
         assertEquals("", rfc822Token6.toString());
     }
 
-    @TestTargetNew(
-        level = TestLevel.NOT_FEASIBLE,
-        notes = "the phrase 'likely to cause trouble outside of a quoted string' is not testable",
-        method = "quoteNameIfNecessary",
-        args = {java.lang.String.class}
-    )
-    @ToBeFixed(bug = "1695243", explanation =
-            "the javadoc for quoteNameIfNecessary() is incomplete." +
-            "1. not clear what is supposed to happen if name is null.")
     public void testQuoteNameIfNecessary() {
         assertEquals("UPPERlower space 0123456789",
                 Rfc822Token.quoteNameIfNecessary("UPPERlower space 0123456789"));
@@ -225,14 +157,6 @@ public class Rfc822TokenTest extends AndroidTestCase {
         assertEquals("", Rfc822Token.quoteNameIfNecessary(""));
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test {@link Rfc822Token#quoteName(String)}",
-        method = "quoteName",
-        args = {java.lang.String.class}
-    )
-    @ToBeFixed(bug = "1695243", explanation = "the javadoc for quoteName() is incomplete." +
-            "1. not clear what is supposed to happen if name is null.")
     public void testQuoteName() {
         assertEquals("John Doe", Rfc822Token.quoteName("John Doe"));
         assertEquals("\\\"John Doe\\\"", Rfc822Token.quoteName("\"John Doe\""));

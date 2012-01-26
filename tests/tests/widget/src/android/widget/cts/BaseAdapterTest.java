@@ -16,10 +16,6 @@
 
 package android.widget.cts;
 
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
 
 import android.database.DataSetObserver;
 import android.test.AndroidTestCase;
@@ -30,36 +26,12 @@ import android.widget.BaseAdapter;
 /**
  * Test {@link BaseAdapter}.
  */
-@TestTargetClass(BaseAdapter.class)
 public class BaseAdapterTest extends AndroidTestCase {
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "this function always returns false.",
-        method = "hasStableIds",
-        args = {}
-    )
     public void testHasStableIds() {
         BaseAdapter baseAdapter = new MockBaseAdapter();
         assertFalse(baseAdapter.hasStableIds());
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "registerDataSetObserver",
-            args = {android.database.DataSetObserver.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "unregisterDataSetObserver",
-            args = {android.database.DataSetObserver.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "notifyDataSetChanged",
-            args = {}
-        )
-    })
     public void testDataSetObserver() {
         BaseAdapter baseAdapter = new MockBaseAdapter();
         MockDataSetObserver dataSetObserver = new MockDataSetObserver();
@@ -79,11 +51,6 @@ public class BaseAdapterTest extends AndroidTestCase {
         assertFalse(dataSetObserver.hasCalledOnChanged());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "notifyDataSetInvalidated",
-        args = {}
-    )
     public void testNotifyDataSetInvalidated() {
         BaseAdapter baseAdapter = new MockBaseAdapter();
         MockDataSetObserver dataSetObserver = new MockDataSetObserver();
@@ -97,65 +64,31 @@ public class BaseAdapterTest extends AndroidTestCase {
         assertTrue(dataSetObserver.hasCalledOnInvalidated());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "this function always returns true.",
-        method = "areAllItemsEnabled",
-        args = {}
-    )
     public void testAreAllItemsEnabled() {
         BaseAdapter baseAdapter = new MockBaseAdapter();
         assertTrue(baseAdapter.areAllItemsEnabled());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "this function always returns true.",
-        method = "isEnabled",
-        args = {int.class}
-    )
     public void testIsEnabled() {
         BaseAdapter baseAdapter = new MockBaseAdapter();
         assertTrue(baseAdapter.isEnabled(0));
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "getDropDownView",
-        args = {int.class, android.view.View.class, android.view.ViewGroup.class}
-    )
     public void testGetDropDownView() {
         BaseAdapter baseAdapter = new MockBaseAdapter();
         assertNull(baseAdapter.getDropDownView(0, null, null));
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "this function always returns 0.",
-        method = "getItemViewType",
-        args = {int.class}
-    )
     public void testGetItemViewType() {
         BaseAdapter baseAdapter = new MockBaseAdapter();
         assertEquals(0, baseAdapter.getItemViewType(0));
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "this function always returns 1.",
-        method = "getViewTypeCount",
-        args = {}
-    )
     public void testGetViewTypeCount() {
         BaseAdapter baseAdapter = new MockBaseAdapter();
         assertEquals(1, baseAdapter.getViewTypeCount());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "isEmpty",
-        args = {}
-    )
     public void testIsEmpty() {
         MockBaseAdapter baseAdapter = new MockBaseAdapter();
 

@@ -36,12 +36,7 @@ import android.util.Xml;
 
 import com.android.cts.stub.R;
 
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.ToBeFixed;
 
-@TestTargetClass(StateListDrawable.class)
 public class StateListDrawableTest extends InstrumentationTestCase {
     private MockStateListDrawable mStateListDrawable;
 
@@ -57,11 +52,6 @@ public class StateListDrawableTest extends InstrumentationTestCase {
         mResources = getInstrumentation().getTargetContext().getResources();
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "StateListDrawable",
-        args = {}
-    )
     public void testStateListDrawable() {
         new StateListDrawable();
         // Check the values set in the constructor
@@ -69,11 +59,6 @@ public class StateListDrawableTest extends InstrumentationTestCase {
         assertTrue(new MockStateListDrawable().hasCalledOnStateChanged());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "addState",
-        args = {int[].class, android.graphics.drawable.Drawable.class}
-    )
     public void testAddState() {
         assertEquals(0, mDrawableContainerState.getChildCount());
 
@@ -103,20 +88,10 @@ public class StateListDrawableTest extends InstrumentationTestCase {
         assertTrue(mStateListDrawable.hasCalledOnStateChanged());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "isStateful",
-        args = {}
-    )
     public void testIsStateful() {
         assertTrue(new StateListDrawable().isStateful());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "onStateChange",
-        args = {int[].class}
-    )
     public void testOnStateChange() {
         mStateListDrawable.addState(new int[] { attr.state_focused, - attr.state_selected },
                 new MockDrawable());
@@ -152,13 +127,6 @@ public class StateListDrawableTest extends InstrumentationTestCase {
         assertSame(mStateListDrawable.getCurrent(), mDrawableContainerState.getChildren()[1]);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "If drawable with wild card state is added before any other drawables, "
-                + "this drawable is always matched at first",
-        method = "onStateChange",
-        args = {int[].class}
-    )
     public void testOnStateChangeWithWildCardAtFirst() {
         mStateListDrawable.addState(StateSet.WILD_CARD, new MockDrawable());
         mStateListDrawable.addState(new int[] { attr.state_focused, - attr.state_selected },
@@ -169,13 +137,6 @@ public class StateListDrawableTest extends InstrumentationTestCase {
         assertSame(mStateListDrawable.getCurrent(), mDrawableContainerState.getChildren()[0]);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "onStateChange",
-        args = {int[].class}
-    )
-    @ToBeFixed(bug = "1417734", explanation = "should add @throws clause into javadoc of "
-            + "StateListDrawable#onStateChange(int[]) when matching the null state")
     public void testOnStateChangeWithNullStateSet() {
         assertEquals(0, mDrawableContainerState.getChildCount());
         try {
@@ -192,12 +153,6 @@ public class StateListDrawableTest extends InstrumentationTestCase {
         }
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "inflate",
-        args = {android.content.res.Resources.class, org.xmlpull.v1.XmlPullParser.class,
-                android.util.AttributeSet.class}
-    )
     public void testInflate() throws XmlPullParserException, IOException {
         XmlResourceParser parser = getResourceParser(R.xml.selector_correct);
 
@@ -247,15 +202,6 @@ public class StateListDrawableTest extends InstrumentationTestCase {
         }
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "inflate",
-        args = {android.content.res.Resources.class, org.xmlpull.v1.XmlPullParser.class,
-                android.util.AttributeSet.class}
-    )
-    @ToBeFixed(bug = "1417734", explanation = "should add @throws clause into javadoc of "
-            + "StateListDrawable#inflate(Resources, XmlPullParser, AttributeSet) when param r,"
-            + "parser or attrs is out of bounds")
     public void testInflateWithNullParameters() throws XmlPullParserException, IOException{
         XmlResourceParser parser = getResourceParser(R.xml.level_list_correct);
         try {
@@ -277,12 +223,6 @@ public class StateListDrawableTest extends InstrumentationTestCase {
         }
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "mutate",
-        args = {}
-    )
-    @ToBeFixed(bug = "", explanation = "mutate() always throw NullPointerException.")
     public void testMutate() {
         StateListDrawable d1 =
             (StateListDrawable) mResources.getDrawable(R.drawable.statelistdrawable);

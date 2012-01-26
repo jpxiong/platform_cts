@@ -16,30 +16,13 @@
 
 package android.view.inputmethod.cts;
 
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
 
 import android.os.Parcel;
 import android.test.AndroidTestCase;
 import android.view.inputmethod.ExtractedTextRequest;
 
-@TestTargetClass(ExtractedTextRequest.class)
 public class ExtractedTextRequestTest extends AndroidTestCase {
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "describeContents",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "writeToParcel",
-            args = {Parcel.class, int.class}
-        )
-    })
     public void testExtractedTextRequest() {
         ExtractedTextRequest request = new ExtractedTextRequest();
         request.flags = 1;

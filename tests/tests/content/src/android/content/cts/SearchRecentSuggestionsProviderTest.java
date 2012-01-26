@@ -25,12 +25,7 @@ import android.test.IsolatedContext;
 import android.test.RenamingDelegatingContext;
 import android.test.mock.MockContentResolver;
 import android.test.mock.MockContext;
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
 
-@TestTargetClass(SearchRecentSuggestionsProvider.class)
 public class SearchRecentSuggestionsProviderTest extends AndroidTestCase {
     private final static String AUTHORITY_HEAD = "content://" + MockSRSProvider.AUTHORITY;
     private final static Uri TEST_URI = Uri.parse(AUTHORITY_HEAD  + "/suggestions");
@@ -47,48 +42,6 @@ public class SearchRecentSuggestionsProviderTest extends AndroidTestCase {
         mProviderContext = new IsolatedContext(new MockContentResolver(), targetContextWrapper);
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "SearchRecentSuggestionsProvider",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setupSuggestions",
-            args = {String.class, int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "onCreate",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getType",
-            args = {Uri.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "update",
-            args = {Uri.class, ContentValues.class, String.class, String[].class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "query",
-            args = {Uri.class, String[].class, String.class, String[].class, String.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "insert",
-            args = {Uri.class, ContentValues.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "delete",
-            args = {Uri.class, String.class, String[].class}
-        )
-    })
     public void testSearchRecentSuggestionsProvider() {
         assertFalse(MockSRSProvider.setupSuggestCalled);
         final MockSRSProvider s = new MockSRSProvider();

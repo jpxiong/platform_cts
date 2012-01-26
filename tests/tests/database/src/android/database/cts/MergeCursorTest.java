@@ -16,10 +16,6 @@
 
 package android.database.cts;
 
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
 
 import android.content.Context;
 import android.database.ContentObserver;
@@ -33,7 +29,6 @@ import android.test.AndroidTestCase;
 import java.io.File;
 import java.util.Arrays;
 
-@TestTargetClass(android.database.MergeCursor.class)
 public class MergeCursorTest extends AndroidTestCase {
     private final int NUMBER_1_COLUMN_INDEX = 1;
     private static final String TABLE1_NAME = "test1";
@@ -78,18 +73,6 @@ public class MergeCursorTest extends AndroidTestCase {
         super.tearDown();
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "MergeCursor",
-            args = {android.database.Cursor[].class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getCount",
-            args = {}
-        )
-    })
     public void testConstructor() {
         // If each item of mCursors are null, count will be zero.
         MergeCursor mergeCursor = new MergeCursor(mCursors);
@@ -102,11 +85,6 @@ public class MergeCursorTest extends AndroidTestCase {
         assertEquals(mCursors[0].getCount() + mCursors[1].getCount(), mergeCursor.getCount());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "onMove",
-        args = {int.class, int.class}
-    )
     public void testOnMove() {
         createCursors();
         MergeCursor mergeCursor = new MergeCursor(mCursors);
@@ -118,13 +96,6 @@ public class MergeCursorTest extends AndroidTestCase {
         }
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test method related to column infos during MergeCursor is switching" +
-                " between different single cursors",
-        method = "getColumnNames",
-        args = {}
-    )
     public void testCursorSwiching() {
         mDatabase.execSQL("CREATE TABLE " + TABLE5_NAME + " (_id INTEGER PRIMARY KEY,"
                 + TABLE3_COLUMNS + ");");
@@ -152,58 +123,6 @@ public class MergeCursorTest extends AndroidTestCase {
         assertTrue(Arrays.equals(tableColumns, mergeCursor.getColumnNames()));
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getBlob",
-            args = {int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getDouble",
-            args = {int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getFloat",
-            args = {int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getInt",
-            args = {int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getLong",
-            args = {int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getShort",
-            args = {int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getString",
-            args = {int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "isNull",
-            args = {int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "onMove",
-            args = {int.class, int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getColumnNames",
-            args = {}
-        )
-    })
     public void testGetValues() {
         byte NUMBER_BLOB_UNIT = 99;
         String[] TEST_STRING = new String[] {"Test String1", "Test String2"};
@@ -263,18 +182,6 @@ public class MergeCursorTest extends AndroidTestCase {
         }
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "registerContentObserver",
-            args = {android.database.ContentObserver.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "unregisterContentObserver",
-            args = {android.database.ContentObserver.class}
-        )
-    })
     public void testContentObsererOperations() throws IllegalStateException {
         createCursors();
         MergeCursor mergeCursor = new MergeCursor(mCursors);
@@ -312,23 +219,6 @@ public class MergeCursorTest extends AndroidTestCase {
         }
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "deactivate",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "registerDataSetObserver",
-            args = {android.database.DataSetObserver.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "unregisterDataSetObserver",
-            args = {android.database.DataSetObserver.class}
-        )
-    })
     public void testDeactivate() throws IllegalStateException {
         createCursors();
         MergeCursor mergeCursor = new MergeCursor(mCursors);
@@ -390,23 +280,6 @@ public class MergeCursorTest extends AndroidTestCase {
         }
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "requery",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getCount",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "close",
-            args = {}
-        )
-    })
     public void testRequery() {
         final String TEST_VALUE1 = Integer.toString(MAX_VALUE + 1);
         final String TEST_VALUE2 = Integer.toString(MAX_VALUE + 2);

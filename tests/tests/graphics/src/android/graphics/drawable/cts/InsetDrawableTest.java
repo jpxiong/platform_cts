@@ -18,11 +18,6 @@ package android.graphics.drawable.cts;
 
 import com.android.cts.stub.R;
 
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
-import dalvik.annotation.ToBeFixed;
 
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
@@ -41,21 +36,7 @@ import android.util.Xml;
 
 import java.io.IOException;
 
-@TestTargetClass(android.graphics.drawable.InsetDrawable.class)
 public class InsetDrawableTest extends AndroidTestCase {
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "InsetDrawable",
-            args = {android.graphics.drawable.Drawable.class, int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "InsetDrawable",
-            args = {android.graphics.drawable.Drawable.class, int.class, int.class, int.class,
-                    int.class}
-        )
-    })
     public void testConstructor() {
         Drawable d = mContext.getResources().getDrawable(R.drawable.pass);
         new InsetDrawable(d, 1);
@@ -65,14 +46,6 @@ public class InsetDrawableTest extends AndroidTestCase {
         new InsetDrawable(null, -1, -1, -1, -1);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "inflate",
-        args = {android.content.res.Resources.class, org.xmlpull.v1.XmlPullParser.class,
-                android.util.AttributeSet.class}
-    )
-    @ToBeFixed(bug = "1386429", explanation = "no getter can not be tested," +
-            " and there should not be a NullPointerException thrown out.")
     public void testInflate() {
         Drawable d = mContext.getResources().getDrawable(R.drawable.pass);
         InsetDrawable insetDrawable = new InsetDrawable(d, 0);
@@ -103,13 +76,6 @@ public class InsetDrawableTest extends AndroidTestCase {
         }
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "invalidateDrawable",
-        args = {android.graphics.drawable.Drawable.class}
-    )
-    @ToBeFixed(bug = "1400249", explanation = "it's hard to do unit test, should be tested by" +
-            " functional test.")
     public void testInvalidateDrawable() {
         Drawable d = mContext.getResources().getDrawable(R.drawable.pass);
         InsetDrawable insetDrawable = new InsetDrawable(d, 0);
@@ -117,13 +83,6 @@ public class InsetDrawableTest extends AndroidTestCase {
         insetDrawable.invalidateDrawable(d);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "scheduleDrawable",
-        args = {android.graphics.drawable.Drawable.class, java.lang.Runnable.class, long.class}
-    )
-    @ToBeFixed(bug = "1400249", explanation = "it's hard to do unit test, should be tested by" +
-            " functional test.")
     public void testScheduleDrawable() {
         Drawable d = mContext.getResources().getDrawable(R.drawable.pass);
         InsetDrawable insetDrawable = new InsetDrawable(d, 0);
@@ -139,13 +98,6 @@ public class InsetDrawableTest extends AndroidTestCase {
         // expected, no Exception thrown out, test success
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "unscheduleDrawable",
-        args = {android.graphics.drawable.Drawable.class, java.lang.Runnable.class}
-    )
-    @ToBeFixed(bug = "1400249", explanation = "it's hard to do unit test, should be tested by" +
-            " functional test.")
     public void testUnscheduleDrawable() {
         Drawable d = mContext.getResources().getDrawable(R.drawable.pass);
         InsetDrawable insetDrawable = new InsetDrawable(d, 0);
@@ -161,13 +113,6 @@ public class InsetDrawableTest extends AndroidTestCase {
         // expected, no Exception thrown out, test success
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "draw",
-        args = {android.graphics.Canvas.class}
-    )
-    @ToBeFixed(bug = "1400249", explanation = "it's hard to do unit test, should be tested by" +
-            " functional test, and there should not be an NullPointerException thrown out.")
     public void testDraw() {
         Drawable d = mContext.getResources().getDrawable(R.drawable.pass);
         InsetDrawable insetDrawable = new InsetDrawable(d, 0);
@@ -184,11 +129,6 @@ public class InsetDrawableTest extends AndroidTestCase {
         }
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "getChangingConfigurations",
-        args = {}
-    )
     public void testGetChangingConfigurations() {
         Drawable d = mContext.getResources().getDrawable(R.drawable.pass);
         InsetDrawable insetDrawable = new InsetDrawable(d, 0);
@@ -200,13 +140,6 @@ public class InsetDrawableTest extends AndroidTestCase {
         assertEquals(-21, insetDrawable.getChangingConfigurations());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "getPadding",
-        args = {android.graphics.Rect.class}
-    )
-    @ToBeFixed(bug = "1371108", explanation = "There should not be a" +
-            " NullPointerException thrown out.")
     public void testGetPadding() {
         Drawable d = mContext.getResources().getDrawable(R.drawable.pass);
         InsetDrawable insetDrawable = new InsetDrawable(d, 1, 2, 3, 4);
@@ -249,11 +182,6 @@ public class InsetDrawableTest extends AndroidTestCase {
         }
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "setVisible",
-        args = {boolean.class, boolean.class}
-    )
     public void testSetVisible() {
         Drawable d = mContext.getResources().getDrawable(R.drawable.pass);
         InsetDrawable insetDrawable = new InsetDrawable(d, 0);
@@ -263,12 +191,6 @@ public class InsetDrawableTest extends AndroidTestCase {
         assertFalse(insetDrawable.setVisible(false, true)); /* unchanged */
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "setAlpha",
-        args = {int.class}
-    )
-    @ToBeFixed(bug = "1386429", explanation = "no getter can not be tested")
     public void testSetAlpha() {
         Drawable d = mContext.getResources().getDrawable(R.drawable.pass);
         InsetDrawable insetDrawable = new InsetDrawable(d, 0);
@@ -281,12 +203,6 @@ public class InsetDrawableTest extends AndroidTestCase {
         insetDrawable.setAlpha(Integer.MIN_VALUE);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "setColorFilter",
-        args = {android.graphics.ColorFilter.class}
-    )
-    @ToBeFixed(bug = "1386429", explanation = "no getter can not be tested")
     public void testSetColorFilter() {
         Drawable d = mContext.getResources().getDrawable(R.drawable.pass);
         InsetDrawable insetDrawable = new InsetDrawable(d, 0);
@@ -299,11 +215,6 @@ public class InsetDrawableTest extends AndroidTestCase {
         // expected, no Exception thrown out, test success
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "getOpacity",
-        args = {}
-    )
     public void testGetOpacity() {
         Drawable d = mContext.getResources().getDrawable(R.drawable.testimage);
         InsetDrawable insetDrawable = new InsetDrawable(d, 0);
@@ -314,23 +225,12 @@ public class InsetDrawableTest extends AndroidTestCase {
         assertEquals(PixelFormat.TRANSLUCENT, insetDrawable.getOpacity());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "isStateful",
-        args = {}
-    )
     public void testIsStateful() {
         Drawable d = mContext.getResources().getDrawable(R.drawable.pass);
         InsetDrawable insetDrawable = new InsetDrawable(d, 0);
         assertFalse(insetDrawable.isStateful());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "onStateChange",
-        args = {int[].class}
-    )
-    @ToBeFixed(bug = "", explanation = "The onStateChange will always return false.")
     public void testOnStateChange() {
         Drawable d = mContext.getResources().getDrawable(R.drawable.pass);
         MockInsetDrawable insetDrawable = new MockInsetDrawable(d, 10);
@@ -354,13 +254,6 @@ public class InsetDrawableTest extends AndroidTestCase {
         // expected, no Exception thrown out, test success
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "onBoundsChange",
-        args = {android.graphics.Rect.class}
-    )
-    @ToBeFixed(bug = "1371108", explanation = "There should not be a" +
-            " NullPointerException thrown out.")
     public void testOnBoundsChange() {
         Drawable d = mContext.getResources().getDrawable(R.drawable.pass);
         MockInsetDrawable insetDrawable = new MockInsetDrawable(d, 5);
@@ -388,11 +281,6 @@ public class InsetDrawableTest extends AndroidTestCase {
         }
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "getIntrinsicWidth",
-        args = {}
-    )
     public void testGetIntrinsicWidth() {
         Drawable d = mContext.getResources().getDrawable(R.drawable.pass);
         InsetDrawable insetDrawable = new InsetDrawable(d, 0);
@@ -407,11 +295,6 @@ public class InsetDrawableTest extends AndroidTestCase {
         assertEquals(expected, insetDrawable.getIntrinsicWidth());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "getIntrinsicHeight",
-        args = {}
-    )
     public void testGetIntrinsicHeight() {
         Drawable d = mContext.getResources().getDrawable(R.drawable.pass);
         InsetDrawable insetDrawable = new InsetDrawable(d, 0);
@@ -426,13 +309,6 @@ public class InsetDrawableTest extends AndroidTestCase {
         assertEquals(expected, insetDrawable.getIntrinsicHeight());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "getConstantState",
-        args = {}
-    )
-    @ToBeFixed(bug = "", explanation = "can not assert the inner fields, becuase the class" +
-            " InsetState is package protected.")
     public void testGetConstantState() {
         Drawable d = mContext.getResources().getDrawable(R.drawable.pass);
         InsetDrawable insetDrawable = new InsetDrawable(d, 0);

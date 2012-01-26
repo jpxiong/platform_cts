@@ -20,16 +20,11 @@ import android.content.Context;
 import android.test.AndroidTestCase;
 import android.text.format.DateUtils;
 import dalvik.annotation.KnownFailure;
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Formatter;
 import java.util.Locale;
 
-@TestTargetClass(DateUtils.class)
 public class DateUtilsTest extends AndroidTestCase {
 
     private static final long MIN_DURATION = 1000;
@@ -46,11 +41,6 @@ public class DateUtilsTest extends AndroidTestCase {
         mBaseTime = System.currentTimeMillis();
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "getDayOfWeekString",
-        args = {int.class, int.class}
-    )
     public void testGetDayOfWeekString() {
         if (!LocaleUtils.isCurrentLocale(mContext, Locale.US)) {
             return;
@@ -71,11 +61,6 @@ public class DateUtilsTest extends AndroidTestCase {
                 DateUtils.getDayOfWeekString(Calendar.SUNDAY, 60));
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "getMonthString",
-        args = {int.class, int.class}
-    )
     public void testGetMonthString() {
         if (!LocaleUtils.isCurrentLocale(mContext, Locale.US)) {
             return;
@@ -92,11 +77,6 @@ public class DateUtilsTest extends AndroidTestCase {
         assertEquals("Jan", DateUtils.getMonthString(Calendar.JANUARY, 60));
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "getAMPMString",
-        args = {int.class}
-    )
     public void testGetAMPMString() {
         if (!LocaleUtils.isCurrentLocale(mContext, Locale.US)) {
             return;
@@ -105,38 +85,6 @@ public class DateUtilsTest extends AndroidTestCase {
         assertEquals("pm", DateUtils.getAMPMString(Calendar.PM));
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getRelativeTimeSpanString",
-            args = {long.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getRelativeTimeSpanString",
-            args = {long.class, long.class, long.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getRelativeTimeSpanString",
-            args = {long.class, long.class, long.class, int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getRelativeDateTimeString",
-            args = {Context.class, long.class, long.class, long.class, int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getRelativeTimeSpanString",
-            args = {Context.class, long.class, boolean.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getRelativeTimeSpanString",
-            args = {Context.class, long.class}
-        )
-    })
 
     public void testGetSpanString() {
         if (!LocaleUtils.isCurrentLocale(mContext, Locale.US)) {
@@ -169,33 +117,6 @@ public class DateUtilsTest extends AndroidTestCase {
                 mBaseTime - DAY_DURATION).toString());
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "formatElapsedTime",
-            args = {long.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "formatElapsedTime",
-            args = {StringBuilder.class, long.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "formatDateRange",
-            args = {Context.class, long.class, long.class, int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "formatSameDayTime",
-            args = {long.class, long.class, int.class, int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "formatDateTime",
-            args = {Context.class, long.class, int.class}
-        )
-    })
     @SuppressWarnings("deprecation")
     public void testFormatMethods() {
         if (!LocaleUtils.isCurrentLocale(mContext, Locale.US)) {
@@ -293,11 +214,6 @@ public class DateUtilsTest extends AndroidTestCase {
         assertTrue("1/19/2009".equals(actual) || "01/19/2009".equals(actual));
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "isToday",
-        args = {long.class}
-    )
     public void testIsToday() {
         assertTrue(DateUtils.isToday(mBaseTime));
         assertFalse(DateUtils.isToday(mBaseTime - DAY_DURATION));
@@ -307,8 +223,6 @@ public class DateUtilsTest extends AndroidTestCase {
      * DateUtils is broken beyond Integer.MAX_VALUE seconds of 1970.
      * http://code.google.com/p/android/issues/detail?id=13050
      */
-    @TestTargetNew(level = TestLevel.ADDITIONAL)
-    @KnownFailure("http://b/2519073")
     public void test2038() {
         assertEquals("00:00, Thursday, January 1, 1970", formatFull(0L));
 

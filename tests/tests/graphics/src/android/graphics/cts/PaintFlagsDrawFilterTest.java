@@ -16,9 +16,6 @@
 
 package android.graphics.cts;
 
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
 
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
@@ -30,7 +27,6 @@ import android.graphics.Bitmap.Config;
 import android.graphics.Paint.Align;
 import android.test.AndroidTestCase;
 
-@TestTargetClass(PaintFlagsDrawFilter.class)
 public class PaintFlagsDrawFilterTest extends AndroidTestCase {
 
     private static final float TEXT_SIZE = 20;
@@ -46,11 +42,6 @@ public class PaintFlagsDrawFilterTest extends AndroidTestCase {
         super.setUp();
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "PaintFlagsDrawFilter",
-        args = {int.class, int.class}
-    )
     public void testPaintFlagsDrawFilter() {
 
         Bitmap bitmapWithoutFilter = drawText(null);

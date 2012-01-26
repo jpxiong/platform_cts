@@ -18,11 +18,6 @@ package android.widget.cts;
 
 import com.android.cts.stub.R;
 
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
-import dalvik.annotation.ToBeFixed;
 
 import org.xmlpull.v1.XmlPullParser;
 
@@ -45,7 +40,6 @@ import android.widget.CompoundButton.OnCheckedChangeListener;
 /**
  * Test {@link CompoundButton}.
  */
-@TestTargetClass(CompoundButton.class)
 public class CompoundButtonTest extends AndroidTestCase {
     private Resources mResources;
 
@@ -55,28 +49,6 @@ public class CompoundButtonTest extends AndroidTestCase {
         mResources = mContext.getResources();
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test constructor(s) of {@link CompoundButton}",
-            method = "CompoundButton",
-            args = {android.content.Context.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test constructor(s) of {@link CompoundButton}",
-            method = "CompoundButton",
-            args = {android.content.Context.class, android.util.AttributeSet.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test constructor(s) of {@link CompoundButton}",
-            method = "CompoundButton",
-            args = {android.content.Context.class, android.util.AttributeSet.class, int.class}
-        )
-    })
-    @ToBeFixed(bug="1417734", explanation="should add @throws clause into javadoc of " +
-            "CompoundButton's constructors when the input AttributeSet or Context is null")
     public void testConstructor() {
         XmlPullParser parser = mContext.getResources().getXml(R.layout.togglebutton_layout);
         AttributeSet mAttrSet = Xml.asAttributeSet(parser);
@@ -107,18 +79,6 @@ public class CompoundButtonTest extends AndroidTestCase {
         }
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setChecked",
-            args = {boolean.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "isChecked",
-            args = {}
-        )
-    })
     public void testAccessChecked() {
         CompoundButton compoundButton = new MockCompoundButton(mContext);
         MockOnCheckedChangeListener listener = new MockOnCheckedChangeListener();
@@ -144,12 +104,6 @@ public class CompoundButtonTest extends AndroidTestCase {
         assertFalse(listener.getInputChecked());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test {@link CompoundButton#setOnCheckedChangeListener(OnCheckedChangeListener)}",
-        method = "setOnCheckedChangeListener",
-        args = {android.widget.CompoundButton.OnCheckedChangeListener.class}
-    )
     public void testSetOnCheckedChangeListener() {
         CompoundButton compoundButton = new MockCompoundButton(mContext);
         MockOnCheckedChangeListener listener = new MockOnCheckedChangeListener();
@@ -167,12 +121,6 @@ public class CompoundButtonTest extends AndroidTestCase {
         assertFalse(listener.hasCalledCheckedChange());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test {@link CompoundButton#toggle()}",
-        method = "toggle",
-        args = {}
-    )
     public void testToggle() {
         CompoundButton compoundButton = new MockCompoundButton(mContext);
         assertFalse(compoundButton.isChecked());
@@ -188,12 +136,6 @@ public class CompoundButtonTest extends AndroidTestCase {
         assertFalse(compoundButton.isChecked());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test {@link CompoundButton#performClick()}",
-        method = "performClick",
-        args = {}
-    )
     public void testPerformClick() {
         CompoundButton compoundButton = new MockCompoundButton(mContext);
         assertFalse(compoundButton.isChecked());
@@ -217,12 +159,6 @@ public class CompoundButtonTest extends AndroidTestCase {
         assertFalse(compoundButton.isChecked());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test {@link CompoundButton#drawableStateChanged()}",
-        method = "drawableStateChanged",
-        args = {}
-    )
     public void testDrawableStateChanged() {
         MockCompoundButton compoundButton = new MockCompoundButton(mContext);
         assertFalse(compoundButton.isChecked());
@@ -240,12 +176,6 @@ public class CompoundButtonTest extends AndroidTestCase {
         assertSame(compoundButton.getDrawableState(), drawable.getState());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test {@link CompoundButton#setButtonDrawable(Drawable)}",
-        method = "setButtonDrawable",
-        args = {android.graphics.drawable.Drawable.class}
-    )
     public void testSetButtonDrawableByDrawable() {
         CompoundButton compoundButton;
 
@@ -275,14 +205,6 @@ public class CompoundButtonTest extends AndroidTestCase {
         assertFalse(firstDrawable.isVisible());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test {@link CompoundButton#setButtonDrawable(int)}",
-        method = "setButtonDrawable",
-        args = {int.class}
-    )
-    @ToBeFixed(bug = "1386429", explanation = "we can not check the drawable which is set" +
-            " by id. we need getter method to complete this test case.")
     public void testSetButtonDrawableById() {
         CompoundButton compoundButton;
         // resId is 0
@@ -300,12 +222,6 @@ public class CompoundButtonTest extends AndroidTestCase {
         compoundButton.setButtonDrawable(R.drawable.pass);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test {@link CompoundButton#onCreateDrawableState(int)}",
-        method = "onCreateDrawableState",
-        args = {int.class}
-    )
     public void testOnCreateDrawableState() {
         MockCompoundButton compoundButton;
 
@@ -327,12 +243,6 @@ public class CompoundButtonTest extends AndroidTestCase {
         assertEquals(0, state[state.length - 1]);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test {@link CompoundButton#onDraw(Canvas)}",
-        method = "onDraw",
-        args = {android.graphics.Canvas.class}
-    )
     public void testOnDraw() {
         int viewHeight;
         int drawableWidth;
@@ -381,18 +291,6 @@ public class CompoundButtonTest extends AndroidTestCase {
         assertEquals( (viewHeight - drawableHeight) / 2 + drawableHeight, bounds.bottom);
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "onSaveInstanceState",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "onRestoreInstanceState",
-            args = {android.os.Parcelable.class}
-        )
-    })
     public void testAccessInstanceState() {
         CompoundButton compoundButton = new MockCompoundButton(mContext);
         Parcelable state;
@@ -411,11 +309,6 @@ public class CompoundButtonTest extends AndroidTestCase {
         assertTrue(compoundButton.isLayoutRequested());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "verifyDrawable",
-        args = {android.graphics.drawable.Drawable.class}
-    )
     public void testVerifyDrawable() {
         MockCompoundButton compoundButton = new MockCompoundButton(mContext);
         Drawable drawable = mContext.getResources().getDrawable(R.drawable.scenery);

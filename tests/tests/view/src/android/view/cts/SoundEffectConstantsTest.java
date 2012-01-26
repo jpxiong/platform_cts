@@ -19,12 +19,7 @@ package android.view.cts;
 import android.test.AndroidTestCase;
 import android.view.SoundEffectConstants;
 import android.view.View;
-import dalvik.annotation.TestTargets;
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargetClass;
 
-@TestTargetClass(SoundEffectConstants.class)
 public class SoundEffectConstantsTest extends AndroidTestCase {
 
     @Override
@@ -33,12 +28,6 @@ public class SoundEffectConstantsTest extends AndroidTestCase {
 
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test getContantForFocusDirection.",
-        method = "getContantForFocusDirection",
-        args = {int.class}
-    )
     public void testgetContantForFocusDirection() {
 
         assertEquals(SoundEffectConstants.NAVIGATION_RIGHT,

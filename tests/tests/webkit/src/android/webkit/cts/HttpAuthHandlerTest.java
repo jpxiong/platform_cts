@@ -21,14 +21,9 @@ import android.webkit.HttpAuthHandler;
 import android.webkit.WebView;
 import android.webkit.cts.WebViewOnUiThread.WaitForLoadedClient;
 
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
 
 import org.apache.http.HttpStatus;
 
-@TestTargetClass(android.webkit.HttpAuthHandler.class)
 public class HttpAuthHandlerTest extends ActivityInstrumentationTestCase2<WebViewStubActivity> {
 
     private static final long TIMEOUT = 10000;
@@ -56,25 +51,6 @@ public class HttpAuthHandlerTest extends ActivityInstrumentationTestCase2<WebVie
         super.tearDown();
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "proceed",
-            args = {String.class, String.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.SUFFICIENT,
-            notes = "useHttpAuthUsernamePassword() always returns true",
-            method = "useHttpAuthUsernamePassword",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.NOT_NECESSARY,
-            notes = "This method is for internal use by the handler",
-            method = "handleMessage",
-            args = {android.os.Message.class}
-        )
-    })
     public void testProceed() throws Exception {
         mWebServer = new CtsTestServer(getActivity());
         String url = mWebServer.getAuthAssetUrl(TestHtmlConstants.HELLO_WORLD_URL);
@@ -108,11 +84,6 @@ public class HttpAuthHandlerTest extends ActivityInstrumentationTestCase2<WebVie
         assertTrue(client.useHttpAuthUsernamePassword);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "cancel",
-        args = {}
-    )
     public void testCancel() throws Exception {
         mWebServer = new CtsTestServer(getActivity());
 

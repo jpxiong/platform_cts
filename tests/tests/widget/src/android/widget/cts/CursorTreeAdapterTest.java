@@ -33,16 +33,10 @@ import android.widget.TextView;
 
 import com.android.cts.stub.R;
 
-import dalvik.annotation.TestTargets;
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.ToBeFixed;
 
 /**
  * Test {@link CursorTreeAdapter}.
  */
-@TestTargetClass(CursorTreeAdapter.class)
 public class CursorTreeAdapterTest extends AndroidTestCase {
     private static final int NAME_INDEX = 1;
     private static final int VALUE_INDEX = 1;
@@ -142,20 +136,6 @@ public class CursorTreeAdapterTest extends AndroidTestCase {
         super.tearDown();
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test constructor(s) of {@link CursorTreeAdapter}",
-            method = "CursorTreeAdapter",
-            args = {android.database.Cursor.class, android.content.Context.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test constructor(s) of {@link CursorTreeAdapter}",
-            method = "CursorTreeAdapter",
-            args = {android.database.Cursor.class, android.content.Context.class, boolean.class}
-        )
-    })
     public void testConstructor() {
         new MockCursorTreeAdapter(mGroupCursor, mContext);
 
@@ -166,12 +146,6 @@ public class CursorTreeAdapterTest extends AndroidTestCase {
         new MockCursorTreeAdapter(null, null, false);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test {@link CursorTreeAdapter#getCursor()}",
-        method = "getCursor",
-        args = {}
-    )
     public void testGetCursor() {
         CursorTreeAdapter adapter = new MockCursorTreeAdapter(mGroupCursor, mContext);
         assertSame(mGroupCursor, adapter.getCursor());
@@ -183,12 +157,6 @@ public class CursorTreeAdapterTest extends AndroidTestCase {
         assertSame(mGroupCursor, adapter.getCursor());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test {@link CursorTreeAdapter#setGroupCursor(Cursor)}",
-        method = "setGroupCursor",
-        args = {android.database.Cursor.class}
-    )
     public void testSetGroupCursor() {
         CursorTreeAdapter adapter = new MockCursorTreeAdapter(mGroupCursor, mContext);
         assertSame(mGroupCursor, adapter.getCursor());
@@ -200,12 +168,6 @@ public class CursorTreeAdapterTest extends AndroidTestCase {
         assertSame(mGroupCursor, adapter.getCursor());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test {@link CursorTreeAdapter#setChildrenCursor(int, Cursor)}",
-        method = "setChildrenCursor",
-        args = {int.class, android.database.Cursor.class}
-    )
     public void testSetChildrenCursor() {
         MockCursorTreeAdapter adapter = new MockCursorTreeAdapter(mGroupCursor, mContext);
         assertTrue(mGroupCursor.moveToFirst());
@@ -215,12 +177,6 @@ public class CursorTreeAdapterTest extends AndroidTestCase {
         assertSame(mChildCursor2, adapter.getChild(0, 0));
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test {@link CursorTreeAdapter#changeCursor(Cursor)}",
-        method = "changeCursor",
-        args = {android.database.Cursor.class}
-    )
     public void testChangeCursor() {
         CursorTreeAdapter adapter = new MockCursorTreeAdapter(null, mContext);
         assertNull(adapter.getCursor());
@@ -232,12 +188,6 @@ public class CursorTreeAdapterTest extends AndroidTestCase {
         assertNull(adapter.getCursor());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test {@link CursorTreeAdapter#notifyDataSetChanged(boolean)}",
-        method = "notifyDataSetChanged",
-        args = {boolean.class}
-    )
     public void testNotifyDataSetChangedBoolean() {
         MockCursorTreeAdapter adapter = new MockCursorTreeAdapter(mGroupCursor, mContext);
         MockDataSetObserver observer = new MockDataSetObserver();
@@ -276,12 +226,6 @@ public class CursorTreeAdapterTest extends AndroidTestCase {
         assertFalse(adapter.hasAddedChild2IntoCache());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test {@link CursorTreeAdapter#notifyDataSetChanged()}",
-        method = "notifyDataSetChanged",
-        args = {}
-    )
     public void testNotifyDataSetChanged() {
         MockCursorTreeAdapter adapter = new MockCursorTreeAdapter(mGroupCursor, mContext);
         MockDataSetObserver observer = new MockDataSetObserver();
@@ -307,12 +251,6 @@ public class CursorTreeAdapterTest extends AndroidTestCase {
         assertTrue(adapter.hasAddedChild2IntoCache());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test {@link CursorTreeAdapter#notifyDataSetInvalidated()}",
-        method = "notifyDataSetInvalidated",
-        args = {}
-    )
     public void testNotifyDataSetInvalidated() {
         MockCursorTreeAdapter adapter = new MockCursorTreeAdapter(mGroupCursor, mContext);
         MockDataSetObserver observer = new MockDataSetObserver();
@@ -338,15 +276,6 @@ public class CursorTreeAdapterTest extends AndroidTestCase {
         assertTrue(adapter.hasAddedChild2IntoCache());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test {@link CursorTreeAdapter#onGroupCollapsed(int)}",
-        method = "onGroupCollapsed",
-        args = {int.class}
-    )
-    @ToBeFixed(bug="1371108", explanation="CursorTreeAdapter#onGroupCollapsed(int)" +
-            " should check whether the return value from" +
-            " CursorTreeAdapter#getChildrenCursorHelper(int, boolean) is null")
     public void testOnGroupCollapsed() {
         MockCursorTreeAdapter adapter = new MockCursorTreeAdapter(mGroupCursor, mContext);
 
@@ -384,12 +313,6 @@ public class CursorTreeAdapterTest extends AndroidTestCase {
         }
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test {@link CursorTreeAdapter#hasStableIds()}, this method always return true",
-        method = "hasStableIds",
-        args = {}
-    )
     public void testHasStableIds() {
         CursorTreeAdapter adapter = new MockCursorTreeAdapter(mGroupCursor, mContext);
         assertTrue(adapter.hasStableIds());
@@ -398,12 +321,6 @@ public class CursorTreeAdapterTest extends AndroidTestCase {
         assertTrue(adapter.hasStableIds());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test {@link CursorTreeAdapter#isChildSelectable(int, int)}",
-        method = "isChildSelectable",
-        args = {int.class, int.class}
-    )
     public void testIsChildSelectable() {
         CursorTreeAdapter adapter = new MockCursorTreeAdapter(mGroupCursor, mContext);
         assertTrue(adapter.isChildSelectable(0, 0));
@@ -413,12 +330,6 @@ public class CursorTreeAdapterTest extends AndroidTestCase {
         assertTrue(adapter.isChildSelectable(0, 0));
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test {@link CursorTreeAdapter#convertToString(Cursor)}",
-        method = "convertToString",
-        args = {android.database.Cursor.class}
-    )
     public void testConvertToString() {
         CursorTreeAdapter adapter = new MockCursorTreeAdapter(mGroupCursor, mContext);
         assertEquals("", adapter.convertToString(null));
@@ -426,12 +337,6 @@ public class CursorTreeAdapterTest extends AndroidTestCase {
         assertEquals(mGroupCursor.toString(), adapter.convertToString(mGroupCursor));
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test {@link CursorTreeAdapter#getFilter()}",
-        method = "getFilter",
-        args = {}
-    )
     public void testGetFilter() {
         MockCursorTreeAdapter adapter = new MockCursorTreeAdapter(mGroupCursor, mContext);
         Filter filter = adapter.getFilter();
@@ -443,18 +348,6 @@ public class CursorTreeAdapterTest extends AndroidTestCase {
         assertTrue(adapter.hasCalledConvertToString());
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getFilterQueryProvider",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setFilterQueryProvider",
-            args = {android.widget.FilterQueryProvider.class}
-        )
-    })
     public void testAccessQueryProvider() {
         CursorTreeAdapter adapter = new MockCursorTreeAdapter(mGroupCursor, mContext);
         FilterQueryProvider filterProvider = new MockFilterQueryProvider();
@@ -466,12 +359,6 @@ public class CursorTreeAdapterTest extends AndroidTestCase {
         assertSame(filterProvider, adapter.getFilterQueryProvider());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test {@link CursorTreeAdapter#runQueryOnBackgroundThread(CharSequence)}",
-        method = "runQueryOnBackgroundThread",
-        args = {java.lang.CharSequence.class}
-    )
     public void testRunQueryOnBackgroundThread() {
         CursorTreeAdapter adapter = new MockCursorTreeAdapter(mGroupCursor, mContext);
         final String constraint = "constraint";
@@ -485,12 +372,6 @@ public class CursorTreeAdapterTest extends AndroidTestCase {
         assertNull(adapter.runQueryOnBackgroundThread(constraint));
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test {@link CursorTreeAdapter#getGroup(int)}",
-        method = "getGroup",
-        args = {int.class}
-    )
     public void testGetGroup() {
         CursorTreeAdapter adapter = new MockCursorTreeAdapter(null, mContext);
 
@@ -510,12 +391,6 @@ public class CursorTreeAdapterTest extends AndroidTestCase {
         assertNull(adapter.getGroup(2));
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test {@link CursorTreeAdapter#getGroupCount()}",
-        method = "getGroupCount",
-        args = {}
-    )
     public void testGetGroupCount() {
         CursorTreeAdapter adapter = new MockCursorTreeAdapter(mGroupCursor, mContext);
         assertEquals(mGroupCursor.getCount(), adapter.getGroupCount());
@@ -524,12 +399,6 @@ public class CursorTreeAdapterTest extends AndroidTestCase {
         assertEquals(0, adapter.getGroupCount());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test {@link CursorTreeAdapter#getGroupId(int)}",
-        method = "getGroupId",
-        args = {int.class}
-    )
     public void testGetGroupId() {
         CursorTreeAdapter adapter = new MockCursorTreeAdapter(null, mContext);
 
@@ -545,12 +414,6 @@ public class CursorTreeAdapterTest extends AndroidTestCase {
         assertEquals(0, adapter.getGroupId(2));
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test {@link CursorAdapter#getGroupView(int, boolean, View, ViewGroup)}",
-        method = "getGroupView",
-        args = {int.class, boolean.class, android.view.View.class, android.view.ViewGroup.class}
-    )
     public void testGetGroupView() {
         final String expectedStr = "getGroupView test";
         TextView retView;
@@ -586,15 +449,6 @@ public class CursorTreeAdapterTest extends AndroidTestCase {
         assertEquals(GROUP_ONE, retView.getText().toString());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test {@link CursorTreeAdapter#getChild(int, int)}",
-        method = "getChild",
-        args = {int.class, int.class}
-    )
-    @ToBeFixed(bug="1371108", explanation="CursorTreeAdapter#onGroupCollapsed(int)" +
-            " should check whether the return value from" +
-            " CursorTreeAdapter#getChildrenCursorHelper(int, boolean) is null")
     public void testGetChild() {
         CursorTreeAdapter adapter = new MockCursorTreeAdapter(mGroupCursor, mContext);
         assertEquals(2, adapter.getGroupCount());
@@ -622,15 +476,6 @@ public class CursorTreeAdapterTest extends AndroidTestCase {
         assertEquals(CHILD_VALUE_THREE, retCursor.getString(VALUE_INDEX));
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test {@link CursorTreeAdapter#getChildId(int, int)}",
-        method = "getChildId",
-        args = {int.class, int.class}
-    )
-    @ToBeFixed(bug="1371108", explanation="CursorTreeAdapter#onGroupCollapsed(int)" +
-            " should check whether the return value from" +
-            " CursorTreeAdapter#getChildrenCursorHelper(int, boolean) is null")
     public void testGetChildId() {
         CursorTreeAdapter adapter = new MockCursorTreeAdapter(null, mContext);
 
@@ -659,12 +504,6 @@ public class CursorTreeAdapterTest extends AndroidTestCase {
         assertEquals(0, adapter.getChildId(0, 2));
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test {@link CursorTreeAdapter#getChildrenCount(int)}",
-        method = "getChildrenCount",
-        args = {int.class}
-    )
     public void testGetChildrenCount() {
         CursorTreeAdapter adapter = new MockCursorTreeAdapter(null, mContext);
 
@@ -680,16 +519,6 @@ public class CursorTreeAdapterTest extends AndroidTestCase {
         assertEquals(0, adapter.getChildrenCount(2));
     }
 
-    @ToBeFixed(bug="1371108", explanation="CursorTreeAdapter#onGroupCollapsed(int)" +
-            " should check whether the return value from" +
-            " CursorTreeAdapter#getChildrenCursorHelper(int, boolean) is null")
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test {@link CursorAdapter#getChildView(int, int, boolean, View, ViewGroup)}",
-        method = "getChildView",
-        args = {int.class, int.class, boolean.class, android.view.View.class,
-                android.view.ViewGroup.class}
-    )
     public void testGetChildView() {
         final String expectedStr = "getChildView test";
         TextView retView;

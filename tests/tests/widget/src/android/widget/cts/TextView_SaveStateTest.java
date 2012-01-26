@@ -16,9 +16,6 @@
 
 package android.widget.cts;
 
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
 
 import android.os.Parcel;
 import android.test.InstrumentationTestCase;
@@ -29,13 +26,7 @@ import android.widget.TextView;
 /**
  * Test {@link TextView.SavedState}.
  */
-@TestTargetClass(TextView.SavedState.class)
 public class TextView_SaveStateTest extends InstrumentationTestCase {
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "toString",
-        args = {}
-    )
     public void testToString() {
         Parcel source = creatTestParcel(0, 0, true, "This is content");
         TextView.SavedState state = TextView.SavedState.CREATOR.createFromParcel(source);
@@ -48,11 +39,6 @@ public class TextView_SaveStateTest extends InstrumentationTestCase {
         assertNotNull(state.toString());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "writeToParcel",
-        args = {android.os.Parcel.class, int.class}
-    )
     public void testWriteToParcel() {
         Parcel source = creatTestParcel(0, 0, true, "This is content");
         TextView.SavedState state = TextView.SavedState.CREATOR.createFromParcel(source);

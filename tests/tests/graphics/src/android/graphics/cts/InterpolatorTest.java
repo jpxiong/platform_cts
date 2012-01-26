@@ -20,30 +20,12 @@ import junit.framework.TestCase;
 import android.graphics.Interpolator;
 import android.graphics.Interpolator.Result;
 import android.os.SystemClock;
-import dalvik.annotation.TestTargets;
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.ToBeFixed;
 
-@TestTargetClass(Interpolator.class)
 public class InterpolatorTest extends TestCase {
 
     private static final int DEFAULT_KEYFRAME_COUNT = 2;
     private static final float TOLERANCE = 0.1f;
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "Interpolator",
-            args = {int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "Interpolator",
-            args = {int.class, int.class}
-        )
-    })
     public void testConstructor() {
         Interpolator i = new Interpolator(10);
         assertEquals(10, i.getValueCount());
@@ -54,18 +36,6 @@ public class InterpolatorTest extends TestCase {
         assertEquals(20, i.getKeyFrameCount());
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "reset",
-            args = {int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getValueCount",
-            args = {}
-        )
-    })
     public void testReset1() {
         final int expected = 100;
         Interpolator interpolator = new Interpolator(10);
@@ -75,23 +45,6 @@ public class InterpolatorTest extends TestCase {
         assertEquals(DEFAULT_KEYFRAME_COUNT, interpolator.getKeyFrameCount());
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "reset",
-            args = {int.class, int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getKeyFrameCount",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getValueCount",
-            args = {}
-        )
-    })
     public void testReset2() {
         int expected1 = 100;
         int expected2 = 200;
@@ -102,33 +55,6 @@ public class InterpolatorTest extends TestCase {
         assertEquals(expected2, interpolator.getKeyFrameCount());
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "timeToValues",
-            args = {float[].class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "reset",
-            args = {int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setKeyFrame",
-            args = {int.class, int.class, float[].class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getValueCount",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setKeyFrame",
-            args = {int.class, int.class, float[].class, float[].class}
-        )
-    })
     public void testTimeToValues1() throws InterruptedException {
         Interpolator interpolator = new Interpolator(1);
         assertEquals(1, interpolator.getValueCount());
@@ -168,24 +94,6 @@ public class InterpolatorTest extends TestCase {
         }
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "timeToValues",
-            args = {int.class, float[].class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "reset",
-            args = {int.class, int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setKeyFrame",
-            args = {int.class, int.class, float[].class}
-        )
-    })
-    @ToBeFixed(explanation="For time < 0 results may be wrong due to signed/unsigned conversion")
     public void testTimeToValues2() {
         Interpolator interpolator = new Interpolator(1);
         interpolator.setKeyFrame(0, 2000, new float[] {1.0f});
@@ -227,25 +135,6 @@ public class InterpolatorTest extends TestCase {
         assertValues(8000, new float[] {2.0f, 4.0f}, Result.FREEZE_END, interpolator);
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setKeyFrame",
-            args = {int.class, int.class, float[].class, float[].class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setKeyFrame",
-            args = {int.class, int.class, float[].class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setRepeatMirror",
-            args = {float.class, boolean.class}
-        )
-    })
-    @ToBeFixed(explanation="For repeat > 1 and time < start key frame, FREEZE_END and the values" +
-    		" for the end key frame are returned.")
     public void testSetRepeatMirror() {
         Interpolator interpolator = new Interpolator(1, 3);
         interpolator.setKeyFrame(0, 2000, new float[] {1.0f});
@@ -276,18 +165,6 @@ public class InterpolatorTest extends TestCase {
         assertValue(11000, 4.0f, Result.FREEZE_END, interpolator);
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setKeyFrame",
-            args = {int.class, int.class, float[].class, float[].class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setKeyFrame",
-            args = {int.class, int.class, float[].class}
-        )
-    })
     public void testSetKeyFrame() {
         final float[] aZero = new float[] {0.0f};
         final float[] aOne = new float[] {1.0f};

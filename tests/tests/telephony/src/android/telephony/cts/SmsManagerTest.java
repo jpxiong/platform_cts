@@ -16,10 +16,6 @@
 
 package android.telephony.cts;
 
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
 
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
@@ -43,7 +39,6 @@ import java.util.List;
  *
  * Structured so tests can be reused to test {@link android.telephony.gsm.SmsManager}
  */
-@TestTargetClass(SmsManager.class)
 public class SmsManagerTest extends AndroidTestCase {
 
     private static final String LONG_TEXT =
@@ -148,11 +143,6 @@ public class SmsManagerTest extends AndroidTestCase {
         }
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "divideMessage",
-        args = {String.class}
-    )
     public void testDivideMessage() {
         ArrayList<String> dividedMessages = divideMessage(LONG_TEXT);
         assertNotNull(dividedMessages);
@@ -173,25 +163,6 @@ public class SmsManagerTest extends AndroidTestCase {
         assertEquals(LONG_TEXT, actualMessage);
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "sendDataMessage",
-            args = {String.class, String.class, short.class, byte[].class,
-                    PendingIntent.class, PendingIntent.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "sendTextMessage",
-            args = {String.class, String.class, String.class, PendingIntent.class,
-                    PendingIntent.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "sendMultipartTextMessage",
-            args = {String.class, String.class, ArrayList.class, ArrayList.class, ArrayList.class}
-        )
-    })
     public void testSendMessages() throws InterruptedException {
         if (!mPackageManager.hasSystemFeature(PackageManager.FEATURE_TELEPHONY)) {
             return;
@@ -281,11 +252,6 @@ public class SmsManagerTest extends AndroidTestCase {
                 PendingIntent.FLAG_ONE_SHOT);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "getDefault",
-        args = {}
-    )
     public void testGetDefault() {
         assertNotNull(getSmsManager());
     }

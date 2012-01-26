@@ -18,22 +18,8 @@ package android.text.cts;
 
 import android.test.AndroidTestCase;
 import android.text.SpannedString;
-import dalvik.annotation.TestTargets;
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.ToBeFixed;
 
-@TestTargetClass(SpannedString.class)
 public class SpannedStringTest extends AndroidTestCase {
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test constructor(s) of {@link SpannedString}",
-        method = "SpannedString",
-        args = {java.lang.CharSequence.class}
-    )
-    @ToBeFixed(bug = "1417734", explanation = "should add @throws clause into javadoc of " +
-            " constructor SpannedString(CharSequence) when param CharSequence is null")
     public void testConstructor() {
         new SpannedString("test");
 
@@ -44,14 +30,6 @@ public class SpannedStringTest extends AndroidTestCase {
         }
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test {@link SpannedString#valueOf(CharSequence)}",
-        method = "valueOf",
-        args = {java.lang.CharSequence.class}
-    )
-    @ToBeFixed(bug = "1417734", explanation = "should add @throws clause into javadoc of " +
-            "SpannedString#valueOf(CharSequence) when param CharSequence is null")
     public void testValueOf() {
         String text = "test valueOf";
         SpannedString spanned = SpannedString.valueOf(text);
@@ -67,14 +45,6 @@ public class SpannedStringTest extends AndroidTestCase {
         }
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test {@link SpannedString#subSequence(int, int)}",
-        method = "subSequence",
-        args = {int.class, int.class}
-    )
-    @ToBeFixed(bug = "1417734", explanation = "should add @throws clause into javadoc of " +
-            "SpannedString#subSequence(int, int) when index is out of bounds")
     public void testSubSequence() {
         String text = "hello, world";
         SpannedString spanned = new SpannedString(text);

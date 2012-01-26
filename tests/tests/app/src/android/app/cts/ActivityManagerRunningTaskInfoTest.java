@@ -19,11 +19,7 @@ import android.app.ActivityManager;
 import android.graphics.Bitmap;
 import android.os.Parcel;
 import android.test.AndroidTestCase;
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
 
-@TestTargetClass(ActivityManager.RunningTaskInfo.class)
 public class ActivityManagerRunningTaskInfoTest extends AndroidTestCase {
     protected ActivityManager.RunningTaskInfo mRunningTaskInfo;
 
@@ -41,30 +37,14 @@ public class ActivityManagerRunningTaskInfoTest extends AndroidTestCase {
         mRunningTaskInfo.description = null;
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test constructor",
-        method = "ActivityManager.RunningTaskInfo",
-        args = {}
-    )
     public void testConstructor() {
         new ActivityManager.RunningTaskInfo();
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "describeContents",
-        args = {}
-    )
     public void testDescribeContents() {
         assertEquals(0, mRunningTaskInfo.describeContents());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "writeToParcel",
-        args = {android.os.Parcel.class, int.class}
-    )
     public void testWriteToParcel() throws Exception {
 
         Parcel parcel = Parcel.obtain();
@@ -93,11 +73,6 @@ public class ActivityManagerRunningTaskInfoTest extends AndroidTestCase {
 
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "readFromParcel",
-        args = {android.os.Parcel.class}
-    )
     public void testReadFromParcel() throws Exception {
 
         Parcel parcel = Parcel.obtain();

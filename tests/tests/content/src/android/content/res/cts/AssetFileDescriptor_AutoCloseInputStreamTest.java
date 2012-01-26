@@ -16,10 +16,6 @@
 
 package android.content.res.cts;
 
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
 
 import android.content.res.AssetFileDescriptor;
 import android.os.ParcelFileDescriptor;
@@ -30,7 +26,6 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
-@TestTargetClass(AssetFileDescriptor.AutoCloseInputStream.class)
 public class AssetFileDescriptor_AutoCloseInputStreamTest extends AndroidTestCase {
     private static final int FILE_END = -1;
     private static final String FILE_NAME = "testAssertFileDescriptorAutoCloseInputStream";
@@ -62,18 +57,6 @@ public class AssetFileDescriptor_AutoCloseInputStreamTest extends AndroidTestCas
         mFile.delete();
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.PARTIAL_COMPLETE,
-            method = "AssetFileDescriptor.AutoCloseInputStream",
-            args = {AssetFileDescriptor.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "skip",
-            args = {long.class}
-        )
-    })
     public void testSkip() throws IOException {
         openInput(0, FILE_LENGTH);
         assertEquals(FILE_DATA[0], mInput.read());
@@ -85,18 +68,6 @@ public class AssetFileDescriptor_AutoCloseInputStreamTest extends AndroidTestCas
         assertEquals(FILE_END, mInput.read());
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.PARTIAL_COMPLETE,
-            method = "AssetFileDescriptor.AutoCloseInputStream",
-            args = {AssetFileDescriptor.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.PARTIAL_COMPLETE,
-            method = "read",
-            args = {}
-        )
-    })
     public void testRead() throws IOException {
         openInput(0, FILE_LENGTH);
         for (int i = 0; i < FILE_LENGTH; i++) {
@@ -105,18 +76,6 @@ public class AssetFileDescriptor_AutoCloseInputStreamTest extends AndroidTestCas
         assertEquals(FILE_END, mInput.read());
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.PARTIAL_COMPLETE,
-            method = "AssetFileDescriptor.AutoCloseInputStream",
-            args = {AssetFileDescriptor.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.PARTIAL_COMPLETE,
-            method = "read",
-            args = {}
-        )
-    })
     public void testReadPartial() throws IOException {
         long len = 6;
         openInput(0, len);
@@ -126,18 +85,6 @@ public class AssetFileDescriptor_AutoCloseInputStreamTest extends AndroidTestCas
         assertEquals(FILE_END, mInput.read());
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.PARTIAL_COMPLETE,
-            method = "AssetFileDescriptor.AutoCloseInputStream",
-            args = {AssetFileDescriptor.class}
-        ),
-        @TestTargetNew(
-                level = TestLevel.COMPLETE,
-                method = "read",
-                args = {byte[].class, int.class, int.class}
-        )
-    })
     public void testReadBufferLen() throws IOException {
         openInput(0, FILE_LENGTH);
         byte[] buf = new byte[FILE_LENGTH];
@@ -148,18 +95,6 @@ public class AssetFileDescriptor_AutoCloseInputStreamTest extends AndroidTestCas
         assertEquals(FILE_END, mInput.read(buf, 0, 4));
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.PARTIAL_COMPLETE,
-            method = "AssetFileDescriptor.AutoCloseInputStream",
-            args = {AssetFileDescriptor.class}
-        ),
-        @TestTargetNew(
-                level = TestLevel.PARTIAL_COMPLETE,
-                method = "read",
-                args = {byte[].class}
-        )
-    })
     public void testReadBuffer() throws IOException {
         openInput(0, FILE_LENGTH);
         byte[] buf = new byte[6];
@@ -170,18 +105,6 @@ public class AssetFileDescriptor_AutoCloseInputStreamTest extends AndroidTestCas
         assertEquals(FILE_END, mInput.read(buf));
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.PARTIAL_COMPLETE,
-            method = "AssetFileDescriptor.AutoCloseInputStream",
-            args = {AssetFileDescriptor.class}
-        ),
-        @TestTargetNew(
-                level = TestLevel.PARTIAL_COMPLETE,
-                method = "read",
-                args = {byte[].class}
-        )
-    })
     public void testReadBufferPartial() throws IOException {
         long len = 8;
         openInput(0, len);
@@ -193,18 +116,6 @@ public class AssetFileDescriptor_AutoCloseInputStreamTest extends AndroidTestCas
         assertEquals(FILE_END, mInput.read(buf));
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.PARTIAL_COMPLETE,
-            method = "AssetFileDescriptor.AutoCloseInputStream",
-            args = {AssetFileDescriptor.class}
-        ),
-        @TestTargetNew(
-                level = TestLevel.PARTIAL_COMPLETE,
-                method = "available",
-                args = {}
-        )
-    })
     public void testAvailableRead() throws IOException {
         openInput(0, FILE_LENGTH);
         assertEquals(FILE_LENGTH, mInput.available());
@@ -212,18 +123,6 @@ public class AssetFileDescriptor_AutoCloseInputStreamTest extends AndroidTestCas
         assertEquals(FILE_LENGTH -1 , mInput.available());
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.PARTIAL_COMPLETE,
-            method = "AssetFileDescriptor.AutoCloseInputStream",
-            args = {AssetFileDescriptor.class}
-        ),
-        @TestTargetNew(
-                level = TestLevel.PARTIAL_COMPLETE,
-                method = "available",
-                args = {}
-        )
-    })
     public void testAvailableReadBuffer() throws IOException {
         openInput(0, FILE_LENGTH);
         byte[] buf = new byte[3];
@@ -232,18 +131,6 @@ public class AssetFileDescriptor_AutoCloseInputStreamTest extends AndroidTestCas
         assertEquals(FILE_LENGTH - buf.length, mInput.available());
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.PARTIAL_COMPLETE,
-            method = "AssetFileDescriptor.AutoCloseInputStream",
-            args = {AssetFileDescriptor.class}
-        ),
-        @TestTargetNew(
-                level = TestLevel.PARTIAL_COMPLETE,
-                method = "available",
-                args = {}
-        )
-    })
     public void testAvailableReadBufferLen() throws IOException {
         openInput(0, FILE_LENGTH);
         byte[] buf = new byte[3];
@@ -255,28 +142,6 @@ public class AssetFileDescriptor_AutoCloseInputStreamTest extends AndroidTestCas
     /*
      * Tests that AutoInputStream doesn't support mark().
      */
-    @TestTargets({
-        @TestTargetNew(
-                level = TestLevel.PARTIAL_COMPLETE,
-                method = "AssetFileDescriptor.AutoCloseInputStream",
-                args = {AssetFileDescriptor.class}
-         ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "mark",
-            args = {int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "reset",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "markSupported",
-            args = {}
-        )
-    })
     public void testMark() throws IOException {
         openInput(0, FILE_LENGTH);
         assertFalse(mInput.markSupported());

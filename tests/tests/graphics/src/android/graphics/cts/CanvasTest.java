@@ -43,13 +43,7 @@ import android.text.SpannedString;
 
 import com.android.cts.stub.R;
 
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
-import dalvik.annotation.ToBeFixed;
 
-@TestTargetClass(Canvas.class)
 public class CanvasTest extends InstrumentationTestCase {
     private final static int PAINT_COLOR = 0xff00ff00;
     private final static int BITMAP_WIDTH = 10;
@@ -90,21 +84,10 @@ public class CanvasTest extends InstrumentationTestCase {
         mCanvas = new Canvas(mMutableBitmap);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "Canvas",
-        args = {}
-    )
     public void testCanvas1() {
         final Canvas c = new Canvas();
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "Canvas",
-        args = {android.graphics.Bitmap.class}
-    )
-    @ToBeFixed(bug="1839977", explanation="These two abnormal case will crash the process")
     public void testCanvas2() {
         // abnormal case: bitmap to be constructed is immutable
         try {
@@ -128,11 +111,6 @@ public class CanvasTest extends InstrumentationTestCase {
         new Canvas(mMutableBitmap);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "setBitmap",
-        args = {android.graphics.Bitmap.class}
-    )
     public void testSetBitmap() {
         // abnormal case: bitmap to be set is immutable
         try {
@@ -159,20 +137,10 @@ public class CanvasTest extends InstrumentationTestCase {
         assertEquals(31, mCanvas.getHeight());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "isOpaque",
-        args = {}
-    )
     public void testIsOpaque() {
         assertFalse(mCanvas.isOpaque());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "restore",
-        args = {}
-    )
     public void testRestore() {
         // abnormal case: save not called before restore
         try {
@@ -187,18 +155,6 @@ public class CanvasTest extends InstrumentationTestCase {
         mCanvas.restore();
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "save",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "restore",
-            args = {}
-        )
-    })
     public void testSave1() {
         final Matrix m1 = new Matrix();
         m1.setValues(values1);
@@ -227,18 +183,6 @@ public class CanvasTest extends InstrumentationTestCase {
         }
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "save",
-            args = {int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "restore",
-            args = {}
-        )
-    })
     public void testSave2() {
         // test save current matrix only
         Matrix m1 = new Matrix();
@@ -323,18 +267,6 @@ public class CanvasTest extends InstrumentationTestCase {
         }
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "saveLayer",
-            args = {android.graphics.RectF.class, android.graphics.Paint.class, int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "restore",
-            args = {}
-        )
-    })
     public void testSaveLayer1() {
         final Paint p = new Paint();
         final RectF rF = new RectF(0, 10, 31, 0);
@@ -422,19 +354,6 @@ public class CanvasTest extends InstrumentationTestCase {
         }
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "saveLayer",
-            args = {float.class, float.class, float.class, float.class,
-                    android.graphics.Paint.class, int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "restore",
-            args = {}
-        )
-    })
     public void testSaveLayer2() {
         final Paint p = new Paint();
 
@@ -521,18 +440,6 @@ public class CanvasTest extends InstrumentationTestCase {
         }
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "saveLayerAlpha",
-            args = {android.graphics.RectF.class, int.class, int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "restore",
-            args = {}
-        )
-    })
     public void testSaveLayerAlpha1() {
         final RectF rF = new RectF(0, 10, 31, 0);
 
@@ -619,18 +526,6 @@ public class CanvasTest extends InstrumentationTestCase {
         }
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "saveLayerAlpha",
-            args = {float.class, float.class, float.class, float.class, int.class, int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "restore",
-            args = {}
-        )
-    })
     public void testSaveLayerAlpha2() {
         // test save current matrix only
         Matrix m1 = new Matrix();
@@ -715,11 +610,6 @@ public class CanvasTest extends InstrumentationTestCase {
         }
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "getSaveCount",
-        args = {}
-    )
     public void testGetSaveCount() {
         // why is 1 not 0
         assertEquals(1, mCanvas.getSaveCount());
@@ -733,11 +623,6 @@ public class CanvasTest extends InstrumentationTestCase {
         assertEquals(5, mCanvas.getSaveCount());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "restoreToCount",
-        args = {int.class}
-    )
     public void testRestoreToCount() {
         // abnormal case: saveCount less than 1
         try {
@@ -775,18 +660,6 @@ public class CanvasTest extends InstrumentationTestCase {
         }
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getMatrix",
-            args = {android.graphics.Matrix.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setMatrix",
-            args = {android.graphics.Matrix.class}
-        )
-    })
     public void testGetMatrix1() {
         final float[] f1 = {
                 1, 2, 3, 4, 5, 6, 7, 8, 9
@@ -808,18 +681,6 @@ public class CanvasTest extends InstrumentationTestCase {
         }
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getMatrix",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setMatrix",
-            args = {android.graphics.Matrix.class}
-        )
-    })
     public void testGetMatrix2() {
         final float[] f1 = {
                 1, 2, 3, 4, 5, 6, 7, 8, 9
@@ -840,11 +701,6 @@ public class CanvasTest extends InstrumentationTestCase {
         }
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "translate",
-        args = {float.class, float.class}
-    )
     public void testTranslate() {
         preCompare();
 
@@ -863,11 +719,6 @@ public class CanvasTest extends InstrumentationTestCase {
         assertEquals(1.0f, values[8]);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "scale",
-        args = {float.class, float.class}
-    )
     public void testScale1() {
         preCompare();
 
@@ -886,11 +737,6 @@ public class CanvasTest extends InstrumentationTestCase {
         assertEquals(1.0f, values[8]);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "scale",
-        args = {float.class, float.class, float.class, float.class}
-    )
     public void testScale2() {
         preCompare();
 
@@ -909,11 +755,6 @@ public class CanvasTest extends InstrumentationTestCase {
         assertEquals(1.0f, values[8]);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "rotate",
-        args = {float.class}
-    )
     public void testRotate1() {
         preCompare();
 
@@ -932,11 +773,6 @@ public class CanvasTest extends InstrumentationTestCase {
         assertEquals(1.0f, values[8]);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "rotate",
-        args = {float.class, float.class, float.class}
-    )
     public void testRotate2() {
         preCompare();
 
@@ -955,11 +791,6 @@ public class CanvasTest extends InstrumentationTestCase {
         assertEquals(1.0f, values[8]);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "skew",
-        args = {float.class, float.class}
-    )
     public void testSkew() {
         preCompare();
 
@@ -978,11 +809,6 @@ public class CanvasTest extends InstrumentationTestCase {
         assertEquals(1.0f, values[8]);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "concat",
-        args = {android.graphics.Matrix.class}
-    )
     public void testConcat() {
         preCompare();
 
@@ -1004,11 +830,6 @@ public class CanvasTest extends InstrumentationTestCase {
         assertEquals(8.0f, values[8]);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "clipRect",
-        args = {android.graphics.RectF.class, android.graphics.Region.Op.class}
-    )
     public void testClipRect1() {
         assertFalse(mCanvas.clipRect(mRectF, Op.DIFFERENCE));
         assertFalse(mCanvas.clipRect(mRectF, Op.INTERSECT));
@@ -1018,11 +839,6 @@ public class CanvasTest extends InstrumentationTestCase {
         assertFalse(mCanvas.clipRect(mRectF, Op.XOR));
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "clipRect",
-        args = {android.graphics.Rect.class, android.graphics.Region.Op.class}
-    )
     public void testClipRect2() {
         assertFalse(mCanvas.clipRect(mRect, Op.DIFFERENCE));
         assertFalse(mCanvas.clipRect(mRect, Op.INTERSECT));
@@ -1032,30 +848,14 @@ public class CanvasTest extends InstrumentationTestCase {
         assertFalse(mCanvas.clipRect(mRect, Op.XOR));
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "clipRect",
-        args = {android.graphics.RectF.class}
-    )
     public void testClipRect3() {
         assertTrue(mCanvas.clipRect(mRectF));
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "clipRect",
-        args = {android.graphics.Rect.class}
-    )
     public void testClipRect4() {
         assertTrue(mCanvas.clipRect(mRect));
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "clipRect",
-        args = {float.class, float.class, float.class, float.class,
-                android.graphics.Region.Op.class}
-    )
     public void testClipRect5() {
         assertFalse(mCanvas.clipRect(0, 0, 10, 31, Op.DIFFERENCE));
         assertFalse(mCanvas.clipRect(0, 0, 10, 31, Op.INTERSECT));
@@ -1065,40 +865,20 @@ public class CanvasTest extends InstrumentationTestCase {
         assertFalse(mCanvas.clipRect(0, 0, 10, 31, Op.XOR));
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "clipRect",
-        args = {float.class, float.class, float.class, float.class}
-    )
     public void testClipRect6() {
         assertTrue(mCanvas.clipRect(0.5f, 0.5f, 10.5f, 31.5f));
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "clipRect",
-        args = {int.class, int.class, int.class, int.class}
-    )
     public void testClipRect7() {
         assertTrue(mCanvas.clipRect(0, 0, 10, 31));
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "clipPath",
-        args = {android.graphics.Path.class}
-    )
     public void testClipPath1() {
         final Path p = new Path();
         p.addRect(mRectF, Direction.CCW);
         assertTrue(mCanvas.clipPath(p));
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "clipPath",
-        args = {android.graphics.Path.class, android.graphics.Region.Op.class}
-    )
     public void testClipPath2() {
         final Path p = new Path();
         p.addRect(mRectF, Direction.CCW);
@@ -1111,20 +891,10 @@ public class CanvasTest extends InstrumentationTestCase {
         assertFalse(mCanvas.clipPath(p, Op.XOR));
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "clipRegion",
-        args = {android.graphics.Region.class}
-    )
     public void testClipRegion1() {
         assertFalse(mCanvas.clipRegion(new Region(0, 10, 29, 0)));
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "clipRegion",
-        args = {android.graphics.Region.class, android.graphics.Region.Op.class}
-    )
     public void testClipRegion2() {
         final Region r = new Region(0, 10, 29, 0);
 
@@ -1136,18 +906,6 @@ public class CanvasTest extends InstrumentationTestCase {
         assertFalse(mCanvas.clipRegion(r, Op.XOR));
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getDrawFilter",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setDrawFilter",
-            args = {android.graphics.DrawFilter.class}
-        )
-    })
     public void testGetDrawFilter() {
         assertNull(mCanvas.getDrawFilter());
         final DrawFilter dF = new DrawFilter();
@@ -1156,21 +914,11 @@ public class CanvasTest extends InstrumentationTestCase {
         assertTrue(dF.equals(mCanvas.getDrawFilter()));
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "quickReject",
-        args = {android.graphics.RectF.class, android.graphics.Canvas.EdgeType.class}
-    )
     public void testQuickReject1() {
         assertFalse(mCanvas.quickReject(mRectF, EdgeType.AA));
         assertFalse(mCanvas.quickReject(mRectF, EdgeType.BW));
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "quickReject",
-        args = {android.graphics.Path.class, android.graphics.Canvas.EdgeType.class}
-    )
     public void testQuickReject2() {
         final Path p = new Path();
         p.addRect(mRectF, Direction.CCW);
@@ -1179,23 +927,11 @@ public class CanvasTest extends InstrumentationTestCase {
         assertFalse(mCanvas.quickReject(p, EdgeType.BW));
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "quickReject",
-        args = {float.class, float.class, float.class, float.class,
-                android.graphics.Canvas.EdgeType.class}
-    )
     public void testQuickReject3() {
         assertFalse(mCanvas.quickReject(0, 0, 10, 31, EdgeType.AA));
         assertFalse(mCanvas.quickReject(0, 0, 10, 31, EdgeType.BW));
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "getClipBounds",
-        args = {android.graphics.Rect.class}
-    )
-    @ToBeFixed(bug = "1488979", explanation = "the width and height returned are error")
     public void testGetClipBounds1() {
         final Rect r = new Rect();
 
@@ -1204,12 +940,6 @@ public class CanvasTest extends InstrumentationTestCase {
         assertEquals(BITMAP_HEIGHT, r.height());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "getClipBounds",
-        args = {}
-    )
-    @ToBeFixed(bug = "1488979", explanation = "the width and height returned are error")
     public void testGetClipBounds2() {
         final Rect r = mCanvas.getClipBounds();
 
@@ -1223,11 +953,6 @@ public class CanvasTest extends InstrumentationTestCase {
         assertEquals(color, mMutableBitmap.getPixel(BITMAP_WIDTH - 1, BITMAP_HEIGHT - 1));
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "drawRGB",
-        args = {int.class, int.class, int.class}
-    )
     public void testDrawRGB() {
         final int alpha = 0xff;
         final int red = 0xff;
@@ -1240,11 +965,6 @@ public class CanvasTest extends InstrumentationTestCase {
         checkDrewColor(color);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "drawARGB",
-        args = {int.class, int.class, int.class, int.class}
-    )
     public void testDrawARGB() {
         final int alpha = 0xff;
         final int red = 0x22;
@@ -1256,11 +976,6 @@ public class CanvasTest extends InstrumentationTestCase {
         checkDrewColor(color);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "drawColor",
-        args = {int.class}
-    )
     public void testDrawColor1() {
         final int color = 0xffff0000;
 
@@ -1268,11 +983,6 @@ public class CanvasTest extends InstrumentationTestCase {
         checkDrewColor(color);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "drawColor",
-        args = {int.class, android.graphics.PorterDuff.Mode.class}
-    )
     public void testDrawColor2() {
         mCanvas.drawColor(0xffff0000, Mode.CLEAR);
         mCanvas.drawColor(0xffff0000, Mode.DARKEN);
@@ -1292,22 +1002,12 @@ public class CanvasTest extends InstrumentationTestCase {
         mCanvas.drawColor(0xffff0000, Mode.XOR);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "drawPaint",
-        args = {android.graphics.Paint.class}
-    )
     public void testDrawPaint() {
         mCanvas.drawPaint(mPaint);
 
         assertEquals(PAINT_COLOR, mMutableBitmap.getPixel(0, 0));
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "drawPoints",
-        args = {float[].class, int.class, int.class, android.graphics.Paint.class}
-    )
     public void testDrawPoints1() {
         // abnormal case: invalid offset
         try {
@@ -1337,44 +1037,24 @@ public class CanvasTest extends InstrumentationTestCase {
         assertEquals(PAINT_COLOR, mMutableBitmap.getPixel(0, 0));
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "drawPoints",
-        args = {float[].class, android.graphics.Paint.class}
-    )
     public void testDrawPoints2() {
         mCanvas.drawPoints(new float[]{0, 0}, mPaint);
 
         assertEquals(PAINT_COLOR, mMutableBitmap.getPixel(0, 0));
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "drawPoint",
-        args = {float.class, float.class, android.graphics.Paint.class}
-    )
     public void testDrawPoint() {
         mCanvas.drawPoint(0, 0, mPaint);
 
         assertEquals(PAINT_COLOR, mMutableBitmap.getPixel(0, 0));
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "drawLine",
-        args = {float.class, float.class, float.class, float.class, android.graphics.Paint.class}
-    )
     public void testDrawLine() {
         mCanvas.drawLine(0, 0, 10, 12, mPaint);
 
         assertEquals(PAINT_COLOR, mMutableBitmap.getPixel(0, 0));
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "drawLines",
-        args = {float[].class, int.class, int.class, android.graphics.Paint.class}
-    )
     public void testDrawLines1() {
         // abnormal case: invalid offset
         try {
@@ -1404,11 +1084,6 @@ public class CanvasTest extends InstrumentationTestCase {
         assertEquals(PAINT_COLOR, mMutableBitmap.getPixel(0, 0));
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "drawLines",
-        args = {float[].class, android.graphics.Paint.class}
-    )
     public void testDrawLines2() {
         mCanvas.drawLines(new float[] {
                 0, 0, 10, 12
@@ -1423,44 +1098,24 @@ public class CanvasTest extends InstrumentationTestCase {
         assertEquals(PAINT_COLOR, mMutableBitmap.getPixel(9, 11));
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "drawRect",
-        args = {android.graphics.RectF.class, android.graphics.Paint.class}
-    )
     public void testDrawRect1() {
         mCanvas.drawRect(new RectF(0, 0, 10, 12), mPaint);
 
         checkDrewPaint();
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "drawRect",
-        args = {android.graphics.Rect.class, android.graphics.Paint.class}
-    )
     public void testDrawRect2() {
         mCanvas.drawRect(new Rect(0, 0, 10, 12), mPaint);
 
         checkDrewPaint();
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "drawRect",
-        args = {float.class, float.class, float.class, float.class, android.graphics.Paint.class}
-    )
     public void testDrawRect3() {
         mCanvas.drawRect(0, 0, 10, 12, mPaint);
 
         checkDrewPaint();
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "drawOval",
-        args = {android.graphics.RectF.class, android.graphics.Paint.class}
-    )
     public void testDrawOval() {
         // abnormal case: Oval is null
         try {
@@ -1474,11 +1129,6 @@ public class CanvasTest extends InstrumentationTestCase {
         mCanvas.drawOval(new RectF(0, 0, 10, 12), mPaint);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "drawCircle",
-        args = {float.class, float.class, float.class, android.graphics.Paint.class}
-    )
     public void testDrawCircle() {
         // special case: circle's radius <= 0
         mCanvas.drawCircle(10.0f, 10.0f, -1.0f, mPaint);
@@ -1489,12 +1139,6 @@ public class CanvasTest extends InstrumentationTestCase {
         assertEquals(PAINT_COLOR, mMutableBitmap.getPixel(9, 11));
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "drawArc",
-        args = {android.graphics.RectF.class, float.class, float.class, boolean.class,
-                android.graphics.Paint.class}
-    )
     public void testDrawArc() {
         // abnormal case: oval is null
         try {
@@ -1509,12 +1153,6 @@ public class CanvasTest extends InstrumentationTestCase {
         mCanvas.drawArc(new RectF(0, 0, 10, 12), 10, 11, true, mPaint);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "drawRoundRect",
-        args = {android.graphics.RectF.class, float.class, float.class,
-                android.graphics.Paint.class}
-    )
     public void testDrawRoundRect() {
         // abnormal case: RoundRect is null
         try {
@@ -1527,21 +1165,10 @@ public class CanvasTest extends InstrumentationTestCase {
         mCanvas.drawRoundRect(new RectF(0, 0, 10, 12), 8, 8, mPaint);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "drawPath",
-        args = {android.graphics.Path.class, android.graphics.Paint.class}
-    )
     public void testDrawPath() {
         mCanvas.drawPath(new Path(), mPaint);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "drawBitmap",
-        args = {android.graphics.Bitmap.class, float.class, float.class,
-                android.graphics.Paint.class}
-    )
     public void testDrawBitmap1() {
         Bitmap b = Bitmap.createBitmap(BITMAP_WIDTH, 29, Config.ARGB_8888);
 
@@ -1559,12 +1186,6 @@ public class CanvasTest extends InstrumentationTestCase {
         mCanvas.drawBitmap(b, 5, 12, mPaint);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "drawBitmap",
-        args = {android.graphics.Bitmap.class, android.graphics.Rect.class,
-                android.graphics.RectF.class, android.graphics.Paint.class}
-    )
     public void testDrawBitmap2() {
         Bitmap b = Bitmap.createBitmap(BITMAP_WIDTH, 29, Config.ARGB_8888);
 
@@ -1582,12 +1203,6 @@ public class CanvasTest extends InstrumentationTestCase {
         mCanvas.drawBitmap(b, new Rect(), new RectF(), mPaint);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "drawBitmap",
-        args = {android.graphics.Bitmap.class, android.graphics.Rect.class,
-                android.graphics.Rect.class, android.graphics.Paint.class}
-    )
     public void testDrawBitmap3() {
         Bitmap b = Bitmap.createBitmap(BITMAP_WIDTH, 29, Config.ARGB_8888);
 
@@ -1605,12 +1220,6 @@ public class CanvasTest extends InstrumentationTestCase {
         mCanvas.drawBitmap(b, new Rect(), new Rect(), mPaint);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "drawBitmap",
-        args = {int[].class, int.class, int.class, int.class, int.class, int.class,
-                int.class, boolean.class, android.graphics.Paint.class}
-    )
     public void testDrawBitmap4() {
         final int[] colors = new int[2008];
 
@@ -1667,12 +1276,6 @@ public class CanvasTest extends InstrumentationTestCase {
         mCanvas.drawBitmap(colors, 10, 10, 10, 10, 10, 29, true, mPaint);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "drawBitmap",
-        args = {int[].class, int.class, int.class, float.class, float.class, int.class,
-                int.class, boolean.class, android.graphics.Paint.class}
-    )
     public void testDrawBitmap6() {
         final int[] colors = new int[2008];
 
@@ -1729,24 +1332,12 @@ public class CanvasTest extends InstrumentationTestCase {
         mCanvas.drawBitmap(colors, 10, 10, 10.0f, 10.0f, 10, 29, true, mPaint);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "drawBitmap",
-        args = {android.graphics.Bitmap.class, android.graphics.Matrix.class,
-                android.graphics.Paint.class}
-    )
     public void testDrawBitmap5() {
         final Bitmap b = Bitmap.createBitmap(BITMAP_WIDTH, 29, Config.ARGB_8888);
         mCanvas.drawBitmap(b, new Matrix(), null);
         mCanvas.drawBitmap(b, new Matrix(), mPaint);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "drawBitmapMesh",
-        args = {android.graphics.Bitmap.class, int.class, int.class, float[].class,
-                int.class, int[].class, int.class, android.graphics.Paint.class}
-    )
     public void testDrawBitmapMesh() {
         final Bitmap b = Bitmap.createBitmap(BITMAP_WIDTH, 29, Config.ARGB_8888);
 
@@ -1820,13 +1411,6 @@ public class CanvasTest extends InstrumentationTestCase {
         mCanvas.drawBitmapMesh(b, 10, 10, verts, 10, colors, 10, mPaint);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "drawVertices",
-        args = {android.graphics.Canvas.VertexMode.class, int.class, float[].class,
-                int.class, float[].class, int.class, int[].class, int.class, short[].class,
-                int.class, int.class, android.graphics.Paint.class}
-    )
     public void testDrawVertices() {
         final float[] verts = new float[10];
         final float[] texs = new float[10];
@@ -1897,12 +1481,6 @@ public class CanvasTest extends InstrumentationTestCase {
                 6, mPaint);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "drawText",
-        args = {char[].class, int.class, int.class, float.class, float.class,
-                android.graphics.Paint.class}
-    )
     public void testDrawText1() {
         final char[] text = {
                 'a', 'n', 'd', 'r', 'o', 'i', 'd'
@@ -1937,21 +1515,10 @@ public class CanvasTest extends InstrumentationTestCase {
         mCanvas.drawText(text, 0, 7, 10, 10, mPaint);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "drawText",
-        args = {java.lang.String.class, float.class, float.class, android.graphics.Paint.class}
-    )
     public void testDrawText2() {
         mCanvas.drawText("android", 10, 30, mPaint);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "drawText",
-        args = {java.lang.String.class, int.class, int.class, float.class, float.class,
-                android.graphics.Paint.class}
-    )
     public void testDrawText3() {
         final String text = "android";
 
@@ -1992,12 +1559,6 @@ public class CanvasTest extends InstrumentationTestCase {
         mCanvas.drawText(text, 0, 7, 10, 30, mPaint);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "drawText",
-        args = {java.lang.CharSequence.class, int.class, int.class, float.class, float.class,
-                android.graphics.Paint.class}
-    )
     public void testDrawText4() {
         final String t1 = "android";
         mCanvas.drawText(t1, 0, 7, 10, 30, mPaint);
@@ -2015,11 +1576,6 @@ public class CanvasTest extends InstrumentationTestCase {
         mCanvas.drawText(t5, 0, 7, 10, 30, mPaint);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "drawPosText",
-        args = {char[].class, int.class, int.class, float[].class, android.graphics.Paint.class}
-    )
     public void testDrawPosText1() {
         final char[] text = {
                 'a', 'n', 'd', 'r', 'o', 'i', 'd'
@@ -2061,11 +1617,6 @@ public class CanvasTest extends InstrumentationTestCase {
         mCanvas.drawPosText(text, 0, 7, pos, mPaint);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "drawPosText",
-        args = {java.lang.String.class, float[].class, android.graphics.Paint.class}
-    )
     public void testDrawPosText2() {
         final String text = "android";
         final float[] pos = new float[] {
@@ -2088,12 +1639,6 @@ public class CanvasTest extends InstrumentationTestCase {
         mCanvas.drawPosText(text, pos, mPaint);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "drawTextOnPath",
-        args = {char[].class, int.class, int.class, android.graphics.Path.class,
-                float.class, float.class, android.graphics.Paint.class}
-    )
     public void testDrawTextOnPath1() {
         final Path path = new Path();
         final char[] text = {
@@ -2121,12 +1666,6 @@ public class CanvasTest extends InstrumentationTestCase {
         mCanvas.drawTextOnPath(text, 0, 7, path, 10.0f, 10.0f, mPaint);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "drawTextOnPath",
-        args = {java.lang.String.class, android.graphics.Path.class, float.class,
-                float.class, android.graphics.Paint.class}
-    )
     public void testDrawTextOnPath2() {
         final Path path = new Path();
         String text = "";
@@ -2139,20 +1678,10 @@ public class CanvasTest extends InstrumentationTestCase {
         mCanvas.drawTextOnPath(text, path, 10.0f, 10.0f, mPaint);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "drawPicture",
-        args = {android.graphics.Picture.class}
-    )
     public void testDrawPicture1() {
         mCanvas.drawPicture(new Picture());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "drawPicture",
-        args = {android.graphics.Picture.class, android.graphics.RectF.class}
-    )
     public void testDrawPicture2() {
         final RectF dst = new RectF(0, 0, 10, 31);
         final Picture p = new Picture();
@@ -2164,11 +1693,6 @@ public class CanvasTest extends InstrumentationTestCase {
         mCanvas.drawPicture(p, dst);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "drawPicture",
-        args = {android.graphics.Picture.class, android.graphics.Rect.class}
-    )
     public void testDrawPicture3() {
         final Rect dst = new Rect(0, 10, 30, 0);
         final Picture p = new Picture();
@@ -2180,18 +1704,6 @@ public class CanvasTest extends InstrumentationTestCase {
         mCanvas.drawPicture(p, dst);
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setDensity",
-            args = {int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getDensity",
-            args = {android.util.DisplayMetrics.class}
-        )
-    })
     public void testDensity() {
         // set Density
         mCanvas.setDensity(DisplayMetrics.DENSITY_DEFAULT);

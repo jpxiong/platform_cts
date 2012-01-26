@@ -17,12 +17,7 @@ package android.os.cts;
 
 import junit.framework.TestCase;
 import android.os.ConditionVariable;
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
 
-@TestTargetClass(ConditionVariable.class)
 public class ConditionVariableTest extends TestCase {
     private static final int WAIT_TIME = 3000;
     private static final int BLOCK_TIME = 1000;
@@ -37,46 +32,12 @@ public class ConditionVariableTest extends TestCase {
         mConditionVariable = new ConditionVariable();
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "ConditionVariable",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "ConditionVariable",
-            args = {boolean.class}
-        )
-    })
     public void testConstructor() {
         assertFalse(mConditionVariable.block(BLOCK_TIME));
         assertFalse(new ConditionVariable(false).block(BLOCK_TIME));
         assertTrue(new ConditionVariable(true).block(BLOCK_TIME));
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "block",
-            args = {long.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "open",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "close",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "block",
-            args = {}
-        )
-    })
     public void testConditionVariable() throws Throwable {
         // test open then block(long)
         mConditionVariable.open();

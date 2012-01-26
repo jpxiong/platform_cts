@@ -16,11 +16,6 @@
 
 package android.os.cts;
 
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
-import dalvik.annotation.ToBeFixed;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -38,7 +33,6 @@ import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.Set;
 
-@TestTargetClass(Bundle.class)
 public class BundleTest extends AndroidTestCase {
     private static final boolean BOOLEANKEYVALUE = false;
 
@@ -65,32 +59,6 @@ public class BundleTest extends AndroidTestCase {
         mSpannable.setSpan(new ForegroundColorSpan(0x123456), 0, 3, 0);
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "test all constructors",
-            method = "Bundle",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "test all constructors",
-            method = "Bundle",
-            args = {android.os.Bundle.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "test all constructors",
-            method = "Bundle",
-            args = {java.lang.ClassLoader.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "test all constructors",
-            method = "Bundle",
-            args = {int.class}
-        )
-    })
     public void testBundle() {
         final Bundle b1 = new Bundle();
         assertTrue(b1.isEmpty());
@@ -105,18 +73,6 @@ public class BundleTest extends AndroidTestCase {
     }
 
     // first put sth into tested Bundle, it shouldn't be empty, then clear it and it should be empty
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "clear",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "isEmpty",
-            args = {}
-        )
-    })
     public void testClear() {
         mBundle.putBoolean("android", true);
         mBundle.putBoolean(KEY, true);
@@ -127,11 +83,6 @@ public class BundleTest extends AndroidTestCase {
 
     // first clone the tested Bundle, then compare the original Bundle with the
     // cloned Bundle, they should equal
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "clone",
-        args = {}
-    )
     public void testClone() {
         mBundle.putBoolean(BOOLEANKEY, BOOLEANKEYVALUE);
         mBundle.putInt(INTKEY, INTKEYVALUE);
@@ -143,11 +94,6 @@ public class BundleTest extends AndroidTestCase {
 
     // containsKey would return false if nothing has been put into the Bundle,
     // else containsKey would return true if any putXXX has been called before
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "containsKey",
-        args = {java.lang.String.class}
-    )
     public void testContainsKey() {
         assertFalse(mBundle.containsKey(KEY));
         mBundle.putBoolean(KEY, true);
@@ -158,11 +104,6 @@ public class BundleTest extends AndroidTestCase {
 
     // get would return null if nothing has been put into the Bundle,else get
     // would return the value set by putXXX
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "get",
-        args = {java.lang.String.class}
-    )
     public void testGet() {
         assertNull(mBundle.get(KEY));
         mBundle.putBoolean(KEY, true);
@@ -171,20 +112,6 @@ public class BundleTest extends AndroidTestCase {
         assertNotNull(mBundle.get(KEY));
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "getBoolean should only return the Boolean set by putBoolean",
-            method = "getBoolean",
-            args = {java.lang.String.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "getBoolean should only return the Boolean set by putBoolean",
-            method = "putBoolean",
-            args = {java.lang.String.class, boolean.class}
-        )
-    })
     public void testGetBoolean1() {
         assertFalse(mBundle.getBoolean(KEY));
         mBundle.putBoolean(KEY, true);
@@ -193,20 +120,6 @@ public class BundleTest extends AndroidTestCase {
         assertTrue(mBundle.getBoolean(KEY));
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "getBoolean should only return the Boolean set by putBoolean",
-            method = "getBoolean",
-            args = {java.lang.String.class, boolean.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "getBoolean should only return the Boolean set by putBoolean",
-            method = "putBoolean",
-            args = {java.lang.String.class, boolean.class}
-        )
-    })
     public void testGetBoolean2() {
         assertTrue(mBundle.getBoolean(KEY, true));
         mBundle.putBoolean(KEY, false);
@@ -215,20 +128,6 @@ public class BundleTest extends AndroidTestCase {
         assertFalse(mBundle.getBoolean(KEY, true));
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "getBooleanArray should only return the BooleanArray set by putBooleanArray",
-            method = "getBooleanArray",
-            args = {java.lang.String.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "getBooleanArray should only return the BooleanArray set by putBooleanArray",
-            method = "putBooleanArray",
-            args = {java.lang.String.class, boolean[].class}
-        )
-    })
     public void testGetBooleanArray() {
         assertNull(mBundle.getBooleanArray(KEY));
         mBundle.putBooleanArray(KEY, new boolean[] {
@@ -249,20 +148,6 @@ public class BundleTest extends AndroidTestCase {
         assertEquals(true, booleanArray[2]);
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "getBundle should only return the Bundle set by putBundle",
-            method = "getBundle",
-            args = {java.lang.String.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "getBundle should only return the Bundle set by putBundle",
-            method = "putBundle",
-            args = {java.lang.String.class, android.os.Bundle.class}
-        )
-    })
     public void testGetBundle() {
         assertNull(mBundle.getBundle(KEY));
         final Bundle bundle = new Bundle();
@@ -272,20 +157,6 @@ public class BundleTest extends AndroidTestCase {
         assertBundleEquals(bundle, mBundle.getBundle(KEY));
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "getByte should only return the Byte set by putByte",
-            method = "getByte",
-            args = {java.lang.String.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "getByte should only return the Byte set by putByte",
-            method = "putByte",
-            args = {java.lang.String.class, byte.class}
-        )
-    })
     public void testGetByte1() {
         final byte b = 7;
 
@@ -296,20 +167,6 @@ public class BundleTest extends AndroidTestCase {
         assertEquals(b, mBundle.getByte(KEY));
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "getByte should only return the Byte set by putByte",
-            method = "getByte",
-            args = {java.lang.String.class, byte.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "getByte should only return the Byte set by putByte",
-            method = "putByte",
-            args = {java.lang.String.class, byte.class}
-        )
-    })
     public void testGetByte2() {
         final byte b1 = 6;
         final byte b2 = 7;
@@ -321,20 +178,6 @@ public class BundleTest extends AndroidTestCase {
         assertEquals((Byte)b2, mBundle.getByte(KEY, b1));
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "getByteArray should only return the ByteArray set by putByteArray",
-            method = "getByteArray",
-            args = {java.lang.String.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "getByteArray should only return the ByteArray set by putByteArray",
-            method = "putByteArray",
-            args = {java.lang.String.class, byte[].class}
-        )
-    })
     public void testGetByteArray() {
         assertNull(mBundle.getByteArray(KEY));
         mBundle.putByteArray(KEY, new byte[] {
@@ -355,20 +198,6 @@ public class BundleTest extends AndroidTestCase {
         assertEquals(3, byteArray[2]);
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "getChar should only return the Char set by putChar",
-            method = "getChar",
-            args = {java.lang.String.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "getChar should only return the Char set by putChar",
-            method = "putChar",
-            args = {java.lang.String.class, char.class}
-        )
-    })
     public void testGetChar1() {
         final char c = 'l';
 
@@ -379,20 +208,6 @@ public class BundleTest extends AndroidTestCase {
         assertEquals(c, mBundle.getChar(KEY));
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "getChar should only return the Char set by putChar",
-            method = "getChar",
-            args = {java.lang.String.class, char.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "getChar should only return the Char set by putChar",
-            method = "putChar",
-            args = {java.lang.String.class, char.class}
-        )
-    })
     public void testGetChar2() {
         final char c1 = 'l';
         final char c2 = 'i';
@@ -404,20 +219,6 @@ public class BundleTest extends AndroidTestCase {
         assertEquals(c2, mBundle.getChar(KEY, c1));
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "getCharArray should only return the CharArray set by putCharArray",
-            method = "getCharArray",
-            args = {java.lang.String.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "getCharArray should only return the CharArray set by putCharArray",
-            method = "putCharArray",
-            args = {java.lang.String.class, char[].class}
-        )
-    })
     public void testGetCharArray() {
         assertNull(mBundle.getCharArray(KEY));
         mBundle.putCharArray(KEY, new char[] {
@@ -432,20 +233,6 @@ public class BundleTest extends AndroidTestCase {
         assertEquals('i', charArray[1]);
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "getCharSequence should only return the CharSequence set by putCharSequence",
-            method = "getCharSequence",
-            args = {java.lang.String.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "getCharSequence should only return the CharSequence set by putCharSequence",
-            method = "putCharSequence",
-            args = {java.lang.String.class, java.lang.CharSequence.class}
-        )
-    })
     public void testGetCharSequence() {
         final CharSequence cS = "Bruce Lee";
 
@@ -460,18 +247,6 @@ public class BundleTest extends AndroidTestCase {
         assertSpannableEquals(mSpannable, mBundle.getCharSequence(KEY2));
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getCharSequenceArray",
-            args = {java.lang.String.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "putCharSequenceArray",
-            args = {java.lang.String.class, java.lang.CharSequence[].class}
-        )
-    })
     public void testGetCharSequenceArray() {
         assertNull(mBundle.getCharSequenceArray(KEY));
         mBundle.putCharSequenceArray(KEY, new CharSequence[] {
@@ -492,18 +267,6 @@ public class BundleTest extends AndroidTestCase {
         assertSpannableEquals(mSpannable, ret[3]);
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getCharSequenceArrayList",
-            args = {java.lang.String.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "putCharSequenceArrayList",
-            args = {java.lang.String.class, java.util.ArrayList.class}
-        )
-    })
     public void testGetCharSequenceArrayList() {
         assertNull(mBundle.getCharSequenceArrayList(KEY));
         final ArrayList<CharSequence> list = new ArrayList<CharSequence>();
@@ -528,20 +291,6 @@ public class BundleTest extends AndroidTestCase {
         assertSpannableEquals(mSpannable, ret.get(3));
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "getDouble should return the Double set by putDouble",
-            method = "getDouble",
-            args = {java.lang.String.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "getDouble should return the Double set by putDouble",
-            method = "putDouble",
-            args = {java.lang.String.class, double.class}
-        )
-    })
     public void testGetDouble1() {
         final double d = 10.07;
 
@@ -552,20 +301,6 @@ public class BundleTest extends AndroidTestCase {
         assertEquals(d, mBundle.getDouble(KEY));
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "getDouble should return the Double set by putDouble",
-            method = "getDouble",
-            args = {java.lang.String.class, double.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "getDouble should return the Double set by putDouble",
-            method = "putDouble",
-            args = {java.lang.String.class, double.class}
-        )
-    })
     public void testGetDouble2() {
         final double d1 = 10.06;
         final double d2 = 10.07;
@@ -577,20 +312,6 @@ public class BundleTest extends AndroidTestCase {
         assertEquals(d2, mBundle.getDouble(KEY, d1));
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "getDoubleArray should only return the DoubleArray set by putDoubleArray",
-            method = "getDoubleArray",
-            args = {java.lang.String.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "getDoubleArray should only return the DoubleArray set by putDoubleArray",
-            method = "putDoubleArray",
-            args = {java.lang.String.class, double[].class}
-        )
-    })
     public void testGetDoubleArray() {
         assertNull(mBundle.getDoubleArray(KEY));
         mBundle.putDoubleArray(KEY, new double[] {
@@ -605,20 +326,6 @@ public class BundleTest extends AndroidTestCase {
         assertEquals(10.07, doubleArray[1]);
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "getFloat should only return the Float set by putFloat",
-            method = "getFloat",
-            args = {java.lang.String.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "getFloat should only return the Float set by putFloat",
-            method = "putFloat",
-            args = {java.lang.String.class, float.class}
-        )
-    })
     public void testGetFloat1() {
         final float f = 10.07f;
 
@@ -629,20 +336,6 @@ public class BundleTest extends AndroidTestCase {
         assertEquals(f, mBundle.getFloat(KEY));
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "getFloat should only return the Float set by putFloat",
-            method = "getFloat",
-            args = {java.lang.String.class, float.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "getFloat should only return the Float set by putFloat",
-            method = "putFloat",
-            args = {java.lang.String.class, float.class}
-        )
-    })
     public void testGetFloat2() {
         final float f1 = 10.06f;
         final float f2 = 10.07f;
@@ -654,20 +347,6 @@ public class BundleTest extends AndroidTestCase {
         assertEquals(f2, mBundle.getFloat(KEY, f1));
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "getFloatArray should only return the FloatArray set by putFloatArray",
-            method = "getFloatArray",
-            args = {java.lang.String.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "getFloatArray should only return the FloatArray set by putFloatArray",
-            method = "putFloatArray",
-            args = {java.lang.String.class, float[].class}
-        )
-    })
     public void testGetFloatArray() {
         assertNull(mBundle.getFloatArray(KEY));
         mBundle.putFloatArray(KEY, new float[] {
@@ -682,20 +361,6 @@ public class BundleTest extends AndroidTestCase {
         assertEquals(10.07f, floatArray[1]);
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "getInt should only return the Int set by putInt",
-            method = "getInt",
-            args = {java.lang.String.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "getInt should only return the Int set by putInt",
-            method = "putInt",
-            args = {java.lang.String.class, int.class}
-        )
-    })
     public void testGetInt1() {
         final int i = 1007;
 
@@ -706,20 +371,6 @@ public class BundleTest extends AndroidTestCase {
         assertEquals(i, mBundle.getInt(KEY));
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "getInt should only return the Int set by putInt",
-            method = "getInt",
-            args = {java.lang.String.class, int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "getInt should only return the Int set by putInt",
-            method = "putInt",
-            args = {java.lang.String.class, int.class}
-        )
-    })
     public void testGetInt2() {
         final int i1 = 1006;
         final int i2 = 1007;
@@ -731,20 +382,6 @@ public class BundleTest extends AndroidTestCase {
         assertEquals(i2, mBundle.getInt(KEY, i2));
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "getIntArray should only return the IntArray set by putIntArray",
-            method = "getIntArray",
-            args = {java.lang.String.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "getIntArray should only return the IntArray set by putIntArray",
-            method = "putIntArray",
-            args = {java.lang.String.class, int[].class}
-        )
-    })
     public void testGetIntArray() {
         assertNull(mBundle.getIntArray(KEY));
         mBundle.putIntArray(KEY, new int[] {
@@ -760,18 +397,6 @@ public class BundleTest extends AndroidTestCase {
     }
 
     // getIntegerArrayList should only return the IntegerArrayList set by putIntegerArrayLis
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getIntegerArrayList",
-            args = {java.lang.String.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "putIntegerArrayList",
-            args = {java.lang.String.class, java.util.ArrayList.class}
-        )
-    })
     public void testGetIntegerArrayList() {
         final int i1 = 1006;
         final int i2 = 1007;
@@ -794,20 +419,6 @@ public class BundleTest extends AndroidTestCase {
         assertEquals((Integer)i2, retArrayList.get(1));
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "getLong should only return the Long set by putLong",
-            method = "getLong",
-            args = {java.lang.String.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "getLong should only return the Long set by putLong",
-            method = "putLong",
-            args = {java.lang.String.class, long.class}
-        )
-    })
     public void testGetLong1() {
         final long l = 1007;
 
@@ -818,20 +429,6 @@ public class BundleTest extends AndroidTestCase {
         assertEquals(l, mBundle.getLong(KEY));
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "getLong should only return the Long set by putLong",
-            method = "getLong",
-            args = {java.lang.String.class, long.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "getLong should only return the Long set by putLong",
-            method = "putLong",
-            args = {java.lang.String.class, long.class}
-        )
-    })
     public void testGetLong2() {
         final long l1 = 1006;
         final long l2 = 1007;
@@ -843,20 +440,6 @@ public class BundleTest extends AndroidTestCase {
         assertEquals(l2, mBundle.getLong(KEY, l2));
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "getLongArray should only return the LongArray set by putLongArray",
-            method = "getLongArray",
-            args = {java.lang.String.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "getLongArray should only return the LongArray set by putLongArray",
-            method = "putLongArray",
-            args = {java.lang.String.class, long[].class}
-        )
-    })
     public void testGetLongArray() {
         assertNull(mBundle.getLongArray(KEY));
         mBundle.putLongArray(KEY, new long[] {
@@ -871,20 +454,6 @@ public class BundleTest extends AndroidTestCase {
         assertEquals(1007, longArray[1]);
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "getParcelable should only return the Parcelable set by putParcelable",
-            method = "getParcelable",
-            args = {java.lang.String.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "getParcelable should only return the Parcelable set by putParcelable",
-            method = "putParcelable",
-            args = {java.lang.String.class, android.os.Parcelable.class}
-        )
-    })
     public void testGetParcelable() {
         assertNull(mBundle.getParcelable(KEY));
         final Bundle bundle = new Bundle();
@@ -895,18 +464,6 @@ public class BundleTest extends AndroidTestCase {
     }
 
     // getParcelableArray should only return the ParcelableArray set by putParcelableArray
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getParcelableArray",
-            args = {java.lang.String.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "putParcelableArray",
-            args = {java.lang.String.class, android.os.Parcelable[].class}
-        )
-    })
     public void testGetParcelableArray() {
         assertNull(mBundle.getParcelableArray(KEY));
         final Bundle bundle1 = new Bundle();
@@ -926,18 +483,6 @@ public class BundleTest extends AndroidTestCase {
     }
 
     // getParcelableArrayList should only return the parcelableArrayList set by putParcelableArrayList
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getParcelableArrayList",
-            args = {java.lang.String.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "putParcelableArrayList",
-            args = {java.lang.String.class, java.util.ArrayList.class}
-        )
-    })
     public void testGetParcelableArrayList() {
         assertNull(mBundle.getParcelableArrayList(KEY));
         final ArrayList<Parcelable> parcelableArrayList = new ArrayList<Parcelable>();
@@ -957,20 +502,6 @@ public class BundleTest extends AndroidTestCase {
         assertBundleEquals(bundle2, (Bundle) ret.get(1));
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "getSerializable should only return the Serializable set by putSerializable",
-            method = "getSerializable",
-            args = {java.lang.String.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "getSerializable should only return the Serializable set by putSerializable",
-            method = "putSerializable",
-            args = {java.lang.String.class, java.io.Serializable.class}
-        )
-    })
     public void testGetSerializable() {
         assertNull(mBundle.getSerializable(KEY));
         mBundle.putSerializable(KEY, "android");
@@ -979,20 +510,6 @@ public class BundleTest extends AndroidTestCase {
         assertEquals("android", mBundle.getSerializable(KEY));
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "getShort should only return the Short set by putShort",
-            method = "getShort",
-            args = {java.lang.String.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "getShort should only return the Short set by putShort",
-            method = "putShort",
-            args = {java.lang.String.class, short.class}
-        )
-    })
     public void testGetShort1() {
         final short s = 1007;
 
@@ -1003,20 +520,6 @@ public class BundleTest extends AndroidTestCase {
         assertEquals(s, mBundle.getShort(KEY));
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "getShort should only return the Short set by putShort",
-            method = "getShort",
-            args = {java.lang.String.class, short.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "getShort should only return the Short set by putShort",
-            method = "putShort",
-            args = {java.lang.String.class, short.class}
-        )
-    })
     public void testGetShort2() {
         final short s1 = 1006;
         final short s2 = 1007;
@@ -1028,20 +531,6 @@ public class BundleTest extends AndroidTestCase {
         assertEquals(s2, mBundle.getShort(KEY, s1));
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "getShortArray should only return the ShortArray set by putShortArray",
-            method = "getShortArray",
-            args = {java.lang.String.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "getShortArray should only return the ShortArray set by putShortArray",
-            method = "putShortArray",
-            args = {java.lang.String.class, short[].class}
-        )
-    })
     public void testGetShortArray() {
         final short s1 = 1006;
         final short s2 = 1007;
@@ -1061,18 +550,6 @@ public class BundleTest extends AndroidTestCase {
 
     // getSparseParcelableArray should only return the SparseArray<Parcelable>
     // set by putSparseParcelableArray
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getSparseParcelableArray",
-            args = {java.lang.String.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "putSparseParcelableArray",
-            args = {java.lang.String.class, android.util.SparseArray.class}
-        )
-    })
     public void testGetSparseParcelableArray() {
         assertNull(mBundle.getSparseParcelableArray(KEY));
         final SparseArray<Parcelable> sparseArray = new SparseArray<Parcelable>();
@@ -1094,20 +571,6 @@ public class BundleTest extends AndroidTestCase {
         assertIntentEquals(intent, (Intent) ret.get(1007));
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "getString should only return the String set by putString",
-            method = "getString",
-            args = {java.lang.String.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "getString should only return the String set by putString",
-            method = "putString",
-            args = {java.lang.String.class, java.lang.String.class}
-        )
-    })
     public void testGetString() {
         assertNull(mBundle.getString(KEY));
         mBundle.putString(KEY, "android");
@@ -1116,20 +579,6 @@ public class BundleTest extends AndroidTestCase {
         assertEquals("android", mBundle.getString(KEY));
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "getStringArray should only return the StringArray set by putStringArray",
-            method = "getStringArray",
-            args = {java.lang.String.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "getStringArray should only return the StringArray set by putStringArray",
-            method = "putStringArray",
-            args = {java.lang.String.class, java.lang.String[].class}
-        )
-    })
     public void testGetStringArray() {
         assertNull(mBundle.getStringArray(KEY));
         mBundle.putStringArray(KEY, new String[] {
@@ -1147,18 +596,6 @@ public class BundleTest extends AndroidTestCase {
     }
 
     // getStringArrayList should only return the StringArrayList set by putStringArrayList
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getStringArrayList",
-            args = {java.lang.String.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "putStringArrayList",
-            args = {java.lang.String.class, java.util.ArrayList.class}
-        )
-    })
     public void testGetStringArrayList() {
         assertNull(mBundle.getStringArrayList(KEY));
         final ArrayList<String> stringArrayList = new ArrayList<String>();
@@ -1179,12 +616,6 @@ public class BundleTest extends AndroidTestCase {
         assertEquals("three", ret.get(2));
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "keySet should contains all keys that have been set",
-        method = "keySet",
-        args = {}
-    )
     public void testKeySet() {
         Set<String> setKey = mBundle.keySet();
         assertFalse(setKey.contains("one"));
@@ -1206,11 +637,6 @@ public class BundleTest extends AndroidTestCase {
 
     // same as hasFileDescriptors, the only difference is that describeContents
     // return 0 if no fd and return 1 if has fd for the tested Bundle
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "describeContents",
-        args = {}
-    )
 
     public void testDescribeContents() {
         assertTrue((mBundle.describeContents()
@@ -1243,11 +669,6 @@ public class BundleTest extends AndroidTestCase {
     //  if it read data from a Parcel object, which is created with a FileDescriptor.
     // case 3: The tested Bundle should has FileDescriptor
     //  if put a Parcelable object, which is created with a FileDescriptor, into it.
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "hasFileDescriptors",
-        args = {}
-    )
     public void testHasFileDescriptors() {
         assertFalse(mBundle.hasFileDescriptors());
         
@@ -1271,24 +692,12 @@ public class BundleTest extends AndroidTestCase {
         assertTrue(mBundle.hasFileDescriptors());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "setClassLoader",
-        args = {java.lang.ClassLoader.class}
-    )
-    @ToBeFixed(bug = "", explanation = "this method only set a private member and there is "
-        + "no way to check whether the set value is right or not ")
     public void testSetClassLoader() {
         mBundle.setClassLoader(new MockClassLoader());
     }
 
     // Write the bundle(A) to a parcel(B), and then create a bundle(C) from B.
     // C should be same as A.
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "writeToParcel",
-        args = {android.os.Parcel.class, int.class}
-    )
     public void testWriteToParcel() {
         final String li = "Bruce Li";
 
@@ -1301,18 +710,6 @@ public class BundleTest extends AndroidTestCase {
     }
 
     // test the size should be right after add/remove key-value pair of the Bundle.
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "size",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "remove",
-            args = {java.lang.String.class}
-        )
-    })
     public void testSize() {
         assertEquals(0, mBundle.size());
         mBundle.putBoolean("one", true);
@@ -1345,18 +742,6 @@ public class BundleTest extends AndroidTestCase {
     }
 
     // The return value of toString() should not be null.
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "toString",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "readFromParcel",
-            args = {android.os.Parcel.class}
-        )
-    })
     public void testToString() {
         assertNotNull(mBundle.toString());
         mBundle.putString("foo", "this test is so stupid");
@@ -1364,11 +749,6 @@ public class BundleTest extends AndroidTestCase {
     }
 
     // The tested Bundle should hold mappings from the given after putAll be invoked.
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "putAll",
-        args = {android.os.Bundle.class}
-    )
     public void testPutAll() {
         assertEquals(0, mBundle.size());
 

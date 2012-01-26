@@ -40,13 +40,7 @@ import android.widget.AdapterView.OnItemSelectedListener;
 
 import com.android.cts.stub.R;
 
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
-import dalvik.annotation.ToBeFixed;
 
-@TestTargetClass(AdapterView.class)
 public class AdapterViewTest extends ActivityInstrumentationTestCase2<AdapterViewStubActivity> {
 
     private final static int INVALID_ID = -1;
@@ -70,23 +64,6 @@ public class AdapterViewTest extends ActivityInstrumentationTestCase2<AdapterVie
         mAdapterView = new ListView(mActivity);
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "AdapterView",
-            args = {android.content.Context.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "AdapterView",
-            args = {android.content.Context.class, android.util.AttributeSet.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "AdapterView",
-            args = {android.content.Context.class, android.util.AttributeSet.class, int.class}
-        )
-    })
     public void testConstructor() {
         XmlPullParser parser = mActivity.getResources().getXml(R.layout.adapterview_layout);
         AttributeSet attrs = Xml.asAttributeSet(parser);
@@ -110,48 +87,6 @@ public class AdapterViewTest extends ActivityInstrumentationTestCase2<AdapterVie
     /**
      * test not supported methods, all should throw UnsupportedOperationException
      */
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "addView",
-            args = {android.view.View.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "addView",
-            args = {android.view.View.class, int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "addView",
-            args = {android.view.View.class, int.class, android.view.ViewGroup.LayoutParams.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "addView",
-            args = {android.view.View.class, android.view.ViewGroup.LayoutParams.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "removeView",
-            args = {android.view.View.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "removeAllViews",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "removeViewAt",
-            args = {int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setOnClickListener",
-            args = {android.view.View.OnClickListener.class}
-        )
-    })
     public void testUnsupportedMethods() {
         ListView subView = new ListView(mActivity);
 
@@ -216,11 +151,6 @@ public class AdapterViewTest extends ActivityInstrumentationTestCase2<AdapterVie
         }
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "getCount",
-        args = {}
-    )
     public void testGetCount() {
         // Before setAdapter, the count should be zero.
         assertEquals(0, mAdapterView.getCount());
@@ -231,23 +161,6 @@ public class AdapterViewTest extends ActivityInstrumentationTestCase2<AdapterVie
         assertEquals(FRUIT.length, mAdapterView.getCount());
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getEmptyView",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setEmptyView",
-            args = {android.view.View.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setAdapter",
-            args = {java.lang.Object.class}
-        )
-    })
     public void testAccessEmptyView() {
         ImageView emptyView = new ImageView(mActivity);
 
@@ -289,18 +202,6 @@ public class AdapterViewTest extends ActivityInstrumentationTestCase2<AdapterVie
         assertEquals(View.VISIBLE, emptyView.getVisibility());
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getFirstVisiblePosition",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getLastVisiblePosition",
-            args = {}
-        )
-    })
     public void testAccessVisiblePosition() {
 
         assertEquals(0, mAdapterView.getFirstVisiblePosition());
@@ -316,19 +217,6 @@ public class AdapterViewTest extends ActivityInstrumentationTestCase2<AdapterVie
         assertEquals(FRUIT.length - 1, mAdapterView.getLastVisiblePosition());
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getItemAtPosition",
-            args = {int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getItemIdAtPosition",
-            args = {int.class}
-        )
-    })
-    @ToBeFixed(bug = "1695243", explanation = "Android API javadocs are incomplete")
     public void testItemOrItemIdAtPosition() {
         // no adapter set
         assertNull(mAdapterView.getItemAtPosition(0));
@@ -356,33 +244,6 @@ public class AdapterViewTest extends ActivityInstrumentationTestCase2<AdapterVie
         assertEquals(FRUIT.length, mAdapterView.getItemIdAtPosition(FRUIT.length));
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getOnItemClickListener",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setOnItemClickListener",
-            args = {android.widget.AdapterView.OnItemClickListener.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getOnItemLongClickListener",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setOnItemLongClickListener",
-            args = {android.widget.AdapterView.OnItemLongClickListener.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "performItemClick",
-            args = {android.view.View.class, int.class, long.class}
-        )
-    })
     public void testAccessOnItemClickAndLongClickListener() {
         MockOnItemClickListener clickListener = new MockOnItemClickListener();
         MockOnItemLongClickListener longClickListener = new MockOnItemLongClickListener();
@@ -403,18 +264,6 @@ public class AdapterViewTest extends ActivityInstrumentationTestCase2<AdapterVie
         assertTrue(longClickListener.isClicked());
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.TODO,
-            method = "getOnItemSelectedListener",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.TODO,
-            method = "setOnItemSelectedListener",
-            args = {android.widget.AdapterView.OnItemSelectedListener.class}
-        )
-    })
     public void testAccessOnItemSelectedListener() {
         // FIXME: we can not select the item in touch mode, how can we change the mode to test
         setArrayAdapter(mAdapterView);
@@ -447,13 +296,6 @@ public class AdapterViewTest extends ActivityInstrumentationTestCase2<AdapterVie
      * it's hard to scroll the list in unit test, so we just test without scrolling
      * this means the position of item is same as position of the children in parent layout
      */
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "getPositionForView",
-        args = {android.view.View.class}
-    )
-    @ToBeFixed(bug = "1695243", explanation = "should add NullPointerException @throws"
-        + " clause into javadoc.")
     public void testGetPositionForView() {
         setArrayAdapter(mAdapterView);
         mAdapterView.layout(0, 0, LAYOUT_WIDTH, LAYOUT_HEIGHT);
@@ -479,18 +321,6 @@ public class AdapterViewTest extends ActivityInstrumentationTestCase2<AdapterVie
         }
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setFocusable",
-            args = {boolean.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setFocusableInTouchMode",
-            args = {boolean.class}
-        )
-    })
     public void testChangeFocusable() {
         assertFalse(mAdapterView.isFocusable());
         assertFalse(mAdapterView.isFocusableInTouchMode());
@@ -516,11 +346,6 @@ public class AdapterViewTest extends ActivityInstrumentationTestCase2<AdapterVie
     /*
      * skip this test, no need to test
      */
-    @TestTargetNew(
-        level = TestLevel.NOT_NECESSARY,
-        method = "onLayout",
-        args = {boolean.class, int.class, int.class, int.class, int.class}
-    )
     public void testOnLayout() {
         // onLayout() is implementation details, do NOT test
     }
@@ -529,28 +354,6 @@ public class AdapterViewTest extends ActivityInstrumentationTestCase2<AdapterVie
      * set and get the selected id, position and item.
      * values will not change if invalid id given.
      */
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setSelected",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getSelectedItemId",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getSelectedItemPosition",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getSelectedItem",
-            args = {}
-        )
-    })
     public void testGetSelected() {
         assertEquals(AdapterView.INVALID_ROW_ID, mAdapterView.getSelectedItemId());
         assertEquals(AdapterView.INVALID_POSITION, mAdapterView.getSelectedItemPosition());
@@ -585,11 +388,6 @@ public class AdapterViewTest extends ActivityInstrumentationTestCase2<AdapterVie
     /*
      * not update this test until the ViewGroup's test finish.
      */
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "dispatchSaveInstanceState",
-        args = {android.util.SparseArray.class}
-    )
     public void testDispatchSaveInstanceState() {
         MockAdapterView adapterView = new MockAdapterView(mActivity);
         adapterView.setSaveEnabled(true);
@@ -602,11 +400,6 @@ public class AdapterViewTest extends ActivityInstrumentationTestCase2<AdapterVie
     /*
      * not update this test until the ViewGroup's test finish.
      */
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "dispatchRestoreInstanceState",
-        args = {android.util.SparseArray.class}
-    )
     public void testDispatchRestoreInstanceState() {
         MockAdapterView adapterView = new MockAdapterView(mActivity);
         adapterView.setSaveEnabled(true);
@@ -620,11 +413,6 @@ public class AdapterViewTest extends ActivityInstrumentationTestCase2<AdapterVie
      * if no child added, it always return false
      * this method is protected, so we involve the mock
      */
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "canAnimate",
-        args = {}
-    )
     public void testCanAnimate() {
         MockAdapterView adapterView = new MockAdapterView(mActivity);
         LayoutAnimationController lAC = new LayoutAnimationController(new AnimationSet(true));

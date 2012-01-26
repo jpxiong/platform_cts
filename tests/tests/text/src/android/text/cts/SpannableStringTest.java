@@ -19,21 +19,9 @@ package android.text.cts;
 import android.test.AndroidTestCase;
 import android.text.SpannableString;
 import android.text.style.UnderlineSpan;
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.ToBeFixed;
 
-@TestTargetClass(SpannableString.class)
 public class SpannableStringTest extends AndroidTestCase {
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "SpannableString",
-        args = {java.lang.CharSequence.class}
-    )
-    @ToBeFixed(bug="1695243", explanation="should add @throws clause into javadoc of "
-        + " constructor SpannableString(CharSequence) when param CharSequence is null")
     public void testConstructor() {
         new SpannableString("test");
 
@@ -44,13 +32,6 @@ public class SpannableStringTest extends AndroidTestCase {
         }
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "valueOf",
-        args = {java.lang.CharSequence.class}
-    )
-    @ToBeFixed(bug="1695243", explanation="should add @throws clause into javadoc of "
-        + "SpannableString#valueOf(CharSequence) when param CharSequence is null")
     public void testValueOf() {
         String text = "test valueOf";
         SpannableString spannable = SpannableString.valueOf(text);
@@ -67,13 +48,6 @@ public class SpannableStringTest extends AndroidTestCase {
         }
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "setSpan",
-        args = {java.lang.Object.class, int.class, int.class, int.class}
-    )
-    @ToBeFixed(bug="1695243", explanation="should add @throws clause into javadoc of "
-        + "SpannableString#setSpan(Object,int, int, int) when index is out of bounds")
     public void testSetSpan() {
         String text = "hello, world";
         SpannableString spannable = new SpannableString(text);
@@ -104,11 +78,6 @@ public class SpannableStringTest extends AndroidTestCase {
         }
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "removeSpan",
-        args = {java.lang.Object.class}
-    )
     public void testRemoveSpan() {
         SpannableString spannable = new SpannableString("hello, world");
 
@@ -132,13 +101,6 @@ public class SpannableStringTest extends AndroidTestCase {
         assertEquals(0, spannable.getSpanFlags(underlineSpan));
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "subSequence",
-        args = {int.class, int.class}
-    )
-    @ToBeFixed(bug="1695243", explanation="should add @throws clause into javadoc of "
-        + "SpannableString#subSequence(int, int) when index is out of bounds")
     public void testSubSequence() {
         String text = "hello, world";
         SpannableString spannable = new SpannableString(text);

@@ -21,12 +21,7 @@ import android.util.SparseIntArray;
 
 import java.util.Arrays;
 
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
 
-@TestTargetClass(SparseIntArray.class)
 public class SparseIntArrayTest extends AndroidTestCase {
     private static final int[] KEYS   = {12, 23, 4, 6, 8, 1, 3, -12, 0, -3, 11, 14, -23};
     private static final int[] VALUES = {0,  1,  2, 3, 4, 5, 6, 7,   8,  9, 10, 11,  12};
@@ -38,80 +33,6 @@ public class SparseIntArrayTest extends AndroidTestCase {
         super.setUp();
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test SparseIntArray with default capacity.",
-            method = "SparseIntArray",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test SparseIntArray with default capacity.",
-            method = "append",
-            args = {int.class, int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test SparseIntArray with default capacity.",
-            method = "clear",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test SparseIntArray with default capacity.",
-            method = "delete",
-            args = {int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test SparseIntArray with default capacity.",
-            method = "get",
-            args = {int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test SparseIntArray with default capacity.",
-            method = "get",
-            args = {int.class, int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test SparseIntArray with default capacity.",
-            method = "indexOfKey",
-            args = {int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test SparseIntArray with default capacity.",
-            method = "indexOfValue",
-            args = {int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test SparseIntArray with default capacity.",
-            method = "keyAt",
-            args = {int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test SparseIntArray with default capacity.",
-            method = "put",
-            args = {int.class, int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test SparseIntArray with default capacity.",
-            method = "size",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test SparseIntArray with default capacity.",
-            method = "valueAt",
-            args = {int.class}
-        )
-    })
     public void testSparseIntArrayWithDefaultCapacity() {
         SparseIntArray sparseIntArray = new SparseIntArray();
         assertEquals(0, sparseIntArray.size());
@@ -161,80 +82,6 @@ public class SparseIntArrayTest extends AndroidTestCase {
         assertEquals(0, sparseIntArray.size());
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test SparseIntArray with specified capacity.",
-            method = "SparseIntArray",
-            args = {int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test SparseIntArray with specified capacity.",
-            method = "append",
-            args = {int.class, int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test SparseIntArray with specified capacity.",
-            method = "clear",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test SparseIntArray with specified capacity.",
-            method = "delete",
-            args = {int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test SparseIntArray with specified capacity.",
-            method = "get",
-            args = {int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test SparseIntArray with specified capacity.",
-            method = "get",
-            args = {int.class, int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test SparseIntArray with specified capacity.",
-            method = "indexOfKey",
-            args = {int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test SparseIntArray with specified capacity.",
-            method = "indexOfValue",
-            args = {int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test SparseIntArray with specified capacity.",
-            method = "keyAt",
-            args = {int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test SparseIntArray with specified capacity.",
-            method = "put",
-            args = {int.class, int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test SparseIntArray with specified capacity.",
-            method = "size",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test SparseIntArray with specified capacity.",
-            method = "valueAt",
-            args = {int.class}
-        )
-    })
     public void testSparseIntArrayWithSpecifiedCapacity() {
         SparseIntArray sparseIntArray = new SparseIntArray(5);
         assertEquals(0, sparseIntArray.size());
@@ -283,14 +130,6 @@ public class SparseIntArrayTest extends AndroidTestCase {
         assertEquals(0, sparseIntArray.size());
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test SparseIntArray with specified capacity.",
-            method = "removeAt",
-            args = {int.class}
-        )
-    })
     public void testSparseIntArrayRemoveAt() {
         final int[] testData = {
             13, 42, 85932, 885932, -6, Integer.MAX_VALUE, 0, Integer.MIN_VALUE };

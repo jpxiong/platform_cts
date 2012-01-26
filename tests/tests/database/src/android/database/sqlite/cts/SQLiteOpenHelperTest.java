@@ -25,15 +25,10 @@ import android.database.sqlite.SQLiteOpenHelper;
 import android.database.sqlite.SQLiteQuery;
 import android.database.sqlite.SQLiteDatabase.CursorFactory;
 import android.test.AndroidTestCase;
-import dalvik.annotation.TestTargets;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
 
 /**
  * Test {@link SQLiteOpenHelper}.
  */
-@TestTargetClass(SQLiteOpenHelper.class)
 public class SQLiteOpenHelperTest extends AndroidTestCase {
     private static final String TEST_DATABASE_NAME = "database_test.db";
     private static final int TEST_VERSION = 1;
@@ -52,12 +47,6 @@ public class SQLiteOpenHelperTest extends AndroidTestCase {
         mOpenHelper = getOpenHelper();
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "SQLiteOpenHelper",
-        args = {android.content.Context.class, java.lang.String.class,
-                android.database.sqlite.SQLiteDatabase.CursorFactory.class, int.class}
-    )
     public void testConstructor() {
         new MockOpenHelper(mContext, TEST_DATABASE_NAME, mFactory, TEST_VERSION);
 
@@ -72,28 +61,6 @@ public class SQLiteOpenHelperTest extends AndroidTestCase {
         new MockOpenHelper(mContext, TEST_DATABASE_NAME, null, TEST_VERSION);
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "onOpen",
-            args = {android.database.sqlite.SQLiteDatabase.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getReadableDatabase",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getWritableDatabase",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "close",
-            args = {}
-        )
-    })
     public void testGetDatabase() {
         SQLiteDatabase database = null;
         assertFalse(mOpenHelper.hasCalledOnOpen());

@@ -19,28 +19,9 @@ package android.database.cts;
 import android.database.DataSetObservable;
 import android.database.DataSetObserver;
 import android.test.AndroidTestCase;
-import dalvik.annotation.TestTargets;
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargetClass;
 
-@TestTargetClass(android.database.DataSetObservable.class)
 public class DataSetObservableTest extends AndroidTestCase {
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test notifyChanged and notifyInvalidated.",
-            method = "notifyChanged",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test notifyChanged and notifyInvalidated.",
-            method = "notifyInvalidated",
-            args = {}
-        )
-    })
     public void testNotifyMethods() {
         DataSetObservable dataSetObservalbe = new DataSetObservable();
         MockDataSetObserver dataSetObserver1 = new MockDataSetObserver();

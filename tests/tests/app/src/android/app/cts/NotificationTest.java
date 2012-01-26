@@ -24,13 +24,7 @@ import android.net.Uri;
 import android.os.Parcel;
 import android.test.AndroidTestCase;
 import android.widget.RemoteViews;
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
-import dalvik.annotation.ToBeFixed;
 
-@TestTargetClass(Notification.class)
 public class NotificationTest extends AndroidTestCase {
 
     private Notification mNotification;
@@ -49,20 +43,6 @@ public class NotificationTest extends AndroidTestCase {
         mNotification = new Notification();
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "Notification",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "Notification",
-            args = {int.class, java.lang.CharSequence.class, long.class}
-        )
-    })
-    @ToBeFixed(bug="1682756", explanation="Javadoc says this constructor sets 'everything to 0'."
-            + " However, the 'when' field is set to currentTimeMillis()")
     public void testConstructor() {
         mNotification = null;
         mNotification = new Notification();
@@ -77,29 +57,12 @@ public class NotificationTest extends AndroidTestCase {
         assertEquals(TICKER_TEXT, mNotification.tickerText);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "describeContents",
-        args = {}
-    )
     public void testDescribeContents() {
         final int expected = 0;
         mNotification = new Notification();
         assertEquals(expected, mNotification.describeContents());
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "writeToParcel",
-            args = {android.os.Parcel.class, int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "Notification",
-            args = {android.os.Parcel.class}
-        )
-    })
     public void testWriteToParcel() {
         mNotification = new Notification();
         mNotification.icon = 0;
@@ -187,12 +150,6 @@ public class NotificationTest extends AndroidTestCase {
         assertNull(result.sound);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "setLatestEventInfo",
-        args = {android.content.Context.class, java.lang.CharSequence.class,
-                java.lang.CharSequence.class, android.app.PendingIntent.class}
-    )
     public void testSetLatestEventInfo() {
         mNotification = new Notification();
         mNotification.icon = 1;
@@ -203,11 +160,6 @@ public class NotificationTest extends AndroidTestCase {
         assertNotNull(mNotification.contentView);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "toString",
-        args = {}
-    )
     public void testToString() {
         mNotification = new Notification();
         assertNotNull(mNotification.toString());

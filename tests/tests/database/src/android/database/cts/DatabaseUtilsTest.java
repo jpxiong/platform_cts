@@ -16,11 +16,6 @@
 
 package android.database.cts;
 
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
-import dalvik.annotation.ToBeFixed;
 
 import android.content.ContentValues;
 import android.content.Context;
@@ -44,7 +39,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintStream;
 
-@TestTargetClass(android.database.DatabaseUtils.class)
 public class DatabaseUtilsTest extends AndroidTestCase {
     private SQLiteDatabase mDatabase;
     private File mDatabaseFile;
@@ -79,11 +73,6 @@ public class DatabaseUtilsTest extends AndroidTestCase {
         super.tearDown();
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "appendEscapedSQLString",
-        args = {java.lang.StringBuilder.class, java.lang.String.class}
-    )
     public void testAppendEscapedSQLString() {
         String expected = "name='Mike'";
         StringBuilder sb = new StringBuilder("name=");
@@ -96,21 +85,11 @@ public class DatabaseUtilsTest extends AndroidTestCase {
         assertEquals(expected, sb.toString());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "sqlEscapeString",
-        args = {java.lang.String.class}
-    )
     public void testSqlEscapeString() {
         String expected = "'Jack'";
         assertEquals(expected, DatabaseUtils.sqlEscapeString("Jack"));
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "appendValueToSql",
-        args = {java.lang.StringBuilder.class, java.lang.Object.class}
-    )
     public void testAppendValueToSql() {
         String expected = "address='LA'";
         StringBuilder sb = new StringBuilder("address=");
@@ -128,11 +107,6 @@ public class DatabaseUtilsTest extends AndroidTestCase {
         assertEquals(expected, sb.toString());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "bindObjectToProgram",
-        args = {android.database.sqlite.SQLiteProgram.class, int.class, java.lang.Object.class}
-    )
     public void testBindObjectToProgram() {
         String name = "Mike";
         int age = 21;
@@ -161,12 +135,6 @@ public class DatabaseUtilsTest extends AndroidTestCase {
         assertEquals(address, cursor.getString(3));
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "createDbFromSqlStatements",
-        args = {android.content.Context.class, java.lang.String.class, int.class,
-                java.lang.String.class}
-    )
     public void testCreateDbFromSqlStatements() {
         String dbName = "ExampleName";
         String sqls = "CREATE TABLE " + TABLE_NAME + " (_id INTEGER PRIMARY KEY, name TEXT);\n"
@@ -186,12 +154,6 @@ public class DatabaseUtilsTest extends AndroidTestCase {
         getContext().deleteDatabase(dbName);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "cursorDoubleToContentValues",
-        args = {android.database.Cursor.class, java.lang.String.class,
-                android.content.ContentValues.class, java.lang.String.class}
-    )
     public void testCursorDoubleToContentValues() {
         mDatabase.execSQL("INSERT INTO " + TABLE_NAME + " (name, age, address)" +
                 " VALUES ('Mike', '20', 'LA');");
@@ -212,13 +174,6 @@ public class DatabaseUtilsTest extends AndroidTestCase {
         assertEquals(0.0, contentValues.getAsDouble(key));
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "cursorDoubleToCursorValues",
-        args = {android.database.Cursor.class, java.lang.String.class,
-                android.content.ContentValues.class}
-    )
-    @ToBeFixed(bug = "1586458", explanation = "It's probably a typo.")
     public void testCursorDoubleToCursorValues() {
         mDatabase.execSQL("INSERT INTO " + TABLE_NAME + " (name, age, address)" +
                 " VALUES ('Mike', '20', 'LA');");
@@ -238,20 +193,6 @@ public class DatabaseUtilsTest extends AndroidTestCase {
         assertEquals(0.0, contentValues.getAsDouble("name"));
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "cursorIntToContentValues",
-            args = {android.database.Cursor.class, java.lang.String.class,
-                    android.content.ContentValues.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "cursorIntToContentValues",
-            args = {android.database.Cursor.class, java.lang.String.class,
-                    android.content.ContentValues.class, java.lang.String.class}
-        )
-    })
     public void testCursorIntToContentValues() {
         mDatabase.execSQL("INSERT INTO " + TABLE_NAME + " (name, age, address)" +
                 " VALUES ('Mike', '20', 'LA');");
@@ -281,20 +222,6 @@ public class DatabaseUtilsTest extends AndroidTestCase {
         assertEquals(Integer.valueOf(0), contentValues.getAsInteger("name"));
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "cursorLongToContentValues",
-            args = {android.database.Cursor.class, java.lang.String.class,
-                    android.content.ContentValues.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "cursorLongToContentValues",
-            args = {android.database.Cursor.class, java.lang.String.class,
-                    android.content.ContentValues.class, java.lang.String.class}
-        )
-    })
     public void testcursorLongToContentValues() {
         mDatabase.execSQL("INSERT INTO " + TABLE_NAME + " (name, age, address)" +
                 " VALUES ('Mike', '20', 'LA');");
@@ -324,11 +251,6 @@ public class DatabaseUtilsTest extends AndroidTestCase {
         assertEquals(Long.valueOf(0), contentValues.getAsLong("name"));
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "cursorRowToContentValues",
-        args = {android.database.Cursor.class, android.content.ContentValues.class}
-    )
     public void testCursorRowToContentValues() {
         mDatabase.execSQL("INSERT INTO " + TABLE_NAME + " (name, age, address)" +
                 " VALUES ('Mike', '20', 'LA');");
@@ -344,20 +266,6 @@ public class DatabaseUtilsTest extends AndroidTestCase {
         assertEquals("LA", (String) contentValues.get("address"));
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "cursorStringToContentValues",
-            args = {android.database.Cursor.class, java.lang.String.class,
-                    android.content.ContentValues.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "cursorStringToContentValues",
-            args = {android.database.Cursor.class, java.lang.String.class,
-                    android.content.ContentValues.class, java.lang.String.class}
-        )
-    })
     public void testCursorStringToContentValues() {
         mDatabase.execSQL("INSERT INTO " + TABLE_NAME + " (name, age, address)" +
                 " VALUES ('Mike', '20', 'LA');");
@@ -397,12 +305,6 @@ public class DatabaseUtilsTest extends AndroidTestCase {
         assertEquals("Mike", contentValues.get("name"));
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "cursorStringToInsertHelper",
-        args = {android.database.Cursor.class, java.lang.String.class,
-                android.database.DatabaseUtils.InsertHelper.class, int.class}
-    )
     public void testCursorStringToInsertHelper() {
         // create a new table.
         mDatabase.execSQL("CREATE TABLE test_copy (_id INTEGER PRIMARY KEY, " +
@@ -434,28 +336,6 @@ public class DatabaseUtilsTest extends AndroidTestCase {
         assertEquals("LA", cursor.getString(3));
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "dumpCurrentRow",
-            args = {android.database.Cursor.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "dumpCurrentRow",
-            args = {android.database.Cursor.class, java.io.PrintStream.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "dumpCurrentRow",
-            args = {android.database.Cursor.class, java.lang.StringBuilder.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "dumpCurrentRowToString",
-            args = {android.database.Cursor.class}
-        )
-    })
     public void testDumpCurrentRow() {
         mDatabase.execSQL("INSERT INTO " + TABLE_NAME + " (name, age, address)" +
                 " VALUES ('Mike', '20', 'LA');");
@@ -481,28 +361,6 @@ public class DatabaseUtilsTest extends AndroidTestCase {
         assertEquals(expected, DatabaseUtils.dumpCurrentRowToString(cursor));
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "dumpCursor",
-            args = {android.database.Cursor.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "dumpCursor",
-            args = {android.database.Cursor.class, java.io.PrintStream.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "dumpCursor",
-            args = {android.database.Cursor.class, java.lang.StringBuilder.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "dumpCursorToString",
-            args = {android.database.Cursor.class}
-        )
-    })
     public void testDumpCursor() {
         mDatabase.execSQL("INSERT INTO " + TABLE_NAME + " (name, age, address)" +
                 " VALUES ('Mike', '20', 'LA');");
@@ -546,18 +404,6 @@ public class DatabaseUtilsTest extends AndroidTestCase {
         assertEquals(pos, cursor.getPosition()); // dumpCursor should not change status of cursor
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getCollationKey",
-            args = {java.lang.String.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getHexCollationKey",
-            args = {java.lang.String.class}
-        )
-    })
     public void testCollationKey() {
         String key1 = DatabaseUtils.getCollationKey("abc");
         String key2 = DatabaseUtils.getCollationKey("ABC");
@@ -574,19 +420,6 @@ public class DatabaseUtilsTest extends AndroidTestCase {
         assertFalse(key1.equals(key3));
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "longForQuery",
-            args = {android.database.sqlite.SQLiteDatabase.class, java.lang.String.class,
-                    java.lang.String[].class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "longForQuery",
-            args = {android.database.sqlite.SQLiteStatement.class, java.lang.String[].class}
-        )
-    })
     public void testLongForQuery() {
         mDatabase.execSQL("INSERT INTO " + TABLE_NAME + " (name, age, address)" +
                 " VALUES ('Mike', '20', 'LA');");
@@ -626,25 +459,6 @@ public class DatabaseUtilsTest extends AndroidTestCase {
         statement.close();
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "queryNumEntries",
-            args = {android.database.sqlite.SQLiteDatabase.class, java.lang.String.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "queryNumEntries",
-            args = {android.database.sqlite.SQLiteDatabase.class, java.lang.String.class,
-                    java.lang.String.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "queryNumEntries",
-            args = {android.database.sqlite.SQLiteDatabase.class, java.lang.String.class,
-                    java.lang.String.class, java.lang.String[].class}
-        )
-    })
     public void testQueryNumEntries() {
         assertEquals(0, DatabaseUtils.queryNumEntries(mDatabase, TABLE_NAME));
 
@@ -676,23 +490,6 @@ public class DatabaseUtilsTest extends AndroidTestCase {
         }
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "readExceptionFromParcel",
-            args = {android.os.Parcel.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "writeExceptionToParcel",
-            args = {android.os.Parcel.class, java.lang.Exception.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "readExceptionWithFileNotFoundExceptionFromParcel",
-            args = {android.os.Parcel.class}
-        )
-    })
     public void testExceptionFromParcel() {
         Parcel parcel = Parcel.obtain();
         DatabaseUtils.writeExceptionToParcel(parcel, new IllegalArgumentException());
@@ -735,19 +532,6 @@ public class DatabaseUtilsTest extends AndroidTestCase {
         }
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "stringForQuery",
-            args = {android.database.sqlite.SQLiteDatabase.class, java.lang.String.class,
-                    java.lang.String[].class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "stringForQuery",
-            args = {android.database.sqlite.SQLiteStatement.class, java.lang.String[].class}
-        )
-    })
     public void testStringForQuery() {
         mDatabase.execSQL("INSERT INTO " + TABLE_NAME + " (name, age, address)" +
                 " VALUES ('Mike', '20', 'LA');");
@@ -783,19 +567,6 @@ public class DatabaseUtilsTest extends AndroidTestCase {
         statement.close();
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "blobFileDescriptorForQuery",
-            args = {android.database.sqlite.SQLiteDatabase.class, java.lang.String.class,
-                    java.lang.String[].class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "blobFileDescriptorForQuery",
-            args = {android.database.sqlite.SQLiteStatement.class, java.lang.String[].class}
-        )
-    })
     public void testBlobFileDescriptorForQuery() throws Exception {
         String data1 = "5300FEFF";
         String data2 = "DECAFBAD";

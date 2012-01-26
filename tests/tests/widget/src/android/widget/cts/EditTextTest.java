@@ -30,13 +30,7 @@ import android.widget.TextView.BufferType;
 
 import com.android.cts.stub.R;
 
-import dalvik.annotation.TestTargets;
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.ToBeFixed;
 
-@TestTargetClass(EditText.class)
 public class EditTextTest extends AndroidTestCase {
     private Context mContext;
     private AttributeSet mAttributeSet;
@@ -50,30 +44,6 @@ public class EditTextTest extends AndroidTestCase {
         mAttributeSet = Xml.asAttributeSet(parser);
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test constructor(s) of {@link EditText}",
-            method = "EditText",
-            args = {android.content.Context.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test constructor(s) of {@link EditText}",
-            method = "EditText",
-            args = {android.content.Context.class, android.util.AttributeSet.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test constructor(s) of {@link EditText}",
-            method = "EditText",
-            args = {android.content.Context.class, android.util.AttributeSet.class, int.class}
-        )
-    })
-    @ToBeFixed(bug="1417734", explanation="EditText#EditText(Context), " +
-            "EditText#EditText(Context, AttributeSet) and " +
-            "EditText#EditText(Context, AttributeSet, int)" +
-            " should check whether the input Context is null")
     public void testConstructor() {
         new EditText(mContext);
 
@@ -104,18 +74,6 @@ public class EditTextTest extends AndroidTestCase {
         }
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getText",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setText",
-            args = {java.lang.CharSequence.class, android.widget.TextView.BufferType.class}
-        )
-    })
     public void testAccessText() {
         EditText editText = new EditText(mContext, mAttributeSet);
 
@@ -129,12 +87,6 @@ public class EditTextTest extends AndroidTestCase {
         assertEquals("", editText.getText().toString());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test {@link EditText#setSelection(int)}",
-        method = "setSelection",
-        args = {int.class}
-    )
     public void testSetSelectionIndex() {
         EditText editText = new EditText(mContext, mAttributeSet);
 
@@ -165,12 +117,6 @@ public class EditTextTest extends AndroidTestCase {
         }
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test {@link EditText#setSelection(int, int)}",
-        method = "setSelection",
-        args = {int.class, int.class}
-    )
     public void testSetSelectionStartstop() {
         EditText editText = new EditText(mContext, mAttributeSet);
 
@@ -209,12 +155,6 @@ public class EditTextTest extends AndroidTestCase {
         }
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test {@link EditText#selectAll()}",
-        method = "selectAll",
-        args = {}
-    )
     public void testSelectAll() {
         EditText editText = new EditText(mContext, mAttributeSet);
 
@@ -235,12 +175,6 @@ public class EditTextTest extends AndroidTestCase {
         assertEquals(0, editText.getSelectionEnd());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test {@link EditText#extendSelection(int)}",
-        method = "extendSelection",
-        args = {int.class}
-    )
     public void testExtendSelection() {
         EditText editText = new EditText(mContext, mAttributeSet);
 
@@ -272,24 +206,12 @@ public class EditTextTest extends AndroidTestCase {
         }
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test {@link EditText#getDefaultEditable()}, this function always returns true",
-        method = "getDefaultEditable",
-        args = {}
-    )
     public void testGetDefaultEditable() {
         MockEditText mockEditText = new MockEditText(mContext, mAttributeSet);
 
         assertTrue(mockEditText.getDefaultEditable());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "{@link EditText#getDefaultMovementMethod()}",
-        method = "getDefaultMovementMethod",
-        args = {}
-    )
     public void testGetDefaultMovementMethod() {
         MockEditText mockEditText = new MockEditText(mContext, mAttributeSet);
         MovementMethod method1 = mockEditText.getDefaultMovementMethod();
@@ -301,14 +223,6 @@ public class EditTextTest extends AndroidTestCase {
         assertSame(method1, method2);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "test {@link EditText#setEllipsize(TextUtils.TruncateAt)}",
-        method = "setEllipsize",
-        args = {android.text.TextUtils.TruncateAt.class}
-    )
-    @ToBeFixed(bug = "1417734", explanation = "should add @throws clause into javadoc of " +
-            "EditText#setEllipsize(TextUtils.TruncateAt)")
     public void testSetEllipsize() {
         EditText editText = new EditText(mContext);
         assertNull(editText.getEllipsize());

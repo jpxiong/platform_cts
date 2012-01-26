@@ -16,17 +16,12 @@
 
 package android.hardware.cts;
 
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
 
 import android.hardware.GeomagneticField;
 import android.test.AndroidTestCase;
 
 import java.util.GregorianCalendar;
 
-@TestTargetClass(GeomagneticField.class)
 public class GeomagneticFieldTest extends AndroidTestCase {
     // Chengdu: Latitude 30d 40' 12", Longitude 104d 3' 36"
     private static final float LATITUDE_OF_CHENGDU = 30.67f;
@@ -34,48 +29,6 @@ public class GeomagneticFieldTest extends AndroidTestCase {
     private static final float ALTITUDE_OF_CHENGDU = 500f;
     private static final long TEST_TIME = new GregorianCalendar(2010, 5, 1).getTimeInMillis();
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "GeomagneticField",
-            args = {float.class, float.class, float.class, long.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getDeclination",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getInclination",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getFieldStrength",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getHorizontalStrength",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getX",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getY",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getZ",
-            args = {}
-        )
-    })
     public void testGeomagneticField() {
         GeomagneticField geomagneticField = new GeomagneticField(LATITUDE_OF_CHENGDU,
                 LONGITUDE_OF_CHENGDU, ALTITUDE_OF_CHENGDU, TEST_TIME);

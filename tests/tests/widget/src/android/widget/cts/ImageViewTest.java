@@ -46,16 +46,10 @@ import android.widget.ImageView.ScaleType;
 
 import com.android.cts.stub.R;
 
-import dalvik.annotation.TestTargets;
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.ToBeFixed;
 
 /**
  * Test {@link ImageView}.
  */
-@TestTargetClass(ImageView.class)
 public class ImageViewTest extends ActivityInstrumentationTestCase<ImageViewStubActivity> {
     private ImageView mImageView;
     private Activity mActivity;
@@ -109,29 +103,6 @@ public class ImageViewTest extends ActivityInstrumentationTestCase<ImageViewStub
         mActivity = getActivity();
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test constructor(s) of {@link ImageView}",
-            method = "ImageView",
-            args = {android.content.Context.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test constructor(s) of {@link ImageView}",
-            method = "ImageView",
-            args = {android.content.Context.class, android.util.AttributeSet.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test constructor(s) of {@link ImageView}",
-            method = "ImageView",
-            args = {android.content.Context.class, android.util.AttributeSet.class, int.class}
-        )
-    })
-    @ToBeFixed(bug = "1417734", explanation = "ImageView#ImageView(Context, AttributeSet) and " +
-            "ImageView#ImageView(Context, AttributeSet, int)" +
-            " should check whether the input Context is null")
     public void testConstructor() {
         new ImageView(mActivity);
 
@@ -157,24 +128,11 @@ public class ImageViewTest extends ActivityInstrumentationTestCase<ImageViewStub
         }
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test {@link ImageView#invalidateDrawable(Drawable)}",
-        method = "invalidateDrawable",
-        args = {android.graphics.drawable.Drawable.class}
-    )
-    @ToBeFixed(bug="1400249", explanation="It will be tested by functional test.")
     public void testInvalidateDrawable() {
         ImageView imageView = new ImageView(mActivity);
         imageView.invalidateDrawable(null);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test {@link ImageView#setAdjustViewBounds(boolean)}",
-        method = "setAdjustViewBounds",
-        args = {boolean.class}
-    )
     public void testSetAdjustViewBounds() {
         ImageView imageView = new ImageView(mActivity);
         imageView.setScaleType(ScaleType.FIT_XY);
@@ -186,38 +144,18 @@ public class ImageViewTest extends ActivityInstrumentationTestCase<ImageViewStub
         assertEquals(ScaleType.FIT_CENTER, imageView.getScaleType());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test {@link ImageView#setMaxWidth(int)}",
-        method = "setMaxWidth",
-        args = {int.class}
-    )
-    @ToBeFixed(bug="1400249", explanation="It will be tested by functional test.")
     public void testSetMaxWidth() {
         ImageView imageView = new ImageView(mActivity);
         imageView.setMaxWidth(120);
         imageView.setMaxWidth(-1);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test {@link ImageView#setMaxHeight(int)}",
-        method = "setMaxHeight",
-        args = {int.class}
-    )
-    @ToBeFixed(bug="1400249", explanation="It will be tested by functional test.")
     public void testSetMaxHeight() {
         ImageView imageView = new ImageView(mActivity);
         imageView.setMaxHeight(120);
         imageView.setMaxHeight(-1);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test {@link ImageView#getDrawable()}",
-        method = "getDrawable",
-        args = {}
-    )
     public void testGetDrawable() {
         final ImageView imageView = new ImageView(mActivity);
         final PaintDrawable drawable1 = new PaintDrawable();
@@ -230,12 +168,6 @@ public class ImageViewTest extends ActivityInstrumentationTestCase<ImageViewStub
         assertNotSame(drawable2, imageView.getDrawable());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test {@link ImageView#setImageResource(int)}",
-        method = "setImageResource",
-        args = {int.class}
-    )
     @UiThreadTest
     public void testSetImageResource() {
         mImageView = findImageViewById(R.id.imageview);
@@ -252,12 +184,6 @@ public class ImageViewTest extends ActivityInstrumentationTestCase<ImageViewStub
         WidgetTestUtils.assertEquals(testimageBitmap.getBitmap(), imageViewBitmap.getBitmap());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test {@link ImageView#setImageURI(Uri)}",
-        method = "setImageURI",
-        args = {android.net.Uri.class}
-    )
     @UiThreadTest
     public void testSetImageURI() {
         mImageView = findImageViewById(R.id.imageview);
@@ -285,12 +211,6 @@ public class ImageViewTest extends ActivityInstrumentationTestCase<ImageViewStub
         WidgetTestUtils.assertEquals(testimageBitmap, imageViewBitmap.getBitmap());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test {@link ImageView#setImageDrawable(Drawable)}",
-        method = "setImageDrawable",
-        args = {android.graphics.drawable.Drawable.class}
-    )
     @UiThreadTest
     public void testSetImageDrawable() {
         mImageView = findImageViewById(R.id.imageview);
@@ -308,12 +228,6 @@ public class ImageViewTest extends ActivityInstrumentationTestCase<ImageViewStub
         WidgetTestUtils.assertEquals(testimageBitmap.getBitmap(), imageViewBitmap.getBitmap());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test {@link ImageView#setImageBitmap(Bitmap)}",
-        method = "setImageBitmap",
-        args = {android.graphics.Bitmap.class}
-    )
     @UiThreadTest
     public void testSetImageBitmap() {
         mImageView = findImageViewById(R.id.imageview);
@@ -332,12 +246,6 @@ public class ImageViewTest extends ActivityInstrumentationTestCase<ImageViewStub
         WidgetTestUtils.assertEquals(bitmap, imageViewBitmap.getBitmap());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test {@link ImageView#setImageState(int[], boolean)}",
-        method = "setImageState",
-        args = {int[].class, boolean.class}
-    )
     public void testSetImageState() {
         mImageView = new ImageView(mActivity);
         int[] state = new int[8];
@@ -345,12 +253,6 @@ public class ImageViewTest extends ActivityInstrumentationTestCase<ImageViewStub
         assertSame(state, mImageView.onCreateDrawableState(0));
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test {@link ImageView#setSelected(boolean)}",
-        method = "setSelected",
-        args = {boolean.class}
-    )
     public void testSetSelected() {
         mImageView = new ImageView(mActivity);
         assertFalse(mImageView.isSelected());
@@ -362,12 +264,6 @@ public class ImageViewTest extends ActivityInstrumentationTestCase<ImageViewStub
         assertFalse(mImageView.isSelected());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test {@link ImageView#setImageLevel(int)}",
-        method = "setImageLevel",
-        args = {int.class}
-    )
     public void testSetImageLevel() {
         PaintDrawable drawable = new PaintDrawable();
         drawable.setLevel(0);
@@ -378,18 +274,6 @@ public class ImageViewTest extends ActivityInstrumentationTestCase<ImageViewStub
         assertEquals(1, drawable.getLevel());
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setScaleType",
-            args = {android.widget.ImageView.ScaleType.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getScaleType",
-            args = {}
-        )
-    })
     public void testAccessScaleType() {
         final ImageView imageView = new ImageView(mActivity);
 
@@ -419,18 +303,6 @@ public class ImageViewTest extends ActivityInstrumentationTestCase<ImageViewStub
         assertEquals(ImageView.ScaleType.CENTER_INSIDE, imageView.getScaleType());
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setImageMatrix",
-            args = {android.graphics.Matrix.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getImageMatrix",
-            args = {}
-        )
-    })
     public void testAccessImageMatrix() {
         final ImageView imageView = new ImageView(mActivity);
 
@@ -442,23 +314,11 @@ public class ImageViewTest extends ActivityInstrumentationTestCase<ImageViewStub
         assertEquals(matrix, imageView.getImageMatrix());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test {@link ImageView#getBaseline()}",
-        method = "getBaseline",
-        args = {}
-    )
     public void testGetBaseline() {
         final ImageView imageView = new ImageView(mActivity);
         assertEquals(-1, imageView.getBaseline());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test {@link ImageView#setColorFilter(int, Mode)}",
-        method = "setColorFilter",
-        args = {int.class, android.graphics.PorterDuff.Mode.class}
-    )
     public void testSetColorFilter1() {
         MockDrawable drawable = new MockDrawable();
 
@@ -471,12 +331,6 @@ public class ImageViewTest extends ActivityInstrumentationTestCase<ImageViewStub
         assertNotNull(drawable.getColorFilter());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test {@link ImageView#clearColorFilter()}",
-        method = "clearColorFilter",
-        args = {}
-    )
     public void testClearColorFilter() {
         MockDrawable drawable = new MockDrawable();
         ColorFilter cf = new ColorFilter();
@@ -489,12 +343,6 @@ public class ImageViewTest extends ActivityInstrumentationTestCase<ImageViewStub
         assertNull(drawable.getColorFilter());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test {@link ImageView#setColorFilter(ColorFilter)}",
-        method = "setColorFilter",
-        args = {android.graphics.ColorFilter.class}
-    )
     public void testSetColorFilter2() {
         MockDrawable drawable = new MockDrawable();
 
@@ -508,12 +356,6 @@ public class ImageViewTest extends ActivityInstrumentationTestCase<ImageViewStub
         assertSame(cf, drawable.getColorFilter());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test {@link ImageView#setAlpha(int)}",
-        method = "setAlpha",
-        args = {int.class}
-    )
     public void testSetAlpha() {
         MockDrawable drawable = new MockDrawable();
 
@@ -526,12 +368,6 @@ public class ImageViewTest extends ActivityInstrumentationTestCase<ImageViewStub
         assertEquals(255, drawable.getAlpha());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test {@link ImageView#drawableStateChanged()}",
-        method = "drawableStateChanged",
-        args = {}
-    )
     public void testDrawableStateChanged() {
         MockImageView mockImageView = new MockImageView(mActivity);
         MockDrawable drawable = new MockDrawable();
@@ -542,13 +378,6 @@ public class ImageViewTest extends ActivityInstrumentationTestCase<ImageViewStub
         assertSame(mockImageView.getDrawableState(), drawable.getState());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test {@link ImageView#onCreateDrawableState(int)}",
-        method = "onCreateDrawableState",
-        args = {int.class}
-    )
-    @ToBeFixed(bug = "1417734", explanation = "IndexOutOfBoundsException is not expected.")
     public void testOnCreateDrawableState() {
         MockImageView mockImageView = new MockImageView(mActivity);
 
@@ -566,12 +395,6 @@ public class ImageViewTest extends ActivityInstrumentationTestCase<ImageViewStub
         }
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test {@link ImageView#onDraw(Canvas)}",
-        method = "onDraw",
-        args = {android.graphics.Canvas.class}
-    )
     public void testOnDraw() {
         MockImageView mockImageView = new MockImageView(mActivity);
         MockDrawable drawable = new MockDrawable();
@@ -580,12 +403,6 @@ public class ImageViewTest extends ActivityInstrumentationTestCase<ImageViewStub
         assertTrue(drawable.hasDrawCalled());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test {@link ImageView#onMeasure(int, int)}",
-        method = "onMeasure",
-        args = {int.class, int.class}
-    )
     public void testOnMeasure() {
         mImageView = findImageViewById(R.id.imageview);
         mImageView.measure(200, 150);
@@ -593,12 +410,6 @@ public class ImageViewTest extends ActivityInstrumentationTestCase<ImageViewStub
         assertTrue(mImageView.getMeasuredHeight() <= 150);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test {@link ImageView#onSetAlpha(int)}",
-        method = "onSetAlpha",
-        args = {int.class}
-    )
     public void testOnSetAlpha() {
         MockImageView mockImageView = new MockImageView(mActivity);
         assertTrue(mockImageView.onSetAlpha(0));
@@ -607,12 +418,6 @@ public class ImageViewTest extends ActivityInstrumentationTestCase<ImageViewStub
         assertFalse(mockImageView.onSetAlpha(0));
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test {@link ImageView#setFrame(int, int, int, int)}",
-        method = "setFrame",
-        args = {int.class, int.class, int.class, int.class}
-    )
     public void testSetFrame() {
         MockImageView mockImageView = new MockImageView(mActivity);
         assertFalse(mockImageView.hasOnSizeChangedCalled());
@@ -628,12 +433,6 @@ public class ImageViewTest extends ActivityInstrumentationTestCase<ImageViewStub
         assertFalse(mockImageView.hasOnSizeChangedCalled());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test {@link ImageView#verifyDrawable(Drawable)}",
-        method = "verifyDrawable",
-        args = {android.graphics.drawable.Drawable.class}
-    )
     public void testVerifyDrawable() {
         MockImageView mockImageView = new MockImageView(mActivity);
         MockDrawable drawable = new MockDrawable();

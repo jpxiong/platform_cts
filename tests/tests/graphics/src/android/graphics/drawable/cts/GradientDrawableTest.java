@@ -18,11 +18,6 @@ package android.graphics.drawable.cts;
 
 import com.android.cts.stub.R;
 
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
-import dalvik.annotation.ToBeFixed;
 
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
@@ -40,20 +35,7 @@ import android.util.Xml;
 
 import java.io.IOException;
 
-@TestTargetClass(android.graphics.drawable.GradientDrawable.class)
 public class GradientDrawableTest extends AndroidTestCase {
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "GradientDrawable",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "GradientDrawable",
-            args = {android.graphics.drawable.GradientDrawable.Orientation.class, int[].class}
-        )
-    })
     public void testConstructor() {
         int[] color = new int[] {1, 2, 3};
 
@@ -62,14 +44,6 @@ public class GradientDrawableTest extends AndroidTestCase {
         new GradientDrawable(null, null);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "setCornerRadii",
-        args = {float[].class}
-    )
-    @ToBeFixed(bug = "", explanation = "can not assert, because GradientState is package" +
-            " protected, this method change the GradientState field," +
-            " but we can not get it to assert.")
     public void testSetCornerRadii() {
         float[] radii = new float[] {1.0f, 2.0f, 3.0f};
 
@@ -83,14 +57,6 @@ public class GradientDrawableTest extends AndroidTestCase {
         gradientDrawable.setCornerRadii(null);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "setCornerRadius",
-        args = {float.class}
-    )
-    @ToBeFixed(bug = "", explanation = "can not assert, because GradientState is package" +
-            " protected, this method change the GradientState field," +
-            " but we can not get it to assert.")
     public void testSetCornerRadius() {
         GradientDrawable gradientDrawable = new GradientDrawable();
 
@@ -98,14 +64,6 @@ public class GradientDrawableTest extends AndroidTestCase {
         gradientDrawable.setCornerRadius(-2.5f);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "setStroke",
-        args = {int.class, int.class}
-    )
-    @ToBeFixed(bug = "", explanation = "can not assert, because GradientState is package" +
-            " protected, this method change the GradientState field," +
-            " but we can not get it to assert.")
     public void testSetStroke() {
         GradientDrawable gradientDrawable = new GradientDrawable();
 
@@ -113,14 +71,6 @@ public class GradientDrawableTest extends AndroidTestCase {
         gradientDrawable.setStroke(-2, -3);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "setStroke",
-        args = {int.class, int.class, float.class, float.class}
-    )
-    @ToBeFixed(bug = "", explanation = "can not assert, because GradientState is package" +
-            " protected, this method change the GradientState field," +
-            " but we can not get it to assert.")
     public void testSetStroke1() {
         int width = 2;
         int color = 3;
@@ -137,11 +87,6 @@ public class GradientDrawableTest extends AndroidTestCase {
         gradientDrawable.setStroke(width, color, dashWidth, dashGap);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "setSize",
-        args = {int.class, int.class}
-    )
     public void testSetSize() {
         GradientDrawable gradientDrawable = new GradientDrawable();
         gradientDrawable.setSize(6, 4);
@@ -161,14 +106,6 @@ public class GradientDrawableTest extends AndroidTestCase {
         assertEquals(Integer.MIN_VALUE, gradientDrawable.getIntrinsicHeight());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "setShape",
-        args = {int.class}
-    )
-    @ToBeFixed(bug = "", explanation = "can not assert, because GradientState is package" +
-            " protected, this method change the GradientState field," +
-            " but we can not get it to assert.")
     public void testSetShape() {
         GradientDrawable gradientDrawable = new GradientDrawable();
 
@@ -179,14 +116,6 @@ public class GradientDrawableTest extends AndroidTestCase {
         gradientDrawable.setShape(Integer.MIN_VALUE);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "setGradientType",
-        args = {int.class}
-    )
-    @ToBeFixed(bug = "", explanation = "can not assert, because GradientState is package" +
-            " protected, this method change the GradientState field," +
-            " but we can not get it to assert.")
     public void testSetGradientType() {
         GradientDrawable gradientDrawable = new GradientDrawable();
 
@@ -197,14 +126,6 @@ public class GradientDrawableTest extends AndroidTestCase {
         gradientDrawable.setGradientType(Integer.MIN_VALUE);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "setGradientCenter",
-        args = {float.class, float.class}
-    )
-    @ToBeFixed(bug = "", explanation = "can not assert, because GradientState is package" +
-            " protected, this method change the GradientState field," +
-            " but we can not get it to assert.")
     public void testSetGradientCenter() {
         GradientDrawable gradientDrawable = new GradientDrawable();
 
@@ -212,14 +133,6 @@ public class GradientDrawableTest extends AndroidTestCase {
         gradientDrawable.setGradientCenter(-3.4f, -5.5f);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "setGradientRadius",
-        args = {float.class}
-    )
-    @ToBeFixed(bug = "", explanation = "can not assert, because GradientState is package" +
-            " protected, this method change the GradientState field," +
-            " but we can not get it to assert.")
     public void testSetGradientRadius() {
         GradientDrawable gradientDrawable = new GradientDrawable();
 
@@ -227,14 +140,6 @@ public class GradientDrawableTest extends AndroidTestCase {
         gradientDrawable.setGradientRadius(-3.6f);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "setUseLevel",
-        args = {boolean.class}
-    )
-    @ToBeFixed(bug = "", explanation = "can not assert, because GradientState is package" +
-            " protected, this method change the GradientState field," +
-            " but we can not get it to assert.")
     public void testSetUseLevel() {
         GradientDrawable gradientDrawable = new GradientDrawable();
 
@@ -242,12 +147,6 @@ public class GradientDrawableTest extends AndroidTestCase {
         gradientDrawable.setUseLevel(false);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "draw",
-        args = {android.graphics.Canvas.class}
-    )
-    @ToBeFixed(bug = "", explanation = "can not assert.")
     public void testDraw() {
         GradientDrawable gradientDrawable = new GradientDrawable();
         Canvas c = new Canvas();
@@ -257,14 +156,6 @@ public class GradientDrawableTest extends AndroidTestCase {
         gradientDrawable.draw(null);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "setColor",
-        args = {int.class}
-    )
-    @ToBeFixed(bug = "", explanation = "can not assert, because GradientState is package" +
-            " protected, this method change the GradientState field," +
-            " but we can not get it to assert.")
     public void testSetColor() {
         GradientDrawable gradientDrawable = new GradientDrawable();
 
@@ -275,11 +166,6 @@ public class GradientDrawableTest extends AndroidTestCase {
         gradientDrawable.setColor(Integer.MIN_VALUE);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "getChangingConfigurations",
-        args = {}
-    )
     public void testGetChangingConfigurations() {
         GradientDrawable gradientDrawable = new GradientDrawable();
         assertEquals(0, gradientDrawable.getChangingConfigurations());
@@ -291,12 +177,6 @@ public class GradientDrawableTest extends AndroidTestCase {
         assertEquals(-20, gradientDrawable.getChangingConfigurations());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "setAlpha",
-        args = {int.class}
-    )
-    @ToBeFixed(bug = "1386429", explanation = "no getter can not be tested")
     public void testSetAlpha() {
         GradientDrawable gradientDrawable = new GradientDrawable();
 
@@ -304,12 +184,6 @@ public class GradientDrawableTest extends AndroidTestCase {
         gradientDrawable.setAlpha(-1);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "setDither",
-        args = {boolean.class}
-    )
-    @ToBeFixed(bug = "1386429", explanation = "no getter can not be tested")
     public void testSetDither() {
         GradientDrawable gradientDrawable = new GradientDrawable();
 
@@ -317,12 +191,6 @@ public class GradientDrawableTest extends AndroidTestCase {
         gradientDrawable.setDither(false);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "setColorFilter",
-        args = {android.graphics.ColorFilter.class}
-    )
-    @ToBeFixed(bug = "1386429", explanation = "no getter can not be tested")
     public void testSetColorFilter() {
         GradientDrawable gradientDrawable = new GradientDrawable();
         ColorFilter cf = new ColorFilter();
@@ -332,46 +200,15 @@ public class GradientDrawableTest extends AndroidTestCase {
         gradientDrawable.setColorFilter(null);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "getOpacity",
-        args = {}
-    )
     public void testGetOpacity() {
         GradientDrawable gradientDrawable = new GradientDrawable();
         assertEquals(PixelFormat.TRANSLUCENT, gradientDrawable.getOpacity());
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.NOT_NECESSARY,
-            method = "onBoundsChange",
-            args = {android.graphics.Rect.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.NOT_NECESSARY,
-            method = "onLevelChange",
-            args = {int.class}
-        )
-    })
     public void testMethods() {
         // implementation details, do not test.
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "inflate",
-            args = {android.content.res.Resources.class, org.xmlpull.v1.XmlPullParser.class,
-                    android.util.AttributeSet.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getPadding",
-            args = {android.graphics.Rect.class}
-        )
-    })
-    @ToBeFixed(bug = "1695243", explanation = "Android API javadocs are incomplete")
     public void testInflate() throws XmlPullParserException, IOException {
         GradientDrawable gradientDrawable = new GradientDrawable();
         Rect rect = new Rect();
@@ -416,11 +253,6 @@ public class GradientDrawableTest extends AndroidTestCase {
         }
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "getIntrinsicWidth",
-        args = {}
-    )
     public void testGetIntrinsicWidth() {
         GradientDrawable gradientDrawable = new GradientDrawable();
         gradientDrawable.setSize(6, 4);
@@ -430,11 +262,6 @@ public class GradientDrawableTest extends AndroidTestCase {
         assertEquals(-10, gradientDrawable.getIntrinsicWidth());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "getIntrinsicHeight",
-        args = {}
-    )
     public void testGetIntrinsicHeight() {
         GradientDrawable gradientDrawable = new GradientDrawable();
         gradientDrawable.setSize(5, 3);
@@ -444,23 +271,11 @@ public class GradientDrawableTest extends AndroidTestCase {
         assertEquals(-15, gradientDrawable.getIntrinsicHeight());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "getConstantState",
-        args = {}
-    )
-    @ToBeFixed(bug = "", explanation = "can not assert the inner fields, becuase the class" +
-            " GradientState is package protected.")
     public void testGetConstantState() {
         GradientDrawable gradientDrawable = new GradientDrawable();
         assertNotNull(gradientDrawable.getConstantState());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "mutate",
-        args = {}
-    )
     public void testMutate() {
         Resources resources = mContext.getResources();
         GradientDrawable d1 = (GradientDrawable) resources.getDrawable(R.drawable.gradientdrawable);

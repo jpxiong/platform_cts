@@ -18,11 +18,6 @@ package android.text.style.cts;
 
 import com.android.cts.stub.R;
 
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
-import dalvik.annotation.ToBeFixed;
 
 import android.graphics.Canvas;
 import android.graphics.Paint.FontMetricsInt;
@@ -35,23 +30,7 @@ import android.text.StaticLayout;
 import android.text.TextPaint;
 import android.text.style.DrawableMarginSpan;
 
-@TestTargetClass(DrawableMarginSpan.class)
 public class DrawableMarginSpanTest extends AndroidTestCase {
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test constructor(s) of DrawableMarginSpan.",
-            method = "DrawableMarginSpan",
-            args = {android.graphics.drawable.Drawable.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test constructor(s) of DrawableMarginSpan.",
-            method = "DrawableMarginSpan",
-            args = {android.graphics.drawable.Drawable.class, int.class}
-        )
-    })
-    @ToBeFixed(bug = "1695243", explanation = "miss javadoc")
     public void testConstructor() {
         Drawable d = mContext.getResources().getDrawable(R.drawable.pass);
 
@@ -60,13 +39,6 @@ public class DrawableMarginSpanTest extends AndroidTestCase {
         new DrawableMarginSpan(null, -1);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test getLeadingMargin(boolean first). The input parameter is never used.",
-        method = "getLeadingMargin",
-        args = {boolean.class}
-    )
-    @ToBeFixed(bug = "1695243", explanation = "miss javadoc")
     public void testGetLeadingMargin() {
         Drawable drawable = mContext.getResources().getDrawable(R.drawable.scenery);
 
@@ -79,20 +51,6 @@ public class DrawableMarginSpanTest extends AndroidTestCase {
         assertTrue(leadingMargin2 > leadingMargin1);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test drawLeadingMargin(Canvas c, Paint p, int x, int dir, int top," +
-                " int baseline, int bottom, CharSequence text, int start, int end," +
-                " boolean first, Layout layout). And the following parameters are never" +
-                " used in this method: p, top, baseline, bottom, start, end, first",
-        method = "drawLeadingMargin",
-        args = {android.graphics.Canvas.class, android.graphics.Paint.class, int.class,
-                int.class, int.class, int.class, int.class, java.lang.CharSequence.class,
-                int.class, int.class, boolean.class, android.text.Layout.class}
-    )
-    @ToBeFixed(bug = "1695243", explanation = "should add @throws NullPointerException clause" +
-            " into javadoc when input null. And when try to use a String as the text," +
-            " there should not be a ClassCastException")
     public void testDrawLeadingMargin() {
         Drawable drawable = mContext.getResources().getDrawable(R.drawable.scenery);
         DrawableMarginSpan drawableMarginSpan = new DrawableMarginSpan(drawable, 0);
@@ -135,17 +93,6 @@ public class DrawableMarginSpanTest extends AndroidTestCase {
         }
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test chooseHeight(CharSequence text, int start, int end, int istartv," +
-                " int v, FontMetricsInt fm).",
-        method = "chooseHeight",
-        args = {java.lang.CharSequence.class, int.class, int.class, int.class, int.class,
-                android.graphics.Paint.FontMetricsInt.class}
-    )
-    @ToBeFixed(bug = "1695243", explanation = "should add @throws NullPointerException clause" +
-            " into javadoc when input null. And when try to use a String as the text," +
-            " there should not be a ClassCastException")
     public void testChooseHeight() {
         Drawable drawable = mContext.getResources().getDrawable(R.drawable.scenery);
         DrawableMarginSpan drawableMarginSpan = new DrawableMarginSpan(drawable, 0);

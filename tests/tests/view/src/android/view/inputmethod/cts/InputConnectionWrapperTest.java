@@ -16,10 +16,6 @@
 
 package android.view.inputmethod.cts;
 
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
 
 import android.os.Bundle;
 import android.test.AndroidTestCase;
@@ -33,121 +29,8 @@ import android.view.inputmethod.ExtractedTextRequest;
 import android.view.inputmethod.InputConnection;
 import android.view.inputmethod.InputConnectionWrapper;
 
-@TestTargetClass(InputConnectionWrapper.class)
 public class InputConnectionWrapperTest extends AndroidTestCase {
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "InputConnectionWrapper",
-            args = {InputConnection.class, boolean.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setTarget",
-            args = {InputConnection.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "beginBatchEdit",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "commitCompletion",
-            args = {CompletionInfo.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "endBatchEdit",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getExtractedText",
-            args = {ExtractedTextRequest.class, int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "performContextMenuAction",
-            args = {int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "performEditorAction",
-            args = {int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "performPrivateCommand",
-            args = {String.class, Bundle.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setSelection",
-            args = {int.class, int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getTextAfterCursor",
-            args = {int.class, int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getTextBeforeCursor",
-            args = {int.class, int.class}
-        ),
-        @TestTargetNew(
-                level = TestLevel.COMPLETE,
-                method = "getSelectedText",
-                args = {int.class}
-            ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getCursorCapsMode",
-            args = {int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "clearMetaKeyStates",
-            args = {int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "commitText",
-            args = {CharSequence.class, int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "deleteSurroundingText",
-            args = {int.class, int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "finishComposingText",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setComposingText",
-            args = {CharSequence.class, int.class}
-        ),
-        @TestTargetNew(
-                level = TestLevel.COMPLETE,
-                method = "setComposingRegion",
-                args = {int.class, int.class}
-            ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "sendKeyEvent",
-            args = {KeyEvent.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "reportFullscreenMode",
-            args = {boolean.class}
-        )
-    })
     public void testInputConnectionWrapper() {
         MockInputConnection inputConnection = new MockInputConnection();
         InputConnectionWrapper wrapper = new InputConnectionWrapper(null, true);

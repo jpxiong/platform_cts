@@ -18,11 +18,6 @@ package android.content.cts;
 
 import com.android.cts.stub.R;
 
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
-import dalvik.annotation.ToBeFixed;
 
 import android.content.ActivityNotFoundException;
 import android.content.BroadcastReceiver;
@@ -59,7 +54,6 @@ import java.util.List;
 /**
  * Test {@link ContextWrapper}.
  */
-@TestTargetClass(ContextWrapper.class)
 public class ContextWrapperTest extends AndroidTestCase {
     private static final String PERMISSION_HARDWARE_TEST = "android.permission.HARDWARE_TEST";
 
@@ -131,11 +125,6 @@ public class ContextWrapperTest extends AndroidTestCase {
         mRegisteredReceiverList.add(receiver);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "ContextWrapper",
-        args = {android.content.Context.class}
-    )
     public void testConstructor() {
         new ContextWrapper(mContext);
 
@@ -143,11 +132,6 @@ public class ContextWrapperTest extends AndroidTestCase {
         new ContextWrapper(null);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "enforceCallingPermission",
-        args = {String.class, String.class}
-    )
     public void testEnforceCallingPermission() {
         try {
             mContextWrapper.enforceCallingPermission(
@@ -159,11 +143,6 @@ public class ContextWrapperTest extends AndroidTestCase {
         }
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "sendOrderedBroadcast",
-        args = {android.content.Intent.class, java.lang.String.class}
-    )
     public void testSendOrderedBroadcast1() throws InterruptedException {
         final HighPriorityBroadcastReceiver highPriorityReceiver =
                 new HighPriorityBroadcastReceiver();
@@ -197,13 +176,6 @@ public class ContextWrapperTest extends AndroidTestCase {
         }.run();
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "sendOrderedBroadcast",
-        args = {android.content.Intent.class, java.lang.String.class,
-                android.content.BroadcastReceiver.class, android.os.Handler.class, int.class,
-                java.lang.String.class, android.os.Bundle.class}
-    )
     public void testSendOrderedBroadcast2() throws InterruptedException {
         final TestBroadcastReceiver broadcastReceiver = new TestBroadcastReceiver();
         broadcastReceiver.mIsOrderedBroadcasts = true;
@@ -232,18 +204,6 @@ public class ContextWrapperTest extends AndroidTestCase {
         assertNull(resultExtras.getString(KEY_REMOVED));
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "registerReceiver",
-            args = {BroadcastReceiver.class, IntentFilter.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "unregisterReceiver",
-            args = {BroadcastReceiver.class}
-        )
-    })
     public void testRegisterReceiver1() throws InterruptedException {
         final FilteredReceiver broadcastReceiver = new FilteredReceiver();
         final IntentFilter filter = new IntentFilter(MOCK_ACTION1);
@@ -283,12 +243,6 @@ public class ContextWrapperTest extends AndroidTestCase {
         assertFalse(broadcastReceiver2.hadReceivedBroadCast2());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "registerReceiver",
-        args = {android.content.BroadcastReceiver.class, android.content.IntentFilter.class,
-                java.lang.String.class, android.os.Handler.class}
-    )
     public void testRegisterReceiver2() throws InterruptedException {
         FilteredReceiver broadcastReceiver = new FilteredReceiver();
         IntentFilter filter = new IntentFilter();
@@ -312,11 +266,6 @@ public class ContextWrapperTest extends AndroidTestCase {
         mContextWrapper.unregisterReceiver(broadcastReceiver);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "enforceCallingOrSelfPermission",
-        args = {String.class, String.class}
-    )
     public void testEnforceCallingOrSelfPermission() {
         try {
             mContextWrapper.enforceCallingOrSelfPermission(PERMISSION_HARDWARE_TEST,
@@ -328,33 +277,6 @@ public class ContextWrapperTest extends AndroidTestCase {
         }
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setWallpaper",
-            args = {Bitmap.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setWallpaper",
-            args = {InputStream.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "clearWallpaper",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getWallpaper",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "peekWallpaper",
-            args = {}
-        )
-    })
     public void testAccessWallpaper() throws IOException, InterruptedException {
         // set Wallpaper by contextWrapper#setWallpaper(Bitmap)
         Bitmap bitmap = Bitmap.createBitmap(20, 30, Bitmap.Config.RGB_565);
@@ -388,35 +310,6 @@ public class ContextWrapperTest extends AndroidTestCase {
         assertNotSame(testDrawable, mContextWrapper.peekWallpaper());
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "openOrCreateDatabase",
-            args = {java.lang.String.class, int.class,
-                    android.database.sqlite.SQLiteDatabase.CursorFactory.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getDatabasePath",
-            args = {String.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "openOrCreateDatabase",
-            args = {String.class, int.class,
-                    android.database.sqlite.SQLiteDatabase.CursorFactory.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "databaseList",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "deleteDatabase",
-            args = {String.class}
-        )
-    })
     public void testAccessDatabase() {
         String DATABASE_NAME = "databasetest";
         String DATABASE_NAME1 = DATABASE_NAME + "1";
@@ -476,11 +369,6 @@ public class ContextWrapperTest extends AndroidTestCase {
         }
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "enforceUriPermission",
-        args = {Uri.class, int.class, int.class, int.class, String.class}
-    )
     public void testEnforceUriPermission1() {
         try {
             Uri uri = Uri.parse("content://ctstest");
@@ -494,12 +382,6 @@ public class ContextWrapperTest extends AndroidTestCase {
         }
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "enforceUriPermission",
-        args = {android.net.Uri.class, java.lang.String.class, java.lang.String.class, int.class,
-                int.class, int.class, java.lang.String.class}
-    )
     public void testEnforceUriPermission2() {
         Uri uri = Uri.parse("content://ctstest");
         try {
@@ -514,20 +396,10 @@ public class ContextWrapperTest extends AndroidTestCase {
         }
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "getPackageResourcePath",
-        args = {}
-    )
     public void testGetPackageResourcePath() {
         assertNotNull(mContextWrapper.getPackageResourcePath());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "startActivity",
-        args = {Intent.class}
-    )
     public void testStartActivity() {
         Intent intent = new Intent(mContext, ContextWrapperStubActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -541,11 +413,6 @@ public class ContextWrapperTest extends AndroidTestCase {
         }
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "createPackageContext",
-        args = {String.class, int.class}
-    )
     public void testCreatePackageContext() throws PackageManager.NameNotFoundException {
         Context actualContext = mContextWrapper.createPackageContext(getValidPackageName(),
                 Context.CONTEXT_IGNORE_SECURITY);
@@ -563,29 +430,14 @@ public class ContextWrapperTest extends AndroidTestCase {
         return packages.get(0).packageName;
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "getMainLooper",
-        args = {}
-    )
     public void testGetMainLooper() {
         assertNotNull(mContextWrapper.getMainLooper());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "getApplicationContext",
-        args = {}
-    )
     public void testGetApplicationContext() {
         assertSame(mContext.getApplicationContext(), mContextWrapper.getApplicationContext());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "getSharedPreferences",
-        args = {String.class, int.class}
-    )
     public void testGetSharedPreferences() {
         SharedPreferences sp;
         SharedPreferences localSP;
@@ -597,41 +449,11 @@ public class ContextWrapperTest extends AndroidTestCase {
         assertSame(sp, localSP);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "revokeUriPermission",
-        args = {Uri.class, int.class}
-    )
-    @ToBeFixed(bug = "1400249", explanation = "Can't test the effect of this function, should be"
-        + "tested by functional test.")
     public void testRevokeUriPermission() {
         Uri uri = Uri.parse("contents://ctstest");
         mContextWrapper.revokeUriPermission(uri, Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "startService",
-            args = {Intent.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "bindService",
-            args = {android.content.Intent.class, android.content.ServiceConnection.class,
-                    int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "stopService",
-            args = {Intent.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "unbindService",
-            args = {ServiceConnection.class}
-        )
-    })
     public void testAccessService() throws InterruptedException {
         MockContextWrapperService.reset();
         bindExpectResult(mContextWrapper, new Intent(mContext, MockContextWrapperService.class));
@@ -646,54 +468,22 @@ public class ContextWrapperTest extends AndroidTestCase {
         assertTrue(MockContextWrapperService.hadCalledOnUnbind());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "getPackageCodePath",
-        args = {}
-    )
     public void testGetPackageCodePath() {
         assertNotNull(mContextWrapper.getPackageCodePath());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "getPackageName",
-        args = {}
-    )
     public void testGetPackageName() {
         assertEquals("com.android.cts.stub", mContextWrapper.getPackageName());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "getCacheDir",
-        args = {}
-    )
     public void testGetCacheDir() {
         assertNotNull(mContextWrapper.getCacheDir());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "getContentResolver",
-        args = {}
-    )
     public void testGetContentResolver() {
         assertSame(mContext.getContentResolver(), mContextWrapper.getContentResolver());
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "attachBaseContext",
-            args = {Context.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getBaseContext",
-            args = {}
-        )
-    })
     public void testAccessBaseContext() throws PackageManager.NameNotFoundException {
         MockContextWrapper testContextWrapper = new MockContextWrapper(mContext);
 
@@ -712,11 +502,6 @@ public class ContextWrapperTest extends AndroidTestCase {
         }
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "getFileStreamPath",
-        args = {String.class}
-    )
     public void testGetFileStreamPath() {
         String TEST_FILENAME = "TestGetFileStreamPath";
 
@@ -725,27 +510,10 @@ public class ContextWrapperTest extends AndroidTestCase {
         assertTrue(fileStreamPath.indexOf(TEST_FILENAME) >= 0);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "getClassLoader",
-        args = {}
-    )
     public void testGetClassLoader() {
         assertSame(mContext.getClassLoader(), mContextWrapper.getClassLoader());
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getWallpaperDesiredMinimumHeight",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getWallpaperDesiredMinimumWidth",
-            args = {}
-        )
-    })
     public void testGetWallpaperDesiredMinimumHeightAndWidth() {
         int height = mContextWrapper.getWallpaperDesiredMinimumHeight();
         int width = mContextWrapper.getWallpaperDesiredMinimumWidth();
@@ -757,18 +525,6 @@ public class ContextWrapperTest extends AndroidTestCase {
         assertTrue((height > 0 && width > 0) || (height <= 0 && width <= 0));
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "sendStickyBroadcast",
-            args = {Intent.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "removeStickyBroadcast",
-            args = {Intent.class}
-        )
-    })
     public void testAccessStickyBroadcast() throws InterruptedException {
         ResultReceiver resultReceiver = new ResultReceiver();
 
@@ -796,11 +552,6 @@ public class ContextWrapperTest extends AndroidTestCase {
         mContextWrapper.unregisterReceiver(stickyReceiver);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "checkCallingOrSelfUriPermission",
-        args = {Uri.class, int.class}
-    )
     public void testCheckCallingOrSelfUriPermission() {
         Uri uri = Uri.parse("content://ctstest");
 
@@ -809,23 +560,11 @@ public class ContextWrapperTest extends AndroidTestCase {
         assertEquals(PackageManager.PERMISSION_DENIED, retValue);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "grantUriPermission",
-        args = {String.class, Uri.class, int.class}
-    )
-    @ToBeFixed(bug = "1400249", explanation = "Can't test the effect of this function,"
-            + " should be tested by functional test.")
     public void testGrantUriPermission() {
         mContextWrapper.grantUriPermission("com.android.mms", Uri.parse("contents://ctstest"),
                 Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "enforcePermission",
-        args = {String.class, int.class, int.class, String.class}
-    )
     public void testEnforcePermission() {
         try {
             mContextWrapper.enforcePermission(
@@ -839,11 +578,6 @@ public class ContextWrapperTest extends AndroidTestCase {
         }
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "checkUriPermission",
-        args = {Uri.class, int.class, int.class, int.class}
-    )
     public void testCheckUriPermission1() {
         Uri uri = Uri.parse("content://ctstest");
 
@@ -856,11 +590,6 @@ public class ContextWrapperTest extends AndroidTestCase {
         assertEquals(PackageManager.PERMISSION_DENIED, retValue);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "checkUriPermission",
-        args = {Uri.class, String.class, String.class, int.class, int.class, int.class}
-    )
     public void testCheckUriPermission2() {
         Uri uri = Uri.parse("content://ctstest");
 
@@ -875,21 +604,11 @@ public class ContextWrapperTest extends AndroidTestCase {
         assertEquals(PackageManager.PERMISSION_DENIED, retValue);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "checkCallingPermission",
-        args = {java.lang.String.class}
-    )
     public void testCheckCallingPermission() {
         int retValue = mContextWrapper.checkCallingPermission(PERMISSION_HARDWARE_TEST);
         assertEquals(PackageManager.PERMISSION_DENIED, retValue);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "checkCallingUriPermission",
-        args = {Uri.class, int.class}
-    )
     public void testCheckCallingUriPermission() {
         Uri uri = Uri.parse("content://ctstest");
 
@@ -898,11 +617,6 @@ public class ContextWrapperTest extends AndroidTestCase {
         assertEquals(PackageManager.PERMISSION_DENIED, retValue);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "enforceCallingUriPermission",
-        args = {Uri.class, int.class, String.class}
-    )
     public void testEnforceCallingUriPermission() {
         try {
             Uri uri = Uri.parse("content://ctstest");
@@ -915,41 +629,21 @@ public class ContextWrapperTest extends AndroidTestCase {
         }
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "getDir",
-        args = {String.class, int.class}
-    )
     public void testGetDir() {
         File dir = mContextWrapper.getDir("testpath", Context.MODE_WORLD_WRITEABLE);
         assertNotNull(dir);
         dir.delete();
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "getPackageManager",
-        args = {}
-    )
     public void testGetPackageManager() {
         assertSame(mContext.getPackageManager(), mContextWrapper.getPackageManager());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "checkCallingOrSelfPermission",
-        args = {String.class}
-    )
     public void testCheckCallingOrSelfPermission() {
         int retValue = mContextWrapper.checkCallingOrSelfPermission("android.permission.GET_TASKS");
         assertEquals(PackageManager.PERMISSION_GRANTED, retValue);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "sendBroadcast",
-        args = {Intent.class}
-    )
     public void testSendBroadcast1() throws InterruptedException {
         final ResultReceiver receiver = new ResultReceiver();
 
@@ -965,11 +659,6 @@ public class ContextWrapperTest extends AndroidTestCase {
         }.run();
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "sendBroadcast",
-        args = {Intent.class, String.class}
-    )
     public void testSendBroadcast2() throws InterruptedException {
         final ResultReceiver receiver = new ResultReceiver();
 
@@ -985,11 +674,6 @@ public class ContextWrapperTest extends AndroidTestCase {
         }.run();
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "enforceCallingOrSelfUriPermission",
-        args = {Uri.class, int.class, String.class}
-    )
     public void testEnforceCallingOrSelfUriPermission() {
         try {
             Uri uri = Uri.parse("content://ctstest");
@@ -1003,11 +687,6 @@ public class ContextWrapperTest extends AndroidTestCase {
         }
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "checkPermission",
-        args = {String.class, int.class, int.class}
-    )
     public void testCheckPermission() {
         // Test with root user, everything will be granted.
         int returnValue = mContextWrapper.checkPermission(PERMISSION_HARDWARE_TEST, 1, 0);
@@ -1029,11 +708,6 @@ public class ContextWrapperTest extends AndroidTestCase {
         assertEquals(PackageManager.PERMISSION_DENIED, returnValue);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "getSystemService",
-        args = {String.class}
-    )
     public void testGetSystemService() {
         // Test invalid service name
         assertNull(mContextWrapper.getSystemService("invalid"));
@@ -1042,30 +716,14 @@ public class ContextWrapperTest extends AndroidTestCase {
         assertNotNull(mContextWrapper.getSystemService(Context.WINDOW_SERVICE));
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "getAssets",
-        args = {}
-    )
     public void testGetAssets() {
         assertSame(mContext.getAssets(), mContextWrapper.getAssets());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "getResources",
-        args = {}
-    )
     public void testGetResources() {
         assertSame(mContext.getResources(), mContextWrapper.getResources());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "startInstrumentation",
-        args = {android.content.ComponentName.class, java.lang.String.class,
-                android.os.Bundle.class}
-    )
     public void testStartInstrumentation() {
         // Use wrong name
         ComponentName cn = new ComponentName("com.android",

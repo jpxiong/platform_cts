@@ -35,12 +35,7 @@ import android.util.Log;
 
 import com.android.cts.stub.R;
 
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
 
-@TestTargetClass(YuvImage.class)
 public class YuvImageTest extends AndroidTestCase {
 
     // Coefficients are taken from jcolor.c in libjpeg.
@@ -94,11 +89,6 @@ public class YuvImageTest extends AndroidTestCase {
         super.setUp();
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "YuvImage",
-        args = {byte[].class, int.class, int.class, int.class, int[].class}
-    )
     public void testYuvImage(){
         int width = 100;
         int height = 100;
@@ -164,11 +154,6 @@ public class YuvImageTest extends AndroidTestCase {
 
    }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "compressToJpeg",
-        args = {android.graphics.Rect.class, int.class, java.io.OutputStream.class}
-    )
     public void testCompressYuvToJpeg() {
         generateTestBitmaps(WIDTH, HEIGHT);
 
@@ -203,18 +188,6 @@ public class YuvImageTest extends AndroidTestCase {
 
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getHeight",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getWidth",
-            args = {}
-        )
-    })
     public void testGetHeight() {
         generateTestBitmaps(WIDTH, HEIGHT);
         YuvImage image = generateYuvImage(ImageFormat.YUY2, mTestBitmaps[0], 0);
@@ -222,11 +195,6 @@ public class YuvImageTest extends AndroidTestCase {
         assertEquals(mTestBitmaps[0].getWidth(), image.getWidth());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "getYuvData",
-        args = {}
-    )
     public void testGetYuvData() {
         generateTestBitmaps(WIDTH, HEIGHT);
         int width = mTestBitmaps[0].getWidth();
@@ -242,11 +210,6 @@ public class YuvImageTest extends AndroidTestCase {
         assertEquals(yuv, image.getYuvData());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "getYuvFormat",
-        args = {}
-    )
     public void testGetYuvFormat() {
         generateTestBitmaps(WIDTH, HEIGHT);
         YuvImage image = generateYuvImage(ImageFormat.YUY2, mTestBitmaps[0], 0);

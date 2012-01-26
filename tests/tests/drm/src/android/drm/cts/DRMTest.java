@@ -16,9 +16,6 @@
 
 package android.drm.cts;
 
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
 
 import android.content.ContentValues;
 import android.test.AndroidTestCase;
@@ -39,7 +36,6 @@ import android.drm.DrmRights;
 import android.drm.DrmStore;
 import android.drm.DrmUtils;
 
-@TestTargetClass(DrmManagerClient.class)
 public class DRMTest extends AndroidTestCase {
     private static String TAG = "CtsDRMTest";
     private static final int WAIT_TIME = 60000; // 1 min max

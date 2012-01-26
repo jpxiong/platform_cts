@@ -19,31 +19,9 @@ package android.app.cts;
 import android.app.PendingIntent;
 import android.app.PendingIntent.CanceledException;
 import android.test.AndroidTestCase;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargets;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestLevel;
 
-@TestTargetClass(PendingIntent.CanceledException.class)
 public class PendingIntent_CanceledExceptionTest extends AndroidTestCase {
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "PendingIntent.CanceledException",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "PendingIntent.CanceledException",
-            args = {String.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "PendingIntent.CanceledException",
-            args = {Exception.class}
-        )
-    })
     public void testConstructor() {
         PendingIntent.CanceledException canceledException = new PendingIntent.CanceledException();
         try {

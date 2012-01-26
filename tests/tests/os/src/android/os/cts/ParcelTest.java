@@ -36,33 +36,9 @@ import android.test.AndroidTestCase;
 import android.util.Log;
 import android.util.SparseArray;
 import android.util.SparseBooleanArray;
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
-import dalvik.annotation.ToBeFixed;
 
-@TestTargetClass(Parcel.class)
 public class ParcelTest extends AndroidTestCase {
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "obtain",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "recycle",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.NOT_FEASIBLE,
-            notes = "This method is protected final, which can't be invoked in test case.",
-            method = "obtain",
-            args = {int.class}
-        )
-    })
     public void testObtain() {
         Parcel p1 = Parcel.obtain();
         assertNotNull(p1);
@@ -88,13 +64,6 @@ public class ParcelTest extends AndroidTestCase {
         p7.recycle();
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "appendFrom",
-            args = {Parcel.class, int.class, int.class}
-        )
-    })
     public void testAppendFrom() {
         Parcel p;
         Parcel p2;
@@ -115,14 +84,6 @@ public class ParcelTest extends AndroidTestCase {
         p.recycle();
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test method: dataAvail ",
-            method = "dataAvail",
-            args = {}
-        )
-    })
     public void testDataAvail() {
         Parcel p;
 
@@ -144,13 +105,6 @@ public class ParcelTest extends AndroidTestCase {
         p.recycle();
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "dataCapacity",
-            args = {}
-        )
-    })
     public void testDataCapacity() {
         Parcel p;
 
@@ -164,13 +118,6 @@ public class ParcelTest extends AndroidTestCase {
         p.recycle();
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setDataCapacity",
-            args = {int.class}
-        )
-    })
     public void testSetDataCapacity() {
         Parcel p;
 
@@ -185,13 +132,6 @@ public class ParcelTest extends AndroidTestCase {
         p.recycle();
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "dataPosition",
-            args = {}
-        )
-    })
     public void testDataPosition() {
         Parcel p;
 
@@ -205,13 +145,6 @@ public class ParcelTest extends AndroidTestCase {
         p.recycle();
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setDataPosition",
-            args = {int.class}
-        )
-    })
     public void testSetDataPosition() {
         Parcel p;
 
@@ -232,13 +165,6 @@ public class ParcelTest extends AndroidTestCase {
         p.recycle();
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "dataSize",
-            args = {}
-        )
-    })
     public void testDataSize() {
         Parcel p;
 
@@ -253,13 +179,6 @@ public class ParcelTest extends AndroidTestCase {
         p.recycle();
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setDataSize",
-            args = {int.class}
-        )
-    })
     public void testSetDataSize() {
         Parcel p;
 
@@ -279,18 +198,6 @@ public class ParcelTest extends AndroidTestCase {
         p.recycle();
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "enforceInterface",
-            args = {String.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "writeInterfaceToken",
-            args = {String.class}
-        )
-    })
     public void testEnforceInterface() {
         Parcel p;
         String s = "IBinder interface token";
@@ -313,18 +220,6 @@ public class ParcelTest extends AndroidTestCase {
         p.recycle();
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "marshall",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "unmarshall",
-            args = {byte[].class, int.class, int.class}
-        )
-    })
     public void testMarshall() {
         final byte[] c = {Byte.MAX_VALUE, (byte) 111, (byte) 11, (byte) 1, (byte) 0,
                     (byte) -1, (byte) -11, (byte) -111, Byte.MIN_VALUE};
@@ -349,18 +244,6 @@ public class ParcelTest extends AndroidTestCase {
     }
 
     @SuppressWarnings("unchecked")
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "readValue",
-            args = {ClassLoader.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "writeValue",
-            args = {Object.class}
-        )
-    })
     public void testReadValue() {
         Parcel p;
         MockClassLoader mcl = new MockClassLoader();
@@ -635,18 +518,6 @@ public class ParcelTest extends AndroidTestCase {
         p.recycle();
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "readByte",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "writeByte",
-            args = {byte.class}
-        )
-    })
     public void testReadByte() {
         Parcel p;
 
@@ -699,18 +570,6 @@ public class ParcelTest extends AndroidTestCase {
         p.recycle();
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "readByteArray",
-            args = {byte[].class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "writeByteArray",
-            args = {byte[].class}
-        )
-    })
     public void testReadByteArray() {
         Parcel p;
 
@@ -802,13 +661,6 @@ public class ParcelTest extends AndroidTestCase {
         p.recycle();
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "writeByteArray",
-            args = {byte[].class, int.class, int.class}
-        )
-    })
     public void testWriteByteArray() {
         Parcel p;
 
@@ -908,13 +760,6 @@ public class ParcelTest extends AndroidTestCase {
         p.recycle();
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "createByteArray",
-            args = {}
-        )
-    })
     public void testCreateByteArray() {
         Parcel p;
 
@@ -968,18 +813,6 @@ public class ParcelTest extends AndroidTestCase {
         p.recycle();
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "readCharArray",
-            args = {char[].class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "writeCharArray",
-            args = {char[].class}
-        )
-    })
     public void testReadCharArray() {
         Parcel p;
 
@@ -1048,13 +881,6 @@ public class ParcelTest extends AndroidTestCase {
         p.recycle();
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "createCharArray",
-            args = {}
-        )
-    })
     public void testCreateCharArray() {
         Parcel p;
 
@@ -1109,18 +935,6 @@ public class ParcelTest extends AndroidTestCase {
         p.recycle();
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "readInt",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "writeInt",
-            args = {int.class}
-        )
-    })
     public void testReadInt() {
         Parcel p;
 
@@ -1173,18 +987,6 @@ public class ParcelTest extends AndroidTestCase {
         p.recycle();
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "readIntArray",
-            args = {int[].class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "writeIntArray",
-            args = {int[].class}
-        )
-    })
     public void testReadIntArray() {
         Parcel p;
 
@@ -1251,13 +1053,6 @@ public class ParcelTest extends AndroidTestCase {
         p.recycle();
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "createIntArray",
-            args = {}
-        )
-    })
     public void testCreateIntArray() {
         Parcel p;
 
@@ -1310,18 +1105,6 @@ public class ParcelTest extends AndroidTestCase {
         p.recycle();
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "readLong",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "writeLong",
-            args = {long.class}
-        )
-    })
     public void testReadLong() {
         Parcel p;
 
@@ -1362,18 +1145,6 @@ public class ParcelTest extends AndroidTestCase {
         p.recycle();
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "readLongArray",
-            args = {long[].class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "writeLongArray",
-            args = {long[].class}
-        )
-    })
     public void testReadLongArray() {
         Parcel p;
 
@@ -1440,13 +1211,6 @@ public class ParcelTest extends AndroidTestCase {
         p.recycle();
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "createLongArray",
-            args = {}
-        )
-    })
     public void testCreateLongArray() {
         Parcel p;
 
@@ -1499,18 +1263,6 @@ public class ParcelTest extends AndroidTestCase {
         p.recycle();
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "readFloat",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "writeFloat",
-            args = {float.class}
-        )
-    })
     public void testReadFloat() {
         Parcel p;
 
@@ -1563,18 +1315,6 @@ public class ParcelTest extends AndroidTestCase {
         p.recycle();
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "readFloatArray",
-            args = {float[].class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "writeFloatArray",
-            args = {float[].class}
-        )
-    })
     public void testReadFloatArray() {
         Parcel p;
 
@@ -1641,13 +1381,6 @@ public class ParcelTest extends AndroidTestCase {
         p.recycle();
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "createFloatArray",
-            args = {}
-        )
-    })
     public void testCreateFloatArray() {
         Parcel p;
 
@@ -1700,18 +1433,6 @@ public class ParcelTest extends AndroidTestCase {
         p.recycle();
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "readDouble",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "writeDouble",
-            args = {double.class}
-        )
-    })
     public void testReadDouble() {
         Parcel p;
 
@@ -1764,18 +1485,6 @@ public class ParcelTest extends AndroidTestCase {
         p.recycle();
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "readDoubleArray",
-            args = {double[].class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "writeDoubleArray",
-            args = {double[].class}
-        )
-    })
     public void testReadDoubleArray() {
         Parcel p;
 
@@ -1842,13 +1551,6 @@ public class ParcelTest extends AndroidTestCase {
         p.recycle();
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "createDoubleArray",
-            args = {}
-        )
-    })
     public void testCreateDoubleArray() {
         Parcel p;
 
@@ -1903,18 +1605,6 @@ public class ParcelTest extends AndroidTestCase {
         p.recycle();
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "readBooleanArray",
-            args = {boolean[].class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "writeBooleanArray",
-            args = {boolean[].class}
-        )
-    })
     public void testReadBooleanArray() {
         Parcel p;
 
@@ -1981,13 +1671,6 @@ public class ParcelTest extends AndroidTestCase {
         p.recycle();
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "createBooleanArray",
-            args = {}
-        )
-    })
     public void testCreateBooleanArray() {
         Parcel p;
 
@@ -2041,18 +1724,6 @@ public class ParcelTest extends AndroidTestCase {
         p.recycle();
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "readString",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "writeString",
-            args = {String.class}
-        )
-    })
     public void testReadString() {
         Parcel p;
         final String string = "Hello, Android!";
@@ -2093,18 +1764,6 @@ public class ParcelTest extends AndroidTestCase {
         p.recycle();
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "readStringArray",
-            args = {String[].class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "writeStringArray",
-            args = {String[].class}
-        )
-    })
     public void testReadStringArray() {
         Parcel p;
 
@@ -2174,13 +1833,6 @@ public class ParcelTest extends AndroidTestCase {
         p.recycle();
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "createStringArray",
-            args = {}
-        )
-    })
     public void testCreateStringArray() {
         Parcel p;
 
@@ -2236,18 +1888,6 @@ public class ParcelTest extends AndroidTestCase {
         p.recycle();
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "readStringList",
-            args = {List.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "writeStringList",
-            args = {List.class}
-        )
-    })
     public void testReadStringList() {
         Parcel p;
 
@@ -2315,13 +1955,6 @@ public class ParcelTest extends AndroidTestCase {
         p.recycle();
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "createStringArrayList",
-            args = {}
-        )
-    })
     public void testCreateStringArrayList() {
         Parcel p;
 
@@ -2373,18 +2006,6 @@ public class ParcelTest extends AndroidTestCase {
         p.recycle();
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "readSerializable",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "writeSerializable",
-            args = {Serializable.class}
-        )
-    })
     public void testReadSerializable() {
         Parcel p;
 
@@ -2402,18 +2023,6 @@ public class ParcelTest extends AndroidTestCase {
         p.recycle();
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "readParcelable",
-            args = {ClassLoader.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "writeParcelable",
-            args = {Parcelable.class, int.class}
-        )
-    })
     public void testReadParcelable() {
         Parcel p;
         MockClassLoader mcl = new MockClassLoader();
@@ -2434,18 +2043,6 @@ public class ParcelTest extends AndroidTestCase {
         p.recycle();
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "readParcelableArray",
-            args = {ClassLoader.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "writeParcelableArray",
-            args = {Parcelable[].class, int.class}
-        )
-    })
     public void testReadParcelableArray() {
         Parcel p;
         MockClassLoader mcl = new MockClassLoader();
@@ -2484,18 +2081,6 @@ public class ParcelTest extends AndroidTestCase {
         p.recycle();
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "readTypedArray",
-            args = {Object[].class, android.os.Parcelable.Creator.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "writeTypedArray",
-            args = {android.os.Parcelable[].class, int.class}
-        )
-    })
     public void testReadTypedArray() {
         Parcel p;
         Signature[] s = {new Signature("1234"),
@@ -2565,13 +2150,6 @@ public class ParcelTest extends AndroidTestCase {
         p.recycle();
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "writeTypedArray",
-            args = {Parcelable[].class, int.class}
-        )
-    })
     public void testReadTypedArray2() {
         Parcel p;
         Signature[] s = {
@@ -2611,18 +2189,6 @@ public class ParcelTest extends AndroidTestCase {
         p.recycle();
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "createTypedArray",
-            args = {Parcelable.Creator.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "writeTypedArray",
-            args = {Parcelable[].class, int.class}
-        )
-    })
     public void testCreateTypedArray() {
         Parcel p;
         Signature[] s = {new Signature("1234"),
@@ -2661,18 +2227,6 @@ public class ParcelTest extends AndroidTestCase {
         p.recycle();
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "readTypedList",
-            args = {List.class, Parcelable.Creator.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "writeTypedList",
-            args = {List.class}
-        )
-    })
     public void testReadTypedList() {
         Parcel p;
         ArrayList<Signature> s = new ArrayList<Signature>();
@@ -2741,18 +2295,6 @@ public class ParcelTest extends AndroidTestCase {
         p.recycle();
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "createTypedArrayList",
-            args = {Parcelable.Creator.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "writeTypedList",
-            args = {List.class}
-        )
-    })
     public void testCreateTypedArrayList() {
         Parcel p;
         ArrayList<Signature> s = new ArrayList<Signature>();
@@ -2793,30 +2335,9 @@ public class ParcelTest extends AndroidTestCase {
         p.recycle();
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.NOT_FEASIBLE,
-            method = "readException",
-            args = {int.class, String.class}
-        )
-    })
-    @ToBeFixed(bug = "1668892", explanation = "The javadoc for readException(int, String) "
-                                               + "is not clear at all")
     public void testReadException() {
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "writeException",
-            args = {Exception.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "readException",
-            args = {}
-        )
-    })
     public void testReadException2() {
         Parcel p = Parcel.obtain();
         String msg = "testReadException2";
@@ -2880,18 +2401,6 @@ public class ParcelTest extends AndroidTestCase {
         p.recycle();
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "writeNoException",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "readException",
-            args = {}
-        )
-    })
     public void testWriteNoException() {
         Parcel p = Parcel.obtain();
         p.writeNoException();
@@ -2900,18 +2409,6 @@ public class ParcelTest extends AndroidTestCase {
         p.recycle();
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "writeFileDescriptor",
-            args = {FileDescriptor.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "readFileDescriptor",
-            args = {}
-        )
-    })
     public void testWriteFileDescriptor() {
         Parcel p;
         FileDescriptor fIn = FileDescriptor.in;
@@ -2931,13 +2428,6 @@ public class ParcelTest extends AndroidTestCase {
         p.recycle();
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "hasFileDescriptors",
-            args = {}
-        )
-    })
     public void testHasFileDescriptor() {
         Parcel p;
         FileDescriptor fIn = FileDescriptor.in;
@@ -2955,18 +2445,6 @@ public class ParcelTest extends AndroidTestCase {
         p.recycle();
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "readBundle",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "writeBundle",
-            args = {Bundle.class}
-        )
-    })
     public void testReadBundle() {
         Bundle bundle = new Bundle();
         bundle.putBoolean("boolean", true);
@@ -3016,20 +2494,6 @@ public class ParcelTest extends AndroidTestCase {
         p.recycle();
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test method: readBundle ",
-            method = "readBundle",
-            args = {ClassLoader.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test method: writeBundle ",
-            method = "writeBundle",
-            args = {Bundle.class}
-        )
-    })
     public void testReadBundle2() {
         Bundle b = new Bundle();
         b.putBoolean("boolean", true);
@@ -3059,18 +2523,6 @@ public class ParcelTest extends AndroidTestCase {
         p.recycle();
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "writeArray",
-            args = {Object[].class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "readArray",
-            args = {ClassLoader.class}
-        )
-    })
     public void testWriteArray() {
         Parcel p;
         MockClassLoader mcl = new MockClassLoader();
@@ -3100,18 +2552,6 @@ public class ParcelTest extends AndroidTestCase {
         p.recycle();
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "readArrayList",
-            args = {ClassLoader.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "writeArray",
-            args = {Object[].class}
-        )
-    })
     public void testReadArrayList() {
         Parcel p;
         MockClassLoader mcl = new MockClassLoader();
@@ -3142,18 +2582,6 @@ public class ParcelTest extends AndroidTestCase {
     }
 
     @SuppressWarnings("unchecked")
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "writeSparseArray",
-            args = {SparseArray.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "readSparseArray",
-            args = {ClassLoader.class}
-        )
-    })
     public void testWriteSparseArray() {
         Parcel p;
         MockClassLoader mcl = new MockClassLoader();
@@ -3188,18 +2616,6 @@ public class ParcelTest extends AndroidTestCase {
         p.recycle();
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "writeSparseBooleanArray",
-            args = {SparseBooleanArray.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "readSparseBooleanArray",
-            args = {}
-        )
-    })
     public void testWriteSparseBooleanArray() {
         Parcel p;
 
@@ -3233,18 +2649,6 @@ public class ParcelTest extends AndroidTestCase {
         p.recycle();
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "writeStrongBinder",
-            args = {IBinder.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "readStrongBinder",
-            args = {}
-        )
-    })
     public void testWriteStrongBinder() {
         Parcel p;
         Binder binder;
@@ -3264,13 +2668,6 @@ public class ParcelTest extends AndroidTestCase {
         p.recycle();
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "writeStrongInterface",
-            args = {IInterface.class}
-        )
-    })
     public void testWriteStrongInterface() {
         Parcel p;
         MockIInterface mockInterface = new MockIInterface();
@@ -3290,18 +2687,6 @@ public class ParcelTest extends AndroidTestCase {
         p.recycle();
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "writeBinderArray",
-            args = {IBinder[].class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "readBinderArray",
-            args = {IBinder[].class}
-        )
-    })
     public void testWriteBinderArray() {
         Parcel p;
         IBinder[] ibinder2 = {new Binder(), new Binder()};
@@ -3363,13 +2748,6 @@ public class ParcelTest extends AndroidTestCase {
         p.recycle();
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "createBinderArray",
-            args = {}
-        )
-    })
     public void testCreateBinderArray() {
         Parcel p;
         IBinder[] ibinder  = {};
@@ -3404,18 +2782,6 @@ public class ParcelTest extends AndroidTestCase {
         p.recycle();
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "writeBinderList",
-            args = {List.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "readBinderList",
-            args = {List.class}
-        )
-    })
     public void testWriteBinderList() {
         Parcel p;
         ArrayList<IBinder> arrayList = new ArrayList<IBinder>();
@@ -3461,13 +2827,6 @@ public class ParcelTest extends AndroidTestCase {
         p.recycle();
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "createBinderArrayList",
-            args = {}
-        )
-    })
     public void testCreateBinderArrayList() {
         Parcel p;
         ArrayList<IBinder> arrayList = new ArrayList<IBinder>();
@@ -3502,18 +2861,6 @@ public class ParcelTest extends AndroidTestCase {
     }
 
     @SuppressWarnings("unchecked")
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "writeMap",
-            args = {Map.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "readMap",
-            args = {Map.class, ClassLoader.class}
-        )
-    })
     public void testWriteMap() {
         Parcel p;
         MockClassLoader mcl = new MockClassLoader();
@@ -3544,18 +2891,6 @@ public class ParcelTest extends AndroidTestCase {
     }
 
     @SuppressWarnings("unchecked")
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "readHashMap",
-            args = {ClassLoader.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "writeMap",
-            args = {Map.class}
-        )
-    })
     public void testReadHashMap() {
         Parcel p;
         MockClassLoader mcl = new MockClassLoader();
@@ -3586,18 +2921,6 @@ public class ParcelTest extends AndroidTestCase {
     }
 
     @SuppressWarnings("unchecked")
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "readList",
-            args = {List.class, ClassLoader.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "writeList",
-            args = {List.class}
-        )
-    })
     public void testReadList() {
         Parcel p;
         MockClassLoader mcl = new MockClassLoader();

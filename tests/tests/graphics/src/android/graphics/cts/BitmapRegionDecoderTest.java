@@ -31,10 +31,6 @@ import android.util.Log;
 
 import com.android.cts.stub.R;
 
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -44,7 +40,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 
-@TestTargetClass(BitmapRegionDecoder.class)
 public class BitmapRegionDecoderTest extends InstrumentationTestCase {
     private static final String TAG = "BitmapRegionDecoderTest";
     private ArrayList<File> mFilesCreated = new ArrayList<File>(
@@ -110,11 +105,6 @@ public class BitmapRegionDecoderTest extends InstrumentationTestCase {
         super.tearDown();
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "newInstance",
-        args = {java.lang.String.class, boolean.class}
-    )
     public void testNewInstanceInputStream() throws IOException {
         for (int i = 0; i < RES_IDS.length; ++i) {
             InputStream is = obtainInputStream(RES_IDS[i]);
@@ -134,11 +124,6 @@ public class BitmapRegionDecoderTest extends InstrumentationTestCase {
         }
     }
 
-    @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "newInstance",
-            args = {byte[].class, int.class, int.class, boolean.class}
-    )
     public void testNewInstanceByteArray() throws IOException {
         for (int i = 0; i < RES_IDS.length; ++i) {
             byte[] imageData = obtainByteArray(RES_IDS[i]);
@@ -154,11 +139,6 @@ public class BitmapRegionDecoderTest extends InstrumentationTestCase {
         }
     }
 
-    @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "newInstance",
-            args = {java.io.FileDescriptor.class, boolean.class}
-    )
     public void testNewInstanceStringAndFileDescriptor() throws IOException {
         for (int i = 0; i < RES_IDS.length; ++i) {
             String filepath = obtainPath(i);
@@ -181,11 +161,6 @@ public class BitmapRegionDecoderTest extends InstrumentationTestCase {
         }
     }
 
-    @TestTargetNew(
-            level = TestLevel.PARTIAL_COMPLETE,
-            method = "decodeRegion",
-            args = {android.graphics.Rect.class, android.graphics.BitmapFactory.Options.class}
-    )
     public void testDecodeRegionInputStream() throws IOException {
         Options opts = new BitmapFactory.Options();
         for (int i = 0; i < NUM_TEST_IMAGES; ++i) {
@@ -211,11 +186,6 @@ public class BitmapRegionDecoderTest extends InstrumentationTestCase {
         }
     }
 
-    @TestTargetNew(
-            level = TestLevel.PARTIAL_COMPLETE,
-            method = "decodeRegion",
-            args = {android.graphics.Rect.class, android.graphics.BitmapFactory.Options.class}
-    )
     public void testDecodeRegionByteArray() throws IOException {
         Options opts = new BitmapFactory.Options();
         for (int i = 0; i < NUM_TEST_IMAGES; ++i) {
@@ -242,11 +212,6 @@ public class BitmapRegionDecoderTest extends InstrumentationTestCase {
         }
     }
 
-    @TestTargetNew(
-            level = TestLevel.PARTIAL_COMPLETE,
-            method = "decodeRegion",
-            args = {android.graphics.Rect.class, android.graphics.BitmapFactory.Options.class}
-    )
     public void testDecodeRegionStringAndFileDescriptor() throws IOException {
         Options opts = new BitmapFactory.Options();
         for (int i = 0; i < NUM_TEST_IMAGES; ++i) {
@@ -283,18 +248,6 @@ public class BitmapRegionDecoderTest extends InstrumentationTestCase {
         }
     }
 
-    @TestTargets ({
-        @TestTargetNew(
-                level = TestLevel.COMPLETE,
-                method = "recycle",
-                args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "isRecycled",
-            args = {}
-        )
-    })
     public void testRecycle() throws IOException {
         InputStream is = obtainInputStream(RES_IDS[0]);
         BitmapRegionDecoder decoder = BitmapRegionDecoder.newInstance(is, false);

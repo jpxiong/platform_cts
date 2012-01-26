@@ -16,10 +16,6 @@
 
 package android.os.cts;
 
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
 
 import android.content.ComponentName;
 import android.content.Context;
@@ -38,7 +34,6 @@ import android.test.AndroidTestCase;
 
 import java.io.FileDescriptor;
 
-@TestTargetClass(Messenger.class)
 public class MessengerTest extends AndroidTestCase {
 
     private Messenger mMessenger;
@@ -129,23 +124,6 @@ public class MessengerTest extends AndroidTestCase {
         getContext().unbindService(mConnection);
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "Messenger",
-            args = {android.os.Handler.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "Messenger",
-            args = {android.os.IBinder.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "equals",
-            args = {java.lang.Object.class}
-        )
-    })
     public void testConstructorAndEquals() {
         Messenger messenger = new Messenger(mHandler);
         Messenger objMessenger = new Messenger(mHandler);
@@ -154,11 +132,6 @@ public class MessengerTest extends AndroidTestCase {
         assertFalse(messenger.equals(objMessenger));
     }
 
-    @TestTargetNew(
-        level = TestLevel.PARTIAL,
-        method = "send",
-        args = {android.os.Message.class}
-    )
     public void testSend() throws RemoteException, InterruptedException {
         // messenger used by its own thread.
         Message message = Message.obtain(mHandler, WHAT, MSG_ARG1, MSG_ARG2);
@@ -174,31 +147,16 @@ public class MessengerTest extends AndroidTestCase {
         (new MessengerTestHelper()).doTest(1000, 50);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "hashCode",
-        args = {}
-    )
     public void testHashCode() {
         assertEquals(mMessenger.getBinder().hashCode(), mMessenger.hashCode());
     }
 
-    @TestTargetNew(
-        level = TestLevel.PARTIAL,
-        method = "getBinder",
-        args = {}
-    )
     public void testGetBinder() {
         Messenger messenger = new Messenger(mIBinder);
         assertSame(mIBinder, messenger.getBinder());
         assertNotNull(mMessenger.getBinder());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "writeToParcel",
-        args = {android.os.Parcel.class, int.class}
-    )
     public void testWriteToParcel() {
         Parcel parcel = Parcel.obtain();
         mMessenger.writeToParcel(parcel, 0);
@@ -208,27 +166,10 @@ public class MessengerTest extends AndroidTestCase {
         parcel.recycle();
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "describeContents",
-        args = {}
-    )
     public void testDescribeContents() {
         assertEquals(0, mMessenger.describeContents());
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "writeMessengerOrNullToParcel",
-            args = {android.os.Messenger.class, android.os.Parcel.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "readMessengerOrNullFromParcel",
-            args = {android.os.Parcel.class}
-        )
-    })
     public void testWriteMessengerOrNullToParcel() {
         Parcel parcelWithMessenger = Parcel.obtain();
         Messenger.writeMessengerOrNullToParcel(mMessenger, parcelWithMessenger);

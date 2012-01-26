@@ -18,32 +18,15 @@ package android.util.cts;
 
 
 import junit.framework.TestCase;
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
 
-@TestTargetClass(TypedValue.class)
 public class TypedValueTest extends TestCase {
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test constructor(s) of {@link TypedValue}",
-        method = "TypedValue",
-        args = {}
-    )
     public void testConstructor() {
         new TypedValue();
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test getFloat().",
-        method = "getFloat",
-        args = {}
-    )
     public void testGetFloat() {
         final float EXPECTED = Float.intBitsToFloat(99);
         TypedValue tv = new TypedValue();
@@ -51,20 +34,6 @@ public class TypedValueTest extends TestCase {
         assertEquals(EXPECTED, tv.getFloat());
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test complexToDimension().",
-            method = "complexToDimension",
-            args = {int.class, DisplayMetrics.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test complexToDimensionPixelOffset().",
-            method = "complexToDimensionPixelOffset",
-            args = {int.class, DisplayMetrics.class}
-        )
-    })
     public void testComplexToDimension() {
         DisplayMetrics dm = new DisplayMetrics();
         dm.density = 1.1f;
@@ -79,12 +48,6 @@ public class TypedValueTest extends TestCase {
         assertEquals((int)EXPECTED, TypedValue.complexToDimensionPixelOffset(10, dm));
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test setTo().",
-        method = "setTo",
-        args = {TypedValue.class}
-    )
     public void testSetTo() {
         TypedValue tv1 = new TypedValue();
         TypedValue tv2 = new TypedValue();
@@ -105,12 +68,6 @@ public class TypedValueTest extends TestCase {
         assertEquals(5, tv2.type);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test getFraction().",
-        method = "getFraction",
-        args = {float.class, float.class}
-    )
     public void testGetFraction() {
         // set the expected value
         final float EXPECTED = TypedValue.complexToFraction(10, 1.1f, 2.1f) ;
@@ -119,12 +76,6 @@ public class TypedValueTest extends TestCase {
         assertEquals(EXPECTED, tv.getFraction(1.1f, 2.1f));
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test complexToDimensionPixelSize().",
-        method = "complexToDimensionPixelSize",
-        args = {int.class, DisplayMetrics.class}
-    )
     public void testComplexToDimensionPixelSize() {
         DisplayMetrics dm = new DisplayMetrics();
         dm.density = 1.1f;
@@ -144,14 +95,6 @@ public class TypedValueTest extends TestCase {
 
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test complexToFraction().",
-            method = "complexToFraction",
-            args = {int.class, float.class, float.class}
-        )
-    })
     public void testComplexToFraction() {
 
         final int data1 = 1;
@@ -167,12 +110,6 @@ public class TypedValueTest extends TestCase {
         assertEquals(expected2, TypedValue.complexToFraction(data2, base2, pbase2));
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test toString().",
-        method = "toString",
-        args = {}
-    )
     public void testToString() {
 
         TypedValue tv = new TypedValue();
@@ -188,12 +125,6 @@ public class TypedValueTest extends TestCase {
         assertNotNull(tv.toString());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test applyDimension().",
-        method = "applyDimension",
-        args = {int.class, float.class, DisplayMetrics.class}
-    )
     public void testApplyDimension() {
         DisplayMetrics dm = new DisplayMetrics();
         dm.density = 1.1f;
@@ -216,12 +147,6 @@ public class TypedValueTest extends TestCase {
         assertEquals(0.0f, TypedValue.applyDimension(-1, 10, dm));
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test coerceToString().",
-        method = "coerceToString",
-        args = {}
-    )
     public void testCoerceToString1() {
         TypedValue tv = new TypedValue();
         tv.assetCookie = 1;
@@ -237,12 +162,6 @@ public class TypedValueTest extends TestCase {
         assertNotNull(tv.coerceToString());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test coerceToString().",
-        method = "coerceToString",
-        args = {int.class, int.class}
-    )
     public void testCoerceToString2() {
         assertNull(TypedValue.coerceToString(TypedValue.TYPE_NULL, 10));
         assertNotNull(TypedValue.coerceToString(TypedValue.TYPE_REFERENCE, 10));
@@ -259,12 +178,6 @@ public class TypedValueTest extends TestCase {
         assertNull(TypedValue.coerceToString(-1, 10));
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test complexToFloat().",
-        method = "complexToFloat",
-        args = {int.class}
-    )
     public void testComplexToFloat() {
 
         final int complex1 = 1;
@@ -278,12 +191,6 @@ public class TypedValueTest extends TestCase {
         assertEquals(expected3, TypedValue.complexToFloat(complex3));
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test getDimension().",
-        method = "getDimension",
-        args = {DisplayMetrics.class}
-    )
     public void testGetDimension() {
         DisplayMetrics dm = new DisplayMetrics();
         dm.density = 1.1f;
@@ -299,12 +206,6 @@ public class TypedValueTest extends TestCase {
         assertEquals(TypedValue.complexToDimension(10, dm), tv.getDimension(dm));
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test complexToDimensionNoisy().",
-        method = "complexToDimensionNoisy",
-        args = {int.class, DisplayMetrics.class}
-    )
     public void testComplexToDimensionNoisy() {
         DisplayMetrics dm = new DisplayMetrics();
         dm.density = 1.1f;

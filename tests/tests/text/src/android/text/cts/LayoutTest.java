@@ -16,10 +16,6 @@
 
 package android.text.cts;
 
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.ToBeFixed;
 
 import android.graphics.Rect;
 import android.test.AndroidTestCase;
@@ -30,7 +26,6 @@ import android.text.TextPaint;
 import android.text.Layout.Alignment;
 import android.text.style.StrikethroughSpan;
 
-@TestTargetClass(Layout.class)
 public class LayoutTest extends AndroidTestCase {
     private final static int LINE_COUNT = 5;
     private final static int LINE_HEIGHT = 12;
@@ -57,14 +52,6 @@ public class LayoutTest extends AndroidTestCase {
         mSpacingadd = 2;
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "Layout",
-        args = {java.lang.CharSequence.class, android.text.TextPaint.class, int.class,
-                android.text.Layout.Alignment.class, float.class, float.class}
-    )
-    @ToBeFixed(bug = "1417734", explanation = "should add @throws clause into javadoc " +
-            " of Layout constructor when the width is smaller than 0")
     public void testConstructor() {
         new MockLayout(LAYOUT_TEXT, mTextPaint, mWidth, mAlign, mSpacingmult, mSpacingadd);
 
@@ -75,11 +62,6 @@ public class LayoutTest extends AndroidTestCase {
         }
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "getText",
-        args = {}
-    )
     public void testGetText() {
         CharSequence text = "test case 1";
         Layout layout = new MockLayout(text, mTextPaint, mWidth,
@@ -90,11 +72,6 @@ public class LayoutTest extends AndroidTestCase {
         assertNull(layout.getText());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "getPaint",
-        args = {}
-    )
     public void testGetPaint() {
         Layout layout = new MockLayout(LAYOUT_TEXT, mTextPaint, mWidth,
                 mAlign, mSpacingmult, mSpacingadd);
@@ -105,11 +82,6 @@ public class LayoutTest extends AndroidTestCase {
         assertNull(layout.getPaint());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "getWidth",
-        args = {}
-    )
     public void testGetWidth() {
         Layout layout = new MockLayout(LAYOUT_TEXT, mTextPaint, 10,
                 mAlign, mSpacingmult, mSpacingadd);
@@ -119,11 +91,6 @@ public class LayoutTest extends AndroidTestCase {
         assertEquals(0,  layout.getWidth());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "getEllipsizedWidth",
-        args = {}
-    )
     public void testGetEllipsizedWidth() {
         Layout layout = new MockLayout(LAYOUT_TEXT, mTextPaint, 15,
                 mAlign, mSpacingmult, mSpacingadd);
@@ -133,13 +100,6 @@ public class LayoutTest extends AndroidTestCase {
         assertEquals(0,  layout.getEllipsizedWidth());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "increaseWidthTo",
-        args = {int.class}
-    )
-    @ToBeFixed(bug = "1417734", explanation = "should add @throws clause into javadoc " +
-            " of Layout#increaseWidthTo(int) when the new width is smaller than old one")
     public void testIncreaseWidthTo() {
         Layout layout = new MockLayout(LAYOUT_TEXT, mTextPaint, mWidth,
                 mAlign, mSpacingmult, mSpacingadd);
@@ -158,22 +118,12 @@ public class LayoutTest extends AndroidTestCase {
         assertEquals(oldWidth + 1, layout.getWidth());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "getHeight",
-        args = {}
-    )
     public void testGetHeight() {
         Layout layout = new MockLayout(LAYOUT_TEXT, mTextPaint, mWidth,
                 mAlign, mSpacingmult, mSpacingadd);
         assertEquals(60, layout.getHeight());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "getAlignment",
-        args = {}
-    )
     public void testGetAlignment() {
         Layout layout = new MockLayout(LAYOUT_TEXT, mTextPaint, mWidth,
                 mAlign, mSpacingmult, mSpacingadd);
@@ -183,11 +133,6 @@ public class LayoutTest extends AndroidTestCase {
         assertNull(layout.getAlignment());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "getSpacingMultiplier",
-        args = {}
-    )
     public void testGetSpacingMultiplier() {
         Layout layout = new MockLayout(LAYOUT_TEXT, mTextPaint, mWidth, mAlign, -1, mSpacingadd);
         assertEquals(-1.0f, layout.getSpacingMultiplier());
@@ -196,11 +141,6 @@ public class LayoutTest extends AndroidTestCase {
         assertEquals(5.0f, layout.getSpacingMultiplier());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "getSpacingAdd",
-        args = {}
-    )
     public void testGetSpacingAdd() {
         Layout layout = new MockLayout(LAYOUT_TEXT, mTextPaint, mWidth, mAlign, mSpacingmult, -1);
         assertEquals(-1.0f, layout.getSpacingAdd());
@@ -209,11 +149,6 @@ public class LayoutTest extends AndroidTestCase {
         assertEquals(20.0f, layout.getSpacingAdd());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "getLineBounds",
-        args = {int.class, android.graphics.Rect.class}
-    )
     public void testGetLineBounds() {
         Layout layout = new MockLayout(LAYOUT_TEXT, mTextPaint, mWidth,
                 mAlign, mSpacingmult, mSpacingadd);
@@ -226,11 +161,6 @@ public class LayoutTest extends AndroidTestCase {
         assertEquals(36, bounds.bottom);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "getLineForVertical",
-        args = {int.class}
-    )
     public void testGetLineForVertical() {
         Layout layout = new MockLayout(LAYOUT_TEXT, mTextPaint, mWidth,
                 mAlign, mSpacingmult, mSpacingadd);
@@ -240,11 +170,6 @@ public class LayoutTest extends AndroidTestCase {
         assertEquals(LINE_COUNT - 1, layout.getLineForVertical(1000));
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "getLineForOffset",
-        args = {int.class}
-    )
     public void testGetLineForOffset() {
         Layout layout = new MockLayout(LAYOUT_TEXT, mTextPaint, mWidth,
                 mAlign, mSpacingmult, mSpacingadd);
@@ -254,24 +179,12 @@ public class LayoutTest extends AndroidTestCase {
         assertEquals(LINE_COUNT - 1, layout.getLineForOffset(1000));
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "getLineEnd",
-        args = {int.class}
-    )
     public void testGetLineEnd() {
         Layout layout = new MockLayout(LAYOUT_TEXT, mTextPaint, mWidth,
                 mAlign, mSpacingmult, mSpacingadd);
         assertEquals(2, layout.getLineEnd(1));
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "getLineVisibleEnd",
-        args = {int.class}
-    )
-    @ToBeFixed(bug = "1417734", explanation = "should add @throws clause into javadoc " +
-            " of Layout#getLineVisibleEnd(int) when the line is out of bound")
     public void testGetLineVisibleEnd() {
         Layout layout = new MockLayout(LAYOUT_TEXT, mTextPaint, mWidth,
                 mAlign, mSpacingmult, mSpacingadd);
@@ -286,44 +199,24 @@ public class LayoutTest extends AndroidTestCase {
         }
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "getLineBottom",
-        args = {int.class}
-    )
     public void testGetLineBottom() {
         Layout layout = new MockLayout(LAYOUT_TEXT, mTextPaint, mWidth,
                 mAlign, mSpacingmult, mSpacingadd);
         assertEquals(LINE_HEIGHT, layout.getLineBottom(0));
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "getLineBaseline",
-        args = {int.class}
-    )
     public void testGetLineBaseline() {
         Layout layout = new MockLayout(LAYOUT_TEXT, mTextPaint, mWidth,
                 mAlign, mSpacingmult, mSpacingadd);
         assertEquals(8, layout.getLineBaseline(0));
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "getLineAscent",
-        args = {int.class}
-    )
     public void testGetLineAscent() {
         Layout layout = new MockLayout(LAYOUT_TEXT, mTextPaint, mWidth,
                 mAlign, mSpacingmult, mSpacingadd);
         assertEquals(-8, layout.getLineAscent(0));
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "getParagraphAlignment",
-        args = {int.class}
-    )
     public void testGetParagraphAlignment() {
         Layout layout = new MockLayout(LAYOUT_TEXT, mTextPaint, mWidth,
                 mAlign, mSpacingmult, mSpacingadd);
@@ -335,33 +228,18 @@ public class LayoutTest extends AndroidTestCase {
         assertSame(mAlign, layout.getParagraphAlignment(1));
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "getParagraphLeft",
-        args = {int.class}
-    )
     public void testGetParagraphLeft() {
         Layout layout = new MockLayout(LAYOUT_TEXT, mTextPaint, mWidth,
                 mAlign, mSpacingmult, mSpacingadd);
         assertEquals(0, layout.getParagraphLeft(0));
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "getParagraphRight",
-        args = {int.class}
-    )
     public void testGetParagraphRight() {
         Layout layout = new MockLayout(LAYOUT_TEXT, mTextPaint, mWidth,
                 mAlign, mSpacingmult, mSpacingadd);
         assertEquals(mWidth, layout.getParagraphRight(0));
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "isSpanned",
-        args = {}
-    )
     public void testIsSpanned() {
         MockLayout layout = new MockLayout(LAYOUT_TEXT, mTextPaint, mWidth,
                 mAlign, mSpacingmult, mSpacingadd);
@@ -374,11 +252,6 @@ public class LayoutTest extends AndroidTestCase {
         assertTrue(layout.mockIsSpanned());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "getDesiredWidth",
-        args = {java.lang.CharSequence.class, int.class, int.class, android.text.TextPaint.class}
-    )
     public void testGetDesiredWidthRange() {
         CharSequence textShort = "test";
         CharSequence textLonger = "test\ngetDesiredWidth";
@@ -395,11 +268,6 @@ public class LayoutTest extends AndroidTestCase {
         assertTrue(widthShort > widthPartShort);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "getDesiredWidth",
-        args = {java.lang.CharSequence.class, android.text.TextPaint.class}
-    )
     public void testGetDesiredWidth() {
         CharSequence textShort = "test";
         CharSequence textLonger = "test\ngetDesiredWidth";

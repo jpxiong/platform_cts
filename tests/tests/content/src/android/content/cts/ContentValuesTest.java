@@ -24,13 +24,7 @@ import java.util.Set;
 import android.content.ContentValues;
 import android.os.Parcel;
 import android.test.AndroidTestCase;
-import dalvik.annotation.TestTargets;
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.ToBeFixed;
 
-@TestTargetClass(ContentValues.class)
 public class ContentValuesTest extends AndroidTestCase {
     ContentValues mContentValues;
 
@@ -40,28 +34,6 @@ public class ContentValuesTest extends AndroidTestCase {
         mContentValues = new ContentValues();
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test constructor(s) of ContentValues.",
-            method = "ContentValues",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test constructor(s) of ContentValues.",
-            method = "ContentValues",
-            args = {int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test constructor(s) of ContentValues.",
-            method = "ContentValues",
-            args = {android.content.ContentValues.class}
-        )
-    })
-    @ToBeFixed(bug = "1417734", explanation = "Unexpected NullPointerException and" +
-            " IllegalArgumentException")
     public void testConstructor() {
         new ContentValues();
         new ContentValues(5);
@@ -82,12 +54,6 @@ public class ContentValuesTest extends AndroidTestCase {
         }
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test valueSet().",
-        method = "valueSet",
-        args = {}
-    )
     public void testValueSet() {
         Set<Map.Entry<String, Object>> map;
         assertNotNull(map = mContentValues.valueSet());
@@ -101,12 +67,6 @@ public class ContentValuesTest extends AndroidTestCase {
         assertEquals(2, map.size());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test putNull(String key).",
-        method = "putNull",
-        args = {java.lang.String.class}
-    )
     public void testPutNull() {
         mContentValues.putNull("key");
         assertNull(mContentValues.get("key"));
@@ -121,12 +81,6 @@ public class ContentValuesTest extends AndroidTestCase {
         mContentValues.putNull(null);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test getAsLong(String key).",
-        method = "getAsLong",
-        args = {java.lang.String.class}
-    )
     public void testGetAsLong() {
         Long expected = 10L;
         mContentValues.put("Long", expected);
@@ -140,12 +94,6 @@ public class ContentValuesTest extends AndroidTestCase {
         assertNull(mContentValues.getAsLong(null));
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test getAsByte(String key).",
-        method = "getAsByte",
-        args = {java.lang.String.class}
-    )
     public void testGetAsByte() {
         Byte expected = 'a';
         mContentValues.put("Byte", expected);
@@ -159,12 +107,6 @@ public class ContentValuesTest extends AndroidTestCase {
         assertNull(mContentValues.getAsByte(null));
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test getAsInteger(String key).",
-        method = "getAsInteger",
-        args = {java.lang.String.class}
-    )
     public void testGetAsInteger() {
         Integer expected = 20;
         mContentValues.put("Integer", expected);
@@ -178,12 +120,6 @@ public class ContentValuesTest extends AndroidTestCase {
         assertNull(mContentValues.getAsInteger(null));
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test size().",
-        method = "size",
-        args = {}
-    )
     public void testSize() {
         assertEquals(0, mContentValues.size());
 
@@ -199,12 +135,6 @@ public class ContentValuesTest extends AndroidTestCase {
         assertEquals(0, mContentValues.size());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test getAsShort(String key).",
-        method = "getAsShort",
-        args = {java.lang.String.class}
-    )
     public void testGetAsShort() {
         Short expected = 20;
         mContentValues.put("Short", expected);
@@ -218,12 +148,6 @@ public class ContentValuesTest extends AndroidTestCase {
         assertNull(mContentValues.getAsShort(null));
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test hashCode().",
-        method = "hashCode",
-        args = {}
-    )
     public void testHashCode() {
         assertEquals(0, mContentValues.hashCode());
 
@@ -242,12 +166,6 @@ public class ContentValuesTest extends AndroidTestCase {
         assertEquals(0, mContentValues.hashCode());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test getAsFloat(String key).",
-        method = "getAsFloat",
-        args = {java.lang.String.class}
-    )
     public void testGetAsFloat() {
         Float expected = 1.0F;
         mContentValues.put("Float", expected);
@@ -261,12 +179,6 @@ public class ContentValuesTest extends AndroidTestCase {
         assertNull(mContentValues.getAsFloat(null));
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test getAsBoolean(String key).",
-        method = "getAsBoolean",
-        args = {java.lang.String.class}
-    )
     public void testGetAsBoolean() {
         mContentValues.put("Boolean", true);
         assertTrue(mContentValues.getAsBoolean("Boolean"));
@@ -278,12 +190,6 @@ public class ContentValuesTest extends AndroidTestCase {
         assertNull(mContentValues.getAsBoolean(null));
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test toString().",
-        method = "toString",
-        args = {}
-    )
     public void testToString() {
         assertNotNull(mContentValues.toString());
 
@@ -292,12 +198,6 @@ public class ContentValuesTest extends AndroidTestCase {
         assertTrue(mContentValues.toString().length() > 0);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test get(String key).",
-        method = "get",
-        args = {java.lang.String.class}
-    )
     public void testGet() {
         Object expected = "android";
         mContentValues.put("Object", "android");
@@ -311,12 +211,6 @@ public class ContentValuesTest extends AndroidTestCase {
         assertNull(mContentValues.get(null));
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test equals(Object object).",
-        method = "equals",
-        args = {java.lang.Object.class}
-    )
     public void testEquals() {
         mContentValues.put("Boolean", false);
         mContentValues.put("String", "string");
@@ -328,12 +222,6 @@ public class ContentValuesTest extends AndroidTestCase {
         assertTrue(mContentValues.equals(cv));
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test equals(Object object).",
-        method = "equals",
-        args = {java.lang.Object.class}
-    )
     public void testEqualsFailure() {
         // the target object is not an instance of ContentValues.
         assertFalse(mContentValues.equals(new String()));
@@ -349,12 +237,6 @@ public class ContentValuesTest extends AndroidTestCase {
         assertFalse(mContentValues.equals(cv));
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test getAsDouble(String key).",
-        method = "getAsDouble",
-        args = {java.lang.String.class}
-    )
     public void testGetAsDouble() {
         Double expected = 10.2;
         mContentValues.put("Double", expected);
@@ -368,12 +250,6 @@ public class ContentValuesTest extends AndroidTestCase {
         assertNull(mContentValues.getAsDouble(null));
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test put(String key, String value).",
-        method = "put",
-        args = {java.lang.String.class, java.lang.String.class}
-    )
     public void testPutString() {
         String expected = "cts";
         mContentValues.put("String", expected);
@@ -387,12 +263,6 @@ public class ContentValuesTest extends AndroidTestCase {
         mContentValues.put(null, (String)null);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test put(String key, Byte value).",
-        method = "put",
-        args = {java.lang.String.class, java.lang.Byte.class}
-    )
     public void testPutByte() {
         Byte expected = 'a';
         mContentValues.put("Byte", expected);
@@ -406,12 +276,6 @@ public class ContentValuesTest extends AndroidTestCase {
         mContentValues.put(null, (Byte)null);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test put(String key, Short value).",
-        method = "put",
-        args = {java.lang.String.class, java.lang.Short.class}
-    )
     public void testPutShort() {
         Short expected = 20;
         mContentValues.put("Short", expected);
@@ -425,12 +289,6 @@ public class ContentValuesTest extends AndroidTestCase {
         mContentValues.put(null, (Short)null);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test put(String key, Integer value).",
-        method = "put",
-        args = {java.lang.String.class, java.lang.Integer.class}
-    )
     public void testPutInteger() {
         Integer expected = 20;
         mContentValues.put("Integer", expected);
@@ -444,12 +302,6 @@ public class ContentValuesTest extends AndroidTestCase {
         mContentValues.put(null, (Integer)null);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test put(String key, Long value).",
-        method = "put",
-        args = {java.lang.String.class, java.lang.Long.class}
-    )
     public void testPutLong() {
         Long expected = 10L;
         mContentValues.put("Long", expected);
@@ -463,12 +315,6 @@ public class ContentValuesTest extends AndroidTestCase {
         mContentValues.put(null, (Long)null);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test put(String key, Float value).",
-        method = "put",
-        args = {java.lang.String.class, java.lang.Float.class}
-    )
     public void testPutFloat() {
         Float expected = 1.0F;
         mContentValues.put("Float", expected);
@@ -482,12 +328,6 @@ public class ContentValuesTest extends AndroidTestCase {
         mContentValues.put(null, (Float)null);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test put(String key, Double value).",
-        method = "put",
-        args = {java.lang.String.class, java.lang.Double.class}
-    )
     public void testPutDouble() {
         Double expected = 10.2;
         mContentValues.put("Double", expected);
@@ -501,12 +341,6 @@ public class ContentValuesTest extends AndroidTestCase {
         mContentValues.put(null, (Double)null);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test put(String key, Boolean value).",
-        method = "put",
-        args = {java.lang.String.class, java.lang.Boolean.class}
-    )
     public void testPutBoolean() {
         // set the expected value
         mContentValues.put("Boolean", true);
@@ -519,12 +353,6 @@ public class ContentValuesTest extends AndroidTestCase {
         mContentValues.put(null, (Boolean)null);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test put(String key, byte[] value).",
-        method = "put",
-        args = {java.lang.String.class, byte[].class}
-    )
     public void testPutByteArray() {
         byte[] expected = new byte[] {'1', '2', '3', '4'};
         mContentValues.put("byte[]", expected);
@@ -534,12 +362,6 @@ public class ContentValuesTest extends AndroidTestCase {
         mContentValues.put(null, (byte[])null);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test containsKey(String key).",
-        method = "containsKey",
-        args = {java.lang.String.class}
-    )
     public void testContainsKey() {
         mContentValues.put("Double", 10.2);
         mContentValues.put("Float", 1.0F);
@@ -554,12 +376,6 @@ public class ContentValuesTest extends AndroidTestCase {
         assertFalse(mContentValues.containsKey(null));
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test clear().",
-        method = "clear",
-        args = {}
-    )
     public void testClear() {
         assertEquals(0, mContentValues.size());
 
@@ -571,22 +387,6 @@ public class ContentValuesTest extends AndroidTestCase {
         assertEquals(0, mContentValues.size());
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test putStringArrayList(String key, ArrayList<String> value) and "
-                    + "getStringArrayList(String key).",
-            method = "putStringArrayList",
-            args = {java.lang.String.class, java.util.ArrayList.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test putStringArrayList(String key, ArrayList<String> value) and "
-                    + "getStringArrayList(String key).",
-            method = "getStringArrayList",
-            args = {java.lang.String.class}
-        )
-    })
     @SuppressWarnings("deprecation")
     public void testAccessStringArrayList() {
         // set the expected value
@@ -602,12 +402,6 @@ public class ContentValuesTest extends AndroidTestCase {
         assertNull(mContentValues.getStringArrayList(null));
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test remove(String key).",
-        method = "remove",
-        args = {java.lang.String.class}
-    )
     public void testRemove() {
         assertEquals(0, mContentValues.size());
 
@@ -633,12 +427,6 @@ public class ContentValuesTest extends AndroidTestCase {
         mContentValues.remove(null);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test getAsString(String key).",
-        method = "getAsString",
-        args = {java.lang.String.class}
-    )
     public void testGetAsString() {
         String expected = "cts";
         mContentValues.put("String", expected);
@@ -652,12 +440,6 @@ public class ContentValuesTest extends AndroidTestCase {
         assertNull(mContentValues.getAsString(null));
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test getAsByteArray(String key).",
-        method = "getAsByteArray",
-        args = {java.lang.String.class}
-    )
     public void testGetAsByteArray() {
         byte[] expected = new byte[] {'1', '2', '3', '4'};
         mContentValues.put("byte[]", expected);
@@ -667,12 +449,6 @@ public class ContentValuesTest extends AndroidTestCase {
         assertNull(mContentValues.getAsByteArray(null));
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test writeToParcel(Parcel parcel, int flags).",
-        method = "writeToParcel",
-        args = {android.os.Parcel.class, int.class}
-    )
     @SuppressWarnings({ "unchecked" })
     public void testWriteToParcel() {
         Parcel p = Parcel.obtain();
@@ -693,13 +469,6 @@ public class ContentValuesTest extends AndroidTestCase {
         assertEquals(false, values.get("Boolean"));
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test writeToParcel(Parcel parcel, int flags).",
-        method = "writeToParcel",
-        args = {android.os.Parcel.class, int.class}
-    )
-    @ToBeFixed(bug = "1417734", explanation = "Unexpected NullPointerException")
     public void testWriteToParcelFailure() {
         try {
             mContentValues.writeToParcel(null, -1);
@@ -709,22 +478,10 @@ public class ContentValuesTest extends AndroidTestCase {
         }
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test describeContents(). This method does nothing, and always return 0",
-        method = "describeContents",
-        args = {}
-    )
     public void testDescribeContents() {
         assertEquals(0, mContentValues.describeContents());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test putAll(ContentValues other).",
-        method = "putAll",
-        args = {android.content.ContentValues.class}
-    )
     public void testPutAll() {
         assertEquals(0, mContentValues.size());
 
@@ -740,13 +497,6 @@ public class ContentValuesTest extends AndroidTestCase {
         assertEquals(3, mContentValues.size());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test putAll(ContentValues other).",
-        method = "putAll",
-        args = {android.content.ContentValues.class}
-    )
-    @ToBeFixed(bug = "1417734", explanation = "Unexpected NullPointerException")
     public void testPutAllFailure() {
         try {
             mContentValues.putAll(null);

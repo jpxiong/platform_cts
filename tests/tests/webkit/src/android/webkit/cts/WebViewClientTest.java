@@ -27,12 +27,7 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.webkit.cts.WebViewOnUiThread.WaitForLoadedClient;
 
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
 
-@TestTargetClass(android.webkit.WebViewClient.class)
 public class WebViewClientTest extends ActivityInstrumentationTestCase2<WebViewStubActivity> {
     private static final long TEST_TIMEOUT = 5000;
 
@@ -59,33 +54,11 @@ public class WebViewClientTest extends ActivityInstrumentationTestCase2<WebViewS
         super.tearDown();
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "shouldOverrideUrlLoading",
-        args = {WebView.class, String.class}
-    )
     public void testShouldOverrideUrlLoading() {
         final MockWebViewClient webViewClient = new MockWebViewClient();
         assertFalse(webViewClient.shouldOverrideUrlLoading(mOnUiThread.getWebView(), null));
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "onPageStarted",
-            args = {WebView.class, String.class, Bitmap.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "onPageFinished",
-            args = {WebView.class, String.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "onLoadResource",
-            args = {WebView.class, String.class}
-        )
-    })
     public void testLoadPage() throws Exception {
         final MockWebViewClient webViewClient = new MockWebViewClient();
         mOnUiThread.setWebViewClient(webViewClient);
@@ -119,11 +92,6 @@ public class WebViewClientTest extends ActivityInstrumentationTestCase2<WebViewS
         }.run();
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "onReceivedError",
-        args = {WebView.class, int.class, String.class, String.class}
-    )
     public void testOnReceivedError() throws Exception {
         final MockWebViewClient webViewClient = new MockWebViewClient();
         mOnUiThread.setWebViewClient(webViewClient);
@@ -135,11 +103,6 @@ public class WebViewClientTest extends ActivityInstrumentationTestCase2<WebViewS
                 webViewClient.hasOnReceivedErrorCode());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "onFormResubmission",
-        args = {WebView.class, Message.class, Message.class}
-    )
     public void testOnFormResubmission() throws Exception {
         final MockWebViewClient webViewClient = new MockWebViewClient();
         mOnUiThread.setWebViewClient(webViewClient);
@@ -165,11 +128,6 @@ public class WebViewClientTest extends ActivityInstrumentationTestCase2<WebViewS
         }.run();
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "doUpdateVisitedHistory",
-        args = {WebView.class, String.class, boolean.class}
-    )
     public void testDoUpdateVisitedHistory() throws Exception {
         final MockWebViewClient webViewClient = new MockWebViewClient();
         mOnUiThread.setWebViewClient(webViewClient);
@@ -188,11 +146,6 @@ public class WebViewClientTest extends ActivityInstrumentationTestCase2<WebViewS
         }.run();
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "onReceivedHttpAuthRequest",
-        args = {WebView.class, HttpAuthHandler.class, String.class, String.class}
-    )
     public void testOnReceivedHttpAuthRequest() throws Exception {
         final MockWebViewClient webViewClient = new MockWebViewClient();
         mOnUiThread.setWebViewClient(webViewClient);
@@ -204,11 +157,6 @@ public class WebViewClientTest extends ActivityInstrumentationTestCase2<WebViewS
         assertTrue(webViewClient.hasOnReceivedHttpAuthRequestCalled());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "shouldOverrideKeyEvent",
-        args = {WebView.class, KeyEvent.class}
-    )
     public void testShouldOverrideKeyEvent() {
         final MockWebViewClient webViewClient = new MockWebViewClient();
         mOnUiThread.setWebViewClient(webViewClient);
@@ -216,11 +164,6 @@ public class WebViewClientTest extends ActivityInstrumentationTestCase2<WebViewS
         assertFalse(webViewClient.shouldOverrideKeyEvent(mOnUiThread.getWebView(), null));
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "onUnhandledKeyEvent",
-        args = {WebView.class, KeyEvent.class}
-    )
     public void testOnUnhandledKeyEvent() throws Throwable {
         final MockWebViewClient webViewClient = new MockWebViewClient();
         mOnUiThread.setWebViewClient(webViewClient);
@@ -239,11 +182,6 @@ public class WebViewClientTest extends ActivityInstrumentationTestCase2<WebViewS
         }.run();
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "onScaleChanged",
-        args = {WebView.class, float.class, float.class}
-    )
     public void testOnScaleChanged() throws Throwable {
         final MockWebViewClient webViewClient = new MockWebViewClient();
         mOnUiThread.setWebViewClient(webViewClient);

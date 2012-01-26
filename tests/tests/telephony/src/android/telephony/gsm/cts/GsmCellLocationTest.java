@@ -19,12 +19,7 @@ package android.telephony.gsm.cts;
 import android.os.Bundle;
 import android.telephony.gsm.GsmCellLocation;
 import android.test.AndroidTestCase;
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
 
-@TestTargetClass(GsmCellLocation.class)
 public class GsmCellLocationTest extends AndroidTestCase {
 
     private static final int CID_VALUE = 20;
@@ -32,58 +27,6 @@ public class GsmCellLocationTest extends AndroidTestCase {
     private static final int INVALID_CID = -1;
     private static final int INVALID_LAC = -1;
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "GsmCellLocation",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "GsmCellLocation",
-            args = {Bundle.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getCid",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getLac",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setLacAndCid",
-            args = {int.class, int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setStateInvalid",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "hashCode",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "toString",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "fillInNotifierBundle",
-            args = {Bundle.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "equals",
-            args = {Object.class}
-        )
-    })
     public void testGsmCellLocation() {
         Bundle bundle = new Bundle();
 

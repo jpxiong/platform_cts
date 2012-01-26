@@ -16,10 +16,6 @@
 
 package android.text.method.cts;
 
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.ToBeFixed;
 
 import android.os.SystemClock;
 import android.test.ActivityInstrumentationTestCase2;
@@ -45,7 +41,6 @@ import android.widget.TextView.BufferType;
  *
  * @see android.widget.cts.TextViewTest
  */
-@TestTargetClass(ArrowKeyMovementMethod.class)
 public class ArrowKeyMovementMethodTest extends ActivityInstrumentationTestCase2<StubActivity> {
     private static final String THREE_LINES_TEXT = "first line\nsecond line\nlast line";
     private static final int END_OF_ALL_TEXT = THREE_LINES_TEXT.length();
@@ -83,34 +78,14 @@ public class ArrowKeyMovementMethodTest extends ActivityInstrumentationTestCase2
         assertTrue(mTextView.isFocused());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test constructor ArrowKeyMovementMethod#ArrowKeyMovementMethod().",
-        method = "ArrowKeyMovementMethod",
-        args = {}
-    )
     public void testConstructor() {
         new ArrowKeyMovementMethod();
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test {@link ArrowKeyMovementMethod#canSelectArbitrarily()}. "
-                + "It always returns true.",
-        method = "canSelectArbitrarily",
-        args = {}
-    )
     public void testCanSelectArbitrarily() {
         assertTrue(new ArrowKeyMovementMethod().canSelectArbitrarily());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test {@link ArrowKeyMovementMethod#getInstance()}. "
-                + "This is a method for creating singleton.",
-        method = "getInstance",
-        args = {}
-    )
     public void testGetInstance() {
         MovementMethod method0 = ArrowKeyMovementMethod.getInstance();
         assertNotNull(method0);
@@ -120,15 +95,6 @@ public class ArrowKeyMovementMethodTest extends ActivityInstrumentationTestCase2
         assertSame(method0, method1);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test {@link ArrowKeyMovementMethod#onTakeFocus(TextView, Spannable, int)}. "
-                + "Test the method after the widget get layouted.",
-        method = "onTakeFocus",
-        args = {TextView.class, Spannable.class, int.class}
-    )
-    @ToBeFixed(bug = "1695243", explanation = "Android API javadocs are incomplete. There is no "
-            + "document about the behaviour of this method.")
     public void testOnTakeFocus() throws Throwable {
         /*
          * The following assertions depend on whether the TextView has a layout.
@@ -185,30 +151,11 @@ public class ArrowKeyMovementMethodTest extends ActivityInstrumentationTestCase2
         assertSelection(END_OF_ALL_TEXT);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test {@link ArrowKeyMovementMethod#onTakeFocus(TextView, Spannable, int)}. "
-                + "Test the method before the widget get layouted.",
-        method = "onTakeFocus",
-        args = {TextView.class, Spannable.class, int.class}
-    )
-    @ToBeFixed(bug = "1695243", explanation = "Android API javadocs are incomplete. There is no "
-            + "document about the behaviour of this method.")
     public void testOnTakeFoucusWithNullLayout() {
         initTextViewWithNullLayout();
         assertSelectEndOfContent();
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test {@link ArrowKeyMovementMethod#onTakeFocus(TextView, Spannable, int)}. "
-                + "Test the method with null parameters.",
-        method = "onTakeFocus",
-        args = {TextView.class, Spannable.class, int.class}
-    )
-    @ToBeFixed(bug = "1695243", explanation = "Android API javadocs are incomplete. @throws clause "
-            + "should be added into javadoc of ArrowKeyMovementMethod#onTakeFocus(TextView, "
-            + "Spannable, int)} when the params view or text is null")
     public void testOnTakeFocusWithNullParameters() {
         initTextViewWithNullLayout();
         try {
@@ -226,15 +173,6 @@ public class ArrowKeyMovementMethodTest extends ActivityInstrumentationTestCase2
         }
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test {@link ArrowKeyMovementMethod#onKeyDown(TextView, Spannable, int, "
-                + "KeyEvent)}. KeyEvent parameter is never read.",
-        method = "onKeyDown",
-        args = {TextView.class, Spannable.class, int.class, KeyEvent.class}
-    )
-    @ToBeFixed(bug = "1695243", explanation = "Android API javadocs are incomplete. There is no "
-            + "document about the behaviour of this method.")
     @UiThreadTest
     public void testOnKeyDownWithKeyCodeUp() {
         // first line
@@ -301,15 +239,6 @@ public class ArrowKeyMovementMethodTest extends ActivityInstrumentationTestCase2
         assertSelection(correspondingIn1stLine);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test {@link ArrowKeyMovementMethod#onKeyDown(TextView, Spannable, int, "
-                + "KeyEvent)}. KeyEvent parameter is never read.",
-        method = "onKeyDown",
-        args = {TextView.class, Spannable.class, int.class, KeyEvent.class}
-    )
-    @ToBeFixed(bug = "1695243", explanation = "Android API javadocs are incomplete. There is no "
-            + "document about the behaviour of this method.")
     @UiThreadTest
     public void testOnKeyDownWithKeyCodeDown() {
         // first line
@@ -376,15 +305,6 @@ public class ArrowKeyMovementMethodTest extends ActivityInstrumentationTestCase2
         assertSelection(correspondingIn3rdLine);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test {@link ArrowKeyMovementMethod#onKeyDown(TextView, Spannable, int, "
-                + "KeyEvent)}. KeyEvent parameter is never read.",
-        method = "onKeyDown",
-        args = {TextView.class, Spannable.class, int.class, KeyEvent.class}
-    )
-    @ToBeFixed(bug = "1695243", explanation = "Android API javadocs are incomplete. There is no "
-            + "document about the behaviour of this method.")
     @UiThreadTest
     public void testOnKeyDownWithKeyCodeLeft() {
         // first line
@@ -470,15 +390,6 @@ public class ArrowKeyMovementMethodTest extends ActivityInstrumentationTestCase2
         assertSelection(END_OF_1ST_LINE);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test {@link ArrowKeyMovementMethod#onKeyDown(TextView, Spannable, int, "
-                + "KeyEvent)}. KeyEvent parameter is never read.",
-        method = "onKeyDown",
-        args = {TextView.class, Spannable.class, int.class, KeyEvent.class}
-    )
-    @ToBeFixed(bug = "1695243", explanation = "Android API javadocs are incomplete. There is no "
-            + "document about the behaviour of this method.")
     @UiThreadTest
     public void testOnKeyDownWithKeyCodeRight() {
         // first line
@@ -564,16 +475,6 @@ public class ArrowKeyMovementMethodTest extends ActivityInstrumentationTestCase2
         assertSelection(START_OF_3RD_LINE);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test {@link ArrowKeyMovementMethod#onKeyDown(TextView, Spannable, int, "
-                + "KeyEvent)}. Test the method before the widget get layouted.",
-        method = "onKeyDown",
-        args = {TextView.class, Spannable.class, int.class, KeyEvent.class}
-    )
-    @ToBeFixed(bug = "1695243", explanation = "Android API javadocs are incomplete. @throws clause "
-            + "should be added into javadoc of ArrowKeyMovementMethod#onKeyDown(TextView, "
-            + "Spannable, int, KeyEvent)} when the view does not get layout")
     public void testOnKeyDownWithNullLayout() {
         initTextViewWithNullLayout();
         try {
@@ -585,14 +486,6 @@ public class ArrowKeyMovementMethodTest extends ActivityInstrumentationTestCase2
         }
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test {@link ArrowKeyMovementMethod#onKeyOther(TextView, Spannable, KeyEvent)}.",
-        method = "onKeyOther",
-        args = {TextView.class, Spannable.class, KeyEvent.class}
-    )
-    @ToBeFixed(bug = "1695243", explanation = "Android API javadocs are incomplete. There is no "
-            + "document about the behaviour of this method.")
     @UiThreadTest
     public void testOnKeyOther() {
         // first line
@@ -629,15 +522,6 @@ public class ArrowKeyMovementMethodTest extends ActivityInstrumentationTestCase2
                 new KeyEvent(0, 0, KeyEvent.ACTION_MULTIPLE, KeyEvent.KEYCODE_DPAD_RIGHT, 2)));
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test {@link ArrowKeyMovementMethod#onKeyDown(TextView, Spannable, int, "
-                + "KeyEvent)}. Test the method with other key code except up, down, left ,right.",
-        method = "onKeyDown",
-        args = {TextView.class, Spannable.class, int.class, KeyEvent.class}
-    )
-    @ToBeFixed(bug = "1695243", explanation = "Android API javadocs are incomplete. There is no "
-            + "document about the behaviour of this method.")
     @UiThreadTest
     public void testOnKeyDownWithOtherKeyCode() {
         // first line
@@ -657,16 +541,7 @@ public class ArrowKeyMovementMethodTest extends ActivityInstrumentationTestCase2
                         KeyEvent.KEYCODE_UNKNOWN)));
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test {@link ArrowKeyMovementMethod#onTouchEvent(TextView, Spannable,"
-            + " MotionEvent)}. Test the method while the widget is focused.",
-        method = "onTouchEvent",
-        args = {TextView.class, Spannable.class, MotionEvent.class}
-    )
     @UiThreadTest
-    @ToBeFixed(bug = "1400249", explanation = "There is a side effect that the "
-            + "view scroll while dragging on the screen. Should be tested in functional test.")
     public void testOnTouchEvent() throws Throwable {
         long now = SystemClock.currentThreadTimeMillis();
         Selection.setSelection(mEditable, SPACE_IN_2ND_LINE);
@@ -680,16 +555,6 @@ public class ArrowKeyMovementMethodTest extends ActivityInstrumentationTestCase2
         assertSelection(SPACE_IN_2ND_LINE);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test {@link ArrowKeyMovementMethod#onTouchEvent(TextView, Spannable, "
-                + "MotionEvent)}. Test the method before the widget get layouted.",
-        method = "onTouchEvent",
-        args = {TextView.class, Spannable.class, MotionEvent.class}
-    )
-    @ToBeFixed(bug = "1695243", explanation = "Android API javadocs are incomplete. @throws clause "
-            + "should be added into javadoc of ArrowKeyMovementMethod#onTouchEvent(TextView, "
-            + "Spannable, MotionEvent)} when the view does not get layout")
     public void testOnTouchEventWithNullLayout() {
         initTextViewWithNullLayout();
         mTextView.setFocusable(true);
@@ -701,16 +566,7 @@ public class ArrowKeyMovementMethodTest extends ActivityInstrumentationTestCase2
                     MotionEvent.obtain(now, now, MotionEvent.ACTION_UP, 1, 1, 0)));
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test {@link ArrowKeyMovementMethod#onTouchEvent(TextView, Spannable, "
-                + "MotionEvent)}. Test the method while the widget is not focused.",
-        method = "onTouchEvent",
-        args = {TextView.class, Spannable.class, MotionEvent.class}
-    )
     @UiThreadTest
-    @ToBeFixed(bug = "1695243", explanation = "Android API javadocs are incomplete. There is no "
-            + "document about the behaviour of this method.")
     public void testOnTouchEventWithoutFocus() {
         long now = SystemClock.currentThreadTimeMillis();
         Selection.setSelection(mEditable, SPACE_IN_2ND_LINE);
@@ -719,16 +575,6 @@ public class ArrowKeyMovementMethodTest extends ActivityInstrumentationTestCase2
         assertSelection(SPACE_IN_2ND_LINE);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test {@link ArrowKeyMovementMethod#onTouchEvent(TextView, Spannable, "
-            + "MotionEvent)}. Test the method with null parameters.",
-        method = "onTouchEvent",
-        args = {TextView.class, Spannable.class, MotionEvent.class}
-    )
-    @ToBeFixed(bug = "1695243", explanation = "Android API javadocs are incomplete. @throws clause "
-            + "should be added into javadoc of ArrowKeyMovementMethod#onTouchEvent(TextView, "
-            + "Spannable, MotionEvent)} when the params view, buffer or event is null")
     public void testOnTouchEventWithNullParameters() {
         initTextViewWithNullLayout();
         try {
@@ -755,16 +601,6 @@ public class ArrowKeyMovementMethodTest extends ActivityInstrumentationTestCase2
         }
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test {@link ArrowKeyMovementMethod#initialize(TextView, Spannable)}. "
-                + "TextView parameter is never read.",
-        method = "initialize",
-        args = {TextView.class, Spannable.class}
-    )
-    @ToBeFixed(bug = "1695243", explanation = "Android API javadocs are incomplete. @throws clause "
-            + "should be added into javadoc of ArrowKeyMovementMethod#initialize(TextView, "
-            + "Spannable)} when the params text is null")
     public void testInitialize() {
         Spannable spannable = new SpannableString("test content");
         ArrowKeyMovementMethod method = new ArrowKeyMovementMethod();
@@ -790,15 +626,6 @@ public class ArrowKeyMovementMethodTest extends ActivityInstrumentationTestCase2
         }
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test {@link ArrowKeyMovementMethod#onTrackballEvent(TextView, Spannable, "
-                + "MotionEvent)}. This method always returns false.",
-        method = "onTrackballEvent",
-        args = {TextView.class, Spannable.class, MotionEvent.class}
-    )
-    @ToBeFixed(bug = "1695243", explanation = "Android API javadocs are incomplete. "
-            + "There is no document about behaviour of this method.")
     public void testOnTrackballEven() {
         assertFalse(mArrowKeyMovementMethod.onTrackballEvent(mTextView, mEditable,
                 MotionEvent.obtain(0, 0, 0, 1, 1, 0)));
@@ -814,15 +641,6 @@ public class ArrowKeyMovementMethodTest extends ActivityInstrumentationTestCase2
         assertFalse(mArrowKeyMovementMethod.onTrackballEvent(mTextView, mEditable, null));
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test {@link ArrowKeyMovementMethod#onKeyUp(TextView, Spannable, int, KeyEvent)}. "
-                + "It always returns false.",
-        method = "onKeyUp",
-        args = {TextView.class, Spannable.class, int.class, KeyEvent.class}
-    )
-    @ToBeFixed(bug = "1695243", explanation = "Android API javadocs are incomplete. "
-            + "There is no document about behaviour of this method.")
     public void testOnKeyUp() {
         ArrowKeyMovementMethod method = new ArrowKeyMovementMethod();
         SpannableString spannable = new SpannableString("Test Content");

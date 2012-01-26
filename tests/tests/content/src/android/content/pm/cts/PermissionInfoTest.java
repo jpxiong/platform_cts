@@ -16,10 +16,6 @@
 
 package android.content.pm.cts;
 
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
 
 import android.content.pm.PackageManager;
 import android.content.pm.PermissionInfo;
@@ -27,50 +23,11 @@ import android.content.pm.PackageManager.NameNotFoundException;
 import android.os.Parcel;
 import android.test.AndroidTestCase;
 
-@TestTargetClass(PermissionInfo.class)
 public class PermissionInfoTest extends AndroidTestCase {
     private static final String PERMISSION_NAME = "android.permission.INTERNET";
     private static final String DEFAULT_DISCPRIPTION =
         "Allows an application to create network sockets.";
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test describeContents",
-            method = "describeContents",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test loadDescription",
-            method = "loadDescription",
-            args = {android.content.pm.PackageManager.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test constructors",
-            method = "PermissionInfo",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test constructors",
-            method = "PermissionInfo",
-            args = {android.content.pm.PermissionInfo.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test toString",
-            method = "toString",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test writeToParcel",
-            method = "writeToParcel",
-            args = {android.os.Parcel.class, int.class}
-        )
-    })
     public void testPermissionInfo() throws NameNotFoundException {
         PackageManager pm = getContext().getPackageManager();
         Parcel p = Parcel.obtain();

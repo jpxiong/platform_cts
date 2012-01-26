@@ -15,10 +15,6 @@
  */
 package android.graphics.cts;
 
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.ToBeFixed;
 
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
@@ -33,7 +29,6 @@ import android.util.Log;
 
 import junit.framework.TestCase;
 
-@TestTargetClass(DashPathEffect.class)
 public class DashPathEffectTest extends TestCase {
     private static final int BITMAP_WIDTH = 200;
     private static final int BITMAP_HEIGHT = 20;
@@ -45,13 +40,6 @@ public class DashPathEffectTest extends TestCase {
     private static final int BACKGROUND = Color.TRANSPARENT;
     private static final int FOREGROUND = Color.GREEN;
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "DashPathEffect",
-        args = {float[].class, float.class}
-    )
-    @ToBeFixed(bug = "2039296", explanation = "Javadoc for phase parameter is wrong. The phase" +
-        " determines the start offset within the pattern and not an initial gap")
     public void testDashPathEffect() {
         PathEffect effect = new DashPathEffect(PATTERN, OFFSET);
         Bitmap bitmap = Bitmap.createBitmap(BITMAP_WIDTH, BITMAP_HEIGHT, Config.ARGB_8888);

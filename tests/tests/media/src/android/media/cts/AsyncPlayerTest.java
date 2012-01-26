@@ -22,31 +22,9 @@ import android.media.AudioManager;
 import android.net.Uri;
 import android.provider.Settings;
 import android.test.AndroidTestCase;
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
 
-@TestTargetClass(AsyncPlayer.class)
 public class AsyncPlayerTest extends AndroidTestCase {
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "AsyncPlayer",
-            args = {String.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "play",
-            args = {Context.class, Uri.class, boolean.class, int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "stop",
-            args = {}
-        )
-    })
     public void testAsyncPlayer() throws Exception {
         final Uri PLAY_URI = Settings.System.DEFAULT_NOTIFICATION_URI;
         AsyncPlayer asyncPlayer = new AsyncPlayer(null);

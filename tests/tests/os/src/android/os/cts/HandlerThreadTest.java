@@ -20,30 +20,11 @@ import junit.framework.TestCase;
 import android.os.HandlerThread;
 import android.os.Looper;
 import android.os.Process;
-import dalvik.annotation.TestTargets;
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargetClass;
 
-@TestTargetClass(HandlerThread.class)
 public class HandlerThreadTest extends TestCase {
 
     private static final int SLEEPTIME = 100;
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test constructors",
-            method = "HandlerThread",
-            args = {java.lang.String.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test constructors",
-            method = "HandlerThread",
-            args = {java.lang.String.class, int.class}
-        )
-    })
     public void testConstructor() {
         // new the HandlerThread instance
         new HandlerThread("test");
@@ -51,32 +32,6 @@ public class HandlerThreadTest extends TestCase {
         new HandlerThread("test", Thread.MAX_PRIORITY);
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test getThreadId, onLooperPrepared, ",
-            method = "getThreadId",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test getThreadId, onLooperPrepared, ",
-            method = "onLooperPrepared",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test getThreadId, onLooperPrepared, ",
-            method = "getLooper",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test getThreadId, onLooperPrepared, ",
-            method = "run",
-            args = {}
-        )
-    })
     public void testGetThreadId() {
         MockHandlerThread ht = new MockHandlerThread("test");
         assertEquals(-1, ht.getThreadId());

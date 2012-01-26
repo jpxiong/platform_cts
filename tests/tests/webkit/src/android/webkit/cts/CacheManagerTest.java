@@ -21,15 +21,9 @@ import android.test.ActivityInstrumentationTestCase2;
 import android.webkit.CacheManager;
 import android.webkit.CacheManager.CacheResult;
 
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
-import dalvik.annotation.ToBeFixed;
 
 import java.util.Map;
 
-@TestTargetClass(android.webkit.CacheManager.class)
 public class CacheManagerTest extends ActivityInstrumentationTestCase2<WebViewStubActivity> {
     private static final long CACHEMANAGER_INIT_TIMEOUT = 5000L;
     private static final long NETWORK_OPERATION_TIMEOUT = 10000L;
@@ -55,43 +49,13 @@ public class CacheManagerTest extends ActivityInstrumentationTestCase2<WebViewSt
         super.tearDown();
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "getCacheFileBaseDir",
-        args = {}
-    )
     public void testGetCacheFileBaseDir() {
         assertTrue(CacheManager.getCacheFileBaseDir().exists());
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.NOT_FEASIBLE,
-            method = "startCacheTransaction",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.NOT_FEASIBLE,
-            method = "endCacheTransaction",
-            args = {}
-        )
-    })
-    @ToBeFixed(bug = "1695243", explanation = "the javadoc of these two methods doesn't exist.")
     public void testCacheTransaction() {
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getCacheFile",
-            args = {String.class, Map.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.NOT_FEASIBLE,
-            method = "saveCacheFile",
-            args = {String.class, CacheResult.class}
-        )
-    })
     public void testCacheFile() throws Exception {
         mWebServer = new CtsTestServer(getActivity());
         final String url = mWebServer.getAssetUrl(TestHtmlConstants.EMBEDDED_IMG_URL);
@@ -127,11 +91,6 @@ public class CacheManagerTest extends ActivityInstrumentationTestCase2<WebViewSt
         // public API to set the output stream.
     }
 
-    @TestTargetNew(
-        level = TestLevel.PARTIAL,
-        method = "cacheDisabled",
-        args = {}
-    )
     public void testCacheDisabled() {
         // The cache should always be enabled.
         assertFalse(CacheManager.cacheDisabled());

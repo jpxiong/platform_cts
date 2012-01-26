@@ -19,11 +19,6 @@ package android.graphics.drawable.cts;
 import com.android.cts.stub.R;
 
 import dalvik.annotation.KnownFailure;
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
-import dalvik.annotation.ToBeFixed;
 
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
@@ -49,7 +44,6 @@ import android.util.Xml;
 
 import java.io.IOException;
 
-@TestTargetClass(NinePatchDrawable.class)
 public class NinePatchDrawableTest extends InstrumentationTestCase {
     private static final int MIN_CHUNK_SIZE = 32;
 
@@ -64,18 +58,6 @@ public class NinePatchDrawableTest extends InstrumentationTestCase {
         mNinePatchDrawable = getNinePatchDrawable(R.drawable.ninepatch_0);
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "NinePatchDrawable",
-            args = {Bitmap.class, byte[].class, Rect.class, String.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "NinePatchDrawable",
-            args = {android.graphics.NinePatch.class}
-        )
-    })
     @SuppressWarnings("deprecation")
     public void testConstructors() {
         byte[] chunk = new byte[MIN_CHUNK_SIZE];
@@ -100,13 +82,6 @@ public class NinePatchDrawableTest extends InstrumentationTestCase {
         }
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "draw",
-        args = {android.graphics.Canvas.class}
-    )
-    @ToBeFixed(bug = "1417734", explanation = "should add @throws clause into javadoc of "
-            + "NinePatchDrawable#draw(Canvas) when param canvas is null")
     public void testDraw() {
         Bitmap bmp = Bitmap.createBitmap(9, 9, Config.ARGB_8888);
         Canvas c = new Canvas(bmp);
@@ -141,11 +116,6 @@ public class NinePatchDrawableTest extends InstrumentationTestCase {
         }
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "getChangingConfigurations",
-        args = {}
-    )
     public void testGetChangingConfigurations() {
         ConstantState constantState = mNinePatchDrawable.getConstantState();
 
@@ -168,14 +138,6 @@ public class NinePatchDrawableTest extends InstrumentationTestCase {
         assertEquals(0xffff,  mNinePatchDrawable.getChangingConfigurations());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "getPadding",
-        args = {android.graphics.Rect.class}
-    )
-    @ToBeFixed(bug = "1417734", explanation = "should add @throws clause into javadoc of "
-            + "NinePatchDrawable#getPadding(Rect) when param padding is null or "
-            + "the insternal padding field is not set ")
     public void testGetPadding() {
         Rect r = new Rect();
         NinePatchDrawable npd = (NinePatchDrawable) mResources.getDrawable(R.drawable.ninepatch_0);
@@ -194,11 +156,6 @@ public class NinePatchDrawableTest extends InstrumentationTestCase {
         assertTrue(r.bottom > 0);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "setAlpha",
-        args = {int.class}
-    )
     public void testSetAlpha() {
         assertEquals(0xff, mNinePatchDrawable.getPaint().getAlpha());
 
@@ -212,11 +169,6 @@ public class NinePatchDrawableTest extends InstrumentationTestCase {
         assertEquals(0xfe, mNinePatchDrawable.getPaint().getAlpha());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "setColorFilter",
-        args = {android.graphics.ColorFilter.class}
-    )
     public void testSetColorFilter() {
         assertNull(mNinePatchDrawable.getPaint().getColorFilter());
 
@@ -228,11 +180,6 @@ public class NinePatchDrawableTest extends InstrumentationTestCase {
         assertNull(mNinePatchDrawable.getPaint().getColorFilter());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "setDither",
-        args = {boolean.class}
-    )
     public void testSetDither() {
         assertTrue(mNinePatchDrawable.getPaint().isDither());
 
@@ -243,11 +190,6 @@ public class NinePatchDrawableTest extends InstrumentationTestCase {
         assertTrue(mNinePatchDrawable.getPaint().isDither());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "getPaint",
-        args = {}
-    )
     public void testGetPaint() {
         Paint paint = mNinePatchDrawable.getPaint();
         assertNotNull(paint);
@@ -255,11 +197,6 @@ public class NinePatchDrawableTest extends InstrumentationTestCase {
         assertSame(paint, mNinePatchDrawable.getPaint());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "getIntrinsicWidth",
-        args = {}
-    )
     public void testGetIntrinsicWidth() {
         Bitmap bmp = getBitmapUnscaled(R.drawable.ninepatch_0);
         assertEquals(bmp.getWidth(), mNinePatchDrawable.getIntrinsicWidth());
@@ -271,11 +208,6 @@ public class NinePatchDrawableTest extends InstrumentationTestCase {
         assertEquals(9, mNinePatchDrawable.getIntrinsicWidth());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "getMinimumWidth",
-        args = {}
-    )
     public void testGetMinimumWidth() {
         Bitmap bmp = getBitmapUnscaled(R.drawable.ninepatch_0);
         assertEquals(bmp.getWidth(), mNinePatchDrawable.getMinimumWidth());
@@ -287,11 +219,6 @@ public class NinePatchDrawableTest extends InstrumentationTestCase {
         assertEquals(9, mNinePatchDrawable.getMinimumWidth());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "getIntrinsicHeight",
-        args = {}
-    )
     public void testGetIntrinsicHeight() {
         Bitmap bmp = getBitmapUnscaled(R.drawable.ninepatch_0);
         assertEquals(bmp.getHeight(), mNinePatchDrawable.getIntrinsicHeight());
@@ -303,11 +230,6 @@ public class NinePatchDrawableTest extends InstrumentationTestCase {
         assertEquals(9, mNinePatchDrawable.getIntrinsicHeight());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "getMinimumHeight",
-        args = {}
-    )
     public void testGetMinimumHeight() {
         Bitmap bmp = getBitmapUnscaled(R.drawable.ninepatch_0);
         assertEquals(bmp.getHeight(), mNinePatchDrawable.getMinimumHeight());
@@ -319,11 +241,6 @@ public class NinePatchDrawableTest extends InstrumentationTestCase {
         assertEquals(9, mNinePatchDrawable.getMinimumHeight());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "getOpacity",
-        args = {}
-    )
     @KnownFailure("Bug 2834281 - Bitmap#hasAlpha seems to return true for "
         + "images without alpha.")
     public void testGetOpacity() {
@@ -333,11 +250,6 @@ public class NinePatchDrawableTest extends InstrumentationTestCase {
         assertEquals(PixelFormat.TRANSLUCENT, mNinePatchDrawable.getOpacity());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "getTransparentRegion",
-        args = {}
-    )
     public void testGetTransparentRegion() {
         // opaque image
         Region r = mNinePatchDrawable.getTransparentRegion();
@@ -358,11 +270,6 @@ public class NinePatchDrawableTest extends InstrumentationTestCase {
         assertEquals(new Rect(1, 1, 7, 7), r.getBounds());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "getConstantState",
-        args = {}
-    )
     public void testGetConstantState() {
         assertNotNull(mNinePatchDrawable.getConstantState());
 
@@ -375,11 +282,6 @@ public class NinePatchDrawableTest extends InstrumentationTestCase {
         assertEquals(0xff, constantState.getChangingConfigurations());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "inflate",
-        args = {Resources.class, XmlPullParser.class, AttributeSet.class}
-    )
     public void testInflate() throws XmlPullParserException, IOException {
         final int width = 80;
         final int height = 120;
@@ -403,12 +305,6 @@ public class NinePatchDrawableTest extends InstrumentationTestCase {
         assertTrue(width != ninePatchDrawable.getIntrinsicWidth());
     }
 
-    @TestTargetNew(
-        level = TestLevel.SUFFICIENT,
-        method = "mutate",
-        args = {}
-    )
-    @ToBeFixed(bug = "", explanation = "mutate() always throw NullPointerException.")
     public void testMutate() {
         NinePatchDrawable d1 =
             (NinePatchDrawable) mResources.getDrawable(R.drawable.ninepatchdrawable);

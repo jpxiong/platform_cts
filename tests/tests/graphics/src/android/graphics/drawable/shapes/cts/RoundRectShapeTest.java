@@ -16,11 +16,6 @@
 
 package android.graphics.drawable.shapes.cts;
 
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
-import dalvik.annotation.ToBeFixed;
 
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
@@ -32,7 +27,6 @@ import android.graphics.drawable.shapes.RoundRectShape;
 
 import junit.framework.TestCase;
 
-@TestTargetClass(android.graphics.drawable.shapes.RoundRectShape.class)
 public class RoundRectShapeTest extends TestCase {
     private static final int TEST_WIDTH  = 100;
     private static final int TEST_HEIGHT = 200;
@@ -40,13 +34,6 @@ public class RoundRectShapeTest extends TestCase {
     private static final int TEST_COLOR_1 = 0xFF00FF00;
     private static final int TEST_COLOR_2 = 0xFFFF0000;
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "RoundRectShape",
-        args = {float[].class, android.graphics.RectF.class, float[].class}
-    )
-    @ToBeFixed(bug = "1695243", explanation = "In some condition, NullPointerException or " +
-            "ArrayIndexOutOfBoundsException will be thrown, which is not mentioned in javadoc.")
     public void testConstructor() {
         new RoundRectShape(new float[8], new RectF(), new float[8]);
 
@@ -71,18 +58,6 @@ public class RoundRectShapeTest extends TestCase {
         }
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "draw",
-            args = {android.graphics.Canvas.class, android.graphics.Paint.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.SUFFICIENT,
-            method = "onResize",
-            args = {float.class, float.class}
-        )
-    })
     public void testDraw() {
         float[] outerR = new float[] { 12, 12, 0, 0, 0, 0, 0, 0 };
         RectF   inset = new RectF(6, 6, 6, 6);
@@ -105,11 +80,6 @@ public class RoundRectShapeTest extends TestCase {
         assertEquals(TEST_COLOR_2, bitmap.getPixel(TEST_WIDTH / 2, 0));
     }
 
-    @TestTargetNew(
-        level = TestLevel.SUFFICIENT,
-        method = "clone",
-        args = {}
-    )
     public void testClone() throws CloneNotSupportedException {
         RoundRectShape roundRectShape = new RoundRectShape(new float[8], new RectF(), new float[8]);
         roundRectShape.resize(100f, 200f);

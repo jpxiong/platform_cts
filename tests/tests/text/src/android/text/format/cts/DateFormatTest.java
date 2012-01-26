@@ -16,10 +16,6 @@
 
 package android.text.format.cts;
 
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
 
 import android.content.ContentResolver;
 import android.content.Context;
@@ -34,7 +30,6 @@ import java.util.GregorianCalendar;
 import java.util.Locale;
 import java.util.TimeZone;
 
-@TestTargetClass(DateFormat.class)
 public class DateFormatTest extends AndroidTestCase {
 
     private Context mContext;
@@ -75,11 +70,6 @@ public class DateFormatTest extends AndroidTestCase {
     }
 
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "is24HourFormat",
-        args = {Context.class}
-    )
     public void testDateFormat() {
         Settings.System.putString(mContentResolver, Settings.System.TIME_12_24, "24");
         assertTrue(DateFormat.is24HourFormat(mContext));
@@ -87,48 +77,6 @@ public class DateFormatTest extends AndroidTestCase {
         assertFalse(DateFormat.is24HourFormat(mContext));
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getTimeFormat",
-            args = {Context.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getDateFormat",
-            args = {Context.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getLongDateFormat",
-            args = {Context.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getMediumDateFormat",
-            args = {Context.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getDateFormatOrder",
-            args = {Context.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "format",
-            args = {CharSequence.class, Calendar.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "format",
-            args = {CharSequence.class, Date.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "format",
-            args = {CharSequence.class, long.class}
-        )
-    })
     @SuppressWarnings("deprecation")
     public void testFormatMethods() throws ParseException {
         if (!mDefaultLocale.equals(Locale.US)) {
@@ -176,7 +124,6 @@ public class DateFormatTest extends AndroidTestCase {
         assertEquals(expectedString, actual.toString());
     }
 
-    @TestTargetNew(level = TestLevel.ADDITIONAL)
     public void test2038() {
         Calendar calendar = new GregorianCalendar(TimeZone.getTimeZone("GMT+00:00"));
 

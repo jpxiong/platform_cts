@@ -31,12 +31,7 @@ import android.graphics.Paint;
 import android.test.ActivityInstrumentationTestCase2;
 import android.widget.cts.WidgetTestUtils;
 
-import dalvik.annotation.TestTargets;
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargetClass;
 
-@TestTargetClass(Movie.class)
 public class MovieTest extends ActivityInstrumentationTestCase2<MockActivity> {
     private Movie mMovie;
     private final int MOVIE = com.android.cts.stub.R.drawable.animated;
@@ -51,33 +46,17 @@ public class MovieTest extends ActivityInstrumentationTestCase2<MockActivity> {
         mMovie = getActivity().getResources().getMovie(MOVIE);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "draw",
-        args = {android.graphics.Canvas.class, float.class, float.class,
-                android.graphics.Paint.class}
-    )
     public void testDraw1() {
         Canvas c = new Canvas();
         Paint p = new Paint();
         mMovie.draw(c, 100, 200, p);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "draw",
-        args = {android.graphics.Canvas.class, float.class, float.class}
-    )
     public void testDraw2() {
         Canvas c = new Canvas();
         mMovie.draw(c, 100, 200);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "decodeFile",
-        args = {java.lang.String.class}
-    )
     public void testDecodeFile() throws Exception {
         mMovie = null;
         File dbDir = getInstrumentation().getTargetContext().getDir("tests",
@@ -131,12 +110,6 @@ public class MovieTest extends ActivityInstrumentationTestCase2<MockActivity> {
 
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "test decodeByteArray",
-        method = "decodeByteArray",
-        args = {byte[].class, int.class, int.class}
-    )
     public void testDecodeByteArray() throws Exception {
         mMovie = null;
         InputStream is = getActivity().getResources().openRawResource(MOVIE);
@@ -146,12 +119,6 @@ public class MovieTest extends ActivityInstrumentationTestCase2<MockActivity> {
         assertNotNull(mMovie);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "test decodeStream method",
-        method = "decodeStream",
-        args = {java.io.InputStream.class}
-    )
     public void testDecodeStream() {
         assertFalse(mMovie.isOpaque());
         mMovie = null;
@@ -166,12 +133,6 @@ public class MovieTest extends ActivityInstrumentationTestCase2<MockActivity> {
         assertNotNull(mMovie);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "test setTime method",
-        method = "setTime",
-        args = {int.class}
-    )
     public void testSetTime() {
         assertTrue(mMovie.setTime(1000));
         assertFalse(mMovie.setTime(Integer.MAX_VALUE));
@@ -179,28 +140,6 @@ public class MovieTest extends ActivityInstrumentationTestCase2<MockActivity> {
         assertFalse(mMovie.setTime(-1));
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "duration",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "isOpaque",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "height",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "width",
-            args = {}
-        )
-    })
     public void testGetMovieProperties() {
         assertEquals(1000, mMovie.duration());
         assertFalse(mMovie.isOpaque());

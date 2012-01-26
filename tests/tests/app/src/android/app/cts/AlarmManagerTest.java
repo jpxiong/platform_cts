@@ -16,10 +16,6 @@
 
 package android.app.cts;
 
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.ToBeFixed;
 
 import android.app.AlarmManager;
 import android.app.PendingIntent;
@@ -29,7 +25,6 @@ import android.content.IntentFilter;
 import android.os.SystemClock;
 import android.test.AndroidTestCase;
 
-@TestTargetClass(AlarmManager.class)
 public class AlarmManagerTest extends AndroidTestCase {
     private AlarmManager mAlarmManager;
     private Intent mIntent;
@@ -70,13 +65,6 @@ public class AlarmManagerTest extends AndroidTestCase {
         }
     }
 
-    @TestTargetNew(
-        level = TestLevel.PARTIAL,
-        method = "set",
-        args = {int.class, long.class, android.app.PendingIntent.class}
-    )
-    @ToBeFixed(bug = "1475410", explanation = "currently if make a device sleep android"
-            + "framework will throw out exception")
     public void testSetTypes() throws Exception {
         // TODO: try to find a way to make device sleep then test whether
         // AlarmManager perform the expected way
@@ -114,13 +102,6 @@ public class AlarmManagerTest extends AndroidTestCase {
         assertEquals(mMockAlarmReceiver.elapsedTime, mWakeupTime, TIME_DELTA);
     }
 
-    @TestTargetNew(
-        level = TestLevel.PARTIAL,
-        method = "set",
-        args = {int.class, long.class, android.app.PendingIntent.class}
-    )
-    @ToBeFixed(bug = "1475410", explanation = "currently if make a device sleep android"
-            + "framework will throw out exception")
     public void testAlarmTriggersImmediatelyIfSetTimeIsNegative() throws Exception {
         // An alarm with a negative wakeup time should be triggered immediately.
         // This exercises a workaround for a limitation of the /dev/alarm driver
@@ -132,13 +113,6 @@ public class AlarmManagerTest extends AndroidTestCase {
         assertTrue(mMockAlarmReceiver.alarmed);
     }
 
-    @TestTargetNew(
-        level = TestLevel.PARTIAL,
-        method = "setRepeating",
-        args = {int.class, long.class, long.class, android.app.PendingIntent.class}
-    )
-    @ToBeFixed(bug = "1475410", explanation = "currently if make a device sleep android"
-            + "framework will throw out exception")
     public void testSetRepeating() throws Exception {
         mMockAlarmReceiver.setAlarmedFalse();
         mWakeupTime = System.currentTimeMillis() + SNOOZE_DELAY;
@@ -151,11 +125,6 @@ public class AlarmManagerTest extends AndroidTestCase {
         mAlarmManager.cancel(mSender);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "cancel",
-        args = {android.app.PendingIntent.class}
-    )
     public void testCancel() throws Exception {
         mMockAlarmReceiver.setAlarmedFalse();
         mWakeupTime = System.currentTimeMillis() + SNOOZE_DELAY;
@@ -172,12 +141,6 @@ public class AlarmManagerTest extends AndroidTestCase {
         assertFalse(mMockAlarmReceiver.alarmed);
     }
 
-    @TestTargetNew(
-        level = TestLevel.PARTIAL,
-        method = "setInexactRepeating",
-        args = {int.class, long.class, long.class, android.app.PendingIntent.class}
-    )
-    @ToBeFixed(bug="1556930", explanation="no way to set the system clock")
     public void testSetInexactRepeating() throws Exception {
 
         mAlarmManager.setInexactRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(),

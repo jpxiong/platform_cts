@@ -16,10 +16,6 @@
 
 package android.text.style.cts;
 
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.ToBeFixed;
 
 import android.graphics.MaskFilter;
 import android.text.TextPaint;
@@ -27,28 +23,13 @@ import android.text.style.MaskFilterSpan;
 
 import junit.framework.TestCase;
 
-@TestTargetClass(MaskFilterSpan.class)
 public class MaskFilterSpanTest extends TestCase {
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test constructor(s) of {@link MaskFilterSpan}",
-        method = "MaskFilterSpan",
-        args = {android.graphics.MaskFilter.class}
-    )
-    @ToBeFixed(bug = "1695243", explanation = "miss javadoc")
     public void testConstructor() {
         MaskFilter mf = new MaskFilter();
         new MaskFilterSpan(mf);
         new MaskFilterSpan(null);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test {@link MaskFilterSpan#updateDrawState(TextPaint)}",
-        method = "updateDrawState",
-        args = {android.text.TextPaint.class}
-    )
-    @ToBeFixed(bug = "1695243", explanation = "miss javadoc")
     public void testUpdateDrawState() {
         MaskFilter mf = new MaskFilter();
         MaskFilterSpan maskFilterSpan = new MaskFilterSpan(mf);
@@ -67,13 +48,6 @@ public class MaskFilterSpanTest extends TestCase {
         }
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test {@link MaskFilterSpan#getMaskFilter()}",
-        method = "getMaskFilter",
-        args = {}
-    )
-    @ToBeFixed(bug = "1695243", explanation = "miss javadoc")
     public void testGetMaskFilter() {
         MaskFilter expected = new MaskFilter();
 

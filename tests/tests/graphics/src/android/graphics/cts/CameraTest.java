@@ -19,12 +19,7 @@ import android.graphics.Camera;
 import android.graphics.Canvas;
 import android.graphics.Matrix;
 import android.test.AndroidTestCase;
-import dalvik.annotation.TestTargets;
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargetClass;
 
-@TestTargetClass(Camera.class)
 public class CameraTest extends AndroidTestCase {
     private Camera mCamera;
 
@@ -34,45 +29,16 @@ public class CameraTest extends AndroidTestCase {
         mCamera = new Camera();
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "Camera",
-        args = {}
-    )
     public void testCamera(){
         new Camera();
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "save",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "restore",
-            args = {}
-        )
-    })
     public void testRestore() {
         // we cannot get the state changed because it was a native method
         mCamera.save();
         mCamera.restore();
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "translate",
-            args = {float.class, float.class, float.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getMatrix",
-            args = {android.graphics.Matrix.class}
-        )
-    })
     public void testTranslate() {
         Matrix m1 = new Matrix();
         preCompare(m1);
@@ -95,18 +61,6 @@ public class CameraTest extends AndroidTestCase {
         assertEquals(1.0f, f[8]);
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "rotateX",
-            args = {float.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getMatrix",
-            args = {android.graphics.Matrix.class}
-        )
-    })
     public void testRotateX() {
         Matrix m1 = new Matrix();
         preCompare(m1);
@@ -129,18 +83,6 @@ public class CameraTest extends AndroidTestCase {
         assertEquals(1.0f, f[8]);
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "rotateY",
-            args = {float.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getMatrix",
-            args = {android.graphics.Matrix.class}
-        )
-    })
     public void testRotateY() {
         Matrix m1 = new Matrix();
         preCompare(m1);
@@ -163,18 +105,6 @@ public class CameraTest extends AndroidTestCase {
         assertEquals(1.0f, f[8]);
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "rotateZ",
-            args = {float.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getMatrix",
-            args = {android.graphics.Matrix.class}
-        )
-    })
     public void testRotateZ() {
         Matrix m1 = new Matrix();
         preCompare(m1);
@@ -197,11 +127,6 @@ public class CameraTest extends AndroidTestCase {
         assertEquals(1.0f, f[8]);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "applyToCanvas",
-        args = {android.graphics.Canvas.class}
-    )
     public void testApplyToCanvas() {
         Canvas c1 = new Canvas();
         mCamera.applyToCanvas(c1);
@@ -214,11 +139,6 @@ public class CameraTest extends AndroidTestCase {
         assertTrue(c1.getMatrix().equals(c2.getMatrix()));
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "dotWithNormal",
-        args = {float.class, float.class, float.class}
-    )
     public void testDotWithNormal() {
         assertEquals(0.0792f, mCamera.dotWithNormal(0.1f, 0.28f, 0.2008f));
     }

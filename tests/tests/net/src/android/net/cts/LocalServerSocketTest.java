@@ -22,49 +22,9 @@ import android.net.LocalServerSocket;
 import android.net.LocalSocket;
 import android.net.LocalSocketAddress;
 import android.test.AndroidTestCase;
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
-import dalvik.annotation.ToBeFixed;
 
-@TestTargetClass(LocalServerSocket.class)
 public class LocalServerSocketTest extends AndroidTestCase {
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "accept",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "close",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getFileDescriptor",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getLocalSocketAddress",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.NOT_FEASIBLE,
-            method = "LocalServerSocket",
-            args = {java.io.FileDescriptor.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "LocalServerSocket",
-            args = {java.lang.String.class}
-        )
-    })
-    @ToBeFixed(bug = "1520987", explanation = "Cannot find a proper FileDescriptor for " +
-            "android.net.LocalServerSocket constructor")
     public void testLocalServerSocket() throws IOException {
         LocalServerSocket localServerSocket = new LocalServerSocket(LocalSocketTest.mSockAddr);
         assertNotNull(localServerSocket.getLocalSocketAddress());

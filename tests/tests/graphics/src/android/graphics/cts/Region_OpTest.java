@@ -19,18 +19,9 @@ package android.graphics.cts;
 import android.graphics.Region;
 import android.graphics.Region.Op;
 import android.test.AndroidTestCase;
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
 
-@TestTargetClass(Region.Op.class)
 public class Region_OpTest extends AndroidTestCase {
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "valueOf",
-        args = {java.lang.String.class}
-    )
     public void testValueOf() {
         assertEquals(Op.DIFFERENCE, Op.valueOf("DIFFERENCE"));
         assertEquals(Op.INTERSECT, Op.valueOf("INTERSECT"));
@@ -43,11 +34,6 @@ public class Region_OpTest extends AndroidTestCase {
         // Every Op element indicates one operation type.
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "values",
-        args = {}
-    )
     public void testValues() {
         // set the expected value
         Op[] expected = {

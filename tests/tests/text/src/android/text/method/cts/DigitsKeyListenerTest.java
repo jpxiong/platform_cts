@@ -18,11 +18,6 @@ package android.text.method.cts;
 
 import com.android.cts.stub.R;
 
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
-import dalvik.annotation.ToBeFixed;
 
 import android.app.Activity;
 import android.app.Instrumentation;
@@ -38,7 +33,6 @@ import android.widget.TextView;
 /**
  * Test {@link DigitsKeyListener}.
  */
-@TestTargetClass(DigitsKeyListener.class)
 public class DigitsKeyListenerTest extends
         ActivityInstrumentationTestCase2<KeyListenerStubActivity> {
     private Activity mActivity;
@@ -58,18 +52,6 @@ public class DigitsKeyListenerTest extends
         mTextView = (TextView) mActivity.findViewById(R.id.keylistener_textview);
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "DigitsKeyListener",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "DigitsKeyListener",
-            args = {boolean.class, boolean.class}
-        )
-    })
     public void testConstructor() {
         new DigitsKeyListener();
 
@@ -85,12 +67,6 @@ public class DigitsKeyListenerTest extends
      * 4. filter Spanned("-a1.b2c3d"), return Spanned("123") and copy spans.
      * 5. filter "", return null
      */
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "filter",
-        args = {CharSequence.class, int.class, int.class, Spanned.class, int.class, int.class}
-    )
-    @ToBeFixed(bug = "1695243", explanation = "Android API javadocs are incomplete")
     public void testFilter1() {
         String source = "123456";
         String destString = "dest string";
@@ -137,12 +113,6 @@ public class DigitsKeyListenerTest extends
      * 7. filter "-123456" but dest has '-' after dend, return ""
      * 8. filter "-123456" but dest has '-' before dstart, return "123456"
      */
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "filter",
-        args = {CharSequence.class, int.class, int.class, Spanned.class, int.class, int.class}
-    )
-    @ToBeFixed(bug = "1695243", explanation = "Android API javadocs are incomplete")
     public void testFilter2() {
         String source = "-123456";
         String destString = "dest string without sign and decimal";
@@ -207,12 +177,6 @@ public class DigitsKeyListenerTest extends
      * 7. filter "123.456" but dest has '.' after dend, return "123456"
      * 8. filter "123.456" but dest has '.' before dstart, return "123456"
      */
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "filter",
-        args = {CharSequence.class, int.class, int.class, Spanned.class, int.class, int.class}
-    )
-    @ToBeFixed(bug = "1695243", explanation = "Android API javadocs are incomplete")
     public void testFilter3() {
         String source = "123.456";
         String destString = "dest string without sign and decimal";
@@ -279,12 +243,6 @@ public class DigitsKeyListenerTest extends
      * 9. filter "-123.456" but dest has '-' after dend, return ""
      * 10. filter "-123.456" but dest has '-' before dstart, return "123.456"
      */
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "filter",
-        args = {CharSequence.class, int.class, int.class, Spanned.class, int.class, int.class}
-    )
-    @ToBeFixed(bug = "1695243", explanation = "Android API javadocs are incomplete")
     public void testFilter4() {
         String source = "-123.456";
         String destString = "dest string without sign and decimal";
@@ -439,8 +397,6 @@ public class DigitsKeyListenerTest extends
      *  5. Press '.' key and this key could not be accepted,
      *     because text view accepts only one decimal point per field.
      */
-    @ToBeFixed(bug = "1728770", explanation = "unexpected IndexOutOfBoundsException occurs" +
-            " when set DigitsKeyListener with InputType.TYPE_NUMBER_FLAG_DECIMAL.")
     public void testDigitsKeyListener3() {
 //        final DigitsKeyListener digitsKeyListener = DigitsKeyListener.getInstance(false, true);
 //
@@ -486,8 +442,6 @@ public class DigitsKeyListenerTest extends
      *  6. Press '.' key and this key could not be accepted,
      *     because text view accepts only one decimal point per field.
      */
-    @ToBeFixed(bug = "1728770", explanation = "unexpected IndexOutOfBoundsException occurs" +
-            " when set DigitsKeyListener with InputType.TYPE_NUMBER_FLAG_DECIMAL.")
     public void testDigitsKeyListener4() {
 //        final DigitsKeyListener digitsKeyListener = DigitsKeyListener.getInstance(true, true);
 //
@@ -578,11 +532,6 @@ public class DigitsKeyListenerTest extends
         assertEquals("5", mTextView.getText().toString());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "getInstance",
-        args = {}
-    )
     public void testGetInstance1() {
         DigitsKeyListener listener1 = DigitsKeyListener.getInstance();
         DigitsKeyListener listener2 = DigitsKeyListener.getInstance();
@@ -592,11 +541,6 @@ public class DigitsKeyListenerTest extends
         assertSame(listener1, listener2);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "getInstance",
-        args = {boolean.class, boolean.class}
-    )
     public void testGetInstance2() {
         DigitsKeyListener listener1 = DigitsKeyListener.getInstance(true, true);
         DigitsKeyListener listener2 = DigitsKeyListener.getInstance(true, true);
@@ -613,11 +557,6 @@ public class DigitsKeyListenerTest extends
         assertSame(listener1, listener2);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "getInstance",
-        args = {String.class}
-    )
     public void testGetInstance3() {
         DigitsKeyListener digitsKeyListener = DigitsKeyListener.getInstance("abcdefg");
         assertNotNull(digitsKeyListener);
@@ -626,12 +565,6 @@ public class DigitsKeyListenerTest extends
         assertNotNull(digitsKeyListener);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "getAcceptedChars",
-        args = {}
-    )
-    @ToBeFixed(bug = "1695243", explanation = "Android API javadocs are incomplete.")
     public void testGetAcceptedChars() {
         MyDigitsKeyListener digitsKeyListener = new MyDigitsKeyListener();
 
@@ -658,12 +591,6 @@ public class DigitsKeyListenerTest extends
                 digitsKeyListener.getAcceptedChars());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "getInputType",
-        args = {}
-    )
-    @ToBeFixed(bug = "1695243", explanation = "Android API javadocs are incomplete.")
     public void testGetInputType() {
         DigitsKeyListener digitsKeyListener = DigitsKeyListener.getInstance(false, false);
         int expected = InputType.TYPE_CLASS_NUMBER;

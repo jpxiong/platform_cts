@@ -16,9 +16,6 @@
 
 package android.provider.cts;
 
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
 
 import android.content.ContentResolver;
 import android.content.ContentValues;
@@ -34,7 +31,6 @@ import android.test.InstrumentationTestCase;
 
 import java.util.regex.Pattern;
 
-@TestTargetClass(Members.class)
 public class MediaStore_Audio_Playlists_MembersTest extends InstrumentationTestCase {
     private String[] mAudioProjection = {
             Members._ID,
@@ -124,11 +120,6 @@ public class MediaStore_Audio_Playlists_MembersTest extends InstrumentationTestC
         super.tearDown();
     }
 
-    @TestTargetNew(
-      level = TestLevel.COMPLETE,
-      method = "getContentUri",
-      args = {String.class, long.class}
-    )
     public void testGetContentUri() {
         assertEquals("content://media/external/audio/playlists/1337/members",
                 Members.getContentUri("external", 1337).toString());

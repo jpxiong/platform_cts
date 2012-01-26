@@ -15,30 +15,13 @@
  */
 package android.view.inputmethod.cts;
 
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
 
 import android.os.Parcel;
 import android.test.AndroidTestCase;
 import android.view.inputmethod.ExtractedText;
 
-@TestTargetClass(ExtractedText.class)
 public class ExtractedTextTest extends AndroidTestCase {
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "describeContents",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "writeToParcel",
-            args = {android.os.Parcel.class, int.class}
-        )
-    })
     public void testWriteToParcel() {
 
         ExtractedText extractedText = new ExtractedText();

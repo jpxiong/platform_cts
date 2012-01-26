@@ -16,9 +16,6 @@
 
 package android.provider.cts;
 
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
 
 import android.content.ContentResolver;
 import android.content.ContentValues;
@@ -32,7 +29,6 @@ import android.test.InstrumentationTestCase;
 
 import java.io.File;
 
-@TestTargetClass(MediaStore.Video.Media.class)
 public class MediaStore_Video_MediaTest extends InstrumentationTestCase {
     private ContentResolver mContentResolver;
 
@@ -43,11 +39,6 @@ public class MediaStore_Video_MediaTest extends InstrumentationTestCase {
         mContentResolver = getInstrumentation().getContext().getContentResolver();
     }
 
-    @TestTargetNew(
-      level = TestLevel.COMPLETE,
-      method = "getContentUri",
-      args = {String.class}
-    )
     public void testGetContentUri() {
         assertNotNull(mContentResolver.query(Media.getContentUri("internal"), null, null, null,
                 null));

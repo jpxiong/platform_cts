@@ -16,7 +16,6 @@
 
 package android.os.cts;
 
-import dalvik.annotation.TestTargetClass;
 
 import android.os.Build;
 
@@ -26,7 +25,6 @@ import java.util.regex.Pattern;
 
 import junit.framework.TestCase;
 
-@TestTargetClass(Build.class)
 public class BuildTest extends TestCase {
 
     private static final String RO_PRODUCT_CPU_ABI = "ro.product.cpu.abi";

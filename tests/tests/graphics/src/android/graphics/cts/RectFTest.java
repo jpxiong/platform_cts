@@ -16,17 +16,12 @@
 
 package android.graphics.cts;
 
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
 
 import android.graphics.Rect;
 import android.graphics.RectF;
 import android.os.Parcel;
 import android.test.AndroidTestCase;
 
-@TestTargetClass(RectF.class)
 public class RectFTest extends AndroidTestCase {
 
     private RectF mRectF;
@@ -37,28 +32,6 @@ public class RectFTest extends AndroidTestCase {
         mRectF = null;
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "RectF",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "RectF",
-            args = {float.class, float.class, float.class, float.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "RectF",
-            args = {android.graphics.RectF.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "RectF",
-            args = {android.graphics.Rect.class}
-        )
-    })
     public void testConstructor() {
 
         mRectF = null;
@@ -81,11 +54,6 @@ public class RectFTest extends AndroidTestCase {
 
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "sort",
-        args = {}
-    )
     public void testSort() {
 
         mRectF = new RectF(10, 10, 5, 5);
@@ -102,11 +70,6 @@ public class RectFTest extends AndroidTestCase {
 
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "set",
-        args = {float.class, float.class, float.class, float.class}
-    )
     public void testSet1() {
 
         mRectF = new RectF();
@@ -118,11 +81,6 @@ public class RectFTest extends AndroidTestCase {
 
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "set",
-        args = {android.graphics.RectF.class}
-    )
     public void testSet2() {
 
         RectF rectF = new RectF(1.0f, 2.0f, 3.0f, 4.0f);
@@ -135,11 +93,6 @@ public class RectFTest extends AndroidTestCase {
 
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "set",
-        args = {android.graphics.Rect.class}
-    )
     public void testSet3() {
 
         Rect rect = new Rect(1, 2, 3, 4);
@@ -152,11 +105,6 @@ public class RectFTest extends AndroidTestCase {
 
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "intersects",
-        args = {float.class, float.class, float.class, float.class}
-    )
     public void testIntersects1() {
 
         mRectF = new RectF(0, 0, 10, 10);
@@ -175,11 +123,6 @@ public class RectFTest extends AndroidTestCase {
 
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "intersects",
-        args = {android.graphics.RectF.class, android.graphics.RectF.class}
-    )
     public void testIntersects2() {
 
         RectF rectF1;
@@ -195,11 +138,6 @@ public class RectFTest extends AndroidTestCase {
 
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "intersect",
-        args = {float.class, float.class, float.class, float.class}
-    )
     public void testIntersect1() {
 
         mRectF = new RectF(0, 0, 10, 10);
@@ -218,11 +156,6 @@ public class RectFTest extends AndroidTestCase {
 
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "intersect",
-        args = {android.graphics.RectF.class}
-    )
     public void testIntersect2() {
 
         RectF rectF;
@@ -245,11 +178,6 @@ public class RectFTest extends AndroidTestCase {
 
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "union",
-        args = {float.class, float.class, float.class, float.class}
-    )
     public void testUnion1() {
 
         // Both rect1 and rect2 are not empty.
@@ -300,11 +228,6 @@ public class RectFTest extends AndroidTestCase {
 
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "union",
-        args = {android.graphics.RectF.class}
-    )
     public void testUnion2() {
 
         RectF rectF;
@@ -362,11 +285,6 @@ public class RectFTest extends AndroidTestCase {
 
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "union",
-        args = {float.class, float.class}
-    )
     public void testUnion3() {
 
         // rect1 is not empty (x > right, y > bottom).
@@ -403,11 +321,6 @@ public class RectFTest extends AndroidTestCase {
 
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "contains",
-        args = {float.class, float.class}
-    )
     public void testContains1() {
 
         mRectF = new RectF(1.0f, 1.0f, 20.0f, 20.0f);
@@ -418,11 +331,6 @@ public class RectFTest extends AndroidTestCase {
 
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "contains",
-        args = {float.class, float.class, float.class, float.class}
-    )
     public void testContains2() {
 
         mRectF = new RectF(1.0f, 1.0f, 20.0f, 20.0f);
@@ -432,11 +340,6 @@ public class RectFTest extends AndroidTestCase {
         assertFalse(mRectF.contains(0.0f, 0.0f, 19.0f, 19.0f));
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "contains",
-        args = {android.graphics.RectF.class}
-    )
     public void testContains3() {
 
         RectF rectF;
@@ -452,11 +355,6 @@ public class RectFTest extends AndroidTestCase {
 
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "offset",
-        args = {float.class, float.class}
-    )
     public void testOffset() {
 
        mRectF = new RectF(5, 5, 10, 10);
@@ -468,11 +366,6 @@ public class RectFTest extends AndroidTestCase {
 
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "inset",
-        args = {float.class, float.class}
-    )
     public void testInset() {
 
         mRectF = new RectF(5.0f, 5.0f, 10.0f, 10.0f);
@@ -491,31 +384,16 @@ public class RectFTest extends AndroidTestCase {
 
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "height",
-        args = {}
-    )
     public void testHeight() {
         mRectF = new RectF(1.0f, 1.0f, 20.5f, 20.5f);
         assertEquals(19.5f, mRectF.height());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "width",
-        args = {}
-    )
     public void testWidth() {
         mRectF = new RectF(1.0f, 1.0f, 20.5f, 20.5f);
         assertEquals(19.5f, mRectF.width());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "offsetTo",
-        args = {float.class, float.class}
-    )
     public void testOffsetTo() {
 
         mRectF = new RectF(5, 5, 10, 10);
@@ -527,11 +405,6 @@ public class RectFTest extends AndroidTestCase {
 
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "setEmpty",
-        args = {}
-    )
     public void testSetEmpty() {
 
         // Before setEmpty()
@@ -550,11 +423,6 @@ public class RectFTest extends AndroidTestCase {
 
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "isEmpty",
-        args = {}
-    )
     public void testIsEmpty() {
 
         mRectF = new RectF();
@@ -568,11 +436,6 @@ public class RectFTest extends AndroidTestCase {
 
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "centerX",
-        args = {}
-    )
     public void testCenterX() {
 
         mRectF = new RectF(10.0f, 10.0f, 20.0f, 20.0f);
@@ -584,11 +447,6 @@ public class RectFTest extends AndroidTestCase {
 
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "centerY",
-        args = {}
-    )
     public void testCenterY() {
 
         mRectF = new RectF(10.0f, 10.0f, 20.0f, 20.0f);
@@ -599,21 +457,11 @@ public class RectFTest extends AndroidTestCase {
         assertEquals(15.2f, mRectF.centerY());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "toString",
-        args = {}
-    )
     public void testToString() {
         mRectF = new RectF();
         assertNotNull(mRectF.toString());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "setIntersect",
-        args = {android.graphics.RectF.class, android.graphics.RectF.class}
-    )
     public void testSetIntersect() {
 
         RectF rectF1 = new RectF(0, 0, 10, 10);
@@ -637,11 +485,6 @@ public class RectFTest extends AndroidTestCase {
 
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "roundOut",
-        args = {android.graphics.Rect.class}
-    )
     public void testRoundOut() {
 
         Rect rect = new Rect();
@@ -654,11 +497,6 @@ public class RectFTest extends AndroidTestCase {
 
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "round",
-        args = {android.graphics.Rect.class}
-    )
     public void testRound() {
 
         Rect rect = new Rect();
@@ -671,23 +509,6 @@ public class RectFTest extends AndroidTestCase {
 
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "readFromParcel",
-            args = {android.os.Parcel.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "writeToParcel",
-            args = {android.os.Parcel.class, int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "describeContents",
-            args = {}
-        )
-    })
     public void testWriteReadParcel() {
         RectF rectOut = new RectF(0.0f,0.0f,10.0f,10.0f);
         Parcel out = Parcel.obtain();

@@ -17,27 +17,8 @@ package android.os.cts;
 
 import junit.framework.TestCase;
 import android.os.BadParcelableException;
-import dalvik.annotation.TestTargets;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
 
-@TestTargetClass(BadParcelableException.class)
 public class BadParcelableExceptionTest extends TestCase {
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "test method: BadParcelableException",
-            method = "BadParcelableException",
-            args = {java.lang.Exception.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "test method: BadParcelableException",
-            method = "BadParcelableException",
-            args = {java.lang.String.class}
-        )
-    })
     public void testBadParcelableException(){
         BadParcelableException ne = null;
         boolean isThrowed = false;

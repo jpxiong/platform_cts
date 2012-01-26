@@ -15,10 +15,6 @@
  */
 package android.media.cts;
 
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
 
 import android.content.pm.PackageManager;
 import android.hardware.Camera;
@@ -37,7 +33,6 @@ import java.io.File;
 import java.io.FileDescriptor;
 import java.io.FileOutputStream;
 
-@TestTargetClass(MediaRecorder.class)
 public class MediaRecorderTest extends ActivityInstrumentationTestCase2<MediaStubActivity> {
     private final String TAG = "MediaRecorderTest";
     private final String OUTPUT_PATH;
@@ -108,48 +103,6 @@ public class MediaRecorderTest extends ActivityInstrumentationTestCase2<MediaStu
         super.tearDown();
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "MediaRecorder",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "release",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setOutputFormat",
-            args = {int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setVideoEncoder",
-            args = {int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setVideoSize",
-            args = {int.class, int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setVideoSource",
-            args = {int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setOutputFile",
-            args = {String.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "reset",
-            args = {}
-        )
-    })
     public void testRecorderCamera() throws Exception {
         if (!hasCamera()) {
             return;
@@ -166,23 +119,6 @@ public class MediaRecorderTest extends ActivityInstrumentationTestCase2<MediaStu
         checkOutputExist();
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setVideoFrameRate",
-            args = {int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setLocation",
-            args = {float.class,float.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setCamera",
-            args = {Camera.class}
-        )
-    })
     @UiThreadTest
     public void testSetCamera() throws Exception {
         int nCamera = Camera.getNumberOfCameras();
@@ -251,63 +187,6 @@ public class MediaRecorderTest extends ActivityInstrumentationTestCase2<MediaStu
         assertTrue(mOutFile.delete());
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "MediaRecorder",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "prepare",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setOutputFile",
-            args = {FileDescriptor.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setOutputFormat",
-            args = {int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setPreviewDisplay",
-            args = {Surface.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setVideoEncoder",
-            args = {int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setVideoSize",
-            args = {int.class, int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setVideoSource",
-            args = {int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "start",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "stop",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setMaxFileSize",
-            args = {long.class}
-        )
-    })
     public void testRecorderVideo() throws Exception {
         if (!hasCamera()) {
             return;
@@ -326,58 +205,6 @@ public class MediaRecorderTest extends ActivityInstrumentationTestCase2<MediaStu
         assertFalse(checkLocationInFile(OUTPUT_PATH2));
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "MediaRecorder",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getMaxAmplitude",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "prepare",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setAudioEncoder",
-            args = {int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setAudioSource",
-            args = {int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setOutputFile",
-            args = {String.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setOutputFormat",
-            args = {int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "start",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "stop",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setMaxFileSize",
-            args = {long.class}
-        )
-    })
     public void testRecorderAudio() throws Exception {
         if (!hasMicrophone()) {
             return;
@@ -390,53 +217,6 @@ public class MediaRecorderTest extends ActivityInstrumentationTestCase2<MediaStu
         recordMedia(MAX_FILE_SIZE, mOutFile);
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "MediaRecorder",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "prepare",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setAudioEncoder",
-            args = {int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setAudioSource",
-            args = {int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setOutputFormat",
-            args = {int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "start",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setMaxDuration",
-            args = {int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setOnInfoListener",
-            args = {OnInfoListener.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setOnErrorListener",
-            args = {OnErrorListener.class}
-        )
-    })
     public void testOnInfoListener() throws Exception {
         if (!hasMicrophone()) {
             return;
@@ -451,11 +231,6 @@ public class MediaRecorderTest extends ActivityInstrumentationTestCase2<MediaStu
         assertTrue(mOnInfoCalled);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "setMaxDuration",
-        args = {int.class}
-    )
     public void testSetMaxDuration() throws Exception {
         if (!hasMicrophone()) {
             return;
@@ -471,11 +246,6 @@ public class MediaRecorderTest extends ActivityInstrumentationTestCase2<MediaStu
         checkOutputExist();
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "setMaxFileSize",
-        args = {int.class}
-    )
     public void testSetMaxFileSize() throws Exception {
         if (!hasMicrophone()) {
             return;
@@ -491,53 +261,6 @@ public class MediaRecorderTest extends ActivityInstrumentationTestCase2<MediaStu
         checkOutputExist();
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "MediaRecorder",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "prepare",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setAudioEncoder",
-            args = {int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setAudioSource",
-            args = {int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setOutputFormat",
-            args = {int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "start",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "stop",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setOnErrorListener",
-            args = {OnErrorListener.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setMaxFileSize",
-            args = {long.class}
-        )
-    })
     public void testOnErrorListener() throws Exception {
         if (!hasMicrophone()) {
             return;

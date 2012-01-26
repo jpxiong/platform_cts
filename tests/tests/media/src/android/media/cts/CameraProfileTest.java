@@ -16,10 +16,6 @@
 
 package android.media.cts;
 
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
 
 import android.hardware.Camera;
 import android.media.CameraProfile;
@@ -28,7 +24,6 @@ import android.util.Log;
 
 import java.util.List;
 
-@TestTargetClass(CameraProfile.class)
 public class CameraProfileTest extends AndroidTestCase {
 
     private static final String TAG = "CameraProfileTest";
@@ -41,13 +36,6 @@ public class CameraProfileTest extends AndroidTestCase {
         assertTrue(low <= mid && mid <= high);
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getJpegEncodingQualityParameter",
-            args = {int.class}
-        )
-    })
     public void testGetImageEncodingQualityParameter() {
         int low = CameraProfile.getJpegEncodingQualityParameter(CameraProfile.QUALITY_LOW);
         int mid = CameraProfile.getJpegEncodingQualityParameter(CameraProfile.QUALITY_MEDIUM);
@@ -55,13 +43,6 @@ public class CameraProfileTest extends AndroidTestCase {
         checkQuality(low, mid, high);
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getJpegEncodingQualityParameter",
-            args = {int.class, int.class}
-        )
-    })
     public void testGetWithId() {
         int nCamera = Camera.getNumberOfCameras();
         for (int id = 0; id < nCamera; id++) {

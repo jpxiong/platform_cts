@@ -17,12 +17,7 @@ package android.graphics.cts;
 
 import android.graphics.ColorMatrix;
 import android.test.AndroidTestCase;
-import dalvik.annotation.TestTargets;
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargetClass;
 
-@TestTargetClass(ColorMatrix.class)
 public class ColorMatrixTest extends AndroidTestCase {
     private ColorMatrix mColorMatrix;
 
@@ -42,23 +37,6 @@ public class ColorMatrixTest extends AndroidTestCase {
         mColorMatrix = new ColorMatrix(mSrc);
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "ColorMatrix",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "ColorMatrix",
-            args = {float[].class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "ColorMatrix",
-            args = {android.graphics.ColorMatrix.class}
-        )
-    })
     public void testColorMatrix(){
         new ColorMatrix();
 
@@ -82,18 +60,6 @@ public class ColorMatrixTest extends AndroidTestCase {
 
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "reset",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getArray",
-            args = {}
-        )
-    })
     public void testReset(){
         float[] ret = mColorMatrix.getArray();
         preCompare(ret);
@@ -112,18 +78,6 @@ public class ColorMatrixTest extends AndroidTestCase {
         }
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "set",
-            args = {float[].class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getArray",
-            args = {}
-        )
-    })
     public void testSet1(){
         float[] ret = mColorMatrix.getArray();
         preCompare(ret);
@@ -145,18 +99,6 @@ public class ColorMatrixTest extends AndroidTestCase {
         }
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "set",
-            args = {android.graphics.ColorMatrix.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getArray",
-            args = {}
-        )
-    })
     public void testSet2(){
         float[] ret = mColorMatrix.getArray();
         preCompare(ret);
@@ -178,18 +120,6 @@ public class ColorMatrixTest extends AndroidTestCase {
         }
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setRotate",
-            args = {int.class, float.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getArray",
-            args = {}
-        )
-    })
     public void testSetRotate(){
         // abnormal case: IllegalArgument axis
         try{
@@ -219,18 +149,6 @@ public class ColorMatrixTest extends AndroidTestCase {
         assertEquals(0, ret[5], TOLERANCE);
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setSaturation",
-            args = {float.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getArray",
-            args = {}
-        )
-    })
     public void testSetSaturation(){
         mColorMatrix.setSaturation(0.5f);
         float[] ret = mColorMatrix.getArray();
@@ -257,18 +175,6 @@ public class ColorMatrixTest extends AndroidTestCase {
         assertEquals(0.0f, ret[19]);
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setScale",
-            args = {float.class, float.class, float.class, float.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getArray",
-            args = {}
-        )
-    })
     public void testSetScale(){
         float[] ret = mColorMatrix.getArray();
         preCompare(ret);
@@ -291,18 +197,6 @@ public class ColorMatrixTest extends AndroidTestCase {
         }
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setRGB2YUV",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getArray",
-            args = {}
-        )
-    })
     public void testSetRGB2YUV(){
         mColorMatrix.setRGB2YUV();
         float[] ret = mColorMatrix.getArray();
@@ -329,18 +223,6 @@ public class ColorMatrixTest extends AndroidTestCase {
         assertEquals(0.0f, ret[19]);
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setYUV2RGB",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getArray",
-            args = {}
-        )
-    })
     public void testSetYUV2RGB(){
         mColorMatrix.setYUV2RGB();
         float[] ret = mColorMatrix.getArray();
@@ -367,18 +249,6 @@ public class ColorMatrixTest extends AndroidTestCase {
         assertEquals(0.0f, ret[19]);
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "postConcat",
-            args = {android.graphics.ColorMatrix.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getArray",
-            args = {}
-        )
-    })
     public void testPostConcat(){
         mColorMatrix.postConcat(new ColorMatrix());
 
@@ -389,18 +259,6 @@ public class ColorMatrixTest extends AndroidTestCase {
         }
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "preConcat",
-            args = {android.graphics.ColorMatrix.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getArray",
-            args = {}
-        )
-    })
     public void testPreConcat(){
         mColorMatrix.preConcat(new ColorMatrix());
 
@@ -411,18 +269,6 @@ public class ColorMatrixTest extends AndroidTestCase {
         }
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setConcat",
-            args = {android.graphics.ColorMatrix.class, android.graphics.ColorMatrix.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getArray",
-            args = {}
-        )
-    })
     public void testSetConcat(){
         float[] floatA = new float[]{
             0, 1, 2, 3, 4,

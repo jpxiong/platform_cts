@@ -27,12 +27,7 @@ import android.content.res.AssetFileDescriptor;
 import android.os.Parcel;
 import android.os.ParcelFileDescriptor;
 import android.test.AndroidTestCase;
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
 
-@TestTargetClass(AssetFileDescriptor.class)
 public class AssetFileDescriptorTest extends AndroidTestCase {
     private static final long START_OFFSET = 0;
     private static final long LENGTH = 100;
@@ -71,23 +66,6 @@ public class AssetFileDescriptorTest extends AndroidTestCase {
         getContext().deleteFile(FILE_NAME);
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "close",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "createInputStream",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "createOutputStream",
-            args = {}
-        )
-    })
     public void testInputOutputStream() throws IOException {
         /*
          * test createOutputStream() and createInputStrean()
@@ -172,54 +150,6 @@ public class AssetFileDescriptorTest extends AndroidTestCase {
         }
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            notes = "Test construct.",
-            method = "AssetFileDescriptor",
-            args = {ParcelFileDescriptor.class, long.class, long.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getParcelFileDescriptor",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getFileDescriptor",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getLength",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getStartOffset",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "toString",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "describeContents",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "writeToParcel",
-            args = {Parcel.class, int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getDeclaredLength",
-            args = {}
-        )
-    })
     public void testMiscMethod() {
         // test constructor
         new AssetFileDescriptor(null, START_OFFSET, LENGTH);

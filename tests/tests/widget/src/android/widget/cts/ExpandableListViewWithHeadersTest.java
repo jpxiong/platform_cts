@@ -16,9 +16,6 @@
 
 package android.widget.cts;
 
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
 
 import android.test.ActivityInstrumentationTestCase2;
 import android.test.suitebuilder.annotation.LargeTest;
@@ -27,7 +24,6 @@ import android.view.KeyEvent;
 import android.widget.ExpandableListView;
 import android.widget.cts.util.ListUtil;
 
-@TestTargetClass(ExpandableListView.class)
 public class ExpandableListViewWithHeadersTest extends
         ActivityInstrumentationTestCase2<ExpandableListWithHeaders> {
     private ExpandableListView mExpandableListView;
@@ -50,12 +46,6 @@ public class ExpandableListViewWithHeadersTest extends
         assertNotNull(mExpandableListView);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test {@link ExpandableListView#expandGroup(int)}",
-        method = "expandGroup",
-        args = {int.class}
-    )
     @MediumTest
     public void testExpandOnFirstPosition() {
         // Should be a header, and hence the first group should NOT have expanded
@@ -65,12 +55,6 @@ public class ExpandableListViewWithHeadersTest extends
         assertFalse(mExpandableListView.isGroupExpanded(0));
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test {@link ExpandableListView#expandGroup(int)}",
-        method = "expandGroup",
-        args = {int.class}
-    )
     @LargeTest
     public void testExpandOnFirstGroup() {
         mListUtil.arrowScrollToSelectedPosition(getActivity().getNumOfHeadersAndFooters());

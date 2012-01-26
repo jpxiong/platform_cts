@@ -18,11 +18,6 @@ package android.text.method.cts;
 
 import com.android.cts.stub.R;
 
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
-import dalvik.annotation.ToBeFixed;
 
 import android.app.Instrumentation;
 import android.os.SystemClock;
@@ -41,7 +36,6 @@ import android.view.View;
 import android.widget.TextView;
 import android.widget.TextView.BufferType;
 
-@TestTargetClass(TextKeyListener.class)
 public class TextKeyListenerTest extends
         ActivityInstrumentationTestCase2<KeyListenerStubActivity> {
     /**
@@ -64,24 +58,12 @@ public class TextKeyListenerTest extends
         mTextView = (TextView) mActivity.findViewById(R.id.keylistener_textview);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "TextKeyListener",
-        args = {TextKeyListener.Capitalize.class, boolean.class}
-    )
     public void testConstructor() {
         new TextKeyListener(Capitalize.NONE, true);
 
         new TextKeyListener(null, true);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "shouldCap",
-        args = {TextKeyListener.Capitalize.class, CharSequence.class, int.class}
-    )
-    @ToBeFixed(bug = "1695243", explanation = "Android API javadocs are incomplete, " +
-            "should add NPE description in javadoc.")
     public void testShouldCap() {
         String str = "hello world! man";
 
@@ -114,12 +96,6 @@ public class TextKeyListenerTest extends
         }
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "onSpanAdded is a non-operation function.",
-        method = "onSpanAdded",
-        args = {Spannable.class, Object.class, int.class, int.class}
-    )
     public void testOnSpanAdded() {
         final MockTextKeyListener textKeyListener
                 = new MockTextKeyListener(Capitalize.CHARACTERS, true);
@@ -139,11 +115,6 @@ public class TextKeyListenerTest extends
         textKeyListener.release();
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "getInstance",
-        args = {boolean.class, TextKeyListener.Capitalize.class}
-    )
     public void testGetInstance1() {
         TextKeyListener listener1 = TextKeyListener.getInstance(true, Capitalize.WORDS);
         TextKeyListener listener2 = TextKeyListener.getInstance(true, Capitalize.WORDS);
@@ -164,11 +135,6 @@ public class TextKeyListenerTest extends
         listener4.release();
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "getInstance",
-        args = {}
-    )
     public void testGetInstance2() {
         TextKeyListener listener1 = TextKeyListener.getInstance();
         TextKeyListener listener2 = TextKeyListener.getInstance();
@@ -181,13 +147,6 @@ public class TextKeyListenerTest extends
         listener2.release();
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "onSpanChanged",
-        args = {Spannable.class, Object.class, int.class, int.class, int.class, int.class}
-    )
-    @ToBeFixed(bug = "1695243", explanation = "Android API javadocs are incomplete, " +
-            "should add @throws clause into javadoc")
     public void testOnSpanChanged() {
         TextKeyListener textKeyListener = TextKeyListener.getInstance();
         final Spannable text = new SpannableStringBuilder("123456");
@@ -202,11 +161,6 @@ public class TextKeyListenerTest extends
         textKeyListener.release();
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "clear",
-        args = {Editable.class}
-    )
     @UiThreadTest
     public void testClear() {
         CharSequence text = "123456";
@@ -219,12 +173,6 @@ public class TextKeyListenerTest extends
         assertEquals("", content.toString());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "onSpanRemoved is a non-operation function.",
-        method = "onSpanRemoved",
-        args = {Spannable.class, Object.class, int.class, int.class}
-    )
     public void testOnSpanRemoved() {
         TextKeyListener textKeyListener = new TextKeyListener(Capitalize.CHARACTERS, true);
         final Spannable text = new SpannableStringBuilder("123456");
@@ -249,23 +197,6 @@ public class TextKeyListenerTest extends
      * 1. press KEYCODE_4 once. if it's ALPHA key board, text will be "4", if it's
      *    NUMERIC key board, text will be "g", else text will be "".
      */
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "onKeyDown",
-            args = {View.class, Editable.class, int.class, KeyEvent.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "onKeyUp",
-            args = {View.class, Editable.class, int.class, KeyEvent.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "release",
-            args = {}
-        )
-    })
     public void testPressKey() {
         final TextKeyListener textKeyListener
                 = TextKeyListener.getInstance(false, Capitalize.NONE);
@@ -297,13 +228,6 @@ public class TextKeyListenerTest extends
         textKeyListener.release();
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "onKeyOther",
-        args = {View.class, Editable.class, KeyEvent.class}
-    )
-    @ToBeFixed(bug = "1731439", explanation = "onKeyOther doesn't insert the" +
-            " event's text into content.")
     public void testOnKeyOther() {
         final String text = "abcd";
         final TextKeyListener textKeyListener
@@ -331,11 +255,6 @@ public class TextKeyListenerTest extends
         textKeyListener.release();
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "getInputType",
-        args = {}
-    )
     public void testGetInputType() {
         TextKeyListener listener = TextKeyListener.getInstance(false, Capitalize.NONE);
         int expected = InputType.TYPE_CLASS_TEXT;

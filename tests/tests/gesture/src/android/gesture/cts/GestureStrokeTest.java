@@ -15,7 +15,6 @@
  */
 package android.gesture.cts;
 
-import dalvik.annotation.TestTargetClass;
 
 import android.gesture.GesturePoint;
 import android.gesture.GestureStroke;
@@ -28,7 +27,6 @@ import junit.framework.TestCase;
 /**
  * Simple compatibility unit tests for {@link GestureStroke}
  */
-@TestTargetClass(GestureStroke.class)
 public class GestureStrokeTest extends TestCase {
 
     private LineGestureStrokeHelper mHelper;

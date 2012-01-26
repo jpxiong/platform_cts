@@ -20,28 +20,14 @@ import android.graphics.Canvas;
 import android.graphics.Path;
 import android.graphics.RectF;
 import android.graphics.Canvas.EdgeType;
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
 
-@TestTargetClass(Canvas.EdgeType.class)
 public class Canvas_EdgeTypeTest extends TestCase {
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "valueOf",
-        args = {java.lang.String.class}
-    )
     public void testValueOf(){
         assertEquals(EdgeType.BW, EdgeType.valueOf("BW"));
         assertEquals(EdgeType.AA, EdgeType.valueOf("AA"));
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "values",
-        args = {}
-    )
     public void testValues(){
         EdgeType[] edgeType = EdgeType.values();
 

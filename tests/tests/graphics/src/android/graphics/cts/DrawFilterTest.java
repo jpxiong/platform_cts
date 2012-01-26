@@ -18,11 +18,7 @@ package android.graphics.cts;
 
 import junit.framework.TestCase;
 import android.graphics.DrawFilter;
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
 
-@TestTargetClass(DrawFilter.class)
 public class DrawFilterTest extends TestCase {
 
     @Override
@@ -30,11 +26,6 @@ public class DrawFilterTest extends TestCase {
         super.setUp();
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "DrawFilter",
-        args = {}
-    )
     public void testConstructor() {
         // new the DrawFilter instance
         new DrawFilter();

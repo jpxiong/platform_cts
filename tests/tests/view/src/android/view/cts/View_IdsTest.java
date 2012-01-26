@@ -18,10 +18,6 @@ package android.view.cts;
 
 import com.android.cts.stub.R;
 
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
 
 import android.app.Activity;
 import android.test.ActivityInstrumentationTestCase2;
@@ -31,24 +27,11 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
-@TestTargetClass(View.class)
 public class View_IdsTest extends ActivityInstrumentationTestCase2<UsingViewsStubActivity> {
     public View_IdsTest() {
         super("com.android.cts.stub", UsingViewsStubActivity.class);
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setId",
-            args = {int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getId",
-            args = {}
-        )
-    })
     @UiThreadTest
     public void testIds() {
         Activity activity = getActivity();

@@ -36,13 +36,7 @@ import android.graphics.drawable.RotateDrawable;
 import android.test.AndroidTestCase;
 import android.util.AttributeSet;
 import android.util.Xml;
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
-import dalvik.annotation.ToBeFixed;
 
-@TestTargetClass(android.graphics.drawable.RotateDrawable.class)
 public class RotateDrawableTest extends AndroidTestCase {
     private RotateDrawable mRotateDrawable;
 
@@ -54,30 +48,15 @@ public class RotateDrawableTest extends AndroidTestCase {
         mRotateDrawable = (RotateDrawable) resources.getDrawable(R.drawable.rotatedrawable);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "RotateDrawable",
-        args = {}
-    )
     public void testConstructor() {
         new RotateDrawable();
     }
 
-    @TestTargetNew(
-        level = TestLevel.SUFFICIENT,
-        method = "draw",
-        args = {android.graphics.Canvas.class}
-    )
     public void testDraw() {
         Canvas canvas = new Canvas();
         mRotateDrawable.draw(canvas);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "getChangingConfigurations",
-        args = {}
-    )
     public void testGetChangingConfigurations() {
         assertEquals(0, mRotateDrawable.getChangingConfigurations());
 
@@ -88,11 +67,6 @@ public class RotateDrawableTest extends AndroidTestCase {
         assertEquals(Configuration.KEYBOARD_12KEY, mRotateDrawable.getChangingConfigurations());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "setAlpha",
-        args = {int.class}
-    )
     public void testSetAlpha() {
         mRotateDrawable.setAlpha(100);
         assertEquals(100, ((BitmapDrawable) mRotateDrawable.getDrawable()).getPaint().getAlpha());
@@ -101,11 +75,6 @@ public class RotateDrawableTest extends AndroidTestCase {
         assertEquals(255, ((BitmapDrawable) mRotateDrawable.getDrawable()).getPaint().getAlpha());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "setColorFilter",
-        args = {android.graphics.ColorFilter.class}
-    )
     public void testSetColorFilter() {
         ColorFilter filter = new ColorFilter();
         mRotateDrawable.setColorFilter(filter);
@@ -116,20 +85,10 @@ public class RotateDrawableTest extends AndroidTestCase {
         assertNull(((BitmapDrawable) mRotateDrawable.getDrawable()).getPaint().getColorFilter());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "getOpacity",
-        args = {}
-    )
     public void testGetOpacity() {
         assertEquals(PixelFormat.OPAQUE, mRotateDrawable.getOpacity());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "invalidateDrawable",
-        args = {android.graphics.drawable.Drawable.class}
-    )
     public void testInvalidateDrawable() {
         Drawable drawable = mContext.getResources().getDrawable(R.drawable.pass);
         MockCallback callback = new MockCallback();
@@ -148,11 +107,6 @@ public class RotateDrawableTest extends AndroidTestCase {
         assertFalse(callback.hasCalledInvalidate());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "scheduleDrawable",
-        args = {android.graphics.drawable.Drawable.class, java.lang.Runnable.class, long.class}
-    )
     public void testScheduleDrawable() {
         MockCallback callback = new MockCallback();
 
@@ -173,11 +127,6 @@ public class RotateDrawableTest extends AndroidTestCase {
         assertFalse(callback.hasCalledSchedule());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "unscheduleDrawable",
-        args = {android.graphics.drawable.Drawable.class, java.lang.Runnable.class}
-    )
     public void testUnscheduleDrawable() {
         MockCallback callback = new MockCallback();
 
@@ -198,11 +147,6 @@ public class RotateDrawableTest extends AndroidTestCase {
         assertFalse(callback.hasCalledUnschedule());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "getPadding",
-        args = {android.graphics.Rect.class}
-    )
     public void testGetPadding() {
         Rect rect = new Rect();
         assertFalse(mRotateDrawable.getPadding(rect));
@@ -212,11 +156,6 @@ public class RotateDrawableTest extends AndroidTestCase {
         assertEquals(0, rect.bottom);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "setVisible",
-        args = {boolean.class, boolean.class}
-    )
     public void testSetVisible() {
         assertTrue(mRotateDrawable.isVisible());
 
@@ -230,54 +169,14 @@ public class RotateDrawableTest extends AndroidTestCase {
         assertTrue(mRotateDrawable.isVisible());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "isStateful",
-        args = {}
-    )
     public void testIsStateful() {
         assertFalse(mRotateDrawable.isStateful());
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.NOT_FEASIBLE,
-            method = "onStateChange",
-            args = {int[].class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.NOT_FEASIBLE,
-            method = "onLevelChange",
-            args = {int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.NOT_FEASIBLE,
-            method = "onBoundsChange",
-            args = {android.graphics.Rect.class}
-        )
-    })
     public void testMethods() {
         // implementation details, do not test.
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getIntrinsicWidth",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getIntrinsicHeight",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "inflate",
-            args = {android.content.res.Resources.class, org.xmlpull.v1.XmlPullParser.class,
-                    android.util.AttributeSet.class}
-        )
-    })
     public void testGetIntrinsicWidthAndHeight() throws XmlPullParserException, IOException {
         // testimage is set in res/drawable/rotatedrawable.xml
         Drawable drawable = mContext.getResources().getDrawable(R.drawable.testimage);
@@ -303,29 +202,11 @@ public class RotateDrawableTest extends AndroidTestCase {
         }
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "getConstantState",
-        args = {}
-    )
-    @ToBeFixed(bug = "1695243", explanation = "Android API javadocs are incomplete")
     public void testGetConstantState() {
         ConstantState state = mRotateDrawable.getConstantState();
         assertNotNull(state);
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "mutate",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getDrawable",
-            args = {}
-        )
-    })
     public void testMutate() {
         Resources resources = mContext.getResources();
 

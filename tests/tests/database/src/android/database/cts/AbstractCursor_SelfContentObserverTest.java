@@ -17,44 +17,20 @@ package android.database.cts;
 
 import android.database.AbstractCursor;
 import android.test.AndroidTestCase;
-import dalvik.annotation.TestTargets;
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargetClass;
 
-@TestTargetClass(AbstractCursor.class)
-// should be @TestTargetClass(AbstractCursor.SelfContentObserver.class)
 public class AbstractCursor_SelfContentObserverTest extends AndroidTestCase{
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test constructor of SelfContentObserver",
-        method = "SelfContentObserver",
-        args = {}
-    )
     public void testConstructor() {
         MockAbstractCursor mac = new MockAbstractCursor();
         mac.getMockSelfContentObserver();
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test deliverSelfNotifications of SelfContentObserver",
-        method = "deliverSelfNotifications",
-        args = {}
-    )
     public void testDeliverSelfNotifications() {
         MockAbstractCursor mac = new MockAbstractCursor();
         MockAbstractCursor.MockSelfContentObserver msc = mac.getMockSelfContentObserver();
         assertFalse(msc.deliverSelfNotifications());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test onChange of SelfContentObserver",
-        method = "onChange",
-        args = {boolean.class}
-    )
     public void testOnChange() {
         MockAbstractCursor mockCursor = new MockAbstractCursor();
         MockAbstractCursor.MockSelfContentObserver msc = mockCursor.getMockSelfContentObserver();

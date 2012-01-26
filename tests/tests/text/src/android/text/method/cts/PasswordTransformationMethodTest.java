@@ -16,11 +16,6 @@
 
 package android.text.method.cts;
 
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
-import dalvik.annotation.ToBeFixed;
 
 import android.cts.util.PollingCheck;
 import android.graphics.Rect;
@@ -39,7 +34,6 @@ import android.widget.LinearLayout.LayoutParams;
 /**
  * Test {@link PasswordTransformationMethod}.
  */
-@TestTargetClass(PasswordTransformationMethod.class)
 public class PasswordTransformationMethodTest extends
         ActivityInstrumentationTestCase2<StubActivity> {
     private static final int EDIT_TXT_ID = 1;
@@ -107,37 +101,10 @@ public class PasswordTransformationMethodTest extends
         super.tearDown();
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "PasswordTransformationMethod",
-        args = {}
-    )
     public void testConstructor() {
         new PasswordTransformationMethod();
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "beforeTextChanged",
-            args = {CharSequence.class, int.class, int.class, int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "onTextChanged",
-            args = {CharSequence.class, int.class, int.class, int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "afterTextChanged",
-            args = {Editable.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getTransformation",
-            args = {CharSequence.class, View.class}
-        )
-    })
     public void testTextChangedCallBacks() throws Throwable {
         runTestOnUiThread(new Runnable() {
             public void run() {
@@ -185,13 +152,6 @@ public class PasswordTransformationMethodTest extends
         }.run();
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "getTransformation",
-        args = {CharSequence.class, View.class}
-    )
-    @ToBeFixed(bug = "1417734", explanation = "should check whether the source passed in is null,"
-            + "if null source is passed in, exception will be thrown when toString() is called")
     public void testGetTransformation() {
         PasswordTransformationMethod method = new PasswordTransformationMethod();
 
@@ -208,12 +168,6 @@ public class PasswordTransformationMethodTest extends
         }
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        notes = "Test {@link PasswordTransformationMethod#getInstance()}.",
-        method = "getInstance",
-        args = {}
-    )
     public void testGetInstance() {
         PasswordTransformationMethod method0 = PasswordTransformationMethod.getInstance();
         assertNotNull(method0);
@@ -223,11 +177,6 @@ public class PasswordTransformationMethodTest extends
         assertSame(method0, method1);
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "onFocusChanged",
-        args = {View.class, CharSequence.class, boolean.class, int.class, Rect.class}
-    )
     public void testOnFocusChanged() {
         // lose focus
         mMethod.reset();

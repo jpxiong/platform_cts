@@ -16,10 +16,6 @@
 
 package android.widget.cts;
 
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
 
 import android.test.ActivityInstrumentationTestCase2;
 import android.test.UiThreadTest;
@@ -29,7 +25,6 @@ import android.widget.Chronometer.OnChronometerTickListener;
 /**
  * Test {@link Chronometer}.
  */
-@TestTargetClass(Chronometer.class)
 public class ChronometerTest extends ActivityInstrumentationTestCase2<ChronometerStubActivity> {
     private ChronometerStubActivity mActivity;
     public ChronometerTest() {
@@ -42,23 +37,6 @@ public class ChronometerTest extends ActivityInstrumentationTestCase2<Chronomete
         mActivity = getActivity();
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "Chronometer",
-            args = {android.content.Context.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "Chronometer",
-            args = {android.content.Context.class, android.util.AttributeSet.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "Chronometer",
-            args = {android.content.Context.class, android.util.AttributeSet.class, int.class}
-        )
-    })
     public void testConstructor() {
         new Chronometer(mActivity);
 
@@ -67,18 +45,6 @@ public class ChronometerTest extends ActivityInstrumentationTestCase2<Chronomete
         new Chronometer(mActivity, null, 0);
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getBase",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setBase",
-            args = {long.class}
-        )
-    })
     @UiThreadTest
     public void testAccessBase() {
         Chronometer chronometer = mActivity.getChronometer();
@@ -108,18 +74,6 @@ public class ChronometerTest extends ActivityInstrumentationTestCase2<Chronomete
         assertNotSame(oldText, chronometer.getText());
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getFormat",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setFormat",
-            args = {java.lang.String.class}
-        )
-    })
     @UiThreadTest
     public void testAccessFormat() {
         Chronometer chronometer = mActivity.getChronometer();
@@ -134,36 +88,12 @@ public class ChronometerTest extends ActivityInstrumentationTestCase2<Chronomete
         assertTrue(text.endsWith("trail"));
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.NOT_NECESSARY,
-            method = "onWindowVisibilityChanged",
-            args = {int.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.NOT_NECESSARY,
-            method = "onDetachedFromWindow",
-            args = {}
-        )
-    })
     public void testFoo() {
         // Do not test these APIs. They are callbacks which:
         // 1. The callback machanism has been tested in super class
         // 2. The functionality is implmentation details, no need to test
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "start",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "stop",
-            args = {}
-        )
-    })
     public void testStartAndStop() throws Throwable {
         final Chronometer chronometer = mActivity.getChronometer();
 
@@ -200,18 +130,6 @@ public class ChronometerTest extends ActivityInstrumentationTestCase2<Chronomete
         assertTrue(expected.equals(chronometer.getText()));
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getOnChronometerTickListener",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setOnChronometerTickListener",
-            args = {OnChronometerTickListener.class}
-        )
-    })
     public void testAccessOnChronometerTickListener() throws Throwable {
         final Chronometer chronometer = mActivity.getChronometer();
         final MockOnChronometerTickListener listener = new MockOnChronometerTickListener();

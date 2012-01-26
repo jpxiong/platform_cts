@@ -16,10 +16,6 @@
 
 package android.webkit.cts;
 
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
 
 import android.content.Context;
 import android.cts.util.PollingCheck;
@@ -27,7 +23,6 @@ import android.test.ActivityInstrumentationTestCase2;
 import android.webkit.CookieManager;
 import android.webkit.CookieSyncManager;
 
-@TestTargetClass(android.webkit.CookieSyncManager.class)
 public class CookieSyncManagerTest
         extends ActivityInstrumentationTestCase2<CookieSyncManagerStubActivity> {
 
@@ -37,23 +32,6 @@ public class CookieSyncManagerTest
         super("com.android.cts.stub", CookieSyncManagerStubActivity.class);
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "createInstance",
-            args = {Context.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getInstance",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "sync",
-            args = {}
-        )
-    })
     public void testCookieSyncManager() throws Exception {
         CookieSyncManager csm1 = CookieSyncManager.createInstance(getActivity());
         assertNotNull(csm1);

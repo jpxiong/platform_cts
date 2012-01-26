@@ -18,11 +18,6 @@ package android.graphics.drawable.cts;
 
 import com.android.cts.stub.R;
 
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
-import dalvik.annotation.ToBeFixed;
 
 import org.xmlpull.v1.XmlPullParserException;
 
@@ -48,7 +43,6 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
-@TestTargetClass(android.graphics.drawable.BitmapDrawable.class)
 public class BitmapDrawableTest extends InstrumentationTestCase {
     // The target context.
     private Context mContext;
@@ -59,58 +53,6 @@ public class BitmapDrawableTest extends InstrumentationTestCase {
         mContext = getInstrumentation().getTargetContext();
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "BitmapDrawable",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "BitmapDrawable",
-            args = {android.content.res.Resources.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "BitmapDrawable",
-            args = {android.graphics.Bitmap.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "BitmapDrawable",
-            args = {android.content.res.Resources.class, android.graphics.Bitmap.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "BitmapDrawable",
-            args = {java.lang.String.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "BitmapDrawable",
-            args = {android.content.res.Resources.class, java.lang.String.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "BitmapDrawable",
-            args = {java.io.InputStream.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "BitmapDrawable",
-            args = {android.content.res.Resources.class, java.io.InputStream.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getPaint",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getBitmap",
-            args = {}
-        )
-    })
     @SuppressWarnings("deprecation")
     public void testConstructor() {
         // TODO: should default paint flags be left as an untested implementation detail?
@@ -149,18 +91,6 @@ public class BitmapDrawableTest extends InstrumentationTestCase {
         new BitmapDrawable((InputStream) null);
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getGravity",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setGravity",
-            args = {int.class}
-        )
-    })
     public void testAccessGravity() {
         InputStream source = mContext.getResources().openRawResource(R.raw.testimage);
         BitmapDrawable bitmapDrawable = new BitmapDrawable(source);
@@ -177,11 +107,6 @@ public class BitmapDrawableTest extends InstrumentationTestCase {
         assertEquals(Integer.MAX_VALUE, bitmapDrawable.getGravity());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "setAntiAlias",
-        args = {boolean.class}
-    )
     public void testSetAntiAlias() {
         InputStream source = mContext.getResources().openRawResource(R.raw.testimage);
         BitmapDrawable bitmapDrawable = new BitmapDrawable(source);
@@ -195,11 +120,6 @@ public class BitmapDrawableTest extends InstrumentationTestCase {
         assertFalse(bitmapDrawable.getPaint().isAntiAlias());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "setFilterBitmap",
-        args = {boolean.class}
-    )
     public void testSetFilterBitmap() {
         InputStream source = mContext.getResources().openRawResource(R.raw.testimage);
         BitmapDrawable bitmapDrawable = new BitmapDrawable(source);
@@ -213,11 +133,6 @@ public class BitmapDrawableTest extends InstrumentationTestCase {
         assertTrue(bitmapDrawable.getPaint().isFilterBitmap());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "setDither",
-        args = {boolean.class}
-    )
     public void testSetDither() {
         InputStream source = mContext.getResources().openRawResource(R.raw.testimage);
         BitmapDrawable bitmapDrawable = new BitmapDrawable(source);
@@ -232,33 +147,6 @@ public class BitmapDrawableTest extends InstrumentationTestCase {
 
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getTileModeX",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getTileModeY",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setTileModeX",
-            args = {android.graphics.Shader.TileMode.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setTileModeY",
-            args = {android.graphics.Shader.TileMode.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setTileModeXY",
-            args = {android.graphics.Shader.TileMode.class, android.graphics.Shader.TileMode.class}
-        )
-    })
     public void testAccessTileMode() {
         InputStream source = mContext.getResources().openRawResource(R.raw.testimage);
         BitmapDrawable bitmapDrawable = new BitmapDrawable(source);
@@ -299,11 +187,6 @@ public class BitmapDrawableTest extends InstrumentationTestCase {
         assertNotSame(oldShader, bitmapDrawable.getPaint().getShader());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "getChangingConfigurations",
-        args = {}
-    )
     public void testGetChangingConfigurations() {
         InputStream source = mContext.getResources().openRawResource(R.raw.testimage);
         BitmapDrawable bitmapDrawable = new BitmapDrawable(source);
@@ -317,22 +200,12 @@ public class BitmapDrawableTest extends InstrumentationTestCase {
         assertEquals(2, bitmapDrawable.getChangingConfigurations());
     }
 
-    @TestTargetNew(
-        level = TestLevel.NOT_NECESSARY,
-        method = "onBoundsChange",
-        args = {android.graphics.Rect.class}
-    )
     public void testOnBoundsChange() {
         // Do not test this API. it is callbacks which:
         // 1. The callback machanism has been tested in super class
         // 2. The functionality is implmentation details, no need to test
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "setAlpha",
-        args = {int.class}
-    )
     public void testSetAlpha() {
         InputStream source = mContext.getResources().openRawResource(R.raw.testimage);
         BitmapDrawable bitmapDrawable = new BitmapDrawable(source);
@@ -353,11 +226,6 @@ public class BitmapDrawableTest extends InstrumentationTestCase {
         assertEquals(0, bitmapDrawable.getPaint().getAlpha());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "setColorFilter",
-        args = {android.graphics.ColorFilter.class}
-    )
     public void testSetColorFilter() {
         InputStream source = mContext.getResources().openRawResource(R.raw.testimage);
         BitmapDrawable bitmapDrawable = new BitmapDrawable(source);
@@ -372,11 +240,6 @@ public class BitmapDrawableTest extends InstrumentationTestCase {
         assertNull(bitmapDrawable.getPaint().getColorFilter());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "getOpacity",
-        args = {}
-    )
     public void testGetOpacity() {
         BitmapDrawable bitmapDrawable = new BitmapDrawable();
         assertEquals(Gravity.FILL, bitmapDrawable.getGravity());
@@ -396,11 +259,6 @@ public class BitmapDrawableTest extends InstrumentationTestCase {
         assertEquals(PixelFormat.TRANSLUCENT, bitmapDrawable.getOpacity());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "getConstantState",
-        args = {}
-    )
     public void testGetConstantState() {
         InputStream source = mContext.getResources().openRawResource(R.raw.testimage);
         BitmapDrawable bitmapDrawable = new BitmapDrawable(source);
@@ -414,18 +272,6 @@ public class BitmapDrawableTest extends InstrumentationTestCase {
         assertEquals(1, constantState.getChangingConfigurations());
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getIntrinsicWidth",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "getIntrinsicHeight",
-            args = {}
-        )
-    })
     @SuppressWarnings("deprecation")
     public void testGetIntrinsicSize() {
         BitmapDrawable bitmapDrawable = new BitmapDrawable();
@@ -445,18 +291,6 @@ public class BitmapDrawableTest extends InstrumentationTestCase {
         assertEquals(48, bitmapDrawable.getIntrinsicHeight());
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setTargetDensity",
-            args = {android.graphics.Canvas.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "setTargetDensity",
-            args = {android.util.DisplayMetrics.class}
-        )
-    })
     @SuppressWarnings("deprecation")
     public void testSetTargetDensity() {
         BitmapDrawable bitmapDrawable = new BitmapDrawable();
@@ -477,14 +311,6 @@ public class BitmapDrawableTest extends InstrumentationTestCase {
         assertEquals(48, bitmapDrawable.getIntrinsicHeight());
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "inflate",
-        args = {android.content.res.Resources.class, org.xmlpull.v1.XmlPullParser.class,
-                android.util.AttributeSet.class}
-    )
-    @ToBeFixed(bug = "1695243", explanation = "the javadoc for draw() is incomplete." +
-            "1. not clear what is supposed to happen if the Resource is null.")
     @SuppressWarnings("deprecation")
     public void testInflate() throws IOException, XmlPullParserException {
         BitmapDrawable bitmapDrawable = new BitmapDrawable();
@@ -544,13 +370,6 @@ public class BitmapDrawableTest extends InstrumentationTestCase {
         }
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "draw",
-        args = {android.graphics.Canvas.class}
-    )
-    @ToBeFixed(bug = "1695243", explanation = "the javadoc for draw() is incomplete." +
-            "1. not clear what is supposed to happen if canvas is null.")
     public void testDraw() {
         InputStream source = mContext.getResources().openRawResource(R.raw.testimage);
         BitmapDrawable bitmapDrawable = new BitmapDrawable(source);
@@ -566,11 +385,6 @@ public class BitmapDrawableTest extends InstrumentationTestCase {
         }
     }
 
-    @TestTargetNew(
-        level = TestLevel.COMPLETE,
-        method = "mutate",
-        args = {}
-    )
     public void testMutate() {
         Resources resources = mContext.getResources();
         BitmapDrawable d1 = (BitmapDrawable) resources.getDrawable(R.drawable.testimage);

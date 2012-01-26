@@ -19,12 +19,7 @@ package android.content.cts;
 import android.content.IntentFilter;
 import android.content.IntentFilter.MalformedMimeTypeException;
 import android.test.AndroidTestCase;
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
 
-@TestTargetClass(MalformedMimeTypeException.class)
 public class IntentFilter_MalformedMimeTypeExceptionTest extends
         AndroidTestCase {
 
@@ -36,18 +31,6 @@ public class IntentFilter_MalformedMimeTypeExceptionTest extends
         mMalformedMimeTypeException = null;
     }
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "IntentFilter.MalformedMimeTypeException",
-            args = {}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "IntentFilter.MalformedMimeTypeException",
-            args = {java.lang.String.class}
-        )
-    })
     public void testMalformedMimeTypeException() {
         mMalformedMimeTypeException = new IntentFilter.MalformedMimeTypeException();
         assertNotNull(mMalformedMimeTypeException);

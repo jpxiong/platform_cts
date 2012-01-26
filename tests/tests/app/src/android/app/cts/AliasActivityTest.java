@@ -19,28 +19,11 @@ package android.app.cts;
 import android.app.AliasActivity;
 import android.content.Intent;
 import android.test.AndroidTestCase;
-import dalvik.annotation.TestLevel;
-import dalvik.annotation.TestTargetClass;
-import dalvik.annotation.TestTargetNew;
-import dalvik.annotation.TestTargets;
 
-@TestTargetClass(AliasActivity.class)
 public class AliasActivityTest extends AndroidTestCase {
 
     private static final long SLEEP_TIME = 1000;
 
-    @TestTargets({
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "onCreate",
-            args = {android.os.Bundle.class}
-        ),
-        @TestTargetNew(
-            level = TestLevel.COMPLETE,
-            method = "AliasActivity",
-            args = {}
-        )
-    })
     public void testAliasActivity() throws InterruptedException {
         new AliasActivity();
 
