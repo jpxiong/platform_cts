@@ -2840,7 +2840,10 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
     private void testVideoSnapshotByCamera(int cameraId) throws Exception {
         initializeMessageLooper(cameraId);
         Camera.Parameters parameters = mCamera.getParameters();
-        if (!parameters.isVideoSnapshotSupported()) return;
+        if (!parameters.isVideoSnapshotSupported()) {
+            terminateMessageLooper();
+            return;
+        }
 
         SurfaceHolder holder = getActivity().getSurfaceView().getHolder();
 
