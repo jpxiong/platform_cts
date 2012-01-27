@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2011 The Android Open Source Project
+ * Copyright (C) 2011-2012 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,8 +18,11 @@ package android.renderscript.cts;
 
 import android.content.Context;
 import android.content.res.Resources;
+import android.renderscript.RenderScript.RSErrorHandler;
 import android.renderscript.RenderScript.RSMessageHandler;
+import android.renderscript.RSRuntimeException;
 import android.test.AndroidTestCase;
+import android.util.Log;
 
 /**
  * Base RenderScript test class. This class provides a message handler and a
@@ -58,6 +61,16 @@ class RSBase extends AndroidTestCase {
             Thread.yield();
         }
     }
+
+    protected boolean FoundError = false;
+    protected RSErrorHandler mRsError = new RSErrorHandler() {
+        public void run() {
+            FoundError = true;
+            Log.e("RenderscriptCTS", mErrorMessage);
+            throw new RSRuntimeException("Received error " + mErrorNum +
+                                         " message " + mErrorMessage);
+        }
+    };
 
     @Override
     protected void setUp() throws Exception {

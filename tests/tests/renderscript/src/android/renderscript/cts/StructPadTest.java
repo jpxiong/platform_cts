@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2011 The Android Open Source Project
+ * Copyright (C) 2011-2012 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,12 +17,17 @@
 package android.renderscript.cts;
 
 import android.renderscript.Float4;
+import com.android.cts.stub.R;
 
 public class StructPadTest extends RSBaseCompute {
     /**
      * Test for appropriate alignment/padding of structures.
      */
     public void testStructPadding() {
+        mRS.setErrorHandler(mRsError);
+        ScriptC_struct_pad pad = new ScriptC_struct_pad(mRS,
+                                                        mRes,
+                                                        R.raw.struct_pad);
         ScriptField_PadMe S = new ScriptField_PadMe(mRS, 1);
         Float4 F4 = new Float4(1.0f, 2.0f, 3.0f, 4.0f);
 
@@ -30,6 +35,16 @@ public class StructPadTest extends RSBaseCompute {
         S.set_f4(0, F4, true);
         S.set_j(0, 9, true);
 
+        ScriptField_PadMe.Item I = new ScriptField_PadMe.Item();
+        I.i = S.get_i(0);
+        I.f4 = S.get_f4(0);
+        I.j = S.get_j(0);
+
         S.set(new ScriptField_PadMe.Item(), 0, true);
+
+        pad.set_s(I);
+        pad.invoke_verify();
+        waitForMessage();
+        assertFalse(FoundError);
     }
 }
