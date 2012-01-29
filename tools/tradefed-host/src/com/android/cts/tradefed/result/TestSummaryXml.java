@@ -20,6 +20,8 @@ import com.android.tradefed.util.xml.AbstractXmlParser.ParseException;
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
 
+import android.tests.getinfo.DeviceInfoConstants;
+
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
@@ -35,6 +37,7 @@ public class TestSummaryXml extends AbstractXmlPullParser implements ITestSummar
     private int mNumPassed = 0;
     private String mPlan = "NA";
     private String mStartTime = "unknown";
+    private String mDeviceSerials = "unknown";
 
     /**
      * @param id
@@ -105,13 +108,17 @@ public class TestSummaryXml extends AbstractXmlPullParser implements ITestSummar
                 mPlan = getAttribute(parser, CtsXmlResultReporter.PLAN_ATTR);
                 mStartTime = getAttribute(parser, CtsXmlResultReporter.STARTTIME_ATTR);
             } else if (eventType == XmlPullParser.START_TAG && parser.getName().equals(
+                    DeviceInfoResult.BUILD_TAG)) {
+                mDeviceSerials = getAttribute(parser, DeviceInfoConstants.SERIAL_NUMBER);
+            } else if (eventType == XmlPullParser.START_TAG && parser.getName().equals(
                     TestResults.SUMMARY_TAG)) {
                 mNumFailed = parseIntAttr(parser, TestResults.FAILED_ATTR) +
                     parseIntAttr(parser, TestResults.TIMEOUT_ATTR);
                 mNumNotExecuted = parseIntAttr(parser, TestResults.NOT_EXECUTED_ATTR);
                 mNumPassed = parseIntAttr(parser, TestResults.PASS_ATTR);
+                // abort after parsing Summary, which should be the last tag
                 return;
-              }
+             }
             eventType = parser.next();
         }
         throw new XmlPullParserException("Could not find Summary tag");
@@ -124,5 +131,12 @@ public class TestSummaryXml extends AbstractXmlPullParser implements ITestSummar
     public String getStartTime() {
         return mStartTime;
     }
-}
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String getDeviceSerials() {
+        return mDeviceSerials;
+    }
+}
