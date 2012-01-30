@@ -60,6 +60,8 @@ public class SmsMessageTest extends AndroidTestCase{
     private static final int STATUS_ON_ICC_DEF = -1;
     private static final int TPLAYER_LENGTH_FOR_PDU = 23;
     private static final long TIMESTAMP_MILLIS = 1149631383000l;
+    private static final int SEPTETS_SKT = 80;
+    private static final int SEPTETS_KT = 90;
 
     @Override
     protected void setUp() throws Exception {
@@ -86,7 +88,7 @@ public class SmsMessageTest extends AndroidTestCase{
         int[] result = SmsMessage.calculateLength(sms.getMessageBody(), true);
         assertEquals(SMS_NUMBER1, result[0]);
         assertEquals(sms.getMessageBody().length(), result[1]);
-        assertEquals(getNumSeptets() - sms.getMessageBody().length(), result[2]);
+        assertRemaining(sms.getMessageBody().length(), result[2]);
         assertEquals(SmsMessage.ENCODING_7BIT, result[3]);
         assertEquals(pdu, toHexString(sms.getPdu()));
 
@@ -118,7 +120,7 @@ public class SmsMessageTest extends AndroidTestCase{
         result = SmsMessage.calculateLength(msgBody, false);
         assertEquals(SMS_NUMBER2, result[0]);
         assertEquals(sms.getMessageBody().length(), result[1]);
-        assertEquals(getNumSeptets() - sms.getMessageBody().length(), result[2]);
+        assertRemaining(sms.getMessageBody().length(), result[2]);
         assertEquals(SmsMessage.ENCODING_7BIT, result[3]);
 
         // Test createFromPdu Ucs to Sms
@@ -129,18 +131,24 @@ public class SmsMessageTest extends AndroidTestCase{
         result = SmsMessage.calculateLength(sms.getMessageBody(), true);
         assertEquals(SMS_NUMBER3, result[0]);
         assertEquals(sms.getMessageBody().length(), result[1]);
-        assertEquals(getNumSeptets() - sms.getMessageBody().length(), result[2]);
+        assertRemaining(sms.getMessageBody().length(), result[2]);
         assertEquals(SmsMessage.ENCODING_7BIT, result[3]);
     }
 
-    private int getNumSeptets() {
+    private void assertRemaining(int messageLength, int remaining) {
         if (TelephonyUtils.isSkt(mTelephonyManager)) {
-            return 80;
+            assertTrue(checkRemaining(SEPTETS_SKT, messageLength, remaining)
+                    || checkRemaining(SmsMessage.MAX_USER_DATA_SEPTETS, messageLength, remaining));
         } else if (TelephonyUtils.isKt(mTelephonyManager)) {
-            return 90;
+            assertTrue(checkRemaining(SEPTETS_KT, messageLength, remaining)
+                    || checkRemaining(SmsMessage.MAX_USER_DATA_SEPTETS, messageLength, remaining));
         } else {
-            return SmsMessage.MAX_USER_DATA_SEPTETS;
+            assertTrue(checkRemaining(SmsMessage.MAX_USER_DATA_SEPTETS, messageLength, remaining));
         }
+    }
+
+    private boolean checkRemaining(int total, int messageLength, int remaining) {
+        return total - messageLength == remaining;
     }
 
     public void testCPHSVoiceMail() throws Exception {
