@@ -39,7 +39,7 @@ import java.util.Set;
 class DeviceInfoResult extends AbstractXmlPullParser {
     static final String TAG = "DeviceInfo";
     private static final String ns = CtsXmlResultReporter.ns;
-    private static final String BUILD_TAG = "BuildInfo";
+    static final String BUILD_TAG = "BuildInfo";
     private static final String PHONE_TAG = "PhoneSubInfo";
     private static final String SCREEN_TAG = "Screen";
 
