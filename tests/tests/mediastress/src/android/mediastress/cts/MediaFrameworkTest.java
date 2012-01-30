@@ -52,6 +52,7 @@ public class MediaFrameworkTest extends Activity implements SurfaceHolder.Callba
         mSurfaceView = (SurfaceView)findViewById(R.id.surface_view);
         mOverlayView = (ImageView)findViewById(R.id.overlay_layer);
         ViewGroup.LayoutParams lp = mSurfaceView.getLayoutParams();
+        mSurfaceView.getHolder().setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
         mSurfaceView.getHolder().addCallback(this);
 
         mOverlayView.setLayoutParams(lp);
