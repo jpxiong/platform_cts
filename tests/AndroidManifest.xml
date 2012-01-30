@@ -930,7 +930,7 @@
         <service android:name="android.app.cts.IntentServiceStub"/>
 
         <activity android:name="android.app.cts.LaunchpadActivity" 
-                  android:configChanges="keyboardHidden|orientation"
+                  android:configChanges="keyboardHidden|orientation|screenSize"
                   android:multiprocess="true">
         </activity>
 
