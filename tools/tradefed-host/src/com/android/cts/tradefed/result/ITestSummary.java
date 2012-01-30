@@ -57,4 +57,9 @@ public interface ITestSummary {
      */
     String getStartTime();
 
+    /**
+     * @return a comma separated list of device serials associated with result
+     */
+    String getDeviceSerials();
+
 }
