@@ -36,6 +36,7 @@ import android.test.InstrumentationTestCase;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.List;
 
 public class Contacts_PeopleTest extends InstrumentationTestCase {
     private ContentResolver mContentResolver;
@@ -172,9 +173,16 @@ public class Contacts_PeopleTest extends InstrumentationTestCase {
             cursor.close();
             mRowsAdded.add(People.addToGroup(mContentResolver, personId, groupId));
             cursor = People.queryGroups(mContentResolver, personId);
-            cursor.moveToFirst();
-            assertEquals(personId, cursor.getInt(MEMBERSHIP_PERSON_ID_INDEX));
-            assertEquals(groupId, cursor.getInt(MEMBERSHIP_GROUP_ID_INDEX));
+            boolean found = false;
+            while (cursor.moveToNext()) {
+                assertEquals(personId, cursor.getInt(MEMBERSHIP_PERSON_ID_INDEX));
+                if (cursor.getInt(MEMBERSHIP_GROUP_ID_INDEX) == groupId) {
+                    found = true;
+                    break;
+                }
+            }
+            assertTrue(found);
+
             cursor.close();
 
             // People: test_people_2, Group: test_group_1
@@ -186,14 +194,24 @@ public class Contacts_PeopleTest extends InstrumentationTestCase {
             String groupName = "test_group_1";
             mRowsAdded.add(People.addToGroup(mContentResolver, personId, groupName));
             cursor = People.queryGroups(mContentResolver, personId);
-            cursor.moveToFirst();
-            assertEquals(personId, cursor.getInt(MEMBERSHIP_PERSON_ID_INDEX));
-            groupId = cursor.getInt(MEMBERSHIP_GROUP_ID_INDEX);
+            List<Integer> groupIds = new ArrayList<Integer>();
+            while (cursor.moveToNext()) {
+                assertEquals(personId, cursor.getInt(MEMBERSHIP_PERSON_ID_INDEX));
+                groupIds.add(cursor.getInt(MEMBERSHIP_GROUP_ID_INDEX));
+            }
             cursor.close();
-            cursor = mProvider.query(Groups.CONTENT_URI, GROUPS_PROJECTION,
-                    Groups._ID + "=" + groupId, null, null, null);
-            cursor.moveToFirst();
-            assertEquals(groupName, cursor.getString(GROUPS_NAME_INDEX));
+
+            found = false;
+            for (int id : groupIds) {
+                cursor = mProvider.query(Groups.CONTENT_URI, GROUPS_PROJECTION,
+                        Groups._ID + "=" + id, null, null, null);
+                cursor.moveToFirst();
+                if (groupName.equals(cursor.getString(GROUPS_NAME_INDEX))) {
+                    found = true;
+                    break;
+                }
+            }
+            assertTrue(found);
             cursor.close();
         } catch (RemoteException e) {
             fail("Unexpected RemoteException");
@@ -264,4 +282,3 @@ public class Contacts_PeopleTest extends InstrumentationTestCase {
         }
     }
 }
-
