@@ -203,7 +203,8 @@ public class CtsConsole extends Console {
     private void listResults(CtsBuildHelper ctsBuild) {
         TableFormatter tableFormatter = new TableFormatter();
         List<List<String>> table = new ArrayList<List<String>>();
-        table.add(Arrays.asList("Session","Pass", "Fail","Not Executed","Start time","Plan name"));
+        table.add(Arrays.asList("Session","Pass", "Fail","Not Executed","Start time","Plan name",
+                "Device serial(s)"));
         ITestResultRepo testResultRepo = new TestResultRepo(ctsBuild.getResultsDir());
         for (ITestSummary result : testResultRepo.getSummaries()) {
             table.add(Arrays.asList(Integer.toString(result.getId()),
@@ -211,7 +212,8 @@ public class CtsConsole extends Console {
                     Integer.toString(result.getNumFailed()),
                     Integer.toString(result.getNumIncomplete()),
                     result.getTimestamp(),
-                    result.getTestPlan()));
+                    result.getTestPlan(),
+                    result.getDeviceSerials()));
         }
         tableFormatter.displayTable(table, new PrintWriter(System.out, true));
     }
