@@ -8,6 +8,10 @@
   bug: 4371654
 },
 {
+  name: "android.openglperf.cts.GlVboPerfTest#testVboWithVaryingIndexBufferNumbers",
+  bug: 5898262
+},
+{
   name: "android.webkit.cts.WebViewTest#testRequestFocusNodeHref",
   bug: 3241968
 },
