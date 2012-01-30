@@ -171,7 +171,8 @@
         </activity>
 
         <activity android:name="android.app.cts.DialogStubActivity"
-            android:label="DialogStubActivity">
+            android:label="DialogStubActivity"
+            android:configChanges="keyboardHidden|orientation|screenSize">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.FRAMEWORK_INSTRUMENTATION_TEST" />
