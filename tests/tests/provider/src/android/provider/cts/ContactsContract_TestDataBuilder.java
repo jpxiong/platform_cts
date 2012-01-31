@@ -19,9 +19,9 @@ package android.provider.cts;
 import com.google.android.collect.Lists;
 import com.google.android.collect.Sets;
 
+import android.content.ContentProviderClient;
 import android.content.ContentUris;
 import android.content.ContentValues;
-import android.content.IContentProvider;
 import android.database.Cursor;
 import android.net.Uri;
 import android.provider.BaseColumns;
@@ -45,7 +45,7 @@ import junit.framework.ComparisonFailure;
  * A test data builder for ContactsContract tests.
  */
 public class ContactsContract_TestDataBuilder {
-    private IContentProvider mProvider;
+    private ContentProviderClient mProvider;
     private ArrayList<Builder<?>> mCreatedRows = Lists.newArrayList();
     private HashSet<Builder<?>> mLoadedRows = Sets.newHashSet();
 
@@ -339,7 +339,7 @@ public class ContactsContract_TestDataBuilder {
         }
     }
 
-    public ContactsContract_TestDataBuilder(IContentProvider provider) {
+    public ContactsContract_TestDataBuilder(ContentProviderClient provider) {
         this.mProvider = provider;
     }
 

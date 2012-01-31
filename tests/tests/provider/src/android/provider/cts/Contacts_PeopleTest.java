@@ -17,11 +17,11 @@
 package android.provider.cts;
 
 
+import android.content.ContentProviderClient;
 import android.content.ContentResolver;
 import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.Context;
-import android.content.IContentProvider;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -40,7 +40,7 @@ import java.util.List;
 
 public class Contacts_PeopleTest extends InstrumentationTestCase {
     private ContentResolver mContentResolver;
-    private IContentProvider mProvider;
+    private ContentProviderClient mProvider;
 
     private ArrayList<Uri> mPeopleRowsAdded;
     private ArrayList<Uri> mGroupRowsAdded;
@@ -67,7 +67,7 @@ public class Contacts_PeopleTest extends InstrumentationTestCase {
     protected void setUp() throws Exception {
         super.setUp();
         mContentResolver = getInstrumentation().getTargetContext().getContentResolver();
-        mProvider = mContentResolver.acquireProvider(Contacts.AUTHORITY);
+        mProvider = mContentResolver.acquireContentProviderClient(Contacts.AUTHORITY);
 
         mPeopleRowsAdded = new ArrayList<Uri>();
         mGroupRowsAdded = new ArrayList<Uri>();

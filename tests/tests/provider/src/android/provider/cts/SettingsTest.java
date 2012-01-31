@@ -17,16 +17,15 @@
 package android.provider.cts;
 
 
+import android.content.ContentProviderClient;
 import android.content.ContentResolver;
 import android.content.ContentValues;
-import android.content.IContentProvider;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteException;
 import android.net.Uri;
 import android.os.RemoteException;
 import android.provider.Settings;
 import android.test.AndroidTestCase;
-import android.util.Log;
 
 public class SettingsTest extends AndroidTestCase {
     public void testSystemTable() throws RemoteException {
@@ -45,7 +44,8 @@ public class SettingsTest extends AndroidTestCase {
 
         // get provider
         ContentResolver cr = mContext.getContentResolver();
-        IContentProvider provider = cr.acquireProvider(Settings.System.CONTENT_URI);
+        ContentProviderClient provider =
+                cr.acquireContentProviderClient(Settings.System.CONTENT_URI);
         Cursor cursor = null;
 
         try {
@@ -113,7 +113,7 @@ public class SettingsTest extends AndroidTestCase {
         // get provider
         Uri uri = Uri.parse("content://settings/bluetooth_devices");
         ContentResolver cr = mContext.getContentResolver();
-        IContentProvider provider = cr.acquireProvider(uri);
+        ContentProviderClient provider = cr.acquireContentProviderClient(uri);
         Cursor cursor = null;
 
         try {
@@ -173,7 +173,8 @@ public class SettingsTest extends AndroidTestCase {
         };
 
         ContentResolver cr = mContext.getContentResolver();
-        IContentProvider provider = cr.acquireProvider(Settings.Secure.CONTENT_URI);
+        ContentProviderClient provider =
+                cr.acquireContentProviderClient(Settings.Secure.CONTENT_URI);
         assertNotNull(provider);
 
         // Test that the secure table can be read from.

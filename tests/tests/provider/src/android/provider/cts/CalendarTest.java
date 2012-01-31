@@ -22,8 +22,6 @@ import android.content.ContentValues;
 import android.content.Entity;
 import android.content.EntityIterator;
 import android.database.Cursor;
-import android.database.DatabaseUtils;
-import android.database.SQLException;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
@@ -38,9 +36,9 @@ import android.provider.CalendarContract.ExtendedProperties;
 import android.provider.CalendarContract.Instances;
 import android.provider.CalendarContract.Reminders;
 import android.provider.CalendarContract.SyncState;
-import android.test.InstrumentationTestCase;
 import android.test.InstrumentationCtsTestRunner;
-import android.test.suitebuilder.annotation.*;
+import android.test.InstrumentationTestCase;
+import android.test.suitebuilder.annotation.MediumTest;
 import android.text.TextUtils;
 import android.text.format.DateUtils;
 import android.text.format.Time;
@@ -902,8 +900,6 @@ public class CalendarTest extends InstrumentationTestCase {
     protected void setUp() throws Exception {
         super.setUp();
         mContentResolver = getInstrumentation().getTargetContext().getContentResolver();
-        // IContentProvider provider = mContentResolver.acquireProvider(Calendar.AUTHORITY);
-        // mBuilder = new ContactsContract_TestDataBuilder(provider);
     }
 
     @MediumTest

@@ -17,12 +17,12 @@
 package android.provider.cts;
 
 
+import android.content.ContentProviderClient;
 import android.content.ContentResolver;
-import android.content.IContentProvider;
 import android.provider.ContactsContract;
+import android.provider.ContactsContract.CommonDataKinds.GroupMembership;
 import android.provider.ContactsContract.Groups;
 import android.provider.ContactsContract.RawContacts;
-import android.provider.ContactsContract.CommonDataKinds.GroupMembership;
 import android.provider.cts.ContactsContract_TestDataBuilder.TestData;
 import android.provider.cts.ContactsContract_TestDataBuilder.TestGroup;
 import android.provider.cts.ContactsContract_TestDataBuilder.TestRawContact;
@@ -36,7 +36,8 @@ public class ContactsContract_GroupMembershipTest extends InstrumentationTestCas
         super.setUp();
         ContentResolver contentResolver =
                 getInstrumentation().getTargetContext().getContentResolver();
-        IContentProvider provider = contentResolver.acquireProvider(ContactsContract.AUTHORITY);
+        ContentProviderClient provider =
+                contentResolver.acquireContentProviderClient(ContactsContract.AUTHORITY);
         mBuilder = new ContactsContract_TestDataBuilder(provider);
     }
 

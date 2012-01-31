@@ -16,28 +16,23 @@
 
 package android.provider.cts;
 
+import android.content.ContentProviderClient;
 import android.content.ContentResolver;
-
 import android.content.ContentValues;
-import android.content.IContentProvider;
 import android.database.Cursor;
 import android.net.Uri;
 import android.provider.VoicemailContract;
-import android.provider.VoicemailContract.Voicemails;
 import android.provider.VoicemailContract.Status;
+import android.provider.VoicemailContract.Voicemails;
 import android.test.InstrumentationTestCase;
-
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.Date;
 
 /**
  * CTS tests for voicemail provider accessed through {@link VoicemailContract}.
  */
 public class VoicemailContractTest extends InstrumentationTestCase {
     private ContentResolver mContentResolver;
-    private IContentProvider mVoicemailProvider;
-    private IContentProvider mStatusProvider;
+    private ContentProviderClient mVoicemailProvider;
+    private ContentProviderClient mStatusProvider;
     private Uri mVoicemailContentUri;
     private Uri mStatusContentUri;
     private String mSourcePackageName;
@@ -49,8 +44,8 @@ public class VoicemailContractTest extends InstrumentationTestCase {
         mVoicemailContentUri = Voicemails.buildSourceUri(mSourcePackageName);
         mStatusContentUri = Status.buildSourceUri(mSourcePackageName);
         mContentResolver = getInstrumentation().getTargetContext().getContentResolver();
-        mVoicemailProvider = mContentResolver.acquireProvider(mVoicemailContentUri);
-        mStatusProvider = mContentResolver.acquireProvider(mStatusContentUri);
+        mVoicemailProvider = mContentResolver.acquireContentProviderClient(mVoicemailContentUri);
+        mStatusProvider = mContentResolver.acquireContentProviderClient(mStatusContentUri);
     }
 
     @Override

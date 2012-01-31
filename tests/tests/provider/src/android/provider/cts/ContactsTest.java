@@ -18,17 +18,17 @@ package android.provider.cts;
 
 
 
+import android.content.ContentProviderClient;
 import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
-import android.content.IContentProvider;
 import android.database.Cursor;
 import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.RemoteException;
 import android.provider.CallLog;
-import android.provider.Contacts;
 import android.provider.CallLog.Calls;
+import android.provider.Contacts;
 import android.provider.Contacts.ContactMethods;
 import android.provider.Contacts.Extensions;
 import android.provider.Contacts.GroupMembership;
@@ -49,15 +49,15 @@ import java.util.Date;
 
 public class ContactsTest extends InstrumentationTestCase {
     private ContentResolver mContentResolver;
-    private IContentProvider mProvider;
-    private IContentProvider mCallLogProvider;
+    private ContentProviderClient mProvider;
+    private ContentProviderClient mCallLogProvider;
 
     @Override
     protected void setUp() throws Exception {
         super.setUp();
         mContentResolver = getInstrumentation().getTargetContext().getContentResolver();
-        mProvider = mContentResolver.acquireProvider(Contacts.AUTHORITY);
-        mCallLogProvider = mContentResolver.acquireProvider(CallLog.AUTHORITY);
+        mProvider = mContentResolver.acquireContentProviderClient(Contacts.AUTHORITY);
+        mCallLogProvider = mContentResolver.acquireContentProviderClient(CallLog.AUTHORITY);
     }
 
     /**

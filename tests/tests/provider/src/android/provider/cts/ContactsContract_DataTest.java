@@ -17,13 +17,13 @@
 package android.provider.cts;
 
 
+import android.content.ContentProviderClient;
 import android.content.ContentResolver;
-import android.content.IContentProvider;
 import android.net.Uri;
 import android.provider.ContactsContract;
+import android.provider.ContactsContract.CommonDataKinds.StructuredName;
 import android.provider.ContactsContract.Data;
 import android.provider.ContactsContract.RawContacts;
-import android.provider.ContactsContract.CommonDataKinds.StructuredName;
 import android.provider.cts.ContactsContract_TestDataBuilder.TestContact;
 import android.provider.cts.ContactsContract_TestDataBuilder.TestData;
 import android.provider.cts.ContactsContract_TestDataBuilder.TestRawContact;
@@ -37,7 +37,8 @@ public class ContactsContract_DataTest extends InstrumentationTestCase {
     protected void setUp() throws Exception {
         super.setUp();
         mResolver = getInstrumentation().getTargetContext().getContentResolver();
-        IContentProvider provider = mResolver.acquireProvider(ContactsContract.AUTHORITY);
+        ContentProviderClient provider =
+                mResolver.acquireContentProviderClient(ContactsContract.AUTHORITY);
         mBuilder = new ContactsContract_TestDataBuilder(provider);
     }
 
