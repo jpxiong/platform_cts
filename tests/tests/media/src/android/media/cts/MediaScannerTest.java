@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2009 The Android Open Source Project
+ * Copyright (C) 2012 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,40 +18,51 @@ package android.media.cts;
 
 import com.android.cts.stub.R;
 
-
 import android.content.ComponentName;
+import android.content.ContentResolver;
+import android.content.ContentUris;
+import android.content.ContentValues;
 import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.cts.util.PollingCheck;
+import android.database.Cursor;
 import android.media.MediaScannerConnection;
 import android.media.MediaScannerConnection.MediaScannerConnectionClient;
+import android.mtp.MtpConstants;
 import android.net.Uri;
+import android.os.Environment;
 import android.os.IBinder;
+import android.os.SystemClock;
+import android.provider.MediaStore;
 import android.provider.cts.FileCopyHelper;
 import android.test.AndroidTestCase;
 
 import java.io.File;
-import java.io.FileOutputStream;
-import java.io.InputStream;
+import java.io.IOException;
 
-public class MediaScannerConnectionTest extends AndroidTestCase {
+public class MediaScannerTest extends AndroidTestCase {
 
     private static final String MEDIA_TYPE = "audio/mpeg";
     private File mMediaFile;
     private static final int TIME_OUT = 2000;
     private MockMediaScannerConnection mMediaScannerConnection;
     private MockMediaScannerConnectionClient mMediaScannerConnectionClient;
+    private String mFileDir;
 
     @Override
     protected void setUp() throws Exception {
         super.setUp();
         // prepare the media file.
-        
-        FileCopyHelper copier = new FileCopyHelper(mContext);
-        String fileName = "test" + System.currentTimeMillis();
-        copier.copy(R.raw.testmp3, fileName);
 
-        File dir = getContext().getFilesDir();
-        mMediaFile = new File(dir, fileName);
+        mFileDir = Environment.getExternalStorageDirectory() + "/" + getClass().getCanonicalName();
+        File dir = new File(mFileDir);
+        dir.mkdir();
+        String fileName = mFileDir + "/test" + System.currentTimeMillis() + ".mp3";
+        FileCopyHelper copier = new FileCopyHelper(mContext);
+        copier.copyToExternalStorage(R.raw.testmp3, new File(fileName));
+
+        mMediaFile = new File(fileName);
         assertTrue(mMediaFile.exists());
     }
 
@@ -61,40 +72,76 @@ public class MediaScannerConnectionTest extends AndroidTestCase {
         if (mMediaFile != null) {
             mMediaFile.delete();
         }
+        if (mFileDir != null) {
+            new File(mFileDir).delete();
+        }
         if (mMediaScannerConnection != null) {
             mMediaScannerConnection.disconnect();
             mMediaScannerConnection = null;
         }
     }
 
-    public void testMediaScannerConnection() throws InterruptedException {
+    public void testMediaScanner() throws InterruptedException, IOException {
         mMediaScannerConnectionClient = new MockMediaScannerConnectionClient();
         mMediaScannerConnection = new MockMediaScannerConnection(getContext(),
                                     mMediaScannerConnectionClient);
 
         assertFalse(mMediaScannerConnection.isConnected());
 
-        // test connect and disconnect.
+        // start connection and wait until connected
         mMediaScannerConnection.connect();
         checkConnectionState(true);
 
-        assertTrue(mMediaScannerConnection.mIsOnServiceConnectedCalled);
+        // start and wait for scan
+        mMediaScannerConnection.scanFile(mMediaFile.getAbsolutePath(), MEDIA_TYPE);
+        checkMediaScannerConnection();
+
+        Uri insertUri = mMediaScannerConnectionClient.mediaUri;
+        long id = Long.valueOf(insertUri.getLastPathSegment());
+        ContentResolver res = mContext.getContentResolver();
+
+        // check that the file ended up in the audio view
+        Uri audiouri = ContentUris.withAppendedId(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, id);
+        Cursor c = res.query(audiouri, null, null, null, null);
+        assertEquals(1, c.getCount());
+        c.close();
+
+        // add nomedia file and insert into database, file should no longer be in audio view
+        File nomedia = new File(mMediaFile.getParent() + "/.nomedia");
+        nomedia.createNewFile();
+        ContentValues values = new ContentValues();
+        values.put(MediaStore.MediaColumns.DATA, nomedia.getAbsolutePath());
+        values.put(MediaStore.Files.FileColumns.FORMAT, MtpConstants.FORMAT_UNDEFINED);
+        Uri nomediauri = res.insert(MediaStore.Files.getContentUri("external"), values);
+        // clean up nomedia file
+        nomedia.delete();
+
+        // entry should not be in audio view anymore
+        c = res.query(audiouri, null, null, null, null);
+        assertEquals(0, c.getCount());
+        c.close();
+
+        // with nomedia file removed, do media scan and check that entry is in audio table again
+        ScannerNotificationReceiver finishedReceiver = new ScannerNotificationReceiver(
+                Intent.ACTION_MEDIA_SCANNER_FINISHED);
+        IntentFilter finshedIntentFilter = new IntentFilter(Intent.ACTION_MEDIA_SCANNER_FINISHED);
+        finshedIntentFilter.addDataScheme("file");
+        mContext.registerReceiver(finishedReceiver, finshedIntentFilter);
+        mContext.sendBroadcast(new Intent(Intent.ACTION_MEDIA_MOUNTED, Uri.parse("file://"
+                + Environment.getExternalStorageDirectory())));
+        finishedReceiver.waitForBroadcast();
+
+        // Give the 2nd stage scan that makes the unhidden files visible again
+        // a little more time
+        SystemClock.sleep(10000);
+        // entry should be in audio view again
+        c = res.query(audiouri, null, null, null, null);
+        assertEquals(1, c.getCount());
+        c.close();
+
         mMediaScannerConnection.disconnect();
 
         checkConnectionState(false);
-
-        // FIXME: onServiceDisconnected is not called.
-        assertFalse(mMediaScannerConnection.mIsOnServiceDisconnectedCalled);
-        mMediaScannerConnection.connect();
-
-        checkConnectionState(true);
-
-        mMediaScannerConnection.scanFile(mMediaFile.getAbsolutePath(), MEDIA_TYPE);
-
-        checkMediaScannerConnection();
-
-        assertEquals(mMediaFile.getAbsolutePath(), mMediaScannerConnectionClient.mediaPath);
-        assertNotNull(mMediaScannerConnectionClient.mediaUri);
     }
 
     private void checkMediaScannerConnection() {
@@ -156,6 +203,10 @@ public class MediaScannerConnectionTest extends AndroidTestCase {
             }
         }
 
+        public void reset() {
+            mediaPath = null;
+            mediaUri = null;
+        }
     }
 
 }
