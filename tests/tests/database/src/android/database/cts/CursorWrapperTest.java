@@ -17,9 +17,7 @@
 package android.database.cts;
 
 
-import android.content.ContentResolver;
 import android.content.Context;
-import android.content.IContentProvider;
 import android.database.CharArrayBuffer;
 import android.database.ContentObserver;
 import android.database.Cursor;
@@ -27,7 +25,6 @@ import android.database.CursorWrapper;
 import android.database.DataSetObserver;
 import android.database.StaleDataException;
 import android.database.sqlite.SQLiteDatabase;
-import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.test.AndroidTestCase;
@@ -438,30 +435,6 @@ public class CursorWrapperTest extends AndroidTestCase {
         }catch(IllegalStateException e){
         }
         cursorWrapper.close();
-    }
-
-    public void testSetNotificationUri() {
-        String MOCK_URI = "content://cursorwrappertest/testtable";
-        CursorWrapper cursorWrapper = new CursorWrapper(getCursor());
-        MockContentResolver contentResolver = new MockContentResolver(null);
-        cursorWrapper.setNotificationUri(contentResolver, Uri.parse(MOCK_URI));
-    }
-
-    private class MockContentResolver extends ContentResolver {
-
-        public MockContentResolver(Context context) {
-            super(context);
-        }
-
-        @Override
-        protected IContentProvider acquireProvider(Context c, String name) {
-            return null;
-        }
-
-        @Override
-        public boolean releaseProvider(IContentProvider icp) {
-            return false;
-        }
     }
 
     private class MockContentObserver extends ContentObserver {
