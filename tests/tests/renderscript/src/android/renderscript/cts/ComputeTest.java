@@ -321,7 +321,7 @@ public class ComputeTest extends RSBaseCompute {
         assertTrue(initializeGlobals(t));
         t.invoke_test();
         waitForMessage();
-        assertEquals(result, RS_MSG_TEST_PASSED);
+        assertEquals(RS_MSG_TEST_PASSED, result);
     }
 
     /**
@@ -333,7 +333,7 @@ public class ComputeTest extends RSBaseCompute {
                                                       R.raw.utils);
         t.invoke_test();
         waitForMessage();
-        assertEquals(result, RS_MSG_TEST_PASSED);
+        assertEquals(RS_MSG_TEST_PASSED, result);
     }
 
     void setUpAllocation(Allocation a, int val) {
