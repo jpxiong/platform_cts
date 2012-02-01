@@ -18,10 +18,10 @@ package android.provider.cts;
 
 import android.app.ActivityManager;
 import android.app.ActivityManager.RunningTaskInfo;
+import android.content.ContentProviderClient;
 import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
-import android.content.IContentProvider;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.RemoteException;
@@ -44,7 +44,7 @@ public class BrowserTest extends ActivityInstrumentationTestCase2<BrowserStubAct
 
     private Context mContext;
     private ContentResolver mContentResolver;
-    private IContentProvider mProvider;
+    private ContentProviderClient mProvider;
     private BrowserStubActivity mActivity;
     private boolean mMasterSyncEnabled;
 
@@ -63,7 +63,8 @@ public class BrowserTest extends ActivityInstrumentationTestCase2<BrowserStubAct
 
         mContext = getInstrumentation().getTargetContext();
         mContentResolver = mContext.getContentResolver();
-        mProvider = mContentResolver.acquireProvider(Browser.BOOKMARKS_URI.getAuthority());
+        mProvider = mContentResolver.acquireContentProviderClient(
+                Browser.BOOKMARKS_URI.getAuthority());
         mBookmarksBackup = new ArrayList<ContentValues>();
         mSearchesBackup = new ArrayList<ContentValues>();
 

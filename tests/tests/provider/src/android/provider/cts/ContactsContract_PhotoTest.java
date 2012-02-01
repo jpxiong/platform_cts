@@ -16,9 +16,9 @@
 
 package android.provider.cts;
 
+import android.content.ContentProviderClient;
 import android.content.ContentResolver;
 import android.content.Context;
-import android.content.IContentProvider;
 import android.os.cts.FileUtils;
 import android.provider.ContactsContract;
 import android.provider.ContactsContract.CommonDataKinds.Photo;
@@ -46,7 +46,8 @@ public class ContactsContract_PhotoTest extends InstrumentationTestCase {
 
         mContext= getInstrumentation().getTargetContext();
         mResolver = mContext.getContentResolver();
-        IContentProvider provider = mResolver.acquireProvider(ContactsContract.AUTHORITY);
+        ContentProviderClient provider =
+                mResolver.acquireContentProviderClient(ContactsContract.AUTHORITY);
         mBuilder = new ContactsContract_TestDataBuilder(provider);
     }
 

@@ -17,10 +17,10 @@
 package android.provider.cts;
 
 import android.app.Instrumentation;
+import android.content.ContentProviderClient;
 import android.content.ContentResolver;
 import android.content.ContentUris;
 import android.content.Context;
-import android.content.IContentProvider;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
@@ -41,7 +41,8 @@ public class ContactsContract_ContactsTest extends InstrumentationTestCase {
     protected void setUp() throws Exception {
         super.setUp();
         mContentResolver = getInstrumentation().getTargetContext().getContentResolver();
-        IContentProvider provider = mContentResolver.acquireProvider(ContactsContract.AUTHORITY);
+        ContentProviderClient provider =
+                mContentResolver.acquireContentProviderClient(ContactsContract.AUTHORITY);
         mBuilder = new ContactsContract_TestDataBuilder(provider);
     }
 
