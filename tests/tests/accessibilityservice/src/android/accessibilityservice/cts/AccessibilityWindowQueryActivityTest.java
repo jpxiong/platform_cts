@@ -20,6 +20,7 @@ import static android.view.accessibility.AccessibilityNodeInfo.ACTION_FOCUS;
 import static android.view.accessibility.AccessibilityNodeInfo.ACTION_SELECT;
 
 import android.accessibilityservice.AccessibilityService;
+import android.accessibilityservice.UiTestAutomationBridge;
 import android.content.Context;
 import android.graphics.Rect;
 import android.os.RemoteException;
@@ -102,7 +103,7 @@ public class AccessibilityWindowQueryActivityTest
     public void testTraverseWindow() throws Exception {
         // make list of expected nodes
         List<String> classNameAndTextList = new ArrayList<String>();
-        classNameAndTextList.add("com.android.internal.policy.impl.PhoneWindow$DecorView");
+        classNameAndTextList.add("android.widget.FrameLayout");
         classNameAndTextList.add("android.widget.LinearLayout");
         classNameAndTextList.add("android.widget.FrameLayout");
         classNameAndTextList.add("android.widget.LinearLayout");
@@ -484,6 +485,7 @@ public class AccessibilityWindowQueryActivityTest
             mWaitedFilter = filter;
             action.run();
             awaitOnBarrier();
+            mWaitedFilter = null;
         }
 
         /**
