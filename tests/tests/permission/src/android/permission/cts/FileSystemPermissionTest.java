@@ -229,6 +229,7 @@ public class FileSystemPermissionTest extends AndroidTestCase {
                     "/data/drm/IDM/HTTP",
                     "/data/drm/rights",
                     "/data/dump",
+                    "/data/fota",
                     "/data/hwvefs",
                     "/data/htcfs",
                     "/data/local",
