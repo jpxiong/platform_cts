@@ -16,10 +16,6 @@
 
 package android.database.cts;
 
-import com.google.android.collect.Lists;
-
-
-import android.database.AbstractCursor;
 import android.database.CharArrayBuffer;
 import android.database.CursorWindow;
 import android.database.MatrixCursor;
@@ -39,9 +35,9 @@ public class CursorWindowTest extends AndroidTestCase {
         // create cursor
         String[] colNames = new String[]{"_id", "name", "number", "profit"};
         int colsize = colNames.length;
-        ArrayList<ArrayList> list = createTestList(10, colsize);
+        ArrayList<ArrayList<Integer>> list = createTestList(10, colsize);
         MatrixCursor cursor = new MatrixCursor(colNames, list.size());
-        for (ArrayList row : list) {
+        for (ArrayList<Integer> row : list) {
             cursor.addRow(row);
         }
 
@@ -51,10 +47,10 @@ public class CursorWindowTest extends AndroidTestCase {
 
         // read from cursor window
         for (int i = 0; i < list.size(); i++) {
-            ArrayList col = list.get(i);
+            ArrayList<Integer> col = list.get(i);
             for (int j = 0; j < colsize; j++) {
                 String s = window.getString(i, j);
-                int r2 = (Integer) col.get(j);
+                int r2 = col.get(j);
                 int r1 = Integer.parseInt(s);
                 assertEquals(r2, r1);
             }
@@ -65,10 +61,10 @@ public class CursorWindowTest extends AndroidTestCase {
         cursor.fillWindow(1, window);
         // read from cursor from window
         for (int i = 1; i < list.size(); i++) {
-            ArrayList col = list.get(i);
+            ArrayList<Integer> col = list.get(i);
             for (int j = 0; j < colsize; j++) {
                 String s = window.getString(i, j);
-                int r2 = (Integer) col.get(j);
+                int r2 = col.get(j);
                 int r1 = Integer.parseInt(s);
                 assertEquals(r2, r1);
             }
@@ -411,12 +407,12 @@ public class CursorWindowTest extends AndroidTestCase {
         }
     }
 
-    private static ArrayList<ArrayList> createTestList(int rows, int cols) {
-        ArrayList<ArrayList> list = Lists.newArrayList();
+    private static ArrayList<ArrayList<Integer>> createTestList(int rows, int cols) {
+        ArrayList<ArrayList<Integer>> list = new ArrayList<ArrayList<Integer>>();
         Random generator = new Random();
 
         for (int i = 0; i < rows; i++) {
-            ArrayList<Integer> col = Lists.newArrayList();
+            ArrayList<Integer> col = new ArrayList<Integer>();
             list.add(col);
             for (int j = 0; j < cols; j++) {
                 // generate random number
