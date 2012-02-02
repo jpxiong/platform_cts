@@ -28,6 +28,7 @@ cts_support_packages := \
 	CtsAccelerationTestStubs \
 	CtsDelegatingAccessibilityService \
 	CtsDeviceAdmin \
+	CtsMonkeyApp \
 	CtsTestStubs \
 	SignatureTest \
 	TestDeviceSetup \
@@ -93,7 +94,8 @@ CTS_COVERAGE_TEST_CASE_LIST := \
 
 # Host side only tests
 cts_host_libraries := \
-    CtsAppSecurityTests
+	CtsAppSecurityTests \
+	CtsMonkeyTestCases
 
 # Native test executables that need to have associated test XMLs.
 cts_native_exes := \
