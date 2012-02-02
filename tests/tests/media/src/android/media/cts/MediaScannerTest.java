@@ -56,14 +56,19 @@ public class MediaScannerTest extends AndroidTestCase {
         // prepare the media file.
 
         mFileDir = Environment.getExternalStorageDirectory() + "/" + getClass().getCanonicalName();
-        File dir = new File(mFileDir);
-        dir.mkdir();
         String fileName = mFileDir + "/test" + System.currentTimeMillis() + ".mp3";
-        FileCopyHelper copier = new FileCopyHelper(mContext);
-        copier.copyToExternalStorage(R.raw.testmp3, new File(fileName));
+        writeFile(R.raw.testmp3, fileName);
 
         mMediaFile = new File(fileName);
         assertTrue(mMediaFile.exists());
+    }
+
+    private void writeFile(int resid, String path) throws IOException {
+        File out = new File(path);
+        File dir = out.getParentFile();
+        dir.mkdirs();
+        FileCopyHelper copier = new FileCopyHelper(mContext);
+        copier.copyToExternalStorage(resid, out);
     }
 
     @Override
@@ -73,8 +78,13 @@ public class MediaScannerTest extends AndroidTestCase {
             mMediaFile.delete();
         }
         if (mFileDir != null) {
+            new File(mFileDir + "/testmp3.mp3").delete();
+            new File(mFileDir + "/testmp3_2.mp3").delete();
+            new File(mFileDir + "/ctsmediascanplaylist1.pls").delete();
+            new File(mFileDir + "/ctsmediascanplaylist2.m3u").delete();
             new File(mFileDir).delete();
         }
+
         if (mMediaScannerConnection != null) {
             mMediaScannerConnection.disconnect();
             mMediaScannerConnection = null;
@@ -122,14 +132,7 @@ public class MediaScannerTest extends AndroidTestCase {
         c.close();
 
         // with nomedia file removed, do media scan and check that entry is in audio table again
-        ScannerNotificationReceiver finishedReceiver = new ScannerNotificationReceiver(
-                Intent.ACTION_MEDIA_SCANNER_FINISHED);
-        IntentFilter finshedIntentFilter = new IntentFilter(Intent.ACTION_MEDIA_SCANNER_FINISHED);
-        finshedIntentFilter.addDataScheme("file");
-        mContext.registerReceiver(finishedReceiver, finshedIntentFilter);
-        mContext.sendBroadcast(new Intent(Intent.ACTION_MEDIA_MOUNTED, Uri.parse("file://"
-                + Environment.getExternalStorageDirectory())));
-        finishedReceiver.waitForBroadcast();
+        startMediaScanAndWait();
 
         // Give the 2nd stage scan that makes the unhidden files visible again
         // a little more time
@@ -139,9 +142,84 @@ public class MediaScannerTest extends AndroidTestCase {
         assertEquals(1, c.getCount());
         c.close();
 
+        // ensure that we don't currently have playlists named ctsmediascanplaylist*
+        res.delete(MediaStore.Audio.Playlists.EXTERNAL_CONTENT_URI,
+                MediaStore.Audio.PlaylistsColumns.NAME + "=?",
+                new String[] { "ctsmediascanplaylist1"});
+        res.delete(MediaStore.Audio.Playlists.EXTERNAL_CONTENT_URI,
+                MediaStore.Audio.PlaylistsColumns.NAME + "=?",
+                new String[] { "ctsmediascanplaylist2"});
+        // delete the playlist file entries, if they exist
+        res.delete(MediaStore.Files.getContentUri("external"),
+                MediaStore.Files.FileColumns.DATA + "=?",
+                new String[] { mFileDir + "/ctsmediascanplaylist1.pls"});
+        res.delete(MediaStore.Files.getContentUri("external"),
+                MediaStore.Files.FileColumns.DATA + "=?",
+                new String[] { mFileDir + "/ctsmediascanplaylist2.m3u"});
+
+        // write some more files
+        writeFile(R.raw.testmp3, mFileDir + "/testmp3.mp3");
+        writeFile(R.raw.testmp3_2, mFileDir + "/testmp3_2.mp3");
+        writeFile(R.raw.playlist1, mFileDir + "/ctsmediascanplaylist1.pls");
+        writeFile(R.raw.playlist2, mFileDir + "/ctsmediascanplaylist2.m3u");
+
+        startMediaScanAndWait();
+
+        // verify that the two playlists were created correctly;
+        c = res.query(MediaStore.Audio.Playlists.EXTERNAL_CONTENT_URI, null,
+                MediaStore.Audio.PlaylistsColumns.NAME + "=?",
+                new String[] { "ctsmediascanplaylist1"}, null);
+        assertEquals(1, c.getCount());
+        c.moveToFirst();
+        long playlistid = c.getLong(c.getColumnIndex(MediaStore.MediaColumns._ID));
+        c.close();
+
+        c = res.query(MediaStore.Audio.Playlists.Members.getContentUri("external", playlistid),
+                null, null, null, MediaStore.Audio.Playlists.Members.PLAY_ORDER);
+        assertEquals(2, c.getCount());
+        c.moveToNext();
+        long song1a = c.getLong(c.getColumnIndex(MediaStore.Audio.Playlists.Members.AUDIO_ID));
+        c.moveToNext();
+        long song1b = c.getLong(c.getColumnIndex(MediaStore.Audio.Playlists.Members.AUDIO_ID));
+        c.close();
+        assertTrue("song id should not be 0", song1a != 0);
+        assertTrue("song id should not be 0", song1b != 0);
+
+        // 2nd playlist should have the same songs, in reverse order
+        c = res.query(MediaStore.Audio.Playlists.EXTERNAL_CONTENT_URI, null,
+                MediaStore.Audio.PlaylistsColumns.NAME + "=?",
+                new String[] { "ctsmediascanplaylist2"}, null);
+        assertEquals(1, c.getCount());
+        c.moveToFirst();
+        playlistid = c.getLong(c.getColumnIndex(MediaStore.MediaColumns._ID));
+        c.close();
+
+        c = res.query(MediaStore.Audio.Playlists.Members.getContentUri("external", playlistid),
+                null, null, null, MediaStore.Audio.Playlists.Members.PLAY_ORDER);
+        assertEquals(2, c.getCount());
+        c.moveToNext();
+        long song2a = c.getLong(c.getColumnIndex(MediaStore.Audio.Playlists.Members.AUDIO_ID));
+        c.moveToNext();
+        long song2b = c.getLong(c.getColumnIndex(MediaStore.Audio.Playlists.Members.AUDIO_ID));
+        c.close();
+        assertEquals("mismatched song ids", song1a, song2b);
+        assertEquals("mismatched song ids", song2a, song1b);
+
         mMediaScannerConnection.disconnect();
 
         checkConnectionState(false);
+    }
+
+    private void startMediaScanAndWait() throws InterruptedException {
+        ScannerNotificationReceiver finishedReceiver = new ScannerNotificationReceiver(
+                Intent.ACTION_MEDIA_SCANNER_FINISHED);
+        IntentFilter finishedIntentFilter = new IntentFilter(Intent.ACTION_MEDIA_SCANNER_FINISHED);
+        finishedIntentFilter.addDataScheme("file");
+        mContext.registerReceiver(finishedReceiver, finishedIntentFilter);
+        mContext.sendBroadcast(new Intent(Intent.ACTION_MEDIA_MOUNTED, Uri.parse("file://"
+                + Environment.getExternalStorageDirectory())));
+        finishedReceiver.waitForBroadcast();
+        mContext.unregisterReceiver(finishedReceiver);
     }
 
     private void checkMediaScannerConnection() {
