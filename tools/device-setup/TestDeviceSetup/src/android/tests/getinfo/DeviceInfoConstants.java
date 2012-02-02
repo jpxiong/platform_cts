@@ -30,7 +30,7 @@ public interface DeviceInfoConstants {
     public static final String OPEN_GL_ES_VERSION = "openGlEsVersion";
     public static final String PROCESSES = "processes";
     public static final String FEATURES = "features";
-    public static final String PHONE_NUMBER = "phoneNumber";
+    public static final String PHONE_NUMBER = "subscriberId";
     public static final String LOCALES = "locales";
     public static final String IMSI = "imsi";
     public static final String IMEI = "imei";
