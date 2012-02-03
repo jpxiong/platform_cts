@@ -18,7 +18,7 @@ package android.content.cts;
 
 import java.util.HashMap;
 
-import android.content.CancelationSignal;
+import android.content.CancellationSignal;
 import android.content.ContentProvider;
 import android.content.ContentUris;
 import android.content.ContentValues;
@@ -185,7 +185,7 @@ public class MockContentProvider extends ContentProvider {
 
     @Override
     public Cursor query(Uri uri, String[] projection, String selection,
-            String[] selectionArgs, String sortOrder, CancelationSignal cancelationSignal) {
+            String[] selectionArgs, String sortOrder, CancellationSignal cancellationSignal) {
 
         SQLiteQueryBuilder qb = new SQLiteQueryBuilder();
 
@@ -203,7 +203,7 @@ public class MockContentProvider extends ContentProvider {
         case TESTTABLE1_CROSS:
             // Create a ridiculous cross-product of the test table.  This is done
             // to create an artificially long-running query to enable us to test
-            // remote query cancelation in ContentResolverTest.
+            // remote query cancellation in ContentResolverTest.
             qb.setTables("TestTable1 a, TestTable1 b, TestTable1 c, TestTable1 d, TestTable1 e");
             break;
 
@@ -230,7 +230,7 @@ public class MockContentProvider extends ContentProvider {
 
         SQLiteDatabase db = mOpenHelper.getReadableDatabase();
         Cursor c = qb.query(db, projection, selection, selectionArgs, null, null, orderBy,
-                null, cancelationSignal);
+                null, cancellationSignal);
 
         c.setNotificationUri(getContext().getContentResolver(), uri);
         return c;

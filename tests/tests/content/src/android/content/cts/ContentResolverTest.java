@@ -20,7 +20,7 @@ import com.android.cts.stub.R;
 
 
 import android.accounts.Account;
-import android.content.CancelationSignal;
+import android.content.CancellationSignal;
 import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
@@ -171,20 +171,20 @@ public class ContentResolverTest extends AndroidTestCase {
     }
 
     public void testCancelableQuery_WhenNotCanceled_ReturnsResultSet() {
-        CancelationSignal cancelationSignal = new CancelationSignal();
+        CancellationSignal cancellationSignal = new CancellationSignal();
 
         Cursor cursor = mContentResolver.query(TABLE1_URI, null, null, null, null,
-                cancelationSignal);
+                cancellationSignal);
         assertEquals(3, cursor.getCount());
         cursor.close();
     }
 
     public void testCancelableQuery_WhenCanceledBeforeQuery_ThrowsImmediately() {
-        CancelationSignal cancelationSignal = new CancelationSignal();
-        cancelationSignal.cancel();
+        CancellationSignal cancellationSignal = new CancellationSignal();
+        cancellationSignal.cancel();
 
         try {
-            mContentResolver.query(TABLE1_URI, null, null, null, null, cancelationSignal);
+            mContentResolver.query(TABLE1_URI, null, null, null, null, cancellationSignal);
             fail("Expected OperationCanceledException");
         } catch (OperationCanceledException ex) {
             // expected
@@ -202,28 +202,28 @@ public class ContentResolverTest extends AndroidTestCase {
         }
 
         for (int i = 0; i < 5; i++) {
-            final CancelationSignal cancelationSignal = new CancelationSignal();
-            Thread cancelationThread = new Thread() {
+            final CancellationSignal cancellationSignal = new CancellationSignal();
+            Thread cancellationThread = new Thread() {
                 @Override
                 public void run() {
                     try {
                         Thread.sleep(300);
                     } catch (InterruptedException ex) {
                     }
-                    cancelationSignal.cancel();
+                    cancellationSignal.cancel();
                 }
             };
             try {
                 // Build an unsatisfiable 5-way cross-product query over 100 values but
                 // produces no output.  This should force SQLite to loop for a long time
                 // as it tests 10^10 combinations.
-                cancelationThread.start();
+                cancellationThread.start();
 
                 final long startTime = System.nanoTime();
                 try {
                     mContentResolver.query(TABLE1_CROSS_URI, null,
                             "a.value + b.value + c.value + d.value + e.value > 1000000",
-                            null, null, cancelationSignal);
+                            null, null, cancellationSignal);
                     fail("Expected OperationCanceledException");
                 } catch (OperationCanceledException ex) {
                     // expected
@@ -237,7 +237,7 @@ public class ContentResolverTest extends AndroidTestCase {
                 }
             } finally {
                 try {
-                    cancelationThread.join();
+                    cancellationThread.join();
                 } catch (InterruptedException e) {
                 }
             }

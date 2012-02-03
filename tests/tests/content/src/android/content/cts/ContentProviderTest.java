@@ -23,7 +23,7 @@ import android.content.ContentProvider;
 import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
-import android.content.ICancelationSignal;
+import android.content.ICancellationSignal;
 import android.content.IContentProvider;
 import android.content.ContentProviderResult;
 import android.content.ContentProviderOperation;
@@ -288,7 +288,7 @@ public class ContentProviderTest extends AndroidTestCase {
             @Override
             public Cursor query(Uri url, String[] projection, String selection,
                     String[] selectionArgs, String sortOrder,
-                    ICancelationSignal cancelationSignal) {
+                    ICancellationSignal cancellationSignal) {
                 return null;
             }
 
@@ -320,7 +320,7 @@ public class ContentProviderTest extends AndroidTestCase {
             }
 
             @Override
-            public ICancelationSignal createCancelationSignal() throws RemoteException {
+            public ICancellationSignal createCancellationSignal() throws RemoteException {
                 return null;
             }
         };
