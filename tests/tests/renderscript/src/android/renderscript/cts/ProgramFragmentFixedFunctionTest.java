@@ -83,8 +83,7 @@ public class ProgramFragmentFixedFunctionTest extends RSBaseGraphics {
 
     public void testProgramFragmentFixedFunctionBuilder() {
         testProgramFragmentFixedFunctionBuilder(false);
-        // TODO: Add this back after FIFO has been reworked.
-        //testProgramFragmentFixedFunctionBuilder(true);
+        testProgramFragmentFixedFunctionBuilder(true);
     }
 
     public void testBuilderEnvMode() {
