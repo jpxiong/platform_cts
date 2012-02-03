@@ -87,8 +87,7 @@ public class ProgramVertexFixedFunctionTest extends RSBaseGraphics {
 
     public void testProgramVertexFixedFunctionBuilder() {
         testProgramVertexFixedFunctionBuilder(false);
-        // TODO: Add this back after FIFO has been reworked.
-        //testProgramVertexFixedFunctionBuilder(true);
+        testProgramVertexFixedFunctionBuilder(true);
     }
 
 }

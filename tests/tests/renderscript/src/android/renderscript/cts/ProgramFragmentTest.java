@@ -200,8 +200,7 @@ public class ProgramFragmentTest extends RSBaseGraphics {
     }
 
     public void testProgramFragmentCreation() {
-        // TODO: Add this back after FIFO has been reworked.
-        //testProgramFragmentBuilderHelper(true);
+        testProgramFragmentBuilderHelper(true);
     }
 
     public void testProgramTextureType() {
