@@ -121,8 +121,11 @@ public class View_AnimationTest extends ActivityInstrumentationTestCase2<ViewTes
                 return mAnimation.hasStarted();
             }
         }.run();
-
-        view.clearAnimation();
+        runTestOnUiThread(new Runnable() {
+            public void run() {
+                view.clearAnimation();
+            }
+        });
         Thread.sleep(TIME_OUT);
         assertTrue(mAnimation.hasStarted());
         assertTrue(mAnimation.hasEnded());
