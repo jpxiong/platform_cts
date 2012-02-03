@@ -33,11 +33,11 @@ class RSBase extends AndroidTestCase {
     Context mCtx;
     Resources mRes;
 
-    public int result;
+    private int result;
     private boolean msgHandled;
 
-    public static final int RS_MSG_TEST_PASSED = 100;
-    public static final int RS_MSG_TEST_FAILED = 101;
+    private static final int RS_MSG_TEST_PASSED = 100;
+    private static final int RS_MSG_TEST_FAILED = 101;
 
     RSMessageHandler mRsMessage = new RSMessageHandler() {
         public void run() {
@@ -79,5 +79,13 @@ class RSBase extends AndroidTestCase {
         msgHandled = false;
         mCtx = getContext();
         mRes = mCtx.getResources();
+    }
+
+    /**
+     * Verify that we didn't fail on the control or script side of things.
+     */
+    protected void checkForErrors() {
+        assertFalse(FoundError);
+        assertTrue(result != RS_MSG_TEST_FAILED);
     }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2011 The Android Open Source Project
+ * Copyright (C) 2011-2012 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -321,7 +321,7 @@ public class ComputeTest extends RSBaseCompute {
         assertTrue(initializeGlobals(t));
         t.invoke_test();
         waitForMessage();
-        assertEquals(RS_MSG_TEST_PASSED, result);
+        checkForErrors();
     }
 
     /**
@@ -333,7 +333,7 @@ public class ComputeTest extends RSBaseCompute {
                                                       R.raw.utils);
         t.invoke_test();
         waitForMessage();
-        assertEquals(RS_MSG_TEST_PASSED, result);
+        checkForErrors();
     }
 
     void setUpAllocation(Allocation a, int val) {
@@ -383,5 +383,6 @@ public class ComputeTest extends RSBaseCompute {
             fail("should throw RSRuntimeException");
         } catch (RSRuntimeException e) {
         }
+        checkForErrors();
     }
 }

@@ -30,7 +30,7 @@ public class VersionTest extends RSBaseCompute {
                                               R.raw.set_target_api_11);
         test11.invoke_check(11);
         waitForMessage();
-        assertEquals(RS_MSG_TEST_PASSED, result);
+        checkForErrors();
     }
 
     public void testVersion12() {
@@ -40,7 +40,7 @@ public class VersionTest extends RSBaseCompute {
                                               R.raw.set_target_api_12);
         test12.invoke_check(12);
         waitForMessage();
-        assertEquals(RS_MSG_TEST_PASSED, result);
+        checkForErrors();
     }
 
     public void testVersion13() {
@@ -50,7 +50,7 @@ public class VersionTest extends RSBaseCompute {
                                               R.raw.set_target_api_13);
         test13.invoke_check(13);
         waitForMessage();
-        assertEquals(RS_MSG_TEST_PASSED, result);
+        checkForErrors();
     }
 
     public void testVersion14() {
@@ -60,7 +60,7 @@ public class VersionTest extends RSBaseCompute {
                                               R.raw.set_target_api_14);
         test14.invoke_check(14);
         waitForMessage();
-        assertEquals(RS_MSG_TEST_PASSED, result);
+        checkForErrors();
     }
 
     public void testVersion15() {
@@ -70,6 +70,6 @@ public class VersionTest extends RSBaseCompute {
                                               R.raw.set_target_api_15);
         test15.invoke_check(15);
         waitForMessage();
-        assertEquals(RS_MSG_TEST_PASSED, result);
+        checkForErrors();
     }
 }
