@@ -45,6 +45,6 @@ public class StructPadTest extends RSBaseCompute {
         pad.set_s(I);
         pad.invoke_verify();
         waitForMessage();
-        assertFalse(FoundError);
+        checkForErrors();
     }
 }
