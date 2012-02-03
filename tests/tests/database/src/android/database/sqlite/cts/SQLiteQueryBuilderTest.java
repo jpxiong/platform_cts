@@ -17,7 +17,7 @@
 package android.database.sqlite.cts;
 
 
-import android.content.CancelationSignal;
+import android.content.CancellationSignal;
 import android.content.Context;
 import android.content.OperationCanceledException;
 import android.database.Cursor;
@@ -274,12 +274,12 @@ public class SQLiteQueryBuilderTest extends AndroidTestCase {
     public void testCancelableQuery_WhenNotCanceled_ReturnsResultSet() {
         createEmployeeTable();
 
-        CancelationSignal cancelationSignal = new CancelationSignal();
+        CancellationSignal cancellationSignal = new CancellationSignal();
         SQLiteQueryBuilder sqliteQueryBuilder = new SQLiteQueryBuilder();
         sqliteQueryBuilder.setTables("Employee");
         Cursor cursor = sqliteQueryBuilder.query(mDatabase,
                 new String[] { "name", "sum(salary)" }, null, null,
-                "name", "sum(salary)>1000", "name", null, cancelationSignal);
+                "name", "sum(salary)>1000", "name", null, cancellationSignal);
 
         assertEquals(3, cursor.getCount());
     }
@@ -287,15 +287,15 @@ public class SQLiteQueryBuilderTest extends AndroidTestCase {
     public void testCancelableQuery_WhenCanceledBeforeQuery_ThrowsImmediately() {
         createEmployeeTable();
 
-        CancelationSignal cancelationSignal = new CancelationSignal();
+        CancellationSignal cancellationSignal = new CancellationSignal();
         SQLiteQueryBuilder sqliteQueryBuilder = new SQLiteQueryBuilder();
         sqliteQueryBuilder.setTables("Employee");
 
-        cancelationSignal.cancel();
+        cancellationSignal.cancel();
         try {
             sqliteQueryBuilder.query(mDatabase,
                     new String[] { "name", "sum(salary)" }, null, null,
-                    "name", "sum(salary)>1000", "name", null, cancelationSignal);
+                    "name", "sum(salary)>1000", "name", null, cancellationSignal);
             fail("Expected OperationCanceledException");
         } catch (OperationCanceledException ex) {
             // expected
@@ -305,15 +305,15 @@ public class SQLiteQueryBuilderTest extends AndroidTestCase {
     public void testCancelableQuery_WhenCanceledAfterQuery_ThrowsWhenExecuted() {
         createEmployeeTable();
 
-        CancelationSignal cancelationSignal = new CancelationSignal();
+        CancellationSignal cancellationSignal = new CancellationSignal();
         SQLiteQueryBuilder sqliteQueryBuilder = new SQLiteQueryBuilder();
         sqliteQueryBuilder.setTables("Employee");
 
         Cursor cursor = sqliteQueryBuilder.query(mDatabase,
                 new String[] { "name", "sum(salary)" }, null, null,
-                "name", "sum(salary)>1000", "name", null, cancelationSignal);
+                "name", "sum(salary)>1000", "name", null, cancellationSignal);
 
-        cancelationSignal.cancel();
+        cancellationSignal.cancel();
         try {
             cursor.getCount(); // force execution
             fail("Expected OperationCanceledException");
@@ -326,7 +326,7 @@ public class SQLiteQueryBuilderTest extends AndroidTestCase {
         createEmployeeTable();
 
         for (int i = 0; i < 5; i++) {
-            final CancelationSignal cancelationSignal = new CancelationSignal();
+            final CancellationSignal cancellationSignal = new CancellationSignal();
             final Semaphore barrier1 = new Semaphore(0);
             final Semaphore barrier2 = new Semaphore(0);
             Thread contentionThread = new Thread() {
@@ -341,14 +341,14 @@ public class SQLiteQueryBuilderTest extends AndroidTestCase {
                     mDatabase.endTransaction(); // release the connection
                 }
             };
-            Thread cancelationThread = new Thread() {
+            Thread cancellationThread = new Thread() {
                 @Override
                 public void run() {
                     try {
                         Thread.sleep(300);
                     } catch (InterruptedException ex) {
                     }
-                    cancelationSignal.cancel();
+                    cancellationSignal.cancel();
                 }
             };
             try {
@@ -356,7 +356,7 @@ public class SQLiteQueryBuilderTest extends AndroidTestCase {
                 sqliteQueryBuilder.setTables("Employee");
 
                 contentionThread.start();
-                cancelationThread.start();
+                cancellationThread.start();
 
                 try {
                     barrier1.acquire(); // wait for contention thread to start transaction
@@ -367,7 +367,7 @@ public class SQLiteQueryBuilderTest extends AndroidTestCase {
                 try {
                     Cursor cursor = sqliteQueryBuilder.query(mDatabase,
                             new String[] { "name", "sum(salary)" }, null, null,
-                            "name", "sum(salary)>1000", "name", null, cancelationSignal);
+                            "name", "sum(salary)>1000", "name", null, cancellationSignal);
                     cursor.getCount(); // force execution
                     fail("Expected OperationCanceledException");
                 } catch (OperationCanceledException ex) {
@@ -385,7 +385,7 @@ public class SQLiteQueryBuilderTest extends AndroidTestCase {
                 barrier2.release();
                 try {
                     contentionThread.join();
-                    cancelationThread.join();
+                    cancellationThread.join();
                 } catch (InterruptedException e) {
                 }
             }
@@ -405,15 +405,15 @@ public class SQLiteQueryBuilderTest extends AndroidTestCase {
         }
 
         for (int i = 0; i < 5; i++) {
-            final CancelationSignal cancelationSignal = new CancelationSignal();
-            Thread cancelationThread = new Thread() {
+            final CancellationSignal cancellationSignal = new CancellationSignal();
+            Thread cancellationThread = new Thread() {
                 @Override
                 public void run() {
                     try {
                         Thread.sleep(300);
                     } catch (InterruptedException ex) {
                     }
-                    cancelationSignal.cancel();
+                    cancellationSignal.cancel();
                 }
             };
             try {
@@ -423,13 +423,13 @@ public class SQLiteQueryBuilderTest extends AndroidTestCase {
                 SQLiteQueryBuilder sqliteQueryBuilder = new SQLiteQueryBuilder();
                 sqliteQueryBuilder.setTables("x AS a, x AS b, x AS c, x AS d, x AS e");
 
-                cancelationThread.start();
+                cancellationThread.start();
 
                 final long startTime = System.nanoTime();
                 try {
                     Cursor cursor = sqliteQueryBuilder.query(mDatabase, null,
                             "a.v + b.v + c.v + d.v + e.v > 1000000",
-                            null, null, null, null, null, cancelationSignal);
+                            null, null, null, null, null, cancellationSignal);
                     cursor.getCount(); // force execution
                     fail("Expected OperationCanceledException");
                 } catch (OperationCanceledException ex) {
@@ -444,7 +444,7 @@ public class SQLiteQueryBuilderTest extends AndroidTestCase {
                 }
             } finally {
                 try {
-                    cancelationThread.join();
+                    cancellationThread.join();
                 } catch (InterruptedException e) {
                 }
             }
