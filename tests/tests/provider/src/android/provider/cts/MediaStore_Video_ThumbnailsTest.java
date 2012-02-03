@@ -83,6 +83,22 @@ public class MediaStore_Video_ThumbnailsTest extends AndroidTestCase {
         // Check that an additional thumbnails have been registered.
         int count2 = getThumbnailCount(Thumbnails.EXTERNAL_CONTENT_URI);
         assertTrue(count2 > count);
+
+        Cursor c = mResolver.query(Thumbnails.EXTERNAL_CONTENT_URI,
+                new String[] { Thumbnails._ID, Thumbnails.DATA, Thumbnails.VIDEO_ID },
+                null, null, null);
+
+        if (c.moveToLast()) {
+            long vid = c.getLong(2);
+            assertEquals(videoId, vid);
+            String path = c.getString(1);
+            assertTrue("thumbnail file does not exist", new File(path).exists());
+            long id = c.getLong(0);
+            mResolver.delete(ContentUris.withAppendedId(Thumbnails.EXTERNAL_CONTENT_URI, id),
+                    null, null);
+            assertFalse("thumbnail file should no longer exist", new File(path).exists());
+        }
+        c.close();
     }
 
     private Uri insertVideo() throws IOException {
