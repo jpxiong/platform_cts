@@ -73,6 +73,7 @@ cts_test_packages := \
 	CtsPermissionTestCases \
 	CtsPermission2TestCases \
 	CtsPreferenceTestCases \
+	CtsPreference2TestCases \
 	CtsProviderTestCases \
 	CtsRenderscriptTestCases \
 	CtsSaxTestCases \
