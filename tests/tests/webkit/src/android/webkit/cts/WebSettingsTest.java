@@ -39,6 +39,18 @@ public class WebSettingsTest extends ActivityInstrumentationTestCase2<WebViewStu
     private static final int WEBVIEW_TIMEOUT = 5000;
     private static final String LOG_TAG = "WebSettingsTest";
 
+    private final String EMPTY_IMAGE_HEIGHT = "0";
+    private final String NETWORK_IMAGE_HEIGHT = "48";  // See getNetworkImageHtml()
+    private final String DATA_URL_IMAGE_HTML = "<html>" +
+            "<head><script>function updateTitle(){" +
+            "document.title=document.getElementById('img').naturalHeight;}</script></head>" +
+            "<body onload='updateTitle()'>" +
+            "<img id='img' onload='updateTitle()' src='data:image/png;base64,iVBORw0KGgoAAA" +
+            "ANSUhEUgAAAAEAAAABCAAAAAA6fptVAAAAAXNSR0IArs4c6QAAAA1JREFUCB0BAgD9/wAAAAIAAc3j" +
+            "0SsAAAAASUVORK5CYII=" +
+            "'></body></html>";
+    private final String DATA_URL_IMAGE_HEIGHT = "1";
+
     private WebSettings mSettings;
     private CtsTestServer mWebServer;
     private WebViewOnUiThread mOnUiThread;
@@ -182,28 +194,6 @@ public class WebSettingsTest extends ActivityInstrumentationTestCase2<WebViewStu
         // Files on the file system should not be loaded.
         mOnUiThread.loadUrlAndWaitForCompletion(TestHtmlConstants.LOCAL_FILESYSTEM_URL);
         assertEquals(TestHtmlConstants.WEBPAGE_NOT_AVAILABLE_TITLE, mOnUiThread.getTitle());
-    }
-
-    public void testAccessBlockNetworkImage() throws Exception {
-        String url = TestHtmlConstants.EMBEDDED_IMG_URL;
-        final String ext = MimeTypeMap.getFileExtensionFromUrl(url);
-
-        mOnUiThread.clearCache(true);
-        assertFalse(mSettings.getBlockNetworkImage());
-        assertTrue(mSettings.getLoadsImagesAutomatically());
-        loadAssetUrl(url);
-        new PollingCheck() {
-            @Override
-            protected boolean check() {
-                return !mWebServer.getLastRequestUrl().endsWith(ext);
-            }
-        }.run();
-
-        mOnUiThread.clearCache(true);
-        mSettings.setBlockNetworkImage(true);
-        assertTrue(mSettings.getBlockNetworkImage());
-        loadAssetUrl(url);
-        assertTrue(mWebServer.getLastRequestUrl().endsWith(ext));
     }
 
     public void testAccessCacheMode() throws Exception {
@@ -393,23 +383,6 @@ public class WebSettingsTest extends ActivityInstrumentationTestCase2<WebViewStu
 
         mSettings.setLightTouchEnabled(true);
         assertTrue(mSettings.getLightTouchEnabled());
-    }
-
-    public void testAccessLoadsImagesAutomatically() throws Exception {
-        mOnUiThread.clearCache(true);
-        assertTrue(mSettings.getLoadsImagesAutomatically());
-        String url = TestHtmlConstants.EMBEDDED_IMG_URL;
-        String ext = MimeTypeMap.getFileExtensionFromUrl(url);
-        loadAssetUrl(url);
-        Thread.sleep(1000);
-        assertFalse(mWebServer.getLastRequestUrl().endsWith(ext));
-
-        mOnUiThread.clearCache(true);
-        mSettings.setLoadsImagesAutomatically(false);
-        assertFalse(mSettings.getLoadsImagesAutomatically());
-        loadAssetUrl(url);
-        Thread.sleep(1000);
-        assertTrue(mWebServer.getLastRequestUrl().endsWith(ext));
     }
 
     public void testAccessMinimumFontSize() {
@@ -607,6 +580,102 @@ public class WebSettingsTest extends ActivityInstrumentationTestCase2<WebViewStu
         }.run();
     }
 
+    public void testLoadsImagesAutomatically() throws Throwable {
+        assertTrue(mSettings.getLoadsImagesAutomatically());
+
+        startWebServer();
+        mSettings.setJavaScriptEnabled(true);
+
+        // Check that by default network and data url images are loaded.
+        mOnUiThread.loadDataAndWaitForCompletion(getNetworkImageHtml(), "text/html", null);
+        assertEquals(NETWORK_IMAGE_HEIGHT, mOnUiThread.getTitle());
+        mOnUiThread.loadDataAndWaitForCompletion(DATA_URL_IMAGE_HTML, "text/html", null);
+        assertEquals(DATA_URL_IMAGE_HEIGHT, mOnUiThread.getTitle());
+
+        // Check that with auto-loading turned off no images are loaded.
+        // Also check that images are loaded automatically once we enable the setting,
+        // without reloading the page.
+        mSettings.setLoadsImagesAutomatically(false);
+        mOnUiThread.clearCache(true);
+        mOnUiThread.loadDataAndWaitForCompletion(getNetworkImageHtml(), "text/html", null);
+        assertEquals(EMPTY_IMAGE_HEIGHT, mOnUiThread.getTitle());
+        mSettings.setLoadsImagesAutomatically(true);
+        waitForNonEmptyImage();
+        assertEquals(NETWORK_IMAGE_HEIGHT, mOnUiThread.getTitle());
+
+        mSettings.setLoadsImagesAutomatically(false);
+        mOnUiThread.clearCache(true);
+        mOnUiThread.loadDataAndWaitForCompletion(DATA_URL_IMAGE_HTML, "text/html", null);
+        assertEquals(EMPTY_IMAGE_HEIGHT, mOnUiThread.getTitle());
+        mSettings.setLoadsImagesAutomatically(true);
+        waitForNonEmptyImage();
+        assertEquals(DATA_URL_IMAGE_HEIGHT, mOnUiThread.getTitle());
+    }
+
+    public void testBlockNetworkImage() throws Throwable {
+        assertFalse(mSettings.getBlockNetworkImage());
+
+        startWebServer();
+        mSettings.setJavaScriptEnabled(true);
+
+        // Check that by default network and data url images are loaded.
+        mOnUiThread.loadDataAndWaitForCompletion(getNetworkImageHtml(), "text/html", null);
+        assertEquals(NETWORK_IMAGE_HEIGHT, mOnUiThread.getTitle());
+        mOnUiThread.loadDataAndWaitForCompletion(DATA_URL_IMAGE_HTML, "text/html", null);
+        assertEquals(DATA_URL_IMAGE_HEIGHT, mOnUiThread.getTitle());
+
+        // Check that only network images are blocked, data url images are still loaded.
+        // Also check that network images are loaded automatically once we disable the setting,
+        // without reloading the page.
+        mSettings.setBlockNetworkImage(true);
+        mOnUiThread.clearCache(true);
+        mOnUiThread.loadDataAndWaitForCompletion(getNetworkImageHtml(), "text/html", null);
+        assertEquals(EMPTY_IMAGE_HEIGHT, mOnUiThread.getTitle());
+        mSettings.setBlockNetworkImage(false);
+        waitForNonEmptyImage();
+        assertEquals(NETWORK_IMAGE_HEIGHT, mOnUiThread.getTitle());
+
+        mSettings.setBlockNetworkImage(true);
+        mOnUiThread.clearCache(true);
+        mOnUiThread.loadDataAndWaitForCompletion(DATA_URL_IMAGE_HTML, "text/html", null);
+        assertEquals(DATA_URL_IMAGE_HEIGHT, mOnUiThread.getTitle());
+    }
+
+    public void testBlockNetworkLoads() throws Throwable {
+        assertFalse(mSettings.getBlockNetworkLoads());
+
+        startWebServer();
+        mSettings.setJavaScriptEnabled(true);
+
+        // Check that by default network resources and data url images are loaded.
+        mOnUiThread.loadUrlAndWaitForCompletion(
+            mWebServer.getAssetUrl(TestHtmlConstants.HELLO_WORLD_URL));
+        assertEquals(TestHtmlConstants.HELLO_WORLD_TITLE, mOnUiThread.getTitle());
+        mOnUiThread.loadDataAndWaitForCompletion(getNetworkImageHtml(), "text/html", null);
+        assertEquals(NETWORK_IMAGE_HEIGHT, mOnUiThread.getTitle());
+        mOnUiThread.loadDataAndWaitForCompletion(DATA_URL_IMAGE_HTML, "text/html", null);
+        assertEquals(DATA_URL_IMAGE_HEIGHT, mOnUiThread.getTitle());
+
+        // Check that only network resources are blocked, data url images are still loaded.
+        mSettings.setBlockNetworkLoads(true);
+        mOnUiThread.clearCache(true);
+        mOnUiThread.loadUrlAndWaitForCompletion(
+            mWebServer.getAssetUrl(TestHtmlConstants.HELLO_WORLD_URL));
+        assertEquals(TestHtmlConstants.WEBPAGE_NOT_AVAILABLE_TITLE, mOnUiThread.getTitle());
+        mOnUiThread.loadDataAndWaitForCompletion(getNetworkImageHtml(), "text/html", null);
+        assertEquals(EMPTY_IMAGE_HEIGHT, mOnUiThread.getTitle());
+        mOnUiThread.loadDataAndWaitForCompletion(DATA_URL_IMAGE_HTML, "text/html", null);
+        assertEquals(DATA_URL_IMAGE_HEIGHT, mOnUiThread.getTitle());
+
+        // Check that network resources are loaded once we disable the setting and reload the page.
+        mSettings.setBlockNetworkLoads(false);
+        mOnUiThread.loadUrlAndWaitForCompletion(
+            mWebServer.getAssetUrl(TestHtmlConstants.HELLO_WORLD_URL));
+        assertEquals(TestHtmlConstants.HELLO_WORLD_TITLE, mOnUiThread.getTitle());
+        mOnUiThread.loadDataAndWaitForCompletion(getNetworkImageHtml(), "text/html", null);
+        assertEquals(NETWORK_IMAGE_HEIGHT, mOnUiThread.getTitle());
+    }
+
     /**
      * Starts the internal web server. The server will be shut down automatically
      * during tearDown().
@@ -631,5 +700,24 @@ public class WebSettingsTest extends ActivityInstrumentationTestCase2<WebViewStu
         }
         String url = mWebServer.getAssetUrl(asset);
         mOnUiThread.loadUrlAndWaitForCompletion(url);
+    }
+
+    private String getNetworkImageHtml() {
+        return "<html>" +
+                "<head><script>function updateTitle(){" +
+                "document.title=document.getElementById('img').naturalHeight;}</script></head>" +
+                "<body onload='updateTitle()'>" +
+                "<img id='img' onload='updateTitle()' src='" +
+                mWebServer.getAssetUrl(TestHtmlConstants.SMALL_IMG_URL) +
+                "'></body></html>";
+    }
+
+    private void waitForNonEmptyImage() {
+        new PollingCheck(WEBVIEW_TIMEOUT) {
+            @Override
+            protected boolean check() {
+                return !EMPTY_IMAGE_HEIGHT.equals(mOnUiThread.getTitle());
+            }
+        }.run();
     }
 }
