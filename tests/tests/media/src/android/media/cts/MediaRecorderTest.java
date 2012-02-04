@@ -205,6 +205,33 @@ public class MediaRecorderTest extends ActivityInstrumentationTestCase2<MediaStu
         assertFalse(checkLocationInFile(OUTPUT_PATH2));
     }
 
+    public void testRecordingAudioInRawFormats() throws Exception {
+        testRecordAudioInRawFormat(
+                MediaRecorder.OutputFormat.AMR_NB,
+                MediaRecorder.AudioEncoder.AMR_NB);
+
+        testRecordAudioInRawFormat(
+                MediaRecorder.OutputFormat.AMR_WB,
+                MediaRecorder.AudioEncoder.AMR_WB);
+
+        testRecordAudioInRawFormat(
+                MediaRecorder.OutputFormat.AAC_ADTS,
+                MediaRecorder.AudioEncoder.AAC);
+    }
+
+    private void testRecordAudioInRawFormat(
+            int fileFormat, int codec) throws Exception {
+
+        if (!hasMicrophone()) {
+            return;
+        }
+        mMediaRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
+        mMediaRecorder.setOutputFormat(fileFormat);
+        mMediaRecorder.setOutputFile(OUTPUT_PATH);
+        mMediaRecorder.setAudioEncoder(codec);
+        recordMedia(MAX_FILE_SIZE, mOutFile);
+    }
+
     public void testRecorderAudio() throws Exception {
         if (!hasMicrophone()) {
             return;
