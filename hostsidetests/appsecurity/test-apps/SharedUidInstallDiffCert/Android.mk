@@ -22,9 +22,9 @@ LOCAL_SRC_FILES := $(call all-java-files-under, src)
 
 LOCAL_SDK_VERSION := current
 
-LOCAL_PACKAGE_NAME := CtsInstrumentationAppDiffCert
+LOCAL_PACKAGE_NAME := CtsSharedUidInstallDiffCert
 
-# sign this app with different cert than CtsTargetInstrumentationApp
-LOCAL_CERTIFICATE := cts/tests/appsecurity-tests/certs/cts-testkey2
+# sign this app with a different cert than CtsSharedUidInstall
+LOCAL_CERTIFICATE := cts/hostsidetests/appsecurity/certs/cts-testkey2
 
 include $(BUILD_PACKAGE)

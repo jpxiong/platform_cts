@@ -25,6 +25,6 @@ LOCAL_SDK_VERSION := current
 LOCAL_PACKAGE_NAME := CtsAppAccessData
 
 # although not strictly necessary, sign this app with different cert than CtsAppWithData
-LOCAL_CERTIFICATE := cts/tests/appsecurity-tests/certs/cts-testkey2
+LOCAL_CERTIFICATE := cts/hostsidetests/appsecurity/certs/cts-testkey2
 
 include $(BUILD_PACKAGE)
