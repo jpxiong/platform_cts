@@ -29,6 +29,7 @@ cts_support_packages := \
 	CtsDelegatingAccessibilityService \
 	CtsDeviceAdmin \
 	CtsMonkeyApp \
+	CtsMonkeyApp2 \
 	CtsTestStubs \
 	SignatureTest \
 	TestDeviceSetup \

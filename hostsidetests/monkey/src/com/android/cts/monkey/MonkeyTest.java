@@ -16,55 +16,22 @@
 
 package com.android.cts.monkey;
 
-import com.android.cts.tradefed.build.CtsBuildHelper;
-import com.android.tradefed.build.IBuildInfo;
 import com.android.tradefed.device.DeviceNotAvailableException;
-import com.android.tradefed.device.ITestDevice;
-import com.android.tradefed.testtype.DeviceTestCase;
-import com.android.tradefed.testtype.IBuildReceiver;
 
-import java.io.File;
 import java.util.Scanner;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class MonkeyTest extends DeviceTestCase implements IBuildReceiver {
-
-    private static final String PKG = "com.android.cts.monkey";
-    private static final String APK = "CtsMonkeyApp.apk";
+public class MonkeyTest extends AbstractMonkeyTest {
 
     private static final Pattern LOG_PATTERN =
             Pattern.compile("I/MonkeyActivity\\([\\d ]+\\): (.*)");
     private static final String MONKEY = "@(>.<)@";
     private static final String HUMAN = "(^_^)";
 
-    private CtsBuildHelper mBuild;
-    private ITestDevice mDevice;
-
-    @Override
-    public void setBuild(IBuildInfo buildInfo) {
-        mBuild = CtsBuildHelper.createBuildHelper(buildInfo);
-    }
-
-    @Override
-    protected void setUp() throws Exception {
-        super.setUp();
-        mDevice = getDevice();
-        mDevice.uninstallPackage(PKG);
-
-        File app = mBuild.getTestApp(APK);
-        mDevice.installPackage(app, false);
-    }
-
-    @Override
-    protected void tearDown() throws Exception {
-        super.tearDown();
-        mDevice.uninstallPackage(PKG);
-    }
-
     public void testIsMonkey() throws Exception {
         clearLogCat();
-        mDevice.executeShellCommand("monkey -v -p " + PKG + " 500");
+        mDevice.executeShellCommand("monkey -p " + PKGS[0] + " 500");
         assertIsUserAMonkey(true);
     }
 
@@ -92,9 +59,5 @@ public class MonkeyTest extends DeviceTestCase implements IBuildReceiver {
         } finally {
             s.close();
         }
-    }
-
-    private void clearLogCat() throws DeviceNotAvailableException {
-        mDevice.executeAdbCommand("logcat", "-c");
     }
 }
