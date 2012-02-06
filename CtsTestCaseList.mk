@@ -36,6 +36,8 @@ CTS_COVERAGE_TEST_CASE_LIST := \
 	CtsBluetoothTestCases \
 	CtsContentTestCases \
 	CtsDatabaseTestCases \
+	CtsDelegatingAccessibilityService \
+	CtsDeviceAdmin \
 	CtsDpiTestCases \
 	CtsDpiTestCases2 \
 	CtsDrmTestCases \
@@ -66,18 +68,16 @@ CTS_COVERAGE_TEST_CASE_LIST := \
 	CtsUtilTestCases \
 	CtsViewTestCases \
 	CtsWebkitTestCases \
-	CtsWidgetTestCases
+	CtsWidgetTestCases \
+	SignatureTest \
+	TestDeviceSetup \
+	$(CTS_SECURITY_APPS_LIST)
 
 CTS_TEST_CASE_LIST := \
-	TestDeviceSetup \
-	CtsDelegatingAccessibilityService \
-	CtsDeviceAdmin \
 	com.replica.replicaisland \
-	SignatureTest \
 	ApiDemos \
 	ApiDemosReferenceTest \
 	$(CTS_COVERAGE_TEST_CASE_LIST) \
-	$(CTS_SECURITY_APPS_LIST)
 
 CTS_NATIVE_EXES := \
 	CtsNativeMediaTestCases
