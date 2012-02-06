@@ -99,6 +99,12 @@ public class MediaStore_Video_ThumbnailsTest extends AndroidTestCase {
             assertFalse("thumbnail file should no longer exist", new File(path).exists());
         }
         c.close();
+
+        // not technically a thumbnail test, but needs testing anyway: check that the video file
+        // is removed when deleting the database entry
+        assertTrue(new File(Environment.getExternalStorageDirectory(), "testVideo.3gp").exists());
+        mResolver.delete(videoUri, null, null);
+        assertFalse(new File(Environment.getExternalStorageDirectory(), "testVideo.3gp").exists());
     }
 
     private Uri insertVideo() throws IOException {
