@@ -3310,6 +3310,11 @@ public class ViewTest extends ActivityInstrumentationTestCase2<ViewTestStubActiv
         public void childOverlayStateChanged(View child) {
 
         }
+
+        @Override
+        public void childHasTransientStateChanged(View child, boolean hasTransientState) {
+
+        }
     }
 
     private final class OnCreateContextMenuListenerImpl implements OnCreateContextMenuListener {
