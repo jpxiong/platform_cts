@@ -17,26 +17,31 @@
 package android.provider.cts;
 
 
+import com.android.cts.stub.R;
+
 import android.content.ContentResolver;
 import android.content.ContentValues;
+import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Environment;
 import android.os.cts.FileUtils;
 import android.provider.MediaStore;
 import android.provider.MediaStore.Video.Media;
-import android.test.InstrumentationTestCase;
+import android.provider.MediaStore.Video.VideoColumns;
+import android.test.AndroidTestCase;
 
 import java.io.File;
+import java.io.IOException;
 
-public class MediaStore_Video_MediaTest extends InstrumentationTestCase {
+public class MediaStore_Video_MediaTest extends AndroidTestCase {
     private ContentResolver mContentResolver;
 
     @Override
     protected void setUp() throws Exception {
         super.setUp();
 
-        mContentResolver = getInstrumentation().getContext().getContentResolver();
+        mContentResolver = getContext().getContentResolver();
     }
 
     public void testGetContentUri() {
@@ -175,6 +180,24 @@ public class MediaStore_Video_MediaTest extends InstrumentationTestCase {
             // delete
             assertEquals(1, mContentResolver.delete(uri, null, null));
         }
+
+        // check that the video file is removed when deleting the database entry
+        Context context = getContext();
+        Uri videoUri = insertVideo(context);
+        File videofile = new File(Environment.getExternalStorageDirectory(), "testVideo.3gp");
+        assertTrue(videofile.exists());
+        mContentResolver.delete(videoUri, null, null);
+        assertFalse(videofile.exists());
+
+        // insert again, then delete with the "delete data" parameter set to false
+        videoUri = insertVideo(context);
+        assertTrue(videofile.exists());
+        Uri.Builder builder = videoUri.buildUpon();
+        builder.appendQueryParameter(MediaStore.PARAM_DELETE_DATA, "false");
+        mContentResolver.delete(builder.build(), null, null);
+        assertTrue(videofile.exists());
+        videofile.delete();
+
     }
 
     public void testStoreVideoMediaInternal() {
@@ -186,5 +209,14 @@ public class MediaStore_Video_MediaTest extends InstrumentationTestCase {
         } catch (UnsupportedOperationException e) {
             // expected
         }
+    }
+
+    private Uri insertVideo(Context context) throws IOException {
+        File file = new File(Environment.getExternalStorageDirectory(), "testVideo.3gp");
+        new FileCopyHelper(context).copyToExternalStorage(R.raw.testvideo, file);
+
+        ContentValues values = new ContentValues();
+        values.put(VideoColumns.DATA, file.getAbsolutePath());
+        return context.getContentResolver().insert(Media.EXTERNAL_CONTENT_URI, values);
     }
 }
