@@ -36,6 +36,14 @@ import java.io.File;
  * Attribution 3.0 License at http://creativecommons.org/licenses/by/3.0/us/.
  */
 public class MediaPlayerTest extends MediaPlayerTestBase {
+    private static final String RECORDED_FILE =
+                new File(Environment.getExternalStorageDirectory(),
+                "record.out").getAbsolutePath();
+
+    private static final int  RECORDED_VIDEO_WIDTH  = 176;
+    private static final int  RECORDED_VIDEO_HEIGHT = 144;
+    private static final long RECORDED_DURATION_MS  = 3000;
+
     public void testPlayNullSource() throws Exception {
         try {
             mMediaPlayer.setDataSource((String) null);
@@ -147,6 +155,79 @@ public class MediaPlayerTest extends MediaPlayerTestBase {
         assertTrue(mMediaPlayer.isPlaying());
 
         Thread.sleep(SLEEP_TIME);
+    }
+
+    public void testRecordedVideoPlayback0() throws Exception {
+        testRecordedVideoPlaybackWithAngle(0);
+    }
+
+    public void testRecordedVideoPlayback90() throws Exception {
+        testRecordedVideoPlaybackWithAngle(90);
+    }
+
+    public void testRecordedVideoPlayback180() throws Exception {
+        testRecordedVideoPlaybackWithAngle(180);
+    }
+
+    public void testRecordedVideoPlayback270() throws Exception {
+        testRecordedVideoPlaybackWithAngle(270);
+    }
+
+    private boolean hasCamera() {
+        return getActivity().getPackageManager().hasSystemFeature(PackageManager.FEATURE_CAMERA);
+    }
+
+    private void testRecordedVideoPlaybackWithAngle(int angle) throws Exception {
+        final int width = RECORDED_VIDEO_WIDTH;
+        final int height = RECORDED_VIDEO_HEIGHT;
+        final String file = RECORDED_FILE;
+        final long durationMs = RECORDED_DURATION_MS;
+
+        if (!hasCamera()) {
+            return;
+        }
+        checkOrientation(angle);
+        recordVideo(width, height, angle, file, durationMs);
+        checkDisplayedVideoSize(width, height, angle, file);
+    }
+
+    private void checkOrientation(int angle) throws Exception {
+        assertTrue(angle >= 0);
+        assertTrue(angle < 360);
+        assertTrue((angle % 90) == 0);
+    }
+
+    private void recordVideo(
+            int w, int h, int angle, String file, long durationMs) throws Exception {
+
+        MediaRecorder recorder = new MediaRecorder();
+        recorder.setVideoSource(MediaRecorder.VideoSource.CAMERA);
+        recorder.setAudioSource(MediaRecorder.AudioSource.MIC);
+        recorder.setOutputFormat(MediaRecorder.OutputFormat.DEFAULT);
+        recorder.setVideoEncoder(MediaRecorder.VideoEncoder.DEFAULT);
+        recorder.setAudioEncoder(MediaRecorder.AudioEncoder.DEFAULT);
+        recorder.setOutputFile(file);
+        recorder.setOrientationHint(angle);
+        recorder.setVideoSize(w, h);
+        recorder.setPreviewDisplay(getActivity().getSurfaceHolder2().getSurface());
+        recorder.prepare();
+        recorder.start();
+        Thread.sleep(durationMs);
+        recorder.stop();
+        recorder.release();
+        recorder = null;
+    }
+
+    private void checkDisplayedVideoSize(
+            int w, int h, int angle, String file) throws Exception {
+
+        int displayWidth  = w;
+        int displayHeight = h;
+        if ((angle % 180) != 0) {
+            displayWidth  = h;
+            displayHeight = w;
+        }
+        playVideoTest(file, displayWidth, displayHeight);
     }
 
     public void testLocalVideo_MP4_H264_480x360_500kbps_25fps_AAC_Stereo_128kbps_44110Hz()
