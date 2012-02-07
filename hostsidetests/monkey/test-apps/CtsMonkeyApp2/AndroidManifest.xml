@@ -14,21 +14,14 @@
      limitations under the License.
 -->
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-       package="com.android.cts.monkey">
+       package="com.android.cts.monkey2">
 
     <application>
 
-        <activity android:name=".MonkeyActivity">
+        <activity android:name=".ChimpActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
-        
-        <activity android:name=".BaboonActivity">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.MONKEY" />
             </intent-filter>
         </activity>
 
