@@ -185,6 +185,10 @@ public class DeviceInfoInstrument extends Instrumentation implements DeviceInfoC
                 screenSize = "large";
                 break;
 
+            case Configuration.SCREENLAYOUT_SIZE_XLARGE:
+                screenSize = "xlarge";
+                break;
+
             case Configuration.SCREENLAYOUT_SIZE_UNDEFINED:
                 screenSize = "undefined";
                 break;
@@ -200,10 +204,13 @@ public class DeviceInfoInstrument extends Instrumentation implements DeviceInfoC
             case DisplayMetrics.DENSITY_MEDIUM:
                 return "mdpi";
 
+            case DisplayMetrics.DENSITY_TV:
+                return "tvdpi";
+
             case DisplayMetrics.DENSITY_HIGH:
                 return "hdpi";
 
-            case 320:
+            case DisplayMetrics.DENSITY_XHIGH:
                 return "xdpi";
 
             default:
