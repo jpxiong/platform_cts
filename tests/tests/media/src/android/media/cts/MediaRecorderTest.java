@@ -41,6 +41,10 @@ public class MediaRecorderTest extends ActivityInstrumentationTestCase2<MediaStu
     private static final int RECORD_TIME = 3000;
     private static final int VIDEO_WIDTH = 176;
     private static final int VIDEO_HEIGHT = 144;
+    private static final int VIDEO_BIT_RATE_IN_BPS = 128000;
+    private static final int AUDIO_BIT_RATE_IN_BPS = 12200;
+    private static final int AUDIO_NUM_CHANNELS = 1;
+    private static final int AUDIO_SAMPLE_RATE_HZ = 8000;
     private static final long MAX_FILE_SIZE = 5000;
     private static final int MAX_DURATION_MSEC = 200;
     private static final float LATITUDE = 0.0000f;
@@ -111,6 +115,7 @@ public class MediaRecorderTest extends ActivityInstrumentationTestCase2<MediaStu
         mMediaRecorder.setOutputFormat(MediaRecorder.OutputFormat.DEFAULT);
         mMediaRecorder.setVideoEncoder(MediaRecorder.VideoEncoder.DEFAULT);
         mMediaRecorder.setVideoSize(VIDEO_WIDTH, VIDEO_HEIGHT);
+        mMediaRecorder.setVideoEncodingBitRate(VIDEO_BIT_RATE_IN_BPS);
         mMediaRecorder.setPreviewDisplay(getActivity().getSurfaceHolder().getSurface());
         mMediaRecorder.prepare();
         mMediaRecorder.start();
@@ -232,6 +237,18 @@ public class MediaRecorderTest extends ActivityInstrumentationTestCase2<MediaStu
         recordMedia(MAX_FILE_SIZE, mOutFile);
     }
 
+    public void testGetAudioSourceMax() throws Exception {
+        final int max = MediaRecorder.getAudioSourceMax();
+        assertTrue(MediaRecorder.AudioSource.DEFAULT <= max);
+        assertTrue(MediaRecorder.AudioSource.MIC <= max);
+        assertTrue(MediaRecorder.AudioSource.CAMCORDER <= max);
+        assertTrue(MediaRecorder.AudioSource.VOICE_CALL <= max);
+        assertTrue(MediaRecorder.AudioSource.VOICE_COMMUNICATION <= max);
+        assertTrue(MediaRecorder.AudioSource.VOICE_DOWNLINK <= max);
+        assertTrue(MediaRecorder.AudioSource.VOICE_RECOGNITION <= max);
+        assertTrue(MediaRecorder.AudioSource.VOICE_UPLINK <= max);
+    }
+
     public void testRecorderAudio() throws Exception {
         if (!hasMicrophone()) {
             return;
@@ -241,6 +258,9 @@ public class MediaRecorderTest extends ActivityInstrumentationTestCase2<MediaStu
         mMediaRecorder.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
         mMediaRecorder.setOutputFile(OUTPUT_PATH);
         mMediaRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB);
+        mMediaRecorder.setAudioChannels(AUDIO_NUM_CHANNELS);
+        mMediaRecorder.setAudioSamplingRate(AUDIO_SAMPLE_RATE_HZ);
+        mMediaRecorder.setAudioEncodingBitRate(AUDIO_BIT_RATE_IN_BPS);
         recordMedia(MAX_FILE_SIZE, mOutFile);
     }
 
