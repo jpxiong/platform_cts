@@ -316,17 +316,17 @@ public class Utils {
         return data.length / AudioQualityVerifierActivity.BYTES_PER_SAMPLE;
     }
 
-    public static void playRawFile(String filename) {
+    public static AudioTrack playRawFile(String filename) {
         byte[] data = readFile(filename);
         if (data == null) {
             Log.e(TAG, "Cannot read " + filename);
-            return;
+            return null;
         }
-        playRaw(data);
+        return playRaw(data);
     }
 
-    public static void playStim(Context context, int stimNum) {
-        Utils.playRaw(getStim(context, stimNum));
+    public static AudioTrack playStim(Context context, int stimNum) {
+        return Utils.playRaw(getStim(context, stimNum));
     }
 
     public static byte[] getStim(Context context, int stimNum) {
@@ -337,13 +337,15 @@ public class Utils {
         return AudioAssets.getPinkNoise(context, ampl, duration);
     }
 
-    public static void playRaw(byte[] data) {
+    public static AudioTrack playRaw(byte[] data) {
         Log.i(TAG, "Playing " + data.length + " bytes of pre-recorded audio");
         AudioTrack at = new AudioTrack(AudioQualityVerifierActivity.PLAYBACK_STREAM, AudioQualityVerifierActivity.SAMPLE_RATE,
                 AudioFormat.CHANNEL_OUT_MONO, AudioQualityVerifierActivity.AUDIO_FORMAT,
                 data.length, AudioTrack.MODE_STREAM);
         writeAudio(at, data);
         at.play();
+
+        return at;
     }
 
     /**
