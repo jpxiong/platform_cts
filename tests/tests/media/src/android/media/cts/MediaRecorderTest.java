@@ -42,6 +42,7 @@ public class MediaRecorderTest extends ActivityInstrumentationTestCase2<MediaStu
     private static final int VIDEO_WIDTH = 176;
     private static final int VIDEO_HEIGHT = 144;
     private static final int VIDEO_BIT_RATE_IN_BPS = 128000;
+    private static final double VIDEO_TIMELAPSE_CAPTURE_RATE_FPS = 1.0;
     private static final int AUDIO_BIT_RATE_IN_BPS = 12200;
     private static final int AUDIO_NUM_CHANNELS = 1;
     private static final int AUDIO_SAMPLE_RATE_HZ = 8000;
@@ -192,7 +193,15 @@ public class MediaRecorderTest extends ActivityInstrumentationTestCase2<MediaStu
         assertTrue(mOutFile.delete());
     }
 
+    public void testRecorderTimelapsedVideo() throws Exception {
+        testRecorderVideo(true);
+    }
+
     public void testRecorderVideo() throws Exception {
+        testRecorderVideo(false);
+    }
+
+    private void testRecorderVideo(boolean isTimelapsed) throws Exception {
         if (!hasCamera()) {
             return;
         }
@@ -202,6 +211,11 @@ public class MediaRecorderTest extends ActivityInstrumentationTestCase2<MediaStu
         mMediaRecorder.setVideoEncoder(MediaRecorder.VideoEncoder.DEFAULT);
         mMediaRecorder.setPreviewDisplay(getActivity().getSurfaceHolder().getSurface());
         mMediaRecorder.setVideoSize(VIDEO_WIDTH, VIDEO_HEIGHT);
+
+        if (isTimelapsed) {
+            mMediaRecorder.setCaptureRate(VIDEO_TIMELAPSE_CAPTURE_RATE_FPS);
+        }
+
         FileOutputStream fos = new FileOutputStream(OUTPUT_PATH2);
         FileDescriptor fd = fos.getFD();
         mMediaRecorder.setOutputFile(fd);
