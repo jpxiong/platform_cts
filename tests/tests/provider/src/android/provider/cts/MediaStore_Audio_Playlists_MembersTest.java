@@ -342,6 +342,46 @@ public class MediaStore_Audio_Playlists_MembersTest extends InstrumentationTestC
             assertEquals(2, result);
             result = mContentResolver.delete(members2Uri, null, null);
             assertEquals(1, result);
+
+            // insert again, then verify that deleting the audio entry cleans up its playlist member
+            // entry as well
+            values.clear();
+            values.put(Members.AUDIO_ID, mIdOfAudio1);
+            values.put(Members.PLAY_ORDER, 1);
+            membersUri = Members.getContentUri(MediaStoreAudioTestHelper.EXTERNAL_VOLUME_NAME,
+                    playlistId);
+            audioUri = mContentResolver.insert(membersUri, values);
+            assertNotNull(audioUri);
+            // Query members of the playlist
+            c = mContentResolver.query(membersUri,
+                    new String[] { Members.AUDIO_ID, Members.PLAYLIST_ID}, null, null, null);
+            colidx = c.getColumnIndex(Members.AUDIO_ID);
+            cnt = 0;
+            // The song should appear only once, for the playlist we used when inserting it
+            while(c.moveToNext()) {
+                if (c.getLong(colidx) == mIdOfAudio1) {
+                    cnt++;
+                    assertEquals(playlistId, c.getLong(c.getColumnIndex(Members.PLAYLIST_ID)));
+                }
+            }
+            assertEquals(1, cnt);
+            c.close();
+            mContentResolver.delete(Media.EXTERNAL_CONTENT_URI,
+                    Media._ID + "=" + mIdOfAudio1, null);
+            // Query members of the playlist
+            c = mContentResolver.query(membersUri,
+                    new String[] { Members.AUDIO_ID, Members.PLAYLIST_ID}, null, null, null);
+            colidx = c.getColumnIndex(Members.AUDIO_ID);
+            cnt = 0;
+            // The song should no longer appear in the playlist
+            while(c.moveToNext()) {
+                if (c.getLong(colidx) == mIdOfAudio1) {
+                    cnt++;
+                }
+            }
+            assertEquals(0, cnt);
+            c.close();
+
         } finally {
             // delete the playlists
             mContentResolver.delete(Playlists.EXTERNAL_CONTENT_URI,
