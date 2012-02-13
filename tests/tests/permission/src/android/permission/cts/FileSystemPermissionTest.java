@@ -193,6 +193,7 @@ public class FileSystemPermissionTest extends AndroidTestCase {
                     "/data/app",
                     "/data/app-private",
                     "/data/backup",
+                    "/data/battd",
                     "/data/btips",
                     "/data/btips/TI",
                     "/data/btips/TI/opp",
@@ -221,6 +222,7 @@ public class FileSystemPermissionTest extends AndroidTestCase {
                     "/data/drm/rights",
                     "/data/dump",
                     "/data/fota",
+                    "/data/emt",
                     "/data/hwvefs",
                     "/data/htcfs",
                     "/data/local",
@@ -240,6 +242,7 @@ public class FileSystemPermissionTest extends AndroidTestCase {
                     "/data/misc/wifi",
                     "/data/misc/wifi/sockets",
                     "/data/misc/wpa_supplicant",
+                    "/data/panicreports",
                     "/data/property",
                     "/data/radio",
                     "/data/secure",
@@ -249,6 +252,12 @@ public class FileSystemPermissionTest extends AndroidTestCase {
                     "/data/simcom/btadd",
                     "/data/simcom/simlog",
                     "/data/system",
+                    "/data/tombstones",
+                    "/data/tpapi",
+                    "/data/tpapi/etc",
+                    "/data/tpapi/etc/tpa",
+                    "/data/tpapi/etc/tpa/persistent",
+                    "/data/tpapi/user.bin",
                     "/data/wapi",
                     "/data/wifi",
                     "/data/wiper",
@@ -260,7 +269,8 @@ public class FileSystemPermissionTest extends AndroidTestCase {
                     "/mnt_ext/badablk3",
                     "/mnt_ext/cache",
                     "/mnt_ext/data",
-                    "/system/etc/security/drm"
+                    "/system/etc/security/drm",
+                    "/tmp"
             )
     );
 
