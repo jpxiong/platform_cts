@@ -56,6 +56,8 @@ public class MediaStore_Audio_Genres_MembersTest extends InstrumentationTestCase
 
     @Override
     protected void tearDown() throws Exception {
+        // "jam" should already have been deleted as part of the test, but delete it again just
+        // in case the test failed and aborted before that.
         mContentResolver.delete(Media.EXTERNAL_CONTENT_URI, Media._ID + "=" + mAudioIdOfJam, null);
         mContentResolver.delete(Media.EXTERNAL_CONTENT_URI, Media._ID + "=" + mAudioIdOfJamLive,
                 null);
@@ -246,6 +248,47 @@ public class MediaStore_Audio_Genres_MembersTest extends InstrumentationTestCase
             assertEquals(0, c.getCount());
             c.close();
 
+            // same for 2nd genre
+            assertEquals(1, mContentResolver.delete(members2Uri, null, null));
+            c = mContentResolver.query(members2Uri, null, null, null, null);
+            assertEquals(0, c.getCount());
+            c.close();
+
+            // insert again, then verify that deleting the audio entry cleans up its genre member
+            // entry as well
+            values.put(Members.AUDIO_ID, mAudioIdOfJam);
+            membersUri = Members.getContentUri(MediaStoreAudioTestHelper.EXTERNAL_VOLUME_NAME,
+                    genreId);
+            assertNotNull(mContentResolver.insert(membersUri, values));
+            // Query members across all genres
+            c = mContentResolver.query(allMembersUri,
+                    new String[] { Members.AUDIO_ID, Members.GENRE_ID}, null, null, null);
+            colidx = c.getColumnIndex(Members.AUDIO_ID);
+            jamcnt = 0;
+            // The song should appear only once, for the genre we used when inserting it
+            while(c.moveToNext()) {
+                if (c.getLong(colidx) == mAudioIdOfJam) {
+                    jamcnt++;
+                    assertEquals(genreId, c.getLong(c.getColumnIndex(Members.GENRE_ID)));
+                }
+            }
+            assertEquals(1, jamcnt);
+            c.close();
+            mContentResolver.delete(Media.EXTERNAL_CONTENT_URI,
+                    Media._ID + "=" + mAudioIdOfJam, null);
+            // Query members across all genres
+            c = mContentResolver.query(allMembersUri,
+                    new String[] { Members.AUDIO_ID, Members.GENRE_ID}, null, null, null);
+            colidx = c.getColumnIndex(Members.AUDIO_ID);
+            jamcnt = 0;
+            // The song should no longer appear in the genre
+            while(c.moveToNext()) {
+                if (c.getLong(colidx) == mAudioIdOfJam) {
+                    jamcnt++;
+                }
+            }
+            assertEquals(0, jamcnt);
+            c.close();
         } finally {
             // the members are deleted when deleting the genre which they belong to
             mContentResolver.delete(Genres.EXTERNAL_CONTENT_URI, Genres._ID + "=" + genreId, null);
