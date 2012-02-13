@@ -1912,7 +1912,8 @@ public class CalendarTest extends InstrumentationTestCase {
         String[] projection = new String[] { Instances.BEGIN };
 
         if (false) {
-            Cursor instances = getInstances(timeZone, rangeStart, rangeEnd, projection);
+            Cursor instances = getInstances(timeZone, rangeStart, rangeEnd, projection,
+                    new long[] { calendarId });
             dumpInstances(instances, timeZone, "all");
             instances.close();
         }
@@ -1923,28 +1924,28 @@ public class CalendarTest extends InstrumentationTestCase {
         // Find all matching "testevent".  The search matches on partial strings, so this
         // will also pick up "nontestevent".
         instances = getInstancesSearch(timeZone, rangeStart, rangeEnd,
-                "testevent", false, projection);
+                "testevent", false, projection, new long[] { calendarId });
         count = instances.getCount();
         instances.close();
         assertEquals(4, count);
 
         // Find all matching "fiddle" and "event".  Set the "by day" flag just to be different.
         instances = getInstancesSearch(timeZone, rangeStart, rangeEnd,
-                "fiddle event", true, projection);
+                "fiddle event", true, projection, new long[] { calendarId });
         count = instances.getCount();
         instances.close();
         assertEquals(2, count);
 
         // Find all matching "fiddle" and "baluchitherium".
         instances = getInstancesSearch(timeZone, rangeStart, rangeEnd,
-                "baluchitherium fiddle", false, projection);
+                "baluchitherium fiddle", false, projection, new long[] { calendarId });
         count = instances.getCount();
         instances.close();
         assertEquals(0, count);
 
         // Find all matching "event-two".
         instances = getInstancesSearch(timeZone, rangeStart, rangeEnd,
-                "event-two", false, projection);
+                "event-two", false, projection, new long[] { calendarId });
         count = instances.getCount();
         instances.close();
         assertEquals(1, count);
@@ -2231,10 +2232,10 @@ public class CalendarTest extends InstrumentationTestCase {
         // Check to see if we have the expected number of instances
         String timeZone = eventValues.getAsString(Events.EVENT_TIMEZONE);
         int instanceCount = getInstanceCount(timeZone, "2003-08-05T00:00:00",
-                "2003-08-31T11:59:59");
+                "2003-08-31T11:59:59", new long[] { calendarId });
         if (false) {
             Cursor instances = getInstances(timeZone, "2003-08-05T00:00:00", "2003-08-31T11:59:59",
-                    new String[] { Instances.BEGIN });
+                    new String[] { Instances.BEGIN }, new long[] { calendarId });
             dumpInstances(instances, timeZone, "initial");
             instances.close();
         }
@@ -2318,7 +2319,8 @@ public class CalendarTest extends InstrumentationTestCase {
         String testEnd = "1999-05-16T23:59:59";
         String[] projection = { Instances.BEGIN, Instances.START_MINUTE, Instances.END_MINUTE };
 
-        Cursor instances = getInstances(timeZone, testStart, testEnd, projection);
+        Cursor instances = getInstances(timeZone, testStart, testEnd, projection,
+                new long[] { calendarId });
         if (DEBUG_RECURRENCE) {
             dumpInstances(instances, timeZone, "initial");
         }
@@ -2363,7 +2365,8 @@ public class CalendarTest extends InstrumentationTestCase {
         // TODO: compare Reminders, Attendees, ExtendedProperties on one of the exception events
 
         // Re-query the instances and figure out if they look right.
-        instances = getInstances(timeZone, testStart, testEnd, projection);
+        instances = getInstances(timeZone, testStart, testEnd, projection,
+                new long[] { calendarId });
         if (DEBUG_RECURRENCE) {
             dumpInstances(instances, timeZone, "with DTSTART exceptions");
         }
@@ -2388,7 +2391,8 @@ public class CalendarTest extends InstrumentationTestCase {
         assertEquals("events deleted", 3, deleteCount);
 
         // Re-query the instances and figure out if they look right.
-        instances = getInstances(timeZone, testStart, testEnd, projection);
+        instances = getInstances(timeZone, testStart, testEnd, projection,
+                new long[] { calendarId });
         if (DEBUG_RECURRENCE) {
             dumpInstances(instances, timeZone, "post exception deletion");
         }
@@ -2409,7 +2413,8 @@ public class CalendarTest extends InstrumentationTestCase {
          * Repeat the test, this time modifying DURATION.
          */
 
-        instances = getInstances(timeZone, testStart, testEnd, projection);
+        instances = getInstances(timeZone, testStart, testEnd, projection,
+                new long[] { calendarId });
         if (DEBUG_RECURRENCE) {
             dumpInstances(instances, timeZone, "initial");
         }
@@ -2446,7 +2451,8 @@ public class CalendarTest extends InstrumentationTestCase {
         // TODO: make sure the selfAttendeeStatus change took
 
         // Re-query the instances and figure out if they look right.
-        instances = getInstances(timeZone, testStart, testEnd, projection);
+        instances = getInstances(timeZone, testStart, testEnd, projection,
+                new long[] { calendarId });
         if (DEBUG_RECURRENCE) {
             dumpInstances(instances, timeZone, "with DURATION exceptions");
         }
@@ -2502,7 +2508,8 @@ public class CalendarTest extends InstrumentationTestCase {
         // Add some attendees.
         addAttendees(account, eventId, seed);
 
-        Cursor instances = getInstances(timeZone, testStart, testEnd, projection);
+        Cursor instances = getInstances(timeZone, testStart, testEnd, projection,
+                new long[] { calendarId });
         if (DEBUG_RECURRENCE) {
             dumpInstances(instances, timeZone, "initial");
         }
@@ -2532,7 +2539,8 @@ public class CalendarTest extends InstrumentationTestCase {
         instances.close();
 
         // Re-query the instances and figure out if they look right.
-        instances = getInstances(timeZone, testStart, testEnd, projection);
+        instances = getInstances(timeZone, testStart, testEnd, projection,
+                new long[] { calendarId });
         if (DEBUG_RECURRENCE) {
             dumpInstances(instances, timeZone, "with exceptions");
         }
@@ -2669,7 +2677,8 @@ public class CalendarTest extends InstrumentationTestCase {
 
         // Check to see how many instances we get.  If the recurrence and the exception don't
         // get paired up correctly, we'll see too many instances.
-        Cursor instances = getInstances(timeZone, testStart, testEnd, projection);
+        Cursor instances = getInstances(timeZone, testStart, testEnd, projection,
+                new long[] { calendarId1, calendarId2 });
         if (DEBUG_RECURRENCE) {
             dumpInstances(instances, timeZone, "with exception");
         }
@@ -2756,7 +2765,8 @@ public class CalendarTest extends InstrumentationTestCase {
         String testEnd = "1999-01-29T23:59:59";
         String[] projection = { Instances.BEGIN, Instances.START_MINUTE };
 
-        Cursor instances = getInstances(timeZone, testStart, testEnd, projection);
+        Cursor instances = getInstances(timeZone, testStart, testEnd, projection,
+                new long[] { calendarId });
         if (DEBUG_RECURRENCE) {
             dumpInstances(instances, timeZone, "initial");
         }
@@ -2780,7 +2790,8 @@ public class CalendarTest extends InstrumentationTestCase {
 
 
         // Check to see if it took.
-        instances = getInstances(timeZone, testStart, testEnd, projection);
+        instances = getInstances(timeZone, testStart, testEnd, projection,
+                new long[] { calendarId });
         if (DEBUG_RECURRENCE) {
             dumpInstances(instances, timeZone, "with new rule");
         }
@@ -2849,7 +2860,8 @@ public class CalendarTest extends InstrumentationTestCase {
         String[] projection = { Instances.BEGIN, Instances.EVENT_LOCATION };
         String newLocation = "NEW!";
 
-        Cursor instances = getInstances(timeZone, testStart, testEnd, projection);
+        Cursor instances = getInstances(timeZone, testStart, testEnd, projection,
+                new long[] { calendarId });
         if (DEBUG_RECURRENCE) {
             dumpInstances(instances, timeZone, "initial");
         }
@@ -2867,7 +2879,8 @@ public class CalendarTest extends InstrumentationTestCase {
         // Check results.
         assertEquals("full update does not create new ID", eventId, excepEventId);
 
-        instances = getInstances(timeZone, testStart, testEnd, projection);
+        instances = getInstances(timeZone, testStart, testEnd, projection,
+                new long[] { calendarId });
         assertEquals("post-update instance count", 3, instances.getCount());
         while (instances.moveToNext()) {
             assertEquals("new location", newLocation, instances.getString(1));
@@ -2940,7 +2953,7 @@ public class CalendarTest extends InstrumentationTestCase {
      * @return Cursor with instances (caller should close when done)
      */
     private Cursor getInstances(String timeZone, String startWhen, String endWhen,
-            String[] projection) {
+            String[] projection, long[] calendarIds) {
         Time startTime = new Time(timeZone);
         startTime.parse3339(startWhen);
         long startMillis = startTime.toMillis(false);
@@ -2954,7 +2967,16 @@ public class CalendarTest extends InstrumentationTestCase {
         Uri uri = Uri.withAppendedPath(CalendarContract.Instances.CONTENT_URI,
                 startMillis + "/" + endMillis);
 
-        Cursor instances = mContentResolver.query(uri, projection, null, null,
+        String where = null;
+        for (int i = 0; i < calendarIds.length; i++) {
+            if (i > 0) {
+                where += " OR ";
+            } else {
+                where = "";
+            }
+            where += (Instances.CALENDAR_ID + "=" + calendarIds[i]);
+        }
+        Cursor instances = mContentResolver.query(uri, projection, where, null,
                 projection[0] + " ASC");
 
         return instances;
@@ -2975,7 +2997,7 @@ public class CalendarTest extends InstrumentationTestCase {
      * @return Cursor with instances (caller should close when done)
      */
     private Cursor getInstancesSearch(String timeZone, String startWhen, String endWhen,
-            String search, boolean searchByDay, String[] projection) {
+            String search, boolean searchByDay, String[] projection, long[] calendarIds) {
         Time startTime = new Time(timeZone);
         startTime.parse3339(startWhen);
         long startMillis = startTime.toMillis(false);
@@ -2996,10 +3018,19 @@ public class CalendarTest extends InstrumentationTestCase {
                     startMillis + "/" + endMillis + "/" + search);
         }
 
+        String where = null;
+        for (int i = 0; i < calendarIds.length; i++) {
+            if (i > 0) {
+                where += " OR ";
+            } else {
+                where = "";
+            }
+            where += (Instances.CALENDAR_ID + "=" + calendarIds[i]);
+        }
         // We want a list of instances that occur between the specified dates and that match
         // the search terms.
 
-        Cursor instances = mContentResolver.query(uri, projection, null, null,
+        Cursor instances = mContentResolver.query(uri, projection, where, null,
                 projection[0] + " ASC");
 
         return instances;
@@ -3031,9 +3062,10 @@ public class CalendarTest extends InstrumentationTestCase {
     /**
      * Counts the number of instances that appear between the specified start and end times.
      */
-    private int getInstanceCount(String timeZone, String startWhen, String endWhen) {
+    private int getInstanceCount(String timeZone, String startWhen, String endWhen,
+                long[] calendarIds) {
         Cursor instances = getInstances(timeZone, startWhen, endWhen,
-                new String[] { Instances._ID });
+                new String[] { Instances._ID }, calendarIds);
         int count = instances.getCount();
         instances.close();
         return count;
@@ -3194,7 +3226,8 @@ public class CalendarTest extends InstrumentationTestCase {
         assertTrue(eventId >= 0);
 
         String[] projection = { Instances.BEGIN, Instances.START_MINUTE };
-        Cursor instances = getInstances(timeZone, testStart, testEnd, projection);
+        Cursor instances = getInstances(timeZone, testStart, testEnd, projection,
+                new long[] { calendarId });
         if (DEBUG_RECURRENCE) {
             dumpInstances(instances, timeZone, "prep-create");
         }
@@ -3204,7 +3237,8 @@ public class CalendarTest extends InstrumentationTestCase {
         Uri eventUri = ContentUris.withAppendedId(Events.CONTENT_URI, eventId);
         removeAndVerifyEvent(eventUri, new ContentValues(eventValues), account);
 
-        instances = getInstances(timeZone, testStart, testEnd, projection);
+        instances = getInstances(timeZone, testStart, testEnd, projection,
+                new long[] { calendarId });
         if (DEBUG_RECURRENCE) {
             dumpInstances(instances, timeZone, "prep-clear");
         }
