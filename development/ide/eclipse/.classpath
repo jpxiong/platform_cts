@@ -35,6 +35,7 @@
     <classpathentry kind="src" path="cts/tests/tests/example/src"/>
     <classpathentry kind="src" path="cts/tests/tests/gesture/src"/>
     <classpathentry kind="src" path="cts/tests/tests/graphics/src"/>
+    <classpathentry kind="src" path="cts/tests/tests/graphics2/src"/>
     <classpathentry kind="src" path="cts/tests/tests/hardware/src"/>
     <classpathentry kind="src" path="cts/tests/tests/holo/src"/>
     <classpathentry kind="src" path="cts/tests/tests/jni/src"/>

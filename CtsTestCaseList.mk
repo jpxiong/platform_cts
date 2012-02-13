@@ -62,6 +62,7 @@ cts_test_packages := \
 	CtsExampleTestCases \
 	CtsGestureTestCases \
 	CtsGraphicsTestCases \
+	CtsGraphics2TestCases \
 	CtsHardwareTestCases \
 	CtsHoloTestCases \
 	CtsJniTestCases \
