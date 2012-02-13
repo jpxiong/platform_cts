@@ -42,6 +42,7 @@ CTS_COVERAGE_TEST_CASE_LIST := \
 	CtsExampleTestCases \
 	CtsGestureTestCases \
 	CtsGraphicsTestCases \
+	CtsGraphics2TestCases \
 	CtsHardwareTestCases \
 	CtsHoloTestCases \
 	CtsJniTestCases \
