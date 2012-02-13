@@ -32,7 +32,7 @@ public class MediaPlayerTestBase extends ActivityInstrumentationTestCase2<MediaS
 
     protected static final int SLEEP_TIME = 1000;
     protected static final int LONG_SLEEP_TIME = 6000;
-    protected static final int STREAM_RETRIES = 5;
+    protected static final int STREAM_RETRIES = 20;
 
     public static class Monitor {
         private boolean signalled;
@@ -188,6 +188,7 @@ public class MediaPlayerTestBase extends ActivityInstrumentationTestCase2<MediaS
         } else {
             Thread.sleep(playTime);
         }
+        mMediaPlayer.stop();
     }
 
     private static class PrepareFailedException extends Exception {}
