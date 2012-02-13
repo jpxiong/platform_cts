@@ -455,11 +455,6 @@ public class PhoneNumberUtilsTest extends AndroidTestCase {
 
         // Test isWellFormedSmsAddress
         assertTrue(PhoneNumberUtils.isWellFormedSmsAddress("+17005554141"));
-        // KT allow a to be a dialable character, the network portion of 'android' is 'a'
-        if (TelephonyUtils.isKt(tm)) {
-            assertTrue(PhoneNumberUtils.isWellFormedSmsAddress("android"));
-        } else {
-            assertFalse(PhoneNumberUtils.isWellFormedSmsAddress("android"));
-        }
+        assertFalse(PhoneNumberUtils.isWellFormedSmsAddress("android"));
     }
 }
