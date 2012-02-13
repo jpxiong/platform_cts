@@ -24,6 +24,7 @@ import com.android.cts.verifier.audioquality.Utils;
 import android.content.Context;
 import android.media.AudioFormat;
 import android.media.AudioRecord;
+import android.media.AudioTrack;
 import android.media.MediaRecorder;
 import android.util.Log;
 
@@ -72,13 +73,15 @@ public class LoopbackExperiment extends Experiment {
         mRecorder.start();
         Utils.delay(END_DELAY_MS);
 
-        Utils.playRaw(playbackData);
+        AudioTrack track = Utils.playRaw(playbackData);
 
         int timeout = duration + 2 * END_DELAY_MS;
         try {
             mRecorder.join(timeout);
         } catch (InterruptedException e) {}
 
+        track.stop();
+        track.release();
         return recordedData;
     }
 
