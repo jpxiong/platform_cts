@@ -158,12 +158,14 @@ public class MessageTest extends AndroidTestCase {
         Bundle bundle = new Bundle();
         bundle.putInt(KEY, VALUE);
         message.setData(bundle);
+        message.setAsynchronous(true);
         mMessage.copyFrom(message);
         assertEquals(WHAT, mMessage.what);
         assertEquals(ARG1, mMessage.arg1);
         assertEquals(ARG2, mMessage.arg2);
         assertEquals(OBJ, mMessage.obj);
         assertEquals(VALUE, mMessage.getData().getInt(KEY));
+        assertTrue(mMessage.isAsynchronous());
     }
 
     public void testRecycle() {
@@ -216,6 +218,17 @@ public class MessageTest extends AndroidTestCase {
         message.sendToTarget();
         sleep(SLEEP_TIME);
         assertTrue(mMessageHandlerCalled);
+    }
+
+    public void testAsynchronous() {
+        Message message = Message.obtain();
+        assertFalse(message.isAsynchronous());
+
+        message.setAsynchronous(true);
+        assertTrue(message.isAsynchronous());
+
+        message.setAsynchronous(false);
+        assertFalse(message.isAsynchronous());
     }
 
     private void sleep(long time) {
