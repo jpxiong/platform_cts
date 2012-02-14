@@ -56,7 +56,7 @@ public class OrientationEventListenerTest extends AndroidTestCase {
             level = TestLevel.SUFFICIENT,
             notes = "Test {@link OrientationEventListener#enable()}. "
                     + "This method is simply called to make sure that no exception is thrown. "
-                    + "The registeration of the listener can not be tested becuase there is "
+                    + "The registration of the listener can not be tested because there is "
                     + "no way to simulate sensor events",
             method = "enable",
             args = {}
@@ -65,7 +65,7 @@ public class OrientationEventListenerTest extends AndroidTestCase {
             level = TestLevel.SUFFICIENT,
             notes = "Test {@link OrientationEventListener#disable()}. "
                     + "This method is simply called to make sure that no exception is thrown. "
-                    + "The registeration of the listener can not be tested becuase there is "
+                    + "The registration of the listener can not be tested because there is "
                     + "no way to simulate sensor events",
             method = "disable",
             args = {}
