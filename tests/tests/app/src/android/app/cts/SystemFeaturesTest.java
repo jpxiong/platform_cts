@@ -343,14 +343,17 @@ public class SystemFeaturesTest extends InstrumentationTestCase {
     }
 
     public void testWifiFeature() throws Exception {
+        if (!mPackageManager.hasSystemFeature(PackageManager.FEATURE_WIFI)) {
+            // no WiFi, skip the test
+            return;
+        }
         boolean enabled = mWifiManager.isWifiEnabled();
         try {
-            // WifiManager is hard-coded to return true, but in other implementations this could
-            // return false for devices that don't have WiFi.
+            // WifiManager is hard-coded to return true,
+            // the case without WiFi is already handled,
+            // so this case MUST have WiFi.
             if (mWifiManager.setWifiEnabled(true)) {
                 assertAvailable(PackageManager.FEATURE_WIFI);
-            } else {
-                assertNotAvailable(PackageManager.FEATURE_WIFI);
             }
         } finally {
             if (!enabled) {

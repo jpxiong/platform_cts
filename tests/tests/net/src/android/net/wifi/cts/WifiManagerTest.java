@@ -90,6 +90,10 @@ public class WifiManagerTest extends AndroidTestCase {
     @Override
     protected void setUp() throws Exception {
         super.setUp();
+        if (!WifiFeature.isWifiSupported(getContext())) {
+            // skip the test if WiFi is not supported
+            return;
+        }
         mMySync = new MySync();
         mIntentFilter = new IntentFilter();
         mIntentFilter.addAction(WifiManager.NETWORK_STATE_CHANGED_ACTION);
@@ -115,6 +119,11 @@ public class WifiManagerTest extends AndroidTestCase {
 
     @Override
     protected void tearDown() throws Exception {
+        if (!WifiFeature.isWifiSupported(getContext())) {
+            // skip the test if WiFi is not supported
+            super.tearDown();
+            return;
+        }
         mWifiLock.release();
         mContext.unregisterReceiver(mReceiver);
         if (!mWifiManager.isWifiEnabled())
@@ -230,6 +239,10 @@ public class WifiManagerTest extends AndroidTestCase {
         )
     })
     public void testWifiManagerActions() throws Exception {
+        if (!WifiFeature.isWifiSupported(getContext())) {
+            // skip the test if WiFi is not supported
+            return;
+        }
         assertTrue(mWifiManager.reconnect());
         assertTrue(mWifiManager.reassociate());
         assertTrue(mWifiManager.disconnect());
@@ -278,6 +291,10 @@ public class WifiManagerTest extends AndroidTestCase {
         )
     })
     public void testWifiManagerProperties() throws Exception {
+        if (!WifiFeature.isWifiSupported(getContext())) {
+            // skip the test if WiFi is not supported
+            return;
+        }
         setWifiEnabled(true);
         assertTrue(mWifiManager.isWifiEnabled());
         assertNotNull(mWifiManager.getDhcpInfo());
@@ -345,6 +362,10 @@ public class WifiManagerTest extends AndroidTestCase {
         )
     })
     public void testWifiManagerNetWork() throws Exception {
+        if (!WifiFeature.isWifiSupported(getContext())) {
+            // skip the test if WiFi is not supported
+            return;
+        }
         // store the list of enabled networks, so they can be re-enabled after test completes
         Set<String> enabledSsids = getEnabledNetworks(mWifiManager.getConfiguredNetworks());
         try {
@@ -441,6 +462,10 @@ public class WifiManagerTest extends AndroidTestCase {
         )
     })
     public void testSignal() {
+        if (!WifiFeature.isWifiSupported(getContext())) {
+            // skip the test if WiFi is not supported
+            return;
+        }
         final int numLevels = 9;
         int expectLevel = 0;
         assertEquals(expectLevel, WifiManager.calculateSignalLevel(MIN_RSSI, numLevels));
