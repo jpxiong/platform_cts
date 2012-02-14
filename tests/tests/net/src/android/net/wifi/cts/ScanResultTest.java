@@ -65,6 +65,10 @@ public class ScanResultTest extends AndroidTestCase {
     @Override
     protected void setUp() throws Exception {
         super.setUp();
+        if (!WifiFeature.isWifiSupported(getContext())) {
+            // skip the test if WiFi is not supported
+            return;
+        }
         mMySync = new MySync();
         mIntentFilter = new IntentFilter();
         mIntentFilter.addAction(WifiManager.NETWORK_STATE_CHANGED_ACTION);
@@ -90,6 +94,11 @@ public class ScanResultTest extends AndroidTestCase {
 
     @Override
     protected void tearDown() throws Exception {
+        if (!WifiFeature.isWifiSupported(getContext())) {
+            // skip the test if WiFi is not supported
+            super.tearDown();
+            return;
+        }
         mWifiLock.release();
         mContext.unregisterReceiver(mReceiver);
         if (!mWifiManager.isWifiEnabled())
@@ -115,6 +124,10 @@ public class ScanResultTest extends AndroidTestCase {
         args = {}
     )
     public void testScanResultProperties() {
+        if (!WifiFeature.isWifiSupported(getContext())) {
+            // skip the test if WiFi is not supported
+            return;
+        }
         List<ScanResult> scanResults = mWifiManager.getScanResults();
         // this test case should in Wifi environment
         for (int i = 0; i < scanResults.size(); i++) {
