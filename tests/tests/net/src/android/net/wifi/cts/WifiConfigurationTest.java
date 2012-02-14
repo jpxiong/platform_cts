@@ -50,6 +50,10 @@ public class WifiConfigurationTest extends AndroidTestCase {
         )
     })
     public void testWifiConfiguration() {
+        if (!WifiFeature.isWifiSupported(getContext())) {
+            // skip the test if WiFi is not supported
+            return;
+        }
         List<WifiConfiguration> wifiConfigurations = mWifiManager.getConfiguredNetworks();
         for (int i = 0; i < wifiConfigurations.size(); i++) {
             WifiConfiguration wifiConfiguration = wifiConfigurations.get(i);
