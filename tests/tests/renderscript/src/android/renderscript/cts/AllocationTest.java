@@ -216,7 +216,7 @@ public class AllocationTest extends RSBaseGraphics {
         }
 
         try {
-            int invalidUsage = 0x0020;
+            int invalidUsage = 0x0100;
             Allocation.createFromBitmap(mRS, B,
                 Allocation.MipmapControl.MIPMAP_NONE, invalidUsage);
             fail("should throw RSIllegalArgumentException.");
