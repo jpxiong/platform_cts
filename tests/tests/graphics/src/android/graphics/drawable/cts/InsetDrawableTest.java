@@ -431,7 +431,7 @@ public class InsetDrawableTest extends AndroidTestCase {
         method = "getConstantState",
         args = {}
     )
-    @ToBeFixed(bug = "", explanation = "can not assert the inner fields, becuase the class" +
+    @ToBeFixed(bug = "", explanation = "can not assert the inner fields, because the class" +
             " InsetState is package protected.")
     public void testGetConstantState() {
         Drawable d = mContext.getResources().getDrawable(R.drawable.pass);
