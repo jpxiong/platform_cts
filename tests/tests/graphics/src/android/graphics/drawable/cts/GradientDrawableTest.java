@@ -449,7 +449,7 @@ public class GradientDrawableTest extends AndroidTestCase {
         method = "getConstantState",
         args = {}
     )
-    @ToBeFixed(bug = "", explanation = "can not assert the inner fields, becuase the class" +
+    @ToBeFixed(bug = "", explanation = "can not assert the inner fields, because the class" +
             " GradientState is package protected.")
     public void testGetConstantState() {
         GradientDrawable gradientDrawable = new GradientDrawable();
