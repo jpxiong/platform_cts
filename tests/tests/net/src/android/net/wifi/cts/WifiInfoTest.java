@@ -66,6 +66,10 @@ public class WifiInfoTest extends AndroidTestCase {
     @Override
     protected void setUp() throws Exception {
         super.setUp();
+        if (!WifiFeature.isWifiSupported(getContext())) {
+            // skip the test if WiFi is not supported
+            return;
+        }
         mMySync = new MySync();
         mIntentFilter = new IntentFilter();
         mIntentFilter.addAction(WifiManager.WIFI_STATE_CHANGED_ACTION);
@@ -84,6 +88,11 @@ public class WifiInfoTest extends AndroidTestCase {
 
     @Override
     protected void tearDown() throws Exception {
+        if (!WifiFeature.isWifiSupported(getContext())) {
+            // skip the test if WiFi is not supported
+            super.tearDown();
+            return;
+        }
         mWifiLock.release();
         mContext.unregisterReceiver(mReceiver);
         if (!mWifiManager.isWifiEnabled())
@@ -161,6 +170,10 @@ public class WifiInfoTest extends AndroidTestCase {
         )
     })
     public void testWifiInfoProperties() throws Exception {
+        if (!WifiFeature.isWifiSupported(getContext())) {
+            // skip the test if WiFi is not supported
+            return;
+        }
         // this test case should in Wifi environment
         WifiInfo wifiInfo = mWifiManager.getConnectionInfo();
 

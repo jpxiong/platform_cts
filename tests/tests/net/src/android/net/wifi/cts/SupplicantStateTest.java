@@ -34,6 +34,10 @@ public class SupplicantStateTest extends AndroidTestCase {
         )
     })
     public void testIsValidState() {
+        if (!WifiFeature.isWifiSupported(getContext())) {
+            // skip the test if WiFi is not supported
+            return;
+        }
         assertTrue(SupplicantState.isValidState(SupplicantState.DISCONNECTED));
         assertTrue(SupplicantState.isValidState(SupplicantState.INACTIVE));
         assertTrue(SupplicantState.isValidState(SupplicantState.SCANNING));

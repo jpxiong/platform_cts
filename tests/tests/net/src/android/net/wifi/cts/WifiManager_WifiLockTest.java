@@ -63,6 +63,10 @@ public class WifiManager_WifiLockTest extends AndroidTestCase {
         )
     })
     public void testWifiLock() {
+        if (!WifiFeature.isWifiSupported(getContext())) {
+            // skip the test if WiFi is not supported
+            return;
+        }
         WifiManager wm = (WifiManager) getContext().getSystemService(Context.WIFI_SERVICE);
         WifiLock wl = wm.createWifiLock(WIFI_TAG);
 
