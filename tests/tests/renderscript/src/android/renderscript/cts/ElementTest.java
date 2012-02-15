@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2011 The Android Open Source Project
+ * Copyright (C) 2011-2012 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@ package android.renderscript.cts;
 import android.renderscript.Element;
 import android.renderscript.Element.DataType;
 import android.renderscript.Element.DataKind;
+import android.renderscript.RSIllegalArgumentException;
 
 public class ElementTest extends RSBaseCompute {
 
@@ -450,7 +451,30 @@ public class ElementTest extends RSBaseCompute {
         assertEquals(28, DataType.values().length);
 
         for (DataType dt : DataType.values()) {
-            Element.createVector(mRS, dt, 2);
+            switch (dt) {
+            case FLOAT_32:
+            case FLOAT_64:
+            case SIGNED_8:
+            case SIGNED_16:
+            case SIGNED_32:
+            case SIGNED_64:
+            case UNSIGNED_8:
+            case UNSIGNED_16:
+            case UNSIGNED_32:
+            case UNSIGNED_64:
+            case BOOLEAN:
+                Element.createVector(mRS, dt, 2);
+                break;
+
+            default: {
+                try {
+                    Element.createVector(mRS, dt, 2);
+                    fail("should throw RSIllegalArgumentException");
+                } catch (RSIllegalArgumentException e) {
+                }
+                break;
+            }
+            }
         }
     }
 
