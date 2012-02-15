@@ -412,6 +412,9 @@ public class ElementTest extends RSBaseCompute {
     }
 
     public void testDataType() {
+        // Uncomment when NONE is no longer hidden.
+        //assertEquals(DataType.NONE, DataType.valueOf("NONE"));
+
         assertEquals(DataType.FLOAT_32, DataType.valueOf("FLOAT_32"));
         assertEquals(DataType.FLOAT_64, DataType.valueOf("FLOAT_64"));
         assertEquals(DataType.SIGNED_8, DataType.valueOf("SIGNED_8"));
@@ -444,7 +447,7 @@ public class ElementTest extends RSBaseCompute {
         assertEquals(DataType.RS_PROGRAM_RASTER, DataType.valueOf("RS_PROGRAM_RASTER"));
         assertEquals(DataType.RS_PROGRAM_STORE, DataType.valueOf("RS_PROGRAM_STORE"));
         // Make sure no new enums are added
-        assertEquals(27, DataType.values().length);
+        assertEquals(28, DataType.values().length);
 
         for (DataType dt : DataType.values()) {
             Element.createVector(mRS, dt, 2);
