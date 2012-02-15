@@ -123,7 +123,6 @@ public class MessageQueueTest extends AndroidTestCase {
                 super.init();
                 long now = SystemClock.uptimeMillis() + 200;
                 mLastMessage = 4;
-                mCount = 0;
 
                 mHandler.sendMessageAtTime(mHandler.obtainMessage(2), now + 1);
                 mHandler.sendMessageAtTime(mHandler.obtainMessage(3), now + 2);
@@ -147,7 +146,6 @@ public class MessageQueueTest extends AndroidTestCase {
                 super.init();
                 long now = SystemClock.uptimeMillis() + 200;
                 mLastMessage = 3;
-                mCount = 0;
                 mHandler.sendMessageAtTime(mHandler.obtainMessage(3), now);
                 mHandler.sendMessageAtFrontOfQueue(mHandler.obtainMessage(2));
                 mHandler.sendMessageAtFrontOfQueue(mHandler.obtainMessage(0));
@@ -162,6 +160,72 @@ public class MessageQueueTest extends AndroidTestCase {
         };
 
         tester.doTest(1000, 50);
+    }
+
+    /**
+     * Use MessageQueue, send messages and apply synchronization barriers.
+     */
+    public void testSyncBarriers() throws Exception {
+        OrderTestHelper tester = new OrderTestHelper() {
+
+            public void init() {
+                super.init();
+                mLastMessage = 10;
+                mHandler.sendEmptyMessage(0);
+                mHandler.sendEmptyMessage(5);
+                sendAsyncMessage(1);
+                sendAsyncMessage(2);
+                sendAsyncMessage(3);
+                mHandler.sendEmptyMessage(6);
+            }
+
+            public void handleMessage(Message msg) {
+                super.handleMessage(msg);
+                if (msg.what == 0) {
+                    getQueue().acquireSyncBarrier();
+                } else if (msg.what == 3) {
+                    mHandler.sendEmptyMessage(7);
+                    sendAsyncMessage(4);
+                    sendAsyncMessage(8);
+                } else if (msg.what == 4) {
+                    getQueue().releaseSyncBarrier();
+                    sendAsyncMessage(9);
+                    mHandler.sendEmptyMessage(10);
+                }
+            }
+
+            private void sendAsyncMessage(int what) {
+                Message msg = mHandler.obtainMessage(what);
+                msg.setAsynchronous(true);
+                mHandler.sendMessage(msg);
+            }
+        };
+
+        tester.doTest(1000, 50);
+    }
+
+    public void testReleaseSyncBarrierThrowsIfImproperlyNested() throws Exception {
+        MessageQueue queue = Looper.myQueue();
+
+        // Release without acquire.
+        try {
+            queue.releaseSyncBarrier();
+            fail("Should have thrown IllegalStateException");
+        } catch (IllegalStateException ex) {
+            // expected
+        }
+
+        // Released more times than acquired.
+        queue.acquireSyncBarrier();
+        queue.acquireSyncBarrier();
+        queue.releaseSyncBarrier();
+        queue.releaseSyncBarrier();
+        try {
+            queue.releaseSyncBarrier();
+            fail("Should have thrown IllegalStateException");
+        } catch (IllegalStateException ex) {
+            // expected
+        }
     }
 
     /**
@@ -219,6 +283,10 @@ public class MessageQueueTest extends AndroidTestCase {
             if (!mSuccess) {
                 throw mFailure;
             }
+        }
+
+        protected MessageQueue getQueue() {
+            return mLooper.getQueue();
         }
 
         class LooperThread extends HandlerThread {
