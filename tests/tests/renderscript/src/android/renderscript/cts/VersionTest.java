@@ -72,4 +72,14 @@ public class VersionTest extends RSBaseCompute {
         waitForMessage();
         checkForErrors();
     }
+
+    public void testVersion16() {
+        ScriptC_set_target_api_16 test16 =
+                new ScriptC_set_target_api_16(mRS,
+                                              mRes,
+                                              R.raw.set_target_api_16);
+        test16.invoke_check(16);
+        waitForMessage();
+        checkForErrors();
+    }
 }
