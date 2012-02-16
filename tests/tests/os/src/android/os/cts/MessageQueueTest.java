@@ -162,16 +162,16 @@ public class MessageQueueTest extends AndroidTestCase {
         tester.doTest(1000, 50);
     }
 
-    /**
-     * Use MessageQueue, send messages and apply synchronization barriers.
-     */
     public void testSyncBarriers() throws Exception {
         OrderTestHelper tester = new OrderTestHelper() {
+            private int mBarrierToken1;
+            private int mBarrierToken2;
 
             public void init() {
                 super.init();
                 mLastMessage = 10;
                 mHandler.sendEmptyMessage(0);
+                mBarrierToken1 = Looper.myLooper().postSyncBarrier();
                 mHandler.sendEmptyMessage(5);
                 sendAsyncMessage(1);
                 sendAsyncMessage(2);
@@ -181,16 +181,17 @@ public class MessageQueueTest extends AndroidTestCase {
 
             public void handleMessage(Message msg) {
                 super.handleMessage(msg);
-                if (msg.what == 0) {
-                    getQueue().acquireSyncBarrier();
-                } else if (msg.what == 3) {
+                if (msg.what == 3) {
                     mHandler.sendEmptyMessage(7);
+                    mBarrierToken2 = Looper.myLooper().postSyncBarrier();
                     sendAsyncMessage(4);
                     sendAsyncMessage(8);
                 } else if (msg.what == 4) {
-                    getQueue().releaseSyncBarrier();
+                    Looper.myLooper().removeSyncBarrier(mBarrierToken1);
                     sendAsyncMessage(9);
                     mHandler.sendEmptyMessage(10);
+                } else if (msg.what == 8) {
+                    Looper.myLooper().removeSyncBarrier(mBarrierToken2);
                 }
             }
 
@@ -204,24 +205,20 @@ public class MessageQueueTest extends AndroidTestCase {
         tester.doTest(1000, 50);
     }
 
-    public void testReleaseSyncBarrierThrowsIfImproperlyNested() throws Exception {
-        MessageQueue queue = Looper.myQueue();
-
-        // Release without acquire.
+    public void testReleaseSyncBarrierThrowsIfTokenNotValid() throws Exception {
+        // Invalid token
         try {
-            queue.releaseSyncBarrier();
+            Looper.myLooper().removeSyncBarrier(-1);
             fail("Should have thrown IllegalStateException");
         } catch (IllegalStateException ex) {
             // expected
         }
 
-        // Released more times than acquired.
-        queue.acquireSyncBarrier();
-        queue.acquireSyncBarrier();
-        queue.releaseSyncBarrier();
-        queue.releaseSyncBarrier();
+        // Token already removed.
+        int barrierToken = Looper.myLooper().postSyncBarrier();
+        Looper.myLooper().removeSyncBarrier(barrierToken);
         try {
-            queue.releaseSyncBarrier();
+            Looper.myLooper().removeSyncBarrier(barrierToken);
             fail("Should have thrown IllegalStateException");
         } catch (IllegalStateException ex) {
             // expected
@@ -283,10 +280,6 @@ public class MessageQueueTest extends AndroidTestCase {
             if (!mSuccess) {
                 throw mFailure;
             }
-        }
-
-        protected MessageQueue getQueue() {
-            return mLooper.getQueue();
         }
 
         class LooperThread extends HandlerThread {
