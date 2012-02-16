@@ -20,6 +20,7 @@ import android.content.Context;
 import android.net.ConnectivityManager;
 import android.test.AndroidTestCase;
 import android.test.suitebuilder.annotation.SmallTest;
+import java.net.InetAddress;
 
 /**
  * Verify ConnectivityManager related methods without specific network state permissions.
@@ -163,6 +164,15 @@ public class NoNetworkStatePermissionTest extends AndroidTestCase {
                     + " expected");
         } catch (SecurityException e) {
             // expected
+        }
+    }
+
+    @SmallTest
+    public void testSecurityExceptionFromDns() throws Exception {
+        try {
+            InetAddress.getByName("www.google.com");
+            fail();
+        } catch (SecurityException expected) {
         }
     }
 }
