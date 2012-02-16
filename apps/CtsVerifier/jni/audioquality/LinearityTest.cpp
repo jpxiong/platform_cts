@@ -150,6 +150,8 @@ int linearityTest(short** pcms, int* sampleCounts, int numSignals,
     for (int sig = 0; sig < numSignals; ++sig) {
         if (!peakLevels(pcms[sig], sampleCounts[sig],
              sampleRate, peakAverage + sig, peakRms + sig)) {
+            delete []peakAverage;
+            delete []peakRms;
             return -6; // failure because a signal is too short.
         }
     }
@@ -168,5 +170,7 @@ int linearityTest(short** pcms, int* sampleCounts, int numSignals,
             maxDev = dev;
     }
     *maxDeviation = maxDev;
+    delete []peakAverage;
+    delete []peakRms;
     return 1;
 }
