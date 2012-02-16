@@ -91,7 +91,7 @@ public class LooperTest extends AndroidTestCase {
     public void testPrepare() throws Throwable {
         try {
             Looper.prepare();
-            fail("should throw exception");
+            fail("should throw exception because current thread already has a looper");
         } catch (RuntimeException e) {
             //expected
         }
@@ -113,20 +113,11 @@ public class LooperTest extends AndroidTestCase {
     }
 
     public void testPrepareMainLooper() throws Throwable {
-        try {
-            Looper.prepareMainLooper();
-            fail("should throw exception");
-        } catch (RuntimeException e) {
-            //expected
-        }
-
         TestThread t = new TestThread(new Runnable() {
             public void run() {
-                Looper.prepareMainLooper();
-
                 try {
                     Looper.prepareMainLooper();
-                    fail("should throw exception");
+                    fail("should throw exception because the main thread was already prepared");
                 } catch (Throwable e) {
                     //expected
                 }
