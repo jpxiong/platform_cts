@@ -285,6 +285,7 @@ public class MediaRecorderStressTest extends ActivityInstrumentationTestCase2<Me
             mRecorder.prepare();
             Log.v(TAG, "before release");
             Thread.sleep(WAIT_TIME_CAMERA_TEST);
+            mRecorder.reset();
             mRecorder.release();
             Log.v(TAG, "release video recorder");
             output.write(", " + i);
