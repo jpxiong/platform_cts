@@ -219,8 +219,11 @@ class LayoutAdapter extends BaseAdapter {
         addLayout(R.string.togglebutton_checked, "toggle_button_checked",
                 R.layout.togglebutton_checked, null, NO_TIMEOUT_MS);
 
-        addLayout(R.string.zoomcontrols, "zoomcontrols",
-                R.layout.zoomcontrols, null, NO_TIMEOUT_MS);
+
+        // TODO: Zoom control hasn't been styled for Holo so don't test them.
+
+//        addLayout(R.string.zoomcontrols, "zoomcontrols",
+//                R.layout.zoomcontrols, null, NO_TIMEOUT_MS);
 
         // Dialogs
 
