@@ -28,6 +28,8 @@ import org.apache.http.impl.cookie.DateUtils;
 
 import java.io.File;
 import java.io.InputStream;
+import java.util.HashMap;
+import java.util.Map;
 
 public class CacheManager_CacheResultTest
         extends ActivityInstrumentationTestCase2<WebViewStubActivity> {
@@ -55,7 +57,7 @@ public class CacheManager_CacheResultTest
     }
 
     public void testCacheResult() throws Exception {
-        final long validity = 5 * 50 * 1000; // 5 min
+        final long validity = 5 * 60 * 1000; // 5 min
         final long age = 30 * 60 * 1000; // 30 min
         final long tolerance = 5 * 1000; // 5s
 
@@ -75,7 +77,11 @@ public class CacheManager_CacheResultTest
         }.run();
         final long time = System.currentTimeMillis();
         mOnUiThread.loadUrlAndWaitForCompletion(url);
-        CacheResult result = CacheManager.getCacheFile(url, null);
+
+        Map<String, String> headers = new HashMap<String, String>();
+        CacheResult result = CacheManager.getCacheFile(url, headers);
+        assertTrue(headers.isEmpty());
+
         assertNotNull(result);
         assertNotNull(result.getInputStream());
         assertTrue(result.getContentLength() > 0);
