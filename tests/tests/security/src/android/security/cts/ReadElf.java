@@ -19,6 +19,8 @@ package android.security.cts;
 import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * A poor man's implementation of the readelf command. This program is
@@ -73,7 +75,7 @@ class ReadElf {
     private static final int OFFSET_SHNUM = 16;
 
     /** The section header index that refers to string table. */
-    private static final int OFFSET_SHTRNDX = 17;
+    private static final int OFFSET_SHSTRNDX = 17;
 
     /** Program header offset for type of this program header. */
     private static final int PHOFF_TYPE = 0;
@@ -103,10 +105,16 @@ class ReadElf {
     private static final int PHOFF_ALIGN = 14;
 
     /** Index into string pool for segment name. */
-    private static final int SHOFF_NAME = 0;
+    private static final long SHOFF_NAME = 0;
 
-    /** Segment header type. */
-    private static final int SHOFF_TYPE = 2;
+    /** Segment header offset for type (half-words) */
+    private static final long SHOFF_TYPE = 2;
+
+    /** Segment header offset for offset (meta!) (half-words) */
+    private static final long SHOFF_OFFSET = 8;
+
+    /** Segment header offset for size (half-words) */
+    private static final long SHOFF_SIZE = 10;
 
     /** Data is presented in LSB format. */
     private static final int ELFDATA2LSB = 1;
@@ -120,7 +128,58 @@ class ReadElf {
 
     private static final long PT_LOAD = 1;
 
-    private RandomAccessFile mFile = null;
+    /** Section Type: Symbol Table */
+    private static final int SHT_SYMTAB = 2;
+
+    /** Section Type: String Table */
+    private static final int SHT_STRTAB = 3;
+
+    /** Section Type: Dynamic **/
+    private static final int SHT_DYNAMIC = 6;
+
+    /** Section Type: Dynamic Symbol Table */
+    private static final int SHT_DYNSYM = 11;
+
+    /** Symbol Table Entry: Name offset */
+    private static final int SYMTAB_NAME = 0;
+
+    /** Symbol Table Entry: SymTab Info */
+    private static final int SYMTAB_ST_INFO = 6;
+
+    /** Symbol Table Entry size (half-words) */
+    private static final int SYMTAB_ENTRY_HALFWORD_SIZE = 7;
+
+    /**
+     * Symbol Table Entry size (extra in bytes) to cover "st_info" and
+     * "st_other"
+     */
+    private static final int SYMTAB_ENTRY_BYTE_EXTRA_SIZE = 2;
+
+    public static class Symbol {
+        public static final int STB_LOCAL = 0;
+
+        public static final int STB_GLOBAL = 1;
+
+        public static final int STB_WEAK = 2;
+
+        public static final int STB_LOPROC = 13;
+
+        public static final int STB_HIPROC = 15;
+
+        public final String name;
+
+        public final int bind;
+
+        public final int type;
+
+        Symbol(String name, int st_info) {
+            this.name = name;
+            this.bind = (st_info >> 4) & 0x0F;
+            this.type = st_info & 0x0F;
+        }
+    };
+
+    private final RandomAccessFile mFile;
     private final byte[] mBuffer = new byte[512];
     private int mClass;
     private int mEndian;
@@ -129,6 +188,42 @@ class ReadElf {
     private int mType;
     private int mWordSize;
     private int mHalfWordSize;
+
+    /** Symbol Table offset */
+    private long mSymTabOffset;
+
+    /** Symbol Table size */
+    private long mSymTabSize;
+
+    /** Dynamic Symbol Table offset */
+    private long mDynSymOffset;
+
+    /** Dynamic Symbol Table size */
+    private long mDynSymSize;
+
+    /** Section Header String Table offset */
+    private long mShStrTabOffset;
+
+    /** Section Header String Table size */
+    private long mShStrTabSize;
+
+    /** String Table offset */
+    private long mStrTabOffset;
+
+    /** String Table size */
+    private long mStrTabSize;
+
+    /** Dynamic String Table offset */
+    private long mDynStrOffset;
+
+    /** Dynamic String Table size */
+    private long mDynStrSize;
+
+    /** Symbol Table symbol names */
+    private Map<String, Symbol> mSymbols;
+
+    /** Dynamic Symbol Table symbol names */
+    private Map<String, Symbol> mDynamicSymbols;
 
     static ReadElf read(File file) throws IOException {
         return new ReadElf(file);
@@ -147,16 +242,20 @@ class ReadElf {
     }
 
     private ReadElf(File file) throws IOException {
+        mFile = new RandomAccessFile(file, "r");
+
+        readIdent();
+
+        readHeader();
+    }
+
+    protected void finalize() throws Throwable {
         try {
-            mFile = new RandomAccessFile(file, "r");
-
-            readIdent();
-
-            readHeader();
+            mFile.close();
+        } catch (IOException e) {
+            // nothing
         } finally {
-            if (mFile != null) {
-                mFile.close();
-            }
+            super.finalize();
         }
     }
 
@@ -166,8 +265,9 @@ class ReadElf {
         final long shOffset = readWord(getHeaderOffset(OFFSET_SHOFF));
         final int shNumber = readHalf(getHeaderOffset(OFFSET_SHNUM));
         final int shSize = readHalf(getHeaderOffset(OFFSET_SHENTSIZE));
+        final int shStrIndex = readHalf(getHeaderOffset(OFFSET_SHSTRNDX));
 
-        readSectionHeaders(shOffset, shNumber, shSize);
+        readSectionHeaders(shOffset, shNumber, shSize, shStrIndex);
 
         final long phOffset = readWord(getHeaderOffset(OFFSET_PHOFF));
         final int phNumber = readHalf(getHeaderOffset(OFFSET_PHNUM));
@@ -176,10 +276,55 @@ class ReadElf {
         readProgramHeaders(phOffset, phNumber, phSize);
     }
 
-    private void readSectionHeaders(long shOffset, int shNumber, int shSize) throws IOException {
+    private void readSectionHeaders(long tableOffset, int shNumber, int shSize, int shStrIndex)
+            throws IOException {
+        // Read the Section Header String Table offset first.
+        {
+            final long shStrTabShOffset = tableOffset + shStrIndex * shSize;
+            final long type = readWord(shStrTabShOffset + mHalfWordSize * SHOFF_TYPE);
+
+            if (type == SHT_STRTAB) {
+                mShStrTabOffset = readWord(shStrTabShOffset + mHalfWordSize * SHOFF_OFFSET);
+                mShStrTabSize = readWord(shStrTabShOffset + mHalfWordSize * SHOFF_SIZE);
+            }
+        }
+
         for (int i = 0; i < shNumber; i++) {
-            final long type = readWord(shOffset + i * shSize + mHalfWordSize * SHOFF_TYPE);
-            if (type == 6) {
+            // Don't bother to re-read the Section Header StrTab.
+            if (i == shStrIndex) {
+                continue;
+            }
+
+            final long shOffset = tableOffset + i * shSize;
+
+            final long type = readWord(shOffset + mHalfWordSize * SHOFF_TYPE);
+            if ((type == SHT_SYMTAB) || (type == SHT_DYNSYM)) {
+                final long nameOffset = readWord(shOffset + mHalfWordSize * SHOFF_NAME);
+                final long offset = readWord(shOffset + mHalfWordSize * SHOFF_OFFSET);
+                final long size = readWord(shOffset + mHalfWordSize * SHOFF_SIZE);
+
+                final String symTabName = readShStrTabEntry(nameOffset);
+                if (".symtab".equals(symTabName)) {
+                    mSymTabOffset = offset;
+                    mSymTabSize = size;
+                } else if (".dynsym".equals(symTabName)) {
+                    mDynSymOffset = offset;
+                    mDynSymSize = size;
+                }
+            } else if (type == SHT_STRTAB) {
+                final long nameOffset = readWord(shOffset + mHalfWordSize * SHOFF_NAME);
+                final long offset = readWord(shOffset + mHalfWordSize * SHOFF_OFFSET);
+                final long size = readWord(shOffset + mHalfWordSize * SHOFF_SIZE);
+
+                final String strTabName = readShStrTabEntry(nameOffset);
+                if (".strtab".equals(strTabName)) {
+                    mStrTabOffset = offset;
+                    mStrTabSize = size;
+                } else if (".dynstr".equals(strTabName)) {
+                    mDynStrOffset = offset;
+                    mDynStrSize = size;
+                }
+            } else if (type == SHT_DYNAMIC) {
                 mIsDynamic = true;
             }
         }
@@ -198,8 +343,50 @@ class ReadElf {
         }
     }
 
+    private void readSymbolTable(Map<String, Symbol> symbolMap, long symStrOffset, long symStrSize,
+            long symOffset, long symSize) throws IOException {
+        final long symEnd = symOffset + symSize;
+        for (long off = symOffset; off < symEnd; off += SYMTAB_ENTRY_HALFWORD_SIZE * mHalfWordSize
+                + SYMTAB_ENTRY_BYTE_EXTRA_SIZE) {
+            long strOffset = readWord(off + SYMTAB_NAME);
+            if (strOffset == 0) {
+                continue;
+            }
+
+            final String symName = readStrTabEntry(symStrOffset, symStrSize, strOffset);
+            if (symName != null) {
+                final int st_info = readByte(off + SYMTAB_ST_INFO);
+                symbolMap.put(symName, new Symbol(symName, st_info));
+            }
+        }
+    }
+
+    private String readShStrTabEntry(long strOffset) throws IOException {
+        if ((mShStrTabOffset == 0) || (strOffset < 0) || (strOffset >= mShStrTabSize)) {
+            return null;
+        }
+
+        return readString(mShStrTabOffset + strOffset);
+    }
+
+    private String readStrTabEntry(long tableOffset, long tableSize, long strOffset)
+            throws IOException {
+        if ((tableOffset == 0) || (strOffset < 0) || (strOffset >= tableSize)) {
+            return null;
+        }
+
+        return readString(tableOffset + strOffset);
+    }
+
     private int getHeaderOffset(int halfWorldOffset) {
         return EI_NIDENT + halfWorldOffset * mHalfWordSize;
+    }
+
+    private int readByte(long offset) throws IOException {
+        mFile.seek(offset);
+        mFile.readFully(mBuffer, 0, 1);
+
+        return mBuffer[0];
     }
 
     private int readHalf(long offset) throws IOException {
@@ -235,12 +422,25 @@ class ReadElf {
         return answer;
     }
 
+    private String readString(long offset) throws IOException {
+        mFile.seek(offset);
+        mFile.readFully(mBuffer, 0, (int) Math.min(mBuffer.length, mFile.length() - offset));
+
+        for (int i = 0; i < mBuffer.length; i++) {
+            if (mBuffer[i] == 0) {
+                return new String(mBuffer, 0, i);
+            }
+        }
+
+        return null;
+    }
+
     private void readIdent() throws IOException {
         mFile.seek(0);
         mFile.readFully(mBuffer, 0, EI_NIDENT);
 
-        if (mBuffer[0] != ELF_IDENT[0] || mBuffer[1] != ELF_IDENT[1] || mBuffer[2] != ELF_IDENT[2]
-                || mBuffer[3] != ELF_IDENT[3]) {
+        if ((mBuffer[0] != ELF_IDENT[0]) || (mBuffer[1] != ELF_IDENT[1])
+                || (mBuffer[2] != ELF_IDENT[2]) || (mBuffer[3] != ELF_IDENT[3])) {
             throw new IllegalArgumentException("Invalid ELF file");
         }
 
@@ -253,5 +453,40 @@ class ReadElf {
         }
 
         mEndian = mBuffer[5];
+    }
+
+    public Symbol getSymbol(String name) {
+        if ((mSymTabOffset == 0) && (mSymTabSize == 0)) {
+            return null;
+        }
+
+        if (mSymbols == null) {
+            mSymbols = new HashMap<String, Symbol>();
+            try {
+                readSymbolTable(mSymbols, mStrTabOffset, mStrTabSize, mSymTabOffset, mSymTabSize);
+            } catch (IOException e) {
+                return null;
+            }
+        }
+
+        return mSymbols.get(name);
+    }
+
+    public Symbol getDynamicSymbol(String name) {
+        if ((mDynSymOffset == 0) && (mDynSymSize == 0)) {
+            return null;
+        }
+
+        if (mDynamicSymbols == null) {
+            mDynamicSymbols = new HashMap<String, Symbol>();
+            try {
+                readSymbolTable(mDynamicSymbols, mDynStrOffset, mDynStrSize, mDynSymOffset,
+                        mDynSymSize);
+            } catch (IOException e) {
+                return null;
+            }
+        }
+
+        return mDynamicSymbols.get(name);
     }
 }
