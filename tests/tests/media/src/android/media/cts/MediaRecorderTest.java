@@ -127,36 +127,78 @@ public class MediaRecorderTest extends ActivityInstrumentationTestCase2<MediaStu
 
     @UiThreadTest
     public void testSetCamera() throws Exception {
+        recordVideoUsingCamera(false);
+    }
+
+    public void testRecorderTimelapsedVideo() throws Exception {
+        recordVideoUsingCamera(true);
+    }
+
+    public void recordVideoUsingCamera(boolean timelapse) throws Exception {
         int nCamera = Camera.getNumberOfCameras();
+        int durMs = timelapse? 4000: 1000;
         for (int cameraId = 0; cameraId < nCamera; cameraId++) {
             mCamera = Camera.open(cameraId);
-
-            // FIXME:
-            // We should add some test case to use Camera.Parameters.getPreviewFpsRange()
-            // to get the supported video frame rate range.
-            Camera.Parameters params = mCamera.getParameters();
-            int frameRate = params.getPreviewFrameRate();
-
-            mCamera.unlock();
-            mMediaRecorder.setCamera(mCamera);
-            mMediaRecorder.setVideoSource(MediaRecorder.VideoSource.CAMERA);
-            mMediaRecorder.setOutputFormat(MediaRecorder.OutputFormat.DEFAULT);
-            mMediaRecorder.setVideoEncoder(MediaRecorder.VideoEncoder.DEFAULT);
-            mMediaRecorder.setVideoFrameRate(frameRate);
-            mMediaRecorder.setVideoSize(VIDEO_WIDTH, VIDEO_HEIGHT);
-            mMediaRecorder.setPreviewDisplay(getActivity().getSurfaceHolder().getSurface());
-            mMediaRecorder.setOutputFile(OUTPUT_PATH);
-            mMediaRecorder.setLocation(LATITUDE, LONGITUDE);
-
-            mMediaRecorder.prepare();
-            mMediaRecorder.start();
-            Thread.sleep(1000);
-            mMediaRecorder.stop();
-            assertTrue(mOutFile.exists());
-
+            recordVideoUsingCamera(mCamera, OUTPUT_PATH, durMs, timelapse);
             mCamera.release();
+            mCamera = null;
             assertTrue(checkLocationInFile(OUTPUT_PATH));
         }
+    }
+
+    private void recordVideoUsingCamera(
+            Camera camera, String fileName, int durMs, boolean timelapse) throws Exception {
+        // FIXME:
+        // We should add some test case to use Camera.Parameters.getPreviewFpsRange()
+        // to get the supported video frame rate range.
+        Camera.Parameters params = camera.getParameters();
+        int frameRate = params.getPreviewFrameRate();
+
+        camera.unlock();
+        mMediaRecorder.setCamera(camera);
+        mMediaRecorder.setVideoSource(MediaRecorder.VideoSource.CAMERA);
+        mMediaRecorder.setAudioSource(MediaRecorder.AudioSource.DEFAULT);
+        mMediaRecorder.setOutputFormat(MediaRecorder.OutputFormat.DEFAULT);
+        mMediaRecorder.setVideoEncoder(MediaRecorder.VideoEncoder.DEFAULT);
+        mMediaRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.DEFAULT);
+        mMediaRecorder.setVideoFrameRate(frameRate);
+        mMediaRecorder.setVideoSize(VIDEO_WIDTH, VIDEO_HEIGHT);
+        mMediaRecorder.setPreviewDisplay(getActivity().getSurfaceHolder().getSurface());
+        mMediaRecorder.setOutputFile(fileName);
+        mMediaRecorder.setLocation(LATITUDE, LONGITUDE);
+        final double captureRate = VIDEO_TIMELAPSE_CAPTURE_RATE_FPS;
+        if (timelapse) {
+            mMediaRecorder.setCaptureRate(captureRate);
+        }
+
+        mMediaRecorder.prepare();
+        mMediaRecorder.start();
+        Thread.sleep(durMs);
+        mMediaRecorder.stop();
+        assertTrue(mOutFile.exists());
+
+        int targetDurMs = timelapse? ((int) (durMs * (captureRate / frameRate))): durMs;
+        boolean hasVideo = true;
+        boolean hasAudio = timelapse? false: true;
+        checkTracksAndDuration(targetDurMs, hasVideo, hasAudio, fileName);
+    }
+
+    private void checkTracksAndDuration(
+            int targetMs, boolean hasVideo, boolean hasAudio, String fileName) throws Exception {
+        MediaMetadataRetriever retriever = new MediaMetadataRetriever();
+        retriever.setDataSource(fileName);
+        String hasVideoStr = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_HAS_VIDEO);
+        String hasAudioStr = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_HAS_AUDIO);
+        assertTrue(hasVideo? hasVideoStr != null : hasVideoStr == null);
+        assertTrue(hasAudio? hasAudioStr != null : hasAudioStr == null);
+        // FIXME:
+        // If we could use fixed frame rate for video recording, we could also do more accurate
+        // check on the duration.
+        String durStr = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION);
+        assertTrue(durStr != null);
+        assertTrue(Integer.parseInt(durStr) > 0);
+        retriever.release();
+        retriever = null;
     }
 
     private boolean checkLocationInFile(String fileName) {
@@ -193,15 +235,7 @@ public class MediaRecorderTest extends ActivityInstrumentationTestCase2<MediaStu
         assertTrue(mOutFile.delete());
     }
 
-    public void testRecorderTimelapsedVideo() throws Exception {
-        testRecorderVideo(true);
-    }
-
     public void testRecorderVideo() throws Exception {
-        testRecorderVideo(false);
-    }
-
-    private void testRecorderVideo(boolean isTimelapsed) throws Exception {
         if (!hasCamera()) {
             return;
         }
@@ -211,10 +245,6 @@ public class MediaRecorderTest extends ActivityInstrumentationTestCase2<MediaStu
         mMediaRecorder.setVideoEncoder(MediaRecorder.VideoEncoder.DEFAULT);
         mMediaRecorder.setPreviewDisplay(getActivity().getSurfaceHolder().getSurface());
         mMediaRecorder.setVideoSize(VIDEO_WIDTH, VIDEO_HEIGHT);
-
-        if (isTimelapsed) {
-            mMediaRecorder.setCaptureRate(VIDEO_TIMELAPSE_CAPTURE_RATE_FPS);
-        }
 
         FileOutputStream fos = new FileOutputStream(OUTPUT_PATH2);
         FileDescriptor fd = fos.getFD();
