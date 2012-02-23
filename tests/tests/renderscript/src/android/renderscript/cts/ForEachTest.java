@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2011 The Android Open Source Project
+ * Copyright (C) 2011-2012 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -519,5 +519,45 @@ public class ForEachTest extends RSBaseCompute {
             fail("should throw RSRuntimeException");
         } catch (RSRuntimeException e) {
         }
+    }
+
+
+    public void testMultipleForEach() {
+        ScriptC_foreach s = new ScriptC_foreach(mRS, mRes, R.raw.foreach);
+        Type.Builder typeBuilder = new Type.Builder(mRS, Element.I32(mRS));
+
+        int X = 5;
+        int Y = 7;
+        s.set_dimX(X);
+        s.set_dimY(Y);
+        typeBuilder.setX(X).setY(Y);
+        Allocation A = Allocation.createTyped(mRS, typeBuilder.create());
+        s.bind_a(A);
+        s.forEach_root(A);
+        s.invoke_verify_root();
+        s.forEach_foo(A, A);
+        s.invoke_verify_foo();
+        s.invoke_foreach_test();
+        mRS.finish();
+        waitForMessage();
+    }
+
+    public void testNoRoot() {
+        ScriptC_noroot s = new ScriptC_noroot(mRS, mRes, R.raw.noroot);
+        Type.Builder typeBuilder = new Type.Builder(mRS, Element.I32(mRS));
+
+        int X = 5;
+        int Y = 7;
+        s.set_dimX(X);
+        s.set_dimY(Y);
+        typeBuilder.setX(X).setY(Y);
+        Allocation A = Allocation.createTyped(mRS, typeBuilder.create());
+        s.bind_a(A);
+        s.forEach_foo(A, A);
+        s.invoke_verify_foo();
+        s.invoke_noroot_test();
+        mRS.finish();
+        checkForErrors();
+        waitForMessage();
     }
 }
