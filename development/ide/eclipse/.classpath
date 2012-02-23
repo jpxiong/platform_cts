@@ -4,6 +4,10 @@
     <classpathentry kind="lib" path="prebuilt/common/tradefed/tradefed-prebuilt.jar"/>
     <classpathentry kind="src" path="cts/apps/CtsVerifier/src"/>
     <classpathentry kind="src" path="cts/apps/CtsVerifier/tests/src"/>
+    <classpathentry kind="src" path="cts/tests/appsecurity/src"/>
+    <classpathentry kind="src" path="cts/tests/appsecurity/test-apps/AppWithData/src"/>
+    <classpathentry kind="src" path="cts/tests/appsecurity/test-apps/CtsMonkeyApp/src"/>
+    <classpathentry kind="src" path="cts/tests/appsecurity/test-apps/CtsMonkeyApp2/src"/>
     <classpathentry kind="src" path="cts/libs/vogar-expect/src"/>
     <classpathentry kind="src" path="cts/tests/ApiDemosReferenceTest/src"/>
     <classpathentry kind="src" path="cts/tests/ProcessTest/src"/>
@@ -13,8 +17,6 @@
     <classpathentry kind="src" path="cts/tests/SignatureTest/tests/src"/>
     <classpathentry kind="src" path="cts/tests/acceleration/src"/>
     <classpathentry kind="src" path="cts/tests/accessibilityservice/src"/>
-    <classpathentry kind="src" path="cts/tests/appsecurity-tests/src"/>
-    <classpathentry kind="src" path="cts/tests/appsecurity-tests/test-apps/AppWithData/src"/>
     <classpathentry kind="src" path="cts/tests/core/runner/src"/>
     <classpathentry kind="src" path="cts/tests/deviceadmin/src"/>
     <classpathentry kind="src" path="cts/tests/src"/>
@@ -38,7 +40,9 @@
     <classpathentry kind="src" path="cts/tests/tests/jni/src"/>
     <classpathentry kind="src" path="cts/tests/tests/location/src"/>
     <classpathentry kind="src" path="cts/tests/tests/media/src"/>
+    <classpathentry kind="src" path="cts/tests/tests/mediastress/src"/>
     <classpathentry kind="src" path="cts/tests/tests/net/src"/>
+    <classpathentry kind="src" path="cts/tests/tests/openglperf/src"/>
     <classpathentry kind="src" path="cts/tests/tests/os/src"/>
     <classpathentry kind="src" path="cts/tests/tests/performance/src"/>
     <classpathentry kind="src" path="cts/tests/tests/performance2/src"/>
