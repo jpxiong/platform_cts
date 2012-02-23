@@ -22,7 +22,9 @@ CTS_SECURITY_APPS_LIST := \
 	CtsSimpleAppInstall \
 	CtsSimpleAppInstallDiffCert \
 	CtsTargetInstrumentationApp \
-	CtsUsePermissionDiffCert
+	CtsUsePermissionDiffCert \
+	CtsMonkeyApp \
+	CtsMonkeyApp2 \
 
 # These test cases will be analyzed by the CTS API coverage tools. 
 CTS_COVERAGE_TEST_CASE_LIST := \
@@ -56,6 +58,7 @@ CTS_COVERAGE_TEST_CASE_LIST := \
 	CtsPermissionTestCases \
 	CtsPermission2TestCases \
 	CtsPreferenceTestCases \
+	CtsPreference2TestCases \
 	CtsProviderTestCases \
 	CtsRenderscriptTestCases \
 	CtsSaxTestCases \
