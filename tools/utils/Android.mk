@@ -22,8 +22,9 @@ LOCAL_MODULE := descGen
 
 LOCAL_SRC_FILES := CollectAllTests.java DescriptionGenerator.java VogarUtils.java
 
-LOCAL_CLASSPATH := $(HOST_JDK_TOOLS_JAR) $(LOCAL_PATH)/lib/junit.jar
+LOCAL_CLASSPATH := $(HOST_JDK_TOOLS_JAR)
 
+LOCAL_JAVA_LIBRARIES := junit
 LOCAL_STATIC_JAVA_LIBRARIES := vogarexpectlib
 
 include $(BUILD_HOST_JAVA_LIBRARY)

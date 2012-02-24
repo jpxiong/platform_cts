@@ -21,6 +21,7 @@ LOCAL_MODULE_TAGS := optional
 
 LOCAL_SRC_FILES := $(call all-java-files-under, src)
 
-LOCAL_CLASSPATH := $(HOST_JDK_TOOLS_JAR) cts/tools/utils/lib/junit.jar
+LOCAL_CLASSPATH := $(HOST_JDK_TOOLS_JAR)
+LOCAL_JAVA_LIBRARIES := junit
 
 include $(BUILD_HOST_JAVA_LIBRARY)
