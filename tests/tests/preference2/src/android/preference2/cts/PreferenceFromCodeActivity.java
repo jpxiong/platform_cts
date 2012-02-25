@@ -49,6 +49,7 @@ public class PreferenceFromCodeActivity extends PreferenceActivity {
         //CheckBox Preference
         CheckBoxPreference checkboxPref = new CheckBoxPreference(this);
         checkboxPref.setKey("checkbox_preference");
+        checkboxPref.setIcon(R.drawable.ic_launcher);
         checkboxPref.setTitle(R.string.title_checkbox_preference);
         checkboxPref.setSummary(R.string.summary_checkbox_preference);
         checkboxPref.setSummaryOn(R.string.summary_on_checkbox_preference);
