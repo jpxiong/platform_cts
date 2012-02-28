@@ -1197,7 +1197,7 @@ public class TextUtilsTest extends AndroidTestCase {
     @ToBeFixed(bug = "1695243", explanation = "the javadoc for htmlEncode() is incomplete." +
             "1. doesn't discuss the case that parameter is expectional.")
     public void testHtmlEncode() {
-        assertEquals("&lt;_html_&gt;\\ &amp;&quot;&apos;string&apos;&quot;",
+        assertEquals("&lt;_html_&gt;\\ &amp;&quot;&#39;string&#39;&quot;",
                 TextUtils.htmlEncode("<_html_>\\ &\"'string'\""));
 
          try {
