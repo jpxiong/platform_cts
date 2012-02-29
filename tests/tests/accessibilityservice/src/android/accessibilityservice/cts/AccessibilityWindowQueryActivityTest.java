@@ -61,7 +61,8 @@ import java.util.concurrent.TimeoutException;
  * whose source is located at <strong>cts/tests/accessibility</strong> is required.
  * Once the former package has been installed the service must be enabled
  * (Settings -> Accessibility -> Delegating Accessibility Service), and then the CTS tests
- * in this package can be successfully run.
+ * in this package can be successfully run or running a command from the shell to
+ * enable the service.
  * </p>
  */
 public class AccessibilityWindowQueryActivityTest

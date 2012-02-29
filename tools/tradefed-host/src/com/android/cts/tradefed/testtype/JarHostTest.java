@@ -38,6 +38,7 @@ import junit.framework.TestResult;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.Collection;
@@ -56,6 +57,8 @@ public class JarHostTest implements IDeviceTest, IRemoteTest, IBuildReceiver, Te
     private String mRunName;
     private CtsBuildHelper mCtsBuild = null;
     private IBuildInfo mBuildInfo = null;
+
+    private ClassLoader mClassLoader;
 
     /**
      * {@inheritDoc}
@@ -258,10 +261,10 @@ public class JarHostTest implements IDeviceTest, IRemoteTest, IBuildReceiver, Te
      */
     private Test loadTest(String className, String testName) {
         try {
-            File jarFile = mCtsBuild.getTestApp(mJarFileName);
-            URL urls[] = {jarFile.getCanonicalFile().toURI().toURL()};
-            Class<?> testClass = loadClass(className, urls);
-
+            Class<?> testClass = loadClass(className);
+            if (testClass == null) {
+                return null;
+            }
             if (TestCase.class.isAssignableFrom(testClass)) {
                 TestCase testCase = (TestCase)testClass.newInstance();
                 testCase.setName(testName);
@@ -273,14 +276,30 @@ public class JarHostTest implements IDeviceTest, IRemoteTest, IBuildReceiver, Te
                 Log.e(LOG_TAG, String.format("Class '%s' from jar '%s' is not a Test",
                         className, mJarFileName));
             }
-        } catch (ClassNotFoundException e) {
-            reportLoadError(mJarFileName, className, e);
         } catch (IllegalAccessException e) {
-            reportLoadError(mJarFileName, className, e);
-        } catch (IOException e) {
             reportLoadError(mJarFileName, className, e);
         } catch (InstantiationException e) {
             reportLoadError(mJarFileName, className, e);
+        }
+        return null;
+    }
+
+    private Class<?> loadClass(String className) {
+        try {
+            if (mClassLoader == null) {
+                File jarFile = mCtsBuild.getTestApp(mJarFileName);
+                URL urls[] = {jarFile.getCanonicalFile().toURI().toURL()};
+                mClassLoader = new URLClassLoader(urls);
+            }
+            return mClassLoader.loadClass(className);
+        } catch (FileNotFoundException fnfe) {
+            reportLoadError(mJarFileName, className, fnfe);
+        } catch (MalformedURLException mue) {
+            reportLoadError(mJarFileName, className, mue);
+        } catch (IOException ioe) {
+            reportLoadError(mJarFileName, className, ioe);
+        } catch (ClassNotFoundException cnfe) {
+            reportLoadError(mJarFileName, className, cnfe);
         }
         return null;
     }
