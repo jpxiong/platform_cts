@@ -14,23 +14,6 @@
 
 LOCAL_PATH := $(call my-dir)
 
-# CTS build rules that are needed to generate the corresponding XML
-# for a test package. CTS needs these XML files to know what tests
-# to run as well as detect which ones were not executed.
-#
-# 1. Replace the regular build command with the CTS variant:
-#
-#    BUILD_EXECUTABLE -> BUILD_CTS_EXECUTABLE
-#    BUILD_PACKAGE -> BUILD_CTS_PACKAGE
-#    BUILD_HOST_JAVA_LIBRARY -> BUILD_HOST_JAVA_LIBRARY
-#
-# 2. Define LOCAL_CTS_TEST_PACKAGE if you are using
-#    BUILD_EXECUTABLE or BUILD_HOST_JAVA_LIBRARY.
-#
-BUILD_CTS_EXECUTABLE := $(LOCAL_PATH)/tools/build/test_executable.mk
-BUILD_CTS_PACKAGE := $(LOCAL_PATH)/tools/build/test_package.mk
-BUILD_CTS_HOST_JAVA_LIBRARY := $(LOCAL_PATH)/tools/build/test_host_java_library.mk
-
 # Test XMLs, native executables, and packages will be placed in this
 # directory before creating the final CTS distribution.
 CTS_TESTCASES_OUT := $(HOST_OUT)/cts-testcases
