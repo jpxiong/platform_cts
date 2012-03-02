@@ -33,7 +33,7 @@
 
   </application>
 
-  <instrumentation android:name="android.test.InstrumentationCtsTestRunner"
+  <instrumentation android:name="android.test.InstrumentationTestRunner"
                    android:targetPackage="com.android.cts.accessibilityservice"
                    android:label="Tests for the accessibility APIs."/>
 

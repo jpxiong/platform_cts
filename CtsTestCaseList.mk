@@ -27,6 +27,7 @@ cts_security_apps_list := \
 cts_support_packages := \
 	CtsAccelerationTestStubs \
 	CtsDelegatingAccessibilityService \
+	CtsAccessibilityServiceTestCases \
 	CtsDeviceAdmin \
 	CtsMonkeyApp \
 	CtsMonkeyApp2 \
@@ -47,7 +48,6 @@ CTS_TEST_CASE_LIST := \
 # Test packages that require an associated test package XML.
 cts_test_packages := \
 	CtsAccelerationTestCases \
-	CtsAccessibilityServiceTestCases \
 	CtsAccountManagerTestCases \
 	CtsAdminTestCases \
 	CtsAnimationTestCases \
@@ -98,7 +98,8 @@ CTS_COVERAGE_TEST_CASE_LIST := \
 # Host side only tests
 cts_host_libraries := \
 	CtsAppSecurityTests \
-	CtsMonkeyTestCases
+	CtsMonkeyTestCases \
+	CtsAccessibilityServiceTestRunner \
 
 # Native test executables that need to have associated test XMLs.
 cts_native_exes := \

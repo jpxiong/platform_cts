@@ -1,4 +1,4 @@
-# Copyright (C) 2010 The Android Open Source Project
+# Copyright (C) 2012 The Android Open Source Project
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -12,22 +12,18 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-LOCAL_PATH:= $(call my-dir)
+LOCAL_PATH := $(call my-dir)
 
 include $(CLEAR_VARS)
 
 LOCAL_MODULE_TAGS := optional
 
-LOCAL_MODULE_PATH := $(TARGET_OUT_DATA_APPS)
-
-LOCAL_JAVA_LIBRARIES := android.test.runner
-
 LOCAL_SRC_FILES := $(call all-java-files-under, src)
 
-LOCAL_SRC_FILES += \
-  src/android/accessibilityservice/IAccessibilityServiceDelegate.aidl \
-  src/android/accessibilityservice/IAccessibilityServiceDelegateConnection.aidl
+LOCAL_MODULE := CtsAccessibilityServiceTestRunner
 
-LOCAL_PACKAGE_NAME := CtsAccessibilityServiceTestCases
+LOCAL_JAVA_LIBRARIES := cts-tradefed tradefed-prebuilt ddmlib-prebuilt junit
 
-include $(BUILD_PACKAGE)
+LOCAL_CTS_TEST_PACKAGE := android.accessibilityservice
+
+include $(BUILD_CTS_HOST_JAVA_LIBRARY)
