@@ -31,25 +31,48 @@ public class DrmEventTest extends AndroidTestCase {
         attributes.put("Hello World", attributes);
         attributes.put("Hello", "World");
         attributes.put("World", "");
-        checkGetAttribute(null, "NotNull");
-        checkGetAttribute(null, null);
-        checkGetAttribute(attributes, null);
-        checkGetAttribute(attributes, "");
-        checkGetAttribute(attributes, "Hello");
-        checkGetAttribute(attributes, "World");
-        checkGetAttribute(attributes, "Hello World");
+
+        // DrmInfoEvent related
+        checkGetAttributeWithEventType(null, "NotNull", true);
+        checkGetAttributeWithEventType(null, null, true);
+        checkGetAttributeWithEventType(attributes, null, true);
+        checkGetAttributeWithEventType(attributes, "", true);
+        checkGetAttributeWithEventType(attributes, "Hello", true);
+        checkGetAttributeWithEventType(attributes, "World", true);
+        checkGetAttributeWithEventType(attributes, "Hello World", true);
+
+        // DrmErrorEvent related
+        checkGetAttributeWithEventType(null, "NotNull", false);
+        checkGetAttributeWithEventType(null, null, false);
+        checkGetAttributeWithEventType(attributes, null, false);
+        checkGetAttributeWithEventType(attributes, "", false);
+        checkGetAttributeWithEventType(attributes, "Hello", false);
+        checkGetAttributeWithEventType(attributes, "World", false);
+        checkGetAttributeWithEventType(attributes, "Hello World", false);
     }
 
     public static void testGetMessage() throws Exception {
-        checkGetMessage(null);
-        checkGetMessage("");
-        checkGetMessage("Hello World");
+        // DrmInfoEvent related
+        checkGetMessageWithEventType(null, true);
+        checkGetMessageWithEventType("", true);
+        checkGetMessageWithEventType("Hello World", true);
+
+        // DrmErrorEvent related
+        checkGetMessageWithEventType(null, false);
+        checkGetMessageWithEventType("", false);
+        checkGetMessageWithEventType("Hello World", false);
     }
 
     public static void testGetUniqueId() throws Exception {
-        checkGetUniqueId(-1);
-        checkGetUniqueId(0);
-        checkGetUniqueId(1);
+        // DrmInfoEvent related
+        checkGetUniqueIdWithEventType(-1, true);
+        checkGetUniqueIdWithEventType(0,  true);
+        checkGetUniqueIdWithEventType(1,  true);
+
+        // DrmErrorEvent related
+        checkGetUniqueIdWithEventType(-1, false);
+        checkGetUniqueIdWithEventType(0,  false);
+        checkGetUniqueIdWithEventType(1,  false);
     }
 
     public static void testValidErrorEventTypes() throws Exception {
@@ -119,33 +142,52 @@ public class DrmEventTest extends AndroidTestCase {
         checkErrorTypeInInfoEvent(DrmErrorEvent.TYPE_ACQUIRE_DRM_INFO_FAILED);
     }
 
-    private static void checkGetAttribute(
-        HashMap<String, Object> attributes, String key) throws Exception {
-        DrmInfoEvent infoEvent = new DrmInfoEvent(
-                0, DrmInfoEvent.TYPE_RIGHTS_INSTALLED, "", attributes);
+    private static DrmEvent createDrmEvent(
+            boolean isInfo, int id, String msg, HashMap<String, Object> attributes) {
 
-        if (attributes == null) {
-            assertNull(infoEvent.getAttribute(key));
+        if (isInfo) {
+            int type = DrmInfoEvent.TYPE_RIGHTS_INSTALLED;
+            if (attributes == null) {
+                return new DrmInfoEvent(id, type, msg);
+            } else {
+                return new DrmInfoEvent(id, type, msg, attributes);
+            }
         } else {
-            assertEquals(infoEvent.getAttribute(key), attributes.get(key));
+            int type = DrmErrorEvent.TYPE_NOT_SUPPORTED;
+            if (attributes == null) {
+                return new DrmErrorEvent(id, type, msg);
+            } else {
+                return new DrmErrorEvent(id, type, msg, attributes);
+            }
         }
     }
 
-    private static void checkGetUniqueId(int id) throws Exception {
-        DrmInfoEvent infoEvent = new DrmInfoEvent(
-                id, DrmInfoEvent.TYPE_RIGHTS_INSTALLED, "");
-
-        assertEquals(infoEvent.getUniqueId(), id);
+    private static void checkGetAttributeWithEventType(
+        HashMap<String, Object> attributes, String key, boolean isInfo) throws Exception {
+        DrmEvent event = createDrmEvent(isInfo, 0, "", attributes);
+        if (attributes == null) {
+            assertNull(event.getAttribute(key));
+        } else {
+            assertEquals(event.getAttribute(key), attributes.get(key));
+        }
     }
 
-    private static void checkGetMessage(String msg) throws Exception {
-        DrmInfoEvent infoEvent = new DrmInfoEvent(0,
-                DrmInfoEvent.TYPE_RIGHTS_INSTALLED, msg);
+    private static void checkGetUniqueIdWithEventType(
+            int id, boolean isInfo) throws Exception {
 
+        DrmEvent event = createDrmEvent(isInfo, id, "", null);
+        assertEquals(id, event.getUniqueId());
+    }
+
+    private static void checkGetMessageWithEventType(
+            String msg, boolean isInfo) throws Exception {
+
+        DrmEvent event = createDrmEvent(isInfo, 0, msg, null);
+        assertNotNull(event);
         if (msg == null) {
-            assertNotNull(infoEvent.getMessage());
+            assertNotNull(event.getMessage());
         } else {
-            assertEquals(infoEvent.getMessage(), msg);
+            assertEquals(event.getMessage(), msg);
         }
     }
 

@@ -18,6 +18,7 @@ package android.drm.cts;
 
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Collection;
 import android.util.Log;
 import android.test.AndroidTestCase;
 import android.drm.DrmInfo;
@@ -96,6 +97,14 @@ public class DrmInfoTest extends AndroidTestCase {
         while (infoKeys.hasNext()) {
             final String key = (String) infoKeys.next();
             assertEquals(info.get(key), attributes.get(key));
+        }
+
+        // Also test the set of the values
+        Iterator<Object> iterator = info.iterator();
+        Collection<Object> vals = attributes.values();
+        while (iterator.hasNext()) {
+            Object o = iterator.next();
+            assertTrue(vals.contains(o));
         }
     }
 
