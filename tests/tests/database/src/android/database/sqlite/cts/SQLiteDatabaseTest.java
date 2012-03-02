@@ -17,6 +17,7 @@
 package android.database.sqlite.cts;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Locale;
 
@@ -114,6 +115,40 @@ public class SQLiteDatabaseTest extends AndroidTestCase {
         db = SQLiteDatabase.create(factory);
         assertNotNull(db);
         db.close();
+    }
+
+    public void testDeleteDatabase() throws IOException {
+        File dbFile = new File(mDatabaseDir, "database_test12345678.db");
+        File journalFile = new File(dbFile.getPath() + "-journal");
+        File shmFile = new File(dbFile.getPath() + "-shm");
+        File walFile = new File(dbFile.getPath() + "-wal");
+        File mjFile1 = new File(dbFile.getPath() + "-mj00000000");
+        File mjFile2 = new File(dbFile.getPath() + "-mj00000001");
+        File innocentFile = new File(dbFile.getPath() + "-innocent");
+
+        dbFile.createNewFile();
+        journalFile.createNewFile();
+        shmFile.createNewFile();
+        walFile.createNewFile();
+        mjFile1.createNewFile();
+        mjFile2.createNewFile();
+        innocentFile.createNewFile();
+
+        boolean deleted = SQLiteDatabase.deleteDatabase(dbFile);
+        assertTrue(deleted);
+
+        assertFalse(dbFile.exists());
+        assertFalse(journalFile.exists());
+        assertFalse(shmFile.exists());
+        assertFalse(walFile.exists());
+        assertFalse(mjFile1.exists());
+        assertFalse(mjFile2.exists());
+        assertTrue(innocentFile.exists());
+
+        innocentFile.delete();
+
+        boolean deletedAgain = SQLiteDatabase.deleteDatabase(dbFile);
+        assertFalse(deletedAgain);
     }
 
     private class MockSQLiteCursor extends SQLiteCursor {
