@@ -59,6 +59,7 @@
     <classpathentry kind="src" path="cts/tests/tests/speech/src"/>
     <classpathentry kind="src" path="cts/tests/tests/telephony/src"/>
     <classpathentry kind="src" path="cts/tests/tests/text/src"/>
+    <classpathentry kind="src" path="cts/tests/tests/textureview/src"/>
     <classpathentry kind="src" path="cts/tests/tests/theme/src"/>
     <classpathentry kind="src" path="cts/tests/tests/util/src"/>
     <classpathentry kind="src" path="cts/tests/tests/view/src"/>

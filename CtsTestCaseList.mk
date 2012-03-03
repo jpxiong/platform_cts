@@ -84,6 +84,7 @@ cts_test_packages := \
 	CtsSpeechTestCases \
 	CtsTelephonyTestCases \
 	CtsTextTestCases \
+	CtsTextureViewTestCases \
 	CtsThemeTestCases \
 	CtsUtilTestCases \
 	CtsViewTestCases \
