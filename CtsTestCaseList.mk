@@ -67,6 +67,7 @@ CTS_COVERAGE_TEST_CASE_LIST := \
 	CtsTelephonyTestCases \
 	CtsTestStubs \
 	CtsTextTestCases \
+	CtsTextureViewTestCases \
 	CtsUtilTestCases \
 	CtsViewTestCases \
 	CtsWebkitTestCases \
