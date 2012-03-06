@@ -1,4 +1,4 @@
-# Copyright (C) 2008 The Android Open Source Project
+# Copyright (C) 2012 The Android Open Source Project
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -16,21 +16,10 @@ LOCAL_PATH:= $(call my-dir)
 
 include $(CLEAR_VARS)
 
-# don't include this package in any target
-LOCAL_MODULE_TAGS := optional
-# and when built explicitly put it in the data partition
-LOCAL_MODULE_PATH := $(TARGET_OUT_DATA_APPS)
-
-LOCAL_JAVA_LIBRARIES := android.test.runner
-
-# include CtsTestServer as a temporary hack to free net.cts from cts.stub.
 LOCAL_SRC_FILES := $(call all-java-files-under, src)
 
-LOCAL_PACKAGE_NAME := CtsNetTestCases
+LOCAL_MODULE_TAGS := optional
 
-LOCAL_STATIC_JAVA_LIBRARIES := ctstestserver
+LOCAL_MODULE := ctsutil
 
-# uncomment when dalvik.annotation.Test* are removed or part of SDK
-#LOCAL_SDK_VERSION := current
-
-include $(BUILD_CTS_PACKAGE)
+include $(BUILD_STATIC_JAVA_LIBRARY)
