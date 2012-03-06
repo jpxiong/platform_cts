@@ -45,7 +45,7 @@ public class ChoreographerTest extends AndroidTestCase {
             mChoreographer.postAnimationCallback(addedCallback1);
             mChoreographer.postAnimationCallbackDelayed(addedCallback2, 0);
             mChoreographer.postAnimationCallback(removedCallback);
-            mChoreographer.removeAnimationCallback(removedCallback);
+            mChoreographer.removeAnimationCallbacks(removedCallback);
 
             // Sleep for a couple of frames.
             sleep(NOMINAL_VSYNC_PERIOD * 3);
@@ -63,9 +63,9 @@ public class ChoreographerTest extends AndroidTestCase {
             assertEquals(1, addedCallback2.invocationCount);
             assertEquals(0, removedCallback.invocationCount);
         } finally {
-            mChoreographer.removeAnimationCallback(addedCallback1);
-            mChoreographer.removeAnimationCallback(addedCallback2);
-            mChoreographer.removeAnimationCallback(removedCallback);
+            mChoreographer.removeAnimationCallbacks(addedCallback1);
+            mChoreographer.removeAnimationCallbacks(addedCallback2);
+            mChoreographer.removeAnimationCallbacks(removedCallback);
         }
     }
 
@@ -76,7 +76,7 @@ public class ChoreographerTest extends AndroidTestCase {
             // Add and remove a few callbacks.
             mChoreographer.postAnimationCallbackDelayed(addedCallback, DELAY_PERIOD);
             mChoreographer.postAnimationCallbackDelayed(removedCallback, DELAY_PERIOD);
-            mChoreographer.removeAnimationCallback(removedCallback);
+            mChoreographer.removeAnimationCallbacks(removedCallback);
 
             // Sleep for a couple of frames.
             sleep(NOMINAL_VSYNC_PERIOD * 3);
@@ -92,8 +92,8 @@ public class ChoreographerTest extends AndroidTestCase {
             assertEquals(1, addedCallback.invocationCount);
             assertEquals(0, removedCallback.invocationCount);
         } finally {
-            mChoreographer.removeAnimationCallback(addedCallback);
-            mChoreographer.removeAnimationCallback(removedCallback);
+            mChoreographer.removeAnimationCallbacks(addedCallback);
+            mChoreographer.removeAnimationCallbacks(removedCallback);
         }
     }
 
@@ -106,7 +106,7 @@ public class ChoreographerTest extends AndroidTestCase {
             mChoreographer.postDrawCallback(addedCallback1);
             mChoreographer.postDrawCallbackDelayed(addedCallback2, 0);
             mChoreographer.postDrawCallback(removedCallback);
-            mChoreographer.removeDrawCallback(removedCallback);
+            mChoreographer.removeDrawCallbacks(removedCallback);
 
             // Sleep for a couple of frames.
             sleep(NOMINAL_VSYNC_PERIOD * 3);
@@ -124,9 +124,9 @@ public class ChoreographerTest extends AndroidTestCase {
             assertEquals(1, addedCallback2.invocationCount);
             assertEquals(0, removedCallback.invocationCount);
         } finally {
-            mChoreographer.removeDrawCallback(addedCallback1);
-            mChoreographer.removeDrawCallback(addedCallback2);
-            mChoreographer.removeDrawCallback(removedCallback);
+            mChoreographer.removeDrawCallbacks(addedCallback1);
+            mChoreographer.removeDrawCallbacks(addedCallback2);
+            mChoreographer.removeDrawCallbacks(removedCallback);
         }
     }
 
@@ -137,7 +137,7 @@ public class ChoreographerTest extends AndroidTestCase {
             // Add and remove a few callbacks.
             mChoreographer.postDrawCallbackDelayed(addedCallback, DELAY_PERIOD);
             mChoreographer.postDrawCallbackDelayed(removedCallback, DELAY_PERIOD);
-            mChoreographer.removeDrawCallback(removedCallback);
+            mChoreographer.removeDrawCallbacks(removedCallback);
 
             // Sleep for a couple of frames.
             sleep(NOMINAL_VSYNC_PERIOD * 3);
@@ -153,8 +153,8 @@ public class ChoreographerTest extends AndroidTestCase {
             assertEquals(1, addedCallback.invocationCount);
             assertEquals(0, removedCallback.invocationCount);
         } finally {
-            mChoreographer.removeDrawCallback(addedCallback);
-            mChoreographer.removeDrawCallback(removedCallback);
+            mChoreographer.removeDrawCallbacks(addedCallback);
+            mChoreographer.removeDrawCallbacks(removedCallback);
         }
     }
 
@@ -178,7 +178,7 @@ public class ChoreographerTest extends AndroidTestCase {
 
     public void testRemoveAnimationCallbackThrowsIfRunnableIsNull() {
         try {
-            mChoreographer.removeAnimationCallback(null);
+            mChoreographer.removeAnimationCallbacks(null);
             fail("Expected IllegalArgumentException");
         } catch (IllegalArgumentException ex) {
             // expected
@@ -205,7 +205,7 @@ public class ChoreographerTest extends AndroidTestCase {
 
     public void testRemoveDrawCallbackThrowsIfRunnableIsNull() {
         try {
-            mChoreographer.removeDrawCallback(null);
+            mChoreographer.removeDrawCallbacks(null);
             fail("Expected IllegalArgumentException");
         } catch (IllegalArgumentException ex) {
             // expected
