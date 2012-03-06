@@ -21,6 +21,7 @@ import android.view.Choreographer;
 
 public class ChoreographerTest extends AndroidTestCase {
     private static final long NOMINAL_VSYNC_PERIOD = 16;
+    private static final long DELAY_PERIOD = NOMINAL_VSYNC_PERIOD * 5;
 
     private Choreographer mChoreographer = Choreographer.getInstance();
 
@@ -35,14 +36,14 @@ public class ChoreographerTest extends AndroidTestCase {
         Choreographer.setFrameDelay(oldFrameDelay);
     }
 
-    public void testPostAnimationCallbackEventuallyRunsCallbacks() {
+    public void testPostAnimationCallbackWithoutDelayEventuallyRunsCallbacks() {
         MockRunnable addedCallback1 = new MockRunnable();
         MockRunnable addedCallback2 = new MockRunnable();
         MockRunnable removedCallback = new MockRunnable();
         try {
             // Add and remove a few callbacks.
             mChoreographer.postAnimationCallback(addedCallback1);
-            mChoreographer.postAnimationCallback(addedCallback2);
+            mChoreographer.postAnimationCallbackDelayed(addedCallback2, 0);
             mChoreographer.postAnimationCallback(removedCallback);
             mChoreographer.removeAnimationCallback(removedCallback);
 
@@ -68,14 +69,42 @@ public class ChoreographerTest extends AndroidTestCase {
         }
     }
 
-    public void testPostDrawCallbackEventuallyRunsCallbacks() {
+    public void testPostAnimationCallbackWithDelayEventuallyRunsCallbacksAfterDelay() {
+        MockRunnable addedCallback = new MockRunnable();
+        MockRunnable removedCallback = new MockRunnable();
+        try {
+            // Add and remove a few callbacks.
+            mChoreographer.postAnimationCallbackDelayed(addedCallback, DELAY_PERIOD);
+            mChoreographer.postAnimationCallbackDelayed(removedCallback, DELAY_PERIOD);
+            mChoreographer.removeAnimationCallback(removedCallback);
+
+            // Sleep for a couple of frames.
+            sleep(NOMINAL_VSYNC_PERIOD * 3);
+
+            // The callbacks should not have been invoked yet because of the delay.
+            assertEquals(0, addedCallback.invocationCount);
+            assertEquals(0, removedCallback.invocationCount);
+
+            // Sleep for the rest of the delay time.
+            sleep(DELAY_PERIOD);
+
+            // We expect the remaining callbacks to have been invoked.
+            assertEquals(1, addedCallback.invocationCount);
+            assertEquals(0, removedCallback.invocationCount);
+        } finally {
+            mChoreographer.removeAnimationCallback(addedCallback);
+            mChoreographer.removeAnimationCallback(removedCallback);
+        }
+    }
+
+    public void testPostDrawCallbackWithoutDelayEventuallyRunsCallbacks() {
         MockRunnable addedCallback1 = new MockRunnable();
         MockRunnable addedCallback2 = new MockRunnable();
         MockRunnable removedCallback = new MockRunnable();
         try {
             // Add and remove a few callbacks.
             mChoreographer.postDrawCallback(addedCallback1);
-            mChoreographer.postDrawCallback(addedCallback2);
+            mChoreographer.postDrawCallbackDelayed(addedCallback2, 0);
             mChoreographer.postDrawCallback(removedCallback);
             mChoreographer.removeDrawCallback(removedCallback);
 
@@ -101,9 +130,46 @@ public class ChoreographerTest extends AndroidTestCase {
         }
     }
 
+    public void testPostDrawCallbackWithDelayEventuallyRunsCallbacksAfterDelay() {
+        MockRunnable addedCallback = new MockRunnable();
+        MockRunnable removedCallback = new MockRunnable();
+        try {
+            // Add and remove a few callbacks.
+            mChoreographer.postDrawCallbackDelayed(addedCallback, DELAY_PERIOD);
+            mChoreographer.postDrawCallbackDelayed(removedCallback, DELAY_PERIOD);
+            mChoreographer.removeDrawCallback(removedCallback);
+
+            // Sleep for a couple of frames.
+            sleep(NOMINAL_VSYNC_PERIOD * 3);
+
+            // The callbacks should not have been invoked yet because of the delay.
+            assertEquals(0, addedCallback.invocationCount);
+            assertEquals(0, removedCallback.invocationCount);
+
+            // Sleep for the rest of the delay time.
+            sleep(DELAY_PERIOD);
+
+            // We expect the remaining callbacks to have been invoked.
+            assertEquals(1, addedCallback.invocationCount);
+            assertEquals(0, removedCallback.invocationCount);
+        } finally {
+            mChoreographer.removeDrawCallback(addedCallback);
+            mChoreographer.removeDrawCallback(removedCallback);
+        }
+    }
+
     public void testPostAnimationCallbackThrowsIfRunnableIsNull() {
         try {
             mChoreographer.postAnimationCallback(null);
+            fail("Expected IllegalArgumentException");
+        } catch (IllegalArgumentException ex) {
+            // expected
+        }
+    }
+
+    public void testPostAnimationCallbackDelayedThrowsIfRunnableIsNull() {
+        try {
+            mChoreographer.postAnimationCallbackDelayed(null, DELAY_PERIOD);
             fail("Expected IllegalArgumentException");
         } catch (IllegalArgumentException ex) {
             // expected
@@ -122,6 +188,15 @@ public class ChoreographerTest extends AndroidTestCase {
     public void testPostDrawCallbackThrowsIfRunnableIsNull() {
         try {
             mChoreographer.postDrawCallback(null);
+            fail("Expected IllegalArgumentException");
+        } catch (IllegalArgumentException ex) {
+            // expected
+        }
+    }
+
+    public void testPostDrawCallbackDelayedThrowsIfRunnableIsNull() {
+        try {
+            mChoreographer.postDrawCallbackDelayed(null, DELAY_PERIOD);
             fail("Expected IllegalArgumentException");
         } catch (IllegalArgumentException ex) {
             // expected
