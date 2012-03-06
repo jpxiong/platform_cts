@@ -16,12 +16,16 @@
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:id="@+id/layout_textviewtest">
+
     <ScrollView android:layout_width="match_parent"
             android:layout_height="match_parent">
+
         <LinearLayout android:orientation="vertical"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent">
+
             <TextView android:id="@+id/textview_textAttr"
                     android:text="@string/text_view_hello"
                     android:textColor="@drawable/black"
@@ -84,5 +88,11 @@
                     android:gravity="center"
                     />
         </LinearLayout>
+
     </ScrollView>
+
+    <TextView android:id="@+id/textview_rtl"
+              android:layout_height="wrap_content"
+              android:layout_width="wrap_content"/>
+
 </LinearLayout>
