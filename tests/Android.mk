@@ -34,6 +34,8 @@ LOCAL_AAPT_FLAGS = -c xx_YY -c cs -c 320dpi -c 240dpi -c 160dpi -c 32dpi \
 
 LOCAL_PACKAGE_NAME := CtsTestStubs
 
+LOCAL_STATIC_JAVA_LIBRARIES := ctsutil ctstestserver
+
 include $(BUILD_PACKAGE)
 
 # Build the test APK using its own makefile, and any other CTS-related packages
