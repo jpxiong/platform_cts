@@ -22,6 +22,7 @@ import android.view.Choreographer;
 public class ChoreographerTest extends AndroidTestCase {
     private static final long NOMINAL_VSYNC_PERIOD = 16;
     private static final long DELAY_PERIOD = NOMINAL_VSYNC_PERIOD * 5;
+    private static final Object TOKEN = new Object();
 
     private Choreographer mChoreographer = Choreographer.getInstance();
 
@@ -42,10 +43,10 @@ public class ChoreographerTest extends AndroidTestCase {
         MockRunnable removedCallback = new MockRunnable();
         try {
             // Add and remove a few callbacks.
-            mChoreographer.postAnimationCallback(addedCallback1);
-            mChoreographer.postAnimationCallbackDelayed(addedCallback2, 0);
-            mChoreographer.postAnimationCallback(removedCallback);
-            mChoreographer.removeAnimationCallbacks(removedCallback);
+            mChoreographer.postAnimationCallback(addedCallback1, null);
+            mChoreographer.postAnimationCallbackDelayed(addedCallback2, null, 0);
+            mChoreographer.postAnimationCallback(removedCallback, null);
+            mChoreographer.removeAnimationCallbacks(removedCallback, null);
 
             // Sleep for a couple of frames.
             sleep(NOMINAL_VSYNC_PERIOD * 3);
@@ -56,16 +57,33 @@ public class ChoreographerTest extends AndroidTestCase {
             assertEquals(0, removedCallback.invocationCount);
 
             // If we post a callback again, then it should be invoked again.
-            mChoreographer.postAnimationCallback(addedCallback1);
+            mChoreographer.postAnimationCallback(addedCallback1, null);
             sleep(NOMINAL_VSYNC_PERIOD * 3);
 
             assertEquals(2, addedCallback1.invocationCount);
             assertEquals(1, addedCallback2.invocationCount);
             assertEquals(0, removedCallback.invocationCount);
+
+            // If the token matches, the the callback should be removed.
+            mChoreographer.postAnimationCallback(addedCallback1, null);
+            mChoreographer.postAnimationCallback(removedCallback, TOKEN);
+            mChoreographer.removeAnimationCallbacks(null, TOKEN);
+            sleep(NOMINAL_VSYNC_PERIOD * 3);
+            assertEquals(3, addedCallback1.invocationCount);
+            assertEquals(0, removedCallback.invocationCount);
+
+            // If the action and token matches, then the callback should be removed.
+            // If only the token matches, then the callback should not be removed.
+            mChoreographer.postAnimationCallback(addedCallback1, TOKEN);
+            mChoreographer.postAnimationCallback(removedCallback, TOKEN);
+            mChoreographer.removeAnimationCallbacks(removedCallback, TOKEN);
+            sleep(NOMINAL_VSYNC_PERIOD * 3);
+            assertEquals(4, addedCallback1.invocationCount);
+            assertEquals(0, removedCallback.invocationCount);
         } finally {
-            mChoreographer.removeAnimationCallbacks(addedCallback1);
-            mChoreographer.removeAnimationCallbacks(addedCallback2);
-            mChoreographer.removeAnimationCallbacks(removedCallback);
+            mChoreographer.removeAnimationCallbacks(addedCallback1, null);
+            mChoreographer.removeAnimationCallbacks(addedCallback2, null);
+            mChoreographer.removeAnimationCallbacks(removedCallback, null);
         }
     }
 
@@ -74,9 +92,9 @@ public class ChoreographerTest extends AndroidTestCase {
         MockRunnable removedCallback = new MockRunnable();
         try {
             // Add and remove a few callbacks.
-            mChoreographer.postAnimationCallbackDelayed(addedCallback, DELAY_PERIOD);
-            mChoreographer.postAnimationCallbackDelayed(removedCallback, DELAY_PERIOD);
-            mChoreographer.removeAnimationCallbacks(removedCallback);
+            mChoreographer.postAnimationCallbackDelayed(addedCallback, null, DELAY_PERIOD);
+            mChoreographer.postAnimationCallbackDelayed(removedCallback, null, DELAY_PERIOD);
+            mChoreographer.removeAnimationCallbacks(removedCallback, null);
 
             // Sleep for a couple of frames.
             sleep(NOMINAL_VSYNC_PERIOD * 3);
@@ -91,9 +109,26 @@ public class ChoreographerTest extends AndroidTestCase {
             // We expect the remaining callbacks to have been invoked.
             assertEquals(1, addedCallback.invocationCount);
             assertEquals(0, removedCallback.invocationCount);
+
+            // If the token matches, the the callback should be removed.
+            mChoreographer.postAnimationCallbackDelayed(addedCallback, null, DELAY_PERIOD);
+            mChoreographer.postAnimationCallbackDelayed(removedCallback, TOKEN, DELAY_PERIOD);
+            mChoreographer.removeAnimationCallbacks(null, TOKEN);
+            sleep(NOMINAL_VSYNC_PERIOD * 3 + DELAY_PERIOD);
+            assertEquals(2, addedCallback.invocationCount);
+            assertEquals(0, removedCallback.invocationCount);
+
+            // If the action and token matches, then the callback should be removed.
+            // If only the token matches, then the callback should not be removed.
+            mChoreographer.postAnimationCallbackDelayed(addedCallback, TOKEN, DELAY_PERIOD);
+            mChoreographer.postAnimationCallbackDelayed(removedCallback, TOKEN, DELAY_PERIOD);
+            mChoreographer.removeAnimationCallbacks(removedCallback, TOKEN);
+            sleep(NOMINAL_VSYNC_PERIOD * 3 + DELAY_PERIOD);
+            assertEquals(3, addedCallback.invocationCount);
+            assertEquals(0, removedCallback.invocationCount);
         } finally {
-            mChoreographer.removeAnimationCallbacks(addedCallback);
-            mChoreographer.removeAnimationCallbacks(removedCallback);
+            mChoreographer.removeAnimationCallbacks(addedCallback, null);
+            mChoreographer.removeAnimationCallbacks(removedCallback, null);
         }
     }
 
@@ -103,10 +138,10 @@ public class ChoreographerTest extends AndroidTestCase {
         MockRunnable removedCallback = new MockRunnable();
         try {
             // Add and remove a few callbacks.
-            mChoreographer.postDrawCallback(addedCallback1);
-            mChoreographer.postDrawCallbackDelayed(addedCallback2, 0);
-            mChoreographer.postDrawCallback(removedCallback);
-            mChoreographer.removeDrawCallbacks(removedCallback);
+            mChoreographer.postDrawCallback(addedCallback1, null);
+            mChoreographer.postDrawCallbackDelayed(addedCallback2, null, 0);
+            mChoreographer.postDrawCallback(removedCallback, null);
+            mChoreographer.removeDrawCallbacks(removedCallback, null);
 
             // Sleep for a couple of frames.
             sleep(NOMINAL_VSYNC_PERIOD * 3);
@@ -117,16 +152,33 @@ public class ChoreographerTest extends AndroidTestCase {
             assertEquals(0, removedCallback.invocationCount);
 
             // If we post a callback again, then it should be invoked again.
-            mChoreographer.postDrawCallback(addedCallback1);
+            mChoreographer.postDrawCallback(addedCallback1, null);
             sleep(NOMINAL_VSYNC_PERIOD * 3);
 
             assertEquals(2, addedCallback1.invocationCount);
             assertEquals(1, addedCallback2.invocationCount);
             assertEquals(0, removedCallback.invocationCount);
+
+            // If the token matches, the the callback should be removed.
+            mChoreographer.postDrawCallback(addedCallback1, null);
+            mChoreographer.postDrawCallback(removedCallback, TOKEN);
+            mChoreographer.removeDrawCallbacks(null, TOKEN);
+            sleep(NOMINAL_VSYNC_PERIOD * 3);
+            assertEquals(3, addedCallback1.invocationCount);
+            assertEquals(0, removedCallback.invocationCount);
+
+            // If the action and token matches, then the callback should be removed.
+            // If only the token matches, then the callback should not be removed.
+            mChoreographer.postDrawCallback(addedCallback1, TOKEN);
+            mChoreographer.postDrawCallback(removedCallback, TOKEN);
+            mChoreographer.removeDrawCallbacks(removedCallback, TOKEN);
+            sleep(NOMINAL_VSYNC_PERIOD * 3);
+            assertEquals(4, addedCallback1.invocationCount);
+            assertEquals(0, removedCallback.invocationCount);
         } finally {
-            mChoreographer.removeDrawCallbacks(addedCallback1);
-            mChoreographer.removeDrawCallbacks(addedCallback2);
-            mChoreographer.removeDrawCallbacks(removedCallback);
+            mChoreographer.removeDrawCallbacks(addedCallback1, null);
+            mChoreographer.removeDrawCallbacks(addedCallback2, null);
+            mChoreographer.removeDrawCallbacks(removedCallback, null);
         }
     }
 
@@ -135,9 +187,9 @@ public class ChoreographerTest extends AndroidTestCase {
         MockRunnable removedCallback = new MockRunnable();
         try {
             // Add and remove a few callbacks.
-            mChoreographer.postDrawCallbackDelayed(addedCallback, DELAY_PERIOD);
-            mChoreographer.postDrawCallbackDelayed(removedCallback, DELAY_PERIOD);
-            mChoreographer.removeDrawCallbacks(removedCallback);
+            mChoreographer.postDrawCallbackDelayed(addedCallback, null, DELAY_PERIOD);
+            mChoreographer.postDrawCallbackDelayed(removedCallback, null, DELAY_PERIOD);
+            mChoreographer.removeDrawCallbacks(removedCallback, null);
 
             // Sleep for a couple of frames.
             sleep(NOMINAL_VSYNC_PERIOD * 3);
@@ -152,15 +204,32 @@ public class ChoreographerTest extends AndroidTestCase {
             // We expect the remaining callbacks to have been invoked.
             assertEquals(1, addedCallback.invocationCount);
             assertEquals(0, removedCallback.invocationCount);
+
+            // If the token matches, the the callback should be removed.
+            mChoreographer.postDrawCallbackDelayed(addedCallback, null, DELAY_PERIOD);
+            mChoreographer.postDrawCallbackDelayed(removedCallback, TOKEN, DELAY_PERIOD);
+            mChoreographer.removeDrawCallbacks(null, TOKEN);
+            sleep(NOMINAL_VSYNC_PERIOD * 3 + DELAY_PERIOD);
+            assertEquals(2, addedCallback.invocationCount);
+            assertEquals(0, removedCallback.invocationCount);
+
+            // If the action and token matches, then the callback should be removed.
+            // If only the token matches, then the callback should not be removed.
+            mChoreographer.postDrawCallbackDelayed(addedCallback, TOKEN, DELAY_PERIOD);
+            mChoreographer.postDrawCallbackDelayed(removedCallback, TOKEN, DELAY_PERIOD);
+            mChoreographer.removeDrawCallbacks(removedCallback, TOKEN);
+            sleep(NOMINAL_VSYNC_PERIOD * 3 + DELAY_PERIOD);
+            assertEquals(3, addedCallback.invocationCount);
+            assertEquals(0, removedCallback.invocationCount);
         } finally {
-            mChoreographer.removeDrawCallbacks(addedCallback);
-            mChoreographer.removeDrawCallbacks(removedCallback);
+            mChoreographer.removeDrawCallbacks(addedCallback, null);
+            mChoreographer.removeDrawCallbacks(removedCallback, null);
         }
     }
 
     public void testPostAnimationCallbackThrowsIfRunnableIsNull() {
         try {
-            mChoreographer.postAnimationCallback(null);
+            mChoreographer.postAnimationCallback(null, TOKEN);
             fail("Expected IllegalArgumentException");
         } catch (IllegalArgumentException ex) {
             // expected
@@ -169,16 +238,7 @@ public class ChoreographerTest extends AndroidTestCase {
 
     public void testPostAnimationCallbackDelayedThrowsIfRunnableIsNull() {
         try {
-            mChoreographer.postAnimationCallbackDelayed(null, DELAY_PERIOD);
-            fail("Expected IllegalArgumentException");
-        } catch (IllegalArgumentException ex) {
-            // expected
-        }
-    }
-
-    public void testRemoveAnimationCallbackThrowsIfRunnableIsNull() {
-        try {
-            mChoreographer.removeAnimationCallbacks(null);
+            mChoreographer.postAnimationCallbackDelayed(null, TOKEN, DELAY_PERIOD);
             fail("Expected IllegalArgumentException");
         } catch (IllegalArgumentException ex) {
             // expected
@@ -187,7 +247,7 @@ public class ChoreographerTest extends AndroidTestCase {
 
     public void testPostDrawCallbackThrowsIfRunnableIsNull() {
         try {
-            mChoreographer.postDrawCallback(null);
+            mChoreographer.postDrawCallback(null, TOKEN);
             fail("Expected IllegalArgumentException");
         } catch (IllegalArgumentException ex) {
             // expected
@@ -196,16 +256,7 @@ public class ChoreographerTest extends AndroidTestCase {
 
     public void testPostDrawCallbackDelayedThrowsIfRunnableIsNull() {
         try {
-            mChoreographer.postDrawCallbackDelayed(null, DELAY_PERIOD);
-            fail("Expected IllegalArgumentException");
-        } catch (IllegalArgumentException ex) {
-            // expected
-        }
-    }
-
-    public void testRemoveDrawCallbackThrowsIfRunnableIsNull() {
-        try {
-            mChoreographer.removeDrawCallbacks(null);
+            mChoreographer.postDrawCallbackDelayed(null, TOKEN, DELAY_PERIOD);
             fail("Expected IllegalArgumentException");
         } catch (IllegalArgumentException ex) {
             // expected
