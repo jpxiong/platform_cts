@@ -17,10 +17,12 @@
 package com.android.cts.usespermissiondiffcertapp;
 
 import android.content.BroadcastReceiver;
+import android.content.ClipData;
 import android.content.ComponentName;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
+import android.database.Cursor;
 import android.net.Uri;
 import android.os.SystemClock;
 import android.test.AndroidTestCase;
@@ -53,12 +55,52 @@ public class AccessPermissionWithDiffSigTest extends AndroidTestCase {
         }
     }
 
+    public void assertReadingClipNotAllowed(ClipData clip, String msg) {
+        for (int i=0; i<clip.getItemCount(); i++) {
+            ClipData.Item item = clip.getItemAt(i);
+            Uri uri = item.getUri();
+            if (uri != null) {
+                assertReadingContentUriNotAllowed(uri, msg);
+            } else {
+                Intent intent = item.getIntent();
+                uri = intent.getData();
+                if (uri != null) {
+                    assertReadingContentUriNotAllowed(uri, msg);
+                }
+                ClipData intentClip = intent.getClipData();
+                if (intentClip != null) {
+                    assertReadingClipNotAllowed(intentClip, msg);
+                }
+            }
+        }
+    }
+
     public void assertWritingContentUriNotAllowed(Uri uri, String msg) {
         try {
             getContext().getContentResolver().insert(uri, new ContentValues());
             fail("expected SecurityException writing " + uri + ": " + msg);
         } catch (SecurityException expected) {
             assertNotNull("security exception's error message.", expected.getMessage());
+        }
+    }
+
+    public void assertWritingClipNotAllowed(ClipData clip, String msg) {
+        for (int i=0; i<clip.getItemCount(); i++) {
+            ClipData.Item item = clip.getItemAt(i);
+            Uri uri = item.getUri();
+            if (uri != null) {
+                assertWritingContentUriNotAllowed(uri, msg);
+            } else {
+                Intent intent = item.getIntent();
+                uri = intent.getData();
+                if (uri != null) {
+                    assertWritingContentUriNotAllowed(uri, msg);
+                }
+                ClipData intentClip = intent.getClipData();
+                if (intentClip != null) {
+                    assertWritingClipNotAllowed(intentClip, msg);
+                }
+            }
         }
     }
 
@@ -98,16 +140,68 @@ public class AccessPermissionWithDiffSigTest extends AndroidTestCase {
                 "shouldn't write private provider");
     }
 
+    public static ClipData makeSingleClipData(Uri uri) {
+        return new ClipData("foo", new String[] { "foo/bar" },
+                new ClipData.Item(uri));
+    }
+
+    public static ClipData makeMultiClipData(Uri uri) {
+        Uri grantClip1Uri = Uri.withAppendedPath(uri, "clip1");
+        Uri grantClip2Uri = Uri.withAppendedPath(uri, "clip2");
+        Uri grantClip3Uri = Uri.withAppendedPath(uri, "clip3");
+        Uri grantClip4Uri = Uri.withAppendedPath(uri, "clip4");
+        Uri grantClip5Uri = Uri.withAppendedPath(uri, "clip5");
+        ClipData clip = new ClipData("foo", new String[] { "foo/bar" },
+                new ClipData.Item(grantClip1Uri));
+        clip.addItem(new ClipData.Item(grantClip2Uri));
+        // Intents in the ClipData should allow their data: and clip URIs
+        // to be granted, but only respect the grant flags of the top-level
+        // Intent.
+        clip.addItem(new ClipData.Item(new Intent(Intent.ACTION_VIEW, grantClip3Uri)));
+        Intent intent = new Intent(Intent.ACTION_VIEW, grantClip4Uri);
+        intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION
+                | Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
+        clip.addItem(new ClipData.Item(intent));
+        intent = new Intent(Intent.ACTION_VIEW);
+        intent.setClipData(new ClipData("foo", new String[] { "foo/bar" },
+                new ClipData.Item(grantClip5Uri)));
+        clip.addItem(new ClipData.Item(intent));
+        return clip;
+    }
+
+    public static Intent makeClipIntent(ClipData clip, int flags) {
+        Intent intent = new Intent();
+        intent.setClipData(clip);
+        intent.addFlags(flags);
+        return intent;
+    }
+
+    public static Intent makeClipIntent(Uri uri, int flags) {
+        return makeClipIntent(makeMultiClipData(uri), flags);
+    }
+
     public void doTryGrantUriActivityPermissionToSelf(Uri uri, int mode) {
+        Uri grantDataUri = Uri.withAppendedPath(uri, "data");
         Intent grantIntent = new Intent();
-        grantIntent.setData(uri);
+        grantIntent.setData(grantDataUri);
         grantIntent.addFlags(mode | Intent.FLAG_ACTIVITY_NEW_TASK);
         grantIntent.setClass(getContext(), ReceiveUriActivity.class);
         try {
             ReceiveUriActivity.clearStarted();
             getContext().startActivity(grantIntent);
             ReceiveUriActivity.waitForStart();
-            fail("expected SecurityException granting " + uri + " to activity");
+            fail("expected SecurityException granting " + grantDataUri + " to activity");
+        } catch (SecurityException e) {
+            // This is what we want.
+        }
+
+        grantIntent = makeClipIntent(uri, mode | Intent.FLAG_ACTIVITY_NEW_TASK);
+        grantIntent.setClass(getContext(), ReceiveUriActivity.class);
+        try {
+            ReceiveUriActivity.clearStarted();
+            getContext().startActivity(grantIntent);
+            ReceiveUriActivity.waitForStart();
+            fail("expected SecurityException granting " + grantIntent.getClipData() + " to activity");
         } catch (SecurityException e) {
             // This is what we want.
         }
@@ -150,13 +244,23 @@ public class AccessPermissionWithDiffSigTest extends AndroidTestCase {
     }
 
     public void doTryGrantUriServicePermissionToSelf(Uri uri, int mode) {
+        Uri grantDataUri = Uri.withAppendedPath(uri, "data");
         Intent grantIntent = new Intent();
-        grantIntent.setData(uri);
+        grantIntent.setData(grantDataUri);
         grantIntent.addFlags(mode);
         grantIntent.setClass(getContext(), ReceiveUriService.class);
         try {
             getContext().startService(grantIntent);
-            fail("expected SecurityException granting " + uri + " to service");
+            fail("expected SecurityException granting " + grantDataUri + " to service");
+        } catch (SecurityException e) {
+            // This is what we want.
+        }
+
+        grantIntent = makeClipIntent(uri, mode);
+        grantIntent.setClass(getContext(), ReceiveUriService.class);
+        try {
+            getContext().startService(grantIntent);
+            fail("expected SecurityException granting " + grantIntent.getClipData() + " to service");
         } catch (SecurityException e) {
             // This is what we want.
         }
@@ -266,10 +370,11 @@ public class AccessPermissionWithDiffSigTest extends AndroidTestCase {
             }
         }
     }
-    
+
     void grantUriPermissionFail(Uri uri, int mode, boolean service) {
+        Uri grantDataUri = Uri.withAppendedPath(uri, "data");
         Intent grantIntent = new Intent();
-        grantIntent.setData(uri);
+        grantIntent.setData(grantDataUri);
         grantIntent.addFlags(mode);
         grantIntent.setClass(getContext(),
                 service ? ReceiveUriService.class : ReceiveUriActivity.class);
@@ -279,7 +384,19 @@ public class AccessPermissionWithDiffSigTest extends AndroidTestCase {
         intent.putExtra("service", service);
         GrantResultReceiver receiver = new GrantResultReceiver();
         getContext().sendOrderedBroadcast(intent, null, receiver, null, 0, null, null);
-        receiver.assertFailure("Able to grant URI permission to " + uri + " when should not");
+        receiver.assertFailure("Able to grant URI permission to " + grantDataUri + " when should not");
+
+        grantIntent = makeClipIntent(uri, mode);
+        grantIntent.setClass(getContext(),
+                service ? ReceiveUriService.class : ReceiveUriActivity.class);
+        intent = new Intent();
+        intent.setComponent(GRANT_URI_PERM_COMP);
+        intent.putExtra("intent", grantIntent);
+        intent.putExtra("service", service);
+        receiver = new GrantResultReceiver();
+        getContext().sendOrderedBroadcast(intent, null, receiver, null, 0, null, null);
+        receiver.assertFailure("Able to grant URI permission to " + grantIntent.getClipData()
+                + " when should not");
     }
 
     void doTestGrantUriPermissionFail(Uri uri) {
@@ -323,9 +440,20 @@ public class AccessPermissionWithDiffSigTest extends AndroidTestCase {
         doTestGrantUriPermissionFail(Uri.withAppendedPath(PRIV_URI_GRANTING, "invalid"));
     }
 
-    void grantUriPermission(Uri uri, int mode, boolean service) {
+    void grantClipUriPermission(ClipData clip, int mode, boolean service) {
         Intent grantIntent = new Intent();
-        grantIntent.setData(uri);
+        if (clip.getItemCount() == 1) {
+            grantIntent.setData(clip.getItemAt(0).getUri());
+        } else {
+            grantIntent.setClipData(clip);
+            // Make this Intent unique from the one that started it.
+            for (int i=0; i<clip.getItemCount(); i++) {
+                Uri uri = clip.getItemAt(i).getUri();
+                if (uri != null) {
+                    grantIntent.addCategory(uri.toString());
+                }
+            }
+        }
         grantIntent.addFlags(mode);
         grantIntent.setClass(getContext(),
                 service ? ReceiveUriService.class : ReceiveUriActivity.class);
@@ -336,27 +464,58 @@ public class AccessPermissionWithDiffSigTest extends AndroidTestCase {
         getContext().sendBroadcast(intent);
     }
 
-    void doTestGrantActivityUriReadPermission(Uri uri) {
+    void assertReadingClipAllowed(ClipData clip) {
+        for (int i=0; i<clip.getItemCount(); i++) {
+            ClipData.Item item = clip.getItemAt(i);
+            Uri uri = item.getUri();
+            if (uri != null) {
+                Cursor c = getContext().getContentResolver().query(uri,
+                        null, null, null, null);
+                if (c != null) {
+                    c.close();
+                }
+            } else {
+                Intent intent = item.getIntent();
+                uri = intent.getData();
+                if (uri != null) {
+                    Cursor c = getContext().getContentResolver().query(uri,
+                            null, null, null, null);
+                    if (c != null) {
+                        c.close();
+                    }
+                }
+                ClipData intentClip = intent.getClipData();
+                if (intentClip != null) {
+                    assertReadingClipAllowed(intentClip);
+                }
+            }
+        }
+    }
+
+    void doTestGrantActivityUriReadPermission(Uri uri, boolean useClip) {
         final Uri subUri = Uri.withAppendedPath(uri, "foo");
         final Uri subSubUri = Uri.withAppendedPath(subUri, "bar");
         final Uri sub2Uri = Uri.withAppendedPath(uri, "yes");
         final Uri sub2SubUri = Uri.withAppendedPath(sub2Uri, "no");
 
+        final ClipData subClip = useClip ? makeMultiClipData(subUri) : makeSingleClipData(subUri);
+        final ClipData sub2Clip = useClip ? makeMultiClipData(sub2Uri) : makeSingleClipData(sub2Uri);
+
         // Precondition: no current access.
-        assertReadingContentUriNotAllowed(subUri, "shouldn't read when starting test");
-        assertReadingContentUriNotAllowed(sub2Uri, "shouldn't read when starting test");
+        assertReadingClipNotAllowed(subClip, "shouldn't read when starting test");
+        assertReadingClipNotAllowed(sub2Clip, "shouldn't read when starting test");
 
         // --------------------------------
 
         ReceiveUriActivity.clearStarted();
-        grantUriPermission(subUri, Intent.FLAG_GRANT_READ_URI_PERMISSION, false);
+        grantClipUriPermission(subClip, Intent.FLAG_GRANT_READ_URI_PERMISSION, false);
         ReceiveUriActivity.waitForStart();
 
         // See if we now have access to the provider.
-        getContext().getContentResolver().query(subUri, null, null, null, null);
+        assertReadingClipAllowed(subClip);
 
         // But not writing.
-        assertWritingContentUriNotAllowed(subUri, "shouldn't write from granted read");
+        assertWritingClipNotAllowed(subClip, "shouldn't write from granted read");
 
         // And not to the base path.
         assertReadingContentUriNotAllowed(uri, "shouldn't read non-granted base URI");
@@ -367,7 +526,7 @@ public class AccessPermissionWithDiffSigTest extends AndroidTestCase {
         // --------------------------------
 
         ReceiveUriActivity.clearNewIntent();
-        grantUriPermission(sub2Uri, Intent.FLAG_GRANT_READ_URI_PERMISSION, false);
+        grantClipUriPermission(sub2Clip, Intent.FLAG_GRANT_READ_URI_PERMISSION, false);
         ReceiveUriActivity.waitForNewIntent();
 
         if (false) {
@@ -381,13 +540,13 @@ public class AccessPermissionWithDiffSigTest extends AndroidTestCase {
         }
 
         // See if we now have access to the provider.
-        getContext().getContentResolver().query(sub2Uri, null, null, null, null);
+        assertReadingClipAllowed(sub2Clip);
 
         // And still have access to the original URI.
-        getContext().getContentResolver().query(subUri, null, null, null, null);
+        assertReadingClipAllowed(subClip);
 
         // But not writing.
-        assertWritingContentUriNotAllowed(sub2Uri, "shouldn't write from granted read");
+        assertWritingClipNotAllowed(sub2Clip, "shouldn't write from granted read");
 
         // And not to the base path.
         assertReadingContentUriNotAllowed(uri, "shouldn't read non-granted base URI");
@@ -417,31 +576,54 @@ public class AccessPermissionWithDiffSigTest extends AndroidTestCase {
         }
 
         // Ensure reading no longer allowed.
-        assertReadingContentUriNotAllowed(subUri, "shouldn't read after losing granted URI");
-        assertReadingContentUriNotAllowed(sub2Uri, "shouldn't read after losing granted URI");
+        assertReadingClipNotAllowed(subClip, "shouldn't read after losing granted URI");
+        assertReadingClipNotAllowed(sub2Clip, "shouldn't read after losing granted URI");
     }
 
-    void doTestGrantActivityUriWritePermission(Uri uri) {
+    void assertWritingClipAllowed(ClipData clip) {
+        for (int i=0; i<clip.getItemCount(); i++) {
+            ClipData.Item item = clip.getItemAt(i);
+            Uri uri = item.getUri();
+            if (uri != null) {
+                getContext().getContentResolver().insert(uri, new ContentValues());
+            } else {
+                Intent intent = item.getIntent();
+                uri = intent.getData();
+                if (uri != null) {
+                    getContext().getContentResolver().insert(uri, new ContentValues());
+                }
+                ClipData intentClip = intent.getClipData();
+                if (intentClip != null) {
+                    assertWritingClipAllowed(intentClip);
+                }
+            }
+        }
+    }
+
+    void doTestGrantActivityUriWritePermission(Uri uri, boolean useClip) {
         final Uri subUri = Uri.withAppendedPath(uri, "foo");
         final Uri subSubUri = Uri.withAppendedPath(subUri, "bar");
         final Uri sub2Uri = Uri.withAppendedPath(uri, "yes");
         final Uri sub2SubUri = Uri.withAppendedPath(sub2Uri, "no");
 
+        final ClipData subClip = useClip ? makeMultiClipData(subUri) : makeSingleClipData(subUri);
+        final ClipData sub2Clip = useClip ? makeMultiClipData(sub2Uri) : makeSingleClipData(sub2Uri);
+
         // Precondition: no current access.
-        assertWritingContentUriNotAllowed(subUri, "shouldn't write when starting test");
-        assertWritingContentUriNotAllowed(sub2Uri, "shouldn't write when starting test");
+        assertWritingClipNotAllowed(subClip, "shouldn't write when starting test");
+        assertWritingClipNotAllowed(sub2Clip, "shouldn't write when starting test");
 
         // --------------------------------
 
         ReceiveUriActivity.clearStarted();
-        grantUriPermission(subUri, Intent.FLAG_GRANT_WRITE_URI_PERMISSION, false);
+        grantClipUriPermission(subClip, Intent.FLAG_GRANT_WRITE_URI_PERMISSION, false);
         ReceiveUriActivity.waitForStart();
 
         // See if we now have access to the provider.
-        getContext().getContentResolver().insert(subUri, new ContentValues());
+        assertWritingClipAllowed(subClip);
 
         // But not reading.
-        assertReadingContentUriNotAllowed(subUri, "shouldn't read from granted write");
+        assertReadingClipNotAllowed(subClip, "shouldn't read from granted write");
 
         // And not to the base path.
         assertWritingContentUriNotAllowed(uri, "shouldn't write non-granted base URI");
@@ -452,7 +634,7 @@ public class AccessPermissionWithDiffSigTest extends AndroidTestCase {
         // --------------------------------
 
         ReceiveUriActivity.clearNewIntent();
-        grantUriPermission(sub2Uri, Intent.FLAG_GRANT_WRITE_URI_PERMISSION, false);
+        grantClipUriPermission(sub2Clip, Intent.FLAG_GRANT_WRITE_URI_PERMISSION, false);
         ReceiveUriActivity.waitForNewIntent();
 
         if (false) {
@@ -466,13 +648,13 @@ public class AccessPermissionWithDiffSigTest extends AndroidTestCase {
         }
 
         // See if we now have access to the provider.
-        getContext().getContentResolver().insert(sub2Uri, new ContentValues());
+        assertWritingClipAllowed(sub2Clip);
 
         // And still have access to the original URI.
-        getContext().getContentResolver().insert(subUri, new ContentValues());
+        assertWritingClipAllowed(subClip);
 
         // But not reading.
-        assertReadingContentUriNotAllowed(sub2Uri, "shouldn't read from granted write");
+        assertReadingClipNotAllowed(sub2Clip, "shouldn't read from granted write");
 
         // And not to the base path.
         assertWritingContentUriNotAllowed(uri, "shouldn't write non-granted base URI");
@@ -502,8 +684,8 @@ public class AccessPermissionWithDiffSigTest extends AndroidTestCase {
         }
 
         // Ensure writing no longer allowed.
-        assertWritingContentUriNotAllowed(subUri, "shouldn't write after losing granted URI");
-        assertWritingContentUriNotAllowed(sub2Uri, "shouldn't write after losing granted URI");
+        assertWritingClipNotAllowed(subClip, "shouldn't write after losing granted URI");
+        assertWritingClipNotAllowed(sub2Clip, "shouldn't write after losing granted URI");
     }
 
     /**
@@ -511,7 +693,8 @@ public class AccessPermissionWithDiffSigTest extends AndroidTestCase {
      * permission.
      */
     public void testGrantReadPermissionFromStartActivity() {
-        doTestGrantActivityUriReadPermission(PERM_URI_GRANTING);
+        doTestGrantActivityUriReadPermission(PERM_URI_GRANTING, false);
+        doTestGrantActivityUriReadPermission(PERM_URI_GRANTING, true);
     }
 
     /**
@@ -519,7 +702,8 @@ public class AccessPermissionWithDiffSigTest extends AndroidTestCase {
      * permission.
      */
     public void testGrantWritePermissionFromStartActivity() {
-        doTestGrantActivityUriWritePermission(PERM_URI_GRANTING);
+        doTestGrantActivityUriWritePermission(PERM_URI_GRANTING, true);
+        doTestGrantActivityUriWritePermission(PERM_URI_GRANTING, false);
     }
 
     /**
@@ -527,7 +711,8 @@ public class AccessPermissionWithDiffSigTest extends AndroidTestCase {
      * permission.
      */
     public void testGrantReadPrivateFromStartActivity() {
-        doTestGrantActivityUriReadPermission(PRIV_URI_GRANTING);
+        doTestGrantActivityUriReadPermission(PRIV_URI_GRANTING, false);
+        doTestGrantActivityUriReadPermission(PRIV_URI_GRANTING, true);
     }
 
     /**
@@ -535,10 +720,11 @@ public class AccessPermissionWithDiffSigTest extends AndroidTestCase {
      * permission.
      */
     public void testGrantWritePrivateFromStartActivity() {
-        doTestGrantActivityUriWritePermission(PRIV_URI_GRANTING);
+        doTestGrantActivityUriWritePermission(PRIV_URI_GRANTING, true);
+        doTestGrantActivityUriWritePermission(PRIV_URI_GRANTING, false);
     }
 
-    void doTestGrantServiceUriReadPermission(Uri uri) {
+    void doTestGrantServiceUriReadPermission(Uri uri, boolean useClip) {
         final Uri subUri = Uri.withAppendedPath(uri, "foo");
         final Uri subSubUri = Uri.withAppendedPath(subUri, "bar");
         final Uri sub2Uri = Uri.withAppendedPath(uri, "yes");
@@ -546,23 +732,26 @@ public class AccessPermissionWithDiffSigTest extends AndroidTestCase {
 
         ReceiveUriService.stop(getContext());
 
+        final ClipData subClip = useClip ? makeMultiClipData(subUri) : makeSingleClipData(subUri);
+        final ClipData sub2Clip = useClip ? makeMultiClipData(sub2Uri) : makeSingleClipData(sub2Uri);
+
         // Precondition: no current access.
-        assertReadingContentUriNotAllowed(subUri, "shouldn't read when starting test");
-        assertReadingContentUriNotAllowed(sub2Uri, "shouldn't read when starting test");
+        assertReadingClipNotAllowed(subClip, "shouldn't read when starting test");
+        assertReadingClipNotAllowed(sub2Clip, "shouldn't read when starting test");
 
         // --------------------------------
 
         ReceiveUriService.clearStarted();
-        grantUriPermission(subUri, Intent.FLAG_GRANT_READ_URI_PERMISSION, true);
+        grantClipUriPermission(subClip, Intent.FLAG_GRANT_READ_URI_PERMISSION, true);
         ReceiveUriService.waitForStart();
 
         int firstStartId = ReceiveUriService.getCurStartId();
 
         // See if we now have access to the provider.
-        getContext().getContentResolver().query(subUri, null, null, null, null);
+        assertReadingClipAllowed(subClip);
 
         // But not writing.
-        assertWritingContentUriNotAllowed(subUri, "shouldn't write from granted read");
+        assertWritingClipNotAllowed(subClip, "shouldn't write from granted read");
 
         // And not to the base path.
         assertReadingContentUriNotAllowed(uri, "shouldn't read non-granted base URI");
@@ -574,7 +763,7 @@ public class AccessPermissionWithDiffSigTest extends AndroidTestCase {
 
         // Send another Intent to it.
         ReceiveUriService.clearStarted();
-        grantUriPermission(sub2Uri, Intent.FLAG_GRANT_READ_URI_PERMISSION, true);
+        grantClipUriPermission(sub2Clip, Intent.FLAG_GRANT_READ_URI_PERMISSION, true);
         ReceiveUriService.waitForStart();
 
         if (false) {
@@ -588,13 +777,13 @@ public class AccessPermissionWithDiffSigTest extends AndroidTestCase {
         }
 
         // See if we now have access to the provider.
-        getContext().getContentResolver().query(sub2Uri, null, null, null, null);
+        assertReadingClipAllowed(sub2Clip);
 
         // And still to the previous URI.
-        getContext().getContentResolver().query(subUri, null, null, null, null);
+        assertReadingClipAllowed(subClip);
 
         // But not writing.
-        assertWritingContentUriNotAllowed(sub2Uri, "shouldn't write from granted read");
+        assertWritingClipNotAllowed(sub2Clip, "shouldn't write from granted read");
 
         // And not to the base path.
         assertReadingContentUriNotAllowed(uri, "shouldn't read non-granted base URI");
@@ -608,7 +797,7 @@ public class AccessPermissionWithDiffSigTest extends AndroidTestCase {
         ReceiveUriService.stopCurWithId(firstStartId);
 
         // Ensure reading no longer allowed.
-        assertReadingContentUriNotAllowed(subUri, "shouldn't read after losing granted URI");
+        assertReadingClipNotAllowed(subClip, "shouldn't read after losing granted URI");
 
         // And make sure we can't generate a permission to a running service.
         doTryGrantUriActivityPermissionToSelf(subUri,
@@ -622,11 +811,11 @@ public class AccessPermissionWithDiffSigTest extends AndroidTestCase {
         ReceiveUriService.stopSync(getContext());
 
         // Ensure reading no longer allowed.
-        assertReadingContentUriNotAllowed(subUri, "shouldn't read after losing granted URI");
-        assertReadingContentUriNotAllowed(sub2Uri, "shouldn't read after losing granted URI");
+        assertReadingClipNotAllowed(subClip, "shouldn't read after losing granted URI");
+        assertReadingClipNotAllowed(sub2Clip, "shouldn't read after losing granted URI");
     }
 
-    void doTestGrantServiceUriWritePermission(Uri uri) {
+    void doTestGrantServiceUriWritePermission(Uri uri, boolean useClip) {
         final Uri subUri = Uri.withAppendedPath(uri, "foo");
         final Uri subSubUri = Uri.withAppendedPath(subUri, "bar");
         final Uri sub2Uri = Uri.withAppendedPath(uri, "yes");
@@ -634,23 +823,26 @@ public class AccessPermissionWithDiffSigTest extends AndroidTestCase {
 
         ReceiveUriService.stop(getContext());
 
+        final ClipData subClip = useClip ? makeMultiClipData(subUri) : makeSingleClipData(subUri);
+        final ClipData sub2Clip = useClip ? makeMultiClipData(sub2Uri) : makeSingleClipData(sub2Uri);
+
         // Precondition: no current access.
-        assertWritingContentUriNotAllowed(subUri, "shouldn't write when starting test");
-        assertWritingContentUriNotAllowed(sub2Uri, "shouldn't write when starting test");
+        assertReadingClipNotAllowed(subClip, "shouldn't read when starting test");
+        assertReadingClipNotAllowed(sub2Clip, "shouldn't read when starting test");
 
         // --------------------------------
 
         ReceiveUriService.clearStarted();
-        grantUriPermission(subUri, Intent.FLAG_GRANT_WRITE_URI_PERMISSION, true);
+        grantClipUriPermission(subClip, Intent.FLAG_GRANT_WRITE_URI_PERMISSION, true);
         ReceiveUriService.waitForStart();
 
         int firstStartId = ReceiveUriService.getCurStartId();
 
         // See if we now have access to the provider.
-        getContext().getContentResolver().insert(subUri, new ContentValues());
+        assertWritingClipAllowed(subClip);
 
         // But not reading.
-        assertReadingContentUriNotAllowed(subUri, "shouldn't read from granted write");
+        assertReadingClipNotAllowed(subClip, "shouldn't read from granted write");
 
         // And not to the base path.
         assertWritingContentUriNotAllowed(uri, "shouldn't write non-granted base URI");
@@ -662,17 +854,17 @@ public class AccessPermissionWithDiffSigTest extends AndroidTestCase {
 
         // Send another Intent to it.
         ReceiveUriService.clearStarted();
-        grantUriPermission(sub2Uri, Intent.FLAG_GRANT_WRITE_URI_PERMISSION, true);
+        grantClipUriPermission(sub2Clip, Intent.FLAG_GRANT_WRITE_URI_PERMISSION, true);
         ReceiveUriService.waitForStart();
 
         // See if we now have access to the provider.
-        getContext().getContentResolver().insert(sub2Uri, new ContentValues());
+        assertWritingClipAllowed(sub2Clip);
 
         // And still to the previous URI.
-        getContext().getContentResolver().insert(subUri, new ContentValues());
+        assertWritingClipAllowed(subClip);
 
         // But not reading.
-        assertReadingContentUriNotAllowed(sub2Uri, "shouldn't read from granted write");
+        assertReadingClipNotAllowed(sub2Clip, "shouldn't read from granted write");
 
         // And not to the base path.
         assertWritingContentUriNotAllowed(uri, "shouldn't write non-granted base URI");
@@ -696,7 +888,7 @@ public class AccessPermissionWithDiffSigTest extends AndroidTestCase {
         ReceiveUriService.stopCurWithId(firstStartId);
 
         // Ensure writing no longer allowed.
-        assertWritingContentUriNotAllowed(subUri, "shouldn't write after losing granted URI");
+        assertWritingClipNotAllowed(subClip, "shouldn't write after losing granted URI");
 
         // And make sure we can't generate a permission to a running service.
         doTryGrantUriActivityPermissionToSelf(subUri,
@@ -710,24 +902,28 @@ public class AccessPermissionWithDiffSigTest extends AndroidTestCase {
         ReceiveUriService.stopSync(getContext());
 
         // Ensure writing no longer allowed.
-        assertWritingContentUriNotAllowed(subUri, "shouldn't write after losing granted URI");
-        assertWritingContentUriNotAllowed(sub2Uri, "shouldn't write after losing granted URI");
+        assertWritingClipNotAllowed(subClip, "shouldn't write after losing granted URI");
+        assertWritingClipNotAllowed(sub2Clip, "shouldn't write after losing granted URI");
     }
 
     public void testGrantReadPermissionFromStartService() {
-        doTestGrantServiceUriReadPermission(PERM_URI_GRANTING);
+        doTestGrantServiceUriReadPermission(PERM_URI_GRANTING, false);
+        doTestGrantServiceUriReadPermission(PERM_URI_GRANTING, true);
     }
 
     public void testGrantWritePermissionFromStartService() {
-        doTestGrantServiceUriWritePermission(PERM_URI_GRANTING);
+        doTestGrantServiceUriWritePermission(PERM_URI_GRANTING, false);
+        doTestGrantServiceUriWritePermission(PERM_URI_GRANTING, true);
     }
 
     public void testGrantReadPrivateFromStartService() {
-        doTestGrantServiceUriReadPermission(PRIV_URI_GRANTING);
+        doTestGrantServiceUriReadPermission(PRIV_URI_GRANTING, false);
+        doTestGrantServiceUriReadPermission(PRIV_URI_GRANTING, true);
     }
 
     public void testGrantWritePrivateFromStartService() {
-        doTestGrantServiceUriWritePermission(PRIV_URI_GRANTING);
+        doTestGrantServiceUriWritePermission(PRIV_URI_GRANTING, false);
+        doTestGrantServiceUriWritePermission(PRIV_URI_GRANTING, true);
     }
 
     /**
@@ -773,7 +969,8 @@ public class AccessPermissionWithDiffSigTest extends AndroidTestCase {
      * permission.
      */
     public void testGrantReadPathPermissionFromStartActivity() {
-        doTestGrantActivityUriReadPermission(PERM_URI_PATH);
+        doTestGrantActivityUriReadPermission(PERM_URI_PATH, false);
+        doTestGrantActivityUriReadPermission(PERM_URI_PATH, true);
     }
 
     /**
@@ -781,7 +978,8 @@ public class AccessPermissionWithDiffSigTest extends AndroidTestCase {
      * permission.
      */
     public void testGrantWritePathPermissionFromStartActivity() {
-        doTestGrantActivityUriWritePermission(PERM_URI_PATH);
+        doTestGrantActivityUriWritePermission(PERM_URI_PATH, false);
+        doTestGrantActivityUriWritePermission(PERM_URI_PATH, true);
     }
 
     /**
@@ -789,7 +987,8 @@ public class AccessPermissionWithDiffSigTest extends AndroidTestCase {
      * permission.
      */
     public void testGrantReadPathPermissionFromStartService() {
-        doTestGrantServiceUriReadPermission(PERM_URI_PATH);
+        doTestGrantServiceUriReadPermission(PERM_URI_PATH, false);
+        doTestGrantServiceUriReadPermission(PERM_URI_PATH, true);
     }
 
     /**
@@ -797,7 +996,8 @@ public class AccessPermissionWithDiffSigTest extends AndroidTestCase {
      * permission.
      */
     public void testGrantWritePathPermissionFromStartService() {
-        doTestGrantServiceUriWritePermission(PERM_URI_PATH);
+        doTestGrantServiceUriWritePermission(PERM_URI_PATH, false);
+        doTestGrantServiceUriWritePermission(PERM_URI_PATH, true);
     }
 
     public void testGetMimeTypePermission() {
