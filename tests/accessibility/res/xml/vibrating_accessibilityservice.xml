@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Copyright (C) 2011 The Android Open Source Project
+<!-- Copyright (C) 2012 The Android Open Source Project
 
      Licensed under the Apache License, Version 2.0 (the "License");
      you may not use this file except in compliance with the License.
@@ -15,9 +15,6 @@
 -->
 <accessibility-service xmlns:android="http://schemas.android.com/apk/res/android"
     android:accessibilityEventTypes="typeAllMask"
-    android:accessibilityFeedbackType="feedbackGeneric"
+    android:accessibilityFeedbackType="feedbackHaptic"
     android:accessibilityFlags="flagDefault"
-    android:canRetrieveWindowContent="true"
-    android:notificationTimeout="50"
-    android:settingsActivity="android.accessibilityservice.delegate.SomeActivity"
-    android:description="@string/title_delegating_accessibility_service" />
+    android:canRetrieveWindowContent="true" />

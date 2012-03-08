@@ -20,7 +20,6 @@ import static android.view.accessibility.AccessibilityNodeInfo.ACTION_FOCUS;
 import static android.view.accessibility.AccessibilityNodeInfo.ACTION_SELECT;
 
 import android.accessibilityservice.AccessibilityService;
-import android.accessibilityservice.UiTestAutomationBridge;
 import android.content.Context;
 import android.graphics.Rect;
 import android.os.RemoteException;

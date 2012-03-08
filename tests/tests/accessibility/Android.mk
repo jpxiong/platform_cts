@@ -1,4 +1,4 @@
-# Copyright (C) 2010 The Android Open Source Project
+# Copyright (C) 2012 The Android Open Source Project
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -18,15 +18,15 @@ include $(CLEAR_VARS)
 
 LOCAL_MODULE_TAGS := optional
 
+LOCAL_MODULE_PATH := $(TARGET_OUT_DATA_APPS)
+
 LOCAL_JAVA_LIBRARIES := android.test.runner
 
-LOCAL_SRC_FILES := $(call all-java-files-under, src) \
-  src/android/accessibilityservice/IAccessibilityServiceDelegate.aidl \
-  src/android/accessibilityservice/IAccessibilityServiceDelegateConnection.aidl
+LOCAL_SRC_FILES := $(call all-java-files-under, src)
 
-LOCAL_PACKAGE_NAME := CtsAccessibilityServiceTestCases
+LOCAL_PACKAGE_NAME := CtsAccessibilityTestCases
 
 # This test runner sets up/cleans up the device before/after running the tests.
-LOCAL_CTS_TEST_RUNNER := com.android.cts.tradefed.testtype.AccessibilityServiceTestRunner
+LOCAL_CTS_TEST_RUNNER := com.android.cts.tradefed.testtype.AccessibilityTestRunner
 
 include $(BUILD_CTS_PACKAGE)

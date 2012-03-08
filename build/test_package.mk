@@ -34,12 +34,16 @@ $(cts_package_xml): PRIVATE_INSTRUMENTATION := $(LOCAL_INSTRUMENTATION_FOR)
 $(cts_package_xml): PRIVATE_PACKAGE := $(LOCAL_PACKAGE_NAME)
 $(cts_package_xml): PRIVATE_TEST_PACKAGE := android.$(notdir $(LOCAL_PATH))
 $(cts_package_xml): PRIVATE_MANIFEST := $(LOCAL_PATH)/AndroidManifest.xml
+$(cts_package_xml): PRIVATE_TEST_TYPE := $(if $(LOCAL_CTS_TEST_RUNNER),$(LOCAL_CTS_TEST_RUNNER),'')
 $(cts_package_xml): $(call intermediates-dir-for,APPS,$(LOCAL_PACKAGE_NAME))/package.apk $(CTS_EXPECTATIONS) $(CTS_JAVA_TEST_SCANNER_DOCLET) $(CTS_JAVA_TEST_SCANNER) $(CTS_XML_GENERATOR)
 	$(hide) echo Generating test description for java package $(PRIVATE_PACKAGE)
 	$(hide) mkdir -p $(CTS_TESTCASES_OUT)
-	$(hide) $(CTS_JAVA_TEST_SCANNER) -s $(PRIVATE_PATH) \
+	$(hide) $(CTS_JAVA_TEST_SCANNER) \
+						-s $(PRIVATE_PATH) \
 						-d $(CTS_JAVA_TEST_SCANNER_DOCLET) | \
-			$(CTS_XML_GENERATOR) -m $(PRIVATE_MANIFEST) \
+			$(CTS_XML_GENERATOR) \
+						-t $(PRIVATE_TEST_TYPE) \
+						-m $(PRIVATE_MANIFEST) \
 						-i "$(PRIVATE_INSTRUMENTATION)" \
 						-n $(PRIVATE_PACKAGE) \
 						-p $(PRIVATE_TEST_PACKAGE) \
