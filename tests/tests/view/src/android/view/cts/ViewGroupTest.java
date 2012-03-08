@@ -1489,17 +1489,99 @@ public class ViewGroupTest extends InstrumentationTestCase implements CTSResult{
         final int top = 2;
         final int right = 3;
         final int bottom = 4;
+
         MockViewGroup vg = new MockViewGroup(mContext);
+
         assertEquals(0, vg.getPaddingBottom());
         assertEquals(0, vg.getPaddingTop());
         assertEquals(0, vg.getPaddingLeft());
         assertEquals(0, vg.getPaddingRight());
+        assertEquals(0, vg.getPaddingStart());
+        assertEquals(0, vg.getPaddingEnd());
 
         vg.setPadding(left, top, right, bottom);
+
         assertEquals(bottom, vg.getPaddingBottom());
         assertEquals(top, vg.getPaddingTop());
         assertEquals(left, vg.getPaddingLeft());
         assertEquals(right, vg.getPaddingRight());
+
+        assertEquals(left, vg.getPaddingStart());
+        assertEquals(right, vg.getPaddingEnd());
+        assertEquals(false, vg.isPaddingRelative());
+
+        // force RTL direction
+        vg.setLayoutDirection(View.LAYOUT_DIRECTION_RTL);
+
+        assertEquals(bottom, vg.getPaddingBottom());
+        assertEquals(top, vg.getPaddingTop());
+        assertEquals(left, vg.getPaddingLeft());
+        assertEquals(right, vg.getPaddingRight());
+
+        assertEquals(right, vg.getPaddingStart());
+        assertEquals(left, vg.getPaddingEnd());
+        assertEquals(false, vg.isPaddingRelative());
+    }
+
+    public void testSetPaddingRelative() {
+        final int start = 1;
+        final int top = 2;
+        final int end = 3;
+        final int bottom = 4;
+
+        MockViewGroup vg = new MockViewGroup(mContext);
+
+        assertEquals(0, vg.getPaddingBottom());
+        assertEquals(0, vg.getPaddingTop());
+        assertEquals(0, vg.getPaddingLeft());
+        assertEquals(0, vg.getPaddingRight());
+        assertEquals(0, vg.getPaddingStart());
+        assertEquals(0, vg.getPaddingEnd());
+
+        vg.setPaddingRelative(start, top, end, bottom);
+
+        assertEquals(bottom, vg.getPaddingBottom());
+        assertEquals(top, vg.getPaddingTop());
+        assertEquals(start, vg.getPaddingLeft());
+        assertEquals(end, vg.getPaddingRight());
+
+        assertEquals(start, vg.getPaddingStart());
+        assertEquals(end, vg.getPaddingEnd());
+        assertEquals(true, vg.isPaddingRelative());
+
+        // force RTL direction after setting relative padding
+        vg.setLayoutDirection(View.LAYOUT_DIRECTION_RTL);
+
+        assertEquals(bottom, vg.getPaddingBottom());
+        assertEquals(top, vg.getPaddingTop());
+        assertEquals(start, vg.getPaddingLeft());
+        assertEquals(end, vg.getPaddingRight());
+
+        assertEquals(start, vg.getPaddingStart());
+        assertEquals(end, vg.getPaddingEnd());
+        assertEquals(true, vg.isPaddingRelative());
+
+        // force RTL direction before setting relative padding
+        vg = new MockViewGroup(mContext);
+        vg.setLayoutDirection(View.LAYOUT_DIRECTION_RTL);
+
+        assertEquals(0, vg.getPaddingBottom());
+        assertEquals(0, vg.getPaddingTop());
+        assertEquals(0, vg.getPaddingLeft());
+        assertEquals(0, vg.getPaddingRight());
+        assertEquals(0, vg.getPaddingStart());
+        assertEquals(0, vg.getPaddingEnd());
+
+        vg.setPaddingRelative(start, top, end, bottom);
+
+        assertEquals(bottom, vg.getPaddingBottom());
+        assertEquals(top, vg.getPaddingTop());
+        assertEquals(end, vg.getPaddingLeft());
+        assertEquals(start, vg.getPaddingRight());
+
+        assertEquals(start, vg.getPaddingStart());
+        assertEquals(end, vg.getPaddingEnd());
+        assertEquals(true, vg.isPaddingRelative());
     }
 
     public void testSetPersistentDrawingCache() {
