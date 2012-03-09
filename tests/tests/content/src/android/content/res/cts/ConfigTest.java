@@ -733,9 +733,9 @@ public class ConfigTest extends AndroidTestCase {
         // ensure that swNNNdp, wNNNdp, and hNNNdp are working correctly
         // for various common screen configurations.
         TotalConfig config = makeClassicConfig();
-        config.setProperty(Properties.SWIDTH_DP, 599);
-        config.setProperty(Properties.WIDTH_DP, 599);
-        config.setProperty(Properties.HEIGHT_DP, 549);
+        config.setProperty(Properties.SWIDTH_DP, 589);
+        config.setProperty(Properties.WIDTH_DP, 589);
+        config.setProperty(Properties.HEIGHT_DP, 500);
         config.setProperty(Properties.ORIENTATION, Configuration.ORIENTATION_LANDSCAPE);
         config.setProperty(Properties.SCREENLAYOUT, Configuration.SCREENLAYOUT_SIZE_LARGE);
         Resources res = config.getResources();
@@ -744,6 +744,44 @@ public class ConfigTest extends AndroidTestCase {
         checkValue(res, R.configVarying.w, "default");
         checkValue(res, R.configVarying.h, "default");
         checkValue(res, R.configVarying.wh, "default");
+
+        config = makeClassicConfig();
+        config.setProperty(Properties.SWIDTH_DP, 590);
+        config.setProperty(Properties.WIDTH_DP, 590);
+        config.setProperty(Properties.HEIGHT_DP, 500);
+        config.setProperty(Properties.ORIENTATION, Configuration.ORIENTATION_LANDSCAPE);
+        config.setProperty(Properties.SCREENLAYOUT, Configuration.SCREENLAYOUT_SIZE_LARGE);
+        config.setProperty(Properties.DENSITY, DisplayMetrics.DENSITY_MEDIUM);
+        res = config.getResources();
+        checkValue(res, R.configVarying.simple, "simple sw590 mdpi");
+        checkValue(res, R.configVarying.sw, "590 mdpi");
+
+        config.setProperty(Properties.DENSITY, DisplayMetrics.DENSITY_HIGH);
+        res = config.getResources();
+        checkValue(res, R.configVarying.simple, "simple sw590 hdpi");
+        checkValue(res, R.configVarying.sw, "590 hdpi");
+
+        config.setProperty(Properties.DENSITY, DisplayMetrics.DENSITY_XHIGH);
+        res = config.getResources();
+        checkValue(res, R.configVarying.simple, "simple sw590 xhdpi");
+        checkValue(res, R.configVarying.sw, "590 xhdpi");
+
+        config.setProperty(Properties.SWIDTH_DP, 591);
+        config.setProperty(Properties.WIDTH_DP, 591);
+        config.setProperty(Properties.DENSITY, DisplayMetrics.DENSITY_MEDIUM);
+        res = config.getResources();
+        checkValue(res, R.configVarying.simple, "simple sw591");
+        checkValue(res, R.configVarying.sw, "591");
+
+        config.setProperty(Properties.DENSITY, DisplayMetrics.DENSITY_HIGH);
+        res = config.getResources();
+        checkValue(res, R.configVarying.simple, "simple sw591 hdpi");
+        checkValue(res, R.configVarying.sw, "591 hdpi");
+
+        config.setProperty(Properties.DENSITY, DisplayMetrics.DENSITY_XHIGH);
+        res = config.getResources();
+        checkValue(res, R.configVarying.simple, "simple sw591 hdpi");
+        checkValue(res, R.configVarying.sw, "591 hdpi");
 
         config = makeClassicConfig();
         config.setProperty(Properties.SWIDTH_DP, 480);
