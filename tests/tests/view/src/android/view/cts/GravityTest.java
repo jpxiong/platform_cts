@@ -16,6 +16,7 @@
 
 package android.view.cts;
 
+import android.test.suitebuilder.annotation.SmallTest;
 import android.view.View;
 
 import android.graphics.Rect;
@@ -287,5 +288,56 @@ public class GravityTest extends AndroidTestCase {
         assertEquals(30, inoutRect.right);
         assertEquals(30, inoutRect.top);
         assertEquals(50, inoutRect.bottom);
+    }
+
+    @SmallTest
+    public void testGetAbsoluteGravity() throws Exception {
+        assertOneGravity(Gravity.LEFT, Gravity.LEFT, false);
+        assertOneGravity(Gravity.LEFT, Gravity.LEFT, true);
+
+        assertOneGravity(Gravity.RIGHT, Gravity.RIGHT, false);
+        assertOneGravity(Gravity.RIGHT, Gravity.RIGHT, true);
+
+        assertOneGravity(Gravity.TOP, Gravity.TOP, false);
+        assertOneGravity(Gravity.TOP, Gravity.TOP, true);
+
+        assertOneGravity(Gravity.BOTTOM, Gravity.BOTTOM, false);
+        assertOneGravity(Gravity.BOTTOM, Gravity.BOTTOM, true);
+
+        assertOneGravity(Gravity.CENTER_VERTICAL, Gravity.CENTER_VERTICAL, false);
+        assertOneGravity(Gravity.CENTER_VERTICAL, Gravity.CENTER_VERTICAL, true);
+
+        assertOneGravity(Gravity.CENTER_HORIZONTAL, Gravity.CENTER_HORIZONTAL, false);
+        assertOneGravity(Gravity.CENTER_HORIZONTAL, Gravity.CENTER_HORIZONTAL, true);
+
+        assertOneGravity(Gravity.CENTER, Gravity.CENTER, false);
+        assertOneGravity(Gravity.CENTER, Gravity.CENTER, true);
+
+        assertOneGravity(Gravity.FILL_VERTICAL, Gravity.FILL_VERTICAL, false);
+        assertOneGravity(Gravity.FILL_VERTICAL, Gravity.FILL_VERTICAL, true);
+
+        assertOneGravity(Gravity.FILL_HORIZONTAL, Gravity.FILL_HORIZONTAL, false);
+        assertOneGravity(Gravity.FILL_HORIZONTAL, Gravity.FILL_HORIZONTAL, true);
+
+        assertOneGravity(Gravity.FILL, Gravity.FILL, false);
+        assertOneGravity(Gravity.FILL, Gravity.FILL, true);
+
+        assertOneGravity(Gravity.CLIP_HORIZONTAL, Gravity.CLIP_HORIZONTAL, false);
+        assertOneGravity(Gravity.CLIP_HORIZONTAL, Gravity.CLIP_HORIZONTAL, true);
+
+        assertOneGravity(Gravity.CLIP_VERTICAL, Gravity.CLIP_VERTICAL, false);
+        assertOneGravity(Gravity.CLIP_VERTICAL, Gravity.CLIP_VERTICAL, true);
+
+        assertOneGravity(Gravity.LEFT, Gravity.START, false);
+        assertOneGravity(Gravity.RIGHT, Gravity.START, true);
+
+        assertOneGravity(Gravity.RIGHT, Gravity.END, false);
+        assertOneGravity(Gravity.LEFT, Gravity.END, true);
+    }
+
+    private void assertOneGravity(int expected, int initial, boolean isRtl) {
+        final int layoutDirection = isRtl ? View.LAYOUT_DIRECTION_RTL : View.LAYOUT_DIRECTION_LTR;
+
+        assertEquals(expected, Gravity.getAbsoluteGravity(initial, layoutDirection));
     }
 }
