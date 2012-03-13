@@ -28,6 +28,8 @@
     <permission android:name="com.android.cts.permissionNotUsedWithSignature"
         android:protectionLevel="signature" />
 
+    <permission android:name="com.android.cts.permissionNormal" />
+
     <application>
         <receiver android:name="GrantUriPermission" android:exported="true">
         </receiver>
@@ -82,6 +84,22 @@
                     android:writePermission="com.android.cts.permissionWithSignature" />
             <grant-uri-permission android:pathPattern=".*" />
         </provider>
-        
+
+        <!-- Target for tests that verify path permissions can restrict access
+             when no default top-level permission. -->
+        <provider android:name="PermissionContentProviderPathRestricting"
+                android:authorities="ctspermissionwithsignaturepathrestricting">
+            <!-- Require signature permission to get into path. -->
+            <path-permission
+                    android:pathPrefix="/foo.*"
+                    android:readPermission="com.android.cts.permissionWithSignature"
+                    android:writePermission="com.android.cts.permissionWithSignature" />
+            <!-- Allow access to a specific path inside. -->
+            <path-permission
+                    android:pathPrefix="/foo/bar"
+                    android:readPermission="com.android.cts.permissionNormal"
+                    android:writePermission="com.android.cts.permissionNormal" />
+        </provider>
+
     </application>
 </manifest>

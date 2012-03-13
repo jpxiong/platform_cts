@@ -41,6 +41,8 @@ public class AccessPermissionWithDiffSigTest extends AndroidTestCase {
     static final Uri PERM_URI = Uri.parse("content://ctspermissionwithsignature");
     static final Uri PERM_URI_GRANTING = Uri.parse("content://ctspermissionwithsignaturegranting");
     static final Uri PERM_URI_PATH = Uri.parse("content://ctspermissionwithsignaturepath");
+    static final Uri PERM_URI_PATH_RESTRICTING = Uri.parse(
+            "content://ctspermissionwithsignaturepathrestricting");
     static final Uri PRIV_URI = Uri.parse("content://ctsprivateprovider");
     static final Uri PRIV_URI_GRANTING = Uri.parse("content://ctsprivateprovidergranting");
 
@@ -52,6 +54,14 @@ public class AccessPermissionWithDiffSigTest extends AndroidTestCase {
             fail("expected SecurityException reading " + uri + ": " + msg);
         } catch (SecurityException expected) {
             assertNotNull("security exception's error message.", expected.getMessage());
+        }
+    }
+
+    public void assertReadingContentUriAllowed(Uri uri) {
+        try {
+            getContext().getContentResolver().query(uri, null, null, null, null);
+        } catch (SecurityException e) {
+            fail("unexpected SecurityException reading " + uri);
         }
     }
 
@@ -81,6 +91,14 @@ public class AccessPermissionWithDiffSigTest extends AndroidTestCase {
             fail("expected SecurityException writing " + uri + ": " + msg);
         } catch (SecurityException expected) {
             assertNotNull("security exception's error message.", expected.getMessage());
+        }
+    }
+
+    public void assertWritingContentUriAllowed(Uri uri) {
+        try {
+            getContext().getContentResolver().insert(uri, new ContentValues());
+        } catch (SecurityException e) {
+            fail("unexpected SecurityException writing " + uri);
         }
     }
 
@@ -998,6 +1016,43 @@ public class AccessPermissionWithDiffSigTest extends AndroidTestCase {
     public void testGrantWritePathPermissionFromStartService() {
         doTestGrantServiceUriWritePermission(PERM_URI_PATH, false);
         doTestGrantServiceUriWritePermission(PERM_URI_PATH, true);
+    }
+
+    /**
+     * Verify that we can access paths outside the {@code path-permission}
+     * protections, which should only rely on {@code provider} permissions.
+     */
+    public void testRestrictingProviderNoMatchingPath() {
+        assertReadingContentUriAllowed(PERM_URI_PATH_RESTRICTING);
+        assertWritingContentUriAllowed(PERM_URI_PATH_RESTRICTING);
+    }
+
+    /**
+     * Verify that paths under {@code path-permission} restriction aren't
+     * allowed, even though the {@code provider} requires no permissions.
+     */
+    public void testRestrictingProviderMatchingPath() {
+        final Uri test1 = PERM_URI_PATH_RESTRICTING.buildUpon().appendPath("fo").build();
+        assertReadingContentUriAllowed(test1);
+        assertWritingContentUriAllowed(test1);
+
+        final Uri test2 = PERM_URI_PATH_RESTRICTING.buildUpon().appendPath("foo").build();
+        assertReadingContentUriNotAllowed(test2, null);
+        assertWritingContentUriNotAllowed(test2, null);
+
+        final Uri test3 = PERM_URI_PATH_RESTRICTING.buildUpon().appendPath("foo/bar2").build();
+        assertReadingContentUriNotAllowed(test3, null);
+        assertWritingContentUriNotAllowed(test3, null);
+    }
+
+    /**
+     * Verify that at least one {@code path-permission} rule will grant access,
+     * even if the caller doesn't hold another matching {@code path-permission}.
+     */
+    public void testRestrictingProviderMultipleMatchingPath() {
+        final Uri test = PERM_URI_PATH_RESTRICTING.buildUpon().appendPath("foo/bar").build();
+        assertReadingContentUriAllowed(test);
+        assertWritingContentUriAllowed(test);
     }
 
     public void testGetMimeTypePermission() {
