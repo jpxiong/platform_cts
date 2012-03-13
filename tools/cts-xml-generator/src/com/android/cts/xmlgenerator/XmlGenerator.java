@@ -122,7 +122,7 @@ class XmlGenerator {
             writer.append(" targetNameSpace=\"").append(mTargetNameSpace).append("\"");
         }
 
-        if (mTestType != null) {
+        if (mTestType != null && !mTestType.isEmpty()) {
             writer.append(" testType=\"").append(mTestType).append("\"");
         }
 

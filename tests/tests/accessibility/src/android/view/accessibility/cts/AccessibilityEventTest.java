@@ -14,18 +14,13 @@
  * limitations under the License.
  */
 
-package android.view.cts;
+package android.view.accessibility.cts;
 
 import android.os.Message;
 import android.os.Parcel;
-import android.test.suitebuilder.annotation.MediumTest;
+import android.test.suitebuilder.annotation.SmallTest;
 import android.view.accessibility.AccessibilityEvent;
 import android.view.accessibility.AccessibilityRecord;
-
-import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
-import java.util.Iterator;
-import java.util.List;
 
 import junit.framework.TestCase;
 
@@ -37,14 +32,25 @@ public class AccessibilityEventTest extends TestCase {
     /** The number of properties of the {@link AccessibilityEvent} class. */
     private static final int NON_STATIC_FIELD_COUNT = 28;
 
-    @MediumTest
-    public void testMarshaling() throws Exception {
+    /**
+     * Test that no new fields have been added without updating the
+     * marshaling tests.
+     */
+    @SmallTest
+    public void testNoNewFieldsAddedWithoutUpdadingMarshallTests() {
         // no new fields, so we are testing marshaling of all such
-        assertNoNewNonStaticFieldsAdded();
+        AccessibilityRecordTest.assertNoNewNonStaticFieldsAdded(NON_STATIC_FIELD_COUNT);
+    }
 
+    /**
+     * Tests whether accessibility events are correctly written and
+     * read from a parcel (version 1).
+     */
+    @SmallTest
+    public void testMarshaling() throws Exception {
         // fully populate the event to marshal
         AccessibilityEvent sentEvent = AccessibilityEvent.obtain();
-        fullyPopulateSentAccessibilityEvent(sentEvent);
+        fullyPopulateAccessibilityEvent(sentEvent);
 
         // marshal and unmarshal the event
         Parcel parcel = Parcel.obtain();
@@ -59,7 +65,7 @@ public class AccessibilityEventTest extends TestCase {
     /**
      * Tests if {@link AccessibilityEvent} are properly reused.
      */
-    @MediumTest
+    @SmallTest
     public void testReuse() {
         AccessibilityEvent firstEvent = AccessibilityEvent.obtain();
         firstEvent.recycle();
@@ -70,11 +76,11 @@ public class AccessibilityEventTest extends TestCase {
     /**
      * Tests if {@link AccessibilityEvent} are properly recycled.
      */
-    @MediumTest
+    @SmallTest
     public void testRecycle() {
         // obtain and populate an event
         AccessibilityEvent populatedEvent = AccessibilityEvent.obtain();
-        fullyPopulateSentAccessibilityEvent(populatedEvent);
+        fullyPopulateAccessibilityEvent(populatedEvent);
 
         // recycle and obtain the same recycled instance
         populatedEvent.recycle();
@@ -85,32 +91,77 @@ public class AccessibilityEventTest extends TestCase {
     }
 
     /**
-     * Asserts that no new fields have been added, so we are testing marshaling
-     * of all such.
+     * Tests whether the event types are correctly converted to strings.
      */
-    private void assertNoNewNonStaticFieldsAdded() {
-        int nonStaticFieldCount = 0;
-
-        Class<?> clazz = AccessibilityEvent.class;
-        while (clazz != null) {
-            for (Field field : clazz.getDeclaredFields()) {
-                if ((field.getModifiers() & Modifier.STATIC) == 0) {
-                    nonStaticFieldCount++;
-                }
-            }
-            clazz = clazz.getSuperclass();
-        }
-
-        String message = "New fields have been added, so add code to test marshaling them.";
-        assertEquals(message, NON_STATIC_FIELD_COUNT, nonStaticFieldCount);
+    @SmallTest
+    public void testEventTypeToString() {
+        assertEquals("TYPE_NOTIFICATION_STATE_CHANGED", AccessibilityEvent.eventTypeToString(
+                AccessibilityEvent.TYPE_NOTIFICATION_STATE_CHANGED));
+        assertEquals("TYPE_TOUCH_EXPLORATION_GESTURE_END", AccessibilityEvent.eventTypeToString(
+                AccessibilityEvent.TYPE_TOUCH_EXPLORATION_GESTURE_END));
+        assertEquals("TYPE_TOUCH_EXPLORATION_GESTURE_START", AccessibilityEvent.eventTypeToString(
+                AccessibilityEvent.TYPE_TOUCH_EXPLORATION_GESTURE_START));
+        assertEquals("TYPE_VIEW_CLICKED", AccessibilityEvent.eventTypeToString(
+                AccessibilityEvent.TYPE_VIEW_CLICKED));
+        assertEquals("TYPE_VIEW_FOCUSED", AccessibilityEvent.eventTypeToString(
+                AccessibilityEvent.TYPE_VIEW_FOCUSED));
+        assertEquals("TYPE_VIEW_HOVER_ENTER",
+                AccessibilityEvent.eventTypeToString(AccessibilityEvent.TYPE_VIEW_HOVER_ENTER));
+        assertEquals("TYPE_VIEW_HOVER_EXIT", AccessibilityEvent.eventTypeToString(
+                AccessibilityEvent.TYPE_VIEW_HOVER_EXIT));
+        assertEquals("TYPE_VIEW_LONG_CLICKED", AccessibilityEvent.eventTypeToString(
+                AccessibilityEvent.TYPE_VIEW_LONG_CLICKED));
+        assertEquals("TYPE_VIEW_SCROLLED", AccessibilityEvent.eventTypeToString(
+                AccessibilityEvent.TYPE_VIEW_SCROLLED));
+        assertEquals("TYPE_VIEW_SELECTED", AccessibilityEvent.eventTypeToString(
+                AccessibilityEvent.TYPE_VIEW_SELECTED));
+        assertEquals("TYPE_VIEW_TEXT_CHANGED", AccessibilityEvent.eventTypeToString(
+                AccessibilityEvent .TYPE_VIEW_TEXT_CHANGED));
+        assertEquals("TYPE_VIEW_TEXT_SELECTION_CHANGED", AccessibilityEvent.eventTypeToString(
+                AccessibilityEvent.TYPE_VIEW_TEXT_SELECTION_CHANGED));
+        assertEquals("TYPE_WINDOW_CONTENT_CHANGED", AccessibilityEvent.eventTypeToString(
+                AccessibilityEvent.TYPE_WINDOW_CONTENT_CHANGED));
+        assertEquals("TYPE_WINDOW_STATE_CHANGED", AccessibilityEvent.eventTypeToString(
+                AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED));
     }
+
+    /**
+     * Tests whether the event describes its contents consistently.
+     */
+    @SmallTest
+    public void testDescribeContents() {
+        AccessibilityEvent event = AccessibilityEvent.obtain();
+        assertSame("Accessibility events always return 0 for this method.", 0,
+                event.describeContents());
+        fullyPopulateAccessibilityEvent(event);
+        assertSame("Accessibility events always return 0 for this method.", 0,
+                event.describeContents());
+    }
+
+    /**
+     * Tests whether accessibility events are correctly written and
+     * read from a parcel (version 2).
+     */
+    @SmallTest
+    public void testMarshaling2() {
+        AccessibilityEvent marshaledEvent = AccessibilityEvent.obtain();
+        fullyPopulateAccessibilityEvent(marshaledEvent);
+        Parcel parcel = Parcel.obtain();
+        marshaledEvent.writeToParcel(parcel, 0);
+        parcel.setDataPosition(0);
+        AccessibilityEvent unmarshaledEvent = AccessibilityEvent.obtain();
+        unmarshaledEvent.initFromParcel(parcel);
+        assertEqualsAccessiblityEvent(marshaledEvent, unmarshaledEvent);
+    }
+
+
 
     /**
      * Fully populates the {@link AccessibilityEvent} to marshal.
      *
      * @param sentEvent The event to populate.
      */
-    private void fullyPopulateSentAccessibilityEvent(AccessibilityEvent sentEvent) {
+    private void fullyPopulateAccessibilityEvent(AccessibilityEvent sentEvent) {
         sentEvent.setAddedCount(1);
         sentEvent.setBeforeText("BeforeText");
         sentEvent.setChecked(true);
@@ -130,31 +181,23 @@ public class AccessibilityEventTest extends TestCase {
         sentEvent.getText().add("Foo");
         sentEvent.setMaxScrollX(1);
         sentEvent.setMaxScrollY(1);
+        sentEvent.setScrollX(1);
+        sentEvent.setScrollY(1);
+        sentEvent.setToIndex(1);
+        sentEvent.setScrollable(true);
 
         AccessibilityRecord record = AccessibilityRecord.obtain();
-        record.setAddedCount(1);
-        record.setBeforeText("BeforeText");
-        record.setChecked(true);
-        record.setClassName("foo.bar.baz.Class");
-        record.setContentDescription("ContentDescription");
-        record.setCurrentItemIndex(1);
-        record.setEnabled(true);
-        record.setFromIndex(1);
-        record.setFullScreen(true);
-        record.setItemCount(1);
-        record.setParcelableData(Message.obtain(null, 1, 2, 3));
-        record.setPassword(true);
-        record.setRemovedCount(1);
-        record.getText().add("Foo");
+        AccessibilityRecordTest.fullyPopulateAccessibilityRecord(record);
         sentEvent.appendRecord(record);
     }
+
 
     /**
      * Compares all properties of the <code>expectedEvent</code> and the
      * <code>receviedEvent</code> to verify that the received event is the one
      * that is expected.
      */
-    public static void assertEqualsAccessiblityEvent(AccessibilityEvent expectedEvent,
+    private static void assertEqualsAccessiblityEvent(AccessibilityEvent expectedEvent,
             AccessibilityEvent receivedEvent) {
         assertEquals("addedCount has incorrect value", expectedEvent.getAddedCount(), receivedEvent
                 .getAddedCount());
@@ -182,63 +225,28 @@ public class AccessibilityEventTest extends TestCase {
                 .isPassword());
         assertEquals("removedCount has incorrect value", expectedEvent.getRemovedCount(),
                 receivedEvent.getRemovedCount());
-        assertEqualsText(expectedEvent.getText(), receivedEvent.getText());
+        AccessibilityRecordTest.assertEqualsText(expectedEvent.getText(), receivedEvent.getText());
         assertEquals("must have one record", expectedEvent.getRecordCount(),
                 receivedEvent.getRecordCount());
         assertSame("maxScrollX has incorect value", expectedEvent.getMaxScrollX(),
                 receivedEvent.getMaxScrollX());
         assertSame("maxScrollY has incorect value", expectedEvent.getMaxScrollY(),
                 receivedEvent.getMaxScrollY());
+        assertSame("scrollX has incorect value", expectedEvent.getScrollX(),
+                receivedEvent.getScrollX());
+        assertSame("scrollY has incorect value", expectedEvent.getScrollY(),
+                receivedEvent.getScrollY());
+        assertSame("toIndex has incorect value", expectedEvent.getToIndex(),
+                receivedEvent.getToIndex());
+        assertSame("scrollable has incorect value", expectedEvent.isScrollable(),
+                receivedEvent.isScrollable());
+        assertSame("parcelableData has incorect value",
+                ((Message) expectedEvent.getParcelableData()).what,
+                ((Message) receivedEvent.getParcelableData()).what);
 
         AccessibilityRecord expectedRecord = expectedEvent.getRecord(0);
         AccessibilityRecord receivedRecord = receivedEvent.getRecord(0);
-
-        assertEquals("addedCount has incorrect value", expectedRecord.getAddedCount(),
-                receivedRecord.getAddedCount());
-        assertEquals("beforeText has incorrect value", expectedRecord.getBeforeText(),
-                receivedRecord.getBeforeText());
-        assertEquals("checked has incorrect value", expectedRecord.isChecked(),
-                receivedRecord.isChecked());
-        assertEquals("className has incorrect value", expectedRecord.getClassName(),
-                receivedRecord.getClassName());
-        assertEquals("contentDescription has incorrect value",
-                expectedRecord.getContentDescription(), receivedRecord.getContentDescription());
-        assertEquals("currentItemIndex has incorrect value", expectedRecord.getCurrentItemIndex(),
-                receivedRecord.getCurrentItemIndex());
-        assertEquals("enabled has incorrect value", expectedRecord.isEnabled(),
-                receivedRecord.isEnabled());
-        assertEquals("fromIndex has incorrect value", expectedRecord.getFromIndex(),
-                receivedRecord.getFromIndex());
-        assertEquals("fullScreen has incorrect value", expectedRecord.isFullScreen(),
-                receivedRecord.isFullScreen());
-        assertEquals("itemCount has incorrect value", expectedRecord.getItemCount(),
-                receivedRecord.getItemCount());
-        assertEquals("password has incorrect value", expectedRecord.isPassword(),
-                receivedRecord.isPassword());
-        assertEquals("removedCount has incorrect value", expectedRecord.getRemovedCount(),
-                receivedRecord.getRemovedCount());
-        assertEqualsText(expectedRecord.getText(), receivedRecord.getText());
-    }
-
-    /**
-     * Compares the text of the <code>expectedEvent</code> and
-     * <code>receivedEvent</code> by comparing the string representation of the
-     * corresponding {@link CharSequence}s.
-     */
-    public static void assertEqualsText(List<CharSequence> expectedText,
-            List<CharSequence> receivedText ) {
-        String message = "text has incorrect value";
-
-        TestCase.assertEquals(message, expectedText.size(), receivedText.size());
-
-        Iterator<CharSequence> expectedTextIterator = expectedText.iterator();
-        Iterator<CharSequence> receivedTextIterator = receivedText.iterator();
-
-        for (int i = 0; i < expectedText.size(); i++) {
-            // compare the string representation
-            TestCase.assertEquals(message, expectedTextIterator.next().toString(),
-                    receivedTextIterator.next().toString());
-        }
+        AccessibilityRecordTest.assertEqualAccessibilityRecord(expectedEvent, receivedRecord);
     }
 
     /**
@@ -246,21 +254,10 @@ public class AccessibilityEventTest extends TestCase {
      *
      * @param event The event to check.
      */
-    public static void assertAccessibilityEventCleared(AccessibilityEvent event) {
-        TestCase.assertEquals("addedCount not properly recycled", -1, event.getAddedCount());
-        TestCase.assertNull("beforeText not properly recycled", event.getBeforeText());
-        TestCase.assertNull("className not properly recycled", event.getClassName());
-        TestCase.assertNull("contentDescription not properly recycled", event
-                .getContentDescription());
-        TestCase.assertEquals("currentItemIndex not properly recycled", -1, event
-                .getCurrentItemIndex());
+    private static void assertAccessibilityEventCleared(AccessibilityEvent event) {
+        AccessibilityRecordTest.assertAccessibilityRecordCleared(event);
         TestCase.assertEquals("eventTime not properly recycled", 0, event.getEventTime());
         TestCase.assertEquals("eventType not properly recycled", 0, event.getEventType());
-        TestCase.assertEquals("fromIndex not properly recycled", -1, event.getFromIndex());
-        TestCase.assertEquals("itemCount not properly recycled", -1, event.getItemCount());
         TestCase.assertNull("packageName not properly recycled", event.getPackageName());
-        TestCase.assertNull("parcelableData not properly recycled", event.getParcelableData());
-        TestCase.assertEquals("removedCount not properly recycled", -1, event.getRemovedCount());
-        TestCase.assertTrue("text not properly recycled", event.getText().isEmpty());
     }
 }

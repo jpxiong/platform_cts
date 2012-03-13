@@ -44,6 +44,10 @@ class TestPackageDef implements ITestPackageDef {
     public static final String HOST_SIDE_ONLY_TEST = "hostSideOnly";
     public static final String NATIVE_TEST = "native";
     public static final String VM_HOST_TEST = "vmHostTest";
+    public static final String ACCESSIBILITY_TEST =
+        "com.android.cts.tradefed.testtype.AccessibilityTestRunner";
+    public static final String ACCESSIBILITYSERVICE_TEST =
+        "com.android.cts.tradefed.testtype.AccessibilityServiceTestRunner";
 
     private static final String SIGNATURE_TEST_METHOD = "testSignature";
     private static final String SIGNATURE_TEST_CLASS = "android.tests.sigtest.SimpleSignatureTest";
@@ -207,6 +211,12 @@ class TestPackageDef implements ITestPackageDef {
             return vmHostTest;
         } else if (NATIVE_TEST.equals(mTestType)) {
             return new GeeTest(mUri, mName);
+        } else if (ACCESSIBILITY_TEST.equals(mTestType)) {
+            AccessibilityTestRunner test = new AccessibilityTestRunner();
+            return setInstrumentationTest(test, testCaseDir);
+        } else if (ACCESSIBILITYSERVICE_TEST.equals(mTestType)) {
+            AccessibilityServiceTestRunner test = new AccessibilityServiceTestRunner();
+            return setInstrumentationTest(test, testCaseDir);
         } else if (mIsSignatureTest) {
             // TODO: hardcode the runner/class/method for now, since current package xml points to
             // specialized instrumentation. Eventually this special case for signatureTest can be

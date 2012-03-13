@@ -17,16 +17,19 @@
 package android.accessibilityservice.cts;
 
 import android.accessibilityservice.AccessibilityServiceInfo;
+import android.app.Service;
 import android.os.Parcel;
+import android.test.AndroidTestCase;
 import android.test.suitebuilder.annotation.SmallTest;
 import android.view.accessibility.AccessibilityEvent;
+import android.view.accessibility.AccessibilityManager;
 
-import junit.framework.TestCase;
+import java.util.List;
 
 /**
  * Class for testing {@link AccessibilityServiceInfo}.
  */
-public class AccessibilityServiceInfoTest extends TestCase {
+public class AccessibilityServiceInfoTest extends AndroidTestCase {
 
     @SmallTest
     public void testMarshalling() throws Exception {
@@ -47,6 +50,80 @@ public class AccessibilityServiceInfoTest extends TestCase {
     }
 
     /**
+     * Tests whether the service info describes its contents consistently.
+     */
+    @SmallTest
+    public void testDescribeContents() {
+        AccessibilityServiceInfo info = new AccessibilityServiceInfo();
+        assertSame("Accessibility service info always return 0 for this method.", 0,
+                info.describeContents());
+        fullyPopulateSentAccessibilityServiceInfo(info);
+        assertSame("Accessibility service infos always return 0 for this method.", 0,
+                info.describeContents());
+    }
+
+    /**
+     * Tests whether a feedback type is correctly transformed to a string.
+     */
+    @SmallTest
+    public void testFeedbackTypeToString() {
+        assertEquals("[FEEDBACK_AUDIBLE]", AccessibilityServiceInfo.feedbackTypeToString(
+                AccessibilityServiceInfo.FEEDBACK_AUDIBLE));
+        assertEquals("[FEEDBACK_GENERIC]", AccessibilityServiceInfo.feedbackTypeToString(
+                AccessibilityServiceInfo.FEEDBACK_GENERIC));
+        assertEquals("[FEEDBACK_HAPTIC]", AccessibilityServiceInfo.feedbackTypeToString(
+                AccessibilityServiceInfo.FEEDBACK_HAPTIC));
+        assertEquals("[FEEDBACK_SPOKEN]", AccessibilityServiceInfo.feedbackTypeToString(
+                AccessibilityServiceInfo.FEEDBACK_SPOKEN));
+        assertEquals("[FEEDBACK_VISUAL]", AccessibilityServiceInfo.feedbackTypeToString(
+                AccessibilityServiceInfo.FEEDBACK_VISUAL));
+        assertEquals("[FEEDBACK_SPOKEN, FEEDBACK_HAPTIC, FEEDBACK_AUDIBLE, FEEDBACK_VISUAL,"
+                + " FEEDBACK_GENERIC]", AccessibilityServiceInfo.feedbackTypeToString(
+                        AccessibilityServiceInfo.FEEDBACK_ALL_MASK));
+    }
+
+    /**
+     * Tests whether a flag is correctly transformed to a string.
+     */
+    @SmallTest
+    public void testFlagToString() {
+        assertEquals("DEFAULT", AccessibilityServiceInfo.flagToString(
+                AccessibilityServiceInfo.DEFAULT));
+    }
+
+    /**
+     * Tests whether a service can that requested it can retrieve
+     * window content.
+     */
+    @SmallTest
+    @SuppressWarnings("deprecation")
+    public void testAccessibilityServiceInfoForEnabledService() {
+        AccessibilityManager accessibilityManager = (AccessibilityManager)
+            getContext().getSystemService(Service.ACCESSIBILITY_SERVICE);
+        List<AccessibilityServiceInfo> enabledServices =
+            accessibilityManager.getEnabledAccessibilityServiceList(
+                    AccessibilityServiceInfo.FEEDBACK_GENERIC);
+        assertSame("There should be one generic service.", 1, enabledServices.size());
+        AccessibilityServiceInfo speakingService = enabledServices.get(0);
+        assertSame(AccessibilityEvent.TYPES_ALL_MASK, speakingService.eventTypes);
+        assertSame(AccessibilityServiceInfo.FEEDBACK_GENERIC, speakingService.feedbackType);
+        assertSame(AccessibilityServiceInfo.DEFAULT, speakingService.flags);
+        assertSame(50l, speakingService.notificationTimeout);
+        assertEquals("Delegating Accessibility Service", speakingService.getDescription());
+        assertNull(speakingService.packageNames /*all packages*/);
+        assertNotNull(speakingService.getId());
+        assertTrue(speakingService.getCanRetrieveWindowContent());
+        assertEquals("android.accessibilityservice.delegate.SomeActivity",
+                speakingService.getSettingsActivityName());
+        assertEquals("Delegating Accessibility Service",
+                speakingService.loadDescription(getContext().getPackageManager()));
+        assertEquals("android.accessibilityservice.delegate",
+                speakingService.getResolveInfo().serviceInfo.packageName);
+        assertEquals("android.accessibilityservice.delegate.DelegatingAccessibilityService",
+                speakingService.getResolveInfo().serviceInfo.name);
+    }
+
+    /**
      * Fully populates the {@link AccessibilityServiceInfo} to marshal.
      *
      * @param sentInfo The service info to populate.
@@ -63,7 +140,7 @@ public class AccessibilityServiceInfoTest extends TestCase {
 
     /**
      * Compares all properties of the <code>sentInfo</code> and the
-     * <code>receviedInfo</code> to make sure marshalling is correctly
+     * <code>receviedInfo</code> to make sure marshaling is correctly
      * implemented.
      */
     private void assertAllFieldsProperlyMarshalled(AccessibilityServiceInfo sentInfo,
