@@ -25,6 +25,7 @@ import android.preference.ListPreference;
 import android.preference.Preference;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceCategory;
+import android.preference.PreferenceGroup;
 import android.preference.PreferenceScreen;
 import android.preference.SwitchPreference;
 
@@ -111,5 +112,15 @@ public class PreferenceFromCodeActivity extends PreferenceActivity {
         listPref.setTitle(R.string.title_list_preference);
         listPref.setSummary(R.string.summary_list_preference);
         dialogBasedPrefCat.addPreference(listPref);
+
+        PreferenceGroup prefGroup = new PreferenceCategory(this);
+        prefGroup.setTitle(R.string.preference_group_title);
+        prefGroup.setKey("pref-group");
+        mPrefScreen.addPreference(prefGroup);
+
+        CustomPreferenceGroup customPrefGroup = new CustomPreferenceGroup(this);
+        customPrefGroup.setTitle(R.string.custom_preference_group_title);
+        customPrefGroup.setKey("custom-pref-group");
+        mPrefScreen.addPreference(customPrefGroup);
     }
 }

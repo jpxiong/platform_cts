@@ -30,6 +30,7 @@
         </activity>
         <activity android:name="android.preference2.cts.PreferencesFromXml" />
         <activity android:name="android.preference2.cts.PreferenceWithHeaders" />
+        <activity android:name="android.preference2.cts.FragmentPreferences" />
     </application>
 
     <!-- This is a self-instrumenting test package. -->

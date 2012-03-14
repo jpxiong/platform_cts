@@ -103,4 +103,9 @@
 
     <string name="cust_title_dialog_preference">Custom Dialog preference</string>
     <string name="cust_dialogtitle_dialog_preference">Custom Dialog Title</string>
+
+    <string name="preference_group_title">Preference Group Title</string>
+    <string name="custom_preference_group_title">Custom Preference Group</string>
+
+    <string name="custom_preference">Custom Preference</string>
 </resources>
