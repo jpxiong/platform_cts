@@ -58,6 +58,9 @@ public class TestHtmlConstants {
 
     public static final String LOCAL_FILESYSTEM_URL = "file:///etc/hosts";
 
+    public static final String PARAM_ASSET_URL = "webkit/test_queryparam.html";
+    public static final String ANCHOR_ASSET_URL = "webkit/test_anchor.html";
+
     // Must match the title of the page at
     // android/frameworks/base/core/res/res/raw/loaderror.html
     public static final String WEBPAGE_NOT_AVAILABLE_TITLE = "Webpage not available";
