@@ -19,8 +19,6 @@ package android.widget.cts;
 import com.android.cts.stub.R;
 import com.android.internal.util.FastMath;
 
-import android.graphics.Path;
-import android.graphics.RectF;
 import dalvik.annotation.TestLevel;
 import dalvik.annotation.TestTargetClass;
 import dalvik.annotation.TestTargetNew;
@@ -38,7 +36,9 @@ import android.content.res.Resources.NotFoundException;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.Path;
 import android.graphics.Rect;
+import android.graphics.RectF;
 import android.graphics.Typeface;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
@@ -56,8 +56,8 @@ import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.TextPaint;
 import android.text.TextUtils;
-import android.text.TextWatcher;
 import android.text.TextUtils.TruncateAt;
+import android.text.TextWatcher;
 import android.text.method.ArrowKeyMovementMethod;
 import android.text.method.DateKeyListener;
 import android.text.method.DateTimeKeyListener;
@@ -70,22 +70,22 @@ import android.text.method.PasswordTransformationMethod;
 import android.text.method.QwertyKeyListener;
 import android.text.method.SingleLineTransformationMethod;
 import android.text.method.TextKeyListener;
+import android.text.method.TextKeyListener.Capitalize;
 import android.text.method.TimeKeyListener;
 import android.text.method.TransformationMethod;
-import android.text.method.TextKeyListener.Capitalize;
 import android.text.style.URLSpan;
 import android.text.style.cts.MockURLSpanTestActivity;
 import android.text.util.Linkify;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
 import android.view.ContextMenu;
+import android.view.ContextMenu.ContextMenuInfo;
 import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.View;
-import android.view.ViewGroup;
-import android.view.ContextMenu.ContextMenuInfo;
 import android.view.View.OnCreateContextMenuListener;
 import android.view.View.OnLongClickListener;
+import android.view.ViewGroup;
 import android.view.animation.cts.DelayedCheck;
 import android.view.inputmethod.BaseInputConnection;
 import android.view.inputmethod.EditorInfo;
@@ -3972,16 +3972,21 @@ public class TextViewTest extends ActivityInstrumentationTestCase2<TextViewStubA
         method = "isInputMethodTarget",
         args = {}
     )
-    @UiThreadTest
-    public void testIsInputMethodTarget() {
+    public void testIsInputMethodTarget() throws Throwable {
         mTextView = findTextView(R.id.textview_text);
         assertFalse(mTextView.isInputMethodTarget());
 
         assertFalse(mTextView.isFocused());
-        mTextView.setFocusable(true);
-        mTextView.requestFocus();
-        assertTrue(mTextView.isFocused());
+        runTestOnUiThread(new Runnable() {
+           @Override
+            public void run() {
+               mTextView.setFocusable(true);
+               mTextView.requestFocus();
+            }
+        });
+        mInstrumentation.waitForIdleSync();
 
+        assertTrue(mTextView.isFocused());
         assertTrue(mTextView.isInputMethodTarget());
     }
 
