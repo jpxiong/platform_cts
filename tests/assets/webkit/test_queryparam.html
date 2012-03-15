@@ -1,0 +1,17 @@
+<html>
+  <head>
+    <title>PASSING QUERY PARAM FAILED</title>
+  </head>
+  <body>
+    <script>
+      query = window.location.search.substring(1);
+      args = query.split('&');
+      param = new Array();
+      for (var i = 0; i < args.length; i++) {
+        tokens = args[i].split('=');
+        param[tokens[0]]=tokens[1];
+      }
+      if (param['val']) document.title = param['val'];
+    </script>
+  </body>
+</html>
