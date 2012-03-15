@@ -28,7 +28,6 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.os.ResultReceiver;
 import android.test.ActivityInstrumentationTestCase2;
-import android.test.UiThreadTest;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.Window;
@@ -146,16 +145,21 @@ public class InputMethodManagerTest
             args = {IBinder.class, int.class, int.class}
         )
     })
-    @UiThreadTest
-    public void testInputMethodManager() {
+    public void testInputMethodManager() throws Throwable {
         Window window = mActivity.getWindow();
-        EditText view = (EditText) window.findViewById(R.id.entry);
-        assertTrue(view.requestFocus());
+        final EditText view = (EditText) window.findViewById(R.id.entry);
+        runTestOnUiThread(new Runnable() {
+           @Override
+            public void run() {
+               view.requestFocus();
+            }
+        });
+        getInstrumentation().waitForIdleSync();
         assertTrue(view.isFocused());
 
         BaseInputConnection connection = new BaseInputConnection(view, false);
         Context context = mInstrumentation.getTargetContext();
-        InputMethodManager imManager = (InputMethodManager) context
+        final InputMethodManager imManager = (InputMethodManager) context
                 .getSystemService(Context.INPUT_METHOD_SERVICE);
         assertTrue(imManager.isActive());
         assertTrue(imManager.isAcceptingText());
@@ -166,34 +170,40 @@ public class InputMethodManagerTest
         connection.reportFullscreenMode(true);
         assertTrue(imManager.isFullscreenMode());
 
-        IBinder token = view.getWindowToken();
+        runTestOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                IBinder token = view.getWindowToken();
 
-        // Show and hide input method.
-        assertTrue(imManager.showSoftInput(view, InputMethodManager.SHOW_IMPLICIT));
-        assertTrue(imManager.hideSoftInputFromWindow(token, 0));
+                // Show and hide input method.
+                assertTrue(imManager.showSoftInput(view, InputMethodManager.SHOW_IMPLICIT));
+                assertTrue(imManager.hideSoftInputFromWindow(token, 0));
 
-        Handler handler = new Handler();
-        ResultReceiver receiver = new ResultReceiver(handler);
-        assertTrue(imManager.showSoftInput(view, 0, receiver));
-        receiver = new ResultReceiver(handler);
-        assertTrue(imManager.hideSoftInputFromWindow(token, 0, receiver));
+                Handler handler = new Handler();
+                ResultReceiver receiver = new ResultReceiver(handler);
+                assertTrue(imManager.showSoftInput(view, 0, receiver));
+                receiver = new ResultReceiver(handler);
+                assertTrue(imManager.hideSoftInputFromWindow(token, 0, receiver));
 
-        imManager.showSoftInputFromInputMethod(token, InputMethodManager.SHOW_FORCED);
-        imManager.hideSoftInputFromInputMethod(token, InputMethodManager.HIDE_NOT_ALWAYS);
+                imManager.showSoftInputFromInputMethod(token, InputMethodManager.SHOW_FORCED);
+                imManager.hideSoftInputFromInputMethod(token, InputMethodManager.HIDE_NOT_ALWAYS);
 
-        // status: hide to show to hide
-        imManager.toggleSoftInputFromWindow(token, 0, InputMethodManager.HIDE_NOT_ALWAYS);
-        imManager.toggleSoftInputFromWindow(token, 0, InputMethodManager.HIDE_NOT_ALWAYS);
+                // status: hide to show to hide
+                imManager.toggleSoftInputFromWindow(token, 0, InputMethodManager.HIDE_NOT_ALWAYS);
+                imManager.toggleSoftInputFromWindow(token, 0, InputMethodManager.HIDE_NOT_ALWAYS);
 
-        List<InputMethodInfo> enabledImList = imManager.getEnabledInputMethodList();
-        if (enabledImList != null && enabledImList.size() > 0) {
-            imManager.setInputMethod(token, enabledImList.get(0).getId());
-            // cannot test whether setting was successful
-        }
+                List<InputMethodInfo> enabledImList = imManager.getEnabledInputMethodList();
+                if (enabledImList != null && enabledImList.size() > 0) {
+                    imManager.setInputMethod(token, enabledImList.get(0).getId());
+                    // cannot test whether setting was successful
+                }
 
-        List<InputMethodInfo> imList = imManager.getInputMethodList();
-        if (imList != null && enabledImList != null) {
-            assertTrue(imList.size() >= enabledImList.size());
-        }
+                List<InputMethodInfo> imList = imManager.getInputMethodList();
+                if (imList != null && enabledImList != null) {
+                    assertTrue(imList.size() >= enabledImList.size());
+                }
+            }
+        });
+        getInstrumentation().waitForIdleSync();
     }
 }
