@@ -35,19 +35,27 @@ public class SeedTest extends AbstractMonkeyTest {
     private void assertOutputs(String out1, String out2) {
         Scanner s1 = new Scanner(out1);
         Scanner s2 = new Scanner(out2);
-        while (s1.hasNextLine()) {
-            assertTrue(s2.hasNextLine());
-
-            String line1 = s1.nextLine().trim();
-            String line2 = s2.nextLine().trim();
-
-            if (line1.startsWith("//[calendar_time") || line1.startsWith("## Network stats")) {
-                // Skip these lines since they have timestamps.
-                continue;
+        int numEvents = 0;
+        while (true) {
+            String line1 = getNextLine(s1);
+            String line2 = getNextLine(s2);
+            if (line1 != null || line2 != null) {
+                assertEquals(line1, line2);
+                numEvents++;
+            } else {
+                break;
             }
-
-            assertEquals(line1, line2);
         }
-        assertFalse(s2.hasNextLine());
+        assertTrue(numEvents > 0);
+    }
+
+    private String getNextLine(Scanner sc) {
+        while (sc.hasNextLine()) {
+            String line = sc.nextLine().trim();
+            if (line.startsWith(":Sending")) {
+                return line;
+            }
+        }
+        return null;
     }
 }
