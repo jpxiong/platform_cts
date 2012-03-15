@@ -157,9 +157,13 @@ public class MediaPlayerTestBase extends ActivityInstrumentationTestCase2<MediaS
      *
      * @param width width of the video to verify, or null to skip verification
      * @param height height of the video to verify, or null to skip verification
-     * @param playTime length of time to play video, or 0 to play entire video
+     * @param playTime length of time to play video, or 0 to play entire video.
+     * with a non-negative value, this method stops the playback after the length of
+     * time or the duration the video is elapsed. With a value of -1,
+     * this method simply starts the video and returns immediately without
+     * stoping the video playback.
      */
-    private void playLoadedVideo(final Integer width, final Integer height, int playTime)
+    protected void playLoadedVideo(final Integer width, final Integer height, int playTime)
             throws Exception {
         final float leftVolume = 0.5f;
         final float rightVolume = 0.5f;
@@ -197,7 +201,9 @@ public class MediaPlayerTestBase extends ActivityInstrumentationTestCase2<MediaS
         mMediaPlayer.setVolume(leftVolume, rightVolume);
 
         // waiting to complete
-        if (playTime == 0) {
+        if (playTime == -1) {
+            return;
+        } else if (playTime == 0) {
             while (mMediaPlayer.isPlaying()) {
                 Thread.sleep(SLEEP_TIME);
             }
