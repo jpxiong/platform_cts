@@ -123,9 +123,9 @@ public class MediaPlayerTest extends MediaPlayerTestBase {
             }
         });
 
-        playVideoTest(R.raw.testvideo, 352, 288);
+        loadResource(R.raw.testvideo);
+        playLoadedVideo(352, 288, -1);
 
-        mMediaPlayer.start();
         Thread.sleep(SLEEP_TIME);
 
         int posBefore = mMediaPlayer.getCurrentPosition();
@@ -152,7 +152,7 @@ public class MediaPlayerTest extends MediaPlayerTestBase {
         Thread.sleep(SLEEP_TIME);
 
         posBefore = mMediaPlayer.getCurrentPosition();
-        mMediaPlayer.setDisplay(getActivity().generateSurfaceHolder());
+        mMediaPlayer.setDisplay(getActivity().getSurfaceHolder());
         posAfter = mMediaPlayer.getCurrentPosition();
 
         assertEquals(posAfter, posBefore, tolerance);
