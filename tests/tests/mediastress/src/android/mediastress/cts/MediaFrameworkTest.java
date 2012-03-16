@@ -66,6 +66,7 @@ public class MediaFrameworkTest extends Activity implements SurfaceHolder.Callba
 
     public void onStop(Bundle icicle) {
         mWakeLock.release();
+        super.onStop();
     }
 
     public void surfaceDestroyed(SurfaceHolder holder) {
