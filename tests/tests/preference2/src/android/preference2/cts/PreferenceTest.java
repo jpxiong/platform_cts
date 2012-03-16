@@ -19,6 +19,7 @@ package android.preference2.cts;
 import android.graphics.drawable.Drawable;
 import android.preference.CheckBoxPreference;
 import android.preference.Preference;
+import android.preference.PreferenceGroup;
 import android.test.ActivityInstrumentationTestCase2;
 
 import com.android.cts.preference2.R;
@@ -176,6 +177,107 @@ public class PreferenceTest
             }
         });
         assertFalse(mPreference.getShouldDisableView());
+    }
+
+    public void testPersistInt() {
+        CustomPreference mCustomPreference = new CustomPreference(mActivity);
+        String key = "" + Math.random();
+        mCustomPreference.setKey(key);
+        PreferenceGroup mPreferenceGroup = (PreferenceGroup) mActivity.findPreference(
+                "pref-group");
+        mPreferenceGroup.addPreference(mCustomPreference);
+        try {
+            int expected = 1;
+            mCustomPreference.persistInt(expected);
+            int actual = mCustomPreference.getPersistedInt(0);
+            assertEquals(expected, actual);
+        } finally {
+            mPreferenceGroup.removePreference(mCustomPreference);
+        }
+    }
+
+    public void testPersistBoolean() {
+        CustomPreference mCustomPreference = new CustomPreference(mActivity);
+        String key = "" + Math.random();
+        mCustomPreference.setKey(key);
+        PreferenceGroup mPreferenceGroup = (PreferenceGroup) mActivity.findPreference(
+                "pref-group");
+        mPreferenceGroup.addPreference(mCustomPreference);
+        try {
+            boolean expected = true;
+            boolean result = mCustomPreference.persistBoolean(expected);
+            assertTrue(result);
+            boolean actual = mCustomPreference.getPersistedBoolean(false);
+            assertEquals(expected, actual);
+        } finally {
+            mPreferenceGroup.removePreference(mCustomPreference);
+        }
+    }
+
+    public void testPersistString() {
+        CustomPreference mCustomPreference = new CustomPreference(mActivity);
+        String key = "" + Math.random();
+        mCustomPreference.setKey(key);
+        PreferenceGroup mPreferenceGroup = (PreferenceGroup) mActivity.findPreference(
+                "pref-group");
+        mPreferenceGroup.addPreference(mCustomPreference);
+        try {
+            String expected = "a";
+            boolean result = mCustomPreference.persistString(expected);
+            assertTrue(result);
+            String actual = mCustomPreference.getPersistedString("b");
+            assertEquals(expected, actual);
+        } finally {
+            mPreferenceGroup.removePreference(mCustomPreference);
+        }
+    }
+
+    public void testPersistFloat() {
+        CustomPreference mCustomPreference = new CustomPreference(mActivity);
+        String key = "" + Math.random();
+        mCustomPreference.setKey(key);
+        PreferenceGroup mPreferenceGroup = (PreferenceGroup) mActivity.findPreference(
+                "pref-group");
+        mPreferenceGroup.addPreference(mCustomPreference);
+        try {
+            float expected = 9.999f;
+            boolean result = mCustomPreference.persistFloat(expected);
+            assertTrue(result);
+            float actual = mCustomPreference.getPersistedFloat(0.000f);
+            assertEquals(expected, actual);
+        } finally {
+            mPreferenceGroup.removePreference(mCustomPreference);
+        }
+    }
+
+    public void testPersistLong() {
+        CustomPreference mCustomPreference = new CustomPreference(mActivity);
+        String key = "" + Math.random();
+        mCustomPreference.setKey(key);
+        PreferenceGroup mPreferenceGroup = (PreferenceGroup) mActivity.findPreference(
+        "pref-group");
+        mPreferenceGroup.addPreference(mCustomPreference);
+        try {
+            long expected = 99999999l;
+            boolean result = mCustomPreference.persistLong(expected);
+            assertTrue(result);
+            long actual = mCustomPreference.getPersistedLong(10000000l);
+            assertEquals(expected, actual);
+        } finally {
+            mPreferenceGroup.removePreference(mCustomPreference);
+        }
+    }
+
+    public void testShouldCommit() {
+        CustomPreference mCustomPreference = (CustomPreference) mActivity.findPreference(
+                "custom-preference");
+        assertTrue(mCustomPreference.shouldCommit());
+    }
+
+    public void testShouldPersist() {
+        CustomPreference mCustomPreference = (CustomPreference) mActivity.findPreference(
+                "custom-preference");
+        assertTrue(mCustomPreference.shouldPersist());
     }
 }
 
