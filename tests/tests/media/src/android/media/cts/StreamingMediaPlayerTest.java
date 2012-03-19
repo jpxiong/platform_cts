@@ -22,7 +22,7 @@ import android.webkit.cts.CtsTestServer;
 /**
  * Tests of MediaPlayer streaming capabilities.
  */
-public class MediaPlayerStreamingTest extends MediaPlayerTestBase {
+public class StreamingMediaPlayerTest extends MediaPlayerTestBase {
     private CtsTestServer mServer;
 
     // Streaming RTSP video from YouTube
