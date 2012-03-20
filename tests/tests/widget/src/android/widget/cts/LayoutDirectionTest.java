@@ -33,6 +33,20 @@ public class LayoutDirectionTest extends ActivityInstrumentationTestCase2<Layout
         super(LayoutDirectionStubActivity.class);
     }
 
+    private void checkDefaultDirectionForOneLayoutWithCode(ViewGroup vg) {
+        assertEquals(LAYOUT_DIRECTION_INHERIT, vg.getLayoutDirection());
+        assertEquals(LAYOUT_DIRECTION_LTR, vg.getResolvedLayoutDirection());
+    }
+
+    @UiThreadTest
+    public void testLayoutDirectionDefaults() {
+        checkDefaultDirectionForOneLayoutWithCode(new LinearLayout(getActivity()));
+        checkDefaultDirectionForOneLayoutWithCode(new FrameLayout(getActivity()));
+        checkDefaultDirectionForOneLayoutWithCode(new TableLayout(getActivity()));
+        checkDefaultDirectionForOneLayoutWithCode(new RelativeLayout(getActivity()));
+        checkDefaultDirectionForOneLayoutWithCode(new GridLayout(getActivity()));
+    }
+
     private void checkDirectionForOneLayoutWithCode(ViewGroup vg) {
         vg.setLayoutDirection(LAYOUT_DIRECTION_LTR);
         assertEquals(LAYOUT_DIRECTION_LTR, vg.getLayoutDirection());
