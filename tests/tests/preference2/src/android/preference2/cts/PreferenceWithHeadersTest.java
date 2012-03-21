@@ -16,10 +16,6 @@
 
 package android.preference2.cts;
 
-import com.android.cts.preference2.R;
-
-import android.os.Bundle;
-import android.preference.PreferenceFragment;
 import android.test.ActivityInstrumentationTestCase2;
 
 public class PreferenceWithHeadersTest
@@ -43,13 +39,5 @@ public class PreferenceWithHeadersTest
 
     public void testOnIsHidingHeaders() {
         assertFalse(mActivity.onIsHidingHeaders());
-    }
-
-    public class PrefsOneFragment extends PreferenceFragment {
-        @Override
-        public void onCreate(Bundle savedInstanceState) {
-            super.onCreate(savedInstanceState);
-            addPreferencesFromResource(R.xml.preferences);
-        }
     }
 }

@@ -18,6 +18,7 @@ package android.preference2.cts;
 
 import android.os.Bundle;
 import android.preference.PreferenceActivity;
+import android.preference.PreferenceFragment;
 import android.widget.Button;
 import com.android.cts.preference2.R;
 import java.util.List;
@@ -30,7 +31,7 @@ import java.util.List;
 public class PreferenceWithHeaders extends PreferenceActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState); 
+        super.onCreate(savedInstanceState);
         // Add a button to the header list.
         if (hasHeaders()) {
             Button button = new Button(this);
@@ -45,6 +46,14 @@ public class PreferenceWithHeaders extends PreferenceActivity {
     @Override
     public void onBuildHeaders(List<Header> target) {
         loadHeadersFromResource(R.xml.preference_headers, target);
+    }
+
+    public static class PrefsOneFragment extends PreferenceFragment {
+        @Override
+        public void onCreate(Bundle savedInstanceState) {
+            super.onCreate(savedInstanceState);
+            addPreferencesFromResource(R.xml.preferences);
+        }
     }
 }
 
