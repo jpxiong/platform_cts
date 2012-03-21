@@ -17,6 +17,7 @@ package android.textureview.cts;
 
 import android.graphics.SurfaceTexture;
 import android.opengl.GLUtils;
+import android.util.Log;
 
 import java.lang.Thread;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -35,12 +36,10 @@ import static android.opengl.GLES20.*;
 
 public class GLProducerThread extends Thread {
     private Thread mProducerThread;
-    private final int mFrames;
-    private final int mDelayMs;
     private final Semaphore mSemaphore;
     private final SurfaceTexture mSurfaceTexture;
     private final AtomicBoolean mShouldRender;
-    private final GLRenderer mRenderer;
+    private final GLFrameRenderer mRenderer;
 
     private EGL10 mEgl;
     private EGLDisplay mEglDisplay = EGL10.EGL_NO_DISPLAY;
@@ -51,28 +50,17 @@ public class GLProducerThread extends Thread {
     private static final int EGL_CONTEXT_CLIENT_VERSION = 0x3098;
     private static final int EGL_OPENGL_ES2_BIT = 4;
 
-    public interface GLRenderer {
-        public void drawFrame(int frame);
-    }
+    public FrameStats mFrameStats;
 
-    GLProducerThread(SurfaceTexture surfaceTexture, GLRenderer renderer, AtomicBoolean shouldRender,
-            int frames, int delayMs, Semaphore semaphore) {
+    GLProducerThread(SurfaceTexture surfaceTexture, GLFrameRenderer renderer, AtomicBoolean shouldRender,  Semaphore semaphore) {
         mShouldRender = shouldRender;
-        mFrames = frames;
-        mDelayMs = delayMs;
         mSemaphore = semaphore;
         mSurfaceTexture = surfaceTexture;
         mRenderer = renderer;
     }
 
-    GLProducerThread(SurfaceTexture surfaceTexture, GLRenderer renderer, int frames, int delayMs,
-            Semaphore semaphore) {
-        this(surfaceTexture, renderer, null, frames, delayMs, semaphore);
-    }
-
-    GLProducerThread(SurfaceTexture surfaceTexture, GLRenderer renderer, AtomicBoolean shouldRender,
-            int delayMs, Semaphore semaphore) {
-        this(surfaceTexture, renderer, shouldRender, 0, delayMs, semaphore);
+    GLProducerThread(SurfaceTexture surfaceTexture, GLFrameRenderer renderer, Semaphore semaphore) {
+        this(surfaceTexture, renderer, null, semaphore);
     }
 
     private void initGL() {
@@ -143,21 +131,28 @@ public class GLProducerThread extends Thread {
     public void run() {
         initGL();
 
-        int frame = 0;
-        while (frame < mFrames || (mShouldRender != null && mShouldRender.get())) {
-            if (mRenderer != null) {
-                mRenderer.drawFrame(frame);
-            }
+        int[] width = new int[1];
+        int[] height = new int[1];
+        mEgl.eglQuerySurface(mEglDisplay, mEglSurface, mEgl.EGL_WIDTH, width);
+        mEgl.eglQuerySurface(mEglDisplay, mEglSurface, mEgl.EGL_HEIGHT, height);
+
+        mFrameStats = new FrameStats();
+
+        mRenderer.init(width[0], height[0]);
+        while (!mRenderer.isFinished() || (mShouldRender != null && mShouldRender.get())) {
+            mFrameStats.startFrame();
+            mRenderer.renderFrame();
             mEgl.eglSwapBuffers(mEglDisplay, mEglSurface);
-            Assert.assertEquals(EGL10.EGL_SUCCESS, mEgl.eglGetError());
-            try {
-                sleep(mDelayMs);
-            } catch (InterruptedException e) {
-            }
-            frame++;
+            mFrameStats.endFrame();
         }
+
+        mRenderer.shutdown();
+
+        Assert.assertEquals(EGL10.EGL_SUCCESS, mEgl.eglGetError());
+        Assert.assertEquals(GL_NO_ERROR, glGetError());
 
         mSemaphore.release();
         destroyGL();
     }
 }
+

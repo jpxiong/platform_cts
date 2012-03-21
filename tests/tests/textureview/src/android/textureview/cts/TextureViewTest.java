@@ -17,40 +17,127 @@
 package android.textureview.cts;
 
 import android.test.ActivityInstrumentationTestCase2;
+import android.util.Log;
 
 public class TextureViewTest extends
         ActivityInstrumentationTestCase2<TextureViewTestActivity> {
+
+    static final String TAG = "TextureViewTest";
 
     public TextureViewTest() {
         super(TextureViewTestActivity.class);
     }
 
     public void testTextureViewStress48Hz() {
-        TextureViewTestActivity.mFrames = 600;
-        TextureViewTestActivity.mDelayMs = 1000/48;
-        if (!getActivity().waitForCompletion())
+        int frames = 600;
+        int delayMs = 1000/48;
+        TextureViewTestActivity.mRenderer = new GLTimedFramesRenderer(frames, delayMs, true);
+        TextureViewTestActivity.mAnimateViewMs = frames * delayMs;
+        if (!getActivity().waitForCompletion(frames * delayMs * 4))
             fail("Did not complete 48Hz test.");
     }
 
     public void testTextureViewStress60Hz() {
-        TextureViewTestActivity.mFrames = 600;
-        TextureViewTestActivity.mDelayMs = 1000/60;
-        if (!getActivity().waitForCompletion())
+        int frames = 600;
+        int delayMs = 1000/60;
+        TextureViewTestActivity.mRenderer = new GLTimedFramesRenderer(frames, delayMs, true);
+        TextureViewTestActivity.mAnimateViewMs = frames * delayMs;
+        if (!getActivity().waitForCompletion(frames * delayMs * 4))
             fail("Did not complete 60Hz test.");
     }
 
     public void testTextureViewStress70Hz()  {
-        TextureViewTestActivity.mFrames = 600;
-        TextureViewTestActivity.mDelayMs = 1000/70;
-        if (!getActivity().waitForCompletion())
+        int frames = 600;
+        int delayMs = 1000/70;
+        TextureViewTestActivity.mRenderer = new GLTimedFramesRenderer(frames, delayMs, true);
+        TextureViewTestActivity.mAnimateViewMs = frames * delayMs;
+        if (!getActivity().waitForCompletion(frames * delayMs * 4))
             fail("Did not complete 70Hz test.");
     }
 
     public void testTextureViewStress200Hz() {
-        TextureViewTestActivity.mFrames = 600;
-        TextureViewTestActivity.mDelayMs = 1000/200;
-        if (!getActivity().waitForCompletion())
+        int frames = 600;
+        int delayMs = 1000/200;
+        TextureViewTestActivity.mRenderer = new GLTimedFramesRenderer(frames, delayMs, true);
+        TextureViewTestActivity.mAnimateViewMs = frames * delayMs;
+        if (!getActivity().waitForCompletion(frames * delayMs * 4))
             fail("Did not complete 200Hz test.");
+    }
+
+
+    public void runTextureUpload(int width,
+                                 int height,
+                                 int frames,
+                                 int layers,
+                                 int tileSize,
+                                 int texturesToUpload,
+                                 boolean recycleTextures,
+                                 GLTextureUploadRenderer.UploadType uploadType) {
+        GLTextureUploadRenderer renderer = new GLTextureUploadRenderer(frames,
+                                                                        layers,
+                                                                        tileSize,
+                                                                        texturesToUpload,
+                                                                        recycleTextures,
+                                                                        uploadType);
+        TextureViewTestActivity.mSurfaceWidth = width;
+        TextureViewTestActivity.mSurfaceHeight = height;
+        TextureViewTestActivity.mAnimateViewMs = 0;
+        TextureViewTestActivity.mRenderer = renderer;
+        String name = "    Layers: " + layers +
+                      "    Textures: " + texturesToUpload +
+                      "    Recycling: " + (recycleTextures ? "ON " : "OFF ") +
+                      "    Using: " + uploadType.name();
+        boolean timedOut = !getActivity().waitForCompletion(frames * 50);
+
+        Log.w(TAG, " ----------------------------------------------- ");
+        Log.w(TAG, " ------------ " + name + "  ------------- ");
+        Log.w(TAG, " ----------------------------------------------- ");
+        Log.w(TAG, " ----------  Producer frame stats  ------------- ");
+        getActivity().mProducerThread.mFrameStats.logStats(TAG);
+        Log.w(TAG, " ----------  Consumer frame stats  ------------- ");
+        getActivity().mFrameStats.logStats(TAG);
+        Log.w(TAG, " ----------  Combined stats        ------------- ");
+        Log.w(TAG, "Dropped frames: " +(getActivity().mProducerThread.mFrameStats.mUsedFrameCount -
+                                        getActivity().mFrameStats.mUsedFrameCount));
+        Log.w(TAG, " ----------------------------------------------- ");
+
+        renderer.logStats();
+        if (timedOut)
+            fail("Did not complete test.");
+    }
+
+    public void fail60fps() {
+        if (getActivity().mProducerThread.mFrameStats.mFrameAveMs > 18.0f)
+            fail("Average frame time not close enough to 60fps: " +
+                    getActivity().mProducerThread.mFrameStats.mFrameAveMs + "ms");
+        if (getActivity().mProducerThread.mFrameStats.mFramesAbove20ms > 50)
+            fail("Too many frames over 20ms: " +
+                    getActivity().mProducerThread.mFrameStats.mFramesAbove20ms);
+    }
+
+    public void fail30fps() {
+        if (getActivity().mProducerThread.mFrameStats.mFrameAveMs > 34.0f)
+            fail("Average frame time not close enough to 60fps: " +
+                    getActivity().mProducerThread.mFrameStats.mFrameAveMs + "ms");
+        if (getActivity().mProducerThread.mFrameStats.mFramesAbove35ms > 50)
+            fail("Too many frames over 20ms: " +
+                    getActivity().mProducerThread.mFrameStats.mFramesAbove20ms);
+    }
+
+    // Fail if we can't render one 256x256 layer with no texture uploads at 60Hz.
+    public void testTextureViewWithoutUploads60Hz()
+    {
+        runTextureUpload(256, 256, 610, 1, 256, 0, true,
+                GLTextureUploadRenderer.UploadType.TexSubImage2D);
+        fail60fps();
+    }
+
+    // Fail if we can't render one layer with some texture uploads at 30Hz.
+    public void testTextureViewWithUploads30Hz()
+    {
+        runTextureUpload(-1, -1, 610, 1, 256, 4, true,
+                GLTextureUploadRenderer.UploadType.TexSubImage2D);
+        fail30fps();
     }
 
 }
