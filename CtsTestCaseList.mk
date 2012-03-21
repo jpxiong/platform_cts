@@ -91,12 +91,14 @@ cts_test_packages := \
 	CtsUtilTestCases \
 	CtsViewTestCases \
 	CtsWebkitTestCases \
+	CtsWebkitSecurityTestCases \
 	CtsWidgetTestCases
 
 # All APKs that need to be scanned by the coverage utilities.
 CTS_COVERAGE_TEST_CASE_LIST := \
 	$(cts_support_packages) \
 	$(cts_test_packages)
+
 
 # Host side only tests
 cts_host_libraries := \
