@@ -194,6 +194,7 @@ public class FileSystemPermissionTest extends AndroidTestCase {
                     "/app-cache/ciq/socket",
                     "/cache/fotapkg",
                     "/cache/fotapkg/tmp",
+                    "/data/amit",
                     "/data/anr",
                     "/data/app",
                     "/data/app-private",
