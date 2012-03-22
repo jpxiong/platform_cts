@@ -1310,4 +1310,57 @@ public class SQLiteDatabaseTest extends AndroidTestCase {
         assertFalse(rslt);
         db.close();
     }
+
+    public void testEnableThenDisableWriteAheadLogging() {
+        // Enable WAL.
+        assertTrue(mDatabase.enableWriteAheadLogging());
+        assertTrue(DatabaseUtils.stringForQuery(mDatabase, "PRAGMA journal_mode", null)
+                .equalsIgnoreCase("WAL"));
+
+        // Enabling when already enabled should have no observable effect.
+        assertTrue(mDatabase.enableWriteAheadLogging());
+        assertTrue(DatabaseUtils.stringForQuery(mDatabase, "PRAGMA journal_mode", null)
+                .equalsIgnoreCase("WAL"));
+
+        // Disabling when there are no connections should work.
+        mDatabase.disableWriteAheadLogging();
+    }
+
+    public void testEnableWriteAheadLoggingShouldThrowIfTransactionInProgress() {
+        String oldJournalMode = DatabaseUtils.stringForQuery(
+                mDatabase, "PRAGMA journal_mode", null);
+
+        // Begin transaction.
+        mDatabase.beginTransaction();
+
+        try {
+            // Attempt to enable WAL should fail.
+            mDatabase.enableWriteAheadLogging();
+            fail("Expected IllegalStateException");
+        } catch (IllegalStateException ex) {
+            // expected
+        }
+
+        assertTrue(DatabaseUtils.stringForQuery(mDatabase, "PRAGMA journal_mode", null)
+                .equalsIgnoreCase(oldJournalMode));
+    }
+
+    public void testDisableWriteAheadLoggingShouldThrowIfTransactionInProgress() {
+        // Enable WAL.
+        assertTrue(mDatabase.enableWriteAheadLogging());
+
+        // Begin transaction.
+        mDatabase.beginTransaction();
+
+        try {
+            // Attempt to disable WAL should fail.
+            mDatabase.disableWriteAheadLogging();
+            fail("Expected IllegalStateException");
+        } catch (IllegalStateException ex) {
+            // expected
+        }
+
+        assertTrue(DatabaseUtils.stringForQuery(mDatabase, "PRAGMA journal_mode", null)
+                .equalsIgnoreCase("WAL"));
+    }
 }
