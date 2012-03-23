@@ -1863,28 +1863,30 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
                 // variance is averaged out.
 
                 // Check if the frame interval is too large or too small.
-                double intervalMargin = 30;  // ms
+                // x100 = percent, intervalMargin should be bigger than fpsMargin considering that
+                // fps will be in the order of 10.
+                double intervalMargin = 0.9;
                 long lastArrivalTime = mFrames.get(mFrames.size() - 1);
                 double interval = arrivalTime - lastArrivalTime;
                 if (LOGV) Log.v(TAG, "Frame interval=" + interval);
                 assertTrue("Frame interval (" + interval + "ms) is too large." +
                         " mMaxFrameInterval=" + mMaxFrameInterval + "ms",
-                        interval < mMaxFrameInterval + intervalMargin);
+                        interval < mMaxFrameInterval * (1.0 + intervalMargin));
                 assertTrue("Frame interval (" + interval + "ms) is too small." +
                         " mMinFrameInterval=" + mMinFrameInterval + "ms",
-                        interval > mMinFrameInterval - intervalMargin);
+                        interval > mMinFrameInterval * (1.0 - intervalMargin));
 
                 // Check if the fps is within range.
-                double fpsMargin = 0.05;
+                double fpsMargin = 0.5; // x100 = percent
                 double avgInterval = (double)(arrivalTime - mFrames.get(0))
                         / mFrames.size();
                 double fps = 1000.0 / avgInterval;
                 assertTrue("Actual fps (" + fps + ") should be larger than " +
                            "min fps (" + mMinFps + ")",
-                           fps >= mMinFps * (1 - fpsMargin));
+                           fps >= mMinFps * (1.0 - fpsMargin));
                 assertTrue("Actual fps (" + fps + ") should be smaller than " +
                            "max fps (" + mMaxFps + ")",
-                           fps <= mMaxFps * (1 + fpsMargin));
+                           fps <= mMaxFps * (1.0 + fpsMargin));
             }
             // Add the arrival time of this frame to the list.
             mFrames.add(arrivalTime);
