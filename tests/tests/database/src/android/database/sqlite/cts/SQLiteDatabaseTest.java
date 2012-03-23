@@ -1412,4 +1412,32 @@ public class SQLiteDatabaseTest extends AndroidTestCase {
         assertTrue(DatabaseUtils.stringForQuery(mDatabase, "PRAGMA journal_mode", null)
                 .equalsIgnoreCase("WAL"));
     }
+
+    public void testEnableAndDisableForeignKeys() {
+        // Initially off.
+        assertEquals(0, DatabaseUtils.longForQuery(mDatabase, "PRAGMA foreign_keys", null));
+
+        // Enable foreign keys.
+        mDatabase.setForeignKeyConstraintsEnabled(true);
+        assertEquals(1, DatabaseUtils.longForQuery(mDatabase, "PRAGMA foreign_keys", null));
+
+        // Disable foreign keys.
+        mDatabase.setForeignKeyConstraintsEnabled(false);
+        assertEquals(0, DatabaseUtils.longForQuery(mDatabase, "PRAGMA foreign_keys", null));
+
+        // Cannot configure foreign keys if there are transactions in progress.
+        mDatabase.beginTransaction();
+        try {
+            mDatabase.setForeignKeyConstraintsEnabled(true);
+            fail("Expected IllegalStateException");
+        } catch (IllegalStateException ex) {
+            // expected
+        }
+        assertEquals(0, DatabaseUtils.longForQuery(mDatabase, "PRAGMA foreign_keys", null));
+        mDatabase.endTransaction();
+
+        // Enable foreign keys should work again after transaction complete.
+        mDatabase.setForeignKeyConstraintsEnabled(true);
+        assertEquals(1, DatabaseUtils.longForQuery(mDatabase, "PRAGMA foreign_keys", null));
+    }
 }
