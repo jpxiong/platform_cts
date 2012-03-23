@@ -92,6 +92,7 @@ public class MediaPlayerTestBase extends ActivityInstrumentationTestCase2<MediaS
      * nonfunctional Looper.
      */
     protected MediaPlayer mMediaPlayer = new MediaPlayer();
+    protected MediaPlayer mMediaPlayer2 = new MediaPlayer();
 
     public MediaPlayerTestBase() {
         super(MediaStubActivity.class);
@@ -106,9 +107,8 @@ public class MediaPlayerTestBase extends ActivityInstrumentationTestCase2<MediaS
 
     @Override
     protected void tearDown() throws Exception {
-        if (mMediaPlayer != null) {
-            mMediaPlayer.release();
-        }
+        mMediaPlayer.release();
+        mMediaPlayer2.release();
         super.tearDown();
     }
 
