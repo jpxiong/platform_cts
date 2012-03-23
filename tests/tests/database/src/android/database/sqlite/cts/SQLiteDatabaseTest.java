@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.Locale;
 
 import android.content.ContentValues;
+import android.content.Context;
 import android.database.Cursor;
 import android.database.DatabaseUtils;
 import android.database.SQLException;
@@ -1302,31 +1303,75 @@ public class SQLiteDatabaseTest extends AndroidTestCase {
 
         // attach a database and call enableWriteAheadLogging - should not be allowed
         mDatabase.execSQL("attach database ':memory:' as memoryDb");
-        boolean rslt = mDatabase.enableWriteAheadLogging();
-        assertFalse(rslt);
+        assertFalse(mDatabase.isWriteAheadLoggingEnabled());
+        assertFalse(mDatabase.enableWriteAheadLogging());
+        assertFalse(mDatabase.isWriteAheadLoggingEnabled());
+
         // enableWriteAheadLogging on memory database is not allowed
         SQLiteDatabase db = SQLiteDatabase.create(null);
-        rslt = db.enableWriteAheadLogging();
-        assertFalse(rslt);
+        assertFalse(mDatabase.isWriteAheadLoggingEnabled());
+        assertFalse(db.enableWriteAheadLogging());
+        assertFalse(mDatabase.isWriteAheadLoggingEnabled());
         db.close();
     }
 
     public void testEnableThenDisableWriteAheadLogging() {
         // Enable WAL.
+        assertFalse(mDatabase.isWriteAheadLoggingEnabled());
         assertTrue(mDatabase.enableWriteAheadLogging());
+        assertTrue(mDatabase.isWriteAheadLoggingEnabled());
         assertTrue(DatabaseUtils.stringForQuery(mDatabase, "PRAGMA journal_mode", null)
                 .equalsIgnoreCase("WAL"));
 
         // Enabling when already enabled should have no observable effect.
         assertTrue(mDatabase.enableWriteAheadLogging());
+        assertTrue(mDatabase.isWriteAheadLoggingEnabled());
         assertTrue(DatabaseUtils.stringForQuery(mDatabase, "PRAGMA journal_mode", null)
                 .equalsIgnoreCase("WAL"));
 
         // Disabling when there are no connections should work.
         mDatabase.disableWriteAheadLogging();
+        assertFalse(mDatabase.isWriteAheadLoggingEnabled());
+    }
+
+    public void testEnableThenDisableWriteAheadLoggingUsingOpenFlag() {
+        new File(mDatabase.getPath()).delete();
+        mDatabase = SQLiteDatabase.openDatabase(mDatabaseFile.getPath(), null,
+                SQLiteDatabase.CREATE_IF_NECESSARY | SQLiteDatabase.ENABLE_WRITE_AHEAD_LOGGING,
+                null);
+        assertTrue(mDatabase.isWriteAheadLoggingEnabled());
+        assertTrue(DatabaseUtils.stringForQuery(mDatabase, "PRAGMA journal_mode", null)
+                .equalsIgnoreCase("WAL"));
+
+        // Enabling when already enabled should have no observable effect.
+        assertTrue(mDatabase.enableWriteAheadLogging());
+        assertTrue(mDatabase.isWriteAheadLoggingEnabled());
+        assertTrue(DatabaseUtils.stringForQuery(mDatabase, "PRAGMA journal_mode", null)
+                .equalsIgnoreCase("WAL"));
+
+        // Disabling when there are no connections should work.
+        mDatabase.disableWriteAheadLogging();
+        assertFalse(mDatabase.isWriteAheadLoggingEnabled());
+    }
+
+    public void testEnableWriteAheadLoggingFromContextUsingModeFlag() {
+        // Without the MODE_ENABLE_WRITE_AHEAD_LOGGING flag, database opens without WAL.
+        getContext().deleteDatabase(DATABASE_FILE_NAME);
+        mDatabase = getContext().openOrCreateDatabase(DATABASE_FILE_NAME,
+                Context.MODE_PRIVATE, null);
+        assertFalse(mDatabase.isWriteAheadLoggingEnabled());
+        mDatabase.close();
+
+        // With the MODE_ENABLE_WRITE_AHEAD_LOGGING flag, database opens with WAL.
+        getContext().deleteDatabase(DATABASE_FILE_NAME);
+        mDatabase = getContext().openOrCreateDatabase(DATABASE_FILE_NAME,
+                Context.MODE_PRIVATE | Context.MODE_ENABLE_WRITE_AHEAD_LOGGING, null);
+        assertTrue(mDatabase.isWriteAheadLoggingEnabled());
+        mDatabase.close();
     }
 
     public void testEnableWriteAheadLoggingShouldThrowIfTransactionInProgress() {
+        assertFalse(mDatabase.isWriteAheadLoggingEnabled());
         String oldJournalMode = DatabaseUtils.stringForQuery(
                 mDatabase, "PRAGMA journal_mode", null);
 
@@ -1341,13 +1386,16 @@ public class SQLiteDatabaseTest extends AndroidTestCase {
             // expected
         }
 
+        assertFalse(mDatabase.isWriteAheadLoggingEnabled());
         assertTrue(DatabaseUtils.stringForQuery(mDatabase, "PRAGMA journal_mode", null)
                 .equalsIgnoreCase(oldJournalMode));
     }
 
     public void testDisableWriteAheadLoggingShouldThrowIfTransactionInProgress() {
         // Enable WAL.
+        assertFalse(mDatabase.isWriteAheadLoggingEnabled());
         assertTrue(mDatabase.enableWriteAheadLogging());
+        assertTrue(mDatabase.isWriteAheadLoggingEnabled());
 
         // Begin transaction.
         mDatabase.beginTransaction();
@@ -1360,6 +1408,7 @@ public class SQLiteDatabaseTest extends AndroidTestCase {
             // expected
         }
 
+        assertTrue(mDatabase.isWriteAheadLoggingEnabled());
         assertTrue(DatabaseUtils.stringForQuery(mDatabase, "PRAGMA journal_mode", null)
                 .equalsIgnoreCase("WAL"));
     }
