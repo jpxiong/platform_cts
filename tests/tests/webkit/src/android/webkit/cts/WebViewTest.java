@@ -1752,7 +1752,7 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
     // verify query parameters can be passed correctly to android asset files
     public void testAndroidAssetQueryParam() {
 
-        WebSettings settings = mWebView.getSettings();
+        WebSettings settings = mOnUiThread.getSettings();
         settings.setJavaScriptEnabled(true);
         // test passing a parameter
         String fileUrl = TestHtmlConstants.getFileUrl(TestHtmlConstants.PARAM_ASSET_URL+"?val=SUCCESS");
@@ -1763,7 +1763,7 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
     // verify anchors work correctly for android asset files
     public void testAndroidAssetAnchor() {
 
-        WebSettings settings = mWebView.getSettings();
+        WebSettings settings = mOnUiThread.getSettings();
         settings.setJavaScriptEnabled(true);
         // test using an anchor
         String fileUrl = TestHtmlConstants.getFileUrl(TestHtmlConstants.ANCHOR_ASSET_URL+"#anchor");
