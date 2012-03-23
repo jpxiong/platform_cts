@@ -113,6 +113,61 @@ public class MediaPlayerTest extends MediaPlayerTestBase {
         playVideoTest(R.raw.testvideo, 352, 288);
     }
 
+    public void testSetNextMediaPlayer() throws Exception {
+        AssetFileDescriptor afd = mResources.openRawResourceFd(R.raw.sine1320hz5sec);
+        try {
+            mMediaPlayer.reset();
+            mMediaPlayer.setDataSource(afd.getFileDescriptor(), afd.getStartOffset(),
+                    afd.getLength());
+            mMediaPlayer.prepare();
+            mMediaPlayer2.reset();
+            mMediaPlayer2.setDataSource(afd.getFileDescriptor(), afd.getStartOffset(),
+                    afd.getLength());
+            mMediaPlayer2.prepare();
+        } finally {
+            afd.close();
+        }
+
+        mOnCompletionCalled.reset();
+        mOnInfoCalled.reset();
+
+        mMediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+            @Override
+            public void onCompletion(MediaPlayer mp) {
+                assertEquals(mMediaPlayer, mp);
+                mOnCompletionCalled.signal();
+            }
+        });
+        mMediaPlayer2.setOnInfoListener(new MediaPlayer.OnInfoListener() {
+            @Override
+            public boolean onInfo(MediaPlayer mp, int what, int extra) {
+                assertEquals(mMediaPlayer2, mp);
+                if (what == MediaPlayer.MEDIA_INFO_STARTED_AS_NEXT) {
+                    mOnInfoCalled.signal();
+                }
+                return false;
+            }
+        });
+
+        try {
+            mMediaPlayer.setNextMediaPlayer(mMediaPlayer2);
+            mMediaPlayer.start();
+            assertTrue(mMediaPlayer.isPlaying());
+            assertFalse(mOnCompletionCalled.isSignalled());
+            assertFalse(mMediaPlayer2.isPlaying());
+            assertFalse(mOnInfoCalled.isSignalled());
+            while(mMediaPlayer.isPlaying()) {
+                Thread.sleep(SLEEP_TIME);
+            }
+            assertTrue(mMediaPlayer2.isPlaying());
+            assertTrue(mOnCompletionCalled.isSignalled());
+            assertTrue(mOnInfoCalled.isSignalled());
+        } finally {
+            mMediaPlayer.reset();
+            mMediaPlayer2.reset();
+        }
+    }
+
     /**
      * Test for reseting a surface during video playback
      * After reseting, the video should continue playing
