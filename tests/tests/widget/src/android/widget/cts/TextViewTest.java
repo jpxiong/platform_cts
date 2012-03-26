@@ -85,6 +85,7 @@ import android.view.inputmethod.BaseInputConnection;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.ExtractedText;
 import android.view.inputmethod.ExtractedTextRequest;
+import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.Scroller;
@@ -2951,7 +2952,7 @@ public class TextViewTest extends ActivityInstrumentationTestCase2<TextViewStubA
 
     @UiThreadTest
     public void testDidTouchFocusSelect() {
-        mTextView = new TextView(mActivity);
+        mTextView = new EditText(mActivity);
         assertFalse(mTextView.didTouchFocusSelect());
 
         mTextView.setFocusable(true);
@@ -2980,13 +2981,13 @@ public class TextViewTest extends ActivityInstrumentationTestCase2<TextViewStubA
 
     @UiThreadTest
     public void testTextDirectionDefault() {
-        TextView tv = new TextView(getActivity());
+        TextView tv = new TextView(mActivity);
         assertEquals(View.TEXT_DIRECTION_INHERIT, tv.getTextDirection());
     }
 
     @UiThreadTest
     public void testSetGetTextDirection() {
-        TextView tv = new TextView(getActivity());
+        TextView tv = new TextView(mActivity);
 
         tv.setTextDirection(View.TEXT_DIRECTION_FIRST_STRONG);
         assertEquals(View.TEXT_DIRECTION_FIRST_STRONG, tv.getTextDirection());
@@ -3009,7 +3010,7 @@ public class TextViewTest extends ActivityInstrumentationTestCase2<TextViewStubA
 
     @UiThreadTest
     public void testGetResolvedTextDirectionLtr() {
-        TextView tv = new TextView(getActivity());
+        TextView tv = new TextView(mActivity);
         tv.setText("this is a test");
 
         assertEquals(View.TEXT_DIRECTION_FIRST_STRONG, tv.getResolvedTextDirection());
@@ -3035,10 +3036,10 @@ public class TextViewTest extends ActivityInstrumentationTestCase2<TextViewStubA
 
     @UiThreadTest
     public void testGetResolvedTextDirectionLtrWithInheritance() {
-        LinearLayout ll = new LinearLayout(getActivity());
+        LinearLayout ll = new LinearLayout(mActivity);
         ll.setTextDirection(View.TEXT_DIRECTION_ANY_RTL);
 
-        TextView tv = new TextView(getActivity());
+        TextView tv = new TextView(mActivity);
         tv.setText("this is a test");
         ll.addView(tv);
 
@@ -3063,7 +3064,7 @@ public class TextViewTest extends ActivityInstrumentationTestCase2<TextViewStubA
 
     @UiThreadTest
     public void testGetResolvedTextDirectionRtl() {
-        TextView tv = new TextView(getActivity());
+        TextView tv = new TextView(mActivity);
         tv.setText("\u05DD\u05DE"); // hebrew
 
         assertEquals(View.TEXT_DIRECTION_FIRST_STRONG, tv.getResolvedTextDirection());
@@ -3089,10 +3090,10 @@ public class TextViewTest extends ActivityInstrumentationTestCase2<TextViewStubA
 
     @UiThreadTest
     public void testGetResolvedTextDirectionRtlWithInheritance() {
-        LinearLayout ll = new LinearLayout(getActivity());
+        LinearLayout ll = new LinearLayout(mActivity);
         ll.setTextDirection(View.TEXT_DIRECTION_FIRST_STRONG);
 
-        TextView tv = new TextView(getActivity());
+        TextView tv = new TextView(mActivity);
         tv.setText("\u05DD\u05DE"); // hebrew
         ll.addView(tv);
 
@@ -3138,10 +3139,8 @@ public class TextViewTest extends ActivityInstrumentationTestCase2<TextViewStubA
 
     @UiThreadTest
     public void testResetTextDirection() {
-        TextViewStubActivity activity = getActivity();
-
-        LinearLayout ll = (LinearLayout) activity.findViewById(R.id.layout_textviewtest);
-        TextView tv = (TextView) activity.findViewById(R.id.textview_rtl);
+        LinearLayout ll = (LinearLayout) mActivity.findViewById(R.id.layout_textviewtest);
+        TextView tv = (TextView) mActivity.findViewById(R.id.textview_rtl);
 
         ll.setTextDirection(View.TEXT_DIRECTION_RTL);
         tv.setTextDirection(View.TEXT_DIRECTION_INHERIT);
