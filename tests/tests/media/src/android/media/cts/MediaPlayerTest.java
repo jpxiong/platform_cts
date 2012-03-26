@@ -22,9 +22,11 @@ import android.content.res.AssetFileDescriptor;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.media.MediaRecorder;
+import android.media.audiofx.Visualizer;
 import android.net.Uri;
 import android.os.Environment;
 import android.os.PowerManager;
+import android.os.SystemClock;
 
 import java.io.File;
 import java.util.concurrent.CountDownLatch;
@@ -165,6 +167,71 @@ public class MediaPlayerTest extends MediaPlayerTestBase {
         } finally {
             mMediaPlayer.reset();
             mMediaPlayer2.reset();
+        }
+    }
+
+    // This test uses one mp3 that is silent but has a strong positive DC offset,
+    // and a second mp3 that is also silent but has a strong negative DC offset.
+    // If the two are played back overlapped, they will cancel each other out,
+    // and result in zeroes being detected.
+    public void testGapless() throws Exception {
+        MediaPlayer mp1 = MediaPlayer.create(mContext, R.raw.monodcpos);
+        int session = mp1.getAudioSessionId();
+        MediaPlayer mp2 = new MediaPlayer();
+        mp2.setAudioSessionId(session);
+        try {
+            AssetFileDescriptor afd = mContext.getResources().openRawResourceFd(R.raw.monodcneg);
+            mp2.setDataSource(afd.getFileDescriptor(), afd.getStartOffset(), afd.getLength());
+            afd.close();
+            mp2.prepare();
+        } catch (Exception e) {
+            assertTrue(false);
+        }
+
+        int size = 256;
+        int[] range = Visualizer.getCaptureSizeRange();
+        if (size < range[0]) {
+            size = range[0];
+        }
+        if (size > range[1]) {
+            size = range[1];
+        }
+        byte [] vizdata = new byte[size];
+        Visualizer vis  = null;
+        vis = new Visualizer(session);
+        assertTrue(vis.setCaptureSize(vizdata.length) == Visualizer.SUCCESS);
+        assertTrue(vis.setEnabled(true) == Visualizer.SUCCESS);
+        try {
+            mp1.setNextMediaPlayer(mp2);
+            mp1.start();
+            assertTrue(mp1.isPlaying());
+            assertFalse(mp2.isPlaying());
+            // allow playback to get started
+            Thread.sleep(SLEEP_TIME);
+            long start = SystemClock.elapsedRealtime();
+            // there should be no consecutive zeroes (-128) in the capture buffer
+            // for the next 8 seconds. If silence is detected right away, then
+            // the volume is probably turned all the way down (visualizer data
+            // is captured after volume adjustment).
+            boolean first = true;
+            while((SystemClock.elapsedRealtime() - start) < 8000) {
+                assertTrue(vis.getWaveForm(vizdata) == Visualizer.SUCCESS);
+                for (int i = 0; i < vizdata.length - 1; i++) {
+                    if (vizdata[i] == -128 && vizdata[i + 1] == -128) {
+                        if (first) {
+                            fail("silence detected, please increase volume and rerun test");
+                        } else {
+                            fail("gap or overlap detected");
+                        }
+                        break;
+                    }
+                }
+                first = false;
+            }
+        } finally {
+            mp1.release();
+            mp2.release();
+            vis.release();
         }
     }
 
