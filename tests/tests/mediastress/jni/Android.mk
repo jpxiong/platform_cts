@@ -24,7 +24,7 @@ LOCAL_SRC_FILES := native-media-jni.cpp
 
 LOCAL_C_INCLUDES := $(JNI_H_INCLUDE)
 
-LOCAL_CFLAGS += -Isystem/media/wilhelm/include
+LOCAL_C_INCLUDES += $(call include-path-for, wilhelm)
 
 LOCAL_SHARED_LIBRARIES := libandroid libnativehelper liblog libOpenMAXAL
 
