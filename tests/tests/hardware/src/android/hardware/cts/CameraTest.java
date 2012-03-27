@@ -309,12 +309,12 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
             Log.v(TAG, "Camera id=" + id);
             initializeMessageLooper(id);
             mCamera.startPreview();
-            testTakePictureByCamera();
+            subtestTakePictureByCamera();
             terminateMessageLooper();
         }
     }
 
-    private void testTakePictureByCamera() throws Exception {
+    private void subtestTakePictureByCamera() throws Exception {
         Size pictureSize = mCamera.getParameters().getPictureSize();
         mCamera.autoFocus(mAutoFocusCallback);
         assertTrue(waitForFocusDone());
@@ -2295,8 +2295,8 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
             Parameters parameters = mCamera.getParameters();
             boolean aeLockSupported = parameters.isAutoExposureLockSupported();
             if (aeLockSupported) {
-                testLockCommon(AUTOEXPOSURE_LOCK);
-                testLockAdditionalAE();
+                subtestLockCommon(AUTOEXPOSURE_LOCK);
+                subtestLockAdditionalAE();
             }
             terminateMessageLooper();
         }
@@ -2311,8 +2311,8 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
             Parameters parameters = mCamera.getParameters();
             boolean awbLockSupported = parameters.isAutoWhiteBalanceLockSupported();
             if (awbLockSupported) {
-                testLockCommon(AUTOWHITEBALANCE_LOCK);
-                testLockAdditionalAWB();
+                subtestLockCommon(AUTOWHITEBALANCE_LOCK);
+                subtestLockAdditionalAWB();
             }
             terminateMessageLooper();
         }
@@ -2329,13 +2329,13 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
                     parameters.isAutoWhiteBalanceLockSupported() &&
                     parameters.isAutoExposureLockSupported();
             if (locksSupported) {
-                testLockInteractions();
+                subtestLockInteractions();
             }
             terminateMessageLooper();
         }
     }
 
-    private void testLockCommon(int type) {
+    private void subtestLockCommon(int type) {
         // Verify lock is not set on open()
         assert3ALockState("Lock not released after open()", type, false);
 
@@ -2414,7 +2414,7 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
         mCamera.stopPreview();
     }
 
-    private void testLockAdditionalAE() {
+    private void subtestLockAdditionalAE() {
         // Verify that exposure compensation can be used while
         // AE lock is active
         mCamera.startPreview();
@@ -2437,7 +2437,7 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
         mCamera.stopPreview();
     }
 
-    private void testLockAdditionalAWB() {
+    private void subtestLockAdditionalAWB() {
         // Verify that switching AWB modes clears AWB lock
         mCamera.startPreview();
         Parameters parameters = mCamera.getParameters();
@@ -2465,7 +2465,7 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
         mCamera.stopPreview();
     }
 
-    private void testLockInteractions() {
+    private void subtestLockInteractions() {
         // Verify that toggling AE does not change AWB lock state
         set3ALockState(false, AUTOWHITEBALANCE_LOCK);
         set3ALockState(false, AUTOEXPOSURE_LOCK);
@@ -2702,7 +2702,7 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
             recorder.setPreviewDisplay(holder.getSurface());
             recorder.prepare();
             recorder.start();
-            testTakePictureByCamera();
+            subtestTakePictureByCamera();
             testJpegExifByCamera(true);
             testJpegThumbnailSizeByCamera(true);
             recorder.stop();
