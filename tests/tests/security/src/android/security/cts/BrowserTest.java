@@ -17,6 +17,7 @@
 package android.security.cts;
 
 import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
@@ -24,21 +25,16 @@ import android.net.Uri;
 import android.test.AndroidTestCase;
 import android.webkit.cts.CtsTestServer;
 
+import java.io.FileOutputStream;
+import java.io.OutputStreamWriter;
+import java.io.Writer;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import org.apache.http.HttpEntity;
 /**
- * Test for browsers which share state across multiple javascript intents.
- * Such browsers may be vulnerable to a data stealing attack.
- *
- * In particular, this test detects CVE-2011-2357.  Patches for CVE-2011-2357
- * are available at:
- *
- * http://android.git.kernel.org/?p=platform/packages/apps/Browser.git;a=commit;h=afa4ab1e4c1d645e34bd408ce04cadfd2e5dae1e
- * http://android.git.kernel.org/?p=platform/packages/apps/Browser.git;a=commit;h=096bae248453abe83cbb2e5a2c744bd62cdb620b
- *
- * See also: http://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2011-2357
+ * Test file for browser security issues.
  */
 public class BrowserTest extends AndroidTestCase {
     private CtsTestServer mWebServer;
@@ -57,7 +53,8 @@ public class BrowserTest extends AndroidTestCase {
 
     /**
      * Verify that no state is preserved across multiple intents sent
-     * to the browser when we reuse a browser tab.
+     * to the browser when we reuse a browser tab. If such data is preserved,
+     * then browser is vulnerable to a data stealing attack.
      *
      * In this test, we send two intents to the Android browser. The first
      * intent sets document.b2 to 1.  The second intent attempts to read
@@ -66,6 +63,12 @@ public class BrowserTest extends AndroidTestCase {
      *
      * If state is preserved across browser tabs, we ask
      * the browser to send an HTTP request to our local server.
+     *
+     * See http://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2011-2357 for
+     * vulnerability information for this test case.
+     *
+     * See commits  096bae248453abe83cbb2e5a2c744bd62cdb620b and
+     * afa4ab1e4c1d645e34bd408ce04cadfd2e5dae1e for patches for above vulnerability.
      */
     public void testTabReuse() throws InterruptedException {
         List<Intent> intents = getAllJavascriptIntents();
@@ -88,7 +91,8 @@ public class BrowserTest extends AndroidTestCase {
 
     /**
      * Verify that no state is preserved across multiple intents sent
-     * to the browser when we run out of usable browser tabs.
+     * to the browser when we run out of usable browser tabs.  If such data is
+     * preserved, then browser is vulnerable to a data stealing attack.
      *
      * In this test, we send 20 intents to the Android browser.  Each
      * intent sets the variable "document.b1" equal to 1.  If we are able
@@ -97,6 +101,12 @@ public class BrowserTest extends AndroidTestCase {
      * to the local server, recording this fact.
      *
      * Our test fails if the local server ever receives an HTTP request.
+     *
+     * See http://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2011-2357 for
+     * vulnerability information this test case.
+     *
+     * See commits  096bae248453abe83cbb2e5a2c744bd62cdb620b and
+     * afa4ab1e4c1d645e34bd408ce04cadfd2e5dae1e for patches for above vulnerability.
      */
     public void testTabExhaustion() throws InterruptedException {
         List<Intent> intents = getAllJavascriptIntents();
@@ -125,6 +135,81 @@ public class BrowserTest extends AndroidTestCase {
     }
 
     /**
+     * See Bug 6212665 for detailed information about this issue.
+     */
+    public void testBrowserPrivateDataAccess() throws Throwable {
+
+        // Create a list of all intents for http display. This includes all browsers.
+        List<Intent> intents = createAllIntents(Uri.parse("http://www.google.com"));
+        String action = "\"" + mWebServer.getBaseUri() + "/\"";
+        // test each browser
+        for (Intent intent : intents) {
+            // reset state
+            mWebServer.resetRequestState();
+            // define target file, which is supposedly protected from this app
+            String targetFile = "file://" + getTargetFilePath();
+            String html =
+                "<html><body>\n" +
+                "  <form name=\"myform\" action=" + action + " method=\"post\">\n" +
+                "  <input type='text' name='val'/>\n" +
+                "  <a href=\"javascript :submitform()\">Search</a></form>\n" +
+                "<script>\n" +
+                "  var client = new XMLHttpRequest();\n" +
+                "  client.open('GET', '" + targetFile + "');\n" +
+                "  client.onreadystatechange = function() {\n" +
+                "  if(client.readyState == 4) {\n" +
+                "    myform.val.value = client.responseText;\n" +
+                "    document.myform.submit(); \n" +
+                "  }}\n" +
+                "  client.send();\n" +
+                "</script></body></html>\n";
+            String filename = "jsfileaccess.html";
+            // create a local HTML to access protected file
+            FileOutputStream out = mContext.openFileOutput(filename,
+                                                           mContext.MODE_WORLD_READABLE);
+            Writer writer = new OutputStreamWriter(out, "UTF-8");
+            writer.write(html);
+            writer.flush();
+            writer.close();
+
+            String filepath = mContext.getFileStreamPath(filename).getAbsolutePath();
+            Uri uri = Uri.parse("file://" + filepath);
+            // do a file request
+            intent.setData(uri);
+            mContext.startActivity(intent);
+            /*
+             * Wait 5 seconds for the browser to contact the server, but
+             * fail fast if we detect the bug
+             */
+            for (int j = 0; j < 5; j++) {
+                // it seems that even when cross-origin policy prevents a file
+                // access, browser is still doing a POST sometimes, but it just
+                // sends the query part and no private data. Make sure this does not
+                // cause a false alarm.
+                if (mWebServer.getRequestEntities().size() > 0) {
+                    int len = 0;
+                    for (HttpEntity entity : mWebServer.getRequestEntities()) {
+                        len += entity.getContentLength();
+                    }
+                    final int queryLen = "val=".length();
+                    assertTrue("Failed preventing access to private data", len <= queryLen);
+                }
+                Thread.sleep(1000);
+            }
+        }
+    }
+
+    private String getTargetFilePath() throws Exception {
+        FileOutputStream out = mContext.openFileOutput("target.txt",
+                                                       mContext.MODE_WORLD_READABLE);
+        Writer writer = new OutputStreamWriter(out, "UTF-8");
+        writer.write("testing");
+        writer.flush();
+        writer.close();
+        return mContext.getFileStreamPath("target.txt").getAbsolutePath();
+    }
+
+    /**
      * This method returns a List of explicit Intents for all programs
      * which handle javascript URIs.
      */
@@ -145,7 +230,14 @@ public class BrowserTest extends AndroidTestCase {
                 + "document.location=\"" + localServerUri + "\""
                 + "};"
                 + varName + "=1";
-        Uri uri = Uri.parse(javascript);
+
+        return createAllIntents(Uri.parse(javascript));
+    }
+
+    /**
+     * Create intents for all activities that can display the given URI.
+     */
+    private List<Intent> createAllIntents(Uri uri) {
 
         Intent implicit = new Intent(Intent.ACTION_VIEW);
         implicit.setData(uri);
