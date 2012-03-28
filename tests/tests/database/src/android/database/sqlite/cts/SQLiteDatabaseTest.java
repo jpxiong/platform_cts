@@ -20,6 +20,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Locale;
+import java.util.concurrent.Semaphore;
 
 import android.content.ContentValues;
 import android.content.Context;
@@ -659,7 +660,7 @@ public class SQLiteDatabaseTest extends AndroidTestCase {
     }
 
     @SuppressWarnings("deprecation")
-    public void testYieldIfContended() {
+    public void testYieldIfContendedWhenNotContended() {
         assertFalse(mDatabase.yieldIfContended());
 
         mDatabase.execSQL("CREATE TABLE test (num INTEGER);");
@@ -684,6 +685,58 @@ public class SQLiteDatabaseTest extends AndroidTestCase {
         setNum(1);
         mDatabase.setTransactionSuccessful();
         mDatabase.endTransaction();
+    }
+
+    @SuppressWarnings("deprecation")
+    public void testYieldIfContendedWhenContended() throws Exception {
+        mDatabase.execSQL("CREATE TABLE test (num INTEGER);");
+        mDatabase.execSQL("INSERT INTO test (num) VALUES (0)");
+
+        // Begin a transaction and update a value.
+        mDatabase.beginTransaction();
+        setNum(1);
+        assertNum(1);
+
+        // On another thread, begin a transaction there.  This causes contention
+        // for use of the database.  When the main thread yields, the second thread
+        // begin its own transaction.  It should perceive the new state that was
+        // committed by the main thread when it yielded.
+        final Semaphore s = new Semaphore(0);
+        Thread t = new Thread() {
+            @Override
+            public void run() {
+                s.release(); // let main thread continue
+
+                mDatabase.beginTransaction();
+                assertNum(1);
+                setNum(2);
+                assertNum(2);
+                mDatabase.setTransactionSuccessful();
+                mDatabase.endTransaction();
+            }
+        };
+        t.start();
+
+        // Wait for thread to try to begin its transaction.
+        s.acquire();
+        Thread.sleep(500);
+
+        // Yield.  There should be contention for the database now, so yield will
+        // return true.
+        assertTrue(mDatabase.yieldIfContendedSafely());
+
+        // Since we reacquired the transaction, the other thread must have finished
+        // its transaction.  We should observe its changes and our own within this transaction.
+        assertNum(2);
+        setNum(3);
+        assertNum(3);
+
+        // Go ahead and finish the transaction.
+        mDatabase.setTransactionSuccessful();
+        mDatabase.endTransaction();
+        assertNum(3);
+
+        t.join();
     }
 
     public void testQuery() {
