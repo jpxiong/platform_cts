@@ -30,12 +30,13 @@ import java.io.InputStreamReader;
  * Verify the read system log require specific permissions.
  */
 public class NoReadLogsPermissionTest extends AndroidTestCase {
-    private static final String LOGTAG = "CTS";
-
     /**
-     * Verify that we won't get the system log without a READ_LOGS permission.
-     * <p>Requires Permission:
-     *   {@link android.Manifest.permission#READ_LOGS }.
+     * Verify that we'll only get our logs without the READ_LOGS permission.
+     *
+     * We test this by examining the logs looking for ActivityManager lines.
+     * Since ActivityManager runs as a different UID, we shouldn't see
+     * any of those log entries.
+     *
      * @throws IOException
      */
     @MediumTest
@@ -44,21 +45,22 @@ public class NoReadLogsPermissionTest extends AndroidTestCase {
         BufferedReader reader = null;
         try {
             logcatProc = Runtime.getRuntime().exec(new String[]
-                    {"logcat", "-d", "AndroidRuntime:E " + LOGTAG + ":V *:S" });
-            Log.d(LOGTAG, "no read logs permission test");
+                    {"logcat", "-d", "ActivityManager:* *:S" });
 
             reader = new BufferedReader(new InputStreamReader(logcatProc.getInputStream()));
 
-            String line;
-            final StringBuilder log = new StringBuilder();
-            String separator = System.getProperty("line.separator");
-            while ((line = reader.readLine()) != null) {
-                log.append(line);
-                log.append(separator);
+            int lineCt = 0;
+            while (reader.readLine() != null) {
+                lineCt++;
             }
 
-            // no permission get empty log
-            assertEquals(0, log.length());
+            // no permission get an empty log buffer.
+            // Logcat returns only one line:
+            // "--------- beginning of /dev/log/main"
+
+            assertEquals("Unexpected logcat entries. Are you running the "
+                       + "the latest logger.c from the Android kernel?",
+                    1, lineCt);
 
         } finally {
             if (reader != null) {
@@ -80,8 +82,6 @@ public class NoReadLogsPermissionTest extends AndroidTestCase {
                         0, status.uid);
                 assertTrue("Log file " + log.getAbsolutePath() + " should have group log.",
                         "log".equals(FileUtils.getGroupName(status.gid)));
-                assertFalse("Log file "  + log.getAbsolutePath() + " should not be world readable.",
-                        status.hasModeFlag(FileUtils.S_IROTH));
             }
         }
     }
