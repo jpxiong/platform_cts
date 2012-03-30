@@ -112,16 +112,16 @@ public class HtmlTest extends AndroidTestCase {
 
     public void testParagraphs() throws Exception {
         SpannableString s = new SpannableString("Hello world");
-        assertEquals("<p>Hello world</p>\n", Html.toHtml(s));
+        assertEquals("<p dir=ltr>Hello world</p>\n", Html.toHtml(s));
 
         s = new SpannableString("Hello world\nor something");
-        assertEquals("<p>Hello world<br>\nor something</p>\n", Html.toHtml(s));
+        assertEquals("<p dir=ltr>Hello world<br>\nor something</p>\n", Html.toHtml(s));
 
         s = new SpannableString("Hello world\n\nor something");
-        assertEquals("<p>Hello world</p>\n<p>or something</p>\n", Html.toHtml(s));
+        assertEquals("<p dir=ltr>Hello world</p>\n<p dir=ltr>or something</p>\n", Html.toHtml(s));
 
         s = new SpannableString("Hello world\n\n\nor something");
-        assertEquals("<p>Hello world<br></p>\n<p>or something</p>\n", Html.toHtml(s));
+        assertEquals("<p dir=ltr>Hello world<br></p>\n<p dir=ltr>or something</p>\n", Html.toHtml(s));
     }
 
     public void testBlockquote() throws Exception {
@@ -130,23 +130,23 @@ public class HtmlTest extends AndroidTestCase {
         SpannableString s = new SpannableString("Hello world");
         int end = s.length();
         s.setSpan(new QuoteSpan(), start, end, Spannable.SPAN_PARAGRAPH);
-        assertEquals("<blockquote><p>Hello world</p>\n</blockquote>\n", Html.toHtml(s));
+        assertEquals("<blockquote><p dir=ltr>Hello world</p>\n</blockquote>\n", Html.toHtml(s));
 
         s = new SpannableString("Hello\n\nworld");
         end = 7;
         s.setSpan(new QuoteSpan(), start, end, Spannable.SPAN_PARAGRAPH);
-        assertEquals("<blockquote><p>Hello</p>\n</blockquote>\n<p>world</p>\n", Html.toHtml(s));
+        assertEquals("<blockquote><p dir=ltr>Hello</p>\n</blockquote>\n<p dir=ltr>world</p>\n", Html.toHtml(s));
     }
 
     public void testEntities() throws Exception {
         SpannableString s = new SpannableString("Hello <&> world");
-        assertEquals("<p>Hello &lt;&amp;&gt; world</p>\n", Html.toHtml(s));
+        assertEquals("<p dir=ltr>Hello &lt;&amp;&gt; world</p>\n", Html.toHtml(s));
 
         s = new SpannableString("Hello \u03D5 world");
-        assertEquals("<p>Hello &#981; world</p>\n", Html.toHtml(s));
+        assertEquals("<p dir=ltr>Hello &#981; world</p>\n", Html.toHtml(s));
 
         s = new SpannableString("Hello  world");
-        assertEquals("<p>Hello&nbsp; world</p>\n", Html.toHtml(s));
+        assertEquals("<p dir=ltr>Hello&nbsp; world</p>\n", Html.toHtml(s));
     }
 
     public void testMarkup() throws Exception {
@@ -155,52 +155,52 @@ public class HtmlTest extends AndroidTestCase {
         SpannableString s = new SpannableString("Hello bold world");
         int end = s.length() - start;
         s.setSpan(new StyleSpan(Typeface.BOLD), start, end, SPAN_EXCLUSIVE_INCLUSIVE);
-        assertEquals("<p>Hello <b>bold</b> world</p>\n", Html.toHtml(s));
+        assertEquals("<p dir=ltr>Hello <b>bold</b> world</p>\n", Html.toHtml(s));
 
         s = new SpannableString("Hello italic world");
         end = s.length() - start;
         s.setSpan(new StyleSpan(Typeface.ITALIC), start, end, SPAN_EXCLUSIVE_INCLUSIVE);
-        assertEquals("<p>Hello <i>italic</i> world</p>\n", Html.toHtml(s));
+        assertEquals("<p dir=ltr>Hello <i>italic</i> world</p>\n", Html.toHtml(s));
 
         s = new SpannableString("Hello monospace world");
         end = s.length() - start;
         s.setSpan(new TypefaceSpan("monospace"), start, end, SPAN_EXCLUSIVE_INCLUSIVE);
-        assertEquals("<p>Hello <tt>monospace</tt> world</p>\n", Html.toHtml(s));
+        assertEquals("<p dir=ltr>Hello <tt>monospace</tt> world</p>\n", Html.toHtml(s));
 
         s = new SpannableString("Hello superscript world");
         end = s.length() - start;
         s.setSpan(new SuperscriptSpan(), start, end, SPAN_EXCLUSIVE_INCLUSIVE);
-        assertEquals("<p>Hello <sup>superscript</sup> world</p>\n", Html.toHtml(s));
+        assertEquals("<p dir=ltr>Hello <sup>superscript</sup> world</p>\n", Html.toHtml(s));
 
         s = new SpannableString("Hello subscript world");
         end = s.length() - start;
         s.setSpan(new SubscriptSpan(), start, end, SPAN_EXCLUSIVE_INCLUSIVE);
-        assertEquals("<p>Hello <sub>subscript</sub> world</p>\n", Html.toHtml(s));
+        assertEquals("<p dir=ltr>Hello <sub>subscript</sub> world</p>\n", Html.toHtml(s));
 
         s = new SpannableString("Hello underline world");
         end = s.length() - start;
         s.setSpan(new UnderlineSpan(), start, end, SPAN_EXCLUSIVE_INCLUSIVE);
-        assertEquals("<p>Hello <u>underline</u> world</p>\n", Html.toHtml(s));
+        assertEquals("<p dir=ltr>Hello <u>underline</u> world</p>\n", Html.toHtml(s));
 
         s = new SpannableString("Hello struck world");
         end = s.length() - start;
         s.setSpan(new StrikethroughSpan(), start, end, SPAN_EXCLUSIVE_INCLUSIVE);
-        assertEquals("<p>Hello <strike>struck</strike> world</p>\n", Html.toHtml(s));
+        assertEquals("<p dir=ltr>Hello <strike>struck</strike> world</p>\n", Html.toHtml(s));
 
         s = new SpannableString("Hello linky world");
         end = s.length() - start;
         s.setSpan(new URLSpan("http://www.google.com"), start, end, SPAN_EXCLUSIVE_INCLUSIVE);
         String ret = Html.toHtml(s);
-        assertEquals("<p>Hello <a href=\"http://www.google.com\">linky</a> world</p>\n", ret);
+        assertEquals("<p dir=ltr>Hello <a href=\"http://www.google.com\">linky</a> world</p>\n", ret);
     }
 
     public void testImg() throws Exception {
         Spanned s = Html.fromHtml("yes<img src=\"http://example.com/foo.gif\">no");
-        assertEquals("<p>yes<img src=\"http://example.com/foo.gif\">no</p>\n", Html.toHtml(s));
+        assertEquals("<p dir=ltr>yes<img src=\"http://example.com/foo.gif\">no</p>\n", Html.toHtml(s));
     }
 
     public void testUtf8() throws Exception {
         Spanned s = Html.fromHtml("<p>\u0124\u00eb\u0142\u0142o, world!</p>");
-        assertEquals("<p>&#292;&#235;&#322;&#322;o, world!</p>\n", Html.toHtml(s));
+        assertEquals("<p dir=ltr>&#292;&#235;&#322;&#322;o, world!</p>\n", Html.toHtml(s));
     }
 }
