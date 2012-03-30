@@ -21,7 +21,6 @@ import com.android.tradefed.build.IFolderBuildInfo;
 import com.android.tradefed.device.DeviceNotAvailableException;
 import com.android.tradefed.device.ITestDevice;
 import com.android.tradefed.log.LogUtil.CLog;
-import com.android.tradefed.targetprep.BuildError;
 import com.android.tradefed.targetprep.DeviceSetup;
 import com.android.tradefed.targetprep.ITargetPreparer;
 import com.android.tradefed.targetprep.TargetSetupError;
@@ -54,7 +53,7 @@ public class CtsRootDeviceSetup implements ITargetPreparer {
      */
     @Override
     public void setUp(ITestDevice device, IBuildInfo buildInfo) throws TargetSetupError,
-            DeviceNotAvailableException, BuildError {
+            DeviceNotAvailableException {
         if (!(buildInfo instanceof IFolderBuildInfo)) {
             throw new IllegalArgumentException("Provided buildInfo is not a IFolderBuildInfo");
         }
@@ -70,8 +69,7 @@ public class CtsRootDeviceSetup implements ITargetPreparer {
             }
 
             // perform CTS setup steps that only work if adb is root
-
-            // TODO: turn on mock locations
+            SettingsToggler.setSecureInt(device, "mock_location", 1);
             enableAccessibilityService(device, buildHelper);
             enableDeviceAdmin(device, buildHelper);
 

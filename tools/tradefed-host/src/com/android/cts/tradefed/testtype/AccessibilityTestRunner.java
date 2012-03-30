@@ -17,8 +17,10 @@
 package com.android.cts.tradefed.testtype;
 
 import com.android.cts.tradefed.build.CtsBuildHelper;
+import com.android.cts.tradefed.targetprep.SettingsToggler;
 import com.android.tradefed.build.IBuildInfo;
 import com.android.tradefed.device.DeviceNotAvailableException;
+import com.android.tradefed.device.ITestDevice;
 import com.android.tradefed.result.ITestInvocationListener;
 import com.android.tradefed.util.FileUtil;
 
@@ -70,7 +72,7 @@ public class AccessibilityTestRunner extends InstrumentationApkTest {
     }
 
     private void afterTest() throws DeviceNotAvailableException {
-        disableAccessibilityAndDelegatingService();
+        disableAccessibilityAndDelegatingService(getDevice());
         uninstallAndAssert(SOME_ACCESSIBLITY_SERVICES_PACKAGE_NAME);
     }
 
@@ -86,43 +88,22 @@ public class AccessibilityTestRunner extends InstrumentationApkTest {
     }
 
     private void enableAccessibilityAndServices() throws DeviceNotAvailableException {
-        // The properties may not be in the database, therefore they are first removed
-        // and then added with the right value. This avoid inserting the same setting
-        // more than once and also avoid parsing the result of a query shell command.
         String enabledServicesValue =
               SOME_ACCESSIBLITY_SERVICES_PACKAGE_NAME + "/" + SPEAKING_ACCESSIBLITY_SERVICE_NAME
             + ":"
             + SOME_ACCESSIBLITY_SERVICES_PACKAGE_NAME + "/" + VIBRATING_ACCESSIBLITY_SERVICE_NAME;
-        getDevice().executeShellCommand(
-                "content delete"
-                + " --uri content://settings/secure"
-                + " --where \"name='enabled_accessibility_services'\"");
-        getDevice().executeShellCommand(
-                "content insert"
-                + " --uri content://settings/secure"
-                + " --bind name:s:enabled_accessibility_services"
-                + " --bind value:s:" + enabledServicesValue);
-        getDevice().executeShellCommand(
-                "content delete"
-                + " --uri content://settings/secure"
-                + " --where \"name='accessibility_enabled'\"");
-        getDevice().executeShellCommand(
-                "content insert"
-                + " --uri content://settings/secure"
-                + " --bind name:s:accessibility_enabled"
-                + " --bind value:i:1");
+        enableAccessibilityAndServices(getDevice(), enabledServicesValue);
     }
 
-    private void disableAccessibilityAndDelegatingService() throws DeviceNotAvailableException {
-        getDevice().executeShellCommand(
-                "content update"
-                + " --uri content://settings/secure"
-                + " --bind value:s:"
-                + " --where \"name='enabled_accessibility_services'\"");
-        getDevice().executeShellCommand(
-                "content update"
-                + " --uri content://settings/secure"
-                + " --bind value:s:0"
-                + " --where \"name='accessibility_enabled'\"");
+    static void enableAccessibilityAndServices(ITestDevice device, String value)
+            throws DeviceNotAvailableException {
+        SettingsToggler.setSecureString(device, "enabled_accessibility_services", value);
+        SettingsToggler.setSecureInt(device, "accessibility_enabled", 1);
+    }
+
+    static void disableAccessibilityAndDelegatingService(ITestDevice device)
+            throws DeviceNotAvailableException {
+        SettingsToggler.updateSecureString(device, "enabled_accessibility_services", "");
+        SettingsToggler.updateSecureInt(device, "accessibility_enabled", 0);
     }
 }
