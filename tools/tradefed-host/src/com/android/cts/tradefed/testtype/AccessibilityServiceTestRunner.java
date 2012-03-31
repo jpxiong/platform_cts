@@ -17,6 +17,7 @@
 package com.android.cts.tradefed.testtype;
 
 import com.android.cts.tradefed.build.CtsBuildHelper;
+import com.android.cts.tradefed.targetprep.SettingsToggler;
 import com.android.tradefed.build.IBuildInfo;
 import com.android.tradefed.device.DeviceNotAvailableException;
 import com.android.tradefed.result.ITestInvocationListener;
@@ -67,7 +68,7 @@ public class AccessibilityServiceTestRunner extends InstrumentationApkTest {
     }
 
     private void afterTest() throws DeviceNotAvailableException {
-        disableAccessibilityAndDelegatingService();
+        AccessibilityTestRunner.disableAccessibilityAndDelegatingService(getDevice());
         uninstallAndAssert(DELEGATING_ACCESSIBLITY_SERVICE_PACKAGE_NAME);
     }
 
@@ -83,41 +84,8 @@ public class AccessibilityServiceTestRunner extends InstrumentationApkTest {
     }
 
     private void enableAccessibilityAndDelegatingService() throws DeviceNotAvailableException {
-        // The properties may not be in the database, therefore they are first removed
-        // and then added with the right value. This avoid inserting the same setting
-        // more than once and also avoid parsing the result of a query shell command.
         String componentName = DELEGATING_ACCESSIBLITY_SERVICE_PACKAGE_NAME + "/"
             + DELEGATING_ACCESSIBLITY_SERVICE_NAME;
-        getDevice().executeShellCommand(
-                "content delete"
-                + " --uri content://settings/secure"
-                + " --where \"name='enabled_accessibility_services'\"");
-        getDevice().executeShellCommand(
-                "content insert"
-                + " --uri content://settings/secure"
-                + " --bind name:s:enabled_accessibility_services"
-                + " --bind value:s:" + componentName);
-        getDevice().executeShellCommand(
-                "content delete"
-                + " --uri content://settings/secure"
-                + " --where \"name='accessibility_enabled'\"");
-        getDevice().executeShellCommand(
-                "content insert"
-                + " --uri content://settings/secure"
-                + " --bind name:s:accessibility_enabled"
-                + " --bind value:i:1");
-    }
-
-    private void disableAccessibilityAndDelegatingService() throws DeviceNotAvailableException {
-        getDevice().executeShellCommand(
-                "content update"
-                + " --uri content://settings/secure"
-                + " --bind value:s:"
-                + " --where \"name='enabled_accessibility_services'\"");
-        getDevice().executeShellCommand(
-                "content update"
-                + " --uri content://settings/secure"
-                + " --bind value:s:0"
-                + " --where \"name='accessibility_enabled'\"");
+        AccessibilityTestRunner.enableAccessibilityAndServices(getDevice(), componentName);
     }
 }
