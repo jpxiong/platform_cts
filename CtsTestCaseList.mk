@@ -73,6 +73,7 @@ cts_test_packages := \
 	CtsMediaTestCases \
 	CtsNdefTestCases \
 	CtsNetTestCases \
+	CtsOpenGLTestCases \
 	CtsOpenGlPerfTestCases \
 	CtsOsTestCases \
 	CtsPermissionTestCases \
