@@ -15,48 +15,42 @@
  */
 package android.textureview.cts;
 
-import android.animation.ObjectAnimator;
-import android.animation.AnimatorSet;
 import android.app.Activity;
+import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.graphics.SurfaceTexture;
 import android.os.Bundle;
 import android.view.TextureView;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 import junit.framework.Assert;
 
 import static android.opengl.GLES20.*;
 
-public class TextureViewTestActivity extends Activity implements TextureView.SurfaceTextureListener {
-    public static int mFrames = -1;
-    public static int mDelayMs = -1;
+public class TextureViewSnapshotTestActivity extends Activity
+        implements TextureView.SurfaceTextureListener {
+    public static int mMaxWaitDelayMs = -1;
 
     private TextureView mTexView;
     private Thread mProducerThread;
     private final Semaphore mSemaphore = new Semaphore(0);
+    private final AtomicBoolean mShouldRender = new AtomicBoolean(true);
+    private boolean mPostedSnapshotGrab = false;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Assert.assertTrue(mFrames > 0);
-        Assert.assertTrue(mDelayMs > 0);
+        Assert.assertTrue(mMaxWaitDelayMs > 0);
         mTexView = new TextureView(this);
         mTexView.setSurfaceTextureListener(this);
         setContentView(mTexView);
-        ObjectAnimator rotate = ObjectAnimator.ofFloat(mTexView, "rotationY", 180);
-        ObjectAnimator fadeIn = ObjectAnimator.ofFloat(mTexView, "alpha", 0.3f, 1f);
-        ObjectAnimator scaleY = ObjectAnimator.ofFloat(mTexView, "scaleY", 0.3f, 1f);
-        AnimatorSet animSet = new AnimatorSet();
-        animSet.play(rotate).with(fadeIn).with(scaleY);
-        animSet.setDuration(mFrames * mDelayMs);
-        animSet.start();
     }
 
     public Boolean waitForCompletion() {
         Boolean success = false;
-        int timeout = mFrames * mDelayMs * 4;
         try {
-            success = mSemaphore.tryAcquire(timeout, TimeUnit.MILLISECONDS);
+            success = mSemaphore.tryAcquire(mMaxWaitDelayMs, TimeUnit.MILLISECONDS);
         } catch (InterruptedException e) {
             Assert.fail();
         }
@@ -66,7 +60,7 @@ public class TextureViewTestActivity extends Activity implements TextureView.Sur
     @Override
     public void onSurfaceTextureAvailable(SurfaceTexture surface, int width, int height) {
         mProducerThread = new GLProducerThread(surface, new GLRendererImpl(),
-                mFrames, mDelayMs, mSemaphore);
+                mShouldRender, 1000/48, mSemaphore);
         mProducerThread.start();
     }
 
@@ -82,20 +76,21 @@ public class TextureViewTestActivity extends Activity implements TextureView.Sur
 
     @Override
     public void onSurfaceTextureUpdated(SurfaceTexture surface) {
+        if (!mPostedSnapshotGrab) {
+            Bitmap bitmap = mTexView.getBitmap();
+            Assert.assertNotNull(bitmap);
+            Assert.assertEquals(mTexView.getWidth(), bitmap.getWidth());
+            Assert.assertEquals(mTexView.getHeight(), bitmap.getHeight());
+            Assert.assertEquals(Color.RED, bitmap.getPixel(0, 0));
+            mShouldRender.set(false);
+            mPostedSnapshotGrab = true;
+        }
     }
 
-    public static class GLRendererImpl implements GLProducerThread.GLRenderer {
-        private final int numColors = 4;
-        private final float[][] color =
-            { { 1.0f, 0.0f, 0.0f },
-              { 0.0f, 1.0f, 0.0f },
-              { 0.0f, 0.0f, 1.0f },
-              { 1.0f, 1.0f, 1.0f } };
-
+    private static class GLRendererImpl implements GLProducerThread.GLRenderer {
         @Override
         public void drawFrame(int frame) {
-            int index = frame % numColors;
-            glClearColor(color[index][0], color[index][1], color[index][2], 1.0f);
+            glClearColor(1.0f, 0.0f, 0.0f, 1.0f);
             glClear(GL_COLOR_BUFFER_BIT);
         }
     }
