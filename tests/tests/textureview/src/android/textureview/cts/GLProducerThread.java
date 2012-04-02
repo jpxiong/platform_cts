@@ -19,6 +19,7 @@ import android.graphics.SurfaceTexture;
 import android.opengl.GLUtils;
 
 import java.lang.Thread;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.Semaphore;
 
 import junit.framework.Assert;
@@ -38,6 +39,8 @@ public class GLProducerThread extends Thread {
     private final int mDelayMs;
     private final Semaphore mSemaphore;
     private final SurfaceTexture mSurfaceTexture;
+    private final AtomicBoolean mShouldRender;
+    private final GLRenderer mRenderer;
 
     private EGL10 mEgl;
     private EGLDisplay mEglDisplay = EGL10.EGL_NO_DISPLAY;
@@ -48,11 +51,28 @@ public class GLProducerThread extends Thread {
     private static final int EGL_CONTEXT_CLIENT_VERSION = 0x3098;
     private static final int EGL_OPENGL_ES2_BIT = 4;
 
-    GLProducerThread(SurfaceTexture surfaceTexture, int frames, int delayMs, Semaphore semaphore) {
+    public interface GLRenderer {
+        public void drawFrame(int frame);
+    }
+
+    GLProducerThread(SurfaceTexture surfaceTexture, GLRenderer renderer, AtomicBoolean shouldRender,
+            int frames, int delayMs, Semaphore semaphore) {
+        mShouldRender = shouldRender;
         mFrames = frames;
         mDelayMs = delayMs;
         mSemaphore = semaphore;
         mSurfaceTexture = surfaceTexture;
+        mRenderer = renderer;
+    }
+
+    GLProducerThread(SurfaceTexture surfaceTexture, GLRenderer renderer, int frames, int delayMs,
+            Semaphore semaphore) {
+        this(surfaceTexture, renderer, null, frames, delayMs, semaphore);
+    }
+
+    GLProducerThread(SurfaceTexture surfaceTexture, GLRenderer renderer, AtomicBoolean shouldRender,
+            int delayMs, Semaphore semaphore) {
+        this(surfaceTexture, renderer, shouldRender, 0, delayMs, semaphore);
     }
 
     private void initGL() {
@@ -122,23 +142,19 @@ public class GLProducerThread extends Thread {
     @Override
     public void run() {
         initGL();
-        final int numColors = 4;
-        final float[][] color =
-            { { 1.0f, 0.0f, 0.0f },
-              { 0.0f, 1.0f, 0.0f },
-              { 0.0f, 0.0f, 1.0f },
-              { 1.0f, 1.0f, 1.0f } };
 
-        for (int index = 0, frame = 0;
-             frame < mFrames; index = (index + 1) % numColors, frame++) {
-            glClearColor(color[index][0], color[index][1], color[index][2], 1.0f);
-            glClear(GL_COLOR_BUFFER_BIT);
+        int frame = 0;
+        while (frame < mFrames || (mShouldRender != null && mShouldRender.get())) {
+            if (mRenderer != null) {
+                mRenderer.drawFrame(frame);
+            }
             mEgl.eglSwapBuffers(mEglDisplay, mEglSurface);
             Assert.assertEquals(EGL10.EGL_SUCCESS, mEgl.eglGetError());
             try {
                 sleep(mDelayMs);
             } catch (InterruptedException e) {
             }
+            frame++;
         }
 
         mSemaphore.release();
