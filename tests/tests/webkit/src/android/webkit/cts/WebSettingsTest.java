@@ -15,18 +15,19 @@
  */
 package android.webkit.cts;
 
+import android.content.Context;
 import android.cts.util.PollingCheck;
 import android.os.Build;
 import android.test.ActivityInstrumentationTestCase2;
 import android.util.Log;
+import android.webkit.ConsoleMessage;
 import android.webkit.MimeTypeMap;
-import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
 import android.webkit.WebSettings.LayoutAlgorithm;
 import android.webkit.WebSettings.RenderPriority;
 import android.webkit.WebSettings.TextSize;
 
-
+import java.io.FileOutputStream;
 import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -54,6 +55,7 @@ public class WebSettingsTest extends ActivityInstrumentationTestCase2<WebViewStu
     private WebSettings mSettings;
     private CtsTestServer mWebServer;
     private WebViewOnUiThread mOnUiThread;
+    private Context mContext;
 
     public WebSettingsTest() {
         super("com.android.cts.stub", WebViewStubActivity.class);
@@ -64,6 +66,7 @@ public class WebSettingsTest extends ActivityInstrumentationTestCase2<WebViewStu
         super.setUp();
         mOnUiThread = new WebViewOnUiThread(this, getActivity().getWebView());
         mSettings = mOnUiThread.getSettings();
+        mContext = getInstrumentation().getTargetContext();
     }
 
     @Override
@@ -674,6 +677,106 @@ public class WebSettingsTest extends ActivityInstrumentationTestCase2<WebViewStu
         assertEquals(TestHtmlConstants.HELLO_WORLD_TITLE, mOnUiThread.getTitle());
         mOnUiThread.loadDataAndWaitForCompletion(getNetworkImageHtml(), "text/html", null);
         assertEquals(NETWORK_IMAGE_HEIGHT, mOnUiThread.getTitle());
+    }
+
+    // Verify that an image in local file system can be loaded by an asset
+    public void testLocalImageLoads() throws Throwable {
+
+        mSettings.setJavaScriptEnabled(true);
+        // Check that local images are loaded without issues regardless of domain checkings
+        mSettings.setAllowUniversalAccessFromFileURLs(false);
+        mSettings.setAllowFileAccessFromFileURLs(false);
+        String url = TestHtmlConstants.getFileUrl(TestHtmlConstants.IMAGE_ACCESS_URL);
+        mOnUiThread.loadUrlAndWaitForCompletion(url);
+        waitForNonEmptyImage();
+        assertEquals(NETWORK_IMAGE_HEIGHT, mOnUiThread.getTitle());
+    }
+
+    // Verify that javascript cross-domain request permissions matches file domain settings
+    // for iframes
+    public void testIframesWhenAccessFromFileURLsEnabled() throws Throwable {
+
+        mSettings.setJavaScriptEnabled(true);
+        // disable universal access from files
+        mSettings.setAllowUniversalAccessFromFileURLs(false);
+        mSettings.setAllowFileAccessFromFileURLs(true);
+
+        // when cross file scripting is enabled, make sure cross domain requests succeed
+        String url = TestHtmlConstants.getFileUrl(TestHtmlConstants.IFRAME_ACCESS_URL);
+        mOnUiThread.loadUrlAndWaitForCompletion(url);
+        String iframeUrl = TestHtmlConstants.getFileUrl(TestHtmlConstants.HELLO_WORLD_URL);
+        assertEquals(iframeUrl, mOnUiThread.getTitle());
+    }
+
+    // Verify that javascript cross-domain request permissions matches file domain settings
+    // for iframes
+    public void testIframesWhenAccessFromFileURLsDisabled() throws Throwable {
+
+        mSettings.setJavaScriptEnabled(true);
+        // disable universal access from files
+        mSettings.setAllowUniversalAccessFromFileURLs(false);
+        mSettings.setAllowFileAccessFromFileURLs(false);
+
+        // when cross file scripting is disabled, make sure cross domain requests fail
+        final ChromeClient webChromeClient = new ChromeClient(mOnUiThread);
+        mOnUiThread.setWebChromeClient(webChromeClient);
+        String url = TestHtmlConstants.getFileUrl(TestHtmlConstants.IFRAME_ACCESS_URL);
+        mOnUiThread.loadUrlAndWaitForCompletion(url);
+        String iframeUrl = TestHtmlConstants.getFileUrl(TestHtmlConstants.HELLO_WORLD_URL);
+        assertFalse(iframeUrl.equals(mOnUiThread.getTitle()));
+        assertEquals(ConsoleMessage.MessageLevel.ERROR, webChromeClient.getMessageLevel(10000));
+    }
+
+    // Verify that enabling file access from file URLs enable XmlHttpRequest (XHR) across files
+    public void testXHRWhenAccessFromFileURLsEnabled() throws Throwable {
+        verifyFileXHR(true);
+    }
+
+    // Verify that disabling file access from file URLs disable XmlHttpRequest (XHR) accross files
+    public void testXHRWhenAccessFromFileURLsDisabled() throws Throwable {
+
+        final ChromeClient webChromeClient = new ChromeClient(mOnUiThread);
+        mOnUiThread.setWebChromeClient(webChromeClient);
+        verifyFileXHR(false);
+        assertEquals(ConsoleMessage.MessageLevel.ERROR, webChromeClient.getMessageLevel(10000));
+    }
+
+    // verify XHR across files matches the allowFileAccessFromFileURLs setting
+    private void verifyFileXHR(boolean enableXHR) throws Throwable {
+        // target file content
+        String target ="<html><body>target</body><html>";
+
+        String targetPath = mContext.getFileStreamPath("target.html").getAbsolutePath();
+        // local file content that use XHR to read the target file
+        String local ="" +
+            "<html><body><script>" +
+            "var client = new XMLHttpRequest();" +
+            "client.open('GET', 'file://" + targetPath + "',false);" +
+            "client.send();" +
+            "document.title = client.responseText;" +
+            "</script></body></html>";
+
+        // create files in internal storage
+        writeFile("local.html", local);
+        writeFile("target.html", target);
+
+        mSettings.setJavaScriptEnabled(true);
+        // disable universal access from files
+        mSettings.setAllowUniversalAccessFromFileURLs(false);
+        mSettings.setAllowFileAccessFromFileURLs(enableXHR);
+        String localPath = mContext.getFileStreamPath("local.html").getAbsolutePath();
+        // when cross file scripting is enabled, make sure cross domain requests succeed
+        mOnUiThread.loadUrlAndWaitForCompletion("file://" + localPath);
+        if (enableXHR) assertEquals(target, mOnUiThread.getTitle());
+        else assertFalse(target.equals(mOnUiThread.getTitle()));
+    }
+
+    // Create a private file on internal storage from the given string
+    private void writeFile(String filename, String content) throws Exception {
+
+        FileOutputStream fos = mContext.openFileOutput(filename, Context.MODE_PRIVATE);
+        fos.write(content.getBytes());
+        fos.close();
     }
 
     /**
