@@ -745,34 +745,8 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
                 "text/html", null);
         assertEquals("Hello,World!", mOnUiThread.getTitle());
 
-        // Test that JavaScript can't access cross-origin content.
-        class ConsoleMessageWebChromeClient extends WaitForProgressClient {
-            private boolean mIsMessageLevelAvailable;
-            private ConsoleMessage.MessageLevel mMessageLevel;
-
-            public ConsoleMessageWebChromeClient() {
-                super(mOnUiThread);
-            }
-
-            @Override
-            public synchronized boolean onConsoleMessage(ConsoleMessage message) {
-                mMessageLevel = message.messageLevel();
-                mIsMessageLevelAvailable = true;
-                notify();
-                return true;
-            }
-            public synchronized ConsoleMessage.MessageLevel getMessageLevel() {
-                while (!mIsMessageLevelAvailable) {
-                    try {
-                        wait();
-                    } catch (InterruptedException e) {
-                    }
-                }
-                return mMessageLevel;
-            }
-        }
         startWebServer(false);
-        final ConsoleMessageWebChromeClient webChromeClient = new ConsoleMessageWebChromeClient();
+        final ChromeClient webChromeClient = new ChromeClient(mOnUiThread);
         final String crossOriginUrl = mWebServer.getAssetUrl(TestHtmlConstants.HELLO_WORLD_URL);
         runTestOnUiThread(new Runnable() {
             @Override
@@ -787,7 +761,7 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
                         "text/html", null);
             }
         });
-        assertEquals(ConsoleMessage.MessageLevel.ERROR, webChromeClient.getMessageLevel());
+        assertEquals(ConsoleMessage.MessageLevel.ERROR, webChromeClient.getMessageLevel(10000));
     }
 
     @UiThreadTest
