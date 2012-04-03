@@ -59,6 +59,8 @@ import java.util.List;
 @TestTargetClass(AbsListView.class)
 public class AbsListViewTest extends ActivityInstrumentationTestCase2<ListViewStubActivity> {
     private final String[] mCountryList = new String[] {
+        "Argentina", "Australia", "China", "France", "Germany", "Italy", "Japan", "United States",
+        "Argentina", "Australia", "China", "France", "Germany", "Italy", "Japan", "United States",
         "Argentina", "Australia", "China", "France", "Germany", "Italy", "Japan", "United States"
     };
 
