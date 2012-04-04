@@ -107,8 +107,12 @@ public class MediaPlayerTestBase extends ActivityInstrumentationTestCase2<MediaS
 
     @Override
     protected void tearDown() throws Exception {
-        mMediaPlayer.release();
-        mMediaPlayer2.release();
+        if (mMediaPlayer != null) {
+            mMediaPlayer.release();
+        }
+        if (mMediaPlayer2 != null) {
+            mMediaPlayer2.release();
+        }
         super.tearDown();
     }
 
