@@ -178,17 +178,15 @@ public class LayoutTestActivity extends Activity {
                 return false;
             }
 
-            int w = bitmap.getWidth();
-            int h = bitmap.getHeight();
+            final int referenceSize = reference.getByteCount();
 
             ByteBuffer buffer1 = ByteBuffer.allocate(bitmap.getByteCount());
-            ByteBuffer buffer2 = ByteBuffer.allocate(reference.getByteCount());
+            ByteBuffer buffer2 = ByteBuffer.allocate(referenceSize);
 
             bitmap.copyPixelsToBuffer(buffer1);
             reference.copyPixelsToBuffer(buffer2);
 
-            final int length = w*h;
-            for (int i = 0; i < length; i++) {
+            for (int i = 0; i < referenceSize; i += 4) {
                 int pel1 = buffer1.getInt(i);
                 int pel2 = buffer2.getInt(i);
                 int dr = (pel1 & 0x000000FF) - (pel2 & 0x000000FF);
