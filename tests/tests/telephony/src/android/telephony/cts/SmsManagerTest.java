@@ -85,7 +85,9 @@ public class SmsManagerTest extends AndroidTestCase {
                     "30237",    // Fido
                     "311490",   // Virgin Mobile
                     "310000",   // Tracfone
-                    "46003"     // China Telecom
+                    "46003",    // China Telecom
+                    "311230",   // C SPire Wireless + Celluar South
+                    "310600"    // Cellcom
             );
 
     // List of network operators that doesn't support Data(binary) SMS message
