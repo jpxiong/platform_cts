@@ -13,9 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package android.opengl.cts;
 
-public class Constants {
-    public static final int SHADER = 1;
-    public static final int PROGRAM = 2;
+public class GL2JniLibOne {
+     static {
+         System.loadLibrary("opengltest");
+     }
+
+     public static native void init(int category, int subcategory);
+     public static native void step();
+
+     public static native int getAttachShaderError();
+     public static native int getLoadShaderError();
+     public static native int getProgramError();
+     public static native int getAttachedShaderCount();
 }

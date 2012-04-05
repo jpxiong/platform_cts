@@ -12,29 +12,26 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-LOCAL_PATH:= $(call my-dir)
-
+#
+# This is the shared library included by the JNI test app.
+#
+LOCAL_PATH := $(call my-dir)
 include $(CLEAR_VARS)
-
-LOCAL_PACKAGE_NAME := CtsOpenGLTestCases
-
-# Don't include this package in any target.
+LOCAL_MODULE := libopengltest
 LOCAL_MODULE_TAGS := optional
+LOCAL_SRC_FILES := common.cpp \
+                   gl2_jni_libone.cpp \
+                   attach_shader_one.cpp \
+                   attach_shader_two.cpp \
+                   attach_shader_three.cpp \
+                   attach_shader_four.cpp \
+                   attach_shader_five.cpp \
+                   attach_shader_six.cpp \
 
-# When built, explicitly put it in the data partition.
-LOCAL_MODULE_PATH := $(TARGET_OUT_DATA_APPS)
+LOCAL_C_INCLUDES := $(JNI_H_INCLUDE)
 
-# All tests should include android.test.runner.
-LOCAL_JAVA_LIBRARIES := android.test.runner
-LOCAL_JNI_SHARED_LIBRARIES := libopengltest
-LOCAL_SRC_FILES := $(call all-java-files-under, src)
-
-LOCAL_SDK_VERSION := current
-
-include $(BUILD_CTS_PACKAGE)
-
-# Include the associated library's makefile.
-include $(LOCAL_PATH)/libopengltest/Android.mk
+LOCAL_SHARED_LIBRARIES := libGLESv2 liblog
+include $(BUILD_SHARED_LIBRARY)
 
 
 

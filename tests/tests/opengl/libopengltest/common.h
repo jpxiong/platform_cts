@@ -13,9 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package android.opengl.cts;
+#ifndef _TYPE_COMMON_
+#define _TYPE_COMMON_
 
-public class Constants {
-    public static final int SHADER = 1;
-    public static final int PROGRAM = 2;
-}
+#include <GLES2/gl2.h>
+#include <GLES2/gl2ext.h>
+#include <stdio.h>
+#include <stdlib.h>
+
+GLuint loadShader(GLenum shaderType, const char* pSource);
+
+#endif

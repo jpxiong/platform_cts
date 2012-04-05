@@ -32,7 +32,7 @@ public class OpenGLES20ActivityOne extends Activity {
 
     }
 
-    public void setView(String type, int i ) {
+    public void setView(int type, int i ) {
         view = new OpenGLES20View(this,type,i);
         setContentView(view);
     }
@@ -61,10 +61,10 @@ public class OpenGLES20ActivityOne extends Activity {
 
     class OpenGLES20View extends GLSurfaceView {
 
-        public OpenGLES20View(Context context, String type, int index) {
+        public OpenGLES20View(Context context, int type, int index) {
             super(context);
             setEGLContextClientVersion(2);
-            if(type.equals(Constants.SHADER)) {
+            if(type == Constants.SHADER) {
                 if(index == 1) {
                     mRenderer = new RendererOneShaderTest();
                 }else if(index == 2) {
@@ -88,7 +88,7 @@ public class OpenGLES20ActivityOne extends Activity {
                 }else {
                     throw new RuntimeException();
                 }
-            }else if(type.equals(Constants.PROGRAM)) {
+            }else if(type == Constants.PROGRAM) {
                 if(index == 1) {
                     mRenderer = new RendererOneProgramTest();
                 }
