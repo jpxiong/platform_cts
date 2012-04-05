@@ -40,17 +40,18 @@ import android.text.Editable;
 import android.text.SpannableStringBuilder;
 import android.util.AttributeSet;
 import android.util.Xml;
+import android.view.ContextMenu.ContextMenuInfo;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.ContextMenu.ContextMenuInfo;
 import android.widget.AbsListView;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
-import android.widget.ListView;
-import android.widget.TextView;
 import android.widget.AbsListView.OnScrollListener;
 import android.widget.AbsListView.RecyclerListener;
+import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemLongClickListener;
+import android.widget.ArrayAdapter;
+import android.widget.ListAdapter;
+import android.widget.ListView;
+import android.widget.TextView;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -58,6 +59,9 @@ import java.util.List;
 
 @TestTargetClass(AbsListView.class)
 public class AbsListViewTest extends ActivityInstrumentationTestCase2<ListViewStubActivity> {
+    private final String[] mShortList = new String[] {
+        "This", "is", "short", "!",
+    };
     private final String[] mCountryList = new String[] {
         "Argentina", "Australia", "China", "France", "Germany", "Italy", "Japan", "United States",
         "Argentina", "Australia", "China", "France", "Germany", "Italy", "Japan", "United States",
@@ -68,6 +72,7 @@ public class AbsListViewTest extends ActivityInstrumentationTestCase2<ListViewSt
     private Activity mActivity;
     private Instrumentation mInstrumentation;
     private AttributeSet mAttributeSet;
+    private ArrayAdapter<String> mAdapter_short;
     private ArrayAdapter<String> mAdapter_countries;
 
     private static final float DELTA = 0.001f;
@@ -92,6 +97,8 @@ public class AbsListViewTest extends ActivityInstrumentationTestCase2<ListViewSt
         WidgetTestUtils.beginDocument(parser, "LinearLayout");
         mAttributeSet = Xml.asAttributeSet(parser);
 
+        mAdapter_short = new ArrayAdapter<String>(mActivity,
+                android.R.layout.simple_list_item_1, mShortList);
         mAdapter_countries = new ArrayAdapter<String>(mActivity,
                 android.R.layout.simple_list_item_1, mCountryList);
 
@@ -183,9 +190,13 @@ public class AbsListViewTest extends ActivityInstrumentationTestCase2<ListViewSt
     }
 
     private void setAdapter() throws Throwable {
+        setAdapter(mAdapter_countries);
+    }
+
+    private void setAdapter(final ListAdapter adapter) throws Throwable {
         runTestOnUiThread(new Runnable() {
             public void run() {
-                mListView.setAdapter(mAdapter_countries);
+                mListView.setAdapter(adapter);
             }
         });
         mInstrumentation.waitForIdleSync();
@@ -257,7 +268,7 @@ public class AbsListViewTest extends ActivityInstrumentationTestCase2<ListViewSt
         args = {android.graphics.Rect.class}
     )
     public void testGetFocusedRect() throws Throwable {
-        setAdapter();
+        setAdapter(mAdapter_short);
         setListSelection(0);
 
         Rect r1 = new Rect();
@@ -268,7 +279,7 @@ public class AbsListViewTest extends ActivityInstrumentationTestCase2<ListViewSt
         assertEquals(0, r1.left);
         assertTrue(r1.right > 0);
 
-        setListSelection(7);
+        setListSelection(3);
         Rect r2 = new Rect();
         mListView.getFocusedRect(r2);
         assertTrue(r2.top > 0);
