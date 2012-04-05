@@ -17,6 +17,7 @@ package android.media.cts;
 
 import com.android.cts.stub.R;
 
+import android.content.Context;
 import android.content.pm.PackageManager;
 import android.content.res.AssetFileDescriptor;
 import android.media.AudioManager;
@@ -175,10 +176,21 @@ public class MediaPlayerTest extends MediaPlayerTestBase {
     // If the two are played back overlapped, they will cancel each other out,
     // and result in zeroes being detected.
     public void testGapless() throws Exception {
-        MediaPlayer mp1 = MediaPlayer.create(mContext, R.raw.monodcpos);
+        MediaPlayer mp1 = new MediaPlayer();
+        mp1.setAudioStreamType(AudioManager.STREAM_MUSIC);
+        try {
+            AssetFileDescriptor afd = mContext.getResources().openRawResourceFd(R.raw.monodcneg);
+            mp1.setDataSource(afd.getFileDescriptor(), afd.getStartOffset(), afd.getLength());
+            afd.close();
+            mp1.prepare();
+        } catch (Exception e) {
+            assertTrue(false);
+        }
         int session = mp1.getAudioSessionId();
+
         MediaPlayer mp2 = new MediaPlayer();
         mp2.setAudioSessionId(session);
+        mp2.setAudioStreamType(AudioManager.STREAM_MUSIC);
         try {
             AssetFileDescriptor afd = mContext.getResources().openRawResourceFd(R.raw.monodcneg);
             mp2.setDataSource(afd.getFileDescriptor(), afd.getStartOffset(), afd.getLength());
@@ -201,6 +213,10 @@ public class MediaPlayerTest extends MediaPlayerTestBase {
         vis = new Visualizer(session);
         assertTrue(vis.setCaptureSize(vizdata.length) == Visualizer.SUCCESS);
         assertTrue(vis.setEnabled(true) == Visualizer.SUCCESS);
+        AudioManager am = (AudioManager) mContext.getSystemService(Context.AUDIO_SERVICE);
+        int oldvolume = am.getStreamVolume(AudioManager.STREAM_MUSIC);
+        int maxvolume = am.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
+        am.setStreamVolume(AudioManager.STREAM_MUSIC, maxvolume, 0);
         try {
             mp1.setNextMediaPlayer(mp2);
             mp1.start();
@@ -232,6 +248,7 @@ public class MediaPlayerTest extends MediaPlayerTestBase {
             mp1.release();
             mp2.release();
             vis.release();
+            am.setStreamVolume(AudioManager.STREAM_MUSIC, oldvolume, 0);
         }
     }
 
