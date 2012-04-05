@@ -50,6 +50,7 @@ public class FilterTest extends ActivityInstrumentationTestCase2<StubActivity> {
                 mMockFilter.filter(TEST_CONSTRAINT);
             }
         });
+        getInstrumentation().waitForIdleSync();
 
         new PollingCheck(TIME_OUT) {
             @Override
@@ -77,6 +78,7 @@ public class FilterTest extends ActivityInstrumentationTestCase2<StubActivity> {
                 mMockFilter.filter(TEST_CONSTRAINT, mockFilterListener);
             }
         });
+        getInstrumentation().waitForIdleSync();
 
         new PollingCheck(TIME_OUT) {
             @Override
