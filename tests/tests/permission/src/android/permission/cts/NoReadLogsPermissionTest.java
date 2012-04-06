@@ -50,8 +50,11 @@ public class NoReadLogsPermissionTest extends AndroidTestCase {
             reader = new BufferedReader(new InputStreamReader(logcatProc.getInputStream()));
 
             int lineCt = 0;
-            while (reader.readLine() != null) {
-                lineCt++;
+            String line;
+            while ((line = reader.readLine()) != null) {
+                if (!line.startsWith("--------- beginning of /dev/log")) {
+                    lineCt++;
+                }
             }
 
             // no permission get an empty log buffer.
@@ -60,7 +63,7 @@ public class NoReadLogsPermissionTest extends AndroidTestCase {
 
             assertEquals("Unexpected logcat entries. Are you running the "
                        + "the latest logger.c from the Android kernel?",
-                    1, lineCt);
+                    0, lineCt);
 
         } finally {
             if (reader != null) {
