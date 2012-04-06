@@ -63,7 +63,9 @@ public class NoExecutePermissionTest extends TestCase {
             }
         }
 
-        assertEquals("NX (No Execute) not enabled for heap", "rw-p", heapPermissions);
+        if (heapPermissions != null) {
+            assertEquals("NX (No Execute) not enabled for heap", "rw-p", heapPermissions);
+        }
         assertEquals("NX (No Execute) not enabled for stack", "rw-p", stackPermissions);
     }
 
