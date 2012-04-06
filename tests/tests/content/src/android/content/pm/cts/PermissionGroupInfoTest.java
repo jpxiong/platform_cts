@@ -25,8 +25,7 @@ import android.test.AndroidTestCase;
 
 public class PermissionGroupInfoTest extends AndroidTestCase {
     private static final String PERMISSIONGROUP_NAME = "android.permission-group.COST_MONEY";
-    private static final String DEFAULT_DISCRIPTION =
-        "Allow applications to do things that can cost you money.";
+    private static final String DEFAULT_DISCRIPTION = "Do things that can cost you money.";
 
     public void testPermissionGroupInfo() throws NameNotFoundException {
         PackageManager pm = getContext().getPackageManager();
