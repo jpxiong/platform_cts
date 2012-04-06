@@ -25,8 +25,7 @@ import android.test.AndroidTestCase;
 
 public class PermissionInfoTest extends AndroidTestCase {
     private static final String PERMISSION_NAME = "android.permission.INTERNET";
-    private static final String DEFAULT_DISCPRIPTION =
-        "Allows an application to create network sockets.";
+    private static final String DEFAULT_DISCPRIPTION = "Allows the app to create network sockets.";
 
     public void testPermissionInfo() throws NameNotFoundException {
         PackageManager pm = getContext().getPackageManager();
