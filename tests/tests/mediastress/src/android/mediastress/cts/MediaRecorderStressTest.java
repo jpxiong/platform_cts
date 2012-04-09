@@ -43,7 +43,7 @@ public class MediaRecorderStressTest extends ActivityInstrumentationTestCase2<Me
     private static final int NUMBER_OF_SWTICHING_LOOPS_BW_CAMERA_AND_RECORDER = 50;
     private static final long WAIT_TIME_CAMERA_TEST = 3000;  // in ms
     private static final long WAIT_TIME_RECORDER_TEST = 5000;  // in ms
-    private static final String OUTPUT_FILE = WorkDir.getTopDirString() + "temp";
+    private final String OUTPUT_FILE = WorkDir.getTopDirString() + "temp";
     private static final String OUTPUT_FILE_EXT = ".3gp";
     private static final String MEDIA_STRESS_OUTPUT ="mediaStressOutput.txt";
     private final CameraErrorCallback mCameraErrorCallback = new CameraErrorCallback();
