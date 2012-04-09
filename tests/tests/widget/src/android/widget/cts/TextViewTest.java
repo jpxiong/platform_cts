@@ -918,25 +918,25 @@ public class TextViewTest extends ActivityInstrumentationTestCase2<TextViewStubA
 
         factory.reset();
         mTextView.setText(text);
-        assertFalse(factory.getNewSpannableCalledCount());
+        assertFalse(factory.hasCalledNewSpannable());
 
         factory.reset();
         mTextView.setText(text, BufferType.EDITABLE);
-        assertFalse(factory.getNewSpannableCalledCount());
+        assertFalse(factory.hasCalledNewSpannable());
 
         factory.reset();
         mTextView.setText(text, BufferType.NORMAL);
-        assertFalse(factory.getNewSpannableCalledCount());
+        assertFalse(factory.hasCalledNewSpannable());
 
         factory.reset();
         mTextView.setText(text, BufferType.SPANNABLE);
-        assertTrue(factory.getNewSpannableCalledCount());
+        assertTrue(factory.hasCalledNewSpannable());
         assertEquals(text, factory.getSource());
 
         mTextView.setMovementMethod(LinkMovementMethod.getInstance());
         factory.reset();
         mTextView.setText(text, BufferType.NORMAL);
-        assertTrue(factory.getNewSpannableCalledCount());
+        assertTrue(factory.hasCalledNewSpannable());
         assertEquals(text, factory.getSource());
 
         try {
@@ -3520,7 +3520,7 @@ public class TextViewTest extends ActivityInstrumentationTestCase2<TextViewStubA
         private boolean mHasCalledNewSpannable;
         private CharSequence mSource;
 
-        public boolean getNewSpannableCalledCount() {
+        public boolean hasCalledNewSpannable() {
             return mHasCalledNewSpannable;
         }
 

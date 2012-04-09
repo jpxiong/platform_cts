@@ -42,36 +42,42 @@ public class SpannableStringBuilderTest extends AndroidTestCase {
     }
 
     public void testConstructor1() {
-        new SpannableStringBuilder();
-        new SpannableStringBuilder("test");
+        @SuppressWarnings("unused")
+        SpannableStringBuilder dummy = new SpannableStringBuilder();
+        dummy = new SpannableStringBuilder("test");
 
         try {
-            new SpannableStringBuilder(null);
+            dummy = new SpannableStringBuilder(null);
             fail("should throw NullPointerException");
         } catch (NullPointerException e) {
+            // expected exception
         }
     }
 
     public void testConstructor2() {
-        new SpannableStringBuilder("Text", 0, "Text".length());
-        new SpannableStringBuilder(new SpannableString("test"), 0, "Text".length());
+        @SuppressWarnings("unused")
+        SpannableStringBuilder dummy = new SpannableStringBuilder("Text", 0, "Text".length());
+        dummy = new SpannableStringBuilder(new SpannableString("test"), 0, "Text".length());
 
         try {
-            new SpannableStringBuilder("Text", 0, 10);
+            dummy = new SpannableStringBuilder("Text", 0, 10);
             fail("should throw StringIndexOutOfBoundsException");
         } catch (StringIndexOutOfBoundsException e) {
+            // expected exception
         }
 
         try {
-            new SpannableStringBuilder("Text", -3, 3);
+            dummy = new SpannableStringBuilder("Text", -3, 3);
             fail("should throw StringIndexOutOfBoundsException");
         } catch (StringIndexOutOfBoundsException e) {
+            // expected exception
         }
 
         try {
-            new SpannableStringBuilder("Text", 3, 0);
+            dummy = new SpannableStringBuilder("Text", 3, 0);
             fail("should throw StringIndexOutOfBoundsException");
         } catch (StringIndexOutOfBoundsException e) {
+            // expected exception
         }
     }
 
@@ -109,12 +115,14 @@ public class SpannableStringBuilderTest extends AndroidTestCase {
             builder.setSpan(mUnderlineSpan, 4, 1, Spanned.SPAN_INCLUSIVE_INCLUSIVE);
             fail("should throw IndexOutOfBoundsException here");
         } catch (IndexOutOfBoundsException e) {
+            // expected exception
         }
 
         try {
             builder.setSpan(mUnderlineSpan, -1, 100, Spanned.SPAN_POINT_POINT);
             fail("should throw ..IndexOutOfBoundsException here");
         } catch (IndexOutOfBoundsException e) {
+            // expected exception
         }
 
         builder.setSpan(null, 1, 4, Spanned.SPAN_POINT_POINT);
@@ -133,12 +141,14 @@ public class SpannableStringBuilderTest extends AndroidTestCase {
             SpannableStringBuilder.valueOf(null);
             fail("should throw NullPointerException here");
         } catch (NullPointerException e) {
+            // expected exception
         }
 
         try {
             SpannableStringBuilder.valueOf((SpannableStringBuilder) null);
             fail("should throw NullPointerException here");
         } catch (NullPointerException e) {
+            // expected exception
         }
 
         assertNotNull(SpannableStringBuilder.valueOf("hello, string"));
@@ -161,18 +171,21 @@ public class SpannableStringBuilderTest extends AndroidTestCase {
             builder.replace(4, 2, text);
             fail("should throw IndexOutOfBoundsException here");
         } catch (IndexOutOfBoundsException e) {
+            // expected exception
         }
 
         try {
             builder.replace(-4, 100, text);
             fail("should throw IndexOutOfBoundsException here");
         } catch (IndexOutOfBoundsException e) {
+            // expected exception
         }
 
         try {
             builder.replace(0, 1, null);
             fail("should throw NullPointerException here");
         } catch (NullPointerException e) {
+            // expected exception
         }
     }
 
@@ -216,24 +229,28 @@ public class SpannableStringBuilderTest extends AndroidTestCase {
             builder.replace(0, 5, text, 10, 3);
             fail("should throw IndexOutOfBoundsException here");
         } catch (IndexOutOfBoundsException e) {
+            // expected exception
         }
 
         try {
             builder.replace(0, 5, text, -1, 100);
             fail("should throw IndexOutOfBoundsException here");
         } catch (IndexOutOfBoundsException e) {
+            // expected exception
         }
 
         try {
             builder.replace(-1, 100, text, 10, 3);
             fail("should throw IndexOutOfBoundsException here");
         } catch (IndexOutOfBoundsException e) {
+            // expected exception
         }
 
         try {
             builder.replace(3, 1, text, -1, 100);
             fail("should throw IndexOutOfBoundsException here");
         } catch (IndexOutOfBoundsException e) {
+            // expected exception
         }
 
         // unexpected IndexOutOfBoundsException
@@ -241,6 +258,7 @@ public class SpannableStringBuilderTest extends AndroidTestCase {
             builder.replace(0, 5, null, 1, 2);
             fail("should throw IndexOutOfBoundsException here");
         } catch (IndexOutOfBoundsException e) {
+            // expected exception
         }
     }
 
@@ -254,6 +272,7 @@ public class SpannableStringBuilderTest extends AndroidTestCase {
             builder.subSequence(2, 0);
             fail("should throw IndexOutOfBoundsException here");
         } catch (IndexOutOfBoundsException e) {
+            // expected exception
         }
     }
 
@@ -272,18 +291,21 @@ public class SpannableStringBuilderTest extends AndroidTestCase {
             builder.getChars(-1, 10, buf, 1);
             fail("should throw IndexOutOfBoundsException here");
         } catch (IndexOutOfBoundsException e) {
+            // expected exception
         }
 
         try {
             builder.getChars(3, 2, buf, 0);
             fail("should throw IndexOutOfBoundsException here");
         } catch (IndexOutOfBoundsException e) {
+            // expected exception
         }
 
         try {
             builder.getChars(1, 2, null, 0);
             fail("should throw NullPointerException here");
         } catch (NullPointerException e) {
+            // expected exception
         }
     }
 
@@ -295,6 +317,7 @@ public class SpannableStringBuilderTest extends AndroidTestCase {
             builder.append(null);
             fail("should throw NullPointerException here");
         } catch (NullPointerException e) {
+            // expected exception
         }
     }
 
@@ -311,18 +334,21 @@ public class SpannableStringBuilderTest extends AndroidTestCase {
             builder.append(null, 0, 1);
             fail("should throw NullPointerException here");
         } catch (NullPointerException e) {
+            // expected exception
         }
 
         try {
             builder.append(",world", -1, 10);
             fail("should throw StringIndexOutOfBoundsException here");
         } catch (StringIndexOutOfBoundsException e) {
+            // expected exception
         }
 
         try {
             builder.append(",world", 4, 1);
             fail("should throw StringIndexOutOfBoundsException here");
         } catch (StringIndexOutOfBoundsException e) {
+            // expected exception
         }
     }
 
@@ -337,6 +363,7 @@ public class SpannableStringBuilderTest extends AndroidTestCase {
             builder.append(null);
             fail("should throw NullPointerException here");
         } catch (NullPointerException e) {
+            // expected exception
         }
     }
 
@@ -372,6 +399,7 @@ public class SpannableStringBuilderTest extends AndroidTestCase {
             builder.setFilters(null);
             fail("should throw IllegalArgumentException here");
         } catch (IllegalArgumentException e) {
+            // expected exception
         }
     }
 
@@ -421,12 +449,14 @@ public class SpannableStringBuilderTest extends AndroidTestCase {
             builder.charAt(10);
             fail("should throw IndexOutOfBoundsException");
         } catch (IndexOutOfBoundsException e) {
+            // expected exception
         }
 
         try {
             builder.charAt(-1);
             fail("should throw IndexOutOfBoundsException");
         } catch (IndexOutOfBoundsException e) {
+            // expected exception
         }
     }
 
@@ -443,30 +473,35 @@ public class SpannableStringBuilderTest extends AndroidTestCase {
             builder.insert(-1, "abcd", 1, 3);
             fail("should throw IndexOutOfBoundsException");
         } catch (IndexOutOfBoundsException e) {
+            // expected exception
         }
 
         try {
             builder.insert(100, "abcd", 1, 3);
             fail("should throw IndexOutOfBoundsException");
         } catch (IndexOutOfBoundsException e) {
+            // expected exception
         }
 
         try {
             builder.insert(1, "abcd", 3, 2);
             fail("should throw IndexOutOfBoundsException");
         } catch (IndexOutOfBoundsException e) {
+            // expected exception
         }
 
         try {
             builder.insert(1, "abcd", -3, 2);
             fail("should throw IndexOutOfBoundsException");
         } catch (IndexOutOfBoundsException e) {
+            // expected exception
         }
 
         try {
             builder.insert(0, null, 0, 1);
             fail("should throw NullPointerException");
         } catch (NullPointerException e) {
+            // expected exception
         }
     }
 
@@ -483,18 +518,21 @@ public class SpannableStringBuilderTest extends AndroidTestCase {
             builder.insert(-1, "abcd");
             fail("should throw IndexOutOfBoundsException");
         } catch (IndexOutOfBoundsException e) {
+            // expected exception
         }
 
         try {
             builder.insert(100, "abcd");
             fail("should throw IndexOutOfBoundsException");
         } catch (IndexOutOfBoundsException e) {
+            // expected exception
         }
 
         try {
             builder.insert(0, null);
             fail("should throw NullPointerException");
         } catch (NullPointerException e) {
+            // expected exception
         }
     }
 
@@ -546,12 +584,14 @@ public class SpannableStringBuilderTest extends AndroidTestCase {
             builder.delete(-1, 100);
             fail("should throw IndexOutOfBoundsException");
         } catch (IndexOutOfBoundsException e) {
+            // expected exception
         }
 
         try {
             builder.delete(4, 1);
             fail("should throw IndexOutOfBoundsException");
         } catch (IndexOutOfBoundsException e) {
+            // expected exception
         }
     }
 }
