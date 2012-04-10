@@ -49,23 +49,23 @@ public class ProviderPermissionTest extends AndroidTestCase {
     }
 
     /**
-     * Verify that read and write to contact requires permissions.
+     * Verify that reading call logs requires permissions.
      * <p>Tests Permission:
-     *   {@link android.Manifest.permission#READ_CONTACTS}
+     *   {@link android.Manifest.permission#READ_CALL_LOG}
      */
     public void testReadCallLog() {
         assertReadingContentUriRequiresPermission(CallLog.CONTENT_URI,
-                android.Manifest.permission.READ_CONTACTS);
+                android.Manifest.permission.READ_CALL_LOG);
     }
 
     /**
-     * Verify that write to contact requires permissions.
+     * Verify that writing call logs requires permissions.
      * <p>Tests Permission:
-     *   {@link android.Manifest.permission#WRITE_CONTACTS}
+     *   {@link android.Manifest.permission#WRITE_CALL_LOG}
      */
     public void testWriteCallLog() {
         assertWritingContentUriRequiresPermission(CallLog.CONTENT_URI,
-                android.Manifest.permission.WRITE_CONTACTS);
+                android.Manifest.permission.WRITE_CALL_LOG);
     }
 
     /**
