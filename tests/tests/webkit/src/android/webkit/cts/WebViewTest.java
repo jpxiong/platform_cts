@@ -1116,7 +1116,18 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
         new PollingCheck() {
             @Override
             protected boolean check() {
-                return handler.hasCalledHandleMessage();
+                boolean done = false;
+                if (handler.hasCalledHandleMessage()) {
+                    if (handler.mResultUrl != null) {
+                        done = true;
+                    } else {
+                        handler.reset();
+                        Message newMsg = new Message();
+                        newMsg.setTarget(handler);
+                        mOnUiThread.requestFocusNodeHref(newMsg);
+                    }
+                }
+                return done;
             }
         }.run();
         assertEquals(TestHtmlConstants.HTML_URL1, handler.getResultUrl());
@@ -1130,7 +1141,19 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
         new PollingCheck() {
             @Override
             protected boolean check() {
-                return handler.hasCalledHandleMessage();
+                boolean done = false;
+                if (handler.hasCalledHandleMessage()) {
+                    if (handler.mResultUrl != null &&
+                            handler.mResultUrl.equals(TestHtmlConstants.HTML_URL2)) {
+                        done = true;
+                    } else {
+                        handler.reset();
+                        Message newMsg = new Message();
+                        newMsg.setTarget(handler);
+                        mOnUiThread.requestFocusNodeHref(newMsg);
+                    }
+                }
+                return done;
             }
         }.run();
         assertEquals(TestHtmlConstants.HTML_URL2, handler.getResultUrl());
@@ -1169,7 +1192,18 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
         new PollingCheck() {
             @Override
             protected boolean check() {
-                return handler.hasCalledHandleMessage();
+                boolean done = false;
+                if (handler.hasCalledHandleMessage()) {
+                    if (handler.mResultUrl != null) {
+                        done = true;
+                    } else {
+                        handler.reset();
+                        Message newMsg = new Message();
+                        newMsg.setTarget(handler);
+                        mOnUiThread.requestImageRef(newMsg);
+                    }
+                }
+                return done;
             }
         }.run();
         assertEquals(imgUrl, handler.mResultUrl);
@@ -1588,11 +1622,11 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
             @Override
             public void onDownloadStart(String url, String userAgent, String contentDisposition,
                     String mimetype, long contentLength) {
-                this.called = true;
                 this.url = url;
                 this.mimeType = mimetype;
                 this.contentLength = contentLength;
                 this.contentDisposition = contentDisposition;
+                this.called = true;
             }
         }
 
