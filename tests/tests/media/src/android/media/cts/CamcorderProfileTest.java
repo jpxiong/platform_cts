@@ -25,6 +25,7 @@ import android.hardware.Camera;
 import android.media.CamcorderProfile;
 import android.test.AndroidTestCase;
 import android.util.Log;
+import android.content.pm.PackageManager;
 
 import java.util.List;
 
@@ -70,6 +71,10 @@ public class CamcorderProfileTest extends AndroidTestCase {
         )
     })
     public void testGet() {
+        PackageManager packageManager = mContext.getPackageManager();
+        if (!packageManager.hasSystemFeature(PackageManager.FEATURE_CAMERA)) {
+            return;
+        }
         int nCamera = Camera.getNumberOfCameras();
         if (nCamera != 0) {
             CamcorderProfile lowProfile = CamcorderProfile.get(CamcorderProfile.QUALITY_LOW);
