@@ -51,8 +51,8 @@ public class GestureStrokeTest extends TestCase {
     public void testGetPath_singlePoint() {
         GestureStroke emptyStroke = mHelper.createGestureStroke(new GesturePoint(0, 0, 0));
         Path emptyPath = emptyStroke.getPath();
-        // expect an empty path
-        assertTrue(emptyPath.isEmpty());
+        // a single point is considered a tap and is not empty
+        assertFalse(emptyPath.isEmpty());
     }
 
     /**
