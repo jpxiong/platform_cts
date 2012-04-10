@@ -24,7 +24,7 @@ LOCAL_JAVA_LIBRARIES := android.test.runner
 
 LOCAL_SRC_FILES := $(call all-java-files-under, src)
 
-LOCAL_AAPT_FLAGS = -c xx_YY -c cs -c 320dpi -c 240dpi -c 213dpi -c 160dpi -c 120dpi
+LOCAL_AAPT_FLAGS = -c land -c xx_YY -c cs -c 320dpi -c 240dpi -c 213dpi -c 160dpi -c 120dpi
 
 LOCAL_PACKAGE_NAME := CtsHoloTestCases
 
