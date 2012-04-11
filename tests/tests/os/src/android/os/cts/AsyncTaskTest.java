@@ -125,7 +125,7 @@ public class AsyncTaskTest extends InstrumentationTestCase {
         startAsyncTask();
         Thread.sleep(DURATION);
         assertFalse(mAsyncTask.cancel(false));
-        assertFalse(mAsyncTask.isCancelled());
+        assertTrue(mAsyncTask.isCancelled());
         assertFalse(mAsyncTask.isOnCancelledCalled);
         assertNull(mAsyncTask.exception);
     }
