@@ -23,6 +23,9 @@
     <!-- Using 10 for more complete NFC support... -->
     <uses-sdk android:minSdkVersion="10"></uses-sdk>
 
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <uses-permission android:name="android.permission.CHANGE_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
     <uses-permission android:name="android.permission.BLUETOOTH" />
     <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
     <uses-permission android:name="android.permission.CAMERA" />
@@ -308,6 +311,29 @@
             <meta-data android:name="test_category" android:value="@string/test_category_hardware" />
             <meta-data android:name="test_required_features" android:value="android.hardware.usb.accessory" />
         </activity>
+
+        <activity android:name=".p2p.P2pTestListActivity"
+                android:label="@string/p2p_test"
+                android:configChanges="keyboardHidden|orientation">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.cts.intent.category.MANUAL_TEST" />
+            </intent-filter>
+            <meta-data android:name="test_category" android:value="@string/test_category_networking" />
+            <meta-data android:name="test_required_features" android:value="android.hardware.wifi.direct" />
+        </activity>
+
+        <activity android:name=".p2p.ServiceRequesterTestListActivity"
+                android:label="@string/p2p_service_discovery_requester"
+                android:configChanges="keyboardHidden|orientation" />
+
+        <activity android:name=".p2p.ServiceRequesterTestActivity"
+                android:label="@string/p2p_service_discovery_requester"
+                android:configChanges="keyboardHidden|orientation" />
+
+        <activity android:name=".p2p.ServiceResponderTestActivity"
+                android:label="@string/p2p_service_discovery_responder"
+                android:configChanges="keyboardHidden|orientation" />
 
    </application>
 

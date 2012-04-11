@@ -319,4 +319,70 @@
     <string name="sv_no_data">No videos.</string>
     <string name="sv_failed_title">Test Failed</string>
     <string name="sv_failed_message">Unable to play stream.  See log for details.</string>
+
+    <!-- Strings for P2pTestActivity -->
+    <string name="p2p_test">Wi-Fi Direct Test</string>
+    <string name="p2p_test_info">
+        The Wi-Fi Direct tests require two devices with Wi-Fi Direct enabled to exchange
+        messages. One device must be the candidate device running the software build to
+        be tested, while the other device must be an implementation already known to be
+        compatible.\n\nOne device should start the requester test, and the other should
+        start the responder test. Your device must pass both requester and responder
+        tests.
+        </string>
+    <string name="p2p_service_discovery">Service Discovery</string>
+    <string name="p2p_service_discovery_responder_test">
+        Service Discovery Responder Test</string>
+    <string name="p2p_service_discovery_requester_test">
+        Service Discovery Requester Test</string>
+
+    <string name="p2p_service_discovery_responder">Service Discovery Responder</string>
+    <string name="p2p_service_discovery_requester">Service Discovery Requester</string>
+
+    <string name="p2p_service_discovery_responder_info">
+        Start the \"Service Discovery Requester Test\" on the other device and follow
+        the instructions.</string>
+
+    <string name="p2p_service_discovery_requester_info">
+        Start the \"Service Discovery Responder Test\" on the other device.
+        Then run each test individually by clicking on it\'s name.</string>
+
+    <string name="p2p_not_enabled">Wi-Fi is not enabled</string>
+    <string name="p2p_not_enabled_message">These tests require Wi-Fi to be enabled.
+        Click the button below to go to system settings and enable Wi-Fi.</string>
+    <string name="p2p_settings">Wi-Fi Direct Settings</string>
+
+    <string name="p2p_result_success">Test passed successfully.</string>
+    <string name="p2p_responder_ready">
+        The Responder is now ready to start. Start the \"Service Discovery
+        Requester Test\" test on the other device.</string>
+
+    <string name="p2p_setup_error">
+        Test failed.\n\nSet up error. Check whether Wi-Fi can be enabled.</string>
+    <string name="p2p_unexpected_error">
+        Test failed.\n\nUnexpected error. Check logcat.</string>
+    <string name="p2p_add_local_service_error">
+        Test failed.\n\nFailed to add local service.</string>
+    <string name="p2p_add_service_request_error">
+        Test failed.\n\nFailed to add service request.</string>
+    <string name="p2p_remove_service_request_error">
+        Test failed.\n\nFailed to remove service request.</string>
+    <string name="p2p_clear_service_requests_error">
+        Test failed.\n\nFailed to clear service requests.</string>
+    <string name="p2p_discover_peers_error">
+        Test failed.\n\nFailed to discover peers.</string>
+    <string name="p2p_discover_services_error">
+        Test failed.\n\nFailed to discover services.</string>
+    <string name="p2p_no_service_requests_error">
+        Test failed.\n\n\"NO_SERVICE_REQUESTS\" error did not occurred.</string>
+    <string name="p2p_receive_invalid_response_error">
+        Test failed.\n\nReceived an invalid message or could not receive
+         the expected message.\n\n</string>
+    <string name="p2p_target_not_found_error">Test failed.\n\n
+        The target responder device was NOT found. Start up the responder
+        test on the other device, then run the test again.</string>
+
+    <string name="p2p_search_target">Search Target</string>
+    <string name="p2p_searching_target">Searching for target device ...</string>
+    <string name="p2p_executing_test">Checking the service discovery capability ...</string>
 </resources>
