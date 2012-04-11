@@ -13,9 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package android.opengl.cts;
+#ifndef _TYPES_H_
+#define _TYPES_H_
+typedef struct {
+    int32_t mShaderError;
+    int32_t mShaderCount;
+    int32_t mProgramError;
+} Data;
 
-public class Constants {
-    public static final int SHADER = 1;
-    public static final int PROGRAM = 2;
-}
+#endif
