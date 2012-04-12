@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2011 The Android Open Source Project
+ * Copyright (C) 2011-2012 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -142,6 +142,7 @@ public class AllocationTest extends RSBaseGraphics {
          createTypedHelper(Element.SAMPLER(mRS));
          createTypedHelper(Element.SCRIPT(mRS));
          createTypedHelper(Element.TYPE(mRS));
+         createTypedHelper(Element.FONT(mRS));
 
          createTypedTextureHelper(Element.A_8(mRS));
          createTypedTextureHelper(Element.RGB_565(mRS));
@@ -181,6 +182,7 @@ public class AllocationTest extends RSBaseGraphics {
          createSizedHelper(Element.SAMPLER(mRS));
          createSizedHelper(Element.SCRIPT(mRS));
          createSizedHelper(Element.TYPE(mRS));
+         createSizedHelper(Element.FONT(mRS));
     }
 
     static int bDimX = 48;
