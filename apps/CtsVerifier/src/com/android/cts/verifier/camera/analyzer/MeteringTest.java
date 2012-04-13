@@ -72,7 +72,7 @@ public class MeteringTest extends CameraTests {
     /** Reference test logs. */
     private ArrayList<String> mReferenceLogs;
     /** Test result to show. */
-    private String[] mTestResults;
+    private int[] mTestResults;
     /** Number of tests. */
     private int mNumTests;
     /** Camera Parameters. */
@@ -114,9 +114,9 @@ public class MeteringTest extends CameraTests {
         mReferenceCompareResults = new ArrayList<Boolean>();
         mReferenceLogs = new ArrayList<String>();
         mNumTests = 3;
-        mTestResults = new String[mNumTests];
+        mTestResults = new int[mNumTests];
         for (int i = 0; i < mNumTests; ++i) {
-            mTestResults[i] = "...";
+            mTestResults[i] = CameraTests.CAMERA_TEST_NOT_RUN;
         }
     }
 
@@ -219,9 +219,9 @@ public class MeteringTest extends CameraTests {
          }
 
         if (groupTestPassed) {
-            mTestResults[index] = "Passed";
+            mTestResults[index] = CameraTests.CAMERA_TEST_SUCCESS;
         } else {
-            mTestResults[index] = "Failed";
+            mTestResults[index] = CameraTests.CAMERA_TEST_FAILURE;
         }
 
     }
@@ -587,7 +587,7 @@ public class MeteringTest extends CameraTests {
     }
 
     @Override
-    public String getResult(int index) {
+    public int getResult(int index) {
         return mTestResults[index];
     }
 

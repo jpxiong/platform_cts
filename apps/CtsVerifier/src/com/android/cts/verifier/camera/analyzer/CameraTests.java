@@ -37,6 +37,10 @@ import java.lang.Runnable;
  */
 public abstract class CameraTests{
 
+    public static final int CAMERA_TEST_NOT_RUN = 0;
+    public static final int CAMERA_TEST_SUCCESS = 1;
+    public static final int CAMERA_TEST_FAILURE = 2;
+
     private static final String TAG = "CameraTests";
 
     /** Memory address of the color checker centers. */
@@ -144,7 +148,7 @@ public abstract class CameraTests{
 
     public abstract String getTestName(int index);
 
-    public abstract String getResult(int index);
+    public abstract int getResult(int index);
 
     public abstract int getNumTests();
 

@@ -51,6 +51,7 @@ public class ColorCheckerTest extends CameraTests {
     private static ColorCheckerTest singletonTest = null;
 
     private boolean mFindCheckerSuccess = false;
+    private boolean mHasRunOnce = false;
 
     /**
      * Constructs a <code>ColorCheckerTest</code> instance with a given
@@ -97,6 +98,7 @@ public class ColorCheckerTest extends CameraTests {
         Log.v(TAG, "ColorCheckerTest thread started!");
         mAutoFocusSuccess = false;
         mFindCheckerSuccess = false;
+        mHasRunOnce = true;
         // Sets camera focus mode to Auto focus if it is supported.
         if (mAutoFocusEnabled) {
             while (!mAutoFocusSuccess) {
@@ -222,11 +224,15 @@ public class ColorCheckerTest extends CameraTests {
     }
 
     @Override
-    public String getResult(int index) {
+    public int getResult(int index) {
         if (mFindCheckerSuccess) {
-          return "Passed";
+            return CameraTests.CAMERA_TEST_SUCCESS;
         } else {
-          return "Failed";
+            if (mHasRunOnce) {
+                return CameraTests.CAMERA_TEST_FAILURE;
+            } else {
+                return CameraTests.CAMERA_TEST_NOT_RUN;
+            }
         }
     }
 

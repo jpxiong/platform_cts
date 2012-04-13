@@ -280,13 +280,14 @@
 
     <!-- Strings for Camera Analyzer -->
     <string name="camera_analyzer">Camera Analyzer</string>
-    <string name="ca_find_checkerboard_label">Find color checker</string>
-    <string name="ca_exposure_test_label">Exposure Comp. Test</string>
+    <string name="ca_find_checkerboard_label">Find target</string>
+    <string name="ca_check_formats_label">Output formats</string>
+    <string name="ca_exposure_test_label">Exposure Comp.</string>
     <string name="ca_result_label">Results will be here</string>
-    <string name="ca_wb_test_label">White Balance Test</string>
-    <string name="ca_lock_test_label">Auto Exposure Lock Test</string>
-    <string name="ca_metering_label">Metering Area Test</string>
-    <string name="ca_focus_modes_label">Focus Modes Test</string>
+    <string name="ca_wb_test_label">White Balance</string>
+    <string name="ca_lock_test_label">AE Lock</string>
+    <string name="ca_metering_label">Metering Area</string>
+    <string name="ca_focus_modes_label">Focus Modes</string>
     <string name="ca_info">This test checks the image quality of the camera of this device. It requires a MacBeth 4x6 color checker. With an ADK board and a lamp connected to it on the Relay 1 port, all tests can be run automatically. Without the ADK board, all the tests except the Auto Exposure Lock Test can be run automatically and the Auto Exposure Lock Test will require users to turn on/off a lamp according to the instruction given. </string>
 
     <!-- Strings for USB accessory test activity -->
