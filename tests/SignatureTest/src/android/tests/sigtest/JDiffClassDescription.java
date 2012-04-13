@@ -1043,7 +1043,7 @@ public class JDiffClassDescription {
      * @returns the class being searched for, or null if it can't be found.
      */
     private Class<?> findInnerClassByName(Class<?> clz, String simpleName) {
-        for (Class<?> c : clz.getClasses()) {
+        for (Class<?> c : clz.getDeclaredClasses()) {
             if (c.getSimpleName().equals(simpleName)) {
                 return c;
             }
