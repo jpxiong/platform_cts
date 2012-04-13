@@ -193,7 +193,6 @@ public class KeyEventTest extends AndroidTestCase {
         assertEquals(0, keyData.number);
         assertEquals('z', keyData.meta[0]);
         assertEquals('Z', keyData.meta[1]);
-        assertEquals(0, keyData.meta[2]);
         assertEquals(0, keyData.meta[3]);
     }
 
