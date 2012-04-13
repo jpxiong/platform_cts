@@ -211,6 +211,11 @@ public class MediaRecorderStressTest extends ActivityInstrumentationTestCase2<Me
         mSurfaceHolder = MediaFrameworkTest.getSurfaceView().getHolder();
         File stressOutFile = new File(WorkDir.getTopDir(), MEDIA_STRESS_OUTPUT);
         Writer output = new BufferedWriter(new FileWriter(stressOutFile, true));
+
+        if (!mHasRearCamera && !mHasFrontCamera) {
+                output.write("No camera found. Skipping recorder stress test\n");
+                return;
+        }
         output.write("H263 video record- reset after prepare Stress test\n");
         output.write("Total number of loops:" +
                 NUMBER_OF_RECORDER_STRESS_LOOPS + "\n");
@@ -347,6 +352,11 @@ public class MediaRecorderStressTest extends ActivityInstrumentationTestCase2<Me
         File stressOutFile = new File(WorkDir.getTopDir(), MEDIA_STRESS_OUTPUT);
         Writer output = new BufferedWriter(
                 new FileWriter(stressOutFile, true));
+
+        if (!mHasRearCamera && !mHasFrontCamera) {
+                output.write("No camera found. Skipping video record and play back stress test\n");
+                return;
+        }
         output.write("Video record and play back stress test:\n");
         output.write("Total number of loops:"
                 + NUMBER_OF_RECORDERANDPLAY_STRESS_LOOPS + "\n");
