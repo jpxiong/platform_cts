@@ -33,6 +33,8 @@ import android.graphics.Xfermode;
 import android.test.AndroidTestCase;
 import android.text.SpannedString;
 
+import java.util.Locale;
+
 public class PaintTest extends AndroidTestCase {
 
     private static final Typeface[] TYPEFACES = new Typeface[] {
@@ -531,6 +533,41 @@ public class PaintTest extends AndroidTestCase {
 
         p.setTextAlign(Align.RIGHT);
         assertEquals(Align.RIGHT, p.getTextAlign());
+    }
+
+    public void testAccessTextLocale() {
+        Paint p = new Paint();
+
+        final Locale defaultLocale = Locale.getDefault();
+
+        // Check default
+        assertEquals(defaultLocale, p.getTextLocale());
+
+        // Check setter / getter
+        p.setTextLocale(Locale.US);
+        assertEquals(Locale.US, p.getTextLocale());
+
+        p.setTextLocale(Locale.CHINESE);
+        assertEquals(Locale.CHINESE, p.getTextLocale());
+
+        p.setTextLocale(Locale.JAPANESE);
+        assertEquals(Locale.JAPANESE, p.getTextLocale());
+
+        p.setTextLocale(Locale.KOREAN);
+        assertEquals(Locale.KOREAN, p.getTextLocale());
+
+        // Check reverting back to default
+        p.setTextLocale(defaultLocale);
+        assertEquals(defaultLocale, p.getTextLocale());
+
+        // Check that we cannot pass a null locale
+        try {
+            p.setTextLocale(null);
+            assertFalse(true);
+        }
+        catch (IllegalArgumentException iae) {
+            // OK !!
+        }
     }
 
     public void testGetFillPath() {
