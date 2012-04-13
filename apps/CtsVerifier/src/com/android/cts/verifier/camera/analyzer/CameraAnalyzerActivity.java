@@ -21,6 +21,7 @@ import com.android.cts.verifier.R;
 import android.app.Activity;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.graphics.ImageFormat;
 import android.hardware.Camera;
 import android.hardware.Camera.CameraInfo;
@@ -456,11 +457,29 @@ public class CameraAnalyzerActivity extends PassFailButtons.Activity {
         public View getView(int position, View convertView, ViewGroup parent) {
             LayoutInflater inflater = getLayoutInflater();
             View row = inflater.inflate(R.layout.ca_row, parent, false);
+            ImageView iconField = (ImageView) row.findViewById(R.id.caTestIcon);
             TextView nameField = (TextView) row.findViewById(R.id.caTestName);
             TextView resultField = (TextView) row.findViewById(R.id.caTestResult);
             if (mCurrentTest != null) {
                 nameField.setText(mCurrentTest.getTestName(position));
-                resultField.setText(mCurrentTest.getResult(position));
+                int result = mCurrentTest.getResult(position);
+                switch (result) {
+                    case CameraTests.CAMERA_TEST_SUCCESS:
+                        resultField.setText("Success");
+                        iconField.setBackgroundColor(Color.rgb(0x99,0xCC,00));
+                        resultField.setTextColor(Color.rgb(0x99,0xCC,00));
+                        break;
+                    case CameraTests.CAMERA_TEST_FAILURE:
+                        resultField.setText("Failed!");
+                        iconField.setBackgroundColor(Color.rgb(0xFF,0x44,0x44));
+                        resultField.setTextColor(Color.rgb(0xFF,0x44,0x44));
+                        break;
+                    case CameraTests.CAMERA_TEST_NOT_RUN:
+                        resultField.setText("Tap to run");
+                        iconField.setBackgroundColor(Color.rgb(0x00,0x99,0xCC));
+                        resultField.setTextColor(Color.rgb(0x33,0xB5,0xE5));
+                        break;
+                }
             }
             return row;
         }

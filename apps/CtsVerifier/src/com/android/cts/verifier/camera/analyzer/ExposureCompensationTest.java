@@ -41,7 +41,7 @@ public class ExposureCompensationTest extends CameraTests {
     /** Memory address of the native test handler.*/
     private long mTestHandler;
     /** Test results. */
-    private String[] mTestResults;
+    private int[] mTestResults;
     /** Number of sub-tests. */
     private int mNumTests;
     /** Camera Parameters. */
@@ -64,9 +64,9 @@ public class ExposureCompensationTest extends CameraTests {
         mNumTests = (int) ((float) (mParams.getMaxExposureCompensation() -
                                     mParams.getMinExposureCompensation())
                             * mParams.getExposureCompensationStep());
-        mTestResults = new String[mNumTests + 1];
+        mTestResults = new int[mNumTests + 1];
         for (int i = 0; i < mNumTests + 1; ++i) {
-            mTestResults[i] = "...";
+            mTestResults[i] = CameraTests.CAMERA_TEST_NOT_RUN;
         }
     }
 
@@ -183,7 +183,7 @@ public class ExposureCompensationTest extends CameraTests {
     }
 
     @Override
-    public String getResult(int index) {
+    public int getResult(int index) {
         return mTestResults[index];
     }
 

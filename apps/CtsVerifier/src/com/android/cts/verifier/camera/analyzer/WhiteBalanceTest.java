@@ -62,7 +62,7 @@ public class WhiteBalanceTest extends CameraTests {
     /** Thread lock. */
     private final Object mProcessingImage = new Object();
     /** Test result to show. */
-    private String[] mTestResults;
+    private int[] mTestResults;
     /** Number of test. */
     private int mNumTests;
     /** Camera Parameters. */
@@ -86,9 +86,9 @@ public class WhiteBalanceTest extends CameraTests {
         mParams = mTestCamera.getParameters();
         mWhiteBalanceList = mParams.getSupportedWhiteBalance();
         mNumTests = mWhiteBalanceList.size() + 1;
-        mTestResults = new String[mNumTests];
+        mTestResults = new int[mNumTests];
         for (int i = 0; i < mNumTests; ++i) {
-            mTestResults[i] = "...";
+            mTestResults[i] = CameraTests.CAMERA_TEST_NOT_RUN;
         }
 
         if (mWhiteBalanceList != null) {
@@ -223,9 +223,9 @@ public class WhiteBalanceTest extends CameraTests {
                                   colorTemperature));
         if ((colorTemperature >= mReferenceTemperature[index - 1][0]) &&
                 (colorTemperature <= mReferenceTemperature[index - 1][1])) {
-            mTestResults[index] = "Passed";
+            mTestResults[index] = CameraTests.CAMERA_TEST_SUCCESS;
         } else {
-            mTestResults[index] = "Failed";
+            mTestResults[index] = CameraTests.CAMERA_TEST_FAILURE;
         }
 
     }
@@ -255,7 +255,7 @@ public class WhiteBalanceTest extends CameraTests {
     }
 
     @Override
-    public String getResult(int index) {
+    public int getResult(int index) {
         return mTestResults[index];
     }
 

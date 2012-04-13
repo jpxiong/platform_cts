@@ -103,7 +103,7 @@ public class AutoLockTest extends CameraTests {
     /** Boolean to indicate whether there is an ADK attached. */
     private boolean mUsingUsb = false;
     /** Test results.*/
-    private String[] mTestResults;
+    private int[] mTestResults;
     /** Number of tests. */
     private int mNumTests;
     /** Singleton test instance.*/
@@ -161,16 +161,16 @@ public class AutoLockTest extends CameraTests {
      */
     private void openAccessory(UsbAccessory accessory) {
         Log.d(TAG, "openAccessory: " + accessory);
-	mFileDescriptor = mUsbManager.openAccessory(accessory);
+        mFileDescriptor = mUsbManager.openAccessory(accessory);
 
         if (mFileDescriptor != null) {
-	    mAccessory = accessory;
-	    FileDescriptor fd = mFileDescriptor.getFileDescriptor();
+            mAccessory = accessory;
+            FileDescriptor fd = mFileDescriptor.getFileDescriptor();
             mOutputStream = new FileOutputStream(fd);
-	    Log.d(TAG, "accessory opened");
-	} else {
+            Log.d(TAG, "accessory opened");
+        } else {
             Log.d(TAG, "accessory open fail");
-	}
+        }
 
         // Unlocks the thread lock of waiting for the USB to be ready.
         synchronized (mUsbSetup) {
@@ -184,14 +184,14 @@ public class AutoLockTest extends CameraTests {
      * Closes the ADK and detaches the output stream from it.
      */
     private void closeAccessory() {
-	try {
-	    if (mFileDescriptor != null) {
+        try {
+            if (mFileDescriptor != null) {
                 mFileDescriptor.close();
-	    }
-	} catch (IOException e) {
+            }
+        } catch (IOException e) {
         } finally {
-	    mFileDescriptor = null;
-	    mAccessory = null;
+            mFileDescriptor = null;
+            mAccessory = null;
         }
     }
 
@@ -226,9 +226,9 @@ public class AutoLockTest extends CameraTests {
         mReferenceCompareResults = new ArrayList<Boolean>();
         mReferenceLogs = new ArrayList<String>();
         mNumTests = 4;
-        mTestResults = new String[mNumTests];
+        mTestResults = new int[mNumTests];
         for (int i = 0; i < mNumTests; ++i) {
-            mTestResults[i] = "...";
+            mTestResults[i] = CameraTests.CAMERA_TEST_NOT_RUN;
         }
     }
 
@@ -981,9 +981,9 @@ public class AutoLockTest extends CameraTests {
               }
          }
         if (groupTestPassed) {
-            mTestResults[index] = "Passed";
+            mTestResults[index] = CameraTests.CAMERA_TEST_SUCCESS;
         } else {
-            mTestResults[index] = "Failed";
+            mTestResults[index] = CameraTests.CAMERA_TEST_FAILURE;
         }
     }
 
@@ -1026,7 +1026,7 @@ public class AutoLockTest extends CameraTests {
     }
 
     @Override
-    public String getResult(int index) {
+    public int getResult(int index) {
         return mTestResults[index];
     }
 
