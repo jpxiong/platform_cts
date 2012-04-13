@@ -122,5 +122,10 @@ public class PreferenceFromCodeActivity extends PreferenceActivity {
         customPrefGroup.setTitle(R.string.custom_preference_group_title);
         customPrefGroup.setKey("custom-pref-group");
         mPrefScreen.addPreference(customPrefGroup);
+
+        CustomPreference customPreference = new CustomPreference(this);
+        customPreference .setTitle(R.string.custom_preference);
+        customPreference.setKey("custom-preference");
+        mPrefScreen.addPreference(customPreference);
     }
 }
