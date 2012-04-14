@@ -16,15 +16,14 @@
 package android.media.cts;
 
 import com.android.cts.stub.R;
+
 import android.app.Activity;
 import android.os.Bundle;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
-import android.view.ViewGroup;
 
 public class MediaStubActivity extends Activity {
-    public static final int WIDTH = 320;
-    public static final int HEIGHT = 240;
+
     private SurfaceHolder mHolder;
     private SurfaceHolder mHolder2;
 
@@ -34,23 +33,10 @@ public class MediaStubActivity extends Activity {
         setContentView(R.layout.mediaplayer);
 
         SurfaceView surfaceV = (SurfaceView)findViewById(R.id.surface);
-        ViewGroup.LayoutParams lp = surfaceV.getLayoutParams();
-        lp.width = WIDTH;
-        lp.height = HEIGHT;
-        surfaceV.setLayoutParams(lp);
         mHolder = surfaceV.getHolder();
-        mHolder.setFixedSize(WIDTH, HEIGHT);
-        mHolder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
 
         SurfaceView surfaceV2 = (SurfaceView)findViewById(R.id.surface2);
-        ViewGroup.LayoutParams lp2 = surfaceV2.getLayoutParams();
-        lp2.width = WIDTH;
-        lp2.height = HEIGHT;
-        surfaceV2.setLayoutParams(lp2);
         mHolder2 = surfaceV2.getHolder();
-        mHolder2.setFixedSize(WIDTH, HEIGHT);
-        mHolder2.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
-
     }
 
     public SurfaceHolder getSurfaceHolder() {
@@ -59,10 +45,5 @@ public class MediaStubActivity extends Activity {
 
     public SurfaceHolder getSurfaceHolder2() {
         return mHolder2;
-    }
-
-    public SurfaceHolder generateSurfaceHolder() {
-        SurfaceView surface = (SurfaceView)findViewById(R.id.surface3);
-        return surface.getHolder();
     }
 }
