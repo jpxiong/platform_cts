@@ -335,8 +335,8 @@ public class BrowserTest extends ActivityInstrumentationTestCase2<BrowserStubAct
         final String bookmarkUrl = "www.visited-bookmark.com";
         final String historyUrlPrefix = "www.visited-history";
         final String historyUrlPostfix = ".com";
-
-        try {
+        final long TIME_BASE = new Date().getTime() - 1000;
+            try {
             assertFalse(Browser.canClearHistory(mContentResolver));
             Browser.clearHistory(mContentResolver);
             assertFalse(Browser.canClearHistory(mContentResolver));
@@ -348,7 +348,7 @@ public class BrowserTest extends ActivityInstrumentationTestCase2<BrowserStubAct
             for (int i = 1; i <= MAX_HISTORY_COUNT - 1; i++) {
                 value.put(BookmarkColumns.URL, historyUrlPrefix + i + historyUrlPostfix);
                 value.put(BookmarkColumns.BOOKMARK, 0);
-                value.put(BookmarkColumns.DATE, i);
+                value.put(BookmarkColumns.DATE, i + TIME_BASE);
                 mProvider.insert(Browser.BOOKMARKS_URI, value);
             }
             value.put(BookmarkColumns.URL, bookmarkUrl);
@@ -376,7 +376,7 @@ public class BrowserTest extends ActivityInstrumentationTestCase2<BrowserStubAct
             value.put(BookmarkColumns.URL, historyUrlPrefix
                     + MAX_HISTORY_COUNT + historyUrlPostfix);
             value.put(BookmarkColumns.BOOKMARK, 0);
-            value.put(BookmarkColumns.DATE, MAX_HISTORY_COUNT);
+            value.put(BookmarkColumns.DATE, MAX_HISTORY_COUNT + TIME_BASE);
             mProvider.insert(Browser.BOOKMARKS_URI, value);
             cursor = mProvider.query(
                     Browser.BOOKMARKS_URI,
@@ -391,7 +391,7 @@ public class BrowserTest extends ActivityInstrumentationTestCase2<BrowserStubAct
                     null, null, null, null);
             assertEquals(MAX_HISTORY_COUNT + 1 - Browser.TRUNCATE_N_OLDEST, cursor.getCount());
             cursor.moveToFirst();
-            assertEquals(Browser.TRUNCATE_N_OLDEST + 1,
+            assertEquals(Browser.TRUNCATE_N_OLDEST + 1 + TIME_BASE,
                     cursor.getLong(Browser.HISTORY_PROJECTION_DATE_INDEX));
             cursor.close();
 
@@ -403,7 +403,8 @@ public class BrowserTest extends ActivityInstrumentationTestCase2<BrowserStubAct
                     null, BookmarkColumns.DATE, null);
             int historyCountBeforeDelete = cursor.getCount();
             cursor.moveToLast();
-            assertEquals(MAX_HISTORY_COUNT, cursor.getLong(Browser.HISTORY_PROJECTION_DATE_INDEX));
+            assertEquals(MAX_HISTORY_COUNT + TIME_BASE,
+                    cursor.getLong(Browser.HISTORY_PROJECTION_DATE_INDEX));
             cursor.close();
             Browser.deleteFromHistory(mContentResolver,
                     historyUrlPrefix + MAX_HISTORY_COUNT + historyUrlPostfix);
@@ -415,7 +416,7 @@ public class BrowserTest extends ActivityInstrumentationTestCase2<BrowserStubAct
             int historyCountAfterDelete = cursor.getCount();
             assertEquals(historyCountBeforeDelete - 1, historyCountAfterDelete);
             cursor.moveToLast();
-            assertEquals(MAX_HISTORY_COUNT - 1,
+            assertEquals(MAX_HISTORY_COUNT - 1 + TIME_BASE,
                     cursor.getLong(Browser.HISTORY_PROJECTION_DATE_INDEX));
             cursor.close();
 
@@ -433,8 +434,8 @@ public class BrowserTest extends ActivityInstrumentationTestCase2<BrowserStubAct
 
             // Specify the history in a time frame to be deleted
             historyCountBeforeDelete = historyCountAfterDelete;
-            long begin = 6;
-            long end = 20;
+            long begin = 6 + TIME_BASE;
+            long end = 20 + TIME_BASE;
             Browser.deleteHistoryTimeFrame(mContentResolver, begin, end);
             cursor = mProvider.query(
                     Browser.BOOKMARKS_URI,
@@ -451,7 +452,7 @@ public class BrowserTest extends ActivityInstrumentationTestCase2<BrowserStubAct
             historyCountBeforeDelete = historyCountAfterDelete;
             long firstDate = end;
             begin = -1;
-            end = 34;
+            end = 34 + TIME_BASE;
             Browser.deleteHistoryTimeFrame(mContentResolver, begin, end);
             cursor = mProvider.query(
                     Browser.BOOKMARKS_URI,
@@ -468,7 +469,7 @@ public class BrowserTest extends ActivityInstrumentationTestCase2<BrowserStubAct
 
             // Specify the history in a time frame (not specify end) to be deleted.
             historyCountBeforeDelete = historyCountAfterDelete;
-            begin = MAX_HISTORY_COUNT - 10;
+            begin = MAX_HISTORY_COUNT - 10 + TIME_BASE;
             end = -1;
             Browser.deleteHistoryTimeFrame(mContentResolver, begin, end);
             cursor = mProvider.query(
