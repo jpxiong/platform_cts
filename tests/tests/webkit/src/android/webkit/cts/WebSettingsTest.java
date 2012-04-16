@@ -195,8 +195,18 @@ public class WebSettingsTest extends ActivityInstrumentationTestCase2<WebViewStu
         assertEquals(TestHtmlConstants.WEBPAGE_NOT_AVAILABLE_TITLE, mOnUiThread.getTitle());
     }
 
-    public void testAccessCacheMode() throws Exception {
-        WebIconDatabase.getInstance().removeAllIcons();
+    public void testAccessCacheMode() throws Throwable {
+        runTestOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                // getInstance must run on the UI thread
+                WebIconDatabase iconDb = WebIconDatabase.getInstance();
+                String dbPath = getActivity().getFilesDir().toString() + "/icons";
+                iconDb.open(dbPath);
+            }
+        });
+        getInstrumentation().waitForIdleSync();
+        Thread.sleep(100); // Wait for open to be received on the icon db thread.
         assertEquals(WebSettings.LOAD_DEFAULT, mSettings.getCacheMode());
 
         mSettings.setCacheMode(WebSettings.LOAD_NORMAL);
