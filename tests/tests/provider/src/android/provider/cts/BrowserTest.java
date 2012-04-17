@@ -81,7 +81,8 @@ public class BrowserTest extends ActivityInstrumentationTestCase2<BrowserStubAct
 
                 for (int i = 0; i < colNames.length; i++) {
                     if (Bookmarks.PARENT_SOURCE_ID.equals(colNames[i])
-                            || Bookmarks.INSERT_AFTER_SOURCE_ID.equals(colNames[i])) {
+                            || Bookmarks.INSERT_AFTER_SOURCE_ID.equals(colNames[i])
+                            || Bookmarks.TYPE.equals(colNames[i])) {
                         // These aren't actual columns, so skip them in the backup
                         continue;
                     }
