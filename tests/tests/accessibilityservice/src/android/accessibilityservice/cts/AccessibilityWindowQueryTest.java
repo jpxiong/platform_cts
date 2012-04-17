@@ -18,9 +18,12 @@ package android.accessibilityservice.cts;
 
 import static android.view.accessibility.AccessibilityNodeInfo.ACTION_CLEAR_FOCUS;
 import static android.view.accessibility.AccessibilityNodeInfo.ACTION_CLEAR_SELECTION;
+import static android.view.accessibility.AccessibilityNodeInfo.ACTION_CLICK;
 import static android.view.accessibility.AccessibilityNodeInfo.ACTION_FOCUS;
+import static android.view.accessibility.AccessibilityNodeInfo.ACTION_LONG_CLICK;
 import static android.view.accessibility.AccessibilityNodeInfo.ACTION_SELECT;
 
+import android.accessibilityservice.AccessibilityService;
 import android.graphics.Rect;
 import android.test.suitebuilder.annotation.MediumTest;
 import android.view.accessibility.AccessibilityEvent;
@@ -204,6 +207,58 @@ public class AccessibilityWindowQueryTest
     }
 
     @MediumTest
+    public void testPerformActionClick() throws Exception {
+        // find a view and make sure it is not selected
+        final AccessibilityNodeInfo button = getInteractionBridge()
+                .findAccessibilityNodeInfoByTextFromRoot(getString(R.string.button5));
+        assertFalse(button.isSelected());
+
+        // Make an action and wait for an event.
+        AccessibilityEvent expected = getInteractionBridge()
+                .executeCommandAndWaitForAccessibilityEvent(new Runnable() {
+            @Override
+            public void run() {
+                getInteractionBridge().performAction(button, ACTION_CLICK);
+            }
+        }, new AccessibilityEventFilter() {
+            @Override
+            public boolean accept(AccessibilityEvent event) {
+                return (event.getEventType() == AccessibilityEvent.TYPE_VIEW_CLICKED);
+            }
+        },
+        TIMEOUT_ASYNC_PROCESSING);
+
+        // Make sure the expected event was received.
+        assertNotNull(expected);
+    }
+
+    @MediumTest
+    public void testPerformActionLongClick() throws Exception {
+        // find a view and make sure it is not selected
+        final AccessibilityNodeInfo button = getInteractionBridge()
+                .findAccessibilityNodeInfoByTextFromRoot(getString(R.string.button5));
+        assertFalse(button.isSelected());
+
+        // Make an action and wait for an event.
+        AccessibilityEvent expected = getInteractionBridge()
+                .executeCommandAndWaitForAccessibilityEvent(new Runnable() {
+            @Override
+            public void run() {
+                getInteractionBridge().performAction(button, ACTION_LONG_CLICK);
+            }
+        }, new AccessibilityEventFilter() {
+            @Override
+            public boolean accept(AccessibilityEvent event) {
+                return (event.getEventType() == AccessibilityEvent.TYPE_VIEW_LONG_CLICKED);
+            }
+        },
+        TIMEOUT_ASYNC_PROCESSING);
+
+        // Make sure the expected event was received.
+        assertNotNull(expected);
+    }
+
+    @MediumTest
     public void testGetEventSource() throws Exception {
         // find a view and make sure it is not focused
         final AccessibilityNodeInfo button =
@@ -261,6 +316,83 @@ public class AccessibilityWindowQueryTest
         assertSame(button.isSelected(), source.isSelected());
         assertSame(button.isCheckable(), source.isCheckable());
         assertSame(button.isChecked(), source.isChecked());
+    }
+
+    @MediumTest
+    public void testPerformGlobalActionBack() throws Exception {
+        // Get the root node info.
+        final AccessibilityNodeInfo root = getInteractionBridge().getRootInActiveWindow();
+
+        AccessibilityEvent expected = getInteractionBridge()
+                .executeCommandAndWaitForAccessibilityEvent(new Runnable() {
+            @Override
+            public void run() {
+                getInteractionBridge().performGlobalAction(AccessibilityService.GLOBAL_ACTION_BACK);
+            }
+        }, new AccessibilityEventFilter() {
+            @Override
+            public boolean accept(AccessibilityEvent event) {
+                return (event.getEventType() == AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED)
+                        && "com.android.launcher".equals(event.getPackageName());
+            }
+        },
+        TIMEOUT_ASYNC_PROCESSING);
+
+        // Check if the expected event was received.
+        assertNotNull(expected);
+    }
+
+    @MediumTest
+    public void testPerformGlobalActionHome() throws Exception {
+        // Get the root node info.
+        final AccessibilityNodeInfo root = getInteractionBridge().getRootInActiveWindow();
+
+        AccessibilityEvent expected = getInteractionBridge()
+                .executeCommandAndWaitForAccessibilityEvent(new Runnable() {
+            @Override
+            public void run() {
+                getInteractionBridge().performGlobalAction(AccessibilityService.GLOBAL_ACTION_HOME);
+            }
+        }, new AccessibilityEventFilter() {
+            @Override
+            public boolean accept(AccessibilityEvent event) {
+                return (event.getEventType() == AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED)
+                    && "com.android.launcher".equals(event.getPackageName());
+            }
+        },
+        TIMEOUT_ASYNC_PROCESSING);
+
+        // Check if the expected event was received.
+        assertNotNull(expected);
+    }
+
+    @MediumTest
+    public void testPerformGlobalActionRecents() throws Exception {
+        // Get the root node info.
+        final AccessibilityNodeInfo root = getInteractionBridge().getRootInActiveWindow();
+
+        AccessibilityEvent expected = getInteractionBridge()
+                .executeCommandAndWaitForAccessibilityEvent(new Runnable() {
+            @Override
+            public void run() {
+                getInteractionBridge().performGlobalAction(
+                        AccessibilityService.GLOBAL_ACTION_RECENTS);
+            }
+        }, new AccessibilityEventFilter() {
+            @Override
+            public boolean accept(AccessibilityEvent event) {
+                return (event.getEventType() == AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED)
+                        && "android".equals(event.getPackageName());
+            }
+        },
+        TIMEOUT_ASYNC_PROCESSING);
+
+        // Check if the expected event was received.
+        assertNotNull(expected);
+
+        // Clean up.
+        AccessibilityNodeInfo expectedSource = getInteractionBridge().getSource(expected);
+        getInteractionBridge().performGlobalAction(AccessibilityService.GLOBAL_ACTION_HOME);
     }
 
     @MediumTest
