@@ -77,4 +77,23 @@ public class SensorTest extends AndroidTestCase {
         assertNotNull(sensor.getVendor());
         assertTrue(sensor.getVersion() > 0);
     }
+
+    @SuppressWarnings("deprecation")
+    public void testLegacySensorOperations() {
+        final SensorManager mSensorManager =
+                (SensorManager) getContext().getSystemService(Context.SENSOR_SERVICE);
+
+        // We expect the set of sensors reported by the new and legacy APIs to be consistent.
+        int sensors = 0;
+        if (mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER) != null) {
+            sensors |= SensorManager.SENSOR_ACCELEROMETER;
+        }
+        if (mSensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD) != null) {
+            sensors |= SensorManager.SENSOR_MAGNETIC_FIELD;
+        }
+        if (mSensorManager.getDefaultSensor(Sensor.TYPE_ORIENTATION) != null) {
+            sensors |= SensorManager.SENSOR_ORIENTATION | SensorManager.SENSOR_ORIENTATION_RAW;
+        }
+        assertEquals(sensors, mSensorManager.getSensors());
+    }
 }
