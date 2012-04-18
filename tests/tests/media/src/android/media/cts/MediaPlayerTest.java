@@ -214,6 +214,8 @@ public class MediaPlayerTest extends MediaPlayerTestBase {
         assertTrue(vis.setCaptureSize(vizdata.length) == Visualizer.SUCCESS);
         assertTrue(vis.setEnabled(true) == Visualizer.SUCCESS);
         AudioManager am = (AudioManager) mContext.getSystemService(Context.AUDIO_SERVICE);
+        int oldRingerMode = am.getRingerMode();
+        am.setRingerMode(AudioManager.RINGER_MODE_NORMAL);
         int oldvolume = am.getStreamVolume(AudioManager.STREAM_MUSIC);
         int maxvolume = am.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
         am.setStreamVolume(AudioManager.STREAM_MUSIC, maxvolume, 0);
@@ -248,6 +250,7 @@ public class MediaPlayerTest extends MediaPlayerTestBase {
             mp1.release();
             mp2.release();
             vis.release();
+            am.setRingerMode(oldRingerMode);
             am.setStreamVolume(AudioManager.STREAM_MUSIC, oldvolume, 0);
         }
     }
