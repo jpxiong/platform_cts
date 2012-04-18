@@ -53,7 +53,7 @@ public class MediaPlayerTest extends MediaPlayerTestBase {
         try {
             mMediaPlayer.setDataSource((String) null);
             fail("Null URI was accepted");
-        } catch (IllegalArgumentException e) {
+        } catch (RuntimeException e) {
             // expected
         }
     }
