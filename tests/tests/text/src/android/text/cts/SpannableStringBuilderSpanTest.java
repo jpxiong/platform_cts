@@ -122,8 +122,10 @@ public class SpannableStringBuilderSpanTest extends AndroidTestCase {
                 int end = ssb.getSpanEnd(span);
                 int startStyle = mSpanSet.mSpanStartPositionStyle[count];
                 int endStyle = mSpanSet.mSpanEndPositionStyle[count];
+                count++;
 
-                if (!isValidSpan(start, end, flag)) continue;
+                if (!isValidSpan(originalStart, originalEnd, flag)) continue;
+
                 if (DEBUG) System.out.println(originalStart + "," + originalEnd + " -> " +
                         start + "," + end + " | " + startStyle + " " + endStyle +
                         " delta=" + delta);
@@ -132,10 +134,11 @@ public class SpannableStringBuilderSpanTest extends AndroidTestCase {
                 // both the start and end styles.
                 if (startStyle == SpanSet.INSIDE && endStyle == SpanSet.INSIDE &&
                         flag == Spanned.SPAN_EXCLUSIVE_EXCLUSIVE) {
-                    // 0-length spans should be removed
+                    // 0-length spans should have been removed
                     assertEquals(-1, start);
                     assertEquals(-1, end);
                     mSpanSet.mRecorder.assertRemoved(span, originalStart, originalEnd);
+                    continue;
                 }
 
                 switch (startStyle) {
@@ -191,7 +194,6 @@ public class SpannableStringBuilderSpanTest extends AndroidTestCase {
                 } else {
                     mSpanSet.mRecorder.assertUnmodified(span);
                 }
-                count++;
             }
         }
     }
@@ -210,6 +212,9 @@ public class SpannableStringBuilderSpanTest extends AndroidTestCase {
                 int originalEnd = mReplacementSpanSet.mPositionSet.getPosition(e);
                 int start = originalSSB.getSpanStart(span);
                 int end = originalSSB.getSpanEnd(span);
+                count++;
+
+                if (!isValidSpan(originalStart, originalEnd, flag)) continue;
 
                 if (DEBUG) System.out.println("Replacement " + originalStart + "," + originalEnd +
                         " -> " + start + "," + end);
@@ -225,19 +230,18 @@ public class SpannableStringBuilderSpanTest extends AndroidTestCase {
                     }
                 }
 
-                if (!isValidSpan(start, end, flag)) {
-                    shouldBeAdded = false;
-                }
-
                 if (shouldBeAdded) {
-                    assertEquals(Math.max(0, originalStart - replStart) + replaceStart, start);
-                    assertEquals(Math.min(originalEnd, replEnd) - replStart + replaceStart, end);
-                    mSpanSet.mRecorder.assertAdded(span, start, end);
-                } else {
-                    mSpanSet.mRecorder.assertUnmodified(span);
+                    int newStart = Math.max(0, originalStart - replStart) + replaceStart;
+                    int newEnd = Math.min(originalEnd, replEnd) - replStart + replaceStart;
+                    if (isValidSpan(newStart, newEnd, flag)) {
+                        assertEquals(start, newStart);
+                        assertEquals(end, newEnd);
+                        mSpanSet.mRecorder.assertAdded(span, start, end);
+                        continue;
+                    }
                 }
 
-                count++;
+                mSpanSet.mRecorder.assertUnmodified(span);
             }
         }
     }
@@ -314,8 +318,6 @@ public class SpannableStringBuilderSpanTest extends AndroidTestCase {
          * identical range
          */
         void initSpans(SpannableStringBuilder ssb, int rangeStart, int rangeEnd, int flag) {
-            ssb.setSpan(mRecorder, 0, ssb.length(), Spanned.SPAN_INCLUSIVE_INCLUSIVE);
-
             mPositionSet.clear();
             mPositionSet.addPosition(0);
             mPositionSet.addPosition(rangeStart / 2);
@@ -340,8 +342,9 @@ public class SpannableStringBuilderSpanTest extends AndroidTestCase {
                 }
             }
 
-            // Must be done after all the spans were added
-            mRecorder.reset();
+            // Must be done after all the spans were added, to not record these additions
+            ssb.setSpan(mRecorder, 0, ssb.length(), Spanned.SPAN_INCLUSIVE_INCLUSIVE);
+            mRecorder.reset(ssb);
         }
     }
 
@@ -349,6 +352,8 @@ public class SpannableStringBuilderSpanTest extends AndroidTestCase {
         private ArrayList<AddedRemoved> mAdded = new ArrayList<AddedRemoved>();
         private ArrayList<AddedRemoved> mRemoved = new ArrayList<AddedRemoved>();
         private ArrayList<Changed> mChanged = new ArrayList<Changed>();
+
+        private Spannable mSpannable;
 
         private class AddedRemoved {
             Object span;
@@ -378,26 +383,27 @@ public class SpannableStringBuilderSpanTest extends AndroidTestCase {
             }
         }
 
-        @Override
-        public void onSpanAdded(Spannable text, Object span, int start, int end) {
-            mAdded.add(new AddedRemoved(span, start, end));
-        }
-
-        public void reset() {
+        public void reset(Spannable spannable) {
+            mSpannable = spannable;
             mAdded.clear();
             mRemoved.clear();
             mChanged.clear();
         }
 
         @Override
+        public void onSpanAdded(Spannable text, Object span, int start, int end) {
+            if (text == mSpannable) mAdded.add(new AddedRemoved(span, start, end));
+        }
+
+        @Override
         public void onSpanRemoved(Spannable text, Object span, int start, int end) {
-            mRemoved.add(new AddedRemoved(span, start, end));
+            if (text == mSpannable) mRemoved.add(new AddedRemoved(span, start, end));
         }
 
         @Override
         public void onSpanChanged(Spannable text, Object span, int ostart, int oend, int nstart,
                 int nend) {
-            mChanged.add(new Changed(span, ostart, oend, nstart, nend));
+            if (text == mSpannable) mChanged.add(new Changed(span, ostart, oend, nstart, nend));
         }
 
         public void assertUnmodified(Object span) {
