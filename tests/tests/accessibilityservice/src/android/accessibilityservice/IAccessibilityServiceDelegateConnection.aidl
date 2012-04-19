@@ -45,4 +45,6 @@ interface IAccessibilityServiceDelegateConnection {
     AccessibilityNodeInfo getSource(in AccessibilityEvent event);
 
     void setFetchViewsNotExposedForAccessibility(boolean fetch);
+
+    boolean performGlobalAction(int action);
 }

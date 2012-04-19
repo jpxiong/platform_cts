@@ -183,6 +183,11 @@ public class DelegatingAccessibilityService extends AccessibilityService {
                 }
                 sServiceDelegate.setServiceInfo(info);
             }
+
+            @Override
+            public boolean performGlobalAction(int action) {
+                return sServiceDelegate.performGlobalAction(action);
+            }
         }
     }
 }

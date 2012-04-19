@@ -126,8 +126,7 @@ public abstract class AccessibilityActivityTestCase<T extends Activity>
      * This class serves as a bridge for querying the screen content.
      * The bride is connected of a delegating accessibility service.
      */
-    static class AccessibilityInteractionBridge extends AccessibilityService
-            implements ServiceConnection {
+    static class AccessibilityInteractionBridge implements ServiceConnection {
 
         /**
          * The package of the accessibility service mock interface.
@@ -183,7 +182,6 @@ public abstract class AccessibilityActivityTestCase<T extends Activity>
             bindToDelegatingAccessibilityService(context);
         }
 
-        @Override
         public void onAccessibilityEvent(AccessibilityEvent event) {
             if (event.getEventType() == AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED) {
                 mLastWindowStateChangeEvent = AccessibilityEvent.obtain(event);
@@ -199,11 +197,6 @@ public abstract class AccessibilityActivityTestCase<T extends Activity>
                     mEventQueue.clear();
                 }
             }
-        }
-
-        @Override
-        public void onInterrupt() {
-            /* do nothing */
         }
 
         /**
@@ -295,7 +288,7 @@ public abstract class AccessibilityActivityTestCase<T extends Activity>
                     }
                     @Override
                     public void onInterrupt() {
-                        AccessibilityInteractionBridge.this.onInterrupt();
+                        /* do nothing */;
                     }
                 });
                 mInitialized = true;
@@ -394,6 +387,15 @@ public abstract class AccessibilityActivityTestCase<T extends Activity>
                 // it so use a clone to avoid losing state
                 AccessibilityNodeInfo targetClone = AccessibilityNodeInfo.obtain(target);
                 return getQueryConnection().performAccessibilityAction(targetClone, action);
+            } catch (RemoteException re) {
+                /* ignore */
+            }
+            return false;
+        }
+
+        public boolean performGlobalAction(int action) {
+            try {
+                return getQueryConnection().performGlobalAction(action);
             } catch (RemoteException re) {
                 /* ignore */
             }
