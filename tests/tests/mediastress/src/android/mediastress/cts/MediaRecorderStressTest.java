@@ -16,6 +16,7 @@
 
 package android.mediastress.cts;
 
+import android.content.pm.PackageManager;
 import android.hardware.Camera;
 import android.media.CamcorderProfile;
 import android.media.MediaPlayer;
@@ -69,11 +70,18 @@ public class MediaRecorderStressTest extends ActivityInstrumentationTestCase2<Me
     private boolean mRemoveVideo = true;
     private int mRecordDuration = 5000;
 
+    private boolean mHasRearCamera = false;
+    private boolean mHasFrontCamera = false;
+
     public MediaRecorderStressTest() {
         super(MediaFrameworkTest.class);
     }
 
     protected void setUp() throws Exception {
+        PackageManager packageManager =
+                getInstrumentation().getTargetContext().getPackageManager();
+        mHasRearCamera = packageManager.hasSystemFeature(PackageManager.FEATURE_CAMERA);
+        mHasFrontCamera = packageManager.hasSystemFeature(PackageManager.FEATURE_CAMERA_FRONT);
         int cameraId = 0;
         CamcorderProfile profile = CamcorderProfile.get(cameraId, CamcorderProfile.QUALITY_HIGH);
         mVideoEncoder = profile.videoCodec;
@@ -170,9 +178,18 @@ public class MediaRecorderStressTest extends ActivityInstrumentationTestCase2<Me
             runOnLooper(new Runnable() {
                 @Override
                 public void run() {
-                    mCamera = Camera.open();
+                    if (mHasRearCamera) {
+                        mCamera = Camera.open();
+                    } else if (mHasFrontCamera) {
+                        mCamera = Camera.open(0);
+                    } else {
+                        mCamera = null;
+                    }
                 }
             });
+            if (mCamera == null) {
+                break;
+            }
             mCamera.setErrorCallback(mCameraErrorCallback);
             mCamera.setPreviewDisplay(mSurfaceHolder);
             mCamera.startPreview();
@@ -252,9 +269,18 @@ public class MediaRecorderStressTest extends ActivityInstrumentationTestCase2<Me
             runOnLooper(new Runnable() {
                 @Override
                 public void run() {
-                    mCamera = Camera.open();
+                    if (mHasRearCamera) {
+                        mCamera = Camera.open();
+                    } else if (mHasFrontCamera) {
+                        mCamera = Camera.open(0);
+                    } else {
+                        mCamera = null;
+                    }
                 }
             });
+            if (mCamera == null) {
+                break;
+            }
             mCamera.setErrorCallback(mCameraErrorCallback);
             mCamera.setPreviewDisplay(mSurfaceHolder);
             mCamera.startPreview();
