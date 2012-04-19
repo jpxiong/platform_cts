@@ -24,4 +24,6 @@ LOCAL_SDK_VERSION := current
 
 LOCAL_PACKAGE_NAME := CtsMonkeyApp2
 
+LOCAL_PROGUARD_ENABLED := disabled
+
 include $(BUILD_PACKAGE)
