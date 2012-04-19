@@ -86,14 +86,16 @@ public class CacheManager_CacheResultTest
         assertNotNull(result.getInputStream());
         assertTrue(result.getContentLength() > 0);
         assertNull(result.getETag());
-        assertEquals(time - age,
-                DateUtils.parseDate(result.getLastModified()).getTime(), tolerance);
+        assertEquals((double)(time - age),
+                (double)DateUtils.parseDate(result.getLastModified()).getTime(),
+                (double)tolerance);
         File file = new File(CacheManager.getCacheFileBaseDir().getPath(), result.getLocalPath());
         assertTrue(file.exists());
         assertNull(result.getLocation());
         assertEquals("text/html", result.getMimeType());
         assertNull(result.getOutputStream());
-        assertEquals(time + validity, result.getExpires(), tolerance);
+        assertEquals((double)(time + validity), (double)result.getExpires(),
+                (double)tolerance);
         assertEquals(HttpStatus.SC_OK, result.getHttpStatusCode());
         assertNotNull(result.getEncoding());
 
