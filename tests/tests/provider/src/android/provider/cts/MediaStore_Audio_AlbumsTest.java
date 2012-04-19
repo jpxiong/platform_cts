@@ -16,24 +16,32 @@
 
 package android.provider.cts;
 
+import com.android.cts.stub.R;
 
 import android.content.ContentResolver;
 import android.content.ContentValues;
+import android.content.res.AssetFileDescriptor;
 import android.database.Cursor;
 import android.net.Uri;
+import android.os.Environment;
+import android.provider.MediaStore;
 import android.provider.MediaStore.Audio.Albums;
+import android.provider.MediaStore.Audio.Media;
 import android.provider.cts.MediaStoreAudioTestHelper.Audio1;
 import android.provider.cts.MediaStoreAudioTestHelper.Audio2;
-import android.test.InstrumentationTestCase;
+import android.test.AndroidTestCase;
 
-public class MediaStore_Audio_AlbumsTest extends InstrumentationTestCase {
+import java.io.File;
+import java.io.FileNotFoundException;
+
+public class MediaStore_Audio_AlbumsTest extends AndroidTestCase {
     private ContentResolver mContentResolver;
 
     @Override
     protected void setUp() throws Exception {
         super.setUp();
 
-        mContentResolver = getInstrumentation().getContext().getContentResolver();
+        mContentResolver = mContext.getContentResolver();
     }
 
     public void testGetContentUri() {
@@ -147,4 +155,59 @@ public class MediaStore_Audio_AlbumsTest extends InstrumentationTestCase {
         assertEquals(0, c.getCount());
         c.close();
     }
+
+    public void testAlbumArt() {
+        File path = new File(Environment.getExternalStorageDirectory()
+                + "/test" + System.currentTimeMillis() + ".mp3");
+        Uri uri = null;
+        try {
+            FileCopyHelper copier = new FileCopyHelper(mContext);
+            File dir = path.getParentFile();
+            dir.mkdirs();
+            copier.copyToExternalStorage(R.raw.testmp3, path);
+
+            ContentValues v = new ContentValues();
+            v.put(Media.DATA, path.getAbsolutePath());
+            v.put(Media.TITLE, "testing");
+            v.put(Albums.ALBUM, "test" + System.currentTimeMillis());
+            uri = mContentResolver.insert(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, v);
+            AssetFileDescriptor afd = mContentResolver.openAssetFileDescriptor(
+                    uri.buildUpon().appendPath("albumart").build(), "r");
+            assertNotNull(afd);
+            afd.close();
+
+            Cursor c = mContentResolver.query(uri, null, null, null, null);
+            c.moveToFirst();
+            long aid = c.getLong(c.getColumnIndex(Albums.ALBUM_ID));
+            c.close();
+
+            Uri albumart = Uri.parse("content://media/external/audio/albumart/" + aid);
+            try {
+                mContentResolver.delete(albumart, null, null);
+                afd = mContentResolver.openAssetFileDescriptor(albumart, "r");
+            } catch (FileNotFoundException e) {
+                fail("no album art");
+            }
+
+            c = mContentResolver.query(albumart, null, null, null, null);
+            c.moveToFirst();
+            String albumartfile = c.getString(c.getColumnIndex("_data"));
+            c.close();
+            new File(albumartfile).delete();
+            try {
+                afd = mContentResolver.openAssetFileDescriptor(albumart, "r");
+            } catch (FileNotFoundException e) {
+                fail("no album art");
+            }
+
+        } catch (Exception e) {
+            fail("album art failed " + e);
+        } finally {
+            path.delete();
+            if (uri != null) {
+                mContentResolver.delete(uri, null, null);
+            }
+        }
+    }
+
 }
