@@ -43,7 +43,7 @@ import java.io.UnsupportedEncodingException;
 import java.util.Vector;
 
 /**
- * TestCase for android.util.Xml. 
+ * TestCase for android.util.Xml.
  */
 public class XmlTest extends AndroidTestCase {
 
@@ -83,10 +83,6 @@ public class XmlTest extends AndroidTestCase {
 
     final String sourceStr = "<" + TAG_TEST + "><" + TAG_SON + " " + ATT_NAME + "=\"" + STR_ABC
             + "\"/></" + TAG_TEST + ">";
-
-    public void testConstructor() {
-        new Xml();
-    }
 
     public void testParseStringContentHandler() {
         final String xmlStr = "<Test><Son name=\"abc\"/></Test>";
@@ -389,7 +385,7 @@ public class XmlTest extends AndroidTestCase {
             Xml.findEncodingByName(STR_INVALIDATE_EN_CODING);
             fail("should throw out exception");
         } catch (UnsupportedEncodingException e) {
-            // expect 
+            // expect
         }
     }
 
