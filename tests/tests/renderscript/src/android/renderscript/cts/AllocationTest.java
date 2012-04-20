@@ -142,7 +142,6 @@ public class AllocationTest extends RSBaseGraphics {
          createTypedHelper(Element.SAMPLER(mRS));
          createTypedHelper(Element.SCRIPT(mRS));
          createTypedHelper(Element.TYPE(mRS));
-         createTypedHelper(Element.FONT(mRS));
 
          createTypedTextureHelper(Element.A_8(mRS));
          createTypedTextureHelper(Element.RGB_565(mRS));
@@ -182,7 +181,6 @@ public class AllocationTest extends RSBaseGraphics {
          createSizedHelper(Element.SAMPLER(mRS));
          createSizedHelper(Element.SCRIPT(mRS));
          createSizedHelper(Element.TYPE(mRS));
-         createSizedHelper(Element.FONT(mRS));
     }
 
     static int bDimX = 48;

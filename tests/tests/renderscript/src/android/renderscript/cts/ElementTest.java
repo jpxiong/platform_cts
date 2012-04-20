@@ -447,7 +447,6 @@ public class ElementTest extends RSBaseCompute {
         assertEquals(DataType.RS_PROGRAM_VERTEX, DataType.valueOf("RS_PROGRAM_VERTEX"));
         assertEquals(DataType.RS_PROGRAM_RASTER, DataType.valueOf("RS_PROGRAM_RASTER"));
         assertEquals(DataType.RS_PROGRAM_STORE, DataType.valueOf("RS_PROGRAM_STORE"));
-        assertEquals(DataType.RS_FONT, DataType.valueOf("RS_FONT"));
         // Make sure no new enums are added
         assertEquals(29, DataType.values().length);
 
