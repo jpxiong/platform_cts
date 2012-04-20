@@ -13,10 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package android.opengl.cts;
 
-public class Constants {
-    public static final int SHADER = 1;
-    public static final int PROGRAM = 2;
-    public static final int COLOR = 3;
-}
+#ifndef _COLOR_ONE_H_
+#define _COLOR_ONE_H_
+
+#include <GLES2/gl2.h>
+#include <GLES2/gl2ext.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <android/log.h>
+#include "types.h"
+
+void initColorOne(int w,int h);
+float* drawColorOne(float color[]);
+
+static void checkGlError(const char* op);
+
+#endif
+

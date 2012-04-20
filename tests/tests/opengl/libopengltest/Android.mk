@@ -27,6 +27,12 @@ LOCAL_SRC_FILES := common.cpp \
                    attach_shader_four.cpp \
                    attach_shader_five.cpp \
                    attach_shader_six.cpp \
+                   attach_shader_seven.cpp \
+                   attach_shader_eight.cpp \
+                   attach_shader_nine.cpp \
+                   attach_shader_ten.cpp \
+                   attach_shader_eleven.cpp \
+                   color_one.cpp
 
 LOCAL_C_INCLUDES := $(JNI_H_INCLUDE)
 

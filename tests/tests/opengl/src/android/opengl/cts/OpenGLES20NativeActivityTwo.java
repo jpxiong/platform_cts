@@ -21,20 +21,23 @@ import android.opengl.GLSurfaceView;
 import android.opengl.GLSurfaceView.Renderer;
 import android.os.Bundle;
 
-public class OpenGLES20ActivityOne extends Activity {
+public class OpenGLES20NativeActivityTwo extends Activity {
     OpenGLES20View view;
     Renderer mRenderer;
     int mRendererType;
-    /** Called when the activity is first created. */
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
     }
 
-    public void setView(int type, int i ) {
-        view = new OpenGLES20View(this,type,i);
+    public void setView(int type, int i, float[] vertexColors ) {
+        view = new OpenGLES20View(this,type,i, vertexColors);
         setContentView(view);
+    }
+
+    public void setView(int type, int i) {
+
     }
 
     public int getNoOfAttachedShaders() {
@@ -48,7 +51,9 @@ public class OpenGLES20ActivityOne extends Activity {
     @Override
     protected void onPause() {
         super.onPause();
-        view.onPause();
+        if(view != null) {
+            view.onPause();
+        }
 
     }
 
@@ -60,42 +65,30 @@ public class OpenGLES20ActivityOne extends Activity {
         }
     }
 
+    public float[] getActualColor() {
+        return ((RendererBase) mRenderer).mColorOne;
+    }
+
     class OpenGLES20View extends GLSurfaceView {
 
-        public OpenGLES20View(Context context, int type, int index) {
+        @Override
+        public void onPause() {
+            super.onPause();
+        }
+
+        @Override
+        public void onResume() {
+            super.onResume();
+        }
+
+        public OpenGLES20View(Context context, int type, int index, float[] rgba) {
             super(context);
             setEGLContextClientVersion(2);
-            if(type == Constants.SHADER) {
+            if(type == Constants.COLOR) {
                 if(index == 1) {
-                    mRenderer = new RendererOneShaderTest();
-                }else if(index == 2) {
-                    mRenderer = new RendererTwoShaderTest();
-                }else if(index == 3) {
-                    mRenderer = new RendererThreeShaderTest();
-                }else if(index == 4) {
-                    mRenderer = new RendererFourShaderTest();
-                }else if(index == 5) {
-                    mRenderer = new RendererFiveShaderTest();
-                }else if(index == 6) {
-                    mRenderer = new RendererSixShaderTest();
-                }else if(index == 7) {
-                    mRenderer = new RendererSevenShaderTest();
-                }else if(index == 8) {
-                    mRenderer = new RendererEightShaderTest();
-                }else if(index == 9) {
-                    mRenderer = new RendererNineShaderTest();
-                }else if(index == 10) {
-                    mRenderer = new RendererTenShaderTest();
-                }else if(index == 11) {
-                    mRenderer = new RendererElevenShaderTest();
-                }else if(index == 12) {
-                    mRenderer = new RendererTwelveShaderTest();
+                    mRenderer = new NativeRendererOneColorBufferTest(context, rgba);
                 }else {
                     throw new RuntimeException();
-                }
-            }else if(type == Constants.PROGRAM) {
-                if(index == 1) {
-                    mRenderer = new RendererOneProgramTest();
                 }
             }
             setRenderer(mRenderer);

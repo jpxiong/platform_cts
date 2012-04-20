@@ -30,15 +30,17 @@
          <activity
             android:label="@string/app_name"
             android:name="android.opengl.cts.OpenGLES20ActivityOne">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
+         </activity>
+          <activity
+            android:label="@string/app_name"
+            android:name="android.opengl.cts.OpenGLES20ActivityTwo">
          </activity> 
          <uses-library  android:name="android.test.runner" />
          <activity
-            android:name="android.opengl.cts.OpenGLES20NativeActivity"
+            android:name="android.opengl.cts.OpenGLES20NativeActivityOne"
+            android:label="@string/app_name" />
+         <activity
+            android:name="android.opengl.cts.OpenGLES20NativeActivityTwo"
             android:label="@string/app_name" />
     </application>
 
