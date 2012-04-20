@@ -16,16 +16,15 @@
 package android.webkit.cts;
 
 import android.cts.util.PollingCheck;
+import android.graphics.Bitmap;
 import android.os.Build;
 import android.test.ActivityInstrumentationTestCase2;
 import android.util.Log;
-import android.webkit.MimeTypeMap;
-import android.webkit.WebChromeClient;
+import android.webkit.WebIconDatabase;
 import android.webkit.WebSettings;
-import android.webkit.WebSettings.LayoutAlgorithm;
-import android.webkit.WebSettings.RenderPriority;
 import android.webkit.WebSettings.TextSize;
-
+import android.webkit.WebView;
+import android.webkit.cts.WebViewOnUiThread.WaitForProgressClient;
 
 import java.util.Locale;
 import java.util.regex.Matcher;
@@ -197,6 +196,7 @@ public class WebSettingsTest extends ActivityInstrumentationTestCase2<WebViewStu
     }
 
     public void testAccessCacheMode() throws Exception {
+        WebIconDatabase.getInstance().removeAllIcons();
         assertEquals(WebSettings.LOAD_DEFAULT, mSettings.getCacheMode());
 
         mSettings.setCacheMode(WebSettings.LOAD_NORMAL);
@@ -204,23 +204,52 @@ public class WebSettingsTest extends ActivityInstrumentationTestCase2<WebViewStu
 
         mSettings.setCacheMode(WebSettings.LOAD_CACHE_ELSE_NETWORK);
         assertEquals(WebSettings.LOAD_CACHE_ELSE_NETWORK, mSettings.getCacheMode());
+        final IconListenerClient iconListener = new IconListenerClient();
+        mOnUiThread.setWebChromeClient(iconListener);
         loadAssetUrl(TestHtmlConstants.HELLO_WORLD_URL);
+        new PollingCheck(WEBVIEW_TIMEOUT) {
+            @Override
+            protected boolean check() {
+                return iconListener.mReceivedIcon;
+            }
+        }.run();
         int firstFetch = mWebServer.getRequestCount();
         loadAssetUrl(TestHtmlConstants.HELLO_WORLD_URL);
         assertEquals(firstFetch, mWebServer.getRequestCount());
 
         mSettings.setCacheMode(WebSettings.LOAD_NO_CACHE);
         assertEquals(WebSettings.LOAD_NO_CACHE, mSettings.getCacheMode());
+        iconListener.mReceivedIcon = false;
         loadAssetUrl(TestHtmlConstants.HELLO_WORLD_URL);
+        new PollingCheck(WEBVIEW_TIMEOUT) {
+            @Override
+            protected boolean check() {
+                return iconListener.mReceivedIcon;
+            }
+        }.run();
         int secondFetch = mWebServer.getRequestCount();
+        iconListener.mReceivedIcon = false;
         loadAssetUrl(TestHtmlConstants.HELLO_WORLD_URL);
+        new PollingCheck(WEBVIEW_TIMEOUT) {
+            @Override
+            protected boolean check() {
+                return iconListener.mReceivedIcon;
+            }
+        }.run();
         int thirdFetch = mWebServer.getRequestCount();
         assertTrue(firstFetch < secondFetch);
         assertTrue(secondFetch < thirdFetch);
 
         mSettings.setCacheMode(WebSettings.LOAD_CACHE_ONLY);
         assertEquals(WebSettings.LOAD_CACHE_ONLY, mSettings.getCacheMode());
+        iconListener.mReceivedIcon = false;
         loadAssetUrl(TestHtmlConstants.HELLO_WORLD_URL);
+        new PollingCheck(WEBVIEW_TIMEOUT) {
+            @Override
+            protected boolean check() {
+                return iconListener.mReceivedIcon;
+            }
+        }.run();
         assertEquals(thirdFetch, mWebServer.getRequestCount());
     }
 
@@ -719,5 +748,18 @@ public class WebSettingsTest extends ActivityInstrumentationTestCase2<WebViewStu
                 return !EMPTY_IMAGE_HEIGHT.equals(mOnUiThread.getTitle());
             }
         }.run();
+    }
+
+    private class IconListenerClient extends WaitForProgressClient {
+        public boolean mReceivedIcon;
+
+        public IconListenerClient() {
+            super(mOnUiThread);
+        }
+
+        @Override
+        public void onReceivedIcon(WebView view, Bitmap icon) {
+            mReceivedIcon = true;
+        }
     }
 }
