@@ -229,6 +229,8 @@ public class FileSystemPermissionTest extends AndroidTestCase {
                     "/data/data/com.lge.ers/arm9",
                     "/data/data/com.lge.ers/kernel",
                     "/data/data/recovery",
+                    "/data/data/recovery/HTCFOTA",
+                    "/data/data/recovery/OMADM",
                     "/data/dontpanic",
                     "/data/drm",
                     "/data/drm/fwdlock",
