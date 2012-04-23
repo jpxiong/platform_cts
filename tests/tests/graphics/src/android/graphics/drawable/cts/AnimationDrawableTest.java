@@ -109,7 +109,7 @@ public class AnimationDrawableTest extends ActivityInstrumentationTestCase2<Imag
         });
         assertTrue(mAnimationDrawable.isVisible());
         assertTrue(mAnimationDrawable.isRunning());
-        assertStoppedAnimation(FIRST_FRAME_INDEX, FIRST_FRAME_DURATION);
+        pollingCheckDrawable(SECOND_FRAME_INDEX, FIRST_FRAME_DURATION);
     }
 
     public void testStart() throws Throwable {
