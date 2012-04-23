@@ -81,33 +81,51 @@ public class WebSettingsTest extends ActivityInstrumentationTestCase2<WebViewStu
 
     /**
      * Verifies that the default user agent string follows the format defined in Android
-     * compatibility definition:
+     * compatibility definition (tokens in angle brackets are variables, tokens in square
+     * brackets are optional):
      * <p/>
-     * Mozilla/5.0 (Linux; U; Android <version>; <language>-<country>; <devicemodel>;
-     * Build/<buildID>) AppleWebKit/533.1 (KHTML, like Gecko) Version/4.0 Mobile Safari/533.1
+     * Mozilla/5.0 (Linux;[ U;] Android <version>;[ <language>-<country>;]
+     * [<devicemodel>;] Build/<buildID>) AppleWebKit/<major>.<minor> (KHTML, like Gecko)
+     * Version/<major>.<minor>[ Mobile] Safari/<major>.<minor>
      */
     public void testUserAgentString_default() {
         final String actualUserAgentString = mSettings.getUserAgentString();
         Log.i(LOG_TAG, String.format("Checking user agent string %s", actualUserAgentString));
-        final String patternString = "Mozilla/5\\.0 \\(Linux; U; Android (.+); (\\w+)-(\\w+);\\s?" +
-            "(.*)\\sBuild/(.+)\\) AppleWebKit/(\\d+)\\.(\\d+) \\(KHTML, like Gecko\\) Version/4\\.0" +
-            "( Mobile)? Safari/(\\d+)\\.(\\d+)";
+        final String patternString =
+                "Mozilla/5\\.0 \\(Linux;( U;)? Android ([^;]+);( (\\w+)-(\\w+);)?" +
+                "\\s?(.*)\\sBuild/(.+)\\) AppleWebKit/(\\d+)\\.(\\d+) \\(KHTML, like Gecko\\) " +
+                "Version/\\d+\\.\\d+( Mobile)? Safari/(\\d+)\\.(\\d+)";
+        // Groups used:
+        //  1 - SSL encryption strength token " U;" (optional)
+        //  2 - Android version
+        //  3 - full locale string (optional)
+        //  4   - country
+        //  5   - language
+        //  6 - device model (optional)
+        //  7 - build ID
+        //  8 - AppleWebKit major version number
+        //  9 - AppleWebKit minor version number
+        // 10 - " Mobile" string (optional)
+        // 11 - Safari major version number
+        // 12 - Safari minor version number
         Log.i(LOG_TAG, String.format("Trying to match pattern %s", patternString));
         final Pattern userAgentExpr = Pattern.compile(patternString);
         Matcher patternMatcher = userAgentExpr.matcher(actualUserAgentString);
         assertTrue(String.format("User agent string did not match expected pattern. \nExpected " +
                         "pattern:\n%s\nActual:\n%s", patternString, actualUserAgentString),
                         patternMatcher.find());
-        Locale currentLocale = Locale.getDefault();
-        assertEquals(currentLocale.getLanguage().toLowerCase(), patternMatcher.group(2));
-        assertEquals(currentLocale.getCountry().toLowerCase(), patternMatcher.group(3));
+        if (patternMatcher.group(3) != null) {
+            Locale currentLocale = Locale.getDefault();
+            assertEquals(currentLocale.getLanguage().toLowerCase(), patternMatcher.group(4));
+            assertEquals(currentLocale.getCountry().toLowerCase(), patternMatcher.group(5));
+        }
         if ("REL".equals(Build.VERSION.CODENAME)) {
             // Model is only added in release builds
-            assertEquals(Build.MODEL, patternMatcher.group(4));
+            assertEquals(Build.MODEL, patternMatcher.group(6));
             // Release version is valid only in release builds
-            assertEquals(Build.VERSION.RELEASE, patternMatcher.group(1));
+            assertEquals(Build.VERSION.RELEASE, patternMatcher.group(2));
         }
-        assertEquals(Build.ID, patternMatcher.group(5));
+        assertEquals(Build.ID, patternMatcher.group(7));
     }
 
     public void testAccessUserAgentString() throws Exception {
