@@ -2406,7 +2406,7 @@ public class TextViewTest extends ActivityInstrumentationTestCase2<TextViewStubA
     })
     @UiThreadTest
     @ToBeFixed(bug = "1386429", explanation = "mTextView.getTypeface() will be null "
-            + "if typeface didn't be set or set to normal "
+            + "if typeface is set to normal "
             + "and style didn't set or set to normal in xml."
             + "And there is no getter to check the highlight colour.")
     public void testTextAttr() {
@@ -2441,7 +2441,7 @@ public class TextViewTest extends ActivityInstrumentationTestCase2<TextViewStubA
         assertEquals(20f, mTextView.getTextSize(), 0.01f);
 
         // getTypeface
-        // getTypeface will be null if android:typeface is not set or is set to normal,
+        // getTypeface will be null if android:typeface is set to normal,
         // and android:style is not set or is set to normal
         assertNull(mTextView.getTypeface());
 
