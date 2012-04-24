@@ -554,6 +554,10 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
         assertTrue(frameRates != null && frameRates.size() != 0);
         assertTrue(focusModes != null && focusModes.size() != 0);
         assertNotNull(focusMode);
+        // The default focus mode must be auto if it exists.
+        if (focusModes.contains(Parameters.FOCUS_MODE_AUTO)) {
+            assertEquals(Parameters.FOCUS_MODE_AUTO, focusMode);
+        }
         assertTrue(focalLength > 0);
         assertTrue(horizontalViewAngle > 0 && horizontalViewAngle <= 360);
         assertTrue(verticalViewAngle > 0 && verticalViewAngle <= 360);
