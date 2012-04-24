@@ -31,8 +31,8 @@
       <activity android:label="@string/accessibility_query_window_test_activity"
               android:name="android.accessibilityservice.cts.AccessibilityWindowQueryActivity"/>
 
-      <activity android:label="@string/accessibility_hierarchical_focus_test_activity"
-              android:name="android.accessibilityservice.cts.AccessibilityHierarchicalFocusActivity"/>
+      <activity android:label="@string/accessibility_view_tree_reporting_test_activity"
+              android:name="android.accessibilityservice.cts.AccessibilityViewTreeReportingActivity"/>
 
       <activity android:label="@string/accessibility_directional_focus_test_activity"
               android:name="android.accessibilityservice.cts.AccessibilityDirectionalFocusActivity"/>

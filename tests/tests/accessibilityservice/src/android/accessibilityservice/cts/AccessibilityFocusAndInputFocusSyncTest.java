@@ -45,10 +45,10 @@ import java.util.Queue;
  * </p>
  */
 public class AccessibilityFocusAndInputFocusSyncTest
-        extends AccessibilityActivityTestCase<AccessibilityHierarchicalFocusActivity>{
+        extends AccessibilityActivityTestCase<AccessibilityFocusAndInputFocusSyncActivity>{
 
     public AccessibilityFocusAndInputFocusSyncTest() {
-        super(AccessibilityHierarchicalFocusActivity.class);
+        super(AccessibilityFocusAndInputFocusSyncActivity.class);
     }
 
     @MediumTest

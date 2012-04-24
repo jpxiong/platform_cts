@@ -84,7 +84,7 @@
     <!-- AccessibilityFocusTest -->
 
     <!-- String title of the accessibility hierarchical focus test activity -->
-    <string name="accessibility_hierarchical_focus_test_activity">Accessibility hierarchical focus test</string>
+    <string name="accessibility_view_tree_reporting_test_activity">Accessibility view three reporting test</string>
 
     <!-- String root LinearLayout text -->
     <string name="rootLinearLayout">rootLinearLayout</string>

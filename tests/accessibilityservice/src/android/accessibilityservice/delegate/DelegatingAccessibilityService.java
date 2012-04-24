@@ -188,6 +188,11 @@ public class DelegatingAccessibilityService extends AccessibilityService {
             public boolean performGlobalAction(int action) {
                 return sServiceDelegate.performGlobalAction(action);
             }
+
+            @Override
+            public AccessibilityNodeInfo getRootInActiveWindow() {
+                return sServiceDelegate.getRootInActiveWindow();
+            }
         }
     }
 }

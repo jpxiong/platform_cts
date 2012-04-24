@@ -26,11 +26,11 @@ import com.android.cts.accessibilityservice.R;
  * this activity is for verifying the hierarchical movement of the
  * accessibility focus.
  */
-public class AccessibilityHierarchicalFocusActivity extends Activity {
+public class AccessibilityViewTreeReportingActivity extends Activity {
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.accessibility_hierarchical_focus_test);
+        setContentView(R.layout.accessibility_view_tree_reporting_test);
     }
 }
