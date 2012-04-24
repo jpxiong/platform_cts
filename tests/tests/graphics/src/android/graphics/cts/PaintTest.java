@@ -30,6 +30,7 @@ import android.graphics.Rasterizer;
 import android.graphics.Shader;
 import android.graphics.Typeface;
 import android.graphics.Xfermode;
+import android.os.Build;
 import android.test.AndroidTestCase;
 import android.text.SpannedString;
 
@@ -873,6 +874,11 @@ public class PaintTest extends AndroidTestCase {
     }
 
     public void testMeasureTextWithLongText() {
+        // This test is not compatible with 4.0.3
+        if ("4.0.3".equals(Build.VERSION.RELEASE)) {
+            return;
+        }
+
         final int MAX_COUNT = 65535;
         char[] longText = new char[MAX_COUNT];
         for (int n = 0; n < MAX_COUNT; n++) {
