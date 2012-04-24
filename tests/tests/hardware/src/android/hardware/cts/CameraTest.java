@@ -770,11 +770,11 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
         // Datetime should be local time.
         assertTrue(datetime.startsWith(localDatetime));
         assertTrue(datetime.length() == 19); // EXIF spec is "YYYY:MM:DD HH:MM:SS".
-        assertTrue(exif.getAttributeInt(ExifInterface.TAG_IMAGE_WIDTH, 0) != 0);
-        assertTrue(exif.getAttributeInt(ExifInterface.TAG_IMAGE_LENGTH, 0) != 0);
         checkGpsDataNull(exif);
         double exifFocalLength = exif.getAttributeDouble(ExifInterface.TAG_FOCAL_LENGTH, -1);
         assertEquals(focalLength, exifFocalLength, 0.001);
+        // Test image width and height exif tags. They should match the jpeg.
+        assertBitmapAndJpegSizeEqual(mJpegData, exif);
 
         // Test gps exif tags.
         testGpsExifValues(parameters, 37.736071, -122.441983, 21, 1199145600,
@@ -782,14 +782,28 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
         testGpsExifValues(parameters, 0.736071, 0.441983, 1, 1199145601, "GPS");
         testGpsExifValues(parameters, -89.736071, -179.441983, 100000, 1199145602, "NETWORK");
 
-        // Test gps tags do not exist after calling removeGpsData.
+        // Test gps tags do not exist after calling removeGpsData. Also check if
+        // image width and height exif match the jpeg when jpeg rotation is set.
         if (!recording) mCamera.startPreview();
         parameters.removeGpsData();
+        parameters.setRotation(90); // For testing image width and height exif.
         mCamera.setParameters(parameters);
         mCamera.takePicture(mShutterCallback, mRawPictureCallback, mJpegPictureCallback);
         waitForSnapshotDone();
         exif = new ExifInterface(JPEG_PATH);
         checkGpsDataNull(exif);
+        assertBitmapAndJpegSizeEqual(mJpegData, exif);
+    }
+
+    private void assertBitmapAndJpegSizeEqual(byte[] jpegData, ExifInterface exif) {
+        int exifWidth = exif.getAttributeInt(ExifInterface.TAG_IMAGE_WIDTH, 0);
+        int exifHeight = exif.getAttributeInt(ExifInterface.TAG_IMAGE_LENGTH, 0);
+        assertTrue(exifWidth != 0 && exifHeight != 0);
+        BitmapFactory.Options bmpOptions = new BitmapFactory.Options();
+        bmpOptions.inJustDecodeBounds = true;
+        BitmapFactory.decodeByteArray(jpegData, 0, jpegData.length, bmpOptions);
+        assertEquals(bmpOptions.outWidth, exifWidth);
+        assertEquals(bmpOptions.outHeight, exifHeight);
     }
 
     private void testGpsExifValues(Parameters parameters, double latitude,
