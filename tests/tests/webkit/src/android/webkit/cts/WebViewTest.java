@@ -283,6 +283,15 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
         assertEquals(TestHtmlConstants.HELLO_WORLD_TITLE, mWebView.getTitle());
     }
 
+    @SuppressWarnings("deprecation")
+    @UiThreadTest
+    public void testGetVisibleTitleHeight() throws Exception {
+        startWebServer(false);
+        String url = mWebServer.getAssetUrl(TestHtmlConstants.HELLO_WORLD_URL);
+        mOnUiThread.loadUrlAndWaitForCompletion(url);
+        assertEquals(0, mWebView.getVisibleTitleHeight());
+    }
+
     @UiThreadTest
     public void testGetOriginalUrl() throws Throwable {
         startWebServer(false);
