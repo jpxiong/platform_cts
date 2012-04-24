@@ -457,14 +457,13 @@ public class PaintTest extends AndroidTestCase {
         p.setTextSize(2.0f);
         assertEquals(2.0f, p.getTextSize());
 
-       // text size should be greater than 0, so set 0 has no effect
-       p.setTextSize(0.0f);
-       assertEquals(2.0f, p.getTextSize());
+        // text size should be greater than 0, so set -1 has no effect
+        p.setTextSize(-1.0f);
+        assertEquals(2.0f, p.getTextSize());
 
-       // text size should be greater than 0, so set -1 has no effect
-       p.setTextSize(-1.0f);
-       assertEquals(2.0f, p.getTextSize());
-
+        // text size should be greater than or equals to 0
+        p.setTextSize(0.0f);
+        assertEquals(0.0f, p.getTextSize());
     }
 
     public void testGetTextWidths() throws Exception {
