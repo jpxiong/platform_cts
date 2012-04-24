@@ -16,7 +16,6 @@
 
 package android.accessibilityservice.cts;
 
-import android.accessibilityservice.AccessibilityService;
 import android.accessibilityservice.AccessibilityServiceInfo;
 import android.accessibilityservice.IAccessibilityServiceDelegate;
 import android.accessibilityservice.IAccessibilityServiceDelegateConnection;
@@ -37,10 +36,9 @@ import android.view.accessibility.AccessibilityEvent;
 import android.view.accessibility.AccessibilityManager;
 import android.view.accessibility.AccessibilityNodeInfo;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
 /**
@@ -163,11 +161,6 @@ public abstract class AccessibilityActivityTestCase<T extends Activity>
         private IAccessibilityServiceDelegateConnection mQueryConnection;
 
         /**
-         * The last window state change event.
-         */
-        private AccessibilityEvent mLastWindowStateChangeEvent;
-
-        /**
          * Flag whether we are waiting for a specific event.
          */
         private volatile boolean mWaitingForEventDelivery;
@@ -175,26 +168,21 @@ public abstract class AccessibilityActivityTestCase<T extends Activity>
         /**
          * Queue with received events.
          */
-        private final LinkedBlockingQueue<AccessibilityEvent> mEventQueue =
-            new LinkedBlockingQueue<AccessibilityEvent>(10);
+        private final ArrayList<AccessibilityEvent> mEventQueue =
+            new ArrayList<AccessibilityEvent>(10);
 
         public AccessibilityInteractionBridge(Context context) {
             bindToDelegatingAccessibilityService(context);
         }
 
         public void onAccessibilityEvent(AccessibilityEvent event) {
-            if (event.getEventType() == AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED) {
-                mLastWindowStateChangeEvent = AccessibilityEvent.obtain(event);
+            if (!mWaitingForEventDelivery) {
+                return;
             }
-            if (mWaitingForEventDelivery) {
-                try {
-                    AccessibilityEvent clone = AccessibilityEvent.obtain(event);
-                    mEventQueue.offer(clone, TIMEOUT_ASYNC_PROCESSING, TimeUnit.MILLISECONDS);
-                } catch (InterruptedException ie) {
-                    /* ignore */
-                }
-                if (!mWaitingForEventDelivery) {
-                    mEventQueue.clear();
+            synchronized (mLock) {
+                mLock.notifyAll();
+                if (mWaitingForEventDelivery) {
+                    mEventQueue.add(AccessibilityEvent.obtain(event));
                 }
             }
         }
@@ -288,7 +276,7 @@ public abstract class AccessibilityActivityTestCase<T extends Activity>
                     }
                     @Override
                     public void onInterrupt() {
-                        /* do nothing */;
+                        /* do nothing */
                     }
                 });
                 mInitialized = true;
@@ -328,16 +316,6 @@ public abstract class AccessibilityActivityTestCase<T extends Activity>
             List<AccessibilityNodeInfo> nodes = findAccessibilityNodeInfosByText(text);
             if (nodes != null && !nodes.isEmpty()) {
                 return nodes.get(0);
-            }
-            return null;
-        }
-
-        /**
-         * @return The event that was waited for.
-         */
-        public AccessibilityNodeInfo getRootInActiveWindow() {
-            if (mLastWindowStateChangeEvent != null) {
-                return getSource(mLastWindowStateChangeEvent);
             }
             return null;
         }
@@ -464,6 +442,15 @@ public abstract class AccessibilityActivityTestCase<T extends Activity>
             }
         }
 
+        public AccessibilityNodeInfo getRootInActiveWindow() {
+            try {
+                return getQueryConnection().getRootInActiveWindow();
+            } catch (RemoteException re) {
+                /* ignore */
+            }
+            return null;
+        }
+
         /**
          * Executes a command and waits for a specific accessibility event type up
          * to a given timeout.
@@ -479,32 +466,38 @@ public abstract class AccessibilityActivityTestCase<T extends Activity>
             mWaitingForEventDelivery = true;
             // Execute the command.
             command.run();
-            // Wait for the event.
-            final long startTimeMillis = SystemClock.uptimeMillis();
-            while (true) {
-                // Check if timed out and if not wait.
-                final long elapsedTimeMillis = SystemClock.uptimeMillis() - startTimeMillis;
-                final long remainingTimeMillis = timeoutMillis - elapsedTimeMillis;
-                if (remainingTimeMillis <= 0) {
+            synchronized (mLock) {
+                try {
+                    // Wait for the event.
+                    final long startTimeMillis = SystemClock.uptimeMillis();
+                    while (true) {
+                        mLock.notifyAll();
+                        // Drain the event queue
+                        while (!mEventQueue.isEmpty()) {
+                            AccessibilityEvent event = mEventQueue.remove(0);
+                            if (filter.accept(event)) {
+                                return event;
+                            } else {
+                                event.recycle();
+                            }
+                        }
+                        // Check if timed out and if not wait.
+                        final long elapsedTimeMillis = SystemClock.uptimeMillis() - startTimeMillis;
+                        final long remainingTimeMillis = timeoutMillis - elapsedTimeMillis;
+                        if (remainingTimeMillis <= 0) {
+                            throw new TimeoutException("Expected event not received within: "
+                                    + timeoutMillis + " ms.");
+                        }
+                        try {
+                            mLock.wait(remainingTimeMillis);
+                        } catch (InterruptedException ie) {
+                            /* ignore */
+                        }
+                    }
+                } finally {
                     mWaitingForEventDelivery = false;
                     mEventQueue.clear();
-                    throw new TimeoutException("Expected event not received within: "
-                            + timeoutMillis + " ms.");
-                }
-                AccessibilityEvent event = null;
-                try {
-                    event = mEventQueue.poll(remainingTimeMillis, TimeUnit.MILLISECONDS);
-                } catch (InterruptedException ie) {
-                    /* ignore */
-                }
-                if (event != null) {
-                    if (filter.accept(event)) {
-                        mWaitingForEventDelivery = false;
-                        mEventQueue.clear();
-                        return event;
-                    } else {
-                        event.recycle();
-                    }
+                    mLock.notifyAll();
                 }
             }
         }

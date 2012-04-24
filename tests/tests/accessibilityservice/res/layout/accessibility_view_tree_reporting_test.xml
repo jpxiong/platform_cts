@@ -3,7 +3,8 @@
     android:id="@+id/rootLinearLayout"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
-    android:orientation="vertical"
+    android:orientation="horizontal"
+    android:layoutDirection="rtl"
     android:importantForAccessibility="yes"
     android:contentDescription="@string/rootLinearLayout">
 
