@@ -38,7 +38,7 @@ public class SweepGradientTest extends TestCase {
     private static final int CENTER = SIZE / 2;
     private static final int RADIUS = 80;
     private static final int NUM_STEPS = 100;
-    private static final int TOLERANCE = 5;
+    private static final int TOLERANCE = 10;
 
     @Override
     protected void setUp() throws Exception {
