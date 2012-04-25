@@ -31,6 +31,7 @@ public class GLEnv {
     private EGLConfig  mEGLConfig;
 
     private static final int EGL_CONTEXT_CLIENT_VERSION = 0x3098;
+    private static final int EGL_OPENGL_ES2_BIT = 0x0004;
 
     public GLEnv() {
         EGL10 egl = (EGL10)EGLContext.getEGL();
@@ -45,6 +46,7 @@ public class GLEnv {
             EGL10.EGL_RED_SIZE, 8,
             EGL10.EGL_GREEN_SIZE, 8,
             EGL10.EGL_BLUE_SIZE, 8,
+            EGL10.EGL_RENDERABLE_TYPE, EGL_OPENGL_ES2_BIT,
             EGL10.EGL_NONE
         };
         EGLConfig[] configs = new EGLConfig[1];
