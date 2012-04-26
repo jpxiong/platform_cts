@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 
-
 #include <jni.h>
 #include <android/log.h>
 
@@ -24,12 +23,19 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
+
 #include "attach_shader_one.h"
 #include "attach_shader_two.h"
 #include "attach_shader_three.h"
 #include "attach_shader_four.h"
 #include "attach_shader_five.h"
 #include "attach_shader_six.h"
+#include "attach_shader_seven.h"
+#include "attach_shader_eight.h"
+#include "attach_shader_nine.h"
+#include "attach_shader_ten.h"
+#include "attach_shader_eleven.h"
+#include "color_one.h"
 
 #define  LOG_TAG    "gl2_jni_libone"
 #define  LOGI(...)  __android_log_print(ANDROID_LOG_INFO,LOG_TAG,__VA_ARGS__)
@@ -40,7 +46,7 @@ static GLint shaderCount = -1;
 
 
 extern "C" JNIEXPORT void JNICALL Java_android_opengl_cts_GL2JniLibOne_init
-  (JNIEnv *, jclass pClass, jint pCategory, jint pSubCategory)  {
+  (JNIEnv *, jclass pClass, jint pCategory, jint pSubCategory, jint width, jint height)  {
     LOGI("Category :  %d\n", pCategory);
 
     if(pCategory == 1) {
@@ -72,6 +78,34 @@ extern "C" JNIEXPORT void JNICALL Java_android_opengl_cts_GL2JniLibOne_init
             Data data = attachShaderSix();
             LOGI("Attach Shader Error :  %d\n", data.mShaderError);
             errorAttachShader = data.mShaderError;
+        }else if(pSubCategory == 7) {
+            Data data = attachShaderSeven();
+            LOGI("Attach Shader Error :  %d\n", data.mShaderError);
+            errorAttachShader = data.mShaderError;
+        }else if(pSubCategory == 8) {
+            Data data = attachShaderEight();
+            LOGI("Attach Shader Error :  %d\n", data.mShaderError);
+            errorAttachShader = data.mShaderError;
+        }else if(pSubCategory == 9) {
+            Data data = attachShaderNine();
+            LOGI("Attach Shader Error :  %d\n", data.mShaderError);
+            errorAttachShader = data.mShaderError;
+        }else if(pSubCategory == 10) {
+            Data data = attachShaderTen();
+            LOGI("Attach Shader Error :  %d\n", data.mShaderError);
+            LOGI("Shader Count :  %d\n", data.mShaderCount);
+            errorAttachShader = data.mShaderError;
+            shaderCount = data.mShaderCount;
+        }else if(pSubCategory == 11) {
+            Data data = attachShaderEleven();
+            LOGI("Attach Shader Error :  %d\n", data.mShaderError);
+            LOGI("Shader Count :  %d\n", data.mShaderCount);
+            errorAttachShader = data.mShaderError;
+            shaderCount = data.mShaderCount;
+        }
+    }else if(pCategory == 3){//Color Test
+        if(pSubCategory == 1){
+            initColorOne( width,height);
         }
     }
 }
@@ -97,4 +131,23 @@ extern "C" JNIEXPORT jint JNICALL Java_android_opengl_cts_GL2JniLibOne_getAttach
     return shaderCount;
 }
 
+extern "C" JNIEXPORT jfloatArray JNICALL Java_android_opengl_cts_GL2JniLibOne_draw(JNIEnv * env,
+        jclass obj, jint pCategory, jint pSubCategory, jfloatArray color)
+{
+    LOGI("Inside draw %d %d", pCategory, pSubCategory);
+    jfloatArray result;
+    if(pCategory == 3){
+        if(pSubCategory == 1){
+            result = env->NewFloatArray(4);
 
+            jfloat *lColor =  env->GetFloatArrayElements(color,0);
+
+            float * actualColor = drawColorOne(lColor);
+            for( int i= 0; i < sizeof(actualColor); i++) {
+                LOGI("actualColor[%d] ; %f", i, actualColor[i]);
+            }
+            env->SetFloatArrayRegion(result, 0, 4, actualColor);
+        }
+    }
+    return result;
+}

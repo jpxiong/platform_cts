@@ -15,33 +15,28 @@
  */
 package android.opengl.cts;
 
-import java.nio.FloatBuffer;
-
+import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
 
 import android.opengl.GLES20;
-import android.opengl.GLSurfaceView;
-import android.opengl.GLSurfaceView.Renderer;
 
-public abstract class RendererBase implements GLSurfaceView.Renderer {
-
-    FloatBuffer floatBuffer;
-    int mProgram;
-    int maPositionHandle;
-    float[] mColorOne = new float[4];
-
-    int[] mShaderCount;
-    int mError;
+public class RendererElevenShaderTest extends RendererBase {
+    private String fragmentShaderCode = Vertex.successfulcompile_vertex;
 
     @Override
-    public void onSurfaceChanged(GL10 gl, int width, int height) {
+    public void onDrawFrame(GL10 gl) {
 
     }
 
-    public int loadShader(int type, String shaderCode) {
-        int shader = GLES20.glCreateShader(type);
-        GLES20.glShaderSource(shader, shaderCode);
-        GLES20.glCompileShader(shader);
-        return shader;
+    @Override
+    public void onSurfaceCreated(GL10 gl, EGLConfig config) {
+        GLES20.glClearColor(0.5f, 0.5f, 0.5f, 1.0f);
+        int fragmentShader = loadShader(GLES20.GL_FRAGMENT_SHADER, fragmentShaderCode);
+        mProgram =  GLES20.glCreateProgram();
+
+        GLES20.glAttachShader(mProgram, fragmentShader);
+        GLES20.glLinkProgram(mProgram);
+
+        mError = GLES20.glGetError();
     }
 }

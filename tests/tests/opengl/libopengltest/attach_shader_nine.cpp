@@ -13,10 +13,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package android.opengl.cts;
+#include <GLES2/gl2.h>
+#include <GLES2/gl2ext.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include "attach_shader_nine.h"
 
-public class Constants {
-    public static final int SHADER = 1;
-    public static final int PROGRAM = 2;
-    public static final int COLOR = 3;
+#define  LOG_TAG    "attach_shader_nine"
+#define  LOGI(...)  __android_log_print(ANDROID_LOG_INFO,LOG_TAG,__VA_ARGS__)
+
+Data attachShaderNine(){
+    GLuint fragmentShader = 0;
+    GLuint program = glCreateProgram();
+    glAttachShader(program, fragmentShader);
+
+    GLint error = glGetError();
+    Data data = {error, -9, -1};
+    glDeleteShader(fragmentShader);
+    glDeleteProgram(program);
+    return data;
 }

@@ -1,24 +1,9 @@
-/*
- * Copyright (C) 2012 The Android Open Source Project
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
 package android.opengl.cts;
 
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
 
-import com.android.cts.opengl.R;
+//import com.android.cts.opengl.R;
 
 import android.app.Activity;
 import android.content.Context;
@@ -32,7 +17,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
-public class OpenGLES20NativeActivity extends Activity {
+public class OpenGLES20NativeActivityOne extends Activity {
     /** Called when the activity is first created. */
 
     int mValue;
@@ -108,15 +93,15 @@ class GL2Renderer implements GLSurfaceView.Renderer {
     }
 
     public void onSurfaceChanged(GL10 gl, int width, int height) {
-        
-    }
-
-    public void onSurfaceCreated(GL10 gl, EGLConfig config) {
         Log.i(TAG ,"onSurfaceCreated");
-        GL2JniLibOne.init(mCategory, mTestCase);
+        GL2JniLibOne.init(mCategory, mTestCase, width, height);
         this.mAttachShaderError = GL2JniLibOne.getAttachShaderError();
         Log.i(TAG,"error:" + mAttachShaderError);
         this.mShaderCount = GL2JniLibOne.getAttachedShaderCount();
         Log.i(TAG,"ShaderCount:" + mShaderCount);
+    }
+
+    public void onSurfaceCreated(GL10 gl, EGLConfig config) {
+
     }
 }
