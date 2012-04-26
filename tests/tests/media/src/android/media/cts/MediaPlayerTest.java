@@ -174,12 +174,31 @@ public class MediaPlayerTest extends MediaPlayerTestBase {
     // This test uses one mp3 that is silent but has a strong positive DC offset,
     // and a second mp3 that is also silent but has a strong negative DC offset.
     // If the two are played back overlapped, they will cancel each other out,
-    // and result in zeroes being detected.
-    public void testGapless() throws Exception {
+    // and result in zeroes being detected. If there is a gap in playback, that
+    // will also result in zeroes being detected.
+    // Note that this test does NOT test guarantee that the correct data is played
+    public void testGapless1() throws Exception {
+        testGapless(R.raw.monodcpos, R.raw.monodcneg);
+    }
+
+    // This test is similar, but uses two identical m4a files that have some noise
+    // with a strong positive DC offset. This is used to detect if there is
+    // a gap in playback
+    // Note that this test does NOT test guarantee that the correct data is played
+    public void testGapless2() throws Exception {
+        testGapless(R.raw.stereonoisedcpos, R.raw.stereonoisedcpos);
+    }
+
+    // same as above, but with a mono file
+    public void testGapless3() throws Exception {
+        testGapless(R.raw.mononoisedcpos, R.raw.mononoisedcpos);
+    }
+
+    private void testGapless(int resid1, int resid2) throws Exception {
         MediaPlayer mp1 = new MediaPlayer();
         mp1.setAudioStreamType(AudioManager.STREAM_MUSIC);
         try {
-            AssetFileDescriptor afd = mContext.getResources().openRawResourceFd(R.raw.monodcneg);
+            AssetFileDescriptor afd = mContext.getResources().openRawResourceFd(resid1);
             mp1.setDataSource(afd.getFileDescriptor(), afd.getStartOffset(), afd.getLength());
             afd.close();
             mp1.prepare();
@@ -192,14 +211,14 @@ public class MediaPlayerTest extends MediaPlayerTestBase {
         mp2.setAudioSessionId(session);
         mp2.setAudioStreamType(AudioManager.STREAM_MUSIC);
         try {
-            AssetFileDescriptor afd = mContext.getResources().openRawResourceFd(R.raw.monodcneg);
+            AssetFileDescriptor afd = mContext.getResources().openRawResourceFd(resid2);
             mp2.setDataSource(afd.getFileDescriptor(), afd.getStartOffset(), afd.getLength());
             afd.close();
             mp2.prepare();
         } catch (Exception e) {
             assertTrue(false);
         }
-
+        int captureintervalms = mp1.getDuration() + mp2.getDuration() - 2000;
         int size = 256;
         int[] range = Visualizer.getCaptureSizeRange();
         if (size < range[0]) {
@@ -217,8 +236,7 @@ public class MediaPlayerTest extends MediaPlayerTestBase {
         int oldRingerMode = am.getRingerMode();
         am.setRingerMode(AudioManager.RINGER_MODE_NORMAL);
         int oldvolume = am.getStreamVolume(AudioManager.STREAM_MUSIC);
-        int maxvolume = am.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
-        am.setStreamVolume(AudioManager.STREAM_MUSIC, maxvolume, 0);
+        am.setStreamVolume(AudioManager.STREAM_MUSIC, 1, 0);
         try {
             mp1.setNextMediaPlayer(mp2);
             mp1.start();
@@ -228,18 +246,19 @@ public class MediaPlayerTest extends MediaPlayerTestBase {
             Thread.sleep(SLEEP_TIME);
             long start = SystemClock.elapsedRealtime();
             // there should be no consecutive zeroes (-128) in the capture buffer
-            // for the next 8 seconds. If silence is detected right away, then
+            // when going to the next file. If silence is detected right away, then
             // the volume is probably turned all the way down (visualizer data
             // is captured after volume adjustment).
             boolean first = true;
-            while((SystemClock.elapsedRealtime() - start) < 8000) {
+            while((SystemClock.elapsedRealtime() - start) < captureintervalms) {
                 assertTrue(vis.getWaveForm(vizdata) == Visualizer.SUCCESS);
                 for (int i = 0; i < vizdata.length - 1; i++) {
                     if (vizdata[i] == -128 && vizdata[i + 1] == -128) {
                         if (first) {
                             fail("silence detected, please increase volume and rerun test");
                         } else {
-                            fail("gap or overlap detected");
+                            fail("gap or overlap detected at t=" +
+                                    (SLEEP_TIME + SystemClock.elapsedRealtime() - start));
                         }
                         break;
                     }
