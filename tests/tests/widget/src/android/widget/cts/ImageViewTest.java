@@ -410,14 +410,6 @@ public class ImageViewTest extends ActivityInstrumentationTestCase<ImageViewStub
         assertTrue(mImageView.getMeasuredHeight() <= 150);
     }
 
-    public void testOnSetAlpha() {
-        MockImageView mockImageView = new MockImageView(mActivity);
-        assertTrue(mockImageView.onSetAlpha(0));
-        MockDrawable drawable = new MockDrawable();
-        mockImageView.setBackgroundDrawable(drawable);
-        assertFalse(mockImageView.onSetAlpha(0));
-    }
-
     public void testSetFrame() {
         MockImageView mockImageView = new MockImageView(mActivity);
         assertFalse(mockImageView.hasOnSizeChangedCalled());
