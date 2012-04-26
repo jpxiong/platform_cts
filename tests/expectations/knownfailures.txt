@@ -1,2 +1,15 @@
 [
+  {
+    name: "android.openglperf.cts.GlVboPerfTest#testVboWithVaryingIndexBufferNumbers",
+    bug: 5898262
+  },
+  {
+    name: "android.text.cts.AndroidCharacterTest#testMirror",
+    bug: 4371654
+  },
+  {
+    name: "android.text.format.cts.DateUtilsTest#test2038",
+    bug: 6293653
+  }
 ]
+
