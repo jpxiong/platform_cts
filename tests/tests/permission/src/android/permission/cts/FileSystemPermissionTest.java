@@ -159,6 +159,22 @@ public class FileSystemPermissionTest extends AndroidTestCase {
         assertFalse(f.canExecute());
     }
 
+    @MediumTest
+    public void testPn544Sane() throws Exception {
+        File f = new File("/dev/pn544");
+        assertFalse(f.canRead());
+        assertFalse(f.canWrite());
+        assertFalse(f.canExecute());
+    }
+
+    @MediumTest
+    public void testTtyO3Sane() throws Exception {
+        File f = new File("/dev/ttyO3");
+        assertFalse(f.canRead());
+        assertFalse(f.canWrite());
+        assertFalse(f.canExecute());
+    }
+
     private static boolean isDirectoryWritable(File directory) {
         File toCreate = new File(directory, "hello");
         try {
