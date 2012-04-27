@@ -281,7 +281,8 @@ public class MediaPlayerTest extends MediaPlayerTestBase {
      */
     public void testVideoSurfaceResetting() throws Exception {
         final int tolerance = 66 * 3 / 2; /* Test video is 15fps... 66 ms per frame */
-        final int seekPos = 1500;
+        final int audioLatencyTolerance = 1000;  /* covers audio path latency variability */
+        final int seekPos = 5000;
 
         final CountDownLatch seekDone = new CountDownLatch(1);
 
@@ -308,14 +309,14 @@ public class MediaPlayerTest extends MediaPlayerTestBase {
 
         mMediaPlayer.seekTo(seekPos);
         seekDone.await();
-        Thread.sleep(SLEEP_TIME / 2);
+        posAfter = mMediaPlayer.getCurrentPosition();
+        assertEquals(seekPos, posAfter, tolerance + audioLatencyTolerance);
 
+        Thread.sleep(SLEEP_TIME / 2);
         posBefore = mMediaPlayer.getCurrentPosition();
         mMediaPlayer.setDisplay(null);
         posAfter = mMediaPlayer.getCurrentPosition();
-
         assertEquals(posAfter, posBefore, tolerance);
-        assertEquals(seekPos + SLEEP_TIME / 2, posBefore, tolerance);
         assertTrue(mMediaPlayer.isPlaying());
 
         Thread.sleep(SLEEP_TIME);
