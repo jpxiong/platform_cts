@@ -83,52 +83,56 @@ public class FileSystemPermissionTest extends AndroidTestCase {
 
     @MediumTest
     public void testOtherApplicationDirectoriesAreNotWritable() throws Exception {
+        Set<File> writableDirs = new HashSet<File>();
         List<ApplicationInfo> apps = getContext()
                 .getPackageManager()
                 .getInstalledApplications(PackageManager.GET_UNINSTALLED_PACKAGES);
         String myAppDirectory = getContext().getApplicationInfo().dataDir;
         for (ApplicationInfo app : apps) {
             if (!myAppDirectory.equals(app.dataDir)) {
-                assertDirectoryAndSubdirectoriesNotWritable(new File(app.dataDir));
+                writableDirs.addAll(getWritableDirectoryiesAndSubdirectoriesOf(new File(app.dataDir)));
             }
         }
+
+        assertTrue("Found writable directories: " + writableDirs.toString(),
+                writableDirs.isEmpty());
     }
 
     @MediumTest
     public void testApplicationParentDirectoryNotWritable() throws Exception {
         String myDataDir = getContext().getApplicationInfo().dataDir;
         File parentDir = new File(myDataDir).getParentFile();
-        assertDirectoryNotWritable(parentDir);
+        assertFalse(parentDir.toString(), isDirectoryWritable(parentDir));
     }
 
     @MediumTest
     public void testDataDirectoryNotWritable() throws Exception {
-        assertDirectoryNotWritable(Environment.getDataDirectory());
+        assertFalse(isDirectoryWritable(Environment.getDataDirectory()));
     }
 
     @MediumTest
     public void testAndroidRootDirectoryNotWritable() throws Exception {
-        assertDirectoryNotWritable(Environment.getRootDirectory());
+        assertFalse(isDirectoryWritable(Environment.getRootDirectory()));
     }
 
     @MediumTest
     public void testDownloadCacheDirectoryNotWritable() throws Exception {
-        assertDirectoryNotWritable(Environment.getDownloadCacheDirectory());
+        assertFalse(isDirectoryWritable(Environment.getDownloadCacheDirectory()));
     }
 
     @MediumTest
     public void testRootDirectoryNotWritable() throws Exception {
-        assertDirectoryNotWritable(new File("/"));
+        assertFalse(isDirectoryWritable(new File("/")));
     }
 
     @MediumTest
     public void testDevDirectoryNotWritable() throws Exception {
-        assertDirectoryNotWritable(new File("/dev"));
+        assertFalse(isDirectoryWritable(new File("/dev")));
     }
 
     @MediumTest
     public void testProcDirectoryNotWritable() throws Exception {
-        assertDirectoryNotWritable(new File("/proc"));
+        assertFalse(isDirectoryWritable(new File("/proc")));
     }
 
     @MediumTest
@@ -155,17 +159,17 @@ public class FileSystemPermissionTest extends AndroidTestCase {
         assertFalse(f.canExecute());
     }
 
-    private static void assertDirectoryNotWritable(File directory) throws Exception {
+    private static boolean isDirectoryWritable(File directory) {
         File toCreate = new File(directory, "hello");
         try {
             toCreate.createNewFile();
-            fail("Expected \"java.io.IOException: Permission denied\""
-                 + " when trying to create " + toCreate.getAbsolutePath());
+            return true;
         } catch (IOException e) {
             // It's expected we'll get a "Permission denied" exception.
         } finally {
             toCreate.delete();
         }
+        return false;
     }
 
     /**
@@ -186,7 +190,10 @@ public class FileSystemPermissionTest extends AndroidTestCase {
     @LargeTest
     public void testAllOtherDirectoriesNotWritable() throws Exception {
         File start = new File("/");
-        assertDirectoryAndSubdirectoriesNotWritable(start);
+        Set<File> writableDirs = getWritableDirectoryiesAndSubdirectoriesOf(start);
+
+        assertTrue("Found writable directories: " + writableDirs.toString(),
+                writableDirs.isEmpty());
     }
 
     private static final Set<String> OTHER_RANDOM_DIRECTORIES = new HashSet<String>(
@@ -336,24 +343,31 @@ public class FileSystemPermissionTest extends AndroidTestCase {
      */
     @LargeTest
     public void testOtherRandomDirectoriesNotWritable() throws Exception {
+        Set<File> writableDirs = new HashSet<File>();
         for (String dir : OTHER_RANDOM_DIRECTORIES) {
             File start = new File(dir);
-            assertDirectoryAndSubdirectoriesNotWritable(start);
+            writableDirs.addAll(getWritableDirectoryiesAndSubdirectoriesOf(start));
         }
+
+        assertTrue("Found writable directories: " + writableDirs.toString(),
+                writableDirs.isEmpty());
     }
 
     @LargeTest
     public void testAllFilesInSysAreNotWritable() throws Exception {
-        assertAllFilesInDirAndSubDirAreNotWritable(new File("/sys"));
+        Set<File> writable = getAllWritableFilesInDirAndSubDir(new File("/sys"));
+        assertTrue("Found writable: " + writable.toString(),
+                writable.isEmpty());
     }
 
-    private static void
-    assertAllFilesInDirAndSubDirAreNotWritable(File dir) throws Exception {
+    private static Set<File>
+    getAllWritableFilesInDirAndSubDir(File dir) throws Exception {
         assertTrue(dir.isDirectory());
+        Set<File> retval = new HashSet<File>();
 
         if (isSymbolicLink(dir)) {
             // don't examine symbolic links.
-            return;
+            return retval;
         }
 
         File[] subDirectories = dir.listFiles(new FileFilter() {
@@ -366,7 +380,7 @@ public class FileSystemPermissionTest extends AndroidTestCase {
         /* recurse into subdirectories */
         if (subDirectories != null) {
             for (File f : subDirectories) {
-                assertAllFilesInDirAndSubDirAreNotWritable(f);
+                retval.addAll(getAllWritableFilesInDirAndSubDir(f));
             }
         }
 
@@ -376,21 +390,27 @@ public class FileSystemPermissionTest extends AndroidTestCase {
             }
         });
         if (filesInThisDirectory == null) {
-            return;
+            return retval;
         }
 
         for (File f: filesInThisDirectory) {
-            assertFalse(f.getCanonicalPath(), f.canWrite());
+            if (f.canWrite()) {
+                retval.add(f.getCanonicalFile());
+            }
         }
+        return retval;
     }
 
-    public void testAllBlockDevicesAreNotReadableWritable() throws Exception {
-        assertBlockDevicesInDirAndSubDirAreNotWritable(new File("/dev"));
+    public void testAllBlockDevicesAreSecure() throws Exception {
+        Set<File> insecure = getAllInsecureBlockDevicesInDirAndSubdir(new File("/dev"));
+        assertTrue("Found insecure: " + insecure.toString(),
+                insecure.isEmpty());
     }
 
-    private static void
-    assertBlockDevicesInDirAndSubDirAreNotWritable(File dir) throws Exception {
+    private static Set<File>
+    getAllInsecureBlockDevicesInDirAndSubdir(File dir) throws Exception {
         assertTrue(dir.isDirectory());
+        Set<File> retval = new HashSet<File>();
         File[] subDirectories = dir.listFiles(new FileFilter() {
             @Override public boolean accept(File pathname) {
                 return pathname.isDirectory();
@@ -401,34 +421,36 @@ public class FileSystemPermissionTest extends AndroidTestCase {
         /* recurse into subdirectories */
         if (subDirectories != null) {
             for (File f : subDirectories) {
-                assertBlockDevicesInDirAndSubDirAreNotWritable(f);
+                retval.addAll(getAllInsecureBlockDevicesInDirAndSubdir(f));
             }
         }
 
         File[] filesInThisDirectory = dir.listFiles();
         if (filesInThisDirectory == null) {
-            return;
+            return retval;
         }
 
         for (File f: filesInThisDirectory) {
             FileUtils.FileStatus status = new FileUtils.FileStatus();
             FileUtils.getFileStatus(f.getAbsolutePath(), status, false);
             if (status.hasModeFlag(FileUtils.S_IFBLK)) {
-                assertFalse(f.getCanonicalPath(), f.canRead());
-                assertFalse(f.getCanonicalPath(), f.canWrite());
-                assertFalse(f.getCanonicalPath(), f.canExecute());
+                if (f.canRead() || f.canWrite() || f.canExecute()) {
+                    retval.add(f);
+                }
             }
         }
+        return retval;
     }
 
-    private void assertDirectoryAndSubdirectoriesNotWritable(File dir) throws Exception {
+    private Set<File> getWritableDirectoryiesAndSubdirectoriesOf(File dir) throws Exception {
+        Set<File> retval = new HashSet<File>();
         if (!dir.isDirectory()) {
-            return;
+            return retval;
         }
 
         if (isSymbolicLink(dir)) {
             // don't examine symbolic links.
-            return;
+            return retval;
         }
 
         String myHome = getContext().getApplicationInfo().dataDir;
@@ -436,19 +458,23 @@ public class FileSystemPermissionTest extends AndroidTestCase {
         if (thisDir.startsWith(myHome)) {
             // Don't examine directories within our home directory.
             // We expect these directories to be writable.
-            return;
+            return retval;
         }
 
-        assertDirectoryNotWritable(dir);
+        if (isDirectoryWritable(dir)) {
+            retval.add(dir);
+        }
 
         File[] subFiles = dir.listFiles();
         if (subFiles == null) {
-            return;
+            return retval;
         }
 
         for (File f : subFiles) {
-            assertDirectoryAndSubdirectoriesNotWritable(f);
+            retval.addAll(getWritableDirectoryiesAndSubdirectoriesOf(f));
         }
+
+        return retval;
     }
 
     private static boolean isSymbolicLink(File f) throws IOException {
