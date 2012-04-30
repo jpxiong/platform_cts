@@ -20,6 +20,7 @@ import android.os.Message;
 import android.os.Parcel;
 import android.test.suitebuilder.annotation.SmallTest;
 import android.view.accessibility.AccessibilityEvent;
+import android.view.accessibility.AccessibilityNodeInfo;
 import android.view.accessibility.AccessibilityRecord;
 
 import junit.framework.TestCase;
@@ -30,7 +31,7 @@ import junit.framework.TestCase;
 public class AccessibilityEventTest extends TestCase {
 
     /** The number of properties of the {@link AccessibilityEvent} class. */
-    private static final int NON_STATIC_FIELD_COUNT = 28;
+    private static final int NON_STATIC_FIELD_COUNT = 29;
 
     /**
      * Test that no new fields have been added without updating the
@@ -185,6 +186,7 @@ public class AccessibilityEventTest extends TestCase {
         sentEvent.setScrollY(1);
         sentEvent.setToIndex(1);
         sentEvent.setScrollable(true);
+        sentEvent.setGranularity(AccessibilityNodeInfo.GRANULARITY_LINE);
 
         AccessibilityRecord record = AccessibilityRecord.obtain();
         AccessibilityRecordTest.fullyPopulateAccessibilityRecord(record);
@@ -240,6 +242,9 @@ public class AccessibilityEventTest extends TestCase {
                 receivedEvent.getToIndex());
         assertSame("scrollable has incorect value", expectedEvent.isScrollable(),
                 receivedEvent.isScrollable());
+        assertSame("granularity has incorect value", expectedEvent.getGranularity(),
+                receivedEvent.getGranularity());
+
         assertSame("parcelableData has incorect value",
                 ((Message) expectedEvent.getParcelableData()).what,
                 ((Message) receivedEvent.getParcelableData()).what);
