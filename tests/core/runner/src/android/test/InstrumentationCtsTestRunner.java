@@ -120,16 +120,6 @@ public class InstrumentationCtsTestRunner extends InstrumentationTestRunner {
              */
             private Class<?> lastClass;
 
-            /**
-             * The minimum time we expect a test to take.
-             */
-            private static final int MINIMUM_TIME = 100;
-
-            /**
-             * The start time of our current test in System.currentTimeMillis().
-             */
-            private long startTime;
-
             @Override
             public void startTest(Test test) {
                 if (test.getClass() != lastClass) {
@@ -141,30 +131,12 @@ public class InstrumentationCtsTestRunner extends InstrumentationTestRunner {
                         test.getClass().getClassLoader());
 
                 mEnvironment.reset();
-
-                startTime = System.currentTimeMillis();
             }
 
             @Override
             public void endTest(Test test) {
                 if (test instanceof TestCase) {
                     cleanup((TestCase)test);
-
-                    /*
-                     * Make sure all tests take at least MINIMUM_TIME to
-                     * complete. If they don't, we wait a bit. The Cupcake
-                     * Binder can't handle too many operations in a very
-                     * short time, which causes headache for the CTS.
-                     */
-                    long timeTaken = System.currentTimeMillis() - startTime;
-
-                    if (timeTaken < MINIMUM_TIME) {
-                        try {
-                            Thread.sleep(MINIMUM_TIME - timeTaken);
-                        } catch (InterruptedException ignored) {
-                            // We don't care.
-                        }
-                    }
                 }
             }
 
