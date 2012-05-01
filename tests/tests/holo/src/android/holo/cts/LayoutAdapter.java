@@ -19,6 +19,7 @@ package android.holo.cts;
 import com.android.cts.holo.R;
 
 import android.holo.cts.modifiers.CalendarViewModifier;
+import android.holo.cts.modifiers.ProgressBarModifier;
 import android.holo.cts.modifiers.SearchViewModifier;
 import android.holo.cts.modifiers.TabHostModifier;
 import android.holo.cts.modifiers.TimePickerModifier;
@@ -129,13 +130,13 @@ class LayoutAdapter extends BaseAdapter {
                 R.layout.edittext, null, NO_TIMEOUT_MS);
 
         addLayout(R.string.progressbar, "progressbar",
-                R.layout.progressbar, null, NO_TIMEOUT_MS);
+                R.layout.progressbar, new ProgressBarModifier(), NO_TIMEOUT_MS);
 
         addLayout(R.string.progressbar_small, "progressbar_small",
-                R.layout.progressbar_small, null, NO_TIMEOUT_MS);
+                R.layout.progressbar_small, new ProgressBarModifier(), NO_TIMEOUT_MS);
 
         addLayout(R.string.progressbar_large, "progressbar_large",
-                R.layout.progressbar_large, null, NO_TIMEOUT_MS);
+                R.layout.progressbar_large, new ProgressBarModifier(), NO_TIMEOUT_MS);
 
         addLayout(R.string.progressbar_horizontal_0, "progressbar_horizontal_0",
                 R.layout.progressbar_horizontal_0, null, NO_TIMEOUT_MS);
