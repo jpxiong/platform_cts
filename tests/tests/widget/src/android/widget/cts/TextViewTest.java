@@ -1797,7 +1797,7 @@ public class TextViewTest extends ActivityInstrumentationTestCase2<TextViewStubA
         assertEquals(20f, mTextView.getTextSize(), 0.01f);
 
         // getTypeface
-        // getTypeface will be null if android:typeface is not set or is set to normal,
+        // getTypeface will be null if android:typeface is set to normal,
         // and android:style is not set or is set to normal
         assertNull(mTextView.getTypeface());
 
