@@ -10,6 +10,8 @@ long la[2] = {13, 21};
 long long lla[4] = {34};
 bool ba[3] = {true, false};
 
+rs_element elemArr[2];
+
 void array_init_test() {
     bool failed = false;
 
