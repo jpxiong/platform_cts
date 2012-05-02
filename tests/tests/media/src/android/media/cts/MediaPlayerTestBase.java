@@ -177,6 +177,11 @@ public class MediaPlayerTestBase extends ActivityInstrumentationTestCase2<MediaS
         mMediaPlayer.setOnVideoSizeChangedListener(new MediaPlayer.OnVideoSizeChangedListener() {
             @Override
             public void onVideoSizeChanged(MediaPlayer mp, int w, int h) {
+                if (w == 0 && h == 0) {
+                    // A size of 0x0 can be sent initially one time when using NuPlayer.
+                    assertFalse(mOnVideoSizeChangedCalled.signalled);
+                    return;
+                }
                 mOnVideoSizeChangedCalled.signal();
                 if (width != null) {
                     assertEquals(width.intValue(), w);
