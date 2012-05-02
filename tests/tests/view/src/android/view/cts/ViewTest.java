@@ -3085,9 +3085,9 @@ public class ViewTest extends ActivityInstrumentationTestCase2<ViewTestStubActiv
         view.setLayoutDirection(View.LAYOUT_DIRECTION_LOCALE);
         assertEquals(View.LAYOUT_DIRECTION_LOCALE, view.getLayoutDirection());
 
-        // View.LAYOUT_DIRECTION_MASK = 0xC0000000
+        // View.LAYOUT_DIRECTION_MASK = 0x00000003
         view.setLayoutDirection(0xffffffff);
-        assertEquals(0xC0000000, view.getLayoutDirection());
+        assertEquals(0x00000003, view.getLayoutDirection());
     }
 
     private static class MockEditText extends EditText {
