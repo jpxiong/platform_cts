@@ -23,6 +23,7 @@ import android.content.res.AssetFileDescriptor;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.media.MediaRecorder;
+import android.media.audiofx.AudioEffect;
 import android.media.audiofx.Visualizer;
 import android.net.Uri;
 import android.os.Environment;
@@ -30,6 +31,7 @@ import android.os.PowerManager;
 import android.os.SystemClock;
 
 import java.io.File;
+import java.util.UUID;
 import java.util.concurrent.CountDownLatch;
 
 /**
@@ -195,6 +197,7 @@ public class MediaPlayerTest extends MediaPlayerTestBase {
     }
 
     private void testGapless(int resid1, int resid2) throws Exception {
+
         MediaPlayer mp1 = new MediaPlayer();
         mp1.setAudioStreamType(AudioManager.STREAM_MUSIC);
         try {
@@ -218,6 +221,14 @@ public class MediaPlayerTest extends MediaPlayerTestBase {
         } catch (Exception e) {
             assertTrue(false);
         }
+        // creating a volume controller on output mix ensures that ro.audio.silent mutes
+        // audio after the effects and not before
+        AudioEffect vc = new AudioEffect(
+                            AudioEffect.EFFECT_TYPE_NULL,
+                            UUID.fromString("119341a0-8469-11df-81f9-0002a5d5c51b"),
+                            0,
+                            0);
+        vc.setEnabled(true);
         int captureintervalms = mp1.getDuration() + mp2.getDuration() - 2000;
         int size = 256;
         int[] range = Visualizer.getCaptureSizeRange();
@@ -269,6 +280,7 @@ public class MediaPlayerTest extends MediaPlayerTestBase {
             mp1.release();
             mp2.release();
             vis.release();
+            vc.release();
             am.setRingerMode(oldRingerMode);
             am.setStreamVolume(AudioManager.STREAM_MUSIC, oldvolume, 0);
         }
