@@ -51,6 +51,7 @@ public class CompressedTextureStubActivity extends Activity {
 
         BitmapFactory.Options optionsRGB = new BitmapFactory.Options();
         optionsRGB.inPreferredConfig = Bitmap.Config.RGB_565;
+        optionsRGB.inScaled = false;
         Bitmap bitmap = BitmapFactory.decodeResource(mResources, R.raw.basetex, optionsRGB);
 
         if (formatTest.equals(CompressedTextureLoader.TEXTURE_ETC1)) {
