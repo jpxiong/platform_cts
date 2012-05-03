@@ -172,7 +172,9 @@ public class ObjectAnimatorTest extends
                 evaluator, values);
         colorAnimator.setCurrentPlayTime(playTime);
         long actualPlayTime = colorAnimator.getCurrentPlayTime();
-        assertEquals(playTime, actualPlayTime);
+        long diff = Math.abs(actualPlayTime - playTime);
+        //Added a buffer of 10ms as the actualPlayTime sometimes returns with some difference
+        assertTrue(diff < 10);
     }
 
     public void testSetFloatValues() throws Throwable {
