@@ -46,7 +46,8 @@
     <application android:label="@string/app_name"
             android:icon="@drawable/icon"
             android:backupAgent="VerifierBackupAgent"
-            android:debuggable="true">
+            android:debuggable="true"
+            android:largeHeap="true">
 
         <uses-library android:name="com.android.future.usb.accessory" />
         <meta-data android:name="com.google.android.backup.api_key"
@@ -283,6 +284,18 @@
             </intent-filter>
             <meta-data android:name="test_category" android:value="@string/test_category_sensors" />
             <meta-data android:name="test_required_features" android:value="android.hardware.sensor.gyroscope" />
+        </activity>
+
+        <activity android:name=".camera.formats.CameraFormatsActivity"
+                 android:label="@string/camera_format"
+                 android:screenOrientation="landscape">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.cts.intent.category.MANUAL_TEST" />
+            </intent-filter>
+            <meta-data android:name="test_category" android:value="@string/test_category_camera" />
+
+            <meta-data android:name="test_required_features" android:value="android.hardware.camera"/>
         </activity>
 
         <activity android:name=".camera.analyzer.CameraAnalyzerActivity"
