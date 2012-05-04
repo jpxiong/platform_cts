@@ -33,6 +33,7 @@ public class CompressedTextureTest extends ActivityInstrumentationTestCase2<Comp
         CompressedTextureStubActivity activity = launchActivity("com.android.cts.stub",
                 CompressedTextureStubActivity.class, extras);
         activity.finish();
+        assertTrue(activity.getPassed());
     }
 
     public void testTextureUncompressed() throws Exception {

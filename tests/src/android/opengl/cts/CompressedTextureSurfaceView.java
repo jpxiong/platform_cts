@@ -45,6 +45,9 @@ import android.opengl.Matrix;
 import android.util.Log;
 import android.view.Surface;
 
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
+
 class CompressedTextureSurfaceView extends GLSurfaceView {
     private static final String TAG = "CompressedTextureSurfaceView";
     private static final int SLEEP_TIME_MS = 1000;
@@ -65,6 +68,10 @@ class CompressedTextureSurfaceView extends GLSurfaceView {
     @Override
     public void onResume() {
         super.onResume();
+    }
+
+    public boolean getTestPassed() throws InterruptedException {
+        return mRenderer.getTestPassed();
     }
 
     private static class CompressedTextureRender implements GLSurfaceView.Renderer {
@@ -119,6 +126,9 @@ class CompressedTextureSurfaceView extends GLSurfaceView {
 
         private boolean updateSurface = false;
 
+        private boolean mTestPassed;
+        private CountDownLatch mDoneSignal;
+
         Bitmap mBaseTexture;
         CompressedTextureLoader.Texture mCompressedTexture;
 
@@ -126,6 +136,14 @@ class CompressedTextureSurfaceView extends GLSurfaceView {
         int mHeight;
 
         ByteBuffer mReadBackBuffer;
+
+        boolean getTestPassed() throws InterruptedException {
+            if (!mDoneSignal.await(2000L, TimeUnit.MILLISECONDS)) {
+                throw new IllegalStateException("Coudn't finish drawing frames!");
+            }
+
+            return mTestPassed;
+        }
 
         public CompressedTextureRender(Context context,
                                        Bitmap base,
@@ -143,6 +161,8 @@ class CompressedTextureSurfaceView extends GLSurfaceView {
                                  mBaseTexture.getHeight() *
                                  FBO_PIXEL_SIZE_BYTES;
             mReadBackBuffer = ByteBuffer.allocateDirect(byteBufferSize);
+
+            mDoneSignal = new CountDownLatch(1);
         }
 
         private void renderQuad(int textureID) {
@@ -215,9 +235,8 @@ class CompressedTextureSurfaceView extends GLSurfaceView {
             boolean sample3Matches = comparePixel(wOver4, hOver4 * 3);
             boolean sample4Matches = comparePixel(wOver4 * 3, hOver4 * 3);
 
-            if (!sample1Matches || !sample2Matches || !sample3Matches || !sample4Matches) {
-                throw new RuntimeException("Compressed colors incorrect");
-            }
+            mTestPassed = sample1Matches && sample2Matches && sample3Matches && sample4Matches;
+            mDoneSignal.countDown();
         }
 
         public void onDrawFrame(GL10 glUnused) {
@@ -289,6 +308,8 @@ class CompressedTextureSurfaceView extends GLSurfaceView {
 
         public void onSurfaceCreated(GL10 glUnused, EGLConfig config) {
             if (mCompressedTexture != null && !mCompressedTexture.isSupported()) {
+                mTestPassed = true;
+                mDoneSignal.countDown();
                 return;
             }
 

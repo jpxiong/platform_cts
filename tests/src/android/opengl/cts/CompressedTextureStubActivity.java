@@ -27,7 +27,6 @@ import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.util.Log;
 
-
 public class CompressedTextureStubActivity extends Activity {
 
     private static final String TAG = "CompressedTextureStubActivity";
@@ -57,7 +56,7 @@ public class CompressedTextureStubActivity extends Activity {
         if (formatTest.equals(CompressedTextureLoader.TEXTURE_ETC1)) {
             compressed = CompressedTextureLoader.createFromUncompressedETC1(bitmap);
         } else if (formatTest.equals(CompressedTextureLoader.TEXTURE_S3TC)) {
-            compressed = CompressedTextureLoader.loadTextureDXT(mResources, R.raw.ddstex); //stub for now
+            compressed = CompressedTextureLoader.loadTextureDXT(mResources, R.raw.ddstex);
         } else if (formatTest.equals(CompressedTextureLoader.TEXTURE_ATC)) {
             compressed = CompressedTextureLoader.loadTextureATC(mResources, 0); //stub for now
         } else if (formatTest.equals(CompressedTextureLoader.TEXTURE_PVRTC)) {
@@ -72,5 +71,9 @@ public class CompressedTextureStubActivity extends Activity {
     protected void onResume() {
         super.onResume();
         mCompressedTextureView.onResume();
+    }
+
+    public boolean getPassed() throws InterruptedException {
+        return mCompressedTextureView.getTestPassed();
     }
 }
