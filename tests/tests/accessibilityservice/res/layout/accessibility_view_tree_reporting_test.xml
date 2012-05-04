@@ -4,7 +4,6 @@
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
     android:orientation="vertical"
-    android:layoutDirection="rtl"
     android:importantForAccessibility="yes"
     android:contentDescription="@string/rootLinearLayout">
 
@@ -21,7 +20,6 @@
           android:layout_width="wrap_content"
           android:layout_height="wrap_content"
           android:orientation="horizontal"
-          android:layoutDirection="ltr"
           android:contentDescription="@string/firstLinearLayout" >
 
           <TextView
@@ -57,7 +55,6 @@
           android:layout_width="wrap_content"
           android:layout_height="wrap_content"
           android:orientation="horizontal"
-          android:layoutDirection="rtl"
           android:contentDescription="@string/secondLinearLayout"
           android:clickable="true"
           android:importantForAccessibility="no" >
