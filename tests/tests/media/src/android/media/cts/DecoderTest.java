@@ -23,6 +23,7 @@ import android.content.res.AssetFileDescriptor;
 import android.content.res.Resources;
 import android.media.MediaCodec;
 import android.media.MediaExtractor;
+import android.media.MediaFormat;
 import android.test.AndroidTestCase;
 import android.util.Log;
 
@@ -102,9 +103,9 @@ public class DecoderTest extends AndroidTestCase {
         extractor.setDataSource(testFd.getFileDescriptor(), testFd.getStartOffset(),
                 testFd.getLength());
 
-        assertEquals("wrong number of tracks", 1, extractor.countTracks());
-        Map<String, Object> format = extractor.getTrackFormat(0);
-        String mime = (String)format.get("mime");
+        assertEquals("wrong number of tracks", 1, extractor.getTrackCount());
+        MediaFormat format = extractor.getTrackFormat(0);
+        String mime = format.getString(MediaFormat.KEY_MIME);
         assertTrue("not an audio file", mime.startsWith("audio/"));
 
         codec = MediaCodec.createDecoderByType(mime);
@@ -116,7 +117,7 @@ public class DecoderTest extends AndroidTestCase {
         // set up codec specific data, if any
         int n = 0;
         while (format.containsKey("csd-" + n)) {
-            ByteBuffer srcBuf = (ByteBuffer)format.get("csd-" + n);
+            ByteBuffer srcBuf = format.getByteBuffer("csd-" + n);
 
             // Specifying a timeout of -1 indicates an infinite timeout, i.e.
             // we're going to block until we get a buffer.
@@ -136,7 +137,7 @@ public class DecoderTest extends AndroidTestCase {
                     0 /* offset */,
                     srcBufLen,
                     0 /* sampleTimeUs */,
-                    MediaCodec.FLAG_CODECCONFIG);
+                    MediaCodec.BUFFER_FLAG_CODEC_CONFIG);
 
             ++n;
         }
@@ -176,7 +177,7 @@ public class DecoderTest extends AndroidTestCase {
                             0 /* offset */,
                             sampleSize,
                             presentationTimeUs,
-                            sawInputEOS ? MediaCodec.FLAG_EOS : 0);
+                            sawInputEOS ? MediaCodec.BUFFER_FLAG_END_OF_STREAM : 0);
 
                     if (!sawInputEOS) {
                         extractor.advance();
@@ -205,7 +206,7 @@ public class DecoderTest extends AndroidTestCase {
 
                 codec.releaseOutputBuffer(outputBufIndex, false /* render */);
 
-                if ((info.flags & MediaCodec.FLAG_EOS) != 0) {
+                if ((info.flags & MediaCodec.BUFFER_FLAG_END_OF_STREAM) != 0) {
                     Log.d(TAG, "saw output EOS.");
                     sawOutputEOS = true;
                 }
@@ -214,7 +215,7 @@ public class DecoderTest extends AndroidTestCase {
 
                 Log.d(TAG, "output buffers have changed.");
             } else if (res == MediaCodec.INFO_OUTPUT_FORMAT_CHANGED) {
-                Map<String, Object> oformat = codec.getOutputFormat();
+                MediaFormat oformat = codec.getOutputFormat();
 
                 Log.d(TAG, "output format has changed to " + oformat);
             }
