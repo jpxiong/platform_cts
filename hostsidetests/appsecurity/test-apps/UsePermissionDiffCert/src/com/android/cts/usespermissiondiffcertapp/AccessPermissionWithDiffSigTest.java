@@ -1025,24 +1025,28 @@ public class AccessPermissionWithDiffSigTest extends AndroidTestCase {
     public void testRestrictingProviderNoMatchingPath() {
         assertReadingContentUriAllowed(PERM_URI_PATH_RESTRICTING);
         assertWritingContentUriAllowed(PERM_URI_PATH_RESTRICTING);
+
+        // allowed by no top-level permission
+        final Uri test = PERM_URI_PATH_RESTRICTING.buildUpon().appendPath("fo").build();
+        assertReadingContentUriAllowed(test);
+        assertWritingContentUriAllowed(test);
     }
 
     /**
      * Verify that paths under {@code path-permission} restriction aren't
      * allowed, even though the {@code provider} requires no permissions.
      */
-    public void testRestrictingProviderMatchingPath() {
-        final Uri test1 = PERM_URI_PATH_RESTRICTING.buildUpon().appendPath("fo").build();
-        assertReadingContentUriAllowed(test1);
-        assertWritingContentUriAllowed(test1);
+    public void testRestrictingProviderMatchingPathDenied() {
+        // rejected by "foo" prefix
+        final Uri test1 = PERM_URI_PATH_RESTRICTING.buildUpon().appendPath("foo").build();
+        assertReadingContentUriNotAllowed(test1, null);
+        assertWritingContentUriNotAllowed(test1, null);
 
-        final Uri test2 = PERM_URI_PATH_RESTRICTING.buildUpon().appendPath("foo").build();
+        // rejected by "foo" prefix
+        final Uri test2 = PERM_URI_PATH_RESTRICTING.buildUpon()
+                .appendPath("foo").appendPath("ba").build();
         assertReadingContentUriNotAllowed(test2, null);
         assertWritingContentUriNotAllowed(test2, null);
-
-        final Uri test3 = PERM_URI_PATH_RESTRICTING.buildUpon().appendPath("foo/bar2").build();
-        assertReadingContentUriNotAllowed(test3, null);
-        assertWritingContentUriNotAllowed(test3, null);
     }
 
     /**
@@ -1050,9 +1054,17 @@ public class AccessPermissionWithDiffSigTest extends AndroidTestCase {
      * even if the caller doesn't hold another matching {@code path-permission}.
      */
     public void testRestrictingProviderMultipleMatchingPath() {
-        final Uri test = PERM_URI_PATH_RESTRICTING.buildUpon().appendPath("foo/bar").build();
-        assertReadingContentUriAllowed(test);
-        assertWritingContentUriAllowed(test);
+        // allowed by narrow "foo/bar" prefix
+        final Uri test1 = PERM_URI_PATH_RESTRICTING.buildUpon()
+                .appendPath("foo").appendPath("bar").build();
+        assertReadingContentUriAllowed(test1);
+        assertWritingContentUriAllowed(test1);
+
+        // allowed by narrow "foo/bar" prefix
+        final Uri test2 = PERM_URI_PATH_RESTRICTING.buildUpon()
+                .appendPath("foo").appendPath("bar2").build();
+        assertReadingContentUriAllowed(test2);
+        assertWritingContentUriAllowed(test2);
     }
 
     public void testGetMimeTypePermission() {
