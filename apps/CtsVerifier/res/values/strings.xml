@@ -290,6 +290,25 @@
     <string name="ca_focus_modes_label">Focus Modes</string>
     <string name="ca_info">This test checks the image quality of the camera of this device. It requires a MacBeth 4x6 color checker. With an ADK board and a lamp connected to it on the Relay 1 port, all tests can be run automatically. Without the ADK board, all the tests except the Auto Exposure Lock Test can be run automatically and the Auto Exposure Lock Test will require users to turn on/off a lamp according to the instruction given. </string>
 
+    <!-- Strings for Camera Formats -->
+
+    <string name="camera_format">Camera Formats</string>
+    <string name="cf_info">This test checks that all the supported
+    output formats for camera preview callbacks work correctly, and
+    that the mandatory formats are available. \n - The left view shows
+    a standard preview window. \n - The right view shows the output
+    processed from camera preview callbacks. \n - For each camera,
+    resolution, and format combination in the dropdowns, the right
+    view should look the same as the left, and neither should have
+    streaks, lines, or other artifacts. \n - For front-facing cameras,
+    the right view must be horizontally mirrored relative to the left
+    view.\n - Note that the frame rate of the right view may be much
+    lower than on the left; this is not an indication of a failed
+    test.
+    </string>
+    <string name="cf_preview_label">Normal preview</string>
+    <string name="cf_format_label">Processed callback data</string>
+
     <!-- Strings for USB accessory test activity -->
     <string name="usb_accessory_test">USB Accessory Test</string>
     <string name="usb_accessory_test_info">
