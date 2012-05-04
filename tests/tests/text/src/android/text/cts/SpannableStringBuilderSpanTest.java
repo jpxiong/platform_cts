@@ -31,10 +31,12 @@ public class SpannableStringBuilderSpanTest extends AndroidTestCase {
 
     private static final boolean DEBUG = false;
 
-    SpanSet mSpanSet = new SpanSet();
-    SpanSet mReplacementSpanSet = new SpanSet();
+    private SpanSet mSpanSet = new SpanSet();
+    private SpanSet mReplacementSpanSet = new SpanSet();
+    private int testCounter;
 
     public void testReplaceWithSpans() {
+        testCounter = 0;
         String originals[] = { "", "A", "here", "Well, hello there" };
         String replacements[] = { "", "X", "test", "longer replacement" };
 
@@ -86,47 +88,54 @@ public class SpannableStringBuilderSpanTest extends AndroidTestCase {
 
     private void replaceWithSpanFlag(String original, int replaceStart, int replaceEnd,
             String replacement, int replacementStart, int replacementEnd, int flag) {
+
+        testCounter++;
+        int debugTestNumber = -1;
+        if (debugTestNumber >= 0 && testCounter != debugTestNumber) return;
+
         String subReplacement = replacement.substring(replacementStart, replacementEnd);
         String expected = original.substring(0, replaceStart) +
                 subReplacement + original.substring(replaceEnd, original.length());
         if (DEBUG) System.out.println("Replace \"" + original + "\" [" +
                 replaceStart + " " + replaceEnd + "] by \"" + subReplacement + "\" -> \"" +
-                expected + "\", flag=" + flag);
+                expected + "\", flag=" + flag + ", test #" + testCounter);
 
-        SpannableStringBuilder originalSSB = new SpannableStringBuilder(original);
-        SpannableStringBuilder replacementSSB = new SpannableStringBuilder(replacement);
+        SpannableStringBuilder originalSpannable = new SpannableStringBuilder(original);
+        Spannable replacementSpannable = new SpannableStringBuilder(replacement);
 
-        mSpanSet.initSpans(originalSSB, replaceStart, replaceEnd, flag);
-        mReplacementSpanSet.initSpans(replacementSSB, replacementStart, replacementEnd, flag);
+        mSpanSet.initSpans(originalSpannable, replaceStart, replaceEnd, flag);
+        mReplacementSpanSet.initSpans(replacementSpannable, replacementStart, replacementEnd, flag);
 
-        originalSSB.replace(replaceStart, replaceEnd, replacementSSB,
+        originalSpannable.replace(replaceStart, replaceEnd, replacementSpannable,
                 replacementStart, replacementEnd);
 
-        assertEquals(expected, originalSSB.toString());
+        assertEquals(expected, originalSpannable.toString());
 
-        checkSpanPositions(originalSSB, replaceStart, replaceEnd, subReplacement.length(), flag);
-        checkReplacementSpanPositions(originalSSB, replaceStart, replacementSSB,
+        checkSpanPositions(originalSpannable, replaceStart, replaceEnd, subReplacement.length(), flag);
+        checkReplacementSpanPositions(originalSpannable, replaceStart, replacementSpannable,
                 replacementStart, replacementEnd, flag);
     }
 
-    private void checkSpanPositions(SpannableStringBuilder ssb, int replaceStart, int replaceEnd,
+    private void checkSpanPositions(Spannable spannable, int replaceStart, int replaceEnd,
             int replacementLength, int flag) {
         int count = 0;
-        int delta = replacementLength - (replaceEnd - replaceStart);
+        int replacedLength = replaceEnd - replaceStart;
+        int delta = replacementLength - replacedLength;
+        boolean textIsReplaced = replacedLength > 0 && replacementLength > 0;
         for (int s = 0; s < mSpanSet.mPositionSet.size(); s++) {
             for (int e = s; e < mSpanSet.mPositionSet.size(); e++) {
                 Object span = mSpanSet.mSpans[count];
                 int originalStart = mSpanSet.mPositionSet.getPosition(s);
                 int originalEnd = mSpanSet.mPositionSet.getPosition(e);
-                int start = ssb.getSpanStart(span);
-                int end = ssb.getSpanEnd(span);
+                int start = spannable.getSpanStart(span);
+                int end = spannable.getSpanEnd(span);
                 int startStyle = mSpanSet.mSpanStartPositionStyle[count];
                 int endStyle = mSpanSet.mSpanEndPositionStyle[count];
                 count++;
 
                 if (!isValidSpan(originalStart, originalEnd, flag)) continue;
 
-                if (DEBUG) System.out.println(originalStart + "," + originalEnd + " -> " +
+                if (DEBUG) System.out.println("  " + originalStart + "," + originalEnd + " -> " +
                         start + "," + end + " | " + startStyle + " " + endStyle +
                         " delta=" + delta);
 
@@ -149,11 +158,21 @@ public class SpannableStringBuilderSpanTest extends AndroidTestCase {
                         switch (flag) {
                             case Spanned.SPAN_EXCLUSIVE_EXCLUSIVE:
                             case Spanned.SPAN_EXCLUSIVE_INCLUSIVE:
-                                assertEquals(replaceStart + replacementLength, start);
+                                // start is POINT
+                                if (originalStart == replaceStart && textIsReplaced) {
+                                    assertEquals(replaceStart, start);
+                                } else {
+                                    assertEquals(replaceStart + replacementLength, start);
+                                }
                                 break;
                             case Spanned.SPAN_INCLUSIVE_INCLUSIVE:
                             case Spanned.SPAN_INCLUSIVE_EXCLUSIVE:
-                                assertEquals(replaceStart, start);
+                                // start is MARK
+                                if (originalStart == replaceEnd && textIsReplaced) {
+                                    assertEquals(replaceStart + replacementLength, start);
+                                } else {
+                                    assertEquals(replaceStart, start);
+                                }
                                 break;
                             case Spanned.SPAN_PARAGRAPH:
                                 fail("TODO");
@@ -173,11 +192,21 @@ public class SpannableStringBuilderSpanTest extends AndroidTestCase {
                         switch (flag) {
                             case Spanned.SPAN_EXCLUSIVE_EXCLUSIVE:
                             case Spanned.SPAN_INCLUSIVE_EXCLUSIVE:
-                                assertEquals(replaceStart, end);
+                                // end is MARK
+                                if (originalEnd == replaceEnd && textIsReplaced) {
+                                    assertEquals(replaceStart + replacementLength, end);
+                                } else {
+                                    assertEquals(replaceStart, end);
+                                }
                                 break;
                             case Spanned.SPAN_INCLUSIVE_INCLUSIVE:
                             case Spanned.SPAN_EXCLUSIVE_INCLUSIVE:
-                                assertEquals(replaceStart + replacementLength, end);
+                                // end is POINT
+                                if (originalEnd == replaceStart && textIsReplaced) {
+                                    assertEquals(replaceStart, end);
+                                } else {
+                                    assertEquals(replaceStart + replacementLength, end);
+                                }
                                 break;
                             case Spanned.SPAN_PARAGRAPH:
                                 fail("TODO");
@@ -198,11 +227,11 @@ public class SpannableStringBuilderSpanTest extends AndroidTestCase {
         }
     }
 
-    private void checkReplacementSpanPositions(SpannableStringBuilder originalSSB, int replaceStart,
-            SpannableStringBuilder replacementSSB, int replStart, int replEnd, int flag) {
+    private void checkReplacementSpanPositions(Spannable originalSpannable, int replaceStart,
+            Spannable replacementSpannable, int replStart, int replEnd, int flag) {
 
         // Get all spans overlapping the replacement substring region
-        Object[] addedSpans = replacementSSB.getSpans(replStart, replEnd, Object.class);
+        Object[] addedSpans = replacementSpannable.getSpans(replStart, replEnd, Object.class);
 
         int count = 0;
         for (int s = 0; s < mReplacementSpanSet.mPositionSet.size(); s++) {
@@ -210,13 +239,13 @@ public class SpannableStringBuilderSpanTest extends AndroidTestCase {
                 Object span = mReplacementSpanSet.mSpans[count];
                 int originalStart = mReplacementSpanSet.mPositionSet.getPosition(s);
                 int originalEnd = mReplacementSpanSet.mPositionSet.getPosition(e);
-                int start = originalSSB.getSpanStart(span);
-                int end = originalSSB.getSpanEnd(span);
+                int start = originalSpannable.getSpanStart(span);
+                int end = originalSpannable.getSpanEnd(span);
                 count++;
 
                 if (!isValidSpan(originalStart, originalEnd, flag)) continue;
 
-                if (DEBUG) System.out.println("Replacement " + originalStart + "," + originalEnd +
+                if (DEBUG) System.out.println("  replacement " + originalStart + "," + originalEnd +
                         " -> " + start + "," + end);
 
                 // There should be no change reported to the replacement string spanWatcher
@@ -317,7 +346,7 @@ public class SpannableStringBuilderSpanTest extends AndroidTestCase {
          * replaced region is at the beginning/end of the text, some of these spans may have an
          * identical range
          */
-        void initSpans(SpannableStringBuilder ssb, int rangeStart, int rangeEnd, int flag) {
+        void initSpans(Spannable spannable, int rangeStart, int rangeEnd, int flag) {
             mPositionSet.clear();
             mPositionSet.addPosition(0);
             mPositionSet.addPosition(rangeStart / 2);
@@ -325,8 +354,8 @@ public class SpannableStringBuilderSpanTest extends AndroidTestCase {
             mPositionSet.addPosition((2 * rangeStart + rangeEnd) / 3);
             mPositionSet.addPosition((rangeStart + 2 * rangeEnd) / 3);
             mPositionSet.addPosition(rangeEnd);
-            mPositionSet.addPosition((rangeEnd + ssb.length()) / 2);
-            mPositionSet.addPosition(ssb.length());
+            mPositionSet.addPosition((rangeEnd + spannable.length()) / 2);
+            mPositionSet.addPosition(spannable.length());
 
             int count = 0;
             for (int s = 0; s < mPositionSet.size(); s++) {
@@ -334,7 +363,7 @@ public class SpannableStringBuilderSpanTest extends AndroidTestCase {
                     int start = mPositionSet.getPosition(s);
                     int end = mPositionSet.getPosition(e);
                     if (isValidSpan(start, end, flag)) {
-                        ssb.setSpan(mSpans[count], start, end, flag);
+                        spannable.setSpan(mSpans[count], start, end, flag);
                     }
                     mSpanStartPositionStyle[count] = getPositionStyle(start, rangeStart, rangeEnd);
                     mSpanEndPositionStyle[count] = getPositionStyle(end, rangeStart, rangeEnd);
@@ -343,8 +372,8 @@ public class SpannableStringBuilderSpanTest extends AndroidTestCase {
             }
 
             // Must be done after all the spans were added, to not record these additions
-            ssb.setSpan(mRecorder, 0, ssb.length(), Spanned.SPAN_INCLUSIVE_INCLUSIVE);
-            mRecorder.reset(ssb);
+            spannable.setSpan(mRecorder, 0, spannable.length(), Spanned.SPAN_INCLUSIVE_INCLUSIVE);
+            mRecorder.reset(spannable);
         }
     }
 
