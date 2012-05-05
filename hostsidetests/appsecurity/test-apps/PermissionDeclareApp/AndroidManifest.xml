@@ -91,7 +91,7 @@
                 android:authorities="ctspermissionwithsignaturepathrestricting">
             <!-- Require signature permission to get into path. -->
             <path-permission
-                    android:pathPrefix="/foo.*"
+                    android:pathPrefix="/foo"
                     android:readPermission="com.android.cts.permissionWithSignature"
                     android:writePermission="com.android.cts.permissionWithSignature" />
             <!-- Allow access to a specific path inside. -->
