@@ -494,11 +494,13 @@ public class AutoCompleteTextViewTest extends
         // re-set 'clicked' flag to false
         listener.clearItemClickedStatus();
 
+
         runTestOnUiThread(new Runnable() {
             public void run() {
                 mAutoCompleteTextView.showDropDown();
             }
         });
+        mInstrumentation.waitForIdleSync();
         mInstrumentation.sendKeyDownUpSync(KeyEvent.KEYCODE_DPAD_DOWN);
         mInstrumentation.sendKeyDownUpSync(KeyEvent.KEYCODE_DPAD_CENTER);
         assertTrue(listener.isOnItemClicked());
@@ -511,6 +513,7 @@ public class AutoCompleteTextViewTest extends
                 mAutoCompleteTextView.showDropDown();
             }
         });
+        mInstrumentation.waitForIdleSync();
         mInstrumentation.sendKeyDownUpSync(KeyEvent.KEYCODE_DPAD_DOWN);
         // Test normal key code.
         mInstrumentation.sendKeyDownUpSync(KeyEvent.KEYCODE_0);
@@ -526,7 +529,7 @@ public class AutoCompleteTextViewTest extends
                mAutoCompleteTextView.dismissDropDown();
             }
         });
-
+        mInstrumentation.waitForIdleSync();
         mInstrumentation.sendKeyDownUpSync(KeyEvent.KEYCODE_DPAD_DOWN);
         mInstrumentation.sendKeyDownUpSync(KeyEvent.KEYCODE_ENTER);
         assertFalse(listener.isOnItemClicked());
