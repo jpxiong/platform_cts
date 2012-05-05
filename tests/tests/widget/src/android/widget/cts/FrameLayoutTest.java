@@ -18,13 +18,13 @@ package android.widget.cts;
 
 import com.android.cts.stub.R;
 
-
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
 
 import android.app.Activity;
 import android.app.Instrumentation;
 import android.content.Context;
+import android.cts.util.PollingCheck;
 import android.graphics.Rect;
 import android.graphics.Region;
 import android.graphics.drawable.BitmapDrawable;
@@ -37,9 +37,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.FrameLayout;
+import android.widget.FrameLayout.LayoutParams;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.FrameLayout.LayoutParams;
 
 import java.io.IOException;
 
@@ -90,9 +90,14 @@ public class FrameLayoutTest extends ActivityInstrumentationTestCase2<FrameLayou
         assertSame(foreground, mFrameLayout.getForeground());
         // check the default gravity FILL, it completely fills its container
         assertTrue(foreground.isVisible());
-        Rect rect = foreground.getBounds();
+        final Rect rect = foreground.getBounds();
         // foreground has been stretched
-        assertEquals(mFrameLayout.getHeight(), rect.bottom - rect.top);
+        new PollingCheck() {
+            @Override
+            protected boolean check() {
+                return mFrameLayout.getHeight() == rect.bottom - rect.top;
+            }
+        }.run();
         assertEquals(mFrameLayout.getWidth(), rect.right - rect.left);
 
         // should get a new foreground again, because former foreground has been stretched
@@ -112,10 +117,10 @@ public class FrameLayoutTest extends ActivityInstrumentationTestCase2<FrameLayou
         mInstrumentation.waitForIdleSync();
         assertSame(newForeground, mFrameLayout.getForeground());
         assertTrue(newForeground.isVisible());
-        rect = newForeground.getBounds();
+        Rect rect2 = newForeground.getBounds();
         // not changing its size
-        assertEquals(foreground.getIntrinsicHeight(), rect.bottom - rect.top);
-        assertEquals(foreground.getIntrinsicWidth(), rect.right - rect.left);
+        assertEquals(foreground.getIntrinsicHeight(), rect2.bottom - rect2.top);
+        assertEquals(foreground.getIntrinsicWidth(), rect2.right - rect2.left);
         assertCenterAligned(mFrameLayout, newForeground);
     }
 

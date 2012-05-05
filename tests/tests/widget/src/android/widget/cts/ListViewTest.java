@@ -19,12 +19,12 @@ package android.widget.cts;
 import com.android.cts.stub.R;
 import com.google.android.collect.Lists;
 
-
 import org.xmlpull.v1.XmlPullParser;
 
 import android.app.Activity;
 import android.app.Instrumentation;
 import android.content.Context;
+import android.cts.util.PollingCheck;
 import android.graphics.Canvas;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
@@ -39,10 +39,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.LayoutAnimationController;
 import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.AdapterView.OnItemClickListener;
 
 import java.util.List;
 
@@ -142,8 +142,13 @@ public class ListViewTest extends ActivityInstrumentationTestCase2<ListViewStubA
         mInstrumentation.waitForIdleSync();
 
         Drawable d = mListView.getDivider();
-        Rect r = d.getBounds();
-        assertTrue(r.bottom - r.top > 0);
+        final Rect r = d.getBounds();
+        new PollingCheck() {
+            @Override
+            protected boolean check() {
+                return r.bottom - r.top > 0;
+            }
+        }.run();
 
         mInstrumentation.runOnMainSync(new Runnable() {
             public void run() {
@@ -362,11 +367,17 @@ public class ListViewTest extends ActivityInstrumentationTestCase2<ListViewStubA
         mInstrumentation.waitForIdleSync();
 
         Drawable defaultDrawable = mListView.getDivider();
-        Rect r = defaultDrawable.getBounds();
-        assertTrue(r.bottom - r.top > 0);
+        final Rect r = defaultDrawable.getBounds();
+        new PollingCheck() {
+            @Override
+            protected boolean check() {
+                return r.bottom - r.top > 0;
+            }
+        }.run();
 
         final Drawable d = mActivity.getResources().getDrawable(R.drawable.scenery);
-        r = d.getBounds();
+
+        Rect r2 = d.getBounds();
         mInstrumentation.runOnMainSync(new Runnable() {
             public void run() {
                 mListView.setDivider(d);
@@ -374,7 +385,7 @@ public class ListViewTest extends ActivityInstrumentationTestCase2<ListViewStubA
         });
         mInstrumentation.waitForIdleSync();
         assertSame(d, mListView.getDivider());
-        assertEquals(r.bottom - r.top, mListView.getDividerHeight());
+        assertEquals(r2.bottom - r2.top, mListView.getDividerHeight());
 
         mInstrumentation.runOnMainSync(new Runnable() {
             public void run() {
@@ -383,7 +394,7 @@ public class ListViewTest extends ActivityInstrumentationTestCase2<ListViewStubA
         });
         mInstrumentation.waitForIdleSync();
         assertEquals(10, mListView.getDividerHeight());
-        assertEquals(10, r.bottom - r.top);
+        assertEquals(10, r2.bottom - r2.top);
     }
 
     public void testSetSelection() {
