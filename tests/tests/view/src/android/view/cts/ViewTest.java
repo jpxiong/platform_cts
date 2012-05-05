@@ -16,14 +16,9 @@
 
 package android.view.cts;
 
-import com.google.android.collect.Lists;
-
 import com.android.cts.stub.R;
 import com.android.internal.view.menu.ContextMenuBuilder;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import com.google.android.collect.Lists;
 
 import android.app.Activity;
 import android.content.Context;
@@ -79,6 +74,10 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.cts.StubActivity;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * Test {@link View}.
@@ -212,7 +211,12 @@ public class ViewTest extends ActivityInstrumentationTestCase2<ViewTestStubActiv
         });
         getInstrumentation().waitForIdleSync();
 
-        assertTrue(view.hasCalledOnAnimationStart());
+        new PollingCheck() {
+            @Override
+            protected boolean check() {
+                return view.hasCalledOnAnimationStart();
+            }
+        }.run();
 
         // check whether it has ended after duration, and alpha changed during this time.
         new PollingCheck(duration + TIMEOUT_DELTA) {
@@ -2268,7 +2272,12 @@ public class ViewTest extends ActivityInstrumentationTestCase2<ViewTestStubActiv
             }
         });
         getInstrumentation().waitForIdleSync();
-        assertTrue(view.hasCalledOnDraw());
+        new PollingCheck() {
+            @Override
+            protected boolean check() {
+                return view.hasCalledOnDraw();
+            }
+        }.run();
 
         view.reset();
         runTestOnUiThread(new Runnable() {
@@ -2300,7 +2309,12 @@ public class ViewTest extends ActivityInstrumentationTestCase2<ViewTestStubActiv
             }
         });
         getInstrumentation().waitForIdleSync();
-        assertTrue(view.hasCalledOnDraw());
+        new PollingCheck() {
+            @Override
+            protected boolean check() {
+                return view.hasCalledOnDraw();
+            }
+        }.run();
 
         view.reset();
         runTestOnUiThread(new Runnable() {
@@ -2326,7 +2340,12 @@ public class ViewTest extends ActivityInstrumentationTestCase2<ViewTestStubActiv
             }
         });
         getInstrumentation().waitForIdleSync();
-        assertTrue(view.hasCalledOnDraw());
+        new PollingCheck() {
+            @Override
+            protected boolean check() {
+                return view.hasCalledOnDraw();
+            }
+        }.run();
 
         view.reset();
         runTestOnUiThread(new Runnable() {
@@ -2352,7 +2371,12 @@ public class ViewTest extends ActivityInstrumentationTestCase2<ViewTestStubActiv
             }
         });
         getInstrumentation().waitForIdleSync();
-        assertTrue(view.hasCalledOnDraw());
+        new PollingCheck() {
+            @Override
+            protected boolean check() {
+                return view.hasCalledOnDraw();
+            }
+        }.run();
 
         view.reset();
         runTestOnUiThread(new Runnable() {
@@ -3059,7 +3083,14 @@ public class ViewTest extends ActivityInstrumentationTestCase2<ViewTestStubActiv
         }.run();
 
         imm.showSoftInput(editText, 0);
-        assertTrue(editText.hasCalledOnCreateInputConnection());
+
+        new PollingCheck() {
+            @Override
+            protected boolean check() {
+                return editText.hasCalledOnCreateInputConnection();
+            }
+        }.run();
+
         assertTrue(editText.hasCalledOnCheckIsTextEditor());
         assertTrue(imm.isActive(editText));
 
