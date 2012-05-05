@@ -18,13 +18,13 @@ package android.widget.cts;
 
 import com.android.cts.stub.R;
 
-
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
 
 import android.app.Activity;
 import android.app.Instrumentation;
 import android.content.Context;
+import android.cts.util.PollingCheck;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Rect;
@@ -304,12 +304,17 @@ public class AbsListViewTest extends ActivityInstrumentationTestCase2<ListViewSt
 
         Drawable drawable = mListView.getSelector();
         assertNotNull(drawable);
-        Rect r = drawable.getBounds();
+        final Rect r = drawable.getBounds();
 
-        TextView v = (TextView) mListView.getSelectedView();
+        final TextView v = (TextView) mListView.getSelectedView();
+        new PollingCheck() {
+            @Override
+            protected boolean check() {
+                return v.getRight() == r.right;
+            }
+        }.run();
         assertEquals(v.getLeft(), r.left);
         assertEquals(v.getTop(), r.top);
-        assertEquals(v.getRight(), r.right);
         assertEquals(v.getBottom(), r.bottom);
     }
 
@@ -518,10 +523,10 @@ public class AbsListViewTest extends ActivityInstrumentationTestCase2<ListViewSt
         });
         mInstrumentation.waitForIdleSync();
 
-        TextView v = (TextView) listView.getSelectedView();
+        final TextView v = (TextView) listView.getSelectedView();
         assertNull(listView.getContextMenuInfo());
 
-        MockOnItemLongClickListener listener = new MockOnItemLongClickListener();
+        final MockOnItemLongClickListener listener = new MockOnItemLongClickListener();
         listView.setOnItemLongClickListener(listener);
 
         assertNull(listener.getParent());
@@ -531,8 +536,14 @@ public class AbsListViewTest extends ActivityInstrumentationTestCase2<ListViewSt
 
         TouchUtils.longClickView(this, v);
 
+        new PollingCheck() {
+            @Override
+            protected boolean check() {
+                return v == listener.getView();
+            }
+        }.run();
+
         assertSame(listView, listener.getParent());
-        assertSame(v, listener.getView());
         assertEquals(2, listener.getPosition());
         assertEquals(listView.getItemIdAtPosition(2), listener.getID());
 
