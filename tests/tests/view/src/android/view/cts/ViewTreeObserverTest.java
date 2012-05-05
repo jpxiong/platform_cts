@@ -21,6 +21,7 @@ import com.android.cts.stub.R;
 import android.app.Activity;
 import android.app.Instrumentation;
 import android.app.cts.MockActivity;
+import android.cts.util.PollingCheck;
 import android.test.ActivityInstrumentationTestCase2;
 import android.test.TouchUtils;
 import android.view.View;
@@ -118,7 +119,7 @@ public class ViewTreeObserverTest extends ActivityInstrumentationTestCase2<MockA
 
         mViewTreeObserver = b.getViewTreeObserver();
 
-        MockOnTouchModeChangeListener listener = new MockOnTouchModeChangeListener();
+        final MockOnTouchModeChangeListener listener = new MockOnTouchModeChangeListener();
         assertFalse(listener.hasCalledOnTouchModeChanged());
         mViewTreeObserver.addOnTouchModeChangeListener(listener);
 
@@ -130,7 +131,12 @@ public class ViewTreeObserverTest extends ActivityInstrumentationTestCase2<MockA
         });
         mInstrumentation.waitForIdleSync();
 
-        assertTrue(listener.hasCalledOnTouchModeChanged());
+        new PollingCheck() {
+            @Override
+            protected boolean check() {
+                return listener.hasCalledOnTouchModeChanged();
+            }
+        }.run();
     }
 
     public void testAddOnComputeInternalInsetsListener() {
@@ -282,7 +288,7 @@ public class ViewTreeObserverTest extends ActivityInstrumentationTestCase2<MockA
 
         mViewTreeObserver = scrollView.getViewTreeObserver();
 
-        MockOnScrollChangedListener listener = new MockOnScrollChangedListener();
+        final MockOnScrollChangedListener listener = new MockOnScrollChangedListener();
         assertFalse(listener.hasCalledOnScrollChanged());
         mViewTreeObserver.addOnScrollChangedListener(listener);
 
@@ -293,7 +299,12 @@ public class ViewTreeObserverTest extends ActivityInstrumentationTestCase2<MockA
             }
         });
         mInstrumentation.waitForIdleSync();
-        assertTrue(listener.hasCalledOnScrollChanged());
+        new PollingCheck() {
+            @Override
+            protected boolean check() {
+                return listener.hasCalledOnScrollChanged();
+            }
+        }.run();
 
         listener.reset();
         assertFalse(listener.hasCalledOnScrollChanged());
