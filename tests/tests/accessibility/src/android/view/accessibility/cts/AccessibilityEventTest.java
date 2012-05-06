@@ -242,8 +242,8 @@ public class AccessibilityEventTest extends TestCase {
                 receivedEvent.getToIndex());
         assertSame("scrollable has incorect value", expectedEvent.isScrollable(),
                 receivedEvent.isScrollable());
-        assertSame("granularity has incorect value", expectedEvent.getGranularity(),
-                receivedEvent.getGranularity());
+        assertSame("granularity has incorect value", expectedEvent.getMovementGranularity(),
+                receivedEvent.getMovementGranularity());
 
         assertSame("parcelableData has incorect value",
                 ((Message) expectedEvent.getParcelableData()).what,
