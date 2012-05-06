@@ -186,7 +186,7 @@ public class AccessibilityEventTest extends TestCase {
         sentEvent.setScrollY(1);
         sentEvent.setToIndex(1);
         sentEvent.setScrollable(true);
-        sentEvent.setGranularity(AccessibilityNodeInfo.GRANULARITY_LINE);
+        sentEvent.setMovementGranularity(AccessibilityNodeInfo.MOVEMENT_GRANULARITY_LINE);
 
         AccessibilityRecord record = AccessibilityRecord.obtain();
         AccessibilityRecordTest.fullyPopulateAccessibilityRecord(record);
