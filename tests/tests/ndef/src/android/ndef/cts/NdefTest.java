@@ -508,7 +508,7 @@ public class NdefTest extends TestCase {
                 NdefRecord.createExternal("com.foo.bar", "type", null).toUri());
         // check normalization
         assertEquals(Uri.parse("http://www.android.com"),
-                new NdefRecord(NdefRecord.TNF_ABSOLUTE_URI, "HTTP://WWW.ANDROID.COM".getBytes(),
+                new NdefRecord(NdefRecord.TNF_ABSOLUTE_URI, "HTTP://www.android.com".getBytes(),
                 null, null).toUri());
 
         // not uri's
