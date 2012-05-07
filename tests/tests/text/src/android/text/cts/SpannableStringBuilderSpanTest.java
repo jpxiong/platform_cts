@@ -96,9 +96,9 @@ public class SpannableStringBuilderSpanTest extends AndroidTestCase {
         String subReplacement = replacement.substring(replacementStart, replacementEnd);
         String expected = original.substring(0, replaceStart) +
                 subReplacement + original.substring(replaceEnd, original.length());
-        if (DEBUG) System.out.println("Replace \"" + original + "\" [" +
+        if (DEBUG) System.out.println("#" + testCounter + ", replace \"" + original + "\" [" +
                 replaceStart + " " + replaceEnd + "] by \"" + subReplacement + "\" -> \"" +
-                expected + "\", flag=" + flag + ", test #" + testCounter);
+                expected + "\", flag=" + flag);
 
         SpannableStringBuilder originalSpannable = new SpannableStringBuilder(original);
         Spannable replacementSpannable = new SpannableStringBuilder(replacement);
@@ -111,7 +111,8 @@ public class SpannableStringBuilderSpanTest extends AndroidTestCase {
 
         assertEquals(expected, originalSpannable.toString());
 
-        checkSpanPositions(originalSpannable, replaceStart, replaceEnd, subReplacement.length(), flag);
+        checkSpanPositions(originalSpannable, replaceStart, replaceEnd, subReplacement.length(),
+                flag);
         checkReplacementSpanPositions(originalSpannable, replaceStart, replacementSpannable,
                 replacementStart, replacementEnd, flag);
     }
@@ -142,7 +143,9 @@ public class SpannableStringBuilderSpanTest extends AndroidTestCase {
                 // This is the exception to the following generic code where we need to consider
                 // both the start and end styles.
                 if (startStyle == SpanSet.INSIDE && endStyle == SpanSet.INSIDE &&
-                        flag == Spanned.SPAN_EXCLUSIVE_EXCLUSIVE) {
+                        flag == Spanned.SPAN_EXCLUSIVE_EXCLUSIVE &&
+                        (replacementLength == 0 || originalStart > replaceStart ||
+                        originalEnd < replaceEnd)) {
                     // 0-length spans should have been removed
                     assertEquals(-1, start);
                     assertEquals(-1, end);
