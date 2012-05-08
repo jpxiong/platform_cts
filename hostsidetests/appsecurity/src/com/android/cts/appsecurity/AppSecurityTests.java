@@ -21,6 +21,7 @@ import com.android.ddmlib.Log;
 import com.android.ddmlib.testrunner.RemoteAndroidTestRunner;
 import com.android.tradefed.build.IBuildInfo;
 import com.android.tradefed.device.DeviceNotAvailableException;
+import com.android.tradefed.device.ITestDevice;
 import com.android.tradefed.result.CollectingTestListener;
 import com.android.tradefed.result.TestRunResult;
 import com.android.tradefed.testtype.DeviceTestCase;
@@ -58,6 +59,17 @@ public class AppSecurityTests extends DeviceTestCase implements IBuildReceiver {
     private static final String APP_ACCESS_DATA_APK = "CtsAppAccessData.apk";
     private static final String APP_ACCESS_DATA_PKG = "com.android.cts.appaccessdata";
 
+    // External storage constants
+    private static final String EXTERNAL_STORAGE_APP_APK = "CtsExternalStorageApp.apk";
+    private static final String EXTERNAL_STORAGE_APP_PKG = "com.android.cts.externalstorageapp";
+    private static final String EXTERNAL_STORAGE_APP_CLASS = EXTERNAL_STORAGE_APP_PKG
+            + ".ExternalStorageTest";
+    private static final String WRITE_EXTERNAL_STORAGE_APP_APK = "CtsWriteExternalStorageApp.apk";
+    private static final String
+            WRITE_EXTERNAL_STORAGE_APP_PKG = "com.android.cts.writeexternalstorageapp";
+    private static final String WRITE_EXTERNAL_STORAGE_APP_CLASS = WRITE_EXTERNAL_STORAGE_APP_PKG
+            + ".WriteExternalStorageTest";
+
     // testInstrumentationDiffCert constants
     private static final String TARGET_INSTRUMENT_APK = "CtsTargetInstrumentationApp.apk";
     private static final String TARGET_INSTRUMENT_PKG = "com.android.cts.targetinstrumentationapp";
@@ -71,6 +83,8 @@ public class AppSecurityTests extends DeviceTestCase implements IBuildReceiver {
     private static final String PERMISSION_DIFF_CERT_APK = "CtsUsePermissionDiffCert.apk";
     private static final String PERMISSION_DIFF_CERT_PKG =
         "com.android.cts.usespermissiondiffcertapp";
+
+    private static final String READ_EXTERNAL_STORAGE = "android.permission.READ_EXTERNAL_STORAGE";
 
     private static final String LOG_TAG = "AppSecurityTests";
 
@@ -175,6 +189,86 @@ public class AppSecurityTests extends DeviceTestCase implements IBuildReceiver {
         finally {
             getDevice().uninstallPackage(APP_WITH_DATA_PKG);
             getDevice().uninstallPackage(APP_ACCESS_DATA_PKG);
+        }
+    }
+
+    /**
+     * Test behavior when
+     * {@link android.Manifest.permission#READ_EXTERNAL_STORAGE} is unenforced.
+     */
+    public void testReadExternalStorageUnenforced() throws Exception {
+        try {
+            getDevice().uninstallPackage(EXTERNAL_STORAGE_APP_PKG);
+            getDevice().uninstallPackage(WRITE_EXTERNAL_STORAGE_APP_PKG);
+
+            // stage test file on external storage
+            getDevice().pushString("CAEK", "/sdcard/meow");
+
+            // mark permission as not enforced
+            setPermissionEnforced(getDevice(), READ_EXTERNAL_STORAGE, false);
+
+            // install apps and run test
+            assertNull(getDevice()
+                    .installPackage(getTestAppFile(EXTERNAL_STORAGE_APP_APK), false));
+            assertNull(getDevice()
+                    .installPackage(getTestAppFile(WRITE_EXTERNAL_STORAGE_APP_APK), false));
+
+            // normal app should be able to read
+            assertTrue("Normal app unable to read external storage", runDeviceTests(
+                    EXTERNAL_STORAGE_APP_PKG, EXTERNAL_STORAGE_APP_CLASS,
+                    "testReadExternalStorage"));
+
+            // WRITE_EXTERNAL app should be able to read and write
+            assertTrue("WRITE_EXTERNAL app unable to read external storage", runDeviceTests(
+                    WRITE_EXTERNAL_STORAGE_APP_PKG, WRITE_EXTERNAL_STORAGE_APP_CLASS,
+                    "testReadExternalStorage"));
+            assertTrue("WRITE_EXTERNAL app unable to write external storage", runDeviceTests(
+                    WRITE_EXTERNAL_STORAGE_APP_PKG, WRITE_EXTERNAL_STORAGE_APP_CLASS,
+                    "testWriteExternalStorage"));
+
+        } finally {
+            getDevice().uninstallPackage(EXTERNAL_STORAGE_APP_PKG);
+            getDevice().uninstallPackage(WRITE_EXTERNAL_STORAGE_APP_PKG);
+        }
+    }
+
+    /**
+     * Test behavior when
+     * {@link android.Manifest.permission#READ_EXTERNAL_STORAGE} is enforced.
+     */
+    public void testReadExternalStorageEnforced() throws Exception {
+        try {
+            getDevice().uninstallPackage(EXTERNAL_STORAGE_APP_PKG);
+            getDevice().uninstallPackage(WRITE_EXTERNAL_STORAGE_APP_PKG);
+
+            // stage test file on external storage
+            getDevice().pushString("CAEK", "/sdcard/meow");
+
+            // mark permission as enforced
+            setPermissionEnforced(getDevice(), READ_EXTERNAL_STORAGE, true);
+
+            // install apps and run test
+            assertNull(getDevice()
+                    .installPackage(getTestAppFile(EXTERNAL_STORAGE_APP_APK), false));
+            assertNull(getDevice()
+                    .installPackage(getTestAppFile(WRITE_EXTERNAL_STORAGE_APP_APK), false));
+
+            // normal app should not be able to read
+            assertTrue("Normal app able to read external storage", runDeviceTests(
+                    EXTERNAL_STORAGE_APP_PKG, EXTERNAL_STORAGE_APP_CLASS,
+                    "testFailReadExternalStorage"));
+
+            // WRITE_EXTERNAL app should be able to read and write
+            assertTrue("WRITE_EXTERNAL app unable to read external storage", runDeviceTests(
+                    WRITE_EXTERNAL_STORAGE_APP_PKG, WRITE_EXTERNAL_STORAGE_APP_CLASS,
+                    "testReadExternalStorage"));
+            assertTrue("WRITE_EXTERNAL app unable to write external storage", runDeviceTests(
+                    WRITE_EXTERNAL_STORAGE_APP_PKG, WRITE_EXTERNAL_STORAGE_APP_CLASS,
+                    "testWriteExternalStorage"));
+
+        } finally {
+            getDevice().uninstallPackage(EXTERNAL_STORAGE_APP_PKG);
+            getDevice().uninstallPackage(WRITE_EXTERNAL_STORAGE_APP_PKG);
         }
     }
 
@@ -319,4 +413,10 @@ public class AppSecurityTests extends DeviceTestCase implements IBuildReceiver {
         return listener.getCurrentRunResults();
     }
 
+    private static void setPermissionEnforced(
+            ITestDevice device, String permission, boolean enforced)
+            throws DeviceNotAvailableException {
+        device.executeShellCommand("pm set-permission-enforced " + permission + " "
+                + Boolean.toString(enforced));
+    }
 }
