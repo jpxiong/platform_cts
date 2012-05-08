@@ -49,6 +49,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -352,12 +353,10 @@ public class ContextWrapperTest extends AndroidTestCase {
         File actualDBPath = mContextWrapper.getDatabasePath(DATABASE_NAME1);
 
         // Test databaseList()
-        assertEquals(2, mContextWrapper.databaseList().length);
-        ArrayList<String> list = new ArrayList<String>();
-        // Don't know the items storing order
-        list.add(mContextWrapper.databaseList()[0]);
-        list.add(mContextWrapper.databaseList()[1]);
-        assertTrue(list.contains(DATABASE_NAME1) && list.contains(DATABASE_NAME2));
+        List<String> list = Arrays.asList(mContextWrapper.databaseList());
+        assertEquals(4, list.size()); // Each database has a journal
+        assertTrue("1) database list: " + list, list.contains(DATABASE_NAME1));
+        assertTrue("2) database list: " + list, list.contains(DATABASE_NAME2));
 
         // Test deleteDatabase()
         for (int i = 1; i < 3; i++) {
