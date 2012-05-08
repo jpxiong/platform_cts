@@ -28,6 +28,7 @@ import android.content.ServiceConnection;
 import android.content.pm.PackageManager;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.content.pm.ServiceInfo;
+import android.os.Bundle;
 import android.os.IBinder;
 import android.os.RemoteException;
 import android.os.SystemClock;
@@ -360,11 +361,16 @@ public abstract class AccessibilityActivityTestCase<T extends Activity>
         }
 
         public boolean performAction(AccessibilityNodeInfo target, int action) {
+            return performAction(target, action, null);
+        }
+
+        public boolean performAction(AccessibilityNodeInfo target, int action, Bundle arguments) {
             try {
                 // Sending a node info across processes recycles
                 // it so use a clone to avoid losing state
                 AccessibilityNodeInfo targetClone = AccessibilityNodeInfo.obtain(target);
-                return getQueryConnection().performAccessibilityAction(targetClone, action);
+                return getQueryConnection().performAccessibilityAction(targetClone, action,
+                        arguments);
             } catch (RemoteException re) {
                 /* ignore */
             }

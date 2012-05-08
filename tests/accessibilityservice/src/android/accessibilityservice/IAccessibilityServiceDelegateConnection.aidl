@@ -15,6 +15,7 @@
  */
 package android.accessibilityservice;
 
+import android.os.Bundle;
 import android.os.IBinder;
 import android.view.accessibility.AccessibilityEvent;
 import android.view.accessibility.AccessibilityNodeInfo;
@@ -40,7 +41,8 @@ interface IAccessibilityServiceDelegateConnection {
 
     AccessibilityNodeInfo focusSearch(in AccessibilityNodeInfo current, int direction);
 
-    boolean performAccessibilityAction(in AccessibilityNodeInfo target, int action);
+    boolean performAccessibilityAction(in AccessibilityNodeInfo target, int action,
+           in Bundle arguments);
 
     AccessibilityNodeInfo getSource(in AccessibilityEvent event);
 
