@@ -20,11 +20,9 @@ import com.android.cts.stub.R;
 
 
 import android.accounts.Account;
-import android.content.CancellationSignal;
 import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
-import android.content.OperationCanceledException;
 import android.content.res.AssetFileDescriptor;
 import android.cts.util.PollingCheck;
 import android.database.ContentObserver;
@@ -32,6 +30,8 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteQueryBuilder;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.CancellationSignal;
+import android.os.OperationCanceledException;
 import android.os.ParcelFileDescriptor;
 import android.test.AndroidTestCase;
 

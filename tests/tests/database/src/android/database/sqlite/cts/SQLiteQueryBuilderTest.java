@@ -17,15 +17,15 @@
 package android.database.sqlite.cts;
 
 
-import android.content.CancellationSignal;
 import android.content.Context;
-import android.content.OperationCanceledException;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteCursor;
 import android.database.sqlite.SQLiteCursorDriver;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteQuery;
 import android.database.sqlite.SQLiteQueryBuilder;
+import android.os.CancellationSignal;
+import android.os.OperationCanceledException;
 import android.test.AndroidTestCase;
 
 import java.util.HashMap;
