@@ -30,7 +30,7 @@
 
           <EditText
               android:id="@+id/firstEditText"
-              android:layout_width="200dip"
+              android:layout_width="wrap_content"
               android:layout_height="wrap_content"
               android:contentDescription="@string/firstEditText" />
 
@@ -67,7 +67,7 @@
 
           <EditText
               android:id="@+id/secondEditText"
-              android:layout_width="200dip"
+              android:layout_width="wrap_content"
               android:layout_height="wrap_content"
               android:contentDescription="@string/secondEditText" />
 
