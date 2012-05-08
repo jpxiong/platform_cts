@@ -114,34 +114,6 @@ public class DecoderTest extends AndroidTestCase {
         codecInputBuffers = codec.getInputBuffers();
         codecOutputBuffers = codec.getOutputBuffers();
 
-        // set up codec specific data, if any
-        int n = 0;
-        while (format.containsKey("csd-" + n)) {
-            ByteBuffer srcBuf = format.getByteBuffer("csd-" + n);
-
-            // Specifying a timeout of -1 indicates an infinite timeout, i.e.
-            // we're going to block until we get a buffer.
-            int dstBufIndex = codec.dequeueInputBuffer(-1 /* timeoutUs */);
-            ByteBuffer dstBuf = codecInputBuffers[dstBufIndex];
-
-            int srcBufLen = srcBuf.limit();
-
-            // The clear() calls below do not "clear" anything,
-            // they merely reset read/write offsets to 0.
-            srcBuf.clear();
-            dstBuf.clear();
-            dstBuf.put(srcBuf);
-
-            codec.queueInputBuffer(
-                    dstBufIndex,
-                    0 /* offset */,
-                    srcBufLen,
-                    0 /* sampleTimeUs */,
-                    MediaCodec.BUFFER_FLAG_CODEC_CONFIG);
-
-            ++n;
-        }
-
         extractor.selectTrack(0);
 
         // start decoding
