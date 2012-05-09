@@ -125,4 +125,33 @@
     <!-- String title of the accessibility focus and input focus sync test activity -->
     <string name="accessibility_focus_and_input_focus_sync_test_activity">Accessibility focus and input focus sync test</string>
 
+    <!-- String title of the accessibility text traversal test activity. -->
+    <string name="accessibility_text_traversal_test_activity">Accessibility text traversal test</string>
+
+    <string name="android_wiki_short">
+        Android is a Linux-based operating system for mobile devices</string>
+
+    <string name="android_wiki">
+        Android is a Linux-based operating system for mobile devices such as smartphones and tablet
+        computers. It is developed by the Open Handset Alliance, led by Google, and other companies.
+        Google purchased the initial developer of the software, Android Inc., in 2005. The
+        unveiling of the Android distribution in 2007 was announced with the founding of the Open
+        Handset Alliance, a consortium of 86 hardware, software, and telecommunication companies
+        devoted to advancing open </string>
+
+    <string name="a_b">A B</string>
+
+    <string name="android_wiki_search">Android is a Linux-based</string>
+
+    <string name="foo_bar_baz">Foo bar baz.</string>
+
+    <string name="android_wiki_paragraphs">
+        \n\nAndroid is a Linux-based operating system for mobile devices such as smartphones and tablet
+        computers.\n\n It is developed by the Open Handset Alliance, led by Google, and other companies.
+        Google purchased the initial developer of the software, Android Inc., in 2005.\n The
+        unveiling of the Android distribution in 2007 was announced with the founding of the Open
+        Handset Alliance, a consortium of 86 hardware, software, and telecommunication companies
+        devoted to advancing open standards for mobile devices. Google releases the
+        Android code as open-source, under the Apache License.\n\n</string>
+
 </resources>
