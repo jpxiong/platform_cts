@@ -20,7 +20,6 @@ import static android.media.AudioManager.ADJUST_LOWER;
 import static android.media.AudioManager.ADJUST_RAISE;
 import static android.media.AudioManager.ADJUST_SAME;
 import static android.media.AudioManager.FLAG_ALLOW_RINGER_MODES;
-import static android.media.AudioManager.FLAG_SHOW_UI;
 import static android.media.AudioManager.MODE_IN_CALL;
 import static android.media.AudioManager.MODE_IN_COMMUNICATION;
 import static android.media.AudioManager.MODE_NORMAL;
@@ -302,53 +301,52 @@ public class AudioManagerTest extends AndroidTestCase {
 
         mAudioManager.adjustVolume(ADJUST_RAISE, 0);
         mAudioManager.adjustSuggestedStreamVolume(
-                ADJUST_LOWER, USE_DEFAULT_STREAM_TYPE, FLAG_SHOW_UI);
+                ADJUST_LOWER, USE_DEFAULT_STREAM_TYPE, 0);
 
         for (int i = 0; i < streams.length; i++) {
             int maxVolume = mAudioManager.getStreamMaxVolume(streams[i]);
 
-            mAudioManager.setStreamVolume(streams[i], 1, FLAG_SHOW_UI);
+            mAudioManager.setStreamVolume(streams[i], 1, 0);
             assertEquals(1, mAudioManager.getStreamVolume(streams[i]));
 
-            mAudioManager.setStreamVolume(streams[i], maxVolume, FLAG_SHOW_UI);
-            mAudioManager.adjustStreamVolume(streams[i], ADJUST_RAISE, FLAG_SHOW_UI);
+            mAudioManager.setStreamVolume(streams[i], maxVolume, 0);
+            mAudioManager.adjustStreamVolume(streams[i], ADJUST_RAISE, 0);
             assertEquals(maxVolume, mAudioManager.getStreamVolume(streams[i]));
 
-            mAudioManager.adjustSuggestedStreamVolume(ADJUST_LOWER, streams[i], FLAG_SHOW_UI);
+            mAudioManager.adjustSuggestedStreamVolume(ADJUST_LOWER, streams[i], 0);
             assertEquals(maxVolume - 1, mAudioManager.getStreamVolume(streams[i]));
 
             // volume lower
-            mAudioManager.setStreamVolume(streams[i], maxVolume, FLAG_SHOW_UI);
+            mAudioManager.setStreamVolume(streams[i], maxVolume, 0);
             for (int k = maxVolume; k > 1; k--) {
-                mAudioManager.adjustStreamVolume(streams[i], ADJUST_LOWER, FLAG_SHOW_UI);
+                mAudioManager.adjustStreamVolume(streams[i], ADJUST_LOWER, 0);
                 assertEquals(k - 1, mAudioManager.getStreamVolume(streams[i]));
             }
             // on voice capable devices, ring and notification volumes cannot be set to 0
             // by continous press on volume minus key
             // simulate volume key release
-            mAudioManager.adjustStreamVolume(streams[i], ADJUST_SAME,
-                    FLAG_SHOW_UI | FLAG_ALLOW_RINGER_MODES);
-            mAudioManager.adjustStreamVolume(streams[i], ADJUST_LOWER, FLAG_SHOW_UI);
+            mAudioManager.adjustStreamVolume(streams[i], ADJUST_SAME, FLAG_ALLOW_RINGER_MODES);
+            mAudioManager.adjustStreamVolume(streams[i], ADJUST_LOWER, 0);
             assertEquals(0, mAudioManager.getStreamVolume(streams[i]));
 
             // set ringer mode to back normal to not interfere with volume tests
             mAudioManager.setRingerMode(RINGER_MODE_NORMAL);
 
             // volume raise
-            mAudioManager.setStreamVolume(streams[i], 0, FLAG_SHOW_UI);
+            mAudioManager.setStreamVolume(streams[i], 0, 0);
             for (int k = 0; k < maxVolume; k++) {
-                mAudioManager.adjustStreamVolume(streams[i], ADJUST_RAISE, FLAG_SHOW_UI);
+                mAudioManager.adjustStreamVolume(streams[i], ADJUST_RAISE, 0);
                 assertEquals(1 + k, mAudioManager.getStreamVolume(streams[i]));
             }
 
             // volume same
-            mAudioManager.setStreamVolume(streams[i], maxVolume, FLAG_SHOW_UI);
+            mAudioManager.setStreamVolume(streams[i], maxVolume, 0);
             for (int k = 0; k < maxVolume; k++) {
-                mAudioManager.adjustStreamVolume(streams[i], ADJUST_SAME, FLAG_SHOW_UI);
+                mAudioManager.adjustStreamVolume(streams[i], ADJUST_SAME, 0);
                 assertEquals(maxVolume, mAudioManager.getStreamVolume(streams[i]));
             }
 
-            mAudioManager.setStreamVolume(streams[i], maxVolume, FLAG_SHOW_UI);
+            mAudioManager.setStreamVolume(streams[i], maxVolume, 0);
         }
 
         // adjust volume
@@ -364,22 +362,22 @@ public class AudioManagerTest extends AndroidTestCase {
 
         // adjust volume as ADJUST_SAME
         for (int k = 0; k < maxVolume; k++) {
-            mAudioManager.adjustVolume(ADJUST_SAME, FLAG_SHOW_UI);
+            mAudioManager.adjustVolume(ADJUST_SAME, 0);
             assertEquals(maxVolume, mAudioManager.getStreamVolume(STREAM_MUSIC));
         }
 
         // adjust volume as ADJUST_RAISE
-        mAudioManager.setStreamVolume(STREAM_MUSIC, 1, FLAG_SHOW_UI);
+        mAudioManager.setStreamVolume(STREAM_MUSIC, 1, 0);
         for (int k = 0; k < maxVolume - 1; k++) {
-            mAudioManager.adjustVolume(ADJUST_RAISE, FLAG_SHOW_UI);
+            mAudioManager.adjustVolume(ADJUST_RAISE, 0);
             assertEquals(2 + k, mAudioManager.getStreamVolume(STREAM_MUSIC));
         }
 
         // adjust volume as ADJUST_LOWER
-        mAudioManager.setStreamVolume(STREAM_MUSIC, maxVolume, FLAG_SHOW_UI);
+        mAudioManager.setStreamVolume(STREAM_MUSIC, maxVolume, 0);
         maxVolume = mAudioManager.getStreamVolume(STREAM_MUSIC);
 
-        mAudioManager.adjustVolume(ADJUST_LOWER, FLAG_SHOW_UI);
+        mAudioManager.adjustVolume(ADJUST_LOWER, 0);
         assertEquals(maxVolume - 1, mAudioManager.getStreamVolume(STREAM_MUSIC));
         mp.stop();
         mp.release();
