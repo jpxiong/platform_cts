@@ -162,7 +162,6 @@ public class DecoderTest extends AndroidTestCase {
             if (res >= 0) {
                 int outputBufIndex = res;
                 ByteBuffer buf = codecOutputBuffers[outputBufIndex];
-                buf.order(null);
 
                 // check the waveform matches within the specified max error
                 for (int i = 0; i < info.size; i += 2) {
