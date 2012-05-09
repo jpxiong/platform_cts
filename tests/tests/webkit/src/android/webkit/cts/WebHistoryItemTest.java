@@ -56,7 +56,7 @@ public class WebHistoryItemTest extends ActivityInstrumentationTestCase2<WebView
         assertNotNull(item);
         int firstId = item.getId();
         assertEquals(url, item.getUrl());
-        assertNull(item.getOriginalUrl());
+        assertEquals(url, item.getOriginalUrl());
         assertEquals(TestHtmlConstants.HELLO_WORLD_TITLE, item.getTitle());
         Bitmap icon = mOnUiThread.getFavicon();
         assertEquals(icon, item.getFavicon());
