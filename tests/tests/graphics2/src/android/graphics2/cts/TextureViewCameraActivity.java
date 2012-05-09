@@ -17,6 +17,7 @@
 package android.graphics2.cts;
 
 import android.app.Activity;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Matrix;
@@ -54,7 +55,19 @@ public class TextureViewCameraActivity extends Activity implements
         Assert.assertTrue(mTextureView.isOpaque());
         mWidth = width;
         mHeight = height;
-        mCamera = Camera.open();
+        PackageManager packageManager = getPackageManager();
+        boolean hasRearCamera = packageManager.hasSystemFeature(PackageManager.FEATURE_CAMERA);
+        boolean hasFrontCamera =
+                packageManager.hasSystemFeature(PackageManager.FEATURE_CAMERA_FRONT);
+        if (hasRearCamera) {
+            mCamera = Camera.open();
+        } else if (hasFrontCamera) {
+            mCamera = Camera.open(0);
+        } else {
+            // no camera, and no frame update, so just complete here.
+            mLatch.countDown();
+            return;
+        }
 
         try {
             mCamera.setPreviewTexture(surface);
