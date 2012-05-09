@@ -40,6 +40,9 @@
       <activity android:label="@string/accessibility_focus_and_input_focus_sync_test_activity"
               android:name="android.accessibilityservice.cts.AccessibilityFocusAndInputFocusSyncActivity"/>
 
+      <activity android:label="@string/accessibility_text_traversal_test_activity"
+              android:name="android.accessibilityservice.cts.AccessibilityTextTraversalActivity"/> 
+
   </application>
 
   <instrumentation android:name="android.test.InstrumentationTestRunner"

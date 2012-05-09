@@ -22,6 +22,7 @@ import android.accessibilityservice.IAccessibilityServiceDelegate;
 import android.accessibilityservice.IAccessibilityServiceDelegateConnection;
 import android.app.Service;
 import android.content.Intent;
+import android.os.Bundle;
 import android.os.IBinder;
 import android.os.RemoteException;
 import android.util.Log;
@@ -169,8 +170,9 @@ public class DelegatingAccessibilityService extends AccessibilityService {
             }
 
             @Override
-            public boolean performAccessibilityAction(AccessibilityNodeInfo target, int action) {
-                return target.performAction(action);
+            public boolean performAccessibilityAction(AccessibilityNodeInfo target, int action,
+                    Bundle arguments) {
+                return target.performAction(action, arguments);
             }
 
             @Override
