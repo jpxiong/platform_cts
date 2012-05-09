@@ -18,7 +18,6 @@ package android.content.cts;
 
 import java.util.HashMap;
 
-import android.content.CancellationSignal;
 import android.content.ContentProvider;
 import android.content.ContentUris;
 import android.content.ContentValues;
@@ -30,6 +29,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.database.sqlite.SQLiteQueryBuilder;
 import android.net.Uri;
+import android.os.CancellationSignal;
 import android.text.TextUtils;
 
 public class MockContentProvider extends ContentProvider {
