@@ -388,10 +388,7 @@ public class AnimationTest extends ActivityInstrumentationTestCase2<AnimationTes
         Animation anim = AnimationUtils.loadAnimation(mActivity, R.anim.accelerate_alpha);
         assertEquals(Animation.START_ON_FIRST_FRAME, anim.getStartTime());
         assertFalse(anim.hasStarted());
-        currentTime = AnimationUtils.currentAnimationTimeMillis();
         AnimationTestUtils.assertRunAnimation(getInstrumentation(), animWindow, anim);
-        // add delta 100 in case the system is sluggish when run animation
-        assertEquals(currentTime, anim.getStartTime(), 100);
     }
 
     public void testGetTransformation() {
