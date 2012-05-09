@@ -33,7 +33,7 @@ import java.lang.reflect.Modifier;
 public class AccessibilityNodeInfoTest extends AndroidTestCase {
 
     /** The number of properties of the {@link AccessibilityNodeInfo} class. */
-    private static final int NON_STATIC_FIELD_COUNT = 28;
+    private static final int NON_STATIC_FIELD_COUNT = 30;
 
     @SmallTest
     public void testMarshaling() throws Exception {
@@ -141,6 +141,8 @@ public class AccessibilityNodeInfoTest extends AndroidTestCase {
         info.setScrollable(true);
         info.setSelected(true);
         info.addAction(AccessibilityNodeInfo.ACTION_CLEAR_FOCUS);
+        info.setAccessibilityFocused(true);
+        info.setMovementGranularities(AccessibilityNodeInfo.MOVEMENT_GRANULARITY_LINE);
     }
 
     /**
@@ -191,6 +193,12 @@ public class AccessibilityNodeInfoTest extends AndroidTestCase {
                 receivedInfo.getChildCount());
         assertSame("childCount has incorrect value", expectedInfo.getChildCount(),
                 receivedInfo.getChildCount());
+        assertSame("accessibilityFocused has incorrect value",
+                expectedInfo.isAccessibilityFocused(),
+                receivedInfo.isAccessibilityFocused());
+        assertSame("movementGranularities has incorrect value",
+                expectedInfo.getMovementGranularities(),
+                receivedInfo.getMovementGranularities());
     }
 
     /**
@@ -219,5 +227,8 @@ public class AccessibilityNodeInfoTest extends AndroidTestCase {
         assertFalse("scrollable not properly recycled", info.isScrollable());
         assertFalse("selected not properly recycled", info.isSelected());
         assertSame("actions not properly recycled", 0, info.getActions());
+        assertFalse("accessibilityFocused not properly recycled", info.isAccessibilityFocused());
+        assertSame("movementGranularities not properly recycled", 0,
+                info.getMovementGranularities());
     }
 }
