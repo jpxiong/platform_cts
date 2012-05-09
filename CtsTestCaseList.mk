@@ -15,6 +15,7 @@
 cts_security_apps_list := \
 	CtsAppAccessData \
 	CtsAppWithData \
+	CtsExternalStorageApp \
 	CtsInstrumentationAppDiffCert \
 	CtsPermissionDeclareApp \
 	CtsSharedUidInstall \
@@ -22,7 +23,8 @@ cts_security_apps_list := \
 	CtsSimpleAppInstall \
 	CtsSimpleAppInstallDiffCert \
 	CtsTargetInstrumentationApp \
-	CtsUsePermissionDiffCert
+	CtsUsePermissionDiffCert \
+	CtsWriteExternalStorageApp
 
 cts_support_packages := \
 	CtsAccelerationTestStubs \
