@@ -55,7 +55,7 @@ public class MonkeyTest extends AbstractMonkeyTest {
                     assertEquals(isMonkey ? MONKEY : HUMAN, m.group(1));
                 }
             }
-            assertTrue(monkeyLogsFound);
+            assertTrue("No monkey logs were found!", monkeyLogsFound);
         } finally {
             s.close();
         }

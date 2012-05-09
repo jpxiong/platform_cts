@@ -16,7 +16,5 @@
 
 package com.android.cts.monkey;
 
-import android.app.Activity;
-
-public class BaboonActivity extends Activity {
+public class BaboonActivity extends MonkeyActivity {
 }
