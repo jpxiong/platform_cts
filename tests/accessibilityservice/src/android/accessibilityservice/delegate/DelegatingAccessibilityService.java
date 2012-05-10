@@ -179,9 +179,9 @@ public class DelegatingAccessibilityService extends AccessibilityService {
             public void setFetchViewsNotExposedForAccessibility(boolean fetch) {
                 AccessibilityServiceInfo info = sServiceDelegate.getServiceInfo();
                 if (fetch) {
-                    info.flags |= AccessibilityServiceInfo.INCLUDE_NOT_IMPORTANT_VIEWS;
+                    info.flags |= AccessibilityServiceInfo.FLAG_INCLUDE_NOT_IMPORTANT_VIEWS;
                 } else {
-                    info.flags &= ~AccessibilityServiceInfo.INCLUDE_NOT_IMPORTANT_VIEWS;
+                    info.flags &= ~AccessibilityServiceInfo.FLAG_INCLUDE_NOT_IMPORTANT_VIEWS;
                 }
                 sServiceDelegate.setServiceInfo(info);
             }
