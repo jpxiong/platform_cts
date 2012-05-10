@@ -59,8 +59,9 @@ public class TextureViewSnapshotTestActivity extends Activity
 
     @Override
     public void onSurfaceTextureAvailable(SurfaceTexture surface, int width, int height) {
-        mProducerThread = new GLProducerThread(surface, new GLRendererImpl(),
-                mShouldRender, 1000/48, mSemaphore);
+        mProducerThread = new GLProducerThread(surface,
+                new GLTimedFramesRenderer(Integer.MAX_VALUE, 1000/48, false),
+                mShouldRender, mSemaphore);
         mProducerThread.start();
     }
 
@@ -84,14 +85,6 @@ public class TextureViewSnapshotTestActivity extends Activity
             Assert.assertEquals(Color.RED, bitmap.getPixel(0, 0));
             mShouldRender.set(false);
             mPostedSnapshotGrab = true;
-        }
-    }
-
-    private static class GLRendererImpl implements GLProducerThread.GLRenderer {
-        @Override
-        public void drawFrame(int frame) {
-            glClearColor(1.0f, 0.0f, 0.0f, 1.0f);
-            glClear(GL_COLOR_BUFFER_BIT);
         }
     }
 }

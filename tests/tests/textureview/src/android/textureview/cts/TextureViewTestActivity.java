@@ -20,6 +20,7 @@ import android.animation.AnimatorSet;
 import android.app.Activity;
 import android.graphics.SurfaceTexture;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.TextureView;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
@@ -28,33 +29,38 @@ import junit.framework.Assert;
 import static android.opengl.GLES20.*;
 
 public class TextureViewTestActivity extends Activity implements TextureView.SurfaceTextureListener {
-    public static int mFrames = -1;
-    public static int mDelayMs = -1;
+    public static GLFrameRenderer mRenderer;
+    public static int mAnimateViewMs;
+    public static int mSurfaceWidth;
+    public static int mSurfaceHeight;
 
     private TextureView mTexView;
-    private Thread mProducerThread;
+    public GLProducerThread mProducerThread;
     private final Semaphore mSemaphore = new Semaphore(0);
+
+    private static String TAG = "TextureViewTestActivity";
+
+    public FrameStats mFrameStats = new FrameStats();
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Assert.assertTrue(mFrames > 0);
-        Assert.assertTrue(mDelayMs > 0);
         mTexView = new TextureView(this);
         mTexView.setSurfaceTextureListener(this);
         setContentView(mTexView);
-        ObjectAnimator rotate = ObjectAnimator.ofFloat(mTexView, "rotationY", 180);
-        ObjectAnimator fadeIn = ObjectAnimator.ofFloat(mTexView, "alpha", 0.3f, 1f);
-        ObjectAnimator scaleY = ObjectAnimator.ofFloat(mTexView, "scaleY", 0.3f, 1f);
-        AnimatorSet animSet = new AnimatorSet();
-        animSet.play(rotate).with(fadeIn).with(scaleY);
-        animSet.setDuration(mFrames * mDelayMs);
-        animSet.start();
+        if (mAnimateViewMs > 0) {
+            ObjectAnimator rotate = ObjectAnimator.ofFloat(mTexView, "rotationY", 180);
+            ObjectAnimator fadeIn = ObjectAnimator.ofFloat(mTexView, "alpha", 0.3f, 1f);
+            ObjectAnimator scaleY = ObjectAnimator.ofFloat(mTexView, "scaleY", 0.3f, 1f);
+            AnimatorSet animSet = new AnimatorSet();
+            animSet.play(rotate).with(fadeIn).with(scaleY);
+            animSet.setDuration(mAnimateViewMs);
+            animSet.start();
+        }
     }
 
-    public Boolean waitForCompletion() {
+    public Boolean waitForCompletion(int timeout) {
         Boolean success = false;
-        int timeout = mFrames * mDelayMs * 4;
         try {
             success = mSemaphore.tryAcquire(timeout, TimeUnit.MILLISECONDS);
         } catch (InterruptedException e) {
@@ -65,8 +71,9 @@ public class TextureViewTestActivity extends Activity implements TextureView.Sur
 
     @Override
     public void onSurfaceTextureAvailable(SurfaceTexture surface, int width, int height) {
-        mProducerThread = new GLProducerThread(surface, new GLRendererImpl(),
-                mFrames, mDelayMs, mSemaphore);
+        if (mSurfaceWidth > 0 && mSurfaceHeight > 0)
+            surface.setDefaultBufferSize(mSurfaceWidth, mSurfaceHeight);
+        mProducerThread = new GLProducerThread(surface, mRenderer, mSemaphore);
         mProducerThread.start();
     }
 
@@ -82,21 +89,8 @@ public class TextureViewTestActivity extends Activity implements TextureView.Sur
 
     @Override
     public void onSurfaceTextureUpdated(SurfaceTexture surface) {
+        mFrameStats.endFrame();
+        mFrameStats.startFrame();
     }
 
-    public static class GLRendererImpl implements GLProducerThread.GLRenderer {
-        private final int numColors = 4;
-        private final float[][] color =
-            { { 1.0f, 0.0f, 0.0f },
-              { 0.0f, 1.0f, 0.0f },
-              { 0.0f, 0.0f, 1.0f },
-              { 1.0f, 1.0f, 1.0f } };
-
-        @Override
-        public void drawFrame(int frame) {
-            int index = frame % numColors;
-            glClearColor(color[index][0], color[index][1], color[index][2], 1.0f);
-            glClear(GL_COLOR_BUFFER_BIT);
-        }
-    }
 }
