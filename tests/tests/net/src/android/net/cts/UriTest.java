@@ -406,11 +406,12 @@ public class UriTest extends AndroidTestCase {
         assertEquals(uriString, uri.toString());
     }
 
-    public void testNormalize() {
-        assertEquals(Uri.parse(""), Uri.parse("").normalize());
+    public void testNormalizeScheme() {
+        assertEquals(Uri.parse(""), Uri.parse("").normalizeScheme());
         assertEquals(Uri.parse("http://www.android.com"),
-                Uri.parse("http://www.android.com").normalize());
+                Uri.parse("http://www.android.com").normalizeScheme());
         assertEquals(Uri.parse("http://USER@WWW.ANDROID.COM:100/ABOUT?foo=blah@bar=bleh#c"),
-                Uri.parse("HTTP://USER@WWW.ANDROID.COM:100/ABOUT?foo=blah@bar=bleh#c").normalize());
+                Uri.parse("HTTP://USER@WWW.ANDROID.COM:100/ABOUT?foo=blah@bar=bleh#c")
+                        .normalizeScheme());
     }
 }
