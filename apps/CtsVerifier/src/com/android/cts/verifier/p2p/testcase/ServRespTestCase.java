@@ -16,12 +16,12 @@
 package com.android.cts.verifier.p2p.testcase;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
 import android.content.Context;
-import android.net.nsd.DnsSdTxtRecord;
 import android.net.wifi.p2p.nsd.WifiP2pDnsSdServiceInfo;
 import android.net.wifi.p2p.nsd.WifiP2pServiceInfo;
 import android.net.wifi.p2p.nsd.WifiP2pUpnpServiceInfo;
@@ -139,9 +139,9 @@ public class ServRespTestCase extends TestCase {
      * @return
      */
     private WifiP2pServiceInfo createIppService() {
-        DnsSdTxtRecord txtRecord = new DnsSdTxtRecord();
-        txtRecord.set("txtvers", "1");
-        txtRecord.set("pdl", "application/postscript");
+        HashMap<String, String> txtRecord = new HashMap<String, String>();
+        txtRecord.put("txtvers", "1");
+        txtRecord.put("pdl", "application/postscript");
         return WifiP2pDnsSdServiceInfo.newInstance("MyPrinter",
                 "_ipp._tcp", txtRecord);
     }
