@@ -151,9 +151,6 @@ public class AssetFileDescriptorTest extends AndroidTestCase {
     }
 
     public void testMiscMethod() {
-        // test constructor
-        new AssetFileDescriptor(null, START_OFFSET, LENGTH);
-
         // test getLength()
         assertEquals(LENGTH, mAssetFileDes.getLength());
 
