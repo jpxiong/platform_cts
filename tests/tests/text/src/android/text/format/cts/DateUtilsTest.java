@@ -149,11 +149,11 @@ public class DateUtilsTest extends AndroidTestCase {
         assertEquals("1/24/09", DateUtils.formatSameDayTime(fixedTime + DAY_DURATION,
                 fixedTime, java.text.DateFormat.SHORT, java.text.DateFormat.FULL).toString());
 
-        assertEquals("5:30:15 AM GMT+00:00", DateUtils.formatSameDayTime(fixedTime + HOUR_DURATION,
+        assertEquals("5:30:15 AM GMT", DateUtils.formatSameDayTime(fixedTime + HOUR_DURATION,
                 fixedTime, java.text.DateFormat.FULL, java.text.DateFormat.FULL).toString());
         assertEquals("5:30:15 AM", DateUtils.formatSameDayTime(fixedTime + HOUR_DURATION,
                 fixedTime, java.text.DateFormat.FULL, java.text.DateFormat.DEFAULT).toString());
-        assertEquals("5:30:15 AM GMT+00:00", DateUtils.formatSameDayTime(fixedTime + HOUR_DURATION,
+        assertEquals("5:30:15 AM GMT", DateUtils.formatSameDayTime(fixedTime + HOUR_DURATION,
                 fixedTime, java.text.DateFormat.FULL, java.text.DateFormat.LONG).toString());
         assertEquals("5:30:15 AM", DateUtils.formatSameDayTime(fixedTime + HOUR_DURATION,
                 fixedTime, java.text.DateFormat.FULL, java.text.DateFormat.MEDIUM).toString());
