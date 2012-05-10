@@ -17,9 +17,10 @@
 package com.android.cts.verifier.p2p.testcase;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
-import android.net.nsd.DnsSdTxtRecord;
 import android.net.wifi.p2p.WifiP2pDevice;
 import android.net.wifi.p2p.WifiP2pManager.DnsSdTxtRecordListener;
 import android.util.Log;
@@ -60,7 +61,7 @@ public class DnsSdTxtRecordListenerTest extends ListenerTest
 
     @Override
     public void onDnsSdTxtRecordAvailable(String fullDomainName,
-            DnsSdTxtRecord record, WifiP2pDevice srcDevice) {
+            Map<String, String> record, WifiP2pDevice srcDevice) {
         Log.d(TAG, fullDomainName + " " + record + " received from "
                 + srcDevice.deviceAddress);
 
@@ -77,10 +78,10 @@ public class DnsSdTxtRecordListenerTest extends ListenerTest
         String ippDomainName = "myprinter._ipp._tcp.local.";
         String afpDomainName = "example._afpovertcp._tcp.local.";
 
-        DnsSdTxtRecord IppTxtRecord = new DnsSdTxtRecord();
-        DnsSdTxtRecord afpTxtRecord = new DnsSdTxtRecord();
-        IppTxtRecord.set("txtvers", "1");
-        IppTxtRecord.set("pdl", "application/postscript");
+        HashMap<String, String> IppTxtRecord = new HashMap<String, String>();
+        HashMap<String, String> afpTxtRecord = new HashMap<String, String>();
+        IppTxtRecord.put("txtvers", "1");
+        IppTxtRecord.put("pdl", "application/postscript");
 
         IPP_DNS_TXT.add(new Argument(ippDomainName, IppTxtRecord));
         AFP_DNS_TXT.add(new Argument(afpDomainName, afpTxtRecord));
@@ -94,14 +95,14 @@ public class DnsSdTxtRecordListenerTest extends ListenerTest
     static class Argument extends ListenerArgument {
 
         private String mFullDomainName;
-        private DnsSdTxtRecord mRecord;
+        private Map<String, String> mRecord;
 
         /**
          * Set the argument of {@link #onDnsSdTxtRecordAvailable}.
          * @param fullDomainName full domain name.
          * @param record txt record.
          */
-        Argument(String fullDomainName, DnsSdTxtRecord record) {
+        Argument(String fullDomainName, Map<String, String> record) {
             mFullDomainName = fullDomainName;
             mRecord = record;
         }
@@ -126,7 +127,7 @@ public class DnsSdTxtRecordListenerTest extends ListenerTest
             return s1.equals(s2);
         }
 
-        private boolean equals(DnsSdTxtRecord s1, DnsSdTxtRecord s2) {
+        private boolean equals(Map<String, String> s1, Map<String, String> s2) {
             if (s1 == null && s2 == null) {
                 return true;
             }
