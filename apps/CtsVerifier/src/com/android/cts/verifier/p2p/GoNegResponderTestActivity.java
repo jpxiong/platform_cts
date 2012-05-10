@@ -19,28 +19,28 @@ import android.content.Context;
 import android.os.Bundle;
 
 import com.android.cts.verifier.R;
-import com.android.cts.verifier.p2p.testcase.ServRespTestCase;
+import com.android.cts.verifier.p2p.testcase.GoNegRespTestCase;
 import com.android.cts.verifier.p2p.testcase.TestCase;
 
 /**
- * Test activity that responds service discovery request.
+ * Test activity that responds go negotiation request.
  */
-public class ServiceResponderTestActivity extends ResponderTestActivity {
+public class GoNegResponderTestActivity extends ResponderTestActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setInfoResources(R.string.p2p_service_discovery_responder,
-                R.string.p2p_service_discovery_responder_info, -1);
+        setInfoResources(R.string.p2p_go_neg_responder,
+                R.string.p2p_go_neg_responder_info, -1);
     }
 
     @Override
     protected TestCase getTestCase(Context context) {
-        return new ServRespTestCase(context);
+        return new GoNegRespTestCase(context);
     }
 
     @Override
     protected int getReadyMsgId() {
-        return R.string.p2p_service_responder_ready;
+        return R.string.p2p_go_neg_responder_ready;
     }
 }
