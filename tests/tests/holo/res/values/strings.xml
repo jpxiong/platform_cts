@@ -24,7 +24,7 @@
     <string name="task_clear_diff_bitmaps">Clear Diff Bitmaps</string>
 
     <string name="display_info">Display Info</string>
-    <string name="display_info_text">Density DPI: %1$d\nDensity Bucket: %2$s</string>
+    <string name="display_info_text">Density DPI: %1$d\nDensity Bucket: %2$s\nWidth DP: %3$d\nHeight DP: %4$d</string>
 
     <string name="pick_theme">Pick Theme</string>
     <string name="pick_layout">Pick Layout</string>
