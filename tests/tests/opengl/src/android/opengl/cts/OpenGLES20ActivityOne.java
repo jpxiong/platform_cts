@@ -20,6 +20,8 @@ import android.content.Context;
 import android.opengl.GLSurfaceView;
 import android.opengl.GLSurfaceView.Renderer;
 import android.os.Bundle;
+import android.view.Window;
+import android.view.WindowManager;
 
 public class OpenGLES20ActivityOne extends Activity {
     OpenGLES20View view;
@@ -29,7 +31,8 @@ public class OpenGLES20ActivityOne extends Activity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
+        Window window = getWindow();
+        window.addFlags(WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD);
     }
 
     public void setView(int type, int i ) {
@@ -48,7 +51,9 @@ public class OpenGLES20ActivityOne extends Activity {
     @Override
     protected void onPause() {
         super.onPause();
-        view.onPause();
+        if (view != null) {
+            view.onPause();
+        }
     }
 
     @Override
