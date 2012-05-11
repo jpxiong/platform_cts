@@ -22,6 +22,10 @@ import junit.framework.TestCase;
 
 public class BannedFilesTest extends TestCase {
 
+    public void testNoSyncAgent() {
+        assertNotSetugid("/system/bin/sync_agent");
+    }
+
     /**
      * setuid or setgid "ip" command can be used to modify the
      * routing tables of a device, potentially allowing a malicious
