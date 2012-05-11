@@ -58,6 +58,17 @@ public class KernelSettingsTest extends TestCase {
         }
     }
 
+    /**
+     * setuid programs should not be dumpable.
+     */
+    public void testSetuidDumpable() throws IOException {
+        try {
+            assertEquals("0", getFile("/proc/sys/fs/suid_dumpable"));
+        } catch (FileNotFoundException e) {
+            // Odd. The file doesn't exist... Assume we're ok.
+        }
+    }
+
     private String getFile(String filename) throws IOException {
         BufferedReader in = null;
         try {
