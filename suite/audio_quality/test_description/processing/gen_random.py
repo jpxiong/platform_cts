@@ -20,32 +20,24 @@ import scipy as sp
 import scipy.fftpack as fft
 import matplotlib.pyplot as plt
 
-# generate random signal
+# generate random signal with max freq
 # Input: peak amplitude,
 #        duration in msec,
 #        sampling rate HZ
-#        low frequency,
 #        high frequency,
 # Output: generated sound (stereo)
 
-def do_gen_random(peakAmpl, durationInMSec, samplingRate, fLow, fHigh, stereo=True):
+def do_gen_random(peakAmpl, durationInMSec, samplingRate, fHigh, stereo=True):
     samples = durationInMSec * samplingRate / 1000
     result = np.zeros(samples * 2 if stereo else samples, dtype=np.int16)
-    #randomSignal = np.random.random_integers(-peakAmpl, peakAmpl, samples)
-    randomSignal = np.random.normal(scale=peakAmpl *2 / 3, size=samples)
+    randomSignal = np.random.normal(scale = peakAmpl * 2 / 3, size=samples)
     fftData = fft.rfft(randomSignal)
     freqSamples = samples/2
-    iLow = 0 #freqSamples * fLow * 2/ samplingRate + 1
-    #if iLow > freqSamples - 1:
-    #    iLow = freqSamples - 1
     iHigh = freqSamples * fHigh * 2 / samplingRate + 1
-    #print len(randomSignal), len(fftData), fLow, iLow, fHigh, iHigh
+    #print len(randomSignal), len(fftData), fLow, fHigh, iHigh
     if iHigh > freqSamples - 1:
         iHigh = freqSamples - 1
     fftData[0] = 0 # DC
-    #for i in range(iLow - 1):
-    #    fftData[2 * i + 1 ] = 0 # Re
-    #    fftData[2 * i + 2 ] = 0 # Imag
     for i in range(iHigh, freqSamples - 1):
         fftData[ 2 * i + 1 ] = 0
         fftData[ 2 * i + 2 ] = 0
@@ -81,15 +73,13 @@ def gen_random(inputData, inputTypes):
         inputError = True
     if (inputTypes[3] != TYPE_I64):
         inputError = True
-    if (inputTypes[4] != TYPE_I64):
-        inputError = True
     if inputError:
         output.append(RESULT_ERROR)
         output.append(outputData)
         output.append(outputTypes)
         return output
 
-    result = do_gen_random(inputData[0], inputData[1], inputData[2], inputData[3], inputData[4])
+    result = do_gen_random(inputData[0], inputData[1], inputData[2], inputData[3])
 
     output.append(RESULT_OK)
     outputData.append(result)
@@ -103,8 +93,8 @@ if __name__=="__main__":
     peakAmplitude = 10000
     samplingRate = 44100
     durationInMSec = 10000
-    fLow = 500
+    #fLow = 500
     fHigh = 15000
-    result = do_gen_random(peakAmplitude, durationInMSec, samplingRate, fLow, fHigh)
+    result = do_gen_random(peakAmplitude, durationInMSec, samplingRate, fHigh)
     plt.plot(result)
     plt.show()

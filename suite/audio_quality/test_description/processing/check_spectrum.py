@@ -23,7 +23,7 @@ import sys
 sys.path.append(sys.path[0])
 import calc_delay
 
-# check if Transfer Function of DUT / Host signal
+# check if amplitude ratio of DUT / Host signal
 #  lies in the given error boundary
 # input: host record
 #        device record,
@@ -34,35 +34,42 @@ import calc_delay
 #        allowed error ih positive side for pass
 # output: min value in negative side, normalized to 1.0
 #         max value in positive side
-#         calculated TF in magnitude (DUT / Host)
+#         calculated amplittude ratio in magnitude (DUT / Host)
 
 def do_check_spectrum(hostData, DUTData, samplingRate, fLow, fHigh, margainLow, margainHigh):
     # reduce FFT resolution to have averaging effects
-    N = 512 if (len(hostData) > 512) else len(hostData)
-    iLow = N * fLow / samplingRate
+    N = 256 if (len(hostData) > 512) else len(hostData)
+    iLow = N * fLow / samplingRate + 1 # 1 for DC
     if iLow > (N / 2 - 1):
         iLow = (N / 2 - 1)
-    iHigh = N * fHigh / samplingRate
-    if iHigh > (N / 2):
-        iHigh = N / 2
+    iHigh = N * fHigh / samplingRate + 1 # 1 for DC
+    if iHigh > (N / 2 + 1):
+        iHigh = N / 2 + 1
     print fLow, iLow, fHigh, iHigh, samplingRate
-    hostFFT = abs(fft.fft(hostData, n = N))[iLow:iHigh]
-    dutFFT = abs(fft.fft(DUTData, n = N))[iLow:iHigh]
-    TF = dutFFT / hostFFT
-    TFmean = sum(TF) / len(TF)
-    TF = TF / TFmean # TF normalized to 1
-    positiveMax = abs(max(TF))
-    negativeMin = abs(min(TF))
+
+    Phh, freqs = plt.psd(hostData, NFFT=N, Fs=samplingRate, Fc=0, detrend=plt.mlab.detrend_none,\
+        window=plt.mlab.window_hanning, noverlap=0, pad_to=None, sides='onesided',\
+        scale_by_freq=False)
+    Pdd, freqs = plt.psd(DUTData, NFFT=N, Fs=samplingRate, Fc=0, detrend=plt.mlab.detrend_none,\
+        window=plt.mlab.window_hanning, noverlap=0, pad_to=None, sides='onesided',\
+        scale_by_freq=False)
+    print len(Phh), len(Pdd)
+    print "Phh", abs(Phh[iLow:iHigh])
+    print "Pdd", abs(Pdd[iLow:iHigh])
+    amplitudeRatio = np.sqrt(abs(Pdd[iLow:iHigh]/Phh[iLow:iHigh]))
+    ratioMean = np.mean(amplitudeRatio)
+    amplitudeRatio = amplitudeRatio / ratioMean
+    print "Normialized ratio", amplitudeRatio
+    print "ration mean for normalization", ratioMean
+    positiveMax = abs(max(amplitudeRatio))
+    negativeMin = abs(min(amplitudeRatio))
     passFail = True if (positiveMax < (margainHigh / 100.0 + 1.0)) and\
         ((1.0 - negativeMin) < margainLow / 100.0) else False
-    TFResult = np.zeros(len(TF), dtype=np.int16)
-    for i in range(len(TF)):
-        TFResult[i] = TF[i] * 256 # make fixed point
-    #freq = np.linspace(0.0, fHigh, num=iHigh, endpoint=False)
-    #plt.plot(freq, abs(fft.fft(hostData, n = N))[:iHigh], freq, abs(fft.fft(DUTData, n = N))[:iHigh])
-    #plt.show()
+    RatioResult = np.zeros(len(amplitudeRatio), dtype=np.int16)
+    for i in range(len(amplitudeRatio)):
+        RatioResult[i] = amplitudeRatio[i] * 256 # make fixed point
     print "positiveMax", positiveMax, "negativeMin", negativeMin
-    return (passFail, negativeMin, positiveMax, TFResult)
+    return (passFail, negativeMin, positiveMax, RatioResult)
 
 def check_spectrum(inputData, inputTypes):
     output = []
@@ -125,10 +132,10 @@ if __name__=="__main__":
     samplingRate = 44100
     fLow = 500
     fHigh = 15000
-    data = getattr(mod, "do_gen_random")(peakAmpl, durationInMSec, samplingRate, fLow, fHigh,\
-                                         stereo=False)
+    data = getattr(mod, "do_gen_random")(peakAmpl, durationInMSec, samplingRate, fHigh,\
+        stereo=False)
     print len(data)
-    (passFail, minVal, maxVal, TF) = do_check_spectrum(data, data, samplingRate, fLow, fHigh,\
-                                                           1.0, 1.0)
-    plt.plot(TF)
+    (passFail, minVal, maxVal, ampRatio) = do_check_spectrum(data, data, samplingRate, fLow, fHigh,\
+        1.0, 1.0)
+    plt.plot(ampRatio)
     plt.show()
