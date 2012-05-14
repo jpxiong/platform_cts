@@ -704,6 +704,23 @@ public class ComputeTest extends RSBaseCompute {
         checkForErrors();
     }
 
+    public void testClamp() {
+        ScriptC_clamp s = new ScriptC_clamp(mRS, mRes, R.raw.clamp);
+        s.invoke_clamp_test();
+        mRS.finish();
+        waitForMessage();
+        checkForErrors();
+    }
+
+    public void testClampRelaxed() {
+        ScriptC_clamp_relaxed s =
+                new ScriptC_clamp_relaxed(mRS, mRes, R.raw.clamp_relaxed);
+        s.invoke_clamp_test();
+        mRS.finish();
+        waitForMessage();
+        checkForErrors();
+    }
+
     /**
      * Test utility functions.
      */
