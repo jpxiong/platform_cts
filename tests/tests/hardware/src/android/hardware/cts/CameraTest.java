@@ -2730,4 +2730,63 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
         }
         terminateMessageLooper();
     }
+
+    public void testPreviewCallbackWithPicture() throws Exception {
+        int nCameras = Camera.getNumberOfCameras();
+        for (int id = 0; id < nCameras; id++) {
+            Log.v(TAG, "Camera id=" + id);
+            testPreviewCallbackWithPictureByCamera(id);
+        }
+    }
+
+    private void testPreviewCallbackWithPictureByCamera(int cameraId)
+            throws Exception {
+        initializeMessageLooper(cameraId);
+
+        SimplePreviewStreamCb callback = new SimplePreviewStreamCb(1);
+        mCamera.setPreviewCallback(callback);
+
+        Log.v(TAG, "Starting preview");
+        mCamera.startPreview();
+
+        // Wait until callbacks are flowing
+        for (int i = 0; i < 30; i++) {
+            assertTrue("testPreviewCallbackWithPicture: Not receiving preview callbacks!",
+                    mPreviewDone.block( WAIT_FOR_COMMAND_TO_COMPLETE ) );
+            mPreviewDone.close();
+        }
+
+        // Now take a picture
+        Log.v(TAG, "Taking picture now");
+
+        Size pictureSize = mCamera.getParameters().getPictureSize();
+        mCamera.takePicture(mShutterCallback, mRawPictureCallback,
+                mJpegPictureCallback);
+
+        waitForSnapshotDone();
+
+        assertTrue("Shutter callback not received", mShutterCallbackResult);
+        assertTrue("Raw picture callback not received", mRawPictureCallbackResult);
+        assertTrue("Jpeg picture callback not received", mJpegPictureCallbackResult);
+        assertNotNull(mJpegData);
+        BitmapFactory.Options bmpOptions = new BitmapFactory.Options();
+        bmpOptions.inJustDecodeBounds = true;
+        BitmapFactory.decodeByteArray(mJpegData, 0, mJpegData.length, bmpOptions);
+        assertEquals(pictureSize.width, bmpOptions.outWidth);
+        assertEquals(pictureSize.height, bmpOptions.outHeight);
+
+        // Restart preview, confirm callbacks still happen
+        Log.v(TAG, "Restarting preview");
+        mCamera.startPreview();
+
+        for (int i = 0; i < 30; i++) {
+            assertTrue("testPreviewCallbackWithPicture: Not receiving preview callbacks!",
+                    mPreviewDone.block( WAIT_FOR_COMMAND_TO_COMPLETE ) );
+            mPreviewDone.close();
+        }
+
+        mCamera.stopPreview();
+
+        terminateMessageLooper();
+    }
 }
