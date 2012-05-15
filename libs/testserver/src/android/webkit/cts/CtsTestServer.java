@@ -88,8 +88,6 @@ import javax.net.ssl.X509TrustManager;
  */
 public class CtsTestServer {
     private static final String TAG = "CtsTestServer";
-    private static final int SERVER_PORT = 4444;
-    private static final int SSL_SERVER_PORT = 4445;
 
     public static final String FAVICON_PATH = "/favicon.ico";
     public static final String USERAGENT_PATH = "/useragent.html";
@@ -122,7 +120,6 @@ public class CtsTestServer {
     public static final String MESSAGE_403 = "403 forbidden";
     public static final String MESSAGE_404 = "404 not found";
 
-    private static CtsTestServer sInstance;
     private static Hashtable<Integer, String> sReasons;
 
     private ServerThread mServerThread;
@@ -165,24 +162,18 @@ public class CtsTestServer {
      * @throws Exception
      */
     public CtsTestServer(Context context, boolean ssl) throws Exception {
-        if (sInstance != null) {
-            // attempt to start a new instance while one is still running
-            // shut down the old instance first
-            sInstance.shutdown();
-        }
-        sInstance = this;
         mContext = context;
         mAssets = mContext.getAssets();
         mResources = mContext.getResources();
         mSsl = ssl;
-        if (mSsl) {
-            mServerUri = "https://localhost:" + SSL_SERVER_PORT;
-        } else {
-            mServerUri = "http://localhost:" + SERVER_PORT;
-        }
         mRequestEntities = new ArrayList<HttpEntity>();
         mMap = MimeTypeMap.getSingleton();
         mServerThread = new ServerThread(this, mSsl);
+        if (mSsl) {
+            mServerUri = "https://localhost:" + mServerThread.mSocket.getLocalPort();
+        } else {
+            mServerUri = "http://localhost:" + mServerThread.mSocket.getLocalPort();
+        }
         mServerThread.start();
     }
 
@@ -217,8 +208,6 @@ public class CtsTestServer {
         } catch (KeyManagementException e) {
             throw new IllegalStateException(e);
         }
-
-        sInstance = null;
     }
 
     private URLConnection openConnection(URL url)
@@ -794,10 +783,9 @@ public class CtsTestServer {
                     if (mIsSsl) {
                         mSslContext = SSLContext.getInstance("TLS");
                         mSslContext.init(getKeyManagers(), null, null);
-                        mSocket = mSslContext.getServerSocketFactory().createServerSocket(
-                                SSL_SERVER_PORT);
+                        mSocket = mSslContext.getServerSocketFactory().createServerSocket(0);
                     } else {
-                        mSocket = new ServerSocket(SERVER_PORT);
+                        mSocket = new ServerSocket(0);
                     }
                     return;
                 } catch (IOException e) {
