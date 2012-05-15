@@ -3356,6 +3356,11 @@ public class ViewTest extends ActivityInstrumentationTestCase2<ViewTestStubActiv
         public void childAccessibilityStateChanged(View child) {
 
         }
+
+        @Override
+        public View findViewToTakeAccessibilityFocusFromHover(View child, View descendant) {
+            return null;
+        }
     }
 
     private final class OnCreateContextMenuListenerImpl implements OnCreateContextMenuListener {
