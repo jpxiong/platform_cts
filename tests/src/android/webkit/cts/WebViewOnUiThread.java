@@ -108,6 +108,18 @@ public class WebViewOnUiThread {
     }
 
     /**
+     * Called after a test is complete and the WebView should be disengaged from
+     * the tests.
+     */
+    public void cleanUp() {
+        clearHistory();
+        clearCache(true);
+        setPictureListener(null);
+        setWebChromeClient(null);
+        setWebViewClient(null);
+    }
+
+    /**
      * Called from WaitForNewPicture, this is used to indicate that
      * the page has been drawn.
      */

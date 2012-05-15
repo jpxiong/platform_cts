@@ -48,8 +48,7 @@ public class WebChromeClientTest extends ActivityInstrumentationTestCase2<WebVie
 
     @Override
     protected void tearDown() throws Exception {
-        mOnUiThread.clearHistory();
-        mOnUiThread.clearCache(true);
+        mOnUiThread.cleanUp();
         if (mWebServer != null) {
             mWebServer.shutdown();
         }

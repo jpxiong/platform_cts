@@ -40,6 +40,7 @@ public class WebHistoryItemTest extends ActivityInstrumentationTestCase2<WebView
 
     @Override
     protected void tearDown() throws Exception {
+        mOnUiThread.cleanUp();
         mWebServer.shutdown();
         super.tearDown();
     }

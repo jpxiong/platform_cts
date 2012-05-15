@@ -74,8 +74,7 @@ public class WebSettingsTest extends ActivityInstrumentationTestCase2<WebViewStu
         if (mWebServer != null) {
             mWebServer.shutdown();
         }
-        // clear the cache to prevent side effects
-        mOnUiThread.clearCache(true);
+        mOnUiThread.cleanUp();
         super.tearDown();
     }
 

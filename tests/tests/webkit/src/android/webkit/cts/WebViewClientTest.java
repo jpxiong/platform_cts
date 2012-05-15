@@ -46,8 +46,7 @@ public class WebViewClientTest extends ActivityInstrumentationTestCase2<WebViewS
 
     @Override
     protected void tearDown() throws Exception {
-        mOnUiThread.clearHistory();
-        mOnUiThread.clearCache(true);
+        mOnUiThread.cleanUp();
         if (mWebServer != null) {
             mWebServer.shutdown();
         }
