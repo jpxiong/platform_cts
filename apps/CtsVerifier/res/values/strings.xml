@@ -191,6 +191,14 @@
 
     <string name="empty"></string>
 
+    <!-- Strings for Location tests -->
+    <string name="location_gps_test">GPS Test</string>
+    <string name="location_gps_test_info">This test verifies basic GPS behavior
+        and callback scheduling.
+        Make sure the device has line of sight to GPS satellites
+        (for example, outside, or near a window)
+        and then press OK to run the automated tests.</string>
+
     <!-- Strings for NfcTestActivity -->
     <string name="nfc_test">NFC Test</string>
     <string name="nfc_test_info">The Peer-to-Peer Data Exchange tests require two devices with
