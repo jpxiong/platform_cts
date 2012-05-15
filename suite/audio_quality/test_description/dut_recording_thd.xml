@@ -32,7 +32,7 @@
 		</sequential>
 		<sequential repeat="5" index="k">
 			<!-- input: host record, device record, signal frequency in Hz, THD for pass in percentile, output: THD calculated -->
-			<process method="script:recording_thd" input="id:host_in_$k,id:dut_in_$k,consti:1000,constf:0.1" output="val:thd_host_$k,val:thd_device_$k" />
+			<process method="script:recording_thd" input="id:host_in_$k,id:dut_in_$k,consti:1000,constf:1.0" output="val:thd_host_$k,val:thd_device_$k" />
 		</sequential>
 	</action>
 	<save file="host_in_.*,dut_in_.*" report="thd_.*" />
