@@ -65,7 +65,7 @@ def recording_thd(inputData, inputTypes):
     thdHost = calc_thd(hostRecording[delay:delay+N], signalFrequency, samplingRate, 0.02) * 100
     thdDevice = calc_thd(deviceRecording, signalFrequency, samplingRate, 0.02) * 100
     print "THD Host %", thdHost, "THD device %", thdDevice, "Margain % ", thdPassPercentile
-    if (thdDevice < (thdHost + thdPassPercentile)) and (thdDevice < 10.0):
+    if (thdDevice < (thdHost + thdPassPercentile)) and (thdHost < thdPassPercentile):
         output.append(RESULT_PASS)
     else:
         output.append(RESULT_OK)
