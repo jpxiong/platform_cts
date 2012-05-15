@@ -60,7 +60,7 @@ def do_check_spectrum(hostData, DUTData, samplingRate, fLow, fHigh, margainLow, 
     ratioMean = np.mean(amplitudeRatio)
     amplitudeRatio = amplitudeRatio / ratioMean
     print "Normialized ratio", amplitudeRatio
-    print "ration mean for normalization", ratioMean
+    print "ratio mean for normalization", ratioMean
     positiveMax = abs(max(amplitudeRatio))
     negativeMin = abs(min(amplitudeRatio))
     passFail = True if (positiveMax < (margainHigh / 100.0 + 1.0)) and\
