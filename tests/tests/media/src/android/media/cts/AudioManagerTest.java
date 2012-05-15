@@ -42,22 +42,25 @@ import com.android.cts.stub.R;
 import android.content.Context;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
+import android.os.Vibrator;
 import android.provider.Settings;
 import android.telephony.TelephonyManager;
 import android.test.AndroidTestCase;
 import android.view.SoundEffectConstants;
-
 
 public class AudioManagerTest extends AndroidTestCase {
 
     private final static int MP3_TO_PLAY = R.raw.testmp3;
     private final static long TIME_TO_PLAY = 2000;
     private AudioManager mAudioManager;
+    private boolean mHasVibrator;
 
     @Override
     protected void setUp() throws Exception {
         super.setUp();
         mAudioManager = (AudioManager) mContext.getSystemService(Context.AUDIO_SERVICE);
+        Vibrator vibrator = (Vibrator) mContext.getSystemService(Context.VIBRATOR_SERVICE);
+        mHasVibrator = (vibrator != null) && vibrator.hasVibrator();
     }
 
     public void testMicrophoneMute() throws Exception {
@@ -167,17 +170,18 @@ public class AudioManagerTest extends AndroidTestCase {
     public void testVibrateNotification() throws Exception {
         // VIBRATE_SETTING_ON
         mAudioManager.setVibrateSetting(VIBRATE_TYPE_NOTIFICATION, VIBRATE_SETTING_ON);
-        assertEquals(VIBRATE_SETTING_ON,
+        assertEquals(mHasVibrator ? VIBRATE_SETTING_ON : VIBRATE_SETTING_OFF,
                 mAudioManager.getVibrateSetting(VIBRATE_TYPE_NOTIFICATION));
         mAudioManager.setRingerMode(RINGER_MODE_NORMAL);
-        assertTrue(mAudioManager.shouldVibrate(VIBRATE_TYPE_NOTIFICATION));
+        assertEquals(mHasVibrator, mAudioManager.shouldVibrate(VIBRATE_TYPE_NOTIFICATION));
 
         mAudioManager.setRingerMode(RINGER_MODE_SILENT);
         assertFalse(mAudioManager.shouldVibrate(VIBRATE_TYPE_NOTIFICATION));
 
         mAudioManager.setRingerMode(RINGER_MODE_VIBRATE);
-        assertEquals(RINGER_MODE_VIBRATE, mAudioManager.getRingerMode());
-        assertTrue(mAudioManager.shouldVibrate(VIBRATE_TYPE_NOTIFICATION));
+        assertEquals(mHasVibrator ? RINGER_MODE_VIBRATE : RINGER_MODE_SILENT,
+                mAudioManager.getRingerMode());
+        assertEquals(mHasVibrator, mAudioManager.shouldVibrate(VIBRATE_TYPE_NOTIFICATION));
 
         // VIBRATE_SETTING_OFF
         mAudioManager.setVibrateSetting(VIBRATE_TYPE_NOTIFICATION, VIBRATE_SETTING_OFF);
@@ -190,13 +194,14 @@ public class AudioManagerTest extends AndroidTestCase {
         assertFalse(mAudioManager.shouldVibrate(VIBRATE_TYPE_NOTIFICATION));
 
         mAudioManager.setRingerMode(RINGER_MODE_VIBRATE);
-        assertEquals(RINGER_MODE_VIBRATE, mAudioManager.getRingerMode());
+        assertEquals(mHasVibrator ? RINGER_MODE_VIBRATE : RINGER_MODE_SILENT,
+                mAudioManager.getRingerMode());
         assertFalse(mAudioManager.shouldVibrate(VIBRATE_TYPE_NOTIFICATION));
 
         // VIBRATE_SETTING_ONLY_SILENT
         mAudioManager.setVibrateSetting(VIBRATE_TYPE_NOTIFICATION, VIBRATE_SETTING_ONLY_SILENT);
-        assertEquals(VIBRATE_SETTING_ONLY_SILENT, mAudioManager
-                .getVibrateSetting(VIBRATE_TYPE_NOTIFICATION));
+        assertEquals(mHasVibrator ? VIBRATE_SETTING_ONLY_SILENT : VIBRATE_SETTING_OFF,
+                mAudioManager.getVibrateSetting(VIBRATE_TYPE_NOTIFICATION));
         mAudioManager.setRingerMode(RINGER_MODE_NORMAL);
         assertFalse(mAudioManager.shouldVibrate(VIBRATE_TYPE_NOTIFICATION));
 
@@ -204,34 +209,37 @@ public class AudioManagerTest extends AndroidTestCase {
         assertFalse(mAudioManager.shouldVibrate(VIBRATE_TYPE_NOTIFICATION));
 
         mAudioManager.setRingerMode(RINGER_MODE_VIBRATE);
-        assertEquals(RINGER_MODE_VIBRATE, mAudioManager.getRingerMode());
-        assertTrue(mAudioManager.shouldVibrate(VIBRATE_TYPE_NOTIFICATION));
+        assertEquals(mHasVibrator ? RINGER_MODE_VIBRATE : RINGER_MODE_SILENT,
+                mAudioManager.getRingerMode());
+        assertEquals(mHasVibrator, mAudioManager.shouldVibrate(VIBRATE_TYPE_NOTIFICATION));
 
         // VIBRATE_TYPE_NOTIFICATION
         mAudioManager.setVibrateSetting(VIBRATE_TYPE_NOTIFICATION, VIBRATE_SETTING_ON);
-        assertEquals(VIBRATE_SETTING_ON,
+        assertEquals(mHasVibrator ? VIBRATE_SETTING_ON : VIBRATE_SETTING_OFF,
                 mAudioManager.getVibrateSetting(VIBRATE_TYPE_NOTIFICATION));
         mAudioManager.setVibrateSetting(VIBRATE_TYPE_NOTIFICATION, VIBRATE_SETTING_OFF);
         assertEquals(VIBRATE_SETTING_OFF, mAudioManager
                 .getVibrateSetting(VIBRATE_TYPE_NOTIFICATION));
         mAudioManager.setVibrateSetting(VIBRATE_TYPE_NOTIFICATION, VIBRATE_SETTING_ONLY_SILENT);
-        assertEquals(VIBRATE_SETTING_ONLY_SILENT,
+        assertEquals(mHasVibrator ? VIBRATE_SETTING_ONLY_SILENT : VIBRATE_SETTING_OFF,
                 mAudioManager.getVibrateSetting(VIBRATE_TYPE_NOTIFICATION));
     }
 
     public void testVibrateRinger() throws Exception {
         // VIBRATE_TYPE_RINGER
         mAudioManager.setVibrateSetting(VIBRATE_TYPE_RINGER, VIBRATE_SETTING_ON);
-        assertEquals(VIBRATE_SETTING_ON, mAudioManager.getVibrateSetting(VIBRATE_TYPE_RINGER));
+        assertEquals(mHasVibrator ? VIBRATE_SETTING_ON : VIBRATE_SETTING_OFF,
+                mAudioManager.getVibrateSetting(VIBRATE_TYPE_RINGER));
         mAudioManager.setRingerMode(RINGER_MODE_NORMAL);
-        assertTrue(mAudioManager.shouldVibrate(VIBRATE_TYPE_RINGER));
+        assertEquals(mHasVibrator, mAudioManager.shouldVibrate(VIBRATE_TYPE_RINGER));
 
         mAudioManager.setRingerMode(RINGER_MODE_SILENT);
         assertFalse(mAudioManager.shouldVibrate(VIBRATE_TYPE_RINGER));
 
         mAudioManager.setRingerMode(RINGER_MODE_VIBRATE);
-        assertEquals(RINGER_MODE_VIBRATE, mAudioManager.getRingerMode());
-        assertTrue(mAudioManager.shouldVibrate(VIBRATE_TYPE_RINGER));
+        assertEquals(mHasVibrator ? RINGER_MODE_VIBRATE : RINGER_MODE_SILENT,
+                mAudioManager.getRingerMode());
+        assertEquals(mHasVibrator, mAudioManager.shouldVibrate(VIBRATE_TYPE_RINGER));
 
         // VIBRATE_SETTING_OFF
         mAudioManager.setVibrateSetting(VIBRATE_TYPE_RINGER, VIBRATE_SETTING_OFF);
@@ -243,7 +251,8 @@ public class AudioManagerTest extends AndroidTestCase {
         assertFalse(mAudioManager.shouldVibrate(VIBRATE_TYPE_RINGER));
 
         mAudioManager.setRingerMode(RINGER_MODE_VIBRATE);
-        assertEquals(RINGER_MODE_VIBRATE, mAudioManager.getRingerMode());
+        assertEquals(mHasVibrator ? RINGER_MODE_VIBRATE : RINGER_MODE_SILENT,
+                mAudioManager.getRingerMode());
         // Note: as of Froyo, if VIBRATE_TYPE_RINGER is set to OFF, it will
         // not vibrate, even in RINGER_MODE_VIBRATE. This allows users to
         // disable the vibration for incoming calls only.
@@ -251,8 +260,8 @@ public class AudioManagerTest extends AndroidTestCase {
 
         // VIBRATE_SETTING_ONLY_SILENT
         mAudioManager.setVibrateSetting(VIBRATE_TYPE_RINGER, VIBRATE_SETTING_ONLY_SILENT);
-        assertEquals(VIBRATE_SETTING_ONLY_SILENT, mAudioManager
-                .getVibrateSetting(VIBRATE_TYPE_RINGER));
+        assertEquals(mHasVibrator ? VIBRATE_SETTING_ONLY_SILENT : VIBRATE_SETTING_OFF,
+                mAudioManager.getVibrateSetting(VIBRATE_TYPE_RINGER));
         mAudioManager.setRingerMode(RINGER_MODE_NORMAL);
         assertFalse(mAudioManager.shouldVibrate(VIBRATE_TYPE_RINGER));
 
@@ -260,16 +269,18 @@ public class AudioManagerTest extends AndroidTestCase {
         assertFalse(mAudioManager.shouldVibrate(VIBRATE_TYPE_RINGER));
 
         mAudioManager.setRingerMode(RINGER_MODE_VIBRATE);
-        assertEquals(RINGER_MODE_VIBRATE, mAudioManager.getRingerMode());
-        assertTrue(mAudioManager.shouldVibrate(VIBRATE_TYPE_RINGER));
+        assertEquals(mHasVibrator ? RINGER_MODE_VIBRATE : RINGER_MODE_SILENT,
+                mAudioManager.getRingerMode());
+        assertEquals(mHasVibrator, mAudioManager.shouldVibrate(VIBRATE_TYPE_RINGER));
 
         // VIBRATE_TYPE_NOTIFICATION
         mAudioManager.setVibrateSetting(VIBRATE_TYPE_RINGER, VIBRATE_SETTING_ON);
-        assertEquals(VIBRATE_SETTING_ON, mAudioManager.getVibrateSetting(VIBRATE_TYPE_RINGER));
+        assertEquals(mHasVibrator ? VIBRATE_SETTING_ON : VIBRATE_SETTING_OFF,
+                mAudioManager.getVibrateSetting(VIBRATE_TYPE_RINGER));
         mAudioManager.setVibrateSetting(VIBRATE_TYPE_RINGER, VIBRATE_SETTING_OFF);
         assertEquals(VIBRATE_SETTING_OFF, mAudioManager.getVibrateSetting(VIBRATE_TYPE_RINGER));
         mAudioManager.setVibrateSetting(VIBRATE_TYPE_RINGER, VIBRATE_SETTING_ONLY_SILENT);
-        assertEquals(VIBRATE_SETTING_ONLY_SILENT,
+        assertEquals(mHasVibrator ? VIBRATE_SETTING_ONLY_SILENT : VIBRATE_SETTING_OFF,
                 mAudioManager.getVibrateSetting(VIBRATE_TYPE_RINGER));
     }
 
@@ -281,7 +292,8 @@ public class AudioManagerTest extends AndroidTestCase {
         assertEquals(RINGER_MODE_SILENT, mAudioManager.getRingerMode());
 
         mAudioManager.setRingerMode(RINGER_MODE_VIBRATE);
-        assertEquals(RINGER_MODE_VIBRATE, mAudioManager.getRingerMode());
+        assertEquals(mHasVibrator ? RINGER_MODE_VIBRATE : RINGER_MODE_SILENT,
+                mAudioManager.getRingerMode());
     }
 
     public void testVolume() throws Exception {
@@ -291,19 +303,14 @@ public class AudioManagerTest extends AndroidTestCase {
                           AudioManager.STREAM_VOICE_CALL,
                           AudioManager.STREAM_RING };
 
-        // set ringer mode to back normal to not interfere with volume tests
-        mAudioManager.setRingerMode(RINGER_MODE_NORMAL);
-
-        TelephonyManager tm =
-            (TelephonyManager)mContext.getSystemService(Context.TELEPHONY_SERVICE);
-        //FIXME: use TelephonyManager.isVoiceCapable() when public
-        boolean voiceCapable = tm.getPhoneType() != TelephonyManager.PHONE_TYPE_NONE;
-
         mAudioManager.adjustVolume(ADJUST_RAISE, 0);
         mAudioManager.adjustSuggestedStreamVolume(
                 ADJUST_LOWER, USE_DEFAULT_STREAM_TYPE, 0);
 
         for (int i = 0; i < streams.length; i++) {
+            // set ringer mode to back normal to not interfere with volume tests
+            mAudioManager.setRingerMode(RINGER_MODE_NORMAL);
+
             int maxVolume = mAudioManager.getStreamMaxVolume(streams[i]);
 
             mAudioManager.setStreamVolume(streams[i], 1, 0);
@@ -318,23 +325,15 @@ public class AudioManagerTest extends AndroidTestCase {
 
             // volume lower
             mAudioManager.setStreamVolume(streams[i], maxVolume, 0);
-            for (int k = maxVolume; k > 1; k--) {
+            for (int k = maxVolume; k > 0; k--) {
                 mAudioManager.adjustStreamVolume(streams[i], ADJUST_LOWER, 0);
                 assertEquals(k - 1, mAudioManager.getStreamVolume(streams[i]));
             }
-            // on voice capable devices, ring and notification volumes cannot be set to 0
-            // by continous press on volume minus key
-            // simulate volume key release
-            mAudioManager.adjustStreamVolume(streams[i], ADJUST_SAME, FLAG_ALLOW_RINGER_MODES);
-            mAudioManager.adjustStreamVolume(streams[i], ADJUST_LOWER, 0);
-            assertEquals(0, mAudioManager.getStreamVolume(streams[i]));
 
-            // set ringer mode to back normal to not interfere with volume tests
-            mAudioManager.setRingerMode(RINGER_MODE_NORMAL);
-
+            mAudioManager.adjustStreamVolume(streams[i], ADJUST_SAME, 0);
             // volume raise
-            mAudioManager.setStreamVolume(streams[i], 0, 0);
-            for (int k = 0; k < maxVolume; k++) {
+            mAudioManager.setStreamVolume(streams[i], 1, 0);
+            for (int k = 1; k < maxVolume; k++) {
                 mAudioManager.adjustStreamVolume(streams[i], ADJUST_RAISE, 0);
                 assertEquals(1 + k, mAudioManager.getStreamVolume(streams[i]));
             }
