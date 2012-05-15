@@ -265,7 +265,8 @@ public class AudioProtocol implements AudioTrack.OnPlaybackPositionUpdateListene
                     int endMarker = data.capacity()/(stereo ? 4 : 2);
                     int res = mPlayback.setNotificationMarkerPosition(endMarker);
                     Log.d(TAG, "start playback id " + id + " len " + data.capacity() +
-                            " set.. res " + res + " stereo? " + stereo + " end " + endMarker);
+                            " set.. res " + res + " stereo? " + stereo + " mode " + mode +
+                            " end " + endMarker);
                     mPlayback.play();
                 }
             });
@@ -321,7 +322,7 @@ public class AudioProtocol implements AudioTrack.OnPlaybackPositionUpdateListene
                             (minBufferSize > mRecordingLength) ? minBufferSize : mRecordingLength);
 
                     mRecord.startRecording();
-                    Log.d(TAG, "recording started " + " samples " + samples +
+                    Log.d(TAG, "recording started " + " samples " + samples + " mode " + mode +
                             " recording state " + mRecord.getRecordingState() + " len " +
                             mRecordingLength);
                     try {
