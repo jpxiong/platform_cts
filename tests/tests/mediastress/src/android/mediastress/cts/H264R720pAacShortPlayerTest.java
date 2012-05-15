@@ -23,7 +23,6 @@ import android.media.MediaRecorder.VideoEncoder;
 public class H264R720pAacShortPlayerTest extends MediaPlayerStressTest {
     private static final String VIDEO_PATH_MIDDLE = "bbb_short/1280x720/mp4_libx264_libfaac/";
     private final String[] mMedias = {
-        "bbb_short.ffmpeg.1280x720.mp4.libx264_10000kbps_30fps.libfaac_stereo_192kbps_48000Hz.mp4",
         "bbb_short.ffmpeg.1280x720.mp4.libx264_1000kbps_25fps.libfaac_stereo_128kbps_44100Hz.mp4",
         "bbb_short.ffmpeg.1280x720.mp4.libx264_1000kbps_25fps.libfaac_stereo_192kbps_44100Hz.mp4",
         "bbb_short.ffmpeg.1280x720.mp4.libx264_1000kbps_30fps.libfaac_stereo_128kbps_44100Hz.mp4",
@@ -33,7 +32,6 @@ public class H264R720pAacShortPlayerTest extends MediaPlayerStressTest {
         "bbb_short.ffmpeg.1280x720.mp4.libx264_1350kbps_30fps.libfaac_stereo_128kbps_44100Hz.mp4",
         "bbb_short.ffmpeg.1280x720.mp4.libx264_1350kbps_30fps.libfaac_stereo_192kbps_44100Hz.mp4",
         "bbb_short.ffmpeg.1280x720.mp4.libx264_1750kbps_30fps.libfaac_stereo_192kbps_48000Hz.mp4",
-        "bbb_short.ffmpeg.1280x720.mp4.libx264_5000kbps_30fps.libfaac_stereo_192kbps_48000Hz.mp4",
         "bbb_short.ffmpeg.1280x720.mp4.libx264_500kbps_25fps.libfaac_stereo_128kbps_44100Hz.mp4",
         "bbb_short.ffmpeg.1280x720.mp4.libx264_500kbps_25fps.libfaac_stereo_192kbps_44100Hz.mp4",
         "bbb_short.ffmpeg.1280x720.mp4.libx264_500kbps_30fps.libfaac_stereo_128kbps_44100Hz.mp4",
@@ -94,14 +92,6 @@ public class H264R720pAacShortPlayerTest extends MediaPlayerStressTest {
 
     public void testPlay12() throws Exception {
         doTestVideoPlaybackShort(12);
-    }
-
-    public void testPlay13() throws Exception {
-        doTestVideoPlaybackShort(13);
-    }
-
-    public void testPlay14() throws Exception {
-        doTestVideoPlaybackShort(14);
     }
 
     @Override
