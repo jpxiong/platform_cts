@@ -50,6 +50,7 @@ public class CacheManager_CacheResultTest
 
     @Override
     protected void tearDown() throws Exception {
+        mOnUiThread.cleanUp();
         if (mWebServer != null) {
             mWebServer.shutdown();
         }

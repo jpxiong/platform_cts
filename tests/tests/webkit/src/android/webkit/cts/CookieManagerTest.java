@@ -49,6 +49,7 @@ public class CookieManagerTest extends
     }
 
     public void testGetInstance() {
+        mOnUiThread.cleanUp();
         CookieManager c1 = CookieManager.getInstance();
         CookieManager c2 = CookieManager.getInstance();
 

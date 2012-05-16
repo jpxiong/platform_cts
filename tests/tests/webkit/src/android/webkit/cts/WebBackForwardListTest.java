@@ -37,6 +37,10 @@ public class WebBackForwardListTest extends ActivityInstrumentationTestCase2<Web
         mOnUiThread = new WebViewOnUiThread(this, getActivity().getWebView());
     }
 
+    public void tearDown() {
+        mOnUiThread.cleanUp();
+    }
+
     public void testGetCurrentItem() throws Exception {
         WebBackForwardList list = mOnUiThread.copyBackForwardList();
 
