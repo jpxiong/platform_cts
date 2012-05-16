@@ -235,6 +235,7 @@ bool RemoteAudio::startPlayback(bool stereo, int samplingF, int mode, int volume
         LOGE("Buffer id %d not registered", id);
         return false;
     }
+    LOGD("RemoteAudio::startPlayback stereo %d mode %d", stereo, mode);
     handler->mActive = true;
     handler->getParam().mStereo = stereo;
     handler->getParam().mSamplingF = samplingF;
