@@ -43,6 +43,7 @@ public class CacheManagerTest extends ActivityInstrumentationTestCase2<WebViewSt
 
     @Override
     protected void tearDown() throws Exception {
+        mOnUiThread.cleanUp();
         if (mWebServer != null) {
             mWebServer.shutdown();
         }
