@@ -404,11 +404,15 @@ public class WebSettingsTest extends ActivityInstrumentationTestCase2<WebViewStu
             @Override
             protected boolean check() {
                 String title = mOnUiThread.getTitle();
-                return title != null && title.length() > 0;
+                // The title may not change immediately after loading, so
+                // we have to discount the initial "Popup blocked" from the
+                // previous load.
+                return title != null && title.length() > 0
+                        && !title.equals("Popup blocked");
             }
         }.run();
         assertEquals("Popup allowed", mOnUiThread.getTitle());
-}
+    }
 
     public void testAccessJavaScriptEnabled() throws Exception {
         mSettings.setJavaScriptEnabled(true);
