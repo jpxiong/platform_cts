@@ -73,7 +73,7 @@ public class LayoutTestActivity extends Activity {
 
         ThemeInfo themeInfo = themeAdapter.getItem(themeIndex);
         LayoutInfo layoutInfo = layoutAdapter.getItem(layoutIndex);
-        mBitmapName = BitmapAssets.getBitmapName(themeInfo, layoutInfo);
+        mBitmapName = BitmapAssets.getBitmapName(this, themeInfo, layoutInfo);
 
         setTheme(themeInfo.getTheme());
         setContentView(R.layout.holo_test);

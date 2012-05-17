@@ -17,14 +17,15 @@
 package android.holo.cts;
 
 import android.content.Context;
+import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.Bitmap.CompressFormat;
 import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.Drawable;
 import android.holo.cts.LayoutAdapter.LayoutInfo;
 import android.holo.cts.ThemeAdapter.ThemeInfo;
 import android.os.Environment;
+import android.util.DisplayMetrics;
 import android.util.Log;
 
 import java.io.File;
@@ -89,8 +90,29 @@ class BitmapAssets {
         return new File(file, subDir);
     }
 
-    public static String getBitmapName(ThemeInfo themeInfo, LayoutInfo layoutInfo) {
-        return themeInfo.getBitmapName() + "_" + layoutInfo.getBitmapName();
+    public static String getBitmapName(Context context, ThemeInfo themeInfo,
+            LayoutInfo layoutInfo) {
+        Resources r = context.getResources();
+        Configuration c = r.getConfiguration();
+        DisplayMetrics dm = r.getDisplayMetrics();
+
+        boolean sw600dp = c.smallestScreenWidthDp >= 600;
+        boolean landscape = c.orientation == Configuration.ORIENTATION_LANDSCAPE;
+        String bitmapName = layoutInfo.getBitmapName();
+        String name = themeInfo.getBitmapName() + "_" + bitmapName;
+
+        if (sw600dp && (bitmapName.equals("button") || bitmapName.equals("searchview")
+                || bitmapName.equals("tabhost"))) {
+            if (landscape && dm.densityDpi == DisplayMetrics.DENSITY_LOW) {
+                name += "_sw600dp_land_ldpi";
+            } else if (dm.densityDpi == DisplayMetrics.DENSITY_MEDIUM) {
+                name += "_sw600dp_mdpi";
+            }  else if (dm.densityDpi == DisplayMetrics.DENSITY_TV) {
+                name += "_sw600dp_tvdpi";
+            }
+        }
+
+        return name;
     }
 
     public static Bitmap getBitmap(Context context, String bitmapName) {
