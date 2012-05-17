@@ -22,9 +22,8 @@ import android.location.LocationManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.os.SystemClock;
 
-public class LocationVerifier implements LocationListener, Handler.Callback {
+public class LocationVerifier implements Handler.Callback {
     public static final String TAG = "CtsVerifierLocation";
 
     private static final int MSG_TIMEOUT = 1;
@@ -33,111 +32,158 @@ public class LocationVerifier implements LocationListener, Handler.Callback {
     private final PassFailLog mCb;
     private final String mProvider;
     private final long mInterval;
-    private final long mMinInterval;
-    private final long mMaxInterval;
+    private final long mMinActiveInterval;
+    private final long mMinPassiveInterval;
+    private final long mTimeout;
     private final Handler mHandler;
     private final int mRequestedUpdates;
+    private final ActiveListener mActiveListener;
+    private final PassiveListener mPassiveListener;
 
-    private long mLastTimestamp = -1;
-    private int mNumUpdates = 0;
+    private long mLastActiveTimestamp = -1;
+    private long mLastPassiveTimestamp = -1;
+    private int mNumActiveUpdates = 0;
+    private int mNumPassiveUpdates = 0;
     private boolean mRunning = false;
+
+    private class ActiveListener implements LocationListener {
+        @Override
+        public void onLocationChanged(Location location) {
+            if (!mRunning) return;
+
+            mNumActiveUpdates++;
+            scheduleTimeout();
+
+            long timestamp = location.getTime();
+            long delta = timestamp - mLastActiveTimestamp;
+            mLastActiveTimestamp = timestamp;
+
+            if (mNumActiveUpdates != 1 && delta < mMinActiveInterval) {
+                fail(mProvider + " location updated too fast: " + delta + "ms < " +
+                        mMinActiveInterval + "ms");
+                return;
+            }
+
+            mCb.log("active " + mProvider + " update (" + delta + "ms)");
+
+            if (!mProvider.equals(location.getProvider())) {
+                fail("wrong provider in callback, actual: " + location.getProvider() +
+                        " expected: " + mProvider);
+                return;
+            }
+
+            if (mNumActiveUpdates >= mRequestedUpdates) {
+                if (mNumPassiveUpdates < mRequestedUpdates - 1) {
+                    fail("passive location updates not working (expected: " + mRequestedUpdates +
+                            " received: " + mNumPassiveUpdates + ")");
+                }
+                pass();
+            }
+        }
+
+        @Override
+        public void onStatusChanged(String provider, int status, Bundle extras) { }
+        @Override
+        public void onProviderEnabled(String provider) { }
+        @Override
+        public void onProviderDisabled(String provider) { }
+    }
+
+    private class PassiveListener implements LocationListener {
+        @Override
+        public void onLocationChanged(Location location) {
+            if (!mRunning) return;
+            if (!location.getProvider().equals(mProvider)) return;
+
+            mNumPassiveUpdates++;
+            long timestamp = location.getTime();
+            long delta = timestamp - mLastPassiveTimestamp;
+            mLastPassiveTimestamp = timestamp;
+
+            if (mNumPassiveUpdates != 1 && delta < mMinPassiveInterval) {
+                fail("passive " + mProvider + " location updated too fast: " + delta + "ms < " +
+                        mMinPassiveInterval + "ms");
+                mCb.log("when passive updates are much much faster than active updates it " +
+                        "suggests the location provider implementation is not power efficient");
+                if (LocationManager.GPS_PROVIDER.equals(mProvider)) {
+                    mCb.log("check GPS_CAPABILITY_SCHEDULING in GPS driver");
+                }
+                return;
+            }
+
+            mCb.log("passive " + mProvider + " update (" + delta + "ms)");
+        }
+
+        @Override
+        public void onStatusChanged(String provider, int status, Bundle extras) { }
+        @Override
+        public void onProviderEnabled(String provider) { }
+        @Override
+        public void onProviderDisabled(String provider) { }
+    }
 
     public LocationVerifier(PassFailLog cb, LocationManager locationManager,
             String provider, long requestedInterval, int numUpdates) {
         mProvider = provider;
         mInterval = requestedInterval;
-        // Updates can be up to 100ms fast
-        mMinInterval = Math.max(0, requestedInterval - 100);
-        // timeout at 60 seconds
-        mMaxInterval = requestedInterval + 60 * 1000;
+        // Updates can be up to 100ms ahead of schedule
+        mMinActiveInterval = Math.max(0, requestedInterval - 100);
+        // Allow passive updates to be up to 10x faster than active updates,
+        // beyond that it is very likely the implementation is not taking
+        // advantage of the interval to be power efficient
+        mMinPassiveInterval = mMinActiveInterval / 10;
+        // timeout at 60 seconds after interval time
+        mTimeout = requestedInterval + 60 * 1000;
         mRequestedUpdates = numUpdates;
         mLocationManager = locationManager;
         mCb = cb;
         mHandler = new Handler(this);
+        mActiveListener = new ActiveListener();
+        mPassiveListener = new PassiveListener();
     }
 
     public void start() {
-        mCb.log("enabling " + mProvider + " for " + mInterval + "ms updates");
         mRunning = true;
-        expectNextUpdate(mMaxInterval);
-        mLastTimestamp = SystemClock.elapsedRealtime();
+        scheduleTimeout();
+        mLastActiveTimestamp = System.currentTimeMillis();
+        mLastPassiveTimestamp = mLastActiveTimestamp;
+        mCb.log("enabling passive listener");
+        mLocationManager.requestLocationUpdates(LocationManager.PASSIVE_PROVIDER, 0, 0,
+                mPassiveListener);
+        mCb.log("enabling " + mProvider + " (minTime=" + mInterval + "ms)");
         mLocationManager.requestLocationUpdates(mProvider, mInterval, 0,
-                LocationVerifier.this);
+                mActiveListener);
     }
 
     public void stop() {
         mRunning = false;
-        mLocationManager.removeUpdates(LocationVerifier.this);
+        mCb.log("disabling " + mProvider);
+        mLocationManager.removeUpdates(mActiveListener);
+        mCb.log("disabling passive listener");
+        mLocationManager.removeUpdates(mPassiveListener);
         mHandler.removeMessages(MSG_TIMEOUT);
     }
 
     private void pass() {
         stop();
-        mCb.log("disabling " + mProvider);
         mCb.pass();
     }
 
     private void fail(String s) {
         stop();
-        mCb.log("disabling");
         mCb.fail(s);
     }
 
-    private void expectNextUpdate(long timeout) {
+    private void scheduleTimeout() {
         mHandler.removeMessages(MSG_TIMEOUT);
-        mHandler.sendMessageDelayed(mHandler.obtainMessage(MSG_TIMEOUT), timeout);
+        mHandler.sendMessageDelayed(mHandler.obtainMessage(MSG_TIMEOUT), mTimeout);
     }
 
     @Override
     public boolean handleMessage(Message msg) {
         if (!mRunning) return true;
-        fail("timeout (" + mMaxInterval + "ms) waiting for " +
+        fail("timeout (" + mTimeout + "ms) waiting for " +
                 mProvider + " location change");
         return true;
     }
-
-    @Override
-    public void onLocationChanged(Location location) {
-        if (!mRunning) return;
-
-        mNumUpdates++;
-        expectNextUpdate(mMaxInterval);
-
-        long timestamp = SystemClock.elapsedRealtime();
-        long delta = timestamp - mLastTimestamp;
-        mLastTimestamp = timestamp;
-
-        if (delta > mMaxInterval) {
-            fail(mProvider + " location changed too slow: " + delta + "ms > " +
-                    mMaxInterval + "ms");
-            return;
-        } else if (mNumUpdates == 1) {
-            mCb.log("received " + mProvider + " location (1st update, " + delta + "ms)");
-        } else if (delta < mMinInterval) {
-            fail(mProvider + " location updated too fast: " + delta + "ms < " +
-                    mMinInterval + "ms");
-            return;
-        } else {
-            mCb.log("received " + mProvider + " location (" + delta + "ms)");
-        }
-
-        if (!mProvider.equals(location.getProvider())) {
-            fail("wrong provider in callback, actual: " + location.getProvider() +
-                    " expected: " + mProvider);
-            return;
-        }
-
-        if (mNumUpdates >= mRequestedUpdates) {
-            pass();
-        }
-    }
-
-    @Override
-    public void onStatusChanged(String provider, int status, Bundle extras) {  }
-
-    @Override
-    public void onProviderEnabled(String provider) {  }
-
-    @Override
-    public void onProviderDisabled(String provider) {   }
 }
