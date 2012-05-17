@@ -396,6 +396,20 @@ public class AccessibilityWindowQueryTest
     }
 
     @MediumTest
+    public void testPerformGlobalActionNotifications() throws Exception {
+        // Get the root node info.
+        final AccessibilityNodeInfo root = getInteractionBridge().getRootInActiveWindow();
+
+        // Perform the action under test
+        final boolean handled = getInteractionBridge().performGlobalAction(
+                AccessibilityService.GLOBAL_ACTION_NOTIFICATIONS);
+        assertTrue(handled);
+
+        // Clean up.
+        getInteractionBridge().performGlobalAction(AccessibilityService.GLOBAL_ACTION_HOME);
+    }
+
+    @MediumTest
     public void testObjectContract() throws Exception {
         try {
             getInteractionBridge().setRegardViewsNotImportantForAccessibility(true);
