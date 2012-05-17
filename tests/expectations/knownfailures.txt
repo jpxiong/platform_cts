@@ -33,6 +33,10 @@
 {
   name: "libcore.java.security.KeyPairGeneratorTest#test_getInstance",
   bug: 5513723
+},
+{
+  name: "android.hardware.cts.CameraTest#testCancelAutofocus",
+  bug: 6296201
 }
 ]
 
