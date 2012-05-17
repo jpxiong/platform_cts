@@ -50,18 +50,6 @@ public class MediaFrameworkTest extends Activity implements SurfaceHolder.Callba
         super.onCreate(icicle);
         setContentView(R.layout.surface_view);
         mSurfaceView = (SurfaceView)findViewById(R.id.surface_view);
-        DisplayMetrics metrics = new DisplayMetrics();
-        WindowManager wm = (WindowManager)getSystemService(Context.WINDOW_SERVICE);
-        Display d = wm.getDefaultDisplay();
-        d.getMetrics(metrics);
-
-        ViewGroup.LayoutParams lp = mSurfaceView.getLayoutParams();
-        lp.width = metrics.widthPixels;
-        lp.height = metrics.heightPixels;
-        mSurfaceView.setLayoutParams(lp);
-        Log.i(TAG, "Setting view holder to size " + lp.width + " " +
-                lp.height);
-        mSurfaceView.getHolder().setFixedSize(lp.width, lp.height);
         mSurfaceView.getHolder().addCallback(this);
 
         //Acquire the full wake lock to keep the device up
