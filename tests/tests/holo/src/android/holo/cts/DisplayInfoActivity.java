@@ -46,7 +46,7 @@ public class DisplayInfoActivity extends Activity {
                 getScreenDensityBucket(metrics), width, height));
     }
 
-    private String getScreenDensityBucket(DisplayMetrics metrics) {
+    static String getScreenDensityBucket(DisplayMetrics metrics) {
         switch (metrics.densityDpi) {
             case DisplayMetrics.DENSITY_LOW:
                 return "ldpi";
