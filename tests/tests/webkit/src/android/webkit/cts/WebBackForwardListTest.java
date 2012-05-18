@@ -33,12 +33,15 @@ public class WebBackForwardListTest extends ActivityInstrumentationTestCase2<Web
     }
 
     @Override
-    public void setUp() {
+    public void setUp() throws Exception {
+        super.setUp();
         mOnUiThread = new WebViewOnUiThread(this, getActivity().getWebView());
     }
 
-    public void tearDown() {
+    @Override
+    public void tearDown() throws Exception {
         mOnUiThread.cleanUp();
+        super.tearDown();
     }
 
     public void testGetCurrentItem() throws Exception {
