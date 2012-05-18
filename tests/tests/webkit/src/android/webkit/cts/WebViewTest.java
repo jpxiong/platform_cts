@@ -782,6 +782,17 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
         startWebServer(false);
         String baseUrl = mWebServer.getAssetUrl("foo.html");
         String historyUrl = "random";
+        mWebServer.resetRequestState();
+        // force the favicon to be loaded first
+        mOnUiThread.loadDataWithBaseURLAndWaitForCompletion(baseUrl,
+                "<html><body></body></html>",
+                "text/html", "UTF-8", historyUrl);
+        new PollingCheck() {
+            @Override
+            protected boolean check() {
+                return mWebServer.getLastRequestUrl().endsWith("favicon.ico");
+            }
+        }.run();
         mOnUiThread.loadDataWithBaseURLAndWaitForCompletion(baseUrl,
                 "<html><body><img src=\"" + imgUrl + "\"/></body></html>",
                 "text/html", "UTF-8", historyUrl);
