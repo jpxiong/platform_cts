@@ -24,8 +24,12 @@ import android.graphics.Color;
 import android.graphics.Typeface;
 import android.location.LocationManager;
 import android.os.Bundle;
+import android.text.Layout;
 import android.text.Spannable;
 import android.text.style.ForegroundColorSpan;
+import android.util.Log;
+import android.view.View;
+import android.widget.ScrollView;
 import android.widget.TextView;
 
 interface PassFailLog {
@@ -40,6 +44,7 @@ interface PassFailLog {
 public class GpsTestActivity extends PassFailButtons.Activity implements PassFailLog {
     private LocationManager mLocationManager;
     private TextView mTextView;
+    private ScrollView mScrollView;
 
     LocationVerifier mLocationVerifier;
     private int mTestNumber;
@@ -57,6 +62,7 @@ public class GpsTestActivity extends PassFailButtons.Activity implements PassFai
         mTextView = (TextView) findViewById(R.id.text);
         mTextView.setTypeface(Typeface.MONOSPACE);
         mTextView.setTextSize(15.0f);
+        mScrollView = (ScrollView) findViewById(R.id.scroll);
     }
 
     @Override
@@ -99,12 +105,18 @@ public class GpsTestActivity extends PassFailButtons.Activity implements PassFai
                 mLocationVerifier.start();
                 break;
             case 3:
+                // Test GPS with minTime = 5s
+                mLocationVerifier = new LocationVerifier(this, mLocationManager,
+                        LocationManager.GPS_PROVIDER, 5 * 1000, 4);
+                mLocationVerifier.start();
+                break;
+            case 4:
                 // Test GPS with minTime = 15s
                 mLocationVerifier = new LocationVerifier(this, mLocationManager,
                         LocationManager.GPS_PROVIDER, 15 * 1000, 4);
                 mLocationVerifier.start();
                 break;
-            case 4:
+            case 5:
                 log("All GPS tests complete", Color.GREEN);
                 getPassButton().setEnabled(true);
                 break;
@@ -115,6 +127,14 @@ public class GpsTestActivity extends PassFailButtons.Activity implements PassFai
     public void log(String s) {
         mTextView.append(s);
         mTextView.append("\n");
+
+        // Scroll to bottom
+        mScrollView.post(new Runnable() {
+            @Override
+            public void run() {
+                mScrollView.fullScroll(View.FOCUS_DOWN);
+            }
+        });
     }
 
     private void log(String s, int color) {
