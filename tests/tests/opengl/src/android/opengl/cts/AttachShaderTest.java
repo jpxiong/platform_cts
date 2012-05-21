@@ -172,7 +172,7 @@ public class AttachShaderTest extends ActivityInstrumentationTestCase2<OpenGLES2
         Thread.sleep(SLEEP_TIME);
 
         int error = mActivity.glGetError();
-        assertEquals(GLES20.GL_INVALID_OPERATION, error);
+        assertEquals(GLES20.GL_INVALID_VALUE, error);
     }
 
     public void test_glAttachShaders_invalidshader_attach_valid_handle() throws Throwable{
@@ -185,7 +185,7 @@ public class AttachShaderTest extends ActivityInstrumentationTestCase2<OpenGLES2
         Thread.sleep(SLEEP_TIME);
 
         int error = mActivity.glGetError();
-        assertEquals(GLES20.GL_INVALID_OPERATION, error);
+        assertEquals(GLES20.GL_INVALID_VALUE, error);
     }
 
     public void test_glAttachShaders_successfulcompile_attach_frag() throws Throwable {
