@@ -18,11 +18,7 @@ package android.view.cts;
 
 
 import android.test.AndroidTestCase;
-import android.view.View;
 import android.view.ViewDebug;
-import android.view.ViewDebug.HierarchyTraceType;
-import android.view.ViewDebug.RecyclerTraceType;
-import android.widget.TextView;
 
 public class ViewDebugTest extends AndroidTestCase {
 
@@ -31,32 +27,12 @@ public class ViewDebugTest extends AndroidTestCase {
     }
 
     public void testRecyclerTracing() {
-        final String recyclerTracePrefix = "ViewDebugTest";
-        View ownerView = new View(getContext());
-        View view = new View(getContext());
-
         // debugging should be disabled on production devices
         assertFalse(ViewDebug.TRACE_RECYCLER);
-
-        // just call the methods; they should return immediately
-        ViewDebug.startRecyclerTracing(recyclerTracePrefix, ownerView);
-        ViewDebug.trace(view, RecyclerTraceType.NEW_VIEW, 0, 1);
-        ViewDebug.stopRecyclerTracing();
     }
 
     public void testHierarchyTracing() {
-        final String hierarchyTracePrefix = "ViewDebugTest";
-        View v1 = new View(getContext());
-        View v2 = new View(getContext());
-
         // debugging should be disabled on production devices
         assertFalse(ViewDebug.TRACE_HIERARCHY);
-
-        // just call the methods; they should return immediately
-        ViewDebug.startHierarchyTracing(hierarchyTracePrefix, v1);
-        ViewDebug.trace(v2, HierarchyTraceType.INVALIDATE);
-        ViewDebug.stopHierarchyTracing();
-        ViewDebug.dumpCapturedView("TAG", new TextView(getContext()));
     }
-
 }
