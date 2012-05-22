@@ -16,7 +16,6 @@ package android.accessibilityservice.cts;
 
 import static android.view.accessibility.AccessibilityNodeInfo.ACTION_ACCESSIBILITY_FOCUS;
 import static android.view.accessibility.AccessibilityNodeInfo.ACTION_CLEAR_ACCESSIBILITY_FOCUS;
-import static android.view.accessibility.AccessibilityNodeInfo.ACTION_FOCUS;
 
 import android.os.SystemClock;
 import android.test.suitebuilder.annotation.MediumTest;
@@ -57,8 +56,11 @@ public class AccessibilityFocusAndInputFocusSyncTest
         AccessibilityNodeInfo expected = getInteractionBridge()
                 .findAccessibilityNodeInfoByTextFromRoot(getString(R.string.firstEditText));
         assertNotNull(expected);
-        assertTrue(expected.isAccessibilityFocused());
+        assertFalse(expected.isAccessibilityFocused());
         assertTrue(expected.isFocused());
+
+        // Perform a focus action and check for success.
+        assertTrue(getInteractionBridge().performAction(expected, ACTION_ACCESSIBILITY_FOCUS));
 
         // Get the second expected node info.
         AccessibilityNodeInfo received = getInteractionBridge().findAccessibilityFocus(
@@ -75,9 +77,7 @@ public class AccessibilityFocusAndInputFocusSyncTest
         // Get the root which is only accessibility focused.
         AccessibilityNodeInfo focused = getInteractionBridge().findAccessibilityFocus(
                 getInteractionBridge().getRootInActiveWindow());
-        assertNotNull(focused);
-        assertTrue(focused.isAccessibilityFocused());
-        assertTrue(focused.isFocused());
+        assertNull(focused);
     }
 
     @MediumTest
@@ -133,131 +133,22 @@ public class AccessibilityFocusAndInputFocusSyncTest
     }
 
     @MediumTest
-    public void testInputFocusFollowsAccessibilityFocusIfPossible() throws Exception {
-        // Get the second not focused edit text.
-        AccessibilityNodeInfo secondEditText = getInteractionBridge()
-            .findAccessibilityNodeInfoByTextFromRoot(getString(R.string.secondEditText));
-        assertNotNull(secondEditText);
-        assertTrue(secondEditText.isFocusable());
-        assertFalse(secondEditText.isFocused());
-        assertFalse(secondEditText.isAccessibilityFocused());
-
-        // Perform a set accessibility focus action and check for success.
-        assertTrue(getInteractionBridge().performAction(secondEditText,
-                ACTION_ACCESSIBILITY_FOCUS));
-
-        // Get the node info again.
-        secondEditText = getInteractionBridge()
-                .findAccessibilityNodeInfoByTextFromRoot(getString(R.string.secondEditText));
-
-        // Make sure input and accessibility focus are in sync.
-        assertTrue(secondEditText.isFocused());
-        assertTrue(secondEditText.isAccessibilityFocused());
-    }
-
-    @MediumTest
-    public void testInputFocusDoesNotFollowAccessibilityFocusIfNotPossible() throws Exception {
-        // Get the second text view.
-        AccessibilityNodeInfo secondTextView = getInteractionBridge()
-                .findAccessibilityNodeInfoByTextFromRoot(getString(R.string.secondTextView));
-        assertNotNull(secondTextView);
-        assertFalse(secondTextView.isFocusable());
-        assertFalse(secondTextView.isFocused());
-        assertFalse(secondTextView.isAccessibilityFocused());
-
-        // Perform a set accessibility focus action and check for success.
-        assertTrue(getInteractionBridge().performAction(secondTextView,
-                ACTION_ACCESSIBILITY_FOCUS));
-
-        // Get the node info again.
-        secondTextView = getInteractionBridge()
-                .findAccessibilityNodeInfoByTextFromRoot(getString(R.string.secondTextView));
-
-        // Make sure input and accessibility focus are not in sync.
-        assertFalse(secondTextView.isFocused());
-        assertTrue(secondTextView.isAccessibilityFocused());
-
-        // The input focus should be in its initial state on the first edit text.
+    public void testOnlyOneNodeHasAccessibilityFocus() throws Exception {
+        // Get the first not focused edit text.
         AccessibilityNodeInfo firstEditText = getInteractionBridge()
-                .findAccessibilityNodeInfoByTextFromRoot(getString(R.string.firstEditText));
+            .findAccessibilityNodeInfoByTextFromRoot(getString(R.string.firstEditText));
+        assertNotNull(firstEditText);
+        assertTrue(firstEditText.isFocusable());
         assertTrue(firstEditText.isFocused());
         assertFalse(firstEditText.isAccessibilityFocused());
-    }
-
-    @MediumTest
-    public void testAccessibilityFocusFollowsInputFocus() throws Exception {
-        // Get the second not focused edit text.
-        AccessibilityNodeInfo secondEditText = getInteractionBridge()
-            .findAccessibilityNodeInfoByTextFromRoot(getString(R.string.secondEditText));
-        assertNotNull(secondEditText);
-        assertTrue(secondEditText.isFocusable());
-        assertFalse(secondEditText.isFocused());
-        assertFalse(secondEditText.isAccessibilityFocused());
 
         // Perform a set focus action and check for success.
-        assertTrue(getInteractionBridge().performAction(secondEditText, ACTION_FOCUS));
-
-        // Get the node info again.
-        secondEditText = getInteractionBridge()
-                .findAccessibilityNodeInfoByTextFromRoot(getString(R.string.secondEditText));
-
-        // Make sure input and accessibility focus are in sync.
-        assertTrue(secondEditText.isFocused());
-        assertTrue(secondEditText.isAccessibilityFocused());
-    }
-
-    @MediumTest
-    public void testClearAccessibilityFocusSyncsItWithInputFocus() throws Exception {
-        // Get the second not focused edit text.
-        AccessibilityNodeInfo secondEditText = getInteractionBridge()
-            .findAccessibilityNodeInfoByTextFromRoot(getString(R.string.secondEditText));
-        assertNotNull(secondEditText);
-        assertTrue(secondEditText.isFocusable());
-        assertFalse(secondEditText.isFocused());
-        assertFalse(secondEditText.isAccessibilityFocused());
-
-        // Perform a set focus action and check for success.
-        assertTrue(getInteractionBridge().performAction(secondEditText, ACTION_FOCUS));
-
-        // Get the node info again.
-        secondEditText = getInteractionBridge()
-                .findAccessibilityNodeInfoByTextFromRoot(getString(R.string.secondEditText));
-
-        // Make sure input and accessibility focus are in sync.
-        assertTrue(secondEditText.isFocused());
-        assertTrue(secondEditText.isAccessibilityFocused());
-
-        // Get the second not accessibility focused text view.
-        AccessibilityNodeInfo secondTextView = getInteractionBridge()
-                .findAccessibilityNodeInfoByTextFromRoot(getString(R.string.secondTextView));
-
-        // Perform a set accessibility focus action and check for success.
-        assertTrue(getInteractionBridge().performAction(secondTextView,
+        assertTrue(getInteractionBridge().performAction(firstEditText,
                 ACTION_ACCESSIBILITY_FOCUS));
 
-        // Get the node info again.
-        secondTextView = getInteractionBridge()
-                .findAccessibilityNodeInfoByTextFromRoot(getString(R.string.secondTextView));
+        // Wait for generated events to propagate and clear the cache.
+        SystemClock.sleep(TIMEOUT_ASYNC_PROCESSING);
 
-        // Make the second text view has only accessibility focus.
-        assertFalse(secondTextView.isFocused());
-        assertTrue(secondTextView.isAccessibilityFocused());
-
-        // Perform a clear focus action and check for success.
-        assertTrue(getInteractionBridge().performAction(secondTextView,
-                ACTION_CLEAR_ACCESSIBILITY_FOCUS));
-
-        // Get second edit text node info again.
-        secondEditText = getInteractionBridge()
-                .findAccessibilityNodeInfoByTextFromRoot(getString(R.string.secondEditText));
-
-        // Make sure the second edit text has both input and accessibility focus.
-        assertTrue(secondEditText.isFocused());
-        assertTrue(secondEditText.isAccessibilityFocused());
-    }
-
-    @MediumTest
-    public void testOnlyOneNodeHasAccessibilityFocus() throws Exception {
         // Get the second not focused edit text.
         AccessibilityNodeInfo secondEditText = getInteractionBridge()
             .findAccessibilityNodeInfoByTextFromRoot(getString(R.string.secondEditText));
@@ -276,10 +167,6 @@ public class AccessibilityFocusAndInputFocusSyncTest
         // Get the node info again.
         secondEditText = getInteractionBridge()
                 .findAccessibilityNodeInfoByTextFromRoot(getString(R.string.secondEditText));
-
-        // Make sure input and accessibility focus are in sync.
-        assertTrue(secondEditText.isFocused());
-        assertTrue(secondEditText.isAccessibilityFocused());
 
         // Make sure no other node has accessibility focus.
         AccessibilityNodeInfo root = getInteractionBridge().getRootInActiveWindow();
