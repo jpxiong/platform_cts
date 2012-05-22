@@ -68,11 +68,11 @@ public class AccessibilityTestRunner extends InstrumentationApkTest {
 
     private void beforeTest() throws DeviceNotAvailableException {
         installApkAndAssert(SOME_ACCESSIBLITY_SERVICES_APK);
-        enableAccessibilityAndServices();
+        enableAccessibilityAndServicesAndTouchExploration();
     }
 
     private void afterTest() throws DeviceNotAvailableException {
-        disableAccessibilityAndDelegatingService(getDevice());
+        disableAccessibilityAndServicesAndTouchExploration(getDevice());
         uninstallAndAssert(SOME_ACCESSIBLITY_SERVICES_PACKAGE_NAME);
     }
 
@@ -87,23 +87,26 @@ public class AccessibilityTestRunner extends InstrumentationApkTest {
         TestCase.assertNull("Error uninstalling: " + packageName, errorMessage);
     }
 
-    private void enableAccessibilityAndServices() throws DeviceNotAvailableException {
+    private void enableAccessibilityAndServicesAndTouchExploration()
+            throws DeviceNotAvailableException {
         String enabledServicesValue =
               SOME_ACCESSIBLITY_SERVICES_PACKAGE_NAME + "/" + SPEAKING_ACCESSIBLITY_SERVICE_NAME
             + ":"
             + SOME_ACCESSIBLITY_SERVICES_PACKAGE_NAME + "/" + VIBRATING_ACCESSIBLITY_SERVICE_NAME;
-        enableAccessibilityAndServices(getDevice(), enabledServicesValue);
+        enableAccessibilityAndServicesAndTouchExploration(getDevice(), enabledServicesValue);
     }
 
-    static void enableAccessibilityAndServices(ITestDevice device, String value)
+    static void enableAccessibilityAndServicesAndTouchExploration(ITestDevice device, String value)
             throws DeviceNotAvailableException {
         SettingsToggler.setSecureString(device, "enabled_accessibility_services", value);
         SettingsToggler.setSecureInt(device, "accessibility_enabled", 1);
+        SettingsToggler.setSecureInt(device, "touch_exploration_enabled", 1);
     }
 
-    static void disableAccessibilityAndDelegatingService(ITestDevice device)
+    static void disableAccessibilityAndServicesAndTouchExploration(ITestDevice device)
             throws DeviceNotAvailableException {
         SettingsToggler.updateSecureString(device, "enabled_accessibility_services", "");
         SettingsToggler.updateSecureInt(device, "accessibility_enabled", 0);
+        SettingsToggler.updateSecureInt(device, "touch_exploration_enabled", 0);
     }
 }
