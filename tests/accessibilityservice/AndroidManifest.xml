@@ -24,7 +24,8 @@
     <uses-library android:name="android.test.runner"/>
 
     <service android:name=".DelegatingAccessibilityService"
-             android:label="@string/title_delegating_accessibility_service">
+             android:label="@string/title_delegating_accessibility_service"
+             android:permission="android.permission.BIND_ACCESSIBILITY_SERVICE">
       <intent-filter>
         <action android:name="android.accessibilityservice.AccessibilityService"/>
       </intent-filter>
