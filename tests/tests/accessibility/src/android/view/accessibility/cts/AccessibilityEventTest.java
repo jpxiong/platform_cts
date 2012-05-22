@@ -31,7 +31,7 @@ import junit.framework.TestCase;
 public class AccessibilityEventTest extends TestCase {
 
     /** The number of properties of the {@link AccessibilityEvent} class. */
-    private static final int NON_STATIC_FIELD_COUNT = 29;
+    private static final int NON_STATIC_FIELD_COUNT = 30;
 
     /**
      * Test that no new fields have been added without updating the
@@ -40,7 +40,8 @@ public class AccessibilityEventTest extends TestCase {
     @SmallTest
     public void testNoNewFieldsAddedWithoutUpdadingMarshallTests() {
         // no new fields, so we are testing marshaling of all such
-        AccessibilityRecordTest.assertNoNewNonStaticFieldsAdded(NON_STATIC_FIELD_COUNT);
+        AccessibilityRecordTest.assertNoNewNonStaticFieldsAdded(AccessibilityEvent.class,
+                NON_STATIC_FIELD_COUNT);
     }
 
     /**
@@ -186,6 +187,7 @@ public class AccessibilityEventTest extends TestCase {
         sentEvent.setScrollY(1);
         sentEvent.setToIndex(1);
         sentEvent.setScrollable(true);
+        sentEvent.setAction(AccessibilityNodeInfo.ACTION_ACCESSIBILITY_FOCUS);
         sentEvent.setMovementGranularity(AccessibilityNodeInfo.MOVEMENT_GRANULARITY_LINE);
 
         AccessibilityRecord record = AccessibilityRecord.obtain();
@@ -244,6 +246,8 @@ public class AccessibilityEventTest extends TestCase {
                 receivedEvent.isScrollable());
         assertSame("granularity has incorect value", expectedEvent.getMovementGranularity(),
                 receivedEvent.getMovementGranularity());
+        assertSame("action has incorect value", expectedEvent.getAction(),
+                receivedEvent.getAction());
 
         assertSame("parcelableData has incorect value",
                 ((Message) expectedEvent.getParcelableData()).what,
