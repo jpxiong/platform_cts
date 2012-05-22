@@ -17,7 +17,6 @@
 package com.android.cts.tradefed.testtype;
 
 import com.android.cts.tradefed.build.CtsBuildHelper;
-import com.android.cts.tradefed.targetprep.SettingsToggler;
 import com.android.tradefed.build.IBuildInfo;
 import com.android.tradefed.device.DeviceNotAvailableException;
 import com.android.tradefed.result.ITestInvocationListener;
@@ -68,7 +67,7 @@ public class AccessibilityServiceTestRunner extends InstrumentationApkTest {
     }
 
     private void afterTest() throws DeviceNotAvailableException {
-        AccessibilityTestRunner.disableAccessibilityAndDelegatingService(getDevice());
+        AccessibilityTestRunner.disableAccessibilityAndServicesAndTouchExploration(getDevice());
         uninstallAndAssert(DELEGATING_ACCESSIBLITY_SERVICE_PACKAGE_NAME);
     }
 
@@ -86,6 +85,7 @@ public class AccessibilityServiceTestRunner extends InstrumentationApkTest {
     private void enableAccessibilityAndDelegatingService() throws DeviceNotAvailableException {
         String componentName = DELEGATING_ACCESSIBLITY_SERVICE_PACKAGE_NAME + "/"
             + DELEGATING_ACCESSIBLITY_SERVICE_NAME;
-        AccessibilityTestRunner.enableAccessibilityAndServices(getDevice(), componentName);
+        AccessibilityTestRunner.enableAccessibilityAndServicesAndTouchExploration(getDevice(),
+                componentName);
     }
 }
