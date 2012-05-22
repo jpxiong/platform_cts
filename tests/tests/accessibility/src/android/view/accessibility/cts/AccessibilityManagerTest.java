@@ -60,7 +60,7 @@ public class AccessibilityManagerTest extends AndroidTestCase {
     }
 
     public void testIsTouchExplorationEnabled() throws Exception {
-        assertFalse(mAccessibilityManager.isTouchExplorationEnabled());
+        assertTrue(mAccessibilityManager.isTouchExplorationEnabled());
     }
 
     public void testGetInstalledAccessibilityServicesList() throws Exception {

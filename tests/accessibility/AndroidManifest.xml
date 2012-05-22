@@ -22,7 +22,8 @@
   <application>
 
     <service android:name=".SpeakingAccessibilityService"
-             android:label="@string/title_speaking_accessibility_service">
+             android:label="@string/title_speaking_accessibility_service"
+             android:permission="android.permission.BIND_ACCESSIBILITY_SERVICE">
       <intent-filter>
         <action android:name="android.accessibilityservice.AccessibilityService"/>
       </intent-filter>
@@ -31,7 +32,8 @@
     </service>
 
     <service android:name=".VibratingAccessibilityService"
-             android:label="@string/title_vibrating_accessibility_service">
+             android:label="@string/title_vibrating_accessibility_service"
+             android:permission="android.permission.BIND_ACCESSIBILITY_SERVICE">
       <intent-filter>
         <action android:name="android.accessibilityservice.AccessibilityService"/>
       </intent-filter>

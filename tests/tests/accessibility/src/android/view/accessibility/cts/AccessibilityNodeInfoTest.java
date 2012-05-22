@@ -24,21 +24,19 @@ import android.view.View;
 import android.view.accessibility.AccessibilityEvent;
 import android.view.accessibility.AccessibilityNodeInfo;
 
-import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
-
 /**
  * Class for testing {@link AccessibilityNodeInfo}.
  */
 public class AccessibilityNodeInfoTest extends AndroidTestCase {
 
     /** The number of properties of the {@link AccessibilityNodeInfo} class. */
-    private static final int NON_STATIC_FIELD_COUNT = 30;
+    private static final int NON_STATIC_FIELD_COUNT = 17;
 
     @SmallTest
     public void testMarshaling() throws Exception {
         // no new fields, so we are testing marshaling of all such
-        assertNoNewNonStaticFieldsAdded();
+        AccessibilityRecordTest.assertNoNewNonStaticFieldsAdded(AccessibilityNodeInfo.class,
+                NON_STATIC_FIELD_COUNT);
 
         // fully populate the node info to marshal
         AccessibilityNodeInfo sentInfo = AccessibilityNodeInfo.obtain(new View(getContext()));
@@ -93,25 +91,6 @@ public class AccessibilityNodeInfoTest extends AndroidTestCase {
         fullyPopulateAccessibilityNodeInfo(info);
         assertSame("Accessibility node infos always return 0 for this method.", 0,
                 info.describeContents());
-    }
-
-    /**
-     * Asserts that no new fields have been added, so we are testing marshaling
-     * of all such.
-     */
-    private void assertNoNewNonStaticFieldsAdded() {
-        int nonStaticFieldCount = 0;
-        Class<?> clazz = AccessibilityEvent.class;
-        while (clazz != null) {
-            for (Field field : clazz.getDeclaredFields()) {
-                if ((field.getModifiers() & Modifier.STATIC) == 0) {
-                    nonStaticFieldCount++;
-                }
-            }
-            clazz = clazz.getSuperclass();
-        }
-        String message = "New fields have been added, so add code to test marshaling them.";
-        assertEquals(message, NON_STATIC_FIELD_COUNT, nonStaticFieldCount);
     }
 
     /**
