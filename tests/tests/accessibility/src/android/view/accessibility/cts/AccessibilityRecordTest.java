@@ -35,7 +35,7 @@ import java.util.List;
 public class AccessibilityRecordTest extends AndroidTestCase {
 
     /** The number of properties of the {@link AccessibilityEvent} class. */
-    private static final int NON_STATIC_FIELD_COUNT = 28;
+    private static final int NON_STATIC_FIELD_COUNT = 22;
 
     /**
      * Test that no new fields have been added without updating the
@@ -45,7 +45,7 @@ public class AccessibilityRecordTest extends AndroidTestCase {
      */
     @SmallTest
     public void testNoNewFieldsAddedWithoutUpdadingMarshallTests() {
-        assertNoNewNonStaticFieldsAdded(NON_STATIC_FIELD_COUNT);
+        assertNoNewNonStaticFieldsAdded(AccessibilityRecord.class, NON_STATIC_FIELD_COUNT);
     }
 
     /**
@@ -201,10 +201,9 @@ public class AccessibilityRecordTest extends AndroidTestCase {
      * Asserts that no new fields have been added, so we are testing marshaling
      * of all such.
      */
-    static void assertNoNewNonStaticFieldsAdded(int fieldCount) {
+    static void assertNoNewNonStaticFieldsAdded(Class<?> clazz, int expectedCount) {
         int nonStaticFieldCount = 0;
 
-        Class<?> clazz = AccessibilityEvent.class;
         while (clazz != null) {
             for (Field field : clazz.getDeclaredFields()) {
                 if ((field.getModifiers() & Modifier.STATIC) == 0) {
@@ -215,6 +214,6 @@ public class AccessibilityRecordTest extends AndroidTestCase {
         }
 
         String message = "New fields have been added, so add code to test marshaling them.";
-        assertEquals(message, fieldCount, nonStaticFieldCount);
+        assertEquals(message, expectedCount, nonStaticFieldCount);
     }
 }
