@@ -21,9 +21,13 @@ import android.content.ContentUris;
 import android.content.ContentValues;
 import android.database.Cursor;
 import android.net.Uri;
+import android.os.Environment;
 import android.provider.MediaStore;
 import android.provider.MediaStore.MediaColumns;
 import android.test.AndroidTestCase;
+
+import java.io.File;
+import java.io.IOException;
 
 public class MediaStore_FilesTest extends AndroidTestCase {
 
@@ -85,6 +89,34 @@ public class MediaStore_FilesTest extends AndroidTestCase {
         Cursor cursor = mResolver.query(fileUri, null, null, null, null);
         try {
             assertFalse(cursor.moveToNext());
+        } finally {
+            cursor.close();
+        }
+
+        // insert file and check its parent
+        values.clear();
+        try {
+            String b = mContext.getExternalFilesDir(Environment.DIRECTORY_MUSIC).getCanonicalPath();
+            values.put(MediaColumns.DATA, b + "/testing");
+            fileUri = mResolver.insert(allFilesUri, values);
+            cursor = mResolver.query(fileUri, new String[] { MediaStore.Files.FileColumns.PARENT },
+                    null, null, null);
+            assertEquals(1, cursor.getCount());
+            cursor.moveToFirst();
+            long parentid = cursor.getLong(0);
+            assertTrue("got 0 parent for non root file", parentid != 0);
+
+            cursor.close();
+            cursor = mResolver.query(ContentUris.withAppendedId(allFilesUri, parentid),
+                    new String[] { MediaColumns.DATA }, null, null, null);
+            assertEquals(1, cursor.getCount());
+            cursor.moveToFirst();
+            String parentPath = cursor.getString(0);
+            assertEquals(b, parentPath);
+
+            mResolver.delete(fileUri, null, null);
+        } catch (IOException e) {
+            fail(e.getMessage());
         } finally {
             cursor.close();
         }
