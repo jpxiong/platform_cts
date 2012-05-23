@@ -37,6 +37,7 @@ import android.os.SystemClock;
 import android.provider.MediaStore;
 import android.provider.cts.FileCopyHelper;
 import android.test.AndroidTestCase;
+import android.util.Log;
 
 import java.io.File;
 import java.io.IOException;
@@ -184,6 +185,7 @@ public class MediaScannerTest extends AndroidTestCase {
         c.close();
         assertTrue("song id should not be 0", song1a != 0);
         assertTrue("song id should not be 0", song1b != 0);
+        assertTrue("song ids should not be same", song1a != song1b);
 
         // 2nd playlist should have the same songs, in reverse order
         c = res.query(MediaStore.Audio.Playlists.EXTERNAL_CONTENT_URI, null,
@@ -209,6 +211,87 @@ public class MediaScannerTest extends AndroidTestCase {
 
         checkConnectionState(false);
     }
+
+    public void testWildcardPaths() throws InterruptedException, IOException {
+        mMediaScannerConnectionClient = new MockMediaScannerConnectionClient();
+        mMediaScannerConnection = new MockMediaScannerConnection(getContext(),
+                                    mMediaScannerConnectionClient);
+
+        assertFalse(mMediaScannerConnection.isConnected());
+
+        // start connection and wait until connected
+        mMediaScannerConnection.connect();
+        checkConnectionState(true);
+
+        long now = System.currentTimeMillis();
+        String dir1 = mFileDir + "/test-" + now;
+        String file1 = dir1 + "/test.mp3";
+        String dir2 = mFileDir + "/test_" + now;
+        String file2 = dir2 + "/test.mp3";
+        assertTrue(new File(dir1).mkdir());
+        writeFile(R.raw.testmp3, file1);
+        mMediaScannerConnection.scanFile(file1, MEDIA_TYPE);
+        checkMediaScannerConnection();
+        Uri file1Uri = mMediaScannerConnectionClient.mediaUri;
+
+        assertTrue(new File(dir2).mkdir());
+        writeFile(R.raw.testmp3, file2);
+        mMediaScannerConnectionClient.reset();
+        mMediaScannerConnection.scanFile(file2, MEDIA_TYPE);
+        checkMediaScannerConnection();
+        Uri file2Uri = mMediaScannerConnectionClient.mediaUri;
+
+        // if the URIs are the same, then the media scanner likely treated the _ character
+        // in the second path as a wildcard, and matched it with the first path
+        assertFalse(file1Uri.equals(file2Uri));
+
+        // rewrite Uris to use the file scheme
+        long file1id = Long.valueOf(file1Uri.getLastPathSegment());
+        long file2id = Long.valueOf(file2Uri.getLastPathSegment());
+        file1Uri = MediaStore.Files.getContentUri("external", file1id);
+        file2Uri = MediaStore.Files.getContentUri("external", file2id);
+
+        ContentResolver res = mContext.getContentResolver();
+        Cursor c = res.query(file1Uri, new String[] { "parent" }, null, null, null);
+        c.moveToFirst();
+        long parent1id = c.getLong(0);
+        c.close();
+        c = res.query(file2Uri, new String[] { "parent" }, null, null, null);
+        c.moveToFirst();
+        long parent2id = c.getLong(0);
+        c.close();
+        // if the parent ids are the same, then the media provider likely
+        // treated the _ character in the second path as a wildcard
+        assertTrue("same parent", parent1id != parent2id);
+
+        // check the parent paths are correct
+        c = res.query(MediaStore.Files.getContentUri("external", parent1id),
+                new String[] { "_data" }, null, null, null);
+        c.moveToFirst();
+        assertEquals(dir1, c.getString(0));
+        c.close();
+
+        c = res.query(MediaStore.Files.getContentUri("external", parent2id),
+                new String[] { "_data" }, null, null, null);
+        c.moveToFirst();
+        assertEquals(dir2, c.getString(0));
+        c.close();
+
+        // clean up
+        new File(file1).delete();
+        new File(dir1).delete();
+        new File(file2).delete();
+        new File(dir2).delete();
+        res.delete(file1Uri, null, null);
+        res.delete(file2Uri, null, null);
+        res.delete(MediaStore.Files.getContentUri("external", parent1id), null, null);
+        res.delete(MediaStore.Files.getContentUri("external", parent2id), null, null);
+
+        mMediaScannerConnection.disconnect();
+
+        checkConnectionState(false);
+    }
+
 
     private void startMediaScanAndWait() throws InterruptedException {
         ScannerNotificationReceiver finishedReceiver = new ScannerNotificationReceiver(
