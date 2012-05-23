@@ -43,6 +43,29 @@
     "org.apache.harmony.luni.tests.internal.net.www.protocol.https.HttpsURLConnectionTest#testProxyAuthConnectionFailed",
     "org.apache.harmony.luni.tests.internal.net.www.protocol.https.HttpsURLConnectionTest#testProxyConnection_Not_Found_Response"
   ]
+},
+{
+  name: "android.media.cts.StreamingMediaPlayerTest#testRTSP_MPEG4SP_AAC_Video1",
+  bug: 6422606
+},
+{
+  name: "android.media.cts.StreamingMediaPlayerTest#testRTSP_MPEG4SP_AAC_Video2",
+  bug: 6422606
+},
+{
+  name: "android.media.cts.StreamingMediaPlayerTest#testRTSP_H263_AMR_Video1",
+  bug: 6216077
+},
+{
+  name: "android.media.cts.StreamingMediaPlayerTest#testRTSP_H263_AMR_Video2",
+  bug: 6216077
+},
+{
+  name: "android.media.cts.StreamingMediaPlayerTest#testRTSP_H264Base_AAC_Video1",
+  bug: 6215719
+},
+{
+  name: "android.media.cts.StreamingMediaPlayerTest#testRTSP_H264Base_AAC_Video2",
+  bug: 6215719
 }
-
 ]
