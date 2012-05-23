@@ -17,15 +17,14 @@ package android.view.inputmethod.cts;
 
 import com.android.cts.stub.R;
 
-
 import android.app.Instrumentation;
 import android.content.Context;
+import android.cts.util.PollingCheck;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.ResultReceiver;
 import android.test.ActivityInstrumentationTestCase2;
 import android.view.KeyEvent;
-import android.view.View;
 import android.view.Window;
 import android.view.inputmethod.BaseInputConnection;
 import android.view.inputmethod.InputMethodInfo;
@@ -74,7 +73,14 @@ public class InputMethodManagerTest
         Context context = mInstrumentation.getTargetContext();
         final InputMethodManager imManager = (InputMethodManager) context
                 .getSystemService(Context.INPUT_METHOD_SERVICE);
-        assertTrue(imManager.isActive());
+
+        new PollingCheck() {
+            @Override
+            protected boolean check() {
+                return imManager.isActive();
+            }
+        }.run();
+
         assertTrue(imManager.isAcceptingText());
         assertTrue(imManager.isActive(view));
 
