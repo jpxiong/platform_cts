@@ -61,6 +61,18 @@
 {
   name: "android.media.cts.StreamingMediaPlayerTest#testRTSP_H264Base_AAC_Video2",
   bug: 6215719
+},
+{
+  names: [
+    "libcore.java.lang.FloatTest#testExponentParsing",
+    "libcore.java.lang.FloatTest#testNamedFloats",
+    "libcore.java.lang.FloatTest#testSuffixParsing",
+    "libcore.java.lang.FloatTest#testVerifierTyping",
+    "libcore.java.lang.FloatTest#test_valueOf_String1",
+    "libcore.java.lang.FloatTest#test_valueOf_String2",
+    "android.text.cts.TextUtilsTest#testHtmlEncode"
+  ],
+  bug: 6004674
 }
 ]
 
