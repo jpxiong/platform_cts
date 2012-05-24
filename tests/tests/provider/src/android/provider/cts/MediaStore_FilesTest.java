@@ -16,12 +16,15 @@
 
 package android.provider.cts;
 
+import com.android.cts.stub.R;
+
 import android.content.ContentResolver;
 import android.content.ContentUris;
 import android.content.ContentValues;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Environment;
+import android.os.ParcelFileDescriptor;
 import android.provider.MediaStore;
 import android.provider.MediaStore.MediaColumns;
 import android.test.AndroidTestCase;
@@ -120,6 +123,35 @@ public class MediaStore_FilesTest extends AndroidTestCase {
         } finally {
             cursor.close();
         }
+    }
+
+    public void testCaseSensitivity() throws IOException {
+        String fileDir = Environment.getExternalStorageDirectory() +
+                "/" + getClass().getCanonicalName();
+        String fileName = fileDir + "/Test.Mp3";
+        writeFile(R.raw.testmp3, fileName);
+
+        String volumeName = MediaStoreAudioTestHelper.EXTERNAL_VOLUME_NAME;
+        Uri allFilesUri = MediaStore.Files.getContentUri(volumeName);
+        ContentValues values = new ContentValues();
+        values.put(MediaColumns.DATA, fileDir + "/test.mp3");
+        Uri fileUri = mResolver.insert(allFilesUri, values);
+        try {
+            ParcelFileDescriptor pfd = mResolver.openFileDescriptor(fileUri, "r");
+            pfd.close();
+        } finally {
+            mResolver.delete(fileUri, null, null);
+            new File(fileName).delete();
+            new File(fileDir).delete();
+        }
+    }
+
+    private void writeFile(int resid, String path) throws IOException {
+        File out = new File(path);
+        File dir = out.getParentFile();
+        dir.mkdirs();
+        FileCopyHelper copier = new FileCopyHelper(mContext);
+        copier.copyToExternalStorage(resid, out);
     }
 
     private int getFileCount(Uri uri) {
