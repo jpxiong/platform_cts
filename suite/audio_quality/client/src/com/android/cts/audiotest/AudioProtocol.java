@@ -117,6 +117,10 @@ public class AudioProtocol implements AudioTrack.OnPlaybackPositionUpdateListene
             Log.e(TAG, "ignore exception", e);
         } finally {
             track.stop();
+            track.flush();
+            track.release();
+            mPlaybackThread.quitLoop(false);
+            mPlaybackThread = null;
         }
     }
 
@@ -195,18 +199,19 @@ public class AudioProtocol implements AudioTrack.OnPlaybackPositionUpdateListene
             mRecord = null;
         }
         if (mRecordThread != null) {
-            mRecordThread.quitLoop();
+            mRecordThread.quitLoop(true);
             mRecordThread = null;
         }
         if (mPlayback != null) {
             if (mPlayback.getState() != AudioTrack.STATE_UNINITIALIZED) {
                 mPlayback.stop();
+                mPlayback.flush();
             }
             mPlayback.release();
             mPlayback = null;
         }
         if (mPlaybackThread != null) {
-            mPlaybackThread.quitLoop();
+            mPlaybackThread.quitLoop(true);
             mPlaybackThread = null;
         }
         mDataMap.clear();
@@ -241,12 +246,17 @@ public class AudioProtocol implements AudioTrack.OnPlaybackPositionUpdateListene
             if (samplingRate != 44100) {
                 throw new ProtocolError("wrong rate");
             }
+            //FIXME cannot start playback again
             //TODO repeat
             //FIXME in MODE_STATIC, setNotificationMarkerPosition does not work with full length
             mPlaybackThread = new LoopThread(new Runnable() {
 
                 @Override
                 public void run() {
+                    if (mPlayback != null) {
+                        mPlayback.release();
+                        mPlayback = null;
+                    }
                     int type = (mode == 0) ? AudioManager.STREAM_VOICE_CALL :
                         AudioManager.STREAM_MUSIC;
                     mPlayback = new AudioTrack(type, samplingRate,
@@ -282,12 +292,14 @@ public class AudioProtocol implements AudioTrack.OnPlaybackPositionUpdateListene
         Log.d(TAG, "stopPlayback");
         assertProtocol(len == 0, "wrong payload len");
         if (mPlayback != null) {
+            Log.d(TAG, "release AudioTrack");
             mPlayback.stop();
+            mPlayback.flush();
             mPlayback.release();
             mPlayback = null;
         }
         if (mPlaybackThread != null) {
-            mPlaybackThread.quitLoop();
+            mPlaybackThread.quitLoop(true);
             mPlaybackThread = null;
         }
         sendSimpleReplyHeader(CMD_STOP_PLAYBACK, PROTOCOL_OK);
@@ -381,7 +393,7 @@ public class AudioProtocol implements AudioTrack.OnPlaybackPositionUpdateListene
             mRecord = null;
         }
         if (mRecordThread != null) {
-            mRecordThread.quitLoop();
+            mRecordThread.quitLoop(true);
             mRecordThread = null;
         }
         sendSimpleReplyHeader(CMD_STOP_RECORDING, PROTOCOL_OK);
@@ -421,17 +433,20 @@ public class AudioProtocol implements AudioTrack.OnPlaybackPositionUpdateListene
             mLooper = Looper.myLooper();
             Log.d(TAG, "run runnable");
             super.run();
-            Log.d(TAG, "loop");
+            //Log.d(TAG, "loop");
             Looper.loop();
         }
         // should be called outside this thread
-        public void quitLoop() {
+        public void quitLoop(boolean wait) {
             mLooper.quit();
             try {
-                join();
+                if (wait) {
+                    join();
+                }
             } catch (InterruptedException e) {
                 // ignore
             }
+            Log.d(TAG, "quit thread");
         }
     }
 

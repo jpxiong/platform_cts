@@ -43,7 +43,8 @@ public:
         ETaskSound          = 9,
         ETaskSave           = 10,
         ETaskMessage        = 11,
-        ETaskInvalidLast    = 12,
+        ETaskDownload       = 12,
+        ETaskInvalidLast    = 13,
         //no ETaskInclude include does not involve any action.
     };
 

@@ -15,21 +15,20 @@
  */
 
 
-#ifndef CTSAUDIO_TASKALL_H
-#define CTSAUDIO_TASKALL_H
-
-/// convenience header to include all Task stuffs
+#ifndef CTSAUDIO_TASKDOWNLOAD_H
+#define CTSAUDIO_TASKDOWNLOAD_H
+#include <utils/String8.h>
+#include <utils/StrongPointer.h>
+#include "audio/Buffer.h"
 #include "TaskGeneric.h"
-#include "TaskBatch.h"
-#include "TaskCase.h"
-#include "TaskSequential.h"
-#include "TaskProcess.h"
-#include "TaskAsync.h"
-#include "TaskInput.h"
-#include "TaskOutput.h"
-#include "TaskSound.h"
-#include "TaskSave.h"
-#include "TaskMessage.h"
-#include "TaskDownload.h"
 
-#endif // CTSAUDIO_TASKALL_H
+
+class TaskDownload: public TaskGeneric {
+public:
+    TaskDownload();
+    virtual ~TaskDownload();
+    virtual TaskGeneric::ExecutionResult run();
+};
+
+
+#endif // CTSAUDIO_TASKDOWNLOAD_H

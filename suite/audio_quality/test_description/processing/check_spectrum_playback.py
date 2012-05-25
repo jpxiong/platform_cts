@@ -23,10 +23,9 @@ import sys
 sys.path.append(sys.path[0])
 import calc_delay
 
-# check if amplitude ratio of DUT / Host signal
+# check if amplitude of DUT's playback
 #  lies in the given error boundary
 # input: host record
-#        device record,
 #        sampling rate
 #        low frequency in Hz,
 #        high frequency in Hz,
@@ -34,9 +33,9 @@ import calc_delay
 #        allowed error ih positive side for pass
 # output: min value in negative side, normalized to 1.0
 #         max value in positive side
-#         calculated amplittude ratio in magnitude (DUT / Host)
+#         calculated freq spectrum in amplittude
 
-def do_check_spectrum(hostData, DUTData, samplingRate, fLow, fHigh, margainLow, margainHigh):
+def do_check_spectrum_playback(hostData, samplingRate, fLow, fHigh, margainLow, margainHigh):
     # reduce FFT resolution to have averaging effects
     N = 512 if (len(hostData) > 512) else len(hostData)
     iLow = N * fLow / samplingRate + 1 # 1 for DC
@@ -50,86 +49,53 @@ def do_check_spectrum(hostData, DUTData, samplingRate, fLow, fHigh, margainLow, 
     Phh, freqs = plt.psd(hostData, NFFT=N, Fs=samplingRate, Fc=0, detrend=plt.mlab.detrend_none,\
         window=plt.mlab.window_hanning, noverlap=0, pad_to=None, sides='onesided',\
         scale_by_freq=False)
-    Pdd, freqs = plt.psd(DUTData, NFFT=N, Fs=samplingRate, Fc=0, detrend=plt.mlab.detrend_none,\
-        window=plt.mlab.window_hanning, noverlap=0, pad_to=None, sides='onesided',\
-        scale_by_freq=False)
-    print len(Phh), len(Pdd)
+    print len(Phh)
     print "Phh", abs(Phh[iLow:iHigh])
-    print "Pdd", abs(Pdd[iLow:iHigh])
-    amplitudeRatio = np.sqrt(abs(Pdd[iLow:iHigh]/Phh[iLow:iHigh]))
-    ratioMean = np.mean(amplitudeRatio)
-    amplitudeRatio = amplitudeRatio / ratioMean
-    print "Normialized ratio", amplitudeRatio
-    print "ratio mean for normalization", ratioMean
-    positiveMax = abs(max(amplitudeRatio))
-    negativeMin = abs(min(amplitudeRatio))
+    spectrum = np.sqrt(abs(Phh[iLow:iHigh]))
+    spectrumMean = np.mean(spectrum)
+    spectrum = spectrum / spectrumMean
+    print "Mean ", spectrumMean
+    print "Normalized spectrum", spectrum
+    positiveMax = abs(max(spectrum))
+    negativeMin = abs(min(spectrum))
     passFail = True if (positiveMax < (margainHigh / 100.0 + 1.0)) and\
         ((1.0 - negativeMin) < margainLow / 100.0) else False
-    RatioResult = np.zeros(len(amplitudeRatio), dtype=np.int16)
-    for i in range(len(amplitudeRatio)):
-        RatioResult[i] = amplitudeRatio[i] * 1024 # make fixed point
+    spectrumResult = np.zeros(len(spectrum), dtype=np.int16)
+    for i in range(len(spectrum)):
+        spectrumResult[i] = spectrum[i] * 1024 # make fixed point
     print "positiveMax", positiveMax, "negativeMin", negativeMin
-    return (passFail, negativeMin, positiveMax, RatioResult)
+    return (passFail, negativeMin, positiveMax, spectrumResult)
 
-def toMono(stereoData):
-    n = len(stereoData)/2
-    monoData = np.zeros(n)
-    for i in range(n):
-        monoData[i] = stereoData[2 * i]
-    return monoData
-
-def check_spectrum(inputData, inputTypes):
+def check_spectrum_playback(inputData, inputTypes):
     output = []
     outputData = []
     outputTypes = []
     # basic sanity check
     inputError = False
-    if (inputTypes[0] != TYPE_MONO) and (inputTypes[0] != TYPE_STEREO):
+    if (inputTypes[0] != TYPE_MONO):
         inputError = True
-    if (inputTypes[1] != TYPE_MONO) and (inputTypes[1] != TYPE_STEREO):
+    if (inputTypes[1] != TYPE_I64):
         inputError = True
     if (inputTypes[2] != TYPE_I64):
         inputError = True
     if (inputTypes[3] != TYPE_I64):
         inputError = True
-    if (inputTypes[4] != TYPE_I64):
+    if (inputTypes[4] != TYPE_DOUBLE):
         inputError = True
     if (inputTypes[5] != TYPE_DOUBLE):
         inputError = True
-    if (inputTypes[6] != TYPE_DOUBLE):
-        inputError = True
     if inputError:
-        print "input error"
         output.append(RESULT_ERROR)
         output.append(outputData)
         output.append(outputTypes)
         return output
     hostData = inputData[0]
-    if inputTypes[0] == TYPE_STEREO:
-        hostData = toMono(hostData)
-    dutData = inputData[1]
-    if inputTypes[1] == TYPE_STEREO:
-        dutData = toMono(dutData)
-    samplingRate = inputData[2]
-    fLow = inputData[3]
-    fHigh = inputData[4]
-    margainLow = inputData[5]
-    margainHigh = inputData[6]
-    delay = 0
-    N = 0
-    hostData_ = hostData
-    dutData_ = dutData
-    if len(hostData) > len(dutData):
-        delay = calc_delay.calc_delay(hostData, dutData)
-        N = len(dutData)
-        hostData_ = hostData[delay:delay+N]
-    if len(hostData) < len(dutData):
-        delay = calc_delay.calc_delay(dutData, hostData)
-        N = len(hostData)
-        dutData_ = dutData[delay:delay+N]
-
-    print "delay ", delay, "deviceRecording samples ", N
-    (passFail, minError, maxError, TF) = do_check_spectrum(hostData_, dutData_,\
+    samplingRate = inputData[1]
+    fLow = inputData[2]
+    fHigh = inputData[3]
+    margainLow = inputData[4]
+    margainHigh = inputData[5]
+    (passFail, minError, maxError, Spectrum) = do_check_spectrum_playback(hostData, \
         samplingRate, fLow, fHigh, margainLow, margainHigh)
 
     if passFail:
@@ -140,7 +106,7 @@ def check_spectrum(inputData, inputTypes):
     outputTypes.append(TYPE_DOUBLE)
     outputData.append(maxError)
     outputTypes.append(TYPE_DOUBLE)
-    outputData.append(TF)
+    outputData.append(Spectrum)
     outputTypes.append(TYPE_MONO)
     output.append(outputData)
     output.append(outputTypes)
@@ -158,7 +124,7 @@ if __name__=="__main__":
     data = getattr(mod, "do_gen_random")(peakAmpl, durationInMSec, samplingRate, fHigh,\
         stereo=False)
     print len(data)
-    (passFail, minVal, maxVal, ampRatio) = do_check_spectrum(data, data, samplingRate, fLow, fHigh,\
-        1.0, 1.0)
-    plt.plot(ampRatio)
+    (passFail, minVal, maxVal, amp) = do_check_spectrum_playback(data, samplingRate, fLow,\
+        fHigh, 1.0, 1.0)
+    plt.plot(amp)
     plt.show()

@@ -111,7 +111,7 @@ bool CmdStartPlayback::sendCommand(AudioParam& param)
     mBuffer[1] = htonl(20);
     mBuffer[2] = htonl(param.mId);
     mBuffer[3] = htonl(param.mSamplingF);
-    uint32_t mode = param.mStereo ? 1<<31 : 0;
+    uint32_t mode = param.mStereo ? 0x80000000 : 0;
     mode |= param.mMode;
     mBuffer[4] = htonl(mode);
     mBuffer[5] = htonl(param.mVolume);
@@ -132,7 +132,7 @@ bool CmdStartRecording::sendCommand(AudioParam& param)
     mBuffer[0] = htonl(ECmdStartRecording);
     mBuffer[1] = htonl(16);
     mBuffer[2] = htonl(param.mSamplingF);
-    uint32_t mode = param.mStereo ? 1<<31 : 0;
+    uint32_t mode = param.mStereo ? 0x80000000 : 0;
     mode |= param.mMode;
     mBuffer[3] = htonl(mode);
     mBuffer[4] = htonl(param.mVolume);

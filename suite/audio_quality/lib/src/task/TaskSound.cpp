@@ -51,7 +51,6 @@ bool TaskSound::parseAttribute(const android::String8& name, const android::Stri
 
 TaskGeneric::ExecutionResult TaskSound::run()
 {
-    //TODO : needs to support data generated from process
     android::String8 id;
     if (!findStringAttribute(STR_ID, id)) {
         LOGE("TaskSound::run %s string not found", STR_ID.string());
@@ -84,6 +83,7 @@ TaskGeneric::ExecutionResult TaskSound::run()
         buffer = AudioSignalFactory::generateSineWave(AudioHardware::E2BPS, amplitude,
                 AudioHardware::ESampleRate_44100, freq, samples, true);
     } else if (StringUtil::compare(tokens->at(0), "random") == 0) {
+        // TODO FIXME it does not seem to work well.
         if (tokens->size() != 3) {
             LOGE("Wrong number of parameters %d", tokens->size());
         }
