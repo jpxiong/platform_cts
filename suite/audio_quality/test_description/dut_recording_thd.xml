@@ -25,12 +25,12 @@
 	<action>
 		<sequential repeat="1" index="i">
 			<output device="host" id="sound1" gain="100" sync="start" waitforcompletion="0" />
-			<sequential repeat="5" index="j">
+			<sequential repeat="2" index="j">
 				<input device="host" id="host_in_$j" gain="100" time="4000" sync="start" />
 				<input device="DUT" id="dut_in_$j" gain="100" time="2000" sync="start" />
 			</sequential>
 		</sequential>
-		<sequential repeat="5" index="k">
+		<sequential repeat="2" index="k">
 			<!-- input: host record, device record, signal frequency in Hz, THD for pass in percentile, output: THD calculated -->
 			<process method="script:recording_thd" input="id:host_in_$k,id:dut_in_$k,consti:1000,constf:1.0" output="val:thd_host_$k,val:thd_device_$k" />
 		</sequential>
