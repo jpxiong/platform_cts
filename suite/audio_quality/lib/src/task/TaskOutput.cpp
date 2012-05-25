@@ -54,15 +54,13 @@ TaskGeneric::ExecutionResult TaskOutput::start()
         LOGE("prepare failed");
         return TaskGeneric::EResultError;
     }
+    android::sp<Buffer> buffer = getTestCase()->findBuffer(mId);
+    if (buffer.get() == NULL) {
+        LOGE("cannot find buffer %s", mId.string());
+        return TaskGeneric::EResultError;
+    }
+    buffer->restart(); // reset to play from beginning
     if (localDevice) {
-        android::sp<Buffer> buffer;
-        buffer = getTestCase()->findBuffer(mId);
-        if (buffer.get() == NULL) {
-            LOGE("cannot find buffer %s", mId.string());
-            return TaskGeneric::EResultError;
-        }
-        buffer->restart(); // reset to play from beginning
-
         if (!hw->startPlaybackOrRecord(buffer)) {
             LOGE("play failed");
             return TaskGeneric::EResultError;
@@ -73,7 +71,7 @@ TaskGeneric::ExecutionResult TaskOutput::start()
             return TaskGeneric::EResultError;
         }
         AudioRemotePlayback* remote = reinterpret_cast<AudioRemotePlayback*>(hw.get());
-        if (!remote->startPlaybackForRemoteData(id, false)) { // mono always
+        if (!remote->startPlaybackForRemoteData(id, buffer->isStereo())) {
             return TaskGeneric::EResultError;
         }
     }

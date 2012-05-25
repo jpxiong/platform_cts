@@ -15,8 +15,8 @@
      limitations under the License.
 -->
 
-<batch name="cts_audio_all" version="1.0" description="All tests">
-	<include file="host_speaker_calibration.xml" />
-	<include file="dut_recording_thd.xml" />
-	<include file="dut_recording_spectrum.xml" />
+<batch name="cts_audio_all_playback" version="1.0" description="All playback tests">
+	<include file="dut_speaker_calibration.xml" />
+	<include file="dut_playback_thd.xml" />
+	<include file="dut_playback_spectrum.xml" />
 </batch>

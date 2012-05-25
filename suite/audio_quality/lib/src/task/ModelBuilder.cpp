@@ -30,7 +30,8 @@ static const ModelBuilder::ChildInfo CASE_TABLE[] = {
 };
 static const ModelBuilder::ChildInfo SETUP_TABLE[] = {
     { TaskGeneric::ETaskSound, false },
-    { TaskGeneric::ETaskProcess, false }
+    { TaskGeneric::ETaskProcess, false },
+    { TaskGeneric::ETaskDownload, false }
 };
 static const ModelBuilder::ChildInfo ACTION_TABLE[] = {
     { TaskGeneric::ETaskSequential, true }
@@ -58,7 +59,8 @@ ModelBuilder::ParsingInfo ModelBuilder::mParsingTable[ModelBuilder::PARSING_TABL
     { "output", TaskGeneric::ETaskOutput, NULL, 0 },
     { "sound", TaskGeneric::ETaskSound, NULL, 0 },
     { "save", TaskGeneric::ETaskSave, NULL, 0 },
-    { "message", TaskGeneric::ETaskMessage, NULL, 0 }
+    { "message", TaskGeneric::ETaskMessage, NULL, 0 },
+    { "download", TaskGeneric::ETaskDownload, NULL, 0 }
 };
 
 

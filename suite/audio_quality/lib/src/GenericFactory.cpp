@@ -59,6 +59,9 @@ TaskGeneric* GenericFactory::createTask(TaskGeneric::TaskType type)
     case TaskGeneric::ETaskMessage:
         task = new TaskMessage();
         break;
+    case TaskGeneric::ETaskDownload:
+        task = new TaskDownload();
+        break;
     default:
         LOGE("GenericFactory::createTask unsupported type %d", type);
         return NULL;
