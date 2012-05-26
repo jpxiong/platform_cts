@@ -20,6 +20,7 @@ import com.android.cts.stub.R;
 
 
 import android.accounts.Account;
+import android.content.ContentProviderClient;
 import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
@@ -33,11 +34,15 @@ import android.os.Bundle;
 import android.os.CancellationSignal;
 import android.os.OperationCanceledException;
 import android.os.ParcelFileDescriptor;
+import android.os.RemoteException;
 import android.test.AndroidTestCase;
+import android.util.Log;
 
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
 
 public class ContentResolverTest extends AndroidTestCase {
@@ -50,6 +55,16 @@ public class ContentResolverTest extends AndroidTestCase {
     private static final Uri TABLE1_CROSS_URI =
             Uri.parse("content://" + AUTHORITY + "/testtable1/cross");
     private static final Uri TABLE2_URI = Uri.parse("content://" + AUTHORITY + "/testtable2/");
+    private static final Uri SELF_URI = Uri.parse("content://" + AUTHORITY + "/self/");
+    private static final Uri CRASH_URI = Uri.parse("content://" + AUTHORITY + "/crash/");
+
+    private static final String REMOTE_AUTHORITY = "remotectstest";
+    private static final Uri REMOTE_TABLE1_URI = Uri.parse("content://"
+                + REMOTE_AUTHORITY + "/testtable1/");
+    private static final Uri REMOTE_SELF_URI = Uri.parse("content://"
+                + REMOTE_AUTHORITY + "/self/");
+    private static final Uri REMOTE_CRASH_URI = Uri.parse("content://"
+            + REMOTE_AUTHORITY + "/crash/");
 
     private static final Account ACCOUNT = new Account("cts", "cts");
 
@@ -73,20 +88,25 @@ public class ContentResolverTest extends AndroidTestCase {
         mContext = getContext();
         mContentResolver = mContext.getContentResolver();
 
+        android.provider.Settings.System.putInt(mContentResolver, "__cts_crash_on_launch", 0);
+
         // add three rows to database when every test case start.
         ContentValues values = new ContentValues();
 
         values.put(COLUMN_KEY_NAME, KEY1);
         values.put(COLUMN_VALUE_NAME, VALUE1);
         mContentResolver.insert(TABLE1_URI, values);
+        mContentResolver.insert(REMOTE_TABLE1_URI, values);
 
         values.put(COLUMN_KEY_NAME, KEY2);
         values.put(COLUMN_VALUE_NAME, VALUE2);
         mContentResolver.insert(TABLE1_URI, values);
+        mContentResolver.insert(REMOTE_TABLE1_URI, values);
 
         values.put(COLUMN_KEY_NAME, KEY3);
         values.put(COLUMN_VALUE_NAME, VALUE3);
         mContentResolver.insert(TABLE1_URI, values);
+        mContentResolver.insert(REMOTE_TABLE1_URI, values);
     }
 
     @Override
@@ -95,11 +115,134 @@ public class ContentResolverTest extends AndroidTestCase {
         if ( null != mCursor && !mCursor.isClosed() ) {
             mCursor.close();
         }
+        mContentResolver.delete(REMOTE_TABLE1_URI, null, null);
+        if ( null != mCursor && !mCursor.isClosed() ) {
+            mCursor.close();
+        }
         super.tearDown();
     }
 
     public void testConstructor() {
         assertNotNull(mContentResolver);
+    }
+
+    public void testCrashOnLaunch() {
+        // This test is going to make sure that the platform deals correctly
+        // with a content provider process going away while a client is waiting
+        // for it to come up.
+        // First, we need to make sure our provider process is gone.  Goodbye!
+        ContentProviderClient client = mContentResolver.acquireContentProviderClient(
+                REMOTE_AUTHORITY);
+        // We are going to do something wrong here...  release the client first,
+        // so the act of killing it doesn't kill our own process.
+        client.release();
+        try {
+            client.delete(REMOTE_SELF_URI, null, null);
+        } catch (RemoteException e) {
+        }
+        // Now make sure the thing is actually gone.
+        boolean gone = true;
+        try {
+            client.getType(REMOTE_TABLE1_URI);
+            gone = false;
+        } catch (RemoteException e) {
+        }
+        if (!gone) {
+            fail("Content provider process is not gone!");
+        }
+        try {
+            android.provider.Settings.System.putInt(mContentResolver, "__cts_crash_on_launch", 1);
+            String type1 = mContentResolver.getType(REMOTE_TABLE1_URI);
+            assertEquals(android.provider.Settings.System.getInt(mContentResolver,
+                "__cts_crash_on_launch", 0), 0);
+            assertTrue(type1.startsWith(ContentResolver.CURSOR_DIR_BASE_TYPE, 0));
+        } finally {
+            android.provider.Settings.System.putInt(mContentResolver, "__cts_crash_on_launch", 0);
+        }
+    }
+
+    public void testUnstableToStableRefs() {
+        // Get an unstable refrence on the remote content provider.
+        ContentProviderClient uClient = mContentResolver.acquireUnstableContentProviderClient(
+                REMOTE_AUTHORITY);
+        // Verify we can access it.
+        String type1 = mContentResolver.getType(REMOTE_TABLE1_URI);
+        assertTrue(type1.startsWith(ContentResolver.CURSOR_DIR_BASE_TYPE, 0));
+
+        // Get a stable reference on the remote content provider.
+        ContentProviderClient sClient = mContentResolver.acquireContentProviderClient(
+                REMOTE_AUTHORITY);
+        // Verify we can still access it.
+        type1 = mContentResolver.getType(REMOTE_TABLE1_URI);
+        assertTrue(type1.startsWith(ContentResolver.CURSOR_DIR_BASE_TYPE, 0));
+
+        // Release unstable reference.
+        uClient.release();
+        // Verify we can still access it.
+        type1 = mContentResolver.getType(REMOTE_TABLE1_URI);
+        assertTrue(type1.startsWith(ContentResolver.CURSOR_DIR_BASE_TYPE, 0));
+
+        // Release stable reference, removing last ref.
+        sClient.release();
+        // Kill it.  Note that a bug at this point where it causes our own
+        // process to be killed will result in the entire test failing.
+        try {
+            Log.i("ContentResolverTest",
+                    "Killing remote client -- if test process goes away, that is why!");
+            uClient.delete(REMOTE_SELF_URI, null, null);
+        } catch (RemoteException e) {
+        }
+        // Make sure the remote client is actually gone.
+        boolean gone = true;
+        try {
+            sClient.getType(REMOTE_TABLE1_URI);
+            gone = false;
+        } catch (RemoteException e) {
+        }
+        if (!gone) {
+            fail("Content provider process is not gone!");
+        }
+    }
+
+    public void testStableToUnstableRefs() {
+        // Get a stable reference on the remote content provider.
+        ContentProviderClient sClient = mContentResolver.acquireContentProviderClient(
+                REMOTE_AUTHORITY);
+        // Verify we can still access it.
+        String type1 = mContentResolver.getType(REMOTE_TABLE1_URI);
+        assertTrue(type1.startsWith(ContentResolver.CURSOR_DIR_BASE_TYPE, 0));
+        
+        // Get an unstable refrence on the remote content provider.
+        ContentProviderClient uClient = mContentResolver.acquireUnstableContentProviderClient(
+                REMOTE_AUTHORITY);
+        // Verify we can access it.
+        type1 = mContentResolver.getType(REMOTE_TABLE1_URI);
+        assertTrue(type1.startsWith(ContentResolver.CURSOR_DIR_BASE_TYPE, 0));
+
+        // Release stable reference, leaving only an unstable ref.
+        sClient.release();
+
+        // Kill it.  Note that a bug at this point where it causes our own
+        // process to be killed will result in the entire test failing.
+        try {
+            Log.i("ContentResolverTest",
+                    "Killing remote client -- if test process goes away, that is why!");
+            uClient.delete(REMOTE_SELF_URI, null, null);
+        } catch (RemoteException e) {
+        }
+        // Make sure the remote client is actually gone.
+        boolean gone = true;
+        try {
+            uClient.getType(REMOTE_TABLE1_URI);
+            gone = false;
+        } catch (RemoteException e) {
+        }
+        if (!gone) {
+            fail("Content provider process is not gone!");
+        }
+
+        // Release unstable reference.
+        uClient.release();
     }
 
     public void testGetType() {
@@ -118,6 +261,43 @@ public class ContentResolverTest extends AndroidTestCase {
         } catch (NullPointerException e) {
             //expected.
         }
+    }
+
+    public void testUnstableGetType() {
+        // Get an unstable refrence on the remote content provider.
+        ContentProviderClient client = mContentResolver.acquireUnstableContentProviderClient(
+                REMOTE_AUTHORITY);
+        // Verify we can access it.
+        String type1 = mContentResolver.getType(REMOTE_TABLE1_URI);
+        assertTrue(type1.startsWith(ContentResolver.CURSOR_DIR_BASE_TYPE, 0));
+
+        // Kill it.  Note that a bug at this point where it causes our own
+        // process to be killed will result in the entire test failing.
+        try {
+            Log.i("ContentResolverTest",
+                    "Killing remote client -- if test process goes away, that is why!");
+            client.delete(REMOTE_SELF_URI, null, null);
+        } catch (RemoteException e) {
+        }
+        // Make sure the remote client is actually gone.
+        boolean gone = true;
+        try {
+            client.getType(REMOTE_TABLE1_URI);
+            gone = false;
+        } catch (RemoteException e) {
+        }
+        if (!gone) {
+            fail("Content provider process is not gone!");
+        }
+
+        // Now the remote client is gone, can we recover?
+        // Release our old reference.
+        client.release();
+        // Get a new reference.
+        client = mContentResolver.acquireUnstableContentProviderClient(REMOTE_AUTHORITY);
+        // Verify we can access it.
+        type1 = mContentResolver.getType(REMOTE_TABLE1_URI);
+        assertTrue(type1.startsWith(ContentResolver.CURSOR_DIR_BASE_TYPE, 0));
     }
 
     public void testQuery() {
@@ -168,6 +348,32 @@ public class ContentResolverTest extends AndroidTestCase {
         } catch (NullPointerException e) {
             //expected.
         }
+    }
+
+    public void testCrashingQuery() {
+        try {
+            android.provider.Settings.System.putInt(mContentResolver, "__cts_crash_on_launch", 1);
+            mCursor = mContentResolver.query(REMOTE_CRASH_URI, null, null, null, null);
+            assertEquals(android.provider.Settings.System.getInt(mContentResolver,
+                "__cts_crash_on_launch", 0), 0);
+        } finally {
+            android.provider.Settings.System.putInt(mContentResolver, "__cts_crash_on_launch", 0);
+        }
+
+        assertNotNull(mCursor);
+        assertEquals(3, mCursor.getCount());
+        assertEquals(3, mCursor.getColumnCount());
+
+        mCursor.moveToLast();
+        assertEquals(3, mCursor.getInt(mCursor.getColumnIndexOrThrow(COLUMN_ID_NAME)));
+        assertEquals(KEY3, mCursor.getString(mCursor.getColumnIndexOrThrow(COLUMN_KEY_NAME)));
+        assertEquals(VALUE3, mCursor.getInt(mCursor.getColumnIndexOrThrow(COLUMN_VALUE_NAME)));
+
+        mCursor.moveToPrevious();
+        assertEquals(2, mCursor.getInt(mCursor.getColumnIndexOrThrow(COLUMN_ID_NAME)));
+        assertEquals(KEY2, mCursor.getString(mCursor.getColumnIndexOrThrow(COLUMN_KEY_NAME)));
+        assertEquals(VALUE2, mCursor.getInt(mCursor.getColumnIndexOrThrow(COLUMN_VALUE_NAME)));
+        mCursor.close();
     }
 
     public void testCancelableQuery_WhenNotCanceled_ReturnsResultSet() {
@@ -332,6 +538,98 @@ public class ContentResolverTest extends AndroidTestCase {
         } catch (FileNotFoundException e) {
             //expected.
         }
+    }
+
+    private String consumeAssetFileDescriptor(AssetFileDescriptor afd)
+            throws IOException {
+        FileInputStream stream = null;
+        try {
+            stream = afd.createInputStream();
+            InputStreamReader reader = new InputStreamReader(stream, "UTF-8");
+
+            // Got it...  copy the stream into a local string and return it.
+            StringBuilder builder = new StringBuilder(128);
+            char[] buffer = new char[8192];
+            int len;
+            while ((len=reader.read(buffer)) > 0) {
+                builder.append(buffer, 0, len);
+            }
+            return builder.toString();
+
+        } finally {
+            if (stream != null) {
+                try {
+                    stream.close();
+                } catch (IOException e) {
+                }
+            }
+        }
+        
+    }
+
+    public void testCrashingOpenAssetFileDescriptor() throws IOException {
+        AssetFileDescriptor afd = null;
+        try {
+            android.provider.Settings.System.putInt(mContentResolver, "__cts_crash_on_launch", 1);
+            afd = mContentResolver.openAssetFileDescriptor(REMOTE_CRASH_URI, "rw");
+            assertEquals(android.provider.Settings.System.getInt(mContentResolver,
+                    "__cts_crash_on_launch", 0), 0);
+            assertNotNull(afd);
+            String str = consumeAssetFileDescriptor(afd);
+            afd = null;
+            assertEquals(str, "This is the openAssetFile test data!");
+        } finally {
+            android.provider.Settings.System.putInt(mContentResolver, "__cts_crash_on_launch", 0);
+            if (afd != null) {
+                afd.close();
+            }
+        }
+
+        // Make sure a content provider crash at this point won't hurt us.
+        ContentProviderClient uClient = mContentResolver.acquireUnstableContentProviderClient(
+                REMOTE_AUTHORITY);
+        // Kill it.  Note that a bug at this point where it causes our own
+        // process to be killed will result in the entire test failing.
+        try {
+            Log.i("ContentResolverTest",
+                    "Killing remote client -- if test process goes away, that is why!");
+            uClient.delete(REMOTE_SELF_URI, null, null);
+        } catch (RemoteException e) {
+        }
+        uClient.release();
+    }
+
+    public void testCrashingOpenTypedAssetFileDescriptor() throws IOException {
+        AssetFileDescriptor afd = null;
+        try {
+            android.provider.Settings.System.putInt(mContentResolver, "__cts_crash_on_launch", 1);
+            afd = mContentResolver.openTypedAssetFileDescriptor(
+                    REMOTE_CRASH_URI, "text/plain", null);
+            assertEquals(android.provider.Settings.System.getInt(mContentResolver,
+                    "__cts_crash_on_launch", 0), 0);
+            assertNotNull(afd);
+            String str = consumeAssetFileDescriptor(afd);
+            afd = null;
+            assertEquals(str, "This is the openTypedAssetFile test data!");
+        } finally {
+            android.provider.Settings.System.putInt(mContentResolver, "__cts_crash_on_launch", 0);
+            if (afd != null) {
+                afd.close();
+            }
+        }
+
+        // Make sure a content provider crash at this point won't hurt us.
+        ContentProviderClient uClient = mContentResolver.acquireUnstableContentProviderClient(
+                REMOTE_AUTHORITY);
+        // Kill it.  Note that a bug at this point where it causes our own
+        // process to be killed will result in the entire test failing.
+        try {
+            Log.i("ContentResolverTest",
+                    "Killing remote client -- if test process goes away, that is why!");
+            uClient.delete(REMOTE_SELF_URI, null, null);
+        } catch (RemoteException e) {
+        }
+        uClient.release();
     }
 
     public void testOpenFileDescriptor() throws IOException {

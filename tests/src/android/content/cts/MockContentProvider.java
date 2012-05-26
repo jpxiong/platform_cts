@@ -16,6 +16,12 @@
 
 package android.content.cts;
 
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
+import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
 
 import android.content.ContentProvider;
@@ -23,37 +29,47 @@ import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.UriMatcher;
+import android.content.ContentProvider.PipeDataWriter;
+import android.content.res.AssetFileDescriptor;
 import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.database.sqlite.SQLiteQueryBuilder;
 import android.net.Uri;
+import android.os.Bundle;
 import android.os.CancellationSignal;
+import android.os.ParcelFileDescriptor;
 import android.text.TextUtils;
+import android.util.Log;
 
-public class MockContentProvider extends ContentProvider {
+public class MockContentProvider extends ContentProvider
+        implements PipeDataWriter<String> {
 
     private SQLiteOpenHelper mOpenHelper;
 
-    private static final String AUTHORITY = "ctstest";
-    private static final String DBNAME = "ctstest.db";
+    private static final String DEFAULT_AUTHORITY = "ctstest";
+    private static final String DEFAULT_DBNAME = "ctstest.db";
     private static final int DBVERSION = 2;
 
-    private static final UriMatcher URL_MATCHER;
     private static final int TESTTABLE1 = 1;
     private static final int TESTTABLE1_ID = 2;
     private static final int TESTTABLE1_CROSS = 3;
     private static final int TESTTABLE2 = 4;
     private static final int TESTTABLE2_ID = 5;
+    private static final int SELF_ID = 6;
+    private static final int CRASH_ID = 6;
 
-    private static HashMap<String, String> CTSDBTABLE1_LIST_PROJECTION_MAP;
-    private static HashMap<String, String> CTSDBTABLE2_LIST_PROJECTION_MAP;
+    private final String mAuthority;
+    private final String mDbName;
+    private final UriMatcher URL_MATCHER;
+    private HashMap<String, String> CTSDBTABLE1_LIST_PROJECTION_MAP;
+    private HashMap<String, String> CTSDBTABLE2_LIST_PROJECTION_MAP;
 
     private static class DatabaseHelper extends SQLiteOpenHelper {
 
-        DatabaseHelper(Context context) {
-            super(context, DBNAME, null, DBVERSION);
+        DatabaseHelper(Context context, String dbname) {
+            super(context, dbname, null, DBVERSION);
         }
 
         @Override
@@ -75,9 +91,46 @@ public class MockContentProvider extends ContentProvider {
         }
     }
 
+    public MockContentProvider() {
+        this(DEFAULT_AUTHORITY, DEFAULT_DBNAME);
+    }
+
+    public MockContentProvider(String authority, String dbName) {
+        mAuthority = authority;
+        mDbName = dbName;
+
+        URL_MATCHER = new UriMatcher(UriMatcher.NO_MATCH);
+        URL_MATCHER.addURI(mAuthority, "testtable1", TESTTABLE1);
+        URL_MATCHER.addURI(mAuthority, "testtable1/#", TESTTABLE1_ID);
+        URL_MATCHER.addURI(mAuthority, "testtable1/cross", TESTTABLE1_CROSS);
+        URL_MATCHER.addURI(mAuthority, "testtable2", TESTTABLE2);
+        URL_MATCHER.addURI(mAuthority, "testtable2/#", TESTTABLE2_ID);
+        URL_MATCHER.addURI(mAuthority, "self", SELF_ID);
+        URL_MATCHER.addURI(mAuthority, "crash", CRASH_ID);
+
+        CTSDBTABLE1_LIST_PROJECTION_MAP = new HashMap<String, String>();
+        CTSDBTABLE1_LIST_PROJECTION_MAP.put("_id", "_id");
+        CTSDBTABLE1_LIST_PROJECTION_MAP.put("key", "key");
+        CTSDBTABLE1_LIST_PROJECTION_MAP.put("value", "value");
+
+        CTSDBTABLE2_LIST_PROJECTION_MAP = new HashMap<String, String>();
+        CTSDBTABLE2_LIST_PROJECTION_MAP.put("_id", "_id");
+        CTSDBTABLE2_LIST_PROJECTION_MAP.put("key", "key");
+        CTSDBTABLE2_LIST_PROJECTION_MAP.put("value", "value");
+    }
+
     @Override
     public boolean onCreate() {
-        mOpenHelper = new DatabaseHelper(getContext());
+        mOpenHelper = new DatabaseHelper(getContext(), mDbName);
+        if (android.provider.Settings.System.getInt(getContext().getContentResolver(),
+                "__cts_crash_on_launch", 0) != 0) {
+            // The test case wants us to crash our process on first launch.
+            // Well, okay then!
+            Log.i("MockContentProvider", "TEST IS CRASHING SELF, CROSS FINGERS!");
+            android.provider.Settings.System.putInt(getContext().getContentResolver(),
+                    "__cts_crash_on_launch", 0);
+            android.os.Process.killProcess(android.os.Process.myPid());
+        }
         return true;
     }
 
@@ -109,6 +162,12 @@ public class MockContentProvider extends ContentProvider {
             count = db.delete("TestTable2", "_id=" + segment +
                     (!TextUtils.isEmpty(selection) ? " AND (" + selection + ')' : ""),
                     selectionArgs);
+            break;
+        case SELF_ID:
+            // Wha...?  Delete ME?!?  O.K.!
+            Log.i("MockContentProvider", "Delete self requested!");
+            count = 1;
+            android.os.Process.killProcess(android.os.Process.myPid());
             break;
         default:
             throw new IllegalArgumentException("Unknown URL " + uri);
@@ -155,11 +214,11 @@ public class MockContentProvider extends ContentProvider {
         switch (URL_MATCHER.match(uri)) {
         case TESTTABLE1:
             table = "TestTable1";
-            testUri = Uri.parse("content://" + AUTHORITY + "/testtable1");
+            testUri = Uri.parse("content://" + mAuthority + "/testtable1");
             break;
         case TESTTABLE2:
             table = "TestTable2";
-            testUri = Uri.parse("content://" + AUTHORITY + "/testtable2");
+            testUri = Uri.parse("content://" + mAuthority + "/testtable2");
             break;
         default:
             throw new IllegalArgumentException("Unknown URL " + uri);
@@ -215,6 +274,20 @@ public class MockContentProvider extends ContentProvider {
         case TESTTABLE2_ID:
             qb.setTables("TestTable2");
             qb.appendWhere("_id=" + uri.getPathSegments().get(1));
+            break;
+
+        case CRASH_ID:
+            if (android.provider.Settings.System.getInt(getContext().getContentResolver(),
+                    "__cts_crash_on_launch", 0) != 0) {
+                // The test case wants us to crash while querying.
+                // Well, okay then!
+                Log.i("MockContentProvider", "TEST IS CRASHING SELF, CROSS FINGERS!");
+                android.provider.Settings.System.putInt(getContext().getContentResolver(),
+                        "__cts_crash_on_launch", 0);
+                android.os.Process.killProcess(android.os.Process.myPid());
+            }
+            qb.setTables("TestTable1");
+            qb.setProjectionMap(CTSDBTABLE1_LIST_PROJECTION_MAP);
             break;
 
         default:
@@ -274,22 +347,71 @@ public class MockContentProvider extends ContentProvider {
         return count;
     }
 
-    static {
-        URL_MATCHER = new UriMatcher(UriMatcher.NO_MATCH);
-        URL_MATCHER.addURI(AUTHORITY, "testtable1", TESTTABLE1);
-        URL_MATCHER.addURI(AUTHORITY, "testtable1/#", TESTTABLE1_ID);
-        URL_MATCHER.addURI(AUTHORITY, "testtable1/cross", TESTTABLE1_CROSS);
-        URL_MATCHER.addURI(AUTHORITY, "testtable2", TESTTABLE2);
-        URL_MATCHER.addURI(AUTHORITY, "testtable2/#", TESTTABLE2_ID);
+    @Override
+    public AssetFileDescriptor openAssetFile(Uri uri, String mode) throws FileNotFoundException {
+        switch (URL_MATCHER.match(uri)) {
+            case CRASH_ID:
+                if (android.provider.Settings.System.getInt(getContext().getContentResolver(),
+                        "__cts_crash_on_launch", 0) != 0) {
+                    // The test case wants us to crash while querying.
+                    // Well, okay then!
+                    Log.i("MockContentProvider", "TEST IS CRASHING SELF, CROSS FINGERS!");
+                    android.provider.Settings.System.putInt(getContext().getContentResolver(),
+                            "__cts_crash_on_launch", 0);
+                    android.os.Process.killProcess(android.os.Process.myPid());
+                }
+                return new AssetFileDescriptor(
+                        openPipeHelper(uri, null, null,
+                                "This is the openAssetFile test data!", this), 0,
+                        AssetFileDescriptor.UNKNOWN_LENGTH);
 
-        CTSDBTABLE1_LIST_PROJECTION_MAP = new HashMap<String, String>();
-        CTSDBTABLE1_LIST_PROJECTION_MAP.put("_id", "_id");
-        CTSDBTABLE1_LIST_PROJECTION_MAP.put("key", "key");
-        CTSDBTABLE1_LIST_PROJECTION_MAP.put("value", "value");
+            default:
+                return super.openAssetFile(uri, mode);
+        }
+    }
 
-        CTSDBTABLE2_LIST_PROJECTION_MAP = new HashMap<String, String>();
-        CTSDBTABLE2_LIST_PROJECTION_MAP.put("_id", "_id");
-        CTSDBTABLE2_LIST_PROJECTION_MAP.put("key", "key");
-        CTSDBTABLE2_LIST_PROJECTION_MAP.put("value", "value");
+    @Override
+    public AssetFileDescriptor openTypedAssetFile(Uri uri, String mimeTypeFilter, Bundle opts)
+            throws FileNotFoundException {
+        switch (URL_MATCHER.match(uri)) {
+            case CRASH_ID:
+                if (android.provider.Settings.System.getInt(getContext().getContentResolver(),
+                        "__cts_crash_on_launch", 0) != 0) {
+                    // The test case wants us to crash while querying.
+                    // Well, okay then!
+                    Log.i("MockContentProvider", "TEST IS CRASHING SELF, CROSS FINGERS!");
+                    android.provider.Settings.System.putInt(getContext().getContentResolver(),
+                            "__cts_crash_on_launch", 0);
+                    android.os.Process.killProcess(android.os.Process.myPid());
+                }
+                return new AssetFileDescriptor(
+                        openPipeHelper(uri, null, null,
+                                "This is the openTypedAssetFile test data!", this), 0,
+                        AssetFileDescriptor.UNKNOWN_LENGTH);
+
+            default:
+                return super.openTypedAssetFile(uri, mimeTypeFilter, opts);
+        }
+    }
+
+    @Override
+    public void writeDataToPipe(ParcelFileDescriptor output, Uri uri, String mimeType, Bundle opts,
+            String args) {
+        FileOutputStream fout = new FileOutputStream(output.getFileDescriptor());
+        PrintWriter pw = null;
+        try {
+            pw = new PrintWriter(new OutputStreamWriter(fout, "UTF-8"));
+            pw.print(args);
+        } catch (UnsupportedEncodingException e) {
+            Log.w("MockContentProvider", "Ooops", e);
+        } finally {
+            if (pw != null) {
+                pw.flush();
+            }
+            try {
+                fout.close();
+            } catch (IOException e) {
+            }
+        }
     }
 }
