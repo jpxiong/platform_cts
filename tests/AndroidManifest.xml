@@ -828,7 +828,10 @@
         <provider android:name="android.content.cts.DummyProvider"
             android:authorities="android.content.cts.dummyprovider"
             android:multiprocess="true" />
-
+        <provider android:name="android.content.cts.MockRemoteContentProvider"
+            android:authorities="remotectstest"
+            android:process=":remoteprovider" android:multiprocess="false" />
+        
         <activity android:name="android.app.cts.ChildTabActivity" android:label="ChildTabActivity" />
 
         <activity android:name="android.app.cts.LauncherActivityStub"
