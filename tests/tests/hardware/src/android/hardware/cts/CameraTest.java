@@ -2622,6 +2622,16 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
         for (Face[] faces: listener.mFacesArray) {
             testFaces(faces, maxNumOfFaces, optionalFieldSupported);
         }
+
+        // After taking a picture, face detection should be started again.
+        initializeMessageLooper(cameraId);
+        mCamera.startPreview();
+        mCamera.startFaceDetection();
+        mCamera.takePicture(mShutterCallback, mRawPictureCallback, mJpegPictureCallback);
+        waitForSnapshotDone();
+        mCamera.startPreview();
+        mCamera.startFaceDetection();
+        terminateMessageLooper();
     }
 
     private class FaceListener implements FaceDetectionListener {
