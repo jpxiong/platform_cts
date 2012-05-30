@@ -45,6 +45,7 @@ import android.view.SurfaceHolder;
 import android.view.View;
 import android.view.Window;
 import android.view.ViewGroup.LayoutParams;
+import android.util.DisplayMetrics;
 
 import com.android.cts.stub.R;
 
@@ -71,10 +72,11 @@ public class InstrumentationTest extends InstrumentationTestCase {
         mContext = mInstrumentation.getTargetContext();
         final long downTime = SystemClock.uptimeMillis();
         final long eventTime = SystemClock.uptimeMillis();
-        // use coordinates for MotionEvent that do not include the status bar
-        // TODO: is there a more deterministic way to get these values
-        final long x = 55;
-        final long y = 55;
+        //Use the middle of the screen to avoid the status bar.
+        DisplayMetrics metrics = mContext.getResources().getDisplayMetrics();
+        final long x = metrics.widthPixels/2;
+        final long y = metrics.heightPixels/2;
+
         final int metaState = 0;
         mMotionEvent = MotionEvent.obtain(downTime, eventTime, MotionEvent.ACTION_DOWN, x, y,
                 metaState);
