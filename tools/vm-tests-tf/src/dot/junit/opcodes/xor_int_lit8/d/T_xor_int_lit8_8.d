@@ -27,7 +27,7 @@
 .method public run(I)I
 .limit regs 3
 
-       xor-int/lit16 v1, v3, 8
+       xor-int/lit8 v1, v3, 8
        return v1
 .end method
 
