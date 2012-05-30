@@ -2445,7 +2445,14 @@ public class ViewTest extends ActivityInstrumentationTestCase2<ViewTestStubActiv
     }
 
     public void testWindowFocusChanged() {
-        MockView view = (MockView) mActivity.findViewById(R.id.mock_view);
+        final MockView view = (MockView) mActivity.findViewById(R.id.mock_view);
+
+        new PollingCheck() {
+            protected boolean check() {
+                return view.hasCalledOnWindowFocusChanged();
+            }
+        }.run();
+
         assertTrue(view.hasCalledOnWindowFocusChanged());
         assertTrue(view.hasCalledDispatchWindowFocusChanged());
 
