@@ -94,6 +94,7 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
     private JpegPictureCallback mJpegPictureCallback = new JpegPictureCallback();
     private TestErrorCallback mErrorCallback = new TestErrorCallback();
     private AutoFocusCallback mAutoFocusCallback = new AutoFocusCallback();
+    private AutoFocusMoveCallback mAutoFocusMoveCallback = new AutoFocusMoveCallback();
 
     private Looper mLooper = null;
     private final ConditionVariable mPreviewDone = new ConditionVariable();
@@ -261,6 +262,13 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
             mAutoFocusSucceeded = success;
             Log.v(TAG, "AutoFocusCallback success=" + success);
             mFocusDone.open();
+        }
+    }
+
+    private final class AutoFocusMoveCallback
+            implements android.hardware.Camera.AutoFocusMoveCallback {
+        @Override
+        public void onAutoFocusMoving(boolean start, Camera camera) {
         }
     }
 
@@ -2624,7 +2632,9 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
         }
 
         // After taking a picture, face detection should be started again.
+        // Also make sure autofocus move callback is supported.
         initializeMessageLooper(cameraId);
+        mCamera.setAutoFocusMoveCallback(mAutoFocusMoveCallback);
         mCamera.startPreview();
         mCamera.startFaceDetection();
         mCamera.takePicture(mShutterCallback, mRawPictureCallback, mJpegPictureCallback);
