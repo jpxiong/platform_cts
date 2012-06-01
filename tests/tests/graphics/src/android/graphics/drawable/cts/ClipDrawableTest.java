@@ -397,7 +397,7 @@ public class ClipDrawableTest extends AndroidTestCase {
         }
     }
 
-    private class MockCallback implements Drawable.Callback2 {
+    private class MockCallback implements Drawable.Callback {
         private Drawable mInvalidateDrawable;
         private Drawable mScheduleDrawable;
         private Runnable mRunnable;

@@ -567,17 +567,6 @@ public class DrawableTest extends AndroidTestCase {
         assertSame(mockDrawable, mockDrawable.mutate());
     }
 
-    public void getResolvedLayoutDirectionSelf() {
-        MockDrawable mockDrawable = new MockDrawable();
-        MockCallback mockCallback = new MockCallback(1);
-        mockDrawable.setCallback(mockCallback);
-        assertEquals(1, mockDrawable.getResolvedLayoutDirectionSelf());
-
-        mockCallback = new MockCallback(0);
-        mockDrawable.setCallback(mockCallback);
-        assertEquals(0, mockDrawable.getResolvedLayoutDirectionSelf());
-    }
-
     private static class MockDrawable extends Drawable {
         private ColorFilter mColorFilter;
 
@@ -612,20 +601,13 @@ public class DrawableTest extends AndroidTestCase {
         }
     }
 
-    private static class MockCallback implements Drawable.Callback2 {
+    private static class MockCallback implements Drawable.Callback {
         private Drawable mInvalidateDrawable;
         private Drawable mScheduleDrawable;
         private Runnable mRunnable;
         private long mWhen;
-        private int mLayoutDirection;
 
         public MockCallback() {
-            // 0 for LTR layout direction
-            this(0);
-        }
-
-        public MockCallback(int direction) {
-            mLayoutDirection = direction;
         }
 
         public Drawable getInvalidateDrawable() {
@@ -657,10 +639,6 @@ public class DrawableTest extends AndroidTestCase {
         public void unscheduleDrawable(Drawable who, Runnable what) {
             mScheduleDrawable = who;
             mRunnable = what;
-        }
-
-        public int getResolvedLayoutDirection(Drawable who) {
-            return mLayoutDirection;
         }
     }
 }

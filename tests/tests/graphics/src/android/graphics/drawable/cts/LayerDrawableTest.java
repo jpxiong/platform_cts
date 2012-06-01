@@ -335,7 +335,7 @@ public class LayerDrawableTest extends AndroidTestCase {
         assertFalse(cb.hasCalledUnschedule());
     }
 
-    private static class MockCallback implements Drawable.Callback2 {
+    private static class MockCallback implements Drawable.Callback {
         private boolean mCalledInvalidate;
         private boolean mCalledSchedule;
         private boolean mCalledUnschedule;
