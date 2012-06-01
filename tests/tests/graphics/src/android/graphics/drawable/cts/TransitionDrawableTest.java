@@ -242,7 +242,7 @@ public class TransitionDrawableTest extends InstrumentationTestCase {
         }
     }
 
-    private class MockCallBack implements Drawable.Callback2 {
+    private class MockCallBack implements Drawable.Callback {
         private boolean mHasCalledInvalidateDrawable;
 
         public boolean hasCalledInvalidateDrawable() {

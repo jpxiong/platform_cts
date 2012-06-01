@@ -231,7 +231,7 @@ public class RotateDrawableTest extends AndroidTestCase {
         assertEquals(50, ((BitmapDrawable) d3.getDrawable()).getPaint().getAlpha());
     }
 
-    private static class MockCallback implements Drawable.Callback2 {
+    private static class MockCallback implements Drawable.Callback {
         private boolean mCalledInvalidate;
         private boolean mCalledSchedule;
         private boolean mCalledUnschedule;

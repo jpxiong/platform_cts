@@ -943,7 +943,7 @@ public class DrawableContainerTest extends TestCase {
         }
     }
 
-    private class MockCallBack implements Drawable.Callback2 {
+    private class MockCallBack implements Drawable.Callback {
         private boolean mCalledInvalidateDrawable;
 
         private boolean mCalledScheduleDrawable;
