@@ -92,7 +92,7 @@ public class ViewTest extends ActivityInstrumentationTestCase2<ViewTestStubActiv
     private Activity mActivity;
 
     /** timeout delta when wait in case the system is sluggish */
-    private static final long TIMEOUT_DELTA = 1000;
+    private static final long TIMEOUT_DELTA = 10000;
 
     private static final String LOG_TAG = "ViewTest";
 
@@ -3072,26 +3072,31 @@ public class ViewTest extends ActivityInstrumentationTestCase2<ViewTestStubActiv
         assertTrue(view.performHapticFeedback(LONG_PRESS, FLAG_IGNORE_GLOBAL_SETTING));
     }
 
-    @UiThreadTest
-    public void testInputConnection() {
+    public void testInputConnection() throws Throwable {
         final InputMethodManager imm = InputMethodManager.getInstance(getActivity());
         final MockView view = (MockView) mActivity.findViewById(R.id.mock_view);
         final ViewGroup viewGroup = (ViewGroup) mActivity.findViewById(R.id.viewlayout_root);
         final MockEditText editText = new MockEditText(mActivity);
 
-        viewGroup.addView(editText);
-        editText.requestFocus();
+        runTestOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                viewGroup.addView(editText);
+                editText.requestFocus();
+            }
+        });
+        getInstrumentation().waitForIdleSync();
+        assertTrue(editText.isFocused());
+
+        runTestOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                imm.showSoftInput(editText, 0);
+            }
+        });
+        getInstrumentation().waitForIdleSync();
 
         new PollingCheck(TIMEOUT_DELTA) {
-            @Override
-            protected boolean check() {
-                return editText.isFocused();
-            }
-        }.run();
-
-        imm.showSoftInput(editText, 0);
-
-        new PollingCheck() {
             @Override
             protected boolean check() {
                 return editText.hasCalledOnCreateInputConnection();
@@ -3099,11 +3104,16 @@ public class ViewTest extends ActivityInstrumentationTestCase2<ViewTestStubActiv
         }.run();
 
         assertTrue(editText.hasCalledOnCheckIsTextEditor());
-        assertTrue(imm.isActive(editText));
 
-        assertFalse(editText.hasCalledCheckInputConnectionProxy());
-        imm.isActive(view);
-        assertTrue(editText.hasCalledCheckInputConnectionProxy());
+        runTestOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                assertTrue(imm.isActive(editText));
+                assertFalse(editText.hasCalledCheckInputConnectionProxy());
+                imm.isActive(view);
+                assertTrue(editText.hasCalledCheckInputConnectionProxy());
+            }
+        });
     }
 
     @UiThreadTest
