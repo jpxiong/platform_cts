@@ -46,7 +46,7 @@ public class MediaScannerTest extends AndroidTestCase {
 
     private static final String MEDIA_TYPE = "audio/mpeg";
     private File mMediaFile;
-    private static final int TIME_OUT = 2000;
+    private static final int TIME_OUT = 10000;
     private MockMediaScannerConnection mMediaScannerConnection;
     private MockMediaScannerConnectionClient mMediaScannerConnectionClient;
     private String mFileDir;
