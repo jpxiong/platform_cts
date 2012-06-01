@@ -20,9 +20,6 @@ import android.content.Context;
 import android.os.Handler;
 import android.test.ActivityInstrumentationTestCase2;
 import android.view.GestureDetector;
-import android.view.MotionEvent;
-import android.view.GestureDetector.OnDoubleTapListener;
-import android.view.GestureDetector.OnGestureListener;
 import android.view.GestureDetector.SimpleOnGestureListener;
 
 public class GestureDetectorTest extends
@@ -66,10 +63,6 @@ public class GestureDetectorTest extends
         } catch (RuntimeException e) {
             // expected
         }
-    }
-
-    public void testOnTouchEvent() {
-        GestureDetectorTestUtil.testGestureDetector(this, mActivity);
     }
 
     public void testLongpressEnabled() {
