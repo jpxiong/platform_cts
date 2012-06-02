@@ -37,7 +37,7 @@ public class MediaScannerConnectionTest extends AndroidTestCase {
 
     private static final String MEDIA_TYPE = "audio/mpeg";
     private File mMediaFile;
-    private static final int TIME_OUT = 2000;
+    private static final int TIME_OUT = 10000;
     private MockMediaScannerConnection mMediaScannerConnection;
     private MockMediaScannerConnectionClient mMediaScannerConnectionClient;
 
@@ -45,7 +45,7 @@ public class MediaScannerConnectionTest extends AndroidTestCase {
     protected void setUp() throws Exception {
         super.setUp();
         // prepare the media file.
-        
+
         FileCopyHelper copier = new FileCopyHelper(mContext);
         String fileName = "test" + System.currentTimeMillis();
         copier.copy(R.raw.testmp3, fileName);
