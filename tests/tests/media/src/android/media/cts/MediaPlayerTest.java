@@ -173,27 +173,49 @@ public class MediaPlayerTest extends MediaPlayerTestBase {
         }
     }
 
+    // The following tests are all a bit flaky, which is why they're retried a
+    // few times in a loop.
+
     // This test uses one mp3 that is silent but has a strong positive DC offset,
     // and a second mp3 that is also silent but has a strong negative DC offset.
     // If the two are played back overlapped, they will cancel each other out,
     // and result in zeroes being detected. If there is a gap in playback, that
     // will also result in zeroes being detected.
-    // Note that this test does NOT test guarantee that the correct data is played
+    // Note that this test does NOT guarantee that the correct data is played
     public void testGapless1() throws Exception {
-        testGapless(R.raw.monodcpos, R.raw.monodcneg);
+        flakyTestWrapper(R.raw.monodcpos, R.raw.monodcneg);
     }
 
     // This test is similar, but uses two identical m4a files that have some noise
     // with a strong positive DC offset. This is used to detect if there is
     // a gap in playback
-    // Note that this test does NOT test guarantee that the correct data is played
+    // Note that this test does NOT guarantee that the correct data is played
     public void testGapless2() throws Exception {
-        testGapless(R.raw.stereonoisedcpos, R.raw.stereonoisedcpos);
+        flakyTestWrapper(R.raw.stereonoisedcpos, R.raw.stereonoisedcpos);
     }
 
     // same as above, but with a mono file
     public void testGapless3() throws Exception {
-        testGapless(R.raw.mononoisedcpos, R.raw.mononoisedcpos);
+        flakyTestWrapper(R.raw.mononoisedcpos, R.raw.mononoisedcpos);
+    }
+
+    private void flakyTestWrapper(int resid1, int resid2) throws Exception {
+        boolean success = false;
+        // test usually succeeds within a few tries, but occasionally may fail
+        // many times in a row, so be aggressive and try up to 20 times
+        for (int i = 0; i < 20 && !success; i++) {
+            try {
+                testGapless(resid1, resid2);
+                success = true;
+            } catch (Throwable t) {
+                SystemClock.sleep(1000);
+            }
+        }
+        // Try one more time. If this succeeds, we'll consider the test a success,
+        // otherwise the exception gets thrown
+        if (!success) {
+            testGapless(R.raw.monodcpos, R.raw.monodcneg);
+        }
     }
 
     private void testGapless(int resid1, int resid2) throws Exception {
@@ -227,7 +249,7 @@ public class MediaPlayerTest extends MediaPlayerTestBase {
                             AudioEffect.EFFECT_TYPE_NULL,
                             UUID.fromString("119341a0-8469-11df-81f9-0002a5d5c51b"),
                             0,
-                            0);
+                            session);
         vc.setEnabled(true);
         int captureintervalms = mp1.getDuration() + mp2.getDuration() - 2000;
         int size = 256;
@@ -239,8 +261,7 @@ public class MediaPlayerTest extends MediaPlayerTestBase {
             size = range[1];
         }
         byte [] vizdata = new byte[size];
-        Visualizer vis  = null;
-        vis = new Visualizer(session);
+        Visualizer vis = new Visualizer(session);
         assertTrue(vis.setCaptureSize(vizdata.length) == Visualizer.SUCCESS);
         assertTrue(vis.setEnabled(true) == Visualizer.SUCCESS);
         AudioManager am = (AudioManager) mContext.getSystemService(Context.AUDIO_SERVICE);
@@ -269,7 +290,8 @@ public class MediaPlayerTest extends MediaPlayerTestBase {
                             fail("silence detected, please increase volume and rerun test");
                         } else {
                             fail("gap or overlap detected at t=" +
-                                    (SLEEP_TIME + SystemClock.elapsedRealtime() - start));
+                                    (SLEEP_TIME + SystemClock.elapsedRealtime() - start) +
+                                    ", offset " + i);
                         }
                         break;
                     }
