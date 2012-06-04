@@ -39,6 +39,19 @@
   {
     name: "android.text.format.cts.DateUtilsTest#test2038",
     bug: 6293653
+  },
+  {
+    description: "flakey libcore tests",
+    names: [
+      "libcore.java.net.ConcurrentCloseTest#test_connect_timeout",
+      "libcore.java.net.ConcurrentCloseTest#test_read",
+      "libcore.java.net.SocketTest#testAvailable",
+      "libcore.java.net.URLConnectionTest#testServerClosesSocket",
+      "libcore.java.net.URLConnectionTest#testServerShutdownInput",
+      "libcore.java.net.URLConnectionTest#testServerShutdownOutput",
+      "libcore.java.util.prefs.OldPreferencesTest#testAddNodeChangeListener",
+      "libcore.net.http.HttpResponseCacheTest#testClientPrematureDisconnectWithChunkedEncoding"
+    ]
   }
 ]
 
