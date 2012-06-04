@@ -163,7 +163,7 @@ public class LayoutTestActivity extends Activity {
         protected void onPreExecute() {
             mBitmap = getBitmap();
             mReferenceBitmap = BitmapAssets.getBitmap(getApplicationContext(), mBitmapName);
-            final int threshold = 1;
+            final int threshold = 2;
             mSame = compareTo(mBitmap, mReferenceBitmap, threshold);
         }
 
