@@ -214,7 +214,7 @@ public class MediaPlayerTest extends MediaPlayerTestBase {
         // Try one more time. If this succeeds, we'll consider the test a success,
         // otherwise the exception gets thrown
         if (!success) {
-            testGapless(R.raw.monodcpos, R.raw.monodcneg);
+            testGapless(resid1, resid2);
         }
     }
 
