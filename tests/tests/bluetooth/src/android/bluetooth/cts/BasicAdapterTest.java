@@ -31,8 +31,8 @@ import java.util.UUID;
  * BluetoothAdapter}.
  */
 public class BasicAdapterTest extends AndroidTestCase {
-    private static final int DISABLE_TIMEOUT = 5000;  // ms timeout for BT disable
-    private static final int ENABLE_TIMEOUT = 10000;  // ms timeout for BT enable
+    private static final int DISABLE_TIMEOUT = 20000; // ms timeout for BT disable
+    private static final int ENABLE_TIMEOUT = 20000;  // ms timeout for BT enable
     private static final int POLL_TIME = 400;         // ms to poll BT state
 
     private boolean mHasBluetooth;
@@ -227,12 +227,13 @@ public class BasicAdapterTest extends AndroidTestCase {
             return;
         }
 
-        assertEquals(BluetoothAdapter.STATE_ON, adapter.getState());
-        assertTrue(adapter.isEnabled());
         adapter.disable();
         for (int i=0; i<DISABLE_TIMEOUT/POLL_TIME; i++) {
             sleep(POLL_TIME);
             switch (adapter.getState()) {
+            case BluetoothAdapter.STATE_ON:
+                assertTrue(adapter.isEnabled());
+                continue;
             case BluetoothAdapter.STATE_OFF:
                 assertFalse(adapter.isEnabled());
                 return;
@@ -255,12 +256,13 @@ public class BasicAdapterTest extends AndroidTestCase {
             return;
         }
 
-        assertEquals(BluetoothAdapter.STATE_OFF, adapter.getState());
-        assertFalse(adapter.isEnabled());
         adapter.enable();
         for (int i=0; i<ENABLE_TIMEOUT/POLL_TIME; i++) {
             sleep(POLL_TIME);
             switch (adapter.getState()) {
+            case BluetoothAdapter.STATE_OFF:
+                assertFalse(adapter.isEnabled());
+                continue;
             case BluetoothAdapter.STATE_ON:
                 assertTrue(adapter.isEnabled());
                 return;

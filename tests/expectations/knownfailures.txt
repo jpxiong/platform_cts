@@ -1,5 +1,26 @@
 [
   {
+    names: [
+      "android.media.cts.StreamingMediaPlayerTest#testRTSP_MPEG4SP_AAC_Video1",
+      "android.media.cts.StreamingMediaPlayerTest#testRTSP_MPEG4SP_AAC_Video2"
+    ],
+    bug: 6422606
+  },
+  {
+    names: [
+      "android.media.cts.StreamingMediaPlayerTest#testRTSP_H263_AMR_Video1",
+      "android.media.cts.StreamingMediaPlayerTest#testRTSP_H263_AMR_Video2"
+    ],
+    bug: 6216077
+  },
+  {
+    names: [
+      "android.media.cts.StreamingMediaPlayerTest#testRTSP_H264Base_AAC_Video1",
+      "android.media.cts.StreamingMediaPlayerTest#testRTSP_H264Base_AAC_Video2"
+    ],
+    bug: 6215719
+  },
+  {
     name: "android.opengl.cts.AttachShaderTest#test_glAttachedShaders_invalidshader",
     bug: 6404341
   },
