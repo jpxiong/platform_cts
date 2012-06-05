@@ -81,6 +81,8 @@ public final class AnimationTestUtils {
                 return animation.hasEnded();
             }
         }.run();
+
+        instrumentation.waitForIdleSync();
     }
 
     /**
