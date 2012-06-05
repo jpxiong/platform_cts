@@ -43,6 +43,7 @@
     <classpathentry kind="src" path="cts/tests/tests/media/src"/>
     <classpathentry kind="src" path="cts/tests/tests/mediastress/src"/>
     <classpathentry kind="src" path="cts/tests/tests/net/src"/>
+    <classpathentry kind="src" path="cts/tests/tests/opengl/src"/>
     <classpathentry kind="src" path="cts/tests/tests/openglperf/src"/>
     <classpathentry kind="src" path="cts/tests/tests/os/src"/>
     <classpathentry kind="src" path="cts/tests/tests/performance/src"/>

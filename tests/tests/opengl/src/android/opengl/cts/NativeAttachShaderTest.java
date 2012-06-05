@@ -15,13 +15,12 @@
  */
 package android.opengl.cts;
 
+import android.content.Intent;
 import android.opengl.GLES20;
 import android.test.ActivityInstrumentationTestCase2;
 
-public class NativeAttachShaderTest 
+public class NativeAttachShaderTest
         extends ActivityInstrumentationTestCase2<OpenGLES20NativeActivity> {
-
-    private static final long SLEEP_TIME = 1000l;
 
     public NativeAttachShaderTest(Class<OpenGLES20NativeActivity> activityClass) {
         super(activityClass);
@@ -33,10 +32,12 @@ public class NativeAttachShaderTest
         super(OpenGLES20NativeActivity.class);
     }
 
-    @Override
-    protected void setUp() throws Exception {
-        super.setUp();
-        mActivity = getActivity();
+    private OpenGLES20NativeActivity getShaderActivity(int viewType, int viewIndex) {
+        Intent intent = new Intent();
+        intent.putExtra(OpenGLES20NativeActivity.EXTRA_VIEW_TYPE, viewType);
+        intent.putExtra(OpenGLES20NativeActivity.EXTRA_VIEW_INDEX, viewIndex);
+        setActivityIntent(intent);
+        return getActivity();
     }
 
     /**
@@ -46,17 +47,10 @@ public class NativeAttachShaderTest
      * error        : GLES20.GL_NO_ERROR
      * </pre>
      */
-
     public void test_glAttachedShaders_validshader() throws Throwable {
-        mActivity = getActivity();
-        this.runTestOnUiThread(new Runnable() {
-            public void run() {
-                mActivity.setView(Constants.SHADER, 1);
-            }
-        });
-        Thread.sleep(SLEEP_TIME);
+        mActivity = getShaderActivity(Constants.SHADER, 1);
         int shaderCount = mActivity.mRenderer.mShaderCount;
-        assertEquals(2,shaderCount);
+        assertEquals(2, shaderCount);
         int error = mActivity.mRenderer.mAttachShaderError;
         assertEquals(GLES20.GL_NO_ERROR, error);
     }
@@ -69,18 +63,9 @@ public class NativeAttachShaderTest
      * </pre>
      * @throws Throwable
      */
-
     public void test_glAttachedShaders_invalidshader() throws Throwable {
-        mActivity = getActivity();
-        this.runTestOnUiThread(new Runnable() {
-            public void run() {
-                mActivity.setView(Constants.SHADER, 2);
-            }
-        });
-        Thread.sleep(SLEEP_TIME);
-
+        mActivity = getShaderActivity(Constants.SHADER, 2);
         int error = mActivity.mRenderer.mAttachShaderError;
-
         assertEquals(GLES20.GL_INVALID_VALUE, error);
     }
 
@@ -93,13 +78,7 @@ public class NativeAttachShaderTest
      * @throws Throwable
      */
     public void test_glAttachedShaders_attach_same_shader() throws Throwable {
-        mActivity = getActivity();
-        this.runTestOnUiThread(new Runnable() {
-            public void run() {
-                mActivity.setView(Constants.SHADER, 3);
-            }
-        });
-        Thread.sleep(SLEEP_TIME);
+        mActivity = getShaderActivity(Constants.SHADER, 3);
         int error = mActivity.mRenderer.mAttachShaderError;
         assertEquals(GLES20.GL_INVALID_OPERATION, error);
     }
@@ -112,44 +91,23 @@ public class NativeAttachShaderTest
      * </pre>
      * @throws Throwable
      */
-
     public void test_glAttachedShaders_noshader() throws Throwable {
-        mActivity = getActivity();
-        this.runTestOnUiThread(new Runnable() {
-            public void run() {
-                mActivity.setView(Constants.SHADER, 4);
-            }
-        });
-        Thread.sleep(SLEEP_TIME);
+        mActivity = getShaderActivity(Constants.SHADER, 4);
         int shaderCount = GL2JniLibOne.getAttachedShaderCount();
-        assertEquals(0,shaderCount);
+        assertEquals(0, shaderCount);
 
         int error = mActivity.mRenderer.mAttachShaderError;
         assertEquals(GLES20.GL_NO_ERROR, error);
     }
 
     public void test_glAttachShaders_emptyfragshader_emptyfragshader() throws Throwable {
-        mActivity = getActivity();
-        this.runTestOnUiThread(new Runnable() {
-            public void run() {
-                mActivity.setView(Constants.SHADER, 5);
-            }
-        });
-        Thread.sleep(SLEEP_TIME);
-
-        int error = mActivity.mRenderer.mAttachShaderError;;
+        mActivity = getShaderActivity(Constants.SHADER, 5);
+        int error = mActivity.mRenderer.mAttachShaderError;
         assertEquals(GLES20.GL_INVALID_OPERATION, error);
     }
 
     public void test_glAttachShaders_emptyfragshader_emptyvertexshader() throws Throwable {
-        mActivity = getActivity();
-        this.runTestOnUiThread(new Runnable() {
-            public void run() {
-                mActivity.setView(Constants.SHADER, 6);
-            }
-        });
-        Thread.sleep(SLEEP_TIME);
-
+        mActivity = getShaderActivity(Constants.SHADER, 6);
         int error = mActivity.mRenderer.mAttachShaderError;;
         assertEquals(GLES20.GL_NO_ERROR, error);
     }
