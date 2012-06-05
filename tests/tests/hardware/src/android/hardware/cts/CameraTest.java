@@ -1372,6 +1372,10 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
 
         mCamera.setParameters(parameters);
 
+        // Valid to call outside of preview; should just reset lens or
+        // be a no-op.
+        mCamera.cancelAutoFocus();
+
         mCamera.startPreview();
 
         // No op if autofocus is not in progress.
