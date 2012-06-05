@@ -22,6 +22,7 @@ import com.android.cts.verifier.R;
 import com.android.cts.verifier.TestListAdapter.TestListItem;
 
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.nfc.tech.MifareUltralight;
 import android.nfc.tech.Ndef;
 import android.nfc.tech.TagTechnology;
@@ -35,6 +36,8 @@ public class NfcTestActivity extends PassFailButtons.TestListActivity {
 
     private static final String MIFARE_ULTRALIGHT_ID =
             TagVerifierActivity.getTagTestId(MifareUltralight.class);
+
+    private static final String FEATURE_NFC_MIFARE = "com.nxp.mifare";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,8 +59,10 @@ public class NfcTestActivity extends PassFailButtons.TestListActivity {
         adapter.add(TestListItem.newCategory(this, R.string.nfc_tag_verification));
         adapter.add(TestListItem.newTest(this, R.string.nfc_ndef,
                 NDEF_ID, getTagIntent(Ndef.class), null));
-        adapter.add(TestListItem.newTest(this, R.string.nfc_mifare_ultralight,
-                MIFARE_ULTRALIGHT_ID, getTagIntent(MifareUltralight.class), null));
+        if (getPackageManager().hasSystemFeature(FEATURE_NFC_MIFARE)) {
+            adapter.add(TestListItem.newTest(this, R.string.nfc_mifare_ultralight,
+                    MIFARE_ULTRALIGHT_ID, getTagIntent(MifareUltralight.class), null));
+        }
 
         setTestListAdapter(adapter);
     }
