@@ -25,6 +25,7 @@
     <classpathentry kind="src" path="cts/tests/tests/accessibilityservice/src"/>
     <classpathentry kind="src" path="cts/tests/tests/accounts/src"/>
     <classpathentry kind="src" path="cts/tests/tests/admin/src"/>
+    <classpathentry kind="src" path="cts/tests/tests/animation/src"/>
     <classpathentry kind="src" path="cts/tests/tests/app/src"/>
     <classpathentry kind="src" path="cts/tests/tests/bluetooth/src"/>
     <classpathentry kind="src" path="cts/tests/tests/content/src"/>
