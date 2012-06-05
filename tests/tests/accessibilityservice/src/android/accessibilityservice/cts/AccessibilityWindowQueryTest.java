@@ -25,6 +25,7 @@ import static android.view.accessibility.AccessibilityNodeInfo.ACTION_SELECT;
 
 import android.accessibilityservice.AccessibilityService;
 import android.graphics.Rect;
+import android.os.SystemClock;
 import android.test.suitebuilder.annotation.MediumTest;
 import android.view.accessibility.AccessibilityEvent;
 import android.view.accessibility.AccessibilityNodeInfo;
@@ -371,27 +372,14 @@ public class AccessibilityWindowQueryTest
         // Get the root node info.
         final AccessibilityNodeInfo root = getInteractionBridge().getRootInActiveWindow();
 
-        AccessibilityEvent expected = getInteractionBridge()
-                .executeCommandAndWaitForAccessibilityEvent(new Runnable() {
-            @Override
-            public void run() {
-                getInteractionBridge().performGlobalAction(
-                        AccessibilityService.GLOBAL_ACTION_RECENTS);
-            }
-        }, new AccessibilityEventFilter() {
-            @Override
-            public boolean accept(AccessibilityEvent event) {
-                return (event.getEventType() == AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED)
-                        && "android".equals(event.getPackageName());
-            }
-        },
-        TIMEOUT_ASYNC_PROCESSING);
+        // Check whether the action succeeded.
+        assertTrue(getInteractionBridge().performGlobalAction(
+                AccessibilityService.GLOBAL_ACTION_RECENTS));
 
-        // Check if the expected event was received.
-        assertNotNull(expected);
+        // Sleep a bit so the recents UI is shown.
+        SystemClock.sleep(200);
 
         // Clean up.
-        AccessibilityNodeInfo expectedSource = getInteractionBridge().getSource(expected);
         getInteractionBridge().performGlobalAction(AccessibilityService.GLOBAL_ACTION_HOME);
     }
 
