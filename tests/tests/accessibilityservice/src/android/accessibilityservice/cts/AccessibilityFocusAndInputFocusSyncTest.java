@@ -73,7 +73,7 @@ public class AccessibilityFocusAndInputFocusSyncTest
     }
 
     @MediumTest
-    public void testInitialStateAccessibilityAndInputFocusInSync() throws Exception {
+    public void testInitialStateNoAccessibilityFocus() throws Exception {
         // Get the root which is only accessibility focused.
         AccessibilityNodeInfo focused = getInteractionBridge().findAccessibilityFocus(
                 getInteractionBridge().getRootInActiveWindow());
