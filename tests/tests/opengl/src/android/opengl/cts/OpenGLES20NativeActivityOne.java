@@ -1,24 +1,21 @@
 package android.opengl.cts;
 
-import javax.microedition.khronos.egl.EGLConfig;
-import javax.microedition.khronos.opengles.GL10;
-
-//import com.android.cts.opengl.R;
-
 import android.app.Activity;
 import android.content.Context;
 import android.opengl.GLSurfaceView;
 
 import android.os.Bundle;
 import android.util.Log;
-import android.view.View;
-import android.view.View.OnClickListener;
-import android.widget.Button;
-import android.widget.EditText;
-import android.widget.TextView;
+import android.view.Window;
+import android.view.WindowManager;
+
+import javax.microedition.khronos.egl.EGLConfig;
+import javax.microedition.khronos.opengles.GL10;
 
 public class OpenGLES20NativeActivityOne extends Activity {
-    /** Called when the activity is first created. */
+
+    public static final String EXTRA_VIEW_TYPE = "viewType";
+    public static final String EXTRA_VIEW_INDEX = "viewIndex";
 
     int mValue;
 
@@ -32,16 +29,14 @@ public class OpenGLES20NativeActivityOne extends Activity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-    }
+        Window window = getWindow();
+        window.addFlags(WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD);
 
-    public void setView(int type, int i ) {
-        view = new OpenGLES20View(this,type,i);
+        int viewType = getIntent().getIntExtra(EXTRA_VIEW_TYPE, -1);
+        int viewIndex = getIntent().getIntExtra(EXTRA_VIEW_INDEX, -1);
+
+        view = new OpenGLES20View(this, viewType, viewIndex);
         setContentView(view);
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
     }
 
     @Override
@@ -89,7 +84,7 @@ class GL2Renderer implements GLSurfaceView.Renderer {
     }
 
     public void onDrawFrame(GL10 gl) {
-        
+
     }
 
     public void onSurfaceChanged(GL10 gl, int width, int height) {
