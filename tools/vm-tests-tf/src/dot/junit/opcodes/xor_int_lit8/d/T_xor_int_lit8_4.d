@@ -28,7 +28,7 @@
 .limit regs 3
 
        const v1, 2147483647
-       xor-int/lit16 v1, v1, -128
+       xor-int/lit8 v1, v1, -128
        return v1
 .end method
 

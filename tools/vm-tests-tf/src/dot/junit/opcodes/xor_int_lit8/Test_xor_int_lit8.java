@@ -34,7 +34,7 @@ public class Test_xor_int_lit8 extends DxTestCase {
      }
 
     /**
-     * @title Arguments = 0xfffffff8, 0xf1
+     * @title Arguments = 0xfffffff8, 0xf1 (will be sign extended)
      */
     public void testN2() {
          T_xor_int_lit8_2 t = new T_xor_int_lit8_2();
