@@ -24,7 +24,7 @@ public class ValueAnimatorTest extends
         ActivityInstrumentationTestCase2<AnimationActivity> {
     private AnimationActivity mActivity;
     private ValueAnimator mValueAnimator;
-    private long mDuration = 1000;
+    private long mDuration = 2000;
 
     public ValueAnimatorTest() {
         super(AnimationActivity.class);
@@ -133,7 +133,7 @@ public class ValueAnimatorTest extends
         ValueAnimator objAnimator = getAnimator();
         startAnimation(objAnimator);
         assertNotNull(objAnimator);
-        float[] fractions = getValue(objAnimator, 10, "getAnimatedFraction()", 100l, null);
+        float[] fractions = getValue(objAnimator, 10, "getAnimatedFraction()", 200l, null);
         for(int j = 0; j < 9; j++){
             assertTrue(fractions[j] >= 0.0);
             assertTrue(fractions[j] <= 1.0);
@@ -145,7 +145,7 @@ public class ValueAnimatorTest extends
         ValueAnimator objAnimator = getAnimator();
         startAnimation(objAnimator);
         assertNotNull(objAnimator);
-        float[] animatedValues = getValue(objAnimator, 10, "getAnimatedValue()", 100l, null);
+        float[] animatedValues = getValue(objAnimator, 10, "getAnimatedValue()", 200l, null);
 
         for(int j = 0; j < 9; j++){
             assertTrue(animatedValues[j + 1] != animatedValues[j]);
@@ -157,7 +157,7 @@ public class ValueAnimatorTest extends
         ValueAnimator objAnimator = getAnimator();
         startAnimation(objAnimator);
         assertNotNull(objAnimator);
-        float[] animatedValues = getValue(objAnimator, 10, "getAnimatedValue(property)", 100l,
+        float[] animatedValues = getValue(objAnimator, 10, "getAnimatedValue(property)", 200l,
             property);
         for(int j = 0; j < 9; j++){
             assertTrue(animatedValues[j + 1] != animatedValues[j]);
@@ -225,7 +225,7 @@ public class ValueAnimatorTest extends
         return objAnimator;
     }
 
-    private float[] getValue(ValueAnimator animator, int n, String methodName, 
+    private float[] getValue(ValueAnimator animator, int n, String methodName,
             long sleepTime, String property) throws InterruptedException {
         float[] values = new float[n];
         for(int i = 0; i < (n-1); i++){
