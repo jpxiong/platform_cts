@@ -18,6 +18,7 @@
 package android.mediastress.cts;
 
 import android.app.Activity;
+import android.content.res.Configuration;
 import android.graphics.SurfaceTexture;
 import android.media.CamcorderProfile;
 import android.os.Bundle;
@@ -59,6 +60,12 @@ public class NativeMediaActivity extends Activity implements OnSurfaceChangedLis
         mVideoQuality = getIntent().getIntExtra(EXTRA_VIDEO_QUALITY, mVideoQuality);
         mGLView = new SurfaceTextureGLSurfaceView(this, this);
         setContentView(mGLView);
+    }
+
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        Log.w(TAG, "configuration changed " + newConfig.orientation);
+        super.onConfigurationChanged(newConfig);
     }
 
     /**
