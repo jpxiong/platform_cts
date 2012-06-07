@@ -15,14 +15,11 @@
  */
 package android.opengl.cts;
 
+import android.content.Intent;
 import android.opengl.GLES20;
 import android.test.ActivityInstrumentationTestCase2;
 
 public class ProgramTest extends ActivityInstrumentationTestCase2<OpenGLES20ActivityOne> {
-    public ProgramTest(Class<OpenGLES20ActivityOne> activityClass) {
-        super(activityClass);
-
-    }
 
     private OpenGLES20ActivityOne mActivity;
 
@@ -30,23 +27,17 @@ public class ProgramTest extends ActivityInstrumentationTestCase2<OpenGLES20Acti
         super(OpenGLES20ActivityOne.class);
     }
 
-    @Override
-    protected void setUp() throws Exception {
-        super.setUp();
-        mActivity = getActivity();
+    private OpenGLES20ActivityOne getShaderActivity(int viewType, int viewIndex) {
+        Intent intent = new Intent();
+        intent.putExtra(OpenGLES20NativeActivityOne.EXTRA_VIEW_TYPE, viewType);
+        intent.putExtra(OpenGLES20NativeActivityOne.EXTRA_VIEW_INDEX, viewIndex);
+        setActivityIntent(intent);
+        return getActivity();
     }
 
     public void test_glAttachShader_program() throws Throwable {
-
-        mActivity = getActivity();
-        this.runTestOnUiThread(new Runnable() {
-            public void run() {
-                mActivity.setView(Constants.PROGRAM,1);
-            }
-        });
-        Thread.sleep(1000);
+        mActivity = getShaderActivity(Constants.PROGRAM, 1);
         int error = mActivity.glGetError();
         assertEquals(GLES20.GL_INVALID_OPERATION, error);
     }
-
 }

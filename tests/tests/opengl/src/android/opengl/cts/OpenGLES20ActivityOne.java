@@ -20,20 +20,28 @@ import android.content.Context;
 import android.opengl.GLSurfaceView;
 import android.opengl.GLSurfaceView.Renderer;
 import android.os.Bundle;
+import android.view.Window;
+import android.view.WindowManager;
 
 public class OpenGLES20ActivityOne extends Activity {
+
+    public static final String EXTRA_VIEW_TYPE = "viewType";
+    public static final String EXTRA_VIEW_INDEX = "viewIndex";
+
     OpenGLES20View view;
     Renderer mRenderer;
     int mRendererType;
-    /** Called when the activity is first created. */
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Window window = getWindow();
+        window.addFlags(WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD);
 
-    }
+        int viewType = getIntent().getIntExtra(EXTRA_VIEW_TYPE, -1);
+        int viewIndex = getIntent().getIntExtra(EXTRA_VIEW_INDEX, -1);
 
-    public void setView(int type, int i ) {
-        view = new OpenGLES20View(this,type,i);
+        view = new OpenGLES20View(this, viewType, viewIndex);
         setContentView(view);
     }
 
@@ -49,7 +57,6 @@ public class OpenGLES20ActivityOne extends Activity {
     protected void onPause() {
         super.onPause();
         view.onPause();
-
     }
 
     @Override

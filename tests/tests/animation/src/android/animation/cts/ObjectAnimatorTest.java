@@ -21,7 +21,6 @@ import android.animation.ObjectAnimator;
 import android.animation.PropertyValuesHolder;
 import android.animation.ValueAnimator;
 import android.test.ActivityInstrumentationTestCase2;
-import android.util.Property;
 import android.view.animation.AccelerateInterpolator;
 import android.view.animation.Interpolator;
 
@@ -133,7 +132,7 @@ public class ObjectAnimatorTest extends
         int values[] = {startColor, endColor};
         ArgbEvaluator evaluator = new ArgbEvaluator();
         PropertyValuesHolder propertyValuesHolder = PropertyValuesHolder.ofInt(propertyName, values);
-        ObjectAnimator colorAnimator = ObjectAnimator.ofPropertyValuesHolder(object, 
+        ObjectAnimator colorAnimator = ObjectAnimator.ofPropertyValuesHolder(object,
             propertyValuesHolder);
         colorAnimator.setDuration(1000);
         colorAnimator.setRepeatCount(1);
@@ -158,23 +157,6 @@ public class ObjectAnimatorTest extends
                 evaluator, values);
         String actualPropertyName = colorAnimator.getPropertyName();
         assertEquals(propertyName, actualPropertyName);
-    }
-
-    public void testSetCurrentPlayTime() throws Throwable {
-        Object object = mActivity.view.newBall;
-        String propertyName = "backgroundColor";
-        int startColor = mActivity.view.RED;
-        int endColor = mActivity.view.BLUE;
-        long playTime = 10000l;
-        Object[] values = {new Integer(startColor), new Integer(endColor)};
-        ArgbEvaluator evaluator = new ArgbEvaluator();
-        ObjectAnimator colorAnimator = ObjectAnimator.ofObject(object, propertyName,
-                evaluator, values);
-        colorAnimator.setCurrentPlayTime(playTime);
-        long actualPlayTime = colorAnimator.getCurrentPlayTime();
-        long diff = Math.abs(actualPlayTime - playTime);
-        //Added a buffer of 10ms as the actualPlayTime sometimes returns with some difference
-        assertTrue(diff < 10);
     }
 
     public void testSetFloatValues() throws Throwable {
@@ -267,5 +249,3 @@ public class ObjectAnimatorTest extends
         this.runTestOnUiThread(mAnimationRunnable);
     }
 }
-
-
