@@ -46,9 +46,12 @@
       "libcore.java.net.ConcurrentCloseTest",
       "libcore.java.net.SocketTest#testAvailable",
       "libcore.java.net.URLConnectionTest",
+      "libcore.java.util.prefs.OldAbstractPreferencesTest#testAddNodeChangeListener",
+      "libcore.java.util.prefs.OldAbstractPreferencesTest#testRemovePreferenceChangeListener",
       "libcore.java.util.prefs.OldPreferencesTest#testAddNodeChangeListener",
       "libcore.net.http.HttpResponseCacheTest#testClientPrematureDisconnectWithChunkedEncoding",
-      "org.apache.harmony.luni.tests.java.net.URLConnectionTest"
+      "org.apache.harmony.luni.tests.java.net.URLConnectionTest",
+      "org.apache.harmony.xnet.provider.jsse.NativeCryptoTest#test_SSL_do_handshake_server_timeout"
     ]
   }
 ]
