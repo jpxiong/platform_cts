@@ -20,6 +20,7 @@ import android.accessibilityservice.AccessibilityServiceInfo;
 import android.app.Service;
 import android.content.pm.ServiceInfo;
 import android.cts.util.PollingCheck;
+import android.provider.Settings;
 import android.test.AndroidTestCase;
 import android.view.accessibility.AccessibilityEvent;
 import android.view.accessibility.AccessibilityManager;
@@ -44,9 +45,17 @@ public class AccessibilityManagerTest extends AndroidTestCase {
     private AccessibilityManager mAccessibilityManager;
 
     @Override
-    public void setUp() {
+    public void setUp() throws Exception {
         mAccessibilityManager = (AccessibilityManager)
             getContext().getSystemService(Service.ACCESSIBILITY_SERVICE);
+
+        assertEquals("Accessibility should have been enabled by the test runner.",
+                1, Settings.Secure.getInt(mContext.getContentResolver(),
+                        Settings.Secure.ACCESSIBILITY_ENABLED));
+
+        assertEquals("Touch exploration should have been enabled by the test runner.",
+                1, Settings.Secure.getInt(mContext.getContentResolver(),
+                        Settings.Secure.TOUCH_EXPLORATION_ENABLED));
     }
 
     public void testAddAndRemoveAccessibilityStateChangeListener() throws Exception {
