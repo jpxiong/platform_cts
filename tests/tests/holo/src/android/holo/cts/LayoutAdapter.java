@@ -52,7 +52,7 @@ class LayoutAdapter extends BaseAdapter {
     private static final int SHORT_TIMEOUT_MS = 500;
 
     /** Longer timeout for widgets that have one-time animations. */
-    private static final int LONG_TIMEOUT_MS = 3000;
+    private static final int LONG_TIMEOUT_MS = 6000;
 
     static class LayoutInfo {
         private final int mDisplayName;
