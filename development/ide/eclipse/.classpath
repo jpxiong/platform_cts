@@ -22,6 +22,7 @@
     <classpathentry kind="src" path="cts/tests/deviceadmin/src"/>
     <classpathentry kind="src" path="cts/tests/src"/>
     <classpathentry kind="src" path="cts/tests/tests/acceleration/src"/>
+    <classpathentry kind="src" path="cts/tests/tests/accessibility/src"/>
     <classpathentry kind="src" path="cts/tests/tests/accessibilityservice/src"/>
     <classpathentry kind="src" path="cts/tests/tests/accounts/src"/>
     <classpathentry kind="src" path="cts/tests/tests/admin/src"/>
