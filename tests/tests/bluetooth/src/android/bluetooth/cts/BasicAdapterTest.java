@@ -31,8 +31,8 @@ import java.util.UUID;
  * BluetoothAdapter}.
  */
 public class BasicAdapterTest extends AndroidTestCase {
-    private static final int DISABLE_TIMEOUT = 20000; // ms timeout for BT disable
-    private static final int ENABLE_TIMEOUT = 20000;  // ms timeout for BT enable
+    private static final int DISABLE_TIMEOUT = 60000; // ms timeout for BT disable
+    private static final int ENABLE_TIMEOUT = 60000;  // ms timeout for BT enable
     private static final int POLL_TIME = 400;         // ms to poll BT state
 
     private boolean mHasBluetooth;
