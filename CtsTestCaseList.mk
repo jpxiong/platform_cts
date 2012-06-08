@@ -47,11 +47,14 @@ CTS_TEST_CASE_LIST := \
 	$(cts_support_packages) \
 	$(cts_external_packages)
 
+# Temporarily blacklisted packages
+#   CtsAccessibilityServiceTestCases \
+#   CtsWebkitSecurityTestCases \
+
 # Test packages that require an associated test package XML.
 cts_test_packages := \
 	CtsAccelerationTestCases \
 	CtsAccountManagerTestCases \
-	CtsAccessibilityServiceTestCases \
 	CtsAccessibilityTestCases \
 	CtsAdminTestCases \
 	CtsAnimationTestCases \
@@ -94,7 +97,6 @@ cts_test_packages := \
 	CtsUtilTestCases \
 	CtsViewTestCases \
 	CtsWebkitTestCases \
-#   CtsWebkitSecurityTestCases \
 	CtsWidgetTestCases
 
 # All APKs that need to be scanned by the coverage utilities.
