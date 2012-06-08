@@ -377,7 +377,7 @@ public class AccessibilityWindowQueryTest
                 AccessibilityService.GLOBAL_ACTION_RECENTS));
 
         // Sleep a bit so the recents UI is shown.
-        SystemClock.sleep(200);
+        SystemClock.sleep(3000);
 
         // Clean up.
         getInteractionBridge().performGlobalAction(AccessibilityService.GLOBAL_ACTION_HOME);
