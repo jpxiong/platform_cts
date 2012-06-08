@@ -19,6 +19,7 @@ package android.view.accessibility.cts;
 import android.accessibilityservice.AccessibilityServiceInfo;
 import android.app.Service;
 import android.content.pm.ServiceInfo;
+import android.cts.util.PollingCheck;
 import android.test.AndroidTestCase;
 import android.view.accessibility.AccessibilityEvent;
 import android.view.accessibility.AccessibilityManager;
@@ -60,7 +61,12 @@ public class AccessibilityManagerTest extends AndroidTestCase {
     }
 
     public void testIsTouchExplorationEnabled() throws Exception {
-        assertTrue(mAccessibilityManager.isTouchExplorationEnabled());
+        new PollingCheck() {
+            @Override
+            protected boolean check() {
+                return mAccessibilityManager.isTouchExplorationEnabled();
+            }
+        }.run();
     }
 
     public void testGetInstalledAccessibilityServicesList() throws Exception {
