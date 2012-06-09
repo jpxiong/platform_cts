@@ -200,7 +200,7 @@ public class ApacheHttpClientTest extends AndroidTestCase {
         }
 
         public boolean waitForStateChange() throws InterruptedException {
-            return hasExpectedState() || mReceiveLatch.await(30, TimeUnit.SECONDS);
+            return mReceiveLatch.await(30, TimeUnit.SECONDS) || hasExpectedState();
         }
 
         private boolean hasExpectedState() {
