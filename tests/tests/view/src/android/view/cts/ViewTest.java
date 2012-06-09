@@ -2250,8 +2250,6 @@ public class ViewTest extends ActivityInstrumentationTestCase2<ViewTestStubActiv
         // it passes the touch screen motion event down to itself even if it is not the target view.
         assertTrue(mockView2.hasCalledOnTouchEvent());
 
-        assertFalse(mockView1.dispatchTouchEvent(null));
-
         mockView1.reset();
         OnTouchListenerImpl listener = new OnTouchListenerImpl();
         mockView1.setOnTouchListener(listener);
