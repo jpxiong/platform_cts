@@ -17,6 +17,7 @@
 package android.graphics2.cts;
 
 import android.graphics2.cts.TextureViewCameraActivity;
+import android.hardware.Camera;
 import android.test.ActivityInstrumentationTestCase2;
 
 
@@ -30,10 +31,16 @@ public class TextureViewTest extends ActivityInstrumentationTestCase2<TextureVie
     @Override
     protected void setUp() throws Exception {
         super.setUp();
+        if (Camera.getNumberOfCameras() < 1) {
+            return;
+        }
         mActivity = getActivity();
     }
 
     public void testTextureViewActivity() throws InterruptedException {
+        if (Camera.getNumberOfCameras() < 1) {
+            return;
+        }
         assertTrue(mActivity.waitForCompletion(WAIT_TIMEOUT_IN_SECS));
     }
 
