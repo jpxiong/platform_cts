@@ -166,5 +166,5 @@ but then I just got bored...</string>
     <string name="long_text">This is a really long string which exceeds the width of the view.
 New devices have a much larger screen which actually enables long strings to be displayed
 with no fading. I have made this string longer to fix this case. If you are correcting this
-text, I would love to see the kind of devices you guys now use!</string>
+text, I would love to see the kind of devices you guys now use! Guys, maybe some devices need longer string! </string>
 </resources>
