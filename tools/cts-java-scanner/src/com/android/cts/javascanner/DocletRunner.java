@@ -65,7 +65,7 @@ class DocletRunner {
         List<String> sourcePath = new ArrayList<String>();
         sourcePath.add("./frameworks/base/core/java");
         sourcePath.add("./frameworks/base/test-runner/src");
-        sourcePath.add("./libcore/junit/src/main/java");
+        sourcePath.add("./external/junit/src");
         sourcePath.add("./development/tools/hosttestlib/src");
         sourcePath.add("./libcore/dalvik/src/main/java");
         sourcePath.add("./cts/tests/src");
