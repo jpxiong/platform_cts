@@ -35,7 +35,7 @@ import com.android.cts.verifier.R;
  */
 public abstract class TestCase {
 
-    protected static final int TIMEOUT = 10000;
+    protected static final int TIMEOUT = 25000;
     protected static final int SUCCESS = 0;
 
     protected Context mContext;
