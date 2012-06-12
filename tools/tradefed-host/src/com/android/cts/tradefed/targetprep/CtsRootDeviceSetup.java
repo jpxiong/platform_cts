@@ -41,12 +41,7 @@ import java.io.FileNotFoundException;
  */
 public class CtsRootDeviceSetup implements ITargetPreparer {
 
-    // TODO: read this from a configuration file rather than hard-coding
-    private static final String ACCESSIBILITY_SERVICE_APK_FILE_NAME =
-        "CtsDelegatingAccessibilityService.apk";
-
-    private static final String DEVICE_ADMIN_APK_FILE_NAME =
-        "CtsDeviceAdmin.apk";
+    private static final String DEVICE_ADMIN_APK_FILE_NAME = "CtsDeviceAdmin.apk";
 
     /**
      * {@inheritDoc}
@@ -70,28 +65,12 @@ public class CtsRootDeviceSetup implements ITargetPreparer {
 
             // perform CTS setup steps that only work if adb is root
             SettingsToggler.setSecureInt(device, "mock_location", 1);
-            enableAccessibilityService(device, buildHelper);
             enableDeviceAdmin(device, buildHelper);
 
             // end root setup steps
         } catch (FileNotFoundException e) {
             throw new TargetSetupError("Invalid CTS installation", e);
         }
-    }
-
-    private void enableAccessibilityService(ITestDevice device, CtsBuildHelper ctsBuild)
-            throws DeviceNotAvailableException, TargetSetupError,
-            FileNotFoundException {
-        String errorCode = device.installPackage(
-                ctsBuild.getTestApp(ACCESSIBILITY_SERVICE_APK_FILE_NAME), true);
-        if (errorCode != null) {
-            // TODO: retry ?
-            throw new TargetSetupError(String.format(
-                    "Failed to install %s on device %s. Reason: %s",
-                    ACCESSIBILITY_SERVICE_APK_FILE_NAME, device.getSerialNumber(), errorCode));
-        }
-        // TODO: enable Settings > Accessibility > Accessibility > Delegating Accessibility
-        // Service
     }
 
     private void enableDeviceAdmin(ITestDevice device, CtsBuildHelper ctsBuild)
