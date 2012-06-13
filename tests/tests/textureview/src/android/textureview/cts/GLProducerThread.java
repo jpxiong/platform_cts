@@ -139,7 +139,7 @@ public class GLProducerThread extends Thread {
         mFrameStats = new FrameStats();
 
         mRenderer.init(width[0], height[0]);
-        while (!mRenderer.isFinished() && (mShouldRender != null && mShouldRender.get())) {
+        while (!mRenderer.isFinished() && (mShouldRender == null || mShouldRender.get())) {
             mFrameStats.startFrame();
             mRenderer.renderFrame();
             mEgl.eglSwapBuffers(mEglDisplay, mEglSurface);
