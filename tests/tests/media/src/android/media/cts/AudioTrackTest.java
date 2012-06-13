@@ -339,6 +339,7 @@ public class AudioTrackTest extends AndroidTestCase {
         final int TEST_FORMAT = AudioFormat.ENCODING_PCM_16BIT;
         final int TEST_MODE = AudioTrack.MODE_STREAM;
         final int TEST_STREAM_TYPE = AudioManager.STREAM_MUSIC;
+        final int TEST_LOOP_CNT = 10;
 
         // -------- initialization --------------
         int minBuffSize = AudioTrack.getMinBufferSize(TEST_SR, TEST_CONF, TEST_FORMAT);
@@ -352,9 +353,14 @@ public class AudioTrackTest extends AndroidTestCase {
         track.play();
         Thread.sleep(WAIT_MSEC);
         track.stop();
-        Thread.sleep(WAIT_MSEC);
-        int pos = track.getPlaybackHeadPosition();
-        log(TEST_NAME, "position =" + pos);
+        int count = 0;
+        int pos;
+        do {
+            Thread.sleep(WAIT_MSEC);
+            pos = track.getPlaybackHeadPosition();
+            count++;
+        } while((pos != 0) && (count < TEST_LOOP_CNT));
+        log(TEST_NAME, "position =" + pos + ", read count ="+count);
         assertTrue(TEST_NAME, pos == 0);
         // -------- tear down --------------
         track.release();
