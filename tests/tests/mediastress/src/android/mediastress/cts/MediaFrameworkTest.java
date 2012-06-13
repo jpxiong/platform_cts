@@ -61,17 +61,20 @@ public class MediaFrameworkTest extends Activity implements SurfaceHolder.Callba
         //Acquire the full wake lock to keep the device up
         PowerManager pm = (PowerManager) this.getSystemService(Context.POWER_SERVICE);
         mWakeLock = pm.newWakeLock(PowerManager.FULL_WAKE_LOCK, "MediaFrameworkTest");
+        mWakeLock.setReferenceCounted(false);
     }
 
     @Override
     protected void onResume() {
+        Log.v(TAG, "onResume, acquire wakelock");
         super.onResume();
         mWakeLock.acquire();
     }
 
     public void onPause(Bundle icicle) {
-        super.onStop();
+        Log.v(TAG, "onPause, release wakelock");
         mWakeLock.release();
+        super.onPause();
     }
 
     public void surfaceDestroyed(SurfaceHolder holder) {
