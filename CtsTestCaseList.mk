@@ -48,12 +48,12 @@ CTS_TEST_CASE_LIST := \
 	$(cts_external_packages)
 
 # Temporarily blacklisted packages
-#   CtsAccessibilityServiceTestCases \
 #   CtsWebkitSecurityTestCases \
 
 # Test packages that require an associated test package XML.
 cts_test_packages := \
 	CtsAccelerationTestCases \
+	CtsAccessibilityServiceTestCases \
 	CtsAccountManagerTestCases \
 	CtsAccessibilityTestCases \
 	CtsAdminTestCases \
