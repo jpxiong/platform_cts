@@ -253,6 +253,7 @@ public class FileSystemPermissionTest extends AndroidTestCase {
                     "/data/data/com.lge.ers/arm9",
                     "/data/data/com.lge.ers/kernel",
                     "/data/data/com.lge.wmc",
+                    "/data/data/com.redbend.vdmc/lib",
                     "/data/data/recovery",
                     "/data/data/recovery/HTCFOTA",
                     "/data/data/recovery/OMADM",
