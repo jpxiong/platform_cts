@@ -35,6 +35,7 @@ public class TestListActivity extends AbstractTestListActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setTitle(getString(R.string.title_version, Version.getVersionName(this)));
         setTestListAdapter(new ManifestTestListAdapter(this, null));
     }
 
