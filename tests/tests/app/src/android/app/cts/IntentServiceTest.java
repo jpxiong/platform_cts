@@ -28,7 +28,7 @@ import android.os.IBinder;
 public class IntentServiceTest extends ActivityTestsBase {
 
     private Intent mIntent;
-    private static final int TIMEOUT_MSEC = 5000;
+    private static final int TIMEOUT_MSEC = 30000;
     private boolean mConnected;
 
     @Override
