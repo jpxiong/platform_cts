@@ -25,10 +25,6 @@
     bug: 6404341
   },
   {
-    name: "android.opengl.cts.AttachShaderTest#test_glAttachShaders_programobject_attach_fragshaderobject",
-    bug: 6292666
-  },
-  {
     name: "android.openglperf.cts.GlVboPerfTest#testVboWithVaryingIndexBufferNumbers",
     bug: 5898262
   },

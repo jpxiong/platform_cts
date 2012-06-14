@@ -17,7 +17,7 @@ package android.opengl.cts;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
-
+import java.util.concurrent.CountDownLatch;
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
 
@@ -36,8 +36,13 @@ public class RendererThreeShaderTest extends RendererBase {
             + "void main(){              \n"
             + " gl_FragColor = vec4 (0.63671875, 0.76953125, 0.22265625, 1.0); \n"
             + "}  \n";
+
+    public RendererThreeShaderTest(CountDownLatch latch) {
+        super(latch);
+    }
+
     @Override
-    public void onDrawFrame(GL10 gl) {
+    public void doOnDrawFrame(GL10 gl) {
         GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT | GLES20.GL_DEPTH_BUFFER_BIT);
         GLES20.glUseProgram(mProgram);
 
