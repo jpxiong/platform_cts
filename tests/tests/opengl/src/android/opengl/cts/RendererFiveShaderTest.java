@@ -17,14 +17,15 @@ package android.opengl.cts;
 
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
-
+import java.util.concurrent.CountDownLatch;
 import android.opengl.GLES20;
 import android.util.Log;
 
 
 public class RendererFiveShaderTest extends RendererBase {
-    @Override
-    public void onDrawFrame(GL10 gl) {
+
+    public RendererFiveShaderTest(CountDownLatch latch) {
+        super(latch);
     }
 
     @Override
@@ -40,5 +41,6 @@ public class RendererFiveShaderTest extends RendererBase {
         int[] shaders = new int[10];
         GLES20.glGetAttachedShaders(mProgram, 10, mShaderCount, 0, shaders, 0);
         mError = GLES20.glGetError();
+        mLatch.countDown();
     }
 }

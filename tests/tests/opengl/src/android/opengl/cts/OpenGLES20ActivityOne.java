@@ -23,6 +23,10 @@ import android.os.Bundle;
 import android.view.Window;
 import android.view.WindowManager;
 
+import java.lang.InterruptedException;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
+
 public class OpenGLES20ActivityOne extends Activity {
 
     public static final String EXTRA_VIEW_TYPE = "viewType";
@@ -31,6 +35,7 @@ public class OpenGLES20ActivityOne extends Activity {
     OpenGLES20View view;
     Renderer mRenderer;
     int mRendererType;
+    private CountDownLatch mLatch = new CountDownLatch(1);
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -41,16 +46,26 @@ public class OpenGLES20ActivityOne extends Activity {
         int viewType = getIntent().getIntExtra(EXTRA_VIEW_TYPE, -1);
         int viewIndex = getIntent().getIntExtra(EXTRA_VIEW_INDEX, -1);
 
-        view = new OpenGLES20View(this, viewType, viewIndex);
+        view = new OpenGLES20View(this, viewType, viewIndex, mLatch);
         setContentView(view);
     }
 
     public int getNoOfAttachedShaders() {
-       return ((RendererBase)mRenderer).mShaderCount[0];
+        return ((RendererBase)mRenderer).mShaderCount[0];
     }
 
     public int glGetError() {
         return ((RendererBase)mRenderer).mError;
+    }
+
+    public boolean waitForFrameDrawn() {
+        boolean result = false;
+        try {
+            result = mLatch.await(10L, TimeUnit.SECONDS);
+        } catch (InterruptedException e) {
+            // just return false
+        }
+        return result;
     }
 
     @Override
@@ -64,43 +79,43 @@ public class OpenGLES20ActivityOne extends Activity {
     @Override
     protected void onResume() {
         super.onResume();
-        if(view != null) {
+        if (view != null) {
             view.onResume();
         }
     }
 
     class OpenGLES20View extends GLSurfaceView {
 
-        public OpenGLES20View(Context context, int type, int index) {
+        public OpenGLES20View(Context context, int type, int index, CountDownLatch latch) {
             super(context);
             setEGLContextClientVersion(2);
-            if(type == Constants.SHADER) {
-                if(index == 1) {
-                    mRenderer = new RendererOneShaderTest();
-                }else if(index == 2) {
-                    mRenderer = new RendererTwoShaderTest();
-                }else if(index == 3) {
-                    mRenderer = new RendererThreeShaderTest();
-                }else if(index == 4) {
-                    mRenderer = new RendererFourShaderTest();
-                }else if(index == 5) {
-                    mRenderer = new RendererFiveShaderTest();
-                }else if(index == 6) {
-                    mRenderer = new RendererSixShaderTest();
-                }else if(index == 7) {
-                    mRenderer = new RendererSevenShaderTest();
-                }else if(index == 8) {
-                    mRenderer = new RendererEightShaderTest();
-                }else if(index == 9) {
-                    mRenderer = new RendererNineShaderTest();
-                }else if(index == 10) {
-                    mRenderer = new RendererTenShaderTest();
-                }else {
+            if (type == Constants.SHADER) {
+                if (index == 1) {
+                    mRenderer = new RendererOneShaderTest(latch);
+                } else if(index == 2) {
+                    mRenderer = new RendererTwoShaderTest(latch);
+                } else if(index == 3) {
+                    mRenderer = new RendererThreeShaderTest(latch);
+                } else if(index == 4) {
+                    mRenderer = new RendererFourShaderTest(latch);
+                } else if(index == 5) {
+                    mRenderer = new RendererFiveShaderTest(latch);
+                } else if(index == 6) {
+                    mRenderer = new RendererSixShaderTest(latch);
+                } else if(index == 7) {
+                    mRenderer = new RendererSevenShaderTest(latch);
+                } else if(index == 8) {
+                    mRenderer = new RendererEightShaderTest(latch);
+                } else if(index == 9) {
+                    mRenderer = new RendererNineShaderTest(latch);
+                } else if(index == 10) {
+                    mRenderer = new RendererTenShaderTest(latch);
+                } else {
                     throw new RuntimeException();
                 }
-            }else if(type == Constants.PROGRAM) {
-                if(index == 1) {
-                    mRenderer = new RendererOneProgramTest();
+            } else if (type == Constants.PROGRAM) {
+                if (index == 1) {
+                    mRenderer = new RendererOneProgramTest(latch);
                 }
             }
             setRenderer(mRenderer);
