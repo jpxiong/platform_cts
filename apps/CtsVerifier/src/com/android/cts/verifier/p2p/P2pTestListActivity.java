@@ -66,6 +66,27 @@ public class P2pTestListActivity extends PassFailButtons.TestListActivity {
          * Added WiFiDirect test activity to the list.
          */
         ArrayTestListAdapter adapter = new ArrayTestListAdapter(this);
+
+        adapter.add(TestListItem.newCategory(this, R.string.p2p_group_formation));
+        adapter.add(TestListItem.newTest(this,
+                R.string.p2p_go_neg_responder_test,
+                GoNegResponderTestActivity.class.getName(),
+                new Intent(this, GoNegResponderTestActivity.class), null));
+        adapter.add(TestListItem.newTest(this,
+                R.string.p2p_go_neg_requester_test,
+                GoNegRequesterTestListActivity.class.getName(),
+                new Intent(this, GoNegRequesterTestListActivity.class), null));
+
+        adapter.add(TestListItem.newCategory(this, R.string.p2p_join));
+        adapter.add(TestListItem.newTest(this,
+                R.string.p2p_group_owner_test,
+                GoTestActivity.class.getName(),
+                new Intent(this, GoTestActivity.class), null));
+        adapter.add(TestListItem.newTest(this,
+                R.string.p2p_group_client_test,
+                P2pClientTestListActivity.class.getName(),
+                new Intent(this, P2pClientTestListActivity.class), null));
+
         adapter.add(TestListItem.newCategory(this, R.string.p2p_service_discovery));
         adapter.add(TestListItem.newTest(this,
                 R.string.p2p_service_discovery_responder_test,

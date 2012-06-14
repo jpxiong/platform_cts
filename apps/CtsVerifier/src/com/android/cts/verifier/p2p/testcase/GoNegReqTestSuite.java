@@ -20,15 +20,29 @@ import java.util.ArrayList;
 
 import android.content.Context;
 
-public class ServReqTestSuite {
+/**
+ * Test suite for go negotiation requester.
+ */
+public class GoNegReqTestSuite {
 
     private static ArrayList<ReqTestCase> sTestSuite = null;
 
+    /**
+     * Return test suite.
+     * @param context
+     * @return
+     */
     public static ArrayList<ReqTestCase> getTestSuite(Context context) {
         initialize(context);
         return sTestSuite;
     }
 
+    /**
+     * Return the specified test case.
+     * @param context
+     * @param testId
+     * @return
+     */
     public static ReqTestCase getTestCase(Context context,
             String testId) {
         initialize(context);
@@ -47,17 +61,7 @@ public class ServReqTestSuite {
         }
 
         sTestSuite = new ArrayList<ReqTestCase>();
-        sTestSuite.add(new ServReqAllTestCase01(context));
-        sTestSuite.add(new ServReqAllTestCase02(context));
-        sTestSuite.add(new ServReqAllTestCase03(context));
-        sTestSuite.add(new ServReqDnsPtrTestCase(context));
-        sTestSuite.add(new ServReqDnsTxtTestCase(context));
-        sTestSuite.add(new ServReqUpnpAllTestCase(context));
-        sTestSuite.add(new ServReqUpnpRootDeviceTestCase(context));
-        sTestSuite.add(new ServReqRemoveRequestTestCase(context));
-        sTestSuite.add(new ServReqClearRequestTestCase(context));
-        sTestSuite.add(new ServReqMultiClientTestCase01(context));
-        sTestSuite.add(new ServReqMultiClientTestCase02(context));
-        sTestSuite.add(new ServReqMultiClientTestCase03(context));
+        sTestSuite.add(new GoNegReqPbcTestCase(context));
+        sTestSuite.add(new GoNegReqPinTestCase(context));
     }
 }

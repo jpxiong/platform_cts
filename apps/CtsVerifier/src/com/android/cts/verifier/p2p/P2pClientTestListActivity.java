@@ -15,19 +15,34 @@
  */
 package com.android.cts.verifier.p2p;
 
-import android.content.Context;
+import java.util.ArrayList;
 
+import android.content.Context;
+import android.os.Bundle;
+
+import com.android.cts.verifier.R;
+import com.android.cts.verifier.p2p.testcase.P2pClientTestSuite;
 import com.android.cts.verifier.p2p.testcase.ReqTestCase;
-import com.android.cts.verifier.p2p.testcase.ServReqTestSuite;
 
 /**
- * Test activity that sends service discovery request.
- * This activity is invoked from ServiceRequesterTestListActivity.
+ * Activity that lists all the joining group owner tests.
  */
-public class ServiceRequesterTestActivity extends RequesterTestActivity {
+public class P2pClientTestListActivity extends RequesterTestListActivity {
 
     @Override
-    protected ReqTestCase getTestCase(Context context, String testId) {
-        return ServReqTestSuite.getTestCase(context, testId);
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setInfoResources(R.string.p2p_join_go,
+                R.string.p2p_join_go_info, -1);
+    }
+
+    @Override
+    protected ArrayList<ReqTestCase> getTestSuite(Context context) {
+        return P2pClientTestSuite.getTestSuite(context);
+    }
+
+    @Override
+    protected Class<?> getRequesterActivityClass() {
+        return P2pClientTestActivity.class;
     }
 }

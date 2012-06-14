@@ -13,21 +13,28 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.android.cts.verifier.p2p;
+
+package com.android.cts.verifier.p2p.testcase;
 
 import android.content.Context;
-
-import com.android.cts.verifier.p2p.testcase.ReqTestCase;
-import com.android.cts.verifier.p2p.testcase.ServReqTestSuite;
+import android.net.wifi.WpsInfo;
 
 /**
- * Test activity that sends service discovery request.
- * This activity is invoked from ServiceRequesterTestListActivity.
+ * Test case to try go negotiation with wps pin code.
  */
-public class ServiceRequesterTestActivity extends RequesterTestActivity {
+public class GoNegReqPinTestCase extends ConnectReqTestCase {
+
+    public GoNegReqPinTestCase(Context context) {
+        super(context);
+    }
 
     @Override
-    protected ReqTestCase getTestCase(Context context, String testId) {
-        return ServReqTestSuite.getTestCase(context, testId);
+    protected boolean executeTest() throws InterruptedException {
+        return connectTest(false, WpsInfo.DISPLAY);
+    }
+
+    @Override
+    public String getTestName() {
+        return "Go negotiation test (PIN)";
     }
 }

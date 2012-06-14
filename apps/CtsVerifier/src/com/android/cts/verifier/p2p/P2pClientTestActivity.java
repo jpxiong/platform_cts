@@ -17,17 +17,17 @@ package com.android.cts.verifier.p2p;
 
 import android.content.Context;
 
+import com.android.cts.verifier.p2p.testcase.P2pClientTestSuite;
 import com.android.cts.verifier.p2p.testcase.ReqTestCase;
-import com.android.cts.verifier.p2p.testcase.ServReqTestSuite;
 
 /**
- * Test activity that sends service discovery request.
- * This activity is invoked from ServiceRequesterTestListActivity.
+ * Test activity that tries to join an existing p2p group.
+ * This activity is invoked from JoinTestListActivity.
  */
-public class ServiceRequesterTestActivity extends RequesterTestActivity {
+public class P2pClientTestActivity  extends RequesterTestActivity {
 
     @Override
     protected ReqTestCase getTestCase(Context context, String testId) {
-        return ServReqTestSuite.getTestCase(context, testId);
+        return P2pClientTestSuite.getTestCase(context, testId);
     }
 }

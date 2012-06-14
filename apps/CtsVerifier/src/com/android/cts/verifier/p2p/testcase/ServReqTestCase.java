@@ -27,24 +27,10 @@ import com.android.cts.verifier.p2p.testcase.ListenerTest.ListenerArgument;
  * The base class for service discovery requester test case.
  * The common functions are defined in this class.
  */
-public abstract class ServReqTestCase extends TestCase {
+public abstract class ServReqTestCase extends ReqTestCase {
 
     public ServReqTestCase(Context context) {
         super(context);
-    }
-
-    /**
-     * The target device address.
-     * The requester checks only the response of this target device.
-     */
-    protected String mTargetAddress;
-
-    /**
-     * Set target device address.
-     * @param targetAddress
-     */
-    public void setTargetAddress(String targetAddress) {
-        this.mTargetAddress = targetAddress;
     }
 
     /**

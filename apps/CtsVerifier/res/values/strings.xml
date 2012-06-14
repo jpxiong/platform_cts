@@ -357,19 +357,42 @@
         start the responder test. Your device must pass both requester and responder
         tests.
         </string>
+    <string name="p2p_group_formation">Group Formation</string>
+    <string name="p2p_join">Group Join</string>
     <string name="p2p_service_discovery">Service Discovery</string>
+
+    <string name="p2p_go_neg_responder_test">GO Negotiation Responder Test</string>
+    <string name="p2p_go_neg_requester_test">GO Negotiation Requester Test</string>
+    <string name="p2p_group_owner_test">Group Owner Test</string>
+    <string name="p2p_group_client_test">Group Client Test</string>
     <string name="p2p_service_discovery_responder_test">
         Service Discovery Responder Test</string>
     <string name="p2p_service_discovery_requester_test">
         Service Discovery Requester Test</string>
 
+    <string name="p2p_go_neg_responder">GO Negotiation Responder</string>
+    <string name="p2p_go_neg_requester">GO Negotiation Requester</string>
+    <string name="p2p_accept_client">Group Owner</string>
+    <string name="p2p_join_go">Group Client</string>
     <string name="p2p_service_discovery_responder">Service Discovery Responder</string>
     <string name="p2p_service_discovery_requester">Service Discovery Requester</string>
 
+    <string name="p2p_go_neg_responder_info">
+        Start the \"GO Negotiation Requester Test\" on the other device and follow
+        the instructions.</string>
+    <string name="p2p_accept_client_info">
+        Start the \"Group Client Test\" on the other device and follow
+        the instructions.</string>
     <string name="p2p_service_discovery_responder_info">
         Start the \"Service Discovery Requester Test\" on the other device and follow
         the instructions.</string>
 
+    <string name="p2p_go_neg_requester_info">
+        Start the \"GO Negotiation Responder Test\" on the other device.
+        Then run each test individually by clicking on it\'s name.</string>
+    <string name="p2p_join_go_info">
+        Start the \"Group Owner Test\" on the other device.
+        Then run each test individually by clicking on it\'s name.</string>
     <string name="p2p_service_discovery_requester_info">
         Start the \"Service Discovery Responder Test\" on the other device.
         Then run each test individually by clicking on it\'s name.</string>
@@ -380,9 +403,22 @@
     <string name="p2p_settings">Wi-Fi Direct Settings</string>
 
     <string name="p2p_result_success">Test passed successfully.</string>
-    <string name="p2p_responder_ready">
-        The Responder is now ready to start. Start the \"Service Discovery
-        Requester Test\" test on the other device.</string>
+
+    <string name="p2p_go_neg_responder_ready">
+        The go negotiation responder is now ready to start. Start
+        the \"GO Negotiation Requester Test\" on the other device.
+        Keep the screen here until all tests on the other device are
+        finished.</string>
+    <string name="p2p_go_ready">
+        The group owner is now ready to start. Start the \"Join
+        Group Test\" on the other device.
+        Keep the screen here until all tests on the other device are
+        finished.</string>
+    <string name="p2p_service_responder_ready">
+        The service responder is now ready to start. Start the
+        \"Service Discovery Requester Test\" on the other device.
+        Keep the screen here until all tests on the other device are
+        finished.</string>
 
     <string name="p2p_setup_error">
         Test failed.\n\nSet up error. Check whether Wi-Fi can be enabled.</string>
@@ -396,20 +432,48 @@
         Test failed.\n\nFailed to remove service request.</string>
     <string name="p2p_clear_service_requests_error">
         Test failed.\n\nFailed to clear service requests.</string>
+    <string name="p2p_connect_error">
+        Test failed.\n\nFailed to start a p2p connection to the target device.</string>
+    <string name="p2p_remove_group_error">
+        Test failed.\n\nFailed to remove a p2p group.</string>
     <string name="p2p_discover_peers_error">
         Test failed.\n\nFailed to discover peers.</string>
     <string name="p2p_discover_services_error">
         Test failed.\n\nFailed to discover services.</string>
+    <string name="p2p_ceate_group_error">
+        Test failed.\n\nFailed to start up group owner.</string>
     <string name="p2p_no_service_requests_error">
-        Test failed.\n\n\"NO_SERVICE_REQUESTS\" error did not occurred.</string>
+        Test failed.\n\n\"NO_SERVICE_REQUESTS\" error did not occur.</string>
     <string name="p2p_receive_invalid_response_error">
         Test failed.\n\nReceived an invalid message or could not receive
          the expected message.\n\n</string>
     <string name="p2p_target_not_found_error">Test failed.\n\n
         The target responder device was NOT found. Start up the responder
         test on the other device, then run the test again.</string>
+    <string name="p2p_target_invalid_role_error">Test failed.\n\n
+        The target responder must be p2p device. However, the target responder
+        device was group owner. Check the test case on the other device.</string>
+    <string name="p2p_target_invalid_role_error2">Test failed.\n\n
+        The target responder must be group owner. However, the target responder
+        device was p2p device. Check the test case on the other device.</string>
+    <string name="p2p_connection_error">
+        Test failed.\n\nFailed to establish a p2p connection.</string>
+    <string name="p2p_detect_disconnection_error">
+        Test failed.\n\nFailed to detect client disconnection.</string>
+    <string name="p2p_disconnect_error">
+        Test failed.\n\nFailed to disconnect a p2p connection.</string>
 
     <string name="p2p_search_target">Search Target</string>
     <string name="p2p_searching_target">Searching for target device ...</string>
-    <string name="p2p_executing_test">Checking the service discovery capability ...</string>
+    <string name="p2p_checking_serv_capab">Checking the service discovery
+        capability ...</string>
+    <string name="p2p_connecting_with_pbc">Trying to connect the target device ...\n\n
+        Click the \"OK\" button on the other device to accept the connection
+        request from this device.</string>
+    <string name="p2p_connecting_with_pin">Trying to connect the target device ...\n\n
+        Enter the pin number on the other device.</string>
+    <string name="p2p_waiting_for_peer_to_connect">Waiting for peer to
+        connect ...</string>
+    <string name="p2p_waiting_for_peer_to_disconnect">Waiting for peer
+        to disconnect ...</string>
 </resources>
