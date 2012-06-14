@@ -13,21 +13,30 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.android.cts.verifier.p2p;
+package com.android.cts.verifier.p2p.testcase;
 
 import android.content.Context;
 
-import com.android.cts.verifier.p2p.testcase.ReqTestCase;
-import com.android.cts.verifier.p2p.testcase.ServReqTestSuite;
-
 /**
- * Test activity that sends service discovery request.
- * This activity is invoked from ServiceRequesterTestListActivity.
+ * A base test case for requester.
  */
-public class ServiceRequesterTestActivity extends RequesterTestActivity {
+public abstract class ReqTestCase extends TestCase {
 
-    @Override
-    protected ReqTestCase getTestCase(Context context, String testId) {
-        return ServReqTestSuite.getTestCase(context, testId);
+    public ReqTestCase(Context context) {
+        super(context);
+    }
+
+    /**
+     * The target device address.
+     * The requester checks only the response of this target device.
+     */
+    protected String mTargetAddress;
+
+    /**
+     * Set target device address.
+     * @param targetAddress
+     */
+    public void setTargetAddress(String targetAddress) {
+        this.mTargetAddress = targetAddress;
     }
 }

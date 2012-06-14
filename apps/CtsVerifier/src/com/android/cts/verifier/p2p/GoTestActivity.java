@@ -16,18 +16,31 @@
 package com.android.cts.verifier.p2p;
 
 import android.content.Context;
+import android.os.Bundle;
 
-import com.android.cts.verifier.p2p.testcase.ReqTestCase;
-import com.android.cts.verifier.p2p.testcase.ServReqTestSuite;
+import com.android.cts.verifier.R;
+import com.android.cts.verifier.p2p.testcase.GoTestCase;
+import com.android.cts.verifier.p2p.testcase.TestCase;
 
 /**
- * Test activity that sends service discovery request.
- * This activity is invoked from ServiceRequesterTestListActivity.
+ * Test activity that accepts a connection from p2p client.
  */
-public class ServiceRequesterTestActivity extends RequesterTestActivity {
+public class GoTestActivity extends ResponderTestActivity {
 
     @Override
-    protected ReqTestCase getTestCase(Context context, String testId) {
-        return ServReqTestSuite.getTestCase(context, testId);
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setInfoResources(R.string.p2p_accept_client,
+                R.string.p2p_accept_client_info, -1);
+    }
+
+    @Override
+    protected TestCase getTestCase(Context context) {
+        return new GoTestCase(context);
+    }
+
+    @Override
+    protected int getReadyMsgId() {
+        return R.string.p2p_go_ready;
     }
 }

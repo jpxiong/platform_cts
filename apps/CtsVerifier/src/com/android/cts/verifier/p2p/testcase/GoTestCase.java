@@ -15,44 +15,42 @@
  */
 package com.android.cts.verifier.p2p.testcase;
 
-import java.util.Timer;
-import java.util.TimerTask;
-
 import android.content.Context;
+import android.net.wifi.p2p.WifiP2pInfo;
 
 import com.android.cts.verifier.R;
 
 /**
- * The service response test case.
+ * A test case which accepts a connection from p2p client.
  *
- * This test case sets bonjour and UPnP local services.
- * The requester devices check whether it can search appropriate
- * devices and services.
+ * The requester device tries to join this device.
  */
-public class ServRespTestCase extends TestCase {
+public class GoTestCase extends TestCase {
 
-    private Timer mTimer;
+    protected P2pBroadcastReceiverTest mReceiverTest;
 
-    public ServRespTestCase(Context context) {
+    public GoTestCase(Context context) {
         super(context);
     }
 
     @Override
     protected void setUp() {
-        mTimer = new Timer(true);
         super.setUp();
+        mReceiverTest = new P2pBroadcastReceiverTest(mContext);
+        mReceiverTest.init(mChannel);
     }
 
     @Override
     protected boolean executeTest() throws InterruptedException {
-        ActionListenerTest listenerTest = new ActionListenerTest();
+
+        ActionListenerTest listener = new ActionListenerTest();
 
         /*
          * Add renderer service
          */
         mP2pMgr.addLocalService(mChannel, LocalServices.createRendererService(),
-                listenerTest);
-        if (!listenerTest.check(ActionListenerTest.SUCCESS, TIMEOUT)) {
+                listener);
+        if (!listener.check(ActionListenerTest.SUCCESS, TIMEOUT)) {
             mReason = mContext.getString(R.string.p2p_add_local_service_error);
             return false;
         }
@@ -61,8 +59,8 @@ public class ServRespTestCase extends TestCase {
          * Add IPP service
          */
         mP2pMgr.addLocalService(mChannel, LocalServices.createIppService(),
-                listenerTest);
-        if (!listenerTest.check(ActionListenerTest.SUCCESS, TIMEOUT)) {
+                listener);
+        if (!listener.check(ActionListenerTest.SUCCESS, TIMEOUT)) {
             mReason = mContext.getString(R.string.p2p_add_local_service_error);
             return false;
         }
@@ -71,41 +69,38 @@ public class ServRespTestCase extends TestCase {
          * Add AFP service
          */
         mP2pMgr.addLocalService(mChannel, LocalServices.createAfpService(),
-                listenerTest);
-        if (!listenerTest.check(ActionListenerTest.SUCCESS, TIMEOUT)) {
+                listener);
+        if (!listener.check(ActionListenerTest.SUCCESS, TIMEOUT)) {
             mReason = mContext.getString(R.string.p2p_add_local_service_error);
             return false;
         }
 
         /*
-         * Start discover
+         * Start up an autonomous group owner.
          */
-        mP2pMgr.discoverPeers(mChannel, listenerTest);
-        if (!listenerTest.check(ActionListenerTest.SUCCESS, TIMEOUT)) {
-            mReason = mContext.getString(R.string.p2p_discover_peers_error);
+        mP2pMgr.createGroup(mChannel, listener);
+        if (!listener.check(ActionListenerTest.SUCCESS, TIMEOUT)) {
+            mReason = mContext.getString(R.string.p2p_ceate_group_error);
             return false;
         }
 
         /*
-         * Responder calls discoverPeers periodically.
+         * Check whether createGroup() is succeeded.
          */
-        mTimer.schedule(new TimerTask() {
-            @Override
-            public void run() {
-                mP2pMgr.discoverPeers(mChannel, null);
-            }
-        }, 10000, 10000);
+        WifiP2pInfo info = mReceiverTest.waitConnectionNotice(TIMEOUT);
+        if (info == null || !info.isGroupOwner) {
+            mReason = mContext.getString(R.string.p2p_ceate_group_error);
+            return false;
+        }
 
+        // wait until p2p client is joining.
         return true;
     }
 
-
     @Override
     protected void tearDown() {
-        /*
-         * If the test is finished, local services will be unregistered.
-         * So, block the test before stop() is called.
-         */
+
+        // wait until p2p client is joining.
         synchronized(this) {
             try {
                 wait();
@@ -113,14 +108,19 @@ public class ServRespTestCase extends TestCase {
                 e.printStackTrace();
             }
         }
-        if (mTimer != null) {
-            mTimer.cancel();
+
+        if (mP2pMgr != null) {
+            mP2pMgr.cancelConnect(mChannel, null);
+            mP2pMgr.removeGroup(mChannel, null);
+        }
+        if (mReceiverTest != null) {
+            mReceiverTest.close();
         }
         super.tearDown();
     }
 
     @Override
     public String getTestName() {
-        return "Service discovery responder test";
+        return "Accept client connection test";
     }
 }

@@ -61,8 +61,8 @@ public class DnsSdTxtRecordListenerTest extends ListenerTest
 
     @Override
     public void onDnsSdTxtRecordAvailable(String fullDomainName,
-            Map<String, String> record, WifiP2pDevice srcDevice) {
-        Log.d(TAG, fullDomainName + " " + record + " received from "
+            Map<String, String> txtRecordMap, WifiP2pDevice srcDevice) {
+        Log.d(TAG, fullDomainName + " " + txtRecordMap + " received from "
                 + srcDevice.deviceAddress);
 
         /*
@@ -70,7 +70,7 @@ public class DnsSdTxtRecordListenerTest extends ListenerTest
          * The response from other devices are ignored.
          */
         if (srcDevice.deviceAddress.equalsIgnoreCase(mTargetAddr)) {
-            receiveCallback(new Argument(fullDomainName, record));
+            receiveCallback(new Argument(fullDomainName, txtRecordMap));
         }
     }
 
@@ -78,14 +78,14 @@ public class DnsSdTxtRecordListenerTest extends ListenerTest
         String ippDomainName = "myprinter._ipp._tcp.local.";
         String afpDomainName = "example._afpovertcp._tcp.local.";
 
-        HashMap<String, String> IppTxtRecord = new HashMap<String, String>();
-        HashMap<String, String> afpTxtRecord = new HashMap<String, String>();
-        IppTxtRecord.put("txtvers", "1");
-        IppTxtRecord.put("pdl", "application/postscript");
+        Map<String, String> ippTxtRecord = new HashMap<String, String>();
+        Map<String, String> afpTxtRecord = new HashMap<String, String>();
+        ippTxtRecord.put("txtvers", "1");
+        ippTxtRecord.put("pdl", "application/postscript");
 
-        IPP_DNS_TXT.add(new Argument(ippDomainName, IppTxtRecord));
+        IPP_DNS_TXT.add(new Argument(ippDomainName, ippTxtRecord));
         AFP_DNS_TXT.add(new Argument(afpDomainName, afpTxtRecord));
-        ALL_DNS_TXT.add(new Argument(ippDomainName, IppTxtRecord));
+        ALL_DNS_TXT.add(new Argument(ippDomainName, ippTxtRecord));
         ALL_DNS_TXT.add(new Argument(afpDomainName, afpTxtRecord));
     }
 
@@ -95,16 +95,16 @@ public class DnsSdTxtRecordListenerTest extends ListenerTest
     static class Argument extends ListenerArgument {
 
         private String mFullDomainName;
-        private Map<String, String> mRecord;
+        private Map<String, String> mTxtRecordMap;
 
         /**
          * Set the argument of {@link #onDnsSdTxtRecordAvailable}.
          * @param fullDomainName full domain name.
-         * @param record txt record.
+         * @param txtRecordMap txt record map.
          */
-        Argument(String fullDomainName, Map<String, String> record) {
+        Argument(String fullDomainName, Map<String, String> txtRecordMap) {
             mFullDomainName = fullDomainName;
-            mRecord = record;
+            mTxtRecordMap = txtRecordMap;
         }
 
         @Override
@@ -114,7 +114,7 @@ public class DnsSdTxtRecordListenerTest extends ListenerTest
             }
             Argument arg = (Argument)obj;
             return equals(mFullDomainName, arg.mFullDomainName) &&
-                    equals(mRecord, arg.mRecord);
+                    equals(mTxtRecordMap, arg.mTxtRecordMap);
         }
 
         private boolean equals(String s1, String s2) {
@@ -139,7 +139,7 @@ public class DnsSdTxtRecordListenerTest extends ListenerTest
 
         @Override
         public String toString() {
-            return "domainName=" + mFullDomainName + " record='" + mRecord + "'";
+            return "domainName=" + mFullDomainName + " record='" + mTxtRecordMap + "'";
         }
     }
 }

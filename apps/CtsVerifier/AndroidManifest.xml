@@ -348,6 +348,30 @@
             <meta-data android:name="test_required_features" android:value="android.hardware.wifi.direct" />
         </activity>
 
+        <activity android:name=".p2p.GoNegRequesterTestListActivity"
+                android:label="@string/p2p_go_neg_requester"
+                android:configChanges="keyboardHidden|orientation" />
+
+        <activity android:name=".p2p.GoNegRequesterTestActivity"
+                android:label="@string/p2p_go_neg_requester"
+                android:configChanges="keyboardHidden|orientation" />
+
+        <activity android:name=".p2p.GoNegResponderTestActivity"
+                android:label="@string/p2p_go_neg_responder"
+                android:configChanges="keyboardHidden|orientation" />
+
+        <activity android:name=".p2p.P2pClientTestListActivity"
+                android:label="@string/p2p_join_go"
+                android:configChanges="keyboardHidden|orientation" />
+
+        <activity android:name=".p2p.P2pClientTestActivity"
+                android:label="@string/p2p_join_go"
+                android:configChanges="keyboardHidden|orientation" />
+
+        <activity android:name=".p2p.GoTestActivity"
+                android:label="@string/p2p_accept_client"
+                android:configChanges="keyboardHidden|orientation" />
+
         <activity android:name=".p2p.ServiceRequesterTestListActivity"
                 android:label="@string/p2p_service_discovery_requester"
                 android:configChanges="keyboardHidden|orientation" />
