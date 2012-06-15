@@ -22,7 +22,7 @@ import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.nio.ShortBuffer;
-
+import java.util.concurrent.CountDownLatch;
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
 
@@ -59,7 +59,8 @@ public class RendererOneColorBufferTest extends RendererBase {
     private FloatBuffer mColor;
 
 
-    public RendererOneColorBufferTest(Context context) {
+    public RendererOneColorBufferTest(Context context, CountDownLatch latch) {
+        super(latch);
         mVertices = ByteBuffer.allocateDirect(mVerticesData.length * 4)
         .order(ByteOrder.nativeOrder()).asFloatBuffer();
         mVertices.put(mVerticesData).position(0);
@@ -75,7 +76,8 @@ public class RendererOneColorBufferTest extends RendererBase {
         mColor.put(mVertexColor).position(0);
     }
 
-    public RendererOneColorBufferTest(Context context, float[] colors) {
+    public RendererOneColorBufferTest(Context context, float[] colors, CountDownLatch latch) {
+        super(latch);
         mVertexColor = colors;
         mVertices = ByteBuffer.allocateDirect(mVerticesData.length * 4)
         .order(ByteOrder.nativeOrder()).asFloatBuffer();
@@ -181,7 +183,7 @@ public class RendererOneColorBufferTest extends RendererBase {
         GLES20.glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
     }
 
-    public void onDrawFrame(GL10 glUnused)
+    public void doOnDrawFrame(GL10 glUnused)
     {
         // Set the viewport
         GLES20.glViewport(0, 0, mWidth, mHeight);

@@ -23,6 +23,8 @@ import android.opengl.GLES20;
 import android.opengl.GLSurfaceView;
 import android.opengl.GLSurfaceView.Renderer;
 
+import java.util.concurrent.CountDownLatch;
+
 public abstract class RendererBase implements GLSurfaceView.Renderer {
 
     FloatBuffer floatBuffer;
@@ -30,8 +32,16 @@ public abstract class RendererBase implements GLSurfaceView.Renderer {
     int maPositionHandle;
     float[] mColorOne = new float[4];
 
-    int[] mShaderCount;
+    int[] mShaderCount = null;
     int mError;
+
+    // child may need to manipulate them directly
+    protected CountDownLatch mLatch;
+    protected boolean mDrawn = false;
+
+    public RendererBase(CountDownLatch latch) {
+        mLatch = latch;
+    }
 
     @Override
     public void onSurfaceChanged(GL10 gl, int width, int height) {
@@ -43,5 +53,19 @@ public abstract class RendererBase implements GLSurfaceView.Renderer {
         GLES20.glShaderSource(shader, shaderCode);
         GLES20.glCompileShader(shader);
         return shader;
+    }
+
+    @Override
+    public void onDrawFrame(GL10 gl) {
+        if (mDrawn) {
+            return;
+        }
+        mDrawn = true;
+        doOnDrawFrame(gl);
+        mLatch.countDown();
+    }
+
+    /// dummy method to be overridden by child
+    public void doOnDrawFrame(GL10 gl) {
     }
 }

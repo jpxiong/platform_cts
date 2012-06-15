@@ -54,7 +54,7 @@ public class ColorBufferTest extends ActivityInstrumentationTestCase2<OpenGLES20
                 mActivity.setView(Constants.COLOR, 1, vertexColors);
             }
         });
-        Thread.sleep(SLEEP_TIME);
+        assertTrue(mActivity.waitForFrameDrawn());
         float[] actualColor = mActivity.getActualColor();
         compare(expectedColor, actualColor);
     }
@@ -72,7 +72,7 @@ public class ColorBufferTest extends ActivityInstrumentationTestCase2<OpenGLES20
                 mActivity.setView(Constants.COLOR, 1, vertexColors);
             }
         });
-        Thread.sleep(SLEEP_TIME);
+        assertTrue(mActivity.waitForFrameDrawn());
         float[] actualColor = mActivity.getActualColor();
         compare(expectedColor, actualColor);
     }
@@ -91,7 +91,7 @@ public class ColorBufferTest extends ActivityInstrumentationTestCase2<OpenGLES20
                 mActivity.setView(Constants.COLOR, 1, vertexColors);
             }
         });
-        Thread.sleep(SLEEP_TIME);
+        assertTrue(mActivity.waitForFrameDrawn());
         float[] actualColor = mActivity.getActualColor();
         compare(expectedColor, actualColor);
     }
@@ -110,7 +110,7 @@ public class ColorBufferTest extends ActivityInstrumentationTestCase2<OpenGLES20
                 mActivity.setView(Constants.COLOR, 1, vertexColors);
             }
         });
-        Thread.sleep(SLEEP_TIME);
+        assertTrue(mActivity.waitForFrameDrawn());
         float[] actualColor = mActivity.getActualColor();
         compare(expectedColor, actualColor);
     }
@@ -129,7 +129,7 @@ public class ColorBufferTest extends ActivityInstrumentationTestCase2<OpenGLES20
                 mActivity.setView(Constants.COLOR, 1, vertexColors);
             }
         });
-        Thread.sleep(SLEEP_TIME);
+        assertTrue(mActivity.waitForFrameDrawn());
         float[] actualColor = mActivity.getActualColor();
         compare(expectedColor, actualColor);
     }
@@ -148,7 +148,7 @@ public class ColorBufferTest extends ActivityInstrumentationTestCase2<OpenGLES20
                 mActivity.setView(Constants.COLOR, 1, vertexColors);
             }
         });
-        Thread.sleep(SLEEP_TIME);
+        assertTrue(mActivity.waitForFrameDrawn());
         float[] actualColor = mActivity.getActualColor();
         compare(expectedColor, actualColor);
     }
@@ -167,7 +167,7 @@ public class ColorBufferTest extends ActivityInstrumentationTestCase2<OpenGLES20
                 mActivity.setView(Constants.COLOR, 1, vertexColors);
             }
         });
-        Thread.sleep(SLEEP_TIME);
+        assertTrue(mActivity.waitForFrameDrawn());
         float[] actualColor = mActivity.getActualColor();
         compare(expectedColor, actualColor);
     }

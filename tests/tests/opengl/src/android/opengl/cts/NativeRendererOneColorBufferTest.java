@@ -22,7 +22,7 @@ import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.nio.ShortBuffer;
-
+import java.util.concurrent.CountDownLatch;
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
 
@@ -54,19 +54,20 @@ public class NativeRendererOneColorBufferTest extends RendererBase {
     private short[] mIndices = { 0, 1, 2, 0, 2, 3 };
     private FloatBuffer mColor;
 
-    public NativeRendererOneColorBufferTest(Context context) {
-
+    public NativeRendererOneColorBufferTest(Context context, CountDownLatch latch) {
+        super(latch);
     }
 
-    public NativeRendererOneColorBufferTest(Context context, float[] color) {
-       this.mVertexColor = color;
+    public NativeRendererOneColorBufferTest(Context context, float[] color, CountDownLatch latch) {
+        super(latch);
+        this.mVertexColor = color;
     }
 
     public void onSurfaceCreated(GL10 glUnused, EGLConfig config) {
 
     }
 
-    public void onDrawFrame(GL10 glUnused) {
+    public void doOnDrawFrame(GL10 glUnused) {
       Log.i(TAG,"onDrawFrame start");
 
       float[] result = GL2JniLibOne.draw(3, 1, mVertexColor);

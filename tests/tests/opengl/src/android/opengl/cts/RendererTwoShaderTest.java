@@ -15,32 +15,25 @@
  */
 package android.opengl.cts;
 
+import android.opengl.GLES20;
+
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+import java.util.concurrent.CountDownLatch;
 
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
-
-import android.opengl.GLES20;
 
 public class RendererTwoShaderTest extends RendererBase {
     private final String fragmentShaderCode = "precision mediump float;  \n"
             + "void main(){              \n"
             + " gl_FragColor = vec4 (0.63671875, 0.76953125, 0.22265625, 1.0); \n"
             + "}  \n";
-    @Override
-    public void onDrawFrame(GL10 gl) {
-        GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT | GLES20.GL_DEPTH_BUFFER_BIT);
-        GLES20.glUseProgram(mProgram);
 
-        GLES20.glVertexAttribPointer(maPositionHandle, 3, GLES20.GL_FLOAT,
-                false, 12, floatBuffer);
-        GLES20.glEnableVertexAttribArray(maPositionHandle);
-        GLES20.glDrawArrays(GLES20.GL_TRIANGLES, 0, 3);
-        mShaderCount = new int[1];
-        int[] shaders = new int[10];
-        GLES20.glGetAttachedShaders(mProgram, 10, mShaderCount, 0, shaders, 0);
+    public RendererTwoShaderTest(CountDownLatch latch) {
+        super(latch);
     }
+
 
     @Override
     public void onSurfaceCreated(GL10 gl, EGLConfig config) {
@@ -50,18 +43,10 @@ public class RendererTwoShaderTest extends RendererBase {
         int vertexShaderOne = 9999;
         int fragmentShader = loadShader(GLES20.GL_FRAGMENT_SHADER, fragmentShaderCode);
         mProgram =  GLES20.glCreateProgram();
+        // some driver crashes instead of returning error.
         GLES20.glAttachShader(mProgram, vertexShaderOne);
         mError = GLES20.glGetError();
-        GLES20.glAttachShader(mProgram, fragmentShader);
-        GLES20.glLinkProgram(mProgram);
-        int[] linkStatus = new int[1];
-        GLES20.glGetProgramiv(mProgram, GLES20.GL_LINK_STATUS, linkStatus, 0);
-        mShaderCount = new int[1];
-        int[] shaders = new int[10];
-        GLES20.glGetAttachedShaders(mProgram, 10, mShaderCount, 0, shaders, 0);
-        if (linkStatus[0] != GLES20.GL_TRUE) {
-           //do nothing
-        }
+        mLatch.countDown();
     }
 
     public void initShapes(){

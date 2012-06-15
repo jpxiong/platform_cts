@@ -15,6 +15,7 @@
  */
 package android.opengl.cts;
 
+import java.util.concurrent.CountDownLatch;
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
 
@@ -23,9 +24,8 @@ import android.opengl.GLES20;
 public class RendererElevenShaderTest extends RendererBase {
     private String fragmentShaderCode = Vertex.successfulcompile_vertex;
 
-    @Override
-    public void onDrawFrame(GL10 gl) {
-
+    public RendererElevenShaderTest(CountDownLatch latch) {
+        super(latch);
     }
 
     @Override
@@ -38,5 +38,6 @@ public class RendererElevenShaderTest extends RendererBase {
         GLES20.glLinkProgram(mProgram);
 
         mError = GLES20.glGetError();
+        mLatch.countDown();
     }
 }

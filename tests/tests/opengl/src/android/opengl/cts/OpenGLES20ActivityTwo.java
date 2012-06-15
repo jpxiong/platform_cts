@@ -21,24 +21,40 @@ import android.opengl.GLSurfaceView;
 import android.opengl.GLSurfaceView.Renderer;
 import android.os.Bundle;
 
+import java.lang.InterruptedException;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
+
+
 public class OpenGLES20ActivityTwo extends Activity {
     OpenGLES20View view;
     Renderer mRenderer;
     int mRendererType;
+    private CountDownLatch mLatch = new CountDownLatch(1);
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
     }
 
+    public boolean waitForFrameDrawn() {
+        boolean result = false;
+        try {
+            result = mLatch.await(10L, TimeUnit.SECONDS);
+        } catch (InterruptedException e) {
+            // just return false
+        }
+        return result;
+    }
+
     public void setView(int type, int i, float[] vertexColors ) {
-        view = new OpenGLES20View(this,type,i, vertexColors);
+        view = new OpenGLES20View(this,type,i, vertexColors, mLatch);
         setContentView(view);
     }
 
     public void setView(int type, int i) {
         float[] f = {};
-        view = new OpenGLES20View(this,type,i,  f  )  ;
+        view = new OpenGLES20View(this, type, i, f, mLatch)  ;
         setContentView(view);
     }
 
@@ -71,12 +87,13 @@ public class OpenGLES20ActivityTwo extends Activity {
 
     class OpenGLES20View extends GLSurfaceView {
 
-        public OpenGLES20View(Context context, int type, int index, float[] rgba) {
+        public OpenGLES20View(Context context, int type, int index, float[] rgba,
+                              CountDownLatch latch) {
             super(context);
             setEGLContextClientVersion(2);
             if(type == Constants.COLOR) {
                 if(index == 1) {
-                    mRenderer = new RendererOneColorBufferTest(context, rgba);
+                    mRenderer = new RendererOneColorBufferTest(context, rgba, latch);
                 }else {
                     throw new RuntimeException();
                 }

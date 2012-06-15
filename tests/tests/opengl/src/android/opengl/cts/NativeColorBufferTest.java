@@ -49,7 +49,7 @@ public class NativeColorBufferTest extends ActivityInstrumentationTestCase2<Open
                 mActivity.setView(Constants.COLOR, 1, vertexColors);
             }
         });
-        Thread.sleep(SLEEP_TIME);
+        assertTrue(mActivity.waitForFrameDrawn());
         float[] actualColor = mActivity.getActualColor();
         compare(expectedColor, actualColor);
     }
@@ -67,7 +67,7 @@ public class NativeColorBufferTest extends ActivityInstrumentationTestCase2<Open
                 mActivity.setView(Constants.COLOR, 1, vertexColors);
             }
         });
-        Thread.sleep(SLEEP_TIME);
+        assertTrue(mActivity.waitForFrameDrawn());
         float[] actualColor = mActivity.getActualColor();
         compare(expectedColor, actualColor);
     }
@@ -86,7 +86,7 @@ public class NativeColorBufferTest extends ActivityInstrumentationTestCase2<Open
                 mActivity.setView(Constants.COLOR, 1, vertexColors);
             }
         });
-        Thread.sleep(SLEEP_TIME);
+        assertTrue(mActivity.waitForFrameDrawn());
         float[] actualColor = mActivity.getActualColor();
         compare(expectedColor, actualColor);
     }
@@ -105,7 +105,7 @@ public class NativeColorBufferTest extends ActivityInstrumentationTestCase2<Open
                 mActivity.setView(Constants.COLOR, 1, vertexColors);
             }
         });
-        Thread.sleep(SLEEP_TIME);
+        assertTrue(mActivity.waitForFrameDrawn());
         float[] actualColor = mActivity.getActualColor();
         compare(expectedColor, actualColor);
     }
@@ -124,7 +124,7 @@ public class NativeColorBufferTest extends ActivityInstrumentationTestCase2<Open
                 mActivity.setView(Constants.COLOR, 1, vertexColors);
             }
         });
-        Thread.sleep(SLEEP_TIME);
+        assertTrue(mActivity.waitForFrameDrawn());
         float[] actualColor = mActivity.getActualColor();
         compare(expectedColor, actualColor);
     }
@@ -143,7 +143,7 @@ public class NativeColorBufferTest extends ActivityInstrumentationTestCase2<Open
                 mActivity.setView(Constants.COLOR, 1, vertexColors);
             }
         });
-        Thread.sleep(SLEEP_TIME);
+        assertTrue(mActivity.waitForFrameDrawn());
         float[] actualColor = mActivity.getActualColor();
         compare(expectedColor, actualColor);
     }
@@ -162,7 +162,7 @@ public class NativeColorBufferTest extends ActivityInstrumentationTestCase2<Open
                 mActivity.setView(Constants.COLOR, 1, vertexColors);
             }
         });
-        Thread.sleep(SLEEP_TIME);
+        assertTrue(mActivity.waitForFrameDrawn());
         float[] actualColor = mActivity.getActualColor();
         compare(expectedColor, actualColor);
     }

@@ -9,6 +9,10 @@ import android.util.Log;
 import android.view.Window;
 import android.view.WindowManager;
 
+import java.lang.InterruptedException;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
+
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
 
@@ -23,6 +27,8 @@ public class OpenGLES20NativeActivityOne extends Activity {
     GL2Renderer mRenderer;
     int mRendererType;
 
+    private CountDownLatch mLatch = new CountDownLatch(1);
+
     /**
      * Called when the activity is first created.
      */
@@ -35,8 +41,18 @@ public class OpenGLES20NativeActivityOne extends Activity {
         int viewType = getIntent().getIntExtra(EXTRA_VIEW_TYPE, -1);
         int viewIndex = getIntent().getIntExtra(EXTRA_VIEW_INDEX, -1);
 
-        view = new OpenGLES20View(this, viewType, viewIndex);
+        view = new OpenGLES20View(this, viewType, viewIndex, mLatch);
         setContentView(view);
+    }
+
+    public boolean waitForFrameDrawn() {
+        boolean result = false;
+        try {
+            result = mLatch.await(10L, TimeUnit.SECONDS);
+        } catch (InterruptedException e) {
+            // just return false
+        }
+        return result;
     }
 
     @Override
@@ -54,10 +70,10 @@ public class OpenGLES20NativeActivityOne extends Activity {
     }
 
     class OpenGLES20View extends GLSurfaceView {
-        public OpenGLES20View(Context context, int category, int testCase) {
+        public OpenGLES20View(Context context, int category, int testCase, CountDownLatch latch) {
             super(context);
             setEGLContextClientVersion(2);
-            mRenderer = new GL2Renderer(category, testCase);
+            mRenderer = new GL2Renderer(category, testCase, latch);
             setRenderer(mRenderer);
         }
 
@@ -78,9 +94,12 @@ class GL2Renderer implements GLSurfaceView.Renderer {
     int mAttachShaderError = -1;
     int mShaderCount = -1;
 
-    public GL2Renderer(int category, int testcase) {
+    private CountDownLatch mLatch;
+
+    public GL2Renderer(int category, int testcase, CountDownLatch latch) {
         this.mCategory = category;
         this.mTestCase = testcase;
+        mLatch = latch;
     }
 
     public void onDrawFrame(GL10 gl) {
@@ -94,6 +113,7 @@ class GL2Renderer implements GLSurfaceView.Renderer {
         Log.i(TAG,"error:" + mAttachShaderError);
         this.mShaderCount = GL2JniLibOne.getAttachedShaderCount();
         Log.i(TAG,"ShaderCount:" + mShaderCount);
+        mLatch.countDown();
     }
 
     public void onSurfaceCreated(GL10 gl, EGLConfig config) {
