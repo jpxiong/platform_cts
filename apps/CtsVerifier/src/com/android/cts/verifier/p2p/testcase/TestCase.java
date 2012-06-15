@@ -35,7 +35,14 @@ import com.android.cts.verifier.R;
  */
 public abstract class TestCase {
 
+    /*
+     * The test case id.
+     */
+    public static final String EXTRA_TEST_NAME =
+            "com.android.cts.verifier.p2p.testcase.EXTRA_TEST_NAME";
+
     protected static final int TIMEOUT = 25000;
+    protected static final int TIMEOUT_FOR_USER_ACTION = 60000;
     protected static final int SUCCESS = 0;
 
     protected Context mContext;
@@ -107,6 +114,7 @@ public abstract class TestCase {
             mThread = null;
         }
     }
+
     /**
      * Return test name.
      * @return test name.
@@ -148,6 +156,14 @@ public abstract class TestCase {
     }
 
     /**
+     * Notify a message to the application.
+     * @param id
+     */
+    protected void notifyTestMsg(int id) {
+        mListener.onTestMsgReceived(mContext.getString(id));
+    }
+
+    /**
      * Get reason for the failure.
      * @return
      */
@@ -164,6 +180,12 @@ public abstract class TestCase {
          * This function is invoked when the test case starts.
          */
         public void onTestStarted();
+
+        /**
+         * This function is invoked when the test notify a message to application.
+         * @param msg
+         */
+        public void onTestMsgReceived(String msg);
 
         /**
          * This function is invoked when the test is success.

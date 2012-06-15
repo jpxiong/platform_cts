@@ -19,6 +19,8 @@ package com.android.cts.verifier.p2p.testcase;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.android.cts.verifier.R;
+
 import android.content.Context;
 import android.net.wifi.p2p.nsd.WifiP2pServiceInfo;
 import android.net.wifi.p2p.nsd.WifiP2pServiceRequest;
@@ -35,6 +37,8 @@ public class ServReqAllTestCase01 extends ServReqTestCase {
 
     @Override
     protected boolean executeTest() throws InterruptedException {
+
+        notifyTestMsg(R.string.p2p_checking_serv_capab);
 
         /*
          * create request to search all services.

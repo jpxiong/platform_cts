@@ -33,6 +33,9 @@ public class ServReqMultiClientTestCase01 extends ServReqTestCase {
 
     @Override
     protected boolean executeTest() throws InterruptedException {
+
+        notifyTestMsg(R.string.p2p_checking_serv_capab);
+
         ActionListenerTest actionListener = new ActionListenerTest();
 
         /*
