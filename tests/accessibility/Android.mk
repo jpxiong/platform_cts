@@ -24,4 +24,8 @@ LOCAL_PACKAGE_NAME := CtsSomeAccessibilityServices
 
 LOCAL_SDK_VERSION := current
 
+LOCAL_MODULE_PATH := $(TARGET_OUT_DATA_APPS)
+
+LOCAL_DEX_PREOPT := false
+
 include $(BUILD_PACKAGE)

@@ -36,6 +36,8 @@ LOCAL_PACKAGE_NAME := CtsTestStubs
 
 LOCAL_STATIC_JAVA_LIBRARIES := ctsutil ctstestserver ctstestrunner
 
+LOCAL_DEX_PREOPT := false
+
 include $(BUILD_PACKAGE)
 
 # Build the test APK using its own makefile, and any other CTS-related packages

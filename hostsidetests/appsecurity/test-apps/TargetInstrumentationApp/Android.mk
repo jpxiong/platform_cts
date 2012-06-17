@@ -27,4 +27,6 @@ LOCAL_PACKAGE_NAME := CtsTargetInstrumentationApp
 # sign this app with different cert than CtsInstrumentationAppDiffCert
 LOCAL_CERTIFICATE := cts/hostsidetests/appsecurity/certs/cts-testkey1
 
+LOCAL_DEX_PREOPT := false
+
 include $(BUILD_PACKAGE)

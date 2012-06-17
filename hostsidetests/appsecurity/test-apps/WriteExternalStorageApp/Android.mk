@@ -22,4 +22,6 @@ LOCAL_SDK_VERSION := 10
 LOCAL_SRC_FILES := $(call all-java-files-under, src)
 LOCAL_PACKAGE_NAME := CtsWriteExternalStorageApp
 
+LOCAL_DEX_PREOPT := false
+
 include $(BUILD_PACKAGE)
