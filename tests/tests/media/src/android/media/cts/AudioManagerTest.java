@@ -130,13 +130,14 @@ public class AudioManagerTest extends AndroidTestCase {
 
     @SuppressWarnings("deprecation")
     public void testRouting() throws Exception {
+        // setBluetoothA2dpOn is a no-op, and getRouting should always return -1
+        // AudioManager.MODE_CURRENT
         boolean oldA2DP = mAudioManager.isBluetoothA2dpOn();
-        mAudioManager.setBluetoothA2dpOn(!oldA2DP);
-        assertEquals(!oldA2DP , mAudioManager.isBluetoothA2dpOn());
-        mAudioManager.setBluetoothA2dpOn(oldA2DP);
+        mAudioManager.setBluetoothA2dpOn(true);
+        assertEquals(oldA2DP , mAudioManager.isBluetoothA2dpOn());
+        mAudioManager.setBluetoothA2dpOn(false);
         assertEquals(oldA2DP , mAudioManager.isBluetoothA2dpOn());
 
-        // getRouting should always return -1 (AudioManager.MODE_CURRENT)
         assertEquals(AudioManager.MODE_CURRENT, mAudioManager.getRouting(MODE_RINGTONE));
         assertEquals(AudioManager.MODE_CURRENT, mAudioManager.getRouting(MODE_NORMAL));
         assertEquals(AudioManager.MODE_CURRENT, mAudioManager.getRouting(MODE_IN_CALL));
