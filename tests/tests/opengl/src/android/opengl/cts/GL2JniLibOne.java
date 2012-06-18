@@ -18,7 +18,7 @@ package android.opengl.cts;
 
 public class GL2JniLibOne {
      static {
-         System.loadLibrary("opengltest");
+         System.loadLibrary("opengltest_jni");
      }
 
      public static native void init(int category, int subcategory, int width, int height);

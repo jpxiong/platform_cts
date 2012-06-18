@@ -113,19 +113,20 @@ public class NativeAttachShaderTest
     public void test_glAttachShaders_emptyvertexshader_emptyvertexshader() throws Throwable {
         mActivity = getShaderActivity(Constants.SHADER, 7);
         int error = mActivity.mRenderer.mAttachShaderError;
-        assertEquals(GLES20.GL_INVALID_OPERATION, error);
+        assertTrue(GLES20.GL_NO_ERROR != error);
     }
 
     public void test_glAttachShaders_programobject_attach_fragshaderobject() throws Throwable {
         mActivity = getShaderActivity(Constants.SHADER, 8);
         int error = mActivity.mRenderer.mAttachShaderError;
-        assertEquals(GLES20.GL_INVALID_OPERATION, error);
+        // The operations are valid
+        assertEquals(GLES20.GL_NO_ERROR, error);
     }
 
     public void test_glAttachShaders_invalidshader_attach_valid_handle() throws Throwable{
         mActivity = getShaderActivity(Constants.SHADER, 9);
         int error = mActivity.mRenderer.mAttachShaderError;
-        assertEquals(GLES20.GL_INVALID_OPERATION, error);
+        assertTrue(GLES20.GL_NO_ERROR != error);
     }
 
     public void test_glAttachShaders_successfulcompile_attach_frag() throws Throwable {

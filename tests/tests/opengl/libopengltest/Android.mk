@@ -17,7 +17,7 @@
 #
 LOCAL_PATH := $(call my-dir)
 include $(CLEAR_VARS)
-LOCAL_MODULE := libopengltest
+LOCAL_MODULE := libopengltest_jni
 LOCAL_MODULE_TAGS := optional
 LOCAL_SRC_FILES := common.cpp \
                    gl2_jni_libone.cpp \
