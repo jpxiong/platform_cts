@@ -54,13 +54,6 @@
         <meta-data android:name="com.google.android.backup.api_key"
                 android:value="AEdPqrEAAAAIbK6ldcOzoeRtQ1u1dFVJ1A7KetRhit-a1Xa82Q" />
 
-        <activity android:name=".CtsVerifierActivity" android:label="@string/app_name">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
-
         <activity android:name=".TestListActivity" android:label="@string/app_name">
             <!--
                 TestListActivity will have the USB accessory Test in its test list, but it
@@ -383,6 +376,14 @@
         <activity android:name=".p2p.ServiceResponderTestActivity"
                 android:label="@string/p2p_service_discovery_responder"
                 android:configChanges="keyboardHidden|orientation" />
+
+        <activity-alias android:name=".CtsVerifierActivity" android:label="@string/app_name"
+                android:targetActivity=".TestListActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity-alias>
 
    </application>
 
