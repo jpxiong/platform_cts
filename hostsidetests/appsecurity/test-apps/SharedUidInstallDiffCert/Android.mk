@@ -27,4 +27,6 @@ LOCAL_PACKAGE_NAME := CtsSharedUidInstallDiffCert
 # sign this app with a different cert than CtsSharedUidInstall
 LOCAL_CERTIFICATE := cts/hostsidetests/appsecurity/certs/cts-testkey2
 
+LOCAL_DEX_PREOPT := false
+
 include $(BUILD_PACKAGE)

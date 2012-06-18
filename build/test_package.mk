@@ -19,6 +19,9 @@
 # Replace "include $(BUILD_PACKAGE)" with "include $(BUILD_CTS_PACKAGE)"
 #
 
+# Disable by default so "m cts" will work in emulator builds
+LOCAL_DEX_PREOPT := false
+
 include $(BUILD_PACKAGE)
 
 cts_package_apk := $(CTS_TESTCASES_OUT)/$(LOCAL_PACKAGE_NAME).apk

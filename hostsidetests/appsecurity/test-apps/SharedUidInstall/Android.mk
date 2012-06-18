@@ -29,4 +29,6 @@ LOCAL_CERTIFICATE := cts/hostsidetests/appsecurity/certs/cts-testkey1
 
 LOCAL_PROGUARD_ENABLED := disabled
 
+LOCAL_DEX_PREOPT := false
+
 include $(BUILD_PACKAGE)
