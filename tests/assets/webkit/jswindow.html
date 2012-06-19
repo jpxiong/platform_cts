@@ -18,12 +18,13 @@
         <title>javascript window</title>
     </head>
     <script type="text/javascript">
+        var childWindow;
         function fireOpen() {
             childWindow = window.open();
             childWindow.document.title = "javascript child window";
             childWindow.document.write("javascript child window");
             childWindow.focus();
-            setTimeout("childWindow.close()", 2000);
+            setTimeout(function(){childWindow.close();}, 2000);
         }
     </script>
     <body onload="fireOpen()">
