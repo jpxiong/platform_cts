@@ -102,9 +102,12 @@ public class AvailableIntentsTest extends AndroidTestCase {
      * Test ACTION_CALL when uri is a phone number, it will call the entered phone number.
      */
     public void testCallPhoneNumber() {
-        Uri uri = Uri.parse("tel:2125551212");
-        Intent intent = new Intent(Intent.ACTION_CALL, uri);
-        assertCanBeHandled(intent);
+        PackageManager packageManager = mContext.getPackageManager();
+        if (packageManager.hasSystemFeature(PackageManager.FEATURE_TELEPHONY)) {
+            Uri uri = Uri.parse("tel:2125551212");
+            Intent intent = new Intent(Intent.ACTION_CALL, uri);
+            assertCanBeHandled(intent);
+        }
     }
 
     /**
