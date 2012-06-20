@@ -163,6 +163,10 @@ public class MediaRecorderStressTest extends ActivityInstrumentationTestCase2<Me
     //Test case for stressing the camera preview.
     @LargeTest
     public void testStressCamera() throws Exception {
+        if (Camera.getNumberOfCameras() < 1) {
+            return;
+        }
+
         SurfaceHolder mSurfaceHolder;
         mSurfaceHolder = MediaFrameworkTest.getSurfaceView().getHolder();
         File stressOutFile = new File(WorkDir.getTopDir(), MEDIA_STRESS_OUTPUT);
@@ -259,6 +263,10 @@ public class MediaRecorderStressTest extends ActivityInstrumentationTestCase2<Me
     //Stress test case for switching camera and video recorder preview.
     @LargeTest
     public void testStressCameraSwitchRecorder() throws Exception {
+        if (Camera.getNumberOfCameras() < 1) {
+            return;
+        }
+
         String filename;
         SurfaceHolder mSurfaceHolder;
         mSurfaceHolder = MediaFrameworkTest.getSurfaceView().getHolder();
@@ -346,6 +354,10 @@ public class MediaRecorderStressTest extends ActivityInstrumentationTestCase2<Me
     //Stress test case for record a video and play right away.
     @LargeTest
     public void testStressRecordVideoAndPlayback() throws Exception {
+        if (Camera.getNumberOfCameras() < 1) {
+            return;
+        }
+
         String filename;
         SurfaceHolder mSurfaceHolder;
         mSurfaceHolder = MediaFrameworkTest.getSurfaceView().getHolder();
@@ -353,10 +365,6 @@ public class MediaRecorderStressTest extends ActivityInstrumentationTestCase2<Me
         Writer output = new BufferedWriter(
                 new FileWriter(stressOutFile, true));
 
-        if (!mHasRearCamera && !mHasFrontCamera) {
-                output.write("No camera found. Skipping video record and play back stress test\n");
-                return;
-        }
         output.write("Video record and play back stress test:\n");
         output.write("Total number of loops:"
                 + NUMBER_OF_RECORDERANDPLAY_STRESS_LOOPS + "\n");
