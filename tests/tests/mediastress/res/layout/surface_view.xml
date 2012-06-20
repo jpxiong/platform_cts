@@ -29,15 +29,6 @@
                 android:layout_height="match_parent"
                 android:layout_centerInParent="true" />
 
-        <ImageView android:id="@+id/overlay_layer"
-                android:layout_width="0dip"
-                android:layout_height="392dip"/>
-
-        <VideoView
-                android:id="@+id/video_view"
-                android:layout_width="320px"
-                android:layout_height="240px"  />
-
     </FrameLayout>
 
 </LinearLayout>
