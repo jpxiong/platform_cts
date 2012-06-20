@@ -314,7 +314,7 @@ public class MediaPlayerTest extends MediaPlayerTestBase {
      * from the time setDisplay() was called
      */
     public void testVideoSurfaceResetting() throws Exception {
-        final int tolerance = 66 * 3 / 2; /* Test video is 15fps... 66 ms per frame */
+        final int tolerance = 150;
         final int audioLatencyTolerance = 1000;  /* covers audio path latency variability */
         final int seekPos = 5000;
 
