@@ -35,9 +35,6 @@ public class MediaFrameworkTest extends Activity implements SurfaceHolder.Callba
     private static String TAG = "MediaFrameworkTest";
     private static SurfaceView mSurfaceView;
 
-    private Bitmap mDestBitmap;
-    private ImageView mOverlayView;
-
     private PowerManager.WakeLock mWakeLock = null;
 
     public static SurfaceView getSurfaceView() {
@@ -50,13 +47,7 @@ public class MediaFrameworkTest extends Activity implements SurfaceHolder.Callba
         super.onCreate(icicle);
         setContentView(R.layout.surface_view);
         mSurfaceView = (SurfaceView)findViewById(R.id.surface_view);
-        mOverlayView = (ImageView)findViewById(R.id.overlay_layer);
-        ViewGroup.LayoutParams lp = mSurfaceView.getLayoutParams();
         mSurfaceView.getHolder().addCallback(this);
-
-        mOverlayView.setLayoutParams(lp);
-        mDestBitmap = Bitmap.createBitmap((int)640, (int)480, Bitmap.Config.ARGB_8888);
-        mOverlayView.setImageBitmap(mDestBitmap);
 
         //Acquire the full wake lock to keep the device up
         PowerManager pm = (PowerManager) this.getSystemService(Context.POWER_SERVICE);
