@@ -365,10 +365,6 @@ public class MediaRecorderStressTest extends ActivityInstrumentationTestCase2<Me
         Writer output = new BufferedWriter(
                 new FileWriter(stressOutFile, true));
 
-        if (!mHasRearCamera && !mHasFrontCamera) {
-                output.write("No camera found. Skipping video record and play back stress test\n");
-                return;
-        }
         output.write("Video record and play back stress test:\n");
         output.write("Total number of loops:"
                 + NUMBER_OF_RECORDERANDPLAY_STRESS_LOOPS + "\n");
