@@ -23,13 +23,10 @@ import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.PowerManager;
-import android.util.DisplayMetrics;
 import android.util.Log;
-import android.view.Display;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.ViewGroup;
-import android.view.WindowManager;
 import android.widget.ImageView;
 
 import com.android.cts.mediastress.R;
@@ -55,12 +52,20 @@ public class MediaFrameworkTest extends Activity implements SurfaceHolder.Callba
         //Acquire the full wake lock to keep the device up
         PowerManager pm = (PowerManager) this.getSystemService(Context.POWER_SERVICE);
         mWakeLock = pm.newWakeLock(PowerManager.FULL_WAKE_LOCK, "MediaFrameworkTest");
+        mWakeLock.setReferenceCounted(false);
+    }
+
+    @Override
+    protected void onResume() {
+        Log.v(TAG, "onResume, acquire wakelock");
+        super.onResume();
         mWakeLock.acquire();
     }
 
-    public void onStop(Bundle icicle) {
+    public void onPause(Bundle icicle) {
+        Log.v(TAG, "onPause, release wakelock");
         mWakeLock.release();
-        super.onStop();
+        super.onPause();
     }
 
     public void surfaceDestroyed(SurfaceHolder holder) {
