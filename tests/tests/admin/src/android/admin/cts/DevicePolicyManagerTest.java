@@ -64,14 +64,6 @@ public class DevicePolicyManagerTest extends AndroidTestCase {
         assertTrue(mDevicePolicyManager.isAdminActive(mComponent));
     }
 
-    public void testGetMaximumTimeToLock() {
-        mDevicePolicyManager.setMaximumTimeToLock(mComponent, 3000);
-        assertEquals(3000, mDevicePolicyManager.getMaximumTimeToLock(mComponent));
-
-        mDevicePolicyManager.setMaximumTimeToLock(mComponent, 5000);
-        assertEquals(5000, mDevicePolicyManager.getMaximumTimeToLock(mComponent));
-    }
-
     public void testGetMaximumFailedPasswordsForWipe() {
         mDevicePolicyManager.setMaximumFailedPasswordsForWipe(mComponent, 3);
         assertEquals(3, mDevicePolicyManager.getMaximumFailedPasswordsForWipe(mComponent));
