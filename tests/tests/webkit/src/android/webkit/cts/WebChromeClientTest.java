@@ -128,10 +128,9 @@ public class WebChromeClientTest extends ActivityInstrumentationTestCase2<WebVie
             @Override
             public void run() {
                 // getInstance must run on the UI thread
-                WebIconDatabase mIconDb = WebIconDatabase.getInstance();
+                mIconDb = WebIconDatabase.getInstance();
                 String dbPath = getActivity().getFilesDir().toString() + "/icons";
                 mIconDb.open(dbPath);
-                mIconDb.removeAllIcons();
             }
         });
 
