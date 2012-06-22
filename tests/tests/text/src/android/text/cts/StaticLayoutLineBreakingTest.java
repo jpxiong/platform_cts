@@ -27,7 +27,7 @@ import android.text.style.MetricAffectingSpan;
 public class StaticLayoutLineBreakingTest extends AndroidTestCase {
     // Span test are currently not supported because text measurement uses the MeasuredText
     // internal mWorkPaint instead of the provided MockTestPaint.
-    private static final boolean SPAN_TESTS_SUPPORTED = true;
+    private static final boolean SPAN_TESTS_SUPPORTED = false;
 
     private static final float SPACE_MULTI = 1.0f;
     private static final float SPACE_ADD = 0.0f;
