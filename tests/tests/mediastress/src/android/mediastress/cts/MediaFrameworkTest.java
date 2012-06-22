@@ -62,7 +62,8 @@ public class MediaFrameworkTest extends Activity implements SurfaceHolder.Callba
         mWakeLock.acquire();
     }
 
-    public void onPause(Bundle icicle) {
+    @Override
+    protected void onPause() {
         Log.v(TAG, "onPause, release wakelock");
         mWakeLock.release();
         super.onPause();
