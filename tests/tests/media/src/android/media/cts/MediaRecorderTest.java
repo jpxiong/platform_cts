@@ -371,6 +371,9 @@ public class MediaRecorderTest extends ActivityInstrumentationTestCase2<MediaStu
         mMediaRecorder.start();
         Thread.sleep(RECORD_TIME);
         mMediaRecorder.stop();
+        // onErrorListner sometimes fails in the 3rd assert.
+        // Fix trial: give some time to write, but this may not fix it.
+        Thread.sleep(1000);
         assertTrue(outFile.exists());
         // The max file size is always guaranteed.
         // We just make sure that the margin is not too big
