@@ -2895,9 +2895,14 @@ public class TextViewTest extends ActivityInstrumentationTestCase2<TextViewStubA
             }
         });
         mInstrumentation.waitForIdleSync();
-
         assertTrue(mTextView.isFocused());
-        assertTrue(mTextView.isInputMethodTarget());
+
+        new PollingCheck() {
+            @Override
+            protected boolean check() {
+                return mTextView.isInputMethodTarget();
+            }
+        }.run();
     }
 
     public void testBeginEndBatchEdit() {
