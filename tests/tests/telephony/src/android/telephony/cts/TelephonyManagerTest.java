@@ -23,6 +23,7 @@ import dalvik.annotation.TestTargets;
 
 import android.content.Context;
 import android.content.pm.PackageManager;
+import android.net.ConnectivityManager;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.os.Build;
@@ -43,12 +44,14 @@ public class TelephonyManagerTest extends AndroidTestCase {
     private static final int TOLERANCE = 1000;
     private Looper mLooper;
     private PhoneStateListener mListener;
+    private static ConnectivityManager mCm;
 
     @Override
     protected void setUp() throws Exception {
         super.setUp();
         mTelephonyManager =
             (TelephonyManager)getContext().getSystemService(Context.TELEPHONY_SERVICE);
+        mCm = (ConnectivityManager) getContext().getSystemService(Context.CONNECTIVITY_SERVICE);
     }
 
     @Override
@@ -296,8 +299,14 @@ public class TelephonyManagerTest extends AndroidTestCase {
                 break;
 
             case TelephonyManager.PHONE_TYPE_NONE:
-                assertSerialNumber();
-                assertMacAddressReported();
+                boolean nwSupported = mCm.isNetworkSupported(mCm.TYPE_WIFI);
+                if (nwSupported) {
+                    assertSerialNumber();
+                    assertMacAddressReported();
+                } else {
+                    nwSupported = mCm.isNetworkSupported(mCm.TYPE_ETHERNET);
+                    assertTrue(nwSupported);
+                }
                 break;
 
             default:
