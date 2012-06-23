@@ -108,7 +108,7 @@ public class ValueAnimatorTest extends
     public void testCancel() throws Throwable {
         startAnimation(mValueAnimator);
         Thread.sleep(100);
-        mValueAnimator.cancel();
+        cancelAnimation(mValueAnimator);
         assertFalse(mValueAnimator.isRunning());
     }
 
@@ -258,6 +258,15 @@ public class ValueAnimatorTest extends
         this.runTestOnUiThread(animationRunnable);
     }
 
+    private void cancelAnimation(final ValueAnimator mValueAnimator) throws Throwable {
+        Thread animationRunnable = new Thread() {
+            public void run() {
+                mValueAnimator.cancel();
+            }
+        };
+        this.runTestOnUiThread(animationRunnable);
+    }
+
     private String errorMessage(float[] values) {
         StringBuilder message = new StringBuilder();
         for (int i = 0; i < values.length; i++) {
@@ -266,4 +275,3 @@ public class ValueAnimatorTest extends
         return message.toString();
     }
 }
-
