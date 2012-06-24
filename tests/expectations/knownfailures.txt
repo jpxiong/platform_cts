@@ -1,5 +1,12 @@
 [
   {
+    names: [
+      "com.android.cts.appsecurity.AppSecurityTests#testReadExternalStorageEnforced",
+      "com.android.cts.appsecurity.AppSecurityTests#testReadExternalStorageUnenforced"
+    ],
+    bug: 6721185
+  },
+  {
     name: "android.accessibilityservice.cts.AccessibilityTextTraversalTest#testActionNextAndPreviousAtGranularityPageOverText",
     bug: 6468754
   },
