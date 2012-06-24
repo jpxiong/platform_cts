@@ -1,5 +1,13 @@
 [
   {
+    name: "android.accessibilityservice.cts.AccessibilityTextTraversalTest#testActionNextAndPreviousAtGranularityPageOverText",
+    bug: 6468754
+  },
+  {
+    name: "android.accessibilityservice.cts.AccessibilityWindowQueryTest#testPerformGlobalActionBack",
+    bug: 6365037
+  },
+  {
     names: [
       "android.media.cts.StreamingMediaPlayerTest#testRTSP_MPEG4SP_AAC_Video1",
       "android.media.cts.StreamingMediaPlayerTest#testRTSP_MPEG4SP_AAC_Video2"
@@ -19,6 +27,10 @@
       "android.media.cts.StreamingMediaPlayerTest#testRTSP_H264Base_AAC_Video2"
     ],
     bug: 6215719
+  },
+  {
+    name: "android.nativemedia.sl.SLObjectCreationTest#testAudioRecorderCreation",
+    bug: 4970300
   },
   {
     name: "android.opengl.cts.AttachShaderTest#test_glAttachedShaders_invalidshader",
