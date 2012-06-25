@@ -2445,6 +2445,14 @@ public class ViewTest extends ActivityInstrumentationTestCase2<ViewTestStubActiv
     public void testWindowFocusChanged() {
         final MockView view = (MockView) mActivity.findViewById(R.id.mock_view);
 
+        // Wait until the window has been focused.
+        new PollingCheck(TIMEOUT_DELTA) {
+            @Override
+            protected boolean check() {
+                return view.hasWindowFocus();
+            }
+        }.run();
+
         new PollingCheck() {
             protected boolean check() {
                 return view.hasCalledOnWindowFocusChanged();
@@ -2459,6 +2467,15 @@ public class ViewTest extends ActivityInstrumentationTestCase2<ViewTestStubActiv
         assertFalse(view.hasCalledDispatchWindowFocusChanged());
 
         StubActivity activity = launchActivity("com.android.cts.stub", StubActivity.class, null);
+
+        // Wait until the window lost focus.
+        new PollingCheck(TIMEOUT_DELTA) {
+            @Override
+            protected boolean check() {
+                return !view.hasWindowFocus();
+            }
+        }.run();
+
         assertTrue(view.hasCalledOnWindowFocusChanged());
         assertTrue(view.hasCalledDispatchWindowFocusChanged());
 
