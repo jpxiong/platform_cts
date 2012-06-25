@@ -373,9 +373,15 @@ public class FileSystemPermissionTest extends AndroidTestCase {
                 writableDirs.isEmpty());
     }
 
+    private static final Set<File> SYS_EXCEPTIONS = new HashSet<File>(
+            Arrays.asList(
+                new File("/sys/kernel/debug/tracing/trace_marker")
+            ));
+
     @LargeTest
     public void testAllFilesInSysAreNotWritable() throws Exception {
         Set<File> writable = getAllWritableFilesInDirAndSubDir(new File("/sys"));
+        writable.removeAll(SYS_EXCEPTIONS);
         assertTrue("Found writable: " + writable.toString(),
                 writable.isEmpty());
     }
