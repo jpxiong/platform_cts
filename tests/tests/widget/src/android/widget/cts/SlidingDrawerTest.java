@@ -123,7 +123,7 @@ public class SlidingDrawerTest
             }
         });
         assertTrue(drawer.isMoving());
-        assertFalse(drawer.isOpened());
+        assertOpened(false, drawer);
         assertEquals(View.GONE, content.getVisibility());
 
         new PollingCheck() {
@@ -132,7 +132,7 @@ public class SlidingDrawerTest
                 return !drawer.isMoving();
             }
         }.run();
-        assertTrue(drawer.isOpened());
+        assertOpened(true, drawer);
         assertEquals(View.VISIBLE, content.getVisibility());
 
         runTestOnUiThread(new Runnable() {
@@ -141,7 +141,7 @@ public class SlidingDrawerTest
             }
         });
         assertTrue(drawer.isMoving());
-        assertTrue(drawer.isOpened());
+        assertOpened(true, drawer);
         assertEquals(View.GONE, content.getVisibility());
 
         new PollingCheck() {
@@ -150,7 +150,7 @@ public class SlidingDrawerTest
                 return !drawer.isMoving();
             }
         }.run();
-        assertFalse(drawer.isOpened());
+        assertOpened(false, drawer);
         assertEquals(View.GONE, content.getVisibility());
     }
 
