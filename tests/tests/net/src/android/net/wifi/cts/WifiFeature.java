@@ -24,5 +24,9 @@ public class WifiFeature {
         PackageManager packageManager = context.getPackageManager();
         return packageManager.hasSystemFeature(PackageManager.FEATURE_WIFI);
     }
-}
 
+    static boolean isP2pSupported(Context context) {
+        PackageManager packageManager = context.getPackageManager();
+        return packageManager.hasSystemFeature(PackageManager.FEATURE_WIFI_DIRECT);
+    }
+}
