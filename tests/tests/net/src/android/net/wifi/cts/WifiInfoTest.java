@@ -21,11 +21,14 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.cts.util.PollingCheck;
 import android.net.wifi.SupplicantState;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.net.wifi.WifiManager.WifiLock;
 import android.test.AndroidTestCase;
+
+import java.util.concurrent.Callable;
 
 public class WifiInfoTest extends AndroidTestCase {
     private static class MySync {
@@ -127,10 +130,21 @@ public class WifiInfoTest extends AndroidTestCase {
         wifiInfo.getHiddenSSID();
         wifiInfo.getMacAddress();
         setWifiEnabled(false);
-        Thread.sleep(DURATION);
-        wifiInfo = mWifiManager.getConnectionInfo();
-        assertEquals(-1, wifiInfo.getNetworkId());
-        assertEquals(WifiManager.WIFI_STATE_DISABLED, mWifiManager.getWifiState());
+
+        PollingCheck.check("getNetworkId not -1", 20000, new Callable<Boolean>() {
+            @Override
+            public Boolean call() throws Exception {
+                WifiInfo wifiInfo = mWifiManager.getConnectionInfo();
+                return wifiInfo.getNetworkId() == -1;
+            }
+        });
+
+        PollingCheck.check("getWifiState not disabled", 20000, new Callable<Boolean>() {
+           @Override
+            public Boolean call() throws Exception {
+               return mWifiManager.getWifiState() == WifiManager.WIFI_STATE_DISABLED;
+            }
+        });
     }
 
 }
