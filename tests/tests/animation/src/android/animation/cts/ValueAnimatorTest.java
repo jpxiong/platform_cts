@@ -137,7 +137,7 @@ public class ValueAnimatorTest extends
         for(int j = 0; j < 9; j++){
             assertTrue(fractions[j] >= 0.0);
             assertTrue(fractions[j] <= 1.0);
-            assertTrue(fractions[j + 1] != fractions[j]);
+            assertTrue(errorMessage(fractions), fractions[j + 1] != fractions[j]);
         }
     }
 
@@ -148,7 +148,7 @@ public class ValueAnimatorTest extends
         float[] animatedValues = getValue(objAnimator, 10, "getAnimatedValue()", 200l, null);
 
         for(int j = 0; j < 9; j++){
-            assertTrue(animatedValues[j + 1] != animatedValues[j]);
+            assertTrue(errorMessage(animatedValues), animatedValues[j + 1] != animatedValues[j]);
         }
     }
     public void testGetAnimatedValue_PropertyName() throws Throwable {
@@ -160,7 +160,7 @@ public class ValueAnimatorTest extends
         float[] animatedValues = getValue(objAnimator, 10, "getAnimatedValue(property)", 200l,
             property);
         for(int j = 0; j < 9; j++){
-            assertTrue(animatedValues[j + 1] != animatedValues[j]);
+            assertTrue(errorMessage(animatedValues), animatedValues[j + 1] != animatedValues[j]);
         }
     }
 
@@ -256,6 +256,14 @@ public class ValueAnimatorTest extends
             }
         };
         this.runTestOnUiThread(animationRunnable);
+    }
+
+    private String errorMessage(float[] values) {
+        StringBuilder message = new StringBuilder();
+        for (int i = 0; i < values.length; i++) {
+            message.append(values[i]).append(" ");
+        }
+        return message.toString();
     }
 }
 
