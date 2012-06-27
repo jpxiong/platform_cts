@@ -27,19 +27,19 @@ public class IntentServiceStub extends IntentService {
         super("IntentServiceStub");
     }
 
-    public static String ISS_ADD = "add";
-    public static String ISS_VALUE = "value";
+    public static final String ISS_ADD = "add";
+    public static final String ISS_VALUE = "value";
 
-    public static int onHandleIntentCalled;
-    public static boolean onBindCalled;
-    public static boolean onCreateCalled;
-    public static boolean onDestroyCalled;
-    public static boolean onStartCalled;
-    public static int accumulator;
+    private static int onHandleIntentCalled;
+    private static boolean onBindCalled;
+    private static boolean onCreateCalled;
+    private static boolean onDestroyCalled;
+    private static boolean onStartCalled;
+    private static int accumulator;
 
     private static Throwable throwable;
 
-    public static void reset() {
+    public synchronized static void reset() {
         onHandleIntentCalled = 0;
         onBindCalled = false;
         onCreateCalled = false;
@@ -53,7 +53,9 @@ public class IntentServiceStub extends IntentService {
         new PollingCheck(timeout) {
             @Override
             protected boolean check() {
-                return IntentServiceStub.onDestroyCalled;
+                synchronized (IntentServiceStub.class) {
+                    return IntentServiceStub.onDestroyCalled;
+                }
             }
         }.run();
         if (throwable != null) {
@@ -63,39 +65,72 @@ public class IntentServiceStub extends IntentService {
 
     @Override
     protected void onHandleIntent(Intent intent) {
-        onHandleIntentCalled += 1;
-        try {
-            String action = intent.getAction();
-            if (action != null && action.equals(ISS_ADD)) {
-                accumulator += intent.getIntExtra(ISS_VALUE, 0);
+        synchronized (IntentServiceStub.class) {
+            onHandleIntentCalled += 1;
+            try {
+                String action = intent.getAction();
+                if (action != null && action.equals(ISS_ADD)) {
+                    accumulator += intent.getIntExtra(ISS_VALUE, 0);
+                }
+            } catch (Throwable t) {
+                throwable = t;
             }
-        } catch (Throwable t) {
-            throwable = t;
         }
     }
 
     @Override
     public IBinder onBind(Intent intent) {
-        onBindCalled = true;
+        synchronized (IntentServiceStub.class) {
+            onBindCalled = true;
+        }
         return new Binder();
     }
 
     @Override
     public void onCreate() {
-        onCreateCalled = true;
+        synchronized (IntentServiceStub.class) {
+            onCreateCalled = true;
+        }
         super.onCreate();
     }
 
     @Override
     public void onDestroy() {
-        onDestroyCalled = true;
+        synchronized (IntentServiceStub.class) {
+            onDestroyCalled = true;
+        }
         super.onDestroy();
     }
 
     @Override
     public void onStart(Intent intent, int startId) {
-        onStartCalled = true;
+        synchronized (IntentService.class) {
+            onStartCalled = true;
+        }
         super.onStart(intent, startId);
     }
 
+    public synchronized static int getOnHandleIntentCalledCount() {
+        return onHandleIntentCalled;
+    }
+
+    public synchronized static boolean isOnBindCalled() {
+        return onBindCalled;
+    }
+
+    public synchronized static boolean isOnCreateCalled() {
+        return onCreateCalled;
+    }
+
+    public synchronized static boolean isOnDestroyCalled() {
+        return onDestroyCalled;
+    }
+
+    public synchronized static boolean isOnStartCalled() {
+        return onStartCalled;
+    }
+
+    public synchronized static int getAccumulator() {
+        return accumulator;
+    }
 }
