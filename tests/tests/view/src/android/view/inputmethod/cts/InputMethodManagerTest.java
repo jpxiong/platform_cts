@@ -60,6 +60,14 @@ public class InputMethodManagerTest
     public void testInputMethodManager() throws Throwable {
         Window window = mActivity.getWindow();
         final EditText view = (EditText) window.findViewById(R.id.entry);
+
+        new PollingCheck(1000) {
+            @Override
+            protected boolean check() {
+                return view.hasWindowFocus();
+            }
+        }.run();
+
         runTestOnUiThread(new Runnable() {
            @Override
             public void run() {
