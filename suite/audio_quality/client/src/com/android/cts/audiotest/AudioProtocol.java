@@ -110,17 +110,16 @@ public class AudioProtocol implements AudioTrack.OnPlaybackPositionUpdateListene
     @Override
     public void onMarkerReached(AudioTrack track) {
         Log.d(TAG, "playback completed");
+        track.stop();
+        track.flush();
+        track.release();
+        mPlaybackThread.quitLoop();
+        mPlaybackThread = null;
         try {
             sendSimpleReplyHeader(CMD_START_PLAYBACK, PROTOCOL_OK);
         } catch (IOException e) {
             // maybe socket already closed. don't do anything
             Log.e(TAG, "ignore exception", e);
-        } finally {
-            track.stop();
-            track.flush();
-            track.release();
-            mPlaybackThread.quitLoop(false);
-            mPlaybackThread = null;
         }
     }
 
@@ -199,7 +198,7 @@ public class AudioProtocol implements AudioTrack.OnPlaybackPositionUpdateListene
             mRecord = null;
         }
         if (mRecordThread != null) {
-            mRecordThread.quitLoop(true);
+            mRecordThread.quitLoop();
             mRecordThread = null;
         }
         if (mPlayback != null) {
@@ -211,7 +210,7 @@ public class AudioProtocol implements AudioTrack.OnPlaybackPositionUpdateListene
             mPlayback = null;
         }
         if (mPlaybackThread != null) {
-            mPlaybackThread.quitLoop(true);
+            mPlaybackThread.quitLoop();
             mPlaybackThread = null;
         }
         mDataMap.clear();
@@ -246,8 +245,6 @@ public class AudioProtocol implements AudioTrack.OnPlaybackPositionUpdateListene
             if (samplingRate != 44100) {
                 throw new ProtocolError("wrong rate");
             }
-            //FIXME cannot start playback again
-            //TODO repeat
             //FIXME in MODE_STATIC, setNotificationMarkerPosition does not work with full length
             mPlaybackThread = new LoopThread(new Runnable() {
 
@@ -259,9 +256,16 @@ public class AudioProtocol implements AudioTrack.OnPlaybackPositionUpdateListene
                     }
                     int type = (mode == 0) ? AudioManager.STREAM_VOICE_CALL :
                         AudioManager.STREAM_MUSIC;
+                    int bufferSize = AudioTrack.getMinBufferSize(samplingRate,
+                            stereo ? AudioFormat.CHANNEL_OUT_STEREO : AudioFormat.CHANNEL_OUT_MONO,
+                            AudioFormat.ENCODING_PCM_16BIT);
+                    bufferSize = bufferSize * 4;
+                    if (bufferSize < 256 * 1024) {
+                        bufferSize = 256 * 1024;
+                    }
                     mPlayback = new AudioTrack(type, samplingRate,
                             stereo ? AudioFormat.CHANNEL_OUT_STEREO : AudioFormat.CHANNEL_OUT_MONO,
-                            AudioFormat.ENCODING_PCM_16BIT, data.capacity(),
+                            AudioFormat.ENCODING_PCM_16BIT, bufferSize,
                             AudioTrack.MODE_STREAM);
                     float minVolume = mPlayback.getMinVolume();
                     float maxVolume = mPlayback.getMaxVolume();
@@ -269,7 +273,10 @@ public class AudioProtocol implements AudioTrack.OnPlaybackPositionUpdateListene
                     mPlayback.setStereoVolume(newVolume, newVolume);
                     Log.d(TAG, "setting volume " + newVolume + " max " + maxVolume +
                             " min " + minVolume + " received " + volume);
-                    mPlayback.write(data.array(), 0, data.capacity());
+                    int dataWritten = 0;
+                    int dataToWrite = (bufferSize < data.capacity())? bufferSize : data.capacity();
+                    mPlayback.write(data.array(), 0, dataToWrite);
+                    dataWritten = dataToWrite;
                     mPlayback.setPlaybackPositionUpdateListener(AudioProtocol.this);
 
                     int endMarker = data.capacity()/(stereo ? 4 : 2);
@@ -278,6 +285,12 @@ public class AudioProtocol implements AudioTrack.OnPlaybackPositionUpdateListene
                             " set.. res " + res + " stereo? " + stereo + " mode " + mode +
                             " end " + endMarker);
                     mPlayback.play();
+                    while (dataWritten < data.capacity()) {
+                        int dataLeft = data.capacity() - dataWritten;
+                        dataToWrite = (bufferSize < dataLeft)? bufferSize : dataLeft;
+                        mPlayback.write(data.array(), dataWritten, dataToWrite);
+                        dataWritten += dataToWrite;
+                    }
                 }
             });
             mPlaybackThread.start();
@@ -299,7 +312,7 @@ public class AudioProtocol implements AudioTrack.OnPlaybackPositionUpdateListene
             mPlayback = null;
         }
         if (mPlaybackThread != null) {
-            mPlaybackThread.quitLoop(true);
+            mPlaybackThread.quitLoop();
             mPlaybackThread = null;
         }
         sendSimpleReplyHeader(CMD_STOP_PLAYBACK, PROTOCOL_OK);
@@ -393,7 +406,7 @@ public class AudioProtocol implements AudioTrack.OnPlaybackPositionUpdateListene
             mRecord = null;
         }
         if (mRecordThread != null) {
-            mRecordThread.quitLoop(true);
+            mRecordThread.quitLoop();
             mRecordThread = null;
         }
         sendSimpleReplyHeader(CMD_STOP_RECORDING, PROTOCOL_OK);
@@ -437,10 +450,10 @@ public class AudioProtocol implements AudioTrack.OnPlaybackPositionUpdateListene
             Looper.loop();
         }
         // should be called outside this thread
-        public void quitLoop(boolean wait) {
+        public void quitLoop() {
             mLooper.quit();
             try {
-                if (wait) {
+                if (Thread.currentThread() != this) {
                     join();
                 }
             } catch (InterruptedException e) {
