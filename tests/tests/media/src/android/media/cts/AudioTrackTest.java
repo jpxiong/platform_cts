@@ -22,6 +22,8 @@ import android.media.AudioTrack;
 import android.test.AndroidTestCase;
 import android.util.Log;
 
+import java.nio.ByteBuffer;
+
 public class AudioTrackTest extends AndroidTestCase {
     private String TAG = "AudioTrackTest";
     private final long WAIT_MSEC = 200;
@@ -1312,6 +1314,27 @@ public class AudioTrackTest extends AndroidTestCase {
         Thread.sleep(WAIT_MSEC);
         // -------- tear down --------------
         track.release();
+    }
+
+    public void testResourceLeakage() throws Exception {
+        final int BUFFER_SIZE = 600 * 1024;
+        ByteBuffer data = ByteBuffer.allocate(BUFFER_SIZE);
+        for (int i = 0; i < 10; i++) {
+            Log.i(TAG, "testResourceLeakage round " + i);
+            data.rewind();
+            AudioTrack track = new AudioTrack(AudioManager.STREAM_VOICE_CALL,
+                                              44100,
+                                              AudioFormat.CHANNEL_OUT_STEREO,
+                                              AudioFormat.ENCODING_PCM_16BIT,
+                                              data.capacity(),
+                                              AudioTrack.MODE_STREAM);
+            assertTrue(track != null);
+            track.write(data.array(), 0, data.capacity());
+            track.play();
+            Thread.sleep(100);
+            track.stop();
+            track.release();
+        }
     }
 
     private class MockAudioTrack extends AudioTrack {
