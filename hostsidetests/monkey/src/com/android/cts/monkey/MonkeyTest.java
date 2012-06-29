@@ -24,8 +24,6 @@ import java.util.regex.Pattern;
 
 public class MonkeyTest extends AbstractMonkeyTest {
 
-    private static final Pattern LOG_PATTERN =
-            Pattern.compile("I/MonkeyActivity\\([\\d ]+\\): (.*)");
     private static final String MONKEY = "@(>.<)@";
     private static final String HUMAN = "(^_^)";
 
@@ -49,13 +47,11 @@ public class MonkeyTest extends AbstractMonkeyTest {
         try {
             while (s.hasNextLine()) {
                 String line = s.nextLine();
-                Matcher m = LOG_PATTERN.matcher(line);
-                if (m.matches()) {
+                if (line.contains(isMonkey ? MONKEY : HUMAN)) {
                     monkeyLogsFound = true;
-                    assertEquals(isMonkey ? MONKEY : HUMAN, m.group(1));
                 }
             }
-            assertTrue("No monkey logs were found!", monkeyLogsFound);
+            assertTrue(monkeyLogsFound);
         } finally {
             s.close();
         }
