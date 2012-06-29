@@ -29,7 +29,7 @@ public class MediaPlayerSurfaceTest extends ActivityInstrumentationTestCase2<Med
 
     public void testSetSurface() throws Exception {
         Bundle extras = new Bundle();
-        MediaPlayerSurfaceStubActivity activity = launchActivity("com.android.cts.stub",
+        MediaPlayerSurfaceStubActivity activity = launchActivity("com.android.cts.media",
                 MediaPlayerSurfaceStubActivity.class, extras);
         activity.playVideo();
         activity.finish();

@@ -121,42 +121,10 @@
                 android:name="android.app.cts.MockApplication">
 
         <activity android:name="android.app.cts.ActionBarActivity" />
-
-        <activity android:name="android.media.cts.AudioManagerStub"
-            android:label="AudioManagerStub"/>
-        <activity android:name="android.media.cts.AudioManagerStubHelper"
-            android:label="AudioManagerStubHelper"/>
-
         <activity android:name="android.widget.cts.TwoLineListItemStubActivity"
             android:label="TwoLineListItemStubActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.FRAMEWORK_INSTRUMENTATION_TEST" />
-            </intent-filter>
-        </activity>
-
-        <activity android:name="android.media.cts.MediaStubActivity"
-            android:label="MediaStubActivity"
-            android:screenOrientation="nosensor"
-            android:configChanges="keyboard|keyboardHidden|orientation|screenSize">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.FRAMEWORK_INSTRUMENTATION_TEST" />
-            </intent-filter>
-        </activity>
-
-        <activity android:name="android.media.cts.MediaPlayerSurfaceStubActivity"
-            android:label="MediaPlayerSurfaceStubActivity">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.FRAMEWORK_INSTRUMENTATION_TEST" />
-            </intent-filter>
-        </activity>
-
-        <activity android:name="android.media.cts.RingtonePickerActivity"
-            android:label="RingtonePickerActivity">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.FRAMEWORK_INSTRUMENTATION_TEST" />
             </intent-filter>
         </activity>
@@ -529,9 +497,6 @@
                 <category android:name="android.intent.category.FRAMEWORK_INSTRUMENTATION_TEST" />
             </intent-filter>
         </activity>
-
-       <activity android:name="android.media.cts.FaceDetectorStub"
-            android:label="FaceDetectorStub"/>
 
         <activity android:name="android.widget.cts.ListViewStubActivity"
             android:label="ListViewStubActivity">
