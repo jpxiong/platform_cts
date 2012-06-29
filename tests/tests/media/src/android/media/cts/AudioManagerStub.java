@@ -16,7 +16,8 @@
 
 package android.media.cts;
 
-import com.android.cts.stub.R;
+import com.android.cts.media.R;
+
 import android.app.Activity;
 import android.app.cts.CTSResult;
 import android.content.Context;

@@ -16,7 +16,7 @@
 
 package android.media.cts;
 
-import com.android.cts.stub.R;
+import com.android.cts.media.R;
 
 
 import android.content.res.AssetFileDescriptor;
