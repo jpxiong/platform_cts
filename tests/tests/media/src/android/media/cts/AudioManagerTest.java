@@ -36,7 +36,7 @@ import static android.media.AudioManager.VIBRATE_TYPE_NOTIFICATION;
 import static android.media.AudioManager.VIBRATE_TYPE_RINGER;
 import static android.provider.Settings.System.SOUND_EFFECTS_ENABLED;
 
-import com.android.cts.stub.R;
+import com.android.cts.media.R;
 
 
 import android.content.Context;
