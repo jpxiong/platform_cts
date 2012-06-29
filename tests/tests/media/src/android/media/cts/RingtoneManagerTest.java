@@ -32,7 +32,7 @@ import android.test.ActivityInstrumentationTestCase2;
 public class RingtoneManagerTest
         extends ActivityInstrumentationTestCase2<RingtonePickerActivity> {
 
-    private static final String PKG = "com.android.cts.stub";
+    private static final String PKG = "com.android.cts.media";
 
     private RingtonePickerActivity mActivity;
     private Instrumentation mInstrumentation;
