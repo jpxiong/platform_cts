@@ -299,7 +299,6 @@ public class AudioManagerTest extends AndroidTestCase {
     public void testVolume() throws Exception {
         int[] streams = { AudioManager.STREAM_ALARM,
                           AudioManager.STREAM_MUSIC,
-                          AudioManager.STREAM_SYSTEM,
                           AudioManager.STREAM_VOICE_CALL,
                           AudioManager.STREAM_RING };
 
