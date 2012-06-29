@@ -24,7 +24,7 @@ import android.test.ActivityInstrumentationTestCase2;
 public class MediaPlayerSurfaceTest extends ActivityInstrumentationTestCase2<MediaPlayerSurfaceStubActivity> {
 
     public MediaPlayerSurfaceTest() {
-        super("com.android.cts.stub", MediaPlayerSurfaceStubActivity.class);
+        super("com.android.cts.media", MediaPlayerSurfaceStubActivity.class);
     }
 
     public void testSetSurface() throws Exception {
