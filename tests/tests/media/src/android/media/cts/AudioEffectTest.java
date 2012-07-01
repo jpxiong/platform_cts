@@ -46,6 +46,8 @@ public class AudioEffectTest extends AndroidTestCase {
     // AudioRecord sampling rate
     private final static int SAMPLING_RATE = 44100;
 
+    private final static int MAX_LOOPER_WAIT_COUNT = 10;
+
     private AudioEffect mEffect = null;
     private AudioEffect mEffect2 = null;
     private int mSession = -1;
@@ -59,6 +61,7 @@ public class AudioEffectTest extends AndroidTestCase {
 
     private final Object mLock = new Object();
 
+    private ListenerThread mEffectListenerLooper = null;
 
     //-----------------------------------------------------------------
     // AUDIOEFFECT TESTS:
@@ -266,72 +269,64 @@ public class AudioEffectTest extends AndroidTestCase {
 
     //Test case 1.5: test auxiliary effect attachement on MediaPlayer
     public void test1_5AuxiliaryOnMediaPlayer() throws Exception {
-        createMediaPlayerLooper();
         synchronized(mLock) {
-            try {
-                mLock.wait(1000);
-            } catch(Exception e) {
-                fail("Looper creation: wait was interrupted.");
-            }
-        }
-        assertTrue(mInitialized);  // mMediaPlayer has been initialized?
-        mError = 0;
+            mInitialized = false;
+            createMediaPlayerLooper();
+            waitForLooperInitialization_l();
 
-        AssetFileDescriptor afd = mContext.getResources().openRawResourceFd(R.raw.testmp3);
-        mMediaPlayer.setDataSource(afd.getFileDescriptor(), afd.getStartOffset(), afd.getLength());
-        afd.close();
-        getEffect(AudioEffect.EFFECT_TYPE_PRESET_REVERB, 0);
-        try {
-            synchronized(mLock) {
+            mError = 0;
+            AssetFileDescriptor afd = mContext.getResources().openRawResourceFd(R.raw.testmp3);
+            mMediaPlayer.setDataSource(afd.getFileDescriptor(),
+                                       afd.getStartOffset(),
+                                       afd.getLength());
+            afd.close();
+            getEffect(AudioEffect.EFFECT_TYPE_PRESET_REVERB, 0);
+            try {
                 try {
                     mMediaPlayer.attachAuxEffect(mEffect.getId());
                     mMediaPlayer.setAuxEffectSendLevel(1.0f);
-                    mLock.wait(200);
+                    mLock.wait(1000);
                 } catch(Exception e) {
                     fail("Attach effect: wait was interrupted.");
                 }
+                assertTrue("error on attachAuxEffect", mError == 0);
+            } catch (IllegalStateException e) {
+                fail("attach aux effect failed");
+            } finally {
+                terminateMediaPlayerLooper();
+                releaseEffect();
             }
-            assertTrue("error on attachAuxEffect", mError == 0);
-
-        } catch (IllegalStateException e) {
-            fail("attach aux effect failed");
-        } finally {
-            terminateMediaPlayerLooper();
-            releaseEffect();
         }
     }
 
     //Test case 1.6: test auxiliary effect attachement failure before setDatasource
     public void test1_6AuxiliaryOnMediaPlayerFailure() throws Exception {
-        createMediaPlayerLooper();
         synchronized(mLock) {
-            try {
-                mLock.wait(1000);
-            } catch(Exception e) {
-                fail("Looper creation: wait was interrupted.");
-            }
-        }
-        assertTrue(mInitialized);  // mMediaPlayer has been initialized?
-        mError = 0;
+            mInitialized = false;
+            createMediaPlayerLooper();
+            waitForLooperInitialization_l();
 
-        getEffect(AudioEffect.EFFECT_TYPE_PRESET_REVERB, 0);
-        try {
-            synchronized(mLock) {
+            getEffect(AudioEffect.EFFECT_TYPE_PRESET_REVERB, 0);
+
+            mError = 0;
+            int looperWaitCount = MAX_LOOPER_WAIT_COUNT;
+            while (mError == 0 && (looperWaitCount-- > 0)) {
                 try {
-                    mMediaPlayer.attachAuxEffect(mEffect.getId());
-                    mLock.wait(1000);
+                    try {
+                        mMediaPlayer.attachAuxEffect(mEffect.getId());
+                    } catch (IllegalStateException e) {
+                        terminateMediaPlayerLooper();
+                        releaseEffect();
+                        fail("attach aux effect failed");
+                    }
+                    mLock.wait();
                 } catch(Exception e) {
-                    fail("Attach effect: wait was interrupted.");
                 }
             }
             assertTrue("no error on attachAuxEffect", mError != 0);
-
-        } catch (IllegalStateException e) {
-            fail("attach aux effect failed");
-        } finally {
-            terminateMediaPlayerLooper();
-            releaseEffect();
         }
+        terminateMediaPlayerLooper();
+        releaseEffect();
     }
 
 
@@ -798,26 +793,22 @@ public class AudioEffectTest extends AndroidTestCase {
     //Test case 4.2: test control status listener
     public void test4_2ControlStatusListener() throws Exception {
 
-        mHasControl = true;
-        createListenerLooper(true, false, false);
         synchronized(mLock) {
-            try {
-                mLock.wait(1000);
-            } catch(Exception e) {
-                fail("Looper creation: wait was interrupted.");
+            mHasControl = true;
+            mInitialized = false;
+            createListenerLooper(true, false, false);
+            waitForLooperInitialization_l();
+
+            getEffect(AudioEffect.EFFECT_TYPE_PRESET_REVERB, 0);
+            int looperWaitCount = MAX_LOOPER_WAIT_COUNT;
+            while (mHasControl && (looperWaitCount-- > 0)) {
+                try {
+                    mLock.wait();
+                } catch(Exception e) {
+                }
             }
-        }
-        assertTrue(mInitialized);
-        synchronized(mLock) {
-            try {
-                getEffect(AudioEffect.EFFECT_TYPE_PRESET_REVERB, 0);
-                mLock.wait(1000);
-            } catch(Exception e) {
-                fail("Create second effect: wait was interrupted.");
-            } finally {
-                releaseEffect();
-                terminateListenerLooper();
-            }
+            terminateListenerLooper();
+            releaseEffect();
         }
         assertFalse("effect control not lost by effect1", mHasControl);
     }
@@ -825,63 +816,53 @@ public class AudioEffectTest extends AndroidTestCase {
     //Test case 4.3: test enable status listener
     public void test4_3EnableStatusListener() throws Exception {
 
-        createListenerLooper(false, true, false);
         synchronized(mLock) {
-            try {
-                mLock.wait(1000);
-            } catch(Exception e) {
-                fail("Looper creation: wait was interrupted.");
-            }
-        }
-        assertTrue(mInitialized);
-        mEffect2.setEnabled(true);
-        mIsEnabled = true;
+            mInitialized = false;
+            createListenerLooper(false, true, false);
+            waitForLooperInitialization_l();
 
-        getEffect(AudioEffect.EFFECT_TYPE_PRESET_REVERB, 0);
-        assertTrue("effect not enabled", mEffect.getEnabled());
-        synchronized(mLock) {
-            try {
-                mEffect.setEnabled(false);
-                mLock.wait(1000);
-            } catch(Exception e) {
-                fail("Second effect setEnabled: wait was interrupted.");
-            } finally {
-                releaseEffect();
-                terminateListenerLooper();
+            mEffect2.setEnabled(true);
+            mIsEnabled = true;
+
+            getEffect(AudioEffect.EFFECT_TYPE_PRESET_REVERB, 0);
+            assertTrue("effect not enabled", mEffect.getEnabled());
+            int looperWaitCount = MAX_LOOPER_WAIT_COUNT;
+            while (mIsEnabled && (looperWaitCount-- > 0)) {
+                try {
+                    mEffect.setEnabled(false);
+                    mLock.wait();
+                } catch(Exception e) {
+                }
             }
+            terminateListenerLooper();
+            releaseEffect();
         }
         assertFalse("enable status not updated", mIsEnabled);
     }
 
     //Test case 4.4: test parameter changed listener
     public void test4_4ParameterChangedListener() throws Exception {
-
-        createListenerLooper(false, false, true);
         synchronized(mLock) {
-            try {
-                mLock.wait(1000);
-            } catch(Exception e) {
-                fail("Looper creation: wait was interrupted.");
+            mInitialized = false;
+            createListenerLooper(false, false, true);
+            waitForLooperInitialization_l();
+            int status = mEffect2.setParameter(PresetReverb.PARAM_PRESET,
+                    PresetReverb.PRESET_SMALLROOM);
+            assertEquals("mEffect2 setParameter failed",
+                    AudioEffect.SUCCESS, status);
+            getEffect(AudioEffect.EFFECT_TYPE_PRESET_REVERB, 0);
+            mChangedParameter = -1;
+            mEffect.setParameter(PresetReverb.PARAM_PRESET,
+                    PresetReverb.PRESET_MEDIUMROOM);
+            int looperWaitCount = MAX_LOOPER_WAIT_COUNT;
+            while (mChangedParameter == -1 && (looperWaitCount-- > 0)) {
+                try {
+                    mLock.wait();
+                } catch(Exception e) {
+                }
             }
-        }
-        assertTrue(mInitialized);
-        int status = mEffect2.setParameter(PresetReverb.PARAM_PRESET,
-                PresetReverb.PRESET_SMALLROOM);
-        assertEquals("mEffect2 setParameter failed",
-                AudioEffect.SUCCESS, status);
-        getEffect(AudioEffect.EFFECT_TYPE_PRESET_REVERB, 0);
-        synchronized(mLock) {
-            try {
-                mChangedParameter = -1;
-                mEffect.setParameter(PresetReverb.PARAM_PRESET,
-                        PresetReverb.PRESET_MEDIUMROOM);
-                mLock.wait(1000);
-            } catch(Exception e) {
-                fail("set Parameter: wait was interrupted.");
-            } finally {
-                releaseEffect();
-                terminateListenerLooper();
-            }
+            terminateListenerLooper();
+            releaseEffect();
         }
         assertEquals("parameter change not received",
                 PresetReverb.PARAM_PRESET, mChangedParameter);
@@ -943,6 +924,17 @@ public class AudioEffectTest extends AndroidTestCase {
         }
     }
 
+    private void waitForLooperInitialization_l() {
+        int looperWaitCount = MAX_LOOPER_WAIT_COUNT;
+        while (!mInitialized && (looperWaitCount-- > 0)) {
+            try {
+                mLock.wait();
+            } catch(Exception e) {
+            }
+        }
+        assertTrue(mInitialized);
+    }
+
     // Initializes the equalizer listener looper
     class ListenerThread extends Thread {
         boolean mControl;
@@ -955,11 +947,18 @@ public class AudioEffectTest extends AndroidTestCase {
             mEnable = enable;
             mParameter = parameter;
         }
+
+        public void cleanUp() {
+            if (mEffect2 != null) {
+                mEffect2.setControlStatusListener(null);
+                mEffect2.setEnableStatusListener(null);
+                mEffect2.setParameterListener(null);
+            }
+        }
     }
 
     private void createListenerLooper(boolean control, boolean enable, boolean parameter) {
-        mInitialized = false;
-        new ListenerThread(control, enable, parameter) {
+        mEffectListenerLooper = new ListenerThread(control, enable, parameter) {
             @Override
             public void run() {
                 // Set up a looper
@@ -975,66 +974,74 @@ public class AudioEffectTest extends AndroidTestCase {
                         0);
                 assertNotNull("could not create Equalizer2", mEffect2);
 
-                if (mControl) {
-                    mEffect2.setControlStatusListener(
-                            new AudioEffect.OnControlStatusChangeListener() {
-                        public void onControlStatusChange(
-                                AudioEffect effect, boolean controlGranted) {
-                            synchronized(mLock) {
-                                if (effect == mEffect2) {
-                                    mHasControl = controlGranted;
-                                    mLock.notify();
-                                }
-                            }
-                        }
-                    });
-                }
-                if (mEnable) {
-                    mEffect2.setEnableStatusListener(
-                            new AudioEffect.OnEnableStatusChangeListener() {
-                        public void onEnableStatusChange(AudioEffect effect, boolean enabled) {
-                            synchronized(mLock) {
-                                if (effect == mEffect2) {
-                                    mIsEnabled = enabled;
-                                    mLock.notify();
-                                }
-                            }
-                        }
-                    });
-                }
-                if (mParameter) {
-                    mEffect2.setParameterListener(new AudioEffect.OnParameterChangeListener() {
-                        public void onParameterChange(AudioEffect effect, int status, byte[] param,
-                                byte[] value)
-                        {
-                            synchronized(mLock) {
-                                if (effect == mEffect2) {
-                                    mChangedParameter = mEffect2.byteArrayToInt(param);
-                                    mLock.notify();
-                                }
-                            }
-                        }
-                    });
-                }
-
                 synchronized(mLock) {
+                    if (mControl) {
+                        mEffect2.setControlStatusListener(
+                                new AudioEffect.OnControlStatusChangeListener() {
+                            public void onControlStatusChange(
+                                    AudioEffect effect, boolean controlGranted) {
+                                synchronized(mLock) {
+                                    if (effect == mEffect2) {
+                                        mHasControl = controlGranted;
+                                        mLock.notify();
+                                    }
+                                }
+                            }
+                        });
+                    }
+                    if (mEnable) {
+                        mEffect2.setEnableStatusListener(
+                                new AudioEffect.OnEnableStatusChangeListener() {
+                            public void onEnableStatusChange(AudioEffect effect, boolean enabled) {
+                                synchronized(mLock) {
+                                    if (effect == mEffect2) {
+                                        mIsEnabled = enabled;
+                                        mLock.notify();
+                                    }
+                                }
+                            }
+                        });
+                    }
+                    if (mParameter) {
+                        mEffect2.setParameterListener(new AudioEffect.OnParameterChangeListener() {
+                            public void onParameterChange(AudioEffect effect, int status, byte[] param,
+                                    byte[] value)
+                            {
+                                synchronized(mLock) {
+                                    if (effect == mEffect2) {
+                                        mChangedParameter = mEffect2.byteArrayToInt(param);
+                                        mLock.notify();
+                                    }
+                                }
+                            }
+                        });
+                    }
                     mInitialized = true;
                     mLock.notify();
                 }
                 Looper.loop();  // Blocks forever until Looper.quit() is called.
             }
-        }.start();
+        };
+        mEffectListenerLooper.start();
     }
 
     // Terminates the listener looper thread.
     private void terminateListenerLooper() {
+        if (mEffectListenerLooper != null) {
+            mEffectListenerLooper.cleanUp();
+            if (mLooper != null) {
+                mLooper.quit();
+                mLooper = null;
+            }
+            try {
+                mEffectListenerLooper.join();
+            } catch(InterruptedException e) {
+            }
+            mEffectListenerLooper = null;
+        }
         if (mEffect2 != null) {
             mEffect2.release();
             mEffect2 = null;
-        }
-        if (mLooper != null) {
-            mLooper.quit();
-            mLooper = null;
         }
     }
 
@@ -1043,7 +1050,6 @@ public class AudioEffectTest extends AndroidTestCase {
      * receive the callback messages.
      */
     private void createMediaPlayerLooper() {
-        mInitialized = false;
         new Thread() {
             @Override
             public void run() {
@@ -1055,23 +1061,24 @@ public class AudioEffectTest extends AndroidTestCase {
                 mLooper = Looper.myLooper();
 
                 mMediaPlayer = new MediaPlayer();
-                mMediaPlayer.setOnErrorListener(new MediaPlayer.OnErrorListener() {
-                    public boolean onError(MediaPlayer player, int what, int extra) {
-                        synchronized(mLock) {
-                            mError = what;
-                            mLock.notify();
-                        }
-                        return true;
-                    }
-                });
-                mMediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
-                    public void onCompletion(MediaPlayer player) {
-                        synchronized(mLock) {
-                            mLock.notify();
-                        }
-                    }
-                });
+
                 synchronized(mLock) {
+                    mMediaPlayer.setOnErrorListener(new MediaPlayer.OnErrorListener() {
+                        public boolean onError(MediaPlayer player, int what, int extra) {
+                            synchronized(mLock) {
+                                mError = what;
+                                mLock.notify();
+                            }
+                            return true;
+                        }
+                    });
+                    mMediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+                        public void onCompletion(MediaPlayer player) {
+                            synchronized(mLock) {
+                                mLock.notify();
+                            }
+                        }
+                    });
                     mInitialized = true;
                     mLock.notify();
                 }
