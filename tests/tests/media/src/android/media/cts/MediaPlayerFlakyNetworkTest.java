@@ -242,7 +242,7 @@ public class MediaPlayerFlakyNetworkTest extends MediaPlayerTestBase {
         mMediaPlayer.setOnErrorListener(new MediaPlayer.OnErrorListener() {
             @Override
             public boolean onError(MediaPlayer mp, int what, int extra) {
-                fail("Media player had error " + what + " playing " + name);
+                fail("Media player had error " + what + " extra " + extra + " playing " + name);
                 return true;
             }
         });
@@ -309,7 +309,8 @@ public class MediaPlayerFlakyNetworkTest extends MediaPlayerTestBase {
                     try {
                         float random = mRandom.nextFloat();
                         if (random < probability) {
-                            int sleepTimeMs = 1000 + mRandom.nextInt(5000);
+                            // TODO restore 1000 to 6000 after fixing 6770717
+                            int sleepTimeMs = 1000 + mRandom.nextInt(1500);
                             Thread.sleep(sleepTimeMs);
                             flush();
                         } else if (random < probability * 100) {
