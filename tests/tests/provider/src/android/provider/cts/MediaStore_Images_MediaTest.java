@@ -33,6 +33,7 @@ import android.test.InstrumentationTestCase;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.lang.Math;
 import java.util.ArrayList;
 
 public class MediaStore_Images_MediaTest extends InstrumentationTestCase {
@@ -243,7 +244,9 @@ public class MediaStore_Images_MediaTest extends InstrumentationTestCase {
             assertEquals(numBytes, c.getInt(c.getColumnIndex(Media.SIZE)));
             long realDateAdded = c.getLong(c.getColumnIndex(Media.DATE_ADDED));
             assertTrue(realDateAdded >= dateAdded);
-            assertEquals(dateModified, c.getLong(c.getColumnIndex(Media.DATE_MODIFIED)));
+            // there can be delay as time is read after creation
+            assertTrue(Math.abs(dateModified - c.getLong(c.getColumnIndex(Media.DATE_MODIFIED)))
+                       < 5);
             c.close();
 
             // update
