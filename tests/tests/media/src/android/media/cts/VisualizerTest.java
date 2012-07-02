@@ -30,6 +30,7 @@ public class VisualizerTest extends AndroidTestCase {
     private final static int MIN_CAPTURE_RATE_MAX = 10000; // 10Hz
     private final static int MIN_CAPTURE_SIZE_MAX = 1024;
     private final static int MAX_CAPTURE_SIZE_MIN = 512;
+    private final static int MAX_LOOPER_WAIT_COUNT = 10;
 
     private Visualizer mVisualizer = null;
     private int mSession = -1;
@@ -40,6 +41,7 @@ public class VisualizerTest extends AndroidTestCase {
     private byte[] mFft = null;
     private boolean mCaptureWaveform = false;
     private boolean mCaptureFft = false;
+    private Thread mListenerThread;
 
     //-----------------------------------------------------------------
     // VISUALIZER TESTS:
@@ -138,16 +140,11 @@ public class VisualizerTest extends AndroidTestCase {
             assertEquals("getFft reports energy for silence",
                     0, energy);
 
-        } catch (IllegalArgumentException e) {
-            fail("Bad parameter value");
-        } catch (UnsupportedOperationException e) {
-            fail("get parameter() rejected");
         } catch (IllegalStateException e) {
-            fail("get parameter() called in wrong state");
+            fail("method called in wrong state");
         } catch (InterruptedException e) {
             fail("sleep() interrupted");
-        }
-        finally {
+        } finally {
             releaseVisualizer();
         }
     }
@@ -156,29 +153,27 @@ public class VisualizerTest extends AndroidTestCase {
     public void test2_1ListenerCapture() throws Exception {
         try {
             getVisualizer(0);
-            createListenerLooper();
             synchronized(mLock) {
-                try {
-                    mLock.wait(1000);
-                } catch(Exception e) {
-                    Log.e(TAG, "Looper creation: wait was interrupted.");
-                }
+                mInitialized = false;
+                createListenerLooper();
+                waitForLooperInitialization_l();
             }
-            assertTrue(mInitialized);
-
             mVisualizer.setEnabled(true);
             assertTrue("visualizer not enabled", mVisualizer.getEnabled());
 
             Thread.sleep(100);
+
             // check capture on silence
             synchronized(mLock) {
-                try {
-                    mCaptureWaveform = true;
-                    mLock.wait(1000);
-                    mCaptureWaveform = false;
-                } catch(Exception e) {
-                    Log.e(TAG, "Capture waveform: wait was interrupted.");
+                mCaptureWaveform = true;
+                int looperWaitCount = MAX_LOOPER_WAIT_COUNT;
+                while ((mWaveform == null) && (looperWaitCount-- > 0)) {
+                    try {
+                        mLock.wait();
+                    } catch(Exception e) {
+                    }
                 }
+                mCaptureWaveform = false;
             }
             assertNotNull("waveform capture failed", mWaveform);
             int energy = computeEnergy(mWaveform, true);
@@ -186,25 +181,23 @@ public class VisualizerTest extends AndroidTestCase {
                     0, energy);
 
             synchronized(mLock) {
-                try {
-                    mCaptureFft = true;
-                    mLock.wait(1000);
-                    mCaptureFft = false;
-                } catch(Exception e) {
-                    Log.e(TAG, "Capture FFT: wait was interrupted.");
+                mCaptureFft = true;
+                int looperWaitCount = MAX_LOOPER_WAIT_COUNT;
+                while ((mFft == null) && (looperWaitCount-- > 0)) {
+                    try {
+                        mLock.wait();
+                    } catch(Exception e) {
+                    }
                 }
+                mCaptureFft = false;
             }
             assertNotNull("FFT capture failed", mFft);
             energy = computeEnergy(mFft, false);
             assertEquals("getFft reports energy for silence",
                     0, energy);
 
-        } catch (IllegalArgumentException e) {
-            fail("Bad parameter value");
-        } catch (UnsupportedOperationException e) {
-            fail("get parameter() rejected");
         } catch (IllegalStateException e) {
-            fail("get parameter() called in wrong state");
+            fail("method called in wrong state");
         } catch (InterruptedException e) {
             fail("sleep() interrupted");
         } finally {
@@ -260,11 +253,21 @@ public class VisualizerTest extends AndroidTestCase {
             mVisualizer.release();
             mVisualizer = null;
         }
-   }
+    }
+
+    private void waitForLooperInitialization_l() {
+        int looperWaitCount = MAX_LOOPER_WAIT_COUNT;
+        while (!mInitialized && (looperWaitCount-- > 0)) {
+            try {
+                mLock.wait();
+            } catch(Exception e) {
+            }
+        }
+        assertTrue(mInitialized);
+    }
 
     private void createListenerLooper() {
-
-        new Thread() {
+        mListenerThread = new Thread() {
             @Override
             public void run() {
                 // Set up a looper to be used by mEffect.
@@ -274,52 +277,60 @@ public class VisualizerTest extends AndroidTestCase {
                 // after we are done with it.
                 mLooper = Looper.myLooper();
 
-                if (mVisualizer != null) {
-                    mVisualizer.setDataCaptureListener(new Visualizer.OnDataCaptureListener() {
-                        public void onWaveFormDataCapture(
-                                Visualizer visualizer, byte[] waveform, int samplingRate) {
-                            synchronized(mLock) {
-                                if (visualizer == mVisualizer) {
-                                    if (mCaptureWaveform) {
-                                        mWaveform = waveform;
-                                        mLock.notify();
-                                    }
-                                }
-                            }
-                        }
-
-                        public void onFftDataCapture(
-                                Visualizer visualizer, byte[] fft, int samplingRate) {
-                            synchronized(mLock) {
-                                if (visualizer == mVisualizer) {
-                                    if (mCaptureFft) {
-                                        mFft = fft;
-                                        mLock.notify();
-                                    }
-                                }
-                            }
-                        }
-                    },
-                    10000,
-                    true,
-                    true);
-                }
-
                 synchronized(mLock) {
+                    if (mVisualizer != null) {
+                        mVisualizer.setDataCaptureListener(new Visualizer.OnDataCaptureListener() {
+                            public void onWaveFormDataCapture(
+                                    Visualizer visualizer, byte[] waveform, int samplingRate) {
+                                synchronized(mLock) {
+                                    if (visualizer == mVisualizer) {
+                                        if (mCaptureWaveform) {
+                                            mWaveform = waveform;
+                                            mLock.notify();
+                                        }
+                                    }
+                                }
+                            }
+
+                            public void onFftDataCapture(
+                                    Visualizer visualizer, byte[] fft, int samplingRate) {
+                                synchronized(mLock) {
+                                    Log.e(TAG, "onFftDataCapture 2 mCaptureFft: "+mCaptureFft);
+                                    if (visualizer == mVisualizer) {
+                                        if (mCaptureFft) {
+                                            mFft = fft;
+                                            mLock.notify();
+                                        }
+                                    }
+                                }
+                            }
+                        },
+                        10000,
+                        true,
+                        true);
+                    }
                     mInitialized = true;
                     mLock.notify();
                 }
                 Looper.loop();  // Blocks forever until Looper.quit() is called.
             }
-        }.start();
+        };
+        mListenerThread.start();
     }
     /*
      * Terminates the listener looper thread.
      */
     private void terminateListenerLooper() {
-        if (mLooper != null) {
-            mLooper.quit();
-            mLooper = null;
+        if (mListenerThread != null) {
+            if (mLooper != null) {
+                mLooper.quit();
+                mLooper = null;
+            }
+            try {
+                mListenerThread.join();
+            } catch(InterruptedException e) {
+            }
+            mListenerThread = null;
         }
     }
 }
