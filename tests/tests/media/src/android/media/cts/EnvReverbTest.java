@@ -30,6 +30,7 @@ public class EnvReverbTest extends AndroidTestCase {
     private final static int MILLIBEL_TOLERANCE = 100;            // +/-1dB
     private final static float DELAY_TOLERANCE = 1.05f;           // 5%
     private final static float RATIO_TOLERANCE = 1.05f;           // 5%
+    private final static int MAX_LOOPER_WAIT_COUNT = 10;
 
     private EnvironmentalReverb mReverb = null;
     private EnvironmentalReverb mReverb2 = null;
@@ -40,7 +41,7 @@ public class EnvReverbTest extends AndroidTestCase {
     private boolean mInitialized = false;
     private Looper mLooper = null;
     private final Object mLock = new Object();
-
+    private ListenerThread mEffectListenerLooper = null;
 
     //-----------------------------------------------------------------
     // ENVIRONMENTAL REVERB TESTS:
@@ -305,81 +306,70 @@ public class EnvReverbTest extends AndroidTestCase {
 
     //Test case 3.0: test control status listener
     public void test3_0ControlStatusListener() throws Exception {
-        mHasControl = true;
-        createListenerLooper(true, false, false);
         synchronized(mLock) {
-            try {
-                mLock.wait(1000);
-            } catch(Exception e) {
-                Log.e(TAG, "Looper creation: wait was interrupted.");
+            mHasControl = true;
+            mInitialized = false;
+            createListenerLooper(true, false, false);
+            waitForLooperInitialization_l();
+
+            getReverb(0);
+            int looperWaitCount = MAX_LOOPER_WAIT_COUNT;
+            while (mHasControl && (looperWaitCount-- > 0)) {
+                try {
+                    mLock.wait();
+                } catch(Exception e) {
+                }
             }
-        }
-        assertTrue(mInitialized);
-        synchronized(mLock) {
-            try {
-                getReverb(0);
-                mLock.wait(1000);
-            } catch(Exception e) {
-                Log.e(TAG, "Create second effect: wait was interrupted.");
-            } finally {
-                releaseReverb();
-                terminateListenerLooper();
-            }
+            terminateListenerLooper();
+            releaseReverb();
         }
         assertFalse("effect control not lost by effect1", mHasControl);
     }
 
     //Test case 3.1: test enable status listener
     public void test3_1EnableStatusListener() throws Exception {
-        createListenerLooper(false, true, false);
-        synchronized(mLock) {
-            try {
-                mLock.wait(1000);
-            } catch(Exception e) {
-                Log.e(TAG, "Looper creation: wait was interrupted.");
+         synchronized(mLock) {
+            mInitialized = false;
+            createListenerLooper(false, true, false);
+            waitForLooperInitialization_l();
+
+            mReverb2.setEnabled(true);
+            mIsEnabled = true;
+            getReverb(0);
+            mReverb.setEnabled(false);
+            int looperWaitCount = MAX_LOOPER_WAIT_COUNT;
+            while (mIsEnabled && (looperWaitCount-- > 0)) {
+                try {
+                    mLock.wait();
+                } catch(Exception e) {
+                }
             }
-        }
-        assertTrue(mInitialized);
-        mReverb2.setEnabled(true);
-        mIsEnabled = true;
-        getReverb(0);
-        synchronized(mLock) {
-            try {
-                mReverb.setEnabled(false);
-                mLock.wait(1000);
-            } catch(Exception e) {
-                Log.e(TAG, "Create second effect: wait was interrupted.");
-            } finally {
-                releaseReverb();
-                terminateListenerLooper();
-            }
+            terminateListenerLooper();
+            releaseReverb();
         }
         assertFalse("enable status not updated", mIsEnabled);
     }
 
     //Test case 3.2: test parameter changed listener
     public void test3_2ParameterChangedListener() throws Exception {
-        createListenerLooper(false, false, true);
         synchronized(mLock) {
-            try {
-                mLock.wait(1000);
-            } catch(Exception e) {
-                Log.e(TAG, "Looper creation: wait was interrupted.");
+            mInitialized = false;
+            createListenerLooper(false, false, true);
+            waitForLooperInitialization_l();
+
+            getReverb(0);
+            mChangedParameter = -1;
+            mReverb.setRoomLevel((short)0);
+
+            int looperWaitCount = MAX_LOOPER_WAIT_COUNT;
+            while ((mChangedParameter == -1) && (looperWaitCount-- > 0)) {
+                try {
+                    mLock.wait();
+                } catch(Exception e) {
+                }
             }
-        }
-        assertTrue(mInitialized);
-        getReverb(0);
-        synchronized(mLock) {
-            try {
-                mChangedParameter = -1;
-                mReverb.setRoomLevel((short)0);
-                mLock.wait(1000);
-            } catch(Exception e) {
-                Log.e(TAG, "Create second effect: wait was interrupted.");
-            } finally {
-                releaseReverb();
-                terminateListenerLooper();
-            }
+            terminateListenerLooper();
+            releaseReverb();
         }
         assertEquals("parameter change not received",
                 EnvironmentalReverb.PARAM_ROOM_LEVEL, mChangedParameter);
@@ -414,6 +404,17 @@ public class EnvReverbTest extends AndroidTestCase {
         }
     }
 
+    private void waitForLooperInitialization_l() {
+        int looperWaitCount = MAX_LOOPER_WAIT_COUNT;
+        while (!mInitialized && (looperWaitCount-- > 0)) {
+            try {
+                mLock.wait();
+            } catch(Exception e) {
+            }
+        }
+        assertTrue(mInitialized);
+    }
+
     // Initializes the reverb listener looper
     class ListenerThread extends Thread {
         boolean mControl;
@@ -426,11 +427,19 @@ public class EnvReverbTest extends AndroidTestCase {
             mEnable = enable;
             mParameter = parameter;
         }
+
+        public void cleanUp() {
+            if (mReverb2 != null) {
+                mReverb2.setControlStatusListener(null);
+                mReverb2.setEnableStatusListener(null);
+                mReverb2.setParameterListener(
+                            (EnvironmentalReverb.OnParameterChangeListener)null);
+            }
+        }
     }
 
     private void createListenerLooper(boolean control, boolean enable, boolean parameter) {
-        mInitialized = false;
-        new ListenerThread(control, enable, parameter) {
+        mEffectListenerLooper = new ListenerThread(control, enable, parameter) {
             @Override
             public void run() {
                 // Set up a looper
@@ -443,66 +452,75 @@ public class EnvReverbTest extends AndroidTestCase {
                 mReverb2 = new EnvironmentalReverb(0, 0);
                 assertNotNull("could not create reverb2", mReverb2);
 
-                if (mControl) {
-                    mReverb2.setControlStatusListener(
-                            new AudioEffect.OnControlStatusChangeListener() {
-                        public void onControlStatusChange(
-                                AudioEffect effect, boolean controlGranted) {
-                            synchronized(mLock) {
-                                if (effect == mReverb2) {
-                                    mHasControl = controlGranted;
-                                    mLock.notify();
-                                }
-                            }
-                        }
-                    });
-                }
-                if (mEnable) {
-                    mReverb2.setEnableStatusListener(
-                            new AudioEffect.OnEnableStatusChangeListener() {
-                        public void onEnableStatusChange(AudioEffect effect, boolean enabled) {
-                            synchronized(mLock) {
-                                if (effect == mReverb2) {
-                                    mIsEnabled = enabled;
-                                    mLock.notify();
-                                }
-                            }
-                        }
-                    });
-                }
-                if (mParameter) {
-                    mReverb2.setParameterListener(new EnvironmentalReverb.OnParameterChangeListener() {
-                        public void onParameterChange(EnvironmentalReverb effect,
-                                int status, int param, int value)
-                        {
-                            synchronized(mLock) {
-                                if (effect == mReverb2) {
-                                    mChangedParameter = param;
-                                    mLock.notify();
-                                }
-                            }
-                        }
-                    });
-                }
-
                 synchronized(mLock) {
+                    if (mControl) {
+                        mReverb2.setControlStatusListener(
+                                new AudioEffect.OnControlStatusChangeListener() {
+                            public void onControlStatusChange(
+                                    AudioEffect effect, boolean controlGranted) {
+                                synchronized(mLock) {
+                                    if (effect == mReverb2) {
+                                        mHasControl = controlGranted;
+                                        mLock.notify();
+                                    }
+                                }
+                            }
+                        });
+                    }
+                    if (mEnable) {
+                        mReverb2.setEnableStatusListener(
+                                new AudioEffect.OnEnableStatusChangeListener() {
+                            public void onEnableStatusChange(AudioEffect effect, boolean enabled) {
+                                synchronized(mLock) {
+                                    if (effect == mReverb2) {
+                                        mIsEnabled = enabled;
+                                        mLock.notify();
+                                    }
+                                }
+                            }
+                        });
+                    }
+                    if (mParameter) {
+                        mReverb2.setParameterListener(new EnvironmentalReverb.OnParameterChangeListener() {
+                            public void onParameterChange(EnvironmentalReverb effect,
+                                    int status, int param, int value)
+                            {
+                                synchronized(mLock) {
+                                    if (effect == mReverb2) {
+                                        mChangedParameter = param;
+                                        mLock.notify();
+                                    }
+                                }
+                            }
+                        });
+                    }
+
                     mInitialized = true;
                     mLock.notify();
                 }
                 Looper.loop();  // Blocks forever until Looper.quit() is called.
             }
-        }.start();
+        };
+        mEffectListenerLooper.start();
     }
 
     // Terminates the listener looper thread.
     private void terminateListenerLooper() {
+        if (mEffectListenerLooper != null) {
+            mEffectListenerLooper.cleanUp();
+            if (mLooper != null) {
+                mLooper.quit();
+                mLooper = null;
+            }
+            try {
+                mEffectListenerLooper.join();
+            } catch(InterruptedException e) {
+            }
+            mEffectListenerLooper = null;
+        }
         if (mReverb2 != null) {
             mReverb2.release();
             mReverb2 = null;
-        }
-        if (mLooper != null) {
-            mLooper.quit();
-            mLooper = null;
         }
     }
 
