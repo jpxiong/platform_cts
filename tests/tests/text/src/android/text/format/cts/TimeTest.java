@@ -16,6 +16,7 @@
 
 package android.text.format.cts;
 
+import java.lang.Math;
 import java.util.Calendar;
 import java.util.TimeZone;
 
@@ -485,7 +486,7 @@ public class TimeTest extends AndroidTestCase {
         long currentTime = System.currentTimeMillis();
         t.setToNow();
         long time = t.toMillis(false);
-        assertEquals(currentTime, time, 999);
+        assertTrue(Math.abs(currentTime - time) < 999);
     }
 
     public void testMillis0() throws Exception {
