@@ -137,7 +137,7 @@ public class ValueAnimatorTest extends
         for(int j = 0; j < 9; j++){
             assertTrue(fractions[j] >= 0.0);
             assertTrue(fractions[j] <= 1.0);
-            assertTrue(errorMessage(fractions), fractions[j + 1] != fractions[j]);
+            assertTrue(errorMessage(fractions), fractions[j + 1] >= fractions[j]);
         }
     }
 
@@ -148,7 +148,7 @@ public class ValueAnimatorTest extends
         float[] animatedValues = getValue(objAnimator, 10, "getAnimatedValue()", 200l, null);
 
         for(int j = 0; j < 9; j++){
-            assertTrue(errorMessage(animatedValues), animatedValues[j + 1] != animatedValues[j]);
+            assertTrue(errorMessage(animatedValues), animatedValues[j + 1] >= animatedValues[j]);
         }
     }
     public void testGetAnimatedValue_PropertyName() throws Throwable {
@@ -160,7 +160,7 @@ public class ValueAnimatorTest extends
         float[] animatedValues = getValue(objAnimator, 10, "getAnimatedValue(property)", 200l,
             property);
         for(int j = 0; j < 9; j++){
-            assertTrue(errorMessage(animatedValues), animatedValues[j + 1] != animatedValues[j]);
+            assertTrue(errorMessage(animatedValues), animatedValues[j + 1] >= animatedValues[j]);
         }
     }
 
@@ -228,7 +228,7 @@ public class ValueAnimatorTest extends
     private float[] getValue(ValueAnimator animator, int n, String methodName,
             long sleepTime, String property) throws InterruptedException {
         float[] values = new float[n];
-        for(int i = 0; i < (n-1); i++){
+        for(int i = 0; i < n; i++){
             Thread.sleep(sleepTime);
             float value = 0.0f;
             if(methodName.equals("getAnimatedFraction()")) {
