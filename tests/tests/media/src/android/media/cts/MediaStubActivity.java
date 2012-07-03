@@ -19,11 +19,12 @@ import com.android.cts.media.R;
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 
 public class MediaStubActivity extends Activity {
-
+    private static final String TAG = "MediaStubActivity";
     private SurfaceHolder mHolder;
     private SurfaceHolder mHolder2;
 
@@ -39,6 +40,17 @@ public class MediaStubActivity extends Activity {
         mHolder2 = surfaceV2.getHolder();
     }
 
+    @Override
+    protected void onResume() {
+        Log.i(TAG, "onResume");
+        super.onResume();
+    }
+
+    @Override
+    protected void onPause() {
+        Log.i(TAG, "onPause");
+        super.onPause();
+    }
     public SurfaceHolder getSurfaceHolder() {
         return mHolder;
     }
