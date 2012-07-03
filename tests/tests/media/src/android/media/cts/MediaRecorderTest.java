@@ -55,6 +55,7 @@ public class MediaRecorderTest extends ActivityInstrumentationTestCase2<MediaStu
     private File mOutFile;
     private File mOutFile2;
     private Camera mCamera;
+    private MediaStubActivity mActivity = null;
 
     /*
      * InstrumentationTestRunner.onStart() calls Looper.prepare(), which creates a looper
@@ -75,6 +76,7 @@ public class MediaRecorderTest extends ActivityInstrumentationTestCase2<MediaStu
 
     @Override
     protected void setUp() throws Exception {
+        mActivity = getActivity();
         mOutFile = new File(OUTPUT_PATH);
         mOutFile2 = new File(OUTPUT_PATH2);
         mMediaRecorder.reset();
@@ -105,6 +107,7 @@ public class MediaRecorderTest extends ActivityInstrumentationTestCase2<MediaStu
             mCamera.release();
             mCamera = null;
         }
+        mActivity = null;
         super.tearDown();
     }
 
@@ -117,7 +120,7 @@ public class MediaRecorderTest extends ActivityInstrumentationTestCase2<MediaStu
         mMediaRecorder.setVideoEncoder(MediaRecorder.VideoEncoder.DEFAULT);
         mMediaRecorder.setVideoSize(VIDEO_WIDTH, VIDEO_HEIGHT);
         mMediaRecorder.setVideoEncodingBitRate(VIDEO_BIT_RATE_IN_BPS);
-        mMediaRecorder.setPreviewDisplay(getActivity().getSurfaceHolder().getSurface());
+        mMediaRecorder.setPreviewDisplay(mActivity.getSurfaceHolder().getSurface());
         mMediaRecorder.prepare();
         mMediaRecorder.start();
         Thread.sleep(1000);
@@ -163,7 +166,7 @@ public class MediaRecorderTest extends ActivityInstrumentationTestCase2<MediaStu
         mMediaRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.DEFAULT);
         mMediaRecorder.setVideoFrameRate(frameRate);
         mMediaRecorder.setVideoSize(VIDEO_WIDTH, VIDEO_HEIGHT);
-        mMediaRecorder.setPreviewDisplay(getActivity().getSurfaceHolder().getSurface());
+        mMediaRecorder.setPreviewDisplay(mActivity.getSurfaceHolder().getSurface());
         mMediaRecorder.setOutputFile(fileName);
         mMediaRecorder.setLocation(LATITUDE, LONGITUDE);
         final double captureRate = VIDEO_TIMELAPSE_CAPTURE_RATE_FPS;
@@ -243,7 +246,7 @@ public class MediaRecorderTest extends ActivityInstrumentationTestCase2<MediaStu
         mMediaRecorder.setOutputFormat(MediaRecorder.OutputFormat.DEFAULT);
         mMediaRecorder.setOutputFile(OUTPUT_PATH2);
         mMediaRecorder.setVideoEncoder(MediaRecorder.VideoEncoder.DEFAULT);
-        mMediaRecorder.setPreviewDisplay(getActivity().getSurfaceHolder().getSurface());
+        mMediaRecorder.setPreviewDisplay(mActivity.getSurfaceHolder().getSurface());
         mMediaRecorder.setVideoSize(VIDEO_WIDTH, VIDEO_HEIGHT);
 
         FileOutputStream fos = new FileOutputStream(OUTPUT_PATH2);
@@ -382,11 +385,11 @@ public class MediaRecorderTest extends ActivityInstrumentationTestCase2<MediaStu
     }
 
     private boolean hasCamera() {
-        return getActivity().getPackageManager().hasSystemFeature(PackageManager.FEATURE_CAMERA);
+        return mActivity.getPackageManager().hasSystemFeature(PackageManager.FEATURE_CAMERA);
     }
 
     private boolean hasMicrophone() {
-        return getActivity().getPackageManager().hasSystemFeature(
+        return mActivity.getPackageManager().hasSystemFeature(
                 PackageManager.FEATURE_MICROPHONE);
     }
 }
