@@ -150,9 +150,11 @@ public class ContextWrapperTest extends AndroidTestCase {
         final LowPriorityBroadcastReceiver lowPriorityReceiver =
             new LowPriorityBroadcastReceiver();
 
-        final IntentFilter filter = new IntentFilter(ResultReceiver.MOCK_ACTION);
-        registerBroadcastReceiver(highPriorityReceiver, filter);
-        registerBroadcastReceiver(lowPriorityReceiver, filter);
+        final IntentFilter filterHighPriority = new IntentFilter(ResultReceiver.MOCK_ACTION);
+        filterHighPriority.setPriority(1);
+        final IntentFilter filterLowPriority = new IntentFilter(ResultReceiver.MOCK_ACTION);
+        registerBroadcastReceiver(highPriorityReceiver, filterHighPriority);
+        registerBroadcastReceiver(lowPriorityReceiver, filterLowPriority);
 
         final Intent broadcastIntent = new Intent(ResultReceiver.MOCK_ACTION);
         mContextWrapper.sendOrderedBroadcast(broadcastIntent, null);
