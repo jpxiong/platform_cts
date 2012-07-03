@@ -119,9 +119,6 @@
     <!-- String second Button text -->
     <string name="secondButton">secondButton</string>
 
-    <!-- String title of the accessibility directional focus test activity -->
-    <string name="accessibility_directional_focus_test_activity">Accessibility directional focus test</string>
-
     <!-- String title of the accessibility focus and input focus sync test activity -->
     <string name="accessibility_focus_and_input_focus_sync_test_activity">Accessibility focus and input focus sync test</string>
 
