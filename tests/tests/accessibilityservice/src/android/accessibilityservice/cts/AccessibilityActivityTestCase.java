@@ -105,6 +105,7 @@ public abstract class AccessibilityActivityTestCase<T extends Activity>
             @Override
             public void run() {
                 getActivity();
+                getInstrumentation().waitForIdleSync();
             }
         },
                 new AccessibilityEventFilter() {
