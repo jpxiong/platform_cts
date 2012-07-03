@@ -83,6 +83,7 @@ public class TextureViewTest extends
         TextureViewTestActivity.mSurfaceHeight = height;
         TextureViewTestActivity.mAnimateViewMs = 0;
         TextureViewTestActivity.mRenderer = renderer;
+        TextureViewTestActivity.mUseVSync = true;
         String name = "    Layers: " + layers +
                       "    Textures: " + texturesToUpload +
                       "    Recycling: " + (recycleTextures ? "ON " : "OFF ") +
@@ -107,21 +108,15 @@ public class TextureViewTest extends
     }
 
     public void fail60fps() {
-        if (getActivity().mProducerThread.mFrameStats.mFrameAveMs > 18.0f)
+        if (getActivity().mProducerThread.mFrameStats.mFrameAveMs > 22.0f)
             fail("Average frame time not close enough to 60fps: " +
                     getActivity().mProducerThread.mFrameStats.mFrameAveMs + "ms");
-        if (getActivity().mProducerThread.mFrameStats.mFramesAbove20ms > 50)
-            fail("Too many frames over 20ms: " +
-                    getActivity().mProducerThread.mFrameStats.mFramesAbove20ms);
     }
 
     public void fail30fps() {
         if (getActivity().mProducerThread.mFrameStats.mFrameAveMs > 34.0f)
-            fail("Average frame time not close enough to 60fps: " +
+            fail("Average frame time not close enough to 30fps: " +
                     getActivity().mProducerThread.mFrameStats.mFrameAveMs + "ms");
-        if (getActivity().mProducerThread.mFrameStats.mFramesAbove35ms > 50)
-            fail("Too many frames over 20ms: " +
-                    getActivity().mProducerThread.mFrameStats.mFramesAbove20ms);
     }
 
     // Fail if we can't render one 256x256 layer with no texture uploads at 60Hz.

@@ -36,9 +36,9 @@ import static android.opengl.GLES20.*;
 
 public class GLProducerThread extends Thread {
     private Thread mProducerThread;
-    private final Semaphore mSemaphore;
+    private final Semaphore mProduceFrameSemaphore;
+    private final Semaphore mFinishedSemaphore;
     private final SurfaceTexture mSurfaceTexture;
-    private final AtomicBoolean mShouldRender;
     private final GLFrameRenderer mRenderer;
 
     private EGL10 mEgl;
@@ -52,15 +52,11 @@ public class GLProducerThread extends Thread {
 
     public FrameStats mFrameStats;
 
-    GLProducerThread(SurfaceTexture surfaceTexture, GLFrameRenderer renderer, AtomicBoolean shouldRender,  Semaphore semaphore) {
-        mShouldRender = shouldRender;
-        mSemaphore = semaphore;
+    GLProducerThread(SurfaceTexture surfaceTexture, GLFrameRenderer renderer, Semaphore produceFrameSemaphore, Semaphore finishedSemaphore) {
+        mFinishedSemaphore = finishedSemaphore;
+        mProduceFrameSemaphore = produceFrameSemaphore;
         mSurfaceTexture = surfaceTexture;
         mRenderer = renderer;
-    }
-
-    GLProducerThread(SurfaceTexture surfaceTexture, GLFrameRenderer renderer, Semaphore semaphore) {
-        this(surfaceTexture, renderer, null, semaphore);
     }
 
     private void initGL() {
@@ -139,9 +135,18 @@ public class GLProducerThread extends Thread {
         mFrameStats = new FrameStats();
 
         mRenderer.init(width[0], height[0]);
-        while (!mRenderer.isFinished() && (mShouldRender == null || mShouldRender.get())) {
+        while (!mRenderer.isFinished()) {
             mFrameStats.startFrame();
             mRenderer.renderFrame();
+
+            if (mProduceFrameSemaphore != null) {
+                try {
+                    mProduceFrameSemaphore.acquire();
+                } catch (InterruptedException e) {
+                    break;
+                }
+            }
+
             mEgl.eglSwapBuffers(mEglDisplay, mEglSurface);
             mFrameStats.endFrame();
         }
@@ -149,9 +154,8 @@ public class GLProducerThread extends Thread {
         mRenderer.shutdown();
 
         Assert.assertEquals(EGL10.EGL_SUCCESS, mEgl.eglGetError());
-        Assert.assertEquals(GL_NO_ERROR, glGetError());
 
-        mSemaphore.release();
+        mFinishedSemaphore.release();
         destroyGL();
     }
 }

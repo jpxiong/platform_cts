@@ -33,10 +33,12 @@ public class TextureViewTestActivity extends Activity implements TextureView.Sur
     public static int mAnimateViewMs;
     public static int mSurfaceWidth;
     public static int mSurfaceHeight;
+    public static boolean mUseVSync;
 
     private TextureView mTexView;
     public GLProducerThread mProducerThread;
-    private final Semaphore mSemaphore = new Semaphore(0);
+    private final Semaphore mProduceFrameSemaphore = new Semaphore(1);
+    private final Semaphore mFinishedSemaphore = new Semaphore(0);
 
     private static String TAG = "TextureViewTestActivity";
 
@@ -62,7 +64,7 @@ public class TextureViewTestActivity extends Activity implements TextureView.Sur
     public Boolean waitForCompletion(int timeout) {
         Boolean success = false;
         try {
-            success = mSemaphore.tryAcquire(timeout, TimeUnit.MILLISECONDS);
+            success = mFinishedSemaphore.tryAcquire(timeout, TimeUnit.MILLISECONDS);
         } catch (InterruptedException e) {
             Assert.fail();
         }
@@ -73,7 +75,11 @@ public class TextureViewTestActivity extends Activity implements TextureView.Sur
     public void onSurfaceTextureAvailable(SurfaceTexture surface, int width, int height) {
         if (mSurfaceWidth > 0 && mSurfaceHeight > 0)
             surface.setDefaultBufferSize(mSurfaceWidth, mSurfaceHeight);
-        mProducerThread = new GLProducerThread(surface, mRenderer, mSemaphore);
+        mProducerThread = new GLProducerThread(
+                surface,
+                mRenderer,
+                mUseVSync ? mProduceFrameSemaphore : null,
+                mFinishedSemaphore);
         mProducerThread.start();
     }
 
@@ -89,6 +95,7 @@ public class TextureViewTestActivity extends Activity implements TextureView.Sur
 
     @Override
     public void onSurfaceTextureUpdated(SurfaceTexture surface) {
+        mProduceFrameSemaphore.release();
         mFrameStats.endFrame();
         mFrameStats.startFrame();
     }

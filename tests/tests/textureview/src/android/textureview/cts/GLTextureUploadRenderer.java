@@ -118,7 +118,6 @@ public class GLTextureUploadRenderer implements GLFrameRenderer{
 
         // Create shader programs
         mProgram2D = new Program(mVertexShader, mFragmentShader2D, GL_TEXTURE_2D);
-        Assert.assertTrue(glGetError() ==  GL_NO_ERROR);
 
         // Set common state
         glDisable(GL_CULL_FACE);
@@ -141,7 +140,6 @@ public class GLTextureUploadRenderer implements GLFrameRenderer{
     public void shutdown() {
         if (mTextures != null)
             glDeleteTextures(mTextures.length, mTextures, 0);
-        Assert.assertTrue(glGetError() ==  GL_NO_ERROR);
     }
 
     private void initTexture(int index) {
@@ -225,20 +223,6 @@ public class GLTextureUploadRenderer implements GLFrameRenderer{
         return mFramesRendered >= mFramesToRender;
     }
 
-    public long WaitUntilNext60HzTick() {
-        // Wait until the next 60Hz tick.
-        long tickTime = 16666666; //60Hz tick
-        long startTime = System.nanoTime();
-        long endTime = startTime + (tickTime - (startTime % tickTime));
-        long currentTime = startTime;
-        while (currentTime < endTime) {
-            LockSupport.parkNanos(endTime - currentTime);
-            currentTime = System.nanoTime();
-        }
-        return currentTime;
-    }
-
-
     public int textureIndex(int tileX, int tileY) {
         return (tileX + tileY * mTileCountX) % mTextures.length;
     }
@@ -291,7 +275,6 @@ public class GLTextureUploadRenderer implements GLFrameRenderer{
 
         mScrollOffset += 16;
         mFramesRendered++;
-        WaitUntilNext60HzTick();
     }
 
     void GLCHK() {

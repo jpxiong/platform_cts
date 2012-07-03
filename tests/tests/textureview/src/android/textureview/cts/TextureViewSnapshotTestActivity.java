@@ -34,8 +34,7 @@ public class TextureViewSnapshotTestActivity extends Activity
 
     private TextureView mTexView;
     private Thread mProducerThread;
-    private final Semaphore mSemaphore = new Semaphore(0);
-    private final AtomicBoolean mShouldRender = new AtomicBoolean(true);
+    private final Semaphore mFinishedSemaphore = new Semaphore(0);
     private boolean mPostedSnapshotGrab = false;
 
     @Override
@@ -50,7 +49,7 @@ public class TextureViewSnapshotTestActivity extends Activity
     public Boolean waitForCompletion() {
         Boolean success = false;
         try {
-            success = mSemaphore.tryAcquire(mMaxWaitDelayMs, TimeUnit.MILLISECONDS);
+            success = mFinishedSemaphore.tryAcquire(mMaxWaitDelayMs, TimeUnit.MILLISECONDS);
         } catch (InterruptedException e) {
             Assert.fail();
         }
@@ -59,9 +58,12 @@ public class TextureViewSnapshotTestActivity extends Activity
 
     @Override
     public void onSurfaceTextureAvailable(SurfaceTexture surface, int width, int height) {
-        mProducerThread = new GLProducerThread(surface,
-                new GLTimedFramesRenderer(Integer.MAX_VALUE, 1000/48, false),
-                mShouldRender, mSemaphore);
+        // Create a producer which produces 10 frames 16 ms apart.
+        mProducerThread = new GLProducerThread(
+                surface,
+                new GLTimedFramesRenderer(10, 16, false),
+                null,
+                mFinishedSemaphore);
         mProducerThread.start();
     }
 
@@ -83,7 +85,6 @@ public class TextureViewSnapshotTestActivity extends Activity
             Assert.assertEquals(mTexView.getWidth(), bitmap.getWidth());
             Assert.assertEquals(mTexView.getHeight(), bitmap.getHeight());
             Assert.assertEquals(Color.RED, bitmap.getPixel(0, 0));
-            mShouldRender.set(false);
             mPostedSnapshotGrab = true;
         }
     }
