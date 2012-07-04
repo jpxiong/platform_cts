@@ -310,7 +310,7 @@ public class MediaPlayerFlakyNetworkTest extends MediaPlayerTestBase {
                         float random = mRandom.nextFloat();
                         if (random < probability) {
                             // TODO restore 1000 to 6000 after fixing 6770717
-                            int sleepTimeMs = 1000 + mRandom.nextInt(1500);
+                            int sleepTimeMs = 1000 + mRandom.nextInt(500);
                             Thread.sleep(sleepTimeMs);
                             flush();
                         } else if (random < probability * 100) {
