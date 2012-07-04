@@ -19,7 +19,7 @@ include $(CLEAR_VARS)
 
 LOCAL_MODULE_TAGS := tests
 
-LOCAL_JAVA_LIBRARIES := android.test.runner
+LOCAL_JAVA_LIBRARIES := android.test.runner telephony-common
 
 LOCAL_JNI_SHARED_LIBRARIES := libctspermission_jni
 
