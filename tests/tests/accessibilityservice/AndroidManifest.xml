@@ -34,9 +34,6 @@
       <activity android:label="@string/accessibility_view_tree_reporting_test_activity"
               android:name="android.accessibilityservice.cts.AccessibilityViewTreeReportingActivity"/>
 
-      <activity android:label="@string/accessibility_directional_focus_test_activity"
-              android:name="android.accessibilityservice.cts.AccessibilityDirectionalFocusActivity"/>
-
       <activity android:label="@string/accessibility_focus_and_input_focus_sync_test_activity"
               android:name="android.accessibilityservice.cts.AccessibilityFocusAndInputFocusSyncActivity"/>
 
