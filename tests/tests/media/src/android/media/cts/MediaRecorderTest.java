@@ -47,7 +47,7 @@ public class MediaRecorderTest extends ActivityInstrumentationTestCase2<MediaStu
     private static final int AUDIO_NUM_CHANNELS = 1;
     private static final int AUDIO_SAMPLE_RATE_HZ = 8000;
     private static final long MAX_FILE_SIZE = 5000;
-    private static final int MAX_DURATION_MSEC = 200;
+    private static final int MAX_DURATION_MSEC = 2000;
     private static final float LATITUDE = 0.0000f;
     private static final float LONGITUDE  = -180.0f;
     private boolean mOnInfoCalled;
@@ -97,6 +97,7 @@ public class MediaRecorderTest extends ActivityInstrumentationTestCase2<MediaStu
     @Override
     protected void tearDown() throws Exception {
         mMediaRecorder.release();
+        mMediaRecorder = null;
         if (mOutFile != null && mOutFile.exists()) {
             mOutFile.delete();
         }
@@ -374,10 +375,9 @@ public class MediaRecorderTest extends ActivityInstrumentationTestCase2<MediaStu
         mMediaRecorder.start();
         Thread.sleep(RECORD_TIME);
         mMediaRecorder.stop();
-        // onErrorListner sometimes fails in the 3rd assert.
-        // Fix trial: give some time to write, but this may not fix it.
-        Thread.sleep(1000);
+
         assertTrue(outFile.exists());
+
         // The max file size is always guaranteed.
         // We just make sure that the margin is not too big
         assertTrue(outFile.length() < 1.1 * maxFileSize);
