@@ -235,9 +235,6 @@ public class WebSettingsTest extends ActivityInstrumentationTestCase2<WebViewStu
         Thread.sleep(100); // Wait for open to be received on the icon db thread.
         assertEquals(WebSettings.LOAD_DEFAULT, mSettings.getCacheMode());
 
-        mSettings.setCacheMode(WebSettings.LOAD_NORMAL);
-        assertEquals(WebSettings.LOAD_NORMAL, mSettings.getCacheMode());
-
         mSettings.setCacheMode(WebSettings.LOAD_CACHE_ELSE_NETWORK);
         assertEquals(WebSettings.LOAD_CACHE_ELSE_NETWORK, mSettings.getCacheMode());
         final IconListenerClient iconListener = new IconListenerClient();
