@@ -23,15 +23,19 @@ import android.content.res.AssetFileDescriptor;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.media.MediaRecorder;
+import android.media.TimedText;
 import android.media.audiofx.AudioEffect;
 import android.media.audiofx.Visualizer;
 import android.net.Uri;
 import android.os.Environment;
 import android.os.PowerManager;
 import android.os.SystemClock;
+import android.util.Log;
 
 import java.io.File;
+import java.util.StringTokenizer;
 import java.util.UUID;
+import java.util.Vector;
 import java.util.concurrent.CountDownLatch;
 
 /**
@@ -44,10 +48,63 @@ import java.util.concurrent.CountDownLatch;
 public class MediaPlayerTest extends MediaPlayerTestBase {
 
     private String RECORDED_FILE;
+    private static final String LOG_TAG = "MediaPlayerTest";
 
     private static final int  RECORDED_VIDEO_WIDTH  = 176;
     private static final int  RECORDED_VIDEO_HEIGHT = 144;
     private static final long RECORDED_DURATION_MS  = 3000;
+    private Vector<Integer> mTimedTextTrackIndex = new Vector<Integer>();
+
+    public class SubtitleMonitor {
+        private int selectedTrack;
+        private int numSignal;
+
+        public synchronized void reset() {
+            selectedTrack = 0;
+            numSignal = 0;
+        }
+
+        public synchronized void setSelectedTrack(int index) {
+            selectedTrack = index;
+        }
+
+        public synchronized int getSelectedTrack() {
+            return selectedTrack;
+        }
+
+        public synchronized void signal() {
+            numSignal++;
+            notifyAll();
+        }
+
+        public synchronized int getNumSignal() {
+            return numSignal;
+        }
+
+        public synchronized void waitForSignal(int targetCount) throws InterruptedException {
+            while (numSignal < targetCount) {
+                wait();
+            }
+        }
+
+        public synchronized void waitForSignal(int targetCount, long millis)
+                throws InterruptedException {
+            if (millis == 0) {
+                waitForSignal(targetCount);
+                return;
+            }
+            long deadline = System.currentTimeMillis() + millis;
+            while (numSignal < targetCount) {
+                long delay = deadline - System.currentTimeMillis();
+                if (delay < 0) {
+                    return;
+                }
+                wait(delay);
+            }
+        }
+    }
+
+    private SubtitleMonitor mSubtitleStatus = new SubtitleMonitor();
 
     private File mOutFile;
 
@@ -637,6 +694,99 @@ public class MediaPlayerTest extends MediaPlayerTestBase {
             throws Exception {
         playVideoTest(
                 R.raw.video_176x144_3gp_h263_300kbps_25fps_aac_stereo_128kbps_22050hz, 176, 144);
+    }
+
+    private void readTimedTextTracks() throws Exception {
+        mTimedTextTrackIndex.clear();
+        MediaPlayer.TrackInfo[] trackInfos = mMediaPlayer.getTrackInfo();
+        if (trackInfos == null || trackInfos.length == 0) {
+            return;
+        }
+        for (int i = 0; i < trackInfos.length; ++i) {
+            if (trackInfos[i] == null) continue;
+            if (trackInfos[i].getTrackType() ==
+                 MediaPlayer.TrackInfo.MEDIA_TRACK_TYPE_TIMEDTEXT) {
+                mTimedTextTrackIndex.add(i);
+            }
+        }
+    }
+
+    private int getTimedTextTrackCount() {
+        return mTimedTextTrackIndex.size();
+    }
+
+    private void selectSubtitleTrack(int index) throws Exception {
+        int trackIndex = mTimedTextTrackIndex.get(index);
+        mMediaPlayer.selectTrack(trackIndex);
+        mSubtitleStatus.setSelectedTrack(index);
+    }
+
+    public void testChangeSubtitleTrack() throws Exception {
+        loadResource(R.raw.testvideo_with_2_subtitles);
+        readTimedTextTracks();
+        assertEquals(getTimedTextTrackCount(), 2);
+
+        // Adds two more external subtitle files.
+        loadSubtitleSource(R.raw.test_subtitle1_srt);
+        loadSubtitleSource(R.raw.test_subtitle2_srt);
+        readTimedTextTracks();
+        assertEquals(getTimedTextTrackCount(), 4);
+
+        mMediaPlayer.setDisplay(getActivity().getSurfaceHolder());
+        mMediaPlayer.setScreenOnWhilePlaying(true);
+        mMediaPlayer.setWakeMode(mContext, PowerManager.PARTIAL_WAKE_LOCK);
+        mMediaPlayer.setOnTimedTextListener(new MediaPlayer.OnTimedTextListener() {
+            @Override
+            public void onTimedText(MediaPlayer mp, TimedText text) {
+                final int toleranceMs = 100;
+                final int durationMs = 500;
+                int posMs = mMediaPlayer.getCurrentPosition();
+                if (text != null) {
+                    String plainText = text.getText();
+                    if (plainText != null) {
+                        StringTokenizer tokens = new StringTokenizer(plainText.trim(), ":");
+                        int subtitleTrackIndex = Integer.parseInt(tokens.nextToken());
+                        int startMs = Integer.parseInt(tokens.nextToken());
+                        Log.w(LOG_TAG, "text: " + plainText.trim() +
+                              ", trackId: " + subtitleTrackIndex + ", posMs: " + posMs);
+                        assertTrue(posMs >= startMs - toleranceMs);
+                        assertTrue(posMs < startMs + durationMs + toleranceMs);
+                        assertEquals(mSubtitleStatus.getSelectedTrack(), subtitleTrackIndex);
+                        mSubtitleStatus.signal();
+                    }
+                }
+            }
+        });
+
+        mSubtitleStatus.reset();
+        selectSubtitleTrack(0);
+
+        mMediaPlayer.prepare();
+        assertFalse(mMediaPlayer.isPlaying());
+        mMediaPlayer.start();
+        assertTrue(mMediaPlayer.isPlaying());
+
+        // Waits until at least two subtitles are fired. Timeout is 2 sec.
+        // Please refer the test srt files:
+        // test_subtitle1_srt.3gp and test_subtitle2_srt.3gp
+        mSubtitleStatus.waitForSignal(2, 2000);
+        assertTrue(mSubtitleStatus.getNumSignal() >= 2);
+        mSubtitleStatus.reset();
+
+        selectSubtitleTrack(1);
+        mSubtitleStatus.waitForSignal(2, 2000);
+        assertTrue(mSubtitleStatus.getNumSignal() >= 2);
+        mSubtitleStatus.reset();
+
+        selectSubtitleTrack(2);
+        mSubtitleStatus.waitForSignal(2, 2000);
+        assertTrue(mSubtitleStatus.getNumSignal() >= 2);
+        mSubtitleStatus.reset();
+
+        selectSubtitleTrack(3);
+        mSubtitleStatus.waitForSignal(2, 2000);
+        assertTrue(mSubtitleStatus.getNumSignal() >= 2);
+        mMediaPlayer.stop();
     }
 
     public void testCallback() throws Throwable {

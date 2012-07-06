@@ -137,6 +137,16 @@ public class MediaPlayerTestBase extends ActivityInstrumentationTestCase2<MediaS
         }
     }
 
+    protected void loadSubtitleSource(int resid) throws Exception {
+        AssetFileDescriptor afd = mResources.openRawResourceFd(resid);
+        try {
+            mMediaPlayer.addTimedTextSource(afd.getFileDescriptor(), afd.getStartOffset(),
+                      afd.getLength(), MediaPlayer.MEDIA_MIMETYPE_TEXT_SUBRIP);
+        } finally {
+            afd.close();
+        }
+    }
+
     protected void playLiveVideoTest(String path, int playTime) throws Exception {
         playVideoWithRetries(path, null, null, playTime);
     }
