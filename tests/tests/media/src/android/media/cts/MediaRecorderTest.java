@@ -138,7 +138,7 @@ public class MediaRecorderTest extends ActivityInstrumentationTestCase2<MediaStu
         recordVideoUsingCamera(true);
     }
 
-    public void recordVideoUsingCamera(boolean timelapse) throws Exception {
+    private void recordVideoUsingCamera(boolean timelapse) throws Exception {
         int nCamera = Camera.getNumberOfCameras();
         int durMs = timelapse? 4000: 1000;
         for (int cameraId = 0; cameraId < nCamera; cameraId++) {
