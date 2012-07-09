@@ -25,6 +25,8 @@ import android.view.Display;
 import android.view.WindowManager;
 import android.util.Log;
 
+import java.lang.InterruptedException;
+import java.lang.Thread;
 import java.util.ArrayList;
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
@@ -50,6 +52,7 @@ public class DisplayRefreshRateTest extends
     private class FpsResult {
         private float mFps;
         private boolean mValid = false;
+        private boolean mRestartRequested = false;
 
         public final synchronized void notifyResult(float fps) {
             if (!mValid) {
@@ -66,6 +69,17 @@ public class DisplayRefreshRateTest extends
                 } catch (InterruptedException e) {/* ignore and retry */}
             }
             return mFps;
+        }
+
+        public synchronized void restart() {
+            mRestartRequested = true;
+            mValid = false;
+        }
+        public synchronized boolean restartNecessary() {
+            return mRestartRequested;
+        }
+        public synchronized void ackRestart() {
+            mRestartRequested = false;
         }
     }
 
@@ -117,6 +131,11 @@ public class DisplayRefreshRateTest extends
                     break;
 
                 case STATE_DONE:
+                    if (mResult.restartNecessary()) {
+                        mResult.ackRestart();
+                        mState = STATE_START;
+                        Log.d(TAG, "restarting");
+                    }
                     break;
             }
 
@@ -150,10 +169,9 @@ public class DisplayRefreshRateTest extends
                 GLSurfaceView.RENDERMODE_CONTINUOUSLY);
     }
 
-    public void testRefreshRate() {
+    public void testRefreshRate() throws java.lang.InterruptedException {
+        boolean fpsOk = false;
         GLSurfaceViewStubActivity activity = getActivity();
-        float achievedFps = mResult.waitResult();
-        activity.finish();
 
         WindowManager wm = (WindowManager)activity
                 .getView()
@@ -162,10 +180,22 @@ public class DisplayRefreshRateTest extends
         Display dpy = wm.getDefaultDisplay();
         float claimedFps = dpy.getRefreshRate();
 
-        Log.d(TAG, "claimed " + claimedFps + " fps, " +
-                   "achieved " + achievedFps + " fps");
-
-        assertTrue(Math.abs(claimedFps - achievedFps) <= FPS_TOLERANCE);
+        for (int i = 0; i < 3; i++) {
+            float achievedFps = mResult.waitResult();
+            Log.d(TAG, "claimed " + claimedFps + " fps, " +
+                       "achieved " + achievedFps + " fps");
+            fpsOk = Math.abs(claimedFps - achievedFps) <= FPS_TOLERANCE;
+            if (fpsOk) {
+                break;
+            } else {
+                // it could be other sctivity like bug report capturing for other failures
+                // sleep for a while and re-try
+                Thread.sleep(10000);
+                mResult.restart();
+            }
+        }
+        activity.finish();
+        assertTrue(fpsOk);
     }
 
 }
