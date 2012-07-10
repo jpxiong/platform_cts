@@ -31,6 +31,7 @@ abstract class AbstractMonkeyTest extends DeviceTestCase implements IBuildReceiv
             File app = mBuild.getTestApp(APKS[i]);
             mDevice.installPackage(app, false);
         }
+        clearLogCat();
     }
 
     @Override
@@ -41,7 +42,7 @@ abstract class AbstractMonkeyTest extends DeviceTestCase implements IBuildReceiv
         }
     }
 
-    void clearLogCat() throws DeviceNotAvailableException {
+    private void clearLogCat() throws DeviceNotAvailableException {
         mDevice.executeAdbCommand("logcat", "-c");
     }
 }
