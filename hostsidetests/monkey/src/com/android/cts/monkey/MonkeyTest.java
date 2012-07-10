@@ -19,8 +19,6 @@ package com.android.cts.monkey;
 import com.android.tradefed.device.DeviceNotAvailableException;
 
 import java.util.Scanner;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 public class MonkeyTest extends AbstractMonkeyTest {
 
@@ -28,13 +26,11 @@ public class MonkeyTest extends AbstractMonkeyTest {
     private static final String HUMAN = "(^_^)";
 
     public void testIsMonkey() throws Exception {
-        clearLogCat();
         mDevice.executeShellCommand("monkey -p " + PKGS[0] + " 500");
         assertIsUserAMonkey(true);
     }
 
     public void testNotMonkey() throws Exception {
-        clearLogCat();
         mDevice.executeShellCommand("am start -W -a android.intent.action.MAIN "
                 + "-n com.android.cts.monkey/com.android.cts.monkey.MonkeyActivity");
         assertIsUserAMonkey(false);
