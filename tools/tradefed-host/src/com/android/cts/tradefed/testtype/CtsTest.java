@@ -29,6 +29,7 @@ import com.android.tradefed.config.Option;
 import com.android.tradefed.config.Option.Importance;
 import com.android.tradefed.device.DeviceNotAvailableException;
 import com.android.tradefed.device.ITestDevice;
+import com.android.tradefed.device.TestDeviceOptions;
 import com.android.tradefed.log.LogUtil.CLog;
 import com.android.tradefed.result.ITestInvocationListener;
 import com.android.tradefed.result.InputStreamSource;
@@ -330,7 +331,9 @@ public class CtsTest implements IDeviceTest, IResumableTest, IShardableTest, IBu
 
         try {
             installPrerequisiteApks(prerequisiteApks);
-
+            // disable keyguard before running each test.
+            // postBootSetup is done inside reboot() but do it here again for the 1st test.
+            mDevice.postBootSetup();
             // always collect the device info, even for resumed runs, since test will likely be
             // running on a different device
             collectDeviceInfo(getDevice(), mCtsBuild, listener);
@@ -352,7 +355,22 @@ public class CtsTest implements IDeviceTest, IResumableTest, IShardableTest, IBu
                 if (mRebootPerPackage) {
                     Log.i(LOG_TAG, String.format("Rebooting after running package %s",
                             knownTests.getPackageDef().getName()));
+                    final int TIMEOUT_MS = 4 * 60 * 1000;
+                    TestDeviceOptions options = mDevice.getOptions();
+                    // store default value and increase time-out for reboot
+                    int rebootTimeout = options.getRebootTimeout();
+                    long onlineTimeout = options.getOnlineTimeout();
+                    options.setRebootTimeout(TIMEOUT_MS);
+                    options.setOnlineTimeout(TIMEOUT_MS);
+                    mDevice.setOptions(options);
+
                     mDevice.reboot();
+
+                    // restore default values
+                    options.setRebootTimeout(rebootTimeout);
+                    options.setOnlineTimeout(onlineTimeout);
+                    mDevice.setOptions(options);
+                    Log.i(LOG_TAG, "Rebooting done");
                 }
             }
 
