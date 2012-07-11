@@ -132,6 +132,10 @@ public class CtsTest implements IDeviceTest, IResumableTest, IShardableTest, IBu
         "run tests including known failures")
     private boolean mIncludeKnownFailures;
 
+    @Option(name = "reboot-per-package", description =
+            "Reboot after each package run")
+    private boolean mRebootPerPackage = false;
+
     /** data structure for a {@link IRemoteTest} and its known tests */
     class TestPackage {
         private final IRemoteTest mTestForPackage;
@@ -345,6 +349,11 @@ public class CtsTest implements IDeviceTest, IResumableTest, IShardableTest, IBu
                 forwardPackageDetails(knownTests.getPackageDef(), listener);
                 test.run(filter);
                 mRemainingTestPkgs.remove(0);
+                if (mRebootPerPackage) {
+                    Log.i(LOG_TAG, String.format("Rebooting after running package %s",
+                            knownTests.getPackageDef().getName()));
+                    mDevice.reboot();
+                }
             }
 
             if (mScreenshot) {
