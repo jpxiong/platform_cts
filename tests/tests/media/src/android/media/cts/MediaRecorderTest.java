@@ -32,6 +32,10 @@ import android.util.Log;
 import java.io.File;
 import java.io.FileDescriptor;
 import java.io.FileOutputStream;
+import java.lang.InterruptedException;
+import java.lang.Runnable;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 public class MediaRecorderTest extends ActivityInstrumentationTestCase2<MediaStubActivity> {
     private final String TAG = "MediaRecorderTest";
@@ -74,21 +78,43 @@ public class MediaRecorderTest extends ActivityInstrumentationTestCase2<MediaStu
                 "record2.out").getAbsolutePath();
     }
 
+    private void completeOnUiThread(final Runnable runnable) {
+        final CountDownLatch latch = new CountDownLatch(1);
+        getActivity().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                runnable.run();
+                latch.countDown();
+            }
+        });
+        try {
+            // if UI thread does not run, things will fail anyway
+            assertTrue(latch.await(10, TimeUnit.SECONDS));
+        } catch (java.lang.InterruptedException e) {
+            fail("should not be interrupted");
+        }
+    }
+
     @Override
     protected void setUp() throws Exception {
         mActivity = getActivity();
-        mOutFile = new File(OUTPUT_PATH);
-        mOutFile2 = new File(OUTPUT_PATH2);
-        mMediaRecorder.reset();
-        mMediaRecorder.setOutputFile(OUTPUT_PATH);
-        mMediaRecorder.setOnInfoListener(new OnInfoListener() {
-            public void onInfo(MediaRecorder mr, int what, int extra) {
-                mOnInfoCalled = true;
-            }
-        });
-        mMediaRecorder.setOnErrorListener(new OnErrorListener() {
-            public void onError(MediaRecorder mr, int what, int extra) {
-                mOnErrorCalled = true;
+        completeOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                mOutFile = new File(OUTPUT_PATH);
+                mOutFile2 = new File(OUTPUT_PATH2);
+                mMediaRecorder.reset();
+                mMediaRecorder.setOutputFile(OUTPUT_PATH);
+                mMediaRecorder.setOnInfoListener(new OnInfoListener() {
+                    public void onInfo(MediaRecorder mr, int what, int extra) {
+                        mOnInfoCalled = true;
+                    }
+                });
+                mMediaRecorder.setOnErrorListener(new OnErrorListener() {
+                    public void onError(MediaRecorder mr, int what, int extra) {
+                        mOnErrorCalled = true;
+                    }
+                });
             }
         });
         super.setUp();
