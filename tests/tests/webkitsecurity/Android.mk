@@ -24,7 +24,7 @@ LOCAL_SRC_FILES := $(call all-java-files-under, src)
 
 LOCAL_PACKAGE_NAME := CtsWebkitSecurityTestCases
 
-LOCAL_STATIC_JAVA_LIBRARIES := ctsutil ctstestserver
+LOCAL_STATIC_JAVA_LIBRARIES := ctsutil ctstestserver ctstestrunner
 
 LOCAL_SDK_VERSION := current
 

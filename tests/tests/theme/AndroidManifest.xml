@@ -17,12 +17,13 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.android.cts.theme">
 
+    <uses-permission android:name="android.permission.DISABLE_KEYGUARD" />
     <application>
         <uses-library android:name="android.test.runner" />        
         <activity android:name="android.theme.cts.DeviceDefaultActivity" />        
     </application>
 
-    <instrumentation android:name="android.test.InstrumentationTestRunner"
+    <instrumentation android:name="android.test.InstrumentationCtsTestRunner"
             android:targetPackage="com.android.cts.theme"
             android:label="CTS tests for themes"/>
 </manifest>

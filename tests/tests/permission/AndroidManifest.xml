@@ -18,6 +18,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.android.cts.permission">
 
+    <uses-permission android:name="android.permission.DISABLE_KEYGUARD" />
     <application>
         <uses-library android:name="android.test.runner" />
         <activity android:name="android.permission.cts.PermissionStubActivity"
@@ -39,7 +40,7 @@
         package. That runner cannot be added to this package either, since it
         relies on hidden APIs.
     -->
-    <instrumentation android:name="android.test.InstrumentationTestRunner"
+    <instrumentation android:name="android.test.InstrumentationCtsTestRunner"
                      android:targetPackage="com.android.cts.permission"
                      android:label="CTS tests of com.android.cts.permission"/>
 
