@@ -26,7 +26,7 @@ LOCAL_SRC_FILES := $(call all-java-files-under, src)
 
 LOCAL_PACKAGE_NAME := CtsAccessibilityTestCases
 
-LOCAL_STATIC_JAVA_LIBRARIES := ctsutil
+LOCAL_STATIC_JAVA_LIBRARIES := ctsutil ctstestrunner
 
 # This test runner sets up/cleans up the device before/after running the tests.
 LOCAL_CTS_TEST_RUNNER := com.android.cts.tradefed.testtype.AccessibilityTestRunner

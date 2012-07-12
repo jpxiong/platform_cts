@@ -23,6 +23,7 @@
     <uses-permission android:name="android.permission.AUTHENTICATE_ACCOUNTS" />
     <uses-permission android:name="android.permission.GET_ACCOUNTS" />
     <uses-permission android:name="android.permission.USE_CREDENTIALS" />
+    <uses-permission android:name="android.permission.DISABLE_KEYGUARD" />
 
     <application>
         <uses-library android:name="android.test.runner" />
@@ -38,7 +39,7 @@
         </service>
     </application>
 
-    <instrumentation android:name="android.test.InstrumentationTestRunner"
+    <instrumentation android:name="android.test.InstrumentationCtsTestRunner"
                      android:targetPackage="android.accounts.cts"
                      android:label="CTS tests for android.accounts"/>
 

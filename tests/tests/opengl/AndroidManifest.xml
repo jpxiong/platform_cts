@@ -18,10 +18,11 @@
     android:versionCode="1"
     android:versionName="1.0" >
 
+    <uses-permission android:name="android.permission.DISABLE_KEYGUARD" />
     <uses-sdk android:minSdkVersion="14" />
     <uses-feature android:glEsVersion="0x00020000"/>
     <instrumentation
-        android:name="android.test.InstrumentationTestRunner"
+        android:name="android.test.InstrumentationCtsTestRunner"
         android:targetPackage="com.android.cts.opengl" />
     <application
         android:icon="@drawable/ic_launcher"
