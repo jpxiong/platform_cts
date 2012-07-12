@@ -242,29 +242,29 @@ public class ValueAnimatorTest extends
         }
         return values;
     }
-    private void startAnimation(final ValueAnimator mValueAnimator) throws Throwable {
-        this.runTestOnUiThread(new Runnable(){
+
+    private void startAnimation(final ValueAnimator animator) throws Throwable {
+        this.runTestOnUiThread(new Runnable() {
             public void run() {
-                  mActivity.startAnimation(mValueAnimator);
+                mActivity.startAnimation(animator);
             }
         });
     }
-    private void endAnimation(final ValueAnimator mValueAnimator) throws Throwable {
-        Thread animationRunnable = new Thread() {
+
+    private void endAnimation(final ValueAnimator animator) throws Throwable {
+        this.runTestOnUiThread(new Runnable() {
             public void run() {
-                mValueAnimator.end();
+                animator.end();
             }
-        };
-        this.runTestOnUiThread(animationRunnable);
+        });
     }
 
-    private void cancelAnimation(final ValueAnimator mValueAnimator) throws Throwable {
-        Thread animationRunnable = new Thread() {
+    private void cancelAnimation(final ValueAnimator animator) throws Throwable {
+        this.runTestOnUiThread(new Runnable() {
             public void run() {
-                mValueAnimator.cancel();
+                animator.cancel();
             }
-        };
-        this.runTestOnUiThread(animationRunnable);
+        });
     }
 
     private String errorMessage(float[] values) {
