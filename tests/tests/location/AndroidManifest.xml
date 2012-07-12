@@ -18,6 +18,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.android.cts.location">
 
+    <uses-permission android:name="android.permission.DISABLE_KEYGUARD" />
     <application>
         <uses-library android:name="android.test.runner" />
     </application>
@@ -26,7 +27,7 @@
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
     <uses-permission android:name="android.permission.ACCESS_LOCATION_EXTRA_COMMANDS"/>
 
-    <instrumentation android:name="android.test.InstrumentationTestRunner"
+    <instrumentation android:name="android.test.InstrumentationCtsTestRunner"
                      android:targetPackage="com.android.cts.location"
                      android:label="CTS tests of android.location"/>
 </manifest>

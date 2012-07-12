@@ -19,13 +19,14 @@
 
     <uses-permission android:name="android.permission.BLUETOOTH" />
     <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
+    <uses-permission android:name="android.permission.DISABLE_KEYGUARD" />
 
     <application>
         <uses-library android:name="android.test.runner" />
     </application>
 
     <!-- This is a self-instrumenting test package. -->
-    <instrumentation android:name="android.test.InstrumentationTestRunner"
+    <instrumentation android:name="android.test.InstrumentationCtsTestRunner"
                      android:targetPackage="com.android.cts.bluetooth"
                      android:label="CTS tests of bluetooth component"/>
 

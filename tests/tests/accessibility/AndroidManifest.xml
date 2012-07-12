@@ -19,11 +19,12 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
         package="android.view.cts.accessibility">
 
+  <uses-permission android:name="android.permission.DISABLE_KEYGUARD" />
   <application android:theme="@android:style/Theme.Holo.NoActionBar" >
       <uses-library android:name="android.test.runner"/>
   </application>
 
-  <instrumentation android:name="android.test.InstrumentationTestRunner"
+  <instrumentation android:name="android.test.InstrumentationCtsTestRunner"
                    android:targetPackage="android.view.cts.accessibility"
                    android:label="Tests for the accessibility APIs."/>
 

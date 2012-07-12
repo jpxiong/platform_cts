@@ -18,6 +18,7 @@
         package="com.android.cts.holo">
 
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.DISABLE_KEYGUARD" />
 
     <application android:hardwareAccelerated="false">
         <uses-library android:name="android.test.runner" />
@@ -53,7 +54,7 @@
 
     </application>
     
-    <instrumentation android:name="android.test.InstrumentationTestRunner"
+    <instrumentation android:name="android.test.InstrumentationCtsTestRunner"
             android:targetPackage="com.android.cts.holo"
             android:label="CTS tests for the Holo theme" />
 
