@@ -89,7 +89,10 @@ public class PackageSignatureTest extends AndroidTestCase {
             "com.android.tradefed.utils.wifi",
 
             // Game used for CTS testing...
-            "com.replica.replicaisland"
+            "com.replica.replicaisland",
+
+            // CTS test
+            "android.core.tests.libcore.package.libcore"
             ));
 
     private boolean isWhitelistedPackage(String packageName) {
