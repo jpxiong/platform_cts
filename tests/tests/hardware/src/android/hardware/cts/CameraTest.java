@@ -78,8 +78,8 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
     private int mCameraErrorCode = NO_ERROR;
     private boolean mAutoFocusSucceeded = false;
 
-    private static final int WAIT_FOR_COMMAND_TO_COMPLETE = 1500;  // Milliseconds.
-    private static final int WAIT_FOR_FOCUS_TO_COMPLETE = 3000;
+    private static final int WAIT_FOR_COMMAND_TO_COMPLETE = 5000;  // Milliseconds.
+    private static final int WAIT_FOR_FOCUS_TO_COMPLETE = 5000;
     private static final int WAIT_FOR_SNAPSHOT_TO_COMPLETE = 5000;
 
     private static final int FOCUS_AREA = 0;
