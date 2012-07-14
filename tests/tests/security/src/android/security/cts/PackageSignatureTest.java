@@ -92,7 +92,13 @@ public class PackageSignatureTest extends AndroidTestCase {
             "com.replica.replicaisland",
 
             // CTS test
-            "android.core.tests.libcore.package.libcore"
+            "android.core.tests.libcore.package.com",
+            "android.core.tests.libcore.package.dalvik",
+            "android.core.tests.libcore.package.libcore",
+            "android.core.tests.libcore.package.org",
+            "android.core.tests.libcore.package.sun",
+            "android.core.tests.libcore.package.tests"
+
             ));
 
     private boolean isWhitelistedPackage(String packageName) {
