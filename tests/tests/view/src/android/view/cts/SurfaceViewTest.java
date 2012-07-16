@@ -30,7 +30,7 @@ import android.view.SurfaceView;
 import android.view.cts.SurfaceViewStubActivity.MockSurfaceView;
 
 public class SurfaceViewTest extends ActivityInstrumentationTestCase2<SurfaceViewStubActivity> {
-    private static final long WAIT_TIME = 1000;
+    private static final long WAIT_TIME = 3000;
 
     private Context mContext;
     private Instrumentation mInstrumentation;
