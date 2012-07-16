@@ -94,7 +94,11 @@ public class AnimatorTest extends ActivityInstrumentationTestCase2<AnimationActi
     public void testCancel() throws Throwable {
         startAnimation(mAnimator);
         Thread.sleep(100);
-        mAnimator.cancel();
+        runTestOnUiThread(new Runnable() {
+            public void run() {
+                mAnimator.cancel();
+            }
+        });
         assertFalse(mAnimator.isRunning());
     }
 
