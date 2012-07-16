@@ -401,7 +401,7 @@ public class AutoCompleteTextViewTest extends
         assertTrue(mAutoCompleteTextView.hasFocus());
         assertTrue(mAutoCompleteTextView.hasWindowFocus());
         // give some time for UI to settle
-        Thread.sleep(200);
+        Thread.sleep(2000);
         assertTrue(mAutoCompleteTextView.isPopupShowing());
     }
 
