@@ -25,6 +25,7 @@ import org.xmlpull.v1.XmlPullParserException;
 import android.app.Activity;
 import android.app.Instrumentation;
 import android.content.Context;
+import android.cts.util.PollingCheck;
 import android.graphics.Rect;
 import android.test.ActivityInstrumentationTestCase2;
 import android.test.UiThreadTest;
@@ -400,9 +401,12 @@ public class AutoCompleteTextViewTest extends
         }
         assertTrue(mAutoCompleteTextView.hasFocus());
         assertTrue(mAutoCompleteTextView.hasWindowFocus());
-        // give some time for UI to settle
-        Thread.sleep(2000);
-        assertTrue(mAutoCompleteTextView.isPopupShowing());
+        new PollingCheck() {
+            @Override
+            protected boolean check() {
+                return mAutoCompleteTextView.isPopupShowing();
+            }
+        }.run();
     }
 
     public void testPerformFiltering() throws Throwable {
@@ -450,7 +454,7 @@ public class AutoCompleteTextViewTest extends
         });
         mInstrumentation.waitForIdleSync();
         // Create and get the filter.
-        MockFilter filter = (MockFilter) adapter.getFilter();
+        final MockFilter filter = (MockFilter) adapter.getFilter();
 
         // performFiltering will be indirectly invoked by onKeyDown
         assertNull(filter.getResult());
@@ -458,13 +462,20 @@ public class AutoCompleteTextViewTest extends
         if (mNumeric) {
             // "numeric" in case of 12-key(NUMERIC) keyboard
             mInstrumentation.sendStringSync("6688633777444222");
-            Thread.sleep(100);
-            assertEquals("numeric", filter.getResult());
+            new PollingCheck() {
+                @Override
+                protected boolean check() {
+                    return "numeric".equals(filter.getResult());
+                }
+            }.run();
         } else {
             mInstrumentation.sendStringSync(STRING_TEST);
-            // give some time for UI to settle
-            Thread.sleep(100);
-            assertEquals(STRING_TEST, filter.getResult());
+            new PollingCheck() {
+                @Override
+                protected boolean check() {
+                    return STRING_TEST.equals(filter.getResult());
+                }
+            }.run();
         }
     }
 
