@@ -16,22 +16,32 @@
 
 package com.android.cts.monkey;
 
+import java.util.regex.Pattern;
+
 public class PackageTest extends AbstractMonkeyTest {
+
+    private static final Pattern ALLOW_MONKEY =
+            Pattern.compile("^.*Allowing.*cmp=com\\.android\\.cts\\.monkey/\\.MonkeyActivity.*$",
+                    Pattern.MULTILINE);
+
+    private static final Pattern ALLOW_CHIMP =
+            Pattern.compile("^.*Allowing.*cmp=com\\.android\\.cts\\.monkey2/\\.ChimpActivity.*$",
+                    Pattern.MULTILINE);
 
     public void testSinglePackage() throws Exception {
         String out = mDevice.executeShellCommand("monkey -v -p " + PKGS[0] + " 5000");
-        assertTrue(out, out.contains("cmp=com.android.cts.monkey/.MonkeyActivity"));
-        assertFalse(out, out.contains("cmp=com.android.cts.monkey2/.ChimpActivity"));
+        assertTrue(out, ALLOW_MONKEY.matcher(out).find());
+        assertFalse(out, ALLOW_CHIMP.matcher(out).find());
 
         out = mDevice.executeShellCommand("monkey -v -p " + PKGS[1] + " 5000");
-        assertFalse(out, out.contains("cmp=com.android.cts.monkey/.MonkeyActivity"));
-        assertTrue(out, out.contains("cmp=com.android.cts.monkey2/.ChimpActivity"));
+        assertFalse(out, ALLOW_MONKEY.matcher(out).find());
+        assertTrue(out, ALLOW_CHIMP.matcher(out).find());
     }
 
     public void testMultiplePackages() throws Exception {
         String out = mDevice.executeShellCommand("monkey -v -p " + PKGS[0]
                 + " -p " + PKGS[1] + " 5000");
-        assertTrue(out, out.contains("cmp=com.android.cts.monkey/.MonkeyActivity"));
-        assertTrue(out, out.contains("cmp=com.android.cts.monkey2/.ChimpActivity"));
+        assertTrue(out, ALLOW_MONKEY.matcher(out).find());
+        assertTrue(out, ALLOW_CHIMP.matcher(out).find());
     }
 }
