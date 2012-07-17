@@ -142,7 +142,7 @@ public class CtsTest implements IDeviceTest, IResumableTest, IShardableTest, IBu
 
     @Option(name = "reboot-wait-time", description =
             "Additional wait time in ms after boot complete. Meaningful only with reboot-per-package option")
-    private int mRebootWaitTimeMSec = 120000;
+    private int mRebootWaitTimeMSec = 2 * 60 * 1000;
 
     @Option(name = "reboot-interval", description =
             "Interval between each reboot in min. Meaningful only with reboot-per-package option")
@@ -348,6 +348,10 @@ public class CtsTest implements IDeviceTest, IResumableTest, IShardableTest, IBu
             // always collect the device info, even for resumed runs, since test will likely be
             // running on a different device
             collectDeviceInfo(getDevice(), mCtsBuild, listener);
+            if (mRemainingTestPkgs.size() > 1) {
+                Log.i(LOG_TAG, "Initial reboot for multiple packages");
+                rebootDevice();
+            }
             long prevTime = System.currentTimeMillis();
             long intervalInMSec = mRebootIntervalMin * 60 * 1000;
             while (!mRemainingTestPkgs.isEmpty()) {
@@ -369,27 +373,7 @@ public class CtsTest implements IDeviceTest, IResumableTest, IShardableTest, IBu
                     if ((currentTime - prevTime) > intervalInMSec) {
                         Log.i(LOG_TAG, String.format("Rebooting after running package %s",
                                 knownTests.getPackageDef().getName()));
-                        final int TIMEOUT_MS = 4 * 60 * 1000;
-                        TestDeviceOptions options = mDevice.getOptions();
-                        // store default value and increase time-out for reboot
-                        int rebootTimeout = options.getRebootTimeout();
-                        long onlineTimeout = options.getOnlineTimeout();
-                        options.setRebootTimeout(TIMEOUT_MS);
-                        options.setOnlineTimeout(TIMEOUT_MS);
-                        mDevice.setOptions(options);
-
-                        mDevice.reboot();
-
-                        // restore default values
-                        options.setRebootTimeout(rebootTimeout);
-                        options.setOnlineTimeout(onlineTimeout);
-                        mDevice.setOptions(options);
-                        Log.i(LOG_TAG, "Rebooting done");
-                        try {
-                            Thread.sleep(mRebootWaitTimeMSec);
-                        } catch (InterruptedException e) {
-                            Log.i(LOG_TAG, "Boot wait interrupted");
-                        }
+                        rebootDevice();
                         prevTime = System.currentTimeMillis();
                     }
                 }
@@ -408,6 +392,30 @@ public class CtsTest implements IDeviceTest, IResumableTest, IShardableTest, IBu
 
         } finally {
             filter.reportUnexecutedTests();
+        }
+    }
+
+    private void rebootDevice() throws DeviceNotAvailableException {
+        final int TIMEOUT_MS = 4 * 60 * 1000;
+        TestDeviceOptions options = mDevice.getOptions();
+        // store default value and increase time-out for reboot
+        int rebootTimeout = options.getRebootTimeout();
+        long onlineTimeout = options.getOnlineTimeout();
+        options.setRebootTimeout(TIMEOUT_MS);
+        options.setOnlineTimeout(TIMEOUT_MS);
+        mDevice.setOptions(options);
+
+        mDevice.reboot();
+
+        // restore default values
+        options.setRebootTimeout(rebootTimeout);
+        options.setOnlineTimeout(onlineTimeout);
+        mDevice.setOptions(options);
+        Log.i(LOG_TAG, "Rebooting done");
+        try {
+            Thread.sleep(mRebootWaitTimeMSec);
+        } catch (InterruptedException e) {
+            Log.i(LOG_TAG, "Boot wait interrupted");
         }
     }
 
