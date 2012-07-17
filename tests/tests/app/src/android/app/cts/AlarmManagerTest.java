@@ -22,6 +22,7 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.cts.util.PollingCheck;
 import android.os.SystemClock;
 import android.test.AndroidTestCase;
 
@@ -38,8 +39,8 @@ public class AlarmManagerTest extends AndroidTestCase {
     private long mWakeupTime;
     private MockAlarmReceiver mMockAlarmReceiver;
 
-    private final int TIME_DELTA = 200;
-    private final int TIME_DELAY = 2000;
+    private final int TIME_DELTA = 1000;
+    private final int TIME_DELAY = 5000;
 
     class Sync {
         public boolean mIsConnected;
@@ -73,32 +74,48 @@ public class AlarmManagerTest extends AndroidTestCase {
         mMockAlarmReceiver.setAlarmedFalse();
         mWakeupTime = System.currentTimeMillis() + SNOOZE_DELAY;
         mAlarmManager.set(AlarmManager.RTC_WAKEUP, mWakeupTime, mSender);
-        Thread.sleep(SNOOZE_DELAY + TIME_DELAY);
-        assertTrue(mMockAlarmReceiver.alarmed);
+        new PollingCheck(SNOOZE_DELAY + TIME_DELAY) {
+            @Override
+            protected boolean check() {
+                return mMockAlarmReceiver.alarmed;
+            }
+        }.run();
         assertEquals(mMockAlarmReceiver.rtcTime, mWakeupTime, TIME_DELTA);
 
         // test parameter type is RTC
         mMockAlarmReceiver.setAlarmedFalse();
         mWakeupTime = System.currentTimeMillis() + SNOOZE_DELAY;
         mAlarmManager.set(AlarmManager.RTC, mWakeupTime, mSender);
-        Thread.sleep(SNOOZE_DELAY + TIME_DELAY);
-        assertTrue(mMockAlarmReceiver.alarmed);
+        new PollingCheck(SNOOZE_DELAY + TIME_DELAY) {
+            @Override
+            protected boolean check() {
+                return mMockAlarmReceiver.alarmed;
+            }
+        }.run();
         assertEquals(mMockAlarmReceiver.rtcTime, mWakeupTime, TIME_DELTA);
 
         // test parameter type is ELAPSED_REALTIME
         mMockAlarmReceiver.setAlarmedFalse();
         mWakeupTime = SystemClock.elapsedRealtime() + SNOOZE_DELAY;
         mAlarmManager.set(AlarmManager.ELAPSED_REALTIME, mWakeupTime, mSender);
-        Thread.sleep(SNOOZE_DELAY + TIME_DELAY);
-        assertTrue(mMockAlarmReceiver.alarmed);
+        new PollingCheck(SNOOZE_DELAY + TIME_DELAY) {
+            @Override
+            protected boolean check() {
+                return mMockAlarmReceiver.alarmed;
+            }
+        }.run();
         assertEquals(mMockAlarmReceiver.elapsedTime, mWakeupTime, TIME_DELTA);
 
         // test parameter type is ELAPSED_REALTIME_WAKEUP
         mMockAlarmReceiver.setAlarmedFalse();
         mWakeupTime = SystemClock.elapsedRealtime() + SNOOZE_DELAY;
         mAlarmManager.set(AlarmManager.ELAPSED_REALTIME_WAKEUP, mWakeupTime, mSender);
-        Thread.sleep(SNOOZE_DELAY + TIME_DELAY);
-        assertTrue(mMockAlarmReceiver.alarmed);
+        new PollingCheck(SNOOZE_DELAY + TIME_DELAY) {
+            @Override
+            protected boolean check() {
+                return mMockAlarmReceiver.alarmed;
+            }
+        }.run();
         assertEquals(mMockAlarmReceiver.elapsedTime, mWakeupTime, TIME_DELTA);
     }
 
@@ -109,19 +126,31 @@ public class AlarmManagerTest extends AndroidTestCase {
         mMockAlarmReceiver.setAlarmedFalse();
         mWakeupTime = -1000;
         mAlarmManager.set(AlarmManager.RTC, mWakeupTime, mSender);
-        Thread.sleep(TIME_DELAY);
-        assertTrue(mMockAlarmReceiver.alarmed);
+        new PollingCheck(TIME_DELAY) {
+            @Override
+            protected boolean check() {
+                return mMockAlarmReceiver.alarmed;
+            }
+        }.run();
     }
 
     public void testSetRepeating() throws Exception {
         mMockAlarmReceiver.setAlarmedFalse();
         mWakeupTime = System.currentTimeMillis() + SNOOZE_DELAY;
         mAlarmManager.setRepeating(AlarmManager.RTC_WAKEUP, mWakeupTime, TIME_DELAY / 2, mSender);
-        Thread.sleep(SNOOZE_DELAY + TIME_DELAY);
-        assertTrue(mMockAlarmReceiver.alarmed);
+        new PollingCheck(SNOOZE_DELAY + TIME_DELAY) {
+            @Override
+            protected boolean check() {
+                return mMockAlarmReceiver.alarmed;
+            }
+        }.run();
         mMockAlarmReceiver.setAlarmedFalse();
-        Thread.sleep(TIME_DELAY);
-        assertTrue(mMockAlarmReceiver.alarmed);
+        new PollingCheck(TIME_DELAY) {
+            @Override
+            protected boolean check() {
+                return mMockAlarmReceiver.alarmed;
+            }
+        }.run();
         mAlarmManager.cancel(mSender);
     }
 
@@ -129,11 +158,19 @@ public class AlarmManagerTest extends AndroidTestCase {
         mMockAlarmReceiver.setAlarmedFalse();
         mWakeupTime = System.currentTimeMillis() + SNOOZE_DELAY;
         mAlarmManager.setRepeating(AlarmManager.RTC_WAKEUP, mWakeupTime, 1000, mSender);
-        Thread.sleep(SNOOZE_DELAY + TIME_DELAY);
-        assertTrue(mMockAlarmReceiver.alarmed);
+        new PollingCheck(SNOOZE_DELAY + TIME_DELAY) {
+            @Override
+            protected boolean check() {
+                return mMockAlarmReceiver.alarmed;
+            }
+        }.run();
         mMockAlarmReceiver.setAlarmedFalse();
-        Thread.sleep(TIME_DELAY);
-        assertTrue(mMockAlarmReceiver.alarmed);
+        new PollingCheck(TIME_DELAY) {
+            @Override
+            protected boolean check() {
+                return mMockAlarmReceiver.alarmed;
+            }
+        }.run();
         mAlarmManager.cancel(mSender);
         Thread.sleep(TIME_DELAY);
         mMockAlarmReceiver.setAlarmedFalse();
