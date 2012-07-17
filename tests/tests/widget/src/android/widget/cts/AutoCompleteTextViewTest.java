@@ -374,7 +374,12 @@ public class AutoCompleteTextViewTest extends
         mInstrumentation.sendStringSync(testString);
 
         // onFilterComplete will close the popup.
-        assertFalse(mAutoCompleteTextView.isPopupShowing());
+        new PollingCheck() {
+            @Override
+            protected boolean check() {
+                return !mAutoCompleteTextView.isPopupShowing();
+            }
+        }.run();
 
         if (mNumeric) {
             // "that" in case of 12-key(NUMERIC) keyboard
@@ -383,7 +388,12 @@ public class AutoCompleteTextViewTest extends
             testString = "that";
         }
         mInstrumentation.sendStringSync(testString);
-        assertFalse(mAutoCompleteTextView.isPopupShowing());
+        new PollingCheck() {
+            @Override
+            protected boolean check() {
+                return !mAutoCompleteTextView.isPopupShowing();
+            }
+        }.run();
 
         // Test the expected filter matching scene
         runTestOnUiThread(new Runnable() {
