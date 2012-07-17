@@ -67,6 +67,11 @@
       "org.apache.harmony.luni.tests.java.net.URLConnectionTest",
       "org.apache.harmony.xnet.provider.jsse.NativeCryptoTest#test_SSL_do_handshake_server_timeout"
     ]
+  },
+  {
+    description: "MediaPlayerFlakyNetworkTest tests",
+    name: "android.media.cts.MediaPlayerFlakyNetworkTest",
+    bug: 6782035
   }
 ]
 
