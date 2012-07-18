@@ -62,7 +62,8 @@ public class MediaStore_Video_MediaTest extends AndroidTestCase {
                 "/video/testvideo1.3gp";
 
         int numBytes = 1337;
-        FileUtils.createFile(new File(externalVideoPath), numBytes);
+        File videoFile = new File(externalVideoPath);
+        FileUtils.createFile(videoFile, numBytes);
 
         ContentValues values = new ContentValues();
         values.put(Media.ALBUM, "cts");
@@ -86,7 +87,7 @@ public class MediaStore_Video_MediaTest extends AndroidTestCase {
         values.put(Media.TITLE, "testvideo");
         long dateAdded = System.currentTimeMillis() / 1000;
         values.put(Media.DATE_ADDED, dateAdded);
-        long dateModified = System.currentTimeMillis() / 1000;
+        long dateModified = videoFile.lastModified() / 1000;
         values.put(Media.DATE_MODIFIED, dateModified);
 
         // insert
