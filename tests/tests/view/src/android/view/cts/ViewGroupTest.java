@@ -1554,8 +1554,8 @@ public class ViewGroupTest extends InstrumentationTestCase implements CTSResult{
 
         assertEquals(bottom, vg.getPaddingBottom());
         assertEquals(top, vg.getPaddingTop());
-        assertEquals(start, vg.getPaddingLeft());
-        assertEquals(end, vg.getPaddingRight());
+        assertEquals(end, vg.getPaddingLeft());
+        assertEquals(start, vg.getPaddingRight());
 
         assertEquals(start, vg.getPaddingStart());
         assertEquals(end, vg.getPaddingEnd());
