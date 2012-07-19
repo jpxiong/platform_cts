@@ -17,6 +17,8 @@
  -->
 <resources>
 
-    <style name="AppTheme" parent="android:Theme.Light" />
+    <dimen name="padding_small">8dp</dimen>
+    <dimen name="padding_medium">8dp</dimen>
+    <dimen name="padding_large">16dp</dimen>
 
 </resources>
