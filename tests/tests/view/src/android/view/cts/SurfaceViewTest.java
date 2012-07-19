@@ -143,10 +143,10 @@ public class SurfaceViewTest extends ActivityInstrumentationTestCase2<SurfaceVie
         new PollingCheck() {
             @Override
             protected boolean check() {
-                return mockSurfaceView.isDetachedFromWindow();
+                return mockSurfaceView.isDetachedFromWindow() &&
+                       !mockSurfaceView.isShown();
             }
         }.run();
-        assertFalse(mockSurfaceView.isShown());
     }
 
     private void sleep(long time) {
