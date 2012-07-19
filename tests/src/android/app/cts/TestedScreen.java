@@ -24,12 +24,13 @@ import android.os.Looper;
 import android.os.Message;
 import android.os.MessageQueue;
 import android.os.SystemClock;
+import android.util.Log;
 
 public class TestedScreen extends Activity {
     public static final String WAIT_BEFORE_FINISH = "TestedScreen.WAIT_BEFORE_FINISH";
     public static final String DELIVER_RESULT = "TestedScreen.DELIVER_RESULT";
     public static final String CLEAR_TASK = "TestedScreen.CLEAR_TASK";
-
+    private static final String TAG = "TestedScreen" ;
     public TestedScreen() {
     }
 
@@ -101,6 +102,7 @@ public class TestedScreen extends Activity {
 
     private class Idler implements MessageQueue.IdleHandler {
         public final boolean queueIdle() {
+            Log.i(TAG, "idle");
             if (WAIT_BEFORE_FINISH.equals(getIntent().getAction())) {
                 final Message m = Message.obtain();
                 mHandler.sendMessageAtTime(m, SystemClock.uptimeMillis() + 1000);

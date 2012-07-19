@@ -272,7 +272,7 @@ public class LaunchpadActivity extends Activity {
         if (!mStarted) {
             mStarted = true;
 
-            mHandler.postDelayed(mTimeout, 5 * 1000);
+            mHandler.postDelayed(mTimeout, 10 * 1000);
 
             final String action = getIntent().getAction();
 
@@ -630,6 +630,7 @@ public class LaunchpadActivity extends Activity {
 
     private final Runnable mTimeout = new Runnable() {
         public void run() {
+            Log.i(TAG, "timeout");
             String msg = "Timeout";
             if (mExpectedReceivers != null && mNextReceiver < mExpectedReceivers.length) {
                 msg = msg + " waiting for " + mExpectedReceivers[mNextReceiver];

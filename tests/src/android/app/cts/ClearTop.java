@@ -19,10 +19,11 @@ package android.app.cts;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 
 public class ClearTop extends Activity {
     public static final String WAIT_CLEAR_TASK = "waitClearTask";
-
+    private static final String TAG = "ClearTop";
     public ClearTop() {
     }
 
@@ -36,6 +37,7 @@ public class ClearTop extends Activity {
 
     @Override
     public void onNewIntent(Intent intent) {
+        Log.i(TAG, "onNewIntent");
         if (LocalScreen.CLEAR_TASK.equals(intent.getAction())) {
             setResult(RESULT_OK);
         } else {
