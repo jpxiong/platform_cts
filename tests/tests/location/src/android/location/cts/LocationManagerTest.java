@@ -37,6 +37,7 @@ import android.provider.Settings;
 import android.test.InstrumentationTestCase;
 
 import java.util.List;
+import java.lang.Thread;
 
 /**
  * Requires the permissions
@@ -606,6 +607,9 @@ public class LocationManagerTest extends InstrumentationTestCase {
 
         // now update to trigger exit proximity proximity
         mIntentReceiver.clearReceivedIntents();
+
+        // delay 2 seconds since location update in less than 1s will be neglected.
+        Thread.sleep(2000);
         updateLocation(20, 20);
         waitForReceiveBroadcast();
         assertProximityType(false);
