@@ -661,12 +661,11 @@ public class WebViewOnUiThread {
      * @param call The call to make on the UI thread prior to waiting.
      */
     private void callAndWait(Runnable call) {
-        synchronized (this) {
-            Assert.assertTrue("WebViewOnUiThread.load*AndWaitForCompletion calls "
-                    + "may not be mixed with load* calls directly on WebView "
-                    + "without calling waitForLoadCompletion after the load",
-                    !mLoaded);
-        }
+        Assert.assertTrue("WebViewOnUiThread.load*AndWaitForCompletion calls "
+                + "may not be mixed with load* calls directly on WebView "
+                + "without calling waitForLoadCompletion after the load",
+                !isLoaded());
+        clearLoad(); // clear any extraneous signals from a previous load.
         runOnUiThread(call);
         waitForLoadCompletion();
     }
