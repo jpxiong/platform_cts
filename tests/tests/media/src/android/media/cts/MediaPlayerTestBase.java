@@ -84,15 +84,10 @@ public class MediaPlayerTestBase extends ActivityInstrumentationTestCase2<MediaS
     protected Context mContext;
     protected Resources mResources;
 
-    /*
-     * InstrumentationTestRunner.onStart() calls Looper.prepare(), which creates a looper
-     * for the current thread. However, since we don't actually call loop() in the test,
-     * any messages queued with that looper will never be consumed. We instantiate the player
-     * in the constructor, before setUp(), so that its constructor does not see the
-     * nonfunctional Looper.
-     */
-    protected MediaPlayer mMediaPlayer = new MediaPlayer();
-    protected MediaPlayer mMediaPlayer2 = new MediaPlayer();
+
+    protected MediaPlayer mMediaPlayer = null;
+    protected MediaPlayer mMediaPlayer2 = null;
+    protected MediaStubActivity mActivity;
 
     public MediaPlayerTestBase() {
         super(MediaStubActivity.class);
@@ -101,6 +96,19 @@ public class MediaPlayerTestBase extends ActivityInstrumentationTestCase2<MediaS
     @Override
     protected void setUp() throws Exception {
         super.setUp();
+        mActivity = getActivity();
+        getInstrumentation().waitForIdleSync();
+        try {
+            runTestOnUiThread(new Runnable() {
+                public void run() {
+                    mMediaPlayer = new MediaPlayer();
+                    mMediaPlayer2 = new MediaPlayer();
+                }
+            });
+        } catch (Throwable e) {
+            e.printStackTrace();
+            fail();
+        }
         mContext = getInstrumentation().getTargetContext();
         mResources = mContext.getResources();
     }
@@ -109,10 +117,13 @@ public class MediaPlayerTestBase extends ActivityInstrumentationTestCase2<MediaS
     protected void tearDown() throws Exception {
         if (mMediaPlayer != null) {
             mMediaPlayer.release();
+            mMediaPlayer = null;
         }
         if (mMediaPlayer2 != null) {
             mMediaPlayer2.release();
+            mMediaPlayer2 = null;
         }
+        mActivity = null;
         super.tearDown();
     }
 
@@ -172,7 +183,7 @@ public class MediaPlayerTestBase extends ActivityInstrumentationTestCase2<MediaS
         final float leftVolume = 0.5f;
         final float rightVolume = 0.5f;
 
-        mMediaPlayer.setDisplay(getActivity().getSurfaceHolder());
+        mMediaPlayer.setDisplay(mActivity.getSurfaceHolder());
         mMediaPlayer.setScreenOnWhilePlaying(true);
         mMediaPlayer.setOnVideoSizeChangedListener(new MediaPlayer.OnVideoSizeChangedListener() {
             @Override
