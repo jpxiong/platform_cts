@@ -321,80 +321,54 @@ public class AccessibilityWindowQueryTest
 
     @MediumTest
     public void testPerformGlobalActionBack() throws Exception {
-        // Get the root node info.
-        final AccessibilityNodeInfo root = getInteractionBridge().getRootInActiveWindow();
+        assertTrue(getInteractionBridge().performGlobalAction(
+                AccessibilityService.GLOBAL_ACTION_BACK));
 
-        AccessibilityEvent expected = getInteractionBridge()
-                .executeCommandAndWaitForAccessibilityEvent(new Runnable() {
-            @Override
-            public void run() {
-                getInteractionBridge().performGlobalAction(AccessibilityService.GLOBAL_ACTION_BACK);
-            }
-        }, new AccessibilityEventFilter() {
-            @Override
-            public boolean accept(AccessibilityEvent event) {
-                return (event.getEventType() == AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED)
-                        && "com.android.launcher".equals(event.getPackageName());
-            }
-        },
-        TIMEOUT_ASYNC_PROCESSING);
-
-        // Check if the expected event was received.
-        assertNotNull(expected);
+        // Sleep a bit so the UI is settles.
+        SystemClock.sleep(3000);
     }
 
     @MediumTest
     public void testPerformGlobalActionHome() throws Exception {
-        // Get the root node info.
-        final AccessibilityNodeInfo root = getInteractionBridge().getRootInActiveWindow();
+        assertTrue(getInteractionBridge().performGlobalAction(
+                AccessibilityService.GLOBAL_ACTION_HOME));
 
-        AccessibilityEvent expected = getInteractionBridge()
-                .executeCommandAndWaitForAccessibilityEvent(new Runnable() {
-            @Override
-            public void run() {
-                getInteractionBridge().performGlobalAction(AccessibilityService.GLOBAL_ACTION_HOME);
-            }
-        }, new AccessibilityEventFilter() {
-            @Override
-            public boolean accept(AccessibilityEvent event) {
-                return (event.getEventType() == AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED)
-                    && "com.android.launcher".equals(event.getPackageName());
-            }
-        },
-        TIMEOUT_ASYNC_PROCESSING);
-
-        // Check if the expected event was received.
-        assertNotNull(expected);
+        // Sleep a bit so the UI is settles.
+        SystemClock.sleep(3000);
     }
 
     @MediumTest
     public void testPerformGlobalActionRecents() throws Exception {
-        // Get the root node info.
-        final AccessibilityNodeInfo root = getInteractionBridge().getRootInActiveWindow();
-
         // Check whether the action succeeded.
         assertTrue(getInteractionBridge().performGlobalAction(
                 AccessibilityService.GLOBAL_ACTION_RECENTS));
 
-        // Sleep a bit so the recents UI is shown.
+        // Sleep a bit so the UI is settles.
         SystemClock.sleep(3000);
 
         // Clean up.
-        getInteractionBridge().performGlobalAction(AccessibilityService.GLOBAL_ACTION_HOME);
+        getInteractionBridge().performGlobalAction(
+                AccessibilityService.GLOBAL_ACTION_BACK);
+
+        // Sleep a bit so the UI is settles.
+        SystemClock.sleep(3000);
     }
 
     @MediumTest
     public void testPerformGlobalActionNotifications() throws Exception {
-        // Get the root node info.
-        final AccessibilityNodeInfo root = getInteractionBridge().getRootInActiveWindow();
-
         // Perform the action under test
-        final boolean handled = getInteractionBridge().performGlobalAction(
-                AccessibilityService.GLOBAL_ACTION_NOTIFICATIONS);
-        assertTrue(handled);
+        assertTrue(getInteractionBridge().performGlobalAction(
+                AccessibilityService.GLOBAL_ACTION_NOTIFICATIONS));
+
+        // Sleep a bit so the UI is settles.
+        SystemClock.sleep(3000);
 
         // Clean up.
-        getInteractionBridge().performGlobalAction(AccessibilityService.GLOBAL_ACTION_HOME);
+        assertTrue(getInteractionBridge().performGlobalAction(
+                AccessibilityService.GLOBAL_ACTION_BACK));
+
+        // Sleep a bit so the UI is settles.
+        SystemClock.sleep(3000);
     }
 
     @MediumTest
