@@ -1164,6 +1164,7 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
         final String imgUrl = mWebServer.getAssetUrl(TestHtmlConstants.LARGE_IMG_URL);
         mOnUiThread.loadDataAndWaitForCompletion(
                 "<html><title>Title</title><body><img src=\"" + imgUrl
+                + "\" width=\"" + imgWidth + "\" height=\"" + imgHeight
                 + "\"/></body></html>", "text/html", null);
         getInstrumentation().waitForIdleSync();
 
