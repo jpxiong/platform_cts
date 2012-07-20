@@ -236,6 +236,7 @@ public class MediaRecorderTest extends ActivityInstrumentationTestCase2<MediaStu
         retriever.setDataSource(fileName);
         String location = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_LOCATION);
         if (location == null) {
+            retriever.release();
             Log.v(TAG, "No location information found in file " + fileName);
             return false;
         }
@@ -256,6 +257,7 @@ public class MediaRecorderTest extends ActivityInstrumentationTestCase2<MediaStu
         float longitude = Float.parseFloat(location.substring(index));
         assertTrue("Incorrect latitude: " + latitude, Math.abs(latitude - LATITUDE) <= TOLERANCE);
         assertTrue("Incorrect longitude: " + longitude, Math.abs(longitude - LONGITUDE) <= TOLERANCE);
+        retriever.release();
         return true;
     }
 
@@ -282,6 +284,7 @@ public class MediaRecorderTest extends ActivityInstrumentationTestCase2<MediaStu
         long maxFileSize = MAX_FILE_SIZE * 10;
         recordMedia(maxFileSize, mOutFile2);
         assertFalse(checkLocationInFile(OUTPUT_PATH2));
+        fos.close();
     }
 
     public void testRecordingAudioInRawFormats() throws Exception {
