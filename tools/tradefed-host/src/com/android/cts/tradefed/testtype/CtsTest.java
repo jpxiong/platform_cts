@@ -368,14 +368,19 @@ public class CtsTest implements IDeviceTest, IResumableTest, IShardableTest, IBu
                 forwardPackageDetails(knownTests.getPackageDef(), listener);
                 test.run(filter);
                 mRemainingTestPkgs.remove(0);
-                if (mRebootPerPackage && (mRemainingTestPkgs.size() > 0)) {
-                    long currentTime = System.currentTimeMillis();
-                    if ((currentTime - prevTime) > intervalInMSec) {
-                        Log.i(LOG_TAG, String.format("Rebooting after running package %s",
-                                knownTests.getPackageDef().getName()));
-                        rebootDevice();
-                        prevTime = System.currentTimeMillis();
+                if (mRemainingTestPkgs.size() > 0) {
+                    if (mRebootPerPackage) {
+                        long currentTime = System.currentTimeMillis();
+                        if ((currentTime - prevTime) > intervalInMSec) {
+                            Log.i(LOG_TAG, String.format("Rebooting after running package %s",
+                                    knownTests.getPackageDef().getName()));
+                            rebootDevice();
+                            prevTime = System.currentTimeMillis();
+                        }
                     }
+                    // remove artifacts like status bar from the previous test.
+                    // But this cannot dismiss dialog popped-up.
+                    changeToHomeScreen();
                 }
             }
 
@@ -419,6 +424,16 @@ public class CtsTest implements IDeviceTest, IResumableTest, IShardableTest, IBu
         }
     }
 
+    private void changeToHomeScreen() throws DeviceNotAvailableException {
+        final String homeCmd = "input keyevent 3";
+
+        mDevice.executeShellCommand(homeCmd);
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+            //ignore
+        }
+    }
     /**
      * Build the list of test packages to run
      */
