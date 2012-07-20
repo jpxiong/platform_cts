@@ -306,6 +306,7 @@ public class FileSystemPermissionTest extends AndroidTestCase {
                     "/data/nv",
                     "/data/nvcam",
                     "/data/panicreports",
+                    "/data/preinstall_md5",
                     "/data/property",
                     "/data/radio",
                     "/data/secure",
