@@ -233,46 +233,6 @@ public class AppSecurityTests extends DeviceTestCase implements IBuildReceiver {
     }
 
     /**
-     * Test behavior when
-     * {@link android.Manifest.permission#READ_EXTERNAL_STORAGE} is enforced.
-     */
-    public void testReadExternalStorageEnforced() throws Exception {
-        try {
-            getDevice().uninstallPackage(EXTERNAL_STORAGE_APP_PKG);
-            getDevice().uninstallPackage(WRITE_EXTERNAL_STORAGE_APP_PKG);
-
-            // stage test file on external storage
-            getDevice().pushString("CAEK", "/sdcard/meow");
-
-            // mark permission as enforced
-            setPermissionEnforced(getDevice(), READ_EXTERNAL_STORAGE, true);
-
-            // install apps and run test
-            assertNull(getDevice()
-                    .installPackage(getTestAppFile(EXTERNAL_STORAGE_APP_APK), false));
-            assertNull(getDevice()
-                    .installPackage(getTestAppFile(WRITE_EXTERNAL_STORAGE_APP_APK), false));
-
-            // normal app should not be able to read
-            assertTrue("Normal app able to read external storage", runDeviceTests(
-                    EXTERNAL_STORAGE_APP_PKG, EXTERNAL_STORAGE_APP_CLASS,
-                    "testFailReadExternalStorage"));
-
-            // WRITE_EXTERNAL app should be able to read and write
-            assertTrue("WRITE_EXTERNAL app unable to read external storage", runDeviceTests(
-                    WRITE_EXTERNAL_STORAGE_APP_PKG, WRITE_EXTERNAL_STORAGE_APP_CLASS,
-                    "testReadExternalStorage"));
-            assertTrue("WRITE_EXTERNAL app unable to write external storage", runDeviceTests(
-                    WRITE_EXTERNAL_STORAGE_APP_PKG, WRITE_EXTERNAL_STORAGE_APP_CLASS,
-                    "testWriteExternalStorage"));
-
-        } finally {
-            getDevice().uninstallPackage(EXTERNAL_STORAGE_APP_PKG);
-            getDevice().uninstallPackage(WRITE_EXTERNAL_STORAGE_APP_PKG);
-        }
-    }
-
-    /**
      * Test that uninstall of an app removes its private data.
      */
     public void testUninstallRemovesData() throws Exception {
