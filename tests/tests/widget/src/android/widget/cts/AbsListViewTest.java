@@ -534,6 +534,7 @@ public class AbsListViewTest extends ActivityInstrumentationTestCase2<ListViewSt
         assertEquals(0, listener.getPosition());
         assertEquals(0, listener.getID());
 
+        mInstrumentation.waitForIdleSync();
         TouchUtils.longClickView(this, v);
 
         new PollingCheck() {

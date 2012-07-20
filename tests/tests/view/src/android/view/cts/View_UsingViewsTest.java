@@ -21,6 +21,7 @@ import com.android.cts.stub.R;
 
 import android.app.Activity;
 import android.app.Instrumentation;
+import android.cts.util.PollingCheck;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.test.ActivityInstrumentationTestCase2;
@@ -34,6 +35,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+
 
 public class View_UsingViewsTest extends ActivityInstrumentationTestCase2<UsingViewsStubActivity> {
     /**
@@ -347,15 +349,21 @@ public class View_UsingViewsTest extends ActivityInstrumentationTestCase2<UsingV
         mEditText.setLongClickable(true);
         assertTrue(mEditText.isLongClickable());
 
-        MockOnLongClickListener onLongClickListener = new MockOnLongClickListener();
+        final MockOnLongClickListener onLongClickListener = new MockOnLongClickListener();
         mEditText.setOnLongClickListener(onLongClickListener);
 
         // long click the edit text
         assertFalse(onLongClickListener.isOnLongClickCalled());
         assertNull(onLongClickListener.getView());
 
+        mInstrumentation.waitForIdleSync();
         TouchUtils.longClickView(this, mEditText);
-        assertTrue(onLongClickListener.isOnLongClickCalled());
+        new PollingCheck() {
+            @Override
+            protected boolean check() {
+                return onLongClickListener.isOnLongClickCalled();
+            }
+        }.run();
         assertSame(mEditText, onLongClickListener.getView());
 
         // click the Cancel button
