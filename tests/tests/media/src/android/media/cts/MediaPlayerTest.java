@@ -43,14 +43,29 @@ import java.util.concurrent.CountDownLatch;
  */
 public class MediaPlayerTest extends MediaPlayerTestBase {
 
-    private static final String RECORDED_FILE =
-                new File(Environment.getExternalStorageDirectory(),
-                "record.out").getAbsolutePath();
+    private String RECORDED_FILE;
 
     private static final int  RECORDED_VIDEO_WIDTH  = 176;
     private static final int  RECORDED_VIDEO_HEIGHT = 144;
     private static final long RECORDED_DURATION_MS  = 3000;
 
+    private File mOutFile;
+
+    @Override
+    protected void setUp() throws Exception {
+        super.setUp();
+        RECORDED_FILE = new File(Environment.getExternalStorageDirectory(),
+                "mediaplayer_record.out").getAbsolutePath();
+        mOutFile = new File(RECORDED_FILE);
+    }
+
+    @Override
+    protected void tearDown() throws Exception {
+        super.tearDown();
+        if (mOutFile != null && mOutFile.exists()) {
+            mOutFile.delete();
+        }
+    }
     public void testPlayNullSource() throws Exception {
         try {
             mMediaPlayer.setDataSource((String) null);
