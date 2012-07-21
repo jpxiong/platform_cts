@@ -340,6 +340,41 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
         assertTrue(mWebView.overlayVerticalScrollbar());
     }
 
+    /** Verify http://trac.webkit.org/changeset/100677 is applied */
+    public void testWebkitChangeset100677() throws Exception {
+        // HTML is from test in
+        // http://trac.webkit.org/changeset/100677
+        String html = "<style>\n"
+                + ".testclass::before { position: absolute; content: \"\"; }\n"
+                + ".testclass { display: run-in; }\n"
+                + "</style>\n"
+                + "PASS, if no exceptions or crash observed\n"
+                + "<script>\n"
+                + "function runTest() \n"
+                + "{\n"
+                + "    test1 = document.createElement('div');\n"
+                + "    test1.setAttribute('class', 'testclass');\n"
+                + "    document.documentElement.appendChild(test1);\n"
+                + "    test2 = document.createElement('b');\n"
+                + "    test2.setAttribute('class', 'testclass');\n"
+                + "    document.documentElement.appendChild(test2);\n"
+                + "    test3 = document.createElement('div');\n"
+                + "    document.documentElement.appendChild(test3);\n"
+                + "    if (window.layoutTestController)\n"
+                + "        layoutTestController.dumpAsText();\n"
+                + "    document.title='hello world';\n"
+                + "}\n"
+                + "window.onload = runTest;\n"
+                + "</script>";
+        mWebView.getSettings().setJavaScriptEnabled(true);
+        mWebView.loadData(html, "text/html", null);
+        waitForLoadComplete(mWebView, TEST_TIMEOUT);
+        assertEquals("hello world", mWebView.getTitle());
+        mWebView.loadUrl("javascript:document.title='hello world 2'");
+        waitForLoadComplete(mWebView, TEST_TIMEOUT);
+        assertEquals("hello world 2", mWebView.getTitle());
+    }
+
     @TestTargets({
         @TestTargetNew(
             level = TestLevel.COMPLETE,
