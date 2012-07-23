@@ -118,41 +118,57 @@ public class FilterTest extends ActivityInstrumentationTestCase2<StubActivity> {
         }
 
         public boolean hadPublishedResults() {
-            return mHadPublishedResults;
+            synchronized (this) {
+                return mHadPublishedResults;
+            }
         }
 
         public boolean hadPerformedFiltering() {
-            return mHadPerformedFiltering;
+            synchronized (this) {
+                return mHadPerformedFiltering;
+            }
         }
 
         public CharSequence getPerformFilteringConstraint() {
-            return mPerformFilteringConstraint;
+            synchronized (this) {
+                return mPerformFilteringConstraint;
+            }
         }
 
         public CharSequence getPublishResultsConstraint() {
-            return mPublishResultsConstraint;
+            synchronized (this) {
+                return mPublishResultsConstraint;
+            }
         }
 
         public FilterResults getResults() {
-            return mResults;
+            synchronized (this) {
+                return mResults;
+            }
         }
 
         public FilterResults getExpectResults() {
-            return mExpectResults;
+            synchronized (this) {
+                return mExpectResults;
+            }
         }
 
         @Override
         protected FilterResults performFiltering(CharSequence constraint) {
-            mHadPerformedFiltering = true;
-            mPerformFilteringConstraint = constraint;
-            return mExpectResults;
+            synchronized (this) {
+                mHadPerformedFiltering = true;
+                mPerformFilteringConstraint = constraint;
+                return mExpectResults;
+            }
         }
 
         @Override
         protected void publishResults(CharSequence constraint, FilterResults results) {
-            mPublishResultsConstraint = constraint;
-            mResults = results;
-            mHadPublishedResults = true;
+            synchronized (this) {
+                mPublishResultsConstraint = constraint;
+                mResults = results;
+                mHadPublishedResults = true;
+            }
         }
     }
 
