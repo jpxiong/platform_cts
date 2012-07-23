@@ -262,6 +262,7 @@ public class FileSystemPermissionTest extends AndroidTestCase {
                     "/data/gpscfg",
                     "/data/hwvefs",
                     "/data/htcfs",
+                    "/data/img",
                     "/data/install",
                     "/data/internal-device",
                     "/data/internal-device/DCIM",
