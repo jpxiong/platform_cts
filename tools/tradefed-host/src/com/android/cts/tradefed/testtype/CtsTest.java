@@ -342,9 +342,7 @@ public class CtsTest implements IDeviceTest, IResumableTest, IShardableTest, IBu
 
         try {
             installPrerequisiteApks(prerequisiteApks);
-            // disable keyguard before running each test.
-            // postBootSetup is done inside reboot() but do it here again for the 1st test.
-            mDevice.postBootSetup();
+
             // always collect the device info, even for resumed runs, since test will likely be
             // running on a different device
             collectDeviceInfo(getDevice(), mCtsBuild, listener);
