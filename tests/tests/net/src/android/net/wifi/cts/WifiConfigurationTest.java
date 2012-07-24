@@ -38,10 +38,12 @@ public class WifiConfigurationTest extends AndroidTestCase {
             return;
         }
         List<WifiConfiguration> wifiConfigurations = mWifiManager.getConfiguredNetworks();
-        for (int i = 0; i < wifiConfigurations.size(); i++) {
-            WifiConfiguration wifiConfiguration = wifiConfigurations.get(i);
-            assertNotNull(wifiConfiguration);
-            assertNotNull(wifiConfiguration.toString());
+        if (wifiConfigurations != null) {
+            for (int i = 0; i < wifiConfigurations.size(); i++) {
+                WifiConfiguration wifiConfiguration = wifiConfigurations.get(i);
+                assertNotNull(wifiConfiguration);
+                assertNotNull(wifiConfiguration.toString());
+            }
         }
     }
 }
