@@ -75,7 +75,7 @@ class DocletRunner {
 
     private String getClassPath() {
         List<String> classPath = new ArrayList<String>();
-        classPath.add("./prebuilt/common/tradefed/tradefed-prebuilt.jar");
+        classPath.add("./prebuilts/misc/common/tradefed/tradefed-prebuilt.jar");
         return join(classPath, ":");
     }
 
