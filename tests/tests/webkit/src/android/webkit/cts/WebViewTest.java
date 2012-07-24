@@ -368,10 +368,10 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
                 + "</script>";
         mWebView.getSettings().setJavaScriptEnabled(true);
         mWebView.loadData(html, "text/html", null);
-        waitForLoadComplete(mWebView, TEST_TIMEOUT);
+        waitForLoadComplete();
         assertEquals("hello world", mWebView.getTitle());
         mWebView.loadUrl("javascript:document.title='hello world 2'");
-        waitForLoadComplete(mWebView, TEST_TIMEOUT);
+        waitForLoadComplete();
         assertEquals("hello world 2", mWebView.getTitle());
     }
 
