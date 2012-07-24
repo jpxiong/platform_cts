@@ -61,14 +61,7 @@ public class MediaRecorderTest extends ActivityInstrumentationTestCase2<MediaStu
     private Camera mCamera;
     private MediaStubActivity mActivity = null;
 
-    /*
-     * InstrumentationTestRunner.onStart() calls Looper.prepare(), which creates a looper
-     * for the current thread. However, since we don't actually call loop() in the test,
-     * any messages queued with that looper will never be consumed. We instantiate the recorder
-     * in the constructor, before setUp(), so that its constructor does not see the
-     * nonfunctional Looper.
-     */
-    private MediaRecorder mMediaRecorder = new MediaRecorder();
+    private MediaRecorder mMediaRecorder;
 
     public MediaRecorderTest() {
         super("com.android.cts.media", MediaStubActivity.class);
@@ -101,9 +94,9 @@ public class MediaRecorderTest extends ActivityInstrumentationTestCase2<MediaStu
         completeOnUiThread(new Runnable() {
             @Override
             public void run() {
+                mMediaRecorder = new MediaRecorder();
                 mOutFile = new File(OUTPUT_PATH);
                 mOutFile2 = new File(OUTPUT_PATH2);
-                mMediaRecorder.reset();
                 mMediaRecorder.setOutputFile(OUTPUT_PATH);
                 mMediaRecorder.setOnInfoListener(new OnInfoListener() {
                     public void onInfo(MediaRecorder mr, int what, int extra) {
