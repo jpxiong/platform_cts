@@ -37,6 +37,7 @@ public:
     uint32_t mVolume;
     uint32_t mId;
     android::sp<Buffer> mBuffer;
+    void* mExtra; // extra data for whatever purpose
 };
 
 class AudioProtocol {
@@ -48,7 +49,8 @@ public:
         ECmdStopPlayback        = 0x12340003,
         ECmdStartRecording      = 0x12340004,
         ECmdStopRecording       = 0x12340005,
-        ECmdLast                = 0x12340006, // not actual command
+        ECmdGetDeviceInfo       = 0x12340006,
+        ECmdLast                = 0x12340007, // not actual command
     };
 
     static const uint32_t REPLY_HEADER_SIZE = 12;
@@ -140,7 +142,13 @@ public:
     virtual ~CmdStopRecording() {};
 };
 
+class CmdGetDeviceInfo: public AudioProtocol {
+public:
+    CmdGetDeviceInfo(ClientSocket& socket)
+        : AudioProtocol(socket, ECmdGetDeviceInfo) {};
+    virtual ~CmdGetDeviceInfo() {};
 
-
+    virtual bool handleReply(const uint32_t* data, AudioParam* param);
+};
 
 #endif // CTSAUDIO_AUDIOPROTOCOL_H

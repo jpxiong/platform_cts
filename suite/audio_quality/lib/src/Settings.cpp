@@ -36,23 +36,11 @@ void Settings::Finalize()
 
 void Settings::addSetting(SettingType type, const android::String8 setting)
 {
-    // TODO key, string can be better if there are large number of settings
-    switch(type) {
-    case EADB:
-        mAdbSetting = setting;
-    default:
-        ASSERT(false);
-    }
+    mSettings[type] = setting;
 }
 const android::String8& Settings::getSetting(SettingType type)
 {
-    switch(type) {
-    case EADB:
-        return mAdbSetting;
-    default:
-        ASSERT(false);
-    }
-    return mAdbSetting; // just for removing compiler warning, will not reach here
+    return mSettings[type];
 }
 
 

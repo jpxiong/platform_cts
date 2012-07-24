@@ -32,6 +32,7 @@ RemoteAudio::RemoteAudio(ClientSocket& socket)
       mDownloadHandler(new CommandHandler(*this, (int)AudioProtocol::ECmdDownload)),
       mPlaybackHandler(new CommandHandler(*this, (int)AudioProtocol::ECmdStartPlayback)),
       mRecordingHandler(new CommandHandler(*this, (int)AudioProtocol::ECmdStartRecording)),
+      mDeviceInfoHandler(new CommandHandler(*this, (int)AudioProtocol::ECmdGetDeviceInfo)),
       mDownloadId(0)
 {
     mCmds[AudioProtocol::ECmdDownload - AudioProtocol::ECmdStart] = new CmdDownload(socket);
@@ -43,6 +44,8 @@ RemoteAudio::RemoteAudio(ClientSocket& socket)
             new CmdStartRecording(socket);
     mCmds[AudioProtocol::ECmdStopRecording - AudioProtocol::ECmdStart] =
             new CmdStopRecording(socket);
+    mCmds[AudioProtocol::ECmdGetDeviceInfo - AudioProtocol::ECmdStart] =
+                new CmdGetDeviceInfo(socket);
 }
 
 RemoteAudio::~RemoteAudio()
@@ -104,7 +107,6 @@ bool RemoteAudio::handlePacket()
     if (!AudioProtocol::handleReplyHeader(mSocket, data, id)) {
         return false;
     }
-    AudioParam* param = NULL;
     CommandHandler* handler = NULL;
     if (id == AudioProtocol::ECmdDownload) {
         handler = reinterpret_cast<CommandHandler*>(mDownloadHandler.get());
@@ -112,6 +114,11 @@ bool RemoteAudio::handlePacket()
         handler = reinterpret_cast<CommandHandler*>(mPlaybackHandler.get());
     } else if (id == AudioProtocol::ECmdStartRecording) {
         handler = reinterpret_cast<CommandHandler*>(mRecordingHandler.get());
+    } else if (id == AudioProtocol::ECmdGetDeviceInfo) {
+        handler = reinterpret_cast<CommandHandler*>(mDeviceInfoHandler.get());
+    }
+    AudioParam* param = NULL;
+    if (handler != NULL) {
         param = &(handler->getParam());
     }
     bool result = mCmds[id - AudioProtocol::ECmdStart]->handleReply(data, param);
@@ -148,6 +155,7 @@ void RemoteAudio::sendCommand(android::sp<android::MessageHandler>& command)
 
 bool RemoteAudio::waitForCompletion(android::sp<android::MessageHandler>& command, int timeInMSec)
 {
+    LOGV("waitForCompletion %d", timeInMSec);
     return toCommandHandler(command)->timedWait(timeInMSec);
 }
 
@@ -190,12 +198,13 @@ bool RemoteAudio::downloadData(const android::String8 name, android::sp<Buffer>&
     CommandHandler* handler = reinterpret_cast<CommandHandler*>(mDownloadHandler.get());
     id = mDownloadId;
     mDownloadId++;
+    handler->mStateLock.lock();
     handler->getParam().mId = id;
     handler->getParam().mBuffer = buffer;
-    sendCommand(mDownloadHandler);
-    handler->mStateLock.lock();
     handler->mNotifyOnReply = true;
     handler->mStateLock.unlock();
+    sendCommand(mDownloadHandler);
+
     // assume 1Mbps ==> 1000 bits per msec ==> 125 bytes per msec
     int maxWaitTime = CLIENT_WAIT_TIMEOUT_MSEC + buffer->getSize() / 125;
     // client blocked until reply comes from DUT
@@ -299,6 +308,23 @@ void RemoteAudio::stopRecording()
     doStop(mRecordingHandler, AudioProtocol::ECmdStopRecording);
 }
 
+bool RemoteAudio::getDeviceInfo(android::String8& data)
+{
+    CommandHandler* handler = reinterpret_cast<CommandHandler*>(mDeviceInfoHandler.get());
+    handler->mStateLock.lock();
+    handler->mNotifyOnReply = true;
+    handler->getParam().mExtra = &data;
+    handler->mStateLock.unlock();
+    sendCommand(mDeviceInfoHandler);
+
+    // client blocked until reply comes from DUT
+    if (!waitForCompletion(mDeviceInfoHandler, CLIENT_WAIT_TIMEOUT_MSEC)) {
+        LOGE("timeout");
+        return false;
+    }
+    return handler->mResult;
+}
+
 /** should be called before RemoteAudio is destroyed */
 void RemoteAudio::release()
 {
@@ -322,11 +348,13 @@ void RemoteAudio::CommandHandler::handleMessage(const android::Message& message)
     case AudioProtocol::ECmdStopPlayback:
     case AudioProtocol::ECmdStartRecording:
     case AudioProtocol::ECmdStopRecording:
+    case AudioProtocol::ECmdGetDeviceInfo:
     {
         mResult = (mThread.mCmds[message.what - AudioProtocol::ECmdStart]) \
                 ->sendCommand(mParam);
-        // no post for download. Client blocked until reply comes with time-out
-        if (message.what != AudioProtocol::ECmdDownload) {
+        // no post for download and getdeviceinfo. Client blocked until reply comes with time-out
+        if ((message.what != AudioProtocol::ECmdDownload) &&
+            (message.what != AudioProtocol::ECmdGetDeviceInfo)    ) {
             mClientWait.post();
         }
 
