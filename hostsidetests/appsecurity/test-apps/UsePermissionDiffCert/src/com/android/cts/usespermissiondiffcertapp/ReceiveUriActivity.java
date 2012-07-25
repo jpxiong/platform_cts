@@ -16,13 +16,15 @@
 
 package com.android.cts.usespermissiondiffcertapp;
 
+import static android.text.format.DateUtils.SECOND_IN_MILLIS;
+
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
-import android.os.SystemClock;
 import android.os.MessageQueue.IdleHandler;
+import android.os.SystemClock;
 import android.util.Log;
 
 public class ReceiveUriActivity extends Activity {
@@ -32,6 +34,8 @@ public class ReceiveUriActivity extends Activity {
     private static boolean sNewIntent;
     private static boolean sDestroyed;
     private static ReceiveUriActivity sCurInstance;
+
+    private static final long TIMEOUT_MILLIS = 30 * SECOND_IN_MILLIS;
 
     Handler mHandler = new Handler();
 
@@ -94,10 +98,10 @@ public class ReceiveUriActivity extends Activity {
             final long startTime = SystemClock.uptimeMillis();
             while (!sDestroyed) {
                 try {
-                    sLock.wait(5000);
+                    sLock.wait(TIMEOUT_MILLIS);
                 } catch (InterruptedException e) {
                 }
-                if (SystemClock.uptimeMillis() >= (startTime+5000)) {
+                if (SystemClock.uptimeMillis() >= (startTime + TIMEOUT_MILLIS)) {
                     throw new RuntimeException("Timeout");
                 }
             }
@@ -121,10 +125,10 @@ public class ReceiveUriActivity extends Activity {
             final long startTime = SystemClock.uptimeMillis();
             while (!sStarted) {
                 try {
-                    sLock.wait(5000);
+                    sLock.wait(TIMEOUT_MILLIS);
                 } catch (InterruptedException e) {
                 }
-                if (SystemClock.uptimeMillis() >= (startTime+5000)) {
+                if (SystemClock.uptimeMillis() >= (startTime + TIMEOUT_MILLIS)) {
                     throw new RuntimeException("Timeout");
                 }
             }
@@ -136,10 +140,10 @@ public class ReceiveUriActivity extends Activity {
             final long startTime = SystemClock.uptimeMillis();
             while (!sNewIntent) {
                 try {
-                    sLock.wait(5000);
+                    sLock.wait(TIMEOUT_MILLIS);
                 } catch (InterruptedException e) {
                 }
-                if (SystemClock.uptimeMillis() >= (startTime+5000)) {
+                if (SystemClock.uptimeMillis() >= (startTime + TIMEOUT_MILLIS)) {
                     throw new RuntimeException("Timeout");
                 }
             }
