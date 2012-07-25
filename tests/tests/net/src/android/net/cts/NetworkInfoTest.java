@@ -53,7 +53,7 @@ public class NetworkInfoTest extends AndroidTestCase {
     }
 
     private void assertNetworkInfo(NetworkInfo netInfo, String expectedTypeName) {
-        assertEquals(expectedTypeName, netInfo.getTypeName());
+        assertEquals(expectedTypeName.compareToIgnoreCase(netInfo.getTypeName()), 0);
         if(netInfo.isConnectedOrConnecting()) {
             assertTrue(netInfo.isAvailable());
             if (State.CONNECTED == netInfo.getState()) {
