@@ -82,7 +82,8 @@ public class SmsManagerTest extends AndroidTestCase {
                     "310000",   // Tracfone
                     "46003",    // China Telecom
                     "311230",   // C SPire Wireless + Celluar South
-                    "310600"    // Cellcom
+                    "310600",   // Cellcom
+                    "31000"     // Republic Wireless US
             );
 
     // List of network operators that doesn't support Data(binary) SMS message
