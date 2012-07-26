@@ -22,6 +22,7 @@ import android.media.AudioManager;
 import android.media.AudioRecord;
 import android.media.MediaRecorder.AudioSource;
 import android.media.AudioTrack;
+import android.os.Build;
 import android.os.Looper;
 import android.util.Log;
 
@@ -52,10 +53,11 @@ public class AudioProtocol implements AudioTrack.OnPlaybackPositionUpdateListene
     private static final int PROTOCOL_ERROR_GENERIC = 2;
 
     private static final int CMD_DOWNLOAD        = 0x12340001;
-    private static final int CMD_START_PLAYBACK      = 0x12340002;
-    private static final int CMD_STOP_PLAYBACK       = 0x12340003;
+    private static final int CMD_START_PLAYBACK  = 0x12340002;
+    private static final int CMD_STOP_PLAYBACK   = 0x12340003;
     private static final int CMD_START_RECORDING = 0x12340004;
     private static final int CMD_STOP_RECORDING  = 0x12340005;
+    private static final int CMD_GET_DEVICE_INFO = 0x12340006;
 
     private ByteBuffer mHeaderBuffer = ByteBuffer.allocate(PROTOCOL_HEADER_SIZE);
     private ByteBuffer mDataBuffer = ByteBuffer.allocate(MAX_NON_DATA_PAYLOAD_SIZE);
@@ -263,6 +265,9 @@ public class AudioProtocol implements AudioTrack.OnPlaybackPositionUpdateListene
                     if (bufferSize < 256 * 1024) {
                         bufferSize = 256 * 1024;
                     }
+                    if (bufferSize > data.capacity()) {
+                        bufferSize = data.capacity();
+                    }
                     mPlayback = new AudioTrack(type, samplingRate,
                             stereo ? AudioFormat.CHANNEL_OUT_STEREO : AudioFormat.CHANNEL_OUT_MONO,
                             AudioFormat.ENCODING_PCM_16BIT, bufferSize,
@@ -288,6 +293,9 @@ public class AudioProtocol implements AudioTrack.OnPlaybackPositionUpdateListene
                     while (dataWritten < data.capacity()) {
                         int dataLeft = data.capacity() - dataWritten;
                         dataToWrite = (bufferSize < dataLeft)? bufferSize : dataLeft;
+                        if (mPlayback == null) { // stopped
+                            return;
+                        }
                         mPlayback.write(data.array(), dataWritten, dataToWrite);
                         dataWritten += dataToWrite;
                     }
@@ -366,19 +374,11 @@ public class AudioProtocol implements AudioTrack.OnPlaybackPositionUpdateListene
                             totalRead += lenRead;
                         }
                         Log.d(TAG, "reading recording completed");
-                        mClientLock.lock();
-
-                        mReplyBuffer.clear();
-                        mReplyBuffer.putInt((CMD_START_RECORDING & 0xffff) | 0x43210000);
-                        mReplyBuffer.putInt(recordingOk ? PROTOCOL_OK : PROTOCOL_ERROR_GENERIC);
-                        mReplyBuffer.putInt(recordingOk ? mRecordingLength : 0);
-
-                        if (mOutput != null) {
-                            mOutput.write(mReplyBuffer.array(), 0, PROTOCOL_SIMPLE_REPLY_SIZE);
-                            if (recordingOk) {
-                                mOutput.write(data, 0, mRecordingLength);
-                            }
-                        }
+                        sendReplyWithData(
+                                CMD_START_RECORDING,
+                                recordingOk ? PROTOCOL_OK : PROTOCOL_ERROR_GENERIC,
+                                recordingOk ? mRecordingLength : 0,
+                                recordingOk ? data : null);
                     } catch (IOException e) {
                         // maybe socket already closed. don't do anything
                         Log.e(TAG, "ignore exception", e);
@@ -386,7 +386,6 @@ public class AudioProtocol implements AudioTrack.OnPlaybackPositionUpdateListene
                         mRecord.stop();
                         mRecord.release();
                         mRecord = null;
-                        mClientLock.unlock();
                     }
                 }
              });
@@ -412,6 +411,32 @@ public class AudioProtocol implements AudioTrack.OnPlaybackPositionUpdateListene
         sendSimpleReplyHeader(CMD_STOP_RECORDING, PROTOCOL_OK);
     }
 
+    private static final String BUILD_INFO_TAG = "build-info";
+
+    private void appendAttrib(StringBuilder builder, String name, String value) {
+        builder.append(" " + name + "=\"" + value + "\"");
+    }
+
+    private void handleGetDeviceInfo(int len) throws ProtocolError, IOException{
+        Log.d(TAG, "getDeviceInfo");
+        assertProtocol(len == 0, "wrong payload len");
+        StringBuilder builder = new StringBuilder();
+        builder.append("<build-info");
+        appendAttrib(builder, "board", Build.BOARD);
+        appendAttrib(builder, "brand", Build.BRAND);
+        appendAttrib(builder, "device", Build.DEVICE);
+        appendAttrib(builder, "display", Build.DISPLAY);
+        appendAttrib(builder, "fingerprint", Build.FINGERPRINT);
+        appendAttrib(builder, "id", Build.ID);
+        appendAttrib(builder, "model", Build.MODEL);
+        appendAttrib(builder, "product", Build.PRODUCT);
+        appendAttrib(builder, "release", Build.VERSION.RELEASE);
+        appendAttrib(builder, "sdk", Integer.toString(Build.VERSION.SDK_INT));
+        builder.append(" />");
+        byte[] data = builder.toString().getBytes();
+
+        sendReplyWithData(CMD_GET_DEVICE_INFO, PROTOCOL_OK, data.length, data);
+    }
     /**
      * send reply without payload.
      * This function is thread-safe.
@@ -422,20 +447,29 @@ public class AudioProtocol implements AudioTrack.OnPlaybackPositionUpdateListene
      */
     private void sendSimpleReplyHeader(int command, int errorCode) throws IOException {
         Log.d(TAG, "sending reply cmd " + command + " err " + errorCode);
+        sendReplyWithData(command, errorCode, 0, null);
+    }
+
+    private void sendReplyWithData(int cmd, int errorCode, int len, byte[] data) throws IOException {
         try {
             mClientLock.lock();
             mReplyBuffer.clear();
-            mReplyBuffer.putInt((command & 0xffff) | 0x43210000);
+            mReplyBuffer.putInt((cmd & 0xffff) | 0x43210000);
             mReplyBuffer.putInt(errorCode);
-            mReplyBuffer.putInt(0); // payload length
+            mReplyBuffer.putInt(len);
+
             if (mOutput != null) {
                 mOutput.write(mReplyBuffer.array(), 0, PROTOCOL_SIMPLE_REPLY_SIZE);
+                if (data != null) {
+                    mOutput.write(data, 0, len);
+                }
             }
+        } catch (IOException e) {
+            throw e;
         } finally {
             mClientLock.unlock();
         }
     }
-
     private class LoopThread extends Thread {
         private Looper mLooper;
         LoopThread(Runnable runnable) {
@@ -513,6 +547,8 @@ public class AudioProtocol implements AudioTrack.OnPlaybackPositionUpdateListene
                             case CMD_STOP_RECORDING:
                                 handleStopRecording(len);
                                 break;
+                            case CMD_GET_DEVICE_INFO:
+                                handleGetDeviceInfo(len);
                             }
                         }
                     } catch (IOException e) {

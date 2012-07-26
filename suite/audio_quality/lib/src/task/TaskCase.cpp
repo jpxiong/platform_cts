@@ -300,8 +300,7 @@ TaskGeneric::ExecutionResult TaskCase::run()
     if (!findStringAttribute(STR_NAME, name) || !findStringAttribute(STR_VERSION, version)) {
         LOGW("TaskCase::run no name or version information");
     }
-    Report::Instance()->printf("== Test case %s version %s started ==", name.string(),
-            version.string());
+    MSG("== Test case %s version %s started ==", name.string(), version.string());
     std::list<TaskGeneric*>::iterator i = getChildren().begin();
     std::list<TaskGeneric*>::iterator end = getChildren().end();
     TaskGeneric* setup = *i;
@@ -316,12 +315,12 @@ TaskGeneric::ExecutionResult TaskCase::run()
     TaskGeneric::ExecutionResult result = setup->run();
     TaskGeneric::ExecutionResult resultAction(TaskGeneric::EResultOK);
     if (result != TaskGeneric::EResultOK) {
-        Report::Instance()->printf("== setup stage failed %d ==", result);
+        MSG("== setup stage failed %d ==", result);
         testPassed = false;
     } else {
         resultAction = action->run();
         if (resultAction != TaskGeneric::EResultPass) {
-            Report::Instance()->printf("== action stage failed %d ==", resultAction);
+            MSG("== action stage failed %d ==", resultAction);
             testPassed = false;
         }
         // save done even for failure if possible
@@ -329,19 +328,19 @@ TaskGeneric::ExecutionResult TaskCase::run()
             result = save->run();
         }
         if (result != TaskGeneric::EResultOK) {
-            Report::Instance()->printf("== save stage failed %d ==", result);
+            MSG("== save stage failed %d ==", result);
             testPassed = false;
         }
     }
     if (testPassed) {
         result = TaskGeneric::EResultPass;
-        Report::Instance()->printf("== Case %s Passed ==", name.string());
+        MSG("== Case %s Passed ==", name.string());
         Report::Instance()->addCasePassed(name);
     } else {
         if (resultAction != TaskGeneric::EResultOK) {
             result = resultAction;
         }
-        Report::Instance()->printf("== Case %s Failed ==", name.string());
+        MSG("== Case %s Failed ==", name.string());
         Report::Instance()->addCaseFailed(name);
     }
     // release remote audio for other cases to use

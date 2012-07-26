@@ -41,7 +41,7 @@ TEST_F(ModelBuilderTest, ParsingCaseTest) {
 }
 
 TEST_F(ModelBuilderTest, ParsingBatchTest) {
-    android::String8 xmlFile("test_description/all.xml");
+    android::String8 xmlFile("test_description/all_playback.xml");
     TaskGeneric* testBatch = mModelBuilder.parseTestDescriptionXml(xmlFile);
     ASSERT_TRUE(testBatch != NULL);
     //TODO verify TestCase
@@ -49,7 +49,7 @@ TEST_F(ModelBuilderTest, ParsingBatchTest) {
 }
 
 TEST_F(ModelBuilderTest, CaseOnlyTest) {
-    android::String8 xmlFile("test_description/all.xml");
+    android::String8 xmlFile("test_description/all_playback.xml");
     TaskGeneric* task = mModelBuilder.parseTestDescriptionXml(xmlFile, true);
     ASSERT_TRUE(task == NULL);
 
