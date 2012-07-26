@@ -307,3 +307,24 @@ TEST_F(RemoteAudioFakeTcpTest, RecordingTest) {
     mTestSocket.setReadExpectation((char*)stopReply, sizeof(stopReply));
     mRemoteAudio->stopRecording();
 }
+
+TEST_F(RemoteAudioFakeTcpTest, getDeviceInfoTest) {
+    uint32_t prepareSend[] = {
+            U32_ENDIAN_SWAP(AudioProtocol::ECmdGetDeviceInfo),
+            U32_ENDIAN_SWAP(0)
+    };
+    uint32_t prepareReply[] = {
+            U32_ENDIAN_SWAP((AudioProtocol::ECmdGetDeviceInfo & 0xffff) | 0x43210000),
+            0,
+            U32_ENDIAN_SWAP(4),
+            U32_ENDIAN_SWAP(0x30313233)
+    };
+
+    mTestSocket.setSendExpectation((char*)prepareSend, sizeof(prepareSend));
+    // this is reply, but set expectation for reply first as it is sent after send
+    mTestSocket.setReadExpectation((char*)prepareReply, sizeof(prepareReply));
+
+    android::String8 info;
+    ASSERT_TRUE(mRemoteAudio->getDeviceInfo(info));
+    ASSERT_TRUE(info == "0123");
+}

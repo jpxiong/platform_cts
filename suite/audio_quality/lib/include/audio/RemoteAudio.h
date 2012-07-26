@@ -21,6 +21,7 @@
 #include <map>
 
 #include <utils/Looper.h>
+#include <utils/String8.h>
 #include <utils/StrongPointer.h>
 #include <utils/threads.h>
 
@@ -56,6 +57,8 @@ public:
             android::sp<Buffer>& buffer);
     bool waitForRecordingCompletion();
     void stopRecording();
+
+    bool getDeviceInfo(android::String8& data);
     /** should be called before RemoteAudio is destroyed */
     void release();
 
@@ -139,6 +142,7 @@ private:
     android::sp<android::MessageHandler> mDownloadHandler;
     android::sp<android::MessageHandler> mPlaybackHandler;
     android::sp<android::MessageHandler> mRecordingHandler;
+    android::sp<android::MessageHandler> mDeviceInfoHandler;
 
     AudioProtocol* mCmds[AudioProtocol::ECmdLast - AudioProtocol::ECmdStart];
     int mDownloadId;

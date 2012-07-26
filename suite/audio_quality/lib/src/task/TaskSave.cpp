@@ -110,7 +110,7 @@ bool TaskSave::handleReport()
         LOGE("alloc failed");
         return false;
     }
-    Report::Instance()->printf("=== Values stored ===");
+    MSG("=== Values stored ===");
     for (size_t i = 0; i < listp->size(); i++) {
         UniquePtr<std::list<TaskCase::ValuePair> > values(
                 getTestCase()->findAllValues((*listp)[i]));
@@ -123,11 +123,9 @@ bool TaskSave::handleReport()
         std::list<TaskCase::ValuePair>::iterator end = values->end();
         for (; it != end; it++) {
             if (it->second.getType() == TaskCase::Value::ETypeDouble) {
-                Report::Instance()->printf("   %s: %f", it->first.string(),
-                        it->second.getDouble());
+                MSG("   %s: %f", it->first.string(), it->second.getDouble());
             } else { //64bit int
-                Report::Instance()->printf("   %s: %lld", it->first.string(),
-                        it->second.getInt64());
+                MSG("   %s: %lld", it->first.string(), it->second.getInt64());
             }
         }
     }
