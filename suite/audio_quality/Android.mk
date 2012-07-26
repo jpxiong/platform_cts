@@ -21,7 +21,8 @@ CTS_AUDIO_TOP:= $(call my-dir)
 
 CTS_AUDIO_INSTALL_DIR := $(HOST_OUT)/cts_audio_quality
 
-cts_audio: cts_audio_quality_test cts_audio_quality CtsAudioClient $(CTS_AUDIO_TOP)/test_description
+$(HOST_OUT)/cts/cts_audio_quality.zip: cts_audio_quality_test cts_audio_quality \
+  CtsAudioClient $(CTS_AUDIO_TOP)/test_description
 	$(hide) mkdir -p $(CTS_AUDIO_INSTALL_DIR)
 	$(hide) mkdir -p $(CTS_AUDIO_INSTALL_DIR)/client
 	$(hide) $(ACP) -fp $(ANDROID_PRODUCT_OUT)/data/app/CtsAudioClient.apk \
@@ -29,6 +30,14 @@ cts_audio: cts_audio_quality_test cts_audio_quality CtsAudioClient $(CTS_AUDIO_T
 	$(hide) $(ACP) -fp $(HOST_OUT)/bin/cts_audio_quality_test $(CTS_AUDIO_INSTALL_DIR)
 	$(hide) $(ACP) -fp $(HOST_OUT)/bin/cts_audio_quality $(CTS_AUDIO_INSTALL_DIR)
 	$(hide) $(ACP) -fr $(CTS_AUDIO_TOP)/test_description $(CTS_AUDIO_INSTALL_DIR)
+	$(hide) echo "Package cts_audio: $@"
+	$(hide) cd $(HOST_OUT) && \
+        zip -rq cts/cts_audio_quality.zip cts_audio_quality -x cts_audio_quality/reports/\*
+
+cts: $(HOST_OUT)/cts/cts_audio_quality.zip
+ifneq ($(filter cts, $(MAKECMDGOALS)),)
+$(call dist-for-goals, cts, $(HOST_OUT)/cts/cts_audio_quality.zip)
+endif # cts
 
 include $(call all-subdir-makefiles)
 
