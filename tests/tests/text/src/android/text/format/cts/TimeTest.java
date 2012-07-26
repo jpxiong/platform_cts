@@ -125,6 +125,49 @@ public class TimeTest extends AndroidTestCase {
         }
     }
 
+    public void testParseNull() {
+        Time t = new Time();
+        try {
+            t.parse(null);
+            fail();
+        } catch (NullPointerException expected) {
+        }
+
+        try {
+            t.parse3339(null);
+            fail();
+        } catch (NullPointerException expected) {
+        }
+    }
+
+    // http://code.google.com/p/android/issues/detail?id=16002
+    // We'd leak one JNI global reference each time parsing failed.
+    // This would cause a crash when we filled the global reference table.
+    public void testBug16002() {
+        Time t = new Time();
+        for (int i = 0; i < 8192; ++i) {
+            try {
+                t.parse3339("xxx");
+                fail();
+            } catch (TimeFormatException expected) {
+            }
+        }
+    }
+
+    // http://code.google.com/p/android/issues/detail?id=22225
+    // We'd leak one JNI global reference each time parsing failed.
+    // This would cause a crash when we filled the global reference table.
+    public void testBug22225() {
+        Time t = new Time();
+        for (int i = 0; i < 8192; ++i) {
+            try {
+                t.parse("xxx");
+                fail();
+            } catch (TimeFormatException expected) {
+            }
+        }
+    }
+
     public void testIsEpoch() {
         Time time = new Time();
         assertTrue(Time.isEpoch(time));
