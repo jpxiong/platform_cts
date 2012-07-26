@@ -19,6 +19,7 @@
 #include <sys/socket.h>
 
 #include <utils/StrongPointer.h>
+#include <utils/UniquePtr.h>
 
 #include "audio/Buffer.h"
 #include "Log.h"
@@ -171,6 +172,26 @@ bool CmdStartRecording::handleReply(const uint32_t* data, AudioParam* param)
     return true;
 }
 
+bool CmdGetDeviceInfo::handleReply(const uint32_t* data, AudioParam* param)
+{
+    if (!checkHeaderId(data, ECmdGetDeviceInfo)) {
+        return false;
+    }
+    if (data[1] != 0) { // no endian change for 0
+        LOGE("error in reply %d", ntohl(data[1]));
+        return false;
+    }
+    int len = ntohl(data[2]);
 
+    UniquePtr<char, DefaultDelete<char[]> > infoString(new char[len + 1]);
+    if (!readData(infoString.get(), len)) {
+        return false;
+    }
+    (infoString.get())[len] = 0;
+    LOGI("received data %s from device", infoString.get());
+    android::String8* string = reinterpret_cast<android::String8*>(param->mExtra);
+    string->setTo(infoString.get(), len);
+    return true;
+}
 
 

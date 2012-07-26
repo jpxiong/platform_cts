@@ -49,6 +49,15 @@ TEST_F(ClientInterfaceTest, InitTest) {
     // all done in SetUp
 }
 
+TEST_F(ClientInterfaceTest, getDeviceInfoTest) {
+    ClientImpl* client = reinterpret_cast<ClientImpl*>(mClient);
+    android::sp<RemoteAudio>& audio(client->getAudio());
+    android::String8 info;
+
+    ASSERT_TRUE(audio->getDeviceInfo(info));
+    LOGD("device info %s", info.string());
+}
+
 TEST_F(ClientInterfaceTest, PlayTest) {
     ClientImpl* client = reinterpret_cast<ClientImpl*>(mClient);
     android::sp<RemoteAudio>& audio(client->getAudio());

@@ -13,15 +13,17 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-
+#include <getopt.h>
 #include <stdio.h>
 
 #include <utils/String8.h>
 
 #include <UniquePtr.h>
 
+#include "GenericFactory.h"
 #include "Log.h"
 #include "Report.h"
+#include "Settings.h"
 #include "task/TaskGeneric.h"
 #include "task/ModelBuilder.h"
 
@@ -29,30 +31,58 @@
 class CleanupStatics {
 public:
 
-    CleanupStatics() {};
+    CleanupStatics() {
+
+    }
     ~CleanupStatics() {
         Log::Finalize();
         Report::Finalize();
+        // create zip file after log and report files are closed.
+        android::String8 reportDirPath =
+                Settings::Instance()->getSetting(Settings::EREPORT_FILE).getPathDir();
+        android::String8 zipFilename = reportDirPath.getPathLeaf();
+        android::String8 command = android::String8::format("cd %s;zip -r ../%s.zip *",
+                reportDirPath.string(), zipFilename.string());
+        fprintf(stderr, "\n\nexecuting %s\n", command.string());
+        if (system(command.string()) == -1) {
+            fprintf(stderr, "cannot create zip file with command %s\n", command.string());
+        }
+        Settings::Finalize();
     }
 };
 
+void usage(char* bin)
+{
+    fprintf(stderr, "%s [-l log_level][-s serial] test_xml\n", bin);
+}
 int main(int argc, char *argv[])
 {
     if (argc < 2) {
-        fprintf(stderr, "%s [-llog_level] test_xml\n", argv[0]);
+        fprintf(stderr, "%s [-l log_level][-s serial] test_xml\n", argv[0]);
         return 1;
     }
     int logLevel = 3;
-    int argCurrent = 1;
-    if (strncmp(argv[argCurrent], "-l", 2) == 0) {
-        logLevel = atoi(argv[argCurrent] + 2);
-        argCurrent++;
+    char* serial = NULL;
+    int opt;
+    while ((opt = getopt(argc, argv, "l:s:")) != -1) {
+        switch (opt) {
+        case 'l':
+            logLevel = atoi(optarg);
+            break;
+        case 's':
+            serial = optarg;
+            break;
+        default:
+            usage(argv[0]);
+            return 1;
+        }
     }
-    if (argCurrent == argc) {
-        fprintf(stderr, "wrong arguments");
+    if (optind >= argc) {
+        usage(argv[0]);
         return 1;
     }
-    android::String8 xmlFile(argv[argCurrent]);
+
+    android::String8 xmlFile(argv[optind]);
 
     android::String8 dirName;
     if (!FileUtil::prepare(dirName)) {
@@ -61,6 +91,14 @@ int main(int argc, char *argv[])
     }
 
     UniquePtr<CleanupStatics> staticStuffs(new CleanupStatics());
+    if (Settings::Instance() == NULL) {
+        fprintf(stderr, "caanot create Settings");
+        return 1;
+    }
+    if (serial != NULL) {
+        android::String8 strSerial(serial);
+        Settings::Instance()->addSetting(Settings::EADB, strSerial);
+    }
     if (Log::Instance(dirName.string()) == NULL) {
         fprintf(stderr, "cannot create Log");
         return 1;
@@ -73,13 +111,33 @@ int main(int argc, char *argv[])
         return 1;
     }
 
+    GenericFactory factory;
+    ClientInterface* client = factory.createClientInterface();
+    if (client == NULL) {
+        fprintf(stderr, "cannot create ClientInterface");
+        return 1;
+    }
+    if (!client->init(Settings::Instance()->getSetting(Settings::EADB))) {
+        fprintf(stderr, "cannot init ClientInterface");
+        return 1;
+    }
+    android::String8 deviceInfo;
+    if (!client->getAudio()->getDeviceInfo(deviceInfo)) {
+        fprintf(stderr, "cannot get device info");
+        return 1;
+    }
+    delete client; // release so that it can be used in tests
+    Settings::Instance()->addSetting(Settings::EDEVICE_INFO, deviceInfo);
+
     ModelBuilder modelBuilder;
     UniquePtr<TaskGeneric> topTask(modelBuilder.parseTestDescriptionXml(xmlFile));
     if (topTask.get() == NULL) {
         LOGE("Parsing of %x failed", xmlFile.string());
         return 1;
     }
+    Settings::Instance()->addSetting(Settings::ETEST_XML, xmlFile);
     topTask->run();
+
     return 0;
 }
 

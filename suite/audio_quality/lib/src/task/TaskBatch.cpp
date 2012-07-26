@@ -58,10 +58,10 @@ TaskGeneric::ExecutionResult TaskBatch::run()
     if (!findStringAttribute(STR_NAME, name) || !findStringAttribute(STR_VERSION, version)) {
         LOGW("TaskBatch::run no name or version information");
     }
-    Report::Instance()->printf("= Test batch %s version %s started. =", name.string(),
+    MSG("= Test batch %s version %s started. =", name.string(),
             version.string());
     bool result = TaskGeneric::forEachChild(runAlways, NULL);
-    Report::Instance()->printf("= Finished Test batch =");
+    MSG("= Finished Test batch =");
     return TaskGeneric::EResultOK;
 }
 

@@ -25,13 +25,18 @@ public:
     static Settings* Instance();
     static void Finalize();
     enum SettingType {
-        EADB
+        EADB            = 0, // adb device serial number
+        EREPORT_TIME    = 1,
+        EREPORT_FILE    = 2,
+        EDEVICE_INFO    = 3,
+        ETEST_XML       = 4, // name of test description xml
+        EMAX_SETTINGS   = 4  // not real setting
     };
     void addSetting(SettingType type, const android::String8 setting);
     const android::String8& getSetting(SettingType type);
 private:
     static Settings* mInstance;
-    android::String8 mAdbSetting;
+    android::String8 mSettings[EMAX_SETTINGS + 1];
 };
 
 
