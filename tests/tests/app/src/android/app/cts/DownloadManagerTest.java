@@ -27,10 +27,16 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.Environment;
 import android.os.ParcelFileDescriptor;
+import android.os.SystemClock;
 import android.test.AndroidTestCase;
+import android.text.format.DateUtils;
 import android.webkit.cts.CtsTestServer;
 
+import com.google.android.collect.Sets;
+
 import java.io.File;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
@@ -41,6 +47,9 @@ public class DownloadManagerTest extends AndroidTestCase {
      * download individual files of 55 MB.
      */
     private static final int MINIMUM_DOWNLOAD_BYTES = 55 * 1024 * 1024;
+
+    private static final long SHORT_TIMEOUT = 5 * DateUtils.SECOND_IN_MILLIS;
+    private static final long LONG_TIMEOUT = 2 * DateUtils.MINUTE_IN_MILLIS;
 
     private DownloadManager mDownloadManager;
 
@@ -61,8 +70,7 @@ public class DownloadManagerTest extends AndroidTestCase {
     }
 
     public void testDownloadManager() throws Exception {
-        DownloadCompleteReceiver receiver =
-                new DownloadCompleteReceiver(2, TimeUnit.SECONDS.toMillis(3));
+        final DownloadCompleteReceiver receiver = new DownloadCompleteReceiver();
         try {
             IntentFilter intentFilter = new IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE);
             mContext.registerReceiver(receiver, intentFilter);
@@ -76,7 +84,7 @@ public class DownloadManagerTest extends AndroidTestCase {
             assertDownloadQueryableById(goodId);
             assertDownloadQueryableById(badId);
 
-            receiver.waitForDownloadComplete();
+            receiver.waitForDownloadComplete(SHORT_TIMEOUT, goodId, badId);
 
             assertDownloadQueryableByStatus(DownloadManager.STATUS_SUCCESSFUL);
             assertDownloadQueryableByStatus(DownloadManager.STATUS_FAILED);
@@ -89,14 +97,13 @@ public class DownloadManagerTest extends AndroidTestCase {
     }
 
     public void testMinimumDownload() throws Exception {
-        DownloadCompleteReceiver receiver =
-                new DownloadCompleteReceiver(1, TimeUnit.MINUTES.toMillis(2));
+        final DownloadCompleteReceiver receiver = new DownloadCompleteReceiver();
         try {
             IntentFilter intentFilter = new IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE);
             mContext.registerReceiver(receiver, intentFilter);
 
             long id = mDownloadManager.enqueue(new Request(getMinimumDownloadUrl()));
-            receiver.waitForDownloadComplete();
+            receiver.waitForDownloadComplete(LONG_TIMEOUT, id);
 
             ParcelFileDescriptor fileDescriptor = mDownloadManager.openDownloadedFile(id);
             assertEquals(MINIMUM_DOWNLOAD_BYTES, fileDescriptor.getStatSize());
@@ -146,8 +153,7 @@ public class DownloadManagerTest extends AndroidTestCase {
             assertTrue(publicLocation.delete());
         }
 
-        DownloadCompleteReceiver receiver =
-            new DownloadCompleteReceiver(3, TimeUnit.SECONDS.toMillis(5));
+        final DownloadCompleteReceiver receiver = new DownloadCompleteReceiver();
         try {
             IntentFilter intentFilter = new IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE);
             mContext.registerReceiver(receiver, intentFilter);
@@ -168,7 +174,7 @@ public class DownloadManagerTest extends AndroidTestCase {
             int allDownloads = getTotalNumberDownloads();
             assertEquals(3, allDownloads);
 
-            receiver.waitForDownloadComplete();
+            receiver.waitForDownloadComplete(SHORT_TIMEOUT, uriId, extFileId, publicId);
 
             assertSuccessfulDownload(uriId, uriLocation);
             assertSuccessfulDownload(extFileId, extFileLocation);
@@ -198,8 +204,7 @@ public class DownloadManagerTest extends AndroidTestCase {
             assertTrue(wrongExtLocation.delete());
         }
 
-        DownloadCompleteReceiver receiver =
-            new DownloadCompleteReceiver(2, TimeUnit.SECONDS.toMillis(5));
+        final DownloadCompleteReceiver receiver = new DownloadCompleteReceiver();
         try {
             IntentFilter intentFilter = new IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE);
             mContext.registerReceiver(receiver, intentFilter);
@@ -215,7 +220,7 @@ public class DownloadManagerTest extends AndroidTestCase {
             int allDownloads = getTotalNumberDownloads();
             assertEquals(2, allDownloads);
 
-            receiver.waitForDownloadComplete();
+            receiver.waitForDownloadComplete(SHORT_TIMEOUT, noExtId, wrongExtId);
 
             assertSuccessfulDownload(noExtId, noExtLocation);
             assertSuccessfulDownload(wrongExtId, wrongExtLocation);
@@ -228,24 +233,45 @@ public class DownloadManagerTest extends AndroidTestCase {
     }
 
     private class DownloadCompleteReceiver extends BroadcastReceiver {
+        private HashSet<Long> mCompleteIds = Sets.newHashSet();
 
-        private final CountDownLatch mReceiveLatch;
-
-        private final long waitTimeMs;
-
-        public DownloadCompleteReceiver(int numDownload, long waitTimeMs) {
-            this.mReceiveLatch = new CountDownLatch(numDownload);
-            this.waitTimeMs = waitTimeMs;
+        public DownloadCompleteReceiver() {
         }
 
         @Override
         public void onReceive(Context context, Intent intent) {
-            mReceiveLatch.countDown();
+            synchronized (mCompleteIds) {
+                mCompleteIds.add(intent.getLongExtra(DownloadManager.EXTRA_DOWNLOAD_ID, -1));
+                mCompleteIds.notifyAll();
+            }
         }
 
-        public void waitForDownloadComplete() throws InterruptedException {
-            assertTrue("Make sure you have WiFi or some other connectivity for this test.",
-                    mReceiveLatch.await(waitTimeMs, TimeUnit.MILLISECONDS));
+        private boolean isCompleteLocked(long... ids) {
+            for (long id : ids) {
+                if (!mCompleteIds.contains(id)) {
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        public void waitForDownloadComplete(long timeoutMillis, long... waitForIds)
+                throws InterruptedException {
+            if (waitForIds.length == 0) {
+                throw new IllegalArgumentException("Missing IDs to wait for");
+            }
+
+            final long startTime = SystemClock.elapsedRealtime();
+            do {
+                synchronized (mCompleteIds) {
+                    mCompleteIds.wait(timeoutMillis);
+                    if (isCompleteLocked(waitForIds)) return;
+                }
+            } while ((SystemClock.elapsedRealtime() - startTime) < timeoutMillis);
+
+            throw new InterruptedException("Timeout waiting for IDs " + Arrays.toString(waitForIds)
+                    + "; received " + mCompleteIds.toString()
+                    + ".  Make sure you have WiFi or some other connectivity for this test.");
         }
     }
 
