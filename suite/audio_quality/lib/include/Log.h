@@ -59,6 +59,8 @@ private:
 #define LOGD(x...) do { Log::Instance()->printf(Log::ELogD, x); } while(0)
 #define LOGV(x...) do { Log::Instance()->printf(Log::ELogV, x); } while(0)
 
+#define MSG(x...) do { Log::Instance()->printf(Log::ELogW, x); } while(0)
+
 #define ASSERT(cond) if(!(cond)) {  Log::Instance()->printf(Log::ELogE, \
         "assertion failed %s %d", __FILE__, __LINE__); \
     Log::Finalize(); \

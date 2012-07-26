@@ -18,8 +18,8 @@
 #define CTSAUDIO_GENERIC_FACTORY_H
 
 #include "task/TaskGeneric.h"
+#include "ClientInterface.h"
 
-class ClientInterface;
 
 /**
  * Factory methods for all abstract classes

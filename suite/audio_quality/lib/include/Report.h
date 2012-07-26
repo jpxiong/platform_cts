@@ -37,13 +37,14 @@ public:
 
     void addCasePassed(const android::String8& name);
     void addCaseFailed(const android::String8& name);
-    void printf(const char* fmt, ...);
+
 
 private:
     Report();
     ~Report();
     bool init(const char* dirName);
-    void writeSummary();
+    void writeReport();
+    void printf(const char* fmt, ...);
 
 private:
     static Report* mInstance;
