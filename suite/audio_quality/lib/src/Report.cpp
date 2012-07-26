@@ -15,6 +15,7 @@
  */
 
 #include "Log.h"
+#include "Settings.h"
 #include "StringUtil.h"
 #include "Report.h"
 
@@ -43,7 +44,7 @@ Report::Report()
 
 Report::~Report()
 {
-    writeSummary();
+    writeReport();
 }
 
 bool Report::init(const char* dirName)
@@ -52,9 +53,10 @@ bool Report::init(const char* dirName)
         return true;
     }
     android::String8 report;
-    if (report.appendFormat("%s/report.txt", dirName) != 0) {
+    if (report.appendFormat("%s/report.xml", dirName) != 0) {
         return false;
     }
+    Settings::Instance()->addSetting(Settings::EREPORT_FILE, report);
     return FileUtil::init(report.string());
 }
 
@@ -76,17 +78,24 @@ void Report::addCaseFailed(const android::String8& name)
     mFailedCases.push_back(name);
 }
 
-void Report::writeSummary()
+void Report::writeReport()
 {
-    printf("= Test cases executed: %d, passed: %d, failed: %d =",
-            mPassedCases.size() + mFailedCases.size(), mPassedCases.size(), mFailedCases.size());
-    printf("= Failed cases =");
+    printf("<?xml version='1.0' encoding='utf-8' standalone='yes' ?>");
+    printf("<audio-test-results-report report-version=\"1\" creation-time=\"%s\">",
+            Settings::Instance()->getSetting(Settings::EREPORT_TIME).string());
+    printf("  <verifier-info version-name=\"1\" version-code=\"1\" />");
+    printf("  <device-info>");
+    printf("    %s", Settings::Instance()->getSetting(Settings::EDEVICE_INFO).string());
+    printf("  </device-info>");
+    printf("  <audio-test-results xml=\"%s\">",
+            Settings::Instance()->getSetting(Settings::ETEST_XML).string());
     std::list<android::String8>::iterator it;
     for (it = mFailedCases.begin(); it != mFailedCases.end(); it++) {
-        printf("* %s", it->string());
+        printf("    <test title=\"%s\" result=\"fail\" />", it->string());
     }
-    printf("= Passed cases =");
     for (it = mPassedCases.begin(); it != mPassedCases.end(); it++) {
-        printf("* %s", it->string());
+        printf("    <test title=\"%s\" result=\"pass\" />", it->string());
     }
+    printf("  </audio-test-results>");
+    printf("</audio-test-results-report>");
 }

@@ -19,6 +19,7 @@
 #include <errno.h>
 
 #include "Log.h"
+#include "Settings.h"
 #include "StringUtil.h"
 #include "FileUtil.h"
 
@@ -54,9 +55,14 @@ bool FileUtil::prepare(android::String8& dirPath)
         _LOGD_("mkdir of topdir failed, error %d", errno);
         return false;
     }
+    android::String8 reportTime;
+    if (reportTime.appendFormat("%04d_%02d_%02d_%02d_%02d_%02d", tm->tm_year + 1900,
+                tm->tm_mon + 1, tm->tm_mday, tm->tm_hour, tm->tm_min, tm->tm_sec) != 0) {
+            return false;
+    }
+    Settings::Instance()->addSetting(Settings::EREPORT_TIME, reportTime);
     android::String8 path;
-    if (path.appendFormat("%s/%04d_%02d_%02d_%02d_%02d_%02d", reportTopDir,tm->tm_year + 1900,
-            tm->tm_mon + 1, tm->tm_mday, tm->tm_hour, tm->tm_min, tm->tm_sec) != 0) {
+    if (path.appendFormat("%s/%s", reportTopDir, reportTime.string()) != 0) {
         return false;
     }
     result = mkdir(path.string(), S_IRWXU);
