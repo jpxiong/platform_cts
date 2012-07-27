@@ -25,7 +25,7 @@ $(HOST_OUT)/cts/cts_audio_quality.zip: cts_audio_quality_test cts_audio_quality 
   CtsAudioClient $(CTS_AUDIO_TOP)/test_description
 	$(hide) mkdir -p $(CTS_AUDIO_INSTALL_DIR)
 	$(hide) mkdir -p $(CTS_AUDIO_INSTALL_DIR)/client
-	$(hide) $(ACP) -fp $(ANDROID_PRODUCT_OUT)/data/app/CtsAudioClient.apk \
+	$(hide) $(ACP) -fp $(PRODUCT_OUT)/data/app/CtsAudioClient.apk \
         $(CTS_AUDIO_INSTALL_DIR)/client
 	$(hide) $(ACP) -fp $(HOST_OUT)/bin/cts_audio_quality_test $(CTS_AUDIO_INSTALL_DIR)
 	$(hide) $(ACP) -fp $(HOST_OUT)/bin/cts_audio_quality $(CTS_AUDIO_INSTALL_DIR)
