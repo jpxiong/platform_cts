@@ -31,6 +31,7 @@ $(HOST_OUT)/cts/cts_audio_quality.zip: cts_audio_quality_test cts_audio_quality 
 	$(hide) $(ACP) -fp $(HOST_OUT)/bin/cts_audio_quality $(CTS_AUDIO_INSTALL_DIR)
 	$(hide) $(ACP) -fr $(CTS_AUDIO_TOP)/test_description $(CTS_AUDIO_INSTALL_DIR)
 	$(hide) echo "Package cts_audio: $@"
+	$(hide) mkdir -p $(HOST_OUT)/cts
 	$(hide) cd $(HOST_OUT) && \
         zip -rq cts/cts_audio_quality.zip cts_audio_quality -x cts_audio_quality/reports/\*
 
