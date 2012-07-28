@@ -1069,7 +1069,7 @@ public class AccessPermissionWithDiffSigTest extends AndroidTestCase {
 
     public void testGetMimeTypePermission() {
         // Precondition: no current access.
-        assertWritingContentUriNotAllowed(PERM_URI, "shouldn't write when starting test");
+        assertReadingContentUriNotAllowed(PERM_URI, "shouldn't read when starting test");
         assertWritingContentUriNotAllowed(PERM_URI, "shouldn't write when starting test");
         
         // All apps should be able to get MIME type regardless of permission.
@@ -1078,7 +1078,7 @@ public class AccessPermissionWithDiffSigTest extends AndroidTestCase {
 
     public void testGetMimeTypePrivate() {
         // Precondition: no current access.
-        assertWritingContentUriNotAllowed(PRIV_URI, "shouldn't write when starting test");
+        assertReadingContentUriNotAllowed(PRIV_URI, "shouldn't read when starting test");
         assertWritingContentUriNotAllowed(PRIV_URI, "shouldn't write when starting test");
         
         // All apps should be able to get MIME type even if provider is private.
