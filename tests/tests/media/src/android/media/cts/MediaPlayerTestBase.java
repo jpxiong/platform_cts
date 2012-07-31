@@ -33,6 +33,7 @@ public class MediaPlayerTestBase extends ActivityInstrumentationTestCase2<MediaS
     protected static final int SLEEP_TIME = 1000;
     protected static final int LONG_SLEEP_TIME = 6000;
     protected static final int STREAM_RETRIES = 20;
+    protected static boolean sUseScaleToFitMode = false;
 
     public static class Monitor {
         private boolean signalled;
@@ -132,9 +133,18 @@ public class MediaPlayerTestBase extends ActivityInstrumentationTestCase2<MediaS
         try {
             mMediaPlayer.setDataSource(afd.getFileDescriptor(), afd.getStartOffset(),
                     afd.getLength());
+
+            // Although it is only meant for video playback, it should not
+            // cause issues for audio-only playback.
+            int videoScalingMode = sUseScaleToFitMode?
+                                    MediaPlayer.VIDEO_SCALING_MODE_SCALE_TO_FIT
+                                  : MediaPlayer.VIDEO_SCALING_MODE_SCALE_TO_FIT_WITH_CROPPING;
+
+            mMediaPlayer.setVideoScalingMode(videoScalingMode);
         } finally {
             afd.close();
         }
+        sUseScaleToFitMode = !sUseScaleToFitMode;  // Alternate the scaling mode
     }
 
     protected void loadSubtitleSource(int resid) throws Exception {
