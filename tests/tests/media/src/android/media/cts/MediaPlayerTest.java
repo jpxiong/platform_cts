@@ -758,11 +758,12 @@ public class MediaPlayerTest extends MediaPlayerTestBase {
             }
         });
 
+        mMediaPlayer.prepare();
+        assertFalse(mMediaPlayer.isPlaying());
+
         mSubtitleStatus.reset();
         selectSubtitleTrack(0);
 
-        mMediaPlayer.prepare();
-        assertFalse(mMediaPlayer.isPlaying());
         mMediaPlayer.start();
         assertTrue(mMediaPlayer.isPlaying());
 
