@@ -53,11 +53,26 @@ public abstract class AccessibilityActivityTestCase<T extends Activity>
         public boolean accept(AccessibilityEvent event);
     }
 
+    private static final boolean DEBUG = false;
+
+    private static final String LOG_TAG = AccessibilityActivityTestCase.class.getSimpleName();
+
     /**
      * Timeout required for pending Binder calls or event processing to
      * complete.
      */
     public static final long TIMEOUT_ASYNC_PROCESSING = 5000;
+
+    /**
+     * The timeout after the last accessibility event to consider the device idle.
+     */
+    public static final long TIMEOUT_ACCESSIBILITY_STATE_IDLE = 100;
+
+    /**
+     * Instance for detecting the next accessibility event.
+     */
+    private static final NextAccessibilityEventWatcher sNextEventWatcher =
+            new NextAccessibilityEventWatcher();
 
     private static AccessibilityInteractionBridge sInteractionBridge;
 
@@ -71,6 +86,7 @@ public abstract class AccessibilityActivityTestCase<T extends Activity>
     @Override
     public void setUp() throws Exception {
         super.setUp();
+        waitForAccessibilityStateIdle();
         startActivityAndWaitForFirstEvent();
     }
 
@@ -121,6 +137,39 @@ public abstract class AccessibilityActivityTestCase<T extends Activity>
         },
         TIMEOUT_ASYNC_PROCESSING);
         assertNotNull(awaitedEvent);
+    }
+
+    /**
+     * Waits for idle accessibility state.
+     */
+    private void waitForAccessibilityStateIdle() throws Exception {
+        AccessibilityEvent awaitedEvent = null;
+        try {
+            do {
+                awaitedEvent = getInteractionBridge().executeCommandAndWaitForAccessibilityEvent(
+                        sNextEventWatcher, sNextEventWatcher, TIMEOUT_ACCESSIBILITY_STATE_IDLE);
+            } while (awaitedEvent != null);
+        } catch (TimeoutException te) {
+            /* success - no event within the timeout - do nothing */
+        }
+    }
+
+    /**
+     * Dummy implementation that matches every event and does nothing.
+     */
+    private static class NextAccessibilityEventWatcher implements Runnable,
+            AccessibilityEventFilter {
+        @Override
+        public boolean accept(AccessibilityEvent event) {
+            if (DEBUG) {
+                Log.i(LOG_TAG, "Watcher event: " + event);
+            }
+            return true;
+        }
+        @Override
+        public void run() {
+            /* do nothing */
+        }
     }
 
     /**
@@ -180,7 +229,6 @@ public abstract class AccessibilityActivityTestCase<T extends Activity>
 
         public void onAccessibilityEvent(AccessibilityEvent event) {
             synchronized (mLock) {
-                Log.e("OPALA", "Event: " + event);
                 mLock.notifyAll();
                 if (mWaitingForEventDelivery) {
                     mEventQueue.add(AccessibilityEvent.obtain(event));
