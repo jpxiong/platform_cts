@@ -75,6 +75,7 @@ public class MediaPlayerTestBase extends ActivityInstrumentationTestCase2<MediaS
     }
 
     protected Monitor mOnVideoSizeChangedCalled = new Monitor();
+    protected Monitor mOnVideoRenderingStartCalled = new Monitor();
     protected Monitor mOnBufferingUpdateCalled = new Monitor();
     protected Monitor mOnPrepareCalled = new Monitor();
     protected Monitor mOnSeekCompleteCalled = new Monitor();
@@ -229,6 +230,15 @@ public class MediaPlayerTestBase extends ActivityInstrumentationTestCase2<MediaS
                 return true;
             }
         });
+        mMediaPlayer.setOnInfoListener(new MediaPlayer.OnInfoListener() {
+            @Override
+            public boolean onInfo(MediaPlayer mp, int what, int extra) {
+                if (what == MediaPlayer.MEDIA_INFO_VIDEO_RENDERING_START) {
+                    mOnVideoRenderingStartCalled.signal();
+                }
+                return true;
+            }
+        });
         try {
           mMediaPlayer.prepare();
         } catch (IOException e) {
@@ -238,6 +248,7 @@ public class MediaPlayerTestBase extends ActivityInstrumentationTestCase2<MediaS
 
         mMediaPlayer.start();
         mOnVideoSizeChangedCalled.waitForSignal();
+        mOnVideoRenderingStartCalled.waitForSignal();
         mMediaPlayer.setVolume(leftVolume, rightVolume);
 
         // waiting to complete
