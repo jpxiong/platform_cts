@@ -23,6 +23,7 @@ import android.content.res.AssetFileDescriptor;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.media.MediaRecorder;
+import android.media.MediaMetadataRetriever;
 import android.media.TimedText;
 import android.media.audiofx.AudioEffect;
 import android.media.audiofx.Visualizer;
@@ -469,6 +470,7 @@ public class MediaPlayerTest extends MediaPlayerTestBase {
         checkOrientation(angle);
         recordVideo(width, height, angle, file, durationMs);
         checkDisplayedVideoSize(width, height, angle, file);
+        checkVideoRotationAngle(angle, file);
     }
 
     private void checkOrientation(int angle) throws Exception {
@@ -508,6 +510,17 @@ public class MediaPlayerTest extends MediaPlayerTestBase {
             displayHeight = w;
         }
         playVideoTest(file, displayWidth, displayHeight);
+    }
+
+    private void checkVideoRotationAngle(int angle, String file) {
+        MediaMetadataRetriever retriever = new MediaMetadataRetriever();
+        retriever.setDataSource(file);
+        String rotation = retriever.extractMetadata(
+                    MediaMetadataRetriever.METADATA_KEY_VIDEO_ROTATION);
+        retriever.release();
+        retriever = null;
+        assertNotNull(rotation);
+        assertEquals(Integer.parseInt(rotation), angle);
     }
 
     public void testLocalVideo_MP4_H264_480x360_500kbps_25fps_AAC_Stereo_128kbps_44110Hz()
