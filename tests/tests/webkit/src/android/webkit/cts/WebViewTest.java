@@ -1167,6 +1167,20 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
     }
 
     public void testRequestImageRef() throws Exception, Throwable {
+        final class ImageLoaded {
+            public boolean mImageLoaded;
+
+            public void loaded() {
+                mImageLoaded = true;
+            }
+        }
+        final ImageLoaded imageLoaded = new ImageLoaded();
+        runTestOnUiThread(new Runnable() {
+            public void run() {
+                mOnUiThread.getSettings().setJavaScriptEnabled(true);
+            }
+        });
+        mOnUiThread.addJavascriptInterface(imageLoaded, "imageLoaded");
         AssetManager assets = getActivity().getAssets();
         Bitmap bitmap = BitmapFactory.decodeStream(assets.open(TestHtmlConstants.LARGE_IMG_URL));
         int imgWidth = bitmap.getWidth();
@@ -1175,9 +1189,24 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
         startWebServer(false);
         final String imgUrl = mWebServer.getAssetUrl(TestHtmlConstants.LARGE_IMG_URL);
         mOnUiThread.loadDataAndWaitForCompletion(
-                "<html><title>Title</title><body><img src=\"" + imgUrl
+                "<html><head><title>Title</title><style type=\"text/css\">"
+                + "#imgElement { -webkit-transform: translate3d(0,0,1); }"
+                + "#imgElement.finish { -webkit-transform: translate3d(0,0,0);"
+                + " -webkit-transition-duration: 1ms; }</style>"
+                + "<script type=\"text/javascript\">function imgLoad() {"
+                + "imgElement = document.getElementById('imgElement');"
+                + "imgElement.addEventListener('webkitTransitionEnd',"
+                + "function(e) { imageLoaded.loaded(); });"
+                + "imgElement.className = 'finish';}</script>"
+                + "</head><body><img id=\"imgElement\" src=\"" + imgUrl
                 + "\" width=\"" + imgWidth + "\" height=\"" + imgHeight
-                + "\"/></body></html>", "text/html", null);
+                + "\" onLoad=\"imgLoad()\"/></body></html>", "text/html", null);
+        new PollingCheck() {
+            @Override
+            protected boolean check() {
+                return imageLoaded.mImageLoaded;
+            }
+        }.run();
         getInstrumentation().waitForIdleSync();
 
         final HrefCheckHandler handler = new HrefCheckHandler(mWebView.getHandler().getLooper());
