@@ -164,6 +164,7 @@ public class WebViewClientTest extends ActivityInstrumentationTestCase2<WebViewS
     }
 
     public void testOnUnhandledKeyEvent() throws Throwable {
+        requireLoadedPage();
         final MockWebViewClient webViewClient = new MockWebViewClient();
         mOnUiThread.setWebViewClient(webViewClient);
 
@@ -189,6 +190,10 @@ public class WebViewClientTest extends ActivityInstrumentationTestCase2<WebViewS
         mOnUiThread.zoomIn();
         getInstrumentation().waitForIdleSync();
         assertTrue(webViewClient.hasOnScaleChangedCalled());
+    }
+
+    private void requireLoadedPage() throws Throwable {
+        mOnUiThread.loadUrlAndWaitForCompletion("about:blank");
     }
 
     private class MockWebViewClient extends WaitForLoadedClient {
