@@ -16,14 +16,14 @@
 
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.android.cts.animation">
-
+    <uses-permission android:name="android.permission.DISABLE_KEYGUARD" />
     <application>
         <activity android:name="android.animation.cts.AnimationActivity"
             android:label="AnimationActivity"/>
         <uses-library android:name="android.test.runner" />
     </application>
 
-    <instrumentation android:name="android.test.InstrumentationTestRunner"
+    <instrumentation android:name="android.test.InstrumentationCtsTestRunner"
                      android:targetPackage="com.android.cts.animation"
                      android:label="CTS tests for android.animation package"/>
 </manifest>

@@ -28,6 +28,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.Formatter;
 import java.util.Locale;
+import java.util.TimeZone;
 
 @TestTargetClass(DateUtils.class)
 public class DateUtilsTest extends AndroidTestCase {
@@ -43,6 +44,7 @@ public class DateUtilsTest extends AndroidTestCase {
     protected void setUp() throws Exception {
         super.setUp();
         mContext = getContext();
+        TimeZone.setDefault(TimeZone.getTimeZone("GMT"));
         mBaseTime = System.currentTimeMillis();
     }
 

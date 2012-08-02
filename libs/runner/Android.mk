@@ -1,4 +1,4 @@
-# Copyright (C) 2008 The Android Open Source Project
+# Copyright (C) 2012 The Android Open Source Project
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -12,28 +12,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-
 LOCAL_PATH:= $(call my-dir)
 
 include $(CLEAR_VARS)
 
-# don't include this package in any target
-LOCAL_MODULE_TAGS := optional
-# and when built explicitly put it in the data partition
-LOCAL_MODULE_PATH := $(TARGET_OUT_DATA_APPS)
+LOCAL_SRC_FILES := $(call all-java-files-under, ../../tests/core/runner/src)
 
 LOCAL_JAVA_LIBRARIES := android.test.runner
 
-LOCAL_STATIC_JAVA_LIBRARIES := ctstestrunner
+LOCAL_MODULE_TAGS := optional
 
-LOCAL_SRC_FILES := $(call all-java-files-under, src)
+LOCAL_MODULE := ctstestrunner
 
-LOCAL_PACKAGE_NAME := CtsTelephonyTestCases
-
-LOCAL_INSTRUMENTATION_FOR := CtsTestStubs
-
-# uncomment when dalvik.annotation.Test* are removed or part of SDK
-# #LOCAL_SDK_VERSION := current
-
-include $(BUILD_PACKAGE)
-
+include $(BUILD_STATIC_JAVA_LIBRARY)

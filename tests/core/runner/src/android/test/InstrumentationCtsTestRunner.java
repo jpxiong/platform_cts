@@ -85,7 +85,7 @@ public class InstrumentationCtsTestRunner extends InstrumentationTestRunner {
         System.setProperty("java.io.tmpdir", cacheDir.getAbsolutePath());
         System.setProperty("user.dir", cacheDir.getAbsolutePath());
 
-        TimeZone.setDefault(TimeZone.getTimeZone("GMT"));
+
 
         mEnvironment = new TestEnvironment();
 

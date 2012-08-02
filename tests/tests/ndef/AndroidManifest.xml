@@ -22,7 +22,7 @@
     </application>
 
     <!-- This is a self-instrumenting test package. -->
-    <instrumentation android:name="android.test.InstrumentationTestRunner"
+    <instrumentation android:name="android.test.InstrumentationCtsTestRunner"
                      android:targetPackage="com.android.cts.ndef"
                      android:label="CTS tests of NDEF data classes"/>
 

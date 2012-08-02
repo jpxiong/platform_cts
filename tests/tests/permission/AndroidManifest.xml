@@ -39,7 +39,7 @@
         package. That runner cannot be added to this package either, since it
         relies on hidden APIs.
     -->
-    <instrumentation android:name="android.test.InstrumentationTestRunner"
+    <instrumentation android:name="android.test.InstrumentationCtsTestRunner"
                      android:targetPackage="com.android.cts.permission"
                      android:label="CTS tests of com.android.cts.permission"/>
 

@@ -19,7 +19,7 @@ include $(CLEAR_VARS)
 
 LOCAL_JAVA_LIBRARIES := android.test.runner
 # We use the DefaultManifestAttributesTest from the android.cts.dpi package.
-LOCAL_STATIC_JAVA_LIBRARIES := android.cts.dpi
+LOCAL_STATIC_JAVA_LIBRARIES := android.cts.dpi ctstestrunner
 
 LOCAL_SRC_FILES := $(call all-java-files-under, src)
 

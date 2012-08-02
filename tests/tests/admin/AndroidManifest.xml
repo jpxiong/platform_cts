@@ -19,13 +19,14 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
         package="com.android.cts.admin">
 
+  <uses-permission android:name="android.permission.DISABLE_KEYGUARD" />
   <application>
 
       <uses-library android:name="android.test.runner"/>
 
   </application>
 
-  <instrumentation android:name="android.test.InstrumentationTestRunner"
+  <instrumentation android:name="android.test.InstrumentationCtsTestRunner"
                    android:targetPackage="android.deviceadmin.cts"
                    android:label="Tests for the admin APIs."/>
 
