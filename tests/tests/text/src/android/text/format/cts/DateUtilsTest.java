@@ -52,9 +52,9 @@ public class DateUtilsTest extends AndroidTestCase {
                 DateUtils.getDayOfWeekString(Calendar.SUNDAY, DateUtils.LENGTH_LONG));
         assertEquals("Sun",
                 DateUtils.getDayOfWeekString(Calendar.SUNDAY, DateUtils.LENGTH_MEDIUM));
-        assertEquals("Su",
+        assertEquals("Sun",
                 DateUtils.getDayOfWeekString(Calendar.SUNDAY, DateUtils.LENGTH_SHORT));
-        assertEquals("Su",
+        assertEquals("Sun",
                 DateUtils.getDayOfWeekString(Calendar.SUNDAY, DateUtils.LENGTH_SHORTER));
         assertEquals("S",
                 DateUtils.getDayOfWeekString(Calendar.SUNDAY, DateUtils.LENGTH_SHORTEST));
@@ -188,7 +188,7 @@ public class DateUtilsTest extends AndroidTestCase {
         assertEquals("Noon", DateUtils.formatDateRange(mContext, fixedTime + noonDuration,
                 fixedTime + noonDuration,
                 DateUtils.FORMAT_12HOUR | DateUtils.FORMAT_SHOW_TIME | DateUtils.FORMAT_CAP_NOON));
-        assertEquals("12:00pm", DateUtils.formatDateRange(mContext, fixedTime + noonDuration,
+        assertEquals("12:00PM", DateUtils.formatDateRange(mContext, fixedTime + noonDuration,
                 fixedTime + noonDuration,
                 DateUtils.FORMAT_12HOUR | DateUtils.FORMAT_NO_NOON | DateUtils.FORMAT_SHOW_TIME));
         assertEquals("12:00AM", DateUtils.formatDateRange(mContext, fixedTime - midnightDuration,
@@ -197,7 +197,7 @@ public class DateUtilsTest extends AndroidTestCase {
                 | DateUtils.FORMAT_NO_MIDNIGHT));
         assertEquals("3:30AM", DateUtils.formatDateRange(mContext, fixedTime, fixedTime,
                 DateUtils.FORMAT_SHOW_TIME | DateUtils.FORMAT_UTC));
-        assertEquals("3AM", DateUtils.formatDateRange(mContext, fixedTime - integralDuration,
+        assertEquals("3am", DateUtils.formatDateRange(mContext, fixedTime - integralDuration,
                 fixedTime - integralDuration,
                 DateUtils.FORMAT_SHOW_TIME | DateUtils.FORMAT_ABBREV_TIME));
         assertEquals("Mon", DateUtils.formatDateRange(mContext, fixedTime,
