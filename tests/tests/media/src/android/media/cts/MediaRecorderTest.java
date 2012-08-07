@@ -45,6 +45,7 @@ public class MediaRecorderTest extends ActivityInstrumentationTestCase2<MediaStu
     private final String OUTPUT_PATH2;
     private static final float TOLERANCE = 0.0002f;
     private static final int RECORD_TIME = 3000;
+    private static final int THREE_MINUTES = 180000;
     private static final int VIDEO_WIDTH = 176;
     private static final int VIDEO_HEIGHT = 144;
     private static final int VIDEO_BIT_RATE_IN_BPS = 128000;
@@ -65,6 +66,7 @@ public class MediaRecorderTest extends ActivityInstrumentationTestCase2<MediaStu
 
     private MediaRecorder mMediaRecorder;
     private ConditionVariable mMaxDurationCond;
+    private ConditionVariable mMaxFileSizeCond;
 
     public MediaRecorderTest() {
         super("com.android.cts.media", MediaStubActivity.class);
@@ -102,6 +104,7 @@ public class MediaRecorderTest extends ActivityInstrumentationTestCase2<MediaStu
                 mOutFile2 = new File(OUTPUT_PATH2);
 
                 mMaxDurationCond = new ConditionVariable();
+                mMaxFileSizeCond = new ConditionVariable();
 
                 mMediaRecorder.setOutputFile(OUTPUT_PATH);
                 mMediaRecorder.setOnInfoListener(new OnInfoListener() {
@@ -111,6 +114,10 @@ public class MediaRecorderTest extends ActivityInstrumentationTestCase2<MediaStu
                             MediaRecorder.MEDIA_RECORDER_INFO_MAX_DURATION_REACHED) {
                             Log.v(TAG, "max duration reached");
                             mMaxDurationCond.open();
+                        } else if (what ==
+                            MediaRecorder.MEDIA_RECORDER_INFO_MAX_FILESIZE_REACHED) {
+                            Log.v(TAG, "max file size reached");
+                            mMaxFileSizeCond.open();
                         }
                     }
                 });
@@ -140,6 +147,8 @@ public class MediaRecorderTest extends ActivityInstrumentationTestCase2<MediaStu
         }
         mMaxDurationCond.close();
         mMaxDurationCond = null;
+        mMaxFileSizeCond.close();
+        mMaxFileSizeCond = null;
         mActivity = null;
         super.tearDown();
     }
@@ -403,15 +412,36 @@ public class MediaRecorderTest extends ActivityInstrumentationTestCase2<MediaStu
         if (!hasMicrophone()) {
             return;
         }
+        testSetMaxFileSize(512 * 1024, 50 * 1024);
+    }
+
+    private void testSetMaxFileSize(
+            long fileSize, long tolerance) throws Exception {
         mMediaRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
+        mMediaRecorder.setVideoSource(MediaRecorder.VideoSource.CAMERA);
         mMediaRecorder.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
         mMediaRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB);
-        mMediaRecorder.setMaxFileSize(0);
+        mMediaRecorder.setVideoEncoder(MediaRecorder.VideoEncoder.H264);
+        mMediaRecorder.setVideoSize(VIDEO_WIDTH, VIDEO_HEIGHT);
+        mMediaRecorder.setVideoEncodingBitRate(256000);
+        mMediaRecorder.setPreviewDisplay(mActivity.getSurfaceHolder().getSurface());
+        mMediaRecorder.setMaxFileSize(fileSize);
         mMediaRecorder.prepare();
         mMediaRecorder.start();
-        Thread.sleep(RECORD_TIME * 30);
+
+        // Recording a scene with moving objects would greatly help reduce
+        // the time for waiting.
+        if (!mMaxFileSizeCond.block(THREE_MINUTES)) {
+            fail("timed out waiting for MEDIA_RECORDER_INFO_MAX_FILESIZE_REACHED");
+        }
         mMediaRecorder.stop();
-        checkOutputExist();
+        checkOutputFileSize(OUTPUT_PATH, fileSize, tolerance);
+    }
+
+    private void checkOutputFileSize(final String fileName, long fileSize, long tolerance) {
+        assertTrue(mOutFile.exists());
+        assertEquals(fileSize, mOutFile.length(), tolerance);
+        assertTrue(mOutFile.delete());
     }
 
     public void testOnErrorListener() throws Exception {
