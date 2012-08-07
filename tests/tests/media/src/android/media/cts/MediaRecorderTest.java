@@ -18,11 +18,13 @@ package android.media.cts;
 
 import android.content.pm.PackageManager;
 import android.hardware.Camera;
+import android.media.MediaMetadataRetriever;
 import android.media.MediaRecorder;
 import android.media.MediaRecorder.OnErrorListener;
 import android.media.MediaRecorder.OnInfoListener;
 import android.media.MediaMetadataRetriever;
 import android.os.Environment;
+import android.os.ConditionVariable;
 import android.test.ActivityInstrumentationTestCase2;
 import android.test.UiThreadTest;
 import android.view.Surface;
@@ -62,6 +64,7 @@ public class MediaRecorderTest extends ActivityInstrumentationTestCase2<MediaStu
     private MediaStubActivity mActivity = null;
 
     private MediaRecorder mMediaRecorder;
+    private ConditionVariable mMaxDurationCond;
 
     public MediaRecorderTest() {
         super("com.android.cts.media", MediaStubActivity.class);
@@ -97,10 +100,18 @@ public class MediaRecorderTest extends ActivityInstrumentationTestCase2<MediaStu
                 mMediaRecorder = new MediaRecorder();
                 mOutFile = new File(OUTPUT_PATH);
                 mOutFile2 = new File(OUTPUT_PATH2);
+
+                mMaxDurationCond = new ConditionVariable();
+
                 mMediaRecorder.setOutputFile(OUTPUT_PATH);
                 mMediaRecorder.setOnInfoListener(new OnInfoListener() {
                     public void onInfo(MediaRecorder mr, int what, int extra) {
                         mOnInfoCalled = true;
+                        if (what ==
+                            MediaRecorder.MEDIA_RECORDER_INFO_MAX_DURATION_REACHED) {
+                            Log.v(TAG, "max duration reached");
+                            mMaxDurationCond.open();
+                        }
                     }
                 });
                 mMediaRecorder.setOnErrorListener(new OnErrorListener() {
@@ -127,6 +138,8 @@ public class MediaRecorderTest extends ActivityInstrumentationTestCase2<MediaStu
             mCamera.release();
             mCamera = null;
         }
+        mMaxDurationCond.close();
+        mMaxDurationCond = null;
         mActivity = null;
         super.tearDown();
     }
@@ -352,15 +365,38 @@ public class MediaRecorderTest extends ActivityInstrumentationTestCase2<MediaStu
         if (!hasMicrophone()) {
             return;
         }
+        testSetMaxDuration(20000, 1000);
+    }
+
+    private void testSetMaxDuration(long durationMs, long toleranceMs) throws Exception {
         mMediaRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
         mMediaRecorder.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
-        mMediaRecorder.setMaxDuration(0);
+        mMediaRecorder.setMaxDuration((int)durationMs);
         mMediaRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB);
         mMediaRecorder.prepare();
         mMediaRecorder.start();
-        Thread.sleep(RECORD_TIME * 30);
+        long startTimeMs = System.currentTimeMillis();
+        if (!mMaxDurationCond.block(durationMs + toleranceMs)) {
+            fail("timed out waiting for MEDIA_RECORDER_INFO_MAX_DURATION_REACHED");
+        }
+        long endTimeMs = System.currentTimeMillis();
+        long actualDurationMs = endTimeMs - startTimeMs;
         mMediaRecorder.stop();
-        checkOutputExist();
+        checkRecordedTime(durationMs, actualDurationMs, toleranceMs);
+    }
+
+    private void checkRecordedTime(long expectedMs, long actualMs, long tolerance) {
+        assertEquals(expectedMs, actualMs, tolerance);
+        long actualFileDurationMs = getRecordedFileDurationMs(OUTPUT_PATH);
+        assertEquals(actualFileDurationMs, actualMs, tolerance);
+    }
+
+    private int getRecordedFileDurationMs(final String fileName) {
+        MediaMetadataRetriever retriever = new MediaMetadataRetriever();
+        retriever.setDataSource(fileName);
+        String durationStr = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION);
+        assertNotNull(durationStr);
+        return Integer.parseInt(durationStr);
     }
 
     public void testSetMaxFileSize() throws Exception {
