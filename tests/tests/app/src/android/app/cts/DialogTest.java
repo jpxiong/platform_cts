@@ -25,6 +25,7 @@ import android.content.DialogInterface;
 import android.content.DialogInterface.OnCancelListener;
 import android.content.DialogInterface.OnDismissListener;
 import android.content.DialogInterface.OnKeyListener;
+import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.content.res.TypedArray;
 import android.cts.util.PollingCheck;
@@ -204,6 +205,13 @@ public class DialogTest extends ActivityInstrumentationTestCase2<DialogStubActiv
 
         assertFalse(d.isOnSaveInstanceStateCalled);
         assertFalse(TestDialog.isOnRestoreInstanceStateCalled);
+
+        //skip if the device doesn't support both of portrait and landscape orientation screens.
+        final PackageManager pm = mContext.getPackageManager();
+        if(!(pm.hasSystemFeature(PackageManager.FEATURE_SCREEN_LANDSCAPE)
+                && pm.hasSystemFeature(PackageManager.FEATURE_SCREEN_PORTRAIT))){
+            return;
+        }
 
         OrientationTestUtils.toggleOrientationSync(mActivity, mInstrumentation);
 
