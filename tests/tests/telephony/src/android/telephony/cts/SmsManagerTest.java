@@ -74,6 +74,8 @@ public class SmsManagerTest extends AndroidTestCase {
                     "44076",    // KDDI
                     "311870",   // Boost Mobile
                     "311220",   // USCC
+                    "311225",   // USCC LTE
+                    "311580",   // USCC LTE
                     "302720",   // Rogers
                     "30272",    // Rogers
                     "302370",   // Fido
