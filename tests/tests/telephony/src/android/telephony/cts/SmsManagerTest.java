@@ -87,6 +87,7 @@ public class SmsManagerTest extends AndroidTestCase {
                     "46003",    // China Telecom
                     "311230",   // C SPire Wireless + Celluar South
                     "310600",    // Cellcom
+                    "31000",     // Republic Wireless US
                     // Verizon
                     "310004",
                     "310012",
