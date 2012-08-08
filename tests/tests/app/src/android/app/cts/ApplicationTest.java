@@ -22,6 +22,7 @@ import android.app.Application;
 import android.app.Instrumentation;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.test.InstrumentationTestCase;
 
 /**
@@ -40,6 +41,13 @@ public class ApplicationTest extends InstrumentationTestCase {
         final MockApplication mockApp = (MockApplication) activity.getApplication();
         assertTrue(mockApp.isConstructorCalled);
         assertTrue(mockApp.isOnCreateCalled);
+
+        //skip if the device doesn't support both of portrait and landscape orientation screens.
+        final PackageManager pm = targetContext.getPackageManager();
+        if(!(pm.hasSystemFeature(PackageManager.FEATURE_SCREEN_LANDSCAPE)
+                && pm.hasSystemFeature(PackageManager.FEATURE_SCREEN_PORTRAIT))){
+            return;
+        }
 
         runTestOnUiThread(new Runnable() {
             public void run() {
