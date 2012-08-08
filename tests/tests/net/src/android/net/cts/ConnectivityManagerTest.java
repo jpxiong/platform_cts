@@ -120,9 +120,14 @@ public class ConnectivityManagerTest extends AndroidTestCase {
                     invalidateFeature));
         }
 
-        // Should return failure(-1) because MMS is not supported on WIFI.
-        assertEquals(failureCode, mCm.startUsingNetworkFeature(TYPE_WIFI, mmsFeature));
-        assertEquals(failureCode, mCm.stopUsingNetworkFeature(TYPE_WIFI, mmsFeature));
+        ni = mCm.getNetworkInfo(TYPE_WIFI);
+        if (ni != null) {
+            // Should return failure(-1) because MMS is not supported on WIFI.
+            assertEquals(failureCode, mCm.startUsingNetworkFeature(TYPE_WIFI,
+                    mmsFeature));
+            assertEquals(failureCode, mCm.stopUsingNetworkFeature(TYPE_WIFI,
+                    mmsFeature));
+        }
     }
 
     public void testRequestRouteToHost() {
