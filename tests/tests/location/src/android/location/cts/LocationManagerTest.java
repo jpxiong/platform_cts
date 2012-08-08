@@ -37,6 +37,7 @@ import android.provider.Settings;
 import android.test.InstrumentationTestCase;
 
 import java.util.List;
+import java.lang.Thread;
 
 /**
  * Requires the permissions
