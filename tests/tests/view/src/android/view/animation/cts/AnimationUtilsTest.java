@@ -91,6 +91,10 @@ public class AnimationUtilsTest extends
         long time2 = 0L;
         for (int i = 0; i < 1000 && time1 >= time2; i++) {
             time2 = AnimationUtils.currentAnimationTimeMillis();
+            try {
+                Thread.sleep(1);
+            } catch (java.lang.InterruptedException e) {
+            }
             assertTrue(time2 > 0);
         }
         assertTrue(time2 > time1);
