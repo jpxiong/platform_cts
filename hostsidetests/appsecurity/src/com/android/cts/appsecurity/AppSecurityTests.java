@@ -84,6 +84,9 @@ public class AppSecurityTests extends DeviceTestCase implements IBuildReceiver {
     // testPermissionDiffCert constants
     private static final String DECLARE_PERMISSION_APK = "CtsPermissionDeclareApp.apk";
     private static final String DECLARE_PERMISSION_PKG = "com.android.cts.permissiondeclareapp";
+    private static final String DECLARE_PERMISSION_COMPAT_APK = "CtsPermissionDeclareAppCompat.apk";
+    private static final String DECLARE_PERMISSION_COMPAT_PKG = "com.android.cts.permissiondeclareappcompat";
+
     private static final String PERMISSION_DIFF_CERT_APK = "CtsUsePermissionDiffCert.apk";
     private static final String PERMISSION_DIFF_CERT_PKG =
         "com.android.cts.usespermissiondiffcertapp";
@@ -311,11 +314,17 @@ public class AppSecurityTests extends DeviceTestCase implements IBuildReceiver {
         try {
             // cleanup test app that might be installed from previous partial test run
             getDevice().uninstallPackage(DECLARE_PERMISSION_PKG);
+            getDevice().uninstallPackage(DECLARE_PERMISSION_COMPAT_PKG);
             getDevice().uninstallPackage(PERMISSION_DIFF_CERT_PKG);
 
             String installResult = getDevice().installPackage(
                     getTestAppFile(DECLARE_PERMISSION_APK), false);
             assertNull(String.format("failed to install declare permission app. Reason: %s",
+                    installResult), installResult);
+
+            installResult = getDevice().installPackage(
+                    getTestAppFile(DECLARE_PERMISSION_COMPAT_APK), false);
+            assertNull(String.format("failed to install declare permission compat app. Reason: %s",
                     installResult), installResult);
 
             // the app will install, but will get error at runtime
@@ -329,6 +338,7 @@ public class AppSecurityTests extends DeviceTestCase implements IBuildReceiver {
         }
         finally {
             getDevice().uninstallPackage(DECLARE_PERMISSION_PKG);
+            getDevice().uninstallPackage(DECLARE_PERMISSION_COMPAT_PKG);
             getDevice().uninstallPackage(PERMISSION_DIFF_CERT_PKG);
         }
     }

@@ -18,6 +18,7 @@ cts_security_apps_list := \
 	CtsExternalStorageApp \
 	CtsInstrumentationAppDiffCert \
 	CtsPermissionDeclareApp \
+	CtsPermissionDeclareAppCompat \
 	CtsSharedUidInstall \
 	CtsSharedUidInstallDiffCert \
 	CtsSimpleAppInstall \

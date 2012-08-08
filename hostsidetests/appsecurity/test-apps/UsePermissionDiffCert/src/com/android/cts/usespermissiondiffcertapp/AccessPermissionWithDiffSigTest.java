@@ -45,9 +45,12 @@ public class AccessPermissionWithDiffSigTest extends AndroidTestCase {
             "content://ctspermissionwithsignaturepathrestricting");
     private static final Uri PRIV_URI = Uri.parse("content://ctsprivateprovider");
     private static final Uri PRIV_URI_GRANTING = Uri.parse("content://ctsprivateprovidergranting");
-
     private static final String EXPECTED_MIME_TYPE = "got/theMIME";
-    
+
+    private static final Uri AMBIGUOUS_URI_COMPAT = Uri.parse("content://ctsambiguousprovidercompat");
+    private static final String EXPECTED_MIME_TYPE_AMBIGUOUS = "got/theUnspecifiedMIME";
+    private static final Uri AMBIGUOUS_URI = Uri.parse("content://ctsambiguousprovider");
+
     private void assertReadingContentUriNotAllowed(Uri uri, String msg) {
         try {
             getContext().getContentResolver().query(uri, null, null, null, null);
@@ -61,7 +64,7 @@ public class AccessPermissionWithDiffSigTest extends AndroidTestCase {
         try {
             getContext().getContentResolver().query(uri, null, null, null, null);
         } catch (SecurityException e) {
-            fail("unexpected SecurityException reading " + uri);
+            fail("unexpected SecurityException reading " + uri + ": " + e.getMessage());
         }
     }
 
@@ -98,7 +101,7 @@ public class AccessPermissionWithDiffSigTest extends AndroidTestCase {
         try {
             getContext().getContentResolver().insert(uri, new ContentValues());
         } catch (SecurityException e) {
-            fail("unexpected SecurityException writing " + uri);
+            fail("unexpected SecurityException writing " + uri + ": " + e.getMessage());
         }
     }
 
@@ -145,8 +148,35 @@ public class AccessPermissionWithDiffSigTest extends AndroidTestCase {
      * since it is not exported from its app.
      */
     public void testReadProviderWhenPrivate() {
-        assertReadingContentUriNotAllowed(PRIV_URI,
-                "shouldn't read private provider");
+        assertReadingContentUriNotAllowed(PRIV_URI, "shouldn't read private provider");
+    }
+
+    /**
+     * Test that the ctsambiguousprovider content provider cannot be read,
+     * since it doesn't have an "exported=" line.
+     */
+    public void testReadProviderWhenAmbiguous() {
+        assertReadingContentUriNotAllowed(AMBIGUOUS_URI, "shouldn't read ambiguous provider");
+    }
+
+    /**
+     * Old App Compatibility Test
+     *
+     * Test that the ctsambiguousprovidercompat content provider can be read for older
+     * API versions, because it didn't specify either exported=true or exported=false.
+     */
+    public void testReadProviderWhenAmbiguousCompat() {
+        assertReadingContentUriAllowed(AMBIGUOUS_URI_COMPAT);
+    }
+
+    /**
+     * Old App Compatibility Test
+     *
+     * Test that the ctsambiguousprovidercompat content provider can be written for older
+     * API versions, because it didn't specify either exported=true or exported=false.
+     */
+    public void testWriteProviderWhenAmbiguousCompat() {
+        assertWritingContentUriAllowed(AMBIGUOUS_URI_COMPAT);
     }
 
     /**
@@ -154,8 +184,15 @@ public class AccessPermissionWithDiffSigTest extends AndroidTestCase {
      * since it is not exported from its app.
      */
     public void testWriteProviderWhenPrivate() {
-        assertWritingContentUriNotAllowed(PRIV_URI,
-                "shouldn't write private provider");
+        assertWritingContentUriNotAllowed(PRIV_URI, "shouldn't write private provider");
+    }
+
+    /**
+     * Test that the ctsambiguousprovider content provider cannot be written,
+     * since it doesn't have an exported= line.
+     */
+    public void testWriteProviderWhenAmbiguous() {
+        assertWritingContentUriNotAllowed(AMBIGUOUS_URI, "shouldn't write ambiguous provider");
     }
 
     private static ClipData makeSingleClipData(Uri uri) {
@@ -447,6 +484,14 @@ public class AccessPermissionWithDiffSigTest extends AndroidTestCase {
      */
     public void testGrantPrivateNonGrantingFail() {
         doTestGrantUriPermissionFail(PRIV_URI);
+    }
+
+    /**
+     * Test that the ctsambiguousprovider content provider can not grant
+     * URI permissions to others.
+     */
+    public void testGrantAmbiguousNonGrantingFail() {
+        doTestGrantUriPermissionFail(AMBIGUOUS_URI);
     }
 
     /**
@@ -1083,5 +1128,27 @@ public class AccessPermissionWithDiffSigTest extends AndroidTestCase {
         
         // All apps should be able to get MIME type even if provider is private.
         assertEquals(getContext().getContentResolver().getType(PRIV_URI), EXPECTED_MIME_TYPE);
+    }
+
+    public void testGetMimeTypeAmbiguous() {
+        // Precondition: no current access.
+        assertReadingContentUriNotAllowed(AMBIGUOUS_URI, "shouldn't read when starting test");
+        assertWritingContentUriNotAllowed(AMBIGUOUS_URI, "shouldn't write when starting test");
+
+        // All apps should be able to get MIME type even if provider is private.
+        assertEquals(getContext().getContentResolver().getType(AMBIGUOUS_URI), EXPECTED_MIME_TYPE);
+    }
+
+    /**
+     * Old App Compatibility Test
+     *
+     * We should be able to access the mime type of a content provider of an older
+     * application, even if that application didn't explicitly declare either
+     * exported=true or exported=false
+     */
+    public void testGetMimeTypeAmbiguousCompat() {
+        // All apps should be able to get MIME type even if provider is private.
+        assertEquals(EXPECTED_MIME_TYPE_AMBIGUOUS,
+                getContext().getContentResolver().getType(AMBIGUOUS_URI_COMPAT));
     }
 }
