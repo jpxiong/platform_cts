@@ -20,6 +20,7 @@ import java.util.Locale;
 import android.test.AndroidTestCase;
 import android.text.AutoText;
 import android.view.View;
+import android.content.res.Configuration;
 
 public class AutoTextTest extends AndroidTestCase {
 
@@ -30,6 +31,11 @@ public class AutoTextTest extends AndroidTestCase {
 
         // set local as English.
         Locale.setDefault(Locale.ENGLISH);
+        Configuration config = getContext().getResources().getConfiguration();
+        if (!config.locale.equals(Locale.getDefault())) {
+                config.locale = Locale.getDefault();
+                getContext().getResources().updateConfiguration(config, null);
+        }
         // New a View instance.
         View view = new View(getContext());
 
@@ -71,6 +77,11 @@ public class AutoTextTest extends AndroidTestCase {
 
     public void testGetSize() {
         Locale.setDefault(Locale.ENGLISH);
+        Configuration config = getContext().getResources().getConfiguration();
+        if (!config.locale.equals(Locale.getDefault())) {
+                config.locale = Locale.getDefault();
+                getContext().getResources().updateConfiguration(config, null);
+        }
         View view = new View(getContext());
         // Returns the size of the auto text dictionary. Just make sure it is bigger than 0.
         assertTrue(AutoText.getSize(view) > 0);
