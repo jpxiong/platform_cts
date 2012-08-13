@@ -31,7 +31,7 @@
 			<sequential repeat="8" index="j">
 				<input device="host" id="host_in" gain="100" time="500" sync="complete" />
 				<!-- ------------moving average RMS        min for pass, max for pass                result calculated -->
-				<process method="builtin:rms_mva" input="id:host_in,consti:3000,consti:8000" output="val:rms_$i_$j" />
+				<process method="builtin:rms_mva" input="id:host_in,consti:1000,consti:8000" output="val:rms_$i_$j" />
 				<!-- <message input="val:passfail" output_low="Volume Low" output_ok="Volume OK" output_high="Volume High" /> -->
 			</sequential>
 		</sequential>
