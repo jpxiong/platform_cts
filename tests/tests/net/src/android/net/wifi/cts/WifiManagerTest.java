@@ -21,17 +21,22 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.net.NetworkInfo;
 import android.net.wifi.ScanResult;
 import android.net.wifi.WifiConfiguration;
-import android.net.wifi.WifiManager;
 import android.net.wifi.WifiConfiguration.Status;
+import android.net.wifi.WifiManager;
+import android.net.wifi.WifiManager.TxPacketCountListener;
 import android.net.wifi.WifiManager.WifiLock;
 import android.test.AndroidTestCase;
 import android.util.Log;
 
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class WifiManagerTest extends AndroidTestCase {
     private static class MySync {
@@ -42,6 +47,7 @@ public class WifiManagerTest extends AndroidTestCase {
     private WifiLock mWifiLock;
     private static MySync mMySync;
     private List<ScanResult> mScanResult = null;
+    private NetworkInfo mNetworkInfo;
 
     // Please refer to WifiManager
     private static final int MIN_RSSI = -100;
@@ -77,6 +83,13 @@ public class WifiManagerTest extends AndroidTestCase {
                 synchronized (mMySync) {
                     mMySync.expectedState = STATE_WIFI_CHANGED;
                     mMySync.notify();
+                }
+            } else if (action.equals(WifiManager.NETWORK_STATE_CHANGED_ACTION)) {
+                synchronized (mMySync) {
+                    mNetworkInfo =
+                            (NetworkInfo) intent.getParcelableExtra(WifiManager.EXTRA_NETWORK_INFO);
+                    if (mNetworkInfo.getState() == NetworkInfo.State.CONNECTED)
+                        mMySync.notify();
                 }
             }
         }
@@ -145,6 +158,18 @@ public class WifiManagerTest extends AndroidTestCase {
             long timeout = System.currentTimeMillis() + TIMEOUT_MSEC;
             while (System.currentTimeMillis() < timeout && mMySync.expectedState == STATE_SCANING)
                 mMySync.wait(WAIT_MSEC);
+        }
+    }
+
+    private void connectWifi() throws Exception {
+        synchronized (mMySync) {
+            if (mNetworkInfo.getState() == NetworkInfo.State.CONNECTED) return;
+            assertTrue(mWifiManager.reconnect());
+            long timeout = System.currentTimeMillis() + TIMEOUT_MSEC;
+            while (System.currentTimeMillis() < timeout
+                    && mNetworkInfo.getState() != NetworkInfo.State.CONNECTED)
+                mMySync.wait(WAIT_MSEC);
+            assertTrue(mNetworkInfo.getState() == NetworkInfo.State.CONNECTED);
         }
     }
 
@@ -338,5 +363,66 @@ public class WifiManagerTest extends AndroidTestCase {
         rssiA = 5;
         rssiB = 4;
         assertTrue(WifiManager.compareSignalLevel(rssiA, rssiB) > 0);
+    }
+
+    private int getTxPacketCount() throws Exception {
+        final AtomicInteger ret = new AtomicInteger(-1);
+
+        mWifiManager.getTxPacketCount(new TxPacketCountListener() {
+            @Override
+            public void onSuccess(int count) {
+                ret.set(count);
+            }
+            @Override
+            public void onFailure(int reason) {
+                ret.set(0);
+            }
+        });
+
+        long timeout = System.currentTimeMillis() + TIMEOUT_MSEC;
+        while (ret.get() < 0 && System.currentTimeMillis() < timeout)
+            Thread.sleep(WAIT_MSEC);
+        assertTrue(ret.get() >= 0);
+        return ret.get();
+    }
+
+    /**
+     * The new WiFi watchdog requires kernel/driver to export some packet loss
+     * counters. This CTS tests whether those counters are correctly exported.
+     * To pass this CTS test, a connected WiFi link is required.
+     */
+    public void testWifiWatchdog() throws Exception {
+        // Make sure WiFi is enabled
+        if (!mWifiManager.isWifiEnabled()) {
+            setWifiEnabled(true);
+            Thread.sleep(DURATION);
+        }
+        assertTrue(mWifiManager.isWifiEnabled());
+
+        // Wait for a WiFi connection
+        connectWifi();
+
+        // Read TX packet counter
+        int txcount1 = getTxPacketCount();
+
+        // Do some network operations
+        HttpURLConnection connection = null;
+        try {
+            URL url = new URL("http://www.google.com/");
+            connection = (HttpURLConnection) url.openConnection();
+            connection.setInstanceFollowRedirects(false);
+            connection.setConnectTimeout(TIMEOUT_MSEC);
+            connection.setReadTimeout(TIMEOUT_MSEC);
+            connection.setUseCaches(false);
+            connection.getInputStream();
+        } catch (Exception e) {
+            // ignore
+        } finally {
+            if (connection != null) connection.disconnect();
+        }
+
+        // Read TX packet counter again and make sure it increases
+        int txcount2 = getTxPacketCount();
+        assertTrue(txcount2 > txcount1);
     }
 }
