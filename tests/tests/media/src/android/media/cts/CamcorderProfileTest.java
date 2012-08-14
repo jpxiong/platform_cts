@@ -266,6 +266,7 @@ public class CamcorderProfileTest extends AndroidTestCase {
                 return true;
             }
         }
+        Log.e(TAG, "Size (" + width + "x" + height + ") is not supported");
         return false;
     }
 }
