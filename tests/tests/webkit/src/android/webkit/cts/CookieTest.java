@@ -45,23 +45,6 @@ public class CookieTest extends AndroidTestCase {
             }
         }
         assertFalse(mCookieManager.hasCookies());
-
-    }
-
-    public void testParse() {
-        String url = "http://www.foo.com";
-
-        // basic
-        mCookieManager.setCookie(url, "a=b");
-        String cookie = mCookieManager.getCookie(url);
-        assertTrue(cookie.equals("a=b"));
-
-        // quoted
-        mCookieManager.setCookie(url, "c=\"d;\"");
-        cookie = mCookieManager.getCookie(url);
-
-        assertTrue(cookie.contains("a=b"));
-        assertTrue(cookie.contains("c=\"d;\""));
     }
 
     public void testDomain() {
