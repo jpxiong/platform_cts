@@ -124,6 +124,19 @@ class CtsBuilder(object):
     plan.Include(r'android\.tests\.appsecurity')
     self.__WritePlan(plan, 'AppSecurity')
 
+    # hard-coded white list for PDK plan
+    plan.Exclude('.*')
+    plan.Include('android\.bluetooth')
+    plan.Include('android\.graphics.*')
+    plan.Include('android\.hardware')
+    plan.Include('android\.media.*')
+    plan.Include('android\.net')
+    plan.Include('android\.opengl.*')
+    plan.Include('android\.renderscript')
+    plan.Include('android\.telephony')
+    plan.Include('android\.nativemedia.*')
+    self.__WritePlan(plan, 'PDK')
+
 def LogGenerateDescription(name):
   print 'Generating test description for package %s' % name
 
