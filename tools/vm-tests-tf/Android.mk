@@ -40,8 +40,13 @@ $(LOCAL_BUILT_MODULE): PRIVATE_CLASS_INTERMEDIATES_DIR := $(intermediates)/class
 
 TF_BUILD_UTIL_INTERMEDIATES_CLASSES := $(intermediates)/classes
 
+
 include $(CLEAR_VARS)
 
+# Not sure exactly what's going on here, but it looks like we're just trying
+# to get an intermediates directory to put staging stuff into, not actually
+# have a binary that's installed.
+LOCAL_UNINSTALLABLE_MODULE := true
 LOCAL_IS_HOST_MODULE := true
 LOCAL_MODULE_CLASS := EXECUTABLES
 LOCAL_MODULE := vm-tests-tf
