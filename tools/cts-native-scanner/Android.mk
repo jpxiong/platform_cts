@@ -34,10 +34,5 @@ $(LOCAL_BUILT_MODULE): $(LOCAL_PATH)/etc/$(LOCAL_MODULE) | $(ACP)
 	$(copy-file-to-new-target)
 	$(hide) chmod 755 $@
 
-# the other stuff
-# ============================================================
-subdirs := $(addprefix $(LOCAL_PATH)/,$(addsuffix /Android.mk, \
-		src \
-	))
-
-include $(subdirs)
+# Build all sub-directories
+include $(call all-makefiles-under,$(LOCAL_PATH))
