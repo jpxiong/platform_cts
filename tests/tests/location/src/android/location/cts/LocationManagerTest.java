@@ -33,6 +33,7 @@ import android.location.GpsStatus.Listener;
 import android.os.Bundle;
 import android.os.HandlerThread;
 import android.os.Looper;
+import android.os.SystemClock;
 import android.provider.Settings;
 import android.test.InstrumentationTestCase;
 
@@ -52,6 +53,8 @@ public class LocationManagerTest extends InstrumentationTestCase {
     private static final String TEST_MOCK_PROVIDER_NAME = "test_provider";
 
     private static final String UNKNOWN_PROVIDER_NAME = "unknown_provider";
+
+    private static final String FUSED_PROVIDER_NAME = "fused";
 
     private LocationManager mManager;
 
@@ -453,7 +456,7 @@ public class LocationManagerTest extends InstrumentationTestCase {
         i.setAction("android.location.cts.TEST_GET_GPS_STATUS_ACTION");
         PendingIntent pi = PendingIntent.getBroadcast(mContext, 0, i, PendingIntent.FLAG_ONE_SHOT);
 
-        mManager.addProximityAlert(0, 0, 0, 5000, pi);
+        mManager.addProximityAlert(0, 0, 1.0f, 5000, pi);
         mManager.removeProximityAlert(pi);
     }
 
@@ -619,12 +622,17 @@ public class LocationManagerTest extends InstrumentationTestCase {
      * @param expiration - expiration of proximity alert
      */
     private void doTestEnterProximity(long expiration) throws Exception {
+        // need to mock the fused location provider for proximity tests
+        mockFusedLocation();
+
         // update location to outside proximity range
-        updateLocation(30, 30);
+        updateLocation(FUSED_PROVIDER_NAME, 30, 30);
         registerProximityListener(0, 0, 1000, expiration);
-        updateLocation(0, 0);
+        updateLocation(FUSED_PROVIDER_NAME, 0, 0);
         waitForReceiveBroadcast();
         assertProximityType(true);
+
+        unmockFusedLocation();
     }
 
     private void registerIntentReceiver() {
@@ -675,13 +683,22 @@ public class LocationManagerTest extends InstrumentationTestCase {
         Location location = new Location(providerName);
         location.setLatitude(latitude);
         location.setLongitude(longitude);
-
+        location.setAccuracy(1.0f);
         location.setTime(java.lang.System.currentTimeMillis());
+        location.setElapsedRealtimeNano(SystemClock.elapsedRealtimeNano());
         mManager.setTestProviderLocation(providerName, location);
     }
 
     private void updateLocation(final double latitude, final double longitude) {
         updateLocation(TEST_MOCK_PROVIDER_NAME, latitude, longitude);
+    }
+
+    private void mockFusedLocation() {
+        addTestProvider(FUSED_PROVIDER_NAME);
+    }
+
+    private void unmockFusedLocation() {
+        mManager.removeTestProvider(FUSED_PROVIDER_NAME);
     }
 
     /**
