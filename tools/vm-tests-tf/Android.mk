@@ -42,6 +42,7 @@ TF_BUILD_UTIL_INTERMEDIATES_CLASSES := $(intermediates)/classes
 
 include $(CLEAR_VARS)
 
+LOCAL_UNINSTALLABLE_MODULE := true
 LOCAL_IS_HOST_MODULE := true
 LOCAL_MODULE_CLASS := EXECUTABLES
 LOCAL_MODULE := vm-tests-tf
@@ -70,7 +71,7 @@ $(GENERATED_FILES): $(HOST_OUT_JAVA_LIBRARIES)/cts-tf-dalvik-buildutil.jar $(HOS
 # generated and compile the host side junit tests
 	$(hide) java -cp $(subst $(space),$(colon),$^):$(HOST_JDK_TOOLS_JAR) util.build.BuildDalvikSuite $(PRIVATE_SRC_FOLDER) $(PRIVATE_INTERMEDIATES) $<:$(PRIVATE_LIB_FOLDER)/junit.jar:$(HOST_OUT_JAVA_LIBRARIES)/tradefed-prebuilt.jar $(PRIVATE_INTERMEDIATES_MAIN_FILES) $(TF_BUILD_UTIL_INTERMEDIATES_CLASSES) $(PRIVATE_INTERMEDIATES_HOSTJUNIT_FILES) $$RUN_VM_TESTS_RTO
 	@echo "wrote generated Main_*.java files to $(PRIVATE_INTERMEDIATES_MAIN_FILES)"
-INSTALLED_TESTS := $(dir $(LOCAL_INSTALLED_MODULE))../cts_dalviktests_tf/timestamp
+INSTALLED_TESTS := $(dir $(LOCAL_BUILT_MODULE))../cts_dalviktests_tf/timestamp
 
 $(LOCAL_BUILT_MODULE):  $(INSTALLED_TESTS)
 
