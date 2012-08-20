@@ -52,9 +52,9 @@ public class DateUtilsTest extends AndroidTestCase {
                 DateUtils.getDayOfWeekString(Calendar.SUNDAY, DateUtils.LENGTH_LONG));
         assertEquals("Sun",
                 DateUtils.getDayOfWeekString(Calendar.SUNDAY, DateUtils.LENGTH_MEDIUM));
-        assertEquals("Su",
+        assertEquals("Sun",
                 DateUtils.getDayOfWeekString(Calendar.SUNDAY, DateUtils.LENGTH_SHORT));
-        assertEquals("Su",
+        assertEquals("Sun",
                 DateUtils.getDayOfWeekString(Calendar.SUNDAY, DateUtils.LENGTH_SHORTER));
         assertEquals("S",
                 DateUtils.getDayOfWeekString(Calendar.SUNDAY, DateUtils.LENGTH_SHORTEST));
@@ -83,8 +83,8 @@ public class DateUtilsTest extends AndroidTestCase {
         if (!LocaleUtils.isCurrentLocale(mContext, Locale.US)) {
             return;
         }
-        assertEquals("am", DateUtils.getAMPMString(Calendar.AM));
-        assertEquals("pm", DateUtils.getAMPMString(Calendar.PM));
+        assertEquals("AM", DateUtils.getAMPMString(Calendar.AM));
+        assertEquals("PM", DateUtils.getAMPMString(Calendar.PM));
     }
 
 
@@ -169,7 +169,7 @@ public class DateUtilsTest extends AndroidTestCase {
                 + HOUR_DURATION, DateUtils.FORMAT_SHOW_WEEKDAY));
         assertEquals("January 19", DateUtils.formatDateRange(mContext, timeWithCurrentYear,
                 timeWithCurrentYear + HOUR_DURATION, DateUtils.FORMAT_SHOW_DATE));
-        assertEquals("3:30am", DateUtils.formatDateRange(mContext, fixedTime, fixedTime,
+        assertEquals("3:30AM", DateUtils.formatDateRange(mContext, fixedTime, fixedTime,
                 DateUtils.FORMAT_SHOW_TIME));
         assertEquals("January 19, 2009", DateUtils.formatDateRange(mContext, fixedTime,
                 fixedTime + HOUR_DURATION, DateUtils.FORMAT_SHOW_YEAR));
@@ -177,7 +177,7 @@ public class DateUtilsTest extends AndroidTestCase {
                 timeWithCurrentYear + HOUR_DURATION, DateUtils.FORMAT_NO_YEAR));
         assertEquals("January", DateUtils.formatDateRange(mContext, timeWithCurrentYear,
                 timeWithCurrentYear + HOUR_DURATION, DateUtils.FORMAT_NO_MONTH_DAY));
-        assertEquals("3:30am", DateUtils.formatDateRange(mContext, fixedTime, fixedTime,
+        assertEquals("3:30AM", DateUtils.formatDateRange(mContext, fixedTime, fixedTime,
                 DateUtils.FORMAT_12HOUR | DateUtils.FORMAT_SHOW_TIME));
         assertEquals("03:30", DateUtils.formatDateRange(mContext, fixedTime, fixedTime,
                 DateUtils.FORMAT_24HOUR | DateUtils.FORMAT_SHOW_TIME));
@@ -188,14 +188,14 @@ public class DateUtilsTest extends AndroidTestCase {
         assertEquals("Noon", DateUtils.formatDateRange(mContext, fixedTime + noonDuration,
                 fixedTime + noonDuration,
                 DateUtils.FORMAT_12HOUR | DateUtils.FORMAT_SHOW_TIME | DateUtils.FORMAT_CAP_NOON));
-        assertEquals("12:00pm", DateUtils.formatDateRange(mContext, fixedTime + noonDuration,
+        assertEquals("12:00PM", DateUtils.formatDateRange(mContext, fixedTime + noonDuration,
                 fixedTime + noonDuration,
                 DateUtils.FORMAT_12HOUR | DateUtils.FORMAT_NO_NOON | DateUtils.FORMAT_SHOW_TIME));
-        assertEquals("12:00am", DateUtils.formatDateRange(mContext, fixedTime - midnightDuration,
+        assertEquals("12:00AM", DateUtils.formatDateRange(mContext, fixedTime - midnightDuration,
                 fixedTime - midnightDuration,
                 DateUtils.FORMAT_12HOUR | DateUtils.FORMAT_SHOW_TIME
                 | DateUtils.FORMAT_NO_MIDNIGHT));
-        assertEquals("3:30am", DateUtils.formatDateRange(mContext, fixedTime, fixedTime,
+        assertEquals("3:30AM", DateUtils.formatDateRange(mContext, fixedTime, fixedTime,
                 DateUtils.FORMAT_SHOW_TIME | DateUtils.FORMAT_UTC));
         assertEquals("3am", DateUtils.formatDateRange(mContext, fixedTime - integralDuration,
                 fixedTime - integralDuration,
