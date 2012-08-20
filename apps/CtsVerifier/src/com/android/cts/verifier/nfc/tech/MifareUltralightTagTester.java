@@ -29,7 +29,7 @@ import java.util.Random;
  */
 public class MifareUltralightTagTester implements TagTester {
 
-    private static final int USER_PAGE_OFFSET = 4;
+    private static final int USER_PAGE_OFFSET = 5;
 
     private static final int NUM_PAGES = 4;
 
