@@ -61,7 +61,7 @@ import android.view.View.OnTouchListener;
 import android.view.ViewConfiguration;
 import android.view.ViewGroup;
 import android.view.ViewParent;
-import android.view.WindowManagerImpl;
+import android.view.WindowManager;
 import android.view.accessibility.AccessibilityEvent;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
@@ -2730,7 +2730,8 @@ public class ViewTest extends ActivityInstrumentationTestCase2<ViewTestStubActiv
         Rect outRect = new Rect();
         View view = new View(mActivity);
         // mAttachInfo is null
-        Display d = WindowManagerImpl.getDefault().getDefaultDisplay();
+        WindowManager wm = (WindowManager)mActivity.getSystemService(Context.WINDOW_SERVICE);
+        Display d = wm.getDefaultDisplay();
         view.getWindowVisibleDisplayFrame(outRect);
         assertEquals(0, outRect.left);
         assertEquals(0, outRect.top);
