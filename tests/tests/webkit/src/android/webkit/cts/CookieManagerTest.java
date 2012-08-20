@@ -68,7 +68,7 @@ public class CookieManagerTest extends
         CtsTestServer server = new CtsTestServer(getActivity(), false);
         String url = server.getCookieUrl("conquest.html");
         mOnUiThread.loadUrlAndWaitForCompletion(url);
-        assertEquals(null, mOnUiThread.getTitle()); // no cookies passed
+        assertEquals("0", mOnUiThread.getTitle()); // no cookies passed
         Thread.sleep(500);
         assertNull(mCookieManager.getCookie(url));
 
@@ -77,7 +77,7 @@ public class CookieManagerTest extends
 
         url = server.getCookieUrl("war.html");
         mOnUiThread.loadUrlAndWaitForCompletion(url);
-        assertEquals(null, mOnUiThread.getTitle()); // no cookies passed
+        assertEquals("0", mOnUiThread.getTitle()); // no cookies passed
         waitForCookie(url);
         String cookie = mCookieManager.getCookie(url);
         assertNotNull(cookie);
@@ -89,7 +89,7 @@ public class CookieManagerTest extends
 
         url = server.getCookieUrl("famine.html");
         mOnUiThread.loadUrlAndWaitForCompletion(url);
-        assertEquals("count=0", mOnUiThread.getTitle()); // outgoing cookie
+        assertEquals("1|count=0", mOnUiThread.getTitle()); // outgoing cookie
         waitForCookie(url);
         cookie = mCookieManager.getCookie(url);
         assertNotNull(cookie);
@@ -100,7 +100,7 @@ public class CookieManagerTest extends
         url = server.getCookieUrl("death.html");
         mCookieManager.setCookie(url, "count=41");
         mOnUiThread.loadUrlAndWaitForCompletion(url);
-        assertEquals("count=41", mOnUiThread.getTitle()); // outgoing cookie
+        assertEquals("1|count=41", mOnUiThread.getTitle()); // outgoing cookie
         waitForCookie(url);
         cookie = mCookieManager.getCookie(url);
         assertNotNull(cookie);
