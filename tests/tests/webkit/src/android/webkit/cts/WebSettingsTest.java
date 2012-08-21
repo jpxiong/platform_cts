@@ -164,7 +164,7 @@ public class WebSettingsTest extends ActivityInstrumentationTestCase2<WebViewStu
         assertEquals(1, mSettings.getUserAgent());
         mOnUiThread.loadUrlAndWaitForCompletion(url);
         String userAgent1 = mOnUiThread.getTitle();
-        assertNotNull(userAgent1);
+        assertEquals(userAgent1, mSettings.getUserAgentString());
 
         mSettings.setUserAgent(3);
         assertEquals(1, mSettings.getUserAgent());
@@ -175,7 +175,7 @@ public class WebSettingsTest extends ActivityInstrumentationTestCase2<WebViewStu
         assertEquals(2, mSettings.getUserAgent());
         mOnUiThread.loadUrlAndWaitForCompletion(url);
         String userAgent2 = mOnUiThread.getTitle();
-        assertNotNull(userAgent2);
+        assertEquals(userAgent2, mSettings.getUserAgentString());
 
         mSettings.setUserAgent(3);
         assertEquals(2, mSettings.getUserAgent());
@@ -186,7 +186,7 @@ public class WebSettingsTest extends ActivityInstrumentationTestCase2<WebViewStu
         assertEquals(0, mSettings.getUserAgent());
         mOnUiThread.loadUrlAndWaitForCompletion(url);
         String userAgent0 = mOnUiThread.getTitle();
-        assertNotNull(userAgent0);
+        assertEquals(userAgent0, mSettings.getUserAgentString());
 
         final String customUserAgent = "Cts/Test";
         mSettings.setUserAgentString(customUserAgent);
@@ -387,11 +387,9 @@ public class WebSettingsTest extends ActivityInstrumentationTestCase2<WebViewStu
         new PollingCheck(WEBVIEW_TIMEOUT) {
             @Override
             protected boolean check() {
-                String title = mOnUiThread.getTitle();
-                return title != null && title.length() > 0;
+                return "Popup blocked".equals(mOnUiThread.getTitle());
             }
         }.run();
-        assertEquals("Popup blocked", mOnUiThread.getTitle());
 
         mSettings.setJavaScriptCanOpenWindowsAutomatically(true);
         assertTrue(mSettings.getJavaScriptCanOpenWindowsAutomatically());
@@ -399,15 +397,9 @@ public class WebSettingsTest extends ActivityInstrumentationTestCase2<WebViewStu
         new PollingCheck(WEBVIEW_TIMEOUT) {
             @Override
             protected boolean check() {
-                String title = mOnUiThread.getTitle();
-                // The title may not change immediately after loading, so
-                // we have to discount the initial "Popup blocked" from the
-                // previous load.
-                return title != null && title.length() > 0
-                        && !title.equals("Popup blocked");
+                return "Popup allowed".equals(mOnUiThread.getTitle());
             }
         }.run();
-        assertEquals("Popup allowed", mOnUiThread.getTitle());
     }
 
     public void testAccessJavaScriptEnabled() throws Exception {
@@ -417,10 +409,9 @@ public class WebSettingsTest extends ActivityInstrumentationTestCase2<WebViewStu
         new PollingCheck(WEBVIEW_TIMEOUT) {
             @Override
             protected boolean check() {
-                return mOnUiThread.getTitle() != null;
+                return "javascript on".equals(mOnUiThread.getTitle());
             }
         }.run();
-        assertEquals("javascript on", mOnUiThread.getTitle());
 
         mSettings.setJavaScriptEnabled(false);
         assertFalse(mSettings.getJavaScriptEnabled());
@@ -428,10 +419,10 @@ public class WebSettingsTest extends ActivityInstrumentationTestCase2<WebViewStu
         new PollingCheck(WEBVIEW_TIMEOUT) {
             @Override
             protected boolean check() {
-                return mOnUiThread.getTitle() != null;
+                return "javascript off".equals(mOnUiThread.getTitle());
             }
         }.run();
-        assertEquals("javascript off", mOnUiThread.getTitle());
+
     }
 
     public void testAccessLayoutAlgorithm() {
