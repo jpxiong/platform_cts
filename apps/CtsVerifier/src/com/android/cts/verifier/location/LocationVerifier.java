@@ -58,6 +58,14 @@ public class LocationVerifier implements Handler.Callback {
             long delta = timestamp - mLastActiveTimestamp;
             mLastActiveTimestamp = timestamp;
 
+            if (location.getAccuracy() <= 0.0) {
+                fail(mProvider + " location has invalid accuracy: " + location.getAccuracy());
+            }
+            if (location.getElapsedRealtimeNano() <= 0) {
+                fail(mProvider + " location has invalid elapsed realtime: " +
+                        location.getElapsedRealtimeNano());
+            }
+
             if (mNumActiveUpdates != 1 && delta < mMinActiveInterval) {
                 fail(mProvider + " location updated too fast: " + delta + "ms < " +
                         mMinActiveInterval + "ms");
@@ -99,6 +107,14 @@ public class LocationVerifier implements Handler.Callback {
             long timestamp = location.getTime();
             long delta = timestamp - mLastPassiveTimestamp;
             mLastPassiveTimestamp = timestamp;
+
+            if (location.getAccuracy() <= 0.0) {
+                fail(mProvider + " location has invalid accuracy: " + location.getAccuracy());
+            }
+            if (location.getElapsedRealtimeNano() <= 0) {
+                fail(mProvider + " location has invalid elapsed realtime: " +
+                        location.getElapsedRealtimeNano());
+            }
 
             if (mNumPassiveUpdates != 1 && delta < mMinPassiveInterval) {
                 fail("passive " + mProvider + " location updated too fast: " + delta + "ms < " +
