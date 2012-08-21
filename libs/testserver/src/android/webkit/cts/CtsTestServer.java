@@ -544,12 +544,11 @@ public class CtsTestServer {
             Header[] cookies = request.getHeaders("Cookie");
             Pattern p = Pattern.compile("count=(\\d+)");
             StringBuilder cookieString = new StringBuilder(100);
+            cookieString.append(cookies.length);
             int count = 0;
             for (Header cookie : cookies) {
+                cookieString.append("|");
                 String value = cookie.getValue();
-                if (cookieString.length() > 0) {
-                    cookieString.append("|");
-                }
                 cookieString.append(value);
                 Matcher m = p.matcher(value);
                 if (m.find()) {
