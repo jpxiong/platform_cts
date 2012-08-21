@@ -84,8 +84,31 @@ public class SmsManagerTest extends AndroidTestCase {
                     "310000",   // Tracfone
                     "46003",    // China Telecom
                     "311230",   // C SPire Wireless + Celluar South
-                    "310600",   // Cellcom
-                    "31000"     // Republic Wireless US
+                    "310600",    // Cellcom
+                    "31000",     // Republic Wireless US
+                    // Verizon
+                    "310004",
+                    "310012",
+                    "311280",
+                    "311281",
+                    "311282",
+                    "311283",
+                    "311284",
+                    "311285",
+                    "311286",
+                    "311287",
+                    "311288",
+                    "311289",
+                    "311480",
+                    "311481",
+                    "311482",
+                    "311483",
+                    "311484",
+                    "311485",
+                    "311486",
+                    "311487",
+                    "311488",
+                    "311489"
             );
 
     // List of network operators that doesn't support Data(binary) SMS message
@@ -99,7 +122,30 @@ public class SmsManagerTest extends AndroidTestCase {
                     "30237",    // Fido
                     "45008",    // KT
                     "45005",    // SKT Mobility
-                    "45002"     // SKT Mobility
+                    "45002",     // SKT Mobility
+                    // Verizon
+                    "310004",
+                    "310012",
+                    "311280",
+                    "311281",
+                    "311282",
+                    "311283",
+                    "311284",
+                    "311285",
+                    "311286",
+                    "311287",
+                    "311288",
+                    "311289",
+                    "311480",
+                    "311481",
+                    "311482",
+                    "311483",
+                    "311484",
+                    "311485",
+                    "311486",
+                    "311487",
+                    "311488",
+                    "311489"
             );
 
     // List of network operators that doesn't support Maltipart SMS message
