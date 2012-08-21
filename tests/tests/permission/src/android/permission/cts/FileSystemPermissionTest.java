@@ -165,6 +165,13 @@ public class FileSystemPermissionTest extends AndroidTestCase {
         assertFalse(f.canRead());
         assertFalse(f.canWrite());
         assertFalse(f.canExecute());
+
+        FileUtils.FileStatus status = new FileUtils.FileStatus();
+        if (f.exists()
+                && FileUtils.getFileStatus(f.getAbsolutePath(), status, true)) {
+            assertEquals("nfc", FileUtils.getUserName(status.uid));
+            assertEquals("nfc", FileUtils.getGroupName(status.gid));
+        }
     }
 
     @MediumTest
