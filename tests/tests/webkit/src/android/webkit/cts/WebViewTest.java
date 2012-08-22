@@ -755,7 +755,6 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
         final String HTML_CONTENT =
                 "<html><head><title>Hello,World!</title></head><body></body>" +
                 "</html>";
-        assertNull(mOnUiThread.getTitle());
         mOnUiThread.loadDataAndWaitForCompletion(HTML_CONTENT,
                 "text/html", null);
         assertEquals("Hello,World!", mOnUiThread.getTitle());
@@ -781,7 +780,6 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
 
     @UiThreadTest
     public void testLoadDataWithBaseUrl() throws Throwable {
-        assertNull(mWebView.getTitle());
         assertNull(mWebView.getUrl());
         String imgUrl = TestHtmlConstants.SMALL_IMG_URL; // relative
 
