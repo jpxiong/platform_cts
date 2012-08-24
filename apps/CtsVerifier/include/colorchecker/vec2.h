@@ -41,12 +41,9 @@ class Vec2{
     }
 
     inline Vec2<float> operator/ (const int param) const {
-        Vec2<float> temp();
         assert(param != 0);
-        temp.set(static_cast<float>(mX) / static_cast<float>(param),
-                 static_cast<float>(mY) / static_cast<float>(param));
-
-        return temp;
+        return Vec2<float>(static_cast<float>(mX) / static_cast<float>(param),
+                           static_cast<float>(mY) / static_cast<float>(param));
     }
 
     template <class U>
