@@ -30,12 +30,14 @@ import java.util.regex.Pattern;
  * Scanner of C++ gTest source files.
  *
  * It looks for test declarations and outputs a file following this format:
- *
- * class:TestClass1
- * method:testMethod1
- * method:testMethod2
- * class:TestClass2
- * method:testMethod1
+ * suite:TestSuite
+ * case:TestCase1
+ * test:Test1
+ * test:Test2
+ * suite:TestSuite
+ * case:TestCase2
+ * test:Test1
+ * test:Test2
  *
  */
 class TestScanner {
@@ -71,38 +73,36 @@ class TestScanner {
             if (file.isDirectory()) {
                 scanDir(file, testNames);
             } else {
-                scanFile(file, testNames);
+                scanFile(new Scanner(file), testNames);
             }
         }
     }
-    // We want to find lines like class SLObjectCreationTest : public ::testing::Test { ...
-    // and extract the "SLObjectCreationTest" as group #1
-    private static final Pattern CLASS_REGEX =
-            Pattern.compile("\\s*class\\s+(\\w+).*");
 
     // We want to find lines like TEST_F(SLObjectCreationTest, testAudioPlayerFromFdCreation) { ...
-    // and extract the "testAudioPlayerFromFdCreation" as group #1
+    // and extract the "SLObjectCreationTest" as group #1,
+    // "testAudioPlayerFromFdCreation" as group #2
     private static final Pattern METHOD_REGEX =
-            Pattern.compile("\\s*TEST_F\\(\\w+,\\s*(\\w+)\\).*");
+            Pattern.compile("\\s*TEST_F\\((\\w+),\\s*(\\w+)\\).*");
 
-    private void scanFile(File file, List<String> testNames) throws FileNotFoundException {
-        Scanner scanner = null;
+    public void scanFile(Scanner scanner, List<String> testNames) {
         try {
-            scanner = new Scanner(file);
+            String lastCase = "";
             while (scanner.hasNextLine()) {
                 String line = scanner.nextLine();
-                Matcher matcher = CLASS_REGEX.matcher(line);
-                if (matcher.matches()) {
-                    testNames.add("suite:" + mTestSuite);
-                    testNames.add("case:" + matcher.group(1));
+
+                Matcher matcher = METHOD_REGEX.matcher(line);
+
+                if (!matcher.matches()) {
                     continue;
                 }
 
-                matcher = METHOD_REGEX.matcher(line);
-                if (matcher.matches()) {
-                    testNames.add("test:" + matcher.group(1));
-                    continue;
+                if (!lastCase.equals(matcher.group(1))) {
+                    testNames.add("suite:" + mTestSuite);
+                    testNames.add("case:" + matcher.group(1));
+                    lastCase = matcher.group(1);
                 }
+
+                testNames.add("test:" + matcher.group(2));
             }
         } finally {
             if (scanner != null) {

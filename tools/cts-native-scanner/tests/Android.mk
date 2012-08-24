@@ -1,4 +1,4 @@
-# Copyright (C) 2012 The Android Open Source Project
+# Copyright 2012 The Android Open Source Project
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -12,7 +12,17 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-BUILD_CTS_EXECUTABLE := cts/build/test_executable.mk
-BUILD_CTS_PACKAGE := cts/build/test_package.mk
-BUILD_CTS_GTEST_PACKAGE := cts/build/test_gtest_package.mk
-BUILD_CTS_HOST_JAVA_LIBRARY := cts/build/test_host_java_library.mk
+LOCAL_PATH := $(call my-dir)
+
+include $(CLEAR_VARS)
+
+# Only compile source java files in this lib
+LOCAL_SRC_FILES := $(call all-java-files-under, src)
+
+LOCAL_MODULE := cts-native-scanner-tests
+LOCAL_MODULE_TAGS := optional
+LOCAL_JAVA_LIBRARIES := ddmlib-prebuilt tradefed-prebuilt cts-native-scanner
+
+include $(BUILD_HOST_JAVA_LIBRARY)
+
+

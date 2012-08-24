@@ -43,6 +43,7 @@ class TestPackageDef implements ITestPackageDef {
 
     public static final String HOST_SIDE_ONLY_TEST = "hostSideOnly";
     public static final String NATIVE_TEST = "native";
+    public static final String WRAPPED_NATIVE_TEST = "wrappednative";
     public static final String VM_HOST_TEST = "vmHostTest";
     public static final String ACCESSIBILITY_TEST =
         "com.android.cts.tradefed.testtype.AccessibilityTestRunner";
@@ -211,6 +212,9 @@ class TestPackageDef implements ITestPackageDef {
             return vmHostTest;
         } else if (NATIVE_TEST.equals(mTestType)) {
             return new GeeTest(mUri, mName);
+        } else if (WRAPPED_NATIVE_TEST.equals(mTestType)) {
+            CLog.d("Creating new wrapped native test for %s", mName);
+            return new WrappedGTest(mAppNameSpace, mUri, mName, mRunner);
         } else if (ACCESSIBILITY_TEST.equals(mTestType)) {
             AccessibilityTestRunner test = new AccessibilityTestRunner();
             return setInstrumentationTest(test, testCaseDir);
