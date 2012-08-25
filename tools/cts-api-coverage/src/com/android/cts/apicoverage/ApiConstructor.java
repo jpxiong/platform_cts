@@ -27,13 +27,17 @@ class ApiConstructor implements Comparable<ApiConstructor> {
 
     private final List<String> mParameterTypes;
 
+    private final boolean mDeprecated;
+
     private boolean mIsCovered;
 
-    ApiConstructor(String name, List<String> parameterTypes) {
-        this.mName = name;
-        this.mParameterTypes = new ArrayList<String>(parameterTypes);
+    ApiConstructor(String name, List<String> parameterTypes, boolean deprecated) {
+        mName = name;
+        mParameterTypes = new ArrayList<String>(parameterTypes);
+        mDeprecated = deprecated;
     }
 
+    @Override
     public int compareTo(ApiConstructor another) {
         return mParameterTypes.size() - another.mParameterTypes.size();
     }
@@ -44,6 +48,10 @@ class ApiConstructor implements Comparable<ApiConstructor> {
 
     public List<String> getParameterTypes() {
         return Collections.unmodifiableList(mParameterTypes);
+    }
+
+    public boolean isDeprecated() {
+        return mDeprecated;
     }
 
     public boolean isCovered() {

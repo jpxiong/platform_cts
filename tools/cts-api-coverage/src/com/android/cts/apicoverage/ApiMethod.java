@@ -29,14 +29,18 @@ class ApiMethod implements Comparable<ApiMethod> {
 
     private final String mReturnType;
 
+    private boolean mDeprecated;
+
     private boolean mIsCovered;
 
-    ApiMethod(String name, List<String> parameterTypes, String returnType) {
-        this.mName = name;
-        this.mParameterTypes = new ArrayList<String>(parameterTypes);
-        this.mReturnType = returnType;
+    ApiMethod(String name, List<String> parameterTypes, String returnType, boolean deprecated) {
+        mName = name;
+        mParameterTypes = new ArrayList<String>(parameterTypes);
+        mReturnType = returnType;
+        mDeprecated = deprecated;
     }
 
+    @Override
     public int compareTo(ApiMethod another) {
         return mName.compareTo(another.mName);
     }
@@ -51,6 +55,10 @@ class ApiMethod implements Comparable<ApiMethod> {
 
     public String getReturnType() {
         return mReturnType;
+    }
+
+    public boolean isDeprecated() {
+        return mDeprecated;
     }
 
     public boolean isCovered() {

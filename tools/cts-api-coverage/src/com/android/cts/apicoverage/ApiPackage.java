@@ -19,7 +19,9 @@ package com.android.cts.apicoverage;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
+import java.util.Map.Entry;
 
 /** Representation of a package in the API containing classes. */
 class ApiPackage implements HasCoverage {
@@ -29,9 +31,10 @@ class ApiPackage implements HasCoverage {
     private final Map<String, ApiClass> mApiClassMap = new HashMap<String, ApiClass>();
 
     ApiPackage(String name) {
-        this.mName = name;
+        mName = name;
     }
 
+    @Override
     public String getName() {
         return mName;
     }
@@ -64,7 +67,20 @@ class ApiPackage implements HasCoverage {
         return total;
     }
 
+    @Override
     public float getCoveragePercentage() {
         return (float) getNumCoveredMethods() / getTotalMethods() * 100;
+    }
+
+    public void removeEmptyAbstractClasses() {
+        Iterator<Entry<String, ApiClass>> it = mApiClassMap.entrySet().iterator();
+        while (it.hasNext()) {
+            Map.Entry<String, ApiClass> entry = it.next();
+            ApiClass cls = entry.getValue();
+            if (cls.isAbstract() && (cls.getTotalMethods() == 0)) {
+                // this is essentially interface
+                it.remove();
+            }
+        }
     }
 }

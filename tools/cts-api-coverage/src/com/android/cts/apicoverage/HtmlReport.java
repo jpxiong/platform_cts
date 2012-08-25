@@ -37,11 +37,12 @@ import javax.xml.transform.stream.StreamSource;
 class HtmlReport {
 
     public static void printHtmlReport(final List<File> testApks, final ApiCoverage apiCoverage,
-            final OutputStream out) throws IOException, TransformerException, InterruptedException {
+            final OutputStream out) throws IOException, TransformerException {
         final PipedOutputStream xmlOut = new PipedOutputStream();
         final PipedInputStream xmlIn = new PipedInputStream(xmlOut);
 
         Thread t = new Thread(new Runnable() {
+            @Override
             public void run() {
                 XmlReport.printXmlReport(testApks, apiCoverage, xmlOut);
 

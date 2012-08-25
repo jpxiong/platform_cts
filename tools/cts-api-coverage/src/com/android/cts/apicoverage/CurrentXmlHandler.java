@@ -32,9 +32,16 @@ class CurrentXmlHandler extends DefaultHandler {
 
     private String mCurrentClassName;
 
+    private boolean mIgnoreCurrentClass;
+
     private String mCurrentMethodName;
 
     private String mCurrentMethodReturnType;
+
+    private boolean mCurrentMethodIsAbstract;
+
+    private boolean mDeprecated;
+
 
     private List<String> mCurrentParameterTypes = new ArrayList<String>();
 
@@ -49,42 +56,62 @@ class CurrentXmlHandler extends DefaultHandler {
             throws SAXException {
         super.startElement(uri, localName, name, attributes);
         if ("package".equalsIgnoreCase(localName)) {
-            mCurrentPackageName = CurrentXmlHandler.getValue(attributes, "name");
+            mCurrentPackageName = getValue(attributes, "name");
 
             ApiPackage apiPackage = new ApiPackage(mCurrentPackageName);
             mApiCoverage.addPackage(apiPackage);
 
-        } else if ("class".equalsIgnoreCase(localName)
-                || "interface".equalsIgnoreCase(localName)) {
-            mCurrentClassName = CurrentXmlHandler.getValue(attributes, "name");
-
-            ApiClass apiClass = new ApiClass(mCurrentClassName);
+        } else if ("class".equalsIgnoreCase(localName)) {
+            if (isEnum(attributes)) {
+                mIgnoreCurrentClass = true;
+                return;
+            }
+            mIgnoreCurrentClass = false;
+            mCurrentClassName = getValue(attributes, "name");
+            mDeprecated = isDeprecated(attributes);
+            ApiClass apiClass = new ApiClass(mCurrentClassName, mDeprecated, isAbstract(attributes));
             ApiPackage apiPackage = mApiCoverage.getPackage(mCurrentPackageName);
             apiPackage.addClass(apiClass);
-
+        } else if ("interface".equalsIgnoreCase(localName)) {
+            // don't add interface
+            mIgnoreCurrentClass = true;
         } else if ("constructor".equalsIgnoreCase(localName)) {
+            mDeprecated = isDeprecated(attributes);
             mCurrentParameterTypes.clear();
         }  else if ("method".equalsIgnoreCase(localName)) {
-            mCurrentMethodName = CurrentXmlHandler.getValue(attributes, "name");
-            mCurrentMethodReturnType = CurrentXmlHandler.getValue(attributes, "return");
+            mDeprecated = isDeprecated(attributes);
+            mCurrentMethodName = getValue(attributes, "name");
+            mCurrentMethodReturnType = getValue(attributes, "return");
+            mCurrentMethodIsAbstract = isAbstract(attributes);
             mCurrentParameterTypes.clear();
         } else if ("parameter".equalsIgnoreCase(localName)) {
-            mCurrentParameterTypes.add(CurrentXmlHandler.getValue(attributes, "type"));
+            mCurrentParameterTypes.add(getValue(attributes, "type"));
         }
     }
 
     @Override
     public void endElement(String uri, String localName, String name) throws SAXException {
         super.endElement(uri, localName, name);
+        if (mIgnoreCurrentClass) {
+            // do not add anything for interface
+            return;
+        }
         if ("constructor".equalsIgnoreCase(localName)) {
+            if (mCurrentParameterTypes.isEmpty()) {
+                // Don't add empty default constructors...
+                return;
+            }
             ApiConstructor apiConstructor = new ApiConstructor(mCurrentClassName,
-                    mCurrentParameterTypes);
+                    mCurrentParameterTypes, mDeprecated);
             ApiPackage apiPackage = mApiCoverage.getPackage(mCurrentPackageName);
             ApiClass apiClass = apiPackage.getClass(mCurrentClassName);
             apiClass.addConstructor(apiConstructor);
         }  else if ("method".equalsIgnoreCase(localName)) {
+            if (mCurrentMethodIsAbstract) { // do not add abstract method
+                return;
+            }
             ApiMethod apiMethod = new ApiMethod(mCurrentMethodName, mCurrentParameterTypes,
-                    mCurrentMethodReturnType);
+                    mCurrentMethodReturnType, mDeprecated);
             ApiPackage apiPackage = mApiCoverage.getPackage(mCurrentPackageName);
             ApiClass apiClass = apiPackage.getClass(mCurrentClassName);
             apiClass.addMethod(apiMethod);
@@ -96,5 +123,17 @@ class CurrentXmlHandler extends DefaultHandler {
         return attributes.getValue(key)
                 .replaceAll("<.+>", "")
                 .replace("$", ".");
+    }
+
+    private boolean isDeprecated(Attributes attributes) {
+        return "deprecated".equals(attributes.getValue("deprecated"));
+    }
+
+    private boolean isAbstract(Attributes attributes) {
+        return "true".equals(attributes.getValue("abstract"));
+    }
+
+    private boolean isEnum(Attributes attributes) {
+        return "java.lang.Enum".equals(attributes.getValue("extends"));
     }
 }

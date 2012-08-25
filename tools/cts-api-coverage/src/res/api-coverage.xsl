@@ -61,15 +61,19 @@
                     }
 
                     .red {
-                        background-color: #FF0000;
+                        background-color: #FF6666;
                     }
 
                     .yellow {
-                        background-color: #FFFF00;
+                        background-color: #FFFF66;
                     }
 
                     .green {
-                        background-color: #00FF00;
+                        background-color: #66FF66;
+                    }
+
+                    .deprecated {
+                        text-decoration: line-through;
                     }
                 </style>
             </head>
@@ -77,6 +81,10 @@
                 <h1>CTS API Coverage</h1>
                 <div class="info">
                     Generated: <xsl:value-of select="api-coverage/@generatedTime" />
+                </div>
+                <div class="total">
+                    Total:&nbsp;<xsl:value-of select="api-coverage/total/@coveragePercentage" />%
+                &nbsp;(<xsl:value-of select="api-coverage/total/@numCovered" />/<xsl:value-of select="api-coverage/total/@numTotal" />)
                 </div>
                 <div class="apks" onclick="toggleVisibility('sourceApks')">
                     Source APKs (<xsl:value-of select="count(api-coverage/debug/sources/apk)" />)
@@ -118,7 +126,7 @@
     
     <xsl:template name="packageOrClassListItem">
         <xsl:param name="bulletClass" />
-        
+
         <xsl:variable name="colorClass">
             <xsl:choose>
                 <xsl:when test="@coveragePercentage &lt;= 50">red</xsl:when>
@@ -127,8 +135,15 @@
             </xsl:choose>
         </xsl:variable>
         
+        <xsl:variable name="deprecatedClass">
+            <xsl:choose>
+                <xsl:when test="@deprecated = 'true'">deprecated</xsl:when>
+                <xsl:otherwise></xsl:otherwise>
+            </xsl:choose>
+        </xsl:variable>
+
         <li class="{$bulletClass}" onclick="toggleVisibility('{@name}')">
-            <span class="{$colorClass}">
+            <span class="{$colorClass} {$deprecatedClass}">
                 <b><xsl:value-of select="@name" /></b>
                 &nbsp;<xsl:value-of select="@coveragePercentage" />%
                 &nbsp;(<xsl:value-of select="@numCovered" />/<xsl:value-of select="@numTotal" />)
@@ -137,7 +152,15 @@
     </xsl:template>
   
   <xsl:template name="methodListItem">
-    <span class="method">
+
+    <xsl:variable name="deprecatedClass">
+        <xsl:choose>
+            <xsl:when test="@deprecated = 'true'">deprecated</xsl:when>
+            <xsl:otherwise></xsl:otherwise>
+        </xsl:choose>
+    </xsl:variable>
+
+    <span class="method {$deprecatedClass}">
       <xsl:choose>
         <xsl:when test="@covered = 'true'">[X]</xsl:when>
         <xsl:otherwise>[ ]</xsl:otherwise>
@@ -147,7 +170,7 @@
     </span>
     <br />
   </xsl:template>
-  
+
   <xsl:template name="formatParameters">(<xsl:for-each select="parameter">
       <xsl:value-of select="@type" />
       <xsl:if test="not(position() = last())">,&nbsp;</xsl:if>

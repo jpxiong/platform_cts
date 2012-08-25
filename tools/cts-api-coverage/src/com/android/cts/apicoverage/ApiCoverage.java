@@ -16,6 +16,7 @@
 
 package com.android.cts.apicoverage;
 
+import java.lang.String;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -36,5 +37,12 @@ class ApiCoverage {
 
     public Collection<ApiPackage> getPackages() {
         return Collections.unmodifiableCollection(mPackages.values());
+    }
+
+    public void removeEmptyAbstractClasses() {
+        for (Map.Entry<String, ApiPackage> entry : mPackages.entrySet()) {
+            ApiPackage pkg = entry.getValue();
+            pkg.removeEmptyAbstractClasses();
+        }
     }
 }

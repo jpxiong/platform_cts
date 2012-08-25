@@ -54,12 +54,18 @@ class XmlReport {
         CoverageComparator comparator = new CoverageComparator();
         List<ApiPackage> packages = new ArrayList<ApiPackage>(apiCoverage.getPackages());
         Collections.sort(packages, comparator);
+        int totalMethods = 0;
+        int totalCoveredMethods = 0;
         for (ApiPackage pkg : packages) {
             if (pkg.getName().startsWith("android")
                     && pkg.getTotalMethods() > 0) {
+                int pkgTotal = pkg.getTotalMethods();
+                totalMethods += pkgTotal;
+                int pkgTotalCovered = pkg.getNumCoveredMethods();
+                totalCoveredMethods += pkgTotalCovered;
                 out.println("<package name=\"" + pkg.getName()
-                        + "\" numCovered=\"" + pkg.getNumCoveredMethods()
-                        + "\" numTotal=\"" + pkg.getTotalMethods()
+                        + "\" numCovered=\"" + pkgTotalCovered
+                        + "\" numTotal=\"" + pkgTotal
                         + "\" coveragePercentage=\""
                             + Math.round(pkg.getCoveragePercentage())
                         + "\">");
@@ -72,14 +78,21 @@ class XmlReport {
                         out.println("<class name=\"" + apiClass.getName()
                                 + "\" numCovered=\"" + apiClass.getNumCoveredMethods()
                                 + "\" numTotal=\"" + apiClass.getTotalMethods()
+                                + "\" deprecated=\"" + apiClass.isDeprecated()
                                 + "\" coveragePercentage=\""
                                     + Math.round(apiClass.getCoveragePercentage())
                                 + "\">");
 
                         for (ApiConstructor constructor : apiClass.getConstructors()) {
                             out.println("<constructor name=\"" + constructor.getName()
+                                    + "\" deprecated=\"" + constructor.isDeprecated()
                                     + "\" covered=\"" + constructor.isCovered() + "\">");
-
+                            if (constructor.isDeprecated()) {
+                                if (constructor.isCovered()) {
+                                    totalCoveredMethods -= 1;
+                                }
+                                totalMethods -= 1;
+                            }
                             for (String parameterType : constructor.getParameterTypes()) {
                                 out.println("<parameter type=\"" + parameterType + "\" />");
                             }
@@ -90,8 +103,14 @@ class XmlReport {
                         for (ApiMethod method : apiClass.getMethods()) {
                             out.println("<method name=\"" + method.getName()
                                     + "\" returnType=\"" + method.getReturnType()
+                                    + "\" deprecated=\"" + method.isDeprecated()
                                     + "\" covered=\"" + method.isCovered() + "\">");
-
+                            if (method.isDeprecated()) {
+                                if (method.isCovered()) {
+                                    totalCoveredMethods -= 1;
+                                }
+                                totalMethods -= 1;
+                            }
                             for (String parameterType : method.getParameterTypes()) {
                                 out.println("<parameter type=\"" + parameterType + "\" />");
                             }
@@ -106,6 +125,10 @@ class XmlReport {
         }
 
         out.println("</api>");
+        out.println("<total numCovered=\"" + totalCoveredMethods + "\" "
+                + "numTotal=\"" + totalMethods + "\" "
+                + "coveragePercentage=\""
+                + Math.round((float)totalCoveredMethods / totalMethods * 100.0f) + "\" />");
         out.println("</api-coverage>");
     }
 }

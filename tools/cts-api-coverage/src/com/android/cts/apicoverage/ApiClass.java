@@ -26,20 +26,36 @@ class ApiClass implements Comparable<ApiClass>, HasCoverage {
 
     private final String mName;
 
+    private final boolean mDeprecated;
+
+    private final boolean mAbstract;
+
     private final List<ApiConstructor> mApiConstructors = new ArrayList<ApiConstructor>();
 
     private final List<ApiMethod> mApiMethods = new ArrayList<ApiMethod>();
 
-    ApiClass(String name) {
-        this.mName = name;
+    ApiClass(String name, boolean deprecated, boolean classAbstract) {
+        mName = name;
+        mDeprecated = deprecated;
+        mAbstract = classAbstract;
     }
 
+    @Override
     public int compareTo(ApiClass another) {
         return mName.compareTo(another.mName);
     }
 
+    @Override
     public String getName() {
         return mName;
+    }
+
+    public boolean isDeprecated() {
+        return mDeprecated;
+    }
+
+    public boolean isAbstract() {
+        return mAbstract;
     }
 
     public void addConstructor(ApiConstructor constructor) {
@@ -97,7 +113,12 @@ class ApiClass implements Comparable<ApiClass>, HasCoverage {
         return mApiConstructors.size() + mApiMethods.size();
     }
 
+    @Override
     public float getCoveragePercentage() {
-        return (float) getNumCoveredMethods() / getTotalMethods() * 100;
+        if (getTotalMethods() == 0) {
+            return 100;
+        } else {
+            return (float) getNumCoveredMethods() / getTotalMethods() * 100;
+        }
     }
 }
