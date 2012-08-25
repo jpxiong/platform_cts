@@ -109,6 +109,7 @@ public class CtsApiCoverage {
          */
 
         ApiCoverage apiCoverage = getEmptyApiCoverage(apiXmlPath);
+        apiCoverage.removeEmptyAbstractClasses();
         for (File testApk : testApks) {
             addApiCoverage(apiCoverage, testApk, dexDeps);
         }
