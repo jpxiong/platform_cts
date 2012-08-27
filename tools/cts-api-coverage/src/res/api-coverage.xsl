@@ -82,6 +82,10 @@
                 <div class="info">
                     Generated: <xsl:value-of select="api-coverage/@generatedTime" />
                 </div>
+                <div class="total">
+                    Total:&nbsp;<xsl:value-of select="api-coverage/total/@coveragePercentage" />%
+                &nbsp;(<xsl:value-of select="api-coverage/total/@numCovered" />/<xsl:value-of select="api-coverage/total/@numTotal" />)
+                </div>
                 <div class="apks" onclick="toggleVisibility('sourceApks')">
                     Source APKs (<xsl:value-of select="count(api-coverage/debug/sources/apk)" />)
                 </div>
