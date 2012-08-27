@@ -16,7 +16,6 @@
 
 package android.telephony.cts;
 
-
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.net.wifi.WifiInfo;
@@ -28,6 +27,8 @@ import android.telephony.CellLocation;
 import android.telephony.PhoneStateListener;
 import android.telephony.TelephonyManager;
 import android.test.AndroidTestCase;
+
+import com.android.internal.telephony.PhoneConstants;
 
 import java.util.regex.Pattern;
 
@@ -165,7 +166,12 @@ public class TelephonyManagerTest extends AndroidTestCase {
                 break;
 
             case TelephonyManager.PHONE_TYPE_CDMA:
-                assertCdmaDeviceId(deviceId);
+                // LTE device is using IMEI as device id
+                if (mTelephonyManager.getLteOnCdmaMode() == PhoneConstants.LTE_ON_CDMA_TRUE) {
+                    assertGsmDeviceId(deviceId);
+                } else {
+                    assertCdmaDeviceId(deviceId);
+                }
                 break;
 
             case TelephonyManager.PHONE_TYPE_NONE:
