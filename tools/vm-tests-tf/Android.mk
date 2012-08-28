@@ -18,6 +18,8 @@ LOCAL_PATH := $(call my-dir)
 # ============================================================
 include $(CLEAR_VARS)
 
+LOCAL_TEST_TYPE := vmHostTest
+
 LOCAL_SRC_FILES := $(call all-java-files-under, src)
 
 LOCAL_MODULE := cts-tf-dalvik-buildutil
