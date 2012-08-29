@@ -51,6 +51,7 @@ import java.lang.InterruptedException;
 import java.lang.System;
 import java.lang.Thread;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -147,6 +148,9 @@ public class CtsTest implements IDeviceTest, IResumableTest, IShardableTest, IBu
     @Option(name = "reboot-interval", description =
             "Interval between each reboot in min. Meaningful only with reboot-per-package option")
     private int mRebootIntervalMin = 30;
+
+
+    private long mPrevRebootTime; // last reboot time
 
     /** data structure for a {@link IRemoteTest} and its known tests */
     class TestPackage {
@@ -350,8 +354,8 @@ public class CtsTest implements IDeviceTest, IResumableTest, IShardableTest, IBu
                 Log.i(LOG_TAG, "Initial reboot for multiple packages");
                 rebootDevice();
             }
-            long prevTime = System.currentTimeMillis();
-            long intervalInMSec = mRebootIntervalMin * 60 * 1000;
+            mPrevRebootTime = System.currentTimeMillis();
+
             while (!mRemainingTestPkgs.isEmpty()) {
                 TestPackage knownTests = mRemainingTestPkgs.get(0);
 
@@ -367,15 +371,7 @@ public class CtsTest implements IDeviceTest, IResumableTest, IShardableTest, IBu
                 test.run(filter);
                 mRemainingTestPkgs.remove(0);
                 if (mRemainingTestPkgs.size() > 0) {
-                    if (mRebootPerPackage) {
-                        long currentTime = System.currentTimeMillis();
-                        if ((currentTime - prevTime) > intervalInMSec) {
-                            Log.i(LOG_TAG, String.format("Rebooting after running package %s",
-                                    knownTests.getPackageDef().getName()));
-                            rebootDevice();
-                            prevTime = System.currentTimeMillis();
-                        }
-                    }
+                    rebootIfNecessary(knownTests, mRemainingTestPkgs.get(0));
                     // remove artifacts like status bar from the previous test.
                     // But this cannot dismiss dialog popped-up.
                     changeToHomeScreen();
@@ -395,6 +391,33 @@ public class CtsTest implements IDeviceTest, IResumableTest, IShardableTest, IBu
 
         } finally {
             filter.reportUnexecutedTests();
+        }
+    }
+
+    private void rebootIfNecessary(TestPackage testFinished, TestPackage testToRun)
+            throws DeviceNotAvailableException {
+        // If there comes spurious failure like INJECT_EVENTS for a package,
+        // reboot it before running it.
+        // Also reboot after package which is know to leave pop-up behind
+        final List<String> rebootAfterList = Arrays.asList("CtsWebkitSecurityTestCases");
+        final List<String> rebootBeforeList = Arrays.asList("CtsAnimationTestCases",
+                "CtsGraphicsTestCases",
+                "CtsViewTestCases",
+                "CtsWebkitSecurityTestCases",
+                "CtsWidgetTestCases" );
+        long intervalInMSec = mRebootIntervalMin * 60 * 1000;
+        if (mRebootPerPackage) {
+            long currentTime = System.currentTimeMillis();
+            if (((currentTime - mPrevRebootTime) > intervalInMSec) ||
+                    rebootAfterList.contains(testFinished.getPackageDef().getName()) ||
+                    rebootBeforeList.contains(testToRun.getPackageDef().getName()) ) {
+                Log.i(LOG_TAG,
+                        String.format("Rebooting after running package %s, before package %s",
+                                testFinished.getPackageDef().getName(),
+                                testToRun.getPackageDef().getName()));
+                rebootDevice();
+                mPrevRebootTime = System.currentTimeMillis();
+            }
         }
     }
 
