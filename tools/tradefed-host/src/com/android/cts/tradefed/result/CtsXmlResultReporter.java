@@ -44,6 +44,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Writes results to an XML files in the CTS format.
@@ -96,6 +98,9 @@ public class CtsXmlResultReporter implements ITestInvocationListener {
 
     private File mLogDir;
 
+    private static final String PTS_PERFORMANCE_EXCEPTION = "com.android.pts.util.PtsException";
+    private static final Pattern mPtsLogPattern = Pattern.compile(
+            "com\\.android\\.pts\\.util\\.PtsException:\\s(.*)");
     public void setReportDir(File reportDir) {
         mReportDir = reportDir;
     }
@@ -216,7 +221,20 @@ public class CtsXmlResultReporter implements ITestInvocationListener {
      */
     @Override
     public void testFailed(TestFailure status, TestIdentifier test, String trace) {
-        mCurrentPkgResult.reportTestFailure(test, CtsTestStatus.FAIL, trace);
+        if (trace.startsWith(PTS_PERFORMANCE_EXCEPTION)) { //PTS result
+            Test tst = mCurrentPkgResult.findTest(test);
+            // this exception is always thrown as exception is thrown from tearDown.
+            // Just ignore it.
+            if (tst.getName().endsWith("testAndroidTestCaseSetupProperly")) {
+                return;
+            }
+            Matcher m = mPtsLogPattern.matcher(trace);
+            if (m.find()) {
+                mCurrentPkgResult.reportPerformanceResult(test, CtsTestStatus.PASS, m.group(1));
+            }
+        } else {
+            mCurrentPkgResult.reportTestFailure(test, CtsTestStatus.FAIL, trace);
+        }
     }
 
     /**
