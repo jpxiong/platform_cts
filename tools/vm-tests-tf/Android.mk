@@ -18,7 +18,9 @@ LOCAL_PATH := $(call my-dir)
 # ============================================================
 include $(CLEAR_VARS)
 
+# custom variables used to generate test description. do not touch!
 LOCAL_TEST_TYPE := vmHostTest
+LOCAL_JAR_PATH := android.core.vm-tests-tf.jar
 
 LOCAL_SRC_FILES := $(call all-java-files-under, src)
 
