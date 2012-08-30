@@ -20,5 +20,6 @@ LOCAL_DEX_PREOPT := false
 LOCAL_MODULE_TAGS := optional
 # and when installed explicitly put them in the data partition
 LOCAL_MODULE_PATH := $(TARGET_OUT_DATA_APPS)
-
+# Don't delete META-INF from the core-tests jar
+LOCAL_DONT_DELETE_JAR_META_INF := true
 include $(BUILD_PACKAGE)
