@@ -81,4 +81,34 @@ public class PackageManagerRequiringPermissionsTest extends AndroidTestCase {
             // expected
         }
     }
+
+    /**
+     * Verify that PackageManager.verifyPendingInstall requires permission.
+     * <p>Requires Permission:
+     *   {@link android.Manifest.permission#PACKAGE_VERIFICATION_AGENT}
+     */
+    public void testVerifyPendingInstall() {
+        try {
+            mPackageManager.verifyPendingInstall(1, 1);
+            fail("PackageManager.verifyPendingInstall did not throw SecurityException"
+                    + " as expected");
+        } catch (SecurityException e) {
+            // expected
+        }
+    }
+
+    /**
+     * Verify that PackageManager.extendVerificationTimeout requires permission.
+     * <p>Requires Permission:
+     *   {@link android.Manifest.permission#PACKAGE_VERIFICATION_AGENT}.
+     */
+    public void testExtendVerificationTimeout() {
+        try {
+            mPackageManager.extendVerificationTimeout(1, 1, 10000);
+            fail("PackageManager.extendVerificationTimeout did not throw SecurityException"
+                    + " as expected");
+        } catch (SecurityException e) {
+            // expected
+        }
+    }
 }
