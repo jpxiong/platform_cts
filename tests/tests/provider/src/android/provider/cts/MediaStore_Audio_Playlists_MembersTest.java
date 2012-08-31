@@ -456,9 +456,16 @@ public class MediaStore_Audio_Playlists_MembersTest extends InstrumentationTestC
         values.put(Playlists.DATE_ADDED, dateAdded);
         long dateModified = System.currentTimeMillis();
         values.put(Playlists.DATE_MODIFIED, dateModified);
+        // insert
         Uri uri = mContentResolver.insert(Playlists.INTERNAL_CONTENT_URI, values);
         assertNotNull(uri);
-        assertTrue(Pattern.matches("content://media/internal/audio/playlists/\\d+",
-                uri.toString()));
+
+        try {
+            assertTrue(Pattern.matches("content://media/internal/audio/playlists/\\d+",
+                    uri.toString()));
+        } finally {
+            // delete the playlists
+            assertEquals(1, mContentResolver.delete(uri, null, null));
+        }
     }
 }
