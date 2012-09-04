@@ -152,19 +152,18 @@ public class LocaleUtilTest extends AndroidTestCase {
         assertEquals(LAYOUT_DIRECTION_RTL,
                 LocaleUtil.getLayoutDirectionFromLocale(locale));
 
-// TODO: uncomment when ICU is fixed (4.8.1.1 version of ICS broke the following unit tests)
-//        locale = new Locale("iw");
-//        assertEquals(LAYOUT_DIRECTION_RTL,
-//                LocaleUtil.getLayoutDirectionFromLocale(locale));
-//        locale = new Locale("iw", "IL");
-//        assertEquals(LAYOUT_DIRECTION_RTL,
-//                LocaleUtil.getLayoutDirectionFromLocale(locale));
-//        locale = new Locale("he");
-//        assertEquals(LAYOUT_DIRECTION_RTL,
-//                LocaleUtil.getLayoutDirectionFromLocale(locale));
-//        locale = new Locale("he", "IL");
-//        assertEquals(LAYOUT_DIRECTION_RTL,
-//                LocaleUtil.getLayoutDirectionFromLocale(locale));
+        locale = new Locale("iw");
+        assertEquals(LAYOUT_DIRECTION_RTL,
+                LocaleUtil.getLayoutDirectionFromLocale(locale));
+        locale = new Locale("iw", "IL");
+        assertEquals(LAYOUT_DIRECTION_RTL,
+                LocaleUtil.getLayoutDirectionFromLocale(locale));
+        locale = new Locale("he");
+        assertEquals(LAYOUT_DIRECTION_RTL,
+                LocaleUtil.getLayoutDirectionFromLocale(locale));
+        locale = new Locale("he", "IL");
+        assertEquals(LAYOUT_DIRECTION_RTL,
+                LocaleUtil.getLayoutDirectionFromLocale(locale));
 
         locale = new Locale("pa_Arab");
         assertEquals(LAYOUT_DIRECTION_RTL,
