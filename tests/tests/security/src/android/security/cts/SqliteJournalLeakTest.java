@@ -81,10 +81,9 @@ public class SqliteJournalLeakTest extends AndroidTestCase {
         webIntent.setData(Uri.parse("http:///localhost"));
         webIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         getContext().startActivity(webIntent);
-        Intent geoIntent = new Intent(Intent.ACTION_VIEW);
-        geoIntent.setData(Uri.parse("geo:0,0"));
-        geoIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        getContext().startActivity(geoIntent);
+        Intent dictIntent = new Intent("android.settings.USER_DICTIONARY_SETTINGS");
+        dictIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        getContext().startActivity(dictIntent);
     }
 
     private void checkDatabases(String suffix) {
