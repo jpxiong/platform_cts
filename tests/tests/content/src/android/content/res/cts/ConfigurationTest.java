@@ -22,6 +22,8 @@ import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
 import android.os.Parcel;
 import android.test.AndroidTestCase;
+import android.util.LocaleUtil;
+import android.view.View;
 
 public class ConfigurationTest extends AndroidTestCase {
 
@@ -154,24 +156,29 @@ public class ConfigurationTest extends AndroidTestCase {
         doConfigCompare(ActivityInfo.CONFIG_MCC
                 | ActivityInfo.CONFIG_MNC, mConfigDefault, config);
         config.locale = Locale.getDefault();
+        config.setLayoutDirection(config.locale);
         doConfigCompare(ActivityInfo.CONFIG_MCC
                 | ActivityInfo.CONFIG_MNC
-                | ActivityInfo.CONFIG_LOCALE, mConfigDefault, config);
+                | ActivityInfo.CONFIG_LOCALE
+                | ActivityInfo.CONFIG_LAYOUT_DIRECTION, mConfigDefault, config);
         config.screenLayout = 1;
         doConfigCompare(ActivityInfo.CONFIG_MCC
                 | ActivityInfo.CONFIG_MNC
                 | ActivityInfo.CONFIG_LOCALE
+                | ActivityInfo.CONFIG_LAYOUT_DIRECTION
                 | ActivityInfo.CONFIG_SCREEN_LAYOUT, mConfigDefault, config);
         config.touchscreen = 1;
         doConfigCompare(ActivityInfo.CONFIG_MCC
                 | ActivityInfo.CONFIG_MNC
                 | ActivityInfo.CONFIG_LOCALE
+                | ActivityInfo.CONFIG_LAYOUT_DIRECTION
                 | ActivityInfo.CONFIG_SCREEN_LAYOUT
                 | ActivityInfo.CONFIG_TOUCHSCREEN, mConfigDefault, config);
         config.keyboard = 1;
         doConfigCompare(ActivityInfo.CONFIG_MCC
                 | ActivityInfo.CONFIG_MNC
                 | ActivityInfo.CONFIG_LOCALE
+                | ActivityInfo.CONFIG_LAYOUT_DIRECTION
                 | ActivityInfo.CONFIG_SCREEN_LAYOUT
                 | ActivityInfo.CONFIG_TOUCHSCREEN
                 | ActivityInfo.CONFIG_KEYBOARD, mConfigDefault, config);
@@ -179,6 +186,7 @@ public class ConfigurationTest extends AndroidTestCase {
         doConfigCompare(ActivityInfo.CONFIG_MCC
                 | ActivityInfo.CONFIG_MNC
                 | ActivityInfo.CONFIG_LOCALE
+                | ActivityInfo.CONFIG_LAYOUT_DIRECTION
                 | ActivityInfo.CONFIG_SCREEN_LAYOUT
                 | ActivityInfo.CONFIG_TOUCHSCREEN
                 | ActivityInfo.CONFIG_KEYBOARD
@@ -188,6 +196,7 @@ public class ConfigurationTest extends AndroidTestCase {
         doConfigCompare(ActivityInfo.CONFIG_MCC
                 | ActivityInfo.CONFIG_MNC
                 | ActivityInfo.CONFIG_LOCALE
+                | ActivityInfo.CONFIG_LAYOUT_DIRECTION
                 | ActivityInfo.CONFIG_SCREEN_LAYOUT
                 | ActivityInfo.CONFIG_TOUCHSCREEN
                 | ActivityInfo.CONFIG_KEYBOARD
@@ -197,6 +206,7 @@ public class ConfigurationTest extends AndroidTestCase {
         doConfigCompare(ActivityInfo.CONFIG_MCC
                 | ActivityInfo.CONFIG_MNC
                 | ActivityInfo.CONFIG_LOCALE
+                | ActivityInfo.CONFIG_LAYOUT_DIRECTION
                 | ActivityInfo.CONFIG_SCREEN_LAYOUT
                 | ActivityInfo.CONFIG_TOUCHSCREEN
                 | ActivityInfo.CONFIG_KEYBOARD
@@ -205,6 +215,7 @@ public class ConfigurationTest extends AndroidTestCase {
         doConfigCompare(ActivityInfo.CONFIG_MCC
                 | ActivityInfo.CONFIG_MNC
                 | ActivityInfo.CONFIG_LOCALE
+                | ActivityInfo.CONFIG_LAYOUT_DIRECTION
                 | ActivityInfo.CONFIG_SCREEN_LAYOUT
                 | ActivityInfo.CONFIG_TOUCHSCREEN
                 | ActivityInfo.CONFIG_KEYBOARD
@@ -214,6 +225,7 @@ public class ConfigurationTest extends AndroidTestCase {
         doConfigCompare(ActivityInfo.CONFIG_MCC
                 | ActivityInfo.CONFIG_MNC
                 | ActivityInfo.CONFIG_LOCALE
+                | ActivityInfo.CONFIG_LAYOUT_DIRECTION
                 | ActivityInfo.CONFIG_SCREEN_LAYOUT
                 | ActivityInfo.CONFIG_TOUCHSCREEN
                 | ActivityInfo.CONFIG_KEYBOARD
@@ -224,6 +236,7 @@ public class ConfigurationTest extends AndroidTestCase {
         doConfigCompare(ActivityInfo.CONFIG_MCC
                 | ActivityInfo.CONFIG_MNC
                 | ActivityInfo.CONFIG_LOCALE
+                | ActivityInfo.CONFIG_LAYOUT_DIRECTION
                 | ActivityInfo.CONFIG_SCREEN_LAYOUT
                 | ActivityInfo.CONFIG_TOUCHSCREEN
                 | ActivityInfo.CONFIG_KEYBOARD
@@ -235,6 +248,7 @@ public class ConfigurationTest extends AndroidTestCase {
         doConfigCompare(ActivityInfo.CONFIG_MCC
                 | ActivityInfo.CONFIG_MNC
                 | ActivityInfo.CONFIG_LOCALE
+                | ActivityInfo.CONFIG_LAYOUT_DIRECTION
                 | ActivityInfo.CONFIG_SCREEN_LAYOUT
                 | ActivityInfo.CONFIG_TOUCHSCREEN
                 | ActivityInfo.CONFIG_KEYBOARD
@@ -278,6 +292,64 @@ public class ConfigurationTest extends AndroidTestCase {
     public void testWriteToParcel() {
         assertWriteToParcel(createConfig(null), Parcel.obtain());
         assertWriteToParcel(createConfig(Locale.JAPAN), Parcel.obtain());
+    }
+
+    public void testSetLocale() {
+        Configuration config = new Configuration();
+
+        config.setLocale(Locale.getDefault());
+        assertEquals(Locale.getDefault(), config.locale);
+        assertEquals(View.LAYOUT_DIRECTION_LTR, config.getLayoutDirection());
+
+        config.setLocale(Locale.ENGLISH);
+        assertEquals(Locale.ENGLISH, config.locale);
+        assertEquals(View.LAYOUT_DIRECTION_LTR, config.getLayoutDirection());
+
+        config.setLocale(Locale.US);
+        assertEquals(Locale.US, config.locale);
+        assertEquals(View.LAYOUT_DIRECTION_LTR, config.getLayoutDirection());
+
+        final Locale arEGLocale = new Locale("ar", "EG");
+        config.setLocale(arEGLocale);
+        assertEquals(arEGLocale, config.locale);
+        assertEquals(View.LAYOUT_DIRECTION_RTL, config.getLayoutDirection());
+
+        final Locale faFALocale = new Locale("fa", "FA");
+        config.setLocale(faFALocale);
+        assertEquals(faFALocale, config.locale);
+        assertEquals(View.LAYOUT_DIRECTION_RTL, config.getLayoutDirection());
+
+// TODO: uncomment when ICU is fixed (4.8.1.1 version of ICS broke the following unit tests)
+//        final Locale iwILLocale = new Locale("iw", "IL");
+//        config.setLocale(iwILLocale);
+//        assertEquals(iwILLocale, config.locale);
+//        assertEquals(View.LAYOUT_DIRECTION_RTL, config.getLayoutDirection());
+    }
+
+    public void testSetGetLayoutDirection() {
+        Configuration config = new Configuration();
+
+        config.setLayoutDirection(Locale.getDefault());
+        assertEquals(View.LAYOUT_DIRECTION_LTR, config.getLayoutDirection());
+
+        config.setLayoutDirection(Locale.ENGLISH);
+        assertEquals(View.LAYOUT_DIRECTION_LTR, config.getLayoutDirection());
+
+        config.setLayoutDirection(Locale.US);
+        assertEquals(View.LAYOUT_DIRECTION_LTR, config.getLayoutDirection());
+
+        final Locale arEGLocale = new Locale("ar", "EG");
+        config.setLayoutDirection(arEGLocale);
+        assertEquals(View.LAYOUT_DIRECTION_RTL, config.getLayoutDirection());
+
+        final Locale faFALocale = new Locale("fa", "FA");
+        config.setLayoutDirection(faFALocale);
+        assertEquals(View.LAYOUT_DIRECTION_RTL, config.getLayoutDirection());
+
+// TODO: uncomment when ICU is fixed (4.8.1.1 version of ICS broke the following unit tests)
+//        final Locale iwILLocale = new Locale("iw", "IL");
+//        config.setLayoutDirection(iwILLocale);
+//        assertEquals(View.LAYOUT_DIRECTION_RTL, config.getLayoutDirection());
     }
 
     private Configuration createConfig(Locale locale) {
