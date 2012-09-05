@@ -319,11 +319,10 @@ public class ConfigurationTest extends AndroidTestCase {
         assertEquals(faFALocale, config.locale);
         assertEquals(View.LAYOUT_DIRECTION_RTL, config.getLayoutDirection());
 
-// TODO: uncomment when ICU is fixed (4.8.1.1 version of ICS broke the following unit tests)
-//        final Locale iwILLocale = new Locale("iw", "IL");
-//        config.setLocale(iwILLocale);
-//        assertEquals(iwILLocale, config.locale);
-//        assertEquals(View.LAYOUT_DIRECTION_RTL, config.getLayoutDirection());
+        final Locale iwILLocale = new Locale("iw", "IL");
+        config.setLocale(iwILLocale);
+        assertEquals(iwILLocale, config.locale);
+        assertEquals(View.LAYOUT_DIRECTION_RTL, config.getLayoutDirection());
     }
 
     public void testSetGetLayoutDirection() {
@@ -346,10 +345,9 @@ public class ConfigurationTest extends AndroidTestCase {
         config.setLayoutDirection(faFALocale);
         assertEquals(View.LAYOUT_DIRECTION_RTL, config.getLayoutDirection());
 
-// TODO: uncomment when ICU is fixed (4.8.1.1 version of ICS broke the following unit tests)
-//        final Locale iwILLocale = new Locale("iw", "IL");
-//        config.setLayoutDirection(iwILLocale);
-//        assertEquals(View.LAYOUT_DIRECTION_RTL, config.getLayoutDirection());
+        final Locale iwILLocale = new Locale("iw", "IL");
+        config.setLayoutDirection(iwILLocale);
+        assertEquals(View.LAYOUT_DIRECTION_RTL, config.getLayoutDirection());
     }
 
     private Configuration createConfig(Locale locale) {
