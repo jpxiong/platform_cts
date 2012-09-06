@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 The Android Open Source Project
+ * Copyright 2013 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,15 +17,15 @@
 
 #include <android/native_window.h>
 
-#include <gtest/gtest.h>
-
 #include <EGL/egl.h>
 #include <EGL/eglext.h>
+
+#include <gtest/gtest.h>
+
 #include <GLES2/gl2.h>
 #include <GLES2/gl2ext.h>
 
-
-#include "GLTestHelper.h"
+#include <GLTestHelper.h>
 
 
 namespace android {
