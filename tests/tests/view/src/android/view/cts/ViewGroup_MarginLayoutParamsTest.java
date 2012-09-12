@@ -81,8 +81,8 @@ public class ViewGroup_MarginLayoutParamsTest extends InstrumentationTestCase {
         assertEquals(120, mMarginLayoutParams.rightMargin);
         assertEquals(140, mMarginLayoutParams.bottomMargin);
 
-        assertEquals(Integer.MIN_VALUE, mMarginLayoutParams.startMargin);
-        assertEquals(Integer.MIN_VALUE, mMarginLayoutParams.endMargin);
+        assertEquals(Integer.MIN_VALUE, mMarginLayoutParams.getMarginStart());
+        assertEquals(Integer.MIN_VALUE, mMarginLayoutParams.getMarginEnd());
 
         assertEquals(false, mMarginLayoutParams.isMarginRelative());
     }
@@ -91,9 +91,9 @@ public class ViewGroup_MarginLayoutParamsTest extends InstrumentationTestCase {
         // create a new MarginLayoutParams instance
         mMarginLayoutParams = new ViewGroup.MarginLayoutParams(320, 480);
         mMarginLayoutParams.setMarginsRelative(20, 30, 120, 140);
-        assertEquals(20, mMarginLayoutParams.startMargin);
+        assertEquals(20, mMarginLayoutParams.getMarginStart());
         assertEquals(30, mMarginLayoutParams.topMargin);
-        assertEquals(120, mMarginLayoutParams.endMargin);
+        assertEquals(120, mMarginLayoutParams.getMarginEnd());
         assertEquals(140, mMarginLayoutParams.bottomMargin);
 
         assertEquals(0, mMarginLayoutParams.leftMargin);
@@ -116,8 +116,8 @@ public class ViewGroup_MarginLayoutParamsTest extends InstrumentationTestCase {
         assertEquals(120, mMarginLayoutParams.rightMargin);
         assertEquals(140, mMarginLayoutParams.bottomMargin);
 
-        assertEquals(Integer.MIN_VALUE, mMarginLayoutParams.startMargin);
-        assertEquals(Integer.MIN_VALUE, mMarginLayoutParams.endMargin);
+        assertEquals(Integer.MIN_VALUE, mMarginLayoutParams.getMarginStart());
+        assertEquals(Integer.MIN_VALUE, mMarginLayoutParams.getMarginEnd());
 
         assertEquals(false, mMarginLayoutParams.isMarginRelative());
 
@@ -126,9 +126,9 @@ public class ViewGroup_MarginLayoutParamsTest extends InstrumentationTestCase {
         vg.setLayoutParams(mMarginLayoutParams);
         vg.requestLayout();
 
-        assertEquals(20, mMarginLayoutParams.startMargin);
+        assertEquals(20, mMarginLayoutParams.getMarginStart());
         assertEquals(30, mMarginLayoutParams.topMargin);
-        assertEquals(120, mMarginLayoutParams.endMargin);
+        assertEquals(120, mMarginLayoutParams.getMarginEnd());
         assertEquals(140, mMarginLayoutParams.bottomMargin);
 
         assertEquals(20, mMarginLayoutParams.leftMargin);
@@ -149,8 +149,8 @@ public class ViewGroup_MarginLayoutParamsTest extends InstrumentationTestCase {
         assertEquals(120, mMarginLayoutParams.rightMargin);
         assertEquals(140, mMarginLayoutParams.bottomMargin);
 
-        assertEquals(Integer.MIN_VALUE, mMarginLayoutParams.startMargin);
-        assertEquals(Integer.MIN_VALUE, mMarginLayoutParams.endMargin);
+        assertEquals(Integer.MIN_VALUE, mMarginLayoutParams.getMarginStart());
+        assertEquals(Integer.MIN_VALUE, mMarginLayoutParams.getMarginEnd());
 
         assertEquals(false, mMarginLayoutParams.isMarginRelative());
 
@@ -159,9 +159,9 @@ public class ViewGroup_MarginLayoutParamsTest extends InstrumentationTestCase {
         vg.setLayoutParams(mMarginLayoutParams);
         vg.requestLayout();
 
-        assertEquals(20, mMarginLayoutParams.startMargin);
+        assertEquals(20, mMarginLayoutParams.getMarginStart());
         assertEquals(30, mMarginLayoutParams.topMargin);
-        assertEquals(120, mMarginLayoutParams.endMargin);
+        assertEquals(120, mMarginLayoutParams.getMarginEnd());
         assertEquals(140, mMarginLayoutParams.bottomMargin);
 
         assertEquals(120, mMarginLayoutParams.leftMargin);
