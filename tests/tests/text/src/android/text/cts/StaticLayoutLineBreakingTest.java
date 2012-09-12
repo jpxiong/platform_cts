@@ -401,9 +401,9 @@ public class StaticLayoutLineBreakingTest extends AndroidTestCase {
         char[] digitCharacters = new char[] {'0', '\u0660', '\u06F0', '\u0966', '\uFF10'};
 
         for (char c : classISCharacters) {
-            // .,:; are class IS breakpoints...
+            // .,:; are class IS breakpoints... (but still shouldn't break alphabetic chars)
             //              01234567
-            layout(replace("L XXX#X", '#', c), new int[] {6});
+            layout(replace("L XXX#X", '#', c), new int[] {2});
             layout(replace("L XXXX#X", '#', c), new int[] {2});
 
             // ...except when adjacent to digits
