@@ -17,6 +17,7 @@
 package com.android.cts.appsecurity;
 
 import com.android.cts.tradefed.build.CtsBuildHelper;
+import com.android.ddmlib.IDevice;
 import com.android.ddmlib.Log;
 import com.android.ddmlib.testrunner.RemoteAndroidTestRunner;
 import com.android.ddmlib.testrunner.TestIdentifier;
@@ -209,7 +210,8 @@ public class AppSecurityTests extends DeviceTestCase implements IBuildReceiver {
             getDevice().uninstallPackage(WRITE_EXTERNAL_STORAGE_APP_PKG);
 
             // stage test file on external storage
-            getDevice().pushString("CAEK", "/sdcard/meow");
+            getDevice().pushString("CAEK",
+                    getDevice().getMountPoint(IDevice.MNT_EXTERNAL_STORAGE) + "/meow");
 
             // mark permission as not enforced
             setPermissionEnforced(getDevice(), READ_EXTERNAL_STORAGE, false);
