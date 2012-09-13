@@ -30,16 +30,10 @@ import java.io.FileNotFoundException;
 public class CtsBuildHelper {
 
     static final String CTS_DIR_NAME = "android-cts";
-    static final String PTS_DIR_NAME = "android-pts";
-    static private boolean mCtsMode = true;
     /** The root location of the extracted CTS package */
     private final File mRootDir;
     /** the {@link CTS_DIR_NAME} directory */
     private final File mCtsDir;
-
-    public static void changeToPtsMode() {
-        mCtsMode = false;
-    }
 
     /**
      * Creates a {@link CtsBuildHelper}.
@@ -49,7 +43,7 @@ public class CtsBuildHelper {
      */
     public CtsBuildHelper(File rootDir) {
         mRootDir = rootDir;
-        mCtsDir = new File(mRootDir, mCtsMode ? CTS_DIR_NAME : PTS_DIR_NAME);
+        mCtsDir = new File(mRootDir, CTS_DIR_NAME);
     }
 
     /**
