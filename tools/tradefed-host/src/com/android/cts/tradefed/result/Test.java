@@ -84,10 +84,6 @@ class Test extends AbstractXmlPullParser {
         return mMessage;
     }
 
-    public void setMessage(String message) {
-        mMessage = message;
-    }
-
     public String getStartTime() {
         return mStartTime;
     }
@@ -129,20 +125,14 @@ class Test extends AbstractXmlPullParser {
         serializer.attribute(CtsXmlResultReporter.ns, ENDTIME_ATTR, mEndTime);
 
         if (mMessage != null) {
-            if (mResult == CtsTestStatus.PASS) { // PTS will add performance result
-                serializer.startTag(CtsXmlResultReporter.ns, SCENE_TAG);
-                serializer.attribute(CtsXmlResultReporter.ns, MESSAGE_ATTR, mMessage);
-                serializer.endTag(CtsXmlResultReporter.ns, SCENE_TAG);
-            } else {
-                serializer.startTag(CtsXmlResultReporter.ns, SCENE_TAG);
-                serializer.attribute(CtsXmlResultReporter.ns, MESSAGE_ATTR, mMessage);
-                if (mStackTrace != null) {
-                    serializer.startTag(CtsXmlResultReporter.ns, STACK_TAG);
-                    serializer.text(mStackTrace);
-                    serializer.endTag(CtsXmlResultReporter.ns, STACK_TAG);
-                }
-                serializer.endTag(CtsXmlResultReporter.ns, SCENE_TAG);
+            serializer.startTag(CtsXmlResultReporter.ns, SCENE_TAG);
+            serializer.attribute(CtsXmlResultReporter.ns, MESSAGE_ATTR, mMessage);
+            if (mStackTrace != null) {
+                serializer.startTag(CtsXmlResultReporter.ns, STACK_TAG);
+                serializer.text(mStackTrace);
+                serializer.endTag(CtsXmlResultReporter.ns, STACK_TAG);
             }
+            serializer.endTag(CtsXmlResultReporter.ns, SCENE_TAG);
         }
         serializer.endTag(CtsXmlResultReporter.ns, TAG);
     }
