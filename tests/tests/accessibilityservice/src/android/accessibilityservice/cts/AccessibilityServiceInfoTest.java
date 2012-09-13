@@ -77,8 +77,11 @@ public class AccessibilityServiceInfoTest extends AndroidTestCase {
                 AccessibilityServiceInfo.FEEDBACK_SPOKEN));
         assertEquals("[FEEDBACK_VISUAL]", AccessibilityServiceInfo.feedbackTypeToString(
                 AccessibilityServiceInfo.FEEDBACK_VISUAL));
+        assertEquals("[FEEDBACK_BRAILLE]", AccessibilityServiceInfo.feedbackTypeToString(
+                AccessibilityServiceInfo.FEEDBACK_BRAILLE));
         assertEquals("[FEEDBACK_SPOKEN, FEEDBACK_HAPTIC, FEEDBACK_AUDIBLE, FEEDBACK_VISUAL,"
-                + " FEEDBACK_GENERIC]", AccessibilityServiceInfo.feedbackTypeToString(
+                + " FEEDBACK_GENERIC, FEEDBACK_BRAILLE]",
+                AccessibilityServiceInfo.feedbackTypeToString(
                         AccessibilityServiceInfo.FEEDBACK_ALL_MASK));
     }
 
