@@ -461,7 +461,7 @@
                         <TR>
                             <TH width="30%">Test</TH>
                             <TH width="5%">Result</TH>
-                            <TH>Failure Details / Details</TH>
+                            <TH>Failure Details</TH>
                         </TR>
 
                         <!-- test case -->
@@ -524,11 +524,6 @@
                                                     <TD class="pass">
                                                         <div style="text-align: center; margin-left:auto; margin-right:auto;">
                                                             <xsl:value-of select="@result"/>
-                                                        </div>
-                                                    </TD>
-                                                    <TD class="failuredetails">
-                                                        <div class="details">
-                                                            <xsl:value-of select="FailedScene/@message"/>
                                                         </div>
                                                     </TD>
                                                     <TD class="failuredetails"></TD>
