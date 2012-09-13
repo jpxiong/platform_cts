@@ -30,7 +30,7 @@ import android.view.accessibility.AccessibilityNodeInfo;
 public class AccessibilityNodeInfoTest extends AndroidTestCase {
 
     /** The number of properties of the {@link AccessibilityNodeInfo} class. */
-    private static final int NON_STATIC_FIELD_COUNT = 19;
+    private static final int NON_STATIC_FIELD_COUNT = 17;
 
     @SmallTest
     public void testMarshaling() throws Exception {
