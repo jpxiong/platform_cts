@@ -197,7 +197,7 @@ public class DateUtilsTest extends AndroidTestCase {
                 | DateUtils.FORMAT_NO_MIDNIGHT));
         assertEquals("3:30AM", DateUtils.formatDateRange(mContext, fixedTime, fixedTime,
                 DateUtils.FORMAT_SHOW_TIME | DateUtils.FORMAT_UTC));
-        assertEquals("3am", DateUtils.formatDateRange(mContext, fixedTime - integralDuration,
+        assertEquals("3AM", DateUtils.formatDateRange(mContext, fixedTime - integralDuration,
                 fixedTime - integralDuration,
                 DateUtils.FORMAT_SHOW_TIME | DateUtils.FORMAT_ABBREV_TIME));
         assertEquals("Mon", DateUtils.formatDateRange(mContext, fixedTime,
