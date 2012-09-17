@@ -37,7 +37,7 @@ public class NetworkInfo_DetailedStateTest extends AndroidTestCase {
 
     public void testValues() {
         DetailedState[] expected = DetailedState.values();
-        assertEquals(12, expected.length);
+        assertEquals(13, expected.length);
         assertEquals(DetailedState.IDLE, expected[0]);
         assertEquals(DetailedState.SCANNING, expected[1]);
         assertEquals(DetailedState.CONNECTING, expected[2]);
@@ -50,6 +50,7 @@ public class NetworkInfo_DetailedStateTest extends AndroidTestCase {
         assertEquals(DetailedState.FAILED, expected[9]);
         assertEquals(DetailedState.BLOCKED, expected[10]);
         assertEquals(DetailedState.VERIFYING_POOR_LINK, expected[11]);
+        assertEquals(DetailedState.CAPTIVE_PORTAL_CHECK, expected[12]);
     }
 
 }
