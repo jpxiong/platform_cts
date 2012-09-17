@@ -45,6 +45,7 @@ import android.webkit.CacheManager;
 import android.webkit.CacheManager.CacheResult;
 import android.webkit.ConsoleMessage;
 import android.webkit.DownloadListener;
+import android.webkit.JavascriptInterface;
 import android.webkit.SslErrorHandler;
 import android.webkit.WebBackForwardList;
 import android.webkit.WebChromeClient;
@@ -411,6 +412,7 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
                 return mWasProvideResultCalled;
             }
 
+            @JavascriptInterface
             public synchronized void provideResult(String result) {
                 mWasProvideResultCalled = true;
                 mResult = result;
@@ -483,9 +485,12 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
     public void testUseRemovedJavascriptInterface() throws Throwable {
         class RemovedObject {
             @Override
+            @JavascriptInterface
             public String toString() {
                 return "removedObject";
             }
+
+            @JavascriptInterface
             public void remove() throws Throwable {
                 mOnUiThread.removeJavascriptInterface("removedObject");
                 System.gc();
@@ -494,6 +499,8 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
         class ResultObject {
             private String mResult;
             private boolean mIsResultAvailable;
+
+            @JavascriptInterface
             public synchronized void setResult(String result) {
                 mResult = result;
                 mIsResultAvailable = true;
@@ -1168,6 +1175,7 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
         final class ImageLoaded {
             public boolean mImageLoaded;
 
+            @JavascriptInterface
             public void loaded() {
                 mImageLoaded = true;
             }
@@ -1767,6 +1775,8 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
     public void testPauseResumeTimers() throws Throwable {
         class Monitor {
             private boolean mIsUpdated;
+
+            @JavascriptInterface
             public synchronized void update() {
                 mIsUpdated  = true;
                 notify();
