@@ -801,6 +801,9 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
         exif = new ExifInterface(JPEG_PATH);
         checkGpsDataNull(exif);
         assertBitmapAndJpegSizeEqual(mJpegData, exif);
+        // Reset the rotation to prevent from affecting other tests.
+        parameters.setRotation(0);
+        mCamera.setParameters(parameters);
     }
 
     private void assertBitmapAndJpegSizeEqual(byte[] jpegData, ExifInterface exif) {
