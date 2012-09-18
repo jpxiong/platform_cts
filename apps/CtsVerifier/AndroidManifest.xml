@@ -300,7 +300,7 @@
 
             <meta-data android:name="test_required_features" android:value="android.hardware.camera"/>
         </activity>
-
+<!-- Experimental
         <activity android:name=".camera.analyzer.CameraAnalyzerActivity"
                  android:label="@string/camera_analyzer"
                  android:screenOrientation="landscape">
@@ -316,7 +316,7 @@
             <meta-data android:name="android.hardware.usb.action.USB_ACCESSORY_ATTACHED"
                 android:resource="@xml/accessory_filter_adk" />
         </activity>
-
+-->
         <activity android:name=".usb.UsbAccessoryTestActivity"
                 android:label="@string/usb_accessory_test"
                 android:configChanges="keyboardHidden|orientation">
