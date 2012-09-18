@@ -461,7 +461,7 @@
                         <TR>
                             <TH width="30%">Test</TH>
                             <TH width="5%">Result</TH>
-                            <TH>Failure Details / Details</TH>
+                            <TH>Details</TH>
                         </TR>
 
                         <!-- test case -->

@@ -75,6 +75,10 @@ class TestPackageDef implements ITestPackageDef {
     private TestFilter mExcludedTestFilter = new TestFilter();
     private String mTargetBinaryName;
     private String mTargetNameSpace;
+    // only timeout per package is supported. To change this to method granularity,
+    // test invocation should be done in method level.
+    // So for now, only max timeout for the package is used.
+    private int mTimeoutInMins = -1;
 
     void setUri(String uri) {
         mUri = uri;
@@ -238,6 +242,12 @@ class TestPackageDef implements ITestPackageDef {
         } else {
             CLog.d("Creating instrumentation test for %s", mName);
             InstrumentationApkTest instrTest = new InstrumentationApkTest();
+            if (mTimeoutInMins >= 0) {
+                // as timeout cannot be set for each test,
+                // increase the time-out of the whole package
+                CLog.d("Setting new timeout to " + mTimeoutInMins + " mins");
+                instrTest.setTestTimeout(mTimeoutInMins * 60 * 1000);
+            }
             return setInstrumentationTest(instrTest, testCaseDir);
         }
     }
@@ -300,10 +310,15 @@ class TestPackageDef implements ITestPackageDef {
      * Add a {@link TestIdentifier} to the list of tests in this package.
      *
      * @param testDef
+     * @param timeout in mins
      */
-    void addTest(TestIdentifier testDef) {
+    void addTest(TestIdentifier testDef, int timeout) {
         mTests.add(testDef);
         mTestClasses.add(testDef.getClassName());
+        // 0 means no timeout, so keep 0 if already is.
+        if ((timeout > mTimeoutInMins) && (mTimeoutInMins != 0)) {
+            mTimeoutInMins = timeout;
+        }
     }
 
     /**

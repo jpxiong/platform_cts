@@ -124,12 +124,16 @@ public class TestPackageXmlParser extends AbstractXmlParser {
                             classNameBuilder.append(".");
                         }
                     }
-
+                    int timeout = -1;
+                    String timeoutStr = attributes.getValue("timeout");
+                    if (timeoutStr != null) {
+                        timeout = Integer.parseInt(timeoutStr);
+                    }
                     TestIdentifier testId = new TestIdentifier(classNameBuilder.toString(),
                             methodName);
                     boolean isKnownFailure = "failure".equals(attributes.getValue("expectation"));
                     if (!isKnownFailure || mIncludeKnownFailures) {
-                        mPackageDef.addTest(testId);
+                        mPackageDef.addTest(testId, timeout);
                     }
                 }
             }
