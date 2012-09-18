@@ -165,8 +165,9 @@ def GenerateSignatureCheckDescription(test_repository):
 
 if __name__ == '__main__':
   builder = CtsBuilder(sys.argv)
-  result = builder.GenerateTestDescriptions()
-  if result != 0:
-    sys.exit(result)
+  if builder.isCts:
+    result = builder.GenerateTestDescriptions()
+    if result != 0:
+      sys.exit(result)
   builder.GenerateTestPlans()
 

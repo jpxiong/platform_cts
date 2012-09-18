@@ -19,14 +19,20 @@
 
 package com.android.pts.filesystemperf;
 
+import android.cts.util.TimeoutReq;
 import com.android.pts.util.PtsAndroidTestCase;
 
+/**
+ * This class is for testing PTS itself. Will be disabled in release.
+ *
+ */
 public class TestTest extends PtsAndroidTestCase {
     @Override
     protected void tearDown() throws Exception {
         super.tearDown();
     }
 
+    @TimeoutReq(minutes = 15)
     public void testPass() {
         double[] array = new double[] {1.0, 2.0, 3.0};
         getReportLog().printArray(" ", array, true);
@@ -35,6 +41,7 @@ public class TestTest extends PtsAndroidTestCase {
         getReportLog().printValue(" ", 2.0);
     }
 
+    @TimeoutReq(minutes = 10)
     public void testFail() throws Exception {
         getReportLog().printValue(" ", 1.0);
         getReportLog().printValue(" ", 2.0);
