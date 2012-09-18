@@ -49,6 +49,7 @@ import com.sun.javadoc.Doclet;
 import com.sun.javadoc.MethodDoc;
 import com.sun.javadoc.RootDoc;
 import com.sun.javadoc.AnnotationDesc.ElementValuePair;
+import com.sun.javadoc.AnnotationTypeElementDoc;
 
 /**
  * Doclet that outputs in the following format:
@@ -56,7 +57,7 @@ import com.sun.javadoc.AnnotationDesc.ElementValuePair;
  * suite:android.holo.cts
  * case:HoloTest
  * test:testHolo
- * test:testHoloDialog
+ * test:testHoloDialog[:timeout_value]
  */
 public class CtsJavaScannerDoclet extends Doclet {
 
@@ -81,7 +82,27 @@ public class CtsJavaScannerDoclet extends Doclet {
                     if (!method.name().startsWith("test")) {
                         continue;
                     }
-                    writer.append("test:").println(method.name());
+                    int timeout = -1;
+                    AnnotationDesc[] annotations = method.annotations();
+                    for (AnnotationDesc annot : annotations) {
+                        AnnotationTypeDoc atype = annot.annotationType();
+                        if (atype.toString().equals("android.cts.util.TimeoutReq")) {
+                            ElementValuePair[] cpairs = annot.elementValues();
+                            for (ElementValuePair pair: cpairs) {
+                                AnnotationTypeElementDoc elem = pair.element();
+                                AnnotationValue value = pair.value();
+                                if (elem.name().equals("minutes")) {
+                                    timeout = ((Integer)value.value());
+                                }
+                            }
+                        }
+                    }
+                    writer.append("test:");
+                    if (timeout >= 0) {
+                        writer.append(method.name()).println(":" + timeout);
+                    } else {
+                        writer.println(method.name());
+                    }
                 }
             }
         }

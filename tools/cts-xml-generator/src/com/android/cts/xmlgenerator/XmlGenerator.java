@@ -174,17 +174,20 @@ class XmlGenerator {
         }
     }
 
-    private void writeTests(PrintWriter writer, Collection<String> tests,
+    private void writeTests(PrintWriter writer, Collection<Test> tests,
             StringBuilder nameCollector) {
-        for (String test : tests) {
-            nameCollector.append('#').append(test);
-            writer.append("<Test name=\"").append(test).append("\"");
+        for (Test test : tests) {
+            nameCollector.append('#').append(test.getName());
+            writer.append("<Test name=\"").append(test.getName()).append("\"");
             if (isKnownFailure(mExpectations, nameCollector.toString())) {
                 writer.append(" expectation=\"failure\"");
             }
+            if (test.getTimeout() >= 0) {
+                writer.append(" timeout=\"" + test.getTimeout() + "\"");
+            }
             writer.println(" />");
 
-            nameCollector.delete(nameCollector.length() - test.length() - 1,
+            nameCollector.delete(nameCollector.length() - test.getName().length() - 1,
                     nameCollector.length());
         }
     }

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2011 The Android Open Source Project
+ * Copyright (C) 2012 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,32 +13,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.android.cts.xmlgenerator;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
+public class Test {
+    private String mName;
+    private int mTimeout;
 
-class TestCase {
-
-    private final String mName;
-
-    private final List<Test> mTests = new ArrayList<Test>();
-
-    public TestCase(String name) {
+    public Test(String name, int timeout) {
         mName = name;
+        mTimeout = timeout;
     }
 
     public String getName() {
         return mName;
     }
 
-    public void addTest(String testName, int timeout) {
-        mTests.add(new Test(testName, timeout));
-    }
-
-    public Collection<Test> getTests() {
-        return Collections.unmodifiableCollection(mTests);
+    public int getTimeout() {
+        return mTimeout;
     }
 }
