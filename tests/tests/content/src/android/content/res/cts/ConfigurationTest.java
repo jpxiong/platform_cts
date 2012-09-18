@@ -22,7 +22,6 @@ import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
 import android.os.Parcel;
 import android.test.AndroidTestCase;
-import android.util.LocaleUtil;
 import android.view.View;
 
 public class ConfigurationTest extends AndroidTestCase {

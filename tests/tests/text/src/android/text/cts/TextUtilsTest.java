@@ -27,23 +27,27 @@ import android.os.Parcel;
 import android.os.Parcelable;
 import android.test.AndroidTestCase;
 import android.text.GetChars;
-import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.SpannableStringBuilder;
 import android.text.Spanned;
 import android.text.SpannedString;
 import android.text.TextPaint;
 import android.text.TextUtils;
-import android.text.TextUtils.EllipsizeCallback;
 import android.text.TextUtils.TruncateAt;
 import android.text.style.BackgroundColorSpan;
 import android.text.style.ReplacementSpan;
 import android.text.style.TextAppearanceSpan;
 import android.text.style.URLSpan;
 import android.util.StringBuilderPrinter;
+import dalvik.annotation.TestLevel;
+import dalvik.annotation.TestTargetNew;
 
 import java.util.ArrayList;
+import java.util.Locale;
 import java.util.regex.Pattern;
+
+import static android.view.View.LAYOUT_DIRECTION_LTR;
+import static android.view.View.LAYOUT_DIRECTION_RTL;
 
 /**
  * Test {@link TextUtils}.
@@ -2026,4 +2030,174 @@ public class TextUtilsTest extends AndroidTestCase {
         TextUtils.dumpSpans(spanned, printer, prefix);
         assertTrue(builder.length() > 0);
     }
-}
+
+    @TestTargetNew(
+            level = TestLevel.COMPLETE,
+            method = "getLayoutDirectionFromLocale",
+            args = {Locale.class}
+    )
+    public void testGetLayoutDirectionFromLocale() {
+        assertEquals(LAYOUT_DIRECTION_LTR,
+                TextUtils.getLayoutDirectionFromLocale(null));
+
+        assertEquals(LAYOUT_DIRECTION_LTR,
+                TextUtils.getLayoutDirectionFromLocale(Locale.ENGLISH));
+        assertEquals(LAYOUT_DIRECTION_LTR,
+                TextUtils.getLayoutDirectionFromLocale(Locale.CANADA));
+        assertEquals(LAYOUT_DIRECTION_LTR,
+                TextUtils.getLayoutDirectionFromLocale(Locale.CANADA_FRENCH));
+        assertEquals(LAYOUT_DIRECTION_LTR,
+                TextUtils.getLayoutDirectionFromLocale(Locale.FRANCE));
+        assertEquals(LAYOUT_DIRECTION_LTR,
+                TextUtils.getLayoutDirectionFromLocale(Locale.FRENCH));
+        assertEquals(LAYOUT_DIRECTION_LTR,
+                TextUtils.getLayoutDirectionFromLocale(Locale.GERMAN));
+        assertEquals(LAYOUT_DIRECTION_LTR,
+                TextUtils.getLayoutDirectionFromLocale(Locale.GERMANY));
+        assertEquals(LAYOUT_DIRECTION_LTR,
+                TextUtils.getLayoutDirectionFromLocale(Locale.ITALIAN));
+        assertEquals(LAYOUT_DIRECTION_LTR,
+                TextUtils.getLayoutDirectionFromLocale(Locale.ITALY));
+        assertEquals(LAYOUT_DIRECTION_LTR,
+                TextUtils.getLayoutDirectionFromLocale(Locale.UK));
+        assertEquals(LAYOUT_DIRECTION_LTR,
+                TextUtils.getLayoutDirectionFromLocale(Locale.US));
+
+        assertEquals(LAYOUT_DIRECTION_LTR,
+                TextUtils.getLayoutDirectionFromLocale(Locale.ROOT));
+
+        assertEquals(LAYOUT_DIRECTION_LTR,
+                TextUtils.getLayoutDirectionFromLocale(Locale.CHINA));
+        assertEquals(LAYOUT_DIRECTION_LTR,
+                TextUtils.getLayoutDirectionFromLocale(Locale.CHINESE));
+        assertEquals(LAYOUT_DIRECTION_LTR,
+                TextUtils.getLayoutDirectionFromLocale(Locale.JAPAN));
+        assertEquals(LAYOUT_DIRECTION_LTR,
+                TextUtils.getLayoutDirectionFromLocale(Locale.JAPANESE));
+        assertEquals(LAYOUT_DIRECTION_LTR,
+                TextUtils.getLayoutDirectionFromLocale(Locale.KOREA));
+        assertEquals(LAYOUT_DIRECTION_LTR,
+                TextUtils.getLayoutDirectionFromLocale(Locale.KOREAN));
+        assertEquals(LAYOUT_DIRECTION_LTR,
+                TextUtils.getLayoutDirectionFromLocale(Locale.PRC));
+        assertEquals(LAYOUT_DIRECTION_LTR,
+                TextUtils.getLayoutDirectionFromLocale(Locale.SIMPLIFIED_CHINESE));
+        assertEquals(LAYOUT_DIRECTION_LTR,
+                TextUtils.getLayoutDirectionFromLocale(Locale.TAIWAN));
+        assertEquals(LAYOUT_DIRECTION_LTR,
+                TextUtils.getLayoutDirectionFromLocale(Locale.TRADITIONAL_CHINESE));
+
+        Locale locale = new Locale("ar");
+        assertEquals(LAYOUT_DIRECTION_RTL,
+                TextUtils.getLayoutDirectionFromLocale(locale));
+        locale = new Locale("ar", "AE");
+        assertEquals(LAYOUT_DIRECTION_RTL,
+                TextUtils.getLayoutDirectionFromLocale(locale));
+        locale = new Locale("ar", "BH");
+        assertEquals(LAYOUT_DIRECTION_RTL,
+                TextUtils.getLayoutDirectionFromLocale(locale));
+        locale = new Locale("ar", "DZ");
+        assertEquals(LAYOUT_DIRECTION_RTL,
+                TextUtils.getLayoutDirectionFromLocale(locale));
+        locale = new Locale("ar", "EG");
+        assertEquals(LAYOUT_DIRECTION_RTL,
+                TextUtils.getLayoutDirectionFromLocale(locale));
+        locale = new Locale("ar", "IQ");
+        assertEquals(LAYOUT_DIRECTION_RTL,
+                TextUtils.getLayoutDirectionFromLocale(locale));
+        locale = new Locale("ar", "JO");
+        assertEquals(LAYOUT_DIRECTION_RTL,
+                TextUtils.getLayoutDirectionFromLocale(locale));
+        locale = new Locale("ar", "KW");
+        assertEquals(LAYOUT_DIRECTION_RTL,
+                TextUtils.getLayoutDirectionFromLocale(locale));
+        locale = new Locale("ar", "LB");
+        assertEquals(LAYOUT_DIRECTION_RTL,
+                TextUtils.getLayoutDirectionFromLocale(locale));
+        locale = new Locale("ar", "LY");
+        assertEquals(LAYOUT_DIRECTION_RTL,
+                TextUtils.getLayoutDirectionFromLocale(locale));
+        locale = new Locale("ar", "MA");
+        assertEquals(LAYOUT_DIRECTION_RTL,
+                TextUtils.getLayoutDirectionFromLocale(locale));
+        locale = new Locale("ar", "OM");
+        assertEquals(LAYOUT_DIRECTION_RTL,
+                TextUtils.getLayoutDirectionFromLocale(locale));
+        locale = new Locale("ar", "QA");
+        assertEquals(LAYOUT_DIRECTION_RTL,
+                TextUtils.getLayoutDirectionFromLocale(locale));
+        locale = new Locale("ar", "SA");
+        assertEquals(LAYOUT_DIRECTION_RTL,
+                TextUtils.getLayoutDirectionFromLocale(locale));
+        locale = new Locale("ar", "SD");
+        assertEquals(LAYOUT_DIRECTION_RTL,
+                TextUtils.getLayoutDirectionFromLocale(locale));
+        locale = new Locale("ar", "SY");
+        assertEquals(LAYOUT_DIRECTION_RTL,
+                TextUtils.getLayoutDirectionFromLocale(locale));
+        locale = new Locale("ar", "TN");
+        assertEquals(LAYOUT_DIRECTION_RTL,
+                TextUtils.getLayoutDirectionFromLocale(locale));
+        locale = new Locale("ar", "YE");
+        assertEquals(LAYOUT_DIRECTION_RTL,
+                TextUtils.getLayoutDirectionFromLocale(locale));
+
+        locale = new Locale("fa");
+        assertEquals(LAYOUT_DIRECTION_RTL,
+                TextUtils.getLayoutDirectionFromLocale(locale));
+        locale = new Locale("fa", "AF");
+        assertEquals(LAYOUT_DIRECTION_RTL,
+                TextUtils.getLayoutDirectionFromLocale(locale));
+        locale = new Locale("fa", "IR");
+        assertEquals(LAYOUT_DIRECTION_RTL,
+                TextUtils.getLayoutDirectionFromLocale(locale));
+
+        locale = new Locale("iw");
+        assertEquals(LAYOUT_DIRECTION_RTL,
+                TextUtils.getLayoutDirectionFromLocale(locale));
+        locale = new Locale("iw", "IL");
+        assertEquals(LAYOUT_DIRECTION_RTL,
+                TextUtils.getLayoutDirectionFromLocale(locale));
+        locale = new Locale("he");
+        assertEquals(LAYOUT_DIRECTION_RTL,
+                TextUtils.getLayoutDirectionFromLocale(locale));
+        locale = new Locale("he", "IL");
+        assertEquals(LAYOUT_DIRECTION_RTL,
+                TextUtils.getLayoutDirectionFromLocale(locale));
+
+        locale = new Locale("pa_Arab");
+        assertEquals(LAYOUT_DIRECTION_RTL,
+                TextUtils.getLayoutDirectionFromLocale(locale));
+        locale = new Locale("pa_Arab", "PK");
+        assertEquals(LAYOUT_DIRECTION_RTL,
+                TextUtils.getLayoutDirectionFromLocale(locale));
+
+        locale = new Locale("ps");
+        assertEquals(LAYOUT_DIRECTION_RTL,
+                TextUtils.getLayoutDirectionFromLocale(locale));
+        locale = new Locale("ps", "AF");
+        assertEquals(LAYOUT_DIRECTION_RTL,
+                TextUtils.getLayoutDirectionFromLocale(locale));
+
+        locale = new Locale("ur");
+        assertEquals(LAYOUT_DIRECTION_RTL,
+                TextUtils.getLayoutDirectionFromLocale(locale));
+        locale = new Locale("ur", "IN");
+        assertEquals(LAYOUT_DIRECTION_RTL,
+                TextUtils.getLayoutDirectionFromLocale(locale));
+        locale = new Locale("ur", "PK");
+        assertEquals(LAYOUT_DIRECTION_RTL,
+                TextUtils.getLayoutDirectionFromLocale(locale));
+
+        locale = new Locale("uz_Arab");
+        assertEquals(LAYOUT_DIRECTION_RTL,
+                TextUtils.getLayoutDirectionFromLocale(locale));
+        locale = new Locale("uz_Arab", "AF");
+        assertEquals(LAYOUT_DIRECTION_RTL,
+                TextUtils.getLayoutDirectionFromLocale(locale));
+
+        // Locale without a real language
+        locale = new Locale("zz");
+        assertEquals(LAYOUT_DIRECTION_LTR,
+                TextUtils.getLayoutDirectionFromLocale(locale));
+    }}
