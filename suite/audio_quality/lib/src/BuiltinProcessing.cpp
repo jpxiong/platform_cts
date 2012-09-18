@@ -63,10 +63,10 @@ TaskGeneric::ExecutionResult BuiltinProcessing::rms_mva(void** inputs, void** ou
 
     TaskGeneric::ExecutionResult result = TaskGeneric::EResultOK;
     if (rms < passMin) {
-        LOGW("Volume %lld low compared to min %lld max %lld", rms, passMin, passMax);
+        MSG("Volume %lld low compared to min %lld max %lld", rms, passMin, passMax);
         mRMSPasses = 0;
     } else if (rms <= passMax) {
-        LOGW("Volume %lld OK compared to min %lld max %lld", rms, passMin, passMax);
+        MSG("Volume %lld OK compared to min %lld max %lld", rms, passMin, passMax);
         mRMSPasses++;
         if (mRMSPasses >= RMS_CONTINUOUS_PASSES) {
             //mRMSPasses = 0;
