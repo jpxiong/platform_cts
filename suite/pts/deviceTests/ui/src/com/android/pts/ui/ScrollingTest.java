@@ -15,12 +15,13 @@
  */
 package com.android.pts.ui;
 
-import java.io.IOException;
-
+import android.cts.util.TimeoutReq;
 import com.android.pts.util.MeasureRun;
 import com.android.pts.util.MeasureTime;
 import com.android.pts.util.PtsActivityInstrumentationTestCase2;
 import com.android.pts.util.ReportLog;
+
+import java.io.IOException;
 
 public class ScrollingTest extends PtsActivityInstrumentationTestCase2<ScrollingActivity> {
     private ScrollingActivity mActivity;
@@ -51,6 +52,7 @@ public class ScrollingTest extends PtsActivityInstrumentationTestCase2<Scrolling
         super.tearDown();
     }
 
+    @TimeoutReq(minutes = 30)
     public void testFullScrolling() throws IOException {
         final int NUMBER_REPEAT = 10;
         final ScrollingActivity activity = mActivity;

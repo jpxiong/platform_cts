@@ -16,10 +16,7 @@
 
 package com.android.pts.filesystemperf;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-
+import android.cts.util.TimeoutReq;
 import com.android.pts.util.MeasureRun;
 import com.android.pts.util.MeasureTime;
 import com.android.pts.util.PtsAndroidTestCase;
@@ -27,6 +24,10 @@ import com.android.pts.util.ReportLog;
 import com.android.pts.util.SystemUtil;
 
 import android.util.Log;
+
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 
 public class FullUpdateTest extends PtsAndroidTestCase {
     private static final String DIR_INITIAL_FILL = "INITIAL_FILL";
@@ -42,6 +43,7 @@ public class FullUpdateTest extends PtsAndroidTestCase {
 
     // fill disk almost, update exceeding free space, then update some amount
     // idea is to drain all free blocks and measure update performance
+    @TimeoutReq(minutes = 30)
     public void testAlmostFilledUpdate() throws IOException {
         long freeDisk = SystemUtil.getFreeDiskSize(getContext());
         final long FREE_SPACE_TO_LEAVE = 500L * 1024L * 1024L; // leave this much

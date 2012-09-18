@@ -16,16 +16,17 @@
 
 package com.android.pts.filesystemperf;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-
+import android.cts.util.TimeoutReq;
 import com.android.pts.util.MeasureRun;
 import com.android.pts.util.MeasureTime;
 import com.android.pts.util.PtsAndroidTestCase;
 import com.android.pts.util.ReportLog;
 import com.android.pts.util.SystemUtil;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
 
 public class RWTest extends PtsAndroidTestCase {
     private static final String DIR_SEQ_WR = "SEQ_WR";
@@ -41,6 +42,7 @@ public class RWTest extends PtsAndroidTestCase {
         super.tearDown();
     }
 
+    @TimeoutReq(minutes = 30)
     public void testSingleSequentialWrite() throws IOException {
         final int numberOfFiles = (int)(getFileSizeExceedingMemory() / BUFFER_SIZE);
         getReportLog().printValue("files", numberOfFiles);
@@ -61,7 +63,7 @@ public class RWTest extends PtsAndroidTestCase {
         getReportLog().printArray("Wr amount", wrAmount, true);
     }
 
-
+    @TimeoutReq(minutes = 30)
     public void testSingleSequentialUpdate() throws IOException {
         final long fileSize = getFileSizeExceedingMemory();
         File file = FileUtil.createNewFilledFile(getContext(),
@@ -87,6 +89,7 @@ public class RWTest extends PtsAndroidTestCase {
         }
     }
 
+    @TimeoutReq(minutes = 30)
     public void testSingleSequentialRead() throws IOException {
         final long fileSize = getFileSizeExceedingMemory();
         long start = System.currentTimeMillis();
