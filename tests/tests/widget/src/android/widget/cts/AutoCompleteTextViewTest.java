@@ -520,6 +520,7 @@ public class AutoCompleteTextViewTest extends
                 mAutoCompleteTextView.showDropDown();
             }
         });
+        mInstrumentation.waitForIdleSync();
         mInstrumentation.sendKeyDownUpSync(KeyEvent.KEYCODE_DPAD_DOWN);
         mInstrumentation.sendKeyDownUpSync(KeyEvent.KEYCODE_DPAD_CENTER);
         assertTrue(listener.isOnItemClicked());
