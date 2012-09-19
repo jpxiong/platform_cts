@@ -20,6 +20,7 @@ import com.android.pts.util.MeasureRun;
 import com.android.pts.util.MeasureTime;
 import com.android.pts.util.PtsActivityInstrumentationTestCase2;
 import com.android.pts.util.ReportLog;
+import com.android.pts.util.Stat;
 
 import java.io.IOException;
 
@@ -65,5 +66,7 @@ public class ScrollingTest extends PtsActivityInstrumentationTestCase2<Scrolling
             }
         });
         getReportLog().printArray("ms", results, false);
+        Stat.StatResult stat = Stat.getStat(results);
+        getReportLog().printSummary("Time ms", stat.mMax, stat.mAverage);
     }
 }

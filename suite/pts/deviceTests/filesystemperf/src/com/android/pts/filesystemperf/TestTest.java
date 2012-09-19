@@ -39,12 +39,14 @@ public class TestTest extends PtsAndroidTestCase {
         getReportLog().printArray(" ", array, false);
         getReportLog().printValue(" ", 1.0);
         getReportLog().printValue(" ", 2.0);
+        getReportLog().printSummary("This should be shown", 0, 0);
     }
 
     @TimeoutReq(minutes = 10)
     public void testFail() throws Exception {
         getReportLog().printValue(" ", 1.0);
         getReportLog().printValue(" ", 2.0);
+        getReportLog().printSummary("This should not be shown", 0, 0);
         throw new Exception("failed");
     }
 }

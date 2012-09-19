@@ -36,9 +36,11 @@ import java.util.List;
 public class ReportLog {
     private static final String TAG = "PtsReport";
     private static final String LOG_SEPARATOR = "+++";
+    private static final String SUMMARY_SEPARATOR = "++++";
     private static final String LOG_ELEM_SEPARATOR = "|";
 
     private List<String> mMessages = new LinkedList<String> ();
+    private String mSummary = null;
     /**
      * print given value to the report
      * @param header string to explain the contents. It can be unit for the value.
@@ -61,36 +63,26 @@ public class ReportLog {
         StringBuilder builder = new StringBuilder();
         builder.append(getClassMethodNames(4, true) + LOG_ELEM_SEPARATOR + header +
                 LOG_ELEM_SEPARATOR + "da" + LOG_ELEM_SEPARATOR);
-        double average = 0.0;
-        double min = val[0];
-        double max = val[0];
         for (double v : val) {
             builder.append(v);
             builder.append(" ");
-            average += v;
-            if (v > max) {
-                max = v;
-            }
-            if (v < min) {
-                min = v;
-            }
         }
-        average /= val.length;
-        double power = 0;
-        for (double v : val) {
-            double delta = v - average;
-            power += (delta * delta);
-        }
-        power /= val.length;
-        double stdDev = Math.sqrt(power);
-        builder.append(LOG_ELEM_SEPARATOR + "average " + average +
-                (addMin ? (" min " + min) : (" max " + max)) + " stddev " + stdDev);
+        Stat.StatResult stat = Stat.getStat(val);
+        builder.append(LOG_ELEM_SEPARATOR + "average " + stat.mAverage +
+                (addMin ? (" min " + stat.mMin) : (" max " + stat.mMax)) + " stddev " + stat.mStddev);
         mMessages.add(builder.toString());
         Log.i(TAG, builder.toString());
     }
 
+    public void printSummary(String header, double worst, double average) {
+        mSummary = header + LOG_ELEM_SEPARATOR + "worst " + worst + LOG_ELEM_SEPARATOR +
+                "average " + average;
+    }
+
     public void throwReportToHost() throws PtsException {
         StringBuilder builder = new StringBuilder();
+        builder.append(mSummary);
+        builder.append(SUMMARY_SEPARATOR);
         for (String entry : mMessages) {
             builder.append(entry);
             builder.append(LOG_SEPARATOR);
