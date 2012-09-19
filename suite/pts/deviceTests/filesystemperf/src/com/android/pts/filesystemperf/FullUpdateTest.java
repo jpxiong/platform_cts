@@ -46,7 +46,7 @@ public class FullUpdateTest extends PtsAndroidTestCase {
     @TimeoutReq(minutes = 30)
     public void testAlmostFilledUpdate() throws IOException {
         long freeDisk = SystemUtil.getFreeDiskSize(getContext());
-        final long FREE_SPACE_TO_LEAVE = 500L * 1024L * 1024L; // leave this much
+        final long FREE_SPACE_TO_LEAVE = 400L * 1024L * 1024L; // leave this much
         long diskToFill = freeDisk - FREE_SPACE_TO_LEAVE;
         Log.i(TAG, "free disk " + freeDisk + ", to fill " + diskToFill);
         final long MAX_FILE_SIZE_TO_FILL = 1024L * 1024L * 1024L;
@@ -64,7 +64,7 @@ public class FullUpdateTest extends PtsAndroidTestCase {
 
         // now about freeSpaceToLeave should be left
         // and try updating exceeding the free space size
-        final long FILE_SIZE = FREE_SPACE_TO_LEAVE / 2;
+        final long FILE_SIZE = 300L * 1024L * 1024L;
         File file = FileUtil.createNewFilledFile(getContext(),
                 DIR_WORK, FILE_SIZE);
         final int BUFFER_SIZE = 10 * 1024 * 1024;
