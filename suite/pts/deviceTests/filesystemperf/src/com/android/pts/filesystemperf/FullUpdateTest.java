@@ -21,6 +21,7 @@ import com.android.pts.util.MeasureRun;
 import com.android.pts.util.MeasureTime;
 import com.android.pts.util.PtsAndroidTestCase;
 import com.android.pts.util.ReportLog;
+import com.android.pts.util.Stat;
 import com.android.pts.util.SystemUtil;
 
 import android.util.Log;
@@ -69,7 +70,10 @@ public class FullUpdateTest extends PtsAndroidTestCase {
                 DIR_WORK, FILE_SIZE);
         final int BUFFER_SIZE = 10 * 1024 * 1024;
         final byte[] data = FileUtil.generateRandomData(BUFFER_SIZE);
-        for (int i = 0; i < 10; i++) {
+        final int NUMBER_REPEATITION = 10;
+        double[] worsts = new double[NUMBER_REPEATITION];
+        double[] averages = new double[NUMBER_REPEATITION];
+        for (int i = 0; i < NUMBER_REPEATITION; i++) {
             final FileOutputStream out = new FileOutputStream(file);
             int numberRepeat = (int)(FILE_SIZE / BUFFER_SIZE);
             double[] times = MeasureTime.measure(numberRepeat, new MeasureRun() {
@@ -81,8 +85,15 @@ public class FullUpdateTest extends PtsAndroidTestCase {
                 }
             });
             out.close();
+            double[] mbps = ReportLog.calcRatePerSecArray(BUFFER_SIZE / 1024 / 1024, times);
             getReportLog().printArray(i + "-th round MB/s",
-                    ReportLog.calcRatePerSecArray(BUFFER_SIZE / 1024 / 1024, times), true);
+                    mbps, true);
+            Stat.StatResult stat = Stat.getStat(mbps);
+            worsts[i] = stat.mMin;
+            averages[i] = stat.mAverage;
         }
+        Stat.StatResult statWorsts = Stat.getStat(worsts);
+        Stat.StatResult statAverages = Stat.getStat(averages);
+        getReportLog().printSummary("MB/s", statWorsts.mMin, statAverages.mAverage);
     }
 }
