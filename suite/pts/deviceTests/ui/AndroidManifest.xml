@@ -32,7 +32,7 @@
             </intent-filter>
         </activity>
     </application>
-    <instrumentation android:name="android.test.InstrumentationTestRunner"
+    <instrumentation android:name="android.test.InstrumentationCtsTestRunner"
             android:targetPackage="com.android.pts.ui"
             android:label="UI Latency measurement" />
 </manifest>
