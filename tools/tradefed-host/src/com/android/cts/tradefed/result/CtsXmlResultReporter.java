@@ -100,7 +100,7 @@ public class CtsXmlResultReporter implements ITestInvocationListener {
 
     private static final String PTS_PERFORMANCE_EXCEPTION = "com.android.pts.util.PtsException";
     private static final Pattern mPtsLogPattern = Pattern.compile(
-            "com\\.android\\.pts\\.util\\.PtsException:\\s(.*)");
+            "com\\.android\\.pts\\.util\\.PtsException:\\s(.*)\\+\\+\\+\\+(.*)");
     public void setReportDir(File reportDir) {
         mReportDir = reportDir;
     }
@@ -230,7 +230,8 @@ public class CtsXmlResultReporter implements ITestInvocationListener {
             }
             Matcher m = mPtsLogPattern.matcher(trace);
             if (m.find()) {
-                mCurrentPkgResult.reportPerformanceResult(test, CtsTestStatus.PASS, m.group(1));
+                mCurrentPkgResult.reportPerformanceResult(test, CtsTestStatus.PASS, m.group(1),
+                        m.group(2));
             }
         } else {
             mCurrentPkgResult.reportTestFailure(test, CtsTestStatus.FAIL, trace);
