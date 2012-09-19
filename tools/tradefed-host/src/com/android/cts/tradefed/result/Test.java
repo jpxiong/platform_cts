@@ -36,6 +36,7 @@ class Test extends AbstractXmlPullParser {
     private static final String RESULT_ATTR = "result";
     private static final String SCENE_TAG = "FailedScene";
     private static final String STACK_TAG = "StackTrace";
+    private static final String DETAILS_TAG = "Details";
 
     private String mName;
     private CtsTestStatus mResult;
@@ -43,6 +44,8 @@ class Test extends AbstractXmlPullParser {
     private String mEndTime;
     private String mMessage;
     private String mStackTrace;
+    // details passed from pts
+    private String mDetails;
 
     /**
      * Create an empty {@link Test}
@@ -106,6 +109,14 @@ class Test extends AbstractXmlPullParser {
         mMessage = getFailureMessageFromStackTrace(mStackTrace);
     }
 
+    public String getDetails() {
+        return mDetails;
+    }
+
+    public void setDetails(String details) {
+        mDetails = details;
+    }
+
     public void updateEndTime() {
         mEndTime = TimeUtil.getTimestamp();
     }
@@ -129,20 +140,19 @@ class Test extends AbstractXmlPullParser {
         serializer.attribute(CtsXmlResultReporter.ns, ENDTIME_ATTR, mEndTime);
 
         if (mMessage != null) {
-            if (mResult == CtsTestStatus.PASS) { // PTS will add performance result
-                serializer.startTag(CtsXmlResultReporter.ns, SCENE_TAG);
-                serializer.attribute(CtsXmlResultReporter.ns, MESSAGE_ATTR, mMessage);
-                serializer.endTag(CtsXmlResultReporter.ns, SCENE_TAG);
-            } else {
-                serializer.startTag(CtsXmlResultReporter.ns, SCENE_TAG);
-                serializer.attribute(CtsXmlResultReporter.ns, MESSAGE_ATTR, mMessage);
-                if (mStackTrace != null) {
-                    serializer.startTag(CtsXmlResultReporter.ns, STACK_TAG);
-                    serializer.text(mStackTrace);
-                    serializer.endTag(CtsXmlResultReporter.ns, STACK_TAG);
-                }
-                serializer.endTag(CtsXmlResultReporter.ns, SCENE_TAG);
+            serializer.startTag(CtsXmlResultReporter.ns, SCENE_TAG);
+            serializer.attribute(CtsXmlResultReporter.ns, MESSAGE_ATTR, mMessage);
+            if (mStackTrace != null) {
+                serializer.startTag(CtsXmlResultReporter.ns, STACK_TAG);
+                serializer.text(mStackTrace);
+                serializer.endTag(CtsXmlResultReporter.ns, STACK_TAG);
             }
+            if (mDetails != null) {
+                serializer.startTag(CtsXmlResultReporter.ns, DETAILS_TAG);
+                serializer.text(mDetails);
+                serializer.endTag(CtsXmlResultReporter.ns, DETAILS_TAG);
+            }
+            serializer.endTag(CtsXmlResultReporter.ns, SCENE_TAG);
         }
         serializer.endTag(CtsXmlResultReporter.ns, TAG);
     }
