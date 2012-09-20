@@ -296,8 +296,19 @@
     <string name="ca_focus_modes_label">Focus Modes</string>
     <string name="ca_info">This test checks the image quality of the camera of this device. It requires a MacBeth 4x6 color checker. With an ADK board and a lamp connected to it on the Relay 1 port, all tests can be run automatically. Without the ADK board, all the tests except the Auto Exposure Lock Test can be run automatically and the Auto Exposure Lock Test will require users to turn on/off a lamp according to the instruction given. </string>
 
-    <!-- Strings for Camera Formats -->
+    <!-- Strings for Camera Orientation -->
+    <string name="camera_orientation">Camera Orientation</string>
+    <string name="co_info">This test checks that the camera output is oriented in the correct direction, for each camera, and for each of four orientations. Read the instruction above the \"Take Photo\" button for further usability details.</string>
+    <string name="co_preview_label">Camera preview</string>
+    <string name="co_format_label">Oriented photo</string>
+    <string name="co_camera_label">Camera:</string>
+    <string name="co_orientation_label">Orientation</string>
+    <string name="co_instruction_heading_label">Instruction:</string>
+    <string name="co_instruction_text_photo_label">Take a photo</string>
+    <string name="co_instruction_text_passfail_label">Choose pass or fail, or take another photo.</string>
+    <string name="co_photo_button_caption">Take Photo</string>
 
+    <!-- Strings for Camera Formats -->
     <string name="camera_format">Camera Formats</string>
     <string name="cf_info">This test checks that all the supported
     output formats for camera preview callbacks work correctly, and

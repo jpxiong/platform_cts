@@ -317,6 +317,19 @@
                 android:resource="@xml/accessory_filter_adk" />
         </activity>
 -->
+
+        <activity android:name=".camera.orientation.CameraOrientationActivity"
+                 android:label="@string/camera_orientation"
+                 android:screenOrientation="landscape">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.cts.intent.category.MANUAL_TEST" />
+            </intent-filter>
+            <meta-data android:name="test_category" android:value="@string/test_category_camera" />
+
+            <meta-data android:name="test_required_features" android:value="android.hardware.camera"/>
+        </activity>
+
         <activity android:name=".usb.UsbAccessoryTestActivity"
                 android:label="@string/usb_accessory_test"
                 android:configChanges="keyboardHidden|orientation">
