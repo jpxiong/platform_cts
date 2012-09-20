@@ -25,6 +25,7 @@ import java.io.InputStreamReader;
 import java.util.Random;
 
 import com.android.pts.util.MeasureRun;
+import com.android.pts.util.SystemUtil;
 
 import android.content.Context;
 import android.util.Log;
@@ -218,5 +219,28 @@ public class FileUtil {
         }
         br.close();
         return amount;
+    }
+
+    /**
+     * get file size exceeding total memory size ( 2x total memory).
+     * The size is rounded in bufferSize. And the size will be bigger than 400MB.
+     * @param context
+     * @param bufferSize
+     * @return
+     * @throws IOException
+     */
+    public static long getFileSizeExceedingMemory(Context context, int bufferSize)
+            throws IOException {
+        long freeDisk = SystemUtil.getFreeDiskSize(context);
+        long memSize = SystemUtil.getTotalMemory(context);
+        long diskSizeTarget = (2 * memSize / bufferSize) * bufferSize;
+        final long minimumDiskSize = (512L * 1024L * 1024L / bufferSize) * bufferSize;
+        if ( diskSizeTarget < minimumDiskSize ) {
+            diskSizeTarget = minimumDiskSize;
+        }
+        if (diskSizeTarget > freeDisk) {
+            throw new IOException("Free disk size " + freeDisk + " too small");
+        }
+        return diskSizeTarget;
     }
 }
