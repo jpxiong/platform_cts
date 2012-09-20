@@ -28,6 +28,11 @@ import android.test.AndroidTestCase;
 public class Settings_SystemTest extends AndroidTestCase {
     private ContentResolver cr;
 
+    private static final String INT_FIELD = "IntField";
+    private static final String LONG_FIELD = "LongField";
+    private static final String FLOAT_FIELD = "FloatField";
+    private static final String STRING_FIELD = "StringField";
+
     @Override
     protected void setUp() throws Exception {
         super.setUp();
@@ -36,13 +41,32 @@ public class Settings_SystemTest extends AndroidTestCase {
         assertNotNull(cr);
     }
 
+    private void deleteTestedRows() {
+        String selection = System.NAME + "=\"" + INT_FIELD + "\"";
+        cr.delete(System.CONTENT_URI, selection, null);
+
+        selection = System.NAME + "=\"" + LONG_FIELD + "\"";
+        cr.delete(System.CONTENT_URI, selection, null);
+
+        selection = System.NAME + "=\"" + FLOAT_FIELD + "\"";
+        cr.delete(System.CONTENT_URI, selection, null);
+
+        selection = System.NAME + "=\"" + STRING_FIELD + "\"";
+        cr.delete(System.CONTENT_URI, selection, null);
+
+        selection = System.NAME + "=\"" + System.SHOW_GTALK_SERVICE_STATUS + "\"";
+        cr.delete(System.CONTENT_URI, selection, null);
+    }
+
     public void testSystemSettings() throws SettingNotFoundException {
         /**
-         * first query the exist settings in System table, and then insert six
-         * rows: an int, a long, a float, a String, a configuration and a
-         * ShowGTalkServiceStatus. Get these six rows to check whether insert
-         * success and then delete them.
+         * first query the exist settings in System table, and then insert five
+         * rows: an int, a long, a float, a String, and a ShowGTalkServiceStatus.
+         * Get these six rows to check whether insert succeeded and then delete them.
          */
+        // Precondition: these rows must not exist in the db when we begin
+        deleteTestedRows();
+
         // first query exist rows
         Cursor c = cr.query(System.CONTENT_URI, null, null, null, null);
         try {
@@ -50,17 +74,13 @@ public class Settings_SystemTest extends AndroidTestCase {
             int origCount = c.getCount();
             c.close();
 
-            String intField = "IntField";
-            String longField = "LongField";
-            String floatField = "FloatField";
-            String stringField = "StringField";
             String stringValue = "cts";
 
             // insert 5 rows, and update 1 rows
-            assertTrue(System.putInt(cr, intField, 10));
-            assertTrue(System.putLong(cr, longField, 20l));
-            assertTrue(System.putFloat(cr, floatField, 30.0f));
-            assertTrue(System.putString(cr, stringField, stringValue));
+            assertTrue(System.putInt(cr, INT_FIELD, 10));
+            assertTrue(System.putLong(cr, LONG_FIELD, 20l));
+            assertTrue(System.putFloat(cr, FLOAT_FIELD, 30.0f));
+            assertTrue(System.putString(cr, STRING_FIELD, stringValue));
             System.setShowGTalkServiceStatus(cr, true);
 
             c = cr.query(System.CONTENT_URI, null, null, null, null);
@@ -69,28 +89,15 @@ public class Settings_SystemTest extends AndroidTestCase {
             c.close();
 
             // get these rows to assert
-            assertEquals(10, System.getInt(cr, intField));
-            assertEquals(20l, System.getLong(cr, longField));
-            assertEquals(30.0f, System.getFloat(cr, floatField), 0.001);
+            assertEquals(10, System.getInt(cr, INT_FIELD));
+            assertEquals(20l, System.getLong(cr, LONG_FIELD));
+            assertEquals(30.0f, System.getFloat(cr, FLOAT_FIELD), 0.001);
 
-            assertEquals(stringValue, System.getString(cr, stringField));
+            assertEquals(stringValue, System.getString(cr, STRING_FIELD));
             assertTrue(System.getShowGTalkServiceStatus(cr));
 
-            // delete these rows
-            String selection = System.NAME + "=\"" + intField + "\"";
-            cr.delete(System.CONTENT_URI, selection, null);
-
-            selection = System.NAME + "=\"" + longField + "\"";
-            cr.delete(System.CONTENT_URI, selection, null);
-
-            selection = System.NAME + "=\"" + floatField + "\"";
-            cr.delete(System.CONTENT_URI, selection, null);
-
-            selection = System.NAME + "=\"" + stringField + "\"";
-            cr.delete(System.CONTENT_URI, selection, null);
-
-            selection = System.NAME + "=\"" + System.SHOW_GTALK_SERVICE_STATUS + "\"";
-            cr.delete(System.CONTENT_URI, selection, null);
+            // delete the tested rows again
+            deleteTestedRows();
 
             c = cr.query(System.CONTENT_URI, null, null, null, null);
             assertNotNull(c);
