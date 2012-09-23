@@ -113,7 +113,9 @@ public class SystemFeaturesTest extends InstrumentationTestCase {
             assertNotAvailable(PackageManager.FEATURE_CAMERA_AUTOFOCUS);
             assertNotAvailable(PackageManager.FEATURE_CAMERA_FLASH);
             assertNotAvailable(PackageManager.FEATURE_CAMERA_FRONT);
+            assertNotAvailable(PackageManager.FEATURE_CAMERA_ANY);
         } else {
+            assertAvailable(PackageManager.FEATURE_CAMERA_ANY);
             checkFrontCamera();
             checkRearCamera();
         }
