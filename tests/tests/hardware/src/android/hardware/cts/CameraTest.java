@@ -2813,4 +2813,31 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
 
         terminateMessageLooper();
     }
+
+    public void testEnableShutterSound() throws Exception {
+        int nCameras = Camera.getNumberOfCameras();
+        for (int id = 0; id < nCameras; id++) {
+            Log.v(TAG, "Camera id=" + id);
+            testEnableShutterSoundByCamera(id);
+        }
+    }
+
+    private void testEnableShutterSoundByCamera(int id) throws Exception {
+        CameraInfo info = new CameraInfo();
+
+        Camera.getCameraInfo(id, info);
+
+        initializeMessageLooper(id);
+
+        boolean result;
+        Log.v(TAG, "testEnableShutterSoundByCamera: canDisableShutterSound: " +
+                info.canDisableShutterSound);
+        result = mCamera.enableShutterSound(false);
+        assertTrue(result == info.canDisableShutterSound);
+        result = mCamera.enableShutterSound(true);
+        assertTrue(result);
+
+        terminateMessageLooper();
+    }
+
 }
