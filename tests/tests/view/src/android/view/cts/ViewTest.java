@@ -3132,28 +3132,6 @@ public class ViewTest extends ActivityInstrumentationTestCase2<ViewTestStubActiv
         });
     }
 
-    @UiThreadTest
-    public void testLayoutDirection() {
-        View view = new View(mActivity);
-        assertEquals(View.LAYOUT_DIRECTION_INHERIT, view.getLayoutDirection());
-
-        view.setLayoutDirection(View.LAYOUT_DIRECTION_LTR);
-        assertEquals(View.LAYOUT_DIRECTION_LTR, view.getLayoutDirection());
-
-        view.setLayoutDirection(View.LAYOUT_DIRECTION_RTL);
-        assertEquals(View.LAYOUT_DIRECTION_RTL, view.getLayoutDirection());
-
-        view.setLayoutDirection(View.LAYOUT_DIRECTION_INHERIT);
-        assertEquals(View.LAYOUT_DIRECTION_INHERIT, view.getLayoutDirection());
-
-        view.setLayoutDirection(View.LAYOUT_DIRECTION_LOCALE);
-        assertEquals(View.LAYOUT_DIRECTION_LOCALE, view.getLayoutDirection());
-
-        // View.LAYOUT_DIRECTION_MASK = 0x00000003
-        view.setLayoutDirection(0xffffffff);
-        assertEquals(0x00000003, view.getLayoutDirection());
-    }
-
     private static class MockEditText extends EditText {
         private boolean mCalledCheckInputConnectionProxy = false;
         private boolean mCalledOnCreateInputConnection = false;

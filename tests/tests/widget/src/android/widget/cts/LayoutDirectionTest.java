@@ -34,8 +34,7 @@ public class LayoutDirectionTest extends ActivityInstrumentationTestCase2<Layout
     }
 
     private void checkDefaultDirectionForOneLayoutWithCode(ViewGroup vg) {
-        assertEquals(LAYOUT_DIRECTION_INHERIT, vg.getLayoutDirection());
-        assertEquals(LAYOUT_DIRECTION_LTR, vg.getResolvedLayoutDirection());
+        assertEquals(LAYOUT_DIRECTION_LTR, vg.getLayoutDirection());
     }
 
     @UiThreadTest
@@ -50,21 +49,17 @@ public class LayoutDirectionTest extends ActivityInstrumentationTestCase2<Layout
     private void checkDirectionForOneLayoutWithCode(ViewGroup vg) {
         vg.setLayoutDirection(LAYOUT_DIRECTION_LTR);
         assertEquals(LAYOUT_DIRECTION_LTR, vg.getLayoutDirection());
-        assertEquals(LAYOUT_DIRECTION_LTR, vg.getResolvedLayoutDirection());
 
         vg.setLayoutDirection(LAYOUT_DIRECTION_RTL);
         assertEquals(LAYOUT_DIRECTION_RTL, vg.getLayoutDirection());
-        assertEquals(LAYOUT_DIRECTION_RTL, vg.getResolvedLayoutDirection());
 
         vg.setLayoutDirection(LAYOUT_DIRECTION_LOCALE);
-        assertEquals(LAYOUT_DIRECTION_LOCALE, vg.getLayoutDirection());
         // running with English locale
-        assertEquals(LAYOUT_DIRECTION_LTR, vg.getResolvedLayoutDirection());
+        assertEquals(LAYOUT_DIRECTION_LTR, vg.getLayoutDirection());
 
         vg.setLayoutDirection(LAYOUT_DIRECTION_INHERIT);
-        assertEquals(LAYOUT_DIRECTION_INHERIT, vg.getLayoutDirection());
         // default is LTR
-        assertEquals(LAYOUT_DIRECTION_LTR, vg.getResolvedLayoutDirection());
+        assertEquals(LAYOUT_DIRECTION_LTR, vg.getLayoutDirection());
     }
 
     @UiThreadTest
@@ -85,19 +80,13 @@ public class LayoutDirectionTest extends ActivityInstrumentationTestCase2<Layout
         parent.setLayoutDirection(LAYOUT_DIRECTION_LTR);
 
         assertEquals(LAYOUT_DIRECTION_LTR, parent.getLayoutDirection());
-        assertEquals(LAYOUT_DIRECTION_LTR, parent.getResolvedLayoutDirection());
-
-        assertEquals(LAYOUT_DIRECTION_INHERIT, child.getLayoutDirection());
-        assertEquals(LAYOUT_DIRECTION_LTR, child.getResolvedLayoutDirection());
+        assertEquals(LAYOUT_DIRECTION_LTR, child.getLayoutDirection());
 
         // Parent is RTL
         parent.setLayoutDirection(LAYOUT_DIRECTION_RTL);
 
         assertEquals(LAYOUT_DIRECTION_RTL, parent.getLayoutDirection());
-        assertEquals(LAYOUT_DIRECTION_RTL, parent.getResolvedLayoutDirection());
-
-        assertEquals(LAYOUT_DIRECTION_INHERIT, child.getLayoutDirection());
-        assertEquals(LAYOUT_DIRECTION_RTL, child.getResolvedLayoutDirection());
+        assertEquals(LAYOUT_DIRECTION_RTL, child.getLayoutDirection());
     }
 
     @UiThreadTest
@@ -115,24 +104,19 @@ public class LayoutDirectionTest extends ActivityInstrumentationTestCase2<Layout
                                                    int child3Id, int child3Dir, int child3ResDir,
                                                    int child4Id, int child4Dir, int child4ResDir) {
         ViewGroup ll = (ViewGroup) getActivity().findViewById(parentId);
-        assertEquals(parentDir, ll.getLayoutDirection());
-        assertEquals(parentResDir, ll.getResolvedLayoutDirection());
+        assertEquals(parentResDir, ll.getLayoutDirection());
 
         ViewGroup child1 = (ViewGroup) getActivity().findViewById(child1Id);
-        assertEquals(child1Dir, child1.getLayoutDirection());
-        assertEquals(child1ResDir, child1.getResolvedLayoutDirection());
+        assertEquals(child1ResDir, child1.getLayoutDirection());
 
         ViewGroup child2 = (ViewGroup) getActivity().findViewById(child2Id);
-        assertEquals(child2Dir, child2.getLayoutDirection());
-        assertEquals(child2ResDir, child2.getResolvedLayoutDirection());
+        assertEquals(child2ResDir, child2.getLayoutDirection());
 
         ViewGroup child3 = (ViewGroup) getActivity().findViewById(child3Id);
-        assertEquals(child3Dir, child3.getLayoutDirection());
-        assertEquals(child3ResDir, child3.getResolvedLayoutDirection());
+        assertEquals(child3ResDir, child3.getLayoutDirection());
 
         ViewGroup child4 = (ViewGroup) getActivity().findViewById(child4Id);
-        assertEquals(child4Dir, child4.getLayoutDirection());
-        assertEquals(child4ResDir, child4.getResolvedLayoutDirection());
+        assertEquals(child4ResDir, child4.getLayoutDirection());
     }
 
     @UiThreadTest
