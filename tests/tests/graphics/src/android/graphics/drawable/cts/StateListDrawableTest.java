@@ -231,10 +231,11 @@ public class StateListDrawableTest extends InstrumentationTestCase {
         StateListDrawable d3 =
             (StateListDrawable) mResources.getDrawable(R.drawable.statelistdrawable);
 
+        // StateListDrawable mutates its children when jumping to a new drawable
         d1.getCurrent().setAlpha(100);
         assertEquals(100, ((BitmapDrawable) d1.getCurrent()).getPaint().getAlpha());
-        assertEquals(100, ((BitmapDrawable) d2.getCurrent()).getPaint().getAlpha());
-        assertEquals(100, ((BitmapDrawable) d3.getCurrent()).getPaint().getAlpha());
+        assertEquals(255, ((BitmapDrawable) d2.getCurrent()).getPaint().getAlpha());
+        assertEquals(255, ((BitmapDrawable) d3.getCurrent()).getPaint().getAlpha());
 
         d1.mutate();
 
