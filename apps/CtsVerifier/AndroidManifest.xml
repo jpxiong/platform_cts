@@ -298,7 +298,7 @@
             </intent-filter>
             <meta-data android:name="test_category" android:value="@string/test_category_camera" />
 
-            <meta-data android:name="test_required_features" android:value="android.hardware.camera"/>
+            <meta-data android:name="test_required_features" android:value="android.hardware.camera.any"/>
         </activity>
 <!-- Experimental
         <activity android:name=".camera.analyzer.CameraAnalyzerActivity"
@@ -327,7 +327,7 @@
             </intent-filter>
             <meta-data android:name="test_category" android:value="@string/test_category_camera" />
 
-            <meta-data android:name="test_required_features" android:value="android.hardware.camera"/>
+            <meta-data android:name="test_required_features" android:value="android.hardware.camera.any"/>
         </activity>
 
         <activity android:name=".usb.UsbAccessoryTestActivity"
