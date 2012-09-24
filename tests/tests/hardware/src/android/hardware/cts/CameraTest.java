@@ -2750,6 +2750,7 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
             subtestTakePictureByCamera();
             testJpegExifByCamera(true);
             testJpegThumbnailSizeByCamera(true);
+            Thread.sleep(2000);
             recorder.stop();
         } finally {
             recorder.release();
