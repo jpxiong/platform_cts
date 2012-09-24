@@ -3158,14 +3158,39 @@ public class TextViewTest extends ActivityInstrumentationTestCase2<TextViewStubA
     @UiThreadTest
     public void testTextAlignmentDefault() {
         TextView tv = new TextView(getActivity());
-        assertEquals(View.TEXT_ALIGNMENT_GRAVITY, tv.getTextAlignment());
+        assertEquals(View.TEXT_ALIGNMENT_GRAVITY, tv.getRawTextAlignment());
         // resolved default text alignment is GRAVITY
-        assertEquals(View.TEXT_ALIGNMENT_GRAVITY, tv.getResolvedTextAlignment());
+        assertEquals(View.TEXT_ALIGNMENT_GRAVITY, tv.getTextAlignment());
     }
 
     @UiThreadTest
     public void testSetGetTextAlignment() {
         TextView tv = new TextView(getActivity());
+
+        tv.setTextAlignment(View.TEXT_ALIGNMENT_GRAVITY);
+        assertEquals(View.TEXT_ALIGNMENT_GRAVITY, tv.getRawTextAlignment());
+
+        tv.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
+        assertEquals(View.TEXT_ALIGNMENT_CENTER, tv.getRawTextAlignment());
+
+        tv.setTextAlignment(View.TEXT_ALIGNMENT_TEXT_START);
+        assertEquals(View.TEXT_ALIGNMENT_TEXT_START, tv.getRawTextAlignment());
+
+        tv.setTextAlignment(View.TEXT_ALIGNMENT_TEXT_END);
+        assertEquals(View.TEXT_ALIGNMENT_TEXT_END, tv.getRawTextAlignment());
+
+        tv.setTextAlignment(View.TEXT_ALIGNMENT_VIEW_START);
+        assertEquals(View.TEXT_ALIGNMENT_VIEW_START, tv.getRawTextAlignment());
+
+        tv.setTextAlignment(View.TEXT_ALIGNMENT_VIEW_END);
+        assertEquals(View.TEXT_ALIGNMENT_VIEW_END, tv.getRawTextAlignment());
+    }
+
+    @UiThreadTest
+    public void testGetResolvedTextAlignment() {
+        TextView tv = new TextView(getActivity());
+
+        assertEquals(View.TEXT_ALIGNMENT_GRAVITY, tv.getTextAlignment());
 
         tv.setTextAlignment(View.TEXT_ALIGNMENT_GRAVITY);
         assertEquals(View.TEXT_ALIGNMENT_GRAVITY, tv.getTextAlignment());
@@ -3187,31 +3212,6 @@ public class TextViewTest extends ActivityInstrumentationTestCase2<TextViewStubA
     }
 
     @UiThreadTest
-    public void testGetResolvedTextAlignment() {
-        TextView tv = new TextView(getActivity());
-
-        assertEquals(View.TEXT_ALIGNMENT_GRAVITY, tv.getResolvedTextAlignment());
-
-        tv.setTextAlignment(View.TEXT_ALIGNMENT_GRAVITY);
-        assertEquals(View.TEXT_ALIGNMENT_GRAVITY, tv.getResolvedTextAlignment());
-
-        tv.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
-        assertEquals(View.TEXT_ALIGNMENT_CENTER, tv.getResolvedTextAlignment());
-
-        tv.setTextAlignment(View.TEXT_ALIGNMENT_TEXT_START);
-        assertEquals(View.TEXT_ALIGNMENT_TEXT_START, tv.getResolvedTextAlignment());
-
-        tv.setTextAlignment(View.TEXT_ALIGNMENT_TEXT_END);
-        assertEquals(View.TEXT_ALIGNMENT_TEXT_END, tv.getResolvedTextAlignment());
-
-        tv.setTextAlignment(View.TEXT_ALIGNMENT_VIEW_START);
-        assertEquals(View.TEXT_ALIGNMENT_VIEW_START, tv.getResolvedTextAlignment());
-
-        tv.setTextAlignment(View.TEXT_ALIGNMENT_VIEW_END);
-        assertEquals(View.TEXT_ALIGNMENT_VIEW_END, tv.getResolvedTextAlignment());
-    }
-
-    @UiThreadTest
     public void testGetResolvedTextAlignmentWithInheritance() {
         LinearLayout ll = new LinearLayout(getActivity());
         ll.setTextAlignment(View.TEXT_ALIGNMENT_GRAVITY);
@@ -3220,45 +3220,45 @@ public class TextViewTest extends ActivityInstrumentationTestCase2<TextViewStubA
         ll.addView(tv);
 
         // check defaults
+        assertEquals(View.TEXT_ALIGNMENT_GRAVITY, tv.getRawTextAlignment());
         assertEquals(View.TEXT_ALIGNMENT_GRAVITY, tv.getTextAlignment());
-        assertEquals(View.TEXT_ALIGNMENT_GRAVITY, tv.getResolvedTextAlignment());
 
         // set inherit and check that child is following parent
         tv.setTextAlignment(View.TEXT_ALIGNMENT_INHERIT);
-        assertEquals(View.TEXT_ALIGNMENT_INHERIT, tv.getTextAlignment());
+        assertEquals(View.TEXT_ALIGNMENT_INHERIT, tv.getRawTextAlignment());
 
         ll.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
-        assertEquals(View.TEXT_ALIGNMENT_CENTER, tv.getResolvedTextAlignment());
+        assertEquals(View.TEXT_ALIGNMENT_CENTER, tv.getTextAlignment());
 
         ll.setTextAlignment(View.TEXT_ALIGNMENT_TEXT_START);
-        assertEquals(View.TEXT_ALIGNMENT_TEXT_START, tv.getResolvedTextAlignment());
+        assertEquals(View.TEXT_ALIGNMENT_TEXT_START, tv.getTextAlignment());
 
         ll.setTextAlignment(View.TEXT_ALIGNMENT_TEXT_END);
-        assertEquals(View.TEXT_ALIGNMENT_TEXT_END, tv.getResolvedTextAlignment());
+        assertEquals(View.TEXT_ALIGNMENT_TEXT_END, tv.getTextAlignment());
 
         ll.setTextAlignment(View.TEXT_ALIGNMENT_VIEW_START);
-        assertEquals(View.TEXT_ALIGNMENT_VIEW_START, tv.getResolvedTextAlignment());
+        assertEquals(View.TEXT_ALIGNMENT_VIEW_START, tv.getTextAlignment());
 
         ll.setTextAlignment(View.TEXT_ALIGNMENT_VIEW_END);
-        assertEquals(View.TEXT_ALIGNMENT_VIEW_END, tv.getResolvedTextAlignment());
+        assertEquals(View.TEXT_ALIGNMENT_VIEW_END, tv.getTextAlignment());
 
         // now get rid of the inheritance but still change the parent
         tv.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
 
         ll.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
-        assertEquals(View.TEXT_ALIGNMENT_CENTER, tv.getResolvedTextAlignment());
+        assertEquals(View.TEXT_ALIGNMENT_CENTER, tv.getTextAlignment());
 
         ll.setTextAlignment(View.TEXT_ALIGNMENT_TEXT_START);
-        assertEquals(View.TEXT_ALIGNMENT_CENTER, tv.getResolvedTextAlignment());
+        assertEquals(View.TEXT_ALIGNMENT_CENTER, tv.getTextAlignment());
 
         ll.setTextAlignment(View.TEXT_ALIGNMENT_TEXT_END);
-        assertEquals(View.TEXT_ALIGNMENT_CENTER, tv.getResolvedTextAlignment());
+        assertEquals(View.TEXT_ALIGNMENT_CENTER, tv.getTextAlignment());
 
         ll.setTextAlignment(View.TEXT_ALIGNMENT_VIEW_START);
-        assertEquals(View.TEXT_ALIGNMENT_CENTER, tv.getResolvedTextAlignment());
+        assertEquals(View.TEXT_ALIGNMENT_CENTER, tv.getTextAlignment());
 
         ll.setTextAlignment(View.TEXT_ALIGNMENT_VIEW_END);
-        assertEquals(View.TEXT_ALIGNMENT_CENTER, tv.getResolvedTextAlignment());
+        assertEquals(View.TEXT_ALIGNMENT_CENTER, tv.getTextAlignment());
     }
 
     @UiThreadTest
@@ -3270,11 +3270,11 @@ public class TextViewTest extends ActivityInstrumentationTestCase2<TextViewStubA
 
         ll.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
         tv.setTextAlignment(View.TEXT_ALIGNMENT_INHERIT);
-        assertEquals(View.TEXT_ALIGNMENT_CENTER, tv.getResolvedTextAlignment());
+        assertEquals(View.TEXT_ALIGNMENT_CENTER, tv.getTextAlignment());
 
         ll.removeView(tv);
         // default text alignment is GRAVITY
-        assertEquals(View.TEXT_ALIGNMENT_GRAVITY, tv.getResolvedTextAlignment());
+        assertEquals(View.TEXT_ALIGNMENT_GRAVITY, tv.getTextAlignment());
     }
 
     private static class MockOnEditorActionListener implements OnEditorActionListener {
