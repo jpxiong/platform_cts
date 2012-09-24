@@ -305,6 +305,7 @@ public class AudioManagerTest extends AndroidTestCase {
         mAudioManager.adjustVolume(ADJUST_RAISE, 0);
         mAudioManager.adjustSuggestedStreamVolume(
                 ADJUST_LOWER, USE_DEFAULT_STREAM_TYPE, 0);
+        int maxMusicVolume = mAudioManager.getStreamMaxVolume(STREAM_MUSIC);
 
         for (int i = 0; i < streams.length; i++) {
             // set ringer mode to back normal to not interfere with volume tests
@@ -315,6 +316,21 @@ public class AudioManagerTest extends AndroidTestCase {
             mAudioManager.setStreamVolume(streams[i], 1, 0);
             assertEquals(1, mAudioManager.getStreamVolume(streams[i]));
 
+            if (streams[i] == AudioManager.STREAM_MUSIC && mAudioManager.isWiredHeadsetOn()) {
+                // due to new regulations, music sent over a wired headset may be volume limited
+                // until the user explicitly increases the limit, so we can't rely on being able
+                // to set the volume to getStreamMaxVolume(). Instead, determine the current limit
+                // by increasing the volume until it won't go any higher, then use that volume as
+                // the maximum for the purposes of this test
+                int curvol = 0;
+                int prevvol = 0;
+                do {
+                    prevvol = curvol;
+                    mAudioManager.adjustStreamVolume(streams[i], ADJUST_RAISE, 0);
+                    curvol = mAudioManager.getStreamVolume(streams[i]);
+                } while (curvol != prevvol);
+                maxVolume = maxMusicVolume = curvol;
+            }
             mAudioManager.setStreamVolume(streams[i], maxVolume, 0);
             mAudioManager.adjustStreamVolume(streams[i], ADJUST_RAISE, 0);
             assertEquals(maxVolume, mAudioManager.getStreamVolume(streams[i]));
@@ -348,7 +364,6 @@ public class AudioManagerTest extends AndroidTestCase {
         }
 
         // adjust volume
-        int maxVolume = mAudioManager.getStreamMaxVolume(STREAM_MUSIC);
         mAudioManager.adjustVolume(ADJUST_RAISE, 0);
 
         MediaPlayer mp = MediaPlayer.create(mContext, MP3_TO_PLAY);
@@ -359,24 +374,24 @@ public class AudioManagerTest extends AndroidTestCase {
         assertTrue(mAudioManager.isMusicActive());
 
         // adjust volume as ADJUST_SAME
-        for (int k = 0; k < maxVolume; k++) {
+        for (int k = 0; k < maxMusicVolume; k++) {
             mAudioManager.adjustVolume(ADJUST_SAME, 0);
-            assertEquals(maxVolume, mAudioManager.getStreamVolume(STREAM_MUSIC));
+            assertEquals(maxMusicVolume, mAudioManager.getStreamVolume(STREAM_MUSIC));
         }
 
         // adjust volume as ADJUST_RAISE
         mAudioManager.setStreamVolume(STREAM_MUSIC, 1, 0);
-        for (int k = 0; k < maxVolume - 1; k++) {
+        for (int k = 0; k < maxMusicVolume - 1; k++) {
             mAudioManager.adjustVolume(ADJUST_RAISE, 0);
             assertEquals(2 + k, mAudioManager.getStreamVolume(STREAM_MUSIC));
         }
 
         // adjust volume as ADJUST_LOWER
-        mAudioManager.setStreamVolume(STREAM_MUSIC, maxVolume, 0);
-        maxVolume = mAudioManager.getStreamVolume(STREAM_MUSIC);
+        mAudioManager.setStreamVolume(STREAM_MUSIC, maxMusicVolume, 0);
+        maxMusicVolume = mAudioManager.getStreamVolume(STREAM_MUSIC);
 
         mAudioManager.adjustVolume(ADJUST_LOWER, 0);
-        assertEquals(maxVolume - 1, mAudioManager.getStreamVolume(STREAM_MUSIC));
+        assertEquals(maxMusicVolume - 1, mAudioManager.getStreamVolume(STREAM_MUSIC));
         mp.stop();
         mp.release();
         Thread.sleep(TIME_TO_PLAY);
