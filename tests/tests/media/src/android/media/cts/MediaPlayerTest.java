@@ -55,57 +55,8 @@ public class MediaPlayerTest extends MediaPlayerTestBase {
     private static final int  RECORDED_VIDEO_HEIGHT = 144;
     private static final long RECORDED_DURATION_MS  = 3000;
     private Vector<Integer> mTimedTextTrackIndex = new Vector<Integer>();
-
-    public class SubtitleMonitor {
-        private int selectedTrack;
-        private int numSignal;
-
-        public synchronized void reset() {
-            selectedTrack = 0;
-            numSignal = 0;
-        }
-
-        public synchronized void setSelectedTrack(int index) {
-            selectedTrack = index;
-        }
-
-        public synchronized int getSelectedTrack() {
-            return selectedTrack;
-        }
-
-        public synchronized void signal() {
-            numSignal++;
-            notifyAll();
-        }
-
-        public synchronized int getNumSignal() {
-            return numSignal;
-        }
-
-        public synchronized void waitForSignal(int targetCount) throws InterruptedException {
-            while (numSignal < targetCount) {
-                wait();
-            }
-        }
-
-        public synchronized void waitForSignal(int targetCount, long millis)
-                throws InterruptedException {
-            if (millis == 0) {
-                waitForSignal(targetCount);
-                return;
-            }
-            long deadline = System.currentTimeMillis() + millis;
-            while (numSignal < targetCount) {
-                long delay = deadline - System.currentTimeMillis();
-                if (delay < 0) {
-                    return;
-                }
-                wait(delay);
-            }
-        }
-    }
-
-    private SubtitleMonitor mSubtitleStatus = new SubtitleMonitor();
+    private int mSelectedTimedTextIndex;
+    private Monitor mOnTimedTextCalled = new Monitor();
 
     private File mOutFile;
 
@@ -731,7 +682,76 @@ public class MediaPlayerTest extends MediaPlayerTestBase {
     private void selectSubtitleTrack(int index) throws Exception {
         int trackIndex = mTimedTextTrackIndex.get(index);
         mMediaPlayer.selectTrack(trackIndex);
-        mSubtitleStatus.setSelectedTrack(index);
+        mSelectedTimedTextIndex = index;
+    }
+
+    private void deselectSubtitleTrack(int index) throws Exception {
+        int trackIndex = mTimedTextTrackIndex.get(index);
+        mMediaPlayer.deselectTrack(trackIndex);
+        if (mSelectedTimedTextIndex == index) {
+            mSelectedTimedTextIndex = -1;
+        }
+    }
+
+    public void testDeselectTrack() throws Exception {
+        loadResource(R.raw.testvideo_with_2_subtitles);
+        loadSubtitleSource(R.raw.test_subtitle1_srt);
+        readTimedTextTracks();
+        assertEquals(getTimedTextTrackCount(), 3);
+
+        mMediaPlayer.setDisplay(getActivity().getSurfaceHolder());
+        mMediaPlayer.setScreenOnWhilePlaying(true);
+        mMediaPlayer.setWakeMode(mContext, PowerManager.PARTIAL_WAKE_LOCK);
+        mMediaPlayer.setOnTimedTextListener(new MediaPlayer.OnTimedTextListener() {
+            @Override
+            public void onTimedText(MediaPlayer mp, TimedText text) {
+                if (text != null) {
+                    String plainText = text.getText();
+                    if (plainText != null) {
+                        mOnTimedTextCalled.signal();
+                        Log.d(LOG_TAG, "text: " + plainText.trim());
+                    }
+                }
+            }
+        });
+        mMediaPlayer.prepare();
+        mMediaPlayer.start();
+        assertTrue(mMediaPlayer.isPlaying());
+
+        // Run twice to check if repeated selection-deselection on the same track works well.
+        for (int i = 0; i < 2; i++) {
+            // Waits until at least one subtitle is fired. Timeout is 1 sec.
+            selectSubtitleTrack(0);
+            mOnTimedTextCalled.reset();
+            assertTrue(mOnTimedTextCalled.waitForSignal(1000));
+
+            // Try deselecting track.
+            deselectSubtitleTrack(0);
+            mOnTimedTextCalled.reset();
+            assertFalse(mOnTimedTextCalled.waitForSignal(1000));
+        }
+
+        // Run the same test for external subtitle track.
+        for (int i = 0; i < 2; i++) {
+            selectSubtitleTrack(2);
+            mOnTimedTextCalled.reset();
+            assertTrue(mOnTimedTextCalled.waitForSignal(1000));
+
+            // Try deselecting track.
+            deselectSubtitleTrack(2);
+            mOnTimedTextCalled.reset();
+            assertFalse(mOnTimedTextCalled.waitForSignal(1000));
+        }
+
+        try {
+            deselectSubtitleTrack(0);
+            fail("Deselecting unselected track: expected RuntimeException, " +
+                 "but no exception has been triggered.");
+        } catch (RuntimeException e) {
+            // expected
+        }
+
+        mMediaPlayer.stop();
     }
 
     public void testChangeSubtitleTrack() throws Exception {
@@ -760,12 +780,17 @@ public class MediaPlayerTest extends MediaPlayerTestBase {
                         StringTokenizer tokens = new StringTokenizer(plainText.trim(), ":");
                         int subtitleTrackIndex = Integer.parseInt(tokens.nextToken());
                         int startMs = Integer.parseInt(tokens.nextToken());
-                        Log.w(LOG_TAG, "text: " + plainText.trim() +
+                        Log.d(LOG_TAG, "text: " + plainText.trim() +
                               ", trackId: " + subtitleTrackIndex + ", posMs: " + posMs);
-                        assertTrue(posMs >= startMs - toleranceMs);
-                        assertTrue(posMs < startMs + durationMs + toleranceMs);
-                        assertEquals(mSubtitleStatus.getSelectedTrack(), subtitleTrackIndex);
-                        mSubtitleStatus.signal();
+                        assertTrue("The diff between subtitle's start time " + startMs +
+                                   " and current time " + posMs +
+                                   " is over tolerance " + toleranceMs,
+                                   (posMs >= startMs - toleranceMs) &&
+                                   (posMs < startMs + durationMs + toleranceMs) );
+                        assertEquals("Expected track: " + mSelectedTimedTextIndex +
+                                     ", actual track: " + subtitleTrackIndex,
+                                     mSelectedTimedTextIndex, subtitleTrackIndex);
+                        mOnTimedTextCalled.signal();
                     }
                 }
             }
@@ -774,8 +799,8 @@ public class MediaPlayerTest extends MediaPlayerTestBase {
         mMediaPlayer.prepare();
         assertFalse(mMediaPlayer.isPlaying());
 
-        mSubtitleStatus.reset();
         selectSubtitleTrack(0);
+        mOnTimedTextCalled.reset();
 
         mMediaPlayer.start();
         assertTrue(mMediaPlayer.isPlaying());
@@ -783,23 +808,19 @@ public class MediaPlayerTest extends MediaPlayerTestBase {
         // Waits until at least two subtitles are fired. Timeout is 2 sec.
         // Please refer the test srt files:
         // test_subtitle1_srt.3gp and test_subtitle2_srt.3gp
-        mSubtitleStatus.waitForSignal(2, 2000);
-        assertTrue(mSubtitleStatus.getNumSignal() >= 2);
-        mSubtitleStatus.reset();
+        assertTrue(mOnTimedTextCalled.waitForCountedSignals(2, 2000) >= 2);
 
         selectSubtitleTrack(1);
-        mSubtitleStatus.waitForSignal(2, 2000);
-        assertTrue(mSubtitleStatus.getNumSignal() >= 2);
-        mSubtitleStatus.reset();
+        mOnTimedTextCalled.reset();
+        assertTrue(mOnTimedTextCalled.waitForCountedSignals(2, 2000) >= 2);
 
         selectSubtitleTrack(2);
-        mSubtitleStatus.waitForSignal(2, 2000);
-        assertTrue(mSubtitleStatus.getNumSignal() >= 2);
-        mSubtitleStatus.reset();
+        mOnTimedTextCalled.reset();
+        assertTrue(mOnTimedTextCalled.waitForCountedSignals(2, 2000) >= 2);
 
         selectSubtitleTrack(3);
-        mSubtitleStatus.waitForSignal(2, 2000);
-        assertTrue(mSubtitleStatus.getNumSignal() >= 2);
+        mOnTimedTextCalled.reset();
+        assertTrue(mOnTimedTextCalled.waitForCountedSignals(2, 2000) >= 2);
         mMediaPlayer.stop();
     }
 

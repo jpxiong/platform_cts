@@ -36,41 +36,54 @@ public class MediaPlayerTestBase extends ActivityInstrumentationTestCase2<MediaS
     protected static boolean sUseScaleToFitMode = false;
 
     public static class Monitor {
-        private boolean signalled;
+        private int numSignal;
 
         public synchronized void reset() {
-            signalled = false;
+            numSignal = 0;
         }
 
         public synchronized void signal() {
-            signalled = true;
+            numSignal++;
             notifyAll();
         }
 
-        public synchronized void waitForSignal() throws InterruptedException {
-            while (!signalled) {
-                wait();
-            }
+        public synchronized boolean waitForSignal() throws InterruptedException {
+            return waitForCountedSignals(1) > 0;
         }
 
-        public synchronized void waitForSignal(long millis) throws InterruptedException {
-            if (millis == 0) {
-                waitForSignal();
-                return;
+        public synchronized int waitForCountedSignals(int targetCount) throws InterruptedException {
+            while (numSignal < targetCount) {
+                wait();
             }
+            return numSignal;
+        }
 
-            long deadline = System.currentTimeMillis() + millis;
-            while (!signalled) {
+        public synchronized boolean waitForSignal(long timeoutMs) throws InterruptedException {
+            return waitForCountedSignals(1, timeoutMs) > 0;
+        }
+
+        public synchronized int waitForCountedSignals(int targetCount, long timeoutMs)
+                throws InterruptedException {
+            if (timeoutMs == 0) {
+                return waitForCountedSignals(targetCount);
+            }
+            long deadline = System.currentTimeMillis() + timeoutMs;
+            while (numSignal < targetCount) {
                 long delay = deadline - System.currentTimeMillis();
                 if (delay <= 0) {
                     break;
                 }
                 wait(delay);
             }
+            return numSignal;
         }
 
         public synchronized boolean isSignalled() {
-            return signalled;
+            return numSignal >= 1;
+        }
+
+        public synchronized int getNumSignal() {
+            return numSignal;
         }
     }
 
@@ -211,7 +224,7 @@ public class MediaPlayerTestBase extends ActivityInstrumentationTestCase2<MediaS
             public void onVideoSizeChanged(MediaPlayer mp, int w, int h) {
                 if (w == 0 && h == 0) {
                     // A size of 0x0 can be sent initially one time when using NuPlayer.
-                    assertFalse(mOnVideoSizeChangedCalled.signalled);
+                    assertFalse(mOnVideoSizeChangedCalled.isSignalled());
                     return;
                 }
                 mOnVideoSizeChangedCalled.signal();
