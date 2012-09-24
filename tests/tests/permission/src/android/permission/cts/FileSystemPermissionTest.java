@@ -384,6 +384,7 @@ public class FileSystemPermissionTest extends AndroidTestCase {
                     "/data/misc/wpa_supplicant",
                     "/data/nv",
                     "/data/nvcam",
+                    "/data/panic",
                     "/data/panicreports",
                     "/data/preinstall_md5",
                     "/data/property",
