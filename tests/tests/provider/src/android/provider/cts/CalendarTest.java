@@ -50,6 +50,10 @@ public class CalendarTest extends InstrumentationTestCase {
 
     private static final String TAG = "CalCTS";
     private static final String CTS_TEST_TYPE = "LOCAL";
+
+    // an arbitrary int used by some tests
+    private static final int SOME_ARBITRARY_INT = 143234;
+
     // @formatter:off
     private static final String[] TIME_ZONES = new String[] {
             "UTC",
@@ -2937,6 +2941,103 @@ public class CalendarTest extends InstrumentationTestCase {
 
         // delete the calendar
         removeAndVerifyCalendar(account, calendarId);
+    }
+
+    /**
+     * Tests correct behavior of Calendars.isPrimary column
+     */
+    @MediumTest
+    public void testCalendarIsPrimary() {
+        String account = "ec_account";
+        int seed = 0;
+
+        // Clean up just in case
+        CalendarHelper.deleteCalendarByAccount(mContentResolver, account);
+
+        int isPrimary;
+        Cursor cursor;
+        ContentValues values = new ContentValues();
+
+        final long calendarId = createAndVerifyCalendar(account, seed++, null);
+        final Uri uri = ContentUris.withAppendedId(Calendars.CONTENT_URI, calendarId);
+
+        // verify when ownerAccount != account_name && isPrimary IS NULL
+        cursor = mContentResolver.query(uri, new String[]{Calendars.IS_PRIMARY}, null, null, null);
+        cursor.moveToFirst();
+        isPrimary = cursor.getInt(0);
+        cursor.close();
+        assertEquals("isPrimary should be 0 if ownerAccount != account_name", 0, isPrimary);
+
+        // verify when ownerAccount == account_name && isPrimary IS NULL
+        values.clear();
+        values.put(Calendars.OWNER_ACCOUNT, account);
+        mContentResolver.update(asSyncAdapter(uri, account, CTS_TEST_TYPE), values, null, null);
+        cursor = mContentResolver.query(uri, new String[]{Calendars.IS_PRIMARY}, null, null, null);
+        cursor.moveToFirst();
+        isPrimary = cursor.getInt(0);
+        cursor.close();
+        assertEquals("isPrimary should be 1 if ownerAccount == account_name", 1, isPrimary);
+
+        // verify isPrimary IS NOT NULL
+        values.clear();
+        values.put(Calendars.IS_PRIMARY, SOME_ARBITRARY_INT);
+        mContentResolver.update(uri, values, null, null);
+        cursor = mContentResolver.query(uri, new String[]{Calendars.IS_PRIMARY}, null, null, null);
+        cursor.moveToFirst();
+        isPrimary = cursor.getInt(0);
+        cursor.close();
+        assertEquals("isPrimary should be the value it was set to", SOME_ARBITRARY_INT, isPrimary);
+
+        CalendarHelper.deleteCalendarByAccount(mContentResolver, account);
+    }
+
+    /**
+     * Tests correct behavior of Events.isOrganizer column
+     */
+    @MediumTest
+    public void testEventsIsOrganizer() {
+        String account = "ec_account";
+        int seed = 0;
+
+        // Clean up just in case
+        CalendarHelper.deleteCalendarByAccount(mContentResolver, account);
+
+        int isOrganizer;
+        Cursor cursor;
+        ContentValues values = new ContentValues();
+
+        final long calendarId = createAndVerifyCalendar(account, seed++, null);
+        final long eventId = createAndVerifyEvent(account, seed, calendarId, true, null);
+        final Uri uri = ContentUris.withAppendedId(Events.CONTENT_URI, eventId);
+
+        // verify when ownerAccount != organizer && isOrganizer IS NULL
+        cursor = mContentResolver.query(uri, new String[]{Events.IS_ORGANIZER}, null, null, null);
+        cursor.moveToFirst();
+        isOrganizer = cursor.getInt(0);
+        cursor.close();
+        assertEquals("isOrganizer should be 0 if ownerAccount != organizer", 0, isOrganizer);
+
+        // verify when ownerAccount == account_name && isOrganizer IS NULL
+        values.clear();
+        values.put(Events.ORGANIZER, CalendarHelper.generateCalendarOwnerEmail(account));
+        mContentResolver.update(asSyncAdapter(uri, account, CTS_TEST_TYPE), values, null, null);
+        cursor = mContentResolver.query(uri, new String[]{Events.IS_ORGANIZER}, null, null, null);
+        cursor.moveToFirst();
+        isOrganizer = cursor.getInt(0);
+        cursor.close();
+        assertEquals("isOrganizer should be 1 if ownerAccount == organizer", 1, isOrganizer);
+
+        // verify isOrganizer IS NOT NULL
+        values.clear();
+        values.put(Events.IS_ORGANIZER, SOME_ARBITRARY_INT);
+        mContentResolver.update(uri, values, null, null);
+        cursor = mContentResolver.query(uri, new String[]{Events.IS_ORGANIZER}, null, null, null);
+        cursor.moveToFirst();
+        isOrganizer = cursor.getInt(0);
+        cursor.close();
+        assertEquals(
+                "isPrimary should be the value it was set to", SOME_ARBITRARY_INT, isOrganizer);
+        CalendarHelper.deleteCalendarByAccount(mContentResolver, account);
     }
 
     /**
