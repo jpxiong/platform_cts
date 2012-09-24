@@ -2987,12 +2987,38 @@ public class TextViewTest extends ActivityInstrumentationTestCase2<TextViewStubA
     @UiThreadTest
     public void testTextDirectionDefault() {
         TextView tv = new TextView(mActivity);
-        assertEquals(View.TEXT_DIRECTION_INHERIT, tv.getTextDirection());
+        assertEquals(View.TEXT_DIRECTION_INHERIT, tv.getRawTextDirection());
     }
 
     @UiThreadTest
     public void testSetGetTextDirection() {
         TextView tv = new TextView(mActivity);
+
+        tv.setTextDirection(View.TEXT_DIRECTION_FIRST_STRONG);
+        assertEquals(View.TEXT_DIRECTION_FIRST_STRONG, tv.getRawTextDirection());
+
+        tv.setTextDirection(View.TEXT_DIRECTION_ANY_RTL);
+        assertEquals(View.TEXT_DIRECTION_ANY_RTL, tv.getRawTextDirection());
+
+        tv.setTextDirection(View.TEXT_DIRECTION_INHERIT);
+        assertEquals(View.TEXT_DIRECTION_INHERIT, tv.getRawTextDirection());
+
+        tv.setTextDirection(View.TEXT_DIRECTION_LTR);
+        assertEquals(View.TEXT_DIRECTION_LTR, tv.getRawTextDirection());
+
+        tv.setTextDirection(View.TEXT_DIRECTION_RTL);
+        assertEquals(View.TEXT_DIRECTION_RTL, tv.getRawTextDirection());
+
+        tv.setTextDirection(View.TEXT_DIRECTION_LOCALE);
+        assertEquals(View.TEXT_DIRECTION_LOCALE, tv.getRawTextDirection());
+    }
+
+    @UiThreadTest
+    public void testGetResolvedTextDirectionLtr() {
+        TextView tv = new TextView(mActivity);
+        tv.setText("this is a test");
+
+        assertEquals(View.TEXT_DIRECTION_FIRST_STRONG, tv.getTextDirection());
 
         tv.setTextDirection(View.TEXT_DIRECTION_FIRST_STRONG);
         assertEquals(View.TEXT_DIRECTION_FIRST_STRONG, tv.getTextDirection());
@@ -3001,7 +3027,7 @@ public class TextViewTest extends ActivityInstrumentationTestCase2<TextViewStubA
         assertEquals(View.TEXT_DIRECTION_ANY_RTL, tv.getTextDirection());
 
         tv.setTextDirection(View.TEXT_DIRECTION_INHERIT);
-        assertEquals(View.TEXT_DIRECTION_INHERIT, tv.getTextDirection());
+        assertEquals(View.TEXT_DIRECTION_FIRST_STRONG, tv.getTextDirection());
 
         tv.setTextDirection(View.TEXT_DIRECTION_LTR);
         assertEquals(View.TEXT_DIRECTION_LTR, tv.getTextDirection());
@@ -3014,32 +3040,6 @@ public class TextViewTest extends ActivityInstrumentationTestCase2<TextViewStubA
     }
 
     @UiThreadTest
-    public void testGetResolvedTextDirectionLtr() {
-        TextView tv = new TextView(mActivity);
-        tv.setText("this is a test");
-
-        assertEquals(View.TEXT_DIRECTION_FIRST_STRONG, tv.getResolvedTextDirection());
-
-        tv.setTextDirection(View.TEXT_DIRECTION_FIRST_STRONG);
-        assertEquals(View.TEXT_DIRECTION_FIRST_STRONG, tv.getResolvedTextDirection());
-
-        tv.setTextDirection(View.TEXT_DIRECTION_ANY_RTL);
-        assertEquals(View.TEXT_DIRECTION_ANY_RTL, tv.getResolvedTextDirection());
-
-        tv.setTextDirection(View.TEXT_DIRECTION_INHERIT);
-        assertEquals(View.TEXT_DIRECTION_FIRST_STRONG, tv.getResolvedTextDirection());
-
-        tv.setTextDirection(View.TEXT_DIRECTION_LTR);
-        assertEquals(View.TEXT_DIRECTION_LTR, tv.getResolvedTextDirection());
-
-        tv.setTextDirection(View.TEXT_DIRECTION_RTL);
-        assertEquals(View.TEXT_DIRECTION_RTL, tv.getResolvedTextDirection());
-
-        tv.setTextDirection(View.TEXT_DIRECTION_LOCALE);
-        assertEquals(View.TEXT_DIRECTION_LOCALE, tv.getResolvedTextDirection());
-    }
-
-    @UiThreadTest
     public void testGetResolvedTextDirectionLtrWithInheritance() {
         LinearLayout ll = new LinearLayout(mActivity);
         ll.setTextDirection(View.TEXT_DIRECTION_ANY_RTL);
@@ -3049,22 +3049,22 @@ public class TextViewTest extends ActivityInstrumentationTestCase2<TextViewStubA
         ll.addView(tv);
 
         tv.setTextDirection(View.TEXT_DIRECTION_FIRST_STRONG);
-        assertEquals(View.TEXT_DIRECTION_FIRST_STRONG, tv.getResolvedTextDirection());
+        assertEquals(View.TEXT_DIRECTION_FIRST_STRONG, tv.getTextDirection());
 
         tv.setTextDirection(View.TEXT_DIRECTION_ANY_RTL);
-        assertEquals(View.TEXT_DIRECTION_ANY_RTL, tv.getResolvedTextDirection());
+        assertEquals(View.TEXT_DIRECTION_ANY_RTL, tv.getTextDirection());
 
         tv.setTextDirection(View.TEXT_DIRECTION_INHERIT);
-        assertEquals(View.TEXT_DIRECTION_ANY_RTL, tv.getResolvedTextDirection());
+        assertEquals(View.TEXT_DIRECTION_ANY_RTL, tv.getTextDirection());
 
         tv.setTextDirection(View.TEXT_DIRECTION_LTR);
-        assertEquals(View.TEXT_DIRECTION_LTR, tv.getResolvedTextDirection());
+        assertEquals(View.TEXT_DIRECTION_LTR, tv.getTextDirection());
 
         tv.setTextDirection(View.TEXT_DIRECTION_RTL);
-        assertEquals(View.TEXT_DIRECTION_RTL, tv.getResolvedTextDirection());
+        assertEquals(View.TEXT_DIRECTION_RTL, tv.getTextDirection());
 
         tv.setTextDirection(View.TEXT_DIRECTION_LOCALE);
-        assertEquals(View.TEXT_DIRECTION_LOCALE, tv.getResolvedTextDirection());
+        assertEquals(View.TEXT_DIRECTION_LOCALE, tv.getTextDirection());
     }
 
     @UiThreadTest
@@ -3072,25 +3072,25 @@ public class TextViewTest extends ActivityInstrumentationTestCase2<TextViewStubA
         TextView tv = new TextView(mActivity);
         tv.setText("\u05DD\u05DE"); // hebrew
 
-        assertEquals(View.TEXT_DIRECTION_FIRST_STRONG, tv.getResolvedTextDirection());
+        assertEquals(View.TEXT_DIRECTION_FIRST_STRONG, tv.getTextDirection());
 
         tv.setTextDirection(View.TEXT_DIRECTION_FIRST_STRONG);
-        assertEquals(View.TEXT_DIRECTION_FIRST_STRONG, tv.getResolvedTextDirection());
+        assertEquals(View.TEXT_DIRECTION_FIRST_STRONG, tv.getTextDirection());
 
         tv.setTextDirection(View.TEXT_DIRECTION_ANY_RTL);
-        assertEquals(View.TEXT_DIRECTION_ANY_RTL, tv.getResolvedTextDirection());
+        assertEquals(View.TEXT_DIRECTION_ANY_RTL, tv.getTextDirection());
 
         tv.setTextDirection(View.TEXT_DIRECTION_INHERIT);
-        assertEquals(View.TEXT_DIRECTION_FIRST_STRONG, tv.getResolvedTextDirection());
+        assertEquals(View.TEXT_DIRECTION_FIRST_STRONG, tv.getTextDirection());
 
         tv.setTextDirection(View.TEXT_DIRECTION_LTR);
-        assertEquals(View.TEXT_DIRECTION_LTR, tv.getResolvedTextDirection());
+        assertEquals(View.TEXT_DIRECTION_LTR, tv.getTextDirection());
 
         tv.setTextDirection(View.TEXT_DIRECTION_RTL);
-        assertEquals(View.TEXT_DIRECTION_RTL, tv.getResolvedTextDirection());
+        assertEquals(View.TEXT_DIRECTION_RTL, tv.getTextDirection());
 
         tv.setTextDirection(View.TEXT_DIRECTION_LOCALE);
-        assertEquals(View.TEXT_DIRECTION_LOCALE, tv.getResolvedTextDirection());
+        assertEquals(View.TEXT_DIRECTION_LOCALE, tv.getTextDirection());
     }
 
     @UiThreadTest
@@ -3103,43 +3103,43 @@ public class TextViewTest extends ActivityInstrumentationTestCase2<TextViewStubA
         ll.addView(tv);
 
         tv.setTextDirection(View.TEXT_DIRECTION_FIRST_STRONG);
-        assertEquals(View.TEXT_DIRECTION_FIRST_STRONG, tv.getResolvedTextDirection());
+        assertEquals(View.TEXT_DIRECTION_FIRST_STRONG, tv.getTextDirection());
 
         tv.setTextDirection(View.TEXT_DIRECTION_ANY_RTL);
-        assertEquals(View.TEXT_DIRECTION_ANY_RTL, tv.getResolvedTextDirection());
+        assertEquals(View.TEXT_DIRECTION_ANY_RTL, tv.getTextDirection());
 
         tv.setTextDirection(View.TEXT_DIRECTION_INHERIT);
-        assertEquals(View.TEXT_DIRECTION_FIRST_STRONG, tv.getResolvedTextDirection());
+        assertEquals(View.TEXT_DIRECTION_FIRST_STRONG, tv.getTextDirection());
 
         tv.setTextDirection(View.TEXT_DIRECTION_LTR);
-        assertEquals(View.TEXT_DIRECTION_LTR, tv.getResolvedTextDirection());
+        assertEquals(View.TEXT_DIRECTION_LTR, tv.getTextDirection());
 
         tv.setTextDirection(View.TEXT_DIRECTION_RTL);
-        assertEquals(View.TEXT_DIRECTION_RTL, tv.getResolvedTextDirection());
+        assertEquals(View.TEXT_DIRECTION_RTL, tv.getTextDirection());
 
         tv.setTextDirection(View.TEXT_DIRECTION_LOCALE);
-        assertEquals(View.TEXT_DIRECTION_LOCALE, tv.getResolvedTextDirection());
+        assertEquals(View.TEXT_DIRECTION_LOCALE, tv.getTextDirection());
 
         // Force to RTL text direction on the layout
         ll.setTextDirection(View.TEXT_DIRECTION_RTL);
 
         tv.setTextDirection(View.TEXT_DIRECTION_FIRST_STRONG);
-        assertEquals(View.TEXT_DIRECTION_FIRST_STRONG, tv.getResolvedTextDirection());
+        assertEquals(View.TEXT_DIRECTION_FIRST_STRONG, tv.getTextDirection());
 
         tv.setTextDirection(View.TEXT_DIRECTION_ANY_RTL);
-        assertEquals(View.TEXT_DIRECTION_ANY_RTL, tv.getResolvedTextDirection());
+        assertEquals(View.TEXT_DIRECTION_ANY_RTL, tv.getTextDirection());
 
         tv.setTextDirection(View.TEXT_DIRECTION_INHERIT);
-        assertEquals(View.TEXT_DIRECTION_RTL, tv.getResolvedTextDirection());
+        assertEquals(View.TEXT_DIRECTION_RTL, tv.getTextDirection());
 
         tv.setTextDirection(View.TEXT_DIRECTION_LTR);
-        assertEquals(View.TEXT_DIRECTION_LTR, tv.getResolvedTextDirection());
+        assertEquals(View.TEXT_DIRECTION_LTR, tv.getTextDirection());
 
         tv.setTextDirection(View.TEXT_DIRECTION_RTL);
-        assertEquals(View.TEXT_DIRECTION_RTL, tv.getResolvedTextDirection());
+        assertEquals(View.TEXT_DIRECTION_RTL, tv.getTextDirection());
 
         tv.setTextDirection(View.TEXT_DIRECTION_LOCALE);
-        assertEquals(View.TEXT_DIRECTION_LOCALE, tv.getResolvedTextDirection());
+        assertEquals(View.TEXT_DIRECTION_LOCALE, tv.getTextDirection());
     }
 
     @UiThreadTest
@@ -3149,10 +3149,10 @@ public class TextViewTest extends ActivityInstrumentationTestCase2<TextViewStubA
 
         ll.setTextDirection(View.TEXT_DIRECTION_RTL);
         tv.setTextDirection(View.TEXT_DIRECTION_INHERIT);
-        assertEquals(View.TEXT_DIRECTION_RTL, tv.getResolvedTextDirection());
+        assertEquals(View.TEXT_DIRECTION_RTL, tv.getTextDirection());
 
         ll.removeView(tv);
-        assertEquals(View.TEXT_DIRECTION_FIRST_STRONG, tv.getResolvedTextDirection());
+        assertEquals(View.TEXT_DIRECTION_FIRST_STRONG, tv.getTextDirection());
     }
 
     @UiThreadTest
