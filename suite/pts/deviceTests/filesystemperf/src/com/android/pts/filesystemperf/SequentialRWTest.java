@@ -29,7 +29,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
-public class RWTest extends PtsAndroidTestCase {
+public class SequentialRWTest extends PtsAndroidTestCase {
     private static final String DIR_SEQ_WR = "SEQ_WR";
     private static final String DIR_SEQ_UPD = "SEQ_UPD";
     private static final String DIR_SEQ_RD = "SEQ_RD";
@@ -45,7 +45,8 @@ public class RWTest extends PtsAndroidTestCase {
 
     @TimeoutReq(minutes = 30)
     public void testSingleSequentialWrite() throws IOException {
-        final int numberOfFiles = (int)(getFileSizeExceedingMemory() / BUFFER_SIZE);
+        final int numberOfFiles =(int)(FileUtil.getFileSizeExceedingMemory(
+                getContext(), BUFFER_SIZE) / BUFFER_SIZE);
         getReportLog().printValue("files", numberOfFiles);
         final byte[] data = FileUtil.generateRandomData(BUFFER_SIZE);
         final File[] files = FileUtil.createNewFiles(getContext(), DIR_SEQ_WR,
@@ -59,7 +60,7 @@ public class RWTest extends PtsAndroidTestCase {
                 FileUtil.writeFile(files[i], data, false);
             }
         });
-        double[] mbps = ReportLog.calcRatePerSecArray(BUFFER_SIZE / 1024 / 1024, times);
+        double[] mbps = ReportLog.calcRatePerSecArray((double)BUFFER_SIZE / 1024 / 1024, times);
         getReportLog().printArray("try " + numberOfFiles + " files, result MB/s",
                 mbps, true);
         getReportLog().printArray("Wr amount", wrAmount, true);
@@ -67,21 +68,22 @@ public class RWTest extends PtsAndroidTestCase {
         getReportLog().printSummary("MB/s", stat.mMin, stat.mAverage);
     }
 
-    @TimeoutReq(minutes = 30)
+    @TimeoutReq(minutes = 60)
     public void testSingleSequentialUpdate() throws IOException {
-        final long fileSize = getFileSizeExceedingMemory();
+        final long fileSize = FileUtil.getFileSizeExceedingMemory(getContext(), BUFFER_SIZE);
         File file = FileUtil.createNewFilledFile(getContext(),
                 DIR_SEQ_UPD, fileSize);
         final byte[] data = FileUtil.generateRandomData(BUFFER_SIZE);
-        final int NUMBER_REPEATITION = 10;
-        double[] worsts = new double[NUMBER_REPEATITION];
-        double[] averages = new double[NUMBER_REPEATITION];
-        for (int i = 0; i < NUMBER_REPEATITION; i++) {
+        final int NUMBER_REPETITION = 6;
+        double[] worsts = new double[NUMBER_REPETITION];
+        double[] averages = new double[NUMBER_REPETITION];
+        for (int i = 0; i < NUMBER_REPETITION; i++) {
             final FileOutputStream out = new FileOutputStream(file);
             int numberRepeat = (int)(fileSize / BUFFER_SIZE);
             double[] rdAmount = new double[numberRepeat];
             double[] wrAmount = new double[numberRepeat];
-            double[] times = FileUtil.measureIO(numberRepeat, rdAmount, wrAmount, new MeasureRun() {
+            double[] times = FileUtil.measureIO(numberRepeat, rdAmount, wrAmount,
+                    new MeasureRun() {
 
                 @Override
                 public void run(int i) throws IOException {
@@ -90,7 +92,8 @@ public class RWTest extends PtsAndroidTestCase {
                 }
             });
             out.close();
-            double[] mbps = ReportLog.calcRatePerSecArray(BUFFER_SIZE / 1024 / 1024, times);
+            double[] mbps = ReportLog.calcRatePerSecArray((double)BUFFER_SIZE / 1024 / 1024,
+                    times);
             getReportLog().printArray(i + "-th round MB/s",
                     mbps, true);
             getReportLog().printArray("Wr amount", wrAmount, true);
@@ -105,13 +108,13 @@ public class RWTest extends PtsAndroidTestCase {
 
     @TimeoutReq(minutes = 30)
     public void testSingleSequentialRead() throws IOException {
-        final long fileSize = getFileSizeExceedingMemory();
+        final long fileSize = FileUtil.getFileSizeExceedingMemory(getContext(), BUFFER_SIZE);
         long start = System.currentTimeMillis();
         final File file = FileUtil.createNewFilledFile(getContext(),
                 DIR_SEQ_RD, fileSize);
         long finish = System.currentTimeMillis();
         getReportLog().printValue("write size " + fileSize + " result MB/s",
-                ReportLog.calcRatePerSec(fileSize / 1024 / 1024, finish - start));
+                ReportLog.calcRatePerSec((double)fileSize / 1024 / 1024, finish - start));
 
         final int NUMBER_READ = 10;
 
@@ -129,20 +132,10 @@ public class RWTest extends PtsAndroidTestCase {
                 in.close();
             }
         });
-        double[] mbps = ReportLog.calcRatePerSecArray(fileSize / 1024 / 1024, times);
+        double[] mbps = ReportLog.calcRatePerSecArray((double)fileSize / 1024 / 1024, times);
         getReportLog().printArray("read MB/s",
                 mbps, true);
         Stat.StatResult stat = Stat.getStat(mbps);
         getReportLog().printSummary("MB/s", stat.mMin, stat.mAverage);
-    }
-
-    private long getFileSizeExceedingMemory() {
-        long freeDisk = SystemUtil.getFreeDiskSize(getContext());
-        long memSize = SystemUtil.getTotalMemory(getContext());
-        long diskSizeTarget = (2 * memSize / BUFFER_SIZE) * BUFFER_SIZE;
-        if (diskSizeTarget > freeDisk) {
-            fail("Free disk size " + freeDisk + " too small");
-        }
-        return diskSizeTarget;
     }
 }
