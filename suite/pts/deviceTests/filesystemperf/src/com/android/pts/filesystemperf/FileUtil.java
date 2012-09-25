@@ -19,12 +19,17 @@ package com.android.pts.filesystemperf;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.RandomAccessFile;
 import java.util.Random;
 
 import com.android.pts.util.MeasureRun;
+import com.android.pts.util.MeasureTime;
+import com.android.pts.util.ReportLog;
+import com.android.pts.util.Stat;
 import com.android.pts.util.SystemUtil;
 
 import android.content.Context;
@@ -162,6 +167,7 @@ public class FileUtil {
                 removeEntry(new File(entry, child));
             }
         }
+        Log.i(TAG, "delete file " + entry.getAbsolutePath());
         entry.delete();
     }
 
@@ -242,5 +248,151 @@ public class FileUtil {
             throw new IOException("Free disk size " + freeDisk + " too small");
         }
         return diskSizeTarget;
+    }
+
+    /**
+     *
+     * @param context
+     * @param dirName
+     * @param report
+     * @param fileSize
+     * @param bufferSize should be power of two
+     * @throws IOException
+     */
+    public static void doRandomReadTest(Context context, String dirName, ReportLog report,
+            long fileSize, int bufferSize) throws IOException {
+        File file = FileUtil.createNewFilledFile(context,
+                dirName, fileSize);
+
+        final byte[] data = FileUtil.generateRandomData(bufferSize);
+        Random random = new Random(0);
+        final int totalReadCount = (int)(fileSize / bufferSize);
+        final int[] readOffsets = new int[totalReadCount];
+        for (int i = 0; i < totalReadCount; i++) {
+            // align in buffer size
+            readOffsets[i] = (int)(random.nextFloat() * (fileSize - bufferSize)) &
+                    ~(bufferSize - 1);
+        }
+        final int runsInOneGo = 16;
+        final int readsInOneMeasure = totalReadCount / runsInOneGo;
+
+
+        final RandomAccessFile randomFile = new RandomAccessFile(file, "rw");
+        double[] rdAmount = new double[runsInOneGo];
+        double[] wrAmount = new double[runsInOneGo];
+        double[] times = FileUtil.measureIO(runsInOneGo, rdAmount, wrAmount, new MeasureRun() {
+
+            @Override
+            public void run(int i) throws IOException {
+                int start = i * readsInOneMeasure;
+                int end = (i + 1) * readsInOneMeasure;
+                for (int j = start; j < end; j++) {
+                    randomFile.seek(readOffsets[j]);
+                    randomFile.read(data);
+                }
+            }
+        });
+        randomFile.close();
+        double[] mbps = ReportLog.calcRatePerSecArray((double)fileSize / runsInOneGo / 1024 / 1024,
+                times);
+        report.printArray("MB/s",
+                mbps, true);
+        report.printArray("Rd amount", rdAmount, true);
+        Stat.StatResult stat = Stat.getStat(mbps);
+
+        report.printSummary("MB/s", stat.mMin, stat.mAverage);
+    }
+
+    /**
+     *
+     * @param context
+     * @param dirName
+     * @param report
+     * @param fileSize
+     * @param bufferSize should be power of two
+     * @throws IOException
+     */
+    public static void doRandomWriteTest(Context context, String dirName, ReportLog report,
+            long fileSize, int bufferSize) throws IOException {
+        File file = FileUtil.createNewFilledFile(context,
+                dirName, fileSize);
+        final byte[] data = FileUtil.generateRandomData(bufferSize);
+        Random random = new Random(0);
+        final int totalWriteCount = (int)(fileSize / bufferSize);
+        final int[] writeOffsets = new int[totalWriteCount];
+        for (int i = 0; i < totalWriteCount; i++) {
+            writeOffsets[i] = (int)(random.nextFloat() * (fileSize - bufferSize)) &
+                    ~(bufferSize - 1);
+        }
+        final int runsInOneGo = 16;
+        final int writesInOneMeasure = totalWriteCount / runsInOneGo; // 32MB at a time
+
+
+        final RandomAccessFile randomFile = new RandomAccessFile(file, "rw");
+        double[] rdAmount = new double[runsInOneGo];
+        double[] wrAmount = new double[runsInOneGo];
+        double[] times = FileUtil.measureIO(runsInOneGo, rdAmount, wrAmount, new MeasureRun() {
+
+            @Override
+            public void run(int i) throws IOException {
+                int start = i * writesInOneMeasure;
+                int end = (i + 1) * writesInOneMeasure;
+                for (int j = start; j < end; j++) {
+                    randomFile.seek(writeOffsets[j]);
+                    randomFile.write(data);
+                }
+            }
+        });
+        randomFile.close();
+        double[] mbps = ReportLog.calcRatePerSecArray((double)fileSize / runsInOneGo / 1024 / 1024,
+                times);
+        report.printArray("MB/s",
+                mbps, true);
+        report.printArray("Wr amount", wrAmount, true);
+        Stat.StatResult stat = Stat.getStat(mbps);
+
+        report.printSummary("MB/s", stat.mMin, stat.mAverage);
+    }
+
+    /**
+     *
+     * @param context
+     * @param dirName
+     * @param report
+     * @param fileSize fileSize should be multiple of bufferSize.
+     * @param bufferSize
+     * @param numberRepetition
+     * @throws IOException
+     */
+    public static void doSequentialUpdateTest(Context context, String dirName, ReportLog report,
+            long fileSize, int bufferSize, int numberRepetition) throws IOException {
+        File file = FileUtil.createNewFilledFile(context,
+                dirName, fileSize);
+        final byte[] data = FileUtil.generateRandomData(bufferSize);
+        double[] worsts = new double[numberRepetition];
+        double[] averages = new double[numberRepetition];
+        for (int i = 0; i < numberRepetition; i++) {
+            final FileOutputStream out = new FileOutputStream(file);
+            int numberRepeat = (int)(fileSize / bufferSize);
+            double[] times = MeasureTime.measure(numberRepeat, new MeasureRun() {
+
+                @Override
+                public void run(int i) throws IOException {
+                    out.write(data);
+                    out.flush();
+                }
+            });
+            out.close();
+            double[] mbps = ReportLog.calcRatePerSecArray((double)bufferSize / 1024 / 1024,
+                    times);
+            report.printArray(i + "-th round MB/s",
+                    mbps, true);
+            Stat.StatResult stat = Stat.getStat(mbps);
+            worsts[i] = stat.mMin;
+            averages[i] = stat.mAverage;
+        }
+        Stat.StatResult statWorsts = Stat.getStat(worsts);
+        Stat.StatResult statAverages = Stat.getStat(averages);
+        report.printSummary("MB/s", statWorsts.mMin, statAverages.mAverage);
     }
 }
