@@ -21,7 +21,8 @@ LOCAL_PATH:= $(call my-dir)
 # New packages should be added here
 PTS_TEST_PACKAGES = \
     PtsDeviceFilePerf \
-    PtsDeviceUi
+    PtsDeviceUi \
+    PtsDeviceDram
 
 PTS_SUPPORT_PACKAGES := \
 	TestDeviceSetup

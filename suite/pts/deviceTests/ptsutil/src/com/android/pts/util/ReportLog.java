@@ -80,6 +80,9 @@ public class ReportLog {
     }
 
     public void throwReportToHost() throws PtsException {
+        if ((mSummary == null) && mMessages.isEmpty()) {
+            return;
+        }
         StringBuilder builder = new StringBuilder();
         builder.append(mSummary);
         builder.append(SUMMARY_SEPARATOR);
@@ -97,7 +100,7 @@ public class ReportLog {
     /**
      * calculate rate per sec for given change happened during given timeInMSec.
      * timeInSec with 0 value will be changed to small value to prevent divide by zero.
-     * @param change
+     * @param change total change of quality for the given duration timeInMSec.
      * @param timeInMSec
      * @return
      */
