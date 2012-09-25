@@ -30,7 +30,7 @@ import android.view.accessibility.AccessibilityNodeInfo;
 public class AccessibilityNodeInfoTest extends AndroidTestCase {
 
     /** The number of properties of the {@link AccessibilityNodeInfo} class. */
-    private static final int NON_STATIC_FIELD_COUNT = 17;
+    private static final int NON_STATIC_FIELD_COUNT = 19;
 
     @SmallTest
     public void testMarshaling() throws Exception {
@@ -122,6 +122,8 @@ public class AccessibilityNodeInfoTest extends AndroidTestCase {
         info.addAction(AccessibilityNodeInfo.ACTION_CLEAR_FOCUS);
         info.setAccessibilityFocused(true);
         info.setMovementGranularities(AccessibilityNodeInfo.MOVEMENT_GRANULARITY_LINE);
+        info.setLabeledBy(new View(getContext()));
+        info.setLabelFor(new View(getContext()));
     }
 
     /**
