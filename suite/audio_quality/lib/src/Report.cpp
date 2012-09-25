@@ -18,6 +18,7 @@
 #include "Settings.h"
 #include "StringUtil.h"
 #include "Report.h"
+#include "task/TaskCase.h"
 
 
 Report* Report::mInstance = NULL;
@@ -45,6 +46,8 @@ Report::Report()
 Report::~Report()
 {
     writeReport();
+    mFailedCases.clear();
+    mPassedCases.clear();
 }
 
 bool Report::init(const char* dirName)
@@ -68,14 +71,36 @@ void Report::printf(const char* fmt, ...)
     va_end(ap);
 }
 
-void Report::addCasePassed(const android::String8& name)
+void Report::addCasePassed(const TaskCase* task)
 {
-    mPassedCases.push_back(name);
+    android::String8 name(" ");
+    task->getCaseName(name);
+    StringPair pair(name, task->getDetails());
+    mPassedCases.push_back(pair);
 }
 
-void Report::addCaseFailed(const android::String8& name)
+void Report::addCaseFailed(const TaskCase* task)
 {
-    mFailedCases.push_back(name);
+    android::String8 name(" ");
+    task->getCaseName(name);
+    StringPair pair(name, task->getDetails());
+    mFailedCases.push_back(pair);
+}
+
+void Report::writeResult(std::list<StringPair>::const_iterator begin,
+        std::list<StringPair>::const_iterator end, bool passed)
+{
+    std::list<StringPair>::const_iterator it;
+    for (it = begin; it != end; it++) {
+        if (passed) {
+            printf("    <test title=\"%s\" result=\"pass\" >", it->first.string());
+        } else {
+            printf("    <test title=\"%s\" result=\"fail\" >", it->first.string());
+        }
+        printf("        <details>\n%s", it->second.string());
+        printf("        </details>");
+        printf("    </test>");
+    }
 }
 
 void Report::writeReport()
@@ -89,13 +114,10 @@ void Report::writeReport()
     printf("  </device-info>");
     printf("  <audio-test-results xml=\"%s\">",
             Settings::Instance()->getSetting(Settings::ETEST_XML).string());
-    std::list<android::String8>::iterator it;
-    for (it = mFailedCases.begin(); it != mFailedCases.end(); it++) {
-        printf("    <test title=\"%s\" result=\"fail\" />", it->string());
-    }
-    for (it = mPassedCases.begin(); it != mPassedCases.end(); it++) {
-        printf("    <test title=\"%s\" result=\"pass\" />", it->string());
-    }
+
+    writeResult(mFailedCases.begin(), mFailedCases.end(), false);
+    writeResult(mPassedCases.begin(), mPassedCases.end(), true);
+
     printf("  </audio-test-results>");
     printf("</audio-test-results-report>");
 }

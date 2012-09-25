@@ -132,9 +132,9 @@ bool TaskGeneric::addStringAttribute(const android::String8& key, const android:
     return true;
 }
 
-bool TaskGeneric::findStringAttribute(const android::String8& key, android::String8& value)
+bool TaskGeneric::findStringAttribute(const android::String8& key, android::String8& value) const
 {
-    std::map<android::String8, android::String8>::iterator it = mStringAttributes.find(key);
+    std::map<android::String8, android::String8>::const_iterator it = mStringAttributes.find(key);
     if (it == mStringAttributes.end()) {
         return false; // not found
     }
