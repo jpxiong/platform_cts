@@ -372,6 +372,23 @@ public class AccessibilityWindowQueryTest
     }
 
     @MediumTest
+    public void testPerformGlobalActionQuickSettings() throws Exception {
+        // Check whether the action succeeded.
+        assertTrue(getInteractionBridge().performGlobalAction(
+                AccessibilityService.GLOBAL_ACTION_QUICK_SETTINGS));
+
+        // Sleep a bit so the UI is settles.
+        SystemClock.sleep(3000);
+
+        // Clean up.
+        getInteractionBridge().performGlobalAction(
+                AccessibilityService.GLOBAL_ACTION_BACK);
+
+        // Sleep a bit so the UI is settles.
+        SystemClock.sleep(3000);
+    }
+
+    @MediumTest
     public void testObjectContract() throws Exception {
         try {
             getInteractionBridge().setRegardViewsNotImportantForAccessibility(true);
