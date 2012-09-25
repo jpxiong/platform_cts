@@ -70,10 +70,10 @@ public class FullUpdateTest extends PtsAndroidTestCase {
                 DIR_WORK, FILE_SIZE);
         final int BUFFER_SIZE = 10 * 1024 * 1024;
         final byte[] data = FileUtil.generateRandomData(BUFFER_SIZE);
-        final int NUMBER_REPEATITION = 10;
-        double[] worsts = new double[NUMBER_REPEATITION];
-        double[] averages = new double[NUMBER_REPEATITION];
-        for (int i = 0; i < NUMBER_REPEATITION; i++) {
+        final int NUMBER_REPETITION = 10;
+        double[] worsts = new double[NUMBER_REPETITION];
+        double[] averages = new double[NUMBER_REPETITION];
+        for (int i = 0; i < NUMBER_REPETITION; i++) {
             final FileOutputStream out = new FileOutputStream(file);
             int numberRepeat = (int)(FILE_SIZE / BUFFER_SIZE);
             double[] times = MeasureTime.measure(numberRepeat, new MeasureRun() {
@@ -85,7 +85,8 @@ public class FullUpdateTest extends PtsAndroidTestCase {
                 }
             });
             out.close();
-            double[] mbps = ReportLog.calcRatePerSecArray(BUFFER_SIZE / 1024 / 1024, times);
+            double[] mbps = ReportLog.calcRatePerSecArray((double)BUFFER_SIZE / 1024 / 1024,
+                    times);
             getReportLog().printArray(i + "-th round MB/s",
                     mbps, true);
             Stat.StatResult stat = Stat.getStat(mbps);
