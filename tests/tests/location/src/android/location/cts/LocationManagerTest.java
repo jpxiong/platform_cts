@@ -685,7 +685,7 @@ public class LocationManagerTest extends InstrumentationTestCase {
         location.setLongitude(longitude);
         location.setAccuracy(1.0f);
         location.setTime(java.lang.System.currentTimeMillis());
-        location.setElapsedRealtimeNano(SystemClock.elapsedRealtimeNano());
+        location.setElapsedRealtimeNanos(SystemClock.elapsedRealtimeNanos());
         mManager.setTestProviderLocation(providerName, location);
     }
 
