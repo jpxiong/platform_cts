@@ -3192,11 +3192,13 @@ public class TextViewTest extends ActivityInstrumentationTestCase2<TextViewStubA
 
         assertEquals(View.TEXT_ALIGNMENT_GRAVITY, tv.getTextAlignment());
 
-        tv.setTextAlignment(View.TEXT_ALIGNMENT_GRAVITY);
-        assertEquals(View.TEXT_ALIGNMENT_GRAVITY, tv.getTextAlignment());
-
+        // Test center alignment first so that we dont hit the default case
         tv.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
         assertEquals(View.TEXT_ALIGNMENT_CENTER, tv.getTextAlignment());
+
+        // Test the default case too
+        tv.setTextAlignment(View.TEXT_ALIGNMENT_GRAVITY);
+        assertEquals(View.TEXT_ALIGNMENT_GRAVITY, tv.getTextAlignment());
 
         tv.setTextAlignment(View.TEXT_ALIGNMENT_TEXT_START);
         assertEquals(View.TEXT_ALIGNMENT_TEXT_START, tv.getTextAlignment());
