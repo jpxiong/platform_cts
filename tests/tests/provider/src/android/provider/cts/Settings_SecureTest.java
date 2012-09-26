@@ -154,6 +154,6 @@ public class Settings_SecureTest extends AndroidTestCase {
 
     public void testUnknownSourcesOffByDefault() throws SettingNotFoundException {
         assertEquals("Device should not ship with 'Unknown Sources' enabled by default.",
-                0, Secure.getInt(cr, Settings.Secure.INSTALL_NON_MARKET_APPS));
+                0, Settings.Global.getInt(cr, Settings.Global.INSTALL_NON_MARKET_APPS));
     }
 }
