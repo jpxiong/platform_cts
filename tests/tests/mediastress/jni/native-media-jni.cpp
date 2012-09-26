@@ -16,7 +16,7 @@
 
 /* Original code copied from NDK Native-media sample code */
 
-
+#undef NDEBUG
 #include <assert.h>
 #include <jni.h>
 #include <pthread.h>
@@ -26,8 +26,9 @@
 // for __android_log_print(ANDROID_LOG_INFO, "YourApp", "formatted message");
 #include <android/log.h>
 #define TAG "NativeMedia"
-#define LOGV(...) __android_log_print(ANDROID_LOG_VERBOSE, TAG, __VA_ARGS__)
-#define LOGE(...) __android_log_print(ANDROID_LOG_ERROR, TAG, __VA_ARGS__)
+#define ALOGV(...) __android_log_print(ANDROID_LOG_VERBOSE, TAG, __VA_ARGS__)
+#define ALOGE(...) __android_log_print(ANDROID_LOG_ERROR, TAG, __VA_ARGS__)
+#define ALOGI(...) __android_log_print(ANDROID_LOG_INFO, TAG, __VA_ARGS__)
 // for native media
 #include <OMXAL/OpenMAXAL.h>
 #include <OMXAL/OpenMAXAL_Android.h>
@@ -60,10 +61,138 @@ static ANativeWindow* theNativeWindow = NULL;
  */
 #define RETURN_ON_ASSERTION_FAILURE(cond, env, clazz)                                   \
         if (!(cond)) {                                                                  \
-            LOGE("assertion failure at file %s line %d", __FILE__, __LINE__);           \
+            ALOGE("assertion failure at file %s line %d", __FILE__, __LINE__);           \
             Java_android_mediastress_cts_NativeMediaActivity_shutdown((env), (clazz));  \
             return JNI_FALSE;                                                           \
         }
+
+// number of buffers in our buffer queue, an arbitrary number
+#define NB_BUFFERS 16
+
+// we're streaming MPEG-2 transport stream data, operate on transport stream block size
+#define MPEG2_TS_BLOCK_SIZE 188
+
+// number of MPEG-2 transport stream blocks per buffer, an arbitrary number
+#define BLOCKS_PER_BUFFER 20
+
+// determines how much memory we're dedicating to memory caching
+#define BUFFER_SIZE (BLOCKS_PER_BUFFER*MPEG2_TS_BLOCK_SIZE)
+
+// where we cache in memory the data to play
+// note this memory is re-used by the buffer queue callback
+char dataCache[BUFFER_SIZE * NB_BUFFERS];
+
+// handle of the file to play
+static FILE *file = NULL;
+
+// has the app reached the end of the file
+static jboolean reachedEof = JNI_FALSE;
+
+// constant to identify a buffer context which is the end of the stream to decode
+static const int kEosBufferCntxt = 1980; // a magic value we can compare against
+
+// for mutual exclusion between callback thread and application thread(s)
+static pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
+static pthread_cond_t cond = PTHREAD_COND_INITIALIZER;
+
+static jboolean enqueueInitialBuffers() {
+
+    /* Fill our cache */
+    size_t nbRead;
+    nbRead = fread(dataCache, BUFFER_SIZE, NB_BUFFERS, file);
+    if (nbRead <= 0) {
+        // could be premature EOF or I/O error
+        ALOGE("Error filling cache, exiting\n");
+        return JNI_FALSE;
+    }
+    assert(1 <= nbRead && nbRead <= NB_BUFFERS);
+    ALOGV("Initially queueing %u buffers of %u bytes each", nbRead, BUFFER_SIZE);
+
+    /* Enqueue the content of our cache before starting to play,
+       we don't want to starve the player */
+    size_t i;
+    for (i = 0; i < nbRead; i++) {
+        XAresult res = (*playerBQItf)->Enqueue(playerBQItf, NULL /*pBufferContext*/,
+                    dataCache + i*BUFFER_SIZE, BUFFER_SIZE, NULL, 0);
+        assert(XA_RESULT_SUCCESS == res);
+    }
+
+    return JNI_TRUE;
+}
+// AndroidBufferQueueItf callback for an audio player
+extern "C" XAresult AndroidBufferQueueCallback(
+        XAAndroidBufferQueueItf caller,
+        void *pCallbackContext,        /* input */
+        void *pBufferContext,          /* input */
+        void *pBufferData,             /* input */
+        XAuint32 dataSize,             /* input */
+        XAuint32 dataUsed,             /* input */
+        const XAAndroidBufferItem *pItems,/* input */
+        XAuint32 itemsLength           /* input */)
+{
+    XAresult res;
+    int ok;
+
+    // pCallbackContext was specified as NULL at RegisterCallback and is unused here
+    assert(NULL == pCallbackContext);
+
+    // note there is never any contention on this mutex unless a discontinuity request is active
+    ok = pthread_mutex_lock(&mutex);
+    assert(0 == ok);
+
+    if ((pBufferData == NULL) && (pBufferContext != NULL)) {
+        const int processedCommand = *(int *)pBufferContext;
+        if (kEosBufferCntxt == processedCommand) {
+            ALOGV("EOS was processed\n");
+            // our buffer with the EOS message has been consumed
+            assert(0 == dataSize);
+            goto exit;
+        }
+    }
+
+    // pBufferData is a pointer to a buffer that we previously Enqueued
+    assert(BUFFER_SIZE == dataSize);
+    assert(dataCache <= (char *) pBufferData && (char *) pBufferData <
+            &dataCache[BUFFER_SIZE * NB_BUFFERS]);
+    assert(0 == (((char *) pBufferData - dataCache) % BUFFER_SIZE));
+
+    // don't bother trying to read more data once we've hit EOF
+    if (reachedEof) {
+        goto exit;
+    }
+
+    size_t nbRead;
+    // note we do call fread from multiple threads, but never concurrently
+    nbRead = fread(pBufferData, BUFFER_SIZE, 1, file);
+    if (nbRead > 0) {
+        assert(1 == nbRead);
+        res = (*caller)->Enqueue(caller, NULL /*pBufferContext*/,
+                pBufferData /*pData*/,
+                nbRead * BUFFER_SIZE /*dataLength*/,
+                NULL /*pMsg*/,
+                0 /*msgLength*/);
+        assert(XA_RESULT_SUCCESS == res);
+    } else {
+        // signal EOS
+        XAAndroidBufferItem msgEos[1];
+        msgEos[0].itemKey = XA_ANDROID_ITEMKEY_EOS;
+        msgEos[0].itemSize = 0;
+        // EOS message has no parameters, so the total size of the message is the size of the key
+        //   plus the size if itemSize, both XAuint32
+        res = (*caller)->Enqueue(caller, (void *)&kEosBufferCntxt /*pBufferContext*/,
+                NULL /*pData*/, 0 /*dataLength*/,
+                msgEos /*pMsg*/,
+                // FIXME == sizeof(BufferItem)? */
+                sizeof(XAuint32)*2 /*msgLength*/);
+        assert(XA_RESULT_SUCCESS == res);
+        reachedEof = JNI_TRUE;
+    }
+
+exit:
+    ok = pthread_mutex_unlock(&mutex);
+    assert(0 == ok);
+    return XA_RESULT_SUCCESS;
+}
 
 // callback invoked whenever there is new or changed stream information
 static void StreamChangeCallback(XAStreamInformationItf caller,
@@ -72,7 +201,7 @@ static void StreamChangeCallback(XAStreamInformationItf caller,
         void * pEventData,
         void * pContext )
 {
-    LOGV("StreamChangeCallback called for stream %u", streamIndex);
+    ALOGV("StreamChangeCallback called for stream %u", streamIndex);
     // pContext was specified as NULL at RegisterStreamChangeCallback and is unused here
     assert(NULL == pContext);
     switch (eventId) {
@@ -91,18 +220,18 @@ static void StreamChangeCallback(XAStreamInformationItf caller,
             XAVideoStreamInformation videoInfo;
             res = (*caller)->QueryStreamInformation(caller, streamIndex, &videoInfo);
             assert(XA_RESULT_SUCCESS == res);
-            LOGV("Found video size %u x %u, codec ID=%u, frameRate=%u, bitRate=%u, duration=%u ms",
+            ALOGV("Found video size %u x %u, codec ID=%u, frameRate=%u, bitRate=%u, duration=%u ms",
                         videoInfo.width, videoInfo.height, videoInfo.codecId, videoInfo.frameRate,
                         videoInfo.bitRate, videoInfo.duration);
           } break;
           default:
-              LOGE("Unexpected domain %u\n", domain);
+              ALOGE("Unexpected domain %u\n", domain);
             break;
         }
       } break;
       default:
-          LOGE("Unexpected stream event ID %u\n", eventId);
-        break;
+          ALOGE("Unexpected stream event ID %u\n", eventId);
+          break;
     }
 }
 
@@ -142,6 +271,13 @@ extern "C" void Java_android_mediastress_cts_NativeMediaActivity_shutdown(JNIEnv
         ANativeWindow_release(theNativeWindow);
         theNativeWindow = NULL;
     }
+
+    // close the file
+    if (file != NULL) {
+        fclose(file);
+        file = NULL;
+    }
+
 }
 
 // create the engine and output mix objects
@@ -184,10 +320,17 @@ extern "C" jboolean Java_android_mediastress_cts_NativeMediaActivity_createMedia
     const char *utf8 = env->GetStringUTFChars(fileUri, NULL);
     RETURN_ON_ASSERTION_FAILURE((NULL != utf8), env, clazz);
 
-    XADataLocator_URI uri = {XA_DATALOCATOR_URI, (XAchar*) utf8};
+    RETURN_ON_ASSERTION_FAILURE(strstr(utf8, "file:///") == utf8, env, clazz);
+
+    file = fopen(utf8 + 7, "rb");
+    RETURN_ON_ASSERTION_FAILURE(file != NULL, env, clazz);
+
+
+    // configure data source
+    XADataLocator_AndroidBufferQueue loc_abq = { XA_DATALOCATOR_ANDROIDBUFFERQUEUE, NB_BUFFERS };
     XADataFormat_MIME format_mime = {
             XA_DATAFORMAT_MIME, XA_ANDROID_MIME_MP2TS, XA_CONTAINERTYPE_MPEG_TS };
-    XADataSource dataSrc = {&uri, &format_mime};
+    XADataSource dataSrc = {&loc_abq, &format_mime};
 
     // configure audio sink
     XADataLocator_OutputMix loc_outmix = { XA_DATALOCATOR_OUTPUTMIX, outputMixObject };
@@ -238,6 +381,22 @@ extern "C" jboolean Java_android_mediastress_cts_NativeMediaActivity_createMedia
     res = (*playerObj)->GetInterface(playerObj, XA_IID_VOLUME, &playerVolItf);
     RETURN_ON_ASSERTION_FAILURE((XA_RESULT_SUCCESS == res), env, clazz);
 
+    // get the Android buffer queue interface
+    res = (*playerObj)->GetInterface(playerObj, XA_IID_ANDROIDBUFFERQUEUESOURCE, &playerBQItf);
+    assert(XA_RESULT_SUCCESS == res);
+
+    // specify which events we want to be notified of
+    res = (*playerBQItf)->SetCallbackEventsMask(playerBQItf, XA_ANDROIDBUFFERQUEUEEVENT_PROCESSED);
+
+    // register the callback from which OpenMAX AL can retrieve the data to play
+    res = (*playerBQItf)->RegisterCallback(playerBQItf, AndroidBufferQueueCallback, NULL);
+    assert(XA_RESULT_SUCCESS == res);
+
+    // enqueue the initial buffers
+    if (!enqueueInitialBuffers()) {
+        return JNI_FALSE;
+    }
+
     // we want to be notified of the video size once it's found, so we register a callback for that
     res = (*playerStreamInfoItf)->RegisterStreamChangeCallback(playerStreamInfoItf,
             StreamChangeCallback, NULL);
@@ -282,3 +441,5 @@ extern "C" jboolean Java_android_mediastress_cts_NativeMediaActivity_setSurface(
     theNativeWindow = ANativeWindow_fromSurface(env, surface);
     return JNI_TRUE;
 }
+
+

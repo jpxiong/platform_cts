@@ -24,6 +24,7 @@ import android.media.CamcorderProfile;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Surface;
+import android.view.WindowManager;
 
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -57,6 +58,8 @@ public class NativeMediaActivity extends Activity implements OnSurfaceChangedLis
     @Override
     public void onCreate(Bundle icicle) {
         super.onCreate(icicle);
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON |
+                WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON);
         mVideoQuality = getIntent().getIntExtra(EXTRA_VIDEO_QUALITY, mVideoQuality);
         mGLView = new SurfaceTextureGLSurfaceView(this, this);
         setContentView(mGLView);
@@ -82,7 +85,7 @@ public class NativeMediaActivity extends Activity implements OnSurfaceChangedLis
                 Assert.assertTrue(setSurfaceForNative());
                 String fileName = getMediaString();
                 Log.i(TAG, "start playing " + fileName);
-                Assert.assertTrue(createMediaPlayer("file:///" + fileName));
+                Assert.assertTrue(createMediaPlayer("file://" + fileName));
                 mNativeCreated = true;
                 mNativeWaitQ.add(mNativeCreated);
             }
