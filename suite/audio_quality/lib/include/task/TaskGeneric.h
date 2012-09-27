@@ -99,7 +99,7 @@ protected:
     /// keys array should end with NULL
     void registerSupportedStringAttributes(const android::String8* keys[]);
     bool addStringAttribute(const android::String8& key, const android::String8& value);
-    bool findStringAttribute(const android::String8& key, android::String8& value);
+    bool findStringAttribute(const android::String8& key, android::String8& value) const;
     inline std::list<TaskGeneric*>& getChildren() {
         return mChildren;
     };

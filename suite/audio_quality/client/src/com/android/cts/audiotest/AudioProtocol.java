@@ -256,8 +256,9 @@ public class AudioProtocol implements AudioTrack.OnPlaybackPositionUpdateListene
                         mPlayback.release();
                         mPlayback = null;
                     }
-                    int type = (mode == 0) ? AudioManager.STREAM_VOICE_CALL :
-                        AudioManager.STREAM_MUSIC;
+                    // STREAM_VOICE_CALL activates different speaker.
+                    // use MUSIC mode to activate the louder speaker.
+                    int type = AudioManager.STREAM_MUSIC;
                     int bufferSize = AudioTrack.getMinBufferSize(samplingRate,
                             stereo ? AudioFormat.CHANNEL_OUT_STEREO : AudioFormat.CHANNEL_OUT_MONO,
                             AudioFormat.ENCODING_PCM_16BIT);

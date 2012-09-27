@@ -44,7 +44,7 @@ TaskCase::~TaskCase()
     delete mClient;
 }
 
-bool TaskCase::getCaseName(android::String8& name)
+bool TaskCase::getCaseName(android::String8& name) const
 {
     if (!findStringAttribute(STR_NAME, name)) {
         LOGW("TaskCase no name");
@@ -292,6 +292,17 @@ void TaskCase::releaseRemoteAudio()
     mClient = NULL;
 }
 
+void TaskCase::setDetails(android::String8 details)
+{
+    mDetails = details;
+}
+
+const android::String8& TaskCase::getDetails() const
+{
+    return mDetails;
+}
+
+
 TaskGeneric::ExecutionResult TaskCase::run()
 {
     android::String8 name;
@@ -335,17 +346,16 @@ TaskGeneric::ExecutionResult TaskCase::run()
     if (testPassed) {
         result = TaskGeneric::EResultPass;
         MSG("== Case %s Passed ==", name.string());
-        Report::Instance()->addCasePassed(name);
+        Report::Instance()->addCasePassed(this);
     } else {
         if (resultAction != TaskGeneric::EResultOK) {
             result = resultAction;
         }
         MSG("== Case %s Failed ==", name.string());
-        Report::Instance()->addCaseFailed(name);
+        Report::Instance()->addCaseFailed(this);
     }
     // release remote audio for other cases to use
     releaseRemoteAudio();
     return result;
 }
-
 

@@ -38,7 +38,7 @@ public:
     virtual bool addChild(TaskGeneric* child);
     virtual TaskGeneric::ExecutionResult run();
 
-    bool getCaseName(android::String8& name);
+    bool getCaseName(android::String8& name) const;
 
     bool registerBuffer(const android::String8& name, android::sp<Buffer>& buffer);
     // update already existing buffer. Actually the old buffer will be deleted.
@@ -62,7 +62,7 @@ public:
         inline Value(double val): mType(ETypeDouble) {
             setDouble(val);
         };
-        inline Value(int64_t val): mType(ETypeI64){
+        inline Value(int64_t val): mType(ETypeI64) {
             setInt64(val);
         };
         inline Type getType() {
@@ -123,6 +123,8 @@ public:
      */
     bool translateVarName(const android::String8& orig, android::String8& translated);
 
+    void setDetails(android::String8 details);
+    const android::String8& getDetails() const;
 private:
     void releaseRemoteAudio();
 
@@ -131,6 +133,7 @@ private:
     std::map<android::String8, int> mIndexList;
     std::map<android::String8, Value> mValueList;
     ClientInterface* mClient;
+    android::String8 mDetails;
 };
 
 
