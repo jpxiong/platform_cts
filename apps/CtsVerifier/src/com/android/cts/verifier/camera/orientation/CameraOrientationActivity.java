@@ -80,7 +80,7 @@ implements OnClickListener, SurfaceHolder.Callback {
 
         setContentView(R.layout.co_main);
         setPassFailButtonClickListeners();
-        setInfoResources(R.string.camera_format, R.string.co_info, -1);
+        setInfoResources(R.string.camera_orientation, R.string.co_info, -1);
         mNumCameras = Camera.getNumberOfCameras();
 
         mPassButton         = (Button) findViewById(R.id.pass_button);
@@ -140,6 +140,8 @@ implements OnClickListener, SurfaceHolder.Callback {
                 + Integer.toString(NUM_ORIENTATIONS)
                 + ": "
                 + mPreviewOrientations.get(mNextPreviewOrientation) + "\u00b0"
+                + " "
+                + getString(R.string.co_orientation_direction_label)
                 );
 
         TextView instructionLabel =
@@ -240,11 +242,12 @@ implements OnClickListener, SurfaceHolder.Callback {
         Camera.Parameters p = mCamera.getParameters();
         Log.v(TAG, "Initializing picture format");
         p.setPictureFormat(ImageFormat.JPEG);
-        Log.v(TAG, "Initializing picture size");
         mOptimalSize = getOptimalPreviewSize(mPreviewSizes, 640, 480);
-        Log.v(TAG, "Initializing picture size");
+        Log.v(TAG, "Initializing picture size to "
+                + mOptimalSize.width + "x" + mOptimalSize.height);
         p.setPictureSize(mOptimalSize.width, mOptimalSize.height);
-        Log.v(TAG, "Initializing preview size");
+        Log.v(TAG, "Initializing preview size to "
+                + mOptimalSize.width + "x" + mOptimalSize.height);
         p.setPreviewSize(mOptimalSize.width, mOptimalSize.height);
 
         Log.v(TAG, "Setting camera parameters");
@@ -260,16 +263,17 @@ implements OnClickListener, SurfaceHolder.Callback {
 
         // set preview orientation
         int degrees = mPreviewOrientations.get(mNextPreviewOrientation);
-        int result;
+        mCamera.setDisplayOrientation(degrees);
+
         android.hardware.Camera.CameraInfo info =
                 new android.hardware.Camera.CameraInfo();
         android.hardware.Camera.getCameraInfo(mCurrentCameraId, info);
         if (info.facing == Camera.CameraInfo.CAMERA_FACING_FRONT) {
-            result = (360 - degrees) % 360; // compensate the mirror
-        } else { // back-facing
-            result = degrees;
+            TextView cameraExtraLabel =
+                    (TextView) findViewById(R.id.instruction_extra_text);
+            cameraExtraLabel.setText(
+                    getString(R.string.co_instruction_text_extra_label));
         }
-        mCamera.setDisplayOrientation(result);
     }
 
     @Override
@@ -479,6 +483,7 @@ implements OnClickListener, SurfaceHolder.Callback {
                 if (info.facing == Camera.CameraInfo.CAMERA_FACING_FRONT) {
                     // mirror the image along vertical axis
                     mirrorX = new float[] {-1, 0, 0, 0, 1, 1, 0, 0, 1};
+                    degrees = (360 - degrees) % 360; // compensate the mirror
                 } else {
                     // leave image the same via identity matrix
                     mirrorX = new float[] {1, 0, 0, 0, 1, 0, 0, 0, 1};
