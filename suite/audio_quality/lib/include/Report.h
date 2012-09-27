@@ -18,9 +18,12 @@
 #define CTSAUDIO_REPORT_H
 
 #include <list>
+#include <map>
 
 #include <utils/String8.h>
 #include "FileUtil.h"
+
+class TaskCase;
 /**
  * Class to generate report
  */
@@ -35,8 +38,8 @@ public:
     // should be called before finishing to flush the report to file system
     static void Finalize();
 
-    void addCasePassed(const android::String8& name);
-    void addCaseFailed(const android::String8& name);
+    void addCasePassed(const TaskCase* task);
+    void addCaseFailed(const TaskCase* task);
 
 
 private:
@@ -45,11 +48,14 @@ private:
     bool init(const char* dirName);
     void writeReport();
     void printf(const char* fmt, ...);
+    typedef std::pair<android::String8, android::String8> StringPair;
+    void writeResult(std::list<StringPair>::const_iterator begin,
+            std::list<StringPair>::const_iterator end, bool passed);
 
 private:
     static Report* mInstance;
-    std::list<android::String8> mPassedCases;
-    std::list<android::String8> mFailedCases;
+    std::list<StringPair> mPassedCases;
+    std::list<StringPair> mFailedCases;
 };
 
 

@@ -55,9 +55,10 @@ private:
     // store dirPath to prevent creating multiple times
     static android::String8 mDirPath;
     std::ofstream mFile;
-    static const int BUFFER_SIZE = 1024;
+    static const int DEFAULT_BUFFER_SIZE = 1024;
     // buffer for printf. one line longer than this will be truncated.
-    char mBuffer[BUFFER_SIZE];
+    char* mBuffer;
+    int mBufferSize;
     android::Mutex mWriteLock;
 };
 

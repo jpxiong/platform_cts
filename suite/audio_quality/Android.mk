@@ -35,7 +35,12 @@ $(CTS_AUDIO_QUALITY_ZIP): cts_audio_quality_test cts_audio_quality \
 	$(hide) cd $(HOST_OUT)/cts-audio-quality && \
         zip -rq android-cts-audio-quality.zip android-cts-audio-quality -x android-cts-audio-quality/reports/\*
 
+# target to build only this package
+.PHONY: cts_audio_quality_package
+cts_audio_quality_package: $(CTS_AUDIO_QUALITY_ZIP)
+
 cts: $(CTS_AUDIO_QUALITY_ZIP)
+
 ifneq ($(filter cts, $(MAKECMDGOALS)),)
 $(call dist-for-goals, cts, $(CTS_AUDIO_QUALITY_ZIP))
 endif # cts

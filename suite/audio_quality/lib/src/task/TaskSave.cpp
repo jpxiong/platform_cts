@@ -111,6 +111,7 @@ bool TaskSave::handleReport()
         return false;
     }
     MSG("=== Values stored ===");
+    android::String8 details;
     for (size_t i = 0; i < listp->size(); i++) {
         UniquePtr<std::list<TaskCase::ValuePair> > values(
                 getTestCase()->findAllValues((*listp)[i]));
@@ -121,14 +122,17 @@ bool TaskSave::handleReport()
         }
         std::list<TaskCase::ValuePair>::iterator it = values->begin();
         std::list<TaskCase::ValuePair>::iterator end = values->end();
+
         for (; it != end; it++) {
             if (it->second.getType() == TaskCase::Value::ETypeDouble) {
-                MSG("   %s: %f", it->first.string(), it->second.getDouble());
+                details.appendFormat("   %s: %f\n", it->first.string(), it->second.getDouble());
             } else { //64bit int
-                MSG("   %s: %lld", it->first.string(), it->second.getInt64());
+                details.appendFormat("   %s: %lld\n", it->first.string(), it->second.getInt64());
             }
         }
+        MSG("%s", details.string());
     }
+    getTestCase()->setDetails(details);
     return true;
 }
 
