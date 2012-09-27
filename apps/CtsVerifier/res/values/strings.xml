@@ -298,14 +298,22 @@
 
     <!-- Strings for Camera Orientation -->
     <string name="camera_orientation">Camera Orientation</string>
-    <string name="co_info">This test checks that the camera output is oriented in the correct direction, for each camera, and for each of four orientations. Read the instruction above the \"Take Photo\" button for further usability details.</string>
+    <string name="co_info">This test checks that the camera output is oriented
+    in the correct direction, for each camera, and for each of four
+    clockwise orientations. Choose \"Pass\" if both the preview window and the
+    still capture image are rotated clockwise by the amount specified. Otherwise,
+    choose \"Fail\". The physical orientation of the device does not matter. Read
+    the message above the \"Take Photo\" button for step-by-step instructions.
+    </string>
     <string name="co_preview_label">Camera preview</string>
     <string name="co_format_label">Oriented photo</string>
     <string name="co_camera_label">Camera:</string>
     <string name="co_orientation_label">Orientation</string>
+    <string name="co_orientation_direction_label">clockwise</string>
     <string name="co_instruction_heading_label">Instruction:</string>
     <string name="co_instruction_text_photo_label">Take a photo</string>
     <string name="co_instruction_text_passfail_label">Choose pass or fail, or take another photo.</string>
+    <string name="co_instruction_text_extra_label">(mirrored along vertical axis for front-facing camera)</string>
     <string name="co_photo_button_caption">Take Photo</string>
 
     <!-- Strings for Camera Formats -->

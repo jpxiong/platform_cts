@@ -112,6 +112,11 @@
                     android:layout_height="wrap_content"
                     android:text="@string/co_instruction_text_photo_label" />
 
+                <TextView
+                    android:id="@+id/instruction_extra_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+
                 <Button
                     android:id="@+id/take_picture_button"
                     android:layout_width="match_parent"
