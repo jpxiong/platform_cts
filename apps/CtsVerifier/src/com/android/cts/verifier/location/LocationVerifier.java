@@ -61,9 +61,9 @@ public class LocationVerifier implements Handler.Callback {
             if (location.getAccuracy() <= 0.0) {
                 fail(mProvider + " location has invalid accuracy: " + location.getAccuracy());
             }
-            if (location.getElapsedRealtimeNano() <= 0) {
+            if (location.getElapsedRealtimeNanos() <= 0) {
                 fail(mProvider + " location has invalid elapsed realtime: " +
-                        location.getElapsedRealtimeNano());
+                        location.getElapsedRealtimeNanos());
             }
 
             if (mNumActiveUpdates != 1 && delta < mMinActiveInterval) {
@@ -111,9 +111,9 @@ public class LocationVerifier implements Handler.Callback {
             if (location.getAccuracy() <= 0.0) {
                 fail(mProvider + " location has invalid accuracy: " + location.getAccuracy());
             }
-            if (location.getElapsedRealtimeNano() <= 0) {
+            if (location.getElapsedRealtimeNanos() <= 0) {
                 fail(mProvider + " location has invalid elapsed realtime: " +
-                        location.getElapsedRealtimeNano());
+                        location.getElapsedRealtimeNanos());
             }
 
             if (mNumPassiveUpdates != 1 && delta < mMinPassiveInterval) {
