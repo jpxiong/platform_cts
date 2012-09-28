@@ -22,6 +22,8 @@ public class CpuFeatures {
 
     public static final String ARMEABI = "armeabi";
 
+    public static final String MIPSABI = "mips";
+
     static {
         System.loadLibrary("cts_jni");
     }
@@ -29,4 +31,6 @@ public class CpuFeatures {
     public static native boolean isArmCpu();
 
     public static native boolean isArm7Compatible();
+
+    public static native boolean isMipsCpu();
 }

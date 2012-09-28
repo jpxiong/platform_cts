@@ -75,6 +75,10 @@ public class NoExecutePermissionTest extends TestCase {
             // http://code.google.com/p/android/issues/detail?id=17328
             return false;
         }
+        if (CpuFeatures.isMipsCpu()) {
+            // MIPS processors do not have NX support.
+            return false;
+        }
 
         // TODO: handle other processors.  For now, assume those processors
         // have NX support.
