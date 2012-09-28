@@ -138,7 +138,7 @@ TaskGeneric::ExecutionResult SignalProcessingImpl::run( const android::String8& 
                 LOGE("send failed");
                 return TaskGeneric::EResultError;
             }
-            LOGD("%d-th param buffer %d, stereo:%d", dataLen, (*buffer)->isStereo());
+            LOGD("%d-th param buffer %d, stereo:%d", i, dataLen, (*buffer)->isStereo());
         } else { //TaskCase::Value*
             TaskCase::Value* val = reinterpret_cast<TaskCase::Value*>(inputs[i]);
             bool isI64 = (val->getType() == TaskCase::Value::ETypeI64);
