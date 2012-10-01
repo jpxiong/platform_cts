@@ -3041,6 +3041,42 @@ public class CalendarTest extends InstrumentationTestCase {
     }
 
     /**
+     * Tests correct behavior of Events.uid2445 column
+     */
+    @MediumTest
+    public void testEventsUid2445() {
+        String account = "ec_account";
+        int seed = 0;
+
+        // Clean up just in case
+        CalendarHelper.deleteCalendarByAccount(mContentResolver, account);
+
+        final String uid = "uid_123";
+        Cursor cursor;
+        ContentValues values = new ContentValues();
+        final long calendarId = createAndVerifyCalendar(account, seed++, null);
+        final long eventId = createAndVerifyEvent(account, seed, calendarId, true, null);
+        final Uri uri = ContentUris.withAppendedId(Events.CONTENT_URI, eventId);
+
+        // Verify default is null
+        cursor = mContentResolver.query(uri, new String[] {Events.UID_2445}, null, null, null);
+        cursor.moveToFirst();
+        assertTrue(cursor.isNull(0));
+        cursor.close();
+
+        // Write column value and read back
+        values.clear();
+        values.put(Events.UID_2445, uid);
+        mContentResolver.update(asSyncAdapter(uri, account, CTS_TEST_TYPE), values, null, null);
+        cursor = mContentResolver.query(uri, new String[] {Events.UID_2445}, null, null, null);
+        cursor.moveToFirst();
+        assertFalse(cursor.isNull(0));
+        assertEquals("Column uid_2445 has unexpected value.", uid, cursor.getString(0));
+
+        CalendarHelper.deleteCalendarByAccount(mContentResolver, account);
+    }
+
+    /**
      * Acquires the set of instances that appear between the specified start and end points.
      *
      * @param timeZone Time zone to use when parsing startWhen and endWhen
