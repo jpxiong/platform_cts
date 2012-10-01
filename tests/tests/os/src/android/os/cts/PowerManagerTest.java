@@ -42,17 +42,36 @@ public class PowerManagerTest extends AndroidTestCase {
         Thread.sleep(TIME + MORE_TIME);
         assertFalse(wl.isHeld());
 
-        long baseTime = SystemClock.uptimeMillis();
         try {
-            pm.goToSleep(baseTime + 1);
+            pm.goToSleep(SystemClock.uptimeMillis());
             fail("goToSleep should throw SecurityException");
         } catch (SecurityException e) {
             // expected
         }
-        Thread.sleep(TIME);
 
-        baseTime = SystemClock.uptimeMillis();
-        pm.userActivity(baseTime + 1, false);
-        Thread.sleep(MORE_TIME);
+        try {
+            pm.wakeUp(SystemClock.uptimeMillis());
+            fail("wakeUp should throw SecurityException");
+        } catch (SecurityException e) {
+            // expected
+        }
+
+        try {
+            pm.nap(SystemClock.uptimeMillis());
+            fail("nap should throw SecurityException");
+        } catch (SecurityException e) {
+            // expected
+        }
+
+        try {
+            pm.reboot("Testing");
+            fail("reboot should throw SecurityException");
+        } catch (SecurityException e) {
+            // expected
+        }
+
+        // This method requires DEVICE_POWER but does not throw a SecurityException
+        // for historical reasons.  So this call should be a no-op.
+        pm.userActivity(SystemClock.uptimeMillis(), false);
     }
 }
