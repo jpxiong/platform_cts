@@ -16,11 +16,16 @@
 
 package android.provider.cts;
 
+import android.content.BroadcastReceiver;
 import android.content.ContentResolver;
 import android.content.ContentUris;
 import android.content.ContentValues;
+import android.content.Context;
 import android.content.Entity;
 import android.content.EntityIterator;
+import android.content.Intent;
+import android.content.IntentFilter;
+import android.cts.util.PollingCheck;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
@@ -53,6 +58,9 @@ public class CalendarTest extends InstrumentationTestCase {
 
     // an arbitrary int used by some tests
     private static final int SOME_ARBITRARY_INT = 143234;
+
+    // 10 sec timeout for reminder broadcast (but shouldn't usually take this long).
+    private static final int POLLING_TIMEOUT = 10000;
 
     // @formatter:off
     private static final String[] TIME_ZONES = new String[] {
@@ -1439,6 +1447,65 @@ public class CalendarTest extends InstrumentationTestCase {
         count = mContentResolver.delete(ContentUris.withAppendedId(Reminders.CONTENT_URI, remId4),
                 null, null);
         assertEquals(1, count);
+
+        removeAndVerifyCalendar(account, calendarId);
+    }
+
+    /**
+     * A listener for the EVENT_REMINDER broadcast that is expected to be fired by the
+     * provider at the reminder time.
+     */
+    public class MockReminderReceiver extends BroadcastReceiver {
+        public boolean received = false;
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            final String action = intent.getAction();
+            if (action.equals(CalendarContract.ACTION_EVENT_REMINDER)) {
+                received = true;
+            }
+        }
+    }
+
+    /**
+     * Test that reminders result in the expected broadcast at reminder time.
+     */
+    public void testRemindersAlarm() throws Exception {
+        // Setup: register a mock listener for the broadcast we expect to fire at the
+        // reminder time.
+        final MockReminderReceiver reminderReceiver = new MockReminderReceiver();
+        IntentFilter filter = new IntentFilter(CalendarContract.ACTION_EVENT_REMINDER);
+        filter.addDataScheme("content");
+        getInstrumentation().getTargetContext().registerReceiver(reminderReceiver, filter);
+
+        // Clean up just in case.
+        String account = "rem_account";
+        CalendarHelper.deleteCalendarByAccount(mContentResolver, account);
+
+        // Create calendar.  Use '1' as seed as this sets the VISIBLE field to 1.
+        // The calendar must be visible for its notifications to occur.
+        long calendarId = createAndVerifyCalendar(account, 1, null);
+
+        // Create event for 15 min in the past, with a 10 min reminder, so that it will
+        // trigger immediately.
+        ContentValues eventValues;
+        int seed = 0;
+        long now = System.currentTimeMillis();
+        eventValues = EventHelper.getNewEventValues(account, seed++, calendarId, true);
+        eventValues.put(Events.DTSTART, now - DateUtils.MINUTE_IN_MILLIS * 15);
+        eventValues.put(Events.DTEND, now + DateUtils.HOUR_IN_MILLIS);
+        long eventId = createAndVerifyEvent(account, seed, calendarId, true, eventValues);
+        assertTrue(eventId >= 0);
+        ReminderHelper.addReminder(mContentResolver, eventId, 10, Reminders.METHOD_ALERT);
+
+        // Confirm that the EVENT_REMINDER broadcast was fired by the provider.
+        new PollingCheck(POLLING_TIMEOUT) {
+            @Override
+            protected boolean check() {
+                return reminderReceiver.received;
+            }
+        }.run();
+        assertTrue(reminderReceiver.received);
 
         removeAndVerifyCalendar(account, calendarId);
     }
