@@ -394,6 +394,7 @@ public class FileSystemPermissionTest extends AndroidTestCase {
                     "/data/tpapi/etc/tpa",
                     "/data/tpapi/etc/tpa/persistent",
                     "/data/tpapi/user.bin",
+                    "/data/vpnch",
                     "/data/wapi",
                     "/data/wifi",
                     "/data/wimax",
