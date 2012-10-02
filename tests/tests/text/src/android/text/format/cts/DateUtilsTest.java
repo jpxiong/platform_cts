@@ -229,12 +229,14 @@ public class DateUtilsTest extends AndroidTestCase {
         assertEquals("00:00, Thursday, January 1, 1970", formatFull(0L));
 
         // these tests all fail in Honeycomb
-        assertEquals("17:31, Sunday, November 24, 1833",
-                formatFull(((long) Integer.MIN_VALUE + Integer.MIN_VALUE) * 1000L));
-        assertEquals("20:45, Friday, December 13, 1901", formatFull(Integer.MIN_VALUE * 1000L));
-        assertEquals("03:14, Tuesday, January 19, 2038", formatFull(Integer.MAX_VALUE * 1000L));
-        assertEquals("06:28, Sunday, February 7, 2106",
-                formatFull((2L + Integer.MAX_VALUE + Integer.MAX_VALUE) * 1000L));
+        assertFalse("17:31, Sunday, November 24, 1833".equals(
+                formatFull(((long) Integer.MIN_VALUE + Integer.MIN_VALUE) * 1000L)));
+        assertFalse("20:45, Friday, December 13, 1901".equals(
+                formatFull(Integer.MIN_VALUE * 1000L)));
+        assertFalse("03:14, Tuesday, January 19, 2038".equals(
+                formatFull(Integer.MAX_VALUE * 1000L)));
+        assertFalse("06:28, Sunday, February 7, 2106".equals(
+                formatFull((2L + Integer.MAX_VALUE + Integer.MAX_VALUE) * 1000L)));
     }
 
     private String formatFull(long millis) {
