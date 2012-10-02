@@ -298,12 +298,17 @@
 
     <!-- Strings for Camera Orientation -->
     <string name="camera_orientation">Camera Orientation</string>
-    <string name="co_info">This test checks that the camera output is oriented
-    in the correct direction, for each camera, and for each of four
-    clockwise orientations. Choose \"Pass\" if both the preview window and the
-    still capture image are rotated clockwise by the amount specified. Otherwise,
-    choose \"Fail\". The physical orientation of the device does not matter. Read
-    the message above the \"Take Photo\" button for step-by-step instructions.
+    <string name="co_info">This test verifies the orientation capabilities of
+    camera preview and capture.\n - The left view shows a preview window rotated
+    clockwise by a given magnitude of degrees.\n - The right view, after taking
+    a photo, shows the captured image.\n - For each camera and orientation, both
+    the left and right views should appear rotated clockwise by the amount of
+    degrees specified. Choose \"Pass\" if this is the case. Otherwise, choose
+    \"Fail\".\n - For front-facing cameras, the test will horizontally mirror
+    the captured image prior to rotation, in attempt to make the left and right
+    views appear the same.\n - The physical orientation of the device does not
+    matter.\n - Read the message above the \"Take Photo\" button for
+    step-by-step instructions.
     </string>
     <string name="co_preview_label">Camera preview</string>
     <string name="co_format_label">Oriented photo</string>
@@ -312,8 +317,8 @@
     <string name="co_orientation_direction_label">clockwise</string>
     <string name="co_instruction_heading_label">Instruction:</string>
     <string name="co_instruction_text_photo_label">Take a photo</string>
-    <string name="co_instruction_text_passfail_label">Choose pass or fail, or take another photo.</string>
-    <string name="co_instruction_text_extra_label">(mirrored along vertical axis for front-facing camera)</string>
+    <string name="co_instruction_text_passfail_label">Choose \"Pass\" if the left view is oriented the same as the right view. Otherwise, choose \"Fail\".</string>
+    <string name="co_instruction_text_extra_label">(mirrored horizontally prior to rotation, since camera is front-facing)</string>
     <string name="co_photo_button_caption">Take Photo</string>
 
     <!-- Strings for Camera Formats -->
