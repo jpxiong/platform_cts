@@ -20,12 +20,21 @@ LOCAL_SRC_FILES := $(call all-java-files-under, src)
 
 LOCAL_MODULE_TAGS := optional
 
-LOCAL_MODULE_PATH := $(TARGET_OUT_DATA_APPS)
-
-LOCAL_MODULE := ptsutil
-
-LOCAL_STATIC_JAVA_LIBRARIES := ptscommonutil
-
-LOCAL_SDK_VERSION := 16
+LOCAL_MODULE := ptscommonutil
 
 include $(BUILD_STATIC_JAVA_LIBRARY)
+
+################################################################
+
+include $(CLEAR_VARS)
+
+# only TmeoutReq annotation used fro, the libs/util, so add it here
+LOCAL_SRC_FILES := \
+    $(call all-java-files-under, src) \
+    ../../../../libs/util/src/android/cts/util/TimeoutReq.java
+
+LOCAL_MODULE_TAGS := optional
+
+LOCAL_MODULE := ptscommonutilhost
+
+include $(BUILD_HOST_JAVA_LIBRARY)
