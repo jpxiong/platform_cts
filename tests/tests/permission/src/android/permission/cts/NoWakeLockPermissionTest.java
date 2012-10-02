@@ -86,7 +86,7 @@ public class NoWakeLockPermissionTest extends AndroidTestCase {
     public void testPowerManagerWakeLockAcquire() {
         try {
             mWakeLock.acquire();
-            fail("MediaPlayer.setWakeMode() did not throw SecurityException as expected");
+            fail("WakeLock.acquire() did not throw SecurityException as expected");
         } catch (SecurityException e) {
             // expected
         }
@@ -102,23 +102,7 @@ public class NoWakeLockPermissionTest extends AndroidTestCase {
         // Tset acquire(long)
         try {
             mWakeLock.acquire(1);
-            fail("MediaPlayer.setWakeMode(long) did not throw SecurityException as expected");
-        } catch (SecurityException e) {
-            // expected
-        }
-    }
-
-    /**
-     * Verify that PowerManager.WakeLock.release() requires permissions.
-     * <p>Requires Permission:
-     *   {@link android.Manifest.permission#WAKE_LOCK}.
-     */
-    @SmallTest
-    public void testPowerManagerWakeLockRelease() {
-        mWakeLock.setReferenceCounted(false);
-        try {
-            mWakeLock.release();
-            fail("MediaPlayer.setWakeMode(long) did not throw SecurityException as expected");
+            fail("WakeLock.acquire(long) did not throw SecurityException as expected");
         } catch (SecurityException e) {
             // expected
         }
