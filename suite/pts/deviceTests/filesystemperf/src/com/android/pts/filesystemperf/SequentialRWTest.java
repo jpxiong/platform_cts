@@ -71,39 +71,9 @@ public class SequentialRWTest extends PtsAndroidTestCase {
     @TimeoutReq(minutes = 60)
     public void testSingleSequentialUpdate() throws IOException {
         final long fileSize = FileUtil.getFileSizeExceedingMemory(getContext(), BUFFER_SIZE);
-        File file = FileUtil.createNewFilledFile(getContext(),
-                DIR_SEQ_UPD, fileSize);
-        final byte[] data = FileUtil.generateRandomData(BUFFER_SIZE);
         final int NUMBER_REPETITION = 6;
-        double[] worsts = new double[NUMBER_REPETITION];
-        double[] averages = new double[NUMBER_REPETITION];
-        for (int i = 0; i < NUMBER_REPETITION; i++) {
-            final FileOutputStream out = new FileOutputStream(file);
-            int numberRepeat = (int)(fileSize / BUFFER_SIZE);
-            double[] rdAmount = new double[numberRepeat];
-            double[] wrAmount = new double[numberRepeat];
-            double[] times = FileUtil.measureIO(numberRepeat, rdAmount, wrAmount,
-                    new MeasureRun() {
-
-                @Override
-                public void run(int i) throws IOException {
-                    out.write(data);
-                    out.flush();
-                }
-            });
-            out.close();
-            double[] mbps = ReportLog.calcRatePerSecArray((double)BUFFER_SIZE / 1024 / 1024,
-                    times);
-            getReportLog().printArray(i + "-th round MB/s",
-                    mbps, true);
-            getReportLog().printArray("Wr amount", wrAmount, true);
-            Stat.StatResult stat = Stat.getStat(mbps);
-            worsts[i] = stat.mMin;
-            averages[i] = stat.mAverage;
-        }
-        Stat.StatResult statWorsts = Stat.getStat(worsts);
-        Stat.StatResult statAverages = Stat.getStat(averages);
-        getReportLog().printSummary("MB/s", statWorsts.mMin, statAverages.mAverage);
+        FileUtil.doSequentialUpdateTest(getContext(), DIR_SEQ_UPD, getReportLog(), fileSize,
+                BUFFER_SIZE, NUMBER_REPETITION);
     }
 
     @TimeoutReq(minutes = 30)
