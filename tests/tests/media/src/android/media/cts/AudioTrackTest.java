@@ -1316,6 +1316,7 @@ public class AudioTrackTest extends AndroidTestCase {
         track.release();
     }
 
+/* Do not run in JB-MR1. will be re-opened in the next platform release.
     public void testResourceLeakage() throws Exception {
         final int BUFFER_SIZE = 600 * 1024;
         ByteBuffer data = ByteBuffer.allocate(BUFFER_SIZE);
@@ -1336,6 +1337,7 @@ public class AudioTrackTest extends AndroidTestCase {
             track.release();
         }
     }
+*/
 
     private class MockAudioTrack extends AudioTrack {
 
