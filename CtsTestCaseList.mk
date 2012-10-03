@@ -96,7 +96,6 @@ cts_test_packages := \
 	CtsUtilTestCases \
 	CtsViewTestCases \
 	CtsWebkitTestCases \
-	CtsWebkitSecurityTestCases \
 	CtsWidgetTestCases
 
 # All APKs that need to be scanned by the coverage utilities.
