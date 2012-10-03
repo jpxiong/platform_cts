@@ -312,6 +312,7 @@ public class NoLocationPermissionTest extends AndroidTestCase {
     @SmallTest
     public void testSetTestProviderLocation() {
         Location location = new Location(TEST_PROVIDER_NAME);
+        location.makeComplete();
 
         try {
             mLocationManager.setTestProviderLocation(TEST_PROVIDER_NAME, location);
