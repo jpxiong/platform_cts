@@ -337,6 +337,8 @@ public class FileSystemPermissionTest extends AndroidTestCase {
                     "/data/dump",
                     "/data/emt",
                     "/data/factory",
+                    "/data/fics",
+                    "/data/fics/dev",
                     "/data/fota",
                     "/data/gps",
                     "/data/gps/log",
