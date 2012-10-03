@@ -200,11 +200,6 @@ public class GradientDrawableTest extends AndroidTestCase {
         gradientDrawable.setColorFilter(null);
     }
 
-    public void testGetOpacity() {
-        GradientDrawable gradientDrawable = new GradientDrawable();
-        assertEquals(PixelFormat.TRANSLUCENT, gradientDrawable.getOpacity());
-    }
-
     public void testMethods() {
         // implementation details, do not test.
     }
