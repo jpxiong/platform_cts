@@ -46,24 +46,12 @@ public class ConfigurationScreenLayoutTest
         int expectedSize = expectedScreenLayout & Configuration.SCREENLAYOUT_SIZE_MASK;
         int expectedLong = expectedScreenLayout & Configuration.SCREENLAYOUT_LONG_MASK;
 
-        // Check if the device has the navigation bar.
-        boolean navigationBar = hasNavigationBar();
-
         // Check that all four orientations report the same configuration value.
         for (int i = 0; i < ORIENTATIONS.length; i++) {
             Activity activity = startOrientationActivity(ORIENTATIONS[i]);
             Configuration mConfig = activity.getResources().getConfiguration();
             int actualSize = mConfig.screenLayout & Configuration.SCREENLAYOUT_SIZE_MASK;
             int actualLong = mConfig.screenLayout & Configuration.SCREENLAYOUT_LONG_MASK;
-
-            if (navigationBar) {
-                // Update screenLayout value if the device has the navigation bar.
-                expectedScreenLayout = reduceScreenLayout(activity,
-                        Configuration.SCREENLAYOUT_SIZE_XLARGE
-                        | Configuration.SCREENLAYOUT_LONG_YES);
-                expectedSize = expectedScreenLayout & Configuration.SCREENLAYOUT_SIZE_MASK;
-                expectedLong = expectedScreenLayout & Configuration.SCREENLAYOUT_LONG_MASK;
-            }
 
             assertEquals("Expected screen size value of " + expectedSize + " but got " + actualSize
                     + " for orientation " + ORIENTATIONS[i], expectedSize, actualSize);
@@ -91,11 +79,6 @@ public class ConfigurationScreenLayoutTest
             tearDown();
         }
         return screenLayout;
-    }
-
-    private boolean hasNavigationBar() {
-        // Check if the device has a permanent menu key available.
-        return !ViewConfiguration.get(getActivity()).hasPermanentMenuKey();
     }
 
     private Activity startOrientationActivity(int orientation) {
