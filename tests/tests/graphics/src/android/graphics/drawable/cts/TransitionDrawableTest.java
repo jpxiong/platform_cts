@@ -211,8 +211,8 @@ public class TransitionDrawableTest extends InstrumentationTestCase {
 
     private void makeReverseTransitionInProgress(int duration, int delay) {
         mTransitionDrawable.resetTransition();
-        mTransitionDrawable.startTransition(100);
-        assertTransition(COLOR0, COLOR1, 100);
+        mTransitionDrawable.startTransition(2000);
+        assertTransition(COLOR0, COLOR1, 2000);
         mTransitionDrawable.reverseTransition(duration);
         assertTransitionStart(COLOR1);
         assertTransitionInProgress(COLOR1, COLOR0, delay);
