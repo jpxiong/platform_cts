@@ -121,7 +121,7 @@
                     android:id="@+id/take_picture_button"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:enabled="true"
+                    android:enabled="false"
                     android:text="@string/co_photo_button_caption" />
 
             </LinearLayout>
