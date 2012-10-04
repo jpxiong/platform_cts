@@ -1753,12 +1753,19 @@ public class CalendarTest extends InstrumentationTestCase {
 
         // Test that you can't remove a color that is referenced by an event
         ev.put(Events.EVENT_COLOR_KEY, ColorHelper.DEFAULT_INDICES[ColorHelper.E_COLOR_1]);
+        Log.d(TAG, "COLOR HELPER - E_COLOR_ " + ColorHelper.E_COLOR_1);
+        Log.d(TAG, "ColorHelper.WHERE_COLOR_ACCOUNT_AND_INDEX, " + ColorHelper.WHERE_COLOR_ACCOUNT_AND_INDEX);
+        Log.d(TAG, "ColorHelper.ACCOUNT, " + account);
+        Log.d(TAG, "ColorHelper.CTS_TEST_TYPE, " +  CTS_TEST_TYPE);
+        Log.d(TAG, "ColorHelper.DEFAUL_INDICES, " + ColorHelper.DEFAULT_INDICES[ColorHelper.E_COLOR_1]);
+	
         mContentResolver.update(eventUri, ev, null, null);
         try {
             mContentResolver.delete(colSyncUri, ColorHelper.WHERE_COLOR_ACCOUNT_AND_INDEX,
                     new String[] {
                             account, CTS_TEST_TYPE,
-                            ColorHelper.DEFAULT_INDICES[ColorHelper.E_COLOR_1]
+                            "5"
+                            //ColorHelper.DEFAULT_INDICES[ColorHelper.E_COLOR_1]
                     });
             fail("Should not allow deleting referenced color");
         } catch (UnsupportedOperationException e) {
