@@ -51,6 +51,7 @@ implements OnClickListener, SurfaceHolder.Callback {
     private static final String TAG = "CameraOrientation";
     private static final int STATE_OFF = 0;
     private static final int STATE_PREVIEW = 1;
+    private static final int STATE_CAPTURE = 2;
     private static final int NUM_ORIENTATIONS = 4;
     private static final String STAGE_INDEX_EXTRA = "stageIndex";
 
@@ -69,6 +70,7 @@ implements OnClickListener, SurfaceHolder.Callback {
     private int mNumCameras;
     private int mCurrentCameraId = -1;
     private int mState = STATE_OFF;
+    private boolean mSizeAdjusted;
 
     private StringBuilder mReportBuilder = new StringBuilder();
     private final TreeSet<String> mTestedCombinations = new TreeSet<String>();
@@ -123,6 +125,7 @@ implements OnClickListener, SurfaceHolder.Callback {
         resetButtons();
 
         // Set initial values
+        mSizeAdjusted = false;
         mCurrentCameraId = settings.mCameraId;
         TextView cameraLabel = (TextView) findViewById(R.id.camera_text);
         cameraLabel.setText(
@@ -148,7 +151,7 @@ implements OnClickListener, SurfaceHolder.Callback {
                 (TextView) findViewById(R.id.instruction_text);
         instructionLabel.setText(R.string.co_instruction_text_photo_label);
 
-        mTakePictureButton.setEnabled(true);
+        mTakePictureButton.setEnabled(false);
         setUpCamera(mCurrentCameraId);
     }
 
@@ -230,7 +233,6 @@ implements OnClickListener, SurfaceHolder.Callback {
             return;
         }
 
-        mState = STATE_PREVIEW;
         mCamera.setPreviewCallback(mPreviewCallback);
 
         try {
@@ -274,6 +276,8 @@ implements OnClickListener, SurfaceHolder.Callback {
             cameraExtraLabel.setText(
                     getString(R.string.co_instruction_text_extra_label));
         }
+
+        mState = STATE_PREVIEW;
     }
 
     @Override
@@ -281,8 +285,12 @@ implements OnClickListener, SurfaceHolder.Callback {
         Log.v(TAG, "Click detected");
 
         if (view == mFormatView || view == mTakePictureButton) {
-            Log.v(TAG, "Taking picture");
-            mCamera.takePicture(null, null, null, mCameraCallback);
+            if(mState == STATE_PREVIEW) {
+                mTakePictureButton.setEnabled(false);
+                Log.v(TAG, "Taking picture");
+                mCamera.takePicture(null, null, null, mCameraCallback);
+                mState = STATE_CAPTURE;
+            }
         }
 
         if(view == mPassButton || view == mFailButton) {
@@ -443,27 +451,30 @@ implements OnClickListener, SurfaceHolder.Callback {
         @Override
         public void onPreviewFrame(byte[] data, Camera camera) {
             // adjust camera preview to match output image's aspect ratio
+            if(!mSizeAdjusted && mState == STATE_PREVIEW) {
+                int viewWidth = mFormatView.getWidth();
+                int viewHeight = mFormatView.getHeight();
+                int newWidth, newHeight;
 
-            int viewWidth = mFormatView.getWidth();
-            int viewHeight = mFormatView.getHeight();
-            int newWidth, newHeight;
+                if (mPreviewOrientations.get(mNextPreviewOrientation) == 0
+                    || mPreviewOrientations.get(mNextPreviewOrientation) == 180) {
+                    // make preview width same as output image width,
+                    // then calculate height using output image's height/width ratio
+                    newWidth = viewWidth;
+                    newHeight = (int) (viewWidth * ((double) mOptimalSize.height /
+                            (double) mOptimalSize.width));
+                }
+                else {
+                    newHeight = viewHeight;
+                    newWidth = (int) (viewHeight * ((double) mOptimalSize.height /
+                            (double) mOptimalSize.width));
+                }
 
-            if (mPreviewOrientations.get(mNextPreviewOrientation) == 0
-                || mPreviewOrientations.get(mNextPreviewOrientation) == 180) {
-                // make preview width same as output image width,
-                // then calculate height using output image's height/width ratio
-                newWidth = viewWidth;
-                newHeight = (int) (viewWidth * ((double) mOptimalSize.height /
-                        (double) mOptimalSize.width));
+                LayoutParams layoutParams = new LayoutParams(newWidth, newHeight);
+                mCameraView.setLayoutParams(layoutParams);
+                mSizeAdjusted = true;
+                mTakePictureButton.setEnabled(true);
             }
-            else {
-                newHeight = viewHeight;
-                newWidth = (int) (viewHeight * ((double) mOptimalSize.height /
-                        (double) mOptimalSize.width));
-            }
-
-            LayoutParams layoutParams = new LayoutParams(newWidth, newHeight);
-            mCameraView.setLayoutParams(layoutParams);
         }
     };
 
