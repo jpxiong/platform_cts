@@ -14,29 +14,19 @@
  * limitations under the License.
  */
 
-
 package com.android.pts.util;
 
-import android.app.Activity;
-import android.test.ActivityInstrumentationTestCase2;
+import android.util.Log;
 
+public class DeviceReportLog extends ReportLog {
+    private static final String TAG = "PtsReport";
 
-public class PtsActivityInstrumentationTestCase2<T extends Activity> extends
-        ActivityInstrumentationTestCase2<T> {
-
-    private ReportLog mReportLog = new DeviceReportLog();
-
-    public PtsActivityInstrumentationTestCase2(Class<T> activityClass) {
-        super(activityClass);
-    }
-
-    public ReportLog getReportLog() {
-        return mReportLog;
+    DeviceReportLog() {
+        mDepth = 4;
     }
 
     @Override
-    protected void tearDown() throws Exception {
-        mReportLog.throwReportToHost();
+    protected void printLog(String msg) {
+        Log.i(TAG, msg);
     }
-
 }

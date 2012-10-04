@@ -21,7 +21,7 @@ import android.test.AndroidTestCase;
 
 public class PtsAndroidTestCase extends AndroidTestCase {
 
-    private ReportLog mReportLog = new ReportLog();
+    private ReportLog mReportLog = new DeviceReportLog();
 
     public ReportLog getReportLog() {
         return mReportLog;

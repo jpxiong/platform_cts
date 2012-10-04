@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-LOCAL_PATH:= $(call my-dir)
+LOCAL_PATH := $(call my-dir)
 
 include $(CLEAR_VARS)
 
@@ -20,12 +20,12 @@ LOCAL_SRC_FILES := $(call all-java-files-under, src)
 
 LOCAL_MODULE_TAGS := optional
 
-LOCAL_MODULE_PATH := $(TARGET_OUT_DATA_APPS)
+LOCAL_MODULE := PtsHostBootup
 
-LOCAL_MODULE := ptsutil
+LOCAL_JAVA_LIBRARIES := cts-tradefed tradefed-prebuilt ddmlib-prebuilt junit ptscommonutilhost
 
-LOCAL_STATIC_JAVA_LIBRARIES := ptscommonutil
+LOCAL_PTS_TEST_PACKAGE := com.android.pts.bootup
 
-LOCAL_SDK_VERSION := 16
+include $(BUILD_PTS_HOST_JAVA_LIBRARY)
 
-include $(BUILD_STATIC_JAVA_LIBRARY)
+include $(call all-makefiles-under,$(LOCAL_PATH))

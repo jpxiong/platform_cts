@@ -54,7 +54,7 @@ public class ScrollingTest extends PtsActivityInstrumentationTestCase2<Scrolling
     }
 
     @TimeoutReq(minutes = 30)
-    public void testFullScrolling() throws IOException {
+    public void testFullScrolling() throws Exception {
         final int NUMBER_REPEAT = 10;
         final ScrollingActivity activity = mActivity;
         double[] results = MeasureTime.measure(NUMBER_REPEAT, new MeasureRun() {
