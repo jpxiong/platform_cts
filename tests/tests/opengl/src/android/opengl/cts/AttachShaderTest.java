@@ -139,10 +139,4 @@ public class AttachShaderTest extends ActivityInstrumentationTestCase2<OpenGLES2
         int error = mActivity.glGetError();
         assertEquals(GLES20.GL_NO_ERROR, error);
     }
-
-    public void test_glAttachShaders_successfulcompile_attach_invalid_handle_frag() throws Throwable {
-        mActivity = getShaderActivity(Constants.SHADER, 12);
-        int error = mActivity.glGetError();
-        assertTrue(GLES20.GL_NO_ERROR != error);
-    }
 }
