@@ -16,8 +16,6 @@
 
 package com.android.pts.util;
 
-import android.util.Log;
-
 import java.util.LinkedList;
 import java.util.List;
 
@@ -34,23 +32,23 @@ import java.util.List;
  *                     average average_value min|max value stddev value
  */
 public class ReportLog {
-    private static final String TAG = "PtsReport";
     private static final String LOG_SEPARATOR = "+++";
     private static final String SUMMARY_SEPARATOR = "++++";
     private static final String LOG_ELEM_SEPARATOR = "|";
 
     private List<String> mMessages = new LinkedList<String> ();
     private String mSummary = null;
+    protected static int mDepth = 3;
     /**
      * print given value to the report
      * @param header string to explain the contents. It can be unit for the value.
      * @param val
      */
     public void printValue(String header, double val) {
-        String message = getClassMethodNames(4, true) + LOG_ELEM_SEPARATOR + header +
+        String message = getClassMethodNames(mDepth, true) + LOG_ELEM_SEPARATOR + header +
                 LOG_ELEM_SEPARATOR + "d" + LOG_ELEM_SEPARATOR + val;
         mMessages.add(message);
-        Log.i(TAG, message);
+        printLog(message);
     }
 
     /**
@@ -61,7 +59,7 @@ public class ReportLog {
      */
     public void printArray(String header, double[] val, boolean addMin) {
         StringBuilder builder = new StringBuilder();
-        builder.append(getClassMethodNames(4, true) + LOG_ELEM_SEPARATOR + header +
+        builder.append(getClassMethodNames(mDepth, true) + LOG_ELEM_SEPARATOR + header +
                 LOG_ELEM_SEPARATOR + "da" + LOG_ELEM_SEPARATOR);
         for (double v : val) {
             builder.append(v);
@@ -71,7 +69,7 @@ public class ReportLog {
         builder.append(LOG_ELEM_SEPARATOR + "average " + stat.mAverage +
                 (addMin ? (" min " + stat.mMin) : (" max " + stat.mMax)) + " stddev " + stat.mStddev);
         mMessages.add(builder.toString());
-        Log.i(TAG, builder.toString());
+        printLog(builder.toString());
     }
 
     public void printSummary(String header, double worst, double average) {
@@ -94,6 +92,8 @@ public class ReportLog {
         if (builder.length() >= LOG_SEPARATOR.length()) {
             builder.delete(builder.length() - LOG_SEPARATOR.length(), builder.length());
         }
+        mSummary = null;
+        mMessages.clear();
         throw new PtsException(builder.toString());
     }
 
@@ -137,7 +137,7 @@ public class ReportLog {
      * @return
      */
     public static String getClassMethodNames() {
-        return getClassMethodNames(4, false);
+        return getClassMethodNames(mDepth, false);
     }
 
     private static String getClassMethodNames(int depth, boolean addLineNumber) {
@@ -145,5 +145,13 @@ public class ReportLog {
         String names = elements[depth].getClassName() + "." + elements[depth].getMethodName() +
                 (addLineNumber ? ":" + elements[depth].getLineNumber() : "");
         return names;
+    }
+
+    /**
+     * to be overridden by child to print message to be passed
+     * @param msg
+     */
+    protected void printLog(String msg) {
+
     }
 }

@@ -182,7 +182,7 @@ public class FileUtil {
      * @throws IOException
      */
     public static double[] measureIO(int count, double[] readAmount, double[] writeAmount,
-            MeasureRun run)  throws IOException {
+            MeasureRun run)  throws Exception {
         double[] result = new double[count];
         File procIo = new File("/proc/self/io");
         boolean measureIo = procIo.exists();
@@ -260,7 +260,7 @@ public class FileUtil {
      * @throws IOException
      */
     public static void doRandomReadTest(Context context, String dirName, ReportLog report,
-            long fileSize, int bufferSize) throws IOException {
+            long fileSize, int bufferSize) throws Exception {
         File file = FileUtil.createNewFilledFile(context,
                 dirName, fileSize);
 
@@ -313,7 +313,7 @@ public class FileUtil {
      * @throws IOException
      */
     public static void doRandomWriteTest(Context context, String dirName, ReportLog report,
-            long fileSize, int bufferSize) throws IOException {
+            long fileSize, int bufferSize) throws Exception {
         File file = FileUtil.createNewFilledFile(context,
                 dirName, fileSize);
         final byte[] data = FileUtil.generateRandomData(bufferSize);
@@ -365,7 +365,7 @@ public class FileUtil {
      * @throws IOException
      */
     public static void doSequentialUpdateTest(Context context, String dirName, ReportLog report,
-            long fileSize, int bufferSize, int numberRepetition) throws IOException {
+            long fileSize, int bufferSize, int numberRepetition) throws Exception {
         File file = FileUtil.createNewFilledFile(context,
                 dirName, fileSize);
         final byte[] data = FileUtil.generateRandomData(bufferSize);

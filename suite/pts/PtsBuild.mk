@@ -19,7 +19,7 @@
 LOCAL_PATH:= $(call my-dir)
 
 # New packages should be added here
-PTS_TEST_PACKAGES = \
+PTS_TEST_PACKAGES := \
     PtsDeviceFilePerf \
     PtsDeviceUi \
     PtsDeviceDram
@@ -27,7 +27,14 @@ PTS_TEST_PACKAGES = \
 PTS_SUPPORT_PACKAGES := \
 	TestDeviceSetup
 
+PTS_HOST_CASES := \
+    PtsHostBootup
+
+PTS_HOST_LIBS := \
+    $(HOST_OUT_JAVA_LIBRARIES)/ptscommonutilhost.jar
+
 BUILD_PTS_PACKAGE := cts/suite/pts/build/test_package.mk
+BUILD_PTS_HOST_JAVA_LIBRARY := cts/suite/pts/build/test_host_java_library.mk
 
 PTS_JAVA_TEST_SCANNER := $(HOST_OUT_EXECUTABLES)/cts-java-scanner
 PTS_JAVA_TEST_SCANNER_DOCLET := $(HOST_OUT_JAVA_LIBRARIES)/cts-java-scanner-doclet.jar
@@ -48,13 +55,20 @@ define pts-get-test-xmls
 	$(foreach name,$(1),$(PTS_TESTCASES_OUT)/$(name).xml)
 endef
 
+define pts-get-lib-paths
+	$(foreach lib,$(1),$(HOST_OUT_JAVA_LIBRARIES)/$(lib).jar)
+endef
+
 PTS_TEST_CASE_LIST := \
 	$(PTS_SUPPORT_PACKAGES)
 
 PTS_TEST_CASES := \
-		$(call pts-get-package-paths,$(PTS_TEST_PACKAGES))
+		$(call pts-get-package-paths,$(PTS_TEST_PACKAGES)) \
+		$(call pts-get-lib-paths,$(PTS_HOST_CASES))
 
-PTS_TEST_XMLS := $(call pts-get-test-xmls,$(PTS_TEST_PACKAGES))
+PTS_TEST_XMLS := \
+    $(call pts-get-test-xmls,$(PTS_TEST_PACKAGES)) \
+    $(call pts-get-test-xmls,$(PTS_HOST_CASES))
 
 pts_dir := $(HOST_OUT)/pts
 pts_tools_src_dir := cts/tools
@@ -74,7 +88,7 @@ DEFAULT_TEST_PLAN := $(pts_dir)/$(pts_name)/resource/plans/PTS.xml
 
 $(pts_dir)/all_pts_files_stamp: PRIVATE_JUNIT_HOST_JAR := $(junit_host_jar)
 
-$(pts_dir)/all_pts_files_stamp: $(PTS_TEST_CASES) $(PTS_TEST_CASE_LIST) $(junit_host_jar) $(HOSTTESTLIB_JAR) $(PTS_HOST_LIBRARY_JARS) $(TF_JAR) $(VMTESTSTF_JAR) $(PTS_TF_JAR) $(PTS_TF_EXEC) $(PTS_TF_README) $(ACP)
+$(pts_dir)/all_pts_files_stamp: $(PTS_TEST_CASES) $(PTS_TEST_CASE_LIST) $(junit_host_jar) $(HOSTTESTLIB_JAR) $(PTS_HOST_LIBRARY_JARS) $(TF_JAR) $(VMTESTSTF_JAR) $(PTS_TF_JAR) $(PTS_TF_EXEC) $(PTS_TF_README) $(ACP) $(PTS_HOST_LIBS)
 # Make necessary directory for PTS
 	$(hide) rm -rf $(PRIVATE_PTS_DIR)
 	$(hide) mkdir -p $(TMP_DIR)
@@ -83,7 +97,7 @@ $(pts_dir)/all_pts_files_stamp: $(PTS_TEST_CASES) $(PTS_TEST_CASE_LIST) $(junit_
 	$(hide) mkdir -p $(PRIVATE_DIR)/repository/testcases
 	$(hide) mkdir -p $(PRIVATE_DIR)/repository/plans
 # Copy executable and JARs to PTS directory
-	$(hide) $(ACP) -fp $(DDMLIB_JAR) $(PRIVATE_JUNIT_HOST_JAR) $(HOSTTESTLIB_JAR) $(PTS_HOST_LIBRARY_JARS) $(TF_JAR) $(PTS_TF_JAR) $(PTS_TF_EXEC) $(PTS_TF_README) $(PRIVATE_DIR)/tools
+	$(hide) $(ACP) -fp $(DDMLIB_JAR) $(PRIVATE_JUNIT_HOST_JAR) $(HOSTTESTLIB_JAR) $(PTS_HOST_LIBRARY_JARS) $(TF_JAR) $(PTS_TF_JAR) $(PTS_TF_EXEC) $(PTS_TF_README) $(PTS_HOST_LIBS) $(PRIVATE_DIR)/tools
 # Change mode of the executables
 	$(foreach apk,$(PTS_TEST_CASE_LIST),$(call copy-testcase-apk,$(apk)))
 	$(foreach testcase,$(PTS_TEST_CASES),$(call copy-testcase,$(testcase)))

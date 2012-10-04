@@ -16,7 +16,6 @@
 
 package com.android.pts.util;
 
-import java.io.IOException;
 
 public class MeasureTime {
     /**
@@ -26,14 +25,15 @@ public class MeasureTime {
      * @return array of time taken in each run in msec.
      * @throws IOException
      */
-    public static double[] measure(int count, MeasureRun run)  throws IOException {
+    public static double[] measure(int count, MeasureRun run)  throws Exception {
         double[] result = new double[count];
-        long prev = System.currentTimeMillis();
+
         for (int i = 0; i < count; i++) {
+            run.prepare(i);
+            long start = System.currentTimeMillis();
             run.run(i);
-            long current =  System.currentTimeMillis();
-            result[i] = current - prev;
-            prev = current;
+            long end =  System.currentTimeMillis();
+            result[i] = end - start;
         }
         return result;
     }
