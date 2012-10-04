@@ -44,7 +44,7 @@ public class SequentialRWTest extends PtsAndroidTestCase {
     }
 
     @TimeoutReq(minutes = 30)
-    public void testSingleSequentialWrite() throws IOException {
+    public void testSingleSequentialWrite() throws Exception {
         final int numberOfFiles =(int)(FileUtil.getFileSizeExceedingMemory(
                 getContext(), BUFFER_SIZE) / BUFFER_SIZE);
         getReportLog().printValue("files", numberOfFiles);
@@ -69,7 +69,7 @@ public class SequentialRWTest extends PtsAndroidTestCase {
     }
 
     @TimeoutReq(minutes = 60)
-    public void testSingleSequentialUpdate() throws IOException {
+    public void testSingleSequentialUpdate() throws Exception {
         final long fileSize = FileUtil.getFileSizeExceedingMemory(getContext(), BUFFER_SIZE);
         final int NUMBER_REPETITION = 6;
         FileUtil.doSequentialUpdateTest(getContext(), DIR_SEQ_UPD, getReportLog(), fileSize,
@@ -77,7 +77,7 @@ public class SequentialRWTest extends PtsAndroidTestCase {
     }
 
     @TimeoutReq(minutes = 30)
-    public void testSingleSequentialRead() throws IOException {
+    public void testSingleSequentialRead() throws Exception {
         final long fileSize = FileUtil.getFileSizeExceedingMemory(getContext(), BUFFER_SIZE);
         long start = System.currentTimeMillis();
         final File file = FileUtil.createNewFilledFile(getContext(),

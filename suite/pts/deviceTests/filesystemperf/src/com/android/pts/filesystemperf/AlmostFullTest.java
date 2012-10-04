@@ -93,7 +93,7 @@ public class AlmostFullTest extends PtsAndroidTestCase {
     }
 
     @TimeoutReq(minutes = 30)
-    public void testSequentialUpdate() throws IOException {
+    public void testSequentialUpdate() throws Exception {
         // now about freeSpaceToLeave should be left
         // and try updating exceeding the free space size
         final long FILE_SIZE = 400L * 1024L * 1024L;
@@ -109,7 +109,7 @@ public class AlmostFullTest extends PtsAndroidTestCase {
     //TODO: file size too small and caching will give wrong better result.
     //      needs to flush cache by reading big files per each read.
     @TimeoutReq(minutes = 60)
-    public void testRandomRead() throws IOException {
+    public void testRandomRead() throws Exception {
         final int BUFFER_SIZE = 4 * 1024;
         final long fileSize = 400L * 1024L * 1024L;
         FileUtil.doRandomReadTest(getContext(), DIR_RANDOM_RD, getReportLog(), fileSize,
@@ -117,7 +117,7 @@ public class AlmostFullTest extends PtsAndroidTestCase {
     }
 
     @TimeoutReq(minutes = 60)
-    public void testRandomUpdate() throws IOException {
+    public void testRandomUpdate() throws Exception {
         final int BUFFER_SIZE = 4 * 1024;
         final long fileSize = 400L * 1024L * 1024L;
         FileUtil.doRandomWriteTest(getContext(), DIR_RANDOM_WR, getReportLog(), fileSize,

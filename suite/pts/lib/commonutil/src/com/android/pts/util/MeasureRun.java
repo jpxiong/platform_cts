@@ -16,12 +16,16 @@
 
 package com.android.pts.util;
 
-import java.io.IOException;
-
 /**
  * interface for measuring time for each run.
  */
-public interface MeasureRun {
+public abstract class MeasureRun {
+    /**
+     *  called before each run. not included to time measurement.
+     */
+    public void prepare(int i) throws Exception {
+        // default empty implementation
+    };
 
-    abstract public void run(int i) throws IOException;
+    abstract public void run(int i) throws Exception;
 }

@@ -41,7 +41,7 @@ public class RandomRWTest extends PtsAndroidTestCase {
     }
 
     @TimeoutReq(minutes = 60)
-    public void testRandomRead() throws IOException {
+    public void testRandomRead() throws Exception {
         final int READ_BUFFER_SIZE = 4 * 1024;
         final long fileSize = FileUtil.getFileSizeExceedingMemory(getContext(), READ_BUFFER_SIZE);
         FileUtil.doRandomReadTest(getContext(), DIR_RANDOM_RD, getReportLog(), fileSize,
@@ -50,7 +50,7 @@ public class RandomRWTest extends PtsAndroidTestCase {
 
     // It is taking too long in tuna, and thus cannot run multiple times
     @TimeoutReq(minutes = 60)
-    public void testRandomUpdate() throws IOException {
+    public void testRandomUpdate() throws Exception {
         final int WRITE_BUFFER_SIZE = 4 * 1024;
         final long fileSize = 512 * 1024 * 1024;
         FileUtil.doRandomWriteTest(getContext(), DIR_RANDOM_WR, getReportLog(), fileSize,

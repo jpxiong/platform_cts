@@ -201,6 +201,10 @@ class TestPackageDef implements ITestPackageDef {
         if (HOST_SIDE_ONLY_TEST.equals(mTestType)) {
             CLog.d("Creating host test for %s", mName);
             JarHostTest hostTest = new JarHostTest();
+            if (mTimeoutInMins >= 0) {
+                CLog.d("Setting new timeout to " + mTimeoutInMins + " mins");
+                hostTest.setTimeout(mTimeoutInMins * 60 * 1000);
+            }
             hostTest.setRunName(getUri());
             hostTest.setJarFileName(mJarPath);
             hostTest.setTests(mTests);
