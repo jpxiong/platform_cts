@@ -123,6 +123,7 @@ public class ConfigTest extends AndroidTestCase {
                 case DENSITY:
                     // this is the ratio from the standard
                     mMetrics.density = (((float)value)/((float)DisplayMetrics.DENSITY_DEFAULT));
+                    mConfig.densityDpi = value;
                     break;
                 case SCREENLAYOUT:
                     mConfig.screenLayout = value;
@@ -182,6 +183,7 @@ public class ConfigTest extends AndroidTestCase {
         config.mConfig.smallestScreenWidthDp = 320;
         config.mConfig.screenWidthDp = 320;
         config.mConfig.screenHeightDp = 480;
+        config.mConfig.densityDpi = 160;
         config.mMetrics.widthPixels = 200;
         config.mMetrics.heightPixels = 320;
         config.mMetrics.density = 1;
