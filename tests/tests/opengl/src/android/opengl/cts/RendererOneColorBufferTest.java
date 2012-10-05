@@ -39,7 +39,7 @@ public class RendererOneColorBufferTest extends RendererBase {
     private FloatBuffer mVertices;
     private ShortBuffer mIndexBuffer;
 
-    private static String TAG = "HelloTriangleRenderer";
+    private static String TAG = "RendererOneColorBufferTest";
 
     // Our vertices.
     private float mVerticesData[] = {
@@ -49,10 +49,12 @@ public class RendererOneColorBufferTest extends RendererBase {
             0.5f,  0.5f, 0.0f,  // 3, Top Right
     };
 
-    private float[] mVertexColor = {1.0f,0.0f,0.0f,1.0f,
-            1.0f,0.0f,0.0f,1.0f,
-            1.0f,0.0f,0.0f,1.0f,
-            1.0f,0.0f,0.0f,1.0f};
+    private float[] mVertexColor = {
+            1.0f, 0.0f, 0.0f, 1.0f,
+            1.0f, 0.0f, 0.0f, 1.0f,
+            1.0f, 0.0f, 0.0f, 1.0f,
+            1.0f, 0.0f, 0.0f, 1.0f
+    };
 
     // The order we like to connect them.
     private short[] mIndices = { 0, 1, 2, 0, 2, 3 };
@@ -62,7 +64,7 @@ public class RendererOneColorBufferTest extends RendererBase {
     public RendererOneColorBufferTest(Context context, CountDownLatch latch) {
         super(latch);
         mVertices = ByteBuffer.allocateDirect(mVerticesData.length * 4)
-        .order(ByteOrder.nativeOrder()).asFloatBuffer();
+                .order(ByteOrder.nativeOrder()).asFloatBuffer();
         mVertices.put(mVerticesData).position(0);
 
         ByteBuffer ibb = ByteBuffer.allocateDirect(mIndices.length * 2);
@@ -80,7 +82,7 @@ public class RendererOneColorBufferTest extends RendererBase {
         super(latch);
         mVertexColor = colors;
         mVertices = ByteBuffer.allocateDirect(mVerticesData.length * 4)
-        .order(ByteOrder.nativeOrder()).asFloatBuffer();
+                .order(ByteOrder.nativeOrder()).asFloatBuffer();
         mVertices.put(mVerticesData).position(0);
 
         ByteBuffer ibb = ByteBuffer.allocateDirect(mIndices.length * 2);
@@ -185,9 +187,6 @@ public class RendererOneColorBufferTest extends RendererBase {
 
     public void doOnDrawFrame(GL10 glUnused)
     {
-        // Set the viewport
-        GLES20.glViewport(0, 0, mWidth, mHeight);
-
         // Clear the color buffer
         GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT);
 
@@ -195,11 +194,11 @@ public class RendererOneColorBufferTest extends RendererBase {
         GLES20.glUseProgram(mProgramObject);
 
         // Load the vertex data
-        GLES20.glVertexAttribPointer(0,3, GLES20.GL_FLOAT, false, 0, mVertices);
+        GLES20.glVertexAttribPointer(0, 3, GLES20.GL_FLOAT, false, 0, mVertices);
         GLES20.glEnableVertexAttribArray(0);
 
         int mColorHandle = GLES20.glGetAttribLocation(mProgramObject, "vColor");
-        GLES20.glVertexAttribPointer(mColorHandle,4, GLES20.GL_FLOAT, false, 0, mColor);
+        GLES20.glVertexAttribPointer(mColorHandle, 4, GLES20.GL_FLOAT, false, 0, mColor);
         GLES20.glEnableVertexAttribArray(1);
 
         GLES20.glDrawElements(GLES20.GL_TRIANGLES, mIndices.length, 
@@ -208,19 +207,16 @@ public class RendererOneColorBufferTest extends RendererBase {
         int x = 1;
         int y =1;
         IntBuffer   pinbuffer   = IntBuffer.allocate(1*1*4);
-        IntBuffer   poutbuffer  = IntBuffer.allocate(x*y*4);
-           int         i,j,z;
-           int []      pin         = pinbuffer.array();
-           int []      pout        = poutbuffer.array();
 
-        GLES20.glReadPixels(mWidth/2, mWidth/2, 1, 1, GLES20.GL_RGBA, GLES20.GL_UNSIGNED_BYTE,
+        GLES20.glReadPixels(mWidth/2, mHeight/2, 1, 1, GLES20.GL_RGBA, GLES20.GL_UNSIGNED_BYTE,
                 pinbuffer);
+        int []      pin         = pinbuffer.array();
         int pixel = pin[0];
         float a = (pixel >> 24) & 0xFF;
         float b = (pixel >> 16) & 0xFF;
         float g = (pixel >> 8) & 0xFF;
         float r = pixel & 0xFF;
-        Log.i(TAG,"rgba" + r + " " + g + " " + b + " " + a);
+        Log.i(TAG, "w " + mWidth + " h " + mHeight + " rgba" + r + " " + g + " " + b + " " + a);
         mColorOne[0] = r;
         mColorOne[1] = g;
         mColorOne[2] = b;
@@ -232,7 +228,10 @@ public class RendererOneColorBufferTest extends RendererBase {
     }
 
     public void onSurfaceChanged(GL10 glUnused, int width, int height) {
+        Log.i(TAG, "onSurfaceChanged " + width + " " + height);
         mWidth = width;
         mHeight = height;
+        // Set the viewport
+        GLES20.glViewport(0, 0, mWidth, mHeight);
     }
 }
