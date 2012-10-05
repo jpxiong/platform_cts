@@ -267,13 +267,6 @@ public class RelativeLayoutTest extends
         LayoutParams layoutParams = relativeLayout.generateLayoutParams(parser);
         assertEquals(LayoutParams.MATCH_PARENT, layoutParams.width);
         assertEquals(LayoutParams.MATCH_PARENT, layoutParams.height);
-
-        // exceptional value
-        try {
-            relativeLayout.generateLayoutParams((AttributeSet) null);
-            fail("Should throw RuntimeException");
-        } catch (RuntimeException e) {
-        }
     }
 
     public void testGenerateLayoutParams2() {
