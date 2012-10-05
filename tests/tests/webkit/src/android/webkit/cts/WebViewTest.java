@@ -41,8 +41,6 @@ import android.util.DisplayMetrics;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.View;
-import android.webkit.CacheManager;
-import android.webkit.CacheManager.CacheResult;
 import android.webkit.ConsoleMessage;
 import android.webkit.DownloadListener;
 import android.webkit.JavascriptInterface;
@@ -1019,40 +1017,6 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
         getInstrumentation().waitForIdleSync();
         assertEquals(pageHeight + pageHeight + extraSpace,
                 mOnUiThread.getContentHeight());
-    }
-
-    @UiThreadTest
-    public void testClearCache() throws Exception {
-        final File cacheFileBaseDir = CacheManager.getCacheFileBaseDir();
-        mWebView.clearCache(true);
-        assertEquals(0, cacheFileBaseDir.list().length);
-
-        startWebServer(false);
-        final String url = mWebServer.getAssetUrl(TestHtmlConstants.HELLO_WORLD_URL);
-        mOnUiThread.loadUrlAndWaitForCompletion(url);
-        new PollingCheck(TEST_TIMEOUT) {
-            @Override
-            protected boolean check() {
-                CacheResult result = CacheManager.getCacheFile(url, null);
-                return result != null;
-            }
-        }.run();
-        int cacheFileCount = cacheFileBaseDir.list().length;
-        assertTrue(cacheFileCount > 0);
-
-        mWebView.clearCache(false);
-        // the cache files are still there
-        // can not check other effects of the method
-        assertEquals(cacheFileCount, cacheFileBaseDir.list().length);
-
-        mWebView.clearCache(true);
-        // check the files are deleted
-        new PollingCheck(TEST_TIMEOUT) {
-            @Override
-            protected boolean check() {
-                return cacheFileBaseDir.list().length == 0;
-            }
-        }.run();
     }
 
     @UiThreadTest
