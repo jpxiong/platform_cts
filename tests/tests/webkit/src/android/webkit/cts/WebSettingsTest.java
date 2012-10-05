@@ -718,7 +718,7 @@ public class WebSettingsTest extends ActivityInstrumentationTestCase2<WebViewStu
         mOnUiThread.clearCache(true);
         mOnUiThread.loadUrlAndWaitForCompletion(
             mWebServer.getAssetUrl(TestHtmlConstants.HELLO_WORLD_URL));
-        assertEquals(TestHtmlConstants.WEBPAGE_NOT_AVAILABLE_TITLE, mOnUiThread.getTitle());
+        assertFalse(TestHtmlConstants.HELLO_WORLD_TITLE.equals(mOnUiThread.getTitle()));
         mOnUiThread.loadDataAndWaitForCompletion(getNetworkImageHtml(), "text/html", null);
         assertEquals(EMPTY_IMAGE_HEIGHT, mOnUiThread.getTitle());
         mOnUiThread.loadDataAndWaitForCompletion(DATA_URL_IMAGE_HTML, "text/html", null);
