@@ -17,12 +17,15 @@
 package android.text.cts;
 
 
+import static android.view.View.LAYOUT_DIRECTION_LTR;
+import static android.view.View.LAYOUT_DIRECTION_RTL;
+
 import android.content.res.ColorStateList;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
-import android.graphics.Typeface;
 import android.graphics.Paint.FontMetricsInt;
+import android.graphics.Typeface;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.test.AndroidTestCase;
@@ -38,16 +41,15 @@ import android.text.style.BackgroundColorSpan;
 import android.text.style.ReplacementSpan;
 import android.text.style.TextAppearanceSpan;
 import android.text.style.URLSpan;
+import android.util.Log;
 import android.util.StringBuilderPrinter;
+
 import dalvik.annotation.TestLevel;
 import dalvik.annotation.TestTargetNew;
 
 import java.util.ArrayList;
 import java.util.Locale;
 import java.util.regex.Pattern;
-
-import static android.view.View.LAYOUT_DIRECTION_LTR;
-import static android.view.View.LAYOUT_DIRECTION_RTL;
 
 /**
  * Test {@link TextUtils}.
@@ -329,15 +331,15 @@ public class TextUtilsTest extends AndroidTestCase {
 
         CharSequence text = "long string to truncate";
 
-        float textWidth = p.measureText(mEllipsis + "uncate");
+        float textWidth = p.measureText(mEllipsis) + p.measureText("uncate");
         assertEquals(mEllipsis + "uncate",
                 TextUtils.ellipsize(text, p, textWidth, TruncateAt.START).toString());
 
-        textWidth = p.measureText("long str" + mEllipsis);
+        textWidth = p.measureText("long str") + p.measureText(mEllipsis);
         assertEquals("long str" + mEllipsis,
                 TextUtils.ellipsize(text, p, textWidth, TruncateAt.END).toString());
 
-        textWidth = p.measureText("long" + mEllipsis + "ate");
+        textWidth = p.measureText("long") + p.measureText(mEllipsis) + p.measureText("ate");
         assertEquals("long" + mEllipsis + "ate",
                 TextUtils.ellipsize(text, p, textWidth, TruncateAt.MIDDLE).toString());
 
