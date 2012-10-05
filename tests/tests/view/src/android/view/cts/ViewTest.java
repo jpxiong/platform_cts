@@ -2543,6 +2543,16 @@ public class ViewTest extends ActivityInstrumentationTestCase2<ViewTestStubActiv
         Rect rectangle = new Rect();
         MockViewGroupParent parent = new MockViewGroupParent(mActivity);
 
+        final Rect requestedRect = new Rect();
+        MockViewGroupParent grandparent = new MockViewGroupParent(mActivity) {
+            @Override
+            public boolean requestChildRectangleOnScreen(View child, Rect rectangle,
+                    boolean immediate) {
+                requestedRect.set(rectangle);
+                return super.requestChildRectangleOnScreen(child, rectangle, immediate);
+            }
+        };
+
         // parent is null
         assertFalse(view.requestRectangleOnScreen(rectangle));
         assertFalse(view.requestRectangleOnScreen(null));
@@ -2551,16 +2561,22 @@ public class ViewTest extends ActivityInstrumentationTestCase2<ViewTestStubActiv
         assertEquals(0, rectangle.right);
         assertEquals(0, rectangle.bottom);
 
-        view.setParent(parent);
-        view.scrollTo(1, 2);
+        parent.addView(view);
+        parent.scrollTo(1, 2);
+        grandparent.addView(parent);
+
         assertFalse(parent.hasRequestChildRectangleOnScreen());
+        assertFalse(grandparent.hasRequestChildRectangleOnScreen());
 
         assertFalse(view.requestRectangleOnScreen(rectangle));
+
         assertTrue(parent.hasRequestChildRectangleOnScreen());
-        assertEquals(-1, rectangle.left);
-        assertEquals(-2, rectangle.top);
-        assertEquals(-1, rectangle.right);
-        assertEquals(-2, rectangle.bottom);
+        assertTrue(grandparent.hasRequestChildRectangleOnScreen());
+
+        assertEquals(-1, requestedRect.left);
+        assertEquals(-2, requestedRect.top);
+        assertEquals(-1, requestedRect.right);
+        assertEquals(-2, requestedRect.bottom);
 
         try {
             view.requestRectangleOnScreen(null);
