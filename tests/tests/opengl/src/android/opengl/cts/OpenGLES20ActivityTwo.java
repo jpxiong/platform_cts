@@ -69,8 +69,9 @@ public class OpenGLES20ActivityTwo extends Activity {
     @Override
     protected void onPause() {
         super.onPause();
-        view.onPause();
-
+        if(view != null) {
+            view.onPause();
+        }
     }
 
     @Override
