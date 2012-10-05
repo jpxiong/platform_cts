@@ -277,7 +277,7 @@ protected:
     }
 
     /* Test case for creating an AudioRecorder object */
-    void AudioRecorderCreation() {
+    void AudioRecorderCreation(bool doNotRealize = false) {
         // source: IO device
         SLDataLocator_IODevice locatorIoDeviceSrc;
         locatorIoDeviceSrc.locatorType = SL_DATALOCATOR_IODEVICE;
@@ -296,8 +296,10 @@ protected:
                 &audioSource, &audioSink, 0, NULL/*iidArray*/, NULL/*required*/);
         ASSERT_TRUE(IsOk(res));
         ASSERT_TRUE(NULL != audioRecorderObj);
-        res = (*audioRecorderObj)->Realize(audioRecorderObj, SL_BOOLEAN_FALSE);
-        ASSERT_TRUE(IsOk(res));
+        if (!doNotRealize) {
+            res = (*audioRecorderObj)->Realize(audioRecorderObj, SL_BOOLEAN_FALSE);
+            ASSERT_TRUE(IsOk(res));
+        }
 
         // AudioRecorder destruction
         (*audioRecorderObj)->Destroy(audioRecorderObj);
@@ -360,7 +362,8 @@ TEST_F(SLObjectCreationTest, testAudioPlayerFromAdtsAbqToPcmBqCreation) {
 
 TEST_F(SLObjectCreationTest, testAudioRecorderCreation) {
     ALOGV("Test Fixture: AudioRecorderCreation");
-    AudioRecorderCreation();
+    // cannot Realize as native test cannot have necessary permission.
+    AudioRecorderCreation(true);
 }
 
 int main(int argc, char **argv) {
