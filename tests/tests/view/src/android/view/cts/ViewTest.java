@@ -3401,7 +3401,7 @@ public class ViewTest extends ActivityInstrumentationTestCase2<ViewTestStubActiv
         }
     }
 
-    private final static class MockViewGroupParent extends ViewGroup implements ViewParent {
+    private static class MockViewGroupParent extends ViewGroup implements ViewParent {
         private boolean mHasRequestChildRectangleOnScreen = false;
 
         public MockViewGroupParent(Context context) {
