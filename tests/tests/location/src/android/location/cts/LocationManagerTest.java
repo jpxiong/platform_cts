@@ -591,28 +591,43 @@ public class LocationManagerTest extends InstrumentationTestCase {
      * Tests basic proximity alert when entering proximity
      */
     public void testEnterProximity() throws Exception {
+        // need to mock the fused location provider for proximity tests
+        mockFusedLocation();
+
         doTestEnterProximity(10000);
+
+        unmockFusedLocation();
     }
 
     /**
      * Tests proximity alert when entering proximity, with no expiration
      */
     public void testEnterProximity_noexpire() throws Exception {
+        // need to mock the fused location provider for proximity tests
+        mockFusedLocation();
+
         doTestEnterProximity(-1);
+
+        unmockFusedLocation();
     }
 
     /**
      * Tests basic proximity alert when exiting proximity
      */
     public void testExitProximity() throws Exception {
+        // need to mock the fused location provider for proximity tests
+        mockFusedLocation();
+
         // first do enter proximity scenario
         doTestEnterProximity(-1);
 
         // now update to trigger exit proximity proximity
         mIntentReceiver.clearReceivedIntents();
-        updateLocation(20, 20);
+        updateLocationAndWait(FUSED_PROVIDER_NAME, 20, 20);
         waitForReceiveBroadcast();
         assertProximityType(false);
+
+        unmockFusedLocation();
     }
 
     /**
@@ -622,17 +637,35 @@ public class LocationManagerTest extends InstrumentationTestCase {
      * @param expiration - expiration of proximity alert
      */
     private void doTestEnterProximity(long expiration) throws Exception {
-        // need to mock the fused location provider for proximity tests
-        mockFusedLocation();
-
         // update location to outside proximity range
-        updateLocation(FUSED_PROVIDER_NAME, 30, 30);
+        updateLocationAndWait(FUSED_PROVIDER_NAME, 30, 30);
         registerProximityListener(0, 0, 1000, expiration);
-        updateLocation(FUSED_PROVIDER_NAME, 0, 0);
+        updateLocationAndWait(FUSED_PROVIDER_NAME, 0, 0);
         waitForReceiveBroadcast();
         assertProximityType(true);
+    }
 
-        unmockFusedLocation();
+
+    private void updateLocationAndWait(String providerName, double latitude, double longitude)
+            throws InterruptedException {
+        // Register a listener for the location we are about to set.
+        MockLocationListener listener = new MockLocationListener();
+        HandlerThread handlerThread = new HandlerThread("updateLocationAndWait");
+        handlerThread.start();
+        mManager.requestLocationUpdates(providerName, 0, 0, listener, handlerThread.getLooper());
+
+        // Set the location.
+        updateLocation(providerName, latitude, longitude);
+
+        // Make sure we received the location, and it is the right one.
+        assertTrue(listener.hasCalledOnLocationChanged(TEST_TIME_OUT));
+        Location location = listener.getLocation();
+        assertEquals(providerName, location.getProvider());
+        assertEquals(latitude, location.getLatitude());
+        assertEquals(longitude, location.getLongitude());
+
+        // Remove the listener.
+        mManager.removeUpdates(listener);
     }
 
     private void registerIntentReceiver() {
@@ -672,7 +705,9 @@ public class LocationManagerTest extends InstrumentationTestCase {
      *            if exit expected
      */
     private void assertProximityType(boolean expectedEnterProximity) throws Exception {
-        boolean proximityTest = mIntentReceiver.getLastReceivedIntent().getBooleanExtra(
+        Intent intent = mIntentReceiver.getLastReceivedIntent();
+        assertNotNull("Did not receive any intent", intent);
+        boolean proximityTest = intent.getBooleanExtra(
                 LocationManager.KEY_PROXIMITY_ENTERING, !expectedEnterProximity);
         assertEquals("proximity alert not set to expected enter proximity value",
                 expectedEnterProximity, proximityTest);
