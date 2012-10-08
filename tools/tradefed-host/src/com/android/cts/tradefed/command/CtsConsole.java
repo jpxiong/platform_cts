@@ -174,7 +174,7 @@ public class CtsConsole extends Console {
         helpBuilder.append("Dump:\n");
         helpBuilder.append("  d/dump l/logs: dump the tradefed logs for all running invocations\n");
         helpBuilder.append("Options:\n");
-        helpBuilder.append("  --reboot-per-package : reboot device after running each package.\n");
+        helpBuilder.append("  --disable-reboot : Do not reboot device after running some amount of tests.\n");
         return helpBuilder.toString();
     }
 
