@@ -58,7 +58,7 @@ import java.util.List;
  */
 @LargeTest
 public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActivity> {
-    private String TAG = "CameraTest";
+    private static String TAG = "CameraTest";
     private static final String PACKAGE = "com.android.cts.stub";
     private static final boolean LOGV = false;
     private final String JPEG_PATH = Environment.getExternalStorageDirectory().getPath() +
@@ -177,6 +177,42 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
         assertEquals("Got camera error callback.", NO_ERROR, mCameraErrorCode);
     }
 
+    // Align 'x' to 'to', which should be a power of 2
+    private static int align(int x, int to) {
+        return (x + (to-1)) & ~(to - 1);
+    }
+    private static int calculateBufferSize(int width, int height,
+                                           int format, int bpp) {
+
+        if (LOGV) {
+            Log.v(TAG, "calculateBufferSize: w=" + width + ",h=" + height
+            + ",f=" + format + ",bpp=" + bpp);
+        }
+
+        if (format == ImageFormat.YV12) {
+            /*
+            http://developer.android.com/reference/android/graphics/ImageFormat.html#YV12
+            */
+
+            int stride = align(width, 16);
+
+            int y_size = stride * height;
+            int c_stride = align(stride/2, 16);
+            int c_size = c_stride * height/2;
+            int size = y_size + c_size * 2;
+
+            if (LOGV) {
+                Log.v(TAG, "calculateBufferSize: YV12 size= " + size);
+            }
+
+            return size;
+
+        }
+        else {
+            return width * height * bpp / 8;
+        }
+    }
+
     //Implement the previewCallback
     private final class PreviewCallback
             implements android.hardware.Camera.PreviewCallback {
@@ -189,7 +225,8 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
             Size size = camera.getParameters().getPreviewSize();
             int format = camera.getParameters().getPreviewFormat();
             int bitsPerPixel = ImageFormat.getBitsPerPixel(format);
-            if (size.width * size.height * bitsPerPixel / 8 != data.length) {
+            if (calculateBufferSize(size.width, size.height,
+                    format, bitsPerPixel) != data.length) {
                 Log.e(TAG, "Invalid frame size " + data.length + ". width=" + size.width
                         + ". height=" + size.height + ". bitsPerPixel=" + bitsPerPixel);
                 mPreviewCallbackResult = PREVIEW_CALLBACK_INVALID_FRAME_SIZE;
@@ -1567,7 +1604,8 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
             int format = camera.getParameters().getPreviewFormat();
             int bitsPerPixel = ImageFormat.getBitsPerPixel(format);
             if (!expectedPreviewSize.equals(size) ||
-                    size.width * size.height * bitsPerPixel / 8 != data.length) {
+                    calculateBufferSize(size.width, size.height,
+                        format, bitsPerPixel) != data.length) {
                 Log.e(TAG, "Expected preview width=" + expectedPreviewSize.width + ", height="
                         + expectedPreviewSize.height + ". Actual width=" + size.width + ", height="
                         + size.height);
