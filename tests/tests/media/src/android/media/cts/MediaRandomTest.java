@@ -172,6 +172,7 @@ public class MediaRandomTest extends ActivityInstrumentationTestCase2<MediaStubA
     }
 
     public void testPlayerRandomAction() throws Exception {
+        Watchdog watchdog = new Watchdog(5000);
         try {
             mPlayer.setOnErrorListener(new MediaPlayer.OnErrorListener() {
                 @Override
@@ -193,7 +194,6 @@ public class MediaRandomTest extends ActivityInstrumentationTestCase2<MediaStubA
             Log.v(TAG, "seed = " + seed);
             Random r = new Random(seed);
 
-            Watchdog watchdog = new Watchdog(5000);
             watchdog.start();
             for (int i = 0; i < NUMBER_OF_PLAYER_RANDOM_ACTIONS; i++){
                 watchdog.ping();
@@ -248,14 +248,16 @@ public class MediaRandomTest extends ActivityInstrumentationTestCase2<MediaStubA
                 }
             }
             mPlayer.stop();
-            watchdog.end();
-            watchdog.join();
         } catch (Exception e) {
             Log.v(TAG, e.toString());
+        } finally {
+            watchdog.end();
+            watchdog.join();
         }
     }
 
     public void testRecorderRandomAction() throws Exception {
+        Watchdog watchdog = new Watchdog(5000);
         try {
             long seed = System.currentTimeMillis();
             Log.v(TAG, "seed = " + seed);
@@ -276,7 +278,6 @@ public class MediaRandomTest extends ActivityInstrumentationTestCase2<MediaStubA
             final int[] width  = {176, 352, 320, 640, 1280, 1920};
             final int[] height = {144, 288, 240, 480,  720, 1080};
 
-            Watchdog watchdog = new Watchdog(5000);
             watchdog.start();
             for (int i = 0; i < NUMBER_OF_RECORDER_RANDOM_ACTIONS; i++) {
                 watchdog.ping();
@@ -338,10 +339,11 @@ public class MediaRandomTest extends ActivityInstrumentationTestCase2<MediaStubA
                 } catch (Exception e) {
                 }
             }
-            watchdog.end();
-            watchdog.join();
         } catch (Exception e) {
             Log.v(TAG, e.toString());
+        } finally {
+            watchdog.end();
+            watchdog.join();
         }
     }
 }
