@@ -72,9 +72,9 @@ public class ReportLog {
         printLog(builder.toString());
     }
 
-    public void printSummary(String header, double worst, double average) {
-        mSummary = header + LOG_ELEM_SEPARATOR + "worst " + worst + LOG_ELEM_SEPARATOR +
-                "average " + average;
+    public void printSummary(String header, double average, double stddev) {
+        mSummary = header + LOG_ELEM_SEPARATOR + "average " + average + LOG_ELEM_SEPARATOR +
+                "stddev " + stddev;
     }
 
     public void throwReportToHost() throws PtsException {
@@ -129,6 +129,19 @@ public class ReportLog {
             }
         }
         return result;
+    }
+
+    /**
+     * copy array from src to dst with given offset in dst.
+     * dst should be big enough to hold src
+     * @param src
+     * @param dst
+     * @param dstOffset
+     */
+    public static void copyArray(double[] src, double[] dst, int dstOffset) {
+        for (int i = 0; i < src.length; i++) {
+            dst[dstOffset + i] = src[i];
+        }
     }
 
     /**
