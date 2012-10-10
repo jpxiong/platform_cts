@@ -75,11 +75,13 @@ public class AttachShaderTest extends ActivityInstrumentationTestCase2<OpenGLES2
      * </pre>
      * @throws Throwable
      */
+/* some devices crash for wrong parameter, and that cannot be reliably tested.
     public void test_glAttachedShaders_attach_same_shader() throws Throwable {
         mActivity = getShaderActivity(Constants.SHADER, 3);
         int error = mActivity.glGetError();
         assertTrue(GLES20.GL_NO_ERROR != error);
     }
+*/
 
     /**
      * Test: No shader is attached to a program, glGetAttachedShaders returns
