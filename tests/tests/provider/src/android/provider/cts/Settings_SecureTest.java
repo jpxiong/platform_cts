@@ -32,7 +32,7 @@ public class Settings_SecureTest extends AndroidTestCase {
      * Setting that will have a string value to trigger SettingNotFoundException caused by
      * NumberFormatExceptions for getInt, getFloat, and getLong.
      */
-    private static final String STRING_VALUE_SETTING = Secure.ENABLED_ACCESSIBILITY_SERVICES;
+    private static final String STRING_VALUE_SETTING = Secure.ANDROID_ID;
 
     private ContentResolver cr;
 
