@@ -104,13 +104,6 @@ public class AbsoluteLayoutTest extends ActivityInstrumentationTestCase2<StubAct
         assertEquals(LayoutParams.MATCH_PARENT, params.height);
         assertEquals(0, params.x);
         assertEquals(0, params.y);
-
-        try {
-            mMyAbsoluteLayout.generateLayoutParams((AttributeSet) null);
-            fail("did not throw NullPointerException when AttributeSet is null.");
-        } catch (RuntimeException e) {
-            // expected, test success
-        }
     }
 
     public void testGenerateLayoutParams2() {
