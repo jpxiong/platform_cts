@@ -36,11 +36,6 @@ public class RelativeLayout_LayoutParamsTest extends
     }
 
     public void testConstructor() {
-        try {
-            new RelativeLayout.LayoutParams(getActivity(), null);
-            fail("Should throw RuntimeException");
-        } catch (RuntimeException e) {
-        }
 
         RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(200, 300);
         assertEquals(200, layoutParams.width);
