@@ -158,16 +158,18 @@ public class BitmapTest extends AndroidTestCase {
 
         Bitmap bitmap = Bitmap.createBitmap(mBitmap.getWidth(), mBitmap.getHeight(),
                 mBitmap.getConfig());
+        intBuf1.position(0); // copyPixelsToBuffer adjusted the position, so rewind to start
         bitmap.copyPixelsFromBuffer(intBuf1);
         IntBuffer intBuf2 = IntBuffer.allocate(pixSize);
         bitmap.copyPixelsToBuffer(intBuf2);
 
+        assertEquals(pixSize >> 2, intBuf2.position());
         assertEquals(intBuf1.position(), intBuf2.position());
         int size = intBuf1.position();
         intBuf1.position(0);
         intBuf2.position(0);
         for (int i = 0; i < size; i++) {
-            assertEquals(intBuf1.get(), intBuf2.get());
+            assertEquals("mismatching pixels at position " + i, intBuf1.get(), intBuf2.get());
         }
     }
 
