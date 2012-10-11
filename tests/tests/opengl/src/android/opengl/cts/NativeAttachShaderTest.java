@@ -98,24 +98,26 @@ public class NativeAttachShaderTest
         assertEquals(GLES20.GL_NO_ERROR, error);
     }
 
+/* only one frag shader can be attached
     public void test_glAttachShaders_emptyfragshader_emptyfragshader() throws Throwable {
         mActivity = getShaderActivity(Constants.SHADER, 5);
         int error = mActivity.mRenderer.mAttachShaderError;
         assertTrue(GLES20.GL_NO_ERROR != error);
     }
-
+*/
     public void test_glAttachShaders_emptyfragshader_emptyvertexshader() throws Throwable {
         mActivity = getShaderActivity(Constants.SHADER, 6);
         int error = mActivity.mRenderer.mAttachShaderError;;
         assertEquals(GLES20.GL_NO_ERROR, error);
     }
 
+/* only one vertex shader can be attached
     public void test_glAttachShaders_emptyvertexshader_emptyvertexshader() throws Throwable {
         mActivity = getShaderActivity(Constants.SHADER, 7);
         int error = mActivity.mRenderer.mAttachShaderError;
         assertTrue(GLES20.GL_NO_ERROR != error);
     }
-
+*/
     public void test_glAttachShaders_programobject_attach_fragshaderobject() throws Throwable {
         mActivity = getShaderActivity(Constants.SHADER, 8);
         int error = mActivity.mRenderer.mAttachShaderError;
