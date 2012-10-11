@@ -56,7 +56,7 @@ public class BannedFilesTest extends TestCase {
         if (!FileUtils.getFileStatus(file, fs, false)) {
             return;
         }
-        assertTrue((fs.mode & FileUtils.S_ISUID) == 0);
-        assertTrue((fs.mode & FileUtils.S_ISGID) == 0);
+        assertTrue("File \"" + file + " is setUID", (fs.mode & FileUtils.S_ISUID) == 0);
+        assertTrue("File \"" + file + " is setGID", (fs.mode & FileUtils.S_ISGID) == 0);
     }
 }
