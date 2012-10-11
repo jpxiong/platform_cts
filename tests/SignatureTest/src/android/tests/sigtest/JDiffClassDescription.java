@@ -830,19 +830,14 @@ public class JDiffClassDescription {
         // Nothing to check if it doesn't extend anything.
         if (mExtendedClass != null) {
             Class<?> superClass = mClass.getSuperclass();
-            if (superClass == null) {
-                // API indicates superclass, reflection doesn't.
-                return false;
-            }
 
-            if (superClass.getCanonicalName().equals(mExtendedClass)) {
-                return true;
+            while (superClass != null) {
+                if (superClass.getCanonicalName().equals(mExtendedClass)) {
+                    return true;
+                }
+                superClass = superClass.getSuperclass();
             }
-
-            if (mAbsoluteClassName.equals("android.hardware.SensorManager")) {
-                // FIXME: Please see Issue 1496822 for more information
-                return true;
-            }
+            // Couldn't find a matching superclass.
             return false;
         }
         return true;
