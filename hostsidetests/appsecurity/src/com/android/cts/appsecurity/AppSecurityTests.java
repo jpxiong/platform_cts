@@ -19,15 +19,17 @@ package com.android.cts.appsecurity;
 import com.android.cts.tradefed.build.CtsBuildHelper;
 import com.android.ddmlib.IDevice;
 import com.android.ddmlib.Log;
+import com.android.ddmlib.testrunner.InstrumentationResultParser;
 import com.android.ddmlib.testrunner.RemoteAndroidTestRunner;
 import com.android.ddmlib.testrunner.TestIdentifier;
 import com.android.tradefed.build.IBuildInfo;
+import com.android.tradefed.device.CollectingOutputReceiver;
 import com.android.tradefed.device.DeviceNotAvailableException;
 import com.android.tradefed.device.ITestDevice;
 import com.android.tradefed.result.CollectingTestListener;
 import com.android.tradefed.result.TestResult;
-import com.android.tradefed.result.TestRunResult;
 import com.android.tradefed.result.TestResult.TestStatus;
+import com.android.tradefed.result.TestRunResult;
 import com.android.tradefed.testtype.DeviceTestCase;
 import com.android.tradefed.testtype.IBuildReceiver;
 
@@ -93,6 +95,11 @@ public class AppSecurityTests extends DeviceTestCase implements IBuildReceiver {
         "com.android.cts.usespermissiondiffcertapp";
 
     private static final String READ_EXTERNAL_STORAGE = "android.permission.READ_EXTERNAL_STORAGE";
+
+    private static final String MULTIUSER_STORAGE_APK = "CtsMultiUserStorageApp.apk";
+    private static final String MULTIUSER_STORAGE_PKG = "com.android.cts.multiuserstorageapp";
+    private static final String MULTIUSER_STORAGE_CLASS = MULTIUSER_STORAGE_PKG
+            + ".MultiUserStorageTest";
 
     private static final String LOG_TAG = "AppSecurityTests";
 
@@ -242,6 +249,25 @@ public class AppSecurityTests extends DeviceTestCase implements IBuildReceiver {
     }
 
     /**
+     * Verify that legacy filesystem paths continue working, and that they all
+     * point to same location.
+     */
+    public void testExternalStorageLegacyPaths() throws Exception {
+        try {
+            getDevice().uninstallPackage(WRITE_EXTERNAL_STORAGE_APP_PKG);
+            assertNull(getDevice()
+                    .installPackage(getTestAppFile(WRITE_EXTERNAL_STORAGE_APP_APK), false));
+
+            assertTrue("Failed to verify legacy filesystem paths", runDeviceTests(
+                    WRITE_EXTERNAL_STORAGE_APP_PKG, WRITE_EXTERNAL_STORAGE_APP_CLASS,
+                    "testLegacyPaths"));
+
+        } finally {
+            getDevice().uninstallPackage(WRITE_EXTERNAL_STORAGE_APP_PKG);
+        }
+    }
+
+    /**
      * Test that uninstall of an app removes its private data.
      */
     public void testUninstallRemovesData() throws Exception {
@@ -346,6 +372,73 @@ public class AppSecurityTests extends DeviceTestCase implements IBuildReceiver {
     }
 
     /**
+     * Test multi-user emulated storage environment, ensuring that each user has
+     * isolated storage minus shared OBB directory.
+     */
+    public void testMultiUserStorage() throws Exception {
+        final String PACKAGE = MULTIUSER_STORAGE_PKG;
+        final String CLAZZ = MULTIUSER_STORAGE_CLASS;
+
+        if (!isMultiUserSupportedOnDevice(getDevice())) {
+            Log.d(LOG_TAG, "Single user device; skipping isolated storage tests");
+            return;
+        }
+
+        int owner = 0;
+        int secondary = -1;
+        try {
+            // Create secondary user
+            secondary = createUserOnDevice(getDevice());
+
+            // Install our test app
+            getDevice().uninstallPackage(MULTIUSER_STORAGE_PKG);
+            final String installResult = getDevice()
+                    .installPackage(getTestAppFile(MULTIUSER_STORAGE_APK), false);
+            assertNull("Failed to install: " + installResult, installResult);
+
+            // Clear data from previous tests
+            assertDeviceTestsPass(
+                    doRunTestsAsUser(PACKAGE, CLAZZ, "cleanIsolatedStorage", owner));
+            assertDeviceTestsPass(
+                    doRunTestsAsUser(PACKAGE, CLAZZ, "cleanIsolatedStorage", secondary));
+
+            // Have both users try writing into isolated storage
+            assertDeviceTestsPass(
+                    doRunTestsAsUser(PACKAGE, CLAZZ, "writeIsolatedStorage", owner));
+            assertDeviceTestsPass(
+                    doRunTestsAsUser(PACKAGE, CLAZZ, "writeIsolatedStorage", secondary));
+
+            // Verify they both have isolated view of storage
+            assertDeviceTestsPass(
+                    doRunTestsAsUser(PACKAGE, CLAZZ, "readIsolatedStorage", owner));
+            assertDeviceTestsPass(
+                    doRunTestsAsUser(PACKAGE, CLAZZ, "readIsolatedStorage", secondary));
+
+            // Clear data from previous tests
+            assertDeviceTestsPass(
+                    doRunTestsAsUser(PACKAGE, CLAZZ, "cleanObbStorage", owner));
+            assertDeviceTestsPass(
+                    doRunTestsAsUser(PACKAGE, CLAZZ, "cleanObbStorage", secondary));
+
+            // Only write data as owner
+            assertDeviceTestsPass(
+                    doRunTestsAsUser(PACKAGE, CLAZZ, "writeObbStorage", owner));
+
+            // Verify that both users can see shared OBB data
+            assertDeviceTestsPass(
+                    doRunTestsAsUser(PACKAGE, CLAZZ, "readObbStorage", owner));
+            assertDeviceTestsPass(
+                    doRunTestsAsUser(PACKAGE, CLAZZ, "readObbStorage", secondary));
+
+        } finally {
+            getDevice().uninstallPackage(MULTIUSER_STORAGE_PKG);
+            if (secondary != -1) {
+                removeUserOnDevice(getDevice(), secondary);
+            }
+        }
+    }
+
+    /**
      * Helper method that checks that all tests in given result passed, and attempts to generate
      * a meaningful error message if they failed.
      *
@@ -412,6 +505,58 @@ public class AppSecurityTests extends DeviceTestCase implements IBuildReceiver {
         }
         CollectingTestListener listener = new CollectingTestListener();
         getDevice().runInstrumentationTests(testRunner, listener);
+        return listener.getCurrentRunResults();
+    }
+
+    private static boolean isMultiUserSupportedOnDevice(ITestDevice device)
+            throws DeviceNotAvailableException {
+        // TODO: move this to ITestDevice once it supports users
+        final String output = device.executeShellCommand("pm get-max-users");
+        try {
+            return Integer.parseInt(output.substring(output.lastIndexOf(" ")).trim()) > 1;
+        } catch (NumberFormatException e) {
+            fail("Failed to parse result: " + output);
+        }
+        return false;
+    }
+
+    private static int createUserOnDevice(ITestDevice device) throws DeviceNotAvailableException {
+        // TODO: move this to ITestDevice once it supports users
+        final String name = "CTS_" + System.currentTimeMillis();
+        final String output = device.executeShellCommand("pm create-user " + name);
+        if (output.startsWith("Success")) {
+            try {
+                return Integer.parseInt(output.substring(output.lastIndexOf(" ")).trim());
+            } catch (NumberFormatException e) {
+                fail("Failed to parse result: " + output);
+            }
+        } else {
+            fail("Failed to create user: " + output);
+        }
+        throw new IllegalStateException();
+    }
+
+    private static void removeUserOnDevice(ITestDevice device, int userId)
+            throws DeviceNotAvailableException {
+        // TODO: move this to ITestDevice once it supports users
+        final String output = device.executeShellCommand("pm remove-user " + userId);
+        if (output.startsWith("Error")) {
+            fail("Failed to remove user: " + output);
+        }
+    }
+
+    private TestRunResult doRunTestsAsUser(
+            String pkgName, String testClassName, String testMethodName, int userId)
+            throws DeviceNotAvailableException {
+        // TODO: move this to RemoteAndroidTestRunner once it supports users
+        final String cmd = "am instrument --user " + userId + " -w -r -e class " + testClassName
+                + "#" + testMethodName + " " + pkgName + "/android.test.InstrumentationTestRunner";
+        Log.i(LOG_TAG, "Running " + cmd + " on " + getDevice().getSerialNumber());
+
+        CollectingTestListener listener = new CollectingTestListener();
+        InstrumentationResultParser parser = new InstrumentationResultParser(pkgName, listener);
+
+        getDevice().executeShellCommand(cmd, parser);
         return listener.getCurrentRunResults();
     }
 

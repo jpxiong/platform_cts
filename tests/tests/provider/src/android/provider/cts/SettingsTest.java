@@ -180,8 +180,8 @@ public class SettingsTest extends AndroidTestCase {
         // Test that the secure table can be read from.
         Cursor cursor = null;
         try {
-            cursor = provider.query(Settings.Secure.CONTENT_URI, SECURE_PROJECTION,
-                    Settings.Secure.NAME + "=\"" + Settings.Secure.ADB_ENABLED + "\"",
+            cursor = provider.query(Settings.Global.CONTENT_URI, SECURE_PROJECTION,
+                    Settings.Global.NAME + "=\"" + Settings.Global.ADB_ENABLED + "\"",
                     null, null, null);
             assertNotNull(cursor);
         } finally {
