@@ -19,48 +19,49 @@ package com.android.cts.writeexternalstorageapp;
 import android.os.Environment;
 import android.test.AndroidTestCase;
 
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.util.Random;
 
 /**
  * Test if {@link Environment#getExternalStorageDirectory()} is writable.
  */
 public class WriteExternalStorageTest extends AndroidTestCase {
 
-    private static final String TEST_FILE = "meow";
+    private static final File TEST_FILE = new File(
+            Environment.getExternalStorageDirectory(), "meow");
 
-    private void assertExternalStorageMounted() {
-        assertEquals(Environment.MEDIA_MOUNTED, Environment.getExternalStorageState());
-    }
+    /**
+     * Set of file paths that should all refer to the same location to verify
+     * support for legacy paths.
+     */
+    private static final File[] IDENTICAL_FILES = {
+            new File("/sdcard/caek"),
+            new File("/mnt/sdcard/caek"),
+            new File("/storage/sdcard0/caek"),
+            new File(Environment.getExternalStorageDirectory(), "caek"),
+    };
 
-    private void readExternalStorage() throws IOException {
-        final File file = new File(Environment.getExternalStorageDirectory(), TEST_FILE);
-        final InputStream is = new FileInputStream(file);
+    @Override
+    protected void tearDown() throws Exception {
         try {
-            is.read();
+            TEST_FILE.delete();
+            for (File file : IDENTICAL_FILES) {
+                file.delete();
+            }
         } finally {
-            is.close();
-        }
-    }
-
-    private void writeExternalStorage() throws IOException {
-        final File file = new File(Environment.getExternalStorageDirectory(), TEST_FILE);
-        final OutputStream os = new FileOutputStream(file);
-        try {
-            os.write(32);
-        } finally {
-            os.close();
+            super.tearDown();
         }
     }
 
     public void testReadExternalStorage() throws Exception {
         assertExternalStorageMounted();
         try {
-            readExternalStorage();
+            writeInt(TEST_FILE, 32);
         } catch (IOException e) {
             fail("unable to read external file");
         }
@@ -69,10 +70,54 @@ public class WriteExternalStorageTest extends AndroidTestCase {
     public void testWriteExternalStorage() throws Exception {
         assertExternalStorageMounted();
         try {
-            writeExternalStorage();
+            assertEquals(readInt(TEST_FILE), 32);
         } catch (IOException e) {
             fail("unable to read external file");
         }
     }
 
+    /**
+     * Verify that legacy filesystem paths continue working, and that they all
+     * point to same location.
+     */
+    public void testLegacyPaths() throws Exception {
+        final Random r = new Random();
+        for (File target : IDENTICAL_FILES) {
+            // Ensure we're starting with clean slate
+            for (File file : IDENTICAL_FILES) {
+                file.delete();
+            }
+
+            // Write value to our current target
+            final int value = r.nextInt();
+            writeInt(target, value);
+
+            // Ensure that identical files all contain the value
+            for (File file : IDENTICAL_FILES) {
+                assertEquals(readInt(file), value);
+            }
+        }
+    }
+
+    private static void assertExternalStorageMounted() {
+        assertEquals(Environment.MEDIA_MOUNTED, Environment.getExternalStorageState());
+    }
+
+    private static void writeInt(File file, int value) throws IOException {
+        final DataOutputStream os = new DataOutputStream(new FileOutputStream(file));
+        try {
+            os.writeInt(value);
+        } finally {
+            os.close();
+        }
+    }
+
+    private static int readInt(File file) throws IOException {
+        final DataInputStream is = new DataInputStream(new FileInputStream(file));
+        try {
+            return is.readInt();
+        } finally {
+            is.close();
+        }
+    }
 }
