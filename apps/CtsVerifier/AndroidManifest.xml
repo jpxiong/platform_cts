@@ -70,7 +70,7 @@
         </activity>
 
         <activity android:name=".ReportViewerActivity"
-                android:configChanges="keyboardHidden|orientation"
+                android:configChanges="keyboardHidden|orientation|screenSize"
                 android:label="@string/report_viewer" />
 
         <provider android:name=".TestResultsProvider" 
@@ -78,7 +78,7 @@
 
         <activity android:name=".admin.PolicySerializationTestActivity"
                 android:label="@string/da_policy_serialization_test"
-                android:configChanges="keyboardHidden|orientation">
+                android:configChanges="keyboardHidden|orientation|screenSize">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.cts.intent.category.MANUAL_TEST" />
@@ -88,7 +88,7 @@
 
         <activity android:name=".admin.ScreenLockTestActivity"
                 android:label="@string/da_screen_lock_test"
-                android:configChanges="keyboardHidden|orientation">
+                android:configChanges="keyboardHidden|orientation|screenSize">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.cts.intent.category.MANUAL_TEST" />
@@ -114,7 +114,7 @@
 
         <activity android:name=".bluetooth.BluetoothTestActivity"
                 android:label="@string/bluetooth_test"
-                android:configChanges="keyboardHidden|orientation">
+                android:configChanges="keyboardHidden|orientation|screenSize">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.cts.intent.category.MANUAL_TEST" />
@@ -125,7 +125,7 @@
 
         <activity android:name=".bluetooth.BluetoothToggleActivity"
                 android:label="@string/bt_toggle_bluetooth"
-                android:configChanges="keyboardHidden|orientation">
+                android:configChanges="keyboardHidden|orientation|screenSize">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.cts.intent.category.MANUAL_TEST" />
@@ -136,7 +136,7 @@
 
         <activity android:name=".bluetooth.SecureServerActivity"
                 android:label="@string/bt_secure_server"
-                android:configChanges="keyboardHidden|orientation">
+                android:configChanges="keyboardHidden|orientation|screenSize">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.cts.intent.category.MANUAL_TEST" />
@@ -147,7 +147,7 @@
 
         <activity android:name=".bluetooth.InsecureServerActivity"
                 android:label="@string/bt_insecure_server"
-                android:configChanges="keyboardHidden|orientation">
+                android:configChanges="keyboardHidden|orientation|screenSize">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.cts.intent.category.MANUAL_TEST" />
@@ -158,7 +158,7 @@
 
         <activity android:name=".bluetooth.SecureClientActivity"
                 android:label="@string/bt_secure_client"
-                android:configChanges="keyboardHidden|orientation">
+                android:configChanges="keyboardHidden|orientation|screenSize">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.cts.intent.category.MANUAL_TEST" />
@@ -169,7 +169,7 @@
 
         <activity android:name=".bluetooth.InsecureClientActivity"
                 android:label="@string/bt_insecure_client"
-                android:configChanges="keyboardHidden|orientation">
+                android:configChanges="keyboardHidden|orientation|screenSize">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.cts.intent.category.MANUAL_TEST" />
@@ -180,7 +180,7 @@
 
         <activity android:name=".bluetooth.ConnectionAccessServerActivity"
                 android:label="@string/bt_connection_access_server"
-                android:configChanges="keyboardHidden|orientation">
+                android:configChanges="keyboardHidden|orientation|screenSize">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
             </intent-filter>
@@ -190,7 +190,7 @@
 
         <activity android:name=".bluetooth.ConnectionAccessClientActivity"
                 android:label="@string/bt_connection_access_client"
-                android:configChanges="keyboardHidden|orientation">
+                android:configChanges="keyboardHidden|orientation|screenSize">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
             </intent-filter>
@@ -200,11 +200,11 @@
 
         <activity android:name=".bluetooth.DevicePickerActivity"
                 android:label="@string/bt_device_picker"
-                android:configChanges="keyboardHidden|orientation" />
+                android:configChanges="keyboardHidden|orientation|screenSize" />
 
         <activity android:name=".suid.SuidFilesActivity"
                 android:label="@string/suid_files"
-                android:configChanges="keyboardHidden|orientation">
+                android:configChanges="keyboardHidden|orientation|screenSize">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.cts.intent.category.MANUAL_TEST" />
@@ -214,7 +214,7 @@
 
         <activity android:name=".streamquality.StreamingVideoActivity"
                 android:label="@string/streaming_video"
-                android:configChanges="keyboardHidden|orientation">
+                android:configChanges="keyboardHidden|orientation|screenSize">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.cts.intent.category.MANUAL_TEST" />
@@ -224,7 +224,7 @@
 
         <activity android:name=".streamquality.PlayVideoActivity"
                 android:label="@string/streaming_video"
-                android:configChanges="keyboardHidden|orientation"
+                android:configChanges="keyboardHidden|orientation|screenSize"
                 android:screenOrientation="nosensor" />
 
         <activity android:name=".features.FeatureSummaryActivity" android:label="@string/feature_summary">
@@ -237,7 +237,7 @@
 
         <activity android:name=".location.GpsTestActivity"
                 android:label="@string/location_gps_test"
-                android:configChanges="keyboardHidden|orientation">
+                android:configChanges="keyboardHidden|orientation|screenSize">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.cts.intent.category.MANUAL_TEST" />
@@ -248,7 +248,7 @@
 
         <activity android:name=".nfc.NfcTestActivity"
                 android:label="@string/nfc_test"
-                android:configChanges="keyboardHidden|orientation">
+                android:configChanges="keyboardHidden|orientation|screenSize">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.cts.intent.category.MANUAL_TEST" />
@@ -259,15 +259,15 @@
 
         <activity android:name=".nfc.NdefPushSenderActivity"
                 android:label="@string/nfc_ndef_push_sender"
-                android:configChanges="keyboardHidden|orientation" />
+                android:configChanges="keyboardHidden|orientation|screenSize" />
 
         <activity android:name=".nfc.NdefPushReceiverActivity"
                 android:label="@string/nfc_ndef_push_receiver"
-                android:configChanges="keyboardHidden|orientation" />
+                android:configChanges="keyboardHidden|orientation|screenSize" />
 
         <activity android:name=".nfc.TagVerifierActivity"
                 android:label="@string/nfc_tag_verifier"
-                android:configChanges="keyboardHidden|orientation" />
+                android:configChanges="keyboardHidden|orientation|screenSize" />
 
         <activity android:name=".sensors.AccelerometerTestActivity" android:label="@string/snsr_accel_test"
                 android:screenOrientation="nosensor">
@@ -332,7 +332,7 @@
 
         <activity android:name=".usb.UsbAccessoryTestActivity"
                 android:label="@string/usb_accessory_test"
-                android:configChanges="keyboardHidden|orientation">
+                android:configChanges="keyboardHidden|orientation|screenSize">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.cts.intent.category.MANUAL_TEST" />
@@ -343,7 +343,7 @@
 
         <activity android:name=".p2p.P2pTestListActivity"
                 android:label="@string/p2p_test"
-                android:configChanges="keyboardHidden|orientation">
+                android:configChanges="keyboardHidden|orientation|screenSize">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.cts.intent.category.MANUAL_TEST" />
@@ -354,39 +354,39 @@
 
         <activity android:name=".p2p.GoNegRequesterTestListActivity"
                 android:label="@string/p2p_go_neg_requester"
-                android:configChanges="keyboardHidden|orientation" />
+                android:configChanges="keyboardHidden|orientation|screenSize" />
 
         <activity android:name=".p2p.GoNegRequesterTestActivity"
                 android:label="@string/p2p_go_neg_requester"
-                android:configChanges="keyboardHidden|orientation" />
+                android:configChanges="keyboardHidden|orientation|screenSize" />
 
         <activity android:name=".p2p.GoNegResponderTestActivity"
                 android:label="@string/p2p_go_neg_responder"
-                android:configChanges="keyboardHidden|orientation" />
+                android:configChanges="keyboardHidden|orientation|screenSize" />
 
         <activity android:name=".p2p.P2pClientTestListActivity"
                 android:label="@string/p2p_join_go"
-                android:configChanges="keyboardHidden|orientation" />
+                android:configChanges="keyboardHidden|orientation|screenSize" />
 
         <activity android:name=".p2p.P2pClientTestActivity"
                 android:label="@string/p2p_join_go"
-                android:configChanges="keyboardHidden|orientation" />
+                android:configChanges="keyboardHidden|orientation|screenSize" />
 
         <activity android:name=".p2p.GoTestActivity"
                 android:label="@string/p2p_accept_client"
-                android:configChanges="keyboardHidden|orientation" />
+                android:configChanges="keyboardHidden|orientation|screenSize" />
 
         <activity android:name=".p2p.ServiceRequesterTestListActivity"
                 android:label="@string/p2p_service_discovery_requester"
-                android:configChanges="keyboardHidden|orientation" />
+                android:configChanges="keyboardHidden|orientation|screenSize" />
 
         <activity android:name=".p2p.ServiceRequesterTestActivity"
                 android:label="@string/p2p_service_discovery_requester"
-                android:configChanges="keyboardHidden|orientation" />
+                android:configChanges="keyboardHidden|orientation|screenSize" />
 
         <activity android:name=".p2p.ServiceResponderTestActivity"
                 android:label="@string/p2p_service_discovery_responder"
-                android:configChanges="keyboardHidden|orientation" />
+                android:configChanges="keyboardHidden|orientation|screenSize" />
 
         <activity-alias android:name=".CtsVerifierActivity" android:label="@string/app_name"
                 android:targetActivity=".TestListActivity">
