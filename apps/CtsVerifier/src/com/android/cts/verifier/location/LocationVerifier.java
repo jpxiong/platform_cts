@@ -45,12 +45,14 @@ public class LocationVerifier implements Handler.Callback {
     private int mNumActiveUpdates = 0;
     private int mNumPassiveUpdates = 0;
     private boolean mRunning = false;
+    private boolean mActiveLocationArrive = false;
 
     private class ActiveListener implements LocationListener {
         @Override
         public void onLocationChanged(Location location) {
             if (!mRunning) return;
 
+            mActiveLocationArrive = true;
             mNumActiveUpdates++;
             scheduleTimeout();
 
@@ -102,6 +104,15 @@ public class LocationVerifier implements Handler.Callback {
         public void onLocationChanged(Location location) {
             if (!mRunning) return;
             if (!location.getProvider().equals(mProvider)) return;
+
+            // When a test round start, passive listener shouldn't recevice location before active listener.
+            // If this situation occurs, we treat this location as overdue location.
+            // (The overdue location comes from previous test round, it occurs occasionally)
+            // We have to skip it to prevent wrong calculation of time interval.
+            if (!mActiveLocationArrive) {
+                mCb.log("ignoring passive " + mProvider + " update");
+                return;
+            }
 
             mNumPassiveUpdates++;
             long timestamp = location.getTime();
