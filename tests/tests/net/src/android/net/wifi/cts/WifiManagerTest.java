@@ -399,30 +399,39 @@ public class WifiManagerTest extends AndroidTestCase {
         }
         assertTrue(mWifiManager.isWifiEnabled());
 
-        // Wait for a WiFi connection
-        connectWifi();
+        int i = 0;
+        for (; i < 15; i++) {
+            // Wait for a WiFi connection
+            connectWifi();
 
-        // Read TX packet counter
-        int txcount1 = getTxPacketCount();
+            // Read TX packet counter
+            int txcount1 = getTxPacketCount();
 
-        // Do some network operations
-        HttpURLConnection connection = null;
-        try {
-            URL url = new URL("http://www.google.com/");
-            connection = (HttpURLConnection) url.openConnection();
-            connection.setInstanceFollowRedirects(false);
-            connection.setConnectTimeout(TIMEOUT_MSEC);
-            connection.setReadTimeout(TIMEOUT_MSEC);
-            connection.setUseCaches(false);
-            connection.getInputStream();
-        } catch (Exception e) {
-            // ignore
-        } finally {
-            if (connection != null) connection.disconnect();
+            // Do some network operations
+            HttpURLConnection connection = null;
+            try {
+                URL url = new URL("http://www.google.com/");
+                connection = (HttpURLConnection) url.openConnection();
+                connection.setInstanceFollowRedirects(false);
+                connection.setConnectTimeout(TIMEOUT_MSEC);
+                connection.setReadTimeout(TIMEOUT_MSEC);
+                connection.setUseCaches(false);
+                connection.getInputStream();
+            } catch (Exception e) {
+                // ignore
+            } finally {
+                if (connection != null) connection.disconnect();
+            }
+
+            // Read TX packet counter again and make sure it increases
+            int txcount2 = getTxPacketCount();
+
+            if (txcount2 > txcount1) {
+                break;
+            } else {
+                Thread.sleep(DURATION);
+            }
         }
-
-        // Read TX packet counter again and make sure it increases
-        int txcount2 = getTxPacketCount();
-        assertTrue(txcount2 > txcount1);
+        assertTrue(i < 15);
     }
 }
