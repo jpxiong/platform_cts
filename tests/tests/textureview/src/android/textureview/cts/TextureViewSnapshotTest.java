@@ -25,7 +25,7 @@ public class TextureViewSnapshotTest extends
     }
 
     public void testTextureViewGrabSnapshot() {
-        TextureViewSnapshotTestActivity.mMaxWaitDelayMs = 750;
+        TextureViewSnapshotTestActivity.mMaxWaitDelayMs = 1500;
         if (!getActivity().waitForCompletion())
             fail("Did not complete complete test.");
     }
