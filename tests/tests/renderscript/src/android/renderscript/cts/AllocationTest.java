@@ -28,6 +28,8 @@ import android.renderscript.Type;
 import android.renderscript.Type.Builder;
 import android.renderscript.Type.CubemapFace;
 
+import android.util.Log;
+
 public class AllocationTest extends RSBaseGraphics {
 
     // Test power of two and non power of two, equal and non-equal sizes
@@ -684,6 +686,73 @@ public class AllocationTest extends RSBaseGraphics {
             }
         }
     }
+
+    public void testCopyFromAllocation() {
+        int nElemsX = 256;
+        int nElemsY = 32;
+        Type.Builder b = new Type.Builder(mRS, Element.I8(mRS));
+        Type.Builder b2 = new Type.Builder(mRS, Element.I32(mRS));
+        Allocation srcA = Allocation.createTyped(mRS, b.setX(nElemsX).setY(nElemsY).create());
+        Allocation dstA = Allocation.createTyped(mRS, b.setX(nElemsX).setY(nElemsY).create());
+
+        // wrong dimensionality
+        Allocation srcB_bad = Allocation.createTyped(mRS, b.setX(nElemsX).setY(1).create());
+        Allocation srcC_bad = Allocation.createTyped(mRS, b.setX(nElemsY).setY(nElemsX).create());
+        Allocation srcD_bad = Allocation.createTyped(mRS, b.setX(nElemsX*2).setY(nElemsY*2).create());
+
+        // wrong element type
+        Allocation srcE_bad = Allocation.createTyped(mRS, b2.setX(nElemsX).setY(nElemsY).create());
+
+        try {
+            dstA.copyFrom(srcB_bad);
+            fail("should throw RSIllegalArgumentException");
+        } catch (RSIllegalArgumentException e) {
+        }
+
+        try {
+            dstA.copyFrom(srcC_bad);
+            fail("should throw RSIllegalArgumentException");
+        } catch (RSIllegalArgumentException e) {
+        }
+
+        try {
+            dstA.copyFrom(srcD_bad);
+            fail("should throw RSIllegalArgumentException");
+        } catch (RSIllegalArgumentException e) {
+        }
+
+        try {
+            dstA.copyFrom(srcE_bad);
+            fail("should throw RSIllegalArgumentException");
+        } catch (RSIllegalArgumentException e) {
+        }
+
+        dstA.copyFrom(srcA);
+
+    }
+
+    public void testResize() {
+        int nElemsX = 384;
+        int nElemsY = 48;
+        int nElemsX2 = 256;
+        int nElemsY2 = 32;
+        int nElemsX3 = 128;
+        int nElemsY3 = 16;
+        int nElemsX4 = 257;
+        int nElemsY4 = 33;
+
+        Type.Builder b = new Type.Builder(mRS, Element.I8(mRS));
+
+        Allocation srcA = Allocation.createTyped(mRS, b.setX(nElemsX).setY(nElemsY).create());
+
+        srcA.resize(nElemsX2, nElemsY2);
+        srcA.resize(nElemsX3, nElemsY2);
+        srcA.resize(nElemsX3, nElemsY3);
+        srcA.resize(nElemsX4, nElemsY4);
+        assertTrue(srcA.getType().getX() == nElemsX4 && srcA.getType().getY() == nElemsY4);
+
+    }
+
 }
 
 
