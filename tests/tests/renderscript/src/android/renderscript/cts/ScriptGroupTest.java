@@ -262,7 +262,6 @@ public class ScriptGroupTest extends RSBaseCompute {
         compare.forEach_compare(out);
         compare.forEach_getCompareResult(resultAlloc);
         resultAlloc.copyTo(result);
-        Log.e("ARGH", "result = " + result[0]);
         assertTrue(result[0] == 2);
     }
 
