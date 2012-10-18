@@ -478,7 +478,6 @@ public class KernelTest extends RSBaseCompute {
         s.invoke_foreach_test();
         mRS.finish();
         waitForMessage();
-        checkForErrors();
     }
 
     public void testNoRoot() {
@@ -496,7 +495,7 @@ public class KernelTest extends RSBaseCompute {
         s.invoke_verify_foo();
         s.invoke_noroot_test();
         mRS.finish();
-        waitForMessage();
         checkForErrors();
+        waitForMessage();
     }
 }
