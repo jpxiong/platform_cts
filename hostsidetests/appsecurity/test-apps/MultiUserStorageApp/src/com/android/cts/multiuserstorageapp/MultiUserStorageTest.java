@@ -36,16 +36,13 @@ public class MultiUserStorageTest extends AndroidTestCase {
 
     private static final String FILE_PREFIX = "MUST_";
 
-    private static final int MAGIC_VALUE = 16785407;
+    private final String FILE_SINGLETON = FILE_PREFIX + "singleton";
+    private final String FILE_OBB_SINGLETON = FILE_PREFIX + "obb_singleton";
+    private final String FILE_OBB_API_SINGLETON = FILE_PREFIX + "obb_api_singleton";
+    private final String FILE_MY_UID = FILE_PREFIX + android.os.Process.myUid();
 
-    private final File mTargetSame = new File(
-            Environment.getExternalStorageDirectory(), FILE_PREFIX + "same");
-    private final File mTargetUid = new File(
-            Environment.getExternalStorageDirectory(), FILE_PREFIX + android.os.Process.myUid());
-
-    private File getFileObbSame() {
-        return new File(getContext().getObbDir(), FILE_PREFIX + "obb_same");
-    }
+    private static final int OBB_API_VALUE = 0xcafe;
+    private static final int OBB_VALUE = 0xf00d;
 
     private void wipeTestFiles(File dir) {
         dir.mkdirs();
@@ -62,15 +59,22 @@ public class MultiUserStorageTest extends AndroidTestCase {
     }
 
     public void writeIsolatedStorage() throws Exception {
-        writeInt(mTargetSame, android.os.Process.myUid());
-        writeInt(mTargetUid, android.os.Process.myUid());
+        writeInt(buildApiPath(FILE_SINGLETON), android.os.Process.myUid());
+        writeInt(buildApiPath(FILE_MY_UID), android.os.Process.myUid());
     }
 
     public void readIsolatedStorage() throws Exception {
         // Expect that the value we wrote earlier is still valid and wasn't
         // overwritten by us running as another user.
-        assertEquals(android.os.Process.myUid(), readInt(mTargetSame));
-        assertEquals(android.os.Process.myUid(), readInt(mTargetUid));
+        assertEquals("Failed to read singleton file from API path", android.os.Process.myUid(),
+                readInt(buildApiPath(FILE_SINGLETON)));
+        assertEquals("Failed to read singleton file from env path", android.os.Process.myUid(),
+                readInt(buildEnvPath(FILE_SINGLETON)));
+        assertEquals("Failed to read singleton file from raw path", android.os.Process.myUid(),
+                readInt(buildRawPath(FILE_SINGLETON)));
+
+        assertEquals("Failed to read UID file from API path", android.os.Process.myUid(),
+                readInt(buildApiPath(FILE_MY_UID)));
     }
 
     public void cleanObbStorage() throws Exception {
@@ -78,11 +82,42 @@ public class MultiUserStorageTest extends AndroidTestCase {
     }
 
     public void writeObbStorage() throws Exception {
-        writeInt(getFileObbSame(), MAGIC_VALUE);
+        writeInt(buildApiObbPath(FILE_OBB_API_SINGLETON), OBB_API_VALUE);
+        writeInt(buildEnvObbPath(FILE_OBB_SINGLETON), OBB_VALUE);
     }
 
     public void readObbStorage() throws Exception {
-        assertEquals(MAGIC_VALUE, readInt(getFileObbSame()));
+        assertEquals("Failed to read OBB file from API path", OBB_API_VALUE,
+                readInt(buildApiObbPath(FILE_OBB_API_SINGLETON)));
+
+        assertEquals("Failed to read OBB file from env path", OBB_VALUE,
+                readInt(buildEnvObbPath(FILE_OBB_SINGLETON)));
+        assertEquals("Failed to read OBB file from raw path", OBB_VALUE,
+                readInt(buildRawObbPath(FILE_OBB_SINGLETON)));
+    }
+
+    private File buildApiObbPath(String file) {
+        return new File(getContext().getObbDir(), file);
+    }
+
+    private File buildEnvObbPath(String file) {
+        return new File(new File(System.getenv("EXTERNAL_STORAGE"), "Android/obb"), file);
+    }
+
+    private File buildRawObbPath(String file) {
+        return new File("/sdcard/Android/obb/", file);
+    }
+
+    private static File buildApiPath(String file) {
+        return new File(Environment.getExternalStorageDirectory(), file);
+    }
+
+    private static File buildEnvPath(String file) {
+        return new File(System.getenv("EXTERNAL_STORAGE"), file);
+    }
+
+    private static File buildRawPath(String file) {
+        return new File("/sdcard/", file);
     }
 
     private static void writeInt(File file, int value) throws IOException {

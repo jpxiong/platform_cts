@@ -41,8 +41,7 @@ public class WriteExternalStorageTest extends AndroidTestCase {
      */
     private static final File[] IDENTICAL_FILES = {
             new File("/sdcard/caek"),
-            new File("/mnt/sdcard/caek"),
-            new File("/storage/sdcard0/caek"),
+            new File(System.getenv("EXTERNAL_STORAGE"), "caek"),
             new File(Environment.getExternalStorageDirectory(), "caek"),
     };
 
@@ -60,20 +59,15 @@ public class WriteExternalStorageTest extends AndroidTestCase {
 
     public void testReadExternalStorage() throws Exception {
         assertExternalStorageMounted();
-        try {
-            writeInt(TEST_FILE, 32);
-        } catch (IOException e) {
-            fail("unable to read external file");
-        }
+        Environment.getExternalStorageDirectory().list();
     }
 
     public void testWriteExternalStorage() throws Exception {
         assertExternalStorageMounted();
-        try {
-            assertEquals(readInt(TEST_FILE), 32);
-        } catch (IOException e) {
-            fail("unable to read external file");
-        }
+
+        // Write a value and make sure we can read it back
+        writeInt(TEST_FILE, 32);
+        assertEquals(readInt(TEST_FILE), 32);
     }
 
     /**
