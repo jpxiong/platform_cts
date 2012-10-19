@@ -163,8 +163,6 @@ public class LayoutTestActivity extends Activity {
         protected void onPreExecute() {
             mBitmap = getBitmap();
             mReferenceBitmap = BitmapAssets.getBitmap(getApplicationContext(), mBitmapName);
-            final int threshold = 2;
-            mSame = compareTo(mBitmap, mReferenceBitmap, threshold);
         }
 
         /* Compares 2 bitmaps' width, height and pixels.
@@ -213,6 +211,8 @@ public class LayoutTestActivity extends Activity {
         @Override
         protected String[] doInBackground(Void... devoid) {
             try {
+                final int threshold = 2;
+                mSame = compareTo(mBitmap, mReferenceBitmap, threshold);
                 if (!mSame) {
                     String[] paths = new String[2];
                     paths[0] = saveDiffBitmap(mBitmap, mReferenceBitmap);
@@ -222,9 +222,6 @@ public class LayoutTestActivity extends Activity {
                     return null;
                 }
             } finally {
-                mReferenceBitmap.recycle();
-                mReferenceBitmap = null;
-
                 mBitmap.recycle();
                 mBitmap = null;
             }
