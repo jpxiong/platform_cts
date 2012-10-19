@@ -41,12 +41,12 @@
                 android:label="@string/pick_layout" />
 
         <activity android:name="android.holo.cts.ThemeTestActivity"
-                android:configChanges="keyboardHidden|orientation|screenSize"
+                android:configChanges="keyboardHidden|orientation|screenSize|mcc|mnc"
                 android:screenOrientation="nosensor"
                 android:theme="@android:style/Theme.Translucent.NoTitleBar" />
 
         <activity android:name="android.holo.cts.LayoutTestActivity"
-                android:configChanges="keyboardHidden|orientation|screenSize"
+                android:configChanges="keyboardHidden|orientation|screenSize|mcc|mnc"
                 android:screenOrientation="nosensor" />
 
         <activity android:name="android.holo.cts.BitmapDeletionActivity"
