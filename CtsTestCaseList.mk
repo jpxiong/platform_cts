@@ -62,6 +62,7 @@ cts_test_packages := \
 	CtsCalendarcommon2TestCases \
 	CtsContentTestCases \
 	CtsDatabaseTestCases \
+	CtsDisplayTestCases \
 	CtsDpiTestCases \
 	CtsDpiTestCases2 \
 	CtsDrmTestCases \
