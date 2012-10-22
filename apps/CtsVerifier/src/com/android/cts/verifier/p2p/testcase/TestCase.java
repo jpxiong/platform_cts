@@ -16,6 +16,7 @@
 package com.android.cts.verifier.p2p.testcase;
 
 import android.content.Context;
+import android.net.wifi.WifiManager;
 import android.net.wifi.p2p.WifiP2pManager;
 import android.net.wifi.p2p.WifiP2pManager.Channel;
 
@@ -49,6 +50,7 @@ public abstract class TestCase {
     protected String mReason;
 
     protected WifiP2pManager mP2pMgr;
+    protected WifiManager mWifiMgr;
     protected Channel mChannel;
     // this is used for multi-client test
     protected Channel mSubChannel;
@@ -141,6 +143,7 @@ public abstract class TestCase {
      */
     protected void setUp() {
         mP2pMgr = (WifiP2pManager) mContext.getSystemService(Context.WIFI_P2P_SERVICE);
+        mWifiMgr = (WifiManager) mContext.getSystemService(Context.WIFI_SERVICE);
         mChannel = mP2pMgr.initialize(mContext, mContext.getMainLooper(), null);
         mSubChannel = mP2pMgr.initialize(mContext, mContext.getMainLooper(), null);
     }
