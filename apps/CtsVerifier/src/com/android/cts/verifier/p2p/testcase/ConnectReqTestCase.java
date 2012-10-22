@@ -21,8 +21,11 @@ import android.net.wifi.WpsInfo;
 import android.net.wifi.p2p.WifiP2pConfig;
 import android.net.wifi.p2p.WifiP2pDevice;
 import android.net.wifi.p2p.WifiP2pInfo;
+import android.net.wifi.p2p.WifiP2pManager;
 
 import com.android.cts.verifier.R;
+
+import java.lang.reflect.Method;
 
 /**
  * A base class for connection request test.
@@ -42,6 +45,22 @@ public abstract class ConnectReqTestCase extends ReqTestCase {
         super.setUp();
         mReceiverTest = new P2pBroadcastReceiverTest(mContext);
         mReceiverTest.init(mChannel);
+
+        try {
+            Method[] methods = WifiP2pManager.class.getMethods();
+            for (int i = 0; i < methods.length; i++) {
+                if (methods[i].getName().equals("deletePersistentGroup")) {
+                    // Delete any persistent group
+                    for (int netid = 0; netid < 32; netid++) {
+                        methods[i].invoke(mP2pMgr, mChannel, netid, null);
+                    }
+                }
+            }
+        } catch(Exception e) {
+            e.printStackTrace();
+        }
+        // Disconnect from wifi to avoid channel conflict
+        mWifiMgr.disconnect();
     }
 
     /**
