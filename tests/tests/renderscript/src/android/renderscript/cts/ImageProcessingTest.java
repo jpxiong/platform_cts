@@ -50,6 +50,8 @@ import android.renderscript.Matrix4f;
 
 import android.renderscript.Type;
 
+import android.renderscript.Script;
+
 import android.renderscript.ScriptGroup;
 
 import android.renderscript.ScriptIntrinsicBlend;
@@ -76,6 +78,29 @@ public class ImageProcessingTest extends RSBaseCompute {
         a2 = Allocation.createTyped(mRS, t);
     }
 
+    protected void runClippedIntrinsic(Script s,
+                                       Allocation ain,
+                                       Allocation aout) {
+        int xStart = 16;
+        int xEnd = 127;
+        int yStart = 48;
+        int yEnd = 63;
+
+        ScriptC_kernel_clip clip = new ScriptC_kernel_clip(mRS);
+        clip.set_xStart(xStart);
+        clip.set_xEnd(xEnd);
+        clip.set_yStart(yStart);
+        clip.set_yEnd(yEnd);
+
+        clip.set_s(s);
+        clip.set_ain(ain);
+        clip.set_aout(aout);
+
+        clip.invoke_run_clipped_script();
+        mRS.finish();
+
+    }
+
     public void testBlur() {
         ScriptIntrinsicBlur mBlur;
         mBlur = ScriptIntrinsicBlur.create(mRS, Element.U8_4(mRS));
@@ -90,6 +115,8 @@ public class ImageProcessingTest extends RSBaseCompute {
 
             mBlur.setRadius(i);
             mBlur.setInput(a1_copy);
+
+            runClippedIntrinsic(mBlur, a1_copy, a2_copy);
 
             mBlur.forEach(a2_copy);
 
@@ -182,6 +209,8 @@ public class ImageProcessingTest extends RSBaseCompute {
         a1_copy.copy2DRangeFrom(0, 0, a1.getType().getX(), a1.getType().getY(), a1, 0, 0);
         a2_copy.copy2DRangeFrom(0, 0, a2.getType().getX(), a2.getType().getY(), a2, 0, 0);
 
+        runClippedIntrinsic(mColorMatrix, a1_copy, a2_copy);
+
         mColorMatrix.forEach(a1_copy, a2_copy);
 
         //validate greyscale
@@ -192,6 +221,8 @@ public class ImageProcessingTest extends RSBaseCompute {
 
         a1_copy.copy2DRangeFrom(0, 0, a1.getType().getX(), a1.getType().getY(), a1, 0, 0);
         a2_copy.copy2DRangeFrom(0, 0, a2.getType().getX(), a2.getType().getY(), a2, 0, 0);
+
+        runClippedIntrinsic(mColorMatrix, a1_copy, a2_copy);
 
         mColorMatrix.forEach(a1_copy, a2_copy);
 
@@ -218,6 +249,9 @@ public class ImageProcessingTest extends RSBaseCompute {
 
         mConvolve3x3.setCoefficients(f);
         mConvolve3x3.setInput(a1_copy);
+
+        runClippedIntrinsic(mConvolve3x3, a1_copy, a2_copy);
+
         mConvolve3x3.forEach(a2_copy);
 
         // validate
@@ -243,6 +277,9 @@ public class ImageProcessingTest extends RSBaseCompute {
 
         mConvolve5x5.setCoefficients(f);
         mConvolve5x5.setInput(a1_copy);
+
+        runClippedIntrinsic(mConvolve5x5, a1_copy, a2_copy);
+
         mConvolve5x5.forEach(a2_copy);
 
         // validate
@@ -285,6 +322,8 @@ public class ImageProcessingTest extends RSBaseCompute {
         }
 
         mLUT.forEach(a1_copy, a2_copy);
+
+        runClippedIntrinsic(mLUT, a1_copy, a2_copy);
 
         // validate
 
