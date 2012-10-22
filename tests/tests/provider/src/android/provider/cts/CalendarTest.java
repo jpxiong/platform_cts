@@ -50,6 +50,9 @@ import android.text.format.Time;
 import android.util.Log;
 
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 public class CalendarTest extends InstrumentationTestCase {
 
@@ -1916,6 +1919,112 @@ public class CalendarTest extends InstrumentationTestCase {
         assertEquals("Big", title);
 
         removeAndVerifyCalendar(account, calendarId);
+    }
+
+    private class CalendarEventHelper {
+
+      private long mCalendarId;
+      private String mAccount;
+      private int mSeed;
+
+      public CalendarEventHelper(String account, int seed) {
+        mAccount = account;
+        mSeed = seed;
+        ContentValues values = CalendarHelper.getNewCalendarValues(account, seed);
+        mCalendarId = createAndVerifyCalendar(account, seed++, values);
+      }
+
+      public ContentValues addEvent(String timeString, int timeZoneIndex, long duration) {
+        long event1Start = timeInMillis(timeString, timeZoneIndex);
+        ContentValues eventValues;
+        eventValues = EventHelper.getNewEventValues(mAccount, mSeed++, mCalendarId, true);
+        eventValues.put(Events.DESCRIPTION, timeString);
+        eventValues.put(Events.DTSTART, event1Start);
+        eventValues.put(Events.DTEND, event1Start + duration);
+        eventValues.put(Events.EVENT_TIMEZONE, TIME_ZONES[timeZoneIndex]);
+        long eventId = createAndVerifyEvent(mAccount, mSeed, mCalendarId, true, eventValues);
+        assertTrue(eventId >= 0);
+        return eventValues;
+      }
+    }
+
+    /**
+     * Test query to retrieve instances within a certain time interval.
+     */
+    public void testWhenByDayQuery() {
+      String account = "cser_account";
+      int seed = 0;
+
+      // Clean up just in case
+      CalendarHelper.deleteCalendarByAccount(mContentResolver, account);
+
+      // Create a calendar
+      CalendarEventHelper helper = new CalendarEventHelper(account, seed);
+
+      // Add events to the calendar--the first two in the queried range
+      List<ContentValues> eventsWithinRange = new ArrayList<ContentValues>();
+
+      ContentValues values = helper.addEvent("2009-10-01T08:00:00", 0, DateUtils.HOUR_IN_MILLIS);
+      eventsWithinRange.add(values);
+
+      values = helper.addEvent("2010-10-01T08:00:00", 0, DateUtils.HOUR_IN_MILLIS);
+      eventsWithinRange.add(values);
+
+      helper.addEvent("2011-10-01T08:00:00", 0, DateUtils.HOUR_IN_MILLIS);
+
+      // Prepare the start time and end time of the range to query
+      String startTime = "2009-01-01T00:00:00";
+      String endTime = "2011-01-01T00:00:00";
+      int julianStart = getJulianDay(startTime, 0);
+      int julianEnd = getJulianDay(endTime, 0);
+      Uri uri = Uri.withAppendedPath(
+          CalendarContract.Instances.CONTENT_BY_DAY_URI, julianStart + "/" + julianEnd);
+
+      // Query the range, sorting by event start time
+      Cursor c = mContentResolver.query(uri, null, null, null, Events.DTSTART);
+
+      // Assert that two events are returned
+      assertEquals(c.getCount(), 2);
+
+      Set<String> keySet = new HashSet();
+      keySet.add(Events.DESCRIPTION);
+      keySet.add(Events.DTSTART);
+      keySet.add(Events.DTEND);
+      keySet.add(Events.EVENT_TIMEZONE);
+
+      // Verify that the contents of those two events match the cursor results
+      verifyContentValuesAgainstCursor(eventsWithinRange, keySet, c);
+    }
+
+    private void verifyContentValuesAgainstCursor(List<ContentValues> cvs,
+        Set<String> keys, Cursor cursor) {
+      assertEquals(cursor.getCount(), cvs.size());
+
+      cursor.moveToFirst();
+
+      int i=0;
+      do {
+        ContentValues cv = cvs.get(i);
+        for (String key : keys) {
+          assertEquals(cv.get(key).toString(),
+                  cursor.getString(cursor.getColumnIndex(key)));
+        }
+        i++;
+      } while (cursor.moveToNext());
+
+      cursor.close();
+    }
+
+    private long timeInMillis(String timeString, int timeZoneIndex) {
+      Time startTime = new Time(TIME_ZONES[timeZoneIndex]);
+      startTime.parse3339(timeString);
+      return startTime.toMillis(false);
+    }
+
+    private int getJulianDay(String timeString, int timeZoneIndex) {
+      Time time = new Time(TIME_ZONES[timeZoneIndex]);
+      time.parse3339(timeString);
+      return Time.getJulianDay(time.toMillis(false), time.gmtoff);
     }
 
     /**
