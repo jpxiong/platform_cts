@@ -240,6 +240,30 @@ public class FileSystemPermissionTest extends AndroidTestCase {
         assertFalse(f.canExecute());
     }
 
+    @MediumTest
+    public void testDataMediaSane() throws Exception {
+        final File f = new File("/data/media");
+        assertFalse(f.canRead());
+        assertFalse(f.canWrite());
+        assertFalse(f.canExecute());
+    }
+
+    @MediumTest
+    public void testMntShellSane() throws Exception {
+        final File f = new File("/mnt/shell");
+        assertFalse(f.canRead());
+        assertFalse(f.canWrite());
+        assertFalse(f.canExecute());
+    }
+
+    @MediumTest
+    public void testMntSecureSane() throws Exception {
+        final File f = new File("/mnt/secure");
+        assertFalse(f.canRead());
+        assertFalse(f.canWrite());
+        assertFalse(f.canExecute());
+    }
+
     private static boolean isDirectoryWritable(File directory) {
         File toCreate = new File(directory, "hello");
         try {
