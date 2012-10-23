@@ -23,7 +23,6 @@ import com.android.ddmlib.testrunner.InstrumentationResultParser;
 import com.android.ddmlib.testrunner.RemoteAndroidTestRunner;
 import com.android.ddmlib.testrunner.TestIdentifier;
 import com.android.tradefed.build.IBuildInfo;
-import com.android.tradefed.device.CollectingOutputReceiver;
 import com.android.tradefed.device.DeviceNotAvailableException;
 import com.android.tradefed.device.ITestDevice;
 import com.android.tradefed.result.CollectingTestListener;
@@ -373,7 +372,7 @@ public class AppSecurityTests extends DeviceTestCase implements IBuildReceiver {
 
     /**
      * Test multi-user emulated storage environment, ensuring that each user has
-     * isolated storage minus shared OBB directory.
+     * isolated storage.
      */
     public void testMultiUserStorage() throws Exception {
         final String PACKAGE = MULTIUSER_STORAGE_PKG;
@@ -413,23 +412,6 @@ public class AppSecurityTests extends DeviceTestCase implements IBuildReceiver {
                     doRunTestsAsUser(PACKAGE, CLAZZ, "readIsolatedStorage", owner));
             assertDeviceTestsPass(
                     doRunTestsAsUser(PACKAGE, CLAZZ, "readIsolatedStorage", secondary));
-
-            // Clear data from previous tests
-            assertDeviceTestsPass(
-                    doRunTestsAsUser(PACKAGE, CLAZZ, "cleanObbStorage", owner));
-            assertDeviceTestsPass(
-                    doRunTestsAsUser(PACKAGE, CLAZZ, "cleanObbStorage", secondary));
-
-            // Only write data as owner
-            assertDeviceTestsPass(
-                    doRunTestsAsUser(PACKAGE, CLAZZ, "writeObbStorage", owner));
-
-            // Verify that both users can see shared OBB data
-            assertDeviceTestsPass(
-                    doRunTestsAsUser(PACKAGE, CLAZZ, "readObbStorage", owner));
-            assertDeviceTestsPass(
-                    doRunTestsAsUser(PACKAGE, CLAZZ, "readObbStorage", secondary));
-
         } finally {
             getDevice().uninstallPackage(MULTIUSER_STORAGE_PKG);
             if (secondary != -1) {
