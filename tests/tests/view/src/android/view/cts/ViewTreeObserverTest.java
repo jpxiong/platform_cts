@@ -73,7 +73,7 @@ public class ViewTreeObserverTest extends ActivityInstrumentationTestCase2<MockA
         final ListView lv2 = (ListView) mActivity.findViewById(R.id.listview2);
 
         mViewTreeObserver = layout.getViewTreeObserver();
-        MockOnGlobalFocusChangeListener listener = new MockOnGlobalFocusChangeListener();
+        final MockOnGlobalFocusChangeListener listener = new MockOnGlobalFocusChangeListener();
         mViewTreeObserver.addOnGlobalFocusChangeListener(listener);
         assertFalse(listener.hasCalledOnGlobalFocusChanged());
 
@@ -84,8 +84,12 @@ public class ViewTreeObserverTest extends ActivityInstrumentationTestCase2<MockA
             }
         });
         mInstrumentation.waitForIdleSync();
-
-        assertTrue(listener.hasCalledOnGlobalFocusChanged());
+        new PollingCheck() {
+            @Override
+            protected boolean check() {
+                return listener.hasCalledOnGlobalFocusChanged();
+            }
+        }.run();
     }
 
     public void testAddOnGlobalLayoutListener() {
@@ -207,7 +211,7 @@ public class ViewTreeObserverTest extends ActivityInstrumentationTestCase2<MockA
         final ListView lv2 = (ListView) mActivity.findViewById(R.id.listview2);
 
         mViewTreeObserver = layout.getViewTreeObserver();
-        MockOnGlobalFocusChangeListener listener = new MockOnGlobalFocusChangeListener();
+        final MockOnGlobalFocusChangeListener listener = new MockOnGlobalFocusChangeListener();
         mViewTreeObserver.addOnGlobalFocusChangeListener(listener);
         assertFalse(listener.hasCalledOnGlobalFocusChanged());
         mInstrumentation.runOnMainSync(new Runnable() {
@@ -217,7 +221,12 @@ public class ViewTreeObserverTest extends ActivityInstrumentationTestCase2<MockA
             }
         });
         mInstrumentation.waitForIdleSync();
-        assertTrue(listener.hasCalledOnGlobalFocusChanged());
+        new PollingCheck() {
+            @Override
+            protected boolean check() {
+                return listener.hasCalledOnGlobalFocusChanged();
+            }
+        }.run();
 
         listener.reset();
         mViewTreeObserver.removeOnGlobalFocusChangeListener(listener);
@@ -229,7 +238,12 @@ public class ViewTreeObserverTest extends ActivityInstrumentationTestCase2<MockA
             }
         });
         mInstrumentation.waitForIdleSync();
-        assertFalse(listener.hasCalledOnGlobalFocusChanged());
+        new PollingCheck() {
+            @Override
+            protected boolean check() {
+                return !listener.hasCalledOnGlobalFocusChanged();
+            }
+        }.run();
     }
 
     public void testRemoveOnPreDrawListener() {
@@ -266,8 +280,13 @@ public class ViewTreeObserverTest extends ActivityInstrumentationTestCase2<MockA
             }
         });
         mInstrumentation.waitForIdleSync();
-
-        assertTrue(listener.hasCalledOnTouchModeChanged());
+        final MockOnTouchModeChangeListener l = listener;
+        new PollingCheck() {
+            @Override
+            protected boolean check() {
+                return l.hasCalledOnTouchModeChanged();
+            }
+        }.run();
 
         listener = new MockOnTouchModeChangeListener();
         assertFalse(listener.hasCalledOnTouchModeChanged());
@@ -278,8 +297,13 @@ public class ViewTreeObserverTest extends ActivityInstrumentationTestCase2<MockA
             }
         });
         mInstrumentation.waitForIdleSync();
-
-        assertFalse(listener.hasCalledOnTouchModeChanged());
+        final MockOnTouchModeChangeListener l2 = listener;
+        new PollingCheck() {
+            @Override
+            protected boolean check() {
+                return !l2.hasCalledOnTouchModeChanged();
+            }
+        }.run();
     }
 
     public void testAccessOnScrollChangedListener() throws Throwable {
