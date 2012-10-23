@@ -34,6 +34,7 @@ import android.graphics.drawable.Drawable;
 import android.graphics.drawable.StateListDrawable;
 import android.os.Parcelable;
 import android.os.SystemClock;
+import android.os.Vibrator;
 import android.test.ActivityInstrumentationTestCase2;
 import android.test.TouchUtils;
 import android.test.UiThreadTest;
@@ -3087,6 +3088,9 @@ public class ViewTest extends ActivityInstrumentationTestCase2<ViewTestStubActiv
     }
 
     public void testHapticFeedback() {
+        Vibrator vib = (Vibrator) mActivity.getSystemService(Context.VIBRATOR_SERVICE);
+        boolean hasVibrator = vib.hasVibrator();
+
         final MockView view = (MockView) mActivity.findViewById(R.id.mock_view);
         final int LONG_PRESS = HapticFeedbackConstants.LONG_PRESS;
         final int FLAG_IGNORE_VIEW_SETTING = HapticFeedbackConstants.FLAG_IGNORE_VIEW_SETTING;
@@ -3097,11 +3101,11 @@ public class ViewTest extends ActivityInstrumentationTestCase2<ViewTestStubActiv
         assertFalse(view.isHapticFeedbackEnabled());
         assertFalse(view.performHapticFeedback(LONG_PRESS));
         assertFalse(view.performHapticFeedback(LONG_PRESS, FLAG_IGNORE_GLOBAL_SETTING));
-        assertTrue(view.performHapticFeedback(LONG_PRESS, ALWAYS));
+        assertEquals(hasVibrator, view.performHapticFeedback(LONG_PRESS, ALWAYS));
 
         view.setHapticFeedbackEnabled(true);
         assertTrue(view.isHapticFeedbackEnabled());
-        assertTrue(view.performHapticFeedback(LONG_PRESS, FLAG_IGNORE_GLOBAL_SETTING));
+        assertEquals(hasVibrator, view.performHapticFeedback(LONG_PRESS, FLAG_IGNORE_GLOBAL_SETTING));
     }
 
     public void testInputConnection() throws Throwable {
