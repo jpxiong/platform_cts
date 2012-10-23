@@ -59,6 +59,7 @@ cts_test_packages := \
 	CtsAnimationTestCases \
 	CtsAppTestCases \
 	CtsBluetoothTestCases \
+	CtsCalendarcommon2TestCases \
 	CtsContentTestCases \
 	CtsDatabaseTestCases \
 	CtsDpiTestCases \
