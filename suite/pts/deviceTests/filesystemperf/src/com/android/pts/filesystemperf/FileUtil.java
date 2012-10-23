@@ -276,7 +276,6 @@ public class FileUtil {
         final int runsInOneGo = 16;
         final int readsInOneMeasure = totalReadCount / runsInOneGo;
 
-
         final RandomAccessFile randomFile = new RandomAccessFile(file, "rw");
         double[] rdAmount = new double[runsInOneGo];
         double[] wrAmount = new double[runsInOneGo];
@@ -300,7 +299,7 @@ public class FileUtil {
         report.printArray("Rd amount", rdAmount, true);
         Stat.StatResult stat = Stat.getStat(mbps);
 
-        report.printSummary("MB/s", stat.mMin, stat.mAverage);
+        report.printSummary("MB/s", stat.mAverage, stat.mStddev);
     }
 
     /**
@@ -327,7 +326,6 @@ public class FileUtil {
         final int runsInOneGo = 16;
         final int writesInOneMeasure = totalWriteCount / runsInOneGo; // 32MB at a time
 
-
         final RandomAccessFile randomFile = new RandomAccessFile(file, "rw");
         double[] rdAmount = new double[runsInOneGo];
         double[] wrAmount = new double[runsInOneGo];
@@ -351,7 +349,7 @@ public class FileUtil {
         report.printArray("Wr amount", wrAmount, true);
         Stat.StatResult stat = Stat.getStat(mbps);
 
-        report.printSummary("MB/s", stat.mMin, stat.mAverage);
+        report.printSummary("MB/s", stat.mAverage, stat.mStddev);
     }
 
     /**
@@ -369,12 +367,11 @@ public class FileUtil {
         File file = FileUtil.createNewFilledFile(context,
                 dirName, fileSize);
         final byte[] data = FileUtil.generateRandomData(bufferSize);
-        double[] worsts = new double[numberRepetition];
-        double[] averages = new double[numberRepetition];
+        int numberRepeatInOneRun = (int)(fileSize / bufferSize);
+        double[] mbpsAll = new double[numberRepetition * numberRepeatInOneRun];
         for (int i = 0; i < numberRepetition; i++) {
             final FileOutputStream out = new FileOutputStream(file);
-            int numberRepeat = (int)(fileSize / bufferSize);
-            double[] times = MeasureTime.measure(numberRepeat, new MeasureRun() {
+            double[] times = MeasureTime.measure(numberRepeatInOneRun, new MeasureRun() {
 
                 @Override
                 public void run(int i) throws IOException {
@@ -387,12 +384,9 @@ public class FileUtil {
                     times);
             report.printArray(i + "-th round MB/s",
                     mbps, true);
-            Stat.StatResult stat = Stat.getStat(mbps);
-            worsts[i] = stat.mMin;
-            averages[i] = stat.mAverage;
+            ReportLog.copyArray(mbps, mbpsAll, i * numberRepeatInOneRun);
         }
-        Stat.StatResult statWorsts = Stat.getStat(worsts);
-        Stat.StatResult statAverages = Stat.getStat(averages);
-        report.printSummary("MB/s", statWorsts.mMin, statAverages.mAverage);
+        Stat.StatResult stat = Stat.getStat(mbpsAll);
+        report.printSummary("MB/s", stat.mAverage, stat.mStddev);
     }
 }
