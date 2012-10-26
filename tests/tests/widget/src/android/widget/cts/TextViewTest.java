@@ -3279,6 +3279,150 @@ public class TextViewTest extends ActivityInstrumentationTestCase2<TextViewStubA
         assertEquals(View.TEXT_ALIGNMENT_GRAVITY, tv.getTextAlignment());
     }
 
+    @UiThreadTest
+    public void testDrawableResolution() {
+        final int LEFT = 0;
+        final int TOP = 1;
+        final int RIGHT = 2;
+        final int BOTTOM = 3;
+
+        TextViewStubActivity activity = getActivity();
+
+        // Case 1.1: left / right drawable defined in default LTR mode
+        TextView tv = (TextView) activity.findViewById(R.id.textview_drawable_1_1);
+        Drawable[] drawables = tv.getCompoundDrawables();
+
+        WidgetTestUtils.assertEquals(getBitmap(R.drawable.icon_blue),
+                ((BitmapDrawable) drawables[LEFT]).getBitmap());
+        WidgetTestUtils.assertEquals(getBitmap(R.drawable.icon_red),
+                ((BitmapDrawable) drawables[RIGHT]).getBitmap());
+        WidgetTestUtils.assertEquals(getBitmap(R.drawable.icon_green),
+                ((BitmapDrawable) drawables[TOP]).getBitmap());
+        WidgetTestUtils.assertEquals(getBitmap(R.drawable.icon_yellow),
+                ((BitmapDrawable) drawables[BOTTOM]).getBitmap());
+
+        // Case 1.2: left / right drawable defined in default RTL mode
+        tv = (TextView) activity.findViewById(R.id.textview_drawable_1_2);
+        drawables = tv.getCompoundDrawables();
+
+        WidgetTestUtils.assertEquals(getBitmap(R.drawable.icon_blue),
+                ((BitmapDrawable) drawables[LEFT]).getBitmap());
+        WidgetTestUtils.assertEquals(getBitmap(R.drawable.icon_red),
+                ((BitmapDrawable) drawables[RIGHT]).getBitmap());
+        WidgetTestUtils.assertEquals(getBitmap(R.drawable.icon_green),
+                ((BitmapDrawable) drawables[TOP]).getBitmap());
+        WidgetTestUtils.assertEquals(getBitmap(R.drawable.icon_yellow),
+                ((BitmapDrawable) drawables[BOTTOM]).getBitmap());
+
+        // Case 2.1: start / end drawable defined in LTR mode
+        tv = (TextView) activity.findViewById(R.id.textview_drawable_2_1);
+        drawables = tv.getCompoundDrawables();
+
+        WidgetTestUtils.assertEquals(getBitmap(R.drawable.icon_blue),
+                ((BitmapDrawable) drawables[LEFT]).getBitmap());
+        WidgetTestUtils.assertEquals(getBitmap(R.drawable.icon_red),
+                ((BitmapDrawable) drawables[RIGHT]).getBitmap());
+        WidgetTestUtils.assertEquals(getBitmap(R.drawable.icon_green),
+                ((BitmapDrawable) drawables[TOP]).getBitmap());
+        WidgetTestUtils.assertEquals(getBitmap(R.drawable.icon_yellow),
+                ((BitmapDrawable) drawables[BOTTOM]).getBitmap());
+
+        // Case 2.2: start / end drawable defined in RTL mode
+        tv = (TextView) activity.findViewById(R.id.textview_drawable_2_2);
+        drawables = tv.getCompoundDrawables();
+
+        WidgetTestUtils.assertEquals(getBitmap(R.drawable.icon_red),
+                ((BitmapDrawable) drawables[LEFT]).getBitmap());
+        WidgetTestUtils.assertEquals(getBitmap(R.drawable.icon_blue),
+                ((BitmapDrawable) drawables[RIGHT]).getBitmap());
+        WidgetTestUtils.assertEquals(getBitmap(R.drawable.icon_green),
+                ((BitmapDrawable) drawables[TOP]).getBitmap());
+        WidgetTestUtils.assertEquals(getBitmap(R.drawable.icon_yellow),
+                ((BitmapDrawable) drawables[BOTTOM]).getBitmap());
+
+        // Case 3.1: left / right / start / end drawable defined in LTR mode
+        tv = (TextView) activity.findViewById(R.id.textview_drawable_3_1);
+        drawables = tv.getCompoundDrawables();
+
+        WidgetTestUtils.assertEquals(getBitmap(R.drawable.icon_blue),
+                ((BitmapDrawable) drawables[LEFT]).getBitmap());
+        WidgetTestUtils.assertEquals(getBitmap(R.drawable.icon_red),
+                ((BitmapDrawable) drawables[RIGHT]).getBitmap());
+        WidgetTestUtils.assertEquals(getBitmap(R.drawable.icon_green),
+                ((BitmapDrawable) drawables[TOP]).getBitmap());
+        WidgetTestUtils.assertEquals(getBitmap(R.drawable.icon_yellow),
+                ((BitmapDrawable) drawables[BOTTOM]).getBitmap());
+
+        // Case 3.2: left / right / start / end drawable defined in RTL mode
+        tv = (TextView) activity.findViewById(R.id.textview_drawable_3_2);
+        drawables = tv.getCompoundDrawables();
+
+        WidgetTestUtils.assertEquals(getBitmap(R.drawable.icon_red),
+                ((BitmapDrawable) drawables[LEFT]).getBitmap());
+        WidgetTestUtils.assertEquals(getBitmap(R.drawable.icon_blue),
+                ((BitmapDrawable) drawables[RIGHT]).getBitmap());
+        WidgetTestUtils.assertEquals(getBitmap(R.drawable.icon_green),
+                ((BitmapDrawable) drawables[TOP]).getBitmap());
+        WidgetTestUtils.assertEquals(getBitmap(R.drawable.icon_yellow),
+                ((BitmapDrawable) drawables[BOTTOM]).getBitmap());
+
+        // Case 4.1: start / end drawable defined in LTR mode inside a layout
+        // that defines the layout direction
+        tv = (TextView) activity.findViewById(R.id.textview_drawable_4_1);
+        drawables = tv.getCompoundDrawables();
+
+        WidgetTestUtils.assertEquals(getBitmap(R.drawable.icon_blue),
+                ((BitmapDrawable) drawables[LEFT]).getBitmap());
+        WidgetTestUtils.assertEquals(getBitmap(R.drawable.icon_red),
+                ((BitmapDrawable) drawables[RIGHT]).getBitmap());
+        WidgetTestUtils.assertEquals(getBitmap(R.drawable.icon_green),
+                ((BitmapDrawable) drawables[TOP]).getBitmap());
+        WidgetTestUtils.assertEquals(getBitmap(R.drawable.icon_yellow),
+                ((BitmapDrawable) drawables[BOTTOM]).getBitmap());
+
+        // Case 4.2: start / end drawable defined in RTL mode inside a layout
+        // that defines the layout direction
+        tv = (TextView) activity.findViewById(R.id.textview_drawable_4_2);
+        drawables = tv.getCompoundDrawables();
+
+        WidgetTestUtils.assertEquals(getBitmap(R.drawable.icon_red),
+                ((BitmapDrawable) drawables[LEFT]).getBitmap());
+        WidgetTestUtils.assertEquals(getBitmap(R.drawable.icon_blue),
+                ((BitmapDrawable) drawables[RIGHT]).getBitmap());
+        WidgetTestUtils.assertEquals(getBitmap(R.drawable.icon_green),
+                ((BitmapDrawable) drawables[TOP]).getBitmap());
+        WidgetTestUtils.assertEquals(getBitmap(R.drawable.icon_yellow),
+                ((BitmapDrawable) drawables[BOTTOM]).getBitmap());
+
+        // Case 5.1: left / right / start / end drawable defined in LTR mode inside a layout
+        // that defines the layout direction
+        tv = (TextView) activity.findViewById(R.id.textview_drawable_3_1);
+        drawables = tv.getCompoundDrawables();
+
+        WidgetTestUtils.assertEquals(getBitmap(R.drawable.icon_blue),
+                ((BitmapDrawable) drawables[LEFT]).getBitmap());
+        WidgetTestUtils.assertEquals(getBitmap(R.drawable.icon_red),
+                ((BitmapDrawable) drawables[RIGHT]).getBitmap());
+        WidgetTestUtils.assertEquals(getBitmap(R.drawable.icon_green),
+                ((BitmapDrawable) drawables[TOP]).getBitmap());
+        WidgetTestUtils.assertEquals(getBitmap(R.drawable.icon_yellow),
+                ((BitmapDrawable) drawables[BOTTOM]).getBitmap());
+
+        // Case 5.2: left / right / start / end drawable defined in RTL mode inside a layout
+        // that defines the layout direction
+        tv = (TextView) activity.findViewById(R.id.textview_drawable_3_2);
+        drawables = tv.getCompoundDrawables();
+
+        WidgetTestUtils.assertEquals(getBitmap(R.drawable.icon_red),
+                ((BitmapDrawable) drawables[LEFT]).getBitmap());
+        WidgetTestUtils.assertEquals(getBitmap(R.drawable.icon_blue),
+                ((BitmapDrawable) drawables[RIGHT]).getBitmap());
+        WidgetTestUtils.assertEquals(getBitmap(R.drawable.icon_green),
+                ((BitmapDrawable) drawables[TOP]).getBitmap());
+        WidgetTestUtils.assertEquals(getBitmap(R.drawable.icon_yellow),
+                ((BitmapDrawable) drawables[BOTTOM]).getBitmap());
+    }
+
     private static class MockOnEditorActionListener implements OnEditorActionListener {
         private boolean isOnEditorActionCalled;
 
