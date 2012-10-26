@@ -44,7 +44,10 @@ public class MediaRecorderTest extends ActivityInstrumentationTestCase2<MediaStu
     private final String OUTPUT_PATH;
     private final String OUTPUT_PATH2;
     private static final float TOLERANCE = 0.0002f;
-    private static final int RECORD_TIME = 3000;
+    private static final int RECORD_TIME_MS = 3000;
+    private static final int RECORD_TIME_LAPSE_MS = 4000;
+    private static final int RECORD_TIME_LONG_MS = 20000;
+    private static final int RECORDED_DUR_TOLERANCE_MS = 1000;
     private static final int THREE_MINUTES = 180000;
     private static final int VIDEO_WIDTH = 176;
     private static final int VIDEO_HEIGHT = 144;
@@ -165,7 +168,7 @@ public class MediaRecorderTest extends ActivityInstrumentationTestCase2<MediaStu
         mMediaRecorder.setPreviewDisplay(mActivity.getSurfaceHolder().getSurface());
         mMediaRecorder.prepare();
         mMediaRecorder.start();
-        Thread.sleep(1000);
+        Thread.sleep(RECORD_TIME_MS);
         mMediaRecorder.stop();
         checkOutputExist();
     }
@@ -181,7 +184,7 @@ public class MediaRecorderTest extends ActivityInstrumentationTestCase2<MediaStu
 
     private void recordVideoUsingCamera(boolean timelapse) throws Exception {
         int nCamera = Camera.getNumberOfCameras();
-        int durMs = timelapse? 4000: 1000;
+        int durMs = timelapse? RECORD_TIME_LAPSE_MS: RECORD_TIME_MS;
         for (int cameraId = 0; cameraId < nCamera; cameraId++) {
             mCamera = Camera.open(cameraId);
             recordVideoUsingCamera(mCamera, OUTPUT_PATH, durMs, timelapse);
@@ -366,7 +369,7 @@ public class MediaRecorderTest extends ActivityInstrumentationTestCase2<MediaStu
         mMediaRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB);
         mMediaRecorder.prepare();
         mMediaRecorder.start();
-        Thread.sleep(RECORD_TIME);
+        Thread.sleep(RECORD_TIME_MS);
         assertTrue(mOnInfoCalled);
     }
 
@@ -374,7 +377,7 @@ public class MediaRecorderTest extends ActivityInstrumentationTestCase2<MediaStu
         if (!hasMicrophone()) {
             return;
         }
-        testSetMaxDuration(20000, 1000);
+        testSetMaxDuration(RECORD_TIME_LONG_MS, RECORDED_DUR_TOLERANCE_MS);
     }
 
     private void testSetMaxDuration(long durationMs, long toleranceMs) throws Exception {
@@ -461,7 +464,7 @@ public class MediaRecorderTest extends ActivityInstrumentationTestCase2<MediaStu
         mMediaRecorder.setMaxFileSize(maxFileSize);
         mMediaRecorder.prepare();
         mMediaRecorder.start();
-        Thread.sleep(RECORD_TIME);
+        Thread.sleep(RECORD_TIME_MS);
         mMediaRecorder.stop();
 
         assertTrue(outFile.exists());
