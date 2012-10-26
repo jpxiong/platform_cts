@@ -49,6 +49,8 @@ class TestPackageDef implements ITestPackageDef {
         "com.android.cts.tradefed.testtype.AccessibilityTestRunner";
     public static final String ACCESSIBILITYSERVICE_TEST =
         "com.android.cts.tradefed.testtype.AccessibilityServiceTestRunner";
+    public static final String DISPLAY_TEST =
+            "com.android.cts.tradefed.testtype.DisplayTestRunner";
 
     private static final String SIGNATURE_TEST_METHOD = "testSignature";
     private static final String SIGNATURE_TEST_CLASS = "android.tests.sigtest.SimpleSignatureTest";
@@ -228,6 +230,9 @@ class TestPackageDef implements ITestPackageDef {
             return setInstrumentationTest(test, testCaseDir);
         } else if (ACCESSIBILITYSERVICE_TEST.equals(mTestType)) {
             AccessibilityServiceTestRunner test = new AccessibilityServiceTestRunner();
+            return setInstrumentationTest(test, testCaseDir);
+        } else if (DISPLAY_TEST.equals(mTestType)) {
+            DisplayTestRunner test = new DisplayTestRunner();
             return setInstrumentationTest(test, testCaseDir);
         } else if (mIsSignatureTest) {
             // TODO: hardcode the runner/class/method for now, since current package xml points to

@@ -22,52 +22,98 @@ import com.android.tradefed.device.ITestDevice;
  * {@link SettingsToggler} sets settings by using the "adb shell content" command.
  */
 public class SettingsToggler {
+    private static final String GROUP_SECURE = "secure";
+    private static final String GROUP_GLOBAL = "global";
+
+    /** Sets a setting by deleting and then inserting the string value. */
+    public static void setString(ITestDevice device, String group, String name, String value)
+            throws DeviceNotAvailableException {
+        deleteSetting(device, group, name);
+        device.executeShellCommand(
+                "content insert"
+                + " --uri content://settings/" + group
+                + " --bind name:s:" + name
+                + " --bind value:s:" + value);
+    }
 
     /** Sets a secure setting by deleting and then inserting the string value. */
     public static void setSecureString(ITestDevice device, String name, String value)
             throws DeviceNotAvailableException {
-        deleteSecure(device, name);
+        setString(device, GROUP_SECURE, name, value);
+    }
+
+    /** Sets a global setting by deleting and then inserting the string value. */
+    public static void setGlobalString(ITestDevice device, String name, String value)
+            throws DeviceNotAvailableException {
+        setString(device, GROUP_GLOBAL, name, value);
+    }
+
+    /** Sets a setting by deleting and then inserting the int value. */
+    public static void setInt(ITestDevice device, String group, String name, int value)
+            throws DeviceNotAvailableException {
+        deleteSetting(device, group, name);
         device.executeShellCommand(
                 "content insert"
-                + " --uri content://settings/secure"
+                + " --uri content://settings/" + group
                 + " --bind name:s:" + name
-                + " --bind value:s:" + value);
+                + " --bind value:i:" + value);
     }
 
     /** Sets a secure setting by deleting and then inserting the int value. */
     public static void setSecureInt(ITestDevice device, String name, int value)
             throws DeviceNotAvailableException {
-        deleteSecure(device, name);
+        setInt(device, GROUP_SECURE, name, value);
+    }
+
+    /** Sets a global setting by deleting and then inserting the int value. */
+    public static void setGlobalInt(ITestDevice device, String name, int value)
+            throws DeviceNotAvailableException {
+        setInt(device, GROUP_GLOBAL, name, value);
+    }
+
+    public static void updateString(ITestDevice device, String group, String name, String value)
+            throws DeviceNotAvailableException {
         device.executeShellCommand(
-                "content insert"
-                + " --uri content://settings/secure"
-                + " --bind name:s:" + name
-                + " --bind value:i:" + value);
+                "content update"
+                + " --uri content://settings/" + group
+                + " --bind value:s:" + value
+                + " --where \"name='" + name + "'\"");
     }
 
     public static void updateSecureString(ITestDevice device, String name, String value)
             throws DeviceNotAvailableException {
+        updateString(device, GROUP_SECURE, name, value);
+    }
+
+    public static void updateGlobalString(ITestDevice device, String name, String value)
+            throws DeviceNotAvailableException {
+        updateString(device, GROUP_GLOBAL, name, value);
+    }
+
+    public static void updateInt(ITestDevice device, String group, String name, int value)
+            throws DeviceNotAvailableException {
         device.executeShellCommand(
                 "content update"
-                + " --uri content://settings/secure"
-                + " --bind value:s:" + value
+                + " --uri content://settings/" + group
+                + " --bind value:i:" + value
                 + " --where \"name='" + name + "'\"");
     }
 
     public static void updateSecureInt(ITestDevice device, String name, int value)
             throws DeviceNotAvailableException {
-        device.executeShellCommand(
-                "content update"
-                + " --uri content://settings/secure"
-                + " --bind value:i:" + value
-                + " --where \"name='" + name + "'\"");
+        updateInt(device, GROUP_SECURE, name, value);
     }
 
-    private static void deleteSecure(ITestDevice device, String name)
+    public static void updateGlobalInt(ITestDevice device, String name, int value)
+            throws DeviceNotAvailableException {
+        updateInt(device, GROUP_GLOBAL, name, value);
+    }
+
+    private static void deleteSetting(ITestDevice device, String group, String name)
             throws DeviceNotAvailableException {
         device.executeShellCommand(
                 "content delete"
-                + " --uri content://settings/secure"
+                + " --uri content://settings/" + group
                 + " --where \"name='" + name + "'\"");
     }
 }
