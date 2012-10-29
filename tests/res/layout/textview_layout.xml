@@ -96,4 +96,120 @@
               android:layout_height="wrap_content"
               android:layout_width="wrap_content"/>
 
+    <TextView android:id="@+id/textview_drawable_1_1"
+              android:layout_height="wrap_content"
+              android:layout_width="wrap_content"
+              android:drawableLeft="@drawable/icon_blue"
+              android:drawableRight="@drawable/icon_red"
+              android:drawableTop="@drawable/icon_green"
+              android:drawableBottom="@drawable/icon_yellow"
+            />
+
+    <TextView android:id="@+id/textview_drawable_1_2"
+              android:layout_height="wrap_content"
+              android:layout_width="wrap_content"
+              android:drawableLeft="@drawable/icon_blue"
+              android:drawableRight="@drawable/icon_red"
+              android:drawableTop="@drawable/icon_green"
+              android:drawableBottom="@drawable/icon_yellow"
+              android:layoutDirection="rtl"
+            />
+
+    <TextView android:id="@+id/textview_drawable_2_1"
+              android:layout_height="wrap_content"
+              android:layout_width="wrap_content"
+              android:drawableStart="@drawable/icon_blue"
+              android:drawableEnd="@drawable/icon_red"
+              android:drawableTop="@drawable/icon_green"
+              android:drawableBottom="@drawable/icon_yellow"
+            />
+
+    <TextView android:id="@+id/textview_drawable_2_2"
+              android:layout_height="wrap_content"
+              android:layout_width="wrap_content"
+              android:drawableStart="@drawable/icon_blue"
+              android:drawableEnd="@drawable/icon_red"
+              android:drawableTop="@drawable/icon_green"
+              android:drawableBottom="@drawable/icon_yellow"
+              android:layoutDirection="rtl"
+            />
+
+    <TextView android:id="@+id/textview_drawable_3_1"
+              android:layout_height="wrap_content"
+              android:layout_width="wrap_content"
+              android:drawableLeft="@drawable/icon_black"
+              android:drawableRight="@drawable/icon_black"
+              android:drawableStart="@drawable/icon_blue"
+              android:drawableEnd="@drawable/icon_red"
+              android:drawableTop="@drawable/icon_green"
+              android:drawableBottom="@drawable/icon_yellow"
+            />
+
+    <TextView android:id="@+id/textview_drawable_3_2"
+              android:layout_height="wrap_content"
+              android:layout_width="wrap_content"
+              android:drawableLeft="@drawable/icon_black"
+              android:drawableRight="@drawable/icon_black"
+              android:drawableStart="@drawable/icon_blue"
+              android:drawableEnd="@drawable/icon_red"
+              android:drawableTop="@drawable/icon_green"
+              android:drawableBottom="@drawable/icon_yellow"
+              android:layoutDirection="rtl"
+            />
+
+
+    <LinearLayout android:orientation="vertical"
+                  android:layout_width="match_parent"
+                  android:layout_height="match_parent"
+                  android:layoutDirection="ltr">
+
+        <TextView android:id="@+id/textview_drawable_4_1"
+                  android:layout_height="wrap_content"
+                  android:layout_width="wrap_content"
+                  android:drawableStart="@drawable/icon_blue"
+                  android:drawableEnd="@drawable/icon_red"
+                  android:drawableTop="@drawable/icon_green"
+                  android:drawableBottom="@drawable/icon_yellow"
+                />
+
+        <TextView android:id="@+id/textview_drawable_5_1"
+                  android:layout_height="wrap_content"
+                  android:layout_width="wrap_content"
+                  android:drawableLeft="@drawable/icon_black"
+                  android:drawableRight="@drawable/icon_black"
+                  android:drawableStart="@drawable/icon_blue"
+                  android:drawableEnd="@drawable/icon_red"
+                  android:drawableTop="@drawable/icon_green"
+                  android:drawableBottom="@drawable/icon_yellow"
+                />
+
+    </LinearLayout>
+
+    <LinearLayout android:orientation="vertical"
+                  android:layout_width="match_parent"
+                  android:layout_height="match_parent"
+                  android:layoutDirection="rtl">
+
+        <TextView android:id="@+id/textview_drawable_4_2"
+                  android:layout_height="wrap_content"
+                  android:layout_width="wrap_content"
+                  android:drawableStart="@drawable/icon_blue"
+                  android:drawableEnd="@drawable/icon_red"
+                  android:drawableTop="@drawable/icon_green"
+                  android:drawableBottom="@drawable/icon_yellow"
+                />
+
+        <TextView android:id="@+id/textview_drawable_5_2"
+                  android:layout_height="wrap_content"
+                  android:layout_width="wrap_content"
+                  android:drawableLeft="@drawable/icon_black"
+                  android:drawableRight="@drawable/icon_black"
+                  android:drawableStart="@drawable/icon_blue"
+                  android:drawableEnd="@drawable/icon_red"
+                  android:drawableTop="@drawable/icon_green"
+                  android:drawableBottom="@drawable/icon_yellow"
+                />
+
+    </LinearLayout>
+
 </LinearLayout>
