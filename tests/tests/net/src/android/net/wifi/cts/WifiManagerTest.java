@@ -55,9 +55,10 @@ public class WifiManagerTest extends AndroidTestCase {
 
     private static final int STATE_NULL = 0;
     private static final int STATE_WIFI_CHANGING = 1;
-    private static final int STATE_WIFI_CHANGED = 2;
-    private static final int STATE_SCANING = 3;
-    private static final int STATE_SCAN_RESULTS_AVAILABLE = 4;
+    private static final int STATE_WIFI_ENABLED = 2;
+    private static final int STATE_WIFI_DISABLED = 3;
+    private static final int STATE_SCANNING = 4;
+    private static final int STATE_SCAN_RESULTS_AVAILABLE = 5;
 
     private static final String TAG = "WifiManagerTest";
     private static final String SSID1 = "\"WifiManagerTest\"";
@@ -76,20 +77,29 @@ public class WifiManagerTest extends AndroidTestCase {
                         mScanResult = mWifiManager.getScanResults();
                         mMySync.expectedState = STATE_SCAN_RESULTS_AVAILABLE;
                         mScanResult = mWifiManager.getScanResults();
-                        mMySync.notify();
+                        mMySync.notifyAll();
                     }
                 }
-            } else if (action.equals(WifiManager.SUPPLICANT_STATE_CHANGED_ACTION)) {
+            } else if (action.equals(WifiManager.WIFI_STATE_CHANGED_ACTION)) {
+                int newState = intent.getIntExtra(WifiManager.EXTRA_WIFI_STATE,
+                        WifiManager.WIFI_STATE_UNKNOWN);
                 synchronized (mMySync) {
-                    mMySync.expectedState = STATE_WIFI_CHANGED;
-                    mMySync.notify();
+                    if (newState == WifiManager.WIFI_STATE_ENABLED) {
+                        Log.d(TAG, "*** New WiFi state is ENABLED ***");
+                        mMySync.expectedState = STATE_WIFI_ENABLED;
+                        mMySync.notifyAll();
+                    } else if (newState == WifiManager.WIFI_STATE_DISABLED) {
+                        Log.d(TAG, "*** New WiFi state is DISABLED ***");
+                        mMySync.expectedState = STATE_WIFI_DISABLED;
+                        mMySync.notifyAll();
+                    }
                 }
             } else if (action.equals(WifiManager.NETWORK_STATE_CHANGED_ACTION)) {
                 synchronized (mMySync) {
                     mNetworkInfo =
                             (NetworkInfo) intent.getParcelableExtra(WifiManager.EXTRA_NETWORK_INFO);
                     if (mNetworkInfo.getState() == NetworkInfo.State.CONNECTED)
-                        mMySync.notify();
+                        mMySync.notifyAll();
                 }
             }
         }
@@ -122,7 +132,9 @@ public class WifiManagerTest extends AndroidTestCase {
             setWifiEnabled(true);
         Thread.sleep(DURATION);
         assertTrue(mWifiManager.isWifiEnabled());
-        mMySync.expectedState = STATE_NULL;
+        synchronized (mMySync) {
+            mMySync.expectedState = STATE_NULL;
+        }
     }
 
     @Override
@@ -132,31 +144,34 @@ public class WifiManagerTest extends AndroidTestCase {
             super.tearDown();
             return;
         }
-        mWifiLock.release();
-        mContext.unregisterReceiver(mReceiver);
         if (!mWifiManager.isWifiEnabled())
             setWifiEnabled(true);
+        mWifiLock.release();
+        mContext.unregisterReceiver(mReceiver);
         Thread.sleep(DURATION);
         super.tearDown();
     }
 
     private void setWifiEnabled(boolean enable) throws Exception {
         synchronized (mMySync) {
-            mMySync.expectedState = STATE_WIFI_CHANGING;
             assertTrue(mWifiManager.setWifiEnabled(enable));
-            long timeout = System.currentTimeMillis() + TIMEOUT_MSEC;
-            while (System.currentTimeMillis() < timeout
-                    && mMySync.expectedState == STATE_WIFI_CHANGING)
-                mMySync.wait(WAIT_MSEC);
+            if (mWifiManager.isWifiEnabled() != enable) {
+                mMySync.expectedState = STATE_WIFI_CHANGING;
+                long timeout = System.currentTimeMillis() + TIMEOUT_MSEC;
+                int expectedState = (enable ? STATE_WIFI_ENABLED : STATE_WIFI_DISABLED);
+                while (System.currentTimeMillis() < timeout
+                        && mMySync.expectedState != expectedState)
+                    mMySync.wait(WAIT_MSEC);
+            }
         }
     }
 
     private void startScan() throws Exception {
         synchronized (mMySync) {
-            mMySync.expectedState = STATE_SCANING;
+            mMySync.expectedState = STATE_SCANNING;
             assertTrue(mWifiManager.startScan());
             long timeout = System.currentTimeMillis() + TIMEOUT_MSEC;
-            while (System.currentTimeMillis() < timeout && mMySync.expectedState == STATE_SCANING)
+            while (System.currentTimeMillis() < timeout && mMySync.expectedState == STATE_SCANNING)
                 mMySync.wait(WAIT_MSEC);
         }
     }
