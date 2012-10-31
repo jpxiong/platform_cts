@@ -24,11 +24,17 @@ PTS_TEST_PACKAGES := \
     PtsDeviceUi \
     PtsDeviceDram
 
+
 PTS_SUPPORT_PACKAGES := \
-	TestDeviceSetup
+    TestDeviceSetup \
+    PtsDeviceTaskswitchingAppA \
+    PtsDeviceTaskswitchingAppB \
+    PtsDeviceTaskswitchingControl \
+    com.replica.replicaisland
 
 PTS_HOST_CASES := \
-    PtsHostBootup
+    PtsHostBootup \
+    PtsHostUi
 
 PTS_HOST_LIBS := \
     $(HOST_OUT_JAVA_LIBRARIES)/ptscommonutilhost.jar

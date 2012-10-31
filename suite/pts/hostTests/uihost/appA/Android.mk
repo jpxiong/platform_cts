@@ -12,19 +12,24 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-LOCAL_PATH := $(call my-dir)
-
+LOCAL_PATH:= $(call my-dir)
 include $(CLEAR_VARS)
+
+# don't include this package in any target
+LOCAL_MODULE_TAGS := optional
+
+LOCAL_MODULE_PATH := $(TARGET_OUT_DATA_APPS)
+
+LOCAL_JAVA_LIBRARIES := android.test.runner
+
+LOCAL_STATIC_JAVA_LIBRARIES := ptsutil ctsutil ctstestrunner
 
 LOCAL_SRC_FILES := $(call all-java-files-under, src)
 
-LOCAL_MODULE_TAGS := optional
+LOCAL_PACKAGE_NAME := PtsDeviceTaskswitchingAppA
 
-LOCAL_MODULE := PtsHostBootup
+LOCAL_SDK_VERSION := 16
 
-LOCAL_JAVA_LIBRARIES := cts-tradefed tradefed-prebuilt ddmlib-prebuilt junit ptscommonutilhost
+include $(BUILD_PTS_PACKAGE)
 
-LOCAL_PTS_TEST_PACKAGE := com.android.pts.bootup
-
-include $(BUILD_PTS_HOST_JAVA_LIBRARY)
 
