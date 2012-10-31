@@ -33,6 +33,8 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
+import android.os.StrictMode;
+import android.os.StrictMode.ThreadPolicy;
 import android.os.SystemClock;
 import android.test.ActivityInstrumentationTestCase2;
 import android.test.UiThreadTest;
@@ -120,6 +122,18 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
     private void startWebServer(boolean secure) throws Exception {
         assertNull(mWebServer);
         mWebServer = new CtsTestServer(getActivity(), secure);
+    }
+
+    private void stopWebServer() throws Exception {
+        assertNotNull(mWebServer);
+        ThreadPolicy oldPolicy = StrictMode.getThreadPolicy();
+        ThreadPolicy tmpPolicy = new ThreadPolicy.Builder(oldPolicy)
+                .permitNetwork()
+                .build();
+        StrictMode.setThreadPolicy(tmpPolicy);
+        mWebServer.shutdown();
+        mWebServer = null;
+        StrictMode.setThreadPolicy(oldPolicy);
     }
 
     @UiThreadTest
@@ -1437,21 +1451,30 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
     }
 
     @UiThreadTest
-    public void testSetAndGetCertificate() {
-        assertNull(mWebView.getCertificate());
-        SslCertificate certificate = new SslCertificate("foo", "bar", new Date(42), new Date(43));
-        mWebView.setCertificate(certificate);
-        assertEquals(certificate, mWebView.getCertificate());
-    }
-
-    @UiThreadTest
     public void testInsecureSiteClearsCertificate() throws Throwable {
-        final SslCertificate certificate =
-                new SslCertificate("foo", "bar", new Date(42), new Date(43));
+        final class MockWebViewClient extends WaitForLoadedClient {
+            public MockWebViewClient() {
+                super(mOnUiThread);
+            }
+            @Override
+            public void onReceivedSslError(WebView view, SslErrorHandler handler, SslError error) {
+                handler.proceed();
+            }
+        }
+
+        startWebServer(true);
+        mOnUiThread.setWebViewClient(new MockWebViewClient());
+        mOnUiThread.loadUrlAndWaitForCompletion(
+                mWebServer.getAssetUrl(TestHtmlConstants.HELLO_WORLD_URL));
+        SslCertificate cert = mWebView.getCertificate();
+        assertNotNull(cert);
+        assertEquals("Android", cert.getIssuedTo().getUName());
+
+        stopWebServer();
+
         startWebServer(false);
-        final String url = mWebServer.getAssetUrl(TestHtmlConstants.HELLO_WORLD_URL);
-        mWebView.setCertificate(certificate);
-        mOnUiThread.loadUrlAndWaitForCompletion(url);
+        mOnUiThread.loadUrlAndWaitForCompletion(
+                mWebServer.getAssetUrl(TestHtmlConstants.HELLO_WORLD_URL));
         assertNull(mWebView.getCertificate());
     }
 
@@ -1467,11 +1490,17 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
             }
         }
 
+        startWebServer(false);
+        mOnUiThread.loadUrlAndWaitForCompletion(
+                mWebServer.getAssetUrl(TestHtmlConstants.HELLO_WORLD_URL));
+        assertNull(mWebView.getCertificate());
+
+        stopWebServer();
+
         startWebServer(true);
-        final String url = mWebServer.getAssetUrl(TestHtmlConstants.HELLO_WORLD_URL);
         mOnUiThread.setWebViewClient(new MockWebViewClient());
-        mWebView.setCertificate(null);
-        mOnUiThread.loadUrlAndWaitForCompletion(url);
+        mOnUiThread.loadUrlAndWaitForCompletion(
+                mWebServer.getAssetUrl(TestHtmlConstants.HELLO_WORLD_URL));
         SslCertificate cert = mWebView.getCertificate();
         assertNotNull(cert);
         assertEquals("Android", cert.getIssuedTo().getUName());
