@@ -45,12 +45,15 @@ public class MediaStore_Audio_AlbumsTest extends AndroidTestCase {
     }
 
     public void testGetContentUri() {
-        assertNotNull(mContentResolver.query(
+        Cursor c = null;
+        assertNotNull(c = mContentResolver.query(
                 Albums.getContentUri(MediaStoreAudioTestHelper.INTERNAL_VOLUME_NAME), null, null,
                 null, null));
-        assertNotNull(mContentResolver.query(
+        c.close();
+        assertNotNull(c = mContentResolver.query(
                 Albums.getContentUri(MediaStoreAudioTestHelper.EXTERNAL_VOLUME_NAME), null, null,
                 null, null));
+        c.close();
 
         // can not accept any other volume names
         String volume = "fakeVolume";

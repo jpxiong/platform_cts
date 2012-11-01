@@ -38,12 +38,15 @@ public class MediaStore_Audio_MediaTest extends InstrumentationTestCase {
     }
 
     public void testGetContentUri() {
-        assertNotNull(mContentResolver.query(
+        Cursor c = null;
+        assertNotNull(c = mContentResolver.query(
                 Media.getContentUri(MediaStoreAudioTestHelper.INTERNAL_VOLUME_NAME), null, null,
                     null, null));
-        assertNotNull(mContentResolver.query(
+        c.close();
+        assertNotNull(c = mContentResolver.query(
                 Media.getContentUri(MediaStoreAudioTestHelper.EXTERNAL_VOLUME_NAME), null, null,
                     null, null));
+        c.close();
 
         // can not accept any other volume names
         String volume = "faveVolume";
@@ -51,14 +54,17 @@ public class MediaStore_Audio_MediaTest extends InstrumentationTestCase {
     }
 
     public void testGetContentUriForPath() {
+        Cursor c = null;
         String externalPath = Environment.getExternalStorageDirectory().getPath();
-        assertNotNull(mContentResolver.query(Media.getContentUriForPath(externalPath), null, null,
+        assertNotNull(c = mContentResolver.query(Media.getContentUriForPath(externalPath), null, null,
                 null, null));
+        c.close();
 
         String internalPath =
             getInstrumentation().getTargetContext().getFilesDir().getAbsolutePath();
-        assertNotNull(mContentResolver.query(Media.getContentUriForPath(internalPath), null, null,
+        assertNotNull(c = mContentResolver.query(Media.getContentUriForPath(internalPath), null, null,
                 null, null));
+        c.close();
     }
 
     public void testStoreAudioMediaInternal() {

@@ -178,10 +178,13 @@ public class MediaStore_Images_MediaTest extends InstrumentationTestCase {
     }
 
     public void testGetContentUri() {
-        assertNotNull(mContentResolver.query(Media.getContentUri("internal"), null, null, null,
+        Cursor c = null;
+        assertNotNull(c = mContentResolver.query(Media.getContentUri("internal"), null, null, null,
                 null));
-        assertNotNull(mContentResolver.query(Media.getContentUri("external"), null, null, null,
+        c.close();
+        assertNotNull(c = mContentResolver.query(Media.getContentUri("external"), null, null, null,
                 null));
+        c.close();
 
         // can not accept any other volume names
         String volume = "fakeVolume";
