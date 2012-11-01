@@ -19,6 +19,8 @@
     package="com.android.cts.webkit">
 
     <uses-permission android:name="android.permission.DISABLE_KEYGUARD" />
+    <uses-permission android:name="android.permission.ACCESS_LOCATION_EXTRA_COMMANDS"/>
+    <uses-permission android:name="android.permission.ACCESS_MOCK_LOCATION"/>
     <application>
         <uses-library android:name="android.test.runner" />
     </application>
