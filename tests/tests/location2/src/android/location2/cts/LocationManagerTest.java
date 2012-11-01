@@ -30,7 +30,6 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.location.LocationProvider;
-import android.location.LocationRequest;
 import android.os.Bundle;
 import android.os.HandlerThread;
 import android.os.Looper;
@@ -48,8 +47,6 @@ import java.lang.Thread;
  * android.permission.ACCESS_LOCATION_EXTRA_COMMANDS to send extra commands to provider
  */
 public class LocationManagerTest extends InstrumentationTestCase {
-
-    private static final String FUSED_PROVIDER_NAME = "fused";
 
     private static final long TEST_TIME_OUT_MS = 10 * 1000;
 
@@ -172,50 +169,6 @@ public class LocationManagerTest extends InstrumentationTestCase {
 
         mManager.removeUpdates(listener);
         mManager.removeTestProvider(providerName);
-    }
-
-    public void testGetFusedLocationUpdates_withIntent() {
-        addTestProvider(FUSED_PROVIDER_NAME, Criteria.ACCURACY_COARSE, true, false, true);
-        registerIntentReceiver();
-
-        mManager.requestLocationUpdates(LocationRequest.create(), mPendingIntent);
-        updateLocation(FUSED_PROVIDER_NAME, LAT, LNG);
-        waitForReceiveBroadcast();
-
-        assertNotNull(mIntentReceiver.getLastReceivedIntent());
-        final Location location = mManager.getLastKnownLocation(FUSED_PROVIDER_NAME);
-        assertEquals(FUSED_PROVIDER_NAME, location.getProvider());
-
-        assertEquals(3000.0f, location.getAccuracy());
-        assertEquals(LAT, location.getLatitude(), FUDGER_DELTA);
-        assertEquals(LNG, location.getLongitude(), FUDGER_DELTA);
-
-        mManager.removeUpdates(mPendingIntent);
-        mManager.removeTestProvider(FUSED_PROVIDER_NAME);
-    }
-
-    public void testGetFusedLocationUpdates_withListener() {
-        addTestProvider(FUSED_PROVIDER_NAME, Criteria.ACCURACY_COARSE, true, false, true);
-
-        MockLocationListener listener = new MockLocationListener();
-        HandlerThread handlerThread = new HandlerThread(
-                "testLocationUpdates for " + FUSED_PROVIDER_NAME);
-        handlerThread.start();
-
-        mManager.requestLocationUpdates(LocationRequest.create(),
-                                        listener, handlerThread.getLooper());
-        updateLocation(FUSED_PROVIDER_NAME, LAT, LNG);
-
-        assertTrue(listener.hasCalledOnLocationChanged(TEST_TIME_OUT_MS));
-        Location location = listener.getLocation();
-        assertEquals(FUSED_PROVIDER_NAME, location.getProvider());
-
-        assertEquals(3000.0f, location.getAccuracy());
-        assertEquals(LAT, location.getLatitude(), FUDGER_DELTA);
-        assertEquals(LNG, location.getLongitude(), FUDGER_DELTA);
-
-        mManager.removeUpdates(listener);
-        mManager.removeTestProvider(FUSED_PROVIDER_NAME);
     }
 
     /**
