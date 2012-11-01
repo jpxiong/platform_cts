@@ -294,6 +294,7 @@ public class MediaStore_Images_MediaTest extends InstrumentationTestCase {
         } finally {
             // delete
             assertEquals(1, mContentResolver.delete(uri, null, null));
+            new File(externalPath).delete();
         }
     }
 
