@@ -99,6 +99,8 @@ public class MediaStore_Video_ThumbnailsTest extends AndroidTestCase {
             assertFalse("thumbnail file should no longer exist", new File(path).exists());
         }
         c.close();
+
+        assertEquals(1, mResolver.delete(videoUri, null, null));
     }
 
     private Uri insertVideo() throws IOException {

@@ -98,6 +98,7 @@ public class MediaStore_Audio_GenresTest extends InstrumentationTestCase {
         // Insert an audio file into the content provider.
         ContentValues values = Audio1.getInstance().getContentValues(true);
         Uri audioUri = mContentResolver.insert(Media.EXTERNAL_CONTENT_URI, values);
+        assertNotNull(audioUri);
         long audioId = ContentUris.parseId(audioUri);
         assertTrue(audioId != -1);
 
@@ -105,6 +106,7 @@ public class MediaStore_Audio_GenresTest extends InstrumentationTestCase {
         values.clear();
         values.put(Genres.NAME, "Soda Pop");
         Uri genreUri = mContentResolver.insert(Genres.EXTERNAL_CONTENT_URI, values);
+        assertNotNull(genreUri);
         long genreId = ContentUris.parseId(genreUri);
         assertTrue(genreId != -1);
 
@@ -131,6 +133,8 @@ public class MediaStore_Audio_GenresTest extends InstrumentationTestCase {
             if (cursor != null) {
                 cursor.close();
             }
+            assertEquals(1, mContentResolver.delete(audioUri, null, null));
+            assertEquals(1, mContentResolver.delete(genreUri, null, null));
         }
     }
 }
