@@ -45,10 +45,13 @@ public class MediaStore_Video_MediaTest extends AndroidTestCase {
     }
 
     public void testGetContentUri() {
-        assertNotNull(mContentResolver.query(Media.getContentUri("internal"), null, null, null,
+        Cursor c = null;
+        assertNotNull(c = mContentResolver.query(Media.getContentUri("internal"), null, null, null,
                 null));
-        assertNotNull(mContentResolver.query(Media.getContentUri("external"), null, null, null,
+        c.close();
+        assertNotNull(c = mContentResolver.query(Media.getContentUri("external"), null, null, null,
                 null));
+        c.close();
 
         // can not accept any other volume names
         String volume = "fakeVolume";
@@ -180,6 +183,7 @@ public class MediaStore_Video_MediaTest extends AndroidTestCase {
         } finally {
             // delete
             assertEquals(1, mContentResolver.delete(uri, null, null));
+            new File(externalVideoPath).delete();
         }
 
         // check that the video file is removed when deleting the database entry

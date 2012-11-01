@@ -37,12 +37,15 @@ public class MediaStore_Audio_ArtistsTest extends InstrumentationTestCase {
     }
 
     public void testGetContentUri() {
-        assertNotNull(mContentResolver.query(
+        Cursor c = null;
+        assertNotNull(c = mContentResolver.query(
                 Artists.getContentUri(MediaStoreAudioTestHelper.INTERNAL_VOLUME_NAME), null, null,
                     null, null));
-        assertNotNull(mContentResolver.query(
+        c.close();
+        assertNotNull(c = mContentResolver.query(
                 Artists.getContentUri(MediaStoreAudioTestHelper.INTERNAL_VOLUME_NAME), null, null,
                 null, null));
+        c.close();
 
         // can not accept any other volume names
         String volume = "fakeVolume";

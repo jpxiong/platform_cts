@@ -65,14 +65,17 @@ public class MediaStore_Audio_Genres_MembersTest extends InstrumentationTestCase
     }
 
     public void testGetContentUri() {
-        assertNotNull(mContentResolver.query(
+        Cursor c = null;
+        assertNotNull(c = mContentResolver.query(
                 Members.getContentUri(MediaStoreAudioTestHelper.EXTERNAL_VOLUME_NAME, 1), null,
                     null, null, null));
+        c.close();
 
         try {
-            assertNotNull(mContentResolver.query(
+            assertNotNull(c = mContentResolver.query(
                     Members.getContentUri(MediaStoreAudioTestHelper.INTERNAL_VOLUME_NAME, 1), null,
                         null, null, null));
+            c.close();
             fail("Should throw SQLException as the internal datatbase has no genre");
         } catch (SQLException e) {
             // expected
