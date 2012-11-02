@@ -1819,27 +1819,6 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
         assertTrue(monitor.waitForUpdate());
     }
 
-    public void testAvailableJavascriptObjects() throws Throwable {
-        final String page = ""
-                + "<html>"
-                + "<script>"
-                + "document.title = '';"
-                + "for (property in window) {"
-                + "    try {"
-                + "        var _classLoader = window[property].getClass().getClassLoader();"
-                + "        var _clazz = _classLoader.loadClass('java.lang.Runtime');"
-                + "        var _runtime = _clazz.getMethod('getRuntime', null).invoke(null, null);"
-                + "        document.title = document.title + ' ' + property;"
-                + "    } catch (e) {"
-                + "    }"
-                + "}"
-                + "</script>"
-                + "</html>";
-        mWebView.getSettings().setJavaScriptEnabled(true);
-        mOnUiThread.loadDataAndWaitForCompletion(page, "text/html", null);
-        assertEquals('', mWebView.getTitle());
-    }
-
     // verify query parameters can be passed correctly to android asset files
     public void testAndroidAssetQueryParam() {
 
