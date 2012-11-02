@@ -19,21 +19,21 @@ package com.android.cts.monkey;
 public class VerbosityTest extends AbstractMonkeyTest {
 
     public void testVerbosity() throws Exception {
-        String v0 = mDevice.executeShellCommand("monkey -s 1337 -p " + PKGS[0] + " 500");
+        String v0 = mDevice.executeShellCommand(MONKEY_CMD + " -s 1337 -p " + PKGS[0] + " 500");
         assertTrue(v0.contains("Events injected"));
         assertFalse(v0.contains("Sending Touch"));
         assertFalse(v0.contains("Sending Trackball"));
         assertFalse(v0.contains("Switch"));
         assertFalse(v0.contains("Sleeping"));
 
-        String v1 = mDevice.executeShellCommand("monkey -v -p " + PKGS[0] + " 500");
+        String v1 = mDevice.executeShellCommand(MONKEY_CMD + " -v -p " + PKGS[0] + " 500");
         assertTrue(v1.contains("Events injected"));
         assertTrue(v1.contains("Sending Touch"));
         assertTrue(v1.contains("Sending Trackball"));
         assertTrue(v1.contains("Switch"));
         assertFalse(v1.contains("Sleeping"));
 
-        String v2 = mDevice.executeShellCommand("monkey -v -v -p " + PKGS[0] + " 500");
+        String v2 = mDevice.executeShellCommand(MONKEY_CMD + " -v -v -p " + PKGS[0] + " 500");
         assertTrue(v2.contains("Events injected"));
         assertTrue(v2.contains("Sending Touch"));
         assertTrue(v2.contains("Sending Trackball"));
