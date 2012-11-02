@@ -14,6 +14,11 @@ abstract class AbstractMonkeyTest extends DeviceTestCase implements IBuildReceiv
     static final String[] PKGS = {"com.android.cts.monkey", "com.android.cts.monkey2"};
     static final String[] APKS = {"CtsMonkeyApp.apk", "CtsMonkeyApp2.apk"};
 
+    /** 
+     * Base monkey command with flags to avoid side effects like airplane mode.
+     */
+    static final String MONKEY_CMD = "monkey --pct-majornav 0 --pct-syskeys 0 --pct-anyevent 0";
+
     CtsBuildHelper mBuild;
     ITestDevice mDevice;
 

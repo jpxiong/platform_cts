@@ -16,7 +16,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
        package="com.android.cts.monkey2">
 
-    <application>
+    <application android:theme="@android:style/Theme.NoTitleBar.Fullscreen">
 
         <activity android:name=".ChimpActivity">
             <intent-filter>

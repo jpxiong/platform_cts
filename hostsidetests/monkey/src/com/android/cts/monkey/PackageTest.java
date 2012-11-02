@@ -29,17 +29,17 @@ public class PackageTest extends AbstractMonkeyTest {
                     Pattern.MULTILINE);
 
     public void testSinglePackage() throws Exception {
-        String out = mDevice.executeShellCommand("monkey -v -p " + PKGS[0] + " 5000");
+        String out = mDevice.executeShellCommand(MONKEY_CMD + " -v -p " + PKGS[0] + " 5000");
         assertTrue(out, ALLOW_MONKEY.matcher(out).find());
         assertFalse(out, ALLOW_CHIMP.matcher(out).find());
 
-        out = mDevice.executeShellCommand("monkey -v -p " + PKGS[1] + " 5000");
+        out = mDevice.executeShellCommand(MONKEY_CMD + " -v -p " + PKGS[1] + " 5000");
         assertFalse(out, ALLOW_MONKEY.matcher(out).find());
         assertTrue(out, ALLOW_CHIMP.matcher(out).find());
     }
 
     public void testMultiplePackages() throws Exception {
-        String out = mDevice.executeShellCommand("monkey -v -p " + PKGS[0]
+        String out = mDevice.executeShellCommand(MONKEY_CMD + " -v -p " + PKGS[0]
                 + " -p " + PKGS[1] + " 5000");
         assertTrue(out, ALLOW_MONKEY.matcher(out).find());
         assertTrue(out, ALLOW_CHIMP.matcher(out).find());
