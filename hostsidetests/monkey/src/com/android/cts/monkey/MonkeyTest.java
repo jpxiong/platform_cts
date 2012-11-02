@@ -26,7 +26,7 @@ public class MonkeyTest extends AbstractMonkeyTest {
     private static final String HUMAN = "(^_^)";
 
     public void testIsMonkey() throws Exception {
-        mDevice.executeShellCommand("monkey -p " + PKGS[0] + " 500");
+        mDevice.executeShellCommand(MONKEY_CMD + " -p " + PKGS[0] + " 500");
         assertIsUserAMonkey(true);
     }
 

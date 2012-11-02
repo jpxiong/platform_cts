@@ -19,25 +19,25 @@ package com.android.cts.monkey;
 public class CategoryTest extends AbstractMonkeyTest {
 
     public void testDefaultCategories() throws Exception {
-        String out = mDevice.executeShellCommand("monkey -v -p " + PKGS[0] + " 5000");
+        String out = mDevice.executeShellCommand(MONKEY_CMD + " -v -p " + PKGS[0] + " 5000");
         assertTrue(out.contains("cmp=com.android.cts.monkey/.MonkeyActivity"));
         assertTrue(out.contains("cmp=com.android.cts.monkey/.BaboonActivity"));
     }
 
     public void testSingleCategory() throws Exception {
-        String out = mDevice.executeShellCommand("monkey -v -p " + PKGS[0]
+        String out = mDevice.executeShellCommand(MONKEY_CMD + " -v -p " + PKGS[0]
                 + " -c android.intent.category.LAUNCHER 5000");
         assertTrue(out.contains("cmp=com.android.cts.monkey/.MonkeyActivity"));
         assertFalse(out.contains("cmp=com.android.cts.monkey/.BaboonActivity"));
 
-        out = mDevice.executeShellCommand("monkey -v -p " + PKGS[0]
+        out = mDevice.executeShellCommand(MONKEY_CMD + " -v -p " + PKGS[0]
                 + " -c android.intent.category.MONKEY 5000");
         assertFalse(out.contains("cmp=com.android.cts.monkey/.MonkeyActivity"));
         assertTrue(out.contains("cmp=com.android.cts.monkey/.BaboonActivity"));
     }
 
     public void testMultipleCategories() throws Exception {
-        String out = mDevice.executeShellCommand("monkey -v -p " + PKGS[0]
+        String out = mDevice.executeShellCommand(MONKEY_CMD + " -v -p " + PKGS[0]
                 + " -c android.intent.category.LAUNCHER"
                 + " -c android.intent.category.MONKEY 5000");
         assertTrue(out.contains("cmp=com.android.cts.monkey/.MonkeyActivity"));

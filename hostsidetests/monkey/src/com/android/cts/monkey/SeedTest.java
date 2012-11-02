@@ -21,12 +21,12 @@ import java.util.Scanner;
 public class SeedTest extends AbstractMonkeyTest {
 
     public void testSeed() throws Exception {
-        String cmd1 = "monkey -s 1337 -v -p " + PKGS[0] + " 500";
+        String cmd1 = MONKEY_CMD + " -s 1337 -v -p " + PKGS[0] + " 500";
         String out1 = mDevice.executeShellCommand(cmd1);
         String out2 = mDevice.executeShellCommand(cmd1);
         assertOutputs(out1, out2);
 
-        String cmd2 = "monkey -s 3007 -v -p " + PKGS[0] + " 125";
+        String cmd2 = MONKEY_CMD + " -s 3007 -v -p " + PKGS[0] + " 125";
         String out3 = mDevice.executeShellCommand(cmd2);
         String out4 = mDevice.executeShellCommand(cmd2);
         assertOutputs(out3, out4);
