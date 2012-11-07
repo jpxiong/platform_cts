@@ -30,14 +30,17 @@ PTS_SUPPORT_PACKAGES := \
     PtsDeviceTaskswitchingAppA \
     PtsDeviceTaskswitchingAppB \
     PtsDeviceTaskswitchingControl \
-    com.replica.replicaisland
+    com.replica.replicaisland \
+    PtsDeviceBrowserLauncher
 
 PTS_HOST_CASES := \
     PtsHostBootup \
-    PtsHostUi
+    PtsHostUi \
+    PtsHostBrowser
 
 PTS_HOST_LIBS := \
-    $(HOST_OUT_JAVA_LIBRARIES)/ptscommonutilhost.jar
+    $(HOST_OUT_JAVA_LIBRARIES)/ptscommonutilhost.jar \
+    $(HOST_OUT_JAVA_LIBRARIES)/ptshostutil.jar
 
 BUILD_PTS_PACKAGE := cts/suite/pts/build/test_package.mk
 BUILD_PTS_HOST_JAVA_LIBRARY := cts/suite/pts/build/test_host_java_library.mk
