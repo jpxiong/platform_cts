@@ -48,7 +48,6 @@ public class MediaRecorderTest extends ActivityInstrumentationTestCase2<MediaStu
     private static final int RECORD_TIME_LAPSE_MS = 4000;
     private static final int RECORD_TIME_LONG_MS = 20000;
     private static final int RECORDED_DUR_TOLERANCE_MS = 1000;
-    private static final int THREE_MINUTES = 180000;
     private static final int VIDEO_WIDTH = 176;
     private static final int VIDEO_HEIGHT = 144;
     private static final int VIDEO_BIT_RATE_IN_BPS = 128000;
@@ -57,6 +56,7 @@ public class MediaRecorderTest extends ActivityInstrumentationTestCase2<MediaStu
     private static final int AUDIO_NUM_CHANNELS = 1;
     private static final int AUDIO_SAMPLE_RATE_HZ = 8000;
     private static final long MAX_FILE_SIZE = 5000;
+    private static final int MAX_FILE_SIZE_TIMEOUT_MS = 5 * 60 * 1000;
     private static final int MAX_DURATION_MSEC = 2000;
     private static final float LATITUDE = 0.0000f;
     private static final float LONGITUDE  = -180.0f;
@@ -434,7 +434,7 @@ public class MediaRecorderTest extends ActivityInstrumentationTestCase2<MediaStu
 
         // Recording a scene with moving objects would greatly help reduce
         // the time for waiting.
-        if (!mMaxFileSizeCond.block(THREE_MINUTES)) {
+        if (!mMaxFileSizeCond.block(MAX_FILE_SIZE_TIMEOUT_MS)) {
             fail("timed out waiting for MEDIA_RECORDER_INFO_MAX_FILESIZE_REACHED");
         }
         mMediaRecorder.stop();
