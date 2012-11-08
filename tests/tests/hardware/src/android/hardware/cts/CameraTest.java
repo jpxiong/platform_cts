@@ -354,12 +354,16 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
             Log.v(TAG, "Camera id=" + id);
             initializeMessageLooper(id);
             mCamera.startPreview();
-            subtestTakePictureByCamera();
+            subtestTakePictureByCamera(false, 0, 0);
             terminateMessageLooper();
         }
     }
 
-    private void subtestTakePictureByCamera() throws Exception {
+    private void subtestTakePictureByCamera(boolean isVideoSnapshot,
+            int videoWidth, int videoHeight) throws Exception {
+        int videoSnapshotMinArea =
+                videoWidth * videoHeight; // Temporary until new API definitions
+
         Size pictureSize = mCamera.getParameters().getPictureSize();
         mCamera.autoFocus(mAutoFocusCallback);
         assertTrue(waitForFocusDone());
@@ -373,8 +377,19 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
         BitmapFactory.Options bmpOptions = new BitmapFactory.Options();
         bmpOptions.inJustDecodeBounds = true;
         BitmapFactory.decodeByteArray(mJpegData, 0, mJpegData.length, bmpOptions);
-        assertEquals(pictureSize.width, bmpOptions.outWidth);
-        assertEquals(pictureSize.height, bmpOptions.outHeight);
+        if (!isVideoSnapshot) {
+            assertEquals(pictureSize.width, bmpOptions.outWidth);
+            assertEquals(pictureSize.height, bmpOptions.outHeight);
+        } else {
+            int realArea = bmpOptions.outWidth * bmpOptions.outHeight;
+            if (LOGV) Log.v(TAG, "Video snapshot is " +
+                    bmpOptions.outWidth + " x " + bmpOptions.outHeight +
+                    ", video size is " + videoWidth + " x " + videoHeight);
+            assertTrue ("Video snapshot too small! Expected at least " +
+                    videoWidth + " x " + videoHeight + " (" +
+                    videoSnapshotMinArea/1000000. + " MP)",
+                    realArea >= videoSnapshotMinArea);
+        }
     }
 
     @UiThreadTest
@@ -742,12 +757,13 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
         for (int id = 0; id < nCameras; id++) {
             Log.v(TAG, "Camera id=" + id);
             initializeMessageLooper(id);
-            testJpegThumbnailSizeByCamera(false);
+            testJpegThumbnailSizeByCamera(false, 0, 0);
             terminateMessageLooper();
         }
     }
 
-    private void testJpegThumbnailSizeByCamera(boolean recording) throws Exception {
+    private void testJpegThumbnailSizeByCamera(boolean recording,
+            int recordingWidth, int recordingHeight) throws Exception {
         // Thumbnail size parameters should have valid values.
         Parameters p = mCamera.getParameters();
         Size size = p.getJpegThumbnailSize();
@@ -768,8 +784,15 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
         BitmapFactory.Options bmpOptions = new BitmapFactory.Options();
         bmpOptions.inJustDecodeBounds = true;
         BitmapFactory.decodeByteArray(thumb, 0, thumb.length, bmpOptions);
-        assertEquals(size.width, bmpOptions.outWidth);
-        assertEquals(size.height, bmpOptions.outHeight);
+        if (!recording) {
+            assertEquals(size.width, bmpOptions.outWidth);
+            assertEquals(size.height, bmpOptions.outHeight);
+        } else {
+            assertTrue(bmpOptions.outWidth >= recordingWidth ||
+                    bmpOptions.outWidth == size.width);
+            assertTrue(bmpOptions.outHeight >= recordingHeight ||
+                    bmpOptions.outHeight == size.height);
+        }
 
         // Test no thumbnail case.
         p.setJpegThumbnailSize(0, 0);
@@ -2748,53 +2771,73 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
         }
     }
 
+    private static final int[] mCamcorderProfileList = {
+        CamcorderProfile.QUALITY_1080P,
+        CamcorderProfile.QUALITY_480P,
+        CamcorderProfile.QUALITY_720P,
+        CamcorderProfile.QUALITY_CIF,
+        CamcorderProfile.QUALITY_HIGH,
+        CamcorderProfile.QUALITY_LOW,
+        CamcorderProfile.QUALITY_QCIF,
+        CamcorderProfile.QUALITY_QVGA,
+    };
+
     private void testVideoSnapshotByCamera(int cameraId) throws Exception {
         initializeMessageLooper(cameraId);
         Camera.Parameters parameters = mCamera.getParameters();
+        terminateMessageLooper();
         if (!parameters.isVideoSnapshotSupported()) {
-            terminateMessageLooper();
             return;
         }
 
         SurfaceHolder holder = getActivity().getSurfaceView().getHolder();
 
-        // Set the preview size.
-        CamcorderProfile profile = CamcorderProfile.get(cameraId,
-                CamcorderProfile.QUALITY_LOW);
-        setPreviewSizeByProfile(parameters, profile);
-
-        // Set the biggest picture size.
-        Size biggestSize = mCamera.new Size(-1, -1);
-        for (Size size: parameters.getSupportedPictureSizes()) {
-            if (biggestSize.width < size.width) {
-                biggestSize = size;
+        for (int profileId: mCamcorderProfileList) {
+            if (!CamcorderProfile.hasProfile(cameraId, profileId)) {
+                continue;
             }
-        }
-        parameters.setPictureSize(biggestSize.width, biggestSize.height);
+            initializeMessageLooper(cameraId);
+            // Set the preview size.
+            CamcorderProfile profile = CamcorderProfile.get(cameraId,
+                    profileId);
+            setPreviewSizeByProfile(parameters, profile);
 
-        mCamera.setParameters(parameters);
-        mCamera.startPreview();
-        mCamera.unlock();
-        MediaRecorder recorder = new MediaRecorder();
-        try {
-            recorder.setCamera(mCamera);
-            recorder.setAudioSource(MediaRecorder.AudioSource.CAMCORDER);
-            recorder.setVideoSource(MediaRecorder.VideoSource.CAMERA);
-            recorder.setProfile(profile);
-            recorder.setOutputFile("/dev/null");
-            recorder.setPreviewDisplay(holder.getSurface());
-            recorder.prepare();
-            recorder.start();
-            subtestTakePictureByCamera();
-            testJpegExifByCamera(true);
-            testJpegThumbnailSizeByCamera(true);
-            Thread.sleep(2000);
-            recorder.stop();
-        } finally {
-            recorder.release();
-            mCamera.lock();
+            // Set the biggest picture size.
+            Size biggestSize = mCamera.new Size(-1, -1);
+            for (Size size: parameters.getSupportedPictureSizes()) {
+                if (biggestSize.width < size.width) {
+                    biggestSize = size;
+                }
+            }
+            parameters.setPictureSize(biggestSize.width, biggestSize.height);
+
+            mCamera.setParameters(parameters);
+            mCamera.startPreview();
+            mCamera.unlock();
+            MediaRecorder recorder = new MediaRecorder();
+            try {
+                recorder.setCamera(mCamera);
+                recorder.setAudioSource(MediaRecorder.AudioSource.CAMCORDER);
+                recorder.setVideoSource(MediaRecorder.VideoSource.CAMERA);
+                recorder.setProfile(profile);
+                recorder.setOutputFile("/dev/null");
+                recorder.setPreviewDisplay(holder.getSurface());
+                recorder.prepare();
+                recorder.start();
+                subtestTakePictureByCamera(true,
+                        profile.videoFrameWidth, profile.videoFrameHeight);
+                testJpegExifByCamera(true);
+                testJpegThumbnailSizeByCamera(true,
+                        profile.videoFrameWidth, profile.videoFrameHeight);
+                Thread.sleep(2000);
+                recorder.stop();
+            } finally {
+                recorder.release();
+                mCamera.lock();
+            }
+            mCamera.stopPreview();
+            terminateMessageLooper();
         }
-        terminateMessageLooper();
     }
 
     public void testPreviewCallbackWithPicture() throws Exception {
