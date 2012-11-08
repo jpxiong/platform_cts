@@ -26,13 +26,16 @@ long currentTimeMillis()
     return (long)tv.tv_sec * 1000 + tv.tv_usec / 1000;
 }
 
-extern "C" JNIEXPORT jlong JNICALL Java_com_android_pts_dram_MemoryNative_runMemcpy(JNIEnv* env, jclass clazz, jint bufferSize,
-        jint repetition)
+extern "C" JNIEXPORT jlong JNICALL Java_com_android_pts_dram_MemoryNative_runMemcpy(JNIEnv* env,
+        jclass clazz, jint bufferSize, jint repetition)
 {
-    char* src = (char*)malloc(bufferSize);
-    char* dst = (char*)malloc(bufferSize);
+    char* src = new char[bufferSize];
+    char* dst = new char[bufferSize];
     if ((src == NULL) || (dst == NULL)) {
+        delete[] src;
+        delete[] dst;
         env->ThrowNew(env->FindClass("java/lang/OutOfMemoryError"), "No memory");
+        return -1;
     }
     memset(src, 0, bufferSize);
     memset(dst, 0, bufferSize);
@@ -42,5 +45,7 @@ extern "C" JNIEXPORT jlong JNICALL Java_com_android_pts_dram_MemoryNative_runMem
         src[bufferSize - 1] = i & 0xff;
     }
     long end = currentTimeMillis();
+    delete[] src;
+    delete[] dst;
     return end - start;
 }
