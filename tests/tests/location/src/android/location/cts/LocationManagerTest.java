@@ -631,6 +631,21 @@ public class LocationManagerTest extends InstrumentationTestCase {
     }
 
     /**
+     * Tests basic proximity alert when initially within proximity
+     */
+    public void testInitiallyWithinProximity() throws Exception {
+        // need to mock the fused location provider for proximity tests
+        mockFusedLocation();
+
+        updateLocationAndWait(FUSED_PROVIDER_NAME, 0, 0);
+        registerProximityListener(0, 0, 1000, 10000);
+        waitForReceiveBroadcast();
+        assertProximityType(true);
+
+        unmockFusedLocation();
+    }
+
+    /**
      * Helper variant for testing enter proximity scenario
      * TODO: add additional parameters as more scenarios are added
      *
