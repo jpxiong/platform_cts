@@ -49,7 +49,7 @@ public class Sphere {
      * @param x,y,z the origin of the sphere
      * @param r the radius of the sphere
      */
-    public Sphere(int nSlices, float x, float y, float z, float r, int indicesPerVertex) {
+    public Sphere(int nSlices, float x, float y, float z, float r, int numIndexBuffers) {
 
         int iMax = nSlices + 1;
         int nVertices = iMax * iMax;
@@ -64,17 +64,17 @@ public class Sphere {
         // 3 vertex coords + 2 texture coords
         mVertices = ByteBuffer.allocateDirect(nVertices * 5 * FLOAT_SIZE)
                 .order(ByteOrder.nativeOrder()).asFloatBuffer();
-        mIndices = new ShortBuffer[indicesPerVertex];
-        mNumIndices = new int[indicesPerVertex];
+        mIndices = new ShortBuffer[numIndexBuffers];
+        mNumIndices = new int[numIndexBuffers];
         // first evenly distribute to n-1 buffers, then put remaining ones to the last one.
-        int noIndicesPerBuffer = (mTotalIndices / indicesPerVertex / 6) * 6;
-        for (int i = 0; i < indicesPerVertex - 1; i++) {
+        int noIndicesPerBuffer = (mTotalIndices / numIndexBuffers / 6) * 6;
+        for (int i = 0; i < numIndexBuffers - 1; i++) {
             mNumIndices[i] = noIndicesPerBuffer;
         }
-        mNumIndices[indicesPerVertex - 1] = mTotalIndices - noIndicesPerBuffer *
-                (indicesPerVertex - 1);
+        mNumIndices[numIndexBuffers - 1] = mTotalIndices - noIndicesPerBuffer *
+                (numIndexBuffers - 1);
 
-        for (int i = 0; i < indicesPerVertex; i++) {
+        for (int i = 0; i < numIndexBuffers; i++) {
             mIndices[i] = ByteBuffer.allocateDirect(mNumIndices[i] * SHORT_SIZE)
                     .order(ByteOrder.nativeOrder()).asShortBuffer();
         }
@@ -123,7 +123,7 @@ public class Sphere {
         mIndices[bufferNum].put(indexBuffer, 0, mNumIndices[bufferNum]);
 
         mVertices.position(0);
-        for (int i = 0; i < indicesPerVertex; i++) {
+        for (int i = 0; i < numIndexBuffers; i++) {
             mIndices[i].position(0);
         }
     }

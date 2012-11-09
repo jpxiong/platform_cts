@@ -32,12 +32,9 @@
         android:targetPackage="com.android.cts.openglperf"
         android:name="android.test.InstrumentationCtsTestRunner" />
 
-    <application
-        android:label="@string/app_name" >
+    <application>
         <uses-library android:name="android.test.runner" />
-        <activity
-            android:name="android.openglperf.cts.GlPlanetsActivity"
-            android:label="@string/app_name" >
+        <activity android:name="android.openglperf.cts.GlPlanetsActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />

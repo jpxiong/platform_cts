@@ -20,7 +20,6 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.opengl.GLES20;
-import android.opengl.GLSurfaceView;
 import android.opengl.GLUtils;
 import android.opengl.Matrix;
 import android.util.Log;
@@ -34,13 +33,16 @@ import java.nio.ShortBuffer;
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
 
-
-public class PlanetsRenderer implements GLSurfaceView.Renderer {
+/**
+ * OpenGl renderer rendering given number of planets with different GL configuration.
+ */
+public class PlanetsRenderer implements GLSurfaceViewCustom.Renderer {
 
     private static final String TAG = "PlanetsRenderer";
     // texture is from
     // http://en.wikipedia.org/wiki/File:Mercator_projection_SW.jpg
     private static final String TEXTURE_FILE = "world_512_512.jpg";
+    private static final long EGL_SWAP_BUFFERS_WAIT_TIME_IN_NS = 100 * 1000 * 1000 * 1000L;
 
     private final Context mContext;
     private final PlanetsRenderingParam mParam;
@@ -65,9 +67,11 @@ public class PlanetsRenderer implements GLSurfaceView.Renderer {
     private int mFrameCount = 0;
     private static final int FPS_DISPLAY_INTERVAL = 50;
     private long mLastFPSTime;
+    private long mLastRenderingTime;
     // for total FPS measurement
     private long mRenderingStartTime;
     private long mMeasurementStartTime;
+    private int[] mFrameInterval = null;
 
     private int mProgram; // shader program
     private int mMVPMatrixHandle;
@@ -104,6 +108,9 @@ public class PlanetsRenderer implements GLSurfaceView.Renderer {
         mNumIndices = mNumSpheres * mParam.mNumIndicesPerVertex;
         mSpheres = new Sphere[mNumSpheres];
 
+        if (mParam.mNumFrames > 0) {
+            mFrameInterval = new int[mParam.mNumFrames];
+        }
         printParams();
 
         // for big model, this construction phase takes time...
@@ -121,6 +128,7 @@ public class PlanetsRenderer implements GLSurfaceView.Renderer {
         measureTime("construction");
     }
 
+    @Override
     public void onSurfaceCreated(GL10 glUnused, EGLConfig config) {
         mProgram = createProgram(getVertexShader(), getFragmentShader());
         if (mProgram == 0) {
@@ -137,31 +145,12 @@ public class PlanetsRenderer implements GLSurfaceView.Renderer {
         mTextureId = createTexture2D();
     }
 
+    @Override
     public void onDrawFrame(GL10 glUnused) {
         mWatchDog.reset();
         long currentTime = System.currentTimeMillis();
-
         mFrameCount++;
-        if ((mFrameCount % FPS_DISPLAY_INTERVAL == 0) && (mFrameCount != 0)) {
-            float fps = (((float) FPS_DISPLAY_INTERVAL)
-                    / ((float) (currentTime - mLastFPSTime)) * 1000.0f);
-            // FPS is not correct if activity is paused/resumed.
-            Log.i(TAG, "FPS " + fps);
-            mLastFPSTime = currentTime;
-        }
-
-        if ((mFrameCount == mParam.mNumFrames) && (mParam.mNumFrames > 0)) {
-            long timePassed = currentTime - mRenderingStartTime;
-            float fps = ((float) mParam.mNumFrames) / ((float) timePassed) * 1000.0f;
-            printGlInfos();
-            printParams();
-            int numTriangles = mNumSpheres * mSpheres[0].getTotalIndices() / 3;
-            Log.i(TAG, "Final FPS " + fps + " Num triangles " + numTriangles);
-            if (mListener != null) {
-                mListener.onRenderCompletion(fps, numTriangles);
-                return;
-            }
-        }
+        mLastRenderingTime = currentTime;
 
         float angle = 0.090f * ((int) (currentTime % 4000L));
         Matrix.setRotateM(mMMatrix, 0, angle, 0, 0, 1.0f);
@@ -232,6 +221,36 @@ public class PlanetsRenderer implements GLSurfaceView.Renderer {
         }
     }
 
+    @Override
+    public void onEglSwapBuffers() {
+        if (!OpenGlPerfNative.waitForEglCompletion(EGL_SWAP_BUFFERS_WAIT_TIME_IN_NS)) {
+            Log.w(TAG, "time-out or error while waiting for eglSwapBuffers completion");
+        }
+        long currentTime = System.currentTimeMillis();
+        if (mFrameCount == 0) {
+            mRenderingStartTime = currentTime;
+        }
+        if (mFrameCount < mParam.mNumFrames) {
+            mFrameInterval[mFrameCount] = (int)(currentTime - mLastRenderingTime);
+        }
+
+        if ((mFrameCount == mParam.mNumFrames) && (mParam.mNumFrames > 0)) {
+            long timePassed = currentTime - mRenderingStartTime;
+            float fps = ((float) mParam.mNumFrames) / ((float) timePassed) * 1000.0f;
+            printGlInfos();
+            printParams();
+            int numTriangles = mNumSpheres * mSpheres[0].getTotalIndices() / 3;
+            Log.i(TAG, "Final FPS " + fps + " Num triangles " + numTriangles + " start time " +
+                    mRenderingStartTime + " finish time " + currentTime);
+            if (mListener != null) {
+                mListener.onRenderCompletion(fps, numTriangles, mFrameInterval);
+                mFrameCount++; // to prevent entering here again
+                return;
+            }
+        }
+    }
+
+    @Override
     public void onSurfaceChanged(GL10 glUnused, int width, int height) {
         mWidth = width;
         mHeight = height;

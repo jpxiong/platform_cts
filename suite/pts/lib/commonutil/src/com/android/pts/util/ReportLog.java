@@ -72,9 +72,28 @@ public class ReportLog {
         printLog(builder.toString());
     }
 
+    /**
+     * For standard report summary with average and stddev
+     * @param header
+     * @param average
+     * @param stddev
+     */
     public void printSummary(String header, double average, double stddev) {
         mSummary = header + LOG_ELEM_SEPARATOR + "average " + average + LOG_ELEM_SEPARATOR +
                 "stddev " + stddev;
+    }
+
+    /**
+     * For a report with two representative values with custom key strings
+     * @param header
+     * @param key1 String key for val1
+     * @param val1
+     * @param key2 String key for val2
+     * @param val2
+     */
+    public void printSummaryFull(String header, String key1, double val1, String key2, double val2) {
+        mSummary = header + LOG_ELEM_SEPARATOR + key1 + " " + val1 + LOG_ELEM_SEPARATOR +
+                key2 + " " + val2;
     }
 
     public void throwReportToHost() throws PtsException {

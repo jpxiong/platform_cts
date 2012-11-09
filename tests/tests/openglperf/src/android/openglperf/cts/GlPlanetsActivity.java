@@ -34,14 +34,15 @@ public class GlPlanetsActivity extends Activity implements
     public static final String INTENT_EXTRA_USE_VBO_VERTICES = "useVboVertices";
     public static final String INTENT_EXTRA_USE_VBO_INDICES = "useVboIndiices";
     public static final String INTENT_EXTRA_NUM_FRAMES = "numFrames";
-    public static final String INTENT_EXTRA_INDICES_PER_VERTEX = "numIndicesPerVertex";
+    public static final String INTENT_EXTRA_NUM_INDEX_BUFFERS = "numIndexBuffers";
 
     public static final String INTENT_RESULT_FPS = "fps";
     public static final String INTENT_RESULT_NUM_TRIANGLES = "numTrigngles";
 
     private final Semaphore mSem = new Semaphore(0);
-    private float mFps;
+    private float mAverageFps;
     private int mNumTriangles;
+    private int[] mFrameInterval;
 
     private PlanetsSurfaceView mView;
 
@@ -50,12 +51,21 @@ public class GlPlanetsActivity extends Activity implements
         return mSem.tryAcquire(timeoutInSecs, TimeUnit.SECONDS);
     }
 
-    public float getFps() {
-        return mFps;
+    public float getAverageFps() {
+        return mAverageFps;
     }
 
     public int getNumTriangles() {
         return mNumTriangles;
+    }
+
+    /**
+     * Time interval between each frame's rendering in ms.
+     * The first value will be invalid, so client should discard them.
+     * @return can return null if INTENT_EXTRA_NUM_FRAMES was not set in intent.
+     */
+    public int[] getFrameInterval() {
+        return mFrameInterval;
     }
 
     @Override
@@ -70,16 +80,17 @@ public class GlPlanetsActivity extends Activity implements
         param.mUseVboForIndices = intent.getBooleanExtra(INTENT_EXTRA_USE_VBO_INDICES,
                 param.mUseVboForIndices);
         param.mNumFrames = intent.getIntExtra(INTENT_EXTRA_NUM_FRAMES, param.mNumFrames);
-        param.mNumIndicesPerVertex = intent.getIntExtra(INTENT_EXTRA_INDICES_PER_VERTEX,
+        param.mNumIndicesPerVertex = intent.getIntExtra(INTENT_EXTRA_NUM_INDEX_BUFFERS,
                 param.mNumIndicesPerVertex);
         mView = new PlanetsSurfaceView(this, param, this);
         setContentView(mView);
     }
 
     @Override
-    public void onRenderCompletion(float fps, int numTriangles) {
-        mFps = fps;
+    public void onRenderCompletion(float averageFps, int numTriangles,  int[] frameInterval) {
+        mAverageFps = averageFps;
         mNumTriangles = numTriangles;
+        mFrameInterval = frameInterval;
         mSem.release();
     }
 
