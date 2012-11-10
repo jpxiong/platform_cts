@@ -22,7 +22,8 @@ LOCAL_PATH:= $(call my-dir)
 PTS_TEST_PACKAGES := \
     PtsDeviceFilePerf \
     PtsDeviceUi \
-    PtsDeviceDram
+    PtsDeviceDram \
+    PtsDeviceSimpleCpu
 
 
 PTS_SUPPORT_PACKAGES := \
