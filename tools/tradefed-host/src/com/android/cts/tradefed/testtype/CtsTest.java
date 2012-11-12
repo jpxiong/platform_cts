@@ -399,8 +399,11 @@ public class CtsTest implements IDeviceTest, IResumableTest, IShardableTest, IBu
         // If there comes spurious failure like INJECT_EVENTS for a package,
         // reboot it before running it.
         // Also reboot after package which is know to leave pop-up behind
-        final List<String> rebootAfterList = Arrays.asList("CtsMediaTestCases");
-        final List<String> rebootBeforeList = Arrays.asList("CtsAnimationTestCases",
+        final List<String> rebootAfterList = Arrays.asList(
+                "CtsMediaTestCases",
+                "CtsAccessibilityTestCases");
+        final List<String> rebootBeforeList = Arrays.asList(
+                "CtsAnimationTestCases",
                 "CtsGraphicsTestCases",
                 "CtsViewTestCases",
                 "CtsWidgetTestCases" );
