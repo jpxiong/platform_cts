@@ -95,7 +95,7 @@ public class CtsXmlResultReporter implements ITestInvocationListener {
     private TestResults mResults = new TestResults();
     private TestPackageResult mCurrentPkgResult = null;
     private boolean mIsDeviceInfoRun = false;
-
+    private ResultReporter mReporter;
     private File mLogDir;
 
     private static final String PTS_PERFORMANCE_EXCEPTION = "com.android.pts.util.PtsException";
@@ -115,12 +115,13 @@ public class CtsXmlResultReporter implements ITestInvocationListener {
             throw new IllegalArgumentException("build info is not a IFolderBuildInfo");
         }
         IFolderBuildInfo ctsBuild = (IFolderBuildInfo)buildInfo;
+        CtsBuildHelper ctsBuildHelper = getBuildHelper(ctsBuild);
         mDeviceSerial = buildInfo.getDeviceSerial() == null ? "unknown_device" :
             buildInfo.getDeviceSerial();
         if (mContinueSessionId != null) {
             CLog.d("Continuing session %d", mContinueSessionId);
             // reuse existing directory
-            TestResultRepo resultRepo = new TestResultRepo(getBuildHelper(ctsBuild).getResultsDir());
+            TestResultRepo resultRepo = new TestResultRepo(ctsBuildHelper.getResultsDir());
             mResults = resultRepo.getResult(mContinueSessionId);
             if (mResults == null) {
                 throw new IllegalArgumentException(String.format("Could not find session %d",
@@ -131,7 +132,7 @@ public class CtsXmlResultReporter implements ITestInvocationListener {
             mReportDir = resultRepo.getReportDir(mContinueSessionId);
         } else {
             if (mReportDir == null) {
-                mReportDir = getBuildHelper(ctsBuild).getResultsDir();
+                mReportDir = ctsBuildHelper.getResultsDir();
             }
             // create a unique directory for saving results, using old cts host convention
             // TODO: in future, consider using LogFileSaver to create build-specific directories
@@ -140,6 +141,9 @@ public class CtsXmlResultReporter implements ITestInvocationListener {
             mStartTime = getTimestamp();
             logResult("Created result dir %s", mReportDir.getName());
         }
+
+        mReporter = new ResultReporter(mResultServer, ctsBuildHelper.getSuiteName());
+
         // TODO: allow customization of log dir
         // create a unique directory for saving logs, with same name as result dir
         File rootLogDir = getBuildHelper(ctsBuild).getLogsDir();
@@ -283,8 +287,7 @@ public class CtsXmlResultReporter implements ITestInvocationListener {
         zipResults(mReportDir);
 
         try {
-            ResultReporter reporter = new ResultReporter(mResultServer, reportFile);
-            reporter.reportResult();
+            mReporter.reportResult(reportFile);
         } catch (IOException e) {
             CLog.e(e);
         }
