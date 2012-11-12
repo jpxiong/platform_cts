@@ -30,23 +30,23 @@ class ResultReporter {
     private static final int RESULT_XML_BYTES = 500 * 1024;
 
     private final String mServerUrl;
+    private final String mSuiteName;
 
-    private final File mReportFile;
-
-    ResultReporter(String serverUrl, File reportFile) {
+    ResultReporter(String serverUrl, String suiteName) {
         mServerUrl = serverUrl;
-        mReportFile = reportFile;
+        mSuiteName = suiteName;
     }
 
-    public void reportResult() throws IOException {
+    public void reportResult(File reportFile) throws IOException {
         if (isEmpty(mServerUrl)) {
             return;
         }
 
-        InputStream input = new FileInputStream(mReportFile);
+        InputStream input = new FileInputStream(reportFile);
         try {
             byte[] data = IssueReporter.getBytes(input, RESULT_XML_BYTES);
             new MultipartForm(mServerUrl)
+                    .addFormValue("suite", mSuiteName)
                     .addFormFile("resultXml", "testResult.xml.gz", data)
                     .submit();
         } finally {
