@@ -321,6 +321,59 @@
     <string name="co_instruction_text_extra_label">(mirrored horizontally prior to rotation, since camera is front-facing)</string>
     <string name="co_photo_button_caption">Take Photo</string>
 
+    <!-- Strings for Camera Intents -->
+    <string name="camera_intents">Camera Intents</string>
+    <string name="ci_info">
+    This test verifies that the default camera app is firing intents
+    after pictures/videos are taken. It also verifies that when the
+    default camera app is invoked via intents, the launch intents work,
+    and the broadcast intents are received when appropriate per the SDK
+    documentation.\n\n
+    - Read the message above the \"Start Test\" button for
+    step-by-step instructions.
+    </string>
+    <string name="ci_preview_label">Camera preview</string>
+    <string name="ci_format_label">Oriented photo</string>
+    <string name="ci_camera_label">Camera:</string>
+    <string name="ci_intents_label">Intents Test</string>
+    <string name="ci_intents_direction_label">clockwise</string>
+    <string name="ci_instruction_heading_label">Instructions:</string>
+    <string name="ci_instruction_text_photo_label">READ BEFORE STARTING TEST</string>
+    <string name="ci_instruction_text_passfail_label">Choose \"Pass\" if the right intent is fired after taking a photo from the camera app. Otherwise, choose \"Fail\".</string>
+    <string name="ci_instruction_text_app_picture_label">\n
+    1. Click Start Test. \n
+    2. Go to home screen (HOME key). \n
+    3. Launch Camera application. \n
+    4. Capture photo. \n
+    5. Return to CTS verifier app. \n
+    6. Pass button will light up if intent was received.\n
+    7. Click "Pass" if possible.
+    </string>
+    <string name="ci_instruction_text_app_video_label">\n
+    1. Click Start Test. \n
+    2. Go to home screen (HOME key). \n
+    3. Launch Camera application. \n
+    4. Capture video. \n
+    5. Return to CTS verifier app. \n
+    6. Pass button will light up if intent was received.\n
+    7. Click "Pass" if possible.
+    </string>
+    <string name="ci_instruction_text_intent_picture_label">\n
+    1. Click Start Test.\n
+    2. Camera app will launch, prompting to take photo.\n
+    3. Capture/confirm photo using camera app controls.\n
+    4. Pass button will light up if intent was NOT received.\n
+    5. Click "Pass" if possible.
+    </string>
+    <string name="ci_instruction_text_intent_video_label">\n
+    1. Click Start Test.\n
+    2. Camera app will launch, prompting to take video.\n
+    3. Capture/confirm video using camera app controls.\n
+    4. Pass button will light up if intent was received.\n
+    5. Click "Pass" if possible.
+    </string>
+    <string name="ci_start_test_button_caption">Start Test</string>
+
     <!-- Strings for Camera Formats -->
     <string name="camera_format">Camera Formats</string>
     <string name="cf_info">This test checks that all the supported
