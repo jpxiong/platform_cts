@@ -549,6 +549,29 @@ public class FileSystemPermissionTest extends AndroidTestCase {
                 if (f.canRead() || f.canWrite() || f.canExecute()) {
                     retval.add(f);
                 }
+                if (status.uid == 2000) {
+                    // The shell user should not own any block devices
+                    retval.add(f);
+                }
+
+                // Don't allow block devices owned by GIDs
+                // accessible to non-privileged applications.
+                if ((status.gid == 1007)           // AID_LOG
+                          || (status.gid == 1015)  // AID_SDCARD_RW
+                          || (status.gid == 1023)  // AID_MEDIA_RW
+                          || (status.gid == 1028)  // AID_SDCARD_R
+                          || (status.gid == 2000)) // AID_SHELL
+                {
+                    if (status.hasModeFlag(FileUtils.S_IRGRP)
+                            || status.hasModeFlag(FileUtils.S_IWGRP)
+                            || status.hasModeFlag(FileUtils.S_IXGRP))
+                    {
+
+                        // non-privileged GIDs should not be able to access
+                        // any block device.
+                        retval.add(f);
+                    }
+                }
             }
         }
         return retval;
