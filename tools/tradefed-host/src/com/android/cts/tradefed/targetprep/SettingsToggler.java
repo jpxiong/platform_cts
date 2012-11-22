@@ -51,7 +51,7 @@ public class SettingsToggler {
                 "content update"
                 + " --uri content://settings/secure"
                 + " --bind value:s:" + value
-                + " --where \"name='" + name + "'\"");
+                + " --where \"name=\\'" + name + "\\'\"");
     }
 
     public static void updateSecureInt(ITestDevice device, String name, int value)
@@ -60,7 +60,7 @@ public class SettingsToggler {
                 "content update"
                 + " --uri content://settings/secure"
                 + " --bind value:i:" + value
-                + " --where \"name='" + name + "'\"");
+                + " --where \"name=\\'" + name + "\\'\"");
     }
 
     private static void deleteSecure(ITestDevice device, String name)
@@ -68,6 +68,6 @@ public class SettingsToggler {
         device.executeShellCommand(
                 "content delete"
                 + " --uri content://settings/secure"
-                + " --where \"name='" + name + "'\"");
+                + " --where \"name=\\'" + name + "\\'\"");
     }
 }
