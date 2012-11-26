@@ -55,7 +55,6 @@ public class WebHistoryItemTest extends ActivityInstrumentationTestCase2<WebView
         assertEquals(1, list.getSize());
         WebHistoryItem item = list.getCurrentItem();
         assertNotNull(item);
-        int firstId = item.getId();
         assertEquals(url, item.getUrl());
         assertEquals(url, item.getOriginalUrl());
         assertEquals(TestHtmlConstants.HELLO_WORLD_TITLE, item.getTitle());
@@ -69,7 +68,5 @@ public class WebHistoryItemTest extends ActivityInstrumentationTestCase2<WebView
         item = list.getCurrentItem();
         assertNotNull(item);
         assertEquals(TestHtmlConstants.BR_TAG_TITLE, item.getTitle());
-        int secondId = item.getId();
-        assertTrue(firstId != secondId);
     }
 }
