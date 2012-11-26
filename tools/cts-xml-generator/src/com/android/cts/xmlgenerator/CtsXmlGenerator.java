@@ -49,6 +49,8 @@ public class CtsXmlGenerator {
         String instrumentation = null;
         String testType = null;
         String jarPath = null;
+        String appNameSpace = null;
+        String targetNameSpace = null;
 
         for (int i = 0; i < args.length; i++) {
             if ("-p".equals(args[i])) {
@@ -68,15 +70,17 @@ public class CtsXmlGenerator {
                         "Missing value for expectation store")));
             } else if ("-o".equals(args[i])) {
                 outputPath = getArg(args, ++i, "Missing value for output file");
+            } else if ("-a".equals(args[i])) {
+                appNameSpace =  getArg(args, ++i, "Missing value for app name space");
+            } else if ("-r".equals(args[i])) {
+                targetNameSpace =  getArg(args, ++i, "Missing value for target name space");
             } else {
                 System.err.println("Unsupported flag: " + args[i]);
                 usage(args);
             }
         }
 
-        String appNameSpace = null;
         String runner = null;
-        String targetNameSpace = null;
 
         if (manifestFile != null) {
             Document manifest = DocumentBuilderFactory.newInstance().newDocumentBuilder()
