@@ -69,6 +69,7 @@ class DocletRunner {
         sourcePath.add("./development/tools/hosttestlib/src");
         sourcePath.add("./libcore/dalvik/src/main/java");
         sourcePath.add("./cts/tests/src");
+        sourcePath.add("./frameworks/testing/uiautomator/library/src");
         sourcePath.add(sourceDir.toString());
         return join(sourcePath, ":");
     }

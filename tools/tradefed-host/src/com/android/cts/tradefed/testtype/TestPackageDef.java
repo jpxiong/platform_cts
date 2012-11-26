@@ -16,6 +16,7 @@
 
 package com.android.cts.tradefed.testtype;
 
+import com.android.ddmlib.Log.LogLevel;
 import com.android.ddmlib.testrunner.TestIdentifier;
 import com.android.tradefed.log.LogUtil.CLog;
 import com.android.tradefed.testtype.IRemoteTest;
@@ -48,6 +49,7 @@ class TestPackageDef implements ITestPackageDef {
         "com.android.cts.tradefed.testtype.AccessibilityTestRunner";
     public static final String ACCESSIBILITYSERVICE_TEST =
         "com.android.cts.tradefed.testtype.AccessibilityServiceTestRunner";
+    public static final String UIAUTOMATOR_TEST = "uiAutomator";
 
     private static final String SIGNATURE_TEST_METHOD = "testSignature";
     private static final String SIGNATURE_TEST_CLASS = "android.tests.sigtest.SimpleSignatureTest";
@@ -217,6 +219,9 @@ class TestPackageDef implements ITestPackageDef {
         } else if (ACCESSIBILITYSERVICE_TEST.equals(mTestType)) {
             AccessibilityServiceTestRunner test = new AccessibilityServiceTestRunner();
             return setInstrumentationTest(test, testCaseDir);
+        } else if (UIAUTOMATOR_TEST.equals(mTestType)) {
+            UiAutomatorJarTest uiautomatorTest = new UiAutomatorJarTest();
+            return setUiAutomatorTest(uiautomatorTest);
         } else if (mIsSignatureTest) {
             // TODO: hardcode the runner/class/method for now, since current package xml points to
             // specialized instrumentation. Eventually this special case for signatureTest can be
@@ -268,6 +273,28 @@ class TestPackageDef implements ITestPackageDef {
             instrTest.setCollectsTestsShellTimeout(10 * 60 * 1000);
         }
         return instrTest;
+    }
+
+    /**
+     * Populates given {@link UiAutomatorJarTest} with data from the package xml.
+     *
+     * @param uiautomatorTest
+     * @return the populated {@link UiAutomatorJarTest} or <code>null</code>
+     */
+    private IRemoteTest setUiAutomatorTest(UiAutomatorJarTest uiautomatorTest) {
+        uiautomatorTest.setInstallArtifacts(getJarPath());
+        if (mClassName != null) {
+            if (mMethodName != null) {
+                CLog.logAndDisplay(LogLevel.WARN, "ui automator tests don't currently support" +
+                        "running  individual methods");
+            }
+            uiautomatorTest.addClassName(mClassName);
+        } else {
+            uiautomatorTest.addClassNames(mTestClasses);
+        }
+        uiautomatorTest.setRunName(getUri());
+        uiautomatorTest.setCaptureLogs(false);
+        return uiautomatorTest;
     }
 
     /**

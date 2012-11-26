@@ -12,7 +12,19 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-BUILD_CTS_EXECUTABLE := cts/build/test_executable.mk
-BUILD_CTS_PACKAGE := cts/build/test_package.mk
-BUILD_CTS_HOST_JAVA_LIBRARY := cts/build/test_host_java_library.mk
-BUILD_CTS_UI_JAVA_LIBRARY := cts/build/test_uiautomator.mk
+LOCAL_PATH:= $(call my-dir)
+
+include $(CLEAR_VARS)
+
+LOCAL_MODULE_TAGS := optional
+LOCAL_MODULE_PATH := $(TARGET_OUT_DATA_APPS)
+
+LOCAL_SRC_FILES := $(call all-java-files-under, src)
+
+LOCAL_SDK_VERSION := current
+
+LOCAL_PACKAGE_NAME := CtsUiAutomatorApp
+
+LOCAL_PROGUARD_ENABLED := disabled
+
+include $(BUILD_PACKAGE)

@@ -36,6 +36,10 @@ define cts-get-lib-paths
 	$(foreach lib,$(1),$(HOST_OUT_JAVA_LIBRARIES)/$(lib).jar)
 endef
 
+define cts-get-ui-lib-paths
+	$(foreach lib,$(1),$(CTS_TESTCASES_OUT)/$(lib).jar)
+endef
+
 define cts-get-native-paths
 	$(foreach exe,$(1),$(call intermediates-dir-for,EXECUTABLES,$(exe))/$(exe))
 endef
