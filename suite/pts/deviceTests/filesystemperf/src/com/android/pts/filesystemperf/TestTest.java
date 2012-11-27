@@ -31,7 +31,7 @@ public class TestTest extends PtsAndroidTestCase {
     protected void tearDown() throws Exception {
         super.tearDown();
     }
-
+/* code for testing PTS logging. Disabled.
     @TimeoutReq(minutes = 15)
     public void testPass() {
         double[] array = new double[] {1.0, 2.0, 3.0};
@@ -49,4 +49,5 @@ public class TestTest extends PtsAndroidTestCase {
         getReportLog().printSummary("This should not be shown", 0, 0);
         throw new Exception("failed");
     }
+*/
 }
