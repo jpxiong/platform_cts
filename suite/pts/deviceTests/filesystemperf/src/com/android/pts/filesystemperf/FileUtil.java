@@ -118,10 +118,14 @@ public class FileUtil {
      * @throws IOException
      */
     public static void writeFile(File file, byte[] data, boolean append) throws IOException {
-        FileOutputStream out = new FileOutputStream(file, append);
-        out.write(data);
-        out.flush();
-        out.close();
+        final RandomAccessFile randomFile = new RandomAccessFile(file, "rwd"); // force O_SYNC
+        if (append) {
+            randomFile.seek(randomFile.length());
+        } else {
+            randomFile.seek(0L);
+        }
+        randomFile.write(data);
+        randomFile.close();
     }
 
     /**
@@ -276,7 +280,7 @@ public class FileUtil {
         final int runsInOneGo = 16;
         final int readsInOneMeasure = totalReadCount / runsInOneGo;
 
-        final RandomAccessFile randomFile = new RandomAccessFile(file, "rw");
+        final RandomAccessFile randomFile = new RandomAccessFile(file, "rw"); // do not need O_SYNC
         double[] rdAmount = new double[runsInOneGo];
         double[] wrAmount = new double[runsInOneGo];
         double[] times = FileUtil.measureIO(runsInOneGo, rdAmount, wrAmount, new MeasureRun() {
@@ -326,7 +330,7 @@ public class FileUtil {
         final int runsInOneGo = 16;
         final int writesInOneMeasure = totalWriteCount / runsInOneGo; // 32MB at a time
 
-        final RandomAccessFile randomFile = new RandomAccessFile(file, "rw");
+        final RandomAccessFile randomFile = new RandomAccessFile(file, "rwd"); // force O_SYNC
         double[] rdAmount = new double[runsInOneGo];
         double[] wrAmount = new double[runsInOneGo];
         double[] times = FileUtil.measureIO(runsInOneGo, rdAmount, wrAmount, new MeasureRun() {
@@ -370,16 +374,16 @@ public class FileUtil {
         int numberRepeatInOneRun = (int)(fileSize / bufferSize);
         double[] mbpsAll = new double[numberRepetition * numberRepeatInOneRun];
         for (int i = 0; i < numberRepetition; i++) {
-            final FileOutputStream out = new FileOutputStream(file);
+            final RandomAccessFile randomFile = new RandomAccessFile(file, "rwd");  // force O_SYNC
+            randomFile.seek(0L);
             double[] times = MeasureTime.measure(numberRepeatInOneRun, new MeasureRun() {
 
                 @Override
                 public void run(int i) throws IOException {
-                    out.write(data);
-                    out.flush();
+                    randomFile.write(data);
                 }
             });
-            out.close();
+            randomFile.close();
             double[] mbps = ReportLog.calcRatePerSecArray((double)bufferSize / 1024 / 1024,
                     times);
             report.printArray(i + "-th round MB/s",
