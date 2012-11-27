@@ -400,8 +400,7 @@ public class CtsTest implements IDeviceTest, IResumableTest, IShardableTest, IBu
         // reboot it before running it.
         // Also reboot after package which is know to leave pop-up behind
         final List<String> rebootAfterList = Arrays.asList(
-                "CtsMediaTestCases",
-                "CtsAccessibilityTestCases");
+                "CtsMediaTestCases");
         final List<String> rebootBeforeList = Arrays.asList(
                 "CtsAnimationTestCases",
                 "CtsGraphicsTestCases",
