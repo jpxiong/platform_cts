@@ -32,6 +32,7 @@ public class CtsBuildHelper {
     static final String CTS_DIR_NAME = "android-cts";
     static final String PTS_DIR_NAME = "android-pts";
     static private boolean mCtsMode = true;
+    private final String mSuiteName;
     /** The root location of the extracted CTS package */
     private final File mRootDir;
     /** the {@link CTS_DIR_NAME} directory */
@@ -49,6 +50,7 @@ public class CtsBuildHelper {
      */
     public CtsBuildHelper(File rootDir) {
         mRootDir = rootDir;
+        mSuiteName = mCtsMode? "CTS" : "PTS";
         mCtsDir = new File(mRootDir, mCtsMode ? CTS_DIR_NAME : PTS_DIR_NAME);
     }
 
@@ -84,6 +86,10 @@ public class CtsBuildHelper {
         } catch (FileNotFoundException e) {
             throw new IllegalArgumentException("Invalid CTS build provided.", e);
         }
+    }
+
+    public String getSuiteName() {
+        return mSuiteName;
     }
 
     /**
