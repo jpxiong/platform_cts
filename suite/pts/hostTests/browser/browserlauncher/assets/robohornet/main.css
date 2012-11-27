@@ -1,0 +1,557 @@
+/*
+ * Orange: #F05A2A
+ * Light-Orange: #F6943D
+ * Yellow: #FCCF4D
+ * Light-Yellow: #FDE7A7
+ * Very-Light-Yellow: #FEF1CA
+ * Dark-Gray: #454545
+ * Light-Gray: #AAAAAA;
+ */
+
+@font-face {
+  font-family: 'Lato';
+  font-style: italic;
+  font-weight: 400;
+  src: local('Lato Italic'), local('Lato-Italic'), url('fonts/Lato-Italic.woff') format('woff');
+}
+@font-face {
+  font-family: 'Lato';
+  font-style: italic;
+  font-weight: 700;
+  src: local('Lato Bold Italic'), local('Lato-BoldItalic'), url('fonts/Lato-BoldItalic.woff') format('woff');
+}
+@font-face {
+  font-family: 'Lato';
+  font-style: normal;
+  font-weight: 700;
+  src: local('Lato Bold'), local('Lato-Bold'), url('fonts/Lato-Bold.woff') format('woff');
+}
+@font-face {
+  font-family: 'Lato';
+  font-style: normal;
+  font-weight: 400;
+  src: local('Lato Regular'), local('Lato-Regular'), url('fonts/Lato-Regular.woff') format('woff');
+}
+@font-face {
+  font-family: 'Lato';
+  font-style: normal;
+  font-weight: 100;
+  src: local('Lato Hairline'), local('Lato-Hairline'), url('fonts/Lato-Hairline.woff') format('woff');
+}
+@font-face {
+  font-family: 'Lato';
+  font-style: normal;
+  font-weight: 900;
+  src: local('Lato Black'), local('Lato-Black'), url('fonts/Lato-Black.woff') format('woff');
+}
+
+html {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  margin: 0;
+  height: 100%;
+  font-family: Lato, Tahoma, sans-serif;
+  color: #454545;
+  background-color: #FEF1CA;
+  background-image: -webkit-linear-gradient(top, #FDE7A7, #FEF1CA 300px);
+  background-image: -moz-linear-gradient(top, #FDE7A7, #FEF1CA 300px);
+  background-image: -o-linear-gradient(top, #FDE7A7, #FEF1CA 300px);
+  background-repeat: no-repeat;
+  font-size: 14px;
+  overflow-x: hidden;
+}
+
+table {
+  border-spacing: 0;
+}
+
+th, td {
+  padding: 0 1ex;
+}
+
+thead small {
+  padding-left: 1em;
+  font-size: x-small;
+}
+
+a {
+  color: inherit;
+}
+
+#sidebar {
+  float: left;
+  width: 300px;
+  margin-left: 15px;
+  margin-right: 10px;
+}
+
+#test-container {
+  margin: 0 auto;
+  width: 1050px;
+}
+
+#iframe-wrap {
+  height: 300px;
+  margin: 9px 23px 0 0;
+  overflow: hidden;
+  width: 300px;
+  display: inline-block;
+  vertical-align: top;
+}
+
+iframe {
+  height: 300px;
+  width: 300px;
+}
+
+#tests-wrap {
+  display: inline-block;
+}
+
+#tests > thead > tr > td {
+  border-bottom: 1px solid #454545;
+}
+
+#tests tr.summary-row td {
+  border-top: 1px solid #454545;
+}
+
+#tests tr.summary-row td:first-child {
+  text-align: right;
+}
+
+#tests tr.summary-row td.final {
+  font-weight: bold;
+}
+
+#tests > tbody > tr > td {
+  font-weight: normal;
+}
+
+#tests > tbody > tr > td.name {
+  padding-left: 2ex;
+}
+
+#tests > thead > tr > td.number, #tests > tbody > tr > td.number {
+  width: 10ex;
+}
+
+#tests > tbody > tr > td.details {
+  border-top: none;
+  padding: 0.5ex 5ex 2ex 5ex;
+}
+
+#tests > tbody > tr.disabled {
+  color: rgba(69, 69, 69, 0.5);
+}
+
+#tests > tbody > tr td > span {
+  font-size: 16px;
+  margin-left: 16px;
+  font-weight: bold;
+  cursor: pointer;
+  position: relative;
+  padding-left: 19px;
+}
+
+#tests > tbody > tr td > span:hover {
+ color: black;
+}
+
+#tests > tbody > tr td > span::before {
+  content: "\25BA";
+  font-size: 10px;
+  margin-right: 10px;
+  position: absolute;
+  top: 4px;
+  left: 0;
+  cursor: pointer;
+  display: inline-block;
+}
+
+#tests > tbody > tr.expanded td > span::before {
+  -webkit-transform: rotate(90deg);
+  -moz-transform: rotate(90deg);
+  -ms-transform: rotate(90deg);
+  -o-transform: rotate(90deg);
+  transform: rotate(90deg);
+}
+
+div[id^=tags] {
+  text-align: center;
+}
+
+.details > div {
+  font-size: 14px;
+  border: 1px dotted #FCCF4D;
+  background: #FDE7A7;
+}
+
+tr.details td {
+  display: none;
+}
+
+tr.details.expanded td {
+  display: table-cell;
+}
+
+.details > div.disabled {
+  opacity: 0.5;
+}
+
+.runs {
+  margin-top: 0.5ex;
+  table-layout: fixed;
+}
+
+.runs > thead > tr > td.number, .runs > tbody > tr > td.number {
+  width: 10ex;
+}
+
+.runs > thead > tr > td.name, .runs > tbody > tr > td.name {
+  width: 30ex;
+}
+
+.runs > tbody > tr > td {
+  font-weight: normal;
+  border-top:1px dotted #FCCF4D;
+}
+
+td.number {
+  text-align: right;
+}
+
+.tag {
+  display: inline-block;
+  background-color: #FCCF4D;
+  color: #FEF1CA;
+  border-radius: 3px;
+  padding: 2px;
+  margin: 2px;
+  cursor: pointer;
+}
+
+.tag.technology {
+  background-color: #F6943D;
+}
+
+.tag.special {
+  background-color: #AAAAAA;
+}
+
+.tag.inactive {
+  opacity: 0.2;
+}
+
+.tag.partially-inactive {
+  opacity: 0.6;
+}
+
+.tag:hover {
+  opacity: 1.0;
+  color: #454545;
+}
+
+#console {
+  color: silver;
+  font-size: 10px;
+  overflow-y: auto;
+  min-height: 200px;
+}
+
+#testSection {
+  clear: both;
+}
+
+#testFrame {
+  width: 300px;
+  height: 300px;
+  border: 1px solid silver;
+}
+
+h2 {
+  font-size: 14px;
+  font-weight: normal;
+  margin: 0;
+}
+
+h1 {
+  font-size: 36px;
+  margin: 0 10px 0 0;
+  display:inline;
+}
+
+header {
+  border-bottom: 1px solid #454545;
+  margin-bottom: 15px;
+  padding:15px;
+  position: relative;
+}
+
+header .logo {
+  display: inline-block;
+}
+
+header .logo h1 {
+  /* Necessary for positioning of "ALPHA" tag */
+  position: relative;
+}
+
+header .logo h1::after {
+  content: "ALPHA";
+  font-size: 14px;
+  font-weight:normal;
+  position:absolute;
+  bottom: -10px;
+  right: 0px;
+  color: #F05A2A;
+}
+
+header img {
+  height: 40px;
+  width: 40px;
+}
+
+#progress {
+  position: absolute;
+  background-color: #F05A2A;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 100%;
+  z-index: -1;
+  margin-left: -100%;
+  -webkit-transition: opacity 3s ease;
+  -moz-transition: opacity 3s ease;
+  -o-transition: opacity 3s ease;
+  transition: opacity 3s ease;
+}
+
+div.results {
+  margin: 120px 0;
+  text-align: center;
+  width: 100%;
+  -webkit-transition: .3s ease;
+  -moz-transition: .3s ease;
+  -o-transition: .3s ease;
+  transition: .3s ease;
+}
+
+.running div.results {
+  margin: 0;
+}
+
+header > div > div {
+
+}
+
+.results div {
+  color: #454545;
+  font-weight: bold;
+  font-size: 108px;
+  font-style: normal;
+}
+
+#index-prefix {
+  color: #FCCF4D;
+  font-weight: 100;
+}
+
+#index {
+  opacity: 0.1;
+  -webkit-transition: opacity 2s;
+  -moz-transition: opacity 2s;
+  -o-transition: opacity 2s;
+  transition: opacity 2s;
+}
+
+#index.final {
+  opacity: 1.0;
+}
+
+#runButton {
+  float: right;
+  margin: 0 130px 0 10px;
+  padding: 5px;
+  border-radius: 5px;
+  background-color: #F05A2A;
+  background-image: -webkit-linear-gradient(top, #F05A2A, #F6943D);
+  background-image: -moz-linear-gradient(top, #F05A2A, #F6943D);
+  background-image: -o-linear-gradient(top, #F05A2A, #F6943D);
+  background-image: linear-gradient(top, #F05A2A, #F6943D);
+  color: #FDE7A7;
+  font-size: 26px;
+  /* Large enough so the size doesn't change for any of the messages */
+  width:175px;
+  border: 1px solid #FCCF4D;
+  cursor: pointer;
+  box-shadow: 0px 2px 5px 0px #454545;
+  -webkit-animation-name: button-flourish;
+  -webkit-animation-duration: 2s;
+  -webkit-animation-iteration-count: 1;
+  -webkit-animation-timing-function: ease;
+  /* we ideally want to flourish just as the logo crosses on load. */
+  -webkit-animation-delay: 1s;
+
+  -moz-animation-name: button-flourish;
+  -moz-animation-duration: 2s;
+  -moz-animation-iteration-count: 1;
+  -moz-animation-timing-function: ease;
+  /* we ideally want to flourish just as the logo crosses on load. */
+  -moz-animation-delay: 1s;
+
+  -o-animation-name: button-flourish;
+  -o-animation-duration: 2s;
+  -o-animation-iteration-count: 1;
+  -o-animation-timing-function: ease;
+  /* we ideally want to flourish just as the logo crosses on load. */
+  -o-animation-delay: 1s;
+
+  animation-name: button-flourish;
+  animation-duration: 2s;
+  animation-iteration-count: 1;
+  animation-timing-function: ease;
+  /* we ideally want to flourish just as the logo crosses on load. */
+  animation-delay: 1s;
+}
+
+#runButton:active {
+  background-image: -webkit-linear-gradient(top, #F6943D, #F05A2A);
+  background-image: -moz-linear-gradient(top, #F6943D, #F05A2A);
+  background-image: -o-linear-gradient(top, #F6943D, #F05A2A);
+  background-image: linear-gradient(top, #F6943D, #F05A2A);
+}
+
+#runButton:hover {
+  color:#FCCF4D;
+}
+
+#runButton:disabled {
+  opacity: 0.6;
+  color: #FCCF4D;
+}
+
+#status {
+  font-size: 14px;
+  text-align: center;
+  color: #666666;
+  font-style: italic;
+  font-weight: normal;
+}
+
+#results > thead > tr > td {
+  border-bottom: 1px solid black;
+}
+
+header img {
+  -webkit-transform-origin: 30% 65%;
+  -moz-transform-origin: 30% 65%;
+  -o-transform-origin: 30% 65%;
+  transform-origin: 30% 65%;
+  /* Trigger compositing now so we don't get a flash when it does */
+  -webkit-transform: translate(0,0,0);
+  /* Show over top of the Run button */
+  z-index:1;
+}
+
+body.ready header img {
+  -webkit-animation-name: logo-ready;
+  -webkit-animation-duration: 4s;
+  -webkit-animation-iteration-count: 1;
+  -webkit-animation-timing-function: ease;
+
+  -moz-animation-name: logo-ready;
+  -moz-animation-duration: 4s;
+  -moz-animation-iteration-count: 1;
+  -moz-animation-timing-function: ease;
+}
+
+@-webkit-keyframes logo-ready {
+  from {
+    -webkit-transform: translate(0, 0);
+  }
+  10% {
+    -webkit-transform: translate(0, 0) rotate(34deg);
+  }
+  17% {
+    -webkit-transform: translate(-50%, 0) rotate(45deg);
+  }
+  50% {
+    -webkit-transform: translate(10000%, 0) rotate(45deg);
+    opacity: 1.0;
+  }
+  51% {
+    opacity: 0.0;
+  }
+  52% {
+    -webkit-transform: translate(0, 0);
+  }
+  to {
+    opacity: 1.0;
+  }
+}
+
+@-moz-keyframes logo-ready {
+  from {
+    -moz-transform: translate(0, 0);
+  }
+  10% {
+    -moz-transform: translate(0, 0) rotate(34deg);
+  }
+  17% {
+    -moz-transform: translate(-50%, 0) rotate(45deg);
+  }
+  50% {
+    -moz-transform: translate(10000%, 0) rotate(45deg);
+    opacity: 1.0;
+  }
+  51% {
+    opacity: 0.0;
+  }
+  52% {
+    -moz-transform: translate(0, 0);
+  }
+  to {
+    opacity: 1.0;
+  }
+}
+
+@-webkit-keyframes button-flourish {
+  from {
+    -webkit-transform: scale(1.0);
+  }
+  10% {
+    -webkit-transform: scale(1.15);
+  }
+  to {
+    -webkit-transform: scale(1.0);
+  }
+}
+
+@-moz-keyframes button-flourish {
+  from {
+    -moz-transform: scale(1.0);
+  }
+  10% {
+    -moz-transform: scale(1.15);
+  }
+  to {
+    -moz-transform: scale(1.0);
+  }
+}
+
+footer #fork {
+  -webkit-animation: button-flourish 2s ease 1.02s 1;
+     -moz-animation: button-flourish 2s ease 1.02s 1;
+       -o-animation: button-flourish 2s ease 1.02s 1;
+          animation: button-flourish 2s ease 1.02s 1;
+
+  position: absolute;
+  top: 0;
+  right: 0;
+  border: 0;
+}
