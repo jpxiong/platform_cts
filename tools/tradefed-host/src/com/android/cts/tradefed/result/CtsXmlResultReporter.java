@@ -58,7 +58,7 @@ public class CtsXmlResultReporter implements ITestInvocationListener {
     private static final String LOG_TAG = "CtsXmlResultReporter";
 
     static final String TEST_RESULT_FILE_NAME = "testResult.xml";
-    private static final String CTS_RESULT_FILE_VERSION = "1.13";
+    private static final String CTS_RESULT_FILE_VERSION = "1.14";
     private static final String[] CTS_RESULT_RESOURCES = {"cts_result.xsl", "cts_result.css",
         "logo.gif", "newrule-green.png"};
 
@@ -97,6 +97,7 @@ public class CtsXmlResultReporter implements ITestInvocationListener {
     private boolean mIsDeviceInfoRun = false;
     private ResultReporter mReporter;
     private File mLogDir;
+    private String mSuiteName;
 
     private static final String PTS_PERFORMANCE_EXCEPTION = "com.android.pts.util.PtsException";
     private static final Pattern mPtsLogPattern = Pattern.compile(
@@ -141,8 +142,8 @@ public class CtsXmlResultReporter implements ITestInvocationListener {
             mStartTime = getTimestamp();
             logResult("Created result dir %s", mReportDir.getName());
         }
-
-        mReporter = new ResultReporter(mResultServer, ctsBuildHelper.getSuiteName());
+        mSuiteName = ctsBuildHelper.getSuiteName();
+        mReporter = new ResultReporter(mResultServer, mSuiteName);
 
         // TODO: allow customization of log dir
         // create a unique directory for saving logs, with same name as result dir
@@ -358,6 +359,7 @@ public class CtsXmlResultReporter implements ITestInvocationListener {
         serializer.attribute(ns, STARTTIME_ATTR, startTime);
         serializer.attribute(ns, "endtime", endTime);
         serializer.attribute(ns, "version", CTS_RESULT_FILE_VERSION);
+        serializer.attribute(ns, "suite", mSuiteName);
 
         mResults.serialize(serializer);
         // TODO: not sure why, but the serializer doesn't like this statement
