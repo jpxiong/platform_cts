@@ -244,6 +244,14 @@
             </intent-filter>
         </activity>
 
+        <activity android:name="android.widget.cts.GridLayoutStubActivity"
+            android:label="GridLayoutStubActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.FRAMEWORK_INSTRUMENTATION_TEST" />
+            </intent-filter>
+        </activity>
+
         <activity android:name="android.widget.cts.LayoutDirectionStubActivity"
             android:label="LayoutDirectionStubActivity">
             <intent-filter>
