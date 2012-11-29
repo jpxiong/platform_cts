@@ -808,6 +808,9 @@ public class CodecTest {
                     return false;
                 }
             }
+            if (!mOnCompleteSuccess && !mPlaybackError) {
+                Log.e(TAG, "wait timed-out without onCompletion notification");
+            }
             terminateMessageLooper();
         } catch (Exception e) {
             Log.v(TAG, "playMediaSample Exception:" + e.getMessage());
