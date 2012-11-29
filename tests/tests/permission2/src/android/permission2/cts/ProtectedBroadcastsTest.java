@@ -16,9 +16,7 @@
 
 package android.permission2.cts;
 
-import android.content.Context;
 import android.content.Intent;
-import android.os.Bundle;
 import android.test.AndroidTestCase;
 
 /**
@@ -62,13 +60,33 @@ public class ProtectedBroadcastsTest extends AndroidTestCase {
         "android.intent.action.NETWORK_SET_TIMEZONE",
         "android.intent.action.ACTION_SHOW_NOTICE_ECM_BLOCK_OTHERS",
         "android.intent.action.ACTION_MDN_STATE_CHANGED",
-        "android.provider.Telephony.SPN_STRINGS_UPDATED"
+        "android.provider.Telephony.SPN_STRINGS_UPDATED",
+        "android.intent.action.ANY_DATA_STATE",
+        "com.android.server.WifiManager.action.START_SCAN",
+        "com.android.server.WifiManager.action.DELAYED_DRIVER_STOP",
+        "android.net.wifi.WIFI_STATE_CHANGED",
+        "android.net.wifi.WIFI_AP_STATE_CHANGED",
+        "android.net.wifi.SCAN_RESULTS",
+        "android.net.wifi.RSSI_CHANGED",
+        "android.net.wifi.STATE_CHANGE",
+        "android.net.wifi.LINK_CONFIGURATION_CHANGED",
+        "android.net.wifi.CONFIGURED_NETWORKS_CHANGE",
+        "android.net.wifi.supplicant.CONNECTION_CHANGE",
+        "android.net.wifi.supplicant.STATE_CHANGE",
+        "android.net.wifi.p2p.STATE_CHANGED",
+        "android.net.wifi.p2p.DISCOVERY_STATE_CHANGE",
+        "android.net.wifi.p2p.THIS_DEVICE_CHANGED",
+        "android.net.wifi.p2p.PEERS_CHANGED",
+        "android.net.wifi.p2p.CONNECTION_STATE_CHANGE",
+        "android.net.wifi.p2p.PERSISTENT_GROUPS_CHANGED",
+        "android.net.conn.TETHER_STATE_CHANGED",
+        "android.net.conn.INET_CONDITION_ACTION"
     };
 
     /**
      * Verify that protected broadcast actions can't be sent.
      */
-    public void testProcessOutgoingCall() {
+    public void testSendProtectedBroadcasts() {
         for (String action : BROADCASTS) {
             try {
                 Intent intent = new Intent(action);
