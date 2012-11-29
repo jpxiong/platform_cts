@@ -26,8 +26,10 @@ import android.widget.ListView;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
-public class ScrollingActivity extends ListActivity implements OnScrollListener
-{
+/**
+ * Activity for measuring scrolling time of long list.
+ */
+public class ScrollingActivity extends ListActivity implements OnScrollListener {
     static final String TAG = "ScrollingActivity";
     private static final int NUMBER_ELEMENTS = 10000;
     private static final int SCROLL_TIME_IN_MS = 1;
@@ -36,8 +38,7 @@ public class ScrollingActivity extends ListActivity implements OnScrollListener
     private CountDownLatch mLatchStop = null;
     private int mTargetLoc;
 
-    public void onCreate(Bundle icicle)
-    {
+    public void onCreate(Bundle icicle) {
         super.onCreate(icicle);
         for (int i = 0; i < NUMBER_ELEMENTS; i++) {
             mItems[i] = Integer.toString(i);
@@ -46,7 +47,6 @@ public class ScrollingActivity extends ListActivity implements OnScrollListener
                 android.R.layout.simple_list_item_1, mItems));
         ListView view = getListView();
         view.setOnScrollListener(this);
-        //view.setVelocityScale(100.0f);
     }
 
     public boolean scrollToTop() {
@@ -74,15 +74,6 @@ public class ScrollingActivity extends ListActivity implements OnScrollListener
         }
         mLatchStop = null;
         return result;
-    }
-    public void onStop()
-    {
-        super.onStop();
-    }
-
-    public void onResume()
-    {
-        super.onResume();
     }
 
     @Override

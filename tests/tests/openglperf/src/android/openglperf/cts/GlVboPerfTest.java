@@ -87,14 +87,14 @@ public class GlVboPerfTest extends
     }
 
     private void runRendering(int numPlanets, boolean useVboVertex, boolean useVboIndex,
-            int indicesPerVertex) throws Exception {
+            int numIndexBuffers) throws Exception {
         Intent intent = new Intent();
         intent.putExtra(GlPlanetsActivity.INTENT_EXTRA_NUM_FRAMES,
                 NUM_FRAMES_TO_RENDER);
         intent.putExtra(GlPlanetsActivity.INTENT_EXTRA_NUM_PLANETS, numPlanets);
         intent.putExtra(GlPlanetsActivity.INTENT_EXTRA_USE_VBO_VERTICES, useVboVertex);
         intent.putExtra(GlPlanetsActivity.INTENT_EXTRA_USE_VBO_INDICES, useVboIndex);
-        intent.putExtra(GlPlanetsActivity.INTENT_EXTRA_INDICES_PER_VERTEX, indicesPerVertex);
+        intent.putExtra(GlPlanetsActivity.INTENT_EXTRA_NUM_INDEX_BUFFERS, numIndexBuffers);
 
         setActivityIntent(intent);
         final GlPlanetsActivity activity = getActivity();
@@ -102,7 +102,7 @@ public class GlVboPerfTest extends
                 .waitForGlPlanetsCompletionWithTimeout(RENDERING_TIMEOUT);
         assertTrue("timeout while waiting for rendering completion", waitResult);
 
-        mFps = activity.getFps();
+        mFps = activity.getAverageFps();
         mNumTriangles = activity.getNumTriangles();
 
         cleanUpActivity();

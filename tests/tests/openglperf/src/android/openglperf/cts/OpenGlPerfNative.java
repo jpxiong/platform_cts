@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2011 The Android Open Source Project
+ * Copyright (C) 2012 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,15 +16,14 @@
 
 package android.openglperf.cts;
 
-/**
- * Interface used to notify the completion of requested rendering.
- */
-public interface RenderCompletionListener {
+public class OpenGlPerfNative {
+    static {
+        System.loadLibrary("ctsopenglperf_jni");
+    }
     /**
-     * @param averageFps average of total frames
-     * @param numTriangles Number of triangles in geometric model
-     * @param frameInterval interval for each frame in ms. Do not use the first one and the last one.
+     * wait for the completion of the pending Egl/Gl operation using eglClientWaitSyncKHR.
+     * @param waitTimeInNs maximum time to wait in nano secs
+     * @return true for success, false for timeout
      */
-    void onRenderCompletion(float averageFps, int numTriangles, int[] frameInterval);
-
+    public static native boolean waitForEglCompletion(long waitTimeInNs);
 }

@@ -24,7 +24,13 @@ LOCAL_JAVA_LIBRARIES := android.test.runner
 
 LOCAL_STATIC_JAVA_LIBRARIES := ptsutil ctsutil ctstestrunner
 
+LOCAL_JNI_SHARED_LIBRARIES := libctsopenglperf_jni
+
 LOCAL_SRC_FILES := $(call all-java-files-under, src)
+# re-use existing openglperf code for CTS. Do not include any test from that dir.
+LOCAL_SRC_FILES += $(filter-out %Test.java,$(call all-java-files-under, ../../../../tests/tests/openglperf/src))
+# do not use its own assets for this package.
+LOCAL_ASSET_DIR := $(LOCAL_PATH)/../../../../tests/tests/openglperf/assets
 
 LOCAL_PACKAGE_NAME := PtsDeviceUi
 
