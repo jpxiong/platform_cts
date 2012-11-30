@@ -25,6 +25,8 @@ import android.os.Environment;
 import android.test.AndroidTestCase;
 
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
@@ -44,11 +46,82 @@ public class MediaScannerNotificationTest extends AndroidTestCase {
         mContext.registerReceiver(startedReceiver, startedIntentFilter);
         mContext.registerReceiver(finishedReceiver, finshedIntentFilter);
 
+        String [] temps = new String[] { "avi", "gif", "jpg", "dat", "mp3", "mp4", "txt" };
+        String tmpPath = createTempFiles(temps);
+
         mContext.sendBroadcast(new Intent(Intent.ACTION_MEDIA_MOUNTED, Uri.parse("file://"
                 + Environment.getExternalStorageDirectory())));
 
         startedReceiver.waitForBroadcast();
         finishedReceiver.waitForBroadcast();
+
+        checkTempFiles(tmpPath, temps);
+
+        // add .nomedia file and scan again
+        File noMedia = new File(tmpPath, ".nomedia");
+        try {
+            noMedia.createNewFile();
+        } catch (IOException e) {
+            fail("couldn't create .nomedia file");
+        }
+        startedReceiver.reset();
+        finishedReceiver.reset();
+        mContext.sendBroadcast(new Intent(Intent.ACTION_MEDIA_MOUNTED, Uri.parse("file://"
+                + Environment.getExternalStorageDirectory())));
+        startedReceiver.waitForBroadcast();
+        finishedReceiver.waitForBroadcast();
+
+        checkTempFiles(tmpPath, temps);
+        assertTrue(noMedia.delete());
+        deleteTempFiles(tmpPath, temps);
+
+        // scan one more time just to clean everything up nicely
+        startedReceiver.reset();
+        finishedReceiver.reset();
+        mContext.sendBroadcast(new Intent(Intent.ACTION_MEDIA_MOUNTED, Uri.parse("file://"
+                + Environment.getExternalStorageDirectory())));
+        startedReceiver.waitForBroadcast();
+        finishedReceiver.waitForBroadcast();
+
+    }
+
+    String createTempFiles(String [] extensions) {
+        String externalPath = Environment.getExternalStorageDirectory().getAbsolutePath();
+        File tmpDir = new File(externalPath, "" + System.nanoTime());
+        String tmpPath = tmpDir.getAbsolutePath();
+        assertFalse(tmpPath + " already exists", tmpDir.exists());
+        assertTrue("failed to create " + tmpDir, tmpDir.mkdirs());
+
+        for (int i = 0; i < extensions.length; i++) {
+            File foo = new File(tmpPath, "foobar." + extensions[i]);
+            try {
+                // create a non-empty file
+                foo.createNewFile();
+                FileOutputStream out = new FileOutputStream(foo);
+                out.write(0x12);
+                out.flush();
+                out.close();
+                assertTrue(foo.length() != 0);
+            } catch (IOException e) {
+                fail("Error creating " + foo.getAbsolutePath() + ": " + e);
+            }
+        }
+        return tmpPath;
+    }
+
+    void checkTempFiles(String tmpPath, String [] extensions) {
+        for (int i = 0; i < extensions.length; i++) {
+            File foo = new File(tmpPath, "foobar." + extensions[i]);
+            assertTrue(foo.getAbsolutePath() + " no longer exists or was truncated",
+                    foo.length() != 0);
+        }
+    }
+
+    void deleteTempFiles(String tmpPath, String [] extensions) {
+        for (int i = 0; i < extensions.length; i++) {
+            assertTrue(new File(tmpPath, "foobar." + extensions[i]).delete());
+        }
+        assertTrue(new File(tmpPath).delete());
     }
 
     static class ScannerNotificationReceiver extends BroadcastReceiver {
@@ -56,7 +129,7 @@ public class MediaScannerNotificationTest extends AndroidTestCase {
         private static final int TIMEOUT_MS = 4 * 60 * 1000;
 
         private final String mAction;
-        private final CountDownLatch mLatch = new CountDownLatch(1);
+        private CountDownLatch mLatch = new CountDownLatch(1);
 
         ScannerNotificationReceiver(String action) {
             mAction = action;
@@ -75,6 +148,10 @@ public class MediaScannerNotificationTest extends AndroidTestCase {
                 fail("Failed to receive broadcast in " + TIMEOUT_MS + "ms for " + mAction
                         + " while trying to scan " + numFiles + " files!");
             }
+        }
+
+        void reset() {
+            mLatch = new CountDownLatch(1);
         }
 
         private int countFiles(File dir) {
