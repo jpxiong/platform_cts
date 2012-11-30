@@ -652,8 +652,8 @@ public class AccessibilityTextTraversalTest
                 AccessibilityNodeInfo.ACTION_PREVIOUS_AT_MOVEMENT_GRANULARITY, arguments));
 
         // Verify the selection position.
-        assertEquals(1, Selection.getSelectionStart(textView.getText()));
-        assertEquals(1, Selection.getSelectionEnd(textView.getText()));
+        assertEquals(0, Selection.getSelectionStart(textView.getText()));
+        assertEquals(0, Selection.getSelectionEnd(textView.getText()));
     }
 
     @MediumTest
