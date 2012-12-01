@@ -1661,6 +1661,63 @@ public class ViewGroupTest extends InstrumentationTestCase implements CTSResult{
         assertFalse(vg.isGetChildStaticTransformationCalled);
     }
 
+    static public int resetRtlPropertiesCount;
+    static public int resetResolvedLayoutDirectionCount;
+    static public int resetResolvedTextDirectionCount;
+    static public int resetResolvedTextAlignmentCount;
+    static public int resetResolvedPaddingCount;
+    static public int resetResolvedDrawablesCount;
+
+
+    private static void clearRtlCounters() {
+        resetRtlPropertiesCount = 0;
+        resetResolvedLayoutDirectionCount = 0;
+        resetResolvedTextDirectionCount = 0;
+        resetResolvedTextAlignmentCount = 0;
+        resetResolvedPaddingCount = 0;
+        resetResolvedDrawablesCount = 0;
+    }
+
+    public void testResetRtlProperties() {
+        clearRtlCounters();
+
+        MockViewGroup vg = new MockViewGroup(mContext);
+        MockView2 v1 = new MockView2(mContext);
+        MockView2 v2 = new MockView2(mContext);
+
+        MockViewGroup v3 = new MockViewGroup(mContext);
+        MockView2 v4 = new MockView2(mContext);
+
+        v3.addView(v4);
+        assertEquals(1, resetRtlPropertiesCount);
+        assertEquals(1, resetResolvedLayoutDirectionCount);
+        assertEquals(1, resetResolvedTextDirectionCount);
+        assertEquals(1, resetResolvedTextAlignmentCount);
+        assertEquals(1, resetResolvedPaddingCount);
+        assertEquals(1, resetResolvedDrawablesCount);
+
+        clearRtlCounters();
+        vg.addView(v1);
+        vg.addView(v2);
+        vg.addView(v3);
+
+        assertEquals(3, resetRtlPropertiesCount); // for v1 / v2 / v3 only
+        assertEquals(4, resetResolvedLayoutDirectionCount); // for v1 / v2 / v3 / v4
+        assertEquals(4, resetResolvedTextDirectionCount);
+        assertEquals(3, resetResolvedTextAlignmentCount); // for v1 / v2 / v3 only
+        assertEquals(4, resetResolvedPaddingCount);
+        assertEquals(4, resetResolvedDrawablesCount);
+
+        clearRtlCounters();
+        vg.resetRtlProperties();
+        assertEquals(1, resetRtlPropertiesCount); // for vg only
+        assertEquals(5, resetResolvedLayoutDirectionCount); // for all
+        assertEquals(5, resetResolvedTextDirectionCount);
+        assertEquals(1, resetResolvedTextAlignmentCount); // for vg only as TextAlignment is not inherited (default is Gravity)
+        assertEquals(5, resetResolvedPaddingCount);
+        assertEquals(5, resetResolvedDrawablesCount);
+    }
+
     static class MockTextView extends TextView {
 
         public boolean isClearFocusCalled;
@@ -2070,6 +2127,93 @@ public class ViewGroupTest extends InstrumentationTestCase implements CTSResult{
         @Override
         public void setStaticTransformationsEnabled(boolean enabled) {
             super.setStaticTransformationsEnabled(enabled);
+        }
+
+        @Override
+        public void resetRtlProperties() {
+            super.resetRtlProperties();
+            resetRtlPropertiesCount++;
+        }
+
+        @Override
+        public void resetResolvedLayoutDirection() {
+            super.resetResolvedLayoutDirection();
+            resetResolvedLayoutDirectionCount++;
+        }
+
+        @Override
+        public void resetResolvedTextDirection() {
+            super.resetResolvedTextDirection();
+            resetResolvedTextDirectionCount++;
+        }
+
+        @Override
+        public void resetResolvedTextAlignment() {
+            super.resetResolvedTextAlignment();
+            resetResolvedTextAlignmentCount++;
+        }
+
+        @Override
+        public void resetResolvedPadding() {
+            super.resetResolvedPadding();
+            resetResolvedPaddingCount++;
+        }
+
+        @Override
+        protected void resetResolvedDrawables() {
+            super.resetResolvedDrawables();
+            resetResolvedDrawablesCount++;
+        }
+    }
+
+    static class MockView2 extends View {
+
+        public MockView2(Context context) {
+            super(context);
+        }
+
+        public MockView2(Context context, AttributeSet attrs) {
+            super(context, attrs);
+        }
+
+        public MockView2(Context context, AttributeSet attrs, int defStyle) {
+            super(context, attrs, defStyle);
+        }
+
+        @Override
+        public void resetRtlProperties() {
+            super.resetRtlProperties();
+            resetRtlPropertiesCount++;
+        }
+
+        @Override
+        public void resetResolvedLayoutDirection() {
+            super.resetResolvedLayoutDirection();
+            resetResolvedLayoutDirectionCount++;
+        }
+
+        @Override
+        public void resetResolvedTextDirection() {
+            super.resetResolvedTextDirection();
+            resetResolvedTextDirectionCount++;
+        }
+
+        @Override
+        public void resetResolvedTextAlignment() {
+            super.resetResolvedTextAlignment();
+            resetResolvedTextAlignmentCount++;
+        }
+
+        @Override
+        public void resetResolvedPadding() {
+            super.resetResolvedPadding();
+            resetResolvedPaddingCount++;
+        }
+
+        @Override
+        protected void resetResolvedDrawables() {
+            super.resetResolvedDrawables();
+            resetResolvedDrawablesCount++;
         }
     }
 
