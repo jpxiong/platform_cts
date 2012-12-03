@@ -303,7 +303,7 @@ public class FileUtil {
         report.printArray("Rd amount", rdAmount, true);
         Stat.StatResult stat = Stat.getStat(mbps);
 
-        report.printSummary("MB/s", stat.mAverage, true, stat.mStddev);
+        report.printSummary("MB/s", stat.mAverage, stat.mStddev);
     }
 
     /**
@@ -353,7 +353,7 @@ public class FileUtil {
         report.printArray("Wr amount", wrAmount, true);
         Stat.StatResult stat = Stat.getStat(mbps);
 
-        report.printSummary("MB/s", stat.mAverage, true, stat.mStddev);
+        report.printSummary("MB/s", stat.mAverage, stat.mStddev);
     }
 
     /**
@@ -391,6 +391,6 @@ public class FileUtil {
             ReportLog.copyArray(mbps, mbpsAll, i * numberRepeatInOneRun);
         }
         Stat.StatResult stat = Stat.getStat(mbpsAll);
-        report.printSummary("MB/s", stat.mAverage, true, stat.mStddev);
+        report.printSummary("MB/s", stat.mAverage, stat.mStddev);
     }
 }

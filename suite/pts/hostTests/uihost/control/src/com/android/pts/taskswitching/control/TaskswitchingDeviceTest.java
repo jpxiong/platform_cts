@@ -83,7 +83,7 @@ public class TaskswitchingDeviceTest extends PtsAndroidTestCase {
         });
         getReportLog().printArray("ms", results, false);
         Stat.StatResult stat = Stat.getStat(results);
-        getReportLog().printSummary("Time ms", stat.mAverage, false, stat.mStddev);
+        getReportLog().printSummary("Time ms", stat.mAverage, stat.mStddev);
     }
 
     private void startActivity(String packageName, String activityName) {
