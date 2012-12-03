@@ -98,7 +98,7 @@ public class BrowserTest extends DeviceTestCase implements IBuildReceiver {
         }
         mReport.printArray("scores", results, true);
         Stat.StatResult stat = Stat.getStat(results);
-        mReport.printSummary("Score", stat.mAverage, true, stat.mStddev);
+        mReport.printSummary("Score", stat.mAverage, stat.mStddev);
     }
 
     private double runBenchmarking(String testMethodName, String resultPattern,

@@ -67,6 +67,6 @@ public class ScrollingTest extends PtsActivityInstrumentationTestCase2<Scrolling
         });
         getReportLog().printArray("ms", results, false);
         Stat.StatResult stat = Stat.getStat(results);
-        getReportLog().printSummary("Time ms", stat.mAverage, false, stat.mStddev);
+        getReportLog().printSummary("Time ms", stat.mAverage, stat.mStddev);
     }
 }

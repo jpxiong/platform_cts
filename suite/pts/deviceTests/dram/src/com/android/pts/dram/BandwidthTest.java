@@ -108,7 +108,7 @@ public class BandwidthTest extends PtsAndroidTestCase {
         // now this represents how many times the whole screen can be copied in a sec.
         double screensPerSecAverage = stat.mAverage / pixels * 1024.0 * 1024.0 / 4.0;
         double screensPerSecStddev = stat.mStddev / pixels * 1024.0 * 1024.0 / 4.0;
-        getReportLog().printSummary("screen copies per sec", screensPerSecAverage, true,
+        getReportLog().printSummary("screen copies per sec", screensPerSecAverage,
                 screensPerSecStddev);
     }
 }

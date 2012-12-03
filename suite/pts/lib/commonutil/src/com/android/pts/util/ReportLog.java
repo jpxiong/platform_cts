@@ -76,12 +76,11 @@ public class ReportLog {
      * For standard report summary with average and stddev
      * @param header
      * @param average
-     * @param tells if average with higher score is better or not (lower better for false)
      * @param stddev
      */
-    public void printSummary(String header, double average, boolean isHigherBetter, double stddev) {
-        mSummary = header + LOG_ELEM_SEPARATOR + "average " + average +  " " +
-        boolToInt(isHigherBetter) + LOG_ELEM_SEPARATOR + "stddev " + stddev + " 0";
+    public void printSummary(String header, double average, double stddev) {
+        mSummary = header + LOG_ELEM_SEPARATOR + "average " + average + LOG_ELEM_SEPARATOR +
+                "stddev " + stddev;
     }
 
     /**
@@ -89,16 +88,12 @@ public class ReportLog {
      * @param header
      * @param key1 String key for val1
      * @param val1
-     * @param val1HigherBetter higher score is better for val1
      * @param key2 String key for val2
      * @param val2
-     * @param val2HigherBetter higher score is better for val2
      */
-    public void printSummaryFull(String header, String key1, double val1, boolean val1HigherBetter,
-            String key2, double val2, boolean val2HigherBetter) {
-        mSummary = header + LOG_ELEM_SEPARATOR + key1 + " " + val1 + " " +
-            boolToInt(val1HigherBetter) + LOG_ELEM_SEPARATOR + key2 + " " + val2 + " " +
-            boolToInt(val2HigherBetter);
+    public void printSummaryFull(String header, String key1, double val1, String key2, double val2) {
+        mSummary = header + LOG_ELEM_SEPARATOR + key1 + " " + val1 + LOG_ELEM_SEPARATOR +
+                key2 + " " + val2;
     }
 
     public void throwReportToHost() throws PtsException {
@@ -184,13 +179,6 @@ public class ReportLog {
         return names;
     }
 
-    private static int boolToInt(boolean val) {
-        if (val) {
-            return 1;
-        } else {
-            return 0;
-        }
-    }
     /**
      * to be overridden by child to print message to be passed
      * @param msg
