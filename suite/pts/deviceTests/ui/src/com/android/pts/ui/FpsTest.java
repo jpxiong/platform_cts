@@ -119,6 +119,7 @@ public class FpsTest extends PtsActivityInstrumentationTestCase2<GlPlanetsActivi
         Log.i(TAG, " fps nominal " + fpsNominal + " fps measured " + fpsMeasured);
         getReportLog().printArray("intervals ms", intervals, false);
         getReportLog().printArray("jankiness ms", jankiness, false);
-        getReportLog().printSummaryFull("Frame interval", " max delay ms", maxDelay, "number of jank", jankNumber);
+        getReportLog().printSummaryFull("Frame interval", " max delay ms", maxDelay, false,
+                "number of jank", jankNumber, false);
     }
 }

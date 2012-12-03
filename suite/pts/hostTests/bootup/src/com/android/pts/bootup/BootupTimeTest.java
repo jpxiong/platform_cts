@@ -67,7 +67,7 @@ public class BootupTimeTest extends DeviceTestCase {
         });
         mReport.printArray("time in ms", result, false);
         StatResult stat = Stat.getStat(result);
-        mReport.printSummary("time in ms", stat.mAverage, stat.mStddev);
+        mReport.printSummary("time in ms", stat.mAverage, false, stat.mStddev);
     }
 
     private void rebootDevice() throws DeviceNotAvailableException {

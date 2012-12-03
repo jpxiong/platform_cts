@@ -65,7 +65,7 @@ public class SequentialRWTest extends PtsAndroidTestCase {
                 mbps, true);
         getReportLog().printArray("Wr amount", wrAmount, true);
         Stat.StatResult stat = Stat.getStat(mbps);
-        getReportLog().printSummary("MB/s", stat.mAverage, stat.mStddev);
+        getReportLog().printSummary("MB/s", stat.mAverage, true, stat.mStddev);
     }
 
     @TimeoutReq(minutes = 60)
@@ -106,6 +106,6 @@ public class SequentialRWTest extends PtsAndroidTestCase {
         getReportLog().printArray("read MB/s",
                 mbps, true);
         Stat.StatResult stat = Stat.getStat(mbps);
-        getReportLog().printSummary("MB/s", stat.mAverage, stat.mStddev);
+        getReportLog().printSummary("MB/s", stat.mAverage, true, stat.mStddev);
     }
 }
