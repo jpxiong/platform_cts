@@ -22,6 +22,7 @@ import android.util.Log;
 import android.view.Display;
 import android.view.WindowManager;
 
+import com.android.pts.util.PerfResultType;
 import com.android.pts.util.PtsActivityInstrumentationTestCase2;
 import com.android.pts.util.ReportLog;
 import com.android.pts.util.Stat;
@@ -119,6 +120,8 @@ public class FpsTest extends PtsActivityInstrumentationTestCase2<GlPlanetsActivi
         Log.i(TAG, " fps nominal " + fpsNominal + " fps measured " + fpsMeasured);
         getReportLog().printArray("intervals ms", intervals, false);
         getReportLog().printArray("jankiness ms", jankiness, false);
-        getReportLog().printSummaryFull("Frame interval", " max delay ms", maxDelay, "number of jank", jankNumber);
+        getReportLog().printSummaryFull("Frame interval",
+                "max delay ms", maxDelay, PerfResultType.LOWER_BETTER,
+                "number of jank", jankNumber, PerfResultType.LOWER_BETTER);
     }
 }

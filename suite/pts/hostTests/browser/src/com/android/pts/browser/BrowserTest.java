@@ -22,6 +22,7 @@ import com.android.cts.tradefed.build.CtsBuildHelper;
 import com.android.ddmlib.Log;
 import com.android.ddmlib.testrunner.RemoteAndroidTestRunner;
 import com.android.pts.ptsutil.LogcatLineReceiver;
+import com.android.pts.util.PerfResultType;
 import com.android.pts.util.ReportLog;
 import com.android.pts.util.Stat;
 import com.android.tradefed.build.IBuildInfo;
@@ -98,7 +99,8 @@ public class BrowserTest extends DeviceTestCase implements IBuildReceiver {
         }
         mReport.printArray("scores", results, true);
         Stat.StatResult stat = Stat.getStat(results);
-        mReport.printSummary("Score", stat.mAverage, stat.mStddev);
+        // Octane score is higher-better
+        mReport.printSummary("Score", stat.mAverage, PerfResultType.HIGHER_BETTER, stat.mStddev);
     }
 
     private double runBenchmarking(String testMethodName, String resultPattern,

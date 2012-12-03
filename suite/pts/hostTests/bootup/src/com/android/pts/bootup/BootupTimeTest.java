@@ -19,6 +19,7 @@ package com.android.pts.bootup;
 import android.cts.util.TimeoutReq;
 import com.android.pts.util.MeasureRun;
 import com.android.pts.util.MeasureTime;
+import com.android.pts.util.PerfResultType;
 import com.android.pts.util.ReportLog;
 import com.android.pts.util.Stat;
 import com.android.pts.util.Stat.StatResult;
@@ -67,7 +68,7 @@ public class BootupTimeTest extends DeviceTestCase {
         });
         mReport.printArray("time in ms", result, false);
         StatResult stat = Stat.getStat(result);
-        mReport.printSummary("time in ms", stat.mAverage, stat.mStddev);
+        mReport.printSummary("time in ms", stat.mAverage, PerfResultType.LOWER_BETTER, stat.mStddev);
     }
 
     private void rebootDevice() throws DeviceNotAvailableException {

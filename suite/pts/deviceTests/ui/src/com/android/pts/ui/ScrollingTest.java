@@ -18,6 +18,7 @@ package com.android.pts.ui;
 import android.cts.util.TimeoutReq;
 import com.android.pts.util.MeasureRun;
 import com.android.pts.util.MeasureTime;
+import com.android.pts.util.PerfResultType;
 import com.android.pts.util.PtsActivityInstrumentationTestCase2;
 import com.android.pts.util.ReportLog;
 import com.android.pts.util.Stat;
@@ -67,6 +68,7 @@ public class ScrollingTest extends PtsActivityInstrumentationTestCase2<Scrolling
         });
         getReportLog().printArray("ms", results, false);
         Stat.StatResult stat = Stat.getStat(results);
-        getReportLog().printSummary("Time ms", stat.mAverage, stat.mStddev);
+        getReportLog().printSummary("Time ms", stat.mAverage, PerfResultType.LOWER_BETTER,
+                stat.mStddev);
     }
 }

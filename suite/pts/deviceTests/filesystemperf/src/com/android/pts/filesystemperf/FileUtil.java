@@ -28,6 +28,7 @@ import java.util.Random;
 
 import com.android.pts.util.MeasureRun;
 import com.android.pts.util.MeasureTime;
+import com.android.pts.util.PerfResultType;
 import com.android.pts.util.ReportLog;
 import com.android.pts.util.Stat;
 import com.android.pts.util.SystemUtil;
@@ -303,7 +304,7 @@ public class FileUtil {
         report.printArray("Rd amount", rdAmount, true);
         Stat.StatResult stat = Stat.getStat(mbps);
 
-        report.printSummary("MB/s", stat.mAverage, stat.mStddev);
+        report.printSummary("MB/s", stat.mAverage, PerfResultType.HIGHER_BETTER, stat.mStddev);
     }
 
     /**
@@ -353,7 +354,7 @@ public class FileUtil {
         report.printArray("Wr amount", wrAmount, true);
         Stat.StatResult stat = Stat.getStat(mbps);
 
-        report.printSummary("MB/s", stat.mAverage, stat.mStddev);
+        report.printSummary("MB/s", stat.mAverage, PerfResultType.HIGHER_BETTER, stat.mStddev);
     }
 
     /**
@@ -391,6 +392,6 @@ public class FileUtil {
             ReportLog.copyArray(mbps, mbpsAll, i * numberRepeatInOneRun);
         }
         Stat.StatResult stat = Stat.getStat(mbpsAll);
-        report.printSummary("MB/s", stat.mAverage, stat.mStddev);
+        report.printSummary("MB/s", stat.mAverage, PerfResultType.HIGHER_BETTER, stat.mStddev);
     }
 }

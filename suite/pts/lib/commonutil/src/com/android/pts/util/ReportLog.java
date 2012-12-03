@@ -39,6 +39,7 @@ public class ReportLog {
     private List<String> mMessages = new LinkedList<String> ();
     private String mSummary = null;
     protected static int mDepth = 3;
+
     /**
      * print given value to the report
      * @param header string to explain the contents. It can be unit for the value.
@@ -76,11 +77,13 @@ public class ReportLog {
      * For standard report summary with average and stddev
      * @param header
      * @param average
+     * @param type type of average value. stddev does not need type.
      * @param stddev
      */
-    public void printSummary(String header, double average, double stddev) {
-        mSummary = header + LOG_ELEM_SEPARATOR + "average " + average + LOG_ELEM_SEPARATOR +
-                "stddev " + stddev;
+    public void printSummary(String header, double average, PerfResultType type, double stddev) {
+        mSummary = header + LOG_ELEM_SEPARATOR + "average " + average + " " + type.ordinal() +
+                LOG_ELEM_SEPARATOR + "stddev " + stddev + " " +
+                PerfResultType.LOWER_BETTER.ordinal();
     }
 
     /**
@@ -88,12 +91,15 @@ public class ReportLog {
      * @param header
      * @param key1 String key for val1
      * @param val1
+     * @param val1type
      * @param key2 String key for val2
      * @param val2
+     * @param val2type
      */
-    public void printSummaryFull(String header, String key1, double val1, String key2, double val2) {
-        mSummary = header + LOG_ELEM_SEPARATOR + key1 + " " + val1 + LOG_ELEM_SEPARATOR +
-                key2 + " " + val2;
+    public void printSummaryFull(String header, String key1, double val1, PerfResultType val1type,
+            String key2, double val2, PerfResultType val2type) {
+        mSummary = header + LOG_ELEM_SEPARATOR + key1 + " " + val1 + " " + val1type.ordinal() +
+                LOG_ELEM_SEPARATOR + key2 + " " + val2 + " " + val2type.ordinal();
     }
 
     public void throwReportToHost() throws PtsException {

@@ -19,6 +19,7 @@ package com.android.pts.filesystemperf;
 import android.cts.util.TimeoutReq;
 import com.android.pts.util.MeasureRun;
 import com.android.pts.util.MeasureTime;
+import com.android.pts.util.PerfResultType;
 import com.android.pts.util.PtsAndroidTestCase;
 import com.android.pts.util.ReportLog;
 import com.android.pts.util.Stat;
@@ -65,7 +66,8 @@ public class SequentialRWTest extends PtsAndroidTestCase {
                 mbps, true);
         getReportLog().printArray("Wr amount", wrAmount, true);
         Stat.StatResult stat = Stat.getStat(mbps);
-        getReportLog().printSummary("MB/s", stat.mAverage, stat.mStddev);
+        getReportLog().printSummary("MB/s", stat.mAverage, PerfResultType.HIGHER_BETTER,
+                stat.mStddev);
     }
 
     @TimeoutReq(minutes = 60)
@@ -106,6 +108,7 @@ public class SequentialRWTest extends PtsAndroidTestCase {
         getReportLog().printArray("read MB/s",
                 mbps, true);
         Stat.StatResult stat = Stat.getStat(mbps);
-        getReportLog().printSummary("MB/s", stat.mAverage, stat.mStddev);
+        getReportLog().printSummary("MB/s", stat.mAverage, PerfResultType.HIGHER_BETTER,
+                stat.mStddev);
     }
 }

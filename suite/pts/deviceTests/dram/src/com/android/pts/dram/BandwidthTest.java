@@ -21,6 +21,7 @@ import android.graphics.Point;
 import android.util.Log;
 import android.view.WindowManager;
 
+import com.android.pts.util.PerfResultType;
 import com.android.pts.util.PtsAndroidTestCase;
 import com.android.pts.util.ReportLog;
 import com.android.pts.util.Stat;
@@ -109,6 +110,6 @@ public class BandwidthTest extends PtsAndroidTestCase {
         double screensPerSecAverage = stat.mAverage / pixels * 1024.0 * 1024.0 / 4.0;
         double screensPerSecStddev = stat.mStddev / pixels * 1024.0 * 1024.0 / 4.0;
         getReportLog().printSummary("screen copies per sec", screensPerSecAverage,
-                screensPerSecStddev);
+                PerfResultType.HIGHER_BETTER, screensPerSecStddev);
     }
 }

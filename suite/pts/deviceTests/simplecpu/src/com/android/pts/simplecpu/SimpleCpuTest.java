@@ -18,6 +18,7 @@ package com.android.pts.simplecpu;
 
 import android.cts.util.TimeoutReq;
 
+import com.android.pts.util.PerfResultType;
 import com.android.pts.util.PtsAndroidTestCase;
 import com.android.pts.util.ReportLog;
 import com.android.pts.util.Stat;
@@ -97,7 +98,8 @@ public class SimpleCpuTest extends PtsAndroidTestCase {
         }
         getReportLog().printArray("ms", result, false);
         Stat.StatResult stat = Stat.getStat(result);
-        getReportLog().printSummary("ms", stat.mAverage, stat.mStddev);
+        getReportLog().printSummary("ms", stat.mAverage, PerfResultType.LOWER_BETTER,
+                stat.mStddev);
     }
 
     /**
@@ -114,7 +116,8 @@ public class SimpleCpuTest extends PtsAndroidTestCase {
         }
         getReportLog().printArray("ms", result, false);
         Stat.StatResult stat = Stat.getStat(result);
-        getReportLog().printSummary("ms", stat.mAverage, stat.mStddev);
+        getReportLog().printSummary("ms", stat.mAverage, PerfResultType.LOWER_BETTER,
+                stat.mStddev);
     }
 
 }
