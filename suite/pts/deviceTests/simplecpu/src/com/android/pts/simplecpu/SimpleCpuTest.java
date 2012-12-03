@@ -97,7 +97,7 @@ public class SimpleCpuTest extends PtsAndroidTestCase {
         }
         getReportLog().printArray("ms", result, false);
         Stat.StatResult stat = Stat.getStat(result);
-        getReportLog().printSummary("ms", stat.mAverage, stat.mStddev);
+        getReportLog().printSummary("ms", stat.mAverage, false, stat.mStddev);
     }
 
     /**
@@ -114,7 +114,7 @@ public class SimpleCpuTest extends PtsAndroidTestCase {
         }
         getReportLog().printArray("ms", result, false);
         Stat.StatResult stat = Stat.getStat(result);
-        getReportLog().printSummary("ms", stat.mAverage, stat.mStddev);
+        getReportLog().printSummary("ms", stat.mAverage, false, stat.mStddev);
     }
 
 }
