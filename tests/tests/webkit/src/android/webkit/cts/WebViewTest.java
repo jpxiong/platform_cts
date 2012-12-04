@@ -1676,15 +1676,13 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
         // WebViewClient.shouldOverrideUrlLoading() returns false, so
         // the WebView will load the new URL.
         mOnUiThread.setDownloadListener(listener);
+        mWebView.getSettings().setJavaScriptEnabled(true);
         mOnUiThread.loadDataAndWaitForCompletion(
-                "<html><body><a href=\"" + url
-                + "\">link</a></body></html>",
+                "<html><body onload=\"window.location = \'" + url + "\'\"></body></html>",
                 "text/html", null);
         // Wait for layout to complete before setting focus.
         getInstrumentation().waitForIdleSync();
-        assertTrue(mOnUiThread.requestFocus(View.FOCUS_DOWN, null));
-        getInstrumentation().waitForIdleSync();
-        getInstrumentation().sendKeyDownUpSync(KeyEvent.KEYCODE_DPAD_CENTER);
+
         new PollingCheck(TEST_TIMEOUT) {
             @Override
             protected boolean check() {
