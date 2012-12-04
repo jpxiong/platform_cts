@@ -66,6 +66,7 @@ cts_test_packages := \
 	CtsDisplayTestCases \
 	CtsDpiTestCases \
 	CtsDpiTestCases2 \
+	CtsDreamsTestCases \
 	CtsDrmTestCases \
 	CtsEffectTestCases \
 	CtsExampleTestCases \
