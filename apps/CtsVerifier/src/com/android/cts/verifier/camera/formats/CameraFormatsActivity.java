@@ -28,12 +28,14 @@ import android.graphics.ImageFormat;
 import android.graphics.Matrix;
 import android.graphics.SurfaceTexture;
 import android.hardware.Camera;
+import android.hardware.Camera.CameraInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
 import android.util.SparseArray;
 import android.view.View;
+import android.view.Surface;
 import android.view.TextureView;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -62,6 +64,7 @@ public class CameraFormatsActivity extends PassFailButtons.Activity
     private SurfaceTexture mPreviewTexture;
     private int mPreviewTexWidth;
     private int mPreviewTexHeight;
+    private int mPreviewRotation;
 
     private ImageView mFormatView;
 
@@ -331,9 +334,40 @@ public class CameraFormatsActivity extends PassFailButtons.Activity
         mNextPreviewFormat = mPreviewFormats.get(0);
         mFormatSpinner.setSelection(0);
 
+
+        // Set up correct display orientation
+
+        CameraInfo info =
+            new CameraInfo();
+        Camera.getCameraInfo(id, info);
+        int rotation = getWindowManager().getDefaultDisplay().getRotation();
+        int degrees = 0;
+        switch (rotation) {
+            case Surface.ROTATION_0: degrees = 0; break;
+            case Surface.ROTATION_90: degrees = 90; break;
+            case Surface.ROTATION_180: degrees = 180; break;
+            case Surface.ROTATION_270: degrees = 270; break;
+        }
+
+        if (info.facing == Camera.CameraInfo.CAMERA_FACING_FRONT) {
+            mPreviewRotation = (info.orientation + degrees) % 360;
+            mPreviewRotation = (360 - mPreviewRotation) % 360;  // compensate the mirror
+        } else {  // back-facing
+            mPreviewRotation = (info.orientation - degrees + 360) % 360;
+        }
+        if (mPreviewRotation != 0 && mPreviewRotation != 180) {
+            Log.w(TAG,
+                "Display orientation correction is not 0 or 180, as expected!");
+        }
+
+        mCamera.setDisplayOrientation(mPreviewRotation);
+
+        // Start up preview if display is ready
+
         if (mPreviewTexture != null) {
             startPreview();
         }
+
     }
 
     private void shutdownCamera() {
@@ -539,15 +573,22 @@ public class CameraFormatsActivity extends PassFailButtons.Activity
         int w = mPreviewSize.width;
         int h = mPreviewSize.height;
         // RGBA output
+        int rgbInc = 1;
+        if (mPreviewRotation == 180) {
+            rgbInc = -1;
+        }
         int index = 0;
         for (int y = 0; y < h; y++) {
             int rgbIndex = y * w;
+            if (mPreviewRotation == 180) {
+                rgbIndex = w * (h - y) - 1;
+            }
             for (int x = 0; x < mPreviewSize.width/3; x++) {
                 int r = data[index + 0] & 0xFF;
                 int g = data[index + 1] & 0xFF;
                 int b = data[index + 2] & 0xFF;
                 rgbData[rgbIndex] = Color.rgb(r,g,b);
-                rgbIndex += 1;
+                rgbIndex += rgbInc;
                 index += 3;
             }
         }
@@ -561,6 +602,11 @@ public class CameraFormatsActivity extends PassFailButtons.Activity
         int h = mPreviewSize.height;
         // RGBA output
         int rgbIndex = 0;
+        int rgbInc = 1;
+        if (mPreviewRotation == 180) {
+            rgbIndex = h * w - 1;
+            rgbInc = -1;
+        }
         int yIndex = 0;
         int uvRowIndex = w*h;
         int uvRowInc = 0;
@@ -579,7 +625,7 @@ public class CameraFormatsActivity extends PassFailButtons.Activity
                 rgbData[rgbIndex] =
                         Color.rgb(yv, uv, vv);
 
-                rgbIndex += 1;
+                rgbIndex += rgbInc;
                 yIndex += 1;
                 uIndex += uvInc;
                 vIndex += uvInc;
@@ -599,6 +645,12 @@ public class CameraFormatsActivity extends PassFailButtons.Activity
         int h = mPreviewSize.height;
         // RGBA output
         int rgbIndex = 0;
+        int rgbInc = 1;
+        if (mPreviewRotation == 180) {
+            rgbIndex = h * w - 1;
+            rgbInc = -1;
+        }
+
         int yStride = (int)Math.ceil(w / 16.0) * 16;
         int uvStride = (int)Math.ceil(yStride/2/16.0) * 16;
         int ySize = yStride * h;
@@ -630,7 +682,7 @@ public class CameraFormatsActivity extends PassFailButtons.Activity
                 rgbData[rgbIndex] =
                         Color.rgb(yv, uv, vv);
 
-                rgbIndex += 1;
+                rgbIndex += rgbInc;
                 yIndex += 1;
             }
         }
@@ -645,13 +697,19 @@ public class CameraFormatsActivity extends PassFailButtons.Activity
         int uIndex = 1;
         int vIndex = 3;
         int rgbIndex = 0;
+        int rgbInc = 1;
+        if (mPreviewRotation == 180) {
+            rgbIndex = h * w - 1;
+            rgbInc = -1;
+        }
+
         for (int y = 0; y < h; y++) {
             for (int x = 0; x < w; x++) {
                 int yv = data[yIndex] & 0xFF;
                 int uv = data[uIndex] & 0xFF;
                 int vv = data[vIndex] & 0xFF;
                 rgbData[rgbIndex] = Color.rgb(yv,uv,vv);
-                rgbIndex += 1;
+                rgbIndex += rgbInc;
                 yIndex += 2;
                 if ( (x & 0x1) == 1 ) {
                     uIndex += 4;
