@@ -33,7 +33,11 @@ LOCAL_SDK_VERSION := current
 # To be passed in on command line
 CTS_API_VERSION ?= current
 
+ifeq (current,$(CTS_API_VERSION))
+android_api_description := frameworks/base/api/$(CTS_API_VERSION).txt
+else
 android_api_description := $(SRC_API_DIR)/$(CTS_API_VERSION).txt
+endif
 
 # Can't call local-intermediates-dir directly here because we have to
 # include BUILD_PACAKGE first.  Can't include BUILD_PACKAGE first

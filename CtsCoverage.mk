@@ -24,7 +24,7 @@ dexdeps_exe := $(HOST_OUT_EXECUTABLES)/dexdeps
 
 coverage_out := $(HOST_OUT)/cts-api-coverage
 
-api_text_description := $(SRC_API_DIR)/current.txt
+api_text_description := frameworks/base/api/current.txt
 api_xml_description := $(coverage_out)/api.xml
 $(api_xml_description) : $(api_text_description) $(APICHECK)
 	$(hide) echo "Converting API file to XML: $@"
