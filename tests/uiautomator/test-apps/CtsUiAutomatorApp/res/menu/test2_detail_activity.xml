@@ -15,8 +15,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  -->
-<resources>
-
-    <style name="AppTheme" parent="android:Theme.Light" />
-
-</resources>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:id="@+id/menu_text1"
+        android:title="Submit" />
+    <item android:id="@+id/menu_text2"
+        android:icon="@drawable/ic_launcher"
+        android:title="Done" />
+    <item android:id="@+id/menu_text3"
+        android:title="OK" />
+    <item android:id="@+id/menu_text4"
+        android:title="Finish" />
+    <item android:id="@+id/menu_text5"
+        android:title="Complete" />
+    <item android:id="@+id/menu_text6"
+        android:title="Exit" />
+</menu>
