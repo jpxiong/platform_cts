@@ -3151,7 +3151,12 @@ public class TextViewTest extends ActivityInstrumentationTestCase2<TextViewStubA
         tv.setTextDirection(View.TEXT_DIRECTION_INHERIT);
         assertEquals(View.TEXT_DIRECTION_RTL, tv.getTextDirection());
 
+        // No reset when we remove the view
         ll.removeView(tv);
+        assertEquals(View.TEXT_DIRECTION_RTL, tv.getTextDirection());
+
+        // Reset is done when we add the view
+        ll.addView(tv);
         assertEquals(View.TEXT_DIRECTION_FIRST_STRONG, tv.getTextDirection());
     }
 
