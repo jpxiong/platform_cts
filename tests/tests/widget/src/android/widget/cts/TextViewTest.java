@@ -3279,8 +3279,13 @@ public class TextViewTest extends ActivityInstrumentationTestCase2<TextViewStubA
         tv.setTextAlignment(View.TEXT_ALIGNMENT_INHERIT);
         assertEquals(View.TEXT_ALIGNMENT_CENTER, tv.getTextAlignment());
 
+        // No reset when we remove the view
         ll.removeView(tv);
-        // default text alignment is GRAVITY
+        assertEquals(View.TEXT_ALIGNMENT_CENTER, tv.getTextAlignment());
+
+        // Reset is done when we add the view
+        // Default text alignment is GRAVITY
+        ll.addView(tv);
         assertEquals(View.TEXT_ALIGNMENT_GRAVITY, tv.getTextAlignment());
     }
 
