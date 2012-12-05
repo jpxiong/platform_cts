@@ -188,10 +188,10 @@ public class AllocationTest extends RSBaseGraphics {
 
     void helperCreateFromBitmap(Bitmap B,
                                 Allocation.MipmapControl mc) {
-        for (int i = 0; i < 1; i++) {
-            for (int j = 0; j < 1; j++) {
-                for (int k = 0; k < 1; k++) {
-                    for (int l = 0; l < 1; l++) {
+        for (int i = 0; i <= 1; i++) {
+            for (int j = 0; j <= 1; j++) {
+                for (int k = 0; k <= 1; k++) {
+                    for (int l = 0; l <= 1; l++) {
                         int u = 0;
                         u |= (i * Allocation.USAGE_SCRIPT);
                         u |= (j * Allocation.USAGE_GRAPHICS_TEXTURE);
