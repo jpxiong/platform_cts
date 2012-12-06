@@ -21,6 +21,7 @@ import android.content.Context;
 import android.media.AudioManager;
 import android.media.Ringtone;
 import android.media.RingtoneManager;
+import android.net.Uri;
 import android.provider.Settings;
 import android.test.AndroidTestCase;
 
@@ -32,6 +33,7 @@ public class RingtoneTest extends AndroidTestCase {
     private int mOriginalVolume;
     private int mOriginalRingerMode;
     private int mOriginalStreamType;
+    private Uri mDefaultRingUri;
 
     @Override
     protected void setUp() throws Exception {
@@ -49,6 +51,9 @@ public class RingtoneTest extends AndroidTestCase {
                 AudioManager.FLAG_ALLOW_RINGER_MODES);
         // make sure that we are not in silent mode
         mAudioManager.setRingerMode(AudioManager.RINGER_MODE_NORMAL);
+
+        mDefaultRingUri = RingtoneManager.getActualDefaultRingtoneUri(mContext,
+                RingtoneManager.TYPE_RINGTONE);
     }
 
     @Override
@@ -63,6 +68,8 @@ public class RingtoneTest extends AndroidTestCase {
             mAudioManager.setStreamVolume(AudioManager.STREAM_RING, mOriginalVolume,
                     AudioManager.FLAG_ALLOW_RINGER_MODES);
         }
+        RingtoneManager.setActualDefaultRingtoneUri(mContext, RingtoneManager.TYPE_RINGTONE,
+                mDefaultRingUri);
         super.tearDown();
     }
 
@@ -79,8 +86,20 @@ public class RingtoneTest extends AndroidTestCase {
         mRingtone.setStreamType(AudioManager.STREAM_RING);
         assertEquals(AudioManager.STREAM_RING, mRingtone.getStreamType());
 
+        // test both the "None" ringtone and an actual ringtone
+        RingtoneManager.setActualDefaultRingtoneUri(mContext, RingtoneManager.TYPE_RINGTONE, null);
+        mRingtone = RingtoneManager.getRingtone(mContext, Settings.System.DEFAULT_RINGTONE_URI);
+        assertTrue(mRingtone.getStreamType() == AudioManager.STREAM_RING);
         mRingtone.play();
-        assertTrue(mRingtone.isPlaying());
+        assertFalse(mRingtone.isPlaying());
+
+        Uri uri = RingtoneManager.getValidRingtoneUri(mContext);
+        assertNotNull("ringtone was unexpectedly null", uri);
+        RingtoneManager.setActualDefaultRingtoneUri(mContext, RingtoneManager.TYPE_RINGTONE, uri);
+        mRingtone = RingtoneManager.getRingtone(mContext, Settings.System.DEFAULT_RINGTONE_URI);
+        assertTrue(mRingtone.getStreamType() == AudioManager.STREAM_RING);
+        mRingtone.play();
+        assertTrue("couldn't play ringtone " + uri, mRingtone.isPlaying());
         mRingtone.stop();
         assertFalse(mRingtone.isPlaying());
     }
