@@ -90,6 +90,29 @@ public class Test_invoke_interface extends DxTestCase {
     }
 
     /**
+     * @title dvmInterpFindInterfaceMethod failures were putting NULL Method*s
+     * in the interface cache, leading to a null pointer deference the second
+     * time you made the same bad call, with no exception thrown.
+     * See http://code.google.com/p/android/issues/detail?id=29358 for details.
+     */
+    public void testE4_2() {
+        //@uses dot.junit.opcodes.invoke_interface.d.T_invoke_interface_11
+        //@uses dot.junit.opcodes.invoke_interface.ITest
+        //@uses dot.junit.opcodes.invoke_interface.ITestImpl
+        T_invoke_interface_11 t = new T_invoke_interface_11();
+        try {
+            t.run();
+            fail("expected IncompatibleClassChangeError");
+        } catch (IncompatibleClassChangeError expected) {
+        }
+        try {
+            t.run();
+            fail("expected IncompatibleClassChangeError");
+        } catch (IncompatibleClassChangeError expected) {
+        }
+    }
+
+    /**
      * @title Native method can't be linked
      */
     public void testE5() {
