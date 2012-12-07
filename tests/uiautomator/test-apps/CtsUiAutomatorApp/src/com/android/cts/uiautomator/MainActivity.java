@@ -35,6 +35,8 @@ public class MainActivity extends FragmentActivity implements TestListFragment.C
                 WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON |
                       WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
+        setContentView(R.layout.list_activity);
+
         if (findViewById(R.id.test_detail_container) != null) {
             mTwoPane = true;
             ((TestListFragment) getSupportFragmentManager().findFragmentById(R.id.item_list))
