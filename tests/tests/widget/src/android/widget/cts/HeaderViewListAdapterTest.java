@@ -81,6 +81,21 @@ public class HeaderViewListAdapterTest extends AndroidTestCase {
         HeaderViewFullAdapter fullAdapter = new HeaderViewFullAdapter();
         headerViewListAdapter = new HeaderViewListAdapter(null, null, fullAdapter);
         assertFalse(headerViewListAdapter.isEmpty());
+
+        ListView lv = new ListView(getContext());
+        ArrayList<ListView.FixedViewInfo> header = new ArrayList<ListView.FixedViewInfo>(4);
+        header.add(lv.new FixedViewInfo());
+        headerViewListAdapter = new HeaderViewListAdapter(header, null, null);
+        assertEquals(1, headerViewListAdapter.getHeadersCount());
+        assertFalse(headerViewListAdapter.isEmpty());
+
+        lv = new ListView(getContext());
+        ArrayList<ListView.FixedViewInfo> footer = new ArrayList<ListView.FixedViewInfo>(4);
+        footer.add(lv.new FixedViewInfo());
+        headerViewListAdapter = new HeaderViewListAdapter(null, footer, null);
+        assertEquals(1, headerViewListAdapter.getFootersCount());
+        assertFalse(headerViewListAdapter.isEmpty());
+
     }
 
     public void testRemoveHeader() {
