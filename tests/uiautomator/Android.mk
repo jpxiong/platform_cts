@@ -22,7 +22,7 @@ LOCAL_MODULE_PATH := $(TARGET_OUT_DATA)/local/tmp
 LOCAL_SRC_FILES := $(call all-java-files-under, src)
 
 LOCAL_MODULE := CtsUiAutomatorTests
-LOCAL_JAVA_LIBRARIES := uiautomator_sdk_v16
+LOCAL_JAVA_LIBRARIES := uiautomator_sdk_v17
 LOCAL_PROGUARD_ENABLED := disabled
 LOCAL_CTS_TEST_APK := CtsUiAutomatorApp
 LOCAL_CTS_TEST_APP_PACKAGE := com.android.cts.uiautomator
