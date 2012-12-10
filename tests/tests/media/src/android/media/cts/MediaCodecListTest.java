@@ -17,10 +17,11 @@
 package android.media.cts;
 
 
-import android.media.MediaCodecList;
+import android.media.MediaCodec;
 import android.media.MediaCodecInfo;
 import android.media.MediaCodecInfo.CodecProfileLevel;
 import android.media.MediaCodecInfo.CodecCapabilities;
+import android.media.MediaCodecList;
 import android.test.AndroidTestCase;
 import android.util.Log;
 
@@ -51,6 +52,63 @@ public class MediaCodecListTest extends AndroidTestCase {
     public static void testMediaCodecXmlFileExist() {
         File file = new File(MEDIA_CODEC_XML_FILE);
         assertTrue("/etc/media_codecs.xml does not exist", file.exists());
+    }
+
+    // Each component advertised by MediaCodecList should at least be
+    // instantiate-able.
+    public void testComponentInstantiation() {
+        Log.d(TAG, "testComponentInstantiation");
+
+        int codecCount = MediaCodecList.getCodecCount();
+        for (int i = 0; i < codecCount; ++i) {
+            MediaCodecInfo info = MediaCodecList.getCodecInfoAt(i);
+
+            Log.d(TAG, (i + 1) + ": " + info.getName());
+            Log.d(TAG, "  isEncoder = " + info.isEncoder());
+
+            if (!info.getName().startsWith("OMX.")) {
+                // Unfortunately for legacy reasons, "AACEncoder", a
+                // non OMX component had to be in this list for the video
+                // editor code to work... but it cannot actually be instantiated
+                // using MediaCodec.
+                Log.d(TAG, "  skipping...");
+                continue;
+            }
+
+            MediaCodec codec = MediaCodec.createByCodecName(info.getName());
+
+            codec.release();
+            codec = null;
+        }
+    }
+
+    // For each type advertised by any of the components we should be able
+    // to get capabilities.
+    public void testGetCapabilities() {
+        Log.d(TAG, "testGetCapabilities");
+
+        int codecCount = MediaCodecList.getCodecCount();
+        for (int i = 0; i < codecCount; ++i) {
+            MediaCodecInfo info = MediaCodecList.getCodecInfoAt(i);
+
+            Log.d(TAG, (i + 1) + ": " + info.getName());
+            Log.d(TAG, "  isEncoder = " + info.isEncoder());
+
+            if (!info.getName().startsWith("OMX.")) {
+                // Unfortunately for legacy reasons, "AACEncoder", a
+                // non OMX component had to be in this list for the video
+                // editor code to work... but it cannot actually be instantiated
+                // using MediaCodec.
+                Log.d(TAG, "  skipping...");
+                continue;
+            }
+
+            String[] types = info.getSupportedTypes();
+            for (int j = 0; j < types.length; ++j) {
+                Log.d(TAG, "calling getCapabilitiesForType " + types[j]);
+                CodecCapabilities cap = info.getCapabilitiesForType(types[j]);
+            }
+        }
     }
 
     public void testRequiredMediaCodecList() {
