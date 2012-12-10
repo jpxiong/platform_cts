@@ -31,8 +31,11 @@
     <string name="test2_description_2">This tests a Button text changing dynamically after a click. The test should attempt to find the button after it has changed using its new text.</string>
     <string name="test3_description">The tests should read the clock, then write the clock back into the EditText then press submit. A dialog will display the time it took from reading the clock until submit is press. This can be used to get an idea of performance differences.</string>
     <string name="button1">Button 1</string>
+    <string name="button1long">Longclick Button 1</string>
     <string name="button2">Button 2</string>
+    <string name="button2long">Longclick Button 2</string>
     <string name="button3">Button 3</string>
+    <string name="button3long">Longclick Button 3</string>
     <string name="buttonBefore">Before</string>
     <string name="buttonAfter">After</string>
     <string name="dialog_title_result">Action results</string>
