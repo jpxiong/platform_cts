@@ -78,6 +78,19 @@ public class Test2DetailFragment extends Fragment {
             }
         });
 
+        mButton1.setOnLongClickListener(new Button.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+                builder.setTitle(R.string.dialog_title_result);
+                builder.setPositiveButton(R.string.OK, null);
+                builder.setMessage(R.string.button1long);
+                AlertDialog diag = builder.create();
+                diag.show();
+                return true;
+            }
+        });
+
         mButton2.setOnClickListener(new Button.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -90,6 +103,19 @@ public class Test2DetailFragment extends Fragment {
             }
         });
 
+        mButton2.setOnLongClickListener(new Button.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+                builder.setTitle(R.string.dialog_title_result);
+                builder.setPositiveButton(R.string.OK, null);
+                builder.setMessage(R.string.button2long);
+                AlertDialog diag = builder.create();
+                diag.show();
+                return true;
+            }
+        });
+
         mButton3.setOnClickListener(new Button.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -99,6 +125,19 @@ public class Test2DetailFragment extends Fragment {
                 builder.setMessage(R.string.button3);
                 AlertDialog diag = builder.create();
                 diag.show();
+            }
+        });
+
+        mButton3.setOnLongClickListener(new Button.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+                builder.setTitle(R.string.dialog_title_result);
+                builder.setPositiveButton(R.string.OK, null);
+                builder.setMessage(R.string.button3long);
+                AlertDialog diag = builder.create();
+                diag.show();
+                return true;
             }
         });
 
