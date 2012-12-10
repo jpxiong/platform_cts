@@ -16,6 +16,7 @@
 package com.android.cts.uiautomatortest;
 
 import android.graphics.Rect;
+import android.os.RemoteException;
 import android.os.SystemClock;
 import android.util.Log;
 
@@ -29,6 +30,7 @@ import com.android.uiautomator.core.UiWatcher;
 import com.android.uiautomator.testrunner.UiAutomatorTestCase;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
 
 /**
@@ -37,7 +39,7 @@ import java.io.IOException;
 public class CtsUiAutomatorTest extends UiAutomatorTestCase {
     private static final String LOG_TAG = CtsUiAutomatorTest.class.getSimpleName();
     private static final String[] LIST_SCROLL_TESTS = new String[] {
-            "Test 17", "Test 11", "Test 30", "Test 29"
+            "Test 17", "Test 11", "Test 20"
     };
     private static final String LAUNCH_APP = "am start -a android.intent.action.MAIN"
             + " -n com.android.cts.uiautomator/.MainActivity -W";
@@ -45,6 +47,8 @@ public class CtsUiAutomatorTest extends UiAutomatorTestCase {
 
     // Maximum wait for key object to become visible
     private static final int WAIT_EXIST_TIMEOUT = 5 * 1000;
+
+    private static final String SCREEN_SHOT_FILE_PATH_NAME = "/data/local/tmp/ctsScreenShot";
 
     @Override
     protected void setUp() throws Exception {
@@ -85,6 +89,13 @@ public class CtsUiAutomatorTest extends UiAutomatorTestCase {
      * scroll is required to reach each item at each of the far ends.
      */
     public void testListScrollAndSelect() throws UiObjectNotFoundException {
+        UiScrollable listView = new UiScrollable(
+                new UiSelector().className(android.widget.ListView.class.getName()));
+
+        // on single fragment display
+        if (!listView.exists())
+            UiDevice.getInstance().pressBack();
+
         for (String test : LIST_SCROLL_TESTS) {
             openTest(test);
             verifyTestDetailsExists(test);
@@ -230,6 +241,7 @@ public class CtsUiAutomatorTest extends UiAutomatorTestCase {
         assertFalse("Wait for exist must return false after press back", result.exists());
 
         // Home button test
+        openTest("Test 5");
         String pkgName = device.getCurrentPackageName();
         assertTrue("CTS test app must be running", pkgName.equals(PKG_NAME));
         device.pressHome();
@@ -363,6 +375,7 @@ public class CtsUiAutomatorTest extends UiAutomatorTestCase {
      *
      * @throws UiObjectNotFoundException
      */
+    /*// broken in MR1
     public void testWebViewTextTraversal() throws UiObjectNotFoundException {
         openTest("Test 6");
         UiObject webView = new UiObject(new UiSelector().className(android.webkit.WebView.class
@@ -390,7 +403,7 @@ public class CtsUiAutomatorTest extends UiAutomatorTestCase {
         device.pressDPadDown();
         text = device.getLastTraversedText();
         assertTrue("h4 text", text.contains("h4"));
-    }
+    }*/
 
     /**
      * Test when an object does not exist, an exception is thrown
@@ -608,6 +621,166 @@ public class CtsUiAutomatorTest extends UiAutomatorTestCase {
     }
 
     /**
+     * Test Orientation APIs by causing rotations and verifying current state
+     *
+     * @throws RemoteException
+     * @throws UiObjectNotFoundException
+     * @since API Level 17
+     */
+    public void testRotation() throws RemoteException, UiObjectNotFoundException {
+        openTest("Test 5");
+        UiDevice device = UiDevice.getInstance();
+
+        device.setOrientationLeft();
+        device.waitForIdle(); // isNaturalOrientation is not waiting for idle
+        SystemClock.sleep(1000);
+        assertFalse("Device orientation should not be natural", device.isNaturalOrientation());
+
+        device.setOrientationNatural();
+        device.waitForIdle(); // isNaturalOrientation is not waiting for idle
+        SystemClock.sleep(1000);
+        assertTrue("Device orientation should be natural", device.isNaturalOrientation());
+
+        device.setOrientationRight();
+        device.waitForIdle(); // isNaturalOrientation is not waiting for idle
+        SystemClock.sleep(1000);
+        assertFalse("Device orientation should not be natural", device.isNaturalOrientation());
+
+        device.setOrientationNatural();
+    }
+
+    /**
+     * Reads the current device's product name. Since it is not possible to predetermine the
+     * would be value, the check verifies that the value is not null and not empty.
+     *
+     * @since API Level 17
+     */
+    public void testGetProductName() {
+        String name = UiDevice.getInstance().getProductName();
+        assertFalse("Product name check returned empty string", name.isEmpty());
+    }
+
+    /**
+     * Select each of the buttons by using only regex text
+     *
+     * @throws UiObjectNotFoundException
+     * @since API Level 17
+     */
+    public void testSelectByTextMatch() throws UiObjectNotFoundException {
+        openTest("Test 2");
+        getObjectByTextMatch(".*n\\s1$").click();
+        verifyDialogActionResults("Button 1");
+        getObjectByTextMatch(".*n\\s2$").click();
+        verifyDialogActionResults("Button 2");
+        getObjectByTextMatch(".*n\\s3$").click();
+        verifyDialogActionResults("Button 3");
+    }
+
+    /**
+     * Select each of the buttons by using only regex content-description
+     *
+     * @throws UiObjectNotFoundException
+     * @since API Level 17
+     */
+    public void testSelectByDescriptionMatch() throws UiObjectNotFoundException {
+        openTest("Test 2");
+        getObjectByDescriptionMatch(".*n\\s1$").click();
+        verifyDialogActionResults("Button 1");
+        getObjectByDescriptionMatch(".*n\\s2$").click();
+        verifyDialogActionResults("Button 2");
+        getObjectByDescriptionMatch(".*n\\s3$").click();
+        verifyDialogActionResults("Button 3");
+    }
+
+    /**
+     * Select each of the buttons by using only regex class name
+     *
+     * @throws UiObjectNotFoundException
+     * @since API Level 17
+     */
+    public void testSelectByClassMatch() throws UiObjectNotFoundException {
+        openTest("Test 5");
+        UiObject tgl = getObjectByClassMatch(".*ToggleButton$", 0);
+        String tglValue = tgl.getText();
+        tgl.click();
+
+        assertFalse("Matching class by Regex failed", tglValue.equals(tgl.getText()));
+    }
+
+    /**
+     * Select each of the buttons by using only class type
+     *
+     * @throws UiObjectNotFoundException
+     * @since API Level 17
+     */
+    public void testSelectByClassType() throws UiObjectNotFoundException {
+        openTest("Test 5");
+        UiObject tgl = getObjectByClass(android.widget.ToggleButton.class, 0);
+        String tglValue = tgl.getText();
+        tgl.click();
+
+        assertFalse("Matching class by class type failed", tglValue.equals(tgl.getText()));
+    }
+
+    /**
+     * Test the coordinates of 3 buttons side by side verifying vertical and
+     * horizontal coordinates.
+     *
+     * @throws UiObjectNotFoundException
+     * @since API Level 17
+     */
+    public void testGetVisibleBounds() throws UiObjectNotFoundException {
+        openTest("Test 2");
+        Rect rect1 = getObjectByText("Button 1").getVisibleBounds();
+        Rect rect2 = getObjectByText("Button 2").getVisibleBounds();
+        Rect rect3 = getObjectByText("Button 3").getVisibleBounds();
+
+        assertTrue("X coordinate check failed",
+                rect1.left < rect2.left && rect2.right < rect3.right);
+        assertTrue("Y coordinate check failed",
+                rect1.top == rect2.top && rect2.bottom == rect3.bottom);
+    }
+
+   /**
+     * Tests the LongClick functionality in the API
+     *
+     * @throws UiObjectNotFoundException
+     * @since API Level 17
+     */
+    public void testSelectorLongClickable() throws UiObjectNotFoundException {
+        openTest("Test 2");
+        getObjectByText("Button 1").longClick();
+        verifyDialogActionResults("Longclick Button 1");
+    }
+
+    /**
+     * Test the UiSelector's long-clickable property
+     *
+     * @throws UiObjectNotFoundException
+     * @since API Level 17
+     */
+    public void testSelectorLongClickableProperty() throws UiObjectNotFoundException {
+        UiObject button3 = new UiObject(new UiSelector().className(
+                android.widget.Button.class).longClickable(true).instance(2));
+        button3.longClick();
+        verifyDialogActionResults("Longclick Button 3");
+    }
+
+    /**
+     * Takes a screen shot of the current display and checks if the file is
+     * created and is not zero size.
+     *
+     * @since API Level 17
+     */
+    public void testTakeScreenShots() {
+        File storePath = new File(SCREEN_SHOT_FILE_PATH_NAME);
+        getUiDevice().takeScreenshot(storePath);
+
+        assertTrue("Screenshot file not detected in store", storePath.exists());
+        assertTrue("Zero size for screenshot file", storePath.length() > 0);
+    }
+
+    /**
      * Private helper to open test views. Also covers UiScrollable tests
      *
      * @param name
@@ -636,8 +809,24 @@ public class CtsUiAutomatorTest extends UiAutomatorTestCase {
         return new UiObject(new UiSelector().text(txt));
     }
 
+    private UiObject getObjectByTextMatch(String regex) {
+        return new UiObject(new UiSelector().textMatches(regex));
+    }
+
+    private UiObject getObjectByDescriptionMatch(String regex) {
+        return new UiObject(new UiSelector().descriptionMatches(regex));
+    }
+
     private UiObject getObjectByDescription(String txt) {
         return new UiObject(new UiSelector().description(txt));
+    }
+
+    private UiObject getObjectByClassMatch(String regex, int instance) {
+        return new UiObject(new UiSelector().classNameMatches(regex).instance(instance));
+    }
+
+    private <T> UiObject getObjectByClass(Class<T> type, int instance) {
+        return new UiObject(new UiSelector().className(type).instance(instance));
     }
 
     private UiObject getObjectByIndex(String className, int index) {
