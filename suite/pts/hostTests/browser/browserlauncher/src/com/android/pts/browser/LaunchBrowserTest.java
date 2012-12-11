@@ -35,8 +35,10 @@ import java.util.concurrent.TimeUnit;
 public class LaunchBrowserTest extends PtsAndroidTestCase {
 
     private static final String OCTANE_START_FILE = "octane/index.html";
+    private static final String ROBOHORNET_START_FILE = "robohornet/robohornet.html";
     private static final String HOST_COMPLETION_BROADCAST = "com.android.pts.browser.completion";
-    private static long BROWSER_COMPLETION_TIMEOUT = 10 * 60;
+    // host-side will time-out anyway. So make it long enough.
+    private static long BROWSER_COMPLETION_TIMEOUT = 60 * 60;
     private CtsTestServer mWebServer;
     private HostBroadcastReceiver mReceiver;
 
@@ -58,6 +60,15 @@ public class LaunchBrowserTest extends PtsAndroidTestCase {
 
     public void testOctane() throws InterruptedException {
         String url = mWebServer.getAssetUrl(OCTANE_START_FILE) + "?auto=1";
+        Uri uri = Uri.parse(url);
+        Intent intent = new Intent(Intent.ACTION_VIEW, uri);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        getContext().startActivity(intent);
+        mReceiver.waitForBroadcast(BROWSER_COMPLETION_TIMEOUT);
+    }
+
+    public void testRoboHornet() throws InterruptedException {
+        String url = mWebServer.getAssetUrl(ROBOHORNET_START_FILE);
         Uri uri = Uri.parse(url);
         Intent intent = new Intent(Intent.ACTION_VIEW, uri);
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);

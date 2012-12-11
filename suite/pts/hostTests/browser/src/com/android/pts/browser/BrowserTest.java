@@ -50,9 +50,10 @@ public class BrowserTest extends DeviceTestCase implements IBuildReceiver {
     private static final String CTS_RUNNER = "android.test.InstrumentationCtsTestRunner";
     private static final String PACKAGE = "com.android.pts.browser";
     private static final String APK = "PtsDeviceBrowserLauncher.apk";
-    private static final long LOGCAT_TIMEOUT_IN_SEC = 10 * 60L;
     private static final String LOGCAT_FILTER = " browser:D chromium:D *:S";
     private static final long REBOOT_WAIT_TIME_IN_MS = 2 * 60 * 1000L;
+    private static final int OCTANE_TIMEOUT_IN_MS = 10 * 60 * 1000;
+    private static final int ROBOHORNET_TIMEOUT_IN_MS = 40 * 60 * 1000;
 
     private CtsBuildHelper mBuild;
     private ITestDevice mDevice;
@@ -60,6 +61,7 @@ public class BrowserTest extends DeviceTestCase implements IBuildReceiver {
     private ReportLog mReport;
 
     private volatile boolean mIgnoreLine = true;
+    private volatile boolean mResultReceived = false;
     private double mResult;
 
     @Override
@@ -88,14 +90,15 @@ public class BrowserTest extends DeviceTestCase implements IBuildReceiver {
     public void testOctane() throws Exception {
         String resultPattern = "([A-Z][\\d\\w]+): ([\\d]+)";
         String summaryPattern = "(Octane Score.*): ([\\d]+)";
-        int numberRepeat = 5;
+        final int numberRepeat = 5;
         double[] results = new double[numberRepeat];
         for (int i = 0; i < numberRepeat; i++) {
             Log.i(TAG, i + "-th round");
             // browser will not refresh if the page is already loaded.
             mDevice.reboot();
             Thread.sleep(REBOOT_WAIT_TIME_IN_MS);
-            results[i] = runBenchmarking("testOctane", resultPattern, summaryPattern);
+            results[i] = runBenchmarking("testOctane", resultPattern, summaryPattern,
+                    OCTANE_TIMEOUT_IN_MS);
         }
         mReport.printArray("scores", results, true);
         Stat.StatResult stat = Stat.getStat(results);
@@ -103,14 +106,37 @@ public class BrowserTest extends DeviceTestCase implements IBuildReceiver {
         mReport.printSummary("Score", stat.mAverage, PerfResultType.HIGHER_BETTER, stat.mStddev);
     }
 
+    @TimeoutReq(minutes = 40)
+    public void testRoboHornet() throws Exception {
+        String resultPattern = "([A-Z][\\d\\w]+):([\\d]+[\\.]?[\\d]*)ms";
+        String summaryPattern = "(RoboHornet Score):([\\d]+[\\.]?[\\d]*)";
+        // currently robohornet takes too long to repeat
+        final int numberRepeat = 1;
+        double[] results = new double[numberRepeat];
+        for (int i = 0; i < numberRepeat; i++) {
+            Log.i(TAG, i + "-th round");
+            // browser will not refresh if the page is already loaded.
+            mDevice.reboot();
+            Thread.sleep(REBOOT_WAIT_TIME_IN_MS);
+            results[i] = runBenchmarking("testRoboHornet", resultPattern, summaryPattern,
+                    ROBOHORNET_TIMEOUT_IN_MS);
+        }
+        mReport.printArray("scores", results, true);
+        Stat.StatResult stat = Stat.getStat(results);
+        mReport.printSummary("Score", stat.mAverage, PerfResultType.HIGHER_BETTER, stat.mStddev);
+    }
+
     private double runBenchmarking(String testMethodName, String resultPattern,
-            String summaryPattern) throws DeviceNotAvailableException, InterruptedException {
+            String summaryPattern, int timeOutInMs)
+                    throws DeviceNotAvailableException, InterruptedException {
         RemoteAndroidTestRunner testRunner = new RemoteAndroidTestRunner(PACKAGE, CTS_RUNNER,
                 mDevice.getIDevice());
+        testRunner.setMaxtimeToOutputResponse(timeOutInMs);
         testRunner.setMethodName("com.android.pts.browser.LaunchBrowserTest", testMethodName);
         CollectingTestListener listener = new CollectingTestListener();
         mIgnoreLine = true;
-        startLogMonitoring(resultPattern, summaryPattern);
+        mResultReceived = false;
+        startLogMonitoring(resultPattern, summaryPattern, timeOutInMs);
         // hack to ignore already captured logcat as the monitor will get it again.
         // Checking time and skipping may be a better logic, but simply throwing away also works.
         Thread.sleep(5000);
@@ -125,14 +151,15 @@ public class BrowserTest extends DeviceTestCase implements IBuildReceiver {
             fail("maybe timeout");
         }
         stopLogMonitoring();
+        assertTrue("No result found", mResultReceived);
         return mResult;
     }
 
-    void startLogMonitoring(String resultPattern, String summaryPattern)
+    void startLogMonitoring(String resultPattern, String summaryPattern, int timeOutInMs)
             throws InterruptedException, DeviceNotAvailableException {
         final Pattern result = Pattern.compile(resultPattern);
         final Pattern summary = Pattern.compile(summaryPattern);
-        mReceiver = new LogcatLineReceiver(mDevice, LOGCAT_FILTER, LOGCAT_TIMEOUT_IN_SEC) {
+        mReceiver = new LogcatLineReceiver(mDevice, LOGCAT_FILTER, timeOutInMs / 1000) {
             @Override
             public void processALine(String line) throws DeviceNotAvailableException {
                 Log.i(TAG, "processALine " + line + " ignore " + mIgnoreLine);
@@ -149,6 +176,7 @@ public class BrowserTest extends DeviceTestCase implements IBuildReceiver {
                     mResult = Double.parseDouble(matchSummary.group(2));
                     mReport.printValue(matchSummary.group(1), mResult);
                     mDevice.executeShellCommand(BROADCAST_CMD);
+                    mResultReceived = true;
                 }
             }
         };
