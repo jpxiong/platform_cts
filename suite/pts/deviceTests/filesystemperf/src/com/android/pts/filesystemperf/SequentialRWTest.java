@@ -19,7 +19,8 @@ package com.android.pts.filesystemperf;
 import android.cts.util.TimeoutReq;
 import com.android.pts.util.MeasureRun;
 import com.android.pts.util.MeasureTime;
-import com.android.pts.util.PerfResultType;
+import com.android.pts.util.ResultType;
+import com.android.pts.util.ResultUnit;
 import com.android.pts.util.PtsAndroidTestCase;
 import com.android.pts.util.ReportLog;
 import com.android.pts.util.Stat;
@@ -48,7 +49,8 @@ public class SequentialRWTest extends PtsAndroidTestCase {
     public void testSingleSequentialWrite() throws Exception {
         final int numberOfFiles =(int)(FileUtil.getFileSizeExceedingMemory(
                 getContext(), BUFFER_SIZE) / BUFFER_SIZE);
-        getReportLog().printValue("files", numberOfFiles);
+        getReportLog().printValue("files", numberOfFiles, ResultType.NEUTRAL,
+                ResultUnit.COUNT);
         final byte[] data = FileUtil.generateRandomData(BUFFER_SIZE);
         final File[] files = FileUtil.createNewFiles(getContext(), DIR_SEQ_WR,
                 numberOfFiles);
@@ -62,12 +64,13 @@ public class SequentialRWTest extends PtsAndroidTestCase {
             }
         });
         double[] mbps = ReportLog.calcRatePerSecArray((double)BUFFER_SIZE / 1024 / 1024, times);
-        getReportLog().printArray("try " + numberOfFiles + " files, result MB/s",
-                mbps, true);
-        getReportLog().printArray("Wr amount", wrAmount, true);
+        getReportLog().printArray("write throughput",
+                mbps, ResultType.HIGHER_BETTER, ResultUnit.MBPS);
+        getReportLog().printArray("write amount", wrAmount, ResultType.NEUTRAL,
+                ResultUnit.BYTE);
         Stat.StatResult stat = Stat.getStat(mbps);
-        getReportLog().printSummary("MB/s", stat.mAverage, PerfResultType.HIGHER_BETTER,
-                stat.mStddev);
+        getReportLog().printSummary("write throughput", stat.mAverage, ResultType.HIGHER_BETTER,
+                ResultUnit.MBPS);
     }
 
     @TimeoutReq(minutes = 60)
@@ -85,8 +88,9 @@ public class SequentialRWTest extends PtsAndroidTestCase {
         final File file = FileUtil.createNewFilledFile(getContext(),
                 DIR_SEQ_RD, fileSize);
         long finish = System.currentTimeMillis();
-        getReportLog().printValue("write size " + fileSize + " result MB/s",
-                ReportLog.calcRatePerSec((double)fileSize / 1024 / 1024, finish - start));
+        getReportLog().printValue("write throughput for test file of length " + fileSize,
+                ReportLog.calcRatePerSec((double)fileSize / 1024 / 1024, finish - start),
+                ResultType.HIGHER_BETTER, ResultUnit.MBPS);
 
         final int NUMBER_READ = 10;
 
@@ -105,10 +109,10 @@ public class SequentialRWTest extends PtsAndroidTestCase {
             }
         });
         double[] mbps = ReportLog.calcRatePerSecArray((double)fileSize / 1024 / 1024, times);
-        getReportLog().printArray("read MB/s",
-                mbps, true);
+        getReportLog().printArray("read throughput",
+                mbps, ResultType.HIGHER_BETTER, ResultUnit.MBPS);
         Stat.StatResult stat = Stat.getStat(mbps);
-        getReportLog().printSummary("MB/s", stat.mAverage, PerfResultType.HIGHER_BETTER,
-                stat.mStddev);
+        getReportLog().printSummary("read throughput", stat.mAverage, ResultType.HIGHER_BETTER,
+                ResultUnit.MBPS);
     }
 }

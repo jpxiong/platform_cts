@@ -16,38 +16,26 @@
 
 package com.android.pts.uihost;
 
-import android.cts.util.TimeoutReq;
-
 import com.android.cts.tradefed.build.CtsBuildHelper;
-import com.android.ddmlib.Log;
-import com.android.ddmlib.testrunner.RemoteAndroidTestRunner;
-import com.android.ddmlib.testrunner.TestIdentifier;
 import com.android.pts.util.MeasureRun;
 import com.android.pts.util.MeasureTime;
-import com.android.pts.util.PerfResultType;
-import com.android.pts.util.PtsException;
+import com.android.pts.util.ResultType;
+import com.android.pts.util.ResultUnit;
 import com.android.pts.util.ReportLog;
 import com.android.pts.util.Stat;
 import com.android.pts.util.Stat.StatResult;
 import com.android.tradefed.build.IBuildInfo;
-import com.android.tradefed.device.DeviceNotAvailableException;
 import com.android.tradefed.device.ITestDevice;
-import com.android.tradefed.device.TestDeviceOptions;
-import com.android.tradefed.result.CollectingTestListener;
-import com.android.tradefed.result.TestResult;
-import com.android.tradefed.result.TestRunResult;
 import com.android.tradefed.testtype.DeviceTestCase;
 import com.android.tradefed.testtype.IBuildReceiver;
 
 import java.io.File;
-import java.util.Map;
+
 
 /**
  * Test to measure installation time of a APK.
  */
 public class InstallTimeTest extends DeviceTestCase implements IBuildReceiver {
-    private static final String TAG = "InstallTimeTest";
-    private final static String CTS_RUNNER = "android.test.InstrumentationCtsTestRunner";
     private CtsBuildHelper mBuild;
     private ITestDevice mDevice;
     private ReportLog mReport = null;
@@ -90,10 +78,11 @@ public class InstallTimeTest extends DeviceTestCase implements IBuildReceiver {
                 device.installPackage(app, false);
             }
         });
-        mReport.printArray("time in ms", result, false);
+        mReport.printArray("install time", result, ResultType.LOWER_BETTER,
+                ResultUnit.MS);
         StatResult stat = Stat.getStat(result);
-        mReport.printSummary("time in ms", stat.mAverage, PerfResultType.LOWER_BETTER,
-                stat.mStddev);
+        mReport.printSummary("install time", stat.mAverage, ResultType.LOWER_BETTER,
+                ResultUnit.MS);
     }
 
 }

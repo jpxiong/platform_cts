@@ -283,7 +283,7 @@ class TestPackageResult  extends AbstractXmlPullParser {
     public void reportPerformanceResult(TestIdentifier test, CtsTestStatus status, String summary, String details) {
         Test result = findTest(test);
         result.setResultStatus(status);
-        result.setMessage(summary);
+        result.setSummary(summary);
         result.setDetails(details);
     }
 
