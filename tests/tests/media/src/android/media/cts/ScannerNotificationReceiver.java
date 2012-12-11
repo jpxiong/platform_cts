@@ -30,7 +30,7 @@ class ScannerNotificationReceiver extends BroadcastReceiver {
     private static final int TIMEOUT_MS = 4 * 60 * 1000;
 
     private final String mAction;
-    private final CountDownLatch mLatch = new CountDownLatch(1);
+    private CountDownLatch mLatch = new CountDownLatch(1);
 
     ScannerNotificationReceiver(String action) {
         mAction = action;
@@ -49,6 +49,10 @@ class ScannerNotificationReceiver extends BroadcastReceiver {
             MediaScannerTest.fail("Failed to receive broadcast in " + TIMEOUT_MS + "ms for "
                     + mAction + " while trying to scan " + numFiles + " files!");
         }
+    }
+
+    void reset() {
+        mLatch = new CountDownLatch(1);
     }
 
     private int countFiles(File dir) {
