@@ -435,13 +435,6 @@ public class WebSettingsTest extends ActivityInstrumentationTestCase2<WebViewStu
         assertEquals(WebSettings.LayoutAlgorithm.SINGLE_COLUMN, mSettings.getLayoutAlgorithm());
     }
 
-    public void testAccessLightTouchEnabled() {
-        assertFalse(mSettings.getLightTouchEnabled());
-
-        mSettings.setLightTouchEnabled(true);
-        assertTrue(mSettings.getLightTouchEnabled());
-    }
-
     public void testAccessMinimumFontSize() {
         assertEquals(8, mSettings.getMinimumFontSize());
 
