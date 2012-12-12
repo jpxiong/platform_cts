@@ -21,7 +21,8 @@ import android.graphics.Point;
 import android.util.Log;
 import android.view.WindowManager;
 
-import com.android.pts.util.PerfResultType;
+import com.android.pts.util.ResultType;
+import com.android.pts.util.ResultUnit;
 import com.android.pts.util.PtsAndroidTestCase;
 import com.android.pts.util.ReportLog;
 import com.android.pts.util.Stat;
@@ -38,6 +39,13 @@ public class BandwidthTest extends PtsAndroidTestCase {
     private static final int REPEAT_IN_EACH_CALL = 100;
     private static final int KB = 1024;
     private static final int MB = 1024 * 1024;
+
+    @Override
+    protected void setUp() throws Exception {
+        super.setUp();
+        // warm-up
+        MemoryNative.runMemcpy(2 * MB, 100);
+    }
 
     public void testMemcpyK004() {
         doRunMemcpy(4 * KB);
@@ -93,13 +101,20 @@ public class BandwidthTest extends PtsAndroidTestCase {
 
     private void doRunMemcpy(int bufferSize) {
         double[] result = new double[REPETITION];
-        for (int i = 0; i < REPETITION; i++) {
-            result[i] = MemoryNative.runMemcpy(bufferSize, REPEAT_IN_EACH_CALL);
+        int repeatInEachCall = REPEAT_IN_EACH_CALL;
+        if (bufferSize < (1 * MB)) {
+            // too small buffer size finishes too early to give accurate result.
+            repeatInEachCall *= (1 * MB / bufferSize);
         }
-        getReportLog().printArray("ms", result, false);
+        for (int i = 0; i < REPETITION; i++) {
+            result[i] = MemoryNative.runMemcpy(bufferSize, repeatInEachCall);
+        }
+        getReportLog().printArray("memcpy time", result, ResultType.LOWER_BETTER,
+                ResultUnit.MS);
         double[] mbps = ReportLog.calcRatePerSecArray(
-                (double)bufferSize * REPEAT_IN_EACH_CALL / 1024.0 / 1024.0, result);
-        getReportLog().printArray("MB/s", mbps, true);
+                (double)bufferSize * repeatInEachCall / 1024.0 / 1024.0, result);
+        getReportLog().printArray("memcpy throughput", mbps, ResultType.HIGHER_BETTER,
+                ResultUnit.MBPS);
         Stat.StatResult stat = Stat.getStat(mbps);
         WindowManager wm = (WindowManager) getContext().getSystemService(Context.WINDOW_SERVICE);
         Point size = new Point();
@@ -108,8 +123,7 @@ public class BandwidthTest extends PtsAndroidTestCase {
         double pixels = size.x * size.y;
         // now this represents how many times the whole screen can be copied in a sec.
         double screensPerSecAverage = stat.mAverage / pixels * 1024.0 * 1024.0 / 4.0;
-        double screensPerSecStddev = stat.mStddev / pixels * 1024.0 * 1024.0 / 4.0;
-        getReportLog().printSummary("screen copies per sec", screensPerSecAverage,
-                PerfResultType.HIGHER_BETTER, screensPerSecStddev);
+        getReportLog().printSummary("memcpy in fps", screensPerSecAverage,
+                ResultType.HIGHER_BETTER, ResultUnit.FPS);
     }
 }

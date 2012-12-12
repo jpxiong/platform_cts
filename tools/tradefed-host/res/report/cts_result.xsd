@@ -16,8 +16,8 @@
  -->
 
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
-           targetNamespace="http://compatibility.android.com/cts_result/1.14"
-           xmlns="http://compatibility.android.com/cts_result/1.14"
+           targetNamespace="http://compatibility.android.com/cts_result/1.15"
+           xmlns="http://compatibility.android.com/cts_result/1.15"
            elementFormDefault="qualified">
 
 <xs:element name="TestResult">
@@ -196,6 +196,28 @@
   <xs:attribute name="priority" type="xs:string"/>
 </xs:complexType>
 
+<xs:simpleType name="unitType">
+  <xs:restriction base="xs:string">
+    <xs:enumeration value="none"/>
+    <xs:enumeration value="ms"/>
+    <xs:enumeration value="fps"/>
+    <xs:enumeration value="ops"/>
+    <xs:enumeration value="kbps"/>
+    <xs:enumeration value="mbps"/>
+    <xs:enumeration value="byte"/>
+    <xs:enumeration value="count"/>
+    <xs:enumeration value="score"/>
+  </xs:restriction>
+</xs:simpleType>
+
+<xs:simpleType name="scoreTypeType">
+  <xs:restriction base="xs:string">
+    <xs:enumeration value="higherBetter"/>
+    <xs:enumeration value="lowerBetter"/>
+    <xs:enumeration value="neutral"/>
+  </xs:restriction>
+</xs:simpleType>
+
 <xs:complexType name="testType">
   <xs:sequence>
     <xs:element name="FailedScene" minOccurs="0" maxOccurs="1">
@@ -204,6 +226,34 @@
           <xs:element name="StackTrace" type="xs:string" minOccurs="0" maxOccurs="1"/>
         </xs:sequence>
         <xs:attribute name="message" type="xs:string"/>
+      </xs:complexType>
+    </xs:element>
+    <xs:element name="Summary" minOccurs="0" maxOccurs="1">
+      <xs:complexType>
+        <xs:simpleContent>
+          <xs:extension base="xs:decimal">
+            <xs:attribute name="message" type="xs:string" use="required" />
+            <xs:attribute name="scoreType" type="scoreTypeType" use="required" />
+            <xs:attribute name="unit" type="unitType" use="required" />
+          </xs:extension>
+        </xs:simpleContent>
+      </xs:complexType>
+    </xs:element>
+    <xs:element name="Details" minOccurs="0" maxOccurs="1">
+      <xs:complexType>
+        <xs:sequence>
+          <xs:element name="ValueArray" minOccurs="0" maxOccurs="unbounded">
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element name="Value" type="xs:decimal" minOccurs="0" maxOccurs="unbounded" />
+              </xs:sequence>
+              <xs:attribute name="source" type="xs:string" use="required" />
+              <xs:attribute name="message" type="xs:string" use="required" />
+              <xs:attribute name="scoreType" type="scoreTypeType" use="required" />
+              <xs:attribute name="unit" type="unitType" use="required" />
+            </xs:complexType>
+          </xs:element>
+        </xs:sequence>
       </xs:complexType>
     </xs:element>
   </xs:sequence>

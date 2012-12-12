@@ -22,7 +22,8 @@ import com.android.cts.tradefed.build.CtsBuildHelper;
 import com.android.ddmlib.Log;
 import com.android.ddmlib.testrunner.RemoteAndroidTestRunner;
 import com.android.pts.ptsutil.LogcatLineReceiver;
-import com.android.pts.util.PerfResultType;
+import com.android.pts.util.ResultType;
+import com.android.pts.util.ResultUnit;
 import com.android.pts.util.ReportLog;
 import com.android.pts.util.Stat;
 import com.android.tradefed.build.IBuildInfo;
@@ -98,12 +99,16 @@ public class BrowserTest extends DeviceTestCase implements IBuildReceiver {
             mDevice.reboot();
             Thread.sleep(REBOOT_WAIT_TIME_IN_MS);
             results[i] = runBenchmarking("testOctane", resultPattern, summaryPattern,
-                    OCTANE_TIMEOUT_IN_MS);
+                    OCTANE_TIMEOUT_IN_MS,
+                    ResultType.HIGHER_BETTER, ResultUnit.SCORE,
+                    ResultType.HIGHER_BETTER, ResultUnit.SCORE);
         }
-        mReport.printArray("scores", results, true);
+        mReport.printArray("scores", results, ResultType.HIGHER_BETTER,
+                ResultUnit.SCORE);
         Stat.StatResult stat = Stat.getStat(results);
         // Octane score is higher-better
-        mReport.printSummary("Score", stat.mAverage, PerfResultType.HIGHER_BETTER, stat.mStddev);
+        mReport.printSummary("Octane score", stat.mAverage, ResultType.HIGHER_BETTER,
+                ResultUnit.SCORE);
     }
 
     @TimeoutReq(minutes = 40)
@@ -119,15 +124,21 @@ public class BrowserTest extends DeviceTestCase implements IBuildReceiver {
             mDevice.reboot();
             Thread.sleep(REBOOT_WAIT_TIME_IN_MS);
             results[i] = runBenchmarking("testRoboHornet", resultPattern, summaryPattern,
-                    ROBOHORNET_TIMEOUT_IN_MS);
+                    ROBOHORNET_TIMEOUT_IN_MS,
+                    ResultType.LOWER_BETTER, ResultUnit.MS,
+                    ResultType.HIGHER_BETTER, ResultUnit.SCORE);
         }
-        mReport.printArray("scores", results, true);
+        mReport.printArray("time for each test", results, ResultType.LOWER_BETTER,
+                ResultUnit.MS);
         Stat.StatResult stat = Stat.getStat(results);
-        mReport.printSummary("Score", stat.mAverage, PerfResultType.HIGHER_BETTER, stat.mStddev);
+        mReport.printSummary("Robohornet Score", stat.mAverage, ResultType.HIGHER_BETTER,
+                ResultUnit.SCORE);
     }
 
     private double runBenchmarking(String testMethodName, String resultPattern,
-            String summaryPattern, int timeOutInMs)
+            String summaryPattern, int timeOutInMs,
+            ResultType resultType, ResultUnit resultUnit,
+            ResultType summaryType, ResultUnit summaryUnit)
                     throws DeviceNotAvailableException, InterruptedException {
         RemoteAndroidTestRunner testRunner = new RemoteAndroidTestRunner(PACKAGE, CTS_RUNNER,
                 mDevice.getIDevice());
@@ -136,7 +147,8 @@ public class BrowserTest extends DeviceTestCase implements IBuildReceiver {
         CollectingTestListener listener = new CollectingTestListener();
         mIgnoreLine = true;
         mResultReceived = false;
-        startLogMonitoring(resultPattern, summaryPattern, timeOutInMs);
+        startLogMonitoring(resultPattern, summaryPattern, timeOutInMs, resultType, resultUnit,
+                summaryType, summaryUnit);
         // hack to ignore already captured logcat as the monitor will get it again.
         // Checking time and skipping may be a better logic, but simply throwing away also works.
         Thread.sleep(5000);
@@ -155,7 +167,9 @@ public class BrowserTest extends DeviceTestCase implements IBuildReceiver {
         return mResult;
     }
 
-    void startLogMonitoring(String resultPattern, String summaryPattern, int timeOutInMs)
+    void startLogMonitoring(String resultPattern, String summaryPattern, int timeOutInMs,
+            final ResultType resultType, final ResultUnit resultUnit,
+            final ResultType summaryType, final ResultUnit summaryUnit)
             throws InterruptedException, DeviceNotAvailableException {
         final Pattern result = Pattern.compile(resultPattern);
         final Pattern summary = Pattern.compile(summaryPattern);
@@ -169,12 +183,14 @@ public class BrowserTest extends DeviceTestCase implements IBuildReceiver {
                 Matcher matchResult = result.matcher(line);
                 if (matchResult.find()) {
                     mReport.printValue(matchResult.group(1),
-                            Double.parseDouble(matchResult.group(2)));
+                            Double.parseDouble(matchResult.group(2)),
+                            resultType, resultUnit);
                 }
                 Matcher matchSummary = summary.matcher(line);
                 if (matchSummary.find()) {
                     mResult = Double.parseDouble(matchSummary.group(2));
-                    mReport.printValue(matchSummary.group(1), mResult);
+                    mReport.printValue(matchSummary.group(1), mResult,
+                            summaryType, summaryUnit);
                     mDevice.executeShellCommand(BROADCAST_CMD);
                     mResultReceived = true;
                 }

@@ -19,7 +19,6 @@ package com.android.pts.filesystemperf;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -28,7 +27,8 @@ import java.util.Random;
 
 import com.android.pts.util.MeasureRun;
 import com.android.pts.util.MeasureTime;
-import com.android.pts.util.PerfResultType;
+import com.android.pts.util.ResultType;
+import com.android.pts.util.ResultUnit;
 import com.android.pts.util.ReportLog;
 import com.android.pts.util.Stat;
 import com.android.pts.util.SystemUtil;
@@ -299,12 +299,14 @@ public class FileUtil {
         randomFile.close();
         double[] mbps = ReportLog.calcRatePerSecArray((double)fileSize / runsInOneGo / 1024 / 1024,
                 times);
-        report.printArray("MB/s",
-                mbps, true);
-        report.printArray("Rd amount", rdAmount, true);
+        report.printArray("read throughput",
+                mbps, ResultType.HIGHER_BETTER, ResultUnit.MBPS);
+        // This is just the amount of IO returned from kernel. So this is performance neutral.
+        report.printArray("read amount", rdAmount, ResultType.NEUTRAL, ResultUnit.BYTE);
         Stat.StatResult stat = Stat.getStat(mbps);
 
-        report.printSummary("MB/s", stat.mAverage, PerfResultType.HIGHER_BETTER, stat.mStddev);
+        report.printSummary("read throughput", stat.mAverage, ResultType.HIGHER_BETTER,
+                ResultUnit.MBPS);
     }
 
     /**
@@ -349,12 +351,14 @@ public class FileUtil {
         randomFile.close();
         double[] mbps = ReportLog.calcRatePerSecArray((double)fileSize / runsInOneGo / 1024 / 1024,
                 times);
-        report.printArray("MB/s",
-                mbps, true);
-        report.printArray("Wr amount", wrAmount, true);
+        report.printArray("write throughput",
+                mbps, ResultType.HIGHER_BETTER, ResultUnit.MBPS);
+        report.printArray("write amount", wrAmount, ResultType.NEUTRAL,
+                ResultUnit.BYTE);
         Stat.StatResult stat = Stat.getStat(mbps);
 
-        report.printSummary("MB/s", stat.mAverage, PerfResultType.HIGHER_BETTER, stat.mStddev);
+        report.printSummary("write throughput", stat.mAverage, ResultType.HIGHER_BETTER,
+                ResultUnit.MBPS);
     }
 
     /**
@@ -387,11 +391,12 @@ public class FileUtil {
             randomFile.close();
             double[] mbps = ReportLog.calcRatePerSecArray((double)bufferSize / 1024 / 1024,
                     times);
-            report.printArray(i + "-th round MB/s",
-                    mbps, true);
+            report.printArray(i + "-th round throughput",
+                    mbps, ResultType.HIGHER_BETTER, ResultUnit.MBPS);
             ReportLog.copyArray(mbps, mbpsAll, i * numberRepeatInOneRun);
         }
         Stat.StatResult stat = Stat.getStat(mbpsAll);
-        report.printSummary("MB/s", stat.mAverage, PerfResultType.HIGHER_BETTER, stat.mStddev);
+        report.printSummary("update throughput", stat.mAverage, ResultType.HIGHER_BETTER,
+                ResultUnit.MBPS);
     }
 }

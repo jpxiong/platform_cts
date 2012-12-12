@@ -17,12 +17,25 @@
 package com.android.pts.util;
 
 /**
- * Enum for distinguish performance results.
- * HIGHER_BETTER: better performance with higher value
- * LOWER_BETTER: better performance with lower value
- *
+ * Enum for distinguishing performance results.
  */
-public enum PerfResultType {
-    LOWER_BETTER,
-    HIGHER_BETTER;
+public enum ResultType {
+    /** lower score shows better performance */
+    LOWER_BETTER("lowerBetter"),
+    /** higher score shows better performance */
+    HIGHER_BETTER("higherBetter"),
+    /** This value is not directly correlated with performance. */
+    NEUTRAL("neutral");
+
+    final private String mXmlString;
+    ResultType(String xmlString) {
+        mXmlString = xmlString;
+    }
+
+    /**
+     * Return string used in CTS XML report
+     */
+    public String getXmlString() {
+        return mXmlString;
+    }
 }

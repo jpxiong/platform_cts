@@ -25,11 +25,9 @@ import java.util.List;
  * For now, throws know exception with message.
  *
  * Format:
- * LOG_SEPARATOR : separates each log
- * Message = log [LOG_SEPARATOR log]*
- * log for single value = classMethodName:line_number|header|d|value
- * log for array = classMethodName:line_number|header|da|values|
- *                     average average_value min|max value stddev value
+ * Message = summary log SUMMARY_SEPARATOR [LOG_SEPARATOR log]*
+ * summary = message|unit|type|value
+ * log for array = classMethodName:line_number|message|unit|type|space separated values
  */
 public class ReportLog {
     private static final String LOG_SEPARATOR = "+++";
@@ -41,65 +39,49 @@ public class ReportLog {
     protected static int mDepth = 3;
 
     /**
-     * print given value to the report
-     * @param header string to explain the contents. It can be unit for the value.
-     * @param val
+     * print array of values to output log
      */
-    public void printValue(String header, double val) {
-        String message = getClassMethodNames(mDepth, true) + LOG_ELEM_SEPARATOR + header +
-                LOG_ELEM_SEPARATOR + "d" + LOG_ELEM_SEPARATOR + val;
-        mMessages.add(message);
-        printLog(message);
+    public void printArray(String message, double[] values, ResultType type,
+            ResultUnit unit) {
+        doPrintArray(message, values, type, unit);
     }
 
     /**
-     * array version of printValue
-     * @param header
-     * @param val
-     * @param addMin add minimum to the result. If false, add maximum to the result
+     * Print a value to output log
      */
-    public void printArray(String header, double[] val, boolean addMin) {
+    public void printValue(String message, double value, ResultType type,
+            ResultUnit unit) {
+        double[] vals = { value };
+        doPrintArray(message, vals, type, unit);
+    }
+
+    private void doPrintArray(String message, double[] values, ResultType type,
+    ResultUnit unit) {
         StringBuilder builder = new StringBuilder();
-        builder.append(getClassMethodNames(mDepth, true) + LOG_ELEM_SEPARATOR + header +
-                LOG_ELEM_SEPARATOR + "da" + LOG_ELEM_SEPARATOR);
-        for (double v : val) {
+        // note mDepth + 1 as this function will be called by printVaue or printArray
+        // and we need caller of printValue / printArray
+        builder.append(getClassMethodNames(mDepth + 1, true) + LOG_ELEM_SEPARATOR + message +
+                LOG_ELEM_SEPARATOR + type.getXmlString() + LOG_ELEM_SEPARATOR +
+                unit.getXmlString() + LOG_ELEM_SEPARATOR);
+        for (double v : values) {
             builder.append(v);
             builder.append(" ");
         }
-        Stat.StatResult stat = Stat.getStat(val);
-        builder.append(LOG_ELEM_SEPARATOR + "average " + stat.mAverage +
-                (addMin ? (" min " + stat.mMin) : (" max " + stat.mMax)) + " stddev " + stat.mStddev);
         mMessages.add(builder.toString());
         printLog(builder.toString());
     }
 
     /**
      * For standard report summary with average and stddev
-     * @param header
-     * @param average
+     * @param messsage
+     * @param value
      * @param type type of average value. stddev does not need type.
-     * @param stddev
+     * @param unit unit of the data
      */
-    public void printSummary(String header, double average, PerfResultType type, double stddev) {
-        mSummary = header + LOG_ELEM_SEPARATOR + "average " + average + " " + type.ordinal() +
-                LOG_ELEM_SEPARATOR + "stddev " + stddev + " " +
-                PerfResultType.LOWER_BETTER.ordinal();
-    }
-
-    /**
-     * For a report with two representative values with custom key strings
-     * @param header
-     * @param key1 String key for val1
-     * @param val1
-     * @param val1type
-     * @param key2 String key for val2
-     * @param val2
-     * @param val2type
-     */
-    public void printSummaryFull(String header, String key1, double val1, PerfResultType val1type,
-            String key2, double val2, PerfResultType val2type) {
-        mSummary = header + LOG_ELEM_SEPARATOR + key1 + " " + val1 + " " + val1type.ordinal() +
-                LOG_ELEM_SEPARATOR + key2 + " " + val2 + " " + val2type.ordinal();
+    public void printSummary(String message, double value, ResultType type,
+            ResultUnit unit) {
+        mSummary = message + LOG_ELEM_SEPARATOR + type.getXmlString() + LOG_ELEM_SEPARATOR +
+                unit.getXmlString() + LOG_ELEM_SEPARATOR + value;
     }
 
     public void throwReportToHost() throws PtsException {
@@ -139,9 +121,6 @@ public class ReportLog {
 
     /**
      * array version of calcRatePerSecArray
-     * @param change
-     * @param timeInMSec
-     * @return
      */
     public static double[] calcRatePerSecArray(double change, double[] timeInMSec) {
         double[] result = new double[timeInMSec.length];
@@ -159,9 +138,6 @@ public class ReportLog {
     /**
      * copy array from src to dst with given offset in dst.
      * dst should be big enough to hold src
-     * @param src
-     * @param dst
-     * @param dstOffset
      */
     public static void copyArray(double[] src, double[] dst, int dstOffset) {
         for (int i = 0; i < src.length; i++) {
@@ -171,8 +147,6 @@ public class ReportLog {
 
     /**
      * get classname.methodname from call stack of the current thread
-     *
-     * @return
      */
     public static String getClassMethodNames() {
         return getClassMethodNames(mDepth, false);
@@ -180,14 +154,13 @@ public class ReportLog {
 
     private static String getClassMethodNames(int depth, boolean addLineNumber) {
         StackTraceElement[] elements = Thread.currentThread().getStackTrace();
-        String names = elements[depth].getClassName() + "." + elements[depth].getMethodName() +
+        String names = elements[depth].getClassName() + "#" + elements[depth].getMethodName() +
                 (addLineNumber ? ":" + elements[depth].getLineNumber() : "");
         return names;
     }
 
     /**
      * to be overridden by child to print message to be passed
-     * @param msg
      */
     protected void printLog(String msg) {
 
