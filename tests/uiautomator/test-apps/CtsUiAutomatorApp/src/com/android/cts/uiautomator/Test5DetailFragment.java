@@ -16,9 +16,11 @@
 
 package com.android.cts.uiautomator;
 
+import android.app.AlertDialog;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -30,6 +32,15 @@ import android.widget.Spinner;
 public class Test5DetailFragment extends Fragment {
 
     public static final String ARG_ITEM_ID = "item_id";
+
+    class PointerEvent {
+        int startX;
+        int startY;
+        int endX;
+        int endY;
+    }
+
+    private final PointerEvent mPointerEvent = new PointerEvent();
 
     public Test5DetailFragment() {
     }
@@ -66,6 +77,75 @@ public class Test5DetailFragment extends Fragment {
             }
         });
 
+        imageButton.setOnTouchListener(new ImageButton.OnTouchListener() {
+
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                if (event.getAction() == MotionEvent.ACTION_DOWN) {
+                    resetTouchResults();
+                    collectStartAction(event, v);
+                } else if (event.getAction() == MotionEvent.ACTION_UP) {
+                    collectEndAction(event, v);
+                    displayTouchResults();
+                }
+                return false;
+            }
+        });
+
         return rootView;
+    }
+
+    private void displayTouchResults() {
+        StringBuilder output = new StringBuilder();
+
+        output.append(String.format("%d,%d:%d,%d\n",
+                mPointerEvent.startX, mPointerEvent.startY, mPointerEvent.endX,
+                mPointerEvent.endY));
+
+        // display the submitted text
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        builder.setTitle(R.string.drag_item_touch_dialog_title);
+        builder.setPositiveButton(R.string.OK, null);
+        builder.setMessage(output.toString());
+        AlertDialog diag = builder.create();
+        diag.show();
+    }
+
+    /**
+     * Clears all collected pointer results
+     */
+    private void resetTouchResults() {
+         mPointerEvent.startX = mPointerEvent.startY =
+                    mPointerEvent.endX = mPointerEvent.endY = -1;
+    }
+
+    /**
+     * Collects pointer touch information converting from relative to absolute before
+     * storing it as starting touch coordinates.
+     *
+     * @param event
+     * @param view
+     * @param pointerIndex
+     */
+    private void collectStartAction(MotionEvent event, View view) {
+        int offsetInScreen[] = new int[2];
+        view.getLocationOnScreen(offsetInScreen);
+        mPointerEvent.startX = (int)(event.getX() + offsetInScreen[0]);
+        mPointerEvent.startY = (int)(event.getY() + offsetInScreen[1]);
+    }
+
+    /**
+     * Collects pointer touch information converting from relative to absolute before
+     * storing it as ending touch coordinates.
+     *
+     * @param event
+     * @param view
+     * @param pointerIndex
+     */
+    private void collectEndAction(MotionEvent event, View view) {
+        int offsetInScreen[] = new int[2];
+        view.getLocationOnScreen(offsetInScreen);
+        mPointerEvent.endX = (int)(event.getX() + offsetInScreen[0]);
+        mPointerEvent.endY = (int)(event.getY() + offsetInScreen[1]);
     }
 }

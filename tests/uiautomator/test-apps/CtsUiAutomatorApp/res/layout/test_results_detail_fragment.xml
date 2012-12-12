@@ -19,6 +19,7 @@
     android:id="@+id/test_results_detail_container"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:contentDescription="@string/title_test_view_detail"
     android:orientation="vertical" >
 
     <TextView

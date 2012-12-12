@@ -30,7 +30,6 @@ import android.widget.Button;
 public class Test2DetailFragment extends Fragment {
     public static final String ARG_ITEM_ID = "item_id";
     private Button mButton1, mButton2, mButton3, mDynaButton;
-    private boolean mDynaButtonAfter = false;
 
     public Test2DetailFragment() {
     }
@@ -144,32 +143,11 @@ public class Test2DetailFragment extends Fragment {
         mDynaButton.setOnClickListener(new Button.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (getActivity().getString(R.string.buttonBefore).equals(mDynaButton.getText())) {
-                    mDynaButton.setText(R.string.buttonAfter);
-                    mDynaButton
-                            .setContentDescription(getActivity().getString(R.string.buttonAfter));
-                    mDynaButtonAfter = true;
-                } else {
-                    mDynaButton.setText(R.string.buttonBefore);
-                    mDynaButton.setContentDescription(getActivity()
-                            .getString(R.string.buttonBefore));
-                    mDynaButtonAfter = false;
-                }
+                mDynaButton.setText(R.string.buttonAfter);
+                mDynaButton.setContentDescription(getString(R.string.buttonAfter));
             }
         });
 
-        if (savedState != null && savedState.getBoolean("DynaButtonAfter")) {
-            mDynaButton.setText(R.string.buttonAfter);
-            mDynaButton.setContentDescription(getActivity().getString(R.string.buttonAfter));
-            mDynaButtonAfter = true;
-        }
         return rootView;
-    }
-
-    @Override
-    public void onSaveInstanceState(Bundle savedInstanceState) {
-        super.onSaveInstanceState(savedInstanceState);
-        // Save UI state changes to the savedInstanceState.
-        savedInstanceState.putBoolean("DynaButtonAfter", mDynaButtonAfter);
     }
 }

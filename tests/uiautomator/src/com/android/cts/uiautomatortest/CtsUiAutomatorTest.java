@@ -15,6 +15,7 @@
  */
 package com.android.cts.uiautomatortest;
 
+import android.graphics.Point;
 import android.graphics.Rect;
 import android.os.RemoteException;
 import android.os.SystemClock;
@@ -54,6 +55,7 @@ public class CtsUiAutomatorTest extends UiAutomatorTestCase {
     protected void setUp() throws Exception {
         super.setUp();
         // Make sure the test app is always running
+        UiDevice.getInstance().waitForIdle();
         if (!new UiObject(new UiSelector().packageName(PKG_NAME)).exists())
             runShellCommand(LAUNCH_APP);
     }
@@ -195,14 +197,17 @@ public class CtsUiAutomatorTest extends UiAutomatorTestCase {
     }
 
     /**
-     * Test if a the content changed due to an action can be verified
+     * Test when a node's state is changed due to an action, it is updated in the accessibility
+     * hierarchy.
      *
      * @throws UiObjectNotFoundException
      */
     public void testSelectAfterContentChanged() throws UiObjectNotFoundException {
         openTest("Test 2");
-        getObjectByText("Before").click();
-        getObjectByText("After").click();
+        UiObject dynaButton = getObjectByText("Before");
+        dynaButton.click();
+        assertTrue("Button state change is not refreshed in accessibility hierarchy",
+                getObjectByText("After").exists());
     }
 
     /**
@@ -288,12 +293,12 @@ public class CtsUiAutomatorTest extends UiAutomatorTestCase {
         int totalDelay = Integer.parseInt(timeDiff);
 
         // Cumulative waits in this test should add up to at minimum 30 seconds
-        assertFalse("Timeout for wait-for-idle is too short. Expecting minimum 10 seconds",
+        assertFalse("Timeout for wait-for-idle is too short. Expecting minimum 30 seconds",
                 totalDelay < 30 * 1000);
 
         // allow for tolerance in time measurements due to differences between
         // device speeds
-        assertFalse("Timeout for wait-for-idle is too long. Expecting maximum 15 seconds",
+        assertFalse("Timeout for wait-for-idle is too long. Expecting maximum 60 seconds",
                 totalDelay > 60 * 1000);
     }
 
@@ -324,27 +329,28 @@ public class CtsUiAutomatorTest extends UiAutomatorTestCase {
         UiObject textView = new UiObject(new UiSelector().textContains("["));
 
         textView.swipeLeft(10);
-        assertTrue("UiObject swipe left", "[ 2 ]".equals(textView.getText()));
+        assertTrue("UiObject swipe left 1->2", "[ 2 ]".equals(textView.getText()));
 
         textView.swipeLeft(10);
-        assertTrue("UiObject swipe left", "[ 3 ]".equals(textView.getText()));
+        assertTrue("UiObject swipe left 2->3", "[ 3 ]".equals(textView.getText()));
 
         textView.swipeLeft(10);
-        assertTrue("UiObject swipe left", "[ 4 ]".equals(textView.getText()));
+        assertTrue("UiObject swipe left 3->4", "[ 4 ]".equals(textView.getText()));
 
         textView.swipeRight(10);
-        assertTrue("UiObject swipe right", "[ 3 ]".equals(textView.getText()));
+        assertTrue("UiObject swipe right 3<-4", "[ 3 ]".equals(textView.getText()));
 
         textView.swipeRight(10);
-        assertTrue("UiObject swipe right", "[ 2 ]".equals(textView.getText()));
+        assertTrue("UiObject swipe right 2<-3", "[ 2 ]".equals(textView.getText()));
 
         textView.swipeRight(10);
-        assertTrue("UiObject swipe right", "[ 1 ]".equals(textView.getText()));
+        assertTrue("UiObject swipe right 1<-2", "[ 1 ]".equals(textView.getText()));
 
         Rect tb = textView.getBounds();
         UiDevice.getInstance().swipe(tb.right - 20, tb.centerY(), tb.left + 20, tb.centerY(), 50);
+
         SystemClock.sleep(100);
-        assertTrue("UiDevice swipe", "[ 2 ]".equals(textView.getText()));
+        assertTrue("UiDevice raw swipe 1->2", "[ 2 ]".equals(textView.getText()));
     }
 
     /**
@@ -371,45 +377,10 @@ public class CtsUiAutomatorTest extends UiAutomatorTestCase {
     }
 
     /**
-     * The view contains a WebView with static content. This test uses the text
-     * traversal feature of pressing down arrows to read the view's contents
-     *
+     * Test when an object does not exist, an exception is thrown
      * @throws UiObjectNotFoundException
      */
-    /*// broken in MR1
-    public void testWebViewTextTraversal() throws UiObjectNotFoundException {
-        openTest("Test 6");
-        UiObject webView = new UiObject(new UiSelector().className(android.webkit.WebView.class
-                .getName()));
-        webView.clickTopLeft();
-        UiDevice device = UiDevice.getInstance();
-        device.clearLastTraversedText();
-
-        device.pressDPadDown();
-        String text = device.getLastTraversedText();
-        assertTrue("Read regular text", text.contains("This is test <b>6</b>"));
-
-        device.pressDPadDown();
-        text = device.getLastTraversedText();
-        assertTrue("Anchor text", text.contains("<a"));
-
-        device.pressDPadDown();
-        text = device.getLastTraversedText();
-        assertTrue("h5 text", text.contains("h5"));
-
-        device.pressDPadDown();
-        text = device.getLastTraversedText();
-        assertTrue("Anchor text", text.contains("<a"));
-
-        device.pressDPadDown();
-        text = device.getLastTraversedText();
-        assertTrue("h4 text", text.contains("h4"));
-    }*/
-
-    /**
-     * Test when an object does not exist, an exception is thrown
-     */
-    public void testExceptionObjectNotFound() {
+    public void testExceptionObjectNotFound() throws UiObjectNotFoundException {
         UiSelector selector = new UiSelector().text("Nothing should be found");
         UiSelector child = new UiSelector().className("Nothing");
         UiObject obj = new UiObject(selector.childSelector(child));
@@ -761,6 +732,7 @@ public class CtsUiAutomatorTest extends UiAutomatorTestCase {
      * @since API Level 17
      */
     public void testSelectorLongClickableProperty() throws UiObjectNotFoundException {
+        openTest("Test 2");
         UiObject button3 = new UiObject(new UiSelector().className(
                 android.widget.Button.class).longClickable(true).instance(2));
         button3.longClick();
@@ -779,6 +751,234 @@ public class CtsUiAutomatorTest extends UiAutomatorTestCase {
 
         assertTrue("Screenshot file not detected in store", storePath.exists());
         assertTrue("Zero size for screenshot file", storePath.length() > 0);
+    }
+
+    /**
+     * Verifies the 'Resource-Id' property of UiSelector
+     *
+     * @throws UiObjectNotFoundException
+     * @since API Level 18
+     */
+    public void testSelectorResourceId() throws UiObjectNotFoundException {
+        openTest("Test 5");
+        UiSelector toggleSelector =
+                new UiSelector().resourceId("com.android.cts.uiautomator:id/test_5_toggleButton");
+        UiObject toggleButton = new UiObject(toggleSelector);
+        assertTrue("Object with selector resource-id not found", toggleButton.exists());
+        assertTrue("Incorrect object for selector resource-id returned",
+                "OFF".equals(toggleButton.getText()) || "ON".equals(toggleButton.getText()));
+    }
+
+    /**
+     * Performs a pinch out from the center of a view to its edges and listens to
+     * the motion events to make sure the starting and ending points of both pointers
+     * are correct.
+     *
+     * @throws UiObjectNotFoundException
+     * @since API Level 18
+     */
+    public void testPinchOut() throws UiObjectNotFoundException {
+        openTest("Test 12");
+
+        UiObject screen = new UiObject(
+                new UiSelector().description("Details View"));
+
+        // get the current view dimensions
+        Rect screenRect = screen.getBounds();
+
+        // perform the pinch for 100% of the view dimensions starting form
+        // the center out to the edges.
+        screen.pinchOut(100, 30);
+
+        // dialog with the detected pointers motion coordinates is displayed.
+        UiObject results = new UiObject(new UiSelector().className(
+                android.widget.ScrollView.class).childSelector(new UiSelector().className(
+                        android.widget.TextView.class)));
+        String allPointers = results.getText();
+        new UiObject(new UiSelector().text("OK")).click(); // dismiss dialog
+
+        // parse pointer 1
+        Point p1s = parsePointerCoordinates(allPointers, 0, 0); // start
+        Point p1e = parsePointerCoordinates(allPointers, 0, 1); // end
+        // parse pointer 2
+        Point p2s = parsePointerCoordinates(allPointers, 1, 0); // start
+        Point p2e = parsePointerCoordinates(allPointers, 1, 1); // end
+
+        assertTrue("All Y axis coordinates for pointer 1 must be the same", p1s.y == p1e.y);
+        assertTrue("All Y axis coordinates for pointer 2 must be the same", p2s.y == p2e.y);
+        assertTrue("All Y axis coordinates for both pointers must be the same", p1s.y == p2s.y);
+        assertTrue("Pinch must be in center of target view", p2s.y == screenRect.centerY());
+
+        assertTrue("Touch-down X coordinate for pointer 1 is invalid",
+                withinMarginOfError(0.05f, screenRect.centerX(), p1s.x));
+
+        assertTrue("Touch-down X coordinate for pointer 2 is invalid",
+                withinMarginOfError(0.05f, screenRect.centerX(), p2s.x));
+
+        assertTrue("Touch-up X coordinate for pointer 1 is invalid",
+                withinMarginOfError(0.05f, screenRect.left, p1e.x));
+
+        assertTrue("Touch-up X coordinate for pointer 2 is invalid",
+                withinMarginOfError(0.05f, screenRect.right, p2e.x));
+    }
+
+    /**
+     * Performs a pinch in from the edges of a view to its center and listens to
+     * the motion events to make sure the starting and ending points of both pointers
+     * are correct.
+     *
+     * @throws UiObjectNotFoundException
+     * @since API Level 18
+     */
+    public void testPinchIn() throws UiObjectNotFoundException {
+        openTest("Test 12");
+
+        UiObject screen = new UiObject(
+                new UiSelector().description("Details View"));
+
+        // get the current view dimensions
+        Rect screenRect = screen.getBounds();
+
+        // perform the pinch for 100% of the view dimensions starting form
+        // the edges in towards the center.
+        screen.pinchIn(100, 30);
+
+        // dialog with the detected pointers motion coordinates is displayed.
+        UiObject results = new UiObject(new UiSelector().className(
+                android.widget.ScrollView.class).childSelector(new UiSelector().className(
+                        android.widget.TextView.class)));
+        String allPointers = results.getText();
+        new UiObject(new UiSelector().text("OK")).click(); // dismiss dialog
+
+        // parse pointer 1
+        Point p1s = parsePointerCoordinates(allPointers, 0, 0); // start
+        Point p1e = parsePointerCoordinates(allPointers, 0, 1); // end
+        // parse pointer 2
+        Point p2s = parsePointerCoordinates(allPointers, 1, 0); // start
+        Point p2e = parsePointerCoordinates(allPointers, 1, 1); // end
+
+        assertTrue("All Y axis coordinates for pointer 1 must be the same", p1s.y == p1e.y);
+        assertTrue("All Y axis coordinates for pointer 2 must be the same", p2s.y == p2e.y);
+        assertTrue("All Y axis coordinates for both pointers must be the same", p1s.y == p2s.y);
+        assertTrue("Pinch must be in center of target view", p2s.y == screenRect.centerY());
+
+        assertTrue("Touch-down X coordinate for pointer 1 is invalid",
+                withinMarginOfError(0.05f, screenRect.left, p1s.x));
+
+        assertTrue("Touch-down X coordinate for pointer 2 is invalid",
+                withinMarginOfError(0.05f, screenRect.right, p2s.x));
+
+        assertTrue("Touch-up X coordinate for pointer 1 is invalid",
+                withinMarginOfError(0.05f, screenRect.centerX(), p1e.x));
+
+        assertTrue("Touch-up X coordinate for pointer 2 is invalid",
+                withinMarginOfError(0.05f, screenRect.centerX(), p2e.x));
+    }
+
+    /**
+     * Performs a drag and drop operation from one UiObject to another UiObject
+     *
+     * @throws UiObjectNotFoundException
+     * @since API Level 18
+     */
+    public void testDragToObject() throws UiObjectNotFoundException {
+        openTest("Test 5");
+
+        UiObject imageButton = new UiObject(new UiSelector().description("Image button"));
+        UiObject starsBar = new UiObject(new UiSelector().className(android.widget.RatingBar.class));
+
+        Rect starsBarRect = starsBar.getBounds();
+        Rect imageButtonRect = imageButton.getBounds();
+        imageButton.dragTo(starsBar, 30);
+
+        // dialog with the detected pointers motion coordinates is displayed.
+        UiObject results = new UiObject(new UiSelector().className(
+                android.widget.ScrollView.class).childSelector(new UiSelector().className(
+                        android.widget.TextView.class)));
+        String allPointers = results.getText();
+        new UiObject(new UiSelector().text("OK")).click(); // dismiss dialog
+
+        // parse pointer 1
+        Point p1s = parsePointerCoordinates(allPointers, 0, 0); // start
+        Point p1e = parsePointerCoordinates(allPointers, 0, 1); // end
+
+        assertTrue("Invalid touch starting.X reported",
+                withinMarginOfError(0.05f, imageButtonRect.centerX(), p1s.x));
+        assertTrue("Invalid touch starting.Y reported",
+                withinMarginOfError(0.05f, imageButtonRect.centerY(), p1s.y));
+        assertTrue("Invalid touch ending.X reported",
+                withinMarginOfError(0.05f, starsBarRect.centerX(), p1e.x));
+        assertTrue("Invalid touch ending.Y reported",
+                withinMarginOfError(0.05f, starsBarRect.centerY(), p1e.y));
+    }
+
+    /**
+     * Performs a drag and drop operation from one UiObject to a specified coordinates
+     *
+     * @throws UiObjectNotFoundException
+     * @since API Level 18
+     */
+   public void testDragToCoordinates() throws UiObjectNotFoundException {
+       openTest("Test 5");
+
+       UiObject imageButton = new UiObject(new UiSelector().description("Image button"));
+       UiObject starsBar = new UiObject(new UiSelector().className(android.widget.RatingBar.class));
+
+       Rect starsBarRect = starsBar.getBounds();
+       Rect imageButtonRect = imageButton.getBounds();
+       imageButton.dragTo(starsBarRect.centerX(), starsBarRect.centerY(), 30);
+
+       // dialog with the detected pointers motion coordinates is displayed.
+       UiObject results = new UiObject(new UiSelector().className(
+               android.widget.ScrollView.class).childSelector(new UiSelector().className(
+                       android.widget.TextView.class)));
+       String allPointers = results.getText();
+       new UiObject(new UiSelector().text("OK")).click(); // dismiss dialog
+
+       // parse pointer 1
+       Point p1s = parsePointerCoordinates(allPointers, 0, 0); // start
+       Point p1e = parsePointerCoordinates(allPointers, 0, 1); // end
+
+       assertTrue("Invalid touch starting.X reported",
+               withinMarginOfError(0.05f, imageButtonRect.centerX(), p1s.x));
+       assertTrue("Invalid touch starting.Y reported",
+               withinMarginOfError(0.05f, imageButtonRect.centerY(), p1s.y));
+       assertTrue("Invalid touch ending.X reported",
+               withinMarginOfError(0.05f, starsBarRect.centerX(), p1e.x));
+       assertTrue("Invalid touch ending.Y reported",
+               withinMarginOfError(0.05f, starsBarRect.centerY(), p1e.y));
+   }
+
+   /**
+    * Detect if actual value is within the allowable margin of error of the expected value.
+    *
+    * Used essentially with actual values that may vary from the expected values such in the
+    * cases of touch and pinch and touch and swipe where the starting or ending points may
+    * not exactly match the expected value.
+    *
+    * @param marginPrecent is values between 0 and 1
+    * @param expected
+    * @param actual
+    * @return true if actual is within the allowed range from expected
+    */
+   private boolean withinMarginOfError(float marginPrecent, int expected, int actual) {
+       int m = (int) (marginPrecent * expected);
+       return actual >= expected - m && actual <= expected + m;
+   }
+
+   /**
+     * Parses a string containing starting to ending coordinates of one or more pointers.
+     *
+     * @param allPointers is a raw string with coordinates from all detected pointers
+     * @param pointerNumber is the desired pointer to be parsed
+     * @param edge is the 0 for the start or 1 for the end of the swipe
+     * @return Point containing the start or end coordinates of the specified pointer number
+     */
+    private Point parsePointerCoordinates(String allPointers, int pointerNumber, int edge) {
+        String pointers[] = allPointers.split("\n");
+        String coordinates = pointers[pointerNumber].split(":")[edge];
+        String xy[] = coordinates.split(",");
+        return new Point(Integer.parseInt(xy[0]), Integer.parseInt(xy[1]));
     }
 
     /**

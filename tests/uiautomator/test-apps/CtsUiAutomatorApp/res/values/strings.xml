@@ -57,5 +57,7 @@
     <string name="title_activity_test5_detail">Test5DetailActivity</string>
     <string name="title_activity_test6_detail">Test6DetailActivity</string>
     <string name="test_5_Widgets_collection">Widgets Collection</string>
-
+    <string name="generic_item_touch_dialog_title">Multi-touch test dialog</string>
+    <string name="drag_item_touch_dialog_title">Drag and drop test dialog</string>
+    <string name="title_test_view_detail">Details View</string>
 </resources>
