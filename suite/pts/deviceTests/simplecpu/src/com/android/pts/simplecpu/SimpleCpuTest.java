@@ -18,7 +18,8 @@ package com.android.pts.simplecpu;
 
 import android.cts.util.TimeoutReq;
 
-import com.android.pts.util.PerfResultType;
+import com.android.pts.util.ResultType;
+import com.android.pts.util.ResultUnit;
 import com.android.pts.util.PtsAndroidTestCase;
 import com.android.pts.util.ReportLog;
 import com.android.pts.util.Stat;
@@ -96,10 +97,11 @@ public class SimpleCpuTest extends PtsAndroidTestCase {
         for (int i = 0; i < numberRepeat; i++) {
             result[i] = CpuNative.runSort(arrayLength, numberRepeatInEachCall);
         }
-        getReportLog().printArray("ms", result, false);
+        getReportLog().printArray("sorting time", result, ResultType.LOWER_BETTER,
+                ResultUnit.MS);
         Stat.StatResult stat = Stat.getStat(result);
-        getReportLog().printSummary("ms", stat.mAverage, PerfResultType.LOWER_BETTER,
-                stat.mStddev);
+        getReportLog().printSummary("sorting time", stat.mAverage, ResultType.LOWER_BETTER,
+                ResultUnit.MS);
     }
 
     /**
@@ -114,10 +116,11 @@ public class SimpleCpuTest extends PtsAndroidTestCase {
         for (int i = 0; i < numberRepeat; i++) {
             result[i] = CpuNative.runMatrixMultiplication(n, numberRepeatInEachCall);
         }
-        getReportLog().printArray("ms", result, false);
+        getReportLog().printArray("matrix mutiplication time", result, ResultType.LOWER_BETTER,
+                ResultUnit.MS);
         Stat.StatResult stat = Stat.getStat(result);
-        getReportLog().printSummary("ms", stat.mAverage, PerfResultType.LOWER_BETTER,
-                stat.mStddev);
+        getReportLog().printSummary("matrix mutiplication time", stat.mAverage,
+                ResultType.LOWER_BETTER, ResultUnit.MS);
     }
 
 }

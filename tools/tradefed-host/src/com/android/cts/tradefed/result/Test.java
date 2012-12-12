@@ -15,6 +15,7 @@
  */
 package com.android.cts.tradefed.result;
 
+import com.android.ddmlib.Log;
 import com.android.tradefed.result.TestResult;
 
 import org.kxml2.io.KXmlSerializer;
@@ -27,7 +28,6 @@ import java.io.IOException;
  * Data structure that represents a "Test" result XML element.
  */
 class Test extends AbstractXmlPullParser {
-
     static final String TAG = "Test";
     private static final String NAME_ATTR = "name";
     private static final String MESSAGE_ATTR = "message";
@@ -36,7 +36,16 @@ class Test extends AbstractXmlPullParser {
     private static final String RESULT_ATTR = "result";
     private static final String SCENE_TAG = "FailedScene";
     private static final String STACK_TAG = "StackTrace";
+    private static final String SUMMARY_TAG = "Summary";
     private static final String DETAILS_TAG = "Details";
+    private static final String VALUEARRAY_TAG = "ValueArray";
+    private static final String VALUE_TAG = "Value";
+    private static final String SCORETYPE_ATTR = "scoreType";
+    private static final String UNIT_ATTR = "unit";
+    private static final String SOURCE_ATTR = "source";
+    // separators for the message from PTS
+    private static final String LOG_SEPARATOR = "\\+\\+\\+";
+    private static final String LOG_ELEM_SEPARATOR = "\\|";
 
     private String mName;
     private CtsTestStatus mResult;
@@ -44,7 +53,8 @@ class Test extends AbstractXmlPullParser {
     private String mEndTime;
     private String mMessage;
     private String mStackTrace;
-    // details passed from pts
+    // summary and details passed from pts
+    private String mSummary;
     private String mDetails;
 
     /**
@@ -109,6 +119,14 @@ class Test extends AbstractXmlPullParser {
         mMessage = getFailureMessageFromStackTrace(mStackTrace);
     }
 
+    public String getSummary() {
+        return mSummary;
+    }
+
+    public void setSummary(String summary) {
+        mSummary = summary;
+    }
+
     public String getDetails() {
         return mDetails;
     }
@@ -147,14 +165,107 @@ class Test extends AbstractXmlPullParser {
                 serializer.text(mStackTrace);
                 serializer.endTag(CtsXmlResultReporter.ns, STACK_TAG);
             }
-            if (mDetails != null) {
-                serializer.startTag(CtsXmlResultReporter.ns, DETAILS_TAG);
-                serializer.text(mDetails);
-                serializer.endTag(CtsXmlResultReporter.ns, DETAILS_TAG);
-            }
             serializer.endTag(CtsXmlResultReporter.ns, SCENE_TAG);
         }
+        if (mSummary != null) {
+            // <Summary message = "screen copies per sec" scoretype="higherBetter" unit="fps">
+            // 23938.82978723404</Summary>
+            PerfResultSummary summary = parseSummary(mSummary);
+            if (summary != null) {
+                serializer.startTag(CtsXmlResultReporter.ns, SUMMARY_TAG);
+                serializer.attribute(CtsXmlResultReporter.ns, MESSAGE_ATTR, summary.mMessage);
+                serializer.attribute(CtsXmlResultReporter.ns, SCORETYPE_ATTR, summary.mType);
+                serializer.attribute(CtsXmlResultReporter.ns, UNIT_ATTR, summary.mUnit);
+                serializer.text(summary.mValue);
+                serializer.endTag(CtsXmlResultReporter.ns, SUMMARY_TAG);
+                // add details only if summary is present
+                // <Details>
+                //   <ValueArray source=”com.android.pts.dram.BandwidthTest#doRunMemcpy:98”
+                //                    message=”measure1” unit="ms" scoretype="higherBetter">
+                //     <Value>0.0</Value>
+                //     <Value>0.1</Value>
+                //   </ValueArray>
+                // </Details>
+                if (mDetails != null) {
+                    PerfResultDetail[] ds = parseDetails(mDetails);
+                    serializer.startTag(CtsXmlResultReporter.ns, DETAILS_TAG);
+                        for (PerfResultDetail d : ds) {
+                            if (d == null) {
+                                continue;
+                            }
+                            serializer.startTag(CtsXmlResultReporter.ns, VALUEARRAY_TAG);
+                            serializer.attribute(CtsXmlResultReporter.ns, SOURCE_ATTR, d.mSource);
+                            serializer.attribute(CtsXmlResultReporter.ns, MESSAGE_ATTR,
+                                    d.mMessage);
+                            serializer.attribute(CtsXmlResultReporter.ns, SCORETYPE_ATTR, d.mType);
+                            serializer.attribute(CtsXmlResultReporter.ns, UNIT_ATTR, d.mUnit);
+                            for (String v : d.mValues) {
+                                if (v == null) {
+                                    continue;
+                                }
+                                serializer.startTag(CtsXmlResultReporter.ns, VALUE_TAG);
+                                serializer.text(v);
+                                serializer.endTag(CtsXmlResultReporter.ns, VALUE_TAG);
+                            }
+                            serializer.endTag(CtsXmlResultReporter.ns, VALUEARRAY_TAG);
+                        }
+                    serializer.endTag(CtsXmlResultReporter.ns, DETAILS_TAG);
+                }
+            }
+        }
         serializer.endTag(CtsXmlResultReporter.ns, TAG);
+    }
+
+    /**
+     *  class containing performance result.
+     */
+    public static class PerfResultCommon {
+        public String mMessage;
+        public String mType;
+        public String mUnit;
+    }
+
+    private class PerfResultSummary extends PerfResultCommon {
+        public String mValue;
+    }
+
+    private class PerfResultDetail extends PerfResultCommon {
+        public String mSource;
+        public String[] mValues;
+    }
+
+    private PerfResultSummary parseSummary(String summary) {
+        String[] elems = summary.split(LOG_ELEM_SEPARATOR);
+        PerfResultSummary r = new PerfResultSummary();
+        if (elems.length < 4) {
+            Log.w(TAG, "wrong message " + summary);
+            return null;
+        }
+        r.mMessage = elems[0];
+        r.mType = elems[1];
+        r.mUnit = elems[2];
+        r.mValue = elems[3];
+        return r;
+    }
+
+    private PerfResultDetail[] parseDetails(String details) {
+        String[] arrays = details.split(LOG_SEPARATOR);
+        PerfResultDetail[] rs = new PerfResultDetail[arrays.length];
+        for (int i = 0; i < arrays.length; i++) {
+            String[] elems = arrays[i].split(LOG_ELEM_SEPARATOR);
+            if (elems.length < 5) {
+                Log.w(TAG, "wrong message " + arrays[i]);
+                continue;
+            }
+            PerfResultDetail r = new PerfResultDetail();
+            r.mSource = elems[0];
+            r.mMessage = elems[1];
+            r.mType = elems[2];
+            r.mUnit = elems[3];
+            r.mValues = elems[4].split(" ");
+            rs[i] = r;
+        }
+        return rs;
     }
 
     /**
