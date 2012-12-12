@@ -27,7 +27,16 @@ import android.content.res.Resources;
  * @hide
  */
 public class ScriptC_set_target_api_11 extends ScriptC {
+    private static final String __rs_resource_name = "set_target_api_11";
     // Constructor
+    public  ScriptC_set_target_api_11(RenderScript rs) {
+        this(rs,
+             rs.getApplicationContext().getResources(),
+             rs.getApplicationContext().getResources().getIdentifier(
+                 __rs_resource_name, "raw",
+                 rs.getApplicationContext().getPackageName()));
+    }
+
     public  ScriptC_set_target_api_11(RenderScript rs, Resources resources, int id) {
         super(rs, resources, id);
     }
