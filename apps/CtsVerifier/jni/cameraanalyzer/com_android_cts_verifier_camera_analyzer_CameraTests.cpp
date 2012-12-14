@@ -51,7 +51,7 @@ jlong Java_com_android_cts_verifier_camera_analyzer_CameraTests_findNative(
             inputBitmap,
             reinterpret_cast<void**>(&inputBuffer));
 
-    if (result != ANDROID_BITMAP_RESUT_SUCCESS) {
+    if (result != ANDROID_BITMAP_RESULT_SUCCESS) {
         ALOGE("Unable to lock input bitmap");
     }
 
@@ -106,7 +106,7 @@ jlong Java_com_android_cts_verifier_camera_analyzer_CameraTests_findNative(
     long lp = (long)input_testing_image;
 
     result = AndroidBitmap_unlockPixels(env, inputBitmap);
-    if (result != ANDROID_BITMAP_RESUT_SUCCESS) {
+    if (result != ANDROID_BITMAP_RESULT_SUCCESS) {
         ALOGE("Unable to unlock input bitmap");
     }
 
@@ -200,14 +200,14 @@ void Java_com_android_cts_verifier_camera_analyzer_CameraTests_displayHandlerDeb
                 outputBitmap,
                 reinterpret_cast<void**>(&outputBuffer) );
 
-        if (result != ANDROID_BITMAP_RESUT_SUCCESS) {
+        if (result != ANDROID_BITMAP_RESULT_SUCCESS) {
             ALOGE("Unable to lock output bitmap");
         }
 
         memcpy(outputBuffer, outputImage, outputWidth * outputHeight * 4);
 
         result = AndroidBitmap_unlockPixels(env, outputBitmap);
-        if (result != ANDROID_BITMAP_RESUT_SUCCESS) {
+        if (result != ANDROID_BITMAP_RESULT_SUCCESS) {
             ALOGE("Unable to unlock output bitmap");
         }
 
