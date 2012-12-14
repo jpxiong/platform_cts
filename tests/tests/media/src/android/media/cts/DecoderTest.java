@@ -18,29 +18,27 @@ package android.media.cts;
 
 import com.android.cts.media.R;
 
-import android.content.Context;
 import android.content.res.AssetFileDescriptor;
 import android.content.res.Resources;
 import android.media.MediaCodec;
 import android.media.MediaExtractor;
 import android.media.MediaFormat;
-import android.test.AndroidTestCase;
 import android.util.Log;
+import android.view.Surface;
 
 import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
-import java.util.Map;
 
-public class DecoderTest extends AndroidTestCase {
+public class DecoderTest extends MediaPlayerTestBase {
     private static final String TAG = "DecoderTest";
 
     private Resources mResources;
 
     @Override
-    public void setContext(Context context) {
-        super.setContext(context);
+    protected void setUp() throws Exception {
+        super.setUp();
         mResources = mContext.getResources();
     }
 
@@ -203,5 +201,211 @@ public class DecoderTest extends AndroidTestCase {
         assertTrue("decoding error too big: " + rmse, rmse <= maxerror);
     }
 
+    public void testCodecBasicH264() throws Exception {
+        Surface s = getActivity().getSurfaceHolder().getSurface();
+        int frames1 = countFrames(
+                R.raw.video_480x360_mp4_h264_1000kbps_25fps_aac_stereo_128kbps_44100hz,
+                false, s);
+        assertEquals("wrong number of frames decoded", 240, frames1);
+
+        int frames2 = countFrames(
+                R.raw.video_480x360_mp4_h264_1000kbps_25fps_aac_stereo_128kbps_44100hz,
+                false, null);
+        assertEquals("different number of frames when using Surface", frames1, frames2);
+    }
+
+    public void testCodecBasicH263() throws Exception {
+        Surface s = getActivity().getSurfaceHolder().getSurface();
+        int frames1 = countFrames(
+                R.raw.video_176x144_3gp_h263_300kbps_12fps_aac_stereo_128kbps_22050hz,
+                false, s);
+        assertEquals("wrong number of frames decoded", 122, frames1);
+
+        int frames2 = countFrames(
+                R.raw.video_176x144_3gp_h263_300kbps_12fps_aac_stereo_128kbps_22050hz,
+                false, null);
+        assertEquals("different number of frames when using Surface", frames1, frames2);
+    }
+
+    public void testCodecReconfigH264WithoutSurface() throws Exception {
+        testCodecReconfig(
+                R.raw.video_480x360_mp4_h264_1000kbps_25fps_aac_stereo_128kbps_44100hz, null);
+    }
+
+    public void testCodecReconfigH264WithSurface() throws Exception {
+        Surface s = getActivity().getSurfaceHolder().getSurface();
+        testCodecReconfig(
+                R.raw.video_480x360_mp4_h264_1000kbps_25fps_aac_stereo_128kbps_44100hz, s);
+    }
+
+    public void testCodecReconfigH263WithoutSurface() throws Exception {
+        testCodecReconfig(
+                R.raw.video_176x144_3gp_h263_300kbps_12fps_aac_stereo_128kbps_22050hz, null);
+    }
+
+    public void testCodecReconfigH263WithSurface() throws Exception {
+        Surface s = getActivity().getSurfaceHolder().getSurface();
+        testCodecReconfig(
+                R.raw.video_176x144_3gp_h263_300kbps_12fps_aac_stereo_128kbps_22050hz, s);
+    }
+
+//    public void testCodecReconfigOgg() throws Exception {
+//        testCodecReconfig(R.raw.sinesweepogg);
+//    }
+//
+//    public void testCodecReconfigMp3() throws Exception {
+//        testCodecReconfig(R.raw.sinesweepmp3lame);
+//    }
+//
+//    public void testCodecReconfigM4a() throws Exception {
+//        testCodecReconfig(R.raw.sinesweepm4a);
+//    }
+
+    private void testCodecReconfig(int video, Surface s) throws Exception {
+        int frames1 = countFrames(video, false, s);
+        int frames2 = countFrames(video, true, s);
+        assertEquals("different number of frames when reusing codec", frames1, frames2);
+    }
+
+    private int countFrames(int video, boolean reconfigure, Surface s) throws Exception {
+        int numframes = 0;
+
+        Log.i("@@@@", "using surface: " + s);
+
+        AssetFileDescriptor testFd = mResources.openRawResourceFd(video);
+
+        MediaExtractor extractor;
+        MediaCodec codec = null;
+        ByteBuffer[] codecInputBuffers;
+        ByteBuffer[] codecOutputBuffers;
+
+        extractor = new MediaExtractor();
+        extractor.setDataSource(testFd.getFileDescriptor(), testFd.getStartOffset(),
+                testFd.getLength());
+
+        MediaFormat format = extractor.getTrackFormat(0);
+        String mime = format.getString(MediaFormat.KEY_MIME);
+        boolean isAudio = mime.startsWith("audio/");
+
+        codec = MediaCodec.createDecoderByType(mime);
+//        if (mime.contains("avc")) {
+//            codec = MediaCodec.createByCodecName("OMX.google.h264.decoder");
+//        } else if (mime.contains("3gpp")) {
+//            codec = MediaCodec.createByCodecName("OMX.google.h263.decoder");
+//        }
+        assertNotNull("couldn't find codec", codec);
+        Log.i("@@@@", "using codec: " + codec.getName());
+        codec.configure(format, s /* surface */, null /* crypto */, 0 /* flags */);
+        codec.start();
+        codecInputBuffers = codec.getInputBuffers();
+        codecOutputBuffers = codec.getOutputBuffers();
+
+        if (reconfigure) {
+            codec.stop();
+            codec.configure(format, s /* surface */, null /* crypto */, 0 /* flags */);
+            codec.start();
+            codecInputBuffers = codec.getInputBuffers();
+            codecOutputBuffers = codec.getOutputBuffers();
+        }
+        Log.i("@@@@", "format: " + format);
+
+        extractor.selectTrack(0);
+
+        // start decoding
+        final long kTimeOutUs = 5000;
+        MediaCodec.BufferInfo info = new MediaCodec.BufferInfo();
+        boolean sawInputEOS = false;
+        boolean sawOutputEOS = false;
+        int deadDecoderCounter = 0;
+        while (!sawOutputEOS && deadDecoderCounter < 100) {
+            if (!sawInputEOS) {
+                int inputBufIndex = codec.dequeueInputBuffer(kTimeOutUs);
+
+                if (inputBufIndex >= 0) {
+                    ByteBuffer dstBuf = codecInputBuffers[inputBufIndex];
+
+                    int sampleSize =
+                        extractor.readSampleData(dstBuf, 0 /* offset */);
+
+                    long presentationTimeUs = 0;
+
+                    if (sampleSize < 0) {
+                        Log.d(TAG, "saw input EOS.");
+                        sawInputEOS = true;
+                        sampleSize = 0;
+                    } else {
+                        presentationTimeUs = extractor.getSampleTime();
+                    }
+
+                    int flags = extractor.getSampleFlags();
+                    Log.i("@@@@@@", "flags: " + flags + " @ " + presentationTimeUs);
+
+                    codec.queueInputBuffer(
+                            inputBufIndex,
+                            0 /* offset */,
+                            sampleSize,
+                            presentationTimeUs,
+                            sawInputEOS ? MediaCodec.BUFFER_FLAG_END_OF_STREAM : 0);
+
+                    if (!sawInputEOS) {
+                        extractor.advance();
+                    }
+                }
+            }
+
+            int res = codec.dequeueOutputBuffer(info, kTimeOutUs);
+
+            deadDecoderCounter++;
+            if (res >= 0) {
+                Log.d("TAG", "got frame");
+                deadDecoderCounter = 0;
+
+                if (reconfigure) {
+                    // once we've gotten some data out of the decoder, reconfigure it one more time
+                    reconfigure = false;
+                    numframes = 0;
+                    extractor.seekTo(0, MediaExtractor.SEEK_TO_NEXT_SYNC);
+                    sawInputEOS = false;
+                    codec.stop();
+                    codec.configure(format, s /* surface */, null /* crypto */, 0 /* flags */);
+                    codec.start();
+                    codecInputBuffers = codec.getInputBuffers();
+                    codecOutputBuffers = codec.getOutputBuffers();
+                    continue;
+                }
+
+                if (isAudio) {
+                    // for audio, count the number of bytes that were decoded, not the number
+                    // of access units
+                    numframes += (info.size - info.offset);
+                } else {
+                    // for video, count the number of video frames
+                    numframes++;
+                }
+                int outputBufIndex = res;
+                codec.releaseOutputBuffer(outputBufIndex, true /* render */);
+
+                if ((info.flags & MediaCodec.BUFFER_FLAG_END_OF_STREAM) != 0) {
+                    Log.d(TAG, "saw output EOS.");
+                    sawOutputEOS = true;
+                }
+            } else if (res == MediaCodec.INFO_OUTPUT_BUFFERS_CHANGED) {
+                codecOutputBuffers = codec.getOutputBuffers();
+
+                Log.d(TAG, "output buffers have changed.");
+            } else if (res == MediaCodec.INFO_OUTPUT_FORMAT_CHANGED) {
+                MediaFormat oformat = codec.getOutputFormat();
+
+                Log.d(TAG, "output format has changed to " + oformat);
+            } else {
+                Log.d(TAG, "no output");
+            }
+        }
+
+        codec.stop();
+        codec.release();
+        testFd.close();
+        return numframes;
+    }
 }
 
