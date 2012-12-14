@@ -35,6 +35,8 @@ LOCAL_SRC_FILES := \
 
 LOCAL_MODULE_TAGS := optional
 
+LOCAL_JAVA_LIBRARIES := junit
+
 LOCAL_MODULE := ptscommonutilhost
 
 include $(BUILD_HOST_JAVA_LIBRARY)
