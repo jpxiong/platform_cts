@@ -119,18 +119,31 @@ public class DateUtilsTest extends AndroidTestCase {
                 mBaseTime - DAY_DURATION).toString());
     }
 
+    public void test_formatElapsedTime() {
+        if (!LocaleUtils.isCurrentLocale(mContext, Locale.US)) {
+            return;
+        }
+
+        long MINUTES = 60;
+        long HOURS = 60 * MINUTES;
+        test_formatElapsedTime("02:01", 2 * MINUTES + 1);
+        test_formatElapsedTime("3:02:01", 3 * HOURS + 2 * MINUTES + 1);
+        // http://code.google.com/p/android/issues/detail?id=41401
+        test_formatElapsedTime("123:02:01", 123 * HOURS + 2 * MINUTES + 1);
+    }
+
+    private void test_formatElapsedTime(String expected, long elapsedTime) {
+        assertEquals(expected, DateUtils.formatElapsedTime(elapsedTime));
+        StringBuilder sb = new StringBuilder();
+        assertEquals(expected, DateUtils.formatElapsedTime(sb, elapsedTime));
+        assertEquals(expected, sb.toString());
+    }
+
     @SuppressWarnings("deprecation")
     public void testFormatMethods() {
         if (!LocaleUtils.isCurrentLocale(mContext, Locale.US)) {
             return;
         }
-
-        long elapsedTime = 2 * 60 * 60;
-        String expected = "2:00:00";
-        assertEquals(expected, DateUtils.formatElapsedTime(elapsedTime));
-        StringBuilder sb = new StringBuilder();
-        assertEquals(expected, DateUtils.formatElapsedTime(sb, elapsedTime));
-        assertEquals(expected, sb.toString());
 
         Date date = new Date(109, 0, 19, 3, 30, 15);
         long fixedTime = date.getTime();
