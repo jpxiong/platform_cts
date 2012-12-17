@@ -19,6 +19,8 @@ package com.android.pts.util;
 import java.util.LinkedList;
 import java.util.List;
 
+import junit.framework.Assert;
+
 
 /**
  * Utility class to print performance measurement result back to host.
@@ -26,8 +28,8 @@ import java.util.List;
  *
  * Format:
  * Message = summary log SUMMARY_SEPARATOR [LOG_SEPARATOR log]*
- * summary = message|unit|type|value
- * log for array = classMethodName:line_number|message|unit|type|space separated values
+ * summary = message|target|unit|type|value, target can be " " if there is no target set.
+ * log for array = classMethodName:line_number|message|unit|type|space seSummaryparated values
  */
 public class ReportLog {
     private static final String LOG_SEPARATOR = "+++";
@@ -72,16 +74,45 @@ public class ReportLog {
     }
 
     /**
-     * For standard report summary with average and stddev
+     * record the result of benchmarking with performance target.
+     * Depending on the ResultType, the function can fail if the result
+     * does not meet the target. For example, for the type of HIGHER_BETTER,
+     * value of 1.0 with target of 2.0 will fail.
+     *
+     * @param message message to be printed in the final report
+     * @param target target performance for the benchmarking
+     * @param value measured value
+     * @param type
+     * @param unit
+     */
+    public void printSummaryWithTarget(String message, double target, double value,
+            ResultType type, ResultUnit unit) {
+        mSummary = message + LOG_ELEM_SEPARATOR + target + LOG_ELEM_SEPARATOR + type.getXmlString()
+                + LOG_ELEM_SEPARATOR + unit.getXmlString() + LOG_ELEM_SEPARATOR + value;
+        boolean resultOk = true;
+        if (type == ResultType.HIGHER_BETTER) {
+            resultOk = value >= target;
+        } else if (type == ResultType.LOWER_BETTER) {
+            resultOk = value <= target;
+        }
+        if (!resultOk) {
+            Assert.fail("Measured result " + value + " does not meet perf target " + target +
+                    " with type " + type.getXmlString());
+        }
+    }
+
+    /**
+     * For standard report summary without target value.
+     * Note that this function will not fail as there is no target.
      * @param messsage
      * @param value
-     * @param type type of average value. stddev does not need type.
+     * @param type type of the value
      * @param unit unit of the data
      */
     public void printSummary(String message, double value, ResultType type,
             ResultUnit unit) {
-        mSummary = message + LOG_ELEM_SEPARATOR + type.getXmlString() + LOG_ELEM_SEPARATOR +
-                unit.getXmlString() + LOG_ELEM_SEPARATOR + value;
+        mSummary = message + LOG_ELEM_SEPARATOR + " " + LOG_ELEM_SEPARATOR + type.getXmlString() +
+                LOG_ELEM_SEPARATOR + unit.getXmlString() + LOG_ELEM_SEPARATOR + value;
     }
 
     public void throwReportToHost() throws PtsException {
