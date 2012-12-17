@@ -40,6 +40,7 @@ class Test extends AbstractXmlPullParser {
     private static final String DETAILS_TAG = "Details";
     private static final String VALUEARRAY_TAG = "ValueArray";
     private static final String VALUE_TAG = "Value";
+    private static final String TARGET_ATTR = "target";
     private static final String SCORETYPE_ATTR = "scoreType";
     private static final String UNIT_ATTR = "unit";
     private static final String SOURCE_ATTR = "source";
@@ -174,6 +175,9 @@ class Test extends AbstractXmlPullParser {
             if (summary != null) {
                 serializer.startTag(CtsXmlResultReporter.ns, SUMMARY_TAG);
                 serializer.attribute(CtsXmlResultReporter.ns, MESSAGE_ATTR, summary.mMessage);
+                if (summary.mTarget.length() != 0 && !summary.mTarget.equals(" ")) {
+                    serializer.attribute(CtsXmlResultReporter.ns, TARGET_ATTR, summary.mTarget);
+                }
                 serializer.attribute(CtsXmlResultReporter.ns, SCORETYPE_ATTR, summary.mType);
                 serializer.attribute(CtsXmlResultReporter.ns, UNIT_ATTR, summary.mUnit);
                 serializer.text(summary.mValue);
@@ -226,6 +230,7 @@ class Test extends AbstractXmlPullParser {
     }
 
     private class PerfResultSummary extends PerfResultCommon {
+        public String mTarget;
         public String mValue;
     }
 
@@ -237,14 +242,15 @@ class Test extends AbstractXmlPullParser {
     private PerfResultSummary parseSummary(String summary) {
         String[] elems = summary.split(LOG_ELEM_SEPARATOR);
         PerfResultSummary r = new PerfResultSummary();
-        if (elems.length < 4) {
+        if (elems.length < 5) {
             Log.w(TAG, "wrong message " + summary);
             return null;
         }
         r.mMessage = elems[0];
-        r.mType = elems[1];
-        r.mUnit = elems[2];
-        r.mValue = elems[3];
+        r.mTarget = elems[1];
+        r.mType = elems[2];
+        r.mUnit = elems[3];
+        r.mValue = elems[4];
         return r;
     }
 
