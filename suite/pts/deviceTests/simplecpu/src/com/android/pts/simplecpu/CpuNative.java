@@ -25,16 +25,16 @@ public class CpuNative {
      * with each having the size of bufferSize.
      * @param numberElements
      * @param repeatition
-     * @return time spent in sorting in ms.
+     * @return time taken for computation, added for all repetition in ms
      */
-    public static native long runSort(int numberElements, int repetition);
+    public static native double runSort(int numberElements, int repetition);
 
     /**
      * run matrix multiplication of (n x n) x (n x n)
      *
      * @param n dimension, should be multiple of 8
      * @param repetition
-     * @return
+     * @return time taken for computation, added for all repetition in ms
      */
-    public static native long runMatrixMultiplication(int n, int repetition);
+    public static native double runMatrixMultiplication(int n, int repetition);
 }

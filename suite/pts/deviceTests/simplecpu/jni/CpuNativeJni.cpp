@@ -156,11 +156,11 @@ loop:   SWAPINIT(a, es);
 /**
  * Util for getting time stamp
  */
-long currentTimeMillis()
+double currentTimeMillis()
 {
     struct timeval tv;
     gettimeofday(&tv, (struct timezone *) NULL);
-    return (long)tv.tv_sec * 1000 + tv.tv_usec / 1000;
+    return tv.tv_sec * 1000.0 + tv.tv_usec / 1000.0;
 }
 
 /**
@@ -182,7 +182,7 @@ int cmpint(const void* p1, const void* p2)
     return *(int*)p1 - *(int*)p2;
 }
 
-extern "C" JNIEXPORT jlong JNICALL Java_com_android_pts_simplecpu_CpuNative_runSort(JNIEnv* env,
+extern "C" JNIEXPORT jdouble JNICALL Java_com_android_pts_simplecpu_CpuNative_runSort(JNIEnv* env,
         jclass clazz, jint numberElements, jint repetition)
 {
     int* data = new int[numberElements];
@@ -190,12 +190,12 @@ extern "C" JNIEXPORT jlong JNICALL Java_com_android_pts_simplecpu_CpuNative_runS
         env->ThrowNew(env->FindClass("java/lang/OutOfMemoryError"), "No memory");
         return -1;
     }
-    long totalTime = 0;
+    double totalTime = 0;
     for (int i = 0; i < repetition; i++) {
         randomInitArray<int>(data, numberElements, 0);
-        long start = currentTimeMillis();
+        double start = currentTimeMillis();
         qsort_local(data, numberElements, sizeof(int), cmpint);
-        long end = currentTimeMillis();
+        double end = currentTimeMillis();
         totalTime += (end - start);
     }
     delete[] data;
@@ -239,7 +239,7 @@ void doMatrixMultiplication(float* A, float* B, float* C, int n)
     }
 }
 
-extern "C" JNIEXPORT jlong JNICALL Java_com_android_pts_simplecpu_CpuNative_runMatrixMultiplication(
+extern "C" JNIEXPORT jdouble JNICALL Java_com_android_pts_simplecpu_CpuNative_runMatrixMultiplication(
         JNIEnv* env, jclass clazz, jint n, jint repetition)
 {
     // C = A x B
@@ -253,13 +253,13 @@ extern "C" JNIEXPORT jlong JNICALL Java_com_android_pts_simplecpu_CpuNative_runM
         env->ThrowNew(env->FindClass("java/lang/OutOfMemoryError"), "No memory");
         return -1;
     }
-    long totalTime = 0;
+    double totalTime = 0;
     for (int i = 0; i < repetition; i++) {
         randomInitArray<float>(A, n * n, 0);
         randomInitArray<float>(B, n * n, 1);
-        long start = currentTimeMillis();
+        double start = currentTimeMillis();
         doMatrixMultiplication(A, B, C, n);
-        long end = currentTimeMillis();
+        double end = currentTimeMillis();
         totalTime += (end - start);
     }
     delete[] A;

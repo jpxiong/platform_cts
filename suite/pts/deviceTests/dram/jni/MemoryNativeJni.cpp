@@ -19,14 +19,14 @@
 #include <string.h>
 #include <sys/time.h>
 
-long currentTimeMillis()
+double currentTimeMillis()
 {
     struct timeval tv;
     gettimeofday(&tv, (struct timezone *) NULL);
-    return (long)tv.tv_sec * 1000 + tv.tv_usec / 1000;
+    return tv.tv_sec * 1000.0 + tv.tv_usec / 1000.0;
 }
 
-extern "C" JNIEXPORT jlong JNICALL Java_com_android_pts_dram_MemoryNative_runMemcpy(JNIEnv* env,
+extern "C" JNIEXPORT jdouble JNICALL Java_com_android_pts_dram_MemoryNative_runMemcpy(JNIEnv* env,
         jclass clazz, jint bufferSize, jint repetition)
 {
     char* src = new char[bufferSize];
@@ -39,12 +39,12 @@ extern "C" JNIEXPORT jlong JNICALL Java_com_android_pts_dram_MemoryNative_runMem
     }
     memset(src, 0, bufferSize);
     memset(dst, 0, bufferSize);
-    long start = currentTimeMillis();
+    double start = currentTimeMillis();
     for (int i = 0; i < repetition; i++) {
         memcpy(dst, src, bufferSize);
         src[bufferSize - 1] = i & 0xff;
     }
-    long end = currentTimeMillis();
+    double end = currentTimeMillis();
     delete[] src;
     delete[] dst;
     return end - start;
