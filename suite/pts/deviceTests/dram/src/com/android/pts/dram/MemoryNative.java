@@ -27,5 +27,5 @@ public class MemoryNative {
      * @param repeatition
      * @return time spent in copying in ms.
      */
-    public static native long runMemcpy(int bufferSize, int repetition);
+    public static native double runMemcpy(int bufferSize, int repetition);
 }
