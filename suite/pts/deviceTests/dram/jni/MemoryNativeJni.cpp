@@ -49,3 +49,23 @@ extern "C" JNIEXPORT jdouble JNICALL Java_com_android_pts_dram_MemoryNative_runM
     delete[] dst;
     return end - start;
 }
+
+extern "C" JNIEXPORT jdouble JNICALL Java_com_android_pts_dram_MemoryNative_runMemset(JNIEnv* env,
+        jclass clazz, jint bufferSize, jint repetition, jint c)
+{
+    char* dst = new char[bufferSize];
+    if (dst == NULL) {
+        delete[] dst;
+        env->ThrowNew(env->FindClass("java/lang/OutOfMemoryError"), "No memory");
+        return -1;
+    }
+    memset(dst, 0, bufferSize);
+    double start = currentTimeMillis();
+    for (int i = 0; i < repetition; i++) {
+        memset(dst, (c + i) & 0xff, bufferSize);
+    }
+    double end = currentTimeMillis();
+    delete[] dst;
+    return end - start;
+}
+

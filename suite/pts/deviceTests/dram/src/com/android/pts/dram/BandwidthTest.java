@@ -39,6 +39,7 @@ public class BandwidthTest extends PtsAndroidTestCase {
     private static final int REPEAT_IN_EACH_CALL = 100;
     private static final int KB = 1024;
     private static final int MB = 1024 * 1024;
+    private static final int MEMSET_CHAR = 0xa5;
 
     @Override
     protected void setUp() throws Exception {
@@ -99,6 +100,58 @@ public class BandwidthTest extends PtsAndroidTestCase {
         doRunMemcpy(16 * MB);
     }
 
+    public void testMemsetK004() {
+        doRunMemset(4 * KB);
+    }
+
+    public void testMemsetK008() {
+        doRunMemset(8 * KB);
+    }
+
+    public void testMemsetK016() {
+        doRunMemset(16 * KB);
+    }
+
+    public void testMemsetK032() {
+        doRunMemset(32 * KB);
+    }
+
+    public void testMemsetK064() {
+        doRunMemset(64 * KB);
+    }
+
+    public void testMemsetK128() {
+        doRunMemset(128 * KB);
+    }
+
+    public void testMemsetK256() {
+        doRunMemset(256 * KB);
+    }
+
+    public void testMemsetK512() {
+        doRunMemset(512 * KB);
+    }
+
+    public void testMemsetM001() {
+        doRunMemset(1 * MB);
+    }
+
+    public void testMemsetM002() {
+        doRunMemset(2 * MB);
+    }
+
+    public void testMemsetM004() {
+        doRunMemset(4 * MB);
+    }
+
+    public void testMemsetM008() {
+        doRunMemset(8 * MB);
+    }
+
+    public void testMemsetM016() {
+        doRunMemset(16 * MB);
+    }
+
     private void doRunMemcpy(int bufferSize) {
         double[] result = new double[REPETITION];
         int repeatInEachCall = REPEAT_IN_EACH_CALL;
@@ -124,6 +177,34 @@ public class BandwidthTest extends PtsAndroidTestCase {
         // now this represents how many times the whole screen can be copied in a sec.
         double screensPerSecAverage = stat.mAverage / pixels * 1024.0 * 1024.0 / 4.0;
         getReportLog().printSummary("memcpy in fps", screensPerSecAverage,
+                ResultType.HIGHER_BETTER, ResultUnit.FPS);
+    }
+
+    private void doRunMemset(int bufferSize) {
+        double[] result = new double[REPETITION];
+        int repeatInEachCall = REPEAT_IN_EACH_CALL;
+        if (bufferSize < (1 * MB)) {
+            // too small buffer size finishes too early to give accurate result.
+            repeatInEachCall *= (1 * MB / bufferSize);
+        }
+        for (int i = 0; i < REPETITION; i++) {
+            result[i] = MemoryNative.runMemset(bufferSize, repeatInEachCall, MEMSET_CHAR);
+        }
+        getReportLog().printArray("memset time", result, ResultType.LOWER_BETTER,
+                ResultUnit.MS);
+        double[] mbps = ReportLog.calcRatePerSecArray(
+                (double)bufferSize * repeatInEachCall / 1024.0 / 1024.0, result);
+        getReportLog().printArray("memset throughput", mbps, ResultType.HIGHER_BETTER,
+                ResultUnit.MBPS);
+        Stat.StatResult stat = Stat.getStat(mbps);
+        WindowManager wm = (WindowManager) getContext().getSystemService(Context.WINDOW_SERVICE);
+        Point size = new Point();
+        wm.getDefaultDisplay().getSize(size);
+        Log.i(TAG, " x " + size.x + " y " + size.y);
+        double pixels = size.x * size.y;
+        // now this represents how many times the whole screen can be copied in a sec.
+        double screensPerSecAverage = stat.mAverage / pixels * 1024.0 * 1024.0 / 4.0;
+        getReportLog().printSummary("memset in fps", screensPerSecAverage,
                 ResultType.HIGHER_BETTER, ResultUnit.FPS);
     }
 }

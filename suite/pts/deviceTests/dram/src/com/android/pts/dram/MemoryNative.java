@@ -28,4 +28,14 @@ public class MemoryNative {
      * @return time spent in copying in ms.
      */
     public static native double runMemcpy(int bufferSize, int repetition);
+
+    /**
+     * run memset for given number of repetition from a source to a destination buffers
+     * with each having the size of bufferSize.
+     * @param bufferSize
+     * @param repetition
+     * @param c char to set. Only LSBs will be used to get char value.
+     * @return time spent in memset in ms.
+     */
+    public static native double runMemset(int bufferSize, int repetition, int c);
 }
