@@ -1,4 +1,4 @@
-# Copyright (C) 2011 The Android Open Source Project
+# Copyright (C) 2012 The Android Open Source Project
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -16,22 +16,17 @@ LOCAL_PATH:= $(call my-dir)
 
 include $(CLEAR_VARS)
 
-LOCAL_MODULE_TAGS := tests
+LOCAL_MODULE := libctssecurity_jni
 
-LOCAL_JAVA_LIBRARIES := android.test.runner
+# Don't include this package in any configuration by default.
+LOCAL_MODULE_TAGS := optional
 
-LOCAL_STATIC_JAVA_LIBRARIES := ctstestrunner
+LOCAL_SRC_FILES := \
+		CtsSecurityJniOnLoad.cpp \
+		android_security_cts_CharDeviceTest.cpp
 
-LOCAL_JNI_SHARED_LIBRARIES := libctssecurity_jni
+LOCAL_C_INCLUDES := $(JNI_H_INCLUDE)
 
-LOCAL_SRC_FILES := $(call all-java-files-under, src)
+LOCAL_SHARED_LIBRARIES := libnativehelper liblog
 
-LOCAL_PACKAGE_NAME := CtsSecurityTestCases
-
-LOCAL_INSTRUMENTATION_FOR := CtsTestStubs
-
-LOCAL_SDK_VERSION := current
-
-include $(BUILD_CTS_PACKAGE)
-
-include $(call all-makefiles-under,$(LOCAL_PATH))
+include $(BUILD_SHARED_LIBRARY)
