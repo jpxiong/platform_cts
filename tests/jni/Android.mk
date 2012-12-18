@@ -24,7 +24,8 @@ LOCAL_MODULE_TAGS := optional
 LOCAL_SRC_FILES := \
 		CtsJniOnLoad.cpp \
 		android_os_cts_FileUtils.cpp \
-		android_net_cts_NetlinkSocket.cpp
+		android_net_cts_NetlinkSocket.cpp \
+		android_security_cts_Exynos.cpp
 
 LOCAL_C_INCLUDES := $(JNI_H_INCLUDE) 
 
