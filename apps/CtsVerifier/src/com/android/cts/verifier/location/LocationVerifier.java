@@ -28,6 +28,9 @@ public class LocationVerifier implements Handler.Callback {
 
     private static final int MSG_TIMEOUT = 1;
 
+    /** Timing failures on first NUM_IGNORED_UPDATES updates are ignored. */
+    private static final int NUM_IGNORED_UPDATES = 2;
+
     private final LocationManager mLocationManager;
     private final PassFailLog mCb;
     private final String mProvider;
@@ -68,10 +71,15 @@ public class LocationVerifier implements Handler.Callback {
                         location.getElapsedRealtimeNanos());
             }
 
-            if (mNumActiveUpdates != 1 && delta < mMinActiveInterval) {
-                fail(mProvider + " location updated too fast: " + delta + "ms < " +
-                        mMinActiveInterval + "ms");
-                return;
+            if (delta < mMinActiveInterval) {
+                if (mNumActiveUpdates > NUM_IGNORED_UPDATES ) {
+                    fail(mProvider + " location updated too fast: " + delta + "ms < " +
+                         mMinActiveInterval + "ms");
+                    return;
+                } else {
+                    mCb.log("WARNING: active " + mProvider + " location updated too fast: " +
+                         delta + "ms < " + mMinActiveInterval + "ms");
+                }
             }
 
             mCb.log("active " + mProvider + " update (" + delta + "ms)");
@@ -127,15 +135,20 @@ public class LocationVerifier implements Handler.Callback {
                         location.getElapsedRealtimeNanos());
             }
 
-            if (mNumPassiveUpdates != 1 && delta < mMinPassiveInterval) {
-                fail("passive " + mProvider + " location updated too fast: " + delta + "ms < " +
-                        mMinPassiveInterval + "ms");
-                mCb.log("when passive updates are much much faster than active updates it " +
-                        "suggests the location provider implementation is not power efficient");
-                if (LocationManager.GPS_PROVIDER.equals(mProvider)) {
-                    mCb.log("check GPS_CAPABILITY_SCHEDULING in GPS driver");
+            if (delta < mMinPassiveInterval) {
+                if (mNumPassiveUpdates > NUM_IGNORED_UPDATES) {
+                    fail("passive " + mProvider + " location updated too fast: " + delta + "ms < " +
+                         mMinPassiveInterval + "ms");
+                    mCb.log("when passive updates are much much faster than active updates it " +
+                            "suggests the location provider implementation is not power efficient");
+                    if (LocationManager.GPS_PROVIDER.equals(mProvider)) {
+                        mCb.log("check GPS_CAPABILITY_SCHEDULING in GPS driver");
+                    }
+                    return;
+                } else {
+                    mCb.log("WARNING: passive " + mProvider + " location updated too fast: " +
+                            delta + "ms < " + mMinPassiveInterval + "ms");
                 }
-                return;
             }
 
             mCb.log("passive " + mProvider + " update (" + delta + "ms)");
@@ -153,15 +166,15 @@ public class LocationVerifier implements Handler.Callback {
             String provider, long requestedInterval, int numUpdates) {
         mProvider = provider;
         mInterval = requestedInterval;
-        // Updates can be up to 100ms ahead of schedule
-        mMinActiveInterval = Math.max(0, requestedInterval - 100);
+        // Updates can be up to 15% of the request interval ahead of schedule
+        mMinActiveInterval = Math.max(0, (long) (requestedInterval * 0.85));
         // Allow passive updates to be up to 10x faster than active updates,
         // beyond that it is very likely the implementation is not taking
         // advantage of the interval to be power efficient
         mMinPassiveInterval = mMinActiveInterval / 10;
         // timeout at 60 seconds after interval time
         mTimeout = requestedInterval + 60 * 1000;
-        mRequestedUpdates = numUpdates;
+        mRequestedUpdates = numUpdates + NUM_IGNORED_UPDATES;
         mLocationManager = locationManager;
         mCb = cb;
         mHandler = new Handler(this);
