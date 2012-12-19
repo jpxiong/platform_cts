@@ -89,6 +89,7 @@ public class DecoderTest extends MediaPlayerTestBase {
             masterBuffer[i] = (short) sample;
         }
         bis.close();
+        masterFd.close();
 
         AssetFileDescriptor testFd = mResources.openRawResourceFd(testinput);
 
@@ -100,6 +101,7 @@ public class DecoderTest extends MediaPlayerTestBase {
         extractor = new MediaExtractor();
         extractor.setDataSource(testFd.getFileDescriptor(), testFd.getStartOffset(),
                 testFd.getLength());
+        testFd.close();
 
         assertEquals("wrong number of tracks", 1, extractor.getTrackCount());
         MediaFormat format = extractor.getTrackFormat(0);
@@ -192,8 +194,6 @@ public class DecoderTest extends MediaPlayerTestBase {
 
         codec.stop();
         codec.release();
-        testFd.close();
-        masterFd.close();
 
         assertEquals("wrong data size", masterLength, numBytesDecoded);
         long avgErrorSquared = (totalErrorSquared / (numBytesDecoded / 2));
@@ -250,16 +250,16 @@ public class DecoderTest extends MediaPlayerTestBase {
     }
 
 //    public void testCodecReconfigOgg() throws Exception {
-//        testCodecReconfig(R.raw.sinesweepogg);
+//        testCodecReconfig(R.raw.sinesweepogg, null);
 //    }
 //
-//    public void testCodecReconfigMp3() throws Exception {
-//        testCodecReconfig(R.raw.sinesweepmp3lame);
-//    }
-//
-//    public void testCodecReconfigM4a() throws Exception {
-//        testCodecReconfig(R.raw.sinesweepm4a);
-//    }
+    public void testCodecReconfigMp3() throws Exception {
+        testCodecReconfig(R.raw.sinesweepmp3lame, null);
+    }
+
+    public void testCodecReconfigM4a() throws Exception {
+        testCodecReconfig(R.raw.sinesweepm4a, null);
+    }
 
     private void testCodecReconfig(int video, Surface s) throws Exception {
         int frames1 = countFrames(video, false, s);
@@ -269,8 +269,6 @@ public class DecoderTest extends MediaPlayerTestBase {
 
     private int countFrames(int video, boolean reconfigure, Surface s) throws Exception {
         int numframes = 0;
-
-        Log.i("@@@@", "using surface: " + s);
 
         AssetFileDescriptor testFd = mResources.openRawResourceFd(video);
 
@@ -338,7 +336,6 @@ public class DecoderTest extends MediaPlayerTestBase {
                     }
 
                     int flags = extractor.getSampleFlags();
-                    Log.i("@@@@@@", "flags: " + flags + " @ " + presentationTimeUs);
 
                     codec.queueInputBuffer(
                             inputBufIndex,
@@ -357,30 +354,33 @@ public class DecoderTest extends MediaPlayerTestBase {
 
             deadDecoderCounter++;
             if (res >= 0) {
-                Log.d("TAG", "got frame");
-                deadDecoderCounter = 0;
+                //Log.d("TAG", "got frame, size " + info.size + "/" + info.presentationTimeUs);
 
-                if (reconfigure) {
-                    // once we've gotten some data out of the decoder, reconfigure it one more time
-                    reconfigure = false;
-                    numframes = 0;
-                    extractor.seekTo(0, MediaExtractor.SEEK_TO_NEXT_SYNC);
-                    sawInputEOS = false;
-                    codec.stop();
-                    codec.configure(format, s /* surface */, null /* crypto */, 0 /* flags */);
-                    codec.start();
-                    codecInputBuffers = codec.getInputBuffers();
-                    codecOutputBuffers = codec.getOutputBuffers();
-                    continue;
-                }
+                // Some decoders output a 0-sized buffer at the end. Disregard those.
+                if (info.size > 0) {
+                    deadDecoderCounter = 0;
+                    if (reconfigure) {
+                        // once we've gotten some data out of the decoder, reconfigure it again
+                        reconfigure = false;
+                        numframes = 0;
+                        extractor.seekTo(0, MediaExtractor.SEEK_TO_NEXT_SYNC);
+                        sawInputEOS = false;
+                        codec.stop();
+                        codec.configure(format, s /* surface */, null /* crypto */, 0 /* flags */);
+                        codec.start();
+                        codecInputBuffers = codec.getInputBuffers();
+                        codecOutputBuffers = codec.getOutputBuffers();
+                        continue;
+                    }
 
-                if (isAudio) {
-                    // for audio, count the number of bytes that were decoded, not the number
-                    // of access units
-                    numframes += (info.size - info.offset);
-                } else {
-                    // for video, count the number of video frames
-                    numframes++;
+                    if (isAudio) {
+                        // for audio, count the number of bytes that were decoded, not the number
+                        // of access units
+                        numframes += info.size;
+                    } else {
+                        // for video, count the number of video frames
+                        numframes++;
+                    }
                 }
                 int outputBufIndex = res;
                 codec.releaseOutputBuffer(outputBufIndex, true /* render */);
