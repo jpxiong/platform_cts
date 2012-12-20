@@ -30,6 +30,7 @@ import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
+import java.util.zip.CRC32;
 
 public class DecoderTest extends MediaPlayerTestBase {
     private static final String TAG = "DecoderTest";
@@ -354,7 +355,7 @@ public class DecoderTest extends MediaPlayerTestBase {
 
             deadDecoderCounter++;
             if (res >= 0) {
-                //Log.d("TAG", "got frame, size " + info.size + "/" + info.presentationTimeUs);
+                //Log.d(TAG, "got frame, size " + info.size + "/" + info.presentationTimeUs);
 
                 // Some decoders output a 0-sized buffer at the end. Disregard those.
                 if (info.size > 0) {
@@ -407,5 +408,288 @@ public class DecoderTest extends MediaPlayerTestBase {
         testFd.close();
         return numframes;
     }
+
+    public void testEOSBehaviorH264() throws Exception {
+        // this video has an I frame at 44
+        testEOSBehavior(R.raw.video_480x360_mp4_h264_1000kbps_25fps_aac_stereo_128kbps_44100hz, 44);
+        testEOSBehavior(R.raw.video_480x360_mp4_h264_1000kbps_25fps_aac_stereo_128kbps_44100hz, 45);
+        testEOSBehavior(R.raw.video_480x360_mp4_h264_1000kbps_25fps_aac_stereo_128kbps_44100hz, 55);
+    }
+
+    public void testEOSBehaviorH263() throws Exception {
+        // this video has an I frame every 12 frames.
+        testEOSBehavior(R.raw.video_176x144_3gp_h263_300kbps_12fps_aac_stereo_128kbps_22050hz, 24);
+        testEOSBehavior(R.raw.video_176x144_3gp_h263_300kbps_12fps_aac_stereo_128kbps_22050hz, 25);
+        testEOSBehavior(R.raw.video_176x144_3gp_h263_300kbps_12fps_aac_stereo_128kbps_22050hz, 48);
+        testEOSBehavior(R.raw.video_176x144_3gp_h263_300kbps_12fps_aac_stereo_128kbps_22050hz, 50);
+    }
+
+    private void testEOSBehavior(int movie, int stopatsample) throws Exception {
+
+        int numframes = 0;
+
+        long [] checksums = new long[stopatsample];
+
+        AssetFileDescriptor testFd = mResources.openRawResourceFd(movie);
+
+        MediaExtractor extractor;
+        MediaCodec codec = null;
+        ByteBuffer[] codecInputBuffers;
+        ByteBuffer[] codecOutputBuffers;
+
+        extractor = new MediaExtractor();
+        extractor.setDataSource(testFd.getFileDescriptor(), testFd.getStartOffset(),
+                testFd.getLength());
+
+        MediaFormat format = extractor.getTrackFormat(0);
+        String mime = format.getString(MediaFormat.KEY_MIME);
+        boolean isAudio = mime.startsWith("audio/");
+
+        codec = MediaCodec.createDecoderByType(mime);
+//        if (mime.contains("avc")) {
+//            codec = MediaCodec.createByCodecName("OMX.google.h264.decoder");
+//        } else if (mime.contains("3gpp")) {
+//            codec = MediaCodec.createByCodecName("OMX.google.h263.decoder");
+//        }
+        assertNotNull("couldn't find codec", codec);
+        Log.i("@@@@", "using codec: " + codec.getName());
+        codec.configure(format, null /* surface */, null /* crypto */, 0 /* flags */);
+        codec.start();
+        codecInputBuffers = codec.getInputBuffers();
+        codecOutputBuffers = codec.getOutputBuffers();
+
+        extractor.selectTrack(0);
+
+        // start decoding
+        final long kTimeOutUs = 5000;
+        MediaCodec.BufferInfo info = new MediaCodec.BufferInfo();
+        boolean sawInputEOS = false;
+        boolean sawOutputEOS = false;
+        int deadDecoderCounter = 0;
+        int samplenum = 0;
+        while (!sawOutputEOS && deadDecoderCounter < 100) {
+            if (!sawInputEOS) {
+                int inputBufIndex = codec.dequeueInputBuffer(kTimeOutUs);
+
+                if (inputBufIndex >= 0) {
+                    ByteBuffer dstBuf = codecInputBuffers[inputBufIndex];
+
+                    int sampleSize =
+                        extractor.readSampleData(dstBuf, 0 /* offset */);
+//                    Log.i("@@@@", "read sample " + samplenum + ":" + extractor.getSampleFlags()
+//                            + " @ " + extractor.getSampleTime() + " size " + sampleSize);
+                    samplenum++;
+
+                    long presentationTimeUs = 0;
+
+                    if (sampleSize < 0 || samplenum >= (stopatsample + 100)) {
+                        Log.d(TAG, "saw input EOS.");
+                        sawInputEOS = true;
+                        sampleSize = 0;
+                    } else {
+                        presentationTimeUs = extractor.getSampleTime();
+                    }
+
+                    int flags = extractor.getSampleFlags();
+
+                    codec.queueInputBuffer(
+                            inputBufIndex,
+                            0 /* offset */,
+                            sampleSize,
+                            presentationTimeUs,
+                            sawInputEOS ? MediaCodec.BUFFER_FLAG_END_OF_STREAM : 0);
+
+                    if (!sawInputEOS) {
+                        extractor.advance();
+                    }
+                }
+            }
+
+            int res = codec.dequeueOutputBuffer(info, kTimeOutUs);
+
+            deadDecoderCounter++;
+            if (res >= 0) {
+
+                // Some decoders output a 0-sized buffer at the end. Disregard those.
+                if (info.size > 0) {
+                    deadDecoderCounter = 0;
+
+                    if (isAudio) {
+                        // for audio, count the number of bytes that were decoded, not the number
+                        // of access units
+                        numframes += info.size;
+                    } else {
+                        // for video, count the number of video frames
+                        long sum = checksum(codecOutputBuffers[res], info.size);
+                        if (numframes < checksums.length) {
+                            checksums[numframes] = sum;
+                        }
+                        numframes++;
+                    }
+                }
+//                Log.d(TAG, "got frame, size " + info.size + "/" + info.presentationTimeUs +
+//                        "/" + numframes + "/" + info.flags);
+
+                int outputBufIndex = res;
+                codec.releaseOutputBuffer(outputBufIndex, true /* render */);
+
+                if ((info.flags & MediaCodec.BUFFER_FLAG_END_OF_STREAM) != 0) {
+                    Log.d(TAG, "saw output EOS.");
+                    sawOutputEOS = true;
+                }
+            } else if (res == MediaCodec.INFO_OUTPUT_BUFFERS_CHANGED) {
+                codecOutputBuffers = codec.getOutputBuffers();
+
+                Log.d(TAG, "output buffers have changed.");
+            } else if (res == MediaCodec.INFO_OUTPUT_FORMAT_CHANGED) {
+                MediaFormat oformat = codec.getOutputFormat();
+
+                Log.d(TAG, "output format has changed to " + oformat);
+            } else {
+                Log.d(TAG, "no output");
+            }
+        }
+
+        codec.stop();
+        codec.release();
+        extractor.release();
+
+
+        // We now have checksums for every frame.
+        // Now decode again, but signal EOS right before an index frame, and ensure the frames
+        // prior to that are the same.
+
+        extractor = new MediaExtractor();
+        extractor.setDataSource(testFd.getFileDescriptor(), testFd.getStartOffset(),
+                testFd.getLength());
+
+        codec = MediaCodec.createDecoderByType(mime);
+//        if (mime.contains("avc")) {
+//            codec = MediaCodec.createByCodecName("OMX.google.h264.decoder");
+//        } else if (mime.contains("3gpp")) {
+//            codec = MediaCodec.createByCodecName("OMX.google.h263.decoder");
+//        }
+        codec.configure(format, null /* surface */, null /* crypto */, 0 /* flags */);
+        codec.start();
+        codecInputBuffers = codec.getInputBuffers();
+        codecOutputBuffers = codec.getOutputBuffers();
+
+        extractor.selectTrack(0);
+
+        // start decoding
+        info = new MediaCodec.BufferInfo();
+        sawInputEOS = false;
+        sawOutputEOS = false;
+        deadDecoderCounter = 0;
+        samplenum = 0;
+        numframes = 0;
+        while (!sawOutputEOS && deadDecoderCounter < 100) {
+            if (!sawInputEOS) {
+                int inputBufIndex = codec.dequeueInputBuffer(kTimeOutUs);
+
+                if (inputBufIndex >= 0) {
+                    ByteBuffer dstBuf = codecInputBuffers[inputBufIndex];
+
+                    int sampleSize =
+                        extractor.readSampleData(dstBuf, 0 /* offset */);
+//                    Log.i("@@@@", "read sample " + samplenum + ":" + extractor.getSampleFlags()
+//                            + " @ " + extractor.getSampleTime() + " size " + sampleSize);
+                    samplenum++;
+
+                    long presentationTimeUs = extractor.getSampleTime();
+
+                    if (sampleSize < 0 || samplenum >= stopatsample) {
+                        Log.d(TAG, "saw input EOS.");
+                        sawInputEOS = true;
+                        if (sampleSize < 0) {
+                            sampleSize = 0;
+                        }
+                    }
+
+                    int flags = extractor.getSampleFlags();
+
+                    codec.queueInputBuffer(
+                            inputBufIndex,
+                            0 /* offset */,
+                            sampleSize,
+                            presentationTimeUs,
+                            sawInputEOS ? MediaCodec.BUFFER_FLAG_END_OF_STREAM : 0);
+
+                    if (!sawInputEOS) {
+                        extractor.advance();
+                    }
+                }
+            }
+
+            int res = codec.dequeueOutputBuffer(info, kTimeOutUs);
+
+            deadDecoderCounter++;
+            if (res >= 0) {
+
+                // Some decoders output a 0-sized buffer at the end. Disregard those.
+                if (info.size > 0) {
+                    deadDecoderCounter = 0;
+
+                    if (isAudio) {
+                        // for audio, count the number of bytes that were decoded, not the number
+                        // of access units
+                        numframes += info.size;
+                    } else {
+                        // for video, count the number of video frames
+                        long sum = checksum(codecOutputBuffers[res], info.size);
+                        if (numframes < checksums.length) {
+                            assertEquals("frame data mismatch at frame " + numframes,
+                                    checksums[numframes], sum);
+                        }
+                        numframes++;
+                    }
+                }
+//                Log.d(TAG, "got frame, size " + info.size + "/" + info.presentationTimeUs +
+//                        "/" + numframes + "/" + info.flags);
+
+                int outputBufIndex = res;
+                codec.releaseOutputBuffer(outputBufIndex, true /* render */);
+
+                if ((info.flags & MediaCodec.BUFFER_FLAG_END_OF_STREAM) != 0) {
+                    Log.d(TAG, "saw output EOS.");
+                    sawOutputEOS = true;
+                }
+            } else if (res == MediaCodec.INFO_OUTPUT_BUFFERS_CHANGED) {
+                codecOutputBuffers = codec.getOutputBuffers();
+
+                Log.d(TAG, "output buffers have changed.");
+            } else if (res == MediaCodec.INFO_OUTPUT_FORMAT_CHANGED) {
+                MediaFormat oformat = codec.getOutputFormat();
+
+                Log.d(TAG, "output format has changed to " + oformat);
+            } else {
+                Log.d(TAG, "no output");
+            }
+        }
+
+        codec.stop();
+        codec.release();
+        extractor.release();
+
+        assertEquals("I!=O", samplenum, numframes);
+        assertTrue("last frame didn't have EOS", sawOutputEOS);
+        assertEquals(stopatsample, numframes);
+
+        testFd.close();
+    }
+
+    private long checksum(ByteBuffer buf, int size) {
+        assertTrue(size != 0);
+        assertTrue(size <= buf.capacity());
+        CRC32 crc = new CRC32();
+        int pos = buf.position();
+        buf.rewind();
+        for (int i = 0; i < buf.capacity(); i++) {
+            crc.update(buf.get());
+        }
+        buf.position(pos);
+        return crc.getValue();
+    }
+
 }
 
