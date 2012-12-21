@@ -343,6 +343,7 @@ public class CtsUiAutomatorTest extends UiAutomatorTestCase {
 
         Rect tb = textView.getBounds();
         UiDevice.getInstance().swipe(tb.right - 20, tb.centerY(), tb.left + 20, tb.centerY(), 50);
+        SystemClock.sleep(100);
         assertTrue("UiDevice swipe", "[ 2 ]".equals(textView.getText()));
     }
 

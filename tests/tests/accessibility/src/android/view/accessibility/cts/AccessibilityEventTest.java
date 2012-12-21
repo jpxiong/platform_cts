@@ -31,7 +31,7 @@ import junit.framework.TestCase;
 public class AccessibilityEventTest extends TestCase {
 
     /** The number of properties of the {@link AccessibilityEvent} class. */
-    private static final int NON_STATIC_FIELD_COUNT = 30;
+    private static final int NON_STATIC_FIELD_COUNT = 28;
 
     /**
      * Test that no new fields have been added without updating the
@@ -253,7 +253,6 @@ public class AccessibilityEventTest extends TestCase {
                 ((Message) expectedEvent.getParcelableData()).what,
                 ((Message) receivedEvent.getParcelableData()).what);
 
-        AccessibilityRecord expectedRecord = expectedEvent.getRecord(0);
         AccessibilityRecord receivedRecord = receivedEvent.getRecord(0);
         AccessibilityRecordTest.assertEqualAccessibilityRecord(expectedEvent, receivedRecord);
     }
