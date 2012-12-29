@@ -187,22 +187,22 @@ public class GeolocationTest extends ActivityInstrumentationTestCase2<WebViewStu
     // WebViewOnUiThread to detect when the page is loaded, so subclassing the one used there.
     private static class TestSimpleGeolocationRequestWebChromeClient
                 extends WaitForProgressClient {
-        private boolean receivedRequest = false;
-        private final boolean accept;
-        private final boolean retain;
+        private boolean mReceivedRequest = false;
+        private final boolean mAccept;
+        private final boolean mRetain;
 
         public TestSimpleGeolocationRequestWebChromeClient(
                 WebViewOnUiThread webViewOnUiThread, boolean accept, boolean retain) {
             super(webViewOnUiThread);
-            this.accept = accept;
-            this.retain = retain;
+            this.mAccept = accept;
+            this.mRetain = retain;
         }
 
         @Override
         public void onGeolocationPermissionsShowPrompt(
                 String origin, GeolocationPermissions.Callback callback) {
-            receivedRequest = true;
-            callback.invoke(origin, accept, retain);
+            mReceivedRequest = true;
+            callback.invoke(origin, mAccept, mRetain);
         }
     }
 
@@ -229,43 +229,43 @@ public class GeolocationTest extends ActivityInstrumentationTestCase2<WebViewStu
         Callable<Boolean> receivedRequest = new Callable<Boolean>() {
             @Override
             public Boolean call() {
-                return chromeClientAcceptOnce.receivedRequest;
+                return chromeClientAcceptOnce.mReceivedRequest;
             }
         };
-        PollingCheck.check("Geolocation prompt called", POLLING_TIMEOUT, receivedRequest);
+        PollingCheck.check("Geolocation prompt not called", POLLING_TIMEOUT, receivedRequest);
         Callable<Boolean> receivedLocation = new Callable<Boolean>() {
             @Override
             public Boolean call() {
-                return mJavascriptStatusReceiver.hasPosition;
+                return mJavascriptStatusReceiver.mHasPosition;
             }
         };
-        PollingCheck.check("JS got position", POLLING_TIMEOUT, receivedLocation);
-        chromeClientAcceptOnce.receivedRequest = false;
+        PollingCheck.check("JS didn't get position", POLLING_TIMEOUT, receivedLocation);
+        chromeClientAcceptOnce.mReceivedRequest = false;
         // Load URL again, should receive callback again
         loadUrlAndUpdateLocation(URL_1);
-        PollingCheck.check("Geolocation prompt called", POLLING_TIMEOUT, receivedRequest);
-        PollingCheck.check("JS got position", POLLING_TIMEOUT, receivedLocation);
+        PollingCheck.check("Geolocation prompt not called", POLLING_TIMEOUT, receivedRequest);
+        PollingCheck.check("JS didn't get position", POLLING_TIMEOUT, receivedLocation);
     }
 
     // Class that waits and checks for a particular value being received
     private static class ValueCheck<T> extends PollingCheck implements
             android.webkit.ValueCallback<T> {
-        private boolean received = false;
-        private final T expectedValue;
-        private T receivedValue = null;
+        private boolean mReceived = false;
+        private final T mExpectedValue;
+        private T mReceivedValue = null;
 
         public ValueCheck(T val) {
-            expectedValue = val;
+            mExpectedValue = val;
         }
 
         @Override
         protected boolean check() {
-            return received && expectedValue.equals(receivedValue);
+            return mReceived && mExpectedValue.equals(mReceivedValue);
         }
         @Override
         public void onReceiveValue(T value) {
-            received = true;
-            receivedValue = value;
+            mReceived = true;
+            mReceivedValue = value;
         }
     }
 
@@ -279,24 +279,24 @@ public class GeolocationTest extends ActivityInstrumentationTestCase2<WebViewStu
         Callable<Boolean> receivedRequest = new Callable<Boolean>() {
             @Override
             public Boolean call() {
-                return chromeClientAcceptAlways.receivedRequest;
+                return chromeClientAcceptAlways.mReceivedRequest;
             }
         };
-        PollingCheck.check("Geolocation prompt called", POLLING_TIMEOUT, receivedRequest);
+        PollingCheck.check("Geolocation prompt not called", POLLING_TIMEOUT, receivedRequest);
         Callable<Boolean> receivedLocation = new Callable<Boolean>() {
             @Override
             public Boolean call() {
-                return mJavascriptStatusReceiver.hasPosition;
+                return mJavascriptStatusReceiver.mHasPosition;
             }
         };
-        PollingCheck.check("JS got position", POLLING_TIMEOUT, receivedLocation);
-        chromeClientAcceptAlways.receivedRequest = false;
+        PollingCheck.check("JS didn't get position", POLLING_TIMEOUT, receivedLocation);
+        chromeClientAcceptAlways.mReceivedRequest = false;
         mJavascriptStatusReceiver.clearState();
         // Load the same URL again
         loadUrlAndUpdateLocation(URL_1);
-        PollingCheck.check("JS got position", POLLING_TIMEOUT, receivedLocation);
+        PollingCheck.check("JS didn't get position", POLLING_TIMEOUT, receivedLocation);
         // Assert prompt for geolocation permission is not called the second time
-        assertFalse(chromeClientAcceptAlways.receivedRequest);
+        assertFalse(chromeClientAcceptAlways.mReceivedRequest);
         // Check that the permission is in GeolocationPermissions
         ValueCheck<Boolean> trueCheck = new ValueCheck<Boolean>(true);
         GeolocationPermissions.getInstance().getAllowed(URL_1, trueCheck);
@@ -308,11 +308,11 @@ public class GeolocationTest extends ActivityInstrumentationTestCase2<WebViewStu
         originCheck.run();
 
         // URL_2 should get a prompt
-        chromeClientAcceptAlways.receivedRequest = false;
+        chromeClientAcceptAlways.mReceivedRequest = false;
         loadUrlAndUpdateLocation(URL_2);
         // Checking the callback for geolocation permission prompt is called
-        PollingCheck.check("Geolocation prompt called", POLLING_TIMEOUT, receivedRequest);
-        PollingCheck.check("JS got position", POLLING_TIMEOUT, receivedLocation);
+        PollingCheck.check("Geolocation prompt not called", POLLING_TIMEOUT, receivedRequest);
+        PollingCheck.check("JS didn't get position", POLLING_TIMEOUT, receivedLocation);
         acceptedOrigins.add(URL_2);
         originCheck = new ValueCheck<Set<String>>(acceptedOrigins);
         GeolocationPermissions.getInstance().getOrigins(originCheck);
@@ -394,34 +394,34 @@ public class GeolocationTest extends ActivityInstrumentationTestCase2<WebViewStu
         Callable<Boolean> receivedRequest = new Callable<Boolean>() {
             @Override
             public Boolean call() {
-                return chromeClientRejectOnce.receivedRequest;
+                return chromeClientRejectOnce.mReceivedRequest;
             }
         };
-        PollingCheck.check("Geolocation prompt called", POLLING_TIMEOUT, receivedRequest);
+        PollingCheck.check("Geolocation prompt not called", POLLING_TIMEOUT, receivedRequest);
         Callable<Boolean> locationDenied = new Callable<Boolean>() {
             @Override
             public Boolean call() {
-                return mJavascriptStatusReceiver.denied;
+                return mJavascriptStatusReceiver.mDenied;
             }
         };
-        PollingCheck.check("JS got position", POLLING_TIMEOUT, locationDenied);
+        PollingCheck.check("JS didn't get position", POLLING_TIMEOUT, locationDenied);
         // Same result should happen on next run
         mOnUiThread.loadUrlAndWaitForCompletion(URL_1);
-        PollingCheck.check("Geolocation prompt called", POLLING_TIMEOUT, receivedRequest);
-        PollingCheck.check("JS got position", POLLING_TIMEOUT, locationDenied);
+        PollingCheck.check("Geolocation prompt not called", POLLING_TIMEOUT, receivedRequest);
+        PollingCheck.check("JS didn't get position", POLLING_TIMEOUT, locationDenied);
 
         // Try to reject forever
         final TestSimpleGeolocationRequestWebChromeClient chromeClientRejectAlways =
             new TestSimpleGeolocationRequestWebChromeClient(mOnUiThread, false, true);
         mOnUiThread.setWebChromeClient(chromeClientRejectAlways);
         mOnUiThread.loadUrlAndWaitForCompletion(URL_2);
-        PollingCheck.check("Geolocation prompt called", POLLING_TIMEOUT, receivedRequest);
-        PollingCheck.check("JS got position", POLLING_TIMEOUT, locationDenied);
+        PollingCheck.check("Geolocation prompt not called", POLLING_TIMEOUT, receivedRequest);
+        PollingCheck.check("JS didn't get position", POLLING_TIMEOUT, locationDenied);
         // second load should now not get a prompt
-        chromeClientRejectAlways.receivedRequest = false;
+        chromeClientRejectAlways.mReceivedRequest = false;
         mOnUiThread.loadUrlAndWaitForCompletion(URL_2);
-        PollingCheck.check("JS got position", POLLING_TIMEOUT, locationDenied);
-        PollingCheck.check("Geolocation prompt called", POLLING_TIMEOUT, receivedRequest);
+        PollingCheck.check("JS didn't get position", POLLING_TIMEOUT, locationDenied);
+        PollingCheck.check("Geolocation prompt not called", POLLING_TIMEOUT, receivedRequest);
 
         // Test if it gets added to origins
         Set<String> acceptedOrigins = new TreeSet<String>();
@@ -438,36 +438,36 @@ public class GeolocationTest extends ActivityInstrumentationTestCase2<WebViewStu
     // Object added to the page via AddJavascriptInterface() that is used by the test Javascript to
     // notify back to Java when a location or error is received.
     public final static class JavascriptStatusReceiver {
-        public volatile boolean hasPosition = false;
-        public volatile boolean denied = false;
-        public volatile boolean unavailable = false;
-        public volatile boolean timeout = false;
+        public volatile boolean mHasPosition = false;
+        public volatile boolean mDenied = false;
+        public volatile boolean mUnavailable = false;
+        public volatile boolean mTimeout = false;
 
         public void clearState() {
-            hasPosition = false;
-            denied = false;
-            unavailable = false;
-            timeout = false;
+            mHasPosition = false;
+            mDenied = false;
+            mUnavailable = false;
+            mTimeout = false;
         }
 
         @JavascriptInterface
         public void errorDenied() {
-            denied = true;
+            mDenied = true;
         }
 
         @JavascriptInterface
         public void errorUnavailable() {
-            unavailable = true;
+            mUnavailable = true;
         }
 
         @JavascriptInterface
         public void errorTimeout() {
-            timeout = true;
+            mTimeout = true;
         }
 
         @JavascriptInterface
         public void gotLocation() {
-            hasPosition = true;
+            mHasPosition = true;
         }
     }
 }
