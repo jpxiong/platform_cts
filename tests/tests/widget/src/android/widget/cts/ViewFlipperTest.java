@@ -93,6 +93,7 @@ public class ViewFlipperTest extends ActivityInstrumentationTestCase<ViewFlipper
 
         // wait for a longer time to make sure the view flipping is completed.
         waitForViewFlipping(FLIP_INTERVAL + 200);
+        getInstrumentation().waitForIdleSync();
         runTestOnUiThread(new Runnable() {
             public void run() {
                 ViewFlipper viewFlipper =
@@ -108,6 +109,7 @@ public class ViewFlipperTest extends ActivityInstrumentationTestCase<ViewFlipper
         });
 
         waitForViewFlipping(FLIP_INTERVAL + 200);
+        getInstrumentation().waitForIdleSync();
         runTestOnUiThread(new Runnable() {
             public void run() {
                 ViewFlipper viewFlipper =
