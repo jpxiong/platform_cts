@@ -461,13 +461,6 @@ public class WebSettingsTest extends ActivityInstrumentationTestCase2<WebViewStu
         assertEquals(10, mSettings.getMinimumLogicalFontSize());
     }
 
-    public void testAccessNavDump() {
-        assertFalse(mSettings.getNavDump());
-
-        mSettings.setNavDump(true);
-        assertTrue(mSettings.getNavDump());
-    }
-
     public void testAccessPluginsEnabled() {
         assertFalse(mSettings.getPluginsEnabled());
 
