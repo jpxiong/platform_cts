@@ -155,47 +155,6 @@ public class WebSettingsTest extends ActivityInstrumentationTestCase2<WebViewStu
         assertEquals(customUserAgent, mOnUiThread.getTitle());
     }
 
-    @SuppressWarnings("deprecation")
-    public void testAccessUserAgent() throws Exception {
-        startWebServer();
-        String url = mWebServer.getUserAgentUrl();
-
-        mSettings.setUserAgent(1);
-        assertEquals(1, mSettings.getUserAgent());
-        mOnUiThread.loadUrlAndWaitForCompletion(url);
-        String userAgent1 = mOnUiThread.getTitle();
-        assertEquals(userAgent1, mSettings.getUserAgentString());
-
-        mSettings.setUserAgent(3);
-        assertEquals(1, mSettings.getUserAgent());
-        mOnUiThread.loadUrlAndWaitForCompletion(url);
-        assertEquals(userAgent1, mOnUiThread.getTitle());
-
-        mSettings.setUserAgent(2);
-        assertEquals(2, mSettings.getUserAgent());
-        mOnUiThread.loadUrlAndWaitForCompletion(url);
-        String userAgent2 = mOnUiThread.getTitle();
-        assertEquals(userAgent2, mSettings.getUserAgentString());
-
-        mSettings.setUserAgent(3);
-        assertEquals(2, mSettings.getUserAgent());
-        mOnUiThread.loadUrlAndWaitForCompletion(url);
-        assertEquals(userAgent2, mOnUiThread.getTitle());
-
-        mSettings.setUserAgent(0);
-        assertEquals(0, mSettings.getUserAgent());
-        mOnUiThread.loadUrlAndWaitForCompletion(url);
-        String userAgent0 = mOnUiThread.getTitle();
-        assertEquals(userAgent0, mSettings.getUserAgentString());
-
-        final String customUserAgent = "Cts/Test";
-        mSettings.setUserAgentString(customUserAgent);
-        assertEquals(-1, mSettings.getUserAgent());
-        mOnUiThread.loadUrlAndWaitForCompletion(url);
-        assertEquals(customUserAgent, mOnUiThread.getTitle());
-    }
-
-
     public void testAccessAllowFileAccess() {
         // This test is not compatible with 4.0.3
         if ("4.0.3".equals(Build.VERSION.RELEASE)) {
