@@ -53,6 +53,8 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 
+import junit.framework.AssertionFailedError;
+
 /**
  * This test case must run with hardware. It can't be tested in emulator
  */
@@ -1713,6 +1715,9 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
                 // ignore
             }
             mCamera.stopPreview();
+            // See if any frame duration violations occurred during preview run
+            AssertionFailedError e = callback.getDurationException();
+            if (e != null) throw(e);
         }
 
         // Test the invalid fps cases.
@@ -1741,6 +1746,7 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
         // An array storing the arrival time of the frames in the last second.
         private ArrayList<Long> mFrames = new ArrayList<Long>();
         private long firstFrameArrivalTime;
+        private AssertionFailedError mDurationException = null;
 
         public void reset(double minFps, double maxFps) {
             this.mMinFps = minFps;
@@ -1752,6 +1758,7 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
                     + ". Max frame interval=" + mMaxFrameInterval);
             mFrames.clear();
             firstFrameArrivalTime = 0;
+            mDurationException = null;
         }
 
         // This method tests if the actual fps is between minimum and maximum.
@@ -1783,33 +1790,49 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
                 // variance is averaged out.
 
                 // Check if the frame interval is too large or too small.
-                // x100 = percent, intervalMargin should be bigger than fpsMargin considering that
-                // fps will be in the order of 10.
+                // x100 = percent, intervalMargin should be bigger than
+                // fpsMargin considering that fps will be in the order of 10.
                 double intervalMargin = 0.9;
                 long lastArrivalTime = mFrames.get(mFrames.size() - 1);
                 double interval = arrivalTime - lastArrivalTime;
                 if (LOGV) Log.v(TAG, "Frame interval=" + interval);
-                assertTrue("Frame interval (" + interval + "ms) is too large." +
-                        " mMaxFrameInterval=" + mMaxFrameInterval + "ms",
-                        interval < mMaxFrameInterval * (1.0 + intervalMargin));
-                assertTrue("Frame interval (" + interval + "ms) is too small." +
-                        " mMinFrameInterval=" + mMinFrameInterval + "ms",
-                        interval > mMinFrameInterval * (1.0 - intervalMargin));
+                try {
+                    assertTrue("Frame interval (" + interval + "ms) is too " +
+                            "large. mMaxFrameInterval=" +
+                             mMaxFrameInterval + "ms",
+                            interval < mMaxFrameInterval *
+                            (1.0 + intervalMargin));
+                    assertTrue("Frame interval (" + interval + "ms) is too " +
+                            "small. mMinFrameInterval=" +
+                            mMinFrameInterval + "ms",
+                            interval > mMinFrameInterval *
+                            (1.0 - intervalMargin));
 
-                // Check if the fps is within range.
-                double fpsMargin = 0.5; // x100 = percent
-                double avgInterval = (double)(arrivalTime - mFrames.get(0))
-                        / mFrames.size();
-                double fps = 1000.0 / avgInterval;
-                assertTrue("Actual fps (" + fps + ") should be larger than " +
-                           "min fps (" + mMinFps + ")",
-                           fps >= mMinFps * (1.0 - fpsMargin));
-                assertTrue("Actual fps (" + fps + ") should be smaller than " +
-                           "max fps (" + mMaxFps + ")",
-                           fps <= mMaxFps * (1.0 + fpsMargin));
+                    // Check if the fps is within range.
+                    double fpsMargin = 0.5; // x100 = percent
+                    double avgInterval = (double)(arrivalTime - mFrames.get(0))
+                            / mFrames.size();
+                    double fps = 1000.0 / avgInterval;
+                    assertTrue("Actual fps (" + fps + ") should be larger " +
+                            "than min fps (" + mMinFps + ")",
+                            fps >= mMinFps * (1.0 - fpsMargin));
+                    assertTrue("Actual fps (" + fps + ") should be smaller" +
+                            "than max fps (" + mMaxFps + ")",
+                            fps <= mMaxFps * (1.0 + fpsMargin));
+                } catch (AssertionFailedError e) {
+                    // Need to throw this only in the test body, instead of in
+                    // the callback
+                    if (mDurationException == null) {
+                        mDurationException = e;
+                    }
+                }
             }
             // Add the arrival time of this frame to the list.
             mFrames.add(arrivalTime);
+        }
+
+        public AssertionFailedError getDurationException() {
+            return mDurationException;
         }
     }
 
