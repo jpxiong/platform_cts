@@ -25,7 +25,7 @@ public class CharDeviceTest extends TestCase {
     }
 
     /**
-     * Detect Exynos 4xxx rooting vuln.
+     * Detect Exynos 4xxx rooting vuln.  CVE-2012-6422.
      *
      * Reference: http://forum.xda-developers.com/showthread.php?t=2048511
      */
@@ -34,7 +34,7 @@ public class CharDeviceTest extends TestCase {
     }
 
     /**
-     * Detect Exynos 4xxx kernel memory leak to userspace.
+     * Detect Exynos 4xxx kernel memory leak to userspace. CVE-2012-6422.
      *
      * Reference: http://forum.xda-developers.com/showthread.php?t=2048511
      */
