@@ -192,6 +192,39 @@ public class FileSystemPermissionTest extends AndroidTestCase {
         assertFileOwnedByGroup(f, "nfc");
     }
 
+    @MediumTest
+    public void testDevQtaguidSane() throws Exception {
+        File f = new File("/dev/xt_qtaguid");
+        assertTrue(f.canRead());
+        assertFalse(f.canWrite());
+        assertFalse(f.canExecute());
+
+        assertFileOwnedBy(f, "root");
+        assertFileOwnedByGroup(f, "root");
+    }
+
+    @MediumTest
+    public void testProcQtaguidCtrlSane() throws Exception {
+        File f = new File("/proc/net/xt_qtaguid/ctrl");
+        assertTrue(f.canRead());
+        assertTrue(f.canWrite());
+        assertFalse(f.canExecute());
+
+        assertFileOwnedBy(f, "root");
+        assertFileOwnedByGroup(f, "net_bw_acct");
+    }
+
+    @MediumTest
+    public void testProcQtaguidStatsSane() throws Exception {
+        File f = new File("/proc/net/xt_qtaguid/stats");
+        assertTrue(f.canRead());
+        assertFalse(f.canWrite());
+        assertFalse(f.canExecute());
+
+        assertFileOwnedBy(f, "root");
+        assertFileOwnedByGroup(f, "net_bw_stats");
+    }
+
     /**
      * Assert that a file is owned by a specific owner. This is a noop if the
      * file does not exist.
