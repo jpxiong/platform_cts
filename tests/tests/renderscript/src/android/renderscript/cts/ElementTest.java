@@ -487,11 +487,12 @@ public class ElementTest extends RSBaseCompute {
         assertEquals(DataKind.PIXEL_RGB, DataKind.valueOf("PIXEL_RGB"));
         assertEquals(DataKind.PIXEL_RGBA, DataKind.valueOf("PIXEL_RGBA"));
         assertEquals(DataKind.PIXEL_DEPTH, DataKind.valueOf("PIXEL_DEPTH"));
+        assertEquals(DataKind.PIXEL_YUV, DataKind.valueOf("PIXEL_YUV"));
         // Make sure no new enums are added
-        assertEquals(7, DataKind.values().length);
+        assertEquals(8, DataKind.values().length);
 
         for (DataKind dk : DataKind.values()) {
-            if (dk != DataKind.USER) {
+            if (dk != DataKind.USER && dk != DataKind.PIXEL_YUV) {
                 Element.createPixel(mRS, DataType.UNSIGNED_8, dk);
             }
         }
