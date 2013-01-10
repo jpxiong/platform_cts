@@ -20,17 +20,19 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
 
-    <ListView android:id="@+id/listview1"
+    <View android:id="@+id/view1"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"/>
+        android:layout_height="10dip"
+        android:focusable="true"/>
 
-    <ListView android:id="@+id/listview2"
+    <View android:id="@+id/view2"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"/>
+        android:layout_height="10dip"
+        android:focusable="true"/>
 
     <Button android:id="@+id/button1"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
+        android:layout_width="wrap_content"
+        android:layout_height="10dip" />
 
 </LinearLayout>
 
