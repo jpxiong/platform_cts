@@ -619,66 +619,6 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
         }.run();
     }
 
-    public void testSaveAndRestorePicture() throws Throwable {
-        mWebView.setBackgroundColor(Color.CYAN);
-        startWebServer(false);
-        final String url = mWebServer.getAssetUrl(TestHtmlConstants.BLANK_PAGE_URL);
-        mOnUiThread.loadUrlAndWaitForCompletion(url);
-        getInstrumentation().waitForIdleSync();
-
-        final Bundle bundle = new Bundle();
-        final File f = getActivity().getFileStreamPath("snapshot");
-        if (f.exists()) {
-            f.delete();
-        }
-
-        try {
-            assertTrue(bundle.isEmpty());
-            assertEquals(0, f.length());
-            assertTrue(mOnUiThread.savePicture(bundle, f));
-
-            // File saving is done in a separate thread.
-            new PollingCheck() {
-                @Override
-                protected boolean check() {
-                    return f.length() > 0;
-                }
-            }.run();
-
-            assertFalse(bundle.isEmpty());
-
-            Picture p = Picture.createFromStream(new FileInputStream(f));
-            Bitmap b = Bitmap.createBitmap(p.getWidth(), p.getHeight(), Config.ARGB_8888);
-            p.draw(new Canvas(b));
-            assertBitmapFillWithColor(b, Color.CYAN);
-
-            mOnUiThread.setBackgroundColor(Color.WHITE);
-            mOnUiThread.reloadAndWaitForCompletion();
-            getInstrumentation().waitForIdleSync();
-
-            runTestOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    Bitmap b = Bitmap.createBitmap(mWebView.getWidth(), mWebView.getHeight(),
-                            Config.ARGB_8888);
-                    mWebView.draw(new Canvas(b));
-                    assertBitmapFillWithColor(b, Color.WHITE);
-
-                    // restorePicture is only supported in software rendering
-                    mWebView.setLayerType(View.LAYER_TYPE_SOFTWARE, null);
-                    assertTrue(mWebView.restorePicture(bundle, f));
-                }
-            });
-            getInstrumentation().waitForIdleSync();
-            // Cannot test whether the picture has been restored successfully.
-            // Drawing the webview into a canvas will draw white, but on the display it is cyan
-        } finally {
-            if (f.exists()) {
-                f.delete();
-            }
-        }
-    }
-
     @UiThreadTest
     public void testAccessHttpAuthUsernamePassword() {
         try {
