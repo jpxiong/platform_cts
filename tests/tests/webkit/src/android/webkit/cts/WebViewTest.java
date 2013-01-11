@@ -681,23 +681,6 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
         }
     }
 
-    @UiThreadTest
-    public void testSavePassword() {
-        WebViewDatabase db = WebViewDatabase.getInstance(getActivity());
-        try {
-            db.clearUsernamePassword();
-
-            String host = "http://localhost:8080";
-            String userName = "user";
-            String password = "password";
-            assertFalse(db.hasUsernamePassword());
-            mWebView.savePassword(host, userName, password);
-            assertTrue(db.hasUsernamePassword());
-        } finally {
-            db.clearUsernamePassword();
-        }
-    }
-
     public void testLoadData() throws Throwable {
         final String HTML_CONTENT =
                 "<html><head><title>Hello,World!</title></head><body></body>" +
