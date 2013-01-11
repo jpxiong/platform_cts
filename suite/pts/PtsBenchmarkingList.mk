@@ -1,4 +1,5 @@
-# Copyright (C) 2011 The Android Open Source Project
+#
+# Copyright (C) 2012 The Android Open Source Project
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -11,12 +12,25 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+#
 
-LOCAL_PATH := $(call my-dir)
-include $(CLEAR_VARS)
+# package definitions for PTS
 
-LOCAL_MODULE_TAGS := optional
+# New packages should be added here
+PTS_TEST_PACKAGES := \
+    PtsDeviceFilePerf \
+    PtsDeviceUi \
+    PtsDeviceDram \
+    PtsDeviceSimpleCpu
 
-LOCAL_PREBUILT_EXECUTABLES := pts-tradefed
-include $(BUILD_HOST_PREBUILT)
 
+PTS_SUPPORT_PACKAGES := \
+    PtsDeviceTaskswitchingAppA \
+    PtsDeviceTaskswitchingAppB \
+    PtsDeviceTaskswitchingControl \
+    PtsDeviceBrowserLauncher
+
+PTS_HOST_CASES := \
+    PtsHostBootup \
+    PtsHostUi \
+    PtsHostBrowser
