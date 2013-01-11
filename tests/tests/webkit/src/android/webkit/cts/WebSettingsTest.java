@@ -443,13 +443,6 @@ public class WebSettingsTest extends ActivityInstrumentationTestCase2<WebViewStu
         assertFalse(mSettings.getSaveFormData());
     }
 
-    public void testAccessSavePassword() {
-        assertTrue(mSettings.getSavePassword());
-
-        mSettings.setSavePassword(false);
-        assertFalse(mSettings.getSavePassword());
-    }
-
     public void testAccessTextSize() {
         assertEquals(TextSize.NORMAL, mSettings.getTextSize());
 
