@@ -215,6 +215,7 @@
     <xs:enumeration value="higherBetter"/>
     <xs:enumeration value="lowerBetter"/>
     <xs:enumeration value="neutral"/>
+    <xs:enumeration value="warning"/>
   </xs:restriction>
 </xs:simpleType>
 

@@ -25,7 +25,9 @@ public enum ResultType {
     /** higher score shows better performance */
     HIGHER_BETTER("higherBetter"),
     /** This value is not directly correlated with performance. */
-    NEUTRAL("neutral");
+    NEUTRAL("neutral"),
+    /** presence of this type requires some attention although it may not be an error. */
+    WARNING("warning");
 
     final private String mXmlString;
     ResultType(String xmlString) {
