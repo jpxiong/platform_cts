@@ -24,7 +24,7 @@ LOCAL_MODULE := PtsHostBootup
 
 LOCAL_JAVA_LIBRARIES := cts-tradefed tradefed-prebuilt ddmlib-prebuilt junit ptscommonutilhost
 
-LOCAL_PTS_TEST_PACKAGE := com.android.pts.bootup
+LOCAL_CTS_TEST_PACKAGE := com.android.pts.bootup
 
-include $(BUILD_PTS_HOST_JAVA_LIBRARY)
+include $(BUILD_CTS_HOST_JAVA_LIBRARY)
 

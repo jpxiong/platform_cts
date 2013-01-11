@@ -36,6 +36,6 @@ LOCAL_PACKAGE_NAME := PtsDeviceUi
 
 LOCAL_SDK_VERSION := 16
 
-include $(BUILD_PTS_PACKAGE)
+include $(BUILD_CTS_PACKAGE)
 
 

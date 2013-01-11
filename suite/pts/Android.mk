@@ -14,5 +14,4 @@
 # limitations under the License.
 #
 
-include cts/suite/pts/PtsBuild.mk
 include $(call all-subdir-makefiles)
