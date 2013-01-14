@@ -95,25 +95,25 @@ public class GpsTestActivity extends PassFailButtons.Activity implements PassFai
             case 1:
                 // Test GPS with minTime = 0
                 mLocationVerifier = new LocationVerifier(this, mLocationManager,
-                        LocationManager.GPS_PROVIDER, 0, 10);
+                        LocationManager.GPS_PROVIDER, 0, 8);
                 mLocationVerifier.start();
                 break;
             case 2:
                 // Test GPS with minTime = 1s
                 mLocationVerifier = new LocationVerifier(this, mLocationManager,
-                        LocationManager.GPS_PROVIDER, 1000, 10);
+                        LocationManager.GPS_PROVIDER, 1 * 1000, 8);
                 mLocationVerifier.start();
                 break;
             case 3:
                 // Test GPS with minTime = 5s
                 mLocationVerifier = new LocationVerifier(this, mLocationManager,
-                        LocationManager.GPS_PROVIDER, 5 * 1000, 4);
+                        LocationManager.GPS_PROVIDER, 5 * 1000, 8);
                 mLocationVerifier.start();
                 break;
             case 4:
                 // Test GPS with minTime = 15s
                 mLocationVerifier = new LocationVerifier(this, mLocationManager,
-                        LocationManager.GPS_PROVIDER, 15 * 1000, 4);
+                        LocationManager.GPS_PROVIDER, 15 * 1000, 8);
                 mLocationVerifier.start();
                 break;
             case 5:
