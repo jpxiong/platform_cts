@@ -27,6 +27,7 @@ import android.media.MediaMetadataRetriever;
 import android.media.TimedText;
 import android.media.audiofx.AudioEffect;
 import android.media.audiofx.Visualizer;
+import android.media.cts.MediaPlayerTestBase.Monitor;
 import android.net.Uri;
 import android.os.Environment;
 import android.os.PowerManager;
@@ -142,59 +143,141 @@ public class MediaPlayerTest extends MediaPlayerTestBase {
         playVideoTest(R.raw.testvideo, 352, 288);
     }
 
-    public void testSetNextMediaPlayer() throws Exception {
-        AssetFileDescriptor afd = mResources.openRawResourceFd(R.raw.sine1320hz5sec);
+    private void initMediaPlayer(MediaPlayer player) throws Exception {
+        AssetFileDescriptor afd = mResources.openRawResourceFd(R.raw.test1m1s);
         try {
-            mMediaPlayer.reset();
-            mMediaPlayer.setDataSource(afd.getFileDescriptor(), afd.getStartOffset(),
-                    afd.getLength());
-            mMediaPlayer.prepare();
-            mMediaPlayer2.reset();
-            mMediaPlayer2.setDataSource(afd.getFileDescriptor(), afd.getStartOffset(),
-                    afd.getLength());
-            mMediaPlayer2.prepare();
+            player.reset();
+            player.setDataSource(afd.getFileDescriptor(), afd.getStartOffset(), afd.getLength());
+            player.prepare();
+            player.seekTo(56000);
         } finally {
             afd.close();
         }
+    }
 
-        mOnCompletionCalled.reset();
-        mOnInfoCalled.reset();
+    public void testSetNextMediaPlayer() throws Exception {
+        initMediaPlayer(mMediaPlayer);
 
-        mMediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+        final Monitor mTestCompleted = new Monitor();
+
+        Thread timer = new Thread(new Runnable() {
+
             @Override
-            public void onCompletion(MediaPlayer mp) {
-                assertEquals(mMediaPlayer, mp);
-                mOnCompletionCalled.signal();
-            }
-        });
-        mMediaPlayer2.setOnInfoListener(new MediaPlayer.OnInfoListener() {
-            @Override
-            public boolean onInfo(MediaPlayer mp, int what, int extra) {
-                assertEquals(mMediaPlayer2, mp);
-                if (what == MediaPlayer.MEDIA_INFO_STARTED_AS_NEXT) {
-                    mOnInfoCalled.signal();
+            public void run() {
+                long startTime = SystemClock.elapsedRealtime();
+                while(true) {
+                    SystemClock.sleep(SLEEP_TIME);
+                    if (mTestCompleted.isSignalled()) {
+                        // done
+                        return;
+                    }
+                    long now = SystemClock.elapsedRealtime();
+                    if ((now - startTime) > 25000) {
+                        // We've been running for 25 seconds and still aren't done, so we're stuck
+                        // somewhere. Signal ourselves to dump the thread stacks.
+                        android.os.Process.sendSignal(android.os.Process.myPid(), 3);
+                        SystemClock.sleep(2000);
+                        fail("Test is stuck, see ANR stack trace for more info. You may need to" +
+                                " create /data/anr first");
+                        return;
+                    }
                 }
-                return false;
             }
         });
+
+        timer.start();
 
         try {
+            for (int i = 0; i < 3; i++) {
+
+                initMediaPlayer(mMediaPlayer2);
+                mOnCompletionCalled.reset();
+                mOnInfoCalled.reset();
+                mMediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+                    @Override
+                    public void onCompletion(MediaPlayer mp) {
+                        assertEquals(mMediaPlayer, mp);
+                        mOnCompletionCalled.signal();
+                    }
+                });
+                mMediaPlayer2.setOnInfoListener(new MediaPlayer.OnInfoListener() {
+                    @Override
+                    public boolean onInfo(MediaPlayer mp, int what, int extra) {
+                        assertEquals(mMediaPlayer2, mp);
+                        if (what == MediaPlayer.MEDIA_INFO_STARTED_AS_NEXT) {
+                            mOnInfoCalled.signal();
+                        }
+                        return false;
+                    }
+                });
+
+                mMediaPlayer.setNextMediaPlayer(mMediaPlayer2);
+                mMediaPlayer.start();
+                assertTrue(mMediaPlayer.isPlaying());
+                assertFalse(mOnCompletionCalled.isSignalled());
+                assertFalse(mMediaPlayer2.isPlaying());
+                assertFalse(mOnInfoCalled.isSignalled());
+                while(mMediaPlayer.isPlaying()) {
+                    Thread.sleep(SLEEP_TIME);
+                }
+                // wait a little longer in case the callbacks haven't quite made it through yet
+                Thread.sleep(100);
+                assertTrue(mMediaPlayer2.isPlaying());
+                assertTrue(mOnCompletionCalled.isSignalled());
+                assertTrue(mOnInfoCalled.isSignalled());
+
+                // At this point the 1st player is done, and the 2nd one is playing.
+                // Now swap them, and go through the loop again.
+                MediaPlayer tmp = mMediaPlayer;
+                mMediaPlayer = mMediaPlayer2;
+                mMediaPlayer2 = tmp;
+            }
+
+            // Now test that setNextMediaPlayer(null) works. 1 is still playing, 2 is done
+            mOnCompletionCalled.reset();
+            mOnInfoCalled.reset();
+            initMediaPlayer(mMediaPlayer2);
             mMediaPlayer.setNextMediaPlayer(mMediaPlayer2);
-            mMediaPlayer.start();
+
+            mMediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+                @Override
+                public void onCompletion(MediaPlayer mp) {
+                    assertEquals(mMediaPlayer, mp);
+                    mOnCompletionCalled.signal();
+                }
+            });
+            mMediaPlayer2.setOnInfoListener(new MediaPlayer.OnInfoListener() {
+                @Override
+                public boolean onInfo(MediaPlayer mp, int what, int extra) {
+                    assertEquals(mMediaPlayer2, mp);
+                    if (what == MediaPlayer.MEDIA_INFO_STARTED_AS_NEXT) {
+                        mOnInfoCalled.signal();
+                    }
+                    return false;
+                }
+            });
             assertTrue(mMediaPlayer.isPlaying());
             assertFalse(mOnCompletionCalled.isSignalled());
             assertFalse(mMediaPlayer2.isPlaying());
             assertFalse(mOnInfoCalled.isSignalled());
+            Thread.sleep(SLEEP_TIME);
+            mMediaPlayer.setNextMediaPlayer(null);
             while(mMediaPlayer.isPlaying()) {
                 Thread.sleep(SLEEP_TIME);
             }
-            assertTrue(mMediaPlayer2.isPlaying());
+            // wait a little longer in case the callbacks haven't quite made it through yet
+            Thread.sleep(100);
+            assertFalse(mMediaPlayer.isPlaying());
+            assertFalse(mMediaPlayer2.isPlaying());
             assertTrue(mOnCompletionCalled.isSignalled());
-            assertTrue(mOnInfoCalled.isSignalled());
+            assertFalse(mOnInfoCalled.isSignalled());
+
         } finally {
             mMediaPlayer.reset();
             mMediaPlayer2.reset();
         }
+        mTestCompleted.signal();
+
     }
 
     // The following tests are all a bit flaky, which is why they're retried a
