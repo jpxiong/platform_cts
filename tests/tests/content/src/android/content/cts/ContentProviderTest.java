@@ -249,12 +249,12 @@ public class ContentProviderTest extends AndroidTestCase {
 
         IContentProvider iContentProvider = new IContentProvider() {
             @Override
-            public int bulkInsert(Uri url, ContentValues[] initialValues) {
+            public int bulkInsert(String callingPkg, Uri url, ContentValues[] initialValues) {
                 return 0;
             }
 
             @Override
-            public int delete(Uri url, String selection, String[] selectionArgs) {
+            public int delete(String callingPkg, Uri url, String selection, String[] selectionArgs) {
                 return 0;
             }
 
@@ -264,36 +264,36 @@ public class ContentProviderTest extends AndroidTestCase {
             }
 
             @Override
-            public Uri insert(Uri url, ContentValues initialValues) {
+            public Uri insert(String callingPkg, Uri url, ContentValues initialValues) {
                 return null;
             }
 
             @Override
-            public ParcelFileDescriptor openFile(Uri url, String mode) {
+            public ParcelFileDescriptor openFile(String callingPkg, Uri url, String mode) {
                 return null;
             }
 
             @Override
-            public AssetFileDescriptor openAssetFile(Uri url, String mode) {
+            public AssetFileDescriptor openAssetFile(String callingPkg, Uri url, String mode) {
                 return null;
             }
 
             @Override
-            public ContentProviderResult[] applyBatch(
+            public ContentProviderResult[] applyBatch(String callingPkg,
                     ArrayList<ContentProviderOperation> operations)
                     throws RemoteException, OperationApplicationException {
                 return null;
             }
 
             @Override
-            public Cursor query(Uri url, String[] projection, String selection,
+            public Cursor query(String callingPkg, Uri url, String[] projection, String selection,
                     String[] selectionArgs, String sortOrder,
                     ICancellationSignal cancellationSignal) {
                 return null;
             }
 
             @Override
-            public int update(Uri url, ContentValues values, String selection,
+            public int update(String callingPkg, Uri url, ContentValues values, String selection,
                     String[] selectionArgs) {
                 return 0;
             }
@@ -304,7 +304,7 @@ public class ContentProviderTest extends AndroidTestCase {
             }
 
             @Override
-            public Bundle call(String method, String request, Bundle args) {
+            public Bundle call(String callingPkg, String method, String request, Bundle args) {
                 return null;
             }
 
@@ -314,7 +314,8 @@ public class ContentProviderTest extends AndroidTestCase {
             }
 
             @Override
-            public AssetFileDescriptor openTypedAssetFile(Uri url, String mimeType, Bundle opts)
+            public AssetFileDescriptor openTypedAssetFile(String callingPkg, Uri url,
+                    String mimeType, Bundle opts)
                     throws RemoteException, FileNotFoundException {
                 return null;
             }
