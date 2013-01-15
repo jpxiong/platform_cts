@@ -23,7 +23,11 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 
+import java.util.List;
+import java.util.ArrayList;
+
 public class LocationVerifier implements Handler.Callback {
+
     public static final String TAG = "CtsVerifierLocation";
 
     private static final int MSG_TIMEOUT = 1;
@@ -31,24 +35,38 @@ public class LocationVerifier implements Handler.Callback {
     /** Timing failures on first NUM_IGNORED_UPDATES updates are ignored. */
     private static final int NUM_IGNORED_UPDATES = 2;
 
+    /* The mean computed for the deltas should not be smaller
+     * than mInterval * MIN_MEAN_RATIO */
+    private static final double MIN_MEAN_RATIO = 0.75;
+
+    /**
+     * The standard deviation computed for the deltas should not be bigger
+     * than mInterval * ALLOWED_STDEV_ERROR_RATIO
+     * or MIN_STDEV_MS, whichever is higher.
+     */
+    private static final double ALLOWED_STDEV_ERROR_RATIO = 0.50;
+    private static final long MIN_STDEV_MS = 1000;
+
     private final LocationManager mLocationManager;
     private final PassFailLog mCb;
     private final String mProvider;
     private final long mInterval;
-    private final long mMinActiveInterval;
-    private final long mMinPassiveInterval;
     private final long mTimeout;
     private final Handler mHandler;
     private final int mRequestedUpdates;
     private final ActiveListener mActiveListener;
     private final PassiveListener mPassiveListener;
 
+    private boolean isTestOutcomeSet = false;
     private long mLastActiveTimestamp = -1;
     private long mLastPassiveTimestamp = -1;
     private int mNumActiveUpdates = 0;
     private int mNumPassiveUpdates = 0;
     private boolean mRunning = false;
     private boolean mActiveLocationArrive = false;
+
+    private List<Long> mActiveDeltas = new ArrayList();
+    private List<Long> mPassiveDeltas = new ArrayList();
 
     private class ActiveListener implements LocationListener {
         @Override
@@ -63,30 +81,17 @@ public class LocationVerifier implements Handler.Callback {
             long delta = timestamp - mLastActiveTimestamp;
             mLastActiveTimestamp = timestamp;
 
-            if (delta < mMinActiveInterval) {
-                if (mNumActiveUpdates > NUM_IGNORED_UPDATES ) {
-                    fail(mProvider + " location updated too fast: " + delta + "ms < " +
-                         mMinActiveInterval + "ms");
-                    return;
-                } else {
-                    mCb.log("WARNING: active " + mProvider + " location updated too fast: " +
-                         delta + "ms < " + mMinActiveInterval + "ms");
-                }
-            }
-
-            mCb.log("active " + mProvider + " update (" + delta + "ms)");
-
-            if (!mProvider.equals(location.getProvider())) {
-                fail("wrong provider in callback, actual: " + location.getProvider() +
-                        " expected: " + mProvider);
+            if (mNumActiveUpdates <= NUM_IGNORED_UPDATES ) {
+                mCb.log("(ignored) active " + mProvider + " update (" + delta + "ms)");
                 return;
             }
 
+            mActiveDeltas.add(delta);
+            mCb.log("active " + mProvider + " update (" + delta + "ms)");
+
             if (mNumActiveUpdates >= mRequestedUpdates) {
-                if (mNumPassiveUpdates < mRequestedUpdates - 1) {
-                    fail("passive location updates not working (expected: " + mRequestedUpdates +
-                            " received: " + mNumPassiveUpdates + ")");
-                }
+                assertMeanAndStdev(mProvider, mActiveDeltas);
+                assertMeanAndStdev(LocationManager.PASSIVE_PROVIDER, mPassiveDeltas);
                 pass();
             }
         }
@@ -97,6 +102,45 @@ public class LocationVerifier implements Handler.Callback {
         public void onProviderEnabled(String provider) { }
         @Override
         public void onProviderDisabled(String provider) { }
+    }
+
+    private void assertMeanAndStdev(String provider, List<Long> deltas) {
+        double mean = computeMean(deltas);
+        double stdev = computeStdev(mean, deltas);
+
+        double minMean = mInterval * MIN_MEAN_RATIO;
+        if (mean < minMean) {
+            fail(provider + " provider mean too small: " + mean
+                 + " (min: " + minMean + ")");
+            return;
+        }
+
+        double maxStdev = Math.max(MIN_STDEV_MS, mInterval * ALLOWED_STDEV_ERROR_RATIO);
+        if (stdev > maxStdev) {
+            fail (provider + " provider stdev too big: "
+                  + stdev + " (max: " + maxStdev + ")");
+            return;
+        }
+
+        mCb.log(provider + " provider mean: " + mean);
+        mCb.log(provider + " provider stdev: " + stdev);
+    }
+
+    private double computeMean(List<Long> deltas) {
+        long accumulator = 0;
+        for (long d : deltas) {
+            accumulator += d;
+        }
+        return accumulator / deltas.size();
+    }
+
+    private double computeStdev(double mean, List<Long> deltas) {
+        double accumulator = 0;
+        for (long d : deltas) {
+            double diff = d - mean;
+            accumulator += diff * diff;
+        }
+        return Math.sqrt(accumulator / (deltas.size() - 1));
     }
 
     private class PassiveListener implements LocationListener {
@@ -119,22 +163,12 @@ public class LocationVerifier implements Handler.Callback {
             long delta = timestamp - mLastPassiveTimestamp;
             mLastPassiveTimestamp = timestamp;
 
-            if (delta < mMinPassiveInterval) {
-                if (mNumPassiveUpdates > NUM_IGNORED_UPDATES) {
-                    fail("passive " + mProvider + " location updated too fast: " + delta + "ms < " +
-                         mMinPassiveInterval + "ms");
-                    mCb.log("when passive updates are much much faster than active updates it " +
-                            "suggests the location provider implementation is not power efficient");
-                    if (LocationManager.GPS_PROVIDER.equals(mProvider)) {
-                        mCb.log("check GPS_CAPABILITY_SCHEDULING in GPS driver");
-                    }
-                    return;
-                } else {
-                    mCb.log("WARNING: passive " + mProvider + " location updated too fast: " +
-                            delta + "ms < " + mMinPassiveInterval + "ms");
-                }
+            if (mNumPassiveUpdates <= NUM_IGNORED_UPDATES) {
+                mCb.log("(ignored) passive " + mProvider + " update (" + delta + "ms)");
+                return;
             }
 
+            mPassiveDeltas.add(delta);
             mCb.log("passive " + mProvider + " update (" + delta + "ms)");
         }
 
@@ -150,12 +184,6 @@ public class LocationVerifier implements Handler.Callback {
             String provider, long requestedInterval, int numUpdates) {
         mProvider = provider;
         mInterval = requestedInterval;
-        // Updates can be up to 15% of the request interval ahead of schedule
-        mMinActiveInterval = Math.max(0, (long) (requestedInterval * 0.85));
-        // Allow passive updates to be up to 10x faster than active updates,
-        // beyond that it is very likely the implementation is not taking
-        // advantage of the interval to be power efficient
-        mMinPassiveInterval = mMinActiveInterval / 10;
         // timeout at 60 seconds after interval time
         mTimeout = requestedInterval + 60 * 1000;
         mRequestedUpdates = numUpdates + NUM_IGNORED_UPDATES;
@@ -189,13 +217,19 @@ public class LocationVerifier implements Handler.Callback {
     }
 
     private void pass() {
-        stop();
-        mCb.pass();
+        if (!isTestOutcomeSet) {
+            stop();
+            mCb.pass();
+            isTestOutcomeSet = true;
+        }
     }
 
     private void fail(String s) {
-        stop();
-        mCb.fail(s);
+        if (!isTestOutcomeSet) {
+            stop();
+            mCb.fail(s);
+            isTestOutcomeSet = true;
+        }
     }
 
     private void scheduleTimeout() {
