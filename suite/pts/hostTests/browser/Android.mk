@@ -22,7 +22,7 @@ LOCAL_MODULE_TAGS := optional
 
 LOCAL_MODULE := PtsHostBrowser
 
-LOCAL_JAVA_LIBRARIES := cts-tradefed tradefed-prebuilt ddmlib-prebuilt junit ptscommonutilhost ptshostutil
+LOCAL_JAVA_LIBRARIES := cts-tradefed tradefed-prebuilt ddmlib-prebuilt junit ptscommonutilhost
 
 LOCAL_CTS_TEST_PACKAGE := com.android.pts.browser
 
