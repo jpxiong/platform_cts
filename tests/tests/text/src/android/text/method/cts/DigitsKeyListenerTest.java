@@ -64,8 +64,9 @@ public class DigitsKeyListenerTest extends
      * 1. filter "123456", return null.
      * 2. filter "a1b2c3d", return "123"
      * 3. filter "-a1.b2c3d", return "123"
-     * 4. filter Spanned("-a1.b2c3d"), return Spanned("123") and copy spans.
-     * 5. filter "", return null
+     * 4. filter "+a1.b2c3d", return "123"
+     * 5. filter Spanned("-a1.b2c3d"), return Spanned("123") and copy spans.
+     * 6. filter "", return null
      */
     public void testFilter1() {
         String source = "123456";
@@ -87,6 +88,11 @@ public class DigitsKeyListenerTest extends
                 dest, 0, dest.length())).toString());
         assertEquals(destString, dest.toString());
 
+        source = "+a1.b2c3d";
+        assertEquals("123", (digitsKeyListener.filter(source, 0, source.length(),
+                dest, 0, dest.length())).toString());
+        assertEquals(destString, dest.toString());
+
         Object what = new Object();
         Spannable spannableSource = new SpannableString(source);
         spannableSource.setSpan(what, 0, spannableSource.length(), Spanned.SPAN_POINT_POINT);
@@ -103,15 +109,21 @@ public class DigitsKeyListenerTest extends
 
     /**
      * Check point:
-     * Current accepted characters are '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '-'.
+     * Current accepted characters are '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '-', '+'.
      * 1. filter "-123456", return null
-     * 2. filter "-a1.b2c3d", return "-123"
-     * 3. filter "-a1-b2c3d", return "-123"
-     * 4. filter "5-a1-b2c3d", return "5123"
-     * 5. filter Spanned("5-a1-b2c3d"), return Spanned("5123") and copy spans.
-     * 6. filter "", return null
-     * 7. filter "-123456" but dest has '-' after dend, return ""
-     * 8. filter "-123456" but dest has '-' before dstart, return "123456"
+     * 2. filter "+123456", return null
+     * 3. filter "-a1.b2c3d", return "-123"
+     * 4. filter "-a1-b2c3d", return "-123"
+     * 5. filter "+a1-b2c3d", return "+123"
+     * 6. filter "5-a1-b2c3d", return "5123"
+     * 7. filter "5-a1+b2c3d", return "5123"
+     * 8. filter "+5-a1+b2c3d", return "+5123"
+     * 9. filter Spanned("5-a1-b2c3d"), return Spanned("5123") and copy spans.
+     * 10. filter "", return null
+     * 11. filter "-123456" but dest has '-' after dend, return ""
+     * 12. filter "-123456" but dest has '+' after dend, return ""
+     * 13. filter "-123456" but dest has '-' before dstart, return "123456"
+     * 14. filter "+123456" but dest has '-' before dstart, return "123456"
      */
     public void testFilter2() {
         String source = "-123456";
@@ -119,6 +131,11 @@ public class DigitsKeyListenerTest extends
 
         DigitsKeyListener digitsKeyListener = DigitsKeyListener.getInstance(true, false);
         SpannableString dest = new SpannableString(destString);
+        assertNull(digitsKeyListener.filter(source, 0, source.length(),
+                dest, 0, dest.length()));
+        assertEquals(destString, dest.toString());
+
+        source = "+123456";
         assertNull(digitsKeyListener.filter(source, 0, source.length(),
                 dest, 0, dest.length()));
         assertEquals(destString, dest.toString());
@@ -133,11 +150,27 @@ public class DigitsKeyListenerTest extends
                 dest, 0, dest.length())).toString());
         assertEquals(destString, dest.toString());
 
+        source = "+a1-b2c3d";
+        assertEquals("+123", (digitsKeyListener.filter(source, 0, source.length(),
+                dest, 0, dest.length())).toString());
+        assertEquals(destString, dest.toString());
+
         source = "5-a1-b2c3d";
         assertEquals("5123", (digitsKeyListener.filter(source, 0, source.length(),
                 dest, 0, dest.length())).toString());
         assertEquals(destString, dest.toString());
 
+        source = "5-a1+b2c3d";
+        assertEquals("5123", (digitsKeyListener.filter(source, 0, source.length(),
+                dest, 0, dest.length())).toString());
+        assertEquals(destString, dest.toString());
+
+        source = "+5-a1+b2c3d";
+        assertEquals("+5123", (digitsKeyListener.filter(source, 0, source.length(),
+                dest, 0, dest.length())).toString());
+        assertEquals(destString, dest.toString());
+
+        source = "5-a1+b2c3d";
         Object what = new Object();
         Spannable spannableSource = new SpannableString(source);
         spannableSource.setSpan(what, 0, spannableSource.length(), Spanned.SPAN_POINT_POINT);
@@ -158,7 +191,19 @@ public class DigitsKeyListenerTest extends
                 dest, 0, dest.length() - 1)).toString());
         assertEquals(endSign, dest.toString());
 
+        endSign = "789+";
+        dest = new SpannableString(endSign);
+        assertEquals("", (digitsKeyListener.filter(source, 0, source.length(),
+                dest, 0, dest.length() - 1)).toString());
+        assertEquals(endSign, dest.toString());
+
         String startSign = "-789";
+        dest = new SpannableString(startSign);
+        assertEquals("123456", (digitsKeyListener.filter(source, 0, source.length(),
+                dest, 1, dest.length())).toString());
+        assertEquals(startSign, dest.toString());
+
+        source = "+123456";
         dest = new SpannableString(startSign);
         assertEquals("123456", (digitsKeyListener.filter(source, 0, source.length(),
                 dest, 1, dest.length())).toString());
@@ -170,12 +215,13 @@ public class DigitsKeyListenerTest extends
      * Current accepted characters are '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '.'.
      * 1. filter "123.456", return null
      * 2. filter "-a1.b2c3d", return "1.23"
-     * 3. filter "a1.b2c3d.", return "123."
-     * 4. filter "5.a1.b2c3d", return "51.23"
-     * 5. filter Spanned("5.a1.b2c3d"), return Spanned("51.23") and copy spans.
-     * 6. filter "", return null
-     * 7. filter "123.456" but dest has '.' after dend, return "123456"
-     * 8. filter "123.456" but dest has '.' before dstart, return "123456"
+     * 3. filter "+a1.b2c3d", return "1.23"
+     * 4. filter "a1.b2c3d.", return "123."
+     * 5. filter "5.a1.b2c3d", return "51.23"
+     * 6. filter Spanned("5.a1.b2c3d"), return Spanned("51.23") and copy spans.
+     * 7. filter "", return null
+     * 8. filter "123.456" but dest has '.' after dend, return "123456"
+     * 9. filter "123.456" but dest has '.' before dstart, return "123456"
      */
     public void testFilter3() {
         String source = "123.456";
@@ -188,6 +234,11 @@ public class DigitsKeyListenerTest extends
         assertEquals(destString, dest.toString());
 
         source = "-a1.b2c3d";
+        assertEquals("1.23", (digitsKeyListener.filter(source, 0, source.length(),
+                dest, 0, dest.length())).toString());
+        assertEquals(destString, dest.toString());
+
+        source = "+a1.b2c3d";
         assertEquals("1.23", (digitsKeyListener.filter(source, 0, source.length(),
                 dest, 0, dest.length())).toString());
         assertEquals(destString, dest.toString());
@@ -231,17 +282,25 @@ public class DigitsKeyListenerTest extends
 
     /**
      * Check point:
-     * Current accepted characters are '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '.', '-'.
+     * Current accepted characters are '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '.', '-',
+     * '+'.
      * 1. filter "-123.456", return null
-     * 2. filter "-a1.b2c3d", return "-1.23"
-     * 3. filter "a1.b-2c3d.", return "123."
-     * 4. filter "-5.a1.b2c3d", return "-51.23"
-     * 5. filter Spanned("-5.a1.b2c3d"), return Spanned("-51.23") and copy spans.
-     * 6. filter "", return null
-     * 7. filter "-123.456" but dest has '.' after dend, return "-123456"
-     * 8. filter "-123.456" but dest has '.' before dstart, return "123456"
-     * 9. filter "-123.456" but dest has '-' after dend, return ""
-     * 10. filter "-123.456" but dest has '-' before dstart, return "123.456"
+     * 2. filter "+123.456", return null
+     * 3. filter "-a1.b2c3d", return "-1.23"
+     * 4. filter "+a1.b2c3d", return "+1.23"
+     * 5. filter "a1.b-2c+3d.", return "123."
+     * 6. filter "-5.a1.b2c+3d", return "-51.23"
+     * 7. filter "+5.a1.b2c-3d", return "+51.23"
+     * 8. filter Spanned("-5.a1.b2c3d"), return Spanned("-51.23") and copy spans.
+     * 9. filter "", return null
+     * 10. filter "-123.456" but dest has '.' after dend, return "-123456"
+     * 11. filter "-123.456" but dest has '.' before dstart, return "123456"
+     * 12. filter "+123.456" but dest has '.' after dend, return "+123456"
+     * 13. filter "+123.456" but dest has '.' before dstart, return "123456"
+     * 14. filter "-123.456" but dest has '-' after dend, return ""
+     * 15. filter "-123.456" but dest has '+' after dend, return ""
+     * 16. filter "-123.456" but dest has '-' before dstart, return "123.456"
+     * 17. filter "+123.456" but dest has '-' before dstart, return "123.456"
      */
     public void testFilter4() {
         String source = "-123.456";
@@ -253,21 +312,32 @@ public class DigitsKeyListenerTest extends
                 dest, 0, dest.length()));
         assertEquals(destString, dest.toString());
 
+        source = "+123.456";
+        assertNull(digitsKeyListener.filter(source, 0, source.length(),
+                dest, 0, dest.length()));
+        assertEquals(destString, dest.toString());
+
         source = "-a1.b2c3d";
         assertEquals("-1.23", (digitsKeyListener.filter(source, 0, source.length(),
                 dest, 0, dest.length())).toString());
         assertEquals(destString, dest.toString());
 
-        source = "a1.b-2c3d.";
+        source = "a1.b-2c+3d.";
         assertEquals("123.", (digitsKeyListener.filter(source, 0, source.length(),
                 dest, 0, dest.length())).toString());
         assertEquals(destString, dest.toString());
 
-        source = "-5.a1.b2c3d";
+        source = "-5.a1.b2c+3d";
         assertEquals("-51.23", (digitsKeyListener.filter(source, 0, source.length(),
                 dest, 0, dest.length())).toString());
         assertEquals(destString, dest.toString());
 
+        source = "+5.a1.b2c-3d";
+        assertEquals("+51.23", (digitsKeyListener.filter(source, 0, source.length(),
+                dest, 0, dest.length())).toString());
+        assertEquals(destString, dest.toString());
+
+        source = "-5.a1.b2c+3d";
         Object what = new Object();
         Spannable spannableSource = new SpannableString(source);
         spannableSource.setSpan(what, 0, spannableSource.length(), Spanned.SPAN_POINT_POINT);
@@ -294,13 +364,39 @@ public class DigitsKeyListenerTest extends
                 dest, 1, dest.length())).toString());
         assertEquals(startDecimal, dest.toString());
 
+        source = "+123.456";
+        endDecimal = "789.";
+        dest = new SpannableString(endDecimal);
+        assertEquals("+123456", (digitsKeyListener.filter(source, 0, source.length(),
+                dest, 0, dest.length() - 1)).toString());
+        assertEquals(endDecimal, dest.toString());
+
+        startDecimal = ".789";
+        dest = new SpannableString(startDecimal);
+        assertEquals("123456", (digitsKeyListener.filter(source, 0, source.length(),
+                dest, 1, dest.length())).toString());
+        assertEquals(startDecimal, dest.toString());
+
+        source = "-123.456";
         String endSign = "789-";
         dest = new SpannableString(endSign);
         assertEquals("", (digitsKeyListener.filter(source, 0, source.length(),
                 dest, 0, dest.length() - 1)).toString());
         assertEquals(endSign, dest.toString());
 
+        endSign = "789+";
+        dest = new SpannableString(endSign);
+        assertEquals("", (digitsKeyListener.filter(source, 0, source.length(),
+                dest, 0, dest.length() - 1)).toString());
+        assertEquals(endSign, dest.toString());
+
         String startSign = "-789";
+        dest = new SpannableString(startSign);
+        assertEquals("123.456", (digitsKeyListener.filter(source, 0, source.length(),
+                dest, 1, dest.length())).toString());
+        assertEquals(startSign, dest.toString());
+
+        source = "+123.456";
         dest = new SpannableString(startSign);
         assertEquals("123.456", (digitsKeyListener.filter(source, 0, source.length(),
                 dest, 1, dest.length())).toString());
@@ -346,12 +442,13 @@ public class DigitsKeyListenerTest extends
 
     /**
      * Scenario description:
-     * Current accepted characters are '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '-'.
+     * Current accepted characters are '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '-', '+'.
      *  1. Press '-' key and check if the content of TextView becomes "-"
      *  2. Press '1' key and check if the content of TextView becomes "-1"
      *  3. Press '.' key and this key could not be accepted.
-     *  4. Press '2' key and check if the content of TextView becomes "-12"
-     *  5. Press '-' key and this key could not be accepted,
+     *  4. Press '+' key and this key could not be accepted.
+     *  5. Press '2' key and check if the content of TextView becomes "-12"
+     *  6. Press '-' key and this key could not be accepted,
      *     because text view accepts minus sign iff it at the beginning.
      */
     public void testDigitsKeyListener2() {
@@ -378,6 +475,10 @@ public class DigitsKeyListenerTest extends
         sendKeys(KeyEvent.KEYCODE_PERIOD);
         assertEquals("-1", mTextView.getText().toString());
 
+        // press '+' key.
+        sendKeys(KeyEvent.KEYCODE_PLUS);
+        assertEquals("-1", mTextView.getText().toString());
+
         // press '2' key.
         sendKeys(KeyEvent.KEYCODE_2);
         assertEquals("-12", mTextView.getText().toString());
@@ -391,92 +492,98 @@ public class DigitsKeyListenerTest extends
      * Scenario description:
      * Current accepted characters are '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '.'.
      *  1. Press '-' key and check if the content of TextView becomes ""
-     *  2. Press '1' key and check if the content of TextView becomes "1"
-     *  3. Press '.' key and check if the content of TextView becomes "1."
-     *  4. Press '2' key and check if the content of TextView becomes "1.2"
-     *  5. Press '.' key and this key could not be accepted,
+     *  2. Press '+' key and check if the content of TextView becomes ""
+     *  3. Press '1' key and check if the content of TextView becomes "1"
+     *  4. Press '.' key and check if the content of TextView becomes "1."
+     *  5. Press '2' key and check if the content of TextView becomes "1.2"
+     *  6. Press '.' key and this key could not be accepted,
      *     because text view accepts only one decimal point per field.
      */
     public void testDigitsKeyListener3() {
-//        final DigitsKeyListener digitsKeyListener = DigitsKeyListener.getInstance(false, true);
-//
-//        mActivity.runOnUiThread(new Runnable() {
-//            public void run() {
-//                mTextView.setKeyListener(digitsKeyListener);
-//                mTextView.requestFocus();
-//            }
-//        });
-//        mInstrumentation.waitForIdleSync();
-//        assertEquals("", mTextView.getText().toString());
-//
-//        // press '-' key.
-//        sendKeys(KeyEvent.KEYCODE_MINUS);
-//        assertEquals("", mTextView.getText().toString());
-//
-//        // press '1' key.
-//        sendKeys(KeyEvent.KEYCODE_1);
-//        assertEquals("1", mTextView.getText().toString());
-//
-//        // press '.' key.
-//        sendKeys(KeyEvent.KEYCODE_PERIOD);
-//        assertEquals("1.", mTextView.getText().toString());
-//
-//        // press '2' key.
-//        sendKeys(KeyEvent.KEYCODE_2);
-//        assertEquals("1.2", mTextView.getText().toString());
-//
-//        // press '.' key.
-//        sendKeys(KeyEvent.KEYCODE_PERIOD);
-//        assertEquals("1.2", mTextView.getText().toString());
+        final DigitsKeyListener digitsKeyListener = DigitsKeyListener.getInstance(false, true);
+
+        mActivity.runOnUiThread(new Runnable() {
+            public void run() {
+                mTextView.setKeyListener(digitsKeyListener);
+                mTextView.requestFocus();
+            }
+        });
+        mInstrumentation.waitForIdleSync();
+        assertEquals("", mTextView.getText().toString());
+
+        // press '-' key.
+        sendKeys(KeyEvent.KEYCODE_MINUS);
+        assertEquals("", mTextView.getText().toString());
+
+        // press '+' key.
+        sendKeys(KeyEvent.KEYCODE_PLUS);
+        assertEquals("", mTextView.getText().toString());
+
+        // press '1' key.
+        sendKeys(KeyEvent.KEYCODE_1);
+        assertEquals("1", mTextView.getText().toString());
+
+        // press '.' key.
+        sendKeys(KeyEvent.KEYCODE_PERIOD);
+        assertEquals("1.", mTextView.getText().toString());
+
+        // press '2' key.
+        sendKeys(KeyEvent.KEYCODE_2);
+        assertEquals("1.2", mTextView.getText().toString());
+
+        // press '.' key.
+        sendKeys(KeyEvent.KEYCODE_PERIOD);
+        assertEquals("1.2", mTextView.getText().toString());
     }
 
     /**
      * Scenario description:
-     * Current accepted characters are '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '-', '.'.
-     *  1. Press '-' key and check if the content of TextView becomes "-"
-     *  2. Press '1' key and check if the content of TextView becomes "-1"
+     * Current accepted characters are '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '-', '+',
+     * '.'.
+     *  1. Press '+' key and check if the content of TextView becomes "+"
+     *  2. Press '1' key and check if the content of TextView becomes "+1"
      *  3. Press '.' key and this key could not be accepted.
-     *  4. Press '2' key and check if the content of TextView becomes "-12"
+     *  4. Press '2' key and check if the content of TextView becomes "+12"
      *  5. Press '-' key and this key could not be accepted,
      *     because text view accepts minus sign iff it at the beginning.
      *  6. Press '.' key and this key could not be accepted,
      *     because text view accepts only one decimal point per field.
      */
     public void testDigitsKeyListener4() {
-//        final DigitsKeyListener digitsKeyListener = DigitsKeyListener.getInstance(true, true);
-//
-//        mActivity.runOnUiThread(new Runnable() {
-//            public void run() {
-//                mTextView.setKeyListener(digitsKeyListener);
-//                mTextView.requestFocus();
-//            }
-//        });
-//        mInstrumentation.waitForIdleSync();
-//        assertEquals("", mTextView.getText().toString());
-//
-//        // press '-' key.
-//        sendKeys(KeyEvent.KEYCODE_MINUS);
-//        assertEquals("-", mTextView.getText().toString());
-//
-//        // press '1' key.
-//        sendKeys(KeyEvent.KEYCODE_1);
-//        assertEquals("-1", mTextView.getText().toString());
-//
-//        // press '.' key.
-//        sendKeys(KeyEvent.KEYCODE_PERIOD);
-//        assertEquals("-1.", mTextView.getText().toString());
-//
-//        // press '2' key.
-//        sendKeys(KeyEvent.KEYCODE_2);
-//        assertEquals("-1.2", mTextView.getText().toString());
-//
-//        // press '-' key.
-//        sendKeys(KeyEvent.KEYCODE_MINUS);
-//        assertEquals("-1.2", mTextView.getText().toString());
-//
-//        // press '.' key.
-//        sendKeys(KeyEvent.KEYCODE_PERIOD);
-//        assertEquals("-1.2", mTextView.getText().toString());
+        final DigitsKeyListener digitsKeyListener = DigitsKeyListener.getInstance(true, true);
+
+        mActivity.runOnUiThread(new Runnable() {
+            public void run() {
+                mTextView.setKeyListener(digitsKeyListener);
+                mTextView.requestFocus();
+            }
+        });
+        mInstrumentation.waitForIdleSync();
+        assertEquals("", mTextView.getText().toString());
+
+        // press '+' key.
+        sendKeys(KeyEvent.KEYCODE_PLUS);
+        assertEquals("+", mTextView.getText().toString());
+
+        // press '1' key.
+        sendKeys(KeyEvent.KEYCODE_1);
+        assertEquals("+1", mTextView.getText().toString());
+
+        // press '.' key.
+        sendKeys(KeyEvent.KEYCODE_PERIOD);
+        assertEquals("+1.", mTextView.getText().toString());
+
+        // press '2' key.
+        sendKeys(KeyEvent.KEYCODE_2);
+        assertEquals("+1.2", mTextView.getText().toString());
+
+        // press '-' key.
+        sendKeys(KeyEvent.KEYCODE_MINUS);
+        assertEquals("+1.2", mTextView.getText().toString());
+
+        // press '.' key.
+        sendKeys(KeyEvent.KEYCODE_PERIOD);
+        assertEquals("+1.2", mTextView.getText().toString());
     }
 
     /**
@@ -570,9 +677,9 @@ public class DigitsKeyListenerTest extends
 
         final char[][] expected = new char[][] {
             new char[] { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9' },
-            new char[] { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '-' },
+            new char[] { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '-', '+' },
             new char[] { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '.' },
-            new char[] { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '-', '.' },
+            new char[] { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '-', '+', '.' },
         };
 
         TextMethodUtils.assertEquals(expected[0],
