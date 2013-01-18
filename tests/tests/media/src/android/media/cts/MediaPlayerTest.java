@@ -750,7 +750,7 @@ public class MediaPlayerTest extends MediaPlayerTestBase {
             return;
         }
         for (int i = 0; i < trackInfos.length; ++i) {
-            if (trackInfos[i] == null) continue;
+            assertTrue(trackInfos[i] != null);
             if (trackInfos[i].getTrackType() ==
                  MediaPlayer.TrackInfo.MEDIA_TRACK_TYPE_TIMEDTEXT) {
                 mTimedTextTrackIndex.add(i);
@@ -905,6 +905,35 @@ public class MediaPlayerTest extends MediaPlayerTestBase {
         mOnTimedTextCalled.reset();
         assertTrue(mOnTimedTextCalled.waitForCountedSignals(2, 2000) >= 2);
         mMediaPlayer.stop();
+    }
+
+    public void testGetTrackInfo() throws Exception {
+        loadResource(R.raw.testvideo_with_2_subtitles);
+        loadSubtitleSource(R.raw.test_subtitle1_srt);
+        loadSubtitleSource(R.raw.test_subtitle2_srt);
+        mMediaPlayer.prepare();
+        mMediaPlayer.start();
+
+        readTimedTextTracks();
+        selectSubtitleTrack(2);
+
+        int count = 0;
+        MediaPlayer.TrackInfo[] trackInfos = mMediaPlayer.getTrackInfo();
+        assertTrue(trackInfos != null && trackInfos.length != 0);
+        for (int i = 0; i < trackInfos.length; ++i) {
+            assertTrue(trackInfos[i] != null);
+            if (trackInfos[i].getTrackType() == MediaPlayer.TrackInfo.MEDIA_TRACK_TYPE_TIMEDTEXT) {
+                String trackLanguage = trackInfos[i].getLanguage();
+                assertTrue(trackLanguage != null);
+                trackLanguage.trim();
+                Log.d(LOG_TAG, "track info lang: " + trackLanguage);
+                assertTrue("Should not see empty track language with our test data.",
+                           trackLanguage.length() > 0);
+                count++;
+            }
+        }
+        // There are 4 subtitle tracks in total in our test data.
+        assertEquals(4, count);
     }
 
     public void testCallback() throws Throwable {
