@@ -1,4 +1,3 @@
-#
 # Copyright (C) 2012 The Android Open Source Project
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,24 +12,20 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
+LOCAL_PATH := $(call my-dir)
 
-# package definitions for PTS
+include $(CLEAR_VARS)
 
-# New packages should be added here
-PTS_TEST_PACKAGES := \
-    PtsDeviceFilePerf \
-    PtsDeviceUi \
-    PtsDeviceDram \
-    PtsDeviceSimpleCpu \
-    PtsDeviceBrowserBench \
-    PtsDeviceVideoPerf \
-    PtsDeviceOpenGl
+LOCAL_MODULE := libptsopengl_jni
 
-PTS_SUPPORT_PACKAGES := \
-    PtsDeviceTaskswitchingAppA \
-    PtsDeviceTaskswitchingAppB \
-    PtsDeviceTaskswitchingControl
+LOCAL_MODULE_TAGS := optional
 
-PTS_HOST_CASES := \
-    PtsHostBootup \
-    PtsHostUi
+# Get all cpp files but not hidden files
+LOCAL_SRC_FILES := $(patsubst ./%,%, $(shell cd $(LOCAL_PATH); \
+          find . -name "*.cpp" -and -not -name ".*"))
+
+LOCAL_C_INCLUDES := $(JNI_H_INCLUDE)
+
+LOCAL_SHARED_LIBRARIES := libEGL libGLESv2 libandroid libutils
+
+include $(BUILD_SHARED_LIBRARY)
