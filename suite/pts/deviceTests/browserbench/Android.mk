@@ -1,4 +1,3 @@
-#
 # Copyright (C) 2012 The Android Open Source Project
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,23 +11,23 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-#
 
-# package definitions for PTS
+LOCAL_PATH:= $(call my-dir)
+include $(CLEAR_VARS)
 
-# New packages should be added here
-PTS_TEST_PACKAGES := \
-    PtsDeviceFilePerf \
-    PtsDeviceUi \
-    PtsDeviceDram \
-    PtsDeviceSimpleCpu \
-    PtsDeviceBrowserBench
+# don't include this package in any target
+LOCAL_MODULE_TAGS := optional
 
-PTS_SUPPORT_PACKAGES := \
-    PtsDeviceTaskswitchingAppA \
-    PtsDeviceTaskswitchingAppB \
-    PtsDeviceTaskswitchingControl
+LOCAL_JAVA_LIBRARIES := android.test.runner
 
-PTS_HOST_CASES := \
-    PtsHostBootup \
-    PtsHostUi
+LOCAL_STATIC_JAVA_LIBRARIES := ptsutil ctsutil ctstestrunner ctstestserver
+
+LOCAL_SRC_FILES := $(call all-java-files-under, src)
+
+LOCAL_PACKAGE_NAME := PtsDeviceBrowserBench
+
+LOCAL_SDK_VERSION := 16
+
+include $(BUILD_CTS_PACKAGE)
+
+include $(call all-makefiles-under,$(LOCAL_PATH))
