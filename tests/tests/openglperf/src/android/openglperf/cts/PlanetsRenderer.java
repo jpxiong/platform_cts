@@ -17,6 +17,7 @@
 package android.openglperf.cts;
 
 import android.content.Context;
+import android.cts.util.WatchDog;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.opengl.GLES20;
@@ -47,7 +48,7 @@ public class PlanetsRenderer implements GLSurfaceViewCustom.Renderer {
     private final Context mContext;
     private final PlanetsRenderingParam mParam;
     private final RenderCompletionListener mListener;
-    private final RenderingWatchDog mWatchDog;
+    private final WatchDog mWatchDog;
 
     private final Sphere[] mSpheres;
     private final int mNumSpheres;
@@ -99,7 +100,7 @@ public class PlanetsRenderer implements GLSurfaceViewCustom.Renderer {
      * @param listener
      */
     public PlanetsRenderer(Context context, PlanetsRenderingParam param,
-            RenderCompletionListener listener, RenderingWatchDog watchDog) {
+            RenderCompletionListener listener, WatchDog watchDog) {
         resetTimer();
         mContext = context;
         mParam = param;

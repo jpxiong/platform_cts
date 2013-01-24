@@ -17,11 +17,11 @@
 package android.openglperf.cts;
 
 import android.content.Context;
-
+import android.cts.util.WatchDog;
 
 class PlanetsSurfaceView extends GLSurfaceViewCustom {
     private final long RENDERING_TIMEOUT = 1900; // in msec, close to 2 secs
-    private final RenderingWatchDog mWatchDog = new RenderingWatchDog(RENDERING_TIMEOUT);
+    private final WatchDog mWatchDog = new WatchDog(RENDERING_TIMEOUT);
 
     public PlanetsSurfaceView(Context context, PlanetsRenderingParam param,
             RenderCompletionListener listener) {

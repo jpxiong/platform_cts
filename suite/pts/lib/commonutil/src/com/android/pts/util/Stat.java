@@ -22,6 +22,9 @@ package com.android.pts.util;
  */
 public class Stat {
 
+    /**
+     * Collection of statistical propertirs like average, max, min, and stddev
+     */
     public static class StatResult {
         public double mAverage;
         public double mMin;
@@ -35,6 +38,9 @@ public class Stat {
         }
     }
 
+    /**
+     * Calculate statistics properties likes average, min, max, and stddev for the given array
+     */
     public static StatResult getStat(double[] data) {
         double average = data[0];
         double min = data[0];
@@ -57,6 +63,20 @@ public class Stat {
         return new StatResult(average, min, max, stddev);
     }
 
+    /**
+     * return the average value of the passed array
+     */
+    public static double getAverage(double[] data) {
+        double sum = data[0];
+        for (int i = 1; i < data.length; i++) {
+            sum += data[i];
+        }
+        return sum / data.length;
+    }
+
+    /**
+     * return the minimum value of the passed array
+     */
     public static double getMin(double[] data) {
         double min = data[0];
         for (int i = 1; i < data.length; i++) {
@@ -67,6 +87,9 @@ public class Stat {
         return min;
     }
 
+    /**
+     * return the maximum value of the passed array
+     */
     public static double getMax(double[] data) {
         double max = data[0];
         for (int i = 1; i < data.length; i++) {

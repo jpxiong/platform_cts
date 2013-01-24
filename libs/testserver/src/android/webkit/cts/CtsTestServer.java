@@ -423,11 +423,20 @@ public class CtsTestServer {
     }
 
     /**
+     * Hook for adding stuffs for HTTP POST. Default implementation does nothing.
+     * @return null to use the default response mechanism of sending the requested uri as it is.
+     *         Otherwise, the whole response should be handled inside onPost.
+     */
+    protected HttpResponse onPost(HttpRequest request) throws Exception {
+        return null;
+    }
+
+    /**
      * Generate a response to the given request.
      * @throws InterruptedException
      * @throws IOException
      */
-    private HttpResponse getResponse(HttpRequest request) throws InterruptedException, IOException {
+    private HttpResponse getResponse(HttpRequest request) throws Exception {
         RequestLine requestLine = request.getRequestLine();
         HttpResponse response = null;
         String uriString = requestLine.getUri();
@@ -438,6 +447,13 @@ public class CtsTestServer {
             mLastQuery = uriString;
             if (request instanceof HttpEntityEnclosingRequest) {
                 mRequestEntities.add(((HttpEntityEnclosingRequest)request).getEntity());
+            }
+        }
+
+        if (requestLine.getMethod().equals("POST")) {
+            HttpResponse responseOnPost = onPost(request);
+            if (responseOnPost != null) {
+                return responseOnPost;
             }
         }
 
@@ -863,7 +879,7 @@ public class CtsTestServer {
             }
 
             @Override
-            public Void call() throws IOException, InterruptedException, HttpException {
+            public Void call() throws Exception {
                 HttpResponse response = mServer.getResponse(mRequest);
                 mConnection.sendResponseHeader(response);
                 mConnection.sendResponseEntity(response);
