@@ -16,7 +16,6 @@
 
 package android.view.inputmethod.cts;
 
-
 import android.content.ComponentName;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -27,6 +26,7 @@ import android.test.AndroidTestCase;
 import android.util.Printer;
 import android.view.inputmethod.InputMethod;
 import android.view.inputmethod.InputMethodInfo;
+import android.view.inputmethod.InputMethodSubtype;
 
 import org.xmlpull.v1.XmlPullParserException;
 
@@ -40,14 +40,40 @@ public class InputMethodInfoTest extends AndroidTestCase {
     private CharSequence mLabel;
     private String mSettingsActivity;
 
+    private int mSubtypeNameResId;
+    private int mSubtypeIconResId;
+    private String mSubtypeLocale;
+    private String mSubtypeMode;
+    private String mSubtypeExtraValue_key;
+    private String mSubtypeExtraValue_value;
+    private String mSubtypeExtraValue;
+    private boolean mSubtypeIsAuxiliary;
+    private boolean mSubtypeOverridesImplicitlyEnabledSubtype;
+    private int mSubtypeId;
+    private InputMethodSubtype mInputMethodSubtype;
+
     @Override
     protected void setUp() throws Exception {
         super.setUp();
         mPackageName = mContext.getPackageName();
-        mClassName = InputMethodInfoStub.class.getName();
+        mClassName = InputMethodSettingsActivityStub.class.getName();
         mLabel = "test";
-        mSettingsActivity = "android.view.inputmethod.cts.InputMethodInfoStub";
+        mSettingsActivity = "android.view.inputmethod.cts.InputMethodSettingsActivityStub";
         mInputMethodInfo = new InputMethodInfo(mPackageName, mClassName, mLabel, mSettingsActivity);
+
+        mSubtypeNameResId = 0;
+        mSubtypeIconResId = 0;
+        mSubtypeLocale = "en_US";
+        mSubtypeMode = "keyboard";
+        mSubtypeExtraValue_key = "key1";
+        mSubtypeExtraValue_value = "value1";
+        mSubtypeExtraValue = "tag," + mSubtypeExtraValue_key + "=" + mSubtypeExtraValue_value;
+        mSubtypeIsAuxiliary = false;
+        mSubtypeOverridesImplicitlyEnabledSubtype = false;
+        mSubtypeId = 99;
+        mInputMethodSubtype = new InputMethodSubtype(mSubtypeNameResId, mSubtypeIconResId,
+                mSubtypeLocale, mSubtypeMode, mSubtypeExtraValue, mSubtypeIsAuxiliary,
+                mSubtypeOverridesImplicitlyEnabledSubtype, mSubtypeId);
     }
 
     public void testInputMethodInfoProperties() throws XmlPullParserException, IOException {
@@ -58,7 +84,7 @@ public class InputMethodInfoTest extends AndroidTestCase {
         assertEquals(0, mInputMethodInfo.getIsDefaultResourceId());
 
         Intent intent = new Intent(InputMethod.SERVICE_INTERFACE);
-        intent.setClass(mContext, InputMethodInfoStub.class);
+        intent.setClass(mContext, InputMethodSettingsActivityStub.class);
         PackageManager pm = mContext.getPackageManager();
         List<ResolveInfo> ris = pm.queryIntentServices(intent, PackageManager.GET_META_DATA);
         for (int i = 0; i < ris.size(); i++) {
@@ -67,6 +93,22 @@ public class InputMethodInfoTest extends AndroidTestCase {
             assertService(resolveInfo.serviceInfo, mInputMethodInfo.getServiceInfo());
             assertInfo(mInputMethodInfo);
         }
+    }
+
+    public void testInputMethodSubtypeProperties() {
+        // TODO: Test InputMethodSubtype.getDisplayName()
+        assertEquals(mSubtypeNameResId, mInputMethodSubtype.getNameResId());
+        assertEquals(mSubtypeIconResId, mInputMethodSubtype.getIconResId());
+        assertEquals(mSubtypeLocale, mInputMethodSubtype.getLocale());
+        assertEquals(mSubtypeMode, mInputMethodSubtype.getMode());
+        assertEquals(mSubtypeExtraValue, mInputMethodSubtype.getExtraValue());
+        assertTrue(mInputMethodSubtype.containsExtraValueKey(mSubtypeExtraValue_key));
+        assertEquals(mSubtypeExtraValue_value,
+                mInputMethodSubtype.getExtraValueOf(mSubtypeExtraValue_key));
+        assertEquals(mSubtypeIsAuxiliary, mInputMethodSubtype.isAuxiliary());
+        assertEquals(mSubtypeOverridesImplicitlyEnabledSubtype,
+                mInputMethodSubtype.overridesImplicitlyEnabledSubtype());
+        assertEquals(mSubtypeId, mInputMethodSubtype.hashCode());
     }
 
     private void assertService(ServiceInfo expected, ServiceInfo actual) {
@@ -110,19 +152,39 @@ public class InputMethodInfoTest extends AndroidTestCase {
         assertEquals(expected.toString(), mInputMethodInfo.loadLabel(pm).toString());
     }
 
-    public void testWriteToParcel() {
-        Parcel p = Parcel.obtain();
+    public void testInputMethodInfoWriteToParcel() {
+        final Parcel p = Parcel.obtain();
         mInputMethodInfo.writeToParcel(p, 0);
         p.setDataPosition(0);
-        InputMethodInfo inputMethodInfo = InputMethodInfo.CREATOR.createFromParcel(p);
+        final InputMethodInfo imi = InputMethodInfo.CREATOR.createFromParcel(p);
 
-        assertEquals(mInputMethodInfo.getPackageName(), inputMethodInfo.getPackageName());
-        assertEquals(mInputMethodInfo.getServiceName(), inputMethodInfo.getServiceName());
-        assertEquals(mInputMethodInfo.getSettingsActivity(), inputMethodInfo.getSettingsActivity());
-        assertEquals(mInputMethodInfo.getId(), inputMethodInfo.getId());
-        assertEquals(mInputMethodInfo.getIsDefaultResourceId(), inputMethodInfo
-                .getIsDefaultResourceId());
-        assertService(mInputMethodInfo.getServiceInfo(), inputMethodInfo.getServiceInfo());
+        assertEquals(mInputMethodInfo.getPackageName(), imi.getPackageName());
+        assertEquals(mInputMethodInfo.getServiceName(), imi.getServiceName());
+        assertEquals(mInputMethodInfo.getSettingsActivity(), imi.getSettingsActivity());
+        assertEquals(mInputMethodInfo.getId(), imi.getId());
+        assertEquals(mInputMethodInfo.getIsDefaultResourceId(), imi.getIsDefaultResourceId());
+        assertService(mInputMethodInfo.getServiceInfo(), imi.getServiceInfo());
+    }
+
+    public void testInputMethodSubtypeWriteToParcel() {
+        final Parcel p = Parcel.obtain();
+        mInputMethodSubtype.writeToParcel(p, 0);
+        p.setDataPosition(0);
+        final InputMethodSubtype subtype = InputMethodSubtype.CREATOR.createFromParcel(p);
+
+        assertEquals(mInputMethodSubtype.containsExtraValueKey(mSubtypeExtraValue_key),
+                subtype.containsExtraValueKey(mSubtypeExtraValue_key));
+        assertEquals(mInputMethodSubtype.getExtraValue(), subtype.getExtraValue());
+        assertEquals(mInputMethodSubtype.getExtraValueOf(mSubtypeExtraValue_key),
+                subtype.getExtraValueOf(mSubtypeExtraValue_key));
+        assertEquals(mInputMethodSubtype.getIconResId(), subtype.getIconResId());
+        assertEquals(mInputMethodSubtype.getLocale(), subtype.getLocale());
+        assertEquals(mInputMethodSubtype.getMode(), subtype.getMode());
+        assertEquals(mInputMethodSubtype.getNameResId(), subtype.getNameResId());
+        assertEquals(mInputMethodSubtype.hashCode(), subtype.hashCode());
+        assertEquals(mInputMethodSubtype.isAuxiliary(), subtype.isAuxiliary());
+        assertEquals(mInputMethodSubtype.overridesImplicitlyEnabledSubtype(),
+                subtype.overridesImplicitlyEnabledSubtype());
     }
 
     class MockPrinter implements Printer {
