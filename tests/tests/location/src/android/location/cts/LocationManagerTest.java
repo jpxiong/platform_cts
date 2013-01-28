@@ -291,7 +291,7 @@ public class LocationManagerTest extends InstrumentationTestCase {
     }
 
     /**
-     * Helper method to test a location update with given provider
+     * Helper method to test a location update with given mock location provider
      *
      * @param providerName name of provider to test. Must already exist.
      * @throws InterruptedException
@@ -322,6 +322,7 @@ public class LocationManagerTest extends InstrumentationTestCase {
         assertEquals(providerName, location.getProvider());
         assertEquals(latitude1, location.getLatitude());
         assertEquals(longitude1, location.getLongitude());
+        assertEquals(true, location.isFromMockProvider());
 
         // update location without notifying listener
         listener.reset();
@@ -373,6 +374,7 @@ public class LocationManagerTest extends InstrumentationTestCase {
         assertEquals(TEST_MOCK_PROVIDER_NAME, location.getProvider());
         assertEquals(latitude1, location.getLatitude());
         assertEquals(longitude1, location.getLongitude());
+        assertEquals(true, location.isFromMockProvider());
 
         // update location without notifying listener
         mManager.removeUpdates(listener);
@@ -420,6 +422,7 @@ public class LocationManagerTest extends InstrumentationTestCase {
         assertEquals(TEST_MOCK_PROVIDER_NAME, location.getProvider());
         assertEquals(latitude1, location.getLatitude());
         assertEquals(longitude1, location.getLongitude());
+        assertEquals(true, location.isFromMockProvider());
 
         // update location without receiving broadcast.
         mManager.removeUpdates(mPendingIntent);
@@ -509,6 +512,7 @@ public class LocationManagerTest extends InstrumentationTestCase {
         assertEquals(TEST_MOCK_PROVIDER_NAME, location.getProvider());
         assertEquals(latitude1, location.getLatitude());
         assertEquals(longitude1, location.getLongitude());
+        assertEquals(true, location.isFromMockProvider());
 
         mIntentReceiver.clearReceivedIntents();
         updateLocation(latitude2, longitude2);
@@ -519,6 +523,7 @@ public class LocationManagerTest extends InstrumentationTestCase {
         assertEquals(TEST_MOCK_PROVIDER_NAME, location.getProvider());
         assertEquals(latitude2, location.getLatitude());
         assertEquals(longitude2, location.getLongitude());
+        assertEquals(true, location.isFromMockProvider());
 
         try {
             mManager.getLastKnownLocation(null);
@@ -678,6 +683,7 @@ public class LocationManagerTest extends InstrumentationTestCase {
         assertEquals(providerName, location.getProvider());
         assertEquals(latitude, location.getLatitude());
         assertEquals(longitude, location.getLongitude());
+        assertEquals(true, location.isFromMockProvider());
 
         // Remove the listener.
         mManager.removeUpdates(listener);
