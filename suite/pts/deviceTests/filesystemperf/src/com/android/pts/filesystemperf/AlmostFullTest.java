@@ -17,18 +17,11 @@
 package com.android.pts.filesystemperf;
 
 import android.cts.util.TimeoutReq;
-import com.android.pts.util.MeasureRun;
-import com.android.pts.util.MeasureTime;
-import com.android.pts.util.PtsAndroidTestCase;
-import com.android.pts.util.ReportLog;
-import com.android.pts.util.Stat;
-import com.android.pts.util.SystemUtil;
-
 import android.util.Log;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
+import com.android.pts.util.PtsAndroidTestCase;
+import com.android.pts.util.SystemUtil;
+
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -57,7 +50,8 @@ public class AlmostFullTest extends PtsAndroidTestCase {
         super.setUp();
         if (mDiskFilled.compareAndSet(false, true)) {
             Log.i(TAG, "Filling disk");
-            // initial fill done in two stage as disk can be filled by other components
+            // initial fill done in two stage as disk can be filled by other
+            // components
             long freeDisk = SystemUtil.getFreeDiskSize(getContext());
             long diskToFill = freeDisk - FREE_SPACE_FINAL;
             Log.i(TAG, "free disk " + freeDisk + ", to fill " + diskToFill);
@@ -106,8 +100,8 @@ public class AlmostFullTest extends PtsAndroidTestCase {
                 BUFFER_SIZE, NUMBER_REPETITION);
     }
 
-    //TODO: file size too small and caching will give wrong better result.
-    //      needs to flush cache by reading big files per each read.
+    // TODO: file size too small and caching will give wrong better result.
+    // needs to flush cache by reading big files per each read.
     @TimeoutReq(minutes = 60)
     public void testRandomRead() throws Exception {
         final int BUFFER_SIZE = 4 * 1024;
