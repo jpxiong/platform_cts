@@ -30,7 +30,7 @@ import android.view.accessibility.AccessibilityNodeInfo;
 public class AccessibilityNodeInfoTest extends AndroidTestCase {
 
     /** The number of properties of the {@link AccessibilityNodeInfo} class. */
-    private static final int NON_STATIC_FIELD_COUNT = 19;
+    private static final int NON_STATIC_FIELD_COUNT = 18;
 
     @SmallTest
     public void testMarshaling() throws Exception {
@@ -124,6 +124,7 @@ public class AccessibilityNodeInfoTest extends AndroidTestCase {
         info.setMovementGranularities(AccessibilityNodeInfo.MOVEMENT_GRANULARITY_LINE);
         info.setLabeledBy(new View(getContext()));
         info.setLabelFor(new View(getContext()));
+        info.setViewId("foo.bar:id/baz");
     }
 
     /**
@@ -180,6 +181,8 @@ public class AccessibilityNodeInfoTest extends AndroidTestCase {
         assertSame("movementGranularities has incorrect value",
                 expectedInfo.getMovementGranularities(),
                 receivedInfo.getMovementGranularities());
+        assertEquals("viewId has incorrect value", expectedInfo.getViewId(),
+                receivedInfo.getViewId());
     }
 
     /**
@@ -211,5 +214,6 @@ public class AccessibilityNodeInfoTest extends AndroidTestCase {
         assertFalse("accessibilityFocused not properly recycled", info.isAccessibilityFocused());
         assertSame("movementGranularities not properly recycled", 0,
                 info.getMovementGranularities());
+        assertNull("viewId not properly recycled", info.getViewId());
     }
 }
