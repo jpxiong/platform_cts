@@ -25,6 +25,7 @@ import android.test.suitebuilder.annotation.LargeTest;
 
 import java.io.File;
 import java.io.FileFilter;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Arrays;
@@ -482,6 +483,46 @@ public class FileSystemPermissionTest extends AndroidTestCase {
 
         assertTrue("Found writable directories: " + writableDirs.toString(),
                 writableDirs.isEmpty());
+    }
+
+    @LargeTest
+    public void testReadingSysFilesDoesntFail() throws Exception {
+        tryToReadFromAllIn(new File("/sys"));
+    }
+
+    private static void tryToReadFromAllIn(File dir) throws IOException {
+        assertTrue(dir.isDirectory());
+
+        if (isSymbolicLink(dir)) {
+            // don't examine symbolic links.
+            return;
+        }
+
+        File[] files = dir.listFiles();
+
+        if (files != null) {
+            for (File f : files) {
+                if (f.isDirectory()) {
+                    tryToReadFromAllIn(f);
+                } else {
+                    tryFileRead(f);
+                }
+            }
+        }
+    }
+
+    private static void tryFileRead(File f) {
+        byte[] b = new byte[1024];
+        try {
+            System.out.println("looking at " + f.getCanonicalPath());
+            FileInputStream fis = new FileInputStream(f);
+            while(fis.read(b) != -1) {
+                // throw away data
+            }
+            fis.close();
+        } catch (IOException e) {
+            // ignore
+        }
     }
 
     private static final Set<File> SYS_EXCEPTIONS = new HashSet<File>(
