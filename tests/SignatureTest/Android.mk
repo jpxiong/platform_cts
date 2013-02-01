@@ -57,8 +57,8 @@ api_ver_file := $(intermediates.COMMON)/api_ver_is_$(CTS_API_VERSION)
 # sure the generated resources rule depend on it, we can ensure that
 # the proper version of the api resource gets generated.
 $(api_ver_file):
-	$(hide) rm -f $(dir $@)/api_ver_is_*
-	$(hide) touch $@
+	$(hide) rm -f $(dir $@)/api_ver_is_* \
+		&& mkdir -p $(dir $@) && touch $@
 
 android_api_xml_description := $(intermediates.COMMON)/api.xml
 $(android_api_xml_description): $(android_api_description) | $(APICHECK)
