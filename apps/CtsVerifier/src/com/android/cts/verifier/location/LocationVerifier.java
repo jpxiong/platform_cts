@@ -35,9 +35,13 @@ public class LocationVerifier implements Handler.Callback {
     /** Timing failures on first NUM_IGNORED_UPDATES updates are ignored. */
     private static final int NUM_IGNORED_UPDATES = 2;
 
-    /* The mean computed for the deltas should not be smaller
-     * than mInterval * MIN_MEAN_RATIO */
-    private static final double MIN_MEAN_RATIO = 0.75;
+    /* In active mode, the mean computed for the deltas should not be smaller
+     * than mInterval * ACTIVE_MIN_MEAN_RATIO */
+    private static final double ACTIVE_MIN_MEAN_RATIO = 0.75;
+
+    /* In passive mode, the mean computed for the deltas should not be smaller
+     * than mInterval * PASSIVE_MIN_MEAN_RATIO */
+    private static final double PASSIVE_MIN_MEAN_RATIO = 0.1;
 
     /**
      * The standard deviation computed for the deltas should not be bigger
@@ -96,8 +100,8 @@ public class LocationVerifier implements Handler.Callback {
             mCb.log("active " + mProvider + " update (" + delta + "ms)");
 
             if (mNumActiveUpdates >= mRequestedUpdates) {
-                assertMeanAndStdev(mProvider, mActiveDeltas);
-                assertMeanAndStdev(LocationManager.PASSIVE_PROVIDER, mPassiveDeltas);
+                assertMeanAndStdev(mProvider, mActiveDeltas, ACTIVE_MIN_MEAN_RATIO);
+                assertMeanAndStdev(LocationManager.PASSIVE_PROVIDER, mPassiveDeltas, PASSIVE_MIN_MEAN_RATIO);
                 pass();
             }
         }
@@ -110,11 +114,11 @@ public class LocationVerifier implements Handler.Callback {
         public void onProviderDisabled(String provider) { }
     }
 
-    private void assertMeanAndStdev(String provider, List<Long> deltas) {
+    private void assertMeanAndStdev(String provider, List<Long> deltas, double minMeanRatio) {
         double mean = computeMean(deltas);
         double stdev = computeStdev(mean, deltas);
 
-        double minMean = mInterval * MIN_MEAN_RATIO;
+        double minMean = mInterval * minMeanRatio;
         if (mean < minMean) {
             fail(provider + " provider mean too small: " + mean
                  + " (min: " + minMean + ")");
