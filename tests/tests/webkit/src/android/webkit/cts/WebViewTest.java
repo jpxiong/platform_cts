@@ -1010,7 +1010,7 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
 
         // focus on first link
         handler.reset();
-        getInstrumentation().sendKeyDownUpSync(KeyEvent.KEYCODE_DPAD_DOWN);
+        getInstrumentation().sendKeyDownUpSync(KeyEvent.KEYCODE_TAB);
         mOnUiThread.requestFocusNodeHref(hrefMsg);
         new PollingCheck() {
             @Override
@@ -1035,7 +1035,7 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
         handler.reset();
         final Message hrefMsg2 = new Message();
         hrefMsg2.setTarget(handler);
-        getInstrumentation().sendKeyDownUpSync(KeyEvent.KEYCODE_DPAD_DOWN);
+        getInstrumentation().sendKeyDownUpSync(KeyEvent.KEYCODE_TAB);
         mOnUiThread.requestFocusNodeHref(hrefMsg2);
         new PollingCheck() {
             @Override
@@ -1787,7 +1787,7 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
 
     private void moveFocusDown() throws Throwable {
         // send down key and wait for idle
-        sendKeys(KeyEvent.KEYCODE_DPAD_DOWN);
+        getInstrumentation().sendKeyDownUpSync(KeyEvent.KEYCODE_TAB);
         // waiting for idle isn't always sufficient for the key to be fully processed
         Thread.sleep(500);
     }
