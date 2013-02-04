@@ -268,20 +268,48 @@ public class EncodeDecodeTest extends AndroidTestCase {
         MediaCodecInfo.CodecCapabilities capabilities = codecInfo.getCapabilitiesForType(mimeType);
         for (int i = 0; i < capabilities.colorFormats.length; i++) {
             int colorFormat = capabilities.colorFormats[i];
-            switch (colorFormat) {
-                // these are the formats we know how to handle for this test
-                case MediaCodecInfo.CodecCapabilities.COLOR_FormatYUV420Planar:
-                case MediaCodecInfo.CodecCapabilities.COLOR_FormatYUV420PackedPlanar:
-                case MediaCodecInfo.CodecCapabilities.COLOR_FormatYUV420SemiPlanar:
-                case MediaCodecInfo.CodecCapabilities.COLOR_FormatYUV420PackedSemiPlanar:
-                case MediaCodecInfo.CodecCapabilities.COLOR_TI_FormatYUV420PackedSemiPlanar:
-                    return colorFormat;
-                default:
-                    break;
+            if (isRecognizedFormat(colorFormat)) {
+                return colorFormat;
             }
         }
         fail("couldn't find a good color format for " + codecInfo.getName() + " / " + mimeType);
         return 0;   // not reached
+    }
+
+    /**
+     * Returns true if this is a color format that this test code understands (i.e. we know how
+     * to read and generate frames in this format).
+     */
+    private static boolean isRecognizedFormat(int colorFormat) {
+        switch (colorFormat) {
+            // these are the formats we know how to handle for this test
+            case MediaCodecInfo.CodecCapabilities.COLOR_FormatYUV420Planar:
+            case MediaCodecInfo.CodecCapabilities.COLOR_FormatYUV420PackedPlanar:
+            case MediaCodecInfo.CodecCapabilities.COLOR_FormatYUV420SemiPlanar:
+            case MediaCodecInfo.CodecCapabilities.COLOR_FormatYUV420PackedSemiPlanar:
+            case MediaCodecInfo.CodecCapabilities.COLOR_TI_FormatYUV420PackedSemiPlanar:
+                return true;
+            default:
+                return false;
+        }
+    }
+
+    /**
+     * Returns true if the specified color format is semi-planar YUV.  Throws an exception
+     * if the color format is not recognized (e.g. not YUV).
+     */
+    private static boolean isSemiPlanarYUV(int colorFormat) {
+        switch (colorFormat) {
+            case MediaCodecInfo.CodecCapabilities.COLOR_FormatYUV420Planar:
+            case MediaCodecInfo.CodecCapabilities.COLOR_FormatYUV420PackedPlanar:
+                return false;
+            case MediaCodecInfo.CodecCapabilities.COLOR_FormatYUV420SemiPlanar:
+            case MediaCodecInfo.CodecCapabilities.COLOR_FormatYUV420PackedSemiPlanar:
+            case MediaCodecInfo.CodecCapabilities.COLOR_TI_FormatYUV420PackedSemiPlanar:
+                return true;
+            default:
+                throw new RuntimeException("unknown format " + colorFormat);
+        }
     }
 
     /**
@@ -489,11 +517,8 @@ public class EncodeDecodeTest extends AndroidTestCase {
                             if (VERBOSE) Log.d(TAG, "output EOS");
                             outputDone = true;
                         }
+                        decoder.releaseOutputBuffer(decoderStatus, false /*render*/);
                     } else {
-                        // Before we release+render this buffer, check to see if data from a
-                        // previous go-round has latched.
-                        surfaceStuff.checkNewImageIfAvailable();
-
                         if (VERBOSE) Log.d(TAG, "surface decoder given buffer " + decoderStatus +
                                 " (size=" + info.size + ")");
                         rawSize += info.size;
@@ -501,20 +526,28 @@ public class EncodeDecodeTest extends AndroidTestCase {
                             if (VERBOSE) Log.d(TAG, "output EOS");
                             outputDone = true;
                         }
-                    }
 
-                    // If output is going to a Surface, the second argument should be true.
-                    // If not, the value doesn't matter.
-                    //
-                    // If we are sending to a Surface, then some time after we call this the
-                    // data will be made available to SurfaceTexture, and the onFrameAvailable()
-                    // callback will fire.
-                    decoder.releaseOutputBuffer(decoderStatus, true /*render*/);
+                        boolean doRender = (info.size != 0);
+
+                        // As soon as we call releaseOutputBuffer, the buffer will be forwarded
+                        // to SurfaceTexture to convert to a texture.  The API doesn't guarantee
+                        // that the texture will be available before the call returns, so we
+                        // need to wait for the onFrameAvailable callback to fire.
+                        decoder.releaseOutputBuffer(decoderStatus, doRender);
+                        if (doRender) {
+                            if (VERBOSE) Log.d(TAG, "awaiting frame " + checkIndex);
+                            surfaceStuff.awaitNewImage(checkIndex++);
+                        }
+                    }
                 }
             }
         }
 
-        if (VERBOSE) Log.d(TAG, "encoded " + NUM_FRAMES + " frames at "
+        if (checkIndex != NUM_FRAMES) {
+            fail("expected " + NUM_FRAMES + " frames, only decoded " + checkIndex);
+        }
+
+        if (VERBOSE) Log.d(TAG, "decoded " + checkIndex + " frames at "
                 + mWidth + "x" + mHeight + ": raw=" + rawSize + ", enc=" + encodedSize);
         if (outputStream != null) {
             try {
@@ -599,18 +632,18 @@ public class EncodeDecodeTest extends AndroidTestCase {
      * Throws a failure if the frame looks wrong.
      */
     private void checkFrame(int frameIndex, int colorFormat, ByteBuffer frameData) {
-        final int HALF_WIDTH = mWidth / 2;
-        boolean frameFailed = false;
-
-        if (colorFormat == 0x7FA30C03) {
-            // Nexus 4 decoder output OMX_QCOM_COLOR_FormatYUV420PackedSemiPlanar64x32Tile2m8ka
+        // Check for color formats we don't understand.  There is no requirement for video
+        // decoders to use a "mundane" format, so we just give a pass on proprietary formats.
+        // e.g. Nexus 4 0x7FA30C03 OMX_QCOM_COLOR_FormatYUV420PackedSemiPlanar64x32Tile2m8ka
+        if (!isRecognizedFormat(colorFormat)) {
             Log.d(TAG, "unable to check frame contents for colorFormat=" +
                     Integer.toHexString(colorFormat));
             return;
         }
-        boolean semiPlanar = isSemiPlanarYUV(colorFormat);
 
-        frameIndex %= 8;
+        final int HALF_WIDTH = mWidth / 2;
+        boolean frameFailed = false;
+        boolean semiPlanar = isSemiPlanarYUV(colorFormat);
 
         for (int i = 0; i < 8; i++) {
             int x, y;
@@ -637,7 +670,7 @@ public class EncodeDecodeTest extends AndroidTestCase {
             }
 
             boolean failed = false;
-            if (i == frameIndex) {
+            if (i == frameIndex % 8) {
                 failed = !isColorClose(testY, TEST_Y) ||
                          !isColorClose(testU, TEST_U) ||
                          !isColorClose(testV, TEST_V);
@@ -648,7 +681,7 @@ public class EncodeDecodeTest extends AndroidTestCase {
                          !isColorClose(testV, 0);
             }
             if (failed) {
-                Log.w(TAG, "Bad frame " + frameIndex + " (r=" + i + ": Y=" + testY +
+                Log.w(TAG, "Bad frame " + frameIndex + " (rect=" + i + ": Y=" + testY +
                         " U=" + testU + " V=" + testV + ")");
                 frameFailed = true;
             }
@@ -673,24 +706,6 @@ public class EncodeDecodeTest extends AndroidTestCase {
     }
 
     /**
-     * Returns true if the specified color format is semi-planar YUV.  Throws an exception
-     * if the color format is not recognized (e.g. not YUV).
-     */
-    private static boolean isSemiPlanarYUV(int colorFormat) {
-        switch (colorFormat) {
-            case MediaCodecInfo.CodecCapabilities.COLOR_FormatYUV420Planar:
-            case MediaCodecInfo.CodecCapabilities.COLOR_FormatYUV420PackedPlanar:
-                return false;
-            case MediaCodecInfo.CodecCapabilities.COLOR_FormatYUV420SemiPlanar:
-            case MediaCodecInfo.CodecCapabilities.COLOR_FormatYUV420PackedSemiPlanar:
-            case MediaCodecInfo.CodecCapabilities.COLOR_TI_FormatYUV420PackedSemiPlanar:
-                return true;
-            default:
-                throw new RuntimeException("unknown format " + colorFormat);
-        }
-    }
-
-    /**
      * Holds state associated with a Surface used for output.
      * <p>
      * By default, the Surface will be using a BufferQueue in asynchronous mode, so we
@@ -706,7 +721,9 @@ public class EncodeDecodeTest extends AndroidTestCase {
 
         private SurfaceTexture mSurfaceTexture;
         private Surface mSurface;
-        private boolean mFrameAvailable = false;    // guarded by "this"
+
+        private Object mFrameSyncObject = new Object();     // guards mFrameAvailable
+        private boolean mFrameAvailable;
 
         private int mWidth;
         private int mHeight;
@@ -821,52 +838,59 @@ public class EncodeDecodeTest extends AndroidTestCase {
         }
 
         /**
-         * Latches the next buffer into the texture if one is available, and checks it for
-         * validity.  Must be called from the thread that created the SurfaceStuff object.
+         * Latches the next buffer into the texture, and checks it for validity.  Must be
+         * called from the thread that created the SurfaceStuff object, after the
+         * onFrameAvailable callback has signaled that new data is available.
          */
-        public void checkNewImageIfAvailable() {
-            boolean newStuff = false;
+        public void awaitNewImage(int frameIndex) {
+            final int TIMEOUT_MS = 500;
 
-            synchronized (this) {
-                if (mSurfaceTexture != null && mFrameAvailable) {
-                    mFrameAvailable = false;
-                    newStuff = true;
+            synchronized (mFrameSyncObject) {
+                while (!mFrameAvailable) {
+                    try {
+                        // Wait for onFrameAvailable() to signal us.  Use a timeout to avoid
+                        // stalling the test if it doesn't arrive.
+                        mFrameSyncObject.wait(TIMEOUT_MS);
+                        if (!mFrameAvailable) {
+                            // TODO: if "spurious wakeup", continue while loop
+                            fail("Surface frame wait timed out");
+                        }
+                    } catch (InterruptedException ie) {
+                        // shouldn't happen
+                        throw new RuntimeException(ie);
+                    }
                 }
+                mFrameAvailable = false;
             }
 
-            if (newStuff) {
-                mVideoRender.checkGlError("before updateTexImage");
-                mSurfaceTexture.updateTexImage();
-                mVideoRender.onDrawFrame(mSurfaceTexture);
-                checkSurfaceFrame();
-            }
+            // Latch the data, render it to the Surface, then check how it looks.
+            mVideoRender.checkGlError("before updateTexImage");
+            mSurfaceTexture.updateTexImage();
+            mVideoRender.onDrawFrame(mSurfaceTexture);
+            checkSurfaceFrame(frameIndex);
         }
 
         @Override
         public void onFrameAvailable(SurfaceTexture st) {
             if (VERBOSE) Log.d(TAG, "new frame available");
-            synchronized (this) {
+            synchronized (mFrameSyncObject) {
+                if (mFrameAvailable) {
+                    Log.e(TAG, "mFrameAvailable already set, frame could be dropped");
+                    fail("dropped a frame");
+                }
                 mFrameAvailable = true;
+                mFrameSyncObject.notifyAll();
             }
         }
 
 
         /**
-         * Attempts to check the frame for correctness.
-         * <p>
-         * Our definition of "correct" is based on knowing what the frame sequence number is,
-         * which we can't reliably get by counting frames since the underlying mechanism can
-         * drop frames.  The alternative would be to use the presentation time stamp that
-         * we passed to the video encoder, but there's no way to get that from the texture.
-         * <p>
-         * All we can do is verify that it looks something like a frame we'd expect, i.e.
-         * green with exactly one pink rectangle.
+         * Checks the frame for correctness.
          */
-        private void checkSurfaceFrame() {
+        private void checkSurfaceFrame(int frameIndex) {
             ByteBuffer pixelBuf = ByteBuffer.allocateDirect(4); // TODO - reuse this
+            boolean frameFailed = false;
 
-            int numColoredRects = 0;
-            int rectPosn = -1;
             for (int i = 0; i < 8; i++) {
                 // Note the coordinates are inverted on the Y-axis in GL.
                 int x, y;
@@ -883,26 +907,27 @@ public class EncodeDecodeTest extends AndroidTestCase {
                 int g = pixelBuf.get(1) & 0xff;
                 int b = pixelBuf.get(2) & 0xff;
 
-                if (isColorClose(r, TEST_R0) &&
-                        isColorClose(g, TEST_G0) &&
-                        isColorClose(b, TEST_B0)) {
-                    // empty space
-                } else if (isColorClose(r, TEST_R1) &&
-                        isColorClose(g, TEST_G1) &&
-                        isColorClose(b, TEST_B1)) {
+                boolean failed = false;
+                if (i == frameIndex % 8) {
                     // colored rect
-                    numColoredRects++;
-                    rectPosn = i;
+                    failed = !isColorClose(r, TEST_R1) ||
+                            !isColorClose(g, TEST_G1) ||
+                            !isColorClose(b, TEST_B1);
                 } else {
-                    // wtf
-                    Log.w(TAG, "found unexpected color r=" + r + " g=" + g + " b=" + b);
+                    // zero background color
+                    failed = !isColorClose(r, TEST_R0) ||
+                            !isColorClose(g, TEST_G0) ||
+                            !isColorClose(b, TEST_B0);
+                }
+                if (failed) {
+                    Log.w(TAG, "Bad frame " + frameIndex + " (rect=" + i + ": r=" + r +
+                            " g=" + g + " b=" + b + ")");
+                    frameFailed = true;
                 }
             }
 
-            if (numColoredRects != 1) {
-                fail("Found surface with colored rects != 1 (" + numColoredRects + ")");
-            } else {
-                if (VERBOSE) Log.d(TAG, "good surface, looks like index " + rectPosn);
+            if (frameFailed) {
+                fail("bad frame (" + frameIndex + ")");
             }
         }
     }
