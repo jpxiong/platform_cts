@@ -124,7 +124,7 @@ public class AccessibilityNodeInfoTest extends AndroidTestCase {
         info.setMovementGranularities(AccessibilityNodeInfo.MOVEMENT_GRANULARITY_LINE);
         info.setLabeledBy(new View(getContext()));
         info.setLabelFor(new View(getContext()));
-        info.setViewId("foo.bar:id/baz");
+        info.setViewIdResourceName("foo.bar:id/baz");
     }
 
     /**
@@ -181,8 +181,8 @@ public class AccessibilityNodeInfoTest extends AndroidTestCase {
         assertSame("movementGranularities has incorrect value",
                 expectedInfo.getMovementGranularities(),
                 receivedInfo.getMovementGranularities());
-        assertEquals("viewId has incorrect value", expectedInfo.getViewId(),
-                receivedInfo.getViewId());
+        assertEquals("viewId has incorrect value", expectedInfo.getViewIdResourceName(),
+                receivedInfo.getViewIdResourceName());
     }
 
     /**
@@ -214,6 +214,6 @@ public class AccessibilityNodeInfoTest extends AndroidTestCase {
         assertFalse("accessibilityFocused not properly recycled", info.isAccessibilityFocused());
         assertSame("movementGranularities not properly recycled", 0,
                 info.getMovementGranularities());
-        assertNull("viewId not properly recycled", info.getViewId());
+        assertNull("viewId not properly recycled", info.getViewIdResourceName());
     }
 }
