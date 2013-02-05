@@ -3143,11 +3143,6 @@ public class AccessibilityTextTraversalTest
 
         // Set selection at the end.
         final int textLength = editText.getText().length();
-        arguments.putInt(AccessibilityNodeInfo.ACTION_ARGUMENT_SELECTION_START_INT, textLength);
-        arguments.putInt(AccessibilityNodeInfo.ACTION_ARGUMENT_SELECTION_END_INT, textLength);
-        assertTrue(getInteractionBridge().performAction(text,
-                AccessibilityNodeInfo.ACTION_SET_SELECTION, arguments));
-
         // Verify the selection position.
         assertEquals(textLength, Selection.getSelectionStart(editText.getText()));
         assertEquals(textLength, Selection.getSelectionEnd(editText.getText()));
@@ -3172,5 +3167,32 @@ public class AccessibilityTextTraversalTest
 
         // Verify the content.
         assertTrue(TextUtils.isEmpty(editText.getText()));
+    }
+
+    public void testSetSelectionInContentDescription() throws Exception {
+        final View view = getActivity().findViewById(R.id.view);
+
+        getInstrumentation().runOnMainSync(new Runnable() {
+            @Override
+            public void run() {
+                view.setContentDescription(getString(R.string.foo_bar_baz));
+            }
+        });
+
+        AccessibilityNodeInfo text = getInteractionBridge()
+               .findAccessibilityNodeInfoByTextFromRoot(getString(R.string.foo_bar_baz));
+
+        // Set the cursor position.
+        Bundle arguments = new Bundle();
+        arguments.putInt(AccessibilityNodeInfo.ACTION_ARGUMENT_SELECTION_START_INT, 4);
+        arguments.putInt(AccessibilityNodeInfo.ACTION_ARGUMENT_SELECTION_END_INT, 4);
+        assertTrue(getInteractionBridge().performAction(text,
+                AccessibilityNodeInfo.ACTION_SET_SELECTION, arguments));
+
+        // Try and fail to set the selection longer than zero.
+        arguments.putInt(AccessibilityNodeInfo.ACTION_ARGUMENT_SELECTION_START_INT, 4);
+        arguments.putInt(AccessibilityNodeInfo.ACTION_ARGUMENT_SELECTION_END_INT, 5);
+        assertFalse(getInteractionBridge().performAction(text,
+                AccessibilityNodeInfo.ACTION_SET_SELECTION, arguments));
     }
 }
