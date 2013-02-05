@@ -64,7 +64,7 @@ class TextureRender {
 
     private static final String FRAGMENT_SHADER =
             "#extension GL_OES_EGL_image_external : require\n" +
-            "precision mediump float;\n" +
+            "precision mediump float;\n" +      // highp here doesn't seem to matter
             "varying vec2 vTextureCoord;\n" +
             "uniform samplerExternalOES sTexture;\n" +
             "void main() {\n" +
@@ -130,11 +130,13 @@ class TextureRender {
         GLES20.glFinish();
     }
 
+    /**
+     * Initializes GL state.  Call this after the EGL surface has been created and made current.
+     */
     public void surfaceCreated() {
         mProgram = createProgram(VERTEX_SHADER, FRAGMENT_SHADER);
         if (mProgram == 0) {
-            Log.e(TAG, "failed creating program");
-            return;
+            throw new RuntimeException("failed creating program");
         }
         maPositionHandle = GLES20.glGetAttribLocation(mProgram, "aPosition");
         checkGlError("glGetAttribLocation aPosition");
@@ -178,6 +180,17 @@ class TextureRender {
         checkGlError("glTexParameter");
     }
 
+    /**
+     * Replaces the fragment shader.
+     */
+    public void changeFragmentShader(String fragmentShader) {
+        GLES20.glDeleteProgram(mProgram);
+        mProgram = createProgram(VERTEX_SHADER, fragmentShader);
+        if (mProgram == 0) {
+            throw new RuntimeException("failed creating program");
+        }
+    }
+
     private int loadShader(int shaderType, String source) {
         int shader = GLES20.glCreateShader(shaderType);
         checkGlError("glCreateShader type=" + shaderType);
@@ -187,7 +200,7 @@ class TextureRender {
         GLES20.glGetShaderiv(shader, GLES20.GL_COMPILE_STATUS, compiled, 0);
         if (compiled[0] == 0) {
             Log.e(TAG, "Could not compile shader " + shaderType + ":");
-            Log.e(TAG, GLES20.glGetShaderInfoLog(shader));
+            Log.e(TAG, " " + GLES20.glGetShaderInfoLog(shader));
             GLES20.glDeleteShader(shader);
             shader = 0;
         }

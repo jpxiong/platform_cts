@@ -21,11 +21,7 @@ import android.media.MediaCodec;
 import android.media.MediaCodecInfo;
 import android.media.MediaCodecList;
 import android.media.MediaFormat;
-import android.opengl.EGL14;
 import android.opengl.GLES20;
-import android.opengl.GLES11Ext;
-import android.opengl.GLSurfaceView;
-import android.opengl.Matrix;
 import android.test.AndroidTestCase;
 import android.util.Log;
 import android.view.Surface;
@@ -37,12 +33,6 @@ import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
 import java.util.Arrays;
 
-import javax.microedition.khronos.egl.EGL10;
-import javax.microedition.khronos.egl.EGLConfig;
-import javax.microedition.khronos.egl.EGLContext;
-import javax.microedition.khronos.egl.EGLDisplay;
-import javax.microedition.khronos.egl.EGLSurface;
-import javax.microedition.khronos.opengles.GL;
 import javax.microedition.khronos.opengles.GL10;
 
 
@@ -50,22 +40,13 @@ import javax.microedition.khronos.opengles.GL10;
  * Generates a series of video frames, encodes them, decodes them, and tests for significant
  * divergence from the original.
  * <p>
- * There are two ways to connect an encoder to a decoder.  The first is to pass the output
- * buffers from the encoder to the input buffers of the decoder, using ByteBuffer.put() to
- * copy the bytes.  With this approach, we need to watch for BUFFER_FLAG_CODEC_CONFIG, and
- * if seen we use format.setByteBuffer("csd-0") followed by decoder.configure() to pass the
- * meta-data through.
+ * We copy the data from the encoder's output buffers to the decoder's input buffers, running
+ * them in parallel.  The first buffer output for video/avc contains codec configuration data,
+ * which we must carefully forward to the decoder.
  * <p>
- * The second way is to write the buffers to a file and then stream it back in.  With this
- * approach it is necessary to use a MediaExtractor to retrieve the format info and skip past
- * the meta-data.
- * <p>
- * The former can be done entirely in memory, but requires that the encoder and decoder
- * operate simultaneously (the I/O buffers are owned by MediaCodec).  The latter requires
- * writing to disk, because MediaExtractor can only accept a file or URL as a source.
- * <p>
- * The direct encoder-to-decoder approach isn't currently tested elsewhere in this CTS
- * package, so we use that here.
+ * An alternative approach would be to save the output of the decoder as an mpeg4 video
+ * file, and read it back in from disk.  The data we're generating is just an elementary
+ * stream, so we'd need to perform additional steps to make that happen.
  */
 public class EncodeDecodeTest extends AndroidTestCase {
     private static final String TAG = "EncodeDecodeTest";
@@ -75,22 +56,22 @@ public class EncodeDecodeTest extends AndroidTestCase {
 
     // parameters for the encoder
     private static final String MIME_TYPE = "video/avc";    // H.264 Advanced Video Coding
-    private static final int BIT_RATE = 1000000;            // 1Mbps
+    private static final int BIT_RATE = 2000000;            // 2Mbps
     private static final int FRAME_RATE = 15;               // 15fps
     private static final int IFRAME_INTERVAL = 10;          // 10 seconds between I-frames
 
     // movie length, in frames
     private static final int NUM_FRAMES = 30;               // two seconds of video
 
-    private static final int TEST_Y = 240;                  // YUV values for colored rect
-    private static final int TEST_U = 220;
+    private static final int TEST_Y = 120;                  // YUV values for colored rect
+    private static final int TEST_U = 160;
     private static final int TEST_V = 200;
-    private static final int TEST_R0 = 0;                   // RGB eqivalent of {0,0,0}
+    private static final int TEST_R0 = 0;                   // RGB equivalent of {0,0,0}
     private static final int TEST_G0 = 136;
     private static final int TEST_B0 = 0;
-    private static final int TEST_R1 = 255;                 // RGB equivalent of {240,220,200}
-    private static final int TEST_G1 = 166;
-    private static final int TEST_B1 = 255;
+    private static final int TEST_R1 = 236;                 // RGB equivalent of {120,160,200}
+    private static final int TEST_G1 = 50;
+    private static final int TEST_B1 = 186;
 
     // size of a frame, in pixels
     private int mWidth = -1;
@@ -104,21 +85,21 @@ public class EncodeDecodeTest extends AndroidTestCase {
      */
     public void testEncodeDecodeVideoFromBufferToBufferQCIF() throws Exception {
         setSize(176, 144);
-        testEncodeDecodeVideoFromBuffer(false);
+        encodeDecodeVideoFromBuffer(false);
     }
     public void testEncodeDecodeVideoFromBufferToBufferQVGA() throws Exception {
         setSize(320, 240);
-        testEncodeDecodeVideoFromBuffer(false);
+        encodeDecodeVideoFromBuffer(false);
     }
     public void testEncodeDecodeVideoFromBufferToBuffer720p() throws Exception {
         setSize(1280, 720);
-        testEncodeDecodeVideoFromBuffer(false);
+        encodeDecodeVideoFromBuffer(false);
     }
 
     /**
      * Tests streaming of AVC video through the encoder and decoder.  Data is encoded from
      * a series of byte[] buffers and decoded into Surfaces.  The output is checked for
-     * validity but some frames may be dropped.
+     * validity.
      * <p>
      * Because of the way SurfaceTexture.OnFrameAvailableListener works, we need to run this
      * test on a thread that doesn't have a Looper configured.  If we don't, the test will
@@ -138,7 +119,6 @@ public class EncodeDecodeTest extends AndroidTestCase {
     public void testEncodeDecodeVideoFromBufferToSurface720p() throws Throwable {
         setSize(1280, 720);
         BufferToSurfaceWrapper.runTest(this);
-
     }
 
     /** Wraps testEncodeDecodeVideoFromBuffer(true) */
@@ -152,7 +132,7 @@ public class EncodeDecodeTest extends AndroidTestCase {
 
         public void run() {
             try {
-                mTest.testEncodeDecodeVideoFromBuffer(true);
+                mTest.encodeDecodeVideoFromBuffer(true);
             } catch (Throwable th) {
                 mThrowable = th;
             }
@@ -163,6 +143,54 @@ public class EncodeDecodeTest extends AndroidTestCase {
          */
         public static void runTest(EncodeDecodeTest obj) throws Throwable {
             BufferToSurfaceWrapper wrapper = new BufferToSurfaceWrapper(obj);
+            Thread th = new Thread(wrapper, "codec test");
+            th.start();
+            th.join();
+            if (wrapper.mThrowable != null) {
+                throw wrapper.mThrowable;
+            }
+        }
+    }
+
+    /**
+     * Tests streaming of AVC video through the encoder and decoder.  Data is provided through
+     * a Surface and decoded onto a Surface.  The output is checked for validity.
+     */
+    public void testEncodeDecodeVideoFromSurfaceToSurfaceQCIF() throws Throwable {
+        setSize(176, 144);
+        SurfaceToSurfaceWrapper.runTest(this);
+    }
+    public void testEncodeDecodeVideoFromSurfaceToSurfaceQVGA() throws Throwable {
+        setSize(320, 240);
+        SurfaceToSurfaceWrapper.runTest(this);
+    }
+    public void testEncodeDecodeVideoFromSurfaceToSurface720p() throws Throwable {
+        setSize(1280, 720);
+        SurfaceToSurfaceWrapper.runTest(this);
+    }
+
+    /** Wraps testEncodeDecodeVideoFromSurfaceToSurface() */
+    private static class SurfaceToSurfaceWrapper implements Runnable {
+        private Throwable mThrowable;
+        private EncodeDecodeTest mTest;
+
+        private SurfaceToSurfaceWrapper(EncodeDecodeTest test) {
+            mTest = test;
+        }
+
+        public void run() {
+            try {
+                mTest.encodeDecodeVideoFromSurfaceToSurface();
+            } catch (Throwable th) {
+                mThrowable = th;
+            }
+        }
+
+        /**
+         * Entry point.
+         */
+        public static void runTest(EncodeDecodeTest obj) throws Throwable {
+            SurfaceToSurfaceWrapper wrapper = new SurfaceToSurfaceWrapper(obj);
             Thread th = new Thread(wrapper, "codec test");
             th.start();
             th.join();
@@ -191,48 +219,127 @@ public class EncodeDecodeTest extends AndroidTestCase {
      * <p>
      * See http://b.android.com/37769 for a discussion of input format pitfalls.
      */
-    private void testEncodeDecodeVideoFromBuffer(boolean toSurface) throws Exception {
-        MediaCodecInfo codecInfo = selectCodec(MIME_TYPE);
-        if (codecInfo == null) {
-            // Don't fail CTS if they don't have an AVC codec (not here, anyway).
-            Log.e(TAG, "Unable to find an appropriate codec for " + MIME_TYPE);
-            return;
-        }
-        if (VERBOSE) Log.d(TAG, "found codec: " + codecInfo.getName());
-
-        int colorFormat = selectColorFormat(codecInfo, MIME_TYPE);
-        if (VERBOSE) Log.d(TAG, "found colorFormat: " + colorFormat);
-
-        // We avoid the device-specific limitations on width and height by using values that
-        // are multiples of 16, which all tested devices seem to be able to handle.
-        MediaFormat format = MediaFormat.createVideoFormat(MIME_TYPE, mWidth, mHeight);
-
-        // Set some properties.  Failing to specify some of these can cause the MediaCodec
-        // configure() call to throw an unhelpful exception.
-        format.setInteger(MediaFormat.KEY_COLOR_FORMAT, colorFormat);
-        format.setInteger(MediaFormat.KEY_BIT_RATE, BIT_RATE);
-        format.setInteger(MediaFormat.KEY_FRAME_RATE, FRAME_RATE);
-        format.setInteger(MediaFormat.KEY_I_FRAME_INTERVAL, IFRAME_INTERVAL);
-        if (VERBOSE) Log.d(TAG, "format: " + format);
-
-        // Create a MediaCodec for the desired codec, then configure it as an encoder with
-        // our desired properties.
-        MediaCodec encoder = MediaCodec.createByCodecName(codecInfo.getName());
-        encoder.configure(format, null, null, MediaCodec.CONFIGURE_FLAG_ENCODE);
-        encoder.start();
-
-        // Create a MediaCodec for the decoder, just based on the MIME type.  The various
-        // format details will be passed through the csd-0 meta-data later on.
-        MediaCodec decoder = MediaCodec.createDecoderByType(MIME_TYPE);
+    private void encodeDecodeVideoFromBuffer(boolean toSurface) throws Exception {
+        MediaCodec encoder = null;
+        MediaCodec decoder = null;
 
         try {
-            encodeDecodeVideoFromBuffer(encoder, colorFormat, decoder, toSurface);
+            MediaCodecInfo codecInfo = selectCodec(MIME_TYPE);
+            if (codecInfo == null) {
+                // Don't fail CTS if they don't have an AVC codec (not here, anyway).
+                Log.e(TAG, "Unable to find an appropriate codec for " + MIME_TYPE);
+                return;
+            }
+            if (VERBOSE) Log.d(TAG, "found codec: " + codecInfo.getName());
+
+            int colorFormat = selectColorFormat(codecInfo, MIME_TYPE);
+            if (VERBOSE) Log.d(TAG, "found colorFormat: " + colorFormat);
+
+            // We avoid the device-specific limitations on width and height by using values that
+            // are multiples of 16, which all tested devices seem to be able to handle.
+            MediaFormat format = MediaFormat.createVideoFormat(MIME_TYPE, mWidth, mHeight);
+
+            // Set some properties.  Failing to specify some of these can cause the MediaCodec
+            // configure() call to throw an unhelpful exception.
+            format.setInteger(MediaFormat.KEY_COLOR_FORMAT, colorFormat);
+            format.setInteger(MediaFormat.KEY_BIT_RATE, BIT_RATE);
+            format.setInteger(MediaFormat.KEY_FRAME_RATE, FRAME_RATE);
+            format.setInteger(MediaFormat.KEY_I_FRAME_INTERVAL, IFRAME_INTERVAL);
+            if (VERBOSE) Log.d(TAG, "format: " + format);
+
+            // Create a MediaCodec for the desired codec, then configure it as an encoder with
+            // our desired properties.
+            encoder = MediaCodec.createByCodecName(codecInfo.getName());
+            encoder.configure(format, null, null, MediaCodec.CONFIGURE_FLAG_ENCODE);
+            encoder.start();
+
+            // Create a MediaCodec for the decoder, just based on the MIME type.  The various
+            // format details will be passed through the csd-0 meta-data later on.
+            decoder = MediaCodec.createDecoderByType(MIME_TYPE);
+
+            doEncodeDecodeVideoFromBuffer(encoder, colorFormat, decoder, toSurface);
         } finally {
             if (VERBOSE) Log.d(TAG, "releasing codecs");
-            encoder.stop();
-            decoder.stop();
-            encoder.release();
-            decoder.release();
+            if (encoder != null) {
+                encoder.stop();
+                encoder.release();
+            }
+            if (decoder != null) {
+                decoder.stop();
+                decoder.release();
+            }
+        }
+    }
+
+    /**
+     * Tests encoding and subsequently decoding video from frames generated into a buffer.
+     * <p>
+     * We encode several frames of a video test pattern using MediaCodec, then decode the
+     * output with MediaCodec and do some simple checks.
+     */
+    private void encodeDecodeVideoFromSurfaceToSurface() throws Exception {
+        MediaCodec encoder = null;
+        MediaCodec decoder = null;
+        InputSurface inputSurface = null;
+        OutputSurface outputSurface = null;
+
+        try {
+            MediaCodecInfo codecInfo = selectCodec(MIME_TYPE);
+            if (codecInfo == null) {
+                // Don't fail CTS if they don't have an AVC codec (not here, anyway).
+                Log.e(TAG, "Unable to find an appropriate codec for " + MIME_TYPE);
+                return;
+            }
+            if (VERBOSE) Log.d(TAG, "found codec: " + codecInfo.getName());
+
+            int colorFormat = MediaCodecInfo.CodecCapabilities.COLOR_FormatAndroidOpaque;
+
+            // We avoid the device-specific limitations on width and height by using values that
+            // are multiples of 16, which all tested devices seem to be able to handle.
+            MediaFormat format = MediaFormat.createVideoFormat(MIME_TYPE, mWidth, mHeight);
+
+            // Set some properties.  Failing to specify some of these can cause the MediaCodec
+            // configure() call to throw an unhelpful exception.
+            format.setInteger(MediaFormat.KEY_COLOR_FORMAT, colorFormat);
+            format.setInteger(MediaFormat.KEY_BIT_RATE, BIT_RATE);
+            format.setInteger(MediaFormat.KEY_FRAME_RATE, FRAME_RATE);
+            format.setInteger(MediaFormat.KEY_I_FRAME_INTERVAL, IFRAME_INTERVAL);
+            if (VERBOSE) Log.d(TAG, "format: " + format);
+
+            // Create the output surface.
+            outputSurface = new OutputSurface(mWidth, mHeight);
+
+            // Create a MediaCodec for the decoder, just based on the MIME type.  The various
+            // format details will be passed through the csd-0 meta-data later on.
+            decoder = MediaCodec.createDecoderByType(MIME_TYPE);
+            MediaFormat decoderFormat = MediaFormat.createVideoFormat(MIME_TYPE, mWidth, mHeight);
+            decoder.configure(format, outputSurface.getSurface(), null, 0);
+            decoder.start();
+
+            // Create a MediaCodec for the desired codec, then configure it as an encoder with
+            // our desired properties.  Request a Surface to use for input.
+            encoder = MediaCodec.createByCodecName(codecInfo.getName());
+            encoder.configure(format, null, null, MediaCodec.CONFIGURE_FLAG_ENCODE);
+            inputSurface = new InputSurface(encoder.createInputSurface());
+            encoder.start();
+
+            doEncodeDecodeVideoFromSurfaceToSurface(encoder, inputSurface, colorFormat, decoder, outputSurface);
+        } finally {
+            if (VERBOSE) Log.d(TAG, "releasing codecs");
+            if (inputSurface != null) {
+                inputSurface.release();
+            }
+            if (outputSurface != null) {
+                outputSurface.release();
+            }
+            if (encoder != null) {
+                encoder.stop();
+                encoder.release();
+            }
+            if (decoder != null) {
+                decoder.stop();
+                decoder.release();
+            }
         }
     }
 
@@ -315,7 +422,7 @@ public class EncodeDecodeTest extends AndroidTestCase {
     /**
      * Does the actual work for encoding frames from buffers of byte[].
      */
-    private void encodeDecodeVideoFromBuffer(MediaCodec encoder, int encoderColorFormat,
+    private void doEncodeDecodeVideoFromBuffer(MediaCodec encoder, int encoderColorFormat,
             MediaCodec decoder, boolean toSurface) {
         final int TIMEOUT_USEC = 10000;
         ByteBuffer[] encoderInputBuffers = encoder.getInputBuffers();
@@ -326,8 +433,9 @@ public class EncodeDecodeTest extends AndroidTestCase {
         int decoderColorFormat = -12345;    // init to invalid value
         int generateIndex = 0;
         int checkIndex = 0;
+        int badFrames = 0;
         boolean decoderConfigured = false;
-        SurfaceStuff surfaceStuff = null;
+        OutputSurface outputSurface = null;
 
         // The size of a frame of video data, in the formats we handle, is stride*sliceHeight
         // for Y, and (stride/2)*(sliceHeight/2) for each of the Cb and Cr channels.  Application
@@ -338,7 +446,8 @@ public class EncodeDecodeTest extends AndroidTestCase {
         long rawSize = 0;
         long encodedSize = 0;
 
-        // Save a copy to disk.  Useful for debugging the test.
+        // Save a copy to disk.  Useful for debugging the test.  Note this is a raw elementary
+        // stream, not a .mp4 file, so not all players will know what to do with it.
         FileOutputStream outputStream = null;
         if (DEBUG_SAVE_FILE) {
             String fileName = DEBUG_FILE_NAME_BASE + mWidth + "x" + mHeight + ".mp4";
@@ -352,7 +461,7 @@ public class EncodeDecodeTest extends AndroidTestCase {
         }
 
         if (toSurface) {
-            surfaceStuff = new SurfaceStuff(mWidth, mHeight);
+            outputSurface = new OutputSurface(mWidth, mHeight);
         }
 
         // Loop until the output side is done.
@@ -444,12 +553,14 @@ public class EncodeDecodeTest extends AndroidTestCase {
                         }
                     }
                     if ((info.flags & MediaCodec.BUFFER_FLAG_CODEC_CONFIG) != 0) {
-                        // Codec config info.  Only expected on first packet.
+                        // Codec config info.  Only expected on first packet.  One way to
+                        // handle this is to manually stuff the data into the MediaFormat
+                        // and pass that to configure().  We do that here to exercise the API.
                         assertFalse(decoderConfigured);
                         MediaFormat format =
                                 MediaFormat.createVideoFormat(MIME_TYPE, mWidth, mHeight);
                         format.setByteBuffer("csd-0", encodedData);
-                        decoder.configure(format, toSurface ? surfaceStuff.getSurface() : null,
+                        decoder.configure(format, toSurface ? outputSurface.getSurface() : null,
                                 null, 0);
                         decoder.start();
                         decoderInputBuffers = decoder.getInputBuffers();
@@ -463,8 +574,8 @@ public class EncodeDecodeTest extends AndroidTestCase {
                         ByteBuffer inputBuf = decoderInputBuffers[inputBufIndex];
                         inputBuf.clear();
                         inputBuf.put(encodedData);
-                        decoder.queueInputBuffer(inputBufIndex, 0, info.size, info.presentationTimeUs,
-                                info.flags);
+                        decoder.queueInputBuffer(inputBufIndex, 0, info.size,
+                                info.presentationTimeUs, info.flags);
 
                         encoderDone = (info.flags & MediaCodec.BUFFER_FLAG_END_OF_STREAM) != 0;
                         if (VERBOSE) Log.d(TAG, "passed " + info.size + " bytes to decoder"
@@ -487,6 +598,9 @@ public class EncodeDecodeTest extends AndroidTestCase {
                     // no output available yet
                     if (VERBOSE) Log.d(TAG, "no output from decoder available");
                 } else if (decoderStatus == MediaCodec.INFO_OUTPUT_BUFFERS_CHANGED) {
+                    // The storage associated with the direct ByteBuffer may already be unmapped,
+                    // so attempting to access data through the old output buffer array could
+                    // lead to a native crash.
                     if (VERBOSE) Log.d(TAG, "decoder output buffers changed");
                     decoderOutputBuffers = decoder.getOutputBuffers();
                 } else if (decoderStatus == MediaCodec.INFO_OUTPUT_FORMAT_CHANGED) {
@@ -510,7 +624,9 @@ public class EncodeDecodeTest extends AndroidTestCase {
                             if (VERBOSE) Log.d(TAG, "got empty frame");
                         } else {
                             if (VERBOSE) Log.d(TAG, "decoded, checking frame " + checkIndex);
-                            checkFrame(checkIndex++, decoderColorFormat, outputFrame);
+                            if (!checkFrame(checkIndex++, decoderColorFormat, outputFrame)) {
+                                badFrames++;
+                            }
                         }
 
                         if ((info.flags & MediaCodec.BUFFER_FLAG_END_OF_STREAM) != 0) {
@@ -536,15 +652,15 @@ public class EncodeDecodeTest extends AndroidTestCase {
                         decoder.releaseOutputBuffer(decoderStatus, doRender);
                         if (doRender) {
                             if (VERBOSE) Log.d(TAG, "awaiting frame " + checkIndex);
-                            surfaceStuff.awaitNewImage(checkIndex++);
+                            outputSurface.awaitNewImage();
+                            outputSurface.drawImage();
+                            if (!checkSurfaceFrame(checkIndex++)) {
+                                badFrames++;
+                            }
                         }
                     }
                 }
             }
-        }
-
-        if (checkIndex != NUM_FRAMES) {
-            fail("expected " + NUM_FRAMES + " frames, only decoded " + checkIndex);
         }
 
         if (VERBOSE) Log.d(TAG, "decoded " + checkIndex + " frames at "
@@ -557,7 +673,212 @@ public class EncodeDecodeTest extends AndroidTestCase {
                 throw new RuntimeException(ioe);
             }
         }
+
+        if (outputSurface != null) {
+            outputSurface.release();
+        }
+
+        if (checkIndex != NUM_FRAMES) {
+            fail("expected " + NUM_FRAMES + " frames, only decoded " + checkIndex);
+        }
+        if (badFrames != 0) {
+            fail("Found " + badFrames + " bad frames");
+        }
     }
+
+    /**
+     * Does the actual work for encoding and decoding from Surface to Surface.
+     */
+    private void doEncodeDecodeVideoFromSurfaceToSurface(MediaCodec encoder,
+            InputSurface inputSurface, int encoderColorFormat, MediaCodec decoder,
+            OutputSurface outputSurface) {
+        final int TIMEOUT_USEC = 10000;
+        ByteBuffer[] encoderOutputBuffers = encoder.getOutputBuffers();
+        ByteBuffer[] decoderInputBuffers = decoder.getInputBuffers();
+        MediaCodec.BufferInfo info = new MediaCodec.BufferInfo();
+        int generateIndex = 0;
+        int checkIndex = 0;
+        int badFrames = 0;
+
+        // Save a copy to disk.  Useful for debugging the test.  Note this is a raw elementary
+        // stream, not a .mp4 file, so not all players will know what to do with it.
+        FileOutputStream outputStream = null;
+        if (DEBUG_SAVE_FILE) {
+            String fileName = DEBUG_FILE_NAME_BASE + mWidth + "x" + mHeight + ".mp4";
+            try {
+                outputStream = new FileOutputStream(fileName);
+                Log.d(TAG, "encoded output will be saved as " + fileName);
+            } catch (IOException ioe) {
+                Log.w(TAG, "Unable to create debug output file " + fileName);
+                throw new RuntimeException(ioe);
+            }
+        }
+
+        // Loop until the output side is done.
+        boolean inputDone = false;
+        boolean encoderDone = false;
+        boolean outputDone = false;
+        while (!outputDone) {
+            if (VERBOSE) Log.d(TAG, "loop");
+
+            // If we're not done submitting frames, generate a new one and submit it.  The
+            // eglSwapBuffers call will block if the input is full.
+            if (!inputDone) {
+                long ptsUsec = generateIndex * 1000000 / FRAME_RATE;
+                if (generateIndex == NUM_FRAMES) {
+                    // Send an empty frame with the end-of-stream flag set.
+                    if (VERBOSE) Log.d(TAG, "signaling input EOS");
+                    encoder.signalEndOfInputStream();
+                    inputDone = true;
+                } else {
+                    inputSurface.makeCurrent();
+                    generateSurfaceFrame(generateIndex);
+                    // TODO: provide PTS time stamp to EGL
+                    if (VERBOSE) Log.d(TAG, "inputSurface swapBuffers");
+                    inputSurface.swapBuffers();
+                }
+                generateIndex++;
+            }
+
+            // Assume output is available.  Loop until both assumptions are false.
+            boolean decoderOutputAvailable = true;
+            boolean encoderOutputAvailable = !encoderDone;
+            while (decoderOutputAvailable || encoderOutputAvailable) {
+                // Start by draining any pending output from the decoder.  It's important to
+                // do this before we try to stuff any more data in.
+                int decoderStatus = decoder.dequeueOutputBuffer(info, TIMEOUT_USEC);
+                if (decoderStatus == MediaCodec.INFO_TRY_AGAIN_LATER) {
+                    // no output available yet
+                    if (VERBOSE) Log.d(TAG, "no output from decoder available");
+                    decoderOutputAvailable = false;
+                } else if (decoderStatus == MediaCodec.INFO_OUTPUT_BUFFERS_CHANGED) {
+                    if (VERBOSE) Log.d(TAG, "decoder output buffers changed (but we don't care)");
+                } else if (decoderStatus == MediaCodec.INFO_OUTPUT_FORMAT_CHANGED) {
+                    // this happens before the first frame is returned
+                    MediaFormat decoderOutputFormat = decoder.getOutputFormat();
+                    if (VERBOSE) Log.d(TAG, "decoder output format changed: " +
+                            decoderOutputFormat);
+                } else if (decoderStatus < 0) {
+                    fail("unexpected result from deocder.dequeueOutputBuffer: " + decoderStatus);
+                } else {  // decoderStatus >= 0
+                    if (VERBOSE) Log.d(TAG, "surface decoder given buffer " + decoderStatus +
+                            " (size=" + info.size + ")");
+                    if ((info.flags & MediaCodec.BUFFER_FLAG_END_OF_STREAM) != 0) {
+                        if (VERBOSE) Log.d(TAG, "output EOS");
+                        outputDone = true;
+                    }
+
+                    // The ByteBuffers are null references, but we still get a nonzero size for
+                    // the decoded data.
+                    boolean doRender = (info.size != 0);
+
+                    // As soon as we call releaseOutputBuffer, the buffer will be forwarded
+                    // to SurfaceTexture to convert to a texture.  The API doesn't guarantee
+                    // that the texture will be available before the call returns, so we
+                    // need to wait for the onFrameAvailable callback to fire.  If we don't
+                    // wait, we risk dropping frames.
+                    outputSurface.makeCurrent();
+                    decoder.releaseOutputBuffer(decoderStatus, doRender);
+                    if (doRender) {
+                        if (VERBOSE) Log.d(TAG, "awaiting frame " + checkIndex);
+                        outputSurface.awaitNewImage();
+                        outputSurface.drawImage();
+                        if (!checkSurfaceFrame(checkIndex++)) {
+                            badFrames++;
+                        }
+                    }
+                }
+                if (decoderStatus != MediaCodec.INFO_TRY_AGAIN_LATER) {
+                    // Continue attempts to drain output.
+                    continue;
+                }
+
+                // Decoder is drained, check to see if we've got a new buffer of output from
+                // the encoder.
+                if (!encoderDone) {
+                    int encoderStatus = encoder.dequeueOutputBuffer(info, TIMEOUT_USEC);
+                    if (encoderStatus == MediaCodec.INFO_TRY_AGAIN_LATER) {
+                        // no output available yet
+                        if (VERBOSE) Log.d(TAG, "no output from encoder available");
+                        encoderOutputAvailable = false;
+                    } else if (encoderStatus == MediaCodec.INFO_OUTPUT_BUFFERS_CHANGED) {
+                        // not expected for an encoder
+                        encoderOutputBuffers = encoder.getOutputBuffers();
+                        if (VERBOSE) Log.d(TAG, "encoder output buffers changed");
+                    } else if (encoderStatus == MediaCodec.INFO_OUTPUT_FORMAT_CHANGED) {
+                        // not expected for an encoder
+                        MediaFormat newFormat = encoder.getOutputFormat();
+                        if (VERBOSE) Log.d(TAG, "encoder output format changed: " + newFormat);
+                    } else if (encoderStatus < 0) {
+                        fail("unexpected result from encoder.dequeueOutputBuffer: " + encoderStatus);
+                    } else { // encoderStatus >= 0
+                        ByteBuffer encodedData = encoderOutputBuffers[encoderStatus];
+                        if (encodedData == null) {
+                            fail("encoderOutputBuffer " + encoderStatus + " was null");
+                        }
+
+                        // It's usually necessary to adjust the ByteBuffer values to match BufferInfo.
+                        encodedData.position(info.offset);
+                        encodedData.limit(info.offset + info.size);
+
+                        if (outputStream != null) {
+                            byte[] data = new byte[info.size];
+                            encodedData.get(data);
+                            encodedData.position(info.offset);
+                            try {
+                                outputStream.write(data);
+                            } catch (IOException ioe) {
+                                Log.w(TAG, "failed writing debug data to file");
+                                throw new RuntimeException(ioe);
+                            }
+                        }
+
+                        // Get a decoder input buffer, blocking until it's available.  We just
+                        // drained the decoder output, so we expect there to be a free input
+                        // buffer now or in the near future (i.e. this should never deadlock
+                        // if the codec is meeting requirements).
+                        //
+                        // The first buffer of data we get will have the BUFFER_FLAG_CODEC_CONFIG
+                        // flag set; the decoder will see this and finish configuring itself.
+                        int inputBufIndex = decoder.dequeueInputBuffer(-1);
+                        ByteBuffer inputBuf = decoderInputBuffers[inputBufIndex];
+                        inputBuf.clear();
+                        inputBuf.put(encodedData);
+                        decoder.queueInputBuffer(inputBufIndex, 0, info.size,
+                                info.presentationTimeUs, info.flags);
+
+                        // If everything from the encoder has been passed to the decoder, we
+                        // can stop polling the encoder output.  (This just an optimization.)
+                        if ((info.flags & MediaCodec.BUFFER_FLAG_END_OF_STREAM) != 0) {
+                            encoderDone = true;
+                            encoderOutputAvailable = false;
+                        }
+                        if (VERBOSE) Log.d(TAG, "passed " + info.size + " bytes to decoder"
+                                + (encoderDone ? " (EOS)" : ""));
+
+                        encoder.releaseOutputBuffer(encoderStatus, false);
+                    }
+                }
+            }
+        }
+
+        if (outputStream != null) {
+            try {
+                outputStream.close();
+            } catch (IOException ioe) {
+                Log.w(TAG, "failed closing debug file");
+                throw new RuntimeException(ioe);
+            }
+        }
+
+        if (checkIndex != NUM_FRAMES) {
+            fail("expected " + NUM_FRAMES + " frames, only decoded " + checkIndex);
+        }
+        if (badFrames != 0) {
+            fail("Found " + badFrames + " bad frames");
+        }
+    }
+
 
     /**
      * Generates data for frame N into the supplied buffer.  We have an 8-frame animation
@@ -590,7 +911,7 @@ public class EncodeDecodeTest extends AndroidTestCase {
         for (int y = startY + (mHeight/2) - 1; y >= startY; --y) {
             for (int x = startX + (mWidth/4) - 1; x >= startX; --x) {
                 if (semiPlanar) {
-                    // full-size Y, followed by CbCr pairs at half resolution
+                    // full-size Y, followed by UV pairs at half resolution
                     // e.g. Nexus 4 OMX.qcom.video.encoder.avc COLOR_FormatYUV420SemiPlanar
                     // e.g. Galaxy Nexus OMX.TI.DUCATI1.VIDEO.H264E
                     //        OMX_TI_COLOR_FormatYUV420PackedSemiPlanar
@@ -600,7 +921,7 @@ public class EncodeDecodeTest extends AndroidTestCase {
                         frameData[mWidth*mHeight + y * HALF_WIDTH + x + 1] = (byte) TEST_V;
                     }
                 } else {
-                    // full-size Y, followed by quarter-size Cb and quarter-size Cr
+                    // full-size Y, followed by quarter-size U and quarter-size V
                     // e.g. Nexus 10 OMX.Exynos.AVC.Encoder COLOR_FormatYUV420Planar
                     // e.g. Nexus 7 OMX.Nvidia.h264.encoder COLOR_FormatYUV420Planar
                     frameData[y * mWidth + x] = (byte) TEST_Y;
@@ -615,9 +936,9 @@ public class EncodeDecodeTest extends AndroidTestCase {
 
         if (false) {
             // make sure that generate and check agree
-            Log.d(TAG, "SPOT CHECK");
-            checkFrame(frameIndex, colorFormat, ByteBuffer.wrap(frameData));
-            Log.d(TAG, "SPOT CHECK DONE");
+            if (!checkFrame(frameIndex, colorFormat, ByteBuffer.wrap(frameData))) {
+                fail("spot check failed");
+            }
         }
     }
 
@@ -628,17 +949,17 @@ public class EncodeDecodeTest extends AndroidTestCase {
      * one pixel from the middle of the 8 regions, and verify that the correct one has
      * the non-background color.  We can't know exactly what the video encoder has done
      * with our frames, so we just check to see if it looks like more or less the right thing.
-     * <p>
-     * Throws a failure if the frame looks wrong.
+     *
+     * @return true if the frame looks good
      */
-    private void checkFrame(int frameIndex, int colorFormat, ByteBuffer frameData) {
+    private boolean checkFrame(int frameIndex, int colorFormat, ByteBuffer frameData) {
         // Check for color formats we don't understand.  There is no requirement for video
         // decoders to use a "mundane" format, so we just give a pass on proprietary formats.
         // e.g. Nexus 4 0x7FA30C03 OMX_QCOM_COLOR_FormatYUV420PackedSemiPlanar64x32Tile2m8ka
         if (!isRecognizedFormat(colorFormat)) {
             Log.d(TAG, "unable to check frame contents for colorFormat=" +
                     Integer.toHexString(colorFormat));
-            return;
+            return true;
         }
 
         final int HALF_WIDTH = mWidth / 2;
@@ -687,248 +1008,94 @@ public class EncodeDecodeTest extends AndroidTestCase {
             }
         }
 
-        if (frameFailed) {
-            fail("bad frame (" + frameIndex + ")");
+        return !frameFailed;
+    }
+
+    /**
+     * Generates a frame of data using GL commands.
+     */
+    private void generateSurfaceFrame(int frameIndex) {
+        frameIndex %= 8;
+
+        int startX, startY;
+        if (frameIndex < 4) {
+            // (0,0) is bottom-left in GL
+            startX = frameIndex * (mWidth / 4);
+            startY = mHeight / 2;
+        } else {
+            startX = (7 - frameIndex) * (mWidth / 4);
+            startY = 0;
         }
+
+        GLES20.glDisable(GLES20.GL_SCISSOR_TEST);
+        GLES20.glClearColor(TEST_R0 / 255.0f, TEST_G0 / 255.0f, TEST_B0 / 255.0f, 1.0f);
+        GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT);
+        GLES20.glEnable(GLES20.GL_SCISSOR_TEST);
+        GLES20.glScissor(startX, startY, mWidth / 4, mHeight / 2);
+        GLES20.glClearColor(TEST_R1 / 255.0f, TEST_G1 / 255.0f, TEST_B1 / 255.0f, 1.0f);
+        GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT);
+    }
+
+    /**
+     * Checks the frame for correctness.  Similar to {@link checkFrame}, but uses GL to
+     * read pixels from the current surface.
+     *
+     * @return true if the frame looks good
+     */
+    private boolean checkSurfaceFrame(int frameIndex) {
+        ByteBuffer pixelBuf = ByteBuffer.allocateDirect(4); // TODO - reuse this
+        boolean frameFailed = false;
+
+        for (int i = 0; i < 8; i++) {
+            // Note the coordinates are inverted on the Y-axis in GL.
+            int x, y;
+            if (i < 4) {
+                x = i * (mWidth / 4) + (mWidth / 8);
+                y = (mHeight * 3) / 4;
+            } else {
+                x = (7 - i) * (mWidth / 4) + (mWidth / 8);
+                y = mHeight / 4;
+            }
+
+            GLES20.glReadPixels(x, y, 1, 1, GL10.GL_RGBA, GL10.GL_UNSIGNED_BYTE, pixelBuf);
+            int r = pixelBuf.get(0) & 0xff;
+            int g = pixelBuf.get(1) & 0xff;
+            int b = pixelBuf.get(2) & 0xff;
+            //Log.d(TAG, "GOT(" + frameIndex + "/" + i + "): r=" + r + " g=" + g + " b=" + b);
+
+            boolean failed = false;
+            if (i == frameIndex % 8) {
+                // colored rect
+                failed = !isColorClose(r, TEST_R1) ||
+                        !isColorClose(g, TEST_G1) ||
+                        !isColorClose(b, TEST_B1);
+            } else {
+                // zero background color
+                failed = !isColorClose(r, TEST_R0) ||
+                        !isColorClose(g, TEST_G0) ||
+                        !isColorClose(b, TEST_B0);
+            }
+            if (failed) {
+                Log.w(TAG, "Bad frame " + frameIndex + " (rect=" + i + ": r=" + r +
+                        " g=" + g + " b=" + b + ")");
+                frameFailed = true;
+            }
+        }
+
+        return !frameFailed;
     }
 
     /**
      * Returns true if the actual color value is close to the expected color value.
      */
     static boolean isColorClose(int actual, int expected) {
-        if (expected < 5) {
-            return actual < (expected + 5);
-        } else if (expected > 250) {
-            return actual > (expected - 5);
+        final int MAX_DELTA = 8;
+        if (expected < MAX_DELTA) {
+            return actual < (expected + MAX_DELTA);
+        } else if (expected > (255 - MAX_DELTA)) {
+            return actual > (expected - MAX_DELTA);
         } else {
-            return actual > (expected - 5) && actual < (expected + 5);
-        }
-    }
-
-    /**
-     * Holds state associated with a Surface used for output.
-     * <p>
-     * By default, the Surface will be using a BufferQueue in asynchronous mode, so we
-     * will likely miss a number of frames.
-     */
-    private static class SurfaceStuff implements SurfaceTexture.OnFrameAvailableListener {
-        private static final int EGL_OPENGL_ES2_BIT = 4;
-
-        private EGL10 mEGL;
-        private EGLDisplay mEGLDisplay;
-        private EGLContext mEGLContext;
-        private EGLSurface mEGLSurface;
-
-        private SurfaceTexture mSurfaceTexture;
-        private Surface mSurface;
-
-        private Object mFrameSyncObject = new Object();     // guards mFrameAvailable
-        private boolean mFrameAvailable;
-
-        private int mWidth;
-        private int mHeight;
-
-        private TextureRender mTextureRender;
-
-        public SurfaceStuff(int width, int height) {
-            mWidth = width;
-            mHeight = height;
-
-            eglSetup();
-
-            mTextureRender = new TextureRender();
-            mTextureRender.surfaceCreated();
-
-            // Even if we don't access the SurfaceTexture after the constructor returns, we
-            // still need to keep a reference to it.  The Surface doesn't retain a reference
-            // at the Java level, so if we don't either then the object can get GCed, which
-            // causes the native finalizer to run.
-            if (VERBOSE) Log.d(TAG, "textureID=" + mTextureRender.getTextureId());
-            mSurfaceTexture = new SurfaceTexture(mTextureRender.getTextureId());
-
-            // This doesn't work if SurfaceStuff is created on the thread that CTS started for
-            // these test cases.
-            //
-            // The CTS-created thread has a Looper, and the SurfaceTexture constructor will
-            // create a Handler that uses it.  The "frame available" message is delivered
-            // there, but since we're not a Looper-based thread we'll never see it.  For
-            // this to do anything useful, SurfaceStuff must be created on a thread without
-            // a Looper, so that SurfaceTexture uses the main application Looper instead.
-            //
-            // Java language note: passing "this" out of a constructor is generally unwise,
-            // but we should be able to get away with it here.
-            mSurfaceTexture.setOnFrameAvailableListener(this);
-
-            mSurface = new Surface(mSurfaceTexture);
-        }
-
-        /**
-         * Prepares EGL.  We want a GLES 2.0 context and a surface that supports pbuffer.
-         */
-        private void eglSetup() {
-            mEGL = (EGL10)EGLContext.getEGL();
-            mEGLDisplay = mEGL.eglGetDisplay(EGL10.EGL_DEFAULT_DISPLAY);
-            if (!mEGL.eglInitialize(mEGLDisplay, null)) {
-                fail("unable to initialize EGL10");
-            }
-
-            // Configure surface for pbuffer and OpenGL ES 2.0.  We want enough RGB bits
-            // to be able to tell if the frame is reasonable.
-            int[] attribList = {
-                    EGL10.EGL_RED_SIZE, 8,
-                    EGL10.EGL_GREEN_SIZE, 8,
-                    EGL10.EGL_BLUE_SIZE, 8,
-                    EGL10.EGL_SURFACE_TYPE, EGL10.EGL_PBUFFER_BIT,
-                    EGL10.EGL_RENDERABLE_TYPE, EGL_OPENGL_ES2_BIT,
-                    EGL10.EGL_NONE
-            };
-            EGLConfig[] configs = new EGLConfig[1];
-            int[] numConfigs = new int[1];
-            if (!mEGL.eglChooseConfig(mEGLDisplay, attribList, configs, 1, numConfigs)) {
-                fail("unable to find RGB888+pbuffer EGL config");
-            }
-
-            // Configure context for OpenGL ES 2.0.
-            int[] attrib_list = {
-                    EGL14.EGL_CONTEXT_CLIENT_VERSION, 2,
-                    EGL10.EGL_NONE
-            };
-            mEGLContext = mEGL.eglCreateContext(mEGLDisplay, configs[0], EGL10.EGL_NO_CONTEXT,
-                    attrib_list);
-            checkEglError("eglCreateContext");
-            assertNotNull(mEGLContext);
-
-            // Create a pbuffer surface.  By using this for output, we can use glReadPixels
-            // to test values in the output.
-            int[] surfaceAttribs = {
-                    EGL10.EGL_WIDTH, mWidth,
-                    EGL10.EGL_HEIGHT, mHeight,
-                    EGL10.EGL_NONE
-            };
-            mEGLSurface = mEGL.eglCreatePbufferSurface(mEGLDisplay, configs[0], surfaceAttribs);
-            checkEglError("eglCreatePbufferSurface");
-            assertNotNull(mEGLSurface);
-
-            if (!mEGL.eglMakeCurrent(mEGLDisplay, mEGLSurface, mEGLSurface, mEGLContext)) {
-                fail("eglMakeCurrent failed");
-            }
-        }
-
-        /**
-         * Checks for EGL errors.
-         */
-        private void checkEglError(String msg) {
-            boolean failed = false;
-            int error;
-            while ((error = mEGL.eglGetError()) != EGL10.EGL_SUCCESS) {
-                Log.e(TAG, msg + ": EGL error: 0x" + Integer.toHexString(error));
-                failed = true;
-            }
-            if (failed) {
-                fail("EGL error encountered (see log)");
-            }
-        }
-
-
-        /**
-         * Returns the Surface that the MediaCodec will draw onto.
-         */
-        public Surface getSurface() {
-            return mSurface;
-        }
-
-        /**
-         * Latches the next buffer into the texture, and checks it for validity.  Must be
-         * called from the thread that created the SurfaceStuff object, after the
-         * onFrameAvailable callback has signaled that new data is available.
-         */
-        public void awaitNewImage(int frameIndex) {
-            final int TIMEOUT_MS = 500;
-
-            synchronized (mFrameSyncObject) {
-                while (!mFrameAvailable) {
-                    try {
-                        // Wait for onFrameAvailable() to signal us.  Use a timeout to avoid
-                        // stalling the test if it doesn't arrive.
-                        mFrameSyncObject.wait(TIMEOUT_MS);
-                        if (!mFrameAvailable) {
-                            // TODO: if "spurious wakeup", continue while loop
-                            fail("Surface frame wait timed out");
-                        }
-                    } catch (InterruptedException ie) {
-                        // shouldn't happen
-                        throw new RuntimeException(ie);
-                    }
-                }
-                mFrameAvailable = false;
-            }
-
-            // Latch the data, render it to the Surface, then check how it looks.
-            mTextureRender.checkGlError("before updateTexImage");
-            mSurfaceTexture.updateTexImage();
-            mTextureRender.drawFrame(mSurfaceTexture);
-            checkSurfaceFrame(frameIndex);
-        }
-
-        @Override
-        public void onFrameAvailable(SurfaceTexture st) {
-            if (VERBOSE) Log.d(TAG, "new frame available");
-            synchronized (mFrameSyncObject) {
-                if (mFrameAvailable) {
-                    Log.e(TAG, "mFrameAvailable already set, frame could be dropped");
-                    fail("dropped a frame");
-                }
-                mFrameAvailable = true;
-                mFrameSyncObject.notifyAll();
-            }
-        }
-
-
-        /**
-         * Checks the frame for correctness.
-         */
-        private void checkSurfaceFrame(int frameIndex) {
-            ByteBuffer pixelBuf = ByteBuffer.allocateDirect(4); // TODO - reuse this
-            boolean frameFailed = false;
-
-            for (int i = 0; i < 8; i++) {
-                // Note the coordinates are inverted on the Y-axis in GL.
-                int x, y;
-                if (i < 4) {
-                    x = i * (mWidth / 4) + (mWidth / 8);
-                    y = (mHeight * 3) / 4;
-                } else {
-                    x = (7 - i) * (mWidth / 4) + (mWidth / 8);
-                    y = mHeight / 4;
-                }
-
-                GLES20.glReadPixels(x, y, 1, 1, GL10.GL_RGBA, GL10.GL_UNSIGNED_BYTE, pixelBuf);
-                int r = pixelBuf.get(0) & 0xff;
-                int g = pixelBuf.get(1) & 0xff;
-                int b = pixelBuf.get(2) & 0xff;
-
-                boolean failed = false;
-                if (i == frameIndex % 8) {
-                    // colored rect
-                    failed = !isColorClose(r, TEST_R1) ||
-                            !isColorClose(g, TEST_G1) ||
-                            !isColorClose(b, TEST_B1);
-                } else {
-                    // zero background color
-                    failed = !isColorClose(r, TEST_R0) ||
-                            !isColorClose(g, TEST_G0) ||
-                            !isColorClose(b, TEST_B0);
-                }
-                if (failed) {
-                    Log.w(TAG, "Bad frame " + frameIndex + " (rect=" + i + ": r=" + r +
-                            " g=" + g + " b=" + b + ")");
-                    frameFailed = true;
-                }
-            }
-
-            if (frameFailed) {
-                fail("bad frame (" + frameIndex + ")");
-            }
+            return actual > (expected - MAX_DELTA) && actual < (expected + MAX_DELTA);
         }
     }
 }
