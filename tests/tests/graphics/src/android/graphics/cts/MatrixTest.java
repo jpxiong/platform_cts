@@ -302,7 +302,7 @@ public class MatrixTest extends AndroidTestCase {
         values[0] = 1000f;
         matrix.setValues(values);
         assertTrue(mMatrix.invert(matrix));
-        String expect = "[1.0, -0.0, 0.0][-0.0, 1.0, 0.0][0.0, 0.0, 1.0]";
+        String expect = "[1.0, 0.0, 0.0][0.0, 1.0, 0.0][0.0, 0.0, 1.0]";
         assertEquals(expect, matrix.toShortString());
         expect = "[1.0, 0.0, 0.0][0.0, 1.0, 0.0][0.0, 0.0, 1.0]";
         assertEquals(expect, mMatrix.toShortString());
