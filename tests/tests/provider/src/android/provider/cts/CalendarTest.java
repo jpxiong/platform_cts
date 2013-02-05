@@ -1769,14 +1769,33 @@ public class CalendarTest extends InstrumentationTestCase {
 
         // Test that inserting a valid color index works
         ev = EventHelper.getNewEventValues(account, seed++, cal_id, false);
-        ev.put(Events.EVENT_COLOR_KEY, ColorHelper.DEFAULT_INDICES[ColorHelper.E_COLOR_0]);
+        final String defaultColorIndex = ColorHelper.DEFAULT_INDICES[ColorHelper.E_COLOR_0];
+        ev.put(Events.EVENT_COLOR_KEY, defaultColorIndex);
 
         Uri uri = mContentResolver.insert(Events.CONTENT_URI, ev);
         long eventId2 = ContentUris.parseId(uri);
         assertTrue(eventId2 >= 0);
         // And updates the event's color to the one in the table
-        ev.put(Events.EVENT_COLOR, ColorHelper.DEFAULT_COLORS[ColorHelper.E_COLOR_0]);
+        final int expectedColor = ColorHelper.DEFAULT_COLORS[ColorHelper.E_COLOR_0];
+        ev.put(Events.EVENT_COLOR, expectedColor);
         verifyEvent(ev, eventId2);
+
+        // Test that event iterator has COLOR columns
+        final EntityIterator iterator = EventsEntity.newEntityIterator(mContentResolver.query(
+                ContentUris.withAppendedId(EventsEntity.CONTENT_URI, eventId2),
+                null, null, null, null), mContentResolver);
+        assertTrue("Empty Iterator", iterator.hasNext());
+        final Entity entity = iterator.next();
+        final ContentValues values = entity.getEntityValues();
+        assertTrue("Missing EVENT_COLOR", values.containsKey(EventsEntity.EVENT_COLOR));
+        assertEquals("Wrong EVENT_COLOR",
+                expectedColor,
+                (int) values.getAsInteger(EventsEntity.EVENT_COLOR));
+        assertTrue("Missing EVENT_COLOR_KEY", values.containsKey(EventsEntity.EVENT_COLOR_KEY));
+        assertEquals("Wrong EVENT_COLOR_KEY",
+                defaultColorIndex,
+                values.getAsString(EventsEntity.EVENT_COLOR_KEY));
+        iterator.close();
 
         // Test that updating a valid color index also updates the color in an
         // event
