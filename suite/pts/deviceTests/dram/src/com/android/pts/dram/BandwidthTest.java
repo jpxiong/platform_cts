@@ -176,8 +176,10 @@ public class BandwidthTest extends PtsAndroidTestCase {
         double pixels = size.x * size.y;
         // now this represents how many times the whole screen can be copied in a sec.
         double screensPerSecAverage = stat.mAverage / pixels * 1024.0 * 1024.0 / 4.0;
-        getReportLog().printSummary("memcpy in fps", screensPerSecAverage,
+        getReportLog().printValue("memcpy in fps", screensPerSecAverage,
                 ResultType.HIGHER_BETTER, ResultUnit.FPS);
+        getReportLog().printSummary("memcpy throughput", stat.mAverage, ResultType.HIGHER_BETTER,
+                ResultUnit.MBPS);
     }
 
     private void doRunMemset(int bufferSize) {
@@ -204,7 +206,9 @@ public class BandwidthTest extends PtsAndroidTestCase {
         double pixels = size.x * size.y;
         // now this represents how many times the whole screen can be copied in a sec.
         double screensPerSecAverage = stat.mAverage / pixels * 1024.0 * 1024.0 / 4.0;
-        getReportLog().printSummary("memset in fps", screensPerSecAverage,
+        getReportLog().printValue("memset in fps", screensPerSecAverage,
                 ResultType.HIGHER_BETTER, ResultUnit.FPS);
+        getReportLog().printSummary("memset throughput", stat.mAverage, ResultType.HIGHER_BETTER,
+                ResultUnit.MBPS);
     }
 }
