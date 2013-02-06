@@ -3195,4 +3195,66 @@ public class AccessibilityTextTraversalTest
         assertFalse(getInteractionBridge().performAction(text,
                 AccessibilityNodeInfo.ACTION_SET_SELECTION, arguments));
     }
+
+    public void testSelectionPositionForNonEditableView() throws Exception {
+        final View view = getActivity().findViewById(R.id.view);
+
+        getInstrumentation().runOnMainSync(new Runnable() {
+            @Override
+            public void run() {
+                view.setContentDescription(getString(R.string.foo_bar_baz));
+            }
+        });
+
+        final AccessibilityNodeInfo text = getInteractionBridge()
+               .findAccessibilityNodeInfoByTextFromRoot(getString(R.string.foo_bar_baz));
+
+        // Check the initial node properties.
+        assertFalse(text.isEditable());
+        assertSame(text.getTextSelectionStart(), -1);
+        assertSame(text.getTextSelectionEnd(), -1);
+
+        // Set the cursor position.
+        getInteractionBridge().executeCommandAndWaitForAccessibilityEvent(new Runnable() {
+            @Override
+            public void run() {
+                Bundle arguments = new Bundle();
+                arguments.putInt(AccessibilityNodeInfo.ACTION_ARGUMENT_SELECTION_START_INT, 4);
+                arguments.putInt(AccessibilityNodeInfo.ACTION_ARGUMENT_SELECTION_END_INT, 4);
+                assertTrue(getInteractionBridge().performAction(text,
+                        AccessibilityNodeInfo.ACTION_SET_SELECTION, arguments));
+            }
+        }, new AccessibilityEventFilter() {
+            @Override
+            public boolean accept(AccessibilityEvent event) {
+                return (event.getEventType()
+                        == AccessibilityEvent.TYPE_VIEW_TEXT_SELECTION_CHANGED);
+            }
+        }, TIMEOUT_ASYNC_PROCESSING);
+
+        // Refresh the node.
+        AccessibilityNodeInfo refreshedText = getInteractionBridge()
+                .findAccessibilityNodeInfoByTextFromRoot(getString(R.string.foo_bar_baz));
+
+        // Check the related node properties.
+        assertFalse(refreshedText.isEditable());
+        assertSame(refreshedText.getTextSelectionStart(), 4);
+        assertSame(refreshedText.getTextSelectionEnd(), 4);
+
+        // Try to set to an invalid cursor position.
+        Bundle arguments = new Bundle();
+        arguments.putInt(AccessibilityNodeInfo.ACTION_ARGUMENT_SELECTION_START_INT, 4);
+        arguments.putInt(AccessibilityNodeInfo.ACTION_ARGUMENT_SELECTION_END_INT, 5);
+        assertFalse(getInteractionBridge().performAction(text,
+                AccessibilityNodeInfo.ACTION_SET_SELECTION, arguments));
+
+        // Refresh the node.
+        refreshedText = getInteractionBridge()
+                .findAccessibilityNodeInfoByTextFromRoot(getString(R.string.foo_bar_baz));
+
+        // Check the related node properties.
+        assertFalse(refreshedText.isEditable());
+        assertSame(refreshedText.getTextSelectionStart(), 4);
+        assertSame(refreshedText.getTextSelectionEnd(), 4);
+    }
 }
