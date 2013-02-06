@@ -304,7 +304,7 @@ public class AccessibilityWindowQueryTest
         // char sequence attributes
         assertEquals(button.getPackageName(), source.getPackageName());
         assertEquals(button.getClassName(), source.getClassName());
-        assertEquals(button.getText(), source.getText());
+        assertEquals(button.getText().toString(), source.getText().toString());
         assertSame(button.getContentDescription(), source.getContentDescription());
 
         // boolean attributes
