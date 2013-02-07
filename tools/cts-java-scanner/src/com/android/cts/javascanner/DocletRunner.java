@@ -72,7 +72,7 @@ class DocletRunner {
         // PTS adds PtsAndroidTestCase
         sourcePath.add("./cts/suite/pts/deviceTests/ptsutil/src");
         sourcePath.add("./cts/libs/util/src");
-        sourcePath.add("./frameworks/testing/uiautomator/library/src");
+        sourcePath.add("./frameworks/testing/uiautomator/library/testrunner-src");
         sourcePath.add(sourceDir.toString());
         return join(sourcePath, ":");
     }
