@@ -1,3 +1,4 @@
+#
 # Copyright (C) 2013 The Android Open Source Project
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -11,25 +12,19 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+#
 
 LOCAL_PATH:= $(call my-dir)
 include $(CLEAR_VARS)
 
-# don't include this package in any target
 LOCAL_MODULE_TAGS := optional
+LOCAL_SRC_FILES := $(patsubst ./%,%, $(shell cd $(LOCAL_PATH); \
+  find . -name "*.cpp" -and -not -name ".*"))
+LOCAL_SRC_FILES += ../jni/graphics/Matrix.cpp
 
-LOCAL_JAVA_LIBRARIES := android.test.runner
-
-LOCAL_STATIC_JAVA_LIBRARIES := ptsutil ctsutil ctstestrunner
-
-LOCAL_JNI_SHARED_LIBRARIES := libptsopengl_jni
-
-LOCAL_SRC_FILES := $(call all-java-files-under, src)
-
-LOCAL_PACKAGE_NAME := PtsDeviceOpenGl
-
-LOCAL_SDK_VERSION := 16
-
-include $(BUILD_CTS_PACKAGE)
-
-include $(call all-makefiles-under,$(LOCAL_PATH))
+#$(info $(LOCAL_SRC_FILES))
+LOCAL_C_INCLUDES += external/gtest/include $(LOCAL_PATH)/../jni/graphics/
+LOCAL_STATIC_LIBRARIES := libutils libcutils libgtest_host libgtest_main_host
+LOCAL_LDFLAGS:= -g -lrt -ldl -lstdc++ -lm -fno-exceptions
+LOCAL_MODULE:= pts_device_opengl_test
+include $(BUILD_HOST_EXECUTABLE)
