@@ -168,6 +168,14 @@ public class FeatureSummaryActivity extends PassFailButtons.ListActivity {
             new Feature(PackageManager.FEATURE_WIFI_DIRECT, false),
     };
 
+    public static final Feature[] ALL_JELLY_BEAN_FEATURES = {
+        new Feature(PackageManager.FEATURE_TELEVISION, false),
+    };
+
+    public static final Feature[] ALL_JELLY_BEAN_MR1_FEATURES = {
+        new Feature(PackageManager.FEATURE_CAMERA_ANY, false),
+    };
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -198,6 +206,12 @@ public class FeatureSummaryActivity extends PassFailButtons.ListActivity {
 
         // add features from latest to last so that the latest requirements are put in the set first
         int apiVersion = Build.VERSION.SDK_INT;
+        if (apiVersion >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
+            Collections.addAll(features, ALL_JELLY_BEAN_MR1_FEATURES);
+        }
+        if (apiVersion >= Build.VERSION_CODES.JELLY_BEAN) {
+            Collections.addAll(features, ALL_JELLY_BEAN_FEATURES);
+        }
         if (apiVersion >= Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
             Collections.addAll(features, ALL_ICE_CREAM_SANDWICH_FEATURES);
         }
