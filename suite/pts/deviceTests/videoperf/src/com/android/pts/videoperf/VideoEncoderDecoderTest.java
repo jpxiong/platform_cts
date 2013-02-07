@@ -44,7 +44,7 @@ import java.util.Vector;
  * To prevent sacrificing quality for faster encoding / decoding, randomly selected pixels are
  * compared with the original image. As the pixel comparison can slow down the decoding process,
  * only some randomly selected pixels are compared. As there can be only one performance index,
- * error above certain threshhold in pixel value will be treated as an error.
+ * error above certain threshold in pixel value will be treated as an error.
  */
 public class VideoEncoderDecoderTest extends PtsAndroidTestCase {
     private static final String TAG = "VideoEncoderDecoderTest";
@@ -125,147 +125,6 @@ public class VideoEncoderDecoderTest extends PtsAndroidTestCase {
     }
 
     /**
-     * Used to pass codec information for given codec type / width / height
-     */
-    private class CodecInfo {
-        public int mBitRate = 0;
-        public int mFps = 0;
-        public boolean mSupportSemiPlanar = false;
-        public boolean mSupportPlanar = false;
-    }
-
-    /**
-     * Check if given codec with given (w,h) is supported.
-     * @param mimeType codec type in mime format like "video/avc"
-     * @param w video width
-     * @param h video height
-     * @param isEncoder whether the codec is encoder or decoder
-     * @return null if the configuration is not supported.
-     */
-    private CodecInfo getSupportedFormatInfo(String mimeType, int w, int h, boolean isEncoder) {
-        CodecCapabilities cap = getCodecCapability(mimeType, isEncoder);
-        if (cap == null) { // not supported
-            return null;
-        }
-        CodecInfo info = new CodecInfo();
-        for (int color : cap.colorFormats) {
-            if (color == CodecCapabilities.COLOR_FormatYUV420SemiPlanar) {
-                info.mSupportSemiPlanar = true;
-            }
-            if (color == CodecCapabilities.COLOR_FormatYUV420Planar) {
-                info.mSupportPlanar = true;
-            }
-        }
-        printIntArray("supported colors", cap.colorFormats);
-        //  either YUV420 planar or semiplanar should be supported
-        if (!info.mSupportPlanar && !info.mSupportSemiPlanar) {
-            Log.i(TAG, "no supported color format");
-            return null;
-        }
-
-        if (mimeType.equals(VIDEO_AVC)) {
-            int highestLevel = 0;
-            for (CodecProfileLevel lvl : cap.profileLevels) {
-                if (lvl.level > highestLevel) {
-                    highestLevel = lvl.level;
-                }
-            }
-            Log.i(TAG, "Avc highest level " + Integer.toHexString(highestLevel));
-            int maxW = 0;
-            int maxH = 0;
-            int bitRate = 0;
-            double fps = 0; // frame rate for the max resolution
-            switch(highestLevel) {
-            // Do not support Level 1 to 2.
-            case CodecProfileLevel.AVCLevel1:
-            case CodecProfileLevel.AVCLevel11:
-            case CodecProfileLevel.AVCLevel12:
-            case CodecProfileLevel.AVCLevel13:
-            case CodecProfileLevel.AVCLevel1b:
-            case CodecProfileLevel.AVCLevel2:
-                fail();
-                break;
-            case CodecProfileLevel.AVCLevel21:
-                maxW = 352;
-                maxH = 576;
-                bitRate = 4000000;
-                fps = 25;
-                break;
-            case CodecProfileLevel.AVCLevel22:
-                maxW = 720;
-                maxH = 480;
-                bitRate = 4000000;
-                fps = 15;
-                break;
-            case CodecProfileLevel.AVCLevel3:
-                maxW = 720;
-                maxH = 480;
-                bitRate = 10000000;
-                fps = 30;
-                break;
-            case CodecProfileLevel.AVCLevel31:
-                maxW = 1280;
-                maxH = 720;
-                bitRate = 14000000;
-                fps = 30;
-                break;
-            case CodecProfileLevel.AVCLevel32:
-                maxW = 1280;
-                maxH = 720;
-                bitRate = 20000000;
-                fps = 60;
-                break;
-            case CodecProfileLevel.AVCLevel4:
-                maxW = 1920;
-                maxH = 1080;
-                bitRate = 20000000;
-                fps = 30.1;
-                break;
-            case CodecProfileLevel.AVCLevel41:
-                maxW = 1920;
-                maxH = 1080;
-                bitRate = 50000000;
-                fps = 30.1;
-                break;
-            case CodecProfileLevel.AVCLevel42:
-                maxW = 2048;
-                maxH = 1080;
-                bitRate = 50000000;
-                fps = 60;
-                break;
-            case CodecProfileLevel.AVCLevel5:
-                maxW = 3672;
-                maxH = 1536;
-                bitRate = 135000000;
-                fps = 26.7;
-                break;
-            case CodecProfileLevel.AVCLevel51:
-                maxW = 4096;
-                maxH = 2304;
-                bitRate = 240000000;
-                fps = 26.7;
-                break;
-            default:
-                maxW = 4096;
-                maxH = 2304;
-                bitRate = 240000000;
-                fps = 26.7;
-                break;
-            }
-            if ((w > maxW) || (h > maxH)) {
-                Log.i(TAG, "Requested resolution (" + w + "," + h + ") exceeds (" +
-                        maxW + "," + maxH + ")");
-                return null;
-            }
-            info.mFps = (int)(fps * maxW * maxH / (w * h));
-            info.mBitRate = bitRate;
-            Log.i(TAG, "AVC Level " + Integer.toHexString(highestLevel) + " bit rate " + bitRate +
-                    " fps " + info.mFps);
-        }
-        return info;
-    }
-
-    /**
      * Run encoding / decoding test for given mimeType of codec
      * @param mimeType like video/avc
      * @param w video width
@@ -273,12 +132,12 @@ public class VideoEncoderDecoderTest extends PtsAndroidTestCase {
      * @param numberRepeat how many times to repeat the encoding / decoding process
      */
     private void doTest(String mimeType, int w, int h, int numberRepeat) throws Exception {
-        CodecInfo infoEnc = getSupportedFormatInfo(mimeType, w, h, true);
+        CodecInfo infoEnc = CodecInfo.getSupportedFormatInfo(mimeType, w, h, true);
         if (infoEnc == null) {
             Log.i(TAG, "Codec " + mimeType + "with " + w + "," + h + " not supported");
             return;
         }
-        CodecInfo infoDec = getSupportedFormatInfo(mimeType, w, h, false);
+        CodecInfo infoDec = CodecInfo.getSupportedFormatInfo(mimeType, w, h, false);
         assertNotNull(infoDec);
         mVideoWidth = w;
         mVideoHeight = h;
@@ -309,6 +168,10 @@ public class VideoEncoderDecoderTest extends PtsAndroidTestCase {
                     infoDec.mSupportSemiPlanar ? CodecCapabilities.COLOR_FormatYUV420SemiPlanar :
                         CodecCapabilities.COLOR_FormatYUV420Planar);
             double[] decoderResult = runDecoder(VIDEO_AVC, format);
+            if (decoderResult == null) {
+                // color change in the middle. give up
+                return;
+            }
             double decodingTime = decoderResult[0];
             decoderRmsErrorResults[i] = decoderResult[1];
             encoderFpsResults[i] = (double)TOTAL_FRAMES / encodingTime * 1000.0;
@@ -560,7 +423,11 @@ public class VideoEncoderDecoderTest extends PtsAndroidTestCase {
                 } else if (colorFormat == CodecCapabilities.COLOR_FormatYUV420Planar ) {
                     mDstSemiPlanar = false;
                 } else {
-                    fail("unsupported color format " + Integer.toHexString(colorFormat));
+                    Log.w(TAG, "output format changed to unsupported one " +
+                            Integer.toHexString(colorFormat));
+                    // give up and return as nothing can be done
+                    codec.release();
+                    return null;
                 }
             }
         }
@@ -712,46 +579,7 @@ public class VideoEncoderDecoderTest extends PtsAndroidTestCase {
         return (byte) (y & 0xff);
     }
 
-    /**
-     * Search for given codecName and returns CodecCapabilities if found
-     * @param codecName
-     * @param isEncoder true for encoder, false for decoder
-     * @return null if the codec is not supported
-     */
-    private CodecCapabilities getCodecCapability(
-            String codecName, boolean isEncoder) {
-        int codecCount = MediaCodecList.getCodecCount();
-        for (int i = 0; i < codecCount; ++i) {
-            MediaCodecInfo info = MediaCodecList.getCodecInfoAt(i);
-            String[] types = info.getSupportedTypes();
-            if (isEncoder != info.isEncoder()) {
-                continue;
-            }
-            for (int j = 0; j < types.length; ++j) {
-                if (types[j].compareTo(codecName) == 0) {
-                    CodecCapabilities cap = info.getCapabilitiesForType(types[j]);
-                    Log.i(TAG, "Use codec " + info.getName());
-                    return cap;
-                }
-            }
-        }
-        return null;
-    }
-
-    /// for debugging
-    private void printIntArray(String msg, int[] data) {
-        StringBuilder builder = new StringBuilder();
-        builder.append(msg);
-        builder.append(":");
-        for (int e : data) {
-            builder.append(Integer.toHexString(e));
-            builder.append(",");
-        }
-        builder.deleteCharAt(builder.length() - 1);
-        Log.i(TAG, builder.toString());
-    }
-
-    /// for debugging
+    // for debugging
     private void printByteArray(String msg, byte[] data, int offset, int len) {
         StringBuilder builder = new StringBuilder();
         builder.append(msg);
@@ -764,7 +592,7 @@ public class VideoEncoderDecoderTest extends PtsAndroidTestCase {
         Log.i(TAG, builder.toString());
     }
 
-    /// for debugging
+    // for debugging
     private void printByteBuffer(String msg, ByteBuffer data, int offset, int len) {
         StringBuilder builder = new StringBuilder();
         builder.append(msg);
