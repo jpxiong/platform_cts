@@ -66,7 +66,10 @@ public class CtsRootDeviceSetup implements ITargetPreparer {
             // perform CTS setup steps that only work if adb is root
             SettingsToggler.setSecureInt(device, "mock_location", 1);
             enableDeviceAdmin(device, buildHelper);
-
+            // This is chrome specific setting to disable the first screen.
+            // For other browser, it will not do anything.
+            device.executeShellCommand(
+                    "echo \"chrome --disable-fre\" > /data/local/chrome-command-line");
             // end root setup steps
         } catch (FileNotFoundException e) {
             throw new TargetSetupError("Invalid CTS installation", e);
