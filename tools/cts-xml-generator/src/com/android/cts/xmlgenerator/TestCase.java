@@ -20,7 +20,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
-class TestCase {
+class TestCase implements Comparable<TestCase> {
 
     private final String mName;
 
@@ -40,5 +40,10 @@ class TestCase {
 
     public Collection<Test> getTests() {
         return Collections.unmodifiableCollection(mTests);
+    }
+
+    @Override
+    public int compareTo(TestCase another) {
+        return getName().compareTo(another.getName());
     }
 }

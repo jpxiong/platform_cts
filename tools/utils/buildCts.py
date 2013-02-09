@@ -98,6 +98,8 @@ class CtsBuilder(object):
     for description in descriptions:
       doc = tools.XmlFile(description)
       packages.append(doc.GetAttr('TestPackage', 'appPackageName'))
+    # sort the list to give the same sequence based on name
+    packages.sort()
 
     ptsPattern = r'com\.android\.pts\..*'
     plan = tools.TestPlan(packages)

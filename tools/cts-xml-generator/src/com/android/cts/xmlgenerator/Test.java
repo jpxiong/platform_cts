@@ -16,7 +16,7 @@
 
 package com.android.cts.xmlgenerator;
 
-public class Test {
+public class Test implements Comparable<Test> {
     private String mName;
     private int mTimeout;
 
@@ -31,5 +31,10 @@ public class Test {
 
     public int getTimeout() {
         return mTimeout;
+    }
+
+    @Override
+    public int compareTo(Test another) {
+        return getName().compareTo(another.getName());
     }
 }

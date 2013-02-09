@@ -24,7 +24,10 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintWriter;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * Generator of TestPackage XML files for native tests.
@@ -141,7 +144,8 @@ class XmlGenerator {
 
     private void writeTestSuites(PrintWriter writer, Collection<TestSuite> suites,
             StringBuilder nameCollector) {
-        for (TestSuite suite : suites) {
+        Collection<TestSuite> sorted = sortCollection(suites);
+        for (TestSuite suite : sorted) {
             writer.append("<TestSuite name=\"").append(suite.getName()).println("\">");
 
             String namePart = suite.getName();
@@ -161,7 +165,8 @@ class XmlGenerator {
 
     private void writeTestCases(PrintWriter writer, Collection<TestCase> cases,
             StringBuilder nameCollector) {
-        for (TestCase testCase : cases) {
+        Collection<TestCase> sorted = sortCollection(cases);
+        for (TestCase testCase : sorted) {
             String name = testCase.getName();
             writer.append("<TestCase name=\"").append(name).println("\">");
             nameCollector.append('.').append(name);
@@ -176,7 +181,8 @@ class XmlGenerator {
 
     private void writeTests(PrintWriter writer, Collection<Test> tests,
             StringBuilder nameCollector) {
-        for (Test test : tests) {
+        Collection<Test> sorted = sortCollection(tests);
+        for (Test test : sorted) {
             nameCollector.append('#').append(test.getName());
             writer.append("<Test name=\"").append(test.getName()).append("\"");
             if (isKnownFailure(mExpectations, nameCollector.toString())) {
@@ -190,6 +196,12 @@ class XmlGenerator {
             nameCollector.delete(nameCollector.length() - test.getName().length() - 1,
                     nameCollector.length());
         }
+    }
+
+    private <E extends Comparable<E>> Collection<E> sortCollection(Collection<E> col) {
+        List<E> list = new ArrayList<E>(col);
+        Collections.sort(list);
+        return list;
     }
 
     public static boolean isKnownFailure(ExpectationStore expectationStore, String testName) {

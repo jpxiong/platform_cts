@@ -22,7 +22,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-class TestSuite {
+class TestSuite implements Comparable<TestSuite> {
 
     private final String mName;
 
@@ -60,5 +60,10 @@ class TestSuite {
 
     public Collection<TestCase> getCases() {
         return Collections.unmodifiableCollection(mCases);
+    }
+
+    @Override
+    public int compareTo(TestSuite another) {
+        return getName().compareTo(another.getName());
     }
 }
