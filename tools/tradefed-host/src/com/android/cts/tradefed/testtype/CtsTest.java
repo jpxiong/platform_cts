@@ -149,6 +149,9 @@ public class CtsTest implements IDeviceTest, IResumableTest, IShardableTest, IBu
             "Interval between each reboot in min.")
     private int mRebootIntervalMin = 30;
 
+    @Option(name = "screenshot-on-ui-failure", description =
+            "take a screenshot if a test fails with a message indicating a UI obstruction.")
+    private boolean mScreenshotOnUiFailures = false;
 
     private long mPrevRebootTime; // last reboot time
 
@@ -200,9 +203,42 @@ public class CtsTest implements IDeviceTest, IResumableTest, IShardableTest, IBu
         public void testFailed(TestFailure status, TestIdentifier test, String trace) {
             super.testFailed(status, test, trace);
             InputStreamSource bugSource = mDevice.getBugreport();
-            super.testLog(String.format("bug-%s", test.toString()), LogDataType.TEXT,
-                    bugSource);
+            super.testLog(String.format("bug-%s_%s", test.getClassName(), test.getTestName()),
+                    LogDataType.TEXT, bugSource);
             bugSource.cancel();
+        }
+    }
+
+    /**
+     * A {@link ResultForwarder} that will forward a screenshot when it detects a failed test due
+     * to a UI obstruction.
+     */
+    private static class FailedUiTestScreenshotGenerator extends ResultForwarder {
+        private ITestDevice mDevice;
+
+        public FailedUiTestScreenshotGenerator(ITestInvocationListener listener,
+                ITestDevice device) {
+            super(listener);
+            mDevice = device;
+        }
+
+        @Override
+        public void testFailed(TestFailure status, TestIdentifier test, String trace) {
+            super.testFailed(status, test, trace);
+
+            if (trace.contains(
+                    "Injecting to another application requires INJECT_EVENTS permission")) {
+                try {
+                    InputStreamSource screenSource = mDevice.getScreenshot();
+                    super.testLog(String.format("screenshot-%s_%s", test.getClassName(),
+                            test.getTestName()), LogDataType.PNG, screenSource);
+                    screenSource.cancel();
+                } catch (DeviceNotAvailableException e) {
+                    // TODO: rethrow this somehow
+                    CLog.e("Device %s became unavailable while capturing screenshot, %s",
+                            mDevice.getSerialNumber(), e.toString());
+                }
+            }
         }
     }
 
@@ -336,6 +372,11 @@ public class CtsTest implements IDeviceTest, IResumableTest, IShardableTest, IBu
             FailedTestBugreportGenerator bugListener = new FailedTestBugreportGenerator(listener,
                     getDevice());
             listener = bugListener;
+        }
+        if (mScreenshotOnUiFailures) {
+            FailedUiTestScreenshotGenerator screenListener = new FailedUiTestScreenshotGenerator(
+                    listener, getDevice());
+            listener = screenListener;
         }
 
         // collect and install the prerequisiteApks first, to save time when multiple test
