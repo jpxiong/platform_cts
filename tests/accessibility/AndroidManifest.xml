@@ -19,6 +19,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
           package="android.view.accessibility.services">
 
+  <uses-permission android:name="android.permission.CAN_REQUEST_TOUCH_EXPLORATION_MODE"/>
+
   <application>
 
     <service android:name=".SpeakingAccessibilityService"

@@ -67,7 +67,7 @@ public class AccessibilityServiceTestRunner extends InstrumentationApkTest {
     }
 
     private void afterTest() throws DeviceNotAvailableException {
-        AccessibilityTestRunner.disableAccessibilityAndServicesAndTouchExploration(getDevice());
+        AccessibilityTestRunner.disableAccessibilityAndServices(getDevice());
         uninstallAndAssert(DELEGATING_ACCESSIBLITY_SERVICE_PACKAGE_NAME);
     }
 
@@ -85,7 +85,7 @@ public class AccessibilityServiceTestRunner extends InstrumentationApkTest {
     private void enableAccessibilityAndDelegatingService() throws DeviceNotAvailableException {
         String componentName = DELEGATING_ACCESSIBLITY_SERVICE_PACKAGE_NAME + "/"
             + DELEGATING_ACCESSIBLITY_SERVICE_NAME;
-        AccessibilityTestRunner.enableAccessibilityAndServicesAndTouchExploration(getDevice(),
+        AccessibilityTestRunner.enableAccessibilityAndServices(getDevice(),
                 componentName);
     }
 }
