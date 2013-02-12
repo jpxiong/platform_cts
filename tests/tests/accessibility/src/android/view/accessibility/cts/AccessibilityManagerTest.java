@@ -52,10 +52,6 @@ public class AccessibilityManagerTest extends AndroidTestCase {
         assertEquals("Accessibility should have been enabled by the test runner.",
                 1, Settings.Secure.getInt(mContext.getContentResolver(),
                         Settings.Secure.ACCESSIBILITY_ENABLED));
-
-        assertEquals("Touch exploration should have been enabled by the test runner.",
-                1, Settings.Secure.getInt(mContext.getContentResolver(),
-                        Settings.Secure.TOUCH_EXPLORATION_ENABLED));
     }
 
     public void testAddAndRemoveAccessibilityStateChangeListener() throws Exception {

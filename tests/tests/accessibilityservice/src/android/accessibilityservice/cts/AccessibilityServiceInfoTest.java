@@ -110,7 +110,9 @@ public class AccessibilityServiceInfoTest extends AndroidTestCase {
         AccessibilityServiceInfo speakingService = enabledServices.get(0);
         assertSame(AccessibilityEvent.TYPES_ALL_MASK, speakingService.eventTypes);
         assertSame(AccessibilityServiceInfo.FEEDBACK_GENERIC, speakingService.feedbackType);
-        assertSame(AccessibilityServiceInfo.DEFAULT, speakingService.flags);
+        assertSame(AccessibilityServiceInfo.DEFAULT
+                | AccessibilityServiceInfo.FLAG_REQUEST_TOUCH_EXPLORATION_MODE,
+                speakingService.flags);
         assertSame(50l, speakingService.notificationTimeout);
         assertEquals("Delegating Accessibility Service", speakingService.getDescription());
         assertNull(speakingService.packageNames /*all packages*/);
