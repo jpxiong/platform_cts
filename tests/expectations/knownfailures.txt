@@ -2,5 +2,9 @@
 {
   name: "android.openglperf.cts.GlVboPerfTest#testVboWithVaryingIndexBufferNumbers",
   bug: 6950385
+},
+{
+  name: "android.holo.cts.HoloTest",
+  bug: 8148617
 }
 ]
