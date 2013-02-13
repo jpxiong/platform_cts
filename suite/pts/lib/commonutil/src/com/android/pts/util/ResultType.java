@@ -21,23 +21,18 @@ package com.android.pts.util;
  */
 public enum ResultType {
     /** lower score shows better performance */
-    LOWER_BETTER("lowerBetter"),
+    LOWER_BETTER,
     /** higher score shows better performance */
-    HIGHER_BETTER("higherBetter"),
+    HIGHER_BETTER,
     /** This value is not directly correlated with performance. */
-    NEUTRAL("neutral"),
+    NEUTRAL,
     /** presence of this type requires some attention although it may not be an error. */
-    WARNING("warning");
-
-    final private String mXmlString;
-    ResultType(String xmlString) {
-        mXmlString = xmlString;
-    }
+    WARNING;
 
     /**
      * Return string used in CTS XML report
      */
     public String getXmlString() {
-        return mXmlString;
+        return name().toLowerCase();
     }
 }
