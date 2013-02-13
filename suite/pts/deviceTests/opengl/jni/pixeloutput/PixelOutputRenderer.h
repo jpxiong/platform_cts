@@ -21,7 +21,6 @@ public:
     PixelOutputRenderer(ANativeWindow* window, int workload);
     virtual ~PixelOutputRenderer() {};
     bool setUp();
-    bool tearDown();
     bool draw();
 private:
     GLuint mTextureId;
