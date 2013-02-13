@@ -1,4 +1,4 @@
-# Copyright (C) 2012 The Android Open Source Project
+# Copyright (C) 2013 The Android Open Source Project
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -22,7 +22,7 @@ LOCAL_MODULE_TAGS := optional
 
 # Get all cpp files but not hidden files
 LOCAL_SRC_FILES := $(patsubst ./%,%, $(shell cd $(LOCAL_PATH); \
-          find . -name "*.cpp" -and -not -name ".*"))
+		  find . -name "*.cpp" -and -not -name ".*"))
 
 LOCAL_C_INCLUDES := $(JNI_H_INCLUDE)
 
