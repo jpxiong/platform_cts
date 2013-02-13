@@ -20,13 +20,13 @@ import android.cts.util.PollingCheck;
 import android.graphics.Bitmap;
 import android.os.Message;
 import android.test.ActivityInstrumentationTestCase2;
-import android.view.ViewGroup;
 import android.webkit.JsPromptResult;
 import android.webkit.JsResult;
 import android.webkit.WebIconDatabase;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.cts.WebViewOnUiThread.WaitForProgressClient;
+
 
 public class WebChromeClientTest extends ActivityInstrumentationTestCase2<WebViewStubActivity> {
     private static final long TEST_TIMEOUT = 5000L;
@@ -132,8 +132,8 @@ public class WebChromeClientTest extends ActivityInstrumentationTestCase2<WebVie
 
         assertFalse(webChromeClient.hadOnCreateWindow());
 
-        // Load a page that opens a child window and sets a timeout after which the child
-        // will be closed.
+        // load a page that opens a child window, requests focus for the child and sets a timeout
+        // after which the child will be closed
         mOnUiThread.loadUrlAndWaitForCompletion(mWebServer.
                 getAssetUrl(TestHtmlConstants.JS_WINDOW_URL));
 
@@ -143,6 +143,7 @@ public class WebChromeClientTest extends ActivityInstrumentationTestCase2<WebVie
                 return webChromeClient.hadOnCreateWindow();
             }
         }.run();
+        assertFalse(webChromeClient.hadOnRequestFocus());
         new PollingCheck(TEST_TIMEOUT) {
             @Override
             protected boolean check() {
@@ -387,8 +388,6 @@ public class WebChromeClientTest extends ActivityInstrumentationTestCase2<WebVie
             transport.setWebView(childView);
             resultMsg.sendToTarget();
             mHadOnCreateWindow = true;
-            getActivity().addContentView(childView, new ViewGroup.LayoutParams(
-                    ViewGroup.LayoutParams.FILL_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
             return true;
         }
 
