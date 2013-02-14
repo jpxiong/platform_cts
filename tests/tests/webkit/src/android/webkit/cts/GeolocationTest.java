@@ -28,7 +28,6 @@ import android.os.Bundle;
 import android.os.Looper;
 import android.os.SystemClock;
 import android.test.ActivityInstrumentationTestCase2;
-import android.util.Log;
 import android.webkit.CookieManager;
 import android.webkit.CookieSyncManager;
 import android.webkit.GeolocationPermissions;
@@ -247,23 +246,64 @@ public class GeolocationTest extends ActivityInstrumentationTestCase2<WebViewStu
         PollingCheck.check("JS didn't get position", POLLING_TIMEOUT, receivedLocation);
     }
 
-    // Class that waits and checks for a particular value being received
-    private static class ValueCheck<T> extends PollingCheck implements
-            android.webkit.ValueCallback<T> {
-        private boolean mReceived = false;
-        private final T mExpectedValue;
-        private T mReceivedValue = null;
+    private static class OriginCheck extends PollingCheck implements
+            android.webkit.ValueCallback<Set<String>> {
 
-        public ValueCheck(T val) {
+        private boolean mReceived = false;
+        private final Set<String> mExpectedValue;
+        private Set<String> mReceivedValue = null;
+
+        public OriginCheck(Set<String> val) {
             mExpectedValue = val;
         }
 
         @Override
         protected boolean check() {
-            return mReceived && mExpectedValue.equals(mReceivedValue);
+            if (!mReceived) return false;
+            if (mExpectedValue.equals(mReceivedValue)) return true;
+            if (mExpectedValue.size() != mReceivedValue.size()) return false;
+            // Origins can have different strings even if they represent the same origin,
+            // for example http://www.example.com is the same origin as http://www.example.com/
+            // and they are both valid representations
+            for (String origin : mReceivedValue) {
+                if (mExpectedValue.contains(origin)) continue;
+                if (origin.endsWith("/")) {
+                    if (mExpectedValue.contains(origin.substring(0, origin.length() - 1))) {
+                        continue;
+                    }
+                } else {
+                    if (mExpectedValue.contains(origin + "/")) continue;
+                }
+                return false;
+            }
+            return true;
         }
         @Override
-        public void onReceiveValue(T value) {
+        public void onReceiveValue(Set<String> value) {
+            mReceived = true;
+            mReceivedValue = value;
+        }
+    }
+
+    // Class that waits and checks for a particular value being received
+    private static class BooleanCheck extends PollingCheck implements
+            android.webkit.ValueCallback<Boolean> {
+
+        private boolean mReceived = false;
+        private final boolean mExpectedValue;
+        private boolean mReceivedValue;
+
+        public BooleanCheck(boolean val) {
+            mExpectedValue = val;
+        }
+
+        @Override
+        protected boolean check() {
+            return mReceived && mReceivedValue == mExpectedValue;
+        }
+
+        @Override
+        public void onReceiveValue(Boolean value) {
             mReceived = true;
             mReceivedValue = value;
         }
@@ -298,12 +338,12 @@ public class GeolocationTest extends ActivityInstrumentationTestCase2<WebViewStu
         // Assert prompt for geolocation permission is not called the second time
         assertFalse(chromeClientAcceptAlways.mReceivedRequest);
         // Check that the permission is in GeolocationPermissions
-        ValueCheck<Boolean> trueCheck = new ValueCheck<Boolean>(true);
+        BooleanCheck trueCheck = new BooleanCheck(true);
         GeolocationPermissions.getInstance().getAllowed(URL_1, trueCheck);
         trueCheck.run();
         Set<String> acceptedOrigins = new TreeSet<String>();
         acceptedOrigins.add(URL_1);
-        ValueCheck<Set<String>> originCheck = new ValueCheck<Set<String>>(acceptedOrigins);
+        OriginCheck originCheck = new OriginCheck(acceptedOrigins);
         GeolocationPermissions.getInstance().getOrigins(originCheck);
         originCheck.run();
 
@@ -314,13 +354,13 @@ public class GeolocationTest extends ActivityInstrumentationTestCase2<WebViewStu
         PollingCheck.check("Geolocation prompt not called", POLLING_TIMEOUT, receivedRequest);
         PollingCheck.check("JS didn't get position", POLLING_TIMEOUT, receivedLocation);
         acceptedOrigins.add(URL_2);
-        originCheck = new ValueCheck<Set<String>>(acceptedOrigins);
+        originCheck = new OriginCheck(acceptedOrigins);
         GeolocationPermissions.getInstance().getOrigins(originCheck);
         originCheck.run();
         // Remove a domain manually that was added by the callback
         GeolocationPermissions.getInstance().clear(URL_1);
         acceptedOrigins.remove(URL_1);
-        originCheck = new ValueCheck<Set<String>>(acceptedOrigins);
+        originCheck = new OriginCheck(acceptedOrigins);
         GeolocationPermissions.getInstance().getOrigins(originCheck);
         originCheck.run();
     }
@@ -328,58 +368,58 @@ public class GeolocationTest extends ActivityInstrumentationTestCase2<WebViewStu
     // Test the GeolocationPermissions API
     public void testGeolocationPermissions() {
         Set<String> acceptedOrigins = new TreeSet<String>();
-        ValueCheck<Boolean> falseCheck = new ValueCheck<Boolean>(false);
+        BooleanCheck falseCheck = new BooleanCheck(false);
         GeolocationPermissions.getInstance().getAllowed(URL_2, falseCheck);
         falseCheck.run();
-        ValueCheck<Set<String>> originCheck = new ValueCheck<Set<String>>(acceptedOrigins);
+        OriginCheck originCheck = new OriginCheck(acceptedOrigins);
         GeolocationPermissions.getInstance().getOrigins(originCheck);
         originCheck.run();
 
         // Remove a domain that has not been allowed
         GeolocationPermissions.getInstance().clear(URL_2);
         acceptedOrigins.remove(URL_2);
-        originCheck = new ValueCheck<Set<String>>(acceptedOrigins);
+        originCheck = new OriginCheck(acceptedOrigins);
         GeolocationPermissions.getInstance().getOrigins(originCheck);
         originCheck.run();
 
         // Add a domain
         acceptedOrigins.add(URL_2);
         GeolocationPermissions.getInstance().allow(URL_2);
-        originCheck = new ValueCheck<Set<String>>(acceptedOrigins);
+        originCheck = new OriginCheck(acceptedOrigins);
         GeolocationPermissions.getInstance().getOrigins(originCheck);
         originCheck.run();
-        ValueCheck<Boolean> trueCheck = new ValueCheck<Boolean>(true);
+        BooleanCheck trueCheck = new BooleanCheck(true);
         GeolocationPermissions.getInstance().getAllowed(URL_2, trueCheck);
         trueCheck.run();
 
         // Add a domain
         acceptedOrigins.add(URL_1);
         GeolocationPermissions.getInstance().allow(URL_1);
-        originCheck = new ValueCheck<Set<String>>(acceptedOrigins);
+        originCheck = new OriginCheck(acceptedOrigins);
         GeolocationPermissions.getInstance().getOrigins(originCheck);
         originCheck.run();
 
         // Remove a domain that has been allowed
         GeolocationPermissions.getInstance().clear(URL_2);
         acceptedOrigins.remove(URL_2);
-        originCheck = new ValueCheck<Set<String>>(acceptedOrigins);
+        originCheck = new OriginCheck(acceptedOrigins);
         GeolocationPermissions.getInstance().getOrigins(originCheck);
         originCheck.run();
-        falseCheck = new ValueCheck<Boolean>(false);
+        falseCheck = new BooleanCheck(false);
         GeolocationPermissions.getInstance().getAllowed(URL_2, falseCheck);
         falseCheck.run();
 
         // Try to clear all domains
         GeolocationPermissions.getInstance().clearAll();
         acceptedOrigins.clear();
-        originCheck = new ValueCheck<Set<String>>(acceptedOrigins);
+        originCheck = new OriginCheck(acceptedOrigins);
         GeolocationPermissions.getInstance().getOrigins(originCheck);
         originCheck.run();
 
         // Add a domain
         acceptedOrigins.add(URL_1);
         GeolocationPermissions.getInstance().allow(URL_1);
-        originCheck = new ValueCheck<Set<String>>(acceptedOrigins);
+        originCheck = new OriginCheck(acceptedOrigins);
         GeolocationPermissions.getInstance().getOrigins(originCheck);
         originCheck.run();
     }
@@ -426,11 +466,11 @@ public class GeolocationTest extends ActivityInstrumentationTestCase2<WebViewStu
         // Test if it gets added to origins
         Set<String> acceptedOrigins = new TreeSet<String>();
         acceptedOrigins.add(URL_2);
-        ValueCheck<Set<String>> domainCheck = new ValueCheck<Set<String>>(acceptedOrigins);
+        OriginCheck domainCheck = new OriginCheck(acceptedOrigins);
         GeolocationPermissions.getInstance().getOrigins(domainCheck);
         domainCheck.run();
         // And now check that getAllowed returns false
-        ValueCheck<Boolean> falseCheck = new ValueCheck<Boolean>(false);
+        BooleanCheck falseCheck = new BooleanCheck(false);
         GeolocationPermissions.getInstance().getAllowed(URL_1, falseCheck);
         falseCheck.run();
     }
