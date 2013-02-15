@@ -23,6 +23,8 @@ LOCAL_MODULE_PATH := $(TARGET_OUT_DATA_APPS)
 
 LOCAL_JAVA_LIBRARIES := android.test.runner voip-common
 
+LOCAL_JNI_SHARED_LIBRARIES := libnativedns_jni
+
 # include CtsTestServer as a temporary hack to free net.cts from cts.stub.
 LOCAL_SRC_FILES := $(call all-java-files-under, src)
 
@@ -34,3 +36,5 @@ LOCAL_STATIC_JAVA_LIBRARIES := ctstestserver ctsutil ctstestrunner
 #LOCAL_SDK_VERSION := current
 
 include $(BUILD_CTS_PACKAGE)
+
+include $(call all-makefiles-under,$(LOCAL_PATH))
