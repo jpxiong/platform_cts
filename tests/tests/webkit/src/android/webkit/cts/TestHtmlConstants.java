@@ -62,7 +62,6 @@ public class TestHtmlConstants {
     public static final String ANCHOR_ASSET_URL = "webkit/test_anchor.html";
     public static final String IMAGE_ACCESS_URL = "webkit/test_imageaccess.html";
     public static final String IFRAME_ACCESS_URL = "webkit/test_iframeaccess.html";
-    public static final String DATABASE_ACCESS_URL = "webkit/test_databaseaccess.html";
 
     // Must match the title of the page at
     // android/frameworks/base/core/res/res/raw/loaderror.html
