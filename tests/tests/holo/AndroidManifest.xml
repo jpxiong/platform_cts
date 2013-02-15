@@ -43,7 +43,12 @@
         <activity android:name="android.holo.cts.ThemeTestActivity"
                 android:configChanges="keyboardHidden|orientation|screenSize|mcc|mnc"
                 android:screenOrientation="nosensor"
-                android:theme="@android:style/Theme.Translucent.NoTitleBar" />
+                android:theme="@android:style/Theme.Translucent.NoTitleBar">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
 
         <activity android:name="android.holo.cts.LayoutTestActivity"
                 android:configChanges="keyboardHidden|orientation|screenSize|mcc|mnc"
