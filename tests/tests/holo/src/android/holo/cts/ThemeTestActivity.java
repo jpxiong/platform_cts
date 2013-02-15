@@ -109,6 +109,11 @@ public class ThemeTestActivity extends Activity {
             startActivityForResult(intent, mRequestCode);
         } else {
             mResultFuture.set(mPendingResult);
+            if (mRequestCode == GENERATE_BITMAP_REQUEST_CODE) {
+                // finish with result so that generated bitmaps can be captured automatically
+                setResult(0);
+                finish();
+            }
         }
     }
 
