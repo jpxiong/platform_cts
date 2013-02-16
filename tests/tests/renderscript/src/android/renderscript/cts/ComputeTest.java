@@ -782,4 +782,44 @@ public class ComputeTest extends RSBaseCompute {
         }
         checkForErrors();
     }
+
+    /**
+     * Test script instancing.
+     */
+    public void testInstance() {
+        ScriptC_instance instance_1 = new ScriptC_instance(mRS);
+        ScriptC_instance instance_2 = new ScriptC_instance(mRS);
+
+        Type t = new Type.Builder(mRS, Element.I32(mRS)).setX(1).create();
+        Allocation ai1 = Allocation.createTyped(mRS, t);
+        Allocation ai2 = Allocation.createTyped(mRS, t);
+
+        instance_1.set_i(1);
+        instance_2.set_i(2);
+        instance_1.set_ai(ai1);
+        instance_2.set_ai(ai2);
+
+        // We now check to ensure that the global is not being shared across
+        // our separate script instances. Our invoke here merely sets the
+        // instanced allocation with the instanced global variable's value.
+        // If globals are being shared (i.e. not instancing scripts), then
+        // both instanced allocations will have the same resulting value
+        // (depending on the order in which the invokes complete).
+        instance_1.invoke_instance_test();
+        instance_2.invoke_instance_test();
+
+        int i1[] = new int[1];
+        int i2[] = new int[1];
+
+        ai1.copyTo(i1);
+        ai2.copyTo(i2);
+
+        // 3-step check ensures that a fortunate race condition wouldn't let us
+        // pass accidentally.
+        assertEquals(2, i2[0]);
+        assertEquals(1, i1[0]);
+        assertEquals(2, i2[0]);
+
+        checkForErrors();
+    }
 }
