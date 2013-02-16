@@ -424,7 +424,7 @@ public class CtsTest implements IDeviceTest, IResumableTest, IShardableTest, IBu
     }
 
     private void rebootDevice() throws DeviceNotAvailableException {
-        final int TIMEOUT_MS = 4 * 60 * 1000;
+        final int TIMEOUT_MS = 10 * 60 * 1000;
         TestDeviceOptions options = mDevice.getOptions();
         // store default value and increase time-out for reboot
         int rebootTimeout = options.getRebootTimeout();
