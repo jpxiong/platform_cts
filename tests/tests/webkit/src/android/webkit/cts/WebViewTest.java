@@ -606,7 +606,7 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
             }
         }.run();
         assertEquals(mWebView, listener.webView);
-        assertNotNull(listener.picture);
+        assertNull(listener.picture);
 
         final int oldCallCount = listener.callCount;
         final String newUrl = mWebServer.getAssetUrl(TestHtmlConstants.SMALL_IMG_URL);
