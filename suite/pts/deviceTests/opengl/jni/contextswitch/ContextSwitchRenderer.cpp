@@ -26,14 +26,17 @@
 static const EGLint contextAttribs[] =
         { EGL_CONTEXT_CLIENT_VERSION, 2, EGL_NONE };
 
-static const float csVertices[] = {
+static const int CS_NUM_VERTICES = 6;
+
+static const float CS_VERTICES[CS_NUM_VERTICES * 3] = {
         1.0f, 1.0f, -1.0f,
         -1.0f, 1.0f, -1.0f,
         -1.0f, -1.0f, -1.0f,
         -1.0f, -1.0f, -1.0f,
         1.0f, -1.0f, -1.0f,
         1.0f, 1.0f, -1.0f };
-static const float csTexCoords[] = {
+
+static const float CS_TEX_COORDS[CS_NUM_VERTICES * 2] = {
         1.0f, 1.0f,
         0.0f, 1.0f,
         0.0f, 0.0f,
@@ -41,7 +44,7 @@ static const float csTexCoords[] = {
         1.0f, 0.0f,
         1.0f, 1.0f };
 
-static const char* csVertex =
+static const char* CS_VERTEX =
         "attribute vec4 a_Position;"
         "attribute vec2 a_TexCoord;"
         "varying vec2 v_TexCoord;"
@@ -50,7 +53,7 @@ static const char* csVertex =
         "  gl_Position = a_Position;"
         "}";
 
-static const char* csFragment =
+static const char* CS_FRAGMENT =
         "precision mediump float;"
         "uniform sampler2D u_Texture;"
         "varying vec2 v_TexCoord;"
@@ -96,7 +99,7 @@ bool ContextSwitchRenderer::setUp() {
     }
 
     // Create program.
-    mProgram = GLUtils::createProgram(&csVertex, &csFragment);
+    mProgram = GLUtils::createProgram(&CS_VERTEX, &CS_FRAGMENT);
     if (mProgram == 0)
         return false;
     // Bind attributes.
@@ -142,11 +145,11 @@ bool ContextSwitchRenderer::draw() {
         glEnableVertexAttribArray(mPositionHandle);
         glEnableVertexAttribArray(mTexCoordHandle);
         glVertexAttribPointer(mPositionHandle, 3, GL_FLOAT, false, 0,
-                csVertices);
+                CS_VERTICES);
         glVertexAttribPointer(mTexCoordHandle, 2, GL_FLOAT, false, 0,
-                csTexCoords);
+                CS_TEX_COORDS);
 
-        glDrawArrays(GL_TRIANGLES, 0, 6);
+        glDrawArrays(GL_TRIANGLES, 0, CS_NUM_VERTICES);
     }
     return eglSwapBuffers(mEglDisplay, mEglSurface);
 }

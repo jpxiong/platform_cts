@@ -35,6 +35,8 @@ public:
     // Sets this matrix to be the result of multiplying the given matrices.
     void multiply(const Matrix& l, const Matrix& r);
 
+    void print(const char* label);
+
     // Returns a new matrix representing the camera.
     static Matrix* newLookAt(float eyeX, float eyeY, float eyeZ, float centerX,
             float centerY, float centerZ, float upX, float upY, float upZ);

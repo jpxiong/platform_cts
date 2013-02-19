@@ -14,14 +14,16 @@
 #include "PixelOutputRenderer.h"
 #include <GLUtils.h>
 
-static const float poVertices[] = {
+static const int PO_NUM_VERTICES = 6;
+
+static const float PO_VERTICES[PO_NUM_VERTICES * 3] = {
         1.0f, 1.0f, -1.0f,
         -1.0f, 1.0f, -1.0f,
         -1.0f, -1.0f, -1.0f,
         -1.0f, -1.0f, -1.0f,
         1.0f, -1.0f, -1.0f,
         1.0f, 1.0f, -1.0f };
-static const float poTexCoords[] = {
+static const float PO_TEX_COORDS[PO_NUM_VERTICES * 2] = {
         1.0f, 1.0f,
         0.0f, 1.0f,
         0.0f, 0.0f,
@@ -29,7 +31,7 @@ static const float poTexCoords[] = {
         1.0f, 0.0f,
         1.0f, 1.0f };
 
-static const char* poVertex =
+static const char* PO_VERTEX =
         "attribute vec4 a_Position;"
         "attribute vec2 a_TexCoord;"
         "varying vec2 v_TexCoord;"
@@ -38,7 +40,7 @@ static const char* poVertex =
         "  gl_Position = a_Position;"
         "}";
 
-static const char* poFragment =
+static const char* PO_FRAGMENT =
         "precision mediump float;"
         "uniform sampler2D u_Texture;"
         "varying vec2 v_TexCoord;"
@@ -56,7 +58,7 @@ bool PixelOutputRenderer::setUp() {
     }
 
     // Create program.
-    mProgram = GLUtils::createProgram(&poVertex, &poFragment);
+    mProgram = GLUtils::createProgram(&PO_VERTEX, &PO_FRAGMENT);
     if (mProgram == 0)
         return false;
     // Bind attributes.
@@ -97,11 +99,11 @@ bool PixelOutputRenderer::draw() {
 
     glEnableVertexAttribArray(mPositionHandle);
     glEnableVertexAttribArray(mTexCoordHandle);
-    glVertexAttribPointer(mPositionHandle, 3, GL_FLOAT, false, 0, poVertices);
-    glVertexAttribPointer(mTexCoordHandle, 2, GL_FLOAT, false, 0, poTexCoords);
+    glVertexAttribPointer(mPositionHandle, 3, GL_FLOAT, false, 0, PO_VERTICES);
+    glVertexAttribPointer(mTexCoordHandle, 2, GL_FLOAT, false, 0, PO_TEX_COORDS);
 
     for (int i = 0; i < mWorkload; i++) {
-        glDrawArrays(GL_TRIANGLES, 0, 6);
+        glDrawArrays(GL_TRIANGLES, 0, PO_NUM_VERTICES);
     }
 
     return eglSwapBuffers(mEglDisplay, mEglSurface);

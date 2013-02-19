@@ -16,12 +16,24 @@
 #include <string.h>
 #include <math.h>
 
+#define LOG_TAG "PTS_OPENGL"
+#define LOG_NDEBUG 0
+#include "utils/Log.h"
+
 Matrix::Matrix() {
     identity();
 }
 
 Matrix::Matrix(const Matrix& src) {
     loadWith(src);
+}
+
+void Matrix::print(const char* label) {
+    ALOGI("%c", *label);
+    for (int i = 0; i < 4; i++) {
+        const float* d = &(mData[i * 4]);
+        ALOGI("%f %f %f %f\n", d[0], d[1], d[2], d[3]);
+    }
 }
 
 bool Matrix::equals(const Matrix& src) {
@@ -214,9 +226,9 @@ Matrix* Matrix::newTranslate(float x, float y, float z) {
     Matrix* m = new Matrix();
     if (m != NULL) {
         float* d = m->mData;
-        d[3] = x;
-        d[7] = y;
-        d[11] = z;
+        d[12] = x;
+        d[13] = y;
+        d[14] = z;
     }
     return m;
 }

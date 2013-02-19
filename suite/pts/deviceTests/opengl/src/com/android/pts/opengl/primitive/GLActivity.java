@@ -119,7 +119,6 @@ public class GLActivity extends Activity {
         public void run() {
             // Creates a watchdog to ensure a iteration doesn't exceed the timeout.
             watchDog = new WatchDog(mTimeout);
-            watchDog.start();
             // Used to record the start and end time of the iteration.
             double[] times = new double[2];
             while (repeat) {
@@ -140,8 +139,11 @@ public class GLActivity extends Activity {
                         setupContextSwitchBenchmark(mSurface, wl);
                         break;
                 }
+                watchDog.start();
+                boolean success = startBenchmark(mNumFrames, times);
+                watchDog.stop();
                 // Start benchmark.
-                if (!startBenchmark(mNumFrames, times)) {
+                if (!success) {
                     mException = new Exception("Could not run benchmark");
                     repeat = false;
                 } else {
@@ -149,7 +151,7 @@ public class GLActivity extends Activity {
                     double totalTimeTaken = times[1] - times[0];
                     double meanFps = mNumFrames * 1000.0f / totalTimeTaken;
                     Log.i(TAG, "Workload: " + wl);
-                    Log.i(TAG, "MeanFPS: " + meanFps);
+                    Log.i(TAG, "Mean FPS: " + meanFps);
                     if (meanFps >= mMinFps) {
                         // Iteration passed, proceed to next one.
                         mWorkload++;
@@ -158,10 +160,7 @@ public class GLActivity extends Activity {
                         repeat = false;
                     }
                 }
-                // Resets the watchdog for the next iteration.
-                watchDog.reset();
             }
-            watchDog.stop();
         }
 
     }

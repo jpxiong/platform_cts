@@ -30,9 +30,12 @@ void FullPipelineMesh::before(Program& program, Matrix& model, Matrix& view,
     glUniform1i(prog.mTextureUniformHandle, 0);
 
     glEnableVertexAttribArray(prog.mPositionHandle);
+    glEnableVertexAttribArray(prog.mNormalHandle);
     glEnableVertexAttribArray(prog.mTexCoordHandle);
     glVertexAttribPointer(prog.mPositionHandle, 3, GL_FLOAT, false, 0,
             mMesh->mVertices);
+    glVertexAttribPointer(prog.mNormalHandle, 3, GL_FLOAT, false, 0,
+            mMesh->mNormals);
     glVertexAttribPointer(prog.mTexCoordHandle, 2, GL_FLOAT, false, 0,
             mMesh->mTexCoords);
 

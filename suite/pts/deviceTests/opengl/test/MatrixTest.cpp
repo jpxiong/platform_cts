@@ -157,8 +157,8 @@ TEST(MatrixTest, matrixNewLookAtTest) {
     float expected[] = {
         1.0f, 0.0f, 0.0f, 0.0f,
         0.0f, 1.0f, 0.0f, 0.0f,
-        0.0f, 0.0f, 1.0f, -6.0f,
-        0.0f, 0.0f, 0.0f, 1.0f};
+        0.0f, 0.0f, 1.0f, 0.0f,
+        0.0f, 0.0f, -6.0f, 1.0f};
     // Check values
     checkValues(m->mData, expected, Matrix::MATRIX_SIZE);
     delete m;
@@ -189,10 +189,10 @@ TEST(MatrixTest, matrixNewTranslateTest) {
     Matrix* m = Matrix::newTranslate(5, 6, 8);
     ASSERT_TRUE(m != NULL);
     float expected[] = {
-        1.0f, 0.0f, 0.0f, 5.0f,
-        0.0f, 1.0f, 0.0f, 6.0f,
-        0.0f, 0.0f, 1.0f, 8.0f,
-        0.0f, 0.0f, 0.0f, 1.0f};
+        1.0f, 0.0f, 0.0f, 0.0f,
+        0.0f, 1.0f, 0.0f, 0.0f,
+        0.0f, 0.0f, 1.0f, 0.0f,
+        5.0f, 6.0f, 8.0f, 1.0f};
     // Check values
     checkValues(m->mData, expected, Matrix::MATRIX_SIZE);
     delete m;

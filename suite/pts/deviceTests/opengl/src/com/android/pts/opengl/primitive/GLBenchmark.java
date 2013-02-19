@@ -19,6 +19,9 @@ import com.android.pts.util.PtsActivityInstrumentationTestCase2;
 import com.android.pts.util.ResultType;
 import com.android.pts.util.ResultUnit;
 
+import android.opengl.Matrix;
+import android.util.Log;
+import java.util.Arrays;
 /**
  * Runs the Primitive OpenGL ES 2.0 Benchmarks.
  */
@@ -36,7 +39,7 @@ public class GLBenchmark extends PtsActivityInstrumentationTestCase2<GLActivity>
      * @throws Exception If the benchmark could not be run.
      */
     public void testFullPipeline() throws Exception {
-        runBenchmark(Benchmark.FullPipeline, 500, 10000);
+        runBenchmark(Benchmark.FullPipeline, 500, 50000, 1);
     }
 
     /**
@@ -45,7 +48,7 @@ public class GLBenchmark extends PtsActivityInstrumentationTestCase2<GLActivity>
      * @throws Exception If the benchmark could not be run.
      */
     public void testPixelOutput() throws Exception {
-        runBenchmark(Benchmark.PixelOutput, 500, 10000);
+        runBenchmark(Benchmark.PixelOutput, 500, 50000, 1);
     }
 
     /**
@@ -55,7 +58,7 @@ public class GLBenchmark extends PtsActivityInstrumentationTestCase2<GLActivity>
      */
     public void testShaderPerf() throws Exception {
         // TODO(stuartscott): Not yet implemented
-        // runBenchmark(Benchmark.ShaderPerf, 500, 10000);
+        // runBenchmark(Benchmark.ShaderPerf, 500, 50000, 1);
     }
 
     /**
@@ -64,7 +67,7 @@ public class GLBenchmark extends PtsActivityInstrumentationTestCase2<GLActivity>
      * @throws Exception If the benchmark could not be run.
      */
     public void testContextSwitch() throws Exception {
-        runBenchmark(Benchmark.ContextSwitch, 500, 10000);
+        runBenchmark(Benchmark.ContextSwitch, 500, 50000, 1);
     }
 
     /**
@@ -75,7 +78,8 @@ public class GLBenchmark extends PtsActivityInstrumentationTestCase2<GLActivity>
      * @param timeout The milliseconds to wait for an iteration of the benchmark before timing out.
      * @throws Exception If the benchmark could not be run.
      */
-    private void runBenchmark(Benchmark benchmark, int numFrames, int timeout) throws Exception {
+    private void runBenchmark(Benchmark benchmark, int numFrames, int timeout, int target)
+            throws Exception {
         String benchmarkName = benchmark.toString();
         Intent intent = new Intent();
         intent.putExtra(GLActivity.INTENT_EXTRA_BENCHMARK_NAME, benchmarkName);
@@ -87,8 +91,12 @@ public class GLBenchmark extends PtsActivityInstrumentationTestCase2<GLActivity>
         setActivityIntent(intent);
         try {
             activity = getActivity();
+            // Represents the maximum workload it can do whilst maintaining MIN_FPS.
             int workload = activity.waitForCompletion();
-            // represents the maximum workload it can do whilst maintaining MIN_FPS.
+            if (workload < target) {
+                throw new Exception("Benchmark did not reach target. Got " + workload
+                        + ", target was " + target);
+            }
             getReportLog()
                     .printSummary("Workload", workload, ResultType.HIGHER_BETTER, ResultUnit.SCORE);
         } finally {

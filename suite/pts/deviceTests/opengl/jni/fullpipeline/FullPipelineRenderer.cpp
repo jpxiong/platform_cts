@@ -11,7 +11,7 @@
  * or implied. See the License for the specific language governing permissions and limitations under
  * the License.
  */
-
+#include <math.h>
 #include <EGL/egl.h>
 #include <GLES2/gl2.h>
 #include <GLES2/gl2ext.h>
@@ -23,21 +23,25 @@
 #include <graphics/TransformationNode.h>
 #include <GLUtils.h>
 
-static const float fullVertices[] = {
-        1.0f, 1.0f, -1.0f,
-        -1.0f, 1.0f, -1.0f,
-        -1.0f, -1.0f, -1.0f,
-        -1.0f, -1.0f, -1.0f,
-        1.0f, -1.0f, -1.0f,
-        1.0f, 1.0f, -1.0f };
-static const float fullNormals[] = {
+static const int FP_NUM_VERTICES = 6;
+
+static const float FP_VERTICES[FP_NUM_VERTICES * 3] = {
+        1.0f, 1.0f, 0.0f,
+        0.0f, 1.0f, 0.0f,
+        0.0f, 0.0f, 0.0f,
+        0.0f, 0.0f, 0.0f,
+        1.0f, 0.0f, 0.0f,
+        1.0f, 1.0f, 0.0f };
+
+static const float FP_NORMALS[FP_NUM_VERTICES * 3] = {
         0.0f, 0.0f, 1.0f,
         0.0f, 0.0f, 1.0f,
         0.0f, 0.0f, 1.0f,
         0.0f, 0.0f, 1.0f,
         0.0f, 0.0f, 1.0f,
         0.0f, 0.0f, 1.0f };
-static const float fullTexCoords[] = {
+
+static const float FP_TEX_COORDS[FP_NUM_VERTICES * 2] = {
         1.0f, 1.0f,
         0.0f, 1.0f,
         0.0f, 0.0f,
@@ -45,7 +49,7 @@ static const float fullTexCoords[] = {
         1.0f, 0.0f,
         1.0f, 1.0f };
 
-static const char* fullVertex =
+static const char* FP_VERTEX =
         "uniform mat4 u_MVPMatrix;"
         "uniform mat4 u_MVMatrix;"
         "attribute vec4 a_Position;"
@@ -65,7 +69,7 @@ static const char* fullVertex =
         "  gl_Position = u_MVPMatrix * a_Position;\n"
         "}";
 
-static const char* fullFragment =
+static const char* FP_FRAGMENT =
         "precision mediump float;"
         "uniform vec3 u_LightPos;"
         "uniform sampler2D u_Texture;"
@@ -96,7 +100,7 @@ bool FullPipelineRenderer::setUp() {
     if (!Renderer::setUp()) {
         return false;
     }
-    GLuint programId = GLUtils::createProgram(&fullVertex, &fullFragment);
+    GLuint programId = GLUtils::createProgram(&FP_VERTEX, &FP_FRAGMENT);
     if (programId == 0)
         return false;
     mProgram = new FullPipelineProgram(programId);
@@ -107,15 +111,12 @@ bool FullPipelineRenderer::setUp() {
     // Use culling to remove back faces.
     glEnable (GL_CULL_FACE);
 
-    // Enable depth testing
-    glEnable (GL_DEPTH_TEST);
-
     mModelMatrix = new Matrix();
 
     // Position the eye in front of the origin.
     float eyeX = 0.0f;
     float eyeY = 0.0f;
-    float eyeZ = 6.0f;
+    float eyeZ = 2.0f;
 
     // We are looking at the origin
     float centerX = 0.0f;
@@ -139,7 +140,7 @@ bool FullPipelineRenderer::setUp() {
     float bottom = -1.0f;
     float top = 1.0f;
     float near = 1.0f;
-    float far = 10.0f;
+    float far = 3.0f;
 
     mProjectionMatrix = Matrix::newFrustum(left, right, bottom, top, near, far);
 
@@ -148,15 +149,22 @@ bool FullPipelineRenderer::setUp() {
         return false;
     }
 
+    float count = pow(2, mWorkload-1);
+    float middle = count / 2.0f;
+    float scale = 1.0f / count;
+
+    mMesh = new Mesh(FP_VERTICES, FP_NORMALS, FP_TEX_COORDS, FP_NUM_VERTICES, textureId);
     mSceneGraph = new ProgramNode();
-    mMesh = new Mesh(fullVertices, fullNormals, fullTexCoords, 6, textureId);
-    for (int i = 0; i < mWorkload; i++) {
-        Matrix* transformMatrix = Matrix::newRotate(45.0f, 0.0f, 1.0f, 0.0f);
-        TransformationNode* transformNode = new TransformationNode(
-                transformMatrix);
-        mSceneGraph->addChild(transformNode);
-        FullPipelineMesh* meshNode = new FullPipelineMesh(mMesh);
-        transformNode->addChild(meshNode);
+
+    for (int i = 0; i < count; i++) {
+        for (int j = 0; j < count; j++) {
+            Matrix* transformMatrix = Matrix::newScale(scale, scale, scale);
+            transformMatrix->translate(i - middle, j - middle, 0.0f);
+            TransformationNode* transformNode = new TransformationNode(transformMatrix);
+            mSceneGraph->addChild(transformNode);
+            FullPipelineMesh* meshNode = new FullPipelineMesh(mMesh);
+            transformNode->addChild(meshNode);
+        }
     }
     return true;
 }
@@ -183,7 +191,6 @@ bool FullPipelineRenderer::tearDown() {
 bool FullPipelineRenderer::draw() {
     glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
     mModelMatrix->identity();
-    mSceneGraph->draw(*mProgram, *mModelMatrix, *mViewMatrix,
-            *mProjectionMatrix);
+    mSceneGraph->draw(*mProgram, *mModelMatrix, *mViewMatrix, *mProjectionMatrix);
     return eglSwapBuffers(mEglDisplay, mEglSurface);
 }
