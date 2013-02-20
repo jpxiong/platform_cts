@@ -64,6 +64,7 @@ public class GeolocationTest extends ActivityInstrumentationTestCase2<WebViewStu
 
     private static final String JS_INTERFACE_NAME = "Android";
     private static final int POLLING_TIMEOUT = 2000;
+    private static final String PROVIDER_NAME = "WebKitGeolocationTestLocationProvider";
 
     // static HTML page always injected instead of the url loaded
     private static final String RAW_HTML =
@@ -150,14 +151,14 @@ public class GeolocationTest extends ActivityInstrumentationTestCase2<WebViewStu
         mLocationManager = (LocationManager)getActivity().getApplicationContext()
                 .getSystemService(Context.LOCATION_SERVICE);
         // Add a test provider before each test to inject a location
-        addTestProvider(LocationManager.NETWORK_PROVIDER);
+        addTestProvider(PROVIDER_NAME);
     }
 
     @Override
     protected void tearDown() throws Exception {
         // Remove the test provider after each test
         try {
-          mLocationManager.removeTestProvider(LocationManager.NETWORK_PROVIDER);
+          mLocationManager.removeTestProvider(PROVIDER_NAME);
         } catch (IllegalArgumentException e) {} // Not much to do about this
         mOnUiThread.cleanUp();
         // This will null all member and static variables
@@ -179,7 +180,7 @@ public class GeolocationTest extends ActivityInstrumentationTestCase2<WebViewStu
     // using a maximum age.
     private void loadUrlAndUpdateLocation(String url) {
         mOnUiThread.loadUrlAndWaitForCompletion(url);
-        updateLocation(LocationManager.NETWORK_PROVIDER);
+        updateLocation(PROVIDER_NAME);
     }
 
     // WebChromeClient that accepts each location for one load. WebChromeClient is used in
