@@ -40,6 +40,7 @@ import com.android.tradefed.testtype.IDeviceTest;
 import com.android.tradefed.testtype.IRemoteTest;
 import com.android.tradefed.testtype.IResumableTest;
 import com.android.tradefed.testtype.IShardableTest;
+import com.android.tradefed.util.RunUtil;
 import com.android.tradefed.util.xml.AbstractXmlParser.ParseException;
 
 import java.io.BufferedInputStream;
@@ -153,6 +154,17 @@ public class CtsTest implements IDeviceTest, IResumableTest, IShardableTest, IBu
             "take a screenshot if a test fails with a message indicating a UI obstruction.")
     private boolean mScreenshotOnUiFailures = false;
 
+    @Option(name = "logcat-on-failure", description =
+            "take a logcat snapshot on every test failure. Unlike --bugreport, this can capture" +
+            "logs even if connection with device has been lost, as well as being much more " +
+            "performant.")
+    private boolean mLogcatOnFailures = false;
+
+    @Option(name = "logcat-on-failure-size", description =
+            "The max number of logcat data in bytes to capture when --logcat-on-failure is on. " +
+            "Should be an amount that can comfortably fit in memory.")
+    private int mMaxLogcatBytes = 500 * 1024; // 500K
+
     private long mPrevRebootTime; // last reboot time
 
     /** data structure for a {@link IRemoteTest} and its known tests */
@@ -206,6 +218,33 @@ public class CtsTest implements IDeviceTest, IResumableTest, IShardableTest, IBu
             super.testLog(String.format("bug-%s_%s", test.getClassName(), test.getTestName()),
                     LogDataType.TEXT, bugSource);
             bugSource.cancel();
+        }
+    }
+
+    /**
+     * A {@link ResultForwarder} that will forward a logcat snapshot on each failed test.
+     */
+    private static class FailedTestLogcatGenerator extends ResultForwarder {
+        private ITestDevice mDevice;
+        private int mNumLogcatBytes;
+
+        public FailedTestLogcatGenerator(ITestInvocationListener listener, ITestDevice device,
+                int maxLogcatBytes) {
+            super(listener);
+            mDevice = device;
+            mNumLogcatBytes = maxLogcatBytes;
+        }
+
+        @Override
+        public void testFailed(TestFailure status, TestIdentifier test, String trace) {
+            super.testFailed(status, test, trace);
+            // sleep a small amount of time to ensure test failure stack trace makes it into logcat
+            // capture
+            RunUtil.getDefault().sleep(10);
+            InputStreamSource logSource = mDevice.getLogcat(mNumLogcatBytes);
+            super.testLog(String.format("logcat-%s_%s", test.getClassName(), test.getTestName()),
+                    LogDataType.TEXT, logSource);
+            logSource.cancel();
         }
     }
 
@@ -377,6 +416,11 @@ public class CtsTest implements IDeviceTest, IResumableTest, IShardableTest, IBu
             FailedUiTestScreenshotGenerator screenListener = new FailedUiTestScreenshotGenerator(
                     listener, getDevice());
             listener = screenListener;
+        }
+        if (mLogcatOnFailures) {
+            FailedTestLogcatGenerator logcatListener = new FailedTestLogcatGenerator(
+                    listener, getDevice(), mMaxLogcatBytes);
+            listener = logcatListener;
         }
 
         // collect and install the prerequisiteApks first, to save time when multiple test

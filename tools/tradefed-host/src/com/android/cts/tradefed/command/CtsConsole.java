@@ -245,7 +245,7 @@ public class CtsConsole extends Console {
         return mCtsBuild;
     }
 
-    public static void main(String[] args) throws InterruptedException {
+    public static void main(String[] args) throws InterruptedException, ConfigurationException {
         Console console = new CtsConsole();
         Console.startConsole(console, args);
     }
