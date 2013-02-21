@@ -80,7 +80,8 @@ public class ProtectedBroadcastsTest extends AndroidTestCase {
         "android.net.wifi.p2p.CONNECTION_STATE_CHANGE",
         "android.net.wifi.p2p.PERSISTENT_GROUPS_CHANGED",
         "android.net.conn.TETHER_STATE_CHANGED",
-        "android.net.conn.INET_CONDITION_ACTION"
+        "android.net.conn.INET_CONDITION_ACTION",
+        "android.net.conn.CAPTIVE_PORTAL_TEST_COMPLETED"
     };
 
     /**
