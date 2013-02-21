@@ -72,6 +72,10 @@
     description: "MediaPlayerFlakyNetworkTest tests",
     name: "android.media.cts.MediaPlayerFlakyNetworkTest",
     bug: 6782035
+  },
+  {
+    name: "android.provider.cts.CalendarTest#testEventColors",
+    bug: 8241711
   }
 ]
 
