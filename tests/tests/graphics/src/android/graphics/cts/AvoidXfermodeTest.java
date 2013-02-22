@@ -62,7 +62,7 @@ public class AvoidXfermodeTest extends TestCase {
 
         assertEquals(Color.GREEN, b.getPixel(BASE_SIZE / 2, BASE_SIZE / 2));
         assertEquals(Color.RED, b.getPixel(BASE_SIZE + BASE_SIZE / 2, BASE_SIZE / 2));
-        assertEquals(Color.CYAN, b.getPixel(BASE_SIZE / 2, BASE_SIZE + BASE_SIZE / 2));
+        assertEquals(Color.BLUE, b.getPixel(BASE_SIZE / 2, BASE_SIZE + BASE_SIZE / 2));
         assertEquals(Color.BLACK, b.getPixel(BASE_SIZE + BASE_SIZE / 2, BASE_SIZE + BASE_SIZE / 2));
     }
 }
