@@ -810,16 +810,17 @@ public class CtsUiAutomatorTest extends UiAutomatorTestCase {
         assertTrue("Pinch must be in center of target view", p2s.y == screenRect.centerY());
 
         assertTrue("Touch-down X coordinate for pointer 1 is invalid",
-                withinMarginOfError(0.05f, screenRect.centerX(), p1s.x));
+                withinMarginOfError(0.1f, screenRect.centerX(), p1s.x));
 
         assertTrue("Touch-down X coordinate for pointer 2 is invalid",
-                withinMarginOfError(0.05f, screenRect.centerX(), p2s.x));
+                withinMarginOfError(0.1f, screenRect.centerX(), p2s.x));
 
         assertTrue("Touch-up X coordinate for pointer 1 is invalid",
-                withinMarginOfError(0.05f, screenRect.left, p1e.x));
+                withinMarginOfError(0.1f, screenRect.centerX() - screenRect.left,
+                        screenRect.centerX() - p1e.x));
 
         assertTrue("Touch-up X coordinate for pointer 2 is invalid",
-                withinMarginOfError(0.05f, screenRect.right, p2e.x));
+                withinMarginOfError(0.1f, screenRect.right, p2e.x));
     }
 
     /**
@@ -863,16 +864,17 @@ public class CtsUiAutomatorTest extends UiAutomatorTestCase {
         assertTrue("Pinch must be in center of target view", p2s.y == screenRect.centerY());
 
         assertTrue("Touch-down X coordinate for pointer 1 is invalid",
-                withinMarginOfError(0.05f, screenRect.left, p1s.x));
+                withinMarginOfError(0.1f, screenRect.centerX() - screenRect.left,
+                        screenRect.centerX() -  p1s.x));
 
         assertTrue("Touch-down X coordinate for pointer 2 is invalid",
-                withinMarginOfError(0.05f, screenRect.right, p2s.x));
+                withinMarginOfError(0.1f, screenRect.right, p2s.x));
 
         assertTrue("Touch-up X coordinate for pointer 1 is invalid",
-                withinMarginOfError(0.05f, screenRect.centerX(), p1e.x));
+                withinMarginOfError(0.1f, screenRect.centerX(), p1e.x));
 
         assertTrue("Touch-up X coordinate for pointer 2 is invalid",
-                withinMarginOfError(0.05f, screenRect.centerX(), p2e.x));
+                withinMarginOfError(0.1f, screenRect.centerX(), p2e.x));
     }
 
     /**
