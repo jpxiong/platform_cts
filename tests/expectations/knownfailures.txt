@@ -73,6 +73,9 @@
     "android.text.cts.TextUtilsTest#testHtmlEncode"
   ],
   bug: 6004674
+},
+{
+  name: "org.apache.harmony.luni.tests.java.net.URLConnectionTest#test_getAllowUserInteraction",
+  bug: 6861033
 }
 ]
-
