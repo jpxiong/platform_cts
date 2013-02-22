@@ -14,6 +14,10 @@
 #include "ShaderPerfRenderer.h"
 #include <GLUtils.h>
 
+#define LOG_TAG "PTS_OPENGL"
+#define LOG_NDEBUG 0
+#include "utils/Log.h"
+
 static const int SP_NUM_VERTICES = 6;
 
 static const float SP_VERTICES[SP_NUM_VERTICES * 3] = {
@@ -52,24 +56,34 @@ bool ShaderPerfRenderer::setUp() {
         return false;
     // Bind attributes.
     mPositionHandle = glGetAttribLocation(mProgram, "a_Position");
-
     return true;
 }
 
-bool ShaderPerfRenderer::draw() {
-    glUseProgram (mProgram);
+bool ShaderPerfRenderer::draw(bool offscreen) {
+    glBindFramebuffer(GL_FRAMEBUFFER, (offscreen) ? mFboId : 0);
+    glUseProgram(mProgram);
+    // Set the background clear color to black.
+    glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
     glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
 
     // No culling of back faces
-    glDisable (GL_CULL_FACE);
-
-    // No depth testing
-    glDisable (GL_DEPTH_TEST);
+    glDisable(GL_CULL_FACE);
 
     glEnableVertexAttribArray(mPositionHandle);
     glVertexAttribPointer(mPositionHandle, 3, GL_FLOAT, false, 0, SP_VERTICES);
 
     glDrawArrays(GL_TRIANGLES, 0, SP_NUM_VERTICES);
 
-    return eglSwapBuffers(mEglDisplay, mEglSurface);
+    GLuint err = glGetError();
+    if (err != GL_NO_ERROR) {
+        ALOGV("GLError %d", err);
+        return false;
+    }
+
+    if (offscreen) {
+        glFinish();
+        return true;
+    } else {
+        return eglSwapBuffers(mEglDisplay, mEglSurface);
+    }
 }

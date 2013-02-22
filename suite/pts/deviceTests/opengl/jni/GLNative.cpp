@@ -44,12 +44,16 @@ Java_com_android_pts_opengl_primitive_GLActivity_startBenchmark(
     // Sets up the renderer.
     bool success = gRenderer->setUp();
 
+    // Draw to the screen. This allows debugging and also warms up the HW.
+    success = success && gRenderer->draw(false);
+
     // Records the start time.
     double start = currentTimeMillis();
 
+    // Draw off the screen.
     for (int i = 0; i < numFrames && success; i++) {
         // Draw a frame.
-        success = gRenderer->draw();
+        success = gRenderer->draw(true);
     }
 
     // Records the end time.

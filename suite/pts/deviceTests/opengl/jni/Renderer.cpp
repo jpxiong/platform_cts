@@ -12,6 +12,11 @@
  * the License.
  */
 #include "Renderer.h"
+#include <GLUtils.h>
+
+#define LOG_TAG "PTS_OPENGL"
+#define LOG_NDEBUG 0
+#include "utils/Log.h"
 
 static const EGLint contextAttribs[] = {
         EGL_CONTEXT_CLIENT_VERSION, 2,
@@ -29,8 +34,7 @@ static const EGLint configAttribs[] = {
         EGL_NONE };
 
 Renderer::Renderer(ANativeWindow* window, int workload) :
-        mEglDisplay(EGL_NO_DISPLAY), mEglSurface(EGL_NO_SURFACE), mEglContext(
-                EGL_NO_CONTEXT) {
+        mEglDisplay(EGL_NO_DISPLAY), mEglSurface(EGL_NO_SURFACE), mEglContext(EGL_NO_CONTEXT) {
     mWindow = window;
     mWorkload = workload;
 }
@@ -43,8 +47,7 @@ bool Renderer::setUp() {
 
     EGLint major;
     EGLint minor;
-    if (!eglInitialize(mEglDisplay, &major, &minor)
-            || EGL_SUCCESS != eglGetError()) {
+    if (!eglInitialize(mEglDisplay, &major, &minor) || EGL_SUCCESS != eglGetError()) {
         return false;
     }
 
@@ -59,8 +62,7 @@ bool Renderer::setUp() {
         return false;
     }
 
-    mEglContext = eglCreateContext(mEglDisplay, mGlConfig, EGL_NO_CONTEXT,
-            contextAttribs);
+    mEglContext = eglCreateContext(mEglDisplay, mGlConfig, EGL_NO_CONTEXT, contextAttribs);
     if (EGL_NO_CONTEXT == mEglContext || EGL_SUCCESS != eglGetError()) {
         return false;
     }
@@ -80,20 +82,71 @@ bool Renderer::setUp() {
     }
 
     glViewport(0, 0, width, height);
-    return GLenum(GL_NO_ERROR) == glGetError();
+
+    int w = GLUtils::roundUpToSmallestPowerOf2(width);
+    int h = GLUtils::roundUpToSmallestPowerOf2(height);
+    if (!createFBO(mFboId, mRboId, mCboId, w, h)) {
+        return false;
+    }
+
+    GLuint err = glGetError();
+    if (err != GL_NO_ERROR) {
+        ALOGV("GLError %d", err);
+        return false;
+    }
+    return true;
+}
+
+bool Renderer::createFBO(GLuint& fboId, GLuint& rboId, GLuint& cboId, int width, int height) {
+    glGenFramebuffers(1, &fboId);
+    glBindFramebuffer(GL_FRAMEBUFFER, fboId);
+
+    glGenRenderbuffers(1, &rboId);
+    glBindRenderbuffer(GL_RENDERBUFFER, rboId);
+    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT16, width, height);
+    glBindRenderbuffer(GL_RENDERBUFFER, 0);
+    glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, rboId);
+
+    glGenRenderbuffers(1, &cboId);
+    glBindRenderbuffer(GL_RENDERBUFFER, cboId);
+    glRenderbufferStorage(GL_RENDERBUFFER, GL_RGB565, width, height);
+    glBindRenderbuffer(GL_RENDERBUFFER, 0);
+    glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_RENDERBUFFER, cboId);
+
+    GLuint err = glGetError();
+    if (err != GL_NO_ERROR) {
+        ALOGV("GLError %d", err);
+        return false;
+    }
+
+    return glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE;
 }
 
 bool Renderer::tearDown() {
+    if (mFboId != 0) {
+        glDeleteFramebuffers(1, &mFboId);
+        mFboId = 0;
+    }
+    if (mRboId != 0) {
+        glDeleteRenderbuffers(1, &mRboId);
+        mRboId = 0;
+    }
+    if (mCboId != 0) {
+        glDeleteRenderbuffers(1, &mCboId);
+        mCboId = 0;
+    }
     if (mEglContext != EGL_NO_CONTEXT) {
         eglDestroyContext(mEglDisplay, mEglContext);
+        mEglContext = EGL_NO_CONTEXT;
     }
     if (mEglSurface != EGL_NO_SURFACE) {
         eglDestroySurface(mEglDisplay, mEglSurface);
+        mEglSurface = EGL_NO_SURFACE;
     }
     if (mEglDisplay != EGL_NO_DISPLAY) {
-        eglMakeCurrent(mEglDisplay, EGL_NO_SURFACE, EGL_NO_SURFACE,
-                EGL_NO_CONTEXT);
+        eglMakeCurrent(mEglDisplay, EGL_NO_SURFACE, EGL_NO_SURFACE, EGL_NO_CONTEXT);
         eglTerminate(mEglDisplay);
+        mEglDisplay = EGL_NO_DISPLAY;
     }
     return EGL_SUCCESS == eglGetError();
 }

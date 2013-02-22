@@ -14,6 +14,10 @@
 #include "PixelOutputRenderer.h"
 #include <GLUtils.h>
 
+#define LOG_TAG "PTS_OPENGL"
+#define LOG_NDEBUG 0
+#include "utils/Log.h"
+
 static const int PO_NUM_VERTICES = 6;
 
 static const float PO_VERTICES[PO_NUM_VERTICES * 3] = {
@@ -67,27 +71,39 @@ bool PixelOutputRenderer::setUp() {
     mTexCoordHandle = glGetAttribLocation(mProgram, "a_TexCoord");
 
     // Setup texture.
-    int texId = GLUtils::genRandTex(width, height);
-    if (texId < 0) {
+    mTextureId = GLUtils::genRandTex(width, height);
+    if (mTextureId == 0) {
         return false;
-    } else {
-        mTextureId = texId;
     }
     return true;
 }
 
-bool PixelOutputRenderer::draw() {
+bool PixelOutputRenderer::tearDown() {
+    if (mTextureId != 0) {
+        glDeleteTextures(1, &mTextureId);
+        mTextureId = 0;
+    }
+    if (!Renderer::tearDown()) {
+        return false;
+    }
+    return true;
+}
+
+bool PixelOutputRenderer::draw(bool offscreen) {
+    glBindFramebuffer(GL_FRAMEBUFFER, (offscreen) ? mFboId : 0);
     glUseProgram (mProgram);
+    // Set the background clear color to black.
+    glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
     glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
 
     // No culling of back faces
-    glDisable (GL_CULL_FACE);
+    glDisable(GL_CULL_FACE);
 
     // No depth testing
-    glDisable (GL_DEPTH_TEST);
+    glDisable(GL_DEPTH_TEST);
 
     // Enable blending
-    glEnable (GL_BLEND);
+    glEnable(GL_BLEND);
     glBlendFunc(GL_ONE, GL_ONE);
 
     glActiveTexture (GL_TEXTURE0);
@@ -106,5 +122,16 @@ bool PixelOutputRenderer::draw() {
         glDrawArrays(GL_TRIANGLES, 0, PO_NUM_VERTICES);
     }
 
-    return eglSwapBuffers(mEglDisplay, mEglSurface);
+    GLuint err = glGetError();
+    if (err != GL_NO_ERROR) {
+        ALOGV("GLError %d", err);
+        return false;
+    }
+
+    if (offscreen) {
+        glFinish();
+        return true;
+    } else {
+        return eglSwapBuffers(mEglDisplay, mEglSurface);
+    }
 }
