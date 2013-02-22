@@ -28,6 +28,11 @@ public class HttpAuthHandlerTest extends ActivityInstrumentationTestCase2<WebVie
 
     private static final long TIMEOUT = 10000;
 
+    private static final String WRONG_USERNAME = "wrong_user";
+    private static final String WRONG_PASSWORD = "wrong_password";
+    private static final String CORRECT_USERNAME = CtsTestServer.AUTH_USER;
+    private static final String CORRECT_PASSWORD = CtsTestServer.AUTH_PASS;
+
     private CtsTestServer mWebServer;
     private WebViewOnUiThread mOnUiThread;
 
@@ -50,64 +55,18 @@ public class HttpAuthHandlerTest extends ActivityInstrumentationTestCase2<WebVie
         super.tearDown();
     }
 
-    public void testProceed() throws Exception {
-        mWebServer = new CtsTestServer(getActivity());
-        String url = mWebServer.getAuthAssetUrl(TestHtmlConstants.HELLO_WORLD_URL);
-
-        // wrong credentials
-        MyWebViewClient client = new MyWebViewClient(true, "FakeUser", "FakePass");
-        mOnUiThread.setWebViewClient(client);
-
-        mOnUiThread.loadUrlAndWaitForCompletion(url);
-        assertEquals(CtsTestServer.AUTH_REALM, client.realm);
-        assertEquals(CtsTestServer.getReasonString(HttpStatus.SC_UNAUTHORIZED), mOnUiThread.getTitle());
-        assertTrue(client.useHttpAuthUsernamePassword);
-
-        // missing credentials
-        client = new MyWebViewClient(true, null, null);
-        mOnUiThread.setWebViewClient(client);
-
-        mOnUiThread.loadUrlAndWaitForCompletion(url);
-        assertEquals(CtsTestServer.AUTH_REALM, client.realm);
-        assertEquals(
-                CtsTestServer.getReasonString(HttpStatus.SC_UNAUTHORIZED), mOnUiThread.getTitle());
-        assertTrue(client.useHttpAuthUsernamePassword);
-
-        // correct credentials
-        client = new MyWebViewClient(true, CtsTestServer.AUTH_USER, CtsTestServer.AUTH_PASS);
-        mOnUiThread.setWebViewClient(client);
-
-        mOnUiThread.loadUrlAndWaitForCompletion(url);
-        assertEquals(CtsTestServer.AUTH_REALM, client.realm);
-        assertEquals(TestHtmlConstants.HELLO_WORLD_TITLE, mOnUiThread.getTitle());
-        assertTrue(client.useHttpAuthUsernamePassword);
-    }
-
-    public void testCancel() throws Exception {
-        mWebServer = new CtsTestServer(getActivity());
-
-        String url = mWebServer.getAuthAssetUrl(TestHtmlConstants.HELLO_WORLD_URL);
-        MyWebViewClient client = new MyWebViewClient(false, null, null);
-        mOnUiThread.setWebViewClient(client);
-
-        mOnUiThread.loadUrlAndWaitForCompletion(url);
-        assertEquals(CtsTestServer.AUTH_REALM, client.realm);
-        assertEquals(
-                CtsTestServer.getReasonString(HttpStatus.SC_UNAUTHORIZED), mOnUiThread.getTitle());
-    }
-
-    private class MyWebViewClient extends WaitForLoadedClient {
+    private class ProceedHttpAuthClient extends WaitForLoadedClient {
         String realm;
         boolean useHttpAuthUsernamePassword;
 
-        private boolean mProceed;
+        private int mMaxAuthAttempts;
         private String mUser;
         private String mPassword;
         private int mAuthCount;
 
-        MyWebViewClient(boolean proceed, String user, String password) {
+        ProceedHttpAuthClient(int maxAuthAttempts, String user, String password) {
             super(mOnUiThread);
-            mProceed = proceed;
+            mMaxAuthAttempts = maxAuthAttempts;
             mUser = user;
             mPassword = password;
         }
@@ -115,18 +74,113 @@ public class HttpAuthHandlerTest extends ActivityInstrumentationTestCase2<WebVie
         @Override
         public void onReceivedHttpAuthRequest(WebView view,
                 HttpAuthHandler handler, String host, String realm) {
-            ++mAuthCount;
-            if (mAuthCount > 1) {
+            if (++mAuthCount > mMaxAuthAttempts) {
                 handler.cancel();
                 return;
             }
+
             this.realm = realm;
             this.useHttpAuthUsernamePassword = handler.useHttpAuthUsernamePassword();
-            if (mProceed) {
-                handler.proceed(mUser, mPassword);
-            } else {
-                handler.cancel();
-            }
+
+            handler.proceed(mUser, mPassword);
         }
+    }
+
+    private class CancelHttpAuthClient extends WaitForLoadedClient {
+        String realm;
+
+        CancelHttpAuthClient() {
+            super(mOnUiThread);
+        }
+
+        @Override
+        public void onReceivedHttpAuthRequest(WebView view,
+                HttpAuthHandler handler, String host, String realm) {
+            this.realm = realm;
+            handler.cancel();
+        }
+    }
+
+    private void incorrectCredentialsAccessDenied(String url) throws Throwable {
+        ProceedHttpAuthClient client = new ProceedHttpAuthClient(1, WRONG_USERNAME, WRONG_PASSWORD);
+        mOnUiThread.setWebViewClient(client);
+
+        // As we're providing incorrect credentials, the page should complete but at
+        // an access denied page.
+        mOnUiThread.loadUrlAndWaitForCompletion(url);
+
+        assertEquals(CtsTestServer.AUTH_REALM, client.realm);
+        assertEquals(CtsTestServer.getReasonString(HttpStatus.SC_UNAUTHORIZED), mOnUiThread.getTitle());
+    }
+
+    private void missingCredentialsAccessDenied(String url) throws Throwable {
+        ProceedHttpAuthClient client = new ProceedHttpAuthClient(1, null, null);
+        mOnUiThread.setWebViewClient(client);
+
+        // As we're providing no credentials, the page should complete but at
+        // an access denied page.
+        mOnUiThread.loadUrlAndWaitForCompletion(url);
+
+        assertEquals(CtsTestServer.AUTH_REALM, client.realm);
+        assertEquals(CtsTestServer.getReasonString(HttpStatus.SC_UNAUTHORIZED), mOnUiThread.getTitle());
+    }
+
+    private void correctCredentialsAccessGranted(String url) throws Throwable {
+        ProceedHttpAuthClient client = new ProceedHttpAuthClient(1, CORRECT_USERNAME, CORRECT_PASSWORD);
+        mOnUiThread.setWebViewClient(client);
+
+        // As we're providing valid credentials, the page should complete and
+        // at the page we requested.
+        mOnUiThread.loadUrlAndWaitForCompletion(url);
+
+        assertEquals(CtsTestServer.AUTH_REALM, client.realm);
+        assertEquals(TestHtmlConstants.HELLO_WORLD_TITLE, mOnUiThread.getTitle());
+    }
+
+    public void testProceed() throws Throwable {
+        mWebServer = new CtsTestServer(getActivity());
+        String url = mWebServer.getAuthAssetUrl(TestHtmlConstants.HELLO_WORLD_URL);
+
+        incorrectCredentialsAccessDenied(url);
+        missingCredentialsAccessDenied(url);
+        correctCredentialsAccessGranted(url);
+    }
+
+    public void testCancel() throws Throwable {
+        mWebServer = new CtsTestServer(getActivity());
+        String url = mWebServer.getAuthAssetUrl(TestHtmlConstants.HELLO_WORLD_URL);
+
+        CancelHttpAuthClient client = new CancelHttpAuthClient();
+        mOnUiThread.setWebViewClient(client);
+
+        mOnUiThread.loadUrlAndWaitForCompletion(url);
+        assertEquals(CtsTestServer.AUTH_REALM, client.realm);
+        assertEquals(CtsTestServer.getReasonString(HttpStatus.SC_UNAUTHORIZED), mOnUiThread.getTitle());
+    }
+
+    public void testUseHttpAuthUsernamePassword() throws Throwable {
+        mWebServer = new CtsTestServer(getActivity());
+        String url = mWebServer.getAuthAssetUrl(TestHtmlConstants.HELLO_WORLD_URL);
+
+        // Try to login once with incorrect credentials. This should cause
+        // useHttpAuthUsernamePassword to be true in the callback, as at that point
+        // we don't yet know that the credentials we will use are invalid.
+        ProceedHttpAuthClient client = new ProceedHttpAuthClient(1, WRONG_USERNAME, WRONG_PASSWORD);
+        mOnUiThread.setWebViewClient(client);
+        mOnUiThread.loadUrlAndWaitForCompletion(url);
+        assertEquals(CtsTestServer.AUTH_REALM, client.realm);
+        assertEquals(CtsTestServer.getReasonString(HttpStatus.SC_UNAUTHORIZED), mOnUiThread.getTitle());
+        assertTrue(client.useHttpAuthUsernamePassword);
+
+        // Try to login twice with invalid credentials. This should cause
+        // useHttpAuthUsernamePassword to return false, as the credentials
+        // we would have stored on the first auth request
+        // are not suitable for use the second time.
+        client = new ProceedHttpAuthClient(2, WRONG_USERNAME, WRONG_PASSWORD);
+        mOnUiThread.setWebViewClient(client);
+        mOnUiThread.loadUrlAndWaitForCompletion(url);
+        assertEquals(CtsTestServer.AUTH_REALM, client.realm);
+        assertEquals(CtsTestServer.getReasonString(HttpStatus.SC_UNAUTHORIZED), mOnUiThread.getTitle());
+        assertFalse(client.useHttpAuthUsernamePassword);
     }
 }
