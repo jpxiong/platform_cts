@@ -22,13 +22,20 @@ public:
     virtual ~ContextSwitchRenderer() {};
     bool setUp();
     bool tearDown();
-    bool draw();
+    bool draw(bool offscreen);
 private:
     GLuint mTextureUniformHandle;
     GLuint mPositionHandle;
     GLuint mTexCoordHandle;
     EGLContext* mContexts;
     GLuint* mTextureIds;
+    GLuint* mFboIds;
+    GLuint* mRboIds;
+    GLuint* mCboIds;
+    GLuint* mPrograms;
+    GLuint* mTextureUniformHandles;
+    GLuint* mPositionHandles;
+    GLuint* mTexCoordHandles;
 };
 
 #endif

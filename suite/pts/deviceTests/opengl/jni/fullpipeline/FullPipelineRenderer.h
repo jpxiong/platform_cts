@@ -27,7 +27,7 @@ public:
     virtual ~FullPipelineRenderer() {};
     bool setUp();
     bool tearDown();
-    bool draw();
+    bool draw(bool offscreen);
 private:
     FullPipelineProgram* mProgram;
     ProgramNode* mSceneGraph;
@@ -35,5 +35,6 @@ private:
     Matrix* mViewMatrix;
     Matrix* mProjectionMatrix;
     Mesh* mMesh;
+    GLuint mTextureId;
 };
 #endif

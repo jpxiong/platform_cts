@@ -21,7 +21,7 @@ public:
     ShaderPerfRenderer(ANativeWindow* window, int workload);
     virtual ~ShaderPerfRenderer() {};
     bool setUp();
-    bool draw();
+    bool draw(bool offscreen);
 private:
     GLuint mPositionHandle;
 };

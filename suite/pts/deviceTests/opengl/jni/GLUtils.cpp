@@ -69,7 +69,7 @@ GLuint GLUtils::createProgram(const char** vertexSource,
 }
 
 // Rounds a number up to the smallest power of 2 that is greater than the original number.
-static inline int roundUpToSmallestPowerOf2(int x) {
+int GLUtils::roundUpToSmallestPowerOf2(int x) {
     if (x < 0) {
         return 0;
     }
@@ -82,8 +82,8 @@ static inline int roundUpToSmallestPowerOf2(int x) {
     return x + 1;
 }
 
-int GLUtils::genRandTex(int texWidth, int texHeight) {
-    GLuint textureId = -1;
+GLuint GLUtils::genRandTex(int texWidth, int texHeight) {
+    GLuint textureId = 0;
     int w = roundUpToSmallestPowerOf2(texWidth);
     int h = roundUpToSmallestPowerOf2(texHeight);
     uint32_t* m = new uint32_t[w * h];

@@ -23,6 +23,10 @@
 #include <graphics/TransformationNode.h>
 #include <GLUtils.h>
 
+#define LOG_TAG "PTS_OPENGL"
+#define LOG_NDEBUG 0
+#include "utils/Log.h"
+
 static const int FP_NUM_VERTICES = 6;
 
 static const float FP_VERTICES[FP_NUM_VERTICES * 3] = {
@@ -92,24 +96,19 @@ static const char* FP_FRAGMENT =
         "}";
 
 FullPipelineRenderer::FullPipelineRenderer(ANativeWindow* window, int workload) :
-        Renderer(window, workload), mProgram(NULL), mSceneGraph(NULL), mModelMatrix(
-                NULL), mViewMatrix(NULL), mProjectionMatrix(NULL), mMesh(NULL) {
+        Renderer(window, workload), mProgram(NULL), mSceneGraph(NULL), mModelMatrix(NULL),
+        mViewMatrix(NULL), mProjectionMatrix(NULL), mMesh(NULL) {
 }
 
 bool FullPipelineRenderer::setUp() {
     if (!Renderer::setUp()) {
         return false;
     }
+
     GLuint programId = GLUtils::createProgram(&FP_VERTEX, &FP_FRAGMENT);
     if (programId == 0)
         return false;
     mProgram = new FullPipelineProgram(programId);
-
-    // Set the background clear color to black.
-    glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
-
-    // Use culling to remove back faces.
-    glEnable (GL_CULL_FACE);
 
     mModelMatrix = new Matrix();
 
@@ -129,8 +128,7 @@ bool FullPipelineRenderer::setUp() {
     float upZ = 0.0f;
 
     // Set the view matrix. This matrix can be said to represent the camera position.
-    mViewMatrix = Matrix::newLookAt(eyeX, eyeY, eyeZ, centerX, centerY, centerZ,
-            upX, upY, upZ);
+    mViewMatrix = Matrix::newLookAt(eyeX, eyeY, eyeZ, centerX, centerY, centerZ, upX, upY, upZ);
 
     // Create a new perspective projection matrix. The height will stay the same
     // while the width will vary as per aspect ratio.
@@ -144,16 +142,17 @@ bool FullPipelineRenderer::setUp() {
 
     mProjectionMatrix = Matrix::newFrustum(left, right, bottom, top, near, far);
 
-    int textureId = GLUtils::genRandTex(width, height);
-    if (textureId < 0) {
+    // Setup texture.
+    mTextureId = GLUtils::genRandTex(width, height);
+    if (mTextureId == 0) {
         return false;
     }
 
-    float count = pow(2, mWorkload-1);
+    float count = pow(2, mWorkload - 1);
     float middle = count / 2.0f;
     float scale = 1.0f / count;
 
-    mMesh = new Mesh(FP_VERTICES, FP_NORMALS, FP_TEX_COORDS, FP_NUM_VERTICES, textureId);
+    mMesh = new Mesh(FP_VERTICES, FP_NORMALS, FP_TEX_COORDS, FP_NUM_VERTICES, mTextureId);
     mSceneGraph = new ProgramNode();
 
     for (int i = 0; i < count; i++) {
@@ -170,6 +169,10 @@ bool FullPipelineRenderer::setUp() {
 }
 
 bool FullPipelineRenderer::tearDown() {
+    if (mTextureId != 0) {
+        glDeleteTextures(1, &mTextureId);
+        mTextureId = 0;
+    }
     if (!Renderer::tearDown()) {
         return false;
     }
@@ -188,9 +191,28 @@ bool FullPipelineRenderer::tearDown() {
     return true;
 }
 
-bool FullPipelineRenderer::draw() {
+bool FullPipelineRenderer::draw(bool offscreen) {
+    glBindFramebuffer(GL_FRAMEBUFFER, (offscreen) ? mFboId : 0);
+    // Set the background clear color to black.
+    glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+    // Use culling to remove back faces.
+    glEnable (GL_CULL_FACE);
+    // Use depth testing.
+    glEnable (GL_DEPTH_TEST);
     glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
     mModelMatrix->identity();
     mSceneGraph->draw(*mProgram, *mModelMatrix, *mViewMatrix, *mProjectionMatrix);
-    return eglSwapBuffers(mEglDisplay, mEglSurface);
+
+    GLuint err = glGetError();
+    if (err != GL_NO_ERROR) {
+        ALOGV("GLError %d", err);
+        return false;
+    }
+
+    if (offscreen) {
+        glFinish();
+        return true;
+    } else {
+        return eglSwapBuffers(mEglDisplay, mEglSurface);
+    }
 }
