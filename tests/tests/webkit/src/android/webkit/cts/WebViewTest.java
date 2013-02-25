@@ -716,7 +716,7 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
         // Check that we can access relative URLs and that reported URL is supplied history URL.
         startWebServer(false);
         String baseUrl = mWebServer.getAssetUrl("foo.html");
-        String historyUrl = "random";
+        String historyUrl = "http://www.random.com/";
         String dbPath = getActivity().getFilesDir().toString() + "/icons";
         mIconDb = WebIconDatabase.getInstance();
         mIconDb.open(dbPath);
@@ -745,7 +745,7 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
         mOnUiThread.loadDataWithBaseURLAndWaitForCompletion(baseUrl,
                 "<html><body><img src=\"" + imgUrl + "\"/></body></html>",
                 "text/html", "UTF-8", null);
-        assertTrue(mWebServer.getLastRequestUrl().endsWith(imgUrl));
+        assertTrue("last request is " + mWebServer.getLastRequestUrl(), mWebServer.getLastRequestUrl().endsWith(imgUrl));
         assertEquals("about:blank", mWebView.getUrl());
 
         // Test that JavaScript can access content from the same origin as the base URL.
@@ -763,8 +763,8 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
         mOnUiThread.loadDataWithBaseURLAndWaitForCompletion("data:foo",
                 "<html><body>bar</body></html>", "text/html", "UTF-8",
                 historyUrl);
-        assertTrue(mWebView.getUrl().indexOf("data:text/html,") == 0);
-        assertTrue(mWebView.getUrl().indexOf("bar") > 0);
+        assertTrue("URL: " + mWebView.getUrl(), mWebView.getUrl().indexOf("data:text/html") == 0);
+        assertTrue("URL: " + mWebView.getUrl(), mWebView.getUrl().indexOf("bar") > 0);
     }
 
     @UiThreadTest
