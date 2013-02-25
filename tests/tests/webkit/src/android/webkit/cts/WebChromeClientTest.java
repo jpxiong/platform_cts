@@ -64,7 +64,8 @@ public class WebChromeClientTest extends ActivityInstrumentationTestCase2<WebVie
         mOnUiThread.setWebChromeClient(webChromeClient);
 
         assertFalse(webChromeClient.hadOnProgressChanged());
-        mOnUiThread.loadUrlAndWaitForCompletion(TestHtmlConstants.HELLO_WORLD_URL);
+        String url = mWebServer.getAssetUrl(TestHtmlConstants.HELLO_WORLD_URL);
+        mOnUiThread.loadUrlAndWaitForCompletion(url);
 
         new PollingCheck(TEST_TIMEOUT) {
             @Override
