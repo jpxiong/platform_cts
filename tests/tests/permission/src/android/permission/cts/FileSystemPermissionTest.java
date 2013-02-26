@@ -560,12 +560,20 @@ public class FileSystemPermissionTest extends AndroidTestCase {
         return retval;
     }
 
+    public void testSystemMountedRO() throws IOException {
+        assertSystemMountedROIn("/proc/self/mounts");
+    }
+
+    public void testSystemMountedRO_init() throws IOException {
+        assertSystemMountedROIn("/proc/1/mounts");
+    }
+
     /**
-     * Scan through /proc/self/mounts, looking for the /system line. If the line
+     * Scan through {@code filename}, looking for the /system line. If the line
      * has "ro" in the 4th column, then we know the filesystem is mounted read-only.
      */
-    public void testSystemMountedRO() throws IOException {
-        BufferedReader br = new BufferedReader(new FileReader("/proc/self/mounts"));
+    private static void assertSystemMountedROIn(String filename) throws IOException {
+        BufferedReader br = new BufferedReader(new FileReader(filename));
         String line;
         boolean foundSystem = false;
         while((line = br.readLine()) != null) {
