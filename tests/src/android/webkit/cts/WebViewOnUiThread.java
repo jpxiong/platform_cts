@@ -39,6 +39,7 @@ import android.webkit.WebViewClient;
 import junit.framework.Assert;
 
 import java.io.File;
+import java.util.concurrent.Callable;
 
 
 /**
@@ -397,12 +398,22 @@ public class WebViewOnUiThread {
      * similar functions.
      */
     public void waitForLoadCompletion() {
-        if (isUiThread()) {
-            waitOnUiThread();
-        } else {
-            waitOnTestThread();
-        }
+        waitForCriteria(LOAD_TIMEOUT,
+                new Callable<Boolean>() {
+                    @Override
+                    public Boolean call() {
+                        return isLoaded();
+                    }
+                });
         clearLoad();
+    }
+
+    private void waitForCriteria(long timeout, Callable<Boolean> doneCriteria) {
+        if (isUiThread()) {
+            waitOnUiThread(timeout, doneCriteria);
+        } else {
+            waitOnTestThread(timeout, doneCriteria);
+        }
     }
 
     public String getTitle() {
@@ -682,33 +693,42 @@ public class WebViewOnUiThread {
 
     /**
      * Uses a polling mechanism, while pumping messages to check when the
-     * load completes.
+     * criteria is met.
      */
-    private void waitOnUiThread() {
-        new PollingCheck(LOAD_TIMEOUT) {
+    private void waitOnUiThread(long timeout, final Callable<Boolean> doneCriteria) {
+        new PollingCheck(timeout) {
             @Override
             protected boolean check() {
                 pumpMessages();
-                return isLoaded();
+                try {
+                    return doneCriteria.call();
+                } catch (Exception e) {
+                    Assert.fail("Unexpected error while checking the criteria: "
+                            + e.getMessage());
+                    return true;
+                }
             }
         }.run();
     }
 
     /**
-     * Uses a wait/notify to check when the load completes.
+     * Uses a wait/notify to check when the criteria is met.
      */
-    private synchronized void waitOnTestThread() {
+    private synchronized void waitOnTestThread(long timeout, Callable<Boolean> doneCriteria) {
         try {
-            long waitEnd = SystemClock.uptimeMillis() + LOAD_TIMEOUT;
-            long timeRemaining = LOAD_TIMEOUT;
-            while (!isLoaded() && timeRemaining > 0) {
+            long waitEnd = SystemClock.uptimeMillis() + timeout;
+            long timeRemaining = timeout;
+            while (!doneCriteria.call() && timeRemaining > 0) {
                 this.wait(timeRemaining);
                 timeRemaining = waitEnd - SystemClock.uptimeMillis();
             }
+            Assert.assertTrue("Action failed to complete before timeout", doneCriteria.call());
         } catch (InterruptedException e) {
             // We'll just drop out of the loop and fail
+        } catch (Exception e) {
+            Assert.fail("Unexpected error while checking the criteria: "
+                    + e.getMessage());
         }
-        Assert.assertTrue("Load failed to complete before timeout", isLoaded());
     }
 
     /**
