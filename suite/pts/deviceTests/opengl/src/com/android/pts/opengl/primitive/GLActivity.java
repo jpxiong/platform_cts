@@ -25,6 +25,8 @@ import android.view.Surface;
 import com.android.pts.util.ResultType;
 import com.android.pts.util.ResultUnit;
 
+import java.util.ArrayList;
+
 public class GLActivity extends Activity {
 
     public final static String TAG = "GLActivity";
@@ -32,6 +34,10 @@ public class GLActivity extends Activity {
      * Holds the name of the benchmark to run.
      */
     public final static String INTENT_EXTRA_BENCHMARK_NAME = "benchmark_name";
+    /**
+     * Holds whether or not the benchmark is to be run offscreen.
+     */
+    public final static String INTENT_EXTRA_OFFSCREEN = "offscreen";
     /**
      * Holds the number of milliseconds to wait before timing out.
      */
@@ -50,10 +56,13 @@ public class GLActivity extends Activity {
     private volatile Surface mSurface;
 
     private Benchmark mBenchmark;
+    private boolean mOffscreen;
     private int mTimeout;
-    private double mMinFps;
+    private int mMinFps;
     private int mNumFrames;
     private volatile int mWorkload = 0;
+
+    public ArrayList<Double> fpsValues = new ArrayList<Double>();
 
     @Override
     public void onCreate(Bundle data) {
@@ -61,11 +70,13 @@ public class GLActivity extends Activity {
         System.loadLibrary("ptsopengl_jni");
         Intent intent = getIntent();
         mBenchmark = Benchmark.valueOf(intent.getStringExtra(INTENT_EXTRA_BENCHMARK_NAME));
+        mOffscreen = intent.getBooleanExtra(INTENT_EXTRA_OFFSCREEN, false);
         mTimeout = intent.getIntExtra(INTENT_EXTRA_TIMEOUT, 0);
-        mMinFps = intent.getDoubleExtra(INTENT_EXTRA_MIN_FPS, 0);
+        mMinFps = intent.getIntExtra(INTENT_EXTRA_MIN_FPS, 0);
         mNumFrames = intent.getIntExtra(INTENT_EXTRA_NUM_FRAMES, 0);
 
         Log.i(TAG, "Benchmark: " + mBenchmark);
+        Log.i(TAG, "Offscreen: " + mOffscreen);
         Log.i(TAG, "Time Out: " + mTimeout);
         Log.i(TAG, "Min FPS: " + mMinFps);
         Log.i(TAG, "Num Frames: " + mNumFrames);
@@ -97,13 +108,17 @@ public class GLActivity extends Activity {
         return mWorkload;
     }
 
-    private static native void setupFullPipelineBenchmark(Surface surface, int workload);
+    private static native void setupFullPipelineBenchmark(
+            Surface surface, boolean offscreen, int workload);
 
-    private static native void setupPixelOutputBenchmark(Surface surface, int workload);
+    private static native void setupPixelOutputBenchmark(
+            Surface surface, boolean offscreen, int workload);
 
-    private static native void setupShaderPerfBenchmark(Surface surface, int workload);
+    private static native void setupShaderPerfBenchmark(
+            Surface surface, boolean offscreen, int workload);
 
-    private static native void setupContextSwitchBenchmark(Surface surface, int workload);
+    private static native void setupContextSwitchBenchmark(
+            Surface surface, boolean offscreen, int workload);
 
     private static native boolean startBenchmark(int numFrames, double[] frameTimes);
 
@@ -127,16 +142,16 @@ public class GLActivity extends Activity {
                 // Setup the benchmark.
                 switch (mBenchmark) {
                     case FullPipeline:
-                        setupFullPipelineBenchmark(mSurface, wl);
+                        setupFullPipelineBenchmark(mSurface, mOffscreen, wl);
                         break;
                     case PixelOutput:
-                        setupPixelOutputBenchmark(mSurface, wl);
+                        setupPixelOutputBenchmark(mSurface, mOffscreen, wl);
                         break;
                     case ShaderPerf:
-                        setupShaderPerfBenchmark(mSurface, wl);
+                        setupShaderPerfBenchmark(mSurface, mOffscreen, wl);
                         break;
                     case ContextSwitch:
-                        setupContextSwitchBenchmark(mSurface, wl);
+                        setupContextSwitchBenchmark(mSurface, mOffscreen, wl);
                         break;
                 }
                 watchDog.start();
@@ -150,8 +165,7 @@ public class GLActivity extends Activity {
                     // Calculate FPS.
                     double totalTimeTaken = times[1] - times[0];
                     double meanFps = mNumFrames * 1000.0f / totalTimeTaken;
-                    Log.i(TAG, "Workload: " + wl);
-                    Log.i(TAG, "Mean FPS: " + meanFps);
+                    fpsValues.add(meanFps);
                     if (meanFps >= mMinFps) {
                         // Iteration passed, proceed to next one.
                         mWorkload++;

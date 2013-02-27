@@ -22,10 +22,10 @@
 
 class Renderer {
 public:
-    Renderer(ANativeWindow* window, int workload);
+    Renderer(ANativeWindow* window, bool offscreen, int workload);
     virtual bool setUp();
     virtual bool tearDown();
-    virtual bool draw(bool offscreen) = 0;
+    virtual bool draw() = 0;
     virtual ~Renderer() {};
 protected:
     bool createFBO(GLuint& fboId, GLuint& rboId, GLuint& cboId, int width, int height);
@@ -37,9 +37,10 @@ protected:
     GLuint mFboId; //Frame buffer
     GLuint mRboId; //Depth buffer
     GLuint mCboId; //Color buffer
-    GLuint mProgram;
+    GLuint mProgramId;
     EGLint width;
     EGLint height;
+    bool mOffscreen;
     int mWorkload;
 };
 #endif

@@ -33,10 +33,9 @@ static const EGLint configAttribs[] = {
         EGL_STENCIL_SIZE, 8,
         EGL_NONE };
 
-Renderer::Renderer(ANativeWindow* window, int workload) :
-        mEglDisplay(EGL_NO_DISPLAY), mEglSurface(EGL_NO_SURFACE), mEglContext(EGL_NO_CONTEXT) {
-    mWindow = window;
-    mWorkload = workload;
+Renderer::Renderer(ANativeWindow* window, bool offscreen, int workload) :
+        mWindow(window), mEglDisplay(EGL_NO_DISPLAY), mEglSurface(EGL_NO_SURFACE),
+        mEglContext(EGL_NO_CONTEXT), mOffscreen(offscreen), mWorkload(workload) {
 }
 
 bool Renderer::setUp() {
@@ -83,10 +82,16 @@ bool Renderer::setUp() {
 
     glViewport(0, 0, width, height);
 
-    int w = GLUtils::roundUpToSmallestPowerOf2(width);
-    int h = GLUtils::roundUpToSmallestPowerOf2(height);
-    if (!createFBO(mFboId, mRboId, mCboId, w, h)) {
-        return false;
+    if (mOffscreen) {
+        int w = GLUtils::roundUpToSmallestPowerOf2(width);
+        int h = GLUtils::roundUpToSmallestPowerOf2(height);
+        if (!createFBO(mFboId, mRboId, mCboId, w, h)) {
+            return false;
+        }
+    } else {
+        mFboId = 0;
+        mRboId = 0;
+        mCboId = 0;
     }
 
     GLuint err = glGetError();

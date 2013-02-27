@@ -44,16 +44,13 @@ Java_com_android_pts_opengl_primitive_GLActivity_startBenchmark(
     // Sets up the renderer.
     bool success = gRenderer->setUp();
 
-    // Draw to the screen. This allows debugging and also warms up the HW.
-    success = success && gRenderer->draw(false);
-
     // Records the start time.
     double start = currentTimeMillis();
 
     // Draw off the screen.
     for (int i = 0; i < numFrames && success; i++) {
         // Draw a frame.
-        success = gRenderer->draw(true);
+        success = gRenderer->draw();
     }
 
     // Records the end time.
@@ -73,24 +70,28 @@ Java_com_android_pts_opengl_primitive_GLActivity_startBenchmark(
 // The following functions create the renderers for the various benchmarks.
 extern "C" JNIEXPORT void JNICALL
 Java_com_android_pts_opengl_primitive_GLActivity_setupFullPipelineBenchmark(
-        JNIEnv* env, jclass clazz, jobject surface, jint workload) {
-    gRenderer = new FullPipelineRenderer(ANativeWindow_fromSurface(env, surface), workload);
+        JNIEnv* env, jclass clazz, jobject surface, jboolean offscreen, jint workload) {
+    gRenderer = new FullPipelineRenderer(
+            ANativeWindow_fromSurface(env, surface), offscreen, workload);
 }
 
 extern "C" JNIEXPORT void JNICALL
 Java_com_android_pts_opengl_primitive_GLActivity_setupPixelOutputBenchmark(
-        JNIEnv* env, jclass clazz, jobject surface, jint workload) {
-    gRenderer = new PixelOutputRenderer(ANativeWindow_fromSurface(env, surface), workload);
+        JNIEnv* env, jclass clazz, jobject surface, jboolean offscreen, jint workload) {
+    gRenderer = new PixelOutputRenderer(
+            ANativeWindow_fromSurface(env, surface), offscreen, workload);
 }
 
 extern "C" JNIEXPORT void JNICALL
 Java_com_android_pts_opengl_primitive_GLActivity_setupShaderPerfBenchmark(
-        JNIEnv* env, jclass clazz, jobject surface, jint workload) {
-    gRenderer = new ShaderPerfRenderer(ANativeWindow_fromSurface(env, surface), workload);
+        JNIEnv* env, jclass clazz, jobject surface, jboolean offscreen, jint workload) {
+    gRenderer = new ShaderPerfRenderer(
+            ANativeWindow_fromSurface(env, surface), offscreen, workload);
 }
 
 extern "C" JNIEXPORT void JNICALL
 Java_com_android_pts_opengl_primitive_GLActivity_setupContextSwitchBenchmark(
-        JNIEnv* env, jclass clazz, jobject surface, jint workload) {
-    gRenderer = new ContextSwitchRenderer(ANativeWindow_fromSurface(env, surface), workload);
+        JNIEnv* env, jclass clazz, jobject surface, jboolean offscreen, jint workload) {
+    gRenderer = new ContextSwitchRenderer(
+            ANativeWindow_fromSurface(env, surface), offscreen, workload);
 }

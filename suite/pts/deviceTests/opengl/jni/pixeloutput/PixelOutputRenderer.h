@@ -18,11 +18,11 @@
 
 class PixelOutputRenderer: public Renderer {
 public:
-    PixelOutputRenderer(ANativeWindow* window, int workload);
+    PixelOutputRenderer(ANativeWindow* window, bool offscreen, int workload);
     virtual ~PixelOutputRenderer() {};
     bool setUp();
     bool tearDown();
-    bool draw(bool offscreen);
+    bool draw();
 private:
     GLuint mTextureId;
     GLuint mTextureUniformHandle;
