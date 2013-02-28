@@ -17,16 +17,8 @@
 package com.android.pts.filesystemperf;
 
 import android.cts.util.TimeoutReq;
-import com.android.pts.util.MeasureRun;
-import com.android.pts.util.PtsAndroidTestCase;
-import com.android.pts.util.ReportLog;
-import com.android.pts.util.Stat;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.RandomAccessFile;
-import java.util.Random;
+import com.android.pts.util.PtsAndroidTestCase;
 
 
 public class RandomRWTest extends PtsAndroidTestCase {
