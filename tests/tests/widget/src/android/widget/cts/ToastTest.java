@@ -28,6 +28,7 @@ import android.test.ActivityInstrumentationTestCase2;
 import android.test.UiThreadTest;
 import android.view.Gravity;
 import android.view.View;
+import android.view.ViewTreeObserver;
 import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.Toast;
@@ -39,6 +40,8 @@ public class ToastTest extends ActivityInstrumentationTestCase2<StubActivity> {
     private Toast mToast;
     private Activity mActivity;
     private Instrumentation mInstrumentation;
+    private boolean mLayoutDone;
+    private ViewTreeObserver.OnGlobalLayoutListener mLayoutListener;
 
     public ToastTest() {
         super("com.android.cts.stub", StubActivity.class);
@@ -51,6 +54,12 @@ public class ToastTest extends ActivityInstrumentationTestCase2<StubActivity> {
         mActivity = getActivity();
         mInstrumentation = getInstrumentation();
         mToast = new Toast(mActivity);
+        mLayoutDone = false;
+        mLayoutListener = new ViewTreeObserver.OnGlobalLayoutListener() {
+            public void onGlobalLayout() {
+                mLayoutDone = true;
+            }
+        };
     }
 
     public void testConstructor() {
@@ -87,6 +96,21 @@ public class ToastTest extends ActivityInstrumentationTestCase2<StubActivity> {
         // sleep a while and then make sure do not show toast
         Thread.sleep(TIME_FOR_UI_OPERATION);
         assertNull(view.getParent());
+    }
+
+    private void registerLayoutListener(final View view) {
+        mLayoutDone = false;
+        view.getViewTreeObserver().addOnGlobalLayoutListener(mLayoutListener);
+    }
+
+    private void assertLayoutDone(final View view) {
+        new PollingCheck(TIME_OUT) {
+            @Override
+            protected boolean check() {
+                return mLayoutDone;
+            }
+        }.run();
+        view.getViewTreeObserver().removeOnGlobalLayoutListener(mLayoutListener);
     }
 
     public void testShow() {
@@ -173,7 +197,6 @@ public class ToastTest extends ActivityInstrumentationTestCase2<StubActivity> {
         assertSame(imageView, mToast.getView());
         assertShowAndHide(imageView);
     }
-
     public void testAccessDuration() {
         long start = SystemClock.uptimeMillis();
         mActivity.runOnUiThread(new Runnable() {
@@ -222,6 +245,7 @@ public class ToastTest extends ActivityInstrumentationTestCase2<StubActivity> {
             public void run() {
                 mToast.setMargin(horizontal1, vertical1);
                 mToast.show();
+                registerLayoutListener(mToast.getView());
             }
         });
         mInstrumentation.waitForIdleSync();
@@ -232,6 +256,7 @@ public class ToastTest extends ActivityInstrumentationTestCase2<StubActivity> {
         WindowManager.LayoutParams params1 = (WindowManager.LayoutParams) view.getLayoutParams();
         assertEquals(horizontal1, params1.horizontalMargin);
         assertEquals(vertical1, params1.verticalMargin);
+        assertLayoutDone(view);
         int[] xy1 = new int[2];
         view.getLocationOnScreen(xy1);
         assertShowAndHide(view);
@@ -242,6 +267,7 @@ public class ToastTest extends ActivityInstrumentationTestCase2<StubActivity> {
             public void run() {
                 mToast.setMargin(horizontal2, vertical2);
                 mToast.show();
+                registerLayoutListener(mToast.getView());
             }
         });
         mInstrumentation.waitForIdleSync();
@@ -253,6 +279,7 @@ public class ToastTest extends ActivityInstrumentationTestCase2<StubActivity> {
         assertEquals(horizontal2, params2.horizontalMargin);
         assertEquals(vertical2, params2.verticalMargin);
 
+        assertLayoutDone(view);
         int[] xy2 = new int[2];
         view.getLocationOnScreen(xy2);
         assertShowAndHide(view);
@@ -267,6 +294,7 @@ public class ToastTest extends ActivityInstrumentationTestCase2<StubActivity> {
                 mToast = Toast.makeText(mActivity, TEST_TOAST_TEXT, Toast.LENGTH_SHORT);
                 mToast.setGravity(Gravity.CENTER, 0, 0);
                 mToast.show();
+                registerLayoutListener(mToast.getView());
             }
         });
         mInstrumentation.waitForIdleSync();
@@ -275,6 +303,7 @@ public class ToastTest extends ActivityInstrumentationTestCase2<StubActivity> {
         assertEquals(Gravity.CENTER, mToast.getGravity());
         assertEquals(0, mToast.getXOffset());
         assertEquals(0, mToast.getYOffset());
+        assertLayoutDone(view);
         int[] centerXY = new int[2];
         view.getLocationOnScreen(centerXY);
         assertShowAndHide(view);
@@ -283,6 +312,7 @@ public class ToastTest extends ActivityInstrumentationTestCase2<StubActivity> {
             public void run() {
                 mToast.setGravity(Gravity.BOTTOM, 0, 0);
                 mToast.show();
+                registerLayoutListener(mToast.getView());
             }
         });
         mInstrumentation.waitForIdleSync();
@@ -291,6 +321,7 @@ public class ToastTest extends ActivityInstrumentationTestCase2<StubActivity> {
         assertEquals(Gravity.BOTTOM, mToast.getGravity());
         assertEquals(0, mToast.getXOffset());
         assertEquals(0, mToast.getYOffset());
+        assertLayoutDone(view);
         int[] bottomXY = new int[2];
         view.getLocationOnScreen(bottomXY);
         assertShowAndHide(view);
@@ -306,6 +337,7 @@ public class ToastTest extends ActivityInstrumentationTestCase2<StubActivity> {
             public void run() {
                 mToast.setGravity(Gravity.BOTTOM, xOffset, yOffset);
                 mToast.show();
+                registerLayoutListener(mToast.getView());
             }
         });
         mInstrumentation.waitForIdleSync();
@@ -314,6 +346,7 @@ public class ToastTest extends ActivityInstrumentationTestCase2<StubActivity> {
         assertEquals(Gravity.BOTTOM, mToast.getGravity());
         assertEquals(xOffset, mToast.getXOffset());
         assertEquals(yOffset, mToast.getYOffset());
+        assertLayoutDone(view);
         int[] bottomOffsetXY = new int[2];
         view.getLocationOnScreen(bottomOffsetXY);
         assertShowAndHide(view);
