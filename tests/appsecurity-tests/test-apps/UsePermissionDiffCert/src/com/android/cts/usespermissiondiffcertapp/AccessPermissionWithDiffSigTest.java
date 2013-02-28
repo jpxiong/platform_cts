@@ -18,6 +18,7 @@ package com.android.cts.usespermissiondiffcertapp;
 
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
+import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
@@ -25,6 +26,8 @@ import android.net.Uri;
 import android.os.SystemClock;
 import android.test.AndroidTestCase;
 import android.util.Log;
+
+import java.io.IOException;
 
 /**
  * Tests that signature-enforced permissions cannot be accessed by apps signed
@@ -43,7 +46,18 @@ public class AccessPermissionWithDiffSigTest extends AndroidTestCase {
     static final Uri PRIV_URI_GRANTING = Uri.parse("content://ctsprivateprovidergranting");
 
     static final String EXPECTED_MIME_TYPE = "got/theMIME";
-    
+
+    private void assertOpenFileDescriptorModeNotAllowed(Uri uri, String msg, String mode) {
+        try {
+            getContext().getContentResolver().openFileDescriptor(uri, mode).close();
+            fail("expected SecurityException writing " + uri + ": " + msg);
+        } catch (IOException e) {
+            throw new IllegalStateException(e);
+        } catch (SecurityException expected) {
+            assertNotNull("security exception's error message.", expected.getMessage());
+        }
+    }
+
     public void assertReadingContentUriNotAllowed(Uri uri, String msg) {
         try {
             getContext().getContentResolver().query(uri, null, null, null, null);
@@ -53,13 +67,43 @@ public class AccessPermissionWithDiffSigTest extends AndroidTestCase {
         }
     }
 
-    public void assertWritingContentUriNotAllowed(Uri uri, String msg) {
+    private void assertWritingContentUriNotAllowed(Uri uri, String msg) {
+        final ContentResolver resolver = getContext().getContentResolver();
         try {
-            getContext().getContentResolver().insert(uri, new ContentValues());
-            fail("expected SecurityException writing " + uri + ": " + msg);
+            resolver.insert(uri, new ContentValues());
+            fail("expected SecurityException inserting " + uri + ": " + msg);
         } catch (SecurityException expected) {
             assertNotNull("security exception's error message.", expected.getMessage());
         }
+
+        try {
+            resolver.update(uri, new ContentValues(), null, null);
+            fail("expected SecurityException updating " + uri + ": " + msg);
+        } catch (SecurityException expected) {
+            assertNotNull("security exception's error message.", expected.getMessage());
+        }
+
+        try {
+            resolver.delete(uri, null, null);
+            fail("expected SecurityException deleting " + uri + ": " + msg);
+        } catch (SecurityException expected) {
+            assertNotNull("security exception's error message.", expected.getMessage());
+        }
+
+        try {
+            getContext().getContentResolver().openOutputStream(uri).close();
+            fail("expected SecurityException writing " + uri + ": " + msg);
+        } catch (IOException e) {
+            throw new IllegalStateException(e);
+        } catch (SecurityException expected) {
+            assertNotNull("security exception's error message.", expected.getMessage());
+        }
+
+        assertOpenFileDescriptorModeNotAllowed(uri, msg, "w");
+        assertOpenFileDescriptorModeNotAllowed(uri, msg, "wt");
+        assertOpenFileDescriptorModeNotAllowed(uri, msg, "wa");
+        assertOpenFileDescriptorModeNotAllowed(uri, msg, "rw");
+        assertOpenFileDescriptorModeNotAllowed(uri, msg, "rwt");
     }
 
     /**
