@@ -427,6 +427,14 @@
             </intent-filter>
         </activity>
 
+        <activity android:name="android.text.cts.EmojiStubActivity"
+            android:label="AvailableIntentsActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.FRAMEWORK_INSTRUMENTATION_TEST" />
+            </intent-filter>
+        </activity>
+
         <activity android:name="android.widget.cts.TableStubActivity"
             android:label="TableStubActivity">
             <intent-filter>
