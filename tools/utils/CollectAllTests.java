@@ -14,27 +14,23 @@
  * limitations under the License.
  */
 
+import org.junit.runner.RunWith;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import vogar.Expectation;
 import vogar.ExpectationStore;
-import vogar.ModeId;
 
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileReader;
-import java.io.FilenameFilter;
 import java.io.IOException;
 import java.lang.annotation.Annotation;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -47,11 +43,7 @@ import java.util.jar.JarFile;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
-import junit.framework.Test;
 import junit.framework.TestCase;
-import junit.framework.TestResult;
-import junit.textui.ResultPrinter;
-import junit.textui.TestRunner;
 
 public class CollectAllTests extends DescriptionGenerator {
 
@@ -203,18 +195,19 @@ public class CollectAllTests extends DescriptionGenerator {
                 Class<?> klass = Class.forName(className,
                                                false,
                                                CollectAllTests.class.getClassLoader());
-                if (!TestCase.class.isAssignableFrom(klass)) {
+                final int modifiers = klass.getModifiers();
+                if (Modifier.isAbstract(modifiers) || !Modifier.isPublic(modifiers)) {
                     continue;
                 }
-                if (Modifier.isAbstract(klass.getModifiers())) {
+
+                final boolean isJunit4Class = isJunit4Class(klass);
+                if (!isJunit4Class && !isJunit3Test(klass)) {
                     continue;
                 }
-                if (!Modifier.isPublic(klass.getModifiers())) {
-                    continue;
-                }
+
                 try {
                     klass.getConstructor(new Class<?>[] { String.class } );
-                    addToTests(expectations, testCases, klass.asSubclass(TestCase.class));
+                    addToTests(expectations, testCases, klass);
                     continue;
                 } catch (NoSuchMethodException e) {
                 } catch (SecurityException e) {
@@ -222,9 +215,10 @@ public class CollectAllTests extends DescriptionGenerator {
                             + className);
                     e.printStackTrace();
                 }
+
                 try {
                     klass.getConstructor(new Class<?>[0]);
-                    addToTests(expectations, testCases, klass.asSubclass(TestCase.class));
+                    addToTests(expectations, testCases, klass);
                     continue;
                 } catch (NoSuchMethodException e) {
                 } catch (SecurityException e) {
@@ -276,7 +270,7 @@ public class CollectAllTests extends DescriptionGenerator {
                 BufferedReader reader = new BufferedReader(new FileReader(makeFileName));
                 String line;
 
-                while ((line =reader.readLine())!=null) {
+                while ((line = reader.readLine())!=null) {
                     if (line.startsWith(TEST_TYPE)) {
                         if (line.indexOf(ATTRIBUTE_VM_HOST_TEST) >= 0) {
                             type = VM_HOST_TEST;
@@ -314,22 +308,22 @@ public class CollectAllTests extends DescriptionGenerator {
         }
     }
 
-    private static String getKnownFailure(final Class<? extends TestCase> testClass,
+    private static String getKnownFailure(final Class<?> testClass,
             final String testName) {
         return getAnnotation(testClass, testName, KNOWN_FAILURE);
     }
 
-    private static boolean isKnownFailure(final Class<? extends TestCase> testClass,
+    private static boolean isKnownFailure(final Class<?> testClass,
             final String testName) {
         return getAnnotation(testClass, testName, KNOWN_FAILURE) != null;
     }
 
-    private static boolean isSuppressed(final Class<? extends TestCase> testClass,
+    private static boolean isSuppressed(final Class<?> testClass,
             final String testName)  {
         return getAnnotation(testClass, testName, SUPPRESSED_TEST) != null;
     }
 
-    private static String getAnnotation(final Class<? extends TestCase> testClass,
+    private static String getAnnotation(final Class<?> testClass,
             final String testName, final String annotationName) {
         try {
             Method testMethod = testClass.getMethod(testName, (Class[])null);
@@ -363,38 +357,42 @@ public class CollectAllTests extends DescriptionGenerator {
 
     private static void addToTests(ExpectationStore[] expectations,
                                    Map<String,TestClass> testCases,
-                                   Class<? extends TestCase> test) {
-        Class testClass = test;
+                                   Class<?> testClass) {
         Set<String> testNames = new HashSet<String>();
-        while (TestCase.class.isAssignableFrom(testClass)) {
-            Method[] testMethods = testClass.getDeclaredMethods();
-            for (Method testMethod : testMethods) {
-                String testName = testMethod.getName();
-                if (testNames.contains(testName)) {
-                    continue;
-                }
-                if (!testName.startsWith("test")) {
-                    continue;
-                }
-                if (testMethod.getParameterTypes().length != 0) {
-                    continue;
-                }
-                if (!testMethod.getReturnType().equals(Void.TYPE)) {
-                    continue;
-                }
-                if (!Modifier.isPublic(testMethod.getModifiers())) {
-                    continue;
-                }
-                testNames.add(testName);
-                addToTests(expectations, testCases, test, testName);
+
+        boolean isJunit3Test = isJunit3Test(testClass);
+
+        Method[] testMethods = testClass.getMethods();
+        for (Method testMethod : testMethods) {
+            String testName = testMethod.getName();
+            if (testNames.contains(testName)) {
+                continue;
             }
-            testClass = testClass.getSuperclass();
+
+            /* Make sure the method has the right signature. */
+            if (!Modifier.isPublic(testMethod.getModifiers())) {
+                continue;
+            }
+            if (!testMethod.getReturnType().equals(Void.TYPE)) {
+                continue;
+            }
+            if (testMethod.getParameterTypes().length != 0) {
+                continue;
+            }
+
+            if ((isJunit3Test && !testName.startsWith("test"))
+                    || (!isJunit3Test && !isJunit4TestMethod(testMethod))) {
+                continue;
+            }
+
+            testNames.add(testName);
+            addToTests(expectations, testCases, testClass, testName);
         }
     }
 
     private static void addToTests(ExpectationStore[] expectations,
                                    Map<String,TestClass> testCases,
-                                   Class<? extends TestCase> test,
+                                   Class<?> test,
                                    String testName) {
 
         String testClassName = test.getName();
@@ -414,7 +412,7 @@ public class CollectAllTests extends DescriptionGenerator {
             return;
         }
 
-        TestClass testClass = null;
+        TestClass testClass;
         if (testCases.containsKey(testClassName)) {
             testClass = testCases.get(testClassName);
         } else {
@@ -423,6 +421,40 @@ public class CollectAllTests extends DescriptionGenerator {
         }
 
         testClass.mCases.add(new TestMethod(testName, "", "", knownFailure, false, false));
+    }
+
+    private static boolean isJunit3Test(Class<?> klass) {
+        return TestCase.class.isAssignableFrom(klass);
+    }
+
+    private static boolean isJunit4Class(Class<?> klass) {
+        for (Annotation a : klass.getAnnotations()) {
+            if (RunWith.class.isAssignableFrom(a.annotationType())) {
+                // @RunWith is currently not supported for CTS tests because tradefed cannot handle
+                // a single test spawning other tests with different names.
+                System.out.println("Skipping test class " + klass.getName()
+                        + ": JUnit4 @RunWith is not supported");
+                return false;
+            }
+        }
+
+        for (Method m : klass.getMethods()) {
+            if (isJunit4TestMethod(m)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private static boolean isJunit4TestMethod(Method method) {
+        for (Annotation a : method.getAnnotations()) {
+            if (org.junit.Test.class.isAssignableFrom(a.annotationType())) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**

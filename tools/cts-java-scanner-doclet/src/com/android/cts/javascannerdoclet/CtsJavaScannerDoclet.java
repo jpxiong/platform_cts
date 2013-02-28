@@ -61,6 +61,8 @@ import com.sun.javadoc.AnnotationTypeElementDoc;
  */
 public class CtsJavaScannerDoclet extends Doclet {
 
+    private static final String JUNIT4_TEST_ANNOTATION = "org.junit.Test";
+
     static final String JUNIT_TEST_CASE_CLASS_NAME = "junit.framework.testcase";
 
     public static boolean start(RootDoc root) {
@@ -72,31 +74,61 @@ public class CtsJavaScannerDoclet extends Doclet {
         PrintWriter writer = new PrintWriter(System.out);
 
         for (ClassDoc clazz : classes) {
-            if (clazz.isAbstract() || !isValidJUnitTestCase(clazz)) {
+            if (clazz.isAbstract()) {
                 continue;
             }
+
+            final boolean isJUnit3 = isJUnit3TestCase(clazz);
+            if (!isJUnit3 && !isJUnit4TestClass(clazz)) {
+                continue;
+            }
+
             writer.append("suite:").println(clazz.containingPackage().name());
             writer.append("case:").println(clazz.name());
             for (; clazz != null; clazz = clazz.superclass()) {
                 for (MethodDoc method : clazz.methods()) {
-                    if (!method.name().startsWith("test")) {
-                        continue;
-                    }
                     int timeout = -1;
-                    AnnotationDesc[] annotations = method.annotations();
-                    for (AnnotationDesc annot : annotations) {
-                        AnnotationTypeDoc atype = annot.annotationType();
-                        if (atype.toString().equals("com.android.cts.util.TimeoutReq")) {
-                            ElementValuePair[] cpairs = annot.elementValues();
-                            for (ElementValuePair pair: cpairs) {
-                                AnnotationTypeElementDoc elem = pair.element();
-                                AnnotationValue value = pair.value();
-                                if (elem.name().equals("minutes")) {
-                                    timeout = ((Integer)value.value());
+                    if (isJUnit3) {
+                        if (method.name().startsWith("test")) {
+                            continue;
+                        }
+
+                        AnnotationDesc[] annotations = method.annotations();
+                        for (AnnotationDesc annot : annotations) {
+                            String atype = annot.annotationType().toString();
+                            if (atype.equals("android.cts.util.TimeoutReq")) {
+                                ElementValuePair[] cpairs = annot.elementValues();
+                                for (ElementValuePair pair : cpairs) {
+                                    AnnotationTypeElementDoc elem = pair.element();
+                                    AnnotationValue value = pair.value();
+                                    if (elem.name().equals("minutes")) {
+                                        timeout = ((Integer) value.value());
+                                    }
                                 }
                             }
                         }
+                    } else {
+                        /* JUnit4 */
+                        boolean isTest = false;
+
+                        for (AnnotationDesc annot : method.annotations()) {
+                            if (annot.annotationType().toString().equals(JUNIT4_TEST_ANNOTATION)) {
+                                isTest = true;
+
+                                for (ElementValuePair pair : annot.elementValues()) {
+                                    if (pair.element().name().equals("timeout")) {
+                                        /* JUnit4 timeouts are in milliseconds. */
+                                        timeout = (int) (((Long) pair.value().value()) / 60000L);
+                                    }
+                                }
+                            }
+                        }
+
+                        if (!isTest) {
+                            continue;
+                        }
                     }
+
                     writer.append("test:");
                     if (timeout >= 0) {
                         writer.append(method.name()).println(":" + timeout);
@@ -111,10 +143,21 @@ public class CtsJavaScannerDoclet extends Doclet {
         return true;
     }
 
-    private static boolean isValidJUnitTestCase(ClassDoc clazz) {
+    private static boolean isJUnit3TestCase(ClassDoc clazz) {
         while((clazz = clazz.superclass()) != null) {
             if (JUNIT_TEST_CASE_CLASS_NAME.equals(clazz.qualifiedName().toLowerCase())) {
                 return true;
+            }
+        }
+        return false;
+    }
+
+    private static boolean isJUnit4TestClass(ClassDoc clazz) {
+        for (MethodDoc method : clazz.methods()) {
+            for (AnnotationDesc annot : method.annotations()) {
+                if (annot.annotationType().toString().equals(JUNIT4_TEST_ANNOTATION)) {
+                    return true;
+                }
             }
         }
         return false;
