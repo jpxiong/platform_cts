@@ -1435,7 +1435,7 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
         webViewClient.resetWasOnReceivedSslErrorCalled();
         mOnUiThread.loadUrlAndWaitForCompletion(url);
         assertTrue(webViewClient.wasOnReceivedSslErrorCalled());
-        assertEquals(url, webViewClient.errorUrl());
+        assertEquals(TestHtmlConstants.HELLO_WORLD_TITLE, mOnUiThread.getTitle());
 
         // Load the page once again, without clearing the sslpreferences.
         // Make sure we do not get the callback.
