@@ -716,7 +716,7 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
         // Check that we can access relative URLs and that reported URL is supplied history URL.
         startWebServer(false);
         String baseUrl = mWebServer.getAssetUrl("foo.html");
-        String historyUrl = "http://www.random.com/";
+        String historyUrl = "http://www.example.com/";
         String dbPath = getActivity().getFilesDir().toString() + "/icons";
         mIconDb = WebIconDatabase.getInstance();
         mIconDb.open(dbPath);
