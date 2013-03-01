@@ -1619,22 +1619,34 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
         mWebView.setMapTrackballToArrowKeys(true);
     }
 
-    @UiThreadTest
     public void testSetNetworkAvailable() throws Exception {
-        WebSettings settings = mWebView.getSettings();
+        WebSettings settings = mOnUiThread.getSettings();
         settings.setJavaScriptEnabled(true);
         startWebServer(false);
+
         String url = mWebServer.getAssetUrl(TestHtmlConstants.NETWORK_STATE_URL);
         mOnUiThread.loadUrlAndWaitForCompletion(url);
-        assertEquals("ONLINE", mWebView.getTitle());
+        assertEquals("ONLINE", mOnUiThread.getTitle());
 
         mWebView.setNetworkAvailable(false);
-        mOnUiThread.reloadAndWaitForCompletion();
-        assertEquals("OFFLINE", mWebView.getTitle());
+
+        // Wait for the DOM to receive notification of the network state change.
+        new PollingCheck(TEST_TIMEOUT) {
+            @Override
+            protected boolean check() {
+                return mOnUiThread.getTitle().equals("OFFLINE");
+            }
+        }.run();
 
         mWebView.setNetworkAvailable(true);
-        mOnUiThread.reloadAndWaitForCompletion();
-        assertEquals("ONLINE", mWebView.getTitle());
+
+        // Wait for the DOM to receive notification of the network state change.
+        new PollingCheck(TEST_TIMEOUT) {
+            @Override
+            protected boolean check() {
+                return mOnUiThread.getTitle().equals("ONLINE");
+            }
+        }.run();
     }
 
     public void testSetWebChromeClient() throws Throwable {
