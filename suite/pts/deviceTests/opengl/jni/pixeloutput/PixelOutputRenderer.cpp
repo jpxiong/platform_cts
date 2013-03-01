@@ -52,8 +52,8 @@ static const char* PO_FRAGMENT =
         "  gl_FragColor = texture2D(u_Texture, v_TexCoord);"
         "}";
 
-PixelOutputRenderer::PixelOutputRenderer(ANativeWindow* window, int workload) :
-        Renderer(window, workload) {
+PixelOutputRenderer::PixelOutputRenderer(ANativeWindow* window, bool offscreen, int workload) :
+        Renderer(window, offscreen, workload) {
 }
 
 bool PixelOutputRenderer::setUp() {
@@ -62,13 +62,13 @@ bool PixelOutputRenderer::setUp() {
     }
 
     // Create program.
-    mProgram = GLUtils::createProgram(&PO_VERTEX, &PO_FRAGMENT);
-    if (mProgram == 0)
+    mProgramId = GLUtils::createProgram(&PO_VERTEX, &PO_FRAGMENT);
+    if (mProgramId == 0)
         return false;
     // Bind attributes.
-    mTextureUniformHandle = glGetUniformLocation(mProgram, "u_Texture");
-    mPositionHandle = glGetAttribLocation(mProgram, "a_Position");
-    mTexCoordHandle = glGetAttribLocation(mProgram, "a_TexCoord");
+    mTextureUniformHandle = glGetUniformLocation(mProgramId, "u_Texture");
+    mPositionHandle = glGetAttribLocation(mProgramId, "a_Position");
+    mTexCoordHandle = glGetAttribLocation(mProgramId, "a_TexCoord");
 
     // Setup texture.
     mTextureId = GLUtils::genRandTex(width, height);
@@ -89,9 +89,11 @@ bool PixelOutputRenderer::tearDown() {
     return true;
 }
 
-bool PixelOutputRenderer::draw(bool offscreen) {
-    glBindFramebuffer(GL_FRAMEBUFFER, (offscreen) ? mFboId : 0);
-    glUseProgram (mProgram);
+bool PixelOutputRenderer::draw() {
+    if (mOffscreen) {
+        glBindFramebuffer(GL_FRAMEBUFFER, mFboId);
+    }
+    glUseProgram(mProgramId);
     // Set the background clear color to black.
     glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
     glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
@@ -106,7 +108,7 @@ bool PixelOutputRenderer::draw(bool offscreen) {
     glEnable(GL_BLEND);
     glBlendFunc(GL_ONE, GL_ONE);
 
-    glActiveTexture (GL_TEXTURE0);
+    glActiveTexture(GL_TEXTURE0);
     // Bind the texture to this unit.
     glBindTexture(GL_TEXTURE_2D, mTextureId);
     // Tell the texture uniform sampler to use this texture in the shader by binding to texture
@@ -128,7 +130,7 @@ bool PixelOutputRenderer::draw(bool offscreen) {
         return false;
     }
 
-    if (offscreen) {
+    if (mOffscreen) {
         glFinish();
         return true;
     } else {

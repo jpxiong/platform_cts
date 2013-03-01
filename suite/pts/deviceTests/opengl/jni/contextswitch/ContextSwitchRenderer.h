@@ -18,11 +18,11 @@
 
 class ContextSwitchRenderer: public Renderer {
 public:
-    ContextSwitchRenderer(ANativeWindow* window, int workload);
+    ContextSwitchRenderer(ANativeWindow* window, bool offscreen, int workload);
     virtual ~ContextSwitchRenderer() {};
     bool setUp();
     bool tearDown();
-    bool draw(bool offscreen);
+    bool draw();
 private:
     GLuint mTextureUniformHandle;
     GLuint mPositionHandle;
@@ -32,7 +32,7 @@ private:
     GLuint* mFboIds;
     GLuint* mRboIds;
     GLuint* mCboIds;
-    GLuint* mPrograms;
+    GLuint* mProgramIds;
     GLuint* mTextureUniformHandles;
     GLuint* mPositionHandles;
     GLuint* mTexCoordHandles;

@@ -18,10 +18,10 @@
 
 class ShaderPerfRenderer: public Renderer {
 public:
-    ShaderPerfRenderer(ANativeWindow* window, int workload);
+    ShaderPerfRenderer(ANativeWindow* window, bool offscreen, int workload);
     virtual ~ShaderPerfRenderer() {};
     bool setUp();
-    bool draw(bool offscreen);
+    bool draw();
 private:
     GLuint mPositionHandle;
 };
