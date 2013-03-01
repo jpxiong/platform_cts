@@ -576,34 +576,14 @@ public class WebSettingsTest extends ActivityInstrumentationTestCase2<WebViewStu
         }.run();
     }
 
-    // Ideally the test cases that test if the database can be enabled and disabled
-    // properly should be combined into one. However, it seems that for some
-    // non-obvious reason the webview does not support such a sequence reliably (in
-    // particular it seems to fail when database is first disabled explicitly and
-    // then after loading the page it is enabled and another url is loaded).
+    // Ideally, we need a test case for the enabled case. However, it seems that
+    // enabling the database should happen prior to navigating the first url due to
+    // some internal limitations of webview. For this reason, we only provide a
+    // test case for "disabled" behavior.
     // Also loading as data rather than using URL should work, but it causes a
     // security exception in JS, most likely due to cross domain access. So we load
     // using a URL. Finally, it looks like enabling database requires creating a
     // webChromeClient and listening to Quota callbacks, which is not documented.
-    public void testDatabaseEnabled() throws Throwable {
-        // Verify that websql database works when enabled.
-        startWebServer();
-
-        mOnUiThread.setWebChromeClient(new ChromeClient(mOnUiThread) {
-           @Override
-           public void onExceededDatabaseQuota(String url, String databaseId, long quota,
-                long estimatedSize, long total, WebStorage.QuotaUpdater updater) {
-                updater.updateQuota(estimatedSize);
-            }
-        });
-        mSettings.setJavaScriptEnabled(true);
-        mSettings.setDatabaseEnabled(true);
-        final String url = mWebServer.getAssetUrl(TestHtmlConstants.DATABASE_ACCESS_URL);
-        mSettings.setDatabasePath(getActivity().getDir("db", 0).getPath());
-        mOnUiThread.loadUrlAndWaitForCompletion(url);
-        assertEquals("Has database", mOnUiThread.getTitle());
-    }
-
     public void testDatabaseDisabled() throws Throwable {
         // Verify that websql database does not work when disabled.
         startWebServer();
