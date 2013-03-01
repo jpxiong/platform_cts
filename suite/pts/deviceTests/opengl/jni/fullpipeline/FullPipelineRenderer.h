@@ -23,11 +23,11 @@
 
 class FullPipelineRenderer: public Renderer {
 public:
-    FullPipelineRenderer(ANativeWindow* window, int workload);
+    FullPipelineRenderer(ANativeWindow* window, bool offscreen, int workload);
     virtual ~FullPipelineRenderer() {};
     bool setUp();
     bool tearDown();
-    bool draw(bool offscreen);
+    bool draw();
 private:
     FullPipelineProgram* mProgram;
     ProgramNode* mSceneGraph;

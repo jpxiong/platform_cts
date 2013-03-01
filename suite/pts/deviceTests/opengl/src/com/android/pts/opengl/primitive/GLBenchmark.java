@@ -22,52 +22,72 @@ import com.android.pts.util.ResultUnit;
 import android.opengl.Matrix;
 import android.util.Log;
 import java.util.Arrays;
+
 /**
  * Runs the Primitive OpenGL ES 2.0 Benchmarks.
  */
 public class GLBenchmark extends PtsActivityInstrumentationTestCase2<GLActivity> {
-
-    private static final double MIN_FPS = 50;
 
     public GLBenchmark() {
         super(GLActivity.class);
     }
 
     /**
-     * Runs the full OpenGL ES 2.0 pipeline test.
-     *
-     * @throws Exception If the benchmark could not be run.
+     * Runs the full OpenGL ES 2.0 pipeline test offscreen.
      */
-    public void testFullPipeline() throws Exception {
-        runBenchmark(Benchmark.FullPipeline, 500, 50000, 1);
+    public void testFullPipelineOffscreen() throws Exception {
+        runBenchmark(Benchmark.FullPipeline, true, 500, 100000, 25, 0);
     }
 
     /**
-     * Runs the pixel output test.
-     *
-     * @throws Exception If the benchmark could not be run.
+     * Runs the full OpenGL ES 2.0 pipeline test onscreen.
      */
-    public void testPixelOutput() throws Exception {
-        runBenchmark(Benchmark.PixelOutput, 500, 50000, 1);
+    public void testFullPipelineOnscreen() throws Exception {
+        runBenchmark(Benchmark.FullPipeline, false, 500, 100000, 25, 0);
     }
 
     /**
-     * Runs the shader performance test.
-     *
-     * @throws Exception If the benchmark could not be run.
+     * Runs the pixel output test offscreen.
      */
-    public void testShaderPerf() throws Exception {
+    public void testPixelOutputOffscreen() throws Exception {
+        runBenchmark(Benchmark.PixelOutput, true, 500, 100000, 25, 0);
+    }
+
+    /**
+     * Runs the pixel output test onscreen.
+     */
+    public void testPixelOutputOnscreen() throws Exception {
+        runBenchmark(Benchmark.PixelOutput, false, 500, 100000, 25, 0);
+    }
+
+    /**
+     * Runs the shader performance test offscreen.
+     */
+    public void testShaderPerfOffscreen() throws Exception {
         // TODO(stuartscott): Not yet implemented
-        // runBenchmark(Benchmark.ShaderPerf, 500, 50000, 1);
+        // runBenchmark(Benchmark.ShaderPerf, true, 500, 100000, 25, 0);
     }
 
     /**
-     * Runs the OpenGL context switch overhead test.
-     *
-     * @throws Exception If the benchmark could not be run.
+     * Runs the shader performance test onscreen.
      */
-    public void testContextSwitch() throws Exception {
-        runBenchmark(Benchmark.ContextSwitch, 500, 50000, 1);
+    public void testShaderPerfOnscreen() throws Exception {
+        // TODO(stuartscott): Not yet implemented
+        // runBenchmark(Benchmark.ShaderPerf, false, 500, 100000, 25, 0);
+    }
+
+    /**
+     * Runs the context switch overhead test offscreen.
+     */
+    public void testContextSwitchOffscreen() throws Exception {
+        runBenchmark(Benchmark.ContextSwitch, true, 500, 100000, 25, 0);
+    }
+
+    /**
+     * Runs the context switch overhead test onscreen.
+     */
+    public void testContextSwitchOnscreen() throws Exception {
+        runBenchmark(Benchmark.ContextSwitch, false, 500, 100000, 25, 0);
     }
 
     /**
@@ -78,13 +98,18 @@ public class GLBenchmark extends PtsActivityInstrumentationTestCase2<GLActivity>
      * @param timeout The milliseconds to wait for an iteration of the benchmark before timing out.
      * @throws Exception If the benchmark could not be run.
      */
-    private void runBenchmark(Benchmark benchmark, int numFrames, int timeout, int target)
-            throws Exception {
+    private void runBenchmark(Benchmark benchmark,
+            boolean offscreen,
+            int numFrames,
+            int timeout,
+            int minFps,
+            int target) throws Exception {
         String benchmarkName = benchmark.toString();
         Intent intent = new Intent();
         intent.putExtra(GLActivity.INTENT_EXTRA_BENCHMARK_NAME, benchmarkName);
+        intent.putExtra(GLActivity.INTENT_EXTRA_OFFSCREEN, offscreen);
         intent.putExtra(GLActivity.INTENT_EXTRA_TIMEOUT, timeout);
-        intent.putExtra(GLActivity.INTENT_EXTRA_MIN_FPS, MIN_FPS);
+        intent.putExtra(GLActivity.INTENT_EXTRA_MIN_FPS, minFps);
         intent.putExtra(GLActivity.INTENT_EXTRA_NUM_FRAMES, numFrames);
 
         GLActivity activity = null;
@@ -94,9 +119,9 @@ public class GLBenchmark extends PtsActivityInstrumentationTestCase2<GLActivity>
             // Represents the maximum workload it can do whilst maintaining MIN_FPS.
             int workload = activity.waitForCompletion();
             if (workload < target) {
-                throw new Exception("Benchmark did not reach target. Got " + workload
-                        + ", target was " + target);
+                throw new Exception("Benchmark did not reach " + target + ", got " + workload);
             }
+            Log.i(GLActivity.TAG, "FPS Values: " + activity.fpsValues);
             getReportLog()
                     .printSummary("Workload", workload, ResultType.HIGHER_BETTER, ResultUnit.SCORE);
         } finally {

@@ -42,8 +42,8 @@ static const char* SP_FRAGMENT = "precision mediump float;"
                                 "  gl_FragColor = v_Position;"
                                 "}";
 
-ShaderPerfRenderer::ShaderPerfRenderer(ANativeWindow* window, int workload) :
-        Renderer(window, workload) {
+ShaderPerfRenderer::ShaderPerfRenderer(ANativeWindow* window, bool offscreen, int workload) :
+        Renderer(window, offscreen, workload) {
 }
 
 bool ShaderPerfRenderer::setUp() {
@@ -51,17 +51,19 @@ bool ShaderPerfRenderer::setUp() {
         return false;
     }
     // Create program.
-    mProgram = GLUtils::createProgram(&SP_VERTEX, &SP_FRAGMENT);
-    if (mProgram == 0)
+    mProgramId = GLUtils::createProgram(&SP_VERTEX, &SP_FRAGMENT);
+    if (mProgramId == 0)
         return false;
     // Bind attributes.
-    mPositionHandle = glGetAttribLocation(mProgram, "a_Position");
+    mPositionHandle = glGetAttribLocation(mProgramId, "a_Position");
     return true;
 }
 
-bool ShaderPerfRenderer::draw(bool offscreen) {
-    glBindFramebuffer(GL_FRAMEBUFFER, (offscreen) ? mFboId : 0);
-    glUseProgram(mProgram);
+bool ShaderPerfRenderer::draw() {
+    if (mOffscreen) {
+        glBindFramebuffer(GL_FRAMEBUFFER, mFboId);
+    }
+    glUseProgram(mProgramId);
     // Set the background clear color to black.
     glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
     glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
@@ -80,7 +82,7 @@ bool ShaderPerfRenderer::draw(bool offscreen) {
         return false;
     }
 
-    if (offscreen) {
+    if (mOffscreen) {
         glFinish();
         return true;
     } else {

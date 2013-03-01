@@ -65,8 +65,8 @@ static const char* CS_FRAGMENT =
         "  gl_FragColor = texture2D(u_Texture, v_TexCoord);"
         "}";
 
-ContextSwitchRenderer::ContextSwitchRenderer(ANativeWindow* window, int workload) :
-        Renderer(window, workload), mContexts(NULL) {
+ContextSwitchRenderer::ContextSwitchRenderer(ANativeWindow* window, bool offscreen, int workload) :
+        Renderer(window, offscreen, workload), mContexts(NULL) {
 }
 
 bool ContextSwitchRenderer::setUp() {
@@ -83,13 +83,15 @@ bool ContextSwitchRenderer::setUp() {
 
     mContexts = new EGLContext[mWorkload];
     mTextureIds = new GLuint[mWorkload];
-    mFboIds = new GLuint[mWorkload];
-    mRboIds = new GLuint[mWorkload];
-    mCboIds = new GLuint[mWorkload];
-    mPrograms = new GLuint[mWorkload];
+    mProgramIds = new GLuint[mWorkload];
     mTextureUniformHandles = new GLuint[mWorkload];
     mPositionHandles = new GLuint[mWorkload];
     mTexCoordHandles = new GLuint[mWorkload];
+    if (mOffscreen) {
+        mFboIds = new GLuint[mWorkload];
+        mRboIds = new GLuint[mWorkload];
+        mCboIds = new GLuint[mWorkload];
+    }
     for (int i = 0; i < mWorkload; i++) {
         mContexts[i] = eglCreateContext(mEglDisplay, mGlConfig, EGL_NO_CONTEXT, contextAttribs);
         if (EGL_NO_CONTEXT == mContexts[i] || EGL_SUCCESS != eglGetError()) {
@@ -101,26 +103,28 @@ bool ContextSwitchRenderer::setUp() {
             return false;
         }
 
-        // Setup FBOs.
-        if (!Renderer::createFBO(mFboIds[i], mRboIds[i], mCboIds[i], w, h)) {
-            return false;
+        if (mOffscreen) {
+            // Setup FBOs.
+            if (!Renderer::createFBO(mFboIds[i], mRboIds[i], mCboIds[i], w, h)) {
+                return false;
+            }
         }
 
         // Setup textures.
-        mTextureIds[i] = GLUtils::genRandTex(width, height);
+        mTextureIds[i] = GLUtils::genRandTex(2, 2);
         if (mTextureIds[i] == 0) {
             return false;
         }
 
         // Create program.
-        mPrograms[i] = GLUtils::createProgram(&CS_VERTEX, &CS_FRAGMENT);
-        if (mPrograms[i] == 0) {
+        mProgramIds[i] = GLUtils::createProgram(&CS_VERTEX, &CS_FRAGMENT);
+        if (mProgramIds[i] == 0) {
             return false;
         }
         // Bind attributes.
-        mTextureUniformHandles[i] = glGetUniformLocation(mPrograms[i], "u_Texture");
-        mPositionHandles[i] = glGetAttribLocation(mPrograms[i], "a_Position");
-        mTexCoordHandles[i] = glGetAttribLocation(mPrograms[i], "a_TexCoord");
+        mTextureUniformHandles[i] = glGetUniformLocation(mProgramIds[i], "u_Texture");
+        mPositionHandles[i] = glGetAttribLocation(mProgramIds[i], "a_Position");
+        mTexCoordHandles[i] = glGetAttribLocation(mProgramIds[i], "a_TexCoord");
     }
 
     GLuint err = glGetError();
@@ -139,17 +143,19 @@ bool ContextSwitchRenderer::tearDown() {
         }
         delete[] mContexts;
     }
-    if (mFboIds) {
-        glDeleteFramebuffers(mWorkload, mFboIds);
-        delete[] mFboIds;
-    }
-    if (mRboIds) {
-        glDeleteRenderbuffers(mWorkload, mRboIds);
-        delete[] mRboIds;
-    }
-    if (mCboIds) {
-        glDeleteRenderbuffers(mWorkload, mCboIds);
-        delete[] mCboIds;
+    if (mOffscreen) {
+        if (mFboIds) {
+            glDeleteFramebuffers(mWorkload, mFboIds);
+            delete[] mFboIds;
+        }
+        if (mRboIds) {
+            glDeleteRenderbuffers(mWorkload, mRboIds);
+            delete[] mRboIds;
+        }
+        if (mCboIds) {
+            glDeleteRenderbuffers(mWorkload, mCboIds);
+            delete[] mCboIds;
+        }
     }
     if (mTextureIds) {
         glDeleteTextures(mWorkload, mTextureIds);
@@ -161,22 +167,25 @@ bool ContextSwitchRenderer::tearDown() {
     return true;
 }
 
-bool ContextSwitchRenderer::draw(bool offscreen) {
+bool ContextSwitchRenderer::draw() {
     for (int i = 0; i < mWorkload; i++) {
         if (!eglMakeCurrent(mEglDisplay, mEglSurface, mEglSurface, mContexts[i])
                 || EGL_SUCCESS != eglGetError()) {
             return false;
         }
-        glBindFramebuffer(GL_FRAMEBUFFER, (offscreen) ? mFboIds[i] : 0);
-        if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
-            return false;
+
+        if (mOffscreen) {
+            glBindFramebuffer(GL_FRAMEBUFFER, mFboIds[i]);
+            if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
+                return false;
+            }
         }
 
         glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
         glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
 
-        glUseProgram(mPrograms[i]);
-        glActiveTexture (GL_TEXTURE0);
+        glUseProgram(mProgramIds[i]);
+        glActiveTexture(GL_TEXTURE0);
         // Bind the texture to this unit.
         glBindTexture(GL_TEXTURE_2D, mTextureIds[i]);
 
@@ -199,5 +208,5 @@ bool ContextSwitchRenderer::draw(bool offscreen) {
         return false;
     }
 
-    return (offscreen) ? true : eglSwapBuffers(mEglDisplay, mEglSurface);
+    return (mOffscreen) ? true : eglSwapBuffers(mEglDisplay, mEglSurface);
 }

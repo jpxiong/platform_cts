@@ -95,9 +95,9 @@ static const char* FP_FRAGMENT =
         "  gl_FragColor = (diffuse * texture2D(u_Texture, v_TexCoordinate));\n"
         "}";
 
-FullPipelineRenderer::FullPipelineRenderer(ANativeWindow* window, int workload) :
-        Renderer(window, workload), mProgram(NULL), mSceneGraph(NULL), mModelMatrix(NULL),
-        mViewMatrix(NULL), mProjectionMatrix(NULL), mMesh(NULL) {
+FullPipelineRenderer::FullPipelineRenderer(ANativeWindow* window, bool offscreen, int workload) :
+        Renderer(window, offscreen, workload), mProgram(NULL), mSceneGraph(NULL),
+        mModelMatrix(NULL), mViewMatrix(NULL), mProjectionMatrix(NULL), mMesh(NULL) {
 }
 
 bool FullPipelineRenderer::setUp() {
@@ -105,10 +105,10 @@ bool FullPipelineRenderer::setUp() {
         return false;
     }
 
-    GLuint programId = GLUtils::createProgram(&FP_VERTEX, &FP_FRAGMENT);
-    if (programId == 0)
+    mProgramId = GLUtils::createProgram(&FP_VERTEX, &FP_FRAGMENT);
+    if (mProgramId == 0)
         return false;
-    mProgram = new FullPipelineProgram(programId);
+    mProgram = new FullPipelineProgram(mProgramId);
 
     mModelMatrix = new Matrix();
 
@@ -191,14 +191,16 @@ bool FullPipelineRenderer::tearDown() {
     return true;
 }
 
-bool FullPipelineRenderer::draw(bool offscreen) {
-    glBindFramebuffer(GL_FRAMEBUFFER, (offscreen) ? mFboId : 0);
+bool FullPipelineRenderer::draw() {
+    if (mOffscreen) {
+        glBindFramebuffer(GL_FRAMEBUFFER, mFboId);
+    }
     // Set the background clear color to black.
     glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
     // Use culling to remove back faces.
-    glEnable (GL_CULL_FACE);
+    glEnable(GL_CULL_FACE);
     // Use depth testing.
-    glEnable (GL_DEPTH_TEST);
+    glEnable(GL_DEPTH_TEST);
     glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
     mModelMatrix->identity();
     mSceneGraph->draw(*mProgram, *mModelMatrix, *mViewMatrix, *mProjectionMatrix);
@@ -209,7 +211,7 @@ bool FullPipelineRenderer::draw(bool offscreen) {
         return false;
     }
 
-    if (offscreen) {
+    if (mOffscreen) {
         glFinish();
         return true;
     } else {
