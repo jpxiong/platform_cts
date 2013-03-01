@@ -20,6 +20,7 @@ import android.webkit.cts.WebViewOnUiThread.WaitForProgressClient;
 
 // A chrome client for listening webview chrome events.
 class ChromeClient extends WaitForProgressClient {
+
     private boolean mIsMessageLevelAvailable;
     private ConsoleMessage.MessageLevel mMessageLevel;
 
@@ -32,7 +33,8 @@ class ChromeClient extends WaitForProgressClient {
         mMessageLevel = message.messageLevel();
         mIsMessageLevelAvailable = true;
         notify();
-        return true;
+        // return false for default handling; i.e. printing the message.
+        return false;
     }
 
     public synchronized ConsoleMessage.MessageLevel getMessageLevel(int timeout) {
