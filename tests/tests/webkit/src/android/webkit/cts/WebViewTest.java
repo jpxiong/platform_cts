@@ -1418,9 +1418,31 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
     }
 
     @UiThreadTest
-    public void testClearSslPreferences() {
-        // FIXME: Implement this. See http://b/5378046.
-        mWebView.clearSslPreferences();
+    public void testClearSslPreferences() throws Throwable {
+        // Load the first page. We expect a call to
+        // WebViewClient.onReceivedSslError().
+        final SslErrorWebViewClient webViewClient = new SslErrorWebViewClient();
+        startWebServer(true);
+        final String url = mWebServer.getAssetUrl(TestHtmlConstants.HELLO_WORLD_URL);
+        mOnUiThread.setWebViewClient(webViewClient);
+        mOnUiThread.clearSslPreferences();
+        mOnUiThread.loadUrlAndWaitForCompletion(url);
+        assertTrue(webViewClient.wasOnReceivedSslErrorCalled());
+
+        // Load the page again. We expect another call to
+        // WebViewClient.onReceivedSslError() since we cleared sslpreferences.
+        mOnUiThread.clearSslPreferences();
+        webViewClient.resetWasOnReceivedSslErrorCalled();
+        mOnUiThread.loadUrlAndWaitForCompletion(url);
+        assertTrue(webViewClient.wasOnReceivedSslErrorCalled());
+        assertEquals(url, webViewClient.errorUrl());
+
+        // Load the page once again, without clearing the sslpreferences.
+        // Make sure we do not get the callback.
+        webViewClient.resetWasOnReceivedSslErrorCalled();
+        mOnUiThread.loadUrlAndWaitForCompletion(url);
+        assertFalse(webViewClient.wasOnReceivedSslErrorCalled());
+        assertEquals(TestHtmlConstants.HELLO_WORLD_TITLE, mOnUiThread.getTitle());
     }
 
     public void testOnReceivedSslError() throws Throwable {
@@ -1912,6 +1934,7 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
     // Note that this class is not thread-safe.
     final class SslErrorWebViewClient extends WaitForLoadedClient {
         private boolean mWasOnReceivedSslErrorCalled;
+        private String mErrorUrl;
 
         public SslErrorWebViewClient() {
             super(mOnUiThread);
@@ -1919,6 +1942,7 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
         @Override
         public void onReceivedSslError(WebView view, SslErrorHandler handler, SslError error) {
             mWasOnReceivedSslErrorCalled = true;
+            mErrorUrl = error.getUrl();
             handler.proceed();
         }
         public void resetWasOnReceivedSslErrorCalled() {
@@ -1926,6 +1950,9 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
         }
         public boolean wasOnReceivedSslErrorCalled() {
             return mWasOnReceivedSslErrorCalled;
+        }
+        public String errorUrl() {
+            return mErrorUrl;
         }
     }
 }
