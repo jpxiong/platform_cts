@@ -90,6 +90,10 @@ public class ActivityManagerMemoryClassTest
                 expectedMinimumMemory = isXLarge ? 128 : 64;
                 break;
 
+            case DisplayMetrics.DENSITY_XXHIGH:
+                expectedMinimumMemory = isXLarge ? 256 : 128;
+                break;
+
             default:
                 throw new IllegalArgumentException("No memory requirement specified "
                         + " for screen density " + screenDensity);
