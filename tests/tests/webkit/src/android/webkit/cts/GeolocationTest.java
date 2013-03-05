@@ -63,7 +63,7 @@ public class GeolocationTest extends ActivityInstrumentationTestCase2<WebViewStu
     private static final String URL_2 = "http://www.example.org";
 
     private static final String JS_INTERFACE_NAME = "Android";
-    private static final int POLLING_TIMEOUT = 2000;
+    private static final int POLLING_TIMEOUT = 60 * 1000;
     private static final String PROVIDER_NAME = "WebKitGeolocationTestLocationProvider";
 
     // static HTML page always injected instead of the url loaded
