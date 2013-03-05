@@ -20,6 +20,10 @@ import android.content.ContentProvider;
 import android.content.ContentValues;
 import android.database.Cursor;
 import android.net.Uri;
+import android.os.ParcelFileDescriptor;
+
+import java.io.File;
+import java.io.FileNotFoundException;
 
 /**
  * Empty content provider, all permissions are enforced in manifest
@@ -57,5 +61,11 @@ public class PermissionContentProviderPathRestricting extends ContentProvider {
     public int update(Uri uri, ContentValues values, String selection,
             String[] selectionArgs) {
         return 0;
+    }
+
+    @Override
+    public ParcelFileDescriptor openFile(Uri uri, String mode) throws FileNotFoundException {
+        return ParcelFileDescriptor.open(
+                new File("/dev/null"), ParcelFileDescriptor.MODE_READ_ONLY);
     }
 }
