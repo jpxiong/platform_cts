@@ -481,7 +481,7 @@ public class EncodeDecodeTest extends AndroidTestCase {
                 int inputBufIndex = encoder.dequeueInputBuffer(TIMEOUT_USEC);
                 if (VERBOSE) Log.d(TAG, "inputBufIndex=" + inputBufIndex);
                 if (inputBufIndex >= 0) {
-                    long ptsUsec = generateIndex * 1000000 / FRAME_RATE;
+                    long ptsUsec = computePresentationTime(generateIndex);
                     if (generateIndex == NUM_FRAMES) {
                         // Send an empty frame with the end-of-stream flag set.  If we set EOS
                         // on a frame with data, that frame data will be ignored, and the
@@ -624,6 +624,8 @@ public class EncodeDecodeTest extends AndroidTestCase {
                             if (VERBOSE) Log.d(TAG, "got empty frame");
                         } else {
                             if (VERBOSE) Log.d(TAG, "decoded, checking frame " + checkIndex);
+                            assertEquals(computePresentationTime(checkIndex),
+                                    info.presentationTimeUs);
                             if (!checkFrame(checkIndex++, decoderColorFormat, outputFrame)) {
                                 badFrames++;
                             }
@@ -652,6 +654,8 @@ public class EncodeDecodeTest extends AndroidTestCase {
                         decoder.releaseOutputBuffer(decoderStatus, doRender);
                         if (doRender) {
                             if (VERBOSE) Log.d(TAG, "awaiting frame " + checkIndex);
+                            assertEquals(computePresentationTime(checkIndex),
+                                    info.presentationTimeUs);
                             outputSurface.awaitNewImage();
                             outputSurface.drawImage();
                             if (!checkSurfaceFrame(checkIndex++)) {
@@ -724,7 +728,6 @@ public class EncodeDecodeTest extends AndroidTestCase {
             // If we're not done submitting frames, generate a new one and submit it.  The
             // eglSwapBuffers call will block if the input is full.
             if (!inputDone) {
-                long ptsUsec = generateIndex * 1000000 / FRAME_RATE;
                 if (generateIndex == NUM_FRAMES) {
                     // Send an empty frame with the end-of-stream flag set.
                     if (VERBOSE) Log.d(TAG, "signaling input EOS");
@@ -733,7 +736,7 @@ public class EncodeDecodeTest extends AndroidTestCase {
                 } else {
                     inputSurface.makeCurrent();
                     generateSurfaceFrame(generateIndex);
-                    // TODO: provide PTS time stamp to EGL
+                    inputSurface.setPresentationTime(computePresentationTime(generateIndex));
                     if (VERBOSE) Log.d(TAG, "inputSurface swapBuffers");
                     inputSurface.swapBuffers();
                 }
@@ -780,6 +783,8 @@ public class EncodeDecodeTest extends AndroidTestCase {
                     outputSurface.makeCurrent();
                     decoder.releaseOutputBuffer(decoderStatus, doRender);
                     if (doRender) {
+                        assertEquals(computePresentationTime(checkIndex),
+                                info.presentationTimeUs);
                         if (VERBOSE) Log.d(TAG, "awaiting frame " + checkIndex);
                         outputSurface.awaitNewImage();
                         outputSurface.drawImage();
@@ -1097,5 +1102,12 @@ public class EncodeDecodeTest extends AndroidTestCase {
         } else {
             return actual > (expected - MAX_DELTA) && actual < (expected + MAX_DELTA);
         }
+    }
+
+    /**
+     * Generates the presentation time for frame N.
+     */
+    private static long computePresentationTime(int frameIndex) {
+        return 132 + frameIndex * 1000000 / FRAME_RATE;
     }
 }
