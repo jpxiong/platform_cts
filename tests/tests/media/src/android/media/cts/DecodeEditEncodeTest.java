@@ -290,7 +290,6 @@ public class DecodeEditEncodeTest extends AndroidTestCase {
             // If we're not done submitting frames, generate a new one and submit it.  The
             // eglSwapBuffers call will block if the input is full.
             if (!inputDone) {
-                long ptsUsec = generateIndex * 1000000 / FRAME_RATE;
                 if (generateIndex == NUM_FRAMES) {
                     // Send an empty frame with the end-of-stream flag set.
                     if (VERBOSE) Log.d(TAG, "signaling input EOS");
@@ -304,7 +303,7 @@ public class DecodeEditEncodeTest extends AndroidTestCase {
                     inputDone = true;
                 } else {
                     generateSurfaceFrame(generateIndex);
-                    // TODO: provide PTS time stamp to EGL
+                    inputSurface.setPresentationTime(computePresentationTime(generateIndex));
                     if (VERBOSE) Log.d(TAG, "inputSurface swapBuffers");
                     inputSurface.swapBuffers();
                 }
@@ -349,7 +348,7 @@ public class DecodeEditEncodeTest extends AndroidTestCase {
                         encodedData.position(info.offset);
                         encodedData.limit(info.offset + info.size);
 
-                        output.addChunk(encodedData, info.flags);
+                        output.addChunk(encodedData, info.flags, info.presentationTimeUs);
                         outputCount++;
                     }
 
@@ -500,9 +499,11 @@ public class DecodeEditEncodeTest extends AndroidTestCase {
                         // the BUFFER_FLAG_CODEC_CONFIG flag set.
                         ByteBuffer inputBuf = decoderInputBuffers[inputBufIndex];
                         inputBuf.clear();
-                        int flags = inputData.getChunk(inputChunk, inputBuf);
+                        inputData.getChunkData(inputChunk, inputBuf);
+                        int flags = inputData.getChunkFlags(inputChunk);
+                        long time = inputData.getChunkTime(inputChunk);
                         decoder.queueInputBuffer(inputBufIndex, 0, inputBuf.position(),
-                                0L, flags);
+                                time, flags);
                         if (VERBOSE) {
                             Log.d(TAG, "submitted frame " + inputChunk + " to dec, size=" +
                                     inputBuf.position() + " flags=" + flags);
@@ -544,7 +545,7 @@ public class DecodeEditEncodeTest extends AndroidTestCase {
                         encodedData.position(info.offset);
                         encodedData.limit(info.offset + info.size);
 
-                        outputData.addChunk(encodedData, info.flags);
+                        outputData.addChunk(encodedData, info.flags, info.presentationTimeUs);
                         outputCount++;
 
                         if (VERBOSE) Log.d(TAG, "encoder output " + info.size + " bytes");
@@ -595,6 +596,7 @@ public class DecodeEditEncodeTest extends AndroidTestCase {
                             outputSurface.drawImage();
 
                             // Send it to the encoder.
+                            inputSurface.setPresentationTime(info.presentationTimeUs);
                             if (VERBOSE) Log.d(TAG, "swapBuffers");
                             inputSurface.swapBuffers();
                         }
@@ -686,9 +688,11 @@ public class DecodeEditEncodeTest extends AndroidTestCase {
                         // the BUFFER_FLAG_CODEC_CONFIG flag set.
                         ByteBuffer inputBuf = decoderInputBuffers[inputBufIndex];
                         inputBuf.clear();
-                        int flags = inputData.getChunk(inputChunk, inputBuf);
+                        inputData.getChunkData(inputChunk, inputBuf);
+                        int flags = inputData.getChunkFlags(inputChunk);
+                        long time = inputData.getChunkTime(inputChunk);
                         decoder.queueInputBuffer(inputBufIndex, 0, inputBuf.position(),
-                                0L, flags);
+                                time, flags);
                         if (VERBOSE) {
                             Log.d(TAG, "submitted frame " + inputChunk + " to dec, size=" +
                                     inputBuf.position() + " flags=" + flags);
@@ -732,6 +736,8 @@ public class DecodeEditEncodeTest extends AndroidTestCase {
                     decoder.releaseOutputBuffer(decoderStatus, doRender);
                     if (doRender) {
                         if (VERBOSE) Log.d(TAG, "awaiting frame " + checkIndex);
+                        assertEquals(computePresentationTime(checkIndex),
+                                info.presentationTimeUs);
                         surface.awaitNewImage();
                         surface.drawImage();
                         if (!checkSurfaceFrame(checkIndex++)) {
@@ -807,6 +813,13 @@ public class DecodeEditEncodeTest extends AndroidTestCase {
         }
     }
 
+    /**
+     * Generates the presentation time for frame N.
+     */
+    private static long computePresentationTime(int frameIndex) {
+        return 123 + frameIndex * 1000000 / FRAME_RATE;
+    }
+
 
     /**
      * The elementary stream coming out of the "video/avc" encoder needs to be fed back into
@@ -818,6 +831,7 @@ public class DecodeEditEncodeTest extends AndroidTestCase {
         private MediaFormat mMediaFormat;
         private ArrayList<byte[]> mChunks = new ArrayList<byte[]>();
         private ArrayList<Integer> mFlags = new ArrayList<Integer>();
+        private ArrayList<Long> mTimes = new ArrayList<Long>();
 
         /**
          * Sets the MediaFormat, for the benefit of a future decoder.
@@ -836,11 +850,12 @@ public class DecodeEditEncodeTest extends AndroidTestCase {
         /**
          * Adds a new chunk.  Advances buf.position to buf.limit.
          */
-        public void addChunk(ByteBuffer buf, int flags) {
+        public void addChunk(ByteBuffer buf, int flags, long time) {
             byte[] data = new byte[buf.remaining()];
             buf.get(data);
             mChunks.add(data);
             mFlags.add(flags);
+            mTimes.add(time);
         }
 
         /**
@@ -851,12 +866,25 @@ public class DecodeEditEncodeTest extends AndroidTestCase {
         }
 
         /**
-         * Copies chunk N into "dest", and returns the BufferInfo flags.  Advances dest.position.
+         * Copies the data from chunk N into "dest".  Advances dest.position.
          */
-        public int getChunk(int chunk, ByteBuffer dest) {
+        public void getChunkData(int chunk, ByteBuffer dest) {
             byte[] data = mChunks.get(chunk);
             dest.put(data);
+        }
+
+        /**
+         * Returns the flags associated with chunk N.
+         */
+        public int getChunkFlags(int chunk) {
             return mFlags.get(chunk);
+        }
+
+        /**
+         * Returns the timestamp associated with chunk N.
+         */
+        public long getChunkTime(int chunk) {
+            return mTimes.get(chunk);
         }
 
         /**
