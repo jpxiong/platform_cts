@@ -320,22 +320,38 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
         assertEquals(redirectUrl, mWebView.getOriginalUrl());
     }
 
-    @UiThreadTest
     public void testStopLoading() throws Exception {
-        assertNull(mWebView.getUrl());
-        assertEquals(INITIAL_PROGRESS, mWebView.getProgress());
+        assertEquals(INITIAL_PROGRESS, mOnUiThread.getProgress());
 
         startWebServer(false);
-        String url = mWebServer.getDelayedAssetUrl(TestHtmlConstants.HELLO_WORLD_URL);
-        mWebView.loadUrl(url);
-        mWebView.stopLoading();
-        new PollingCheck() {
-            @Override
-            protected boolean check() {
-                return 100 == mWebView.getProgress();
+        String url = mWebServer.getDelayedAssetUrl(TestHtmlConstants.STOP_LOADING_URL);
+
+        class JsInterface {
+            private boolean mPageLoaded;
+
+            @JavascriptInterface
+            public synchronized void pageLoaded() {
+                mPageLoaded = true;
+                notify();
             }
-        }.run();
-        assertNull(mWebView.getUrl());
+            public synchronized boolean getPageLoaded() {
+                return mPageLoaded;
+            }
+        }
+
+        JsInterface jsInterface = new JsInterface();
+
+        mOnUiThread.getSettings().setJavaScriptEnabled(true);
+        mOnUiThread.addJavascriptInterface(jsInterface, "javabridge");
+        mOnUiThread.loadUrl(url);
+        mOnUiThread.stopLoading();
+
+        // We wait to see that the onload callback in the HTML is not fired.
+        synchronized (jsInterface) {
+            jsInterface.wait(3000);
+        }
+
+        assertFalse(jsInterface.getPageLoaded());
     }
 
     @UiThreadTest

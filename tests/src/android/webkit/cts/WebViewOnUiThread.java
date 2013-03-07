@@ -341,6 +341,24 @@ public class WebViewOnUiThread {
         });
     }
 
+    public void loadUrl(final String url) {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                mWebView.loadUrl(url);
+            }
+        });
+    }
+
+    public void stopLoading() {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                mWebView.stopLoading();
+            }
+        });
+    }
+
     public void loadDataAndWaitForCompletion(final String data,
             final String mimeType, final String encoding) {
         callAndWait(new Runnable() {
