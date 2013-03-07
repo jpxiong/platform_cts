@@ -87,36 +87,45 @@ public class DateUtilsTest extends AndroidTestCase {
         assertEquals("PM", DateUtils.getAMPMString(Calendar.PM));
     }
 
-
-    public void testGetSpanString() {
+    public void test_getRelativeTimeSpanString() {
         if (!LocaleUtils.isCurrentLocale(mContext, Locale.US)) {
             return;
         }
         assertEquals("0 minutes ago",
-                DateUtils.getRelativeTimeSpanString(mBaseTime - MIN_DURATION).toString());
+                DateUtils.getRelativeTimeSpanString(mBaseTime - MIN_DURATION));
         assertEquals("in 0 minutes",
-                DateUtils.getRelativeTimeSpanString(mBaseTime + MIN_DURATION).toString());
+                DateUtils.getRelativeTimeSpanString(mBaseTime + MIN_DURATION));
+
+        assertEquals("1 minute ago",
+                DateUtils.getRelativeTimeSpanString(0, 60000, DateUtils.MINUTE_IN_MILLIS));
+        assertEquals("in 1 minute",
+                DateUtils.getRelativeTimeSpanString(60000, 0, DateUtils.MINUTE_IN_MILLIS));
 
         assertEquals("42 minutes ago", DateUtils.getRelativeTimeSpanString(
-                mBaseTime - MINUTE_DURATION, mBaseTime, DateUtils.MINUTE_IN_MILLIS).toString());
+                mBaseTime - MINUTE_DURATION, mBaseTime, DateUtils.MINUTE_IN_MILLIS));
         assertEquals("in 42 minutes", DateUtils.getRelativeTimeSpanString(
-                mBaseTime + MINUTE_DURATION, mBaseTime, DateUtils.MINUTE_IN_MILLIS).toString());
+                mBaseTime + MINUTE_DURATION, mBaseTime, DateUtils.MINUTE_IN_MILLIS));
 
         assertEquals("2 hours ago", DateUtils.getRelativeTimeSpanString(mBaseTime - HOUR_DURATION,
-                mBaseTime, DateUtils.MINUTE_IN_MILLIS, DateUtils.FORMAT_NUMERIC_DATE).toString());
+                mBaseTime, DateUtils.MINUTE_IN_MILLIS, DateUtils.FORMAT_NUMERIC_DATE));
         assertEquals("in 2 hours", DateUtils.getRelativeTimeSpanString(mBaseTime + HOUR_DURATION,
-                mBaseTime, DateUtils.MINUTE_IN_MILLIS, DateUtils.FORMAT_NUMERIC_DATE).toString());
+                mBaseTime, DateUtils.MINUTE_IN_MILLIS, DateUtils.FORMAT_NUMERIC_DATE));
         assertEquals("in 42 mins", DateUtils.getRelativeTimeSpanString(mBaseTime + MINUTE_DURATION,
                 mBaseTime, DateUtils.MINUTE_IN_MILLIS,
-                DateUtils.FORMAT_ABBREV_RELATIVE).toString());
+                DateUtils.FORMAT_ABBREV_RELATIVE));
 
-        assertNotNull(DateUtils.getRelativeDateTimeString(mContext,
-                mBaseTime - DAY_DURATION, DateUtils.MINUTE_IN_MILLIS, DateUtils.DAY_IN_MILLIS,
-                DateUtils.FORMAT_NUMERIC_DATE).toString());
         assertNotNull(DateUtils.getRelativeTimeSpanString(mContext,
-                mBaseTime - DAY_DURATION, true).toString());
+                mBaseTime - DAY_DURATION, true));
         assertNotNull(DateUtils.getRelativeTimeSpanString(mContext,
-                mBaseTime - DAY_DURATION).toString());
+                mBaseTime - DAY_DURATION));
+    }
+
+    public void test_getRelativeDateTimeString() {
+      assertNotNull(DateUtils.getRelativeDateTimeString(mContext,
+                                                        mBaseTime - DAY_DURATION,
+                                                        DateUtils.MINUTE_IN_MILLIS,
+                                                        DateUtils.DAY_IN_MILLIS,
+                                                        DateUtils.FORMAT_NUMERIC_DATE));
     }
 
     public void test_formatElapsedTime() {
@@ -154,26 +163,26 @@ public class DateUtilsTest extends AndroidTestCase {
 
         assertEquals("Saturday, January 24, 2009", DateUtils.formatSameDayTime(
                 fixedTime + DAY_DURATION, fixedTime, java.text.DateFormat.FULL,
-                java.text.DateFormat.FULL).toString());
+                java.text.DateFormat.FULL));
         assertEquals("Jan 24, 2009", DateUtils.formatSameDayTime(fixedTime + DAY_DURATION,
-                fixedTime, java.text.DateFormat.DEFAULT, java.text.DateFormat.FULL).toString());
+                fixedTime, java.text.DateFormat.DEFAULT, java.text.DateFormat.FULL));
         assertEquals("January 24, 2009", DateUtils.formatSameDayTime(fixedTime + DAY_DURATION,
-                fixedTime, java.text.DateFormat.LONG, java.text.DateFormat.FULL).toString());
+                fixedTime, java.text.DateFormat.LONG, java.text.DateFormat.FULL));
         assertEquals("Jan 24, 2009", DateUtils.formatSameDayTime(fixedTime + DAY_DURATION,
-                fixedTime, java.text.DateFormat.MEDIUM, java.text.DateFormat.FULL).toString());
+                fixedTime, java.text.DateFormat.MEDIUM, java.text.DateFormat.FULL));
         assertEquals("1/24/09", DateUtils.formatSameDayTime(fixedTime + DAY_DURATION,
-                fixedTime, java.text.DateFormat.SHORT, java.text.DateFormat.FULL).toString());
+                fixedTime, java.text.DateFormat.SHORT, java.text.DateFormat.FULL));
 
         assertEquals("5:30:15 AM GMT", DateUtils.formatSameDayTime(fixedTime + HOUR_DURATION,
-                fixedTime, java.text.DateFormat.FULL, java.text.DateFormat.FULL).toString());
+                fixedTime, java.text.DateFormat.FULL, java.text.DateFormat.FULL));
         assertEquals("5:30:15 AM", DateUtils.formatSameDayTime(fixedTime + HOUR_DURATION,
-                fixedTime, java.text.DateFormat.FULL, java.text.DateFormat.DEFAULT).toString());
+                fixedTime, java.text.DateFormat.FULL, java.text.DateFormat.DEFAULT));
         assertEquals("5:30:15 AM GMT", DateUtils.formatSameDayTime(fixedTime + HOUR_DURATION,
-                fixedTime, java.text.DateFormat.FULL, java.text.DateFormat.LONG).toString());
+                fixedTime, java.text.DateFormat.FULL, java.text.DateFormat.LONG));
         assertEquals("5:30:15 AM", DateUtils.formatSameDayTime(fixedTime + HOUR_DURATION,
-                fixedTime, java.text.DateFormat.FULL, java.text.DateFormat.MEDIUM).toString());
+                fixedTime, java.text.DateFormat.FULL, java.text.DateFormat.MEDIUM));
         assertEquals("5:30 AM", DateUtils.formatSameDayTime(fixedTime + HOUR_DURATION,
-                fixedTime, java.text.DateFormat.FULL, java.text.DateFormat.SHORT).toString());
+                fixedTime, java.text.DateFormat.FULL, java.text.DateFormat.SHORT));
 
         long noonDuration = (8 * 60 + 30) * 60 * 1000 - 15 * 1000;
         long midnightDuration = (3 * 60 + 30) * 60 * 1000 + 15 * 1000;
