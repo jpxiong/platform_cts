@@ -111,7 +111,7 @@ bool ContextSwitchRenderer::setUp() {
         }
 
         // Setup textures.
-        mTextureIds[i] = GLUtils::genRandTex(2, 2);
+        mTextureIds[i] = GLUtils::genRandTex(64, 64);
         if (mTextureIds[i] == 0) {
             return false;
         }

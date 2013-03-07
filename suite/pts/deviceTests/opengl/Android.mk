@@ -12,6 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+# build only for linux
+ifeq ($(HOST_OS),linux)
+
 LOCAL_PATH:= $(call my-dir)
 include $(CLEAR_VARS)
 
@@ -33,3 +36,5 @@ LOCAL_SDK_VERSION := 16
 include $(BUILD_CTS_PACKAGE)
 
 include $(call all-makefiles-under,$(LOCAL_PATH))
+
+endif # linux

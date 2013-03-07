@@ -39,17 +39,17 @@ public class GLActivity extends Activity {
      */
     public final static String INTENT_EXTRA_OFFSCREEN = "offscreen";
     /**
-     * Holds the number of milliseconds to wait before timing out.
-     */
-    public final static String INTENT_EXTRA_TIMEOUT = "timeout";
-    /**
-     * The minimum number of frames per second the device must achieve to pass.
-     */
-    public final static String INTENT_EXTRA_MIN_FPS = "min_fps";
-    /**
      * The number of frames to render for each workload.
      */
     public final static String INTENT_EXTRA_NUM_FRAMES = "num_frames";
+    /**
+     * The number of iterations to run, the workload increases with each iteration.
+     */
+    public final static String INTENT_EXTRA_NUM_ITERATIONS = "num_iterations";
+    /**
+     * The number of milliseconds to wait before timing out.
+     */
+    public final static String INTENT_EXTRA_TIMEOUT = "timeout";
 
     private Worker runner;
     private volatile Exception mException;
@@ -57,12 +57,10 @@ public class GLActivity extends Activity {
 
     private Benchmark mBenchmark;
     private boolean mOffscreen;
-    private int mTimeout;
-    private int mMinFps;
     private int mNumFrames;
-    private volatile int mWorkload = 0;
-
-    public ArrayList<Double> fpsValues = new ArrayList<Double>();
+    private int mNumIterations;
+    private int mTimeout;
+    private double[] mFpsValues;
 
     @Override
     public void onCreate(Bundle data) {
@@ -71,15 +69,16 @@ public class GLActivity extends Activity {
         Intent intent = getIntent();
         mBenchmark = Benchmark.valueOf(intent.getStringExtra(INTENT_EXTRA_BENCHMARK_NAME));
         mOffscreen = intent.getBooleanExtra(INTENT_EXTRA_OFFSCREEN, false);
-        mTimeout = intent.getIntExtra(INTENT_EXTRA_TIMEOUT, 0);
-        mMinFps = intent.getIntExtra(INTENT_EXTRA_MIN_FPS, 0);
         mNumFrames = intent.getIntExtra(INTENT_EXTRA_NUM_FRAMES, 0);
+        mNumIterations = intent.getIntExtra(INTENT_EXTRA_NUM_ITERATIONS, 0);
+        mTimeout = intent.getIntExtra(INTENT_EXTRA_TIMEOUT, 0);
+        mFpsValues = new double[mNumIterations];
 
         Log.i(TAG, "Benchmark: " + mBenchmark);
         Log.i(TAG, "Offscreen: " + mOffscreen);
-        Log.i(TAG, "Time Out: " + mTimeout);
-        Log.i(TAG, "Min FPS: " + mMinFps);
         Log.i(TAG, "Num Frames: " + mNumFrames);
+        Log.i(TAG, "Num Iterations: " + mNumIterations);
+        Log.i(TAG, "Time Out: " + mTimeout);
 
         SurfaceView surfaceView = new SurfaceView(this);
         surfaceView.getHolder().addCallback(new SurfaceHolder.Callback() {
@@ -97,7 +96,7 @@ public class GLActivity extends Activity {
         setContentView(surfaceView);
     }
 
-    public int waitForCompletion() throws Exception {
+    public double[] waitForCompletion() throws Exception {
         // Creates, starts and waits for a worker to run the benchmark.
         runner = new Worker();
         runner.start();
@@ -105,7 +104,7 @@ public class GLActivity extends Activity {
         if (mException != null) {
             throw mException;
         }
-        return mWorkload;
+        return mFpsValues;
     }
 
     private static native void setupFullPipelineBenchmark(
@@ -127,7 +126,6 @@ public class GLActivity extends Activity {
      */
     private class Worker extends Thread {
 
-        private volatile boolean repeat = true;
         private WatchDog watchDog;
 
         @Override
@@ -136,43 +134,34 @@ public class GLActivity extends Activity {
             watchDog = new WatchDog(mTimeout);
             // Used to record the start and end time of the iteration.
             double[] times = new double[2];
-            while (repeat) {
+            boolean success = true;
+            for (int i = 0; i < mNumIterations && success; i++) {
                 // The workload to use for this iteration.
-                int wl = mWorkload + 1;
+                int workload = i + 1;
                 // Setup the benchmark.
                 switch (mBenchmark) {
                     case FullPipeline:
-                        setupFullPipelineBenchmark(mSurface, mOffscreen, wl);
+                        setupFullPipelineBenchmark(mSurface, mOffscreen, workload);
                         break;
                     case PixelOutput:
-                        setupPixelOutputBenchmark(mSurface, mOffscreen, wl);
+                        setupPixelOutputBenchmark(mSurface, mOffscreen, workload);
                         break;
                     case ShaderPerf:
-                        setupShaderPerfBenchmark(mSurface, mOffscreen, wl);
+                        setupShaderPerfBenchmark(mSurface, mOffscreen, workload);
                         break;
                     case ContextSwitch:
-                        setupContextSwitchBenchmark(mSurface, mOffscreen, wl);
+                        setupContextSwitchBenchmark(mSurface, mOffscreen, workload);
                         break;
                 }
                 watchDog.start();
-                boolean success = startBenchmark(mNumFrames, times);
+                success = startBenchmark(mNumFrames, times);
                 watchDog.stop();
                 // Start benchmark.
                 if (!success) {
                     mException = new Exception("Could not run benchmark");
-                    repeat = false;
                 } else {
                     // Calculate FPS.
-                    double totalTimeTaken = times[1] - times[0];
-                    double meanFps = mNumFrames * 1000.0f / totalTimeTaken;
-                    fpsValues.add(meanFps);
-                    if (meanFps >= mMinFps) {
-                        // Iteration passed, proceed to next one.
-                        mWorkload++;
-                    } else {
-                        // Iteration failed.
-                        repeat = false;
-                    }
+                    mFpsValues[i] = mNumFrames * 1000.0f / (times[1] - times[0]);
                 }
             }
         }
