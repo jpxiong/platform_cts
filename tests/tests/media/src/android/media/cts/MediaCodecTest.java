@@ -47,16 +47,16 @@ public class MediaCodecTest extends AndroidTestCase {
      * Tests:
      * <br> calling createInputSurface() before configure() throws exception
      * <br> calling createInputSurface() after start() throws exception
-     * <br> calling createInputSurface() with a non-AndroidOpaque color format throws exception
+     * <br> calling createInputSurface() with a non-Surface color format throws exception
      */
     public void testCreateInputSurfaceErrors() {
         MediaFormat format = createMediaFormat();
         MediaCodec encoder = null;
         Surface surface = null;
 
-        // Replace color format with something that isn't COLOR_FormatAndroidOpaque.
+        // Replace color format with something that isn't COLOR_FormatSurface.
         MediaCodecInfo codecInfo = selectCodec(MIME_TYPE);
-        int colorFormat = findNonAndroidOpaqueColorFormat(codecInfo, MIME_TYPE);
+        int colorFormat = findNonSurfaceColorFormat(codecInfo, MIME_TYPE);
         format.setInteger(MediaFormat.KEY_COLOR_FORMAT, colorFormat);
 
         try {
@@ -71,7 +71,7 @@ public class MediaCodecTest extends AndroidTestCase {
 
             try {
                 surface = encoder.createInputSurface();
-                fail("createInputSurface should require AndroidOpaque");
+                fail("createInputSurface should require COLOR_FormatSurface");
             } catch (IllegalStateException ise) {
                 // good
             }
@@ -228,7 +228,7 @@ public class MediaCodecTest extends AndroidTestCase {
     private static MediaFormat createMediaFormat() {
         MediaFormat format = MediaFormat.createVideoFormat(MIME_TYPE, WIDTH, HEIGHT);
         format.setInteger(MediaFormat.KEY_COLOR_FORMAT,
-                MediaCodecInfo.CodecCapabilities.COLOR_FormatAndroidOpaque);
+                MediaCodecInfo.CodecCapabilities.COLOR_FormatSurface);
         format.setInteger(MediaFormat.KEY_BIT_RATE, BIT_RATE);
         format.setInteger(MediaFormat.KEY_FRAME_RATE, FRAME_RATE);
         format.setInteger(MediaFormat.KEY_I_FRAME_INTERVAL, IFRAME_INTERVAL);
@@ -259,14 +259,14 @@ public class MediaCodecTest extends AndroidTestCase {
     }
 
     /**
-     * Returns a color format that is supported by the codec and isn't AndroidOpaque.  Throws
+     * Returns a color format that is supported by the codec and isn't COLOR_FormatSurface.  Throws
      * an exception if none found.
      */
-    private static int findNonAndroidOpaqueColorFormat(MediaCodecInfo codecInfo, String mimeType) {
+    private static int findNonSurfaceColorFormat(MediaCodecInfo codecInfo, String mimeType) {
         MediaCodecInfo.CodecCapabilities capabilities = codecInfo.getCapabilitiesForType(mimeType);
         for (int i = 0; i < capabilities.colorFormats.length; i++) {
             int colorFormat = capabilities.colorFormats[i];
-            if (colorFormat != MediaCodecInfo.CodecCapabilities.COLOR_FormatAndroidOpaque) {
+            if (colorFormat != MediaCodecInfo.CodecCapabilities.COLOR_FormatSurface) {
                 return colorFormat;
             }
         }
