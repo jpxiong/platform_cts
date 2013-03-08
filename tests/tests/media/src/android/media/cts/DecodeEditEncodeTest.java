@@ -202,7 +202,7 @@ public class DecodeEditEncodeTest extends AndroidTestCase {
             // Set some properties.  Failing to specify some of these can cause the MediaCodec
             // configure() call to throw an unhelpful exception.
             format.setInteger(MediaFormat.KEY_COLOR_FORMAT,
-                    MediaCodecInfo.CodecCapabilities.COLOR_FormatAndroidOpaque);
+                    MediaCodecInfo.CodecCapabilities.COLOR_FormatSurface);
             format.setInteger(MediaFormat.KEY_BIT_RATE, BIT_RATE);
             format.setInteger(MediaFormat.KEY_FRAME_RATE, FRAME_RATE);
             format.setInteger(MediaFormat.KEY_I_FRAME_INTERVAL, IFRAME_INTERVAL);
@@ -407,7 +407,7 @@ public class DecodeEditEncodeTest extends AndroidTestCase {
             // re-use the format used to generate the video, since we want it to be the same.)
             MediaFormat outputFormat = MediaFormat.createVideoFormat(MIME_TYPE, mWidth, mHeight);
             outputFormat.setInteger(MediaFormat.KEY_COLOR_FORMAT,
-                    MediaCodecInfo.CodecCapabilities.COLOR_FormatAndroidOpaque);
+                    MediaCodecInfo.CodecCapabilities.COLOR_FormatSurface);
             outputFormat.setInteger(MediaFormat.KEY_BIT_RATE,
                     inputFormat.getInteger(MediaFormat.KEY_BIT_RATE));
             outputFormat.setInteger(MediaFormat.KEY_FRAME_RATE,
