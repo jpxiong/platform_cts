@@ -290,7 +290,7 @@ public class EncodeDecodeTest extends AndroidTestCase {
             }
             if (VERBOSE) Log.d(TAG, "found codec: " + codecInfo.getName());
 
-            int colorFormat = MediaCodecInfo.CodecCapabilities.COLOR_FormatAndroidOpaque;
+            int colorFormat = MediaCodecInfo.CodecCapabilities.COLOR_FormatSurface;
 
             // We avoid the device-specific limitations on width and height by using values that
             // are multiples of 16, which all tested devices seem to be able to handle.
