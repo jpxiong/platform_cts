@@ -12,7 +12,9 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-#
+
+# build only for linux
+ifeq ($(HOST_OS),linux)
 
 LOCAL_PATH:= $(call my-dir)
 include $(CLEAR_VARS)
@@ -28,3 +30,5 @@ LOCAL_STATIC_LIBRARIES := libutils libcutils libgtest_host libgtest_main_host
 LOCAL_LDFLAGS:= -g -lrt -ldl -lstdc++ -lm -fno-exceptions
 LOCAL_MODULE:= pts_device_opengl_test
 include $(BUILD_HOST_EXECUTABLE)
+
+endif # linux
