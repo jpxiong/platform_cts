@@ -34,10 +34,11 @@ public class DateFormatTest extends AndroidTestCase {
 
     private Context mContext;
     private ContentResolver mContentResolver;
-    // Date: 12-18-2008 5:30AM
+
+    // Date: 2008-12-18 05:30
     private static final int YEAR_FROM_1900 = 108;
     private static final int YEAR = 2008;
-    private static final int MONTH = 11;
+    private static final int MONTH = Calendar.DECEMBER; // java.util.Calendar months are 0-based.
     private static final int DAY = 18;
     private static final int HOUR = 5;
     private static final int MINUTE = 30;
@@ -70,11 +71,49 @@ public class DateFormatTest extends AndroidTestCase {
     }
 
 
-    public void testDateFormat() {
+    public void test_is24HourFormat() {
         Settings.System.putString(mContentResolver, Settings.System.TIME_12_24, "24");
         assertTrue(DateFormat.is24HourFormat(mContext));
         Settings.System.putString(mContentResolver, Settings.System.TIME_12_24, "12");
         assertFalse(DateFormat.is24HourFormat(mContext));
+    }
+
+    public void test_format_M() {
+        Calendar c = new GregorianCalendar(2008, Calendar.DECEMBER, 18);
+        assertEquals("D", DateFormat.format("MMMMM", c));
+        assertEquals("December", DateFormat.format("MMMM", c));
+        assertEquals("Dec", DateFormat.format("MMM", c));
+        assertEquals("12", DateFormat.format("MM", c));
+        assertEquals("12", DateFormat.format("M", c));
+    }
+
+    public void test_format_L() {
+        // TODO: we can't test other locales with this API so we can't test 'L' properly!
+        Calendar c = new GregorianCalendar(2008, Calendar.DECEMBER, 18);
+        assertEquals("D", DateFormat.format("LLLLL", c));
+        assertEquals("December", DateFormat.format("LLLL", c));
+        assertEquals("Dec", DateFormat.format("LLL", c));
+        assertEquals("12", DateFormat.format("LL", c));
+        assertEquals("12", DateFormat.format("L", c));
+    }
+
+    public void test_format_E() {
+        Calendar c = new GregorianCalendar(2008, Calendar.DECEMBER, 18);
+        assertEquals("T", DateFormat.format("EEEEE", c));
+        assertEquals("Thursday", DateFormat.format("EEEE", c));
+        assertEquals("Thu", DateFormat.format("EEE", c));
+        assertEquals("Thu", DateFormat.format("EE", c));
+        assertEquals("Thu", DateFormat.format("E", c));
+    }
+
+    public void test_format_c() {
+        // TODO: we can't test other locales with this API, so we can't test 'c' properly!
+        Calendar c = new GregorianCalendar(2008, Calendar.DECEMBER, 18);
+        assertEquals("T", DateFormat.format("ccccc", c));
+        assertEquals("Thursday", DateFormat.format("cccc", c));
+        assertEquals("Thu", DateFormat.format("ccc", c));
+        assertEquals("Thu", DateFormat.format("cc", c));
+        assertEquals("Thu", DateFormat.format("c", c));
     }
 
     @SuppressWarnings("deprecation")
