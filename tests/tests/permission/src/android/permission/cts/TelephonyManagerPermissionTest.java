@@ -22,8 +22,8 @@ import android.test.AndroidTestCase;
 import android.test.suitebuilder.annotation.SmallTest;
 
 /**
-* Test the non-location-related functionality of TelephonyManager.
-*/
+ * Test the non-location-related functionality of TelephonyManager.
+ */
 public class TelephonyManagerPermissionTest extends AndroidTestCase {
 
     TelephonyManager mTelephonyManager = null;
@@ -37,8 +37,9 @@ public class TelephonyManagerPermissionTest extends AndroidTestCase {
 
     /**
      * Verify that TelephonyManager.getDeviceId requires Permission.
-     * <p>Requires Permission:
-     *   {@link android.Manifest.permission#READ_PHONE_STATE}.
+     * <p>
+     * Requires Permission:
+     * {@link android.Manifest.permission#READ_PHONE_STATE}.
      */
     @SmallTest
     public void testGetDeviceId() {
@@ -52,8 +53,9 @@ public class TelephonyManagerPermissionTest extends AndroidTestCase {
 
     /**
      * Verify that TelephonyManager.getLine1Number requires Permission.
-     * <p>Requires Permission:
-     *   {@link android.Manifest.permission#READ_PHONE_STATE}.
+     * <p>
+     * Requires Permission:
+     * {@link android.Manifest.permission#READ_PHONE_STATE}.
      */
     @SmallTest
     public void testGetLine1Number() {
@@ -67,8 +69,9 @@ public class TelephonyManagerPermissionTest extends AndroidTestCase {
 
     /**
      * Verify that TelephonyManager.getSimSerialNumber requires Permission.
-     * <p>Requires Permission:
-     *   {@link android.Manifest.permission#READ_PHONE_STATE}.
+     * <p>
+     * Requires Permission:
+     * {@link android.Manifest.permission#READ_PHONE_STATE}.
      */
     @SmallTest
     public void testGetSimSerialNumber() {
@@ -79,5 +82,36 @@ public class TelephonyManagerPermissionTest extends AndroidTestCase {
             // expected
         }
     }
-}
 
+    /**
+     * Verify that TelephonyManager.getSubscriberId requires Permission.
+     * <p>
+     * Requires Permission:
+     * {@link android.Manifest.permission#READ_PHONE_STATE}.
+     */
+    @SmallTest
+    public void testGetSubscriberId() {
+        try {
+            String sid = mTelephonyManager.getSubscriberId();
+            fail("Got subscriber id: " + sid);
+        } catch (SecurityException e) {
+            // expected
+        }
+    }
+
+    /**
+     * Verify that TelephonyManager.getVoiceMailNumber requires Permission.
+     * <p>
+     * Requires Permission:
+     * {@link android.Manifest.permission#READ_PHONE_STATE}.
+     */
+    @SmallTest
+    public void testVoiceMailNumber() {
+        try {
+            String vmnum = mTelephonyManager.getVoiceMailNumber();
+            fail("Got voicemail number: " + vmnum);
+        } catch (SecurityException e) {
+            // expected
+        }
+    }
+}
