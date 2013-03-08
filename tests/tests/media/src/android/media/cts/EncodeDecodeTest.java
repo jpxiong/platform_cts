@@ -622,7 +622,7 @@ public class EncodeDecodeTest extends AndroidTestCase {
                             if (VERBOSE) Log.d(TAG, "got empty frame");
                         } else {
                             if (VERBOSE) Log.d(TAG, "decoded, checking frame " + checkIndex);
-                            assertEquals(computePresentationTime(checkIndex),
+                            assertEquals("Wrong time stamp", computePresentationTime(checkIndex),
                                     info.presentationTimeUs);
                             if (!checkFrame(checkIndex++, decoderColorFormat, outputFrame)) {
                                 badFrames++;
@@ -652,7 +652,7 @@ public class EncodeDecodeTest extends AndroidTestCase {
                         decoder.releaseOutputBuffer(decoderStatus, doRender);
                         if (doRender) {
                             if (VERBOSE) Log.d(TAG, "awaiting frame " + checkIndex);
-                            assertEquals(computePresentationTime(checkIndex),
+                            assertEquals("Wrong time stamp", computePresentationTime(checkIndex),
                                     info.presentationTimeUs);
                             outputSurface.awaitNewImage();
                             outputSurface.drawImage();
@@ -781,7 +781,7 @@ public class EncodeDecodeTest extends AndroidTestCase {
                     outputSurface.makeCurrent();
                     decoder.releaseOutputBuffer(decoderStatus, doRender);
                     if (doRender) {
-                        assertEquals(computePresentationTime(checkIndex),
+                        assertEquals("Wrong time stamp", computePresentationTime(checkIndex),
                                 info.presentationTimeUs);
                         if (VERBOSE) Log.d(TAG, "awaiting frame " + checkIndex);
                         outputSurface.awaitNewImage();
@@ -993,20 +993,22 @@ public class EncodeDecodeTest extends AndroidTestCase {
                         (y/2) * HALF_WIDTH + (x/2)) & 0xff;
             }
 
-            boolean failed = false;
+            int expY, expU, expV;
             if (i == frameIndex % 8) {
-                failed = !isColorClose(testY, TEST_Y) ||
-                         !isColorClose(testU, TEST_U) ||
-                         !isColorClose(testV, TEST_V);
+                // colored rect
+                expY = TEST_Y;
+                expU = TEST_U;
+                expV = TEST_V;
             } else {
                 // should be our zeroed-out buffer
-                failed = !isColorClose(testY, 0) ||
-                         !isColorClose(testU, 0) ||
-                         !isColorClose(testV, 0);
+                expY = expU = expV = 0;
             }
-            if (failed) {
-                Log.w(TAG, "Bad frame " + frameIndex + " (rect=" + i + ": Y=" + testY +
-                        " U=" + testU + " V=" + testV + ")");
+            if (!isColorClose(testY, expY) ||
+                    !isColorClose(testU, expU) ||
+                    !isColorClose(testV, expV)) {
+                Log.w(TAG, "Bad frame " + frameIndex + " (rect=" + i + ": yuv=" + testY +
+                        "," + testU + "," + testV + " vs. expected " + expY + "," + expU +
+                        "," + expV + ")");
                 frameFailed = true;
             }
         }
@@ -1066,21 +1068,24 @@ public class EncodeDecodeTest extends AndroidTestCase {
             int b = pixelBuf.get(2) & 0xff;
             //Log.d(TAG, "GOT(" + frameIndex + "/" + i + "): r=" + r + " g=" + g + " b=" + b);
 
-            boolean failed = false;
+            int expR, expG, expB;
             if (i == frameIndex % 8) {
                 // colored rect
-                failed = !isColorClose(r, TEST_R1) ||
-                        !isColorClose(g, TEST_G1) ||
-                        !isColorClose(b, TEST_B1);
+                expR = TEST_R1;
+                expG = TEST_G1;
+                expB = TEST_B1;
             } else {
                 // zero background color
-                failed = !isColorClose(r, TEST_R0) ||
-                        !isColorClose(g, TEST_G0) ||
-                        !isColorClose(b, TEST_B0);
+                expR = TEST_R0;
+                expG = TEST_G0;
+                expB = TEST_B0;
             }
-            if (failed) {
-                Log.w(TAG, "Bad frame " + frameIndex + " (rect=" + i + ": r=" + r +
-                        " g=" + g + " b=" + b + ")");
+            if (!isColorClose(r, expR) ||
+                    !isColorClose(g, expG) ||
+                    !isColorClose(b, expB)) {
+                Log.w(TAG, "Bad frame " + frameIndex + " (rect=" + i + ": rgb=" + r +
+                        "," + g + "," + b + " vs. expected " + expR + "," + expG +
+                        "," + expB + ")");
                 frameFailed = true;
             }
         }
