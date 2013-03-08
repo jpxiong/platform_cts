@@ -38,7 +38,7 @@ public class GLBenchmark extends PtsActivityInstrumentationTestCase2<GLActivity>
      */
     @TimeoutReq(minutes = 20)
     public void testFullPipelineOffscreen() throws Exception {
-        runBenchmark(Benchmark.FullPipeline, true, 500, 8, 500000);
+        runBenchmark(Benchmark.FullPipeline, true, 500, 8, 1000000);
     }
 
     /**
@@ -46,21 +46,21 @@ public class GLBenchmark extends PtsActivityInstrumentationTestCase2<GLActivity>
      */
     @TimeoutReq(minutes = 20)
     public void testFullPipelineOnscreen() throws Exception {
-        runBenchmark(Benchmark.FullPipeline, false, 500, 8, 500000);
+        runBenchmark(Benchmark.FullPipeline, false, 500, 8, 1000000);
     }
 
     /**
      * Runs the pixel output test offscreen.
      */
     public void testPixelOutputOffscreen() throws Exception {
-        runBenchmark(Benchmark.PixelOutput, true, 500, 8, 500000);
+        runBenchmark(Benchmark.PixelOutput, true, 500, 8, 1000000);
     }
 
     /**
      * Runs the pixel output test onscreen.
      */
     public void testPixelOutputOnscreen() throws Exception {
-        runBenchmark(Benchmark.PixelOutput, false, 500, 8, 500000);
+        runBenchmark(Benchmark.PixelOutput, false, 500, 8, 1000000);
     }
 
     /**
@@ -68,7 +68,7 @@ public class GLBenchmark extends PtsActivityInstrumentationTestCase2<GLActivity>
      */
     public void testShaderPerfOffscreen() throws Exception {
         // TODO(stuartscott): Not yet implemented
-        // runBenchmark(Benchmark.ShaderPerf, true, 500, 8, 500000);
+        // runBenchmark(Benchmark.ShaderPerf, true, 500, 8, 1000000);
     }
 
     /**
@@ -76,38 +76,36 @@ public class GLBenchmark extends PtsActivityInstrumentationTestCase2<GLActivity>
      */
     public void testShaderPerfOnscreen() throws Exception {
         // TODO(stuartscott): Not yet implemented
-        // runBenchmark(Benchmark.ShaderPerf, false, 500, 8, 500000);
+        // runBenchmark(Benchmark.ShaderPerf, false, 500, 8, 1000000);
     }
 
     /**
      * Runs the context switch overhead test offscreen.
      */
     public void testContextSwitchOffscreen() throws Exception {
-        runBenchmark(Benchmark.ContextSwitch, true, 500, 8, 500000);
+        runBenchmark(Benchmark.ContextSwitch, true, 500, 8, 1000000);
     }
 
     /**
      * Runs the context switch overhead test onscreen.
      */
     public void testContextSwitchOnscreen() throws Exception {
-        runBenchmark(Benchmark.ContextSwitch, false, 500, 8, 500000);
+        runBenchmark(Benchmark.ContextSwitch, false, 500, 8, 1000000);
     }
 
     /**
      * Runs the specified test.
      *
      * @param benchmark An enum representing the benchmark to run.
-     * @param offscreen Whether to render the benchmark to an offscreen buffer rather than the screen.
+     * @param offscreen Whether to render to an offscreen framebuffer rather than the screen.
      * @param numFrames The number of frames to render.
      * @param numIterations The number of iterations to run, each iteration has a bigger workload.
      * @param timeout The milliseconds to wait for an iteration of the benchmark before timing out.
      * @throws Exception If the benchmark could not be run.
      */
-    private void runBenchmark(Benchmark benchmark,
-            boolean offscreen,
-            int numFrames,
-            int numIterations,
-            int timeout) throws Exception {
+    private void runBenchmark(
+            Benchmark benchmark, boolean offscreen, int numFrames, int numIterations, int timeout)
+            throws Exception {
         String benchmarkName = benchmark.toString();
         Intent intent = new Intent();
         intent.putExtra(GLActivity.INTENT_EXTRA_BENCHMARK_NAME, benchmarkName);
@@ -120,17 +118,18 @@ public class GLBenchmark extends PtsActivityInstrumentationTestCase2<GLActivity>
         setActivityIntent(intent);
         try {
             activity = getActivity();
-            double[] fpsValues = activity.waitForCompletion();
-            double score = 0;
-            for (double d : fpsValues) {
-                score += d;
-            }
-            getReportLog().printArray(
-                    "Fps Values", fpsValues, ResultType.HIGHER_BETTER, ResultUnit.FPS);
-            getReportLog().printSummary(
-                    "Score", score, ResultType.HIGHER_BETTER, ResultUnit.SCORE);
+            activity.spawnAndWaitForCompletion();
         } finally {
             if (activity != null) {
+                double[] fpsValues = activity.mFpsValues;
+                double score = 0;
+                for (double d : fpsValues) {
+                    score += d;
+                }
+                getReportLog().printArray(
+                        "Fps Values", fpsValues, ResultType.HIGHER_BETTER, ResultUnit.FPS);
+                getReportLog()
+                        .printSummary("Score", score, ResultType.HIGHER_BETTER, ResultUnit.SCORE);
                 activity.finish();
             }
         }

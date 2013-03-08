@@ -19,10 +19,10 @@ FullPipelineMesh::FullPipelineMesh(const Mesh* mesh) :
         MeshNode(mesh) {
 }
 
-void FullPipelineMesh::before(Program& program, Matrix& model, Matrix& view,
-        Matrix& projection) {
+void FullPipelineMesh::before(Program& program, Matrix& model, Matrix& view, Matrix& projection) {
     FullPipelineProgram& prog = (FullPipelineProgram&) program;
-    glActiveTexture (GL_TEXTURE0);
+
+    glActiveTexture(GL_TEXTURE0);
     // Bind the texture to this unit.
     glBindTexture(GL_TEXTURE_2D, mMesh->mTextureId);
     // Tell the texture uniform sampler to use this texture in the shader by binding to texture
@@ -32,12 +32,9 @@ void FullPipelineMesh::before(Program& program, Matrix& model, Matrix& view,
     glEnableVertexAttribArray(prog.mPositionHandle);
     glEnableVertexAttribArray(prog.mNormalHandle);
     glEnableVertexAttribArray(prog.mTexCoordHandle);
-    glVertexAttribPointer(prog.mPositionHandle, 3, GL_FLOAT, false, 0,
-            mMesh->mVertices);
-    glVertexAttribPointer(prog.mNormalHandle, 3, GL_FLOAT, false, 0,
-            mMesh->mNormals);
-    glVertexAttribPointer(prog.mTexCoordHandle, 2, GL_FLOAT, false, 0,
-            mMesh->mTexCoords);
+    glVertexAttribPointer(prog.mPositionHandle, 3, GL_FLOAT, false, 0, mMesh->mVertices);
+    glVertexAttribPointer(prog.mNormalHandle, 3, GL_FLOAT, false, 0, mMesh->mNormals);
+    glVertexAttribPointer(prog.mTexCoordHandle, 2, GL_FLOAT, false, 0, mMesh->mTexCoords);
 
     // This multiplies the view matrix by the model matrix, and stores the result in the MVP
     // matrix (which currently contains model * view).
@@ -54,12 +51,11 @@ void FullPipelineMesh::before(Program& program, Matrix& model, Matrix& view,
     glUniformMatrix4fv(prog.mMVPMatrixHandle, 1, false, prog.mMVPMatrix.mData);
 
     // Pass in the light position in eye space.
-    glUniform3f(prog.mLightPosHandle, prog.mLightPosInEyeSpace[0],
-            prog.mLightPosInEyeSpace[1], prog.mLightPosInEyeSpace[2]);
+    glUniform3f(prog.mLightPosHandle, prog.mLightPosInEyeSpace[0], prog.mLightPosInEyeSpace[1],
+            prog.mLightPosInEyeSpace[2]);
 
     glDrawArrays(GL_TRIANGLES, 0, mMesh->mNumVertices);
 }
 
-void FullPipelineMesh::after(Program& program, Matrix& model, Matrix& view,
-        Matrix& projection) {
+void FullPipelineMesh::after(Program& program, Matrix& model, Matrix& view, Matrix& projection) {
 }
