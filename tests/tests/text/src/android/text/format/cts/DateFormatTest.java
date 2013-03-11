@@ -24,6 +24,7 @@ import android.test.AndroidTestCase;
 import android.text.format.DateFormat;
 
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
@@ -168,22 +169,62 @@ public class DateFormatTest extends AndroidTestCase {
 
         calendar.setTimeInMillis(((long) Integer.MIN_VALUE + Integer.MIN_VALUE) * 1000L);
         assertEquals("Sun Nov 24 17:31:44 GMT+00:00 1833",
-                DateFormat.format("EEE MMM dd kk:mm:ss zzz yyyy", calendar));
+                DateFormat.format("EEE MMM dd HH:mm:ss zzz yyyy", calendar));
 
         calendar.setTimeInMillis(Integer.MIN_VALUE * 1000L);
         assertEquals("Fri Dec 13 20:45:52 GMT+00:00 1901",
-                DateFormat.format("EEE MMM dd kk:mm:ss zzz yyyy", calendar));
+                DateFormat.format("EEE MMM dd HH:mm:ss zzz yyyy", calendar));
 
         calendar.setTimeInMillis(0L);
         assertEquals("Thu Jan 01 00:00:00 GMT+00:00 1970",
-                DateFormat.format("EEE MMM dd kk:mm:ss zzz yyyy", calendar));
+                DateFormat.format("EEE MMM dd HH:mm:ss zzz yyyy", calendar));
 
         calendar.setTimeInMillis(Integer.MAX_VALUE * 1000L);
         assertEquals("Tue Jan 19 03:14:07 GMT+00:00 2038",
-                DateFormat.format("EEE MMM dd kk:mm:ss zzz yyyy", calendar));
+                DateFormat.format("EEE MMM dd HH:mm:ss zzz yyyy", calendar));
 
         calendar.setTimeInMillis((2L + Integer.MAX_VALUE + Integer.MAX_VALUE) * 1000L);
         assertEquals("Sun Feb 07 06:28:16 GMT+00:00 2106",
-                DateFormat.format("EEE MMM dd kk:mm:ss zzz yyyy", calendar));
+                DateFormat.format("EEE MMM dd HH:mm:ss zzz yyyy", calendar));
+    }
+
+    private static void checkFormat(String expected, String pattern, int hour) {
+        TimeZone utc = TimeZone.getTimeZone("UTC");
+
+        Calendar c = new GregorianCalendar(utc);
+        c.set(2013, Calendar.JANUARY, 1, hour, 00);
+
+        SimpleDateFormat sdf = new SimpleDateFormat(pattern);
+        sdf.setTimeZone(utc);
+
+        assertEquals(expected, DateFormat.format(pattern, c));
+        assertEquals(expected, sdf.format(c.getTime()));
+    }
+
+    public void test_bug_8359981() {
+        checkFormat("24", "k", 00);
+        checkFormat( "0", "K", 00);
+        checkFormat("12", "h", 00);
+        checkFormat( "0", "H", 00);
+
+        checkFormat( "1", "k", 01);
+        checkFormat( "1", "K", 01);
+        checkFormat( "1", "h", 01);
+        checkFormat( "1", "H", 01);
+
+        checkFormat("12", "k", 12);
+        checkFormat( "0", "K", 12);
+        checkFormat("12", "h", 12);
+        checkFormat("12", "H", 12);
+
+        checkFormat("13", "k", 13);
+        checkFormat( "1", "K", 13);
+        checkFormat( "1", "h", 13);
+        checkFormat("13", "H", 13);
+
+        checkFormat("24", "k", 24);
+        checkFormat( "0", "K", 24);
+        checkFormat("12", "h", 24);
+        checkFormat( "0", "H", 24);
     }
 }
