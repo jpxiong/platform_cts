@@ -284,4 +284,17 @@ public class DateUtilsTest extends AndroidTestCase {
         DateUtils.formatDateRange(null, formatter, millis, millis, flags, "UTC");
         return formatter.toString();
     }
+
+    public void test_bug_7548161() {
+        long now = System.currentTimeMillis();
+        long today = now;
+        long tomorrow = now + DateUtils.DAY_IN_MILLIS;
+        long yesterday = now - DateUtils.DAY_IN_MILLIS;
+        assertEquals("Tomorrow", DateUtils.getRelativeTimeSpanString(tomorrow, now,
+                                                                     DateUtils.DAY_IN_MILLIS, 0));
+        assertEquals("Yesterday", DateUtils.getRelativeTimeSpanString(yesterday, now,
+                                                                      DateUtils.DAY_IN_MILLIS, 0));
+        assertEquals("Today", DateUtils.getRelativeTimeSpanString(today, now,
+                                                                  DateUtils.DAY_IN_MILLIS, 0));
+    }
 }
