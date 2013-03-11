@@ -32,9 +32,15 @@ public class WatchDog implements Runnable {
     private Semaphore mSemaphore;
     private volatile boolean mStopRequested;
     private final long mTimeoutInMilliSecs;
+    private TimeoutCallback mCallback = null;
 
     public WatchDog(long timeoutInMilliSecs) {
         mTimeoutInMilliSecs = timeoutInMilliSecs;
+    }
+
+    public WatchDog(long timeoutInMilliSecs, TimeoutCallback callback) {
+        this(timeoutInMilliSecs);
+        mCallback = callback;
     }
 
     /** start watch-dog */
@@ -74,12 +80,24 @@ public class WatchDog implements Runnable {
     public void run() {
         while (!mStopRequested) {
             try {
-                Assert.assertTrue("Watchdog timed-out",
-                        mSemaphore.tryAcquire(mTimeoutInMilliSecs, TimeUnit.MILLISECONDS));
+                boolean success = mSemaphore.tryAcquire(mTimeoutInMilliSecs, TimeUnit.MILLISECONDS);
+                if (mCallback == null) {
+                    Assert.assertTrue("Watchdog timed-out", success);
+                } else if (!success) {
+                    mCallback.onTimeout();
+                }
             } catch (InterruptedException e) {
                 // this thread will not be interrupted,
                 // but if it happens, just check the exit condition.
             }
         }
+    }
+
+    /**
+     * Called by the Watchdog when it has timed out.
+     */
+    public interface TimeoutCallback {
+
+        public void onTimeout();
     }
 }

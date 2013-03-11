@@ -26,6 +26,7 @@ import com.android.pts.util.ResultType;
 import com.android.pts.util.ResultUnit;
 
 import java.util.ArrayList;
+import java.util.concurrent.Semaphore;
 
 public class GLActivity extends Activity {
 
@@ -54,13 +55,14 @@ public class GLActivity extends Activity {
     private Worker runner;
     private volatile Exception mException;
     private volatile Surface mSurface;
+    private Semaphore mSemaphore = new Semaphore(0);
 
     private Benchmark mBenchmark;
     private boolean mOffscreen;
     private int mNumFrames;
     private int mNumIterations;
     private int mTimeout;
-    private double[] mFpsValues;
+    public double[] mFpsValues;
 
     @Override
     public void onCreate(Bundle data) {
@@ -96,15 +98,26 @@ public class GLActivity extends Activity {
         setContentView(surfaceView);
     }
 
-    public double[] waitForCompletion() throws Exception {
-        // Creates, starts and waits for a worker to run the benchmark.
+    public void spawnAndWaitForCompletion() throws Exception {
+        // Spawns a worker to run the benchmark.
         runner = new Worker();
         runner.start();
-        runner.join();
+        // Wait for semiphore.
+        mSemaphore.acquire();
         if (mException != null) {
             throw mException;
         }
-        return mFpsValues;
+    }
+
+    private void complete() {
+        // Release semiphore.
+        mSemaphore.release();
+    }
+
+    private synchronized void setException(Exception e) {
+        if (mException == null) {
+            mException = e;
+        }
     }
 
     private static native void setupFullPipelineBenchmark(
@@ -124,17 +137,17 @@ public class GLActivity extends Activity {
     /**
      * This thread runs the benchmarks, freeing the UI thread.
      */
-    private class Worker extends Thread {
+    private class Worker extends Thread implements WatchDog.TimeoutCallback {
 
         private WatchDog watchDog;
+        private volatile boolean success = true;
 
         @Override
         public void run() {
             // Creates a watchdog to ensure a iteration doesn't exceed the timeout.
-            watchDog = new WatchDog(mTimeout);
+            watchDog = new WatchDog(mTimeout, this);
             // Used to record the start and end time of the iteration.
             double[] times = new double[2];
-            boolean success = true;
             for (int i = 0; i < mNumIterations && success; i++) {
                 // The workload to use for this iteration.
                 int workload = i + 1;
@@ -154,16 +167,23 @@ public class GLActivity extends Activity {
                         break;
                 }
                 watchDog.start();
+                // Start benchmark.
                 success = startBenchmark(mNumFrames, times);
                 watchDog.stop();
-                // Start benchmark.
+
                 if (!success) {
-                    mException = new Exception("Could not run benchmark");
+                    setException(new Exception("Benchmark failed to run"));
                 } else {
                     // Calculate FPS.
                     mFpsValues[i] = mNumFrames * 1000.0f / (times[1] - times[0]);
                 }
             }
+            complete();
+        }
+
+        public void onTimeout() {
+            setException(new Exception("Benchmark timed out"));
+            complete();
         }
 
     }
