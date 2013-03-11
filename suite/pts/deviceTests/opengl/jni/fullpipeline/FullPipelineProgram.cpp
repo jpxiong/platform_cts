@@ -21,8 +21,8 @@
 FullPipelineProgram::FullPipelineProgram(GLuint programId) :
         Program(programId) {
     mLightPosInModelSpace[0] = 0.0f;
-    mLightPosInModelSpace[1] = 5.0f;
-    mLightPosInModelSpace[2] = 5.0f;
+    mLightPosInModelSpace[1] = 2.0f;
+    mLightPosInModelSpace[2] = 2.0f;
     mLightPosInModelSpace[3] = 1.0f;
     mMVMatrixHandle = glGetUniformLocation(programId, "u_MVMatrix");
     mMVPMatrixHandle = glGetUniformLocation(programId, "u_MVPMatrix");
@@ -33,12 +33,10 @@ FullPipelineProgram::FullPipelineProgram(GLuint programId) :
     mTexCoordHandle = glGetAttribLocation(programId, "a_TexCoordinate");
 }
 
-void FullPipelineProgram::before(Matrix& model, Matrix& view,
-        Matrix& projection) {
+void FullPipelineProgram::before(Matrix& model, Matrix& view, Matrix& projection) {
     Program::before(model, view, projection);
     mLightModelMatrix.identity();
 
-    Matrix::multiplyVector(mLightPosInWorldSpace, mLightModelMatrix,
-            mLightPosInModelSpace);
+    Matrix::multiplyVector(mLightPosInWorldSpace, mLightModelMatrix, mLightPosInModelSpace);
     Matrix::multiplyVector(mLightPosInEyeSpace, view, mLightPosInWorldSpace);
 }
