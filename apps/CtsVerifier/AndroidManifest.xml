@@ -30,12 +30,14 @@
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.CHANGE_NETWORK_STATE" />
     <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
+    <uses-permission android:name="android.permission.FULLSCREEN" />
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.NFC" />
     <uses-feature android:name="android.hardware.camera.front"
                   android:required="false" />
     <uses-feature android:name="android.hardware.camera.autofocus"
                   android:required="false" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
@@ -339,6 +341,30 @@
             <meta-data android:name="test_category" android:value="@string/test_category_camera" />
 
             <meta-data android:name="test_required_features" android:value="android.hardware.camera.any"/>
+        </activity>
+
+        <activity
+            android:name=".camera.fov.PhotoCaptureActivity"
+            android:label="@string/camera_fov_calibration"
+            android:screenOrientation="landscape"
+            android:theme="@android:style/Theme.Holo.NoActionBar.Fullscreen" >
+            <intent-filter android:label="@string/camera_fov_calibration" >
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.cts.intent.category.MANUAL_TEST" />
+            </intent-filter>
+            <meta-data android:name="test_category" android:value="@string/test_category_camera" />
+            <meta-data android:name="test_required_features" android:value="android.hardware.sensor.gyroscope" />
+            <meta-data android:name="test_required_features" android:value="android.hardware.camera.any"/>
+        </activity>
+        <activity
+            android:name=".camera.fov.DetermineFovActivity"
+            android:label="@string/camera_fov_calibration"
+            android:screenOrientation="landscape"
+            android:theme="@android:style/Theme.Holo.NoActionBar.Fullscreen" >
+        </activity>
+        <activity
+            android:name=".camera.fov.CalibrationPreferenceActivity"
+            android:label="@string/camera_fov_label_options" >
         </activity>
 
         <activity android:name=".usb.UsbAccessoryTestActivity"
