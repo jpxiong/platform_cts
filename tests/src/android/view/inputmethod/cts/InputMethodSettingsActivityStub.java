@@ -16,8 +16,8 @@
 
 package android.view.inputmethod.cts;
 
-import android.inputmethodservice.InputMethodService;
+import android.preference.PreferenceActivity;
 
-public class InputMethodInfoStub extends InputMethodService {
+public class InputMethodSettingsActivityStub extends PreferenceActivity {
 
 }
