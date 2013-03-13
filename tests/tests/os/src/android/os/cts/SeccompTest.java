@@ -39,7 +39,6 @@ public class SeccompTest extends TestCase {
      *   ARM: 7577/1: arch/add syscall_get_arch
      *   http://git.kernel.org/cgit/linux/kernel/git/torvalds/linux.git/commit/?id=1f59d13
      */
-
     public void testSeccomp() {
         if (OSFeatures.needsSeccompSupport()) {
             assertTrue("Please enable seccomp support in your kernel "
