@@ -115,7 +115,7 @@ bool FullPipelineRenderer::setUp() {
     // Position the eye in front of the origin.
     float eyeX = 0.0f;
     float eyeY = 0.0f;
-    float eyeZ = 2.0f;
+    float eyeZ = 1.5f;
 
     // We are looking at the origin
     float centerX = 0.0f;
@@ -138,7 +138,7 @@ bool FullPipelineRenderer::setUp() {
     float bottom = -1.0f;
     float top = 1.0f;
     float near = 1.0f;
-    float far = 3.0f;
+    float far = 2.0f;
 
     mProjectionMatrix = Matrix::newFrustum(left, right, bottom, top, near, far);
 
