@@ -36,6 +36,12 @@ jboolean android_os_cts_CpuFeatures_isMipsCpu(JNIEnv* env, jobject thiz)
     return cpuFamily == ANDROID_CPU_FAMILY_MIPS;
 }
 
+jboolean android_os_cts_CpuFeatures_isX86Cpu(JNIEnv* env, jobject thiz)
+{
+    AndroidCpuFamily cpuFamily = android_getCpuFamily();
+    return cpuFamily == ANDROID_CPU_FAMILY_X86;
+}
+
 static JNINativeMethod gMethods[] = {
     {  "isArmCpu", "()Z",
             (void *) android_os_cts_CpuFeatures_isArmCpu  },
@@ -43,6 +49,8 @@ static JNINativeMethod gMethods[] = {
             (void *) android_os_cts_CpuFeatures_isArm7Compatible  },
     {  "isMipsCpu", "()Z",
             (void *) android_os_cts_CpuFeatures_isMipsCpu  },
+    {  "isX86Cpu", "()Z",
+            (void *) android_os_cts_CpuFeatures_isX86Cpu  },
 };
 
 int register_android_os_cts_CpuFeatures(JNIEnv* env)
