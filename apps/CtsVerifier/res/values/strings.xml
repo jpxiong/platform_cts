@@ -551,4 +551,32 @@
         connect ...</string>
     <string name="p2p_waiting_for_peer_to_disconnect">Waiting for peer
         to disconnect ...</string>
+
+    <string name="camera_fov_calibration">Camera FOV Calibration</string>
+    <string name="camera_fov_calibration_done">Done</string>
+    <string name="camera_fov_general_settings">General settings</string>
+    <string name="camera_fov_label_options">Settings</string>
+    <string name="camera_fov_tap_to_take_photo">Tap to calibrate</string>
+    <string name="camera_fov_marker_distance">Marker distance (in cm)</string>
+    <string name="camera_fov_marker_distance_description">The distance in centimeters between
+        the solid lines on the target pattern.</string>
+    <string name="camera_fov_target_distance">Target distance (in cm)</string>
+    <string name="camera_fov_target_distance_description">The distance in centimeters from the
+        device to the target pattern.</string>
+    <string name="camera_fov_settings_button_text">Setup</string>
+    <string name="camera_fov_displayed_fov_label">Displayed FOV : </string>
+    <string name="camera_fov_reported_fov_label">Reported  FOV : </string>
+    <string name="camera_fov_panorama_wallpaper_title">Photo Sphere Live Wallpaper</string>
+    <string name="camera_fov_panorama_wallpaper_description">This live wallapper displays photo
+        spheres.</string>
+    <string name="camera_fov_select_panorama">Select panorama</string>
+    <string name="camera_fov_select_panorama_description">Select a panorama to display in the
+       live wallpaper.</string>
+    <string name="camera_fov_reset_panorama">Reset panorama</string>
+    <string name="camera_fov_reset_panorama_description">Resets the panorama to show the demo
+        file.</string>
+    <string name="camera_fov_enable_compass_mode">Enable compass mode</string>
+    <string name="camera_fov_enable_compass_mode_description">If enabled, the panorama orients
+        itself according to the current rotation of the device.</string>
+
 </resources>
