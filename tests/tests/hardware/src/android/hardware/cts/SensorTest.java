@@ -16,36 +16,21 @@
 
 package android.hardware.cts;
 
-import java.lang.IllegalArgumentException;
-import java.lang.Override;
 import java.util.List;
 
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.hardware.Sensor;
-import android.hardware.SensorEvent;
-import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
-import android.hardware.TriggerEvent;
-import android.hardware.TriggerEventListener;
 import android.test.AndroidTestCase;
 
 public class SensorTest extends AndroidTestCase {
-    private SensorManager mSensorManager;
-    private TriggerListener mTriggerListener;
-    private SensorListener mSensorListener;
-
-    @Override
-    protected void setUp() throws Exception {
-        super.setUp();
-        mSensorManager = (SensorManager) getContext().getSystemService(Context.SENSOR_SERVICE);
-        mTriggerListener = new TriggerListener();
-        mSensorListener = new SensorListener();
-    }
 
     public void testSensorOperations() {
         // Because we can't know every sensors unit details, so we can't assert
         // get values with specified values.
+        final SensorManager mSensorManager =
+            (SensorManager) getContext().getSystemService(Context.SENSOR_SERVICE);
         List<Sensor> sensors = mSensorManager.getSensorList(Sensor.TYPE_ALL);
         assertNotNull(sensors);
         Sensor sensor = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
@@ -85,48 +70,7 @@ public class SensorTest extends AndroidTestCase {
         }
     }
 
-    public void testRequestTriggerWithNonTriggerSensor() {
-        Sensor sensor = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
-        boolean result;
-        if (sensor != null) {
-            result = mSensorManager.requestTriggerSensor(mTriggerListener, sensor);
-            assertFalse(result);
-        }
-    }
-
-    public void testCancelTriggerWithNonTriggerSensor() {
-        Sensor sensor = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
-        boolean result;
-        if (sensor != null) {
-            result = mSensorManager.cancelTriggerSensor(mTriggerListener, sensor);
-            assertFalse(result);
-        }
-    }
-
-    public void testRegisterWithTriggerSensor() {
-        Sensor sensor = mSensorManager.getDefaultSensor(Sensor.TYPE_SIGNIFICANT_MOTION);
-        boolean result;
-        if (sensor != null) {
-            result = mSensorManager.registerListener(mSensorListener, sensor,
-                    SensorManager.SENSOR_DELAY_NORMAL);
-            assertFalse(result);
-        }
-    }
-
-    public void testRegisterTwiceWithSameSensor() {
-        Sensor sensor = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
-        boolean result;
-        if (sensor != null) {
-            result = mSensorManager.registerListener(mSensorListener, sensor,
-                    SensorManager.SENSOR_DELAY_NORMAL);
-            assertTrue(result);
-            result = mSensorManager.registerListener(mSensorListener, sensor,
-                    SensorManager.SENSOR_DELAY_NORMAL);
-            assertFalse(result);
-        }
-    }
-
-        private void assertSensorValues(Sensor sensor) {
+    private void assertSensorValues(Sensor sensor) {
         assertTrue(sensor.getMaximumRange() >= 0);
         assertTrue(sensor.getPower() >= 0);
         assertTrue(sensor.getResolution() >= 0);
@@ -151,21 +95,5 @@ public class SensorTest extends AndroidTestCase {
             sensors |= SensorManager.SENSOR_ORIENTATION | SensorManager.SENSOR_ORIENTATION_RAW;
         }
         assertEquals(sensors, mSensorManager.getSensors());
-    }
-
-    class TriggerListener extends TriggerEventListener {
-        @Override
-        public void onTrigger(TriggerEvent event) {
-        }
-    }
-
-    class SensorListener implements SensorEventListener {
-        @Override
-        public void onSensorChanged(SensorEvent event) {
-        }
-
-        @Override
-        public void onAccuracyChanged(Sensor sensor, int accuracy) {
-        }
     }
 }
