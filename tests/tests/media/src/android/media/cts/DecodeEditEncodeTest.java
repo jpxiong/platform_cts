@@ -87,6 +87,9 @@ public class DecodeEditEncodeTest extends AndroidTestCase {
     private int mWidth = -1;
     private int mHeight = -1;
 
+    // largest color component delta seen (i.e. actual vs. expected)
+    private int mLargestColorDelta;
+
 
     public void testVideoEditQCIF() throws Throwable {
         setSize(176, 144);
@@ -616,6 +619,8 @@ public class DecodeEditEncodeTest extends AndroidTestCase {
         OutputSurface surface = null;
         MediaCodec decoder = null;
 
+        mLargestColorDelta = -1;
+
         if (VERBOSE) Log.d(TAG, "checkVideoFile");
 
         try {
@@ -638,6 +643,8 @@ public class DecodeEditEncodeTest extends AndroidTestCase {
                 decoder.stop();
                 decoder.release();
             }
+
+            Log.i(TAG, "Largest color delta: " + mLargestColorDelta);
         }
     }
 
@@ -790,17 +797,16 @@ public class DecodeEditEncodeTest extends AndroidTestCase {
     }
 
     /**
-     * Returns true if the actual color value is close to the expected color value.
+     * Returns true if the actual color value is close to the expected color value.  Updates
+     * mLargestColorDelta.
      */
-    static boolean isColorClose(int actual, int expected) {
-        final int MAX_DELTA = 8;
-        if (expected < MAX_DELTA) {
-            return actual < (expected + MAX_DELTA);
-        } else if (expected > (255 - MAX_DELTA)) {
-            return actual > (expected - MAX_DELTA);
-        } else {
-            return actual > (expected - MAX_DELTA) && actual < (expected + MAX_DELTA);
+    boolean isColorClose(int actual, int expected) {
+        final int MAX_DELTA = 7;
+        int delta = Math.abs(actual - expected);
+        if (delta > mLargestColorDelta) {
+            mLargestColorDelta = delta;
         }
+        return (delta <= MAX_DELTA);
     }
 
     /**
