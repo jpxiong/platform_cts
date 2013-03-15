@@ -75,6 +75,9 @@ public class EncodeDecodeTest extends AndroidTestCase {
     private int mWidth = -1;
     private int mHeight = -1;
 
+    // largest color component delta seen (i.e. actual vs. expected)
+    private int mLargestColorDelta;
+
 
     /**
      * Tests streaming of AVC video through the encoder and decoder.  Data is encoded from
@@ -221,6 +224,8 @@ public class EncodeDecodeTest extends AndroidTestCase {
         MediaCodec encoder = null;
         MediaCodec decoder = null;
 
+        mLargestColorDelta = -1;
+
         try {
             MediaCodecInfo codecInfo = selectCodec(MIME_TYPE);
             if (codecInfo == null) {
@@ -266,6 +271,8 @@ public class EncodeDecodeTest extends AndroidTestCase {
                 decoder.stop();
                 decoder.release();
             }
+
+            Log.i(TAG, "Largest color delta: " + mLargestColorDelta);
         }
     }
 
@@ -280,6 +287,8 @@ public class EncodeDecodeTest extends AndroidTestCase {
         MediaCodec decoder = null;
         InputSurface inputSurface = null;
         OutputSurface outputSurface = null;
+
+        mLargestColorDelta = -1;
 
         try {
             MediaCodecInfo codecInfo = selectCodec(MIME_TYPE);
@@ -338,6 +347,8 @@ public class EncodeDecodeTest extends AndroidTestCase {
                 decoder.stop();
                 decoder.release();
             }
+
+            Log.i(TAG, "Largest color delta: " + mLargestColorDelta);
         }
     }
 
@@ -1094,17 +1105,16 @@ public class EncodeDecodeTest extends AndroidTestCase {
     }
 
     /**
-     * Returns true if the actual color value is close to the expected color value.
+     * Returns true if the actual color value is close to the expected color value.  Updates
+     * mLargestColorDelta.
      */
-    static boolean isColorClose(int actual, int expected) {
-        final int MAX_DELTA = 8;
-        if (expected < MAX_DELTA) {
-            return actual < (expected + MAX_DELTA);
-        } else if (expected > (255 - MAX_DELTA)) {
-            return actual > (expected - MAX_DELTA);
-        } else {
-            return actual > (expected - MAX_DELTA) && actual < (expected + MAX_DELTA);
+    boolean isColorClose(int actual, int expected) {
+        final int MAX_DELTA = 7;
+        int delta = Math.abs(actual - expected);
+        if (delta > mLargestColorDelta) {
+            mLargestColorDelta = delta;
         }
+        return (delta <= MAX_DELTA);
     }
 
     /**
