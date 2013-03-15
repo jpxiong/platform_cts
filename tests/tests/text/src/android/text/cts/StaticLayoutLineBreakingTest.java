@@ -48,12 +48,16 @@ public class StaticLayoutLineBreakingTest extends AndroidTestCase {
 
         @Override
         public float getTextRunAdvances(char[] chars, int index, int count,
-                int contextIndex, int contextCount, float[] advances,
-                int advancesIndex) {
+                int contextIndex, int contextCount, int flags, float[] advances,
+                int advancesIndex, int reserved) {
 
             // Conditions copy pasted from Paint
             if (chars == null) {
                 throw new IllegalArgumentException("text cannot be null");
+            }
+
+            if (flags != DIRECTION_LTR && flags != DIRECTION_RTL) {
+                throw new IllegalArgumentException("unknown flags value: " + flags);
             }
 
             if ((index | count | contextIndex | contextCount | advancesIndex
