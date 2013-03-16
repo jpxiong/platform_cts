@@ -152,6 +152,8 @@ class CtsBuilder(object):
     plan.Include('android\.renderscript')
     plan.Include('android\.telephony')
     plan.Include('android\.nativemedia.*')
+    plan.Include('com\.android\.pts\..*')
+    plan.Exclude('com\.android\.pts\.bootup')
     self.__WritePlan(plan, 'PDK')
 
 def LogGenerateDescription(name):
