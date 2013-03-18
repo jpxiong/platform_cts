@@ -197,7 +197,13 @@ public class DateFormatTest extends AndroidTestCase {
         SimpleDateFormat sdf = new SimpleDateFormat(pattern);
         sdf.setTimeZone(utc);
 
-        assertEquals(expected, DateFormat.format(pattern, c));
+        if (pattern.equals("k") && (hour == 0 || hour == 24)) {
+          // http://b/8359981: 'k' has always been broken on Android, and we keep it broken
+          // for compatibility. Maybe one day we'll be able to fix this...
+          assertEquals("0", DateFormat.format(pattern, c));
+        } else {
+          assertEquals(expected, DateFormat.format(pattern, c));
+        }
         assertEquals(expected, sdf.format(c.getTime()));
     }
 
