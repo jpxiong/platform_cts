@@ -23,7 +23,11 @@ public:
     bool setUp();
     bool draw();
 private:
+    GLuint mTextureId;
+    GLuint mTextureUniformHandle;
     GLuint mPositionHandle;
+    GLuint mTexCoordHandle;
+    GLuint mSeedUniformHandle;
 };
 
 #endif

@@ -67,16 +67,14 @@ public class GLBenchmark extends PtsActivityInstrumentationTestCase2<GLActivity>
      * Runs the shader performance test offscreen.
      */
     public void testShaderPerfOffscreen() throws Exception {
-        // TODO(stuartscott): Not yet implemented
-        // runBenchmark(Benchmark.ShaderPerf, true, 500, 8, 1000000);
+        runBenchmark(Benchmark.ShaderPerf, true, 500, 8, 1000000);
     }
 
     /**
      * Runs the shader performance test onscreen.
      */
     public void testShaderPerfOnscreen() throws Exception {
-        // TODO(stuartscott): Not yet implemented
-        // runBenchmark(Benchmark.ShaderPerf, false, 500, 8, 1000000);
+        runBenchmark(Benchmark.ShaderPerf, false, 500, 8, 1000000);
     }
 
     /**

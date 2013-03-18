@@ -15,6 +15,10 @@
 #include <GLUtils.h>
 #include <stdlib.h>
 
+#define LOG_TAG "PTS_OPENGL"
+#define LOG_NDEBUG 0
+#include "utils/Log.h"
+
 // Loads the given source code as a shader of the given type.
 static GLuint loadShader(GLenum shaderType, const char** source) {
     GLuint shader = glCreateShader(shaderType);
@@ -24,6 +28,14 @@ static GLuint loadShader(GLenum shaderType, const char** source) {
         GLint compiled = 0;
         glGetShaderiv(shader, GL_COMPILE_STATUS, &compiled);
         if (!compiled) {
+            GLint infoLen = 0;
+            glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &infoLen);
+            if (infoLen > 0) {
+                char* infoLog = (char*) malloc(sizeof(char) * infoLen);
+                glGetShaderInfoLog(shader, infoLen, NULL, infoLog);
+                ALOGE("Error compiling shader:\n%s\n", infoLog);
+                free(infoLog);
+            }
             glDeleteShader(shader);
             shader = 0;
         }
@@ -38,29 +50,29 @@ GLuint GLUtils::createProgram(const char** vertexSource,
         return 0;
     }
 
-    GLuint pixelShader = loadShader(GL_FRAGMENT_SHADER, fragmentSource);
-    if (!pixelShader) {
+    GLuint fragmentShader = loadShader(GL_FRAGMENT_SHADER, fragmentSource);
+    if (!fragmentShader) {
         return 0;
     }
 
     GLuint program = glCreateProgram();
     if (program) {
-        bool success = true;
         glAttachShader(program, vertexShader);
-        if (GLenum(GL_NO_ERROR) != glGetError()) {
-            success = false;
-        }
-        glAttachShader(program, pixelShader);
-        if (GLenum(GL_NO_ERROR) != glGetError()) {
-            success = false;
-        }
+        glAttachShader(program, fragmentShader);
 
-        GLint linkStatus = GL_FALSE;
-        if (success) {
-            glLinkProgram(program);
-            glGetProgramiv(program, GL_LINK_STATUS, &linkStatus);
-        }
-        if (linkStatus != GL_TRUE || !success) {
+        GLint linkStatus;
+        glLinkProgram(program);
+        glGetProgramiv(program, GL_LINK_STATUS, &linkStatus);
+
+        if (!linkStatus) {
+            GLint infoLen = 0;
+            glGetProgramiv(program, GL_INFO_LOG_LENGTH, &infoLen);
+            if (infoLen > 0) {
+                char* infoLog = (char*) malloc(sizeof(char) * infoLen);
+                glGetProgramInfoLog(program, infoLen, NULL, infoLog);
+                ALOGE("Error linking program:\n%s\n", infoLog);
+                free(infoLog);
+            }
             glDeleteProgram(program);
             program = 0;
         }
