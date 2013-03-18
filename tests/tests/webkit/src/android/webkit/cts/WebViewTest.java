@@ -728,29 +728,16 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
     public void testLoadDataWithBaseUrl() throws Throwable {
         assertNull(mWebView.getUrl());
         String imgUrl = TestHtmlConstants.SMALL_IMG_URL; // relative
+        // Snippet of HTML that will prevent favicon requests to the test server.
+        final String HTML_HEADER = "<html><head><link rel=\"shortcut icon\" href=\"#\" /></head>";
 
         // Check that we can access relative URLs and that reported URL is supplied history URL.
         startWebServer(false);
         String baseUrl = mWebServer.getAssetUrl("foo.html");
         String historyUrl = "http://www.example.com/";
-        String dbPath = getActivity().getFilesDir().toString() + "/icons";
-        mIconDb = WebIconDatabase.getInstance();
-        mIconDb.open(dbPath);
         mWebServer.resetRequestState();
-        // force the favicon to be loaded first
         mOnUiThread.loadDataWithBaseURLAndWaitForCompletion(baseUrl,
-                "<html><body></body></html>",
-                "text/html", "UTF-8", historyUrl);
-        new PollingCheck() {
-            @Override
-            protected boolean check() {
-                String lastRequestedUrl = mWebServer.getLastRequestUrl();
-                return lastRequestedUrl != null
-                        && lastRequestedUrl.endsWith("favicon.ico");
-            }
-        }.run();
-        mOnUiThread.loadDataWithBaseURLAndWaitForCompletion(baseUrl,
-                "<html><body><img src=\"" + imgUrl + "\"/></body></html>",
+                HTML_HEADER + "<body><img src=\"" + imgUrl + "\"/></body></html>",
                 "text/html", "UTF-8", historyUrl);
         assertTrue(mWebServer.getLastRequestUrl().endsWith(imgUrl));
         assertEquals(historyUrl, mWebView.getUrl());
@@ -759,7 +746,7 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
         // is null.
         imgUrl = TestHtmlConstants.LARGE_IMG_URL;
         mOnUiThread.loadDataWithBaseURLAndWaitForCompletion(baseUrl,
-                "<html><body><img src=\"" + imgUrl + "\"/></body></html>",
+                HTML_HEADER + "<body><img src=\"" + imgUrl + "\"/></body></html>",
                 "text/html", "UTF-8", null);
         assertTrue("last request is " + mWebServer.getLastRequestUrl(), mWebServer.getLastRequestUrl().endsWith(imgUrl));
         assertEquals("about:blank", mWebView.getUrl());
@@ -768,7 +755,7 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
         mWebView.getSettings().setJavaScriptEnabled(true);
         final String crossOriginUrl = mWebServer.getAssetUrl(TestHtmlConstants.HELLO_WORLD_URL);
         mOnUiThread.loadDataWithBaseURLAndWaitForCompletion(baseUrl,
-                "<html><head></head><body onload=\"" +
+                HTML_HEADER + "<body onload=\"" +
                 "document.title = document.getElementById('frame').contentWindow.location.href;" +
                 "\"><iframe id=\"frame\" src=\"" + crossOriginUrl + "\"></body></html>",
                 "text/html", "UTF-8", null);
@@ -777,7 +764,7 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
         // Check that when the base URL uses the 'data' scheme, a 'data' scheme URL is used and the
         // history URL is ignored.
         mOnUiThread.loadDataWithBaseURLAndWaitForCompletion("data:foo",
-                "<html><body>bar</body></html>", "text/html", "UTF-8",
+                HTML_HEADER + "<body>bar</body></html>", "text/html", "UTF-8",
                 historyUrl);
         assertTrue("URL: " + mWebView.getUrl(), mWebView.getUrl().indexOf("data:text/html") == 0);
         assertTrue("URL: " + mWebView.getUrl(), mWebView.getUrl().indexOf("bar") > 0);
