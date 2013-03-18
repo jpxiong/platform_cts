@@ -22,8 +22,8 @@ import android.content.res.Resources;
 import android.media.MediaCodec.BufferInfo;
 import android.media.MediaExtractor;
 import android.media.MediaFormat;
+import android.media.MediaMetadataRetriever;
 import android.media.MediaMuxer;
-import android.media.MediaPlayer;
 import android.test.AndroidTestCase;
 import android.util.Log;
 
@@ -52,7 +52,7 @@ public class MediaMuxerTest extends AndroidTestCase {
     public void testVideoAudio() throws Exception {
         int source = R.raw.video_176x144_3gp_h263_300kbps_25fps_aac_stereo_128kbps_11025hz;
         String outputFile = "/sdcard/videoAudio.mp4";
-        cloneAndVerify(source, outputFile, 2);
+        cloneAndVerify(source, outputFile, 2, 90);
     }
 
     /**
@@ -61,7 +61,7 @@ public class MediaMuxerTest extends AndroidTestCase {
     public void testAudioOnly() throws Exception {
         int source = R.raw.sinesweepm4a;
         String outputFile = "/sdcard/audioOnly.mp4";
-        cloneAndVerify(source, outputFile, 1);
+        cloneAndVerify(source, outputFile, 1, -1);
     }
 
     /**
@@ -70,7 +70,7 @@ public class MediaMuxerTest extends AndroidTestCase {
     public void testVideoOnly() throws Exception {
         int source = R.raw.video_only_176x144_3gp_h263_25fps;
         String outputFile = "/sdcard/videoOnly.mp4";
-        cloneAndVerify(source, outputFile, 1);
+        cloneAndVerify(source, outputFile, 1, 180);
     }
 
     /**
@@ -88,7 +88,7 @@ public class MediaMuxerTest extends AndroidTestCase {
 
         // Throws exception b/c start() is not called.
         muxer = new MediaMuxer(outputFile, MediaMuxer.OutputFormat.MUXER_OUTPUT_MPEG_4);
-        muxer.addTrack(MediaFormat.createVideoFormat("video/mp4", 480, 320));
+        muxer.addTrack(MediaFormat.createVideoFormat("video/avc", 480, 320));
 
         try {
             muxer.stop();
@@ -99,10 +99,10 @@ public class MediaMuxerTest extends AndroidTestCase {
 
         // Throws exception b/c 2 video tracks were added.
         muxer = new MediaMuxer(outputFile, MediaMuxer.OutputFormat.MUXER_OUTPUT_MPEG_4);
-        muxer.addTrack(MediaFormat.createVideoFormat("video/mp4", 480, 320));
+        muxer.addTrack(MediaFormat.createVideoFormat("video/avc", 480, 320));
 
         try {
-            muxer.addTrack(MediaFormat.createVideoFormat("video/mp4", 480, 320));
+            muxer.addTrack(MediaFormat.createVideoFormat("video/avc", 480, 320));
             fail("should throw IllegalStateException.");
         } catch (IllegalStateException e) {
             // expected
@@ -110,9 +110,9 @@ public class MediaMuxerTest extends AndroidTestCase {
 
         // Throws exception b/c 2 audio tracks were added.
         muxer = new MediaMuxer(outputFile, MediaMuxer.OutputFormat.MUXER_OUTPUT_MPEG_4);
-        muxer.addTrack(MediaFormat.createAudioFormat("audio/mp4", 48000, 1));
+        muxer.addTrack(MediaFormat.createAudioFormat("audio/mp4a-latm", 48000, 1));
         try {
-            muxer.addTrack(MediaFormat.createAudioFormat("audio/mp4", 48000, 1));
+            muxer.addTrack(MediaFormat.createAudioFormat("audio/mp4a-latm", 48000, 1));
             fail("should throw IllegalStateException.");
         } catch (IllegalStateException e) {
             // expected
@@ -120,11 +120,11 @@ public class MediaMuxerTest extends AndroidTestCase {
 
         // Throws exception b/c 3 tracks were added.
         muxer = new MediaMuxer(outputFile, MediaMuxer.OutputFormat.MUXER_OUTPUT_MPEG_4);
-        muxer.addTrack(MediaFormat.createVideoFormat("video/mp4", 480, 320));
-        muxer.addTrack(MediaFormat.createAudioFormat("audio/mp4", 48000, 1));
+        muxer.addTrack(MediaFormat.createVideoFormat("video/avc", 480, 320));
+        muxer.addTrack(MediaFormat.createAudioFormat("audio/mp4a-latm", 48000, 1));
         try {
 
-            muxer.addTrack(MediaFormat.createVideoFormat("video/mp4", 480, 320));
+            muxer.addTrack(MediaFormat.createVideoFormat("video/avc", 480, 320));
             fail("should throw IllegalStateException.");
         } catch (IllegalStateException e) {
             // expected
@@ -154,7 +154,7 @@ public class MediaMuxerTest extends AndroidTestCase {
      * Using the MediaMuxer to clone a media file.
      */
     private void cloneMediaUsingMuxer(int srcMedia, String dstMediaPath,
-            int expectedTrackCount) throws IOException {
+            int expectedTrackCount, int degrees) throws IOException {
         // Set up MediaExtractor to read from the source.
         AssetFileDescriptor srcFd = mResources.openRawResourceFd(srcMedia);
         MediaExtractor extractor = new MediaExtractor();
@@ -185,6 +185,10 @@ public class MediaMuxerTest extends AndroidTestCase {
 
         ByteBuffer dstBuf = ByteBuffer.allocate(bufferSize);
         BufferInfo bufferInfo = new BufferInfo();
+
+        if (degrees >= 0) {
+            muxer.setOrientationHint(degrees);
+        }
         muxer.start();
         while (!sawEOS) {
             bufferInfo.offset = offset;
@@ -227,10 +231,10 @@ public class MediaMuxerTest extends AndroidTestCase {
      * sure they match.
      */
     private void cloneAndVerify(int srcMedia, String outputMediaFile,
-            int expectedTrackCount) throws IOException {
+            int expectedTrackCount, int degrees) throws IOException {
         try {
-            cloneMediaUsingMuxer(srcMedia, outputMediaFile, expectedTrackCount);
-            verifyAttributesMatch(srcMedia, outputMediaFile);
+            cloneMediaUsingMuxer(srcMedia, outputMediaFile, expectedTrackCount, degrees);
+            verifyAttributesMatch(srcMedia, outputMediaFile, degrees);
             // Check the sample on 1s and 0.5s.
             verifySamplesMatch(srcMedia, outputMediaFile, 1000000);
             verifySamplesMatch(srcMedia, outputMediaFile, 500000);
@@ -240,51 +244,50 @@ public class MediaMuxerTest extends AndroidTestCase {
     }
 
     /**
-     * Compares some attributes using MediaPlayer to make sure the cloned
-     * media file matches the source file.
+     * Compares some attributes using MediaMetadataRetriever to make sure the
+     * cloned media file matches the source file.
      */
-    private void verifyAttributesMatch(int srcMedia, String testMediaPath) {
+    private void verifyAttributesMatch(int srcMedia, String testMediaPath,
+            int degrees) {
         AssetFileDescriptor testFd = mResources.openRawResourceFd(srcMedia);
-        MediaPlayer playerSrc = new MediaPlayer();
-        MediaPlayer playerTest = new MediaPlayer();
-        try {
-            playerSrc.setDataSource(testFd.getFileDescriptor(),
-                    testFd.getStartOffset(), testFd.getLength());
-            playerTest.setDataSource(testMediaPath);
 
-            playerSrc.prepare();
-            playerTest.prepare();
+        MediaMetadataRetriever retrieverSrc = new MediaMetadataRetriever();
+        retrieverSrc.setDataSource(testFd.getFileDescriptor(),
+                testFd.getStartOffset(), testFd.getLength());
 
-            int durationSrc = playerSrc.getDuration();
-            int durationTest = playerTest.getDuration();
+        MediaMetadataRetriever retrieverTest = new MediaMetadataRetriever();
+        retrieverTest.setDataSource(testMediaPath);
 
-            int heightSrc = playerSrc.getVideoHeight();
-            int heightTest = playerTest.getVideoHeight();
-
-            int widthSrc = playerSrc.getVideoWidth();
-            int widthTest = playerTest.getVideoWidth();
-
-            if (VERBOSE) {
-                Log.d(TAG, "Source video info : width " + widthSrc + " height "
-                        + heightSrc + " duration " + durationSrc);
-                Log.d(TAG, "Test video info : width " + widthTest + " height "
-                        + heightTest + " duration " + durationTest);
-            }
-
-            assertEquals("Different duration", durationSrc, durationTest);
-            assertEquals("Different height", heightSrc, heightTest);
-            assertEquals("Different width", widthSrc, widthTest);
-
-            playerSrc.stop();
-            playerTest.stop();
-
-            playerSrc.release();
-            playerTest.release();
-        } catch (Exception e) {
-            // Don't expect seeing any exception here.
-            assertTrue("verifyTwoVideos failed!", false);
+        String testDegrees = retrieverTest.extractMetadata(
+                MediaMetadataRetriever.METADATA_KEY_VIDEO_ROTATION);
+        if (testDegrees != null) {
+            assertEquals("Different degrees", degrees,
+                    Integer.parseInt(testDegrees));
         }
 
+        String heightSrc = retrieverSrc.extractMetadata(
+                MediaMetadataRetriever.METADATA_KEY_VIDEO_HEIGHT);
+        String heightTest = retrieverTest.extractMetadata(
+                MediaMetadataRetriever.METADATA_KEY_VIDEO_HEIGHT);
+        assertEquals("Different height", heightSrc,
+                heightTest);
+
+        String widthSrc = retrieverSrc.extractMetadata(
+                MediaMetadataRetriever.METADATA_KEY_VIDEO_WIDTH);
+        String widthTest = retrieverTest.extractMetadata(
+                MediaMetadataRetriever.METADATA_KEY_VIDEO_WIDTH);
+        assertEquals("Different height", widthSrc,
+                widthTest);
+
+        String durationSrc = retrieverSrc.extractMetadata(
+                MediaMetadataRetriever.METADATA_KEY_VIDEO_WIDTH);
+        String durationTest = retrieverTest.extractMetadata(
+                MediaMetadataRetriever.METADATA_KEY_VIDEO_WIDTH);
+        assertEquals("Different height", durationSrc,
+                durationTest);
+
+        retrieverSrc.release();
+        retrieverTest.release();
     }
 
     /**
