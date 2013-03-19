@@ -12,11 +12,14 @@
  * the License.
  */
 #include "Renderer.h"
-#include <GLUtils.h>
+#include <graphics/GLUtils.h>
 
 #define LOG_TAG "PTS_OPENGL"
 #define LOG_NDEBUG 0
-#include "utils/Log.h"
+#include <utils/Log.h>
+
+#define ATRACE_TAG ATRACE_TAG_GRAPHICS
+#include <utils/Trace.h>
 
 static const EGLint contextAttribs[] = {
         EGL_CONTEXT_CLIENT_VERSION, 2,
@@ -39,6 +42,7 @@ Renderer::Renderer(ANativeWindow* window, bool offscreen, int workload) :
 }
 
 bool Renderer::setUp() {
+    android::ScopedTrace st(ATRACE_TAG, __func__);
     mEglDisplay = eglGetDisplay(EGL_DEFAULT_DISPLAY);
     if (EGL_NO_DISPLAY == mEglDisplay || EGL_SUCCESS != eglGetError()) {
         return false;
@@ -85,7 +89,7 @@ bool Renderer::setUp() {
     if (mOffscreen) {
         int w = GLUtils::roundUpToSmallestPowerOf2(width);
         int h = GLUtils::roundUpToSmallestPowerOf2(height);
-        if (!createFBO(mFboId, mRboId, mCboId, w, h)) {
+        if (!GLUtils::createFBO(mFboId, mRboId, mCboId, w, h)) {
             return false;
         }
     } else {
@@ -102,32 +106,8 @@ bool Renderer::setUp() {
     return true;
 }
 
-bool Renderer::createFBO(GLuint& fboId, GLuint& rboId, GLuint& cboId, int width, int height) {
-    glGenFramebuffers(1, &fboId);
-    glBindFramebuffer(GL_FRAMEBUFFER, fboId);
-
-    glGenRenderbuffers(1, &rboId);
-    glBindRenderbuffer(GL_RENDERBUFFER, rboId);
-    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT16, width, height);
-    glBindRenderbuffer(GL_RENDERBUFFER, 0);
-    glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, rboId);
-
-    glGenRenderbuffers(1, &cboId);
-    glBindRenderbuffer(GL_RENDERBUFFER, cboId);
-    glRenderbufferStorage(GL_RENDERBUFFER, GL_RGB565, width, height);
-    glBindRenderbuffer(GL_RENDERBUFFER, 0);
-    glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_RENDERBUFFER, cboId);
-
-    GLuint err = glGetError();
-    if (err != GL_NO_ERROR) {
-        ALOGV("GLError %d", err);
-        return false;
-    }
-
-    return glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE;
-}
-
 bool Renderer::tearDown() {
+    android::ScopedTrace st(ATRACE_TAG, __func__);
     if (mFboId != 0) {
         glDeleteFramebuffers(1, &mFboId);
         mFboId = 0;

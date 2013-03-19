@@ -41,7 +41,7 @@ def main(argv):
       # Create a new figure
       fig = plt.figure()
       # Set the title of the graph
-      plt.title(benchmark)
+      plt.title(benchmark[benchmark.index('#') + 1:])
       # For each result in the data set
       for r in results:
         score = r['result']
@@ -60,6 +60,9 @@ def main(argv):
           ax.plot(x, y, 'o-', label=r['device'] + ' (%s)'%score)
           # Add a legend
           ax.legend(loc='upper right').get_frame().set_fill(False)
+      (ymin, ymax) = plt.ylim()
+      if ymax < 90:# So that on screen tests are easier to compare
+        plt.ylim(0, 90)
       plt.xlabel('Iteration')
       plt.ylabel('FPS')
       fig.autofmt_xdate()

@@ -14,7 +14,7 @@
 #ifndef SHADERPERFRENDERER_H
 #define SHADERPERFRENDERER_H
 
-#include <Renderer.h>
+#include <primitive/Renderer.h>
 
 class ShaderPerfRenderer: public Renderer {
 public:

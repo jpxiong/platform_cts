@@ -14,7 +14,7 @@
 #ifndef PIXELOUTPUTRENDERER_H
 #define PIXELOUTPUTRENDERER_H
 
-#include <Renderer.h>
+#include <primitive/Renderer.h>
 
 class PixelOutputRenderer: public Renderer {
 public:

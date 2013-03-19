@@ -12,12 +12,12 @@
  * the License.
  */
 
-#include <GLUtils.h>
+#include "GLUtils.h"
 #include <stdlib.h>
 
 #define LOG_TAG "PTS_OPENGL"
 #define LOG_NDEBUG 0
-#include "utils/Log.h"
+#include <utils/Log.h>
 
 // Loads the given source code as a shader of the given type.
 static GLuint loadShader(GLenum shaderType, const char** source) {
@@ -119,4 +119,29 @@ GLuint GLUtils::genRandTex(int texWidth, int texHeight) {
     }
     delete[] m;
     return textureId;
+}
+
+bool GLUtils::createFBO(GLuint& fboId, GLuint& rboId, GLuint& cboId, int width, int height) {
+    glGenFramebuffers(1, &fboId);
+    glBindFramebuffer(GL_FRAMEBUFFER, fboId);
+
+    glGenRenderbuffers(1, &rboId);
+    glBindRenderbuffer(GL_RENDERBUFFER, rboId);
+    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT16, width, height);
+    glBindRenderbuffer(GL_RENDERBUFFER, 0);
+    glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, rboId);
+
+    glGenRenderbuffers(1, &cboId);
+    glBindRenderbuffer(GL_RENDERBUFFER, cboId);
+    glRenderbufferStorage(GL_RENDERBUFFER, GL_RGB565, width, height);
+    glBindRenderbuffer(GL_RENDERBUFFER, 0);
+    glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_RENDERBUFFER, cboId);
+
+    GLuint err = glGetError();
+    if (err != GL_NO_ERROR) {
+        ALOGV("GLError %d", err);
+        return false;
+    }
+
+    return glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE;
 }
