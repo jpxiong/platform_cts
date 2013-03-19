@@ -990,6 +990,12 @@ public class CtsUiAutomatorTest extends UiAutomatorTestCase {
      * @throws UiObjectNotFoundException
      */
     private void openTest(String name) throws UiObjectNotFoundException {
+        try {
+            UiDevice.getInstance().setOrientationNatural();
+        } catch (RemoteException e) {
+            // will catch it in its own test. For now try to put the device
+            // in its natural orientation prior to each test
+        }
         UiScrollable listView = new UiScrollable(
                 new UiSelector().className(android.widget.ListView.class.getName()));
 
