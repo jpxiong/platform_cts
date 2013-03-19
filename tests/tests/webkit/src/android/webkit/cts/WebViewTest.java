@@ -739,7 +739,7 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
         mOnUiThread.loadDataWithBaseURLAndWaitForCompletion(baseUrl,
                 HTML_HEADER + "<body><img src=\"" + imgUrl + "\"/></body></html>",
                 "text/html", "UTF-8", historyUrl);
-        assertTrue(mWebServer.getLastRequestUrl().endsWith(imgUrl));
+        assertTrue("last request is " + mWebServer.getLastRequestUrl(), mWebServer.getLastRequestUrl().endsWith(imgUrl));
         assertEquals(historyUrl, mWebView.getUrl());
 
         // Check that reported URL is "about:blank" when supplied history URL
