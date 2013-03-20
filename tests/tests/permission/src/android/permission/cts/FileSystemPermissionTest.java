@@ -564,49 +564,15 @@ public class FileSystemPermissionTest extends AndroidTestCase {
         }
     }
 
-    // This set contains all exceptions for writable sysfs, if it is a
-    // directory, all files below that directory are included, so be
-    // careful.
-    private static final Set<String> SYS_EXCEPTIONS = new HashSet<String>(
+    private static final Set<File> SYS_EXCEPTIONS = new HashSet<File>(
             Arrays.asList(
-                "/sys/kernel/debug/tracing/trace_marker",
-                "/sys/fs/selinux"
+                new File("/sys/kernel/debug/tracing/trace_marker")
             ));
-
-    private static Set <File> getIgnorablesFromPaths(Set <String> paths) {
-
-        Set <File> ignorable = new HashSet <File> ();
-
-        for(String ignore : paths) {
-               File tmp = new File(ignore);
-
-               File[] files = null;
-               if(tmp.isDirectory()) {
-                    files = tmp.listFiles(new FileFilter() {
-                       @Override public boolean accept(File pathname) {
-                           return pathname.isFile();
-                       }
-                   });
-               }
-               else if(tmp.isFile()){
-                   files = new File[1];
-                   files [0] = tmp;
-               }
-               else {
-                   // Should this be an Exception?
-                   continue;
-               }
-               ignorable.addAll(Arrays.asList(files));
-        }
-        return ignorable;
-    }
 
     @LargeTest
     public void testAllFilesInSysAreNotWritable() throws Exception {
         Set<File> writable = getAllWritableFilesInDirAndSubDir(new File("/sys"));
-        Set<File> ignorables = getIgnorablesFromPaths(SYS_EXCEPTIONS);
-
-        writable.removeAll(ignorables);
+        writable.removeAll(SYS_EXCEPTIONS);
         assertTrue("Found writable: " + writable.toString(),
                 writable.isEmpty());
     }
