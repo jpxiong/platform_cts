@@ -17,7 +17,7 @@ abstract class AbstractMonkeyTest extends DeviceTestCase implements IBuildReceiv
     /** 
      * Base monkey command with flags to avoid side effects like airplane mode.
      */
-    static final String MONKEY_CMD = "monkey --pct-majornav 0 --pct-syskeys 0 --pct-anyevent 0";
+    static final String MONKEY_CMD = "monkey --pct-touch 0 --pct-motion 0 --pct-majornav 0 --pct-syskeys 0 --pct-anyevent 0";
 
     CtsBuildHelper mBuild;
     ITestDevice mDevice;
