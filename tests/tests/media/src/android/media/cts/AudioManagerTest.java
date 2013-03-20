@@ -54,6 +54,7 @@ public class AudioManagerTest extends AndroidTestCase {
     private final static long TIME_TO_PLAY = 2000;
     private AudioManager mAudioManager;
     private boolean mHasVibrator;
+    private boolean mUseFixedVolume;
 
     @Override
     protected void setUp() throws Exception {
@@ -61,6 +62,8 @@ public class AudioManagerTest extends AndroidTestCase {
         mAudioManager = (AudioManager) mContext.getSystemService(Context.AUDIO_SERVICE);
         Vibrator vibrator = (Vibrator) mContext.getSystemService(Context.VIBRATOR_SERVICE);
         mHasVibrator = (vibrator != null) && vibrator.hasVibrator();
+        mUseFixedVolume = mContext.getResources().getBoolean(
+                                            com.android.internal.R.bool.config_useFixedVolume);
     }
 
     public void testMicrophoneMute() throws Exception {
@@ -168,6 +171,9 @@ public class AudioManagerTest extends AndroidTestCase {
     }
 
     public void testVibrateNotification() throws Exception {
+        if (mUseFixedVolume) {
+            return;
+        }
         // VIBRATE_SETTING_ON
         mAudioManager.setVibrateSetting(VIBRATE_TYPE_NOTIFICATION, VIBRATE_SETTING_ON);
         assertEquals(mHasVibrator ? VIBRATE_SETTING_ON : VIBRATE_SETTING_OFF,
@@ -226,6 +232,9 @@ public class AudioManagerTest extends AndroidTestCase {
     }
 
     public void testVibrateRinger() throws Exception {
+        if (mUseFixedVolume) {
+            return;
+        }
         // VIBRATE_TYPE_RINGER
         mAudioManager.setVibrateSetting(VIBRATE_TYPE_RINGER, VIBRATE_SETTING_ON);
         assertEquals(mHasVibrator ? VIBRATE_SETTING_ON : VIBRATE_SETTING_OFF,
@@ -289,11 +298,19 @@ public class AudioManagerTest extends AndroidTestCase {
         assertEquals(RINGER_MODE_NORMAL, mAudioManager.getRingerMode());
 
         mAudioManager.setRingerMode(RINGER_MODE_SILENT);
-        assertEquals(RINGER_MODE_SILENT, mAudioManager.getRingerMode());
+        if (mUseFixedVolume) {
+            assertEquals(RINGER_MODE_NORMAL, mAudioManager.getRingerMode());
+        } else {
+            assertEquals(RINGER_MODE_SILENT, mAudioManager.getRingerMode());
+        }
 
         mAudioManager.setRingerMode(RINGER_MODE_VIBRATE);
-        assertEquals(mHasVibrator ? RINGER_MODE_VIBRATE : RINGER_MODE_SILENT,
-                mAudioManager.getRingerMode());
+        if (mUseFixedVolume) {
+            assertEquals(RINGER_MODE_NORMAL, mAudioManager.getRingerMode());
+        } else {
+            assertEquals(mHasVibrator ? RINGER_MODE_VIBRATE : RINGER_MODE_SILENT,
+                    mAudioManager.getRingerMode());
+        }
     }
 
     public void testVolume() throws Exception {
@@ -314,6 +331,10 @@ public class AudioManagerTest extends AndroidTestCase {
             int maxVolume = mAudioManager.getStreamMaxVolume(streams[i]);
 
             mAudioManager.setStreamVolume(streams[i], 1, 0);
+            if (mUseFixedVolume) {
+                assertEquals(maxVolume, mAudioManager.getStreamVolume(streams[i]));
+                continue;
+            }
             assertEquals(1, mAudioManager.getStreamVolume(streams[i]));
 
             if (streams[i] == AudioManager.STREAM_MUSIC && mAudioManager.isWiredHeadsetOn()) {
@@ -361,6 +382,10 @@ public class AudioManagerTest extends AndroidTestCase {
             }
 
             mAudioManager.setStreamVolume(streams[i], maxVolume, 0);
+        }
+
+        if (mUseFixedVolume) {
+            return;
         }
 
         // adjust volume
