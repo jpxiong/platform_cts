@@ -731,7 +731,10 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
         // Snippet of HTML that will prevent favicon requests to the test server.
         final String HTML_HEADER = "<html><head><link rel=\"shortcut icon\" href=\"#\" /></head>";
 
-        // Check that we can access relative URLs and that reported URL is supplied history URL.
+        // Trying to resolve a relative URL against a data URL without a base URL
+        // will fail and we won't make a request to the test web server.
+        // By using the test web server as the base URL we expect to see a request
+        // for the relative URL in the test server.
         startWebServer(false);
         String baseUrl = mWebServer.getAssetUrl("foo.html");
         String historyUrl = "http://www.example.com/";
@@ -739,7 +742,8 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
         mOnUiThread.loadDataWithBaseURLAndWaitForCompletion(baseUrl,
                 HTML_HEADER + "<body><img src=\"" + imgUrl + "\"/></body></html>",
                 "text/html", "UTF-8", historyUrl);
-        assertTrue("last request is " + mWebServer.getLastRequestUrl(), mWebServer.getLastRequestUrl().endsWith(imgUrl));
+        // Verify that the resource request makes it to the server.
+        assertTrue(mWebServer.wasResourceRequested(imgUrl));
         assertEquals(historyUrl, mWebView.getUrl());
 
         // Check that reported URL is "about:blank" when supplied history URL
@@ -748,7 +752,7 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
         mOnUiThread.loadDataWithBaseURLAndWaitForCompletion(baseUrl,
                 HTML_HEADER + "<body><img src=\"" + imgUrl + "\"/></body></html>",
                 "text/html", "UTF-8", null);
-        assertTrue("last request is " + mWebServer.getLastRequestUrl(), mWebServer.getLastRequestUrl().endsWith(imgUrl));
+        assertTrue(mWebServer.wasResourceRequested(imgUrl));
         assertEquals("about:blank", mWebView.getUrl());
 
         // Test that JavaScript can access content from the same origin as the base URL.

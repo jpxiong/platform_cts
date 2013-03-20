@@ -67,7 +67,9 @@ import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Hashtable;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Vector;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -129,9 +131,8 @@ public class CtsTestServer {
     private Resources mResources;
     private boolean mSsl;
     private MimeTypeMap mMap;
-    private String mLastQuery;
+    private Vector<String> mQueries;
     private ArrayList<HttpEntity> mRequestEntities;
-    private int mRequestCount;
     private long mDocValidity;
     private long mDocAge;
 
@@ -168,6 +169,7 @@ public class CtsTestServer {
         mSsl = ssl;
         mRequestEntities = new ArrayList<HttpEntity>();
         mMap = MimeTypeMap.getSingleton();
+        mQueries = new Vector<String>();
         mServerThread = new ServerThread(this, mSsl);
         if (mSsl) {
             mServerUri = "https://localhost:" + mServerThread.mSocket.getLocalPort();
@@ -379,8 +381,21 @@ public class CtsTestServer {
                 .toString();
     }
 
-    public synchronized String getLastRequestUrl() {
-        return mLastQuery;
+    /**
+     * Returns true if the resource identified by url has been requested since
+     * the server was started or the last call to resetRequestState().
+     *
+     * @param url The relative url to check whether it has been requested.
+     */
+    public synchronized boolean wasResourceRequested(String url) {
+        Iterator<String> it = mQueries.iterator();
+        while (it.hasNext()) {
+            String request = it.next();
+            if (request.endsWith(url)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
@@ -391,7 +406,7 @@ public class CtsTestServer {
     }
 
     public synchronized int getRequestCount() {
-        return mRequestCount;
+        return mQueries.size();
     }
 
     /**
@@ -417,8 +432,7 @@ public class CtsTestServer {
      */
     public synchronized void resetRequestState() {
 
-        mRequestCount = 0;
-        mLastQuery = null;
+        mQueries.clear();
         mRequestEntities = new ArrayList<HttpEntity>();
     }
 
@@ -443,8 +457,7 @@ public class CtsTestServer {
         Log.i(TAG, requestLine.getMethod() + ": " + uriString);
 
         synchronized (this) {
-            mRequestCount += 1;
-            mLastQuery = uriString;
+            mQueries.add(uriString);
             if (request instanceof HttpEntityEnclosingRequest) {
                 mRequestEntities.add(((HttpEntityEnclosingRequest)request).getEntity());
             }
