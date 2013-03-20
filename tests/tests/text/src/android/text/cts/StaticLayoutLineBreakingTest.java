@@ -49,7 +49,7 @@ public class StaticLayoutLineBreakingTest extends AndroidTestCase {
         @Override
         public float getTextRunAdvances(char[] chars, int index, int count,
                 int contextIndex, int contextCount, int flags, float[] advances,
-                int advancesIndex, int reserved) {
+                int advancesIndex) {
 
             // Conditions copy pasted from Paint
             if (chars == null) {
