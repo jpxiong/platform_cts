@@ -20,31 +20,10 @@ import junit.framework.TestCase;
 
 public class SeccompTest extends TestCase {
 
-    /**
-     * Verify that seccomp is enabled in Linux kernel versions
-     * 3.5 and greater.
-     *
-     * IMPORTANT NOTE: If you are running an ARM kernel between
-     * version 3.5 and 3.8, you will need to apply the following patches:
-     *
-     *   ARM: 7580/1: arch/select HAVE_ARCH_SECCOMP_FILTER
-     *   http://git.kernel.org/cgit/linux/kernel/git/torvalds/linux.git/commit/?id=4095ccc
-     *
-     *   ARM: 7579/1: arch/allow a scno of -1 to not cause a SIGILL
-     *   http://git.kernel.org/cgit/linux/kernel/git/torvalds/linux.git/commit/?id=ad75b51
-     *
-     *   ARM: 7578/1: arch/move secure_computing into trace
-     *   http://git.kernel.org/cgit/linux/kernel/git/torvalds/linux.git/commit/?id=9b790d7
-     *
-     *   ARM: 7577/1: arch/add syscall_get_arch
-     *   http://git.kernel.org/cgit/linux/kernel/git/torvalds/linux.git/commit/?id=1f59d13
-     */
-
     public void testSeccomp() {
         if (OSFeatures.needsSeccompSupport()) {
-            assertTrue("Please enable seccomp support in your kernel "
-                       + "(CONFIG_SECCOMP_FILTER=y). Please see CTS "
-                       + "test javadocs for important details.",
+            assertTrue("Please enable seccomp support "
+                       + "in your kernel (CONFIG_SECCOMP_FILTER=y)",
                        OSFeatures.hasSeccompSupport());
         }
     }
