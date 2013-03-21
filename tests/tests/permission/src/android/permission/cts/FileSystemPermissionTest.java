@@ -566,7 +566,13 @@ public class FileSystemPermissionTest extends AndroidTestCase {
 
     private static final Set<File> SYS_EXCEPTIONS = new HashSet<File>(
             Arrays.asList(
-                new File("/sys/kernel/debug/tracing/trace_marker")
+                new File("/sys/kernel/debug/tracing/trace_marker"),
+                new File("/sys/fs/selinux/member"),
+                new File("/sys/fs/selinux/user"),
+                new File("/sys/fs/selinux/relabel"),
+                new File("/sys/fs/selinux/create"),
+                new File("/sys/fs/selinux/access"),
+                new File("/sys/fs/selinux/context")
             ));
 
     @LargeTest
