@@ -576,14 +576,6 @@ public class BuildDalvikSuite {
         }
 
         // find the @title/@constraint in javadoc comment for this method
-        Scanner scanner2;
-        try {
-            // using platform's default charset
-            scanner2 = new Scanner(f);
-        } catch (FileNotFoundException e) {
-            throw new RuntimeException("error while reading to file: " + e.getClass().getName() +
-                    ", msg:" + e.getMessage());
-        }
         // using platform's default charset
         String all = new String(FileUtils.readFile(f));
         // System.out.println("grepping javadoc found for method " + method +
@@ -629,9 +621,6 @@ public class BuildDalvikSuite {
         md.title = title;
         if (scanner != null) {
             scanner.close();
-        }
-        if (scanner2 != null) {
-            scanner2.close();
         }
         return md;
     }
