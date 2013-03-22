@@ -21,11 +21,14 @@
 #include "FullPipelineRenderer.h"
 #include <graphics/Mesh.h>
 #include <graphics/TransformationNode.h>
-#include <GLUtils.h>
+#include <graphics/GLUtils.h>
 
 #define LOG_TAG "PTS_OPENGL"
 #define LOG_NDEBUG 0
-#include "utils/Log.h"
+#include <utils/Log.h>
+
+#define ATRACE_TAG ATRACE_TAG_GRAPHICS
+#include <utils/Trace.h>
 
 static const int FP_NUM_VERTICES = 6;
 
@@ -101,6 +104,7 @@ FullPipelineRenderer::FullPipelineRenderer(ANativeWindow* window, bool offscreen
 }
 
 bool FullPipelineRenderer::setUp() {
+    android::ScopedTrace st(ATRACE_TAG, __func__);
     if (!Renderer::setUp()) {
         return false;
     }
@@ -169,6 +173,7 @@ bool FullPipelineRenderer::setUp() {
 }
 
 bool FullPipelineRenderer::tearDown() {
+    android::ScopedTrace st(ATRACE_TAG, __func__);
     if (mTextureId != 0) {
         glDeleteTextures(1, &mTextureId);
         mTextureId = 0;
@@ -192,6 +197,7 @@ bool FullPipelineRenderer::tearDown() {
 }
 
 bool FullPipelineRenderer::draw() {
+    android::ScopedTrace st(ATRACE_TAG, __func__);
     if (mOffscreen) {
         glBindFramebuffer(GL_FRAMEBUFFER, mFboId);
     }
