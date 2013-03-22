@@ -21,11 +21,14 @@
 #include <GLES2/gl2ext.h>
 
 #include "ContextSwitchRenderer.h"
-#include <GLUtils.h>
+#include <graphics/GLUtils.h>
 
 #define LOG_TAG "PTS_OPENGL"
 #define LOG_NDEBUG 0
-#include "utils/Log.h"
+#include <utils/Log.h>
+
+#define ATRACE_TAG ATRACE_TAG_GRAPHICS
+#include <utils/Trace.h>
 
 static const EGLint contextAttribs[] =
         { EGL_CONTEXT_CLIENT_VERSION, 2, EGL_NONE };
@@ -70,6 +73,7 @@ ContextSwitchRenderer::ContextSwitchRenderer(ANativeWindow* window, bool offscre
 }
 
 bool ContextSwitchRenderer::setUp() {
+    android::ScopedTrace st(ATRACE_TAG, __func__);
     if (!Renderer::setUp()) {
         return false;
     }
@@ -105,7 +109,7 @@ bool ContextSwitchRenderer::setUp() {
 
         if (mOffscreen) {
             // Setup FBOs.
-            if (!Renderer::createFBO(mFboIds[i], mRboIds[i], mCboIds[i], w, h)) {
+            if (!GLUtils::createFBO(mFboIds[i], mRboIds[i], mCboIds[i], w, h)) {
                 return false;
             }
         }
@@ -137,6 +141,7 @@ bool ContextSwitchRenderer::setUp() {
 }
 
 bool ContextSwitchRenderer::tearDown() {
+    android::ScopedTrace st(ATRACE_TAG, __func__);
     if (mContexts) {
         for (int i = 0; i < mWorkload; i++) {
             eglDestroyContext(mEglDisplay, mContexts[i]);
@@ -168,6 +173,7 @@ bool ContextSwitchRenderer::tearDown() {
 }
 
 bool ContextSwitchRenderer::draw() {
+    android::ScopedTrace st(ATRACE_TAG, __func__);
     for (int i = 0; i < mWorkload; i++) {
         if (!eglMakeCurrent(mEglDisplay, mEglSurface, mEglSurface, mContexts[i])
                 || EGL_SUCCESS != eglGetError()) {

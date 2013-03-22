@@ -11,22 +11,35 @@
  * or implied. See the License for the specific language governing permissions and limitations under
  * the License.
  */
-#ifndef GLUTILS_H
-#define GLUTILS_H
+#ifndef RENDERER_H
+#define RENDERER_H
+
+#include <android/native_window.h>
 
 #include <EGL/egl.h>
 #include <GLES2/gl2.h>
 #include <GLES2/gl2ext.h>
 
-class GLUtils {
+class Renderer {
 public:
-    // Creates a program with the given vertex and fragment shader source code.
-    static GLuint createProgram(const char** vertexSource,
-            const char** fragmentSource);
-    // Rounds a number up to the smallest power of 2 that is greater than the original number.
-    static int roundUpToSmallestPowerOf2(int x);
-    // Generates a random texture of the given dimensions.
-    static GLuint genRandTex(int texWidth, int texHeight);
+    Renderer(ANativeWindow* window, bool offscreen, int workload);
+    virtual bool setUp();
+    virtual bool tearDown();
+    virtual bool draw() = 0;
+    virtual ~Renderer() {};
+protected:
+    ANativeWindow* mWindow;
+    EGLDisplay mEglDisplay;
+    EGLSurface mEglSurface;
+    EGLContext mEglContext;
+    EGLConfig mGlConfig;
+    GLuint mFboId; //Frame buffer
+    GLuint mRboId; //Depth buffer
+    GLuint mCboId; //Color buffer
+    GLuint mProgramId;
+    EGLint width;
+    EGLint height;
+    bool mOffscreen;
+    int mWorkload;
 };
-
 #endif

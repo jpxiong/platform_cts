@@ -12,13 +12,16 @@
  * the License.
  */
 #include "ShaderPerfRenderer.h"
-#include <GLUtils.h>
+#include <graphics/GLUtils.h>
 
 #include <math.h>
 
 #define LOG_TAG "PTS_OPENGL"
 #define LOG_NDEBUG 0
-#include "utils/Log.h"
+#include <utils/Log.h>
+
+#define ATRACE_TAG ATRACE_TAG_GRAPHICS
+#include <utils/Trace.h>
 
 static const float GOLDEN_RATIO = (1.0 + sqrt(5.0)) / 2.0;
 
@@ -98,6 +101,7 @@ ShaderPerfRenderer::ShaderPerfRenderer(ANativeWindow* window, bool offscreen, in
 }
 
 bool ShaderPerfRenderer::setUp() {
+    android::ScopedTrace st(ATRACE_TAG, __func__);
     if (!Renderer::setUp()) {
         return false;
     }
@@ -148,6 +152,7 @@ bool ShaderPerfRenderer::setUp() {
 }
 
 bool ShaderPerfRenderer::draw() {
+    android::ScopedTrace st(ATRACE_TAG, __func__);
     if (mOffscreen) {
         glBindFramebuffer(GL_FRAMEBUFFER, mFboId);
     }

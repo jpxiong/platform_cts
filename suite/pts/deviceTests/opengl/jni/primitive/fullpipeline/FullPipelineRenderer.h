@@ -16,7 +16,7 @@
 
 #include "FullPipelineProgram.h"
 
-#include <Renderer.h>
+#include <primitive/Renderer.h>
 #include <graphics/Matrix.h>
 #include <graphics/Mesh.h>
 #include <graphics/ProgramNode.h>

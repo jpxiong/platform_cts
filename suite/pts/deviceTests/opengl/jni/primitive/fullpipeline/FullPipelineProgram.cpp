@@ -23,7 +23,7 @@ FullPipelineProgram::FullPipelineProgram(GLuint programId) :
     mLightPosInModelSpace[0] = 0.0f;
     mLightPosInModelSpace[1] = 2.0f;
     mLightPosInModelSpace[2] = 2.0f;
-    mLightPosInModelSpace[3] = 1.0f;
+    mLightPosInModelSpace[3] = 2.0f;
     mMVMatrixHandle = glGetUniformLocation(programId, "u_MVMatrix");
     mMVPMatrixHandle = glGetUniformLocation(programId, "u_MVPMatrix");
     mLightPosHandle = glGetUniformLocation(programId, "u_LightPos");
