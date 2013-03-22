@@ -122,7 +122,13 @@ public class WifiInfoTest extends AndroidTestCase {
         assertNotNull(wifiInfo.toString());
         SupplicantState.isValidState(wifiInfo.getSupplicantState());
         WifiInfo.getDetailedStateOf(SupplicantState.DISCONNECTED);
-        wifiInfo.getSSID();
+        String ssid = wifiInfo.getSSID();
+        if (ssid.startsWith("0x") == false) {
+            // Non-hex string should be quoted
+            assertTrue(ssid.charAt(0) == '"');
+            assertTrue(ssid.charAt(ssid.length() - 1) == '"');
+        }
+
         wifiInfo.getBSSID();
         wifiInfo.getIpAddress();
         wifiInfo.getLinkSpeed();
