@@ -95,19 +95,21 @@ class Result(object):
     self.infoValues = []
     doc = minidom.parse(reportXml)
     testResult = doc.getElementsByTagName("TestResult")[0]
-    buildInfo = testResult.getElementsByTagName("BuildInfo")[0]
-    buildId = buildInfo.getAttribute("buildID")
-    deviceId = buildInfo.getAttribute("deviceID")
-    deviceName = buildInfo.getAttribute("build_device")
-    boardName = buildInfo.getAttribute("build_board")
-    partitions = buildInfo.getAttribute("partitions")
-    m = re.search(r'.*;/data\s+([\w\.]+)\s+([\w\.]+)\s+([\w\.]+)\s+([\w\.]+);', partitions)
-    dataPartitionSize = m.group(1)
-    self.addKV("device", deviceName)
-    self.addKV("board", boardName)
-    self.addKV("serial", deviceId)
-    self.addKV("build", buildId)
-    self.addKV("data size", dataPartitionSize)
+    buildInfos = testResult.getElementsByTagName("BuildInfo")
+    if buildInfos != None and len(buildInfos) > 0:
+      buildInfo = buildInfos[0]
+      buildId = buildInfo.getAttribute("buildID")
+      deviceId = buildInfo.getAttribute("deviceID")
+      deviceName = buildInfo.getAttribute("build_device")
+      boardName = buildInfo.getAttribute("build_board")
+      partitions = buildInfo.getAttribute("partitions")
+      m = re.search(r'.*;/data\s+([\w\.]+)\s+([\w\.]+)\s+([\w\.]+)\s+([\w\.]+);', partitions)
+      dataPartitionSize = m.group(1)
+      self.addKV("device", deviceName)
+      self.addKV("board", boardName)
+      self.addKV("serial", deviceId)
+      self.addKV("build", buildId)
+      self.addKV("data size", dataPartitionSize)
     packages = getChildrenWithTag(testResult, "TestPackage")
     for package in packages:
       casesFromChild = parseSuite(package, "")
@@ -127,6 +129,15 @@ class Result(object):
   def getValues(self):
     return self.infoValues
 
+  def getDeviceName(self):
+    return self.getInfoV("device")
+
+  def getInfoV(self, key):
+    if key in self.infoKeys:
+      return self.infoValues[self.infoKeys.index(key)]
+    else:
+      return "unknown"
+
 def executeWithResult(command):
   p = subprocess.Popen(command.split(), stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
   out, err = p.communicate()
@@ -141,12 +152,12 @@ def parseReports(path):
     result = Result(xml)
     deviceResults.append(result)
   reportInfo = {}
-  keys = deviceResults[0].getKeys()
-  noDevices = len(deviceResults)
+  keys = ["device", "board", "serial", "build", "data size"]
+  numDevices = len(deviceResults)
   for i in xrange(len(keys)):
     values = []
-    for j in xrange(noDevices):
-      values.append(str(deviceResults[j].getValues()[i]))
+    for j in xrange(numDevices):
+      values.append(str(deviceResults[j].getInfoV(keys[i])))
     reportInfo[keys[i]] = values
   #print reportInfo
 
@@ -155,23 +166,23 @@ def parseReports(path):
     for key in deviceResult.getResults().keys():
       if not key in tests:
         tests.append(key)
-  tests.sort()
   #print tests
 
   reportTests = {}
   for i in xrange(len(tests)):
     test = tests[i]
     reportTests[test] = []
-    for j in xrange(noDevices):
+    for j in xrange(numDevices):
       values = {}
       if deviceResults[j].getResults().has_key(test):
         result = deviceResults[j].getResults()[test]
         values["result"] = result.getResult()
         values["summary"] = result.getSummary()
         values["details"] = result.getDetails()
-        values["device"] = deviceResults[j].getValues()[0]
-        reportTests[test].append(values)
-
+        values["device"] = deviceResults[j].getDeviceName()
+      # even if report does not have test, put empty dict
+      # otherwise, there is no way to distinguish results from the same device
+      reportTests[test].append(values)
   #print reportTests
   return (reportInfo, reportTests)
 
@@ -191,21 +202,18 @@ def main(argv):
         f.write(',')
         f.write(value)
       f.write('\n')
-    for test in reportTests:
+    sortedTest = sorted(reportTests)
+    for test in sortedTest:
+      f.write(test)
       for report in reportTests[test]:
-        if report.has_key('result'):
-          result = report['result'] 
-          f.write(test)
-          f.write(',')
-          f.write(result)
-          for key in report['summary']:
-            f.write(',')
-            f.write(report['summary'][key])
-          for key in report['details']:
-            for value in report['details'][key]:
-              f.write(',')
-              f.write(value)
-          f.write('\n')
+        f.write(',')
+        if 'summary' in report:
+          summaryValues = report['summary'].values()
+          if len(summaryValues) > 0:
+            f.write(summaryValues[0])
+        # else: no data printed but just empty cell
+      # close a test with line
+      f.write('\n')
 
 if __name__ == '__main__':
   main(sys.argv)
