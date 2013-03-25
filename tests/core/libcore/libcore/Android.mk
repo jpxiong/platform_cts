@@ -20,4 +20,5 @@ endif
 
 include $(CLEAR_VARS)
 LOCAL_PACKAGE_NAME := android.core.tests.libcore.package.libcore
+LOCAL_STATIC_JAVA_LIBRARIES := core-tests
 include $(BUILD_CTSCORE_PACKAGE)
