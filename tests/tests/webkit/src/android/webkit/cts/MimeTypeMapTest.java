@@ -75,6 +75,7 @@ public class MimeTypeMapTest extends AndroidTestCase {
     }
 
     public void testGetExtensionFromMimeType() {
+        assertEquals("mp3", mMimeTypeMap.getExtensionFromMimeType("audio/mpeg"));
         assertEquals("png", mMimeTypeMap.getExtensionFromMimeType("image/png"));
         assertEquals("zip", mMimeTypeMap.getExtensionFromMimeType("application/zip"));
 
