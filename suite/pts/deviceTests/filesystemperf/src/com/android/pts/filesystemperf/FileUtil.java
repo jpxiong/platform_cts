@@ -190,7 +190,7 @@ public class FileUtil {
             MeasureRun run)  throws Exception {
         double[] result = new double[count];
         File procIo = new File("/proc/self/io");
-        boolean measureIo = procIo.exists();
+        boolean measureIo = procIo.exists() && procIo.canRead();
         long prev = System.currentTimeMillis();
         RWAmount prevAmount = new RWAmount();
         if (measureIo) {
