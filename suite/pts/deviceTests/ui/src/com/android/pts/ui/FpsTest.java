@@ -37,11 +37,6 @@ public class FpsTest extends PtsActivityInstrumentationTestCase2<GlPlanetsActivi
     private static final String TAG = "FpsTest";
     private static final int NUM_FRAMES_TO_RENDER = 60 * 60;
     private static final long RENDERING_TIMEOUT = NUM_FRAMES_TO_RENDER / 10;
-    // error of this much in ms in refresh interval is not considered as jankiness
-    // note that this margin is set to be little big to consider that there can be additional delay
-    // measurement on some devices showed many jankiness around 2 to 3 ms,
-    // which should not be counted
-    private static final double REFRESH_INTERVAL_THRESHHOLD_IN_MS = 4.0;
     private GlPlanetsActivity mActivity;
 
     public FpsTest() {
@@ -54,7 +49,7 @@ public class FpsTest extends PtsActivityInstrumentationTestCase2<GlPlanetsActivi
         super.tearDown();
     }
 
-    public void testFrameIntervals() throws Exception {
+    public void testFrameJankiness() throws Exception {
         Intent intent = new Intent();
         intent.putExtra(GlPlanetsActivity.INTENT_EXTRA_NUM_FRAMES,
                 NUM_FRAMES_TO_RENDER);
@@ -75,57 +70,35 @@ public class FpsTest extends PtsActivityInstrumentationTestCase2<GlPlanetsActivi
         Display dpy = wm.getDefaultDisplay();
         double fpsNominal = dpy.getRefreshRate();
         double frameIntervalNominalInMs = 1000.0 / fpsNominal;
-        int jankNumber = 0;
-        // only count positive ( = real delay)
-        double maxDelay = 0;
+
         // first one not valid, and should be thrown away
         double[] intervals = new double[NUM_FRAMES_TO_RENDER - 1];
-        double[] jankiness = new double[NUM_FRAMES_TO_RENDER - 1];
-        double deltaAccumulated = 0;
+        double[] jankiness = new double[NUM_FRAMES_TO_RENDER - 2];
         for (int i = 0; i < NUM_FRAMES_TO_RENDER - 1; i++) {
             intervals[i] = frameInterval[i + 1];
-            double delay = (double)intervals[i] - frameIntervalNominalInMs;
-            if (Math.abs(delay) > REFRESH_INTERVAL_THRESHHOLD_IN_MS) {
-                // Falling here does not necessarily mean jank as it may be catching up
-                // the previous delay. Basically count the first delay as jank, but subsequent
-                // variation should be checked with accumulated delay
-                double delayAdjusted = 0;
-                if (deltaAccumulated == 0) { // This is the first delay. always consider as total
-                    jankNumber++;
-                    delayAdjusted = delay;
-                } else { // delay already happened
-                    double deltaFromLastRefresh = deltaAccumulated - Math.floor(deltaAccumulated /
-                            frameIntervalNominalInMs) * frameIntervalNominalInMs;
-                    if (deltaAccumulated < 0) {
-                        // adjust as the above operation makes delay positive
-                        deltaFromLastRefresh -= frameIntervalNominalInMs;
-                    }
-                    delayAdjusted = delay + deltaFromLastRefresh;
-                    if (Math.abs(delayAdjusted) > REFRESH_INTERVAL_THRESHHOLD_IN_MS) {
-                        jankNumber++;
-                    } else { // caught up
-                        delayAdjusted = 0;
-                        deltaAccumulated = 0;
-                    }
-                }
-                deltaAccumulated += delay;
-                if (delayAdjusted > maxDelay) {
-                    maxDelay = delayAdjusted;
-                }
-                jankiness[i] = delayAdjusted;
-            } else {
-                jankiness[i] = 0;
-                deltaAccumulated = 0;
-            }
         }
+        int jankNumber = 0;
+        double totalJanks = 0.0;
+        for (int i = 0; i < NUM_FRAMES_TO_RENDER - 2; i++) {
+            double delta = intervals[i + 1] - intervals[i];
+            double normalizedDelta = delta / frameIntervalNominalInMs;
+            // This makes delay over 1.5 * frameIntervalNomial a jank.
+            // Note that too big delay is not excluded here as there should be no pause.
+            jankiness[i] = (int)Math.round(Math.max(normalizedDelta, 0.0));
+            if (jankiness[i] > 0) {
+                jankNumber++;
+            }
+            totalJanks += jankiness[i];
+        }
+
         Log.i(TAG, " fps nominal " + fpsNominal + " fps measured " + fpsMeasured);
         getReportLog().printArray("intervals", intervals, ResultType.NEUTRAL,
                 ResultUnit.MS);
         getReportLog().printArray("jankiness", jankiness, ResultType.LOWER_BETTER,
-                ResultUnit.MS);
+                ResultUnit.COUNT);
         getReportLog().printValue("number of jank", jankNumber, ResultType.LOWER_BETTER,
                 ResultUnit.COUNT);
-        getReportLog().printSummary("max jank delay", maxDelay, ResultType.LOWER_BETTER,
-                ResultUnit.MS);
+        getReportLog().printSummary("total janks", totalJanks, ResultType.LOWER_BETTER,
+                ResultUnit.COUNT);
     }
 }
