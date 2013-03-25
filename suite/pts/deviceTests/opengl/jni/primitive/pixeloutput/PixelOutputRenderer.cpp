@@ -18,8 +18,7 @@
 #define LOG_NDEBUG 0
 #include <utils/Log.h>
 
-#define ATRACE_TAG ATRACE_TAG_GRAPHICS
-#include <utils/Trace.h>
+#include <primitive/Trace.h>
 
 static const int PO_NUM_VERTICES = 6;
 
@@ -60,7 +59,7 @@ PixelOutputRenderer::PixelOutputRenderer(ANativeWindow* window, bool offscreen, 
 }
 
 bool PixelOutputRenderer::setUp() {
-    android::ScopedTrace st(ATRACE_TAG, __func__);
+    SCOPED_TRACE();
     if (!Renderer::setUp()) {
         return false;
     }
@@ -83,7 +82,7 @@ bool PixelOutputRenderer::setUp() {
 }
 
 bool PixelOutputRenderer::tearDown() {
-    android::ScopedTrace st(ATRACE_TAG, __func__);
+    SCOPED_TRACE();
     if (mTextureId != 0) {
         glDeleteTextures(1, &mTextureId);
         mTextureId = 0;
@@ -95,7 +94,7 @@ bool PixelOutputRenderer::tearDown() {
 }
 
 bool PixelOutputRenderer::draw() {
-    android::ScopedTrace st(ATRACE_TAG, __func__);
+    SCOPED_TRACE();
     if (mOffscreen) {
         glBindFramebuffer(GL_FRAMEBUFFER, mFboId);
     }
@@ -130,16 +129,5 @@ bool PixelOutputRenderer::draw() {
         glDrawArrays(GL_TRIANGLES, 0, PO_NUM_VERTICES);
     }
 
-    GLuint err = glGetError();
-    if (err != GL_NO_ERROR) {
-        ALOGV("GLError %d", err);
-        return false;
-    }
-
-    if (mOffscreen) {
-        glFinish();
-        return true;
-    } else {
-        return eglSwapBuffers(mEglDisplay, mEglSurface);
-    }
+    return Renderer::draw();
 }

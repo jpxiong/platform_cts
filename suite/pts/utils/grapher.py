@@ -26,6 +26,13 @@ This uses MatPlotLib (http://matplotlib.org/) to plot which can be installed on 
   sudo apt-get install python-matplotlib
 """
 
+colors = {
+  'maguro':'#FF0000',
+  'mako':'#00FF00',
+  'manta':'#0000FF',
+  'tilapia':'#00FFFF'
+}
+
 def main(argv):
   if len(argv) != 2:
     print "grapher.py pts_report_dir"
@@ -44,7 +51,7 @@ def main(argv):
       plt.title(benchmark[benchmark.index('#') + 1:])
       # For each result in the data set
       for r in results:
-        score = r['result']
+        score = r.get('result', 'no results')
         x = []
         y = []
         if score == 'pass':
@@ -56,8 +63,12 @@ def main(argv):
         if score != 'no results':
           # Create a plot
           ax = fig.add_subplot(111)
+          name = r['device']
+          lbl = name + ' (%s)'%score
+          clr = colors.get(name, "#%06X" % (hash(name) % 0xFFFFFF))
+          print clr
           # Plot the workload vs the values
-          ax.plot(x, y, 'o-', label=r['device'] + ' (%s)'%score)
+          ax.plot(x, y, 'o-', label=lbl, color=clr)
           # Add a legend
           ax.legend(loc='upper right').get_frame().set_fill(False)
       (ymin, ymax) = plt.ylim()

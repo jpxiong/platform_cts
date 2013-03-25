@@ -18,8 +18,7 @@
 #define LOG_NDEBUG 0
 #include <utils/Log.h>
 
-#define ATRACE_TAG ATRACE_TAG_GRAPHICS
-#include <utils/Trace.h>
+#include <primitive/Trace.h>
 
 static const EGLint contextAttribs[] = {
         EGL_CONTEXT_CLIENT_VERSION, 2,
@@ -42,7 +41,7 @@ Renderer::Renderer(ANativeWindow* window, bool offscreen, int workload) :
 }
 
 bool Renderer::setUp() {
-    android::ScopedTrace st(ATRACE_TAG, __func__);
+    SCOPED_TRACE();
     mEglDisplay = eglGetDisplay(EGL_DEFAULT_DISPLAY);
     if (EGL_NO_DISPLAY == mEglDisplay || EGL_SUCCESS != eglGetError()) {
         return false;
@@ -87,12 +86,16 @@ bool Renderer::setUp() {
     glViewport(0, 0, width, height);
 
     if (mOffscreen) {
-        int w = GLUtils::roundUpToSmallestPowerOf2(width);
-        int h = GLUtils::roundUpToSmallestPowerOf2(height);
-        if (!GLUtils::createFBO(mFboId, mRboId, mCboId, w, h)) {
+        mFboWidth = GLUtils::roundUpToSmallestPowerOf2(width);
+        mFboHeight = GLUtils::roundUpToSmallestPowerOf2(height);
+        if (!GLUtils::createFBO(mFboId, mRboId, mCboId, mFboWidth, mFboHeight)) {
             return false;
         }
+        mBuffer = new GLushort[mFboWidth * mFboHeight];
     } else {
+        mFboWidth = 0;
+        mFboHeight = 0;
+        mBuffer = 0;
         mFboId = 0;
         mRboId = 0;
         mCboId = 0;
@@ -100,14 +103,17 @@ bool Renderer::setUp() {
 
     GLuint err = glGetError();
     if (err != GL_NO_ERROR) {
-        ALOGV("GLError %d", err);
+        ALOGE("GLError %d", err);
         return false;
     }
     return true;
 }
 
 bool Renderer::tearDown() {
-    android::ScopedTrace st(ATRACE_TAG, __func__);
+    SCOPED_TRACE();
+    if (mBuffer != 0) {
+        delete[] mBuffer;
+    }
     if (mFboId != 0) {
         glDeleteFramebuffers(1, &mFboId);
         mFboId = 0;
@@ -134,4 +140,21 @@ bool Renderer::tearDown() {
         mEglDisplay = EGL_NO_DISPLAY;
     }
     return EGL_SUCCESS == eglGetError();
+}
+
+bool Renderer::draw() {
+    SCOPED_TRACE();
+    GLuint err = glGetError();
+    if (err != GL_NO_ERROR) {
+        ALOGE("GLError %d", err);
+        return false;
+    }
+
+    if (mOffscreen) {
+        // Read the pixels back from the frame buffer.
+        glReadPixels(0, 0, mFboWidth, mFboHeight, GL_RGB, GL_UNSIGNED_SHORT_5_6_5, mBuffer);
+        return true;
+    } else {
+        return eglSwapBuffers(mEglDisplay, mEglSurface);
+    }
 }
