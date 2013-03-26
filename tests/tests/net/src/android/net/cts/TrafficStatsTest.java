@@ -16,7 +16,6 @@
 
 package android.net.cts;
 
-
 import android.net.TrafficStats;
 import android.os.Process;
 import android.test.AndroidTestCase;
@@ -26,20 +25,48 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 public class TrafficStatsTest extends AndroidTestCase {
-    public void testGetMobileStats() {
+    public void testValidMobileStats() {
         // We can't assume a mobile network is even present in this test, so
         // we simply assert that a valid value is returned.
 
-        assertTrue(TrafficStats.getMobileTxPackets() == TrafficStats.UNSUPPORTED ||
-                   TrafficStats.getMobileTxPackets() >= 0);
-        assertTrue(TrafficStats.getMobileRxPackets() == TrafficStats.UNSUPPORTED ||
-                   TrafficStats.getMobileRxPackets() >= 0);
-        assertTrue(TrafficStats.getMobileTxBytes() == TrafficStats.UNSUPPORTED ||
-                   TrafficStats.getMobileTxBytes() >= 0);
-        assertTrue(TrafficStats.getMobileRxBytes() == TrafficStats.UNSUPPORTED ||
-                   TrafficStats.getMobileRxBytes() >= 0);
+        assertTrue(TrafficStats.getMobileTxPackets() >= 0);
+        assertTrue(TrafficStats.getMobileRxPackets() >= 0);
+        assertTrue(TrafficStats.getMobileTxBytes() >= 0);
+        assertTrue(TrafficStats.getMobileRxBytes() >= 0);
+    }
+
+    public void testValidTotalStats() {
+        assertTrue(TrafficStats.getTotalTxPackets() >= 0);
+        assertTrue(TrafficStats.getTotalRxPackets() >= 0);
+        assertTrue(TrafficStats.getTotalTxBytes() >= 0);
+        assertTrue(TrafficStats.getTotalRxBytes() >= 0);
+    }
+
+    public void testThreadStatsTag() throws Exception {
+        TrafficStats.setThreadStatsTag(0xf00d);
+        assertTrue("Tag didn't stick", TrafficStats.getThreadStatsTag() == 0xf00d);
+
+        final CountDownLatch latch = new CountDownLatch(1);
+
+        new Thread("TrafficStatsTest.testThreadStatsTag") {
+            @Override
+            public void run() {
+                assertTrue("Tag leaked", TrafficStats.getThreadStatsTag() != 0xf00d);
+                TrafficStats.setThreadStatsTag(0xcafe);
+                assertTrue("Tag didn't stick", TrafficStats.getThreadStatsTag() == 0xcafe);
+                latch.countDown();
+            }
+        }.start();
+
+        latch.await(5, TimeUnit.SECONDS);
+        assertTrue("Tag lost", TrafficStats.getThreadStatsTag() == 0xf00d);
+
+        TrafficStats.clearThreadStatsTag();
+        assertTrue("Tag not cleared", TrafficStats.getThreadStatsTag() != 0xf00d);
     }
 
     long tcpPacketToIpBytes(long packetCount, long bytes) {
