@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012 The Android Open Source Project
+ * Copyright (C) 2013 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,20 +17,8 @@
 
 package com.android.pts.util;
 
-import android.content.Context;
-import android.test.AndroidTestCase;
+import android.app.Activity;
 
-/**
- *  This class emulates AndroidTestCase, but internally it is ActivityInstrumentationTestCase2
- *  to access Instrumentation.
- *  DummyActivity is not supposed to be accessed.
- */
-public class PtsAndroidTestCase extends PtsActivityInstrumentationTestCase2<DummyActivity> {
-    public PtsAndroidTestCase() {
-        super(DummyActivity.class);
-    }
+public class DummyActivity extends Activity {
 
-    public Context getContext() {
-        return getInstrumentation().getContext();
-    }
 }

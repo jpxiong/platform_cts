@@ -16,10 +16,16 @@
 
 package com.android.pts.util;
 
+import android.app.Instrumentation;
+import android.os.Bundle;
 import android.util.Log;
 
+import java.lang.Exception;
+
 public class DeviceReportLog extends ReportLog {
-    private static final String TAG = "PtsReport";
+    private static final String TAG = "DevicePtsReport";
+    private static final String PTS_RESULT = "PTS_RESULT";
+    private static final int INST_STATUS_IN_PROGRESS = 2;
 
     DeviceReportLog() {
         mDepth = 4;
@@ -28,5 +34,12 @@ public class DeviceReportLog extends ReportLog {
     @Override
     protected void printLog(String msg) {
         Log.i(TAG, msg);
+    }
+
+    public void deliverReportToHost(Instrumentation instrumentation) {
+        Log.i(TAG, "deliverReportToHost");
+        Bundle output = new Bundle();
+        output.putString(PTS_RESULT, generateReport());
+        instrumentation.sendStatus(INST_STATUS_IN_PROGRESS, output);
     }
 }

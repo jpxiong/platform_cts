@@ -99,9 +99,8 @@ public class CtsXmlResultReporter implements ITestInvocationListener {
     private File mLogDir;
     private String mSuiteName;
 
-    private static final String PTS_PERFORMANCE_EXCEPTION = "com.android.pts.util.PtsException";
-    private static final Pattern mPtsLogPattern = Pattern.compile(
-            "com\\.android\\.pts\\.util\\.PtsException:\\s(.*)\\+\\+\\+\\+(.*)");
+    private static final Pattern mPtsLogPattern = Pattern.compile("(.*)\\+\\+\\+\\+(.*)");
+
     public void setReportDir(File reportDir) {
         mReportDir = reportDir;
     }
@@ -226,21 +225,7 @@ public class CtsXmlResultReporter implements ITestInvocationListener {
      */
     @Override
     public void testFailed(TestFailure status, TestIdentifier test, String trace) {
-        if (trace.startsWith(PTS_PERFORMANCE_EXCEPTION)) { //PTS result
-            Test tst = mCurrentPkgResult.findTest(test);
-            // this exception is always thrown as exception is thrown from tearDown.
-            // Just ignore it.
-            if (tst.getName().endsWith("testAndroidTestCaseSetupProperly")) {
-                return;
-            }
-            Matcher m = mPtsLogPattern.matcher(trace);
-            if (m.find()) {
-                mCurrentPkgResult.reportPerformanceResult(test, CtsTestStatus.PASS, m.group(1),
-                        m.group(2));
-            }
-        } else {
-            mCurrentPkgResult.reportTestFailure(test, CtsTestStatus.FAIL, trace);
-        }
+        mCurrentPkgResult.reportTestFailure(test, CtsTestStatus.FAIL, trace);
     }
 
     /**
@@ -248,11 +233,37 @@ public class CtsXmlResultReporter implements ITestInvocationListener {
      */
     @Override
     public void testEnded(TestIdentifier test, Map<String, String> testMetrics) {
+        collectPtsResults(test, testMetrics);
         mCurrentPkgResult.reportTestEnded(test);
         Test result = mCurrentPkgResult.findTest(test);
         String stack = result.getStackTrace() == null ? "" : "\n" + result.getStackTrace();
         logResult("%s#%s %s %s", test.getClassName(), test.getTestName(), result.getResult(),
                 stack);
+    }
+
+    /**
+     * Collect Pts results for both device and host tests to the package result.
+     * @param test test ran
+     * @param testMetrics test metrics which can contain performance result for device tests
+     */
+    private void collectPtsResults(TestIdentifier test, Map<String, String> testMetrics) {
+        // device test can have performance results in testMetrics
+        String perfResult = PtsReportUtil.getPtsResultFromMetrics(testMetrics);
+        // host test should be checked in PtsHostStore.
+        if (perfResult == null) {
+            perfResult = PtsHostStore.removePtsResult(mDeviceSerial, test);
+        }
+        if (perfResult != null) {
+            // PTS result is passed in Summary++++Details format.
+            // Extract Summary and Details, and pass them.
+            Matcher m = mPtsLogPattern.matcher(perfResult);
+            if (m.find()) {
+                mCurrentPkgResult.reportPerformanceResult(test, CtsTestStatus.PASS, m.group(1),
+                        m.group(2));
+            } else {
+                logResult("PTS Result unrecognizable:" + perfResult);
+            }
+        }
     }
 
     /**
