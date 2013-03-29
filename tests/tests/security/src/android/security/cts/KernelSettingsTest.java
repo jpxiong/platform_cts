@@ -96,14 +96,14 @@ public class KernelSettingsTest extends TestCase {
      * which is commonly used by exploit writers to gain root access.
      *
      * Support for loadable modules can be removed by editing the Linux kernel
-     * config and removing the CONFIG_KMOD option.
+     * config and removing the CONFIG_MODULES option.
      */
     public void testNoLoadableModules() throws IOException {
         assertFalse(
             "Support for loadable modules is compiled into the kernel. "
                 + "Loadable modules are often used by rootkits and other "
                 + "exploits and should be disabled. Please remove "
-                + "CONFIG_KMOD from your kernel config and compile "
+                + "CONFIG_MODULES from your kernel config and compile "
                 + "all modules directly into the kernel.",
             new File("/proc/sys/kernel/modprobe").exists());
     }
