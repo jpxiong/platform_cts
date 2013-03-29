@@ -155,6 +155,12 @@ public class GpsTestActivity extends PassFailButtons.Activity implements PassFai
     @Override
     public void pass() {
         log("OK!\n", Color.GREEN);
+        try {
+            Thread.sleep(2000);
+            log("(Sleep 2 second) \n", Color.GREEN);
+        } catch (InterruptedException e) {
+            fail("unexpected InterruptedException when sleep");
+        }
         mLocationVerifier = null;
         nextTest();
     }
