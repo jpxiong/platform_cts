@@ -139,7 +139,7 @@ bool GLUtils::createFBO(GLuint& fboId, GLuint& rboId, GLuint& cboId, int width, 
 
     GLuint err = glGetError();
     if (err != GL_NO_ERROR) {
-        ALOGV("GLError %d", err);
+        ALOGE("GLError %d", err);
         return false;
     }
 

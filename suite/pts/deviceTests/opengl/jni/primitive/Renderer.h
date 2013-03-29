@@ -25,7 +25,7 @@ public:
     Renderer(ANativeWindow* window, bool offscreen, int workload);
     virtual bool setUp();
     virtual bool tearDown();
-    virtual bool draw() = 0;
+    virtual bool draw();
     virtual ~Renderer() {};
 protected:
     ANativeWindow* mWindow;
@@ -33,9 +33,12 @@ protected:
     EGLSurface mEglSurface;
     EGLContext mEglContext;
     EGLConfig mGlConfig;
-    GLuint mFboId; //Frame buffer
-    GLuint mRboId; //Depth buffer
-    GLuint mCboId; //Color buffer
+    int mFboWidth;// Frame buffer width
+    int mFboHeight;// Frame buffer height
+    GLuint mFboId;// Frame buffer id
+    GLuint mRboId;// Depth buffer id
+    GLuint mCboId;// Color buffer id
+    GLushort* mBuffer;// Used for FBO read back
     GLuint mProgramId;
     EGLint width;
     EGLint height;
