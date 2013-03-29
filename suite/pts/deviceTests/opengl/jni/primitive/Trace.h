@@ -11,25 +11,17 @@
  * or implied. See the License for the specific language governing permissions and limitations under
  * the License.
  */
-#ifndef CONTEXTSWITCHRENDERER_H
-#define CONTEXTSWITCHRENDERER_H
+#ifndef TRACE_H
+#define TRACE_H
 
-#include <primitive/Renderer.h>
+// #define TRACE
 
-class ContextSwitchRenderer: public Renderer {
-public:
-    ContextSwitchRenderer(ANativeWindow* window, bool offscreen, int workload);
-    virtual ~ContextSwitchRenderer() {};
-    bool setUp();
-    bool tearDown();
-    bool draw();
-private:
-    EGLContext* mContexts;
-    GLuint mTextureId;
-    GLuint mTextureUniformHandle;
-    GLuint mTranslateUniformHandle;
-    GLuint mPositionHandle;
-    GLuint mTexCoordHandle;
-};
+#ifdef TRACE
+#define ATRACE_TAG ATRACE_TAG_GRAPHICS
+#include <utils/Trace.h>
+#define SCOPED_TRACE() android::ScopedTrace st(ATRACE_TAG, __func__)
+#else
+#define SCOPED_TRACE()
+#endif
 
 #endif

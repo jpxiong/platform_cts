@@ -92,6 +92,9 @@ Java_com_android_pts_opengl_primitive_GLActivity_setupShaderPerfBenchmark(
 extern "C" JNIEXPORT void JNICALL
 Java_com_android_pts_opengl_primitive_GLActivity_setupContextSwitchBenchmark(
         JNIEnv* env, jclass clazz, jobject surface, jboolean offscreen, jint workload) {
-    gRenderer = new ContextSwitchRenderer(
-            ANativeWindow_fromSurface(env, surface), offscreen, workload);
+    if (workload <= 8) {
+        // This test uses 8 iterations, so workload can't be more than 8.
+        gRenderer = new ContextSwitchRenderer(
+                ANativeWindow_fromSurface(env, surface), offscreen, workload);
+    }
 }

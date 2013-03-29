@@ -20,7 +20,6 @@ import com.android.pts.util.ResultUnit;
 import android.content.Intent;
 import android.cts.util.TimeoutReq;
 import android.opengl.Matrix;
-import android.util.Log;
 
 import java.util.Arrays;
 
@@ -29,6 +28,10 @@ import java.util.Arrays;
  */
 public class GLBenchmark extends PtsActivityInstrumentationTestCase2<GLActivity> {
 
+    private static final int NUM_FRAMES = 100;
+    private static final int NUM_ITERATIONS = 8;
+    private static final int TIME_OUT = 1000000;
+
     public GLBenchmark() {
         super(GLActivity.class);
     }
@@ -36,59 +39,65 @@ public class GLBenchmark extends PtsActivityInstrumentationTestCase2<GLActivity>
     /**
      * Runs the full OpenGL ES 2.0 pipeline test offscreen.
      */
-    @TimeoutReq(minutes = 20)
+    @TimeoutReq(minutes = 100)
     public void testFullPipelineOffscreen() throws Exception {
-        runBenchmark(Benchmark.FullPipeline, true, 500, 8, 1000000);
+        runBenchmark(Benchmark.FullPipeline, true, NUM_FRAMES, NUM_ITERATIONS, TIME_OUT);
     }
 
     /**
      * Runs the full OpenGL ES 2.0 pipeline test onscreen.
      */
-    @TimeoutReq(minutes = 20)
+    @TimeoutReq(minutes = 100)
     public void testFullPipelineOnscreen() throws Exception {
-        runBenchmark(Benchmark.FullPipeline, false, 500, 8, 1000000);
+        runBenchmark(Benchmark.FullPipeline, false, NUM_FRAMES, NUM_ITERATIONS, TIME_OUT);
     }
 
     /**
      * Runs the pixel output test offscreen.
      */
+    @TimeoutReq(minutes = 100)
     public void testPixelOutputOffscreen() throws Exception {
-        runBenchmark(Benchmark.PixelOutput, true, 500, 8, 1000000);
+        runBenchmark(Benchmark.PixelOutput, true, NUM_FRAMES, NUM_ITERATIONS, TIME_OUT);
     }
 
     /**
      * Runs the pixel output test onscreen.
      */
+    @TimeoutReq(minutes = 100)
     public void testPixelOutputOnscreen() throws Exception {
-        runBenchmark(Benchmark.PixelOutput, false, 500, 8, 1000000);
+        runBenchmark(Benchmark.PixelOutput, false, NUM_FRAMES, NUM_ITERATIONS, TIME_OUT);
     }
 
     /**
      * Runs the shader performance test offscreen.
      */
+    @TimeoutReq(minutes = 100)
     public void testShaderPerfOffscreen() throws Exception {
-        runBenchmark(Benchmark.ShaderPerf, true, 500, 8, 1000000);
+        runBenchmark(Benchmark.ShaderPerf, true, NUM_FRAMES, NUM_ITERATIONS, TIME_OUT);
     }
 
     /**
      * Runs the shader performance test onscreen.
      */
+    @TimeoutReq(minutes = 100)
     public void testShaderPerfOnscreen() throws Exception {
-        runBenchmark(Benchmark.ShaderPerf, false, 500, 8, 1000000);
+        runBenchmark(Benchmark.ShaderPerf, false, NUM_FRAMES, NUM_ITERATIONS, TIME_OUT);
     }
 
     /**
      * Runs the context switch overhead test offscreen.
      */
+    @TimeoutReq(minutes = 100)
     public void testContextSwitchOffscreen() throws Exception {
-        runBenchmark(Benchmark.ContextSwitch, true, 500, 8, 1000000);
+        runBenchmark(Benchmark.ContextSwitch, true, NUM_FRAMES, NUM_ITERATIONS, TIME_OUT);
     }
 
     /**
      * Runs the context switch overhead test onscreen.
      */
+    @TimeoutReq(minutes = 100)
     public void testContextSwitchOnscreen() throws Exception {
-        runBenchmark(Benchmark.ContextSwitch, false, 500, 8, 1000000);
+        runBenchmark(Benchmark.ContextSwitch, false, NUM_FRAMES, NUM_ITERATIONS, TIME_OUT);
     }
 
     /**
@@ -124,6 +133,8 @@ public class GLBenchmark extends PtsActivityInstrumentationTestCase2<GLActivity>
                 for (double d : fpsValues) {
                     score += d;
                 }
+                score /= numIterations;// Average.
+
                 getReportLog().printArray(
                         "Fps Values", fpsValues, ResultType.HIGHER_BETTER, ResultUnit.FPS);
                 getReportLog()

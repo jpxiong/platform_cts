@@ -20,10 +20,9 @@
 #define LOG_NDEBUG 0
 #include <utils/Log.h>
 
-#define ATRACE_TAG ATRACE_TAG_GRAPHICS
-#include <utils/Trace.h>
+#include <primitive/Trace.h>
 
-static const float GOLDEN_RATIO = (1.0 + sqrt(5.0)) / 2.0;
+static const float GOLDEN_RATIO = (1.0f + sqrt(5.0f)) / 2.0f;
 
 static const int SP_NUM_VERTICES = 6;
 
@@ -63,7 +62,7 @@ static const char* SP_FRAGMENT_1 =
 //Add workload here
 
 static const char* SP_FRAGMENT_2 =
-        " * 5;"//workload * 5 (5 is a balanced number, bigger = more work)
+        " * 4;"//workload * 4 (4 is a tweaking number, bigger = more work)
         "  vec2 z;"
         "  z.x = 3.0 * (v_TexCoord.x - 0.5);"
         "  z.y = 2.0 * (v_TexCoord.y - 0.5);"
@@ -101,7 +100,7 @@ ShaderPerfRenderer::ShaderPerfRenderer(ANativeWindow* window, bool offscreen, in
 }
 
 bool ShaderPerfRenderer::setUp() {
-    android::ScopedTrace st(ATRACE_TAG, __func__);
+    SCOPED_TRACE();
     if (!Renderer::setUp()) {
         return false;
     }
@@ -144,7 +143,7 @@ bool ShaderPerfRenderer::setUp() {
 
     GLuint err = glGetError();
     if (err != GL_NO_ERROR) {
-        ALOGV("GLError %d", err);
+        ALOGE("GLError %d", err);
         return false;
     }
 
@@ -152,7 +151,7 @@ bool ShaderPerfRenderer::setUp() {
 }
 
 bool ShaderPerfRenderer::draw() {
-    android::ScopedTrace st(ATRACE_TAG, __func__);
+    SCOPED_TRACE();
     if (mOffscreen) {
         glBindFramebuffer(GL_FRAMEBUFFER, mFboId);
     }
@@ -180,16 +179,5 @@ bool ShaderPerfRenderer::draw() {
 
     glDrawArrays(GL_TRIANGLES, 0, SP_NUM_VERTICES);
 
-    GLuint err = glGetError();
-    if (err != GL_NO_ERROR) {
-        ALOGV("GLError %d", err);
-        return false;
-    }
-
-    if (mOffscreen) {
-        glFinish();
-        return true;
-    } else {
-        return eglSwapBuffers(mEglDisplay, mEglSurface);
-    }
+    return Renderer::draw();
 }

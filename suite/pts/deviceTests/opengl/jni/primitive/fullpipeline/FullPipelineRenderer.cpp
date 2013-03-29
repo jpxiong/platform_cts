@@ -11,7 +11,6 @@
  * or implied. See the License for the specific language governing permissions and limitations under
  * the License.
  */
-#include <math.h>
 #include <EGL/egl.h>
 #include <GLES2/gl2.h>
 #include <GLES2/gl2ext.h>
@@ -27,8 +26,7 @@
 #define LOG_NDEBUG 0
 #include <utils/Log.h>
 
-#define ATRACE_TAG ATRACE_TAG_GRAPHICS
-#include <utils/Trace.h>
+#include <primitive/Trace.h>
 
 static const int FP_NUM_VERTICES = 6;
 
@@ -104,7 +102,7 @@ FullPipelineRenderer::FullPipelineRenderer(ANativeWindow* window, bool offscreen
 }
 
 bool FullPipelineRenderer::setUp() {
-    android::ScopedTrace st(ATRACE_TAG, __func__);
+    SCOPED_TRACE();
     if (!Renderer::setUp()) {
         return false;
     }
@@ -126,12 +124,12 @@ bool FullPipelineRenderer::setUp() {
     float centerY = 0.0f;
     float centerZ = 0.0f;
 
-    // Set our up vector. This is where our head would be pointing were we holding the camera.
+    // Set our up vector.
     float upX = 0.0f;
     float upY = 1.0f;
     float upZ = 0.0f;
 
-    // Set the view matrix. This matrix can be said to represent the camera position.
+    // Set the view matrix.
     mViewMatrix = Matrix::newLookAt(eyeX, eyeY, eyeZ, centerX, centerY, centerZ, upX, upY, upZ);
 
     // Create a new perspective projection matrix. The height will stay the same
@@ -152,9 +150,9 @@ bool FullPipelineRenderer::setUp() {
         return false;
     }
 
-    float count = pow(2, mWorkload - 1);
+    float count = mWorkload * mWorkload;
     float middle = count / 2.0f;
-    float scale = 1.0f / count;
+    float scale = 2.0f / count;
 
     mMesh = new Mesh(FP_VERTICES, FP_NORMALS, FP_TEX_COORDS, FP_NUM_VERTICES, mTextureId);
     mSceneGraph = new ProgramNode();
@@ -173,7 +171,7 @@ bool FullPipelineRenderer::setUp() {
 }
 
 bool FullPipelineRenderer::tearDown() {
-    android::ScopedTrace st(ATRACE_TAG, __func__);
+    SCOPED_TRACE();
     if (mTextureId != 0) {
         glDeleteTextures(1, &mTextureId);
         mTextureId = 0;
@@ -197,7 +195,7 @@ bool FullPipelineRenderer::tearDown() {
 }
 
 bool FullPipelineRenderer::draw() {
-    android::ScopedTrace st(ATRACE_TAG, __func__);
+    SCOPED_TRACE();
     if (mOffscreen) {
         glBindFramebuffer(GL_FRAMEBUFFER, mFboId);
     }
@@ -211,16 +209,5 @@ bool FullPipelineRenderer::draw() {
     mModelMatrix->identity();
     mSceneGraph->draw(*mProgram, *mModelMatrix, *mViewMatrix, *mProjectionMatrix);
 
-    GLuint err = glGetError();
-    if (err != GL_NO_ERROR) {
-        ALOGV("GLError %d", err);
-        return false;
-    }
-
-    if (mOffscreen) {
-        glFinish();
-        return true;
-    } else {
-        return eglSwapBuffers(mEglDisplay, mEglSurface);
-    }
+    return Renderer::draw();
 }
