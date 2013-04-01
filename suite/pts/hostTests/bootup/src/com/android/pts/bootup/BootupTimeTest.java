@@ -17,6 +17,7 @@
 package com.android.pts.bootup;
 
 import android.cts.util.TimeoutReq;
+import com.android.pts.util.HostReportLog;
 import com.android.pts.util.MeasureRun;
 import com.android.pts.util.MeasureTime;
 import com.android.pts.util.ResultType;
@@ -32,27 +33,14 @@ import com.android.tradefed.testtype.DeviceTestCase;
  *  Measure reboot-time using adb shell reboot
  */
 public class BootupTimeTest extends DeviceTestCase {
-
-    private ReportLog mReport = null;
     // add some delay before each reboot
     final static long SLEEP_BEFORE_REBOOT_TIME = 2 * 60 * 1000L;
     final static int REBOOT_TIMEOUT_MS = 10 * 60 * 1000;
 
-    @Override
-    protected void setUp() throws Exception {
-        mReport = new ReportLog();
-        super.setUp();
-    }
-
-
-    @Override
-    protected void tearDown() throws Exception {
-        super.tearDown();
-        mReport.throwReportToHost();
-    }
-
     @TimeoutReq(minutes = 30)
     public void testBootupTime() throws Exception {
+        HostReportLog report =
+                new HostReportLog(getDevice().getSerialNumber(), ReportLog.getClassMethodNames());
         final int NUMBER_REPEAT = 5;
         double[] result = MeasureTime.measure(NUMBER_REPEAT, new MeasureRun() {
             @Override
@@ -67,11 +55,12 @@ public class BootupTimeTest extends DeviceTestCase {
                 rebootDevice();
             }
         });
-        mReport.printArray("bootup time", result, ResultType.LOWER_BETTER,
+        report.printArray("bootup time", result, ResultType.LOWER_BETTER,
                 ResultUnit.MS);
         StatResult stat = Stat.getStat(result);
-        mReport.printSummary("bootup time", stat.mAverage, ResultType.LOWER_BETTER,
+        report.printSummary("bootup time", stat.mAverage, ResultType.LOWER_BETTER,
                 ResultUnit.MS);
+        report.deliverReportToHost();
     }
 
     private void rebootDevice() throws DeviceNotAvailableException {

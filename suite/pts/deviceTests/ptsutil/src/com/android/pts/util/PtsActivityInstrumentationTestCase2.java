@@ -24,7 +24,7 @@ import android.test.ActivityInstrumentationTestCase2;
 public class PtsActivityInstrumentationTestCase2<T extends Activity> extends
         ActivityInstrumentationTestCase2<T> {
 
-    private ReportLog mReportLog = new DeviceReportLog();
+    private DeviceReportLog mReportLog = new DeviceReportLog();
 
     public PtsActivityInstrumentationTestCase2(Class<T> activityClass) {
         super(activityClass);
@@ -36,7 +36,8 @@ public class PtsActivityInstrumentationTestCase2<T extends Activity> extends
 
     @Override
     protected void tearDown() throws Exception {
-        mReportLog.throwReportToHost();
+        mReportLog.deliverReportToHost(getInstrumentation());
+        super.tearDown();
     }
 
 }
