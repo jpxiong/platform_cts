@@ -16,7 +16,8 @@ LOCAL_PATH := $(call my-dir)
 
 include $(CLEAR_VARS)
 
-# Only compile source java files in this lib.
+# suite/pts/hostTests/ptshostutil is treated specially
+# as it cannot be put into ptscommonutilhost due to dependency on cts-tradefed
 LOCAL_SRC_FILES := \
 	$(call all-java-files-under, src) \
 	$(call all-java-files-under, ../../suite/pts/hostTests/ptshostutil/src)

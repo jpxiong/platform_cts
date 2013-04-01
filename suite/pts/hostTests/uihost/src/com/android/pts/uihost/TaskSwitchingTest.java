@@ -19,14 +19,14 @@ package com.android.pts.uihost;
 import android.cts.util.TimeoutReq;
 
 import com.android.cts.tradefed.build.CtsBuildHelper;
+import com.android.cts.tradefed.result.PtsReportUtil;
+import com.android.cts.tradefed.result.PtsHostStore;
 import com.android.ddmlib.Log;
+import com.android.ddmlib.Log.LogLevel;
 import com.android.ddmlib.testrunner.RemoteAndroidTestRunner;
 import com.android.ddmlib.testrunner.TestIdentifier;
-import com.android.pts.util.MeasureRun;
-import com.android.pts.util.MeasureTime;
-import com.android.pts.util.PtsException;
-import com.android.pts.util.Stat;
-import com.android.pts.util.Stat.StatResult;
+import com.android.pts.util.HostReportLog;
+import com.android.pts.util.ReportLog;
 import com.android.tradefed.build.IBuildInfo;
 import com.android.tradefed.device.DeviceNotAvailableException;
 import com.android.tradefed.device.ITestDevice;
@@ -40,6 +40,7 @@ import com.android.tradefed.testtype.IBuildReceiver;
 import java.io.File;
 import java.util.Map;
 
+
 /**
  * Measure time to taskswitching between two Apps: A & B
  * Actual test is done in device, but this host side code installs all necessary APKs
@@ -50,6 +51,7 @@ public class TaskSwitchingTest extends DeviceTestCase implements IBuildReceiver 
     private final static String CTS_RUNNER = "android.test.InstrumentationCtsTestRunner";
     private CtsBuildHelper mBuild;
     private ITestDevice mDevice;
+    private String mPtsReport = null;
 
     static final String[] PACKAGES = {
         "com.android.pts.taskswitching.control",
@@ -81,36 +83,36 @@ public class TaskSwitchingTest extends DeviceTestCase implements IBuildReceiver 
 
     @Override
     protected void tearDown() throws Exception {
-        super.tearDown();
         for (int i = 0; i < PACKAGES.length; i++) {
             mDevice.uninstallPackage(PACKAGES[i]);
         }
+        super.tearDown();
     }
 
     @TimeoutReq(minutes = 30)
     public void testTaskswitching() throws Exception {
+        HostReportLog report =
+                new HostReportLog(mDevice.getSerialNumber(), ReportLog.getClassMethodNames());
         RemoteAndroidTestRunner testRunner = new RemoteAndroidTestRunner(PACKAGES[0], CTS_RUNNER,
                 mDevice.getIDevice());
-        CollectingTestListener listener = new CollectingTestListener();
+        LocalListener listener = new LocalListener();
         mDevice.runInstrumentationTests(testRunner, listener);
         TestRunResult result = listener.getCurrentRunResults();
         if (result.isRunFailure()) {
             fail(result.getRunFailureMessage());
         }
-        Map<TestIdentifier, TestResult> details = result.getTestResults();
-        final String expectedException = "com.android.pts.util.PtsException";
-        for (Map.Entry<TestIdentifier, TestResult> entry : details.entrySet()) {
-            TestResult res = entry.getValue();
-            String stackTrace = res.getStackTrace();
-            if (stackTrace != null) {
-                if (stackTrace.startsWith(expectedException)) {
-                    String[] lines = stackTrace.split("[\r\n]+");
-                    String msg = lines[0].substring(expectedException.length() + 1).trim();
-                    throw new PtsException(msg);
-                }
-            }
-        }
-        fail("no performance data");
+        assertNotNull("no performance data", mPtsReport);
+        PtsHostStore.storePtsResult(mDevice.getSerialNumber(),
+                ReportLog.getClassMethodNames(), mPtsReport);
+
     }
 
+    public class LocalListener extends CollectingTestListener {
+        @Override
+        public void testEnded(TestIdentifier test, Map<String, String> testMetrics) {
+            // necessary as testMetrics passed from CollectingTestListerner is empty
+            mPtsReport = PtsReportUtil.getPtsResultFromMetrics(testMetrics);
+            super.testEnded(test, testMetrics);
+        }
+    }
 }
