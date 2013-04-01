@@ -526,11 +526,6 @@
                                                             <xsl:value-of select="@result"/>
                                                         </div>
                                                     </TD>
-                                                    <TD class="failuredetails">
-                                                        <div class="details">
-                                                            <xsl:value-of select="FailedScene/@message"/>
-                                                        </div>
-                                                    </TD>
                                                     <TD class="failuredetails"></TD>
                                                 </xsl:if>
 
