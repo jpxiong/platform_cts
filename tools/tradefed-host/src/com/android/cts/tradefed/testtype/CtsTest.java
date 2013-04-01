@@ -493,6 +493,9 @@ public class CtsTest implements IDeviceTest, IResumableTest, IShardableTest, IBu
                 "CtsViewTestCases",
                 "CtsWidgetTestCases" );
         long intervalInMSec = mRebootIntervalMin * 60 * 1000;
+        if (mDevice.getSerialNumber().startsWith("emulator-")) {
+            return;
+        }
         if (!mDisableReboot) {
             long currentTime = System.currentTimeMillis();
             if (((currentTime - mPrevRebootTime) > intervalInMSec) ||
