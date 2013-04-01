@@ -17,6 +17,7 @@
 package com.android.pts.uihost;
 
 import com.android.cts.tradefed.build.CtsBuildHelper;
+import com.android.pts.util.HostReportLog;
 import com.android.pts.util.MeasureRun;
 import com.android.pts.util.MeasureTime;
 import com.android.pts.util.ResultType;
@@ -38,7 +39,6 @@ import java.io.File;
 public class InstallTimeTest extends DeviceTestCase implements IBuildReceiver {
     private CtsBuildHelper mBuild;
     private ITestDevice mDevice;
-    private ReportLog mReport = null;
 
     static final String PACKAGE = "com.replica.replicaisland";
     static final String APK = "com.replica.replicaisland.apk";
@@ -51,19 +51,19 @@ public class InstallTimeTest extends DeviceTestCase implements IBuildReceiver {
     @Override
     protected void setUp() throws Exception {
         super.setUp();
-        mReport = new ReportLog();
         mDevice = getDevice();
     }
 
 
     @Override
     protected void tearDown() throws Exception {
-        super.tearDown();
         mDevice.uninstallPackage(PACKAGE);
-        mReport.throwReportToHost();
+        super.tearDown();
     }
 
     public void testInstallTime() throws Exception {
+        HostReportLog report =
+                new HostReportLog(mDevice.getSerialNumber(), ReportLog.getClassMethodNames());
         final int NUMBER_REPEAT = 10;
         final CtsBuildHelper build = mBuild;
         final ITestDevice device = mDevice;
@@ -78,11 +78,12 @@ public class InstallTimeTest extends DeviceTestCase implements IBuildReceiver {
                 device.installPackage(app, false);
             }
         });
-        mReport.printArray("install time", result, ResultType.LOWER_BETTER,
+        report.printArray("install time", result, ResultType.LOWER_BETTER,
                 ResultUnit.MS);
         StatResult stat = Stat.getStat(result);
-        mReport.printSummary("install time", stat.mAverage, ResultType.LOWER_BETTER,
+        report.printSummary("install time", stat.mAverage, ResultType.LOWER_BETTER,
                 ResultUnit.MS);
+        report.deliverReportToHost();
     }
 
 }

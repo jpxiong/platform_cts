@@ -115,9 +115,10 @@ public class ReportLog {
                 LOG_ELEM_SEPARATOR + unit.getXmlString() + LOG_ELEM_SEPARATOR + value;
     }
 
-    public void throwReportToHost() throws PtsException {
+    protected String generateReport() {
         if ((mSummary == null) && mMessages.isEmpty()) {
-            return;
+            // just return empty string
+            return "";
         }
         StringBuilder builder = new StringBuilder();
         builder.append(mSummary);
@@ -132,7 +133,7 @@ public class ReportLog {
         }
         mSummary = null;
         mMessages.clear();
-        throw new PtsException(builder.toString());
+        return builder.toString();
     }
 
     /**
@@ -177,7 +178,7 @@ public class ReportLog {
     }
 
     /**
-     * get classname.methodname from call stack of the current thread
+     * get classname#methodname from call stack of the current thread
      */
     public static String getClassMethodNames() {
         return getClassMethodNames(mDepth, false);
