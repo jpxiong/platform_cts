@@ -247,10 +247,11 @@ public class ViewTest extends ActivityInstrumentationTestCase2<ViewTestStubActiv
         Rect rect = new Rect();
         final Button button = new Button(mActivity);
         final int WRAP_CONTENT = ViewGroup.LayoutParams.WRAP_CONTENT;
+        final int btnHeight = view.getHeight()/3;
         runTestOnUiThread(new Runnable() {
             public void run() {
                 mActivity.addContentView(button,
-                        new LinearLayout.LayoutParams(WRAP_CONTENT, WRAP_CONTENT));
+                        new LinearLayout.LayoutParams(WRAP_CONTENT, btnHeight));
             }
         });
         getInstrumentation().waitForIdleSync();
