@@ -18,7 +18,8 @@ package android.media.cts;
 
 import android.media.MediaDrm;
 import android.media.MediaDrm.ProvisionRequest;
-import android.media.MediaDrm.LicenseRequest;
+import android.media.MediaDrm.KeyRequest;
+import android.media.MediaDrm.CryptoSession;
 import android.media.MediaDrmException;
 import android.test.AndroidTestCase;
 import android.util.Log;
@@ -73,7 +74,7 @@ public class MediaDrmMockTest extends AndroidTestCase {
         MediaDrm md = new MediaDrm(mockScheme);
 
         md.setPropertyString("test-string", "test-value");
-        assertTrue(md.getPropertyString("test-string").equals("test-value")); 
+        assertTrue(md.getPropertyString("test-string").equals("test-value"));
     }
 
     public void testByteArrayProperties() throws Exception {
@@ -194,7 +195,7 @@ public class MediaDrmMockTest extends AndroidTestCase {
         assertTrue(gotException);
     }
 
-    public void testGetLicenseRequest() throws Exception {
+    public void testGetKeyRequest() throws Exception {
         if (!isMockPluginInstalled()) {
             return;
         }
@@ -214,21 +215,21 @@ public class MediaDrmMockTest extends AndroidTestCase {
         optionalParameters.put("param2", "value2");
 
         String mimeType = "video/iso.segment";
-        LicenseRequest request = md.getLicenseRequest(sessionId, initData, mimeType,
-                                                      MediaDrm.MEDIA_DRM_LICENSE_TYPE_STREAMING,
+        KeyRequest request = md.getKeyRequest(sessionId, initData, mimeType,
+                                                      MediaDrm.MEDIA_DRM_KEY_TYPE_STREAMING,
                                                       optionalParameters);
         assertTrue(Arrays.equals(request.data, testRequest));
         assertTrue(request.defaultUrl.equals(testDefaultUrl));
 
         assertTrue(Arrays.equals(initData, md.getPropertyByteArray("mock-initdata")));
         assertTrue(mimeType.equals(md.getPropertyString("mock-mimetype")));
-        assertTrue(md.getPropertyString("mock-licensetype").equals("1"));
+        assertTrue(md.getPropertyString("mock-keytype").equals("1"));
         assertTrue(md.getPropertyString("mock-optparams").equals("{param1,value1},{param2,value2}"));
 
         md.closeSession(sessionId);
     }
 
-    public void testGetLicenseRequestNoOptionalParameters() throws Exception {
+    public void testGetKeyRequestNoOptionalParameters() throws Exception {
         if (!isMockPluginInstalled()) {
             return;
         }
@@ -245,20 +246,20 @@ public class MediaDrmMockTest extends AndroidTestCase {
         byte[] initData = {0x0a, 0x0b, 0x0c, 0x0d};
 
         String mimeType = "video/iso.segment";
-        LicenseRequest request = md.getLicenseRequest(sessionId, initData, mimeType,
-                                                      MediaDrm.MEDIA_DRM_LICENSE_TYPE_STREAMING,
+        KeyRequest request = md.getKeyRequest(sessionId, initData, mimeType,
+                                                      MediaDrm.MEDIA_DRM_KEY_TYPE_STREAMING,
                                                       null);
         assertTrue(Arrays.equals(request.data, testRequest));
         assertTrue(request.defaultUrl.equals(testDefaultUrl));
 
         assertTrue(Arrays.equals(initData, md.getPropertyByteArray("mock-initdata")));
         assertTrue(mimeType.equals(md.getPropertyString("mock-mimetype")));
-        assertTrue(md.getPropertyString("mock-licensetype").equals("1"));
+        assertTrue(md.getPropertyString("mock-keytype").equals("1"));
 
         md.closeSession(sessionId);
     }
 
-    public void testProvideLicenseResponse() throws Exception {
+    public void testProvideKeyResponse() throws Exception {
         if (!isMockPluginInstalled()) {
             return;
         }
@@ -269,31 +270,52 @@ public class MediaDrmMockTest extends AndroidTestCase {
         // Set up mock expected responses using properties
         byte testResponse[] = {0x1a, 0x1b, 0x1c, 0x1d, 0x1e, 0x1f, 0x20};
 
-        md.provideLicenseResponse(sessionId, testResponse);
+        md.provideKeyResponse(sessionId, testResponse);
 
         assertTrue(Arrays.equals(testResponse, md.getPropertyByteArray("mock-response")));
         md.closeSession(sessionId);
     }
 
-    public void testRemoveLicense() throws Exception {
+    public void testRemoveKeys() throws Exception {
         if (!isMockPluginInstalled()) {
             return;
         }
 
         MediaDrm md = new MediaDrm(mockScheme);
         byte[] sessionId = md.openSession();
-        md.removeLicense(sessionId);
+
+        byte testResponse[] = {0x1a, 0x1b, 0x1c, 0x1d, 0x1e, 0x1f, 0x20};
+        byte[] keySetId = md.provideKeyResponse(sessionId, testResponse);
+        md.closeSession(sessionId);
+
+        md.removeKeys(keySetId);
+    }
+
+    public void testRestoreKeys() throws Exception {
+        if (!isMockPluginInstalled()) {
+            return;
+        }
+
+        MediaDrm md = new MediaDrm(mockScheme);
+        byte[] sessionId = md.openSession();
+
+        byte testResponse[] = {0x1a, 0x1b, 0x1c, 0x1d, 0x1e, 0x1f, 0x20};
+        byte[] keySetId = md.provideKeyResponse(sessionId, testResponse);
+        md.closeSession(sessionId);
+
+        sessionId = md.openSession();
+        md.restoreKeys(sessionId, keySetId);
         md.closeSession(sessionId);
     }
 
-    public void testQueryLicenseStatus() throws Exception {
+    public void testQueryKeyStatus() throws Exception {
         if (!isMockPluginInstalled()) {
             return;
         }
 
         MediaDrm md = new MediaDrm(mockScheme);
         byte[] sessionId = md.openSession();
-        HashMap<String, String> infoMap = md.queryLicenseStatus(sessionId);
+        HashMap<String, String> infoMap = md.queryKeyStatus(sessionId);
 
         // these are canned strings returned by the mock
         assertTrue(infoMap.containsKey("purchaseDuration"));
@@ -355,4 +377,134 @@ public class MediaDrmMockTest extends AndroidTestCase {
         md.closeSession(session3);
     }
 
+    public void testCryptoSession() throws Exception {
+        if (!isMockPluginInstalled()) {
+            return;
+        }
+
+        MediaDrm md = new MediaDrm(mockScheme);
+
+        byte[] sessionId = md.openSession();
+        CryptoSession cs = md.getCryptoSession(sessionId, "AES/CBC/NoPadding", "HmacSHA256");
+        assertFalse(cs == null);
+    }
+
+    public void testBadCryptoSession() throws Exception {
+        if (!isMockPluginInstalled()) {
+            return;
+        }
+
+        MediaDrm md = new MediaDrm(mockScheme);
+
+        boolean gotException = false;
+        try {
+            byte[] sessionId = md.openSession();
+            CryptoSession cs = md.getCryptoSession(sessionId, "bad", "bad");
+        } catch (IllegalArgumentException e) {
+            gotException = true;
+        }
+        assertTrue(gotException);
+    }
+
+    public void testCryptoSessionEncrypt() throws Exception {
+        if (!isMockPluginInstalled()) {
+            return;
+        }
+
+        MediaDrm md = new MediaDrm(mockScheme);
+
+        byte[] sessionId = md.openSession();
+        CryptoSession cs = md.getCryptoSession(sessionId, "AES/CBC/NoPadding", "HmacSHA256");
+        assertFalse(cs == null);
+
+        byte[] keyId = {0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09};
+        byte[] input = {0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17, 0x18, 0x19};
+        byte[] iv = {0x20, 0x21, 0x22, 0x23, 0x24, 0x25, 0x26, 0x27, 0x28, 0x29};
+        byte[] expected_output = {0x30, 0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37, 0x38, 0x39};
+
+        md.setPropertyByteArray("mock-output", expected_output);
+
+        byte[] output = cs.encrypt(keyId, input, iv);
+
+        assertTrue(Arrays.equals(keyId, md.getPropertyByteArray("mock-keyid")));
+        assertTrue(Arrays.equals(input, md.getPropertyByteArray("mock-input")));
+        assertTrue(Arrays.equals(iv, md.getPropertyByteArray("mock-iv")));
+        assertTrue(Arrays.equals(output, expected_output));
+    }
+
+    public void testCryptoSessionDecrypt() throws Exception {
+        if (!isMockPluginInstalled()) {
+            return;
+        }
+
+        MediaDrm md = new MediaDrm(mockScheme);
+
+        byte[] sessionId = md.openSession();
+        CryptoSession cs = md.getCryptoSession(sessionId, "AES/CBC/NoPadding", "HmacSHA256");
+        assertFalse(cs == null);
+
+        byte[] keyId = {0x40, 0x41, 0x42, 0x43, 0x44, 0x45, 0x46, 0x47, 0x48, 0x49};
+        byte[] input = {0x50, 0x51, 0x52, 0x53, 0x54, 0x55, 0x56, 0x57, 0x58, 0x59};
+        byte[] iv = {0x60, 0x61, 0x62, 0x63, 0x64, 0x65, 0x66, 0x67, 0x68, 0x69};
+        byte[] expected_output = {0x70, 0x71, 0x72, 0x73, 0x74, 0x75, 0x76, 0x77, 0x78, 0x79};
+
+        md.setPropertyByteArray("mock-output", expected_output);
+
+        byte[] output = cs.decrypt(keyId, input, iv);
+
+        assertTrue(Arrays.equals(keyId, md.getPropertyByteArray("mock-keyid")));
+        assertTrue(Arrays.equals(input, md.getPropertyByteArray("mock-input")));
+        assertTrue(Arrays.equals(iv, md.getPropertyByteArray("mock-iv")));
+        assertTrue(Arrays.equals(output, expected_output));
+    }
+
+    public void testCryptoSessionSign() throws Exception {
+        if (!isMockPluginInstalled()) {
+            return;
+        }
+
+        MediaDrm md = new MediaDrm(mockScheme);
+
+        byte[] sessionId = md.openSession();
+        CryptoSession cs = md.getCryptoSession(sessionId, "AES/CBC/NoPadding", "HmacSHA256");
+        assertFalse(cs == null);
+
+        byte[] keyId = {0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09};
+        byte[] message = {0x20, 0x21, 0x22, 0x23, 0x24, 0x25, 0x26, 0x27, 0x28, 0x29};
+        byte[] expected_signature = {0x30, 0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37, 0x38, 0x39};
+
+        md.setPropertyByteArray("mock-signature", expected_signature);
+
+        byte[] signature = cs.sign(keyId, message);
+
+        assertTrue(Arrays.equals(keyId, md.getPropertyByteArray("mock-keyid")));
+        assertTrue(Arrays.equals(message, md.getPropertyByteArray("mock-message")));
+        assertTrue(Arrays.equals(signature, expected_signature));
+    }
+
+    public void testCryptoSessionVerify() throws Exception {
+        if (!isMockPluginInstalled()) {
+            return;
+        }
+
+        MediaDrm md = new MediaDrm(mockScheme);
+
+        byte[] sessionId = md.openSession();
+        CryptoSession cs = md.getCryptoSession(sessionId, "AES/CBC/NoPadding", "HmacSHA256");
+        assertFalse(cs == null);
+
+        byte[] keyId = {0x40, 0x41, 0x42, 0x43, 0x44, 0x45, 0x46, 0x47, 0x48, 0x49};
+        byte[] message = {0x50, 0x51, 0x52, 0x53, 0x54, 0x55, 0x56, 0x57, 0x58, 0x59};
+        byte[] signature = {0x60, 0x61, 0x62, 0x63, 0x64, 0x65, 0x66, 0x67, 0x68, 0x69};
+
+        md.setPropertyString("mock-match", "1");
+        assertTrue(cs.verify(keyId, message, signature));
+
+        assertTrue(Arrays.equals(keyId, md.getPropertyByteArray("mock-keyid")));
+        assertTrue(Arrays.equals(message, md.getPropertyByteArray("mock-message")));
+        assertTrue(Arrays.equals(signature, md.getPropertyByteArray("mock-signature")));
+
+        md.setPropertyString("mock-match", "0");
+        assertFalse(cs.verify(keyId, message, signature));
+    }
 }
