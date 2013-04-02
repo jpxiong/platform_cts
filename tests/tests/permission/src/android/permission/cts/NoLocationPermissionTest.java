@@ -110,33 +110,6 @@ public class NoLocationPermissionTest extends AndroidTestCase {
     }
 
     /**
-     * Verify that get cell location requires permissions.
-     * <p>
-     * Requires Permission: {@link
-     * android.Manifest.permission#ACCESS_COARSE_LOCATION.}
-     */
-    @SmallTest
-    public void testListenCellLocation2() {
-        TelephonyManager telephonyManager = (TelephonyManager) getContext().getSystemService(
-                Context.TELEPHONY_SERVICE);
-        PhoneStateListener phoneStateListener = new PhoneStateListener();
-
-        try {
-            telephonyManager.getNeighboringCellInfo();
-            fail("TelephonyManager.getNeighbouringCellInfo did not throw SecurityException as expected");
-        } catch (SecurityException e) {
-            // expected
-        }
-
-        try {
-            telephonyManager.getAllCellInfo();
-            fail("TelephonyManager.getAllCellInfo did not throw SecurityException as expected");
-        } catch (SecurityException e) {
-            // expected
-        }
-    }
-
-    /**
      * Helper method to verify that calling requestLocationUpdates with given
      * provider throws SecurityException.
      * 
