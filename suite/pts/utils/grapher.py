@@ -66,7 +66,6 @@ def main(argv):
           name = r['device']
           lbl = name + ' (%s)'%score
           clr = colors.get(name, "#%06X" % (hash(name) % 0xFFFFFF))
-          print clr
           # Plot the workload vs the values
           ax.plot(x, y, 'o-', label=lbl, color=clr)
           # Add a legend
