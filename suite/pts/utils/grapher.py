@@ -42,7 +42,7 @@ def main(argv):
 
   # For each of the benchmarks
   for benchmark in tests:
-    if benchmark.startswith('com.android.pts.opengl'):
+    if benchmark.startswith('com.android.pts.opengl.primitive'):
       results = tests[benchmark]
       legend = []
       # Create a new figure
@@ -58,7 +58,7 @@ def main(argv):
           y = r['details']['Fps Values']
           x = range(1, len(y) + 1)
           # Get the score, then trim it to 2 decimal places
-          score = r['summary']['Score']
+          score = r['summary']['Average Frames Per Second']
           score = score[0:score.index('.') + 3]
         if score != 'no results':
           # Create a plot

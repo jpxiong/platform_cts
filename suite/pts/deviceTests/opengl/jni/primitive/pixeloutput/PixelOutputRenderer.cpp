@@ -14,11 +14,7 @@
 #include "PixelOutputRenderer.h"
 #include <graphics/GLUtils.h>
 
-#define LOG_TAG "PTS_OPENGL"
-#define LOG_NDEBUG 0
-#include <utils/Log.h>
-
-#include <primitive/Trace.h>
+#include <Trace.h>
 
 static const int PO_NUM_VERTICES = 6;
 

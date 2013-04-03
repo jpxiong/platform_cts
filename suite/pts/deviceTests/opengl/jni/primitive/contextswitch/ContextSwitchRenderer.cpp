@@ -23,11 +23,7 @@
 #include "ContextSwitchRenderer.h"
 #include <graphics/GLUtils.h>
 
-#define LOG_TAG "PTS_OPENGL"
-#define LOG_NDEBUG 0
-#include <utils/Log.h>
-
-#include <primitive/Trace.h>
+#include <Trace.h>
 
 static const EGLint contextAttribs[] =
         { EGL_CONTEXT_CLIENT_VERSION, 2, EGL_NONE };
@@ -110,12 +106,6 @@ bool ContextSwitchRenderer::setUp() {
                 || EGL_SUCCESS != eglGetError()) {
             return false;
         }
-    }
-
-    GLuint err = glGetError();
-    if (err != GL_NO_ERROR) {
-        ALOGE("GLError %d", err);
-        return false;
     }
 
     return true;

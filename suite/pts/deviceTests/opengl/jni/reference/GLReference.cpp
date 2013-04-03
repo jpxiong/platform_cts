@@ -11,23 +11,12 @@
  * or implied. See the License for the specific language governing permissions and limitations under
  * the License.
  */
-#ifndef SHADERPERFRENDERER_H
-#define SHADERPERFRENDERER_H
+#include <jni.h>
 
-#include <graphics/Renderer.h>
-
-class ShaderPerfRenderer: public Renderer {
-public:
-    ShaderPerfRenderer(ANativeWindow* window, bool offscreen, int workload);
-    virtual ~ShaderPerfRenderer() {};
-    bool setUp();
-    bool draw();
-private:
-    GLuint mTextureId;
-    GLuint mTextureUniformHandle;
-    GLuint mPositionHandle;
-    GLuint mTexCoordHandle;
-    GLuint mSeedUniformHandle;
-};
-
-#endif
+extern "C" JNIEXPORT jboolean JNICALL
+Java_com_android_pts_opengl_reference_GLGameActivity_startBenchmark(
+        JNIEnv* env, jclass clazz, jobject surface, jint numFrames,
+        jdoubleArray setUpTimes, jdoubleArray updateTimes, jdoubleArray renderTimes) {
+    // TODO
+    return true;
+}

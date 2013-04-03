@@ -13,14 +13,15 @@
  */
 
 #include "FullPipelineMesh.h"
-#include "FullPipelineProgram.h"
+
+#include <graphics/BasicProgram.h>
 
 FullPipelineMesh::FullPipelineMesh(const Mesh* mesh) :
         MeshNode(mesh) {
 }
 
 void FullPipelineMesh::before(Program& program, Matrix& model, Matrix& view, Matrix& projection) {
-    FullPipelineProgram& prog = (FullPipelineProgram&) program;
+    BasicProgram& prog = (BasicProgram&) program;
 
     glActiveTexture(GL_TEXTURE0);
     // Bind the texture to this unit.
