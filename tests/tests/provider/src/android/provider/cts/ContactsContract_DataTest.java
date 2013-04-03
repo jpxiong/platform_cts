@@ -17,16 +17,23 @@
 package android.provider.cts;
 
 
+import static android.provider.ContactsContract.CommonDataKinds;
+
 import android.content.ContentProviderClient;
 import android.content.ContentResolver;
+import android.content.ContentValues;
 import android.net.Uri;
+import android.os.SystemClock;
 import android.provider.ContactsContract;
-import android.provider.ContactsContract.CommonDataKinds.StructuredName;
 import android.provider.ContactsContract.Data;
 import android.provider.ContactsContract.RawContacts;
 import android.provider.cts.ContactsContract_TestDataBuilder.TestContact;
 import android.provider.cts.ContactsContract_TestDataBuilder.TestData;
 import android.provider.cts.ContactsContract_TestDataBuilder.TestRawContact;
+import android.provider.cts.contacts.ContactUtil;
+import android.provider.cts.contacts.DataUtil;
+import android.provider.cts.contacts.DatabaseAsserts;
+import android.provider.cts.contacts.RawContactUtil;
 import android.test.InstrumentationTestCase;
 
 public class ContactsContract_DataTest extends InstrumentationTestCase {
@@ -57,8 +64,8 @@ public class ContactsContract_DataTest extends InstrumentationTestCase {
 
         // TODO remove this. The method under test is currently broken: it will not
         // work without at least one data row in the raw contact.
-        TestData data = rawContact.newDataRow(StructuredName.CONTENT_ITEM_TYPE)
-                .with(StructuredName.DISPLAY_NAME, "test name")
+        TestData data = rawContact.newDataRow(CommonDataKinds.StructuredName.CONTENT_ITEM_TYPE)
+                .with(CommonDataKinds.StructuredName.DISPLAY_NAME, "test name")
                 .insert();
 
         Uri lookupUri = Data.getContactLookupUri(mResolver, data.getUri());
@@ -74,8 +81,8 @@ public class ContactsContract_DataTest extends InstrumentationTestCase {
                 .with(RawContacts.ACCOUNT_TYPE, "test_type")
                 .with(RawContacts.ACCOUNT_NAME, "test_name")
                 .insert();
-        TestData data = rawContact.newDataRow(StructuredName.CONTENT_ITEM_TYPE)
-                .with(StructuredName.DISPLAY_NAME, "test name")
+        TestData data = rawContact.newDataRow(CommonDataKinds.StructuredName.CONTENT_ITEM_TYPE)
+                .with(CommonDataKinds.StructuredName.DISPLAY_NAME, "test name")
                 .insert();
 
         Uri lookupUri = Data.getContactLookupUri(mResolver, data.getUri());
@@ -84,6 +91,65 @@ public class ContactsContract_DataTest extends InstrumentationTestCase {
         TestContact lookupContact = mBuilder.newContact().setUri(lookupUri).load();
         assertEquals("Lookup URI matched the wrong contact",
                 lookupContact.getId(), data.load().getRawContact().load().getContactId());
+    }
+
+    public void testDataInsert_updatesContactLastUpdatedTimestamp() {
+        DatabaseAsserts.ContactIdPair ids = DatabaseAsserts.assertAndCreateContact(mResolver);
+        long baseTime = ContactUtil.queryContactLastUpdatedTimestamp(mResolver, ids.mContactId);
+
+        SystemClock.sleep(1);
+        createData(ids.mRawContactId);
+
+        long newTime = ContactUtil.queryContactLastUpdatedTimestamp(mResolver, ids.mContactId);
+        assertTrue(newTime > baseTime);
+
+        // Clean up
+        RawContactUtil.delete(mResolver, ids.mRawContactId, true);
+    }
+
+    public void testDataDelete_updatesContactLastUpdatedTimestamp() {
+        DatabaseAsserts.ContactIdPair ids = DatabaseAsserts.assertAndCreateContact(mResolver);
+
+        long dataId = createData(ids.mRawContactId);
+
+        long baseTime = ContactUtil.queryContactLastUpdatedTimestamp(mResolver, ids.mContactId);
+
+        SystemClock.sleep(1);
+        DataUtil.delete(mResolver, dataId);
+
+        long newTime = ContactUtil.queryContactLastUpdatedTimestamp(mResolver, ids.mContactId);
+        assertTrue(newTime > baseTime);
+
+        // Clean up
+        RawContactUtil.delete(mResolver, ids.mRawContactId, true);
+    }
+
+    public void testDataUpdate_updatesContactLastUpdatedTimestamp() {
+        DatabaseAsserts.ContactIdPair ids = DatabaseAsserts.assertAndCreateContact(mResolver);
+
+        long dataId = createData(ids.mRawContactId);
+
+        long baseTime = ContactUtil.queryContactLastUpdatedTimestamp(mResolver, ids.mContactId);
+
+        SystemClock.sleep(1);
+        ContentValues values = new ContentValues();
+        values.put(CommonDataKinds.Phone.NUMBER, "555-5555");
+        DataUtil.update(mResolver, dataId, values);
+
+        long newTime = ContactUtil.queryContactLastUpdatedTimestamp(mResolver, ids.mContactId);
+        assertTrue(newTime > baseTime);
+
+        // Clean up
+        RawContactUtil.delete(mResolver, ids.mRawContactId, true);
+    }
+
+    private long createData(long rawContactId) {
+        ContentValues values = new ContentValues();
+        values.put(Data.MIMETYPE, CommonDataKinds.Phone.CONTENT_ITEM_TYPE);
+        values.put(CommonDataKinds.Phone.NUMBER, "1-800-GOOG-411");
+        values.put(CommonDataKinds.Phone.TYPE, CommonDataKinds.Phone.TYPE_CUSTOM);
+        values.put(CommonDataKinds.Phone.LABEL, "free directory assistance");
+        return DataUtil.insertData(mResolver, rawContactId, values);
     }
 }
 
