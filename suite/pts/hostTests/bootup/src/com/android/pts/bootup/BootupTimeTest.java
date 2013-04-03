@@ -39,6 +39,10 @@ public class BootupTimeTest extends DeviceTestCase {
 
     @TimeoutReq(minutes = 30)
     public void testBootupTime() throws Exception {
+        // cannot run in emulator
+        if (getDevice().getSerialNumber().startsWith("emulator-")) {
+            return;
+        }
         HostReportLog report =
                 new HostReportLog(getDevice().getSerialNumber(), ReportLog.getClassMethodNames());
         final int NUMBER_REPEAT = 5;
