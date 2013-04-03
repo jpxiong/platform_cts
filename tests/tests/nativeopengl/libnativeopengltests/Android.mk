@@ -16,7 +16,7 @@
 # This is the shared library included by the JNI test app.
 #
 
-LOCAL_PATH:= $(call my-dir)
+LOCAL_PATH:= $(call my-dir)/../standalone/jni/
 
 include $(CLEAR_VARS)
 
@@ -34,14 +34,13 @@ LOCAL_C_INCLUDES := $(JNI_H_INCLUDE) \
 LOCAL_SRC_FILES := \
         register.cpp \
         GLTestHelper.cpp \
-        android_test_wrappedgtest_WrappedGTestActivity.cpp \
-        com_android_opengl_cts_GLTestActivity.cpp \
         tests/GLTest_test.cpp
 
 LOCAL_SHARED_LIBRARIES := libEGL \
                           libGLESv2 \
                           libstlport \
-                          libandroid
+                          libandroid \
+                          liblog
 
 LOCAL_STATIC_LIBRARIES := libgtest
 
