@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012 The Android Open Source Project
+ * Copyright 2013 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,20 +17,22 @@
 #ifndef ANDROID_GL_TEST_HELPER_H
 #define ANDROID_GL_TEST_HELPER_H
 
-#include <stdint.h>
-#include <sys/types.h>
-#include <android/native_window.h>
-#include <utils/RefBase.h>
+#include <android/native_window_jni.h>
+#include <gtest/gtest.h>
 
-using namespace android;
+using namespace testing;
 
 class GLTestHelper
 {
 private:
     static ANativeWindow* mWindow;
+    static int runGTests(TestEventListener* listener, char * filter);
+    static int runTests(JNIEnv* env, jobject obj, jstring filter);
+    static int runTestsCTS(JNIEnv* env, jobject obj, jobject activity);
 public:
     static ANativeWindow* getWindow();
-    static void setWindow(ANativeWindow* value);
+    static void setWindow(JNIEnv* env, jobject obj, jobject surface);
+    static int registerNative(JNIEnv* env);
 };
 
 
