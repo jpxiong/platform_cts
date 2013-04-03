@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 The Android Open Source Project
+ * Copyright 2013 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,7 +15,7 @@
  */
 
 #include <jni.h>
-#include <stdlib.h>
+#include <GLTestHelper.h>
 
 /*
  * This function is called automatically by the system when this
@@ -29,13 +29,7 @@ jint JNI_OnLoad(JavaVM *vm, void *reserved) {
         return JNI_ERR;
     }
 
-    extern int register_WrappedGTestActivity(JNIEnv *);
-    if (register_WrappedGTestActivity(env)) {
-        return JNI_ERR;
-    }
-
-    extern int register_GLTestActivity(JNIEnv *);
-    if (register_GLTestActivity(env)) {
+    if (GLTestHelper::registerNative(env)) {
         return JNI_ERR;
     }
 
