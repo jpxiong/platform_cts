@@ -143,6 +143,7 @@ class CtsBuilder(object):
 
     # hard-coded white list for PDK plan
     plan.Exclude('.*')
+    plan.Include('android\.aadb')
     plan.Include('android\.bluetooth')
     plan.Include('android\.graphics.*')
     plan.Include('android\.hardware')

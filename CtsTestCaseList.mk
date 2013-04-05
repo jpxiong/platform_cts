@@ -114,8 +114,10 @@ CTS_COVERAGE_TEST_CASE_LIST := \
 # Host side only tests
 cts_host_libraries := \
 	$(PTS_HOST_CASES) \
+	CtsAdbTests \
 	CtsAppSecurityTests \
 	CtsMonkeyTestCases
+
 
 # Native test executables that need to have associated test XMLs.
 cts_native_exes := \
