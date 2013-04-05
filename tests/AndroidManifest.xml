@@ -28,14 +28,14 @@
         <meta-data android:name="android.app.cts.float" android:value="100.1" />
         <meta-data android:name="android.app.cts.reference" android:resource="@xml/metadata" />
     </permission>
-    
+
     <uses-permission android:name="android.permission.GET_TASKS" />
     <uses-permission android:name="android.permission.SET_WALLPAPER" />
     <uses-permission android:name="android.permission.SET_TIME_ZONE" />
     <uses-permission android:name="android.permission.WRITE_CALL_LOG" />
-    <uses-permission android:name="android.permission.WRITE_CONTACTS" />        
+    <uses-permission android:name="android.permission.WRITE_CONTACTS" />
     <uses-permission android:name="android.permission.WRITE_SOCIAL_STREAM" />
-    <uses-permission android:name="android.permission.READ_CALL_LOG" />    
+    <uses-permission android:name="android.permission.READ_CALL_LOG" />
     <uses-permission android:name="android.permission.READ_CONTACTS" />
     <uses-permission android:name="android.permission.READ_SOCIAL_STREAM" />
     <uses-permission android:name="android.permission.WRITE_CALENDAR" />
@@ -106,7 +106,7 @@
     <uses-permission android:name="android.permission.READ_SYNC_SETTINGS" />
     <uses-permission android:name="android.permission.WRITE_SYNC_SETTINGS" />
     <uses-permission android:name="android.permission.READ_SYNC_STATS" />
-    
+
     <!-- Used for PackageManager test, don't delete this permission-tree -->
     <permission-tree android:name="com.android.cts.stub.permission.TEST_DYNAMIC"
                     android:label="Test Tree"/>
@@ -627,7 +627,7 @@
             </intent-filter>
         </activity>
 
-        <activity android:name="android.widget.cts.ZoomButtonStubActivity" 
+        <activity android:name="android.widget.cts.ZoomButtonStubActivity"
             android:label="ZoomButtonStubActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
@@ -813,7 +813,7 @@
         <provider android:name="android.content.cts.MockRemoteContentProvider"
             android:authorities="remotectstest"
             android:process=":remoteprovider" android:multiprocess="false" />
-        
+
         <activity android:name="android.app.cts.ChildTabActivity" android:label="ChildTabActivity" />
 
         <activity android:name="android.app.cts.LauncherActivityStub"
@@ -928,7 +928,7 @@
         </service>
         <service android:name="android.app.cts.IntentServiceStub"/>
 
-        <activity android:name="android.app.cts.LaunchpadActivity" 
+        <activity android:name="android.app.cts.LaunchpadActivity"
                   android:configChanges="keyboardHidden|orientation|screenSize"
                   android:multiprocess="true">
         </activity>
@@ -969,10 +969,10 @@
         </activity>
 
         <activity android:name="android.preference.cts.PreferenceStubActivity">
-            <meta-data android:name="android.preference" 
+            <meta-data android:name="android.preference"
                     android:resource="@xml/preferences_from_intent" />
         </activity>
-                
+
         <activity android:name="android.content.cts.ClipboardManagerListenerActivity"/>
 
         <activity android:name="android.app.cts.ActivityManagerMemoryClassLaunchActivity" />
@@ -987,7 +987,7 @@
             </intent-filter>
         </service>
 
-        <activity android:name="android.renderscript.cts.RenderscriptGLStubActivity"
+        <activity android:name="android.renderscriptgraphics.cts.RenderscriptGLStubActivity"
                   android:label="RenderscriptGLStub"/>
     </application>
 

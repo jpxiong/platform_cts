@@ -19,7 +19,7 @@ package android.renderscript.cts;
 import android.renderscript.Sampler;
 import android.renderscript.Sampler.Value;
 
-public class SamplerTest extends RSBaseGraphics {
+public class SamplerTest extends RSBaseCompute {
 
     Sampler.Value[] mMinValues;
     Sampler.Value[] mMagValues;
