@@ -636,7 +636,7 @@ public class AudioTrackTest extends AndroidTestCase {
         final int TEST_SR = 22050;
         final int TEST_CONF = AudioFormat.CHANNEL_CONFIGURATION_MONO;
         final int TEST_FORMAT = AudioFormat.ENCODING_PCM_16BIT;
-        final int TEST_MODE = AudioTrack.MODE_STREAM;
+        final int TEST_MODE = AudioTrack.MODE_STATIC;
         final int TEST_STREAM_TYPE = AudioManager.STREAM_MUSIC;
 
         // -------- initialization --------------
@@ -645,9 +645,10 @@ public class AudioTrackTest extends AndroidTestCase {
                 2 * minBuffSize, TEST_MODE);
         byte data[] = new byte[minBuffSize];
         // -------- test --------------
-        assertTrue(TEST_NAME, track.getState() == AudioTrack.STATE_INITIALIZED);
+        assertEquals(TEST_NAME, AudioTrack.STATE_NO_STATIC_DATA, track.getState());
         track.write(data, OFFSET_DEFAULT, data.length);
         track.write(data, OFFSET_DEFAULT, data.length);
+        assertEquals(TEST_NAME, AudioTrack.STATE_INITIALIZED, track.getState());
         track.play();
         track.stop();
         assertEquals(TEST_NAME, AudioTrack.PLAYSTATE_STOPPED, track.getPlayState());
@@ -663,7 +664,7 @@ public class AudioTrackTest extends AndroidTestCase {
         final int TEST_SR = 22050;
         final int TEST_CONF = AudioFormat.CHANNEL_CONFIGURATION_MONO;
         final int TEST_FORMAT = AudioFormat.ENCODING_PCM_16BIT;
-        final int TEST_MODE = AudioTrack.MODE_STREAM;
+        final int TEST_MODE = AudioTrack.MODE_STATIC;
         final int TEST_STREAM_TYPE = AudioManager.STREAM_MUSIC;
 
         // -------- initialization --------------
@@ -672,9 +673,10 @@ public class AudioTrackTest extends AndroidTestCase {
                 2 * minBuffSize, TEST_MODE);
         byte data[] = new byte[minBuffSize];
         // -------- test --------------
-        assertTrue(TEST_NAME, track.getState() == AudioTrack.STATE_INITIALIZED);
+        assertEquals(TEST_NAME, AudioTrack.STATE_NO_STATIC_DATA, track.getState());
         track.write(data, OFFSET_DEFAULT, data.length);
         track.write(data, OFFSET_DEFAULT, data.length);
+        assertEquals(TEST_NAME, AudioTrack.STATE_INITIALIZED, track.getState());
         track.play();
         track.pause();
         assertEquals(TEST_NAME, AudioTrack.PLAYSTATE_PAUSED, track.getPlayState());
@@ -690,7 +692,7 @@ public class AudioTrackTest extends AndroidTestCase {
         final int TEST_SR = 22050;
         final int TEST_CONF = AudioFormat.CHANNEL_CONFIGURATION_MONO;
         final int TEST_FORMAT = AudioFormat.ENCODING_PCM_16BIT;
-        final int TEST_MODE = AudioTrack.MODE_STREAM;
+        final int TEST_MODE = AudioTrack.MODE_STATIC;
         final int TEST_STREAM_TYPE = AudioManager.STREAM_MUSIC;
 
         // -------- initialization --------------
@@ -703,9 +705,10 @@ public class AudioTrackTest extends AndroidTestCase {
         // count (given the audio track properties), and add 77.
         int frameIndexTooFar = (2 * minBuffSize / 2) + 77;
         // -------- test --------------
-        assertTrue(TEST_NAME, track.getState() == AudioTrack.STATE_INITIALIZED);
+        assertEquals(TEST_NAME, AudioTrack.STATE_NO_STATIC_DATA, track.getState());
         track.write(data, OFFSET_DEFAULT, data.length);
         track.write(data, OFFSET_DEFAULT, data.length);
+        assertEquals(TEST_NAME, AudioTrack.STATE_INITIALIZED, track.getState());
         track.play();
         track.stop();
         assertEquals(TEST_NAME, AudioTrack.PLAYSTATE_STOPPED, track.getPlayState());
