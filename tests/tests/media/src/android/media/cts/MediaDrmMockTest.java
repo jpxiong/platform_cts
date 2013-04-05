@@ -26,6 +26,9 @@ import android.util.Log;
 import java.util.HashMap;
 import java.util.Arrays;
 import java.util.UUID;
+import java.lang.Thread;
+import java.lang.Object;
+import android.os.Looper;
 
 // This test works with the MediaDrm mock plugin
 public class MediaDrmMockTest extends AndroidTestCase {
@@ -506,5 +509,158 @@ public class MediaDrmMockTest extends AndroidTestCase {
 
         md.setPropertyString("mock-match", "0");
         assertFalse(cs.verify(keyId, message, signature));
+    }
+
+    private MediaDrm mMediaDrm = null;
+    private Looper mLooper = null;
+    private Object mLock = new Object();
+    private boolean mGotEvent = false;
+
+    public void testEventNoSessionNoData() throws Exception {
+        if (!isMockPluginInstalled()) {
+            return;
+        }
+
+
+        new Thread() {
+            @Override
+            public void run() {
+                // Set up a looper to be used by mMediaPlayer.
+                Looper.prepare();
+
+                // Save the looper so that we can terminate this thread
+                // after we are done with it.
+                mLooper = Looper.myLooper();
+
+                try {
+                    mMediaDrm = new MediaDrm(mockScheme);
+
+                    synchronized(mLock) {
+                        mLock.notify();
+                        mMediaDrm.setOnEventListener(new MediaDrm.OnEventListener() {
+                                @Override
+                                public void onEvent(MediaDrm md, byte[] sessionId, int event,
+                                                    int extra, byte[] data) {
+                                    synchronized(mLock) {
+                                        Log.d(TAG,"testEventNoSessionNoData.onEvent");
+                                        assertTrue(md == mMediaDrm);
+                                        assertTrue(event == 2);
+                                        assertTrue(extra == 456);
+                                        assertTrue(sessionId == null);
+                                        assertTrue(data == null);
+                                        mGotEvent = true;
+                                        mLock.notify();
+                                    }
+                                }
+                            });
+                    }
+                } catch (MediaDrmException e) {
+                    e.printStackTrace();
+                    fail();
+                }
+
+                Looper.loop();  // Blocks forever until Looper.quit() is called.
+            }
+        }.start();
+
+        // wait for mMediaDrm to be created
+        synchronized(mLock) {
+            try {
+                mLock.wait(1000);
+            } catch (Exception e) {
+            }
+        }
+        assertTrue(mMediaDrm != null);
+
+        mGotEvent = false;
+        mMediaDrm.setPropertyString("mock-send-event", "2 456");
+
+        synchronized(mLock) {
+            try {
+                mLock.wait(1000);
+            } catch (Exception e) {
+            }
+        }
+
+        mLooper.quit();
+        assertTrue(mGotEvent);
+    }
+
+    public void testEventWithSessionAndData() throws Exception {
+        if (!isMockPluginInstalled()) {
+            return;
+        }
+
+
+        new Thread() {
+            @Override
+            public void run() {
+                // Set up a looper to be used by mMediaPlayer.
+                Looper.prepare();
+
+                // Save the looper so that we can terminate this thread
+                // after we are done with it.
+                mLooper = Looper.myLooper();
+
+                try {
+                    mMediaDrm = new MediaDrm(mockScheme);
+
+                    final byte[] expected_sessionId = mMediaDrm.openSession();
+                    final byte[] expected_data = {0x10, 0x11, 0x12, 0x13, 0x14,
+                                                  0x15, 0x16, 0x17, 0x18, 0x19};
+
+                    mMediaDrm.setPropertyByteArray("mock-event-session-id", expected_sessionId);
+                    mMediaDrm.setPropertyByteArray("mock-event-data", expected_data);
+
+                    synchronized(mLock) {
+                        mLock.notify();
+
+                        mMediaDrm.setOnEventListener(new MediaDrm.OnEventListener() {
+                                @Override
+                                public void onEvent(MediaDrm md, byte[] sessionId, int event,
+                                                    int extra, byte[] data) {
+                                    synchronized(mLock) {
+                                        Log.d(TAG,"testEventWithSessoinAndData.onEvent");
+                                        assertTrue(md == mMediaDrm);
+                                        assertTrue(event == 1);
+                                        assertTrue(extra == 123);
+                                        assertTrue(Arrays.equals(sessionId, expected_sessionId));
+                                        assertTrue(Arrays.equals(data, expected_data));
+                                        mGotEvent = true;
+                                        mLock.notify();
+                                    }
+                                }
+                            });
+                    }
+                } catch (MediaDrmException e) {
+                    e.printStackTrace();
+                    fail();
+                }
+
+                Looper.loop();  // Blocks forever until Looper.quit() is called.
+            }
+        }.start();
+
+        // wait for mMediaDrm to be created
+        synchronized(mLock) {
+            try {
+                mLock.wait(1000);
+            } catch (Exception e) {
+            }
+        }
+        assertTrue(mMediaDrm != null);
+
+        mGotEvent = false;
+        mMediaDrm.setPropertyString("mock-send-event", "1 123");
+
+        synchronized(mLock) {
+            try {
+                mLock.wait(1000);
+            } catch (Exception e) {
+            }
+        }
+
+        mLooper.quit();
+        assertTrue(mGotEvent);
     }
 }
