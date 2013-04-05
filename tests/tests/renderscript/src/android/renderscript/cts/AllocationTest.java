@@ -30,7 +30,7 @@ import android.renderscript.Type.CubemapFace;
 
 import android.util.Log;
 
-public class AllocationTest extends RSBaseGraphics {
+public class AllocationTest extends RSBaseCompute {
 
     // Test power of two and non power of two, equal and non-equal sizes
     void createTypedHelper(Element e) {
