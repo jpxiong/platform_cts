@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package android.renderscript.cts;
+package android.renderscriptgraphics.cts;
 
 import android.app.Activity;
 import android.os.Bundle;
@@ -112,7 +112,7 @@ public class RenderscriptGLStubActivity extends Activity {
         setContentView(mView);
         oldView.forceDestroy();
     }
-    
+
     public void destroyAll() {
         if (mView != null) {
             mView.forceDestroy();

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package android.renderscript.cts;
+package android.renderscriptgraphics.cts;
 
 import com.android.cts.stub.R;
 import android.renderscript.Element;

@@ -15,7 +15,7 @@
 #pragma version(1)
 
 // Tell which java package name the reflected files should belong to
-#pragma rs java_package_name(android.renderscript.cts)
+#pragma rs java_package_name(android.renderscriptgraphics.cts)
 
 // Built-in header with graphics API's
 #include "rs_graphics.rsh"

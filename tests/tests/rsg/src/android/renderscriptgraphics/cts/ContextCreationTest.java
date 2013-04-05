@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package android.renderscript.cts;
+package android.renderscriptgraphics.cts;
 
 import android.renderscript.*;
 import android.test.ActivityInstrumentationTestCase2;
@@ -48,7 +48,7 @@ public class ContextCreationTest extends
         super.setUp();
         mActivity = getActivity();
     }
-    
+
     @Override
     protected void tearDown() throws Exception {
         mActivity.destroyAll();
