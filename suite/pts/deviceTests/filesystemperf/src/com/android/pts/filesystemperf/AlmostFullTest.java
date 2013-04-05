@@ -37,8 +37,9 @@ public class AlmostFullTest extends PtsAndroidTestCase {
 
     // test runner creates multiple instances at the begging.
     // use that to fill disk only once.
-    private static AtomicInteger mRefCounter = new AtomicInteger(0);
-    private static AtomicBoolean mDiskFilled = new AtomicBoolean(false);
+    // set as final to initialize it only once
+    private static final AtomicInteger mRefCounter = new AtomicInteger(0);
+    private static final AtomicBoolean mDiskFilled = new AtomicBoolean(false);
 
     public AlmostFullTest() {
         int currentCounter = mRefCounter.incrementAndGet();
