@@ -13,27 +13,27 @@
  */
 package com.android.pts.opengl.primitive;
 
+import com.android.pts.opengl.GLActivityIntentKeys;
 import com.android.pts.util.PtsActivityInstrumentationTestCase2;
 import com.android.pts.util.ResultType;
 import com.android.pts.util.ResultUnit;
 
 import android.content.Intent;
 import android.cts.util.TimeoutReq;
-import android.opengl.Matrix;
 
 import java.util.Arrays;
 
 /**
  * Runs the Primitive OpenGL ES 2.0 Benchmarks.
  */
-public class GLBenchmark extends PtsActivityInstrumentationTestCase2<GLActivity> {
+public class GLPrimitiveBenchmark extends PtsActivityInstrumentationTestCase2<GLPrimitiveActivity> {
 
     private static final int NUM_FRAMES = 100;
     private static final int NUM_ITERATIONS = 8;
-    private static final int TIME_OUT = 1000000;
+    private static final int TIMEOUT = 1000000;
 
-    public GLBenchmark() {
-        super(GLActivity.class);
+    public GLPrimitiveBenchmark() {
+        super(GLPrimitiveActivity.class);
     }
 
     /**
@@ -41,7 +41,7 @@ public class GLBenchmark extends PtsActivityInstrumentationTestCase2<GLActivity>
      */
     @TimeoutReq(minutes = 100)
     public void testFullPipelineOffscreen() throws Exception {
-        runBenchmark(Benchmark.FullPipeline, true, NUM_FRAMES, NUM_ITERATIONS, TIME_OUT);
+        runBenchmark(Benchmark.FullPipeline, true, NUM_FRAMES, NUM_ITERATIONS, TIMEOUT);
     }
 
     /**
@@ -49,7 +49,7 @@ public class GLBenchmark extends PtsActivityInstrumentationTestCase2<GLActivity>
      */
     @TimeoutReq(minutes = 100)
     public void testFullPipelineOnscreen() throws Exception {
-        runBenchmark(Benchmark.FullPipeline, false, NUM_FRAMES, NUM_ITERATIONS, TIME_OUT);
+        runBenchmark(Benchmark.FullPipeline, false, NUM_FRAMES, NUM_ITERATIONS, TIMEOUT);
     }
 
     /**
@@ -57,7 +57,7 @@ public class GLBenchmark extends PtsActivityInstrumentationTestCase2<GLActivity>
      */
     @TimeoutReq(minutes = 100)
     public void testPixelOutputOffscreen() throws Exception {
-        runBenchmark(Benchmark.PixelOutput, true, NUM_FRAMES, NUM_ITERATIONS, TIME_OUT);
+        runBenchmark(Benchmark.PixelOutput, true, NUM_FRAMES, NUM_ITERATIONS, TIMEOUT);
     }
 
     /**
@@ -65,7 +65,7 @@ public class GLBenchmark extends PtsActivityInstrumentationTestCase2<GLActivity>
      */
     @TimeoutReq(minutes = 100)
     public void testPixelOutputOnscreen() throws Exception {
-        runBenchmark(Benchmark.PixelOutput, false, NUM_FRAMES, NUM_ITERATIONS, TIME_OUT);
+        runBenchmark(Benchmark.PixelOutput, false, NUM_FRAMES, NUM_ITERATIONS, TIMEOUT);
     }
 
     /**
@@ -73,7 +73,7 @@ public class GLBenchmark extends PtsActivityInstrumentationTestCase2<GLActivity>
      */
     @TimeoutReq(minutes = 100)
     public void testShaderPerfOffscreen() throws Exception {
-        runBenchmark(Benchmark.ShaderPerf, true, NUM_FRAMES, NUM_ITERATIONS, TIME_OUT);
+        runBenchmark(Benchmark.ShaderPerf, true, NUM_FRAMES, NUM_ITERATIONS, TIMEOUT);
     }
 
     /**
@@ -81,7 +81,7 @@ public class GLBenchmark extends PtsActivityInstrumentationTestCase2<GLActivity>
      */
     @TimeoutReq(minutes = 100)
     public void testShaderPerfOnscreen() throws Exception {
-        runBenchmark(Benchmark.ShaderPerf, false, NUM_FRAMES, NUM_ITERATIONS, TIME_OUT);
+        runBenchmark(Benchmark.ShaderPerf, false, NUM_FRAMES, NUM_ITERATIONS, TIMEOUT);
     }
 
     /**
@@ -89,7 +89,7 @@ public class GLBenchmark extends PtsActivityInstrumentationTestCase2<GLActivity>
      */
     @TimeoutReq(minutes = 100)
     public void testContextSwitchOffscreen() throws Exception {
-        runBenchmark(Benchmark.ContextSwitch, true, NUM_FRAMES, NUM_ITERATIONS, TIME_OUT);
+        runBenchmark(Benchmark.ContextSwitch, true, NUM_FRAMES, NUM_ITERATIONS, TIMEOUT);
     }
 
     /**
@@ -97,7 +97,7 @@ public class GLBenchmark extends PtsActivityInstrumentationTestCase2<GLActivity>
      */
     @TimeoutReq(minutes = 100)
     public void testContextSwitchOnscreen() throws Exception {
-        runBenchmark(Benchmark.ContextSwitch, false, NUM_FRAMES, NUM_ITERATIONS, TIME_OUT);
+        runBenchmark(Benchmark.ContextSwitch, false, NUM_FRAMES, NUM_ITERATIONS, TIMEOUT);
     }
 
     /**
@@ -115,17 +115,17 @@ public class GLBenchmark extends PtsActivityInstrumentationTestCase2<GLActivity>
             throws Exception {
         String benchmarkName = benchmark.toString();
         Intent intent = new Intent();
-        intent.putExtra(GLActivity.INTENT_EXTRA_BENCHMARK_NAME, benchmarkName);
-        intent.putExtra(GLActivity.INTENT_EXTRA_OFFSCREEN, offscreen);
-        intent.putExtra(GLActivity.INTENT_EXTRA_NUM_FRAMES, numFrames);
-        intent.putExtra(GLActivity.INTENT_EXTRA_NUM_ITERATIONS, numIterations);
-        intent.putExtra(GLActivity.INTENT_EXTRA_TIMEOUT, timeout);
+        intent.putExtra(GLActivityIntentKeys.INTENT_EXTRA_BENCHMARK_NAME, benchmarkName);
+        intent.putExtra(GLActivityIntentKeys.INTENT_EXTRA_OFFSCREEN, offscreen);
+        intent.putExtra(GLActivityIntentKeys.INTENT_EXTRA_NUM_FRAMES, numFrames);
+        intent.putExtra(GLActivityIntentKeys.INTENT_EXTRA_NUM_ITERATIONS, numIterations);
+        intent.putExtra(GLActivityIntentKeys.INTENT_EXTRA_TIMEOUT, timeout);
 
-        GLActivity activity = null;
+        GLPrimitiveActivity activity = null;
         setActivityIntent(intent);
         try {
             activity = getActivity();
-            activity.spawnAndWaitForCompletion();
+            activity.waitForCompletion();
         } finally {
             if (activity != null) {
                 double[] fpsValues = activity.mFpsValues;
@@ -135,10 +135,13 @@ public class GLBenchmark extends PtsActivityInstrumentationTestCase2<GLActivity>
                 }
                 score /= numIterations;// Average.
 
+                // TODO: maybe standard deviation / RMSE will be useful?
+
                 getReportLog().printArray(
                         "Fps Values", fpsValues, ResultType.HIGHER_BETTER, ResultUnit.FPS);
-                getReportLog()
-                        .printSummary("Score", score, ResultType.HIGHER_BETTER, ResultUnit.SCORE);
+                getReportLog().printSummary(
+                        "Average Frames Per Second", score, ResultType.HIGHER_BETTER,
+                        ResultUnit.SCORE);
                 activity.finish();
             }
         }

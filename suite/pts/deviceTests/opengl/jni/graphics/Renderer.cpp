@@ -18,7 +18,7 @@
 #define LOG_NDEBUG 0
 #include <utils/Log.h>
 
-#include <primitive/Trace.h>
+#include <Trace.h>
 
 static const EGLint contextAttribs[] = {
         EGL_CONTEXT_CLIENT_VERSION, 2,

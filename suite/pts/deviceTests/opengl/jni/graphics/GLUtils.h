@@ -23,6 +23,7 @@ public:
     // Creates a program with the given vertex and fragment shader source code.
     static GLuint createProgram(const char** vertexSource,
             const char** fragmentSource);
+    static double currentTimeMillis();
     // Rounds a number up to the smallest power of 2 that is greater than the original number.
     static int roundUpToSmallestPowerOf2(int x);
     // Generates a random texture of the given dimensions.

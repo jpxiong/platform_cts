@@ -14,7 +14,7 @@
 #ifndef CONTEXTSWITCHRENDERER_H
 #define CONTEXTSWITCHRENDERER_H
 
-#include <primitive/Renderer.h>
+#include <graphics/Renderer.h>
 
 class ContextSwitchRenderer: public Renderer {
 public:

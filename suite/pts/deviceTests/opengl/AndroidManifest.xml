@@ -5,6 +5,7 @@
     android:versionName="1.0" >
 
     <uses-sdk
+        android:targetSdkVersion="17"
         android:minSdkVersion="16" />
 
     <uses-feature
@@ -18,13 +19,27 @@
         <uses-library android:name="android.test.runner" />
 
         <activity
-            android:name="com.android.pts.opengl.primitive.GLActivity"
+            android:name="com.android.pts.opengl.primitive.GLPrimitiveActivity"
             android:theme="@android:style/Theme.NoTitleBar.Fullscreen" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+        </activity>
+
+        <activity
+            android:name="com.android.pts.opengl.reference.GLReferenceActivity" >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <activity
+            android:name="com.android.pts.opengl.reference.GLGameActivity"
+            android:theme="@android:style/Theme.NoTitleBar.Fullscreen" >
         </activity>
     </application>
 

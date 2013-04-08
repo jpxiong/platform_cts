@@ -14,11 +14,10 @@
 #ifndef FULLPIPELINERENDERER_H
 #define FULLPIPELINERENDERER_H
 
-#include "FullPipelineProgram.h"
-
-#include <primitive/Renderer.h>
+#include <graphics/BasicProgram.h>
 #include <graphics/Matrix.h>
 #include <graphics/Mesh.h>
+#include <graphics/Renderer.h>
 #include <graphics/ProgramNode.h>
 
 class FullPipelineRenderer: public Renderer {
@@ -29,7 +28,7 @@ public:
     bool tearDown();
     bool draw();
 private:
-    FullPipelineProgram* mProgram;
+    BasicProgram* mProgram;
     ProgramNode* mSceneGraph;
     Matrix* mModelMatrix;
     Matrix* mViewMatrix;
