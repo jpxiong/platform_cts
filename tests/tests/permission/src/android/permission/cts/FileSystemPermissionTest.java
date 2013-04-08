@@ -660,14 +660,30 @@ public class FileSystemPermissionTest extends AndroidTestCase {
         assertTrue("Cannot find /system partition", foundSystem);
     }
 
-    public void testAllBlockDevicesAreSecure() throws Exception {
-        Set<File> insecure = getAllInsecureBlockDevicesInDirAndSubdir(new File("/dev"));
+    private static final Set<File> DEV_EXCEPTIONS = new HashSet<File>(
+            Arrays.asList(
+                // Known good devices- should be present everywhere
+                new File("/dev/ashmem"),
+                new File("/dev/binder"),
+                new File("/dev/full"),
+                new File("/dev/ion"),
+                new File("/dev/null"),
+                new File("/dev/random"),
+                new File("/dev/tty"),
+                new File("/dev/urandom"),
+                new File("/dev/zero")
+                // Other exceptions go below here, along with a bug #
+            ));
+
+    public void testAllDevicesAreSecure() throws Exception {
+        Set<File> insecure = getAllInsecureDevicesInDirAndSubdir(new File("/dev"));
+        insecure.removeAll(DEV_EXCEPTIONS);
         assertTrue("Found insecure: " + insecure.toString(),
                 insecure.isEmpty());
     }
 
     private static Set<File>
-    getAllInsecureBlockDevicesInDirAndSubdir(File dir) throws Exception {
+    getAllInsecureDevicesInDirAndSubdir(File dir) throws Exception {
         assertTrue(dir.isDirectory());
         Set<File> retval = new HashSet<File>();
         File[] subDirectories = dir.listFiles(new FileFilter() {
@@ -680,7 +696,7 @@ public class FileSystemPermissionTest extends AndroidTestCase {
         /* recurse into subdirectories */
         if (subDirectories != null) {
             for (File f : subDirectories) {
-                retval.addAll(getAllInsecureBlockDevicesInDirAndSubdir(f));
+                retval.addAll(getAllInsecureDevicesInDirAndSubdir(f));
             }
         }
 
@@ -692,16 +708,16 @@ public class FileSystemPermissionTest extends AndroidTestCase {
         for (File f: filesInThisDirectory) {
             FileUtils.FileStatus status = new FileUtils.FileStatus();
             FileUtils.getFileStatus(f.getAbsolutePath(), status, false);
-            if (status.hasModeFlag(FileUtils.S_IFBLK)) {
+            if (status.hasModeFlag(FileUtils.S_IFBLK) || status.hasModeFlag(FileUtils.S_IFCHR)) {
                 if (f.canRead() || f.canWrite() || f.canExecute()) {
                     retval.add(f);
                 }
                 if (status.uid == 2000) {
-                    // The shell user should not own any block devices
+                    // The shell user should not own any devices
                     retval.add(f);
                 }
 
-                // Don't allow block devices owned by GIDs
+                // Don't allow devices owned by GIDs
                 // accessible to non-privileged applications.
                 if ((status.gid == 1007)           // AID_LOG
                           || (status.gid == 1015)  // AID_SDCARD_RW
@@ -713,9 +729,6 @@ public class FileSystemPermissionTest extends AndroidTestCase {
                             || status.hasModeFlag(FileUtils.S_IWGRP)
                             || status.hasModeFlag(FileUtils.S_IXGRP))
                     {
-
-                        // non-privileged GIDs should not be able to access
-                        // any block device.
                         retval.add(f);
                     }
                 }
