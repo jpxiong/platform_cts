@@ -14,12 +14,13 @@
 #include <jni.h>
 
 #include <stdlib.h>
-#include <sys/time.h>
 
 #include <android/native_window.h>
 #include <android/native_window_jni.h>
 
-#include "Renderer.h"
+#include <graphics/GLUtils.h>
+#include <graphics/Renderer.h>
+
 #include "fullpipeline/FullPipelineRenderer.h"
 #include "pixeloutput/PixelOutputRenderer.h"
 #include "shaderperf/ShaderPerfRenderer.h"
@@ -28,14 +29,8 @@
 // Holds the current benchmark's renderer.
 Renderer* gRenderer = NULL;
 
-double currentTimeMillis() {
-    struct timeval tv;
-    gettimeofday(&tv, (struct timezone *) NULL);
-    return tv.tv_sec * 1000.0 + tv.tv_usec / 1000.0;
-}
-
 extern "C" JNIEXPORT jboolean JNICALL
-Java_com_android_pts_opengl_primitive_GLActivity_startBenchmark(
+Java_com_android_pts_opengl_primitive_GLPrimitiveActivity_startBenchmark(
         JNIEnv* env, jclass clazz, jint numFrames, jdoubleArray frameTimes) {
     if (gRenderer == NULL) {
         return false;
@@ -45,7 +40,7 @@ Java_com_android_pts_opengl_primitive_GLActivity_startBenchmark(
     bool success = gRenderer->setUp();
 
     // Records the start time.
-    double start = currentTimeMillis();
+    double start = GLUtils::currentTimeMillis();
 
     // Draw off the screen.
     for (int i = 0; i < numFrames && success; i++) {
@@ -54,7 +49,7 @@ Java_com_android_pts_opengl_primitive_GLActivity_startBenchmark(
     }
 
     // Records the end time.
-    double end = currentTimeMillis();
+    double end = GLUtils::currentTimeMillis();
 
     // Sets the times in the Java array.
     double times[] = {start, end};
@@ -69,28 +64,28 @@ Java_com_android_pts_opengl_primitive_GLActivity_startBenchmark(
 
 // The following functions create the renderers for the various benchmarks.
 extern "C" JNIEXPORT void JNICALL
-Java_com_android_pts_opengl_primitive_GLActivity_setupFullPipelineBenchmark(
+Java_com_android_pts_opengl_primitive_GLPrimitiveActivity_setupFullPipelineBenchmark(
         JNIEnv* env, jclass clazz, jobject surface, jboolean offscreen, jint workload) {
     gRenderer = new FullPipelineRenderer(
             ANativeWindow_fromSurface(env, surface), offscreen, workload);
 }
 
 extern "C" JNIEXPORT void JNICALL
-Java_com_android_pts_opengl_primitive_GLActivity_setupPixelOutputBenchmark(
+Java_com_android_pts_opengl_primitive_GLPrimitiveActivity_setupPixelOutputBenchmark(
         JNIEnv* env, jclass clazz, jobject surface, jboolean offscreen, jint workload) {
     gRenderer = new PixelOutputRenderer(
             ANativeWindow_fromSurface(env, surface), offscreen, workload);
 }
 
 extern "C" JNIEXPORT void JNICALL
-Java_com_android_pts_opengl_primitive_GLActivity_setupShaderPerfBenchmark(
+Java_com_android_pts_opengl_primitive_GLPrimitiveActivity_setupShaderPerfBenchmark(
         JNIEnv* env, jclass clazz, jobject surface, jboolean offscreen, jint workload) {
     gRenderer = new ShaderPerfRenderer(
             ANativeWindow_fromSurface(env, surface), offscreen, workload);
 }
 
 extern "C" JNIEXPORT void JNICALL
-Java_com_android_pts_opengl_primitive_GLActivity_setupContextSwitchBenchmark(
+Java_com_android_pts_opengl_primitive_GLPrimitiveActivity_setupContextSwitchBenchmark(
         JNIEnv* env, jclass clazz, jobject surface, jboolean offscreen, jint workload) {
     if (workload <= 8) {
         // This test uses 8 iterations, so workload can't be more than 8.

@@ -11,20 +11,20 @@
  * or implied. See the License for the specific language governing permissions and limitations under
  * the License.
  */
-#ifndef FULLPIPELINEPROGRAM_H
-#define FULLPIPELINEPROGRAM_H
+#ifndef BASICPROGRAM_H
+#define BASICPROGRAM_H
 
-#include <graphics/Matrix.h>
-#include <graphics/Program.h>
+#include "Matrix.h"
+#include "Program.h"
 
 #include <EGL/egl.h>
 #include <GLES2/gl2.h>
 #include <GLES2/gl2ext.h>
 
-class FullPipelineProgram: public Program {
+class BasicProgram: public Program {
 public:
-    FullPipelineProgram(GLuint programId);
-    virtual ~FullPipelineProgram() {};
+    BasicProgram(GLuint programId);
+    virtual ~BasicProgram() {};
     Matrix mMVMatrix;
     Matrix mMVPMatrix;
     Matrix mLightModelMatrix;

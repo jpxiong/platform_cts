@@ -22,39 +22,21 @@ import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.Surface;
 
+import com.android.pts.opengl.GLActivityIntentKeys;
 import com.android.pts.util.ResultType;
 import com.android.pts.util.ResultUnit;
 
 import java.util.ArrayList;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Semaphore;
 
-public class GLActivity extends Activity {
+public class GLPrimitiveActivity extends Activity {
 
-    public final static String TAG = "GLActivity";
-    /**
-     * Holds the name of the benchmark to run.
-     */
-    public final static String INTENT_EXTRA_BENCHMARK_NAME = "benchmark_name";
-    /**
-     * Holds whether or not the benchmark is to be run offscreen.
-     */
-    public final static String INTENT_EXTRA_OFFSCREEN = "offscreen";
-    /**
-     * The number of frames to render for each workload.
-     */
-    public final static String INTENT_EXTRA_NUM_FRAMES = "num_frames";
-    /**
-     * The number of iterations to run, the workload increases with each iteration.
-     */
-    public final static String INTENT_EXTRA_NUM_ITERATIONS = "num_iterations";
-    /**
-     * The number of milliseconds to wait before timing out.
-     */
-    public final static String INTENT_EXTRA_TIMEOUT = "timeout";
+    public final static String TAG = "GLPrimitiveActivity";
 
-    private Worker runner;
     private volatile Exception mException;
-    private volatile Surface mSurface;
+    private volatile Surface mSurface = null;
+    private CountDownLatch mStartSignal = new CountDownLatch(1);
     private Semaphore mSemaphore = new Semaphore(0);
 
     private Benchmark mBenchmark;
@@ -69,11 +51,12 @@ public class GLActivity extends Activity {
         super.onCreate(data);
         System.loadLibrary("ptsopengl_jni");
         Intent intent = getIntent();
-        mBenchmark = Benchmark.valueOf(intent.getStringExtra(INTENT_EXTRA_BENCHMARK_NAME));
-        mOffscreen = intent.getBooleanExtra(INTENT_EXTRA_OFFSCREEN, false);
-        mNumFrames = intent.getIntExtra(INTENT_EXTRA_NUM_FRAMES, 0);
-        mNumIterations = intent.getIntExtra(INTENT_EXTRA_NUM_ITERATIONS, 0);
-        mTimeout = intent.getIntExtra(INTENT_EXTRA_TIMEOUT, 0);
+        mBenchmark = Benchmark.valueOf(
+                intent.getStringExtra(GLActivityIntentKeys.INTENT_EXTRA_BENCHMARK_NAME));
+        mOffscreen = intent.getBooleanExtra(GLActivityIntentKeys.INTENT_EXTRA_OFFSCREEN, false);
+        mNumFrames = intent.getIntExtra(GLActivityIntentKeys.INTENT_EXTRA_NUM_FRAMES, 0);
+        mNumIterations = intent.getIntExtra(GLActivityIntentKeys.INTENT_EXTRA_NUM_ITERATIONS, 0);
+        mTimeout = intent.getIntExtra(GLActivityIntentKeys.INTENT_EXTRA_TIMEOUT, 0);
         mFpsValues = new double[mNumIterations];
 
         Log.i(TAG, "Benchmark: " + mBenchmark);
@@ -87,6 +70,7 @@ public class GLActivity extends Activity {
             @Override
             public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
                 mSurface = holder.getSurface();
+                mStartSignal.countDown();
             }
 
             @Override
@@ -96,12 +80,12 @@ public class GLActivity extends Activity {
             public void surfaceDestroyed(SurfaceHolder holder) {}
         });
         setContentView(surfaceView);
+        // Spawns a worker to run the benchmark.
+        Worker worker = new Worker();
+        worker.start();
     }
 
-    public void spawnAndWaitForCompletion() throws Exception {
-        // Spawns a worker to run the benchmark.
-        runner = new Worker();
-        runner.start();
+    public void waitForCompletion() throws Exception {
         // Wait for semiphore.
         mSemaphore.acquire();
         if (mException != null) {
@@ -144,6 +128,13 @@ public class GLActivity extends Activity {
 
         @Override
         public void run() {
+            try {
+                mStartSignal.await();
+            } catch (InterruptedException e) {
+                setException(e);
+                complete();
+                return;
+            }
             // Creates a watchdog to ensure a iteration doesn't exceed the timeout.
             watchDog = new WatchDog(mTimeout, this);
             // Used to record the start and end time of the iteration.

@@ -14,6 +14,7 @@
 
 #include "GLUtils.h"
 #include <stdlib.h>
+#include <sys/time.h>
 
 #define LOG_TAG "PTS_OPENGL"
 #define LOG_NDEBUG 0
@@ -78,6 +79,12 @@ GLuint GLUtils::createProgram(const char** vertexSource,
         }
     }
     return program;
+}
+
+double GLUtils::currentTimeMillis() {
+    struct timeval tv;
+    gettimeofday(&tv, (struct timezone *) NULL);
+    return tv.tv_sec * 1000.0 + tv.tv_usec / 1000.0;
 }
 
 // Rounds a number up to the smallest power of 2 that is greater than the original number.
