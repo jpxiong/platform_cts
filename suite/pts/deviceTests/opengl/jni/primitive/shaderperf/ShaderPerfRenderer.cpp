@@ -16,11 +16,7 @@
 
 #include <math.h>
 
-#define LOG_TAG "PTS_OPENGL"
-#define LOG_NDEBUG 0
-#include <utils/Log.h>
-
-#include <primitive/Trace.h>
+#include <Trace.h>
 
 static const float GOLDEN_RATIO = (1.0f + sqrt(5.0f)) / 2.0f;
 
@@ -140,12 +136,6 @@ bool ShaderPerfRenderer::setUp() {
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
     }
     delete[] m;
-
-    GLuint err = glGetError();
-    if (err != GL_NO_ERROR) {
-        ALOGE("GLError %d", err);
-        return false;
-    }
 
     return true;
 }

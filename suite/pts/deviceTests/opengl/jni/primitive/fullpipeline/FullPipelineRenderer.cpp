@@ -16,17 +16,12 @@
 #include <GLES2/gl2ext.h>
 
 #include "FullPipelineMesh.h"
-#include "FullPipelineProgram.h"
 #include "FullPipelineRenderer.h"
-#include <graphics/Mesh.h>
+
 #include <graphics/TransformationNode.h>
 #include <graphics/GLUtils.h>
 
-#define LOG_TAG "PTS_OPENGL"
-#define LOG_NDEBUG 0
-#include <utils/Log.h>
-
-#include <primitive/Trace.h>
+#include <Trace.h>
 
 static const int FP_NUM_VERTICES = 6;
 
@@ -98,7 +93,8 @@ static const char* FP_FRAGMENT =
 
 FullPipelineRenderer::FullPipelineRenderer(ANativeWindow* window, bool offscreen, int workload) :
         Renderer(window, offscreen, workload), mProgram(NULL), mSceneGraph(NULL),
-        mModelMatrix(NULL), mViewMatrix(NULL), mProjectionMatrix(NULL), mMesh(NULL) {
+        mModelMatrix(NULL), mViewMatrix(NULL), mProjectionMatrix(NULL), mMesh(NULL),
+        mTextureId(0) {
 }
 
 bool FullPipelineRenderer::setUp() {
@@ -110,7 +106,7 @@ bool FullPipelineRenderer::setUp() {
     mProgramId = GLUtils::createProgram(&FP_VERTEX, &FP_FRAGMENT);
     if (mProgramId == 0)
         return false;
-    mProgram = new FullPipelineProgram(mProgramId);
+    mProgram = new BasicProgram(mProgramId);
 
     mModelMatrix = new Matrix();
 

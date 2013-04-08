@@ -12,13 +12,13 @@
  * the License.
  */
 
-#include "FullPipelineProgram.h"
+#include "BasicProgram.h"
 
 #include <EGL/egl.h>
 #include <GLES2/gl2.h>
 #include <GLES2/gl2ext.h>
 
-FullPipelineProgram::FullPipelineProgram(GLuint programId) :
+BasicProgram::BasicProgram(GLuint programId) :
         Program(programId) {
     mLightPosInModelSpace[0] = 0.0f;
     mLightPosInModelSpace[1] = 2.0f;
@@ -33,7 +33,7 @@ FullPipelineProgram::FullPipelineProgram(GLuint programId) :
     mTexCoordHandle = glGetAttribLocation(programId, "a_TexCoordinate");
 }
 
-void FullPipelineProgram::before(Matrix& model, Matrix& view, Matrix& projection) {
+void BasicProgram::before(Matrix& model, Matrix& view, Matrix& projection) {
     Program::before(model, view, projection);
     mLightModelMatrix.identity();
 
