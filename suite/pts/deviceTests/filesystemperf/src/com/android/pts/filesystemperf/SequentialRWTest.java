@@ -33,22 +33,25 @@ import java.io.IOException;
 
 public class SequentialRWTest extends PtsAndroidTestCase {
     private static final String DIR_SEQ_WR = "SEQ_WR";
-    private static final String DIR_SEQ_UPD = "SEQ_UPD";
+    private static final String DIR_SEQ_UPDATE = "SEQ_UPDATE";
     private static final String DIR_SEQ_RD = "SEQ_RD";
     private static final int BUFFER_SIZE = 10 * 1024 * 1024;
 
     @Override
     protected void tearDown() throws Exception {
         FileUtil.removeFileOrDir(getContext(), DIR_SEQ_WR);
-        FileUtil.removeFileOrDir(getContext(), DIR_SEQ_UPD);
+        FileUtil.removeFileOrDir(getContext(), DIR_SEQ_UPDATE);
         FileUtil.removeFileOrDir(getContext(), DIR_SEQ_RD);
         super.tearDown();
     }
 
     @TimeoutReq(minutes = 30)
     public void testSingleSequentialWrite() throws Exception {
-        final int numberOfFiles =(int)(FileUtil.getFileSizeExceedingMemory(
-                getContext(), BUFFER_SIZE) / BUFFER_SIZE);
+        final long fileSize = FileUtil.getFileSizeExceedingMemory(getContext(), BUFFER_SIZE);
+        if (fileSize == 0) { // not enough space, give up
+            return;
+        }
+        final int numberOfFiles =(int)(fileSize / BUFFER_SIZE);
         getReportLog().printValue("files", numberOfFiles, ResultType.NEUTRAL,
                 ResultUnit.COUNT);
         final byte[] data = FileUtil.generateRandomData(BUFFER_SIZE);
@@ -76,14 +79,20 @@ public class SequentialRWTest extends PtsAndroidTestCase {
     @TimeoutReq(minutes = 60)
     public void testSingleSequentialUpdate() throws Exception {
         final long fileSize = FileUtil.getFileSizeExceedingMemory(getContext(), BUFFER_SIZE);
+        if (fileSize == 0) { // not enough space, give up
+            return;
+        }
         final int NUMBER_REPETITION = 6;
-        FileUtil.doSequentialUpdateTest(getContext(), DIR_SEQ_UPD, getReportLog(), fileSize,
+        FileUtil.doSequentialUpdateTest(getContext(), DIR_SEQ_UPDATE, getReportLog(), fileSize,
                 BUFFER_SIZE, NUMBER_REPETITION);
     }
 
     @TimeoutReq(minutes = 30)
     public void testSingleSequentialRead() throws Exception {
         final long fileSize = FileUtil.getFileSizeExceedingMemory(getContext(), BUFFER_SIZE);
+        if (fileSize == 0) { // not enough space, give up
+            return;
+        }
         long start = System.currentTimeMillis();
         final File file = FileUtil.createNewFilledFile(getContext(),
                 DIR_SEQ_RD, fileSize);
