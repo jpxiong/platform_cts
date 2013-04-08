@@ -40,9 +40,7 @@ TEST_F(MixerTest, tryTinyAlsaTest) {
     struct mixer* mixerp = mixer_open(hwId);
     ASSERT_TRUE(mixerp != NULL);
     int num_ctls = mixer_get_num_ctls(mixerp);
-    // no mixer control for MobilePre. If this assumption fails,
-    // mixer control should be added.
-    ASSERT_TRUE(num_ctls == 0);
+    LOGI("Number of mixel control %d", num_ctls);
     for (int i = 0; i < num_ctls; i++) {
         struct mixer_ctl* control = mixer_get_ctl(mixerp, i);
         ASSERT_TRUE(control != NULL);
@@ -50,6 +48,9 @@ TEST_F(MixerTest, tryTinyAlsaTest) {
                 mixer_ctl_get_type_string(control), mixer_ctl_get_num_values(control));
         free(control);
     }
+    // no mixer control for MobilePre. If this assumption fails,
+    // mixer control should be added.
+    ASSERT_TRUE(num_ctls == 0);
     mixer_close(mixerp);
 }
 

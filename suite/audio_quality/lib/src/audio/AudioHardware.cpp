@@ -34,7 +34,11 @@ int AudioHardware::mHwId = -1;
 int AudioHardware::detectAudioHw()
 {
     android::String8 script("test_description/conf/detect_usb_audio.py");
-    android::String8 param("MobilePre");
+    /* This is the list of supported devices.
+       MobilePre: M-Audio MobilePre
+       Track: M-Audio FastTrack
+     */
+    android::String8 param("MobilePre Track");
     android::String8 resultStr;
     if (!SimpleScriptExec::runScript(script, param, resultStr)) {
         LOGE("cannot run script");
