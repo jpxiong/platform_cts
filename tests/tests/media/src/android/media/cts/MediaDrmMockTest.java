@@ -25,6 +25,8 @@ import android.test.AndroidTestCase;
 import android.util.Log;
 import java.util.HashMap;
 import java.util.Arrays;
+import java.util.List;
+import java.util.Iterator;
 import java.util.UUID;
 import java.lang.Thread;
 import java.lang.Object;
@@ -359,6 +361,45 @@ public class MediaDrmMockTest extends AndroidTestCase {
 
         md.provideProvisionResponse(testResponse);
         assertTrue(Arrays.equals(testResponse, md.getPropertyByteArray("mock-response")));
+    }
+
+    public void testGetSecureStops() throws Exception {
+        if (!isMockPluginInstalled()) {
+            return;
+        }
+
+        MediaDrm md = new MediaDrm(mockScheme);
+
+        // Set up mock expected responses using properties
+        byte ss1[] = {0x1a, 0x1b, 0x1c, 0x1d, 0x1e, 0x1f, 0x20};
+        byte ss2[] = {0x2a, 0x2b, 0x2c, 0x2d, 0x2e, 0x2f, 0x30};
+
+        md.setPropertyByteArray("mock-secure-stop1", ss1);
+        md.setPropertyByteArray("mock-secure-stop2", ss2);
+
+        List<byte[]> secureStopList = md.getSecureStops();
+        assertTrue(secureStopList != null);
+
+        Iterator<byte[]> iter = secureStopList.iterator();
+        assertTrue(iter.hasNext());
+        assertTrue(Arrays.equals(iter.next(), ss1));
+        assertTrue(iter.hasNext());
+        assertTrue(Arrays.equals(iter.next(), ss2));
+        assertFalse(iter.hasNext());
+    }
+
+    public void testReleaseSecureStops() throws Exception {
+        if (!isMockPluginInstalled()) {
+            return;
+        }
+
+        MediaDrm md = new MediaDrm(mockScheme);
+
+        // Set up mock expected responses using properties
+        byte ssrelease[] = {0x3a, 0x3b, 0x3c, 0x3d, 0x3e, 0x3f, 0x40};
+
+        md.releaseSecureStops(ssrelease);
+        assertTrue(Arrays.equals(ssrelease, md.getPropertyByteArray("mock-ssrelease")));
     }
 
     public void testMultipleSessions() throws Exception {
