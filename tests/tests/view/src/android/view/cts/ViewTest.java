@@ -2768,7 +2768,8 @@ public class ViewTest extends ActivityInstrumentationTestCase2<ViewTestStubActiv
         final MockView scrollView = (MockView) mActivity.findViewById(R.id.scroll_view);
         Bitmap bitmap = Bitmap.createBitmap(200, 300, Bitmap.Config.RGB_565);
         final BitmapDrawable d = new BitmapDrawable(bitmap);
-        final InputMethodManager imm = InputMethodManager.getInstance(getActivity());
+        final InputMethodManager imm = (InputMethodManager)getActivity().getSystemService(
+                Context.INPUT_METHOD_SERVICE);
         final LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(300, 500);
         runTestOnUiThread(new Runnable() {
             public void run() {
@@ -3110,7 +3111,8 @@ public class ViewTest extends ActivityInstrumentationTestCase2<ViewTestStubActiv
     }
 
     public void testInputConnection() throws Throwable {
-        final InputMethodManager imm = InputMethodManager.getInstance(getActivity());
+        final InputMethodManager imm = (InputMethodManager)getActivity().getSystemService(
+                Context.INPUT_METHOD_SERVICE);
         final MockView view = (MockView) mActivity.findViewById(R.id.mock_view);
         final ViewGroup viewGroup = (ViewGroup) mActivity.findViewById(R.id.viewlayout_root);
         final MockEditText editText = new MockEditText(mActivity);
