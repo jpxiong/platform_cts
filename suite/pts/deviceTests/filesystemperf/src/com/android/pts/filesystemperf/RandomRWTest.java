@@ -36,6 +36,9 @@ public class RandomRWTest extends PtsAndroidTestCase {
     public void testRandomRead() throws Exception {
         final int READ_BUFFER_SIZE = 4 * 1024;
         final long fileSize = FileUtil.getFileSizeExceedingMemory(getContext(), READ_BUFFER_SIZE);
+        if (fileSize == 0) { // not enough space, give up
+            return;
+        }
         FileUtil.doRandomReadTest(getContext(), DIR_RANDOM_RD, getReportLog(), fileSize,
                 READ_BUFFER_SIZE);
     }
