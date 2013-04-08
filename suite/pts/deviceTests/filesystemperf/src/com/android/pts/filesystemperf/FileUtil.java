@@ -237,11 +237,9 @@ public class FileUtil {
      * The size is rounded in bufferSize. And the size will be bigger than 400MB.
      * @param context
      * @param bufferSize
-     * @return
-     * @throws IOException
+     * @return file size or 0 if there is not enough space.
      */
-    public static long getFileSizeExceedingMemory(Context context, int bufferSize)
-            throws IOException {
+    public static long getFileSizeExceedingMemory(Context context, int bufferSize) {
         long freeDisk = SystemUtil.getFreeDiskSize(context);
         long memSize = SystemUtil.getTotalMemory(context);
         long diskSizeTarget = (2 * memSize / bufferSize) * bufferSize;
@@ -250,7 +248,8 @@ public class FileUtil {
             diskSizeTarget = minimumDiskSize;
         }
         if (diskSizeTarget > freeDisk) {
-            throw new IOException("Free disk size " + freeDisk + " too small");
+            Log.i(TAG, "Free disk size " + freeDisk + " too small");
+            return 0;
         }
         return diskSizeTarget;
     }
