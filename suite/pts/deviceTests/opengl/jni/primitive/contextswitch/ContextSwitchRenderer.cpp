@@ -25,10 +25,13 @@
 
 #include <Trace.h>
 
-static const EGLint contextAttribs[] =
-        { EGL_CONTEXT_CLIENT_VERSION, 2, EGL_NONE };
+static const EGLint contextAttribs[] = {
+        EGL_CONTEXT_CLIENT_VERSION, 2,
+        EGL_NONE };
 
 static const int NUM_WORKER_CONTEXTS = 7;
+
+static const int CS_TEXTURE_SIZE = 64;
 
 static const int CS_NUM_VERTICES = 6;
 
@@ -78,7 +81,7 @@ bool ContextSwitchRenderer::setUp() {
     }
 
     // Setup texture.
-    mTextureId = GLUtils::genRandTex(64, 64);
+    mTextureId = GLUtils::genTexture(CS_TEXTURE_SIZE, CS_TEXTURE_SIZE, GLUtils::RANDOM_FILL);
     if (mTextureId == 0) {
         return false;
     }

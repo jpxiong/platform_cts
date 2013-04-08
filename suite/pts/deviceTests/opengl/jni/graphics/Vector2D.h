@@ -11,24 +11,23 @@
  * or implied. See the License for the specific language governing permissions and limitations under
  * the License.
  */
+#ifndef VECTOR2D_H
+#define VECTOR2D_H
 
-#ifndef FULLPIPELINEMESH_H
-#define FULLPIPELINEMESH_H
-
-#include <graphics/Matrix.h>
-#include <graphics/Mesh.h>
-#include <graphics/MeshNode.h>
-#include <graphics/Program.h>
-
-class FullPipelineMesh: public MeshNode {
+class Vector2D {
 public:
-    FullPipelineMesh(const Mesh* mesh);
-    virtual ~FullPipelineMesh() {};
-protected:
-    virtual void before(Program& program, Matrix& model, Matrix& view,
-            Matrix& projection);
-    virtual void after(Program& program, Matrix& model, Matrix& view,
-            Matrix& projection);
+    Vector2D();
+    Vector2D(float x, float y);
+    Vector2D copy();
+    void normalize();
+    void add(const Vector2D& v);
+    void sub(const Vector2D& v);
+    void scale(float s);
+    void limit(float max);
+    void limit(float maxX, float maxY);
+    float magnitude();
+    float distance(const Vector2D& v);
+    float mX;
+    float mY;
 };
-
 #endif

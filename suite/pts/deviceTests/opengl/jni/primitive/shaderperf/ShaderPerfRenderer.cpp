@@ -112,8 +112,9 @@ bool ShaderPerfRenderer::setUp() {
     // Create program.
     mProgramId = GLUtils::createProgram(&SP_VERTEX, const_cast<const char**>(&spFragment));
     delete[] spFragment;
-    if (mProgramId == 0)
+    if (mProgramId == 0) {
         return false;
+    }
     // Bind attributes.
     mTextureUniformHandle = glGetUniformLocation(mProgramId, "u_Texture");
     mSeedUniformHandle = glGetUniformLocation(mProgramId, "u_Seed");

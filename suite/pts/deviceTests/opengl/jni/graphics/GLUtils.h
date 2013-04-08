@@ -26,8 +26,11 @@ public:
     static double currentTimeMillis();
     // Rounds a number up to the smallest power of 2 that is greater than the original number.
     static int roundUpToSmallestPowerOf2(int x);
-    // Generates a random texture of the given dimensions.
-    static GLuint genRandTex(int texWidth, int texHeight);
+    static const int RANDOM_FILL = -1;
+    // Generates a texture of the given dimensions. The texture can either be filled with the
+    // specified fill color, else if RANDOM_FILL is passed in the texture will be filled with
+    // random values.
+    static GLuint genTexture(int texWidth, int texHeight, int fill);
     static bool createFBO(GLuint& fboId, GLuint& rboId, GLuint& cboId, int width, int height);
 };
 

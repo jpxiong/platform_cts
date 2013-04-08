@@ -62,15 +62,16 @@ bool PixelOutputRenderer::setUp() {
 
     // Create program.
     mProgramId = GLUtils::createProgram(&PO_VERTEX, &PO_FRAGMENT);
-    if (mProgramId == 0)
+    if (mProgramId == 0) {
         return false;
+    }
     // Bind attributes.
     mTextureUniformHandle = glGetUniformLocation(mProgramId, "u_Texture");
     mPositionHandle = glGetAttribLocation(mProgramId, "a_Position");
     mTexCoordHandle = glGetAttribLocation(mProgramId, "a_TexCoord");
 
     // Setup texture.
-    mTextureId = GLUtils::genRandTex(width, height);
+    mTextureId = GLUtils::genTexture(mWidth, mHeight, GLUtils::RANDOM_FILL);
     if (mTextureId == 0) {
         return false;
     }

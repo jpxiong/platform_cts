@@ -101,7 +101,7 @@ int GLUtils::roundUpToSmallestPowerOf2(int x) {
     return x + 1;
 }
 
-GLuint GLUtils::genRandTex(int texWidth, int texHeight) {
+GLuint GLUtils::genTexture(int texWidth, int texHeight, int fill) {
     GLuint textureId = 0;
     int w = roundUpToSmallestPowerOf2(texWidth);
     int h = roundUpToSmallestPowerOf2(texHeight);
@@ -110,8 +110,11 @@ GLuint GLUtils::genRandTex(int texWidth, int texHeight) {
         uint32_t* d = m;
         for (int y = 0; y < h; y++) {
             for (int x = 0; x < w; x++) {
-                *d = 0xff000000 | ((y & 0xff) << 16) | ((x & 0xff) << 8)
-                        | ((x + y) & 0xff);
+                if (fill == RANDOM_FILL) {
+                    *d = 0xff000000 | ((y & 0xff) << 16) | ((x & 0xff) << 8) | ((x + y) & 0xff);
+                } else {
+                    *d = 0xff000000 | fill;
+                }
                 d++;
             }
         }
