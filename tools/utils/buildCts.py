@@ -122,22 +122,18 @@ class CtsBuilder(object):
     self.__WritePlan(plan, 'Android')
 
     plan = tools.TestPlan(packages)
-    plan.Exclude(ptsPattern)
     plan.Include(r'android\.core\.tests.*')
     self.__WritePlan(plan, 'Java')
 
     plan = tools.TestPlan(packages)
-    plan.Exclude(ptsPattern)
     plan.Include(r'android\.core\.vm-tests-tf')
     self.__WritePlan(plan, 'VM-TF')
 
     plan = tools.TestPlan(packages)
-    plan.Exclude(ptsPattern)
     plan.Include(r'android\.tests\.sigtest')
     self.__WritePlan(plan, 'Signature')
 
     plan = tools.TestPlan(packages)
-    plan.Exclude(ptsPattern)
     plan.Include(r'android\.tests\.appsecurity')
     self.__WritePlan(plan, 'AppSecurity')
 
