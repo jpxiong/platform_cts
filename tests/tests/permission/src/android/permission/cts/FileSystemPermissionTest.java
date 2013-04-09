@@ -27,9 +27,17 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeoutException;
+import java.util.concurrent.TimeUnit;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
@@ -525,11 +533,32 @@ public class FileSystemPermissionTest extends AndroidTestCase {
 
     @LargeTest
     public void testReadingSysFilesDoesntFail() throws Exception {
-        // TODO: fix b/8148087
-        // tryToReadFromAllIn(new File("/sys"));
+        ExecutorService executor = Executors.newCachedThreadPool();
+        tryToReadFromAllIn(new File("/sys"), executor);
+        executor.shutdownNow();
     }
 
-    private static void tryToReadFromAllIn(File dir) throws IOException {
+    // TODO: Remove blacklisting once b/8557832 and b/8557891 fixed.
+    private static final Set<String> SYS_FILES_TO_IGNORE = new HashSet<String>(
+            Arrays.asList(
+                // Nakasi
+                "/sys/devices/tegradc.0/nvdps",
+                "/sys/devices/tegradc.1/nvdps",
+                "/sys/kernel/debug/asoc/tegra30-dam.0",
+                "/sys/kernel/debug/asoc/tegra30-dam.1",
+                "/sys/kernel/debug/asoc/tegra30-dam.2",
+                // Mako
+                "/sys/module/wlan/parameters/fwpath"
+            ));
+
+    // TODO: Remove blacklisting once b/8550159 fixed.
+    private static final Set<String> SYS_DIRECTORIES_TO_IGNORE = new HashSet<String>(
+            Arrays.asList(
+                // Manta
+                "/sys/kernel/debug/clock"
+            ));
+
+    private static void tryToReadFromAllIn(File dir, ExecutorService executor) throws IOException {
         assertTrue(dir.isDirectory());
 
         if (isSymbolicLink(dir)) {
@@ -542,26 +571,67 @@ public class FileSystemPermissionTest extends AndroidTestCase {
         if (files != null) {
             for (File f : files) {
                 if (f.isDirectory()) {
-                    tryToReadFromAllIn(f);
+                    if (!SYS_DIRECTORIES_TO_IGNORE.contains(f.getCanonicalPath())) {
+                        tryToReadFromAllIn(f, executor);
+                    }
                 } else {
-                    tryFileRead(f);
+                    if (!SYS_FILES_TO_IGNORE.contains(f.getCanonicalPath())) {
+                        tryFileOpenRead(f, executor);
+                    }
                 }
             }
         }
     }
 
-    private static void tryFileRead(File f) {
+    private static void tryFileOpenRead(final File f, ExecutorService executor) throws IOException {
+        // Callable requires stack variables to be final.
+        Callable<Boolean> readFile = new Callable<Boolean>() {
+            @Override
+            public Boolean call() throws Exception {
+                return tryFileRead(f);
+            }
+        };
+
+        Boolean completed = false;
+        String fileName = null;
+        Future<Boolean> future = null;
+        try {
+            fileName = f.getCanonicalPath();
+
+            future = executor.submit(readFile);
+
+            // Block, waiting no more than set seconds.
+            completed = future.get(3, TimeUnit.SECONDS);
+        } catch (TimeoutException e) {
+            System.out.println("TIMEOUT: " + fileName);
+        } catch (InterruptedException e) {
+            System.out.println("INTERRUPTED: " + fileName);
+        } catch (ExecutionException e) {
+            System.out.println("TASK WAS ABORTED BY EXCEPTION: " + fileName);
+        } catch (IOException e) {
+            // File.getCanonicalPath() will throw this.
+        } finally {
+            if (future != null) {
+                future.cancel(true);
+            }
+        }
+    }
+
+    private static Boolean tryFileRead(File f) {
         byte[] b = new byte[1024];
         try {
             System.out.println("looking at " + f.getCanonicalPath());
+
             FileInputStream fis = new FileInputStream(f);
-            while(fis.read(b) != -1) {
+            while((fis.available() != 0) && (fis.read(b) != -1)) {
                 // throw away data
             }
+
             fis.close();
         } catch (IOException e) {
             // ignore
         }
+        return true;
     }
 
     private static final Set<File> SYS_EXCEPTIONS = new HashSet<File>(
