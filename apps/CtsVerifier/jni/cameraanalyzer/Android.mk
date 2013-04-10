@@ -35,6 +35,6 @@ LOCAL_STATIC_LIBRARIES := libcolorchecker
 LOCAL_SHARED_LIBRARIES := libjnigraphics \
                           libstlport \
                           libcutils \
-                          libutils
+                          libutils liblog
 
 include $(BUILD_SHARED_LIBRARY)
