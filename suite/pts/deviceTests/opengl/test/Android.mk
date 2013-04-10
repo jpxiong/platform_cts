@@ -26,7 +26,7 @@ LOCAL_SRC_FILES += ../jni/graphics/Matrix.cpp
 
 #$(info $(LOCAL_SRC_FILES))
 LOCAL_C_INCLUDES += external/gtest/include $(LOCAL_PATH)/../jni/graphics/
-LOCAL_STATIC_LIBRARIES := libutils libcutils libgtest_host libgtest_main_host
+LOCAL_STATIC_LIBRARIES := libutils libcutils libgtest_host libgtest_main_host liblog
 LOCAL_LDFLAGS:= -g -lrt -ldl -lstdc++ -lm -fno-exceptions
 LOCAL_MODULE:= pts_device_opengl_test
 include $(BUILD_HOST_EXECUTABLE)
