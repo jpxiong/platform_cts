@@ -16,34 +16,42 @@
 
 package android.provider.cts;
 
-import android.app.Instrumentation;
 import android.content.ContentProviderClient;
 import android.content.ContentResolver;
 import android.content.ContentUris;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.net.Uri;
+import android.os.SystemClock;
 import android.provider.ContactsContract;
 import android.provider.ContactsContract.Contacts;
 import android.provider.cts.ContactsContract_TestDataBuilder.TestContact;
 import android.provider.cts.ContactsContract_TestDataBuilder.TestRawContact;
-import android.test.InstrumentationTestCase;
+import android.provider.cts.contacts.ContactUtil;
+import android.provider.cts.contacts.DatabaseAsserts;
+import android.provider.cts.contacts.RawContactUtil;
+import android.test.AndroidTestCase;
 
 import java.util.List;
 
-public class ContactsContract_ContactsTest extends InstrumentationTestCase {
-    private ContentResolver mContentResolver;
+public class ContactsContract_ContactsTest extends AndroidTestCase {
+
+    private StaticAccountAuthenticator mAuthenticator;
+    private ContentResolver mResolver;
     private ContactsContract_TestDataBuilder mBuilder;
 
     @Override
     protected void setUp() throws Exception {
         super.setUp();
-        mContentResolver = getInstrumentation().getTargetContext().getContentResolver();
+        mResolver = getContext().getContentResolver();
         ContentProviderClient provider =
-                mContentResolver.acquireContentProviderClient(ContactsContract.AUTHORITY);
+                mResolver.acquireContentProviderClient(ContactsContract.AUTHORITY);
         mBuilder = new ContactsContract_TestDataBuilder(provider);
+
+        mAuthenticator = new StaticAccountAuthenticator(getContext());
     }
 
     @Override
@@ -57,14 +65,14 @@ public class ContactsContract_ContactsTest extends InstrumentationTestCase {
         TestContact contact = rawContact.getContact().load();
         long oldLastContacted = contact.getLong(Contacts.LAST_TIME_CONTACTED);
 
-        Contacts.markAsContacted(mContentResolver, contact.getId());
+        Contacts.markAsContacted(mResolver, contact.getId());
         contact.load(); // Reload
 
         long lastContacted = contact.getLong(Contacts.LAST_TIME_CONTACTED);
         assertTrue(oldLastContacted < lastContacted);
         oldLastContacted = lastContacted;
 
-        Contacts.markAsContacted(mContentResolver, contact.getId());
+        Contacts.markAsContacted(mResolver, contact.getId());
         contact.load();
 
         lastContacted = contact.getLong(Contacts.LAST_TIME_CONTACTED);
@@ -72,8 +80,7 @@ public class ContactsContract_ContactsTest extends InstrumentationTestCase {
     }
 
     public void testContentUri() {
-        Instrumentation instrumentation = getInstrumentation();
-        Context context = instrumentation.getContext();
+        Context context = getContext();
         PackageManager packageManager = context.getPackageManager();
         Intent intent = new Intent(Intent.ACTION_VIEW, ContactsContract.Contacts.CONTENT_URI);
         List<ResolveInfo> resolveInfos = packageManager.queryIntentActivities(intent, 0);
@@ -93,11 +100,79 @@ public class ContactsContract_ContactsTest extends InstrumentationTestCase {
         assertEquals(ContentUris.withAppendedId(Uri.withAppendedPath(Contacts.CONTENT_LOOKUP_URI,
                 lookupKey), contactId), lookupUri);
 
-        Uri lookupUri2 = Contacts.getLookupUri(mContentResolver, contactUri);
+        Uri lookupUri2 = Contacts.getLookupUri(mResolver, contactUri);
         assertEquals(lookupUri, lookupUri2);
 
-        Uri contactUri2 = Contacts.lookupContact(mContentResolver, lookupUri);
+        Uri contactUri2 = Contacts.lookupContact(mResolver, lookupUri);
         assertEquals(contactUri, contactUri2);
     }
-}
 
+    public void testInsert_isUnsupported() {
+        DatabaseAsserts.assertInsertIsUnsupported(mResolver, Contacts.CONTENT_URI);
+    }
+
+    public void testContactDelete_removesContactRecord() {
+        assertContactCreateDelete();
+    }
+
+    public void testContactDelete_hasDeleteLog() {
+        long start = System.currentTimeMillis();
+        DatabaseAsserts.ContactIdPair ids = assertContactCreateDelete();
+        DatabaseAsserts.assertHasDeleteLogGreaterThan(mResolver, ids.mContactId, start);
+
+        // Clean up. Must also remove raw contact.
+        RawContactUtil.delete(mResolver, ids.mRawContactId, true);
+    }
+
+    public void testContactDelete_marksRawContactsForDeletion() {
+        DatabaseAsserts.ContactIdPair ids = assertContactCreateDelete();
+
+        String[] projection = new String[] {
+                ContactsContract.RawContacts.DIRTY,
+                ContactsContract.RawContacts.DELETED
+        };
+        List<String[]> records = RawContactUtil.queryByContactId(mResolver, ids.mContactId,
+                projection);
+        for (String[] arr : records) {
+            assertEquals("1", arr[0]);
+            assertEquals("1", arr[1]);
+        }
+
+        // Clean up
+        RawContactUtil.delete(mResolver, ids.mRawContactId, true);
+    }
+
+    public void testContactUpdate_updatesContactUpdatedTimestamp() {
+        DatabaseAsserts.ContactIdPair ids = DatabaseAsserts.assertAndCreateContact(mResolver);
+
+        long baseTime = ContactUtil.queryContactLastUpdatedTimestamp(mResolver, ids.mContactId);
+
+        ContentValues values = new ContentValues();
+        values.put(ContactsContract.Contacts.STARRED, 1);
+
+        SystemClock.sleep(1);
+        ContactUtil.update(mResolver, ids.mContactId, values);
+
+        long newTime = ContactUtil.queryContactLastUpdatedTimestamp(mResolver, ids.mContactId);
+        assertTrue(newTime > baseTime);
+
+        // Clean up
+        RawContactUtil.delete(mResolver, ids.mRawContactId, true);
+    }
+
+    /**
+     * Create a contact.  Delete it.  And assert that the contact record is no longer present.
+     *
+     * @return The contact id and raw contact id that was created.
+     */
+    private DatabaseAsserts.ContactIdPair assertContactCreateDelete() {
+        DatabaseAsserts.ContactIdPair ids = DatabaseAsserts.assertAndCreateContact(mResolver);
+
+        SystemClock.sleep(1);
+        ContactUtil.delete(mResolver, ids.mContactId);
+
+        assertFalse(ContactUtil.recordExistsForContactId(mResolver, ids.mContactId));
+
+        return ids;
+    }
+}

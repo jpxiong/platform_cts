@@ -19,22 +19,28 @@ package android.provider.cts;
 
 import android.content.ContentProviderClient;
 import android.content.ContentResolver;
+import android.content.ContentValues;
 import android.net.Uri;
 import android.provider.ContactsContract;
 import android.provider.ContactsContract.CommonDataKinds.StructuredName;
 import android.provider.ContactsContract.RawContacts;
 import android.provider.cts.ContactsContract_TestDataBuilder.TestContact;
 import android.provider.cts.ContactsContract_TestDataBuilder.TestRawContact;
-import android.test.InstrumentationTestCase;
+import android.provider.cts.contacts.CommonDatabaseUtils;
+import android.provider.cts.contacts.ContactUtil;
+import android.provider.cts.contacts.DatabaseAsserts;
+import android.provider.cts.contacts.RawContactUtil;
+import android.test.AndroidTestCase;
+import android.test.MoreAsserts;
 
-public class ContactsContract_RawContactsTest extends InstrumentationTestCase {
+public class ContactsContract_RawContactsTest extends AndroidTestCase {
     private ContentResolver mResolver;
     private ContactsContract_TestDataBuilder mBuilder;
 
     @Override
     protected void setUp() throws Exception {
         super.setUp();
-        mResolver = getInstrumentation().getTargetContext().getContentResolver();
+        mResolver = getContext().getContentResolver();
         ContentProviderClient provider =
                 mResolver.acquireContentProviderClient(ContactsContract.AUTHORITY);
         mBuilder = new ContactsContract_TestDataBuilder(provider);
@@ -83,5 +89,98 @@ public class ContactsContract_RawContactsTest extends InstrumentationTestCase {
         assertEquals("Lookup URI matched the wrong contact",
                 lookupContact.getId(), rawContact.load().getContactId());
     }
-}
 
+    public void testRawContactDelete_setsDeleteFlag() {
+        long rawContactid = RawContactUtil.insertRawContact(mResolver);
+
+        assertTrue(RawContactUtil.rawContactExistsById(mResolver, rawContactid));
+
+        RawContactUtil.delete(mResolver, rawContactid, false);
+
+        String[] projection = new String[]{
+                ContactsContract.RawContacts.CONTACT_ID,
+                ContactsContract.RawContacts.DELETED
+        };
+        String[] result = RawContactUtil.queryByRawContactId(mResolver, rawContactid,
+                projection);
+
+        // Contact id should be null
+        assertNull(result[0]);
+        // Record should be marked deleted.
+        assertEquals("1", result[1]);
+    }
+
+    public void testRawContactDelete_removesRecord() {
+        long rawContactid = RawContactUtil.insertRawContact(mResolver);
+        assertTrue(RawContactUtil.rawContactExistsById(mResolver, rawContactid));
+
+        RawContactUtil.delete(mResolver, rawContactid, true);
+
+        assertFalse(RawContactUtil.rawContactExistsById(mResolver, rawContactid));
+
+        // already clean
+    }
+
+
+    // This implicitly tests the Contact create case.
+    public void testRawContactCreate_updatesContactUpdatedTimestamp() {
+        long startTime = System.currentTimeMillis();
+
+        long rawContactId = RawContactUtil.createRawContactWithName(mResolver);
+        long lastUpdated = getContactLastUpdatedTimestampByRawContactId(mResolver, rawContactId);
+
+        assertTrue(lastUpdated > startTime);
+
+        // Clean up
+        RawContactUtil.delete(mResolver, rawContactId, true);
+    }
+
+    public void testRawContactUpdate_updatesContactUpdatedTimestamp() {
+        DatabaseAsserts.ContactIdPair ids = DatabaseAsserts.assertAndCreateContact(mResolver);
+
+        long baseTime = ContactUtil.queryContactLastUpdatedTimestamp(mResolver, ids.mContactId);
+
+        ContentValues values = new ContentValues();
+        values.put(ContactsContract.RawContacts.STARRED, 1);
+        RawContactUtil.update(mResolver, ids.mRawContactId, values);
+
+        long newTime = ContactUtil.queryContactLastUpdatedTimestamp(mResolver, ids.mContactId);
+        assertTrue(newTime > baseTime);
+
+        // Clean up
+        RawContactUtil.delete(mResolver, ids.mRawContactId, true);
+    }
+
+    public void testRawContactPsuedoDelete_hasDeleteLogForContact() {
+        DatabaseAsserts.ContactIdPair ids = DatabaseAsserts.assertAndCreateContact(mResolver);
+
+        long baseTime = ContactUtil.queryContactLastUpdatedTimestamp(mResolver, ids.mContactId);
+
+        RawContactUtil.delete(mResolver, ids.mRawContactId, false);
+
+        DatabaseAsserts.assertHasDeleteLogGreaterThan(mResolver, ids.mContactId, baseTime);
+
+        // clean up
+        RawContactUtil.delete(mResolver, ids.mRawContactId, true);
+    }
+
+    public void testRawContactDelete_hasDeleteLogForContact() {
+        DatabaseAsserts.ContactIdPair ids = DatabaseAsserts.assertAndCreateContact(mResolver);
+
+        long baseTime = ContactUtil.queryContactLastUpdatedTimestamp(mResolver, ids.mContactId);
+
+        RawContactUtil.delete(mResolver, ids.mRawContactId, true);
+
+        DatabaseAsserts.assertHasDeleteLogGreaterThan(mResolver, ids.mContactId, baseTime);
+
+        // already clean
+    }
+
+    private long getContactLastUpdatedTimestampByRawContactId(ContentResolver resolver,
+            long rawContactId) {
+        long contactId = RawContactUtil.queryContactIdByRawContactId(mResolver, rawContactId);
+        MoreAsserts.assertNotEqual(CommonDatabaseUtils.NOT_FOUND, contactId);
+
+        return ContactUtil.queryContactLastUpdatedTimestamp(mResolver, contactId);
+    }
+}
