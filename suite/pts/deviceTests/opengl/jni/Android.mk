@@ -26,6 +26,6 @@ LOCAL_SRC_FILES := $(patsubst ./%,%, $(shell cd $(LOCAL_PATH); \
 
 LOCAL_C_INCLUDES := $(JNI_H_INCLUDE)
 
-LOCAL_SHARED_LIBRARIES := libEGL libGLESv2 libandroid libutils libcutils
+LOCAL_SHARED_LIBRARIES := libEGL libGLESv2 libandroid libutils libcutils liblog
 
 include $(BUILD_SHARED_LIBRARY)
