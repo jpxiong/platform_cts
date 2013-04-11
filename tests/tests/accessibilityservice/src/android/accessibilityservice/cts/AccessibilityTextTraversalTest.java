@@ -1246,6 +1246,261 @@ public class AccessibilityTextTraversalTest
     }
 
     @MediumTest
+    public void testActionNextAndPreviousAtGranularityWordOverEditTextWithContentDescription()
+            throws Exception {
+
+        final EditText editText = (EditText) getActivity().findViewById(R.id.edit);
+
+        getInstrumentation().runOnMainSync(new Runnable() {
+            @Override
+            public void run() {
+                editText.setText(getString(R.string.foo_bar_baz));
+                editText.setContentDescription(getString(R.string.android_wiki));
+            }
+        });
+
+        final AccessibilityNodeInfo text = getInteractionBridge()
+               .findAccessibilityNodeInfoByTextFromRoot(getString(R.string.foo_bar_baz));
+
+        final int granularities = text.getMovementGranularities();
+        assertEquals(granularities, AccessibilityNodeInfo.MOVEMENT_GRANULARITY_CHARACTER
+                | AccessibilityNodeInfo.MOVEMENT_GRANULARITY_WORD
+                | AccessibilityNodeInfo.MOVEMENT_GRANULARITY_LINE
+                | AccessibilityNodeInfo.MOVEMENT_GRANULARITY_PARAGRAPH
+                | AccessibilityNodeInfo.MOVEMENT_GRANULARITY_PAGE);
+
+        final Bundle arguments = new Bundle();
+        arguments.putInt(AccessibilityNodeInfo.ACTION_ARGUMENT_MOVEMENT_GRANULARITY_INT,
+                AccessibilityNodeInfo.MOVEMENT_GRANULARITY_WORD);
+
+        // Move to the next word and wait for an event.
+        AccessibilityEvent firstExpected = getInteractionBridge()
+                .executeCommandAndWaitForAccessibilityEvent(new Runnable() {
+            @Override
+            public void run() {
+                getInteractionBridge().performAction(text,
+                        AccessibilityNodeInfo.ACTION_NEXT_AT_MOVEMENT_GRANULARITY, arguments);
+            }
+        }, new AccessibilityEventFilter() {
+            @Override
+            public boolean accept(AccessibilityEvent event) {
+                return
+                (event.getEventType() ==
+                    AccessibilityEvent.TYPE_VIEW_TEXT_TRAVERSED_AT_MOVEMENT_GRANULARITY
+                        && event.getAction() ==
+                                AccessibilityNodeInfo.ACTION_NEXT_AT_MOVEMENT_GRANULARITY
+                        && event.getPackageName().equals(getActivity().getPackageName())
+                        && event.getClassName().equals(EditText.class.getName())
+                        && event.getText().size() > 0
+                        && event.getText().get(0).toString().equals(getString(R.string.foo_bar_baz))
+                        && event.getContentDescription().equals(getString(R.string.android_wiki))
+                        && event.getFromIndex() == 0
+                        && event.getToIndex() == 3
+                        && event.getMovementGranularity() ==
+                                AccessibilityNodeInfo.MOVEMENT_GRANULARITY_WORD);
+            }
+        }, TIMEOUT_ASYNC_PROCESSING);
+
+        // Make sure we got the expected event.
+        assertNotNull(firstExpected);
+
+        // Verify the selection position.
+        assertEquals(3, editText.getSelectionStart());
+        assertEquals(3, editText.getSelectionEnd());
+
+        // Move to the next word and wait for an event.
+        AccessibilityEvent secondExpected = getInteractionBridge()
+                .executeCommandAndWaitForAccessibilityEvent(new Runnable() {
+            @Override
+            public void run() {
+                getInteractionBridge().performAction(text,
+                        AccessibilityNodeInfo.ACTION_NEXT_AT_MOVEMENT_GRANULARITY, arguments);
+            }
+        }, new AccessibilityEventFilter() {
+            @Override
+            public boolean accept(AccessibilityEvent event) {
+                return
+                (event.getEventType() ==
+                    AccessibilityEvent.TYPE_VIEW_TEXT_TRAVERSED_AT_MOVEMENT_GRANULARITY
+                        && event.getAction() ==
+                                AccessibilityNodeInfo.ACTION_NEXT_AT_MOVEMENT_GRANULARITY
+                        && event.getPackageName().equals(getActivity().getPackageName())
+                        && event.getClassName().equals(EditText.class.getName())
+                        && event.getText().size() > 0
+                        && event.getText().get(0).toString().equals(getString(R.string.foo_bar_baz))
+                        && event.getContentDescription().equals(getString(R.string.android_wiki))
+                        && event.getFromIndex() == 4
+                        && event.getToIndex() == 7
+                        && event.getMovementGranularity() ==
+                                AccessibilityNodeInfo.MOVEMENT_GRANULARITY_WORD);
+            }
+        }, TIMEOUT_ASYNC_PROCESSING);
+
+        // Make sure we got the expected event.
+        assertNotNull(secondExpected);
+
+        // Verify the selection position.
+        assertEquals(7, editText.getSelectionStart());
+        assertEquals(7, editText.getSelectionEnd());
+
+        // Move to the next word and wait for an event.
+        AccessibilityEvent thirdExpected = getInteractionBridge()
+                .executeCommandAndWaitForAccessibilityEvent(new Runnable() {
+            @Override
+            public void run() {
+                getInteractionBridge().performAction(text,
+                        AccessibilityNodeInfo.ACTION_NEXT_AT_MOVEMENT_GRANULARITY, arguments);
+            }
+        }, new AccessibilityEventFilter() {
+            @Override
+            public boolean accept(AccessibilityEvent event) {
+                return
+                (event.getEventType() ==
+                    AccessibilityEvent.TYPE_VIEW_TEXT_TRAVERSED_AT_MOVEMENT_GRANULARITY
+                        && event.getAction() ==
+                                AccessibilityNodeInfo.ACTION_NEXT_AT_MOVEMENT_GRANULARITY
+                        && event.getPackageName().equals(getActivity().getPackageName())
+                        && event.getClassName().equals(EditText.class.getName())
+                        && event.getText().size() > 0
+                        && event.getText().get(0).toString().equals(getString(R.string.foo_bar_baz))
+                        && event.getContentDescription().equals(getString(R.string.android_wiki))
+                        && event.getFromIndex() == 8
+                        && event.getToIndex() == 11
+                        && event.getMovementGranularity() ==
+                                 AccessibilityNodeInfo.MOVEMENT_GRANULARITY_WORD);
+            }
+        }, TIMEOUT_ASYNC_PROCESSING);
+
+        // Make sure we got the expected event.
+        assertNotNull(thirdExpected);
+
+        // Verify the selection position.
+        assertEquals(11, editText.getSelectionStart());
+        assertEquals(11, editText.getSelectionEnd());
+
+        // Make sure there is no next.
+        assertFalse(getInteractionBridge().performAction(text,
+                AccessibilityNodeInfo.ACTION_NEXT_AT_MOVEMENT_GRANULARITY, arguments));
+
+        // Verify the selection position.
+        assertEquals(11, editText.getSelectionStart());
+        assertEquals(11, editText.getSelectionEnd());
+
+        // Move to the next word and wait for an event.
+        AccessibilityEvent fourthExpected = getInteractionBridge()
+                .executeCommandAndWaitForAccessibilityEvent(new Runnable() {
+            @Override
+            public void run() {
+                getInteractionBridge().performAction(text,
+                        AccessibilityNodeInfo.ACTION_PREVIOUS_AT_MOVEMENT_GRANULARITY, arguments);
+            }
+        }, new AccessibilityEventFilter() {
+            @Override
+            public boolean accept(AccessibilityEvent event) {
+                return
+                (event.getEventType() ==
+                    AccessibilityEvent.TYPE_VIEW_TEXT_TRAVERSED_AT_MOVEMENT_GRANULARITY
+                        && event.getAction() ==
+                                AccessibilityNodeInfo.ACTION_PREVIOUS_AT_MOVEMENT_GRANULARITY
+                        && event.getPackageName().equals(getActivity().getPackageName())
+                        && event.getClassName().equals(EditText.class.getName())
+                        && event.getText().size() > 0
+                        && event.getText().get(0).toString().equals(getString(R.string.foo_bar_baz))
+                        && event.getContentDescription().equals(getString(R.string.android_wiki))
+                        && event.getFromIndex() == 8
+                        && event.getToIndex() == 11
+                        && event.getMovementGranularity() ==
+                                AccessibilityNodeInfo.MOVEMENT_GRANULARITY_WORD);
+            }
+        }, TIMEOUT_ASYNC_PROCESSING);
+
+        // Make sure we got the expected event.
+        assertNotNull(fourthExpected);
+
+        // Verify the selection position.
+        assertEquals(8, editText.getSelectionStart());
+        assertEquals(8, editText.getSelectionEnd());
+
+        // Move to the next word and wait for an event.
+        AccessibilityEvent fifthExpected = getInteractionBridge()
+                .executeCommandAndWaitForAccessibilityEvent(new Runnable() {
+            @Override
+            public void run() {
+                getInteractionBridge().performAction(text,
+                        AccessibilityNodeInfo.ACTION_PREVIOUS_AT_MOVEMENT_GRANULARITY, arguments);
+            }
+        }, new AccessibilityEventFilter() {
+            @Override
+            public boolean accept(AccessibilityEvent event) {
+                return
+                (event.getEventType() ==
+                    AccessibilityEvent.TYPE_VIEW_TEXT_TRAVERSED_AT_MOVEMENT_GRANULARITY
+                        && event.getAction() ==
+                                AccessibilityNodeInfo.ACTION_PREVIOUS_AT_MOVEMENT_GRANULARITY
+                        && event.getPackageName().equals(getActivity().getPackageName())
+                        && event.getClassName().equals(EditText.class.getName())
+                        && event.getText().size() > 0
+                        && event.getText().get(0).toString().equals(getString(R.string.foo_bar_baz))
+                        && event.getContentDescription().equals(getString(R.string.android_wiki))
+                        && event.getFromIndex() == 4
+                        && event.getToIndex() == 7
+                        && event.getMovementGranularity() ==
+                                AccessibilityNodeInfo.MOVEMENT_GRANULARITY_WORD);
+            }
+        }, TIMEOUT_ASYNC_PROCESSING);
+
+        // Make sure we got the expected event.
+        assertNotNull(fifthExpected);
+
+        // Verify the selection position.
+        assertEquals(4, editText.getSelectionStart());
+        assertEquals(4, editText.getSelectionEnd());
+
+        // Move to the next character and wait for an event.
+        AccessibilityEvent sixthExpected = getInteractionBridge()
+                .executeCommandAndWaitForAccessibilityEvent(new Runnable() {
+            @Override
+            public void run() {
+                getInteractionBridge().performAction(text,
+                        AccessibilityNodeInfo.ACTION_PREVIOUS_AT_MOVEMENT_GRANULARITY, arguments);
+            }
+        }, new AccessibilityEventFilter() {
+            @Override
+            public boolean accept(AccessibilityEvent event) {
+                return
+                (event.getEventType() ==
+                    AccessibilityEvent.TYPE_VIEW_TEXT_TRAVERSED_AT_MOVEMENT_GRANULARITY
+                        && event.getAction() ==
+                                AccessibilityNodeInfo.ACTION_PREVIOUS_AT_MOVEMENT_GRANULARITY
+                        && event.getPackageName().equals(getActivity().getPackageName())
+                        && event.getClassName().equals(EditText.class.getName())
+                        && event.getText().size() > 0
+                        && event.getText().get(0).toString().equals(getString(R.string.foo_bar_baz))
+                        && event.getContentDescription().equals(getString(R.string.android_wiki))
+                        && event.getFromIndex() == 0
+                        && event.getToIndex() == 3
+                        && event.getMovementGranularity() ==
+                                AccessibilityNodeInfo.MOVEMENT_GRANULARITY_WORD);
+            }
+        }, TIMEOUT_ASYNC_PROCESSING);
+
+        // Make sure we got the expected event.
+        assertNotNull(sixthExpected);
+
+        // Verify the selection position.
+        assertEquals(0, editText.getSelectionStart());
+        assertEquals(0, editText.getSelectionEnd());
+
+        // Make sure there is no previous.
+        assertFalse(getInteractionBridge().performAction(text,
+                AccessibilityNodeInfo.ACTION_PREVIOUS_AT_MOVEMENT_GRANULARITY, arguments));
+
+        // Verify the selection position.
+        assertEquals(0, editText.getSelectionStart());
+        assertEquals(0, editText.getSelectionEnd());
+    }
+    
+    @MediumTest
     public void testActionNextAndPreviousAtGranularityWordOverTextExtend() throws Exception {
         final EditText editText = (EditText) getActivity().findViewById(R.id.edit);
 
