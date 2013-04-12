@@ -551,13 +551,6 @@ public class FileSystemPermissionTest extends AndroidTestCase {
                 "/sys/module/wlan/parameters/fwpath"
             ));
 
-    // TODO: Remove blacklisting once b/8550159 fixed.
-    private static final Set<String> SYS_DIRECTORIES_TO_IGNORE = new HashSet<String>(
-            Arrays.asList(
-                // Manta
-                "/sys/kernel/debug/clock"
-            ));
-
     private static void tryToReadFromAllIn(File dir, ExecutorService executor) throws IOException {
         assertTrue(dir.isDirectory());
 
@@ -571,9 +564,7 @@ public class FileSystemPermissionTest extends AndroidTestCase {
         if (files != null) {
             for (File f : files) {
                 if (f.isDirectory()) {
-                    if (!SYS_DIRECTORIES_TO_IGNORE.contains(f.getCanonicalPath())) {
-                        tryToReadFromAllIn(f, executor);
-                    }
+                    tryToReadFromAllIn(f, executor);
                 } else {
                     if (!SYS_FILES_TO_IGNORE.contains(f.getCanonicalPath())) {
                         tryFileOpenRead(f, executor);
