@@ -18,10 +18,13 @@ package android.provider.cts.contacts;
 
 import android.content.ContentResolver;
 import android.content.ContentValues;
+import android.database.Cursor;
 import android.net.Uri;
 import android.test.MoreAsserts;
 
 import junit.framework.Assert;
+
+import java.util.BitSet;
 
 /**
  * Common methods for asserting database related operations.
@@ -91,5 +94,108 @@ public class DatabaseAsserts {
             this.mContactId = contactId;
             this.mRawContactId = rawContactId;
         }
+    }
+
+    /**
+     * Queries for a given {@link Uri} against a provided {@link ContentResolver}, and
+     * ensures that the returned cursor contains exactly the expected values.
+     *
+     * @param resolver - ContentResolver to query against
+     * @param uri - {@link Uri} to perform the query for
+     * contained in <code>expectedValues</code> in order for the assert to pass.
+     * @param expectedValues - Array of {@link ContentValues} which the cursor returned from the
+     * query should contain.
+     */
+    public static void assertStoredValuesInUriMatchExactly(ContentResolver resolver, Uri uri,
+            ContentValues... expectedValues) {
+        assertStoredValuesInUriMatchExactly(resolver, uri, null, null, null, null, expectedValues);
+    }
+
+    /**
+     * Queries for a given {@link Uri} against a provided {@link ContentResolver}, and
+     * ensures that the returned cursor contains exactly the expected values.
+     *
+     * @param resolver - ContentResolver to query against
+     * @param uri - {@link Uri} to perform the query for
+     * @param projection - Projection to use for the query. Must contain at least the columns
+     * contained in <code>expectedValues</code> in order for the assert to pass.
+     * @param selection - Selection string to use for the query.
+     * @param selectionArgs - Selection arguments to use for the query.
+     * @param sortOrder - Sort order to use for the query.
+     * @param expectedValues - Array of {@link ContentValues} which the cursor returned from the
+     * query should contain.
+     */
+    public static void assertStoredValuesInUriMatchExactly(ContentResolver resolver, Uri uri, String[] projection,
+            String selection, String[] selectionArgs, String sortOrder,
+            ContentValues... expectedValues) {
+        final Cursor cursor = resolver.query(uri, projection, selection, selectionArgs, sortOrder);
+        try {
+            assertCursorValuesMatchExactly(cursor, expectedValues);
+        } finally {
+            cursor.close();
+        }
+    }
+
+    /**
+     * Ensures that the rows in the cursor match the rows in the expected values exactly. However,
+     * does not require that the rows in the cursor are ordered the same way as those in the
+     * expected values.
+     *
+     * @param cursor - Cursor containing the values to check for
+     * @param expectedValues - Array of ContentValues that the cursor should be expected to
+     * contain.
+     */
+    public static void assertCursorValuesMatchExactly(Cursor cursor,
+            ContentValues... expectedValues) {
+        Assert.assertEquals("Cursor does not contain the number of expected rows",
+                expectedValues.length, cursor.getCount());
+        StringBuilder message = new StringBuilder();
+        // In case if expectedValues contains multiple identical values, remember which cursor
+        // rows are "consumed" to prevent multiple ContentValues from hitting the same row.
+        final BitSet used = new BitSet(cursor.getCount());
+
+        for (ContentValues v : expectedValues) {
+            boolean found = false;
+            cursor.moveToPosition(-1);
+            while (cursor.moveToNext()) {
+                final int pos = cursor.getPosition();
+                if (used.get(pos)) continue;
+                found = equalsWithExpectedValues(cursor, v, message);
+                if (found) {
+                    used.set(pos);
+                    break;
+                }
+            }
+            Assert.assertTrue("Expected values can not be found " + v + "," + message.toString(),
+                    found);
+        }
+    }
+
+    private static boolean equalsWithExpectedValues(Cursor cursor, ContentValues expectedValues,
+            StringBuilder msgBuffer) {
+        for (String column : expectedValues.keySet()) {
+            int index = cursor.getColumnIndex(column);
+            if (index == -1) {
+                msgBuffer.append(" No such column: ").append(column);
+                return false;
+            }
+            Object expectedValue = expectedValues.get(column);
+            String value;
+            expectedValue = expectedValues.getAsString(column);
+            value = cursor.getString(cursor.getColumnIndex(column));
+            if (expectedValue != null && !expectedValue.equals(value) || value != null
+                    && !value.equals(expectedValue)) {
+                msgBuffer
+                        .append(" Column value ")
+                        .append(column)
+                        .append(" expected <")
+                        .append(expectedValue)
+                        .append(">, but was <")
+                        .append(value)
+                        .append('>');
+                return false;
+            }
+        }
+        return true;
     }
 }
