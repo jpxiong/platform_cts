@@ -31,13 +31,16 @@ import java.util.Arrays;
  */
 public class GLReferenceBenchmark extends PtsActivityInstrumentationTestCase2<GLReferenceActivity> {
 
-    private static final int NUM_FRAMES = 100;
+    private static final int NUM_FRAMES_PER_SCENE = 500;
+    private static final int NUM_SCENES = 1;
+    private static final int NUM_FRAMES = NUM_FRAMES_PER_SCENE * NUM_SCENES;
     private static final int TIMEOUT = 1000000;
     // Reference values collected by averaging across n4, n7, n10.
-    private static final double NEXUS_REF_UI_LOAD = 40;// Milliseconds.
-    private static final double[] NEXUS_REF_SET_UP = {40, 0, 0, 0};// Milliseconds.
-    private static final double NEXUS_REF_UPDATE_AVG = 40;// Milliseconds.
-    private static final double NEXUS_REF_RENDER_AVG = 1;// As fraction of display refresh rate.
+    private static final double NEXUS_REF_UI_LOAD = 39.67f;// Milliseconds.
+    // (GL, Context, Textures, Meshes).
+    private static final double[] NEXUS_REF_SET_UP = {22.58f, 44.49f, 2.47f, 0.02f};// MS.
+    private static final double NEXUS_REF_UPDATE_AVG = 9.8f;// MS.
+    private static final double NEXUS_REF_RENDER_AVG = 0.44f;// Fraction of display refresh rate.
 
     public GLReferenceBenchmark() {
         super(GLReferenceActivity.class);
@@ -117,10 +120,16 @@ public class GLReferenceBenchmark extends PtsActivityInstrumentationTestCase2<GL
                             "Set Up Score", setUpScore, ResultType.HIGHER_BETTER, ResultUnit.SCORE);
                     getReportLog().printArray(
                             "Update Times", updateTimes, ResultType.LOWER_BETTER, ResultUnit.MS);
+                    getReportLog().printValue(
+                            "Update Time Average", updateAverage, ResultType.LOWER_BETTER,
+                            ResultUnit.MS);
                     getReportLog().printValue("Update Score", updateScore, ResultType.HIGHER_BETTER,
                             ResultUnit.SCORE);
                     getReportLog().printArray(
                             "Render Times", renderTimes, ResultType.LOWER_BETTER, ResultUnit.MS);
+                    getReportLog().printValue(
+                            "Render Time Average", renderAverage, ResultType.LOWER_BETTER,
+                            ResultUnit.MS);
                     getReportLog().printValue("Render Score", renderScore, ResultType.HIGHER_BETTER,
                             ResultUnit.SCORE);
                     getReportLog().printValue(

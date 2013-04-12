@@ -11,13 +11,30 @@
  * or implied. See the License for the specific language governing permissions and limitations under
  * the License.
  */
-#include "Mesh.h"
+#ifndef REFERENCERENDERER_H
+#define REFERENCERENDERER_H
 
-Mesh::Mesh(const float* vertices, const float* normals, const float* texCoords,
-           const int numVertices)
-    : mVertices(vertices),
-      mNormals(normals),
-      mTexCoords(texCoords),
-      mNumVertices(numVertices) {
+#include "scene/Scene.h"
 
-}
+#include <graphics/Mesh.h>
+#include <graphics/Renderer.h>
+
+class ReferenceRenderer: public Renderer {
+public:
+    ReferenceRenderer(ANativeWindow* window);
+    virtual ~ReferenceRenderer() {};
+    bool setUp();
+    bool tearDown();
+    bool update(int frame);
+    bool draw();
+    double mSetUpTimes[4];
+    static const int FRAMES_PER_SCENE = 500;
+    static const int NUM_SCENES = 1;
+    static const int NUM_SETUP_TIMES = 4;
+private:
+    Scene* mScenes[NUM_SCENES];
+    Scene* mCurrentScene;
+
+};
+
+#endif

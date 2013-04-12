@@ -11,13 +11,25 @@
  * or implied. See the License for the specific language governing permissions and limitations under
  * the License.
  */
+
+#ifndef BASICMESHNODE_H
+#define BASICMESHNODE_H
+
+#include "Matrix.h"
 #include "Mesh.h"
+#include "MeshNode.h"
+#include "Program.h"
 
-Mesh::Mesh(const float* vertices, const float* normals, const float* texCoords,
-           const int numVertices)
-    : mVertices(vertices),
-      mNormals(normals),
-      mTexCoords(texCoords),
-      mNumVertices(numVertices) {
+class BasicMeshNode: public MeshNode {
+public:
+    BasicMeshNode(const Mesh* mesh, const GLuint textureId);
+    virtual ~BasicMeshNode() {};
+protected:
+    virtual void before(Program& program, Matrix& model, Matrix& view,
+            Matrix& projection);
+    virtual void after(Program& program, Matrix& model, Matrix& view,
+            Matrix& projection);
+    const GLuint mTextureId;
+};
 
-}
+#endif

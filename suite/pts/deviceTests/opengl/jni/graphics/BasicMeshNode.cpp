@@ -12,20 +12,21 @@
  * the License.
  */
 
-#include "FullPipelineMesh.h"
+#include "BasicMeshNode.h"
 
-#include <graphics/BasicProgram.h>
+#include "BasicProgram.h"
 
-FullPipelineMesh::FullPipelineMesh(const Mesh* mesh) :
-        MeshNode(mesh) {
+BasicMeshNode::BasicMeshNode(const Mesh* mesh, const GLuint textureId) :
+        MeshNode(mesh),
+        mTextureId(textureId) {
 }
 
-void FullPipelineMesh::before(Program& program, Matrix& model, Matrix& view, Matrix& projection) {
+void BasicMeshNode::before(Program& program, Matrix& model, Matrix& view, Matrix& projection) {
     BasicProgram& prog = (BasicProgram&) program;
 
     glActiveTexture(GL_TEXTURE0);
     // Bind the texture to this unit.
-    glBindTexture(GL_TEXTURE_2D, mMesh->mTextureId);
+    glBindTexture(GL_TEXTURE_2D, mTextureId);
     // Tell the texture uniform sampler to use this texture in the shader by binding to texture
     // unit 0.
     glUniform1i(prog.mTextureUniformHandle, 0);
@@ -58,5 +59,5 @@ void FullPipelineMesh::before(Program& program, Matrix& model, Matrix& view, Mat
     glDrawArrays(GL_TRIANGLES, 0, mMesh->mNumVertices);
 }
 
-void FullPipelineMesh::after(Program& program, Matrix& model, Matrix& view, Matrix& projection) {
+void BasicMeshNode::after(Program& program, Matrix& model, Matrix& view, Matrix& projection) {
 }
