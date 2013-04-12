@@ -17,7 +17,7 @@
 
 #include "FullPipelineRenderer.h"
 
-#include <graphics/BasicMeshNode.h>
+#include <graphics/PerspectiveMeshNode.h>
 #include <graphics/GLUtils.h>
 #include <graphics/TransformationNode.h>
 
@@ -107,7 +107,7 @@ bool FullPipelineRenderer::setUp() {
     if (mProgramId == 0) {
         return false;
     }
-    mProgram = new BasicProgram(mProgramId);
+    mProgram = new PerspectiveProgram(mProgramId);
 
     mModelMatrix = new Matrix();
 
@@ -152,7 +152,7 @@ bool FullPipelineRenderer::setUp() {
     float scale = 2.0f / count;
 
     mMesh = new Mesh(FP_VERTICES, FP_NORMALS, FP_TEX_COORDS, FP_NUM_VERTICES);
-    mSceneGraph = new ProgramNode();
+    mSceneGraph = new ProgramNode(*mProgram);
 
     for (int i = 0; i < count; i++) {
         for (int j = 0; j < count; j++) {
@@ -160,7 +160,7 @@ bool FullPipelineRenderer::setUp() {
             transformMatrix->translate(i - middle, j - middle, 0.0f);
             TransformationNode* transformNode = new TransformationNode(transformMatrix);
             mSceneGraph->addChild(transformNode);
-            BasicMeshNode* meshNode = new BasicMeshNode(mMesh, mTextureId);
+            PerspectiveMeshNode* meshNode = new PerspectiveMeshNode(mMesh, mTextureId);
             transformNode->addChild(meshNode);
         }
     }
@@ -193,6 +193,10 @@ bool FullPipelineRenderer::tearDown() {
 
 bool FullPipelineRenderer::draw() {
     SCOPED_TRACE();
+    if (!eglMakeCurrent(mEglDisplay, mEglSurface, mEglSurface, mEglContext)
+            || EGL_SUCCESS != eglGetError()) {
+        return false;
+    }
     if (mOffscreen) {
         glBindFramebuffer(GL_FRAMEBUFFER, mFboId);
     }
@@ -204,7 +208,7 @@ bool FullPipelineRenderer::draw() {
     glEnable(GL_DEPTH_TEST);
     glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
     mModelMatrix->identity();
-    mSceneGraph->draw(*mProgram, *mModelMatrix, *mViewMatrix, *mProjectionMatrix);
+    mSceneGraph->drawProgram(*mModelMatrix, *mViewMatrix, *mProjectionMatrix);
 
     return Renderer::draw();
 }

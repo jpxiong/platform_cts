@@ -23,8 +23,7 @@ void SceneGraphNode::addChild(SceneGraphNode* child) {
     mChildren.add(child);
 }
 
-void SceneGraphNode::draw(Program& program, Matrix& model, Matrix& view,
-        Matrix& projection) {
+void SceneGraphNode::draw(Program& program, Matrix& model, Matrix& view, Matrix& projection) {
     before(program, model, view, projection);
     for (size_t i = 0; i < mChildren.size(); i++) {
         mChildren[i]->draw(program, model, view, projection);

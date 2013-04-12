@@ -14,7 +14,7 @@
 #ifndef FULLPIPELINERENDERER_H
 #define FULLPIPELINERENDERER_H
 
-#include <graphics/BasicProgram.h>
+#include <graphics/PerspectiveProgram.h>
 #include <graphics/Matrix.h>
 #include <graphics/Mesh.h>
 #include <graphics/Renderer.h>
@@ -28,7 +28,7 @@ public:
     bool tearDown();
     bool draw();
 private:
-    BasicProgram* mProgram;
+    Program* mProgram;
     ProgramNode* mSceneGraph;
     Matrix* mModelMatrix;
     Matrix* mViewMatrix;

@@ -23,26 +23,28 @@
 
 extern "C" JNIEXPORT jboolean JNICALL
 Java_com_android_pts_opengl_reference_GLGameActivity_startBenchmark(
-        JNIEnv* env, jclass clazz, jobject surface, jint numFrames,
+        JNIEnv* env, jclass clazz, jobject assetManager, jobject surface, jint numFrames,
         jdoubleArray setUpTimes, jdoubleArray updateTimes, jdoubleArray renderTimes) {
+
+    GLUtils::setEnvAndAssetManager(env, assetManager);
 
     if (numFrames > (ReferenceRenderer::FRAMES_PER_SCENE * ReferenceRenderer::NUM_SCENES)) {
         return false;
     }
 
-    ReferenceRenderer* gRenderer = new ReferenceRenderer(ANativeWindow_fromSurface(env, surface));
+    ReferenceRenderer* renderer = new ReferenceRenderer(ANativeWindow_fromSurface(env, surface));
 
-    bool success = gRenderer->setUp();
+    bool success = renderer->setUp();
     env->SetDoubleArrayRegion(
-            setUpTimes, 0, ReferenceRenderer::NUM_SETUP_TIMES, gRenderer->mSetUpTimes);
+            setUpTimes, 0, ReferenceRenderer::NUM_SETUP_TIMES, renderer->mSetUpTimes);
 
     double updates[numFrames];
     double renders[numFrames];
     for (int i = 0; i < numFrames && success; i++) {
         double t0 = GLUtils::currentTimeMillis();
-        success = gRenderer->update(i);
+        success = renderer->update(i);
         double t1 = GLUtils::currentTimeMillis();
-        success = success && gRenderer->draw();
+        success = success && renderer->draw();
         double t2 = GLUtils::currentTimeMillis();
         updates[i] = t1 - t0;
         renders[i] = t2 - t1;
@@ -51,8 +53,8 @@ Java_com_android_pts_opengl_reference_GLGameActivity_startBenchmark(
     env->SetDoubleArrayRegion(updateTimes, 0, numFrames, updates);
     env->SetDoubleArrayRegion(renderTimes, 0, numFrames, renders);
 
-    success = gRenderer->tearDown() && success;
-    delete gRenderer;
-    gRenderer = NULL;
+    success = renderer->tearDown() && success;
+    delete renderer;
+    renderer = NULL;
     return success;
 }

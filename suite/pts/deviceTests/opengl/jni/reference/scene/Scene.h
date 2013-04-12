@@ -17,7 +17,7 @@
 #include <graphics/Matrix.h>
 #include <graphics/Mesh.h>
 #include <graphics/Program.h>
-#include <graphics/SceneGraphNode.h>
+#include <graphics/ProgramNode.h>
 
 #include <utils/Vector.h>
 
@@ -30,20 +30,20 @@ public:
     virtual bool setUpMeshes() = 0;
     virtual bool tearDown();
     virtual bool update(int frame);
-    virtual bool draw();
+    virtual bool draw() = 0;
+    void drawSceneGraph(int index);
 protected:
-    virtual Program* setUpProgram() = 0;
+    virtual bool setUpPrograms() = 0;
     virtual Matrix* setUpModelMatrix() = 0;
     virtual Matrix* setUpViewMatrix() = 0;
-    virtual Matrix* setUpProjectionMatrix() = 0;
-    virtual SceneGraphNode* updateSceneGraph() = 0;
+    virtual Matrix* setUpProjectionMatrix(float width, float height) = 0;
+    virtual bool updateSceneGraphs(int frame) = 0;
     int mWidth;
     int mHeight;
     android::Vector<Mesh*> mMeshes;
     android::Vector<GLuint> mTextureIds;
+    android::Vector<ProgramNode*> mSceneGraphs;
 private:
-    Program* mProgram;
-    SceneGraphNode* mSceneGraph;
     Matrix* mModelMatrix;
     Matrix* mViewMatrix;
     Matrix* mProjectionMatrix;

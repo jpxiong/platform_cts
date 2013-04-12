@@ -24,7 +24,6 @@ public:
     virtual ~Program() {};
     virtual void before(Matrix& model, Matrix& view, Matrix& projection);
     virtual void after(Matrix& model, Matrix& view, Matrix& projection);
-private:
     GLuint mProgramId;
 };
 

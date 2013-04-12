@@ -38,11 +38,12 @@ protected:
     GLuint mFboId;// Frame buffer id
     GLuint mRboId;// Depth buffer id
     GLuint mCboId;// Color buffer id
-    GLushort* mBuffer;// Used for FBO read back
     GLuint mProgramId;
     EGLint mWidth;
     EGLint mHeight;
     bool mOffscreen;
     int mWorkload;
+private:
+    GLushort* mBuffer;// Used for FBO read back
 };
 #endif
