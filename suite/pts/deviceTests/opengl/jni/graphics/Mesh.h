@@ -21,13 +21,12 @@
 class Mesh {
 public:
     Mesh(const float* vertices, const float* normals, const float* texCoords,
-            const int numVertices, const GLuint textureId);
+            const int numVertices);
     virtual ~Mesh() {};
     const float* mVertices;
     const float* mNormals;
     const float* mTexCoords;
     const int mNumVertices;
-    const GLuint mTextureId;
 };
 
 #endif

@@ -15,11 +15,11 @@
 #include <GLES2/gl2.h>
 #include <GLES2/gl2ext.h>
 
-#include "FullPipelineMesh.h"
 #include "FullPipelineRenderer.h"
 
-#include <graphics/TransformationNode.h>
+#include <graphics/BasicMeshNode.h>
 #include <graphics/GLUtils.h>
+#include <graphics/TransformationNode.h>
 
 #include <Trace.h>
 
@@ -104,8 +104,9 @@ bool FullPipelineRenderer::setUp() {
     }
 
     mProgramId = GLUtils::createProgram(&FP_VERTEX, &FP_FRAGMENT);
-    if (mProgramId == 0)
+    if (mProgramId == 0) {
         return false;
+    }
     mProgram = new BasicProgram(mProgramId);
 
     mModelMatrix = new Matrix();
@@ -130,7 +131,7 @@ bool FullPipelineRenderer::setUp() {
 
     // Create a new perspective projection matrix. The height will stay the same
     // while the width will vary as per aspect ratio.
-    float ratio = (float) width / height;
+    float ratio = (float) mWidth / mHeight;
     float left = -ratio;
     float right = ratio;
     float bottom = -1.0f;
@@ -141,7 +142,7 @@ bool FullPipelineRenderer::setUp() {
     mProjectionMatrix = Matrix::newFrustum(left, right, bottom, top, near, far);
 
     // Setup texture.
-    mTextureId = GLUtils::genRandTex(width, height);
+    mTextureId = GLUtils::genTexture(mWidth, mHeight, GLUtils::RANDOM_FILL);
     if (mTextureId == 0) {
         return false;
     }
@@ -150,7 +151,7 @@ bool FullPipelineRenderer::setUp() {
     float middle = count / 2.0f;
     float scale = 2.0f / count;
 
-    mMesh = new Mesh(FP_VERTICES, FP_NORMALS, FP_TEX_COORDS, FP_NUM_VERTICES, mTextureId);
+    mMesh = new Mesh(FP_VERTICES, FP_NORMALS, FP_TEX_COORDS, FP_NUM_VERTICES);
     mSceneGraph = new ProgramNode();
 
     for (int i = 0; i < count; i++) {
@@ -159,7 +160,7 @@ bool FullPipelineRenderer::setUp() {
             transformMatrix->translate(i - middle, j - middle, 0.0f);
             TransformationNode* transformNode = new TransformationNode(transformMatrix);
             mSceneGraph->addChild(transformNode);
-            FullPipelineMesh* meshNode = new FullPipelineMesh(mMesh);
+            BasicMeshNode* meshNode = new BasicMeshNode(mMesh, mTextureId);
             transformNode->addChild(meshNode);
         }
     }
