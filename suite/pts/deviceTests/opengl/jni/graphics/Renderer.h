@@ -40,8 +40,8 @@ protected:
     GLuint mCboId;// Color buffer id
     GLushort* mBuffer;// Used for FBO read back
     GLuint mProgramId;
-    EGLint width;
-    EGLint height;
+    EGLint mWidth;
+    EGLint mHeight;
     bool mOffscreen;
     int mWorkload;
 };

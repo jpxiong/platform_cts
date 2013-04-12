@@ -74,20 +74,20 @@ bool Renderer::setUp() {
         return false;
     }
 
-    if (!eglQuerySurface(mEglDisplay, mEglSurface, EGL_WIDTH, &width)
+    if (!eglQuerySurface(mEglDisplay, mEglSurface, EGL_WIDTH, &mWidth)
             || EGL_SUCCESS != eglGetError()) {
         return false;
     }
-    if (!eglQuerySurface(mEglDisplay, mEglSurface, EGL_HEIGHT, &height)
+    if (!eglQuerySurface(mEglDisplay, mEglSurface, EGL_HEIGHT, &mHeight)
             || EGL_SUCCESS != eglGetError()) {
         return false;
     }
 
-    glViewport(0, 0, width, height);
+    glViewport(0, 0, mWidth, mHeight);
 
     if (mOffscreen) {
-        mFboWidth = GLUtils::roundUpToSmallestPowerOf2(width);
-        mFboHeight = GLUtils::roundUpToSmallestPowerOf2(height);
+        mFboWidth = GLUtils::roundUpToSmallestPowerOf2(mWidth);
+        mFboHeight = GLUtils::roundUpToSmallestPowerOf2(mHeight);
         if (!GLUtils::createFBO(mFboId, mRboId, mCboId, mFboWidth, mFboHeight)) {
             return false;
         }
