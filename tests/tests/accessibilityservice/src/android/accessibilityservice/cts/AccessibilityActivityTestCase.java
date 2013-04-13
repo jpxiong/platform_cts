@@ -66,7 +66,7 @@ public abstract class AccessibilityActivityTestCase<T extends Activity>
     /**
      * The timeout after the last accessibility event to consider the device idle.
      */
-    public static final long TIMEOUT_ACCESSIBILITY_STATE_IDLE = 100;
+    public static final long TIMEOUT_ACCESSIBILITY_STATE_IDLE = 200;
 
     /**
      * Instance for detecting the next accessibility event.
@@ -130,9 +130,12 @@ public abstract class AccessibilityActivityTestCase<T extends Activity>
             public boolean accept(AccessibilityEvent event) {
                 final int eventType = event.getEventType();
                 CharSequence packageName = event.getPackageName();
-                Context targetContext = getInstrumentation().getTargetContext();
-                return (eventType == AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED
-                        && targetContext.getPackageName().equals(packageName));
+                // Do not check the package name since an event of this type may
+                // come concurrently from the app and from the IME (since input
+                // focus goes to the first focusable) but we dispatch one event
+                // of each type within a timeout. Hence, sometimes the window
+                // change event from the IME may override the one from the app.
+                return (eventType == AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED);
             }
         },
         TIMEOUT_ASYNC_PROCESSING);
@@ -520,6 +523,8 @@ public abstract class AccessibilityActivityTestCase<T extends Activity>
                 mEventQueue.clear();
                 // Prepare to wait for an event.
                 mWaitingForEventDelivery = true;
+                // We will ignore events from previous interactions.
+                final long executionStartTimeMillis = SystemClock.uptimeMillis();
                 // Execute the command.
                 command.run();
                 try {
@@ -529,11 +534,16 @@ public abstract class AccessibilityActivityTestCase<T extends Activity>
                         // Drain the event queue
                         while (!mEventQueue.isEmpty()) {
                             AccessibilityEvent event = mEventQueue.remove(0);
+
+                            // Ignore events from previous interactions.
+                            if (event.getEventTime() < executionStartTimeMillis) {
+                                continue;
+                            }
                             if (filter.accept(event)) {
                                 return event;
-                            } else {
-                                event.recycle();
                             }
+                            
+                            event.recycle();
                         }
                         // Check if timed out and if not wait.
                         final long elapsedTimeMillis = SystemClock.uptimeMillis() - startTimeMillis;

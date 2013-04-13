@@ -113,7 +113,7 @@ public class AccessibilityServiceInfoTest extends AndroidTestCase {
         assertSame(AccessibilityServiceInfo.DEFAULT
                 | AccessibilityServiceInfo.FLAG_REQUEST_TOUCH_EXPLORATION_MODE,
                 speakingService.flags);
-        assertSame(50l, speakingService.notificationTimeout);
+        assertSame(0l, speakingService.notificationTimeout);
         assertEquals("Delegating Accessibility Service", speakingService.getDescription());
         assertNull(speakingService.packageNames /*all packages*/);
         assertNotNull(speakingService.getId());

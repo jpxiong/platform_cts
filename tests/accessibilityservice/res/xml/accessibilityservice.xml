@@ -18,6 +18,6 @@
     android:accessibilityFeedbackType="feedbackGeneric"
     android:accessibilityFlags="flagDefault|flagRequestTouchExplorationMode"
     android:canRetrieveWindowContent="true"
-    android:notificationTimeout="50"
+    android:notificationTimeout="0"
     android:settingsActivity="android.accessibilityservice.delegate.SomeActivity"
     android:description="@string/title_delegating_accessibility_service" />
