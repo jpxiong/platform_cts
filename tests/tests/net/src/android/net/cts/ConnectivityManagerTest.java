@@ -23,6 +23,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.net.ConnectivityManager;
+import android.net.NetworkConfig;
 import android.net.NetworkInfo;
 import android.net.NetworkInfo.DetailedState;
 import android.net.NetworkInfo.State;
@@ -30,7 +31,10 @@ import android.net.wifi.WifiManager;
 import android.test.AndroidTestCase;
 import android.util.Log;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
@@ -51,6 +55,9 @@ public class ConnectivityManagerTest extends AndroidTestCase {
     private ConnectivityManager mCm;
     private WifiManager mWifiManager;
     private PackageManager mPackageManager;
+    private final HashMap<Integer, NetworkConfig> mNetworks =
+            new HashMap<Integer, NetworkConfig>();
+    private final List<Integer>mProtectedNetworks = new ArrayList<Integer>();
 
     @Override
     protected void setUp() throws Exception {
@@ -58,45 +65,115 @@ public class ConnectivityManagerTest extends AndroidTestCase {
         mCm = (ConnectivityManager) getContext().getSystemService(Context.CONNECTIVITY_SERVICE);
         mWifiManager = (WifiManager) getContext().getSystemService(Context.WIFI_SERVICE);
         mPackageManager = getContext().getPackageManager();
-    }
 
-    public void testGetNetworkInfo() {
-        assertTrue(mCm.getAllNetworkInfo().length >= MIN_NUM_NETWORK_TYPES);
-        NetworkInfo ni = mCm.getNetworkInfo(TYPE_WIFI);
-        if (ni != null) {
-            State state = ni.getState();
-            assertTrue(State.UNKNOWN.ordinal() >= state.ordinal()
-                       && state.ordinal() >= State.CONNECTING.ordinal());
-            DetailedState ds = ni.getDetailedState();
-            assertTrue(DetailedState.FAILED.ordinal() >= ds.ordinal()
-                       && ds.ordinal() >= DetailedState.IDLE.ordinal());
+        String[] naStrings = getContext().getResources().getStringArray(
+                com.android.internal.R.array.networkAttributes);
+        for (String naString : naStrings) {
+            try {
+                NetworkConfig n = new NetworkConfig(naString);
+                mNetworks.put(n.type, n);
+            } catch (Exception e) {}
         }
-        ni = mCm.getNetworkInfo(TYPE_MOBILE);
-        if (ni != null) {
-            State state = ni.getState();
-            assertTrue(State.UNKNOWN.ordinal() >= state.ordinal()
-                    && state.ordinal() >= State.CONNECTING.ordinal());
-            DetailedState ds = ni.getDetailedState();
-            assertTrue(DetailedState.FAILED.ordinal() >= ds.ordinal()
-                    && ds.ordinal() >= DetailedState.IDLE.ordinal());
+
+        int[] protectedNetworks = getContext().getResources().getIntArray(
+                com.android.internal.R.array.config_protectedNetworks);
+        for (int p : protectedNetworks) {
+            mProtectedNetworks.add(p);
         }
-        ni = mCm.getNetworkInfo(-1);
-        assertNull(ni);
     }
 
     public void testIsNetworkTypeValid() {
+        assertTrue(ConnectivityManager.isNetworkTypeValid(ConnectivityManager.TYPE_MOBILE));
+        assertTrue(ConnectivityManager.isNetworkTypeValid(ConnectivityManager.TYPE_WIFI));
+        assertTrue(ConnectivityManager.isNetworkTypeValid(ConnectivityManager.TYPE_MOBILE_MMS));
+        assertTrue(ConnectivityManager.isNetworkTypeValid(ConnectivityManager.TYPE_MOBILE_SUPL));
+        assertTrue(ConnectivityManager.isNetworkTypeValid(ConnectivityManager.TYPE_MOBILE_DUN));
+        assertTrue(ConnectivityManager.isNetworkTypeValid(ConnectivityManager.TYPE_MOBILE_HIPRI));
+        assertTrue(ConnectivityManager.isNetworkTypeValid(ConnectivityManager.TYPE_WIMAX));
+        assertTrue(ConnectivityManager.isNetworkTypeValid(ConnectivityManager.TYPE_BLUETOOTH));
+        assertTrue(ConnectivityManager.isNetworkTypeValid(ConnectivityManager.TYPE_DUMMY));
+        assertTrue(ConnectivityManager.isNetworkTypeValid(ConnectivityManager.TYPE_ETHERNET));
+        assertTrue(mCm.isNetworkTypeValid(ConnectivityManager.TYPE_MOBILE_FOTA));
+        assertTrue(mCm.isNetworkTypeValid(ConnectivityManager.TYPE_MOBILE_IMS));
+        assertTrue(mCm.isNetworkTypeValid(ConnectivityManager.TYPE_MOBILE_CBS));
+        assertTrue(mCm.isNetworkTypeValid(ConnectivityManager.TYPE_WIFI_P2P));
+        assertFalse(mCm.isNetworkTypeValid(-1));
+        assertTrue(mCm.isNetworkTypeValid(0));
+        assertTrue(mCm.isNetworkTypeValid(ConnectivityManager.MAX_NETWORK_TYPE));
+        assertFalse(ConnectivityManager.isNetworkTypeValid(ConnectivityManager.MAX_NETWORK_TYPE+1));
 
         NetworkInfo[] ni = mCm.getAllNetworkInfo();
 
-        for (NetworkInfo n : ni) {
+        for (NetworkInfo n: ni) {
             assertTrue(ConnectivityManager.isNetworkTypeValid(n.getType()));
         }
-        assertFalse(ConnectivityManager.isNetworkTypeValid(-1));
+
+    }
+
+    public void testSetNetworkPreference() {
+        // verify swtiching between two default networks - need to connectable networks though
+        // could use test and whatever the current active network is
+        NetworkInfo active = mCm.getActiveNetworkInfo();
+        int originalPref = mCm.getNetworkPreference();
+        int currentPref = originalPref;
+        for (int type = -1; type <= ConnectivityManager.MAX_NETWORK_TYPE+1; type++) {
+            mCm.setNetworkPreference(type);
+            NetworkConfig c = mNetworks.get(type);
+            boolean expectWorked = (c != null && c.isDefault());
+            try {
+                Thread.currentThread().sleep(100);
+            } catch (InterruptedException e) {}
+            int foundType = mCm.getNetworkPreference();
+            if (expectWorked) {
+                assertTrue("We should have been able to switch prefered type " + type,
+                        foundType == type);
+                currentPref = foundType;
+            } else {
+                assertTrue("We should not have been able to switch type " + type,
+                        foundType == currentPref);
+            }
+        }
+        mCm.setNetworkPreference(originalPref);
+    }
+
+    public void testGetActiveNetworkInfo() {
+        NetworkInfo ni = mCm.getActiveNetworkInfo();
+
+        assertTrue("You must have an active network connection to complete CTS", ni != null);
+        assertTrue(ConnectivityManager.isNetworkTypeValid(ni.getType()));
+        assertTrue(ni.getState() == State.CONNECTED);
+    }
+
+    public void testGetNetworkInfo() {
+        for (int type = -1; type <= ConnectivityManager.MAX_NETWORK_TYPE+1; type++) {
+            if (isSupported(type)) {
+                NetworkInfo ni = mCm.getNetworkInfo(type);
+                assertTrue("Info shouldn't be null for " + type, ni != null);
+                State state = ni.getState();
+                assertTrue("Bad state for " + type, State.UNKNOWN.ordinal() >= state.ordinal()
+                           && state.ordinal() >= State.CONNECTING.ordinal());
+                DetailedState ds = ni.getDetailedState();
+                assertTrue("Bad detailed state for " + type,
+                           DetailedState.FAILED.ordinal() >= ds.ordinal()
+                           && ds.ordinal() >= DetailedState.IDLE.ordinal());
+            } else {
+                assertNull("Info should be null for " + type, mCm.getNetworkInfo(type));
+            }
+        }
     }
 
     public void testGetAllNetworkInfo() {
         NetworkInfo[] ni = mCm.getAllNetworkInfo();
         assertTrue(ni.length >= MIN_NUM_NETWORK_TYPES);
+        for (int type = 0; type <= ConnectivityManager.MAX_NETWORK_TYPE; type++) {
+            int desiredFoundCount = (isSupported(type) ? 1 : 0);
+            int foundCount = 0;
+            for (NetworkInfo i : ni) {
+                if (i.getType() == type) foundCount++;
+            }
+            assertTrue("Unexpected foundCount of " + foundCount + " for type " + type,
+                    foundCount == desiredFoundCount);
+        }
     }
 
     public void testStartUsingNetworkFeature() {
@@ -130,33 +207,44 @@ public class ConnectivityManagerTest extends AndroidTestCase {
         }
     }
 
-    public void testRequestRouteToHost() {
-        Set<Integer> exceptionFreeTypes = new HashSet<Integer>();
-        exceptionFreeTypes.add(ConnectivityManager.TYPE_BLUETOOTH);
-        exceptionFreeTypes.add(ConnectivityManager.TYPE_ETHERNET);
-        exceptionFreeTypes.add(ConnectivityManager.TYPE_MOBILE);
-        exceptionFreeTypes.add(ConnectivityManager.TYPE_MOBILE_DUN);
-        exceptionFreeTypes.add(ConnectivityManager.TYPE_MOBILE_HIPRI);
-        exceptionFreeTypes.add(ConnectivityManager.TYPE_MOBILE_MMS);
-        exceptionFreeTypes.add(ConnectivityManager.TYPE_MOBILE_SUPL);
+    private boolean isSupported(int networkType) {
+        return mNetworks.containsKey(networkType);
+    }
 
-        NetworkInfo[] ni = mCm.getAllNetworkInfo();
-        for (NetworkInfo n : ni) {
-            if (n.isConnected() && exceptionFreeTypes.contains(n.getType())) {
-                assertTrue("Network type: " + n.getType(), mCm.requestRouteToHost(n.getType(),
-                        HOST_ADDRESS));
+    // true if only the system can turn it on
+    private boolean isNetworkProtected(int networkType) {
+        return mProtectedNetworks.contains(networkType);
+    }
+
+    public void testIsNetworkSupported() {
+        for (int type = -1; type <= ConnectivityManager.MAX_NETWORK_TYPE; type++) {
+            boolean supported = mCm.isNetworkSupported(type);
+            if (isSupported(type)) {
+                assertTrue(supported);
+            } else {
+                assertFalse(supported);
             }
+        }
+    }
+
+    public void testRequestRouteToHost() {
+        for (int type = -1 ; type <= ConnectivityManager.MAX_NETWORK_TYPE; type++) {
+            NetworkInfo ni = mCm.getNetworkInfo(type);
+            boolean expectToWork = isSupported(type) && !isNetworkProtected(type) &&
+                    ni != null && ni.isConnected();
+
+            try {
+                assertTrue("Network type " + type,
+                        mCm.requestRouteToHost(type, HOST_ADDRESS) == expectToWork);
+            } catch (Exception e) {
+                Log.d(TAG, "got exception in requestRouteToHost for type " + type);
+                assertFalse("Exception received for type " + type, expectToWork);
+            }
+
+            //TODO verify route table
         }
 
         assertFalse(mCm.requestRouteToHost(-1, HOST_ADDRESS));
-    }
-
-    public void testGetActiveNetworkInfo() {
-        NetworkInfo ni = mCm.getActiveNetworkInfo();
-
-        if (ni != null) {
-            assertTrue(ni.getType() >= 0);
-        }
     }
 
     public void testTest() {
@@ -197,12 +285,16 @@ public class ConnectivityManagerTest extends AndroidTestCase {
 
             assertTrue("Couldn't requestRouteToHost using HIPRI.",
                     mCm.requestRouteToHost(ConnectivityManager.TYPE_MOBILE_HIPRI, HOST_ADDRESS));
-
+            // TODO check dns selection
+            // TODO check routes
         } catch (InterruptedException e) {
             fail("Broadcast receiver waiting for ConnectivityManager interrupted.");
         } finally {
             mCm.stopUsingNetworkFeature(ConnectivityManager.TYPE_MOBILE,
                     FEATURE_ENABLE_HIPRI);
+            // TODO wait for HIPRI to go
+            // TODO check dns selection
+            // TODO check routes
             if (!isWifiConnected) {
                 mWifiManager.setWifiEnabled(false);
             }
