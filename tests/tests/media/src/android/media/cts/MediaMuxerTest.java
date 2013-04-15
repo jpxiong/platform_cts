@@ -295,7 +295,7 @@ public class MediaMuxerTest extends AndroidTestCase {
      * makes sure the samples match.
      */
     private void verifySamplesMatch(int srcMedia, String testMediaPath,
-            int seekToUs) {
+            int seekToUs) throws IOException {
         AssetFileDescriptor testFd = mResources.openRawResourceFd(srcMedia);
         MediaExtractor extractorSrc = new MediaExtractor();
         extractorSrc.setDataSource(testFd.getFileDescriptor(),
