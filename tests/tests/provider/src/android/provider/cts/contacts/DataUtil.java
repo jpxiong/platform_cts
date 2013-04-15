@@ -19,6 +19,7 @@ package android.provider.cts.contacts;
 import android.content.ContentResolver;
 import android.content.ContentUris;
 import android.content.ContentValues;
+import android.database.Cursor;
 import android.net.Uri;
 import android.provider.ContactsContract;
 
@@ -28,6 +29,12 @@ import android.provider.ContactsContract;
 public class DataUtil {
 
     private static final Uri URI = ContactsContract.Data.CONTENT_URI;
+
+    public static String[] queryById(ContentResolver resolver, long dataId, String[] projection) {
+        Uri uri = ContentUris.withAppendedId(URI, dataId);
+        Cursor cursor = resolver.query(uri, projection, null, null, null);
+        return CommonDatabaseUtils.singleRecordToArray(cursor);
+    }
 
     public static void insertName(ContentResolver resolver, long rawContactId) {
         ContentValues values = new ContentValues();
