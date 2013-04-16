@@ -49,14 +49,13 @@ public class RawContactUtil {
         ContentValues values = new ContentValues();
         values.put(ContactsContract.RawContacts.ACCOUNT_NAME, StaticAccountAuthenticator.NAME);
         values.put(ContactsContract.RawContacts.ACCOUNT_TYPE, StaticAccountAuthenticator.TYPE);
-        Uri uri = resolver.insert(ContactsContract.RawContacts.CONTENT_URI, values);
+        Uri uri = resolver.insert(URI, values);
         return ContentUris.parseId(uri);
     }
 
     public static String[] queryByRawContactId(ContentResolver resolver,
             long rawContactId, String[] projection) {
-        Uri uri = ContentUris.withAppendedId(ContactsContract.RawContacts.CONTENT_URI,
-                rawContactId);
+        Uri uri = ContentUris.withAppendedId(URI, rawContactId);
         Cursor cursor = resolver.query(uri, projection, null, null, null);
         return CommonDatabaseUtils.singleRecordToArray(cursor);
     }
@@ -68,14 +67,14 @@ public class RawContactUtil {
      */
     public static List<String[]> queryByContactId(ContentResolver resolver, long contactId,
             String[] projection) {
-        Uri uri = ContentUris.withAppendedId(ContactsContract.RawContacts.CONTENT_URI, contactId);
+        Uri uri = ContentUris.withAppendedId(URI, contactId);
         Cursor cursor = resolver.query(uri, projection, null, null, null);
         return CommonDatabaseUtils.multiRecordToArray(cursor);
     }
 
     public static void delete(ContentResolver resolver, long rawContactId,
             boolean isSyncAdapter) {
-        Uri uri = ContentUris.withAppendedId(ContactsContract.RawContacts.CONTENT_URI, rawContactId)
+        Uri uri = ContentUris.withAppendedId(URI, rawContactId)
                 .buildUpon()
                 .appendQueryParameter(ContactsContract.CALLER_IS_SYNCADAPTER, isSyncAdapter + "")
                 .build();
