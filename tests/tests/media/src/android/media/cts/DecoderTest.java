@@ -30,17 +30,37 @@ import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
+import java.util.Arrays;
 import java.util.zip.CRC32;
 
 public class DecoderTest extends MediaPlayerTestBase {
     private static final String TAG = "DecoderTest";
 
     private Resources mResources;
+    short[] mMasterBuffer;
 
     @Override
     protected void setUp() throws Exception {
         super.setUp();
         mResources = mContext.getResources();
+
+        // read master file into memory
+        AssetFileDescriptor masterFd = mResources.openRawResourceFd(R.raw.sinesweepraw);
+        long masterLength = masterFd.getLength();
+        mMasterBuffer = new short[(int) (masterLength / 2)];
+        InputStream is = masterFd.createInputStream();
+        BufferedInputStream bis = new BufferedInputStream(is);
+        for (int i = 0; i < mMasterBuffer.length; i++) {
+            int lo = bis.read();
+            int hi = bis.read();
+            if (hi >= 128) {
+                hi -= 256;
+            }
+            int sample = hi * 256 + lo;
+            mMasterBuffer[i] = (short) sample;
+        }
+        bis.close();
+        masterFd.close();
     }
 
     // The allowed errors in the following tests are the actual maximum measured
@@ -48,22 +68,22 @@ public class DecoderTest extends MediaPlayerTestBase {
     // This should allow for some variation in decoders, while still detecting
     // phase and delay errors, channel swap, etc.
     public void testDecodeMp3Lame() throws Exception {
-        decode(R.raw.sinesweepmp3lame, R.raw.sinesweepraw, 804.f);
+        decode(R.raw.sinesweepmp3lame, 804.f);
     }
     public void testDecodeMp3Smpb() throws Exception {
-        decode(R.raw.sinesweepmp3smpb, R.raw.sinesweepraw, 413.f);
+        decode(R.raw.sinesweepmp3smpb, 413.f);
     }
     public void testDecodeM4a() throws Exception {
-        decode(R.raw.sinesweepm4a, R.raw.sinesweepraw, 124.f);
+        decode(R.raw.sinesweepm4a, 124.f);
     }
     public void testDecodeOgg() throws Exception {
-        decode(R.raw.sinesweepogg, R.raw.sinesweepraw, 168.f);
+        decode(R.raw.sinesweepogg, 168.f);
     }
     public void testDecodeWav() throws Exception {
-        decode(R.raw.sinesweepwav, R.raw.sinesweepraw, 0.0f);
+        decode(R.raw.sinesweepwav, 0.0f);
     }
     public void testDecodeFlac() throws Exception {
-        decode(R.raw.sinesweepflac, R.raw.sinesweepraw, 0.0f);
+        decode(R.raw.sinesweepflac, 0.0f);
     }
 
     /**
@@ -72,25 +92,30 @@ public class DecoderTest extends MediaPlayerTestBase {
      * @param maxerror the maximum allowed root mean squared error
      * @throws IOException
      */
-    private void decode(int testinput, int master, float maxerror) throws IOException {
+    private void decode(int testinput, float maxerror) throws IOException {
 
-        // read master file into memory
-        AssetFileDescriptor masterFd = mResources.openRawResourceFd(master);
-        long masterLength = masterFd.getLength();
-        short[] masterBuffer = new short[(int) (masterLength / 2)];
-        InputStream is = masterFd.createInputStream();
-        BufferedInputStream bis = new BufferedInputStream(is);
-        for (int i = 0; i < masterBuffer.length; i++) {
-            int lo = bis.read();
-            int hi = bis.read();
-            if (hi >= 128) {
-                hi -= 256;
-            }
-            int sample = hi * 256 + lo;
-            masterBuffer[i] = (short) sample;
+        short [] decoded = decodeToMemory(testinput);
+
+        assertEquals("wrong data size", mMasterBuffer.length, decoded.length);
+
+        long totalErrorSquared = 0;
+
+        for (int i = 0; i < decoded.length; i++) {
+            short sample = decoded[i];
+            short mastersample = mMasterBuffer[i];
+            int d = sample - mastersample;
+            totalErrorSquared += d * d;
         }
-        bis.close();
-        masterFd.close();
+
+        long avgErrorSquared = (totalErrorSquared / decoded.length);
+        double rmse = Math.sqrt(avgErrorSquared);
+        assertTrue("decoding error too big: " + rmse, rmse <= maxerror);
+     }
+
+    private short[] decodeToMemory(int testinput) throws IOException {
+
+        short [] decoded = new short[1024];
+        int decodedIdx = 0;
 
         AssetFileDescriptor testFd = mResources.openRawResourceFd(testinput);
 
@@ -118,9 +143,6 @@ public class DecoderTest extends MediaPlayerTestBase {
         extractor.selectTrack(0);
 
         // start decoding
-        int numBytesDecoded = 0;
-        int maxdelta = 0;
-        long totalErrorSquared = 0;
         final long kTimeOutUs = 5000;
         MediaCodec.BufferInfo info = new MediaCodec.BufferInfo();
         boolean sawInputEOS = false;
@@ -164,17 +186,13 @@ public class DecoderTest extends MediaPlayerTestBase {
                 int outputBufIndex = res;
                 ByteBuffer buf = codecOutputBuffers[outputBufIndex];
 
-                // check the waveform matches within the specified max error
-                for (int i = 0; i < info.size; i += 2) {
-                    short sample = buf.getShort(i);
-                    int idx = (numBytesDecoded + i) / 2;
-                    assertTrue("decoder returned too much data", idx < masterBuffer.length);
-                    short mastersample = masterBuffer[idx];
-                    int d = sample - mastersample;
-                    totalErrorSquared += d * d;
+                if (decodedIdx + (info.size / 2) >= decoded.length) {
+                    decoded = Arrays.copyOf(decoded, decodedIdx + (info.size / 2));
                 }
 
-                numBytesDecoded += info.size;
+                for (int i = 0; i < info.size; i += 2) {
+                    decoded[decodedIdx++] = buf.getShort(i);
+                }
 
                 codec.releaseOutputBuffer(outputBufIndex, false /* render */);
 
@@ -195,11 +213,7 @@ public class DecoderTest extends MediaPlayerTestBase {
 
         codec.stop();
         codec.release();
-
-        assertEquals("wrong data size", masterLength, numBytesDecoded);
-        long avgErrorSquared = (totalErrorSquared / (numBytesDecoded / 2));
-        double rmse = Math.sqrt(avgErrorSquared); 
-        assertTrue("decoding error too big: " + rmse, rmse <= maxerror);
+        return decoded;
     }
 
     public void testCodecBasicH264() throws Exception {
