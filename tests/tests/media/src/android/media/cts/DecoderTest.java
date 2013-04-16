@@ -691,5 +691,110 @@ public class DecoderTest extends MediaPlayerTestBase {
         return crc.getValue();
     }
 
+    public void testFlush() throws Exception {
+        testFlush(R.raw.loudsoftwav);
+        testFlush(R.raw.loudsoftogg);
+        testFlush(R.raw.loudsoftmp3);
+        testFlush(R.raw.loudsoftaac);
+        testFlush(R.raw.loudsoftfaac);
+        testFlush(R.raw.loudsoftitunes);
+    }
+
+    private void testFlush(int resource) throws Exception {
+
+        AssetFileDescriptor testFd = mResources.openRawResourceFd(resource);
+
+        MediaExtractor extractor;
+        MediaCodec codec;
+        ByteBuffer[] codecInputBuffers;
+        ByteBuffer[] codecOutputBuffers;
+
+        extractor = new MediaExtractor();
+        extractor.setDataSource(testFd.getFileDescriptor(), testFd.getStartOffset(),
+                testFd.getLength());
+        testFd.close();
+
+        assertEquals("wrong number of tracks", 1, extractor.getTrackCount());
+        MediaFormat format = extractor.getTrackFormat(0);
+        String mime = format.getString(MediaFormat.KEY_MIME);
+        assertTrue("not an audio file", mime.startsWith("audio/"));
+
+        codec = MediaCodec.createDecoderByType(mime);
+        codec.configure(format, null /* surface */, null /* crypto */, 0 /* flags */);
+        codec.start();
+        codecInputBuffers = codec.getInputBuffers();
+        codecOutputBuffers = codec.getOutputBuffers();
+
+        extractor.selectTrack(0);
+
+        // decode a bit of the first part of the file, and verify the amplitude
+        short maxvalue1 = getAmplitude(extractor, codec);
+
+        // flush the codec and seek the extractor a different position, then decode a bit more
+        // and check the amplitude
+        extractor.seekTo(8000000, 0);
+        codec.flush();
+        short maxvalue2 = getAmplitude(extractor, codec);
+
+        assertTrue(maxvalue1 > 20000);
+        assertTrue(maxvalue2 < 5000);
+        codec.stop();
+        codec.release();
+
+    }
+    
+    private short getAmplitude(MediaExtractor extractor, MediaCodec codec) {
+        short maxvalue = 0;
+        int numBytesDecoded = 0;
+        final long kTimeOutUs = 5000;
+        ByteBuffer[] codecInputBuffers = codec.getInputBuffers();
+        ByteBuffer[] codecOutputBuffers = codec.getOutputBuffers();
+        MediaCodec.BufferInfo info = new MediaCodec.BufferInfo();
+
+        while(numBytesDecoded < 44100 * 2) {
+            int inputBufIndex = codec.dequeueInputBuffer(kTimeOutUs);
+
+            if (inputBufIndex >= 0) {
+                ByteBuffer dstBuf = codecInputBuffers[inputBufIndex];
+
+                int sampleSize = extractor.readSampleData(dstBuf, 0 /* offset */);
+                long presentationTimeUs = extractor.getSampleTime();
+
+                codec.queueInputBuffer(
+                        inputBufIndex,
+                        0 /* offset */,
+                        sampleSize,
+                        presentationTimeUs,
+                        0 /* flags */);
+
+                extractor.advance();
+            }
+            int res = codec.dequeueOutputBuffer(info, kTimeOutUs);
+
+            if (res >= 0) {
+
+                int outputBufIndex = res;
+                ByteBuffer buf = codecOutputBuffers[outputBufIndex];
+
+                for (int i = 0; i < info.size; i += 2) {
+                    short sample = buf.getShort(i);
+                    if (maxvalue < sample) {
+                        maxvalue = sample;
+                    }
+                    int idx = (numBytesDecoded + i) / 2;
+                }
+
+                numBytesDecoded += info.size;
+
+                codec.releaseOutputBuffer(outputBufIndex, false /* render */);
+            } else if (res == MediaCodec.INFO_OUTPUT_BUFFERS_CHANGED) {
+                codecOutputBuffers = codec.getOutputBuffers();
+            } else if (res == MediaCodec.INFO_OUTPUT_FORMAT_CHANGED) {
+                MediaFormat oformat = codec.getOutputFormat();
+            }
+        }
+        return maxvalue; 
+    }
+    
 }
 
