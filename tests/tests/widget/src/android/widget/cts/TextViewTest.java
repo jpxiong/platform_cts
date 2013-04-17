@@ -1422,8 +1422,13 @@ public class TextViewTest extends ActivityInstrumentationTestCase2<TextViewStubA
         mInstrumentation.waitForIdleSync();
         mTextView.getFocusedRect(rc);
         assertNotNull(mTextView.getLayout());
-        assertEquals(mTextView.getLayout().getPrimaryHorizontal(3), (float) rc.left);
-        assertEquals(mTextView.getLayout().getPrimaryHorizontal(13), (float) rc.right);
+        /* Cursor coordinates from getPrimaryHorizontal() may have a fractional
+         * component, while the result of getFocusedRect is in int coordinates.
+         * It's not practical for these to match exactly, so we compare that the
+         * integer components match - there can be a fractional pixel
+         * discrepancy, which should be okay for all practical applications. */
+        assertEquals((int) mTextView.getLayout().getPrimaryHorizontal(3), rc.left);
+        assertEquals((int) mTextView.getLayout().getPrimaryHorizontal(13), rc.right);
         assertEquals(mTextView.getLayout().getLineTop(0), rc.top);
         assertEquals(mTextView.getLayout().getLineBottom(0), rc.bottom);
 
@@ -1438,8 +1443,8 @@ public class TextViewTest extends ActivityInstrumentationTestCase2<TextViewStubA
         mInstrumentation.waitForIdleSync();
         mTextView.getFocusedRect(rc);
         assertNotNull(mTextView.getLayout());
-        assertEquals(mTextView.getLayout().getPrimaryHorizontal(3) - 2, (float) rc.left);
-        assertEquals(mTextView.getLayout().getPrimaryHorizontal(3) + 2, (float) rc.right);
+        assertEquals((int) mTextView.getLayout().getPrimaryHorizontal(3) - 2, rc.left);
+        assertEquals((int) mTextView.getLayout().getPrimaryHorizontal(3) + 2, rc.right);
         assertEquals(mTextView.getLayout().getLineTop(0), rc.top);
         assertEquals(mTextView.getLayout().getLineBottom(0), rc.bottom);
 
@@ -1462,8 +1467,8 @@ public class TextViewTest extends ActivityInstrumentationTestCase2<TextViewStubA
         mInstrumentation.waitForIdleSync();
         mTextView.getFocusedRect(rc);
         assertNotNull(mTextView.getLayout());
-        assertEquals(mTextView.getLayout().getPrimaryHorizontal(2), (float) rc.left);
-        assertEquals(mTextView.getLayout().getPrimaryHorizontal(4), (float) rc.right);
+        assertEquals((int) mTextView.getLayout().getPrimaryHorizontal(2), rc.left);
+        assertEquals((int) mTextView.getLayout().getPrimaryHorizontal(4), rc.right);
         assertEquals(mTextView.getLayout().getLineTop(0), rc.top);
         assertEquals(mTextView.getLayout().getLineBottom(0), rc.bottom);
 
