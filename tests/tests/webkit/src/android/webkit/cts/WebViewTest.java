@@ -1616,7 +1616,7 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
         // WebViewClient.shouldOverrideUrlLoading() returns false, so
         // the WebView will load the new URL.
         mOnUiThread.setDownloadListener(listener);
-        mWebView.getSettings().setJavaScriptEnabled(true);
+        mOnUiThread.getSettings().setJavaScriptEnabled(true);
         mOnUiThread.loadDataAndWaitForCompletion(
                 "<html><body onload=\"window.location = \'" + url + "\'\"></body></html>",
                 "text/html", null);
@@ -1657,7 +1657,7 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
         mOnUiThread.loadUrlAndWaitForCompletion(url);
         assertEquals("ONLINE", mOnUiThread.getTitle());
 
-        mWebView.setNetworkAvailable(false);
+        mOnUiThread.setNetworkAvailable(false);
 
         // Wait for the DOM to receive notification of the network state change.
         new PollingCheck(TEST_TIMEOUT) {
@@ -1667,7 +1667,7 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
             }
         }.run();
 
-        mWebView.setNetworkAvailable(true);
+        mOnUiThread.setNetworkAvailable(true);
 
         // Wait for the DOM to receive notification of the network state change.
         new PollingCheck(TEST_TIMEOUT) {
