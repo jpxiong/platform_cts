@@ -264,6 +264,63 @@ public class MediaDrmMockTest extends AndroidTestCase {
         md.closeSession(sessionId);
     }
 
+    public void testGetKeyRequestOffline() throws Exception {
+        if (!isMockPluginInstalled()) {
+            return;
+        }
+
+        MediaDrm md = new MediaDrm(mockScheme);
+        byte[] sessionId = md.openSession();
+
+        // Set up mock expected responses using properties
+        byte testRequest[] = {0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x10, 0x11, 0x12};
+        md.setPropertyByteArray("mock-request", testRequest);
+        String testDefaultUrl = "http://1.2.3.4:8080/blah";
+        md.setPropertyString("mock-defaultUrl", testDefaultUrl);
+
+        byte[] initData = {0x0a, 0x0b, 0x0c, 0x0d};
+
+        String mimeType = "video/iso.segment";
+        KeyRequest request = md.getKeyRequest(sessionId, initData, mimeType,
+                                              MediaDrm.MEDIA_DRM_KEY_TYPE_OFFLINE,
+                                              null);
+        assertTrue(Arrays.equals(request.data, testRequest));
+        assertTrue(request.defaultUrl.equals(testDefaultUrl));
+
+        assertTrue(Arrays.equals(initData, md.getPropertyByteArray("mock-initdata")));
+        assertTrue(mimeType.equals(md.getPropertyString("mock-mimetype")));
+        assertTrue(md.getPropertyString("mock-keytype").equals("2"));
+
+        md.closeSession(sessionId);
+    }
+
+    public void testGetKeyRequestRelease() throws Exception {
+        if (!isMockPluginInstalled()) {
+            return;
+        }
+
+        MediaDrm md = new MediaDrm(mockScheme);
+        byte[] sessionId = md.openSession();
+
+        // Set up mock expected responses using properties
+        byte testRequest[] = {0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x10, 0x11, 0x12};
+        md.setPropertyByteArray("mock-request", testRequest);
+        String testDefaultUrl = "http://1.2.3.4:8080/blah";
+        md.setPropertyString("mock-defaultUrl", testDefaultUrl);
+
+        String mimeType = "video/iso.segment";
+        KeyRequest request = md.getKeyRequest(sessionId, null, mimeType,
+                                              MediaDrm.MEDIA_DRM_KEY_TYPE_RELEASE,
+                                              null);
+        assertTrue(Arrays.equals(request.data, testRequest));
+        assertTrue(request.defaultUrl.equals(testDefaultUrl));
+
+        assertTrue(mimeType.equals(md.getPropertyString("mock-mimetype")));
+        assertTrue(md.getPropertyString("mock-keytype").equals("3"));
+
+        md.closeSession(sessionId);
+    }
+
     public void testProvideKeyResponse() throws Exception {
         if (!isMockPluginInstalled()) {
             return;
