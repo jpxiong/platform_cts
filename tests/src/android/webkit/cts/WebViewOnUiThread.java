@@ -182,6 +182,15 @@ public class WebViewOnUiThread {
         });
     }
 
+    public void setNetworkAvailable(final boolean available) {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                mWebView.setNetworkAvailable(available);
+            }
+        });
+    }
+
     public void setDownloadListener(final DownloadListener listener) {
         runOnUiThread(new Runnable() {
             @Override
