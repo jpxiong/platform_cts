@@ -476,7 +476,8 @@
         </activity>
 
         <activity android:name="android.webkit.cts.CookieSyncManagerStubActivity"
-            android:label="CookieSyncManagerStubActivity">
+            android:label="CookieSyncManagerStubActivity"
+            android:screenOrientation="nosensor">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.FRAMEWORK_INSTRUMENTATION_TEST" />
@@ -666,7 +667,8 @@
         </activity>
 
         <activity android:name="android.webkit.cts.WebViewStubActivity"
-            android:label="WebViewStubActivity">
+            android:label="WebViewStubActivity"
+            android:screenOrientation="nosensor">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.FRAMEWORK_INSTRUMENTATION_TEST" />
