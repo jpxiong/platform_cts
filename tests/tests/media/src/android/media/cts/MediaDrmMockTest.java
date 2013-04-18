@@ -221,10 +221,10 @@ public class MediaDrmMockTest extends AndroidTestCase {
 
         String mimeType = "video/iso.segment";
         KeyRequest request = md.getKeyRequest(sessionId, initData, mimeType,
-                                                      MediaDrm.MEDIA_DRM_KEY_TYPE_STREAMING,
+                                                      MediaDrm.KEY_TYPE_STREAMING,
                                                       optionalParameters);
-        assertTrue(Arrays.equals(request.data, testRequest));
-        assertTrue(request.defaultUrl.equals(testDefaultUrl));
+        assertTrue(Arrays.equals(request.getData(), testRequest));
+        assertTrue(request.getDefaultUrl().equals(testDefaultUrl));
 
         assertTrue(Arrays.equals(initData, md.getPropertyByteArray("mock-initdata")));
         assertTrue(mimeType.equals(md.getPropertyString("mock-mimetype")));
@@ -252,10 +252,10 @@ public class MediaDrmMockTest extends AndroidTestCase {
 
         String mimeType = "video/iso.segment";
         KeyRequest request = md.getKeyRequest(sessionId, initData, mimeType,
-                                                      MediaDrm.MEDIA_DRM_KEY_TYPE_STREAMING,
+                                                      MediaDrm.KEY_TYPE_STREAMING,
                                                       null);
-        assertTrue(Arrays.equals(request.data, testRequest));
-        assertTrue(request.defaultUrl.equals(testDefaultUrl));
+        assertTrue(Arrays.equals(request.getData(), testRequest));
+        assertTrue(request.getDefaultUrl().equals(testDefaultUrl));
 
         assertTrue(Arrays.equals(initData, md.getPropertyByteArray("mock-initdata")));
         assertTrue(mimeType.equals(md.getPropertyString("mock-mimetype")));
@@ -282,10 +282,10 @@ public class MediaDrmMockTest extends AndroidTestCase {
 
         String mimeType = "video/iso.segment";
         KeyRequest request = md.getKeyRequest(sessionId, initData, mimeType,
-                                              MediaDrm.MEDIA_DRM_KEY_TYPE_OFFLINE,
+                                              MediaDrm.KEY_TYPE_OFFLINE,
                                               null);
-        assertTrue(Arrays.equals(request.data, testRequest));
-        assertTrue(request.defaultUrl.equals(testDefaultUrl));
+        assertTrue(Arrays.equals(request.getData(), testRequest));
+        assertTrue(request.getDefaultUrl().equals(testDefaultUrl));
 
         assertTrue(Arrays.equals(initData, md.getPropertyByteArray("mock-initdata")));
         assertTrue(mimeType.equals(md.getPropertyString("mock-mimetype")));
@@ -310,10 +310,10 @@ public class MediaDrmMockTest extends AndroidTestCase {
 
         String mimeType = "video/iso.segment";
         KeyRequest request = md.getKeyRequest(sessionId, null, mimeType,
-                                              MediaDrm.MEDIA_DRM_KEY_TYPE_RELEASE,
+                                              MediaDrm.KEY_TYPE_RELEASE,
                                               null);
-        assertTrue(Arrays.equals(request.data, testRequest));
-        assertTrue(request.defaultUrl.equals(testDefaultUrl));
+        assertTrue(Arrays.equals(request.getData(), testRequest));
+        assertTrue(request.getDefaultUrl().equals(testDefaultUrl));
 
         assertTrue(mimeType.equals(md.getPropertyString("mock-mimetype")));
         assertTrue(md.getPropertyString("mock-keytype").equals("3"));
@@ -402,8 +402,8 @@ public class MediaDrmMockTest extends AndroidTestCase {
         md.setPropertyString("mock-defaultUrl", testDefaultUrl);
 
         ProvisionRequest request = md.getProvisionRequest();
-        assertTrue(Arrays.equals(request.data, testRequest));
-        assertTrue(request.defaultUrl.equals(testDefaultUrl));
+        assertTrue(Arrays.equals(request.getData(), testRequest));
+        assertTrue(request.getDefaultUrl().equals(testDefaultUrl));
     }
 
     public void testProvideProvisionResponse() throws Exception {
@@ -632,29 +632,29 @@ public class MediaDrmMockTest extends AndroidTestCase {
 
                 try {
                     mMediaDrm = new MediaDrm(mockScheme);
-
-                    synchronized(mLock) {
-                        mLock.notify();
-                        mMediaDrm.setOnEventListener(new MediaDrm.OnEventListener() {
-                                @Override
-                                public void onEvent(MediaDrm md, byte[] sessionId, int event,
-                                                    int extra, byte[] data) {
-                                    synchronized(mLock) {
-                                        Log.d(TAG,"testEventNoSessionNoData.onEvent");
-                                        assertTrue(md == mMediaDrm);
-                                        assertTrue(event == 2);
-                                        assertTrue(extra == 456);
-                                        assertTrue(sessionId == null);
-                                        assertTrue(data == null);
-                                        mGotEvent = true;
-                                        mLock.notify();
-                                    }
-                                }
-                            });
-                    }
                 } catch (MediaDrmException e) {
                     e.printStackTrace();
                     fail();
+                }
+
+                synchronized(mLock) {
+                    mLock.notify();
+                    mMediaDrm.setOnEventListener(new MediaDrm.OnEventListener() {
+                            @Override
+                            public void onEvent(MediaDrm md, byte[] sessionId, int event,
+                                                int extra, byte[] data) {
+                                synchronized(mLock) {
+                                    Log.d(TAG,"testEventNoSessionNoData.onEvent");
+                                    assertTrue(md == mMediaDrm);
+                                    assertTrue(event == 2);
+                                    assertTrue(extra == 456);
+                                    assertTrue(sessionId == null);
+                                    assertTrue(data == null);
+                                    mGotEvent = true;
+                                    mLock.notify();
+                                }
+                            }
+                        });
                 }
 
                 Looper.loop();  // Blocks forever until Looper.quit() is called.
@@ -702,39 +702,39 @@ public class MediaDrmMockTest extends AndroidTestCase {
 
                 try {
                     mMediaDrm = new MediaDrm(mockScheme);
-
-                    final byte[] expected_sessionId = mMediaDrm.openSession();
-                    final byte[] expected_data = {0x10, 0x11, 0x12, 0x13, 0x14,
-                                                  0x15, 0x16, 0x17, 0x18, 0x19};
-
-                    mMediaDrm.setPropertyByteArray("mock-event-session-id", expected_sessionId);
-                    mMediaDrm.setPropertyByteArray("mock-event-data", expected_data);
-
-                    synchronized(mLock) {
-                        mLock.notify();
-
-                        mMediaDrm.setOnEventListener(new MediaDrm.OnEventListener() {
-                                @Override
-                                public void onEvent(MediaDrm md, byte[] sessionId, int event,
-                                                    int extra, byte[] data) {
-                                    synchronized(mLock) {
-                                        Log.d(TAG,"testEventWithSessoinAndData.onEvent");
-                                        assertTrue(md == mMediaDrm);
-                                        assertTrue(event == 1);
-                                        assertTrue(extra == 123);
-                                        assertTrue(Arrays.equals(sessionId, expected_sessionId));
-                                        assertTrue(Arrays.equals(data, expected_data));
-                                        mGotEvent = true;
-                                        mLock.notify();
-                                    }
-                                }
-                            });
-                    }
                 } catch (MediaDrmException e) {
                     e.printStackTrace();
                     fail();
                 }
 
+
+                final byte[] expected_sessionId = mMediaDrm.openSession();
+                final byte[] expected_data = {0x10, 0x11, 0x12, 0x13, 0x14,
+                                              0x15, 0x16, 0x17, 0x18, 0x19};
+
+                mMediaDrm.setPropertyByteArray("mock-event-session-id", expected_sessionId);
+                mMediaDrm.setPropertyByteArray("mock-event-data", expected_data);
+
+                synchronized(mLock) {
+                    mLock.notify();
+
+                    mMediaDrm.setOnEventListener(new MediaDrm.OnEventListener() {
+                            @Override
+                            public void onEvent(MediaDrm md, byte[] sessionId, int event,
+                                                int extra, byte[] data) {
+                                synchronized(mLock) {
+                                    Log.d(TAG,"testEventWithSessoinAndData.onEvent");
+                                    assertTrue(md == mMediaDrm);
+                                    assertTrue(event == 1);
+                                    assertTrue(extra == 123);
+                                    assertTrue(Arrays.equals(sessionId, expected_sessionId));
+                                    assertTrue(Arrays.equals(data, expected_data));
+                                    mGotEvent = true;
+                                    mLock.notify();
+                                }
+                            }
+                        });
+                }
                 Looper.loop();  // Blocks forever until Looper.quit() is called.
             }
         }.start();
