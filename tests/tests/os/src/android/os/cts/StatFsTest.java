@@ -22,29 +22,39 @@ import android.os.Environment;
 import android.os.StatFs;
 
 public class StatFsTest extends TestCase {
-    public void testStatFs(){
+    public void testStatFs() {
         File path = Environment.getDataDirectory();
         StatFs stat = new StatFs(path.getPath());
-        int blockSize = stat.getBlockSize();
-        int totalBlocks = stat.getBlockCount();
-        int freeBlocks = stat.getFreeBlocks();
-        int availableBlocks = stat.getAvailableBlocks();
 
-        assertTrue(blockSize > 0);
-        assertTrue(totalBlocks > 0);
-        assertTrue(freeBlocks >= availableBlocks);
-        assertTrue(availableBlocks > 0);
+        assertTrue(stat.getBlockSize() > 0);
+        assertTrue(stat.getBlockCount() > 0);
+        assertTrue(stat.getFreeBlocks() >= stat.getAvailableBlocks());
+        assertTrue(stat.getAvailableBlocks() > 0);
+
+        assertTrue(stat.getBlockSizeLong() > 0);
+        assertTrue(stat.getBlockCountLong() > 0);
+        assertTrue(stat.getFreeBlocksLong() >= stat.getAvailableBlocksLong());
+        assertTrue(stat.getAvailableBlocksLong() > 0);
+
+        assertTrue(stat.getFreeBytes() > 0);
+        assertTrue(stat.getAvailableBytes() > 0);
+        assertTrue(stat.getTotalBytes() > 0);
 
         path = Environment.getRootDirectory();
         stat.restat(path.getPath());
-        blockSize = stat.getBlockSize();
-        totalBlocks = stat.getBlockCount();
-        freeBlocks = stat.getFreeBlocks();
-        availableBlocks = stat.getAvailableBlocks();
 
-        assertTrue(blockSize > 0);
-        assertTrue(totalBlocks > 0);
-        assertTrue(freeBlocks >= availableBlocks);
-        assertTrue(availableBlocks > 0);
+        assertTrue(stat.getBlockSize() > 0);
+        assertTrue(stat.getBlockCount() > 0);
+        assertTrue(stat.getFreeBlocks() >= stat.getAvailableBlocks());
+        assertTrue(stat.getAvailableBlocks() > 0);
+
+        assertTrue(stat.getBlockSizeLong() > 0);
+        assertTrue(stat.getBlockCountLong() > 0);
+        assertTrue(stat.getFreeBlocksLong() >= stat.getAvailableBlocksLong());
+        assertTrue(stat.getAvailableBlocksLong() > 0);
+
+        assertTrue(stat.getFreeBytes() > 0);
+        assertTrue(stat.getAvailableBytes() > 0);
+        assertTrue(stat.getTotalBytes() > 0);
     }
 }
