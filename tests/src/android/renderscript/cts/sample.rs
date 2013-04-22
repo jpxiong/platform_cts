@@ -73,7 +73,7 @@ static bool sub_test_RGBA_1D(rs_allocation alloc1D, float location, float lod,
 
     result = rsSample(alloc1D, gMipLinear, location, lod);
     _RS_ASSERT(compare(expected3, result));
-    return failed;
+    return !failed;
 }
 
 static bool sub_test_RGBA_2D(rs_allocation alloc2D, float2 location, float lod,
@@ -90,17 +90,17 @@ static bool sub_test_RGBA_2D(rs_allocation alloc2D, float2 location, float lod,
 
     result = rsSample(alloc2D, gMipLinear, location, lod);
     _RS_ASSERT(compare(expected3, result));
-    return failed;
+    return !failed;
 }
 
 void test_RGBA(rs_allocation alloc1D, rs_allocation alloc2D) {
     bool failed = false;
     float4 result;
 
-    float4 fLOD0 = convert_float4(lod0Color);
-    float4 fLOD1 = convert_float4(lod1Color);
-    float4 fLOD2 = convert_float4(lod2Color);
-    float4 fLOD3 = convert_float4(lod3Color);
+    float4 fLOD0 = rsUnpackColor8888(lod0Color);
+    float4 fLOD1 = rsUnpackColor8888(lod1Color);
+    float4 fLOD2 = rsUnpackColor8888(lod2Color);
+    float4 fLOD3 = rsUnpackColor8888(lod3Color);
 
     float4 fLOD04 = fLOD0*0.6f + fLOD1*0.4f;
     float4 fLOD06 = fLOD0*0.4f + fLOD1*0.6f;
