@@ -64,7 +64,7 @@ public class GeolocationTest extends ActivityInstrumentationTestCase2<WebViewStu
 
     private static final String JS_INTERFACE_NAME = "Android";
     private static final int POLLING_TIMEOUT = 60 * 1000;
-    private static final String PROVIDER_NAME = "WebKitGeolocationTestLocationProvider";
+    private static final String PROVIDER_NAME = LocationManager.NETWORK_PROVIDER;
 
     // static HTML page always injected instead of the url loaded
     private static final String RAW_HTML =
