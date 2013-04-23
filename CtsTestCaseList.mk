@@ -31,7 +31,6 @@ cts_security_apps_list := \
 cts_support_packages := \
 	$(PTS_SUPPORT_PACKAGES) \
 	CtsAccelerationTestStubs \
-	CtsDelegatingAccessibilityService \
 	CtsDeviceAdmin \
 	CtsMonkeyApp \
 	CtsMonkeyApp2 \

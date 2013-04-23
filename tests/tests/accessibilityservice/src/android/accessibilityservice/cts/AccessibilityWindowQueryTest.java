@@ -24,6 +24,8 @@ import static android.view.accessibility.AccessibilityNodeInfo.ACTION_LONG_CLICK
 import static android.view.accessibility.AccessibilityNodeInfo.ACTION_SELECT;
 
 import android.accessibilityservice.AccessibilityService;
+import android.accessibilityservice.AccessibilityServiceInfo;
+import android.app.UiAutomation;
 import android.graphics.Rect;
 import android.os.SystemClock;
 import android.test.suitebuilder.annotation.MediumTest;
@@ -41,17 +43,6 @@ import java.util.Queue;
  * Test cases for testing the accessibility APIs for querying of the screen content.
  * These APIs allow exploring the screen and requesting an action to be performed
  * on a given view from an AccessiiblityService.
- * <p>
- * Note: The accessibility CTS tests are composed of two APKs, one with delegating
- * accessibility service and another with the instrumented activity and test cases.
- * The delegating service is installed and enabled during test execution. It serves
- * as a proxy to the system used by the tests. This indirection is needed since the
- * test runner stops the package before running the tests. Hence, if the accessibility
- * service is in the test package running the tests would break the binding between
- * the service and the system.  The delegating service is in
- * <strong>CtsDelegatingAccessibilityService.apk</strong> whose source is located at
- * <strong>cts/tests/accessibilityservice</strong>.
- * </p>
  */
 public class AccessibilityWindowQueryTest
         extends AccessibilityActivityTestCase<AccessibilityWindowQueryActivity> {
@@ -63,23 +54,26 @@ public class AccessibilityWindowQueryTest
     @MediumTest
     public void testFindByText() throws Exception {
         // find a view by text
-        List<AccessibilityNodeInfo> buttons =
-            getInteractionBridge().findAccessibilityNodeInfosByText("butto");
+        List<AccessibilityNodeInfo> buttons = getInstrumentation().getUiAutomation()
+                .getRootInActiveWindow().findAccessibilityNodeInfosByText("butto");
         assertEquals(9, buttons.size());
     }
 
     @MediumTest
     public void testFindByContentDescription() throws Exception {
         // find a view by text
-        AccessibilityNodeInfo button = getInteractionBridge()
-                .findAccessibilityNodeInfoByTextFromRoot(getString(R.string.contentDescription));
+        AccessibilityNodeInfo button = getInstrumentation().getUiAutomation()
+                .getRootInActiveWindow().findAccessibilityNodeInfosByText(
+                        getString(R.string.contentDescription)).get(0);
         assertNotNull(button);
     }
 
     @MediumTest
     public void testTraverseWindow() throws Exception {
         try {
-            getInteractionBridge().setRegardViewsNotImportantForAccessibility(true);
+            AccessibilityServiceInfo info = getInstrumentation().getUiAutomation().getServiceInfo();
+            info.flags |= AccessibilityServiceInfo.FLAG_INCLUDE_NOT_IMPORTANT_VIEWS;
+            getInstrumentation().getUiAutomation().setServiceInfo(info);
 
             // make list of expected nodes
             List<String> classNameAndTextList = new ArrayList<String>();
@@ -101,7 +95,7 @@ public class AccessibilityWindowQueryTest
             classNameAndTextList.add("android.widget.ButtonButton9");
 
             Queue<AccessibilityNodeInfo> fringe = new LinkedList<AccessibilityNodeInfo>();
-            fringe.add(getInteractionBridge().getRootInActiveWindow());
+            fringe.add(getInstrumentation().getUiAutomation().getRootInActiveWindow());
 
             // do a BFS traversal and check nodes
             while (!fringe.isEmpty()) {
@@ -117,111 +111,118 @@ public class AccessibilityWindowQueryTest
 
                 final int childCount = current.getChildCount();
                 for (int i = 0; i < childCount; i++) {
-                    AccessibilityNodeInfo child = getInteractionBridge().getChild(current, i);
+                    AccessibilityNodeInfo child = current.getChild(i);
                     fringe.add(child);
                 }
             }
         } finally {
-            getInteractionBridge().setRegardViewsNotImportantForAccessibility(false);
+            AccessibilityServiceInfo info = getInstrumentation().getUiAutomation().getServiceInfo();
+            info.flags &= ~AccessibilityServiceInfo.FLAG_INCLUDE_NOT_IMPORTANT_VIEWS;
+            getInstrumentation().getUiAutomation().setServiceInfo(info);
         }
     }
 
     @MediumTest
     public void testPerformActionFocus() throws Exception {
         // find a view and make sure it is not focused
-        AccessibilityNodeInfo button = getInteractionBridge()
-                .findAccessibilityNodeInfoByTextFromRoot(getString(R.string.button5));
+        AccessibilityNodeInfo button = getInstrumentation().getUiAutomation()
+                .getRootInActiveWindow().findAccessibilityNodeInfosByText(
+                        getString(R.string.button5)).get(0);
         assertFalse(button.isFocused());
 
         // focus the view
-        assertTrue(getInteractionBridge().performAction(button, ACTION_FOCUS));
+        assertTrue(button.performAction(ACTION_FOCUS));
 
         // find the view again and make sure it is focused
-        button = getInteractionBridge().findAccessibilityNodeInfoByTextFromRoot(
-                getString(R.string.button5));
+        button = getInstrumentation().getUiAutomation().getRootInActiveWindow()
+                .findAccessibilityNodeInfosByText(getString(R.string.button5)).get(0);
         assertTrue(button.isFocused());
     }
 
     @MediumTest
     public void testPerformActionClearFocus() throws Exception {
         // find a view and make sure it is not focused
-        AccessibilityNodeInfo button = getInteractionBridge()
-                .findAccessibilityNodeInfoByTextFromRoot(getString(R.string.button5));
+        AccessibilityNodeInfo button = getInstrumentation().getUiAutomation()
+                .getRootInActiveWindow().findAccessibilityNodeInfosByText(
+                        getString(R.string.button5)).get(0);
         assertFalse(button.isFocused());
 
         // focus the view
-        assertTrue(getInteractionBridge().performAction(button, ACTION_FOCUS));
+        assertTrue(button.performAction(ACTION_FOCUS));
 
         // find the view again and make sure it is focused
-        button = getInteractionBridge().findAccessibilityNodeInfoByTextFromRoot(
-                getString(R.string.button5));
+        button = getInstrumentation().getUiAutomation().getRootInActiveWindow()
+                .findAccessibilityNodeInfosByText(getString(R.string.button5)).get(0);
         assertTrue(button.isFocused());
 
         // unfocus the view
-        assertTrue(getInteractionBridge().performAction(button, ACTION_CLEAR_FOCUS));
+        assertTrue(button.performAction(ACTION_CLEAR_FOCUS));
 
         // find the view again and make sure it is not focused
-        button = getInteractionBridge().findAccessibilityNodeInfoByTextFromRoot(getString(
-                R.string.button5));
+        button = getInstrumentation().getUiAutomation().getRootInActiveWindow()
+                .findAccessibilityNodeInfosByText(getString(R.string.button5)).get(0);
         assertFalse(button.isFocused());
     }
 
     @MediumTest
     public void testPerformActionSelect() throws Exception {
         // find a view and make sure it is not selected
-        AccessibilityNodeInfo button = getInteractionBridge()
-                .findAccessibilityNodeInfoByTextFromRoot(getString(R.string.button5));
+        AccessibilityNodeInfo button = getInstrumentation().getUiAutomation()
+                .getRootInActiveWindow().findAccessibilityNodeInfosByText(
+                        getString(R.string.button5)).get(0);
         assertFalse(button.isSelected());
 
         // select the view
-        assertTrue(getInteractionBridge().performAction(button, ACTION_SELECT));
+        assertTrue(button.performAction(ACTION_SELECT));
 
         // find the view again and make sure it is selected
-        button = getInteractionBridge().findAccessibilityNodeInfoByTextFromRoot(
-                getString(R.string.button5));
+        button = getInstrumentation().getUiAutomation().getRootInActiveWindow()
+                .findAccessibilityNodeInfosByText(getString(R.string.button5)).get(0);
         assertTrue(button.isSelected());
     }
 
     @MediumTest
     public void testPerformActionClearSelection() throws Exception {
         // find a view and make sure it is not selected
-        AccessibilityNodeInfo button = getInteractionBridge()
-                .findAccessibilityNodeInfoByTextFromRoot(getString(R.string.button5));
+        AccessibilityNodeInfo button = getInstrumentation().getUiAutomation()
+                .getRootInActiveWindow().findAccessibilityNodeInfosByText(
+                        getString(R.string.button5)).get(0);
         assertFalse(button.isSelected());
 
         // select the view
-        assertTrue(getInteractionBridge().performAction(button, ACTION_SELECT));
+        assertTrue(button.performAction(ACTION_SELECT));
 
         // find the view again and make sure it is selected
-        button = getInteractionBridge().findAccessibilityNodeInfoByTextFromRoot(
-                getString(R.string.button5));
+        button = getInstrumentation().getUiAutomation().getRootInActiveWindow()
+                .findAccessibilityNodeInfosByText(getString(R.string.button5)).get(0);
 
         assertTrue(button.isSelected());
 
         // unselect the view
-        assertTrue(getInteractionBridge().performAction(button, ACTION_CLEAR_SELECTION));
+        assertTrue(button.performAction(ACTION_CLEAR_SELECTION));
 
         // find the view again and make sure it is not selected
-        button = getInteractionBridge().findAccessibilityNodeInfoByTextFromRoot(
-                getString(R.string.button5));
+        button = getInstrumentation().getUiAutomation().getRootInActiveWindow()
+                .findAccessibilityNodeInfosByText(getString(R.string.button5)).get(0);
         assertFalse(button.isSelected());
     }
 
     @MediumTest
     public void testPerformActionClick() throws Exception {
         // find a view and make sure it is not selected
-        final AccessibilityNodeInfo button = getInteractionBridge()
-                .findAccessibilityNodeInfoByTextFromRoot(getString(R.string.button5));
+        final AccessibilityNodeInfo button = getInstrumentation().getUiAutomation()
+                .getRootInActiveWindow().findAccessibilityNodeInfosByText(
+                        getString(R.string.button5)).get(0);
         assertFalse(button.isSelected());
 
         // Make an action and wait for an event.
-        AccessibilityEvent expected = getInteractionBridge()
-                .executeCommandAndWaitForAccessibilityEvent(new Runnable() {
+        AccessibilityEvent expected = getInstrumentation().getUiAutomation()
+                .executeAndWaitForEvent(new Runnable() {
             @Override
             public void run() {
-                getInteractionBridge().performAction(button, ACTION_CLICK);
+                button.performAction(ACTION_CLICK);
             }
-        }, new AccessibilityEventFilter() {
+        }, new UiAutomation.AccessibilityEventFilter() {
             @Override
             public boolean accept(AccessibilityEvent event) {
                 return (event.getEventType() == AccessibilityEvent.TYPE_VIEW_CLICKED);
@@ -236,18 +237,19 @@ public class AccessibilityWindowQueryTest
     @MediumTest
     public void testPerformActionLongClick() throws Exception {
         // find a view and make sure it is not selected
-        final AccessibilityNodeInfo button = getInteractionBridge()
-                .findAccessibilityNodeInfoByTextFromRoot(getString(R.string.button5));
+        final AccessibilityNodeInfo button = getInstrumentation().getUiAutomation()
+                .getRootInActiveWindow().findAccessibilityNodeInfosByText(
+                        getString(R.string.button5)).get(0);
         assertFalse(button.isSelected());
 
         // Make an action and wait for an event.
-        AccessibilityEvent expected = getInteractionBridge()
-                .executeCommandAndWaitForAccessibilityEvent(new Runnable() {
+        AccessibilityEvent expected = getInstrumentation().getUiAutomation()
+                .executeAndWaitForEvent(new Runnable() {
             @Override
             public void run() {
-                getInteractionBridge().performAction(button, ACTION_LONG_CLICK);
+                button.performAction(ACTION_LONG_CLICK);
             }
-        }, new AccessibilityEventFilter() {
+        }, new UiAutomation.AccessibilityEventFilter() {
             @Override
             public boolean accept(AccessibilityEvent event) {
                 return (event.getEventType() == AccessibilityEvent.TYPE_VIEW_LONG_CLICKED);
@@ -262,21 +264,21 @@ public class AccessibilityWindowQueryTest
     @MediumTest
     public void testGetEventSource() throws Exception {
         // find a view and make sure it is not focused
-        final AccessibilityNodeInfo button =
-            getInteractionBridge().findAccessibilityNodeInfoByTextFromRoot(
-                    getString(R.string.button5));
+        final AccessibilityNodeInfo button = getInstrumentation().getUiAutomation()
+                .getRootInActiveWindow().findAccessibilityNodeInfosByText(
+                        getString(R.string.button5)).get(0);
         assertFalse(button.isSelected());
 
         // focus and wait for the event
-        AccessibilityEvent awaitedEvent =
-            getInteractionBridge().executeCommandAndWaitForAccessibilityEvent(
+        AccessibilityEvent awaitedEvent = getInstrumentation().getUiAutomation()
+            .executeAndWaitForEvent(
                 new Runnable() {
             @Override
             public void run() {
-                assertTrue(getInteractionBridge().performAction(button, ACTION_FOCUS));
+                assertTrue(button.performAction(ACTION_FOCUS));
             }
         },
-                new AccessibilityEventFilter() {
+                new UiAutomation.AccessibilityEventFilter() {
             @Override
             public boolean accept(AccessibilityEvent event) {
                 return (event.getEventType() == AccessibilityEvent.TYPE_VIEW_FOCUSED);
@@ -287,7 +289,7 @@ public class AccessibilityWindowQueryTest
         assertNotNull(awaitedEvent);
 
         // check that last event source
-        AccessibilityNodeInfo source = getInteractionBridge().getSource(awaitedEvent);
+        AccessibilityNodeInfo source = awaitedEvent.getSource();
         assertNotNull(source);
 
         // bounds
@@ -321,7 +323,7 @@ public class AccessibilityWindowQueryTest
 
     @MediumTest
     public void testPerformGlobalActionBack() throws Exception {
-        assertTrue(getInteractionBridge().performGlobalAction(
+        assertTrue(getInstrumentation().getUiAutomation().performGlobalAction(
                 AccessibilityService.GLOBAL_ACTION_BACK));
 
         // Sleep a bit so the UI is settles.
@@ -330,7 +332,7 @@ public class AccessibilityWindowQueryTest
 
     @MediumTest
     public void testPerformGlobalActionHome() throws Exception {
-        assertTrue(getInteractionBridge().performGlobalAction(
+        assertTrue(getInstrumentation().getUiAutomation().performGlobalAction(
                 AccessibilityService.GLOBAL_ACTION_HOME));
 
         // Sleep a bit so the UI is settles.
@@ -340,14 +342,14 @@ public class AccessibilityWindowQueryTest
     @MediumTest
     public void testPerformGlobalActionRecents() throws Exception {
         // Check whether the action succeeded.
-        assertTrue(getInteractionBridge().performGlobalAction(
+        assertTrue(getInstrumentation().getUiAutomation().performGlobalAction(
                 AccessibilityService.GLOBAL_ACTION_RECENTS));
 
         // Sleep a bit so the UI is settles.
         SystemClock.sleep(3000);
 
         // Clean up.
-        getInteractionBridge().performGlobalAction(
+        getInstrumentation().getUiAutomation().performGlobalAction(
                 AccessibilityService.GLOBAL_ACTION_BACK);
 
         // Sleep a bit so the UI is settles.
@@ -357,14 +359,14 @@ public class AccessibilityWindowQueryTest
     @MediumTest
     public void testPerformGlobalActionNotifications() throws Exception {
         // Perform the action under test
-        assertTrue(getInteractionBridge().performGlobalAction(
+        assertTrue(getInstrumentation().getUiAutomation().performGlobalAction(
                 AccessibilityService.GLOBAL_ACTION_NOTIFICATIONS));
 
         // Sleep a bit so the UI is settles.
         SystemClock.sleep(3000);
 
         // Clean up.
-        assertTrue(getInteractionBridge().performGlobalAction(
+        assertTrue(getInstrumentation().getUiAutomation().performGlobalAction(
                 AccessibilityService.GLOBAL_ACTION_BACK));
 
         // Sleep a bit so the UI is settles.
@@ -374,14 +376,14 @@ public class AccessibilityWindowQueryTest
     @MediumTest
     public void testPerformGlobalActionQuickSettings() throws Exception {
         // Check whether the action succeeded.
-        assertTrue(getInteractionBridge().performGlobalAction(
+        assertTrue(getInstrumentation().getUiAutomation().performGlobalAction(
                 AccessibilityService.GLOBAL_ACTION_QUICK_SETTINGS));
 
         // Sleep a bit so the UI is settles.
         SystemClock.sleep(3000);
 
         // Clean up.
-        getInteractionBridge().performGlobalAction(
+        getInstrumentation().getUiAutomation().performGlobalAction(
                 AccessibilityService.GLOBAL_ACTION_BACK);
 
         // Sleep a bit so the UI is settles.
@@ -391,14 +393,18 @@ public class AccessibilityWindowQueryTest
     @MediumTest
     public void testObjectContract() throws Exception {
         try {
-            getInteractionBridge().setRegardViewsNotImportantForAccessibility(true);
+            AccessibilityServiceInfo info = getInstrumentation().getUiAutomation().getServiceInfo();
+            info.flags |= AccessibilityServiceInfo.FLAG_INCLUDE_NOT_IMPORTANT_VIEWS;
+            getInstrumentation().getUiAutomation().setServiceInfo(info);
+
             // find a view and make sure it is not focused
-            AccessibilityNodeInfo button = getInteractionBridge()
-                    .findAccessibilityNodeInfoByTextFromRoot(getString(R.string.button5));
-            AccessibilityNodeInfo parent = getInteractionBridge().getParent(button);
+            AccessibilityNodeInfo button = getInstrumentation().getUiAutomation()
+                    .getRootInActiveWindow().findAccessibilityNodeInfosByText(
+                            getString(R.string.button5)).get(0);
+            AccessibilityNodeInfo parent = button.getParent();
             final int childCount = parent.getChildCount();
             for (int i = 0; i < childCount; i++) {
-                AccessibilityNodeInfo child = getInteractionBridge().getChild(parent, i);
+                AccessibilityNodeInfo child = parent.getChild(i);
                 assertNotNull(child);
                 if (child.equals(button)) {
                     assertEquals("Equal objects must have same hasCode.", button.hashCode(),
@@ -408,7 +414,9 @@ public class AccessibilityWindowQueryTest
             }
             fail("Parent's children do not have the info whose parent is the parent.");
         } finally {
-            getInteractionBridge().setRegardViewsNotImportantForAccessibility(false);
+            AccessibilityServiceInfo info = getInstrumentation().getUiAutomation().getServiceInfo();
+            info.flags &= ~AccessibilityServiceInfo.FLAG_INCLUDE_NOT_IMPORTANT_VIEWS;
+            getInstrumentation().getUiAutomation().setServiceInfo(info);
         }
     }
 
