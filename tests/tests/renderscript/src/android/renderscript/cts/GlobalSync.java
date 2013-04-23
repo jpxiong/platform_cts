@@ -40,20 +40,19 @@ public class GlobalSync extends RSBaseCompute {
         int [] In = new int [1];
         In[0] = v;
         AIn.copyFrom(In);
-
     }
 
     /**
      * Test whether we are properly synchronizing extern global data
-     * when dealing with mixed kernels/invokables.
+     * when going from kernel to invokable.
      */
-    public void testGlobalSync() {
+    public void testKIGlobalSync() {
         ScriptC_global_sync gs = new ScriptC_global_sync(mRS);
 
         int v = 7;
         setupGlobalSync(mRS, gs, v);
         gs.forEach_write_global(AIn);
-        gs.invoke_test_global(v);
+        gs.invoke_test_read_global(v);
 
         AFailed.copyTo(Failed);
         if (Failed[0] != 0) {
@@ -66,15 +65,57 @@ public class GlobalSync extends RSBaseCompute {
 
     /**
      * Test whether we are properly synchronizing static global data
-     * when dealing with mixed kernels/invokables.
+     * when going from invokable to kernel.
      */
-    public void testStaticGlobalSync() {
+    public void testKIStaticGlobalSync() {
         ScriptC_global_sync gs = new ScriptC_global_sync(mRS);
 
         int v = 9;
         setupGlobalSync(mRS, gs, v);
         gs.forEach_write_static_global(AIn);
-        gs.invoke_test_static_global(v);
+        gs.invoke_test_read_static_global(v);
+
+        AFailed.copyTo(Failed);
+        if (Failed[0] != 0) {
+            FoundError = true;
+        }
+
+        gs.destroy();
+        checkForErrors();
+    }
+
+    /**
+     * Test whether we are properly synchronizing extern global data
+     * when going from invokable to kernel.
+     */
+    public void testIKGlobalSync() {
+        ScriptC_global_sync gs = new ScriptC_global_sync(mRS);
+
+        int v = 7;
+        setupGlobalSync(mRS, gs, v);
+        gs.invoke_test_write_global(v);
+        gs.forEach_read_global(AIn, AFailed);
+
+        AFailed.copyTo(Failed);
+        if (Failed[0] != 0) {
+            FoundError = true;
+        }
+
+        gs.destroy();
+        checkForErrors();
+    }
+
+    /**
+     * Test whether we are properly synchronizing static global data
+     * when going from kernel to invokable.
+     */
+    public void testIKStaticGlobalSync() {
+        ScriptC_global_sync gs = new ScriptC_global_sync(mRS);
+
+        int v = 9;
+        setupGlobalSync(mRS, gs, v);
+        gs.invoke_test_write_static_global(v);
+        gs.forEach_read_static_global(AIn, AFailed);
 
         AFailed.copyTo(Failed);
         if (Failed[0] != 0) {
@@ -85,4 +126,3 @@ public class GlobalSync extends RSBaseCompute {
         checkForErrors();
     }
 }
-
