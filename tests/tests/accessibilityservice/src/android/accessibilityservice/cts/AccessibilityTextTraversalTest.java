@@ -14,6 +14,7 @@
 
 package android.accessibilityservice.cts;
 
+import android.app.UiAutomation;
 import android.os.Bundle;
 import android.test.suitebuilder.annotation.MediumTest;
 import android.text.Selection;
@@ -29,17 +30,6 @@ import com.android.cts.accessibilityservice.R;
 /**
  * Test cases for testing the accessibility APIs for traversing the text content of
  * a View at several granularities.
- * <p>
- * Note: The accessibility CTS tests are composed of two APKs, one with delegating
- * accessibility service and another with the instrumented activity and test cases.
- * The delegating service is installed and enabled during test execution. It serves
- * as a proxy to the system used by the tests. This indirection is needed since the
- * test runner stops the package before running the tests. Hence, if the accessibility
- * service is in the test package running the tests would break the binding between
- * the service and the system.  The delegating service is in
- * <strong>CtsDelegatingAccessibilityService.apk</strong> whose source is located at
- * <strong>cts/tests/accessibilityservice</strong>.
- * </p>
  */
 public class AccessibilityTextTraversalTest
         extends AccessibilityActivityTestCase<AccessibilityTextTraversalActivity>{
@@ -60,8 +50,9 @@ public class AccessibilityTextTraversalTest
             }
         });
 
-        final AccessibilityNodeInfo text = getInteractionBridge()
-               .findAccessibilityNodeInfoByTextFromRoot(getString(R.string.a_b));
+        final AccessibilityNodeInfo text = getInstrumentation().getUiAutomation()
+                .getRootInActiveWindow().findAccessibilityNodeInfosByText(
+                        getString(R.string.a_b)).get(0);
 
         final int granularities = text.getMovementGranularities();
         assertEquals(granularities, AccessibilityNodeInfo.MOVEMENT_GRANULARITY_CHARACTER
@@ -73,14 +64,14 @@ public class AccessibilityTextTraversalTest
                 AccessibilityNodeInfo.MOVEMENT_GRANULARITY_CHARACTER);
 
         // Move to the next character and wait for an event.
-        AccessibilityEvent firstExpected = getInteractionBridge()
-                .executeCommandAndWaitForAccessibilityEvent(new Runnable() {
+        AccessibilityEvent firstExpected = getInstrumentation().getUiAutomation()
+                .executeAndWaitForEvent(new Runnable() {
             @Override
             public void run() {
-                getInteractionBridge().performAction(text,
-                        AccessibilityNodeInfo.ACTION_NEXT_AT_MOVEMENT_GRANULARITY, arguments);
+                text.performAction(AccessibilityNodeInfo.ACTION_NEXT_AT_MOVEMENT_GRANULARITY,
+                        arguments);
             }
-        }, new AccessibilityEventFilter() {
+        }, new UiAutomation.AccessibilityEventFilter() {
             @Override
             public boolean accept(AccessibilityEvent event) {
                 return
@@ -103,14 +94,14 @@ public class AccessibilityTextTraversalTest
         assertNotNull(firstExpected);
 
         // Move to the next character and wait for an event.
-        AccessibilityEvent secondExpected = getInteractionBridge()
-                .executeCommandAndWaitForAccessibilityEvent(new Runnable() {
+        AccessibilityEvent secondExpected = getInstrumentation().getUiAutomation()
+                .executeAndWaitForEvent(new Runnable() {
             @Override
             public void run() {
-                getInteractionBridge().performAction(text,
-                        AccessibilityNodeInfo.ACTION_NEXT_AT_MOVEMENT_GRANULARITY, arguments);
+                text.performAction(AccessibilityNodeInfo.ACTION_NEXT_AT_MOVEMENT_GRANULARITY,
+                        arguments);
             }
-        }, new AccessibilityEventFilter() {
+        }, new UiAutomation.AccessibilityEventFilter() {
             @Override
             public boolean accept(AccessibilityEvent event) {
                 return
@@ -133,14 +124,14 @@ public class AccessibilityTextTraversalTest
         assertNotNull(secondExpected);
 
         // Move to the next character and wait for an event.
-        AccessibilityEvent thirdExpected = getInteractionBridge()
-                .executeCommandAndWaitForAccessibilityEvent(new Runnable() {
+        AccessibilityEvent thirdExpected = getInstrumentation().getUiAutomation()
+                .executeAndWaitForEvent(new Runnable() {
             @Override
             public void run() {
-                getInteractionBridge().performAction(text,
-                        AccessibilityNodeInfo.ACTION_NEXT_AT_MOVEMENT_GRANULARITY, arguments);
+                text.performAction(AccessibilityNodeInfo.ACTION_NEXT_AT_MOVEMENT_GRANULARITY,
+                        arguments);
             }
-        }, new AccessibilityEventFilter() {
+        }, new UiAutomation.AccessibilityEventFilter() {
             @Override
             public boolean accept(AccessibilityEvent event) {
                 return
@@ -163,18 +154,18 @@ public class AccessibilityTextTraversalTest
         assertNotNull(thirdExpected);
 
         // Make sure there is no next.
-        assertFalse(getInteractionBridge().performAction(text,
-                AccessibilityNodeInfo.ACTION_NEXT_AT_MOVEMENT_GRANULARITY, arguments));
+        assertFalse(text.performAction(AccessibilityNodeInfo.ACTION_NEXT_AT_MOVEMENT_GRANULARITY,
+                arguments));
 
         // Move to the previous character and wait for an event.
-        AccessibilityEvent fourthExpected = getInteractionBridge()
-                .executeCommandAndWaitForAccessibilityEvent(new Runnable() {
+        AccessibilityEvent fourthExpected = getInstrumentation().getUiAutomation()
+                .executeAndWaitForEvent(new Runnable() {
             @Override
             public void run() {
-                getInteractionBridge().performAction(text,
-                        AccessibilityNodeInfo.ACTION_PREVIOUS_AT_MOVEMENT_GRANULARITY, arguments);
+                text.performAction(AccessibilityNodeInfo.ACTION_PREVIOUS_AT_MOVEMENT_GRANULARITY,
+                        arguments);
             }
-        }, new AccessibilityEventFilter() {
+        }, new UiAutomation.AccessibilityEventFilter() {
             @Override
             public boolean accept(AccessibilityEvent event) {
                 return
@@ -197,14 +188,14 @@ public class AccessibilityTextTraversalTest
         assertNotNull(fourthExpected);
 
         // Move to the previous character and wait for an event.
-        AccessibilityEvent fifthExpected = getInteractionBridge()
-                .executeCommandAndWaitForAccessibilityEvent(new Runnable() {
+        AccessibilityEvent fifthExpected = getInstrumentation().getUiAutomation()
+                .executeAndWaitForEvent(new Runnable() {
             @Override
             public void run() {
-                getInteractionBridge().performAction(text,
-                        AccessibilityNodeInfo.ACTION_PREVIOUS_AT_MOVEMENT_GRANULARITY, arguments);
+                text.performAction(AccessibilityNodeInfo.ACTION_PREVIOUS_AT_MOVEMENT_GRANULARITY,
+                        arguments);
             }
-        }, new AccessibilityEventFilter() {
+        }, new UiAutomation.AccessibilityEventFilter() {
             @Override
             public boolean accept(AccessibilityEvent event) {
                 return
@@ -227,14 +218,14 @@ public class AccessibilityTextTraversalTest
         assertNotNull(fifthExpected);
 
         // Move to the next character and wait for an event.
-        AccessibilityEvent sixthExpected = getInteractionBridge()
-                .executeCommandAndWaitForAccessibilityEvent(new Runnable() {
+        AccessibilityEvent sixthExpected = getInstrumentation().getUiAutomation()
+                .executeAndWaitForEvent(new Runnable() {
             @Override
             public void run() {
-                getInteractionBridge().performAction(text,
-                        AccessibilityNodeInfo.ACTION_PREVIOUS_AT_MOVEMENT_GRANULARITY, arguments);
+                text.performAction(AccessibilityNodeInfo.ACTION_PREVIOUS_AT_MOVEMENT_GRANULARITY,
+                        arguments);
             }
-        }, new AccessibilityEventFilter() {
+        }, new UiAutomation.AccessibilityEventFilter() {
             @Override
             public boolean accept(AccessibilityEvent event) {
                 return
@@ -257,7 +248,7 @@ public class AccessibilityTextTraversalTest
         assertNotNull(sixthExpected);
 
         // Make sure there is no previous.
-        assertFalse(getInteractionBridge().performAction(text,
+        assertFalse(text.performAction(
                 AccessibilityNodeInfo.ACTION_PREVIOUS_AT_MOVEMENT_GRANULARITY, arguments));
     }
 
@@ -273,8 +264,9 @@ public class AccessibilityTextTraversalTest
             }
         });
 
-        final AccessibilityNodeInfo text = getInteractionBridge()
-               .findAccessibilityNodeInfoByTextFromRoot(getString(R.string.foo_bar_baz));
+        final AccessibilityNodeInfo text = getInstrumentation().getUiAutomation()
+                .getRootInActiveWindow().findAccessibilityNodeInfosByText(
+                        getString(R.string.foo_bar_baz)).get(0);
 
         final int granularities = text.getMovementGranularities();
         assertEquals(granularities, AccessibilityNodeInfo.MOVEMENT_GRANULARITY_CHARACTER
@@ -286,14 +278,14 @@ public class AccessibilityTextTraversalTest
                 AccessibilityNodeInfo.MOVEMENT_GRANULARITY_WORD);
 
         // Move to the next character and wait for an event.
-        AccessibilityEvent firstExpected = getInteractionBridge()
-                .executeCommandAndWaitForAccessibilityEvent(new Runnable() {
+        AccessibilityEvent firstExpected = getInstrumentation().getUiAutomation()
+                .executeAndWaitForEvent(new Runnable() {
             @Override
             public void run() {
-                getInteractionBridge().performAction(text,
+                text.performAction(
                         AccessibilityNodeInfo.ACTION_NEXT_AT_MOVEMENT_GRANULARITY, arguments);
             }
-        }, new AccessibilityEventFilter() {
+        }, new UiAutomation.AccessibilityEventFilter() {
             @Override
             public boolean accept(AccessibilityEvent event) {
                 return
@@ -316,14 +308,14 @@ public class AccessibilityTextTraversalTest
         assertNotNull(firstExpected);
 
         // Move to the next character and wait for an event.
-        AccessibilityEvent secondExpected = getInteractionBridge()
-                .executeCommandAndWaitForAccessibilityEvent(new Runnable() {
+        AccessibilityEvent secondExpected = getInstrumentation().getUiAutomation()
+                .executeAndWaitForEvent(new Runnable() {
             @Override
             public void run() {
-                getInteractionBridge().performAction(text,
+                text.performAction(
                         AccessibilityNodeInfo.ACTION_NEXT_AT_MOVEMENT_GRANULARITY, arguments);
             }
-        }, new AccessibilityEventFilter() {
+        }, new UiAutomation.AccessibilityEventFilter() {
             @Override
             public boolean accept(AccessibilityEvent event) {
                 return
@@ -346,14 +338,14 @@ public class AccessibilityTextTraversalTest
         assertNotNull(secondExpected);
 
         // Move to the next character and wait for an event.
-        AccessibilityEvent thirdExpected = getInteractionBridge()
-                .executeCommandAndWaitForAccessibilityEvent(new Runnable() {
+        AccessibilityEvent thirdExpected = getInstrumentation().getUiAutomation()
+                .executeAndWaitForEvent(new Runnable() {
             @Override
             public void run() {
-                getInteractionBridge().performAction(text,
+                text.performAction(
                         AccessibilityNodeInfo.ACTION_NEXT_AT_MOVEMENT_GRANULARITY, arguments);
             }
-        }, new AccessibilityEventFilter() {
+        }, new UiAutomation.AccessibilityEventFilter() {
             @Override
             public boolean accept(AccessibilityEvent event) {
                 return
@@ -376,18 +368,18 @@ public class AccessibilityTextTraversalTest
         assertNotNull(thirdExpected);
 
         // Make sure there is no next.
-        assertFalse(getInteractionBridge().performAction(text,
+        assertFalse(text.performAction(
                 AccessibilityNodeInfo.ACTION_NEXT_AT_MOVEMENT_GRANULARITY, arguments));
 
         // Move to the next character and wait for an event.
-        AccessibilityEvent fourthExpected = getInteractionBridge()
-                .executeCommandAndWaitForAccessibilityEvent(new Runnable() {
+        AccessibilityEvent fourthExpected = getInstrumentation().getUiAutomation()
+                .executeAndWaitForEvent(new Runnable() {
             @Override
             public void run() {
-                getInteractionBridge().performAction(text,
+                text.performAction(
                         AccessibilityNodeInfo.ACTION_PREVIOUS_AT_MOVEMENT_GRANULARITY, arguments);
             }
-        }, new AccessibilityEventFilter() {
+        }, new UiAutomation.AccessibilityEventFilter() {
             @Override
             public boolean accept(AccessibilityEvent event) {
                 return
@@ -410,14 +402,14 @@ public class AccessibilityTextTraversalTest
         assertNotNull(fourthExpected);
 
         // Move to the next character and wait for an event.
-        AccessibilityEvent fifthExpected = getInteractionBridge()
-                .executeCommandAndWaitForAccessibilityEvent(new Runnable() {
+        AccessibilityEvent fifthExpected = getInstrumentation().getUiAutomation()
+                .executeAndWaitForEvent(new Runnable() {
             @Override
             public void run() {
-                getInteractionBridge().performAction(text,
+                text.performAction(
                         AccessibilityNodeInfo.ACTION_PREVIOUS_AT_MOVEMENT_GRANULARITY, arguments);
             }
-        }, new AccessibilityEventFilter() {
+        }, new UiAutomation.AccessibilityEventFilter() {
             @Override
             public boolean accept(AccessibilityEvent event) {
                 return
@@ -440,14 +432,14 @@ public class AccessibilityTextTraversalTest
         assertNotNull(fifthExpected);
 
         // Move to the next character and wait for an event.
-        AccessibilityEvent sixthExpected = getInteractionBridge()
-                .executeCommandAndWaitForAccessibilityEvent(new Runnable() {
+        AccessibilityEvent sixthExpected = getInstrumentation().getUiAutomation()
+                .executeAndWaitForEvent(new Runnable() {
             @Override
             public void run() {
-                getInteractionBridge().performAction(text,
+                text.performAction(
                         AccessibilityNodeInfo.ACTION_PREVIOUS_AT_MOVEMENT_GRANULARITY, arguments);
             }
-        }, new AccessibilityEventFilter() {
+        }, new UiAutomation.AccessibilityEventFilter() {
             @Override
             public boolean accept(AccessibilityEvent event) {
                 return
@@ -470,7 +462,7 @@ public class AccessibilityTextTraversalTest
         assertNotNull(sixthExpected);
 
         // Make sure there is no previous.
-        assertFalse(getInteractionBridge().performAction(text,
+        assertFalse(text.performAction(
                 AccessibilityNodeInfo.ACTION_PREVIOUS_AT_MOVEMENT_GRANULARITY, arguments));
     }
 
@@ -486,8 +478,9 @@ public class AccessibilityTextTraversalTest
             }
         });
 
-        final AccessibilityNodeInfo text = getInteractionBridge()
-               .findAccessibilityNodeInfoByTextFromRoot(getString(R.string.a_b));
+        final AccessibilityNodeInfo text = getInstrumentation().getUiAutomation()
+               .getRootInActiveWindow().findAccessibilityNodeInfosByText(
+                       getString(R.string.a_b)).get(0);
 
         final int granularities = text.getMovementGranularities();
         assertEquals(granularities, AccessibilityNodeInfo.MOVEMENT_GRANULARITY_CHARACTER
@@ -501,14 +494,14 @@ public class AccessibilityTextTraversalTest
                 AccessibilityNodeInfo.MOVEMENT_GRANULARITY_CHARACTER);
 
         // Move to the next character and wait for an event.
-        AccessibilityEvent firstExpected = getInteractionBridge()
-                .executeCommandAndWaitForAccessibilityEvent(new Runnable() {
+        AccessibilityEvent firstExpected = getInstrumentation().getUiAutomation()
+                .executeAndWaitForEvent(new Runnable() {
             @Override
             public void run() {
-                getInteractionBridge().performAction(text,
+                text.performAction(
                         AccessibilityNodeInfo.ACTION_NEXT_AT_MOVEMENT_GRANULARITY, arguments);
             }
-        }, new AccessibilityEventFilter() {
+        }, new UiAutomation.AccessibilityEventFilter() {
             @Override
             public boolean accept(AccessibilityEvent event) {
                 return
@@ -535,14 +528,14 @@ public class AccessibilityTextTraversalTest
         assertEquals(1, Selection.getSelectionEnd(textView.getText()));
 
         // Move to the next character and wait for an event.
-        AccessibilityEvent secondExpected = getInteractionBridge()
-                .executeCommandAndWaitForAccessibilityEvent(new Runnable() {
+        AccessibilityEvent secondExpected = getInstrumentation().getUiAutomation()
+                .executeAndWaitForEvent(new Runnable() {
             @Override
             public void run() {
-                getInteractionBridge().performAction(text,
+                text.performAction(
                         AccessibilityNodeInfo.ACTION_NEXT_AT_MOVEMENT_GRANULARITY, arguments);
             }
-        }, new AccessibilityEventFilter() {
+        }, new UiAutomation.AccessibilityEventFilter() {
             @Override
             public boolean accept(AccessibilityEvent event) {
                 return
@@ -569,14 +562,14 @@ public class AccessibilityTextTraversalTest
         assertEquals(2, Selection.getSelectionEnd(textView.getText()));
 
         // Move to the next character and wait for an event.
-        AccessibilityEvent thirdExpected = getInteractionBridge()
-                .executeCommandAndWaitForAccessibilityEvent(new Runnable() {
+        AccessibilityEvent thirdExpected = getInstrumentation().getUiAutomation()
+                .executeAndWaitForEvent(new Runnable() {
             @Override
             public void run() {
-                getInteractionBridge().performAction(text,
+                text.performAction(
                         AccessibilityNodeInfo.ACTION_NEXT_AT_MOVEMENT_GRANULARITY, arguments);
             }
-        }, new AccessibilityEventFilter() {
+        }, new UiAutomation.AccessibilityEventFilter() {
             @Override
             public boolean accept(AccessibilityEvent event) {
                 return
@@ -603,7 +596,7 @@ public class AccessibilityTextTraversalTest
         assertEquals(3, Selection.getSelectionEnd(textView.getText()));
 
         // Make sure there is no next.
-        assertFalse(getInteractionBridge().performAction(text,
+        assertFalse(text.performAction(
                 AccessibilityNodeInfo.ACTION_NEXT_AT_MOVEMENT_GRANULARITY, arguments));
 
         // Verify the selection position.
@@ -611,14 +604,14 @@ public class AccessibilityTextTraversalTest
         assertEquals(3, Selection.getSelectionEnd(textView.getText()));
 
         // Move to the previous character and wait for an event.
-        AccessibilityEvent fifthExpected = getInteractionBridge()
-                .executeCommandAndWaitForAccessibilityEvent(new Runnable() {
+        AccessibilityEvent fifthExpected = getInstrumentation().getUiAutomation()
+                .executeAndWaitForEvent(new Runnable() {
             @Override
             public void run() {
-                getInteractionBridge().performAction(text,
+                text.performAction(
                         AccessibilityNodeInfo.ACTION_PREVIOUS_AT_MOVEMENT_GRANULARITY, arguments);
             }
-        }, new AccessibilityEventFilter() {
+        }, new UiAutomation.AccessibilityEventFilter() {
             @Override
             public boolean accept(AccessibilityEvent event) {
                 return
@@ -645,14 +638,14 @@ public class AccessibilityTextTraversalTest
         assertEquals(2, Selection.getSelectionEnd(textView.getText()));
 
         // Move to the previous character and wait for an event.
-        AccessibilityEvent sixthExpected = getInteractionBridge()
-                .executeCommandAndWaitForAccessibilityEvent(new Runnable() {
+        AccessibilityEvent sixthExpected = getInstrumentation().getUiAutomation()
+                .executeAndWaitForEvent(new Runnable() {
             @Override
             public void run() {
-                getInteractionBridge().performAction(text,
+                text.performAction(
                         AccessibilityNodeInfo.ACTION_PREVIOUS_AT_MOVEMENT_GRANULARITY, arguments);
             }
-        }, new AccessibilityEventFilter() {
+        }, new UiAutomation.AccessibilityEventFilter() {
             @Override
             public boolean accept(AccessibilityEvent event) {
                 return
@@ -679,14 +672,14 @@ public class AccessibilityTextTraversalTest
         assertEquals(1, Selection.getSelectionEnd(textView.getText()));
 
         // Move to the previous character and wait for an event.
-        AccessibilityEvent seventhExpected = getInteractionBridge()
-                .executeCommandAndWaitForAccessibilityEvent(new Runnable() {
+        AccessibilityEvent seventhExpected = getInstrumentation().getUiAutomation()
+                .executeAndWaitForEvent(new Runnable() {
             @Override
             public void run() {
-                getInteractionBridge().performAction(text,
+                text.performAction(
                         AccessibilityNodeInfo.ACTION_PREVIOUS_AT_MOVEMENT_GRANULARITY, arguments);
             }
-        }, new AccessibilityEventFilter() {
+        }, new UiAutomation.AccessibilityEventFilter() {
             @Override
             public boolean accept(AccessibilityEvent event) {
                 return
@@ -713,7 +706,7 @@ public class AccessibilityTextTraversalTest
         assertEquals(0, Selection.getSelectionEnd(textView.getText()));
 
         // Make sure there is no previous.
-        assertFalse(getInteractionBridge().performAction(text,
+        assertFalse(text.performAction(
                 AccessibilityNodeInfo.ACTION_PREVIOUS_AT_MOVEMENT_GRANULARITY, arguments));
 
         // Verify the selection position.
@@ -734,8 +727,9 @@ public class AccessibilityTextTraversalTest
             }
         });
 
-        final AccessibilityNodeInfo text = getInteractionBridge()
-               .findAccessibilityNodeInfoByTextFromRoot(getString(R.string.a_b));
+        final AccessibilityNodeInfo text = getInstrumentation().getUiAutomation()
+               .getRootInActiveWindow().findAccessibilityNodeInfosByText(
+                       getString(R.string.a_b)).get(0);
 
         final int granularities = text.getMovementGranularities();
         assertEquals(granularities, AccessibilityNodeInfo.MOVEMENT_GRANULARITY_CHARACTER
@@ -750,14 +744,14 @@ public class AccessibilityTextTraversalTest
         arguments.putBoolean(AccessibilityNodeInfo.ACTION_ARGUMENT_EXTEND_SELECTION_BOOLEAN, true);
 
         // Move to the next character and wait for an event.
-        AccessibilityEvent firstExpected = getInteractionBridge()
-                .executeCommandAndWaitForAccessibilityEvent(new Runnable() {
+        AccessibilityEvent firstExpected = getInstrumentation().getUiAutomation()
+                .executeAndWaitForEvent(new Runnable() {
             @Override
             public void run() {
-                getInteractionBridge().performAction(text,
+                text.performAction(
                         AccessibilityNodeInfo.ACTION_NEXT_AT_MOVEMENT_GRANULARITY, arguments);
             }
-        }, new AccessibilityEventFilter() {
+        }, new UiAutomation.AccessibilityEventFilter() {
             @Override
             public boolean accept(AccessibilityEvent event) {
                 return
@@ -784,14 +778,14 @@ public class AccessibilityTextTraversalTest
         assertEquals(1, Selection.getSelectionEnd(editText.getText()));
 
         // Move to the next character and wait for an event.
-        AccessibilityEvent secondExpected = getInteractionBridge()
-                .executeCommandAndWaitForAccessibilityEvent(new Runnable() {
+        AccessibilityEvent secondExpected = getInstrumentation().getUiAutomation()
+                .executeAndWaitForEvent(new Runnable() {
             @Override
             public void run() {
-                getInteractionBridge().performAction(text,
+                text.performAction(
                         AccessibilityNodeInfo.ACTION_NEXT_AT_MOVEMENT_GRANULARITY, arguments);
             }
-        }, new AccessibilityEventFilter() {
+        }, new UiAutomation.AccessibilityEventFilter() {
             @Override
             public boolean accept(AccessibilityEvent event) {
                 return
@@ -818,14 +812,14 @@ public class AccessibilityTextTraversalTest
         assertEquals(2, Selection.getSelectionEnd(editText.getText()));
 
         // Move to the next character and wait for an event.
-        AccessibilityEvent thirdExpected = getInteractionBridge()
-                .executeCommandAndWaitForAccessibilityEvent(new Runnable() {
+        AccessibilityEvent thirdExpected = getInstrumentation().getUiAutomation()
+                .executeAndWaitForEvent(new Runnable() {
             @Override
             public void run() {
-                getInteractionBridge().performAction(text,
+                text.performAction(
                         AccessibilityNodeInfo.ACTION_NEXT_AT_MOVEMENT_GRANULARITY, arguments);
             }
-        }, new AccessibilityEventFilter() {
+        }, new UiAutomation.AccessibilityEventFilter() {
             @Override
             public boolean accept(AccessibilityEvent event) {
                 return
@@ -852,7 +846,7 @@ public class AccessibilityTextTraversalTest
         assertEquals(3, Selection.getSelectionEnd(editText.getText()));
 
         // Make sure there is no next.
-        assertFalse(getInteractionBridge().performAction(text,
+        assertFalse(text.performAction(
                 AccessibilityNodeInfo.ACTION_NEXT_AT_MOVEMENT_GRANULARITY, arguments));
 
         // Verify the selection position.
@@ -872,7 +866,7 @@ public class AccessibilityTextTraversalTest
         Bundle setSelectionArgs = new Bundle();
         setSelectionArgs.putInt(AccessibilityNodeInfo.ACTION_ARGUMENT_SELECTION_START_INT, 3);
         setSelectionArgs.putInt(AccessibilityNodeInfo.ACTION_ARGUMENT_SELECTION_END_INT, 3);
-        assertTrue(getInteractionBridge().performAction(text,
+        assertTrue(text.performAction(
                 AccessibilityNodeInfo.ACTION_SET_SELECTION, setSelectionArgs));
 
         // Verify the selection position.
@@ -889,14 +883,14 @@ public class AccessibilityTextTraversalTest
         });
 
         // Move to the previous character and wait for an event.
-        AccessibilityEvent fifthExpected = getInteractionBridge()
-                .executeCommandAndWaitForAccessibilityEvent(new Runnable() {
+        AccessibilityEvent fifthExpected = getInstrumentation().getUiAutomation()
+                .executeAndWaitForEvent(new Runnable() {
             @Override
             public void run() {
-                getInteractionBridge().performAction(text,
+                text.performAction(
                         AccessibilityNodeInfo.ACTION_PREVIOUS_AT_MOVEMENT_GRANULARITY, arguments);
             }
-        }, new AccessibilityEventFilter() {
+        }, new UiAutomation.AccessibilityEventFilter() {
             @Override
             public boolean accept(AccessibilityEvent event) {
                 return
@@ -923,14 +917,14 @@ public class AccessibilityTextTraversalTest
         assertEquals(3, Selection.getSelectionEnd(editText.getText()));
 
         // Move to the previous character and wait for an event.
-        AccessibilityEvent sixthExpected = getInteractionBridge()
-                .executeCommandAndWaitForAccessibilityEvent(new Runnable() {
+        AccessibilityEvent sixthExpected = getInstrumentation().getUiAutomation()
+                .executeAndWaitForEvent(new Runnable() {
             @Override
             public void run() {
-                getInteractionBridge().performAction(text,
+                text.performAction(
                         AccessibilityNodeInfo.ACTION_PREVIOUS_AT_MOVEMENT_GRANULARITY, arguments);
             }
-        }, new AccessibilityEventFilter() {
+        }, new UiAutomation.AccessibilityEventFilter() {
             @Override
             public boolean accept(AccessibilityEvent event) {
                 return
@@ -957,14 +951,14 @@ public class AccessibilityTextTraversalTest
         assertEquals(3, Selection.getSelectionEnd(editText.getText()));
 
         // Move to the previous character and wait for an event.
-        AccessibilityEvent seventhExpected = getInteractionBridge()
-                .executeCommandAndWaitForAccessibilityEvent(new Runnable() {
+        AccessibilityEvent seventhExpected = getInstrumentation().getUiAutomation()
+                .executeAndWaitForEvent(new Runnable() {
             @Override
             public void run() {
-                getInteractionBridge().performAction(text,
+                text.performAction(
                         AccessibilityNodeInfo.ACTION_PREVIOUS_AT_MOVEMENT_GRANULARITY, arguments);
             }
-        }, new AccessibilityEventFilter() {
+        }, new UiAutomation.AccessibilityEventFilter() {
             @Override
             public boolean accept(AccessibilityEvent event) {
                 return
@@ -991,7 +985,7 @@ public class AccessibilityTextTraversalTest
         assertEquals(3, Selection.getSelectionEnd(editText.getText()));
 
         // Make sure there is no previous.
-        assertFalse(getInteractionBridge().performAction(text,
+        assertFalse(text.performAction(
                 AccessibilityNodeInfo.ACTION_PREVIOUS_AT_MOVEMENT_GRANULARITY, arguments));
 
         // Verify the selection position.
@@ -1010,8 +1004,9 @@ public class AccessibilityTextTraversalTest
             }
         });
 
-        final AccessibilityNodeInfo text = getInteractionBridge()
-               .findAccessibilityNodeInfoByTextFromRoot(getString(R.string.foo_bar_baz));
+        final AccessibilityNodeInfo text = getInstrumentation().getUiAutomation()
+               .getRootInActiveWindow().findAccessibilityNodeInfosByText(getString(
+                       R.string.foo_bar_baz)).get(0);
 
         final int granularities = text.getMovementGranularities();
         assertEquals(granularities, AccessibilityNodeInfo.MOVEMENT_GRANULARITY_CHARACTER
@@ -1025,14 +1020,14 @@ public class AccessibilityTextTraversalTest
                 AccessibilityNodeInfo.MOVEMENT_GRANULARITY_WORD);
 
         // Move to the next word and wait for an event.
-        AccessibilityEvent firstExpected = getInteractionBridge()
-                .executeCommandAndWaitForAccessibilityEvent(new Runnable() {
+        AccessibilityEvent firstExpected = getInstrumentation().getUiAutomation()
+                .executeAndWaitForEvent(new Runnable() {
             @Override
             public void run() {
-                getInteractionBridge().performAction(text,
+                text.performAction(
                         AccessibilityNodeInfo.ACTION_NEXT_AT_MOVEMENT_GRANULARITY, arguments);
             }
-        }, new AccessibilityEventFilter() {
+        }, new UiAutomation.AccessibilityEventFilter() {
             @Override
             public boolean accept(AccessibilityEvent event) {
                 return
@@ -1059,14 +1054,14 @@ public class AccessibilityTextTraversalTest
         assertEquals(3, Selection.getSelectionEnd(textView.getText()));
 
         // Move to the next word and wait for an event.
-        AccessibilityEvent secondExpected = getInteractionBridge()
-                .executeCommandAndWaitForAccessibilityEvent(new Runnable() {
+        AccessibilityEvent secondExpected = getInstrumentation().getUiAutomation()
+                .executeAndWaitForEvent(new Runnable() {
             @Override
             public void run() {
-                getInteractionBridge().performAction(text,
+                text.performAction(
                         AccessibilityNodeInfo.ACTION_NEXT_AT_MOVEMENT_GRANULARITY, arguments);
             }
-        }, new AccessibilityEventFilter() {
+        }, new UiAutomation.AccessibilityEventFilter() {
             @Override
             public boolean accept(AccessibilityEvent event) {
                 return
@@ -1093,14 +1088,14 @@ public class AccessibilityTextTraversalTest
         assertEquals(7, Selection.getSelectionEnd(textView.getText()));
 
         // Move to the next word and wait for an event.
-        AccessibilityEvent thirdExpected = getInteractionBridge()
-                .executeCommandAndWaitForAccessibilityEvent(new Runnable() {
+        AccessibilityEvent thirdExpected = getInstrumentation().getUiAutomation()
+                .executeAndWaitForEvent(new Runnable() {
             @Override
             public void run() {
-                getInteractionBridge().performAction(text,
+                text.performAction(
                         AccessibilityNodeInfo.ACTION_NEXT_AT_MOVEMENT_GRANULARITY, arguments);
             }
-        }, new AccessibilityEventFilter() {
+        }, new UiAutomation.AccessibilityEventFilter() {
             @Override
             public boolean accept(AccessibilityEvent event) {
                 return
@@ -1127,7 +1122,7 @@ public class AccessibilityTextTraversalTest
         assertEquals(11, Selection.getSelectionEnd(textView.getText()));
 
         // Make sure there is no next.
-        assertFalse(getInteractionBridge().performAction(text,
+        assertFalse(text.performAction(
                 AccessibilityNodeInfo.ACTION_NEXT_AT_MOVEMENT_GRANULARITY, arguments));
 
         // Verify the selection position.
@@ -1135,14 +1130,14 @@ public class AccessibilityTextTraversalTest
         assertEquals(11, Selection.getSelectionEnd(textView.getText()));
 
         // Move to the next word and wait for an event.
-        AccessibilityEvent fourthExpected = getInteractionBridge()
-                .executeCommandAndWaitForAccessibilityEvent(new Runnable() {
+        AccessibilityEvent fourthExpected = getInstrumentation().getUiAutomation()
+                .executeAndWaitForEvent(new Runnable() {
             @Override
             public void run() {
-                getInteractionBridge().performAction(text,
+                text.performAction(
                         AccessibilityNodeInfo.ACTION_PREVIOUS_AT_MOVEMENT_GRANULARITY, arguments);
             }
-        }, new AccessibilityEventFilter() {
+        }, new UiAutomation.AccessibilityEventFilter() {
             @Override
             public boolean accept(AccessibilityEvent event) {
                 return
@@ -1169,14 +1164,14 @@ public class AccessibilityTextTraversalTest
         assertEquals(8, Selection.getSelectionEnd(textView.getText()));
 
         // Move to the next word and wait for an event.
-        AccessibilityEvent fifthExpected = getInteractionBridge()
-                .executeCommandAndWaitForAccessibilityEvent(new Runnable() {
+        AccessibilityEvent fifthExpected = getInstrumentation().getUiAutomation()
+                .executeAndWaitForEvent(new Runnable() {
             @Override
             public void run() {
-                getInteractionBridge().performAction(text,
+                text.performAction(
                         AccessibilityNodeInfo.ACTION_PREVIOUS_AT_MOVEMENT_GRANULARITY, arguments);
             }
-        }, new AccessibilityEventFilter() {
+        }, new UiAutomation.AccessibilityEventFilter() {
             @Override
             public boolean accept(AccessibilityEvent event) {
                 return
@@ -1203,14 +1198,14 @@ public class AccessibilityTextTraversalTest
         assertEquals(4, Selection.getSelectionEnd(textView.getText()));
 
         // Move to the next character and wait for an event.
-        AccessibilityEvent sixthExpected = getInteractionBridge()
-                .executeCommandAndWaitForAccessibilityEvent(new Runnable() {
+        AccessibilityEvent sixthExpected = getInstrumentation().getUiAutomation()
+                .executeAndWaitForEvent(new Runnable() {
             @Override
             public void run() {
-                getInteractionBridge().performAction(text,
+                text.performAction(
                         AccessibilityNodeInfo.ACTION_PREVIOUS_AT_MOVEMENT_GRANULARITY, arguments);
             }
-        }, new AccessibilityEventFilter() {
+        }, new UiAutomation.AccessibilityEventFilter() {
             @Override
             public boolean accept(AccessibilityEvent event) {
                 return
@@ -1237,7 +1232,7 @@ public class AccessibilityTextTraversalTest
         assertEquals(0, Selection.getSelectionEnd(textView.getText()));
 
         // Make sure there is no previous.
-        assertFalse(getInteractionBridge().performAction(text,
+        assertFalse(text.performAction(
                 AccessibilityNodeInfo.ACTION_PREVIOUS_AT_MOVEMENT_GRANULARITY, arguments));
 
         // Verify the selection position.
@@ -1259,8 +1254,9 @@ public class AccessibilityTextTraversalTest
             }
         });
 
-        final AccessibilityNodeInfo text = getInteractionBridge()
-               .findAccessibilityNodeInfoByTextFromRoot(getString(R.string.foo_bar_baz));
+        final AccessibilityNodeInfo text = getInstrumentation().getUiAutomation()
+               .getRootInActiveWindow().findAccessibilityNodeInfosByText(getString(
+                       R.string.foo_bar_baz)).get(0);
 
         final int granularities = text.getMovementGranularities();
         assertEquals(granularities, AccessibilityNodeInfo.MOVEMENT_GRANULARITY_CHARACTER
@@ -1274,14 +1270,14 @@ public class AccessibilityTextTraversalTest
                 AccessibilityNodeInfo.MOVEMENT_GRANULARITY_WORD);
 
         // Move to the next word and wait for an event.
-        AccessibilityEvent firstExpected = getInteractionBridge()
-                .executeCommandAndWaitForAccessibilityEvent(new Runnable() {
+        AccessibilityEvent firstExpected = getInstrumentation().getUiAutomation()
+                .executeAndWaitForEvent(new Runnable() {
             @Override
             public void run() {
-                getInteractionBridge().performAction(text,
+                text.performAction(
                         AccessibilityNodeInfo.ACTION_NEXT_AT_MOVEMENT_GRANULARITY, arguments);
             }
-        }, new AccessibilityEventFilter() {
+        }, new UiAutomation.AccessibilityEventFilter() {
             @Override
             public boolean accept(AccessibilityEvent event) {
                 return
@@ -1309,14 +1305,14 @@ public class AccessibilityTextTraversalTest
         assertEquals(3, editText.getSelectionEnd());
 
         // Move to the next word and wait for an event.
-        AccessibilityEvent secondExpected = getInteractionBridge()
-                .executeCommandAndWaitForAccessibilityEvent(new Runnable() {
+        AccessibilityEvent secondExpected = getInstrumentation().getUiAutomation()
+                .executeAndWaitForEvent(new Runnable() {
             @Override
             public void run() {
-                getInteractionBridge().performAction(text,
+                text.performAction(
                         AccessibilityNodeInfo.ACTION_NEXT_AT_MOVEMENT_GRANULARITY, arguments);
             }
-        }, new AccessibilityEventFilter() {
+        }, new UiAutomation.AccessibilityEventFilter() {
             @Override
             public boolean accept(AccessibilityEvent event) {
                 return
@@ -1344,14 +1340,14 @@ public class AccessibilityTextTraversalTest
         assertEquals(7, editText.getSelectionEnd());
 
         // Move to the next word and wait for an event.
-        AccessibilityEvent thirdExpected = getInteractionBridge()
-                .executeCommandAndWaitForAccessibilityEvent(new Runnable() {
+        AccessibilityEvent thirdExpected = getInstrumentation().getUiAutomation()
+                .executeAndWaitForEvent(new Runnable() {
             @Override
             public void run() {
-                getInteractionBridge().performAction(text,
+                text.performAction(
                         AccessibilityNodeInfo.ACTION_NEXT_AT_MOVEMENT_GRANULARITY, arguments);
             }
-        }, new AccessibilityEventFilter() {
+        }, new UiAutomation.AccessibilityEventFilter() {
             @Override
             public boolean accept(AccessibilityEvent event) {
                 return
@@ -1379,7 +1375,7 @@ public class AccessibilityTextTraversalTest
         assertEquals(11, editText.getSelectionEnd());
 
         // Make sure there is no next.
-        assertFalse(getInteractionBridge().performAction(text,
+        assertFalse(text.performAction(
                 AccessibilityNodeInfo.ACTION_NEXT_AT_MOVEMENT_GRANULARITY, arguments));
 
         // Verify the selection position.
@@ -1387,14 +1383,14 @@ public class AccessibilityTextTraversalTest
         assertEquals(11, editText.getSelectionEnd());
 
         // Move to the next word and wait for an event.
-        AccessibilityEvent fourthExpected = getInteractionBridge()
-                .executeCommandAndWaitForAccessibilityEvent(new Runnable() {
+        AccessibilityEvent fourthExpected = getInstrumentation().getUiAutomation()
+                .executeAndWaitForEvent(new Runnable() {
             @Override
             public void run() {
-                getInteractionBridge().performAction(text,
+                text.performAction(
                         AccessibilityNodeInfo.ACTION_PREVIOUS_AT_MOVEMENT_GRANULARITY, arguments);
             }
-        }, new AccessibilityEventFilter() {
+        }, new UiAutomation.AccessibilityEventFilter() {
             @Override
             public boolean accept(AccessibilityEvent event) {
                 return
@@ -1422,14 +1418,14 @@ public class AccessibilityTextTraversalTest
         assertEquals(8, editText.getSelectionEnd());
 
         // Move to the next word and wait for an event.
-        AccessibilityEvent fifthExpected = getInteractionBridge()
-                .executeCommandAndWaitForAccessibilityEvent(new Runnable() {
+        AccessibilityEvent fifthExpected = getInstrumentation().getUiAutomation()
+                .executeAndWaitForEvent(new Runnable() {
             @Override
             public void run() {
-                getInteractionBridge().performAction(text,
+                text.performAction(
                         AccessibilityNodeInfo.ACTION_PREVIOUS_AT_MOVEMENT_GRANULARITY, arguments);
             }
-        }, new AccessibilityEventFilter() {
+        }, new UiAutomation.AccessibilityEventFilter() {
             @Override
             public boolean accept(AccessibilityEvent event) {
                 return
@@ -1457,14 +1453,14 @@ public class AccessibilityTextTraversalTest
         assertEquals(4, editText.getSelectionEnd());
 
         // Move to the next character and wait for an event.
-        AccessibilityEvent sixthExpected = getInteractionBridge()
-                .executeCommandAndWaitForAccessibilityEvent(new Runnable() {
+        AccessibilityEvent sixthExpected = getInstrumentation().getUiAutomation()
+                .executeAndWaitForEvent(new Runnable() {
             @Override
             public void run() {
-                getInteractionBridge().performAction(text,
+                text.performAction(
                         AccessibilityNodeInfo.ACTION_PREVIOUS_AT_MOVEMENT_GRANULARITY, arguments);
             }
-        }, new AccessibilityEventFilter() {
+        }, new UiAutomation.AccessibilityEventFilter() {
             @Override
             public boolean accept(AccessibilityEvent event) {
                 return
@@ -1492,7 +1488,7 @@ public class AccessibilityTextTraversalTest
         assertEquals(0, editText.getSelectionEnd());
 
         // Make sure there is no previous.
-        assertFalse(getInteractionBridge().performAction(text,
+        assertFalse(text.performAction(
                 AccessibilityNodeInfo.ACTION_PREVIOUS_AT_MOVEMENT_GRANULARITY, arguments));
 
         // Verify the selection position.
@@ -1512,8 +1508,9 @@ public class AccessibilityTextTraversalTest
             }
         });
 
-        final AccessibilityNodeInfo text = getInteractionBridge()
-               .findAccessibilityNodeInfoByTextFromRoot(getString(R.string.foo_bar_baz));
+        final AccessibilityNodeInfo text = getInstrumentation().getUiAutomation()
+               .getRootInActiveWindow().findAccessibilityNodeInfosByText(getString(
+                       R.string.foo_bar_baz)).get(0);
 
         final int granularities = text.getMovementGranularities();
         assertEquals(granularities, AccessibilityNodeInfo.MOVEMENT_GRANULARITY_CHARACTER
@@ -1528,14 +1525,14 @@ public class AccessibilityTextTraversalTest
         arguments.putBoolean(AccessibilityNodeInfo.ACTION_ARGUMENT_EXTEND_SELECTION_BOOLEAN, true);
 
         // Move to the next word and wait for an event.
-        AccessibilityEvent firstExpected = getInteractionBridge()
-                .executeCommandAndWaitForAccessibilityEvent(new Runnable() {
+        AccessibilityEvent firstExpected = getInstrumentation().getUiAutomation()
+                .executeAndWaitForEvent(new Runnable() {
             @Override
             public void run() {
-                getInteractionBridge().performAction(text,
+                text.performAction(
                         AccessibilityNodeInfo.ACTION_NEXT_AT_MOVEMENT_GRANULARITY, arguments);
             }
-        }, new AccessibilityEventFilter() {
+        }, new UiAutomation.AccessibilityEventFilter() {
             @Override
             public boolean accept(AccessibilityEvent event) {
                 return
@@ -1562,14 +1559,14 @@ public class AccessibilityTextTraversalTest
         assertEquals(3, Selection.getSelectionEnd(editText.getText()));
 
         // Move to the next word and wait for an event.
-        AccessibilityEvent secondExpected = getInteractionBridge()
-                .executeCommandAndWaitForAccessibilityEvent(new Runnable() {
+        AccessibilityEvent secondExpected = getInstrumentation().getUiAutomation()
+                .executeAndWaitForEvent(new Runnable() {
             @Override
             public void run() {
-                getInteractionBridge().performAction(text,
+                text.performAction(
                         AccessibilityNodeInfo.ACTION_NEXT_AT_MOVEMENT_GRANULARITY, arguments);
             }
-        }, new AccessibilityEventFilter() {
+        }, new UiAutomation.AccessibilityEventFilter() {
             @Override
             public boolean accept(AccessibilityEvent event) {
                 return
@@ -1596,14 +1593,14 @@ public class AccessibilityTextTraversalTest
         assertEquals(7, Selection.getSelectionEnd(editText.getText()));
 
         // Move to the next word and wait for an event.
-        AccessibilityEvent thirdExpected = getInteractionBridge()
-                .executeCommandAndWaitForAccessibilityEvent(new Runnable() {
+        AccessibilityEvent thirdExpected = getInstrumentation().getUiAutomation()
+                .executeAndWaitForEvent(new Runnable() {
             @Override
             public void run() {
-                getInteractionBridge().performAction(text,
+                text.performAction(
                         AccessibilityNodeInfo.ACTION_NEXT_AT_MOVEMENT_GRANULARITY, arguments);
             }
-        }, new AccessibilityEventFilter() {
+        }, new UiAutomation.AccessibilityEventFilter() {
             @Override
             public boolean accept(AccessibilityEvent event) {
                 return
@@ -1630,7 +1627,7 @@ public class AccessibilityTextTraversalTest
         assertEquals(11, Selection.getSelectionEnd(editText.getText()));
 
         // Make sure there is no next.
-        assertFalse(getInteractionBridge().performAction(text,
+        assertFalse(text.performAction(
                 AccessibilityNodeInfo.ACTION_NEXT_AT_MOVEMENT_GRANULARITY, arguments));
 
         // Focus the view so we can change selection.
@@ -1646,7 +1643,7 @@ public class AccessibilityTextTraversalTest
         Bundle setSelectionArgs = new Bundle();
         setSelectionArgs.putInt(AccessibilityNodeInfo.ACTION_ARGUMENT_SELECTION_START_INT, 11);
         setSelectionArgs.putInt(AccessibilityNodeInfo.ACTION_ARGUMENT_SELECTION_END_INT, 11);
-        assertTrue(getInteractionBridge().performAction(text,
+        assertTrue(text.performAction(
                 AccessibilityNodeInfo.ACTION_SET_SELECTION, setSelectionArgs));
 
         // Verify the selection position.
@@ -1663,14 +1660,14 @@ public class AccessibilityTextTraversalTest
         });
 
         // Move to the next word and wait for an event.
-        AccessibilityEvent fourthExpected = getInteractionBridge()
-                .executeCommandAndWaitForAccessibilityEvent(new Runnable() {
+        AccessibilityEvent fourthExpected = getInstrumentation().getUiAutomation()
+                .executeAndWaitForEvent(new Runnable() {
             @Override
             public void run() {
-                getInteractionBridge().performAction(text,
+                text.performAction(
                         AccessibilityNodeInfo.ACTION_PREVIOUS_AT_MOVEMENT_GRANULARITY, arguments);
             }
-        }, new AccessibilityEventFilter() {
+        }, new UiAutomation.AccessibilityEventFilter() {
             @Override
             public boolean accept(AccessibilityEvent event) {
                 return
@@ -1697,14 +1694,14 @@ public class AccessibilityTextTraversalTest
         assertEquals(11, Selection.getSelectionEnd(editText.getText()));
 
         // Move to the next word and wait for an event.
-        AccessibilityEvent fifthExpected = getInteractionBridge()
-                .executeCommandAndWaitForAccessibilityEvent(new Runnable() {
+        AccessibilityEvent fifthExpected = getInstrumentation().getUiAutomation()
+                .executeAndWaitForEvent(new Runnable() {
             @Override
             public void run() {
-                getInteractionBridge().performAction(text,
+                text.performAction(
                         AccessibilityNodeInfo.ACTION_PREVIOUS_AT_MOVEMENT_GRANULARITY, arguments);
             }
-        }, new AccessibilityEventFilter() {
+        }, new UiAutomation.AccessibilityEventFilter() {
             @Override
             public boolean accept(AccessibilityEvent event) {
                 return
@@ -1731,14 +1728,14 @@ public class AccessibilityTextTraversalTest
         assertEquals(11, Selection.getSelectionEnd(editText.getText()));
 
         // Move to the next character and wait for an event.
-        AccessibilityEvent sixthExpected = getInteractionBridge()
-                .executeCommandAndWaitForAccessibilityEvent(new Runnable() {
+        AccessibilityEvent sixthExpected = getInstrumentation().getUiAutomation()
+                .executeAndWaitForEvent(new Runnable() {
             @Override
             public void run() {
-                getInteractionBridge().performAction(text,
+                text.performAction(
                         AccessibilityNodeInfo.ACTION_PREVIOUS_AT_MOVEMENT_GRANULARITY, arguments);
             }
-        }, new AccessibilityEventFilter() {
+        }, new UiAutomation.AccessibilityEventFilter() {
             @Override
             public boolean accept(AccessibilityEvent event) {
                 return
@@ -1765,7 +1762,7 @@ public class AccessibilityTextTraversalTest
         assertEquals(11, Selection.getSelectionEnd(editText.getText()));
 
         // Make sure there is no previous.
-        assertFalse(getInteractionBridge().performAction(text,
+        assertFalse(text.performAction(
                 AccessibilityNodeInfo.ACTION_PREVIOUS_AT_MOVEMENT_GRANULARITY, arguments));
 
         // Verify the selection position.
@@ -1784,8 +1781,9 @@ public class AccessibilityTextTraversalTest
             }
         });
 
-        final AccessibilityNodeInfo text = getInteractionBridge()
-               .findAccessibilityNodeInfoByTextFromRoot(getString(R.string.android_wiki_short));
+        final AccessibilityNodeInfo text = getInstrumentation().getUiAutomation()
+               .getRootInActiveWindow().findAccessibilityNodeInfosByText(getString(
+                       R.string.android_wiki_short)).get(0);
 
         final int granularities = text.getMovementGranularities();
         assertEquals(granularities, AccessibilityNodeInfo.MOVEMENT_GRANULARITY_CHARACTER
@@ -1799,14 +1797,14 @@ public class AccessibilityTextTraversalTest
                 AccessibilityNodeInfo.MOVEMENT_GRANULARITY_LINE);
 
         // Move to the next line and wait for an event.
-        AccessibilityEvent firstExpected = getInteractionBridge()
-                .executeCommandAndWaitForAccessibilityEvent(new Runnable() {
+        AccessibilityEvent firstExpected = getInstrumentation().getUiAutomation()
+                .executeAndWaitForEvent(new Runnable() {
             @Override
             public void run() {
-                getInteractionBridge().performAction(text,
+                text.performAction(
                         AccessibilityNodeInfo.ACTION_NEXT_AT_MOVEMENT_GRANULARITY, arguments);
             }
-        }, new AccessibilityEventFilter() {
+        }, new UiAutomation.AccessibilityEventFilter() {
             @Override
             public boolean accept(AccessibilityEvent event) {
                 return
@@ -1834,14 +1832,14 @@ public class AccessibilityTextTraversalTest
         assertEquals(25, Selection.getSelectionEnd(textView.getText()));
 
         // Move to the next line and wait for an event.
-        AccessibilityEvent secondExpected = getInteractionBridge()
-                .executeCommandAndWaitForAccessibilityEvent(new Runnable() {
+        AccessibilityEvent secondExpected = getInstrumentation().getUiAutomation()
+                .executeAndWaitForEvent(new Runnable() {
             @Override
             public void run() {
-                getInteractionBridge().performAction(text,
+                text.performAction(
                         AccessibilityNodeInfo.ACTION_NEXT_AT_MOVEMENT_GRANULARITY, arguments);
             }
-        }, new AccessibilityEventFilter() {
+        }, new UiAutomation.AccessibilityEventFilter() {
             @Override
             public boolean accept(AccessibilityEvent event) {
                 return
@@ -1869,14 +1867,14 @@ public class AccessibilityTextTraversalTest
         assertEquals(53, Selection.getSelectionEnd(textView.getText()));
 
         // Move to the next line and wait for an event.
-        AccessibilityEvent thirdExpected = getInteractionBridge()
-                .executeCommandAndWaitForAccessibilityEvent(new Runnable() {
+        AccessibilityEvent thirdExpected = getInstrumentation().getUiAutomation()
+                .executeAndWaitForEvent(new Runnable() {
             @Override
             public void run() {
-                getInteractionBridge().performAction(text,
+                text.performAction(
                         AccessibilityNodeInfo.ACTION_NEXT_AT_MOVEMENT_GRANULARITY, arguments);
             }
-        }, new AccessibilityEventFilter() {
+        }, new UiAutomation.AccessibilityEventFilter() {
             @Override
             public boolean accept(AccessibilityEvent event) {
                 return
@@ -1904,7 +1902,7 @@ public class AccessibilityTextTraversalTest
         assertEquals(60, Selection.getSelectionEnd(textView.getText()));
 
         // Make sure there is no next.
-        assertFalse(getInteractionBridge().performAction(text,
+        assertFalse(text.performAction(
                 AccessibilityNodeInfo.ACTION_NEXT_AT_MOVEMENT_GRANULARITY, arguments));
 
         // Verify the selection position.
@@ -1912,14 +1910,14 @@ public class AccessibilityTextTraversalTest
         assertEquals(60, Selection.getSelectionEnd(textView.getText()));
 
         // Move to the previous line and wait for an event.
-        AccessibilityEvent fourthExpected = getInteractionBridge()
-                .executeCommandAndWaitForAccessibilityEvent(new Runnable() {
+        AccessibilityEvent fourthExpected = getInstrumentation().getUiAutomation()
+                .executeAndWaitForEvent(new Runnable() {
             @Override
             public void run() {
-                getInteractionBridge().performAction(text,
+                text.performAction(
                         AccessibilityNodeInfo.ACTION_PREVIOUS_AT_MOVEMENT_GRANULARITY, arguments);
             }
-        }, new AccessibilityEventFilter() {
+        }, new UiAutomation.AccessibilityEventFilter() {
             @Override
             public boolean accept(AccessibilityEvent event) {
                 return
@@ -1947,14 +1945,14 @@ public class AccessibilityTextTraversalTest
         assertEquals(53, Selection.getSelectionEnd(textView.getText()));
 
         // Move to the previous line and wait for an event.
-        AccessibilityEvent fifthExpected = getInteractionBridge()
-                .executeCommandAndWaitForAccessibilityEvent(new Runnable() {
+        AccessibilityEvent fifthExpected = getInstrumentation().getUiAutomation()
+                .executeAndWaitForEvent(new Runnable() {
             @Override
             public void run() {
-                getInteractionBridge().performAction(text,
+                text.performAction(
                         AccessibilityNodeInfo.ACTION_PREVIOUS_AT_MOVEMENT_GRANULARITY, arguments);
             }
-        }, new AccessibilityEventFilter() {
+        }, new UiAutomation.AccessibilityEventFilter() {
             @Override
             public boolean accept(AccessibilityEvent event) {
                 return
@@ -1982,14 +1980,14 @@ public class AccessibilityTextTraversalTest
         assertEquals(25, Selection.getSelectionEnd(textView.getText()));
 
         // Move to the previous line and wait for an event.
-        AccessibilityEvent sixthExpected = getInteractionBridge()
-                .executeCommandAndWaitForAccessibilityEvent(new Runnable() {
+        AccessibilityEvent sixthExpected = getInstrumentation().getUiAutomation()
+                .executeAndWaitForEvent(new Runnable() {
             @Override
             public void run() {
-                getInteractionBridge().performAction(text,
+                text.performAction(
                         AccessibilityNodeInfo.ACTION_PREVIOUS_AT_MOVEMENT_GRANULARITY, arguments);
             }
-        }, new AccessibilityEventFilter() {
+        }, new UiAutomation.AccessibilityEventFilter() {
             @Override
             public boolean accept(AccessibilityEvent event) {
                 return
@@ -2017,7 +2015,7 @@ public class AccessibilityTextTraversalTest
         assertEquals(0, Selection.getSelectionEnd(textView.getText()));
 
         // Make sure there is no previous.
-        assertFalse(getInteractionBridge().performAction(text,
+        assertFalse(text.performAction(
                 AccessibilityNodeInfo.ACTION_PREVIOUS_AT_MOVEMENT_GRANULARITY, arguments));
 
         // Verify the selection position.
@@ -2037,8 +2035,9 @@ public class AccessibilityTextTraversalTest
             }
         });
 
-        final AccessibilityNodeInfo text = getInteractionBridge()
-               .findAccessibilityNodeInfoByTextFromRoot(getString(R.string.android_wiki_short));
+        final AccessibilityNodeInfo text = getInstrumentation().getUiAutomation()
+               .getRootInActiveWindow().findAccessibilityNodeInfosByText(getString(
+                       R.string.android_wiki_short)).get(0);
 
         final int granularities = text.getMovementGranularities();
         assertEquals(granularities, AccessibilityNodeInfo.MOVEMENT_GRANULARITY_CHARACTER
@@ -2053,14 +2052,14 @@ public class AccessibilityTextTraversalTest
         arguments.putBoolean(AccessibilityNodeInfo.ACTION_ARGUMENT_EXTEND_SELECTION_BOOLEAN, true);
 
         // Move to the next line and wait for an event.
-        AccessibilityEvent firstExpected = getInteractionBridge()
-                .executeCommandAndWaitForAccessibilityEvent(new Runnable() {
+        AccessibilityEvent firstExpected = getInstrumentation().getUiAutomation()
+                .executeAndWaitForEvent(new Runnable() {
             @Override
             public void run() {
-                getInteractionBridge().performAction(text,
+                text.performAction(
                         AccessibilityNodeInfo.ACTION_NEXT_AT_MOVEMENT_GRANULARITY, arguments);
             }
-        }, new AccessibilityEventFilter() {
+        }, new UiAutomation.AccessibilityEventFilter() {
             @Override
             public boolean accept(AccessibilityEvent event) {
                 return
@@ -2088,14 +2087,14 @@ public class AccessibilityTextTraversalTest
         assertEquals(19, Selection.getSelectionEnd(editText.getText()));
 
         // Move to the next line and wait for an event.
-        AccessibilityEvent secondExpected = getInteractionBridge()
-                .executeCommandAndWaitForAccessibilityEvent(new Runnable() {
+        AccessibilityEvent secondExpected = getInstrumentation().getUiAutomation()
+                .executeAndWaitForEvent(new Runnable() {
             @Override
             public void run() {
-                getInteractionBridge().performAction(text,
+                text.performAction(
                         AccessibilityNodeInfo.ACTION_NEXT_AT_MOVEMENT_GRANULARITY, arguments);
             }
-        }, new AccessibilityEventFilter() {
+        }, new UiAutomation.AccessibilityEventFilter() {
             @Override
             public boolean accept(AccessibilityEvent event) {
                 return
@@ -2123,14 +2122,14 @@ public class AccessibilityTextTraversalTest
         assertEquals(35, Selection.getSelectionEnd(editText.getText()));
 
         // Move to the next line and wait for an event.
-        AccessibilityEvent thirdExpected = getInteractionBridge()
-                .executeCommandAndWaitForAccessibilityEvent(new Runnable() {
+        AccessibilityEvent thirdExpected = getInstrumentation().getUiAutomation()
+                .executeAndWaitForEvent(new Runnable() {
             @Override
             public void run() {
-                getInteractionBridge().performAction(text,
+                text.performAction(
                         AccessibilityNodeInfo.ACTION_NEXT_AT_MOVEMENT_GRANULARITY, arguments);
             }
-        }, new AccessibilityEventFilter() {
+        }, new UiAutomation.AccessibilityEventFilter() {
             @Override
             public boolean accept(AccessibilityEvent event) {
                 return
@@ -2170,7 +2169,7 @@ public class AccessibilityTextTraversalTest
         Bundle setSelectionArgs = new Bundle();
         setSelectionArgs.putInt(AccessibilityNodeInfo.ACTION_ARGUMENT_SELECTION_START_INT, 53);
         setSelectionArgs.putInt(AccessibilityNodeInfo.ACTION_ARGUMENT_SELECTION_END_INT, 53);
-        assertTrue(getInteractionBridge().performAction(text,
+        assertTrue(text.performAction(
                 AccessibilityNodeInfo.ACTION_SET_SELECTION, setSelectionArgs));
 
         // Verify the selection position.
@@ -2187,14 +2186,14 @@ public class AccessibilityTextTraversalTest
         });
 
         // Move to the previous line and wait for an event.
-        AccessibilityEvent fourthExpected = getInteractionBridge()
-                .executeCommandAndWaitForAccessibilityEvent(new Runnable() {
+        AccessibilityEvent fourthExpected = getInstrumentation().getUiAutomation()
+                .executeAndWaitForEvent(new Runnable() {
             @Override
             public void run() {
-                getInteractionBridge().performAction(text,
+                text.performAction(
                         AccessibilityNodeInfo.ACTION_PREVIOUS_AT_MOVEMENT_GRANULARITY, arguments);
             }
-        }, new AccessibilityEventFilter() {
+        }, new UiAutomation.AccessibilityEventFilter() {
             @Override
             public boolean accept(AccessibilityEvent event) {
                 return
@@ -2222,14 +2221,14 @@ public class AccessibilityTextTraversalTest
         assertEquals(53, Selection.getSelectionEnd(editText.getText()));
 
         // Move to the previous line and wait for an event.
-        AccessibilityEvent fifthExpected = getInteractionBridge()
-                .executeCommandAndWaitForAccessibilityEvent(new Runnable() {
+        AccessibilityEvent fifthExpected = getInstrumentation().getUiAutomation()
+                .executeAndWaitForEvent(new Runnable() {
             @Override
             public void run() {
-                getInteractionBridge().performAction(text,
+                text.performAction(
                         AccessibilityNodeInfo.ACTION_PREVIOUS_AT_MOVEMENT_GRANULARITY, arguments);
             }
-        }, new AccessibilityEventFilter() {
+        }, new UiAutomation.AccessibilityEventFilter() {
             @Override
             public boolean accept(AccessibilityEvent event) {
                 return
@@ -2257,14 +2256,14 @@ public class AccessibilityTextTraversalTest
         assertEquals(53, Selection.getSelectionEnd(editText.getText()));
 
         // Move to the previous line and wait for an event.
-        AccessibilityEvent sixthExpected = getInteractionBridge()
-                .executeCommandAndWaitForAccessibilityEvent(new Runnable() {
+        AccessibilityEvent sixthExpected = getInstrumentation().getUiAutomation()
+                .executeAndWaitForEvent(new Runnable() {
             @Override
             public void run() {
-                getInteractionBridge().performAction(text,
+                text.performAction(
                         AccessibilityNodeInfo.ACTION_PREVIOUS_AT_MOVEMENT_GRANULARITY, arguments);
             }
-        }, new AccessibilityEventFilter() {
+        }, new UiAutomation.AccessibilityEventFilter() {
             @Override
             public boolean accept(AccessibilityEvent event) {
                 return
@@ -2292,7 +2291,7 @@ public class AccessibilityTextTraversalTest
         assertEquals(53, Selection.getSelectionEnd(editText.getText()));
 
         // Make sure there is no previous.
-        assertFalse(getInteractionBridge().performAction(text,
+        assertFalse(text.performAction(
                 AccessibilityNodeInfo.ACTION_PREVIOUS_AT_MOVEMENT_GRANULARITY, arguments));
 
         // Verify the selection position.
@@ -2312,8 +2311,9 @@ public class AccessibilityTextTraversalTest
             }
         });
 
-        final AccessibilityNodeInfo text = getInteractionBridge()
-               .findAccessibilityNodeInfoByTextFromRoot(getString(R.string.android_wiki));
+        final AccessibilityNodeInfo text = getInstrumentation().getUiAutomation()
+               .getRootInActiveWindow().findAccessibilityNodeInfosByText(getString(
+                       R.string.android_wiki)).get(0);
 
         final int granularities = text.getMovementGranularities();
         assertEquals(granularities, AccessibilityNodeInfo.MOVEMENT_GRANULARITY_CHARACTER
@@ -2327,14 +2327,14 @@ public class AccessibilityTextTraversalTest
                 AccessibilityNodeInfo.MOVEMENT_GRANULARITY_PAGE);
 
         // Move to the next page and wait for an event.
-        AccessibilityEvent firstExpected = getInteractionBridge()
-                .executeCommandAndWaitForAccessibilityEvent(new Runnable() {
+        AccessibilityEvent firstExpected = getInstrumentation().getUiAutomation()
+                .executeAndWaitForEvent(new Runnable() {
             @Override
             public void run() {
-                getInteractionBridge().performAction(text,
+                text.performAction(
                         AccessibilityNodeInfo.ACTION_NEXT_AT_MOVEMENT_GRANULARITY, arguments);
             }
-        }, new AccessibilityEventFilter() {
+        }, new UiAutomation.AccessibilityEventFilter() {
             @Override
             public boolean accept(AccessibilityEvent event) {
                 return
@@ -2362,14 +2362,14 @@ public class AccessibilityTextTraversalTest
         assertEquals(139, Selection.getSelectionEnd(editText.getText()));
 
         // Move to the next page and wait for an event.
-        AccessibilityEvent secondExpected = getInteractionBridge()
-                .executeCommandAndWaitForAccessibilityEvent(new Runnable() {
+        AccessibilityEvent secondExpected = getInstrumentation().getUiAutomation()
+                .executeAndWaitForEvent(new Runnable() {
             @Override
             public void run() {
-                getInteractionBridge().performAction(text,
+                text.performAction(
                         AccessibilityNodeInfo.ACTION_NEXT_AT_MOVEMENT_GRANULARITY, arguments);
             }
-        }, new AccessibilityEventFilter() {
+        }, new UiAutomation.AccessibilityEventFilter() {
             @Override
             public boolean accept(AccessibilityEvent event) {
                 return
@@ -2397,14 +2397,14 @@ public class AccessibilityTextTraversalTest
         assertEquals(285, Selection.getSelectionEnd(editText.getText()));
 
         // Move to the next page and wait for an event.
-        AccessibilityEvent thirdExpected = getInteractionBridge()
-                .executeCommandAndWaitForAccessibilityEvent(new Runnable() {
+        AccessibilityEvent thirdExpected = getInstrumentation().getUiAutomation()
+                .executeAndWaitForEvent(new Runnable() {
             @Override
             public void run() {
-                getInteractionBridge().performAction(text,
+                text.performAction(
                         AccessibilityNodeInfo.ACTION_NEXT_AT_MOVEMENT_GRANULARITY, arguments);
             }
-        }, new AccessibilityEventFilter() {
+        }, new UiAutomation.AccessibilityEventFilter() {
             @Override
             public boolean accept(AccessibilityEvent event) {
                 return
@@ -2432,7 +2432,7 @@ public class AccessibilityTextTraversalTest
         assertEquals(436, Selection.getSelectionEnd(editText.getText()));
 
         // Make sure there is no next.
-        assertFalse(getInteractionBridge().performAction(text,
+        assertFalse(text.performAction(
                 AccessibilityNodeInfo.ACTION_NEXT_AT_MOVEMENT_GRANULARITY, arguments));
 
         // Verify the selection position.
@@ -2440,14 +2440,14 @@ public class AccessibilityTextTraversalTest
         assertEquals(436, Selection.getSelectionEnd(editText.getText()));
 
         // Move to the previous page and wait for an event.
-        AccessibilityEvent fourthExpected = getInteractionBridge()
-                .executeCommandAndWaitForAccessibilityEvent(new Runnable() {
+        AccessibilityEvent fourthExpected = getInstrumentation().getUiAutomation()
+                .executeAndWaitForEvent(new Runnable() {
             @Override
             public void run() {
-                getInteractionBridge().performAction(text,
+                text.performAction(
                         AccessibilityNodeInfo.ACTION_PREVIOUS_AT_MOVEMENT_GRANULARITY, arguments);
             }
-        }, new AccessibilityEventFilter() {
+        }, new UiAutomation.AccessibilityEventFilter() {
             @Override
             public boolean accept(AccessibilityEvent event) {
                 return
@@ -2475,14 +2475,14 @@ public class AccessibilityTextTraversalTest
         assertEquals(285, Selection.getSelectionEnd(editText.getText()));
 
         // Move to the previous page and wait for an event.
-        AccessibilityEvent fifthExpected = getInteractionBridge()
-                .executeCommandAndWaitForAccessibilityEvent(new Runnable() {
+        AccessibilityEvent fifthExpected = getInstrumentation().getUiAutomation()
+                .executeAndWaitForEvent(new Runnable() {
             @Override
             public void run() {
-                getInteractionBridge().performAction(text,
+                text.performAction(
                         AccessibilityNodeInfo.ACTION_PREVIOUS_AT_MOVEMENT_GRANULARITY, arguments);
             }
-        }, new AccessibilityEventFilter() {
+        }, new UiAutomation.AccessibilityEventFilter() {
             @Override
             public boolean accept(AccessibilityEvent event) {
                 return
@@ -2510,14 +2510,14 @@ public class AccessibilityTextTraversalTest
         assertEquals(139, Selection.getSelectionEnd(editText.getText()));
 
         // Move to the previous page and wait for an event.
-        AccessibilityEvent sixthExpected = getInteractionBridge()
-                .executeCommandAndWaitForAccessibilityEvent(new Runnable() {
+        AccessibilityEvent sixthExpected = getInstrumentation().getUiAutomation()
+                .executeAndWaitForEvent(new Runnable() {
             @Override
             public void run() {
-                getInteractionBridge().performAction(text,
+                text.performAction(
                         AccessibilityNodeInfo.ACTION_PREVIOUS_AT_MOVEMENT_GRANULARITY, arguments);
             }
-        }, new AccessibilityEventFilter() {
+        }, new UiAutomation.AccessibilityEventFilter() {
             @Override
             public boolean accept(AccessibilityEvent event) {
                 return
@@ -2545,7 +2545,7 @@ public class AccessibilityTextTraversalTest
         assertEquals(0, Selection.getSelectionEnd(editText.getText()));
 
         // Make sure there is no previous.
-        assertFalse(getInteractionBridge().performAction(text,
+        assertFalse(text.performAction(
                 AccessibilityNodeInfo.ACTION_PREVIOUS_AT_MOVEMENT_GRANULARITY, arguments));
 
         // Verify the selection position.
@@ -2565,8 +2565,9 @@ public class AccessibilityTextTraversalTest
             }
         });
 
-        final AccessibilityNodeInfo text = getInteractionBridge()
-               .findAccessibilityNodeInfoByTextFromRoot(getString(R.string.android_wiki));
+        final AccessibilityNodeInfo text = getInstrumentation().getUiAutomation()
+               .getRootInActiveWindow().findAccessibilityNodeInfosByText(getString(
+                       R.string.android_wiki)).get(0);
 
         final int granularities = text.getMovementGranularities();
         assertEquals(granularities, AccessibilityNodeInfo.MOVEMENT_GRANULARITY_CHARACTER
@@ -2581,14 +2582,14 @@ public class AccessibilityTextTraversalTest
         arguments.putBoolean(AccessibilityNodeInfo.ACTION_ARGUMENT_EXTEND_SELECTION_BOOLEAN, true);
 
         // Move to the next page and wait for an event.
-        AccessibilityEvent firstExpected = getInteractionBridge()
-                .executeCommandAndWaitForAccessibilityEvent(new Runnable() {
+        AccessibilityEvent firstExpected = getInstrumentation().getUiAutomation()
+                .executeAndWaitForEvent(new Runnable() {
             @Override
             public void run() {
-                getInteractionBridge().performAction(text,
+                text.performAction(
                         AccessibilityNodeInfo.ACTION_NEXT_AT_MOVEMENT_GRANULARITY, arguments);
             }
-        }, new AccessibilityEventFilter() {
+        }, new UiAutomation.AccessibilityEventFilter() {
             @Override
             public boolean accept(AccessibilityEvent event) {
                 return
@@ -2616,14 +2617,14 @@ public class AccessibilityTextTraversalTest
         assertEquals(139, Selection.getSelectionEnd(editText.getText()));
 
         // Move to the next page and wait for an event.
-        AccessibilityEvent secondExpected = getInteractionBridge()
-                .executeCommandAndWaitForAccessibilityEvent(new Runnable() {
+        AccessibilityEvent secondExpected = getInstrumentation().getUiAutomation()
+                .executeAndWaitForEvent(new Runnable() {
             @Override
             public void run() {
-                getInteractionBridge().performAction(text,
+                text.performAction(
                         AccessibilityNodeInfo.ACTION_NEXT_AT_MOVEMENT_GRANULARITY, arguments);
             }
-        }, new AccessibilityEventFilter() {
+        }, new UiAutomation.AccessibilityEventFilter() {
             @Override
             public boolean accept(AccessibilityEvent event) {
                 return
@@ -2651,14 +2652,14 @@ public class AccessibilityTextTraversalTest
         assertEquals(285, Selection.getSelectionEnd(editText.getText()));
 
         // Move to the next page and wait for an event.
-        AccessibilityEvent thirdExpected = getInteractionBridge()
-                .executeCommandAndWaitForAccessibilityEvent(new Runnable() {
+        AccessibilityEvent thirdExpected = getInstrumentation().getUiAutomation()
+                .executeAndWaitForEvent(new Runnable() {
             @Override
             public void run() {
-                getInteractionBridge().performAction(text,
+                text.performAction(
                         AccessibilityNodeInfo.ACTION_NEXT_AT_MOVEMENT_GRANULARITY, arguments);
             }
-        }, new AccessibilityEventFilter() {
+        }, new UiAutomation.AccessibilityEventFilter() {
             @Override
             public boolean accept(AccessibilityEvent event) {
                 return
@@ -2686,7 +2687,7 @@ public class AccessibilityTextTraversalTest
         assertEquals(436, Selection.getSelectionEnd(editText.getText()));
 
         // Make sure there is no next.
-        assertFalse(getInteractionBridge().performAction(text,
+        assertFalse(text.performAction(
                 AccessibilityNodeInfo.ACTION_NEXT_AT_MOVEMENT_GRANULARITY, arguments));
 
         // Focus the view so we can change selection.
@@ -2702,7 +2703,7 @@ public class AccessibilityTextTraversalTest
         Bundle setSelectionArgs = new Bundle();
         setSelectionArgs.putInt(AccessibilityNodeInfo.ACTION_ARGUMENT_SELECTION_START_INT, 436);
         setSelectionArgs.putInt(AccessibilityNodeInfo.ACTION_ARGUMENT_SELECTION_END_INT, 436);
-        assertTrue(getInteractionBridge().performAction(text,
+        assertTrue(text.performAction(
                 AccessibilityNodeInfo.ACTION_SET_SELECTION, setSelectionArgs));
 
         // Verify the selection position.
@@ -2719,14 +2720,14 @@ public class AccessibilityTextTraversalTest
         });
 
         // Move to the previous page and wait for an event.
-        AccessibilityEvent fourthExpected = getInteractionBridge()
-                .executeCommandAndWaitForAccessibilityEvent(new Runnable() {
+        AccessibilityEvent fourthExpected = getInstrumentation().getUiAutomation()
+                .executeAndWaitForEvent(new Runnable() {
             @Override
             public void run() {
-                getInteractionBridge().performAction(text,
+                text.performAction(
                         AccessibilityNodeInfo.ACTION_PREVIOUS_AT_MOVEMENT_GRANULARITY, arguments);
             }
-        }, new AccessibilityEventFilter() {
+        }, new UiAutomation.AccessibilityEventFilter() {
             @Override
             public boolean accept(AccessibilityEvent event) {
                 return
@@ -2754,14 +2755,14 @@ public class AccessibilityTextTraversalTest
         assertEquals(436, Selection.getSelectionEnd(editText.getText()));
 
         // Move to the previous page and wait for an event.
-        AccessibilityEvent fifthExpected = getInteractionBridge()
-                .executeCommandAndWaitForAccessibilityEvent(new Runnable() {
+        AccessibilityEvent fifthExpected = getInstrumentation().getUiAutomation()
+                .executeAndWaitForEvent(new Runnable() {
             @Override
             public void run() {
-                getInteractionBridge().performAction(text,
+                text.performAction(
                         AccessibilityNodeInfo.ACTION_PREVIOUS_AT_MOVEMENT_GRANULARITY, arguments);
             }
-        }, new AccessibilityEventFilter() {
+        }, new UiAutomation.AccessibilityEventFilter() {
             @Override
             public boolean accept(AccessibilityEvent event) {
                 return
@@ -2789,14 +2790,14 @@ public class AccessibilityTextTraversalTest
         assertEquals(436, Selection.getSelectionEnd(editText.getText()));
 
         // Move to the previous page and wait for an event.
-        AccessibilityEvent sixthExpected = getInteractionBridge()
-                .executeCommandAndWaitForAccessibilityEvent(new Runnable() {
+        AccessibilityEvent sixthExpected = getInstrumentation().getUiAutomation()
+                .executeAndWaitForEvent(new Runnable() {
             @Override
             public void run() {
-                getInteractionBridge().performAction(text,
+                text.performAction(
                         AccessibilityNodeInfo.ACTION_PREVIOUS_AT_MOVEMENT_GRANULARITY, arguments);
             }
-        }, new AccessibilityEventFilter() {
+        }, new UiAutomation.AccessibilityEventFilter() {
             @Override
             public boolean accept(AccessibilityEvent event) {
                 return
@@ -2824,7 +2825,7 @@ public class AccessibilityTextTraversalTest
         assertEquals(436, Selection.getSelectionEnd(editText.getText()));
 
         // Make sure there is no previous.
-        assertFalse(getInteractionBridge().performAction(text,
+        assertFalse(text.performAction(
                 AccessibilityNodeInfo.ACTION_PREVIOUS_AT_MOVEMENT_GRANULARITY, arguments));
 
         // Verify the selection position.
@@ -2843,8 +2844,9 @@ public class AccessibilityTextTraversalTest
             }
         });
 
-        final AccessibilityNodeInfo text = getInteractionBridge()
-               .findAccessibilityNodeInfoByTextFromRoot(getString(R.string.android_wiki_short));
+        final AccessibilityNodeInfo text = getInstrumentation().getUiAutomation()
+               .getRootInActiveWindow().findAccessibilityNodeInfosByText(getString(
+                       R.string.android_wiki_short)).get(0);
 
         final int granularities = text.getMovementGranularities();
         assertEquals(granularities, AccessibilityNodeInfo.MOVEMENT_GRANULARITY_CHARACTER
@@ -2858,14 +2860,14 @@ public class AccessibilityTextTraversalTest
                 AccessibilityNodeInfo.MOVEMENT_GRANULARITY_PARAGRAPH);
 
         // Move to the next paragraph and wait for an event.
-        AccessibilityEvent firstExpected = getInteractionBridge()
-                .executeCommandAndWaitForAccessibilityEvent(new Runnable() {
+        AccessibilityEvent firstExpected = getInstrumentation().getUiAutomation()
+                .executeAndWaitForEvent(new Runnable() {
             @Override
             public void run() {
-                getInteractionBridge().performAction(text,
+                text.performAction(
                         AccessibilityNodeInfo.ACTION_NEXT_AT_MOVEMENT_GRANULARITY, arguments);
             }
-        }, new AccessibilityEventFilter() {
+        }, new UiAutomation.AccessibilityEventFilter() {
             @Override
             public boolean accept(AccessibilityEvent event) {
                 return
@@ -2893,14 +2895,14 @@ public class AccessibilityTextTraversalTest
         assertEquals(104, Selection.getSelectionEnd(textView.getText()));
 
         // Move to the next paragraph and wait for an event.
-        AccessibilityEvent secondExpected = getInteractionBridge()
-                .executeCommandAndWaitForAccessibilityEvent(new Runnable() {
+        AccessibilityEvent secondExpected = getInstrumentation().getUiAutomation()
+                .executeAndWaitForEvent(new Runnable() {
             @Override
             public void run() {
-                getInteractionBridge().performAction(text,
+                text.performAction(
                         AccessibilityNodeInfo.ACTION_NEXT_AT_MOVEMENT_GRANULARITY, arguments);
             }
-        }, new AccessibilityEventFilter() {
+        }, new UiAutomation.AccessibilityEventFilter() {
             @Override
             public boolean accept(AccessibilityEvent event) {
                 return
@@ -2928,14 +2930,14 @@ public class AccessibilityTextTraversalTest
         assertEquals(267, Selection.getSelectionEnd(textView.getText()));
 
         // Move to the next paragraph and wait for an event.
-        AccessibilityEvent thirdExpected = getInteractionBridge()
-                .executeCommandAndWaitForAccessibilityEvent(new Runnable() {
+        AccessibilityEvent thirdExpected = getInstrumentation().getUiAutomation()
+                .executeAndWaitForEvent(new Runnable() {
             @Override
             public void run() {
-                getInteractionBridge().performAction(text,
+                text.performAction(
                         AccessibilityNodeInfo.ACTION_NEXT_AT_MOVEMENT_GRANULARITY, arguments);
             }
-        }, new AccessibilityEventFilter() {
+        }, new UiAutomation.AccessibilityEventFilter() {
             @Override
             public boolean accept(AccessibilityEvent event) {
                 return
@@ -2963,7 +2965,7 @@ public class AccessibilityTextTraversalTest
         assertEquals(582, Selection.getSelectionEnd(textView.getText()));
 
         // Make sure there is no next.
-        assertFalse(getInteractionBridge().performAction(text,
+        assertFalse(text.performAction(
                 AccessibilityNodeInfo.ACTION_NEXT_AT_MOVEMENT_GRANULARITY, arguments));
 
         // Verify the selection position.
@@ -2971,14 +2973,14 @@ public class AccessibilityTextTraversalTest
         assertEquals(582, Selection.getSelectionEnd(textView.getText()));
 
         // Move to the previous paragraph and wait for an event.
-        AccessibilityEvent fourthExpected = getInteractionBridge()
-                .executeCommandAndWaitForAccessibilityEvent(new Runnable() {
+        AccessibilityEvent fourthExpected = getInstrumentation().getUiAutomation()
+                .executeAndWaitForEvent(new Runnable() {
             @Override
             public void run() {
-                getInteractionBridge().performAction(text,
+                text.performAction(
                         AccessibilityNodeInfo.ACTION_PREVIOUS_AT_MOVEMENT_GRANULARITY, arguments);
             }
-        }, new AccessibilityEventFilter() {
+        }, new UiAutomation.AccessibilityEventFilter() {
             @Override
             public boolean accept(AccessibilityEvent event) {
                 return
@@ -3006,14 +3008,14 @@ public class AccessibilityTextTraversalTest
         assertEquals(268, Selection.getSelectionEnd(textView.getText()));
 
         // Move to the previous paragraph and wait for an event.
-        AccessibilityEvent fifthExpected = getInteractionBridge()
-                .executeCommandAndWaitForAccessibilityEvent(new Runnable() {
+        AccessibilityEvent fifthExpected = getInstrumentation().getUiAutomation()
+                .executeAndWaitForEvent(new Runnable() {
             @Override
             public void run() {
-                getInteractionBridge().performAction(text,
+                text.performAction(
                         AccessibilityNodeInfo.ACTION_PREVIOUS_AT_MOVEMENT_GRANULARITY, arguments);
             }
-        }, new AccessibilityEventFilter() {
+        }, new UiAutomation.AccessibilityEventFilter() {
             @Override
             public boolean accept(AccessibilityEvent event) {
                 return
@@ -3041,14 +3043,14 @@ public class AccessibilityTextTraversalTest
         assertEquals(106, Selection.getSelectionEnd(textView.getText()));
 
         // Move to the previous paragraph and wait for an event.
-        AccessibilityEvent sixthExpected = getInteractionBridge()
-                .executeCommandAndWaitForAccessibilityEvent(new Runnable() {
+        AccessibilityEvent sixthExpected = getInstrumentation().getUiAutomation()
+                .executeAndWaitForEvent(new Runnable() {
             @Override
             public void run() {
-                getInteractionBridge().performAction(text,
+                text.performAction(
                         AccessibilityNodeInfo.ACTION_PREVIOUS_AT_MOVEMENT_GRANULARITY, arguments);
             }
-        }, new AccessibilityEventFilter() {
+        }, new UiAutomation.AccessibilityEventFilter() {
             @Override
             public boolean accept(AccessibilityEvent event) {
                 return
@@ -3076,7 +3078,7 @@ public class AccessibilityTextTraversalTest
         assertEquals(2, Selection.getSelectionEnd(textView.getText()));
 
         // Make sure there is no previous.
-        assertFalse(getInteractionBridge().performAction(text,
+        assertFalse(text.performAction(
                 AccessibilityNodeInfo.ACTION_PREVIOUS_AT_MOVEMENT_GRANULARITY, arguments));
 
         // Verify the selection position.
@@ -3096,8 +3098,9 @@ public class AccessibilityTextTraversalTest
             }
         });
 
-        final AccessibilityNodeInfo text = getInteractionBridge()
-               .findAccessibilityNodeInfoByTextFromRoot(getString(R.string.android_wiki_short));
+        final AccessibilityNodeInfo text = getInstrumentation().getUiAutomation()
+               .getRootInActiveWindow().findAccessibilityNodeInfosByText(getString(
+                       R.string.android_wiki_short)).get(0);
 
         final int granularities = text.getMovementGranularities();
         assertEquals(granularities, AccessibilityNodeInfo.MOVEMENT_GRANULARITY_CHARACTER
@@ -3112,14 +3115,14 @@ public class AccessibilityTextTraversalTest
         arguments.putBoolean(AccessibilityNodeInfo.ACTION_ARGUMENT_EXTEND_SELECTION_BOOLEAN, true);
 
         // Move to the next paragraph and wait for an event.
-        AccessibilityEvent firstExpected = getInteractionBridge()
-                .executeCommandAndWaitForAccessibilityEvent(new Runnable() {
+        AccessibilityEvent firstExpected = getInstrumentation().getUiAutomation()
+                .executeAndWaitForEvent(new Runnable() {
             @Override
             public void run() {
-                getInteractionBridge().performAction(text,
+                text.performAction(
                         AccessibilityNodeInfo.ACTION_NEXT_AT_MOVEMENT_GRANULARITY, arguments);
             }
-        }, new AccessibilityEventFilter() {
+        }, new UiAutomation.AccessibilityEventFilter() {
             @Override
             public boolean accept(AccessibilityEvent event) {
                 return
@@ -3147,14 +3150,14 @@ public class AccessibilityTextTraversalTest
         assertEquals(104, Selection.getSelectionEnd(editText.getText()));
 
         // Move to the next paragraph and wait for an event.
-        AccessibilityEvent secondExpected = getInteractionBridge()
-                .executeCommandAndWaitForAccessibilityEvent(new Runnable() {
+        AccessibilityEvent secondExpected = getInstrumentation().getUiAutomation()
+                .executeAndWaitForEvent(new Runnable() {
             @Override
             public void run() {
-                getInteractionBridge().performAction(text,
+                text.performAction(
                         AccessibilityNodeInfo.ACTION_NEXT_AT_MOVEMENT_GRANULARITY, arguments);
             }
-        }, new AccessibilityEventFilter() {
+        }, new UiAutomation.AccessibilityEventFilter() {
             @Override
             public boolean accept(AccessibilityEvent event) {
                 return
@@ -3182,14 +3185,14 @@ public class AccessibilityTextTraversalTest
         assertEquals(267, Selection.getSelectionEnd(editText.getText()));
 
         // Move to the next paragraph and wait for an event.
-        AccessibilityEvent thirdExpected = getInteractionBridge()
-                .executeCommandAndWaitForAccessibilityEvent(new Runnable() {
+        AccessibilityEvent thirdExpected = getInstrumentation().getUiAutomation()
+                .executeAndWaitForEvent(new Runnable() {
             @Override
             public void run() {
-                getInteractionBridge().performAction(text,
+                text.performAction(
                         AccessibilityNodeInfo.ACTION_NEXT_AT_MOVEMENT_GRANULARITY, arguments);
             }
-        }, new AccessibilityEventFilter() {
+        }, new UiAutomation.AccessibilityEventFilter() {
             @Override
             public boolean accept(AccessibilityEvent event) {
                 return
@@ -3217,7 +3220,7 @@ public class AccessibilityTextTraversalTest
         assertEquals(582, Selection.getSelectionEnd(editText.getText()));
 
         // Make sure there is no next.
-        assertFalse(getInteractionBridge().performAction(text,
+        assertFalse(text.performAction(
                 AccessibilityNodeInfo.ACTION_NEXT_AT_MOVEMENT_GRANULARITY, arguments));
 
         // Verify the selection position.
@@ -3237,7 +3240,7 @@ public class AccessibilityTextTraversalTest
         Bundle setSelectionArgs = new Bundle();
         setSelectionArgs.putInt(AccessibilityNodeInfo.ACTION_ARGUMENT_SELECTION_START_INT, 582);
         setSelectionArgs.putInt(AccessibilityNodeInfo.ACTION_ARGUMENT_SELECTION_END_INT, 582);
-        assertTrue(getInteractionBridge().performAction(text,
+        assertTrue(text.performAction(
                 AccessibilityNodeInfo.ACTION_SET_SELECTION, setSelectionArgs));
 
         // Verify the selection position.
@@ -3254,14 +3257,14 @@ public class AccessibilityTextTraversalTest
         });
 
         // Move to the previous paragraph and wait for an event.
-        AccessibilityEvent fourthExpected = getInteractionBridge()
-                .executeCommandAndWaitForAccessibilityEvent(new Runnable() {
+        AccessibilityEvent fourthExpected = getInstrumentation().getUiAutomation()
+                .executeAndWaitForEvent(new Runnable() {
             @Override
             public void run() {
-                getInteractionBridge().performAction(text,
+                text.performAction(
                         AccessibilityNodeInfo.ACTION_PREVIOUS_AT_MOVEMENT_GRANULARITY, arguments);
             }
-        }, new AccessibilityEventFilter() {
+        }, new UiAutomation.AccessibilityEventFilter() {
             @Override
             public boolean accept(AccessibilityEvent event) {
                 return
@@ -3289,14 +3292,14 @@ public class AccessibilityTextTraversalTest
         assertEquals(582, Selection.getSelectionEnd(editText.getText()));
 
         // Move to the previous paragraph and wait for an event.
-        AccessibilityEvent fifthExpected = getInteractionBridge()
-                .executeCommandAndWaitForAccessibilityEvent(new Runnable() {
+        AccessibilityEvent fifthExpected = getInstrumentation().getUiAutomation()
+                .executeAndWaitForEvent(new Runnable() {
             @Override
             public void run() {
-                getInteractionBridge().performAction(text,
+                text.performAction(
                         AccessibilityNodeInfo.ACTION_PREVIOUS_AT_MOVEMENT_GRANULARITY, arguments);
             }
-        }, new AccessibilityEventFilter() {
+        }, new UiAutomation.AccessibilityEventFilter() {
             @Override
             public boolean accept(AccessibilityEvent event) {
                 return
@@ -3324,14 +3327,14 @@ public class AccessibilityTextTraversalTest
         assertEquals(582, Selection.getSelectionEnd(editText.getText()));
 
         // Move to the previous paragraph and wait for an event.
-        AccessibilityEvent sixthExpected = getInteractionBridge()
-                .executeCommandAndWaitForAccessibilityEvent(new Runnable() {
+        AccessibilityEvent sixthExpected = getInstrumentation().getUiAutomation()
+                .executeAndWaitForEvent(new Runnable() {
             @Override
             public void run() {
-                getInteractionBridge().performAction(text,
+                text.performAction(
                         AccessibilityNodeInfo.ACTION_PREVIOUS_AT_MOVEMENT_GRANULARITY, arguments);
             }
-        }, new AccessibilityEventFilter() {
+        }, new UiAutomation.AccessibilityEventFilter() {
             @Override
             public boolean accept(AccessibilityEvent event) {
                 return
@@ -3359,7 +3362,7 @@ public class AccessibilityTextTraversalTest
         assertEquals(582, Selection.getSelectionEnd(editText.getText()));
 
         // Make sure there is no previous.
-        assertFalse(getInteractionBridge().performAction(text,
+        assertFalse(text.performAction(
                 AccessibilityNodeInfo.ACTION_PREVIOUS_AT_MOVEMENT_GRANULARITY, arguments));
 
         // Verify the selection position.
@@ -3382,19 +3385,20 @@ public class AccessibilityTextTraversalTest
             }
         });
 
-        final AccessibilityNodeInfo text = getInteractionBridge()
-               .findAccessibilityNodeInfoByTextFromRoot(getString(R.string.foo_bar_baz));
+        final AccessibilityNodeInfo text = getInstrumentation().getUiAutomation()
+               .getRootInActiveWindow().findAccessibilityNodeInfosByText(
+                       getString(R.string.foo_bar_baz)).get(0);
 
         // Select all text.
         Bundle arguments = new Bundle();
         arguments.putInt(AccessibilityNodeInfo.ACTION_ARGUMENT_SELECTION_START_INT, 0);
         arguments.putInt(AccessibilityNodeInfo.ACTION_ARGUMENT_SELECTION_END_INT,
                 editText.getText().length());
-        assertTrue(getInteractionBridge().performAction(text,
+        assertTrue(text.performAction(
                 AccessibilityNodeInfo.ACTION_SET_SELECTION, arguments));
 
         // Copy the selected text.
-        getInteractionBridge().performAction(text, AccessibilityNodeInfo.ACTION_COPY);
+        text.performAction( AccessibilityNodeInfo.ACTION_COPY);
 
         // Set selection at the end.
         final int textLength = editText.getText().length();
@@ -3403,7 +3407,7 @@ public class AccessibilityTextTraversalTest
         assertEquals(textLength, Selection.getSelectionEnd(editText.getText()));
 
         // Paste the selected text.
-        assertTrue(getInteractionBridge().performAction(text,
+        assertTrue(text.performAction(
                 AccessibilityNodeInfo.ACTION_PASTE));
 
         // Verify the content.
@@ -3413,11 +3417,11 @@ public class AccessibilityTextTraversalTest
         arguments.putInt(AccessibilityNodeInfo.ACTION_ARGUMENT_SELECTION_START_INT, 0);
         arguments.putInt(AccessibilityNodeInfo.ACTION_ARGUMENT_SELECTION_END_INT,
                 editText.getText().length());
-        assertTrue(getInteractionBridge().performAction(text,
+        assertTrue(text.performAction(
                 AccessibilityNodeInfo.ACTION_SET_SELECTION, arguments));
 
         // Cut the selected text.
-        assertTrue(getInteractionBridge().performAction(text,
+        assertTrue(text.performAction(
                 AccessibilityNodeInfo.ACTION_CUT));
 
         // Verify the content.
@@ -3434,20 +3438,21 @@ public class AccessibilityTextTraversalTest
             }
         });
 
-        AccessibilityNodeInfo text = getInteractionBridge()
-               .findAccessibilityNodeInfoByTextFromRoot(getString(R.string.foo_bar_baz));
+        AccessibilityNodeInfo text = getInstrumentation().getUiAutomation()
+               .getRootInActiveWindow().findAccessibilityNodeInfosByText(
+                       getString(R.string.foo_bar_baz)).get(0);
 
         // Set the cursor position.
         Bundle arguments = new Bundle();
         arguments.putInt(AccessibilityNodeInfo.ACTION_ARGUMENT_SELECTION_START_INT, 4);
         arguments.putInt(AccessibilityNodeInfo.ACTION_ARGUMENT_SELECTION_END_INT, 4);
-        assertTrue(getInteractionBridge().performAction(text,
+        assertTrue(text.performAction(
                 AccessibilityNodeInfo.ACTION_SET_SELECTION, arguments));
 
         // Try and fail to set the selection longer than zero.
         arguments.putInt(AccessibilityNodeInfo.ACTION_ARGUMENT_SELECTION_START_INT, 4);
         arguments.putInt(AccessibilityNodeInfo.ACTION_ARGUMENT_SELECTION_END_INT, 5);
-        assertFalse(getInteractionBridge().performAction(text,
+        assertFalse(text.performAction(
                 AccessibilityNodeInfo.ACTION_SET_SELECTION, arguments));
     }
 
@@ -3461,8 +3466,9 @@ public class AccessibilityTextTraversalTest
             }
         });
 
-        final AccessibilityNodeInfo text = getInteractionBridge()
-               .findAccessibilityNodeInfoByTextFromRoot(getString(R.string.foo_bar_baz));
+        final AccessibilityNodeInfo text = getInstrumentation().getUiAutomation()
+               .getRootInActiveWindow().findAccessibilityNodeInfosByText(
+                       getString(R.string.foo_bar_baz)).get(0);
 
         // Check the initial node properties.
         assertFalse(text.isEditable());
@@ -3470,16 +3476,16 @@ public class AccessibilityTextTraversalTest
         assertSame(text.getTextSelectionEnd(), -1);
 
         // Set the cursor position.
-        getInteractionBridge().executeCommandAndWaitForAccessibilityEvent(new Runnable() {
+        getInstrumentation().getUiAutomation().executeAndWaitForEvent(new Runnable() {
             @Override
             public void run() {
                 Bundle arguments = new Bundle();
                 arguments.putInt(AccessibilityNodeInfo.ACTION_ARGUMENT_SELECTION_START_INT, 4);
                 arguments.putInt(AccessibilityNodeInfo.ACTION_ARGUMENT_SELECTION_END_INT, 4);
-                assertTrue(getInteractionBridge().performAction(text,
+                assertTrue(text.performAction(
                         AccessibilityNodeInfo.ACTION_SET_SELECTION, arguments));
             }
-        }, new AccessibilityEventFilter() {
+        }, new UiAutomation.AccessibilityEventFilter() {
             @Override
             public boolean accept(AccessibilityEvent event) {
                 return (event.getEventType()
@@ -3488,8 +3494,9 @@ public class AccessibilityTextTraversalTest
         }, TIMEOUT_ASYNC_PROCESSING);
 
         // Refresh the node.
-        AccessibilityNodeInfo refreshedText = getInteractionBridge()
-                .findAccessibilityNodeInfoByTextFromRoot(getString(R.string.foo_bar_baz));
+        AccessibilityNodeInfo refreshedText = getInstrumentation().getUiAutomation()
+                .getRootInActiveWindow().findAccessibilityNodeInfosByText(
+                        getString(R.string.foo_bar_baz)).get(0);
 
         // Check the related node properties.
         assertFalse(refreshedText.isEditable());
@@ -3500,12 +3507,13 @@ public class AccessibilityTextTraversalTest
         Bundle arguments = new Bundle();
         arguments.putInt(AccessibilityNodeInfo.ACTION_ARGUMENT_SELECTION_START_INT, 4);
         arguments.putInt(AccessibilityNodeInfo.ACTION_ARGUMENT_SELECTION_END_INT, 5);
-        assertFalse(getInteractionBridge().performAction(text,
+        assertFalse(text.performAction(
                 AccessibilityNodeInfo.ACTION_SET_SELECTION, arguments));
 
         // Refresh the node.
-        refreshedText = getInteractionBridge()
-                .findAccessibilityNodeInfoByTextFromRoot(getString(R.string.foo_bar_baz));
+        refreshedText = getInstrumentation().getUiAutomation()
+                .getRootInActiveWindow().findAccessibilityNodeInfosByText(
+                        getString(R.string.foo_bar_baz)).get(0);
 
         // Check the related node properties.
         assertFalse(refreshedText.isEditable());
