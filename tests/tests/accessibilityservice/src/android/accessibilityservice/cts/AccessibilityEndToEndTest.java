@@ -22,6 +22,7 @@ import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
+import android.app.UiAutomation;
 import android.content.Intent;
 import android.test.suitebuilder.annotation.MediumTest;
 import android.text.TextUtils;
@@ -39,17 +40,6 @@ import java.util.List;
  * This class performs end-to-end testing of the accessibility feature by
  * creating an {@link Activity} and poking around so {@link AccessibilityEvent}s
  * are generated and their correct dispatch verified.
- * <p>
- * Note: The accessibility CTS tests are composed of two APKs, one with delegating
- * accessibility service and another with the instrumented activity and test cases.
- * The delegating service is installed and enabled during test execution. It serves
- * as a proxy to the system used by the tests. This indirection is needed since the
- * test runner stops the package before running the tests. Hence, if the accessibility
- * service is in the test package running the tests would break the binding between
- * the service and the system.  The delegating service is in
- * <strong>CtsDelegatingAccessibilityService.apk</strong> whose source is located at
- * <strong>cts/tests/accessibilityservice</strong>.
- * </p>
  */
 public class AccessibilityEndToEndTest extends
         AccessibilityActivityTestCase<AccessibilityEndToEndActivity> {
@@ -81,7 +71,7 @@ public class AccessibilityEndToEndTest extends
         final ListView listView = (ListView) getActivity().findViewById(R.id.listview);
 
         AccessibilityEvent awaitedEvent =
-            getInteractionBridge().executeCommandAndWaitForAccessibilityEvent(
+            getInstrumentation().getUiAutomation().executeAndWaitForEvent(
                 new Runnable() {
             @Override
             public void run() {
@@ -93,7 +83,7 @@ public class AccessibilityEndToEndTest extends
                     }
                 });
             }},
-            new AccessibilityEventFilter() {
+            new UiAutomation.AccessibilityEventFilter() {
                 // check the received event
                 @Override
                 public boolean accept(AccessibilityEvent event) {
@@ -117,7 +107,7 @@ public class AccessibilityEndToEndTest extends
         final Button button = (Button) getActivity().findViewById(R.id.button);
 
         AccessibilityEvent awaitedEvent =
-            getInteractionBridge().executeCommandAndWaitForAccessibilityEvent(
+            getInstrumentation().getUiAutomation().executeAndWaitForEvent(
                 new Runnable() {
             @Override
             public void run() {
@@ -129,7 +119,7 @@ public class AccessibilityEndToEndTest extends
                     }
                 });
             }},
-            new AccessibilityEventFilter() {
+            new UiAutomation.AccessibilityEventFilter() {
                 // check the received event
                 @Override
                 public boolean accept(AccessibilityEvent event) {
@@ -153,7 +143,7 @@ public class AccessibilityEndToEndTest extends
         final Button button = (Button) getActivity().findViewById(R.id.button);
 
         AccessibilityEvent awaitedEvent =
-            getInteractionBridge().executeCommandAndWaitForAccessibilityEvent(
+            getInstrumentation().getUiAutomation().executeAndWaitForEvent(
                 new Runnable() {
             @Override
             public void run() {
@@ -165,7 +155,7 @@ public class AccessibilityEndToEndTest extends
                     }
                 });
             }},
-            new AccessibilityEventFilter() {
+            new UiAutomation.AccessibilityEventFilter() {
                 // check the received event
                 @Override
                 public boolean accept(AccessibilityEvent event) {
@@ -191,7 +181,7 @@ public class AccessibilityEndToEndTest extends
         final Button button = (Button) getActivity().findViewById(R.id.button);
 
         AccessibilityEvent awaitedEvent =
-            getInteractionBridge().executeCommandAndWaitForAccessibilityEvent(
+            getInstrumentation().getUiAutomation().executeAndWaitForEvent(
                 new Runnable() {
             @Override
             public void run() {
@@ -203,7 +193,7 @@ public class AccessibilityEndToEndTest extends
                     }
                 });
             }},
-            new AccessibilityEventFilter() {
+            new UiAutomation.AccessibilityEventFilter() {
                 // check the received event
                 @Override
                 public boolean accept(AccessibilityEvent event) {
@@ -220,7 +210,7 @@ public class AccessibilityEndToEndTest extends
         final EditText editText = (EditText) getActivity().findViewById(R.id.edittext);
 
         AccessibilityEvent awaitedFocusEvent =
-            getInteractionBridge().executeCommandAndWaitForAccessibilityEvent(
+            getInstrumentation().getUiAutomation().executeAndWaitForEvent(
                 new Runnable() {
             @Override
             public void run() {
@@ -232,7 +222,7 @@ public class AccessibilityEndToEndTest extends
                     }
                 });
             }},
-            new AccessibilityEventFilter() {
+            new UiAutomation.AccessibilityEventFilter() {
                 // check the received event
                 @Override
                 public boolean accept(AccessibilityEvent event) {
@@ -259,7 +249,7 @@ public class AccessibilityEndToEndTest extends
         expected.setEnabled(true);
 
         AccessibilityEvent awaitedTextChangeEvent =
-            getInteractionBridge().executeCommandAndWaitForAccessibilityEvent(
+            getInstrumentation().getUiAutomation().executeAndWaitForEvent(
                 new Runnable() {
             @Override
             public void run() {
@@ -271,7 +261,7 @@ public class AccessibilityEndToEndTest extends
                     }
                 });
             }},
-            new AccessibilityEventFilter() {
+            new UiAutomation.AccessibilityEventFilter() {
                 // check the received event
                 @Override
                 public boolean accept(AccessibilityEvent event) {
@@ -293,10 +283,8 @@ public class AccessibilityEndToEndTest extends
         expected.getText().add(getActivity().getString(R.string.alert_message));
         expected.setEnabled(true);
 
-        final EditText editText = (EditText) getActivity().findViewById(R.id.edittext);
-
         AccessibilityEvent awaitedEvent =
-            getInteractionBridge().executeCommandAndWaitForAccessibilityEvent(
+            getInstrumentation().getUiAutomation().executeAndWaitForEvent(
                 new Runnable() {
             @Override
             public void run() {
@@ -309,7 +297,7 @@ public class AccessibilityEndToEndTest extends
                     }
                 });
             }},
-            new AccessibilityEventFilter() {
+            new UiAutomation.AccessibilityEventFilter() {
                 // check the received event
                 @Override
                 public boolean accept(AccessibilityEvent event) {
@@ -343,7 +331,7 @@ public class AccessibilityEndToEndTest extends
         expected.setParcelableData(notification);
 
         AccessibilityEvent awaitedEvent =
-            getInteractionBridge().executeCommandAndWaitForAccessibilityEvent(
+            getInstrumentation().getUiAutomation().executeAndWaitForEvent(
                 new Runnable() {
             @Override
             public void run() {
@@ -359,7 +347,7 @@ public class AccessibilityEndToEndTest extends
                     }
                 });
             }},
-            new AccessibilityEventFilter() {
+            new UiAutomation.AccessibilityEventFilter() {
                 // check the received event
                 @Override
                 public boolean accept(AccessibilityEvent event) {
@@ -403,7 +391,6 @@ public class AccessibilityEndToEndTest extends
      */
     private boolean equalsNotificationAsParcelableData(AccessibilityEvent first,
             AccessibilityEvent second) {
-        String message = "parcelableData has incorrect value";
         Notification firstNotification = (Notification) first.getParcelableData();
         Notification secondNotification = (Notification) second.getParcelableData();
         if (firstNotification == null) {

@@ -17,8 +17,9 @@ package android.accessibilityservice.cts;
 import static android.view.accessibility.AccessibilityNodeInfo.ACTION_ACCESSIBILITY_FOCUS;
 import static android.view.accessibility.AccessibilityNodeInfo.ACTION_CLEAR_ACCESSIBILITY_FOCUS;
 
-import android.os.SystemClock;
+import android.app.UiAutomation;
 import android.test.suitebuilder.annotation.MediumTest;
+import android.view.accessibility.AccessibilityEvent;
 import android.view.accessibility.AccessibilityNodeInfo;
 
 import com.android.cts.accessibilityservice.R;
@@ -31,17 +32,6 @@ import java.util.Queue;
  * services. These APIs allow moving accessibility focus in the view tree from
  * an AccessiiblityService. Specifically, this activity is for verifying the the
  * sync between accessibility and input focus.
- * <p>
- * Note: The accessibility CTS tests are composed of two APKs, one with delegating
- * accessibility service and another with the instrumented activity and test cases.
- * The delegating service is installed and enabled during test execution. It serves
- * as a proxy to the system used by the tests. This indirection is needed since the
- * test runner stops the package before running the tests. Hence, if the accessibility
- * service is in the test package running the tests would break the binding between
- * the service and the system.  The delegating service is in
- * <strong>CtsDelegatingAccessibilityService.apk</strong> whose source is located at
- * <strong>cts/tests/accessibilityservice</strong>.
- * </p>
  */
 public class AccessibilityFocusAndInputFocusSyncTest
         extends AccessibilityActivityTestCase<AccessibilityFocusAndInputFocusSyncActivity>{
@@ -53,18 +43,29 @@ public class AccessibilityFocusAndInputFocusSyncTest
     @MediumTest
     public void testFindAccessibilityFocus() throws Exception {
         // Get the view that has input and accessibility focus.
-        AccessibilityNodeInfo expected = getInteractionBridge()
-                .findAccessibilityNodeInfoByTextFromRoot(getString(R.string.firstEditText));
+        final AccessibilityNodeInfo expected = getInstrumentation().getUiAutomation()
+                .getRootInActiveWindow().findAccessibilityNodeInfosByText(
+                        getString(R.string.firstEditText)).get(0);
         assertNotNull(expected);
         assertFalse(expected.isAccessibilityFocused());
         assertTrue(expected.isFocused());
 
-        // Perform a focus action and check for success.
-        assertTrue(getInteractionBridge().performAction(expected, ACTION_ACCESSIBILITY_FOCUS));
+        getInstrumentation().getUiAutomation().executeAndWaitForEvent(new Runnable() {
+            @Override
+            public void run() {
+                // Perform a focus action and check for success.
+                assertTrue(expected.performAction(ACTION_ACCESSIBILITY_FOCUS));
+            }
+        }, new UiAutomation.AccessibilityEventFilter() {
+            @Override
+            public boolean accept(AccessibilityEvent event) {
+                return event.getEventType() == AccessibilityEvent.TYPE_VIEW_ACCESSIBILITY_FOCUSED;
+            }
+        }, TIMEOUT_ASYNC_PROCESSING);
 
         // Get the second expected node info.
-        AccessibilityNodeInfo received = getInteractionBridge().findAccessibilityFocus(
-                getInteractionBridge().getRootInActiveWindow());
+        AccessibilityNodeInfo received = getInstrumentation().getUiAutomation()
+                .getRootInActiveWindow().findFocus(AccessibilityNodeInfo.FOCUS_ACCESSIBILITY);
         assertNotNull(received);
         assertTrue(received.isAccessibilityFocused());
 
@@ -75,27 +76,35 @@ public class AccessibilityFocusAndInputFocusSyncTest
     @MediumTest
     public void testInitialStateNoAccessibilityFocus() throws Exception {
         // Get the root which is only accessibility focused.
-        AccessibilityNodeInfo focused = getInteractionBridge().findAccessibilityFocus(
-                getInteractionBridge().getRootInActiveWindow());
+        AccessibilityNodeInfo focused = getInstrumentation().getUiAutomation()
+                .getRootInActiveWindow().findFocus(AccessibilityNodeInfo.FOCUS_ACCESSIBILITY);
         assertNull(focused);
     }
 
     @MediumTest
     public void testActionAccessibilityFocus() throws Exception {
         // Get the root linear layout info.
-        AccessibilityNodeInfo rootLinearLayout = getInteractionBridge()
-                .findAccessibilityNodeInfoByTextFromRoot(getString(R.string.rootLinearLayout));
+        final AccessibilityNodeInfo rootLinearLayout = getInstrumentation().getUiAutomation()
+                .getRootInActiveWindow().findAccessibilityNodeInfosByText(
+                        getString(R.string.rootLinearLayout)).get(0);
         assertNotNull(rootLinearLayout);
         assertFalse(rootLinearLayout.isAccessibilityFocused());
 
-        // Perform a focus action and check for success.
-        assertTrue(getInteractionBridge().performAction(rootLinearLayout,
-                ACTION_ACCESSIBILITY_FOCUS));
+        getInstrumentation().getUiAutomation().executeAndWaitForEvent(new Runnable() {
+            @Override
+            public void run() {
+                // Perform a focus action and check for success.
+                assertTrue(rootLinearLayout.performAction(ACTION_ACCESSIBILITY_FOCUS));
+            }
+        }, new UiAutomation.AccessibilityEventFilter() {
+            @Override
+            public boolean accept(AccessibilityEvent event) {
+                return event.getEventType() == AccessibilityEvent.TYPE_VIEW_ACCESSIBILITY_FOCUSED;
+            }
+        }, TIMEOUT_ASYNC_PROCESSING);
 
         // Get the node info again.
-        rootLinearLayout = getInteractionBridge()
-               .findAccessibilityNodeInfoByTextFromRoot(getString(R.string.rootLinearLayout));
-        assertNotNull(rootLinearLayout);
+        rootLinearLayout.refresh();
 
         // Check if the node info is focused.
         assertTrue(rootLinearLayout.isAccessibilityFocused());
@@ -104,29 +113,46 @@ public class AccessibilityFocusAndInputFocusSyncTest
     @MediumTest
     public void testActionClearAccessibilityFocus() throws Exception {
         // Get the root linear layout info.
-        AccessibilityNodeInfo rootLinearLayout = getInteractionBridge()
-                .findAccessibilityNodeInfoByTextFromRoot(getString(R.string.rootLinearLayout));
+        final AccessibilityNodeInfo rootLinearLayout = getInstrumentation().getUiAutomation()
+                .getRootInActiveWindow().findAccessibilityNodeInfosByText(
+                        getString(R.string.rootLinearLayout)).get(0);
         assertNotNull(rootLinearLayout);
 
-        // Perform a focus action and check for success.
-        assertTrue(getInteractionBridge().performAction(rootLinearLayout,
-                ACTION_ACCESSIBILITY_FOCUS));
+        getInstrumentation().getUiAutomation().executeAndWaitForEvent(new Runnable() {
+            @Override
+            public void run() {
+                // Perform a focus action and check for success.
+                assertTrue(rootLinearLayout.performAction(ACTION_ACCESSIBILITY_FOCUS));
+            }
+        }, new UiAutomation.AccessibilityEventFilter() {
+            @Override
+            public boolean accept(AccessibilityEvent event) {
+                return event.getEventType() == AccessibilityEvent.TYPE_VIEW_ACCESSIBILITY_FOCUSED;
+            }
+        }, TIMEOUT_ASYNC_PROCESSING);
 
-        // Get the node info again.
-        rootLinearLayout = getInteractionBridge()
-               .findAccessibilityNodeInfoByTextFromRoot(getString(R.string.rootLinearLayout));
-        assertNotNull(rootLinearLayout);
+        // Refresh the node info.
+        rootLinearLayout.refresh();
 
         // Check if the node info is focused.
         assertTrue(rootLinearLayout.isAccessibilityFocused());
 
-        // Perform a clear focus action and check for success.
-        assertTrue(getInteractionBridge().performAction(rootLinearLayout,
-                ACTION_CLEAR_ACCESSIBILITY_FOCUS));
+        getInstrumentation().getUiAutomation().executeAndWaitForEvent(new Runnable() {
+            @Override
+            public void run() {
+                // Perform a clear focus action and check for success.
+                assertTrue(rootLinearLayout.performAction(ACTION_CLEAR_ACCESSIBILITY_FOCUS));
+            }
+        }, new UiAutomation.AccessibilityEventFilter() {
+            @Override
+            public boolean accept(AccessibilityEvent event) {
+                return event.getEventType()
+                        == AccessibilityEvent.TYPE_VIEW_ACCESSIBILITY_FOCUS_CLEARED;
+            }
+        }, TIMEOUT_ASYNC_PROCESSING);
 
-        // Get the node info again.
-        rootLinearLayout = getInteractionBridge()
-                .findAccessibilityNodeInfoByTextFromRoot(getString(R.string.rootLinearLayout));
+        // Refresh the node info.
+        rootLinearLayout.refresh();
 
         // Check if the node info is not focused.
         assertFalse(rootLinearLayout.isAccessibilityFocused());
@@ -135,41 +161,55 @@ public class AccessibilityFocusAndInputFocusSyncTest
     @MediumTest
     public void testOnlyOneNodeHasAccessibilityFocus() throws Exception {
         // Get the first not focused edit text.
-        AccessibilityNodeInfo firstEditText = getInteractionBridge()
-            .findAccessibilityNodeInfoByTextFromRoot(getString(R.string.firstEditText));
+        final AccessibilityNodeInfo firstEditText = getInstrumentation().getUiAutomation()
+                .getRootInActiveWindow().findAccessibilityNodeInfosByText(
+                        getString(R.string.firstEditText)).get(0);
         assertNotNull(firstEditText);
         assertTrue(firstEditText.isFocusable());
         assertTrue(firstEditText.isFocused());
         assertFalse(firstEditText.isAccessibilityFocused());
 
-        // Perform a set focus action and check for success.
-        assertTrue(getInteractionBridge().performAction(firstEditText,
-                ACTION_ACCESSIBILITY_FOCUS));
-
-        // Wait for generated events to propagate and clear the cache.
-        SystemClock.sleep(TIMEOUT_ASYNC_PROCESSING);
+        getInstrumentation().getUiAutomation().executeAndWaitForEvent(new Runnable() {
+            @Override
+            public void run() {
+                // Perform a set focus action and check for success.
+                assertTrue(firstEditText.performAction(ACTION_ACCESSIBILITY_FOCUS));
+            }
+        }, new UiAutomation.AccessibilityEventFilter() {
+            @Override
+            public boolean accept(AccessibilityEvent event) {
+                return event.getEventType() == AccessibilityEvent.TYPE_VIEW_ACCESSIBILITY_FOCUSED;
+            }
+        }, TIMEOUT_ASYNC_PROCESSING);
 
         // Get the second not focused edit text.
-        AccessibilityNodeInfo secondEditText = getInteractionBridge()
-            .findAccessibilityNodeInfoByTextFromRoot(getString(R.string.secondEditText));
+        final AccessibilityNodeInfo secondEditText = getInstrumentation().getUiAutomation()
+                .getRootInActiveWindow().findAccessibilityNodeInfosByText(
+                        getString(R.string.secondEditText)).get(0);
         assertNotNull(secondEditText);
         assertTrue(secondEditText.isFocusable());
         assertFalse(secondEditText.isFocused());
         assertFalse(secondEditText.isAccessibilityFocused());
 
-        // Perform a set focus action and check for success.
-        assertTrue(getInteractionBridge().performAction(secondEditText,
-                ACTION_ACCESSIBILITY_FOCUS));
-
-        // Wait for generated events to propagate and clear the cache.
-        SystemClock.sleep(TIMEOUT_ASYNC_PROCESSING);
+        getInstrumentation().getUiAutomation().executeAndWaitForEvent(new Runnable() {
+            @Override
+            public void run() {
+                // Perform a set focus action and check for success.
+                assertTrue(secondEditText.performAction(ACTION_ACCESSIBILITY_FOCUS));
+                
+            }
+        }, new UiAutomation.AccessibilityEventFilter() {
+            @Override
+            public boolean accept(AccessibilityEvent event) {
+                return event.getEventType() == AccessibilityEvent.TYPE_VIEW_ACCESSIBILITY_FOCUSED;
+            }
+        }, TIMEOUT_ASYNC_PROCESSING);
 
         // Get the node info again.
-        secondEditText = getInteractionBridge()
-                .findAccessibilityNodeInfoByTextFromRoot(getString(R.string.secondEditText));
+        secondEditText.refresh();
 
         // Make sure no other node has accessibility focus.
-        AccessibilityNodeInfo root = getInteractionBridge().getRootInActiveWindow();
+        AccessibilityNodeInfo root = getInstrumentation().getUiAutomation().getRootInActiveWindow();
         Queue<AccessibilityNodeInfo> workQueue = new LinkedList<AccessibilityNodeInfo>();
         workQueue.add(root);
         while (!workQueue.isEmpty()) {
@@ -179,8 +219,10 @@ public class AccessibilityFocusAndInputFocusSyncTest
             }
             final int childCount = current.getChildCount();
             for (int i = 0; i < childCount; i++) {
-                AccessibilityNodeInfo child = getInteractionBridge().getChild(current, i);
-                workQueue.offer(child);
+                AccessibilityNodeInfo child = current.getChild(i);
+                if (child != null) {
+                    workQueue.offer(child);
+                }
             }
         }
     }
