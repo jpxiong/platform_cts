@@ -23,17 +23,6 @@ import com.android.cts.accessibilityservice.R;
  * Test cases for testing the accessibility focus APIs exposed to accessibility
  * services. This test checks how the view hierarchy is reported to accessibility
  * services.
- * <p>
- * Note: The accessibility CTS tests are composed of two APKs, one with delegating
- * accessibility service and another with the instrumented activity and test cases.
- * The delegating service is installed and enabled during test execution. It serves
- * as a proxy to the system used by the tests. This indirection is needed since the
- * test runner stops the package before running the tests. Hence, if the accessibility
- * service is in the test package running the tests would break the binding between
- * the service and the system.  The delegating service is in
- * <strong>CtsDelegatingAccessibilityService.apk</strong> whose source is located at
- * <strong>cts/tests/accessibilityservice</strong>.
- * </p>
  */
 public class AccessibilityViewTreeReportingTest
         extends AccessibilityActivityTestCase<AccessibilityViewTreeReportingActivity>{
@@ -44,75 +33,88 @@ public class AccessibilityViewTreeReportingTest
 
     @MediumTest
     public void testDescendantsOfNotImportantViewReportedInOrder1() throws Exception {
-        AccessibilityNodeInfo firstFrameLayout = getInteractionBridge()
-            .findAccessibilityNodeInfoByTextFromRoot(getString(R.string.firstFrameLayout));
+        AccessibilityNodeInfo firstFrameLayout = getInstrumentation().getUiAutomation()
+            .getRootInActiveWindow().findAccessibilityNodeInfosByText(
+                    getString(R.string.firstFrameLayout)).get(0);
         assertNotNull(firstFrameLayout);
         assertSame(3, firstFrameLayout.getChildCount());
 
         // Check if the first child is the right one.
-        AccessibilityNodeInfo firstTextView = getInteractionBridge()
-            .findAccessibilityNodeInfoByTextFromRoot(getString(R.string.firstTextView));
-        assertEquals(firstTextView, getInteractionBridge().getChild(firstFrameLayout, 0));
+        AccessibilityNodeInfo firstTextView = getInstrumentation().getUiAutomation()
+            .getRootInActiveWindow().findAccessibilityNodeInfosByText(getString(
+                    R.string.firstTextView)).get(0);
+        assertEquals(firstTextView, firstFrameLayout.getChild(0));
 
         // Check if the second child is the right one.
-        AccessibilityNodeInfo firstEditText = getInteractionBridge()
-            .findAccessibilityNodeInfoByTextFromRoot(getString(R.string.firstEditText));
-        assertEquals(firstEditText, getInteractionBridge().getChild(firstFrameLayout, 1));
+        AccessibilityNodeInfo firstEditText = getInstrumentation().getUiAutomation()
+            .getRootInActiveWindow().findAccessibilityNodeInfosByText(getString(
+                    R.string.firstEditText)).get(0);
+        assertEquals(firstEditText, firstFrameLayout.getChild(1));
 
         // Check if the third child is the right one.
-        AccessibilityNodeInfo firstButton = getInteractionBridge()
-            .findAccessibilityNodeInfoByTextFromRoot(getString(R.string.firstButton));
-        assertEquals(firstButton, getInteractionBridge().getChild(firstFrameLayout, 2));
+        AccessibilityNodeInfo firstButton = getInstrumentation().getUiAutomation()
+            .getRootInActiveWindow().findAccessibilityNodeInfosByText(
+                    getString(R.string.firstButton)).get(0);
+        assertEquals(firstButton, firstFrameLayout.getChild(2));
     }
 
     @MediumTest
     public void testDescendantsOfNotImportantViewReportedInOrder2() throws Exception {
-        AccessibilityNodeInfo secondFrameLayout = getInteractionBridge()
-            .findAccessibilityNodeInfoByTextFromRoot(getString(R.string.secondFrameLayout));
+        AccessibilityNodeInfo secondFrameLayout = getInstrumentation().getUiAutomation()
+            .getRootInActiveWindow().findAccessibilityNodeInfosByText(
+                    getString(R.string.secondFrameLayout)).get(0);
         assertNotNull(secondFrameLayout);
         assertSame(3, secondFrameLayout.getChildCount());
 
         // Check if the first child is the right one.
-        AccessibilityNodeInfo secondTextView = getInteractionBridge()
-            .findAccessibilityNodeInfoByTextFromRoot(getString(R.string.secondTextView));
-        assertEquals(secondTextView, getInteractionBridge().getChild(secondFrameLayout, 0));
+        AccessibilityNodeInfo secondTextView = getInstrumentation().getUiAutomation()
+            .getRootInActiveWindow().findAccessibilityNodeInfosByText(
+                    getString(R.string.secondTextView)).get(0);
+        assertEquals(secondTextView, secondFrameLayout.getChild(0));
 
         // Check if the second child is the right one.
-        AccessibilityNodeInfo secondEditText = getInteractionBridge()
-            .findAccessibilityNodeInfoByTextFromRoot(getString(R.string.secondEditText));
-        assertEquals(secondEditText, getInteractionBridge().getChild(secondFrameLayout, 1));
+        AccessibilityNodeInfo secondEditText = getInstrumentation().getUiAutomation()
+            .getRootInActiveWindow().findAccessibilityNodeInfosByText(
+                    getString(R.string.secondEditText)).get(0);
+        assertEquals(secondEditText, secondFrameLayout.getChild(1));
 
         // Check if the third child is the right one.
-        AccessibilityNodeInfo secondButton = getInteractionBridge()
-            .findAccessibilityNodeInfoByTextFromRoot(getString(R.string.secondButton));
-        assertEquals(secondButton, getInteractionBridge().getChild(secondFrameLayout, 2));
+        AccessibilityNodeInfo secondButton = getInstrumentation().getUiAutomation()
+            .getRootInActiveWindow().findAccessibilityNodeInfosByText(
+                    getString(R.string.secondButton)).get(0);
+        assertEquals(secondButton, secondFrameLayout.getChild(2));
     }
 
     @MediumTest
     public void testDescendantsOfNotImportantViewReportedInOrder3() throws Exception {
-        AccessibilityNodeInfo rootLinearLayout = getInteractionBridge()
-            .findAccessibilityNodeInfoByTextFromRoot(getString(R.string.rootLinearLayout));
+        AccessibilityNodeInfo rootLinearLayout = getInstrumentation().getUiAutomation()
+            .getRootInActiveWindow().findAccessibilityNodeInfosByText(
+                    getString(R.string.rootLinearLayout)).get(0);
         assertNotNull(rootLinearLayout);
         assertSame(4, rootLinearLayout.getChildCount());
 
         // Check if the first child is the right one.
-        AccessibilityNodeInfo firstFrameLayout = getInteractionBridge()
-            .findAccessibilityNodeInfoByTextFromRoot(getString(R.string.firstFrameLayout));
-        assertEquals(firstFrameLayout, getInteractionBridge().getChild(rootLinearLayout, 0));
+        AccessibilityNodeInfo firstFrameLayout = getInstrumentation().getUiAutomation()
+            .getRootInActiveWindow().findAccessibilityNodeInfosByText(
+                    getString(R.string.firstFrameLayout)).get(0);
+        assertEquals(firstFrameLayout, rootLinearLayout.getChild(0));
 
         // Check if the second child is the right one.
-        AccessibilityNodeInfo secondTextView = getInteractionBridge()
-            .findAccessibilityNodeInfoByTextFromRoot(getString(R.string.secondTextView));
-        assertEquals(secondTextView, getInteractionBridge().getChild(rootLinearLayout, 1));
+        AccessibilityNodeInfo secondTextView = getInstrumentation().getUiAutomation()
+            .getRootInActiveWindow().findAccessibilityNodeInfosByText(
+                    getString(R.string.secondTextView)).get(0);
+        assertEquals(secondTextView, rootLinearLayout.getChild(1));
 
         // Check if the third child is the right one.
-        AccessibilityNodeInfo secondEditText = getInteractionBridge()
-            .findAccessibilityNodeInfoByTextFromRoot(getString(R.string.secondEditText));
-        assertEquals(secondEditText, getInteractionBridge().getChild(rootLinearLayout, 2));
+        AccessibilityNodeInfo secondEditText = getInstrumentation().getUiAutomation()
+            .getRootInActiveWindow().findAccessibilityNodeInfosByText(
+                    getString(R.string.secondEditText)).get(0);
+        assertEquals(secondEditText, rootLinearLayout.getChild(2));
 
         // Check if the fourth child is the right one.
-        AccessibilityNodeInfo secondButton = getInteractionBridge()
-            .findAccessibilityNodeInfoByTextFromRoot(getString(R.string.secondButton));
-        assertEquals(secondButton, getInteractionBridge().getChild(rootLinearLayout, 3));
+        AccessibilityNodeInfo secondButton = getInstrumentation().getUiAutomation()
+            .getRootInActiveWindow().findAccessibilityNodeInfosByText(
+                    getString(R.string.secondButton)).get(0);
+        assertEquals(secondButton, rootLinearLayout.getChild(3));
     }
 }

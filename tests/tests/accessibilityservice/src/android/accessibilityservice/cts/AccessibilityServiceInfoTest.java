@@ -92,6 +92,17 @@ public class AccessibilityServiceInfoTest extends AndroidTestCase {
     public void testFlagToString() {
         assertEquals("DEFAULT", AccessibilityServiceInfo.flagToString(
                 AccessibilityServiceInfo.DEFAULT));
+        assertEquals("FLAG_INCLUDE_NOT_IMPORTANT_VIEWS", AccessibilityServiceInfo.flagToString(
+                AccessibilityServiceInfo.FLAG_INCLUDE_NOT_IMPORTANT_VIEWS));
+        assertEquals("FLAG_REPORT_VIEW_IDS", AccessibilityServiceInfo.flagToString(
+                AccessibilityServiceInfo.FLAG_REPORT_VIEW_IDS));
+        assertEquals("FLAG_REQUEST_ENHANCED_WEB_ACCESSIBILITY", AccessibilityServiceInfo
+                .flagToString(AccessibilityServiceInfo.FLAG_REQUEST_ENHANCED_WEB_ACCESSIBILITY));
+        assertEquals("FLAG_REQUEST_FILTER_KEY_EVENTS", AccessibilityServiceInfo.flagToString(
+                AccessibilityServiceInfo.FLAG_REQUEST_FILTER_KEY_EVENTS));
+        assertEquals("FLAG_REQUEST_TOUCH_EXPLORATION_MODE", AccessibilityServiceInfo.flagToString(
+                AccessibilityServiceInfo.FLAG_REQUEST_TOUCH_EXPLORATION_MODE));
+        
     }
 
     /**
@@ -110,22 +121,21 @@ public class AccessibilityServiceInfoTest extends AndroidTestCase {
         AccessibilityServiceInfo speakingService = enabledServices.get(0);
         assertSame(AccessibilityEvent.TYPES_ALL_MASK, speakingService.eventTypes);
         assertSame(AccessibilityServiceInfo.FEEDBACK_GENERIC, speakingService.feedbackType);
-        assertSame(AccessibilityServiceInfo.DEFAULT
-                | AccessibilityServiceInfo.FLAG_REQUEST_TOUCH_EXPLORATION_MODE,
+        assertSame(AccessibilityServiceInfo.FLAG_REQUEST_TOUCH_EXPLORATION_MODE
+                | AccessibilityServiceInfo.FLAG_REPORT_VIEW_IDS,
                 speakingService.flags);
         assertSame(0l, speakingService.notificationTimeout);
-        assertEquals("Delegating Accessibility Service", speakingService.getDescription());
+        assertNull(speakingService.getDescription());
         assertNull(speakingService.packageNames /*all packages*/);
         assertNotNull(speakingService.getId());
-        assertTrue(speakingService.getCanRetrieveWindowContent());
-        assertEquals("android.accessibilityservice.delegate.SomeActivity",
-                speakingService.getSettingsActivityName());
-        assertEquals("Delegating Accessibility Service",
-                speakingService.loadDescription(getContext().getPackageManager()));
-        assertEquals("android.accessibilityservice.delegate",
-                speakingService.getResolveInfo().serviceInfo.packageName);
-        assertEquals("android.accessibilityservice.delegate.DelegatingAccessibilityService",
-                speakingService.getResolveInfo().serviceInfo.name);
+        assertSame(speakingService.getCapabilities(),
+                AccessibilityServiceInfo.CAPABILITY_CAN_REQUEST_ENHANCED_WEB_ACCESSIBILITY
+                | AccessibilityServiceInfo.CAPABILITY_CAN_REQUEST_FILTER_KEY_EVENTS
+                | AccessibilityServiceInfo.CAPABILITY_CAN_REQUEST_TOUCH_EXPLORATION
+                | AccessibilityServiceInfo.CAPABILITY_CAN_RETRIEVE_WINDOW_CONTENT);
+        assertNull(speakingService.getSettingsActivityName());
+        assertNull(speakingService.loadDescription(getContext().getPackageManager()));
+        assertNull(speakingService.getResolveInfo());
     }
 
     /**
