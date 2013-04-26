@@ -17,4 +17,5 @@
     android:accessibilityEventTypes="typeAllMask"
     android:accessibilityFeedbackType="feedbackSpoken"
     android:accessibilityFlags="flagDefault|flagRequestTouchExplorationMode"
-    android:canRetrieveWindowContent="true" />
+    android:canRetrieveWindowContent="true"
+    android:canRequestTouchExplorationMode="true" />
