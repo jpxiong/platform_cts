@@ -16,7 +16,6 @@
 
 package android.provider.cts;
 
-import static android.provider.ContactsContract.CommonDataKinds;
 import static android.provider.ContactsContract.DataUsageFeedback;
 
 import android.content.ContentResolver;
@@ -85,27 +84,10 @@ public class ContactsContract_DataUsageTest extends AndroidTestCase {
     private long[] setupRawContactDataItems(long rawContactId) {
         // Create 4 data items.
         long[] dataIds = new long[4];
-
-        ContentValues values = new ContentValues();
-        values.put(ContactsContract.Data.MIMETYPE, CommonDataKinds.Phone.CONTENT_ITEM_TYPE);
-        values.put(CommonDataKinds.Phone.NUMBER, "555-5555");
-        dataIds[0] = DataUtil.insertData(mResolver, rawContactId, values);
-
-        values.clear();
-        values.put(ContactsContract.Data.MIMETYPE, CommonDataKinds.Phone.CONTENT_ITEM_TYPE);
-        values.put(CommonDataKinds.Phone.NUMBER, "555-5554");
-        dataIds[1] = DataUtil.insertData(mResolver, rawContactId, values);
-
-        values.clear();
-        values.put(ContactsContract.Data.MIMETYPE, CommonDataKinds.Email.CONTENT_ITEM_TYPE);
-        values.put(CommonDataKinds.Email.ADDRESS, "test@thisisfake.com");
-        dataIds[2] = DataUtil.insertData(mResolver, rawContactId, values);
-
-        values.clear();
-        values.put(ContactsContract.Data.MIMETYPE, CommonDataKinds.Email.CONTENT_ITEM_TYPE);
-        values.put(CommonDataKinds.Phone.NUMBER, "555-5556");
-        dataIds[3] = DataUtil.insertData(mResolver, rawContactId, values);
-
+        dataIds[0] = DataUtil.insertPhoneNumber(mResolver, rawContactId, "555-5555");
+        dataIds[1] = DataUtil.insertPhoneNumber(mResolver, rawContactId, "555-5554");
+        dataIds[2] = DataUtil.insertEmail(mResolver, rawContactId, "test@thisisfake.com");
+        dataIds[3] = DataUtil.insertPhoneNumber(mResolver, rawContactId, "555-5556");
         return dataIds;
     }
 
