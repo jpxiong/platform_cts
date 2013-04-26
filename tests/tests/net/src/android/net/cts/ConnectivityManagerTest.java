@@ -113,25 +113,30 @@ public class ConnectivityManagerTest extends AndroidTestCase {
     public void testSetNetworkPreference() {
         // verify swtiching between two default networks - need to connectable networks though
         // could use test and whatever the current active network is
-        NetworkInfo active = mCm.getActiveNetworkInfo();
         int originalPref = mCm.getNetworkPreference();
         int currentPref = originalPref;
         for (int type = -1; type <= ConnectivityManager.MAX_NETWORK_TYPE+1; type++) {
             mCm.setNetworkPreference(type);
             NetworkConfig c = mNetworks.get(type);
             boolean expectWorked = (c != null && c.isDefault());
-            try {
-                Thread.currentThread().sleep(100);
-            } catch (InterruptedException e) {}
-            int foundType = mCm.getNetworkPreference();
+            int totalSleep = 0;
+            int foundType = ConnectivityManager.TYPE_NONE;
+            while (totalSleep < 1000) {
+                try {
+                    Thread.currentThread().sleep(100);
+                } catch (InterruptedException e) {}
+                totalSleep += 100;
+                foundType = mCm.getNetworkPreference();
+                if (currentPref != foundType) break;
+            }
             if (expectWorked) {
                 assertTrue("We should have been able to switch prefered type " + type,
                         foundType == type);
-                currentPref = foundType;
             } else {
                 assertTrue("We should not have been able to switch type " + type,
-                        foundType == currentPref);
+                        foundType != type);
             }
+            currentPref = foundType;
         }
         mCm.setNetworkPreference(originalPref);
     }
@@ -170,6 +175,10 @@ public class ConnectivityManagerTest extends AndroidTestCase {
             int foundCount = 0;
             for (NetworkInfo i : ni) {
                 if (i.getType() == type) foundCount++;
+            }
+            if (foundCount != desiredFoundCount) {
+                Log.e(TAG, "failure in testGetAllNetworkInfo.  Dump of returned NetworkInfos:");
+                for (NetworkInfo networkInfo : ni) Log.e(TAG, "  " + networkInfo);
             }
             assertTrue("Unexpected foundCount of " + foundCount + " for type " + type,
                     foundCount == desiredFoundCount);
