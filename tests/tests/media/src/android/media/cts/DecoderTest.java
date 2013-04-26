@@ -88,13 +88,12 @@ public class DecoderTest extends MediaPlayerTestBase {
 
     /**
      * @param testinput the file to decode
-     * @param master the "golden master" to compared against
      * @param maxerror the maximum allowed root mean squared error
      * @throws IOException
      */
     private void decode(int testinput, float maxerror) throws IOException {
 
-        short [] decoded = decodeToMemory(testinput);
+        short [] decoded = decodeToMemory(testinput, false);
 
         assertEquals("wrong data size", mMasterBuffer.length, decoded.length);
 
@@ -110,11 +109,17 @@ public class DecoderTest extends MediaPlayerTestBase {
         long avgErrorSquared = (totalErrorSquared / decoded.length);
         double rmse = Math.sqrt(avgErrorSquared);
         assertTrue("decoding error too big: " + rmse, rmse <= maxerror);
-     }
 
-    private short[] decodeToMemory(int testinput) throws IOException {
+        short [] decoded2 = decodeToMemory(testinput, true);
+        assertEquals("count different with reconfigure", decoded.length, decoded2.length);
+        for (int i = 0; i < decoded.length; i++) {
+            assertEquals("samples don't match", decoded[i], decoded2[i]);
+        }
+    }
 
-        short [] decoded = new short[1024];
+    private short[] decodeToMemory(int testinput, boolean reconfigure) throws IOException {
+
+        short [] decoded = new short[0];
         int decodedIdx = 0;
 
         AssetFileDescriptor testFd = mResources.openRawResourceFd(testinput);
@@ -139,6 +144,14 @@ public class DecoderTest extends MediaPlayerTestBase {
         codec.start();
         codecInputBuffers = codec.getInputBuffers();
         codecOutputBuffers = codec.getOutputBuffers();
+
+        if (reconfigure) {
+            codec.stop();
+            codec.configure(format, null /* surface */, null /* crypto */, 0 /* flags */);
+            codec.start();
+            codecInputBuffers = codec.getInputBuffers();
+            codecOutputBuffers = codec.getOutputBuffers();
+        }
 
         extractor.selectTrack(0);
 
@@ -183,6 +196,21 @@ public class DecoderTest extends MediaPlayerTestBase {
             int res = codec.dequeueOutputBuffer(info, kTimeOutUs);
 
             if (res >= 0) {
+                //Log.d(TAG, "got frame, size " + info.size + "/" + info.presentationTimeUs);
+
+                if (info.size > 0 && reconfigure) {
+                    // once we've gotten some data out of the decoder, reconfigure it again
+                    reconfigure = false;
+                    extractor.seekTo(0, MediaExtractor.SEEK_TO_NEXT_SYNC);
+                    sawInputEOS = false;
+                    codec.stop();
+                    codec.configure(format, null /* surface */, null /* crypto */, 0 /* flags */);
+                    codec.start();
+                    codecInputBuffers = codec.getInputBuffers();
+                    codecOutputBuffers = codec.getOutputBuffers();
+                    continue;
+                }
+
                 int outputBufIndex = res;
                 ByteBuffer buf = codecOutputBuffers[outputBufIndex];
 
@@ -208,6 +236,8 @@ public class DecoderTest extends MediaPlayerTestBase {
                 MediaFormat oformat = codec.getOutputFormat();
 
                 Log.d(TAG, "output format has changed to " + oformat);
+            } else {
+                Log.d(TAG, "dequeueOutputBuffer returned " + res);
             }
         }
 
@@ -750,8 +780,8 @@ public class DecoderTest extends MediaPlayerTestBase {
         codec.flush();
         short maxvalue2 = getAmplitude(extractor, codec);
 
-        assertTrue(maxvalue1 > 20000);
-        assertTrue(maxvalue2 < 5000);
+        assertTrue("first section amplitude too low", maxvalue1 > 20000);
+        assertTrue("second section amplitude too high", maxvalue2 < 5000);
         codec.stop();
         codec.release();
 
