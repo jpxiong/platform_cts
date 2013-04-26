@@ -618,6 +618,15 @@ public class WebViewOnUiThread {
         });
     }
 
+    public Picture capturePicture() {
+        return getValue(new ValueGetter<Picture>() {
+            @Override
+            public Picture capture() {
+                return mWebView.capturePicture();
+            }
+        });
+    }
+
     /**
      * Helper for running code on the UI thread where an exception is
      * a test failure. If this is already the UI thread then it runs

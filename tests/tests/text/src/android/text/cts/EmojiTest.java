@@ -25,7 +25,7 @@ import android.test.ActivityInstrumentationTestCase2;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.View;
-import android.webkit.WebView;
+import android.webkit.cts.WebViewOnUiThread;
 import android.widget.TextView;
 import android.widget.EditText;
 
@@ -212,24 +212,18 @@ public class EmojiTest extends ActivityInstrumentationTestCase2<EmojiStubActivit
 
     private class CaptureWebView {
 
-        WebView view;
+        WebViewOnUiThread webViewOnUiThread;
         Bitmap bitmap;
         CaptureWebView(Context context) {
-            view = getActivity().getWebView();
+            webViewOnUiThread = new WebViewOnUiThread(EmojiTest.this, getActivity().getWebView());
         }
 
         Bitmap capture(char c[]) {
 
-            view.loadData("<html><body>" + String.valueOf(c) + "</body></html>",
+            webViewOnUiThread.loadDataAndWaitForCompletion("<html><body>" + String.valueOf(c) + "</body></html>",
                     "text/html; charset=utf-8", "utf-8");
 
-            try {
-                Thread.sleep(200);
-            } catch (InterruptedException ie) {
-                return null;
-            }
-
-            Picture picture = view.capturePicture();
+            Picture picture = webViewOnUiThread.capturePicture();
             if (picture == null || picture.getHeight() <= 0 || picture.getWidth() <= 0) {
                 return null;
             } else {
