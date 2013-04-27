@@ -30,6 +30,7 @@ import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.zip.CRC32;
 
@@ -250,12 +251,12 @@ public class DecoderTest extends MediaPlayerTestBase {
         Surface s = getActivity().getSurfaceHolder().getSurface();
         int frames1 = countFrames(
                 R.raw.video_480x360_mp4_h264_1000kbps_25fps_aac_stereo_128kbps_44100hz,
-                false, s);
+                false, -1, s);
         assertEquals("wrong number of frames decoded", 240, frames1);
 
         int frames2 = countFrames(
                 R.raw.video_480x360_mp4_h264_1000kbps_25fps_aac_stereo_128kbps_44100hz,
-                false, null);
+                false, -1, null);
         assertEquals("different number of frames when using Surface", frames1, frames2);
     }
 
@@ -263,13 +264,29 @@ public class DecoderTest extends MediaPlayerTestBase {
         Surface s = getActivity().getSurfaceHolder().getSurface();
         int frames1 = countFrames(
                 R.raw.video_176x144_3gp_h263_300kbps_12fps_aac_stereo_128kbps_22050hz,
-                false, s);
+                false /* reconfigure */, -1 /* eosframe */, s);
         assertEquals("wrong number of frames decoded", 122, frames1);
 
         int frames2 = countFrames(
                 R.raw.video_176x144_3gp_h263_300kbps_12fps_aac_stereo_128kbps_22050hz,
-                false, null);
+                false /* reconfigure */, -1 /* eosframe */, null);
         assertEquals("different number of frames when using Surface", frames1, frames2);
+    }
+
+    public void testCodecEarlyEOSH263() throws Exception {
+        Surface s = getActivity().getSurfaceHolder().getSurface();
+        int frames1 = countFrames(
+                R.raw.video_176x144_3gp_h263_300kbps_12fps_aac_stereo_128kbps_22050hz,
+                false, 64, s);
+        assertEquals("wrong number of frames decoded", 64, frames1);
+    }
+
+    public void testCodecEarlyEOSH264() throws Exception {
+        Surface s = getActivity().getSurfaceHolder().getSurface();
+        int frames1 = countFrames(
+                R.raw.video_480x360_mp4_h264_1000kbps_25fps_aac_stereo_128kbps_44100hz,
+                false, 120, s);
+        assertEquals("wrong number of frames decoded", 120, frames1);
     }
 
     public void testCodecReconfigH264WithoutSurface() throws Exception {
@@ -307,12 +324,12 @@ public class DecoderTest extends MediaPlayerTestBase {
     }
 
     private void testCodecReconfig(int video, Surface s) throws Exception {
-        int frames1 = countFrames(video, false, s);
-        int frames2 = countFrames(video, true, s);
+        int frames1 = countFrames(video, false /* reconfigure */, -1 /* eosframe */, s);
+        int frames2 = countFrames(video, true /* reconfigure */, -1 /* eosframe */, s);
         assertEquals("different number of frames when reusing codec", frames1, frames2);
     }
 
-    private int countFrames(int video, boolean reconfigure, Surface s) throws Exception {
+    private int countFrames(int video, boolean reconfigure, int eosframe, Surface s) throws Exception {
         int numframes = 0;
 
         AssetFileDescriptor testFd = mResources.openRawResourceFd(video);
@@ -360,6 +377,8 @@ public class DecoderTest extends MediaPlayerTestBase {
         boolean sawInputEOS = false;
         boolean sawOutputEOS = false;
         int deadDecoderCounter = 0;
+        int samplecounter = 0;
+        ArrayList<Long> timestamps = new ArrayList<Long>();
         while (!sawOutputEOS && deadDecoderCounter < 100) {
             if (!sawInputEOS) {
                 int inputBufIndex = codec.dequeueInputBuffer(kTimeOutUs);
@@ -378,7 +397,13 @@ public class DecoderTest extends MediaPlayerTestBase {
                         sampleSize = 0;
                     } else {
                         presentationTimeUs = extractor.getSampleTime();
+                        samplecounter++;
+                        if (samplecounter == eosframe) {
+                            sawInputEOS = true;
+                        }
                     }
+
+                    timestamps.add(presentationTimeUs);
 
                     int flags = extractor.getSampleFlags();
 
@@ -410,6 +435,7 @@ public class DecoderTest extends MediaPlayerTestBase {
                         numframes = 0;
                         extractor.seekTo(0, MediaExtractor.SEEK_TO_NEXT_SYNC);
                         sawInputEOS = false;
+                        timestamps.clear();
                         codec.stop();
                         codec.configure(format, s /* surface */, null /* crypto */, 0 /* flags */);
                         codec.start();
@@ -423,8 +449,9 @@ public class DecoderTest extends MediaPlayerTestBase {
                         // of access units
                         numframes += info.size;
                     } else {
-                        // for video, count the number of video frames
+                        // for video, count the number of video frames and check the timestamp
                         numframes++;
+                        assertTrue("invalid timestamp", timestamps.remove(info.presentationTimeUs));
                     }
                 }
                 int outputBufIndex = res;
