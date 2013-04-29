@@ -215,9 +215,7 @@ public class ContactsContract_DataTest extends InstrumentationTestCase {
 
     public void testDataUpdate_updatesContactLastUpdatedTimestamp() {
         DatabaseAsserts.ContactIdPair ids = DatabaseAsserts.assertAndCreateContact(mResolver);
-
         long dataId = createData(ids.mRawContactId);
-
         long baseTime = ContactUtil.queryContactLastUpdatedTimestamp(mResolver, ids.mContactId);
 
         SystemClock.sleep(1);
@@ -226,7 +224,8 @@ public class ContactsContract_DataTest extends InstrumentationTestCase {
         DataUtil.update(mResolver, dataId, values);
 
         long newTime = ContactUtil.queryContactLastUpdatedTimestamp(mResolver, ids.mContactId);
-        assertTrue(newTime > baseTime);
+        assertTrue("Expected contact " + ids.mContactId + " last updated to be greater than " +
+                baseTime + ". But was " + newTime, newTime > baseTime);
 
         // Clean up
         RawContactUtil.delete(mResolver, ids.mRawContactId, true);
