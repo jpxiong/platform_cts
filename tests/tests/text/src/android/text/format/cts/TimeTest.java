@@ -661,10 +661,13 @@ public class TimeTest extends AndroidTestCase {
     public void testGetJulianDay() throws Exception {
         Time time = new Time();
 
-        // For each day of the year, and for each timezone, get the Julian
-        // day for 12am and then check that if we change the time we get the
-        // same Julian day.
-        for (int monthDay = 1; monthDay <= 366; monthDay += 20) {
+        // For every 15th day of 2008, and for each of the timezones listed above,
+        // get the Julian day for 12am and then check that if we change the time we get the
+        // same Julian day. Note that one of the many problems with the Time class
+        // is its lack of error handling. If we accidentally hit a time that doesn't
+        // exist (because it was skipped by a daylight savings transition), rather than
+        // an error, you'll silently get 1970-01-01. We should @deprecate Time.
+        for (int monthDay = 1; monthDay <= 366; monthDay += 15) {
             for (int zoneIndex = 0; zoneIndex < mTimeZones.length; zoneIndex++) {
                 // We leave the "month" as zero because we are changing the
                 // "monthDay" from 1 to 366. The call to normalize() will
