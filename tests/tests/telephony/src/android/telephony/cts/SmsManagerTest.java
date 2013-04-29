@@ -65,6 +65,7 @@ public class SmsManagerTest extends AndroidTestCase {
                     "45006",    // LGT
                     "311660",   // MetroPCS
                     "310120",   // Sprint
+                    "44050",    // KDDI
                     "44053",    // KDDI
                     "44054",    // KDDI
                     "44070",    // KDDI
