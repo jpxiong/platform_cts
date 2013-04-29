@@ -546,9 +546,7 @@ public class FileSystemPermissionTest extends AndroidTestCase {
                 "/sys/devices/tegradc.1/nvdps",
                 "/sys/kernel/debug/asoc/tegra30-dam.0",
                 "/sys/kernel/debug/asoc/tegra30-dam.1",
-                "/sys/kernel/debug/asoc/tegra30-dam.2",
-                // Mako
-                "/sys/module/wlan/parameters/fwpath"
+                "/sys/kernel/debug/asoc/tegra30-dam.2"
             ));
 
     private static void tryToReadFromAllIn(File dir, ExecutorService executor) throws IOException {
