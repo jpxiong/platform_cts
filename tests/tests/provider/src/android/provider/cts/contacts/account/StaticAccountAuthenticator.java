@@ -14,7 +14,7 @@
  * limitations under the License
  */
 
-package android.provider.cts;
+package android.provider.cts.contacts.account;
 
 import android.accounts.AbstractAccountAuthenticator;
 import android.accounts.Account;
@@ -32,7 +32,9 @@ import android.os.Bundle;
 public class StaticAccountAuthenticator extends AbstractAccountAuthenticator {
 
     public static final String NAME = "test_account_name";
-    public static final String TYPE = "test_account_type";
+    public static final String TYPE = "com.android.cts.contactsprovider";
+    public static final Account ACCOUNT_1 = new Account("cp account 1", TYPE);
+
     private static final String LABEL = "test_auth_token_label";
     private static final String TOKEN = "asdlkjfslkjfdklj";
 
@@ -44,20 +46,12 @@ public class StaticAccountAuthenticator extends AbstractAccountAuthenticator {
         sAccountBundle.putString(AccountManager.KEY_AUTHTOKEN, TOKEN);
     }
 
-    private Context mContext;
-
     private static Bundle createResultBundle() {
         return sAccountBundle;
     }
 
-    public void addAccount() {
-        AccountManager.get(mContext).addAccount(TYPE, null, null, null, null, null, null);
-    }
-
     public StaticAccountAuthenticator(Context context) {
         super(context);
-        this.mContext = context;
-        addAccount();
     }
 
     @Override

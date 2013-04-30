@@ -30,6 +30,7 @@ import android.provider.cts.contacts.CommonDatabaseUtils;
 import android.provider.cts.contacts.ContactUtil;
 import android.provider.cts.contacts.DatabaseAsserts;
 import android.provider.cts.contacts.RawContactUtil;
+import android.provider.cts.contacts.account.StaticAccountAuthenticator;
 import android.test.AndroidTestCase;
 import android.test.MoreAsserts;
 
@@ -91,7 +92,8 @@ public class ContactsContract_RawContactsTest extends AndroidTestCase {
     }
 
     public void testRawContactDelete_setsDeleteFlag() {
-        long rawContactid = RawContactUtil.insertRawContact(mResolver);
+        long rawContactid = RawContactUtil.insertRawContact(mResolver,
+                StaticAccountAuthenticator.ACCOUNT_1);
 
         assertTrue(RawContactUtil.rawContactExistsById(mResolver, rawContactid));
 
@@ -111,7 +113,8 @@ public class ContactsContract_RawContactsTest extends AndroidTestCase {
     }
 
     public void testRawContactDelete_removesRecord() {
-        long rawContactid = RawContactUtil.insertRawContact(mResolver);
+        long rawContactid = RawContactUtil.insertRawContact(mResolver,
+                StaticAccountAuthenticator.ACCOUNT_1);
         assertTrue(RawContactUtil.rawContactExistsById(mResolver, rawContactid));
 
         RawContactUtil.delete(mResolver, rawContactid, true);
@@ -126,13 +129,14 @@ public class ContactsContract_RawContactsTest extends AndroidTestCase {
     public void testRawContactCreate_updatesContactUpdatedTimestamp() {
         long startTime = System.currentTimeMillis();
 
-        long rawContactId = RawContactUtil.createRawContactWithName(mResolver);
-        long lastUpdated = getContactLastUpdatedTimestampByRawContactId(mResolver, rawContactId);
+        DatabaseAsserts.ContactIdPair ids = DatabaseAsserts.assertAndCreateContact(mResolver);
+        long lastUpdated = getContactLastUpdatedTimestampByRawContactId(mResolver,
+                ids.mRawContactId);
 
         assertTrue(lastUpdated > startTime);
 
         // Clean up
-        RawContactUtil.delete(mResolver, rawContactId, true);
+        RawContactUtil.delete(mResolver, ids.mRawContactId, true);
     }
 
     public void testRawContactUpdate_updatesContactUpdatedTimestamp() {

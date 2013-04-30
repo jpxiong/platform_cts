@@ -33,6 +33,7 @@ import android.provider.cts.ContactsContract_TestDataBuilder.TestRawContact;
 import android.provider.cts.contacts.ContactUtil;
 import android.provider.cts.contacts.DatabaseAsserts;
 import android.provider.cts.contacts.RawContactUtil;
+import android.provider.cts.contacts.account.StaticAccountAuthenticator;
 import android.test.AndroidTestCase;
 
 import java.util.List;
