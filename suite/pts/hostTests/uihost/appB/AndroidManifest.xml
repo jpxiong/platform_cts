@@ -21,9 +21,10 @@
 
     <application>
         <activity
-                android:name=".AppBActivity"
-                android:screenOrientation="portrait"
-                android:configChanges="keyboard|keyboardHidden|orientation|screenSize">
+            android:name=".AppBActivity"
+            android:configChanges="keyboard|keyboardHidden|orientation|screenSize"
+            android:screenOrientation="portrait" >
+
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER"/>
