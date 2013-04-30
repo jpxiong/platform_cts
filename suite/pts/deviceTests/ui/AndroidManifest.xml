@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Copyright (C) 2012 The Android Open Source Project
+<!--
+     Copyright (C) 2012 The Android Open Source Project
 
      Licensed under the Apache License, Version 2.0 (the "License");
      you may not use this file except in compliance with the License.
@@ -15,25 +16,32 @@
 -->
 
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-        package="com.android.pts.ui">
+    package="com.android.pts.ui" >
 
     <uses-permission android:name="android.permission.DISABLE_KEYGUARD" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
     <application>
         <uses-library android:name="android.test.runner" />
+
         <activity
-                android:name=".ScrollingActivity"
-                android:screenOrientation="portrait"
-                android:configChanges="keyboard|keyboardHidden|orientation|screenSize">
+            android:name=".ScrollingActivity"
+            android:configChanges="keyboard|keyboardHidden|orientation|screenSize"
+            android:screenOrientation="portrait" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.LAUNCHER"/>
+
+                <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-         <activity android:name="android.openglperf.cts.GlPlanetsActivity" />
+        <activity
+            android:name="android.openglperf.cts.GlPlanetsActivity"
+            android:configChanges="keyboard|keyboardHidden|orientation|screenSize" />
     </application>
-    <instrumentation android:name="android.test.InstrumentationCtsTestRunner"
-            android:targetPackage="com.android.pts.ui"
-            android:label="UI Latency measurement" />
+
+    <instrumentation
+        android:name="android.test.InstrumentationCtsTestRunner"
+        android:label="UI Latency measurement"
+        android:targetPackage="com.android.pts.ui" />
+
 </manifest>
