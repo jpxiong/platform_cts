@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-LOCAL_JAVA_LIBRARIES := android.test.runner bouncycastle
+LOCAL_JAVA_LIBRARIES := android.test.runner bouncycastle conscrypt
 LOCAL_PROGUARD_ENABLED := disabled
 LOCAL_DEX_PREOPT := false
 
