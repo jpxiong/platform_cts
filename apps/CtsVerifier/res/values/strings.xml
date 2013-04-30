@@ -579,4 +579,24 @@
     <string name="camera_fov_enable_compass_mode_description">If enabled, the panorama orients
         itself according to the current rotation of the device.</string>
 
+    <string name="test_category_notifications">Notifications</string>
+    <string name="nls_test">Notification Listener Test</string>
+    <string name="nls_service_name">Notification Listener for CTS Verifier</string>
+    <string name="nls_info">This test checks that a NotificationListenerService can be enabled
+        and disabled, and that once enabled the service is able to receive notificaitons and
+        dismiss them.
+    </string>
+    <string name="nls_enable_service">Please enable \"Notification Listener for CTS Verifier\" 
+        under Security > Notification Access and return here.</string>
+    <string name="nls_disable_service">Please disable \"Notification Listener for CTS Verifier\" 
+        under Security > Notification Access and return here.</string>
+    <string name="nls_start_settings">Launch Settings</string>
+    <string name="nls_service_started">Service should start once enabled.</string>
+    <string name="nls_note_received">Check that notification was received.</string>
+    <string name="nls_payload_intact">Check that notification payload was intact.</string>
+    <string name="nls_clear_one">Check that service can clear a notification.</string>
+    <string name="nls_clear_all">Check that service can clear all notifications.</string>
+    <string name="nls_service_stopped">Service should stop once disabled.</string>
+    <string name="nls_note_missed">Check that notification was not received.</string>
+    
 </resources>
