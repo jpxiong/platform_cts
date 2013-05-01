@@ -246,6 +246,15 @@ public class WebViewOnUiThread {
         });
     }
 
+    public void setFindListener(final WebView.FindListener listener) {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                mWebView.setFindListener(listener);
+            }
+        });
+    }
+
     public void removeJavascriptInterface(final String interfaceName) {
         runOnUiThread(new Runnable() {
             @Override
