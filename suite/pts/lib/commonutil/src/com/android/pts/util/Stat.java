@@ -16,6 +16,8 @@
 
 package com.android.pts.util;
 
+import java.util.Arrays;
+
 /**
  * Utilities for doing statistics
  *
@@ -30,11 +32,13 @@ public class Stat {
         public double mMin;
         public double mMax;
         public double mStddev;
-        public StatResult(double average, double min, double max, double stddev) {
+        public int mDataCount;
+        public StatResult(double average, double min, double max, double stddev, int dataCount) {
             mAverage = average;
             mMin = min;
             mMax = max;
             mStddev = stddev;
+            mDataCount = dataCount;
         }
     }
 
@@ -60,7 +64,58 @@ public class Stat {
         eX2 /= data.length;
         // stddev = sqrt(E[X^2] - (E[X])^2)
         double stddev = Math.sqrt(eX2 - average * average);
-        return new StatResult(average, min, max, stddev);
+        return new StatResult(average, min, max, stddev, data.length);
+    }
+
+    /**
+     * Calculate statistics properties likes average, min, max, and stddev for the given array
+     * while rejecting outlier +/- median * rejectionThreshold.
+     * rejectionThreshold should be bigger than 0.0 and be lowerthan 1.0
+     */
+    public static StatResult getStatWithOutlierRejection(double[] data, double rejectionThreshold) {
+        double[] dataCopied = Arrays.copyOf(data, data.length);
+        Arrays.sort(dataCopied);
+        int medianIndex = dataCopied.length / 2;
+        double median;
+        if (dataCopied.length % 2 == 1) {
+            median = dataCopied[medianIndex];
+        } else {
+            median = (dataCopied[medianIndex - 1] + dataCopied[medianIndex]) / 2.0;
+        }
+        double thresholdMin = median * (1.0 - rejectionThreshold);
+        double thresholdMax = median * (1.0 + rejectionThreshold);
+
+        double average = 0.0;
+        double min = median;
+        double max = median;
+        double eX2 = 0.0; // will become E[X^2]
+        int validDataCounter = 0;
+        for (int i = 0; i < data.length; i++) {
+            if ((data[i] > thresholdMin) && (data[i] < thresholdMax)) {
+                validDataCounter++;
+                average += data[i];
+                eX2 += data[i] * data[i];
+                if (data[i] > max) {
+                    max = data[i];
+                }
+                if (data[i] < min) {
+                    min = data[i];
+                }
+            }
+            //TODO report rejected data
+        }
+        double stddev;
+        if (validDataCounter > 0) {
+            average /= validDataCounter;
+            eX2 /= validDataCounter;
+            // stddev = sqrt(E[X^2] - (E[X])^2)
+            stddev = Math.sqrt(eX2 - average * average);
+        } else { // both median is showing too much diff
+            average = median;
+            stddev = 0; // don't care
+        }
+
+        return new StatResult(average, min, max, stddev, validDataCounter);
     }
 
     /**

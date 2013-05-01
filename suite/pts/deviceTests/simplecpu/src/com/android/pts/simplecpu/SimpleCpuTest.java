@@ -17,6 +17,7 @@
 package com.android.pts.simplecpu;
 
 import android.cts.util.TimeoutReq;
+import android.util.Log;
 
 import com.android.pts.util.ResultType;
 import com.android.pts.util.ResultUnit;
@@ -35,6 +36,8 @@ public class SimpleCpuTest extends PtsAndroidTestCase {
     private static final int KB = 1024;
     private static final int MB = 1024 * 1024;
     private static final int NUMBER_REPEAT = 20;
+    // reject data outside +/- this value * median
+    private static final double OUTLIER_THRESHOLD = 0.1;
 
     @Override
     protected void setUp() throws Exception {
@@ -99,7 +102,10 @@ public class SimpleCpuTest extends PtsAndroidTestCase {
         }
         getReportLog().printArray("sorting time", result, ResultType.LOWER_BETTER,
                 ResultUnit.MS);
-        Stat.StatResult stat = Stat.getStat(result);
+        Stat.StatResult stat = Stat.getStatWithOutlierRejection(result, OUTLIER_THRESHOLD);
+        if (stat.mDataCount != result.length) {
+            Log.w(TAG, "rejecting " + (result.length - stat.mDataCount) + " outliers");
+        }
         getReportLog().printSummary("sorting time", stat.mAverage, ResultType.LOWER_BETTER,
                 ResultUnit.MS);
     }
@@ -118,7 +124,10 @@ public class SimpleCpuTest extends PtsAndroidTestCase {
         }
         getReportLog().printArray("matrix mutiplication time", result, ResultType.LOWER_BETTER,
                 ResultUnit.MS);
-        Stat.StatResult stat = Stat.getStat(result);
+        Stat.StatResult stat = Stat.getStatWithOutlierRejection(result, OUTLIER_THRESHOLD);
+        if (stat.mDataCount != result.length) {
+            Log.w(TAG, "rejecting " + (result.length - stat.mDataCount) + " outliers");
+        }
         getReportLog().printSummary("matrix mutiplication time", stat.mAverage,
                 ResultType.LOWER_BETTER, ResultUnit.MS);
     }
