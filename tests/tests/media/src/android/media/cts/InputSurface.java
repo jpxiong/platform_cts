@@ -17,6 +17,7 @@
 package android.media.cts;
 
 import android.opengl.EGL14;
+import android.opengl.EGLExt;
 import android.opengl.EGLConfig;
 import android.opengl.EGLContext;
 import android.opengl.EGLDisplay;
@@ -169,7 +170,7 @@ class InputSurface {
      * Sends the presentation time stamp to EGL.
      */
     public void setPresentationTime(long when) {
-        EGL14.eglPresentationTimeANDROID(mEGLDisplay, mEGLSurface, when);
+        EGLExt.eglPresentationTimeANDROID(mEGLDisplay, mEGLSurface, when);
     }
 
     /**
