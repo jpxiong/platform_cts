@@ -287,6 +287,7 @@ public class FileUtil {
 
             @Override
             public void run(int i) throws IOException {
+                Log.i(TAG, "starting " + i + " -th round");
                 int start = i * readsInOneMeasure;
                 int end = (i + 1) * readsInOneMeasure;
                 for (int j = start; j < end; j++) {
@@ -339,6 +340,7 @@ public class FileUtil {
 
             @Override
             public void run(int i) throws IOException {
+                Log.i(TAG, "starting " + i + " -th round");
                 int start = i * writesInOneMeasure;
                 int end = (i + 1) * writesInOneMeasure;
                 for (int j = start; j < end; j++) {
@@ -378,6 +380,7 @@ public class FileUtil {
         int numberRepeatInOneRun = (int)(fileSize / bufferSize);
         double[] mbpsAll = new double[numberRepetition * numberRepeatInOneRun];
         for (int i = 0; i < numberRepetition; i++) {
+            Log.i(TAG, "starting " + i + " -th round");
             final RandomAccessFile randomFile = new RandomAccessFile(file, "rwd");  // force O_SYNC
             randomFile.seek(0L);
             double[] times = MeasureTime.measure(numberRepeatInOneRun, new MeasureRun() {
