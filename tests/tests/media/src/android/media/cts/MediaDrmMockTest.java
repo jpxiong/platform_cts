@@ -21,6 +21,7 @@ import android.media.MediaDrm.ProvisionRequest;
 import android.media.MediaDrm.KeyRequest;
 import android.media.MediaDrm.CryptoSession;
 import android.media.MediaDrmException;
+import android.media.NotProvisionedException;
 import android.test.AndroidTestCase;
 import android.util.Log;
 import java.util.HashMap;
@@ -164,7 +165,7 @@ public class MediaDrmMockTest extends AndroidTestCase {
         }
 
         MediaDrm md = new MediaDrm(mockScheme);
-        byte[] sessionId = md.openSession();
+        byte[] sessionId = openSession(md);
         md.closeSession(sessionId);
     }
 
@@ -206,7 +207,7 @@ public class MediaDrmMockTest extends AndroidTestCase {
         }
 
         MediaDrm md = new MediaDrm(mockScheme);
-        byte[] sessionId = md.openSession();
+        byte[] sessionId = openSession(md);
 
         // Set up mock expected responses using properties
         byte testRequest[] = {0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x10, 0x11, 0x12};
@@ -240,7 +241,7 @@ public class MediaDrmMockTest extends AndroidTestCase {
         }
 
         MediaDrm md = new MediaDrm(mockScheme);
-        byte[] sessionId = md.openSession();
+        byte[] sessionId = openSession(md);
 
         // Set up mock expected responses using properties
         byte testRequest[] = {0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x10, 0x11, 0x12};
@@ -270,7 +271,7 @@ public class MediaDrmMockTest extends AndroidTestCase {
         }
 
         MediaDrm md = new MediaDrm(mockScheme);
-        byte[] sessionId = md.openSession();
+        byte[] sessionId = openSession(md);
 
         // Set up mock expected responses using properties
         byte testRequest[] = {0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x10, 0x11, 0x12};
@@ -300,7 +301,7 @@ public class MediaDrmMockTest extends AndroidTestCase {
         }
 
         MediaDrm md = new MediaDrm(mockScheme);
-        byte[] sessionId = md.openSession();
+        byte[] sessionId = openSession(md);
 
         // Set up mock expected responses using properties
         byte testRequest[] = {0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x10, 0x11, 0x12};
@@ -327,7 +328,7 @@ public class MediaDrmMockTest extends AndroidTestCase {
         }
 
         MediaDrm md = new MediaDrm(mockScheme);
-        byte[] sessionId = md.openSession();
+        byte[] sessionId = openSession(md);
 
         // Set up mock expected responses using properties
         byte testResponse[] = {0x1a, 0x1b, 0x1c, 0x1d, 0x1e, 0x1f, 0x20};
@@ -344,7 +345,7 @@ public class MediaDrmMockTest extends AndroidTestCase {
         }
 
         MediaDrm md = new MediaDrm(mockScheme);
-        byte[] sessionId = md.openSession();
+        byte[] sessionId = openSession(md);
 
         byte testResponse[] = {0x1a, 0x1b, 0x1c, 0x1d, 0x1e, 0x1f, 0x20};
         byte[] keySetId = md.provideKeyResponse(sessionId, testResponse);
@@ -359,13 +360,13 @@ public class MediaDrmMockTest extends AndroidTestCase {
         }
 
         MediaDrm md = new MediaDrm(mockScheme);
-        byte[] sessionId = md.openSession();
+        byte[] sessionId = openSession(md);
 
         byte testResponse[] = {0x1a, 0x1b, 0x1c, 0x1d, 0x1e, 0x1f, 0x20};
         byte[] keySetId = md.provideKeyResponse(sessionId, testResponse);
         md.closeSession(sessionId);
 
-        sessionId = md.openSession();
+        sessionId = openSession(md);
         md.restoreKeys(sessionId, keySetId);
         md.closeSession(sessionId);
     }
@@ -376,7 +377,7 @@ public class MediaDrmMockTest extends AndroidTestCase {
         }
 
         MediaDrm md = new MediaDrm(mockScheme);
-        byte[] sessionId = md.openSession();
+        byte[] sessionId = openSession(md);
         HashMap<String, String> infoMap = md.queryKeyStatus(sessionId);
 
         // these are canned strings returned by the mock
@@ -466,9 +467,9 @@ public class MediaDrmMockTest extends AndroidTestCase {
 
         MediaDrm md = new MediaDrm(mockScheme);
 
-        byte[] session1 = md.openSession();
-        byte[] session2 = md.openSession();
-        byte[] session3 = md.openSession();
+        byte[] session1 = openSession(md);
+        byte[] session2 = openSession(md);
+        byte[] session3 = openSession(md);
 
         assertFalse(Arrays.equals(session1, session2));
         assertFalse(Arrays.equals(session2, session3));
@@ -485,7 +486,7 @@ public class MediaDrmMockTest extends AndroidTestCase {
 
         MediaDrm md = new MediaDrm(mockScheme);
 
-        byte[] sessionId = md.openSession();
+        byte[] sessionId = openSession(md);
         CryptoSession cs = md.getCryptoSession(sessionId, "AES/CBC/NoPadding", "HmacSHA256");
         assertFalse(cs == null);
     }
@@ -499,7 +500,7 @@ public class MediaDrmMockTest extends AndroidTestCase {
 
         boolean gotException = false;
         try {
-            byte[] sessionId = md.openSession();
+            byte[] sessionId = openSession(md);
             CryptoSession cs = md.getCryptoSession(sessionId, "bad", "bad");
         } catch (IllegalArgumentException e) {
             gotException = true;
@@ -514,7 +515,7 @@ public class MediaDrmMockTest extends AndroidTestCase {
 
         MediaDrm md = new MediaDrm(mockScheme);
 
-        byte[] sessionId = md.openSession();
+        byte[] sessionId = openSession(md);
         CryptoSession cs = md.getCryptoSession(sessionId, "AES/CBC/NoPadding", "HmacSHA256");
         assertFalse(cs == null);
 
@@ -540,7 +541,7 @@ public class MediaDrmMockTest extends AndroidTestCase {
 
         MediaDrm md = new MediaDrm(mockScheme);
 
-        byte[] sessionId = md.openSession();
+        byte[] sessionId = openSession(md);
         CryptoSession cs = md.getCryptoSession(sessionId, "AES/CBC/NoPadding", "HmacSHA256");
         assertFalse(cs == null);
 
@@ -566,7 +567,7 @@ public class MediaDrmMockTest extends AndroidTestCase {
 
         MediaDrm md = new MediaDrm(mockScheme);
 
-        byte[] sessionId = md.openSession();
+        byte[] sessionId = openSession(md);
         CryptoSession cs = md.getCryptoSession(sessionId, "AES/CBC/NoPadding", "HmacSHA256");
         assertFalse(cs == null);
 
@@ -590,7 +591,7 @@ public class MediaDrmMockTest extends AndroidTestCase {
 
         MediaDrm md = new MediaDrm(mockScheme);
 
-        byte[] sessionId = md.openSession();
+        byte[] sessionId = openSession(md);
         CryptoSession cs = md.getCryptoSession(sessionId, "AES/CBC/NoPadding", "HmacSHA256");
         assertFalse(cs == null);
 
@@ -708,7 +709,7 @@ public class MediaDrmMockTest extends AndroidTestCase {
                 }
 
 
-                final byte[] expected_sessionId = mMediaDrm.openSession();
+                final byte[] expected_sessionId = openSession(mMediaDrm);
                 final byte[] expected_data = {0x10, 0x11, 0x12, 0x13, 0x14,
                                               0x15, 0x16, 0x17, 0x18, 0x19};
 
@@ -760,5 +761,15 @@ public class MediaDrmMockTest extends AndroidTestCase {
 
         mLooper.quit();
         assertTrue(mGotEvent);
+    }
+
+    private byte[] openSession(MediaDrm md) {
+        byte[] sessionId = null;
+        try {
+            sessionId = md.openSession();
+        } catch (NotProvisionedException e) {
+            // ignore, not thrown by mock
+        }
+        return sessionId;
     }
 }
