@@ -339,6 +339,7 @@
         </activity>
 
         <activity android:name="android.widget.cts.VideoViewStubActivity"
+            android:configChanges="keyboardHidden|orientation|screenSize">
             android:label="VideoViewStubActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
