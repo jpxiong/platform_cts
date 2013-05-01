@@ -35,11 +35,14 @@ import com.android.pts.util.Stat;
  */
 public class BandwidthTest extends PtsAndroidTestCase {
     private static final String TAG = "BandwidthTest";
-    private static final int REPETITION = 10;
+    private static final int MEMCPY_REPETITION = 10;
+    private static final int MEMSET_REPETITION = 30;
     private static final int REPEAT_IN_EACH_CALL = 100;
     private static final int KB = 1024;
     private static final int MB = 1024 * 1024;
     private static final int MEMSET_CHAR = 0xa5;
+    // reject data outside +/- this value * median
+    private static final double OUTLIER_THRESHOLD = 0.1;
 
     @Override
     protected void setUp() throws Exception {
@@ -153,13 +156,13 @@ public class BandwidthTest extends PtsAndroidTestCase {
     }
 
     private void doRunMemcpy(int bufferSize) {
-        double[] result = new double[REPETITION];
+        double[] result = new double[MEMCPY_REPETITION];
         int repeatInEachCall = REPEAT_IN_EACH_CALL;
         if (bufferSize < (1 * MB)) {
             // too small buffer size finishes too early to give accurate result.
             repeatInEachCall *= (1 * MB / bufferSize);
         }
-        for (int i = 0; i < REPETITION; i++) {
+        for (int i = 0; i < MEMCPY_REPETITION; i++) {
             result[i] = MemoryNative.runMemcpy(bufferSize, repeatInEachCall);
         }
         getReportLog().printArray("memcpy time", result, ResultType.LOWER_BETTER,
@@ -168,7 +171,10 @@ public class BandwidthTest extends PtsAndroidTestCase {
                 (double)bufferSize * repeatInEachCall / 1024.0 / 1024.0, result);
         getReportLog().printArray("memcpy throughput", mbps, ResultType.HIGHER_BETTER,
                 ResultUnit.MBPS);
-        Stat.StatResult stat = Stat.getStat(mbps);
+        Stat.StatResult stat = Stat.getStatWithOutlierRejection(mbps, OUTLIER_THRESHOLD);
+        if (stat.mDataCount != result.length) {
+            Log.w(TAG, "rejecting " + (result.length - stat.mDataCount) + " outliers");
+        }
         WindowManager wm = (WindowManager) getContext().getSystemService(Context.WINDOW_SERVICE);
         Point size = new Point();
         wm.getDefaultDisplay().getSize(size);
@@ -183,13 +189,13 @@ public class BandwidthTest extends PtsAndroidTestCase {
     }
 
     private void doRunMemset(int bufferSize) {
-        double[] result = new double[REPETITION];
+        double[] result = new double[MEMSET_REPETITION];
         int repeatInEachCall = REPEAT_IN_EACH_CALL;
         if (bufferSize < (1 * MB)) {
             // too small buffer size finishes too early to give accurate result.
             repeatInEachCall *= (1 * MB / bufferSize);
         }
-        for (int i = 0; i < REPETITION; i++) {
+        for (int i = 0; i < MEMSET_REPETITION; i++) {
             result[i] = MemoryNative.runMemset(bufferSize, repeatInEachCall, MEMSET_CHAR);
         }
         getReportLog().printArray("memset time", result, ResultType.LOWER_BETTER,
@@ -198,7 +204,10 @@ public class BandwidthTest extends PtsAndroidTestCase {
                 (double)bufferSize * repeatInEachCall / 1024.0 / 1024.0, result);
         getReportLog().printArray("memset throughput", mbps, ResultType.HIGHER_BETTER,
                 ResultUnit.MBPS);
-        Stat.StatResult stat = Stat.getStat(mbps);
+        Stat.StatResult stat = Stat.getStatWithOutlierRejection(mbps, OUTLIER_THRESHOLD);
+        if (stat.mDataCount != result.length) {
+            Log.w(TAG, "rejecting " + (result.length - stat.mDataCount) + " outliers");
+        }
         WindowManager wm = (WindowManager) getContext().getSystemService(Context.WINDOW_SERVICE);
         Point size = new Point();
         wm.getDefaultDisplay().getSize(size);
