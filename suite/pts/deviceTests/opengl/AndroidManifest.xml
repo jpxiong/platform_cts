@@ -20,7 +20,7 @@
 
         <activity
             android:name="com.android.pts.opengl.primitive.GLPrimitiveActivity"
-            android:configChanges="keyboard|keyboardHidden|orientation|screenSize"
+            android:configChanges="keyboard|keyboardHidden|orientation|screenSize|uiMode"
             android:theme="@android:style/Theme.NoTitleBar.Fullscreen" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -30,7 +30,7 @@
         </activity>
         <activity
             android:name="com.android.pts.opengl.reference.GLReferenceActivity"
-            android:configChanges="keyboard|keyboardHidden|orientation|screenSize" >
+            android:configChanges="keyboard|keyboardHidden|orientation|screenSize|uiMode" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -39,7 +39,7 @@
         </activity>
         <activity
             android:name="com.android.pts.opengl.reference.GLGameActivity"
-            android:configChanges="keyboard|keyboardHidden|orientation|screenSize"
+            android:configChanges="keyboard|keyboardHidden|orientation|screenSize|uiMode"
             android:theme="@android:style/Theme.NoTitleBar.Fullscreen" >
         </activity>
     </application>
