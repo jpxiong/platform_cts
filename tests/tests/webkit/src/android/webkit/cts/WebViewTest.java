@@ -66,6 +66,7 @@ import junit.framework.Assert;
 import java.io.File;
 import java.io.FileInputStream;
 import java.util.Date;
+import java.util.concurrent.FutureTask;
 
 public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubActivity> {
     private static final String LOGTAG = "WebViewTest";
@@ -774,14 +775,35 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
         assertTrue("URL: " + mWebView.getUrl(), mWebView.getUrl().indexOf("bar") > 0);
     }
 
-    @UiThreadTest
-    public void testFindAll() {
+    private static class WaitForFindResultsListener extends FutureTask<Integer>
+            implements WebView.FindListener {
+        public WaitForFindResultsListener() {
+            super(new Runnable() {
+                @Override
+                public void run() { }
+            }, null);
+        }
+
+        @Override
+        public void onFindResultReceived(int activeMatchOrdinal, int numberOfMatches,
+                boolean isDoneCounting) {
+            if (isDoneCounting) {
+                set(numberOfMatches);
+            }
+        }
+    }
+
+    public void testFindAll()  throws Throwable {
         String p = "<p>Find all instances of find on the page and highlight them.</p>";
 
         mOnUiThread.loadDataAndWaitForCompletion("<html><body>" + p
                 + "</body></html>", "text/html", null);
 
-        assertEquals(2, mWebView.findAll("find"));
+        WaitForFindResultsListener l = new WaitForFindResultsListener();
+        mOnUiThread.setFindListener(l);
+        mOnUiThread.findAll("find");
+
+        assertEquals(2, l.get().intValue());
     }
 
     public void testFindNext() throws Throwable {
