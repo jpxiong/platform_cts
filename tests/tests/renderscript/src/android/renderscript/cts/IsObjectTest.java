@@ -36,6 +36,8 @@ public class IsObjectTest extends RSBaseCompute {
     Sampler sampler;
     Script script;
 
+    private ScriptC_is_object ms_is_object;
+
     @Override
     protected void setUp() throws Exception {
         super.setUp();
@@ -45,7 +47,8 @@ public class IsObjectTest extends RSBaseCompute {
         type = new Type.Builder(mRS, Element.I8(mRS)).setX(1).create();
         allocation = Allocation.createTyped(mRS, type);
         sampler = new Sampler.Builder(mRS).create();
-        script = new ScriptC_is_object_element(mRS, mRes, R.raw.is_object_element);
+        script = new ScriptC_is_object(mRS);
+        ms_is_object = new ScriptC_is_object(mRS);
     }
 
     /**
@@ -61,10 +64,8 @@ public class IsObjectTest extends RSBaseCompute {
 
         mIn = filed.getAllocation();
         mOut = Allocation.createSized(mRS, Element.I32(mRS), ObjectNum);
-        ScriptC_is_object_element mScript = new ScriptC_is_object_element(mRS, mRes,
-                R.raw.is_object_element);
         try {
-            mScript.forEach_root(mIn, mOut);
+            ms_is_object.forEach_is_object_element(mIn, mOut);
         } catch (RSRuntimeException e) {
             Log.i("compare", "rsIsObject root fail");
         }
@@ -83,11 +84,9 @@ public class IsObjectTest extends RSBaseCompute {
 
         mIn = filed.getAllocation();
         mOut = Allocation.createSized(mRS, Element.I32(mRS), ObjectNum);
-        ScriptC_is_object_type mScript = new ScriptC_is_object_type(mRS, mRes,
-                R.raw.is_object_type);
 
         try {
-            mScript.forEach_root(mIn, mOut);
+            ms_is_object.forEach_is_object_type(mIn, mOut);
         } catch (RSRuntimeException e) {
             Log.i("compare", "rsIsObject root fail");
         }
@@ -109,11 +108,9 @@ public class IsObjectTest extends RSBaseCompute {
 
         mIn = filed.getAllocation();
         mOut = Allocation.createSized(mRS, Element.I32(mRS), ObjectNum);
-        ScriptC_is_object_allocation mScript = new ScriptC_is_object_allocation(mRS,
-                mRes, R.raw.is_object_allocation);
 
         try {
-            mScript.forEach_root(mIn, mOut);
+            ms_is_object.forEach_is_object_allocation(mIn, mOut);
         } catch (RSRuntimeException e) {
             Log.i("compare", "rsIsObject root fail");
         }
@@ -134,11 +131,9 @@ public class IsObjectTest extends RSBaseCompute {
 
         mIn = filed.getAllocation();
         mOut = Allocation.createSized(mRS, Element.I32(mRS), ObjectNum);
-        ScriptC_is_object_sampler mScript = new ScriptC_is_object_sampler(mRS, mRes,
-                R.raw.is_object_sampler);
 
         try {
-            mScript.forEach_root(mIn, mOut);
+            ms_is_object.forEach_is_object_sampler(mIn, mOut);
         } catch (RSRuntimeException e) {
             Log.i("compare", "rsIsObject root fail");
         }
@@ -158,11 +153,9 @@ public class IsObjectTest extends RSBaseCompute {
 
         mIn = filed.getAllocation();
         mOut = Allocation.createSized(mRS, Element.I32(mRS), ObjectNum);
-        ScriptC_is_object_script mScript = new ScriptC_is_object_script(mRS, mRes,
-                R.raw.is_object_script);
 
         try {
-            mScript.forEach_root(mIn, mOut);
+            ms_is_object.forEach_is_object_script(mIn, mOut);
         } catch (RSRuntimeException e) {
             Log.i("compare", "rsIsObject root fail");
         }
