@@ -114,7 +114,7 @@ public class AlmostFullTest extends PtsAndroidTestCase {
     @TimeoutReq(minutes = 60)
     public void testRandomUpdate() throws Exception {
         final int BUFFER_SIZE = 4 * 1024;
-        final long fileSize = 400L * 1024L * 1024L;
+        final long fileSize = 256L * 1024L * 1024L;
         FileUtil.doRandomWriteTest(getContext(), DIR_RANDOM_WR, getReportLog(), fileSize,
                 BUFFER_SIZE);
     }

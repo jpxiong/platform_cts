@@ -331,7 +331,7 @@ public class FileUtil {
                     ~(bufferSize - 1);
         }
         final int runsInOneGo = 16;
-        final int writesInOneMeasure = totalWriteCount / runsInOneGo; // 32MB at a time
+        final int writesInOneMeasure = totalWriteCount / runsInOneGo;
 
         final RandomAccessFile randomFile = new RandomAccessFile(file, "rwd"); // force O_SYNC
         double[] rdAmount = new double[runsInOneGo];
