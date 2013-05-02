@@ -43,11 +43,11 @@ public class RandomRWTest extends PtsAndroidTestCase {
                 READ_BUFFER_SIZE);
     }
 
-    // It is taking too long in tuna, and thus cannot run multiple times
+    // It is taking too long in some device, and thus cannot run multiple times
     @TimeoutReq(minutes = 60)
     public void testRandomUpdate() throws Exception {
         final int WRITE_BUFFER_SIZE = 4 * 1024;
-        final long fileSize = 512 * 1024 * 1024;
+        final long fileSize = 256 * 1024 * 1024;
         FileUtil.doRandomWriteTest(getContext(), DIR_RANDOM_WR, getReportLog(), fileSize,
                 WRITE_BUFFER_SIZE);
     }
