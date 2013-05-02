@@ -23,7 +23,6 @@ import android.media.MediaFormat;
 import android.opengl.GLES20;
 import android.test.AndroidTestCase;
 import android.util.Log;
-import android.view.Surface;
 
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -31,7 +30,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
-import java.util.Arrays;
 
 import javax.microedition.khronos.opengles.GL10;
 
@@ -59,7 +57,6 @@ public class DecodeEditEncodeTest extends AndroidTestCase {
 
     // parameters for the encoder
     private static final String MIME_TYPE = "video/avc";    // H.264 Advanced Video Coding
-    private static final int BIT_RATE = 2000000;            // 2Mbps
     private static final int FRAME_RATE = 15;               // 15fps
     private static final int IFRAME_INTERVAL = 10;          // 10 seconds between I-frames
 
@@ -86,21 +83,23 @@ public class DecodeEditEncodeTest extends AndroidTestCase {
     // size of a frame, in pixels
     private int mWidth = -1;
     private int mHeight = -1;
+    // bit rate, in bits per second
+    private int mBitRate = -1;
 
     // largest color component delta seen (i.e. actual vs. expected)
     private int mLargestColorDelta;
 
 
     public void testVideoEditQCIF() throws Throwable {
-        setSize(176, 144);
+        setParameters(176, 144, 1000000);
         VideoEditWrapper.runTest(this);
     }
     public void testVideoEditQVGA() throws Throwable {
-        setSize(320, 240);
+        setParameters(320, 240, 2000000);
         VideoEditWrapper.runTest(this);
     }
     public void testVideoEdit720p() throws Throwable {
-        setSize(1280, 720);
+        setParameters(1280, 720, 6000000);
         VideoEditWrapper.runTest(this);
     }
 
@@ -138,14 +137,15 @@ public class DecodeEditEncodeTest extends AndroidTestCase {
     }
 
     /**
-     * Sets the desired frame size.
+     * Sets the desired frame size and bit rate.
      */
-    private void setSize(int width, int height) {
+    private void setParameters(int width, int height, int bitRate) {
         if ((width % 16) != 0 || (height % 16) != 0) {
             Log.w(TAG, "WARNING: width or height not multiple of 16");
         }
         mWidth = width;
         mHeight = height;
+        mBitRate = bitRate;
     }
 
     /**
@@ -206,7 +206,7 @@ public class DecodeEditEncodeTest extends AndroidTestCase {
             // configure() call to throw an unhelpful exception.
             format.setInteger(MediaFormat.KEY_COLOR_FORMAT,
                     MediaCodecInfo.CodecCapabilities.COLOR_FormatSurface);
-            format.setInteger(MediaFormat.KEY_BIT_RATE, BIT_RATE);
+            format.setInteger(MediaFormat.KEY_BIT_RATE, mBitRate);
             format.setInteger(MediaFormat.KEY_FRAME_RATE, FRAME_RATE);
             format.setInteger(MediaFormat.KEY_I_FRAME_INTERVAL, IFRAME_INTERVAL);
             if (VERBOSE) Log.d(TAG, "format: " + format);

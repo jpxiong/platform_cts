@@ -16,7 +16,6 @@
 
 package android.media.cts;
 
-import android.graphics.SurfaceTexture;
 import android.media.MediaCodec;
 import android.media.MediaCodecInfo;
 import android.media.MediaCodecList;
@@ -24,7 +23,6 @@ import android.media.MediaFormat;
 import android.opengl.GLES20;
 import android.test.AndroidTestCase;
 import android.util.Log;
-import android.view.Surface;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -54,7 +52,6 @@ public class EncodeDecodeTest extends AndroidTestCase {
 
     // parameters for the encoder
     private static final String MIME_TYPE = "video/avc";    // H.264 Advanced Video Coding
-    private static final int BIT_RATE = 2000000;            // 2Mbps
     private static final int FRAME_RATE = 15;               // 15fps
     private static final int IFRAME_INTERVAL = 10;          // 10 seconds between I-frames
 
@@ -74,6 +71,8 @@ public class EncodeDecodeTest extends AndroidTestCase {
     // size of a frame, in pixels
     private int mWidth = -1;
     private int mHeight = -1;
+    // bit rate, in bits per second
+    private int mBitRate = -1;
 
     // largest color component delta seen (i.e. actual vs. expected)
     private int mLargestColorDelta;
@@ -85,15 +84,15 @@ public class EncodeDecodeTest extends AndroidTestCase {
      * validity.
      */
     public void testEncodeDecodeVideoFromBufferToBufferQCIF() throws Exception {
-        setSize(176, 144);
+        setParameters(176, 144, 1000000);
         encodeDecodeVideoFromBuffer(false);
     }
     public void testEncodeDecodeVideoFromBufferToBufferQVGA() throws Exception {
-        setSize(320, 240);
+        setParameters(320, 240, 2000000);
         encodeDecodeVideoFromBuffer(false);
     }
     public void testEncodeDecodeVideoFromBufferToBuffer720p() throws Exception {
-        setSize(1280, 720);
+        setParameters(1280, 720, 6000000);
         encodeDecodeVideoFromBuffer(false);
     }
 
@@ -110,15 +109,15 @@ public class EncodeDecodeTest extends AndroidTestCase {
      * the test.
      */
     public void testEncodeDecodeVideoFromBufferToSurfaceQCIF() throws Throwable {
-        setSize(176, 144);
+        setParameters(176, 144, 1000000);
         BufferToSurfaceWrapper.runTest(this);
     }
     public void testEncodeDecodeVideoFromBufferToSurfaceQVGA() throws Throwable {
-        setSize(320, 240);
+        setParameters(320, 240, 2000000);
         BufferToSurfaceWrapper.runTest(this);
     }
     public void testEncodeDecodeVideoFromBufferToSurface720p() throws Throwable {
-        setSize(1280, 720);
+        setParameters(1280, 720, 6000000);
         BufferToSurfaceWrapper.runTest(this);
     }
 
@@ -158,15 +157,15 @@ public class EncodeDecodeTest extends AndroidTestCase {
      * a Surface and decoded onto a Surface.  The output is checked for validity.
      */
     public void testEncodeDecodeVideoFromSurfaceToSurfaceQCIF() throws Throwable {
-        setSize(176, 144);
+        setParameters(176, 144, 1000000);
         SurfaceToSurfaceWrapper.runTest(this);
     }
     public void testEncodeDecodeVideoFromSurfaceToSurfaceQVGA() throws Throwable {
-        setSize(320, 240);
+        setParameters(320, 240, 2000000);
         SurfaceToSurfaceWrapper.runTest(this);
     }
     public void testEncodeDecodeVideoFromSurfaceToSurface720p() throws Throwable {
-        setSize(1280, 720);
+        setParameters(1280, 720, 6000000);
         SurfaceToSurfaceWrapper.runTest(this);
     }
 
@@ -202,14 +201,15 @@ public class EncodeDecodeTest extends AndroidTestCase {
     }
 
     /**
-     * Sets the desired frame size.
+     * Sets the desired frame size and bit rate.
      */
-    private void setSize(int width, int height) {
+    private void setParameters(int width, int height, int bitRate) {
         if ((width % 16) != 0 || (height % 16) != 0) {
             Log.w(TAG, "WARNING: width or height not multiple of 16");
         }
         mWidth = width;
         mHeight = height;
+        mBitRate = bitRate;
     }
 
     /**
@@ -245,7 +245,7 @@ public class EncodeDecodeTest extends AndroidTestCase {
             // Set some properties.  Failing to specify some of these can cause the MediaCodec
             // configure() call to throw an unhelpful exception.
             format.setInteger(MediaFormat.KEY_COLOR_FORMAT, colorFormat);
-            format.setInteger(MediaFormat.KEY_BIT_RATE, BIT_RATE);
+            format.setInteger(MediaFormat.KEY_BIT_RATE, mBitRate);
             format.setInteger(MediaFormat.KEY_FRAME_RATE, FRAME_RATE);
             format.setInteger(MediaFormat.KEY_I_FRAME_INTERVAL, IFRAME_INTERVAL);
             if (VERBOSE) Log.d(TAG, "format: " + format);
@@ -308,7 +308,7 @@ public class EncodeDecodeTest extends AndroidTestCase {
             // Set some properties.  Failing to specify some of these can cause the MediaCodec
             // configure() call to throw an unhelpful exception.
             format.setInteger(MediaFormat.KEY_COLOR_FORMAT, colorFormat);
-            format.setInteger(MediaFormat.KEY_BIT_RATE, BIT_RATE);
+            format.setInteger(MediaFormat.KEY_BIT_RATE, mBitRate);
             format.setInteger(MediaFormat.KEY_FRAME_RATE, FRAME_RATE);
             format.setInteger(MediaFormat.KEY_I_FRAME_INTERVAL, IFRAME_INTERVAL);
             if (VERBOSE) Log.d(TAG, "format: " + format);
