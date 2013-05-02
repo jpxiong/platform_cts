@@ -17,27 +17,14 @@
 package com.android.cts.verifier.camera.fov;
 
 /**
- * A resolution to be used in the adapter that feeds the resolution spinner.
+ * Simple immutable class for keeping a size.
  */
-public class SelectableResolution {
-    public final int cameraId;
+public class Size {
     public final int width;
     public final int height;
-    public boolean passed;
-    public boolean tested;
-    public float measuredFOV;
 
-    public SelectableResolution(int cameraId, int width, int height) {
-        this.cameraId = cameraId;
+    public Size(int width, int height) {
         this.width = width;
         this.height = height;
-        this.passed = false;
-        this.tested = false;
-    }
-
-    @Override
-    public String toString() {
-        return "Cam " + cameraId + ": " + width + " x " + height + " - "
-                + (!tested ? "untested" : "done");
     }
 }

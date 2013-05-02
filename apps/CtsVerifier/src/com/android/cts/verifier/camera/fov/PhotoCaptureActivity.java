@@ -22,7 +22,6 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.hardware.Camera;
 import android.hardware.Camera.PictureCallback;
-import android.hardware.Camera.Size;
 import android.os.Bundle;
 import android.os.PowerManager;
 import android.os.PowerManager.WakeLock;
@@ -52,7 +51,7 @@ import java.util.List;
  * An activity for showing the camera preview and taking a picture.
  */
 public class PhotoCaptureActivity extends Activity
-implements PictureCallback, SurfaceHolder.Callback {
+        implements PictureCallback, SurfaceHolder.Callback {
     private static final String TAG = PhotoCaptureActivity.class.getSimpleName();
     private static final int FOV_REQUEST_CODE = 1006;
     private static final String PICTURE_FILENAME = "photo.jpg";
@@ -65,6 +64,7 @@ implements PictureCallback, SurfaceHolder.Callback {
     private ArrayAdapter<SelectableResolution> mAdapter;
 
     private Camera mCamera;
+    private Size mSurfaceSize;
     private boolean mCameraInitialized = false;
     private boolean mPreviewActive = false;
     private int mResolutionSpinnerIndex = -1;
@@ -119,6 +119,7 @@ implements PictureCallback, SurfaceHolder.Callback {
                 if (mSupportedResolutions != null) {
                     SelectableResolution resolution = mSupportedResolutions.get(position);
 
+                    switchToCamera(resolution.cameraId);
                     Camera.Parameters params = mCamera.getParameters();
                     params.setPictureSize(resolution.width, resolution.height);
                     mCamera.setParameters(params);
@@ -131,54 +132,38 @@ implements PictureCallback, SurfaceHolder.Callback {
         });
     }
 
-    /**
-     * Get the best supported focus mode.
-     *
-     * @param camera - Android camera object.
-     * @return the best supported focus mode.
-     */
-    protected String getFocusMode(Camera camera) {
-        List<String> modes = camera.getParameters().getSupportedFocusModes();
-        if (modes != null) {
-            if (modes.contains(Camera.Parameters.FOCUS_MODE_INFINITY)) {
-                Log.v(TAG, "Using Focus mode infinity");
-                return Camera.Parameters.FOCUS_MODE_INFINITY;
-            }
-            if (modes.contains(Camera.Parameters.FOCUS_MODE_FIXED)) {
-                Log.v(TAG, "Using Focus mode fixed");
-                return Camera.Parameters.FOCUS_MODE_FIXED;
-            }
-        }
-        Log.v(TAG, "Using Focus mode auto.");
-        return Camera.Parameters.FOCUS_MODE_AUTO;
-    }
-
     @Override
     protected void onResume() {
         super.onResume();
-        mCamera = Camera.open();
-
         // Keep the device from going to sleep.
         PowerManager pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
         mWakeLock = pm.newWakeLock(PowerManager.FULL_WAKE_LOCK, TAG);
         mWakeLock.acquire();
 
         if (mSupportedResolutions == null) {
-            // Get the supported picture sizes and fill the spinner.
-            List<Size> supportedSizes =
-                    mCamera.getParameters().getSupportedPictureSizes();
             mSupportedResolutions = new ArrayList<SelectableResolution>();
-            for (Size size : supportedSizes) {
-                mSupportedResolutions.add(
-                        new SelectableResolution(size.width, size.height));
+            int numCameras = Camera.getNumberOfCameras();
+            for (int cameraId = 0; cameraId < numCameras; ++cameraId) {
+                Camera camera = Camera.open(cameraId);
+
+                // Get the supported picture sizes and fill the spinner.
+                List<Camera.Size> supportedSizes =
+                        camera.getParameters().getSupportedPictureSizes();
+                for (Camera.Size size : supportedSizes) {
+                    mSupportedResolutions.add(
+                            new SelectableResolution(cameraId, size.width, size.height));
+                }
+                camera.release();
             }
         }
 
-        // find teh first untested one.
+        // Find the first untested entry.
         for (mResolutionSpinnerIndex = 0;
                 mResolutionSpinnerIndex < mSupportedResolutions.size();
                 mResolutionSpinnerIndex++) {
-            if (!mSupportedResolutions.get(mResolutionSpinnerIndex).tested) break;
+            if (!mSupportedResolutions.get(mResolutionSpinnerIndex).tested) {
+                break;
+            }
         }
 
         mAdapter = new ArrayAdapter<SelectableResolution>(
@@ -215,20 +200,23 @@ implements PictureCallback, SurfaceHolder.Callback {
             fos.close();
             Log.d(TAG, "File saved to " + pictureFile.getAbsolutePath());
 
-            // Start activity which will use he taken picture to determine the FOV.
+            // Start activity which will use the taken picture to determine the
+            // FOV.
             startActivityForResult(new Intent(this, DetermineFovActivity.class),
                     FOV_REQUEST_CODE + mResolutionSpinnerIndex, null);
         } catch (IOException e) {
             Log.e(TAG, "Could not save picture file.", e);
             Toast.makeText(this, "Could not save picture file: " + e.getMessage(),
-                           Toast.LENGTH_LONG).show();
+                    Toast.LENGTH_LONG).show();
             return;
         }
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (resultCode != RESULT_OK) return;
+        if (resultCode != RESULT_OK) {
+            return;
+        }
         int testIndex = requestCode - FOV_REQUEST_CODE;
         SelectableResolution res = mSupportedResolutions.get(testIndex);
         res.tested = true;
@@ -260,10 +248,10 @@ implements PictureCallback, SurfaceHolder.Callback {
         }
         if (allPassed) {
             TestResult.setPassedResult(this, getClass().getName(),
-                                       CtsTestHelper.getTestDetails(mSupportedResolutions));
+                    CtsTestHelper.getTestDetails(mSupportedResolutions));
         } else {
             TestResult.setFailedResult(this, getClass().getName(),
-                                       CtsTestHelper.getTestDetails(mSupportedResolutions));
+                    CtsTestHelper.getTestDetails(mSupportedResolutions));
         }
         finish();
     }
@@ -271,32 +259,8 @@ implements PictureCallback, SurfaceHolder.Callback {
     @Override
     public void surfaceChanged(
             SurfaceHolder holder, int format, int width, int height) {
-        if (mCamera == null || mSurfaceHolder.getSurface() == null) {
-            return;
-        }
-
-        try {
-            mCamera.setPreviewDisplay(mSurfaceHolder);
-        } catch (Throwable t) {
-            Log.e("TAG", "Could not set preview display", t);
-            Toast.makeText(this, t.getMessage(), Toast.LENGTH_LONG).show();
-            return;
-        }
-
-        // The picture size is taken and set from the spinner selection callback.
-        Camera.Parameters params = mCamera.getParameters();
-        params.setJpegThumbnailSize(0, 0);
-        params.setJpegQuality(100);
-        params.setFocusMode(getFocusMode(mCamera));
-        params.setZoom(0);
-
-        Camera.Size size = getBestPreviewSize(width, height, params);
-        if (size != null) {
-            params.setPreviewSize(size.width, size.height);
-            mCamera.setParameters(params);
-            mCameraInitialized = true;
-        }
-        startPreview();
+        mSurfaceSize = new Size(width, height);
+        initializeCamera();
     }
 
     @Override
@@ -309,11 +273,82 @@ implements PictureCallback, SurfaceHolder.Callback {
         // Nothing to do.
     }
 
+    public void initializeCamera() {
+        if (mCamera == null || mSurfaceHolder.getSurface() == null) {
+            return;
+        }
+
+        try {
+            mCamera.setPreviewDisplay(mSurfaceHolder);
+        } catch (Throwable t) {
+            Log.e("TAG", "Could not set preview display", t);
+            Toast.makeText(this, t.getMessage(), Toast.LENGTH_LONG).show();
+            return;
+        }
+
+        Camera.Parameters params = setCameraParams(mCamera);
+
+        Camera.Size selectedPreviewSize =
+            getBestPreviewSize(mSurfaceSize.width, mSurfaceSize.height, params);
+        if (selectedPreviewSize != null) {
+            params.setPreviewSize(selectedPreviewSize.width, selectedPreviewSize.height);
+            mCamera.setParameters(params);
+            mCameraInitialized = true;
+        }
+        startPreview();
+    }
+
     private void startPreview() {
         if (mCameraInitialized && mCamera != null) {
             mCamera.startPreview();
             mPreviewActive = true;
         }
+    }
+
+    private void switchToCamera(int cameraId) {
+        if (mCamera != null) {
+            mCamera.stopPreview();
+            mCamera.release();
+        }
+        mCamera = Camera.open(cameraId);
+        initializeCamera();
+    }
+
+    /**
+     * Get the best supported focus mode.
+     *
+     * @param camera - Android camera object.
+     * @return the best supported focus mode.
+     */
+    private static String getFocusMode(Camera camera) {
+        List<String> modes = camera.getParameters().getSupportedFocusModes();
+        if (modes != null) {
+            if (modes.contains(Camera.Parameters.FOCUS_MODE_INFINITY)) {
+                Log.v(TAG, "Using Focus mode infinity");
+                return Camera.Parameters.FOCUS_MODE_INFINITY;
+            }
+            if (modes.contains(Camera.Parameters.FOCUS_MODE_FIXED)) {
+                Log.v(TAG, "Using Focus mode fixed");
+                return Camera.Parameters.FOCUS_MODE_FIXED;
+            }
+        }
+        Log.v(TAG, "Using Focus mode auto.");
+        return Camera.Parameters.FOCUS_MODE_AUTO;
+    }
+
+    /**
+     * Set the common camera parameters on the given camera and returns the
+     * parameter object for further modification, if needed.
+     */
+    private static Camera.Parameters setCameraParams(Camera camera) {
+        // The picture size is taken and set from the spinner selection
+        // callback.
+        Camera.Parameters params = camera.getParameters();
+        params.setJpegThumbnailSize(0, 0);
+        params.setJpegQuality(100);
+        params.setFocusMode(getFocusMode(camera));
+        params.setZoom(0);
+        return params;
     }
 
     private Camera.Size getBestPreviewSize(
