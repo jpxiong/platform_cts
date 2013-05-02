@@ -17,6 +17,7 @@
 package com.android.pts.uihost;
 
 import com.android.cts.tradefed.build.CtsBuildHelper;
+import com.android.ddmlib.Log;
 import com.android.pts.util.HostReportLog;
 import com.android.pts.util.MeasureRun;
 import com.android.pts.util.MeasureTime;
@@ -40,8 +41,10 @@ public class InstallTimeTest extends DeviceTestCase implements IBuildReceiver {
     private CtsBuildHelper mBuild;
     private ITestDevice mDevice;
 
+    private static final String TAG = "InstallTimeTest";
     static final String PACKAGE = "com.replica.replicaisland";
     static final String APK = "com.replica.replicaisland.apk";
+    private static final double OUTLIER_THRESHOLD = 0.1;
 
     @Override
     public void setBuild(IBuildInfo buildInfo) {
@@ -80,7 +83,10 @@ public class InstallTimeTest extends DeviceTestCase implements IBuildReceiver {
         });
         report.printArray("install time", result, ResultType.LOWER_BETTER,
                 ResultUnit.MS);
-        StatResult stat = Stat.getStat(result);
+        Stat.StatResult stat = Stat.getStatWithOutlierRejection(result, OUTLIER_THRESHOLD);
+        if (stat.mDataCount != result.length) {
+            Log.w(TAG, "rejecting " + (result.length - stat.mDataCount) + " outliers");
+        }
         report.printSummary("install time", stat.mAverage, ResultType.LOWER_BETTER,
                 ResultUnit.MS);
         report.deliverReportToHost();
