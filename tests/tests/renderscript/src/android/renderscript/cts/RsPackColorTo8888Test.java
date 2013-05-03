@@ -24,46 +24,45 @@ import android.renderscript.Float4;
 import android.renderscript.RSRuntimeException;
 
 public class RsPackColorTo8888Test extends RSBaseCompute {
-    private ScriptC_rs_pack_color_to_8888_rgb script_rgb;
-    private ScriptC_rs_pack_color_to_8888_rgba script_rgba;
-    private ScriptC_rs_pack_color_to_8888_f32_3 script_f32_3;
-    private ScriptC_rs_pack_color_to_8888_f32_4 script_f32_4;
+    private ScriptC_rs_pack_color_to_8888 script_f32;
+
+    @Override
+    protected void setUp() throws Exception {
+        super.setUp();
+        script_f32 = new ScriptC_rs_pack_color_to_8888(mRS);
+    }
 
     @Override
     public void forEach(int testId, Allocation mIn, Allocation mOut) throws RSRuntimeException {
         switch (testId) {
         case 0:
-            script_rgb.forEach_root(mIn, mOut);
+            script_f32.forEach_pack_color_to_8888_rgb(mIn, mOut);
             break;
         case 1:
-            script_rgba.forEach_root(mIn, mOut);
+            script_f32.forEach_pack_color_to_8888_rgba(mIn, mOut);
             break;
         case 2:
-            script_f32_3.forEach_root(mIn, mOut);
+            script_f32.forEach_pack_color_to_8888_f32_3(mIn, mOut);
             break;
         case 3:
-            script_f32_4.forEach_root(mIn, mOut);
+            script_f32.forEach_pack_color_to_8888_f32_4(mIn, mOut);
             break;
         }
     }
 
     public void testRsPackColorTo8888RGB() {
-        script_rgb = new ScriptC_rs_pack_color_to_8888_rgb(mRS, mRes, R.raw.rs_pack_color_to_8888_rgb);
         float3input(0x17abc72, 0);
     }
 
     public void testRsPackColorTo8888RGBA() {
-        script_rgba = new ScriptC_rs_pack_color_to_8888_rgba(mRS, mRes, R.raw.rs_pack_color_to_8888_rgba);
         float4input(0x76a6b, 1);
     }
 
     public void testRsPackColorTo8888F32_3() {
-        script_f32_3 = new ScriptC_rs_pack_color_to_8888_f32_3(mRS, mRes, R.raw.rs_pack_color_to_8888_f32_3);
         float3input(0x17abc72, 2);
     }
 
     public void testRsPackColorTo8888F32_4() {
-        script_f32_4 = new ScriptC_rs_pack_color_to_8888_f32_4(mRS, mRes, R.raw.rs_pack_color_to_8888_f32_4);
         float4input(0xabc72, 3);
     }
 

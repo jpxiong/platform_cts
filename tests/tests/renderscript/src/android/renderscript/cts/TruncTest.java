@@ -22,24 +22,27 @@ import android.renderscript.RSRuntimeException;
 
 public class TruncTest extends RSBaseCompute {
     private ScriptC_trunc_f32 script_f32;
-    private ScriptC_trunc_f32_2 script_f32_2;
-    private ScriptC_trunc_f32_3 script_f32_3;
-    private ScriptC_trunc_f32_4 script_f32_4;
+
+    @Override
+    protected void setUp() throws Exception {
+        super.setUp();
+        script_f32 = new ScriptC_trunc_f32(mRS);
+    }
 
     @Override
     public void forEach(int testId, Allocation mIn, Allocation mOut) throws RSRuntimeException {
         switch (testId) {
         case TEST_F32:
-            script_f32.forEach_root(mIn, mOut);
+            script_f32.forEach_trunc_f32_1(mIn, mOut);
             break;
         case TEST_F32_2:
-            script_f32_2.forEach_root(mIn, mOut);
+            script_f32.forEach_trunc_f32_2(mIn, mOut);
             break;
         case TEST_F32_3:
-            script_f32_3.forEach_root(mIn, mOut);
+            script_f32.forEach_trunc_f32_3(mIn, mOut);
             break;
         case TEST_F32_4:
-            script_f32_4.forEach_root(mIn, mOut);
+            script_f32.forEach_trunc_f32_4(mIn, mOut);
             break;
         }
     }
@@ -66,7 +69,6 @@ public class TruncTest extends RSBaseCompute {
      * trunc test for float
      */
     public void testTruncF32() {
-        script_f32 = new ScriptC_trunc_f32(mRS, mRes, R.raw.trunc_f32);
         doF32(0x12345678, 0);
     }
 
@@ -74,7 +76,6 @@ public class TruncTest extends RSBaseCompute {
      * trunc test for float2
      */
     public void testTruncF32_2() {
-        script_f32_2 = new ScriptC_trunc_f32_2(mRS, mRes, R.raw.trunc_f32_2);
         doF32_2(0x12345a78, 0);
     }
 
@@ -82,7 +83,6 @@ public class TruncTest extends RSBaseCompute {
      * trunc test for float3
      */
     public void testTruncF32_3() {
-        script_f32_3 = new ScriptC_trunc_f32_3(mRS, mRes, R.raw.trunc_f32_3);
         doF32_3(0x12f45678, 0);
     }
 
@@ -90,7 +90,6 @@ public class TruncTest extends RSBaseCompute {
      * trunc test for float4
      */
     public void testTruncF32_4() {
-        script_f32_4 = new ScriptC_trunc_f32_4(mRS, mRes, R.raw.trunc_f32_4);
         doF32_4(0x123c5678, 0);
     }
 }

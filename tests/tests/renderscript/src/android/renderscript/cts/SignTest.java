@@ -22,24 +22,27 @@ import com.android.cts.stub.R;
 
 public class SignTest extends RSBaseCompute {
     private ScriptC_sign_f32 script_f32;
-    private ScriptC_sign_f32_2 script_f32_2;
-    private ScriptC_sign_f32_3 script_f32_3;
-    private ScriptC_sign_f32_4 script_f32_4;
+
+    @Override
+    protected void setUp() throws Exception {
+        super.setUp();
+        script_f32 = new ScriptC_sign_f32(mRS);
+    }
 
     @Override
     public void forEach(int testId, Allocation mIn, Allocation mOut) throws RSRuntimeException {
         switch (testId) {
         case TEST_F32:
-            script_f32.forEach_root(mIn, mOut);
+            script_f32.forEach_sign_f32_1(mIn, mOut);
             break;
         case TEST_F32_2:
-            script_f32_2.forEach_root(mIn, mOut);
+            script_f32.forEach_sign_f32_2(mIn, mOut);
             break;
         case TEST_F32_3:
-            script_f32_3.forEach_root(mIn, mOut);
+            script_f32.forEach_sign_f32_3(mIn, mOut);
             break;
         case TEST_F32_4:
-            script_f32_4.forEach_root(mIn, mOut);
+            script_f32.forEach_sign_f32_4(mIn, mOut);
             break;
         }
     }
@@ -61,12 +64,10 @@ public class SignTest extends RSBaseCompute {
      * This method is used for sign() function with f32
      */
     public void testSignF32() {
-        script_f32 = new ScriptC_sign_f32(mRS, mRes, R.raw.sign_f32);
         doF32(0x12345678, 0);
     }
 
     public void testSignF32_2() {
-        script_f32_2 = new ScriptC_sign_f32_2(mRS, mRes, R.raw.sign_f32_2);
         doF32_2(0x12a45678, 0);
     }
 
@@ -74,7 +75,6 @@ public class SignTest extends RSBaseCompute {
      * This method is used for sign() function with f32_3
      */
     public void testSignF32_3() {
-        script_f32_3 = new ScriptC_sign_f32_3(mRS, mRes, R.raw.sign_f32_3);
         doF32_3(0x123c5678, 0);
     }
 
@@ -82,7 +82,6 @@ public class SignTest extends RSBaseCompute {
      * This method is used for sign() function with f32_4
      */
     public void testSignF32_4() {
-        script_f32_4 = new ScriptC_sign_f32_4(mRS, mRes, R.raw.sign_f32_4);
         doF32_4(0x123d678, 0);
     }
 }
