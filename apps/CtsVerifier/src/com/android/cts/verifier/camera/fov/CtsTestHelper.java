@@ -50,7 +50,7 @@ class CtsTestHelper {
         String details = "PhotoSphere FOV test result:\n";
         for (int i = 0; i < resolutions.size(); i++) {
             SelectableResolution res = resolutions.get(i);
-            details += "Resolution:" + res.width + 'x' + res.height
+            details += "Camera:" + res.cameraId + ", Resolution:" + res.width + 'x' + res.height
                     + ", Measured FOV = " + res.measuredFOV + '\n';
 
         }
