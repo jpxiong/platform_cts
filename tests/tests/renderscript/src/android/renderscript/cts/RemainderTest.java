@@ -23,25 +23,28 @@ import com.android.cts.stub.R;
 
 public class RemainderTest extends RSBaseCompute {
     private ScriptC_remainder_f32 script_f32;
-    private ScriptC_remainder_f32_2 script_f32_2;
-    private ScriptC_remainder_f32_3 script_f32_3;
-    private ScriptC_remainder_f32_4 script_f32_4;
     private Allocation mIn;
+
+    @Override
+    protected void setUp() throws Exception {
+        super.setUp();
+        script_f32 = new ScriptC_remainder_f32(mRS);
+    }
 
     @Override
     public void forEach(int testId, Allocation mIn, Allocation mOut) throws RSRuntimeException {
         switch (testId) {
         case TEST_F32:
-            script_f32.forEach_root(mIn, mOut);
+            script_f32.forEach_remainder_f32_1(mIn, mOut);
             break;
         case TEST_F32_2:
-            script_f32_2.forEach_root(mIn, mOut);
+            script_f32.forEach_remainder_f32_2(mIn, mOut);
             break;
         case TEST_F32_3:
-            script_f32_3.forEach_root(mIn, mOut);
+            script_f32.forEach_remainder_f32_3(mIn, mOut);
             break;
         case TEST_F32_4:
-            script_f32_4.forEach_root(mIn, mOut);
+            script_f32.forEach_remainder_f32_4(mIn, mOut);
             break;
         }
     }
@@ -71,28 +74,24 @@ public class RemainderTest extends RSBaseCompute {
     }
 
     public void testRemainderF32() {
-        script_f32 = new ScriptC_remainder_f32(mRS, mRes, R.raw.remainder_f32);
         ScriptField_remainder_f32 in = new ScriptField_remainder_f32(mRS, INPUTSIZE);
         mIn = in.getAllocation();
         doF32(0x123678, 0);
     }
 
     public void testRemainderF32_2() {
-        script_f32_2 = new ScriptC_remainder_f32_2(mRS, mRes, R.raw.remainder_f32_2);
         ScriptField_remainder_f32_2 in = new ScriptField_remainder_f32_2(mRS, INPUTSIZE);
         mIn = in.getAllocation();
         doF32_2(0x1234a5, 0);
     }
 
     public void testRemainderF32_3() {
-        script_f32_3 = new ScriptC_remainder_f32_3(mRS, mRes, R.raw.remainder_f32_3);
         ScriptField_remainder_f32_3 in = new ScriptField_remainder_f32_3(mRS, INPUTSIZE);
         mIn = in.getAllocation();
         doF32_3(0x1af345, 0);
     }
 
     public void testRemainderF32_4() {
-        script_f32_4 = new ScriptC_remainder_f32_4(mRS, mRes, R.raw.remainder_f32_4);
         ScriptField_remainder_f32_4 in = new ScriptField_remainder_f32_4(mRS, INPUTSIZE);
         mIn = in.getAllocation();
         doF32_4(0x12ce45, 0);

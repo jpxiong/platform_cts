@@ -22,24 +22,27 @@ import android.renderscript.RSRuntimeException;
 
 public class SinhTest extends RSBaseCompute {
     private ScriptC_sinh_f32 script_f32;
-    private ScriptC_sinh_f32_2 script_f32_2;
-    private ScriptC_sinh_f32_3 script_f32_3;
-    private ScriptC_sinh_f32_4 script_f32_4;
+
+    @Override
+    protected void setUp() throws Exception {
+        super.setUp();
+        script_f32 = new ScriptC_sinh_f32(mRS);
+    }
 
     @Override
     public void forEach(int testId, Allocation mIn, Allocation mOut) throws RSRuntimeException {
         switch (testId) {
         case TEST_F32:
-            script_f32.forEach_root(mIn, mOut);
+            script_f32.forEach_sinh_f32_1(mIn, mOut);
             break;
         case TEST_F32_2:
-            script_f32_2.forEach_root(mIn, mOut);
+            script_f32.forEach_sinh_f32_2(mIn, mOut);
             break;
         case TEST_F32_3:
-            script_f32_3.forEach_root(mIn, mOut);
+            script_f32.forEach_sinh_f32_3(mIn, mOut);
             break;
         case TEST_F32_4:
-            script_f32_4.forEach_root(mIn, mOut);
+            script_f32.forEach_sinh_f32_4(mIn, mOut);
             break;
         }
     }
@@ -58,22 +61,18 @@ public class SinhTest extends RSBaseCompute {
     }
 
     public void testSinhF32() {
-        script_f32 = new ScriptC_sinh_f32(mRS, mRes, R.raw.sinh_f32);
         doF32(0x32a, 4);
     }
 
     public void testSinhF32_2() {
-        script_f32_2 = new ScriptC_sinh_f32_2(mRS, mRes, R.raw.sinh_f32_2);
         doF32_2(0xba35, 4);
     }
 
     public void testSinhF32_3() {
-        script_f32_3 = new ScriptC_sinh_f32_3(mRS, mRes, R.raw.sinh_f32_3);
         doF32_3(0xacc3, 4);
     }
 
     public void testSinhF32_4() {
-        script_f32_4 = new ScriptC_sinh_f32_4(mRS, mRes, R.raw.sinh_f32_4);
         doF32_4(0xaa, 4);
     }
 }
