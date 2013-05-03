@@ -665,6 +665,12 @@ public class FileSystemPermissionTest extends AndroidTestCase {
     getAllInsecureBlockDevicesInDirAndSubdir(File dir) throws Exception {
         assertTrue(dir.isDirectory());
         Set<File> retval = new HashSet<File>();
+
+        if (isSymbolicLink(dir)) {
+            // don't examine symbolic links.
+            return retval;
+        }
+
         File[] subDirectories = dir.listFiles(new FileFilter() {
             @Override public boolean accept(File pathname) {
                 return pathname.isDirectory();
