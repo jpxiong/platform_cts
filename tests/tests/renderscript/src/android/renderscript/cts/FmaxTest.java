@@ -22,25 +22,28 @@ import com.android.cts.stub.R;
 
 public class FmaxTest extends RSBaseCompute {
     private ScriptC_fmax_f32 script_f32;
-    private ScriptC_fmax_f32_2 script_f32_2;
-    private ScriptC_fmax_f32_3 script_f32_3;
-    private ScriptC_fmax_f32_4 script_f32_4;
     private Allocation mIn;
+
+    @Override
+    protected void setUp() throws Exception {
+        super.setUp();
+        script_f32 = new ScriptC_fmax_f32(mRS);
+    }
 
     @Override
     public void forEach(int testId, Allocation max, Allocation mOut) throws RSRuntimeException {
         switch (testId) {
         case TEST_F32:
-            script_f32.forEach_root(mIn, mOut);
+            script_f32.forEach_fmax_f32_1(mIn, mOut);
             break;
         case TEST_F32_2:
-            script_f32_2.forEach_root(mIn, mOut);
+            script_f32.forEach_fmax_f32_2(mIn, mOut);
             break;
         case TEST_F32_3:
-            script_f32_3.forEach_root(mIn, mOut);
+            script_f32.forEach_fmax_f32_3(mIn, mOut);
             break;
         case TEST_F32_4:
-            script_f32_4.forEach_root(mIn, mOut);
+            script_f32.forEach_fmax_f32_4(mIn, mOut);
             break;
         }
     }
@@ -68,28 +71,24 @@ public class FmaxTest extends RSBaseCompute {
     }
 
     public void testfmaxF32() {
-        script_f32 = new ScriptC_fmax_f32(mRS, mRes, R.raw.fmax_f32);
         ScriptField_fmax_f32_in in = new ScriptField_fmax_f32_in(mRS, INPUTSIZE);
         mIn = in.getAllocation();
         doF32(0x12678, 0);
     }
 
     public void testfmaxF32_2() {
-        script_f32_2 = new ScriptC_fmax_f32_2(mRS, mRes, R.raw.fmax_f32_2);
         ScriptField_fmax_f32_2_in in = new ScriptField_fmax_f32_2_in(mRS, INPUTSIZE);
         mIn = in.getAllocation();
         doF32_2(0x12ace, 0);
     }
 
     public void testfmaxF32_3() {
-        script_f32_3 = new ScriptC_fmax_f32_3(mRS, mRes, R.raw.fmax_f32_3);
         ScriptField_fmax_f32_3_in in = new ScriptField_fmax_f32_3_in(mRS, INPUTSIZE);
         mIn = in.getAllocation();
         doF32_3(0x12e8, 0);
     }
 
     public void testfmaxF32_4() {
-        script_f32_4 = new ScriptC_fmax_f32_4(mRS, mRes, R.raw.fmax_f32_4);
         ScriptField_fmax_f32_4_in in = new ScriptField_fmax_f32_4_in(mRS, INPUTSIZE);
         mIn = in.getAllocation();
         doF32_4(0xeac, 0);

@@ -22,18 +22,23 @@ import android.renderscript.Element;
 import android.renderscript.RSRuntimeException;
 
 public class CrossTest extends RSBaseCompute {
-    private ScriptC_cross_f32_3 script_f32_3;
-    private ScriptC_cross_f32_4 script_f32_4;
+    private ScriptC_cross_f32 script_f32;
     private Allocation mIn;
+
+    @Override
+    protected void setUp() throws Exception {
+        super.setUp();
+        script_f32 = new ScriptC_cross_f32(mRS);
+    }
 
     @Override
     public void forEach(int testId, Allocation mIn, Allocation mOut) throws RSRuntimeException {
         switch (testId) {
         case TEST_F32_3:
-            script_f32_3.forEach_root(mIn, mOut);
+            script_f32.forEach_cross_f32_3(mIn, mOut);
             break;
         case TEST_F32_4:
-            script_f32_4.forEach_root(mIn, mOut);
+            script_f32.forEach_cross_f32_4(mIn, mOut);
             break;
         }
     }
@@ -67,7 +72,6 @@ public class CrossTest extends RSBaseCompute {
      * cross test for float3
      */
     public void testCrossF32_3() {
-        script_f32_3 = new ScriptC_cross_f32_3(mRS, mRes, R.raw.cross_f32_3);
         ScriptField__cross_f32_3_struct in = new ScriptField__cross_f32_3_struct(mRS, INPUTSIZE);
         mIn = in.getAllocation();
         doF32_3(0x12345678, 0);
@@ -77,7 +81,6 @@ public class CrossTest extends RSBaseCompute {
      * cross test for float4
      */
     public void testCrossF32_4() {
-        script_f32_4 = new ScriptC_cross_f32_4(mRS, mRes, R.raw.cross_f32_4);
         ScriptField__cross_f32_4_struct in = new ScriptField__cross_f32_4_struct(mRS, INPUTSIZE);
         mIn = in.getAllocation();
         doF32_4(0x12ac5678, 0);

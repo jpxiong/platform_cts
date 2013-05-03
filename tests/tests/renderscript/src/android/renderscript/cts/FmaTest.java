@@ -23,25 +23,28 @@ import com.android.cts.stub.R;
 
 public class FmaTest extends RSBaseCompute {
     private ScriptC_fma_f32 script_f32;
-    private ScriptC_fma_f32_2 script_f32_2;
-    private ScriptC_fma_f32_3 script_f32_3;
-    private ScriptC_fma_f32_4 script_f32_4;
     private Allocation mIn;
+
+    @Override
+    protected void setUp() throws Exception {
+        super.setUp();
+        script_f32 = new ScriptC_fma_f32(mRS);
+    }
 
     @Override
     public void forEach(int testId, Allocation mIn, Allocation mOut) throws RSRuntimeException {
         switch (testId) {
         case TEST_F32:
-            script_f32.forEach_root(mIn, mOut);
+            script_f32.forEach_fma_f32_1(mIn, mOut);
             break;
         case TEST_F32_2:
-            script_f32_2.forEach_root(mIn, mOut);
+            script_f32.forEach_fma_f32_2(mIn, mOut);
             break;
         case TEST_F32_3:
-            script_f32_3.forEach_root(mIn, mOut);
+            script_f32.forEach_fma_f32_3(mIn, mOut);
             break;
         case TEST_F32_4:
-            script_f32_4.forEach_root(mIn, mOut);
+            script_f32.forEach_fma_f32_4(mIn, mOut);
             break;
         }
     }
@@ -69,28 +72,24 @@ public class FmaTest extends RSBaseCompute {
     }
 
     public void testFmaF32() {
-        script_f32 = new ScriptC_fma_f32(mRS, mRes, R.raw.fma_f32);
         ScriptField_Floats floatArray = new ScriptField_Floats(mRS, INPUTSIZE);
         mIn = floatArray.getAllocation();
         doF32(0xea1, 0);
     }
 
     public void testFmaF32_2() {
-        script_f32_2 = new ScriptC_fma_f32_2(mRS, mRes, R.raw.fma_f32_2);
         ScriptField_Floats2 floatArray = new ScriptField_Floats2(mRS, INPUTSIZE);
         mIn = floatArray.getAllocation();
         doF32_2(0x12a, 0);
     }
 
     public void testFmaF32_3() {
-        script_f32_3 = new ScriptC_fma_f32_3(mRS, mRes, R.raw.fma_f32_3);
         ScriptField_Floats3 floatArray = new ScriptField_Floats3(mRS, INPUTSIZE);
         mIn = floatArray.getAllocation();
         doF32_3(0xfae, 0);
     }
 
     public void testFmaF32_4() {
-        script_f32_4 = new ScriptC_fma_f32_4(mRS, mRes, R.raw.fma_f32_4);
         ScriptField_Floats4 floatArray = new ScriptField_Floats4(mRS, INPUTSIZE);
         mIn = floatArray.getAllocation();
         doF32_4(0x87a, 0);

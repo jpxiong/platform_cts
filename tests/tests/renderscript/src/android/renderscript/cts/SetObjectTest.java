@@ -35,6 +35,8 @@ public class SetObjectTest extends RSBaseCompute {
     Sampler sampler;
     Script script;
 
+    private ScriptC_set_object ms_set;
+
     @Override
     protected void setUp() throws Exception {
         super.setUp();
@@ -44,7 +46,9 @@ public class SetObjectTest extends RSBaseCompute {
         type = new Type.Builder(mRS, Element.I8(mRS)).setX(1).create();
         allocation = Allocation.createTyped(mRS, type);
         sampler = new Sampler.Builder(mRS).create();
-        script = new ScriptC_set_object_element(mRS, mRes, R.raw.set_object_element);
+        script = new ScriptC_set_object(mRS);
+
+        ms_set = new ScriptC_set_object(mRS);
     }
 
     /**
@@ -59,10 +63,8 @@ public class SetObjectTest extends RSBaseCompute {
 
         mIn = filed.getAllocation();
         mOut = Allocation.createSized(mRS, Element.I32(mRS), ObjectNum);
-        ScriptC_set_object_element mScript = new ScriptC_set_object_element(mRS, mRes,
-                R.raw.set_object_element);
         try {
-            mScript.forEach_root(mIn, mOut);
+            ms_set.forEach_set_object_element(mIn, mOut);
         } catch (RSRuntimeException e) {
             Log.i("compare", "rsSetObject root fail");
         }
@@ -81,11 +83,9 @@ public class SetObjectTest extends RSBaseCompute {
 
         mIn = filed.getAllocation();
         mOut = Allocation.createSized(mRS, Element.I32(mRS), ObjectNum);
-        ScriptC_set_object_type mScript = new ScriptC_set_object_type(mRS, mRes,
-                R.raw.set_object_type);
 
         try {
-            mScript.forEach_root(mIn, mOut);
+            ms_set.forEach_set_object_type(mIn, mOut);
         } catch (RSRuntimeException e) {
             Log.i("compare", "rsSetObject root fail");
         }
@@ -106,11 +106,9 @@ public class SetObjectTest extends RSBaseCompute {
 
         mIn = filed.getAllocation();
         mOut = Allocation.createSized(mRS, Element.I32(mRS), ObjectNum);
-        ScriptC_set_object_allocation mScript = new ScriptC_set_object_allocation(mRS,
-                mRes, R.raw.set_object_allocation);
 
         try {
-            mScript.forEach_root(mIn, mOut);
+            ms_set.forEach_set_object_allocation(mIn, mOut);
         } catch (RSRuntimeException e) {
             Log.i("compare", "rsSetObject root fail");
         }
@@ -130,11 +128,9 @@ public class SetObjectTest extends RSBaseCompute {
 
         mIn = filed.getAllocation();
         mOut = Allocation.createSized(mRS, Element.I32(mRS), ObjectNum);
-        ScriptC_set_object_sampler mScript = new ScriptC_set_object_sampler(mRS, mRes,
-                R.raw.set_object_sampler);
 
         try {
-            mScript.forEach_root(mIn, mOut);
+            ms_set.forEach_set_object_sampler(mIn, mOut);
         } catch (RSRuntimeException e) {
             Log.i("compare", "rsSetObject root fail");
         }
@@ -154,11 +150,9 @@ public class SetObjectTest extends RSBaseCompute {
 
         mIn = filed.getAllocation();
         mOut = Allocation.createSized(mRS, Element.I32(mRS), ObjectNum);
-        ScriptC_set_object_script mScript = new ScriptC_set_object_script(mRS, mRes,
-                R.raw.set_object_script);
 
         try {
-            mScript.forEach_root(mIn, mOut);
+            ms_set.forEach_set_object_script(mIn, mOut);
         } catch (RSRuntimeException e) {
             Log.i("compare", "rsSetObject root fail");
         }

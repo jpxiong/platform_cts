@@ -31,39 +31,40 @@ public class ClearObjectTest extends RSBaseCompute {
     static final int TEST_ID_ALLOCATION = 2;
     static final int TEST_ID_SAMPLER = 3;
     static final int TEST_ID_SCRIPT = 4;
-    private ScriptC_clear_object_element ms_element;
-    private ScriptC_clear_object_type ms_type;
-    private ScriptC_clear_object_allocation ms_allcation;
-    private ScriptC_clear_object_sampler ms_sampler;
-    private ScriptC_clear_object_script ms_script;
+    private ScriptC_clear_object ms_clear;
+
+    @Override
+    protected void setUp() throws Exception {
+        super.setUp();
+        ms_clear = new ScriptC_clear_object(mRS);
+    }
 
     @Override
     public void forEach(int testId, Allocation mIn, Allocation mOut) throws RSRuntimeException {
         switch (testId) {
         case TEST_ID_ELEMENT:
-            ms_element.forEach_root(mOut);
+            ms_clear.forEach_clear_element(mOut);
             break;
         case TEST_ID_TYPE:
-            ms_type.forEach_root(mOut);
+            ms_clear.forEach_clear_type(mOut);
             break;
         case TEST_ID_ALLOCATION:
-            ms_allcation.forEach_root(mOut);
+            ms_clear.forEach_clear_allocation(mOut);
             break;
         case TEST_ID_SAMPLER:
-            ms_sampler.forEach_root(mOut);
+            ms_clear.forEach_clear_sampler(mOut);
             break;
         case TEST_ID_SCRIPT:
-            ms_script.forEach_root(mOut);
+            ms_clear.forEach_clear_script(mOut);
             break;
         }
     }
 
     public void testClearObjectElement() {
-        ms_element = new ScriptC_clear_object_element(mRS, mRes, R.raw.clear_object_element);
         Element element = Element.BOOLEAN(mRS);
         Allocation mIn = Allocation.createSized(mRS, Element.I32(mRS), ObjectNum);
         Allocation mOut = Allocation.createSized(mRS, Element.I32(mRS), ObjectNum);
-        ms_element.set_element(element);
+        ms_clear.set_element(element);
         try {
             RSUtils.forEach(this, TEST_ID_ELEMENT, mIn, mOut);
         } catch (RSRuntimeException e) {
@@ -76,11 +77,10 @@ public class ClearObjectTest extends RSBaseCompute {
     }
 
     public void testclearObjectType() {
-        ms_type = new ScriptC_clear_object_type(mRS, mRes, R.raw.clear_object_type);
         Type type= new Type.Builder(mRS, Element.I8(mRS)).setX(1).create();
         Allocation mOut = Allocation.createSized(mRS, Element.I32(mRS), ObjectNum);
         Allocation mIn = Allocation.createSized(mRS, Element.I32(mRS), ObjectNum);
-        ms_type.set_type(type);
+        ms_clear.set_type(type);
 
         try {
             RSUtils.forEach(this, TEST_ID_TYPE, mIn, mOut);
@@ -94,12 +94,10 @@ public class ClearObjectTest extends RSBaseCompute {
     }
 
     public void testclearObjectAllocation() {
-        ms_allcation = new ScriptC_clear_object_allocation(mRS, mRes,
-                R.raw.clear_object_allocation);
         Allocation mOut = Allocation.createSized(mRS, Element.I32(mRS), ObjectNum);
         Allocation mIn = Allocation.createSized(mRS, Element.I32(mRS), ObjectNum);
         Allocation allocation = Allocation.createTyped(mRS, mIn.getType());
-        ms_allcation.set_allocation(allocation);
+        ms_clear.set_allocation(allocation);
         try {
             RSUtils.forEach(this, TEST_ID_ALLOCATION, mIn, mOut);
         } catch (RSRuntimeException e) {
@@ -112,11 +110,10 @@ public class ClearObjectTest extends RSBaseCompute {
     }
 
     public void testclearObjectSampler() {
-        ms_sampler = new ScriptC_clear_object_sampler(mRS, mRes, R.raw.clear_object_sampler);
         Sampler sampler = new Sampler.Builder(mRS).create();
         Allocation mOut = Allocation.createSized(mRS, Element.I32(mRS), ObjectNum);
         Allocation mIn = Allocation.createSized(mRS, Element.I32(mRS), ObjectNum);
-        ms_sampler.set_sampler(sampler);
+        ms_clear.set_sampler(sampler);
         try {
             RSUtils.forEach(this, TEST_ID_SAMPLER, mIn, mOut);
         } catch (RSRuntimeException e) {
@@ -129,11 +126,10 @@ public class ClearObjectTest extends RSBaseCompute {
     }
 
     public void testclearObjectScript() {
-        ms_script = new ScriptC_clear_object_script(mRS, mRes, R.raw.clear_object_script);
-        Script script = new ScriptC_clear_object_type(mRS, mRes, R.raw.clear_object_element);
+        Script script = new ScriptC_clear_object(mRS);
         Allocation mIn = Allocation.createSized(mRS, Element.I32(mRS), ObjectNum);
         Allocation mOut = Allocation.createSized(mRS, Element.I32(mRS), ObjectNum);
-        ms_script.set_script(script);
+        ms_clear.set_script(script);
         try {
             RSUtils.forEach(this, TEST_ID_SCRIPT, mIn, mOut);
         } catch (RSRuntimeException e) {
