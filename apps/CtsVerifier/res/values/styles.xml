@@ -3,6 +3,8 @@
     <style name="InstructionsFont" parent="@android:style/TextAppearance.Large">
         <item name="android:padding">10dp</item>
     </style>
+    <style name="InstructionsSmallFont" parent="@android:style/TextAppearance.Medium">
+    </style>
     <style name="MessageRow">
         <item name="android:gravity">center_vertical</item>
         <item name="android:textSize">18sp</item>
