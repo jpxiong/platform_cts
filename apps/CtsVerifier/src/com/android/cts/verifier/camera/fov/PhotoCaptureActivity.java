@@ -17,7 +17,9 @@
 package com.android.cts.verifier.camera.fov;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.hardware.Camera;
@@ -63,12 +65,21 @@ public class PhotoCaptureActivity extends Activity
     private List<SelectableResolution> mSupportedResolutions;
     private ArrayAdapter<SelectableResolution> mAdapter;
 
+    private int mCameraId;
     private Camera mCamera;
     private Size mSurfaceSize;
     private boolean mCameraInitialized = false;
     private boolean mPreviewActive = false;
     private int mResolutionSpinnerIndex = -1;
     private WakeLock mWakeLock;
+
+    private ArrayList<Integer> mPreviewSizeCamerasToProcess = new ArrayList<Integer>();
+
+    /**
+     * Selected preview size per camera. If null, preview size should be
+     * automatically detected.
+     */
+    private Size[] mPreviewSizes = null;
 
     public static File getPictureFile(Context context) {
         return new File(context.getExternalCacheDir(), PICTURE_FILENAME);
@@ -100,6 +111,25 @@ public class PhotoCaptureActivity extends Activity
             public void onClick(View v) {
                 startActivity(new Intent(
                         PhotoCaptureActivity.this, CalibrationPreferenceActivity.class));
+            }
+        });
+
+        Button changePreviewSizeButton = (Button) findViewById(
+                R.id.camera_fov_change_preview_size_button);
+        changePreviewSizeButton.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // Stop camera until preview sizes have been obtained.
+                mCamera.stopPreview();
+                mCamera.release();
+                mCamera = null;
+
+                mPreviewSizeCamerasToProcess.clear();
+                mPreviewSizes =  new Size[Camera.getNumberOfCameras()];
+                for (int cameraId = 0; cameraId < Camera.getNumberOfCameras(); ++cameraId) {
+                    mPreviewSizeCamerasToProcess.add(cameraId);
+                }
+                showNextDialogToChoosePreviewSize();
             }
         });
 
@@ -177,15 +207,16 @@ public class PhotoCaptureActivity extends Activity
 
     @Override
     public void onPause() {
-        if (mPreviewActive) {
-            mCamera.stopPreview();
-        }
+        if (mCamera != null) {
+            if (mPreviewActive) {
+                mCamera.stopPreview();
+            }
 
-        mCamera.release();
-        mCamera = null;
+            mCamera.release();
+            mCamera = null;
+        }
         mPreviewActive = false;
         mWakeLock.release();
-
         super.onPause();
     }
 
@@ -273,7 +304,53 @@ public class PhotoCaptureActivity extends Activity
         // Nothing to do.
     }
 
-    public void initializeCamera() {
+    private void showNextDialogToChoosePreviewSize() {
+        final int cameraId = mPreviewSizeCamerasToProcess.remove(0);
+
+        Camera camera = Camera.open(cameraId);
+        final List<Camera.Size> sizes = camera.getParameters()
+                .getSupportedPreviewSizes();
+        String[] choices = new String[sizes.size()];
+        for (int i = 0; i < sizes.size(); ++i) {
+            Camera.Size size = sizes.get(i);
+            choices[i] = size.width + " x " + size.height;
+        }
+
+        final AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        String dialogTitle = String.format(
+                getResources().getString(R.string.camera_fov_choose_preview_size_for_camera),
+                cameraId);
+        builder.setTitle(
+                dialogTitle).
+                setOnCancelListener(new DialogInterface.OnCancelListener() {
+                    @Override
+                    public void onCancel(DialogInterface arg0) {
+                        // User cancelled preview size selection.
+                        mPreviewSizes = null;
+                        switchToCamera(mCameraId);
+                    }
+                }).
+                setSingleChoiceItems(choices, 0, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        Camera.Size size = sizes.get(which);
+                        mPreviewSizes[cameraId] = new Size(
+                                size.width, size.height);
+                        dialog.dismiss();
+
+                        if (mPreviewSizeCamerasToProcess.isEmpty()) {
+                            // We're done, re-initialize camera.
+                            switchToCamera(mCameraId);
+                        } else {
+                            // Process other cameras.
+                            showNextDialogToChoosePreviewSize();
+                        }
+                    }
+                }).create().show();
+        camera.release();
+    }
+
+    private void initializeCamera() {
         if (mCamera == null || mSurfaceHolder.getSurface() == null) {
             return;
         }
@@ -285,10 +362,11 @@ public class PhotoCaptureActivity extends Activity
             Toast.makeText(this, t.getMessage(), Toast.LENGTH_LONG).show();
             return;
         }
-
         Camera.Parameters params = setCameraParams(mCamera);
 
-        Camera.Size selectedPreviewSize =
+        // Either use chosen preview size for current camera or automatically
+        // choose preview size based on view dimensions.
+        Size selectedPreviewSize = (mPreviewSizes != null) ? mPreviewSizes[mCameraId] :
             getBestPreviewSize(mSurfaceSize.width, mSurfaceSize.height, params);
         if (selectedPreviewSize != null) {
             params.setPreviewSize(selectedPreviewSize.width, selectedPreviewSize.height);
@@ -310,6 +388,7 @@ public class PhotoCaptureActivity extends Activity
             mCamera.stopPreview();
             mCamera.release();
         }
+        mCameraId = cameraId;
         mCamera = Camera.open(cameraId);
         initializeCamera();
     }
@@ -351,24 +430,24 @@ public class PhotoCaptureActivity extends Activity
         return params;
     }
 
-    private Camera.Size getBestPreviewSize(
+    private Size getBestPreviewSize(
             int width, int height, Camera.Parameters parameters) {
-        Camera.Size result = null;
+        Size result = null;
 
         for (Camera.Size size : parameters.getSupportedPreviewSizes()) {
             if (size.width <= width && size.height <= height) {
                 if (result == null) {
-                    result = size;
+                    result = new Size(size.width, size.height);
                 } else {
                     int resultArea = result.width * result.height;
                     int newArea = size.width * size.height;
 
                     if (newArea > resultArea) {
-                        result = size;
+                        result = new Size(size.width, size.height);
                     }
                 }
             }
         }
-        return (result);
+        return result;
     }
 }
