@@ -191,11 +191,20 @@ public class MediaStore_Images_MediaTest extends InstrumentationTestCase {
         assertNull(mContentResolver.query(Media.getContentUri(volume), null, null, null, null));
     }
 
+    private void cleanExternalMediaFile(String path) {
+        mContentResolver.delete(Media.EXTERNAL_CONTENT_URI, "_data=?", new String[] { path });
+        new File(path).delete();
+    }
+
     public void testStoreImagesMediaExternal() throws Exception {
         final String externalPath = Environment.getExternalStorageDirectory().getPath() +
                 "/testimage.jpg";
         final String externalPath2 = Environment.getExternalStorageDirectory().getPath() +
                 "/testimage1.jpg";
+
+        // clean up any potential left over entries from a previous aborted run
+        cleanExternalMediaFile(externalPath);
+        cleanExternalMediaFile(externalPath2);
 
         int numBytes = 1337;
         FileUtils.createFile(new File(externalPath), numBytes);
