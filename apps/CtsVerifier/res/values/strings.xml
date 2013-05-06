@@ -564,6 +564,8 @@
     <string name="camera_fov_target_distance_description">The distance in centimeters from the
         device to the target pattern.</string>
     <string name="camera_fov_settings_button_text">Setup</string>
+    <string name="camera_fov_change_preview_sizes_button_text">Preview Sizes</string>
+    <string name="camera_fov_choose_preview_size_for_camera">Choose preview size for camera %1$s</string>
     <string name="camera_fov_displayed_fov_label">Displayed FOV : </string>
     <string name="camera_fov_reported_fov_label">Reported  FOV : </string>
     <string name="camera_fov_panorama_wallpaper_title">Photo Sphere Live Wallpaper</string>
