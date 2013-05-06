@@ -58,11 +58,20 @@ public class MediaStore_Video_MediaTest extends AndroidTestCase {
         assertNull(mContentResolver.query(Media.getContentUri(volume), null, null, null, null));
     }
 
+    private void cleanExternalMediaFile(String path) {
+        mContentResolver.delete(Media.EXTERNAL_CONTENT_URI, "_data=?", new String[] { path });
+        new File(path).delete();
+    }
+
     public void testStoreVideoMediaExternal() throws Exception {
         final String externalVideoPath = Environment.getExternalStorageDirectory().getPath() +
                  "/video/testvideo.3gp";
         final String externalVideoPath2 = Environment.getExternalStorageDirectory().getPath() +
                 "/video/testvideo1.3gp";
+
+        // clean up any potential left over entries from a previous aborted run
+        cleanExternalMediaFile(externalVideoPath);
+        cleanExternalMediaFile(externalVideoPath2);
 
         int numBytes = 1337;
         File videoFile = new File(externalVideoPath);
