@@ -40,7 +40,10 @@ public class OpenGlEsVersionTest
 
     private static final String TAG = OpenGlEsVersionTest.class.getSimpleName();
 
+    // TODO: switch to android.opengl.EGL14/EGLExt and use the constants from there
+    private static final int EGL_OPENGL_ES_BIT = 0x0001;
     private static final int EGL_OPENGL_ES2_BIT = 0x0004;
+    private static final int EGL_OPENGL_ES3_BIT_KHR = 0x0040;
 
     private OpenGlEsVersionStubActivity mActivity;
 
@@ -71,12 +74,27 @@ public class OpenGlEsVersionTest
         }
     }
 
-    /** @return OpenGL ES major version 1 or 2 or some negative number for error */
-    private static int getDetectedVersion() {
+    private static boolean hasExtension(String extensions, String name) {
+        int start = extensions.indexOf(name);
+        while (start >= 0) {
+            // check that we didn't find a prefix of a longer extension name
+            int end = start + name.length();
+            if (end == extensions.length() || extensions.charAt(end) == ' ') {
+                return true;
+            }
+            start = extensions.indexOf(name, end);
+        }
+        return false;
+    }
 
+    /** @return OpenGL ES major version 1, 2, or 3 or some non-positive number for error */
+    private static int getDetectedVersion() {
         /*
-         * Get all the device configurations and check if any of the attributes specify the
-         * the EGL_OPENGL_ES2_BIT to determine whether the device supports 2.0.
+         * Get all the device configurations and check the EGL_RENDERABLE_TYPE attribute
+         * to determine the highest ES version supported by any config. The
+         * EGL_KHR_create_context extension is required to check for ES3 support; if the
+         * extension is not present this test will fail to detect ES3 support. This
+         * effectively makes the extension mandatory for ES3-capable devices.
          */
 
         EGL10 egl = (EGL10) EGLContext.getEGL();
@@ -85,15 +103,23 @@ public class OpenGlEsVersionTest
 
         if (egl.eglInitialize(display, null)) {
             try {
+                boolean checkES3 = hasExtension(egl.eglQueryString(display, EGL10.EGL_EXTENSIONS),
+                        "EGL_KHR_create_context");
                 if (egl.eglGetConfigs(display, null, 0, numConfigs)) {
                     EGLConfig[] configs = new EGLConfig[numConfigs[0]];
                     if (egl.eglGetConfigs(display, configs, numConfigs[0], numConfigs)) {
+                        int highestEsVersion = 0;
                         int[] value = new int[1];
                         for (int i = 0; i < numConfigs[0]; i++) {
                             if (egl.eglGetConfigAttrib(display, configs[i],
                                     EGL10.EGL_RENDERABLE_TYPE, value)) {
-                                if ((value[0] & EGL_OPENGL_ES2_BIT) == EGL_OPENGL_ES2_BIT) {
-                                    return 2;
+                                if (checkES3 && ((value[0] & EGL_OPENGL_ES3_BIT_KHR) ==
+                                        EGL_OPENGL_ES3_BIT_KHR)) {
+                                    if (highestEsVersion < 3) highestEsVersion = 3;
+                                } else if ((value[0] & EGL_OPENGL_ES2_BIT) == EGL_OPENGL_ES2_BIT) {
+                                    if (highestEsVersion < 2) highestEsVersion = 2;
+                                } else if ((value[0] & EGL_OPENGL_ES_BIT) == EGL_OPENGL_ES_BIT) {
+                                    if (highestEsVersion < 1) highestEsVersion = 1;
                                 }
                             } else {
                                 Log.w(TAG, "Getting config attribute with "
@@ -102,7 +128,7 @@ public class OpenGlEsVersionTest
                                         + egl.eglGetError());
                             }
                         }
-                        return 1;
+                        return highestEsVersion;
                     } else {
                         Log.e(TAG, "Getting configs with EGL10#eglGetConfigs failed: "
                                 + egl.eglGetError());
@@ -161,9 +187,13 @@ public class OpenGlEsVersionTest
      * version and Y must be some digit.
      */
     private void assertGlVersionString(int majorVersion) throws InterruptedException {
+        String versionString = "" + majorVersion;
         String message = "OpenGL version string '" + mActivity.getVersionString()
                 + "' is not " + majorVersion + ".0+.";
-        assertTrue(message, Pattern.matches(".*OpenGL.*ES.*" + majorVersion + "\\.\\d.*",
+        if (majorVersion == 2) {
+             versionString = "(2|3)";
+        }
+        assertTrue(message, Pattern.matches(".*OpenGL.*ES.*" + versionString + "\\.\\d.*",
                 mActivity.getVersionString()));
     }
 
