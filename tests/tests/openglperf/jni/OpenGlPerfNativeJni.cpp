@@ -68,7 +68,7 @@ jboolean JNICALL Java_android_openglperf_cts_OpenGlPerfNative_waitForEglCompleti
         return JNI_FALSE;
     }
     jboolean res = JNI_TRUE;
-    EGLint result = mEglClientWaitSyncKHR(dpy, sync, 0, waitTimeInNs);
+    EGLint result = mEglClientWaitSyncKHR(dpy, sync, EGL_SYNC_FLUSH_COMMANDS_BIT_KHR, waitTimeInNs);
     if (result == EGL_FALSE) {
         ALOGE("FrameCompletion: error waiting for fence: %#x", eglGetError());
         res = JNI_FALSE;
