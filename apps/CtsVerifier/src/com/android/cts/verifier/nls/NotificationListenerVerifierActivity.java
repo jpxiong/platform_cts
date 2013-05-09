@@ -16,6 +16,13 @@
 
 package com.android.cts.verifier.nls;
 
+import static com.android.cts.verifier.nls.MockListener.JSON_FLAGS;
+import static com.android.cts.verifier.nls.MockListener.JSON_ICON;
+import static com.android.cts.verifier.nls.MockListener.JSON_ID;
+import static com.android.cts.verifier.nls.MockListener.JSON_PACKAGE;
+import static com.android.cts.verifier.nls.MockListener.JSON_TAG;
+import static com.android.cts.verifier.nls.MockListener.JSON_WHEN;
+
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.Notification;
@@ -29,6 +36,7 @@ import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.provider.Settings.Secure;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -39,7 +47,12 @@ import com.android.cts.verifier.PassFailButtons;
 import com.android.cts.verifier.R;
 import com.android.cts.verifier.nfc.TagVerifierActivity;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.LinkedBlockingQueue;
 
@@ -49,13 +62,17 @@ implements Runnable {
     private static final String STATE = "state";
     private static final String LISTENER_PATH = "com.android.cts.verifier/" + 
             "com.android.cts.verifier.nls.MockListener";
+    private static final int SETUP = 0;
     private static final int PASS = 1;
     private static final int FAIL = 2;
     private static final int WAIT_FOR_USER = 3;
+    private static final int CLEARED = 4;
+    private static final int READY = 5;
+    private static final int RETRY = 6;
     private static final int NOTIFICATION_ID = 1001;
     private static LinkedBlockingQueue<String> sDeletedQueue = new LinkedBlockingQueue<String>();
 
-    private int mState = -1;
+    private int mState;
     private int[] mStatus;
     private LayoutInflater mInflater;
     private ViewGroup mItemList;
@@ -67,8 +84,19 @@ implements Runnable {
     private Context mContext;
     private Runnable mRunner;
     private View mHandler;
-    private String mIdString;
     private String mPackageString;
+    private int mIcon1;
+    private int mIcon2;
+    private int mIcon3;
+    private int mId1;
+    private int mId2;
+    private int mId3;
+    private long mWhen1;
+    private long mWhen2;
+    private long mWhen3;
+    private int mFlag1;
+    private int mFlag2;
+    private int mFlag3;
 
     public static class DismissService extends Service {
         @Override
@@ -87,7 +115,7 @@ implements Runnable {
         super.onCreate(savedInstanceState);
 
         if (savedInstanceState != null) {
-            mState = savedInstanceState.getInt(STATE, -1);
+            mState = savedInstanceState.getInt(STATE, 0);
         }
         mContext = this;
         mRunner = this;
@@ -115,7 +143,7 @@ implements Runnable {
     @Override
     protected void onResume() {
         super.onResume();
-        mHandler.post(mRunner);
+        next();
     }
 
     // Interface Utilities
@@ -133,15 +161,20 @@ implements Runnable {
     }
 
     private void setItemState(int index, boolean passed) {
-        if (index != -1) {
-            ViewGroup item = (ViewGroup) mItemList.getChildAt(index);
-            ImageView status = (ImageView) item.findViewById(R.id.nls_status);
-            status.setImageResource(passed ? R.drawable.fs_good : R.drawable.fs_error);
-            View button = item.findViewById(R.id.nls_launch_settings);
-            button.setClickable(false);
-            button.setEnabled(false);
-            status.invalidate();
-        }
+        ViewGroup item = (ViewGroup) mItemList.getChildAt(index);
+        ImageView status = (ImageView) item.findViewById(R.id.nls_status);
+        status.setImageResource(passed ? R.drawable.fs_good : R.drawable.fs_error);
+        View button = item.findViewById(R.id.nls_launch_settings);
+        button.setClickable(false);
+        button.setEnabled(false);
+        status.invalidate();
+    }
+
+    private void markItemWaiting(int index) {
+        ViewGroup item = (ViewGroup) mItemList.getChildAt(index);
+        ImageView status = (ImageView) item.findViewById(R.id.nls_status);
+        status.setImageResource(R.drawable.fs_warning);
+        status.invalidate();
     }
 
     private View createUserItem(int stringId) {
@@ -165,7 +198,7 @@ implements Runnable {
     // Test management
 
     public void run() {
-        while (mState >= 0 && mState < mStatus.length && mStatus[mState] != WAIT_FOR_USER) {
+        while (mState < mStatus.length && mStatus[mState] != WAIT_FOR_USER) {
             if (mStatus[mState] == PASS) {
                 setItemState(mState, true);
                 mState++;
@@ -177,11 +210,11 @@ implements Runnable {
             }
         }
 
+        if (mState < mStatus.length && mStatus[mState] == WAIT_FOR_USER) {
+            markItemWaiting(mState);
+        }
+
         switch (mState) {
-            case -1:
-                mState++;
-                mHandler.post(mRunner);
-                break;
             case 0:
                 testIsEnabled(0);
                 break;
@@ -211,6 +244,7 @@ implements Runnable {
                 break;
             case 9:
                 getPassButton().setEnabled(true);
+                mNm.cancelAll();
                 break;
         }
     }
@@ -236,41 +270,109 @@ implements Runnable {
 
         mNm.cancelAll();
 
+        mWhen1 = System.currentTimeMillis() + 1;
+        mWhen2 = System.currentTimeMillis() + 2;
+        mWhen3 = System.currentTimeMillis() + 3;
+
+        mIcon1 = R.drawable.fs_good;
+        mIcon2 = R.drawable.fs_error;
+        mIcon3 = R.drawable.fs_warning;
+
+        mId1 = NOTIFICATION_ID + 1;
+        mId2 = NOTIFICATION_ID + 2;
+        mId3 = NOTIFICATION_ID + 3;
+
+        mPackageString = "com.android.cts.verifier";
+
         Notification n1 = new Notification.Builder(mContext)
         .setContentTitle("ClearTest 1")
         .setContentText(mTag1.toString())
         .setPriority(Notification.PRIORITY_LOW)
-        .setSmallIcon(R.drawable.fs_good)
+        .setSmallIcon(mIcon1)
+        .setWhen(mWhen1)
         .setDeleteIntent(makeIntent(1, mTag1))
+        .setOnlyAlertOnce(true)
         .build();
-        mNm.notify(mTag1, NOTIFICATION_ID + 1, n1);
-        mIdString = Integer.toString(NOTIFICATION_ID + 1);
-        mPackageString = "com.android.cts.verifier";
+        mNm.notify(mTag1, mId1, n1);
+        mFlag1 = Notification.FLAG_ONLY_ALERT_ONCE;
 
         Notification n2 = new Notification.Builder(mContext)
         .setContentTitle("ClearTest 2")
         .setContentText(mTag2.toString())
-        .setPriority(Notification.PRIORITY_LOW)
-        .setSmallIcon(R.drawable.fs_good)
+        .setPriority(Notification.PRIORITY_HIGH)
+        .setSmallIcon(mIcon2)
+        .setWhen(mWhen2)
         .setDeleteIntent(makeIntent(2, mTag2))
+        .setAutoCancel(true)
         .build();
-        mNm.notify(mTag2, NOTIFICATION_ID + 2, n2);
+        mNm.notify(mTag2, mId2, n2);
+        mFlag2 = Notification.FLAG_AUTO_CANCEL;
 
         Notification n3 = new Notification.Builder(mContext)
         .setContentTitle("ClearTest 3")
         .setContentText(mTag3.toString())
         .setPriority(Notification.PRIORITY_LOW)
-        .setSmallIcon(R.drawable.fs_good)
+        .setSmallIcon(mIcon3)
+        .setWhen(mWhen3)
         .setDeleteIntent(makeIntent(3, mTag3))
+        .setAutoCancel(true)
+        .setOnlyAlertOnce(true)
         .build();
-        mNm.notify(mTag3, NOTIFICATION_ID + 3, n3);
+        mNm.notify(mTag3, mId3, n3);
+        mFlag3 = Notification.FLAG_ONLY_ALERT_ONCE | Notification.FLAG_AUTO_CANCEL;
+    }
+
+    /**
+     * Return to the state machine to progress through the tests.
+     */
+    private void next() {
+        mHandler.post(mRunner);
+    }
+
+    /**
+     * Wait for things to settle before returning to the state machine.
+     */
+    private void delay() {
+        mHandler.postDelayed(mRunner, 2000);
+    }
+
+    boolean checkEquals(long expected, long actual, String message) {
+        if (expected == actual) {
+            return true;
+        }
+        logWithStack(String.format(message, expected, actual));
+        return false;
+    }
+
+    boolean checkEquals(String expected, String actual, String message) {
+        if (expected.equals(actual)) {
+            return true;
+        }
+        logWithStack(String.format(message, expected, actual));
+        return false;
+    }
+
+    boolean checkFlagSet(int expected, int actual, String message) {
+        if ((expected & actual) != 0) {
+            return true;
+        }
+        logWithStack(String.format(message, expected, actual));
+        return false;
+    };
+
+    private void logWithStack(String message) {
+        Throwable stackTrace = new Throwable();
+        stackTrace.fillInStackTrace();
+        Log.e(TAG, message, stackTrace);
     }
 
     // Tests
 
     private void testIsEnabled(int i) {
+        // no setup required
         Intent settings = new Intent("android.settings.ACTION_NOTIFICATION_LISTENER_SETTINGS");
         if (settings.resolveActivity(mPackageManager) == null) {
+            logWithStack("failed testIsEnabled: no settings activity");
             mStatus[i] = FAIL;
         } else {
             // TODO: find out why Secure.ENABLED_NOTIFICATION_LISTENERS is hidden
@@ -282,139 +384,244 @@ implements Runnable {
                 mStatus[i] = WAIT_FOR_USER;
             }
         }
-        mHandler.postDelayed(mRunner, 2000);
+        next();
     }
 
     private void testIsStarted(final int i) {
-        MockListener.resetListenerData(this);
-        MockListener.probeListenerStatus(mContext,
-                new MockListener.IntegerResultCatcher() {
-            @Override
-            public void accept(int result) {
-                if (result == Activity.RESULT_OK) {
-                    mStatus[i] = PASS;
-                    // setup for testNotificationRecieved
-                    sendNotificaitons();
-                } else {
-                    mStatus[i] = FAIL;
+        if (mStatus[i] == SETUP) {
+            mStatus[i] = READY;
+            // wait for the service to start
+            delay();
+        } else {
+            MockListener.probeListenerStatus(mContext,
+                    new MockListener.IntegerResultCatcher() {
+                @Override
+                public void accept(int result) {
+                    if (result == Activity.RESULT_OK) {
+                        mStatus[i] = PASS;
+                    } else {
+                        logWithStack("failed testIsStarted: " + result);
+                        mStatus[i] = FAIL;
+                    }
+                    next();
                 }
-                mHandler.postDelayed(mRunner, 2000);
-            }
-        });
+            });
+        }
     }
 
     private void testNotificationRecieved(final int i) {
-        MockListener.probeListenerPosted(mContext,
-                new MockListener.StringListResultCatcher() {
-            @Override
-            public void accept(List<String> result) {
-                if (result.size() > 0 && result.contains(mTag1)) {
-                    mStatus[i] = PASS;
-                } else {
-                    mStatus[i] = FAIL;
-                }
-                mHandler.post(mRunner);
-            }});
+        if (mStatus[i] == SETUP) {
+            MockListener.resetListenerData(this);
+            mStatus[i] = CLEARED;
+            // wait for intent to move through the system
+            delay();
+        } else if (mStatus[i] == CLEARED) {
+            sendNotificaitons();
+            mStatus[i] = READY;
+            // wait for notifications to move through the system
+            delay();
+        } else {
+            MockListener.probeListenerPosted(mContext,
+                    new MockListener.StringListResultCatcher() {
+                @Override
+                public void accept(List<String> result) {
+                    if (result.size() > 0 && result.contains(mTag1)) {
+                        mStatus[i] = PASS;
+                    } else {
+                        logWithStack("failed testNotificationRecieved");
+                        mStatus[i] = FAIL;
+                    }
+                    next();
+                }});
+        }
     }
 
     private void testDataIntact(final int i) {
+        // no setup required
         MockListener.probeListenerPayloads(mContext,
                 new MockListener.StringListResultCatcher() {
             @Override
             public void accept(List<String> result) {
-                mStatus[i] = FAIL;
+                boolean pass = false;
+                Set<String> found = new HashSet<String>();
                 if (result.size() > 0) {
-                    for(String payload : result) {
-                        if (payload.contains(mTag1) &&
-                                payload.contains(mIdString) &&
-                                payload.contains(mPackageString)) {
-                            mStatus[i] = PASS;
+                    pass = true;
+                    for(String payloadData : result) {
+                        try {
+                            JSONObject payload = new JSONObject(payloadData);
+                            pass &= checkEquals(mPackageString, payload.getString(JSON_PACKAGE),
+                                    "data integrity test fail: notificaiton package (%s, %s)");
+                            String tag = payload.getString(JSON_TAG);
+                            if (mTag1.equals(tag)) {
+                                found.add(mTag1);
+                                pass &= checkEquals(mIcon1, payload.getInt(JSON_ICON),
+                                        "data integrity test fail: notificaiton icon (%d, %d)");
+                                pass &= checkFlagSet(mFlag1, payload.getInt(JSON_FLAGS),
+                                        "data integrity test fail: notificaiton flags (%d, %d)");
+                                pass &= checkEquals(mId1, payload.getInt(JSON_ID),
+                                        "data integrity test fail: notificaiton ID (%d, %d)");
+                                pass &= checkEquals(mWhen1, payload.getLong(JSON_WHEN),
+                                        "data integrity test fail: notificaiton when (%d, %d)");
+                            } else if (mTag2.equals(tag)) {
+                                found.add(mTag2);
+                                pass &= checkEquals(mIcon2, payload.getInt(JSON_ICON),
+                                        "data integrity test fail: notificaiton icon (%d, %d)");
+                                pass &= checkFlagSet(mFlag2, payload.getInt(JSON_FLAGS),
+                                        "data integrity test fail: notificaiton flags (%d, %d)");
+                                pass &= checkEquals(mId2, payload.getInt(JSON_ID),
+                                        "data integrity test fail: notificaiton ID (%d, %d)");
+                                pass &= checkEquals(mWhen2, payload.getLong(JSON_WHEN),
+                                        "data integrity test fail: notificaiton when (%d, %d)");
+                            } else if (mTag3.equals(tag)) {
+                                found.add(mTag3);
+                                pass &= checkEquals(mIcon3, payload.getInt(JSON_ICON),
+                                        "data integrity test fail: notificaiton icon (%d, %d)");
+                                pass &= checkFlagSet(mFlag3, payload.getInt(JSON_FLAGS),
+                                        "data integrity test fail: notificaiton flags (%d, %d)");
+                                pass &= checkEquals(mId3, payload.getInt(JSON_ID),
+                                        "data integrity test fail: notificaiton ID (%d, %d)");
+                                pass &= checkEquals(mWhen3, payload.getLong(JSON_WHEN),
+                                        "data integrity test fail: notificaiton when (%d, %d)");
+                            } else {
+                                pass = false;
+                                logWithStack("failed on unexpected notification tag: " + tag);
+                            }
+                        } catch (JSONException e) {
+                            pass = false;
+                            Log.e(TAG, "failed to unpack data from mocklistener", e);
                         }
                     }
                 }
-                // setup for testDismissOne
-                MockListener.resetListenerData(mContext);
-                MockListener.clearOne(mContext, mTag1, NOTIFICATION_ID + 1);
-                mHandler.postDelayed(mRunner, 1000);
+                pass &= found.size() == 3;
+                mStatus[i] = pass ? PASS : FAIL;
+                next();
             }});
     }
 
     private void testDismissOne(final int i) {
-        MockListener.probeListenerRemoved(mContext,
-                new MockListener.StringListResultCatcher() {
-            @Override
-            public void accept(List<String> result) {
-                if (result.size() > 0 && result.contains(mTag1)) {
-                    mStatus[i] = PASS;
-                } else {
-                    mStatus[i] = FAIL;
-                }
+        if (mStatus[i] == SETUP) {
+            MockListener.resetListenerData(this);
+            mStatus[i] = CLEARED;
+            // wait for intent to move through the system
+            delay();
+        } else if (mStatus[i] == CLEARED) {
+            MockListener.clearOne(mContext, mTag1, NOTIFICATION_ID + 1);
+            mStatus[i] = READY;
+            delay();
+        } else {
+            MockListener.probeListenerRemoved(mContext,
+                    new MockListener.StringListResultCatcher() {
+                @Override
+                public void accept(List<String> result) {
+                    if (result.size() > 0 && result.contains(mTag1)) {
+                        mStatus[i] = PASS;
+                    } else {
+                        if (mStatus[i] == RETRY) {
+                            logWithStack("failed testDismissOne");
+                            mStatus[i] = FAIL;
+                        } else {
+                            logWithStack("failed testDismissOne, once: retrying");
+                            mStatus[i] = RETRY;
+                        }
+                    }
 
-                // setup for testDismissAll
-                MockListener.resetListenerData(mContext);
-                MockListener.clearAll(mContext);
-                mHandler.postDelayed(mRunner, 1000);
-            }});
+                    next();
+                }});
+        }
     }
 
     private void testDismissAll(final int i) {
-        MockListener.probeListenerRemoved(mContext,
-                new MockListener.StringListResultCatcher() {
-            @Override
-            public void accept(List<String> result) {
-                if (result.size() == 2 && result.contains(mTag2) && result.contains(mTag3)) {
-                    mStatus[i] = PASS;
-                } else {
-                    mStatus[i] = FAIL;
+        if (mStatus[i] == SETUP) {
+            MockListener.resetListenerData(this);
+            mStatus[i] = CLEARED;
+            // wait for intent to move through the system
+            delay();
+        } else if (mStatus[i] == CLEARED) {
+            MockListener.clearAll(mContext);
+            mStatus[i] = READY;
+            delay();
+        } else {
+            MockListener.probeListenerRemoved(mContext,
+                    new MockListener.StringListResultCatcher() {
+                @Override
+                public void accept(List<String> result) {
+                    if (result.size() == 2 && result.contains(mTag2) && result.contains(mTag3)) {
+                        mStatus[i] = PASS;
+                    } else {
+                        if (mStatus[i] == RETRY) {
+                            logWithStack("failed testDismissAll");
+                            mStatus[i] = FAIL;
+                        } else {
+                            logWithStack("failed testDismissAll, once: retrying");
+                            mStatus[i] = RETRY;
+                        }
+                    }
+                    next();
                 }
-                mHandler.post(mRunner);
-            }
-        });   
+            });
+        }
     }
 
     private void testIsDisabled(int i) {
-        MockListener.resetListenerData(this);
+        // no setup required
         // TODO: find out why Secure.ENABLED_NOTIFICATION_LISTENERS is hidden
         String listeners = Secure.getString(getContentResolver(),
                 "enabled_notification_listeners");
         if (listeners == null || !listeners.contains(LISTENER_PATH)) {
             mStatus[i] = PASS;
+            next();
         } else {
             mStatus[i] = WAIT_FOR_USER;
+            delay();
         }
-        mHandler.postDelayed(mRunner, 2000);
     }
 
     private void testIsStopped(final int i) {
-        MockListener.probeListenerStatus(mContext,
-                new MockListener.IntegerResultCatcher() {
-            @Override
-            public void accept(int result) {
-                if (result == Activity.RESULT_OK) {
-                    MockListener.resetListenerData(mContext);
-                    sendNotificaitons();
-                    mStatus[i] = FAIL;
-                } else {
-                    mStatus[i] = PASS;
+        if (mStatus[i] == SETUP) {
+            mStatus[i] = READY;
+            // wait for the service to start
+            delay();
+        } else {
+            MockListener.probeListenerStatus(mContext,
+                    new MockListener.IntegerResultCatcher() {
+                @Override
+                public void accept(int result) {
+                    if (result == Activity.RESULT_OK) {
+                        logWithStack("failed testIsStopped");
+                        mStatus[i] = FAIL;
+                    } else {
+                        mStatus[i] = PASS;
+                    }
+                    next();
                 }
-                // setup for testNotificationRecieved
-                sendNotificaitons();
-                mHandler.postDelayed(mRunner, 1000);
-            }
-        });
+            });
+        }
     }
 
     private void testNotificationNotRecieved(final int i) {
-        MockListener.probeListenerPosted(mContext,
-                new MockListener.StringListResultCatcher() {
-            @Override
-            public void accept(List<String> result) {
-                if (result == null || result.size() == 0) {
-                    mStatus[i] = PASS;
-                } else {
-                    mStatus[i] = FAIL;
-                }
-                mHandler.post(mRunner);
-            }});
+        if (mStatus[i] == SETUP) {
+            MockListener.resetListenerData(this);
+            mStatus[i] = CLEARED;
+            // wait for intent to move through the system
+            delay();
+        } else if (mStatus[i] == CLEARED) {
+            // setup for testNotificationRecieved
+            sendNotificaitons();
+            mStatus[i] = READY;
+            delay();
+        } else {
+            MockListener.probeListenerPosted(mContext,
+                    new MockListener.StringListResultCatcher() {
+                @Override
+                public void accept(List<String> result) {
+                    if (result == null || result.size() == 0) {
+                        mStatus[i] = PASS;
+                    } else {
+                        logWithStack("failed testNotificationNotRecieved");
+                        mStatus[i] = FAIL;
+                    }
+                    next();
+                }});
+        }
     }
 }
