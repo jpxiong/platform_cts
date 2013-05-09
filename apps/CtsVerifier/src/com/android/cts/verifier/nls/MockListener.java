@@ -16,7 +16,6 @@
 package com.android.cts.verifier.nls;
 
 import android.app.Activity;
-import android.app.Notification;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -25,6 +24,9 @@ import android.os.Bundle;
 import android.service.notification.NotificationListenerService;
 import android.service.notification.StatusBarNotification;
 import android.util.Log;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -46,6 +48,13 @@ public class MockListener extends NotificationListenerService {
 
     static final int RESULT_TIMEOUT = Activity.RESULT_FIRST_USER;
     static final int RESULT_NO_SERVER = Activity.RESULT_FIRST_USER + 1;
+
+    static final String JSON_FLAGS = "flag";
+    static final String JSON_ICON = "icon";
+    static final String JSON_ID = "id";
+    static final String JSON_PACKAGE = "pkg";
+    static final String JSON_WHEN = "when";
+    static final String JSON_TAG = "tag";
 
     private ArrayList<String> mPosted = new ArrayList<String>();
     private ArrayList<String> mPayloads = new ArrayList<String>();
@@ -126,20 +135,24 @@ public class MockListener extends NotificationListenerService {
         mPosted.clear();
         mPayloads.clear();
         mRemoved.clear();
-        Log.d(TAG, "reset");
     }
 
     @Override
     public void onNotificationPosted(StatusBarNotification sbn) {
         Log.d(TAG, "posted: " + sbn.getTag());
         mPosted.add(sbn.getTag());
-        StringBuilder payload = new StringBuilder();
-        payload.append(sbn.getTag());
-        payload.append(":");
-        payload.append(sbn.getId());
-        payload.append(":");
-        payload.append(sbn.getPackageName());
-        mPayloads.add(payload.toString());
+        JSONObject payload = new JSONObject();
+        try {
+            payload.put(JSON_TAG, sbn.getTag());
+            payload.put(JSON_ID, sbn.getId());
+            payload.put(JSON_PACKAGE, sbn.getPackageName());
+            payload.put(JSON_WHEN, sbn.getNotification().when);
+            payload.put(JSON_ICON, sbn.getNotification().icon);
+            payload.put(JSON_FLAGS, sbn.getNotification().flags);
+            mPayloads.add(payload.toString());
+        } catch (JSONException e) {
+            Log.e(TAG, "failed to pack up notification payload", e);
+        }
     }
 
     @Override
