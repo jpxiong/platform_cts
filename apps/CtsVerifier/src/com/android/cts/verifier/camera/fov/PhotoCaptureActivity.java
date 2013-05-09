@@ -120,9 +120,11 @@ public class PhotoCaptureActivity extends Activity
             @Override
             public void onClick(View v) {
                 // Stop camera until preview sizes have been obtained.
-                mCamera.stopPreview();
-                mCamera.release();
-                mCamera = null;
+                if (mCamera != null) {
+                    mCamera.stopPreview();
+                    mCamera.release();
+                    mCamera = null;
+                }
 
                 mPreviewSizeCamerasToProcess.clear();
                 mPreviewSizes =  new Size[Camera.getNumberOfCameras()];
