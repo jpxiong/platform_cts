@@ -77,7 +77,7 @@ public class DeviceInfoInstrument extends Instrumentation implements DeviceInfoC
         WindowManager wm = (WindowManager) getContext().getSystemService(
                 Context.WINDOW_SERVICE);
         Display d = wm.getDefaultDisplay();
-        d.getMetrics(metrics);
+        d.getRealMetrics(metrics);
         addResult(RESOLUTION, String.format("%sx%s", metrics.widthPixels, metrics.heightPixels));
         addResult(SCREEN_DENSITY, metrics.density);
         addResult(SCREEN_X_DENSITY, metrics.xdpi);
