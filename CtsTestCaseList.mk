@@ -77,6 +77,7 @@ cts_test_packages := \
 	CtsHardwareTestCases \
 	CtsHoloTestCases \
 	CtsJniTestCases \
+	CtsKeystoreTestCases \
 	CtsLocationTestCases \
 	CtsMediaStressTestCases \
 	CtsMediaTestCases \
