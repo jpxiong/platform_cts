@@ -19,13 +19,12 @@
 #include <Trace.h>
 
 Scene::Scene(int width, int height) :
-        mWidth(width), mHeight(height), mSceneGraph(NULL) {
+        mWidth(width), mHeight(height) {
 }
 
 bool Scene::setUpContext() {
     SCOPED_TRACE();
-    mProgram = setUpProgram();
-    if (mProgram == NULL) {
+    if (!setUpPrograms()) {
         return false;
     }
     mModelMatrix = setUpModelMatrix();
@@ -36,7 +35,7 @@ bool Scene::setUpContext() {
     if (mViewMatrix == NULL) {
         return false;
     }
-    mProjectionMatrix = setUpProjectionMatrix();
+    mProjectionMatrix = setUpProjectionMatrix(mWidth, mHeight);
     if (mProjectionMatrix == NULL) {
         return false;
     }
@@ -51,10 +50,9 @@ bool Scene::tearDown() {
     for (size_t i = 0; i < mMeshes.size(); i++) {
         delete mMeshes[i];
     }
-    delete mProgram;
-    mProgram = NULL;
-    delete mSceneGraph;
-    mSceneGraph = NULL;
+    for (size_t i = 0; i < mSceneGraphs.size(); i++) {
+        delete mSceneGraphs[i];
+    }
     delete mModelMatrix;
     mModelMatrix = NULL;
     delete mViewMatrix;
@@ -66,16 +64,15 @@ bool Scene::tearDown() {
 
 bool Scene::update(int frame) {
     SCOPED_TRACE();
-    delete mSceneGraph; // Delete the old scene graph.
-    mSceneGraph = updateSceneGraph();
-    if (mSceneGraph == NULL) {
-        return false;
+    // Delete the old scene graphs.
+    for (size_t i = 0; i < mSceneGraphs.size(); i++) {
+        delete mSceneGraphs[i];
     }
-    return true;
+    mSceneGraphs.clear();
+    return updateSceneGraphs(frame);
 }
 
-bool Scene::draw() {
-    SCOPED_TRACE();
-    mSceneGraph->draw(*mProgram, *mModelMatrix, *mViewMatrix, *mProjectionMatrix);
-    return true;
+void Scene::drawSceneGraph(int index) {
+    mModelMatrix->identity();
+    mSceneGraphs[index]->drawProgram(*mModelMatrix, *mViewMatrix, *mProjectionMatrix);
 }

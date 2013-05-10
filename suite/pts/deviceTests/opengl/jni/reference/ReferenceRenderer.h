@@ -29,7 +29,7 @@ public:
     bool draw();
     double mSetUpTimes[4];
     static const int FRAMES_PER_SCENE = 500;
-    static const int NUM_SCENES = 1;
+    static const int NUM_SCENES = 2;
     static const int NUM_SETUP_TIMES = 4;
 private:
     Scene* mScenes[NUM_SCENES];

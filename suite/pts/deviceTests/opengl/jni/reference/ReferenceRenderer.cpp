@@ -14,6 +14,7 @@
 #include "ReferenceRenderer.h"
 
 #include "scene/flocking/FlockingScene.h"
+#include "scene/glowing/GlowingScene.h"
 
 #include <graphics/GLUtils.h>
 #include <graphics/ProgramNode.h>
@@ -39,6 +40,7 @@ bool ReferenceRenderer::setUp() {
 
     // Create the scenes.
     mScenes[0] = new FlockingScene(mWidth, mHeight);
+    mScenes[1] = new GlowingScene(mWidth, mHeight);
     // TODO add more scenes to do a comprehensive test.
 
     // Set up the scenes.
@@ -84,6 +86,10 @@ bool ReferenceRenderer::update(int frame) {
 
 bool ReferenceRenderer::draw() {
     SCOPED_TRACE();
+    if (!eglMakeCurrent(mEglDisplay, mEglSurface, mEglSurface, mEglContext)
+            || EGL_SUCCESS != eglGetError()) {
+        return false;
+    }
     if (mOffscreen) {
         glBindFramebuffer(GL_FRAMEBUFFER, mFboId);
     }
@@ -93,8 +99,9 @@ bool ReferenceRenderer::draw() {
     glEnable(GL_CULL_FACE);
     // Use depth testing.
     glEnable(GL_DEPTH_TEST);
-    glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
-    mCurrentScene->draw();
 
-    return Renderer::draw();
+    glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
+    bool success = mCurrentScene->draw();
+
+    return Renderer::draw() && success;
 }

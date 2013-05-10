@@ -16,9 +16,115 @@
 #include <stdlib.h>
 #include <sys/time.h>
 
+#include <android/asset_manager_jni.h>
+
 #define LOG_TAG "PTS_OPENGL"
 #define LOG_NDEBUG 0
 #include <utils/Log.h>
+
+static JNIEnv* sEnv = NULL;
+static jobject sAssetManager = NULL;
+
+void GLUtils::setEnvAndAssetManager(JNIEnv* env, jobject assetManager) {
+    sEnv = env;
+    sAssetManager = assetManager;
+}
+
+static AAsset* loadAsset(const char* path) {
+    AAssetManager* nativeManager = AAssetManager_fromJava(sEnv, sAssetManager);
+    if (nativeManager == NULL) {
+        return NULL;
+    }
+    return AAssetManager_open(nativeManager, path, AASSET_MODE_UNKNOWN);;
+}
+
+char* GLUtils::openTextFile(const char* path) {
+    AAsset* asset = loadAsset(path);
+    if (asset == NULL) {
+        ALOGE("Couldn't load %s", path);
+        return NULL;
+    }
+    off_t length = AAsset_getLength(asset);
+    char* buffer = new char[length + 1];
+    int num = AAsset_read(asset, buffer, length);
+    AAsset_close(asset);
+    if (num != length) {
+        ALOGE("Couldn't read %s", path);
+        delete[] buffer;
+        return NULL;
+    }
+    buffer[length] = '\0';
+    return buffer;
+}
+
+GLuint GLUtils::loadTexture(const char* path) {
+    GLuint textureId = 0;
+    jclass activityClass = sEnv->FindClass("com/android/pts/opengl/reference/GLGameActivity");
+    if (activityClass == NULL) {
+        ALOGE("Couldn't find activity class");
+        return -1;
+    }
+    jmethodID loadTexture = sEnv->GetStaticMethodID(activityClass, "loadTexture",
+            "(Landroid/content/res/AssetManager;Ljava/lang/String;)I");
+    if (loadTexture == NULL) {
+        ALOGE("Couldn't find loadTexture method");
+        return -1;
+    }
+    jstring pathStr = sEnv->NewStringUTF(path);
+    textureId = sEnv->CallStaticIntMethod(activityClass, loadTexture, sAssetManager, pathStr);
+    sEnv->DeleteLocalRef(pathStr);
+    return textureId;
+}
+
+static int readInt(char* b) {
+    return (((int) b[0]) << 24) | (((int) b[1]) << 16) | (((int) b[2]) << 8) | ((int) b[3]);
+}
+
+static float readFloat(char* b) {
+    union {
+        int input;
+        float output;
+    } data;
+    data.input = readInt(b);
+    return data.output;
+}
+
+Mesh* GLUtils::loadMesh(const char* path) {
+    char* buffer = openTextFile(path);
+    if (buffer == NULL) {
+        return NULL;
+    }
+    int index = 0;
+    int numVertices = readInt(buffer + index);
+    index += 4;
+    float* vertices = new float[numVertices * 3];
+    float* normals = new float[numVertices * 3];
+    float* texCoords = new float[numVertices * 2];
+    for (int i = 0; i < numVertices; i++) {
+        // Vertices
+        int vIndex = i * 3;
+        vertices[vIndex + 0] = readFloat(buffer + index);
+        index += 4;
+        vertices[vIndex + 1] = readFloat(buffer + index);
+        index += 4;
+        vertices[vIndex + 2] = readFloat(buffer + index);
+        index += 4;
+        // Normals
+        normals[vIndex + 0] = readFloat(buffer + index);
+        index += 4;
+        normals[vIndex + 1] = readFloat(buffer + index);
+        index += 4;
+        normals[vIndex + 2] = readFloat(buffer + index);
+        index += 4;
+        // Texture Coordinates
+        int tIndex = i * 2;
+        texCoords[tIndex + 0] = readFloat(buffer + index);
+        index += 4;
+        texCoords[tIndex + 1] = readFloat(buffer + index);
+        index += 4;
+    }
+    return new Mesh(vertices, normals, texCoords, numVertices);
+}
 
 // Loads the given source code as a shader of the given type.
 static GLuint loadShader(GLenum shaderType, const char** source) {
@@ -44,8 +150,7 @@ static GLuint loadShader(GLenum shaderType, const char** source) {
     return shader;
 }
 
-GLuint GLUtils::createProgram(const char** vertexSource,
-        const char** fragmentSource) {
+GLuint GLUtils::createProgram(const char** vertexSource, const char** fragmentSource) {
     GLuint vertexShader = loadShader(GL_VERTEX_SHADER, vertexSource);
     if (!vertexShader) {
         return 0;
@@ -120,8 +225,7 @@ GLuint GLUtils::genTexture(int texWidth, int texHeight, int fill) {
         }
         glGenTextures(1, &textureId);
         glBindTexture(GL_TEXTURE_2D, textureId);
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w, h, 0, GL_RGBA,
-                GL_UNSIGNED_BYTE, m);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w, h, 0, GL_RGBA, GL_UNSIGNED_BYTE, m);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
