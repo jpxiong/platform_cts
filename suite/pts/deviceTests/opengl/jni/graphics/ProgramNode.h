@@ -20,13 +20,13 @@
 
 class ProgramNode: public SceneGraphNode {
 public:
-    ProgramNode() {};
+    ProgramNode(Program& program);
     virtual ~ProgramNode() {};
+    void drawProgram(Matrix& model, Matrix& view, Matrix& projection);
 protected:
-    virtual void before(Program& program, Matrix& model, Matrix& view,
-            Matrix& projection);
-    virtual void after(Program& program, Matrix& model, Matrix& view,
-            Matrix& projection);
+    virtual void before(Program& program, Matrix& model, Matrix& view, Matrix& projection);
+    virtual void after(Program& program, Matrix& model, Matrix& view, Matrix& projection);
+    Program& mProgram;
 };
 
 #endif

@@ -14,15 +14,25 @@
 #ifndef GLUTILS_H
 #define GLUTILS_H
 
+#include <jni.h>
+
 #include <EGL/egl.h>
 #include <GLES2/gl2.h>
 #include <GLES2/gl2ext.h>
 
+#include "Mesh.h"
+
 class GLUtils {
 public:
+    static void setEnvAndAssetManager(JNIEnv* env, jobject assetManager);
+    // Loads a file from assets/path into a char array.
+    static char* openTextFile(const char* path);
+    // Loads a texture from assets/texture/<name>
+    static GLuint loadTexture(const char* name);
+    // Loads a mesh from assets/mesh/<name>
+    static Mesh* loadMesh(const char* name);
     // Creates a program with the given vertex and fragment shader source code.
-    static GLuint createProgram(const char** vertexSource,
-            const char** fragmentSource);
+    static GLuint createProgram(const char** vertexSource, const char** fragmentSource);
     static double currentTimeMillis();
     // Rounds a number up to the smallest power of 2 that is greater than the original number.
     static int roundUpToSmallestPowerOf2(int x);

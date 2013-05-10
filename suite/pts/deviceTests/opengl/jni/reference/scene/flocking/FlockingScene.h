@@ -14,6 +14,8 @@
 #ifndef FLOCKINGSCENE_H
 #define FLOCKINGSCENE_H
 
+#include <graphics/Program.h>
+
 #include "../Scene.h"
 #include "Boid.h"
 
@@ -24,18 +26,21 @@ public:
     bool setUpTextures();
     bool setUpMeshes();
     bool tearDown();
+    bool draw();
     static const int NUM_BOIDS = 100;
 protected:
-    Program* setUpProgram();
+    bool setUpPrograms();
     Matrix* setUpModelMatrix();
     Matrix* setUpViewMatrix();
-    Matrix* setUpProjectionMatrix();
-    SceneGraphNode* updateSceneGraph();
+    Matrix* setUpProjectionMatrix(float width, float height);
+    bool updateSceneGraphs(int frame);
 private:
     Boid* mBoids[NUM_BOIDS];
     float mDisplayRatio;
     float mBoardWidth;
     float mBoardHeight;
+    Program* mMainProgram;
+    Program* mWaterProgram;
     static const float BOID_SCALE = 1.0f / 50.0f;
 };
 #endif

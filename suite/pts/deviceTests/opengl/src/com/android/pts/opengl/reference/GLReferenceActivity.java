@@ -31,7 +31,6 @@ public class GLReferenceActivity extends Activity {
     private int mTimeout;
 
     public boolean mSuccess = false;
-    public double mUILoadTime;
     public double[] mSetUpTimes;
     public double[] mUpdateTimes;
     public double[] mRenderTimes;
@@ -44,10 +43,6 @@ public class GLReferenceActivity extends Activity {
         Intent intent = getIntent();
         mNumFrames = intent.getIntExtra(GLActivityIntentKeys.INTENT_EXTRA_NUM_FRAMES, 0);
         mTimeout = intent.getIntExtra(GLActivityIntentKeys.INTENT_EXTRA_TIMEOUT, 0);
-
-        double start = System.currentTimeMillis();
-        setContentView(R.layout.main);
-        mUILoadTime = System.currentTimeMillis() - start;
 
         // Start benchmark
         intent = new Intent(this, GLGameActivity.class);

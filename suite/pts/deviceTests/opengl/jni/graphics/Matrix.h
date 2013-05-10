@@ -31,7 +31,7 @@ public:
     // Scales this matrix by the given amounts.
     void scale(float x, float y, float z);
     // Rotates this matrix the given angle.
-    void rotate(float degrees, float x, float y, float z);
+    void rotate(float radians, float x, float y, float z);
     // Sets this matrix to be the result of multiplying the given matrices.
     void multiply(const Matrix& l, const Matrix& r);
 
@@ -48,7 +48,7 @@ public:
     // Returns a new matrix representing the scaling.
     static Matrix* newScale(float x, float y, float z);
     // Returns a new matrix representing the rotation.
-    static Matrix* newRotate(float degrees, float x, float y, float z);
+    static Matrix* newRotate(float radians, float x, float y, float z);
 
     // Sets the given matrix to be the result of multiplying the given matrix by the given vector.
     static void multiplyVector(float* result, const Matrix& lhs,

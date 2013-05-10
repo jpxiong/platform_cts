@@ -83,8 +83,6 @@ bool Renderer::setUp() {
         return false;
     }
 
-    glViewport(0, 0, mWidth, mHeight);
-
     if (mOffscreen) {
         mFboWidth = GLUtils::roundUpToSmallestPowerOf2(mWidth);
         mFboHeight = GLUtils::roundUpToSmallestPowerOf2(mHeight);
@@ -92,18 +90,20 @@ bool Renderer::setUp() {
             return false;
         }
         mBuffer = new GLushort[mFboWidth * mFboHeight];
+        glViewport(0, 0, mFboWidth, mFboHeight);
     } else {
         mFboWidth = 0;
         mFboHeight = 0;
-        mBuffer = 0;
+        mBuffer = NULL;
         mFboId = 0;
         mRboId = 0;
         mCboId = 0;
+        glViewport(0, 0, mWidth, mHeight);
     }
 
     GLuint err = glGetError();
     if (err != GL_NO_ERROR) {
-        ALOGE("GLError %d", err);
+        ALOGE("GLError %d in setUp", err);
         return false;
     }
     return true;
@@ -111,8 +111,9 @@ bool Renderer::setUp() {
 
 bool Renderer::tearDown() {
     SCOPED_TRACE();
-    if (mBuffer != 0) {
+    if (mBuffer != NULL) {
         delete[] mBuffer;
+        mBuffer = NULL;
     }
     if (mFboId != 0) {
         glDeleteFramebuffers(1, &mFboId);
@@ -139,6 +140,13 @@ bool Renderer::tearDown() {
         eglTerminate(mEglDisplay);
         mEglDisplay = EGL_NO_DISPLAY;
     }
+
+    GLuint err = glGetError();
+    if (err != GL_NO_ERROR) {
+        ALOGE("GLError %d in tearDown", err);
+        return false;
+    }
+
     return EGL_SUCCESS == eglGetError();
 }
 
@@ -146,7 +154,7 @@ bool Renderer::draw() {
     SCOPED_TRACE();
     GLuint err = glGetError();
     if (err != GL_NO_ERROR) {
-        ALOGE("GLError %d", err);
+        ALOGE("GLError %d in draw", err);
         return false;
     }
 

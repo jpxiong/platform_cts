@@ -23,13 +23,10 @@ public:
     SceneGraphNode() {};
     virtual ~SceneGraphNode();
     void addChild(SceneGraphNode* child);
-    void draw(Program& program, Matrix& model, Matrix& view,
-            Matrix& projection);
 protected:
-    virtual void before(Program& program, Matrix& model, Matrix& view,
-            Matrix& projection) = 0;
-    virtual void after(Program& program, Matrix& model, Matrix& view,
-            Matrix& projection) = 0;
+    virtual void before(Program& program, Matrix& model, Matrix& view, Matrix& projection) = 0;
+    virtual void after(Program& program, Matrix& model, Matrix& view, Matrix& projection) = 0;
+    void draw(Program& program, Matrix& model, Matrix& view, Matrix& projection);
 private:
     android::Vector<SceneGraphNode*> mChildren;
 };
