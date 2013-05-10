@@ -20,6 +20,8 @@
 
 extern int register_android_os_cts_CpuFeatures(JNIEnv*);
 
+extern int register_android_os_cts_OSFeatures(JNIEnv*);
+
 extern int register_android_os_cts_FileUtils(JNIEnv*);
 
 jint JNI_OnLoad(JavaVM *vm, void *reserved) {
@@ -30,6 +32,10 @@ jint JNI_OnLoad(JavaVM *vm, void *reserved) {
     }
 
     if (register_android_os_cts_CpuFeatures(env)) {
+        return JNI_ERR;
+    }
+
+    if (register_android_os_cts_OSFeatures(env)) {
         return JNI_ERR;
     }
 
