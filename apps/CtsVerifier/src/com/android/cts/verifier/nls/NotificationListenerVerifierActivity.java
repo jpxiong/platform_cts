@@ -515,17 +515,18 @@ implements Runnable {
                 public void accept(List<String> result) {
                     if (result.size() > 0 && result.contains(mTag1)) {
                         mStatus[i] = PASS;
+                        next();
                     } else {
                         if (mStatus[i] == RETRY) {
                             logWithStack("failed testDismissOne");
                             mStatus[i] = FAIL;
+                            next();
                         } else {
                             logWithStack("failed testDismissOne, once: retrying");
                             mStatus[i] = RETRY;
+                            delay();
                         }
                     }
-
-                    next();
                 }});
         }
     }
@@ -547,16 +548,18 @@ implements Runnable {
                 public void accept(List<String> result) {
                     if (result.size() == 2 && result.contains(mTag2) && result.contains(mTag3)) {
                         mStatus[i] = PASS;
+                        next();
                     } else {
                         if (mStatus[i] == RETRY) {
                             logWithStack("failed testDismissAll");
                             mStatus[i] = FAIL;
+                            next();
                         } else {
                             logWithStack("failed testDismissAll, once: retrying");
                             mStatus[i] = RETRY;
+                            delay();
                         }
                     }
-                    next();
                 }
             });
         }
