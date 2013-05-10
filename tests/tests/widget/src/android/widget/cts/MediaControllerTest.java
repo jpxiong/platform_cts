@@ -300,6 +300,11 @@ public class MediaControllerTest extends
         public boolean canSeekForward() {
             return true;
         }
+
+        @Override
+        public int getAudioSessionId() {
+            return 0;
+        }
     }
 
     private static class MockOnClickListener implements OnClickListener {
