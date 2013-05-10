@@ -14,12 +14,18 @@
 
 #include "ProgramNode.h"
 
-void ProgramNode::before(Program& program, Matrix& model, Matrix& view,
-        Matrix& projection) {
+ProgramNode::ProgramNode(Program& program) :
+        mProgram(program) {
+}
+
+void ProgramNode::before(Program& program, Matrix& model, Matrix& view, Matrix& projection) {
     program.before(model, view, projection);
 }
 
-void ProgramNode::after(Program& program, Matrix& model, Matrix& view,
-        Matrix& projection) {
+void ProgramNode::after(Program& program, Matrix& model, Matrix& view, Matrix& projection) {
     program.after(model, view, projection);
+}
+
+void ProgramNode::drawProgram(Matrix& model, Matrix& view, Matrix& projection) {
+    SceneGraphNode::draw(mProgram, model, view, projection);
 }

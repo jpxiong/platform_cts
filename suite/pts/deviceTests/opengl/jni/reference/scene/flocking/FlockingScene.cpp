@@ -13,104 +13,59 @@
  */
 #include "FlockingScene.h"
 
+#include "WaterMeshNode.h"
+
 #include <cstdlib>
+#include <cmath>
 
 #include <Trace.h>
 
-#include <graphics/BasicMeshNode.h>
-#include <graphics/BasicProgram.h>
+#include <graphics/PerspectiveMeshNode.h>
+#include <graphics/PerspectiveProgram.h>
 #include <graphics/GLUtils.h>
 #include <graphics/Matrix.h>
 #include <graphics/Mesh.h>
 #include <graphics/ProgramNode.h>
 #include <graphics/TransformationNode.h>
 
-static const int FS_NUM_VERTICES = 6;
-
-static const float FS_VERTICES[FS_NUM_VERTICES * 3] = {
-        1.0f, 1.0f, 0.0f,
-        -1.0f, 1.0f, 0.0f,
-        -1.0f, -1.0f, 0.0f,
-        -1.0f, -1.0f, 0.0f,
-        1.0f, -1.0f, 0.0f,
-        1.0f, 1.0f, 0.0f };
-
-static const float FS_NORMALS[FS_NUM_VERTICES * 3] = {
-        0.0f, 0.0f, 1.0f,
-        0.0f, 0.0f, 1.0f,
-        0.0f, 0.0f, 1.0f,
-        0.0f, 0.0f, 1.0f,
-        0.0f, 0.0f, 1.0f,
-        0.0f, 0.0f, 1.0f };
-
-static const float FS_TEX_COORDS[FS_NUM_VERTICES * 2] = {
-        1.0f, 1.0f,
-        0.0f, 1.0f,
-        0.0f, 0.0f,
-        0.0f, 0.0f,
-        1.0f, 0.0f,
-        1.0f, 1.0f };
-
-static const char* FS_VERTEX =
-        "uniform mat4 u_MVPMatrix;"
-        "uniform mat4 u_MVMatrix;"
-        "attribute vec4 a_Position;"
-        "attribute vec3 a_Normal;"
-        "attribute vec2 a_TexCoordinate;"
-        "varying vec3 v_Position;"
-        "varying vec3 v_Normal;"
-        "varying vec2 v_TexCoordinate;"
-        "void main() {\n"
-        "  // Transform the vertex into eye space.\n"
-        "  v_Position = vec3(u_MVMatrix * a_Position);\n"
-        "  // Pass through the texture coordinate.\n"
-        "  v_TexCoordinate = a_TexCoordinate;\n"
-        "  // Transform the normal\'s orientation into eye space.\n"
-        "  v_Normal = vec3(u_MVMatrix * vec4(a_Normal, 0.0));\n"
-        "  // Multiply to get the final point in normalized screen coordinates.\n"
-        "  gl_Position = u_MVPMatrix * a_Position;\n"
-        "}";
-
-static const char* FS_FRAGMENT =
-        "precision mediump float;"
-        "uniform vec3 u_LightPos;"
-        "uniform sampler2D u_Texture;"
-        "varying vec3 v_Position;"
-        "varying vec3 v_Normal;"
-        "varying vec2 v_TexCoordinate;"
-        "void main() {\n"
-        "  // Will be used for attenuation.\n"
-        "  float distance = length(u_LightPos - v_Position);\n"
-        "  // Get a lighting direction vector from the light to the vertex.\n"
-        "  vec3 lightVector = normalize(u_LightPos - v_Position);\n"
-        "  // Calculate the dot product of the light vector and vertex normal.\n"
-        "  float diffuse = max(dot(v_Normal, lightVector), 0.0);\n"
-        "  // Add attenuation.\n"
-        "  diffuse = diffuse * (1.0 / (1.0 + (0.01 * distance)));\n"
-        "  // Add ambient lighting\n"
-        "  diffuse = diffuse + 0.25;\n"
-        "  // Multiply the diffuse illumination and texture to get final output color.\n"
-        "  gl_FragColor = (diffuse * texture2D(u_Texture, v_TexCoordinate));\n"
-        "}";
-
 FlockingScene::FlockingScene(int width, int height) :
-        Scene(width, height) {
+        Scene(width, height), mMainProgram(NULL), mWaterProgram(NULL) {
     for (int i = 0; i < NUM_BOIDS; i++) {
-        // Generate a boid with a random position.
-        float x = ((rand() % 10) / 5.0f) - 0.1f;
-        float y = ((rand() % 10) / 5.0f) - 0.1f;
+        // Generate a boid with a random position. (-50, 50)
+        float x = (rand() % 101) - 50.0f;
+        float y = (rand() % 101) - 50.0f;
         mBoids[i] = new Boid(x, y);
     }
 }
 
-Program* FlockingScene::setUpProgram() {
-    // TODO Enable loading programs from file.
-    // mProgramId = GLUtils::loadProgram("flocking");
-    GLuint programId = GLUtils::createProgram(&FS_VERTEX, &FS_FRAGMENT);
-    if (programId == 0) {
-        return NULL;
+bool FlockingScene::setUpPrograms() {
+    // Main Program
+    const char* vertex = GLUtils::openTextFile("vertex/perspective");
+    const char* fragment = GLUtils::openTextFile("fragment/perspective");
+    if (vertex == NULL || fragment == NULL) {
+        return false;
     }
-    return new BasicProgram(programId);
+    GLuint programId = GLUtils::createProgram(&vertex, &fragment);
+    delete[] vertex;
+    delete[] fragment;
+    if (programId == 0) {
+        return false;
+    }
+    mMainProgram = new PerspectiveProgram(programId);
+    // Water Program
+    vertex = GLUtils::openTextFile("vertex/water");
+    fragment = GLUtils::openTextFile("fragment/water");
+    if (vertex == NULL || fragment == NULL) {
+        return false;
+    }
+    programId = GLUtils::createProgram(&vertex, &fragment);
+    delete[] vertex;
+    delete[] fragment;
+    if (programId == 0) {
+        return false;
+    }
+    mWaterProgram = new PerspectiveProgram(programId);
+    return true;
 }
 
 Matrix* FlockingScene::setUpModelMatrix() {
@@ -121,7 +76,7 @@ Matrix* FlockingScene::setUpViewMatrix() {
     // Position the eye in front of the origin.
     float eyeX = 0.0f;
     float eyeY = 0.0f;
-    float eyeZ = 2.0f;
+    float eyeZ = 10.0f;
 
     // We are looking at the origin
     float centerX = 0.0f;
@@ -137,37 +92,36 @@ Matrix* FlockingScene::setUpViewMatrix() {
     return Matrix::newLookAt(eyeX, eyeY, eyeZ, centerX, centerY, centerZ, upX, upY, upZ);
 }
 
-Matrix* FlockingScene::setUpProjectionMatrix() {
+Matrix* FlockingScene::setUpProjectionMatrix(float width, float height) {
     // Create a new perspective projection matrix. The height will stay the same
     // while the width will vary as per aspect ratio.
-    mDisplayRatio = ((float) mWidth) / ((float) mHeight);
+    mDisplayRatio = width / height;
+    // Set board dimensions
     mBoardHeight = 1000.0f;
     mBoardWidth = mDisplayRatio * mBoardHeight;
     float left = -mDisplayRatio;
     float right = mDisplayRatio;
     float bottom = -1.0f;
     float top = 1.0f;
-    float near = 1.0f;
-    float far = 3.0f;
-    // Set board dimensions
+    float near = 8.0f;
+    float far = 12.0f;
 
     return Matrix::newFrustum(left, right, bottom, top, near, far);
 }
 
 bool FlockingScene::setUpTextures() {
     SCOPED_TRACE();
-    mTextureIds.add(GLUtils::genTexture(256, 256, GLUtils::RANDOM_FILL));
-    mTextureIds.add(GLUtils::genTexture(1, 1, 0xc0c0c0));
-    // TODO Enable loading textures from file.
-    // mTextureIds.add(GLUtils::loadTexture("knight.jpg"));
+    mTextureIds.add(GLUtils::loadTexture("texture/fish_dark.png"));
+    mTextureIds.add(GLUtils::loadTexture("texture/background.png"));
+    mTextureIds.add(GLUtils::loadTexture("texture/water1.png"));
+    mTextureIds.add(GLUtils::loadTexture("texture/water2.png"));
     return true;
 }
 
 bool FlockingScene::setUpMeshes() {
     SCOPED_TRACE();
-    mMeshes.add(new Mesh(FS_VERTICES, FS_NORMALS, FS_TEX_COORDS, FS_NUM_VERTICES));
-    // TODO Enable loading meshes from file.
-    // mMeshes.add(GLUtils::loadMesh("knight.obj", mTextureIds[0]));
+    mMeshes.add(GLUtils::loadMesh("mesh/fish.cob"));
+    mMeshes.add(GLUtils::loadMesh("mesh/plane.cob"));
     return true;
 }
 
@@ -176,22 +130,29 @@ bool FlockingScene::tearDown() {
     for (int i = 0; i < NUM_BOIDS; i++) {
         delete mBoids[i];
     }
+    delete mMainProgram;
+    delete mWaterProgram;
     return Scene::tearDown();
 }
 
-SceneGraphNode* FlockingScene::updateSceneGraph() {
-    const float MAIN_SCALE = 2.0f; // Scale up as the camera is far away.
+bool FlockingScene::updateSceneGraphs(int frame) {
+    const float MAIN_SCALE = 1.25f; // Scale up as the camera is far away.
     const float LIMIT_X = mBoardWidth / 2.0f;
     const float LIMIT_Y = mBoardHeight / 2.0f;
-    SceneGraphNode* sceneGraph = new ProgramNode();
-    Matrix* transformMatrix = Matrix::newScale(MAIN_SCALE * mDisplayRatio, MAIN_SCALE, MAIN_SCALE);
+
+    ProgramNode* mainSceneGraph = new ProgramNode(*mMainProgram);
+    mSceneGraphs.add(mainSceneGraph);
+    // Bottom
+    Matrix* transformMatrix = Matrix::newScale(MAIN_SCALE * mDisplayRatio, MAIN_SCALE, 0.0f);
     TransformationNode* transformNode = new TransformationNode(transformMatrix);
-    sceneGraph->addChild(transformNode);
-    BasicMeshNode* meshNode = new BasicMeshNode(mMeshes[0], mTextureIds[1]);
+    mainSceneGraph->addChild(transformNode);
+    MeshNode* meshNode = new PerspectiveMeshNode(mMeshes[1], mTextureIds[1]);
     transformNode->addChild(meshNode);
+    // Boids
+    const float MARGIN = 30.0f; // So the fish dont disappear and appear at the edges.
     for (int i = 0; i < NUM_BOIDS; i++) {
         Boid* b = mBoids[i];
-        b->flock((const Boid**) &mBoids, NUM_BOIDS, i, LIMIT_X, LIMIT_Y);
+        b->flock((const Boid**) &mBoids, NUM_BOIDS, i, LIMIT_X + MARGIN, LIMIT_Y + MARGIN);
         Vector2D* pos = &(b->mPosition);
         Vector2D* vel = &(b->mVelocity);
 
@@ -199,13 +160,34 @@ SceneGraphNode* FlockingScene::updateSceneGraph() {
         float x = pos->mX / (LIMIT_X * BOID_SCALE) * mDisplayRatio;
         float y = pos->mY / (LIMIT_Y * BOID_SCALE);
 
-        // TODO need to include rotation.
-        transformMatrix = Matrix::newScale(BOID_SCALE * MAIN_SCALE, BOID_SCALE * MAIN_SCALE, 1.0f);
-        transformMatrix->translate(x, y, 0.01f);
+        const float SCALE = BOID_SCALE * MAIN_SCALE;
+        transformMatrix = Matrix::newScale(SCALE, SCALE, SCALE);
+        transformMatrix->translate(x, y, 1.0f);
+        transformMatrix->rotate(atan2(vel->mY, vel->mX) + M_PI, 0, 0, 1);
         transformNode = new TransformationNode(transformMatrix);
-        sceneGraph->addChild(transformNode);
-        meshNode = new BasicMeshNode(mMeshes[0], mTextureIds[0]);
+        mainSceneGraph->addChild(transformNode);
+        meshNode = new PerspectiveMeshNode(mMeshes[0], mTextureIds[0]);
         transformNode->addChild(meshNode);
     }
-    return sceneGraph;
+    ProgramNode* waterSceneGraph = new ProgramNode(*mWaterProgram);
+    mSceneGraphs.add(waterSceneGraph);
+    // Top
+    transformMatrix = Matrix::newScale(MAIN_SCALE * mDisplayRatio, MAIN_SCALE, 1.0f);
+    transformMatrix->translate(0, 0, 0.1f);
+    transformNode = new TransformationNode(transformMatrix);
+    waterSceneGraph->addChild(transformNode);
+    meshNode = new WaterMeshNode(mMeshes[1], frame, mTextureIds[2], mTextureIds[3]);
+    transformNode->addChild(meshNode);
+    return true;
+}
+
+bool FlockingScene::draw() {
+    SCOPED_TRACE();
+    drawSceneGraph(0); // Draw fish and pond bottom
+    // Use blending.
+    glEnable (GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    drawSceneGraph(1); // Draw water
+    glDisable(GL_BLEND);
+    return true;
 }

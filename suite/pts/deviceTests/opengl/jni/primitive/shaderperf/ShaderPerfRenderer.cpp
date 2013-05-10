@@ -143,6 +143,10 @@ bool ShaderPerfRenderer::setUp() {
 
 bool ShaderPerfRenderer::draw() {
     SCOPED_TRACE();
+    if (!eglMakeCurrent(mEglDisplay, mEglSurface, mEglSurface, mEglContext)
+            || EGL_SUCCESS != eglGetError()) {
+        return false;
+    }
     if (mOffscreen) {
         glBindFramebuffer(GL_FRAMEBUFFER, mFboId);
     }

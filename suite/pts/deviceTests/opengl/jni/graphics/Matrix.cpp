@@ -14,7 +14,7 @@
 
 #include "Matrix.h"
 #include <string.h>
-#include <math.h>
+#include <cmath>
 
 #define LOG_TAG "PTS_OPENGL"
 #define LOG_NDEBUG 0
@@ -93,8 +93,8 @@ void Matrix::scale(float x, float y, float z) {
     delete temp;
 }
 
-void Matrix::rotate(float degrees, float x, float y, float z) {
-    Matrix* m = newRotate(degrees, x, y, z);
+void Matrix::rotate(float radians, float x, float y, float z) {
+    Matrix* m = newRotate(radians, x, y, z);
     Matrix* temp = new Matrix(*this);
     if (m != NULL && temp != NULL) {
         multiply(*temp, *m);
@@ -242,7 +242,7 @@ Matrix* Matrix::newScale(float x, float y, float z) {
     }
     return m;
 }
-Matrix* Matrix::newRotate(float degrees, float x, float y, float z) {
+Matrix* Matrix::newRotate(float radians, float x, float y, float z) {
     Matrix* m = new Matrix();
     if (m != NULL) {
         float* d = m->mData;
@@ -253,7 +253,6 @@ Matrix* Matrix::newRotate(float degrees, float x, float y, float z) {
         d[13] = 0;
         d[14] = 0;
         d[15] = 1;
-        float radians = degrees * (M_PI / 180.0f);
         float s = (float) sinf(radians);
         float c = (float) cosf(radians);
         if (1.0f == x && 0.0f == y && 0.0f == z) {

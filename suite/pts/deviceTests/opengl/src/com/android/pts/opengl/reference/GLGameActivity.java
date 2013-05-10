@@ -17,7 +17,12 @@ import com.android.pts.opengl.GLActivityIntentKeys;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.content.res.AssetManager;
 import android.cts.util.WatchDog;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.opengl.GLES20;
+import android.opengl.GLUtils;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -25,6 +30,8 @@ import android.view.Surface;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.HashMap;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Semaphore;
@@ -82,8 +89,12 @@ public class GLGameActivity extends Activity {
         worker.start();
     }
 
-    private static native boolean startBenchmark(Surface surface, int numFrames,
-            double[] setUpTimes, double[] updateTimes, double[] renderTimes);
+    private static native boolean startBenchmark(AssetManager manager,
+            Surface surface,
+            int numFrames,
+            double[] setUpTimes,
+            double[] updateTimes,
+            double[] renderTimes);
 
     /**
      * This thread renderers the benchmarks, freeing the UI thread.
@@ -115,8 +126,12 @@ public class GLGameActivity extends Activity {
             mUpdateTimes = new double[mNumFrames];
             // Used to record the times taken to render.
             mRenderTimes = new double[mNumFrames];
-            boolean success =
-                    startBenchmark(mSurface, mNumFrames, mSetUpTimes, mUpdateTimes, mRenderTimes);
+            boolean success = startBenchmark(getAssets(),
+                    mSurface,
+                    mNumFrames,
+                    mSetUpTimes,
+                    mUpdateTimes,
+                    mRenderTimes);
 
             watchDog.stop();
             mHandler.sendEmptyMessage((success) ? 1 : 0);
@@ -126,5 +141,42 @@ public class GLGameActivity extends Activity {
             mHandler.sendEmptyMessage(0);
         }
 
+    }
+
+    public static int loadTexture(AssetManager manager, String path) {
+        InputStream in = null;
+        try {
+            in = manager.open(path);
+        } catch (IOException e) {
+            e.printStackTrace();
+            return -1;
+        }
+        BitmapFactory.Options op = new BitmapFactory.Options();
+        op.inPreferredConfig = Bitmap.Config.ARGB_8888;
+        Bitmap bmp = BitmapFactory.decodeStream(in, null, op);
+        // generate textureID
+        int[] textures = new int[1];
+        GLES20.glGenTextures(1, textures, 0);
+        int textureID = textures[0];
+
+        // create texture
+        GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, textureID);
+        GLES20.glTexParameteri(
+                GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MIN_FILTER, GLES20.GL_LINEAR);
+        GLES20.glTexParameteri(
+                GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MAG_FILTER, GLES20.GL_LINEAR);
+        GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_S, GLES20.GL_REPEAT);
+        GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_T, GLES20.GL_REPEAT);
+        GLUtils.texImage2D(GLES20.GL_TEXTURE_2D, 0, bmp, 0);
+
+        // clean up
+        try {
+            in.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            bmp.recycle();
+        }
+        return textureID;
     }
 }
