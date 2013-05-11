@@ -14,7 +14,6 @@
 package com.android.pts.opengl.reference;
 
 import com.android.pts.opengl.GLActivityIntentKeys;
-import com.android.pts.opengl.R;
 
 import android.app.Activity;
 import android.content.Intent;
