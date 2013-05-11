@@ -92,9 +92,6 @@ public class TextureViewCameraActivity extends Activity implements
     public void onSurfaceTextureUpdated(SurfaceTexture surface) {
         mUpdateCounter++;
         if (mUpdateCounter % CAPTURE_SCREEN_INTERVAL == 0) {
-            Canvas canvas = mTextureView.lockCanvas();
-            canvas.drawColor(0xffff0000);
-            mTextureView.unlockCanvasAndPost(canvas);
             Bitmap bitmap = mTextureView.getBitmap();
             Assert.assertEquals(mHeight, bitmap.getHeight());
             Assert.assertEquals(mWidth, bitmap.getWidth());
