@@ -770,6 +770,20 @@ public class CtsUiAutomatorTest extends UiAutomatorTestCase {
     }
 
     /**
+     * Verify the UiSelector property resourceIdMatches
+     *
+     * @throws UiObjectNotFoundException
+     * @since API Level 18
+     */
+    public void testSelectorResourceIdMatches() throws UiObjectNotFoundException {
+        openTest("Test 2");
+        new UiObject(new UiSelector().resourceIdMatches("(?i).*button.*").instance(2)).click();
+        verifyDialogActionResults("Button 3");
+        new UiObject(new UiSelector().resourceIdMatches("(?i).*button1.*")).click();
+        verifyDialogActionResults("Button 1");
+    }
+
+    /**
      * Performs a pinch out from the center of a view to its edges and listens to
      * the motion events to make sure the starting and ending points of both pointers
      * are correct.
