@@ -21,6 +21,7 @@ import com.android.cts.stub.R;
 
 import android.app.Activity;
 import android.app.Instrumentation;
+import android.cts.util.PollingCheck;
 import android.os.SystemClock;
 import android.test.ActivityInstrumentationTestCase2;
 import android.text.Editable;
@@ -54,6 +55,12 @@ public class BaseKeyListenerTest extends
         mActivity = getActivity();
         mInstrumentation = getInstrumentation();
         mTextView = (TextView) mActivity.findViewById(R.id.keylistener_textview);
+        new PollingCheck(1000) {
+            @Override
+            protected boolean check() {
+                return mTextView.hasWindowFocus();
+            }
+        }.run();
     }
 
     public void testBackspace() {
