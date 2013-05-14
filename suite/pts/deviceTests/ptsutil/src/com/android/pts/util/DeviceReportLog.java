@@ -38,8 +38,11 @@ public class DeviceReportLog extends ReportLog {
 
     public void deliverReportToHost(Instrumentation instrumentation) {
         Log.i(TAG, "deliverReportToHost");
-        Bundle output = new Bundle();
-        output.putString(PTS_RESULT, generateReport());
-        instrumentation.sendStatus(INST_STATUS_IN_PROGRESS, output);
+        String report = generateReport();
+        if (!report.equals("")) {
+            Bundle output = new Bundle();
+            output.putString(PTS_RESULT, report);
+            instrumentation.sendStatus(INST_STATUS_IN_PROGRESS, output);
+        }
     }
 }
