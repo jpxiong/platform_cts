@@ -55,7 +55,12 @@ public class AlmostFullTest extends PtsAndroidTestCase {
             // components
             long freeDisk = SystemUtil.getFreeDiskSize(getContext());
             long diskToFill = freeDisk - FREE_SPACE_FINAL;
-            Log.i(TAG, "free disk " + freeDisk + ", to fill " + diskToFill);
+            if (diskToFill >= 0) {
+                Log.i(TAG, "free disk " + freeDisk + ", to fill " + diskToFill);
+            } else {
+                Log.i(TAG, "free disk " + freeDisk + " too small, needs " + FREE_SPACE_FINAL);
+                return;
+            }
             final long MAX_FILE_SIZE_TO_FILL = 1024L * 1024L * 1024L;
             long filled = 0;
             while (filled < diskToFill) {
@@ -94,7 +99,10 @@ public class AlmostFullTest extends PtsAndroidTestCase {
         final long FILE_SIZE = 400L * 1024L * 1024L;
         long freeDisk = SystemUtil.getFreeDiskSize(getContext());
         Log.i(TAG, "Now free space is " + freeDisk);
-        assertTrue(freeDisk > FILE_SIZE);
+        if (freeDisk < FILE_SIZE) {
+            Log.w(TAG, "too little space: " + freeDisk);
+            return;
+        }
         final int BUFFER_SIZE = 10 * 1024 * 1024;
         final int NUMBER_REPETITION = 10;
         FileUtil.doSequentialUpdateTest(getContext(), DIR_SEQ_UPDATE, getReportLog(), FILE_SIZE,
@@ -107,6 +115,11 @@ public class AlmostFullTest extends PtsAndroidTestCase {
     public void testRandomRead() throws Exception {
         final int BUFFER_SIZE = 4 * 1024;
         final long fileSize = 400L * 1024L * 1024L;
+        long freeDisk = SystemUtil.getFreeDiskSize(getContext());
+        if (freeDisk < fileSize) {
+            Log.w(TAG, "too little space: " + freeDisk);
+            return;
+        }
         FileUtil.doRandomReadTest(getContext(), DIR_RANDOM_RD, getReportLog(), fileSize,
                 BUFFER_SIZE);
     }
@@ -115,6 +128,11 @@ public class AlmostFullTest extends PtsAndroidTestCase {
     public void testRandomUpdate() throws Exception {
         final int BUFFER_SIZE = 4 * 1024;
         final long fileSize = 256L * 1024L * 1024L;
+        long freeDisk = SystemUtil.getFreeDiskSize(getContext());
+        if (freeDisk < fileSize) {
+            Log.w(TAG, "too little space: " + freeDisk);
+            return;
+        }
         FileUtil.doRandomWriteTest(getContext(), DIR_RANDOM_WR, getReportLog(), fileSize,
                 BUFFER_SIZE);
     }
