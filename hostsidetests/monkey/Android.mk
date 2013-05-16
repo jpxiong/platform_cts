@@ -24,7 +24,8 @@ LOCAL_MODULE := CtsMonkeyTestCases
 
 LOCAL_JAVA_LIBRARIES := cts-tradefed tradefed-prebuilt ddmlib-prebuilt junit
 
-LOCAL_CTS_TEST_PACKAGE := android.monkey
+# prefix zzz intentional to run this last
+LOCAL_CTS_TEST_PACKAGE := zzz.android.monkey
 
 include $(BUILD_CTS_HOST_JAVA_LIBRARY)
 
