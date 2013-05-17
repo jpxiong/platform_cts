@@ -17,6 +17,7 @@
 package com.android.cts.audiotest;
 
 import android.app.Activity;
+import android.app.KeyguardManager;
 import android.content.Context;
 import android.media.AudioManager;
 import android.os.Bundle;
@@ -54,6 +55,9 @@ public class CtsAudioClientActivity extends Activity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
+        KeyguardManager keyguardManager =
+            (KeyguardManager) getSystemService(Context.KEYGUARD_SERVICE);
+        keyguardManager.newKeyguardLock("cts-audio").disableKeyguard();
     }
 
     /**
