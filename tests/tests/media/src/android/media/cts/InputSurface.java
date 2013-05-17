@@ -22,14 +22,8 @@ import android.opengl.EGLConfig;
 import android.opengl.EGLContext;
 import android.opengl.EGLDisplay;
 import android.opengl.EGLSurface;
-import android.opengl.GLES10;
-import android.opengl.GLES11Ext;
-import android.opengl.GLES20;
-import android.opengl.Matrix;
 import android.util.Log;
 import android.view.Surface;
-
-import java.nio.ByteBuffer;
 
 
 /**
@@ -167,10 +161,10 @@ class InputSurface {
     }
 
     /**
-     * Sends the presentation time stamp to EGL.
+     * Sends the presentation time stamp to EGL.  Time is expressed in nanoseconds.
      */
-    public void setPresentationTime(long when) {
-        EGLExt.eglPresentationTimeANDROID(mEGLDisplay, mEGLSurface, when);
+    public void setPresentationTime(long nsecs) {
+        EGLExt.eglPresentationTimeANDROID(mEGLDisplay, mEGLSurface, nsecs);
     }
 
     /**

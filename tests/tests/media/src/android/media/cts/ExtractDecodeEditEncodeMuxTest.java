@@ -797,7 +797,7 @@ public class ExtractDecodeEditEncodeMuxTest extends AndroidTestCase {
                     if (VERBOSE) Log.d(TAG, "output surface: draw image");
                     outputSurface.drawImage();
                     inputSurface.setPresentationTime(
-                            videoDecoderOutputBufferInfo.presentationTimeUs);
+                            videoDecoderOutputBufferInfo.presentationTimeUs * 1000);
                     if (VERBOSE) Log.d(TAG, "input surface: swap buffers");
                     inputSurface.swapBuffers();
                     if (VERBOSE) Log.d(TAG, "video encoder: notified of new frame");
