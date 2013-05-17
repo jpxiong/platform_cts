@@ -17,8 +17,8 @@
 
 <case name="host_speaker_calibration" version="1.0" description="Calibrate host speaker's volume.">
 	<setup> <!-- 1 setup -->
-		<!-- prepare sound source id: to be used in output, sine 1000Hz, 20000ms long -->
-		<sound id="sound1" type="sin:32000:1000:20000" />
+		<!-- prepare sound source id: to be used in output, sine 1000Hz, 30000ms long -->
+		<sound id="sound1" type="sin:32000:1000:30000" />
 	</setup>
 
 	<action> <!-- 1 action -->
@@ -28,8 +28,8 @@
 			<!--  sync start : execute only sync complete : execute + complete
 			      For sync start, complete will be called when the parent completes -->
 			<output device="host" id="sound1" gain="70" sync="start"/>
-			<sequential repeat="10" index="j">
-				<input device="host" id="host_in" gain="70" time="500" sync="complete" />
+			<sequential repeat="80" index="j">
+				<input device="host" id="host_in" gain="70" time="250" sync="complete" />
 				<!-- ------------moving average RMS        min for pass, max for pass                result calculated -->
 				<process method="builtin:rms_mva" input="id:host_in,consti:4000,consti:6000" output="val:rms_$i_$j" />
 				<!-- <message input="val:passfail" output_low="Volume Low" output_ok="Volume OK" output_high="Volume High" /> -->

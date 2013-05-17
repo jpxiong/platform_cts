@@ -61,7 +61,7 @@ int main(int argc, char *argv[])
         fprintf(stderr, "%s [-l log_level][-s serial] test_xml\n", argv[0]);
         return 1;
     }
-    int logLevel = Log::ELogE;
+    int logLevel = Log::ELogW;
     char* serial = NULL;
     int opt;
     while ((opt = getopt(argc, argv, "l:s:")) != -1) {
