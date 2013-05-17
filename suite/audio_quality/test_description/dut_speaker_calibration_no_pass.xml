@@ -18,7 +18,7 @@
 <case name="dut_speaker_calibration" version="1.0" description="Calibrate host recording gain">
 	<setup> <!-- 1 setup -->
 		<!-- prepare sound source id: to be used in output, sine 1000Hz, 20000ms long -->
-		<sound id="sound1" type="sin:32000:1000:5000" preload="1" />
+		<sound id="sound1" type="sin:32000:1000:20000" preload="1" />
 	</setup>
 
 	<action> <!-- 1 action -->
@@ -28,8 +28,8 @@
 			<!--  sync start : execute only sync complete : execute + complete
 			      For sync start, complete will be called when the parent completes -->
 			<output device="DUT" id="sound1" gain="100" sync="start" waitforcompletion="1" />
-			<sequential repeat="8" index="j">
-				<input device="host" id="host_in" gain="100" time="500" sync="complete" />
+			<sequential repeat="50" index="j">
+				<input device="host" id="host_in" gain="100" time="250" sync="complete" />
 				<!-- ------------moving average RMS        min for pass, max for pass                result calculated -->
 				<process method="builtin:rms_mva" input="id:host_in,consti:2,consti:1" output="val:rms_$i_$j" />
 				<!-- <message input="val:passfail" output_low="Volume Low" output_ok="Volume OK" output_high="Volume High" /> -->
