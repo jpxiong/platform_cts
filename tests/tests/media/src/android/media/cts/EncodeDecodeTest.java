@@ -130,6 +130,7 @@ public class EncodeDecodeTest extends AndroidTestCase {
             mTest = test;
         }
 
+        @Override
         public void run() {
             try {
                 mTest.encodeDecodeVideoFromBuffer(true);
@@ -178,6 +179,7 @@ public class EncodeDecodeTest extends AndroidTestCase {
             mTest = test;
         }
 
+        @Override
         public void run() {
             try {
                 mTest.encodeDecodeVideoFromSurfaceToSurface();
@@ -745,7 +747,7 @@ public class EncodeDecodeTest extends AndroidTestCase {
                 } else {
                     inputSurface.makeCurrent();
                     generateSurfaceFrame(generateIndex);
-                    inputSurface.setPresentationTime(computePresentationTime(generateIndex));
+                    inputSurface.setPresentationTime(computePresentationTime(generateIndex) * 1000);
                     if (VERBOSE) Log.d(TAG, "inputSurface swapBuffers");
                     inputSurface.swapBuffers();
                 }
@@ -959,7 +961,7 @@ public class EncodeDecodeTest extends AndroidTestCase {
     /**
      * Performs a simple check to see if the frame is more or less right.
      * <p>
-     * See {@link generateFrame} for a description of the layout.  The idea is to sample
+     * See {@link #generateFrame} for a description of the layout.  The idea is to sample
      * one pixel from the middle of the 8 regions, and verify that the correct one has
      * the non-background color.  We can't know exactly what the video encoder has done
      * with our frames, so we just check to see if it looks like more or less the right thing.
@@ -1053,7 +1055,7 @@ public class EncodeDecodeTest extends AndroidTestCase {
     }
 
     /**
-     * Checks the frame for correctness.  Similar to {@link checkFrame}, but uses GL to
+     * Checks the frame for correctness.  Similar to {@link #checkFrame}, but uses GL to
      * read pixels from the current surface.
      *
      * @return true if the frame looks good
@@ -1118,7 +1120,7 @@ public class EncodeDecodeTest extends AndroidTestCase {
     }
 
     /**
-     * Generates the presentation time for frame N.
+     * Generates the presentation time for frame N, in microseconds.
      */
     private static long computePresentationTime(int frameIndex) {
         return 132 + frameIndex * 1000000 / FRAME_RATE;
