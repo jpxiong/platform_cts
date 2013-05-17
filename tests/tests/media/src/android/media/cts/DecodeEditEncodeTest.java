@@ -116,6 +116,7 @@ public class DecodeEditEncodeTest extends AndroidTestCase {
             mTest = test;
         }
 
+        @Override
         public void run() {
             try {
                 mTest.videoEditTest();
@@ -293,7 +294,7 @@ public class DecodeEditEncodeTest extends AndroidTestCase {
                     inputDone = true;
                 } else {
                     generateSurfaceFrame(generateIndex);
-                    inputSurface.setPresentationTime(computePresentationTime(generateIndex));
+                    inputSurface.setPresentationTime(computePresentationTime(generateIndex) * 1000);
                     if (VERBOSE) Log.d(TAG, "inputSurface swapBuffers");
                     inputSurface.swapBuffers();
                 }
@@ -586,7 +587,7 @@ public class DecodeEditEncodeTest extends AndroidTestCase {
                             outputSurface.drawImage();
 
                             // Send it to the encoder.
-                            inputSurface.setPresentationTime(info.presentationTimeUs);
+                            inputSurface.setPresentationTime(info.presentationTimeUs * 1000);
                             if (VERBOSE) Log.d(TAG, "swapBuffers");
                             inputSurface.swapBuffers();
                         }
@@ -810,7 +811,7 @@ public class DecodeEditEncodeTest extends AndroidTestCase {
     }
 
     /**
-     * Generates the presentation time for frame N.
+     * Generates the presentation time for frame N, in microseconds.
      */
     private static long computePresentationTime(int frameIndex) {
         return 123 + frameIndex * 1000000 / FRAME_RATE;
