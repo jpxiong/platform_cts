@@ -25,6 +25,7 @@ import java.io.InputStream;
 /** Bits and pieces copied from hidden API of android.os.FileUtils. */
 public class FileUtils {
 
+    public static final int S_IFMT  = 0170000;
     public static final int S_IFSOCK = 0140000;
     public static final int S_IFLNK = 0120000;
     public static final int S_IFREG = 0100000;
@@ -73,7 +74,17 @@ public class FileUtils {
         public long ctime;
 
         public boolean hasModeFlag(int flag) {
+            if (((S_IRWXU | S_IRWXG | S_IRWXO) & flag) != flag) {
+                throw new IllegalArgumentException("Inappropriate flag " + flag);
+            }
             return (mode & flag) == flag;
+        }
+
+        public boolean isOfType(int type) {
+            if ((type & S_IFMT) != type) {
+                throw new IllegalArgumentException("Unknown type " + type);
+            }
+            return (mode & S_IFMT) == type;
         }
     }
 
