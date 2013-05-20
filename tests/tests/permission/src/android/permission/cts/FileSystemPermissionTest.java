@@ -660,7 +660,13 @@ public class FileSystemPermissionTest extends AndroidTestCase {
         assertTrue("Cannot find /system partition", foundSystem);
     }
 
-    private static final Set<File> DEV_EXCEPTIONS = new HashSet<File>(
+    public void testAllBlockDevicesAreSecure() throws Exception {
+        Set<File> insecure = getAllInsecureDevicesInDirAndSubdir(new File("/dev"), FileUtils.S_IFBLK);
+        assertTrue("Found insecure block devices: " + insecure.toString(),
+                insecure.isEmpty());
+    }
+
+    private static final Set<File> CHAR_DEV_EXCEPTIONS = new HashSet<File>(
             Arrays.asList(
                 // Known good devices- should be present everywhere
                 new File("/dev/ashmem"),
@@ -675,15 +681,15 @@ public class FileSystemPermissionTest extends AndroidTestCase {
                 // Other exceptions go below here, along with a bug #
             ));
 
-    public void testAllDevicesAreSecure() throws Exception {
-        Set<File> insecure = getAllInsecureDevicesInDirAndSubdir(new File("/dev"));
-        insecure.removeAll(DEV_EXCEPTIONS);
-        assertTrue("Found insecure: " + insecure.toString(),
+    public void testAllCharacterDevicesAreSecure() throws Exception {
+        Set<File> insecure = getAllInsecureDevicesInDirAndSubdir(new File("/dev"), FileUtils.S_IFCHR);
+        insecure.removeAll(CHAR_DEV_EXCEPTIONS);
+        assertTrue("Found insecure character devices: " + insecure.toString(),
                 insecure.isEmpty());
     }
 
     private static Set<File>
-    getAllInsecureDevicesInDirAndSubdir(File dir) throws Exception {
+    getAllInsecureDevicesInDirAndSubdir(File dir, int type) throws Exception {
         assertTrue(dir.isDirectory());
         Set<File> retval = new HashSet<File>();
 
@@ -702,7 +708,7 @@ public class FileSystemPermissionTest extends AndroidTestCase {
         /* recurse into subdirectories */
         if (subDirectories != null) {
             for (File f : subDirectories) {
-                retval.addAll(getAllInsecureDevicesInDirAndSubdir(f));
+                retval.addAll(getAllInsecureDevicesInDirAndSubdir(f, type));
             }
         }
 
@@ -714,7 +720,7 @@ public class FileSystemPermissionTest extends AndroidTestCase {
         for (File f: filesInThisDirectory) {
             FileUtils.FileStatus status = new FileUtils.FileStatus();
             FileUtils.getFileStatus(f.getAbsolutePath(), status, false);
-            if (status.hasModeFlag(FileUtils.S_IFBLK) || status.hasModeFlag(FileUtils.S_IFCHR)) {
+            if (status.isOfType(type)) {
                 if (f.canRead() || f.canWrite() || f.canExecute()) {
                     retval.add(f);
                 }
