@@ -668,17 +668,21 @@ public class FileSystemPermissionTest extends AndroidTestCase {
 
     private static final Set<File> CHAR_DEV_EXCEPTIONS = new HashSet<File>(
             Arrays.asList(
-                // Known good devices- should be present everywhere
+                // All exceptions should be alphabetical and associated with a bug number.
+                new File("/dev/alarm"),      // b/9035217
                 new File("/dev/ashmem"),
                 new File("/dev/binder"),
                 new File("/dev/full"),
                 new File("/dev/ion"),
+                new File("/dev/log/events"), // b/9035217
+                new File("/dev/log/main"),   // b/9035217
+                new File("/dev/log/radio"),  // b/9035217
+                new File("/dev/log/system"), // b/9035217
                 new File("/dev/null"),
                 new File("/dev/random"),
                 new File("/dev/tty"),
                 new File("/dev/urandom"),
                 new File("/dev/zero")
-                // Other exceptions go below here, along with a bug #
             ));
 
     public void testAllCharacterDevicesAreSecure() throws Exception {
