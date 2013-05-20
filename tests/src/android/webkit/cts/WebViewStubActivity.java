@@ -20,6 +20,8 @@ import com.android.cts.stub.R;
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.view.ViewGroup;
+import android.view.ViewParent;
 import android.webkit.WebView;
 
 public class WebViewStubActivity extends Activity {
@@ -38,6 +40,10 @@ public class WebViewStubActivity extends Activity {
 
     @Override
     public void onDestroy() {
+        ViewParent parent =  mWebView.getParent();
+        if (parent instanceof ViewGroup) {
+            ((ViewGroup) parent).removeView(mWebView);
+        }
         mWebView.destroy();
         super.onDestroy();
     }
