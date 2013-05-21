@@ -16,18 +16,15 @@ LOCAL_PATH := $(call my-dir)
 
 include $(CLEAR_VARS)
 
-# suite/pts/hostTests/ptshostutil is treated specially
-# as it cannot be put into ptscommonutilhost due to dependency on cts-tradefed
 LOCAL_SRC_FILES := \
-	$(call all-java-files-under, src) \
-	$(call all-java-files-under, ../../suite/pts/hostTests/ptshostutil/src)
+	$(call all-java-files-under, src)
 
 LOCAL_JAVA_RESOURCE_DIRS := res
 
 LOCAL_MODULE := cts-tradefed
 LOCAL_MODULE_TAGS := optional
 LOCAL_JAVA_LIBRARIES := ddmlib-prebuilt tradefed-prebuilt hosttestlib
-LOCAL_STATIC_JAVA_LIBRARIES := ctsdeviceinfolib ptscommonutilhost
+LOCAL_STATIC_JAVA_LIBRARIES := ctsdeviceinfolib
 
 include $(BUILD_HOST_JAVA_LIBRARY)
 

@@ -101,19 +101,12 @@ class CtsBuilder(object):
     # sort the list to give the same sequence based on name
     packages.sort()
 
-    ptsPattern = r'com\.android\.pts\..*'
-    plan = tools.TestPlan(packages)
-    plan.Exclude('.*')
-    plan.Include(ptsPattern)
-    self.__WritePlan(plan, 'PTS')
-
     plan = tools.TestPlan(packages)
     plan.Exclude('android\.performance.*')
     self.__WritePlan(plan, 'CTS')
     self.__WritePlan(plan, 'CTS-TF')
 
     plan = tools.TestPlan(packages)
-    plan.Exclude(ptsPattern)
     plan.Exclude('android\.performance.*')
     self.__WritePlan(plan, 'SDK')
 
@@ -150,8 +143,6 @@ class CtsBuilder(object):
     plan.Include('android\.renderscript')
     plan.Include('android\.telephony')
     plan.Include('android\.nativemedia.*')
-    plan.Include('com\.android\.pts\..*')
-    plan.Exclude('com\.android\.pts\.bootup')
     self.__WritePlan(plan, 'PDK')
 
 def LogGenerateDescription(name):
