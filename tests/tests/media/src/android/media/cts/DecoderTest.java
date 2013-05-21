@@ -273,6 +273,32 @@ public class DecoderTest extends MediaPlayerTestBase {
         assertEquals("different number of frames when using Surface", frames1, frames2);
     }
 
+    public void testCodecBasicMpeg4() throws Exception {
+        Surface s = getActivity().getSurfaceHolder().getSurface();
+        int frames1 = countFrames(
+                R.raw.video_480x360_mp4_mpeg4_860kbps_25fps_aac_stereo_128kbps_44100hz,
+                false, -1, s);
+        assertEquals("wrong number of frames decoded", 249, frames1);
+
+        int frames2 = countFrames(
+                R.raw.video_480x360_mp4_mpeg4_860kbps_25fps_aac_stereo_128kbps_44100hz,
+                false, -1, null);
+        assertEquals("different number of frames when using Surface", frames1, frames2);
+    }
+
+    public void testCodecBasicVP8() throws Exception {
+        Surface s = getActivity().getSurfaceHolder().getSurface();
+        int frames1 = countFrames(
+                R.raw.video_480x360_mp4_vp8_333kbps_25fps_aac_stereo_128kbps_44100hz,
+                false, -1, s);
+        assertEquals("wrong number of frames decoded", 240, frames1);
+
+        int frames2 = countFrames(
+                R.raw.video_480x360_mp4_vp8_333kbps_25fps_aac_stereo_128kbps_44100hz,
+                false, -1, null);
+        assertEquals("different number of frames when using Surface", frames1, frames2);
+    }
+
     public void testCodecEarlyEOSH263() throws Exception {
         Surface s = getActivity().getSurfaceHolder().getSurface();
         int frames1 = countFrames(
@@ -285,6 +311,22 @@ public class DecoderTest extends MediaPlayerTestBase {
         Surface s = getActivity().getSurfaceHolder().getSurface();
         int frames1 = countFrames(
                 R.raw.video_480x360_mp4_h264_1000kbps_25fps_aac_stereo_128kbps_44100hz,
+                false, 120, s);
+        assertEquals("wrong number of frames decoded", 120, frames1);
+    }
+
+    public void testCodecEarlyEOSMpeg4() throws Exception {
+        Surface s = getActivity().getSurfaceHolder().getSurface();
+        int frames1 = countFrames(
+                R.raw.video_480x360_mp4_mpeg4_860kbps_25fps_aac_stereo_128kbps_44100hz,
+                false, 120, s);
+        assertEquals("wrong number of frames decoded", 120, frames1);
+    }
+
+    public void testCodecEarlyEOSVP8() throws Exception {
+        Surface s = getActivity().getSurfaceHolder().getSurface();
+        int frames1 = countFrames(
+                R.raw.video_480x360_mp4_vp8_333kbps_25fps_aac_stereo_128kbps_44100hz,
                 false, 120, s);
         assertEquals("wrong number of frames decoded", 120, frames1);
     }
@@ -311,6 +353,28 @@ public class DecoderTest extends MediaPlayerTestBase {
                 R.raw.video_176x144_3gp_h263_300kbps_12fps_aac_stereo_128kbps_22050hz, s);
     }
 
+    public void testCodecReconfigMpeg4WithoutSurface() throws Exception {
+        testCodecReconfig(
+                R.raw.video_480x360_mp4_mpeg4_860kbps_25fps_aac_stereo_128kbps_44100hz, null);
+    }
+
+    public void testCodecReconfigMpeg4WithSurface() throws Exception {
+        Surface s = getActivity().getSurfaceHolder().getSurface();
+        testCodecReconfig(
+                R.raw.video_480x360_mp4_mpeg4_860kbps_25fps_aac_stereo_128kbps_44100hz, s);
+    }
+
+    public void testCodecReconfigVP8WithoutSurface() throws Exception {
+        testCodecReconfig(
+                R.raw.video_480x360_mp4_vp8_333kbps_25fps_aac_stereo_128kbps_44100hz, null);
+    }
+
+    public void testCodecReconfigVP8WithSurface() throws Exception {
+        Surface s = getActivity().getSurfaceHolder().getSurface();
+        testCodecReconfig(
+                R.raw.video_480x360_mp4_vp8_333kbps_25fps_aac_stereo_128kbps_44100hz, s);
+    }
+
 //    public void testCodecReconfigOgg() throws Exception {
 //        testCodecReconfig(R.raw.sinesweepogg, null);
 //    }
@@ -327,6 +391,22 @@ public class DecoderTest extends MediaPlayerTestBase {
         int frames1 = countFrames(video, false /* reconfigure */, -1 /* eosframe */, s);
         int frames2 = countFrames(video, true /* reconfigure */, -1 /* eosframe */, s);
         assertEquals("different number of frames when reusing codec", frames1, frames2);
+    }
+
+    private MediaCodec createDecoder(String mime) {
+        if (false) {
+            // change to force testing software codecs
+            if (mime.contains("avc")) {
+                return MediaCodec.createByCodecName("OMX.google.h264.decoder");
+            } else if (mime.contains("3gpp")) {
+                return MediaCodec.createByCodecName("OMX.google.h263.decoder");
+            } else if (mime.contains("mp4v")) {
+                return MediaCodec.createByCodecName("OMX.google.mpeg4.decoder");
+            } else if (mime.contains("vp8")) {
+                return MediaCodec.createByCodecName("OMX.google.vpx.decoder");
+            }
+        }
+        return MediaCodec.createDecoderByType(mime);
     }
 
     private int countFrames(int video, boolean reconfigure, int eosframe, Surface s) throws Exception {
@@ -347,12 +427,8 @@ public class DecoderTest extends MediaPlayerTestBase {
         String mime = format.getString(MediaFormat.KEY_MIME);
         boolean isAudio = mime.startsWith("audio/");
 
-        codec = MediaCodec.createDecoderByType(mime);
-//        if (mime.contains("avc")) {
-//            codec = MediaCodec.createByCodecName("OMX.google.h264.decoder");
-//        } else if (mime.contains("3gpp")) {
-//            codec = MediaCodec.createByCodecName("OMX.google.h263.decoder");
-//        }
+        codec = createDecoder(mime);
+
         assertNotNull("couldn't find codec", codec);
         Log.i("@@@@", "using codec: " + codec.getName());
         codec.configure(format, s /* surface */, null /* crypto */, 0 /* flags */);
@@ -495,6 +571,23 @@ public class DecoderTest extends MediaPlayerTestBase {
         testEOSBehavior(R.raw.video_176x144_3gp_h263_300kbps_12fps_aac_stereo_128kbps_22050hz, 50);
     }
 
+    public void testEOSBehaviorMpeg4() throws Exception {
+        // this video has an I frame every 12 frames
+        testEOSBehavior(R.raw.video_480x360_mp4_mpeg4_860kbps_25fps_aac_stereo_128kbps_44100hz, 24);
+        testEOSBehavior(R.raw.video_480x360_mp4_mpeg4_860kbps_25fps_aac_stereo_128kbps_44100hz, 25);
+        testEOSBehavior(R.raw.video_480x360_mp4_mpeg4_860kbps_25fps_aac_stereo_128kbps_44100hz, 48);
+        testEOSBehavior(R.raw.video_480x360_mp4_mpeg4_860kbps_25fps_aac_stereo_128kbps_44100hz, 50);
+        testEOSBehavior(R.raw.video_480x360_mp4_mpeg4_860kbps_25fps_aac_stereo_128kbps_44100hz, 2);
+    }
+
+    public void testEOSBehaviorVP8() throws Exception {
+        // this video has an I frame at 46
+        testEOSBehavior(R.raw.video_480x360_mp4_vp8_333kbps_25fps_aac_stereo_128kbps_44100hz, 46);
+        testEOSBehavior(R.raw.video_480x360_mp4_vp8_333kbps_25fps_aac_stereo_128kbps_44100hz, 47);
+        testEOSBehavior(R.raw.video_480x360_mp4_vp8_333kbps_25fps_aac_stereo_128kbps_44100hz, 57);
+        testEOSBehavior(R.raw.video_480x360_mp4_vp8_333kbps_25fps_aac_stereo_128kbps_44100hz, 45);
+    }
+
     private void testEOSBehavior(int movie, int stopatsample) throws Exception {
 
         int numframes = 0;
@@ -516,12 +609,8 @@ public class DecoderTest extends MediaPlayerTestBase {
         String mime = format.getString(MediaFormat.KEY_MIME);
         boolean isAudio = mime.startsWith("audio/");
 
-        codec = MediaCodec.createDecoderByType(mime);
-//        if (mime.contains("avc")) {
-//            codec = MediaCodec.createByCodecName("OMX.google.h264.decoder");
-//        } else if (mime.contains("3gpp")) {
-//            codec = MediaCodec.createByCodecName("OMX.google.h263.decoder");
-//        }
+        codec = createDecoder(mime);
+
         assertNotNull("couldn't find codec", codec);
         Log.i("@@@@", "using codec: " + codec.getName());
         codec.configure(format, null /* surface */, null /* crypto */, 0 /* flags */);
@@ -634,12 +723,7 @@ public class DecoderTest extends MediaPlayerTestBase {
         extractor.setDataSource(testFd.getFileDescriptor(), testFd.getStartOffset(),
                 testFd.getLength());
 
-        codec = MediaCodec.createDecoderByType(mime);
-//        if (mime.contains("avc")) {
-//            codec = MediaCodec.createByCodecName("OMX.google.h264.decoder");
-//        } else if (mime.contains("3gpp")) {
-//            codec = MediaCodec.createByCodecName("OMX.google.h263.decoder");
-//        }
+        codec = createDecoder(mime);
         codec.configure(format, null /* surface */, null /* crypto */, 0 /* flags */);
         codec.start();
         codecInputBuffers = codec.getInputBuffers();
