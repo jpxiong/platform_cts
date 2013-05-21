@@ -183,12 +183,12 @@ public class RelativeLayout_LayoutParamsTest extends
         layoutParams = (RelativeLayout.LayoutParams) (view2.getLayoutParams());
         rules = layoutParams.getRules();
         assertEquals(R.id.relative_view21, rules[RelativeLayout.BELOW]);
-        assertEquals(R.id.relative_view21, rules[RelativeLayout.ALIGN_START]);
+        assertEquals(0, rules[RelativeLayout.ALIGN_START]);
         assertEquals(R.id.relative_view21, rules[RelativeLayout.ALIGN_LEFT]);
         assertEquals(0, rules[RelativeLayout.ALIGN_RIGHT]);
         rules = layoutParams.getRules(View.LAYOUT_DIRECTION_RTL);
         assertEquals(R.id.relative_view21, rules[RelativeLayout.BELOW]);
-        assertEquals(R.id.relative_view21, rules[RelativeLayout.ALIGN_START]);
+        assertEquals(0, rules[RelativeLayout.ALIGN_START]);
         assertEquals(0, rules[RelativeLayout.ALIGN_LEFT]);
         assertEquals(R.id.relative_view21, rules[RelativeLayout.ALIGN_RIGHT]);
 
@@ -203,13 +203,13 @@ public class RelativeLayout_LayoutParamsTest extends
         rules = layoutParams.getRules();
         assertEquals(R.id.relative_view21, rules[RelativeLayout.ALIGN_TOP]);
         assertEquals(R.id.relative_view22, rules[RelativeLayout.ALIGN_BOTTOM]);
-        assertEquals(R.id.relative_view21, rules[RelativeLayout.END_OF]);
+        assertEquals(0, rules[RelativeLayout.END_OF]);
         assertEquals(0, rules[RelativeLayout.LEFT_OF]);
         assertEquals(R.id.relative_view21, rules[RelativeLayout.RIGHT_OF]);
         rules = layoutParams.getRules(View.LAYOUT_DIRECTION_RTL);
         assertEquals(R.id.relative_view21, rules[RelativeLayout.ALIGN_TOP]);
         assertEquals(R.id.relative_view22, rules[RelativeLayout.ALIGN_BOTTOM]);
-        assertEquals(R.id.relative_view21, rules[RelativeLayout.END_OF]);
+        assertEquals(0, rules[RelativeLayout.END_OF]);
         assertEquals(R.id.relative_view21, rules[RelativeLayout.LEFT_OF]);
         assertEquals(0, rules[RelativeLayout.RIGHT_OF]);
 
@@ -220,12 +220,12 @@ public class RelativeLayout_LayoutParamsTest extends
         assertEquals(view3.getTop(), view4.getBottom());
         layoutParams = (RelativeLayout.LayoutParams) (view4.getLayoutParams());
         rules = layoutParams.getRules();
-        assertEquals(R.id.relative_view23, rules[RelativeLayout.ALIGN_END]);
+        assertEquals(0, rules[RelativeLayout.ALIGN_END]);
         assertEquals(0, rules[RelativeLayout.ALIGN_LEFT]);
         assertEquals(R.id.relative_view23, rules[RelativeLayout.ALIGN_RIGHT]);
         assertEquals(R.id.relative_view23, rules[RelativeLayout.ABOVE]);
         rules = layoutParams.getRules(View.LAYOUT_DIRECTION_RTL);
-        assertEquals(R.id.relative_view23, rules[RelativeLayout.ALIGN_END]);
+        assertEquals(0, rules[RelativeLayout.ALIGN_END]);
         assertEquals(R.id.relative_view23, rules[RelativeLayout.ALIGN_LEFT]);
         assertEquals(0, rules[RelativeLayout.ALIGN_RIGHT]);
         assertEquals(R.id.relative_view23, rules[RelativeLayout.ABOVE]);
@@ -238,12 +238,12 @@ public class RelativeLayout_LayoutParamsTest extends
         layoutParams = (RelativeLayout.LayoutParams) (view5.getLayoutParams());
         rules = layoutParams.getRules();
         assertEquals(RelativeLayout.TRUE, rules[RelativeLayout.ALIGN_PARENT_BOTTOM]);
-        assertEquals(RelativeLayout.TRUE, rules[RelativeLayout.ALIGN_PARENT_START]);
+        assertEquals(0, rules[RelativeLayout.ALIGN_PARENT_START]);
         assertEquals(RelativeLayout.TRUE, rules[RelativeLayout.ALIGN_PARENT_LEFT]);
         assertEquals(0, rules[RelativeLayout.ALIGN_PARENT_RIGHT]);
         rules = layoutParams.getRules(View.LAYOUT_DIRECTION_RTL);
         assertEquals(RelativeLayout.TRUE, rules[RelativeLayout.ALIGN_PARENT_BOTTOM]);
-        assertEquals(RelativeLayout.TRUE, rules[RelativeLayout.ALIGN_PARENT_START]);
+        assertEquals(0, rules[RelativeLayout.ALIGN_PARENT_START]);
         assertEquals(0, rules[RelativeLayout.ALIGN_PARENT_LEFT]);
         assertEquals(RelativeLayout.TRUE, rules[RelativeLayout.ALIGN_PARENT_RIGHT]);
 
@@ -255,12 +255,12 @@ public class RelativeLayout_LayoutParamsTest extends
         layoutParams = (RelativeLayout.LayoutParams) (view6.getLayoutParams());
         rules = layoutParams.getRules();
         assertEquals(RelativeLayout.TRUE, rules[RelativeLayout.ALIGN_PARENT_TOP]);
-        assertEquals(RelativeLayout.TRUE, rules[RelativeLayout.ALIGN_PARENT_END]);
+        assertEquals(0, rules[RelativeLayout.ALIGN_PARENT_END]);
         assertEquals(0, rules[RelativeLayout.ALIGN_PARENT_LEFT]);
         assertEquals(RelativeLayout.TRUE, rules[RelativeLayout.ALIGN_PARENT_RIGHT]);
         rules = layoutParams.getRules(View.LAYOUT_DIRECTION_RTL);
         assertEquals(RelativeLayout.TRUE, rules[RelativeLayout.ALIGN_PARENT_TOP]);
-        assertEquals(RelativeLayout.TRUE, rules[RelativeLayout.ALIGN_PARENT_END]);
+        assertEquals(0, rules[RelativeLayout.ALIGN_PARENT_END]);
         assertEquals(RelativeLayout.TRUE, rules[RelativeLayout.ALIGN_PARENT_LEFT]);
         assertEquals(0, rules[RelativeLayout.ALIGN_PARENT_RIGHT]);
 
@@ -284,12 +284,12 @@ public class RelativeLayout_LayoutParamsTest extends
         assertEquals(view1.getLeft(), view8.getRight());
         layoutParams = (RelativeLayout.LayoutParams) (view8.getLayoutParams());
         rules = layoutParams.getRules();
-        assertEquals(R.id.relative_view21, rules[RelativeLayout.START_OF]);
+        assertEquals(0, rules[RelativeLayout.START_OF]);
         assertEquals(R.id.relative_view21, rules[RelativeLayout.LEFT_OF]);
         assertEquals(0, rules[RelativeLayout.RIGHT_OF]);
         assertEquals(RelativeLayout.TRUE, rules[RelativeLayout.CENTER_VERTICAL]);
         rules = layoutParams.getRules(View.LAYOUT_DIRECTION_RTL);
-        assertEquals(R.id.relative_view21, rules[RelativeLayout.START_OF]);
+        assertEquals(0, rules[RelativeLayout.START_OF]);
         assertEquals(0, rules[RelativeLayout.LEFT_OF]);
         assertEquals(R.id.relative_view21, rules[RelativeLayout.RIGHT_OF]);
         assertEquals(RelativeLayout.TRUE, rules[RelativeLayout.CENTER_VERTICAL]);
@@ -303,13 +303,13 @@ public class RelativeLayout_LayoutParamsTest extends
         ViewAsserts.assertLeftAligned(relativeLayout, view9);
         layoutParams = (RelativeLayout.LayoutParams) (view9.getLayoutParams());
         rules = layoutParams.getRules();
-        assertEquals(R.id.gravity_bottom, rules[RelativeLayout.ALIGN_START]);
+        assertEquals(0, rules[RelativeLayout.ALIGN_START]);
         assertEquals(R.id.gravity_bottom, rules[RelativeLayout.ALIGN_LEFT]);
         assertEquals(0, rules[RelativeLayout.ALIGN_RIGHT]);
         assertEquals(R.id.relative_view23, rules[RelativeLayout.ALIGN_TOP]);
         assertEquals(R.id.relative_view23, rules[RelativeLayout.ALIGN_BOTTOM]);
         rules = layoutParams.getRules(View.LAYOUT_DIRECTION_RTL);
-        assertEquals(R.id.gravity_bottom, rules[RelativeLayout.ALIGN_START]);
+        assertEquals(0, rules[RelativeLayout.ALIGN_START]);
         assertEquals(0, rules[RelativeLayout.ALIGN_LEFT]);
         assertEquals(R.id.gravity_bottom, rules[RelativeLayout.ALIGN_RIGHT]);
         assertEquals(R.id.relative_view23, rules[RelativeLayout.ALIGN_TOP]);
