@@ -29,7 +29,6 @@ cts_security_apps_list := \
 	CtsMultiUserStorageApp
 
 cts_support_packages := \
-	$(PTS_SUPPORT_PACKAGES) \
 	CtsAccelerationTestStubs \
 	CtsDeviceAdmin \
 	CtsMonkeyApp \
@@ -52,7 +51,6 @@ CTS_TEST_CASE_LIST := \
 
 # Test packages that require an associated test package XML.
 cts_test_packages := \
-	$(PTS_TEST_PACKAGES) \
 	CtsAccelerationTestCases \
 	CtsAccountManagerTestCases \
 	CtsAccessibilityServiceTestCases \
@@ -113,7 +111,6 @@ CTS_COVERAGE_TEST_CASE_LIST := \
 
 # Host side only tests
 cts_host_libraries := \
-	$(PTS_HOST_CASES) \
 	CtsAdbTests \
 	CtsAppSecurityTests \
 	CtsMonkeyTestCases
