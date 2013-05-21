@@ -21,6 +21,7 @@ import com.android.cts.stub.R;
 
 import android.app.Activity;
 import android.app.Instrumentation;
+import android.cts.util.PollingCheck;
 import android.test.ActivityInstrumentationTestCase2;
 import android.text.InputType;
 import android.text.method.DateKeyListener;
@@ -47,6 +48,12 @@ public class DateKeyListenerTest extends
         mActivity = getActivity();
         mInstrumentation = getInstrumentation();
         mTextView = (TextView) mActivity.findViewById(R.id.keylistener_textview);
+        new PollingCheck(1000) {
+            @Override
+            protected boolean check() {
+                return mTextView.hasWindowFocus();
+            }
+        }.run();
     }
 
     public void testConstructor() {
