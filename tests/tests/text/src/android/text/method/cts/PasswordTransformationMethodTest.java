@@ -49,7 +49,7 @@ public class PasswordTransformationMethodTest extends
 
     private boolean isPasswordPrefSaved;
 
-    private StubActivity mActicity;
+    private StubActivity mActivity;
 
     private MockPasswordTransformationMethod mMethod;
 
@@ -64,22 +64,28 @@ public class PasswordTransformationMethodTest extends
     @Override
     protected void setUp() throws Exception {
         super.setUp();
-        mActicity = getActivity();
+        mActivity = getActivity();
+        new PollingCheck(1000) {
+            @Override
+            protected boolean check() {
+                return mActivity.hasWindowFocus();
+            }
+        }.run();
         mMethod = new MockPasswordTransformationMethod();
         try {
             runTestOnUiThread(new Runnable() {
                 public void run() {
-                    EditText editText = new EditText(mActicity);
+                    EditText editText = new EditText(mActivity);
                     editText.setId(EDIT_TXT_ID);
                     editText.setTransformationMethod(mMethod);
-                    Button button = new Button(mActicity);
-                    LinearLayout layout = new LinearLayout(mActicity);
+                    Button button = new Button(mActivity);
+                    LinearLayout layout = new LinearLayout(mActivity);
                     layout.setOrientation(LinearLayout.VERTICAL);
                     layout.addView(editText, new LayoutParams(LayoutParams.MATCH_PARENT,
                             LayoutParams.WRAP_CONTENT));
                     layout.addView(button, new LayoutParams(LayoutParams.MATCH_PARENT,
                             LayoutParams.WRAP_CONTENT));
-                    mActicity.setContentView(layout);
+                    mActivity.setContentView(layout);
                     editText.requestFocus();
                 }
             });
@@ -195,7 +201,7 @@ public class PasswordTransformationMethodTest extends
 
     private void savePasswordPref() {
         try {
-            mPasswordPrefBackUp = System.getInt(mActicity.getContentResolver(),
+            mPasswordPrefBackUp = System.getInt(mActivity.getContentResolver(),
                     System.TEXT_SHOW_PASSWORD);
             isPasswordPrefSaved = true;
         } catch (SettingNotFoundException e) {
@@ -205,13 +211,13 @@ public class PasswordTransformationMethodTest extends
 
     private void resumePasswordPref() {
         if (isPasswordPrefSaved) {
-            System.putInt(mActicity.getContentResolver(), System.TEXT_SHOW_PASSWORD,
+            System.putInt(mActivity.getContentResolver(), System.TEXT_SHOW_PASSWORD,
                     mPasswordPrefBackUp);
         }
     }
 
     private void switchShowPassword(boolean on) {
-        System.putInt(mActicity.getContentResolver(), System.TEXT_SHOW_PASSWORD,
+        System.putInt(mActivity.getContentResolver(), System.TEXT_SHOW_PASSWORD,
                 on ? 1 : 0);
     }
 
