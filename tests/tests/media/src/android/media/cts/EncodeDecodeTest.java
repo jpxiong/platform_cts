@@ -441,7 +441,7 @@ public class EncodeDecodeTest extends AndroidTestCase {
         ByteBuffer[] decoderInputBuffers = null;
         ByteBuffer[] decoderOutputBuffers = null;
         MediaCodec.BufferInfo info = new MediaCodec.BufferInfo();
-        int decoderColorFormat = -12345;    // init to invalid value
+        MediaFormat decoderOutputFormat = null;
         int generateIndex = 0;
         int checkIndex = 0;
         int badFrames = 0;
@@ -616,9 +616,7 @@ public class EncodeDecodeTest extends AndroidTestCase {
                     decoderOutputBuffers = decoder.getOutputBuffers();
                 } else if (decoderStatus == MediaCodec.INFO_OUTPUT_FORMAT_CHANGED) {
                     // this happens before the first frame is returned
-                    MediaFormat decoderOutputFormat = decoder.getOutputFormat();
-                    decoderColorFormat =
-                            decoderOutputFormat.getInteger(MediaFormat.KEY_COLOR_FORMAT);
+                    decoderOutputFormat = decoder.getOutputFormat();
                     if (VERBOSE) Log.d(TAG, "decoder output format changed: " +
                             decoderOutputFormat);
                 } else if (decoderStatus < 0) {
@@ -637,7 +635,7 @@ public class EncodeDecodeTest extends AndroidTestCase {
                             if (VERBOSE) Log.d(TAG, "decoded, checking frame " + checkIndex);
                             assertEquals("Wrong time stamp", computePresentationTime(checkIndex),
                                     info.presentationTimeUs);
-                            if (!checkFrame(checkIndex++, decoderColorFormat, outputFrame)) {
+                            if (!checkFrame(checkIndex++, decoderOutputFormat, outputFrame)) {
                                 badFrames++;
                             }
                         }
@@ -949,13 +947,6 @@ public class EncodeDecodeTest extends AndroidTestCase {
                 }
             }
         }
-
-        if (false) {
-            // make sure that generate and check agree
-            if (!checkFrame(frameIndex, colorFormat, ByteBuffer.wrap(frameData))) {
-                fail("spot check failed");
-            }
-        }
     }
 
     /**
@@ -968,19 +959,31 @@ public class EncodeDecodeTest extends AndroidTestCase {
      *
      * @return true if the frame looks good
      */
-    private boolean checkFrame(int frameIndex, int colorFormat, ByteBuffer frameData) {
+    private boolean checkFrame(int frameIndex, MediaFormat format, ByteBuffer frameData) {
         // Check for color formats we don't understand.  There is no requirement for video
         // decoders to use a "mundane" format, so we just give a pass on proprietary formats.
         // e.g. Nexus 4 0x7FA30C03 OMX_QCOM_COLOR_FormatYUV420PackedSemiPlanar64x32Tile2m8ka
+        int colorFormat = format.getInteger(MediaFormat.KEY_COLOR_FORMAT);
         if (!isRecognizedFormat(colorFormat)) {
             Log.d(TAG, "unable to check frame contents for colorFormat=" +
                     Integer.toHexString(colorFormat));
             return true;
         }
 
-        final int HALF_WIDTH = mWidth / 2;
         boolean frameFailed = false;
         boolean semiPlanar = isSemiPlanarYUV(colorFormat);
+        int width = format.getInteger(MediaFormat.KEY_WIDTH);
+        int height = format.getInteger(MediaFormat.KEY_HEIGHT);
+        int halfWidth = width / 2;
+        int cropLeft = format.getInteger("crop-left");
+        int cropRight = format.getInteger("crop-right");
+        int cropTop = format.getInteger("crop-top");
+        int cropBottom = format.getInteger("crop-bottom");
+        int cropWidth = cropRight - cropLeft + 1;
+        int cropHeight = cropBottom - cropTop + 1;
+
+        assertEquals(mWidth, cropWidth);
+        assertEquals(mHeight, cropHeight);
 
         for (int i = 0; i < 8; i++) {
             int x, y;
@@ -992,18 +995,21 @@ public class EncodeDecodeTest extends AndroidTestCase {
                 y = (mHeight * 3) / 4;
             }
 
+            y += cropTop;
+            x += cropLeft;
+
             int testY, testU, testV;
             if (semiPlanar) {
                 // Galaxy Nexus uses OMX_TI_COLOR_FormatYUV420PackedSemiPlanar
-                testY = frameData.get(y * mWidth + x) & 0xff;
-                testU = frameData.get(mWidth*mHeight + 2*(y/2) * HALF_WIDTH + 2*(x/2)) & 0xff;
-                testV = frameData.get(mWidth*mHeight + 2*(y/2) * HALF_WIDTH + 2*(x/2) + 1) & 0xff;
+                testY = frameData.get(y * width + x) & 0xff;
+                testU = frameData.get(width*height + 2*(y/2) * halfWidth + 2*(x/2)) & 0xff;
+                testV = frameData.get(width*height + 2*(y/2) * halfWidth + 2*(x/2) + 1) & 0xff;
             } else {
                 // Nexus 10, Nexus 7 use COLOR_FormatYUV420Planar
-                testY = frameData.get(y * mWidth + x) & 0xff;
-                testU = frameData.get(mWidth*mHeight + (y/2) * HALF_WIDTH + (x/2)) & 0xff;
-                testV = frameData.get(mWidth*mHeight + HALF_WIDTH * (mHeight / 2) +
-                        (y/2) * HALF_WIDTH + (x/2)) & 0xff;
+                testY = frameData.get(y * width + x) & 0xff;
+                testU = frameData.get(width*height + (y/2) * halfWidth + (x/2)) & 0xff;
+                testV = frameData.get(width*height + halfWidth * (height / 2) +
+                        (y/2) * halfWidth + (x/2)) & 0xff;
             }
 
             int expY, expU, expV;
