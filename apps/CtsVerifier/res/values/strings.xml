@@ -601,4 +601,12 @@
     <string name="nls_service_stopped">Service should stop once disabled.</string>
     <string name="nls_note_missed">Check that notification was not received.</string>
     
+    <!-- Strings for Widget -->
+    <string name="widget_framework_test">Widget Framework Test</string>
+    <string name="widget_framework_test_info">This test checks some basic features of the widget
+        framework. In order to perform the test, press the Home button. Add the widget
+        titled "CTS Verifier" to the home screen. Follow the instructions in the widget.</string>
+    <string name="widget_name">Widget Framework Test</string>
+    <string name="widget_pass">Pass</string>
+    <string name="widget_fail">Fail</string>
 </resources>
