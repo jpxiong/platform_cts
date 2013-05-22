@@ -738,9 +738,15 @@ public class FileSystemPermissionTest extends AndroidTestCase {
                 new File("/dev/log/radio"),  // b/9035217
                 new File("/dev/log/system"), // b/9035217
                 new File("/dev/null"),
+                new File("/dev/nvhost-ctrl"), // b/9088251
+                new File("/dev/nvhost-gr2d"), // b/9088251
+                new File("/dev/nvhost-gr3d"), // b/9088251
+                new File("/dev/nvmap"),       // b/9088251
+                new File("/dev/ptmx"),        // b/9088251
                 new File("/dev/random"),
                 new File("/dev/tty"),
                 new File("/dev/urandom"),
+                new File("/dev/xt_qtaguid"),  // b/9088251
                 new File("/dev/zero")
             ));
 
