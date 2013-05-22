@@ -732,11 +732,14 @@ public class FileSystemPermissionTest extends AndroidTestCase {
                 new File("/dev/ashmem"),
                 new File("/dev/binder"),
                 new File("/dev/full"),
+                new File("/dev/genlock"),    // b/9035217
                 new File("/dev/ion"),
+                new File("/dev/kgsl-3d0"),   // b/9035217
                 new File("/dev/log/events"), // b/9035217
                 new File("/dev/log/main"),   // b/9035217
                 new File("/dev/log/radio"),  // b/9035217
                 new File("/dev/log/system"), // b/9035217
+                new File("/dev/msm_rotator"), // b/9035217
                 new File("/dev/null"),
                 new File("/dev/nvhost-ctrl"), // b/9088251
                 new File("/dev/nvhost-gr2d"), // b/9088251
