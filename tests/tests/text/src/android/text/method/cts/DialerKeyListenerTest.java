@@ -16,17 +16,17 @@
 
 package android.text.method.cts;
 
-import junit.framework.TestCase;
 import android.text.InputType;
 import android.text.Spannable;
 import android.text.SpannableString;
+import android.text.method.cts.KeyListenerTestCase;
 import android.text.method.DialerKeyListener;
 import android.view.KeyEvent;
 
 /**
- * Test {@link DialerKeyListener}.
+ * Test {@link android.text.method.DialerKeyListener}.
  */
-public class DialerKeyListenerTest extends TestCase {
+public class DialerKeyListenerTest extends KeyListenerTestCase {
     public void testConstructor() {
         new DialerKeyListener();
     }
@@ -76,11 +76,20 @@ public class DialerKeyListenerTest extends TestCase {
         assertEquals(InputType.TYPE_CLASS_PHONE, listener.getInputType());
     }
 
+    /**
+     * A mocked {@link android.text.method.DialerKeyListener} for testing purposes.
+     *
+     * Allows {@link DialerKeyListenerTest} to call
+     * {@link android.text.method.DialerKeyListener#getAcceptedChars()} and
+     * {@link android.text.method.DialerKeyListener#lookup(KeyEvent, Spannable)}.
+     */
     private class MockDialerKeyListener extends DialerKeyListener {
+        @Override
         protected char[] getAcceptedChars() {
             return super.getAcceptedChars();
         }
 
+        @Override
         protected int lookup(KeyEvent event, Spannable content) {
             return super.lookup(event, content);
         }

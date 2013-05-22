@@ -16,56 +16,25 @@
 
 package android.text.method.cts;
 
-import com.android.cts.stub.R;
-
-
-import android.app.Activity;
-import android.app.Instrumentation;
-import android.cts.util.PollingCheck;
-import android.test.ActivityInstrumentationTestCase2;
 import android.text.InputType;
 import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.Spanned;
+import android.text.method.cts.KeyListenerTestCase;
 import android.text.method.DigitsKeyListener;
 import android.view.KeyEvent;
-import android.widget.TextView;
 
 /**
  * Test {@link DigitsKeyListener}.
  */
-public class DigitsKeyListenerTest extends
-        ActivityInstrumentationTestCase2<KeyListenerStubActivity> {
-    private Activity mActivity;
-    private Instrumentation mInstrumentation;
-    private TextView mTextView;
-
-    public DigitsKeyListenerTest(){
-        super("com.android.cts.stub", KeyListenerStubActivity.class);
-    }
-
-    @Override
-    protected void setUp() throws Exception {
-        super.setUp();
-
-        mActivity = getActivity();
-        mInstrumentation = getInstrumentation();
-        mTextView = (TextView) mActivity.findViewById(R.id.keylistener_textview);
-        new PollingCheck(1000) {
-            @Override
-            protected boolean check() {
-                return mTextView.hasWindowFocus();
-            }
-        }.run();
-    }
-
+public class DigitsKeyListenerTest extends KeyListenerTestCase {
     public void testConstructor() {
         new DigitsKeyListener();
 
         new DigitsKeyListener(true, true);
     }
 
-    /**
+    /*
      * Check point:
      * Current accepted characters are '0', '1', '2', '3', '4', '5', '6', '7', '8', '9'.
      * 1. filter "123456", return null.
@@ -114,7 +83,7 @@ public class DigitsKeyListenerTest extends
         assertEquals(destString, dest.toString());
     }
 
-    /**
+    /*
      * Check point:
      * Current accepted characters are '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '-', '+'.
      * 1. filter "-123456", return null
@@ -217,7 +186,7 @@ public class DigitsKeyListenerTest extends
         assertEquals(startSign, dest.toString());
     }
 
-    /**
+    /*
      * Check point:
      * Current accepted characters are '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '.'.
      * 1. filter "123.456", return null
@@ -287,7 +256,7 @@ public class DigitsKeyListenerTest extends
         assertEquals(startDecimal, dest.toString());
     }
 
-    /**
+    /*
      * Check point:
      * Current accepted characters are '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '.', '-',
      * '+'.
@@ -410,7 +379,7 @@ public class DigitsKeyListenerTest extends
         assertEquals(startSign, dest.toString());
     }
 
-    /**
+    /*
      * Scenario description:
      * Current accepted characters are '0', '1', '2', '3', '4', '5', '6', '7', '8', '9'.
      *  1. Press '-' key and this key could not be accepted.
@@ -421,13 +390,7 @@ public class DigitsKeyListenerTest extends
     public void testDigitsKeyListener1() {
         final DigitsKeyListener digitsKeyListener = DigitsKeyListener.getInstance();
 
-        mActivity.runOnUiThread(new Runnable() {
-            public void run() {
-                mTextView.setKeyListener(digitsKeyListener);
-                mTextView.requestFocus();
-            }
-        });
-        mInstrumentation.waitForIdleSync();
+        setKeyListenerSync(digitsKeyListener);
         assertEquals("", mTextView.getText().toString());
 
         // press '-' key.
@@ -447,7 +410,7 @@ public class DigitsKeyListenerTest extends
         assertEquals("12", mTextView.getText().toString());
     }
 
-    /**
+    /*
      * Scenario description:
      * Current accepted characters are '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '-', '+'.
      *  1. Press '-' key and check if the content of TextView becomes "-"
@@ -461,13 +424,7 @@ public class DigitsKeyListenerTest extends
     public void testDigitsKeyListener2() {
         final DigitsKeyListener digitsKeyListener = DigitsKeyListener.getInstance(true, false);
 
-        mActivity.runOnUiThread(new Runnable() {
-            public void run() {
-                mTextView.setKeyListener(digitsKeyListener);
-                mTextView.requestFocus();
-            }
-        });
-        mInstrumentation.waitForIdleSync();
+        setKeyListenerSync(digitsKeyListener);
         assertEquals("", mTextView.getText().toString());
 
         // press '-' key.
@@ -495,7 +452,7 @@ public class DigitsKeyListenerTest extends
         assertEquals("-12", mTextView.getText().toString());
     }
 
-    /**
+    /*
      * Scenario description:
      * Current accepted characters are '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '.'.
      *  1. Press '-' key and check if the content of TextView becomes ""
@@ -509,13 +466,7 @@ public class DigitsKeyListenerTest extends
     public void testDigitsKeyListener3() {
         final DigitsKeyListener digitsKeyListener = DigitsKeyListener.getInstance(false, true);
 
-        mActivity.runOnUiThread(new Runnable() {
-            public void run() {
-                mTextView.setKeyListener(digitsKeyListener);
-                mTextView.requestFocus();
-            }
-        });
-        mInstrumentation.waitForIdleSync();
+        setKeyListenerSync(digitsKeyListener);
         assertEquals("", mTextView.getText().toString());
 
         // press '-' key.
@@ -543,7 +494,7 @@ public class DigitsKeyListenerTest extends
         assertEquals("1.2", mTextView.getText().toString());
     }
 
-    /**
+    /*
      * Scenario description:
      * Current accepted characters are '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '-', '+',
      * '.'.
@@ -559,13 +510,7 @@ public class DigitsKeyListenerTest extends
     public void testDigitsKeyListener4() {
         final DigitsKeyListener digitsKeyListener = DigitsKeyListener.getInstance(true, true);
 
-        mActivity.runOnUiThread(new Runnable() {
-            public void run() {
-                mTextView.setKeyListener(digitsKeyListener);
-                mTextView.requestFocus();
-            }
-        });
-        mInstrumentation.waitForIdleSync();
+        setKeyListenerSync(digitsKeyListener);
         assertEquals("", mTextView.getText().toString());
 
         // press '+' key.
@@ -593,7 +538,7 @@ public class DigitsKeyListenerTest extends
         assertEquals("+1.2", mTextView.getText().toString());
     }
 
-    /**
+    /*
      * Scenario description:
      * Current accepted characters are '5', '6', '7', '8', '9'.
      *  1. Press '1' key and this key could not be accepted.
@@ -606,13 +551,7 @@ public class DigitsKeyListenerTest extends
         final String accepted = "56789";
         final DigitsKeyListener digitsKeyListener = DigitsKeyListener.getInstance(accepted);
 
-        mActivity.runOnUiThread(new Runnable() {
-            public void run() {
-                mTextView.setKeyListener(digitsKeyListener);
-                mTextView.requestFocus();
-            }
-        });
-        mInstrumentation.waitForIdleSync();
+        setKeyListenerSync(digitsKeyListener);
         assertEquals("", mTextView.getText().toString());
 
         // press '1' key.
@@ -680,7 +619,7 @@ public class DigitsKeyListenerTest extends
     }
 
     public void testGetAcceptedChars() {
-        MyDigitsKeyListener digitsKeyListener = new MyDigitsKeyListener();
+        MockDigitsKeyListener mockDigitsKeyListener = new MockDigitsKeyListener();
 
         final char[][] expected = new char[][] {
             new char[] { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9' },
@@ -689,20 +628,16 @@ public class DigitsKeyListenerTest extends
             new char[] { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '-', '+', '.' },
         };
 
-        TextMethodUtils.assertEquals(expected[0],
-                digitsKeyListener.getAcceptedChars());
+        TextMethodUtils.assertEquals(expected[0], mockDigitsKeyListener.getAcceptedChars());
 
-        digitsKeyListener = new MyDigitsKeyListener(true, false);
-        TextMethodUtils.assertEquals(expected[1],
-                digitsKeyListener.getAcceptedChars());
+        mockDigitsKeyListener = new MockDigitsKeyListener(true, false);
+        TextMethodUtils.assertEquals(expected[1], mockDigitsKeyListener.getAcceptedChars());
 
-        digitsKeyListener = new MyDigitsKeyListener(false, true);
-        TextMethodUtils.assertEquals(expected[2],
-                digitsKeyListener.getAcceptedChars());
+        mockDigitsKeyListener = new MockDigitsKeyListener(false, true);
+        TextMethodUtils.assertEquals(expected[2], mockDigitsKeyListener.getAcceptedChars());
 
-        digitsKeyListener = new MyDigitsKeyListener(true, true);
-        TextMethodUtils.assertEquals(expected[3],
-                digitsKeyListener.getAcceptedChars());
+        mockDigitsKeyListener = new MockDigitsKeyListener(true, true);
+        TextMethodUtils.assertEquals(expected[3], mockDigitsKeyListener.getAcceptedChars());
     }
 
     public void testGetInputType() {
@@ -727,12 +662,18 @@ public class DigitsKeyListenerTest extends
         assertEquals(expected, digitsKeyListener.getInputType());
     }
 
-    private class MyDigitsKeyListener extends DigitsKeyListener {
-        public MyDigitsKeyListener() {
+    /**
+     * A mocked {@link android.text.method.DigitsKeyListener} for testing purposes.
+     *
+     * Allows {@link DigitsKeyListenerTest} to call
+     * {@link android.text.method.DigitsKeyListener#getAcceptedChars()}.
+     */
+    private class MockDigitsKeyListener extends DigitsKeyListener {
+        public MockDigitsKeyListener() {
             super();
         }
 
-        public MyDigitsKeyListener(boolean sign, boolean decimal) {
+        public MockDigitsKeyListener(boolean sign, boolean decimal) {
             super(sign, decimal);
         }
 

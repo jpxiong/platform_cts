@@ -38,6 +38,7 @@ import android.os.Vibrator;
 import android.test.ActivityInstrumentationTestCase2;
 import android.test.TouchUtils;
 import android.test.UiThreadTest;
+import android.text.format.DateUtils;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.util.SparseArray;
@@ -90,7 +91,7 @@ public class ViewTest extends ActivityInstrumentationTestCase2<ViewTestStubActiv
 
     private Resources mResources;
     private MockViewParent mMockParent;
-    private Activity mActivity;
+    private ViewTestStubActivity mActivity;
 
     /** timeout delta when wait in case the system is sluggish */
     private static final long TIMEOUT_DELTA = 10000;
@@ -109,6 +110,7 @@ public class ViewTest extends ActivityInstrumentationTestCase2<ViewTestStubActiv
         }.run();
         mResources = mActivity.getResources();
         mMockParent = new MockViewParent(mActivity);
+        assertTrue(mActivity.waitForWindowFocus(5 * DateUtils.SECOND_IN_MILLIS));
     }
 
     public void testConstructor() {

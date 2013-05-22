@@ -16,12 +16,11 @@
 
 package android.text.method.cts;
 
-
-import android.test.AndroidTestCase;
 import android.text.Editable;
 import android.text.Selection;
 import android.text.Spannable;
 import android.text.Spanned;
+import android.text.method.cts.KeyListenerTestCase;
 import android.text.method.DateKeyListener;
 import android.text.method.MetaKeyKeyListener;
 import android.view.KeyCharacterMap;
@@ -32,11 +31,11 @@ import android.widget.ImageView;
 /**
  * Test {@link MetaKeyKeyListener}.
  */
-public class MetaKeyKeyListenerTest extends AndroidTestCase {
+public class MetaKeyKeyListenerTest extends KeyListenerTestCase {
     public void testPressKey() {
         final CharSequence str = "123456";
         final MetaKeyKeyListener numberKeyListener = new DateKeyListener();
-        final View view = new ImageView(getContext());
+        final View view = new ImageView(mInstrumentation.getTargetContext());
         final Editable content = Editable.Factory.getInstance().newEditable(str);
 
         content.setSpan(Selection.SELECTION_START, 0, 0, Spanned.SPAN_POINT_POINT);
@@ -61,7 +60,7 @@ public class MetaKeyKeyListenerTest extends AndroidTestCase {
     public void testReleaseKey() {
         final CharSequence str = "123456";
         final MetaKeyKeyListener numberKeyListener = new DateKeyListener();
-        final View view = new ImageView(getContext());
+        final View view = new ImageView(mInstrumentation.getTargetContext());
         final Editable content = Editable.Factory.getInstance().newEditable(str);
 
         content.setSpan(Selection.SELECTION_START, 0, 0, Spanned.SPAN_POINT_POINT);
@@ -343,12 +342,21 @@ public class MetaKeyKeyListenerTest extends AndroidTestCase {
         assertEquals(0, state);
     }
 
+    /**
+     * A mocked {@link android.text.method.MetaKeyKeyListener} for testing purposes.
+     *
+     * Allows {@link MetaKeyKeyListenerTest} to call
+     * {@link android.text.method.MetaKeyKeyListener.resetLockedMeta(Spannable)}.
+     */
     private class MockMetaKeyKeyListener extends MetaKeyKeyListener {
         public void callResetLockedMeta(Spannable content) {
             MetaKeyKeyListener.resetLockedMeta(content);
         }
     }
 
+    /**
+     * A mocked {@link android.text.Spannable} for testing purposes.
+     */
     private class MockSpannable implements Spannable {
         private int mFlags;
         private boolean mCalledRemoveSpan = false;
