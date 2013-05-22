@@ -122,6 +122,7 @@ public class SmsManagerTest extends AndroidTestCase {
                     "45008",    // KT
                     "45005",    // SKT Mobility
                     "45002",     // SKT Mobility
+                    "45006",    // LGT
                     // Verizon
                     "310004",
                     "310012",
@@ -156,6 +157,7 @@ public class SmsManagerTest extends AndroidTestCase {
                     "30272",    // Rogers
                     "302370",   // Fido
                     "30237",    // Fido
+                    "45006",    // LGT
                     "45008"     // KT
             );
 
