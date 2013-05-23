@@ -22,6 +22,7 @@ import com.android.cts.stub.R;
 import android.app.Activity;
 import android.content.Context;
 import android.content.res.Resources;
+import android.cts.util.PollingCheck;
 import android.graphics.Canvas;
 import android.graphics.ColorFilter;
 import android.graphics.drawable.Drawable;
@@ -160,7 +161,12 @@ public class AbsSeekBarTest extends ActivityInstrumentationTestCase2<ProgressBar
                 seekBar.requestFocus();
             }
         });
-        getInstrumentation().waitForIdleSync();
+        new PollingCheck(1000) {
+            @Override
+            protected boolean check() {
+                return seekBar.hasWindowFocus();
+            }
+        }.run();
         assertEquals(keyProgressIncrement, seekBar.getKeyProgressIncrement());
 
         int oldProgress = seekBar.getProgress();
