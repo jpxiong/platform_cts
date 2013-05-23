@@ -64,6 +64,7 @@ public class GeolocationTest extends ActivityInstrumentationTestCase2<WebViewStu
 
     private static final String JS_INTERFACE_NAME = "Android";
     private static final int POLLING_TIMEOUT = 60 * 1000;
+    private static final int LOCATION_THREAD_UPDATE_WAIT_MS = 250;
     private static final String PROVIDER_NAME = LocationManager.NETWORK_PROVIDER;
 
     // static HTML page always injected instead of the url loaded
@@ -102,6 +103,8 @@ public class GeolocationTest extends ActivityInstrumentationTestCase2<WebViewStu
     private JavascriptStatusReceiver mJavascriptStatusReceiver;
     private LocationManager mLocationManager;
     private WebViewOnUiThread mOnUiThread;
+    private Thread mLocationUpdateThread;
+    private volatile boolean mLocationUpdateThreadExitRequested;
 
     public GeolocationTest() throws Exception {
         super("com.android.cts.stub", WebViewStubActivity.class);
@@ -156,13 +159,48 @@ public class GeolocationTest extends ActivityInstrumentationTestCase2<WebViewStu
 
     @Override
     protected void tearDown() throws Exception {
+        stopUpdateLocationThread();
         // Remove the test provider after each test
         try {
-          mLocationManager.removeTestProvider(PROVIDER_NAME);
+            mLocationManager.removeTestProvider(PROVIDER_NAME);
         } catch (IllegalArgumentException e) {} // Not much to do about this
         mOnUiThread.cleanUp();
         // This will null all member and static variables
         super.tearDown();
+    }
+
+    private void startUpdateLocationThread() {
+        // Only start the thread once
+        if (mLocationUpdateThread == null) {
+            mLocationUpdateThreadExitRequested = false;
+            mLocationUpdateThread = new Thread() {
+                @Override
+                public void run() {
+                    while (!mLocationUpdateThreadExitRequested) {
+                        try {
+                            Thread.sleep(LOCATION_THREAD_UPDATE_WAIT_MS);
+                        } catch(Exception e) {
+                            // Do nothing, an extra update is no problem
+                        }
+                        updateLocation(PROVIDER_NAME);
+                    }
+                }
+            };
+            mLocationUpdateThread.start();
+        }
+    }
+
+    private void stopUpdateLocationThread() {
+        // Only stop the thread if it was started
+        if (mLocationUpdateThread != null) {
+            mLocationUpdateThreadExitRequested = true;
+            try {
+                mLocationUpdateThread.join();
+            } catch (InterruptedException e) {
+                // Do nothing
+            }
+            mLocationUpdateThread = null;
+        }
     }
 
     // Update location with a fixed latitude and longtitude, sets the time to the current time.
@@ -180,7 +218,7 @@ public class GeolocationTest extends ActivityInstrumentationTestCase2<WebViewStu
     // using a maximum age.
     private void loadUrlAndUpdateLocation(String url) {
         mOnUiThread.loadUrlAndWaitForCompletion(url);
-        updateLocation(PROVIDER_NAME);
+        startUpdateLocationThread();
     }
 
     // WebChromeClient that accepts each location for one load. WebChromeClient is used in
