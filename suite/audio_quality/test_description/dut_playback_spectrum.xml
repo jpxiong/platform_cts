@@ -28,7 +28,7 @@
 		</sequential>
 		<sequential repeat="1" index="k">
 			<!-- input: host record, device record, samping rate, low frequency in Hz, high frequency in Hz, allowed error for pass in smaller side, allowed error in bigger side%, output: min value in lower side calculated normalized to 1.0, max value in higher side, calculated amplitude ratio in mannitude only between low f to high f -->
-			<process method="script:check_spectrum" input="id:sound1,id:host_in_$k,consti:44100,consti:500,consti:8000,constf:85.0,constf:150.0" output="val:min_val_$k,val:max_val_$k,id:spectrum_$k" />
+			<process method="script:check_spectrum" input="id:sound1,id:host_in_$k,consti:44100,consti:500,consti:8000,constf:97.0,constf:200.0" output="val:min_val_$k,val:max_val_$k,id:spectrum_$k" />
 		</sequential>
 	</action>
 	<save file="sound1,host_in_.*,spectrum_.*" report="min_val_.*,max_val_.*" />
