@@ -41,7 +41,14 @@ public class WebViewClientTest extends ActivityInstrumentationTestCase2<WebViewS
     @Override
     protected void setUp() throws Exception {
         super.setUp();
-        mOnUiThread = new WebViewOnUiThread(this, getActivity().getWebView());
+        final WebViewStubActivity activity = getActivity();
+        new PollingCheck() {
+            @Override
+                protected boolean check() {
+                return activity.hasWindowFocus();
+            }
+        }.run();
+        mOnUiThread = new WebViewOnUiThread(this, activity.getWebView());
     }
 
     @Override
