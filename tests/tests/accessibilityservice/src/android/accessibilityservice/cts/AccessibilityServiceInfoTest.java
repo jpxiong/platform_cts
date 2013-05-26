@@ -17,14 +17,10 @@
 package android.accessibilityservice.cts;
 
 import android.accessibilityservice.AccessibilityServiceInfo;
-import android.app.Service;
 import android.os.Parcel;
 import android.test.AndroidTestCase;
 import android.test.suitebuilder.annotation.MediumTest;
 import android.view.accessibility.AccessibilityEvent;
-import android.view.accessibility.AccessibilityManager;
-
-import java.util.List;
 
 /**
  * Class for testing {@link AccessibilityServiceInfo}.
@@ -103,39 +99,6 @@ public class AccessibilityServiceInfoTest extends AndroidTestCase {
         assertEquals("FLAG_REQUEST_TOUCH_EXPLORATION_MODE", AccessibilityServiceInfo.flagToString(
                 AccessibilityServiceInfo.FLAG_REQUEST_TOUCH_EXPLORATION_MODE));
         
-    }
-
-    /**
-     * Tests whether a service can that requested it can retrieve
-     * window content.
-     */
-    @MediumTest
-    @SuppressWarnings("deprecation")
-    public void testAccessibilityServiceInfoForEnabledService() {
-        AccessibilityManager accessibilityManager = (AccessibilityManager)
-            getContext().getSystemService(Service.ACCESSIBILITY_SERVICE);
-        List<AccessibilityServiceInfo> enabledServices =
-            accessibilityManager.getEnabledAccessibilityServiceList(
-                    AccessibilityServiceInfo.FEEDBACK_GENERIC);
-        assertSame("There should be one generic service.", 1, enabledServices.size());
-        AccessibilityServiceInfo speakingService = enabledServices.get(0);
-        assertSame(AccessibilityEvent.TYPES_ALL_MASK, speakingService.eventTypes);
-        assertSame(AccessibilityServiceInfo.FEEDBACK_GENERIC, speakingService.feedbackType);
-        assertSame(AccessibilityServiceInfo.FLAG_REQUEST_TOUCH_EXPLORATION_MODE
-                | AccessibilityServiceInfo.FLAG_REPORT_VIEW_IDS,
-                speakingService.flags);
-        assertSame(0l, speakingService.notificationTimeout);
-        assertNull(speakingService.getDescription());
-        assertNull(speakingService.packageNames /*all packages*/);
-        assertNotNull(speakingService.getId());
-        assertSame(speakingService.getCapabilities(),
-                AccessibilityServiceInfo.CAPABILITY_CAN_REQUEST_ENHANCED_WEB_ACCESSIBILITY
-                | AccessibilityServiceInfo.CAPABILITY_CAN_REQUEST_FILTER_KEY_EVENTS
-                | AccessibilityServiceInfo.CAPABILITY_CAN_REQUEST_TOUCH_EXPLORATION
-                | AccessibilityServiceInfo.CAPABILITY_CAN_RETRIEVE_WINDOW_CONTENT);
-        assertNull(speakingService.getSettingsActivityName());
-        assertNull(speakingService.loadDescription(getContext().getPackageManager()));
-        assertNull(speakingService.getResolveInfo());
     }
 
     /**
