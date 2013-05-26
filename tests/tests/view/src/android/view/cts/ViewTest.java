@@ -101,6 +101,12 @@ public class ViewTest extends ActivityInstrumentationTestCase2<ViewTestStubActiv
     protected void setUp() throws Exception {
         super.setUp();
         mActivity = getActivity();
+        new PollingCheck() {
+            @Override
+                protected boolean check() {
+                return mActivity.hasWindowFocus();
+            }
+        }.run();
         mResources = mActivity.getResources();
         mMockParent = new MockViewParent(mActivity);
     }

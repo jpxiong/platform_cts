@@ -97,8 +97,15 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
     @Override
     protected void setUp() throws Exception {
         super.setUp();
-        mWebView = getActivity().getWebView();
-        File f = getActivity().getFileStreamPath("snapshot");
+        final WebViewStubActivity activity = getActivity();
+        new PollingCheck() {
+            @Override
+                protected boolean check() {
+                return activity.hasWindowFocus();
+            }
+        }.run();
+        mWebView = activity.getWebView();
+        File f = activity.getFileStreamPath("snapshot");
         if (f.exists()) {
             f.delete();
         }

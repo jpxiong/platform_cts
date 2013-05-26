@@ -48,6 +48,12 @@ public class ViewTreeObserverTest extends ActivityInstrumentationTestCase2<MockA
         super.setUp();
         mViewTreeObserver = null;
         mActivity = getActivity();
+        new PollingCheck() {
+            @Override
+                protected boolean check() {
+                return mActivity.hasWindowFocus();
+            }
+        }.run();
         mInstrumentation = getInstrumentation();
         layout(R.layout.viewtreeobserver_layout);
     }
