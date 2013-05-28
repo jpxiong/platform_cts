@@ -81,6 +81,12 @@ public class AbsListViewTest extends ActivityInstrumentationTestCase2<ListViewSt
         super.setUp();
 
         mActivity = getActivity();
+        new PollingCheck() {
+            @Override
+                protected boolean check() {
+                return mActivity.hasWindowFocus();
+            }
+        }.run();
         mInstrumentation = getInstrumentation();
 
         XmlPullParser parser = mActivity.getResources().getXml(R.layout.listview_layout);
