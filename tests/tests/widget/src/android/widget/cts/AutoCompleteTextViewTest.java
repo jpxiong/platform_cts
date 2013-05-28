@@ -87,6 +87,12 @@ public class AutoCompleteTextViewTest extends
     protected void setUp() throws Exception {
         super.setUp();
         mActivity = getActivity();
+        new PollingCheck() {
+            @Override
+                protected boolean check() {
+                return mActivity.hasWindowFocus();
+            }
+        }.run();
         mInstrumentation = getInstrumentation();
         mAutoCompleteTextView = (AutoCompleteTextView) mActivity
                 .findViewById(R.id.autocompletetv_edit);

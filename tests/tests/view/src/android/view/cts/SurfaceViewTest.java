@@ -45,7 +45,14 @@ public class SurfaceViewTest extends ActivityInstrumentationTestCase2<SurfaceVie
         super.setUp();
         mInstrumentation = getInstrumentation();
         mContext = mInstrumentation.getContext();
-        mMockSurfaceView = getActivity().getSurfaceView();
+        final SurfaceViewStubActivity activity = getActivity();
+        new PollingCheck() {
+            @Override
+                protected boolean check() {
+                return activity.hasWindowFocus();
+            }
+        }.run();
+        mMockSurfaceView = activity.getSurfaceView();
     }
 
     public void testConstructor() {

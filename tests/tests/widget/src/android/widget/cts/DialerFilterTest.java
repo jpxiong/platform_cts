@@ -24,6 +24,7 @@ import org.xmlpull.v1.XmlPullParser;
 import android.app.Activity;
 import android.app.Instrumentation;
 import android.content.Context;
+import android.cts.util.PollingCheck;
 import android.test.ActivityInstrumentationTestCase2;
 import android.test.UiThreadTest;
 import android.text.Editable;
@@ -52,6 +53,12 @@ public class DialerFilterTest extends ActivityInstrumentationTestCase2<DialerFil
         super.setUp();
 
         mActivity = getActivity();
+        new PollingCheck() {
+            @Override
+                protected boolean check() {
+                return mActivity.hasWindowFocus();
+            }
+        }.run();
         mInstrumentation = getInstrumentation();
 
         mDialerFilter = (DialerFilter) mActivity.findViewById(R.id.dialer_filter);

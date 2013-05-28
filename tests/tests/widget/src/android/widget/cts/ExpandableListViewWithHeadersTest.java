@@ -17,6 +17,7 @@
 package android.widget.cts;
 
 
+import android.cts.util.PollingCheck;
 import android.test.ActivityInstrumentationTestCase2;
 import android.test.suitebuilder.annotation.LargeTest;
 import android.test.suitebuilder.annotation.MediumTest;
@@ -37,7 +38,14 @@ public class ExpandableListViewWithHeadersTest extends
     protected void setUp() throws Exception {
         super.setUp();
 
-        mExpandableListView = getActivity().getExpandableListView();
+        final ExpandableListWithHeaders activity = getActivity();
+        new PollingCheck() {
+            @Override
+                protected boolean check() {
+                return activity.hasWindowFocus();
+            }
+        }.run();
+        mExpandableListView = activity.getExpandableListView();
         mListUtil = new ListUtil(mExpandableListView, getInstrumentation());
     }
 
