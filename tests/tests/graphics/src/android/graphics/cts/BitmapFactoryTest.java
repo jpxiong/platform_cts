@@ -242,6 +242,61 @@ public class BitmapFactoryTest extends InstrumentationTestCase {
         assertEquals(START_WIDTH, b.getWidth());
     }
 
+    public void testDecodeReuse1() throws IOException {
+        BitmapFactory.Options options = new BitmapFactory.Options();
+        options.inMutable = true;
+        options.inSampleSize = 0; // treated as 1
+        options.inScaled = false;
+        Bitmap start = BitmapFactory.decodeResource(mRes, R.drawable.start, options);
+        int originalSize = start.getByteCount();
+        assertEquals(originalSize, start.getAllocationByteCount());
+
+        options.inBitmap = start;
+        options.inMutable = false; // will be overridden by non-null inBitamp
+        options.inSampleSize = -42; // treated as 1
+        Bitmap pass = BitmapFactory.decodeResource(mRes, R.drawable.pass, options);
+
+        assertEquals(originalSize, pass.getByteCount());
+        assertEquals(originalSize, pass.getAllocationByteCount());
+        assertEquals(start, pass);
+        assertTrue(pass.isMutable());
+    }
+
+    public void testDecodeReuse2() throws IOException {
+        BitmapFactory.Options options = new BitmapFactory.Options();
+        options.inMutable = true;
+        options.inScaled = false;
+        Bitmap original = BitmapFactory.decodeResource(mRes, R.drawable.robot, options);
+        int originalSize = original.getByteCount();
+        assertEquals(originalSize, original.getAllocationByteCount());
+
+        options.inBitmap = original;
+        options.inSampleSize = 4;
+        Bitmap reduced = BitmapFactory.decodeResource(mRes, R.drawable.pass, options);
+
+        assertEquals(original, reduced);
+        assertEquals(originalSize, reduced.getAllocationByteCount());
+        assertEquals(originalSize, reduced.getByteCount() * 256);
+    }
+
+    public void testDecodeReuse3() throws IOException {
+        BitmapFactory.Options options = new BitmapFactory.Options();
+        options.inMutable = true;
+        options.inScaled = false;
+        options.inSampleSize = 4;
+        Bitmap reduced = BitmapFactory.decodeResource(mRes, R.drawable.robot, options);
+
+        options.inBitmap = reduced;
+        options.inSampleSize = 1;
+        boolean failedCorrectly = false;
+        try {
+            Bitmap original = BitmapFactory.decodeResource(mRes, R.drawable.robot, options);
+        } catch (IllegalArgumentException e) {
+            failedCorrectly = true; // fails due to lack of space
+        }
+        assertTrue(failedCorrectly);
+    }
+
     private byte[] obtainArray() {
         ByteArrayOutputStream stm = new ByteArrayOutputStream();
         Options opt = new BitmapFactory.Options();
