@@ -56,6 +56,12 @@ public class BaseInputConnectionTest extends
         super.setUp();
         mInstrumentation = getInstrumentation();
         mActivity = getActivity();
+        new PollingCheck() {
+            @Override
+                protected boolean check() {
+                return mActivity.hasWindowFocus();
+            }
+        }.run();
         mWindow = mActivity.getWindow();
         mView = (EditText) mWindow.findViewById(R.id.entry);
         mConnection = new BaseInputConnection(mView, true);

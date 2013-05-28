@@ -119,6 +119,12 @@ public class TextViewTest extends ActivityInstrumentationTestCase2<TextViewStubA
     protected void setUp() throws Exception {
         super.setUp();
         mActivity = getActivity();
+        new PollingCheck() {
+            @Override
+                protected boolean check() {
+                return mActivity.hasWindowFocus();
+            }
+        }.run();
         mInstrumentation = getInstrumentation();
     }
 
