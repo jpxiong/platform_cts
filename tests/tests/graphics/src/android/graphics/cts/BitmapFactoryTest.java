@@ -252,7 +252,7 @@ public class BitmapFactoryTest extends InstrumentationTestCase {
         assertEquals(originalSize, start.getAllocationByteCount());
 
         options.inBitmap = start;
-        options.inMutable = false; // will be overridden by non-null inBitamp
+        options.inMutable = false; // will be overridden by non-null inBitmap
         options.inSampleSize = -42; // treated as 1
         Bitmap pass = BitmapFactory.decodeResource(mRes, R.drawable.pass, options);
 
@@ -272,11 +272,11 @@ public class BitmapFactoryTest extends InstrumentationTestCase {
 
         options.inBitmap = original;
         options.inSampleSize = 4;
-        Bitmap reduced = BitmapFactory.decodeResource(mRes, R.drawable.pass, options);
+        Bitmap reduced = BitmapFactory.decodeResource(mRes, R.drawable.robot, options);
 
         assertEquals(original, reduced);
         assertEquals(originalSize, reduced.getAllocationByteCount());
-        assertEquals(originalSize, reduced.getByteCount() * 256);
+        assertEquals(originalSize, reduced.getByteCount() * 16);
     }
 
     public void testDecodeReuse3() throws IOException {
