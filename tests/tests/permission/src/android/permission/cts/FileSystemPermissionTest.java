@@ -538,17 +538,6 @@ public class FileSystemPermissionTest extends AndroidTestCase {
         executor.shutdownNow();
     }
 
-    // TODO: Remove blacklisting once b/8557832 and b/8557891 fixed.
-    private static final Set<String> SYS_FILES_TO_IGNORE = new HashSet<String>(
-            Arrays.asList(
-                // Nakasi
-                "/sys/devices/tegradc.0/nvdps",
-                "/sys/devices/tegradc.1/nvdps",
-                "/sys/kernel/debug/asoc/tegra30-dam.0",
-                "/sys/kernel/debug/asoc/tegra30-dam.1",
-                "/sys/kernel/debug/asoc/tegra30-dam.2"
-            ));
-
     private static void tryToReadFromAllIn(File dir, ExecutorService executor) throws IOException {
         assertTrue(dir.isDirectory());
 
@@ -564,9 +553,7 @@ public class FileSystemPermissionTest extends AndroidTestCase {
                 if (f.isDirectory()) {
                     tryToReadFromAllIn(f, executor);
                 } else {
-                    if (!SYS_FILES_TO_IGNORE.contains(f.getCanonicalPath())) {
-                        tryFileOpenRead(f, executor);
-                    }
+                    tryFileOpenRead(f, executor);
                 }
             }
         }
