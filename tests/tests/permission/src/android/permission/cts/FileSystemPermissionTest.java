@@ -720,6 +720,7 @@ public class FileSystemPermissionTest extends AndroidTestCase {
                 new File("/dev/binder"),
                 new File("/dev/full"),
                 new File("/dev/genlock"),    // b/9035217
+                new File("/dev/hw_random"),  // b/9191279
                 new File("/dev/ion"),
                 new File("/dev/kgsl-3d0"),   // b/9035217
                 new File("/dev/log/events"), // b/9035217
