@@ -118,7 +118,7 @@ class InputSurface {
      * Surface that was passed to our constructor.
      */
     public void release() {
-        if (EGL14.eglGetCurrentContext() == mEGLContext) {
+        if (EGL14.eglGetCurrentContext().equals(mEGLContext)) {
             // Clear the current context and surface to ensure they are discarded immediately.
             EGL14.eglMakeCurrent(mEGLDisplay, EGL14.EGL_NO_SURFACE, EGL14.EGL_NO_SURFACE,
                     EGL14.EGL_NO_CONTEXT);

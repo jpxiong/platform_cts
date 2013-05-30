@@ -183,7 +183,7 @@ class OutputSurface implements SurfaceTexture.OnFrameAvailableListener {
      */
     public void release() {
         if (mEGL != null) {
-            if (mEGL.eglGetCurrentContext() == mEGLContext) {
+            if (mEGL.eglGetCurrentContext().equals(mEGLContext)) {
                 // Clear the current context and surface to ensure they are discarded immediately.
                 mEGL.eglMakeCurrent(mEGLDisplay, EGL10.EGL_NO_SURFACE, EGL10.EGL_NO_SURFACE,
                         EGL10.EGL_NO_CONTEXT);
