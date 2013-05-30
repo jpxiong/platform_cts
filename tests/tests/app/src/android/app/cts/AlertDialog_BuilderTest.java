@@ -18,6 +18,7 @@ package android.app.cts;
 
 import java.util.ArrayList;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Instrumentation;
 import android.app.AlertDialog.Builder;
@@ -29,6 +30,7 @@ import android.content.DialogInterface.OnCancelListener;
 import android.content.DialogInterface.OnClickListener;
 import android.content.DialogInterface.OnKeyListener;
 import android.content.DialogInterface.OnMultiChoiceClickListener;
+import android.cts.util.PollingCheck;
 import android.database.Cursor;
 import android.database.CursorWrapper;
 import android.graphics.drawable.Drawable;
@@ -108,6 +110,13 @@ public class AlertDialog_BuilderTest extends ActivityInstrumentationTestCase2<Di
         mBuilder = null;
         mInstrumentation = getInstrumentation();
         mContext = getActivity();
+        final Activity activity = getActivity();
+        new PollingCheck() {
+            @Override
+            protected boolean check() {
+                return activity.hasWindowFocus();
+            }
+        }.run();
         mButton = null;
         mView = null;
         mListView = null;

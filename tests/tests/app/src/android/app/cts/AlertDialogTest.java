@@ -23,6 +23,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnCancelListener;
 import android.content.DialogInterface.OnClickListener;
+import android.cts.util.PollingCheck;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Message;
@@ -55,6 +56,12 @@ public class AlertDialogTest extends ActivityInstrumentationTestCase2<DialogStub
 
     protected void startDialogActivity(int dialogNumber) {
         mActivity = DialogStubActivity.startDialogActivity(this, dialogNumber);
+        new PollingCheck() {
+            @Override
+            protected boolean check() {
+                return mActivity.getDialog().isShowing();
+            }
+        }.run();
     }
 
     public void testAlertDialog() throws Throwable {
