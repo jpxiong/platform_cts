@@ -802,7 +802,7 @@ public class DecodeEditEncodeTest extends AndroidTestCase {
      * mLargestColorDelta.
      */
     boolean isColorClose(int actual, int expected) {
-        final int MAX_DELTA = 7;
+        final int MAX_DELTA = 8;
         int delta = Math.abs(actual - expected);
         if (delta > mLargestColorDelta) {
             mLargestColorDelta = delta;
