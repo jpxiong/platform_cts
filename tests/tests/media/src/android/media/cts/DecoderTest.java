@@ -161,7 +161,9 @@ public class DecoderTest extends MediaPlayerTestBase {
         MediaCodec.BufferInfo info = new MediaCodec.BufferInfo();
         boolean sawInputEOS = false;
         boolean sawOutputEOS = false;
-        while (!sawOutputEOS) {
+        int noOutputCounter = 0;
+        while (!sawOutputEOS && noOutputCounter < 50) {
+            noOutputCounter++;
             if (!sawInputEOS) {
                 int inputBufIndex = codec.dequeueInputBuffer(kTimeOutUs);
 
@@ -199,6 +201,9 @@ public class DecoderTest extends MediaPlayerTestBase {
             if (res >= 0) {
                 //Log.d(TAG, "got frame, size " + info.size + "/" + info.presentationTimeUs);
 
+                if (info.size > 0) {
+                    noOutputCounter = 0;
+                }
                 if (info.size > 0 && reconfigure) {
                     // once we've gotten some data out of the decoder, reconfigure it again
                     reconfigure = false;
