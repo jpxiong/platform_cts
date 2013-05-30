@@ -569,7 +569,8 @@
 
         <activity android:name="android.hardware.cts.CameraStubActivity"
             android:label="CameraStubActivity"
-            android:screenOrientation="landscape">
+            android:screenOrientation="landscape"
+            android:configChanges="keyboardHidden|orientation|screenSize">
         </activity>
 
         <activity android:name="android.view.inputmethod.cts.InputMethodStubActivity"
