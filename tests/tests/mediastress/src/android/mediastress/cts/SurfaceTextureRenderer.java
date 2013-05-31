@@ -127,7 +127,7 @@ class SurfaceTextureRenderer implements GLSurfaceView.Renderer, SurfaceTexture.O
         checkGlError("glEnableVertexAttribArray maPositionHandle");
 
         mVertices.position(VERTICES_DATA_UV_OFFSET);
-        GLES20.glVertexAttribPointer(maTextureHandle, 3, GLES20.GL_FLOAT, false,
+        GLES20.glVertexAttribPointer(maTextureHandle, 2, GLES20.GL_FLOAT, false,
                 VERTICES_DATA_STRIDE_BYTES, mVertices);
         checkGlError("glVertexAttribPointer maTextureHandle");
         GLES20.glEnableVertexAttribArray(maTextureHandle);

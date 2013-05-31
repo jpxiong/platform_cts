@@ -685,7 +685,7 @@ public class CameraGLTest extends ActivityInstrumentationTestCase2<GLSurfaceView
             checkGlError("glEnableVertexAttribArray maPositionHandle");
 
             mTriangleVertices.position(TRIANGLE_VERTICES_DATA_UV_OFFSET);
-            GLES20.glVertexAttribPointer(maTextureHandle, 3, GLES20.GL_FLOAT, false,
+            GLES20.glVertexAttribPointer(maTextureHandle, 2, GLES20.GL_FLOAT, false,
                                          TRIANGLE_VERTICES_DATA_STRIDE_BYTES, mTriangleVertices);
             checkGlError("glVertexAttribPointer maTextureHandle");
             GLES20.glEnableVertexAttribArray(maTextureHandle);
