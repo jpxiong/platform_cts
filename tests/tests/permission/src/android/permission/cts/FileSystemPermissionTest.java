@@ -681,6 +681,7 @@ public class FileSystemPermissionTest extends AndroidTestCase {
                 new File("/dev/log/main"),   // b/9035217
                 new File("/dev/log/radio"),  // b/9035217
                 new File("/dev/log/system"), // b/9035217
+                new File("/dev/mali0"),       // b/9106968
                 new File("/dev/msm_rotator"), // b/9035217
                 new File("/dev/null"),
                 new File("/dev/nvhost-ctrl"), // b/9088251
