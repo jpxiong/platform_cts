@@ -24,6 +24,7 @@ import org.xmlpull.v1.XmlPullParser;
 import android.app.Activity;
 import android.app.Instrumentation;
 import android.content.Context;
+import android.cts.util.PollingCheck;
 import android.database.DataSetObservable;
 import android.database.DataSetObserver;
 import android.graphics.Rect;
@@ -68,6 +69,12 @@ public class GridViewTest extends ActivityInstrumentationTestCase<GridViewStubAc
         super.setUp();
         mGridView = null;
         mActivity = getActivity();
+        new PollingCheck() {
+            @Override
+            protected boolean check() {
+                return mActivity.hasWindowFocus();
+            }
+        }.run();
         mInstrumentation = getInstrumentation();
     }
 
