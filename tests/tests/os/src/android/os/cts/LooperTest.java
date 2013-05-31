@@ -46,16 +46,23 @@ public class LooperTest extends AndroidTestCase {
         assertNotNull(looper);
     }
 
-    public void testLoop() {
-        MockRunnable run = new MockRunnable();
+    public void testLoop() throws Throwable {
+        Thread t = new Thread(new Runnable() {
+            public void run() {
+                Looper.prepare();
 
-        Handler handler = new Handler();
-        Message msg = Message.obtain(handler, run);
-        handler.sendMessageAtTime(msg, 0);
-        assertFalse(run.runCalled);
-        Looper.loop();
+                MockRunnable run = new MockRunnable();
 
-        assertTrue(run.runCalled);
+                Handler handler = new Handler();
+                Message msg = Message.obtain(handler, run);
+                handler.sendMessageAtTime(msg, 0);
+                assertFalse(run.runCalled);
+                Looper.loop();
+                assertTrue(run.runCalled);
+            }
+        });
+        t.start();
+        t.join();
     }
 
     public void testMyLooper() throws Throwable {
