@@ -42,7 +42,7 @@ public class WebViewClientTest extends ActivityInstrumentationTestCase2<WebViewS
     protected void setUp() throws Exception {
         super.setUp();
         final WebViewStubActivity activity = getActivity();
-        new PollingCheck() {
+        new PollingCheck(TEST_TIMEOUT) {
             @Override
                 protected boolean check() {
                 return activity.hasWindowFocus();
