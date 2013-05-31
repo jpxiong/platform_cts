@@ -734,7 +734,9 @@ public class FileSystemPermissionTest extends AndroidTestCase {
                 new File("/dev/nvhost-gr3d"), // b/9088251
                 new File("/dev/nvmap"),       // b/9088251
                 new File("/dev/ptmx"),        // b/9088251
+                new File("/dev/pvrsrvkm"),    // b/9108170
                 new File("/dev/random"),
+                new File("/dev/tiler"),       // b/9108170
                 new File("/dev/tty"),
                 new File("/dev/urandom"),
                 new File("/dev/xt_qtaguid"),  // b/9088251
