@@ -31,6 +31,7 @@ import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -658,39 +659,47 @@ public class FileSystemPermissionTest extends AndroidTestCase {
     }
 
     public void testSystemMountedRO() throws IOException {
-        assertSystemMountedROIn("/proc/self/mounts");
-    }
-
-    public void testSystemMountedRO_init() throws IOException {
-        assertSystemMountedROIn("/proc/1/mounts");
+        ParsedMounts pm = new ParsedMounts("/proc/self/mounts");
+        String mountPoint = pm.findMountPointContaining(new File("/system"));
+        assertTrue(mountPoint + " is not mounted read-only", pm.isMountReadOnly(mountPoint));
     }
 
     /**
-     * Scan through {@code filename}, looking for the /system line. If the line
-     * has "ro" in the 4th column, then we know the filesystem is mounted read-only.
+     * Test that the /system directory, as mounted by init, is mounted read-only.
+     * Different processes can have different mount namespaces, so init
+     * may be in a different mount namespace than Zygote spawned processes.
+     *
+     * This test assumes that init's filesystem layout is roughly identical
+     * to Zygote's filesystem layout. If this assumption ever changes, we should
+     * delete this test.
      */
-    private static void assertSystemMountedROIn(String filename) throws IOException {
-        BufferedReader br = new BufferedReader(new FileReader(filename));
-        String line;
-        boolean foundSystem = false;
-        while((line = br.readLine()) != null) {
-            String[] fields = line.split(" ");
-            String mountPoint = fields[1];
-            if ("/system".equals(mountPoint)) {
-                foundSystem = true;
-                String all_options = fields[3];
-                boolean foundRo = false;
-                String[] options = all_options.split(",");
-                for (String option : options) {
-                    if ("ro".equals(option)) {
-                        foundRo = true;
-                        break;
-                    }
-                }
-                assertTrue(mountPoint + " is not mounted read-only", foundRo);
-            }
-        }
-        assertTrue("Cannot find /system partition", foundSystem);
+    public void testSystemMountedRO_init() throws IOException {
+        ParsedMounts pm = new ParsedMounts("/proc/1/mounts");
+        String mountPoint = pm.findMountPointContaining(new File("/system"));
+        assertTrue(mountPoint + " is not mounted read-only", pm.isMountReadOnly(mountPoint));
+    }
+
+    public void testRootMountedRO() throws IOException {
+        ParsedMounts pm = new ParsedMounts("/proc/self/mounts");
+        String mountPoint = pm.findMountPointContaining(new File("/"));
+        assertTrue("The root directory \"" + mountPoint + "\" is not mounted read-only",
+                   pm.isMountReadOnly(mountPoint));
+    }
+
+    /**
+     * Test that the root directory, as mounted by init, is mounted read-only.
+     * Different processes can have different mount namespaces, so init
+     * may be in a different mount namespace than Zygote spawned processes.
+     *
+     * This test assumes that init's filesystem layout is roughly identical
+     * to Zygote's filesystem layout. If this assumption ever changes, we should
+     * delete this test.
+     */
+    public void testRootMountedRO_init() throws IOException {
+        ParsedMounts pm = new ParsedMounts("/proc/1/mounts");
+        String mountPoint = pm.findMountPointContaining(new File("/"));
+        assertTrue("The root directory \"" + mountPoint + "\" is not mounted read-only",
+                   pm.isMountReadOnly(mountPoint));
     }
 
     public void testAllBlockDevicesAreSecure() throws Exception {
@@ -800,5 +809,50 @@ public class FileSystemPermissionTest extends AndroidTestCase {
 
     private static boolean isSymbolicLink(File f) throws IOException {
         return !f.getAbsolutePath().equals(f.getCanonicalPath());
+    }
+
+    private static class ParsedMounts {
+        private HashMap<String, Boolean> mFileReadOnlyMap = new HashMap<String, Boolean>();
+
+        private ParsedMounts(String filename) throws IOException {
+            BufferedReader br = new BufferedReader(new FileReader(filename));
+            try {
+                String line;
+                while ((line = br.readLine()) != null) {
+                    String[] fields = line.split(" ");
+                    String mountPoint = fields[1];
+                    String all_options = fields[3];
+                    String[] options = all_options.split(",");
+                    boolean foundRo = false;
+                    for (String option : options) {
+                        if ("ro".equals(option)) {
+                            foundRo = true;
+                            break;
+                        }
+                    }
+                    mFileReadOnlyMap.put(mountPoint, foundRo);
+                }
+           } finally {
+               br.close();
+           }
+        }
+
+        private boolean isMountReadOnly(String s) {
+            return mFileReadOnlyMap.get(s).booleanValue();
+        }
+
+        private String findMountPointContaining(File f) throws IOException {
+            while (f != null) {
+                f = f.getCanonicalFile();
+                String path = f.getPath();
+                if (mFileReadOnlyMap.containsKey(path)) {
+                    return path;
+                }
+                f = f.getParentFile();
+            }
+            // This should NEVER be reached, as we'll eventually hit the
+            // root directory.
+            throw new AssertionError("Unable to find mount point");
+        }
     }
 }
