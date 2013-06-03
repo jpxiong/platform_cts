@@ -302,7 +302,7 @@
 
             <meta-data android:name="test_required_features" android:value="android.hardware.camera.any"/>
         </activity>
-<!-- Experimental
+<!-- Experimental. If re-enabling, libcameraanalyzer must be included in the build
         <activity android:name=".camera.analyzer.CameraAnalyzerActivity"
                  android:label="@string/camera_analyzer"
                  android:screenOrientation="landscape">
