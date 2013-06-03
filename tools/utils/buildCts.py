@@ -115,6 +115,12 @@ class CtsBuilder(object):
     plan = tools.TestPlan(packages)
     plan.Exclude(ptsPattern)
     plan.Exclude('android\.performance.*')
+    plan.Exclude('android\.media\.cts\.StreamingMediaPlayerTest.*')
+    # Test plan to not include media streaming tests
+    self.__WritePlan(plan, 'CTS-No-Media-Stream')
+
+    plan = tools.TestPlan(packages)
+    plan.Exclude('android\.performance.*')
     self.__WritePlan(plan, 'SDK')
 
     plan.Exclude(r'android\.tests\.sigtest')
