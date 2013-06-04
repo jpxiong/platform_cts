@@ -22,7 +22,6 @@ import android.opengl.EGLContext;
 import android.opengl.EGLDisplay;
 import android.opengl.EGLSurface;
 import android.opengl.GLES10;
-import android.opengl.GLES11Ext;
 import android.opengl.GLES20;
 import android.test.AndroidTestCase;
 import android.util.Log;
@@ -41,8 +40,11 @@ public class WrapperTest extends AndroidTestCase {
     private EGLSurface mEGLSurface;
 
 
+    /**
+     * Tests range-checking on glGetIntegerv in GLES 1.x.
+     */
     public void testGetIntegerv1() {
-        eglSetup(1);
+        eglSetup(1, 1, 1);  // GLES 1.x with 1x1 pbuffer
 
         checkGlError("start");
 
@@ -91,11 +93,14 @@ public class WrapperTest extends AndroidTestCase {
             // good
         }
 
-        eglRelease();
+        eglRelease(true);
     }
 
+    /**
+     * Tests range-checking on glGetIntegerv in GLES 2.x.
+     */
     public void testGetIntegerv2() {
-        eglSetup(2);
+        eglSetup(2, 1, 1);  // GLES 2.x with 1x1 pbuffer
 
         checkGlError("start");
 
@@ -144,7 +149,52 @@ public class WrapperTest extends AndroidTestCase {
             // good
         }
 
-        eglRelease();
+        eglRelease(true);
+    }
+
+    /**
+     * Tests whether EGL is releasing resources when the thread exits.  If
+     * it doesn't, we'll consume memory rapidly, and will fail or be
+     * killed within a couple hundred iterations.
+     * <p>
+     * It may be worthwhile to watch the memory growth with procrank or showmap
+     * while the test runs to detect smaller leaks.
+     */
+    public void testThreadCleanup() throws Throwable {
+        class WrappedTest implements Runnable {
+            public Throwable mThrowable;
+
+            private static final int WIDTH = 1280;
+            private static final int HEIGHT = 720;
+
+            @Override
+            public void run() {
+                try {
+                    eglSetup(2, WIDTH, HEIGHT);
+                    if (!EGL14.eglMakeCurrent(mEGLDisplay, mEGLSurface, mEGLSurface, mEGLContext)) {
+                        throw new RuntimeException("eglMakeCurrent failed");
+                    }
+                    eglRelease(false);
+                } catch (Throwable th) {
+                    mThrowable = th;
+                }
+            }
+        }
+
+        WrappedTest wrappedTest = new WrappedTest();
+
+        for (int i = 0; i < 1000; i++) {
+            if ((i % 25) == 0) {
+                Log.d(TAG, "iteration " + i);
+            }
+
+            Thread th = new Thread(wrappedTest, "EGL thrash");
+            th.start();
+            th.join();
+            if (wrappedTest.mThrowable != null) {
+                throw wrappedTest.mThrowable;
+            }
+        }
     }
 
     /**
@@ -158,11 +208,10 @@ public class WrapperTest extends AndroidTestCase {
         }
     }
 
-
     /**
      * Prepares EGL.  Pass in the desired GLES API version.
      */
-    private void eglSetup(int api) {
+    private void eglSetup(int api, int width, int height) {
         mEGLDisplay = EGL14.eglGetDisplay(EGL14.EGL_DEFAULT_DISPLAY);
         if (mEGLDisplay == EGL14.EGL_NO_DISPLAY) {
             throw new RuntimeException("unable to get EGL14 display");
@@ -215,8 +264,8 @@ public class WrapperTest extends AndroidTestCase {
 
         // Create a 1x1 pbuffer surface
         int[] surfaceAttribs = {
-                EGL14.EGL_WIDTH, 1,
-                EGL14.EGL_HEIGHT, 1,
+                EGL14.EGL_WIDTH, width,
+                EGL14.EGL_HEIGHT, height,
                 EGL14.EGL_NONE
         };
         mEGLSurface = EGL14.eglCreatePbufferSurface(mEGLDisplay, configs[0], surfaceAttribs, 0);
@@ -232,10 +281,11 @@ public class WrapperTest extends AndroidTestCase {
     }
 
     /**
-     * Releases EGL goodies.
+     * Releases EGL goodies.  If switchCurrent is true, this will use eglMakeCurrent to switch
+     * away from the current surface+context before destroying them.
      */
-    private void eglRelease() {
-        if (EGL14.eglGetCurrentContext() == mEGLContext) {
+    private void eglRelease(boolean switchCurrent) {
+        if (switchCurrent) {
             // Clear the current context and surface to ensure they are discarded immediately.
             EGL14.eglMakeCurrent(mEGLDisplay, EGL14.EGL_NO_SURFACE, EGL14.EGL_NO_SURFACE,
                     EGL14.EGL_NO_CONTEXT);
