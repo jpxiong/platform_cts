@@ -69,30 +69,31 @@ public class DecoderTest extends MediaPlayerTestBase {
     // This should allow for some variation in decoders, while still detecting
     // phase and delay errors, channel swap, etc.
     public void testDecodeMp3Lame() throws Exception {
-        decode(R.raw.sinesweepmp3lame, 804.f);
+        decode(R.raw.sinesweepmp3lame, 804.f, true);
     }
     public void testDecodeMp3Smpb() throws Exception {
-        decode(R.raw.sinesweepmp3smpb, 413.f);
+        decode(R.raw.sinesweepmp3smpb, 413.f, true);
     }
     public void testDecodeM4a() throws Exception {
-        decode(R.raw.sinesweepm4a, 124.f);
+        decode(R.raw.sinesweepm4a, 124.f, true);
     }
     public void testDecodeOgg() throws Exception {
-        decode(R.raw.sinesweepogg, 168.f);
+        decode(R.raw.sinesweepogg, 168.f, false);
     }
     public void testDecodeWav() throws Exception {
-        decode(R.raw.sinesweepwav, 0.0f);
+        decode(R.raw.sinesweepwav, 0.0f, true);
     }
     public void testDecodeFlac() throws Exception {
-        decode(R.raw.sinesweepflac, 0.0f);
+        decode(R.raw.sinesweepflac, 0.0f, true);
     }
 
     /**
      * @param testinput the file to decode
      * @param maxerror the maximum allowed root mean squared error
+     * @param testReconfigure whether to also test reconfiguring the codec
      * @throws IOException
      */
-    private void decode(int testinput, float maxerror) throws IOException {
+    private void decode(int testinput, float maxerror, boolean reconfigure) throws IOException {
 
         short [] decoded = decodeToMemory(testinput, false);
 
@@ -111,10 +112,12 @@ public class DecoderTest extends MediaPlayerTestBase {
         double rmse = Math.sqrt(avgErrorSquared);
         assertTrue("decoding error too big: " + rmse, rmse <= maxerror);
 
-        short [] decoded2 = decodeToMemory(testinput, true);
-        assertEquals("count different with reconfigure", decoded.length, decoded2.length);
-        for (int i = 0; i < decoded.length; i++) {
-            assertEquals("samples don't match", decoded[i], decoded2[i]);
+        if (reconfigure) {
+            short [] decoded2 = decodeToMemory(testinput, true);
+            assertEquals("count different with reconfigure", decoded.length, decoded2.length);
+            for (int i = 0; i < decoded.length; i++) {
+                assertEquals("samples don't match", decoded[i], decoded2[i]);
+            }
         }
     }
 
