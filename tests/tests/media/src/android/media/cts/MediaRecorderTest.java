@@ -412,7 +412,7 @@ public class MediaRecorderTest extends ActivityInstrumentationTestCase2<MediaStu
     }
 
     public void testSetMaxFileSize() throws Exception {
-        if (!hasMicrophone()) {
+        if (!hasMicrophone() || !hasCamera()) {
             return;
         }
         testSetMaxFileSize(512 * 1024, 50 * 1024);
