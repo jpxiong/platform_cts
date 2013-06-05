@@ -56,8 +56,8 @@ public class GLGameActivity extends Activity {
         System.loadLibrary("ptsopengl_jni");
 
         Intent intent = getIntent();
-        mNumFrames = intent.getIntExtra(GLActivityIntentKeys.INTENT_EXTRA_NUM_FRAMES, 0);
-        mTimeout = intent.getIntExtra(GLActivityIntentKeys.INTENT_EXTRA_TIMEOUT, 0);
+        mNumFrames = intent.getIntExtra(GLActivityIntentKeys.INTENT_EXTRA_NUM_FRAMES, 1000);
+        mTimeout = intent.getIntExtra(GLActivityIntentKeys.INTENT_EXTRA_TIMEOUT, 1000000);
 
         SurfaceView surfaceView = new SurfaceView(this);
         surfaceView.getHolder().addCallback(new SurfaceHolder.Callback() {

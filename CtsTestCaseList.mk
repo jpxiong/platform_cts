@@ -125,21 +125,23 @@ cts_native_exes := \
 	NativeMediaTest_XA
 
 cts_ui_tests := \
-        CtsUiAutomatorTests
+	CtsUiAutomatorTests
 
 # All the files that will end up under the repository/testcases
 # directory of the final CTS distribution.
 CTS_TEST_CASES := $(call cts-get-lib-paths,$(cts_host_libraries)) \
 		$(call cts-get-package-paths,$(cts_test_packages)) \
 		$(call cts-get-native-paths,$(cts_native_exes)) \
-		$(call cts-get-ui-lib-paths,$(cts_ui_tests))
+		$(call cts-get-ui-lib-paths,$(cts_ui_tests)) \
+		$(call cts-get-ui-lib-paths,$(PTS_UI_TESTS))
 
 # All the XMLs that will end up under the repository/testcases
 # and that need to be created before making the final CTS distribution.
 CTS_TEST_XMLS := $(call cts-get-test-xmls,$(cts_host_libraries)) \
 		$(call cts-get-test-xmls,$(cts_test_packages)) \
 		$(call cts-get-test-xmls,$(cts_native_exes)) \
-		$(call cts-get-test-xmls,$(cts_ui_tests))
+		$(call cts-get-test-xmls,$(cts_ui_tests)) \
+		$(call cts-get-test-xmls,$(PTS_UI_TESTS))
 
 
 # The following files will be placed in the tools directory of the CTS distribution

@@ -73,6 +73,7 @@ class DocletRunner {
         sourcePath.add("./cts/suite/pts/deviceTests/ptsutil/src");
         sourcePath.add("./cts/libs/util/src");
         sourcePath.add("./frameworks/testing/uiautomator/library/testrunner-src");
+        sourcePath.add("./frameworks/testing/uiautomator_test_libraries/src");
         sourcePath.add(sourceDir.toString());
         return join(sourcePath, ":");
     }
