@@ -1965,6 +1965,10 @@ public class CalendarTest extends InstrumentationTestCase {
         assertTrue(eventId >= 0);
         return eventValues;
       }
+
+      public long getCalendarId() {
+        return mCalendarId;
+      }
     }
 
     /**
@@ -2000,7 +2004,8 @@ public class CalendarTest extends InstrumentationTestCase {
           CalendarContract.Instances.CONTENT_BY_DAY_URI, julianStart + "/" + julianEnd);
 
       // Query the range, sorting by event start time
-      Cursor c = mContentResolver.query(uri, null, null, null, Events.DTSTART);
+      Cursor c = mContentResolver.query(uri, null, Instances.CALENDAR_ID + "="
+              + helper.getCalendarId(), null, Events.DTSTART);
 
       // Assert that two events are returned
       assertEquals(c.getCount(), 2);
