@@ -242,7 +242,7 @@ public class BitmapFactoryTest extends InstrumentationTestCase {
         assertEquals(START_WIDTH, b.getWidth());
     }
 
-    public void testDecodeReuse1() throws IOException {
+    public void testDecodeReuseBasic() throws IOException {
         BitmapFactory.Options options = new BitmapFactory.Options();
         options.inMutable = true;
         options.inSampleSize = 0; // treated as 1
@@ -258,28 +258,24 @@ public class BitmapFactoryTest extends InstrumentationTestCase {
 
         assertEquals(originalSize, pass.getByteCount());
         assertEquals(originalSize, pass.getAllocationByteCount());
-        assertEquals(start, pass);
+        assertSame(start, pass);
         assertTrue(pass.isMutable());
     }
 
-    public void testDecodeReuse2() throws IOException {
-        BitmapFactory.Options options = new BitmapFactory.Options();
-        options.inMutable = true;
-        options.inScaled = false;
-        Bitmap original = BitmapFactory.decodeResource(mRes, R.drawable.robot, options);
-        int originalSize = original.getByteCount();
-        assertEquals(originalSize, original.getAllocationByteCount());
+    public void testDecodeReuseFormats() throws IOException {
+        // reuse should support all image formats
+        for (int i = 0; i < RES_IDS.length; ++i) {
+            Bitmap reuseBuffer = Bitmap.createBitmap(1000000, 1, Bitmap.Config.ALPHA_8);
 
-        options.inBitmap = original;
-        options.inSampleSize = 4;
-        Bitmap reduced = BitmapFactory.decodeResource(mRes, R.drawable.robot, options);
-
-        assertEquals(original, reduced);
-        assertEquals(originalSize, reduced.getAllocationByteCount());
-        assertEquals(originalSize, reduced.getByteCount() * 16);
+            BitmapFactory.Options options = new BitmapFactory.Options();
+            options.inBitmap = reuseBuffer;
+            options.inSampleSize = 5;
+            Bitmap decoded = BitmapFactory.decodeResource(mRes, RES_IDS[i], options);
+            assertSame(reuseBuffer, decoded);
+        }
     }
 
-    public void testDecodeReuse3() throws IOException {
+    public void testDecodeReuseFailure() throws IOException {
         BitmapFactory.Options options = new BitmapFactory.Options();
         options.inMutable = true;
         options.inScaled = false;
@@ -295,6 +291,63 @@ public class BitmapFactoryTest extends InstrumentationTestCase {
             failedCorrectly = true; // fails due to lack of space
         }
         assertTrue(failedCorrectly);
+    }
+
+    public void testDecodeReuseScaling() throws IOException {
+        BitmapFactory.Options options = new BitmapFactory.Options();
+        options.inMutable = true;
+        options.inScaled = false;
+        Bitmap original = BitmapFactory.decodeResource(mRes, R.drawable.robot, options);
+        int originalSize = original.getByteCount();
+        assertEquals(originalSize, original.getAllocationByteCount());
+
+        options.inBitmap = original;
+        options.inSampleSize = 4;
+        Bitmap reduced = BitmapFactory.decodeResource(mRes, R.drawable.robot, options);
+
+        assertSame(original, reduced);
+        assertEquals(originalSize, reduced.getAllocationByteCount());
+        assertEquals(originalSize, reduced.getByteCount() * 16);
+    }
+
+    public void testDecodeReuseDoubleScaling() throws IOException {
+        BitmapFactory.Options options = new BitmapFactory.Options();
+        options.inMutable = true;
+        options.inScaled = false;
+        options.inSampleSize = 1;
+        Bitmap original = BitmapFactory.decodeResource(mRes, R.drawable.robot, options);
+        int originalSize = original.getByteCount();
+
+        // Verify that inSampleSize and density scaling both work with reuse concurrently
+        options.inBitmap = original;
+        options.inScaled = true;
+        options.inSampleSize = 2;
+        options.inDensity = 2;
+        options.inTargetDensity = 4;
+        Bitmap doubleScaled = BitmapFactory.decodeResource(mRes, R.drawable.robot, options);
+
+        assertSame(original, doubleScaled);
+        assertEquals(4, doubleScaled.getDensity());
+        assertEquals(originalSize, doubleScaled.getByteCount());
+    }
+
+    public void testDecodeReuseEquivalentScaling() throws IOException {
+        BitmapFactory.Options options = new BitmapFactory.Options();
+        options.inMutable = true;
+        options.inScaled = true;
+        options.inDensity = 4;
+        options.inTargetDensity = 2;
+        Bitmap densityReduced = BitmapFactory.decodeResource(mRes, R.drawable.robot, options);
+        assertEquals(2, densityReduced.getDensity());
+        options.inBitmap = densityReduced;
+        options.inDensity = 0;
+        options.inScaled = false;
+        options.inSampleSize = 2;
+        Bitmap scaleReduced = BitmapFactory.decodeResource(mRes, R.drawable.robot, options);
+        // verify that density isn't incorrectly carried over during bitmap reuse
+        assertFalse(densityReduced.getDensity() == 2);
+        assertFalse(densityReduced.getDensity() == 0);
+        assertSame(densityReduced, scaleReduced);
     }
 
     private byte[] obtainArray() {
