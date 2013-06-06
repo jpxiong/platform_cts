@@ -31,6 +31,11 @@ import android.deviceadmin.cts.CtsDeviceAdminActivationTestActivity.OnActivityRe
 import android.os.SystemClock;
 import android.test.ActivityInstrumentationTestCase2;
 
+import org.mockito.ArgumentCaptor;
+import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
+
 /**
  * Tests for the standard way of activating a Device Admin: by starting system UI via an
  * {@link Intent} with {@link DevicePolicyManager#ACTION_ADD_DEVICE_ADMIN}. The test requires that
@@ -51,21 +56,7 @@ public class DeviceAdminActivationTest
      */
     private static final int UI_EFFECT_TIMEOUT_MILLIS = 5000;
 
-    /**
-     * Monitor guarding access to {@link #mLastOnActivityResultResultCode} and which is notified
-     * every time {@code onActivityResult} of the {@code CtsDeviceAdminActivationTestActivity} is
-     * invoked.
-     */
-    private final Object mOnActivityResultListenerLock = new Object();
-
-    /**
-     * Result code of the most recent invocation of
-     * {@code CtsDeviceAdminActivationTestActivity.onActivityResult} or {@code null} if no
-     * invocations have occured yet.
-     *
-     * @GuardedBy {@link #mOnActivityResultListenerLock}
-     */
-    private Integer mLastOnActivityResultResultCode;
+    @Mock private OnActivityResultListener mMockOnActivityResultListener;
 
     public DeviceAdminActivationTest() {
         super(CtsDeviceAdminActivationTestActivity.class);
@@ -74,18 +65,8 @@ public class DeviceAdminActivationTest
     @Override
     protected void setUp() throws Exception {
         super.setUp();
-        getActivity().setOnActivityResultListener(new OnActivityResultListener() {
-            @Override
-            public void onActivityResult(int requestCode, int resultCode, Intent data) {
-                if (requestCode != REQUEST_CODE_ACTIVATE_ADMIN) {
-                    return;
-                }
-                synchronized (mOnActivityResultListenerLock) {
-                    mLastOnActivityResultResultCode = resultCode;
-                    mOnActivityResultListenerLock.notifyAll();
-                }
-            }
-        });
+        MockitoAnnotations.initMocks(this);
+        getActivity().setOnActivityResultListener(mMockOnActivityResultListener);
     }
 
     @Override
@@ -148,32 +129,21 @@ public class DeviceAdminActivationTest
 
     private void assertWithTimeoutOnActivityResultNotInvoked() {
         SystemClock.sleep(UI_EFFECT_TIMEOUT_MILLIS);
-        synchronized (mOnActivityResultListenerLock) {
-            assertNull(mLastOnActivityResultResultCode);
-        }
+        Mockito.verify(mMockOnActivityResultListener, Mockito.never())
+                .onActivityResult(
+                        Mockito.eq(REQUEST_CODE_ACTIVATE_ADMIN),
+                        Mockito.anyInt(),
+                        Mockito.any(Intent.class));
     }
 
-    private void assertWithTimeoutOnActivityResultInvokedWithResultCode(int expectedResultCode)
-            throws Exception {
-        long deadlineMillis = SystemClock.elapsedRealtime() + UI_EFFECT_TIMEOUT_MILLIS;
-        synchronized (mOnActivityResultListenerLock) {
-            while (true) {
-                if (mLastOnActivityResultResultCode != null) {
-                    // onActivityResult has been invoked -- check the arguments
-                    assertEquals(expectedResultCode, (int) mLastOnActivityResultResultCode);
-                    break;
-                }
-
-                // onActivityResult has not yet been invoked -- wait until it is
-                long millisTillDeadline = deadlineMillis - SystemClock.elapsedRealtime();
-                if (millisTillDeadline <= 0) {
-                    fail("onActivityResult not invoked within " + UI_EFFECT_TIMEOUT_MILLIS + " ms");
-                    break;
-                }
-
-                mOnActivityResultListenerLock.wait(millisTillDeadline);
-            }
-        }
+    private void assertWithTimeoutOnActivityResultInvokedWithResultCode(int expectedResultCode) {
+        ArgumentCaptor<Integer> resultCodeCaptor = ArgumentCaptor.forClass(int.class);
+        Mockito.verify(mMockOnActivityResultListener, Mockito.timeout(UI_EFFECT_TIMEOUT_MILLIS))
+                .onActivityResult(
+                        Mockito.eq(REQUEST_CODE_ACTIVATE_ADMIN),
+                        resultCodeCaptor.capture(),
+                        Mockito.any(Intent.class));
+        assertEquals(expectedResultCode, (int) resultCodeCaptor.getValue());
     }
 
     private void finishActivateDeviceAdminActivity() {
