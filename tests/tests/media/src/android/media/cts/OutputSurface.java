@@ -18,23 +18,14 @@ package android.media.cts;
 
 import android.graphics.SurfaceTexture;
 import android.opengl.EGL14;
-import android.opengl.GLES20;
-import android.opengl.GLES11Ext;
-import android.opengl.GLSurfaceView;
-import android.opengl.Matrix;
 import android.util.Log;
 import android.view.Surface;
-
-import java.nio.ByteBuffer;
 
 import javax.microedition.khronos.egl.EGL10;
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.egl.EGLContext;
 import javax.microedition.khronos.egl.EGLDisplay;
 import javax.microedition.khronos.egl.EGLSurface;
-import javax.microedition.khronos.opengles.GL;
-import javax.microedition.khronos.opengles.GL10;
-
 
 
 /**
@@ -182,15 +173,9 @@ class OutputSurface implements SurfaceTexture.OnFrameAvailableListener {
      * Discard all resources held by this class, notably the EGL context.
      */
     public void release() {
-        if (mEGL != null) {
-            if (mEGL.eglGetCurrentContext().equals(mEGLContext)) {
-                // Clear the current context and surface to ensure they are discarded immediately.
-                mEGL.eglMakeCurrent(mEGLDisplay, EGL10.EGL_NO_SURFACE, EGL10.EGL_NO_SURFACE,
-                        EGL10.EGL_NO_CONTEXT);
-            }
-            mEGL.eglDestroySurface(mEGLDisplay, mEGLSurface);
-            mEGL.eglDestroyContext(mEGLDisplay, mEGLContext);
-            //mEGL.eglTerminate(mEGLDisplay);
+        if (mEGL != null && mEGLDisplay != null) {
+            mEGL.eglReleaseThread();
+            mEGL.eglTerminate(mEGLDisplay);
         }
 
         mSurface.release();

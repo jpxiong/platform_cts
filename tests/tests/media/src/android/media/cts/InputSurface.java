@@ -38,7 +38,6 @@ class InputSurface {
     private static final boolean VERBOSE = false;
 
     private static final int EGL_RECORDABLE_ANDROID = 0x3142;
-    private static final int EGL_OPENGL_ES2_BIT = 4;
 
     private EGLDisplay mEGLDisplay;
     private EGLContext mEGLContext;
@@ -78,7 +77,7 @@ class InputSurface {
                 EGL14.EGL_RED_SIZE, 8,
                 EGL14.EGL_GREEN_SIZE, 8,
                 EGL14.EGL_BLUE_SIZE, 8,
-                EGL14.EGL_RENDERABLE_TYPE, EGL_OPENGL_ES2_BIT,
+                EGL14.EGL_RENDERABLE_TYPE, EGL14.EGL_OPENGL_ES2_BIT,
                 EGL_RECORDABLE_ANDROID, 1,
                 EGL14.EGL_NONE
         };
@@ -118,14 +117,10 @@ class InputSurface {
      * Surface that was passed to our constructor.
      */
     public void release() {
-        if (EGL14.eglGetCurrentContext().equals(mEGLContext)) {
-            // Clear the current context and surface to ensure they are discarded immediately.
-            EGL14.eglMakeCurrent(mEGLDisplay, EGL14.EGL_NO_SURFACE, EGL14.EGL_NO_SURFACE,
-                    EGL14.EGL_NO_CONTEXT);
+        if (mEGLDisplay != null) {
+            EGL14.eglReleaseThread();
+            EGL14.eglTerminate(mEGLDisplay);
         }
-        EGL14.eglDestroySurface(mEGLDisplay, mEGLSurface);
-        EGL14.eglDestroyContext(mEGLDisplay, mEGLContext);
-        //EGL14.eglTerminate(mEGLDisplay);
 
         mSurface.release();
 
