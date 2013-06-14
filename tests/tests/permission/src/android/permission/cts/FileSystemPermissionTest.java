@@ -709,7 +709,9 @@ public class FileSystemPermissionTest extends AndroidTestCase {
 
     public void testAllCharacterDevicesAreSecure() throws Exception {
         Set<File> insecure = getAllInsecureDevicesInDirAndSubdir(new File("/dev"), FileUtils.S_IFCHR);
+        Set<File> insecurePts = getAllInsecureDevicesInDirAndSubdir(new File("/dev/pts"), FileUtils.S_IFCHR);
         insecure.removeAll(CHAR_DEV_EXCEPTIONS);
+        insecure.removeAll(insecurePts);
         assertTrue("Found insecure character devices: " + insecure.toString(),
                 insecure.isEmpty());
     }
