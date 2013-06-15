@@ -134,10 +134,8 @@ public class CtsXmlResultReporter implements ITestInvocationListener {
             if (mReportDir == null) {
                 mReportDir = ctsBuildHelper.getResultsDir();
             }
-            // create a unique directory for saving results, using old cts host convention
-            // TODO: in future, consider using LogFileSaver to create build-specific directories
-            mReportDir = new File(mReportDir, TimeUtil.getResultTimestamp());
-            mReportDir.mkdirs();
+            mReportDir = createUniqueReportDir(mReportDir);
+
             mStartTime = getTimestamp();
             logResult("Created result dir %s", mReportDir.getName());
         }
@@ -149,6 +147,39 @@ public class CtsXmlResultReporter implements ITestInvocationListener {
         File rootLogDir = getBuildHelper(ctsBuild).getLogsDir();
         mLogDir = new File(rootLogDir, mReportDir.getName());
         mLogDir.mkdirs();
+    }
+
+    /**
+     * Create a unique directory for saving results.
+     * <p/>
+     * Currently using legacy CTS host convention of timestamp directory names. In case of
+     * collisions, will use {@link FileUtil} to generate unique file name.
+     * <p/>
+     * TODO: in future, consider using LogFileSaver to create build-specific directories
+     *
+     * @param parentDir the parent folder to create dir in
+     * @return the created directory
+     */
+    private static synchronized File createUniqueReportDir(File parentDir) {
+        // TODO: in future, consider using LogFileSaver to create build-specific directories
+
+        File reportDir = new File(parentDir, TimeUtil.getResultTimestamp());
+        if (reportDir.exists()) {
+            // directory with this timestamp exists already! Choose a unique, although uglier, name
+            try {
+                reportDir = FileUtil.createTempDir(TimeUtil.getResultTimestamp() + "_", parentDir);
+            } catch (IOException e) {
+                CLog.e(e);
+                CLog.e("Failed to create result directory %s", reportDir.getAbsolutePath());
+            }
+        } else {
+            if (!reportDir.mkdirs()) {
+                // TODO: consider throwing an exception
+                CLog.e("mkdirs failed when attempting to create result directory %s",
+                        reportDir.getAbsolutePath());
+            }
+        }
+        return reportDir;
     }
 
     /**
