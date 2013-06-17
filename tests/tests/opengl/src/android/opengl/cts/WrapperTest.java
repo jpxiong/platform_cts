@@ -93,7 +93,7 @@ public class WrapperTest extends AndroidTestCase {
             // good
         }
 
-        eglRelease(true);
+        eglRelease();
     }
 
     /**
@@ -149,7 +149,7 @@ public class WrapperTest extends AndroidTestCase {
             // good
         }
 
-        eglRelease(true);
+        eglRelease();
     }
 
     /**
@@ -174,7 +174,7 @@ public class WrapperTest extends AndroidTestCase {
                     if (!EGL14.eglMakeCurrent(mEGLDisplay, mEGLSurface, mEGLSurface, mEGLContext)) {
                         throw new RuntimeException("eglMakeCurrent failed");
                     }
-                    eglRelease(false);
+                    eglRelease();
                 } catch (Throwable th) {
                     mThrowable = th;
                 }
@@ -281,18 +281,16 @@ public class WrapperTest extends AndroidTestCase {
     }
 
     /**
-     * Releases EGL goodies.  If switchCurrent is true, this will use eglMakeCurrent to switch
-     * away from the current surface+context before destroying them.
+     * Releases EGL goodies.
      */
-    private void eglRelease(boolean switchCurrent) {
-        if (switchCurrent) {
-            // Clear the current context and surface to ensure they are discarded immediately.
-            EGL14.eglMakeCurrent(mEGLDisplay, EGL14.EGL_NO_SURFACE, EGL14.EGL_NO_SURFACE,
-                    EGL14.EGL_NO_CONTEXT);
+    private void eglRelease() {
+        // Terminating the display will release most objects, but won't discard the current
+        // surfaces and context until we release the thread.  It shouldn't matter what order
+        // we do these in.
+        if (mEGLDisplay != null) {
+            EGL14.eglTerminate(mEGLDisplay);
+            EGL14.eglReleaseThread();
         }
-        EGL14.eglDestroySurface(mEGLDisplay, mEGLSurface);
-        EGL14.eglDestroyContext(mEGLDisplay, mEGLContext);
-        //EGL14.eglTerminate(mEGLDisplay);
 
         // null everything out so future attempts to use this object will cause an NPE
         mEGLDisplay = null;
