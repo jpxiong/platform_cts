@@ -29,8 +29,12 @@ PTS_TEST_PACKAGES := \
 PTS_SUPPORT_PACKAGES := \
     PtsDeviceTaskswitchingAppA \
     PtsDeviceTaskswitchingAppB \
-    PtsDeviceTaskswitchingControl
+    PtsDeviceTaskswitchingControl \
+    PtsDeviceJankApp
 
 PTS_HOST_CASES := \
     PtsHostBootup \
     PtsHostUi
+
+PTS_UI_TESTS := \
+    PtsHostJank
