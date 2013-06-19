@@ -57,53 +57,53 @@ public class StreamingMediaPlayerTest extends MediaPlayerTestBase {
 */
     // Streaming HTTP video from YouTube
     public void testHTTP_H263_AMR_Video1() throws Exception {
-        playVideoTest("http://v20.lscache8.c.youtube.com/videoplayback?id=271de9756065677e"
-                + "&itag=13&ip=0.0.0.0&ipbits=0&expire=999999999999999999"
-                + "&sparams=ip,ipbits,expire,ip,ipbits,expire,id,itag"
-                + "&signature=372FA4C532AA49D14EAF049BCDA66460EEE161E9"
-                + ".6D8BF096B73B7A68A7032CA8685053CFB498D30A"
+        playVideoTest("http://redirector.c.youtube.com/videoplayback?id=271de9756065677e"
+                + "&itag=13&source=youtube&ip=0.0.0.0&ipbits=0&expire=19000000000"
+                + "&sparams=ip,ipbits,expire,id,itag,source"
+                + "&signature=6F5AEC448AAF88466D7A10EBB76020745405D33F."
+                + "5050D35AE997E1535FE828B0DE99EF31A699D9D0"
                 + "&key=test_key1&user=android-device-test", 176, 144);
     }
     public void testHTTP_H263_AMR_Video2() throws Exception {
-        playVideoTest("http://v20.lscache8.c.youtube.com/videoplayback?id=c80658495af60617"
-                + "&itag=13&ip=0.0.0.0&ipbits=0&expire=999999999999999999"
-                + "&sparams=ip,ipbits,expire,ip,ipbits,expire,id,itag"
-                + "&signature=191FCD5C4B7400065C20845D7AC2B437B1291F26"
-                + ".66F8B8D7EFF7F144141AC67E8E35E078468CE6FB"
+        playVideoTest("http://redirector.c.youtube.com/videoplayback?id=c80658495af60617"
+                + "&itag=13&source=youtube&ip=0.0.0.0&ipbits=0&expire=19000000000"
+                + "&sparams=ip,ipbits,expire,id,itag,source"
+                + "&signature=71749754E28115FD1C233E3BE96CDDC3F430CB74."
+                + "49D1506DE694CC8FCEE63CB4F3AD41EB76C198CE"
                 + "&key=test_key1&user=android-device-test", 176, 144);
     }
 
     public void testHTTP_MPEG4SP_AAC_Video1() throws Exception {
-        playVideoTest("http://v20.lscache8.c.youtube.com/videoplayback?id=271de9756065677e"
-                + "&itag=17&ip=0.0.0.0&ipbits=0&expire=999999999999999999"
-                + "&sparams=ip,ipbits,expire,ip,ipbits,expire,id,itag"
-                + "&signature=3DCD3F79E045F95B6AF661765F046FB0440FF016"
-                + ".06A42661B3AF6BAF046F012549CC9BA34EBC80A9"
+        playVideoTest("http://redirector.c.youtube.com/videoplayback?id=271de9756065677e"
+                + "&itag=17&source=youtube&ip=0.0.0.0&ipbits=0&expire=19000000000"
+                + "&sparams=ip,ipbits,expire,id,itag,source"
+                + "&signature=197A9742C1EFCA95725F2F26DFFD512FC48C149F."
+                + "A59B42FD490F6B591B292F3B2659A9723B980351"
                 + "&key=test_key1&user=android-device-test", 176, 144);
     }
     public void testHTTP_MPEG4SP_AAC_Video2() throws Exception {
-        playVideoTest("http://v20.lscache8.c.youtube.com/videoplayback?id=c80658495af60617"
-                + "&itag=17&ip=0.0.0.0&ipbits=0&expire=999999999999999999"
-                + "&sparams=ip,ipbits,expire,ip,ipbits,expire,id,itag"
-                + "&signature=242B7AEF3AB38519F593203FDEF420E2A585DA6E"
-                + ".4A57C03AF6859FE4694CD69C3225E386373A98B0"
+        playVideoTest("http://redirector.c.youtube.com/videoplayback?id=c80658495af60617"
+                + "&itag=17&source=youtube&ip=0.0.0.0&ipbits=0&expire=19000000000"
+                + "&sparams=ip,ipbits,expire,id,itag,source"
+                + "&signature=0F84740A7E06F884127E78A6D7DE6DEA8F4B8BFD."
+                + "248DF1E90B8137C30769C79BF23147F6BB3DFCDF"
                 + "&key=test_key1&user=android-device-test", 176, 144);
     }
 
     public void testHTTP_H264Base_AAC_Video1() throws Exception {
-        playVideoTest("http://v20.lscache8.c.youtube.com/videoplayback?id=271de9756065677e"
-                + "&itag=18&ip=0.0.0.0&ipbits=0&expire=999999999999999999"
-                + "&sparams=ip,ipbits,expire,ip,ipbits,expire,id,itag"
-                + "&signature=1219C2B07AF0638C27916307A6093C0E43CB894E"
-                + ".126B6B916BD57157782738AA7C03E59F21DBC168"
+        playVideoTest("http://redirector.c.youtube.com/videoplayback?id=271de9756065677e"
+                + "&itag=18&source=youtube&ip=0.0.0.0&ipbits=0&expire=19000000000"
+                + "&sparams=ip,ipbits,expire,id,itag,source"
+                + "&signature=3CFCAFB87EB9FC943FACDC54FEC8C725A801642C."
+                + "7D77ACBC4CAF40349BF093E302B635757E45F345"
                 + "&key=test_key1&user=android-device-test", 480, 270);
     }
     public void testHTTP_H264Base_AAC_Video2() throws Exception {
-        playVideoTest("http://v20.lscache8.c.youtube.com/videoplayback?id=c80658495af60617"
-                + "&itag=18&ip=0.0.0.0&ipbits=0&expire=999999999999999999"
-                + "&sparams=ip,ipbits,expire,ip,ipbits,expire,id,itag"
-                + "&signature=61674BC069F2C812A18C390DE785CECD296228C7"
-                + ".11F5FCE823FB8FA31269A06A483C2F9B2C22F357"
+        playVideoTest("http://redirector.c.youtube.com/videoplayback?id=c80658495af60617"
+                + "&itag=18&source=youtube&ip=0.0.0.0&ipbits=0&expire=19000000000"
+                + "&sparams=ip,ipbits,expire,id,itag,source"
+                + "&signature=A11D8BA0AA67A27F1409BE0C0B96B756625DB88B."
+                + "9BF4C93A130583ADBDF2B953AD5A8A58F518B012"
                 + "&key=test_key1&user=android-device-test", 480, 270);
     }
 
