@@ -27,8 +27,11 @@ LOCAL_STATIC_JAVA_LIBRARIES := ptsutil ctsutil ctstestrunner
 LOCAL_JNI_SHARED_LIBRARIES := libptsopengl_jni
 
 LOCAL_SRC_FILES := $(call all-java-files-under, src)
-# add the src of the reference benchmark
-LOCAL_SRC_FILES += $(call all-java-files-under, ../../../deviceTests/opengl/src)
+# add the src of the benchmark, but filter out the tests
+BENCHMARK_SRC := $(call all-java-files-under, ../../../deviceTests/opengl/src)
+LOCAL_SRC_FILES += $(filter-out %Benchmark.java, $(BENCHMARK_SRC))
+
+#$(info $(LOCAL_SRC_FILES))
 
 LOCAL_ASSET_DIR := $(LOCAL_PATH)/../../../deviceTests/opengl/assets
 

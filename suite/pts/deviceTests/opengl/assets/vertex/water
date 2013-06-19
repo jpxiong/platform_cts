@@ -11,6 +11,7 @@
  * or implied. See the License for the specific language governing permissions and limitations under
  * the License.
  */
+precision mediump float;
 uniform mat4 u_MVPMatrix;
 uniform mat4 u_MVMatrix;
 attribute vec4 a_Position;

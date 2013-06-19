@@ -11,6 +11,7 @@
  * or implied. See the License for the specific language governing permissions and limitations under
  * the License.
  */
+precision mediump float;
 attribute vec4 a_Position;
 attribute vec2 a_TexCoordinate;
 varying vec2 v_TexCoordinate;

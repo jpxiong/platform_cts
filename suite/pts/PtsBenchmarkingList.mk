@@ -34,7 +34,5 @@ PTS_SUPPORT_PACKAGES := \
 
 PTS_HOST_CASES := \
     PtsHostBootup \
-    PtsHostUi
-
-PTS_UI_TESTS := \
+    PtsHostUi \
     PtsHostJank
