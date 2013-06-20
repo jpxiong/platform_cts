@@ -22,7 +22,7 @@ LOCAL_MODULE_PATH := $(TARGET_OUT_DATA)/local/tmp
 LOCAL_SRC_FILES := $(call all-java-files-under, src)
 
 LOCAL_MODULE := PtsHostJank
-LOCAL_JAVA_LIBRARIES := uiautomator.core geppetto.tests.common
+LOCAL_JAVA_LIBRARIES := uiautomator.core
 LOCAL_STATIC_JAVA_LIBRARIES := com.android.uiautomator.platform.common
 LOCAL_PROGUARD_ENABLED := disabled
 LOCAL_CTS_TEST_APK := PtsDeviceJankApp
