@@ -468,7 +468,7 @@ public class GeolocationTest extends ActivityInstrumentationTestCase2<WebViewStu
         final TestSimpleGeolocationRequestWebChromeClient chromeClientRejectOnce =
                 new TestSimpleGeolocationRequestWebChromeClient(mOnUiThread, false, false);
         mOnUiThread.setWebChromeClient(chromeClientRejectOnce);
-        // Load url once, and the callback should accept the domain for all future loads
+        // Load url once, and the callback should reject it once
         mOnUiThread.loadUrlAndWaitForCompletion(URL_1);
         Callable<Boolean> receivedRequest = new Callable<Boolean>() {
             @Override
@@ -483,11 +483,12 @@ public class GeolocationTest extends ActivityInstrumentationTestCase2<WebViewStu
                 return mJavascriptStatusReceiver.mDenied;
             }
         };
-        PollingCheck.check("JS didn't get position", POLLING_TIMEOUT, locationDenied);
+        PollingCheck.check("JS got position", POLLING_TIMEOUT, locationDenied);
         // Same result should happen on next run
+        chromeClientRejectOnce.mReceivedRequest = false;
         mOnUiThread.loadUrlAndWaitForCompletion(URL_1);
         PollingCheck.check("Geolocation prompt not called", POLLING_TIMEOUT, receivedRequest);
-        PollingCheck.check("JS didn't get position", POLLING_TIMEOUT, locationDenied);
+        PollingCheck.check("JS got position", POLLING_TIMEOUT, locationDenied);
 
         // Try to reject forever
         final TestSimpleGeolocationRequestWebChromeClient chromeClientRejectAlways =
