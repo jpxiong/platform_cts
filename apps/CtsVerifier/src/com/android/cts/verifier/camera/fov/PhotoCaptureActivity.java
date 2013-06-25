@@ -18,12 +18,14 @@ package com.android.cts.verifier.camera.fov;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.hardware.Camera;
 import android.hardware.Camera.PictureCallback;
+import android.hardware.Camera.ShutterCallback;
 import android.os.Bundle;
 import android.os.PowerManager;
 import android.os.PowerManager.WakeLock;
@@ -58,6 +60,7 @@ public class PhotoCaptureActivity extends Activity
     private static final int FOV_REQUEST_CODE = 1006;
     private static final String PICTURE_FILENAME = "photo.jpg";
     private static float mReportedFovDegrees = 0;
+    private float mReportedFovPrePictureTaken = -1;
 
     private SurfaceView mPreview;
     private SurfaceHolder mSurfaceHolder;
@@ -72,8 +75,11 @@ public class PhotoCaptureActivity extends Activity
     private boolean mPreviewActive = false;
     private int mResolutionSpinnerIndex = -1;
     private WakeLock mWakeLock;
+    private long shutterStartTime;
 
     private ArrayList<Integer> mPreviewSizeCamerasToProcess = new ArrayList<Integer>();
+
+    private Dialog mActiveDialog;
 
     /**
      * Selected preview size per camera. If null, preview size should be
@@ -139,7 +145,15 @@ public class PhotoCaptureActivity extends Activity
         previewView.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                mCamera.takePicture(null, null, PhotoCaptureActivity.this);
+                shutterStartTime = System.currentTimeMillis();
+
+                mCamera.takePicture(new ShutterCallback() {
+                    @Override
+                    public void onShutter() {
+                        long dT = System.currentTimeMillis() - shutterStartTime;
+                        Log.d("CTS", "Shutter Lag: " + dT);
+                    }
+                }, null, PhotoCaptureActivity.this);
             }
         });
 
@@ -151,11 +165,17 @@ public class PhotoCaptureActivity extends Activity
                 if (mSupportedResolutions != null) {
                     SelectableResolution resolution = mSupportedResolutions.get(position);
 
-                    switchToCamera(resolution.cameraId);
+                    switchToCamera(resolution.cameraId, false);
+
                     Camera.Parameters params = mCamera.getParameters();
                     params.setPictureSize(resolution.width, resolution.height);
                     mCamera.setParameters(params);
+
+                    // It should be guaranteed that the FOV is correctly updated after setParameters().
+                    mReportedFovPrePictureTaken = mCamera.getParameters().getHorizontalViewAngle();
+
                     mResolutionSpinnerIndex = position;
+                    initializeCamera();
                 }
             }
 
@@ -227,6 +247,32 @@ public class PhotoCaptureActivity extends Activity
         File pictureFile = getPictureFile(this);
         Camera.Parameters params = mCamera.getParameters();
         mReportedFovDegrees = params.getHorizontalViewAngle();
+
+        // Show error if FOV does not match the value reported before takePicture().
+        if (mReportedFovPrePictureTaken != mReportedFovDegrees) {
+            mSupportedResolutions.get(mResolutionSpinnerIndex).tested = true;
+            mSupportedResolutions.get(mResolutionSpinnerIndex).passed = false;
+
+            AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this);
+            dialogBuilder.setTitle(R.string.camera_fov_reported_fov_problem);
+            dialogBuilder.setNeutralButton(
+                    android.R.string.ok, new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    if (mActiveDialog != null) {
+                        mActiveDialog.dismiss();
+                        mActiveDialog = null;
+                        initializeCamera();
+                    }
+                }
+            });
+
+            String message  = getResources().getString(R.string.camera_fov_reported_fov_problem_message);
+            dialogBuilder.setMessage(String.format(message, mReportedFovPrePictureTaken, mReportedFovDegrees));
+            mActiveDialog = dialogBuilder.show();
+            return;
+        }
+
         try {
             FileOutputStream fos = new FileOutputStream(pictureFile);
             fos.write(data);
@@ -329,7 +375,7 @@ public class PhotoCaptureActivity extends Activity
                     public void onCancel(DialogInterface arg0) {
                         // User cancelled preview size selection.
                         mPreviewSizes = null;
-                        switchToCamera(mCameraId);
+                        switchToCamera(mCameraId, true);
                     }
                 }).
                 setSingleChoiceItems(choices, 0, new DialogInterface.OnClickListener() {
@@ -342,7 +388,7 @@ public class PhotoCaptureActivity extends Activity
 
                         if (mPreviewSizeCamerasToProcess.isEmpty()) {
                             // We're done, re-initialize camera.
-                            switchToCamera(mCameraId);
+                            switchToCamera(mCameraId, true);
                         } else {
                             // Process other cameras.
                             showNextDialogToChoosePreviewSize();
@@ -385,14 +431,17 @@ public class PhotoCaptureActivity extends Activity
         }
     }
 
-    private void switchToCamera(int cameraId) {
+    private void switchToCamera(int cameraId, boolean initializeCamera) {
         if (mCamera != null) {
             mCamera.stopPreview();
             mCamera.release();
         }
         mCameraId = cameraId;
         mCamera = Camera.open(cameraId);
-        initializeCamera();
+
+        if (initializeCamera){
+          initializeCamera();
+        }
     }
 
     /**

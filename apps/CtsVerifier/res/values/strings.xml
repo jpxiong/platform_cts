@@ -568,6 +568,11 @@
     <string name="camera_fov_choose_preview_size_for_camera">Choose preview size for camera %1$s</string>
     <string name="camera_fov_displayed_fov_label">Displayed FOV : </string>
     <string name="camera_fov_reported_fov_label">Reported  FOV : </string>
+    <string name="camera_fov_reported_fov_problem">Reported FOV problem</string>
+    <string name="camera_fov_reported_fov_problem_message">The reported FOV before takePicture() is
+        different from when onPictureTaken() is called.\nAs picture size has not been changed, the
+        reported FOV should be identical at both times.\n\nFOV before/after: %1$f / %2$f</string>
+
     <string name="camera_fov_panorama_wallpaper_title">Photo Sphere Live Wallpaper</string>
     <string name="camera_fov_panorama_wallpaper_description">This live wallapper displays photo
         spheres.</string>
