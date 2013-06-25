@@ -40,8 +40,8 @@ public class Vp8EncoderTest extends AndroidTestCase {
 
     private static final String TAG = "VP8EncoderTest";
     private static final String VP8_MIME = "video/x-vnd.on2.vp8";
-    private static final String VPX_DECODER_NAME = "OMX.google.vpx.decoder";
-    private static final String VPX_ENCODER_NAME = "OMX.google.vpx.encoder";
+    private static final String VPX_DECODER_NAME = "OMX.google.vp8.decoder";
+    private static final String VPX_ENCODER_NAME = "OMX.google.vp8.encoder";
     private static final String BASIC_IVF = "video_176x144_vp8_basic.ivf";
     private static final long DEFAULT_TIMEOUT_US = 5000;
 
