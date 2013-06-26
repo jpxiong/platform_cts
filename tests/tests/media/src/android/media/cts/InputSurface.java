@@ -39,9 +39,9 @@ class InputSurface {
 
     private static final int EGL_RECORDABLE_ANDROID = 0x3142;
 
-    private EGLDisplay mEGLDisplay;
-    private EGLContext mEGLContext;
-    private EGLSurface mEGLSurface;
+    private EGLDisplay mEGLDisplay = EGL14.EGL_NO_DISPLAY;
+    private EGLContext mEGLContext = EGL14.EGL_NO_CONTEXT;
+    private EGLSurface mEGLSurface = EGL14.EGL_NO_SURFACE;
 
     private Surface mSurface;
 
@@ -71,8 +71,8 @@ class InputSurface {
             throw new RuntimeException("unable to initialize EGL14");
         }
 
-        // Configure EGL for pbuffer and OpenGL ES 2.0.  We want enough RGB bits
-        // to be able to tell if the frame is reasonable.
+        // Configure EGL for recordable and OpenGL ES 2.0.  We want enough RGB bits
+        // to minimize artifacts from possible YUV conversion.
         int[] attribList = {
                 EGL14.EGL_RED_SIZE, 8,
                 EGL14.EGL_GREEN_SIZE, 8,
@@ -117,17 +117,18 @@ class InputSurface {
      * Surface that was passed to our constructor.
      */
     public void release() {
-        if (mEGLDisplay != null) {
+        if (mEGLDisplay != EGL14.EGL_NO_DISPLAY) {
+            EGL14.eglDestroySurface(mEGLDisplay, mEGLSurface);
+            EGL14.eglDestroyContext(mEGLDisplay, mEGLContext);
             EGL14.eglReleaseThread();
             EGL14.eglTerminate(mEGLDisplay);
         }
 
         mSurface.release();
 
-        // null everything out so future attempts to use this object will cause an NPE
-        mEGLDisplay = null;
-        mEGLContext = null;
-        mEGLSurface = null;
+        mEGLDisplay = EGL14.EGL_NO_DISPLAY;
+        mEGLContext = EGL14.EGL_NO_CONTEXT;
+        mEGLSurface = EGL14.EGL_NO_SURFACE;
 
         mSurface = null;
     }
@@ -166,14 +167,9 @@ class InputSurface {
      * Checks for EGL errors.
      */
     private void checkEglError(String msg) {
-        boolean failed = false;
         int error;
-        while ((error = EGL14.eglGetError()) != EGL14.EGL_SUCCESS) {
-            Log.e(TAG, msg + ": EGL error: 0x" + Integer.toHexString(error));
-            failed = true;
-        }
-        if (failed) {
-            throw new RuntimeException("EGL error encountered (see log)");
+        if ((error = EGL14.eglGetError()) != EGL14.EGL_SUCCESS) {
+            throw new RuntimeException(msg + ": EGL error: 0x" + Integer.toHexString(error));
         }
     }
 }
