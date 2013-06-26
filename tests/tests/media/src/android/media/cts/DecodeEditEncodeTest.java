@@ -31,8 +31,6 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 
-import javax.microedition.khronos.opengles.GL10;
-
 
 /**
  * This test has three steps:
@@ -53,7 +51,6 @@ public class DecodeEditEncodeTest extends AndroidTestCase {
     private static final boolean WORK_AROUND_BUGS = false;  // avoid fatal codec bugs
     private static final boolean VERBOSE = false;           // lots of logging
     private static final boolean DEBUG_SAVE_FILE = false;   // save copy of encoded movie
-    private static final String DEBUG_FILE_NAME_BASE = "/sdcard/test.";
 
     // parameters for the encoder
     private static final String MIME_TYPE = "video/avc";    // H.264 Advanced Video Coding
@@ -766,7 +763,7 @@ public class DecodeEditEncodeTest extends AndroidTestCase {
                 y = mHeight / 4;
             }
 
-            GLES20.glReadPixels(x, y, 1, 1, GL10.GL_RGBA, GL10.GL_UNSIGNED_BYTE, pixelBuf);
+            GLES20.glReadPixels(x, y, 1, 1, GLES20.GL_RGBA, GLES20.GL_UNSIGNED_BYTE, pixelBuf);
             int r = pixelBuf.get(0) & 0xff;
             int g = pixelBuf.get(1) & 0xff;
             int b = pixelBuf.get(2) & 0xff;
