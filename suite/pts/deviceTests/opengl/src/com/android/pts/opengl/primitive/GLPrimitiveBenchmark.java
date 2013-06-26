@@ -41,7 +41,7 @@ public class GLPrimitiveBenchmark extends PtsActivityInstrumentationTestCase2<GL
      */
     @TimeoutReq(minutes = 100)
     public void testFullPipelineOffscreen() throws Exception {
-        runBenchmark(Benchmark.FullPipeline, true, NUM_FRAMES, NUM_ITERATIONS, TIMEOUT);
+        runBenchmark(BenchmarkName.FullPipeline, true, NUM_FRAMES, NUM_ITERATIONS, TIMEOUT);
     }
 
     /**
@@ -49,7 +49,7 @@ public class GLPrimitiveBenchmark extends PtsActivityInstrumentationTestCase2<GL
      */
     @TimeoutReq(minutes = 100)
     public void testFullPipelineOnscreen() throws Exception {
-        runBenchmark(Benchmark.FullPipeline, false, NUM_FRAMES, NUM_ITERATIONS, TIMEOUT);
+        runBenchmark(BenchmarkName.FullPipeline, false, NUM_FRAMES, NUM_ITERATIONS, TIMEOUT);
     }
 
     /**
@@ -57,7 +57,7 @@ public class GLPrimitiveBenchmark extends PtsActivityInstrumentationTestCase2<GL
      */
     @TimeoutReq(minutes = 100)
     public void testPixelOutputOffscreen() throws Exception {
-        runBenchmark(Benchmark.PixelOutput, true, NUM_FRAMES, NUM_ITERATIONS, TIMEOUT);
+        runBenchmark(BenchmarkName.PixelOutput, true, NUM_FRAMES, NUM_ITERATIONS, TIMEOUT);
     }
 
     /**
@@ -65,7 +65,7 @@ public class GLPrimitiveBenchmark extends PtsActivityInstrumentationTestCase2<GL
      */
     @TimeoutReq(minutes = 100)
     public void testPixelOutputOnscreen() throws Exception {
-        runBenchmark(Benchmark.PixelOutput, false, NUM_FRAMES, NUM_ITERATIONS, TIMEOUT);
+        runBenchmark(BenchmarkName.PixelOutput, false, NUM_FRAMES, NUM_ITERATIONS, TIMEOUT);
     }
 
     /**
@@ -73,7 +73,7 @@ public class GLPrimitiveBenchmark extends PtsActivityInstrumentationTestCase2<GL
      */
     @TimeoutReq(minutes = 100)
     public void testShaderPerfOffscreen() throws Exception {
-        runBenchmark(Benchmark.ShaderPerf, true, NUM_FRAMES, NUM_ITERATIONS, TIMEOUT);
+        runBenchmark(BenchmarkName.ShaderPerf, true, NUM_FRAMES, NUM_ITERATIONS, TIMEOUT);
     }
 
     /**
@@ -81,7 +81,7 @@ public class GLPrimitiveBenchmark extends PtsActivityInstrumentationTestCase2<GL
      */
     @TimeoutReq(minutes = 100)
     public void testShaderPerfOnscreen() throws Exception {
-        runBenchmark(Benchmark.ShaderPerf, false, NUM_FRAMES, NUM_ITERATIONS, TIMEOUT);
+        runBenchmark(BenchmarkName.ShaderPerf, false, NUM_FRAMES, NUM_ITERATIONS, TIMEOUT);
     }
 
     /**
@@ -89,7 +89,7 @@ public class GLPrimitiveBenchmark extends PtsActivityInstrumentationTestCase2<GL
      */
     @TimeoutReq(minutes = 100)
     public void testContextSwitchOffscreen() throws Exception {
-        runBenchmark(Benchmark.ContextSwitch, true, NUM_FRAMES, NUM_ITERATIONS, TIMEOUT);
+        runBenchmark(BenchmarkName.ContextSwitch, true, NUM_FRAMES, NUM_ITERATIONS, TIMEOUT);
     }
 
     /**
@@ -97,7 +97,7 @@ public class GLPrimitiveBenchmark extends PtsActivityInstrumentationTestCase2<GL
      */
     @TimeoutReq(minutes = 100)
     public void testContextSwitchOnscreen() throws Exception {
-        runBenchmark(Benchmark.ContextSwitch, false, NUM_FRAMES, NUM_ITERATIONS, TIMEOUT);
+        runBenchmark(BenchmarkName.ContextSwitch, false, NUM_FRAMES, NUM_ITERATIONS, TIMEOUT);
     }
 
     /**
@@ -110,9 +110,8 @@ public class GLPrimitiveBenchmark extends PtsActivityInstrumentationTestCase2<GL
      * @param timeout The milliseconds to wait for an iteration of the benchmark before timing out.
      * @throws Exception If the benchmark could not be run.
      */
-    private void runBenchmark(
-            Benchmark benchmark, boolean offscreen, int numFrames, int numIterations, int timeout)
-            throws Exception {
+    private void runBenchmark(BenchmarkName benchmark, boolean offscreen, int numFrames,
+            int numIterations, int timeout) throws Exception {
         String benchmarkName = benchmark.toString();
         Intent intent = new Intent();
         intent.putExtra(GLActivityIntentKeys.INTENT_EXTRA_BENCHMARK_NAME, benchmarkName);

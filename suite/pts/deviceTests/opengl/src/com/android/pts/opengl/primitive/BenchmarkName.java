@@ -16,7 +16,7 @@ package com.android.pts.opengl.primitive;
 /**
  * Represents the different primitive benchmarks.
  */
-public enum Benchmark {
+public enum BenchmarkName {
     FullPipeline,
     PixelOutput,
     ShaderPerf,

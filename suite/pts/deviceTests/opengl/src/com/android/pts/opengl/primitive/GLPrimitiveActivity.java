@@ -39,7 +39,7 @@ public class GLPrimitiveActivity extends Activity {
     private CountDownLatch mStartSignal = new CountDownLatch(1);
     private Semaphore mSemaphore = new Semaphore(0);
 
-    private Benchmark mBenchmark;
+    private BenchmarkName mBenchmark;
     private boolean mOffscreen;
     private int mNumFrames;
     private int mNumIterations;
@@ -51,8 +51,8 @@ public class GLPrimitiveActivity extends Activity {
         super.onCreate(data);
         System.loadLibrary("ptsopengl_jni");
         Intent intent = getIntent();
-        mBenchmark = Benchmark.valueOf(
-                intent.getStringExtra(GLActivityIntentKeys.INTENT_EXTRA_BENCHMARK_NAME));
+        mBenchmark = BenchmarkName.valueOf(intent.getStringExtra(
+                GLActivityIntentKeys.INTENT_EXTRA_BENCHMARK_NAME));
         mOffscreen = intent.getBooleanExtra(GLActivityIntentKeys.INTENT_EXTRA_OFFSCREEN, false);
         mNumFrames = intent.getIntExtra(GLActivityIntentKeys.INTENT_EXTRA_NUM_FRAMES, 0);
         mNumIterations = intent.getIntExtra(GLActivityIntentKeys.INTENT_EXTRA_NUM_ITERATIONS, 0);

@@ -17,19 +17,16 @@ LOCAL_PATH:= $(call my-dir)
 include $(CLEAR_VARS)
 
 LOCAL_MODULE_TAGS := optional
-LOCAL_MODULE_PATH := $(TARGET_OUT_DATA)/local/tmp
 
 LOCAL_SRC_FILES := $(call all-java-files-under, src)
 
 LOCAL_MODULE := PtsHostJank
-LOCAL_JAVA_LIBRARIES := uiautomator.core
-LOCAL_STATIC_JAVA_LIBRARIES := com.android.uiautomator.platform.common
-LOCAL_PROGUARD_ENABLED := disabled
-LOCAL_CTS_TEST_APK := PtsDeviceJankApp
-LOCAL_CTS_TEST_APP_PACKAGE := com.android.pts.opengl
+
+LOCAL_JAVA_LIBRARIES := cts-tradefed tradefed-prebuilt ddmlib-prebuilt ptscommonutilhost
+
 LOCAL_CTS_TEST_PACKAGE := com.android.pts.jank
 
-include $(BUILD_CTS_UI_JAVA_LIBRARY)
+include $(BUILD_CTS_HOST_JAVA_LIBRARY)
 
 # Build the test APK using its own makefile, and any other CTS-related packages
 include $(call all-makefiles-under,$(LOCAL_PATH))
