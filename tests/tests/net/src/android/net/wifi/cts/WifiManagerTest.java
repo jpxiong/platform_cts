@@ -233,7 +233,7 @@ public class WifiManagerTest extends AndroidTestCase {
         startScan();
         setWifiEnabled(false);
         Thread.sleep(DURATION);
-        assertFalse(mWifiManager.pingSupplicant());
+        assertTrue(mWifiManager.pingSupplicant() == mWifiManager.isScanAlwaysAvailable());
         final String TAG = "Test";
         assertNotNull(mWifiManager.createWifiLock(TAG));
         assertNotNull(mWifiManager.createWifiLock(WifiManager.WIFI_MODE_FULL, TAG));
