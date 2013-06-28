@@ -2,9 +2,5 @@
 {
   name: "android.openglperf.cts.GlVboPerfTest#testVboWithVaryingIndexBufferNumbers",
   bug: 6950385
-},
-{
-  name: "libcore.java.util.zip.ZipFileTest#testDuplicateEntries",
-  bug: 8462076
 }
 ]
