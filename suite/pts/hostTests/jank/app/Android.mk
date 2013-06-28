@@ -13,32 +13,16 @@
 # limitations under the License.
 
 LOCAL_PATH:= $(call my-dir)
+
 include $(CLEAR_VARS)
 
-# don't include this package in any target
-LOCAL_MODULE_TAGS := optional
-
-LOCAL_MODULE_PATH := $(TARGET_OUT_DATA_APPS)
-
-LOCAL_JAVA_LIBRARIES := android.test.runner
-
-LOCAL_STATIC_JAVA_LIBRARIES := ptsutil ctsutil ctstestrunner
-
-LOCAL_JNI_SHARED_LIBRARIES := libptsopengl_jni
-
 LOCAL_SRC_FILES := $(call all-java-files-under, src)
-# add the src of the benchmark, but filter out the tests
-BENCHMARK_SRC := $(call all-java-files-under, ../../../deviceTests/opengl/src)
-LOCAL_SRC_FILES += $(filter-out %Benchmark.java, $(BENCHMARK_SRC))
+LOCAL_MODULE_TAGS := optional
+LOCAL_MODULE := PtsDeviceJankOpenGl
+LOCAL_DEX_PREOPT := false
 
-#$(info $(LOCAL_SRC_FILES))
+LOCAL_JAVA_LIBRARIES := uiautomator.core
 
-LOCAL_ASSET_DIR := $(LOCAL_PATH)/../../../deviceTests/opengl/assets
+LOCAL_STATIC_JAVA_LIBRARIES := com.android.uiautomator.platform.common
 
-LOCAL_PACKAGE_NAME := PtsDeviceJankApp
-
-LOCAL_SDK_VERSION := 16
-
-include $(BUILD_CTS_PACKAGE)
-
-
+include $(BUILD_JAVA_LIBRARY)

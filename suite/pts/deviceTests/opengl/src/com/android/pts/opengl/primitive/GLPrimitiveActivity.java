@@ -51,8 +51,8 @@ public class GLPrimitiveActivity extends Activity {
         super.onCreate(data);
         System.loadLibrary("ptsopengl_jni");
         Intent intent = getIntent();
-        mBenchmark = BenchmarkName.valueOf(intent.getStringExtra(
-                GLActivityIntentKeys.INTENT_EXTRA_BENCHMARK_NAME));
+        mBenchmark = BenchmarkName.valueOf(
+                intent.getStringExtra(GLActivityIntentKeys.INTENT_EXTRA_BENCHMARK_NAME));
         mOffscreen = intent.getBooleanExtra(GLActivityIntentKeys.INTENT_EXTRA_OFFSCREEN, false);
         mNumFrames = intent.getIntExtra(GLActivityIntentKeys.INTENT_EXTRA_NUM_FRAMES, 0);
         mNumIterations = intent.getIntExtra(GLActivityIntentKeys.INTENT_EXTRA_NUM_ITERATIONS, 0);
@@ -96,6 +96,7 @@ public class GLPrimitiveActivity extends Activity {
     private void complete() {
         // Release semiphore.
         mSemaphore.release();
+        finish();
     }
 
     private synchronized void setException(Exception e) {
@@ -135,6 +136,7 @@ public class GLPrimitiveActivity extends Activity {
                 complete();
                 return;
             }
+            Log.i(TAG, mBenchmark + " Benchmark Started");
             // Creates a watchdog to ensure a iteration doesn't exceed the timeout.
             watchDog = new WatchDog(mTimeout, this);
             // Used to record the start and end time of the iteration.
@@ -170,6 +172,7 @@ public class GLPrimitiveActivity extends Activity {
                 }
             }
             complete();
+            Log.i(TAG, mBenchmark + " Benchmark Completed");
         }
 
         public void onTimeout() {

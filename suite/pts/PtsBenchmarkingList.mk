@@ -30,9 +30,12 @@ PTS_SUPPORT_PACKAGES := \
     PtsDeviceTaskswitchingAppA \
     PtsDeviceTaskswitchingAppB \
     PtsDeviceTaskswitchingControl \
-    PtsDeviceJankApp
+    PtsDeviceOpenGl
 
 PTS_HOST_CASES := \
     PtsHostBootup \
     PtsHostUi \
-    PtsHostJank
+    PtsHostJankOpenGl
+
+pts_device_lib_tests := \
+    PtsDeviceJankOpenGl

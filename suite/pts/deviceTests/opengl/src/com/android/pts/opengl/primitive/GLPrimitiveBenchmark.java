@@ -141,7 +141,6 @@ public class GLPrimitiveBenchmark extends PtsActivityInstrumentationTestCase2<GL
                 getReportLog().printSummary(
                         "Average Frames Per Second", score, ResultType.HIGHER_BETTER,
                         ResultUnit.SCORE);
-                activity.finish();
             }
         }
     }
