@@ -48,6 +48,8 @@ class TestPackageDef implements ITestPackageDef {
     public static final String VM_HOST_TEST = "vmHostTest";
     public static final String ACCESSIBILITY_TEST =
         "com.android.cts.tradefed.testtype.AccessibilityTestRunner";
+    public static final String ACCESSIBILITY_SERVICE_TEST =
+        "com.android.cts.tradefed.testtype.AccessibilityServiceTestRunner";
     public static final String DISPLAY_TEST =
             "com.android.cts.tradefed.testtype.DisplayTestRunner";
     public static final String UIAUTOMATOR_TEST = "uiAutomator";
@@ -227,6 +229,9 @@ class TestPackageDef implements ITestPackageDef {
             return new WrappedGTest(mAppNameSpace, mUri, mName, mRunner);
         } else if (ACCESSIBILITY_TEST.equals(mTestType)) {
             AccessibilityTestRunner test = new AccessibilityTestRunner();
+            return setInstrumentationTest(test, testCaseDir);
+        } else if (ACCESSIBILITY_SERVICE_TEST.equals(mTestType)) {
+            AccessibilityServiceTestRunner test = new AccessibilityServiceTestRunner();
             return setInstrumentationTest(test, testCaseDir);
         } else if (DISPLAY_TEST.equals(mTestType)) {
             DisplayTestRunner test = new DisplayTestRunner();
