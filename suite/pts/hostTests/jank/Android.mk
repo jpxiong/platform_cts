@@ -20,13 +20,22 @@ LOCAL_MODULE_TAGS := optional
 
 LOCAL_SRC_FILES := $(call all-java-files-under, src)
 
-LOCAL_MODULE := PtsHostJank
+LOCAL_MODULE := PtsHostJankOpenGl
 
 LOCAL_JAVA_LIBRARIES := cts-tradefed tradefed-prebuilt ddmlib-prebuilt ptscommonutilhost
 
-LOCAL_CTS_TEST_PACKAGE := com.android.pts.jank
+LOCAL_CTS_TEST_PACKAGE := com.android.pts.jank.opengl
+
+LOCAL_DEVICE_JAR_ := PtsDeviceJankOpenGl
+cts_library_jar_ := $(CTS_TESTCASES_OUT)/$(LOCAL_DEVICE_JAR_).jar
+
+$(cts_library_jar_): $(call intermediates-dir-for,JAVA_LIBRARIES,$(LOCAL_DEVICE_JAR_))/javalib.jar | $(ACP)
+	$(hide) mkdir -p $(CTS_TESTCASES_OUT)
+	$(hide) $(ACP) -fp $(call intermediates-dir-for,JAVA_LIBRARIES,$(LOCAL_DEVICE_JAR_))/javalib.jar $@
+
+$(CTS_TESTCASES_OUT)/PtsHostJankOpenGl.xml: $(cts_library_jar_)
 
 include $(BUILD_CTS_HOST_JAVA_LIBRARY)
 
-# Build the test APK using its own makefile, and any other CTS-related packages
+# Build the library using its own makefile
 include $(call all-makefiles-under,$(LOCAL_PATH))

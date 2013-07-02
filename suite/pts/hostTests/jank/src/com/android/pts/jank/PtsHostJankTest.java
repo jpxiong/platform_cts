@@ -15,6 +15,7 @@ package com.android.pts.jank;
 
 import com.android.cts.tradefed.build.CtsBuildHelper;
 import com.android.ddmlib.testrunner.RemoteAndroidTestRunner;
+import com.android.ddmlib.IShellOutputReceiver;
 import com.android.ddmlib.Log;
 import com.android.ddmlib.Log.LogLevel;
 import com.android.pts.util.HostReportLog;
@@ -34,30 +35,27 @@ import java.io.FileNotFoundException;
 import java.io.InputStreamReader;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.concurrent.Semaphore;
+import java.util.HashMap;
+import java.util.Scanner;
 
 public class PtsHostJankTest extends DeviceTestCase implements IBuildReceiver {
 
     private static final String TAG = "PtsHostJankTest";
-    private static final String CTS_RUNNER = "android.test.InstrumentationCtsTestRunner";
-    private static final String APP_WINDOW_NAME = "SurfaceView";
-    private static final String PACKAGE = "com.android.pts.jank";
-    private static final String APK = "PtsDeviceJankApp.apk";
-    private static final String CLEAR_BUFFER_CMD =
-            "adb -s %s shell dumpsys SurfaceFlinger --latency-clear %s";
-    private static final String FRAME_LATENCY_CMD =
-            "adb -s %s shell dumpsys SurfaceFlinger --latency %s";
-    private static final long PENDING_FENCE_TIMESTAMP = (1L << 63) - 1;
-    private static final double MILLISECOND = 1E3;
-    private static final int REQ_NUM_DELTAS = 100;
+    private static final String DEVICE_LOCATION = "/data/local/tmp/";
+    private static final String RUN_UI_AUTOMATOR_CMD = "uiautomator runtest %s -c %s";
+    private final String mHostTestClass;
+    private final String mDeviceTestClass;
+    private final String mJarName;
+    private final String mJarPath;
+    protected ITestDevice mDevice;
+    protected CtsBuildHelper mBuild;
 
-    private ArrayList<Double> mTimestamps = new ArrayList<Double>();
-    private double mRefreshPeriod;
-    private volatile int mNumDeltas = 0;
-    private volatile int mJankNumber = 0;
-    private volatile int mTotalJanks = 0;
-    private CtsBuildHelper mBuild;
-    private ITestDevice mDevice;
+    public PtsHostJankTest(String jarName, String deviceTestClass, String hostTestClass) {
+        this.mHostTestClass = hostTestClass;
+        this.mDeviceTestClass = deviceTestClass;
+        this.mJarName = jarName;
+        this.mJarPath = DEVICE_LOCATION + jarName;
+    }
 
     @Override
     public void setBuild(IBuildInfo buildInfo) {
@@ -68,181 +66,78 @@ public class PtsHostJankTest extends DeviceTestCase implements IBuildReceiver {
     protected void setUp() throws Exception {
         super.setUp();
         mDevice = getDevice();
-        mDevice.uninstallPackage(PACKAGE);
-        File app = mBuild.getTestApp(APK);
-        mDevice.installPackage(app, false);
+        // Push jar to device.
+        File jarFile = mBuild.getTestApp(mJarName);
+        boolean result = mDevice.pushFile(jarFile, mJarPath);
+        assertTrue("Failed to push file to " + mJarPath, result);
     }
-
 
     @Override
     protected void tearDown() throws Exception {
-        mDevice.uninstallPackage(PACKAGE);
+        // Delete jar from device.
+        mDevice.executeShellCommand("rm " + mJarPath);
         super.tearDown();
     }
 
-    public void testFullPipeline() throws Exception {
-        runGLPrimitiveBenchmark("testFullPipeline");
-    }
+    public void runUiAutomatorTest(String testName) throws Exception {
+        // Delete any existing result files
+        mDevice.executeShellCommand("rm -r " + DEVICE_LOCATION + "*.txt");
 
-    public void testPixelOutput() throws Exception {
-        runGLPrimitiveBenchmark("testPixelOutput");
-    }
+        // Run ui automator test.
+        mDevice.executeShellCommand(
+                String.format(RUN_UI_AUTOMATOR_CMD, mJarName, mDeviceTestClass + "#" + testName),
+                new IShellOutputReceiver() {
+                    private StringBuilder sb = new StringBuilder();
 
-    public void testShaderPerf() throws Exception {
-        runGLPrimitiveBenchmark("testShaderPerf");
-    }
+                    public void addOutput(byte[] data, int offset, int length) {
+                        byte[] raw = new byte[length];
+                        for (int i = 0; i < length; i++) {
+                            raw[i] = data[i + offset];
+                        }
+                        sb.append(new String(raw));
+                    }
 
-    public void testContextSwitch() throws Exception {
-        runGLPrimitiveBenchmark("testContextSwitch");
-    }
+                    public void flush() {
+                        Log.logAndDisplay(LogLevel.INFO, TAG, sb.toString());
+                    }
 
-    public void runGLPrimitiveBenchmark(String benchmark) throws Exception {
-        // Collect timestamps.
-        final TimestampCollector worker = new TimestampCollector();
-        worker.start();
+                    public boolean isCancelled() {
+                        return false;
+                    }
+                });
 
-        // Start the benchmark.
-        RemoteAndroidTestRunner testRunner =
-                new RemoteAndroidTestRunner(PACKAGE, CTS_RUNNER, mDevice.getIDevice());
-        testRunner.setMethodName("com.android.pts.jank.JankTest", benchmark);
-        CollectingTestListener listener = new CollectingTestListener();
-        mDevice.runInstrumentationTests(testRunner, listener);
-
-        // Wait for the worker.
-        worker.finish();
-
-        TestRunResult result = listener.getCurrentRunResults();
-        if (result.isRunFailure()) {
-            throw new Exception(result.getRunFailureMessage());
+        // Pull result file across
+        File result = mDevice.pullFile(DEVICE_LOCATION + "UiJankinessTestsOutput.txt");
+        assertNotNull("Couldn't get result file", result);
+        // Parse result file
+        Scanner in = new Scanner(result);
+        HashMap<String, Double> results = new HashMap<String, Double>(4);
+        while (in.hasNextLine()) {
+            String[] parts = in.nextLine().split(":");
+            if (parts.length == 2) {
+                results.put(parts[0], Double.parseDouble(parts[1]));
+            }
         }
+        Log.logAndDisplay(LogLevel.INFO, TAG, "Results: " + results);
+        assertEquals("Could not parse the results file: ", 4, results.size());
 
-        assertFalse("Couldn't get enough timestamps", needMoreDeltas());
+        double avgNumJanks = results.get("average number of jankiness");
+        double maxNumJanks = results.get("max number of jankiness");
+        double avgFrameRate = results.get("average frame rate");
+        double avgMaxAccFrames = results.get("average of max accumulated frames");
 
         // Create and deliver the report.
-        HostReportLog report = new HostReportLog(
-                mDevice.getSerialNumber(), PtsHostJankTest.class.getName() + "#" + benchmark);
+        HostReportLog report =
+                new HostReportLog(mDevice.getSerialNumber(), mHostTestClass + "#" + testName);
         report.printValue(
-                "Number of Janks", mJankNumber, ResultType.LOWER_BETTER, ResultUnit.COUNT);
-        report.printValue("Total Janks", mTotalJanks, ResultType.LOWER_BETTER, ResultUnit.COUNT);
-        double jankiness = ((double) mJankNumber / mNumDeltas) * 100.0;
+                "Average Frame Rate", avgFrameRate, ResultType.HIGHER_BETTER, ResultUnit.COUNT);
+        report.printValue("Average of Maximum Accumulated Frames", avgMaxAccFrames,
+                ResultType.LOWER_BETTER, ResultUnit.COUNT);
+        report.printValue(
+                "Maximum Number of Janks", maxNumJanks, ResultType.LOWER_BETTER, ResultUnit.COUNT);
         report.printSummary(
-                "Jankiness Percentage", jankiness, ResultType.LOWER_BETTER, ResultUnit.SCORE);
+                "Average Number of Janks", avgNumJanks, ResultType.LOWER_BETTER, ResultUnit.SCORE);
         report.deliverReportToHost();
     }
 
-    private boolean needMoreDeltas() {
-        return mNumDeltas < REQ_NUM_DELTAS;
-    }
-
-    private void calcJank() {
-        final int numTimestamps = mTimestamps.size();
-        if (numTimestamps > 2) {
-            final int numIntervals = numTimestamps - 1;
-            double[] intervals = new double[numIntervals];
-            for (int i = 0; i < numIntervals; i++) {
-                intervals[i] = mTimestamps.get(i + 1) - mTimestamps.get(i);
-            }
-            final int numDeltas = Math.min(numIntervals - 1, REQ_NUM_DELTAS - mNumDeltas);
-            for (int i = 0; i < numDeltas; i++) {
-                double delta = intervals[i + 1] - intervals[i];
-                double normalizedDelta = delta / mRefreshPeriod;
-                // This makes delay over 1.5 * frameIntervalNomial a jank.
-                // Note that too big delay is not excluded here as there should be no pause.
-                int jankiness = (int) Math.round(Math.max(normalizedDelta, 0.0));
-                if (jankiness > 0) {
-                    mJankNumber++;
-                    Log.i(TAG, "Jank at frame " + (mNumDeltas + i));
-                }
-                mTotalJanks += jankiness;
-            }
-            mNumDeltas += numDeltas;
-        }
-        mTimestamps.clear();
-    }
-
-    private class TimestampCollector extends Thread {
-        private volatile Exception mException = null;
-        private volatile boolean mRunning = true;
-
-        public void run() {
-            try {
-                // Loop because SurfaceFlinger's buffer is small.
-                while (mRunning) {
-                    clearBuffer();
-                    Thread.sleep(2000);
-                    dumpBuffer();
-                    calcJank();
-                    // Keep going till we have enough deltas
-                    mRunning = needMoreDeltas();
-                }
-            } catch (Exception e) {
-                mException = e;
-            }
-        }
-
-        public void finish() throws Exception {
-            mRunning = false;
-            try {
-                join(20000);// Wait 20s for thread to join
-            } catch (InterruptedException e) {
-                // Nobody cares
-            }
-            // If there was an error, throw it.
-            if (mException != null) {
-                throw mException;
-            }
-        }
-    }
-
-    private void clearBuffer() throws Exception {
-        // Clear SurfaceFlinger latency buffer.
-        Process p = null;
-        try {
-            p = runShellCommand(
-                    String.format(CLEAR_BUFFER_CMD, mDevice.getSerialNumber(), APP_WINDOW_NAME));
-        } finally {
-            if (p != null) {
-                p.destroy();
-                p = null;
-            }
-        }
-    }
-
-    private void dumpBuffer() throws Exception {
-        // Dump SurfaceFlinger latency buffer.
-        Process p = null;
-        try {
-            p = runShellCommand(
-                    String.format(FRAME_LATENCY_CMD, mDevice.getSerialNumber(), APP_WINDOW_NAME));
-            BufferedReader reader = new BufferedReader(new InputStreamReader(p.getInputStream()));
-            String line = reader.readLine();
-            if (line != null) {
-                mRefreshPeriod = Long.parseLong(line.trim()) / 1e6;// Convert from ns to ms
-                while ((line = reader.readLine()) != null) {
-                    String[] values = line.split("\\s+");
-                    if (values.length == 3) {
-                        long timestamp = Long.parseLong(values[1]);
-                        if (timestamp != PENDING_FENCE_TIMESTAMP && timestamp != 0) {
-                            mTimestamps.add(timestamp / 1e6);// Convert from ns to ms
-                        }
-                    }
-                }
-            }
-        } finally {
-            if (p != null) {
-                p.destroy();
-                p = null;
-            }
-        }
-    }
-
-    private Process runShellCommand(String command) throws Exception {
-        Process p = Runtime.getRuntime().exec(command);
-        int status = p.waitFor();
-        if (status != 0) {
-            throw new RuntimeException(
-                    String.format("Run shell command: %s, status: %s", command, status));
-        }
-        return p;
-    }
 }

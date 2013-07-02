@@ -132,7 +132,8 @@ cts_ui_tests := \
 CTS_TEST_CASES := $(call cts-get-lib-paths,$(cts_host_libraries)) \
 		$(call cts-get-package-paths,$(cts_test_packages)) \
 		$(call cts-get-native-paths,$(cts_native_exes)) \
-		$(call cts-get-ui-lib-paths,$(cts_ui_tests))
+		$(call cts-get-ui-lib-paths,$(cts_ui_tests)) \
+		$(call cts-get-ui-lib-paths,$(pts_device_lib_tests))
 
 # All the XMLs that will end up under the repository/testcases
 # and that need to be created before making the final CTS distribution.

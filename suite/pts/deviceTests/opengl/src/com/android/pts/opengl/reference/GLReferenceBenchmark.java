@@ -95,7 +95,6 @@ public class GLReferenceBenchmark extends PtsActivityInstrumentationTestCase2<GL
                 getReportLog().printSummary(
                         "Total Time", totalTime, ResultType.LOWER_BETTER, ResultUnit.MS);
                  */
-                activity.finish();
             }
         }
     }

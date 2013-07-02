@@ -66,6 +66,7 @@ public class GLReferenceActivity extends Activity {
             }
             // Release semiphore.
             mSemaphore.release();
+            finish();
         }
     }
 
