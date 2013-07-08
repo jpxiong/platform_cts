@@ -31,7 +31,9 @@ class RootProcessScanner {
             "debuggerd",
             "init",
             "installd",
+            "netd",
             "servicemanager",
+            "ueventd",
             "vold",
             "zygote"
     );
