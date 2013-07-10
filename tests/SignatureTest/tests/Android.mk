@@ -17,4 +17,6 @@ LOCAL_INSTRUMENTATION_FOR := SignatureTest
 
 LOCAL_PROGUARD_FLAGS := -ignorewarnings
 
+LOCAL_DEX_PREOPT := false
+
 include $(BUILD_PACKAGE)

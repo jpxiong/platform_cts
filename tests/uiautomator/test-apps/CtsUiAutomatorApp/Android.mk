@@ -28,4 +28,6 @@ LOCAL_STATIC_JAVA_LIBRARIES = android-support-v4
 
 LOCAL_PROGUARD_ENABLED := disabled
 
+LOCAL_DEX_PREOPT := false
+
 include $(BUILD_PACKAGE)
