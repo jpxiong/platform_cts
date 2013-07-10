@@ -22,18 +22,24 @@ CTS_AUDIO_TOP:= $(call my-dir)
 CTS_AUDIO_INSTALL_DIR := $(HOST_OUT)/cts-audio-quality/android-cts-audio-quality
 CTS_AUDIO_QUALITY_ZIP := $(HOST_OUT)/cts-audio-quality/android-cts-audio-quality.zip
 
-$(CTS_AUDIO_QUALITY_ZIP): cts_audio_quality_test cts_audio_quality \
-  CtsAudioClient $(CTS_AUDIO_TOP)/test_description
-	$(hide) mkdir -p $(CTS_AUDIO_INSTALL_DIR)
+cts_audio_quality_client_apk := $(TARGET_OUT_DATA_APPS)/CtsAudioClient.apk
+cts_audio_quality_host_bins := $(HOST_OUT)/bin/cts_audio_quality_test $(HOST_OUT)/bin/cts_audio_quality
+$(CTS_AUDIO_QUALITY_ZIP): PRIVATE_CLIENT_APK := $(cts_audio_quality_client_apk)
+$(CTS_AUDIO_QUALITY_ZIP): PRIVATE_HOST_BINS := $(cts_audio_quality_host_bins)
+$(CTS_AUDIO_QUALITY_ZIP): PRIVATE_TEST_DESC := $(CTS_AUDIO_TOP)/test_description
+$(CTS_AUDIO_QUALITY_ZIP): $(cts_audio_quality_client_apk) $(cts_audio_quality_host_bins) \
+    $(CTS_AUDIO_TOP)/test_description | $(ACP)
 	$(hide) mkdir -p $(CTS_AUDIO_INSTALL_DIR)/client
-	$(hide) $(ACP) -fp $(PRODUCT_OUT)/data/app/CtsAudioClient.apk \
+	$(hide) $(ACP) -fp $(PRIVATE_CLIENT_APK) \
         $(CTS_AUDIO_INSTALL_DIR)/client
-	$(hide) $(ACP) -fp $(HOST_OUT)/bin/cts_audio_quality_test $(CTS_AUDIO_INSTALL_DIR)
-	$(hide) $(ACP) -fp $(HOST_OUT)/bin/cts_audio_quality $(CTS_AUDIO_INSTALL_DIR)
-	$(hide) $(ACP) -fr $(CTS_AUDIO_TOP)/test_description $(CTS_AUDIO_INSTALL_DIR)
+	$(hide) $(ACP) -fp $(PRIVATE_HOST_BINS) $(CTS_AUDIO_INSTALL_DIR)
+	$(hide) $(ACP) -fr $(PRIVATE_TEST_DESC) $(CTS_AUDIO_INSTALL_DIR)
 	$(hide) echo "Package cts_audio: $@"
-	$(hide) cd $(HOST_OUT)/cts-audio-quality && \
-        zip -rq android-cts-audio-quality.zip android-cts-audio-quality -x android-cts-audio-quality/reports/\*
+	$(hide) cd $(dir $@) && \
+        zip -rq $(notdir $@) android-cts-audio-quality -x android-cts-audio-quality/reports/\*
+
+cts_audio_quality_client_apk :=
+cts_audio_quality_host_bins :=
 
 # target to build only this package
 .PHONY: cts_audio_quality_package
