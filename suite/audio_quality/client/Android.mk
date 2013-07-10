@@ -30,4 +30,6 @@ LOCAL_PROGUARD_FLAG_FILES := proguard.cfg
 # intentional to keep compatibility with ICS
 LOCAL_SDK_VERSION := 15
 
+LOCAL_DEX_PREOPT := false
+
 include $(BUILD_PACKAGE)

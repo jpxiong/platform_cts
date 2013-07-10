@@ -32,6 +32,8 @@ LOCAL_PROGUARD_FLAG_FILES := proguard.flags
 
 LOCAL_SDK_VERSION := current
 
+LOCAL_DEX_PREOPT := false
+
 include $(BUILD_PACKAGE)
 
 # Builds and launches CTS Verifier on a device.
