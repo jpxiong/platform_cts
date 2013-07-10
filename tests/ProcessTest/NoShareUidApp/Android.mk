@@ -26,5 +26,6 @@ LOCAL_SRC_FILES := $(call all-subdir-java-files)
 LOCAL_PACKAGE_NAME := NoShareUidApp
 
 LOCAL_PROGUARD_ENABLED := disabled
+LOCAL_DEX_PREOPT := false
 
 include $(BUILD_PACKAGE)
