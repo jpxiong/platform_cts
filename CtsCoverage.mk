@@ -43,7 +43,7 @@ $(cts-test-coverage-report) : $(cts_coverage_test_cases_dependencies) $(cts_api_
 	$(call generate-coverage-report,"CTS Tests API Coverage Report",\
 			$(PRIVATE_TEST_CASES_APKS),html,test-coverage.html)
 
-cts_coverage_test_cases_dependencies := $(call intermediates-dir-for,APPS,CtsVerifier)
+cts_coverage_test_cases_dependencies := $(call intermediates-dir-for,APPS,CtsVerifier)/package.apk
 $(cts-test-coverage-report) : PRIVATE_TEST_CASES_APKS := $(cts_coverage_test_cases_dependencies)
 $(cts-verifier-coverage-report) : $(cts_coverage_test_cases_dependencies) $(cts_api_coverage_dependencies) | $(ACP)
 	$(call generate-coverage-report,"CTS Verifier API Coverage Report",\
