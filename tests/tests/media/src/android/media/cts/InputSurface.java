@@ -142,6 +142,13 @@ class InputSurface {
         }
     }
 
+    public void makeUnCurrent() {
+        if (!EGL14.eglMakeCurrent(mEGLDisplay, EGL14.EGL_NO_SURFACE, EGL14.EGL_NO_SURFACE,
+                EGL14.EGL_NO_CONTEXT)) {
+            throw new RuntimeException("eglMakeCurrent failed");
+        }
+    }
+
     /**
      * Calls eglSwapBuffers.  Use this to "publish" the current frame.
      */
@@ -154,6 +161,24 @@ class InputSurface {
      */
     public Surface getSurface() {
         return mSurface;
+    }
+
+    /**
+     * Queries the surface's width.
+     */
+    public int getWidth() {
+        int[] value = new int[1];
+        EGL14.eglQuerySurface(mEGLDisplay, mEGLSurface, EGL14.EGL_WIDTH, value, 0);
+        return value[0];
+    }
+
+    /**
+     * Queries the surface's height.
+     */
+    public int getHeight() {
+        int[] value = new int[1];
+        EGL14.eglQuerySurface(mEGLDisplay, mEGLSurface, EGL14.EGL_HEIGHT, value, 0);
+        return value[0];
     }
 
     /**
