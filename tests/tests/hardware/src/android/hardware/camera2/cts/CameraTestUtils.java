@@ -20,16 +20,19 @@ import android.graphics.ImageFormat;
 import android.hardware.camera2.CameraDevice;
 import android.hardware.camera2.CameraMetadata;
 import android.hardware.camera2.CameraProperties;
+import android.hardware.camera2.CameraPropertiesKeys;
 import android.hardware.camera2.Size;
 import android.media.Image;
 import android.media.Image.Plane;
+import android.os.ConditionVariable;
+import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
 
 import junit.framework.Assert;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.lang.reflect.Array;
 import java.nio.ByteBuffer;
 import java.util.Arrays;
 
@@ -39,34 +42,11 @@ import java.util.Arrays;
 class CameraTestUtils extends Assert {
     private static final String TAG = "CameraTestUtils";
     private static final boolean VERBOSE = Log.isLoggable(TAG, Log.VERBOSE);
+    // Timeout for initializing looper and opening camera in Milliseconds.
+    private static final int WAIT_FOR_COMMAND_TO_COMPLETE = 5000;
 
-    public static <T> void assertArrayNotEmpty(T arr, String message) {
-        assertTrue(message, arr != null && Array.getLength(arr) > 0);
-    }
-
-    /**
-     * Check if the format is a legal YUV format camera supported.
-     */
-    public static void checkYuvFormat(int format) {
-        if ((format != ImageFormat.YUV_420_888) &&
-                (format != ImageFormat.NV21) &&
-                (format != ImageFormat.YV12) &&
-                (format != ImageFormat.Y8) &&
-                (format != ImageFormat.Y16)) {
-            fail("Wrong formats: " + format);
-        }
-    }
-
-    /**
-     * Check if image size and format match given size and format.
-     */
-    public static void checkImage(Image image, int width, int height, int format) {
-        assertNotNull("Input image is invalid", image);
-        assertEquals("Format doesn't match", format, image.getFormat());
-        assertEquals("Width doesn't match", width, image.getWidth());
-        assertEquals("Height doesn't match", height, image.getHeight());
-    }
-
+    private Looper mLooper = null;
+    private Handler mHandler = null;
     /**
      * <p>Read data from all planes of an Image into a contiguous unpadded, unpacked
      * 1-D linear byte array, such that it can be write into disk, or accessed by
@@ -136,7 +116,7 @@ class CameraTestUtils extends Assert {
                     offset += length;
                 } else {
                     // Generic case: should work for any pixelStride but slower.
-                    // Use intermediate buffer to avoid read byte-by-byte from
+                    // Use use intermediate buffer to avoid read byte-by-byte from
                     // DirectByteBuffer, which is very bad for performance
                     buffer.get(rowData, 0, rowStride);
                     for (int col = 0; col < w; col++) {
@@ -199,14 +179,14 @@ class CameraTestUtils extends Assert {
         assertNotNull("Can't get camera properties!", properties);
         switch (format) {
             case ImageFormat.JPEG:
-                key = CameraProperties.SCALER_AVAILABLE_JPEG_SIZES;
+                key = CameraPropertiesKeys.Scaler.AVAILABLE_JPEG_SIZES;
                 break;
             case ImageFormat.YUV_420_888:
             case ImageFormat.YV12:
             case ImageFormat.NV21:
             case ImageFormat.Y8:
             case ImageFormat.Y16:
-                key = CameraProperties.SCALER_AVAILABLE_PROCESSED_SIZES;
+                key = CameraPropertiesKeys.Scaler.AVAILABLE_PROCESSED_SIZES;
                 break;
             default:
                 throw new UnsupportedOperationException(
@@ -215,5 +195,60 @@ class CameraTestUtils extends Assert {
         Size[] availableSizes = properties.get(key);
         if (VERBOSE) Log.v(TAG, "Supported sizes are: " + Arrays.deepToString(availableSizes));
         return availableSizes;
+    }
+
+    /**
+     * Create a message looper thread so that it can be used to receive the
+     * camera test callback messages.
+     */
+    public void createLooperThread() throws Exception {
+        if (mLooper != null || mHandler !=null) {
+            Log.w(TAG, "Looper thread already exist");
+            return;
+        }
+
+        final ConditionVariable startDone = new ConditionVariable();
+        new Thread() {
+            @Override
+            public void run() {
+                if (VERBOSE) Log.v(TAG, "start loopRun");
+                // Set up a looper to be used by camera.
+                Looper.prepare();
+                // Save the looper so that we can terminate this thread
+                // after we are done with it.
+                mLooper = Looper.myLooper();
+                mHandler = new Handler();
+                startDone.open();
+                Looper.loop();
+                if (VERBOSE) Log.v(TAG, "createLooperThread: finished");
+            }
+        }.start();
+
+        if (VERBOSE) Log.v(TAG, "start waiting for looper");
+        if (!startDone.block(WAIT_FOR_COMMAND_TO_COMPLETE)) {
+            fail("createLooperThread: start timeout");
+        }
+    }
+
+    /**
+     * Terminates the message looper thread.
+     */
+    public void terminateLoopThread() throws Exception {
+        if (mLooper == null || mHandler ==null) {
+            Log.w(TAG, "Looper thread doesn't exist");
+            return;
+        }
+        if (VERBOSE) Log.v(TAG, "Terminate looper thread");
+        mLooper.quit();
+        mLooper.getThread().join();
+        mLooper = null;
+        mHandler = null;
+    }
+
+    public Handler getHandler() {
+        if (mHandler == null) {
+            throw new IllegalStateException("Looper thread isn't created yet!");
+        }
+        return mHandler;
     }
 }

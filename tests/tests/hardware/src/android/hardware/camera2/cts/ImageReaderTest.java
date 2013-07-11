@@ -16,8 +16,6 @@
 
 package android.hardware.camera2.cts;
 
-import static android.hardware.camera2.cts.CameraTestUtils.*;
-
 import android.content.Context;
 import android.graphics.BitmapFactory;
 import android.graphics.ImageFormat;
@@ -29,12 +27,14 @@ import android.hardware.camera2.CaptureRequest;
 import android.hardware.camera2.Size;
 import android.media.Image;
 import android.media.ImageReader;
+import android.os.ConditionVariable;
 import android.os.Environment;
 import android.os.Handler;
 import android.test.AndroidTestCase;
 import android.util.Log;
 import android.view.Surface;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -59,15 +59,15 @@ public class ImageReaderTest extends AndroidTestCase {
     // TODO: Need extend it to bigger number
     private static final int NUM_FRAME_VERIFIED = 1;
     // Max number of images can be accessed simultaneously from ImageReader.
-    private static final int MAX_NUM_IMAGES = 5;
+    private static final int MAX_NUM_IMAGES = 1;
 
     private CameraManager mCameraManager;
     private CameraDevice mCamera;
     private String[] mCameraIds;
     private ImageReader mReader = null;
+    private CameraTestUtils mTestUtil = null;
     private Handler mHandler = null;
     private SimpleImageListener mListener = null;
-    private CameraTestThread mLooperThread = null;
 
     @Override
     public void setContext(Context context) {
@@ -79,9 +79,10 @@ public class ImageReaderTest extends AndroidTestCase {
     @Override
     protected void setUp() throws Exception {
         super.setUp();
-        mCameraIds = mCameraManager.getCameraIdList();
-        mLooperThread = new CameraTestThread();
-        mHandler = mLooperThread.start();
+        mCameraIds = mCameraManager.getDeviceIdList();
+        mTestUtil = new CameraTestUtils();
+        mTestUtil.createLooperThread();
+        mHandler = mTestUtil.getHandler();
     }
 
     @Override
@@ -94,7 +95,8 @@ public class ImageReaderTest extends AndroidTestCase {
             mReader.close();
             mReader = null;
         }
-        mLooperThread.close();
+        mTestUtil.terminateLoopThread();
+        mTestUtil = null;
         mHandler = null;
         super.tearDown();
     }
@@ -137,18 +139,14 @@ public class ImageReaderTest extends AndroidTestCase {
          * to int[]. It'll also be nice to put this into a helper function and
          * move to util class.
          */
-        // Comment out below check to work around b/10406212.
-        /*
         int[] availableFormats = properties.get(CameraProperties.SCALER_AVAILABLE_FORMATS);
-        assertArrayNotEmpty(availableFormats,
-                "availableFormats should not be empty");
+        assertArrayNotEmpty(availableFormats, "availableFormats should not be empty");
         Arrays.sort(availableFormats);
         assertTrue("Can't find the format " + format + " in supported formats " +
                 Arrays.toString(availableFormats),
                 Arrays.binarySearch(availableFormats, format) >= 0);
-        */
 
-        Size[] availableSizes = getSupportedSizeForFormat(format, mCamera);
+        Size[] availableSizes = CameraTestUtils.getSupportedSizeForFormat(format, mCamera);
         assertArrayNotEmpty(availableSizes, "availableSizes should not be empty");
 
         // for each resolution, test imageReader:
@@ -220,12 +218,11 @@ public class ImageReaderTest extends AndroidTestCase {
         outputSurfaces.add(surface);
         mCamera.configureOutputs(outputSurfaces);
 
-        CaptureRequest.Builder captureBuilder =
-                mCamera.createCaptureRequest(CameraDevice.TEMPLATE_PREVIEW);
-        assertNotNull("Fail to get captureRequest", captureBuilder);
-        captureBuilder.addTarget(mReader.getSurface());
+        CaptureRequest captureRequest = mCamera.createCaptureRequest(CameraDevice.TEMPLATE_PREVIEW);
+        assertNotNull("Fail to get captureRequest", captureRequest);
+        captureRequest.addTarget(mReader.getSurface());
 
-        return captureBuilder.build();
+        return captureRequest;
     }
 
     private void captureAndValidateImage(CaptureRequest request,
@@ -236,9 +233,9 @@ public class ImageReaderTest extends AndroidTestCase {
         // Only verify single image for still capture
         if (format == ImageFormat.JPEG) {
             captureCount = 1;
-            mCamera.capture(request, null, null);
+            mCamera.capture(request, null);
         } else {
-            mCamera.setRepeatingRequest(request, null, null);
+            mCamera.setRepeatingRequest(request, null);
         }
 
         for (int i = 0; i < captureCount; i++) {
@@ -286,7 +283,10 @@ public class ImageReaderTest extends AndroidTestCase {
     }
 
     private void validateImage(Image image, int width, int height, int format) {
-        checkImage(image, width, height, format);
+        assertNotNull("Input image is invalid", image);
+        assertEquals("Format doesn't match", format, image.getFormat());
+        assertEquals("Width doesn't match", width, image.getWidth());
+        assertEquals("Height doesn't match", height, image.getHeight());
 
         /**
          * TODO: validate timestamp:
@@ -295,7 +295,7 @@ public class ImageReaderTest extends AndroidTestCase {
          * 2. timestamps should be monotonically increasing for different requests
          */
         if(VERBOSE) Log.v(TAG, "validating Image");
-        byte[] data = getDataFromImage(image);
+        byte[] data = CameraTestUtils.getDataFromImage(image);
         assertTrue("Invalid image data", data != null && data.length > 0);
 
         if (format == ImageFormat.JPEG) {
@@ -321,12 +321,18 @@ public class ImageReaderTest extends AndroidTestCase {
         if (DUMP_FILE) {
             String fileName =
                     DEBUG_FILE_NAME_BASE + width + "x" + height + ".yuv";
-            dumpFile(fileName, jpegData);
+            CameraTestUtils.dumpFile(fileName, jpegData);
         }
     }
 
     private void validateYuvData(byte[] yuvData, int width, int height, int format, long ts) {
-        checkYuvFormat(format);
+        if ((format != ImageFormat.YUV_420_888) &&
+                (format != ImageFormat.NV21) &&
+                (format != ImageFormat.YV12) &&
+                (format != ImageFormat.Y8) &&
+                (format != ImageFormat.Y16)) {
+            fail("Wrong formats: " + format);
+        }
         if (VERBOSE) Log.v(TAG, "Validating YUV data");
         int expectedSize = width * height * ImageFormat.getBitsPerPixel(format) / 8;
         assertEquals("Yuv data doesn't match", expectedSize, yuvData.length);
@@ -336,7 +342,11 @@ public class ImageReaderTest extends AndroidTestCase {
         if (DUMP_FILE) {
             String fileName =
                     DEBUG_FILE_NAME_BASE + "/" + width + "x" + height + "_" + ts / 1e6 + ".yuv";
-            dumpFile(fileName, yuvData);
+            CameraTestUtils.dumpFile(fileName, yuvData);
         }
+    }
+
+    private <T> void assertArrayNotEmpty(T arr, String message) {
+        assertTrue(message, arr != null && Array.getLength(arr) > 0);
     }
 }
