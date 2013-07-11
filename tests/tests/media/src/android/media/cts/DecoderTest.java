@@ -294,12 +294,25 @@ public class DecoderTest extends MediaPlayerTestBase {
     public void testCodecBasicVP8() throws Exception {
         Surface s = getActivity().getSurfaceHolder().getSurface();
         int frames1 = countFrames(
-                R.raw.video_480x360_mp4_vp8_333kbps_25fps_aac_stereo_128kbps_44100hz,
+                R.raw.video_480x360_webm_vp8_333kbps_25fps_vorbis_stereo_128kbps_44100hz,
                 false, -1, s);
         assertEquals("wrong number of frames decoded", 240, frames1);
 
         int frames2 = countFrames(
-                R.raw.video_480x360_mp4_vp8_333kbps_25fps_aac_stereo_128kbps_44100hz,
+                R.raw.video_480x360_webm_vp8_333kbps_25fps_vorbis_stereo_128kbps_44100hz,
+                false, -1, null);
+        assertEquals("different number of frames when using Surface", frames1, frames2);
+    }
+
+    public void testCodecBasicVP9() throws Exception {
+        Surface s = getActivity().getSurfaceHolder().getSurface();
+        int frames1 = countFrames(
+                R.raw.video_480x360_webm_vp9_333kbps_25fps_vorbis_stereo_128kbps_44100hz,
+                false, -1, s);
+        assertEquals("wrong number of frames decoded", 240, frames1);
+
+        int frames2 = countFrames(
+                R.raw.video_480x360_webm_vp9_333kbps_25fps_vorbis_stereo_128kbps_44100hz,
                 false, -1, null);
         assertEquals("different number of frames when using Surface", frames1, frames2);
     }
@@ -331,7 +344,15 @@ public class DecoderTest extends MediaPlayerTestBase {
     public void testCodecEarlyEOSVP8() throws Exception {
         Surface s = getActivity().getSurfaceHolder().getSurface();
         int frames1 = countFrames(
-                R.raw.video_480x360_mp4_vp8_333kbps_25fps_aac_stereo_128kbps_44100hz,
+                R.raw.video_480x360_webm_vp8_333kbps_25fps_vorbis_stereo_128kbps_44100hz,
+                false, 120, s);
+        assertEquals("wrong number of frames decoded", 120, frames1);
+    }
+
+    public void testCodecEarlyEOSVP9() throws Exception {
+        Surface s = getActivity().getSurfaceHolder().getSurface();
+        int frames1 = countFrames(
+                R.raw.video_480x360_webm_vp9_333kbps_25fps_vorbis_stereo_128kbps_44100hz,
                 false, 120, s);
         assertEquals("wrong number of frames decoded", 120, frames1);
     }
@@ -371,15 +392,25 @@ public class DecoderTest extends MediaPlayerTestBase {
 
     public void testCodecReconfigVP8WithoutSurface() throws Exception {
         testCodecReconfig(
-                R.raw.video_480x360_mp4_vp8_333kbps_25fps_aac_stereo_128kbps_44100hz, null);
+                R.raw.video_480x360_webm_vp8_333kbps_25fps_vorbis_stereo_128kbps_44100hz, null);
     }
 
     public void testCodecReconfigVP8WithSurface() throws Exception {
         Surface s = getActivity().getSurfaceHolder().getSurface();
         testCodecReconfig(
-                R.raw.video_480x360_mp4_vp8_333kbps_25fps_aac_stereo_128kbps_44100hz, s);
+                R.raw.video_480x360_webm_vp8_333kbps_25fps_vorbis_stereo_128kbps_44100hz, s);
     }
 
+    public void testCodecReconfigVP9WithoutSurface() throws Exception {
+        testCodecReconfig(
+                R.raw.video_480x360_webm_vp9_333kbps_25fps_vorbis_stereo_128kbps_44100hz, null);
+    }
+
+    public void testCodecReconfigVP9WithSurface() throws Exception {
+        Surface s = getActivity().getSurfaceHolder().getSurface();
+        testCodecReconfig(
+                R.raw.video_480x360_webm_vp9_333kbps_25fps_vorbis_stereo_128kbps_44100hz, s);
+    }
 //    public void testCodecReconfigOgg() throws Exception {
 //        testCodecReconfig(R.raw.sinesweepogg, null);
 //    }
@@ -408,7 +439,9 @@ public class DecoderTest extends MediaPlayerTestBase {
             } else if (mime.contains("mp4v")) {
                 return MediaCodec.createByCodecName("OMX.google.mpeg4.decoder");
             } else if (mime.contains("vp8")) {
-                return MediaCodec.createByCodecName("OMX.google.vpx.decoder");
+                return MediaCodec.createByCodecName("OMX.google.vp8.decoder");
+            } else if (mime.contains("vp9")) {
+                return MediaCodec.createByCodecName("OMX.google.vp9.decoder");
             }
         }
         return MediaCodec.createDecoderByType(mime);
@@ -587,10 +620,18 @@ public class DecoderTest extends MediaPlayerTestBase {
 
     public void testEOSBehaviorVP8() throws Exception {
         // this video has an I frame at 46
-        testEOSBehavior(R.raw.video_480x360_mp4_vp8_333kbps_25fps_aac_stereo_128kbps_44100hz, 46);
-        testEOSBehavior(R.raw.video_480x360_mp4_vp8_333kbps_25fps_aac_stereo_128kbps_44100hz, 47);
-        testEOSBehavior(R.raw.video_480x360_mp4_vp8_333kbps_25fps_aac_stereo_128kbps_44100hz, 57);
-        testEOSBehavior(R.raw.video_480x360_mp4_vp8_333kbps_25fps_aac_stereo_128kbps_44100hz, 45);
+        testEOSBehavior(R.raw.video_480x360_webm_vp8_333kbps_25fps_vorbis_stereo_128kbps_44100hz, 46);
+        testEOSBehavior(R.raw.video_480x360_webm_vp8_333kbps_25fps_vorbis_stereo_128kbps_44100hz, 47);
+        testEOSBehavior(R.raw.video_480x360_webm_vp8_333kbps_25fps_vorbis_stereo_128kbps_44100hz, 57);
+        testEOSBehavior(R.raw.video_480x360_webm_vp8_333kbps_25fps_vorbis_stereo_128kbps_44100hz, 45);
+    }
+
+    public void testEOSBehaviorVP9() throws Exception {
+        // this video has an I frame at 44
+        testEOSBehavior(R.raw.video_480x360_webm_vp9_333kbps_25fps_vorbis_stereo_128kbps_44100hz, 44);
+        testEOSBehavior(R.raw.video_480x360_webm_vp9_333kbps_25fps_vorbis_stereo_128kbps_44100hz, 45);
+        testEOSBehavior(R.raw.video_480x360_webm_vp9_333kbps_25fps_vorbis_stereo_128kbps_44100hz, 55);
+        testEOSBehavior(R.raw.video_480x360_webm_vp9_333kbps_25fps_vorbis_stereo_128kbps_44100hz, 43);
     }
 
     private void testEOSBehavior(int movie, int stopatsample) throws Exception {

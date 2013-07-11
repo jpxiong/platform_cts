@@ -241,6 +241,7 @@ public class MediaCodecListTest extends AndroidTestCase {
         list.add(new CodecType("video/3gpp", true));            // h263 encoder
         list.add(new CodecType("video/mp4v-es", false));        // m4v decoder
         list.add(new CodecType("video/x-vnd.on2.vp8", false));  // vp8 decoder
+        list.add(new CodecType("video/x-vnd.on2.vp9", false));  // vp9 decoder
 
         return list;
     }
