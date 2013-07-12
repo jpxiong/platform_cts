@@ -21,6 +21,7 @@ import com.android.cts.stub.R;
 import android.content.ContentResolver;
 import android.content.ContentUris;
 import android.content.ContentValues;
+import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Environment;
@@ -30,6 +31,8 @@ import android.provider.MediaStore.MediaColumns;
 import android.test.AndroidTestCase;
 
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 
 public class MediaStore_FilesTest extends AndroidTestCase {
@@ -147,6 +150,133 @@ public class MediaStore_FilesTest extends AndroidTestCase {
             mResolver.delete(fileUri, null, null);
             new File(fileName).delete();
             new File(fileDir).delete();
+        }
+    }
+
+    public void testAccess() throws IOException {
+        // clean up from previous run
+        mResolver.delete(MediaStore.Images.Media.INTERNAL_CONTENT_URI,
+                "_data NOT LIKE ?", new String[] { "/system/%" } );
+
+        // insert some dummy starter data into the provider
+        ContentValues values = new ContentValues();
+        values.put(MediaStore.Images.Media.DISPLAY_NAME, "My Bitmap");
+        values.put(MediaStore.Images.Media.MIME_TYPE, "image/jpeg");
+        values.put(MediaStore.Images.Media.DATA, "/foo/bar/dummy.jpg");
+        Uri uri = mResolver.insert(MediaStore.Images.Media.INTERNAL_CONTENT_URI, values);
+
+        // point _data at directory and try to get an fd for it
+        values = new ContentValues();
+        values.put("_data", "/data/media");
+        mResolver.update(uri, values, null, null);
+        ParcelFileDescriptor pfd = null;
+        try {
+            pfd = mResolver.openFileDescriptor(uri, "r");
+            pfd.close();
+            fail("shouldn't be here");
+        } catch (FileNotFoundException e) {
+            // expected
+        }
+
+        // try to create a file in a place we don't have access to
+        values = new ContentValues();
+        values.put("_data", "/data/media/test.dat");
+        mResolver.update(uri, values, null, null);
+        try {
+            pfd = mResolver.openFileDescriptor(uri, "w");
+            pfd.close();
+            fail("shouldn't be here");
+        } catch (FileNotFoundException e) {
+            // expected
+        }
+        // read file back
+        try {
+            pfd = mResolver.openFileDescriptor(uri, "r");
+            pfd.close();
+            fail("shouldn't be here");
+        } catch (FileNotFoundException e) {
+            // expected
+        }
+
+        // point _data at media database and read it
+        values = new ContentValues();
+        values.put("_data", "/data/data/com.android.providers.media/databases/internal.db");
+        mResolver.update(uri, values, null, null);
+        try {
+            pfd = mResolver.openFileDescriptor(uri, "r");
+            pfd.close();
+            fail("shouldn't be here");
+        } catch (FileNotFoundException e) {
+            // expected
+        }
+
+        // Insert a private file into the database. Since it's private, the media provider won't
+        // be able to open it
+        FileOutputStream fos = mContext.openFileOutput("dummy.dat", Context.MODE_PRIVATE);
+        fos.write(0);
+        fos.close();
+        File path = mContext.getFileStreamPath("dummy.dat");
+        values = new ContentValues();
+        values.put("_data", path.getAbsolutePath());
+
+        mResolver.update(uri, values, null, null);
+        try {
+            pfd = mResolver.openFileDescriptor(uri, "r");
+            pfd.close();
+            fail("shouldn't be here");
+        } catch (FileNotFoundException e) {
+            // expected
+        }
+        // now make the file world-readable
+        fos = mContext.openFileOutput("dummy.dat", Context.MODE_WORLD_READABLE);
+        fos.write(0);
+        fos.close();
+        try {
+            pfd = mResolver.openFileDescriptor(uri, "r");
+            pfd.close();
+        } catch (FileNotFoundException e) {
+            fail("failed to open file");
+        }
+        path.delete();
+
+        File sdfile = null;
+        if (Environment.isExternalStorageEmulated()) {
+            // create file on sdcard and check access via real path
+            String fileDir = Environment.getExternalStorageDirectory() +
+                    "/" + getClass().getCanonicalName() + "/test.mp3";
+            sdfile = new File(fileDir);
+            writeFile(R.raw.testmp3, sdfile.getCanonicalPath());
+            assertTrue(sdfile.exists());
+            values = new ContentValues();
+            values.put("_data", sdfile.getCanonicalPath());
+            mResolver.update(uri, values, null, null);
+            try {
+                pfd = mResolver.openFileDescriptor(uri, "r");
+
+                // get the real path from the file descriptor
+                File real = new File("/proc/self/fd/" + pfd.getFd());
+                values = new ContentValues();
+                values.put("_data", real.getCanonicalPath());
+                mResolver.update(uri, values, null, null);
+                pfd.close();
+
+                // we shouldn't be able to access this
+                try {
+                    pfd = mResolver.openFileDescriptor(uri, "r");
+                    pfd.close();
+                    fail("shouldn't be here");
+                } catch (FileNotFoundException e) {
+                    // expected
+                }
+            } catch (FileNotFoundException e) {
+                fail("couldn't open file");
+            }
+        }
+
+        // clean up
+        assertEquals(1, mResolver.delete(uri, null, null));
+        if (sdfile != null) {
+            sdfile.delete();
         }
     }
 
