@@ -22,11 +22,13 @@ import android.renderscript.RSRuntimeException;
 
 public class TruncTest extends RSBaseCompute {
     private ScriptC_trunc_f32 script_f32;
+    private ScriptC_trunc_f32_relaxed script_f32_relaxed;
 
     @Override
     protected void setUp() throws Exception {
         super.setUp();
         script_f32 = new ScriptC_trunc_f32(mRS);
+        script_f32_relaxed = new ScriptC_trunc_f32_relaxed(mRS);
     }
 
     @Override
@@ -43,6 +45,19 @@ public class TruncTest extends RSBaseCompute {
             break;
         case TEST_F32_4:
             script_f32.forEach_trunc_f32_4(mIn, mOut);
+            break;
+
+        case TEST_RELAXED_F32:
+            script_f32_relaxed.forEach_trunc_f32_1(mIn, mOut);
+            break;
+        case TEST_RELAXED_F32_2:
+            script_f32_relaxed.forEach_trunc_f32_2(mIn, mOut);
+            break;
+        case TEST_RELAXED_F32_3:
+            script_f32_relaxed.forEach_trunc_f32_3(mIn, mOut);
+            break;
+        case TEST_RELAXED_F32_4:
+            script_f32_relaxed.forEach_trunc_f32_4(mIn, mOut);
             break;
         }
     }
@@ -72,11 +87,19 @@ public class TruncTest extends RSBaseCompute {
         doF32(0x12345678, 0);
     }
 
+    public void testTruncF32_relaxed() {
+        doF32_relaxed(0x12345678, 0);
+    }
+
     /**
      * trunc test for float2
      */
     public void testTruncF32_2() {
         doF32_2(0x12345a78, 0);
+    }
+
+    public void testTruncF32_2_relaxed() {
+        doF32_2_relaxed(0x12345a78, 0);
     }
 
     /**
@@ -86,10 +109,19 @@ public class TruncTest extends RSBaseCompute {
         doF32_3(0x12f45678, 0);
     }
 
+    public void testTruncF32_3_relaxed() {
+        doF32_3_relaxed(0x12f45678, 0);
+    }
+
     /**
      * trunc test for float4
      */
     public void testTruncF32_4() {
         doF32_4(0x123c5678, 0);
     }
+
+    public void testTruncF32_4_relaxed() {
+        doF32_4_relaxed(0x123c5678, 0);
+    }
+
 }

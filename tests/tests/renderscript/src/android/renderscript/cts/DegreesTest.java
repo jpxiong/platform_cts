@@ -22,11 +22,13 @@ import android.renderscript.RSRuntimeException;
 
 public class DegreesTest extends RSBaseCompute {
     private ScriptC_degrees_f32 script_f32;
+    private ScriptC_degrees_f32_relaxed script_f32_relaxed;
 
     @Override
     protected void setUp() throws Exception {
         super.setUp();
         script_f32 = new ScriptC_degrees_f32(mRS);
+        script_f32_relaxed = new ScriptC_degrees_f32_relaxed(mRS);
     }
 
     @Override
@@ -43,6 +45,19 @@ public class DegreesTest extends RSBaseCompute {
             break;
         case TEST_F32_4:
             script_f32.forEach_degrees_f32_4(mIn, mOut);
+            break;
+
+        case TEST_RELAXED_F32:
+            script_f32_relaxed.forEach_degrees_f32_1(mIn, mOut);
+            break;
+        case TEST_RELAXED_F32_2:
+            script_f32_relaxed.forEach_degrees_f32_2(mIn, mOut);
+            break;
+        case TEST_RELAXED_F32_3:
+            script_f32_relaxed.forEach_degrees_f32_3(mIn, mOut);
+            break;
+        case TEST_RELAXED_F32_4:
+            script_f32_relaxed.forEach_degrees_f32_4(mIn, mOut);
             break;
         }
     }
@@ -68,11 +83,19 @@ public class DegreesTest extends RSBaseCompute {
         doF32(0x12345678, 3);
     }
 
+    public void testDegreesF32_relaxed() {
+        doF32_relaxed(0x12345678, 3);
+    }
+
     /**
      * degrees test for float2
      */
     public void testDegreesF32_2() {
         doF32_2(0x12353678, 3);
+    }
+
+    public void testDegreesF32_2_relaxed() {
+        doF32_2_relaxed(0x12353678, 3);
     }
 
     /**
@@ -82,10 +105,19 @@ public class DegreesTest extends RSBaseCompute {
         doF32_3(0x12312678, 3);
     }
 
+    public void testDegreesF32_3_relaxed() {
+        doF32_3_relaxed(0x12312678, 3);
+    }
+
     /**
      * degrees test for float4
      */
     public void testDegreesF32_4() {
         doF32_4(0x12675678, 3);
+
     }
+    public void testDegreesF32_4_relaxed() {
+        doF32_4_relaxed(0x12675678, 3);
+    }
+
 }

@@ -32,6 +32,10 @@ class RSBaseCompute extends RSBase {
     static final int TEST_F32_2 = 1;
     static final int TEST_F32_3 = 2;
     static final int TEST_F32_4 = 3;
+    static final int TEST_RELAXED_F32 = 4;
+    static final int TEST_RELAXED_F32_2 = 5;
+    static final int TEST_RELAXED_F32_3 = 6;
+    static final int TEST_RELAXED_F32_4 = 7;
     protected int INPUTSIZE = 512;
 
     @Override
@@ -119,6 +123,23 @@ class RSBaseCompute extends RSBase {
     public void doF32_4(long seed, int ulp) {
         baseTestHelper(TEST_F32_4, Element.F32_4(mRS), Element.F32_4(mRS), seed, 1, 0, 1, 0, 4, 4, 4, 0, ulp);
     }
+
+    public void doF32_relaxed(long seed, int ulp) {
+        baseTestHelper(TEST_RELAXED_F32, Element.F32(mRS), Element.F32(mRS), seed, 1, 0, 1, 0, 1, 1, 1, 0, ulp);
+    }
+
+    public void doF32_2_relaxed(long seed, int ulp) {
+        baseTestHelper(TEST_RELAXED_F32_2, Element.F32_2(mRS), Element.F32_2(mRS), seed, 1, 0, 1, 0, 2, 2, 2, 0, ulp);
+    }
+
+    public void doF32_3_relaxed(long seed, int ulp) {
+        baseTestHelper(TEST_RELAXED_F32_3, Element.F32_3(mRS), Element.F32_3(mRS), seed, 1, 0, 4, 1, 3, 4, 4, 1, ulp);
+    }
+
+    public void doF32_4_relaxed(long seed, int ulp) {
+        baseTestHelper(TEST_RELAXED_F32_4, Element.F32_4(mRS), Element.F32_4(mRS), seed, 1, 0, 1, 0, 4, 4, 4, 0, ulp);
+    }
+
 
     public void forEach(int testId, Allocation mIn, Allocation mOut) throws RSRuntimeException {
         // Intentionally empty... subclass will likely define only one, but not both

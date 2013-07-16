@@ -22,11 +22,13 @@ import com.android.cts.stub.R;
 
 public class Exp2Test extends RSBaseCompute {
     private ScriptC_exp2_f32 script_f32;
+    private ScriptC_exp2_f32_relaxed script_f32_relaxed;
 
     @Override
     protected void setUp() throws Exception {
         super.setUp();
         script_f32 = new ScriptC_exp2_f32(mRS);
+        script_f32_relaxed = new ScriptC_exp2_f32_relaxed(mRS);
     }
 
     @Override
@@ -43,6 +45,19 @@ public class Exp2Test extends RSBaseCompute {
             break;
         case TEST_F32_4:
             script_f32.forEach_exp2_f32_4(mIn, mOut);
+            break;
+
+        case TEST_RELAXED_F32:
+            script_f32_relaxed.forEach_exp2_f32_1(mIn, mOut);
+            break;
+        case TEST_RELAXED_F32_2:
+            script_f32_relaxed.forEach_exp2_f32_2(mIn, mOut);
+            break;
+        case TEST_RELAXED_F32_3:
+            script_f32_relaxed.forEach_exp2_f32_3(mIn, mOut);
+            break;
+        case TEST_RELAXED_F32_4:
+            script_f32_relaxed.forEach_exp2_f32_4(mIn, mOut);
             break;
         }
     }
@@ -64,15 +79,32 @@ public class Exp2Test extends RSBaseCompute {
         doF32(0xa6, 3);
     }
 
+    public void testExp2F32_relaxed() {
+        doF32_relaxed(0xa6, 3);
+    }
+
     public void testExp2F32_2() {
         doF32_2(0xab2, 3);
+    }
+
+    public void testExp2F32_2_relaxed() {
+        doF32_2_relaxed(0xab2, 3);
     }
 
     public void testExp2F32_3() {
         doF32_3(0x617a, 3);
     }
 
+    public void testExp2F32_3_relaxed() {
+        doF32_3_relaxed(0x617a, 3);
+    }
+
     public void testExp2F32_4() {
         doF32_4(0xabc3, 3);
+
     }
+    public void testExp2F32_4_relaxed() {
+        doF32_4_relaxed(0xabc3, 3);
+    }
+
 }
