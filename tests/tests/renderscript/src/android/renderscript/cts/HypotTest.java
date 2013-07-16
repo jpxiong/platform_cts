@@ -23,12 +23,14 @@ import com.android.cts.stub.R;
 
 public class HypotTest extends RSBaseCompute {
     private ScriptC_hypot_f32 script_f32;
+    private ScriptC_hypot_f32_relaxed script_f32_relaxed;
     private Allocation mIn;
 
     @Override
     protected void setUp() throws Exception {
         super.setUp();
         script_f32 = new ScriptC_hypot_f32(mRS);
+        script_f32_relaxed = new ScriptC_hypot_f32_relaxed(mRS);
     }
 
     @Override
@@ -45,6 +47,19 @@ public class HypotTest extends RSBaseCompute {
             break;
         case TEST_F32_4:
             script_f32.forEach_hypot_f32_4(mIn, mOut);
+            break;
+
+        case TEST_RELAXED_F32:
+            script_f32_relaxed.forEach_hypot_f32_1(mIn, mOut);
+            break;
+        case TEST_RELAXED_F32_2:
+            script_f32_relaxed.forEach_hypot_f32_2(mIn, mOut);
+            break;
+        case TEST_RELAXED_F32_3:
+            script_f32_relaxed.forEach_hypot_f32_3(mIn, mOut);
+            break;
+        case TEST_RELAXED_F32_4:
+            script_f32_relaxed.forEach_hypot_f32_4(mIn, mOut);
             break;
         }
     }
@@ -77,10 +92,22 @@ public class HypotTest extends RSBaseCompute {
         doF32(0x123678, 4);
     }
 
+    public void testHypotF32_relaxed() {
+        ScriptField_hypot_f32_in in = new ScriptField_hypot_f32_in(mRS, INPUTSIZE);
+        mIn = in.getAllocation();
+        doF32_relaxed(0x123678, 4);
+    }
+
     public void testHypotF32_2() {
         ScriptField_hypot_f32_2_in in = new ScriptField_hypot_f32_2_in(mRS, INPUTSIZE);
         mIn = in.getAllocation();
         doF32_2(0x1234a5, 4);
+    }
+
+    public void testHypotF32_2_relaxed() {
+        ScriptField_hypot_f32_2_in in = new ScriptField_hypot_f32_2_in(mRS, INPUTSIZE);
+        mIn = in.getAllocation();
+        doF32_2_relaxed(0x1234a5, 4);
     }
 
     public void testHypotF32_3() {
@@ -89,9 +116,21 @@ public class HypotTest extends RSBaseCompute {
         doF32_3(0x1af345, 4);
     }
 
+    public void testHypotF32_3_relaxed() {
+        ScriptField_hypot_f32_3_in in = new ScriptField_hypot_f32_3_in(mRS, INPUTSIZE);
+        mIn = in.getAllocation();
+        doF32_3_relaxed(0x1af345, 4);
+    }
+
     public void testHypotF32_4() {
         ScriptField_hypot_f32_4_in in = new ScriptField_hypot_f32_4_in(mRS, INPUTSIZE);
         mIn = in.getAllocation();
         doF32_4(0x12ce45, 4);
+    }
+
+    public void testHypotF32_4_relaxed() {
+        ScriptField_hypot_f32_4_in in = new ScriptField_hypot_f32_4_in(mRS, INPUTSIZE);
+        mIn = in.getAllocation();
+        doF32_4_relaxed(0x12ce45, 4);
     }
 }

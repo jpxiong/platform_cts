@@ -22,12 +22,14 @@ import com.android.cts.stub.R;
 
 public class FminTest extends RSBaseCompute {
     private ScriptC_fmin_f32 script_f32;
+    private ScriptC_fmin_f32_relaxed script_f32_relaxed;
     private Allocation mIn;
 
     @Override
     protected void setUp() throws Exception {
         super.setUp();
         script_f32 = new ScriptC_fmin_f32(mRS);
+        script_f32_relaxed = new ScriptC_fmin_f32_relaxed(mRS);
     }
 
     @Override
@@ -44,6 +46,19 @@ public class FminTest extends RSBaseCompute {
             break;
         case TEST_F32_4:
             script_f32.forEach_fmin_f32_4(mIn, mOut);
+            break;
+
+        case TEST_RELAXED_F32:
+            script_f32_relaxed.forEach_fmin_f32_1(mIn, mOut);
+            break;
+        case TEST_RELAXED_F32_2:
+            script_f32_relaxed.forEach_fmin_f32_2(mIn, mOut);
+            break;
+        case TEST_RELAXED_F32_3:
+            script_f32_relaxed.forEach_fmin_f32_3(mIn, mOut);
+            break;
+        case TEST_RELAXED_F32_4:
+            script_f32_relaxed.forEach_fmin_f32_4(mIn, mOut);
             break;
         }
     }
@@ -76,10 +91,22 @@ public class FminTest extends RSBaseCompute {
         doF32(0x12678, 0);
     }
 
+    public void testfminF32_relaxed() {
+        ScriptField_fmin_f32_in in = new ScriptField_fmin_f32_in(mRS, INPUTSIZE);
+        mIn = in.getAllocation();
+        doF32_relaxed(0x12678, 0);
+    }
+
     public void testfminF32_2() {
         ScriptField_fmin_f32_2_in in = new ScriptField_fmin_f32_2_in(mRS, INPUTSIZE);
         mIn = in.getAllocation();
         doF32_2(0x12ace, 0);
+    }
+
+    public void testfminF32_2_relaxed() {
+        ScriptField_fmin_f32_2_in in = new ScriptField_fmin_f32_2_in(mRS, INPUTSIZE);
+        mIn = in.getAllocation();
+        doF32_2_relaxed(0x12ace, 0);
     }
 
     public void testfminF32_3() {
@@ -88,9 +115,21 @@ public class FminTest extends RSBaseCompute {
         doF32_3(0x12e8, 0);
     }
 
+    public void testfminF32_3_relaxed() {
+        ScriptField_fmin_f32_3_in in = new ScriptField_fmin_f32_3_in(mRS, INPUTSIZE);
+        mIn = in.getAllocation();
+        doF32_3_relaxed(0x12e8, 0);
+    }
+
     public void testfminF32_4() {
         ScriptField_fmin_f32_4_in in = new ScriptField_fmin_f32_4_in(mRS, INPUTSIZE);
         mIn = in.getAllocation();
         doF32_4(0xeac, 0);
+    }
+
+    public void testfminF32_4_relaxed() {
+        ScriptField_fmin_f32_4_in in = new ScriptField_fmin_f32_4_in(mRS, INPUTSIZE);
+        mIn = in.getAllocation();
+        doF32_4_relaxed(0xeac, 0);
     }
 }

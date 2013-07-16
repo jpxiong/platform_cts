@@ -23,12 +23,14 @@ import com.android.cts.stub.R;
 
 public class RootnTest extends RSBaseCompute {
     private ScriptC_rootn_f32 script_f32;
+    private ScriptC_rootn_f32_relaxed script_f32_relaxed;
     private int[] n;
 
     @Override
     protected void setUp() throws Exception {
         super.setUp();
         script_f32 = new ScriptC_rootn_f32(mRS);
+        script_f32_relaxed = new ScriptC_rootn_f32_relaxed(mRS);
     }
 
     @Override
@@ -45,6 +47,18 @@ public class RootnTest extends RSBaseCompute {
             break;
         case TEST_F32_4:
             script_f32.forEach_rootn_f32_4(mIn, mOut);
+            break;
+        case TEST_RELAXED_F32:
+            script_f32_relaxed.forEach_rootn_f32_1(mIn, mOut);
+            break;
+        case TEST_RELAXED_F32_2:
+            script_f32_relaxed.forEach_rootn_f32_2(mIn, mOut);
+            break;
+        case TEST_RELAXED_F32_3:
+            script_f32_relaxed.forEach_rootn_f32_3(mIn, mOut);
+            break;
+        case TEST_RELAXED_F32_4:
+            script_f32_relaxed.forEach_rootn_f32_4(mIn, mOut);
             break;
         }
     }
@@ -73,6 +87,18 @@ public class RootnTest extends RSBaseCompute {
         doF32(0x716acd, 16);
     }
 
+    public void testRootnF32_relaxed() {
+        Allocation nAlloc = Allocation.createSized(mRS, Element.I32(mRS), INPUTSIZE);
+
+        n = new int[INPUTSIZE];
+        RSUtils.genRandom(0x12345678, 32, 1, 1, n);
+        nAlloc.copyFrom(n);
+        script_f32_relaxed.set_n1(nAlloc);
+
+        doF32_relaxed(0x716acd, 16);
+    }
+
+
     public void testRootnF32_2() {
         Allocation nAlloc = Allocation.createSized(mRS, Element.I32_2(mRS), INPUTSIZE);
 
@@ -83,6 +109,18 @@ public class RootnTest extends RSBaseCompute {
 
         doF32_2(0xacdef1, 16);
     }
+
+    public void testRootnF32_2_relaxed() {
+        Allocation nAlloc = Allocation.createSized(mRS, Element.I32_2(mRS), INPUTSIZE);
+
+        n = new int[INPUTSIZE*2];
+        RSUtils.genRandom(0xacdef1, 32, 1, 1, n);
+        nAlloc.copyFrom(n);
+        script_f32_relaxed.set_n2(nAlloc);
+
+        doF32_2_relaxed(0xacdef1, 16);
+    }
+
 
     public void testRootnF32_3() {
         Allocation nAlloc = Allocation.createSized(mRS, Element.I32_3(mRS), INPUTSIZE);
@@ -95,6 +133,17 @@ public class RootnTest extends RSBaseCompute {
         doF32_3(0xaac3f1, 16);
     }
 
+    public void testRootnF32_3_relaxed() {
+        Allocation nAlloc = Allocation.createSized(mRS, Element.I32_3(mRS), INPUTSIZE);
+
+        n = new int[INPUTSIZE*4];
+        RSUtils.genRandom(0xa123f1, 32, 1, 1, n, 4, 1);
+        nAlloc.copyFrom(n);
+        script_f32_relaxed.set_n3(nAlloc);
+
+        doF32_3_relaxed(0xaac3f1, 16);
+    }
+
     public void testRootnF32_4() {
         Allocation nAlloc = Allocation.createSized(mRS, Element.I32_4(mRS), INPUTSIZE);
 
@@ -105,4 +154,16 @@ public class RootnTest extends RSBaseCompute {
 
         doF32_4(0xaa12f1, 16);
     }
+
+    public void testRootnF32_4_relaxed() {
+        Allocation nAlloc = Allocation.createSized(mRS, Element.I32_4(mRS), INPUTSIZE);
+
+        n = new int[INPUTSIZE*4];
+        RSUtils.genRandom(0x4323ca, 32, 1, 1, n);
+        nAlloc.copyFrom(n);
+        script_f32_relaxed.set_n4(nAlloc);
+
+        doF32_4_relaxed(0xaa12f1, 16);
+    }
+
 }

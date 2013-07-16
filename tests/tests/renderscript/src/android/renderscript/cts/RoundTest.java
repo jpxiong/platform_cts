@@ -22,11 +22,13 @@ import android.renderscript.RSRuntimeException;
 
 public class RoundTest extends RSBaseCompute {
     private ScriptC_round_f32 script_f32;
+    private ScriptC_round_f32_relaxed script_f32_relaxed;
 
     @Override
     protected void setUp() throws Exception {
         super.setUp();
         script_f32 = new ScriptC_round_f32(mRS);
+        script_f32_relaxed = new ScriptC_round_f32_relaxed(mRS);
     }
 
     @Override
@@ -44,6 +46,19 @@ public class RoundTest extends RSBaseCompute {
             break;
         case TEST_F32_4:
             script_f32.forEach_round_f32_4(mIn, mOut);
+            break;
+
+        case TEST_RELAXED_F32:
+            script_f32_relaxed.forEach_round_f32_1(mIn, mOut);
+            break;
+        case TEST_RELAXED_F32_2:
+            script_f32_relaxed.forEach_round_f32_2(mIn, mOut);
+            break;
+        case TEST_RELAXED_F32_3:
+            script_f32_relaxed.forEach_round_f32_3(mIn, mOut);
+            break;
+        case TEST_RELAXED_F32_4:
+            script_f32_relaxed.forEach_round_f32_4(mIn, mOut);
             break;
         }
     }
@@ -76,11 +91,19 @@ public class RoundTest extends RSBaseCompute {
         doF32(0x12345678, 0);
     }
 
+    public void testRoundF32_relaxed() {
+        doF32_relaxed(0x12345678, 0);
+    }
+
     /**
      * round test for float2
      */
     public void testRoundF32_2() {
         doF32_2(0x123a5678, 0);
+    }
+
+    public void testRoundF32_2_relaxed() {
+        doF32_2_relaxed(0x123a5678, 0);
     }
 
     /**
@@ -90,10 +113,19 @@ public class RoundTest extends RSBaseCompute {
         doF32_3(0x1af45678, 0);
     }
 
+    public void testRoundF32_3_relaxed() {
+        doF32_3_relaxed(0x1af45678, 0);
+    }
+
     /**
      * round test for float4
      */
     public void testRoundF32_4() {
         doF32_4(0x1f345678, 0);
+
     }
+    public void testRoundF32_4_relaxed() {
+        doF32_4_relaxed(0x1f345678, 0);
+    }
+
 }

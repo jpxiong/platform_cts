@@ -22,12 +22,14 @@ import com.android.cts.stub.R;
 
 public class StepTest extends RSBaseCompute {
     private ScriptC_step_f32 script_f32;
+    private ScriptC_step_f32_relaxed script_f32_relaxed;
     private Allocation mIn;
 
     @Override
     protected void setUp() throws Exception {
         super.setUp();
         script_f32 = new ScriptC_step_f32(mRS);
+        script_f32_relaxed = new ScriptC_step_f32_relaxed(mRS);
     }
 
     @Override
@@ -44,6 +46,19 @@ public class StepTest extends RSBaseCompute {
             break;
         case TEST_F32_4:
             script_f32.forEach_step_f32_4(mIn, mOut);
+            break;
+
+        case TEST_RELAXED_F32:
+            script_f32_relaxed.forEach_step_f32_1(mIn, mOut);
+            break;
+        case TEST_RELAXED_F32_2:
+            script_f32_relaxed.forEach_step_f32_2(mIn, mOut);
+            break;
+        case TEST_RELAXED_F32_3:
+            script_f32_relaxed.forEach_step_f32_3(mIn, mOut);
+            break;
+        case TEST_RELAXED_F32_4:
+            script_f32_relaxed.forEach_step_f32_4(mIn, mOut);
             break;
         }
     }
@@ -76,10 +91,22 @@ public class StepTest extends RSBaseCompute {
         doF32(0x12678, 0);
     }
 
+    public void testStepF32_relaxed() {
+        ScriptField_step_input in = new ScriptField_step_input(mRS, INPUTSIZE);
+        mIn = in.getAllocation();
+        doF32_relaxed(0x12678, 0);
+    }
+
     public void testStepF32_2() {
         ScriptField_step_2_input in = new ScriptField_step_2_input(mRS, INPUTSIZE);
         mIn = in.getAllocation();
         doF32_2(0x1ace8, 0);
+    }
+
+    public void testStepF32_2_relaxed() {
+        ScriptField_step_2_input in = new ScriptField_step_2_input(mRS, INPUTSIZE);
+        mIn = in.getAllocation();
+        doF32_2_relaxed(0x1ace8, 0);
     }
 
     public void testStepF32_3() {
@@ -88,9 +115,21 @@ public class StepTest extends RSBaseCompute {
         doF32_3(0xa2ce8, 0);
     }
 
+    public void testStepF32_3_relaxed() {
+        ScriptField_step_3_input in = new ScriptField_step_3_input(mRS, INPUTSIZE);
+        mIn = in.getAllocation();
+        doF32_3_relaxed(0xa2ce8, 0);
+    }
+
     public void testStepF32_4() {
         ScriptField_step_4_input in = new ScriptField_step_4_input(mRS, INPUTSIZE);
         mIn = in.getAllocation();
         doF32_4(0x1ee8, 0);
+    }
+
+    public void testStepF32_4_relaxed() {
+        ScriptField_step_4_input in = new ScriptField_step_4_input(mRS, INPUTSIZE);
+        mIn = in.getAllocation();
+        doF32_4_relaxed(0x1ee8, 0);
     }
 }

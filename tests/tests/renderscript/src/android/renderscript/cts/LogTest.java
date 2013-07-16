@@ -22,11 +22,13 @@ import android.renderscript.RSRuntimeException;
 
 public class LogTest extends RSBaseCompute {
     private ScriptC_log_f32 script_f32;
+    private ScriptC_log_f32_relaxed script_f32_relaxed;
 
     @Override
     protected void setUp() throws Exception {
         super.setUp();
         script_f32 = new ScriptC_log_f32(mRS);
+        script_f32_relaxed = new ScriptC_log_f32_relaxed(mRS);
     }
 
     @Override
@@ -43,6 +45,19 @@ public class LogTest extends RSBaseCompute {
             break;
         case TEST_F32_4:
             script_f32.forEach_log_f32_4(mIn, mOut);
+            break;
+
+        case TEST_RELAXED_F32:
+            script_f32_relaxed.forEach_log_f32_1(mIn, mOut);
+            break;
+        case TEST_RELAXED_F32_2:
+            script_f32_relaxed.forEach_log_f32_2(mIn, mOut);
+            break;
+        case TEST_RELAXED_F32_3:
+            script_f32_relaxed.forEach_log_f32_3(mIn, mOut);
+            break;
+        case TEST_RELAXED_F32_4:
+            script_f32_relaxed.forEach_log_f32_4(mIn, mOut);
             break;
         }
     }
@@ -64,15 +79,32 @@ public class LogTest extends RSBaseCompute {
         doF32(0xfae, 3);
     }
 
+    public void testLogF32_relaxed() {
+        doF32_relaxed(0xfae, 3);
+    }
+
     public void testLogF32_2() {
         doF32_2(0x123, 3);
+    }
+
+    public void testLogF32_2_relaxed() {
+        doF32_2_relaxed(0x123, 3);
     }
 
     public void testLogF32_3() {
         doF32_3(0xab4, 3);
     }
 
+    public void testLogF32_3_relaxed() {
+        doF32_3_relaxed(0xab4, 3);
+    }
+
     public void testLogF32_4() {
         doF32_4(0xfa3, 3);
+
     }
+    public void testLogF32_4_relaxed() {
+        doF32_4_relaxed(0xfa3, 3);
+    }
+
 }
