@@ -32,6 +32,10 @@
        android:id="@+id/text"
        android:layout_width="200dip"
        android:layout_height="200dip"
+       android:includeFontPadding="false"
+       android:textSize="14dip"
+       android:textStyle="normal"
+       android:fontFamily="sans-serif"
        />
 
    <EditText
@@ -41,6 +45,10 @@
        android:maxLines="1000"
        android:scrollbars="vertical"
        android:focusable="false"
+       android:includeFontPadding="false"
+       android:textSize="18dip"
+       android:textStyle="normal"
+       android:fontFamily="sans-serif"
        />
 
 </LinearLayout>
