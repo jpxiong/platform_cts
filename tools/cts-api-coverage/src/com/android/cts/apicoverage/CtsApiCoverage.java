@@ -55,10 +55,11 @@ public class CtsApiCoverage {
         System.out.println("directory and dexdeps must be built via \"make dexdeps\".");
         System.out.println();
         System.out.println("Options:");
-        System.out.println("  -o FILE              output file or standard out if not given");
-        System.out.println("  -f [txt|xml|html]    format of output");
-        System.out.println("  -d PATH              path to dexdeps or expected to be in $PATH");
-        System.out.println("  -a PATH              path to the API XML file");
+        System.out.println("  -o FILE                output file or standard out if not given");
+        System.out.println("  -f [txt|xml|html]      format of output");
+        System.out.println("  -d PATH                path to dexdeps or expected to be in $PATH");
+        System.out.println("  -a PATH                path to the API XML file");
+        System.out.println("  -p PACKAGENAMEPREFIX   report coverage only for package that start with");
         System.out.println();
         System.exit(1);
     }
@@ -69,6 +70,8 @@ public class CtsApiCoverage {
         int format = FORMAT_TXT;
         String dexDeps = "dexDeps";
         String apiXmlPath = "";
+        // By default only care about packages starting with "android"
+	String packageFilter = "android";
 
         for (int i = 0; i < args.length; i++) {
             if (args[i].startsWith("-")) {
@@ -89,6 +92,8 @@ public class CtsApiCoverage {
                     dexDeps = getExpectedArg(args, ++i);
                 } else if ("-a".equals(args[i])) {
                     apiXmlPath = getExpectedArg(args, ++i);
+                } else if ("-p".equals(args[i])) {
+                    packageFilter = getExpectedArg(args, ++i);
                 } else {
                     printUsage();
                 }
@@ -113,7 +118,7 @@ public class CtsApiCoverage {
         for (File testApk : testApks) {
             addApiCoverage(apiCoverage, testApk, dexDeps);
         }
-        outputCoverageReport(apiCoverage, testApks, outputFile, format);
+        outputCoverageReport(apiCoverage, testApks, outputFile, format, packageFilter);
     }
 
     /** Get the argument or print out the usage and exit. */
@@ -172,7 +177,7 @@ public class CtsApiCoverage {
     }
 
     private static void outputCoverageReport(ApiCoverage apiCoverage, List<File> testApks,
-            File outputFile, int format) throws IOException, TransformerException,
+            File outputFile, int format, String packageFilter) throws IOException, TransformerException,
                     InterruptedException {
 
         OutputStream out = outputFile != null
@@ -182,15 +187,15 @@ public class CtsApiCoverage {
         try {
             switch (format) {
                 case FORMAT_TXT:
-                    TextReport.printTextReport(apiCoverage, out);
+                    TextReport.printTextReport(apiCoverage, packageFilter, out);
                     break;
 
                 case FORMAT_XML:
-                    XmlReport.printXmlReport(testApks, apiCoverage, out);
+                    XmlReport.printXmlReport(testApks, apiCoverage, packageFilter, out);
                     break;
 
                 case FORMAT_HTML:
-                    HtmlReport.printHtmlReport(testApks, apiCoverage, out);
+                    HtmlReport.printHtmlReport(testApks, apiCoverage, packageFilter, out);
                     break;
             }
         } finally {
