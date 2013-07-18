@@ -32,7 +32,7 @@ import java.util.List;
 class XmlReport {
 
     public static void printXmlReport(List<File> testApks, ApiCoverage apiCoverage,
-            OutputStream outputStream) {
+            String packageFilter, OutputStream outputStream) {
         PrintStream out = new PrintStream(outputStream);
         out.println("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
         out.println("<?xml-stylesheet type=\"text/xsl\"  href=\"api-coverage.xsl\"?>");
@@ -57,8 +57,8 @@ class XmlReport {
         int totalMethods = 0;
         int totalCoveredMethods = 0;
         for (ApiPackage pkg : packages) {
-            if (pkg.getName().startsWith("android")
-                    && pkg.getTotalMethods() > 0) {
+            if (pkg.getName().startsWith(packageFilter)
+                   && pkg.getTotalMethods() > 0) {
                 int pkgTotal = pkg.getTotalMethods();
                 totalMethods += pkgTotal;
                 int pkgTotalCovered = pkg.getNumCoveredMethods();
