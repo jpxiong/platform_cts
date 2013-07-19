@@ -959,25 +959,37 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
     public void testGetContentHeight() throws Throwable {
         mOnUiThread.loadDataAndWaitForCompletion(
                 "<html><body></body></html>", "text/html", null);
-        getInstrumentation().waitForIdleSync();
+        new PollingCheck() {
+            @Override
+            protected boolean check() {
+                return mOnUiThread.getScale() != 0 && mOnUiThread.getContentHeight() != 0;
+            }
+        }.run();
+        assertEquals(mOnUiThread.getHeight(),
+                mOnUiThread.getContentHeight() * mOnUiThread.getScale(), 2f);
 
         final int pageHeight = 600;
         // set the margin to 0
         final String p = "<p style=\"height:" + pageHeight
                 + "px;margin:0px auto;\">Get the height of HTML content.</p>";
-        assertEquals(mOnUiThread.getHeight(), mOnUiThread.getContentHeight() * mOnUiThread.getScale(), 2f);
         mOnUiThread.loadDataAndWaitForCompletion("<html><body>" + p
                 + "</body></html>", "text/html", null);
-        getInstrumentation().waitForIdleSync();
+        new PollingCheck() {
+            @Override
+            protected boolean check() {
+                return mOnUiThread.getContentHeight() > pageHeight;
+            }
+        }.run();
 
-        assertTrue(mOnUiThread.getContentHeight() > pageHeight);
-        int extraSpace = mOnUiThread.getContentHeight() - pageHeight;
-
+        final int extraSpace = mOnUiThread.getContentHeight() - pageHeight;
         mOnUiThread.loadDataAndWaitForCompletion("<html><body>" + p
                 + p + "</body></html>", "text/html", null);
-        getInstrumentation().waitForIdleSync();
-        assertEquals(pageHeight + pageHeight + extraSpace,
-                mOnUiThread.getContentHeight());
+        new PollingCheck() {
+            @Override
+            protected boolean check() {
+                return pageHeight + pageHeight + extraSpace == mOnUiThread.getContentHeight();
+            }
+        }.run();
     }
 
     @UiThreadTest
