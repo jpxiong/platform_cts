@@ -780,6 +780,20 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
                 historyUrl);
         assertTrue("URL: " + mWebView.getUrl(), mWebView.getUrl().indexOf("data:text/html") == 0);
         assertTrue("URL: " + mWebView.getUrl(), mWebView.getUrl().indexOf("bar") > 0);
+
+        // Check that when a non-data: base URL is used, we treat the String to load as
+        // a raw string and just dump it into the WebView, i.e. not decoding any URL entities.
+        mOnUiThread.loadDataWithBaseURLAndWaitForCompletion("http://www.foo.com",
+                HTML_HEADER + "<title>Hello World%21</title><body>bar</body></html>",
+                "text/html", "UTF-8", null);
+        assertEquals("Hello World%21", mOnUiThread.getTitle());
+
+        // Check that when a data: base URL is used, we treat the String to load as a data: URL
+        // and run load steps such as decoding URL entities (i.e., contrary to the test case
+        // above.)
+        mOnUiThread.loadDataWithBaseURLAndWaitForCompletion("data:foo",
+                HTML_HEADER + "<title>Hello World%21</title></html>", "text/html", "UTF-8", null);
+        assertEquals("Hello World!", mOnUiThread.getTitle());
     }
 
     private static class WaitForFindResultsListener extends FutureTask<Integer>
