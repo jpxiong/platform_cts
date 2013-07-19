@@ -26,7 +26,7 @@ public:
     virtual ~FullPipelineRenderer() {};
     bool setUp();
     bool tearDown();
-    bool draw();
+    void drawWorkload();
 private:
     Program* mProgram;
     ProgramNode* mSceneGraph;

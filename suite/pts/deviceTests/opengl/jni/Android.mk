@@ -20,6 +20,9 @@ LOCAL_MODULE := libptsopengl_jni
 
 LOCAL_MODULE_TAGS := optional
 
+# Needed in order to use fences for synchronization
+LOCAL_CFLAGS += -DEGL_EGLEXT_PROTOTYPES
+
 # Get all cpp files but not hidden files
 LOCAL_SRC_FILES := $(patsubst ./%,%, $(shell cd $(LOCAL_PATH); \
 		  find . -name "*.cpp" -and -not -name ".*"))

@@ -26,7 +26,7 @@ public:
     bool setUp();
     bool tearDown();
     bool update(int frame);
-    bool draw();
+    void drawWorkload();
     double mSetUpTimes[4];
     static const int FRAMES_PER_SCENE = 500;
     static const int NUM_SCENES = 2;

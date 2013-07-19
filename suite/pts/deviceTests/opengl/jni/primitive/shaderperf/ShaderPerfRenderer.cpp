@@ -141,15 +141,8 @@ bool ShaderPerfRenderer::setUp() {
     return true;
 }
 
-bool ShaderPerfRenderer::draw() {
+void ShaderPerfRenderer::drawWorkload() {
     SCOPED_TRACE();
-    if (!eglMakeCurrent(mEglDisplay, mEglSurface, mEglSurface, mEglContext)
-            || EGL_SUCCESS != eglGetError()) {
-        return false;
-    }
-    if (mOffscreen) {
-        glBindFramebuffer(GL_FRAMEBUFFER, mFboId);
-    }
     glUseProgram(mProgramId);
     // Set the background clear color.
     glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
@@ -173,6 +166,4 @@ bool ShaderPerfRenderer::draw() {
     glVertexAttribPointer(mTexCoordHandle, 2, GL_FLOAT, false, 0, SP_TEX_COORDS);
 
     glDrawArrays(GL_TRIANGLES, 0, SP_NUM_VERTICES);
-
-    return Renderer::draw();
 }

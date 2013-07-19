@@ -90,15 +90,8 @@ bool PixelOutputRenderer::tearDown() {
     return true;
 }
 
-bool PixelOutputRenderer::draw() {
+void PixelOutputRenderer::drawWorkload() {
     SCOPED_TRACE();
-    if (!eglMakeCurrent(mEglDisplay, mEglSurface, mEglSurface, mEglContext)
-            || EGL_SUCCESS != eglGetError()) {
-        return false;
-    }
-    if (mOffscreen) {
-        glBindFramebuffer(GL_FRAMEBUFFER, mFboId);
-    }
     glUseProgram(mProgramId);
     // Set the background clear color to black.
     glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
@@ -129,6 +122,4 @@ bool PixelOutputRenderer::draw() {
     for (int i = 0; i < mWorkload; i++) {
         glDrawArrays(GL_TRIANGLES, 0, PO_NUM_VERTICES);
     }
-
-    return Renderer::draw();
 }
