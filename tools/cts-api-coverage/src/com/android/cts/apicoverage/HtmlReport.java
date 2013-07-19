@@ -37,15 +37,15 @@ import javax.xml.transform.stream.StreamSource;
 class HtmlReport {
 
     public static void printHtmlReport(final List<File> testApks, final ApiCoverage apiCoverage,
-            final String packageFilter, final OutputStream out) throws IOException,
-                TransformerException {
+            final String packageFilter, final String reportTitle, final OutputStream out)
+                throws IOException, TransformerException {
         final PipedOutputStream xmlOut = new PipedOutputStream();
         final PipedInputStream xmlIn = new PipedInputStream(xmlOut);
 
         Thread t = new Thread(new Runnable() {
             @Override
             public void run() {
-                XmlReport.printXmlReport(testApks, apiCoverage, packageFilter, xmlOut);
+                XmlReport.printXmlReport(testApks, apiCoverage, packageFilter, reportTitle, xmlOut);
 
                 // Close the output stream to avoid "Write dead end" errors.
                 try {

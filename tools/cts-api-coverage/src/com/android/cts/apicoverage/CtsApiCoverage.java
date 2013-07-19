@@ -60,6 +60,7 @@ public class CtsApiCoverage {
         System.out.println("  -d PATH                path to dexdeps or expected to be in $PATH");
         System.out.println("  -a PATH                path to the API XML file");
         System.out.println("  -p PACKAGENAMEPREFIX   report coverage only for package that start with");
+        System.out.println("  -t TITLE               report title");
         System.out.println();
         System.exit(1);
     }
@@ -71,7 +72,8 @@ public class CtsApiCoverage {
         String dexDeps = "dexDeps";
         String apiXmlPath = "";
         // By default only care about packages starting with "android"
-	String packageFilter = "android";
+        String packageFilter = "android";
+        String reportTitle = "CTS API Coverage";
 
         for (int i = 0; i < args.length; i++) {
             if (args[i].startsWith("-")) {
@@ -94,6 +96,8 @@ public class CtsApiCoverage {
                     apiXmlPath = getExpectedArg(args, ++i);
                 } else if ("-p".equals(args[i])) {
                     packageFilter = getExpectedArg(args, ++i);
+                } else if ("-t".equals(args[i])) {
+                    reportTitle = getExpectedArg(args, ++i);
                 } else {
                     printUsage();
                 }
@@ -118,7 +122,7 @@ public class CtsApiCoverage {
         for (File testApk : testApks) {
             addApiCoverage(apiCoverage, testApk, dexDeps);
         }
-        outputCoverageReport(apiCoverage, testApks, outputFile, format, packageFilter);
+        outputCoverageReport(apiCoverage, testApks, outputFile, format, packageFilter, reportTitle);
     }
 
     /** Get the argument or print out the usage and exit. */
@@ -177,8 +181,8 @@ public class CtsApiCoverage {
     }
 
     private static void outputCoverageReport(ApiCoverage apiCoverage, List<File> testApks,
-            File outputFile, int format, String packageFilter) throws IOException, TransformerException,
-                    InterruptedException {
+            File outputFile, int format, String packageFilter, String reportTitle)
+                throws IOException, TransformerException, InterruptedException {
 
         OutputStream out = outputFile != null
                 ? new FileOutputStream(outputFile)
@@ -191,11 +195,11 @@ public class CtsApiCoverage {
                     break;
 
                 case FORMAT_XML:
-                    XmlReport.printXmlReport(testApks, apiCoverage, packageFilter, out);
+                    XmlReport.printXmlReport(testApks, apiCoverage, packageFilter, reportTitle, out);
                     break;
 
                 case FORMAT_HTML:
-                    HtmlReport.printHtmlReport(testApks, apiCoverage, packageFilter, out);
+                    HtmlReport.printHtmlReport(testApks, apiCoverage, packageFilter, reportTitle, out);
                     break;
             }
         } finally {

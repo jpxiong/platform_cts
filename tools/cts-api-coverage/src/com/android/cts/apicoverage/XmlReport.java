@@ -32,14 +32,14 @@ import java.util.List;
 class XmlReport {
 
     public static void printXmlReport(List<File> testApks, ApiCoverage apiCoverage,
-            String packageFilter, OutputStream outputStream) {
+            String packageFilter, String reportTitle, OutputStream outputStream) {
         PrintStream out = new PrintStream(outputStream);
         out.println("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
         out.println("<?xml-stylesheet type=\"text/xsl\"  href=\"api-coverage.xsl\"?>");
 
         SimpleDateFormat format = new SimpleDateFormat("EEE, MMM d, yyyy h:mm a z");
         String date = format.format(new Date(System.currentTimeMillis()));
-        out.println("<api-coverage generatedTime=\"" + date + "\">");
+        out.println("<api-coverage generatedTime=\"" + date + "\" title=\"" + reportTitle +"\">");
 
         out.println("<debug>");
         out.println("<sources>");

@@ -78,7 +78,7 @@
                 </style>
             </head>
             <body>
-                <h1>CTS API Coverage</h1>
+                <h1><xsl:value-of select="api-coverage/@title" /></h1>
                 <div class="info">
                     Generated: <xsl:value-of select="api-coverage/@generatedTime" />
                 </div>
