@@ -21,6 +21,7 @@ import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.database.Cursor;
 import android.net.Uri;
+import android.os.RemoteException;
 import android.provider.VoicemailContract;
 import android.provider.VoicemailContract.Status;
 import android.provider.VoicemailContract.Voicemails;
@@ -138,6 +139,66 @@ public class VoicemailContractTest extends InstrumentationTestCase {
                 Voicemails._ID + " = " + id, null, null, null);
         assertEquals(0, cursor.getCount());
         cursor.close();
+    }
+
+    // Data column should be automatically generated during insert.
+    public void testInsert_doesNotUpdateDataColumn() throws Exception {
+
+        final String newFilePath = "my/new/file/path";
+        final ContentValues value = buildContentValuesForNewVoicemail();
+        value.put(Voicemails._DATA, newFilePath);
+        mVoicemailProvider.insert(mVoicemailContentUri, value);
+
+        assertDataNotEquals(newFilePath);
+    }
+
+    public void testDataColumnUpdate_throwsIllegalArgumentException() throws Exception {
+
+        final ContentValues value = buildContentValuesForNewVoicemail();
+        final Uri uri = mVoicemailProvider.insert(mVoicemailContentUri, value);
+
+        // Test: update
+        final String newFilePath = "another/file/path";
+
+        value.clear();
+        value.put(Voicemails._DATA, newFilePath);
+        try {
+            mVoicemailProvider.update(uri, value, null, null);
+            fail("IllegalArgumentException expected but not thrown.");
+        } catch (IllegalArgumentException e) {
+            // pass
+        }
+
+        assertDataNotEquals(newFilePath);
+    }
+
+    private void assertDataNotEquals(String newFilePath) throws RemoteException {
+        // Make sure data value is not actually updated.
+        final Cursor cursor = mVoicemailProvider.query(mVoicemailContentUri,
+                new String[]{Voicemails._DATA}, null, null, null);
+        cursor.moveToNext();
+        final String data = cursor.getString(0);
+        assertFalse(data.equals(newFilePath));
+    }
+
+    private ContentValues buildContentValuesForNewVoicemail() {
+        final String insertCallsNumber = "0123456789";
+        final long insertCallsDuration = 120;
+        final String insertSourceData = "internal_id";
+        final String insertMimeType = "audio/mp3";
+        final long insertDate = 1324478862000L;
+
+        ContentValues value = new ContentValues();
+        value.put(Voicemails.NUMBER, insertCallsNumber);
+        value.put(Voicemails.DATE, insertDate);
+        value.put(Voicemails.DURATION, insertCallsDuration);
+        // Source package is expected to be inserted by the provider, if not set.
+        value.put(Voicemails.SOURCE_DATA, insertSourceData);
+        value.put(Voicemails.MIME_TYPE, insertMimeType);
+        value.put(Voicemails.IS_READ, false);
+        value.put(Voicemails.HAS_CONTENT, true);
+
+        return value;
     }
 
     public void testStatusTable() throws Exception {
