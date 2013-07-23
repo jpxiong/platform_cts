@@ -376,6 +376,22 @@ public class BitmapTest extends AndroidTestCase {
         assertEquals(0x00, Color.alpha(color));
     }
 
+    public void testGetAllocationByteCount() {
+        mBitmap = Bitmap.createBitmap(100, 200, Bitmap.Config.ALPHA_8);
+        int alloc = mBitmap.getAllocationByteCount();
+        assertEquals(mBitmap.getByteCount(), alloc);
+
+        // reconfigure same size
+        mBitmap.reconfigure(50, 100, Bitmap.Config.ARGB_8888);
+        assertEquals(mBitmap.getByteCount(), alloc);
+        assertEquals(mBitmap.getAllocationByteCount(), alloc);
+
+        // reconfigure different size
+        mBitmap.reconfigure(10, 10, Bitmap.Config.ALPHA_8);
+        assertEquals(mBitmap.getByteCount(), 100);
+        assertEquals(mBitmap.getAllocationByteCount(), alloc);
+    }
+
     public void testGetConfig(){
         Bitmap bm0 = Bitmap.createBitmap(100, 200, Bitmap.Config.ALPHA_8);
         Bitmap bm1 = Bitmap.createBitmap(100, 200, Bitmap.Config.ARGB_8888);
@@ -463,6 +479,81 @@ public class BitmapTest extends AndroidTestCase {
         assertFalse(mBitmap.isRecycled());
         mBitmap.recycle();
         assertTrue(mBitmap.isRecycled());
+    }
+
+    public void testReconfigure() {
+        mBitmap = Bitmap.createBitmap(100, 200, Bitmap.Config.RGB_565);
+        int alloc = mBitmap.getAllocationByteCount();
+
+        // test shrinking
+        mBitmap.reconfigure(50, 100, Bitmap.Config.ALPHA_8);
+        assertEquals(mBitmap.getAllocationByteCount(), alloc);
+        assertEquals(mBitmap.getByteCount() * 8, alloc);
+
+        // test expanding
+        try {
+            mBitmap.reconfigure(101, 201, Bitmap.Config.ARGB_8888);
+            fail("shouldn't come to here");
+        } catch (IllegalArgumentException e) {
+        }
+
+        // test mutable
+        mBitmap = BitmapFactory.decodeResource(mRes, R.drawable.start, mOptions);
+        try {
+            mBitmap.reconfigure(1, 1, Bitmap.Config.ALPHA_8);
+            fail("shouldn't come to here");
+        } catch (IllegalStateException e) {
+        }
+    }
+
+    public void testSetConfig() {
+        mBitmap = Bitmap.createBitmap(100, 200, Bitmap.Config.RGB_565);
+        int alloc = mBitmap.getAllocationByteCount();
+
+        // test shrinking
+        mBitmap.setConfig(Bitmap.Config.ALPHA_8);
+        assertEquals(mBitmap.getAllocationByteCount(), alloc);
+        assertEquals(mBitmap.getByteCount() * 2, alloc);
+
+        // test expanding
+        try {
+            mBitmap.setConfig(Bitmap.Config.ARGB_8888);
+            fail("shouldn't come to here");
+        } catch (IllegalArgumentException e) {
+        }
+
+        // test mutable
+        mBitmap = BitmapFactory.decodeResource(mRes, R.drawable.start, mOptions);
+        try {
+            mBitmap.setConfig(Bitmap.Config.ALPHA_8);
+            fail("shouldn't come to here");
+        } catch (IllegalStateException e) {
+        }
+    }
+
+    public void testSetHeight() {
+        mBitmap = Bitmap.createBitmap(100, 200, Bitmap.Config.ARGB_8888);
+        int alloc = mBitmap.getAllocationByteCount();
+
+        // test shrinking
+        mBitmap.setHeight(100);
+        assertEquals(mBitmap.getAllocationByteCount(), alloc);
+        assertEquals(mBitmap.getByteCount() * 2, alloc);
+
+        // test expanding
+        try {
+            mBitmap.setHeight(201);
+            fail("shouldn't come to here");
+        } catch (IllegalArgumentException e) {
+        }
+
+        // test mutable
+        mBitmap = BitmapFactory.decodeResource(mRes, R.drawable.start, mOptions);
+        try {
+            mBitmap.setHeight(1);
+            fail("shouldn't come to here");
+        } catch (IllegalStateException e) {
+        }
     }
 
     public void testSetPixel(){
@@ -601,6 +692,31 @@ public class BitmapTest extends AndroidTestCase {
 
         for(int i = 0; i < 10000; i++){
             assertEquals(ret[i], colors[i]);
+        }
+    }
+
+    public void testSetWidth() {
+        mBitmap = Bitmap.createBitmap(100, 200, Bitmap.Config.ARGB_8888);
+        int alloc = mBitmap.getAllocationByteCount();
+
+        // test shrinking
+        mBitmap.setWidth(50);
+        assertEquals(mBitmap.getAllocationByteCount(), alloc);
+        assertEquals(mBitmap.getByteCount() * 2, alloc);
+
+        // test expanding
+        try {
+            mBitmap.setWidth(101);
+            fail("shouldn't come to here");
+        } catch (IllegalArgumentException e) {
+        }
+
+        // test mutable
+        mBitmap = BitmapFactory.decodeResource(mRes, R.drawable.start, mOptions);
+        try {
+            mBitmap.setWidth(1);
+            fail("shouldn't come to here");
+        } catch (IllegalStateException e) {
         }
     }
 
