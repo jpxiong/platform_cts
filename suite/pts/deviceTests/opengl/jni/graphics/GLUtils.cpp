@@ -192,7 +192,7 @@ double GLUtils::currentTimeMillis() {
     return tv.tv_sec * 1000.0 + tv.tv_usec / 1000.0;
 }
 
-// Rounds a number up to the smallest power of 2 that is greater than the original number.
+// Rounds a number up to the smallest power of 2 that is greater than or equal to x.
 int GLUtils::roundUpToSmallestPowerOf2(int x) {
     if (x < 0) {
         return 0;
@@ -233,29 +233,4 @@ GLuint GLUtils::genTexture(int texWidth, int texHeight, int fill) {
     }
     delete[] m;
     return textureId;
-}
-
-bool GLUtils::createFBO(GLuint& fboId, GLuint& rboId, GLuint& cboId, int width, int height) {
-    glGenFramebuffers(1, &fboId);
-    glBindFramebuffer(GL_FRAMEBUFFER, fboId);
-
-    glGenRenderbuffers(1, &rboId);
-    glBindRenderbuffer(GL_RENDERBUFFER, rboId);
-    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT16, width, height);
-    glBindRenderbuffer(GL_RENDERBUFFER, 0);
-    glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, rboId);
-
-    glGenRenderbuffers(1, &cboId);
-    glBindRenderbuffer(GL_RENDERBUFFER, cboId);
-    glRenderbufferStorage(GL_RENDERBUFFER, GL_RGB565, width, height);
-    glBindRenderbuffer(GL_RENDERBUFFER, 0);
-    glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_RENDERBUFFER, cboId);
-
-    GLuint err = glGetError();
-    if (err != GL_NO_ERROR) {
-        ALOGE("GLError %d", err);
-        return false;
-    }
-
-    return glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE;
 }

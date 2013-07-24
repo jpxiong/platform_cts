@@ -28,12 +28,9 @@ void PerspectiveMeshNode::before(Program& program, Matrix& model, Matrix& view, 
     int normalHandle = glGetAttribLocation(prog.mProgramId, "a_Normal");
     int texCoordHandle = glGetAttribLocation(prog.mProgramId, "a_TexCoordinate");
 
+    // Set the texture.
     glActiveTexture (GL_TEXTURE0);
-    // Bind the texture to this unit.
     glBindTexture(GL_TEXTURE_2D, mTextureId);
-
-    // Tell the texture uniform sampler to use this texture in the shader by binding to texture
-    // unit 0.
     glUniform1i(textureUniformHandle, 0);
 
     glEnableVertexAttribArray(positionHandle);

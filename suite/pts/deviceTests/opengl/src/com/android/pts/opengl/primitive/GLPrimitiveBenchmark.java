@@ -122,26 +122,23 @@ public class GLPrimitiveBenchmark extends PtsActivityInstrumentationTestCase2<GL
 
         GLPrimitiveActivity activity = null;
         setActivityIntent(intent);
-        try {
-            activity = getActivity();
+        activity = getActivity();
+        if (activity != null) {
             activity.waitForCompletion();
-        } finally {
-            if (activity != null) {
-                double[] fpsValues = activity.mFpsValues;
-                double score = 0;
-                for (double d : fpsValues) {
-                    score += d;
-                }
-                score /= numIterations;// Average.
-
-                // TODO: maybe standard deviation / RMSE will be useful?
-
-                getReportLog().printArray(
-                        "Fps Values", fpsValues, ResultType.HIGHER_BETTER, ResultUnit.FPS);
-                getReportLog().printSummary(
-                        "Average Frames Per Second", score, ResultType.HIGHER_BETTER,
-                        ResultUnit.SCORE);
+            double[] fpsValues = activity.mFpsValues;
+            double score = 0;
+            for (double d : fpsValues) {
+                score += d;
             }
+            score /= numIterations;// Average.
+
+            // TODO: maybe standard deviation / RMSE will be useful?
+
+            getReportLog().printArray(
+                    "Fps Values", fpsValues, ResultType.HIGHER_BETTER, ResultUnit.FPS);
+            getReportLog().printSummary(
+                    "Average Frames Per Second", score, ResultType.HIGHER_BETTER,
+                    ResultUnit.SCORE);
         }
     }
 }

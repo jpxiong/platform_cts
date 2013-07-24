@@ -21,7 +21,7 @@ public:
     ShaderPerfRenderer(ANativeWindow* window, bool offscreen, int workload);
     virtual ~ShaderPerfRenderer() {};
     bool setUp();
-    bool draw();
+    void drawWorkload();
 private:
     GLuint mTextureId;
     GLuint mTextureUniformHandle;

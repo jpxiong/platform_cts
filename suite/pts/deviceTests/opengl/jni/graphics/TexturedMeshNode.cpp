@@ -23,6 +23,7 @@ void TexturedMeshNode::before(Program& program, Matrix& model, Matrix& view, Mat
     int positionHandle = glGetAttribLocation(program.mProgramId, "a_Position");
     int texCoordHandle = glGetAttribLocation(program.mProgramId, "a_TexCoordinate");
 
+    // Set the texture.
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, mTextureId);
     glUniform1i(textureUniformHandle, 0);

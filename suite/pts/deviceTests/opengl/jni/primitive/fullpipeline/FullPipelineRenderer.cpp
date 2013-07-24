@@ -191,15 +191,8 @@ bool FullPipelineRenderer::tearDown() {
     return true;
 }
 
-bool FullPipelineRenderer::draw() {
+void FullPipelineRenderer::drawWorkload() {
     SCOPED_TRACE();
-    if (!eglMakeCurrent(mEglDisplay, mEglSurface, mEglSurface, mEglContext)
-            || EGL_SUCCESS != eglGetError()) {
-        return false;
-    }
-    if (mOffscreen) {
-        glBindFramebuffer(GL_FRAMEBUFFER, mFboId);
-    }
     // Set the background clear color to black.
     glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
     // Use culling to remove back faces.
@@ -209,6 +202,4 @@ bool FullPipelineRenderer::draw() {
     glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
     mModelMatrix->identity();
     mSceneGraph->drawProgram(*mModelMatrix, *mViewMatrix, *mProjectionMatrix);
-
-    return Renderer::draw();
 }

@@ -22,9 +22,10 @@ public:
     virtual ~ContextSwitchRenderer() {};
     bool setUp();
     bool tearDown();
-    bool draw();
+    void drawWorkload();
 private:
     EGLContext* mContexts;
+    GLuint* mFboIds;
     GLuint mTextureId;
     GLuint mTextureUniformHandle;
     GLuint mTranslateUniformHandle;

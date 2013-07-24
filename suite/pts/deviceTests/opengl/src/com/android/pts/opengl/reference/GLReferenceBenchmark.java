@@ -51,51 +51,48 @@ public class GLReferenceBenchmark extends PtsActivityInstrumentationTestCase2<GL
 
         GLReferenceActivity activity = null;
         setActivityIntent(intent);
-        try {
-            activity = getActivity();
+        activity = getActivity();
+        if (activity != null) {
             activity.waitForCompletion();
-        } finally {
-            if (activity != null) {
-                double totalTime = 0;
-                if (activity.mSuccess) {
-                    double[] setUpTimes = activity.mSetUpTimes;
-                    double[] updateTimes = activity.mUpdateTimes;
-                    double[] renderTimes = activity.mRenderTimes;
+            double totalTime = 0;
+            if (activity.mSuccess) {
+                double[] setUpTimes = activity.mSetUpTimes;
+                double[] updateTimes = activity.mUpdateTimes;
+                double[] renderTimes = activity.mRenderTimes;
 
-                    // Calculate update and render average.
-                    double updateSum = updateTimes[0];
-                    double renderSum = renderTimes[0];
-                    for (int i = 0; i < NUM_FRAMES - 1; i++) {
-                        updateSum += updateTimes[i + 1];
-                        renderSum += renderTimes[i + 1];
-                    }
-                    double updateAverage = updateSum / NUM_FRAMES;
-                    double renderAverage = renderSum / NUM_FRAMES;
-
-                    /* Held back for now
-                    getReportLog().printArray(
-                            "Set Up Times", setUpTimes, ResultType.LOWER_BETTER, ResultUnit.MS);
-                    getReportLog().printArray(
-                            "Update Times", updateTimes, ResultType.LOWER_BETTER, ResultUnit.MS);
-                    getReportLog().printValue(
-                            "Update Time Average", updateAverage, ResultType.LOWER_BETTER,
-                            ResultUnit.MS);
-                    getReportLog().printArray(
-                            "Render Times", renderTimes, ResultType.LOWER_BETTER, ResultUnit.MS);
-                    getReportLog().printValue(
-                            "Render Time Average", renderAverage, ResultType.LOWER_BETTER,
-                            ResultUnit.MS);
-                    totalTime = setUpTimes[0] + setUpTimes[1] + setUpTimes[2] +
-                            setUpTimes[3] + updateAverage + renderAverage;
-                     */
-                } else {
-                    // TODO benchmark failed to run
+                // Calculate update and render average.
+                double updateSum = updateTimes[0];
+                double renderSum = renderTimes[0];
+                for (int i = 0; i < NUM_FRAMES - 1; i++) {
+                    updateSum += updateTimes[i + 1];
+                    renderSum += renderTimes[i + 1];
                 }
-                /*
-                getReportLog().printSummary(
-                        "Total Time", totalTime, ResultType.LOWER_BETTER, ResultUnit.MS);
+                double updateAverage = updateSum / NUM_FRAMES;
+                double renderAverage = renderSum / NUM_FRAMES;
+
+                /* Held back for now
+                getReportLog().printArray(
+                        "Set Up Times", setUpTimes, ResultType.LOWER_BETTER, ResultUnit.MS);
+                getReportLog().printArray(
+                        "Update Times", updateTimes, ResultType.LOWER_BETTER, ResultUnit.MS);
+                getReportLog().printValue(
+                        "Update Time Average", updateAverage, ResultType.LOWER_BETTER,
+                        ResultUnit.MS);
+                getReportLog().printArray(
+                        "Render Times", renderTimes, ResultType.LOWER_BETTER, ResultUnit.MS);
+                getReportLog().printValue(
+                        "Render Time Average", renderAverage, ResultType.LOWER_BETTER,
+                        ResultUnit.MS);
+                totalTime = setUpTimes[0] + setUpTimes[1] + setUpTimes[2] +
+                        setUpTimes[3] + updateAverage + renderAverage;
                  */
+            } else {
+                // TODO benchmark failed to run
             }
+            /*
+            getReportLog().printSummary(
+                    "Total Time", totalTime, ResultType.LOWER_BETTER, ResultUnit.MS);
+             */
         }
     }
 }

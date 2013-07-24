@@ -22,7 +22,7 @@ public:
     virtual ~PixelOutputRenderer() {};
     bool setUp();
     bool tearDown();
-    bool draw();
+    void drawWorkload();
 private:
     GLuint mTextureId;
     GLuint mTextureUniformHandle;

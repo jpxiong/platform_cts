@@ -84,24 +84,17 @@ bool ReferenceRenderer::update(int frame) {
     return true;
 }
 
-bool ReferenceRenderer::draw() {
+void ReferenceRenderer::drawWorkload() {
     SCOPED_TRACE();
-    if (!eglMakeCurrent(mEglDisplay, mEglSurface, mEglSurface, mEglContext)
-            || EGL_SUCCESS != eglGetError()) {
-        return false;
-    }
-    if (mOffscreen) {
-        glBindFramebuffer(GL_FRAMEBUFFER, mFboId);
-    }
     // Set the background clear color to black.
     glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
     // Use culling to remove back faces.
-    glEnable(GL_CULL_FACE);
+    glEnable (GL_CULL_FACE);
     // Use depth testing.
-    glEnable(GL_DEPTH_TEST);
+    glEnable (GL_DEPTH_TEST);
 
     glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
-    bool success = mCurrentScene->draw();
-
-    return Renderer::draw() && success;
+    if (!mCurrentScene->draw()) {
+        ALOGE("Error when rendering scene");
+    }
 }

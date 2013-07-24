@@ -42,6 +42,11 @@ Java_com_android_pts_opengl_primitive_GLPrimitiveActivity_startBenchmark(
     // Records the start time.
     double start = GLUtils::currentTimeMillis();
 
+    // Offscreen renders 100 tiles per frame so reduce the number of frames to render.
+    if (gRenderer->mOffscreen) {
+        numFrames /= Renderer::OFFSCREEN_INNER_FRAMES;
+    }
+
     // Draw off the screen.
     for (int i = 0; i < numFrames && success; i++) {
         // Draw a frame.
