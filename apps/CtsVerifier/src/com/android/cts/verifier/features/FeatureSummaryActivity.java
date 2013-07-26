@@ -172,6 +172,12 @@ public class FeatureSummaryActivity extends PassFailButtons.ListActivity {
             new Feature(PackageManager.FEATURE_TELEVISION, false),
     };
 
+    public static final Feature[] ALL_JELLY_BEAN_MR2_FEATURES = {
+            new Feature("android.software.app_widgets", false),
+            new Feature("android.software.home_screen", false),
+            new Feature("android.hardware.bluetooth_le", false),
+    };
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -202,6 +208,9 @@ public class FeatureSummaryActivity extends PassFailButtons.ListActivity {
 
         // add features from latest to last so that the latest requirements are put in the set first
         int apiVersion = Build.VERSION.SDK_INT;
+        if (apiVersion >= Build.VERSION_CODES.JELLY_BEAN_MR2) {
+            Collections.addAll(features, ALL_JELLY_BEAN__MR2_FEATURES);
+        }
         if (apiVersion >= Build.VERSION_CODES.JELLY_BEAN) {
             Collections.addAll(features, ALL_JELLY_BEAN_FEATURES);
         }
