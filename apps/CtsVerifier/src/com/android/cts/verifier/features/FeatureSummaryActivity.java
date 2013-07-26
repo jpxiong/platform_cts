@@ -174,8 +174,10 @@ public class FeatureSummaryActivity extends PassFailButtons.ListActivity {
 
     public static final Feature[] ALL_JELLY_BEAN_MR2_FEATURES = {
             new Feature("android.software.app_widgets", false),
+            new Feature("android.software.input_methods", false),
             new Feature("android.software.home_screen", false),
             new Feature("android.hardware.bluetooth_le", false),
+            new Feature("android.hardware.camera.any", false),
     };
 
     @Override
