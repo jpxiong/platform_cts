@@ -20,7 +20,9 @@ import android.animation.AnimatorSet;
 import android.app.Activity;
 import android.graphics.SurfaceTexture;
 import android.os.Bundle;
+import android.view.Display;
 import android.view.TextureView;
+import android.view.WindowManager;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 import junit.framework.Assert;
@@ -52,11 +54,32 @@ public class TextureViewTestActivity extends Activity implements TextureView.Sur
         animSet.start();
     }
 
+    private static int addMargin(int a) {
+         /* Worst case is 2 * actual refresh rate, in case when the delay pushes the frame off
+          * VSYNC every frame.
+          */
+         return 2 * a;
+    }
+
+    private static int roundUpFrame(int a, int b) {
+         /* Need to give time based on (frame duration limited by refresh rate + delay given
+          * from the test)
+          */
+         return (a + b + 1);
+    }
+
+
     public Boolean waitForCompletion() {
         Boolean success = false;
-        int timeout = mFrames * mDelayMs * 4;
+        int oneframeMs;
+
+        WindowManager wm = (WindowManager)getSystemService(WINDOW_SERVICE);
+        Display display = wm.getDefaultDisplay();
+        float rate = display.getRefreshRate();
+        oneframeMs = roundUpFrame(mDelayMs, (int)(1000.0f / rate));
         try {
-            success = mSemaphore.tryAcquire(timeout, TimeUnit.MILLISECONDS);
+            success = mSemaphore.tryAcquire(addMargin(oneframeMs * mFrames),
+                    TimeUnit.MILLISECONDS);
         } catch (InterruptedException e) {
             Assert.fail();
         }
