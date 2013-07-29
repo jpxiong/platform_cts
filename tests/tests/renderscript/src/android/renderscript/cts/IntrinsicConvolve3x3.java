@@ -20,24 +20,15 @@ import android.renderscript.*;
 import android.util.Log;
 
 public class IntrinsicConvolve3x3 extends IntrinsicBase {
-    private void testConvolve3(int w, int h, Element.DataType dt, int vecSize, int en) {
+    private void testConvolve3(int w, int h, Element.DataType dt, int vecSize) {
         float cf1[] = {0.f, 0.f, 0.f,  0.f, 1.f, 0.f,  0.f, 0.f, 0.f};
         float cf2[] = {0.f, -1.f, 0.f,  -1.f, 5.f, -1.f,  0.f, -1.f, 0.f};
 
 
-        Element e;
-        if (vecSize > 1) {
-            e = Element.createVector(mRS, dt, vecSize);
-        } else {
-            if (dt == Element.DataType.UNSIGNED_8) {
-                e = Element.U8(mRS);
-            } else {
-                e = Element.F32(mRS);
-            }
-        }
+        Element e = makeElement(dt, vecSize);
 
         System.gc();
-        makeSource(w, h, e);
+        makeBuffers(w, h, e);
 
 
         ScriptIntrinsicConvolve3x3 si = ScriptIntrinsicConvolve3x3.create(mRS, e);
@@ -83,7 +74,7 @@ public class IntrinsicConvolve3x3 extends IntrinsicBase {
         }
 
         android.util.Log.e("RSI test", "test convolve U8_" + vecSize + " 1 " + w + ", " + h);
-        mVerify.invoke_verify(mAllocRef, mAllocDst, en);
+        mVerify.invoke_verify(mAllocRef, mAllocDst, getVerifyEnum(e));
 
         si.setCoefficients(cf2);
         sr.set_gCoeffs(cf2);
@@ -120,21 +111,45 @@ public class IntrinsicConvolve3x3 extends IntrinsicBase {
             }
         }
         android.util.Log.e("RSI test", "test convolve U8_" + vecSize + " 2 " + w + ", " + h);
-        mVerify.invoke_verify(mAllocRef, mAllocDst, en);
+        mVerify.invoke_verify(mAllocRef, mAllocDst, getVerifyEnum(e));
         mRS.finish();
     }
 
 
-    public void test() {
-        testConvolve3(100, 100, Element.DataType.UNSIGNED_8, 4, 0);
-        testConvolve3(100, 100, Element.DataType.UNSIGNED_8, 3, 1);
-        testConvolve3(100, 100, Element.DataType.UNSIGNED_8, 2, 2);
-        testConvolve3(100, 100, Element.DataType.UNSIGNED_8, 1, 3);
+    public void test_U8_4() {
+        testConvolve3(100, 100, Element.DataType.UNSIGNED_8, 4);
+        checkError();
+    }
+    public void test_U8_3() {
+        testConvolve3(100, 100, Element.DataType.UNSIGNED_8, 3);
+        checkError();
+    }
+    public void test_U8_2() {
+        testConvolve3(100, 100, Element.DataType.UNSIGNED_8, 2);
+        checkError();
+    }
+    public void test_U8_1() {
+        testConvolve3(100, 100, Element.DataType.UNSIGNED_8, 1);
+        checkError();
+    }
 
-        testConvolve3(100, 100, Element.DataType.FLOAT_32, 4, 4);
-        testConvolve3(100, 100, Element.DataType.FLOAT_32, 3, 5);
-        testConvolve3(100, 100, Element.DataType.FLOAT_32, 2, 6);
-        testConvolve3(100, 100, Element.DataType.FLOAT_32, 1, 7);
+    public void test_F32_4() {
+        testConvolve3(100, 100, Element.DataType.FLOAT_32, 4);
+        checkError();
+    }
+
+    public void test_F32_3() {
+        testConvolve3(100, 100, Element.DataType.FLOAT_32, 3);
+        checkError();
+    }
+
+    public void test_F32_2() {
+        testConvolve3(100, 100, Element.DataType.FLOAT_32, 2);
+        checkError();
+    }
+
+    public void test_F32_1() {
+        testConvolve3(100, 100, Element.DataType.FLOAT_32, 1);
         checkError();
     }
 

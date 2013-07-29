@@ -16,115 +16,98 @@
 
 #include "shared.rsh"
 
-static rs_matrix4x4 Mat;
 
-int gFormatIn;
-int gFormatOut;
-float4 gAdd;
+void reference(rs_matrix4x4 m, float4 add, rs_allocation in, rs_allocation out) {
+    uint32_t w = rsAllocationGetDimX(in);
+    uint32_t h = rsAllocationGetDimY(in);
 
+    rs_element ein = rsAllocationGetElement(in);
+    rs_element eout = rsAllocationGetElement(out);
+    rs_data_type dtin = rsElementGetDataType(ein);
+    rs_data_type dtout = rsElementGetDataType(eout);
+    uint32_t vsin = rsElementGetVectorSize(ein);
+    uint32_t vsout = rsElementGetVectorSize(eout);
 
-void init() {
-    rsMatrixLoadIdentity(&Mat);
-    gAdd = 0.f;
+    for (uint32_t y = 0; y < h; y++) {
+        for (uint32_t x = 0; x < w; x++) {
+            float4 pin = 0.f;
+
+            if (dtin == RS_TYPE_FLOAT_32) {
+                switch(vsin) {
+                case 4:
+                    pin.xyzw = rsGetElementAt_float4(in, x, y);
+                    break;
+                case 3:
+                    pin.xyz = rsGetElementAt_float3(in, x, y);
+                    break;
+                case 2:
+                    pin.xy = rsGetElementAt_float2(in, x, y);
+                    break;
+                case 1:
+                    pin.x = rsGetElementAt_float(in, x, y);
+                    break;
+                }
+            }
+
+            if (dtin == RS_TYPE_UNSIGNED_8) {
+                uchar4 u = 0;
+                switch(vsin) {
+                case 4:
+                    u.xyzw = rsGetElementAt_uchar4(in, x, y);
+                    break;
+                case 3:
+                    u.xyz = rsGetElementAt_uchar3(in, x, y);
+                    break;
+                case 2:
+                    u.xy = rsGetElementAt_uchar2(in, x, y);
+                    break;
+                case 1:
+                    u.x = rsGetElementAt_uchar(in, x, y);
+                    break;
+                }
+                pin = convert_float4(u) * (1.f / 255.f);
+            }
+
+            pin = rsMatrixMultiply(&m, pin);
+            pin += add;
+
+            if (dtout == RS_TYPE_FLOAT_32) {
+                switch(vsout) {
+                case 4:
+                    rsSetElementAt_float4(out, pin, x, y);
+                    break;
+                case 3:
+                    rsSetElementAt_float3(out, pin.xyz, x, y);
+                    break;
+                case 2:
+                    rsSetElementAt_float2(out, pin.xy, x, y);
+                    break;
+                case 1:
+                    rsSetElementAt_float(out, pin.x, x, y);
+                    break;
+                }
+            }
+
+            if (dtout == RS_TYPE_FLOAT_32) {
+                uchar4 u = rsPackColorTo8888(pin);
+                switch(vsout) {
+                case 4:
+                    rsSetElementAt_uchar4(out, u, x, y);
+                    break;
+                case 3:
+                    rsSetElementAt_uchar3(out, u.xyz, x, y);
+                    break;
+                case 2:
+                    rsSetElementAt_uchar2(out, u.xy, x, y);
+                    break;
+                case 1:
+                    rsSetElementAt_uchar(out, u.x, x, y);
+                    break;
+                }
+            }
+
+        }
+    }
 }
 
-void setMatrix(rs_matrix4x4 m) {
-    Mat = m;
-}
-
-void test(rs_matrix4x4 m, float4 add, int formatIn, int formatOut) {
-
-}
-
-static float4 __attribute__((overloadable)) cvt_in(uchar4 in) {
-    float4 f = convert_float4(in);
-    f *= (1.f / 255.f);
-    return rsMatrixMultiply(&Mat, f);
-}
-static float4 __attribute__((overloadable)) cvt_in(uchar3 in) {
-    float4 f = {in.x, in.y, in.z, 0.f};
-    f *= (1.f / 255.f);
-    return rsMatrixMultiply(&Mat, f);
-}
-static float4 __attribute__((overloadable)) cvt_in(uchar2 in) {
-    float4 f = {in.x, in.y, 0.f, 0.f};
-    f *= (1.f / 255.f);
-    return rsMatrixMultiply(&Mat, f);
-}
-static float4 __attribute__((overloadable)) cvt_in(uchar in) {
-    float4 f = {in, 0.f, 0.f, 0.f};
-    f *= (1.f / 255.f);
-    return rsMatrixMultiply(&Mat, f);
-}
-static float4 __attribute__((overloadable)) cvt_in(float4 in) {
-    float4 f = in;
-    return rsMatrixMultiply(&Mat, f);
-}
-static float4 __attribute__((overloadable)) cvt_in(float3 in) {
-    float4 f = {in.x, in.y, in.z, 0.f};
-    return rsMatrixMultiply(&Mat, f);
-}
-static float4 __attribute__((overloadable)) cvt_in(float2 in) {
-    float4 f = {in.x, in.y, 0.f, 0.f};
-    return rsMatrixMultiply(&Mat, f);
-}
-static float4 __attribute__((overloadable)) cvt_in(float in) {
-    float4 f = {in, 0.f, 0.f, 0.f};
-    return rsMatrixMultiply(&Mat, f);
-}
-
-
-static uchar4 cvt_out_uchar4(float4 f) {
-    f = clamp(f, 0.f, 255.5f);
-    return convert_uchar4(f.xyzw);
-}
-static uchar3 cvt_out_uchar3(float4 f) {
-    f = clamp(f, 0.f, 255.5f);
-    return convert_uchar3(f.xyz);
-}
-static uchar2 cvt_out_uchar2(float4 f) {
-    f = clamp(f, 0.f, 255.5f);
-    return convert_uchar2(f.xy);
-}
-static uchar cvt_out_uchar(float4 f) {
-    f = clamp(f, 0.f, 255.5f);
-    return f.x;
-}
-static float4 cvt_out_float4(float4 f) {
-    return f;
-}
-static float3 cvt_out_float3(float4 f) {
-    return f.xyz;
-}
-static float2 cvt_out_float2(float4 f) {
-    return f.xy;
-}
-static float cvt_out_float(float4 f) {
-    return f.x;
-}
-
-#define KERN(tin, tout) \
-tout __attribute__((kernel)) k_##tin##_##tout(tin in) {         \
-    float4 f = cvt_in(in);                                      \
-    return cvt_out_##tout(f);                                   \
-}
-
-#define KERN2(tin)  \
-KERN(tin, uchar4)   \
-KERN(tin, uchar3)   \
-KERN(tin, uchar2)   \
-KERN(tin, uchar)    \
-KERN(tin, float4)   \
-KERN(tin, float3)   \
-KERN(tin, float2)   \
-KERN(tin, float)
-
-KERN2(uchar4)
-KERN2(uchar3)
-KERN2(uchar2)
-KERN2(uchar)
-KERN2(float4)
-KERN2(float3)
-KERN2(float2)
-KERN2(float)
 

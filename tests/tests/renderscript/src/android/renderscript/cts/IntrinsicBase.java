@@ -45,6 +45,33 @@ public class IntrinsicBase extends RSBaseCompute {
         super.tearDown();
     }
 
+    protected Element makeElement(Element.DataType dt, int vecSize) {
+        Element e;
+        if (vecSize > 1) {
+            e = Element.createVector(mRS, dt, vecSize);
+        } else {
+            if (dt == Element.DataType.UNSIGNED_8) {
+                e = Element.U8(mRS);
+            } else {
+                e = Element.F32(mRS);
+            }
+        }
+        return e;
+    }
+
+    protected int getVerifyEnum(Element.DataType dt, int vecSize) {
+        if (dt == Element.DataType.FLOAT_32) {
+            return 8 - vecSize;
+        }
+
+        // U8
+        return 4 - vecSize;
+    }
+
+    protected int getVerifyEnum(Element e) {
+        return getVerifyEnum(e.getDataType(), e.getVectorSize());
+    }
+
     protected void makeSource(int w, int h, Element e) {
         System.gc();
 
@@ -69,6 +96,7 @@ public class IntrinsicBase extends RSBaseCompute {
         java.util.Random r = new java.util.Random(100);
 
         int vs = e.getVectorSize();
+        if (vs == 3) vs = 4;
         if (e.getDataType() == Element.DataType.FLOAT_32) {
             float f[] = new float[w * h * vs];
             for (int y=0; y < h; y++) {
@@ -92,7 +120,12 @@ public class IntrinsicBase extends RSBaseCompute {
             }
             mAllocSrc.copyFromUnchecked(f);
         }
+    }
 
+    protected void makeBuffers(int w, int h, Element e) {
+        makeSource(w, h, e);
+        mAllocRef = Allocation.createTyped(mRS, mAllocSrc.getType());
+        mAllocDst = Allocation.createTyped(mRS, mAllocSrc.getType());
     }
 
 
