@@ -47,6 +47,7 @@ import android.webkit.ConsoleMessage;
 import android.webkit.DownloadListener;
 import android.webkit.JavascriptInterface;
 import android.webkit.SslErrorHandler;
+import android.webkit.ValueCallback;
 import android.webkit.WebBackForwardList;
 import android.webkit.WebChromeClient;
 import android.webkit.WebIconDatabase;
@@ -59,7 +60,6 @@ import android.webkit.WebViewDatabase;
 import android.webkit.cts.WebViewOnUiThread.WaitForLoadedClient;
 import android.webkit.cts.WebViewOnUiThread.WaitForProgressClient;
 import android.widget.LinearLayout;
-
 
 import junit.framework.Assert;
 
@@ -1846,6 +1846,33 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
         assertEquals("anchor", mOnUiThread.getTitle());
     }
 
+    public void testEvaluateJavascript() {
+        // evaluteJavaScript not supported with WebViewClassic
+        // TODO: Remove when WebViewClassic no longer in system image.
+        if (mWebView.getWebViewProvider() instanceof android.webkit.WebViewClassic) {
+            return;
+        }
+
+        mOnUiThread.getSettings().setJavaScriptEnabled(true);
+        mOnUiThread.loadUrlAndWaitForCompletion("about:blank");
+
+        EvaluateJsResultPollingCheck jsResult = new EvaluateJsResultPollingCheck("2");
+        mOnUiThread.evaluateJavascript("1+1", jsResult);
+        jsResult.run();
+
+        jsResult = new EvaluateJsResultPollingCheck("9");
+        mOnUiThread.evaluateJavascript("1+1; 4+5", jsResult);
+        jsResult.run();
+
+        final String EXPECTED_TITLE = "test";
+        mOnUiThread.evaluateJavascript("document.title='" + EXPECTED_TITLE + "';", null);
+        new PollingCheck(TEST_TIMEOUT) {
+            @Override
+            protected boolean check() {
+                return mOnUiThread.getTitle().equals(EXPECTED_TITLE);
+            }
+        }.run();
+    }
 
     @UiThreadTest
     public void testInternals() {
@@ -2027,6 +2054,26 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
         }
         public String errorUrl() {
             return mErrorUrl;
+        }
+    }
+
+    private static class EvaluateJsResultPollingCheck  extends PollingCheck
+            implements ValueCallback<String> {
+        private String mActualResult;
+        private String mExpectedResult;
+
+        public EvaluateJsResultPollingCheck(String expected) {
+            mExpectedResult = expected;
+        }
+
+        @Override
+        public synchronized boolean check() {
+            return mExpectedResult.equals(mActualResult);
+        }
+
+        @Override
+        public synchronized void onReceiveValue(String result) {
+            mActualResult = result;
         }
     }
 }
