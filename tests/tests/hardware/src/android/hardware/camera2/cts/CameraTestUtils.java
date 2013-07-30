@@ -24,9 +24,6 @@ import android.hardware.camera2.CameraPropertiesKeys;
 import android.hardware.camera2.Size;
 import android.media.Image;
 import android.media.Image.Plane;
-import android.os.ConditionVariable;
-import android.os.Handler;
-import android.os.Looper;
 import android.util.Log;
 
 import junit.framework.Assert;
@@ -42,11 +39,7 @@ import java.util.Arrays;
 class CameraTestUtils extends Assert {
     private static final String TAG = "CameraTestUtils";
     private static final boolean VERBOSE = Log.isLoggable(TAG, Log.VERBOSE);
-    // Timeout for initializing looper and opening camera in Milliseconds.
-    private static final int WAIT_FOR_COMMAND_TO_COMPLETE = 5000;
 
-    private Looper mLooper = null;
-    private Handler mHandler = null;
     /**
      * <p>Read data from all planes of an Image into a contiguous unpadded, unpacked
      * 1-D linear byte array, such that it can be write into disk, or accessed by
@@ -195,60 +188,5 @@ class CameraTestUtils extends Assert {
         Size[] availableSizes = properties.get(key);
         if (VERBOSE) Log.v(TAG, "Supported sizes are: " + Arrays.deepToString(availableSizes));
         return availableSizes;
-    }
-
-    /**
-     * Create a message looper thread so that it can be used to receive the
-     * camera test callback messages.
-     */
-    public void createLooperThread() throws Exception {
-        if (mLooper != null || mHandler !=null) {
-            Log.w(TAG, "Looper thread already exist");
-            return;
-        }
-
-        final ConditionVariable startDone = new ConditionVariable();
-        new Thread() {
-            @Override
-            public void run() {
-                if (VERBOSE) Log.v(TAG, "start loopRun");
-                // Set up a looper to be used by camera.
-                Looper.prepare();
-                // Save the looper so that we can terminate this thread
-                // after we are done with it.
-                mLooper = Looper.myLooper();
-                mHandler = new Handler();
-                startDone.open();
-                Looper.loop();
-                if (VERBOSE) Log.v(TAG, "createLooperThread: finished");
-            }
-        }.start();
-
-        if (VERBOSE) Log.v(TAG, "start waiting for looper");
-        if (!startDone.block(WAIT_FOR_COMMAND_TO_COMPLETE)) {
-            fail("createLooperThread: start timeout");
-        }
-    }
-
-    /**
-     * Terminates the message looper thread.
-     */
-    public void terminateLoopThread() throws Exception {
-        if (mLooper == null || mHandler ==null) {
-            Log.w(TAG, "Looper thread doesn't exist");
-            return;
-        }
-        if (VERBOSE) Log.v(TAG, "Terminate looper thread");
-        mLooper.quit();
-        mLooper.getThread().join();
-        mLooper = null;
-        mHandler = null;
-    }
-
-    public Handler getHandler() {
-        if (mHandler == null) {
-            throw new IllegalStateException("Looper thread isn't created yet!");
-        }
-        return mHandler;
     }
 }

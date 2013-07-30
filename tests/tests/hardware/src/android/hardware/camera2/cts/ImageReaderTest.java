@@ -68,6 +68,7 @@ public class ImageReaderTest extends AndroidTestCase {
     private CameraTestUtils mTestUtil = null;
     private Handler mHandler = null;
     private SimpleImageListener mListener = null;
+    private CameraTestThread mLooperThread = null;
 
     @Override
     public void setContext(Context context) {
@@ -81,8 +82,8 @@ public class ImageReaderTest extends AndroidTestCase {
         super.setUp();
         mCameraIds = mCameraManager.getDeviceIdList();
         mTestUtil = new CameraTestUtils();
-        mTestUtil.createLooperThread();
-        mHandler = mTestUtil.getHandler();
+        mLooperThread = new CameraTestThread();
+        mHandler = mLooperThread.start();
     }
 
     @Override
@@ -95,7 +96,7 @@ public class ImageReaderTest extends AndroidTestCase {
             mReader.close();
             mReader = null;
         }
-        mTestUtil.terminateLoopThread();
+        mLooperThread.close();
         mTestUtil = null;
         mHandler = null;
         super.tearDown();
