@@ -28,6 +28,7 @@ import android.test.InstrumentationTestCase;
 import android.util.DisplayMetrics;
 import android.view.View;
 import android.webkit.DownloadListener;
+import android.webkit.ValueCallback;
 import android.webkit.WebBackForwardList;
 import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
@@ -643,6 +644,15 @@ public class WebViewOnUiThread {
             @Override
             public Picture capture() {
                 return mWebView.capturePicture();
+            }
+        });
+    }
+
+    public void evaluateJavascript(final String script, final ValueCallback<String> result) {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                mWebView.evaluateJavascript(script, result);
             }
         });
     }
