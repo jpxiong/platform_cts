@@ -26,7 +26,6 @@ import android.hardware.camera2.CaptureRequest;
 import android.hardware.camera2.CaptureResult;
 import android.media.Image;
 import android.media.ImageReader;
-import android.os.Handler;
 import android.os.SystemClock;
 import android.test.AndroidTestCase;
 import android.util.Log;
@@ -46,9 +45,7 @@ public class CameraDeviceTest extends AndroidTestCase {
     private static final boolean VERBOSE = Log.isLoggable(TAG, Log.VERBOSE);
 
     private CameraManager mCameraManager;
-    private CameraDevice.CameraDeviceListener mMockDeviceListener;
-    private CameraTestThread mLooperThread;
-    private Handler mCallbackHandler;
+    private CameraDevice.ErrorListener mMockErrorListener;
 
     /**
      * The error triggered flag starts out as false, and it will flip to true if any errors
@@ -89,10 +86,10 @@ public class CameraDeviceTest extends AndroidTestCase {
         System.setProperty("dexmaker.dexcache", mContext.getCacheDir().toString());
         /**
          * Create errorlistener in context scope, to catch asynchronous device error.
-         * Use spy object here since we want to use the SimpleDeviceListener callback
+         * Use spy object here since we want to use the SimpleErrorListener callback
          * implementation (spy doesn't stub the functions unless we ask it to do so).
          */
-        mMockDeviceListener = spy(new SimpleDeviceListener());
+        mMockErrorListener = spy(new SimpleErrorListener());
     }
 
     @Override
@@ -108,8 +105,6 @@ public class CameraDeviceTest extends AndroidTestCase {
         mCameraManager = (CameraManager)mContext.getSystemService(Context.CAMERA_SERVICE);
         assertNotNull("Can't connect to camera manager", mCameraManager);
         createDefaultSurface();
-        mLooperThread = new CameraTestThread();
-        mCallbackHandler = mLooperThread.start();
     }
 
     @Override
@@ -122,64 +117,15 @@ public class CameraDeviceTest extends AndroidTestCase {
     /**
      * This class need to be public because spy need access it.
      */
-    public class SimpleDeviceListener extends CameraDevice.CameraDeviceListener {
-        private Object mIdleLock = new Object();
-        private boolean mIdle = false;
-
-        public SimpleDeviceListener() {
-
-        }
-
-        // Wait for idle to occur, with a timeout in milliseconds.
-        // A timeout of 0 means indefinite wait
-        public void waitForIdle(long timeout) {
-            synchronized(mIdleLock) {
-                if (!mIdle) {
-                    try {
-                        if (timeout > 0) {
-                            mIdleLock.wait(timeout);
-                        } else {
-                            mIdleLock.wait();
-                        }
-                    } catch (InterruptedException e) {
-                        // Probably fail the idle assert, but needs no other
-                        // action
-                    }
-                    assertTrue("Timeout waiting for camera device idle", mIdle);
-                }
-                mIdle = false;
-            }
-        }
-
-        // Clear idle flag
-        public void clearIdleFlag() {
-            synchronized(mIdleLock) {
-                mIdle = false;
-            }
-        }
-
+    public class SimpleErrorListener implements CameraDevice.ErrorListener {
         @Override
-        public void onCameraIdle(CameraDevice camera) {
-            synchronized(mIdleLock) {
-                mIdle = true;
-                mIdleLock.notifyAll();
-            }
-        }
-
-        @Override
-        public void onCameraDisconnected(CameraDevice camera) {
-            // Not expecting disconnections
-            mErrorTriggered = true;
-        }
-
-        @Override
-        public void onCameraError(CameraDevice camera, int error) {
+        public void onCameraDeviceError(CameraDevice camera, int error) {
             mErrorTriggered = true;
         }
     }
 
-    public void testCameraDeviceCreateCaptureBuilder() throws Exception {
-        String[] ids = mCameraManager.getCameraIdList();
+    public void testCameraDeviceCreateCaptureRequest() throws Exception {
+        String[] ids = mCameraManager.getDeviceIdList();
         for (int i = 0; i < ids.length; i++) {
             CameraDevice camera = null;
             try {
@@ -192,7 +138,7 @@ public class CameraDeviceTest extends AndroidTestCase {
                  * present.
                  */
                 for (int j = 0; j < mTemplates.length; j++) {
-                    CaptureRequest.Builder capReq = camera.createCaptureRequest(mTemplates[j]);
+                    CaptureRequest capReq = camera.createCaptureRequest(mTemplates[j]);
                     assertNotNull("Failed to create capture request", capReq);
                     assertNotNull("Missing field: SENSOR_EXPOSURE_TIME",
                             capReq.get(CaptureRequest.SENSOR_EXPOSURE_TIME));
@@ -211,7 +157,7 @@ public class CameraDeviceTest extends AndroidTestCase {
     }
 
     public void testCameraDeviceGetProperties() throws Exception {
-        String[] ids = mCameraManager.getCameraIdList();
+        String[] ids = mCameraManager.getDeviceIdList();
         for (int i = 0; i < ids.length; i++) {
             CameraDevice camera = null;
             try {
@@ -236,7 +182,7 @@ public class CameraDeviceTest extends AndroidTestCase {
     }
 
     public void testCameraDeviceSetErrorListener() throws Exception {
-        String[] ids = mCameraManager.getCameraIdList();
+        String[] ids = mCameraManager.getDeviceIdList();
         for (int i = 0; i < ids.length; i++) {
             CameraDevice camera = null;
             try {
@@ -248,10 +194,10 @@ public class CameraDeviceTest extends AndroidTestCase {
                  * Test: that the error listener can be set without problems.
                  * Also, wait some time to check if device doesn't run into error.
                  */
-                camera.setDeviceListener(mMockDeviceListener, mCallbackHandler);
+                camera.setErrorListener(mMockErrorListener);
                 SystemClock.sleep(ERROR_LISTENER_WAIT_TIMEOUT_MS);
-                verify(mMockDeviceListener, never())
-                        .onCameraError(
+                verify(mMockErrorListener, never())
+                        .onCameraDeviceError(
                                 any(CameraDevice.class),
                                 anyInt());
             }
@@ -296,14 +242,14 @@ public class CameraDeviceTest extends AndroidTestCase {
     }
 
     private void runCaptureTest(boolean burst, boolean repeating) throws Exception {
-        String[] ids = mCameraManager.getCameraIdList();
+        String[] ids = mCameraManager.getDeviceIdList();
         for (int i = 0; i < ids.length; i++) {
             CameraDevice camera = null;
             try {
                 camera = mCameraManager.openCamera(ids[i]);
                 assertNotNull(
                         String.format("Failed to open camera device %s", ids[i]), camera);
-                camera.setDeviceListener(mMockDeviceListener, mCallbackHandler);
+                camera.setErrorListener(mMockErrorListener);
 
                 prepareCapture(camera);
 
@@ -334,8 +280,8 @@ public class CameraDeviceTest extends AndroidTestCase {
                     // Test: burst of 5 shots of different template types
                     captureBurstShot(camera, ids[i], mTemplates, mTemplates.length, repeating);
                 }
-                verify(mMockDeviceListener, never())
-                        .onCameraError(
+                verify(mMockErrorListener, never())
+                        .onCameraDeviceError(
                                 any(CameraDevice.class),
                                 anyInt());
             }
@@ -353,9 +299,9 @@ public class CameraDeviceTest extends AndroidTestCase {
             int template,
             boolean repeating) throws Exception {
 
-        CaptureRequest.Builder requestBuilder = camera.createCaptureRequest(template);
-        assertNotNull("Failed to create capture request", requestBuilder);
-        requestBuilder.addTarget(mSurface);
+        CaptureRequest request = camera.createCaptureRequest(template);
+        assertNotNull("Failed to create capture request", request);
+        request.addTarget(mSurface);
         CameraDevice.CaptureListener mockCaptureListener =
                 mock(CameraDevice.CaptureListener.class);
 
@@ -364,11 +310,10 @@ public class CameraDeviceTest extends AndroidTestCase {
                     id, template));
         }
         if (!repeating) {
-            camera.capture(requestBuilder.build(), mockCaptureListener, mCallbackHandler);
+            camera.capture(request, mockCaptureListener);
         }
         else {
-            camera.setRepeatingRequest(requestBuilder.build(), mockCaptureListener,
-                    mCallbackHandler);
+            camera.setRepeatingRequest(request, mockCaptureListener);
         }
 
         int expectedCaptureResultCount = repeating ? REPEATING_CAPTURE_EXPECTED_RESULT_COUNT : 1;
@@ -390,10 +335,10 @@ public class CameraDeviceTest extends AndroidTestCase {
         assertTrue("Invalid args to capture function", len <= templates.length);
         List<CaptureRequest> requests = new ArrayList<CaptureRequest>();
         for (int i = 0; i < len; i++) {
-            CaptureRequest.Builder requestBuilder = camera.createCaptureRequest(templates[i]);
-            assertNotNull("Failed to create capture request", requestBuilder);
-            requestBuilder.addTarget(mSurface);
-            requests.add(requestBuilder.build());
+            CaptureRequest request = camera.createCaptureRequest(templates[i]);
+            assertNotNull("Failed to create capture request", request);
+            request.addTarget(mSurface);
+            requests.add(request);
         }
         CameraDevice.CaptureListener mockCaptureListener =
                 mock(CameraDevice.CaptureListener.class);
@@ -403,10 +348,10 @@ public class CameraDeviceTest extends AndroidTestCase {
         }
 
         if (!repeating) {
-            camera.captureBurst(requests, mockCaptureListener, mCallbackHandler);
+            camera.captureBurst(requests, mockCaptureListener);
         }
         else {
-            camera.setRepeatingBurst(requests, mockCaptureListener, mCallbackHandler);
+            camera.setRepeatingBurst(requests, mockCaptureListener);
         }
         int expectedResultCount = len;
         if (repeating) {
@@ -459,7 +404,7 @@ public class CameraDeviceTest extends AndroidTestCase {
         // Should receive expected number of capture results.
         verify(mockListener,
                 timeout(CAPTURE_WAIT_TIMEOUT_MS).atLeast(expectResultCount))
-                        .onCaptureCompleted(
+                        .onCaptureComplete(
                                 any(CameraDevice.class),
                                 argThat(new IsCameraMetadataNotEmpty<CaptureRequest>()),
                                 argThat(new IsCameraMetadataNotEmpty<CaptureResult>()));
