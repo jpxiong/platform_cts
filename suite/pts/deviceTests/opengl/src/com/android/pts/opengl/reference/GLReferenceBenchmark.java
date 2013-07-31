@@ -49,9 +49,8 @@ public class GLReferenceBenchmark extends PtsActivityInstrumentationTestCase2<GL
         intent.putExtra(GLActivityIntentKeys.INTENT_EXTRA_NUM_FRAMES, NUM_FRAMES);
         intent.putExtra(GLActivityIntentKeys.INTENT_EXTRA_TIMEOUT, TIMEOUT);
 
-        GLReferenceActivity activity = null;
         setActivityIntent(intent);
-        activity = getActivity();
+        GLReferenceActivity activity = getActivity();
         if (activity != null) {
             activity.waitForCompletion();
             double totalTime = 0;
