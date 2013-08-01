@@ -261,6 +261,7 @@ public class EncodeDecodeTest extends AndroidTestCase {
             // Create a MediaCodec for the decoder, just based on the MIME type.  The various
             // format details will be passed through the csd-0 meta-data later on.
             decoder = MediaCodec.createDecoderByType(MIME_TYPE);
+            if (VERBOSE) Log.d(TAG, "got decoder: " + decoder.getName());
 
             doEncodeDecodeVideoFromBuffer(encoder, colorFormat, decoder, toSurface);
         } finally {
@@ -321,6 +322,7 @@ public class EncodeDecodeTest extends AndroidTestCase {
             // Create a MediaCodec for the decoder, just based on the MIME type.  The various
             // format details will be passed through the csd-0 meta-data later on.
             decoder = MediaCodec.createDecoderByType(MIME_TYPE);
+            if (VERBOSE) Log.d(TAG, "got decoder: " + decoder.getName());
             decoder.configure(format, outputSurface.getSurface(), null, 0);
             decoder.start();
 
