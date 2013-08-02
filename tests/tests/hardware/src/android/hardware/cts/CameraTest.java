@@ -774,6 +774,7 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
         assertTrue(sizes.size() >= 2);
         assertTrue(sizes.contains(size));
         assertTrue(sizes.contains(mCamera.new Size(0, 0)));
+        Size pictureSize = p.getPictureSize();
 
         // Test if the thumbnail size matches the setting.
         if (!recording) mCamera.startPreview();
@@ -808,6 +809,13 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
         assertTrue(mJpegPictureCallbackResult);
         exif = new ExifInterface(JPEG_PATH);
         assertFalse(exif.hasThumbnail());
+        // Primary image should still be valid for no thumbnail capture.
+        BitmapFactory.decodeFile(JPEG_PATH, bmpOptions);
+        assertTrue("Jpeg primary image size should match requested size",
+                bmpOptions.outWidth == pictureSize.width &&
+                bmpOptions.outHeight == pictureSize.height);
+        assertNotNull("Jpeg primary image data should be decodable",
+                BitmapFactory.decodeFile(JPEG_PATH));
     }
 
     @UiThreadTest
