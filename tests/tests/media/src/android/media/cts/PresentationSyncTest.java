@@ -96,14 +96,15 @@ public class PresentationSyncTest extends ActivityInstrumentationTestCase2<Media
         // Run a test with no presentation times specified.  Assuming nothing else is
         // fighting us for resources, all frames should display as quickly as possible,
         // and we can estimate the refresh rate of the device.
-        long baseTimeNsec = runThroughputTest(output, 0L, -1);
+        long baseTimeNsec = runThroughputTest(output, 0L, -1.0f);
         long refreshNsec = baseTimeNsec / FRAME_COUNT;
         Log.i(TAG, "Using " + refreshNsec + "ns as refresh rate");
 
-        // Run tests with times specified, at 1x, 1/2x, and 1/4x speed.
-        runThroughputTest(output, refreshNsec, 1);
-        runThroughputTest(output, refreshNsec, 2);
-        runThroughputTest(output, refreshNsec, 4);
+        // Run tests with times specified, at 1.3x, 1x, 1/2x, and 1/4x speed.
+        runThroughputTest(output, refreshNsec, 0.75f);
+        runThroughputTest(output, refreshNsec, 1.0f);
+        runThroughputTest(output, refreshNsec, 2.0f);
+        runThroughputTest(output, refreshNsec, 4.0f);
 
         output.release();
     }
@@ -116,7 +117,7 @@ public class PresentationSyncTest extends ActivityInstrumentationTestCase2<Media
      * <p>
      * @return the test duration, in nanoseconds
      */
-    private long runThroughputTest(InputSurface output, long frameTimeNsec, int mult) {
+    private long runThroughputTest(InputSurface output, long frameTimeNsec, float mult) {
         Log.d(TAG, "runThroughputTest: " + mult);
         long startNsec = System.nanoTime();
         long showNsec = 0;
@@ -132,8 +133,8 @@ public class PresentationSyncTest extends ActivityInstrumentationTestCase2<Media
         }
 
         for (int frameNum = 0; frameNum < FRAME_COUNT; frameNum++) {
-            if (mult != -1) {
-                showNsec = startNsec + frameNum * frameTimeNsec * mult;
+            if (mult != -1.0f) {
+                showNsec = startNsec + (long) (frameNum * frameTimeNsec * mult);
                 //Log.d(TAG, "showNsec=" + showNsec);
             }
             drawFrame(frameNum, mult);
@@ -149,7 +150,7 @@ public class PresentationSyncTest extends ActivityInstrumentationTestCase2<Media
 
         if (mult != -1) {
             // Some variation is inevitable, but we should be within a few percent of expected.
-            long expectedNsec = frameTimeNsec * FRAME_COUNT * mult;
+            long expectedNsec = (long) (frameTimeNsec * FRAME_COUNT * mult);
             long deltaNsec = Math.abs(expectedNsec - actualNsec);
             double delta = (double) deltaNsec / expectedNsec;
             if (delta > 0.1) {
@@ -353,7 +354,7 @@ public class PresentationSyncTest extends ActivityInstrumentationTestCase2<Media
     /**
      * Draws a frame with GLES in the current context.
      */
-    private void drawFrame(int num, int mult) {
+    private void drawFrame(int num, float mult) {
         num %= 64;
         float colorVal;
 
