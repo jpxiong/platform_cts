@@ -32,6 +32,9 @@
 .method public run(Ljava/lang/Object;)V
 .limit regs 5
 
+       new-instance v2, java/lang/Object
+       invoke-direct {v2}, java/lang/Object/<init>()V
+       monitor-enter v2
        monitor-exit v3
        return-void
 .end method

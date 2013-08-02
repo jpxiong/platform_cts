@@ -178,19 +178,6 @@ public class Test_aput_byte extends DxTestCase {
     }
 
     /**
-     * @constraint B15 
-     * @title put value 128 into byte array
-     */
-    public void testVFE8() {
-        try {
-            Class.forName("dot.junit.opcodes.aput_byte.d.T_aput_byte_10");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
-        }
-    }
-
-    /**
      * @constraint B1
      * @title Type of index argument - float. The verifier checks that ints
      * and floats are not used interchangeably.

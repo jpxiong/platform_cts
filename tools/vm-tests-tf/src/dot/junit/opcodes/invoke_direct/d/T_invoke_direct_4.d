@@ -27,6 +27,7 @@
 .end method
 
 .method public run()V
-    invoke-direct {v0}, dot/junit/opcodes/invoke_direct/d/T_invoke_direct_4/<clinit>()V
+    invoke-direct {}, dot/junit/opcodes/invoke_direct/d/T_invoke_direct_4/<clinit>()V
+    return-void
 .end method
 
