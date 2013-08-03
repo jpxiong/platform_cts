@@ -174,6 +174,6 @@ public class DisplayTest extends AndroidTestCase {
     public void testFlags() {
         Display display = getSecondaryDisplay(mDisplayManager.getDisplays());
 
-        assertEquals(0, display.getFlags());
+        assertEquals(Display.FLAG_PRESENTATION, display.getFlags());
     }
 }
