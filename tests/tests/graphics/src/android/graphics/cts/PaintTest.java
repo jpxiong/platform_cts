@@ -780,7 +780,7 @@ public class PaintTest extends AndroidTestCase {
         assertEquals(Paint.ANTI_ALIAS_FLAG, p.getFlags());
 
         p.reset();
-        assertEquals(Paint.DEV_KERN_TEXT_FLAG, p.getFlags());
+        assertEquals(Paint.DEV_KERN_TEXT_FLAG | Paint.EMBEDDED_BITMAP_TEXT_FLAG, p.getFlags());
         assertEquals(null, p.getColorFilter());
         assertEquals(null, p.getMaskFilter());
         assertEquals(null, p.getPathEffect());

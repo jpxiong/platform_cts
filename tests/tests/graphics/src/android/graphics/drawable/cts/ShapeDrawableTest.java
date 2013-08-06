@@ -177,8 +177,8 @@ public class ShapeDrawableTest extends AndroidTestCase {
     public void testGetPaint() {
         ShapeDrawable shapeDrawable = new ShapeDrawable();
         assertNotNull(shapeDrawable.getPaint());
-        assertEquals(Paint.ANTI_ALIAS_FLAG | Paint.DEV_KERN_TEXT_FLAG,
-                shapeDrawable.getPaint().getFlags());
+        assertEquals(Paint.ANTI_ALIAS_FLAG | Paint.DEV_KERN_TEXT_FLAG
+                | Paint.EMBEDDED_BITMAP_TEXT_FLAG, shapeDrawable.getPaint().getFlags());
     }
 
     public void testAccessShaderFactory() {
