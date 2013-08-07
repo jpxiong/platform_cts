@@ -93,6 +93,8 @@ cts_test_packages := \
 	CtsPreference2TestCases \
 	CtsProviderTestCases \
 	CtsRenderscriptTestCases \
+	CtsRenderscriptGraphicsTestCases \
+	CtsRsCppTestCases \
 	CtsSaxTestCases \
 	CtsSecurityTestCases \
 	CtsSpeechTestCases \
