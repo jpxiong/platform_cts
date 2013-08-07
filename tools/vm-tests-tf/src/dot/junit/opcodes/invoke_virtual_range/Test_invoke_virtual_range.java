@@ -27,6 +27,7 @@ import dot.junit.opcodes.invoke_virtual_range.d.T_invoke_virtual_range_18;
 import dot.junit.opcodes.invoke_virtual_range.d.T_invoke_virtual_range_19;
 import dot.junit.opcodes.invoke_virtual_range.d.T_invoke_virtual_range_2;
 import dot.junit.opcodes.invoke_virtual_range.d.T_invoke_virtual_range_20;
+import dot.junit.opcodes.invoke_virtual_range.d.T_invoke_virtual_range_24;
 import dot.junit.opcodes.invoke_virtual_range.d.T_invoke_virtual_range_4;
 import dot.junit.opcodes.invoke_virtual_range.d.T_invoke_virtual_range_5;
 import dot.junit.opcodes.invoke_virtual_range.d.T_invoke_virtual_range_6;
@@ -148,8 +149,9 @@ public class Test_invoke_virtual_range extends DxTestCase {
     public void testVFE3() {
         try {
             new T_invoke_virtual_range_10().run();
-            fail("expected IncompatibleClassChangeError");
-        } catch (IncompatibleClassChangeError t) {
+            fail("expected a verification exception");
+        } catch (Throwable t) {
+            DxUtil.checkVerifyException(t);
         }
     }
 
@@ -324,8 +326,9 @@ public class Test_invoke_virtual_range extends DxTestCase {
      * @title attempt to invoke interface method
      */
     public void testVFE18() {
+        //@uses dot.junit.opcodes.invoke_virtual_range.d.T_invoke_virtual_range_24
         try {
-            Class.forName("dot.junit.opcodes.invoke_virtual_range.d.T_invoke_virtual_range_24");
+            new T_invoke_virtual_range_24().run();
             fail("expected a verification exception");
         } catch (Throwable t) {
             DxUtil.checkVerifyException(t);

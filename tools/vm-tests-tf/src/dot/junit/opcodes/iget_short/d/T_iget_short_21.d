@@ -30,7 +30,7 @@
        new-instance v0, Ldot/junit/opcodes/iget_short/TestStubs;
        invoke-direct {v0}, dot/junit/opcodes/iget_short/TestStubs/<init>()V
        
-       iget-wide v1, v0, dot.junit.opcodes.iget_short.TestStubs.TestStubProtectedField S
+       iget-short v1, v0, dot.junit.opcodes.iget_short.TestStubs.TestStubProtectedField S
        return-void
 .end method
 

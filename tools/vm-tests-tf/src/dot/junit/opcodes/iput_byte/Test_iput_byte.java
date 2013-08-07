@@ -122,20 +122,6 @@ public class Test_iput_byte extends DxTestCase {
     /**
      *
      * @constraint B14
-     * @title put value '256' into byte field
-     */
-    public void testVFE6() {
-        try {
-            Class.forName("dot.junit.opcodes.iput_byte.d.T_iput_byte_6");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
-        }
-    }
-
-    /**
-     *
-     * @constraint B14
      * @title type of field doesn't match opcode - attempt to modify double
      * field with single-width register
      */

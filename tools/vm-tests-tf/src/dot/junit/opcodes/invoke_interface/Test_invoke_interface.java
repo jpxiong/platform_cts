@@ -166,8 +166,9 @@ public class Test_invoke_interface extends DxTestCase {
     public void testVFE2() {
         try {
             new T_invoke_interface_4().run();
-            fail("expected NoSuchMethodError");
+            fail("expected NoSuchMethodError or IncompatibleClassChangeError");
         } catch (NoSuchMethodError t) {
+        } catch (IncompatibleClassChangeError e) {
         }
     }
 
@@ -216,13 +217,13 @@ public class Test_invoke_interface extends DxTestCase {
      * @title invoke-interface may not be used to call <init>.
      */
     public void testVFE10() {
-        //@uses dot.junit.opcodes.invoke_interface.ITest
-        //@uses dot.junit.opcodes.invoke_interface.ITestImpl
-        //@uses dot.junit.opcodes.invoke_interface.ITestImplAbstract
+        //@uses dot.junit.opcodes.invoke_interface.d.T_invoke_interface_18
         try {
             new T_invoke_interface_18().run(new ITestImpl());
-            fail("expected InstantiationError");
-        } catch (InstantiationError t) {
+            fail("expected NoSuchMethodError or verification exception");
+        } catch (NoSuchMethodError t) {
+        } catch (Throwable t) {
+            DxUtil.checkVerifyException(t);
         }
     }
 
@@ -235,8 +236,10 @@ public class Test_invoke_interface extends DxTestCase {
         //@uses dot.junit.opcodes.invoke_interface.ITestImpl
         try {
             new T_invoke_interface_20().run(new ITestImpl());
-            fail("expected NoSuchMethodError");
+            fail("expected NoSuchMethodError or verification exception");
         } catch (NoSuchMethodError t) {
+        } catch (Throwable t) {
+            DxUtil.checkVerifyException(t);
         }
     }
 

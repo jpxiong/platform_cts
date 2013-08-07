@@ -27,6 +27,9 @@
 .method private declared_synchronized test()F
 .limit regs 4
 
+    new-instance v2, java/lang/Object
+    invoke-direct {v2}, java/lang/Object/<init>()V
+    monitor-enter v2
     monitor-exit v3
     const v0, 1.0
     return v0

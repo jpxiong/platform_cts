@@ -175,19 +175,6 @@ public class Test_aput_short extends DxTestCase {
             DxUtil.checkVerifyException(t);
         }
     }
-    
-    /**
-     * @constraint B15 
-     * @title put value 32768 into array of shorts
-     */
-    public void testVFE8() {
-        try {
-            Class.forName("dot.junit.opcodes.aput_short.d.T_aput_short_10");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
-        }
-    }
 
     /**
      * @constraint B1

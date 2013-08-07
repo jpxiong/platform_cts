@@ -125,20 +125,6 @@ public class Test_sput_boolean extends DxTestCase {
     /**
      *
      * @constraint B13
-     * @title put value '2' into boolean field
-     */
-    public void testVFE6() {
-        try {
-            Class.forName("dot.junit.opcodes.sput_boolean.d.T_sput_boolean_6");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
-        }
-    }
-
-    /**
-     *
-     * @constraint B13
      * @title type of field doesn't match opcode - attempt to modify double
      * field with single-width register
      */
