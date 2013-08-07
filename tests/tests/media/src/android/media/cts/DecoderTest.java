@@ -31,7 +31,7 @@ import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
-import java.util.Map;
+import java.util.Arrays;
 
 public class DecoderTest extends AndroidTestCase {
     private static final String TAG = "DecoderTest";
@@ -201,6 +201,153 @@ public class DecoderTest extends AndroidTestCase {
         long avgErrorSquared = (totalErrorSquared / (numBytesDecoded / 2));
         double rmse = Math.sqrt(avgErrorSquared); 
         assertTrue("decoding error too big: " + rmse, rmse <= maxerror);
+    }
+
+    public void testDecodeMonoMp3() throws Exception {
+        monoTest(R.raw.monotestmp3);
+    }
+
+    public void testDecodeMonoM4a() throws Exception {
+        monoTest(R.raw.monotestm4a);
+    }
+
+    public void testDecodeMonoOgg() throws Exception {
+        monoTest(R.raw.monotestogg);
+    }
+
+    private void monoTest(int res) throws Exception {
+        short [] mono = decodeToMemory(res);
+        if (mono.length == 44100) {
+            // expected
+            return;
+        } else if (mono.length == 88200) {
+            // the decoder output 2 channels instead of 1, check that the left and right channel
+            // are identical
+            for (int i = 0; i < mono.length; i += 2) {
+                assertEquals("mismatched samples at " + i, mono[i], mono[i+1]);
+            }
+        } else {
+            fail("wrong number of samples: " + mono.length);
+        }
+    }
+
+    private short[] decodeToMemory(int testinput) throws IOException {
+
+        short [] decoded = new short[0];
+        int decodedIdx = 0;
+
+        AssetFileDescriptor testFd = mResources.openRawResourceFd(testinput);
+
+        MediaExtractor extractor;
+        MediaCodec codec;
+        ByteBuffer[] codecInputBuffers;
+        ByteBuffer[] codecOutputBuffers;
+
+        extractor = new MediaExtractor();
+        extractor.setDataSource(testFd.getFileDescriptor(), testFd.getStartOffset(),
+                testFd.getLength());
+        testFd.close();
+
+        assertEquals("wrong number of tracks", 1, extractor.getTrackCount());
+        MediaFormat format = extractor.getTrackFormat(0);
+        String mime = format.getString(MediaFormat.KEY_MIME);
+        assertTrue("not an audio file", mime.startsWith("audio/"));
+        Log.i("@@@@", "extractor format: " + format);
+
+        codec = MediaCodec.createDecoderByType(mime);
+        codec.configure(format, null /* surface */, null /* crypto */, 0 /* flags */);
+        codec.start();
+        codecInputBuffers = codec.getInputBuffers();
+        codecOutputBuffers = codec.getOutputBuffers();
+
+        extractor.selectTrack(0);
+
+        // start decoding
+        final long kTimeOutUs = 5000;
+        MediaCodec.BufferInfo info = new MediaCodec.BufferInfo();
+        boolean sawInputEOS = false;
+        boolean sawOutputEOS = false;
+        int noOutputCounter = 0;
+        while (!sawOutputEOS && noOutputCounter < 50) {
+            noOutputCounter++;
+            if (!sawInputEOS) {
+                int inputBufIndex = codec.dequeueInputBuffer(kTimeOutUs);
+
+                if (inputBufIndex >= 0) {
+                    ByteBuffer dstBuf = codecInputBuffers[inputBufIndex];
+
+                    int sampleSize =
+                        extractor.readSampleData(dstBuf, 0 /* offset */);
+
+                    long presentationTimeUs = 0;
+
+                    if (sampleSize < 0) {
+                        Log.d(TAG, "saw input EOS.");
+                        sawInputEOS = true;
+                        sampleSize = 0;
+                    } else {
+                        presentationTimeUs = extractor.getSampleTime();
+                    }
+
+                    codec.queueInputBuffer(
+                            inputBufIndex,
+                            0 /* offset */,
+                            sampleSize,
+                            presentationTimeUs,
+                            sawInputEOS ? MediaCodec.BUFFER_FLAG_END_OF_STREAM : 0);
+
+                    if (!sawInputEOS) {
+                        extractor.advance();
+                    }
+                }
+            }
+
+            int res = codec.dequeueOutputBuffer(info, kTimeOutUs);
+
+            if (res >= 0) {
+                //Log.d(TAG, "got frame, size " + info.size + "/" + info.presentationTimeUs);
+
+                if (info.size > 0) {
+                    noOutputCounter = 0;
+                }
+
+                int outputBufIndex = res;
+                ByteBuffer buf = codecOutputBuffers[outputBufIndex];
+
+                if (decodedIdx + (info.size / 2) >= decoded.length) {
+                    decoded = Arrays.copyOf(decoded, decodedIdx + (info.size / 2));
+                }
+
+                for (int i = 0; i < info.size; i += 2) {
+                    decoded[decodedIdx++] = buf.getShort(i);
+                }
+
+                codec.releaseOutputBuffer(outputBufIndex, false /* render */);
+
+                if ((info.flags & MediaCodec.BUFFER_FLAG_END_OF_STREAM) != 0) {
+                    Log.d(TAG, "saw output EOS.");
+                    sawOutputEOS = true;
+                }
+            } else if (res == MediaCodec.INFO_OUTPUT_BUFFERS_CHANGED) {
+                codecOutputBuffers = codec.getOutputBuffers();
+
+                Log.d(TAG, "output buffers have changed.");
+            } else if (res == MediaCodec.INFO_OUTPUT_FORMAT_CHANGED) {
+                MediaFormat oformat = codec.getOutputFormat();
+
+                Log.d(TAG, "output format has changed to " + oformat);
+            } else {
+                Log.d(TAG, "dequeueOutputBuffer returned " + res);
+            }
+        }
+
+        if (noOutputCounter >= 50) {
+            fail("failed to get output for 50 iterations");
+        }
+
+        codec.stop();
+        codec.release();
+        return decoded;
     }
 
 }
