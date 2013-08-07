@@ -87,6 +87,38 @@ public class DecoderTest extends MediaPlayerTestBase {
         decode(R.raw.sinesweepflac, 0.0f, true);
     }
 
+    public void testDecodeMonoMp3() throws Exception {
+        monoTest(R.raw.monotestmp3);
+    }
+
+    public void testDecodeMonoM4a() throws Exception {
+        monoTest(R.raw.monotestm4a);
+    }
+
+    public void testDecodeMonoOgg() throws Exception {
+        monoTest(R.raw.monotestogg);
+    }
+
+    private void monoTest(int res) throws Exception {
+        short [] mono = decodeToMemory(res, false);
+        if (mono.length == 44100) {
+            // expected
+            return;
+        } else if (mono.length == 88200) {
+            // the decoder output 2 channels instead of 1, check that the left and right channel
+            // are identical
+            for (int i = 0; i < mono.length; i += 2) {
+                assertEquals("mismatched samples at " + i, mono[i], mono[i+1]);
+            }
+        } else {
+            fail("wrong number of samples: " + mono.length);
+        }
+
+        // we should get the same data when reconfiguring the codec
+        short [] mono2 = decodeToMemory(res, true);
+        Arrays.equals(mono, mono2);
+    }
+
     /**
      * @param testinput the file to decode
      * @param maxerror the maximum allowed root mean squared error
@@ -874,6 +906,6 @@ public class DecoderTest extends MediaPlayerTestBase {
         }
         return maxvalue; 
     }
-    
+
 }
 
