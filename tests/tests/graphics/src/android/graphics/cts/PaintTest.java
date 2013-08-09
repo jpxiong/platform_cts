@@ -166,7 +166,7 @@ public class PaintTest extends AndroidTestCase {
         assertEquals(m, p2.getMaskFilter());
         assertEquals(e, p2.getPathEffect());
         assertEquals(r, p2.getRasterizer());
-        assertEquals(s, p2.getShader());
+        assertNotSame(s, p2.getShader());
         assertEquals(t, p2.getTypeface());
         assertEquals(x, p2.getXfermode());
 
@@ -175,7 +175,7 @@ public class PaintTest extends AndroidTestCase {
         assertEquals(m, p2.getMaskFilter());
         assertEquals(e, p2.getPathEffect());
         assertEquals(r, p2.getRasterizer());
-        assertEquals(s, p2.getShader());
+        assertNotSame(s, p2.getShader());
         assertEquals(t, p2.getTypeface());
         assertEquals(x, p2.getXfermode());
 
