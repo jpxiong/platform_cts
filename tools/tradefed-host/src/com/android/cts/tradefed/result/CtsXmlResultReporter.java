@@ -26,7 +26,6 @@ import com.android.tradefed.build.IBuildInfo;
 import com.android.tradefed.build.IFolderBuildInfo;
 import com.android.tradefed.config.Option;
 import com.android.tradefed.log.LogUtil.CLog;
-import com.android.tradefed.result.ILogFileSaver;
 import com.android.tradefed.result.ITestInvocationListener;
 import com.android.tradefed.result.InputStreamSource;
 import com.android.tradefed.result.LogDataType;
@@ -212,11 +211,11 @@ public class CtsXmlResultReporter implements ITestInvocationListener {
     }
 
     /**
-     * Return the {@link ILogFileSaver} to use.
+     * Return the {@link LogFileSaver} to use.
      * <p/>
      * Exposed for unit testing.
      */
-    ILogFileSaver getLogFileSaver() {
+    LogFileSaver getLogFileSaver() {
         return new LogFileSaver(mLogDir);
     }
 
