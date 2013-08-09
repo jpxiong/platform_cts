@@ -46,7 +46,8 @@ extern "C" JNIEXPORT jboolean JNICALL Java_android_cts_rscpp_RSBlurTest_blurTest
                                                                                  jint X,
                                                                                  jint Y,
                                                                                  jbyteArray inputByteArray,
-                                                                                 jbyteArray outputByteArray)
+                                                                                 jbyteArray outputByteArray,
+                                                                                 jboolean singleChannel)
 {
     jbyte * input = (jbyte *) env->GetPrimitiveArrayCritical(inputByteArray, 0);
     jbyte * output = (jbyte *) env->GetPrimitiveArrayCritical(outputByteArray, 0);
@@ -54,9 +55,16 @@ extern "C" JNIEXPORT jboolean JNICALL Java_android_cts_rscpp_RSBlurTest_blurTest
     sp<RS> rs = new RS();
     rs->init();
 
-    sp<Allocation> inputAlloc = Allocation::createSized2D(rs, Element::A_8(rs), X, Y);
-    sp<Allocation> outputAlloc = Allocation::createSized2D(rs, Element::A_8(rs), X, Y);
-    sp<ScriptIntrinsicBlur> blur = new ScriptIntrinsicBlur(rs, Element::A_8(rs));
+    sp<const Element> e;
+    if (singleChannel) {
+        e = Element::A_8(rs);
+    } else {
+        e = Element::RGBA_8888(rs);
+    }
+
+    sp<Allocation> inputAlloc = Allocation::createSized2D(rs, e, X, Y);
+    sp<Allocation> outputAlloc = Allocation::createSized2D(rs, e, X, Y);
+    sp<ScriptIntrinsicBlur> blur = new ScriptIntrinsicBlur(rs, e);
 
     inputAlloc->copy2DRangeFrom(0, 0, X, Y, input);
 
@@ -69,3 +77,48 @@ extern "C" JNIEXPORT jboolean JNICALL Java_android_cts_rscpp_RSBlurTest_blurTest
     return true;
 
 }
+
+extern "C" JNIEXPORT jboolean JNICALL
+Java_android_cts_rscpp_RSConvolveTest_convolveTest(JNIEnv * env, jclass obj, jint X,
+                                                   jint Y, jbyteArray inputByteArray,
+                                                   jbyteArray outputByteArray,
+                                                   jfloatArray coeffArray,
+                                                   jboolean is3x3)
+{
+    jfloat * coeffs = env->GetFloatArrayElements(coeffArray, NULL);
+    jbyte * input = (jbyte *) env->GetPrimitiveArrayCritical(inputByteArray, 0);
+    jbyte * output = (jbyte *) env->GetPrimitiveArrayCritical(outputByteArray, 0);
+
+
+    sp<RS> rs = new RS();
+    rs->init();
+
+    sp<const Element> e = Element::A_8(rs);
+
+    sp<Allocation> inputAlloc = Allocation::createSized2D(rs, e, X, Y);
+    sp<Allocation> outputAlloc = Allocation::createSized2D(rs, e, X, Y);
+
+    inputAlloc->copy2DRangeFrom(0, 0, X, Y, input);
+
+
+    if (is3x3) {
+        sp<ScriptIntrinsicConvolve3x3> convolve = new ScriptIntrinsicConvolve3x3(rs, e);
+        convolve->setInput(inputAlloc);
+        convolve->setCoefficients(coeffs);
+        convolve->forEach(outputAlloc);
+    } else {
+        sp<ScriptIntrinsicConvolve5x5> convolve = new ScriptIntrinsicConvolve5x5(rs, e);
+        convolve->setInput(inputAlloc);
+        convolve->setCoefficients(coeffs);
+        convolve->forEach(outputAlloc);
+    }
+
+    outputAlloc->copy2DRangeTo(0, 0, X, Y, output);
+
+    env->ReleasePrimitiveArrayCritical(inputByteArray, input, 0);
+    env->ReleasePrimitiveArrayCritical(outputByteArray, output, 0);
+    env->ReleaseFloatArrayElements(coeffArray, coeffs, JNI_ABORT);
+    return true;
+
+}
+
