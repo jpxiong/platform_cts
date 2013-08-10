@@ -74,7 +74,7 @@ public class IntrinsicConvolve3x3 extends IntrinsicBase {
         }
 
         android.util.Log.e("RSI test", "test convolve U8_" + vecSize + " 1 " + w + ", " + h);
-        mVerify.invoke_verify(mAllocRef, mAllocDst, getVerifyEnum(e));
+        mVerify.invoke_verify(mAllocRef, mAllocDst);
 
         si.setCoefficients(cf2);
         sr.set_gCoeffs(cf2);
@@ -111,7 +111,7 @@ public class IntrinsicConvolve3x3 extends IntrinsicBase {
             }
         }
         android.util.Log.e("RSI test", "test convolve U8_" + vecSize + " 2 " + w + ", " + h);
-        mVerify.invoke_verify(mAllocRef, mAllocDst, getVerifyEnum(e));
+        mVerify.invoke_verify(mAllocRef, mAllocDst);
         mRS.finish();
     }
 
