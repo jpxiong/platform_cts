@@ -1029,11 +1029,17 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
 
     public void testFlingScroll() throws Throwable {
         DisplayMetrics metrics = mOnUiThread.getDisplayMetrics();
-        int dimension = 2 * Math.max(metrics.widthPixels, metrics.heightPixels);
+        final int dimension = 10 * Math.max(metrics.widthPixels, metrics.heightPixels);
         String p = "<p style=\"height:" + dimension + "px;" +
                 "width:" + dimension + "px\">Test fling scroll.</p>";
         mOnUiThread.loadDataAndWaitForCompletion("<html><body>" + p
                 + "</body></html>", "text/html", null);
+        new PollingCheck() {
+            @Override
+            protected boolean check() {
+                return mOnUiThread.getContentHeight() >= dimension;
+            }
+        }.run();
         getInstrumentation().waitForIdleSync();
 
         int previousScrollX = mOnUiThread.getScrollX();
