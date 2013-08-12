@@ -35,7 +35,8 @@ LOCAL_SRC_FILES := \
         register.cpp \
         GLTestHelper.cpp \
         tests/GLTest_test.cpp \
-        tests/EGLCleanup_test.cpp
+        tests/EGLCleanup_test.cpp \
+        tests/EGLCreateContext_test.cpp
 
 LOCAL_SHARED_LIBRARIES := libEGL \
                           libGLESv2 \
