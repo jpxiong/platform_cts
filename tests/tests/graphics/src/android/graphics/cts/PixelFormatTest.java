@@ -46,7 +46,7 @@ public class PixelFormatTest extends TestCase {
 
         PixelFormat.getPixelFormatInfo(PixelFormat.RGBX_8888, mPixelFormat);
         assertEquals(4, mPixelFormat.bytesPerPixel);
-        assertEquals(24, mPixelFormat.bitsPerPixel);
+        assertEquals(32, mPixelFormat.bitsPerPixel);
 
         PixelFormat.getPixelFormatInfo(PixelFormat.RGB_888, mPixelFormat);
         assertEquals(3, mPixelFormat.bytesPerPixel);
