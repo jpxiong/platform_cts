@@ -43,7 +43,8 @@ LOCAL_MODULE    := nativeopengltests
 LOCAL_SRC_FILES := GLTestHelper.cpp \
                    register.cpp \
                    tests/GLTest_test.cpp \
-                   tests/EGLCleanup_test.cpp
+                   tests/EGLCleanup_test.cpp \
+                   tests/EGLCreateContext_test.cpp
 
 LOCAL_SHARED_LIBRARIES := libgtest
 
