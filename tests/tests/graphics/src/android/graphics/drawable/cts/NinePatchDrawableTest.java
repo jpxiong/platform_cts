@@ -181,8 +181,6 @@ public class NinePatchDrawableTest extends InstrumentationTestCase {
     }
 
     public void testSetDither() {
-        assertTrue(mNinePatchDrawable.getPaint().isDither());
-
         mNinePatchDrawable.setDither(false);
         assertFalse(mNinePatchDrawable.getPaint().isDither());
 
