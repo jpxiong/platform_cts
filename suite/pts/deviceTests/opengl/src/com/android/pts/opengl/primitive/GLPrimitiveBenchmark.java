@@ -120,9 +120,8 @@ public class GLPrimitiveBenchmark extends PtsActivityInstrumentationTestCase2<GL
         intent.putExtra(GLActivityIntentKeys.INTENT_EXTRA_NUM_ITERATIONS, numIterations);
         intent.putExtra(GLActivityIntentKeys.INTENT_EXTRA_TIMEOUT, timeout);
 
-        GLPrimitiveActivity activity = null;
         setActivityIntent(intent);
-        activity = getActivity();
+        GLPrimitiveActivity activity = getActivity();
         if (activity != null) {
             activity.waitForCompletion();
             double[] fpsValues = activity.mFpsValues;
