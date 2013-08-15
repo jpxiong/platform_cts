@@ -183,6 +183,19 @@ public class WrapperTest extends AndroidTestCase {
 
         WrappedTest wrappedTest = new WrappedTest();
 
+        // Android has "reference-counted" EGL initialization.  We want our eglTerminate call
+        // to be the "last" termination, since that's the situation we're trying to test, but
+        // it's possible that some previous test failed to balance eglInitialize and
+        // eglTerminate.  So we call eglTerminate several times in a desperate attempt to
+        // zero out the refcount.
+        //
+        // Before we can terminate we need to be sure that the display has been initialized
+        // at least once.
+        eglSetup(2, 1, 1);
+        for (int i = 0; i < 100; i++) {
+            EGL14.eglTerminate(mEGLDisplay);
+        }
+
         for (int i = 0; i < 1000; i++) {
             if ((i % 25) == 0) {
                 Log.d(TAG, "iteration " + i);
@@ -209,7 +222,9 @@ public class WrapperTest extends AndroidTestCase {
     }
 
     /**
-     * Prepares EGL.  Pass in the desired GLES API version.
+     * Prepares EGL.  Pass in the desired GLES API version (1 or 2).
+     * <p>
+     * Sets mEGLDisplay, mEGLContext, and mEGLSurface, and makes them current.
      */
     private void eglSetup(int api, int width, int height) {
         mEGLDisplay = EGL14.eglGetDisplay(EGL14.EGL_DEFAULT_DISPLAY);
