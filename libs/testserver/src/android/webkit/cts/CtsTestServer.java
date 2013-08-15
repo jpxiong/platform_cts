@@ -67,8 +67,10 @@ import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Hashtable;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Vector;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
@@ -133,6 +135,7 @@ public class CtsTestServer {
     private MimeTypeMap mMap;
     private Vector<String> mQueries;
     private ArrayList<HttpEntity> mRequestEntities;
+    private final Map<String, HttpRequest> mLastRequestMap = new HashMap<String, HttpRequest>();
     private long mDocValidity;
     private long mDocAge;
 
@@ -437,12 +440,31 @@ public class CtsTestServer {
     }
 
     /**
+     * Returns the last HttpRequest at this path. Can return null if it is never requested.
+     */
+    public synchronized HttpRequest getLastRequest(String requestPath) {
+        String relativeUrl = getRelativeUrl(requestPath);
+        if (!mLastRequestMap.containsKey(relativeUrl))
+            return null;
+        return mLastRequestMap.get(relativeUrl);
+    }
+    /**
      * Hook for adding stuffs for HTTP POST. Default implementation does nothing.
      * @return null to use the default response mechanism of sending the requested uri as it is.
      *         Otherwise, the whole response should be handled inside onPost.
      */
     protected HttpResponse onPost(HttpRequest request) throws Exception {
         return null;
+    }
+
+    /**
+     * Return the relative URL that refers to the given asset.
+     * @param path The path of the asset. See {@link AssetManager#open(String)}
+     */
+    private String getRelativeUrl(String path) {
+        StringBuilder sb = new StringBuilder(ASSET_PREFIX);
+        sb.append(path);
+        return sb.toString();
     }
 
     /**
@@ -458,6 +480,7 @@ public class CtsTestServer {
 
         synchronized (this) {
             mQueries.add(uriString);
+            mLastRequestMap.put(uriString, request);
             if (request instanceof HttpEntityEnclosingRequest) {
                 mRequestEntities.add(((HttpEntityEnclosingRequest)request).getEntity());
             }
