@@ -269,7 +269,8 @@ public class BitmapFactoryTest extends InstrumentationTestCase {
 
             BitmapFactory.Options options = new BitmapFactory.Options();
             options.inBitmap = reuseBuffer;
-            options.inSampleSize = 5;
+            options.inSampleSize = 4;
+            options.inScaled = false;
             Bitmap decoded = BitmapFactory.decodeResource(mRes, RES_IDS[i], options);
             assertSame(reuseBuffer, decoded);
         }
