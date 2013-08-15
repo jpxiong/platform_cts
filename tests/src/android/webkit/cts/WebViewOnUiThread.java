@@ -41,6 +41,7 @@ import junit.framework.Assert;
 
 import java.io.File;
 import java.util.concurrent.Callable;
+import java.util.Map;
 
 
 /**
@@ -357,6 +358,22 @@ public class WebViewOnUiThread {
             @Override
             public void run() {
                 mWebView.loadUrl(url);
+            }
+        });
+    }
+
+    /**
+     * Calls loadUrl on the WebView and then waits onPageFinished,
+     * onNewPicture and onProgressChange to reach 100.
+     * Test fails if the load timeout elapses.
+     * @param url The URL to load.
+     */
+    public void loadUrlAndWaitForCompletion(final String url,
+            final Map<String, String> extraHeaders) {
+        callAndWait(new Runnable() {
+            @Override
+            public void run() {
+                mWebView.loadUrl(url, extraHeaders);
             }
         });
     }

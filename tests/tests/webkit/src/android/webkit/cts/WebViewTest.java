@@ -67,11 +67,17 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.util.Date;
 import java.util.concurrent.FutureTask;
+import java.util.HashMap;
+
+import org.apache.http.Header;
+import org.apache.http.HttpRequest;
 
 public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubActivity> {
     private static final String LOGTAG = "WebViewTest";
     private static final int INITIAL_PROGRESS = 100;
     private static long TEST_TIMEOUT = 20000L;
+    private static final String X_REQUESTED_WITH = "X-Requested-With";
+
     /**
      * This is the minimum number of milliseconds to wait for scrolling to
      * start. If no scrolling has started before this timeout then it is
@@ -296,6 +302,33 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
         assertEquals(url, mWebView.getUrl());
         assertEquals(url, mWebView.getOriginalUrl());
         assertEquals(TestHtmlConstants.HELLO_WORLD_TITLE, mWebView.getTitle());
+
+        // verify that the request also includes X-Requested-With header
+        HttpRequest request = mWebServer.getLastRequest(TestHtmlConstants.HELLO_WORLD_URL);
+        Header[] matchingHeaders = request.getHeaders(X_REQUESTED_WITH);
+        assertEquals(1, matchingHeaders.length);
+
+        Header header = matchingHeaders[0];
+        assertEquals(mWebView.getContext().getApplicationInfo().packageName, header.getValue());
+    }
+
+    @UiThreadTest
+    public void testAppInjectedXRequestedWithHeaderIsNotOverwritten() throws Exception {
+        startWebServer(false);
+        String url = mWebServer.getAssetUrl(TestHtmlConstants.HELLO_WORLD_URL);
+        HashMap<String, String> map = new HashMap<String, String>();
+        final String requester = "foo";
+        map.put(X_REQUESTED_WITH, requester);
+        mOnUiThread.loadUrlAndWaitForCompletion(url, map);
+
+        // verify that the request also includes X-Requested-With header
+        // but is not overwritten by the webview
+        HttpRequest request = mWebServer.getLastRequest(TestHtmlConstants.HELLO_WORLD_URL);
+        Header[] matchingHeaders = request.getHeaders(X_REQUESTED_WITH);
+        assertEquals(1, matchingHeaders.length);
+
+        Header header = matchingHeaders[0];
+        assertEquals(requester, header.getValue());
     }
 
     @SuppressWarnings("deprecation")
