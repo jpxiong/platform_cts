@@ -20,7 +20,6 @@ import android.graphics.ImageFormat;
 import android.hardware.camera2.CameraDevice;
 import android.hardware.camera2.CameraMetadata;
 import android.hardware.camera2.CameraProperties;
-import android.hardware.camera2.CameraPropertiesKeys;
 import android.hardware.camera2.Size;
 import android.media.Image;
 import android.media.Image.Plane;
@@ -172,14 +171,14 @@ class CameraTestUtils extends Assert {
         assertNotNull("Can't get camera properties!", properties);
         switch (format) {
             case ImageFormat.JPEG:
-                key = CameraPropertiesKeys.Scaler.AVAILABLE_JPEG_SIZES;
+                key = CameraProperties.SCALER_AVAILABLE_JPEG_SIZES;
                 break;
             case ImageFormat.YUV_420_888:
             case ImageFormat.YV12:
             case ImageFormat.NV21:
             case ImageFormat.Y8:
             case ImageFormat.Y16:
-                key = CameraPropertiesKeys.Scaler.AVAILABLE_PROCESSED_SIZES;
+                key = CameraProperties.SCALER_AVAILABLE_PROCESSED_SIZES;
                 break;
             default:
                 throw new UnsupportedOperationException(
