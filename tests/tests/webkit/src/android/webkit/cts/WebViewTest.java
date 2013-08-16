@@ -65,6 +65,7 @@ import junit.framework.Assert;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.util.Collections;
 import java.util.Date;
 import java.util.concurrent.FutureTask;
 import java.util.HashMap;
@@ -320,6 +321,25 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
         final String requester = "foo";
         map.put(X_REQUESTED_WITH, requester);
         mOnUiThread.loadUrlAndWaitForCompletion(url, map);
+
+        // verify that the request also includes X-Requested-With header
+        // but is not overwritten by the webview
+        HttpRequest request = mWebServer.getLastRequest(TestHtmlConstants.HELLO_WORLD_URL);
+        Header[] matchingHeaders = request.getHeaders(X_REQUESTED_WITH);
+        assertEquals(1, matchingHeaders.length);
+
+        Header header = matchingHeaders[0];
+        assertEquals(requester, header.getValue());
+    }
+
+    @UiThreadTest
+    public void testAppCanInjectHeadersViaImmutableMap() throws Exception {
+        startWebServer(false);
+        String url = mWebServer.getAssetUrl(TestHtmlConstants.HELLO_WORLD_URL);
+        HashMap<String, String> map = new HashMap<String, String>();
+        final String requester = "foo";
+        map.put(X_REQUESTED_WITH, requester);
+        mOnUiThread.loadUrlAndWaitForCompletion(url, Collections.unmodifiableMap(map));
 
         // verify that the request also includes X-Requested-With header
         // but is not overwritten by the webview
