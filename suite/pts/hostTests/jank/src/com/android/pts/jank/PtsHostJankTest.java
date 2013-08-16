@@ -14,7 +14,6 @@
 package com.android.pts.jank;
 
 import com.android.cts.tradefed.build.CtsBuildHelper;
-import com.android.ddmlib.testrunner.RemoteAndroidTestRunner;
 import com.android.ddmlib.IShellOutputReceiver;
 import com.android.ddmlib.Log;
 import com.android.ddmlib.Log.LogLevel;
@@ -24,17 +23,10 @@ import com.android.pts.util.ResultType;
 import com.android.pts.util.ResultUnit;
 import com.android.tradefed.build.IBuildInfo;
 import com.android.tradefed.device.ITestDevice;
-import com.android.tradefed.result.CollectingTestListener;
-import com.android.tradefed.result.TestRunResult;
 import com.android.tradefed.testtype.DeviceTestCase;
 import com.android.tradefed.testtype.IBuildReceiver;
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.InputStreamReader;
-import java.io.IOException;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Scanner;
 
