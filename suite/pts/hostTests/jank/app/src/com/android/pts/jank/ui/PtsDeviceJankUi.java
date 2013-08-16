@@ -12,60 +12,34 @@
  * the License.
  */
 
-package com.android.pts.jank.opengl;
+package com.android.pts.jank.ui;
 
 import android.util.Log;
+import android.widget.ListView;
 
 import com.android.pts.jank.PtsJankTestBase;
+import com.android.uiautomator.core.UiScrollable;
+import com.android.uiautomator.core.UiSelector;
 import com.android.uiautomator.platform.SurfaceFlingerHelper;
 
-public class PtsDeviceJankOpenGl extends PtsJankTestBase {
-    private final static String TAG = PtsDeviceJankOpenGl.class.getName();
-    private final static String PACKAGE = "com.android.pts.opengl";
+public class PtsDeviceJankUi extends PtsJankTestBase {
+    private final static String TAG = PtsDeviceJankUi.class.getName();
+    private final static String PACKAGE = "com.android.pts.ui";
     private final static String COMPONENT =
-            PACKAGE + "/" + PACKAGE + ".primitive.GLPrimitiveActivity";
-    private static String APP_WINDOW_NAME = "SurfaceView";
+            PACKAGE + "/" + PACKAGE + ".ScrollingActivity";
+    private final static int NUM_ELEMENTS = 1000;
+    private static String APP_WINDOW_NAME = COMPONENT;
+
+    // TODO(stuartscott): expand deviceTests/ui app to have a more complex UI, such as fragments.
 
     /**
-     * Runs the full OpenGL ES 2.0 pipeline test.
+     * Runs the ScrollingActivity and measures jank during a scroll.
      */
-    public void testFullPipeline() throws Exception {
-        runBenchmark("FullPipeline");
-    }
-
-    /**
-     * Runs the pixel output test.
-     */
-    public void testPixelOutput() throws Exception {
-        runBenchmark("PixelOutput");
-    }
-
-    /**
-     * Runs the shader performance test.
-     */
-    public void testShaderPerf() throws Exception {
-        runBenchmark("ShaderPerf");
-    }
-
-    /**
-     * Runs the context switch overhead test.
-     */
-    public void testContextSwitch() throws Exception {
-        runBenchmark("ContextSwitch");
-    }
-
-    /**
-     * Runs the benchhmark for jank test.
-     */
-    public void runBenchmark(String benchmark) throws Exception {
+    public void testScrolling() throws Exception {
         // Start activity command
         final StringBuilder sb = new StringBuilder();
         sb.append(String.format(START_CMD, COMPONENT));
-        sb.append(String.format(INTENT_STRING_EXTRA, "benchmark_name", benchmark));
-        sb.append(String.format(INTENT_BOOLEAN_EXTRA, "offscreen", false));
-        sb.append(String.format(INTENT_INTEGER_EXTRA, "num_frames", 200));
-        sb.append(String.format(INTENT_INTEGER_EXTRA, "num_iterations", 1));
-        sb.append(String.format(INTENT_INTEGER_EXTRA, "timeout", 10000));
+        sb.append(String.format(INTENT_INTEGER_EXTRA, "num_elements", NUM_ELEMENTS));
         final String startCommand = sb.toString();
         final String stopCommand = String.format(STOP_CMD, PACKAGE);
 
@@ -82,6 +56,9 @@ public class PtsDeviceJankOpenGl extends PtsJankTestBase {
             // Wait for the activity to start
             sleep(SLEEP_TIME / 2);
 
+            UiScrollable list = new UiScrollable(
+                    new UiSelector().className(ListView.class.getName()));
+
             // Start systrace
             // TODO(jgennis): Systrace has been commented out because of read-tgid permission error
             // startTrace(mTestCaseName, i);
@@ -90,8 +67,7 @@ public class PtsDeviceJankOpenGl extends PtsJankTestBase {
             Log.i(TAG, "Clearing SurfaceFlinger buffer");
             SurfaceFlingerHelper.clearBuffer(APP_WINDOW_NAME);
 
-            // This is where user interactions would go, in this case just sleep
-            sleep(SLEEP_TIME);
+            list.flingToEnd(2);
 
             // Dump SurfaceFlinger buffer
             Log.i(TAG, "Dumping SurfaceFlinger buffer");
