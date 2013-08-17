@@ -19,12 +19,21 @@
     package="com.android.cts.os">
 
     <uses-permission android:name="android.permission.DISABLE_KEYGUARD" />
+    <uses-permission android:name="android.permission.KILL_BACKGROUND_PROCESSES" />
+    <uses-permission android:name="android.permission.INTERNET" />
+
     <application>
+        <service
+            android:name="android.os.cts.ParcelFileDescriptorPeer$Red"
+            android:process=":red" />
+        <service
+            android:name="android.os.cts.ParcelFileDescriptorPeer$Blue"
+            android:process=":blue" />
         <uses-library android:name="android.test.runner" />
     </application>
 
     <instrumentation android:name="android.test.InstrumentationCtsTestRunner"
-                     android:targetPackage="com.android.cts.stub"
+                     android:targetPackage="com.android.cts.os"
                      android:label="CTS tests of android.os"/>
 
 </manifest>
