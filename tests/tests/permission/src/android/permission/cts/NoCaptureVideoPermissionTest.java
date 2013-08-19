@@ -17,7 +17,6 @@
 package android.permission.cts;
 
 import android.content.Context;
-import android.graphics.ImageFormat;
 import android.graphics.PixelFormat;
 import android.hardware.display.DisplayManager;
 import android.hardware.display.VirtualDisplay;
@@ -27,9 +26,9 @@ import android.test.suitebuilder.annotation.SmallTest;
 import android.util.DisplayMetrics;
 
 /**
- * Verify the capture system audio output and video output permission requirements.
+ * Verify the capture system video output permission requirements.
  */
-public class NoCapturePermissionTest extends AndroidTestCase {
+public class NoCaptureVideoPermissionTest extends AndroidTestCase {
     private static final String NAME = "VirtualDisplayTest";
     private static final int WIDTH = 720;
     private static final int HEIGHT = 480;
