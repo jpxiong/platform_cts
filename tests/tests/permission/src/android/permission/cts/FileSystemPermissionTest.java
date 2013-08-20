@@ -704,7 +704,9 @@ public class FileSystemPermissionTest extends AndroidTestCase {
                 new File("/dev/tty"),
                 new File("/dev/urandom"),
                 new File("/dev/xt_qtaguid"),  // b/9088251
-                new File("/dev/zero")
+                new File("/dev/zero"),
+                new File("/dev/fimg2d"),      // b/10428016
+                new File("/dev/mobicore-user") // b/10428016
             ));
 
     public void testAllCharacterDevicesAreSecure() throws Exception {
