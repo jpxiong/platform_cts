@@ -26,17 +26,13 @@
 
         <activity
             android:name=".ScrollingActivity"
-            android:configChanges="keyboard|keyboardHidden|orientation|screenSize|uiMode"
-            android:screenOrientation="portrait" >
+            android:configChanges="keyboard|keyboardHidden|orientation|screenSize|uiMode" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity
-            android:name="android.openglperf.cts.GlPlanetsActivity"
-            android:configChanges="keyboard|keyboardHidden|orientation|screenSize|uiMode" />
     </application>
 
     <instrumentation
