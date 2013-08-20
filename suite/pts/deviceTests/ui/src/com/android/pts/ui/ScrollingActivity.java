@@ -31,16 +31,20 @@ import java.util.concurrent.TimeUnit;
  */
 public class ScrollingActivity extends ListActivity implements OnScrollListener {
     static final String TAG = "ScrollingActivity";
-    private static final int NUMBER_ELEMENTS = 10000;
+    private static final String NUM_ELEMENTS_EXTRA = "num_elements";
+    private static final int NUM_ELEMENTS_DEFAULT = 10000;
     private static final int SCROLL_TIME_IN_MS = 1;
     private static final int WAIT_TIMEOUT_IN_SECS = 5 * 60;
-    private String[] mItems = new String[NUMBER_ELEMENTS];
+    private String[] mItems;
     private CountDownLatch mLatchStop = null;
     private int mTargetLoc;
+    private int mNumElements;
 
     public void onCreate(Bundle icicle) {
         super.onCreate(icicle);
-        for (int i = 0; i < NUMBER_ELEMENTS; i++) {
+        mNumElements = getIntent().getIntExtra(NUM_ELEMENTS_EXTRA, NUM_ELEMENTS_DEFAULT);
+        mItems = new String[mNumElements];
+        for (int i = 0; i < mNumElements; i++) {
             mItems[i] = Integer.toString(i);
         }
         setListAdapter(new ArrayAdapter<String>(this,
@@ -53,7 +57,7 @@ public class ScrollingActivity extends ListActivity implements OnScrollListener 
         return doScroll(0);
     }
     public boolean scrollToBottom() {
-        return doScroll(NUMBER_ELEMENTS - 1);
+        return doScroll(mNumElements - 1);
     }
 
     private boolean doScroll(final int loc) {
