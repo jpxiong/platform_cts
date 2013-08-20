@@ -64,12 +64,13 @@ extern "C" JNIEXPORT jboolean JNICALL Java_android_cts_rscpp_RSBlurTest_blurTest
 
     sp<Allocation> inputAlloc = Allocation::createSized2D(rs, e, X, Y);
     sp<Allocation> outputAlloc = Allocation::createSized2D(rs, e, X, Y);
-    sp<ScriptIntrinsicBlur> blur = new ScriptIntrinsicBlur(rs, e);
+    sp<ScriptIntrinsicBlur> blur = ScriptIntrinsicBlur::create(rs, e);
 
     inputAlloc->copy2DRangeFrom(0, 0, X, Y, input);
 
     blur->setRadius(15);
-    blur->blur(inputAlloc, outputAlloc);
+    blur->setInput(inputAlloc);
+    blur->forEach(outputAlloc);
     outputAlloc->copy2DRangeTo(0, 0, X, Y, output);
 
     env->ReleasePrimitiveArrayCritical(inputByteArray, input, 0);
@@ -102,12 +103,12 @@ Java_android_cts_rscpp_RSConvolveTest_convolveTest(JNIEnv * env, jclass obj, jin
 
 
     if (is3x3) {
-        sp<ScriptIntrinsicConvolve3x3> convolve = new ScriptIntrinsicConvolve3x3(rs, e);
+        sp<ScriptIntrinsicConvolve3x3> convolve = ScriptIntrinsicConvolve3x3::create(rs, e);
         convolve->setInput(inputAlloc);
         convolve->setCoefficients(coeffs);
         convolve->forEach(outputAlloc);
     } else {
-        sp<ScriptIntrinsicConvolve5x5> convolve = new ScriptIntrinsicConvolve5x5(rs, e);
+        sp<ScriptIntrinsicConvolve5x5> convolve = ScriptIntrinsicConvolve5x5::create(rs, e);
         convolve->setInput(inputAlloc);
         convolve->setCoefficients(coeffs);
         convolve->forEach(outputAlloc);
