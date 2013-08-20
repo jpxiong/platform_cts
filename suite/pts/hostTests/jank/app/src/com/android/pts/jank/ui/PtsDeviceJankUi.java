@@ -30,8 +30,7 @@ public class PtsDeviceJankUi extends PtsJankTestBase {
     private final static int NUM_ELEMENTS = 1000;
     private static String APP_WINDOW_NAME = COMPONENT;
 
-    // TODO(stuartscott): expand deviceTests/ui app to have a more complex UI, such as fragments.
-
+    // TODO(stuartscott): expand deviceTests/ui app to have a more complex UI
     /**
      * Runs the ScrollingActivity and measures jank during a scroll.
      */
@@ -60,8 +59,7 @@ public class PtsDeviceJankUi extends PtsJankTestBase {
                     new UiSelector().className(ListView.class.getName()));
 
             // Start systrace
-            // TODO(jgennis): Systrace has been commented out because of read-tgid permission error
-            // startTrace(mTestCaseName, i);
+            startTrace(mTestCaseName, i);
 
             // Clear SurfaceFlinger buffer
             Log.i(TAG, "Clearing SurfaceFlinger buffer");
@@ -75,7 +73,7 @@ public class PtsDeviceJankUi extends PtsJankTestBase {
             assertTrue("SurfaceFlingerHelper could not get timestamps", result);
 
             // Stop systrace
-            // endTrace();
+            endTrace();
 
             // Record results
             recordResults(mTestCaseName, i);
