@@ -25,7 +25,7 @@ import android.renderscript.*;
 import android.util.Log;
 import java.lang.Integer;
 
-public class RSBlurTest extends RSCppTest {
+public class RSConvolveTest extends RSCppTest {
     static {
         System.loadLibrary("rscpptest_jni");
     }
@@ -33,10 +33,21 @@ public class RSBlurTest extends RSCppTest {
     private final int X = 1024;
     private final int Y = 1024;
 
-    native boolean blurTest(int X, int Y, byte[] input, byte[] output, boolean singleChannel);
-    public void testRSBlurOneChannel() {
+    native boolean convolveTest(int X, int Y, byte[] input, byte[] output, float[] coeffs, boolean is3x3);
+    public void testConvolve3x3() {
         int[] baseAlloc = new int[X * Y];
-        RSUtils.genRandom(0x1DEFF, 255, 1, -128, baseAlloc);
+        float[] coeffs = new float[9];
+        coeffs[0] = .5f;
+        coeffs[1] = .35f;
+        coeffs[2] =  .1f;
+        coeffs[3] =  1.f;
+        coeffs[4] =  1.f;
+        coeffs[5] =  1.f;
+        coeffs[6] =  .1f;
+        coeffs[7] =  .35f;
+        coeffs[8] =  .5f;
+
+        RSUtils.genRandom(0x1DEFFD0, 255, 1, -128, baseAlloc);
         RenderScript mRS = RenderScript.create(getContext());
         byte[] byteAlloc = new byte[X * Y];
         for (int i = 0; i < X * Y; i++) {
@@ -49,13 +60,13 @@ public class RSBlurTest extends RSCppTest {
         Allocation rsInput = Allocation.createTyped(mRS, build.create());
         Allocation rsOutput = Allocation.createTyped(mRS, build.create());
         rsInput.copyFromUnchecked(byteAlloc);
-        ScriptIntrinsicBlur blur = ScriptIntrinsicBlur.create(mRS, Element.A_8(mRS));
-        blur.setInput(rsInput);
-        blur.setRadius(15);
-        blur.forEach(rsOutput);
+        ScriptIntrinsicConvolve3x3 convolve = ScriptIntrinsicConvolve3x3.create(mRS, Element.A_8(mRS));
+        convolve.setInput(rsInput);
+        convolve.setCoefficients(coeffs);
+        convolve.forEach(rsOutput);
 
         byte[] nativeByteAlloc = new byte[X * Y];
-        blurTest(X, Y, byteAlloc, nativeByteAlloc, true);
+        convolveTest(X, Y, byteAlloc, nativeByteAlloc, coeffs, true);
         rsOutput.copyTo(byteAlloc);
 
         for (int i = 0; i < X * Y; i++) {
@@ -64,32 +75,59 @@ public class RSBlurTest extends RSCppTest {
 
     }
 
+    public void testConvolve5x5() {
+        int[] baseAlloc = new int[X * Y];
+        float[] coeffs = new float[25];
+        coeffs[0] = .5f;
+        coeffs[1] = .35f;
+        coeffs[2] =  .1f;
+        coeffs[3] =  1.f;
+        coeffs[4] =  1.f;
+        coeffs[5] =  1.f;
+        coeffs[6] =  .1f;
+        coeffs[7] =  .35f;
+        coeffs[8] =  .5f;
+        coeffs[9] = .5f;
+        coeffs[10] = .35f;
+        coeffs[11] =  .1f;
+        coeffs[12] =  1.f;
+        coeffs[13] =  1.f;
+        coeffs[14] =  1.f;
+        coeffs[15] =  .1f;
+        coeffs[16] =  .35f;
+        coeffs[17] =  .5f;
+        coeffs[18] = .5f;
+        coeffs[19] = .35f;
+        coeffs[20] =  .1f;
+        coeffs[21] =  1.f;
+        coeffs[22] =  1.f;
+        coeffs[23] =  1.f;
+        coeffs[24] =  .1f;
 
-    public void testRSBlurFourChannels() {
-        int[] baseAlloc = new int[X * Y * 4];
-        RSUtils.genRandom(0xFAFADE10, 255, 1, -128, baseAlloc);
+
+        RSUtils.genRandom(0x1DEFFD0, 255, 1, -128, baseAlloc);
         RenderScript mRS = RenderScript.create(getContext());
-        byte[] byteAlloc = new byte[X * Y * 4];
-        for (int i = 0; i < X * Y * 4; i++) {
+        byte[] byteAlloc = new byte[X * Y];
+        for (int i = 0; i < X * Y; i++) {
             byteAlloc[i] = (byte)baseAlloc[i];
         }
 
-        Type.Builder build = new Type.Builder(mRS, Element.RGBA_8888(mRS));
+        Type.Builder build = new Type.Builder(mRS, Element.A_8(mRS));
         build.setX(X);
         build.setY(Y);
         Allocation rsInput = Allocation.createTyped(mRS, build.create());
         Allocation rsOutput = Allocation.createTyped(mRS, build.create());
         rsInput.copyFromUnchecked(byteAlloc);
-        ScriptIntrinsicBlur blur = ScriptIntrinsicBlur.create(mRS, Element.RGBA_8888(mRS));
-        blur.setInput(rsInput);
-        blur.setRadius(15);
-        blur.forEach(rsOutput);
+        ScriptIntrinsicConvolve5x5 convolve = ScriptIntrinsicConvolve5x5.create(mRS, Element.A_8(mRS));
+        convolve.setInput(rsInput);
+        convolve.setCoefficients(coeffs);
+        convolve.forEach(rsOutput);
 
-        byte[] nativeByteAlloc = new byte[X * Y * 4];
-        blurTest(X, Y, byteAlloc, nativeByteAlloc, false);
+        byte[] nativeByteAlloc = new byte[X * Y];
+        convolveTest(X, Y, byteAlloc, nativeByteAlloc, coeffs, false);
         rsOutput.copyTo(byteAlloc);
 
-        for (int i = 0; i < X * Y * 4; i++) {
+        for (int i = 0; i < X * Y; i++) {
             assertTrue(byteAlloc[i] == nativeByteAlloc[i]);
         }
 
