@@ -750,8 +750,10 @@ public class FileSystemPermissionTest extends AndroidTestCase {
                 new File("/dev/tty"),
                 new File("/dev/urandom"),
                 new File("/dev/xt_qtaguid"),  // b/9088251
-                new File("/dev/zero")
-            ));
+                new File("/dev/zero"),
+		new File("/dev/fimg2d"),
+                new File("/dev/mobicore-user")
+	     ));
 
     public void testAllCharacterDevicesAreSecure() throws Exception {
         Set<File> insecure = getAllInsecureDevicesInDirAndSubdir(new File("/dev"), FileUtils.S_IFCHR);
