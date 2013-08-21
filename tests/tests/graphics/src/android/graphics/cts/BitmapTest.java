@@ -43,6 +43,11 @@ public class BitmapTest extends AndroidTestCase {
     private Bitmap mBitmap;
     private BitmapFactory.Options mOptions;
 
+    // small alpha values cause color values to be pre-multiplied down, losing accuracy
+    private final int PREMUL_COLOR = Color.argb(2, 255, 254, 253);
+    private final int PREMUL_ROUNDED_COLOR = Color.argb(2, 255, 255, 255);
+    private final int PREMUL_STORED_COLOR = Color.argb(2, 2, 2, 2);
+
     @Override
     protected void setUp() throws Exception {
         super.setUp();
@@ -693,6 +698,94 @@ public class BitmapTest extends AndroidTestCase {
         for(int i = 0; i < 10000; i++){
             assertEquals(ret[i], colors[i]);
         }
+    }
+
+    private void checkPremultipliedBitmapConfig(Config config, boolean expectedPremul) {
+        Bitmap bitmap = Bitmap.createBitmap(1, 1, config);
+        bitmap.setPremultiplied(true);
+        bitmap.setPixel(0, 0, Color.TRANSPARENT);
+        assertTrue(bitmap.isPremultiplied() == expectedPremul);
+
+        bitmap.setHasAlpha(false);
+        assertFalse(bitmap.isPremultiplied());
+    }
+
+    public void testSetPremultipliedSimple() {
+        checkPremultipliedBitmapConfig(Bitmap.Config.ALPHA_8, true);
+        checkPremultipliedBitmapConfig(Bitmap.Config.RGB_565, false);
+        checkPremultipliedBitmapConfig(Bitmap.Config.ARGB_4444, true);
+        checkPremultipliedBitmapConfig(Bitmap.Config.ARGB_8888, true);
+    }
+
+    public void testSetPremultipliedData() {
+        // with premul, will store 2,2,2,2, so it doesn't get value correct
+        Bitmap bitmap = Bitmap.createBitmap(1, 1, Bitmap.Config.ARGB_8888);
+        bitmap.setPixel(0, 0, PREMUL_COLOR);
+        assertEquals(bitmap.getPixel(0, 0), PREMUL_ROUNDED_COLOR);
+
+        // read premultiplied value directly
+        bitmap.setPremultiplied(false);
+        assertEquals(bitmap.getPixel(0, 0), PREMUL_STORED_COLOR);
+
+        // value can now be stored/read correctly
+        bitmap.setPixel(0, 0, PREMUL_COLOR);
+        assertEquals(bitmap.getPixel(0, 0), PREMUL_COLOR);
+
+        // verify with array methods
+        int testArray[] = new int[] { PREMUL_COLOR };
+        bitmap.setPixels(testArray, 0, 1, 0, 0, 1, 1);
+        bitmap.getPixels(testArray, 0, 1, 0, 0, 1, 1);
+        assertEquals(bitmap.getPixel(0, 0), PREMUL_COLOR);
+    }
+
+    public void testPremultipliedCanvas() {
+        Bitmap bitmap = Bitmap.createBitmap(1, 1, Bitmap.Config.ARGB_8888);
+        bitmap.setHasAlpha(true);
+        bitmap.setPremultiplied(false);
+        assertFalse(bitmap.isPremultiplied());
+
+        Canvas c = new Canvas();
+        try {
+            c.drawBitmap(bitmap, 0, 0, null);
+            fail("canvas should fail with exception");
+        } catch (RuntimeException e) {
+        }
+    }
+
+    private int getBitmapRawInt(Bitmap bitmap) {
+        IntBuffer buffer = IntBuffer.allocate(1);
+        bitmap.copyPixelsToBuffer(buffer);
+        return buffer.get(0);
+    }
+
+    private void bitmapStoreRawInt(Bitmap bitmap, int value) {
+        IntBuffer buffer = IntBuffer.allocate(1);
+        buffer.put(0, value);
+        bitmap.copyPixelsFromBuffer(buffer);
+    }
+
+    public void testSetPremultipliedToBuffer() {
+        Bitmap bitmap = Bitmap.createBitmap(1, 1, Bitmap.Config.ARGB_8888);
+        bitmap.setPixel(0, 0, PREMUL_COLOR);
+        int storedPremul = getBitmapRawInt(bitmap);
+
+        bitmap = Bitmap.createBitmap(1, 1, Bitmap.Config.ARGB_8888);
+        bitmap.setPremultiplied(false);
+        bitmap.setPixel(0, 0, PREMUL_STORED_COLOR);
+
+        assertEquals(getBitmapRawInt(bitmap), storedPremul);
+    }
+
+    public void testSetPremultipliedFromBuffer() {
+        Bitmap bitmap = Bitmap.createBitmap(1, 1, Bitmap.Config.ARGB_8888);
+        bitmap.setPremultiplied(false);
+        bitmap.setPixel(0, 0, PREMUL_COLOR);
+        int rawTestColor = getBitmapRawInt(bitmap);
+
+        bitmap = Bitmap.createBitmap(1, 1, Bitmap.Config.ARGB_8888);
+        bitmap.setPremultiplied(false);
+        bitmapStoreRawInt(bitmap, rawTestColor);
+        assertEquals(bitmap.getPixel(0, 0), PREMUL_COLOR);
     }
 
     public void testSetWidth() {
