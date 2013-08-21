@@ -1,4 +1,4 @@
-# Copyright (C) 2009 The Android Open Source Project
+# Copyright (C) 2013 The Android Open Source Project
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -15,6 +15,6 @@
 LOCAL_PATH:= $(call my-dir)
 
 include $(CLEAR_VARS)
-LOCAL_PACKAGE_NAME := android.core.tests.libcore.package.org
-LOCAL_STATIC_JAVA_LIBRARIES := core-tests
+LOCAL_PACKAGE_NAME := android.core.tests.libcore.package.jsr166
+LOCAL_STATIC_JAVA_LIBRARIES := jsr166-tests
 include $(BUILD_CTSCORE_PACKAGE)
