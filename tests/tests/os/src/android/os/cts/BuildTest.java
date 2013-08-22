@@ -157,7 +157,7 @@ public class BuildTest extends TestCase {
     private static final Pattern PRODUCT_PATTERN =
         Pattern.compile("^([0-9A-Za-z._-]+)$");
     private static final Pattern SERIAL_NUMBER_PATTERN =
-        Pattern.compile("^([0-9A-Za-z]{0,20})$");
+        Pattern.compile("^([0-9A-Za-z]{6,20})$");
     private static final Pattern TAGS_PATTERN =
         Pattern.compile("^([0-9A-Za-z.,_-]+)$");
     private static final Pattern TYPE_PATTERN =
