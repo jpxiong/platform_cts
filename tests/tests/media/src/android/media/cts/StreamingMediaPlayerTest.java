@@ -46,11 +46,11 @@ public class StreamingMediaPlayerTest extends MediaPlayerTestBase {
 
     public void testRTSP_H264Base_AAC_Video1() throws Exception {
         playVideoTest("rtsp://v2.cache7.c.youtube.com/video.3gp?cid=0x271de9756065677e"
-                + "&fmt=18&user=android-device-test", 480, 270);
+                + "&fmt=18&user=android-device-test", 640, 360);
     }
     public void testRTSP_H264Base_AAC_Video2() throws Exception {
         playVideoTest("rtsp://v2.cache7.c.youtube.com/video.3gp?cid=0xc80658495af60617"
-                + "&fmt=18&user=android-device-test", 480, 270);
+                + "&fmt=18&user=android-device-test", 640, 360);
     }
 
     // Streaming HTTP video from YouTube
@@ -94,7 +94,7 @@ public class StreamingMediaPlayerTest extends MediaPlayerTestBase {
                 + "&sparams=ip,ipbits,expire,ip,ipbits,expire,id,itag"
                 + "&signature=1219C2B07AF0638C27916307A6093C0E43CB894E"
                 + ".126B6B916BD57157782738AA7C03E59F21DBC168"
-                + "&key=test_key1&user=android-device-test", 480, 270);
+                + "&key=test_key1&user=android-device-test", 640, 360);
     }
     public void testHTTP_H264Base_AAC_Video2() throws Exception {
         playVideoTest("http://v20.lscache8.c.youtube.com/videoplayback?id=c80658495af60617"
@@ -102,7 +102,7 @@ public class StreamingMediaPlayerTest extends MediaPlayerTestBase {
                 + "&sparams=ip,ipbits,expire,ip,ipbits,expire,id,itag"
                 + "&signature=61674BC069F2C812A18C390DE785CECD296228C7"
                 + ".11F5FCE823FB8FA31269A06A483C2F9B2C22F357"
-                + "&key=test_key1&user=android-device-test", 480, 270);
+                + "&key=test_key1&user=android-device-test", 640, 360);
     }
 
     // Streaming HLS video from YouTube
