@@ -86,9 +86,9 @@ public class SSLCertificateSocketFactoryTest extends AndroidTestCase {
     }
 
     // a host and port that are expected to be available but have
-    // a cert with a different CN, in this case CN=mtalk.google.com
-    private static String TEST_CREATE_SOCKET_HOST = "mobile-gtalk.l.google.com";
-    private static int TEST_CREATE_SOCKET_PORT = 5228;
+    // a cert with a different CN, in this case CN=mail.google.com
+    private static String TEST_CREATE_SOCKET_HOST = "googlemail.com";
+    private static int TEST_CREATE_SOCKET_PORT = 443;
 
     /**
      * b/2807618 Make sure that hostname verifcation in cases were it
