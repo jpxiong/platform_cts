@@ -63,7 +63,7 @@ public class IntrinsicConvolve5x5 extends IntrinsicBase {
         }
 
         android.util.Log.e("RSI test", name + "  " + e.getVectorSize() + " " + num + " " + w + ", " + h);
-        mVerify.invoke_verify(mAllocRef, mAllocDst, getVerifyEnum(e));
+        mVerify.invoke_verify(mAllocRef, mAllocDst);
         mRS.finish();
     }
 

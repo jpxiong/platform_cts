@@ -51,20 +51,52 @@ public class IntrinsicColorMatrix extends IntrinsicBase {
         mSr.invoke_reference(mat, add, mAllocSrc, mAllocRef);
 
         android.util.Log.e("RSI test", "test ColorMatrix U8_" + vsIn + " 1 " + w + ", " + h);
-        mVerify.invoke_verify(mAllocRef, mAllocDst, getVerifyEnum(eout));
+        mVerify.invoke_verify(mAllocRef, mAllocDst);
         mRS.finish();
     }
 
 
-    public void test_U8_4() {
+    public void test_U8_U8() {
         Float4 add = new Float4();
         Matrix4f mat = new Matrix4f();
+        java.util.Random r = new java.util.Random(100);
 
-        subtest(100, 100, mat, add,
-                Element.DataType.UNSIGNED_8, 4,
-                Element.DataType.UNSIGNED_8, 4);
-        checkError();
+        for (int t=0; t < 1; t++) {
+            float f[] = mat.getArray();
+            for (int i=0; i < f.length; i++) {
+                f[i] = 0.f;
+            }
+
+
+            switch (t) {
+            case 0:
+                mat.loadIdentity();
+                break;
+            case 1:
+                mat.set(0, 0, 1.f);
+                mat.set(0, 1, 1.f);
+                mat.set(0, 2, 1.f);
+                break;
+            case 2:
+                for (int i=0; i < f.length; i++) {
+                    if (r.nextFloat() > 0.2f) {
+                        f[i] = 10.f * r.nextFloat();
+                    }
+                }
+
+            }
+
+            for (int i=1; i <= 4; i++) {
+                for (int j=1; j <=4; j++) {
+                    subtest(100, 100, mat, add,
+                            Element.DataType.UNSIGNED_8, i,
+                            Element.DataType.UNSIGNED_8, j);
+                    checkError();
+                }
+            }
+        }
     }
+
 
 
 }

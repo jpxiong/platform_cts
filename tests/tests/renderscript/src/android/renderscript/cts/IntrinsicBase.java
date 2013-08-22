@@ -59,19 +59,6 @@ public class IntrinsicBase extends RSBaseCompute {
         return e;
     }
 
-    protected int getVerifyEnum(Element.DataType dt, int vecSize) {
-        if (dt == Element.DataType.FLOAT_32) {
-            return 8 - vecSize;
-        }
-
-        // U8
-        return 4 - vecSize;
-    }
-
-    protected int getVerifyEnum(Element e) {
-        return getVerifyEnum(e.getDataType(), e.getVectorSize());
-    }
-
     protected void makeSource(int w, int h, Element e) {
         System.gc();
 
