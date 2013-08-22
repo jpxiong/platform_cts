@@ -49,6 +49,16 @@ public class MediaDrmMockTest extends AndroidTestCase {
         assertFalse(MediaDrm.isCryptoSchemeSupported(badScheme));
     }
 
+    public void testIsMimeTypeSupported() throws Exception {
+        String mimeType = "video/mp4";
+        assertTrue(MediaDrm.isCryptoSchemeSupported(mockScheme, mimeType));
+    }
+
+    public void testIsMimeTypeNotSupported() throws Exception {
+        String mimeType = "video/foo";
+        assertFalse(MediaDrm.isCryptoSchemeSupported(mockScheme, mimeType));
+    }
+
     public void testMediaDrmConstructor() throws Exception {
         if (isMockPluginInstalled()) {
             MediaDrm md = new MediaDrm(mockScheme);
