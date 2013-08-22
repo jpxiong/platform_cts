@@ -65,7 +65,7 @@ void reference(rs_matrix4x4 m, float4 add, rs_allocation in, rs_allocation out) 
                     u.x = rsGetElementAt_uchar(in, x, y);
                     break;
                 }
-                pin = convert_float4(u) * (1.f / 255.f);
+                pin = rsUnpackColor8888(u);
             }
 
             pin = rsMatrixMultiply(&m, pin);
@@ -88,7 +88,7 @@ void reference(rs_matrix4x4 m, float4 add, rs_allocation in, rs_allocation out) 
                 }
             }
 
-            if (dtout == RS_TYPE_FLOAT_32) {
+            if (dtout == RS_TYPE_UNSIGNED_8) {
                 uchar4 u = rsPackColorTo8888(pin);
                 switch(vsout) {
                 case 4:

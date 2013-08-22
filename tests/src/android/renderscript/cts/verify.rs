@@ -216,33 +216,42 @@ static void verify_uchar(rs_allocation in1, rs_allocation in2)
     }
 }
 
-void verify(rs_allocation in1, rs_allocation in2, int etype)
+void verify(rs_allocation in1, rs_allocation in2)
 {
-    switch(etype) {
-    case 0:
-        verify_uchar4(in1, in2);
-        break;
-    case 1:
-        verify_uchar3(in1, in2);
-        break;
-    case 2:
-        verify_uchar2(in1, in2);
-        break;
-    case 3:
-        verify_uchar(in1, in2);
-        break;
-    case 4:
-        verify_float4(in1, in2);
-        break;
-    case 5:
-        verify_float3(in1, in2);
-        break;
-    case 6:
-        verify_float2(in1, in2);
-        break;
-    case 7:
-        verify_float(in1, in2);
-        break;
+    rs_element e = rsAllocationGetElement(in1);
+    rs_data_type dt = rsElementGetDataType(e);
+    uint32_t vs = rsElementGetVectorSize(e);
+
+    if (dt == RS_TYPE_UNSIGNED_8) {
+        switch(vs) {
+        case 4:
+            verify_uchar4(in1, in2);
+            break;
+        case 3:
+            verify_uchar3(in1, in2);
+            break;
+        case 2:
+            verify_uchar2(in1, in2);
+            break;
+        case 1:
+            verify_uchar(in1, in2);
+            break;
+        }
+    } else {
+        switch(vs) {
+        case 4:
+            verify_float4(in1, in2);
+            break;
+        case 3:
+            verify_float3(in1, in2);
+            break;
+        case 2:
+            verify_float2(in1, in2);
+            break;
+        case 1:
+            verify_float(in1, in2);
+            break;
+        }
     }
 
 }
