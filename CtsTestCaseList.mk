@@ -39,6 +39,7 @@ cts_support_packages := \
 	SignatureTest \
 	TestDeviceSetup \
 	CtsUiAutomatorApp \
+	CtsUsbSerialTestApp \
 	$(cts_security_apps_list)
 
 cts_external_packages := \
@@ -118,7 +119,8 @@ cts_host_libraries := \
 	$(PTS_HOST_CASES) \
 	CtsAdbTests \
 	CtsAppSecurityTests \
-	CtsMonkeyTestCases
+	CtsMonkeyTestCases \
+	CtsUsbTests
 
 
 # Native test executables that need to have associated test XMLs.
