@@ -36,7 +36,7 @@ import android.view.SurfaceHolder;
  */
 public class PresentationSyncTest extends ActivityInstrumentationTestCase2<MediaStubActivity>
         implements SurfaceHolder.Callback {
-    private static final String TAG = "RenderSyncTest";
+    private static final String TAG = "PresentationSyncTest";
     private static final boolean VERBOSE = false;           // lots of logging
     private static final int FRAME_COUNT = 128;             // ~2 sec @ 60fps
 
@@ -135,11 +135,9 @@ public class PresentationSyncTest extends ActivityInstrumentationTestCase2<Media
         for (int frameNum = 0; frameNum < FRAME_COUNT; frameNum++) {
             if (mult != -1.0f) {
                 showNsec = startNsec + (long) (frameNum * frameTimeNsec * mult);
-                //Log.d(TAG, "showNsec=" + showNsec);
             }
             drawFrame(frameNum, mult);
             output.setPresentationTime(showNsec);
-            //Log.d(TAG, "ZZZ des=" + showNsec + " now=" + System.nanoTime());
             Trace.beginSection("swapbuf " + frameNum);
             output.swapBuffers();
             Trace.endSection();
@@ -153,10 +151,12 @@ public class PresentationSyncTest extends ActivityInstrumentationTestCase2<Media
             long expectedNsec = (long) (frameTimeNsec * FRAME_COUNT * mult);
             long deltaNsec = Math.abs(expectedNsec - actualNsec);
             double delta = (double) deltaNsec / expectedNsec;
-            if (delta > 0.1) {
-                Log.e(TAG, "mult=" + mult + ": expected=" + expectedNsec +
+            final double MAX_DELTA = 0.05;
+            if (delta > MAX_DELTA) {
+                throw new RuntimeException("Time delta exceeds tolerance (" + MAX_DELTA +
+                        "): mult=" + mult + ": expected=" + expectedNsec +
                         " actual=" + actualNsec + " p=" + delta);
-                // TODO: fail() instead of Log()
+
             } else {
                 Log.d(TAG, "mult=" + mult + ": expected=" + expectedNsec +
                         " actual=" + actualNsec + " p=" + delta);
