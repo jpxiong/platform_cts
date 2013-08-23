@@ -18,6 +18,7 @@
 #include <stdio.h>
 
 extern int register_android_security_cts_CharDeviceTest(JNIEnv*);
+extern int register_android_security_cts_LinuxRngTest(JNIEnv*);
 extern int register_android_security_cts_NativeCodeTest(JNIEnv*);
 
 jint JNI_OnLoad(JavaVM *vm, void *reserved) {
@@ -28,6 +29,10 @@ jint JNI_OnLoad(JavaVM *vm, void *reserved) {
     }
 
     if (register_android_security_cts_CharDeviceTest(env)) {
+        return JNI_ERR;
+    }
+
+    if (register_android_security_cts_LinuxRngTest(env)) {
         return JNI_ERR;
     }
 
