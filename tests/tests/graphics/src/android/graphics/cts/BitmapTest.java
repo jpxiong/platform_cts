@@ -406,7 +406,8 @@ public class BitmapTest extends AndroidTestCase {
         assertEquals(Bitmap.Config.ALPHA_8, bm0.getConfig());
         assertEquals(Bitmap.Config.ARGB_8888, bm1.getConfig());
         assertEquals(Bitmap.Config.RGB_565, bm2.getConfig());
-        assertEquals(Bitmap.Config.ARGB_4444, bm3.getConfig());
+        // Attempting to create a 4444 bitmap actually creates an 8888 bitmap.
+        assertEquals(Bitmap.Config.ARGB_8888, bm3.getConfig());
     }
 
     public void testGetHeight(){
@@ -459,7 +460,8 @@ public class BitmapTest extends AndroidTestCase {
         assertEquals(100, bm0.getRowBytes());
         assertEquals(400, bm1.getRowBytes());
         assertEquals(200, bm2.getRowBytes());
-        assertEquals(200, bm3.getRowBytes());
+        // Attempting to create a 4444 bitmap actually creates an 8888 bitmap.
+        assertEquals(400, bm3.getRowBytes());
     }
 
     public void testGetWidth(){
