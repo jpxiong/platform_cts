@@ -83,8 +83,7 @@ public class PtsDeviceJankOpenGl extends PtsJankTestBase {
             sleep(SLEEP_TIME / 2);
 
             // Start systrace
-            // TODO(jgennis): Systrace has been commented out because of read-tgid permission error
-            // startTrace(mTestCaseName, i);
+            startTrace(mTestCaseName, i);
 
             // Clear SurfaceFlinger buffer
             Log.i(TAG, "Clearing SurfaceFlinger buffer");
@@ -99,7 +98,7 @@ public class PtsDeviceJankOpenGl extends PtsJankTestBase {
             assertTrue("SurfaceFlingerHelper could not get timestamps", result);
 
             // Stop systrace
-            // endTrace();
+            endTrace();
 
             // Record results
             recordResults(mTestCaseName, i);
