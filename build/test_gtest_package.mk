@@ -21,6 +21,7 @@
 
 # Disable by default so "m cts" will work in emulator builds
 LOCAL_DEX_PREOPT := false
+LOCAL_PROGUARD_ENABLED := disabled
 
 include $(BUILD_PACKAGE)
 
