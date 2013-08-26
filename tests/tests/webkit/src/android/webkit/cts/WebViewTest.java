@@ -1906,12 +1906,6 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
     }
 
     public void testEvaluateJavascript() {
-        // evaluteJavaScript not supported with WebViewClassic
-        // TODO: Remove when WebViewClassic no longer in system image.
-        if (mWebView.getWebViewProvider() instanceof android.webkit.WebViewClassic) {
-            return;
-        }
-
         mOnUiThread.getSettings().setJavaScriptEnabled(true);
         mOnUiThread.loadUrlAndWaitForCompletion("about:blank");
 
