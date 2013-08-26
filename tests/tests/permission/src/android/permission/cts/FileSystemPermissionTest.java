@@ -670,6 +670,24 @@ public class FileSystemPermissionTest extends AndroidTestCase {
                 insecure.isEmpty());
     }
 
+    public void testDevRandomWorldReadableAndWritable() throws Exception {
+        FileUtils.FileStatus status = new FileUtils.FileStatus();
+        assertTrue(FileUtils.getFileStatus("/dev/random", status, false));
+        assertTrue(
+                "/dev/random not world-readable/writable. Actual mode: 0"
+                        + Integer.toString(status.mode, 8),
+                (status.mode & 0666) == 0666);
+    }
+
+    public void testDevUrandomWorldReadableAndWritable() throws Exception {
+        FileUtils.FileStatus status = new FileUtils.FileStatus();
+        assertTrue(FileUtils.getFileStatus("/dev/urandom", status, false));
+        assertTrue(
+                "/dev/urandom not world-readable/writable. Actual mode: 0"
+                        + Integer.toString(status.mode, 8),
+                (status.mode & 0666) == 0666);
+    }
+
     private static Set<File>
     getAllInsecureBlockDevicesInDirAndSubdir(File dir) throws Exception {
         assertTrue(dir.isDirectory());
