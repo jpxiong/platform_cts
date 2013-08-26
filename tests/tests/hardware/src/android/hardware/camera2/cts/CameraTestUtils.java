@@ -29,6 +29,7 @@ import junit.framework.Assert;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.lang.reflect.Array;
 import java.nio.ByteBuffer;
 import java.util.Arrays;
 
@@ -38,6 +39,33 @@ import java.util.Arrays;
 class CameraTestUtils extends Assert {
     private static final String TAG = "CameraTestUtils";
     private static final boolean VERBOSE = Log.isLoggable(TAG, Log.VERBOSE);
+
+    public static <T> void assertArrayNotEmpty(T arr, String message) {
+        assertTrue(message, arr != null && Array.getLength(arr) > 0);
+    }
+
+    /**
+     * Check if the format is a legal YUV format camera supported.
+     */
+    public static void checkYuvFormat(int format) {
+        if ((format != ImageFormat.YUV_420_888) &&
+                (format != ImageFormat.NV21) &&
+                (format != ImageFormat.YV12) &&
+                (format != ImageFormat.Y8) &&
+                (format != ImageFormat.Y16)) {
+            fail("Wrong formats: " + format);
+        }
+    }
+
+    /**
+     * Check if image size and format match given size and format.
+     */
+    public static void checkImage(Image image, int width, int height, int format) {
+        assertNotNull("Input image is invalid", image);
+        assertEquals("Format doesn't match", format, image.getFormat());
+        assertEquals("Width doesn't match", width, image.getWidth());
+        assertEquals("Height doesn't match", height, image.getHeight());
+    }
 
     /**
      * <p>Read data from all planes of an Image into a contiguous unpadded, unpacked
@@ -108,7 +136,7 @@ class CameraTestUtils extends Assert {
                     offset += length;
                 } else {
                     // Generic case: should work for any pixelStride but slower.
-                    // Use use intermediate buffer to avoid read byte-by-byte from
+                    // Use intermediate buffer to avoid read byte-by-byte from
                     // DirectByteBuffer, which is very bad for performance
                     buffer.get(rowData, 0, rowStride);
                     for (int col = 0; col < w; col++) {
