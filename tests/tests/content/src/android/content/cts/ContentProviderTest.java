@@ -16,33 +16,22 @@
 
 package android.content.cts;
 
-import com.android.cts.stub.R;
-
-
 import android.content.ContentProvider;
 import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
-import android.content.IContentProvider;
-import android.content.ContentProviderResult;
-import android.content.ContentProviderOperation;
-import android.content.OperationApplicationException;
 import android.content.pm.ProviderInfo;
-import android.content.res.AssetFileDescriptor;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
-import android.os.Bundle;
-import android.os.IBinder;
-import android.os.ICancellationSignal;
 import android.os.ParcelFileDescriptor;
-import android.os.RemoteException;
 import android.test.AndroidTestCase;
+
+import com.android.cts.stub.R;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.ArrayList;
 
 /**
  * Test {@link ContentProvider}.
@@ -239,93 +228,6 @@ public class ContentProviderTest extends AndroidTestCase {
 
     public void testOnLowMemory() {
         // cannot trigger this callback reliably
-    }
-
-    public void testCoerceToLocalContentProvider() {
-        MockContentProvider mockContentProvider = new MockContentProvider();
-
-        IContentProvider transport = mockContentProvider.getIContentProvider();
-        assertSame(mockContentProvider, ContentProvider.coerceToLocalContentProvider(transport));
-
-        IContentProvider iContentProvider = new IContentProvider() {
-            @Override
-            public int bulkInsert(String callingPkg, Uri url, ContentValues[] initialValues) {
-                return 0;
-            }
-
-            @Override
-            public int delete(String callingPkg, Uri url, String selection, String[] selectionArgs) {
-                return 0;
-            }
-
-            @Override
-            public String getType(Uri url) {
-                return null;
-            }
-
-            @Override
-            public Uri insert(String callingPkg, Uri url, ContentValues initialValues) {
-                return null;
-            }
-
-            @Override
-            public ParcelFileDescriptor openFile(String callingPkg, Uri url, String mode) {
-                return null;
-            }
-
-            @Override
-            public AssetFileDescriptor openAssetFile(String callingPkg, Uri url, String mode) {
-                return null;
-            }
-
-            @Override
-            public ContentProviderResult[] applyBatch(String callingPkg,
-                    ArrayList<ContentProviderOperation> operations)
-                    throws RemoteException, OperationApplicationException {
-                return null;
-            }
-
-            @Override
-            public Cursor query(String callingPkg, Uri url, String[] projection, String selection,
-                    String[] selectionArgs, String sortOrder,
-                    ICancellationSignal cancellationSignal) {
-                return null;
-            }
-
-            @Override
-            public int update(String callingPkg, Uri url, ContentValues values, String selection,
-                    String[] selectionArgs) {
-                return 0;
-            }
-
-            @Override
-            public IBinder asBinder() {
-                return null;
-            }
-
-            @Override
-            public Bundle call(String callingPkg, String method, String request, Bundle args) {
-                return null;
-            }
-
-            @Override
-            public String[] getStreamTypes(Uri url, String mimeTypeFilter) throws RemoteException {
-                return null;
-            }
-
-            @Override
-            public AssetFileDescriptor openTypedAssetFile(String callingPkg, Uri url,
-                    String mimeType, Bundle opts)
-                    throws RemoteException, FileNotFoundException {
-                return null;
-            }
-
-            @Override
-            public ICancellationSignal createCancellationSignal() throws RemoteException {
-                return null;
-            }
-        };
-        assertNull(ContentProvider.coerceToLocalContentProvider(iContentProvider));
     }
 
     public void testGetIContentProvider() {
