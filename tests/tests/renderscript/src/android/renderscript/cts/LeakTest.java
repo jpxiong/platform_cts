@@ -55,7 +55,7 @@ public class LeakTest extends RSBaseCompute {
             Allocation A = Allocation.createTyped(mRS, t);
             leak.set_a(A);
             A = null;
-            System.gc();
+            //System.gc();
             leak.destroy();
             mRS.finish();
         }
