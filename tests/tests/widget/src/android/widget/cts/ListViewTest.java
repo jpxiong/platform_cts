@@ -44,6 +44,9 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import junit.framework.Assert;
@@ -743,6 +746,96 @@ public class ListViewTest extends ActivityInstrumentationTestCase2<ListViewStubA
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
             return new MockView(getContext());
+        }
+    }
+
+    public void testTransientStateUnstableIds() throws Exception {
+        final ListView listView = mListView;
+        final ArrayList<String> items = new ArrayList<String>(Arrays.asList(mCountryList));
+        final ArrayAdapter<String> adapter = new ArrayAdapter<String>(mActivity,
+                android.R.layout.simple_list_item_1, items);
+
+        mInstrumentation.runOnMainSync(new Runnable() {
+            @Override
+            public void run() {
+                listView.setAdapter(adapter);
+            }
+        });
+        mInstrumentation.waitForIdleSync();
+
+        final View oldItem = listView.getChildAt(2);
+        final CharSequence oldText = ((TextView) oldItem.findViewById(android.R.id.text1))
+                .getText();
+        oldItem.setHasTransientState(true);
+
+        mInstrumentation.runOnMainSync(new Runnable() {
+            @Override
+            public void run() {
+                adapter.remove(adapter.getItem(0));
+                adapter.notifyDataSetChanged();
+            }
+        });
+        mInstrumentation.waitForIdleSync();
+
+        final View newItem = listView.getChildAt(2);
+        final CharSequence newText = ((TextView) newItem.findViewById(android.R.id.text1))
+                .getText();
+
+        Assert.assertFalse(oldText.equals(newText));
+    }
+
+    public void testTransientStateStableIds() throws Exception {
+        final ListView listView = mListView;
+        final ArrayList<String> items = new ArrayList<String>(Arrays.asList(mCountryList));
+        final StableArrayAdapter<String> adapter = new StableArrayAdapter<String>(mActivity,
+                android.R.layout.simple_list_item_1, items);
+
+        mInstrumentation.runOnMainSync(new Runnable() {
+            @Override
+            public void run() {
+                listView.setAdapter(adapter);
+            }
+        });
+        mInstrumentation.waitForIdleSync();
+
+        final Object tag = new Object();
+        final View oldItem = listView.getChildAt(2);
+        final CharSequence oldText = ((TextView) oldItem.findViewById(android.R.id.text1))
+                .getText();
+        oldItem.setHasTransientState(true);
+        oldItem.setTag(tag);
+
+        mInstrumentation.runOnMainSync(new Runnable() {
+            @Override
+            public void run() {
+                adapter.remove(adapter.getItem(0));
+                adapter.notifyDataSetChanged();
+            }
+        });
+        mInstrumentation.waitForIdleSync();
+
+        final View newItem = listView.getChildAt(1);
+        final CharSequence newText = ((TextView) newItem.findViewById(android.R.id.text1))
+                .getText();
+
+        Assert.assertTrue(newItem.hasTransientState());
+        Assert.assertEquals(oldText, newText);
+        Assert.assertEquals(tag, newItem.getTag());
+    }
+
+    private static class StableArrayAdapter<T> extends ArrayAdapter<T> {
+        public StableArrayAdapter(Context context, int resource, List<T> objects) {
+            super(context, resource, objects);
+        }
+
+        @Override
+        public long getItemId(int position) {
+            return getItem(position).hashCode();
+        }
+
+        @Override
+        public boolean hasStableIds() {
+            return true;
         }
     }
 }
