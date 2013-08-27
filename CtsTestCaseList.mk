@@ -119,7 +119,8 @@ cts_host_libraries := \
 # Native test executables that need to have associated test XMLs.
 cts_native_exes := \
 	NativeMediaTest_SL \
-	NativeMediaTest_XA
+	NativeMediaTest_XA \
+	bionic-unit-tests-cts \
 
 cts_ui_tests := \
         CtsUiAutomatorTests

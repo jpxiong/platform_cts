@@ -27,7 +27,7 @@ include $(BUILD_EXECUTABLE)
 
 cts_executable_xml := $(CTS_TESTCASES_OUT)/$(LOCAL_MODULE).xml
 
-$(cts_executable_xml): PRIVATE_PATH := $(LOCAL_PATH)
+$(cts_executable_xml): PRIVATE_PATH := $(cts_src_test_path)
 $(cts_executable_xml): PRIVATE_TEST_PACKAGE := $(LOCAL_CTS_TEST_PACKAGE)
 $(cts_executable_xml): PRIVATE_EXECUTABLE := $(LOCAL_MODULE)
 $(cts_executable_xml): $(addprefix $(LOCAL_PATH)/,$(LOCAL_SRC_FILES)) $(CTS_EXPECTATIONS) $(CTS_NATIVE_TEST_SCANNER) $(CTS_XML_GENERATOR)
