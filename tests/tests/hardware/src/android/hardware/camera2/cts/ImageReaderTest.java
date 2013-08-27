@@ -69,10 +69,10 @@ public class ImageReaderTest extends AndroidTestCase {
     private CameraDevice mCamera;
     private BlockingStateListener mCameraListener;
     private String[] mCameraIds;
-    private ImageReader mReader = null;
-    private Handler mHandler = null;
-    private SimpleImageListener mListener = null;
-    private CameraTestThread mLooperThread = null;
+    private ImageReader mReader;
+    private Handler mHandler;
+    private SimpleImageListener mListener;
+    private CameraTestThread mLooperThread;
 
     @Override
     public void setContext(Context context) {
@@ -110,7 +110,7 @@ public class ImageReaderTest extends AndroidTestCase {
             Log.i(TAG, "Testing Camera " + mCameraIds[i]);
             openDevice(mCameraIds[i]);
             bufferFormatTestByCamera(ImageFormat.YUV_420_888, mCameraIds[i]);
-            closeDevice(mCameraIds[i]);
+            closeDevice();
         }
     }
 
@@ -119,7 +119,7 @@ public class ImageReaderTest extends AndroidTestCase {
             Log.v(TAG, "Testing Camera " + mCameraIds[i]);
             openDevice(mCameraIds[i]);
             bufferFormatTestByCamera(ImageFormat.JPEG, mCameraIds[i]);
-            closeDevice(mCameraIds[i]);
+            closeDevice();
         }
     }
 
@@ -136,16 +136,8 @@ public class ImageReaderTest extends AndroidTestCase {
         CameraCharacteristics properties = mCameraManager.getCameraCharacteristics(cameraId);
         assertNotNull("Can't get camera properties!", properties);
 
-        /**
-         * TODO: cleanup the color format mess, we probably need define formats
-         * in Image class instead of using ImageFormat for camera. also,
-         * probably make sense to change the available format type from Enum[]
-         * to int[]. It'll also be nice to put this into a helper function and
-         * move to util class.
-         */
         int[] availableFormats = properties.get(CameraCharacteristics.SCALER_AVAILABLE_FORMATS);
-        assertArrayNotEmpty(availableFormats,
-                "availableFormats should not be empty");
+        assertArrayNotEmpty(availableFormats, "availableFormats should not be empty");
         Arrays.sort(availableFormats);
         assertTrue("Can't find the format " + format + " in supported formats " +
                 Arrays.toString(availableFormats),
@@ -160,7 +152,7 @@ public class ImageReaderTest extends AndroidTestCase {
 
             prepareImageReader(sz, format);
 
-            CaptureRequest request = prepareCaptureRequest(format);
+            CaptureRequest request = prepareCaptureRequest();
 
             captureAndValidateImage(request, sz, format);
 
@@ -216,7 +208,7 @@ public class ImageReaderTest extends AndroidTestCase {
         if (VERBOSE) Log.v(TAG, "Preparing ImageReader size " + sz.toString());
     }
 
-    private CaptureRequest prepareCaptureRequest(int format) throws Exception {
+    private CaptureRequest prepareCaptureRequest() throws Exception {
         List<Surface> outputSurfaces = new ArrayList<Surface>(1);
         Surface surface = mReader.getSurface();
         assertNotNull("Fail to get surface from ImageReader", surface);
@@ -282,6 +274,7 @@ public class ImageReaderTest extends AndroidTestCase {
         if (mCamera != null) {
             throw new IllegalStateException("Already have open camera device");
         }
+
         try {
             mCamera = CameraTestUtils.openCamera(
                 mCameraManager, cameraId, mCameraListener, mHandler);
@@ -292,11 +285,12 @@ public class ImageReaderTest extends AndroidTestCase {
             mCamera = null;
             fail("Fail to open camera, " + Log.getStackTraceString(e));
         }
-        mCameraListener.waitForState(STATE_UNCONFIGURED, CAMERA_OPEN_TIMEOUT_MS);
+        mCameraListener.waitForState(STATE_OPENED, CAMERA_OPEN_TIMEOUT_MS);
     }
 
-    private void closeDevice(String cameraId) {
+    private void closeDevice() {
         mCamera.close();
+        mCameraListener.waitForState(STATE_CLOSED, CAMERA_CLOSE_TIMEOUT_MS);
         mCamera = null;
     }
 
@@ -335,7 +329,7 @@ public class ImageReaderTest extends AndroidTestCase {
                 BitmapFactory.decodeByteArray(jpegData, 0, jpegData.length));
         if (DUMP_FILE) {
             String fileName =
-                    DEBUG_FILE_NAME_BASE + width + "x" + height + ".yuv";
+                    DEBUG_FILE_NAME_BASE + "/" + width + "x" + height + ".jpeg";
             dumpFile(fileName, jpegData);
         }
     }

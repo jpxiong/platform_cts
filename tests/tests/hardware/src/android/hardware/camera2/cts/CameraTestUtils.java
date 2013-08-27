@@ -38,7 +38,11 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.lang.reflect.Array;
 import java.nio.ByteBuffer;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
 
 /**
  * A package private utility class for wrapping up the camera2 cts test common utility functions
@@ -47,11 +51,14 @@ class CameraTestUtils extends Assert {
     private static final String TAG = "CameraTestUtils";
     private static final boolean VERBOSE = Log.isLoggable(TAG, Log.VERBOSE);
 
+    // Only test the preview and video size that is no larger than 1080p.
+    public static final Size PREVIEW_SIZE_BOUND = new Size(1920, 1080);
     // Default timeouts for reaching various states
-    public static final int CAMERA_OPEN_TIMEOUT_MS = 500;
+    public static final int CAMERA_OPEN_TIMEOUT_MS = 2000;
+    public static final int CAMERA_CLOSE_TIMEOUT_MS = 2000;
     public static final int CAMERA_IDLE_TIMEOUT_MS = 2000;
-    public static final int CAMERA_ACTIVE_TIMEOUT_MS = 500;
-    public static final int CAMERA_BUSY_TIMEOUT_MS = 500;
+    public static final int CAMERA_ACTIVE_TIMEOUT_MS = 1000;
+    public static final int CAMERA_BUSY_TIMEOUT_MS = 1000;
 
     public static class ImageDropperListener implements ImageReader.OnImageAvailableListener {
         @Override
@@ -287,7 +294,53 @@ class CameraTestUtils extends Assert {
                         String.format("Invalid format specified 0x%x", format));
         }
         Size[] availableSizes = properties.get(key);
+        assertArrayNotEmpty(availableSizes, "availableSizes should not be empty");
         if (VERBOSE) Log.v(TAG, "Supported sizes are: " + Arrays.deepToString(availableSizes));
         return availableSizes;
+    }
+
+    /**
+     * Size comparator that compares the number of pixels it covers.
+     */
+    public static class SizeComparator implements Comparator<Size> {
+        @Override
+        public int compare(Size lhs, Size rhs) {
+            long left = lhs.getWidth() * lhs.getHeight();
+            long right = rhs.getWidth() * rhs.getHeight();
+            return (left < right) ? -1 : (left > right ? 1 : 0);
+        }
+    }
+
+    /**
+     * Get sorted size list in descending order. Remove the sizes larger than
+     * the bound. If the bound is null, don't do the size bound filtering.
+     */
+    static public List<Size> getSupportedPreviewSizes(
+            String cameraId, CameraManager cameraManager, Size bound) throws Exception {
+        Comparator<Size> comparator = new SizeComparator();
+        Size[] sizes = getSupportedSizeForFormat(ImageFormat.YUV_420_888, cameraId, cameraManager);
+        List<Size> supportedPreviewSizes = null;
+        if (bound != null) {
+            supportedPreviewSizes = new ArrayList<Size>(/* capacity */1);
+            for (Size sz : sizes) {
+                if (comparator.compare(sz, bound) <= 0) {
+                    supportedPreviewSizes.add(sz);
+                }
+            }
+        } else {
+            supportedPreviewSizes = Arrays.asList(sizes);
+        }
+        assertTrue("Supported preview size should have at least one element",
+                supportedPreviewSizes.size() > 0);
+
+        Collections.sort(supportedPreviewSizes, comparator);
+        // Make it in descending order.
+        Collections.reverse(supportedPreviewSizes);
+        return supportedPreviewSizes;
+    }
+
+    static public List<Size> getSupportedVideoSizes(
+            String cameraId, CameraManager cameraManager, Size bound) throws Exception {
+        return getSupportedPreviewSizes(cameraId, cameraManager, bound);
     }
 }
