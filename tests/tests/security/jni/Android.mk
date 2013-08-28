@@ -24,7 +24,8 @@ LOCAL_MODULE_TAGS := optional
 LOCAL_SRC_FILES := \
 		CtsSecurityJniOnLoad.cpp \
 		android_security_cts_CharDeviceTest.cpp \
-		android_security_cts_NativeCodeTest.cpp
+		android_security_cts_LinuxRngTest.cpp \
+		android_security_cts_NativeCodeTest.cpp \
 
 LOCAL_C_INCLUDES := $(JNI_H_INCLUDE)
 
