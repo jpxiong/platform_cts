@@ -3,6 +3,8 @@
 LOCAL_PATH:= $(call my-dir)
 include $(CLEAR_VARS)
 
+cts_src_test_path := $(LOCAL_PATH)
+
 LOCAL_MODULE_TAGS := optional
 
 LOCAL_C_INCLUDES:= \
