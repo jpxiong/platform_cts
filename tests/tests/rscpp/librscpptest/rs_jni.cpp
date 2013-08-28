@@ -123,3 +123,39 @@ Java_android_cts_rscpp_RSConvolveTest_convolveTest(JNIEnv * env, jclass obj, jin
 
 }
 
+extern "C" JNIEXPORT jboolean JNICALL Java_android_cts_rscpp_RSLUTTest_lutTest(JNIEnv * env,
+                                                                               jclass obj,
+                                                                               jint X,
+                                                                               jint Y,
+                                                                               jbyteArray inputByteArray,
+                                                                               jbyteArray outputByteArray)
+{
+    jbyte * input = (jbyte *) env->GetPrimitiveArrayCritical(inputByteArray, 0);
+    jbyte * output = (jbyte *) env->GetPrimitiveArrayCritical(outputByteArray, 0);
+
+    sp<RS> rs = new RS();
+    rs->init();
+
+    sp<const Element> e = Element::RGBA_8888(rs);
+
+    sp<Allocation> inputAlloc = Allocation::createSized2D(rs, e, X, Y);
+    sp<Allocation> outputAlloc = Allocation::createSized2D(rs, e, X, Y);
+    sp<ScriptIntrinsicLUT> lut = ScriptIntrinsicLUT::create(rs, e);
+
+    inputAlloc->copy2DRangeFrom(0, 0, X, Y, input);
+    unsigned char lutValues[256];
+    for (int i = 0; i < 256; i++) {
+        lutValues[i] = 255-i;
+    }
+    lut->setRed(0, 256, lutValues);
+    lut->setGreen(0, 256, lutValues);
+    lut->setBlue(0, 256, lutValues);
+
+    lut->forEach(inputAlloc,outputAlloc);
+    outputAlloc->copy2DRangeTo(0, 0, X, Y, output);
+
+    env->ReleasePrimitiveArrayCritical(inputByteArray, input, 0);
+    env->ReleasePrimitiveArrayCritical(outputByteArray, output, 0);
+    return true;
+
+}
