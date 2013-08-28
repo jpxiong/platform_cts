@@ -78,11 +78,13 @@ class TestScanner {
         }
     }
 
-    // We want to find lines like TEST_F(SLObjectCreationTest, testAudioPlayerFromFdCreation) { ...
+    // We want to find lines like TEST_F(SLObjectCreationTest, testAudioPlayerFromFdCreation)
+    // or TEST(stdio, printf) { ...
     // and extract the "SLObjectCreationTest" as group #1,
     // "testAudioPlayerFromFdCreation" as group #2
+    // TODO: It would be better to concatenate the two parts.
     private static final Pattern METHOD_REGEX =
-            Pattern.compile("\\s*TEST_F\\((\\w+),\\s*(\\w+)\\).*");
+            Pattern.compile("\\s*TEST(?:_F)?\\((\\w+),\\s*(\\w+)\\).*");
 
     public void scanFile(Scanner scanner, List<String> testNames) {
         try {
