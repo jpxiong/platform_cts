@@ -50,13 +50,13 @@ public class IntrinsicColorMatrix extends IntrinsicBase {
         mSi.forEach(mAllocSrc, mAllocDst);
         mSr.invoke_reference(mat, add, mAllocSrc, mAllocRef);
 
-        android.util.Log.e("RSI test", "test ColorMatrix U8_" + vsIn + " 1 " + w + ", " + h);
+        android.util.Log.e("RSI test", "test ColorMatrix " + vsIn + " 1 " + w + ", " + h);
         mVerify.invoke_verify(mAllocRef, mAllocDst);
         mRS.finish();
     }
 
 
-    public void test_U8_U8() {
+    private void test(Element.DataType dtin, Element.DataType dtout) {
         Float4 add = new Float4();
         Matrix4f mat = new Matrix4f();
         java.util.Random r = new java.util.Random(100);
@@ -88,15 +88,29 @@ public class IntrinsicColorMatrix extends IntrinsicBase {
 
             for (int i=1; i <= 4; i++) {
                 for (int j=1; j <=4; j++) {
-                    subtest(100, 100, mat, add,
-                            Element.DataType.UNSIGNED_8, i,
-                            Element.DataType.UNSIGNED_8, j);
+                    subtest(101, 101, mat, add,
+                            dtin, i,
+                            dtout, j);
                     checkError();
                 }
             }
         }
     }
 
+    public void test_U8_U8() {
+        test(Element.DataType.UNSIGNED_8, Element.DataType.UNSIGNED_8);
+    }
 
+    public void test_F32_F32() {
+        test(Element.DataType.FLOAT_32, Element.DataType.FLOAT_32);
+    }
+
+    public void test_U8_F32() {
+        test(Element.DataType.UNSIGNED_8, Element.DataType.FLOAT_32);
+    }
+
+    public void test_F32_U8() {
+        test(Element.DataType.FLOAT_32, Element.DataType.UNSIGNED_8);
+    }
 
 }
