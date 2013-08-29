@@ -11,6 +11,7 @@ LOCAL_ADDITION_DEPENDENCIES := \
 
 LOCAL_SHARED_LIBRARIES += \
 	libstlport \
+	libdl \
 
 LOCAL_WHOLE_STATIC_LIBRARIES += \
 	libBionicTests \
