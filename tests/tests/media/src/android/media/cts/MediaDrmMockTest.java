@@ -41,7 +41,7 @@ public class MediaDrmMockTest extends AndroidTestCase {
     static final UUID mockScheme = new UUID(0x0102030405060708L, 0x090a0b0c0d0e0f10L);
     static final UUID badScheme = new UUID(0xffffffffffffffffL, 0xffffffffffffffffL);
 
-    private boolean isMockPluginInstalled() {
+    private boolean testIsCryptoSchemeSupported() {
         return MediaDrm.isCryptoSchemeSupported(mockScheme);
     }
 
@@ -60,19 +60,16 @@ public class MediaDrmMockTest extends AndroidTestCase {
     }
 
     public void testMediaDrmConstructor() throws Exception {
-        if (isMockPluginInstalled()) {
+        boolean gotException = false;
+        try {
             MediaDrm md = new MediaDrm(mockScheme);
-        } else {
-            Log.w(TAG, "optional plugin libmockdrmcryptoplugin.so is not installed");
-            Log.w(TAG, "To verify the MediaDrm APIs, you should install this plugin");
+        } catch (MediaDrmException e) {
+            gotException = true;
         }
+        assertFalse(gotException);
     }
 
     public void testMediaDrmConstructorFails() throws Exception {
-        if (!isMockPluginInstalled()) {
-            return;
-        }
-
         boolean gotException = false;
         try {
             MediaDrm md = new MediaDrm(badScheme);
@@ -83,10 +80,6 @@ public class MediaDrmMockTest extends AndroidTestCase {
     }
 
     public void testStringProperties() throws Exception {
-        if (!isMockPluginInstalled()) {
-            return;
-        }
-
         MediaDrm md = new MediaDrm(mockScheme);
 
         md.setPropertyString("test-string", "test-value");
@@ -94,10 +87,6 @@ public class MediaDrmMockTest extends AndroidTestCase {
     }
 
     public void testByteArrayProperties() throws Exception {
-        if (!isMockPluginInstalled()) {
-            return;
-        }
-
         MediaDrm md = new MediaDrm(mockScheme);
 
         byte testArray[] = {0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x10, 0x11, 0x12};
@@ -106,10 +95,6 @@ public class MediaDrmMockTest extends AndroidTestCase {
     }
 
     public void testMissingPropertyString() throws Exception {
-        if (!isMockPluginInstalled()) {
-            return;
-        }
-
         MediaDrm md = new MediaDrm(mockScheme);
 
         boolean gotException = false;
@@ -122,10 +107,6 @@ public class MediaDrmMockTest extends AndroidTestCase {
     }
 
     public void testNullPropertyString() throws Exception {
-        if (!isMockPluginInstalled()) {
-            return;
-        }
-
         MediaDrm md = new MediaDrm(mockScheme);
 
         boolean gotException = false;
@@ -138,10 +119,6 @@ public class MediaDrmMockTest extends AndroidTestCase {
     }
 
     public void testMissingPropertyByteArray() throws Exception {
-        if (!isMockPluginInstalled()) {
-            return;
-        }
-
         MediaDrm md = new MediaDrm(mockScheme);
 
         boolean gotException = false;
@@ -154,10 +131,6 @@ public class MediaDrmMockTest extends AndroidTestCase {
     }
 
     public void testNullPropertyByteArray() throws Exception {
-        if (!isMockPluginInstalled()) {
-            return;
-        }
-
         MediaDrm md = new MediaDrm(mockScheme);
 
         boolean gotException = false;
@@ -170,20 +143,12 @@ public class MediaDrmMockTest extends AndroidTestCase {
     }
 
     public void testOpenCloseSession() throws Exception {
-        if (!isMockPluginInstalled()) {
-            return;
-        }
-
         MediaDrm md = new MediaDrm(mockScheme);
         byte[] sessionId = openSession(md);
         md.closeSession(sessionId);
     }
 
     public void testBadSession() throws Exception {
-        if (!isMockPluginInstalled()) {
-            return;
-        }
-
         MediaDrm md = new MediaDrm(mockScheme);
         byte[] sessionId = {0x05, 0x6, 0x7, 0x8};
         boolean gotException = false;
@@ -196,10 +161,6 @@ public class MediaDrmMockTest extends AndroidTestCase {
     }
 
     public void testNullSession() throws Exception {
-        if (!isMockPluginInstalled()) {
-            return;
-        }
-
         MediaDrm md = new MediaDrm(mockScheme);
         byte[] sessionId = null;
         boolean gotException = false;
@@ -212,10 +173,6 @@ public class MediaDrmMockTest extends AndroidTestCase {
     }
 
     public void testGetKeyRequest() throws Exception {
-        if (!isMockPluginInstalled()) {
-            return;
-        }
-
         MediaDrm md = new MediaDrm(mockScheme);
         byte[] sessionId = openSession(md);
 
@@ -246,10 +203,6 @@ public class MediaDrmMockTest extends AndroidTestCase {
     }
 
     public void testGetKeyRequestNoOptionalParameters() throws Exception {
-        if (!isMockPluginInstalled()) {
-            return;
-        }
-
         MediaDrm md = new MediaDrm(mockScheme);
         byte[] sessionId = openSession(md);
 
@@ -276,10 +229,6 @@ public class MediaDrmMockTest extends AndroidTestCase {
     }
 
     public void testGetKeyRequestOffline() throws Exception {
-        if (!isMockPluginInstalled()) {
-            return;
-        }
-
         MediaDrm md = new MediaDrm(mockScheme);
         byte[] sessionId = openSession(md);
 
@@ -300,16 +249,12 @@ public class MediaDrmMockTest extends AndroidTestCase {
 
         assertTrue(Arrays.equals(initData, md.getPropertyByteArray("mock-initdata")));
         assertTrue(mimeType.equals(md.getPropertyString("mock-mimetype")));
-        assertTrue(md.getPropertyString("mock-keytype").equals("2"));
+        assertTrue(md.getPropertyString("mock-keytype").equals("0"));
 
         md.closeSession(sessionId);
     }
 
     public void testGetKeyRequestRelease() throws Exception {
-        if (!isMockPluginInstalled()) {
-            return;
-        }
-
         MediaDrm md = new MediaDrm(mockScheme);
         byte[] sessionId = openSession(md);
 
@@ -327,16 +272,12 @@ public class MediaDrmMockTest extends AndroidTestCase {
         assertTrue(request.getDefaultUrl().equals(testDefaultUrl));
 
         assertTrue(mimeType.equals(md.getPropertyString("mock-mimetype")));
-        assertTrue(md.getPropertyString("mock-keytype").equals("3"));
+        assertTrue(md.getPropertyString("mock-keytype").equals("2"));
 
         md.closeSession(sessionId);
     }
 
     public void testProvideKeyResponse() throws Exception {
-        if (!isMockPluginInstalled()) {
-            return;
-        }
-
         MediaDrm md = new MediaDrm(mockScheme);
         byte[] sessionId = openSession(md);
 
@@ -350,10 +291,6 @@ public class MediaDrmMockTest extends AndroidTestCase {
     }
 
     public void testRemoveKeys() throws Exception {
-        if (!isMockPluginInstalled()) {
-            return;
-        }
-
         MediaDrm md = new MediaDrm(mockScheme);
         byte[] sessionId = openSession(md);
 
@@ -365,10 +302,6 @@ public class MediaDrmMockTest extends AndroidTestCase {
     }
 
     public void testRestoreKeys() throws Exception {
-        if (!isMockPluginInstalled()) {
-            return;
-        }
-
         MediaDrm md = new MediaDrm(mockScheme);
         byte[] sessionId = openSession(md);
 
@@ -382,10 +315,6 @@ public class MediaDrmMockTest extends AndroidTestCase {
     }
 
     public void testQueryKeyStatus() throws Exception {
-        if (!isMockPluginInstalled()) {
-            return;
-        }
-
         MediaDrm md = new MediaDrm(mockScheme);
         byte[] sessionId = openSession(md);
         HashMap<String, String> infoMap = md.queryKeyStatus(sessionId);
@@ -400,10 +329,6 @@ public class MediaDrmMockTest extends AndroidTestCase {
     }
 
     public void testGetProvisionRequest() throws Exception {
-        if (!isMockPluginInstalled()) {
-            return;
-        }
-
         MediaDrm md = new MediaDrm(mockScheme);
 
         // Set up mock expected responses using properties
@@ -418,10 +343,6 @@ public class MediaDrmMockTest extends AndroidTestCase {
     }
 
     public void testProvideProvisionResponse() throws Exception {
-        if (!isMockPluginInstalled()) {
-            return;
-        }
-
         MediaDrm md = new MediaDrm(mockScheme);
 
         // Set up mock expected responses using properties
@@ -432,10 +353,6 @@ public class MediaDrmMockTest extends AndroidTestCase {
     }
 
     public void testGetSecureStops() throws Exception {
-        if (!isMockPluginInstalled()) {
-            return;
-        }
-
         MediaDrm md = new MediaDrm(mockScheme);
 
         // Set up mock expected responses using properties
@@ -457,10 +374,6 @@ public class MediaDrmMockTest extends AndroidTestCase {
     }
 
     public void testReleaseSecureStops() throws Exception {
-        if (!isMockPluginInstalled()) {
-            return;
-        }
-
         MediaDrm md = new MediaDrm(mockScheme);
 
         // Set up mock expected responses using properties
@@ -471,10 +384,6 @@ public class MediaDrmMockTest extends AndroidTestCase {
     }
 
     public void testMultipleSessions() throws Exception {
-        if (!isMockPluginInstalled()) {
-            return;
-        }
-
         MediaDrm md = new MediaDrm(mockScheme);
 
         byte[] session1 = openSession(md);
@@ -490,10 +399,6 @@ public class MediaDrmMockTest extends AndroidTestCase {
     }
 
     public void testCryptoSession() throws Exception {
-        if (!isMockPluginInstalled()) {
-            return;
-        }
-
         MediaDrm md = new MediaDrm(mockScheme);
 
         byte[] sessionId = openSession(md);
@@ -502,10 +407,6 @@ public class MediaDrmMockTest extends AndroidTestCase {
     }
 
     public void testBadCryptoSession() throws Exception {
-        if (!isMockPluginInstalled()) {
-            return;
-        }
-
         MediaDrm md = new MediaDrm(mockScheme);
 
         boolean gotException = false;
@@ -519,10 +420,6 @@ public class MediaDrmMockTest extends AndroidTestCase {
     }
 
     public void testCryptoSessionEncrypt() throws Exception {
-        if (!isMockPluginInstalled()) {
-            return;
-        }
-
         MediaDrm md = new MediaDrm(mockScheme);
 
         byte[] sessionId = openSession(md);
@@ -545,10 +442,6 @@ public class MediaDrmMockTest extends AndroidTestCase {
     }
 
     public void testCryptoSessionDecrypt() throws Exception {
-        if (!isMockPluginInstalled()) {
-            return;
-        }
-
         MediaDrm md = new MediaDrm(mockScheme);
 
         byte[] sessionId = openSession(md);
@@ -571,10 +464,6 @@ public class MediaDrmMockTest extends AndroidTestCase {
     }
 
     public void testCryptoSessionSign() throws Exception {
-        if (!isMockPluginInstalled()) {
-            return;
-        }
-
         MediaDrm md = new MediaDrm(mockScheme);
 
         byte[] sessionId = openSession(md);
@@ -595,10 +484,6 @@ public class MediaDrmMockTest extends AndroidTestCase {
     }
 
     public void testCryptoSessionVerify() throws Exception {
-        if (!isMockPluginInstalled()) {
-            return;
-        }
-
         MediaDrm md = new MediaDrm(mockScheme);
 
         byte[] sessionId = openSession(md);
@@ -626,10 +511,6 @@ public class MediaDrmMockTest extends AndroidTestCase {
     private boolean mGotEvent = false;
 
     public void testEventNoSessionNoData() throws Exception {
-        if (!isMockPluginInstalled()) {
-            return;
-        }
-
 
         new Thread() {
             @Override
@@ -696,10 +577,6 @@ public class MediaDrmMockTest extends AndroidTestCase {
     }
 
     public void testEventWithSessionAndData() throws Exception {
-        if (!isMockPluginInstalled()) {
-            return;
-        }
-
 
         new Thread() {
             @Override
