@@ -44,6 +44,7 @@ import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.View;
 import android.webkit.ConsoleMessage;
+import android.webkit.CookieSyncManager;
 import android.webkit.DownloadListener;
 import android.webkit.JavascriptInterface;
 import android.webkit.SslErrorHandler;
@@ -156,6 +157,12 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
         new WebView(getActivity());
         new WebView(getActivity(), null);
         new WebView(getActivity(), null, 0);
+    }
+
+    @UiThreadTest
+    public void testCreatingWebViewCreatesCookieSyncManager() throws Exception {
+        new WebView(getActivity());
+        assertNotNull(CookieSyncManager.getInstance());
     }
 
     @UiThreadTest
