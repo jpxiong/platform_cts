@@ -207,9 +207,9 @@ public class ImageReaderTest extends AndroidTestCase {
     private void prepareImageReader(Size sz, int format) throws Exception {
         int width = sz.getWidth();
         int height = sz.getHeight();
-        mReader = new ImageReader(width, height, format, MAX_NUM_IMAGES);
+        mReader = ImageReader.newInstance(width, height, format, MAX_NUM_IMAGES);
         mListener  = new SimpleImageListener();
-        mReader.setImageAvailableListener(mListener, mHandler);
+        mReader.setOnImageAvailableListener(mListener, mHandler);
         if (VERBOSE) Log.v(TAG, "Preparing ImageReader size " + sz.toString());
     }
 
@@ -244,17 +244,17 @@ public class ImageReaderTest extends AndroidTestCase {
             assertNotNull("Image listener is null", mListener);
             if (VERBOSE) Log.v(TAG, "Waiting for an Image");
             mListener.waitForImage();
-            img = mReader.getNextImage();
+            img = mReader.acquireNextImage();
             if (VERBOSE) Log.v(TAG, "Got next image");
             validateImage(img, sz.getWidth(), sz.getHeight(), format);
-            mReader.releaseImage(img);
+            img.close();
             // Return the pending images to producer in case the validation is slower
             // than the image producing rate. Otherwise, it could cause the producer
             // starvation.
             while (mListener.isImagePending()) {
                 mListener.waitForImage();
-                img = mReader.getNextImage();
-                mReader.releaseImage(img);
+                img = mReader.acquireNextImage();
+                img.close();
             }
         }
     }

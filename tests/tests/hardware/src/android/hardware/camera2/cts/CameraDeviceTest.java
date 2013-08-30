@@ -26,6 +26,8 @@ import android.hardware.camera2.CaptureRequest;
 import android.hardware.camera2.CaptureResult;
 import android.media.Image;
 import android.media.ImageReader;
+import android.media.ImageReader.MaxImagesAcquiredException;
+import android.os.Handler;
 import android.os.SystemClock;
 import android.test.AndroidTestCase;
 import android.util.Log;
@@ -380,22 +382,43 @@ public class CameraDeviceTest extends AndroidTestCase {
     private class ImageDropperListener implements ImageReader.OnImageAvailableListener {
         @Override
         public void onImageAvailable(ImageReader reader) {
-            Image image = reader.getNextImage();
-            image.close();
+            try {
+                Image image = reader.acquireNextImage();
+                image.close();
+            } catch (MaxImagesAcquiredException e) {
+                // Impossible: We drop every frame we get.
+                throw new IllegalStateException(e);
+            }
         }
     }
 
     private void createDefaultSurface() throws Exception {
+<<<<<<< HEAD
         ImageReader mReader =
                 new ImageReader(DEFAULT_CAPTURE_WIDTH,
+||||||| parent of 33286bc... media: Update ImageReader APIs
+        mReader =
+                new ImageReader(DEFAULT_CAPTURE_WIDTH,
+=======
+        mReader =
+                ImageReader.newInstance(DEFAULT_CAPTURE_WIDTH,
+>>>>>>> 33286bc... media: Update ImageReader APIs
                         DEFAULT_CAPTURE_HEIGHT,
                         ImageFormat.YUV_420_888,
                         MAX_NUM_IMAGES);
         mSurface = mReader.getSurface();
         // Create dummy image listener since we don't care the image data in this test.
         ImageReader.OnImageAvailableListener listener = new ImageDropperListener();
+<<<<<<< HEAD
         CameraTestThread mDummyThread = new CameraTestThread();
         mReader.setImageAvailableListener(listener, mDummyThread.start());
+||||||| parent of 33286bc... media: Update ImageReader APIs
+        mDummyThread = new CameraTestThread();
+        mReader.setImageAvailableListener(listener, mDummyThread.start());
+=======
+        mDummyThread = new CameraTestThread();
+        mReader.setOnImageAvailableListener(listener, mDummyThread.start());
+>>>>>>> 33286bc... media: Update ImageReader APIs
     }
 
     private void verifyCaptureResults(
