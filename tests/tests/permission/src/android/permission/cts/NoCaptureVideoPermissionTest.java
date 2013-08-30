@@ -45,7 +45,7 @@ public class NoCaptureVideoPermissionTest extends AndroidTestCase {
     public void testCreatePublicVirtualDisplay() {
         DisplayManager displayManager =
                 (DisplayManager)mContext.getSystemService(Context.DISPLAY_SERVICE);
-        ImageReader reader = new ImageReader(WIDTH, HEIGHT, PixelFormat.RGBX_8888, 1);
+        ImageReader reader = ImageReader.newInstance(WIDTH, HEIGHT, PixelFormat.RGBX_8888, 1);
         try {
             displayManager.createVirtualDisplay(NAME, WIDTH, HEIGHT, DENSITY,
                     reader.getSurface(), DisplayManager.VIRTUAL_DISPLAY_FLAG_PUBLIC);
@@ -68,7 +68,7 @@ public class NoCaptureVideoPermissionTest extends AndroidTestCase {
     public void testCreateSecureVirtualDisplay() {
         DisplayManager displayManager =
                 (DisplayManager)mContext.getSystemService(Context.DISPLAY_SERVICE);
-        ImageReader reader = new ImageReader(WIDTH, HEIGHT, PixelFormat.RGBX_8888, 1);
+        ImageReader reader = ImageReader.newInstance(WIDTH, HEIGHT, PixelFormat.RGBX_8888, 1);
         try {
             displayManager.createVirtualDisplay(NAME, WIDTH, HEIGHT, DENSITY,
                     reader.getSurface(), DisplayManager.VIRTUAL_DISPLAY_FLAG_SECURE);
@@ -89,7 +89,7 @@ public class NoCaptureVideoPermissionTest extends AndroidTestCase {
     public void testCreatePrivateVirtualDisplay() {
         DisplayManager displayManager =
                 (DisplayManager)mContext.getSystemService(Context.DISPLAY_SERVICE);
-        ImageReader reader = new ImageReader(WIDTH, HEIGHT, PixelFormat.RGBX_8888, 1);
+        ImageReader reader = ImageReader.newInstance(WIDTH, HEIGHT, PixelFormat.RGBX_8888, 1);
         try {
             VirtualDisplay display = displayManager.createVirtualDisplay(
                     NAME, WIDTH, HEIGHT, DENSITY,
