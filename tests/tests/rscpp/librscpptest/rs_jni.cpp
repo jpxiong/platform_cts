@@ -75,7 +75,7 @@ extern "C" JNIEXPORT jboolean JNICALL Java_android_cts_rscpp_RSBlurTest_blurTest
 
     env->ReleasePrimitiveArrayCritical(inputByteArray, input, 0);
     env->ReleasePrimitiveArrayCritical(outputByteArray, output, 0);
-    return true;
+    return (rs->getError() == RS_SUCCESS);
 
 }
 
@@ -119,7 +119,7 @@ Java_android_cts_rscpp_RSConvolveTest_convolveTest(JNIEnv * env, jclass obj, jin
     env->ReleasePrimitiveArrayCritical(inputByteArray, input, 0);
     env->ReleasePrimitiveArrayCritical(outputByteArray, output, 0);
     env->ReleaseFloatArrayElements(coeffArray, coeffs, JNI_ABORT);
-    return true;
+    return (rs->getError() == RS_SUCCESS);
 
 }
 
@@ -156,6 +156,50 @@ extern "C" JNIEXPORT jboolean JNICALL Java_android_cts_rscpp_RSLUTTest_lutTest(J
 
     env->ReleasePrimitiveArrayCritical(inputByteArray, input, 0);
     env->ReleasePrimitiveArrayCritical(outputByteArray, output, 0);
-    return true;
+    return (rs->getError() == RS_SUCCESS);
+
+}
+
+extern "C" JNIEXPORT jboolean JNICALL Java_android_cts_rscpp_RS3DLUTTest_lutTest(JNIEnv * env,
+                                                                                 jclass obj,
+                                                                                 jint X,
+                                                                                 jint Y,
+                                                                                 jint lutSize,
+                                                                                 jbyteArray inputByteArray,
+                                                                                 jbyteArray inputByteArray2,
+                                                                                 jbyteArray outputByteArray)
+{
+    jbyte * input = (jbyte *) env->GetPrimitiveArrayCritical(inputByteArray, 0);
+    jbyte * input2 = (jbyte *) env->GetPrimitiveArrayCritical(inputByteArray2, 0);
+    jbyte * output = (jbyte *) env->GetPrimitiveArrayCritical(outputByteArray, 0);
+
+    sp<RS> rs = new RS();
+    rs->init();
+
+    sp<const Element> e = Element::RGBA_8888(rs);
+
+    Type::Builder builder(rs, e);
+
+    builder.setX(lutSize);
+    builder.setY(lutSize);
+    builder.setZ(lutSize);
+
+    sp<Allocation> inputAlloc = Allocation::createSized2D(rs, e, X, Y);
+    sp<Allocation> colorCube = Allocation::createTyped(rs, builder.create());
+    sp<Allocation> outputAlloc = Allocation::createSized2D(rs, e, X, Y);
+    sp<ScriptIntrinsic3DLUT> lut = ScriptIntrinsic3DLUT::create(rs, e);
+
+    inputAlloc->copy2DRangeFrom(0, 0, X, Y, input);
+    colorCube->copy3DRangeFrom(0, 0, 0, lutSize, lutSize, lutSize, input2);
+
+    lut->setLUT(colorCube);
+    lut->forEach(inputAlloc,outputAlloc);
+
+    outputAlloc->copy2DRangeTo(0, 0, X, Y, output);
+
+    env->ReleasePrimitiveArrayCritical(inputByteArray, input, 0);
+    env->ReleasePrimitiveArrayCritical(inputByteArray2, input2, 0);
+    env->ReleasePrimitiveArrayCritical(outputByteArray, output, 0);
+    return (rs->getError() == RS_SUCCESS);
 
 }
