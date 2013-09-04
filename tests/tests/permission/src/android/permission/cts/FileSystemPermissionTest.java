@@ -685,6 +685,13 @@ public class FileSystemPermissionTest extends AndroidTestCase {
                 new File("/dev/alarm"),      // b/9035217
                 new File("/dev/ashmem"),
                 new File("/dev/binder"),
+                new File("/dev/felica"),     // b/11142586
+                new File("/dev/felica_ant"), // b/11142586
+                new File("/dev/felica_cen"), // b/11142586
+                new File("/dev/felica_pon"), // b/11142586
+                new File("/dev/felica_rfs"), // b/11142586
+                new File("/dev/felica_rws"), // b/11142586
+                new File("/dev/felica_uicc"), // b/11142586
                 new File("/dev/full"),
                 new File("/dev/genlock"),    // b/9035217
                 new File("/dev/hw_random"),  // b/9191279
@@ -708,6 +715,10 @@ public class FileSystemPermissionTest extends AndroidTestCase {
                 new File("/dev/pvrsrvkm"),    // b/9108170
                 new File("/dev/quadd"),
                 new File("/dev/random"),
+                new File("/dev/snfc_cen"),    // b/11142586
+                new File("/dev/snfc_hsel"),   // b/11142586
+                new File("/dev/snfc_intu_poll"), // b/11142586
+                new File("/dev/snfc_rfs"),    // b/11142586
                 new File("/dev/tiler"),       // b/9108170
                 new File("/dev/tty"),
                 new File("/dev/urandom"),
