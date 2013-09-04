@@ -203,3 +203,51 @@ extern "C" JNIEXPORT jboolean JNICALL Java_android_cts_rscpp_RS3DLUTTest_lutTest
     return (rs->getError() == RS_SUCCESS);
 
 }
+
+extern "C" JNIEXPORT jboolean JNICALL
+Java_android_cts_rscpp_RSColorMatrixTest_colorMatrixTest(JNIEnv * env, jclass obj, jint X,
+                                                         jint Y, jbyteArray inputByteArray,
+                                                         jbyteArray outputByteArray,
+                                                         jfloatArray coeffArray,
+                                                         jint optionFlag)
+{
+    jfloat * coeffs = env->GetFloatArrayElements(coeffArray, NULL);
+    jbyte * input = (jbyte *) env->GetPrimitiveArrayCritical(inputByteArray, 0);
+    jbyte * output = (jbyte *) env->GetPrimitiveArrayCritical(outputByteArray, 0);
+
+    sp<RS> rs = new RS();
+    rs->init();
+
+    sp<const Element> e = Element::RGBA_8888(rs);
+
+    sp<Allocation> inputAlloc = Allocation::createSized2D(rs, e, X, Y);
+    sp<Allocation> outputAlloc = Allocation::createSized2D(rs, e, X, Y);
+
+    inputAlloc->copy2DRangeFrom(0, 0, X, Y, input);
+
+    sp<ScriptIntrinsicColorMatrix> cm = ScriptIntrinsicColorMatrix::create(rs);
+    if (optionFlag == 0) {
+        cm->setColorMatrix3(coeffs);
+    } else if (optionFlag == 1) {
+        cm->setGreyscale();
+    } else if (optionFlag == 2) {
+        cm->setColorMatrix4(coeffs);
+    } else if (optionFlag == 3) {
+        cm->setYUVtoRGB();
+    } else if (optionFlag == 4) {
+        cm->setRGBtoYUV();
+    } else if (optionFlag == 5) {
+        cm->setColorMatrix4(coeffs);
+        float add[4] = {5.3f, 2.1f, 0.3f, 4.4f};
+        cm->setAdd(add);
+    }
+    cm->forEach(inputAlloc, outputAlloc);
+
+    outputAlloc->copy2DRangeTo(0, 0, X, Y, output);
+
+    env->ReleasePrimitiveArrayCritical(inputByteArray, input, 0);
+    env->ReleasePrimitiveArrayCritical(outputByteArray, output, 0);
+    env->ReleaseFloatArrayElements(coeffArray, coeffs, JNI_ABORT);
+    return (rs->getError() == RS_SUCCESS);
+
+}
