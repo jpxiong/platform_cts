@@ -251,3 +251,83 @@ Java_android_cts_rscpp_RSColorMatrixTest_colorMatrixTest(JNIEnv * env, jclass ob
     return (rs->getError() == RS_SUCCESS);
 
 }
+
+extern "C" JNIEXPORT jboolean JNICALL
+Java_android_cts_rscpp_RSBlendTest_blendTest(JNIEnv * env, jclass obj, jint X,
+                                             jint Y, jbyteArray inputByteArray,
+                                             jbyteArray outputByteArray,
+                                             jint optionFlag)
+{
+    jbyte * input = (jbyte *) env->GetPrimitiveArrayCritical(inputByteArray, 0);
+    jbyte * output = (jbyte *) env->GetPrimitiveArrayCritical(outputByteArray, 0);
+
+    sp<RS> rs = new RS();
+    rs->init();
+
+    sp<const Element> e = Element::RGBA_8888(rs);
+
+    sp<Allocation> inputAlloc = Allocation::createSized2D(rs, e, X, Y);
+    sp<Allocation> outputAlloc = Allocation::createSized2D(rs, e, X, Y);
+
+    inputAlloc->copy2DRangeFrom(0, 0, X, Y, input);
+    outputAlloc->copy2DRangeFrom(0, 0, X, Y, output);
+
+    sp<ScriptIntrinsicBlend> blend = ScriptIntrinsicBlend::create(rs, e);
+    switch(optionFlag) {
+    case 0:
+        blend->blendAdd(inputAlloc, outputAlloc);
+        break;
+    case 1:
+        blend->blendClear(inputAlloc, outputAlloc);
+        break;
+    case 2:
+        blend->blendDst(inputAlloc, outputAlloc);
+        break;
+    case 3:
+        blend->blendDstAtop(inputAlloc, outputAlloc);
+        break;
+    case 4:
+        blend->blendDstIn(inputAlloc, outputAlloc);
+        break;
+    case 5:
+        blend->blendDstOut(inputAlloc, outputAlloc);
+        break;
+    case 6:
+        blend->blendDstOver(inputAlloc, outputAlloc);
+        break;
+    case 7:
+        blend->blendMultiply(inputAlloc, outputAlloc);
+        break;
+    case 8:
+        blend->blendSrc(inputAlloc, outputAlloc);
+        break;
+    case 9:
+        blend->blendSrcAtop(inputAlloc, outputAlloc);
+        break;
+    case 10:
+        blend->blendSrcIn(inputAlloc, outputAlloc);
+        break;
+    case 11:
+        blend->blendSrcOut(inputAlloc, outputAlloc);
+        break;
+    case 12:
+        blend->blendSrcOver(inputAlloc, outputAlloc);
+        break;
+    case 13:
+        blend->blendSubtract(inputAlloc, outputAlloc);
+        break;
+    case 14:
+        blend->blendXor(inputAlloc, outputAlloc);
+        break;
+    default:
+        break;
+    }
+
+    outputAlloc->copy2DRangeTo(0, 0, X, Y, output);
+
+    env->ReleasePrimitiveArrayCritical(inputByteArray, input, 0);
+    env->ReleasePrimitiveArrayCritical(outputByteArray, output, 0);
+    return (rs->getError() == RS_SUCCESS);
+
+}
+
