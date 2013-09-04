@@ -107,6 +107,9 @@
     <uses-permission android:name="android.permission.WRITE_SYNC_SETTINGS" />
     <uses-permission android:name="android.permission.READ_SYNC_STATS" />
 
+    <!-- Used for ClonedSecureRandomTest -->
+    <uses-permission android:name="android.permission.KILL_BACKGROUND_PROCESSES" />
+
     <!-- Used for PackageManager test, don't delete this permission-tree -->
     <permission-tree android:name="com.android.cts.stub.permission.TEST_DYNAMIC"
                     android:label="Test Tree"/>
@@ -994,6 +997,9 @@
 
         <activity android:name="android.renderscriptgraphics.cts.RenderscriptGLStubActivity"
                   android:label="RenderscriptGLStub"/>
+
+        <service android:name="android.security.cts.activity.SecureRandomService"
+                 android:process=":secureRandom"/>
     </application>
 
 

@@ -23,14 +23,11 @@
 
     <application>
         <uses-library android:name="android.test.runner" />
-
-        <service android:name="android.security.cts.activity.SecureRandomService"
-                 android:process=":secureRandom"/>
     </application>
 
     <instrumentation android:name="android.test.InstrumentationCtsTestRunner"
-                     android:targetPackage="com.android.cts.security"
-                     android:label="CTS tests of com.android.cts.security"/>
+                     android:targetPackage="com.android.cts.stub"
+                     android:label="CTS tests of com.android.cts.stub"/>
 
 </manifest>
 
