@@ -97,6 +97,7 @@ public class PackageSignatureTest extends AndroidTestCase {
 
             // CTS test
             "android.core.tests.libcore.package.com",
+            "android.core.tests.libcore.package.conscrypt",
             "android.core.tests.libcore.package.dalvik",
             "android.core.tests.libcore.package.libcore",
             "android.core.tests.libcore.package.org",
