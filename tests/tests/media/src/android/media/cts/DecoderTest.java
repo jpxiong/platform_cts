@@ -32,6 +32,7 @@ import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.zip.CRC32;
 
 public class DecoderTest extends MediaPlayerTestBase {
@@ -100,7 +101,7 @@ public class DecoderTest extends MediaPlayerTestBase {
     }
 
     private void monoTest(int res) throws Exception {
-        short [] mono = decodeToMemory(res, false);
+        short [] mono = decodeToMemory(res, false, -1, null);
         if (mono.length == 44100) {
             // expected
             return;
@@ -115,7 +116,7 @@ public class DecoderTest extends MediaPlayerTestBase {
         }
 
         // we should get the same data when reconfiguring the codec
-        short [] mono2 = decodeToMemory(res, true);
+        short [] mono2 = decodeToMemory(res, true, -1, null);
         Arrays.equals(mono, mono2);
     }
 
@@ -126,7 +127,7 @@ public class DecoderTest extends MediaPlayerTestBase {
      */
     private void decode(int testinput, float maxerror) throws IOException {
 
-        short [] decoded = decodeToMemory(testinput, false);
+        short [] decoded = decodeToMemory(testinput, false, -1, null);
 
         assertEquals("wrong data size", mMasterBuffer.length, decoded.length);
 
@@ -143,14 +144,15 @@ public class DecoderTest extends MediaPlayerTestBase {
         double rmse = Math.sqrt(avgErrorSquared);
         assertTrue("decoding error too big: " + rmse, rmse <= maxerror);
 
-        short [] decoded2 = decodeToMemory(testinput, true);
+        short [] decoded2 = decodeToMemory(testinput, true, -1, null);
         assertEquals("count different with reconfigure", decoded.length, decoded2.length);
         for (int i = 0; i < decoded.length; i++) {
             assertEquals("samples don't match", decoded[i], decoded2[i]);
         }
     }
 
-    private short[] decodeToMemory(int testinput, boolean reconfigure) throws IOException {
+    private short[] decodeToMemory(int testinput, boolean reconfigure,
+            int eossample, List<Long> timestamps) throws IOException {
 
         short [] decoded = new short[0];
         int decodedIdx = 0;
@@ -194,6 +196,7 @@ public class DecoderTest extends MediaPlayerTestBase {
         boolean sawInputEOS = false;
         boolean sawOutputEOS = false;
         int noOutputCounter = 0;
+        int samplecounter = 0;
         while (!sawOutputEOS && noOutputCounter < 50) {
             noOutputCounter++;
             if (!sawInputEOS) {
@@ -207,14 +210,20 @@ public class DecoderTest extends MediaPlayerTestBase {
 
                     long presentationTimeUs = 0;
 
+                    if (sampleSize < 0 && eossample > 0) {
+                        fail("test is broken: never reached eos sample");
+                    }
                     if (sampleSize < 0) {
                         Log.d(TAG, "saw input EOS.");
                         sawInputEOS = true;
                         sampleSize = 0;
                     } else {
+                        if (samplecounter == eossample) {
+                            sawInputEOS = true;
+                        }
+                        samplecounter++;
                         presentationTimeUs = extractor.getSampleTime();
                     }
-
                     codec.queueInputBuffer(
                             inputBufIndex,
                             0 /* offset */,
@@ -235,6 +244,9 @@ public class DecoderTest extends MediaPlayerTestBase {
 
                 if (info.size > 0) {
                     noOutputCounter = 0;
+                    if (timestamps != null) {
+                        timestamps.add(info.presentationTimeUs);
+                    }
                 }
                 if (info.size > 0 && reconfigure) {
                     // once we've gotten some data out of the decoder, reconfigure it again
@@ -246,6 +258,10 @@ public class DecoderTest extends MediaPlayerTestBase {
                     codec.start();
                     codecInputBuffers = codec.getInputBuffers();
                     codecOutputBuffers = codec.getOutputBuffers();
+                    if (timestamps != null) {
+                        timestamps.clear();
+                    }
+                    samplecounter = 0;
                     continue;
                 }
 
@@ -278,10 +294,67 @@ public class DecoderTest extends MediaPlayerTestBase {
                 Log.d(TAG, "dequeueOutputBuffer returned " + res);
             }
         }
+        if (noOutputCounter >= 50) {
+            fail("decoder stopped outputing data");
+        }
 
         codec.stop();
         codec.release();
         return decoded;
+    }
+
+    public void testDecodeWithEOSOnLastBuffer() throws Exception {
+        testDecodeWithEOSOnLastBuffer(R.raw.sinesweepm4a);
+        testDecodeWithEOSOnLastBuffer(R.raw.sinesweepmp3lame);
+        testDecodeWithEOSOnLastBuffer(R.raw.sinesweepmp3smpb);
+        testDecodeWithEOSOnLastBuffer(R.raw.sinesweepwav);
+        testDecodeWithEOSOnLastBuffer(R.raw.sinesweepflac);
+        testDecodeWithEOSOnLastBuffer(R.raw.sinesweepogg);
+    }
+
+    /* setting EOS on the last full input buffer should be equivalent to setting EOS on an empty
+     * input buffer after all the full ones. */
+    private void testDecodeWithEOSOnLastBuffer(int res) throws Exception {
+        int numsamples = countSamples(res);
+        assertTrue(numsamples != 0);
+
+        List<Long> timestamps1 = new ArrayList<Long>();
+        short[] decode1 = decodeToMemory(res, false, -1, timestamps1);
+
+        List<Long> timestamps2 = new ArrayList<Long>();
+        short[] decode2 = decodeToMemory(res, false, numsamples - 1, timestamps2);
+
+        // check that the data and the timestamps are the same for EOS-on-last and EOS-after-last
+        assertEquals(decode1.length, decode2.length);
+        assertTrue(Arrays.equals(decode1, decode2));
+        assertEquals(timestamps1.size(), timestamps2.size());
+        assertTrue(timestamps1.equals(timestamps2));
+
+        // ... and that this is also true when reconfiguring the codec
+        timestamps2.clear();
+        decode2 = decodeToMemory(res, true, -1, timestamps2);
+        assertTrue(Arrays.equals(decode1, decode2));
+        assertTrue(timestamps1.equals(timestamps2));
+        timestamps2.clear();
+        decode2 = decodeToMemory(res, true, numsamples - 1, timestamps2);
+        assertEquals(decode1.length, decode2.length);
+        assertTrue(Arrays.equals(decode1, decode2));
+        assertTrue(timestamps1.equals(timestamps2));
+    }
+
+    private int countSamples(int res) throws IOException {
+        AssetFileDescriptor testFd = mResources.openRawResourceFd(res);
+
+        MediaExtractor extractor = new MediaExtractor();
+        extractor.setDataSource(testFd.getFileDescriptor(), testFd.getStartOffset(),
+                testFd.getLength());
+        testFd.close();
+        extractor.selectTrack(0);
+        int numsamples = 0;
+        while (extractor.advance()) {
+            numsamples++;
+        }
+        return numsamples;
     }
 
     public void testCodecBasicH264() throws Exception {
