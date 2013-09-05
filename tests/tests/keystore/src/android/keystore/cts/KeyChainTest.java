@@ -21,6 +21,8 @@ import junit.framework.TestCase;
 
 public class KeyChainTest extends TestCase {
     public void testIsKeyAlgorithmSupported_RequiredAlgorithmsSupported() throws Exception {
+        assertTrue("DSA must be supported", KeyChain.isKeyAlgorithmSupported("DSA"));
+        assertTrue("EC must be supported", KeyChain.isKeyAlgorithmSupported("EC"));
         assertTrue("RSA must be supported", KeyChain.isKeyAlgorithmSupported("RSA"));
     }
 
@@ -34,5 +36,9 @@ public class KeyChainTest extends TestCase {
     public void testIsBoundKeyAlgorithm_RequiredAlgorithmsSupported() throws Exception {
         assertTrue("RSA must be hardware-backed by a hardware-specific Keymaster HAL",
                 KeyChain.isBoundKeyAlgorithm("RSA"));
+
+        // These are not required, but must not throw an exception
+        KeyChain.isBoundKeyAlgorithm("DSA");
+        KeyChain.isBoundKeyAlgorithm("EC");
     }
 }
