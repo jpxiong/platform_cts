@@ -116,6 +116,7 @@
 
     <string name="bt_control">Bluetooth Control</string>
     <string name="bt_device_communication">Device Communication</string>
+    <string name="bt_le">Bluetooth Low Energy</string>
 
     <string name="bt_toggle_bluetooth">Toggle Bluetooth</string>
     <string name="bt_toggle_instructions">Disable and enable Bluetooth to successfully complete this test.</string>
@@ -175,6 +176,53 @@
     <string name="bt_scanning">Scanning...</string>
     <string name="bt_unpair">Device must be unpaired via Bluetooth settings before completing the test.\n\nUnpair the device in settings, make the server discoverable, and rescan to pick this device.</string>
     <string name="bt_settings">Bluetooth Settings</string>
+
+    <!-- BLE client side strings -->
+    <string name="ble_client_service_name">Bluetooth LE GATT Client Handler Service</string>
+    <string name="ble_client_test_name">BLE Client Test</string>
+    <string name="ble_client_connect_name">1. BLE Client Connect</string>
+    <string name="ble_discover_service_name">2. BLE Discover Service</string>
+    <string name="ble_client_characteristic_name">3. BLE Read/Write Characteristic</string>
+    <string name="ble_reliable_write_name">4. BLE Reliable Write</string>
+    <string name="ble_notify_characteristic_name">5. BLE Notify Characteristic</string>
+    <string name="ble_client_descriptor_name">6. BLE Read/Write Descriptor</string>
+    <string name="ble_read_rssi_name">7. BLE Read RSSI</string>
+    <string name="ble_client_disconnect_name">8. BLE Client Disconnect</string>
+    <string name="ble_client_test_info">The BLE test must be done simultaneously on two devices. This device is the client. All tests listed here must be done in order.</string>
+    <string name="ble_client_send_connect_info">Type in the Bluetooth address of the remote device to connect to, and verify that the devices are connected.</string>
+    <string name="ble_discover_service_info">Verify that the service is discovered when you press the "Discover Service" button.</string>
+    <string name="ble_read_write_info">Write values to and read values from the server to verify that the write and read functionalities are working correctly.</string>
+    <string name="ble_reliable_write_info">A Reliable Write has two steps.\n\n1) Write to the device. This will trigger a callback from the server to verify that the value written was correct.\n2) Execute the write, if the value written is valid.</string>
+    <string name="ble_notify_characteristic_info">Start accepting notifications, and verify that notifications are being reported correctly. The server should be notifying this device with the time every second.</string>
+    <string name="ble_read_rssi_info">Press button to read the RSSI value. Verify that the RSSI changes as you move the two devices further apart or closer together.</string>
+    <string name="ble_client_disconnect_info">Verify that the device is disconnected when you press the "Disconnect" button</string>
+    <string name="ble_address">Bluetooth address</string>
+    <string name="ble_connect">Connect</string>
+    <string name="ble_discover_service">Discover service</string>
+    <string name="ble_write_hint">Nothing to write yet</string>
+    <string name="ble_read_hint">Nothing read yet</string>
+    <string name="ble_write">Write</string>
+    <string name="ble_read">Read</string>
+    <string name="ble_begin_write">Begin write</string>
+    <string name="ble_execute_write">Execute write</string>
+    <string name="ble_begin_notification">Begin notification</string>
+    <string name="ble_stop_notification">Stop notification</string>
+    <string name="ble_waiting_notification">Waiting on notification</string>
+    <string name="ble_read_rssi">Read RSSI</string>
+    <string name="ble_disconnect">Disconnect</string>
+
+    <!-- BLE server side strings -->
+    <string name="ble_server_service_name">Bluetooth LE GATT Server Handler Service</string>
+    <string name="ble_server_start_name">BLE Server Test</string>
+    <string name="ble_server_start_info">The BLE test must be done simultaneously on two devices, a server device and a client device. This device is the server.</string>
+    <string name="ble_server_receiving_connect">Waiting on connection from BLE client.</string>
+    <string name="ble_server_add_service">Adding service to BLE server.</string>
+    <string name="ble_server_write_characteristic">Waiting on write characteristic request</string>
+    <string name="ble_server_read_characteristic">Waiting on read characteristic request</string>
+    <string name="ble_server_write_descriptor">Waiting on write descriptor request</string>
+    <string name="ble_server_read_descriptor">Waiting on read descriptor request</string>
+    <string name="ble_server_reliable_write">Waiting on reliable write from client</string>
+    <string name="ble_server_receiving_disconnect">Waiting on disconnection from BLE client</string>
 
     <!-- Strings for FeatureSummaryActivity -->
     <string name="feature_summary">Hardware/Software Feature Summary</string>
