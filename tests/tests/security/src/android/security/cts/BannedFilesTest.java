@@ -20,6 +20,8 @@ import android.os.cts.FileUtils;
 
 import junit.framework.TestCase;
 
+import java.io.File;
+
 public class BannedFilesTest extends TestCase {
 
     /**
@@ -61,6 +63,14 @@ public class BannedFilesTest extends TestCase {
         assertNotSetugid("/system/xbin/tcpdump-arm");
         assertNotSetugid("/vendor/bin/tcpdump");
         assertNotSetugid("/vendor/bin/tcpdump-arm");
+    }
+
+    /**
+     * Test if /dev/diag exists.
+     */
+    public void testNoDevDiag(){
+        File file = new File("/dev/diag");
+        assertFalse("File \"" + file.getAbsolutePath() + "\" exists", file.exists());
     }
 
     private static void assertNotSetugid(String file) {
