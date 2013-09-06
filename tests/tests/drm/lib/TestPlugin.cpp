@@ -96,7 +96,7 @@ bool TestPlugIn::onCanHandle(int uniqueId, const String8& path) {
     return false;
 }
 
-String8 TestPlugIn::onGetOriginalMimeType(int uniqueId, const String8& path) {
+String8 TestPlugIn::onGetOriginalMimeType(int uniqueId, const String8& path, int fd) {
     return String8("video/none");
 }
 
