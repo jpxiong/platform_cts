@@ -22,6 +22,7 @@ import android.hardware.camera2.CameraAccessException;
 import android.hardware.camera2.CameraDevice;
 import android.hardware.camera2.CameraManager;
 import android.hardware.camera2.CameraProperties;
+import android.os.Handler;
 import android.test.AndroidTestCase;
 import android.util.Log;
 
@@ -62,8 +63,8 @@ public class CameraManagerTest extends AndroidTestCase {
 
     public void testCameraManagerGetDeviceIdList() throws Exception {
 
-        // Test: that the getDeviceIdList method runs without exceptions.
-        String[] ids = mCameraManager.getDeviceIdList();
+        // Test: that the getCameraIdList method runs without exceptions.
+        String[] ids = mCameraManager.getCameraIdList();
         if (VERBOSE) Log.v(TAG, "CameraManager ids: " + Arrays.toString(ids));
 
         // Test: that if the device has a camera, there must be at least one reported id.
@@ -95,7 +96,7 @@ public class CameraManagerTest extends AndroidTestCase {
 
     // Test: that properties can be queried from each device, without exceptions.
     public void testCameraManagerGetCameraProperties() throws Exception {
-        String[] ids = mCameraManager.getDeviceIdList();
+        String[] ids = mCameraManager.getCameraIdList();
         for (int i = 0; i < ids.length; i++) {
             CameraDevice camera = mCameraManager.openCamera(ids[i]);
             assertNotNull(
@@ -113,7 +114,7 @@ public class CameraManagerTest extends AndroidTestCase {
 
     // Test: that an exception is thrown if an invalid device id is passed down.
     public void testCameraManagerInvalidDevice() throws Exception {
-        String[] ids = mCameraManager.getDeviceIdList();
+        String[] ids = mCameraManager.getCameraIdList();
         // Create an invalid id by concatenating all the valid ids together.
         StringBuilder invalidId = new StringBuilder();
         invalidId.append("INVALID");
@@ -132,7 +133,7 @@ public class CameraManagerTest extends AndroidTestCase {
 
     // Test: that each camera device can be opened one at a time, several times.
     public void testCameraManagerOpenCamerasSerially() throws Exception {
-        String[] ids = mCameraManager.getDeviceIdList();
+        String[] ids = mCameraManager.getCameraIdList();
         for (int i = 0; i < ids.length; i++) {
             for (int j = 0; j < NUM_CAMERA_REOPENS; j++) {
                 CameraDevice camera = mCameraManager.openCamera(ids[i]);
@@ -148,7 +149,7 @@ public class CameraManagerTest extends AndroidTestCase {
      * exception is thrown if this can't be done.
      */
     public void testCameraManagerOpenAllCameras() throws Exception {
-        String[] ids = mCameraManager.getDeviceIdList();
+        String[] ids = mCameraManager.getCameraIdList();
         CameraDevice[] cameras = new CameraDevice[ids.length];
         try {
             for (int i = 0; i < ids.length; i++) {
@@ -185,7 +186,7 @@ public class CameraManagerTest extends AndroidTestCase {
 
     // Test: that opening the same device multiple times throws the right exception.
     public void testCameraManagerOpenCameraTwice() throws Exception {
-        String[] ids = mCameraManager.getDeviceIdList();
+        String[] ids = mCameraManager.getCameraIdList();
         CameraDevice[] cameras = new CameraDevice[2];
         if (ids.length > 0) {
             try {
@@ -218,7 +219,7 @@ public class CameraManagerTest extends AndroidTestCase {
         }
     }
 
-    private class NoopCameraListener implements CameraManager.CameraListener {
+    private class NoopCameraListener extends CameraManager.AvailabilityListener {
         @Override
         public void onCameraAvailable(String cameraId) {
             // No-op
@@ -237,11 +238,13 @@ public class CameraManagerTest extends AndroidTestCase {
      * a listener that isn't registered should have no effect.
      */
     public void testCameraManagerListener() throws Exception {
-        mCameraManager.unregisterCameraListener(mListener);
-        mCameraManager.registerCameraListener(mListener);
-        mCameraManager.registerCameraListener(mListener);
-        mCameraManager.unregisterCameraListener(mListener);
-        mCameraManager.unregisterCameraListener(mListener);
+        CameraTestThread callbackThread = new CameraTestThread();
+        Handler callbackHandler = callbackThread.start();
+
+        mCameraManager.removeAvailabilityListener(mListener);
+        mCameraManager.addAvailabilityListener(mListener, callbackHandler);
+        mCameraManager.addAvailabilityListener(mListener, callbackHandler);
+        mCameraManager.removeAvailabilityListener(mListener);
+        mCameraManager.removeAvailabilityListener(mListener);
     }
 }
-
