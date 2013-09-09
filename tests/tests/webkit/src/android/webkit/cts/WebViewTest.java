@@ -999,9 +999,15 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
                 "Scroll by half the size of the page.</p>";
         mOnUiThread.loadDataAndWaitForCompletion("<html><body>" + p
                 + p + "</body></html>", "text/html", null);
-        getInstrumentation().waitForIdleSync();
 
-        assertTrue(mOnUiThread.pageDown(false));
+        // Wait for UI thread to settle and receive page dimentions from renderer
+        // such that we can invoke page down.
+        new PollingCheck() {
+            @Override
+            protected boolean check() {
+                 return mOnUiThread.pageDown(false);
+            }
+        }.run();
 
         do {
             getInstrumentation().waitForIdleSync();
