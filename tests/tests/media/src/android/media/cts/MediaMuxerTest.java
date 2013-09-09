@@ -38,6 +38,11 @@ public class MediaMuxerTest extends AndroidTestCase {
     private static final String TAG = "MediaMuxerTest";
     private static final boolean VERBOSE = false;
     private static final int MAX_SAMPLE_SIZE = 256 * 1024;
+    private static final float LATITUDE = 0.0000f;
+    private static final float LONGITUDE  = -180.0f;
+    private static final float BAD_LATITUDE = 91.0f;
+    private static final float BAD_LONGITUDE = -181.0f;
+    private static final float TOLERANCE = 0.0002f;
     private Resources mResources;
 
     @Override
@@ -189,6 +194,25 @@ public class MediaMuxerTest extends AndroidTestCase {
         if (degrees >= 0) {
             muxer.setOrientationHint(degrees);
         }
+
+        // Test setLocation out of bound cases
+        try {
+            muxer.setLocation(BAD_LATITUDE, LONGITUDE);
+            fail("setLocation succeeded with bad argument: [" + BAD_LATITUDE + "," + LONGITUDE
+                    + "]");
+        } catch (IllegalArgumentException e) {
+            // Expected
+        }
+        try {
+            muxer.setLocation(LATITUDE, BAD_LONGITUDE);
+            fail("setLocation succeeded with bad argument: [" + LATITUDE + "," + BAD_LONGITUDE
+                    + "]");
+        } catch (IllegalArgumentException e) {
+            // Expected
+        }
+
+        muxer.setLocation(LATITUDE, LONGITUDE);
+
         muxer.start();
         while (!sawEOS) {
             bufferInfo.offset = offset;
@@ -235,6 +259,7 @@ public class MediaMuxerTest extends AndroidTestCase {
         try {
             cloneMediaUsingMuxer(srcMedia, outputMediaFile, expectedTrackCount, degrees);
             verifyAttributesMatch(srcMedia, outputMediaFile, degrees);
+            verifyLocationInFile(outputMediaFile);
             // Check the sample on 1s and 0.5s.
             verifySamplesMatch(srcMedia, outputMediaFile, 1000000);
             verifySamplesMatch(srcMedia, outputMediaFile, 500000);
@@ -337,5 +362,32 @@ public class MediaMuxerTest extends AndroidTestCase {
             fail("byteBuffer didn't match");
         }
     }
+
+    private void verifyLocationInFile(String fileName) {
+        MediaMetadataRetriever retriever = new MediaMetadataRetriever();
+        retriever.setDataSource(fileName);
+        String location = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_LOCATION);
+        assertNotNull("No location information found in file " + fileName, location);
+
+        // parsing String location and recover the location inforamtion in floats
+        // Make sure the tolerance is very small - due to rounding errors.
+
+        // Get the position of the -/+ sign in location String, which indicates
+        // the beginning of the longtitude.
+        int index = location.lastIndexOf('-');
+        if (index == -1) {
+            index = location.lastIndexOf('+');
+        }
+        assertTrue("+ or - is not found", index != -1);
+        assertTrue("+ or - is only found at the beginning", index != 0);
+        float latitude = Float.parseFloat(location.substring(0, index - 1));
+        float longitude = Float.parseFloat(location.substring(index));
+        assertTrue("Incorrect latitude: " + latitude,
+                Math.abs(latitude - LATITUDE) <= TOLERANCE);
+        assertTrue("Incorrect longitude: " + longitude,
+                Math.abs(longitude - LONGITUDE) <= TOLERANCE);
+        retriever.release();
+    }
+
 }
 
