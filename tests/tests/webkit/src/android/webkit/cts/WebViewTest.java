@@ -203,65 +203,86 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
         mWebView.invokeZoomPicker();
     }
 
-    @UiThreadTest
-    public void testZoom() {
-        WebSettings settings = mWebView.getSettings();
+    public void testZoom() throws Throwable {
+        final ScaleChangedWebViewClient webViewClient = new ScaleChangedWebViewClient();
+        mOnUiThread.setWebViewClient(webViewClient);
+
+        mWebServer = new CtsTestServer(getActivity());
+        mOnUiThread.loadUrlAndWaitForCompletion(
+                mWebServer.getAssetUrl(TestHtmlConstants.HELLO_WORLD_URL));
+        // Wait for initial scale to be set.
+        webViewClient.waitForScaleChanged();
+
+        WebSettings settings = mOnUiThread.getSettings();
         settings.setSupportZoom(false);
         assertFalse(settings.supportZoom());
-        float currScale = mWebView.getScale();
+        float currScale = mOnUiThread.getScale();
         float previousScale = currScale;
 
         // can zoom in or out although zoom support is disabled in web settings
-        assertTrue(mWebView.zoomIn());
-        currScale = mWebView.getScale();
+        assertTrue(mOnUiThread.zoomIn());
+        webViewClient.waitForScaleChanged();
+
+        currScale = mOnUiThread.getScale();
         assertTrue(currScale > previousScale);
 
-        // zoom in
-        assertTrue(mWebView.zoomOut());
+        assertTrue(mOnUiThread.zoomOut());
         previousScale = currScale;
-        currScale = mWebView.getScale();
+        webViewClient.waitForScaleChanged();
+
+        currScale = mOnUiThread.getScale();
         assertTrue(currScale < previousScale);
 
         // enable zoom support
         settings.setSupportZoom(true);
         assertTrue(settings.supportZoom());
-        currScale = mWebView.getScale();
+        previousScale = mOnUiThread.getScale();
 
-        assertTrue(mWebView.zoomIn());
-        previousScale = currScale;
-        currScale = mWebView.getScale();
+        assertTrue(mOnUiThread.zoomIn());
+        webViewClient.waitForScaleChanged();
+
+        currScale = mOnUiThread.getScale();
         assertTrue(currScale > previousScale);
 
         // zoom in until it reaches maximum scale
-        while (currScale > previousScale) {
-            mWebView.zoomIn();
+        while (mOnUiThread.zoomIn()) {
             previousScale = currScale;
-            currScale = mWebView.getScale();
+            webViewClient.waitForScaleChanged();
+            currScale = mOnUiThread.getScale();
+            assertTrue(currScale > previousScale);
         }
 
-        // can not zoom in further
-        assertFalse(mWebView.zoomIn());
         previousScale = currScale;
-        currScale = mWebView.getScale();
+        // can not zoom in further
+        assertFalse(mOnUiThread.zoomIn());
+        // We sleep to assert to the best of our ability
+        // that a scale change does *not* happen.
+        Thread.sleep(500);
+        currScale = mOnUiThread.getScale();
         assertEquals(currScale, previousScale);
 
         // zoom out
-        assertTrue(mWebView.zoomOut());
+        assertTrue(mOnUiThread.zoomOut());
         previousScale = currScale;
-        currScale = mWebView.getScale();
+        webViewClient.waitForScaleChanged();
+        currScale = mOnUiThread.getScale();
         assertTrue(currScale < previousScale);
 
         // zoom out until it reaches minimum scale
-        while (currScale < previousScale) {
-            mWebView.zoomOut();
+        while (mOnUiThread.zoomOut()) {
             previousScale = currScale;
-            currScale = mWebView.getScale();
+            webViewClient.waitForScaleChanged();
+            currScale = mOnUiThread.getScale();
+            assertTrue(currScale < previousScale);
         }
 
-        // can not zoom out further
-        assertFalse(mWebView.zoomOut());
         previousScale = currScale;
-        currScale = mWebView.getScale();
+        assertFalse(mOnUiThread.zoomOut());
+
+        // We sleep to assert to the best of our ability
+        // that a scale change does *not* happen.
+        Thread.sleep(500);
+        currScale = mOnUiThread.getScale();
         assertEquals(currScale, previousScale);
     }
 
@@ -1476,22 +1497,7 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
     }
 
     public void testSetWebViewClient() throws Throwable {
-        final class MockWebViewClient extends WaitForLoadedClient {
-            private boolean mOnScaleChangedCalled = false;
-            public MockWebViewClient() {
-                super(mOnUiThread);
-            }
-            @Override
-            public void onScaleChanged(WebView view, float oldScale, float newScale) {
-                super.onScaleChanged(view, oldScale, newScale);
-                mOnScaleChangedCalled = true;
-            }
-            public boolean onScaleChangedCalled() {
-                return mOnScaleChangedCalled;
-            }
-        }
-
-        final MockWebViewClient webViewClient = new MockWebViewClient();
+        final ScaleChangedWebViewClient webViewClient = new ScaleChangedWebViewClient();
         mOnUiThread.setWebViewClient(webViewClient);
         startWebServer(false);
 
@@ -1500,12 +1506,7 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
         mOnUiThread.loadUrlAndWaitForCompletion(url1);
 
         mOnUiThread.zoomIn();
-        new PollingCheck() {
-            @Override
-            protected boolean check() {
-                return webViewClient.onScaleChangedCalled();
-            }
-        }.run();
+        webViewClient.waitForScaleChanged();
     }
 
     @UiThreadTest
@@ -2156,6 +2157,37 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
         @Override
         public synchronized void onReceiveValue(String result) {
             mActualResult = result;
+        }
+    }
+
+    final class ScaleChangedWebViewClient extends WaitForLoadedClient {
+        private boolean mOnScaleChangedCalled = false;
+        public ScaleChangedWebViewClient() {
+            super(mOnUiThread);
+        }
+
+        @Override
+        public void onScaleChanged(WebView view, float oldScale, float newScale) {
+            super.onScaleChanged(view, oldScale, newScale);
+            synchronized (this) {
+                mOnScaleChangedCalled = true;
+            }
+        }
+
+        public void waitForScaleChanged() {
+            new PollingCheck(TEST_TIMEOUT) {
+                 @Override
+                 protected boolean check() {
+                     return onScaleChangedCalled();
+                 }
+            }.run();
+            synchronized (this) {
+                mOnScaleChangedCalled = false;
+            }
+        }
+
+        public synchronized boolean onScaleChangedCalled() {
+            return mOnScaleChangedCalled;
         }
     }
 }

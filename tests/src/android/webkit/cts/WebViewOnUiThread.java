@@ -43,7 +43,6 @@ import java.io.File;
 import java.util.concurrent.Callable;
 import java.util.Map;
 
-
 /**
  * Many tests need to run WebView code in the UI thread. This class
  * wraps a WebView so that calls are ensured to arrive on the UI thread.
@@ -239,11 +238,20 @@ public class WebViewOnUiThread {
         });
     }
 
-    public void zoomIn() {
-        runOnUiThread(new Runnable() {
+    public boolean zoomIn() {
+        return getValue(new ValueGetter<Boolean>() {
             @Override
-            public void run() {
-                mWebView.zoomIn();
+            public Boolean capture() {
+                return mWebView.zoomIn();
+            }
+        });
+    }
+
+    public boolean zoomOut() {
+        return getValue(new ValueGetter<Boolean>() {
+            @Override
+            public Boolean capture() {
+                return mWebView.zoomOut();
             }
         });
     }
