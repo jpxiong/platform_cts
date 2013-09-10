@@ -1487,12 +1487,19 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
 
         final MockWebViewClient webViewClient = new MockWebViewClient();
         mOnUiThread.setWebViewClient(webViewClient);
-        getInstrumentation().waitForIdleSync();
+        startWebServer(false);
+
         assertFalse(webViewClient.onScaleChangedCalled());
+        String url1 = mWebServer.getAssetUrl(TestHtmlConstants.HELLO_WORLD_URL);
+        mOnUiThread.loadUrlAndWaitForCompletion(url1);
 
         mOnUiThread.zoomIn();
-        getInstrumentation().waitForIdleSync();
-        assertTrue(webViewClient.onScaleChangedCalled());
+        new PollingCheck() {
+            @Override
+            protected boolean check() {
+                return webViewClient.onScaleChangedCalled();
+            }
+        }.run();
     }
 
     @UiThreadTest

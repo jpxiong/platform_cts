@@ -192,11 +192,19 @@ public class WebViewClientTest extends ActivityInstrumentationTestCase2<WebViewS
     public void testOnScaleChanged() throws Throwable {
         final MockWebViewClient webViewClient = new MockWebViewClient();
         mOnUiThread.setWebViewClient(webViewClient);
+        mWebServer = new CtsTestServer(getActivity());
 
         assertFalse(webViewClient.hasOnScaleChangedCalled());
+        String url1 = mWebServer.getAssetUrl(TestHtmlConstants.HELLO_WORLD_URL);
+        mOnUiThread.loadUrlAndWaitForCompletion(url1);
+
         mOnUiThread.zoomIn();
-        getInstrumentation().waitForIdleSync();
-        assertTrue(webViewClient.hasOnScaleChangedCalled());
+        new PollingCheck(TEST_TIMEOUT) {
+            @Override
+            protected boolean check() {
+                return webViewClient.hasOnScaleChangedCalled();
+            }
+        }.run();
     }
 
     private void requireLoadedPage() throws Throwable {
