@@ -24,7 +24,7 @@ import android.graphics.ImageFormat;
 import android.hardware.camera2.CameraAccessException;
 import android.hardware.camera2.CameraDevice;
 import android.hardware.camera2.CameraManager;
-import android.hardware.camera2.CameraProperties;
+import android.hardware.camera2.CameraCharacteristics;
 import android.hardware.camera2.CaptureRequest;
 import android.hardware.camera2.Size;
 import android.media.Image;
@@ -129,7 +129,7 @@ public class ImageReaderTest extends AndroidTestCase {
     }
 
     private void bufferFormatTestByCamera(int format, String cameraId) throws Exception {
-        CameraProperties properties = mCamera.getProperties();
+        CameraCharacteristics properties = mCamera.getProperties();
         assertNotNull("Can't get camera properties!", properties);
 
         /**
@@ -141,7 +141,7 @@ public class ImageReaderTest extends AndroidTestCase {
          */
         // Comment out below check to work around b/10406212.
         /*
-        int[] availableFormats = properties.get(CameraProperties.SCALER_AVAILABLE_FORMATS);
+        int[] availableFormats = properties.get(CameraCharacteristics.SCALER_AVAILABLE_FORMATS);
         assertArrayNotEmpty(availableFormats,
                 "availableFormats should not be empty");
         Arrays.sort(availableFormats);

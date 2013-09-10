@@ -18,10 +18,10 @@ package android.hardware.camera2.cts;
 
 import android.content.Context;
 import android.graphics.ImageFormat;
+import android.hardware.camera2.CameraCharacteristics;
 import android.hardware.camera2.CameraDevice;
 import android.hardware.camera2.CameraManager;
 import android.hardware.camera2.CameraMetadata;
-import android.hardware.camera2.CameraProperties;
 import android.hardware.camera2.CaptureFailure;
 import android.hardware.camera2.CaptureRequest;
 import android.hardware.camera2.CaptureResult;
@@ -232,7 +232,7 @@ public class CameraDeviceTest extends AndroidTestCase {
                 /**
                  * Test: that the properties can be queried for this device.
                  */
-                CameraProperties props = camera.getProperties();
+                CameraCharacteristics props = camera.getProperties();
                 assertNotNull("Failed to get camera properties", props);
 
                 // TODO: Add more tests to check more fields.
