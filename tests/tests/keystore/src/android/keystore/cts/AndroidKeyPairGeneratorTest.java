@@ -20,9 +20,12 @@ import android.security.KeyPairGeneratorSpec;
 import android.test.AndroidTestCase;
 
 import java.math.BigInteger;
+import java.net.InetAddress;
+import java.net.Socket;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.KeyStore;
+import java.security.Principal;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.SecureRandom;
@@ -37,8 +40,22 @@ import java.security.spec.DSAParameterSpec;
 import java.security.spec.RSAKeyGenParameterSpec;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
+import javax.net.ssl.KeyManager;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLServerSocket;
+import javax.net.ssl.SSLSocket;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.X509ExtendedKeyManager;
 import javax.security.auth.x500.X500Principal;
+
+import libcore.java.security.TestKeyStore;
+import libcore.javax.net.ssl.TestKeyManager;
+import libcore.javax.net.ssl.TestSSLContext;
 
 public class AndroidKeyPairGeneratorTest extends AndroidTestCase {
     private KeyPairGenerator mGenerator;
@@ -452,6 +469,92 @@ public class AndroidKeyPairGeneratorTest extends AndroidTestCase {
         Certificate[] chain = privEntry.getCertificateChain();
         assertEquals("A list of CA certificates should not exist for the generated entry", 1,
                 chain.length);
+
+        assertUsableInSSLConnection(privKey, x509userCert);
+    }
+
+    private static void assertUsableInSSLConnection(final PrivateKey privKey,
+            final X509Certificate x509userCert) throws Exception {
+        // TODO this should probably be in something like:
+        // TestKeyStore.createForClientSelfSigned(...)
+        String provider = SSLContext.getDefault().getProvider().getName();
+        TrustManager[] clientTrustManagers = TestKeyStore.createTrustManagers(
+                TestKeyStore.getIntermediateCa().keyStore);
+        SSLContext clientContext = TestSSLContext.createSSLContext("TLS", provider,
+                new KeyManager[] {
+                    TestKeyManager.wrap(new MyKeyManager(privKey, x509userCert))
+                }, clientTrustManagers);
+        TestKeyStore serverKeyStore = TestKeyStore.getServer();
+        serverKeyStore.keyStore.setCertificateEntry("client-selfSigned", x509userCert);
+        SSLContext serverContext = TestSSLContext.createSSLContext("TLS", provider,
+                serverKeyStore.keyManagers,
+                TestKeyStore.createTrustManagers(serverKeyStore.keyStore));
+        SSLServerSocket serverSocket = (SSLServerSocket) serverContext.getServerSocketFactory()
+                .createServerSocket(0);
+        InetAddress host = InetAddress.getLocalHost();
+        int port = serverSocket.getLocalPort();
+
+        SSLSocket client = (SSLSocket) clientContext.getSocketFactory().createSocket(host, port);
+        final SSLSocket server = (SSLSocket) serverSocket.accept();
+        ExecutorService executor = Executors.newSingleThreadExecutor();
+        Future<Void> future = executor.submit(new Callable<Void>() {
+            @Override
+            public Void call() throws Exception {
+                server.setNeedClientAuth(true);
+                server.setWantClientAuth(true);
+                server.startHandshake();
+                return null;
+            }
+        });
+        executor.shutdown();
+        client.startHandshake();
+        Certificate[] usedClientCerts = client.getSession().getLocalCertificates();
+        assertNotNull(usedClientCerts);
+        assertEquals(1, usedClientCerts.length);
+        assertEquals(x509userCert, usedClientCerts[0]);
+        future.get();
+        client.close();
+        server.close();
+    }
+
+    private static class MyKeyManager extends X509ExtendedKeyManager {
+        private final PrivateKey key;
+        private final X509Certificate[] chain;
+
+        public MyKeyManager(PrivateKey key, X509Certificate cert) {
+            this.key = key;
+            this.chain = new X509Certificate[] { cert };
+        }
+
+        @Override
+        public String chooseClientAlias(String[] keyType, Principal[] issuers, Socket socket) {
+            return "fake";
+        }
+
+        @Override
+        public String chooseServerAlias(String keyType, Principal[] issuers, Socket socket) {
+            throw new UnsupportedOperationException("Not implemented");
+        }
+
+        @Override
+        public X509Certificate[] getCertificateChain(String alias) {
+            return chain;
+        }
+
+        @Override
+        public String[] getClientAliases(String keyType, Principal[] issuers) {
+            return new String[] { "fake" };
+        }
+
+        @Override
+        public String[] getServerAliases(String keyType, Principal[] issuers) {
+            throw new UnsupportedOperationException("Not implemented");
+        }
+
+        @Override
+        public PrivateKey getPrivateKey(String alias) {
+            return key;
+        }
     }
 
     private static void assertDateEquals(String message, Date date1, Date date2) throws Exception {
