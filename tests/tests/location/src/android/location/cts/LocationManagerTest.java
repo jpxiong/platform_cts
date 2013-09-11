@@ -660,6 +660,13 @@ public class LocationManagerTest extends InstrumentationTestCase {
         // update location to outside proximity range
         updateLocationAndWait(FUSED_PROVIDER_NAME, 30, 30);
         registerProximityListener(0, 0, 1000, expiration);
+
+        // Adding geofences is asynchronous, the return of LocationManager.addProximityAlert
+        // doesn't mean that geofences are already being monitored. Wait for a few milliseconds
+        // so that GeofenceManager is actively monitoring locations before we send the mock
+        // location to avoid flaky tests.
+        Thread.sleep(500);
+
         updateLocationAndWait(FUSED_PROVIDER_NAME, 0, 0);
         waitForReceiveBroadcast();
         assertProximityType(true);
