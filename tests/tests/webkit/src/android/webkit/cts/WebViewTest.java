@@ -1112,27 +1112,18 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
         }.run();
         getInstrumentation().waitForIdleSync();
 
-        int previousScrollX = mOnUiThread.getScrollX();
-        int previousScrollY = mOnUiThread.getScrollY();
+        final int previousScrollX = mOnUiThread.getScrollX();
+        final int previousScrollY = mOnUiThread.getScrollY();
 
         mOnUiThread.flingScroll(100, 100);
 
-        int timeSlice = 500;
-        Thread.sleep(timeSlice);
-        assertTrue(mOnUiThread.getScrollX() > previousScrollX);
-        assertTrue(mOnUiThread.getScrollY() > previousScrollY);
-
-        previousScrollY = mOnUiThread.getScrollY();
-        previousScrollX = mOnUiThread.getScrollX();
-        Thread.sleep(timeSlice);
-        assertTrue(mOnUiThread.getScrollX() >= previousScrollX);
-        assertTrue(mOnUiThread.getScrollY() >= previousScrollY);
-
-        previousScrollY = mOnUiThread.getScrollY();
-        previousScrollX = mOnUiThread.getScrollX();
-        Thread.sleep(timeSlice);
-        assertTrue(mOnUiThread.getScrollX() >= previousScrollX);
-        assertTrue(mOnUiThread.getScrollY() >= previousScrollY);
+        new PollingCheck() {
+            @Override
+            protected boolean check() {
+                return mOnUiThread.getScrollX() > previousScrollX &&
+                        mOnUiThread.getScrollY() > previousScrollY;
+            }
+        }.run();
     }
 
     public void testRequestFocusNodeHref() throws Throwable {
