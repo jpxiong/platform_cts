@@ -202,13 +202,13 @@ public class ScriptGroupTest extends RSBaseCompute {
         Type compareType = new Type.Builder(mRS, Element.I32(mRS)).create();
 
         ScriptC_scriptgroup node1, node2, node3, node4, node5, compare;
-        node1 = new ScriptC_scriptgroup(mRS, mRes, R.raw.scriptgroup);
-        node2 = new ScriptC_scriptgroup(mRS, mRes, R.raw.scriptgroup);
-        node3 = new ScriptC_scriptgroup(mRS, mRes, R.raw.scriptgroup);
-        node4 = new ScriptC_scriptgroup(mRS, mRes, R.raw.scriptgroup);
-        node5 = new ScriptC_scriptgroup(mRS, mRes, R.raw.scriptgroup);
+        node1 = new ScriptC_scriptgroup(mRS);
+        node2 = new ScriptC_scriptgroup(mRS);
+        node3 = new ScriptC_scriptgroup(mRS);
+        node4 = new ScriptC_scriptgroup(mRS);
+        node5 = new ScriptC_scriptgroup(mRS);
 
-        compare = new ScriptC_scriptgroup(mRS, mRes, R.raw.scriptgroup);
+        compare = new ScriptC_scriptgroup(mRS);
 
         Allocation in1, in2, out, resultAlloc;
         in1 = Allocation.createTyped(mRS, connect);
@@ -265,4 +265,50 @@ public class ScriptGroupTest extends RSBaseCompute {
         assertTrue(result[0] == 2);
     }
 
+    /**
+     * Tests a case where a shared global variable is updated by the first kernel in a group,
+     * but then read by a subsequent kernel.
+     *
+     * The test ensures that we don't accidentally apply any fusion optimizations to the kernel
+     * pair, since there is a potential dependency that crosses the kernel cell boundary.
+     */
+    public void testScriptGroupSharedGlobal() {
+        Type i32 = new Type.Builder(mRS, Element.I32(mRS)).setX(1).create();
+        Type u32 = new Type.Builder(mRS, Element.U32(mRS)).setX(2).create();
+
+        Allocation aFailed = Allocation.createTyped(mRS, i32);
+        Allocation aSharedInt = Allocation.createTyped(mRS, i32);
+
+        ScriptC_group1 mG1 = new ScriptC_group1(mRS);
+        ScriptC_group2 mG2 = new ScriptC_group2(mRS);
+
+        mG1.set_aSharedInt(aSharedInt);
+        mG2.set_aSharedInt(aSharedInt);
+        mG2.set_aFailed(aFailed);
+
+        int [] Failed = new int [1];
+        Failed[0] = 0;
+        aFailed.copyFrom(Failed);
+
+        ScriptGroup.Builder b = new ScriptGroup.Builder(mRS);
+
+        // Writes to aSharedInt[x] in the kernel.
+        b.addKernel(mG1.getKernelID_setSharedInt());
+        // Reads aSharedInt[1] to verify it is -5.
+        b.addKernel(mG2.getKernelID_getSharedInt());
+        // If we fuse mG1/mG2, we won't see the update to the aSharedInt[1] during mG2 for x == 0.
+        // The update is only visible if we correctly identify the dependency and execute all of
+        // mG1 before starting on mG2.
+        b.addConnection(u32, mG1.getKernelID_setSharedInt(), mG2.getKernelID_getSharedInt());
+        ScriptGroup group = b.create();
+        group.execute();
+
+        mG2.invoke_verify();
+        aFailed.copyTo(Failed);
+        if (Failed[0] != 0) {
+            FoundError = true;
+        }
+
+        checkForErrors();
+    }
 }
