@@ -854,6 +854,10 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
         mOnUiThread.loadDataWithBaseURLAndWaitForCompletion("data:foo",
                 HTML_HEADER + "<title>Hello World%21</title></html>", "text/html", "UTF-8", null);
         assertEquals("Hello World!", mOnUiThread.getTitle());
+
+        // Check the method is null input safe.
+        mOnUiThread.loadDataWithBaseURLAndWaitForCompletion(null, null, null, null, null);
+        assertEquals("about:blank", mOnUiThread.getUrl());
     }
 
     private static class WaitForFindResultsListener extends FutureTask<Integer>
