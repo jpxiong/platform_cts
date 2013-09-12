@@ -79,7 +79,7 @@ public class ImageReaderTest extends AndroidTestCase {
     @Override
     protected void setUp() throws Exception {
         super.setUp();
-        mCameraIds = mCameraManager.getDeviceIdList();
+        mCameraIds = mCameraManager.getCameraIdList();
         mLooperThread = new CameraTestThread();
         mHandler = mLooperThread.start();
     }
@@ -220,11 +220,12 @@ public class ImageReaderTest extends AndroidTestCase {
         outputSurfaces.add(surface);
         mCamera.configureOutputs(outputSurfaces);
 
-        CaptureRequest captureRequest = mCamera.createCaptureRequest(CameraDevice.TEMPLATE_PREVIEW);
-        assertNotNull("Fail to get captureRequest", captureRequest);
-        captureRequest.addTarget(mReader.getSurface());
+        CaptureRequest.Builder captureBuilder =
+                mCamera.createCaptureRequest(CameraDevice.TEMPLATE_PREVIEW);
+        assertNotNull("Fail to get captureRequest", captureBuilder);
+        captureBuilder.addTarget(mReader.getSurface());
 
-        return captureRequest;
+        return captureBuilder.build();
     }
 
     private void captureAndValidateImage(CaptureRequest request,
@@ -235,9 +236,9 @@ public class ImageReaderTest extends AndroidTestCase {
         // Only verify single image for still capture
         if (format == ImageFormat.JPEG) {
             captureCount = 1;
-            mCamera.capture(request, null);
+            mCamera.capture(request, null, null);
         } else {
-            mCamera.setRepeatingRequest(request, null);
+            mCamera.setRepeatingRequest(request, null, null);
         }
 
         for (int i = 0; i < captureCount; i++) {
