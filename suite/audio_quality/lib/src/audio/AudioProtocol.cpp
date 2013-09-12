@@ -18,8 +18,8 @@
 #include <sys/types.h>
 #include <sys/socket.h>
 
+#include <UniquePtr.h>
 #include <utils/StrongPointer.h>
-#include <utils/UniquePtr.h>
 
 #include "audio/Buffer.h"
 #include "Log.h"
