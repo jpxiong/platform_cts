@@ -21,6 +21,7 @@ import com.android.cts.media.R;
 import android.content.res.AssetFileDescriptor;
 import android.content.res.Resources;
 import android.media.MediaCodec;
+import android.media.MediaCodecInfo;
 import android.media.MediaExtractor;
 import android.media.MediaFormat;
 import android.util.Log;
@@ -778,6 +779,7 @@ public class DecoderTest extends MediaPlayerTestBase {
         boolean sawOutputEOS = false;
         int deadDecoderCounter = 0;
         int samplenum = 0;
+        boolean dochecksum = false;
         while (!sawOutputEOS && deadDecoderCounter < 100) {
             if (!sawInputEOS) {
                 int inputBufIndex = codec.dequeueInputBuffer(kTimeOutUs);
@@ -831,7 +833,7 @@ public class DecoderTest extends MediaPlayerTestBase {
                         numframes += info.size;
                     } else {
                         // for video, count the number of video frames
-                        long sum = checksum(codecOutputBuffers[res], info.size);
+                        long sum = dochecksum ? checksum(codecOutputBuffers[res], info.size) : 0;
                         if (numframes < checksums.length) {
                             checksums[numframes] = sum;
                         }
@@ -854,7 +856,8 @@ public class DecoderTest extends MediaPlayerTestBase {
                 Log.d(TAG, "output buffers have changed.");
             } else if (res == MediaCodec.INFO_OUTPUT_FORMAT_CHANGED) {
                 MediaFormat oformat = codec.getOutputFormat();
-
+                int colorFormat = oformat.getInteger(MediaFormat.KEY_COLOR_FORMAT);
+                dochecksum = isRecognizedFormat(colorFormat);
                 Log.d(TAG, "output format has changed to " + oformat);
             } else {
                 Log.d(TAG, "no output");
@@ -889,6 +892,7 @@ public class DecoderTest extends MediaPlayerTestBase {
         deadDecoderCounter = 0;
         samplenum = 0;
         numframes = 0;
+        dochecksum = false;
         while (!sawOutputEOS && deadDecoderCounter < 100) {
             if (!sawInputEOS) {
                 int inputBufIndex = codec.dequeueInputBuffer(kTimeOutUs);
@@ -942,7 +946,7 @@ public class DecoderTest extends MediaPlayerTestBase {
                         numframes += info.size;
                     } else {
                         // for video, count the number of video frames
-                        long sum = checksum(codecOutputBuffers[res], info.size);
+                        long sum = dochecksum ? checksum(codecOutputBuffers[res], info.size) : 0;
                         if (numframes < checksums.length) {
                             assertEquals("frame data mismatch at frame " + numframes,
                                     checksums[numframes], sum);
@@ -966,7 +970,8 @@ public class DecoderTest extends MediaPlayerTestBase {
                 Log.d(TAG, "output buffers have changed.");
             } else if (res == MediaCodec.INFO_OUTPUT_FORMAT_CHANGED) {
                 MediaFormat oformat = codec.getOutputFormat();
-
+                int colorFormat = oformat.getInteger(MediaFormat.KEY_COLOR_FORMAT);
+                dochecksum = isRecognizedFormat(colorFormat);
                 Log.d(TAG, "output format has changed to " + oformat);
             } else {
                 Log.d(TAG, "no output");
@@ -982,6 +987,21 @@ public class DecoderTest extends MediaPlayerTestBase {
         assertEquals(stopatsample, numframes);
 
         testFd.close();
+    }
+
+    /* from EncodeDecodeTest */
+    private static boolean isRecognizedFormat(int colorFormat) {
+        switch (colorFormat) {
+            // these are the formats we know how to handle for this test
+            case MediaCodecInfo.CodecCapabilities.COLOR_FormatYUV420Planar:
+            case MediaCodecInfo.CodecCapabilities.COLOR_FormatYUV420PackedPlanar:
+            case MediaCodecInfo.CodecCapabilities.COLOR_FormatYUV420SemiPlanar:
+            case MediaCodecInfo.CodecCapabilities.COLOR_FormatYUV420PackedSemiPlanar:
+            case MediaCodecInfo.CodecCapabilities.COLOR_TI_FormatYUV420PackedSemiPlanar:
+                return true;
+            default:
+                return false;
+        }
     }
 
     private long checksum(ByteBuffer buf, int size) {
