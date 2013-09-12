@@ -31,6 +31,7 @@ import android.media.MediaScannerConnection;
 import android.media.MediaScannerConnection.MediaScannerConnectionClient;
 import android.mtp.MtpConstants;
 import android.net.Uri;
+import android.os.Bundle;
 import android.os.Environment;
 import android.os.IBinder;
 import android.os.SystemClock;
@@ -57,6 +58,7 @@ public class MediaScannerTest extends AndroidTestCase {
         // prepare the media file.
 
         mFileDir = Environment.getExternalStorageDirectory() + "/" + getClass().getCanonicalName();
+        cleanup();
         String fileName = mFileDir + "/test" + System.currentTimeMillis() + ".mp3";
         writeFile(R.raw.testmp3, fileName);
 
@@ -75,6 +77,9 @@ public class MediaScannerTest extends AndroidTestCase {
     @Override
     protected void tearDown() throws Exception {
         super.tearDown();
+    }
+
+    private void cleanup() {
         if (mMediaFile != null) {
             mMediaFile.delete();
         }
@@ -90,6 +95,9 @@ public class MediaScannerTest extends AndroidTestCase {
             mMediaScannerConnection.disconnect();
             mMediaScannerConnection = null;
         }
+
+        mContext.getContentResolver().delete(MediaStore.Audio.Media.getContentUri("external"),
+                "_data like ?", new String[] { mFileDir + "%"});
     }
 
     public void testMediaScanner() throws InterruptedException, IOException {
@@ -292,6 +300,72 @@ public class MediaScannerTest extends AndroidTestCase {
         checkConnectionState(false);
     }
 
+    public void testCanonicalize() throws Exception {
+        mMediaScannerConnectionClient = new MockMediaScannerConnectionClient();
+        mMediaScannerConnection = new MockMediaScannerConnection(getContext(),
+                                    mMediaScannerConnectionClient);
+
+        assertFalse(mMediaScannerConnection.isConnected());
+
+        // start connection and wait until connected
+        mMediaScannerConnection.connect();
+        checkConnectionState(true);
+
+        // write file and scan to insert into database
+        String fileDir = Environment.getExternalStorageDirectory() + "/"
+                + getClass().getCanonicalName() + "/canonicaltest-" + System.currentTimeMillis();
+        String fileName = fileDir + "/test.mp3";
+        writeFile(R.raw.testmp3, fileName);
+        mMediaScannerConnection.scanFile(fileName, MEDIA_TYPE);
+        checkMediaScannerConnection();
+
+        // check path and uri
+        Uri uri = mMediaScannerConnectionClient.mediaUri;
+        String path = mMediaScannerConnectionClient.mediaPath;
+        assertEquals(fileName, path);
+        assertNotNull(uri);
+
+        // check canonicalization
+        ContentResolver res = mContext.getContentResolver();
+        Uri canonicalUri = res.canonicalize(uri);
+        assertNotNull(canonicalUri);
+        assertFalse(uri.equals(canonicalUri));
+        Uri uncanonicalizedUri = res.uncanonicalize(canonicalUri);
+        assertEquals(uri, uncanonicalizedUri);
+
+        // remove the entry from the database
+        assertEquals(1, res.delete(uri, null, null));
+        assertTrue(new File(path).delete());
+
+        // write same file again and scan to insert into database
+        mMediaScannerConnectionClient.reset();
+        String fileName2 = fileDir + "/test2.mp3";
+        writeFile(R.raw.testmp3, fileName2);
+        mMediaScannerConnection.scanFile(fileName2, MEDIA_TYPE);
+        checkMediaScannerConnection();
+
+        // check path and uri
+        Uri uri2 = mMediaScannerConnectionClient.mediaUri;
+        String path2 = mMediaScannerConnectionClient.mediaPath;
+        assertEquals(fileName2, path2);
+        assertNotNull(uri2);
+
+        // this should be a different entry in the database and not re-use the same database id
+        assertFalse(uri.equals(uri2));
+
+        Uri canonicalUri2 = res.canonicalize(uri2);
+        assertNotNull(canonicalUri2);
+        assertFalse(uri2.equals(canonicalUri2));
+        Uri uncanonicalizedUri2 = res.uncanonicalize(canonicalUri2);
+        assertEquals(uri2, uncanonicalizedUri2);
+
+        // uncanonicalize the original canonicalized uri, it should resolve to the new uri
+        Uri uncanonicalizedUri3 = res.uncanonicalize(canonicalUri);
+        assertEquals(uri2, uncanonicalizedUri3);
+
+        assertEquals(1, res.delete(uri2, null, null));
+        assertTrue(new File(path2).delete());
+    }
 
     private void startMediaScanAndWait() throws InterruptedException {
         ScannerNotificationReceiver finishedReceiver = new ScannerNotificationReceiver(
@@ -299,8 +373,14 @@ public class MediaScannerTest extends AndroidTestCase {
         IntentFilter finishedIntentFilter = new IntentFilter(Intent.ACTION_MEDIA_SCANNER_FINISHED);
         finishedIntentFilter.addDataScheme("file");
         mContext.registerReceiver(finishedReceiver, finishedIntentFilter);
-        mContext.sendBroadcast(new Intent(Intent.ACTION_MEDIA_MOUNTED, Uri.parse("file://"
-                + Environment.getExternalStorageDirectory())));
+
+        Bundle args = new Bundle();
+        args.putString("volume", "external");
+        Intent i = new Intent("android.media.IMediaScannerService").putExtras(args);
+        i.setClassName("com.android.providers.media",
+                "com.android.providers.media.MediaScannerService");
+        mContext.startService(i);
+
         finishedReceiver.waitForBroadcast();
         mContext.unregisterReceiver(finishedReceiver);
     }
