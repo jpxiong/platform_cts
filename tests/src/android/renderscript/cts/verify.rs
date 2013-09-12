@@ -16,11 +16,10 @@
 
 #include "shared.rsh"
 
-rs_allocation gIn1;
-rs_allocation gIn2;
-float gAllowedError;
-
+int gAllowedIntError = 0;
 static bool hadError = false;
+static int2 errorLoc = {0,0};
+
 
 static bool compare_float(float f1, float f2) {
     if (fabs(f1-f2) > 0.0001f) {
@@ -30,230 +29,271 @@ static bool compare_float(float f1, float f2) {
     return true;
 }
 
-static void verify_float4(rs_allocation in1, rs_allocation in2)
+static bool verify_float4(rs_allocation in1, rs_allocation in2)
 {
     uint32_t w = rsAllocationGetDimX(in1);
     uint32_t h = rsAllocationGetDimY(in1);
     for (uint32_t y=0; y < h; y++) {
         for (uint32_t x=0; x < w; x++) {
-            float4 p1 = rsGetElementAt_float4(in1, x, y);
-            float4 p2 = rsGetElementAt_float4(in2, x, y);
-            bool e = !compare_float(p1.x, p2.x);
-            e |= !compare_float(p1.y, p2.y);
-            e |= !compare_float(p1.z, p2.z);
-            e |= !compare_float(p1.w, p2.w);
+            float4 pref = rsGetElementAt_float4(in1, x, y);
+            float4 ptst = rsGetElementAt_float4(in2, x, y);
+            bool e = !compare_float(pref.x, ptst.x);
+            e |= !compare_float(pref.y, ptst.y);
+            e |= !compare_float(pref.z, ptst.z);
+            e |= !compare_float(pref.w, ptst.w);
             if (e) {
-                rsDebug("verify_float4 x", x);
-                rsDebug("verify_float4 y", y);
-                rsDebug("verify_float4 p1", p1);
-                rsDebug("verify_float4 p2", p2);
-                return;
+                errorLoc.x = x;
+                errorLoc.y = y;
+                return false;
             }
         }
     }
+    return true;
 }
 
-static void verify_float3(rs_allocation in1, rs_allocation in2)
+static bool verify_float3(rs_allocation in1, rs_allocation in2)
 {
     uint32_t w = rsAllocationGetDimX(in1);
     uint32_t h = rsAllocationGetDimY(in1);
     for (uint32_t y=0; y < h; y++) {
         for (uint32_t x=0; x < w; x++) {
-            float3 p1 = rsGetElementAt_float3(in1, x, y);
-            float3 p2 = rsGetElementAt_float3(in2, x, y);
-            bool e = !compare_float(p1.x, p2.x);
-            e |= !compare_float(p1.y, p2.y);
-            e |= !compare_float(p1.z, p2.z);
+            float3 pref = rsGetElementAt_float3(in1, x, y);
+            float3 ptst = rsGetElementAt_float3(in2, x, y);
+            bool e = !compare_float(pref.x, ptst.x);
+            e |= !compare_float(pref.y, ptst.y);
+            e |= !compare_float(pref.z, ptst.z);
             if (e) {
-                rsDebug("verify_float4 x", x);
-                rsDebug("verify_float4 y", y);
-                rsDebug("verify_float4 p1", p1);
-                rsDebug("verify_float4 p2", p2);
-                return;
+                errorLoc.x = x;
+                errorLoc.y = y;
+                return false;
             }
         }
     }
+    return true;
 }
 
-static void verify_float2(rs_allocation in1, rs_allocation in2)
+static bool verify_float2(rs_allocation in1, rs_allocation in2)
 {
     uint32_t w = rsAllocationGetDimX(in1);
     uint32_t h = rsAllocationGetDimY(in1);
     for (uint32_t y=0; y < h; y++) {
         for (uint32_t x=0; x < w; x++) {
-            float2 p1 = rsGetElementAt_float2(in1, x, y);
-            float2 p2 = rsGetElementAt_float2(in2, x, y);
-            bool e = !compare_float(p1.x, p2.x);
-            e |= !compare_float(p1.y, p2.y);
+            float2 pref = rsGetElementAt_float2(in1, x, y);
+            float2 ptst = rsGetElementAt_float2(in2, x, y);
+            bool e = !compare_float(pref.x, ptst.x);
+            e |= !compare_float(pref.y, ptst.y);
             if (e) {
-                rsDebug("verify_float4 x", x);
-                rsDebug("verify_float4 y", y);
-                rsDebug("verify_float4 p1", p1);
-                rsDebug("verify_float4 p2", p2);
-                return;
+                errorLoc.x = x;
+                errorLoc.y = y;
+                return false;
             }
         }
     }
+    return true;
 }
 
-static void verify_float(rs_allocation in1, rs_allocation in2)
+static bool verify_float(rs_allocation in1, rs_allocation in2)
 {
     uint32_t w = rsAllocationGetDimX(in1);
     uint32_t h = rsAllocationGetDimY(in1);
     for (uint32_t y=0; y < h; y++) {
         for (uint32_t x=0; x < w; x++) {
-            float p1 = rsGetElementAt_float(in1, x, y);
-            float p2 = rsGetElementAt_float(in2, x, y);
-            bool e = !compare_float(p1, p2);
+            float pref = rsGetElementAt_float(in1, x, y);
+            float ptst = rsGetElementAt_float(in2, x, y);
+            bool e = !compare_float(pref, ptst);
             if (e) {
-                rsDebug("verify_float4 x", x);
-                rsDebug("verify_float4 y", y);
-                rsDebug("verify_float4 p1", p1);
-                rsDebug("verify_float4 p2", p2);
-                return;
+                errorLoc.x = x;
+                errorLoc.y = y;
+                return false;
             }
         }
     }
+    return true;
 }
 
-static void verify_uchar4(rs_allocation in1, rs_allocation in2)
+static bool verify_uchar4(rs_allocation in1, rs_allocation in2)
 {
     int merr = 0;
     uint32_t w = rsAllocationGetDimX(in1);
     uint32_t h = rsAllocationGetDimY(in1);
     for (uint32_t y=0; y < h; y++) {
         for (uint32_t x=0; x < w; x++) {
-            int4 p1 = convert_int4(rsGetElementAt_uchar4(in1, x, y));
-            int4 p2 = convert_int4(rsGetElementAt_uchar4(in2, x, y));
-            int4 d = convert_int4(abs(p1 - p2));
+            int4 pref = convert_int4(rsGetElementAt_uchar4(in1, x, y));
+            int4 ptst = convert_int4(rsGetElementAt_uchar4(in2, x, y));
+            int4 d = convert_int4(abs(pref - ptst));
             int e = 0;
             e = max(e, d.x);
             e = max(e, d.y);
             e = max(e, d.z);
             e = max(e, d.w);
-            if (e != 0) {
-                rsDebug("verify_uchar4 x", x);
-                rsDebug("verify_uchar4 y", y);
-                rsDebug("verify_uchar4 p1", p1);
-                rsDebug("verify_uchar4 p2", p2);
-                return;
+            if (e > gAllowedIntError) {
+                errorLoc.x = x;
+                errorLoc.y = y;
+                hadError = true;
+                return false;
             }
             merr = max(e, merr);
         }
     }
+    return true;
 }
 
-static void verify_uchar3(rs_allocation in1, rs_allocation in2)
+static bool verify_uchar3(rs_allocation in1, rs_allocation in2)
 {
     int merr = 0;
     uint32_t w = rsAllocationGetDimX(in1);
     uint32_t h = rsAllocationGetDimY(in1);
     for (uint32_t y=0; y < h; y++) {
         for (uint32_t x=0; x < w; x++) {
-            int3 p1 = convert_int3(rsGetElementAt_uchar3(in1, x, y));
-            int3 p2 = convert_int3(rsGetElementAt_uchar3(in2, x, y));
-            int3 d = convert_int3(abs(p1 - p2));
+            int3 pref = convert_int3(rsGetElementAt_uchar3(in1, x, y));
+            int3 ptst = convert_int3(rsGetElementAt_uchar3(in2, x, y));
+            int3 d = convert_int3(abs(pref - ptst));
             int e = 0;
             e = max(e, d.x);
             e = max(e, d.y);
             e = max(e, d.z);
-            if (e != 0) {
-                rsDebug("verify_uchar3 x", x);
-                rsDebug("verify_uchar3 y", y);
-                rsDebug("verify_uchar3 p1", p1);
-                rsDebug("verify_uchar3 p2", p2);
-                return;
+            if (e > gAllowedIntError) {
+                errorLoc.x = x;
+                errorLoc.y = y;
+                hadError = true;
+                return false;
             }
             merr = max(e, merr);
         }
     }
+    return true;
 }
 
-static void verify_uchar2(rs_allocation in1, rs_allocation in2)
+static bool verify_uchar2(rs_allocation in1, rs_allocation in2)
 {
     int merr = 0;
     uint32_t w = rsAllocationGetDimX(in1);
     uint32_t h = rsAllocationGetDimY(in1);
     for (uint32_t y=0; y < h; y++) {
         for (uint32_t x=0; x < w; x++) {
-            int2 p1 = convert_int2(rsGetElementAt_uchar2(in1, x, y));
-            int2 p2 = convert_int2(rsGetElementAt_uchar2(in2, x, y));
-            int2 d = convert_int2(abs(p1 - p2));
+            int2 pref = convert_int2(rsGetElementAt_uchar2(in1, x, y));
+            int2 ptst = convert_int2(rsGetElementAt_uchar2(in2, x, y));
+            int2 d = convert_int2(abs(pref - ptst));
             int e = 0;
             e = max(e, d.x);
             e = max(e, d.y);
-            if (e != 0) {
-                rsDebug("verify_uchar2 x", x);
-                rsDebug("verify_uchar2 y", y);
-                rsDebug("verify_uchar2 p1", p1);
-                rsDebug("verify_uchar2 p2", p2);
-                return;
+            if (e > gAllowedIntError) {
+                errorLoc.x = x;
+                errorLoc.y = y;
+                hadError = true;
+                return false;
             }
             merr = max(e, merr);
         }
     }
+    return true;
 }
 
-static void verify_uchar(rs_allocation in1, rs_allocation in2)
+static bool verify_uchar(rs_allocation in1, rs_allocation in2)
 {
     int merr = 0;
     uint32_t w = rsAllocationGetDimX(in1);
     uint32_t h = rsAllocationGetDimY(in1);
     for (uint32_t y=0; y < h; y++) {
         for (uint32_t x=0; x < w; x++) {
-            int p1 = rsGetElementAt_uchar(in1, x, y);
-            int p2 = rsGetElementAt_uchar(in2, x, y);
-            int e = abs(p1 - p2);
-            if (e != 0) {
-                rsDebug("verify_uchar4 x", x);
-                rsDebug("verify_uchar4 y", y);
-                rsDebug("verify_uchar4 p1", p1);
-                rsDebug("verify_uchar4 p2", p2);
-                return;
+            int pref = rsGetElementAt_uchar(in1, x, y);
+            int ptst = rsGetElementAt_uchar(in2, x, y);
+            int e = abs(pref - ptst);
+            if (e > gAllowedIntError) {
+                errorLoc.x = x;
+                errorLoc.y = y;
+                hadError = true;
+                return false;
             }
             merr = max(e, merr);
         }
     }
+    return true;
 }
 
-void verify(rs_allocation in1, rs_allocation in2)
+#define printCell(txt, a, xy) \
+{                       \
+    rs_element e = rsAllocationGetElement(a); \
+    rs_data_type dt = rsElementGetDataType(e); \
+    uint32_t vs = rsElementGetVectorSize(e); \
+ \
+    if (dt == RS_TYPE_UNSIGNED_8) { \
+        switch(vs) { \
+        case 4: \
+            rsDebug(txt, rsGetElementAt_uchar4(a, xy.x, xy.y)); \
+            break; \
+        case 3: \
+            rsDebug(txt, rsGetElementAt_uchar3(a, xy.x, xy.y)); \
+            break; \
+        case 2: \
+            rsDebug(txt, rsGetElementAt_uchar2(a, xy.x, xy.y)); \
+            break; \
+        case 1: \
+            rsDebug(txt, rsGetElementAt_uchar(a, xy.x, xy.y)); \
+            break; \
+        } \
+    } else { \
+        switch(vs) { \
+        case 4: \
+            rsDebug(txt, rsGetElementAt_float4(a, xy.x, xy.y)); \
+            break; \
+        case 3: \
+            rsDebug(txt, rsGetElementAt_float3(a, xy.x, xy.y)); \
+            break; \
+        case 2: \
+            rsDebug(txt, rsGetElementAt_float2(a, xy.x, xy.y)); \
+            break; \
+        case 1: \
+            rsDebug(txt, rsGetElementAt_float(a, xy.x, xy.y)); \
+            break; \
+        } \
+    } \
+}
+
+void verify(rs_allocation ref_in, rs_allocation tst_in, rs_allocation src_in)
 {
-    rs_element e = rsAllocationGetElement(in1);
+    rs_element e = rsAllocationGetElement(ref_in);
     rs_data_type dt = rsElementGetDataType(e);
     uint32_t vs = rsElementGetVectorSize(e);
+    bool valid = false;
 
     if (dt == RS_TYPE_UNSIGNED_8) {
         switch(vs) {
         case 4:
-            verify_uchar4(in1, in2);
+            valid = verify_uchar4(ref_in, tst_in);
             break;
         case 3:
-            verify_uchar3(in1, in2);
+            valid = verify_uchar3(ref_in, tst_in);
             break;
         case 2:
-            verify_uchar2(in1, in2);
+            valid = verify_uchar2(ref_in, tst_in);
             break;
         case 1:
-            verify_uchar(in1, in2);
+            valid = verify_uchar(ref_in, tst_in);
             break;
         }
     } else {
         switch(vs) {
         case 4:
-            verify_float4(in1, in2);
+            valid = verify_float4(ref_in, tst_in);
             break;
         case 3:
-            verify_float3(in1, in2);
+            valid = verify_float3(ref_in, tst_in);
             break;
         case 2:
-            verify_float2(in1, in2);
+            valid = verify_float2(ref_in, tst_in);
             break;
         case 1:
-            verify_float(in1, in2);
+            valid = verify_float(ref_in, tst_in);
             break;
         }
     }
-
+    if (!valid) {
+        rsDebug("verify failure at xy", errorLoc);
+        printCell("start value     ", src_in, errorLoc);
+        printCell("reference value ", ref_in, errorLoc);
+        printCell("test value      ", tst_in, errorLoc);
+    }
 }
 
 void checkError()

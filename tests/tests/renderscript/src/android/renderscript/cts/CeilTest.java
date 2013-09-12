@@ -80,7 +80,7 @@ public class CeilTest extends RSBaseCompute {
     }
 
     public void testCeilF32_relaxed() {
-        doF32_relaxed(0x12345ace, 0);
+        doF32_relaxed(0x12345ace, 1);
     }
 
     public void testCeilF32_2() {
@@ -88,7 +88,7 @@ public class CeilTest extends RSBaseCompute {
     }
 
     public void testCeilF32_2_relaxed() {
-        doF32_2_relaxed(0x1ac478, 0);
+        doF32_2_relaxed(0x1ac478, 1);
     }
 
     public void testCeilF32_3() {
@@ -96,7 +96,7 @@ public class CeilTest extends RSBaseCompute {
     }
 
     public void testCeilF32_3_relaxed() {
-        doF32_3_relaxed(0xacef, 0);
+        doF32_3_relaxed(0xacef, 1);
     }
 
     public void testCeilF32_4() {
@@ -104,7 +104,7 @@ public class CeilTest extends RSBaseCompute {
 
     }
     public void testCeilF32_4_relaxed() {
-        doF32_4_relaxed(0xef12, 0);
+        doF32_4_relaxed(0xef12, 1);
     }
 
 }

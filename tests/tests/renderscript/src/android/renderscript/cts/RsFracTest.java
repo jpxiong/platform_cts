@@ -52,7 +52,7 @@ public class RsFracTest extends RSBaseCompute {
     }
     public void testRsFrac_relaxed() {
         mScript_relaxed = new ScriptC_rs_frac_f32_relaxed(mRS, mRes, R.raw.rs_frac_f32);
-        doF32_relaxed(0x12, 0);
+        doF32_relaxed(0x12, 1);
     }
 
 }

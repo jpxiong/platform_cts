@@ -79,7 +79,7 @@ public class FloorTest extends RSBaseCompute {
     }
 
     public void testfloorF32_relaxed() {
-        doF32_relaxed(0xa, 0);
+        doF32_relaxed(0xa, 1);
     }
 
     public void testfloorF32_2() {
@@ -87,7 +87,7 @@ public class FloorTest extends RSBaseCompute {
     }
 
     public void testfloorF32_2_relaxed() {
-        doF32_2_relaxed(0xb, 0);
+        doF32_2_relaxed(0xb, 1);
     }
 
     public void testfloorF32_3() {
@@ -95,7 +95,7 @@ public class FloorTest extends RSBaseCompute {
     }
 
     public void testfloorF32_3_relaxed() {
-        doF32_3_relaxed(0xef1, 0);
+        doF32_3_relaxed(0xef1, 1);
     }
 
     public void testfloorF32_4() {
@@ -103,7 +103,7 @@ public class FloorTest extends RSBaseCompute {
 
     }
     public void testfloorF32_4_relaxed() {
-        doF32_4_relaxed(0xefa12, 0);
+        doF32_4_relaxed(0xefa12, 1);
     }
 
 }

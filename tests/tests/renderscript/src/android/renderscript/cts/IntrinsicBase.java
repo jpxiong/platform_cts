@@ -59,26 +59,19 @@ public class IntrinsicBase extends RSBaseCompute {
         return e;
     }
 
-    protected void makeSource(int w, int h, Element e) {
-        System.gc();
-
-        if (mAllocSrc != null) {
-            mAllocSrc.destroy();
-        }
-        if (mAllocRef != null) {
-            mAllocRef.destroy();
-        }
-        if (mAllocDst != null) {
-            mAllocDst.destroy();
-        }
-
+    protected Allocation makeAllocation(int w, int h, Element e) {
         Type.Builder tb = new Type.Builder(mRS, e);
         tb.setX(w);
         tb.setY(h);
         Type t = tb.create();
-        mAllocSrc = Allocation.createTyped(mRS, t);
-        mAllocRef = Allocation.createTyped(mRS, t);
-        mAllocDst = Allocation.createTyped(mRS, t);
+        return Allocation.createTyped(mRS, t);
+    }
+
+    protected void makeSource(int w, int h, Element e) {
+        if (mAllocSrc != null) {
+            mAllocSrc.destroy();
+        }
+        mAllocSrc = makeAllocation(w, h, e);
 
         java.util.Random r = new java.util.Random(100);
 
@@ -111,6 +104,13 @@ public class IntrinsicBase extends RSBaseCompute {
 
     protected void makeBuffers(int w, int h, Element e) {
         makeSource(w, h, e);
+
+        if (mAllocRef != null) {
+            mAllocRef.destroy();
+        }
+        if (mAllocDst != null) {
+            mAllocDst.destroy();
+        }
         mAllocRef = Allocation.createTyped(mRS, mAllocSrc.getType());
         mAllocDst = Allocation.createTyped(mRS, mAllocSrc.getType());
     }
