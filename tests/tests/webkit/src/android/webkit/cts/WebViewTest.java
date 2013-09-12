@@ -879,12 +879,23 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
     }
 
     public void testFindAll()  throws Throwable {
-        String p = "<p>Find all instances of find on the page and highlight them.</p>";
+        // Make the page scrollable, so we can detect the scrolling to make sure the
+        // content fully loaded.
+        mOnUiThread.setInitialScale(100);
+        DisplayMetrics metrics = mOnUiThread.getDisplayMetrics();
+        int dimension = Math.max(metrics.widthPixels, metrics.heightPixels);
+        // create a paragraph high enough to take up the entire screen
+        String p = "<p style=\"height:" + dimension + "px;\">" +
+                "Find all instances of find on the page and highlight them.</p>";
 
         mOnUiThread.loadDataAndWaitForCompletion("<html><body>" + p
                 + "</body></html>", "text/html", null);
 
         WaitForFindResultsListener l = new WaitForFindResultsListener();
+        int previousScrollY = mOnUiThread.getScrollY();
+        mOnUiThread.pageDown(true);
+        // Wait for content fully loaded.
+        waitForScrollingComplete(previousScrollY);
         mOnUiThread.setFindListener(l);
         mOnUiThread.findAll("find");
 
