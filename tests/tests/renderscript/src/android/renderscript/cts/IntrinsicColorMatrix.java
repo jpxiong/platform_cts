@@ -41,76 +41,110 @@ public class IntrinsicColorMatrix extends IntrinsicBase {
         Element eout = makeElement(dtOut, vsOut);
 
 
-        System.gc();
         makeSource(w, h, ein);
-        mAllocRef = Allocation.createTyped(mRS, mAllocSrc.getType());
-        mAllocDst = Allocation.createTyped(mRS, mAllocSrc.getType());
+        mAllocRef = makeAllocation(w, h, eout);
+        mAllocDst = makeAllocation(w, h, eout);
 
         mSi.setColorMatrix(mat);
+        mSi.setAdd(add);
         mSi.forEach(mAllocSrc, mAllocDst);
         mSr.invoke_reference(mat, add, mAllocSrc, mAllocRef);
 
-        android.util.Log.e("RSI test", "test ColorMatrix " + vsIn + " 1 " + w + ", " + h);
-        mVerify.invoke_verify(mAllocRef, mAllocDst);
+        android.util.Log.e("RSI test", "test ColorMatrix  vsin=" + vsIn + ", vsout=" + vsOut + ",  dim " + w + ", " + h);
+        mVerify.invoke_verify(mAllocRef, mAllocDst, mAllocSrc);
         mRS.finish();
     }
 
 
-    private void test(Element.DataType dtin, Element.DataType dtout) {
+    private void test(Element.DataType dtin, Element.DataType dtout, int subtest) {
         Float4 add = new Float4();
         Matrix4f mat = new Matrix4f();
         java.util.Random r = new java.util.Random(100);
 
-        for (int t=0; t < 1; t++) {
-            float f[] = mat.getArray();
+        float f[] = mat.getArray();
+        for (int i=0; i < f.length; i++) {
+            f[i] = 0.f;
+        }
+
+
+        switch (subtest) {
+        case 0:
+            mVerify.set_gAllowedIntError(0);
+            mat.loadIdentity();
+            break;
+        case 1:
+            mVerify.set_gAllowedIntError(1);
+            mat.set(0, 0, 1.f);
+            mat.set(0, 1, 1.f);
+            mat.set(0, 2, 1.f);
+            break;
+        default:
+            mVerify.set_gAllowedIntError(2);
             for (int i=0; i < f.length; i++) {
-                f[i] = 0.f;
-            }
-
-
-            switch (t) {
-            case 0:
-                mat.loadIdentity();
-                break;
-            case 1:
-                mat.set(0, 0, 1.f);
-                mat.set(0, 1, 1.f);
-                mat.set(0, 2, 1.f);
-                break;
-            case 2:
-                for (int i=0; i < f.length; i++) {
-                    if (r.nextFloat() > 0.2f) {
-                        f[i] = 10.f * r.nextFloat();
-                    }
+                if (r.nextFloat() > 0.5f) {
+                    f[i] = r.nextFloat() * (subtest - 1);
                 }
-
             }
-
-            for (int i=1; i <= 4; i++) {
-                for (int j=1; j <=4; j++) {
-                    subtest(101, 101, mat, add,
-                            dtin, i,
-                            dtout, j);
-                    checkError();
+            for (int i=0; i < f.length; i++) {
+                if (r.nextFloat() > 0.5f) {
+                    add.x = r.nextFloat() * (subtest - 1);
                 }
+                if (r.nextFloat() > 0.5f) {
+                    add.y = r.nextFloat() * (subtest - 1);
+                }
+                if (r.nextFloat() > 0.5f) {
+                    add.z = r.nextFloat() * (subtest - 1);
+                }
+                if (r.nextFloat() > 0.5f) {
+                    add.w = r.nextFloat() * (subtest - 1);
+                }
+            }
+            android.util.Log.v("rs", "Mat [" + f[0] + ", " + f[4] + ", " + f[8] + ", " + f[12] + "]");
+            android.util.Log.v("rs", "    [" + f[1] + ", " + f[5] + ", " + f[9] + ", " + f[13] + "]");
+            android.util.Log.v("rs", "    [" + f[2] + ", " + f[6] + ", " + f[10] + ", " + f[14] + "]");
+            android.util.Log.v("rs", "    [" + f[3] + ", " + f[7] + ", " + f[11] + ", " + f[15] + "]");
+        }
+
+        for (int i=1; i <= 4; i++) {
+            for (int j=1; j <=4; j++) {
+                subtest(101, 101, mat, add,
+                        dtin, i,
+                        dtout, j);
             }
         }
+        checkError();
     }
 
-    public void test_U8_U8() {
-        test(Element.DataType.UNSIGNED_8, Element.DataType.UNSIGNED_8);
+    public void test_U8_U8_Ident() {
+        test(Element.DataType.UNSIGNED_8, Element.DataType.UNSIGNED_8, 0);
     }
 
-    public void test_F32_F32() {
-        test(Element.DataType.FLOAT_32, Element.DataType.FLOAT_32);
+    public void test_F32_F32_Ident() {
+        test(Element.DataType.FLOAT_32, Element.DataType.FLOAT_32, 0);
     }
 
-    public void test_U8_F32() {
-        test(Element.DataType.UNSIGNED_8, Element.DataType.FLOAT_32);
+    public void test_U8_F32_Ident() {
+        test(Element.DataType.UNSIGNED_8, Element.DataType.FLOAT_32, 0);
     }
 
-    public void test_F32_U8() {
-        test(Element.DataType.FLOAT_32, Element.DataType.UNSIGNED_8);
+    public void test_F32_U8_Ident() {
+        test(Element.DataType.FLOAT_32, Element.DataType.UNSIGNED_8, 0);
+    }
+
+    public void test_U8_U8_Rand() {
+        test(Element.DataType.UNSIGNED_8, Element.DataType.UNSIGNED_8, 2);
+    }
+
+    public void test_F32_F32_Rand() {
+        test(Element.DataType.FLOAT_32, Element.DataType.FLOAT_32, 10);
+    }
+
+    public void test_U8_F32_Rand() {
+        test(Element.DataType.UNSIGNED_8, Element.DataType.FLOAT_32, 10);
+    }
+
+    public void test_F32_U8_Rand() {
+        test(Element.DataType.FLOAT_32, Element.DataType.UNSIGNED_8, 10);
     }
 
 }
