@@ -97,7 +97,7 @@ public class PownTest extends RSBaseCompute {
         nAlloc.copyFrom(n);
         script_f32_relaxed.set_n1(nAlloc);
 
-        doF32_relaxed(0x716acd, 16);
+        doF32_relaxed(0x716acd, 128);
     }
 
     public void testPownF32_2() {
@@ -119,7 +119,7 @@ public class PownTest extends RSBaseCompute {
         nAlloc.copyFrom(n);
         script_f32_relaxed.set_n2(nAlloc);
 
-        doF32_2_relaxed(0xacdef1, 16);
+        doF32_2_relaxed(0xacdef1, 128);
     }
 
     public void testPownF32_3() {
@@ -141,7 +141,7 @@ public class PownTest extends RSBaseCompute {
         nAlloc.copyFrom(n);
         script_f32_relaxed.set_n3(nAlloc);
 
-        doF32_3_relaxed(0xaac3f1, 16);
+        doF32_3_relaxed(0xaac3f1, 128);
     }
 
     public void testPownF32_4() {
@@ -163,6 +163,6 @@ public class PownTest extends RSBaseCompute {
         nAlloc.copyFrom(n);
         script_f32_relaxed.set_n4(nAlloc);
 
-        doF32_4_relaxed(0xaa12f1, 16);
+        doF32_4_relaxed(0xaa12f1, 128);
     }
 }

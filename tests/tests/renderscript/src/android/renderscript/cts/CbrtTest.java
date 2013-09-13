@@ -80,7 +80,7 @@ public class CbrtTest extends RSBaseCompute {
     }
 
     public void testCbrtF32_relaxed() {
-        doF32_relaxed(0xabe, 2);
+        doF32_relaxed(0xabe, 128);
     }
 
     public void testCbrtF32_2() {
@@ -88,7 +88,7 @@ public class CbrtTest extends RSBaseCompute {
     }
 
     public void testCbrtF32_2_relaxed() {
-        doF32_2_relaxed(0x78, 2);
+        doF32_2_relaxed(0x78, 128);
     }
 
     public void testCbrtF32_3() {
@@ -96,7 +96,7 @@ public class CbrtTest extends RSBaseCompute {
     }
 
     public void testCbrtF32_3_relaxed() {
-        doF32_3_relaxed(0x1e, 2);
+        doF32_3_relaxed(0x1e, 128);
     }
 
     public void testCbrtF32_4() {
@@ -104,7 +104,7 @@ public class CbrtTest extends RSBaseCompute {
 
     }
     public void testCbrtF32_4_relaxed() {
-        doF32_4_relaxed(0xfe2, 2);
+        doF32_4_relaxed(0xfe2, 128);
     }
 
 }

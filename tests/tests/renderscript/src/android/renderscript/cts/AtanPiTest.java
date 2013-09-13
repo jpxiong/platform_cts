@@ -80,7 +80,7 @@ public class AtanPiTest extends RSBaseCompute {
     }
 
     public void testAtanPiF32_relaxed() {
-        doF32_relaxed(0x123, 5);
+        doF32_relaxed(0x123, 128);
     }
 
     public void testAtanPiF32_2() {
@@ -88,7 +88,7 @@ public class AtanPiTest extends RSBaseCompute {
     }
 
     public void testAtanPiF32_2_relaxed() {
-        doF32_2_relaxed(0x12, 5);
+        doF32_2_relaxed(0x12, 128);
     }
 
     public void testAtanPiF32_3() {
@@ -96,7 +96,7 @@ public class AtanPiTest extends RSBaseCompute {
     }
 
     public void testAtanPiF32_3_relaxed() {
-        doF32_3_relaxed(0x847, 5);
+        doF32_3_relaxed(0x847, 128);
     }
 
     public void testAtanPiF32_4() {
@@ -104,7 +104,7 @@ public class AtanPiTest extends RSBaseCompute {
 
     }
     public void testAtanPiF32_4_relaxed() {
-        doF32_4_relaxed(0xfa2, 5);
+        doF32_4_relaxed(0xfa2, 128);
     }
 
 }
