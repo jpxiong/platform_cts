@@ -399,6 +399,7 @@ public class FileSystemPermissionTest extends AndroidTestCase {
                     "/data/property",
                     "/data/radio",
                     "/data/secure",
+                    "/data/security",
                     "/data/sensors",
                     "/data/shared",
                     "/data/simcom",
