@@ -80,7 +80,7 @@ public class LogTest extends RSBaseCompute {
     }
 
     public void testLogF32_relaxed() {
-        doF32_relaxed(0xfae, 3);
+        doF32_relaxed(0xfae, 16);
     }
 
     public void testLogF32_2() {
@@ -88,7 +88,7 @@ public class LogTest extends RSBaseCompute {
     }
 
     public void testLogF32_2_relaxed() {
-        doF32_2_relaxed(0x123, 3);
+        doF32_2_relaxed(0x123, 16);
     }
 
     public void testLogF32_3() {
@@ -96,7 +96,7 @@ public class LogTest extends RSBaseCompute {
     }
 
     public void testLogF32_3_relaxed() {
-        doF32_3_relaxed(0xab4, 3);
+        doF32_3_relaxed(0xab4, 16);
     }
 
     public void testLogF32_4() {
@@ -104,7 +104,7 @@ public class LogTest extends RSBaseCompute {
 
     }
     public void testLogF32_4_relaxed() {
-        doF32_4_relaxed(0xfa3, 3);
+        doF32_4_relaxed(0xfa3, 16);
     }
 
 }

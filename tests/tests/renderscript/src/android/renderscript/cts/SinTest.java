@@ -80,7 +80,7 @@ public class SinTest extends RSBaseCompute {
     }
 
     public void testSinF32_relaxed() {
-        doF32_relaxed(0xba, 4);
+        doF32_relaxed(0xba, 128);
     }
 
     public void testSinF32_2() {
@@ -88,7 +88,7 @@ public class SinTest extends RSBaseCompute {
     }
 
     public void testSinF32_2_relaxed() {
-        doF32_2_relaxed(0xbaa, 4);
+        doF32_2_relaxed(0xbaa, 128);
     }
 
     public void testSinF32_3() {
@@ -96,7 +96,7 @@ public class SinTest extends RSBaseCompute {
     }
 
     public void testSinF32_3_relaxed() {
-        doF32_3_relaxed(0xca, 4);
+        doF32_3_relaxed(0xca, 128);
     }
 
     public void testSinF32_4() {
@@ -104,7 +104,7 @@ public class SinTest extends RSBaseCompute {
 
     }
     public void testSinF32_4_relaxed() {
-        doF32_4_relaxed(0xda, 4);
+        doF32_4_relaxed(0xda, 128);
     }
 
 }

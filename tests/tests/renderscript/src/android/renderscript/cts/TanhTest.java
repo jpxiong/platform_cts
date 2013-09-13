@@ -80,7 +80,7 @@ public class TanhTest extends RSBaseCompute {
     }
 
     public void testTanhF32_relaxed() {
-        doF32_relaxed(0xab61, 5);
+        doF32_relaxed(0xab61, 128);
     }
 
     public void testTanhF32_2() {
@@ -88,7 +88,7 @@ public class TanhTest extends RSBaseCompute {
     }
 
     public void testTanhF32_2_relaxed() {
-        doF32_2_relaxed(0xa301, 5);
+        doF32_2_relaxed(0xa301, 128);
     }
 
     public void testTanhF32_3() {
@@ -96,7 +96,7 @@ public class TanhTest extends RSBaseCompute {
     }
 
     public void testTanhF32_3_relaxed() {
-        doF32_3_relaxed(0x918, 5);
+        doF32_3_relaxed(0x918, 128);
     }
 
     public void testTanhF32_4() {
@@ -104,7 +104,7 @@ public class TanhTest extends RSBaseCompute {
 
     }
     public void testTanhF32_4_relaxed() {
-        doF32_4_relaxed(0x81, 5);
+        doF32_4_relaxed(0x81, 128);
     }
 
 }

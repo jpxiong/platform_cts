@@ -80,7 +80,7 @@ public class AsinTest extends RSBaseCompute {
     }
 
     public void testAsinF32_relaxed() {
-        doF32_relaxed(0x12efa, 4);
+        doF32_relaxed(0x12efa, 128);
     }
 
     public void testAsinF32_2() {
@@ -88,7 +88,7 @@ public class AsinTest extends RSBaseCompute {
     }
 
     public void testAsinF32_2_relaxed() {
-        doF32_2_relaxed(0x34ef, 4);
+        doF32_2_relaxed(0x34ef, 128);
     }
 
     public void testAsinF32_3() {
@@ -96,7 +96,7 @@ public class AsinTest extends RSBaseCompute {
     }
 
     public void testAsinF32_3_relaxed() {
-        doF32_3_relaxed(0xae31, 4);
+        doF32_3_relaxed(0xae31, 128);
     }
 
     public void testAsinF32_4() {
@@ -104,7 +104,7 @@ public class AsinTest extends RSBaseCompute {
 
     }
     public void testAsinF32_4_relaxed() {
-        doF32_4_relaxed(0x341, 4);
+        doF32_4_relaxed(0x341, 128);
     }
 
 }
