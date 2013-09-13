@@ -1138,8 +1138,11 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
     }
 
     public void testRequestFocusNodeHref() throws Throwable {
-        final String links = "<DL><p><DT><A HREF=\"" + TestHtmlConstants.HTML_URL1
-                + "\">HTML_URL1</A><DT><A HREF=\"" + TestHtmlConstants.HTML_URL2
+        startWebServer(false);
+        String url1 = mWebServer.getAssetUrl(TestHtmlConstants.HTML_URL1);
+        String url2 = mWebServer.getAssetUrl(TestHtmlConstants.HTML_URL2);
+        final String links = "<DL><p><DT><A HREF=\"" + url1
+                + "\">HTML_URL1</A><DT><A HREF=\"" + url2
                 + "\">HTML_URL2</A></DL><p>";
         mOnUiThread.loadDataAndWaitForCompletion("<html><body>" + links + "</body></html>", "text/html", null);
         getInstrumentation().waitForIdleSync();
@@ -1169,7 +1172,7 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
                 return done;
             }
         }.run();
-        assertEquals(TestHtmlConstants.HTML_URL1, handler.getResultUrl());
+        assertEquals(url1, handler.getResultUrl());
 
         // focus on second link
         handler.reset();
@@ -1181,9 +1184,10 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
             @Override
             protected boolean check() {
                 boolean done = false;
+                final String url2 = mWebServer.getAssetUrl(TestHtmlConstants.HTML_URL2);
                 if (handler.hasCalledHandleMessage()) {
                     if (handler.mResultUrl != null &&
-                            handler.mResultUrl.equals(TestHtmlConstants.HTML_URL2)) {
+                            handler.mResultUrl.equals(url2)) {
                         done = true;
                     } else {
                         handler.reset();
@@ -1195,7 +1199,7 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
                 return done;
             }
         }.run();
-        assertEquals(TestHtmlConstants.HTML_URL2, handler.getResultUrl());
+        assertEquals(url2, handler.getResultUrl());
 
         mOnUiThread.requestFocusNodeHref(null);
     }
