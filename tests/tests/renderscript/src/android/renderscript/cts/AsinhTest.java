@@ -81,7 +81,7 @@ public class AsinhTest extends RSBaseCompute {
     }
 
     public void testAsinhF32_relaxed() {
-        doF32_relaxed(0x12, 4);
+        doF32_relaxed(0x12, 128);
     }
 
     public void testAsinhF32_2() {
@@ -89,7 +89,7 @@ public class AsinhTest extends RSBaseCompute {
     }
 
     public void testAsinhF32_2_relaxed() {
-        doF32_2_relaxed(0xead, 4);
+        doF32_2_relaxed(0xead, 128);
     }
 
     public void testAsinhF32_3() {
@@ -97,7 +97,7 @@ public class AsinhTest extends RSBaseCompute {
     }
 
     public void testAsinhF32_3_relaxed() {
-        doF32_3_relaxed(0xabc, 4);
+        doF32_3_relaxed(0xabc, 128);
     }
 
     public void testAsinhF32_4() {
@@ -105,7 +105,7 @@ public class AsinhTest extends RSBaseCompute {
 
     }
     public void testAsinhF32_4_relaxed() {
-        doF32_4_relaxed(0xfea, 4);
+        doF32_4_relaxed(0xfea, 128);
     }
 
 }

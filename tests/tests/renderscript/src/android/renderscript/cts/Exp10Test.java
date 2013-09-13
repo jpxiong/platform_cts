@@ -80,7 +80,7 @@ public class Exp10Test extends RSBaseCompute {
     }
 
     public void testExp10F32_relaxed() {
-        doF32_relaxed(0x81, 3);
+        doF32_relaxed(0x81, 16);
     }
 
     public void testExp10F32_2() {
@@ -88,7 +88,7 @@ public class Exp10Test extends RSBaseCompute {
     }
 
     public void testExp10F32_2_relaxed() {
-        doF32_2_relaxed(0xa42, 3);
+        doF32_2_relaxed(0xa42, 16);
     }
 
     public void testExp10F32_3() {
@@ -96,7 +96,7 @@ public class Exp10Test extends RSBaseCompute {
     }
 
     public void testExp10F32_3_relaxed() {
-        doF32_3_relaxed(0xace2, 3);
+        doF32_3_relaxed(0xace2, 16);
     }
 
     public void testExp10F32_4() {
@@ -104,7 +104,7 @@ public class Exp10Test extends RSBaseCompute {
 
     }
     public void testExp10F32_4_relaxed() {
-        doF32_4_relaxed(0x918, 3);
+        doF32_4_relaxed(0x918, 16);
     }
 
 }

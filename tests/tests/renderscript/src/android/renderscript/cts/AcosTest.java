@@ -92,19 +92,19 @@ public class AcosTest extends RSBaseCompute {
     }
 
     public void testAcosF32_relaxed() {
-        doF32_relaxed(0x123e, 4);
+        doF32_relaxed(0x123e, 128);
     }
 
     public void testAcosF32_2_relaxed() {
-        doF32_2_relaxed(0x1e, 4);
+        doF32_2_relaxed(0x1e, 128);
     }
 
     public void testAcosF32_3_relaxed() {
-        doF32_3_relaxed(0xeaf, 4);
+        doF32_3_relaxed(0xeaf, 128);
     }
 
     public void testAcosF32_4_relaxed() {
-        doF32_4_relaxed(0x123, 4);
+        doF32_4_relaxed(0x123, 128);
     }
 
 

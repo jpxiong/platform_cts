@@ -81,7 +81,7 @@ public class CoshTest extends RSBaseCompute {
     }
 
     public void testCoshF32_relaxed() {
-        doF32_relaxed(0xfe, 4);
+        doF32_relaxed(0xfe, 128);
     }
 
     public void testCoshF32_2() {
@@ -89,7 +89,7 @@ public class CoshTest extends RSBaseCompute {
     }
 
     public void testCoshF32_2_relaxed() {
-        doF32_2_relaxed(0x71, 4);
+        doF32_2_relaxed(0x71, 128);
     }
 
     public void testCoshF32_3() {
@@ -97,7 +97,7 @@ public class CoshTest extends RSBaseCompute {
     }
 
     public void testCoshF32_3_relaxed() {
-        doF32_3_relaxed(0xa, 4);
+        doF32_3_relaxed(0xa, 128);
     }
 
     public void testCoshF32_4() {
@@ -105,7 +105,7 @@ public class CoshTest extends RSBaseCompute {
 
     }
     public void testCoshF32_4_relaxed() {
-        doF32_4_relaxed(0xabe, 4);
+        doF32_4_relaxed(0xabe, 128);
     }
 
 }

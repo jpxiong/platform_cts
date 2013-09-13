@@ -80,7 +80,7 @@ public class AcosPiTest extends RSBaseCompute {
     }
 
     public void testAcosPiF32_relaxed() {
-        doF32_relaxed(0xe1, 5);
+        doF32_relaxed(0xe1, 128);
     }
 
     public void testAcosPiF32_2() {
@@ -88,7 +88,7 @@ public class AcosPiTest extends RSBaseCompute {
     }
 
     public void testAcosPiF32_2_relaxed() {
-        doF32_2_relaxed(0xa123, 5);
+        doF32_2_relaxed(0xa123, 128);
     }
 
     public void testAcosPiF32_3() {
@@ -96,7 +96,7 @@ public class AcosPiTest extends RSBaseCompute {
     }
 
     public void testAcosPiF32_3_relaxed() {
-        doF32_3_relaxed(0x123, 5);
+        doF32_3_relaxed(0x123, 128);
     }
 
     public void testAcosPiF32_4() {
@@ -104,7 +104,7 @@ public class AcosPiTest extends RSBaseCompute {
 
     }
     public void testAcosPiF32_4_relaxed() {
-        doF32_4_relaxed(0x123ef, 5);
+        doF32_4_relaxed(0x123ef, 128);
     }
 
 }

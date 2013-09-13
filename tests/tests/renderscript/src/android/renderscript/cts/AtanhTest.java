@@ -81,7 +81,7 @@ public class AtanhTest extends RSBaseCompute {
     }
 
     public void testAtanhF32_relaxed() {
-        doF32_relaxed(0xace, 5);
+        doF32_relaxed(0xace, 128);
     }
 
     public void testAtanhF32_2() {
@@ -89,7 +89,7 @@ public class AtanhTest extends RSBaseCompute {
     }
 
     public void testAtanhF32_2_relaxed() {
-        doF32_2_relaxed(0xdae, 5);
+        doF32_2_relaxed(0xdae, 128);
     }
 
     public void testAtanhF32_3() {
@@ -97,7 +97,7 @@ public class AtanhTest extends RSBaseCompute {
     }
 
     public void testAtanhF32_3_relaxed() {
-        doF32_3_relaxed(0x123, 5);
+        doF32_3_relaxed(0x123, 128);
     }
 
     public void testAtanhF32_4() {
@@ -105,7 +105,7 @@ public class AtanhTest extends RSBaseCompute {
 
     }
     public void testAtanhF32_4_relaxed() {
-        doF32_4_relaxed(0x6480, 5);
+        doF32_4_relaxed(0x6480, 128);
     }
 
 }
