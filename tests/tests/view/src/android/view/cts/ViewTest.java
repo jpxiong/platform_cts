@@ -3387,7 +3387,8 @@ public class ViewTest extends ActivityInstrumentationTestCase2<ViewTestStubActiv
         }
 
         @Override
-        public void childAccessibilityStateChanged(View root) {
+        public void notifySubtreeAccessibilityStateChanged(View child,
+            View source, int changeType) {
 
         }
     }
