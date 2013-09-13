@@ -70,7 +70,6 @@ public class CameraDeviceTest extends AndroidTestCase {
     private static final int MAX_NUM_IMAGES = 5;
 
     private static int[] mTemplates = new int[] {
-            CameraDevice.TEMPLATE_MANUAL,
             CameraDevice.TEMPLATE_PREVIEW,
             CameraDevice.TEMPLATE_RECORD,
             CameraDevice.TEMPLATE_STILL_CAPTURE,
@@ -123,7 +122,7 @@ public class CameraDeviceTest extends AndroidTestCase {
      * This class need to be public because spy need access it.
      */
     public class SimpleDeviceListener extends CameraDevice.CameraDeviceListener {
-        private Object mIdleLock = new Object();
+        private final Object mIdleLock = new Object();
         private boolean mIdle = false;
 
         public SimpleDeviceListener() {
@@ -281,6 +280,7 @@ public class CameraDeviceTest extends AndroidTestCase {
 
     private class IsCameraMetadataNotEmpty<T extends CameraMetadata>
             extends ArgumentMatcher<T> {
+        @Override
         public boolean matches(Object obj) {
             /**
              * Do the simple verification here. Only verify the timestamp for now.
@@ -441,7 +441,7 @@ public class CameraDeviceTest extends AndroidTestCase {
     }
 
     private void createDefaultSurface() throws Exception {
-        ImageReader mReader =
+        mReader =
                 new ImageReader(DEFAULT_CAPTURE_WIDTH,
                         DEFAULT_CAPTURE_HEIGHT,
                         ImageFormat.YUV_420_888,
@@ -449,7 +449,7 @@ public class CameraDeviceTest extends AndroidTestCase {
         mSurface = mReader.getSurface();
         // Create dummy image listener since we don't care the image data in this test.
         ImageReader.OnImageAvailableListener listener = new ImageDropperListener();
-        CameraTestThread mDummyThread = new CameraTestThread();
+        mDummyThread = new CameraTestThread();
         mReader.setImageAvailableListener(listener, mDummyThread.start());
     }
 
@@ -461,7 +461,7 @@ public class CameraDeviceTest extends AndroidTestCase {
                 timeout(CAPTURE_WAIT_TIMEOUT_MS).atLeast(expectResultCount))
                         .onCaptureCompleted(
                                 any(CameraDevice.class),
-                                argThat(new IsCameraMetadataNotEmpty<CaptureRequest>()),
+                                any(CaptureRequest.class),
                                 argThat(new IsCameraMetadataNotEmpty<CaptureResult>()));
         // Should not receive any capture failed callbacks.
         verify(mockListener, never())
