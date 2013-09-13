@@ -886,7 +886,7 @@ public class MediaPlayerTest extends MediaPlayerTestBase {
         mMediaPlayer.setOnTimedTextListener(new MediaPlayer.OnTimedTextListener() {
             @Override
             public void onTimedText(MediaPlayer mp, TimedText text) {
-                final int toleranceMs = 100;
+                final int toleranceMs = 150;
                 final int durationMs = 500;
                 int posMs = mMediaPlayer.getCurrentPosition();
                 if (text != null) {
