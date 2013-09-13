@@ -105,7 +105,6 @@ public class DecoderTest extends MediaPlayerTestBase {
         short [] mono = decodeToMemory(res, false, -1, null);
         if (mono.length == 44100) {
             // expected
-            return;
         } else if (mono.length == 88200) {
             // the decoder output 2 channels instead of 1, check that the left and right channel
             // are identical
@@ -118,7 +117,7 @@ public class DecoderTest extends MediaPlayerTestBase {
 
         // we should get the same data when reconfiguring the codec
         short [] mono2 = decodeToMemory(res, true, -1, null);
-        Arrays.equals(mono, mono2);
+        assertTrue(Arrays.equals(mono, mono2));
     }
 
     /**
