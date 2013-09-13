@@ -80,7 +80,7 @@ public class SinhTest extends RSBaseCompute {
     }
 
     public void testSinhF32_relaxed() {
-        doF32_relaxed(0x32a, 4);
+        doF32_relaxed(0x32a, 128);
     }
 
     public void testSinhF32_2() {
@@ -88,7 +88,7 @@ public class SinhTest extends RSBaseCompute {
     }
 
     public void testSinhF32_2_relaxed() {
-        doF32_2_relaxed(0xba35, 4);
+        doF32_2_relaxed(0xba35, 128);
     }
 
     public void testSinhF32_3() {
@@ -96,7 +96,7 @@ public class SinhTest extends RSBaseCompute {
     }
 
     public void testSinhF32_3_relaxed() {
-        doF32_3_relaxed(0xacc3, 4);
+        doF32_3_relaxed(0xacc3, 128);
     }
 
     public void testSinhF32_4() {
@@ -104,7 +104,7 @@ public class SinhTest extends RSBaseCompute {
 
     }
     public void testSinhF32_4_relaxed() {
-        doF32_4_relaxed(0xaa, 4);
+        doF32_4_relaxed(0xaa, 128);
     }
 
 }

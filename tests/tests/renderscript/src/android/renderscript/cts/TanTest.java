@@ -80,7 +80,7 @@ public class TanTest extends RSBaseCompute {
     }
 
     public void testTanF32_relaxed() {
-        doF32_relaxed(0xabe, 5);
+        doF32_relaxed(0xabe, 128);
     }
 
     public void testTanF32_2() {
@@ -88,7 +88,7 @@ public class TanTest extends RSBaseCompute {
     }
 
     public void testTanF32_2_relaxed() {
-        doF32_2_relaxed(0x29, 5);
+        doF32_2_relaxed(0x29, 128);
     }
 
     public void testTanF32_3() {
@@ -96,7 +96,7 @@ public class TanTest extends RSBaseCompute {
     }
 
     public void testTanF32_3_relaxed() {
-        doF32_3_relaxed(0x9a, 5);
+        doF32_3_relaxed(0x9a, 128);
     }
 
     public void testTanF32_4() {
@@ -104,7 +104,7 @@ public class TanTest extends RSBaseCompute {
 
     }
     public void testTanF32_4_relaxed() {
-        doF32_4_relaxed(0xac3, 5);
+        doF32_4_relaxed(0xac3, 128);
     }
 
 }

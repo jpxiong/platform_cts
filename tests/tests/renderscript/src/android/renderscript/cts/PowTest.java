@@ -101,7 +101,7 @@ public class PowTest extends RSBaseCompute {
     public void testPowF32_relaxed() {
         ScriptField_PowInputData in = new ScriptField_PowInputData(mRS, INPUTSIZE);
         mIn = in.getAllocation();
-        doF32_relaxed(0x12345678, 16);
+        doF32_relaxed(0x12345678, 128);
     }
 
     public void testPowF32_2() {
@@ -113,7 +113,7 @@ public class PowTest extends RSBaseCompute {
     public void testPowF32_2_relaxed() {
         ScriptField_PowInputData_2 in = new ScriptField_PowInputData_2(mRS, INPUTSIZE);
         mIn = in.getAllocation();
-        doF32_2_relaxed(0x12ab78, 16);
+        doF32_2_relaxed(0x12ab78, 128);
     }
 
     public void testPowF32_3() {
@@ -125,7 +125,7 @@ public class PowTest extends RSBaseCompute {
     public void testPowF32_3_relaxed() {
         ScriptField_PowInputData_3 in = new ScriptField_PowInputData_3(mRS, INPUTSIZE);
         mIn = in.getAllocation();
-        doF32_3_relaxed(0x1f5678, 16);
+        doF32_3_relaxed(0x1f5678, 128);
     }
 
     public void testPowF32_4() {
@@ -137,6 +137,6 @@ public class PowTest extends RSBaseCompute {
     public void testPowF32_4_relaxed() {
         ScriptField_PowInputData_4 in = new ScriptField_PowInputData_4(mRS, INPUTSIZE);
         mIn = in.getAllocation();
-        doF32_4_relaxed(0xc678, 16);
+        doF32_4_relaxed(0xc678, 128);
     }
 }

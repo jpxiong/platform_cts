@@ -95,7 +95,7 @@ public class Atan2PiTest extends RSBaseCompute {
     public void testAtan2PiF32_relaxed() {
         ScriptField_atan2pi_float_input in = new ScriptField_atan2pi_float_input(mRS, INPUTSIZE);
         mIn = in.getAllocation();
-        doF32_relaxed(0x12678, 6);
+        doF32_relaxed(0x12678, 128);
     }
 
     public void testAtan2PiF32_2() {
@@ -107,7 +107,7 @@ public class Atan2PiTest extends RSBaseCompute {
     public void testAtan2PiF32_2_relaxed() {
         ScriptField_atan2pi_float2_input in = new ScriptField_atan2pi_float2_input(mRS, INPUTSIZE);
         mIn = in.getAllocation();
-        doF32_2_relaxed(0x1af45, 6);
+        doF32_2_relaxed(0x1af45, 128);
     }
 
     public void testAtan2PiF32_3() {
@@ -119,7 +119,7 @@ public class Atan2PiTest extends RSBaseCompute {
     public void testAtan2PiF32_3_relaxed() {
         ScriptField_atan2pi_float3_input in = new ScriptField_atan2pi_float3_input(mRS, INPUTSIZE);
         mIn = in.getAllocation();
-        doF32_3_relaxed(0x1cd345, 6);
+        doF32_3_relaxed(0x1cd345, 128);
     }
 
     public void testAtan2PiF32_4() {
@@ -131,6 +131,6 @@ public class Atan2PiTest extends RSBaseCompute {
     public void testAtan2PiF32_4_relaxed() {
         ScriptField_atan2pi_float4_input in = new ScriptField_atan2pi_float4_input(mRS, INPUTSIZE);
         mIn = in.getAllocation();
-        doF32_4_relaxed(0x1ca45, 6);
+        doF32_4_relaxed(0x1ca45, 128);
     }
 }
