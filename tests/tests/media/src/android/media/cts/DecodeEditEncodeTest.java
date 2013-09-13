@@ -88,7 +88,7 @@ public class DecodeEditEncodeTest extends AndroidTestCase {
 
 
     public void testVideoEditQCIF() throws Throwable {
-        setParameters(176, 144, 1000000);
+        setParameters(176, 144, 1100000);
         VideoEditWrapper.runTest(this);
     }
     public void testVideoEditQVGA() throws Throwable {
