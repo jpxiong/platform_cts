@@ -26,7 +26,6 @@ import android.hardware.camera2.CaptureRequest;
 import android.hardware.camera2.CaptureResult;
 import android.media.Image;
 import android.media.ImageReader;
-import android.media.ImageReader.MaxImagesAcquiredException;
 import android.os.Handler;
 import android.os.SystemClock;
 import android.test.AndroidTestCase;
@@ -382,12 +381,13 @@ public class CameraDeviceTest extends AndroidTestCase {
     private class ImageDropperListener implements ImageReader.OnImageAvailableListener {
         @Override
         public void onImageAvailable(ImageReader reader) {
+            Image image = null;
             try {
-                Image image = reader.acquireNextImage();
-                image.close();
-            } catch (MaxImagesAcquiredException e) {
-                // Impossible: We drop every frame we get.
-                throw new IllegalStateException(e);
+                image = reader.acquireNextImage();
+            } finally {
+                if (image != null) {
+                    image.close();
+                }
             }
         }
     }
