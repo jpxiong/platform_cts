@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2009 The Android Open Source Project
+ * Copyright (C) 2013 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,18 +16,22 @@
 
 package android.util.cts;
 
-import android.test.AndroidTestCase;
-import android.util.SparseArray;
+import android.util.LongSparseArray;
 
-public class SparseArrayTest extends AndroidTestCase {
-    private static final int[] KEYS = {12, 23, 4, 6, 8, 1, 3, -12, 0, -3, 11, 14, -23};
+import junit.framework.TestCase;
+
+/**
+ * Tests for {@link LongSparseArray}.
+ */
+public class LongSparseArrayTest extends TestCase {
+    private static final long[] KEYS = {12, 23, 4, 6, 8, 1, 3, -12, 0, -3, 11, 14, -23};
     private static final Integer[] VALUES = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12};
     private static final int LENGTH = VALUES.length;
-    private static final int NON_EXISTED_KEY = 123;
+    private static final long NON_EXISTED_KEY = 123;
     private static final Integer VALUE_FOR_NON_EXISTED_KEY = -1;
 
     public void testSparseArrayWithDefaultCapacity() {
-        SparseArray<Integer> sparseArray = new SparseArray<Integer>();
+        LongSparseArray<Integer> sparseArray = new LongSparseArray<Integer>();
         assertEquals(0, sparseArray.size());
 
         int length = VALUES.length;
@@ -46,7 +50,7 @@ public class SparseArrayTest extends AndroidTestCase {
         }
 
         // for key already exist, old value will be replaced
-        int existKey = KEYS[0];
+        long existKey = KEYS[0];
         Integer oldValue = VALUES[0]; // 0
         Integer newValue = 100;
         assertEquals(oldValue, sparseArray.get(existKey));
@@ -92,7 +96,7 @@ public class SparseArrayTest extends AndroidTestCase {
     }
 
     public void testSparseArrayWithSpecifiedCapacity() {
-        SparseArray<Integer> sparseArray = new SparseArray<Integer>(5);
+        LongSparseArray<Integer> sparseArray = new LongSparseArray<Integer>(5);
         assertEquals(0, sparseArray.size());
 
         int length = VALUES.length;
@@ -111,7 +115,7 @@ public class SparseArrayTest extends AndroidTestCase {
         }
 
         // for key already exist, old value will be replaced
-        int existKey = KEYS[0];
+        long existKey = KEYS[0];
         Integer oldValue = VALUES[0]; // 0
         Integer newValue = 100;
         assertEquals(oldValue, sparseArray.get(existKey));
@@ -157,21 +161,22 @@ public class SparseArrayTest extends AndroidTestCase {
     }
 
     public void testIterationOrder() {
-        SparseArray<Long> sparseArray = new SparseArray<Long>();
+        LongSparseArray<Long> sparseArray = new LongSparseArray<Long>();
         // No matter in which order they are inserted.
-        sparseArray.put(1, Long.valueOf(2L));
-        sparseArray.put(10, Long.valueOf(20L));
-        sparseArray.put(5, Long.valueOf(40L));
-        sparseArray.put(Integer.MAX_VALUE, Long.valueOf(Long.MIN_VALUE));
+        sparseArray.put(1L, Long.valueOf(2L));
+        sparseArray.put(10L, Long.valueOf(20L));
+        sparseArray.put(5L, Long.valueOf(40L));
+        sparseArray.put(Long.MAX_VALUE, Long.valueOf(Long.MIN_VALUE));
         // The keys are returned in order.
-        assertEquals(1, sparseArray.keyAt(0));
-        assertEquals(5, sparseArray.keyAt(1));
-        assertEquals(10, sparseArray.keyAt(2));
-        assertEquals(Integer.MAX_VALUE, sparseArray.keyAt(3));
+        assertEquals(1L, sparseArray.keyAt(0));
+        assertEquals(5L, sparseArray.keyAt(1));
+        assertEquals(10L, sparseArray.keyAt(2));
+        assertEquals(Long.MAX_VALUE, sparseArray.keyAt(3));
         // The values are returned in the order of the corresponding keys.
         assertEquals(2L, sparseArray.valueAt(0).longValue());
         assertEquals(40L, sparseArray.valueAt(1).longValue());
         assertEquals(20L, sparseArray.valueAt(2).longValue());
         assertEquals(Long.MIN_VALUE, sparseArray.valueAt(3).longValue());
     }
+
 }
