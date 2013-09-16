@@ -19,6 +19,7 @@ package android.media.cts;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.net.Uri;
+import android.os.Bundle;
 import android.os.Environment;
 import android.test.AndroidTestCase;
 
@@ -47,8 +48,12 @@ public class MediaScannerNotificationTest extends AndroidTestCase {
         String [] temps = new String[] { "avi", "gif", "jpg", "dat", "mp3", "mp4", "txt" };
         String tmpPath = createTempFiles(temps);
 
-        mContext.sendBroadcast(new Intent(Intent.ACTION_MEDIA_MOUNTED, Uri.parse("file://"
-                + Environment.getExternalStorageDirectory())));
+        Bundle args = new Bundle();
+        args.putString("volume", "external");
+        Intent i = new Intent("android.media.IMediaScannerService").putExtras(args);
+        i.setClassName("com.android.providers.media",
+                "com.android.providers.media.MediaScannerService");
+        mContext.startService(i);
 
         startedReceiver.waitForBroadcast();
         finishedReceiver.waitForBroadcast();
@@ -64,8 +69,7 @@ public class MediaScannerNotificationTest extends AndroidTestCase {
         }
         startedReceiver.reset();
         finishedReceiver.reset();
-        mContext.sendBroadcast(new Intent(Intent.ACTION_MEDIA_MOUNTED, Uri.parse("file://"
-                + Environment.getExternalStorageDirectory())));
+        mContext.startService(i);
         startedReceiver.waitForBroadcast();
         finishedReceiver.waitForBroadcast();
 
@@ -76,8 +80,7 @@ public class MediaScannerNotificationTest extends AndroidTestCase {
         // scan one more time just to clean everything up nicely
         startedReceiver.reset();
         finishedReceiver.reset();
-        mContext.sendBroadcast(new Intent(Intent.ACTION_MEDIA_MOUNTED, Uri.parse("file://"
-                + Environment.getExternalStorageDirectory())));
+        mContext.startService(i);
         startedReceiver.waitForBroadcast();
         finishedReceiver.waitForBroadcast();
 
