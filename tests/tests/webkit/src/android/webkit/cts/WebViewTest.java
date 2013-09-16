@@ -1707,17 +1707,20 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
 
     public void testRequestChildRectangleOnScreen() throws Throwable {
         DisplayMetrics metrics = mOnUiThread.getDisplayMetrics();
-        int dimension = 2 * Math.max(metrics.widthPixels, metrics.heightPixels);
+        final int dimension = 2 * Math.max(metrics.widthPixels, metrics.heightPixels);
         String p = "<p style=\"height:" + dimension + "px;width:" + dimension + "px\">&nbsp;</p>";
         mOnUiThread.loadDataAndWaitForCompletion("<html><body>" + p
                 + "</body></html>", "text/html", null);
-        getInstrumentation().waitForIdleSync();
+        new PollingCheck() {
+            @Override
+            protected boolean check() {
+                return mOnUiThread.getContentHeight() >= dimension;
+            }
+        }.run();
 
         int origX = mOnUiThread.getScrollX();
         int origY = mOnUiThread.getScrollY();
 
-        metrics = mOnUiThread.getDisplayMetrics();
-        dimension = 2 * Math.max(metrics.widthPixels, metrics.heightPixels);
         int half = dimension / 2;
         Rect rect = new Rect(half, half, half + 1, half + 1);
         assertTrue(mOnUiThread.requestChildRectangleOnScreen(mWebView, rect, true));
