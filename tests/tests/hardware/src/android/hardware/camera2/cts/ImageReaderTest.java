@@ -185,7 +185,7 @@ public class ImageReaderTest extends AndroidTestCase {
         }
 
         public void waitForImage() {
-            final int TIMEOUT_MS = 500;
+            final int TIMEOUT_MS = 5000;
             synchronized (mImageSyncObject) {
                 while (mPendingImages == 0) {
                     try {
