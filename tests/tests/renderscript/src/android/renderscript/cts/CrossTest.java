@@ -86,11 +86,14 @@ public class CrossTest extends RSBaseCompute {
         doF32_3(0x12345678, 0);
     }
 
+    /*
+    Disable until we can add an absolute error metric
     public void testCrossF32_3_relaxed() {
         ScriptField__cross_f32_3_struct in = new ScriptField__cross_f32_3_struct(mRS, INPUTSIZE);
         mIn = in.getAllocation();
         doF32_3_relaxed(0x12345678, 2);
     }
+    */
 
 
     /**
@@ -102,10 +105,13 @@ public class CrossTest extends RSBaseCompute {
         doF32_4(0x12ac5678, 0);
     }
 
+    /*
+    Disable until we can add an absolute error metric
     public void testCrossF32_4_relaxed() {
         ScriptField__cross_f32_4_struct in = new ScriptField__cross_f32_4_struct(mRS, INPUTSIZE);
         mIn = in.getAllocation();
         doF32_4_relaxed(0x12ac5678, 2);
     }
+    */
 
 }
