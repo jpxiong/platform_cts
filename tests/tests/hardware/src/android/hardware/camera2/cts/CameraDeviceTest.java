@@ -26,6 +26,7 @@ import android.hardware.camera2.CaptureRequest;
 import android.hardware.camera2.CaptureResult;
 import android.media.Image;
 import android.media.ImageReader;
+import android.media.ImageReader.MaxImagesAcquiredException;
 import android.os.Handler;
 import android.os.SystemClock;
 import android.test.AndroidTestCase;
@@ -435,14 +436,19 @@ public class CameraDeviceTest extends AndroidTestCase {
     private class ImageDropperListener implements ImageReader.OnImageAvailableListener {
         @Override
         public void onImageAvailable(ImageReader reader) {
-            Image image = reader.getNextImage();
-            image.close();
+            try {
+                Image image = reader.acquireNextImage();
+                image.close();
+            } catch (MaxImagesAcquiredException e) {
+                // Impossible: We drop every frame we get.
+                throw new IllegalStateException(e);
+            }
         }
     }
 
     private void createDefaultSurface() throws Exception {
         mReader =
-                new ImageReader(DEFAULT_CAPTURE_WIDTH,
+                ImageReader.newInstance(DEFAULT_CAPTURE_WIDTH,
                         DEFAULT_CAPTURE_HEIGHT,
                         ImageFormat.YUV_420_888,
                         MAX_NUM_IMAGES);
@@ -450,7 +456,7 @@ public class CameraDeviceTest extends AndroidTestCase {
         // Create dummy image listener since we don't care the image data in this test.
         ImageReader.OnImageAvailableListener listener = new ImageDropperListener();
         mDummyThread = new CameraTestThread();
-        mReader.setImageAvailableListener(listener, mDummyThread.start());
+        mReader.setOnImageAvailableListener(listener, mDummyThread.start());
     }
 
     private void verifyCaptureResults(
