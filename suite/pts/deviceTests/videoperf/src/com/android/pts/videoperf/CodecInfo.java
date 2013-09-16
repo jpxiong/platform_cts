@@ -80,7 +80,9 @@ public class CodecInfo {
             int maxW = 0;
             int maxH = 0;
             int bitRate = 0;
-            double fps = 0; // frame rate for the max resolution
+            int mbW = (w + 15) / 16; // size in macroblocks
+            int mbH = (h + 15) / 16;
+            int maxMacroblocksPerSecond = 0; // max decoding speed
             switch(highestLevel) {
             // Do not support Level 1 to 2.
             case CodecProfileLevel.AVCLevel1:
@@ -94,67 +96,62 @@ public class CodecInfo {
                 maxW = 352;
                 maxH = 576;
                 bitRate = 4000000;
-                fps = 25;
+                maxMacroblocksPerSecond = 19800;
                 break;
             case CodecProfileLevel.AVCLevel22:
                 maxW = 720;
                 maxH = 480;
                 bitRate = 4000000;
-                fps = 15;
+                maxMacroblocksPerSecond = 20250;
                 break;
             case CodecProfileLevel.AVCLevel3:
                 maxW = 720;
                 maxH = 480;
                 bitRate = 10000000;
-                fps = 30;
+                maxMacroblocksPerSecond = 40500;
                 break;
             case CodecProfileLevel.AVCLevel31:
                 maxW = 1280;
                 maxH = 720;
                 bitRate = 14000000;
-                fps = 30;
+                maxMacroblocksPerSecond = 108000;
                 break;
             case CodecProfileLevel.AVCLevel32:
                 maxW = 1280;
                 maxH = 720;
                 bitRate = 20000000;
-                fps = 60;
+                maxMacroblocksPerSecond = 216000;
                 break;
             case CodecProfileLevel.AVCLevel4:
                 maxW = 1920;
                 maxH = 1080;
                 bitRate = 20000000;
-                fps = 30.1;
+                maxMacroblocksPerSecond = 245760;
                 break;
             case CodecProfileLevel.AVCLevel41:
                 maxW = 1920;
                 maxH = 1080;
                 bitRate = 50000000;
-                fps = 30.1;
+                maxMacroblocksPerSecond = 245760;
                 break;
             case CodecProfileLevel.AVCLevel42:
                 maxW = 2048;
                 maxH = 1080;
                 bitRate = 50000000;
-                fps = 60;
+                maxMacroblocksPerSecond = 522240;
                 break;
             case CodecProfileLevel.AVCLevel5:
                 maxW = 3672;
                 maxH = 1536;
                 bitRate = 135000000;
-                fps = 26.7;
+                maxMacroblocksPerSecond = 589824;
                 break;
             case CodecProfileLevel.AVCLevel51:
-                maxW = 4096;
-                maxH = 2304;
-                bitRate = 240000000;
-                fps = 26.7;
-                break;
             default:
                 maxW = 4096;
                 maxH = 2304;
                 bitRate = 240000000;
-                fps = 26.7;
+                maxMacroblocksPerSecond = 983040;
                 break;
             }
             if ((w > maxW) || (h > maxH)) {
@@ -162,7 +159,7 @@ public class CodecInfo {
                         maxW + "," + maxH + ")");
                 return null;
             }
-            info.mFps = (int)(fps * maxW * maxH / (w * h));
+            info.mFps = maxMacroblocksPerSecond / mbH / mbW;
             info.mBitRate = bitRate;
             Log.i(TAG, "AVC Level " + Integer.toHexString(highestLevel) + " bit rate " + bitRate +
                     " fps " + info.mFps);
