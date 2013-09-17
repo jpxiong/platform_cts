@@ -249,7 +249,7 @@ public class AlertDialog_BuilderTest extends ActivityInstrumentationTestCase2<Di
         assertTrue(mResult);
     }
 
-    private void setCancelable(final boolean cancelable) throws Throwable {
+    private void testCancelable(final boolean cancelable) throws Throwable {
         runTestOnUiThread(new Runnable() {
             public void run() {
                 mBuilder = new AlertDialog.Builder(mContext);
@@ -258,18 +258,37 @@ public class AlertDialog_BuilderTest extends ActivityInstrumentationTestCase2<Di
             }
         });
         mInstrumentation.waitForIdleSync();
+        new PollingCheck() {
+            @Override
+            protected boolean check() {
+                return mDialog.isShowing();
+            }
+        }.run();
+        mInstrumentation.sendKeyDownUpSync(KeyEvent.KEYCODE_BACK);
+        mInstrumentation.waitForIdleSync();
+        new PollingCheck() {
+            @Override
+            protected boolean check() {
+                boolean showing = mDialog.isShowing();
+                if (cancelable) {
+                    // if the dialog is cancelable, then pressing back
+                    // should cancel it. Thus it should not be showing
+                    return !showing;
+                } else {
+                    // if the dialog is not cancelable, pressing back
+                    // should so nothing and it should still be showing
+                    return showing;
+                }
+            }
+        }.run();
     }
 
     public void testSetCancelable() throws Throwable {
-        setCancelable(true);
-        mInstrumentation.sendKeyDownUpSync(KeyEvent.KEYCODE_BACK);
-        assertFalse(mDialog.isShowing());
+        testCancelable(true);
     }
 
     public void testDisableCancelable() throws Throwable {
-        setCancelable(false);
-        mInstrumentation.sendKeyDownUpSync(KeyEvent.KEYCODE_BACK);
-        assertTrue(mDialog.isShowing());
+        testCancelable(false);
     }
 
     public void testSetOnCancelListener() throws Throwable {
