@@ -207,47 +207,6 @@ public class AppSecurityTests extends DeviceTestCase implements IBuildReceiver {
     }
 
     /**
-     * Test behavior when
-     * {@link android.Manifest.permission#READ_EXTERNAL_STORAGE} is unenforced.
-     */
-    public void testReadExternalStorageUnenforced() throws Exception {
-        try {
-            getDevice().uninstallPackage(EXTERNAL_STORAGE_APP_PKG);
-            getDevice().uninstallPackage(WRITE_EXTERNAL_STORAGE_APP_PKG);
-
-            // stage test file on external storage
-            getDevice().pushString("CAEK",
-                    getDevice().getMountPoint(IDevice.MNT_EXTERNAL_STORAGE) + "/meow");
-
-            // mark permission as not enforced
-            setPermissionEnforced(getDevice(), READ_EXTERNAL_STORAGE, false);
-
-            // install apps and run test
-            assertNull(getDevice()
-                    .installPackage(getTestAppFile(EXTERNAL_STORAGE_APP_APK), false));
-            assertNull(getDevice()
-                    .installPackage(getTestAppFile(WRITE_EXTERNAL_STORAGE_APP_APK), false));
-
-            // normal app should be able to read
-            assertTrue("Normal app unable to read external storage", runDeviceTests(
-                    EXTERNAL_STORAGE_APP_PKG, EXTERNAL_STORAGE_APP_CLASS,
-                    "testReadExternalStorage"));
-
-            // WRITE_EXTERNAL app should be able to read and write
-            assertTrue("WRITE_EXTERNAL app unable to read external storage", runDeviceTests(
-                    WRITE_EXTERNAL_STORAGE_APP_PKG, WRITE_EXTERNAL_STORAGE_APP_CLASS,
-                    "testReadExternalStorage"));
-            assertTrue("WRITE_EXTERNAL app unable to write external storage", runDeviceTests(
-                    WRITE_EXTERNAL_STORAGE_APP_PKG, WRITE_EXTERNAL_STORAGE_APP_CLASS,
-                    "testWriteExternalStorage"));
-
-        } finally {
-            getDevice().uninstallPackage(EXTERNAL_STORAGE_APP_PKG);
-            getDevice().uninstallPackage(WRITE_EXTERNAL_STORAGE_APP_PKG);
-        }
-    }
-
-    /**
      * Verify that legacy filesystem paths continue working, and that they all
      * point to same location.
      */
@@ -540,12 +499,5 @@ public class AppSecurityTests extends DeviceTestCase implements IBuildReceiver {
 
         getDevice().executeShellCommand(cmd, parser);
         return listener.getCurrentRunResults();
-    }
-
-    private static void setPermissionEnforced(
-            ITestDevice device, String permission, boolean enforced)
-            throws DeviceNotAvailableException {
-        device.executeShellCommand("pm set-permission-enforced " + permission + " "
-                + Boolean.toString(enforced));
     }
 }
