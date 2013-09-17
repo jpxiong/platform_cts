@@ -25,16 +25,17 @@
     <application>
         <service
             android:name="android.os.cts.ParcelFileDescriptorPeer$Red"
-            android:process=":red" />
+            android:process=":red"
+            android:exported="true" />
         <service
             android:name="android.os.cts.ParcelFileDescriptorPeer$Blue"
-            android:process=":blue" />
+            android:process=":blue"
+            android:exported="true" />
         <uses-library android:name="android.test.runner" />
     </application>
 
     <instrumentation android:name="android.test.InstrumentationCtsTestRunner"
-                     android:targetPackage="com.android.cts.os"
+                     android:targetPackage="com.android.cts.stub"
                      android:label="CTS tests of android.os"/>
 
 </manifest>
-
