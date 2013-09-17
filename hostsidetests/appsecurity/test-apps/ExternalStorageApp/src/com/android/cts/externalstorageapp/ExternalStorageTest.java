@@ -45,15 +45,6 @@ public class ExternalStorageTest extends AndroidTestCase {
         }
     }
 
-    public void testReadExternalStorage() throws Exception {
-        assertExternalStorageMounted();
-        try {
-            readExternalStorage();
-        } catch (IOException e) {
-            fail("unable to read external file");
-        }
-    }
-
     public void testFailReadExternalStorage() throws Exception {
         assertExternalStorageMounted();
         try {
