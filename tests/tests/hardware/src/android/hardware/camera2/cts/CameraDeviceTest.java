@@ -46,7 +46,7 @@ public class CameraDeviceTest extends AndroidTestCase {
     private static final boolean VERBOSE = Log.isLoggable(TAG, Log.VERBOSE);
 
     private CameraManager mCameraManager;
-    private CameraDevice.CameraDeviceListener mMockDeviceListener;
+    private CameraDevice.StateListener mMockDeviceListener;
     private CameraTestThread mLooperThread;
     private Handler mCallbackHandler;
 
@@ -120,13 +120,17 @@ public class CameraDeviceTest extends AndroidTestCase {
 
     /**
      * This class need to be public because spy need access it.
+     *
+     * <p><b>Warning</b>: {@link #onOpened} does nothing, so only use this with the
+     * {@link CameraTestUtils#openCamera}
+     * If using this with {@link CameraManager#openDevice} directly,
+     * remember to implement openCamera!</p>
      */
-    public class SimpleDeviceListener extends CameraDevice.CameraDeviceListener {
+    public class SimpleDeviceListener extends CameraDevice.StateListener {
         private final Object mIdleLock = new Object();
         private boolean mIdle = false;
 
         public SimpleDeviceListener() {
-
         }
 
         // Wait for idle to occur, with a timeout in milliseconds.
@@ -158,7 +162,7 @@ public class CameraDeviceTest extends AndroidTestCase {
         }
 
         @Override
-        public void onCameraIdle(CameraDevice camera) {
+        public void onIdle(CameraDevice camera) {
             synchronized(mIdleLock) {
                 mIdle = true;
                 mIdleLock.notifyAll();
@@ -166,14 +170,20 @@ public class CameraDeviceTest extends AndroidTestCase {
         }
 
         @Override
-        public void onCameraDisconnected(CameraDevice camera) {
+        public void onDisconnected(CameraDevice camera) {
             // Not expecting disconnections
             mErrorTriggered = true;
         }
 
         @Override
-        public void onCameraError(CameraDevice camera, int error) {
+        public void onError(CameraDevice camera, int error) {
             mErrorTriggered = true;
+        }
+
+        @Override
+        public void onOpened(CameraDevice camera) {
+            // Do nothing. Handled by CameraTestUtils#openCamera
+            // TODO: If using this listener with CameraManager#openCamera, IMPLEMENT THIS.
         }
     }
 
@@ -182,7 +192,7 @@ public class CameraDeviceTest extends AndroidTestCase {
         for (int i = 0; i < ids.length; i++) {
             CameraDevice camera = null;
             try {
-                camera = mCameraManager.openCamera(ids[i]);
+                camera = CameraTestUtils.openCamera(mCameraManager, ids[i], mCallbackHandler);
                 assertNotNull(
                         String.format("Failed to open camera device ID: %s", ids[i]), camera);
 
@@ -214,7 +224,7 @@ public class CameraDeviceTest extends AndroidTestCase {
         for (int i = 0; i < ids.length; i++) {
             CameraDevice camera = null;
             try {
-                camera = mCameraManager.openCamera(ids[i]);
+                camera = CameraTestUtils.openCamera(mCameraManager, ids[i], mCallbackHandler);
                 assertNotNull(
                         String.format("Failed to open camera device %s", ids[i]), camera);
 
@@ -239,7 +249,8 @@ public class CameraDeviceTest extends AndroidTestCase {
         for (int i = 0; i < ids.length; i++) {
             CameraDevice camera = null;
             try {
-                camera = mCameraManager.openCamera(ids[i]);
+                camera = CameraTestUtils.openCamera(mCameraManager, ids[i],
+                        mMockDeviceListener, mCallbackHandler);
                 assertNotNull(
                         String.format("Failed to open camera device %s", ids[i]), camera);
 
@@ -247,10 +258,9 @@ public class CameraDeviceTest extends AndroidTestCase {
                  * Test: that the error listener can be set without problems.
                  * Also, wait some time to check if device doesn't run into error.
                  */
-                camera.setDeviceListener(mMockDeviceListener, mCallbackHandler);
                 SystemClock.sleep(ERROR_LISTENER_WAIT_TIMEOUT_MS);
                 verify(mMockDeviceListener, never())
-                        .onCameraError(
+                        .onError(
                                 any(CameraDevice.class),
                                 anyInt());
             }
@@ -300,10 +310,10 @@ public class CameraDeviceTest extends AndroidTestCase {
         for (int i = 0; i < ids.length; i++) {
             CameraDevice camera = null;
             try {
-                camera = mCameraManager.openCamera(ids[i]);
+                camera = CameraTestUtils.openCamera(mCameraManager, ids[i],
+                        mMockDeviceListener, mCallbackHandler);
                 assertNotNull(
                         String.format("Failed to open camera device %s", ids[i]), camera);
-                camera.setDeviceListener(mMockDeviceListener, mCallbackHandler);
 
                 prepareCapture(camera);
 
@@ -335,7 +345,7 @@ public class CameraDeviceTest extends AndroidTestCase {
                     captureBurstShot(camera, ids[i], mTemplates, mTemplates.length, repeating);
                 }
                 verify(mMockDeviceListener, never())
-                        .onCameraError(
+                        .onError(
                                 any(CameraDevice.class),
                                 anyInt());
             }

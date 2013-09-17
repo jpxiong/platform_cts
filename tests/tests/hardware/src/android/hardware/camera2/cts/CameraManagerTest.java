@@ -40,6 +40,8 @@ public class CameraManagerTest extends AndroidTestCase {
     private PackageManager mPackageManager;
     private CameraManager mCameraManager;
     private NoopCameraListener mListener;
+    private CameraTestThread mLooperThread;
+    private Handler mHandler;
 
     @Override
     public void setContext(Context context) {
@@ -54,10 +56,16 @@ public class CameraManagerTest extends AndroidTestCase {
     @Override
     protected void setUp() throws Exception {
         super.setUp();
+
+        mLooperThread = new CameraTestThread();
+        mHandler = mLooperThread.start();
     }
 
     @Override
     protected void tearDown() throws Exception {
+        mLooperThread.close();
+        mHandler = null;
+
         super.tearDown();
     }
 
@@ -98,7 +106,7 @@ public class CameraManagerTest extends AndroidTestCase {
     public void testCameraManagerGetCameraProperties() throws Exception {
         String[] ids = mCameraManager.getCameraIdList();
         for (int i = 0; i < ids.length; i++) {
-            CameraDevice camera = mCameraManager.openCamera(ids[i]);
+            CameraDevice camera = CameraTestUtils.openCamera(mCameraManager, ids[i], mHandler);
             assertNotNull(
                 String.format("Failed to open camera device ID: %s", ids[i]), camera);
             try {
@@ -136,7 +144,7 @@ public class CameraManagerTest extends AndroidTestCase {
         String[] ids = mCameraManager.getCameraIdList();
         for (int i = 0; i < ids.length; i++) {
             for (int j = 0; j < NUM_CAMERA_REOPENS; j++) {
-                CameraDevice camera = mCameraManager.openCamera(ids[i]);
+                CameraDevice camera = CameraTestUtils.openCamera(mCameraManager, ids[i], mHandler);
                 assertNotNull(
                     String.format("Failed to open camera device ID: %s", ids[i]), camera);
                 camera.close();
@@ -154,7 +162,7 @@ public class CameraManagerTest extends AndroidTestCase {
         try {
             for (int i = 0; i < ids.length; i++) {
                 try {
-                    cameras[i] = mCameraManager.openCamera(ids[i]);
+                    cameras[i] = CameraTestUtils.openCamera(mCameraManager, ids[i], mHandler);
 
                     /**
                      * If the camera can't be opened, should throw an exception, rather than
@@ -190,12 +198,12 @@ public class CameraManagerTest extends AndroidTestCase {
         CameraDevice[] cameras = new CameraDevice[2];
         if (ids.length > 0) {
             try {
-                cameras[0] = mCameraManager.openCamera(ids[0]);
+                cameras[0] = CameraTestUtils.openCamera(mCameraManager, ids[0], mHandler);
                 assertNotNull(
                     String.format("Failed to open camera device ID: %s", ids[0]),
                     cameras[0]);
                 try {
-                    cameras[1] = mCameraManager.openCamera(ids[0]);
+                    cameras[1] = CameraTestUtils.openCamera(mCameraManager, ids[0], mHandler);
                     fail(String.format("Opened the same camera device twice ID: %s",
                         ids[0]));
                 }
