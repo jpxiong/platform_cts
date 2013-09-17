@@ -31,10 +31,22 @@ public class NativeCodeTest extends TestCase {
                     doPerfEventTest());
     }
 
+    public void testSockDiag() throws Exception {
+        int result = doSockDiagTest();
+        assertFalse("Encountered unexpected error: " + result + ".", (result == -1));
+        assertEquals(0, result);
+    }
+
     /**
      * Returns true iff this device is vulnerable to CVE-2013-2094.
      * A patch for CVE-2013-2094 can be found at
      * http://git.kernel.org/cgit/linux/kernel/git/torvalds/linux.git/commit/?id=8176cced706b5e5d15887584150764894e94e02f
      */
     private static native boolean doPerfEventTest();
+
+    /**
+     * Hangs if device is vulnerable to CVE-2013-1763, returns -1 if
+     * unexpected error occurs, 0 otherwise.
+     */
+    private static native int doSockDiagTest();
 }
