@@ -139,7 +139,10 @@ public class BaseKeyListenerTest extends KeyListenerTestCase {
      */
     private void sendAltDelete() {
         mInstrumentation.sendKeySync(new KeyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_ALT_LEFT));
-        sendKeys(KeyEvent.KEYCODE_DEL);
+        mInstrumentation.sendKeySync(new KeyEvent(0, 0, KeyEvent.ACTION_DOWN,
+                KeyEvent.KEYCODE_DEL, 0, KeyEvent.META_ALT_ON));
+        mInstrumentation.sendKeySync(new KeyEvent(0, 0, KeyEvent.ACTION_UP,
+                KeyEvent.KEYCODE_DEL, 0, KeyEvent.META_ALT_ON));
         mInstrumentation.sendKeySync(new KeyEvent(KeyEvent.ACTION_UP, KeyEvent.KEYCODE_ALT_LEFT));
     }
 
