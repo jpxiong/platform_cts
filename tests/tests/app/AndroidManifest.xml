@@ -19,6 +19,7 @@
     package="com.android.cts.app">
 
     <uses-permission android:name="android.permission.DISABLE_KEYGUARD" />
+    <uses-permission android:name="android.permission.INJECT_EVENTS" />
     <application>
         <uses-library android:name="android.test.runner" />
     </application>
