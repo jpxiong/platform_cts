@@ -371,7 +371,7 @@ public class DialogTest extends ActivityInstrumentationTestCase2<DialogStubActiv
 
         long now = SystemClock.uptimeMillis();
         MotionEvent touchMotionEvent = MotionEvent.obtain(now, now, MotionEvent.ACTION_DOWN,
-                -20.0f, -20.0f, 0);
+                0.0f, 0.0f, 0);
         mInstrumentation.sendPointerSync(touchMotionEvent);
 
         assertFalse(d.dispatchTouchEventResult);
@@ -387,7 +387,7 @@ public class DialogTest extends ActivityInstrumentationTestCase2<DialogStubActiv
         d.setCanceledOnTouchOutside(true);
 
         touchMotionEvent = MotionEvent.obtain(now + 1, now, MotionEvent.ACTION_DOWN,
-                -20.0f, -20.0f, 0);
+                0.0f, 0.0f, 0);
         mInstrumentation.sendPointerSync(touchMotionEvent);
 
         assertTrue(d.dispatchTouchEventResult);
@@ -403,7 +403,7 @@ public class DialogTest extends ActivityInstrumentationTestCase2<DialogStubActiv
         final TestDialog d = (TestDialog) mActivity.getDialog();
         long eventTime = SystemClock.uptimeMillis();
         final MotionEvent trackBallEvent = MotionEvent.obtain(eventTime, eventTime,
-                MotionEvent.ACTION_DOWN, -20.0f, -20.0f, 0);
+                MotionEvent.ACTION_DOWN, 0.0f, 0.0f, 0);
 
         assertNull(d.trackballEvent);
         assertNull(d.onTrackballEvent);
