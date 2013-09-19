@@ -77,12 +77,6 @@ protected:
     }
 
     virtual void TearDown() {
-        // Display the result
-        if (mDisplaySecs > 0 && mEglWindowSurface != EGL_NO_SURFACE) {
-            eglSwapBuffers(mEglDisplay, mEglWindowSurface);
-            sleep(mDisplaySecs);
-        }
-
         if (mEglContext != EGL_NO_CONTEXT) {
             eglDestroyContext(mEglDisplay, mEglContext);
         }
@@ -113,8 +107,6 @@ protected:
     virtual const EGLint* getWindowSurfaceAttribs() {
         return NULL;
     }
-
-    int mDisplaySecs;
 
     EGLDisplay mEglDisplay;
     EGLConfig  mEglConfig;
