@@ -88,7 +88,9 @@ public class TestFilter {
      */
     public void setTestInclusion(String className, String method) {
         mIncludedClass = className;
-        mIncludedMethod = Pattern.compile(method);
+        if (method != null) {
+            mIncludedMethod = Pattern.compile(method);
+        }
     }
 
     /**
