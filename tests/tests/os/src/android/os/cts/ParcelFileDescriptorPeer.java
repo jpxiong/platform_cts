@@ -24,6 +24,7 @@ import android.os.Looper;
 import android.os.ParcelFileDescriptor;
 import android.os.Process;
 import android.os.ParcelFileDescriptor.OnCloseListener;
+import android.os.ParcelFileDescriptor.FileDescriptorDetachedException;
 import android.os.RemoteException;
 import android.os.SystemClock;
 
@@ -181,7 +182,7 @@ public class ParcelFileDescriptorPeer extends IParcelFileDescriptorPeer.Stub {
     @Override
     public String checkError() throws RemoteException {
         try {
-            mLocal.checkError(true);
+            mLocal.checkError();
             return null;
         } catch (IOException e) {
             return e.getMessage();
@@ -202,8 +203,8 @@ public class ParcelFileDescriptorPeer extends IParcelFileDescriptorPeer.Stub {
     public static class FutureCloseListener extends AbstractFuture<IOException>
             implements OnCloseListener {
         @Override
-        public void onClose(IOException e, boolean fromDetach) {
-            if (fromDetach) {
+        public void onClose(IOException e) {
+            if (e instanceof FileDescriptorDetachedException) {
                 set(new IOException("DETACHED"));
             } else {
                 set(e);
