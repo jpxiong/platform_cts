@@ -393,32 +393,16 @@ public class CameraDeviceTest extends AndroidTestCase {
     }
 
     private void createDefaultSurface() throws Exception {
-<<<<<<< HEAD
-        ImageReader mReader =
-                new ImageReader(DEFAULT_CAPTURE_WIDTH,
-||||||| parent of 33286bc... media: Update ImageReader APIs
-        mReader =
-                new ImageReader(DEFAULT_CAPTURE_WIDTH,
-=======
         mReader =
                 ImageReader.newInstance(DEFAULT_CAPTURE_WIDTH,
->>>>>>> 33286bc... media: Update ImageReader APIs
                         DEFAULT_CAPTURE_HEIGHT,
                         ImageFormat.YUV_420_888,
                         MAX_NUM_IMAGES);
         mSurface = mReader.getSurface();
         // Create dummy image listener since we don't care the image data in this test.
         ImageReader.OnImageAvailableListener listener = new ImageDropperListener();
-<<<<<<< HEAD
-        CameraTestThread mDummyThread = new CameraTestThread();
-        mReader.setImageAvailableListener(listener, mDummyThread.start());
-||||||| parent of 33286bc... media: Update ImageReader APIs
-        mDummyThread = new CameraTestThread();
-        mReader.setImageAvailableListener(listener, mDummyThread.start());
-=======
         mDummyThread = new CameraTestThread();
         mReader.setOnImageAvailableListener(listener, mDummyThread.start());
->>>>>>> 33286bc... media: Update ImageReader APIs
     }
 
     private void verifyCaptureResults(
