@@ -31,6 +31,17 @@ import java.io.IOException;
 public class KernelSettingsTest extends TestCase {
 
     /**
+     * Ensure that SELinux is in enforcing mode.
+     */
+    public void testSELinuxEnforcing() throws IOException {
+        try {
+            assertEquals("1", getFile("/sys/fs/selinux/enforce"));
+        } catch (FileNotFoundException e) {
+            fail("SELinux is not compiled into this kernel, or is disabled.");
+        }
+    }
+
+    /**
      * Protect against kernel based NULL pointer attacks by enforcing a
      * minimum (and maximum!) value of mmap_min_addr.
      *
