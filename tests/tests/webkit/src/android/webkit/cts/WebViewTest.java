@@ -1377,31 +1377,47 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
 
         mOnUiThread.loadDataAndWaitForCompletion("<html><body>" + p
                 + "</body></html>", "text/html", null);
-        getInstrumentation().waitForIdleSync();
 
-        assertEquals(defaultScale, mOnUiThread.getScale(), .01f);
+        new PollingCheck(TEST_TIMEOUT) {
+            @Override
+            protected boolean check() {
+                return Math.abs(defaultScale - mOnUiThread.getScale()) < .01f;
+            }
+        }.run();
 
         mOnUiThread.setInitialScale(0);
         // modify content to fool WebKit into re-loading
         mOnUiThread.loadDataAndWaitForCompletion("<html><body>" + p
                 + "2" + "</body></html>", "text/html", null);
-        getInstrumentation().waitForIdleSync();
 
-        assertEquals(defaultScale, mOnUiThread.getScale(), .01f);
+        new PollingCheck(TEST_TIMEOUT) {
+            @Override
+            protected boolean check() {
+                return Math.abs(defaultScale - mOnUiThread.getScale()) < .01f;
+            }
+        }.run();
 
         mOnUiThread.setInitialScale(50);
         mOnUiThread.loadDataAndWaitForCompletion("<html><body>" + p
                 + "3" + "</body></html>", "text/html", null);
-        getInstrumentation().waitForIdleSync();
 
-        assertEquals(0.5f, mOnUiThread.getScale(), .02f);
+        new PollingCheck(TEST_TIMEOUT) {
+            @Override
+            protected boolean check() {
+                return Math.abs(0.5 - mOnUiThread.getScale()) < .01f;
+            }
+        }.run();
 
         mOnUiThread.setInitialScale(0);
         mOnUiThread.loadDataAndWaitForCompletion("<html><body>" + p
                 + "4" + "</body></html>", "text/html", null);
-        getInstrumentation().waitForIdleSync();
 
-        assertEquals(defaultScale, mOnUiThread.getScale(), .01f);
+        new PollingCheck(TEST_TIMEOUT) {
+            @Override
+            protected boolean check() {
+                return Math.abs(defaultScale - mOnUiThread.getScale()) < .01f;
+            }
+        }.run();
     }
 
     @UiThreadTest
