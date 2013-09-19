@@ -253,7 +253,7 @@ public class ParcelFileDescriptorTest extends AndroidTestCase {
 
         blue.close();
         assertEquals(-1, read(red));
-        red.checkError(true);
+        red.checkError();
     }
 
     public void testPipeError() throws Exception {
@@ -268,7 +268,7 @@ public class ParcelFileDescriptorTest extends AndroidTestCase {
         assertEquals(2, read(red));
         assertEquals(-1, read(red));
         try {
-            red.checkError(true);
+            red.checkError();
             fail("expected throw!");
         } catch (IOException e) {
             assertContains("OMG MUFFINS", e.getMessage());
@@ -328,14 +328,14 @@ public class ParcelFileDescriptorTest extends AndroidTestCase {
         // red noticed the blue error, but after that the comm pipe was dead so
         // blue had no way of seeing the red error.
         try {
-            red.checkError(true);
+            red.checkError();
             fail("expected throw!");
         } catch (IOException e) {
             assertContains("BLUE RAWR", e.getMessage());
         }
 
         // expected to not throw; no error
-        blue.checkError(true);
+        blue.checkError();
     }
 
     public void testSocketMultipleCheck() throws Exception {
@@ -344,14 +344,14 @@ public class ParcelFileDescriptorTest extends AndroidTestCase {
         final ParcelFileDescriptor blue = pair[1];
 
         // allow checking before closed; they should all pass
-        blue.checkError(true);
-        blue.checkError(true);
-        blue.checkError(true);
+        blue.checkError();
+        blue.checkError();
+        blue.checkError();
 
         // and verify we actually see it
         red.closeWithError("RAWR RED");
         try {
-            blue.checkError(true);
+            blue.checkError();
             fail("expected throw!");
         } catch (IOException e) {
             assertContains("RAWR RED", e.getMessage());
