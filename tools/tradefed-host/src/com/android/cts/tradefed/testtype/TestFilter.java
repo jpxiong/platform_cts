@@ -25,6 +25,7 @@ import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.regex.Pattern;
 
 /**
  * Filter for {@link TestIdentifier}s.
@@ -34,7 +35,7 @@ public class TestFilter {
     private final Set<String> mExcludedClasses;
     private final Set<TestIdentifier> mExcludedTests;
     private String mIncludedClass = null;
-    private String mIncludedMethod = null;
+    private Pattern mIncludedMethod = null;
 
     /**
      * Creates a {@link TestFilter}
@@ -87,7 +88,7 @@ public class TestFilter {
      */
     public void setTestInclusion(String className, String method) {
         mIncludedClass = className;
-        mIncludedMethod = method;
+        mIncludedMethod = Pattern.compile(method);
     }
 
     /**
@@ -103,7 +104,7 @@ public class TestFilter {
                 // skip
                 continue;
             }
-            if (mIncludedMethod != null && !test.getTestName().equals(mIncludedMethod)) {
+            if (mIncludedMethod != null && !mIncludedMethod.matcher(test.getTestName()).matches()) {
                 // skip
                 continue;
             }
