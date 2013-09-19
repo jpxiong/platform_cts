@@ -20,6 +20,8 @@ import android.os.cts.FileUtils;
 
 import junit.framework.TestCase;
 
+import java.io.File;
+
 public class BannedFilesTest extends TestCase {
 
     public void testNoSyncAgent() {
