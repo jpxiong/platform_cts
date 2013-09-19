@@ -38,6 +38,26 @@ public class BannedFilesTest extends TestCase {
         assertNotSetugid("/system/bin/sync_agent");
     }
 
+    public void testNoSu() {
+        assertFalse("/sbin/su",        new File("/sbin/su").exists());
+        assertFalse("/system/bin/su",  new File("/system/bin/su").exists());
+        assertFalse("/system/sbin/su", new File("/system/sbin/su").exists());
+        assertFalse("/system/xbin/su", new File("/system/xbin/su").exists());
+        assertFalse("/vendor/bin/su",  new File("/vendor/bin/su").exists());
+    }
+
+    public void testNoSuInPath() {
+        String path = System.getenv("PATH");
+        if (path == null) {
+            return;
+        }
+        String[] elems = path.split(":");
+        for (String i : elems) {
+            File f = new File(i, "su");
+            assertFalse(f.getAbsolutePath() + " exists", f.exists());
+        }
+    }
+
     /**
      * setuid or setgid "ip" command can be used to modify the
      * routing tables of a device, potentially allowing a malicious
