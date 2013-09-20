@@ -27,7 +27,7 @@ import java.lang.reflect.Field;
 import java.io.FileDescriptor;
 
 // To run the tests in this file w/o running all the cts tests:
-// build cts
+// make cts
 // cts-tradefed
 // run cts -c android.provider.cts.TelephonyProviderTest
 
@@ -37,7 +37,7 @@ public class TelephonyProviderTest extends InstrumentationTestCase {
     @Override
     protected void setUp() throws Exception {
         super.setUp();
-        mContentResolver = getInstrumentation().getTargetContext().getContentResolver();
+        mContentResolver = getInstrumentation().getContext().getContentResolver();
     }
 
     // Test that the TelephonyProvider doesn't allow clients to update _data column data and
