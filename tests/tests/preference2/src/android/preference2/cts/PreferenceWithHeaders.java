@@ -40,6 +40,14 @@ public class PreferenceWithHeaders extends PreferenceActivity {
         }
     }
 
+    /*
+     * Validate the fragment loaded into this activity. Required for apps built for API 19 and
+     * above.
+     */
+    protected boolean isValidFragment(String fragment) {
+        return PrefsOneFragment.class.getName().equals(fragment);
+    }
+
     /**
      * Populate the activity with the top-level headers.
      */
