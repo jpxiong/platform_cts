@@ -17,13 +17,19 @@
 package android.hardware.camera2.cts;
 
 import android.graphics.ImageFormat;
+import android.hardware.camera2.CameraAccessException;
 import android.hardware.camera2.CameraDevice;
+import android.hardware.camera2.CameraManager;
 import android.hardware.camera2.CameraMetadata;
 import android.hardware.camera2.CameraProperties;
 import android.hardware.camera2.Size;
 import android.media.Image;
 import android.media.Image.Plane;
+import android.os.Handler;
 import android.util.Log;
+
+import com.android.ex.camera2.blocking.BlockingCameraManager;
+import com.android.ex.camera2.blocking.BlockingCameraManager.BlockingOpenException;
 
 import junit.framework.Assert;
 
@@ -39,6 +45,73 @@ import java.util.Arrays;
 class CameraTestUtils extends Assert {
     private static final String TAG = "CameraTestUtils";
     private static final boolean VERBOSE = Log.isLoggable(TAG, Log.VERBOSE);
+
+    /**
+     * Provide a default implementation of CameraDevice.StateListener that does nothing.
+     */
+    public abstract static class DeviceStateListener extends CameraDevice.StateListener {
+        public DeviceStateListener() {
+        }
+
+        @Override
+        public void onOpened(CameraDevice camera) {
+            // Do nothing. It should be handled by #openCamera
+        }
+
+        @Override
+        public void onDisconnected(CameraDevice camera) {
+            // Do nothing
+        }
+
+        @Override
+        public void onError(CameraDevice camera, int error) {
+            // Do nothing
+        }
+    }
+
+    /**
+     * Block until the camera is opened.
+     *
+     * <p>Don't use this to test #onDisconnected/#onError since this will throw
+     * an AssertionError if it fails to open the camera device.</p>
+     *
+     * @return CameraDevice opened camera device
+     * @throws BlockingOpenException
+     *
+     * @throws AssertionError if the camera fails to open (or times out)
+     */
+    public static CameraDevice openCamera(CameraManager manager, String cameraId,
+            CameraDevice.StateListener listener, Handler handler) throws CameraAccessException,
+            BlockingOpenException {
+
+        /**
+         * Although camera2 API allows 'null' Handler (it will just use the current
+         * thread's Looper), this is not what we want for CTS.
+         *
+         * In CTS the default looper is used only to process events in between test runs,
+         * so anything sent there would not be executed inside a test and the test would fail.
+         *
+         * In this case, BlockingCameraManager#openCamera performs the check for us.
+         */
+        return (new BlockingCameraManager(manager)).openCamera(cameraId, listener, handler);
+    }
+
+
+    /**
+     * Block until the camera is opened.
+     *
+     * <p>Don't use this to test #onDisconnected/#onError since this will throw
+     * an AssertionError if it fails to open the camera device.</p>
+     *
+     * @return CameraDevice opened camera device
+     *
+     * @throws AssertionError if the camera fails to open (or times out)
+     */
+    public static CameraDevice openCamera(CameraManager manager, String cameraId, Handler handler)
+            throws CameraAccessException,
+            BlockingOpenException {
+        return openCamera(manager, cameraId, /*listener*/null, handler);
+    }
 
     public static <T> void assertArrayNotEmpty(T arr, String message) {
         assertTrue(message, arr != null && Array.getLength(arr) > 0);
