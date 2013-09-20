@@ -28,6 +28,7 @@ import android.content.Context;
 import android.hardware.camera2.CameraDevice;
 import android.hardware.camera2.CameraManager;
 import android.hardware.camera2.CameraProperties;
+import android.os.Handler;
 import android.test.AndroidTestCase;
 
 /**
@@ -35,6 +36,9 @@ import android.test.AndroidTestCase;
  */
 public class CameraPropertiesTest extends AndroidTestCase {
     private CameraManager mCameraManager;
+
+    private CameraTestThread mLooperThread;
+    private Handler mHandler;
 
     @Override
     public void setContext(Context context) {
@@ -46,17 +50,23 @@ public class CameraPropertiesTest extends AndroidTestCase {
     @Override
     protected void setUp() throws Exception {
         super.setUp();
+
+        mLooperThread = new CameraTestThread();
+        mHandler = mLooperThread.start();
     }
 
     @Override
     protected void tearDown() throws Exception {
+        mLooperThread.close();
+        mHandler = null;
+
         super.tearDown();
     }
 
     public void testCameraPropertiesAndroidControlAeAvailableAntibandingModes() throws Exception {
         String[] ids = mCameraManager.getCameraIdList();
         for (int i = 0; i < ids.length; i++) {
-            CameraDevice camera = mCameraManager.openCamera(ids[i]);
+            CameraDevice camera = CameraTestUtils.openCamera(mCameraManager, ids[i], mHandler);
             assertNotNull("Failed to open camera", camera);
             CameraProperties props;
             try {
@@ -75,7 +85,7 @@ public class CameraPropertiesTest extends AndroidTestCase {
     public void testCameraPropertiesAndroidControlAeAvailableTargetFpsRanges() throws Exception {
         String[] ids = mCameraManager.getCameraIdList();
         for (int i = 0; i < ids.length; i++) {
-            CameraDevice camera = mCameraManager.openCamera(ids[i]);
+            CameraDevice camera = CameraTestUtils.openCamera(mCameraManager, ids[i], mHandler);
             assertNotNull("Failed to open camera", camera);
             CameraProperties props;
             try {
@@ -94,7 +104,7 @@ public class CameraPropertiesTest extends AndroidTestCase {
     public void testCameraPropertiesAndroidControlAeCompensationRange() throws Exception {
         String[] ids = mCameraManager.getCameraIdList();
         for (int i = 0; i < ids.length; i++) {
-            CameraDevice camera = mCameraManager.openCamera(ids[i]);
+            CameraDevice camera = CameraTestUtils.openCamera(mCameraManager, ids[i], mHandler);
             assertNotNull("Failed to open camera", camera);
             CameraProperties props;
             try {
@@ -113,7 +123,7 @@ public class CameraPropertiesTest extends AndroidTestCase {
     public void testCameraPropertiesAndroidControlAeCompensationStep() throws Exception {
         String[] ids = mCameraManager.getCameraIdList();
         for (int i = 0; i < ids.length; i++) {
-            CameraDevice camera = mCameraManager.openCamera(ids[i]);
+            CameraDevice camera = CameraTestUtils.openCamera(mCameraManager, ids[i], mHandler);
             assertNotNull("Failed to open camera", camera);
             CameraProperties props;
             try {
@@ -132,7 +142,7 @@ public class CameraPropertiesTest extends AndroidTestCase {
     public void testCameraPropertiesAndroidControlAfAvailableModes() throws Exception {
         String[] ids = mCameraManager.getCameraIdList();
         for (int i = 0; i < ids.length; i++) {
-            CameraDevice camera = mCameraManager.openCamera(ids[i]);
+            CameraDevice camera = CameraTestUtils.openCamera(mCameraManager, ids[i], mHandler);
             assertNotNull("Failed to open camera", camera);
             CameraProperties props;
             try {
@@ -151,7 +161,7 @@ public class CameraPropertiesTest extends AndroidTestCase {
     public void testCameraPropertiesAndroidControlAvailableEffects() throws Exception {
         String[] ids = mCameraManager.getCameraIdList();
         for (int i = 0; i < ids.length; i++) {
-            CameraDevice camera = mCameraManager.openCamera(ids[i]);
+            CameraDevice camera = CameraTestUtils.openCamera(mCameraManager, ids[i], mHandler);
             assertNotNull("Failed to open camera", camera);
             CameraProperties props;
             try {
@@ -170,7 +180,7 @@ public class CameraPropertiesTest extends AndroidTestCase {
     public void testCameraPropertiesAndroidControlAvailableSceneModes() throws Exception {
         String[] ids = mCameraManager.getCameraIdList();
         for (int i = 0; i < ids.length; i++) {
-            CameraDevice camera = mCameraManager.openCamera(ids[i]);
+            CameraDevice camera = CameraTestUtils.openCamera(mCameraManager, ids[i], mHandler);
             assertNotNull("Failed to open camera", camera);
             CameraProperties props;
             try {
@@ -189,7 +199,7 @@ public class CameraPropertiesTest extends AndroidTestCase {
     public void testCameraPropertiesAndroidControlAvailableVideoStabilizationModes() throws Exception {
         String[] ids = mCameraManager.getCameraIdList();
         for (int i = 0; i < ids.length; i++) {
-            CameraDevice camera = mCameraManager.openCamera(ids[i]);
+            CameraDevice camera = CameraTestUtils.openCamera(mCameraManager, ids[i], mHandler);
             assertNotNull("Failed to open camera", camera);
             CameraProperties props;
             try {
@@ -208,7 +218,7 @@ public class CameraPropertiesTest extends AndroidTestCase {
     public void testCameraPropertiesAndroidControlAwbAvailableModes() throws Exception {
         String[] ids = mCameraManager.getCameraIdList();
         for (int i = 0; i < ids.length; i++) {
-            CameraDevice camera = mCameraManager.openCamera(ids[i]);
+            CameraDevice camera = CameraTestUtils.openCamera(mCameraManager, ids[i], mHandler);
             assertNotNull("Failed to open camera", camera);
             CameraProperties props;
             try {
@@ -227,7 +237,7 @@ public class CameraPropertiesTest extends AndroidTestCase {
     public void testCameraPropertiesAndroidControlMaxRegions() throws Exception {
         String[] ids = mCameraManager.getCameraIdList();
         for (int i = 0; i < ids.length; i++) {
-            CameraDevice camera = mCameraManager.openCamera(ids[i]);
+            CameraDevice camera = CameraTestUtils.openCamera(mCameraManager, ids[i], mHandler);
             assertNotNull("Failed to open camera", camera);
             CameraProperties props;
             try {
@@ -246,7 +256,7 @@ public class CameraPropertiesTest extends AndroidTestCase {
     public void testCameraPropertiesAndroidFlashInfoAvailable() throws Exception {
         String[] ids = mCameraManager.getCameraIdList();
         for (int i = 0; i < ids.length; i++) {
-            CameraDevice camera = mCameraManager.openCamera(ids[i]);
+            CameraDevice camera = CameraTestUtils.openCamera(mCameraManager, ids[i], mHandler);
             assertNotNull("Failed to open camera", camera);
             CameraProperties props;
             try {
@@ -265,7 +275,7 @@ public class CameraPropertiesTest extends AndroidTestCase {
     public void testCameraPropertiesAndroidJpegAvailableThumbnailSizes() throws Exception {
         String[] ids = mCameraManager.getCameraIdList();
         for (int i = 0; i < ids.length; i++) {
-            CameraDevice camera = mCameraManager.openCamera(ids[i]);
+            CameraDevice camera = CameraTestUtils.openCamera(mCameraManager, ids[i], mHandler);
             assertNotNull("Failed to open camera", camera);
             CameraProperties props;
             try {
@@ -284,7 +294,7 @@ public class CameraPropertiesTest extends AndroidTestCase {
     public void testCameraPropertiesAndroidLensFacing() throws Exception {
         String[] ids = mCameraManager.getCameraIdList();
         for (int i = 0; i < ids.length; i++) {
-            CameraDevice camera = mCameraManager.openCamera(ids[i]);
+            CameraDevice camera = CameraTestUtils.openCamera(mCameraManager, ids[i], mHandler);
             assertNotNull("Failed to open camera", camera);
             CameraProperties props;
             try {
@@ -303,7 +313,7 @@ public class CameraPropertiesTest extends AndroidTestCase {
     public void testCameraPropertiesAndroidLensInfoAvailableApertures() throws Exception {
         String[] ids = mCameraManager.getCameraIdList();
         for (int i = 0; i < ids.length; i++) {
-            CameraDevice camera = mCameraManager.openCamera(ids[i]);
+            CameraDevice camera = CameraTestUtils.openCamera(mCameraManager, ids[i], mHandler);
             assertNotNull("Failed to open camera", camera);
             CameraProperties props;
             try {
@@ -322,7 +332,7 @@ public class CameraPropertiesTest extends AndroidTestCase {
     public void testCameraPropertiesAndroidLensInfoAvailableFilterDensities() throws Exception {
         String[] ids = mCameraManager.getCameraIdList();
         for (int i = 0; i < ids.length; i++) {
-            CameraDevice camera = mCameraManager.openCamera(ids[i]);
+            CameraDevice camera = CameraTestUtils.openCamera(mCameraManager, ids[i], mHandler);
             assertNotNull("Failed to open camera", camera);
             CameraProperties props;
             try {
@@ -341,7 +351,7 @@ public class CameraPropertiesTest extends AndroidTestCase {
     public void testCameraPropertiesAndroidLensInfoAvailableFocalLengths() throws Exception {
         String[] ids = mCameraManager.getCameraIdList();
         for (int i = 0; i < ids.length; i++) {
-            CameraDevice camera = mCameraManager.openCamera(ids[i]);
+            CameraDevice camera = CameraTestUtils.openCamera(mCameraManager, ids[i], mHandler);
             assertNotNull("Failed to open camera", camera);
             CameraProperties props;
             try {
@@ -360,7 +370,7 @@ public class CameraPropertiesTest extends AndroidTestCase {
     public void testCameraPropertiesAndroidLensInfoAvailableOpticalStabilization() throws Exception {
         String[] ids = mCameraManager.getCameraIdList();
         for (int i = 0; i < ids.length; i++) {
-            CameraDevice camera = mCameraManager.openCamera(ids[i]);
+            CameraDevice camera = CameraTestUtils.openCamera(mCameraManager, ids[i], mHandler);
             assertNotNull("Failed to open camera", camera);
             CameraProperties props;
             try {
@@ -379,7 +389,7 @@ public class CameraPropertiesTest extends AndroidTestCase {
     public void testCameraPropertiesAndroidLensInfoHyperfocalDistance() throws Exception {
         String[] ids = mCameraManager.getCameraIdList();
         for (int i = 0; i < ids.length; i++) {
-            CameraDevice camera = mCameraManager.openCamera(ids[i]);
+            CameraDevice camera = CameraTestUtils.openCamera(mCameraManager, ids[i], mHandler);
             assertNotNull("Failed to open camera", camera);
             CameraProperties props;
             try {
@@ -398,7 +408,7 @@ public class CameraPropertiesTest extends AndroidTestCase {
     public void testCameraPropertiesAndroidLensInfoMinimumFocusDistance() throws Exception {
         String[] ids = mCameraManager.getCameraIdList();
         for (int i = 0; i < ids.length; i++) {
-            CameraDevice camera = mCameraManager.openCamera(ids[i]);
+            CameraDevice camera = CameraTestUtils.openCamera(mCameraManager, ids[i], mHandler);
             assertNotNull("Failed to open camera", camera);
             CameraProperties props;
             try {
@@ -417,7 +427,7 @@ public class CameraPropertiesTest extends AndroidTestCase {
     public void testCameraPropertiesAndroidLensInfoShadingMapSize() throws Exception {
         String[] ids = mCameraManager.getCameraIdList();
         for (int i = 0; i < ids.length; i++) {
-            CameraDevice camera = mCameraManager.openCamera(ids[i]);
+            CameraDevice camera = CameraTestUtils.openCamera(mCameraManager, ids[i], mHandler);
             assertNotNull("Failed to open camera", camera);
             CameraProperties props;
             try {
@@ -436,7 +446,7 @@ public class CameraPropertiesTest extends AndroidTestCase {
     public void testCameraPropertiesAndroidRequestMaxNumOutputStreams() throws Exception {
         String[] ids = mCameraManager.getCameraIdList();
         for (int i = 0; i < ids.length; i++) {
-            CameraDevice camera = mCameraManager.openCamera(ids[i]);
+            CameraDevice camera = CameraTestUtils.openCamera(mCameraManager, ids[i], mHandler);
             assertNotNull("Failed to open camera", camera);
             CameraProperties props;
             try {
@@ -455,7 +465,7 @@ public class CameraPropertiesTest extends AndroidTestCase {
     public void testCameraPropertiesAndroidScalerAvailableFormats() throws Exception {
         String[] ids = mCameraManager.getCameraIdList();
         for (int i = 0; i < ids.length; i++) {
-            CameraDevice camera = mCameraManager.openCamera(ids[i]);
+            CameraDevice camera = CameraTestUtils.openCamera(mCameraManager, ids[i], mHandler);
             assertNotNull("Failed to open camera", camera);
             CameraProperties props;
             try {
@@ -474,7 +484,7 @@ public class CameraPropertiesTest extends AndroidTestCase {
     public void testCameraPropertiesAndroidScalerAvailableJpegMinDurations() throws Exception {
         String[] ids = mCameraManager.getCameraIdList();
         for (int i = 0; i < ids.length; i++) {
-            CameraDevice camera = mCameraManager.openCamera(ids[i]);
+            CameraDevice camera = CameraTestUtils.openCamera(mCameraManager, ids[i], mHandler);
             assertNotNull("Failed to open camera", camera);
             CameraProperties props;
             try {
@@ -493,7 +503,7 @@ public class CameraPropertiesTest extends AndroidTestCase {
     public void testCameraPropertiesAndroidScalerAvailableJpegSizes() throws Exception {
         String[] ids = mCameraManager.getCameraIdList();
         for (int i = 0; i < ids.length; i++) {
-            CameraDevice camera = mCameraManager.openCamera(ids[i]);
+            CameraDevice camera = CameraTestUtils.openCamera(mCameraManager, ids[i], mHandler);
             assertNotNull("Failed to open camera", camera);
             CameraProperties props;
             try {
@@ -512,7 +522,7 @@ public class CameraPropertiesTest extends AndroidTestCase {
     public void testCameraPropertiesAndroidScalerAvailableMaxDigitalZoom() throws Exception {
         String[] ids = mCameraManager.getCameraIdList();
         for (int i = 0; i < ids.length; i++) {
-            CameraDevice camera = mCameraManager.openCamera(ids[i]);
+            CameraDevice camera = CameraTestUtils.openCamera(mCameraManager, ids[i], mHandler);
             assertNotNull("Failed to open camera", camera);
             CameraProperties props;
             try {
@@ -531,7 +541,7 @@ public class CameraPropertiesTest extends AndroidTestCase {
     public void testCameraPropertiesAndroidScalerAvailableProcessedMinDurations() throws Exception {
         String[] ids = mCameraManager.getCameraIdList();
         for (int i = 0; i < ids.length; i++) {
-            CameraDevice camera = mCameraManager.openCamera(ids[i]);
+            CameraDevice camera = CameraTestUtils.openCamera(mCameraManager, ids[i], mHandler);
             assertNotNull("Failed to open camera", camera);
             CameraProperties props;
             try {
@@ -550,7 +560,7 @@ public class CameraPropertiesTest extends AndroidTestCase {
     public void testCameraPropertiesAndroidScalerAvailableProcessedSizes() throws Exception {
         String[] ids = mCameraManager.getCameraIdList();
         for (int i = 0; i < ids.length; i++) {
-            CameraDevice camera = mCameraManager.openCamera(ids[i]);
+            CameraDevice camera = CameraTestUtils.openCamera(mCameraManager, ids[i], mHandler);
             assertNotNull("Failed to open camera", camera);
             CameraProperties props;
             try {
@@ -569,7 +579,7 @@ public class CameraPropertiesTest extends AndroidTestCase {
     public void testCameraPropertiesAndroidSensorBaseGainFactor() throws Exception {
         String[] ids = mCameraManager.getCameraIdList();
         for (int i = 0; i < ids.length; i++) {
-            CameraDevice camera = mCameraManager.openCamera(ids[i]);
+            CameraDevice camera = CameraTestUtils.openCamera(mCameraManager, ids[i], mHandler);
             assertNotNull("Failed to open camera", camera);
             CameraProperties props;
             try {
@@ -588,7 +598,7 @@ public class CameraPropertiesTest extends AndroidTestCase {
     public void testCameraPropertiesAndroidSensorMaxAnalogSensitivity() throws Exception {
         String[] ids = mCameraManager.getCameraIdList();
         for (int i = 0; i < ids.length; i++) {
-            CameraDevice camera = mCameraManager.openCamera(ids[i]);
+            CameraDevice camera = CameraTestUtils.openCamera(mCameraManager, ids[i], mHandler);
             assertNotNull("Failed to open camera", camera);
             CameraProperties props;
             try {
@@ -607,7 +617,7 @@ public class CameraPropertiesTest extends AndroidTestCase {
     public void testCameraPropertiesAndroidSensorOrientation() throws Exception {
         String[] ids = mCameraManager.getCameraIdList();
         for (int i = 0; i < ids.length; i++) {
-            CameraDevice camera = mCameraManager.openCamera(ids[i]);
+            CameraDevice camera = CameraTestUtils.openCamera(mCameraManager, ids[i], mHandler);
             assertNotNull("Failed to open camera", camera);
             CameraProperties props;
             try {
@@ -626,7 +636,7 @@ public class CameraPropertiesTest extends AndroidTestCase {
     public void testCameraPropertiesAndroidSensorInfoActiveArraySize() throws Exception {
         String[] ids = mCameraManager.getCameraIdList();
         for (int i = 0; i < ids.length; i++) {
-            CameraDevice camera = mCameraManager.openCamera(ids[i]);
+            CameraDevice camera = CameraTestUtils.openCamera(mCameraManager, ids[i], mHandler);
             assertNotNull("Failed to open camera", camera);
             CameraProperties props;
             try {
@@ -645,7 +655,7 @@ public class CameraPropertiesTest extends AndroidTestCase {
     public void testCameraPropertiesAndroidSensorInfoSensitivityRange() throws Exception {
         String[] ids = mCameraManager.getCameraIdList();
         for (int i = 0; i < ids.length; i++) {
-            CameraDevice camera = mCameraManager.openCamera(ids[i]);
+            CameraDevice camera = CameraTestUtils.openCamera(mCameraManager, ids[i], mHandler);
             assertNotNull("Failed to open camera", camera);
             CameraProperties props;
             try {
@@ -664,7 +674,7 @@ public class CameraPropertiesTest extends AndroidTestCase {
     public void testCameraPropertiesAndroidSensorInfoExposureTimeRange() throws Exception {
         String[] ids = mCameraManager.getCameraIdList();
         for (int i = 0; i < ids.length; i++) {
-            CameraDevice camera = mCameraManager.openCamera(ids[i]);
+            CameraDevice camera = CameraTestUtils.openCamera(mCameraManager, ids[i], mHandler);
             assertNotNull("Failed to open camera", camera);
             CameraProperties props;
             try {
@@ -683,7 +693,7 @@ public class CameraPropertiesTest extends AndroidTestCase {
     public void testCameraPropertiesAndroidSensorInfoMaxFrameDuration() throws Exception {
         String[] ids = mCameraManager.getCameraIdList();
         for (int i = 0; i < ids.length; i++) {
-            CameraDevice camera = mCameraManager.openCamera(ids[i]);
+            CameraDevice camera = CameraTestUtils.openCamera(mCameraManager, ids[i], mHandler);
             assertNotNull("Failed to open camera", camera);
             CameraProperties props;
             try {
@@ -702,7 +712,7 @@ public class CameraPropertiesTest extends AndroidTestCase {
     public void testCameraPropertiesAndroidSensorInfoPhysicalSize() throws Exception {
         String[] ids = mCameraManager.getCameraIdList();
         for (int i = 0; i < ids.length; i++) {
-            CameraDevice camera = mCameraManager.openCamera(ids[i]);
+            CameraDevice camera = CameraTestUtils.openCamera(mCameraManager, ids[i], mHandler);
             assertNotNull("Failed to open camera", camera);
             CameraProperties props;
             try {
@@ -721,7 +731,7 @@ public class CameraPropertiesTest extends AndroidTestCase {
     public void testCameraPropertiesAndroidStatisticsInfoAvailableFaceDetectModes() throws Exception {
         String[] ids = mCameraManager.getCameraIdList();
         for (int i = 0; i < ids.length; i++) {
-            CameraDevice camera = mCameraManager.openCamera(ids[i]);
+            CameraDevice camera = CameraTestUtils.openCamera(mCameraManager, ids[i], mHandler);
             assertNotNull("Failed to open camera", camera);
             CameraProperties props;
             try {
@@ -740,7 +750,7 @@ public class CameraPropertiesTest extends AndroidTestCase {
     public void testCameraPropertiesAndroidStatisticsInfoMaxFaceCount() throws Exception {
         String[] ids = mCameraManager.getCameraIdList();
         for (int i = 0; i < ids.length; i++) {
-            CameraDevice camera = mCameraManager.openCamera(ids[i]);
+            CameraDevice camera = CameraTestUtils.openCamera(mCameraManager, ids[i], mHandler);
             assertNotNull("Failed to open camera", camera);
             CameraProperties props;
             try {
@@ -759,7 +769,7 @@ public class CameraPropertiesTest extends AndroidTestCase {
     public void testCameraPropertiesAndroidTonemapMaxCurvePoints() throws Exception {
         String[] ids = mCameraManager.getCameraIdList();
         for (int i = 0; i < ids.length; i++) {
-            CameraDevice camera = mCameraManager.openCamera(ids[i]);
+            CameraDevice camera = CameraTestUtils.openCamera(mCameraManager, ids[i], mHandler);
             assertNotNull("Failed to open camera", camera);
             CameraProperties props;
             try {
@@ -778,7 +788,7 @@ public class CameraPropertiesTest extends AndroidTestCase {
     public void testCameraPropertiesAndroidInfoSupportedHardwareLevel() throws Exception {
         String[] ids = mCameraManager.getCameraIdList();
         for (int i = 0; i < ids.length; i++) {
-            CameraDevice camera = mCameraManager.openCamera(ids[i]);
+            CameraDevice camera = CameraTestUtils.openCamera(mCameraManager, ids[i], mHandler);
             assertNotNull("Failed to open camera", camera);
             CameraProperties props;
             try {

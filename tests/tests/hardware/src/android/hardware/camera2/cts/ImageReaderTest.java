@@ -35,6 +35,8 @@ import android.test.AndroidTestCase;
 import android.util.Log;
 import android.view.Surface;
 
+import com.android.ex.camera2.blocking.BlockingCameraManager.BlockingOpenException;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -167,7 +169,7 @@ public class ImageReaderTest extends AndroidTestCase {
 
     private class SimpleImageListener implements ImageReader.OnImageAvailableListener {
         private int mPendingImages = 0;
-        private Object mImageSyncObject = new Object();
+        private final Object mImageSyncObject = new Object();
 
         @Override
         public void onImageAvailable(ImageReader reader) {
@@ -260,7 +262,7 @@ public class ImageReaderTest extends AndroidTestCase {
         }
     }
 
-    private void stopCapture() throws Exception{
+    private void stopCapture() throws CameraAccessException {
         mCamera.stopRepeating();
         mCamera.waitUntilIdle();
         mReader.close();
@@ -268,19 +270,22 @@ public class ImageReaderTest extends AndroidTestCase {
         mListener = null;
     }
 
-    private void openDevice(String cameraId) throws Exception{
+    private void openDevice(String cameraId) {
         if (mCamera != null) {
             throw new IllegalStateException("Already have open camera device");
         }
         try {
-            mCamera = mCameraManager.openCamera(cameraId);
+            mCamera = openCamera(mCameraManager, cameraId, mHandler);
         } catch (CameraAccessException e) {
+            mCamera = null;
+            fail("Fail to open camera, " + Log.getStackTraceString(e));
+        } catch (BlockingOpenException e) {
             mCamera = null;
             fail("Fail to open camera, " + Log.getStackTraceString(e));
         }
     }
 
-    private void closeDevice(String cameraId) throws Exception {
+    private void closeDevice(String cameraId) {
         mCamera.close();
         mCamera = null;
     }
