@@ -22,6 +22,7 @@ import android.hardware.camera2.CameraDevice;
 import android.hardware.camera2.CameraManager;
 import android.hardware.camera2.CameraMetadata;
 import android.hardware.camera2.CameraProperties;
+import android.hardware.camera2.CaptureFailure;
 import android.hardware.camera2.CaptureRequest;
 import android.hardware.camera2.CaptureResult;
 import android.media.Image;
@@ -382,7 +383,7 @@ public class CameraDeviceTest extends AndroidTestCase {
         }
 
         int expectedCaptureResultCount = repeating ? REPEATING_CAPTURE_EXPECTED_RESULT_COUNT : 1;
-        verifyCaptureResults(mockCaptureListener, expectedCaptureResultCount);
+        verifyCaptureResults(camera, mockCaptureListener, expectedCaptureResultCount);
 
         if (repeating) {
             camera.stopRepeating();
@@ -423,7 +424,7 @@ public class CameraDeviceTest extends AndroidTestCase {
             expectedResultCount *= REPEATING_CAPTURE_EXPECTED_RESULT_COUNT;
         }
 
-        verifyCaptureResults(mockCaptureListener, expectedResultCount);
+        verifyCaptureResults(camera, mockCaptureListener, expectedResultCount);
 
         if (repeating) {
             camera.stopRepeating();
@@ -470,19 +471,21 @@ public class CameraDeviceTest extends AndroidTestCase {
     }
 
     private void verifyCaptureResults(
+            CameraDevice camera,
             CameraDevice.CaptureListener mockListener,
             int expectResultCount) {
         // Should receive expected number of capture results.
         verify(mockListener,
                 timeout(CAPTURE_WAIT_TIMEOUT_MS).atLeast(expectResultCount))
                         .onCaptureCompleted(
-                                any(CameraDevice.class),
-                                any(CaptureRequest.class),
+                                eq(camera),
+                                isA(CaptureRequest.class),
                                 argThat(new IsCameraMetadataNotEmpty<CaptureResult>()));
         // Should not receive any capture failed callbacks.
         verify(mockListener, never())
                         .onCaptureFailed(
-                                any(CameraDevice.class),
-                                argThat(new IsCameraMetadataNotEmpty<CaptureRequest>()));
+                                eq(camera),
+                                argThat(new IsCameraMetadataNotEmpty<CaptureRequest>()),
+                                isA(CaptureFailure.class));
     }
 }
