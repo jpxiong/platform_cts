@@ -19,9 +19,9 @@ package android.hardware.camera2.cts;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.hardware.camera2.CameraAccessException;
+import android.hardware.camera2.CameraCharacteristics;
 import android.hardware.camera2.CameraDevice;
 import android.hardware.camera2.CameraManager;
-import android.hardware.camera2.CameraProperties;
 import android.os.Handler;
 import android.test.AndroidTestCase;
 import android.util.Log;
@@ -103,14 +103,14 @@ public class CameraManagerTest extends AndroidTestCase {
     }
 
     // Test: that properties can be queried from each device, without exceptions.
-    public void testCameraManagerGetCameraProperties() throws Exception {
+    public void testCameraManagerGetCameraCharacteristics() throws Exception {
         String[] ids = mCameraManager.getCameraIdList();
         for (int i = 0; i < ids.length; i++) {
             CameraDevice camera = CameraTestUtils.openCamera(mCameraManager, ids[i], mHandler);
             assertNotNull(
                 String.format("Failed to open camera device ID: %s", ids[i]), camera);
             try {
-                CameraProperties props = camera.getProperties();
+                CameraCharacteristics props = camera.getProperties();
                 assertNotNull(
                     String.format("Can't get camera properties from: ID %s", ids[i]), props);
             }
@@ -130,7 +130,7 @@ public class CameraManagerTest extends AndroidTestCase {
             invalidId.append(ids[i]);
         }
         try {
-            CameraProperties props = mCameraManager.getCameraProperties(
+            CameraCharacteristics props = mCameraManager.getCameraCharacteristics(
                 invalidId.toString());
             fail(String.format("Accepted invalid camera ID: %s", invalidId.toString()));
         }
