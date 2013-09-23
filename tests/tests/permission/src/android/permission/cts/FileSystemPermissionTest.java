@@ -739,6 +739,30 @@ public class FileSystemPermissionTest extends AndroidTestCase {
                 (status.mode & 0666) == 0666);
     }
 
+    /**
+     * Test that the /system/bin/run-as command has setuid and setgid
+     * attributes set on the file.  If these calls fail, debugger
+     * breakpoints for native code will not work as run-as will not
+     * be able to perform required elevated-privilege functionality.
+     */
+    public void testRunAsHasCorrectCapabilities() throws Exception {
+        // ensure file is user and group read/executable
+        String filename = "/system/bin/run-as";
+        FileUtils.FileStatus status = new FileUtils.FileStatus();
+        assertTrue(FileUtils.getFileStatus(filename, status, false));
+        assertTrue(status.hasModeFlag(FileUtils.S_IRUSR | FileUtils.S_IXUSR));
+        assertTrue(status.hasModeFlag(FileUtils.S_IRGRP | FileUtils.S_IXGRP));
+
+        // ensure file owner/group is set correctly
+        File f = new File(filename);
+        assertFileOwnedBy(f, "root");
+        assertFileOwnedByGroup(f, "shell");
+
+        // ensure file has setuid/setgid enabled
+        assertTrue(FileUtils.hasSetUidCapability(filename));
+        assertTrue(FileUtils.hasSetGidCapability(filename));
+    }
+
     private static Set<File>
     getAllInsecureDevicesInDirAndSubdir(File dir, int type) throws Exception {
         assertTrue(dir.isDirectory());

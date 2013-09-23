@@ -16,10 +16,15 @@
 
 #include <jni.h>
 #include <stdio.h>
+#include <cutils/log.h>
+#include <linux/xattr.h>
 #include <sys/types.h>
 #include <sys/stat.h>
+#include <sys/xattr.h>
+#include <sys/capability.h>
 #include <grp.h>
 #include <pwd.h>
+#include <string.h>
 
 static jfieldID gFileStatusDevFieldID;
 static jfieldID gFileStatusInoFieldID;
@@ -87,6 +92,44 @@ jstring android_permission_cts_FileUtils_getGroupName(JNIEnv* env, jobject thiz,
     return env->NewStringUTF(grp->gr_name);
 }
 
+static jboolean isPermittedCapBitSet(JNIEnv* env, jstring path, size_t capId)
+{
+    const char* pathStr = env->GetStringUTFChars(path, NULL);
+    jboolean ret = false;
+
+    struct vfs_cap_data capData;
+    memset(&capData, 0, sizeof(capData));
+
+    ssize_t result = getxattr(pathStr, XATTR_NAME_CAPS, &capData,
+                              sizeof(capData));
+    if (result > 0) {
+      ret = (capData.data[CAP_TO_INDEX(capId)].permitted &
+             CAP_TO_MASK(capId)) != 0;
+      ALOGD("isPermittedCapBitSet(): getxattr(\"%s\") call succeeded, "
+            "cap bit %u %s",
+            pathStr, capId, ret ? "set" : "unset");
+    } else {
+      ALOGD("isPermittedCapBitSet(): getxattr(\"%s\") call failed: "
+            "return %d (error: %s (%d))\n",
+            pathStr, result, strerror(errno), errno);
+    }
+
+    env->ReleaseStringUTFChars(path, pathStr);
+    return ret;
+}
+
+jboolean android_permission_cts_FileUtils_hasSetUidCapability(JNIEnv* env,
+        jobject clazz, jstring path)
+{
+    return isPermittedCapBitSet(env, path, CAP_SETUID);
+}
+
+jboolean android_permission_cts_FileUtils_hasSetGidCapability(JNIEnv* env,
+        jobject clazz, jstring path)
+{
+    return isPermittedCapBitSet(env, path, CAP_SETGID);
+}
+
 static JNINativeMethod gMethods[] = {
     {  "getFileStatus", "(Ljava/lang/String;Landroid/permission/cts/FileUtils$FileStatus;Z)Z",
             (void *) android_permission_cts_FileUtils_getFileStatus  },
@@ -94,6 +137,10 @@ static JNINativeMethod gMethods[] = {
             (void *) android_permission_cts_FileUtils_getUserName  },
     {  "getGroupName", "(I)Ljava/lang/String;",
             (void *) android_permission_cts_FileUtils_getGroupName  },
+    {  "hasSetUidCapability", "(Ljava/lang/String;)Z",
+            (void *) android_permission_cts_FileUtils_hasSetUidCapability   },
+    {  "hasSetGidCapability", "(Ljava/lang/String;)Z",
+            (void *) android_permission_cts_FileUtils_hasSetGidCapability   },
 };
 
 int register_android_permission_cts_FileUtils(JNIEnv* env)
