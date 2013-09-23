@@ -94,4 +94,7 @@ public class FileUtils {
 
     public native static String getGroupName(int gid);
 
+    public native static boolean hasSetUidCapability(String path);
+
+    public native static boolean hasSetGidCapability(String path);
 }
