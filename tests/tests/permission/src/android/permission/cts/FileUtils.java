@@ -16,6 +16,13 @@ package android.permission.cts;
  * limitations under the License.
  */
 
+import com.google.common.primitives.Ints;
+
+import java.util.HashSet;
+import java.util.Set;
+
+import libcore.io.OsConstants;
+
 /** Bits and pieces copied from hidden API of android.os.FileUtils. */
 public class FileUtils {
 
@@ -79,6 +86,27 @@ public class FileUtils {
                 throw new IllegalArgumentException("Unknown type " + type);
             }
             return (mode & S_IFMT) == type;
+        }
+    }
+
+    public static class CapabilitySet {
+
+        private final Set<Integer> mCapabilities = new HashSet<Integer>();
+
+        public CapabilitySet add(int capability) {
+            if ((capability < 0) || (capability > OsConstants.CAP_LAST_CAP)) {
+                throw new IllegalArgumentException(String.format(
+                        "capability id %d out of valid range", capability));
+            }
+            mCapabilities.add(capability);
+            return this;
+        }
+
+        private native static boolean fileHasOnly(String path,
+                int[] capabilities);
+
+        public boolean fileHasOnly(String path) {
+            return fileHasOnly(path, Ints.toArray(mCapabilities));
         }
     }
 

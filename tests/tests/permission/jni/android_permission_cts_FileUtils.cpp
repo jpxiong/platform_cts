@@ -25,6 +25,9 @@
 #include <grp.h>
 #include <pwd.h>
 #include <string.h>
+#include <ScopedLocalRef.h>
+#include <ScopedPrimitiveArray.h>
+#include <ScopedUtfChars.h>
 
 static jfieldID gFileStatusDevFieldID;
 static jfieldID gFileStatusInoFieldID;
@@ -46,14 +49,15 @@ static jfieldID gFileStatusCtimeFieldID;
  * Copied from hidden API: frameworks/base/core/jni/android_os_FileUtils.cpp
  */
 
-jboolean android_permission_cts_FileUtils_getFileStatus(JNIEnv* env, jobject thiz,
-        jstring path, jobject fileStatus, jboolean statLinks)
+jboolean android_permission_cts_FileUtils_getFileStatus(JNIEnv* env,
+        jobject /* thiz */, jstring path, jobject fileStatus, jboolean statLinks)
 {
-    const char* pathStr = env->GetStringUTFChars(path, NULL);
+    ScopedUtfChars cPath(env, path);
     jboolean ret = false;
     struct stat s;
 
-    int res = statLinks == true ? lstat(pathStr, &s) : stat(pathStr, &s);
+    int res = statLinks == true ? lstat(cPath.c_str(), &s)
+            : stat(cPath.c_str(), &s);
 
     if (res == 0) {
         ret = true;
@@ -73,20 +77,18 @@ jboolean android_permission_cts_FileUtils_getFileStatus(JNIEnv* env, jobject thi
         }
     }
 
-    env->ReleaseStringUTFChars(path, pathStr);
-
     return ret;
 }
 
-jstring android_permission_cts_FileUtils_getUserName(JNIEnv* env, jobject thiz,
-        jint uid)
+jstring android_permission_cts_FileUtils_getUserName(JNIEnv* env,
+        jobject /* thiz */, jint uid)
 {
     struct passwd *pwd = getpwuid(uid);
     return env->NewStringUTF(pwd->pw_name);
 }
 
-jstring android_permission_cts_FileUtils_getGroupName(JNIEnv* env, jobject thiz,
-        jint gid)
+jstring android_permission_cts_FileUtils_getGroupName(JNIEnv* env,
+        jobject /* thiz */, jint gid)
 {
     struct group *grp = getgrgid(gid);
     return env->NewStringUTF(grp->gr_name);
@@ -94,40 +96,104 @@ jstring android_permission_cts_FileUtils_getGroupName(JNIEnv* env, jobject thiz,
 
 static jboolean isPermittedCapBitSet(JNIEnv* env, jstring path, size_t capId)
 {
-    const char* pathStr = env->GetStringUTFChars(path, NULL);
-    jboolean ret = false;
-
     struct vfs_cap_data capData;
     memset(&capData, 0, sizeof(capData));
 
-    ssize_t result = getxattr(pathStr, XATTR_NAME_CAPS, &capData,
+    ScopedUtfChars cPath(env, path);
+    ssize_t result = getxattr(cPath.c_str(), XATTR_NAME_CAPS, &capData,
                               sizeof(capData));
-    if (result > 0) {
-      ret = (capData.data[CAP_TO_INDEX(capId)].permitted &
-             CAP_TO_MASK(capId)) != 0;
-      ALOGD("isPermittedCapBitSet(): getxattr(\"%s\") call succeeded, "
-            "cap bit %u %s",
-            pathStr, capId, ret ? "set" : "unset");
-    } else {
-      ALOGD("isPermittedCapBitSet(): getxattr(\"%s\") call failed: "
-            "return %d (error: %s (%d))\n",
-            pathStr, result, strerror(errno), errno);
+    if (result <= 0)
+    {
+          ALOGD("isPermittedCapBitSet(): getxattr(\"%s\") call failed: "
+                  "return %d (error: %s (%d))\n",
+                  cPath.c_str(), result, strerror(errno), errno);
+          return false;
     }
 
-    env->ReleaseStringUTFChars(path, pathStr);
-    return ret;
+    return (capData.data[CAP_TO_INDEX(capId)].permitted &
+            CAP_TO_MASK(capId)) != 0;
 }
 
 jboolean android_permission_cts_FileUtils_hasSetUidCapability(JNIEnv* env,
-        jobject clazz, jstring path)
+        jobject /* clazz */, jstring path)
 {
     return isPermittedCapBitSet(env, path, CAP_SETUID);
 }
 
 jboolean android_permission_cts_FileUtils_hasSetGidCapability(JNIEnv* env,
-        jobject clazz, jstring path)
+        jobject /* clazz */, jstring path)
 {
     return isPermittedCapBitSet(env, path, CAP_SETGID);
+}
+
+static bool throwNamedException(JNIEnv* env, const char* className,
+        const char* message)
+{
+    ScopedLocalRef<jclass> eClazz(env, env->FindClass(className));
+    if (eClazz.get() == NULL)
+    {
+        ALOGE("throwNamedException(): failed to find class %s, cannot throw",
+                className);
+        return false;
+    }
+
+    env->ThrowNew(eClazz.get(), message);
+    return true;
+}
+
+// fill vfs_cap_data's permitted caps given a Java int[] of cap ids
+static bool fillPermittedCaps(vfs_cap_data* capData, JNIEnv* env, jintArray capIds)
+{
+    ScopedIntArrayRO cCapIds(env, capIds);
+    const size_t capCount = cCapIds.size();
+
+    for (size_t i = 0; i < capCount; ++i)
+    {
+        const jint capId = cCapIds[i];
+        if (!cap_valid(capId))
+        {
+            char message[64];
+            snprintf(message, sizeof(message),
+                    "capability id %d out of valid range", capId);
+            throwNamedException(env, "java/lang/IllegalArgumentException",
+                    message);
+
+            return false;
+        }
+        capData->data[CAP_TO_INDEX(capId)].permitted |= CAP_TO_MASK(capId);
+    }
+    return true;
+}
+
+jboolean android_permission_cts_FileUtils_CapabilitySet_fileHasOnly(JNIEnv* env,
+        jobject /* clazz */, jstring path, jintArray capIds)
+{
+    struct vfs_cap_data expectedCapData;
+    memset(&expectedCapData, 0, sizeof(expectedCapData));
+
+    expectedCapData.magic_etc = VFS_CAP_REVISION | VFS_CAP_FLAGS_EFFECTIVE;
+    if (!fillPermittedCaps(&expectedCapData, env, capIds))
+    {
+        // exception thrown
+        return false;
+    }
+
+    struct vfs_cap_data actualCapData;
+    memset(&actualCapData, 0, sizeof(actualCapData));
+
+    ScopedUtfChars cPath(env, path);
+    ssize_t result = getxattr(cPath.c_str(), XATTR_NAME_CAPS, &actualCapData,
+            sizeof(actualCapData));
+    if (result <= 0)
+    {
+        ALOGD("fileHasOnly(): getxattr(\"%s\") call failed: "
+                "return %d (error: %s (%d))\n",
+                cPath.c_str(), result, strerror(errno), errno);
+        return false;
+    }
+
+    return (memcmp(&expectedCapData, &actualCapData,
+            sizeof(struct vfs_cap_data)) == 0);
 }
 
 static JNINativeMethod gMethods[] = {
@@ -141,6 +207,11 @@ static JNINativeMethod gMethods[] = {
             (void *) android_permission_cts_FileUtils_hasSetUidCapability   },
     {  "hasSetGidCapability", "(Ljava/lang/String;)Z",
             (void *) android_permission_cts_FileUtils_hasSetGidCapability   },
+};
+
+static JNINativeMethod gCapabilitySetMethods[] = {
+    {  "fileHasOnly", "(Ljava/lang/String;[I)Z",
+            (void *) android_permission_cts_FileUtils_CapabilitySet_fileHasOnly  },
 };
 
 int register_android_permission_cts_FileUtils(JNIEnv* env)
@@ -161,6 +232,16 @@ int register_android_permission_cts_FileUtils(JNIEnv* env)
     gFileStatusMtimeFieldID = env->GetFieldID(fileStatusClass, "mtime", "J");
     gFileStatusCtimeFieldID = env->GetFieldID(fileStatusClass, "ctime", "J");
 
-    return env->RegisterNatives(clazz, gMethods, 
-            sizeof(gMethods) / sizeof(JNINativeMethod)); 
+    jint result = env->RegisterNatives(clazz, gMethods,
+            sizeof(gMethods) / sizeof(JNINativeMethod));
+    if (result)
+    {
+      return result;
+    }
+
+    // register FileUtils.CapabilitySet native methods
+    jclass capClazz = env->FindClass("android/permission/cts/FileUtils$CapabilitySet");
+
+    return env->RegisterNatives(capClazz, gCapabilitySetMethods,
+            sizeof(gCapabilitySetMethods) / sizeof(JNINativeMethod));
 }

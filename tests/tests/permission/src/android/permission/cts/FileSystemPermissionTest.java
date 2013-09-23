@@ -44,6 +44,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import libcore.io.OsConstants;
+
 /**
  * Verify certain permissions on the filesystem
  *
@@ -785,6 +787,30 @@ public class FileSystemPermissionTest extends AndroidTestCase {
                 (status.mode & 0666) == 0666);
     }
 
+    public void testFileHasOnlyCapsThrowsOnInvalidCaps() throws Exception {
+        try {
+            // Ensure negative cap id fails.
+            new FileUtils.CapabilitySet()
+                    .add(-1)
+                    .fileHasOnly("/system/bin/run-as");
+            fail();
+        }
+        catch (IllegalArgumentException e) {
+            // expected
+        }
+
+        try {
+            // Ensure too-large cap throws.
+            new FileUtils.CapabilitySet()
+                    .add(OsConstants.CAP_LAST_CAP + 1)
+                    .fileHasOnly("/system/bin/run-as");
+            fail();
+        }
+        catch (IllegalArgumentException e) {
+            // expected
+        }
+    }
+
     /**
      * Test that the /system/bin/run-as command has setuid and setgid
      * attributes set on the file.  If these calls fail, debugger
@@ -807,6 +833,12 @@ public class FileSystemPermissionTest extends AndroidTestCase {
         // ensure file has setuid/setgid enabled
         assertTrue(FileUtils.hasSetUidCapability(filename));
         assertTrue(FileUtils.hasSetGidCapability(filename));
+
+        // ensure file has *only* setuid/setgid attributes enabled
+        assertTrue(new FileUtils.CapabilitySet()
+                .add(OsConstants.CAP_SETUID)
+                .add(OsConstants.CAP_SETGID)
+                .fileHasOnly("/system/bin/run-as"));
     }
 
     private static Set<File>
