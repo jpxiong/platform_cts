@@ -20,6 +20,8 @@ import com.android.cts.verifier.ArrayTestListAdapter;
 import com.android.cts.verifier.PassFailButtons;
 import com.android.cts.verifier.R;
 import com.android.cts.verifier.TestListAdapter.TestListItem;
+import com.android.cts.verifier.nfc.hce.HceEmulatorTestActivity;
+import com.android.cts.verifier.nfc.hce.HceReaderTestActivity;
 
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -62,6 +64,16 @@ public class NfcTestActivity extends PassFailButtons.TestListActivity {
         if (getPackageManager().hasSystemFeature(FEATURE_NFC_MIFARE)) {
             adapter.add(TestListItem.newTest(this, R.string.nfc_mifare_ultralight,
                     MIFARE_ULTRALIGHT_ID, getTagIntent(MifareUltralight.class), null));
+        }
+
+        if (getPackageManager().hasSystemFeature(PackageManager.FEATURE_NFC_HOST_CARD_EMULATION)) {
+            adapter.add(TestListItem.newCategory(this, R.string.nfc_hce));
+            adapter.add(TestListItem.newTest(this, R.string.nfc_hce_reader_tests,
+                    HceReaderTestActivity.class.getName(),
+                    new Intent(this, HceReaderTestActivity.class), null));
+            adapter.add(TestListItem.newTest(this, R.string.nfc_hce_emulator_tests,
+                    HceEmulatorTestActivity.class.getName(),
+                    new Intent(this, HceEmulatorTestActivity.class), null));
         }
 
         setTestListAdapter(adapter);
