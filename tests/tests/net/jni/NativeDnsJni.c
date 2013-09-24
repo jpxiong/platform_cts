@@ -20,6 +20,11 @@
 #include <stdio.h>
 #include <utils/Log.h>
 
+const char *GoogleDNSIpV4Address="8.8.8.8";
+const char *GoogleDNSIpV4Address2="8.8.4.4";
+const char *GoogleDNSIpV6Address="2001:4860:4860::8888";
+const char *GoogleDNSIpV6Address2="2001:4860:4860::8844";
+
 JNIEXPORT jboolean Java_android_net_cts_DnsTest_testNativeDns(JNIEnv* env, jclass class)
 {
     const char *node = "www.google.com";
@@ -53,8 +58,8 @@ JNIEXPORT jboolean Java_android_net_cts_DnsTest_testNativeDns(JNIEnv* env, jclas
 
         freeaddrinfo(answer);
         answer = NULL;
-        if (foundv4 != 1 || foundv6 != 1) {
-            ALOGD("getaddrinfo(www.google.com) didn't find both v4 and v6");
+        if (foundv4 != 1 && foundv6 != 1) {
+            ALOGD("getaddrinfo(www.google.com) didn't find either v4 or v6 address");
             return JNI_FALSE;
         }
     }
@@ -96,49 +101,50 @@ JNIEXPORT jboolean Java_android_net_cts_DnsTest_testNativeDns(JNIEnv* env, jclas
     struct sockaddr_in sa4;
     sa4.sin_family = AF_INET;
     sa4.sin_port = 0;
-    inet_pton(AF_INET, "173.252.110.27", &(sa4.sin_addr));
+    inet_pton(AF_INET, GoogleDNSIpV4Address, &(sa4.sin_addr));
 
     struct sockaddr_in6 sa6;
     sa6.sin6_family = AF_INET6;
     sa6.sin6_port = 0;
     sa6.sin6_flowinfo = 0;
     sa6.sin6_scope_id = 0;
-    inet_pton(AF_INET6, "2001:4860:4001:802::1008", &(sa6.sin6_addr));
+    inet_pton(AF_INET6, GoogleDNSIpV6Address2, &(sa6.sin6_addr));
 
     char buf[NI_MAXHOST];
     int flags = NI_NAMEREQD;
 
     res = getnameinfo((const struct sockaddr*)&sa4, sizeof(sa4), buf, sizeof(buf), NULL, 0, flags);
     if (res != 0) {
-        ALOGD("getnameinfo(173.252.110.27 (facebook) ) gave error %d (%s)", res, gai_strerror(res));
+        ALOGD("getnameinfo(%s (GoogleDNS) ) gave error %d (%s)", GoogleDNSIpV4Address, res,
+            gai_strerror(res));
         return JNI_FALSE;
     }
-    if (strstr(buf, "facebook.com") == NULL) {
-        ALOGD("getnameinfo(173.252.110.27 (facebook) ) didn't return facebook.com: %s", buf);
+    if (strstr(buf, "google.com") == NULL) {
+        ALOGD("getnameinfo(%s (GoogleDNS) ) didn't return google.com: %s",
+            GoogleDNSIpV4Address, buf);
         return JNI_FALSE;
     }
 
     memset(buf, sizeof(buf), 0);
-    res = getnameinfo((const struct sockaddr*)&sa6, sizeof(sa6), buf, sizeof(buf),
-            NULL, 0, flags);
+    res = getnameinfo((const struct sockaddr*)&sa6, sizeof(sa6), buf, sizeof(buf), NULL, 0, flags);
     if (res != 0) {
-        ALOGD("getnameinfo(2a03:2880:2110:df01:face:b00c::8 (facebook) ) gave error %d (%s)",
-                res, gai_strerror(res));
+        ALOGD("getnameinfo(%s (GoogleDNS) ) gave error %d (%s)", GoogleDNSIpV6Address2,
+            res, gai_strerror(res));
         return JNI_FALSE;
     }
-    if (strstr(buf, "1e100.net") == NULL) {
-        ALOGD("getnameinfo(2a03:2880:2110:df01:face:b00c::8) didn't return facebook.com: %s", buf);
+    if (strstr(buf, "google.com") == NULL) {
+        ALOGD("getnameinfo(%s) didn't return google.com: %s", GoogleDNSIpV6Address2, buf);
         return JNI_FALSE;
     }
 
     // gethostbyname
-    struct hostent *my_hostent = gethostbyname("www.mit.edu");
+    struct hostent *my_hostent = gethostbyname("www.youtube.com");
     if (my_hostent == NULL) {
-        ALOGD("gethostbyname(www.mit.edu) gave null response");
+        ALOGD("gethostbyname(www.youtube.com) gave null response");
         return JNI_FALSE;
     }
     if ((my_hostent->h_addr_list == NULL) || (*my_hostent->h_addr_list == NULL)) {
-        ALOGD("gethostbyname(www.mit.edu) gave 0 addresses");
+        ALOGD("gethostbyname(www.youtube.com) gave 0 addresses");
         return JNI_FALSE;
     }
     {
@@ -146,21 +152,23 @@ JNIEXPORT jboolean Java_android_net_cts_DnsTest_testNativeDns(JNIEnv* env, jclas
         while (*current != NULL) {
             char buf[256];
             inet_ntop(my_hostent->h_addrtype, *current, buf, sizeof(buf));
-            ALOGD("gethostbyname(www.mit.edu) gave %s", buf);
+            ALOGD("gethostbyname(www.youtube.com) gave %s", buf);
             current++;
         }
     }
 
     // gethostbyaddr
     char addr6[16];
-    inet_pton(AF_INET6, "2001:4b10:bbc::2", addr6);
+    inet_pton(AF_INET6, GoogleDNSIpV6Address, addr6);
     my_hostent = gethostbyaddr(addr6, sizeof(addr6), AF_INET6);
     if (my_hostent == NULL) {
-        ALOGD("gethostbyaddr(2001:4b10:bbc::2 (bbc) ) gave null response");
+        ALOGD("gethostbyaddr(%s (GoogleDNS) ) gave null response", GoogleDNSIpV6Address);
         return JNI_FALSE;
     }
-    ALOGD("gethostbyaddr(2001:4b10:bbc::2 (bbc) ) gave %s for name",
-    my_hostent->h_name ? my_hostent->h_name : "null");
+
+    ALOGD("gethostbyaddr(%s (GoogleDNS) ) gave %s for name", GoogleDNSIpV6Address,
+        my_hostent->h_name ? my_hostent->h_name : "null");
+
     if (my_hostent->h_name == NULL) return JNI_FALSE;
     return JNI_TRUE;
 }
