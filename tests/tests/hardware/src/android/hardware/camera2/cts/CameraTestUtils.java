@@ -265,11 +265,14 @@ class CameraTestUtils extends Assert {
         }
     }
 
-    public static Size[] getSupportedSizeForFormat(int format, CameraDevice camera)
-            throws Exception {
+    public static Size[] getSupportedSizeForFormat(int format, String cameraId,
+            CameraManager cameraManager) throws Exception {
         CameraMetadata.Key<Size[]> key = null;
-        CameraCharacteristics properties = camera.getProperties();
-        assertNotNull("Can't get camera properties!", properties);
+        CameraCharacteristics properties = cameraManager.getCameraCharacteristics(cameraId);
+        assertNotNull("Can't get camera characteristics!", properties);
+        if (VERBOSE) {
+            Log.v(TAG, "get camera characteristics for camera: " + cameraId);
+        }
         switch (format) {
             case ImageFormat.JPEG:
                 key = CameraCharacteristics.SCALER_AVAILABLE_JPEG_SIZES;
