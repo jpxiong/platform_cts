@@ -43,6 +43,7 @@ import android.util.DisplayMetrics;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewGroup;
 import android.webkit.ConsoleMessage;
 import android.webkit.CookieSyncManager;
 import android.webkit.DownloadListener;
@@ -204,14 +205,15 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
     }
 
     public void testZoom() throws Throwable {
+        // Pinch zoom is not supported in wrap_content layouts.
+        mOnUiThread.setLayoutHeightToMatchParent();
+
         final ScaleChangedWebViewClient webViewClient = new ScaleChangedWebViewClient();
         mOnUiThread.setWebViewClient(webViewClient);
 
         mWebServer = new CtsTestServer(getActivity());
         mOnUiThread.loadUrlAndWaitForCompletion(
                 mWebServer.getAssetUrl(TestHtmlConstants.HELLO_WORLD_URL));
-        // Wait for initial scale to be set.
-        webViewClient.waitForScaleChanged();
 
         WebSettings settings = mOnUiThread.getSettings();
         settings.setSupportZoom(false);
