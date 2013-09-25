@@ -27,14 +27,16 @@ import android.os.SystemClock;
 import android.test.InstrumentationTestCase;
 import android.util.DisplayMetrics;
 import android.view.View;
+import android.view.ViewGroup;
+import android.view.ViewParent;
 import android.webkit.DownloadListener;
 import android.webkit.ValueCallback;
 import android.webkit.WebBackForwardList;
 import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
-import android.webkit.WebView;
 import android.webkit.WebView.HitTestResult;
 import android.webkit.WebView.PictureListener;
+import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
 import junit.framework.Assert;
@@ -678,6 +680,21 @@ public class WebViewOnUiThread {
             @Override
             public void run() {
                 mWebView.evaluateJavascript(script, result);
+            }
+        });
+    }
+
+    public void setLayoutHeightToMatchParent() {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                ViewParent parent = mWebView.getParent();
+                if (parent instanceof ViewGroup) {
+                    ((ViewGroup) parent).getLayoutParams().height =
+                        ViewGroup.LayoutParams.MATCH_PARENT;
+                }
+                mWebView.getLayoutParams().height = ViewGroup.LayoutParams.MATCH_PARENT;
+                mWebView.requestLayout();
             }
         });
     }
