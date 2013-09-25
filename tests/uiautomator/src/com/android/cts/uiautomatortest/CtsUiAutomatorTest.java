@@ -40,7 +40,7 @@ import java.io.IOException;
 public class CtsUiAutomatorTest extends UiAutomatorTestCase {
     private static final String LOG_TAG = CtsUiAutomatorTest.class.getSimpleName();
     private static final String[] LIST_SCROLL_TESTS = new String[] {
-            "Test 17", "Test 11", "Test 20"
+            "Test 17", "Test 11", "Test 20", "Test 35"
     };
     private static final String LAUNCH_APP = "am start -a android.intent.action.MAIN"
             + " -n com.android.cts.uiautomator/.MainActivity -W";
