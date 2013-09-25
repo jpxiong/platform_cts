@@ -40,6 +40,7 @@ abstract class MediaPlayerStressTest extends InstrumentationTestCase {
     protected static final String VIDEO_TOP_DIR = WorkDir.getMediaDirString();
     protected static final int REPEAT_NUMBER_FOR_SHORT_CLIPS = 2;
     protected static final int REPEAT_NUMBER_FOR_LONG_CLIPS = 1;
+    protected static final int REPEAT_NUMBER_FOR_REPEATED_PLAYBACK = 20;
     private static final String TAG = "MediaPlayerStressTest";
     // whether a video format is supported or not.
     private final boolean mSupported;
@@ -167,5 +168,9 @@ abstract class MediaPlayerStressTest extends InstrumentationTestCase {
 
     protected void doTestVideoPlaybackLong(int mediaNumber) throws Exception {
         doTestVideoPlayback(mediaNumber, REPEAT_NUMBER_FOR_LONG_CLIPS);
+    }
+
+    protected void doTestVideoPlaybackRepeated(int mediaNumber) throws Exception {
+        doTestVideoPlayback(mediaNumber, REPEAT_NUMBER_FOR_REPEATED_PLAYBACK);
     }
 }
