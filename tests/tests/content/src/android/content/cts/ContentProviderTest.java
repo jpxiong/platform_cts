@@ -201,8 +201,8 @@ public class ContentProviderTest extends AndroidTestCase {
         try {
             uri = Uri.parse("content://test");
             cp.openFile(uri, "wrong");
-            fail("Should throw FileNotFoundException!");
-        } catch (FileNotFoundException e) {
+            fail("Should throw IllegalArgumentException for bad mode!");
+        } catch (IllegalArgumentException e) {
         }
 
         // delete the temporary file
