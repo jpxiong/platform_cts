@@ -80,6 +80,16 @@ public class TestItems {
         addTestItem(new TestItem("28", "Test 28", TestGenericDetailFragment.class));
         addTestItem(new TestItem("29", "Test 29", TestGenericDetailFragment.class));
         addTestItem(new TestItem("30", "Test 30", TestGenericDetailFragment.class));
+        addTestItem(new TestItem("31", "Test 31", TestGenericDetailFragment.class));
+        addTestItem(new TestItem("32", "Test 32", TestGenericDetailFragment.class));
+        addTestItem(new TestItem("33", "Test 33", TestGenericDetailFragment.class));
+        addTestItem(new TestItem("34", "Test 34", TestGenericDetailFragment.class));
+        addTestItem(new TestItem("35", "Test 35", TestGenericDetailFragment.class));
+        addTestItem(new TestItem("36", "Test 36", TestGenericDetailFragment.class));
+        addTestItem(new TestItem("37", "Test 37", TestGenericDetailFragment.class));
+        addTestItem(new TestItem("38", "Test 38", TestGenericDetailFragment.class));
+        addTestItem(new TestItem("39", "Test 39", TestGenericDetailFragment.class));
+        addTestItem(new TestItem("40", "Test 40", TestGenericDetailFragment.class));
     }
 
     private static void addTestItem(TestItem item) {
