@@ -86,7 +86,8 @@ public class WebSettingsTest extends ActivityInstrumentationTestCase2<WebViewStu
      * <p/>
      * Mozilla/5.0 (Linux;[ U;] Android <version>;[ <language>-<country>;]
      * [<devicemodel>;] Build/<buildID>) AppleWebKit/<major>.<minor> (KHTML, like Gecko)
-     * Version/<major>.<minor>[ Mobile] Safari/<major>.<minor>
+     * Version/<major>.<minor> Chrome/<major>.<minor>.<branch>.<build>[ Mobile]
+     * Safari/<major>.<minor>
      */
     public void testUserAgentString_default() {
         final String actualUserAgentString = mSettings.getUserAgentString();
@@ -94,7 +95,8 @@ public class WebSettingsTest extends ActivityInstrumentationTestCase2<WebViewStu
         final String patternString =
                 "Mozilla/5\\.0 \\(Linux;( U;)? Android ([^;]+);( (\\w+)-(\\w+);)?" +
                 "\\s?(.*)\\sBuild/(.+)\\) AppleWebKit/(\\d+)\\.(\\d+) \\(KHTML, like Gecko\\) " +
-                "Version/\\d+\\.\\d+( Mobile)? Safari/(\\d+)\\.(\\d+)";
+                "Version/\\d+\\.\\d+ Chrome/\\d+\\.\\d+\\.\\d+\\.\\d+( Mobile)? " +
+                "Safari/(\\d+)\\.(\\d+)";
         // Groups used:
         //  1 - SSL encryption strength token " U;" (optional)
         //  2 - Android version
