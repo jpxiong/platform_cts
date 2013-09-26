@@ -129,7 +129,7 @@ public class ImageReaderTest extends AndroidTestCase {
     }
 
     private void bufferFormatTestByCamera(int format, String cameraId) throws Exception {
-        CameraCharacteristics properties = mCamera.getProperties();
+        CameraCharacteristics properties = mCameraManager.getCameraCharacteristics(cameraId);
         assertNotNull("Can't get camera properties!", properties);
 
         /**
@@ -150,7 +150,7 @@ public class ImageReaderTest extends AndroidTestCase {
                 Arrays.binarySearch(availableFormats, format) >= 0);
         */
 
-        Size[] availableSizes = getSupportedSizeForFormat(format, mCamera);
+        Size[] availableSizes = getSupportedSizeForFormat(format, mCamera.getId(), mCameraManager);
         assertArrayNotEmpty(availableSizes, "availableSizes should not be empty");
 
         // for each resolution, test imageReader:
