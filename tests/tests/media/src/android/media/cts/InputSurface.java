@@ -35,7 +35,6 @@ import android.view.Surface;
  */
 class InputSurface {
     private static final String TAG = "InputSurface";
-    private static final boolean VERBOSE = false;
 
     private static final int EGL_RECORDABLE_ANDROID = 0x3142;
 
