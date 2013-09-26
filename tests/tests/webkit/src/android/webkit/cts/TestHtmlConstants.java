@@ -47,6 +47,7 @@ public class TestHtmlConstants {
     public static final String NETWORK_STATE_URL = "webkit/network_state.html";
     public static final String TEST_TIMER_URL = "webkit/test_timer.html";
 
+    public static final String HTML_BASE_URL = "http://base/";
     public static final String HTML_URL1 = "webkit/test_firstPage.html";
     public static final String HTML_URL2 = "webkit/test_secondPage.html";
     public static final String HTML_URL3 = "webkit/test_thirdPage.html";
