@@ -221,7 +221,8 @@ public class Vp8EncoderTest extends AndroidTestCase {
             ivf = new IvfWriter(outputFilename, frameWidth, frameHeight);
             // encode loop
             long presentationTimeUs = 0;
-            int frameIndex = 0;
+            int inputFrameIndex = 0;
+            int outputFrameIndex = 0;
             boolean sawInputEOS = false;
             boolean sawOutputEOS = false;
 
@@ -241,8 +242,8 @@ public class Vp8EncoderTest extends AndroidTestCase {
                         mInputBuffers[inputBufIndex].put(frame);
                         mInputBuffers[inputBufIndex].rewind();
 
-                        presentationTimeUs = (frameIndex * 1000000) / frameRate;
-                        Log.d(TAG, "Encoding frame at index " + frameIndex);
+                        presentationTimeUs = (inputFrameIndex * 1000000) / frameRate;
+                        Log.d(TAG, "Encoding frame at index " + inputFrameIndex);
                         encoder.queueInputBuffer(
                                 inputBufIndex,
                                 0,  // offset
@@ -250,7 +251,7 @@ public class Vp8EncoderTest extends AndroidTestCase {
                                 presentationTimeUs,
                                 sawInputEOS ? MediaCodec.BUFFER_FLAG_END_OF_STREAM : 0);
 
-                        frameIndex++;
+                        inputFrameIndex++;
                     }
                 }
 
@@ -261,6 +262,12 @@ public class Vp8EncoderTest extends AndroidTestCase {
                     mOutputBuffers[outputBufIndex].rewind();
                     mOutputBuffers[outputBufIndex].get(buffer, 0, mBufferInfo.size);
 
+                    if ((outputFrameIndex == 0)
+                        && ((mBufferInfo.flags & MediaCodec.BUFFER_FLAG_SYNC_FRAME) == 0)) {
+                      throw new RuntimeException("First frame is not a sync frame.");
+
+                    }
+
                     if ((mBufferInfo.flags & MediaCodec.BUFFER_FLAG_END_OF_STREAM) != 0) {
                         sawOutputEOS = true;
                     } else {
@@ -268,6 +275,8 @@ public class Vp8EncoderTest extends AndroidTestCase {
                     }
                     encoder.releaseOutputBuffer(outputBufIndex,
                                                 false);  // render
+
+                    outputFrameIndex++;
                 } else if (result == MediaCodec.INFO_OUTPUT_BUFFERS_CHANGED) {
                     mOutputBuffers = encoder.getOutputBuffers();
                 }
