@@ -220,31 +220,6 @@ public class CameraDeviceTest extends AndroidTestCase {
         }
     }
 
-    public void testCameraDeviceGetProperties() throws Exception {
-        String[] ids = mCameraManager.getCameraIdList();
-        for (int i = 0; i < ids.length; i++) {
-            CameraDevice camera = null;
-            try {
-                camera = CameraTestUtils.openCamera(mCameraManager, ids[i], mCallbackHandler);
-                assertNotNull(
-                        String.format("Failed to open camera device %s", ids[i]), camera);
-
-                /**
-                 * Test: that the properties can be queried for this device.
-                 */
-                CameraCharacteristics props = camera.getProperties();
-                assertNotNull("Failed to get camera properties", props);
-
-                // TODO: Add more tests to check more fields.
-            }
-            finally {
-                if (camera != null) {
-                    camera.close();
-                }
-            }
-        }
-    }
-
     public void testCameraDeviceSetErrorListener() throws Exception {
         String[] ids = mCameraManager.getCameraIdList();
         for (int i = 0; i < ids.length; i++) {

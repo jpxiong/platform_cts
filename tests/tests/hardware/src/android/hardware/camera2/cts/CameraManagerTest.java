@@ -106,17 +106,9 @@ public class CameraManagerTest extends AndroidTestCase {
     public void testCameraManagerGetCameraCharacteristics() throws Exception {
         String[] ids = mCameraManager.getCameraIdList();
         for (int i = 0; i < ids.length; i++) {
-            CameraDevice camera = CameraTestUtils.openCamera(mCameraManager, ids[i], mHandler);
+            CameraCharacteristics props = mCameraManager.getCameraCharacteristics(ids[i]);
             assertNotNull(
-                String.format("Failed to open camera device ID: %s", ids[i]), camera);
-            try {
-                CameraCharacteristics props = camera.getProperties();
-                assertNotNull(
-                    String.format("Can't get camera properties from: ID %s", ids[i]), props);
-            }
-            finally {
-                camera.close();
-            }
+                    String.format("Can't get camera characteristics from: ID %s", ids[i]), props);
         }
     }
 
