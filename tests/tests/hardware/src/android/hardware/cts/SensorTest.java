@@ -19,9 +19,11 @@ package android.hardware.cts;
 import java.lang.IllegalArgumentException;
 import java.lang.Override;
 import java.util.List;
+import java.util.concurrent.CountDownLatch;
 
 import android.content.Context;
 import android.content.pm.PackageManager;
+import android.hardware.FlushCompleteListener;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
@@ -85,6 +87,15 @@ public class SensorTest extends AndroidTestCase {
         }
     }
 
+    public void testValuesForAllSensors() {
+        for (int i = Sensor.TYPE_ACCELEROMETER; i <= Sensor.TYPE_GEOMAGNETIC_ROTATION_VECTOR; ++i) {
+            Sensor sensor = mSensorManager.getDefaultSensor(i);
+            if (sensor != null) {
+                assertSensorValues(sensor);
+            }
+        }
+    }
+
     public void testRequestTriggerWithNonTriggerSensor() {
         Sensor sensor = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
         boolean result;
@@ -126,12 +137,57 @@ public class SensorTest extends AndroidTestCase {
         }
     }
 
-        private void assertSensorValues(Sensor sensor) {
+    public void testBatchAndFlush() throws Exception {
+        for (int i = Sensor.TYPE_ACCELEROMETER; i <= Sensor.TYPE_GEOMAGNETIC_ROTATION_VECTOR; ++i) {
+            Sensor sensor = mSensorManager.getDefaultSensor(i);
+            // Skip all non-continuous mode sensors.
+            if (sensor == null || Sensor.TYPE_SIGNIFICANT_MOTION == i ||
+                Sensor.TYPE_STEP_COUNTER == i || Sensor.TYPE_STEP_DETECTOR == i ||
+                Sensor.TYPE_LIGHT == i || Sensor.TYPE_PROXIMITY == i ||
+                Sensor.TYPE_AMBIENT_TEMPERATURE == i) {
+                continue;
+            }
+
+            final CountDownLatch eventReceived = new CountDownLatch(25);
+            SensorEventListener listener = new SensorEventListener() {
+                @Override
+                public void onSensorChanged(SensorEvent event) {
+                    eventReceived.countDown();
+                }
+
+                @Override
+                public void onAccuracyChanged(Sensor sensor, int accuracy) {
+                }
+            };
+
+            final CountDownLatch flushReceived = new CountDownLatch(1);
+            FlushCompleteListener flushCompleteListener = new FlushCompleteListener() {
+                @Override
+                public void onFlushCompleted(Sensor sensor) {
+                    flushReceived.countDown();
+                }
+            };
+            boolean result = mSensorManager.registerListener(listener, sensor,
+                                            SensorManager.SENSOR_DELAY_NORMAL, 10000000, 0,
+                                            flushCompleteListener);
+            assertTrue(result);
+            // Wait for 25 events and call flush.
+            eventReceived.await();
+            result = mSensorManager.flush(sensor);
+            assertTrue(result);
+            flushReceived.await();
+            mSensorManager.unregisterListener(listener);
+        }
+    }
+
+    private void assertSensorValues(Sensor sensor) {
         assertTrue(sensor.getMaximumRange() >= 0);
         assertTrue(sensor.getPower() >= 0);
         assertTrue(sensor.getResolution() >= 0);
         assertNotNull(sensor.getVendor());
         assertTrue(sensor.getVersion() > 0);
+        assertTrue(sensor.getFifoMaxEventCount() >= 0);
+        assertTrue(sensor.getFifoReservedEventCount() >= 0);
     }
 
     @SuppressWarnings("deprecation")
