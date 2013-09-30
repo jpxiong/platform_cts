@@ -119,6 +119,13 @@ public class PresentationSyncTest extends ActivityInstrumentationTestCase2<Media
      */
     private long runThroughputTest(InputSurface output, long frameTimeNsec, float mult) {
         Log.d(TAG, "runThroughputTest: " + mult);
+
+        // Sleep briefly.  This is strangely necessary on some devices to allow the GPU to
+        // catch up (b/10898363).  It also provides an easily-visible break in the systrace
+        // output.
+        try { Thread.sleep(50); }
+        catch (InterruptedException ignored) {}
+
         long startNsec = System.nanoTime();
         long showNsec = 0;
 
