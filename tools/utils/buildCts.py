@@ -74,7 +74,7 @@ class CtsBuilder(object):
     self.plan_repository = os.path.join(self.out_dir, 'repository/plans')
     
     #dirty hack to copy over prepopulated CTS test plans, stable vs flaky, for autoCTS
-    self.expectations_repository = os.path.join(self.android_root, 'cts/tests/expectations')
+    self.definedplans_repository = os.path.join(self.android_root, 'cts/tests/plans')
 
   def GenerateTestDescriptions(self):
     """Generate test descriptions for all packages."""
@@ -156,9 +156,9 @@ class CtsBuilder(object):
     self.__WritePlan(plan, 'PDK')
 
     #dirty hack to copy over pre-populated CTS plans - flaky vs stable - to streamline autoCTS
-    shutil.copyfile(os.path.join(self.expectations_repository, 'CTS-flaky.xml'),
+    shutil.copyfile(os.path.join(self.definedplans_repository, 'CTS-flaky.xml'),
         os.path.join(self.plan_repository, 'CTS-flaky.xml'))
-    shutil.copyfile(os.path.join(self.expectations_repository, 'CTS-stable.xml'),
+    shutil.copyfile(os.path.join(self.definedplans_repository, 'CTS-stable.xml'),
         os.path.join(self.plan_repository, 'CTS-stable.xml'))
 
 def LogGenerateDescription(name):
