@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<TestPlan version="1.0">
+  <Entry uri="android.app" exclude="android.app.backup.cts.BackupAgentHelperTest#testAndroidtestCaseSetupProperly;android.app.backup.cts.BackupAgentHelperTest#testBackupAGentHelper;android.app.backup.cts.BackupAgentTest#testAndroidTestCaseSetupProperly;android.app.backup.cts.BackupAgentTest#testBackupAgent;android.app.backup.cts.BackupManagerTest#testAndroidTestCaseSetupProperly;android.app.backup.cts.BackupManagerTest#testBackupManager;android.app.backup"/>
+  <Entry uri="android.hardware"/>
+  <Entry uri="android.media"/>
+  <Entry uri="android.net"/>
+  <Entry uri="android.provider"/>
+</TestPlan>
