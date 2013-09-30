@@ -30,17 +30,6 @@ import android.test.suitebuilder.annotation.SmallTest;
  * Verify permissions are enforced.
  */
 public class ContactsProviderTest extends AndroidTestCase {
-    @SmallTest
-    public void testAcquireContentProviderClient() throws Exception {
-        try {
-            final ContentProviderClient provider = getContext().getContentResolver().
-                    acquireContentProviderClient(Contacts.AUTHORITY);
-            fail("acquireContentProviderClient(Contacts.AUTHORITY) did not throw"
-                    + " SecurityException as expected");
-        } catch (SecurityException se) {
-            // Expected Exception
-        }
-    }
 
     /**
      * Verifies that query(ContactsContract.Contacts.CONTENT_URI) requires
