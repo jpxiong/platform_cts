@@ -41,6 +41,8 @@
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="com.android.alarm.permission.SET_ALARM" />
+
     <uses-feature android:name="android.hardware.usb.accessory" />
 
     <!-- Needed by the Audio Quality Verifier to store the sound samples that will be mailed. -->
@@ -461,6 +463,18 @@
             </intent-filter>
             <meta-data android:name="test_category" android:value="@string/test_category_other" />
         </activity>
+
+        <activity android:name=".deskclock.DeskClockTestsActivity"
+                  android:label="@string/deskclock_tests">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.cts.intent.category.MANUAL_TEST" />
+            </intent-filter>
+            <meta-data android:name="test_category" android:value="@string/test_category_deskclock" />
+        </activity>
+
+        <activity android:name=".deskclock.ShowAlarmsTestActivity"
+                  android:label="@string/dc_show_alarms_test"/>
 
         <receiver android:name=".widget.WidgetCtsProvider">
             <intent-filter>
