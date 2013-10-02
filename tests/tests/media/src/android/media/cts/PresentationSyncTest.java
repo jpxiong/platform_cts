@@ -189,8 +189,7 @@ public class PresentationSyncTest extends ActivityInstrumentationTestCase2<Media
      * <p>
      * @throws Exception
      */
-    @Suppress
-    public void testChoreographed() throws Throwable {
+    public void suppressed_testChoreographed() throws Throwable {
         // Get the Surface from the SurfaceView.
         // TODO: is it safe to assume that it's ready?
         SurfaceHolder holder = getActivity().getSurfaceHolder();
