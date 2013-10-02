@@ -328,9 +328,8 @@ TEST_F(EGLCleanupTest, TestCorrect) {
     ASSERT_TRUE(result);
 }
 
-#if 0
-/* try it without un-currenting the surfaces and context */
-TEST_F(EGLCleanupTest, TestNoReleaseCurrent) {
+/* try it without un-currenting the surfaces and context
+TEST _F(EGLCleanupTest, TestNoReleaseCurrent) {
     ALOGI("Starting TEST_NO_RELEASE_CURRENT");
     ChainedThread cht(ChainedThread::TEST_NO_RELEASE_CURRENT);
 
@@ -342,6 +341,6 @@ TEST_F(EGLCleanupTest, TestNoReleaseCurrent) {
     bool result = cht.getResult();
     ASSERT_TRUE(result);
 }
-#endif
+*/
 
 } // namespace android
