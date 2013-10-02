@@ -75,19 +75,33 @@ public class CameraManagerTest extends AndroidTestCase {
         String[] ids = mCameraManager.getCameraIdList();
         if (VERBOSE) Log.v(TAG, "CameraManager ids: " + Arrays.toString(ids));
 
-        // Test: that if the device has a camera, there must be at least one reported id.
-        assertTrue("At least one camera must be detected",
-               ! mPackageManager.hasSystemFeature(PackageManager.FEATURE_CAMERA_ANY)
-            || ids.length >= 1);
+        /**
+         * Test: that if there is at least one reported id, then the system must have
+         * the FEATURE_CAMERA_ANY feature.
+         */
+        assertTrue("System camera feature and camera id list don't match",
+                ids.length == 0 ||
+                mPackageManager.hasSystemFeature(PackageManager.FEATURE_CAMERA_ANY));
 
         /**
-         * Test: that if the device has both front and rear facing cameras, then there
-         * must be at lest two reported ids.
+         * Test: that if the device has front or rear facing cameras, then there
+         * must be matched system features.
          */
-        assertTrue("At least two cameras must be detected",
-               ! mPackageManager.hasSystemFeature(PackageManager.FEATURE_CAMERA)
-            || ! mPackageManager.hasSystemFeature(PackageManager.FEATURE_CAMERA_FRONT)
-            || ids.length >= 2);
+        for (int i = 0; i < ids.length; i++) {
+            CameraCharacteristics props = mCameraManager.getCameraCharacteristics(ids[i]);
+            assertNotNull("Can't get camera characteristics for camera " + ids[i], props);
+            Integer lensFacing = props.get(CameraCharacteristics.LENS_FACING);
+            assertNotNull("Can't get lens facing info", lensFacing);
+            if (lensFacing == CameraCharacteristics.LENS_FACING_FRONT) {
+                assertTrue("System doesn't have front camera feature",
+                        mPackageManager.hasSystemFeature(PackageManager.FEATURE_CAMERA_FRONT));
+            } else if (lensFacing == CameraCharacteristics.LENS_FACING_BACK) {
+                assertTrue("System doesn't have back camera feature",
+                        mPackageManager.hasSystemFeature(PackageManager.FEATURE_CAMERA));
+            } else {
+                fail("Unknown camera lens facing " + lensFacing.toString());
+            }
+        }
 
         /**
          * Test: that if there is one camera device, then the system must have some
