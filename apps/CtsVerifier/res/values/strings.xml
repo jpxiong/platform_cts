@@ -32,6 +32,7 @@
     <string name="test_category_security">Security</string>
     <string name="test_category_streaming">Streaming</string>
     <string name="test_category_features">Features</string>
+    <string name="test_category_deskclock">Desk Clock</string>
     <string name="test_category_other">Other</string>
     <string name="clear">Clear</string>
     <string name="test_results_cleared">Test results cleared.</string>
@@ -662,4 +663,22 @@
     <string name="widget_name">Widget Framework Test</string>
     <string name="widget_pass">Pass</string>
     <string name="widget_fail">Fail</string>
+
+    <!-- Strings for DeskClock -->
+    <string name="deskclock_tests">Desk Clock Tests</string>
+    <string name="deskclock_tests_info">
+        The Desk Clock tests verify that the Desk Clock app implements the Clock API\'s properly.
+    </string>
+    <string name="deskclock_group_alarms">Alarms</string>
+    <string name="deskclock_group_timers">Timers</string>
+
+    <string name="dc_show_alarms_test">Show Alarms Test</string>
+    <string name="dc_show_alarms_test_info">
+        This test verifies that the SHOW_ALARMS API works.\n
+        1. Press the "Show Alarms" button.\n
+        2. Verify that the Desk Clock app is launched and displays the Alarms section\n
+    </string>
+    <string name="dc_show_alarms_button">Show Alarms</string>
+
+
 </resources>
