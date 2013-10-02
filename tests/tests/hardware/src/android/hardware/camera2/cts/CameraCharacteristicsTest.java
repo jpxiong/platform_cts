@@ -27,13 +27,18 @@ package android.hardware.camera2.cts;
 import android.content.Context;
 import android.hardware.camera2.CameraCharacteristics;
 import android.hardware.camera2.CameraManager;
+import android.hardware.camera2.CameraMetadata.Key;
 import android.test.AndroidTestCase;
+import android.util.Log;
+
+import java.util.List;
 
 /**
  * Auto-generated CTS test for CameraCharacteristics fields.
  */
 public class CameraCharacteristicsTest extends AndroidTestCase {
     private CameraManager mCameraManager;
+    private static final String TAG = "CameraCharacteristicsTest";
 
     @Override
     public void setContext(Context context) {
@@ -60,6 +65,12 @@ public class CameraCharacteristicsTest extends AndroidTestCase {
                                         props);
             assertNotNull("Invalid property: android.control.aeAvailableAntibandingModes",
                     props.get(CameraCharacteristics.CONTROL_AE_AVAILABLE_ANTIBANDING_MODES));
+
+            List<Key<?>> allKeys = props.getKeys();
+            assertNotNull(String.format("Can't get camera characteristics keys from: ID %s", ids[i],
+                                        props));
+            assertTrue("Key not in keys list: android.control.aeAvailableAntibandingModes",
+                    allKeys.contains(CameraCharacteristics.CONTROL_AE_AVAILABLE_ANTIBANDING_MODES));
         }
     }
 
@@ -71,6 +82,12 @@ public class CameraCharacteristicsTest extends AndroidTestCase {
                                         props);
             assertNotNull("Invalid property: android.control.aeAvailableTargetFpsRanges",
                     props.get(CameraCharacteristics.CONTROL_AE_AVAILABLE_TARGET_FPS_RANGES));
+
+            List<Key<?>> allKeys = props.getKeys();
+            assertNotNull(String.format("Can't get camera characteristics keys from: ID %s", ids[i],
+                                        props));
+            assertTrue("Key not in keys list: android.control.aeAvailableTargetFpsRanges",
+                    allKeys.contains(CameraCharacteristics.CONTROL_AE_AVAILABLE_TARGET_FPS_RANGES));
         }
     }
 
@@ -82,6 +99,12 @@ public class CameraCharacteristicsTest extends AndroidTestCase {
                                         props);
             assertNotNull("Invalid property: android.control.aeCompensationRange",
                     props.get(CameraCharacteristics.CONTROL_AE_COMPENSATION_RANGE));
+
+            List<Key<?>> allKeys = props.getKeys();
+            assertNotNull(String.format("Can't get camera characteristics keys from: ID %s", ids[i],
+                                        props));
+            assertTrue("Key not in keys list: android.control.aeCompensationRange",
+                    allKeys.contains(CameraCharacteristics.CONTROL_AE_COMPENSATION_RANGE));
         }
     }
 
@@ -93,6 +116,12 @@ public class CameraCharacteristicsTest extends AndroidTestCase {
                                         props);
             assertNotNull("Invalid property: android.control.aeCompensationStep",
                     props.get(CameraCharacteristics.CONTROL_AE_COMPENSATION_STEP));
+
+            List<Key<?>> allKeys = props.getKeys();
+            assertNotNull(String.format("Can't get camera characteristics keys from: ID %s", ids[i],
+                                        props));
+            assertTrue("Key not in keys list: android.control.aeCompensationStep",
+                    allKeys.contains(CameraCharacteristics.CONTROL_AE_COMPENSATION_STEP));
         }
     }
 
@@ -104,6 +133,12 @@ public class CameraCharacteristicsTest extends AndroidTestCase {
                                         props);
             assertNotNull("Invalid property: android.control.afAvailableModes",
                     props.get(CameraCharacteristics.CONTROL_AF_AVAILABLE_MODES));
+
+            List<Key<?>> allKeys = props.getKeys();
+            assertNotNull(String.format("Can't get camera characteristics keys from: ID %s", ids[i],
+                                        props));
+            assertTrue("Key not in keys list: android.control.afAvailableModes",
+                    allKeys.contains(CameraCharacteristics.CONTROL_AF_AVAILABLE_MODES));
         }
     }
 
@@ -115,6 +150,12 @@ public class CameraCharacteristicsTest extends AndroidTestCase {
                                         props);
             assertNotNull("Invalid property: android.control.availableEffects",
                     props.get(CameraCharacteristics.CONTROL_AVAILABLE_EFFECTS));
+
+            List<Key<?>> allKeys = props.getKeys();
+            assertNotNull(String.format("Can't get camera characteristics keys from: ID %s", ids[i],
+                                        props));
+            assertTrue("Key not in keys list: android.control.availableEffects",
+                    allKeys.contains(CameraCharacteristics.CONTROL_AVAILABLE_EFFECTS));
         }
     }
 
@@ -126,6 +167,12 @@ public class CameraCharacteristicsTest extends AndroidTestCase {
                                         props);
             assertNotNull("Invalid property: android.control.availableSceneModes",
                     props.get(CameraCharacteristics.CONTROL_AVAILABLE_SCENE_MODES));
+
+            List<Key<?>> allKeys = props.getKeys();
+            assertNotNull(String.format("Can't get camera characteristics keys from: ID %s", ids[i],
+                                        props));
+            assertTrue("Key not in keys list: android.control.availableSceneModes",
+                    allKeys.contains(CameraCharacteristics.CONTROL_AVAILABLE_SCENE_MODES));
         }
     }
 
@@ -137,6 +184,12 @@ public class CameraCharacteristicsTest extends AndroidTestCase {
                                         props);
             assertNotNull("Invalid property: android.control.availableVideoStabilizationModes",
                     props.get(CameraCharacteristics.CONTROL_AVAILABLE_VIDEO_STABILIZATION_MODES));
+
+            List<Key<?>> allKeys = props.getKeys();
+            assertNotNull(String.format("Can't get camera characteristics keys from: ID %s", ids[i],
+                                        props));
+            assertTrue("Key not in keys list: android.control.availableVideoStabilizationModes",
+                    allKeys.contains(CameraCharacteristics.CONTROL_AVAILABLE_VIDEO_STABILIZATION_MODES));
         }
     }
 
@@ -148,6 +201,12 @@ public class CameraCharacteristicsTest extends AndroidTestCase {
                                         props);
             assertNotNull("Invalid property: android.control.awbAvailableModes",
                     props.get(CameraCharacteristics.CONTROL_AWB_AVAILABLE_MODES));
+
+            List<Key<?>> allKeys = props.getKeys();
+            assertNotNull(String.format("Can't get camera characteristics keys from: ID %s", ids[i],
+                                        props));
+            assertTrue("Key not in keys list: android.control.awbAvailableModes",
+                    allKeys.contains(CameraCharacteristics.CONTROL_AWB_AVAILABLE_MODES));
         }
     }
 
@@ -159,6 +218,12 @@ public class CameraCharacteristicsTest extends AndroidTestCase {
                                         props);
             assertNotNull("Invalid property: android.control.maxRegions",
                     props.get(CameraCharacteristics.CONTROL_MAX_REGIONS));
+
+            List<Key<?>> allKeys = props.getKeys();
+            assertNotNull(String.format("Can't get camera characteristics keys from: ID %s", ids[i],
+                                        props));
+            assertTrue("Key not in keys list: android.control.maxRegions",
+                    allKeys.contains(CameraCharacteristics.CONTROL_MAX_REGIONS));
         }
     }
 
@@ -170,6 +235,12 @@ public class CameraCharacteristicsTest extends AndroidTestCase {
                                         props);
             assertNotNull("Invalid property: android.flash.info.available",
                     props.get(CameraCharacteristics.FLASH_INFO_AVAILABLE));
+
+            List<Key<?>> allKeys = props.getKeys();
+            assertNotNull(String.format("Can't get camera characteristics keys from: ID %s", ids[i],
+                                        props));
+            assertTrue("Key not in keys list: android.flash.info.available",
+                    allKeys.contains(CameraCharacteristics.FLASH_INFO_AVAILABLE));
         }
     }
 
@@ -181,6 +252,12 @@ public class CameraCharacteristicsTest extends AndroidTestCase {
                                         props);
             assertNotNull("Invalid property: android.jpeg.availableThumbnailSizes",
                     props.get(CameraCharacteristics.JPEG_AVAILABLE_THUMBNAIL_SIZES));
+
+            List<Key<?>> allKeys = props.getKeys();
+            assertNotNull(String.format("Can't get camera characteristics keys from: ID %s", ids[i],
+                                        props));
+            assertTrue("Key not in keys list: android.jpeg.availableThumbnailSizes",
+                    allKeys.contains(CameraCharacteristics.JPEG_AVAILABLE_THUMBNAIL_SIZES));
         }
     }
 
@@ -192,6 +269,12 @@ public class CameraCharacteristicsTest extends AndroidTestCase {
                                         props);
             assertNotNull("Invalid property: android.lens.facing",
                     props.get(CameraCharacteristics.LENS_FACING));
+
+            List<Key<?>> allKeys = props.getKeys();
+            assertNotNull(String.format("Can't get camera characteristics keys from: ID %s", ids[i],
+                                        props));
+            assertTrue("Key not in keys list: android.lens.facing",
+                    allKeys.contains(CameraCharacteristics.LENS_FACING));
         }
     }
 
@@ -203,6 +286,12 @@ public class CameraCharacteristicsTest extends AndroidTestCase {
                                         props);
             assertNotNull("Invalid property: android.lens.info.availableApertures",
                     props.get(CameraCharacteristics.LENS_INFO_AVAILABLE_APERTURES));
+
+            List<Key<?>> allKeys = props.getKeys();
+            assertNotNull(String.format("Can't get camera characteristics keys from: ID %s", ids[i],
+                                        props));
+            assertTrue("Key not in keys list: android.lens.info.availableApertures",
+                    allKeys.contains(CameraCharacteristics.LENS_INFO_AVAILABLE_APERTURES));
         }
     }
 
@@ -214,6 +303,12 @@ public class CameraCharacteristicsTest extends AndroidTestCase {
                                         props);
             assertNotNull("Invalid property: android.lens.info.availableFilterDensities",
                     props.get(CameraCharacteristics.LENS_INFO_AVAILABLE_FILTER_DENSITIES));
+
+            List<Key<?>> allKeys = props.getKeys();
+            assertNotNull(String.format("Can't get camera characteristics keys from: ID %s", ids[i],
+                                        props));
+            assertTrue("Key not in keys list: android.lens.info.availableFilterDensities",
+                    allKeys.contains(CameraCharacteristics.LENS_INFO_AVAILABLE_FILTER_DENSITIES));
         }
     }
 
@@ -225,6 +320,12 @@ public class CameraCharacteristicsTest extends AndroidTestCase {
                                         props);
             assertNotNull("Invalid property: android.lens.info.availableFocalLengths",
                     props.get(CameraCharacteristics.LENS_INFO_AVAILABLE_FOCAL_LENGTHS));
+
+            List<Key<?>> allKeys = props.getKeys();
+            assertNotNull(String.format("Can't get camera characteristics keys from: ID %s", ids[i],
+                                        props));
+            assertTrue("Key not in keys list: android.lens.info.availableFocalLengths",
+                    allKeys.contains(CameraCharacteristics.LENS_INFO_AVAILABLE_FOCAL_LENGTHS));
         }
     }
 
@@ -236,6 +337,12 @@ public class CameraCharacteristicsTest extends AndroidTestCase {
                                         props);
             assertNotNull("Invalid property: android.lens.info.availableOpticalStabilization",
                     props.get(CameraCharacteristics.LENS_INFO_AVAILABLE_OPTICAL_STABILIZATION));
+
+            List<Key<?>> allKeys = props.getKeys();
+            assertNotNull(String.format("Can't get camera characteristics keys from: ID %s", ids[i],
+                                        props));
+            assertTrue("Key not in keys list: android.lens.info.availableOpticalStabilization",
+                    allKeys.contains(CameraCharacteristics.LENS_INFO_AVAILABLE_OPTICAL_STABILIZATION));
         }
     }
 
@@ -247,6 +354,12 @@ public class CameraCharacteristicsTest extends AndroidTestCase {
                                         props);
             assertNotNull("Invalid property: android.lens.info.hyperfocalDistance",
                     props.get(CameraCharacteristics.LENS_INFO_HYPERFOCAL_DISTANCE));
+
+            List<Key<?>> allKeys = props.getKeys();
+            assertNotNull(String.format("Can't get camera characteristics keys from: ID %s", ids[i],
+                                        props));
+            assertTrue("Key not in keys list: android.lens.info.hyperfocalDistance",
+                    allKeys.contains(CameraCharacteristics.LENS_INFO_HYPERFOCAL_DISTANCE));
         }
     }
 
@@ -258,6 +371,12 @@ public class CameraCharacteristicsTest extends AndroidTestCase {
                                         props);
             assertNotNull("Invalid property: android.lens.info.minimumFocusDistance",
                     props.get(CameraCharacteristics.LENS_INFO_MINIMUM_FOCUS_DISTANCE));
+
+            List<Key<?>> allKeys = props.getKeys();
+            assertNotNull(String.format("Can't get camera characteristics keys from: ID %s", ids[i],
+                                        props));
+            assertTrue("Key not in keys list: android.lens.info.minimumFocusDistance",
+                    allKeys.contains(CameraCharacteristics.LENS_INFO_MINIMUM_FOCUS_DISTANCE));
         }
     }
 
@@ -269,6 +388,12 @@ public class CameraCharacteristicsTest extends AndroidTestCase {
                                         props);
             assertNotNull("Invalid property: android.lens.info.shadingMapSize",
                     props.get(CameraCharacteristics.LENS_INFO_SHADING_MAP_SIZE));
+
+            List<Key<?>> allKeys = props.getKeys();
+            assertNotNull(String.format("Can't get camera characteristics keys from: ID %s", ids[i],
+                                        props));
+            assertTrue("Key not in keys list: android.lens.info.shadingMapSize",
+                    allKeys.contains(CameraCharacteristics.LENS_INFO_SHADING_MAP_SIZE));
         }
     }
 
@@ -280,6 +405,12 @@ public class CameraCharacteristicsTest extends AndroidTestCase {
                                         props);
             assertNotNull("Invalid property: android.request.maxNumOutputStreams",
                     props.get(CameraCharacteristics.REQUEST_MAX_NUM_OUTPUT_STREAMS));
+
+            List<Key<?>> allKeys = props.getKeys();
+            assertNotNull(String.format("Can't get camera characteristics keys from: ID %s", ids[i],
+                                        props));
+            assertTrue("Key not in keys list: android.request.maxNumOutputStreams",
+                    allKeys.contains(CameraCharacteristics.REQUEST_MAX_NUM_OUTPUT_STREAMS));
         }
     }
 
@@ -291,6 +422,12 @@ public class CameraCharacteristicsTest extends AndroidTestCase {
                                         props);
             assertNotNull("Invalid property: android.scaler.availableFormats",
                     props.get(CameraCharacteristics.SCALER_AVAILABLE_FORMATS));
+
+            List<Key<?>> allKeys = props.getKeys();
+            assertNotNull(String.format("Can't get camera characteristics keys from: ID %s", ids[i],
+                                        props));
+            assertTrue("Key not in keys list: android.scaler.availableFormats",
+                    allKeys.contains(CameraCharacteristics.SCALER_AVAILABLE_FORMATS));
         }
     }
 
@@ -302,6 +439,12 @@ public class CameraCharacteristicsTest extends AndroidTestCase {
                                         props);
             assertNotNull("Invalid property: android.scaler.availableJpegMinDurations",
                     props.get(CameraCharacteristics.SCALER_AVAILABLE_JPEG_MIN_DURATIONS));
+
+            List<Key<?>> allKeys = props.getKeys();
+            assertNotNull(String.format("Can't get camera characteristics keys from: ID %s", ids[i],
+                                        props));
+            assertTrue("Key not in keys list: android.scaler.availableJpegMinDurations",
+                    allKeys.contains(CameraCharacteristics.SCALER_AVAILABLE_JPEG_MIN_DURATIONS));
         }
     }
 
@@ -313,6 +456,12 @@ public class CameraCharacteristicsTest extends AndroidTestCase {
                                         props);
             assertNotNull("Invalid property: android.scaler.availableJpegSizes",
                     props.get(CameraCharacteristics.SCALER_AVAILABLE_JPEG_SIZES));
+
+            List<Key<?>> allKeys = props.getKeys();
+            assertNotNull(String.format("Can't get camera characteristics keys from: ID %s", ids[i],
+                                        props));
+            assertTrue("Key not in keys list: android.scaler.availableJpegSizes",
+                    allKeys.contains(CameraCharacteristics.SCALER_AVAILABLE_JPEG_SIZES));
         }
     }
 
@@ -324,6 +473,12 @@ public class CameraCharacteristicsTest extends AndroidTestCase {
                                         props);
             assertNotNull("Invalid property: android.scaler.availableMaxDigitalZoom",
                     props.get(CameraCharacteristics.SCALER_AVAILABLE_MAX_DIGITAL_ZOOM));
+
+            List<Key<?>> allKeys = props.getKeys();
+            assertNotNull(String.format("Can't get camera characteristics keys from: ID %s", ids[i],
+                                        props));
+            assertTrue("Key not in keys list: android.scaler.availableMaxDigitalZoom",
+                    allKeys.contains(CameraCharacteristics.SCALER_AVAILABLE_MAX_DIGITAL_ZOOM));
         }
     }
 
@@ -335,6 +490,12 @@ public class CameraCharacteristicsTest extends AndroidTestCase {
                                         props);
             assertNotNull("Invalid property: android.scaler.availableProcessedMinDurations",
                     props.get(CameraCharacteristics.SCALER_AVAILABLE_PROCESSED_MIN_DURATIONS));
+
+            List<Key<?>> allKeys = props.getKeys();
+            assertNotNull(String.format("Can't get camera characteristics keys from: ID %s", ids[i],
+                                        props));
+            assertTrue("Key not in keys list: android.scaler.availableProcessedMinDurations",
+                    allKeys.contains(CameraCharacteristics.SCALER_AVAILABLE_PROCESSED_MIN_DURATIONS));
         }
     }
 
@@ -346,6 +507,12 @@ public class CameraCharacteristicsTest extends AndroidTestCase {
                                         props);
             assertNotNull("Invalid property: android.scaler.availableProcessedSizes",
                     props.get(CameraCharacteristics.SCALER_AVAILABLE_PROCESSED_SIZES));
+
+            List<Key<?>> allKeys = props.getKeys();
+            assertNotNull(String.format("Can't get camera characteristics keys from: ID %s", ids[i],
+                                        props));
+            assertTrue("Key not in keys list: android.scaler.availableProcessedSizes",
+                    allKeys.contains(CameraCharacteristics.SCALER_AVAILABLE_PROCESSED_SIZES));
         }
     }
 
@@ -357,6 +524,12 @@ public class CameraCharacteristicsTest extends AndroidTestCase {
                                         props);
             assertNotNull("Invalid property: android.sensor.baseGainFactor",
                     props.get(CameraCharacteristics.SENSOR_BASE_GAIN_FACTOR));
+
+            List<Key<?>> allKeys = props.getKeys();
+            assertNotNull(String.format("Can't get camera characteristics keys from: ID %s", ids[i],
+                                        props));
+            assertTrue("Key not in keys list: android.sensor.baseGainFactor",
+                    allKeys.contains(CameraCharacteristics.SENSOR_BASE_GAIN_FACTOR));
         }
     }
 
@@ -368,6 +541,12 @@ public class CameraCharacteristicsTest extends AndroidTestCase {
                                         props);
             assertNotNull("Invalid property: android.sensor.maxAnalogSensitivity",
                     props.get(CameraCharacteristics.SENSOR_MAX_ANALOG_SENSITIVITY));
+
+            List<Key<?>> allKeys = props.getKeys();
+            assertNotNull(String.format("Can't get camera characteristics keys from: ID %s", ids[i],
+                                        props));
+            assertTrue("Key not in keys list: android.sensor.maxAnalogSensitivity",
+                    allKeys.contains(CameraCharacteristics.SENSOR_MAX_ANALOG_SENSITIVITY));
         }
     }
 
@@ -379,6 +558,12 @@ public class CameraCharacteristicsTest extends AndroidTestCase {
                                         props);
             assertNotNull("Invalid property: android.sensor.orientation",
                     props.get(CameraCharacteristics.SENSOR_ORIENTATION));
+
+            List<Key<?>> allKeys = props.getKeys();
+            assertNotNull(String.format("Can't get camera characteristics keys from: ID %s", ids[i],
+                                        props));
+            assertTrue("Key not in keys list: android.sensor.orientation",
+                    allKeys.contains(CameraCharacteristics.SENSOR_ORIENTATION));
         }
     }
 
@@ -390,6 +575,12 @@ public class CameraCharacteristicsTest extends AndroidTestCase {
                                         props);
             assertNotNull("Invalid property: android.sensor.info.activeArraySize",
                     props.get(CameraCharacteristics.SENSOR_INFO_ACTIVE_ARRAY_SIZE));
+
+            List<Key<?>> allKeys = props.getKeys();
+            assertNotNull(String.format("Can't get camera characteristics keys from: ID %s", ids[i],
+                                        props));
+            assertTrue("Key not in keys list: android.sensor.info.activeArraySize",
+                    allKeys.contains(CameraCharacteristics.SENSOR_INFO_ACTIVE_ARRAY_SIZE));
         }
     }
 
@@ -401,6 +592,12 @@ public class CameraCharacteristicsTest extends AndroidTestCase {
                                         props);
             assertNotNull("Invalid property: android.sensor.info.sensitivityRange",
                     props.get(CameraCharacteristics.SENSOR_INFO_SENSITIVITY_RANGE));
+
+            List<Key<?>> allKeys = props.getKeys();
+            assertNotNull(String.format("Can't get camera characteristics keys from: ID %s", ids[i],
+                                        props));
+            assertTrue("Key not in keys list: android.sensor.info.sensitivityRange",
+                    allKeys.contains(CameraCharacteristics.SENSOR_INFO_SENSITIVITY_RANGE));
         }
     }
 
@@ -412,6 +609,12 @@ public class CameraCharacteristicsTest extends AndroidTestCase {
                                         props);
             assertNotNull("Invalid property: android.sensor.info.exposureTimeRange",
                     props.get(CameraCharacteristics.SENSOR_INFO_EXPOSURE_TIME_RANGE));
+
+            List<Key<?>> allKeys = props.getKeys();
+            assertNotNull(String.format("Can't get camera characteristics keys from: ID %s", ids[i],
+                                        props));
+            assertTrue("Key not in keys list: android.sensor.info.exposureTimeRange",
+                    allKeys.contains(CameraCharacteristics.SENSOR_INFO_EXPOSURE_TIME_RANGE));
         }
     }
 
@@ -423,6 +626,12 @@ public class CameraCharacteristicsTest extends AndroidTestCase {
                                         props);
             assertNotNull("Invalid property: android.sensor.info.maxFrameDuration",
                     props.get(CameraCharacteristics.SENSOR_INFO_MAX_FRAME_DURATION));
+
+            List<Key<?>> allKeys = props.getKeys();
+            assertNotNull(String.format("Can't get camera characteristics keys from: ID %s", ids[i],
+                                        props));
+            assertTrue("Key not in keys list: android.sensor.info.maxFrameDuration",
+                    allKeys.contains(CameraCharacteristics.SENSOR_INFO_MAX_FRAME_DURATION));
         }
     }
 
@@ -434,6 +643,12 @@ public class CameraCharacteristicsTest extends AndroidTestCase {
                                         props);
             assertNotNull("Invalid property: android.sensor.info.physicalSize",
                     props.get(CameraCharacteristics.SENSOR_INFO_PHYSICAL_SIZE));
+
+            List<Key<?>> allKeys = props.getKeys();
+            assertNotNull(String.format("Can't get camera characteristics keys from: ID %s", ids[i],
+                                        props));
+            assertTrue("Key not in keys list: android.sensor.info.physicalSize",
+                    allKeys.contains(CameraCharacteristics.SENSOR_INFO_PHYSICAL_SIZE));
         }
     }
 
@@ -445,6 +660,12 @@ public class CameraCharacteristicsTest extends AndroidTestCase {
                                         props);
             assertNotNull("Invalid property: android.statistics.info.availableFaceDetectModes",
                     props.get(CameraCharacteristics.STATISTICS_INFO_AVAILABLE_FACE_DETECT_MODES));
+
+            List<Key<?>> allKeys = props.getKeys();
+            assertNotNull(String.format("Can't get camera characteristics keys from: ID %s", ids[i],
+                                        props));
+            assertTrue("Key not in keys list: android.statistics.info.availableFaceDetectModes",
+                    allKeys.contains(CameraCharacteristics.STATISTICS_INFO_AVAILABLE_FACE_DETECT_MODES));
         }
     }
 
@@ -456,6 +677,12 @@ public class CameraCharacteristicsTest extends AndroidTestCase {
                                         props);
             assertNotNull("Invalid property: android.statistics.info.maxFaceCount",
                     props.get(CameraCharacteristics.STATISTICS_INFO_MAX_FACE_COUNT));
+
+            List<Key<?>> allKeys = props.getKeys();
+            assertNotNull(String.format("Can't get camera characteristics keys from: ID %s", ids[i],
+                                        props));
+            assertTrue("Key not in keys list: android.statistics.info.maxFaceCount",
+                    allKeys.contains(CameraCharacteristics.STATISTICS_INFO_MAX_FACE_COUNT));
         }
     }
 
@@ -467,6 +694,12 @@ public class CameraCharacteristicsTest extends AndroidTestCase {
                                         props);
             assertNotNull("Invalid property: android.tonemap.maxCurvePoints",
                     props.get(CameraCharacteristics.TONEMAP_MAX_CURVE_POINTS));
+
+            List<Key<?>> allKeys = props.getKeys();
+            assertNotNull(String.format("Can't get camera characteristics keys from: ID %s", ids[i],
+                                        props));
+            assertTrue("Key not in keys list: android.tonemap.maxCurvePoints",
+                    allKeys.contains(CameraCharacteristics.TONEMAP_MAX_CURVE_POINTS));
         }
     }
 
@@ -478,6 +711,12 @@ public class CameraCharacteristicsTest extends AndroidTestCase {
                                         props);
             assertNotNull("Invalid property: android.info.supportedHardwareLevel",
                     props.get(CameraCharacteristics.INFO_SUPPORTED_HARDWARE_LEVEL));
+
+            List<Key<?>> allKeys = props.getKeys();
+            assertNotNull(String.format("Can't get camera characteristics keys from: ID %s", ids[i],
+                                        props));
+            assertTrue("Key not in keys list: android.info.supportedHardwareLevel",
+                    allKeys.contains(CameraCharacteristics.INFO_SUPPORTED_HARDWARE_LEVEL));
         }
     }
 }
