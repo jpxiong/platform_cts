@@ -1,4 +1,4 @@
-# Copyright (C) 2012 The Android Open Source Project
+# Copyright (C) 2013 The Android Open Source Project
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -22,7 +22,7 @@ LOCAL_SDK_VERSION := current
 LOCAL_SRC_FILES := $(call all-java-files-under, src) \
     ../ExternalStorageApp/src/com/android/cts/externalstorageapp/CommonExternalStorageTest.java
 
-LOCAL_PACKAGE_NAME := CtsWriteExternalStorageApp
+LOCAL_PACKAGE_NAME := CtsReadExternalStorageApp
 
 LOCAL_DEX_PREOPT := false
 
