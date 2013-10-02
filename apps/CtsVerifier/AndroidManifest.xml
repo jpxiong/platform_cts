@@ -54,7 +54,6 @@
             android:debuggable="true"
             android:largeHeap="true">
 
-        <uses-library android:name="com.android.future.usb.accessory" />
         <meta-data android:name="com.google.android.backup.api_key"
                 android:value="AEdPqrEAAAAIbK6ldcOzoeRtQ1u1dFVJ1A7KetRhit-a1Xa82Q" />
 
