@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<TestPlan version="1.0">
+  <Entry uri="android.aadb"/>
+  <Entry uri="android.acceleration"/>
+  <Entry uri="android.accessibility"/>
+  <Entry uri="android.accessibilityservice"/>
+  <Entry uri="android.accounts"/>
+  <Entry uri="android.admin"/>
+  <Entry uri="android.animation"/>
+  <Entry uri="android.app" exclude="android.app.cts.AlertDialogTest#testAlertDialogCancelable;android.app.cts.AlertDialogTest#testCallback"/>
+  <Entry uri="android.bluetooth"/>
+  <Entry uri="android.calendarcommon"/>
+  <Entry uri="android.content"/>
+  <Entry uri="android.core.tests.libcore.package.com"/>
+  <Entry uri="android.core.tests.libcore.package.dalvik"/>
+  <Entry uri="android.core.tests.libcore.package.libcore"/>
+  <Entry uri="android.core.tests.libcore.package.org"/>
+  <Entry uri="android.core.tests.libcore.package.sun"/>
+  <Entry uri="android.core.tests.libcore.package.tests"/>
+  <Entry uri="android.core.vm-tests-tf"/>
+  <Entry uri="android.database"/>
+  <Entry uri="android.display"/>
+  <Entry uri="android.dpi"/>
+  <Entry uri="android.dpi2"/>
+  <Entry uri="android.dreams"/>
+  <Entry uri="android.drm"/>
+  <Entry uri="android.effect"/>
+  <Entry uri="android.example"/>
+  <Entry uri="android.gesture"/>
+  <Entry uri="android.graphics"/>
+  <Entry uri="android.graphics2"/>
+  <Entry uri="android.hardware" exclude="android.hardware.cts.CameraTest#testCancelAutofocus"/>
+  <Entry uri="android.holo"/>
+  <Entry uri="android.jni"/>
+  <Entry uri="android.keystore"/>
+  <Entry uri="android.location"/>
+  <Entry uri="android.media" exclude="android.media.cts.DecodeEditEncodeTest#testVideoEditQCIF"/>
+  <Entry uri="android.mediastress"/>
+  <Entry uri="android.nativemedia.sl"/>
+  <Entry uri="android.nativemedia.xa"/>
+  <Entry uri="android.nativeopengl"/>
+  <Entry uri="android.ndef"/>
+  <Entry uri="android.net" exclude="android.net.cts.SSLCertificateSocketFactoryTest#testCreateSocket;android.net.cts.trafficStatsTest#testTrafficStatsForLocalhost;android.net.wifi.cts.ScanResultTest#testScanResultTimeStamp"/>
+  <Entry uri="android.opengl"/>
+  <Entry uri="android.openglperf"/>
+  <Entry uri="android.os"/>
+  <Entry uri="android.permission"/>
+  <Entry uri="android.permission2"/>
+  <Entry uri="android.preference"/>
+  <Entry uri="android.preference2"/>
+  <Entry uri="android.provider" exclude="android.provider.cts.MediaStore_Images_MediaTest#testInsertImageWithBitmap;android.provider.cts.MediaStore_Images_MediaTes#testInsertImageWithImagePath;android.provider.cts.MediaStore_Images_ThumbnailsTest#testQueryExternalMiniThumbnails"/>
+  <Entry uri="android.renderscript"/>
+  <Entry uri="android.sax"/>
+  <Entry uri="android.security"/>
+  <Entry uri="android.speech"/>
+  <Entry uri="android.telephony"/>
+  <Entry uri="android.tests.appsecurity"/>
+  <Entry uri="android.tests.sigtest"/>
+  <Entry uri="android.text"/>
+  <Entry uri="android.textureview"/>
+  <Entry uri="android.theme"/>
+  <Entry uri="android.uiautomator"/>
+  <Entry uri="android.util"/>
+  <Entry uri="android.view"/>
+  <Entry uri="android.webkit"/>
+  <Entry uri="android.widget"/>
+  <Entry uri="zzz.android.monkey"/>
+</TestPlan>
