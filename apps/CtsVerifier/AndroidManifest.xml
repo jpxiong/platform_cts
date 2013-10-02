@@ -472,7 +472,7 @@
             </intent-filter>
             <meta-data android:name="test_category" android:value="@string/test_category_camera" />
             <meta-data android:name="test_required_features" android:value="android.hardware.sensor.gyroscope" />
-            <meta-data android:name="test_required_features" android:value="android.hardware.camera.any"/>
+            <meta-data android:name="test_required_features" android:value="android.hardware.camera"/>
         </activity>
         <activity
             android:name=".camera.fov.DetermineFovActivity"
