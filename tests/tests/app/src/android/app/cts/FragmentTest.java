@@ -47,7 +47,8 @@ public class FragmentTest extends AndroidTestCase {
             Fragment.instantiate(getContext(), TestNotFragment.class.getName());
             fail();
         } catch (Exception e) {
-            assertTrue(e instanceof IllegalStateException);
+            // Should get an exception and it shouldn't be an IllegalStateException
+            assertFalse(e instanceof IllegalStateException);
         }
     }
 }
