@@ -20,8 +20,8 @@
       android:versionCode="1"
       android:versionName="4.3_r1">
 
-    <!-- Using 10 for more complete NFC support... -->
-    <uses-sdk android:minSdkVersion="11"></uses-sdk>
+    <!-- Using 10+ for more complete NFC support... -->
+    <uses-sdk android:minSdkVersion="12"></uses-sdk>
 
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
