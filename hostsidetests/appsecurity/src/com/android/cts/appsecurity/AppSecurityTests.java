@@ -17,7 +17,6 @@
 package com.android.cts.appsecurity;
 
 import com.android.cts.tradefed.build.CtsBuildHelper;
-import com.android.ddmlib.IDevice;
 import com.android.ddmlib.Log;
 import com.android.ddmlib.testrunner.InstrumentationResultParser;
 import com.android.ddmlib.testrunner.RemoteAndroidTestRunner;
@@ -66,15 +65,16 @@ public class AppSecurityTests extends DeviceTestCase implements IBuildReceiver {
     private static final String APP_ACCESS_DATA_PKG = "com.android.cts.appaccessdata";
 
     // External storage constants
+    private static final String COMMON_EXTERNAL_STORAGE_APP_CLASS = "com.android.cts.externalstorageapp.CommonExternalStorageTest";
     private static final String EXTERNAL_STORAGE_APP_APK = "CtsExternalStorageApp.apk";
     private static final String EXTERNAL_STORAGE_APP_PKG = "com.android.cts.externalstorageapp";
-    private static final String EXTERNAL_STORAGE_APP_CLASS = EXTERNAL_STORAGE_APP_PKG
-            + ".ExternalStorageTest";
+    private static final String EXTERNAL_STORAGE_APP_CLASS = EXTERNAL_STORAGE_APP_PKG + ".ExternalStorageTest";
+    private static final String READ_EXTERNAL_STORAGE_APP_APK = "CtsReadExternalStorageApp.apk";
+    private static final String READ_EXTERNAL_STORAGE_APP_PKG = "com.android.cts.readexternalstorageapp";
+    private static final String READ_EXTERNAL_STORAGE_APP_CLASS = READ_EXTERNAL_STORAGE_APP_PKG + ".ReadExternalStorageTest";
     private static final String WRITE_EXTERNAL_STORAGE_APP_APK = "CtsWriteExternalStorageApp.apk";
-    private static final String
-            WRITE_EXTERNAL_STORAGE_APP_PKG = "com.android.cts.writeexternalstorageapp";
-    private static final String WRITE_EXTERNAL_STORAGE_APP_CLASS = WRITE_EXTERNAL_STORAGE_APP_PKG
-            + ".WriteExternalStorageTest";
+    private static final String WRITE_EXTERNAL_STORAGE_APP_PKG = "com.android.cts.writeexternalstorageapp";
+    private static final String WRITE_EXTERNAL_STORAGE_APP_CLASS = WRITE_EXTERNAL_STORAGE_APP_PKG + ".WriteExternalStorageTest";
 
     // testInstrumentationDiffCert constants
     private static final String TARGET_INSTRUMENT_APK = "CtsTargetInstrumentationApp.apk";
@@ -207,20 +207,89 @@ public class AppSecurityTests extends DeviceTestCase implements IBuildReceiver {
     }
 
     /**
-     * Verify that legacy filesystem paths continue working, and that they all
-     * point to same location.
+     * Verify that app with no external storage permissions works correctly.
      */
-    public void testExternalStorageLegacyPaths() throws Exception {
+    public void testExternalStorageNone() throws Exception {
         try {
+            wipePrimaryExternalStorage(getDevice());
+
+            getDevice().uninstallPackage(EXTERNAL_STORAGE_APP_PKG);
+            assertNull(getDevice()
+                    .installPackage(getTestAppFile(EXTERNAL_STORAGE_APP_APK), false));
+            assertTrue("Failed external storage with no permissions",
+                    runDeviceTests(EXTERNAL_STORAGE_APP_PKG));
+        } finally {
+            getDevice().uninstallPackage(EXTERNAL_STORAGE_APP_PKG);
+        }
+    }
+
+    /**
+     * Verify that app with
+     * {@link android.Manifest.permission#READ_EXTERNAL_STORAGE} works
+     * correctly.
+     */
+    public void testExternalStorageRead() throws Exception {
+        try {
+            wipePrimaryExternalStorage(getDevice());
+
+            getDevice().uninstallPackage(READ_EXTERNAL_STORAGE_APP_PKG);
+            assertNull(getDevice()
+                    .installPackage(getTestAppFile(READ_EXTERNAL_STORAGE_APP_APK), false));
+            assertTrue("Failed external storage with read permissions",
+                    runDeviceTests(READ_EXTERNAL_STORAGE_APP_PKG));
+        } finally {
+            getDevice().uninstallPackage(READ_EXTERNAL_STORAGE_APP_PKG);
+        }
+    }
+
+    /**
+     * Verify that app with
+     * {@link android.Manifest.permission#WRITE_EXTERNAL_STORAGE} works
+     * correctly.
+     */
+    public void testExternalStorageWrite() throws Exception {
+        try {
+            wipePrimaryExternalStorage(getDevice());
+
             getDevice().uninstallPackage(WRITE_EXTERNAL_STORAGE_APP_PKG);
             assertNull(getDevice()
                     .installPackage(getTestAppFile(WRITE_EXTERNAL_STORAGE_APP_APK), false));
+            assertTrue("Failed external storage with write permissions",
+                    runDeviceTests(WRITE_EXTERNAL_STORAGE_APP_PKG));
+        } finally {
+            getDevice().uninstallPackage(WRITE_EXTERNAL_STORAGE_APP_PKG);
+        }
+    }
 
-            assertTrue("Failed to verify legacy filesystem paths", runDeviceTests(
-                    WRITE_EXTERNAL_STORAGE_APP_PKG, WRITE_EXTERNAL_STORAGE_APP_CLASS,
-                    "testLegacyPaths"));
+    /**
+     * Verify that app with WRITE_EXTERNAL can leave gifts in external storage
+     * directories belonging to other apps, and those apps can read.
+     */
+    public void testExternalStorageGifts() throws Exception {
+        try {
+            wipePrimaryExternalStorage(getDevice());
+
+            getDevice().uninstallPackage(EXTERNAL_STORAGE_APP_PKG);
+            getDevice().uninstallPackage(READ_EXTERNAL_STORAGE_APP_PKG);
+            getDevice().uninstallPackage(WRITE_EXTERNAL_STORAGE_APP_PKG);
+            assertNull(getDevice()
+                    .installPackage(getTestAppFile(EXTERNAL_STORAGE_APP_APK), false));
+            assertNull(getDevice()
+                    .installPackage(getTestAppFile(READ_EXTERNAL_STORAGE_APP_APK), false));
+            assertNull(getDevice()
+                    .installPackage(getTestAppFile(WRITE_EXTERNAL_STORAGE_APP_APK), false));
+
+            assertTrue("Failed to write gifts", runDeviceTests(WRITE_EXTERNAL_STORAGE_APP_PKG,
+                    WRITE_EXTERNAL_STORAGE_APP_CLASS, "doWriteGifts"));
+
+            assertTrue("Read failed to verify gifts", runDeviceTests(READ_EXTERNAL_STORAGE_APP_PKG,
+                    READ_EXTERNAL_STORAGE_APP_CLASS, "doVerifyGifts"));
+            assertTrue("None failed to verify gifts", runDeviceTests(EXTERNAL_STORAGE_APP_PKG,
+                    EXTERNAL_STORAGE_APP_CLASS, "doVerifyGifts"));
 
         } finally {
+            getDevice().uninstallPackage(EXTERNAL_STORAGE_APP_PKG);
+            getDevice().uninstallPackage(READ_EXTERNAL_STORAGE_APP_PKG);
             getDevice().uninstallPackage(WRITE_EXTERNAL_STORAGE_APP_PKG);
         }
     }
@@ -499,5 +568,10 @@ public class AppSecurityTests extends DeviceTestCase implements IBuildReceiver {
 
         getDevice().executeShellCommand(cmd, parser);
         return listener.getCurrentRunResults();
+    }
+
+    private static void wipePrimaryExternalStorage(ITestDevice device)
+            throws DeviceNotAvailableException {
+        device.executeShellCommand("rm -rf /sdcard/*");
     }
 }

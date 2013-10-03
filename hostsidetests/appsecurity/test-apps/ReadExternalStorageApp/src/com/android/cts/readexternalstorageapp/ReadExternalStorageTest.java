@@ -14,14 +14,14 @@
  * limitations under the License.
  */
 
-package com.android.cts.externalstorageapp;
+package com.android.cts.readexternalstorageapp;
 
 import static com.android.cts.externalstorageapp.CommonExternalStorageTest.PACKAGE_NONE;
 import static com.android.cts.externalstorageapp.CommonExternalStorageTest.PACKAGE_READ;
 import static com.android.cts.externalstorageapp.CommonExternalStorageTest.PACKAGE_WRITE;
-import static com.android.cts.externalstorageapp.CommonExternalStorageTest.assertDirNoAccess;
+import static com.android.cts.externalstorageapp.CommonExternalStorageTest.assertDirReadOnlyAccess;
 import static com.android.cts.externalstorageapp.CommonExternalStorageTest.assertDirReadWriteAccess;
-import static com.android.cts.externalstorageapp.CommonExternalStorageTest.assertFileNoAccess;
+import static com.android.cts.externalstorageapp.CommonExternalStorageTest.assertFileReadOnlyAccess;
 import static com.android.cts.externalstorageapp.CommonExternalStorageTest.assertFileReadWriteAccess;
 import static com.android.cts.externalstorageapp.CommonExternalStorageTest.buildGiftForPackage;
 import static com.android.cts.externalstorageapp.CommonExternalStorageTest.getAllPackageSpecificPaths;
@@ -34,19 +34,20 @@ import java.io.File;
 import java.util.List;
 
 /**
- * Test external storage from an application that has no external storage
- * permissions.
+ * Test external storage from an application that has
+ * {@link android.Manifest.permission#READ_EXTERNAL_STORAGE}.
  */
-public class ExternalStorageTest extends AndroidTestCase {
+public class ReadExternalStorageTest extends AndroidTestCase {
 
-    public void testPrimaryNoAccess() throws Exception {
-        assertDirNoAccess(Environment.getExternalStorageDirectory());
+    public void testPrimaryReadOnly() throws Exception {
+        assertDirReadOnlyAccess(Environment.getExternalStorageDirectory());
     }
 
     /**
-     * Verify that above our package directories we always have no access.
+     * Verify that above our package directories we always have read only
+     * access.
      */
-    public void testAllWalkingUpTreeNoAccess() throws Exception {
+    public void testAllWalkingUpTreeReadOnly() throws Exception {
         final List<File> paths = getAllPackageSpecificPaths(getContext());
         final String packageName = getContext().getPackageName();
 
@@ -61,24 +62,26 @@ public class ExternalStorageTest extends AndroidTestCase {
 
             // Keep walking up until we leave device
             while (Environment.MEDIA_MOUNTED.equals(Environment.getStorageState(path))) {
-                assertDirNoAccess(path);
+                assertDirReadOnlyAccess(path);
                 path = path.getParentFile();
             }
         }
     }
 
     /**
-     * Verify we can read only our gifts.
+     * Verify we can read all gifts.
      */
     public void doVerifyGifts() throws Exception {
         final File none = buildGiftForPackage(getContext(), PACKAGE_NONE);
-        assertFileReadWriteAccess(none);
+        assertFileReadOnlyAccess(none);
         assertEquals(100, readInt(none));
 
         final File read = buildGiftForPackage(getContext(), PACKAGE_READ);
-        assertFileNoAccess(read);
+        assertFileReadWriteAccess(read);
+        assertEquals(101, readInt(read));
 
         final File write = buildGiftForPackage(getContext(), PACKAGE_WRITE);
-        assertFileNoAccess(write);
+        assertFileReadOnlyAccess(write);
+        assertEquals(102, readInt(write));
     }
 }
