@@ -393,6 +393,29 @@
     <string name="cf_preview_label">Normal preview</string>
     <string name="cf_format_label">Processed callback data</string>
 
+    <!-- Strings for Camera Video -->
+    <string name="record_button_text">Test</string>
+    <string name="camera_video">Camera Video</string>
+    <string name="video_info"> This test checks video capture
+    at different resolutions. \n - The left view window shows the preview.
+    \n - Pressing the test button will trigger three
+    seconds of video recording. Playback will show up in the right view
+    window after recording is complete. \n - Use the spinners to choose
+    camera and resolution combinations. The playback should be similar
+    to what you saw in preview. \n - After all possible combinations
+    are tested, the pass button will be enabled. You may press the pass
+    button to indicate a pass. \n - You may press fail button any time during
+    the test to indicate failure.
+    </string>
+    <string name="video_capture_label">Video capture</string>
+    <string name="video_playback_label">Video playback</string>
+    <string name="dialog_fail_test">Test failed</string>
+    <string name="fail_quit">Fail and quit</string>
+    <string name="cancel">Cancel</string>
+    <string name="status_ready">Ready</string>
+    <string name="status_recording">Recording</string>
+    <string name="status_playback">Playing back</string>
+
     <!-- Strings for USB accessory test activity -->
     <string name="usb_accessory_test">USB Accessory Test</string>
     <string name="usb_accessory_test_info">
