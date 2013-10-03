@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              android:layout_width="match_parent"
-              android:layout_height="match_parent"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
     >
 
     <LinearLayout android:orientation="vertical"
@@ -12,17 +12,18 @@
                   android:padding="5dp"
         >
 
-        <TextView android:layout_width="wrap_content"
+        <TextView android:id="@+id/info"
+                  android:layout_width="wrap_content"
                   android:textSize="18sp"
                   android:layout_height="wrap_content"
                   android:text="@string/dc_show_alarms_test_info"
             />
 
-        <Button android:id="@+id/dc_show_alarms"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/dc_show_alarms_button"
-            />
+        <LinearLayout android:id="@+id/buttons"
+                      android:orientation="horizontal"
+                      android:layout_width="wrap_content"
+                      android:layout_height="wrap_content"
+                      android:layout_alignParentTop="true"/>
     </LinearLayout>
 
     <LinearLayout
@@ -30,6 +31,6 @@
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         >
-        <include layout="@layout/pass_fail_buttons" />
+        <include layout="@layout/pass_fail_buttons"/>
     </LinearLayout>
 </RelativeLayout>

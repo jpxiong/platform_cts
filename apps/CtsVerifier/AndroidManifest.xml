@@ -89,6 +89,9 @@
             <meta-data android:name="test_category" android:value="@string/test_category_device_admin" />
         </activity>
 
+        <!-- A generic activity for intent based tests -->
+        <activity android:name=".IntentDrivenTestActivity"/>
+
         <activity android:name=".admin.ScreenLockTestActivity"
                 android:label="@string/da_screen_lock_test"
                 android:configChanges="keyboardHidden|orientation|screenSize">
@@ -471,9 +474,6 @@
             </intent-filter>
             <meta-data android:name="test_category" android:value="@string/test_category_deskclock" />
         </activity>
-
-        <activity android:name=".deskclock.ShowAlarmsTestActivity"
-                  android:label="@string/dc_show_alarms_test"/>
 
         <receiver android:name=".widget.WidgetCtsProvider">
             <intent-filter>
