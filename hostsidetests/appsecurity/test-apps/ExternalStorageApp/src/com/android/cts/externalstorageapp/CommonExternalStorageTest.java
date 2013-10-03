@@ -36,7 +36,7 @@ import java.util.List;
  * storage status.
  */
 public class CommonExternalStorageTest extends AndroidTestCase {
-    private static final String TAG = "CommonExternalStorageTest";
+    public static final String TAG = "CommonExternalStorageTest";
 
     public static final String PACKAGE_NONE = "com.android.cts.externalstorageapp";
     public static final String PACKAGE_READ = "com.android.cts.readexternalstorageapp";
@@ -83,7 +83,7 @@ public class CommonExternalStorageTest extends AndroidTestCase {
     /**
      * Verify we can write to our own package dirs.
      */
-    public void testPackageDirs() throws Exception {
+    public void testAllPackageDirsWritable() throws Exception {
         final List<File> paths = getAllPackageSpecificPaths(getContext());
         for (File path : paths) {
             if (path == null) continue;
@@ -152,6 +152,10 @@ public class CommonExternalStorageTest extends AndroidTestCase {
                 packageName + ".gift");
     }
 
+    public static File buildProbeFile(File dir) {
+        return new File(dir, ".probe_" + System.nanoTime());
+    }
+
     public static void assertDirReadOnlyAccess(File path) {
         Log.d(TAG, "Asserting read-only access to " + path);
 
@@ -161,8 +165,7 @@ public class CommonExternalStorageTest extends AndroidTestCase {
         assertNotNull("list", path.list());
 
         try {
-            final File probe = new File(path, ".probe");
-            assertTrue(!probe.exists());
+            final File probe = buildProbeFile(path);
             probe.createNewFile();
             probe.delete();
             fail("able to create probe!");
@@ -180,8 +183,7 @@ public class CommonExternalStorageTest extends AndroidTestCase {
         assertNotNull("list", path.list());
 
         try {
-            final File probe = new File(path, ".probe");
-            assertTrue(!probe.exists());
+            final File probe = buildProbeFile(path);
             probe.createNewFile();
             probe.delete();
         } catch (IOException e) {
@@ -196,8 +198,20 @@ public class CommonExternalStorageTest extends AndroidTestCase {
         assertNull("list", path.list());
 
         try {
-            final File probe = new File(path, ".probe");
-            assertTrue(!probe.exists());
+            final File probe = buildProbeFile(path);
+            probe.createNewFile();
+            probe.delete();
+            fail("able to create probe!");
+        } catch (IOException e) {
+            // expected
+        }
+    }
+
+    public static void assertDirNoWriteAccess(File path) {
+        Log.d(TAG, "Asserting no write access to " + path);
+
+        try {
+            final File probe = buildProbeFile(path);
             probe.createNewFile();
             probe.delete();
             fail("able to create probe!");

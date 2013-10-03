@@ -52,6 +52,8 @@ public class ReadExternalStorageTest extends AndroidTestCase {
         final String packageName = getContext().getPackageName();
 
         for (File path : paths) {
+            if (path == null) continue;
+
             assertTrue(path.getAbsolutePath().contains(packageName));
 
             // Walk up until we drop our package
