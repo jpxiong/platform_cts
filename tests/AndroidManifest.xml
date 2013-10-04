@@ -684,6 +684,15 @@
             </intent-filter>
         </activity>
 
+        <activity android:name="android.webkit.cts.WebViewStartupStubActivity"
+            android:label="WebViewStartupStubActivity"
+            android:screenOrientation="nosensor">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.FRAMEWORK_INSTRUMENTATION_TEST" />
+            </intent-filter>
+        </activity>
+
         <activity android:name="android.app.cts.ChildActivity"
                         android:label="ChildActivity" />
 
