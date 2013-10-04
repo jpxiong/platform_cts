@@ -135,6 +135,12 @@ public class TelephonyManagerTest extends AndroidTestCase {
         assertTrue(mTelephonyManager.getDataState() >= TelephonyManager.DATA_DISCONNECTED);
         assertTrue(mTelephonyManager.getCallState() >= TelephonyManager.CALL_STATE_IDLE);
 
+        // Make sure devices without MMS service won't fail on this
+        if (mTelephonyManager.getPhoneType() != TelephonyManager.PHONE_TYPE_NONE) {
+            assertFalse(mTelephonyManager.getMmsUserAgent().isEmpty());
+            assertFalse(mTelephonyManager.getMmsUAProfUrl().isEmpty());
+        }
+
         // The following methods may return null. Simply call them to make sure they do not
         // throw any exceptions.
         mTelephonyManager.getVoiceMailNumber();
