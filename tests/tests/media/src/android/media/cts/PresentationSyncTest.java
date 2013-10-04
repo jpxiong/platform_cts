@@ -69,7 +69,6 @@ public class PresentationSyncTest extends ActivityInstrumentationTestCase2<Media
      *
      * @throws Exception
      */
-    //@Suppress
     public void testThroughput() throws Exception {
         // Get the Surface from the SurfaceView.
         // TODO: is it safe to assume that it's ready?
@@ -101,10 +100,23 @@ public class PresentationSyncTest extends ActivityInstrumentationTestCase2<Media
         Log.i(TAG, "Using " + refreshNsec + "ns as refresh rate");
 
         // Run tests with times specified, at 1.3x, 1x, 1/2x, and 1/4x speed.
-        runThroughputTest(output, refreshNsec, 0.75f);
-        runThroughputTest(output, refreshNsec, 1.0f);
-        runThroughputTest(output, refreshNsec, 2.0f);
-        runThroughputTest(output, refreshNsec, 4.0f);
+        //
+        // One particular device is overly aggressive at reducing clock frequencies, and it
+        // will slow things to the point where we can't push frames quickly enough in the
+        // faster test.  By adding an artificial workload in a second thread we can make the
+        // system run faster.  (This could have a detrimental effect on a single-core CPU,
+        // so it's a no-op there.)
+        CpuWaster cpuWaster = new CpuWaster();
+        try {
+            cpuWaster.start();
+            runThroughputTest(output, refreshNsec, 0.75f);
+            cpuWaster.stop();
+            runThroughputTest(output, refreshNsec, 1.0f);
+            runThroughputTest(output, refreshNsec, 2.0f);
+            runThroughputTest(output, refreshNsec, 4.0f);
+        } finally {
+            cpuWaster.stop();
+        }
 
         output.release();
     }
@@ -408,5 +420,48 @@ public class PresentationSyncTest extends ActivityInstrumentationTestCase2<Media
     @Override
     public void surfaceDestroyed(SurfaceHolder holder) {
         Log.d(TAG, "surfaceDestroyed");
+    }
+
+
+    /**
+     * Wastes CPU time.
+     * <p>
+     * The start() and stop() methods must be called from the same thread.
+     */
+    private static class CpuWaster {
+        volatile boolean mRunning = false;
+
+        public void start() {
+            if (mRunning) {
+                throw new IllegalStateException("already running");
+            }
+
+            if (Runtime.getRuntime().availableProcessors() < 2) {
+                return;
+            }
+
+            mRunning = true;
+
+            new Thread("Stupid") {
+                @Override
+                public void run() {
+                    while (mRunning) { /* spin! */ }
+                }
+            }.start();
+
+            // sleep briefly while the system re-evaluates its load (might want to spin)
+            try { Thread.sleep(10); }
+            catch (InterruptedException ignored) {}
+        }
+
+        public void stop() {
+            if (mRunning) {
+                mRunning = false;
+
+                // give the system a chance to slow back down
+                try { Thread.sleep(10); }
+                catch (InterruptedException ignored) {}
+            }
+        }
     }
 }
