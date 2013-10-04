@@ -230,12 +230,7 @@ public class EncodeVirtualDisplayWithCompositionTest extends AndroidTestCase {
             try {
                 ByteBuffer[] encoderOutputBuffers = mEncoder.getOutputBuffers();
                 MediaCodec.BufferInfo info = new MediaCodec.BufferInfo();
-                boolean stopEncoding = false;
-                while (!stopEncoding) {
-                    if (mStopEncoding) {
-                        mEncoder.signalEndOfInputStream();
-                        mStopEncoding = false; // reset to prevent sending EOS again
-                    }
+                while (!mStopEncoding) {
                     int index = mEncoder.dequeueOutputBuffer(info, TIMEOUT_USEC_NORMAL);
                     if (index >= 0) {
                         if ((info.flags & MediaCodec.BUFFER_FLAG_CODEC_CONFIG) != 0) {
@@ -246,7 +241,7 @@ public class EncodeVirtualDisplayWithCompositionTest extends AndroidTestCase {
                             mEventListener.onCodecConfig(encodedData, info);
                             mEncoder.releaseOutputBuffer(index, false);
                         } else if ((info.flags & MediaCodec.BUFFER_FLAG_END_OF_STREAM) != 0) {
-                            stopEncoding = true;
+                            break;
                         } else {
                             ByteBuffer encodedData = encoderOutputBuffers[index];
                             encodedData.position(info.offset);
