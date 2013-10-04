@@ -811,9 +811,17 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
         assertFalse(exif.hasThumbnail());
         // Primary image should still be valid for no thumbnail capture.
         BitmapFactory.decodeFile(JPEG_PATH, bmpOptions);
-        assertTrue("Jpeg primary image size should match requested size",
-                bmpOptions.outWidth == pictureSize.width &&
-                bmpOptions.outHeight == pictureSize.height);
+        if (!recording) {
+            assertTrue("Jpeg primary image size should match requested size",
+                    bmpOptions.outWidth == pictureSize.width &&
+                    bmpOptions.outHeight == pictureSize.height);
+        } else {
+            assertTrue(bmpOptions.outWidth >= recordingWidth ||
+                    bmpOptions.outWidth == size.width);
+            assertTrue(bmpOptions.outHeight >= recordingHeight ||
+                    bmpOptions.outHeight == size.height);
+        }
+
         assertNotNull("Jpeg primary image data should be decodable",
                 BitmapFactory.decodeFile(JPEG_PATH));
     }
