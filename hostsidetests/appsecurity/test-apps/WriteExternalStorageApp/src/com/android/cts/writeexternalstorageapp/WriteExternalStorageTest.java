@@ -19,10 +19,14 @@ package com.android.cts.writeexternalstorageapp;
 import static com.android.cts.externalstorageapp.CommonExternalStorageTest.PACKAGE_NONE;
 import static com.android.cts.externalstorageapp.CommonExternalStorageTest.PACKAGE_READ;
 import static com.android.cts.externalstorageapp.CommonExternalStorageTest.PACKAGE_WRITE;
+import static com.android.cts.externalstorageapp.CommonExternalStorageTest.TAG;
+import static com.android.cts.externalstorageapp.CommonExternalStorageTest.assertDirNoAccess;
+import static com.android.cts.externalstorageapp.CommonExternalStorageTest.assertDirNoWriteAccess;
 import static com.android.cts.externalstorageapp.CommonExternalStorageTest.assertDirReadOnlyAccess;
 import static com.android.cts.externalstorageapp.CommonExternalStorageTest.assertDirReadWriteAccess;
 import static com.android.cts.externalstorageapp.CommonExternalStorageTest.assertFileReadWriteAccess;
 import static com.android.cts.externalstorageapp.CommonExternalStorageTest.buildGiftForPackage;
+import static com.android.cts.externalstorageapp.CommonExternalStorageTest.buildProbeFile;
 import static com.android.cts.externalstorageapp.CommonExternalStorageTest.deleteContents;
 import static com.android.cts.externalstorageapp.CommonExternalStorageTest.getAllPackageSpecificPaths;
 import static com.android.cts.externalstorageapp.CommonExternalStorageTest.getPrimaryPackageSpecificPaths;
@@ -32,8 +36,13 @@ import static com.android.cts.externalstorageapp.CommonExternalStorageTest.write
 
 import android.os.Environment;
 import android.test.AndroidTestCase;
+import android.util.Log;
 
+import com.android.cts.externalstorageapp.CommonExternalStorageTest;
+
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileReader;
 import java.util.List;
 import java.util.Random;
 
@@ -121,6 +130,7 @@ public class WriteExternalStorageTest extends AndroidTestCase {
         final String packageName = getContext().getPackageName();
 
         for (File path : paths) {
+            assertNotNull(path);
             assertTrue(path.getAbsolutePath().contains(packageName));
 
             // Walk until we leave device, writing the whole way
@@ -147,6 +157,46 @@ public class WriteExternalStorageTest extends AndroidTestCase {
     }
 
     /**
+     * Verify we have valid mount status until we leave the device.
+     */
+    public void testMountStatusWalkingUpTree() {
+        final File top = Environment.getExternalStorageDirectory();
+        File path = getContext().getExternalCacheDir();
+
+        int depth = 0;
+        while (depth++ < 32) {
+            assertDirReadWriteAccess(path);
+            assertEquals(Environment.MEDIA_MOUNTED, Environment.getStorageState(path));
+
+            if (path.getAbsolutePath().equals(top.getAbsolutePath())) {
+                break;
+            }
+
+            path = path.getParentFile();
+        }
+
+        // Make sure we hit the top
+        assertEquals(top.getAbsolutePath(), path.getAbsolutePath());
+
+        // And going one step further should be outside our reach
+        path = path.getParentFile();
+        assertDirNoWriteAccess(path);
+        assertEquals(Environment.MEDIA_UNKNOWN, Environment.getStorageState(path));
+    }
+
+    /**
+     * Verify mount status for random paths.
+     */
+    public void testMountStatus() {
+        assertEquals(Environment.MEDIA_UNKNOWN,
+                Environment.getStorageState(new File("/meow-should-never-exist")));
+
+        // Internal data isn't a mount point
+        assertEquals(Environment.MEDIA_UNKNOWN,
+                Environment.getStorageState(getContext().getCacheDir()));
+    }
+
+    /**
      * Verify that we have write access in our package-specific directories on
      * secondary storage devices, but it becomes read-only access above them.
      */
@@ -155,6 +205,8 @@ public class WriteExternalStorageTest extends AndroidTestCase {
         final String packageName = getContext().getPackageName();
 
         for (File path : paths) {
+            if (path == null) continue;
+
             assertTrue(path.getAbsolutePath().contains(packageName));
 
             // Walk up until we drop our package
@@ -181,6 +233,8 @@ public class WriteExternalStorageTest extends AndroidTestCase {
 
         // Require that .nomedia was created somewhere above each dir
         for (File path : paths) {
+            if (path == null) continue;
+
             final File start = path;
 
             boolean found = false;
@@ -198,6 +252,37 @@ public class WriteExternalStorageTest extends AndroidTestCase {
                         + "; gave up at " + path);
             }
         }
+    }
+
+    /**
+     * Secondary external storage mount points must always be read-only, per
+     * CDD, <em>except</em> for the package specific directories tested by
+     * {@link CommonExternalStorageTest#testAllPackageDirsWritable()}.
+     */
+    public void testSecondaryMountPointsNotWritable() throws Exception {
+        final File probe = buildProbeFile(Environment.getExternalStorageDirectory());
+        assertTrue(probe.createNewFile());
+
+        final BufferedReader br = new BufferedReader(new FileReader("/proc/self/mounts"));
+        try {
+            String line;
+            while ((line = br.readLine()) != null) {
+                final String[] fields = line.split(" ");
+                final File testMount = new File(fields[1]);
+                final File testProbe = new File(testMount, probe.getName());
+                if (testProbe.exists()) {
+                    Log.d(TAG, "Primary external mountpoint " + testMount);
+                } else {
+                    // This mountpoint is not primary external storage; we must
+                    // not be able to write.
+                    Log.d(TAG, "Other mountpoint " + testMount);
+                    assertDirNoWriteAccess(testProbe.getParentFile());
+                }
+            }
+       } finally {
+           br.close();
+           probe.delete();
+       }
     }
 
     /**
