@@ -37,25 +37,37 @@ public class MediaStoreIntentsTest extends AndroidTestCase {
                 resolveInfoList.size() > 0);
     }
 
-    public void testPickImage() {
+    public void testPickImageDir() {
         Intent intent = new Intent(Intent.ACTION_PICK);
         intent.setData(MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
         assertCanBeHandled(intent);
     }
 
-    public void testPickVideo() {
+    public void testPickVideoDir() {
         Intent intent = new Intent(Intent.ACTION_PICK);
         intent.setData(MediaStore.Video.Media.EXTERNAL_CONTENT_URI);
         assertCanBeHandled(intent);
     }
 
-    public void testPickAudio() {
+    public void testPickAudioDir() {
         Intent intent = new Intent(Intent.ACTION_PICK);
         intent.setData(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI);
         assertCanBeHandled(intent);
     }
 
-    public void testViewImage() {
+    public void testViewImageDir() {
+        Intent intent = new Intent(Intent.ACTION_VIEW);
+        intent.setData(MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+        assertCanBeHandled(intent);
+    }
+
+    public void testViewVideoDir() {
+        Intent intent = new Intent(Intent.ACTION_VIEW);
+        intent.setData(MediaStore.Video.Media.EXTERNAL_CONTENT_URI);
+        assertCanBeHandled(intent);
+    }
+
+    public void testViewImageFile() {
         final String[] schemes = new String[] {
                 "file", "http", "https", "content" };
         final String[] mimes = new String[] {
@@ -72,7 +84,7 @@ public class MediaStoreIntentsTest extends AndroidTestCase {
         }
     }
 
-    public void testViewVideo() {
+    public void testViewVideoFile() {
         final String[] schemes = new String[] {
                 "file", "http", "https", "content" };
         final String[] mimes = new String[] {
@@ -90,7 +102,7 @@ public class MediaStoreIntentsTest extends AndroidTestCase {
         }
     }
 
-    public void testViewAudio() {
+    public void testViewAudioFile() {
         final String[] schemes = new String[] {
                 "file", "http", "content" };
         final String[] mimes = new String[] {
@@ -106,12 +118,5 @@ public class MediaStoreIntentsTest extends AndroidTestCase {
                 assertCanBeHandled(intent);
             }
         }
-    }
-
-    public void testSearchActions() {
-        assertCanBeHandled(new Intent(MediaStore.INTENT_ACTION_MEDIA_SEARCH));
-        assertCanBeHandled(new Intent(MediaStore.INTENT_ACTION_MEDIA_PLAY_FROM_SEARCH));
-        assertCanBeHandled(new Intent(MediaStore.INTENT_ACTION_TEXT_OPEN_FROM_SEARCH));
-        assertCanBeHandled(new Intent(MediaStore.INTENT_ACTION_VIDEO_PLAY_FROM_SEARCH));
     }
 }
