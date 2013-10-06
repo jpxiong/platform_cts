@@ -24,6 +24,7 @@ import android.hardware.camera2.CameraMetadata;
 import android.hardware.camera2.CameraCharacteristics;
 import android.hardware.camera2.Size;
 import android.media.Image;
+import android.media.ImageReader;
 import android.media.Image.Plane;
 import android.os.Handler;
 import android.util.Log;
@@ -51,6 +52,20 @@ class CameraTestUtils extends Assert {
     public static final int CAMERA_IDLE_TIMEOUT_MS = 2000;
     public static final int CAMERA_ACTIVE_TIMEOUT_MS = 500;
     public static final int CAMERA_BUSY_TIMEOUT_MS = 500;
+
+    public static class ImageDropperListener implements ImageReader.OnImageAvailableListener {
+        @Override
+        public void onImageAvailable(ImageReader reader) {
+            Image image = null;
+            try {
+                image = reader.acquireNextImage();
+            } finally {
+                if (image != null) {
+                    image.close();
+                }
+            }
+        }
+    }
 
     /**
      * Block until the camera is opened.
@@ -214,21 +229,21 @@ class CameraTestUtils extends Assert {
         int format = image.getFormat();
         Plane[] planes = image.getPlanes();
         switch (format) {
-          case ImageFormat.YUV_420_888:
-          case ImageFormat.NV21:
-          case ImageFormat.YV12:
-              assertEquals("YUV420 format Images should have 3 planes", 3, planes.length);
-              break;
-          case ImageFormat.Y8:
-          case ImageFormat.Y16:
-              assertEquals("Y8/Y16 Image should have 1 plane", 1, planes.length);
-              break;
-          case ImageFormat.JPEG:
-              assertEquals("Jpeg Image should have one plane", 1, planes.length);
-              break;
-          default:
-              fail("Unsupported Image Format: " + format);
-      }
+            case ImageFormat.YUV_420_888:
+            case ImageFormat.NV21:
+            case ImageFormat.YV12:
+                assertEquals("YUV420 format Images should have 3 planes", 3, planes.length);
+                break;
+            case ImageFormat.Y8:
+            case ImageFormat.Y16:
+                assertEquals("Y8/Y16 Image should have 1 plane", 1, planes.length);
+                break;
+            case ImageFormat.JPEG:
+                assertEquals("Jpeg Image should have one plane", 1, planes.length);
+                break;
+            default:
+                fail("Unsupported Image Format: " + format);
+        }
     }
 
     public static void dumpFile(String fileName, byte[] data) {
