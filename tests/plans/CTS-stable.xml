@@ -7,11 +7,13 @@
   <Entry uri="android.accounts"/>
   <Entry uri="android.admin"/>
   <Entry uri="android.animation"/>
-  <Entry uri="android.app" exclude="android.app.cts.AlertDialogTest#testAlertDialogCancelable;android.app.cts.AlertDialogTest#testCallback"/>
+  <Entry uri="android.app" exclude="android.app.cts.ActivityManagerTest#testIsRunningInTestHarness;android.app.cts.AlertDialogTest#testAlertDialogCancelable;android.app.cts.ExpandableListActivityTest#testCallback" />
+  <Entry uri="android.bionic"/>
   <Entry uri="android.bluetooth"/>
   <Entry uri="android.calendarcommon"/>
   <Entry uri="android.content"/>
   <Entry uri="android.core.tests.libcore.package.com"/>
+  <Entry uri="android.core.tests.libcore.package.conscrypt"/>
   <Entry uri="android.core.tests.libcore.package.dalvik"/>
   <Entry uri="android.core.tests.libcore.package.libcore"/>
   <Entry uri="android.core.tests.libcore.package.org"/>
@@ -29,18 +31,18 @@
   <Entry uri="android.gesture"/>
   <Entry uri="android.graphics"/>
   <Entry uri="android.graphics2"/>
-  <Entry uri="android.hardware" exclude="android.hardware.cts.CameraTest#testCancelAutofocus"/>
+  <Entry uri="android.hardware" exclude="android.hardware.camera2.cts.CameraDeviceTest#testCameraDeviceRepeatingRequest;android.hardware.camera2.cts.ImageReaderTest#testImageReaderFromCameraJpeg;android.hardware.cts.CameraGLTest#testCameraToSurfaceTextureMetadata;android.hardware.cts.CameraTest#testImmediateZoom;android.hardware.cts.CameraTest#testPreviewCallback;android.hardware.cts.CameraTest#testSmoothZoom;android.hardware.cts.CameraTest#testVideoSnapshot" />
   <Entry uri="android.holo"/>
   <Entry uri="android.jni"/>
   <Entry uri="android.keystore"/>
   <Entry uri="android.location"/>
-  <Entry uri="android.media" exclude="android.media.cts.DecodeEditEncodeTest#testVideoEditQCIF"/>
+  <Entry uri="android.media"/>
   <Entry uri="android.mediastress"/>
   <Entry uri="android.nativemedia.sl"/>
   <Entry uri="android.nativemedia.xa"/>
   <Entry uri="android.nativeopengl"/>
   <Entry uri="android.ndef"/>
-  <Entry uri="android.net" exclude="android.net.cts.SSLCertificateSocketFactoryTest#testCreateSocket;android.net.cts.trafficStatsTest#testTrafficStatsForLocalhost;android.net.wifi.cts.ScanResultTest#testScanResultTimeStamp"/>
+  <Entry uri="android.net" exclude="android.net.wifi.cts.ScanResultTest#testScanResultTimeStamp;android.net.cts.DnsTest#testDnsWorks;android.net.cts.TrafficStatsTest#testTrafficStatsForLocalhost;android.net.cts.SSLCertificateSocketFactoryTest#testCreateSocket;android.net.cts.SSLCertificateSocketFactoryTest#test_createSocket_bind;android.net.cts.SSLCertificateSocketFactoryTest#test_createSocket_simple;android.net.cts.SSLCertificateSocketFactoryTest#test_createSocket_wrapping" />
   <Entry uri="android.opengl"/>
   <Entry uri="android.openglperf"/>
   <Entry uri="android.os"/>
@@ -48,8 +50,10 @@
   <Entry uri="android.permission2"/>
   <Entry uri="android.preference"/>
   <Entry uri="android.preference2"/>
-  <Entry uri="android.provider" exclude="android.provider.cts.MediaStore_Images_MediaTest#testInsertImageWithBitmap;android.provider.cts.MediaStore_Images_MediaTes#testInsertImageWithImagePath;android.provider.cts.MediaStore_Images_ThumbnailsTest#testQueryExternalMiniThumbnails"/>
+  <Entry uri="android.provider"/>
   <Entry uri="android.renderscript"/>
+  <Entry uri="android.rscpp"/>
+  <Entry uri="android.rsg"/>
   <Entry uri="android.sax"/>
   <Entry uri="android.security"/>
   <Entry uri="android.speech"/>
@@ -60,9 +64,20 @@
   <Entry uri="android.textureview"/>
   <Entry uri="android.theme"/>
   <Entry uri="android.uiautomator"/>
+  <Entry uri="android.usb"/>
   <Entry uri="android.util"/>
   <Entry uri="android.view"/>
-  <Entry uri="android.webkit"/>
+  <Entry uri="android.webkit" exclude="android.webkit.cts.WebViewClientTest#testDoUpdateVisitedHistory;android.webkit.cts.WebViewClientTest#testLoadPage;android.webkit.cts.WebViewClientTest#testOnFormResubmission;android.webkit.cts.WebViewClientTest#testOnReceivedError;android.webkit.cts.WebViewClientTest#testOnReceivedHttpAuthRequest;android.webkit.cts.WebViewClientTest#testOnScaleChanged;android.webkit.cts.WebViewClientTest#testOnUnhandledKeyEvent;android.webkit.cts.WebViewTest#testSetInitialScale" />
   <Entry uri="android.widget"/>
+  <Entry uri="com.android.pts.bootup"/>
+  <Entry uri="com.android.pts.browserbench"/>
+  <Entry uri="com.android.pts.dram"/>
+  <Entry uri="com.android.pts.filesystemperf"/>
+  <Entry uri="com.android.pts.jank.opengl"/>
+  <Entry uri="com.android.pts.opengl"/>
+  <Entry uri="com.android.pts.simplecpu"/>
+  <Entry uri="com.android.pts.ui"/>
+  <Entry uri="com.android.pts.uihost"/>
+  <Entry uri="com.android.pts.videoperf"/>
   <Entry uri="zzz.android.monkey"/>
 </TestPlan>
