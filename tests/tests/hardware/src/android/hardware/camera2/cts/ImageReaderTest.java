@@ -17,6 +17,7 @@
 package android.hardware.camera2.cts;
 
 import static android.hardware.camera2.cts.CameraTestUtils.*;
+import static com.android.ex.camera2.blocking.BlockingStateListener.*;
 
 import android.content.Context;
 import android.graphics.BitmapFactory;
@@ -36,6 +37,7 @@ import android.util.Log;
 import android.view.Surface;
 
 import com.android.ex.camera2.blocking.BlockingCameraManager.BlockingOpenException;
+import com.android.ex.camera2.blocking.BlockingStateListener;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -65,6 +67,7 @@ public class ImageReaderTest extends AndroidTestCase {
 
     private CameraManager mCameraManager;
     private CameraDevice mCamera;
+    private BlockingStateListener mCameraListener;
     private String[] mCameraIds;
     private ImageReader mReader = null;
     private Handler mHandler = null;
@@ -84,6 +87,7 @@ public class ImageReaderTest extends AndroidTestCase {
         mCameraIds = mCameraManager.getCameraIdList();
         mLooperThread = new CameraTestThread();
         mHandler = mLooperThread.start();
+        mCameraListener = new BlockingStateListener();
     }
 
     @Override
@@ -221,6 +225,8 @@ public class ImageReaderTest extends AndroidTestCase {
         assertNotNull("Fail to get surface from ImageReader", surface);
         outputSurfaces.add(surface);
         mCamera.configureOutputs(outputSurfaces);
+        mCameraListener.waitForState(STATE_BUSY, CAMERA_BUSY_TIMEOUT_MS);
+        mCameraListener.waitForState(STATE_IDLE, CAMERA_IDLE_TIMEOUT_MS);
 
         CaptureRequest.Builder captureBuilder =
                 mCamera.createCaptureRequest(CameraDevice.TEMPLATE_PREVIEW);
@@ -235,6 +241,7 @@ public class ImageReaderTest extends AndroidTestCase {
         // TODO: Add more format here, and wrap each one as a function.
         Image img;
         int captureCount = NUM_FRAME_VERIFIED;
+
         // Only verify single image for still capture
         if (format == ImageFormat.JPEG) {
             captureCount = 1;
@@ -263,8 +270,12 @@ public class ImageReaderTest extends AndroidTestCase {
     }
 
     private void stopCapture() throws CameraAccessException {
-        mCamera.stopRepeating();
-        mCamera.waitUntilIdle();
+        if (VERBOSE) Log.v(TAG, "Stopping capture and waiting for idle");
+        // Stop repeat, wait for captures to complete, and disconnect from surfaces
+        mCamera.configureOutputs(/*outputs*/ null);
+        mCameraListener.waitForState(STATE_BUSY, CAMERA_BUSY_TIMEOUT_MS);
+        mCameraListener.waitForState(STATE_UNCONFIGURED, CAMERA_IDLE_TIMEOUT_MS);
+        // Camera has disconnected, clear out the reader
         mReader.close();
         mReader = null;
         mListener = null;
@@ -275,7 +286,8 @@ public class ImageReaderTest extends AndroidTestCase {
             throw new IllegalStateException("Already have open camera device");
         }
         try {
-            mCamera = openCamera(mCameraManager, cameraId, mHandler);
+            mCamera = CameraTestUtils.openCamera(
+                mCameraManager, cameraId, mCameraListener, mHandler);
         } catch (CameraAccessException e) {
             mCamera = null;
             fail("Fail to open camera, " + Log.getStackTraceString(e));
@@ -283,6 +295,7 @@ public class ImageReaderTest extends AndroidTestCase {
             mCamera = null;
             fail("Fail to open camera, " + Log.getStackTraceString(e));
         }
+        mCameraListener.waitForState(STATE_UNCONFIGURED, CAMERA_OPEN_TIMEOUT_MS);
     }
 
     private void closeDevice(String cameraId) {

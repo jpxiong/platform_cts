@@ -46,28 +46,11 @@ class CameraTestUtils extends Assert {
     private static final String TAG = "CameraTestUtils";
     private static final boolean VERBOSE = Log.isLoggable(TAG, Log.VERBOSE);
 
-    /**
-     * Provide a default implementation of CameraDevice.StateListener that does nothing.
-     */
-    public abstract static class DeviceStateListener extends CameraDevice.StateListener {
-        public DeviceStateListener() {
-        }
-
-        @Override
-        public void onOpened(CameraDevice camera) {
-            // Do nothing. It should be handled by #openCamera
-        }
-
-        @Override
-        public void onDisconnected(CameraDevice camera) {
-            // Do nothing
-        }
-
-        @Override
-        public void onError(CameraDevice camera, int error) {
-            // Do nothing
-        }
-    }
+    // Default timeouts for reaching various states
+    public static final int CAMERA_OPEN_TIMEOUT_MS = 500;
+    public static final int CAMERA_IDLE_TIMEOUT_MS = 2000;
+    public static final int CAMERA_ACTIVE_TIMEOUT_MS = 500;
+    public static final int CAMERA_BUSY_TIMEOUT_MS = 500;
 
     /**
      * Block until the camera is opened.
