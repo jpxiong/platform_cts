@@ -31,7 +31,7 @@
   <Entry uri="android.gesture"/>
   <Entry uri="android.graphics"/>
   <Entry uri="android.graphics2"/>
-  <Entry uri="android.hardware" exclude="android.hardware.camera2.cts.CameraDeviceTest#testCameraDeviceRepeatingRequest;android.hardware.camera2.cts.ImageReaderTest#testImageReaderFromCameraJpeg;android.hardware.cts.CameraGLTest#testCameraToSurfaceTextureMetadata;android.hardware.cts.CameraTest#testImmediateZoom;android.hardware.cts.CameraTest#testPreviewCallback;android.hardware.cts.CameraTest#testSmoothZoom;android.hardware.cts.CameraTest#testVideoSnapshot" />
+  <Entry uri="android.hardware" exclude="android.hardware.camera2.cts.CameraDeviceTest#testCameraDeviceRepeatingRequest;android.hardware.camera2.cts.ImageReaderTest#testImageReaderFromCameraJpeg;android.hardware.cts.CameraGLTest#testCameraToSurfaceTextureMetadata;android.hardware.cts.CameraTest#testImmediateZoom;android.hardware.cts.CameraTest#testPreviewCallback;android.hardware.cts.CameraTest#testSmoothZoom;android.hardware.cts.CameraTest#testVideoSnapshot;android.hardware.cts.CameraGLTest#testSetPreviewTextureBothCallbacks;android.hardware.cts.CameraGLTest#testSetPreviewTexturePreviewCallback" />
   <Entry uri="android.holo"/>
   <Entry uri="android.jni"/>
   <Entry uri="android.keystore"/>
