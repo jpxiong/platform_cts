@@ -655,6 +655,24 @@
     <string name="nls_service_stopped">Service should stop once disabled.</string>
     <string name="nls_note_missed">Check that notification was not received.</string>
     
+    <string name="cacert_test">CA Cert Notification Test</string>
+    <string name="cacert_info">This test checks that when a CA Certificate is installed, the user is notified.</string>
+    <string name="cacert_do_something">Do it</string>
+    <string name="cacert_done">Done</string>
+    <string name="cacert_install_cert">Use the CertInstaller to install the certificate. When it opens, just tap "Okay". If this button does nothing, pass the test and move on.</string>
+    <string name="cacert_check_cert_in_settings">Visit the user-installed trusted credentials page and confirm that the "Internet Widgits Pty Ltd" cert appears in the list.</string>
+    <string name="cacert_check_notification">Please look at the new notification and confirm: It say the network may be monitored. Tapping it brings up a more detailed explanation and a button to check trusted credentials. Tapping that button brings up the Trusted Credentials page you just visited.</string>
+    <string name="cacert_dismiss_notification">Dismiss the notification. If it cannot be dismissed, fail the test.</string>
+
+    <string name="caboot_test">CA Cert Notification on Boot test</string>
+    <string name="caboot_info">This test is to confirm that when the user has installed a trusted credential, the system notifies the user when it boots.</string>
+    <string name="caboot_check_cert_installed">Please check here to see whether a certificate is already installed. (If this button does nothing, pass the test and move on.)</string>
+    <string name="caboot_check_creds">Check Credentials</string>
+    <string name="caboot_if_not_installed">Only if there is no credential currently installed, install one. (If this button does nothing, pass the test and move on.)</string>
+    <string name="caboot_install_cert">Install credential</string>
+    <string name="caboot_reboot_desc">Please reboot the device and return to this test.</string>
+    <string name="caboot_after_boot">AFTER REBOOTING: Check that there is a notification that the network may be monitored. Opening that notification should show a dialog box giving more information, with a button to check trusted credentials. This should open up the same view of trusted credentials that you get via the "Check credentials" button.</string>
+
     <!-- Strings for Widget -->
     <string name="widget_framework_test">Widget Framework Test</string>
     <string name="widget_framework_test_info">This test checks some basic features of the widget
