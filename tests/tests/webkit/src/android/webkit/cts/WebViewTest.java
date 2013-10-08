@@ -1080,7 +1080,8 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
         new PollingCheck() {
             @Override
             protected boolean check() {
-                return mOnUiThread.getScale() != 0 && mOnUiThread.getContentHeight() != 0;
+                return mOnUiThread.getScale() != 0 && mOnUiThread.getContentHeight() != 0
+                    && mOnUiThread.getHeight() != 0;
             }
         }.run();
         assertEquals(mOnUiThread.getHeight(),
