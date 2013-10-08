@@ -16,6 +16,8 @@
 
 package android.telephony.cts;
 
+import android.content.Context;
+import android.content.pm.PackageManager;
 import android.test.AndroidTestCase;
 import android.test.suitebuilder.annotation.SmallTest;
 
@@ -25,6 +27,8 @@ import com.android.internal.telephony.SmsUsageMonitor;
  * Test cases for SMS short code pattern matching in SmsUsageMonitor.
  */
 public class SmsUsageMonitorShortCodeTest extends AndroidTestCase {
+
+    private PackageManager mPackageManager;
 
     /** Return value from {@link SmsUsageMonitor#checkDestination} for regular phone numbers. */
     static final int CATEGORY_NOT_SHORT_CODE = 0;
@@ -475,8 +479,19 @@ public class SmsUsageMonitorShortCodeTest extends AndroidTestCase {
             new ShortCodeTest(null, "112", CATEGORY_NOT_SHORT_CODE),
     };
 
+    @Override
+    protected void setUp() throws Exception {
+        super.setUp();
+        mPackageManager = getContext().getPackageManager();
+    }
+
     @SmallTest
     public void testSmsUsageMonitor() {
+        if (!mPackageManager.hasSystemFeature(PackageManager.FEATURE_TELEPHONY)) {
+            // do not test if device does not support telephony (voice or sms)
+            return;
+        }
+
         SmsUsageMonitor monitor = new SmsUsageMonitor(getContext());
         for (ShortCodeTest test : sShortCodeTests) {
             assertEquals("country: " + test.countryIso + " number: " + test.address,
