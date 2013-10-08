@@ -52,7 +52,9 @@ public class ReadExternalStorageTest extends AndroidTestCase {
         final String packageName = getContext().getPackageName();
 
         for (File path : paths) {
-            if (path == null) continue;
+            assertNotNull("Valid media must be inserted during CTS", path);
+            assertEquals("Valid media must be inserted during CTS", Environment.MEDIA_MOUNTED,
+                    Environment.getStorageState(path));
 
             assertTrue(path.getAbsolutePath().contains(packageName));
 

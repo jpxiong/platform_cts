@@ -20,7 +20,6 @@ import static com.android.cts.externalstorageapp.CommonExternalStorageTest.PACKA
 import static com.android.cts.externalstorageapp.CommonExternalStorageTest.PACKAGE_READ;
 import static com.android.cts.externalstorageapp.CommonExternalStorageTest.PACKAGE_WRITE;
 import static com.android.cts.externalstorageapp.CommonExternalStorageTest.TAG;
-import static com.android.cts.externalstorageapp.CommonExternalStorageTest.assertDirNoAccess;
 import static com.android.cts.externalstorageapp.CommonExternalStorageTest.assertDirNoWriteAccess;
 import static com.android.cts.externalstorageapp.CommonExternalStorageTest.assertDirReadOnlyAccess;
 import static com.android.cts.externalstorageapp.CommonExternalStorageTest.assertDirReadWriteAccess;
@@ -130,7 +129,10 @@ public class WriteExternalStorageTest extends AndroidTestCase {
         final String packageName = getContext().getPackageName();
 
         for (File path : paths) {
-            assertNotNull(path);
+            assertNotNull("Valid media must be inserted during CTS", path);
+            assertEquals("Valid media must be inserted during CTS", Environment.MEDIA_MOUNTED,
+                    Environment.getStorageState(path));
+
             assertTrue(path.getAbsolutePath().contains(packageName));
 
             // Walk until we leave device, writing the whole way
@@ -205,7 +207,9 @@ public class WriteExternalStorageTest extends AndroidTestCase {
         final String packageName = getContext().getPackageName();
 
         for (File path : paths) {
-            if (path == null) continue;
+            assertNotNull("Valid media must be inserted during CTS", path);
+            assertEquals("Valid media must be inserted during CTS", Environment.MEDIA_MOUNTED,
+                    Environment.getStorageState(path));
 
             assertTrue(path.getAbsolutePath().contains(packageName));
 
@@ -233,7 +237,9 @@ public class WriteExternalStorageTest extends AndroidTestCase {
 
         // Require that .nomedia was created somewhere above each dir
         for (File path : paths) {
-            if (path == null) continue;
+            assertNotNull("Valid media must be inserted during CTS", path);
+            assertEquals("Valid media must be inserted during CTS", Environment.MEDIA_MOUNTED,
+                    Environment.getStorageState(path));
 
             final File start = path;
 
