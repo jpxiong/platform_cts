@@ -86,9 +86,10 @@ public class CommonExternalStorageTest extends AndroidTestCase {
     public void testAllPackageDirsWritable() throws Exception {
         final List<File> paths = getAllPackageSpecificPaths(getContext());
         for (File path : paths) {
-            if (path == null) continue;
+            assertNotNull("Valid media must be inserted during CTS", path);
+            assertEquals("Valid media must be inserted during CTS", Environment.MEDIA_MOUNTED,
+                    Environment.getStorageState(path));
 
-            assertEquals(Environment.MEDIA_MOUNTED, Environment.getStorageState(path));
             assertDirReadWriteAccess(path);
 
             final File directChild = new File(path, "directChild");
