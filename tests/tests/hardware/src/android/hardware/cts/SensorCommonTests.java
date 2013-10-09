@@ -18,10 +18,10 @@ package android.hardware.cts;
 
 import android.content.Context;
 
-import android.hardware.FlushCompleteListener;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
+import android.hardware.SensorEventListener2;
 import android.hardware.SensorManager;
 import android.hardware.TriggerEvent;
 import android.hardware.TriggerEventListener;
@@ -56,7 +56,6 @@ abstract class SensorCommonTests extends AndroidTestCase {
     protected Sensor mSensorUnderTest;
     protected TestSensorListener mEventListener;
 
-    private FlushCompleteListener mFlushListener;
     private PowerManager.WakeLock mWakeLock;
 
     protected SensorCommonTests() {}
@@ -103,14 +102,12 @@ abstract class SensorCommonTests extends AndroidTestCase {
         mWakeLock.acquire();
 
         mEventListener = new TestSensorListener();
-        mFlushListener = new TestFlushListener();
     }
 
     @Override
     protected void tearDown() throws Exception {
         mSensorManager.unregisterListener(mEventListener, mSensorUnderTest);
 
-        mFlushListener = null;
         mEventListener = null;
         mSensorUnderTest = null;
 
@@ -260,9 +257,7 @@ abstract class SensorCommonTests extends AndroidTestCase {
                 mEventListener,
                 mSensorUnderTest,
                 SensorManager.SENSOR_DELAY_NORMAL,
-                0 /*maxBatchReportLatencyUs*/,
-                0 /*reservedFlags*/,
-                mFlushListener);
+                0 /*maxBatchReportLatencyUs*/);
         assertTrue("registerListener", result);
         mEventListener.waitForEvents(10);
     }
@@ -275,9 +270,7 @@ abstract class SensorCommonTests extends AndroidTestCase {
                 mEventListener,
                 mSensorUnderTest,
                 SensorManager.SENSOR_DELAY_NORMAL,
-                5 * 1000000 /*maxBatchReportLatencyUs*/,
-                0 /*reservedFlags*/,
-                mFlushListener);
+                5 * 1000000 /*maxBatchReportLatencyUs*/);
         assertTrue("registerListener", result);
         mEventListener.waitForEvents(10);
     }
@@ -289,9 +282,7 @@ abstract class SensorCommonTests extends AndroidTestCase {
                 mEventListener,
                 mSensorUnderTest,
                 SensorManager.SENSOR_DELAY_NORMAL,
-                5 * 1000000 /*maxBatchReportLatencyUs*/,
-                0 /*reservedFlags*/,
-                mFlushListener);
+                5 * 1000000 /*maxBatchReportLatencyUs*/);
         assertTrue("registerListener", result);
         mEventListener.waitForEvents(100);
 
@@ -314,9 +305,7 @@ abstract class SensorCommonTests extends AndroidTestCase {
                     mEventListener,
                     mSensorUnderTest,
                     SensorManager.SENSOR_DELAY_FASTEST,
-                    5 * 1000000 /*maxBatchReportLatencyUs*/,
-                    0 /*reservedFlags*/,
-                    mFlushListener);
+                    5 * 1000000 /*maxBatchReportLatencyUs*/);
 
             assertTrue(iterationInfo, result);
             mEventListener.waitForEvents(5, iterationInfo);
@@ -356,9 +345,7 @@ abstract class SensorCommonTests extends AndroidTestCase {
                     mEventListener,
                     mSensorUnderTest,
                     rate,
-                    generator.nextInt(5 * 1000000),
-                    0 /*reservedFlags*/,
-                    mFlushListener);
+                    generator.nextInt(5 * 1000000));
             assertTrue(iterationInfo, result);
 
             mEventListener.waitForEvents(generator.nextInt(5) + 1, iterationInfo);
@@ -627,7 +614,7 @@ abstract class SensorCommonTests extends AndroidTestCase {
         }
     }
 
-    protected class TestSensorListener implements SensorEventListener {
+    protected class TestSensorListener implements SensorEventListener2 {
         private final ConcurrentLinkedDeque<SensorEventForTest> mSensorEventsList =
                 new ConcurrentLinkedDeque<SensorEventForTest>();
         private volatile CountDownLatch mEventLatch;
@@ -645,6 +632,10 @@ abstract class SensorCommonTests extends AndroidTestCase {
 
         @Override
         public void onAccuracyChanged(Sensor sensor, int accuracy) {
+        }
+
+        @Override
+        public void onFlushCompleted(Sensor sensor) {
         }
 
         public void waitForEvents(int eventCount) {
@@ -684,12 +675,6 @@ abstract class SensorCommonTests extends AndroidTestCase {
     private class TestTriggerListener extends TriggerEventListener {
         @Override
         public void onTrigger(TriggerEvent event) {
-        }
-    }
-
-    private class TestFlushListener implements FlushCompleteListener {
-        @Override
-        public void onFlushCompleted(Sensor sensor) {
         }
     }
 }

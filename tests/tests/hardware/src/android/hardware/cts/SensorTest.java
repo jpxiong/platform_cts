@@ -23,10 +23,10 @@ import java.util.concurrent.CountDownLatch;
 
 import android.content.Context;
 import android.content.pm.PackageManager;
-import android.hardware.FlushCompleteListener;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
+import android.hardware.SensorEventListener2;
 import android.hardware.SensorManager;
 import android.hardware.TriggerEvent;
 import android.hardware.TriggerEventListener;
@@ -149,7 +149,8 @@ public class SensorTest extends AndroidTestCase {
             }
 
             final CountDownLatch eventReceived = new CountDownLatch(25);
-            SensorEventListener listener = new SensorEventListener() {
+            final CountDownLatch flushReceived = new CountDownLatch(1);
+            SensorEventListener2 listener = new SensorEventListener2() {
                 @Override
                 public void onSensorChanged(SensorEvent event) {
                     eventReceived.countDown();
@@ -158,22 +159,18 @@ public class SensorTest extends AndroidTestCase {
                 @Override
                 public void onAccuracyChanged(Sensor sensor, int accuracy) {
                 }
-            };
 
-            final CountDownLatch flushReceived = new CountDownLatch(1);
-            FlushCompleteListener flushCompleteListener = new FlushCompleteListener() {
                 @Override
                 public void onFlushCompleted(Sensor sensor) {
                     flushReceived.countDown();
                 }
             };
             boolean result = mSensorManager.registerListener(listener, sensor,
-                                            SensorManager.SENSOR_DELAY_NORMAL, 10000000, 0,
-                                            flushCompleteListener);
+                                            SensorManager.SENSOR_DELAY_NORMAL, 10000000);
             assertTrue(result);
             // Wait for 25 events and call flush.
             eventReceived.await();
-            result = mSensorManager.flush(sensor);
+            result = mSensorManager.flush(listener);
             assertTrue(result);
             flushReceived.await();
             mSensorManager.unregisterListener(listener);
