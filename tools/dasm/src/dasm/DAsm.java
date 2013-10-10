@@ -403,8 +403,11 @@ public class DAsm {
         regs_count = 1;
 
         method_nat = new CstNat(new CstString(name), new CstString(descriptor));
-        if (method_nat.isClassInit()) access |= AccessFlags.ACC_STATIC;
-        if (method_nat.isInstanceInit()) access |= AccessFlags.ACC_CONSTRUCTOR;
+        if (method_nat.isClassInit()) {
+            access |= (AccessFlags.ACC_CONSTRUCTOR | AccessFlags.ACC_STATIC);
+        } else if (method_nat.isInstanceInit()) {
+            access |= AccessFlags.ACC_CONSTRUCTOR;
+        }
 
         method_acc = access;
     }
