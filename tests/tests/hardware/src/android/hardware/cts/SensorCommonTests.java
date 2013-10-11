@@ -438,7 +438,7 @@ abstract class SensorCommonTests extends AndroidTestCase {
     /**
      * Tests for sensor characteristics.
      */
-    public void testEventJittering() {
+    public void ignore_testEventJittering() {
         final long EXPECTED_TIMESTAMP_NS = this.getMaxFrequencySupportedInuS() * 1000;
         final long THRESHOLD_IN_NS = EXPECTED_TIMESTAMP_NS / 10; // 10%
 
@@ -463,7 +463,7 @@ abstract class SensorCommonTests extends AndroidTestCase {
         }
     }
 
-    public void testFrequencyAccuracy() {
+    public void ignore_testFrequencyAccuracy() {
         final long EXPECTED_TIMESTAMP_NS = this.getMaxFrequencySupportedInuS() * 1000;
         final long THRESHOLD_IN_NS = EXPECTED_TIMESTAMP_NS / 10; // 10%
 
