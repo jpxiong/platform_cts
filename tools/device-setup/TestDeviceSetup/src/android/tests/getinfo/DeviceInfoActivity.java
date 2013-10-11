@@ -27,7 +27,6 @@ import java.util.HashSet;
 import java.util.Locale;
 import java.util.concurrent.CountDownLatch;
 
-
 /**
  * Collect device information on target device.
  */
