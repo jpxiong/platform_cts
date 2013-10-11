@@ -18,37 +18,52 @@ package android.view.cts;
 
 import com.android.cts.stub.R;
 
-
 import android.app.Instrumentation;
+import android.app.Presentation;
 import android.content.Context;
 import android.content.res.Configuration;
 import android.content.res.TypedArray;
+import android.cts.util.PollingCheck;
 import android.graphics.Color;
 import android.graphics.PixelFormat;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
+import android.hardware.display.DisplayManager;
+import android.hardware.display.VirtualDisplay;
 import android.media.AudioManager;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.SystemClock;
 import android.test.ActivityInstrumentationTestCase2;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.ActionMode;
+import android.view.Display;
 import android.view.Gravity;
+import android.view.InputDevice;
 import android.view.InputQueue;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
+import android.view.Surface;
 import android.view.SurfaceHolder;
+import android.view.SurfaceView;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
 import android.view.accessibility.AccessibilityEvent;
+import android.widget.Button;
 import android.widget.TextView;
 
+import java.util.concurrent.Semaphore;
+import java.util.concurrent.TimeUnit;
+
 public class WindowTest extends ActivityInstrumentationTestCase2<WindowStubActivity> {
+    static final String TAG = "WindowTest";
     private Window mWindow;
     private Context mContext;
     private Instrumentation mInstrumentation;
@@ -56,6 +71,10 @@ public class WindowTest extends ActivityInstrumentationTestCase2<WindowStubActiv
 
     private static final int VIEWGROUP_LAYOUT_HEIGHT = 100;
     private static final int VIEWGROUP_LAYOUT_WIDTH = 200;
+
+    // for testing setLocalFocus
+    private ProjectedPresentation mPresentation;
+    private VirtualDisplay mVirtualDisplay;
 
     public WindowTest() {
         super("com.android.cts.stub", WindowStubActivity.class);
@@ -627,6 +646,189 @@ public class WindowTest extends ActivityInstrumentationTestCase2<WindowStubActiv
 
     public void testFinalMethod() throws Exception {
         // No way to test protected final method
+    }
+
+    /**
+     * Test setLocalFocus together with injectInputEvent.
+     */
+    public void testSetLocalFocus() throws Throwable {
+        final SurfaceView surfaceView = new SurfaceView(mContext);
+        final Semaphore waitingSemaphore = new Semaphore(0);
+        surfaceView.getHolder().addCallback(new SurfaceHolder.Callback() {
+            @Override
+            public void surfaceCreated(SurfaceHolder holder) {
+            }
+
+            @Override
+            public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
+                destroyPresentation();
+                createPresentation(holder.getSurface(), width, height);
+                waitingSemaphore.release();
+            }
+
+            @Override
+            public void surfaceDestroyed(SurfaceHolder holder) {
+                destroyPresentation();
+            }
+          });
+        runTestOnUiThread(new Runnable() {
+            public void run() {
+                mWindow.setContentView(surfaceView);
+            }
+        });
+        assertTrue(waitingSemaphore.tryAcquire(5, TimeUnit.SECONDS));
+        assertNotNull(mVirtualDisplay);
+        assertNotNull(mPresentation);
+        new PollingCheck() {
+            @Override
+            protected boolean check() {
+                return (mPresentation.button1 != null) && (mPresentation.button2 != null) &&
+                        (mPresentation.button3 != null) && mPresentation.ready;
+            }
+        }.run();
+        assertTrue(mPresentation.button1.isFocusable() && mPresentation.button2.isFocusable() &&
+                mPresentation.button3.isFocusable());
+        // currently it is only for debugging
+        View.OnFocusChangeListener listener = new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View v, boolean hasFocus) {
+                Log.d(TAG, "view " + v + " focus " + hasFocus);
+            }
+        };
+
+        // check key event focus
+        mPresentation.button1.setOnFocusChangeListener(listener);
+        mPresentation.button2.setOnFocusChangeListener(listener);
+        mPresentation.button3.setOnFocusChangeListener(listener);
+        final Window presentationWindow = mPresentation.getWindow();
+        presentationWindow.setLocalFocus(true, false);
+        new PollingCheck() {
+            @Override
+            protected boolean check() {
+                return mPresentation.button1.hasWindowFocus();
+            }
+        }.run();
+        checkPresentationButtonFocus(true, false, false);
+        assertFalse(mPresentation.button1.isInTouchMode());
+        injectKeyEvent(presentationWindow, KeyEvent.KEYCODE_TAB);
+        checkPresentationButtonFocus(false, true, false);
+        injectKeyEvent(presentationWindow, KeyEvent.KEYCODE_TAB);
+        checkPresentationButtonFocus(false, false, true);
+
+        // check touch input injection
+        presentationWindow.setLocalFocus(true, true);
+        new PollingCheck() {
+            @Override
+            protected boolean check() {
+                return mPresentation.button1.isInTouchMode();
+            }
+        }.run();
+        View.OnClickListener clickListener = new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Log.d(TAG, "onClick " + v);
+                if (v == mPresentation.button1) {
+                    waitingSemaphore.release();
+                }
+            }
+        };
+        mPresentation.button1.setOnClickListener(clickListener);
+        mPresentation.button2.setOnClickListener(clickListener);
+        mPresentation.button3.setOnClickListener(clickListener);
+        injectTouchEvent(presentationWindow, mPresentation.button1.getX() +
+                mPresentation.button1.getWidth() / 2,
+                mPresentation.button1.getY() + mPresentation.button1.getHeight() / 2);
+        assertTrue(waitingSemaphore.tryAcquire(5, TimeUnit.SECONDS));
+
+        destroyPresentation();
+    }
+
+    private void checkPresentationButtonFocus(final boolean button1Focused,
+            final boolean button2Focused, final boolean button3Focused) {
+        new PollingCheck() {
+            @Override
+            protected boolean check() {
+                return (mPresentation.button1.isFocused() == button1Focused) &&
+                        (mPresentation.button2.isFocused() == button2Focused) &&
+                        (mPresentation.button3.isFocused() == button3Focused);
+            }
+        }.run();
+    }
+
+    private void injectKeyEvent(Window window, int keyCode) {
+        KeyEvent downEvent = new KeyEvent(KeyEvent.ACTION_DOWN, keyCode);
+        window.injectInputEvent(downEvent);
+        KeyEvent upEvent = new KeyEvent(KeyEvent.ACTION_UP, keyCode);
+        window.injectInputEvent(upEvent);
+    }
+
+    private void injectTouchEvent(Window window, float x, float y) {
+        Log.d(TAG, "injectTouchEvent " + x + "," + y);
+        long downTime = SystemClock.uptimeMillis();
+        MotionEvent downEvent = MotionEvent.obtain(downTime, downTime, MotionEvent.ACTION_DOWN,
+                x, y, 0);
+        downEvent.setSource(InputDevice.SOURCE_TOUCHSCREEN);
+        window.injectInputEvent(downEvent);
+        long upTime = SystemClock.uptimeMillis();
+        MotionEvent upEvent = MotionEvent.obtain(downTime, upTime, MotionEvent.ACTION_UP,
+                x, y, 0);
+        upEvent.setSource(InputDevice.SOURCE_TOUCHSCREEN);
+        window.injectInputEvent(upEvent);
+    }
+
+    private void createPresentation(final Surface surface, final int width,
+            final int height) {
+        Context context = getInstrumentation().getTargetContext();
+        DisplayManager displayManager =
+                (DisplayManager) context.getSystemService(Context.DISPLAY_SERVICE);
+        mVirtualDisplay = displayManager.createVirtualDisplay("localFocusTest",
+                width, height, 300, surface, 0);
+        mPresentation = new ProjectedPresentation(
+                context, mVirtualDisplay.getDisplay());
+        mPresentation.show();
+    }
+
+    private void destroyPresentation() {
+        if (mPresentation != null) {
+            mPresentation.dismiss();
+        }
+        if (mVirtualDisplay != null) {
+            mVirtualDisplay.release();
+        }
+    }
+
+    private class ProjectedPresentation extends Presentation {
+        public Button button1 = null;
+        public Button button2 = null;
+        public Button button3 = null;
+        public volatile boolean ready = false;
+
+        public ProjectedPresentation(Context outerContext, Display display) {
+            super(outerContext, display);
+            getWindow().setType(WindowManager.LayoutParams.TYPE_PRIVATE_PRESENTATION);
+            getWindow().addFlags(WindowManager.LayoutParams.FLAG_LOCAL_FOCUS_MODE);
+        }
+
+        @Override
+        protected void onCreate(Bundle savedInstanceState) {
+            super.onCreate(savedInstanceState);
+            setContentView(R.layout.windowstub_presentation);
+            button1 = (Button) findViewById(R.id.presentation_button1);
+            button2 = (Button) findViewById(R.id.presentation_button2);
+            button3 = (Button) findViewById(R.id.presentation_button3);
+        }
+
+        @Override
+        public void show() {
+            super.show();
+            new Handler().post(new Runnable() {
+
+                @Override
+                public void run() {
+                    ready = true;
+                }
+            });
+        }
     }
 
     public class MockWindow extends Window {
