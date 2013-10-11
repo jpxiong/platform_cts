@@ -25,6 +25,8 @@ import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
+import android.os.UserManager;
 import android.telephony.TelephonyManager;
 import android.util.DisplayMetrics;
 import android.util.Log;
@@ -33,6 +35,8 @@ import android.view.WindowManager;
 
 import java.io.IOException;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -134,6 +138,12 @@ public class DeviceInfoInstrument extends Instrumentation implements DeviceInfoC
         // System libraries
         String sysLibraries = getSystemLibraries();
         addResult(SYS_LIBRARIES, sysLibraries);
+
+        // Storage devices
+        addResult(STORAGE_DEVICES, getStorageDevices());
+
+        // Multi-user support
+        addResult(MULTI_USER, getMultiUserInfo());
 
         finish(Activity.RESULT_OK, mResults);
     }
@@ -342,5 +352,43 @@ public class DeviceInfoInstrument extends Instrumentation implements DeviceInfoC
         }
 
         return builder.toString();
+    }
+
+    private String getStorageDevices() {
+        int count = 0;
+        count = Math.max(count, getContext().getExternalCacheDirs().length);
+        count = Math.max(count, getContext().getExternalFilesDirs(null).length);
+        count = Math.max(
+                count, getContext().getExternalFilesDirs(Environment.DIRECTORY_PICTURES).length);
+        count = Math.max(count, getContext().getObbDirs().length);
+
+        final String result;
+        if (Environment.isExternalStorageEmulated()) {
+            if (count == 1) {
+                return "1 emulated";
+            } else {
+                return "1 emulated, " + (count - 1) + " physical media";
+            }
+        } else {
+            return count + " physical media";
+        }
+    }
+
+    private String getMultiUserInfo() {
+        try {
+            final Method method = UserManager.class.getMethod("getMaxSupportedUsers");
+            final Integer maxUsers = (Integer) method.invoke(null);
+            if (maxUsers == 1) {
+                return "single user";
+            } else {
+                return maxUsers + " users supported";
+            }
+        } catch (ClassCastException e) {
+        } catch (NoSuchMethodException e) {
+        } catch (InvocationTargetException e) {
+        } catch (IllegalAccessException e) {
+        }
+
+        return "unknown";
     }
 }

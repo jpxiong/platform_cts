@@ -298,6 +298,18 @@
                                             </pre>
                                         </TD>
                                     </TR>
+                                    <TR>
+                                        <TD class="rowtitle">Storage devices</TD>
+                                        <TD>
+                                            <xsl:value-of select="TestResult/DeviceInfo/BuildInfo/@storage_devices"/>
+                                        </TD>
+                                    </TR>
+                                    <TR>
+                                        <TD class="rowtitle">Multi-user support</TD>
+                                        <TD>
+                                            <xsl:value-of select="TestResult/DeviceInfo/BuildInfo/@multi_user"/>
+                                        </TD>
+                                    </TR>
                                 </TABLE>
                             </TD>
                         </TR>
