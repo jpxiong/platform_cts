@@ -78,6 +78,8 @@
         <xs:attribute name="partitions" type="xs:string"/>
         <xs:attribute name="build_abi" type="xs:string"/>
         <xs:attribute name="build_abi2" type="xs:string"/>
+        <xs:attribute name="storage_devices" type="xs:string"/>
+        <xs:attribute name="multi_user" type="xs:string"/>
       </xs:complexType>
     </xs:element>
     <xs:element name="FeatureInfo" type="featureInfoType"/>
