@@ -43,6 +43,12 @@ public class NsdManagerTest extends AndroidTestCase {
     NsdManager.ResolveListener mResolveListener;
 
     public NsdManagerTest() {
+        initRegistrationListener();
+        initDiscoveryListener();
+        initResolveListener();
+    }
+
+    private void initRegistrationListener() {
         mRegistrationListener = new NsdManager.RegistrationListener() {
             @Override
             public void onRegistrationFailed(NsdServiceInfo serviceInfo, int errorCode) {
@@ -64,6 +70,9 @@ public class NsdManagerTest extends AndroidTestCase {
                 setEvent("onServiceUnregistered", serviceInfo);
             }
         };
+    }
+
+    private void initDiscoveryListener() {
         mDiscoveryListener = new NsdManager.DiscoveryListener() {
             @Override
             public void onStartDiscoveryFailed(String serviceType, int errorCode) {
@@ -99,6 +108,9 @@ public class NsdManagerTest extends AndroidTestCase {
                 setEvent("onServiceLost", serviceInfo);
             }
         };
+    }
+
+    private void initResolveListener() {
         mResolveListener = new NsdManager.ResolveListener() {
             @Override
             public void onResolveFailed(NsdServiceInfo serviceInfo, int errorCode) {
@@ -111,6 +123,8 @@ public class NsdManagerTest extends AndroidTestCase {
             }
         };
     }
+
+
 
     private final class EventData {
         EventData(String callbackName, NsdServiceInfo info) {
@@ -198,6 +212,29 @@ public class NsdManagerTest extends AndroidTestCase {
         }
     }
 
+    private EventData waitForNewEvents() throws InterruptedException {
+        if (DBG) Log.d(TAG, "Waiting for a bit, id=" + String.valueOf(mWaitId));
+
+        long startTime = android.os.SystemClock.uptimeMillis();
+        long elapsedTime = 0;
+        synchronized (mEventCache) {
+            int index = mEventCache.size();
+            while (elapsedTime < TIMEOUT ) {
+                // first check if we've received that event
+                for (; index < mEventCache.size(); index++) {
+                    EventData e = mEventCache.get(index);
+                    return e;
+                }
+
+                // Not yet received, just wait
+                mEventCache.wait(TIMEOUT - elapsedTime);
+                elapsedTime = android.os.SystemClock.uptimeMillis() - startTime;
+            }
+        }
+
+        return null;
+    }
+
     private String mServiceName;
 
     @Override
@@ -266,7 +303,9 @@ public class NsdManagerTest extends AndroidTestCase {
         assertTrue(lastEvent.mSucceeded);
 
         // Remove this event, so accounting becomes easier later
-        mEventCache.remove(lastEvent);
+        synchronized (mEventCache) {
+            mEventCache.remove(lastEvent);
+        }
 
         // Expect a service record to be discovered (and filter the ones
         // that are unrelated to this test)
@@ -292,7 +331,9 @@ public class NsdManagerTest extends AndroidTestCase {
 
             // Remove this event from the event cache, so it won't be found by subsequent
             // calls to waitForCallback
-            mEventCache.remove(lastEvent);
+            synchronized (mEventCache) {
+                mEventCache.remove(lastEvent);
+            }
         }
 
         assertTrue(found);
@@ -315,6 +356,7 @@ public class NsdManagerTest extends AndroidTestCase {
         assertTrue(lastEvent.mInfo.getPort() == localPort);
         assertTrue(eventCacheSize() == 1);
 
+        assertTrue(checkForAdditionalEvents());
         clearEventCache();
 
         // Unregister the service
@@ -333,12 +375,17 @@ public class NsdManagerTest extends AndroidTestCase {
         assertTrue(eventCacheSize() == 2);
 
         // Register service again to see if we discover it
+        checkForAdditionalEvents();
         clearEventCache();
 
         si = new NsdServiceInfo();
         si.setServiceType(SERVICE_TYPE);
         si.setServiceName(mServiceName);
         si.setPort(localPort);
+
+        // Create a new registration listener and register same service again
+        initRegistrationListener();
+
         mNsdManager.registerService(si, NsdManager.PROTOCOL_DNS_SD, mRegistrationListener);
 
         lastEvent = waitForCallback("onServiceRegistered");                 // id = 7
@@ -358,67 +405,55 @@ public class NsdManagerTest extends AndroidTestCase {
                 lastEvent.mInfo.getServiceName());
 
         assertTrue(lastEvent.mInfo.getServiceName().equals(registeredName));
+        assertTrue(checkCacheSize(2));
 
-        assertTrue(eventCacheSize() == 2);
+        checkForAdditionalEvents();
         clearEventCache();
 
         mNsdManager.stopServiceDiscovery(mDiscoveryListener);
         lastEvent = waitForCallback("onDiscoveryStopped");                  // id = 9
         assertTrue(lastEvent != null);
         assertTrue(lastEvent.mSucceeded);
-        assertTrue(eventCacheSize() == 1);
+        assertTrue(checkCacheSize(1));
 
+        checkForAdditionalEvents();
         clearEventCache();
+
         mNsdManager.unregisterService(mRegistrationListener);
 
         lastEvent =  waitForCallback("onServiceUnregistered");              // id = 10
         assertTrue(lastEvent != null);
         assertTrue(lastEvent.mSucceeded);
-        assertTrue(eventCacheSize() == 1);
+        assertTrue(checkCacheSize(1));
+    }
+
+    boolean checkCacheSize(int size) {
+        synchronized (mEventCache) {
+            int cacheSize = mEventCache.size();
+            if (cacheSize != size) {
+                Log.d(TAG, "id = " + mWaitId + ": event cache size = " + cacheSize);
+                for (int i = 0; i < cacheSize; i++) {
+                    EventData e = mEventCache.get(i);
+                    String sname = (e.mInfo != null) ? "(" + e.mInfo.getServiceName() + ")" : "";
+                    Log.d(TAG, "eventName is " + e.mCallbackName + sname);
+                }
+            }
+            return (cacheSize == size);
+        }
+    }
+
+    boolean checkForAdditionalEvents() {
+        try {
+            EventData e = waitForNewEvents();
+            if (e != null) {
+                String sname = (e.mInfo != null) ? "(" + e.mInfo.getServiceName() + ")" : "";
+                Log.d(TAG, "ignoring unexpected event " + e.mCallbackName + sname);
+            }
+            return (e == null);
+        }
+        catch (InterruptedException ex) {
+            return false;
+        }
     }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
