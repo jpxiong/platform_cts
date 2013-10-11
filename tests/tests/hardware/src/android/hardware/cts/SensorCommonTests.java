@@ -19,43 +19,33 @@ package android.hardware.cts;
 import android.content.Context;
 
 import android.hardware.Sensor;
-import android.hardware.SensorEvent;
-import android.hardware.SensorEventListener;
-import android.hardware.SensorEventListener2;
 import android.hardware.SensorManager;
 import android.hardware.TriggerEvent;
 import android.hardware.TriggerEventListener;
 
+import android.hardware.cts.helpers.SensorCtsHelper;
+import android.hardware.cts.helpers.TestSensorManager;
+
 import android.os.PowerManager;
 
+import android.os.SystemClock;
 import android.test.AndroidTestCase;
 
-import java.util.List;
 import android.util.Log;
 
-import java.io.DataOutputStream;
-import java.io.IOException;
-
-import java.text.SimpleDateFormat;
-
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
+import java.util.List;
 import java.util.Random;
-import java.util.concurrent.ConcurrentLinkedDeque;
-import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
+
+import junit.framework.Assert;
 
 /**
  * Class is not marked public to avoid TestRunner to pick the tests in it
  */
 abstract class SensorCommonTests extends AndroidTestCase {
     protected final String LOG_TAG = "TestRunner";
-
-    protected SensorManager mSensorManager;
-    protected Sensor mSensorUnderTest;
-    protected TestSensorListener mEventListener;
-
+    protected TestSensorManager mTestSensorManager;
     private PowerManager.WakeLock mWakeLock;
 
     protected SensorCommonTests() {}
@@ -70,15 +60,11 @@ abstract class SensorCommonTests extends AndroidTestCase {
      * Abstract test methods that sensors need to verify
      */
     public abstract void testEventValidity();
-    public abstract void testVarianceWhileStatic();
+    public abstract void testStandardDeviationWhileStatic();
 
     /**
      * Methods to control the behavior of the tests by concrete sensor tests
      */
-    protected int getWaitTimeoutInSeconds() {
-        return 30;
-    }
-
     protected int getHighNumberOfIterationsToExecute() {
         return 100;
     }
@@ -100,29 +86,27 @@ abstract class SensorCommonTests extends AndroidTestCase {
                 Context.POWER_SERVICE);
         mWakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, this.getLogTag());
         mWakeLock.acquire();
-
-        mEventListener = new TestSensorListener();
     }
 
     @Override
     protected void tearDown() throws Exception {
-        mSensorManager.unregisterListener(mEventListener, mSensorUnderTest);
-
-        mEventListener = null;
-        mSensorUnderTest = null;
+        if(mTestSensorManager != null) {
+            mTestSensorManager.close();
+            mTestSensorManager = null;
+        }
 
         releaseWakeLock();
     }
 
     @Override
     public void runBare() throws Throwable {
-        mSensorManager = (SensorManager) this.getContext().getSystemService(Context.SENSOR_SERVICE);
-        assertNotNull("getSystemService#Sensor_Service", mSensorManager);
+        SensorManager sensorManager = (SensorManager) this.getContext().getSystemService(Context.SENSOR_SERVICE);
+        assertNotNull("getSystemService#Sensor_Service", sensorManager);
 
-        List<Sensor> availableSensors = mSensorManager.getSensorList(this.getSensorType());
+        List<Sensor> availableSensors = sensorManager.getSensorList(this.getSensorType());
         // it is OK if there are no sensors available
         for(Sensor sensor : availableSensors) {
-            mSensorUnderTest = sensor;
+            mTestSensorManager = new TestSensorManager(this, sensorManager, sensor);
             super.runBare();
         }
     }
@@ -131,49 +115,34 @@ abstract class SensorCommonTests extends AndroidTestCase {
      * Test cases continuous mode.
      */
     public void testCanRegisterListener() {
-        boolean result = mSensorManager.registerListener(
-                mEventListener,
-                mSensorUnderTest,
-                SensorManager.SENSOR_DELAY_NORMAL);
-        assertTrue("registerListener", result);
+        mTestSensorManager.registerListener(SensorManager.SENSOR_DELAY_NORMAL);
     }
 
     public void testNotTriggerSensor() {
         TestTriggerListener listener = new TestTriggerListener();
-        assertFalse(
-                "requestTriggerSensor",
-                mSensorManager.requestTriggerSensor(listener, mSensorUnderTest));
+        boolean result = mTestSensorManager.getUnderlyingSensorManager().requestTriggerSensor(
+                listener,
+                mTestSensorManager.getSensorUnderTest());
+        assertFalse("requestTriggerSensor", result);
     }
 
     public void testCanReceiveEvents() {
-        boolean result = mSensorManager.registerListener(
-                mEventListener,
-                mSensorUnderTest,
-                SensorManager.SENSOR_DELAY_NORMAL);
-        assertTrue("registerListener", result);
-        mEventListener.waitForEvents(5);
+        mTestSensorManager.collectEvents(SensorManager.SENSOR_DELAY_NORMAL, 5);
     }
 
     public void testMaxFrequency() {
-        boolean result = mSensorManager.registerListener(
-                mEventListener,
-                mSensorUnderTest,
-                this.getMaxFrequencySupportedInuS());
-        assertTrue("registerListener", result);
+        // TODO: verify that events do arrive at the proper rate
+        mTestSensorManager.registerListener(this.getMaxFrequencySupportedInuS());
     }
 
     public void testEventsArriveInOrder() {
-        boolean result = mSensorManager.registerListener(
-                mEventListener,
-                mSensorUnderTest,
-                SensorManager.SENSOR_DELAY_FASTEST);
-        assertTrue("registerListener", result);
-        mEventListener.waitForEvents(100);
-
-        SensorEventForTest[] events = mEventListener.getAllEvents();
+        // TODO: test for other sensor frequencies, rely on helper test classes for sensors
+        TestSensorManager.SensorEventForTest[] events = mTestSensorManager.collectEvents(
+                SensorManager.SENSOR_DELAY_FASTEST,
+                100);
         for(int i = 1; i < events.length; ++i) {
-            long previousTimestamp = events[i-1].getTimestamp();
-            long timestamp = events[i].getTimestamp();
+            long previousTimestamp = events[i-1].timestamp;
+            long timestamp = events[i].timestamp;
             assertTrue(
                     String.format("[timestamp:%d] %d >= %d", i, previousTimestamp, timestamp),
                     previousTimestamp < timestamp);
@@ -181,17 +150,7 @@ abstract class SensorCommonTests extends AndroidTestCase {
     }
 
     public void testStartStopRepeatedly() {
-        for(int i = 0; i < this.getLowNumberOfIterationsToExecute(); ++i) {
-            String iterationInfo = String.format("registerListener:%d", i);
-            boolean result = mSensorManager.registerListener(
-                    mEventListener,
-                    mSensorUnderTest,
-                    SensorManager.SENSOR_DELAY_FASTEST);
-            assertTrue(iterationInfo, result);
-            mEventListener.waitForEvents(1, iterationInfo);
-
-            mSensorManager.unregisterListener(mEventListener, mSensorUnderTest);
-        }
+        validateRegisterUnregisterRepeteadly(mTestSensorManager);
     }
 
     public void testUpdateRate() {
@@ -218,33 +177,87 @@ abstract class SensorCommonTests extends AndroidTestCase {
                     rate = this.getMaxFrequencySupportedInuS() * generator.nextInt(10);
             }
 
-            String iterationInfo = String.format("registerListener:%d, rate:%d", i, rate);
-            assertTrue(
-                    iterationInfo,
-                    mSensorManager.registerListener(mEventListener, mSensorUnderTest, rate));
-
-            mEventListener.waitForEvents(generator.nextInt(5) + 1, iterationInfo);
-            mEventListener.clearEvents();
-
-            mSensorManager.unregisterListener(mEventListener, mSensorUnderTest);
+            // TODO: check that the rate has indeed changed
+            mTestSensorManager.collectEvents(
+                    rate,
+                    generator.nextInt(5) + 1,
+                    String.format("iteration:%d, rate:%d", i, rate));
         }
     }
 
-    public void testSeveralClients() throws InterruptedException {
-        ArrayList<Thread> threads = new ArrayList<Thread>();
-        for(int i = 0; i < this.getNumberOfThreadsToUse(); ++i) {
-            threads.add(new Thread() {
-                @Override
-                public void run() {
-                    testStartStopRepeatedly();
-                }
-            });
-        }
+    public void testOneClientSeveralThreads() throws InterruptedException {
+        Runnable operation = new Runnable() {
+            @Override
+            public void run() {
+                validateRegisterUnregisterRepeteadly(mTestSensorManager);
+            }
+        };
+        SensorCtsHelper.performOperationInThreads(this.getNumberOfThreadsToUse(), operation);
+    }
 
-        while(!threads.isEmpty()) {
-            Thread thread = threads.remove(0);
-            thread.join();
-        }
+    public void testSeveralClients() throws InterruptedException {
+        final Assert assertionObject = this;
+        Runnable operation = new Runnable() {
+            @Override
+            public void run() {
+                TestSensorManager testSensorManager = new TestSensorManager(
+                        assertionObject,
+                        mTestSensorManager.getUnderlyingSensorManager(),
+                        mTestSensorManager.getSensorUnderTest());
+                validateRegisterUnregisterRepeteadly(testSensorManager);
+            }
+        };
+        SensorCtsHelper.performOperationInThreads(this.getNumberOfThreadsToUse(), operation);
+    }
+
+    public void testStoppingOtherClients() {
+        // TODO: use a higher test abstraction and move these to integration tests
+        final int EVENT_COUNT = 1;
+        final int SECOND_EVENT_COUNT = 5;
+        TestSensorManager sensorManager2 = new TestSensorManager(
+                this,
+                mTestSensorManager.getUnderlyingSensorManager(),
+                mTestSensorManager.getSensorUnderTest());
+
+        mTestSensorManager.registerListener(SensorManager.SENSOR_DELAY_NORMAL);
+
+        // is receiving events
+        mTestSensorManager.getEvents(EVENT_COUNT);
+
+        // operate in a different client
+        sensorManager2.collectEvents(SensorManager.SENSOR_DELAY_FASTEST, SECOND_EVENT_COUNT);
+
+        // verify first client is still operating
+        TestSensorManager.SensorEventForTest[] events = mTestSensorManager.getEvents(EVENT_COUNT);
+        assertTrue(
+                String.format("Events| expected:%d, actual:%d", EVENT_COUNT, events.length),
+                events.length >= EVENT_COUNT);
+    }
+
+    public void testStoppingOtherClientsBatching() {
+        final int EVENT_COUNT = 1;
+        final int SECOND_EVENT_COUNT = 5;
+        TestSensorManager sensorManager2 = new TestSensorManager(
+                this,
+                mTestSensorManager.getUnderlyingSensorManager(),
+                mTestSensorManager.getSensorUnderTest());
+
+        mTestSensorManager.registerListener(SensorManager.SENSOR_DELAY_NORMAL);
+
+        // is receiving events
+        mTestSensorManager.getEvents(EVENT_COUNT);
+
+        // operate in a different client
+        sensorManager2.collectBatchEvents(
+                SensorManager.SENSOR_DELAY_FASTEST,
+                SensorCtsHelper.getSecondsAsMicroSeconds(1),
+                SECOND_EVENT_COUNT);
+
+        // verify first client is still operating
+        TestSensorManager.SensorEventForTest[] events = mTestSensorManager.getEvents(EVENT_COUNT);
+        assertTrue(
+                String.format("Events| expected:%d, actual:%d", EVENT_COUNT, events.length),
+                events.length >= EVENT_COUNT);
     }
 
     /**
@@ -252,44 +265,52 @@ abstract class SensorCommonTests extends AndroidTestCase {
      */
     public void testRegisterForBatchingZeroReport() {
         releaseWakeLock();
-
-        boolean result = mSensorManager.registerListener(
-                mEventListener,
-                mSensorUnderTest,
-                SensorManager.SENSOR_DELAY_NORMAL,
-                0 /*maxBatchReportLatencyUs*/);
-        assertTrue("registerListener", result);
-        mEventListener.waitForEvents(10);
+        // TODO: use test wrappers to verify for reportLatency ==0 !=0
+        mTestSensorManager.collectBatchEvents(SensorManager.SENSOR_DELAY_NORMAL, 0, 10);
     }
 
     public void testCanReceiveBatchEvents() {
         releaseWakeLock();
-
-        // TODO: refactor out common code across tests that register for events and do post-process
-        boolean result = mSensorManager.registerListener(
-                mEventListener,
-                mSensorUnderTest,
+        mTestSensorManager.collectBatchEvents(
                 SensorManager.SENSOR_DELAY_NORMAL,
-                5 * 1000000 /*maxBatchReportLatencyUs*/);
-        assertTrue("registerListener", result);
-        mEventListener.waitForEvents(10);
+                SensorCtsHelper.getSecondsAsMicroSeconds(5),
+                10 /*eventCount*/);
+    }
+
+    /**
+     * Regress:
+     * -b/10790905
+     */
+    public void ignore_testBatchingReportLatency() {
+        long startTime = SystemClock.elapsedRealtimeNanos();
+        // TODO: define the sensor frequency per sensor
+        TestSensorManager.SensorEventForTest[] events = mTestSensorManager.collectBatchEvents(
+                SensorCtsHelper.getSecondsAsMicroSeconds(1),
+                SensorCtsHelper.getSecondsAsMicroSeconds(5),
+                1 /*eventCount*/);
+        long elapsedTime = SystemClock.elapsedRealtimeNanos() - startTime;
+        long expectedTime =
+                TimeUnit.NANOSECONDS.convert(5, TimeUnit.SECONDS) +
+                TimeUnit.NANOSECONDS.convert(500, TimeUnit.MILLISECONDS);
+
+        // TODO: ensure the proper batching time considers the size of the FIFO (fifoMaxEventCount),
+        //       and make sure that no other application is registered
+        assertTrue(
+                String.format("WaitTime| expected:%d, actual:%d", expectedTime, elapsedTime),
+                elapsedTime <= expectedTime);
     }
 
     public void testBatchEventsArriveInOrder() {
         releaseWakeLock();
 
-        boolean result = mSensorManager.registerListener(
-                mEventListener,
-                mSensorUnderTest,
+        // TODO: identify if we can reuse code from the non-batching case, same for other batch tests
+        TestSensorManager.SensorEventForTest[] events = mTestSensorManager.collectBatchEvents(
                 SensorManager.SENSOR_DELAY_NORMAL,
-                5 * 1000000 /*maxBatchReportLatencyUs*/);
-        assertTrue("registerListener", result);
-        mEventListener.waitForEvents(100);
-
-        SensorEventForTest[] events = mEventListener.getAllEvents();
+                SensorCtsHelper.getSecondsAsMicroSeconds(5),
+                100);
         for(int i = 1; i < events.length; ++i) {
-            long previousTimestamp = events[i-1].getTimestamp();
-            long timestamp = events[i].getTimestamp();
+            long previousTimestamp = events[i-1].timestamp;
+            long timestamp = events[i].timestamp;
             assertTrue(
                     String.format("[timestamp:%d] %d >= %d", i, previousTimestamp, timestamp),
                     previousTimestamp < timestamp);
@@ -298,20 +319,7 @@ abstract class SensorCommonTests extends AndroidTestCase {
 
     public void testStartStopBatchingRepeatedly() {
         releaseWakeLock();
-
-        for(int i = 0; i < this.getLowNumberOfIterationsToExecute(); ++i) {
-            String iterationInfo = String.format("registerListener:%d", i);
-            boolean result = mSensorManager.registerListener(
-                    mEventListener,
-                    mSensorUnderTest,
-                    SensorManager.SENSOR_DELAY_FASTEST,
-                    5 * 1000000 /*maxBatchReportLatencyUs*/);
-
-            assertTrue(iterationInfo, result);
-            mEventListener.waitForEvents(5, iterationInfo);
-
-            mSensorManager.unregisterListener(mEventListener, mSensorUnderTest);
-        }
+        validateRegisterUnregisterRepeteadlyBatching(mTestSensorManager);
     }
 
     public void testUpdateBatchRate() {
@@ -340,39 +348,91 @@ abstract class SensorCommonTests extends AndroidTestCase {
                     rate = this.getMaxFrequencySupportedInuS() * generator.nextInt(10);
             }
 
-            String iterationInfo = String.format("registerListener:%d, rate:%d", i, rate);
-            boolean result = mSensorManager.registerListener(
-                    mEventListener,
-                    mSensorUnderTest,
+            String iterationInfo = String.format("iteration:%d, rate:%d", i, rate);
+            mTestSensorManager.collectBatchEvents(
                     rate,
-                    generator.nextInt(5 * 1000000));
-            assertTrue(iterationInfo, result);
-
-            mEventListener.waitForEvents(generator.nextInt(5) + 1, iterationInfo);
-            mSensorManager.unregisterListener(mEventListener, mSensorUnderTest);
-            mEventListener.clearEvents();
+                    generator.nextInt(SensorCtsHelper.getSecondsAsMicroSeconds(5)),
+                    generator.nextInt(5) + 1,
+                    iterationInfo);
         }
     }
 
-    public void testSeveralClientsBatching() {
-        ArrayList<Thread> threads = new ArrayList<Thread>();
-        for(int i = 0; i < this.getNumberOfThreadsToUse(); ++i) {
-            threads.add(new Thread() {
-                @Override
-                public void run() {
-                    testStartStopBatchingRepeatedly();
-                }
-            });
-        }
-
-        while(!threads.isEmpty()) {
-            Thread thread = threads.remove(0);
-            try {
-                thread.join();
-            } catch(InterruptedException e) {
-                // just continue
+    public void testOneClientSeveralThreadsBatching() throws InterruptedException {
+        Runnable operation = new Runnable() {
+            @Override
+            public void run() {
+                validateRegisterUnregisterRepeteadlyBatching(mTestSensorManager);
             }
-        }
+        };
+        SensorCtsHelper.performOperationInThreads(this.getNumberOfThreadsToUse(), operation);
+    }
+
+    public void testSeveralClientsBatching() throws InterruptedException {
+        final Assert assertionObject = this;
+        Runnable operation = new Runnable() {
+            @Override
+            public void run() {
+                TestSensorManager testSensorManager = new TestSensorManager(
+                        assertionObject,
+                        mTestSensorManager.getUnderlyingSensorManager(),
+                        mTestSensorManager.getSensorUnderTest());
+                validateRegisterUnregisterRepeteadlyBatching(testSensorManager);
+            }
+        };
+        SensorCtsHelper.performOperationInThreads(this.getNumberOfThreadsToUse(), operation);
+    }
+
+    public void testBatchingStoppingOtherClients() {
+        final int EVENT_COUNT = 1;
+        final int SECOND_EVENT_COUNT = 5;
+        TestSensorManager sensorManager2 = new TestSensorManager(
+                this,
+                mTestSensorManager.getUnderlyingSensorManager(),
+                mTestSensorManager.getSensorUnderTest());
+
+        mTestSensorManager.registerBatchListener(
+                SensorManager.SENSOR_DELAY_NORMAL,
+                SensorCtsHelper.getSecondsAsMicroSeconds(5));
+
+        // is receiving events
+        mTestSensorManager.getEvents(EVENT_COUNT);
+
+        // operate in a different client
+        sensorManager2.collectEvents(SensorManager.SENSOR_DELAY_FASTEST, SECOND_EVENT_COUNT);
+
+        // verify first client is still operating
+        TestSensorManager.SensorEventForTest[] events = mTestSensorManager.getEvents(EVENT_COUNT);
+        assertTrue(
+                String.format("Events| expected:%d, actual:%d", EVENT_COUNT, events.length),
+                events.length >= EVENT_COUNT);
+    }
+
+    public void testBatchingStoppingOtherClientsBatching() {
+        final int EVENT_COUNT = 1;
+        final int SECOND_EVENT_COUNT = 5;
+        TestSensorManager sensorManager2 = new TestSensorManager(
+                this,
+                mTestSensorManager.getUnderlyingSensorManager(),
+                mTestSensorManager.getSensorUnderTest());
+
+        mTestSensorManager.registerBatchListener(
+                SensorManager.SENSOR_DELAY_NORMAL,
+                SensorCtsHelper.getSecondsAsMicroSeconds(5));
+
+        // is receiving events
+        mTestSensorManager.getEvents(EVENT_COUNT);
+
+        // operate in a different client
+        sensorManager2.collectBatchEvents(
+                SensorManager.SENSOR_DELAY_FASTEST,
+                SensorCtsHelper.getSecondsAsMicroSeconds(1),
+                SECOND_EVENT_COUNT);
+
+        // verify first client is still operating
+        TestSensorManager.SensorEventForTest[] events = mTestSensorManager.getEvents(EVENT_COUNT);
+        assertTrue(
+                String.format("Events| expected:%d, actual:%d", EVENT_COUNT, events.length),
+                events.length >= EVENT_COUNT);
     }
 
     /**
@@ -381,36 +441,47 @@ abstract class SensorCommonTests extends AndroidTestCase {
     public void testEventJittering() {
         final long EXPECTED_TIMESTAMP_NS = this.getMaxFrequencySupportedInuS() * 1000;
         final long THRESHOLD_IN_NS = EXPECTED_TIMESTAMP_NS / 10; // 10%
-        boolean result = mSensorManager.registerListener(
-                mEventListener,
-                mSensorUnderTest,
-                this.getMaxFrequencySupportedInuS());
-        assertTrue("registerListener", result);
-        mEventListener.waitForEvents(100);
 
-        SensorEventForTest[] events = mEventListener.getAllEvents();
-        ArrayList<Long> timestampDeltas = new ArrayList<Long>();
-        for(int i = 1; i < events.length; ++i) {
-            long previousTimestamp = events[i-1].getTimestamp();
-            long timestamp = events[i].getTimestamp();
-            long delta = timestamp - previousTimestamp;
-            long jitterValue = Math.abs(EXPECTED_TIMESTAMP_NS - delta);
-            timestampDeltas.add(jitterValue);
-        }
-
-        Collections.sort(timestampDeltas);
-        long percentile95InNs = timestampDeltas.get(95);
-        long actualPercentValue = (percentile95InNs * 100) / EXPECTED_TIMESTAMP_NS;
+        TestSensorManager.SensorEventForTest[] events = mTestSensorManager.collectEvents(
+                this.getMaxFrequencySupportedInuS(),
+                100);
+        ArrayList<Double> jitterValues = new ArrayList<Double>();
+        double jitterMean = SensorCtsHelper.getJitterMean(events, jitterValues);
+        double percentile95InNs = SensorCtsHelper.get95PercentileValue(jitterValues);
 
         if(percentile95InNs > THRESHOLD_IN_NS) {
-            for(long jitter : timestampDeltas) {
-                Log.e(LOG_TAG, "Jittering delta: " + jitter);
+            for(double jitter : jitterValues) {
+                Log.e(LOG_TAG, "Jitter: " + jitter);
             }
+            double actualPercentValue = (percentile95InNs * 100) / jitterMean;
             String message = String.format(
-                    "95%%Jitter| 10%%:%dns, observed:%dns(%d%%)",
+                    "95%% Jitter| 10%%:%dns, actual:%fns(%.2f%%)",
                     THRESHOLD_IN_NS,
                     percentile95InNs,
                     actualPercentValue);
+            fail(message);
+        }
+    }
+
+    public void testFrequencyAccuracy() {
+        final long EXPECTED_TIMESTAMP_NS = this.getMaxFrequencySupportedInuS() * 1000;
+        final long THRESHOLD_IN_NS = EXPECTED_TIMESTAMP_NS / 10; // 10%
+
+        TestSensorManager.SensorEventForTest[] events = mTestSensorManager.collectEvents(
+                this.getMaxFrequencySupportedInuS(),
+                100);
+        ArrayList<Long> timestampDelayValues = new ArrayList<Long>();
+        Double frequencyMean = SensorCtsHelper.getAverageTimestampDelayWithValues(
+                events,
+                timestampDelayValues);
+        if(Math.abs(EXPECTED_TIMESTAMP_NS - frequencyMean) > THRESHOLD_IN_NS) {
+            for(long value : timestampDelayValues) {
+                Log.e(LOG_TAG, "TimestampDelay: " + value);
+            }
+            String message = String.format(
+                    "Frequency| expected:%d, actual:%f",
+                    EXPECTED_TIMESTAMP_NS,
+                    frequencyMean);
             fail(message);
         }
     }
@@ -431,247 +502,81 @@ abstract class SensorCommonTests extends AndroidTestCase {
         }
     }
 
-    private void collectBugreport() {
-        String commands[] = new String[] {
-                "dumpstate",
-                "dumpsys",
-                "logcat -d -v threadtime",
-                "exit"
-        };
-
-        SimpleDateFormat dateFormat = new SimpleDateFormat("M-d-y_H:m:s.S");
-        String outputFile = String.format(
-                "%s/%s_%s",
-                this.getLogTag(),
-                "/sdcard/Download",
-                dateFormat.format(new Date()));
-
-        DataOutputStream processOutput = null;
-        try {
-            Process process = Runtime.getRuntime().exec("/system/bin/sh -");
-            processOutput = new DataOutputStream(process.getOutputStream());
-
-            for(String command : commands) {
-                processOutput.writeBytes(String.format("%s >> %s\n", command, outputFile));
-            }
-
-            processOutput.flush();
-            process.waitFor();
-
-            Log.d(this.getLogTag(), String.format("Bug-Report collected at: %s", outputFile));
-        } catch (IOException e) {
-            fail("Unable to collect Bug Report. " + e.toString());
-        } catch (InterruptedException e) {
-            fail("Unable to collect Bug Report. " + e.toString());
-        } finally {
-            if(processOutput != null) {
-                try {
-                    processOutput.close();
-                } catch(IOException e) {}
-            }
-        }
-    }
-
     /**
      * Test method helper implementations
      */
-    protected void validateSensorEvent(
-            float expectedX,
-            float expectedY,
-            float expectedZ,
-            float threshold) {
-        boolean result = mSensorManager.registerListener(
-                mEventListener,
-                mSensorUnderTest,
-                SensorManager.SENSOR_DELAY_FASTEST);
+    protected void validateNormForSensorEvent(float reference, float threshold, int axisCount) {
+        TestSensorManager.SensorEventForTest[] events = mTestSensorManager.collectEvents(
+                SensorManager.SENSOR_DELAY_FASTEST,
+                1);
+        TestSensorManager.SensorEventForTest event = events[0];
 
-        assertTrue("registerListener", result);
-        mEventListener.waitForEvents(1);
-        SensorEventForTest event = mEventListener.getLastEvent();
+        StringBuilder valuesBuilder = new StringBuilder();
+        double norm = 0.0;
+        for(int i = 0; i < axisCount; ++i) {
+            float value = event.values[i];
+            norm += Math.pow(value, 2);
 
-        float xValue = event.getX();
-        assertTrue(
-                String.format("x-axis| expected:%f, actual:%f, threshold:%f", expectedX, xValue, threshold),
-                Math.abs(expectedX - xValue) <= threshold);
+            valuesBuilder.append(value);
+            valuesBuilder.append(", ");
+        }
+        norm = Math.sqrt(norm);
 
-        float yValue = event.getY();
-        assertTrue(
-                String.format("y-axis| expected:%f, actual:%f, threshold:%f", expectedY, yValue, threshold),
-                Math.abs(expectedY - yValue) <= threshold);
-
-        float zValue = event.getZ();
-        assertTrue(
-                String.format("z-axis| expected:%f, actual:%f, threshold:%f", expectedZ, zValue, threshold),
-                Math.abs(expectedZ - zValue) <= threshold);
+        String message = String.format(
+                "Norm| expected:%f, threshold:%f, actual:%f (%s)",
+                reference,
+                threshold,
+                norm,
+                valuesBuilder.toString());
+        assertTrue(message, Math.abs(reference - norm) <= threshold);
     }
 
-    protected void validateVarianceWhileStatic(
-            float referenceX,
-            float referenceY,
-            float referenceZ,
-            float threshold) {
-        boolean result = mSensorManager.registerListener(
-                mEventListener,
-                mSensorUnderTest,
-                this.getMaxFrequencySupportedInuS());
-        assertTrue("registerListener", result);
-        mEventListener.waitForEvents(100);
-
-        SensorEventForTest[] events = mEventListener.getAllEvents();
-        ArrayList<Float> deltaValuesX = new ArrayList<Float>();
-        ArrayList<Float> deltaValuesY = new ArrayList<Float>();
-        ArrayList<Float> deltaValuesZ = new ArrayList<Float>();
-        for(int i = 0; i < events.length; ++i) {
-            SensorEventForTest event = events[i];
-            deltaValuesX.add(Math.abs(event.getX() - referenceX));
-            deltaValuesY.add(Math.abs(event.getY() - referenceY));
-            deltaValuesZ.add(Math.abs(event.getZ() - referenceZ));
+    protected void validateRegisterUnregisterRepeteadly(TestSensorManager testSensorManager) {
+        for(int i = 0; i < this.getLowNumberOfIterationsToExecute(); ++i) {
+            String iterationInfo = String.format("iteration:%d", i);
+            testSensorManager.collectEvents(SensorManager.SENSOR_DELAY_FASTEST, 1, iterationInfo);
         }
+    }
 
-        Collections.sort(deltaValuesX);
-        float percentile95X = deltaValuesX.get(95);
-        if(percentile95X > threshold) {
-            for(float valueX : deltaValuesX) {
-                Log.e(LOG_TAG, "Variance|X delta: " + valueX);
-            }
-            String message = String.format(
-                    "95%%Variance|X expected:%f, observed:%f",
-                    threshold,
-                    percentile95X);
-            fail(message);
+    protected void validateRegisterUnregisterRepeteadlyBatching(
+            TestSensorManager testSensorManager) {
+        // TODO: refactor if allowed with test wrapper abstractions
+        for(int i = 0; i < this.getLowNumberOfIterationsToExecute(); ++i) {
+            testSensorManager.collectBatchEvents(
+                    SensorManager.SENSOR_DELAY_FASTEST,
+                    SensorCtsHelper.getSecondsAsMicroSeconds(5),
+                    5 /*eventCont*/,
+                    String.format("iteration:%d", i));
         }
+    }
 
-        Collections.sort(deltaValuesY);
-        float percentile95Y = deltaValuesY.get(95);
-        if(percentile95Y > threshold) {
-            for(float valueY : deltaValuesY) {
-                Log.e(LOG_TAG, "Variance|Y delta: " + valueY);
-            }
-            String message = String.format(
-                    "95%%Variance|Y expected:%f, observed:%f",
-                    threshold,
-                    percentile95Y);
-            fail(message);
-        }
+    protected void validateStandardDeviationWhileStatic(
+            float expectedStandardDeviation,
+            int axisCount) {
+        // TODO: refactor the report parameter with test wrappers if available
+        TestSensorManager.SensorEventForTest[] events = mTestSensorManager.collectEvents(
+                this.getMaxFrequencySupportedInuS(),
+                100);
 
-        Collections.sort(deltaValuesZ);
-        float percentile95Z = deltaValuesZ.get(95);
-        if(percentile95Z > threshold) {
-            for(float valueZ : deltaValuesZ) {
-                Log.e(LOG_TAG, "Variance|Z delta: " + valueZ);
+        for(int i = 0; i < axisCount; ++i) {
+            ArrayList<Float> values = new ArrayList<Float>();
+            for(TestSensorManager.SensorEventForTest event : events) {
+                values.add(event.values[i]);
             }
+
+            double standardDeviation = SensorCtsHelper.getStandardDeviation(values);
             String message = String.format(
-                    "95%%Variance|Z expected:%f, observed:%f",
-                    threshold,
-                    percentile95Z);
-            fail(message);
+                    "StandardDeviation| axis:%d, expected:%f, actual:%f",
+                    i,
+                    expectedStandardDeviation,
+                    standardDeviation);
+            assertTrue(message, standardDeviation <= expectedStandardDeviation);
         }
     }
 
     /**
      * Private class definitions to support test of event handlers.
      */
-    protected class SensorEventForTest {
-        private Sensor mSensor;
-        private long mTimestamp;
-        private int mAccuracy;
-
-        private float mValueX;
-        private float mValueY;
-        private float mValueZ;
-
-        public SensorEventForTest(SensorEvent event) {
-            mSensor = event.sensor;
-            mTimestamp = event.timestamp;
-            mAccuracy = event.accuracy;
-            mValueX = event.values[0];
-            mValueY = event.values[1];
-            mValueZ = event.values[2];
-        }
-
-        public Sensor getSensor() {
-            return mSensor;
-        }
-
-        public int getAccuracy() {
-            return mAccuracy;
-        }
-
-        public float getX() {
-            return mValueX;
-        }
-
-        public float getY() {
-            return mValueY;
-        }
-
-        public float getZ() {
-            return mValueZ;
-        }
-
-        public long getTimestamp() {
-            return mTimestamp;
-        }
-    }
-
-    protected class TestSensorListener implements SensorEventListener2 {
-        private final ConcurrentLinkedDeque<SensorEventForTest> mSensorEventsList =
-                new ConcurrentLinkedDeque<SensorEventForTest>();
-        private volatile CountDownLatch mEventLatch;
-
-        @Override
-        public void onSensorChanged(SensorEvent event) {
-            // copy the event because there is no better way to do this in the platform
-            mSensorEventsList.addLast(new SensorEventForTest(event));
-
-            CountDownLatch latch = mEventLatch;
-            if(latch != null) {
-                latch.countDown();
-            }
-        }
-
-        @Override
-        public void onAccuracyChanged(Sensor sensor, int accuracy) {
-        }
-
-        @Override
-        public void onFlushCompleted(Sensor sensor) {
-        }
-
-        public void waitForEvents(int eventCount) {
-            waitForEvents(eventCount, null);
-        }
-
-        public void waitForEvents(int eventCount, String timeoutInfo) {
-            mEventLatch = new CountDownLatch(eventCount);
-            try {
-                boolean awaitCompleted = mEventLatch.await(getWaitTimeoutInSeconds(), TimeUnit.SECONDS);
-                if(!awaitCompleted) {
-                    collectBugreport();
-                }
-
-                String assertMessage = String.format(
-                        "WaitForEvents:%d, available:%d, %s",
-                        eventCount,
-                        mSensorEventsList.size(),
-                        timeoutInfo);
-                assertTrue(assertMessage, awaitCompleted);
-            } catch(InterruptedException e) { }
-        }
-
-        public SensorEventForTest getLastEvent() {
-            return mSensorEventsList.getLast();
-        }
-
-        public SensorEventForTest[] getAllEvents() {
-            return mSensorEventsList.toArray(new SensorEventForTest[0]);
-        }
-
-        public void clearEvents() {
-            mSensorEventsList.clear();
-        }
-    }
-
     private class TestTriggerListener extends TriggerEventListener {
         @Override
         public void onTrigger(TriggerEvent event) {

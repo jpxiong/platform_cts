@@ -20,6 +20,8 @@ import android.hardware.Sensor;
 import android.hardware.SensorManager;
 
 public class SensorAccelerometerTest extends SensorCommonTests {
+    private final int AXIS_COUNT = 3;
+
     @Override
     protected int getMaxFrequencySupportedInuS() {
         return 10000; // 100Hz
@@ -37,21 +39,13 @@ public class SensorAccelerometerTest extends SensorCommonTests {
      */
     @Override
     public void testEventValidity() {
-        final float THRESHOLD = 0.25f; // m / s^2
-        validateSensorEvent(
-                0 /*x-axis*/,
-                0 /*y-axis*/,
-                SensorManager.STANDARD_GRAVITY /*z-axis*/,
-                THRESHOLD);
+        final float THRESHOLD = 0.5f; // m / s^2
+        validateNormForSensorEvent(SensorManager.STANDARD_GRAVITY, THRESHOLD, AXIS_COUNT);
     }
 
     @Override
-    public void testVarianceWhileStatic() {
-        final float THRESHOLD = 0.25f; // m / s^2
-        validateVarianceWhileStatic(
-                0 /*x-axis*/,
-                0 /*y-axis*/,
-                SensorManager.STANDARD_GRAVITY /*z-axis*/,
-                THRESHOLD);
+    public void testStandardDeviationWhileStatic() {
+        final float STANDARD_DEVIATION = 1f; // m / s^2
+        validateStandardDeviationWhileStatic(STANDARD_DEVIATION, AXIS_COUNT);
     }
 }
