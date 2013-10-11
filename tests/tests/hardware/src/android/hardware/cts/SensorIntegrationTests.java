@@ -60,30 +60,6 @@ public class SensorIntegrationTests extends AndroidTestCase {
     /**
      * Test cases.
      */
-    public void testBatchAndFlush() throws InterruptedException {
-        List<Sensor> sensorList = mSensorManager.getSensorList(Sensor.TYPE_ALL);
-        for(Sensor sensor : sensorList) {
-            // skip all non-continuous mode sensors.
-            switch(sensor.getType()) {
-                case Sensor.TYPE_SIGNIFICANT_MOTION:
-                case Sensor.TYPE_STEP_COUNTER:
-                case Sensor.TYPE_STEP_DETECTOR:
-                case Sensor.TYPE_LIGHT:
-                case Sensor.TYPE_PROXIMITY:
-                case Sensor.TYPE_AMBIENT_TEMPERATURE:
-                    continue;
-            }
-
-            TestSensorManager sensorManager = new TestSensorManager(this, mSensorManager, sensor);
-            sensorManager.registerBatchListener(SensorManager.SENSOR_DELAY_NORMAL, 0);
-
-            // wait for 25 events and call flush
-            sensorManager.getEvents(25);
-            sensorManager.waitForFlush();
-
-            sensorManager.unregisterListener();
-        }
-    }
 
     /**
      * Regress:
