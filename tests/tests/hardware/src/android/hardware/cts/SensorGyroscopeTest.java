@@ -19,6 +19,8 @@ package android.hardware.cts;
 import android.hardware.Sensor;
 
 public class SensorGyroscopeTest extends SensorCommonTests {
+    private final int AXIS_COUNT = 3;
+
     @Override
     protected int getMaxFrequencySupportedInuS() {
         return 10000; // 100Hz
@@ -32,20 +34,12 @@ public class SensorGyroscopeTest extends SensorCommonTests {
     @Override
     public void testEventValidity() {
         final float THRESHOLD = 0.1f; // dps
-        validateSensorEvent(
-                0 /*x-axis*/,
-                0 /*y-axis*/,
-                0 /*z-axis*/,
-                THRESHOLD);
+        validateNormForSensorEvent(0 /*reference*/, THRESHOLD, AXIS_COUNT);
     }
 
     @Override
-    public void testVarianceWhileStatic() {
-        final float THRESHOLD = 0.1f; // dps
-        validateVarianceWhileStatic(
-                0 /*x-axis*/,
-                0 /*y-axis*/,
-                0 /*z-axis*/,
-                THRESHOLD);
+    public void testStandardDeviationWhileStatic() {
+        final float STANDARD_DEVIATION = 0.5f; // dps
+        validateStandardDeviationWhileStatic(STANDARD_DEVIATION, AXIS_COUNT);
     }
 }
