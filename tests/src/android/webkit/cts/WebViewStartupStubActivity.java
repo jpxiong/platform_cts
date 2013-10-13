@@ -18,6 +18,7 @@ package android.webkit.cts;
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.view.ViewGroup;
 import android.webkit.WebView;
 
 public class WebViewStartupStubActivity extends Activity {
@@ -39,8 +40,9 @@ public class WebViewStartupStubActivity extends Activity {
     }
 
     public void detachAndDestroyWebView() {
-        setContentView(null);
         if (mWebView != null) {
+            ViewGroup vg = (ViewGroup)mWebView.getParent();
+            vg.removeView(mWebView);
             mWebView.destroy();
         }
     }
