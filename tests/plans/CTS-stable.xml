@@ -36,8 +36,8 @@
   <Entry uri="android.jni"/>
   <Entry uri="android.keystore"/>
   <Entry uri="android.location"/>
-  <Entry uri="android.media"/>
-  <Entry uri="android.mediastress"/>
+  <Entry uri="android.media" exclude="android.media.cts.StreamingMediaPlayerTest#testHLS" />
+  <Entry uri="android.mediastress" exclude="android.mediastress.cts.NativeMediaTest#test480pPlay" />
   <Entry uri="android.nativemedia.sl"/>
   <Entry uri="android.nativemedia.xa"/>
   <Entry uri="android.nativeopengl"/>
@@ -50,12 +50,12 @@
   <Entry uri="android.permission2"/>
   <Entry uri="android.preference"/>
   <Entry uri="android.preference2"/>
-  <Entry uri="android.provider"/>
+  <Entry uri="android.provider" exclude="android.provider.cts.CalendarTest#testRemindersAlarm" />
   <Entry uri="android.renderscript"/>
   <Entry uri="android.rscpp"/>
   <Entry uri="android.rsg"/>
   <Entry uri="android.sax"/>
-  <Entry uri="android.security"/>
+  <Entry uri="android.security" exclude="android.security.cts.BannedFilesTest#testNoSu;android.security.cts.BannedFilesTest#testNoSuInPath;android.security.cts.PackageSignatureTest#testPackageSignatures" />
   <Entry uri="android.speech"/>
   <Entry uri="android.telephony"/>
   <Entry uri="android.tests.appsecurity"/>
@@ -68,7 +68,7 @@
   <Entry uri="android.util"/>
   <Entry uri="android.view"/>
   <Entry uri="android.webkit" exclude="android.webkit.cts.WebViewClientTest#testDoUpdateVisitedHistory;android.webkit.cts.WebViewClientTest#testLoadPage;android.webkit.cts.WebViewClientTest#testOnFormResubmission;android.webkit.cts.WebViewClientTest#testOnReceivedError;android.webkit.cts.WebViewClientTest#testOnReceivedHttpAuthRequest;android.webkit.cts.WebViewClientTest#testOnScaleChanged;android.webkit.cts.WebViewClientTest#testOnUnhandledKeyEvent;android.webkit.cts.WebViewTest#testSetInitialScale" />
-  <Entry uri="android.widget"/>
+  <Entry uri="android.widget" exclude="android.widget.cts.GridViewTest#testSetNumColumns" />
   <Entry uri="com.android.pts.bootup"/>
   <Entry uri="com.android.pts.browserbench"/>
   <Entry uri="com.android.pts.dram"/>
