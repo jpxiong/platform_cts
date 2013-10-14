@@ -58,16 +58,10 @@ public class YuvTest extends RSBaseCompute {
             bv[i] = (byte)r.nextInt(256);
         }
 
-        Type.Builder tb = new Type.Builder(mRS, Element.U8(mRS));
-        tb.setX(w);
-        tb.setY(h);
-        ay = Allocation.createTyped(mRS, tb.create());
-
-        tb = new Type.Builder(mRS, Element.U8(mRS));
-        tb.setX(w >> 1);
-        tb.setY(h >> 1);
-        au = Allocation.createTyped(mRS, tb.create());
-        av = Allocation.createTyped(mRS, tb.create());
+        ay = Allocation.createTyped(mRS, Type.createXY(mRS, Element.U8(mRS), w, h));
+        final Type tuv = Type.createXY(mRS, Element.U8(mRS), w >> 1, h >> 1);
+        au = Allocation.createTyped(mRS, tuv);
+        av = Allocation.createTyped(mRS, tuv);
 
         ay.copyFrom(by);
         au.copyFrom(bu);
@@ -75,11 +69,7 @@ public class YuvTest extends RSBaseCompute {
     }
 
     public Allocation makeOutput() {
-        Type.Builder tb = new Type.Builder(mRS, Element.RGBA_8888(mRS));
-        tb.setX(width);
-        tb.setY(height);
-        Type t = tb.create();
-        return Allocation.createTyped(mRS, t);
+        return Allocation.createTyped(mRS, Type.createXY(mRS, Element.RGBA_8888(mRS), w, h));
     }
 
     // Test for the API 17 conversion path
