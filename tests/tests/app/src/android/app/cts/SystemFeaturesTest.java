@@ -229,6 +229,10 @@ public class SystemFeaturesTest extends InstrumentationTestCase {
                 Sensor.TYPE_LIGHT);
         assertFeatureForSensor(featuresLeft, PackageManager.FEATURE_SENSOR_PROXIMITY,
                 Sensor.TYPE_PROXIMITY);
+        assertFeatureForSensor(featuresLeft, PackageManager.FEATURE_SENSOR_STEP_COUNTER,
+                Sensor.TYPE_STEP_COUNTER);
+        assertFeatureForSensor(featuresLeft, PackageManager.FEATURE_SENSOR_STEP_DETECTOR,
+                Sensor.TYPE_STEP_DETECTOR);
 
         assertTrue("Assertions need to be added to this test for " + featuresLeft,
                 featuresLeft.isEmpty());
