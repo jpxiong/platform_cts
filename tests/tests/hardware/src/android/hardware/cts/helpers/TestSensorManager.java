@@ -171,7 +171,7 @@ public class TestSensorManager implements Closeable {
         private final ConcurrentLinkedDeque<SensorEventForTest> mSensorEventsList =
                 new ConcurrentLinkedDeque<SensorEventForTest>();
         private volatile CountDownLatch mEventLatch;
-        private volatile CountDownLatch mFlushLatch;
+        private volatile CountDownLatch mFlushLatch = new CountDownLatch(1);
 
         @Override
         public void onSensorChanged(SensorEvent event) {
@@ -199,9 +199,11 @@ public class TestSensorManager implements Closeable {
 
         public void waitForFlushComplete() throws InterruptedException {
             CountDownLatch latch = mFlushLatch;
-            mAssert.assertTrue(
-                    "WaitForFlush",
-                    latch.await(WAIT_TIMEOUT_IN_SECONDS, TimeUnit.SECONDS));
+            if(latch != null) {
+                mAssert.assertTrue(
+                        "WaitForFlush",
+                        latch.await(WAIT_TIMEOUT_IN_SECONDS, TimeUnit.SECONDS));
+            }
         }
 
         public void waitForEvents(int eventCount) {
