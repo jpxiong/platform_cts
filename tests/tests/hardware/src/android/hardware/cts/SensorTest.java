@@ -61,6 +61,28 @@ public class SensorTest extends AndroidTestCase {
             assertNull(sensor);
         }
 
+        sensor = mSensorManager.getDefaultSensor(Sensor.TYPE_STEP_COUNTER);
+        boolean hasStepCounter = getContext().getPackageManager().hasSystemFeature(
+                                        PackageManager.FEATURE_SENSOR_STEP_COUNTER);
+        // stepcounter sensor is optional
+        if (hasStepCounter) {
+            assertEquals(Sensor.TYPE_STEP_COUNTER, sensor.getType());
+            assertSensorValues(sensor);
+        } else {
+            assertNull(sensor);
+        }
+
+        sensor = mSensorManager.getDefaultSensor(Sensor.TYPE_STEP_DETECTOR);
+        boolean hasStepDetector = getContext().getPackageManager().hasSystemFeature(
+                                        PackageManager.FEATURE_SENSOR_STEP_DETECTOR);
+        // stepdetector sensor is optional
+        if (hasStepDetector) {
+            assertEquals(Sensor.TYPE_STEP_DETECTOR, sensor.getType());
+            assertSensorValues(sensor);
+        } else {
+            assertNull(sensor);
+        }
+
         sensor = mSensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD);
         boolean hasCompass = getContext().getPackageManager().hasSystemFeature(
                 PackageManager.FEATURE_SENSOR_COMPASS);
