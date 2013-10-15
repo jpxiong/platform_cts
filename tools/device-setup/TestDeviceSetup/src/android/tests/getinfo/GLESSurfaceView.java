@@ -37,7 +37,7 @@ class GLESSurfaceView extends GLSurfaceView {
     /**
      *
      * @param parent
-     * @param useGL20 whether to use GLES2.0 API or not inside the view
+     * @param glVersion the version of GLES API to use inside the view
      * @param done to notify the completion of the task
      */
     public GLESSurfaceView(DeviceInfoActivity parent, int glVersion, CountDownLatch done){
@@ -58,14 +58,25 @@ class GLESSurfaceView extends GLSurfaceView {
         @Override
         public void onSurfaceCreated(GL10 gl, EGLConfig config) {
             String extensions;
+            String vendor;
+            String renderer;
             if (mGLVersion == 2) {
                 extensions = GLES20.glGetString(GLES20.GL_EXTENSIONS);
+                vendor = GLES20.glGetString(GLES20.GL_VENDOR);
+                renderer = GLES20.glGetString(GLES20.GL_RENDERER);
             } else if (mGLVersion == 3) {
                 extensions = GLES30.glGetString(GLES30.GL_EXTENSIONS);
+                vendor = GLES30.glGetString(GLES30.GL_VENDOR);
+                renderer = GLES30.glGetString(GLES30.GL_RENDERER);
             } else {
                 extensions = gl.glGetString(GL10.GL_EXTENSIONS);
+                vendor = gl.glGetString(GL10.GL_VENDOR);
+                renderer = gl.glGetString(GL10.GL_RENDERER);
             }
             Log.i(TAG, "extensions : " + extensions);
+            Log.i(TAG, "vendor : " + vendor);
+            Log.i(TAG, "renderer : " + renderer);
+            mParent.setGraphicsInfo(vendor, renderer);
             Scanner scanner = new Scanner(extensions);
             scanner.useDelimiter(" ");
             while (scanner.hasNext()) {
