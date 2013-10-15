@@ -69,7 +69,7 @@ public class YuvTest extends RSBaseCompute {
     }
 
     public Allocation makeOutput() {
-        return Allocation.createTyped(mRS, Type.createXY(mRS, Element.RGBA_8888(mRS), w, h));
+        return Allocation.createTyped(mRS, Type.createXY(mRS, Element.RGBA_8888(mRS), width, height));
     }
 
     // Test for the API 17 conversion path
