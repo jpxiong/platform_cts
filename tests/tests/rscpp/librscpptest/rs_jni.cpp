@@ -275,49 +275,49 @@ Java_android_cts_rscpp_RSBlendTest_blendTest(JNIEnv * env, jclass obj, jint X,
     sp<ScriptIntrinsicBlend> blend = ScriptIntrinsicBlend::create(rs, e);
     switch(optionFlag) {
     case 0:
-        blend->blendAdd(inputAlloc, outputAlloc);
+        blend->forEachAdd(inputAlloc, outputAlloc);
         break;
     case 1:
-        blend->blendClear(inputAlloc, outputAlloc);
+        blend->forEachClear(inputAlloc, outputAlloc);
         break;
     case 2:
-        blend->blendDst(inputAlloc, outputAlloc);
+        blend->forEachDst(inputAlloc, outputAlloc);
         break;
     case 3:
-        blend->blendDstAtop(inputAlloc, outputAlloc);
+        blend->forEachDstAtop(inputAlloc, outputAlloc);
         break;
     case 4:
-        blend->blendDstIn(inputAlloc, outputAlloc);
+        blend->forEachDstIn(inputAlloc, outputAlloc);
         break;
     case 5:
-        blend->blendDstOut(inputAlloc, outputAlloc);
+        blend->forEachDstOut(inputAlloc, outputAlloc);
         break;
     case 6:
-        blend->blendDstOver(inputAlloc, outputAlloc);
+        blend->forEachDstOver(inputAlloc, outputAlloc);
         break;
     case 7:
-        blend->blendMultiply(inputAlloc, outputAlloc);
+        blend->forEachMultiply(inputAlloc, outputAlloc);
         break;
     case 8:
-        blend->blendSrc(inputAlloc, outputAlloc);
+        blend->forEachSrc(inputAlloc, outputAlloc);
         break;
     case 9:
-        blend->blendSrcAtop(inputAlloc, outputAlloc);
+        blend->forEachSrcAtop(inputAlloc, outputAlloc);
         break;
     case 10:
-        blend->blendSrcIn(inputAlloc, outputAlloc);
+        blend->forEachSrcIn(inputAlloc, outputAlloc);
         break;
     case 11:
-        blend->blendSrcOut(inputAlloc, outputAlloc);
+        blend->forEachSrcOut(inputAlloc, outputAlloc);
         break;
     case 12:
-        blend->blendSrcOver(inputAlloc, outputAlloc);
+        blend->forEachSrcOver(inputAlloc, outputAlloc);
         break;
     case 13:
-        blend->blendSubtract(inputAlloc, outputAlloc);
+        blend->forEachSubtract(inputAlloc, outputAlloc);
         break;
     case 14:
-        blend->blendXor(inputAlloc, outputAlloc);
+        blend->forEachXor(inputAlloc, outputAlloc);
         break;
     default:
         break;
