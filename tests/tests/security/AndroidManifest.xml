@@ -19,6 +19,7 @@
     package="com.android.cts.security">
 
     <uses-permission android:name="android.permission.DISABLE_KEYGUARD" />
+    <uses-permission android:name="android.permission.CHANGE_NETWORK_STATE" />
     <application>
         <uses-library android:name="android.test.runner" />
     </application>
