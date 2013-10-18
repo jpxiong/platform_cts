@@ -379,6 +379,24 @@
             <meta-data android:name="test_required_features" android:value="android.hardware.nfc" />
         </activity>
 
+        <activity android:name="com.android.cts.verifier.nfc.hce.HceReaderTestActivity"
+                android:label="@string/nfc_test"
+                android:configChanges="keyboardHidden|orientation|screenSize">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.cts.intent.category.MANUAL_TEST" />
+            </intent-filter>
+        </activity>
+
+        <activity android:name="com.android.cts.verifier.nfc.hce.HceEmulatorTestActivity"
+                android:label="@string/nfc_test"
+                android:configChanges="keyboardHidden|orientation|screenSize">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.cts.intent.category.MANUAL_TEST" />
+            </intent-filter>
+        </activity>
+
         <activity android:name=".nfc.NdefPushSenderActivity"
                 android:label="@string/nfc_ndef_push_sender"
                 android:configChanges="keyboardHidden|orientation|screenSize" />
@@ -390,6 +408,115 @@
         <activity android:name=".nfc.TagVerifierActivity"
                 android:label="@string/nfc_tag_verifier"
                 android:configChanges="keyboardHidden|orientation|screenSize" />
+        <activity android:name=".nfc.hce.SinglePaymentEmulatorActivity"
+                android:label="@string/nfc_hce_single_payment_emulator"
+                android:configChanges="keyboardHidden|orientation|screenSize" />
+
+        <activity android:name=".nfc.hce.SimpleReaderActivity"
+                android:label="@string/nfc_hce_single_payment_reader"
+                android:configChanges="keyboardHidden|orientation|screenSize" />
+
+        <activity android:name=".nfc.hce.DualPaymentEmulatorActivity"
+                android:label="@string/nfc_hce_dual_payment_emulator"
+                android:configChanges="keyboardHidden|orientation|screenSize" />
+
+        <activity android:name=".nfc.hce.ChangeDefaultEmulatorActivity"
+                android:label="@string/nfc_hce_change_default_emulator"
+                android:configChanges="keyboardHidden|orientation|screenSize" />
+
+        <activity android:name=".nfc.hce.SingleNonPaymentEmulatorActivity"
+                android:label="@string/nfc_hce_single_non_payment_emulator"
+                android:configChanges="keyboardHidden|orientation|screenSize" />
+
+        <activity android:name=".nfc.hce.DualNonPaymentEmulatorActivity"
+                android:label="@string/nfc_hce_dual_non_payment_emulator"
+                android:configChanges="keyboardHidden|orientation|screenSize" />
+
+        <activity android:name=".nfc.hce.ConflictingNonPaymentEmulatorActivity"
+                android:label="@string/nfc_hce_conflicting_non_payment_emulator"
+                android:configChanges="keyboardHidden|orientation|screenSize" />
+
+        <activity android:name=".nfc.hce.OffHostEmulatorActivity"
+                android:label="@string/nfc_hce_offhost_service_emulator"
+                android:configChanges="keyboardHidden|orientation|screenSize" />
+
+        <activity android:name=".nfc.hce.OnAndOffHostEmulatorActivity"
+                android:label="@string/nfc_hce_on_and_offhost_service_emulator"
+                android:configChanges="keyboardHidden|orientation|screenSize" />
+
+        <activity android:name=".nfc.hce.ThroughputEmulatorActivity"
+                android:label="@string/nfc_hce_throughput_emulator"
+                android:configChanges="keyboardHidden|orientation|screenSize" />
+
+        <activity android:name=".nfc.hce.TapTestEmulatorActivity"
+                android:label="@string/nfc_hce_tap_test_emulator"
+                android:configChanges="keyboardHidden|orientation|screenSize" />
+
+        <!-- services used for testing NFC host-based card emulation -->
+        <service android:name=".nfc.hce.PaymentService1" android:exported="true"
+                 android:permission="android.permission.BIND_NFC_SERVICE"
+                 android:enabled="false">
+            <intent-filter>
+                <action android:name="android.nfc.cardemulation.action.HOST_APDU_SERVICE"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+            </intent-filter>
+            <meta-data android:name="android.nfc.cardemulation.host_apdu_service" android:resource="@xml/payment_aid_list_1"/>
+        </service>
+        <service android:name=".nfc.hce.PaymentService2" android:exported="true"
+                 android:permission="android.permission.BIND_NFC_SERVICE"
+                 android:enabled="false">
+            <intent-filter>
+                <action android:name="android.nfc.cardemulation.action.HOST_APDU_SERVICE"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+            </intent-filter>
+            <meta-data android:name="android.nfc.cardemulation.host_apdu_service" android:resource="@xml/payment_aid_list_2"/>
+        </service>
+        <service android:name=".nfc.hce.TransportService1" android:exported="true"
+                 android:permission="android.permission.BIND_NFC_SERVICE"
+                 android:enabled="false">
+            <intent-filter>
+                <action android:name="android.nfc.cardemulation.action.HOST_APDU_SERVICE"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+            </intent-filter>
+            <meta-data android:name="android.nfc.cardemulation.host_apdu_service" android:resource="@xml/transport_aid_list_1"/>
+        </service>
+        <service android:name=".nfc.hce.TransportService2" android:exported="true"
+                 android:permission="android.permission.BIND_NFC_SERVICE"
+                 android:enabled="false">
+            <intent-filter>
+                <action android:name="android.nfc.cardemulation.action.HOST_APDU_SERVICE"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+            </intent-filter>
+            <meta-data android:name="android.nfc.cardemulation.host_apdu_service" android:resource="@xml/transport_aid_list_2"/>
+        </service>
+        <service android:name=".nfc.hce.AccessService" android:exported="true"
+                 android:permission="android.permission.BIND_NFC_SERVICE"
+                 android:enabled="false">
+            <intent-filter>
+                <action android:name="android.nfc.cardemulation.action.HOST_APDU_SERVICE"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+            </intent-filter>
+            <meta-data android:name="android.nfc.cardemulation.host_apdu_service" android:resource="@xml/access_aid_list"/>
+        </service>
+        <service android:name=".nfc.hce.ThroughputService" android:exported="true"
+                 android:permission="android.permission.BIND_NFC_SERVICE"
+                 android:enabled="false">
+            <intent-filter>
+                <action android:name="android.nfc.cardemulation.action.HOST_APDU_SERVICE"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+            </intent-filter>
+            <meta-data android:name="android.nfc.cardemulation.host_apdu_service" android:resource="@xml/throughput_aid_list"/>
+        </service>
+
+        <service android:name=".nfc.hce.OffHostService" android:exported="true"
+                 android:permission="android.permission.BIND_NFC_SERVICE"
+                 android:enabled="false">
+            <intent-filter>
+                <action android:name="android.nfc.cardemulation.action.OFF_HOST_APDU_SERVICE"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+            </intent-filter>
+            <meta-data android:name="android.nfc.cardemulation.off_host_apdu_service" android:resource="@xml/offhost_aid_list"/>
+        </service>
 
         <activity android:name=".sensors.AccelerometerTestActivity" android:label="@string/snsr_accel_test"
                 android:screenOrientation="nosensor">

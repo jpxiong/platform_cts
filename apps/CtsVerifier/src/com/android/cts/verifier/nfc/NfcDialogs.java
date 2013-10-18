@@ -25,7 +25,7 @@ import android.content.Intent;
 import android.provider.Settings;
 
 /** Class containing methods to create common dialogs for NFC activities. */
-class NfcDialogs {
+public class NfcDialogs {
 
     static AlertDialog createNotEnabledDialog(final Context context) {
         return new AlertDialog.Builder(context)
@@ -57,6 +57,15 @@ class NfcDialogs {
                 .create();
     }
 
+    public static AlertDialog createHceTapReaderDialog(final Context context, String message) {
+        String baseString = context.getString(R.string.nfc_hce_tap_reader_message);
+        return new AlertDialog.Builder(context)
+                .setIcon(android.R.drawable.ic_dialog_alert)
+                .setTitle(R.string.nfc_hce_tap_reader_title)
+                .setMessage(message != null ? message + "\n\n" + baseString : baseString)
+                .setPositiveButton("OK", null)
+                .create();
+    }
     private NfcDialogs() {
     }
 }
