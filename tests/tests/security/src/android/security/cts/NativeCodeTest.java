@@ -35,6 +35,10 @@ public class NativeCodeTest extends TestCase {
                     doPerfEventTest());
     }
 
+    public void testPerfEvent2() throws Exception {
+        assertTrue(doPerfEventTest2());
+    }
+
     public void testSockDiag() throws Exception {
         int result = doSockDiagTest();
         assertFalse("Encountered unexpected error: " + result + ".", (result == -1));
@@ -47,6 +51,21 @@ public class NativeCodeTest extends TestCase {
      * http://git.kernel.org/cgit/linux/kernel/git/torvalds/linux.git/commit/?id=8176cced706b5e5d15887584150764894e94e02f
      */
     private static native boolean doPerfEventTest();
+
+    /**
+     * CVE-2013-4254
+     *
+     * Verifies that
+     * http://git.kernel.org/cgit/linux/kernel/git/torvalds/linux.git/commit/?id=c95eb3184ea1a3a2551df57190c81da695e2144b
+     * is applied to the system. Returns true if the patch is applied,
+     * and crashes the system otherwise.
+     *
+     * While you're at it, please also apply the following patch:
+     * http://git.kernel.org/cgit/linux/kernel/git/torvalds/linux.git/commit/?id=b88a2595b6d8aedbd275c07dfa784657b4f757eb
+     *
+     * Credit: https://github.com/deater/perf_event_tests/blob/master/exploits/arm_perf_exploit.c
+     */
+    private static native boolean doPerfEventTest2();
 
     /**
      * Hangs if device is vulnerable to CVE-2013-1763, returns -1 if
