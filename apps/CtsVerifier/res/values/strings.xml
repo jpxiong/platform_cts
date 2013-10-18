@@ -206,6 +206,8 @@
         known to be compatible.\n\nThe Tag Verification tests check that your
         device can properly read and write to tags of different technologies. The MIFARE
         Ultralight test is only applicable for devices that support it.
+        \n\nThe Host-based card emulation tests check that your device has properly implemented
+             host-based card emulation.
     </string>
 
     <string name="nfc_not_enabled">NFC is not enabled!</string>
@@ -263,6 +265,75 @@
 
     <string name="nfc_result_message">Written data:\n%1$s\n\nRead data:\n%2$s</string>
     <string name="nfc_ndef_content">Id: %1$s\nMime: %2$s\nPayload: %3$s</string>
+
+    <string name="nfc_hce">Host-based card emulation</string>
+    <string name="nfc_hce_default">Default route</string>
+    <string name="nfc_hce_reader_tests">HCE reader tests</string>
+    <string name="nfc_hce_emulator_tests">HCE emulator tests</string>
+    <string name="nfc_hce_emulator_test_info">The host-based card emulation
+        tests require two devices to be completed. The HCE emulator tests are used
+        to actually test the host-based card emulation feature of the device-under-test. So the
+        device running the emulator tests must be the candidate device running the software
+        to be tested. \n\nFor each emulator test, there is a corresponding "reader test"
+        in the "HCE reader tests" section. The "reader test" acts as a NFC terminal/POS
+        and makes sure the device-under-test implements card emulation correctly.
+    </string>
+    <string name="nfc_hce_reader_test_info">The host-based card emulation
+        tests require two devices to be completed. The HCE emulator tests are used
+        to actually test the host-based card emulation feature of the device-under-test. So the
+        device running the emulator tests must be the candidate device running the software
+        to be tested. \n\nFor each emulator test, there is a corresponding "reader test"
+        in the "HCE reader tests" section. The "reader test" acts as a NFC terminal/POS
+        and makes sure the device-under-test implements card emulation correctly.
+    </string>
+    <string name="nfc_hce_please_wait">Please wait</string>
+    <string name="nfc_hce_setting_up">Setting up card emulation services...</string>
+    <string name="nfc_hce_single_payment_emulator">Single payment (Emulator)</string>
+    <string name="nfc_hce_single_payment_reader">Single payment (Reader)</string>
+
+    <string name="nfc_hce_dual_payment_emulator">Two payment services (Emulator)</string>
+    <string name="nfc_hce_dual_payment_reader">Two payment services (Reader)</string>
+
+    <string name="nfc_hce_change_default_emulator">Change default payment service (Emulator)</string>
+    <string name="nfc_hce_change_default_reader">Change default payment service (Reader)</string>
+
+    <string name="nfc_hce_tap_reader_title">Tap reader</string>
+    <string name="nfc_hce_tap_reader_message">Select the corresponding reader test on the remote device, click OK on this dialog, and tap devices together. The pass button will be enabled if the test passes.</string>
+
+    <string name="nfc_hce_single_non_payment_emulator">Single non-payment (Emulator)</string>
+    <string name="nfc_hce_single_non_payment_reader">Single non-payment (Reader)</string>
+
+    <string name="nfc_hce_dual_non_payment_emulator">Two non-payment services (Emulator)</string>
+    <string name="nfc_hce_dual_non_payment_reader">Two non-payment services (Reader)</string>
+
+    <string name="nfc_hce_conflicting_non_payment_emulator">Two conflicting non-payment services (Emulator)</string>
+    <string name="nfc_hce_conflicting_non_payment_reader">Two conflicting non-payment services (Reader)</string>
+
+    <string name="nfc_hce_offhost_service_emulator">Off-host service (Emulator)</string>
+    <string name="nfc_hce_offhost_service_reader">Off-host service (Reader)</string>
+    <string name="nfc_hce_offhost_emulator_help">This tests enables a service that declares some AIDs to reside off-host. This test only needs to be passed if your device has a secure element (either embedded or UICC.). The responses from the secure element are not verified by the test - it is up to the tester to verify the responses are as expected.</string>
+
+    <string name="nfc_hce_on_and_offhost_service_emulator">On and off-host services (Emulator)</string>
+    <string name="nfc_hce_on_and_offhost_service_reader">On and off-host services (Reader)</string>
+    <string name="nfc_hce_on_and_offhost_emulator_help">This tests enables a service that declares some AIDs to reside off-host, and another service that runs on host. It then first sends an APDU sequence that goes off-host, and subsequently some APDUs that should go to the on-host service. This test only needs to be passed if your device has a secure element (either embedded or UICC.). The pass button will be enabled if the on-host sequence is performed as expected. The responses from the secure element are not verified by the test - it is up to the tester to verify the responses are as expected. </string>
+
+    <string name="nfc_hce_tap_test_emulator">50 successful taps test (Emulator)</string>
+    <string name="nfc_hce_tap_test_reader">50 successful taps test (Reader)</string>
+    <string name="nfc_hce_tap_test_emulator_help">This test requires you to complete at least 50 HCE taps, to ensure stability of the HCE feature. The NFC service and controller should not crash or hang during any of the 50 taps.</string>
+    <string name="nfc_hce_throughput_emulator">HCE throughput test (Emulator)</string>
+    <string name="nfc_hce_throughput_reader">HCE throughput test (Reader)</string>
+    <string name="nfc_hce_throughput_emulator_help">This tests verifies that your HCE implementation can reach a decent throughput. While Android does not have any requirements on HCE performance, many HCE applications such as transport and payment apps do. If the average APDU roundtrip time is more than 50ms, please take a look at your implementation to see where the delay is coming from.</string>
+    <string name="nfc_hce_change_default_help">You will now be asked whether you want to make Payment Service #1 the default app. Select yes.</string>
+    <string name="nfc_hce_conflicting_non_payment_help">When tapping the first time, you will be shown a dialog that asks you to choose between TransportService #1 and TransportService #2. Select TransportService #2. Verify a dialog is shown that asks you to tap again to complete. Now tap again, and if communication with TransportService #2 is successfull the pass button will be enabled."</string>
+    <string name="nfc_payment_service_desc">NFC Payment service</string>
+    <string name="ppse">PPSE</string>
+    <string name="mastercard">MasterCard</string>
+    <string name="paymentService1">Payment Service #1</string>
+    <string name="paymentService2">Payment Service #2</string>
+    <string name="transportService1">TransportService #1</string>
+    <string name="transportService2">TransportService #2</string>
+    <string name="accessService">AccessService</string>
+    <string name="offhostService">OffhostService</string>
 
     <!-- Strings for AccelerometerTestActivity and GyroscopeTestActivity -->
     <string name="snsr_accel_test">Accelerometer Test</string>
