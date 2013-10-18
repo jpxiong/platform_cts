@@ -22,6 +22,12 @@
 #include <sys/types.h>
 #include <sys/syscall.h>
 #include <unistd.h>
+#include <sys/prctl.h>
+#include <sys/ptrace.h>
+#include <sys/wait.h>
+#include <signal.h>
+#include <stdlib.h>
+#include <cutils/log.h>
 
 #define PASSED 0
 #define UNKNOWN_ERROR -1
@@ -103,11 +109,102 @@ static jint android_security_cts_NativeCodeTest_doSockDiagTest(JNIEnv* env, jobj
     return UNKNOWN_ERROR;
 }
 
+#define SEARCH_SIZE 0x4000
+
+static int secret;
+
+static bool isValidChildAddress(pid_t child, uintptr_t addr) {
+    long word;
+    long ret = syscall(__NR_ptrace, PTRACE_PEEKDATA, child, addr, &word);
+    return (ret == 0);
+}
+
+/* A lazy, do nothing child. GET A JOB. */
+static void child() {
+    int res;
+    ALOGE("in child");
+    secret = 0xbaadadd4;
+    res = prctl(PR_SET_DUMPABLE, 1, 0, 0, 0);
+    if (res != 0) {
+        ALOGE("prctl failed");
+    }
+    res = ptrace(PTRACE_TRACEME, 0, 0, 0);
+    if (res != 0) {
+        ALOGE("child ptrace failed");
+    }
+    signal(SIGSTOP, SIG_IGN);
+    kill(getpid(), SIGSTOP);
+}
+
+static jboolean parent(pid_t child) {
+    int status;
+    // Wait for the child to suspend itself so we can trace it.
+    waitpid(child, &status, 0);
+    jboolean result = true;
+
+    uintptr_t addr;
+    for (addr = 0x00000000; addr < 0xFFFF1000; addr+=SEARCH_SIZE) {
+        if (isValidChildAddress(child, addr)) {
+            // Don't scribble on our memory.
+            // (which has the same mapping as our child)
+            // We don't want to corrupt ourself.
+            continue;
+        }
+
+        errno = 0;
+        syscall(__NR_ptrace, PTRACE_PEEKDATA, child, &secret, addr);
+        if (errno == 0) {
+            result = false;
+            // We found an address which isn't in our our, or our child's,
+            // address space, but yet which is still writable. Scribble
+            // all over it.
+            ALOGE("parent: found writable at %x", addr);
+            uintptr_t addr2;
+            for (addr2 = addr; addr2 < addr + SEARCH_SIZE; addr2++) {
+                syscall(__NR_ptrace, PTRACE_PEEKDATA, child, &secret, addr2);
+            }
+        }
+    }
+
+    ptrace(PTRACE_DETACH, child, 0, 0);
+    return result;
+}
+
+/*
+ * Prior to https://git.kernel.org/cgit/linux/kernel/git/torvalds/linux.git/commit/arch/arm/include/asm/uaccess.h?id=8404663f81d212918ff85f493649a7991209fa04
+ * there was a flaw in the kernel's handling of get_user and put_user
+ * requests. Normally, get_user and put_user are supposed to guarantee
+ * that reads/writes outside the process's address space are not
+ * allowed.
+ *
+ * In this test, we use prctl(PTRACE_PEEKDATA) to force a write to
+ * an address outside of our address space. Without the patch applied,
+ * this write succeeds, because prctl(PTRACE_PEEKDATA) uses the
+ * vulnerable put_user call.
+ */
+static jboolean android_security_cts_NativeCodeTest_doVrootTest(JNIEnv*, jobject)
+{
+    ALOGE("Starting doVrootTest");
+    pid_t pid = fork();
+    if (pid == -1) {
+        return false;
+    }
+
+    if (pid == 0) {
+        child();
+        exit(0);
+    }
+
+    return parent(pid);
+}
+
 static JNINativeMethod gMethods[] = {
     {  "doPerfEventTest", "()Z",
             (void *) android_security_cts_NativeCodeTest_doPerfEventTest },
     {  "doSockDiagTest", "()I",
             (void *) android_security_cts_NativeCodeTest_doSockDiagTest },
+    {  "doVrootTest", "()Z",
+            (void *) android_security_cts_NativeCodeTest_doVrootTest },
 };
 
 int register_android_security_cts_NativeCodeTest(JNIEnv* env)
