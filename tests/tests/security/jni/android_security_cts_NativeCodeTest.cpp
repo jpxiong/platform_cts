@@ -24,6 +24,7 @@
 #include <signal.h>
 #include <stdlib.h>
 #include <cutils/log.h>
+#include <linux/perf_event.h>
 
 /*
  * Returns true iff this device is vulnerable to CVE-2013-2094.
@@ -42,6 +43,35 @@ static jboolean android_security_cts_NativeCodeTest_doPerfEventTest(JNIEnv* env,
     }
 
     return result;
+}
+
+/*
+ * Detects if the following patch is present.
+ * http://git.kernel.org/cgit/linux/kernel/git/torvalds/linux.git/commit/?id=c95eb3184ea1a3a2551df57190c81da695e2144b
+ *
+ * Returns true if the patch is applied, or crashes the system otherwise.
+ *
+ * While you're at it, you want to apply the following patch too.
+ * http://git.kernel.org/cgit/linux/kernel/git/torvalds/linux.git/commit/?id=b88a2595b6d8aedbd275c07dfa784657b4f757eb
+ * This test doesn't cover the above patch. TODO write a new test.
+ *
+ * Credit: https://github.com/deater/perf_event_tests/blob/master/exploits/arm_perf_exploit.c
+ */
+static jboolean android_security_cts_NativeCodeTest_doPerfEventTest2(JNIEnv* env, jobject thiz)
+{
+    struct perf_event_attr pe[2];
+    int fd[2];
+    memset(pe, 0, sizeof(pe));
+    pe[0].type = 2;
+    pe[0].config = 72;
+    pe[0].size = 80;
+    pe[1].type = PERF_TYPE_RAW;
+    pe[1].size = 80;
+    fd[0]=syscall(__NR_perf_event_open, &pe[0], 0, 0, -1, 0);
+    fd[1]=syscall(__NR_perf_event_open, &pe[1], 0, 0, fd[0], 0);
+    close(fd[0]);
+    close(fd[1]);
+    return true;
 }
 
 #define SEARCH_SIZE 0x4000
@@ -136,6 +166,8 @@ static jboolean android_security_cts_NativeCodeTest_doVrootTest(JNIEnv*, jobject
 static JNINativeMethod gMethods[] = {
     {  "doPerfEventTest", "()Z",
             (void *) android_security_cts_NativeCodeTest_doPerfEventTest },
+    {  "doPerfEventTest2", "()Z",
+            (void *) android_security_cts_NativeCodeTest_doPerfEventTest2 },
     {  "doVrootTest", "()Z",
             (void *) android_security_cts_NativeCodeTest_doVrootTest },
 };
