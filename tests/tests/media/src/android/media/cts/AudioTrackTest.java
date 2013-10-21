@@ -401,11 +401,11 @@ public class AudioTrackTest extends AndroidTestCase {
     public void testPlaybackHeadPositionAfterFlushAndPlay() throws Exception {
         // constants for test
         final String TEST_NAME = "testPlaybackHeadPositionAfterFlushAndPlay";
-        final int TEST_SR = 22050;
         final int TEST_CONF = AudioFormat.CHANNEL_OUT_STEREO;
         final int TEST_FORMAT = AudioFormat.ENCODING_PCM_16BIT;
         final int TEST_MODE = AudioTrack.MODE_STREAM;
         final int TEST_STREAM_TYPE = AudioManager.STREAM_MUSIC;
+        final int TEST_SR = AudioTrack.getNativeOutputSampleRate(TEST_STREAM_TYPE);
 
         // -------- initialization --------------
         int minBuffSize = AudioTrack.getMinBufferSize(TEST_SR, TEST_CONF, TEST_FORMAT);
