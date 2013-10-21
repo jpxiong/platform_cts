@@ -30,12 +30,20 @@ import android.net.Uri;
 import android.net.http.SslCertificate;
 import android.net.http.SslError;
 import android.os.Bundle;
+import android.os.CancellationSignal;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
+import android.os.ParcelFileDescriptor;
 import android.os.StrictMode;
 import android.os.StrictMode.ThreadPolicy;
 import android.os.SystemClock;
+import android.print.PageRange;
+import android.print.PrintAttributes;
+import android.print.PrintDocumentAdapter;
+import android.print.PrintDocumentAdapter.LayoutResultCallback;
+import android.print.PrintDocumentAdapter.WriteResultCallback;
+import android.print.PrintDocumentInfo;
 import android.test.ActivityInstrumentationTestCase2;
 import android.test.UiThreadTest;
 import android.util.AttributeSet;
@@ -67,9 +75,12 @@ import junit.framework.Assert;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.util.Collections;
 import java.util.Date;
+import java.util.concurrent.Callable;
 import java.util.concurrent.FutureTask;
+import java.util.concurrent.TimeUnit;
 import java.util.HashMap;
 
 import org.apache.http.Header;
@@ -80,6 +91,8 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
     private static final int INITIAL_PROGRESS = 100;
     private static long TEST_TIMEOUT = 20000L;
     private static final String X_REQUESTED_WITH = "X-Requested-With";
+    private static final String PRINTER_TEST_FILE = "print.pdf";
+    private static final String PDF_PREAMBLE = "%PDF-1";
 
     /**
      * This is the minimum number of milliseconds to wait for scrolling to
@@ -1978,6 +1991,89 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
                 return mOnUiThread.getTitle().equals(EXPECTED_TITLE);
             }
         }.run();
+    }
+
+    // Verify Print feature can create a PDF file with a correct preamble.
+    public void testPrinting() throws Throwable {
+        mOnUiThread.loadDataAndWaitForCompletion("<html><head></head>" +
+                "<body>foo</body></html>",
+                "text/html", null);
+        final PrintDocumentAdapter adapter =  mOnUiThread.createPrintDocumentAdapter();
+        printDocumentStart(adapter);
+        PrintAttributes attributes = new PrintAttributes.Builder()
+                .setMediaSize(PrintAttributes.MediaSize.ISO_A4)
+                .setResolution(new PrintAttributes.Resolution("foo", "bar", 300, 300))
+                .setMinMargins(PrintAttributes.Margins.NO_MARGINS)
+                .build();
+        final WebViewStubActivity activity = getActivity();
+        final File file = activity.getFileStreamPath(PRINTER_TEST_FILE);
+        final ParcelFileDescriptor descriptor = ParcelFileDescriptor.open(file,
+                ParcelFileDescriptor.parseMode("w"));
+        final FutureTask<Boolean> result =
+                new FutureTask<Boolean>(new Callable<Boolean>() {
+                            public Boolean call() {
+                                return true;
+                            }
+                        });
+        printDocumentLayout(adapter, null, attributes,
+                new LayoutResultCallback() {
+                    // Called on UI thread
+                    @Override
+                    public void onLayoutFinished(PrintDocumentInfo info, boolean changed) {
+                        savePrintedPage(adapter, descriptor, result);
+                    }
+                });
+        try {
+            result.get(TEST_TIMEOUT, TimeUnit.MILLISECONDS);
+            assertTrue(file.length() > 0);
+            FileInputStream in = new FileInputStream(file);
+            byte[] b = new byte[PDF_PREAMBLE.length()];
+            in.read(b);
+            String preamble = new String(b);
+            assertEquals(PDF_PREAMBLE, preamble);
+        } finally {
+            // close the descriptor, if not closed already.
+            descriptor.close();
+            file.delete();
+        }
+    }
+
+    private void savePrintedPage(final PrintDocumentAdapter adapter,
+            final ParcelFileDescriptor descriptor, final FutureTask<Boolean> result) {
+        adapter.onWrite(new PageRange[] {PageRange.ALL_PAGES}, descriptor,
+                new CancellationSignal(),
+                new WriteResultCallback() {
+                    @Override
+                    public void onWriteFinished(PageRange[] pages) {
+                        try {
+                            descriptor.close();
+                            result.run();
+                        } catch (IOException ex) {
+                            fail("Failed file operation: " + ex.toString());
+                        }
+                    }
+                });
+    }
+
+    private void printDocumentStart(final PrintDocumentAdapter adapter) {
+        mOnUiThread.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                adapter.onStart();
+            }
+        });
+    }
+
+    private void printDocumentLayout(final PrintDocumentAdapter adapter,
+            final PrintAttributes oldAttributes, final PrintAttributes newAttributes,
+            final LayoutResultCallback layoutResultCallback) {
+        mOnUiThread.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                adapter.onLayout(oldAttributes, newAttributes, new CancellationSignal(),
+                        layoutResultCallback, null);
+            }
+        });
     }
 
     @UiThreadTest
