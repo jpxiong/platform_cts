@@ -49,6 +49,7 @@ public class VerifyMaximumFrequencyOperation extends SensorTestOperation {
             int sensorType,
             int reportLatencyInUs,
             int thresholdPercentageOfNs) throws InvalidParameterException {
+        super(testCase);
         if(thresholdPercentageOfNs < 0) {
             throw new InvalidParameterException("thresholdPercentageOfNs needs to be >= 0");
         }
@@ -90,7 +91,7 @@ public class VerifyMaximumFrequencyOperation extends SensorTestOperation {
                     SensorCtsHelper.getFrequencyInHz(frequencyMeanInUs),
                     mThresholdInNs,
                     mThresholdPercentage);
-            mSensor.verifier().fail(message);
+            mAssert.fail(message);
         }
     }
 }
