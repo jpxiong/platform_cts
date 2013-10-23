@@ -19,5 +19,10 @@
   name: "com.android.pts.opengl.primitive.GLPrimitiveBenchmark#testFullPipelineOffscreen",
   name: "com.android.pts.opengl.primitive.GLPrimitiveBenchmark#testPixelOutputOffscreen",
   bug: 11238219
+},
+{
+  name: "android.hardware.cts.SensorIntegrationTests#testSensorsWithSeveralClients",
+  name: "android.hardware.cts.SensorIntegrationTests#testSensorsMovingRates",
+  bug: 11352697
 }
 ]
