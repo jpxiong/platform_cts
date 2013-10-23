@@ -66,6 +66,7 @@ public class SimpleReaderActivity extends PassFailButtons.Activity implements Re
 
         try {
             isoDep.connect();
+            isoDep.setTimeout(5000);
             int count = 0;
             boolean success = true;
             long startTime = System.currentTimeMillis();
@@ -117,7 +118,12 @@ public class SimpleReaderActivity extends PassFailButtons.Activity implements Re
             }
         } catch (IOException e) {
             sb.insert(0, "Test failed. IOException (did you keep the devices in range?)\n\n.");
-            mTextView.setText(sb.toString());
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    mTextView.setText(sb.toString());
+                }
+            });
         } finally {
         }
     }
