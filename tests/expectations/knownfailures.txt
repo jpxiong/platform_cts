@@ -14,5 +14,10 @@
   name: "android.hardware.camera2.cts.CameraDeviceTest",
   name: "android.hardware.camera2.cts.CameraManagerTest",
   bug: 11141002
+},
+{
+  name: "com.android.pts.opengl.primitive.GLPrimitiveBenchmark#testFullPipelineOffscreen",
+  name: "com.android.pts.opengl.primitive.GLPrimitiveBenchmark#testPixelOutputOffscreen",
+  bug: 11238219
 }
 ]
