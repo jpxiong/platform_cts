@@ -408,12 +408,25 @@
         <activity android:name=".nfc.TagVerifierActivity"
                 android:label="@string/nfc_tag_verifier"
                 android:configChanges="keyboardHidden|orientation|screenSize" />
+
+        <activity android:name=".nfc.hce.DefaultRouteEmulatorActivity"
+                android:label="@string/nfc_hce_default_route_emulator"
+                android:configChanges="keyboardHidden|orientation|screenSize" />
+
+        <activity android:name=".nfc.hce.ProtocolParamsEmulatorActivity"
+                android:label="@string/nfc_hce_protocol_params_emulator"
+                android:configChanges="keyboardHidden|orientation|screenSize" />
+
         <activity android:name=".nfc.hce.SinglePaymentEmulatorActivity"
                 android:label="@string/nfc_hce_single_payment_emulator"
                 android:configChanges="keyboardHidden|orientation|screenSize" />
 
         <activity android:name=".nfc.hce.SimpleReaderActivity"
                 android:label="@string/nfc_hce_single_payment_reader"
+                android:configChanges="keyboardHidden|orientation|screenSize" />
+
+        <activity android:name=".nfc.hce.ProtocolParamsReaderActivity"
+                android:label="@string/nfc_hce_protocol_params_reader"
                 android:configChanges="keyboardHidden|orientation|screenSize" />
 
         <activity android:name=".nfc.hce.DualPaymentEmulatorActivity"
