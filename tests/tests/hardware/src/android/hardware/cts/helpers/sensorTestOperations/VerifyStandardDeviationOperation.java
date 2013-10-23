@@ -42,13 +42,14 @@ public class VerifyStandardDeviationOperation extends SensorTestOperation {
             int samplingRateInUs,
             int reportLatencyInUs,
             float expectedStandardDeviation) {
+        super(testCase);
         mSensor = new SensorManagerTestVerifier(
                 testCase,
                 sensorType,
                 samplingRateInUs,
                 reportLatencyInUs);
         // set expectations
-        mAxisCount = SensorTestInformation.getAxisCount(mSensor.getUnderlyingType());
+        mAxisCount = SensorTestInformation.getAxisCount(mSensor.getUnderlyingSensor().getType());
         mExpectedStandardDeviation = expectedStandardDeviation;
     }
 
@@ -74,7 +75,7 @@ public class VerifyStandardDeviationOperation extends SensorTestOperation {
                         i,
                         mExpectedStandardDeviation,
                         standardDeviation);
-                mSensor.verifier().fail(message);
+                mAssert.fail(message);
             }
         }
     }

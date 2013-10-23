@@ -146,7 +146,7 @@ public class SensorCtsHelper {
      *      . android.permission.READ_LOGS
      *      . android.permission.DUMP
      */
-    public static void collectBugreport(String collectorId)
+    public static String collectBugreport(String collectorId)
             throws IOException, InterruptedException {
         String commands[] = new String[] {
                 "dumpstate",
@@ -158,8 +158,8 @@ public class SensorCtsHelper {
         SimpleDateFormat dateFormat = new SimpleDateFormat("M-d-y_H:m:s.S");
         String outputFile = String.format(
                 "%s/%s_%s",
-                collectorId,
                 Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS),
+                collectorId,
                 dateFormat.format(new Date()));
 
         DataOutputStream processOutput = null;
@@ -182,6 +182,8 @@ public class SensorCtsHelper {
                 } catch(IOException e) {}
             }
         }
+
+        return outputFile;
     }
 
     public static Sensor getSensor(AndroidTestCase testCase, int sensorType) {
