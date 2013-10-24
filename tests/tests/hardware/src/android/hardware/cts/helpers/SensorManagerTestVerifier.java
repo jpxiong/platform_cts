@@ -146,17 +146,6 @@ public class SensorManagerTestVerifier implements Closeable {
     }
 
     /**
-     * Support methods for clients of this class.
-     */
-    public Assert verifier() {
-        return mAssert;
-    }
-
-    public int getUnderlyingType() {
-        return mSensorUnderTest.getType();
-    }
-
-    /**
      * Definition of support test classes.
      */
     private class TestSensorListener implements SensorEventListener2 {

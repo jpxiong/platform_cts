@@ -6,5 +6,23 @@
 {
   name: "android.holo.cts.HoloTest",
   bug: 8148617
+},
+{
+  name: "android.hardware.camera2.cts.ImageReaderTest",
+  name: "android.hardware.camera2.cts.CameraCharacteristicsTest",
+  name: "android.hardware.camera2.cts.CameraCaptureResultTest",
+  name: "android.hardware.camera2.cts.CameraDeviceTest",
+  name: "android.hardware.camera2.cts.CameraManagerTest",
+  bug: 11141002
+},
+{
+  name: "com.android.pts.opengl.primitive.GLPrimitiveBenchmark#testFullPipelineOffscreen",
+  name: "com.android.pts.opengl.primitive.GLPrimitiveBenchmark#testPixelOutputOffscreen",
+  bug: 11238219
+},
+{
+  name: "android.hardware.cts.SensorIntegrationTests#testSensorsWithSeveralClients",
+  name: "android.hardware.cts.SensorIntegrationTests#testSensorsMovingRates",
+  bug: 11352697
 }
 ]
