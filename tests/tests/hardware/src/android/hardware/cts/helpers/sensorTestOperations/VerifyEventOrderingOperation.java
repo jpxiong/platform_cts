@@ -34,6 +34,7 @@ public class VerifyEventOrderingOperation extends SensorTestOperation {
             int sensorType,
             int samplingRateInUs,
             int reportLatencyInUs) {
+        super(testCase);
         mSensor = new SensorManagerTestVerifier(
                 testCase,
                 sensorType,
@@ -55,7 +56,9 @@ public class VerifyEventOrderingOperation extends SensorTestOperation {
                     i,
                     previousTimestamp,
                     timestamp);
-            mSensor.verifier().assertTrue(message, previousTimestamp < timestamp);
+            // allow two identical timestamps to be considered in order, in case the resolution of
+            // the timestamp is not granular enough
+            mAssert.assertTrue(message, previousTimestamp <= timestamp);
         }
     }
 }
