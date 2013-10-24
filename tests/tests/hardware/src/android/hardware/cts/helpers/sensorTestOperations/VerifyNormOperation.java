@@ -40,13 +40,14 @@ public class VerifyNormOperation extends SensorTestOperation {
             int samplingRateInUs,
             float referenceValue,
             float threshold) {
+        super(testCase);
         mSensor = new SensorManagerTestVerifier(
                 testCase,
                 sensorType,
                 samplingRateInUs,
                 0 /*reportLatencyInUs*/);
         // set expectations
-        mAxisCount = SensorTestInformation.getAxisCount(mSensor.getUnderlyingType());
+        mAxisCount = SensorTestInformation.getAxisCount(mSensor.getUnderlyingSensor().getType());
         mReferenceValue = referenceValue;
         mThreshold = threshold;
     }
@@ -75,6 +76,6 @@ public class VerifyNormOperation extends SensorTestOperation {
                 mThreshold,
                 norm,
                 valuesBuilder.toString());
-        mSensor.verifier().assertTrue(message, Math.abs(mReferenceValue - norm) <= mThreshold);
+        mAssert.assertTrue(message, Math.abs(mReferenceValue - norm) <= mThreshold);
     }
 }
