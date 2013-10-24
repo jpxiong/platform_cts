@@ -92,21 +92,22 @@ public class SensorIntegrationTests extends SensorTestCase {
                 Sensor.TYPE_MAGNETIC_FIELD,
                 Sensor.TYPE_GYROSCOPE };
 
-        ParallelCompositeSensorTestOperation operation = new ParallelCompositeSensorTestOperation();
+        ParallelCompositeSensorTestOperation operation =
+                new ParallelCompositeSensorTestOperation(this);
         for(int sensorType : sensorTypes) {
             SensorTestOperation continuousOperation = new VerifyEventOrderingOperation(
                     this,
                     sensorType,
                     SensorManager.SENSOR_DELAY_NORMAL,
                     0 /* reportLatencyInUs */);
-            operation.add(new RepeatingSensorTestOperation(continuousOperation, ITERATIONS));
+            operation.add(new RepeatingSensorTestOperation(this, continuousOperation, ITERATIONS));
 
             SensorTestOperation batchingOperation = new VerifyEventOrderingOperation(
                     this,
                     sensorType,
                     SensorTestInformation.getMaxSamplingRateInUs(this, sensorType),
                     SensorCtsHelper.getSecondsAsMicroSeconds(BATCHING_RATE_IN_SECONDS));
-            operation.add(new RepeatingSensorTestOperation(batchingOperation, ITERATIONS));
+            operation.add(new RepeatingSensorTestOperation(this, batchingOperation, ITERATIONS));
         }
         operation.execute();
     }
@@ -137,7 +138,8 @@ public class SensorIntegrationTests extends SensorTestCase {
         final int INSTANCES_TO_USE = 5;
         final int ITERATIONS_TO_EXECUTE = 100;
 
-        ParallelCompositeSensorTestOperation operation = new ParallelCompositeSensorTestOperation();
+        ParallelCompositeSensorTestOperation operation =
+                new ParallelCompositeSensorTestOperation(this);
         int sensorTypes[] = {
                 Sensor.TYPE_ACCELEROMETER,
                 Sensor.TYPE_MAGNETIC_FIELD,
@@ -146,7 +148,7 @@ public class SensorIntegrationTests extends SensorTestCase {
         for(int sensorType : sensorTypes) {
             for(int instance = 0; instance < INSTANCES_TO_USE; ++instance) {
                 SequentialCompositeSensorTestOperation sequentialOperation =
-                        new SequentialCompositeSensorTestOperation();
+                        new SequentialCompositeSensorTestOperation(this);
                 for(int iteration = 0; iteration < ITERATIONS_TO_EXECUTE; ++iteration) {
                     VerifyEventOrderingOperation sensorOperation = new VerifyEventOrderingOperation(
                             this,
