@@ -20,6 +20,7 @@ import android.renderscript.RenderScript;
 import android.renderscript.Allocation;
 import android.renderscript.Element;
 import android.renderscript.RSRuntimeException;
+import android.util.Log;
 
 /**
  * Base RenderScript test class. This class provides a message handler and a
@@ -98,6 +99,8 @@ class RSBaseCompute extends RSBase {
         try {
             RSUtils.forEach(this, testid, mAllocationIn, mAllocationOut);
         } catch (RSRuntimeException e) {
+            Log.e("RenderscriptCTS", "Caught RSRuntimeException: " +
+                  e.getMessage());
         }
         float[] outArray = makeOutArray(INPUTSIZE * outStride);
         mAllocationOut.copyTo(outArray);
