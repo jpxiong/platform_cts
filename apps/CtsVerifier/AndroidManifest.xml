@@ -380,21 +380,13 @@
         </activity>
 
         <activity android:name="com.android.cts.verifier.nfc.hce.HceReaderTestActivity"
-                android:label="@string/nfc_test"
+                android:label="@string/nfc_hce_reader_tests"
                 android:configChanges="keyboardHidden|orientation|screenSize">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.cts.intent.category.MANUAL_TEST" />
-            </intent-filter>
         </activity>
 
         <activity android:name="com.android.cts.verifier.nfc.hce.HceEmulatorTestActivity"
-                android:label="@string/nfc_test"
+                android:label="@string/nfc_hce_emulator_tests"
                 android:configChanges="keyboardHidden|orientation|screenSize">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.cts.intent.category.MANUAL_TEST" />
-            </intent-filter>
         </activity>
 
         <activity android:name=".nfc.NdefPushSenderActivity"
