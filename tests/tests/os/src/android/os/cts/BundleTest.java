@@ -72,6 +72,17 @@ public class BundleTest extends AndroidTestCase {
         new Bundle(getClass().getClassLoader());
     }
 
+    public void testEmptyStream() {
+        Parcel p = Parcel.obtain();
+        p.unmarshall(new byte[] {}, 0, 0);
+        Bundle b = p.readBundle();
+        assertTrue(b.isEmpty());
+        mBundle.putBoolean("android", true);
+        p.unmarshall(new byte[] {}, 0, 0);
+        mBundle.readFromParcel(p);
+        assertTrue(mBundle.isEmpty());
+    }
+
     // first put sth into tested Bundle, it shouldn't be empty, then clear it and it should be empty
     public void testClear() {
         mBundle.putBoolean("android", true);
