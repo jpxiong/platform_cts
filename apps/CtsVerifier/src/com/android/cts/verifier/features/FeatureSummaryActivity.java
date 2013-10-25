@@ -180,6 +180,10 @@ public class FeatureSummaryActivity extends PassFailButtons.ListActivity {
             new Feature("android.hardware.camera.any", false),
     };
 
+    public static final Feature[] ALL_KITKAT_FEATURES = {
+            new Feature(PackageManager.FEATURE_NFC_HOST_CARD_EMULATION, false),
+    };
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -210,6 +214,9 @@ public class FeatureSummaryActivity extends PassFailButtons.ListActivity {
 
         // add features from latest to last so that the latest requirements are put in the set first
         int apiVersion = Build.VERSION.SDK_INT;
+        if (apiVersion >= Build.VERSION_CODES.KITKAT) {
+            Collections.addAll(features, ALL_KITKAT_FEATURES);
+        }
         if (apiVersion >= Build.VERSION_CODES.JELLY_BEAN_MR2) {
             Collections.addAll(features, ALL_JELLY_BEAN_MR2_FEATURES);
         }
