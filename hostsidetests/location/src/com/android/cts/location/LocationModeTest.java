@@ -2,8 +2,6 @@
 
 package com.android.cts.location;
 
-import android.content.ContentResolver;
-import android.provider.Settings;
 import com.android.cts.tradefed.targetprep.SettingsToggler;
 import com.android.tradefed.testtype.DeviceTestCase;
 
