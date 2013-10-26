@@ -11,22 +11,22 @@
  * or implied. See the License for the specific language governing permissions and limitations under
  * the License.
  */
-package com.android.pts.jank.opengl;
+package com.android.pts.jank.ui;
 
 import com.android.pts.jank.PtsHostJankTest;
 
 import java.io.File;
 
-public class PtsHostJankOpenGl extends PtsHostJankTest {
+public class PtsHostJankUi extends PtsHostJankTest {
 
     private static final String APK_PACKAGE = "com.android.pts";
-    private static final String APK = "PtsDeviceOpenGl.apk";
-    private static final String PACKAGE = "com.android.pts.jank.opengl";
-    private static final String HOST_CLASS = PtsHostJankOpenGl.class.getName();
-    private static final String DEVICE_CLASS = PACKAGE + ".PtsDeviceJankOpenGl";
+    private static final String APK = "PtsDeviceUi.apk";
+    private static final String PACKAGE = "com.android.pts.jank.ui";
+    private static final String HOST_CLASS = PtsHostJankUi.class.getName();
+    private static final String DEVICE_CLASS = PACKAGE + ".PtsDeviceJankUi";
     private static final String JAR_NAME = "PtsDeviceJank.jar";
 
-    public PtsHostJankOpenGl() {
+    public PtsHostJankUi() {
         super(JAR_NAME, DEVICE_CLASS, HOST_CLASS);
     }
 
@@ -46,19 +46,7 @@ public class PtsHostJankOpenGl extends PtsHostJankTest {
         super.tearDown();
     }
 
-    public void testFullPipeline() throws Exception {
-        runUiAutomatorTest("testFullPipeline");
-    }
-
-    public void testPixelOutput() throws Exception {
-        runUiAutomatorTest("testPixelOutput");
-    }
-
-    public void testShaderPerf() throws Exception {
-        runUiAutomatorTest("testShaderPerf");
-    }
-
-    public void testContextSwitch() throws Exception {
-        runUiAutomatorTest("testContextSwitch");
+    public void testScrolling() throws Exception {
+        runUiAutomatorTest("testScrolling");
     }
 }
