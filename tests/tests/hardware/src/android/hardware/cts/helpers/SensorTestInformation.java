@@ -16,9 +16,9 @@
 
 package android.hardware.cts.helpers;
 
-import android.hardware.Sensor;
+import android.content.Context;
 
-import android.test.AndroidTestCase;
+import android.hardware.Sensor;
 
 import java.security.InvalidParameterException;
 
@@ -46,10 +46,10 @@ public class SensorTestInformation {
 //                return "Temperature";
 //            case Sensor.TYPE_PROXIMITY:
 //                return "Proximity";
-//            case Sensor.TYPE_GRAVITY:
-//                return "Gravity";
-//            case Sensor.TYPE_LINEAR_ACCELERATION:
-//                return "Linear Acceleration";
+            case Sensor.TYPE_GRAVITY:
+                return 3;
+            case Sensor.TYPE_LINEAR_ACCELERATION:
+                return 3;
 //            case Sensor.TYPE_ROTATION_VECTOR:
 //                return "Rotation Vector";
 //            case Sensor.TYPE_RELATIVE_HUMIDITY:
@@ -72,7 +72,7 @@ public class SensorTestInformation {
 //                return "Geomagnetic Rotation Vector";
             default:
                 throw new InvalidParameterException(
-                        String.format("Invalid sensorType:%d", sensorType));
+                        String.format("Invalid sensorType:%d. Unable to find axis count.", sensorType));
         }
     }
 
@@ -145,8 +145,8 @@ public class SensorTestInformation {
         return String.format("%s (%d)", name, sensorType);
     }
 
-    public static int getMaxSamplingRateInUs(AndroidTestCase testCase, int sensorType) {
-        Sensor sensor = SensorCtsHelper.getSensor(testCase, sensorType);
+    public static int getMaxSamplingRateInUs(Context context, int sensorType) {
+        Sensor sensor = SensorCtsHelper.getSensor(context, sensorType);
         return sensor.getMinDelay();
     }
 }

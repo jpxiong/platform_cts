@@ -97,7 +97,7 @@ public class SensorFrequencyTests extends SensorTestCase {
      */
     public void testMaxFrequency() throws Throwable {
         VerifyMaximumFrequencyOperation operation = new VerifyMaximumFrequencyOperation(
-                this,
+                this.getContext(),
                 mSensorType,
                 mReportLatencyInUs,
                 mThresholdPercentageOfNs);
@@ -147,7 +147,7 @@ public class SensorFrequencyTests extends SensorTestCase {
      */
     public void testJittering() throws Throwable {
         VerifyJitteringOperation operation = new VerifyJitteringOperation(
-                this,
+                this.getContext(),
                 mSensorType,
                 mReportLatencyInUs,
                 mThresholdPercentageOfNs);
@@ -195,7 +195,7 @@ public class SensorFrequencyTests extends SensorTestCase {
      * - the observed maximum sampling rate
      */
     public void testMaxFrequencyExpected() {
-        Sensor sensor = SensorCtsHelper.getSensor(this, mSensorType);
+        Sensor sensor = SensorCtsHelper.getSensor(this.getContext(), mSensorType);
         int samplingRateInUs = sensor.getMinDelay();
         String message = String.format(
                 "samplingRateInUs| expected:%d, actual:%d",
