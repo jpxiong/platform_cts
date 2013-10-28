@@ -101,7 +101,7 @@ public class SensorEventOrderingTests extends SensorTestCase {
      */
     public void testEventOrdering() throws Throwable {
         VerifyEventOrderingOperation operation = new VerifyEventOrderingOperation(
-                this,
+                this.getContext(),
                 mSensorType,
                 mSamplingRateInUs,
                 mReportLatencyInUs);
