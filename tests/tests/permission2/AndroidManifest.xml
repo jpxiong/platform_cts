@@ -45,6 +45,17 @@
     <!-- need app that has RECORD_AUDIO but not CAPTURE_AUDIO_OUTPUT -->
     <uses-permission android:name="android.permission.RECORD_AUDIO"/>
 
+    <!-- need a permission that would ordinarily be granted, but has a maxSdkVersion that
+         causes it to be withheld under the current API level -->
+    <uses-permission
+            android:name="android.permission.VIBRATE"
+            android:maxSdkVersion="18" />
+
+    <!-- need a permission that will be granted -->
+    <uses-permission
+            android:name="android.permission.FLASHLIGHT"
+            android:maxSdkVersion="9000" />
+
     <instrumentation android:name="android.test.InstrumentationCtsTestRunner"
                      android:targetPackage="com.android.cts.permission2"
                      android:label="More CTS tests for permissions"/>
