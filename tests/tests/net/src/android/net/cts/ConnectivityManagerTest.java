@@ -66,8 +66,10 @@ public class ConnectivityManagerTest extends AndroidTestCase {
         mWifiManager = (WifiManager) getContext().getSystemService(Context.WIFI_SERVICE);
         mPackageManager = getContext().getPackageManager();
 
-        String[] naStrings = getContext().getResources().getStringArray(
-                com.android.internal.R.array.networkAttributes);
+        // Get com.android.internal.R.array.networkAttributes
+        int resId = getContext().getResources().getIdentifier("networkAttributes", "array", "android");
+        String[] naStrings = getContext().getResources().getStringArray(resId);
+
         for (String naString : naStrings) {
             try {
                 NetworkConfig n = new NetworkConfig(naString);
@@ -75,8 +77,9 @@ public class ConnectivityManagerTest extends AndroidTestCase {
             } catch (Exception e) {}
         }
 
-        int[] protectedNetworks = getContext().getResources().getIntArray(
-                com.android.internal.R.array.config_protectedNetworks);
+        // Get com.android.internal.R.array.config_protectedNetworks
+        resId = getContext().getResources().getIdentifier("config_protectedNetworks", "array", "android");
+        int[] protectedNetworks = getContext().getResources().getIntArray(resId);
         for (int p : protectedNetworks) {
             mProtectedNetworks.add(p);
         }
