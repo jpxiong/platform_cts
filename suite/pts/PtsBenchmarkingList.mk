@@ -34,7 +34,6 @@ PTS_SUPPORT_PACKAGES := \
     PtsDeviceOpenGl
 
 PTS_HOST_CASES := \
-    PtsHostBootup \
     PtsHostUi \
     PtsHostJank
 
