@@ -172,6 +172,8 @@ public class GeolocationTest extends ActivityInstrumentationTestCase2<WebViewStu
         // Remove the test provider after each test
         for (String provider : mProviders) {
             try {
+                // Work around b/11446702 by clearing the test provider before removing it
+                mLocationManager.clearTestProviderEnabled(provider);
                 mLocationManager.removeTestProvider(provider);
             } catch (IllegalArgumentException e) {} // Not much to do about this
         }
