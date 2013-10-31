@@ -25,6 +25,7 @@
 .end method
 
 .method public test(Ljava/lang/String;)V
+.limit regs 2
     return-void
 .end method
 
