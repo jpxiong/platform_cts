@@ -208,4 +208,14 @@ public class HtmlTest extends AndroidTestCase {
         Spanned s = Html.fromHtml("<p>\u0124\u00eb\u0142\u0142o, world!</p>");
         assertEquals("<p dir=\"ltr\">&#292;&#235;&#322;&#322;o, world!</p>\n", Html.toHtml(s));
     }
+
+    public void testSurrogates() throws Exception {
+        Spanned s = Html.fromHtml("\ud83d\udc31");
+        assertEquals("<p dir=\"ltr\">&#128049;</p>\n", Html.toHtml(s));
+    }
+
+    public void testBadSurrogates() throws Exception {
+        Spanned s = Html.fromHtml("\udc31\ud83d");
+        assertEquals("<p dir=\"ltr\"></p>\n", Html.toHtml(s));
+    }
 }
