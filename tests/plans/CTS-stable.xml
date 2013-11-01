@@ -36,13 +36,13 @@
   <Entry uri="android.jni"/>
   <Entry uri="android.keystore"/>
   <Entry uri="android.location"/>
-  <Entry uri="android.media" exclude="android.media.cts.StreamingMediaPlayerTest#testHLS" />
+  <Entry uri="android.media" exclude="android.media.cts.StreamingMediaPlayerTest#testHLS;android.media.cts.DecoderTest#testCodecResetsH264WithSurface" />
   <Entry uri="android.mediastress" exclude="android.mediastress.cts.NativeMediaTest#test480pPlay" />
   <Entry uri="android.nativemedia.sl"/>
   <Entry uri="android.nativemedia.xa"/>
   <Entry uri="android.nativeopengl"/>
   <Entry uri="android.ndef"/>
-  <Entry uri="android.net" exclude="android.net.wifi.cts.ScanResultTest#testScanResultTimeStamp;android.net.cts.DnsTest#testDnsWorks;android.net.cts.TrafficStatsTest#testTrafficStatsForLocalhost;android.net.cts.SSLCertificateSocketFactoryTest#testCreateSocket;android.net.cts.SSLCertificateSocketFactoryTest#test_createSocket_bind;android.net.cts.SSLCertificateSocketFactoryTest#test_createSocket_simple;android.net.cts.SSLCertificateSocketFactoryTest#test_createSocket_wrapping" />
+  <Entry uri="android.net" exclude="android.net.cts.ConnectivityManagerTest#testStartUsingNetworkFeature_enableHipri;android.net.wifi.cts.ScanResultTest#testScanResultTimeStamp;android.net.cts.DnsTest#testDnsWorks;android.net.cts.TrafficStatsTest#testTrafficStatsForLocalhost;android.net.wifi.cts.ScanResultTest#testAndroidTestCaseSetupProperly;android.net.wifi.cts.NsdManagerTest#testAndroidTestCaseSetupProperly;android.net.cts.SSLCertificateSocketFactoryTest#testCreateSocket;android.net.cts.SSLCertificateSocketFactoryTest#test_createSocket_bind;android.net.cts.SSLCertificateSocketFactoryTest#test_createSocket_simple;android.net.cts.SSLCertificateSocketFactoryTest#test_createSocket_wrapping" />
   <Entry uri="android.opengl"/>
   <Entry uri="android.openglperf"/>
   <Entry uri="android.os"/>
@@ -55,10 +55,11 @@
   <Entry uri="android.rscpp"/>
   <Entry uri="android.rsg"/>
   <Entry uri="android.sax"/>
-  <Entry uri="android.security" exclude="android.security.cts.BannedFilesTest#testNoSu;android.security.cts.BannedFilesTest#testNoSuInPath;android.security.cts.PackageSignatureTest#testPackageSignatures" />
+  <Entry uri="android.security" exclude="android.security.cts.ListeningPortsTest#testNoRemotelyAccessibleListeningUdp6Ports;android.security.cts.ListeningPortsTest#testNoRemotelyAccessibleListeningUdpPorts;android.security.cts.BannedFilesTest#testNoSu;android.security.cts.BannedFilesTest#testNoSuInPath;android.security.cts.PackageSignatureTest#testPackageSignatures" />
   <Entry uri="android.speech"/>
   <Entry uri="android.telephony"/>
   <Entry uri="android.tests.appsecurity"/>
+  <Entry uri="android.tests.location"/>    
   <Entry uri="android.tests.sigtest"/>
   <Entry uri="android.text"/>
   <Entry uri="android.textureview"/>
@@ -73,7 +74,7 @@
   <Entry uri="com.android.pts.browserbench"/>
   <Entry uri="com.android.pts.dram"/>
   <Entry uri="com.android.pts.filesystemperf"/>
-  <Entry uri="com.android.pts.jank.opengl"/>
+  <Entry uri="com.android.pts.jank"/>
   <Entry uri="com.android.pts.opengl"/>
   <Entry uri="com.android.pts.simplecpu"/>
   <Entry uri="com.android.pts.ui"/>
