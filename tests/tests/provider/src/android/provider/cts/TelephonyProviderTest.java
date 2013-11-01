@@ -18,8 +18,10 @@ package android.provider.cts;
 
 import android.content.ContentResolver;
 import android.content.ContentValues;
+import android.database.Cursor;
 import android.net.Uri;
 import android.os.ParcelFileDescriptor;
+import android.provider.Telephony.Carriers;
 import android.test.InstrumentationTestCase;
 
 import java.lang.reflect.Field;
@@ -33,6 +35,12 @@ import java.io.FileDescriptor;
 
 public class TelephonyProviderTest extends InstrumentationTestCase {
     private ContentResolver mContentResolver;
+    private static final String[] APN_PROJECTION = {
+        Carriers.TYPE,            // 0
+        Carriers.MMSC,            // 1
+        Carriers.MMSPROXY,        // 2
+        Carriers.MMSPORT          // 3
+    };
 
     @Override
     protected void setUp() throws Exception {
@@ -66,6 +74,20 @@ public class TelephonyProviderTest extends InstrumentationTestCase {
             fail("The code was able to abuse the MmsProvider to open any file");
         } catch(Exception e){
             e.printStackTrace();
+        }
+    }
+
+    // In JB MR1 access to the TelephonyProvider's Carriers table was clamped down and would
+    // throw a SecurityException when queried. That was fixed in JB MR2. Verify that 3rd parties
+    // can access the APN info the carriers table, after JB MR1.
+    public void testAccessToApns() {
+        try {
+            String selection = Carriers.CURRENT + " IS NOT NULL";
+            String[] selectionArgs = null;
+            Cursor cursor = mContentResolver.query(Carriers.CONTENT_URI,
+                    APN_PROJECTION, selection, selectionArgs, null);
+        } catch (SecurityException e) {
+            fail("No access to current APN");
         }
     }
 }
