@@ -149,7 +149,8 @@ public class DecodeEditEncodeTest extends AndroidTestCase {
     /**
      * Tests editing of a video file with GL.
      */
-    private void videoEditTest() {
+    private void videoEditTest()
+            throws IOException {
         VideoChunks sourceChunks = new VideoChunks();
 
         if (!generateVideoFile(sourceChunks)) {
@@ -182,7 +183,8 @@ public class DecodeEditEncodeTest extends AndroidTestCase {
      *
      * @return true on success, false on "soft" failure
      */
-    private boolean generateVideoFile(VideoChunks output) {
+    private boolean generateVideoFile(VideoChunks output)
+            throws IOException {
         if (VERBOSE) Log.d(TAG, "generateVideoFile " + mWidth + "x" + mHeight);
         MediaCodec encoder = null;
         InputSurface inputSurface = null;
@@ -393,7 +395,8 @@ public class DecodeEditEncodeTest extends AndroidTestCase {
      * for output and a Surface for input, we can avoid issues with obscure formats and can
      * use a fragment shader to do transformations.
      */
-    private VideoChunks editVideoFile(VideoChunks inputData) {
+    private VideoChunks editVideoFile(VideoChunks inputData)
+            throws IOException {
         if (VERBOSE) Log.d(TAG, "editVideoFile " + mWidth + "x" + mHeight);
         VideoChunks outputData = new VideoChunks();
         MediaCodec decoder = null;
@@ -613,7 +616,8 @@ public class DecodeEditEncodeTest extends AndroidTestCase {
      * Checks the video file to see if the contents match our expectations.  We decode the
      * video to a Surface and check the pixels with GL.
      */
-    private void checkVideoFile(VideoChunks inputData) {
+    private void checkVideoFile(VideoChunks inputData)
+            throws IOException {
         OutputSurface surface = null;
         MediaCodec decoder = null;
 

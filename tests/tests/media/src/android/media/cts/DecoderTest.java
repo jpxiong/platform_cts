@@ -679,21 +679,25 @@ public class DecoderTest extends MediaPlayerTestBase {
     }
 
     private static MediaCodec createDecoder(String mime) {
-        if (false) {
-            // change to force testing software codecs
-            if (mime.contains("avc")) {
-                return MediaCodec.createByCodecName("OMX.google.h264.decoder");
-            } else if (mime.contains("3gpp")) {
-                return MediaCodec.createByCodecName("OMX.google.h263.decoder");
-            } else if (mime.contains("mp4v")) {
-                return MediaCodec.createByCodecName("OMX.google.mpeg4.decoder");
-            } else if (mime.contains("vp8")) {
-                return MediaCodec.createByCodecName("OMX.google.vp8.decoder");
-            } else if (mime.contains("vp9")) {
-                return MediaCodec.createByCodecName("OMX.google.vp9.decoder");
+        try {
+            if (false) {
+                // change to force testing software codecs
+                if (mime.contains("avc")) {
+                    return MediaCodec.createByCodecName("OMX.google.h264.decoder");
+                } else if (mime.contains("3gpp")) {
+                    return MediaCodec.createByCodecName("OMX.google.h263.decoder");
+                } else if (mime.contains("mp4v")) {
+                    return MediaCodec.createByCodecName("OMX.google.mpeg4.decoder");
+                } else if (mime.contains("vp8")) {
+                    return MediaCodec.createByCodecName("OMX.google.vp8.decoder");
+                } else if (mime.contains("vp9")) {
+                    return MediaCodec.createByCodecName("OMX.google.vp9.decoder");
+                }
             }
+            return MediaCodec.createDecoderByType(mime);
+        } catch (Exception e) {
+            return null;
         }
-        return MediaCodec.createDecoderByType(mime);
     }
 
     // for video
@@ -1162,6 +1166,8 @@ public class DecoderTest extends MediaPlayerTestBase {
         assertTrue("not an audio file", mime.startsWith("audio/"));
 
         codec = MediaCodec.createDecoderByType(mime);
+        assertNotNull("couldn't find codec " + mime, codec);
+
         codec.configure(format, null /* surface */, null /* crypto */, 0 /* flags */);
         codec.start();
         codecInputBuffers = codec.getInputBuffers();
