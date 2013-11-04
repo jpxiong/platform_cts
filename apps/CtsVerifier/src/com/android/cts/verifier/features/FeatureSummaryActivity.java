@@ -182,6 +182,10 @@ public class FeatureSummaryActivity extends PassFailButtons.ListActivity {
 
     public static final Feature[] ALL_KITKAT_FEATURES = {
             new Feature(PackageManager.FEATURE_NFC_HOST_CARD_EMULATION, false),
+            new Feature(PackageManager.FEATURE_CONSUMER_IR, false),
+            new Feature(PackageManager.FEATURE_DEVICE_ADMIN, false),
+            new Feature(PackageManager.FEATURE_SENSOR_STEP_COUNTER, false),
+            new Feature(PackageManager.FEATURE_SENSOR_STEP_DETECTOR, false),
     };
 
     @Override
