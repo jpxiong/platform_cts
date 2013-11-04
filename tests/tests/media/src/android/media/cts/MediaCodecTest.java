@@ -27,6 +27,7 @@ import android.test.AndroidTestCase;
 import android.util.Log;
 import android.view.Surface;
 
+import java.io.IOException;
 import java.nio.ByteBuffer;
 
 
@@ -77,7 +78,11 @@ public class MediaCodecTest extends AndroidTestCase {
         format.setInteger(MediaFormat.KEY_COLOR_FORMAT, colorFormat);
 
         try {
-            encoder = MediaCodec.createByCodecName(codecInfo.getName());
+            try {
+                encoder = MediaCodec.createByCodecName(codecInfo.getName());
+            } catch (IOException e) {
+                fail("failed to create codec " + codecInfo.getName());
+            }
             try {
                 surface = encoder.createInputSurface();
                 fail("createInputSurface should not work pre-configure");
@@ -123,7 +128,11 @@ public class MediaCodecTest extends AndroidTestCase {
         InputSurface inputSurface = null;
 
         try {
-            encoder = MediaCodec.createEncoderByType(MIME_TYPE);
+            try {
+                encoder = MediaCodec.createEncoderByType(MIME_TYPE);
+            } catch (IOException e) {
+                fail("failed to create " + MIME_TYPE + " encoder");
+            }
             encoder.configure(format, null, null, MediaCodec.CONFIGURE_FLAG_ENCODE);
             inputSurface = new InputSurface(encoder.createInputSurface());
             inputSurface.makeCurrent();
@@ -171,7 +180,11 @@ public class MediaCodecTest extends AndroidTestCase {
         Surface surface = null;
 
         try {
-            encoder = MediaCodec.createEncoderByType(MIME_TYPE);
+            try {
+                encoder = MediaCodec.createEncoderByType(MIME_TYPE);
+            } catch (IOException e) {
+                fail("failed to create " + MIME_TYPE + " encoder");
+            }
             encoder.configure(format, null, null, MediaCodec.CONFIGURE_FLAG_ENCODE);
             surface = encoder.createInputSurface();
             encoder.start();
@@ -205,7 +218,11 @@ public class MediaCodecTest extends AndroidTestCase {
         Surface surface = null;
 
         try {
-            encoder = MediaCodec.createEncoderByType(MIME_TYPE);
+            try {
+                encoder = MediaCodec.createEncoderByType(MIME_TYPE);
+            } catch (IOException e) {
+                fail("failed to create " + MIME_TYPE + " encoder");
+            }
             encoder.configure(format, null, null, MediaCodec.CONFIGURE_FLAG_ENCODE);
             surface = encoder.createInputSurface();
             encoder.start();
