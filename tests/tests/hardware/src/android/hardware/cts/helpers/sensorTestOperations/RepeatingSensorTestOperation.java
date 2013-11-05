@@ -16,8 +16,6 @@
 
 package android.hardware.cts.helpers.sensorTestOperations;
 
-import junit.framework.Assert;
-
 import android.hardware.cts.helpers.SensorTestOperation;
 
 /**
@@ -27,11 +25,7 @@ public class RepeatingSensorTestOperation extends SensorTestOperation {
     private final SensorTestOperation mSensorTestOperation;
     private final int mRepetitionCount;
 
-    public RepeatingSensorTestOperation(
-            Assert assertionObject,
-            SensorTestOperation operation,
-            int repetitionCount) {
-        super(assertionObject);
+    public RepeatingSensorTestOperation(SensorTestOperation operation, int repetitionCount) {
         mSensorTestOperation = operation;
         mRepetitionCount = repetitionCount;
     }

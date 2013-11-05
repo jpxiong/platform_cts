@@ -76,7 +76,7 @@
                 android:configChanges="keyboardHidden|orientation|screenSize"
                 android:label="@string/report_viewer" />
 
-        <provider android:name=".TestResultsProvider" 
+        <provider android:name=".TestResultsProvider"
                 android:authorities="com.android.cts.verifier.testresultsprovider" />
 
         <activity android:name=".admin.PolicySerializationTestActivity"
@@ -533,6 +533,18 @@
             <meta-data android:name="test_required_features" android:value="android.hardware.sensor.accelerometer" />
         </activity>
 
+        <activity android:name=".sensors.AccelerometerMeasurementTestActivity"
+                  android:label="@string/snsr_accel_m_test"
+                  android:screenOrientation="nosensor">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN"/>
+                <category android:name="android.cts.intent.category.MANUAL_TEST"/>
+            </intent-filter>
+            <meta-data android:name="test_category" android:value="@string/test_category_sensors"/>
+            <meta-data android:name="test_required_features"
+                       android:value="android.hardware.sensor.accelerometer"/>
+        </activity>
+
         <activity android:name=".sensors.GyroscopeTestActivity" android:label="@string/snsr_gyro_test"
                 android:screenOrientation="nosensor">
             <intent-filter>
@@ -541,6 +553,30 @@
             </intent-filter>
             <meta-data android:name="test_category" android:value="@string/test_category_sensors" />
             <meta-data android:name="test_required_features" android:value="android.hardware.sensor.gyroscope" />
+        </activity>
+
+        <activity android:name=".sensors.GyroscopeMeasurementTestActivity"
+                  android:label="@string/snsr_gyro_m_test"
+                  android:screenOrientation="nosensor">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN"/>
+                <category android:name="android.cts.intent.category.MANUAL_TEST"/>
+            </intent-filter>
+            <meta-data android:name="test_category" android:value="@string/test_category_sensors"/>
+            <meta-data android:name="test_require_features"
+                       android:value="android.hardware.sensor.gyroscope"/>
+        </activity>
+
+        <activity android:name=".sensors.MagneticFieldMeasurementTestActivity"
+                  android:label="@string/snsr_mag_m_test"
+                  android:screenOrientation="nosensor">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.cts.intent.category.MANUAL_TEST" />
+            </intent-filter>
+            <meta-data android:name="test_category" android:value="@string/test_category_sensors" />
+            <meta-data android:name="test_required_features"
+                       android:value="android.hardware.sensor.compass" />
         </activity>
 
         <activity android:name=".camera.formats.CameraFormatsActivity"
@@ -640,7 +676,7 @@
             <meta-data android:name="test_category" android:value="@string/test_category_networking" />
             <meta-data android:name="test_required_features" android:value="android.hardware.wifi.direct" />
         </activity>
-        
+
         <activity android:name=".nls.NotificationListenerVerifierActivity"
                 android:label="@string/nls_test">
             <intent-filter>
@@ -658,7 +694,7 @@
                 <action android:name="android.service.notification.NotificationListenerService" />
             </intent-filter>
         </service>
-        
+
         <service  android:name="nls.NotificationListenerVerifierActivity$DismissService"/>
         <activity android:name=".security.CAInstallNotificationVerifierActivity"
                 android:label="@string/cacert_test">

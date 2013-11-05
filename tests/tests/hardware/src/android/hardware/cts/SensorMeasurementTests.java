@@ -105,7 +105,7 @@ public class SensorMeasurementTests extends SensorTestCase {
      */
     public void testEventNorm() throws Throwable {
         VerifyNormOperation operation = new VerifyNormOperation(
-                this,
+                this.getContext(),
                 mSensorType,
                 mSamplingRateInUs,
                 mReferenceValue,
@@ -162,7 +162,7 @@ public class SensorMeasurementTests extends SensorTestCase {
      */
     public void testStandardDeviation() throws Throwable {
         VerifyStandardDeviationOperation operation = new VerifyStandardDeviationOperation(
-                this,
+                this.getContext(),
                 mSensorType,
                 mSamplingRateInUs,
                 mReportLatencyInUs,

@@ -16,13 +16,15 @@
 
 package android.hardware.cts.helpers.sensorTestOperations;
 
+import junit.framework.Assert;
+
+import android.content.Context;
+
 import android.hardware.cts.helpers.SensorCtsHelper;
 import android.hardware.cts.helpers.SensorManagerTestVerifier;
 import android.hardware.cts.helpers.SensorTestInformation;
 import android.hardware.cts.helpers.SensorTestOperation;
 import android.hardware.cts.helpers.TestSensorEvent;
-
-import android.test.AndroidTestCase;
 
 import android.util.Log;
 
@@ -37,14 +39,13 @@ public class VerifyStandardDeviationOperation extends SensorTestOperation {
     private double mExpectedStandardDeviation;
 
     public VerifyStandardDeviationOperation(
-            AndroidTestCase testCase,
+            Context context,
             int sensorType,
             int samplingRateInUs,
             int reportLatencyInUs,
             float expectedStandardDeviation) {
-        super(testCase);
         mSensor = new SensorManagerTestVerifier(
-                testCase,
+                context,
                 sensorType,
                 samplingRateInUs,
                 reportLatencyInUs);
@@ -75,7 +76,7 @@ public class VerifyStandardDeviationOperation extends SensorTestOperation {
                         i,
                         mExpectedStandardDeviation,
                         standardDeviation);
-                mAssert.fail(message);
+                Assert.fail(message);
             }
         }
     }
