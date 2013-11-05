@@ -16,12 +16,14 @@
 
 package android.hardware.cts.helpers.sensorTestOperations;
 
+import junit.framework.Assert;
+
+import android.content.Context;
+
 import android.hardware.cts.helpers.SensorCtsHelper;
 import android.hardware.cts.helpers.SensorManagerTestVerifier;
 import android.hardware.cts.helpers.SensorTestOperation;
 import android.hardware.cts.helpers.TestSensorEvent;
-
-import android.test.AndroidTestCase;
 
 /**
  * Test Operation class that validates the ordering of sensor events.
@@ -30,13 +32,12 @@ public class VerifyEventOrderingOperation extends SensorTestOperation {
     private SensorManagerTestVerifier mSensor;
 
     public VerifyEventOrderingOperation(
-            AndroidTestCase testCase,
+            Context context,
             int sensorType,
             int samplingRateInUs,
             int reportLatencyInUs) {
-        super(testCase);
         mSensor = new SensorManagerTestVerifier(
-                testCase,
+                context,
                 sensorType,
                 samplingRateInUs,
                 reportLatencyInUs);
@@ -48,17 +49,19 @@ public class VerifyEventOrderingOperation extends SensorTestOperation {
         for(int i = 1; i < events.length; ++i) {
             long previousTimestamp = events[i-1].timestamp;
             long timestamp = events[i].timestamp;
-            String message = SensorCtsHelper.formatAssertionMessage(
-                    "Ordering",
-                    this,
-                    mSensor.getUnderlyingSensor(),
-                    "position:%d, previous:%d, timestamp:%d",
-                    i,
-                    previousTimestamp,
-                    timestamp);
             // allow two identical timestamps to be considered in order, in case the resolution of
             // the timestamp is not granular enough
-            mAssert.assertTrue(message, previousTimestamp <= timestamp);
+            if(previousTimestamp > timestamp) {
+                String message = SensorCtsHelper.formatAssertionMessage(
+                        "Ordering",
+                        this,
+                        mSensor.getUnderlyingSensor(),
+                        "position:%d, previous:%d, timestamp:%d",
+                        i,
+                        previousTimestamp,
+                        timestamp);
+                Assert.fail(message);
+            }
         }
     }
 }
