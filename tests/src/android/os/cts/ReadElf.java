@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package android.security.cts;
+package android.os.cts;
 
 import java.io.File;
 import java.io.IOException;
@@ -26,11 +26,18 @@ import java.util.Map;
  * A poor man's implementation of the readelf command. This program is
  * designed to parse ELF (Executable and Linkable Format) files.
  */
-class ReadElf {
+public class ReadElf {
     /** The magic values for the ELF identification. */
     private static final byte[] ELF_IDENT = {
             (byte) 0x7F, (byte) 'E', (byte) 'L', (byte) 'F',
     };
+
+    private static final int EI_CLASS = 4;
+    private static final int EI_DATA = 5;
+
+    private static final int EM_386 = 3;
+    private static final int EM_MIPS = 8;
+    private static final int EM_ARM = 40;
 
     /** Size of the e_ident[] structure in the ELF header. */
     private static final int EI_NIDENT = 16;
@@ -179,9 +186,9 @@ class ReadElf {
         }
     };
 
+    private final String mPath;
     private final RandomAccessFile mFile;
     private final byte[] mBuffer = new byte[512];
-    private int mClass;
     private int mEndian;
     private boolean mIsDynamic;
     private boolean mIsPIE;
@@ -225,23 +232,24 @@ class ReadElf {
     /** Dynamic Symbol Table symbol names */
     private Map<String, Symbol> mDynamicSymbols;
 
-    static ReadElf read(File file) throws IOException {
+    public static ReadElf read(File file) throws IOException {
         return new ReadElf(file);
     }
 
-    boolean isDynamic() {
+    public boolean isDynamic() {
         return mIsDynamic;
     }
 
-    int getType() {
+    public int getType() {
         return mType;
     }
 
-    boolean isPIE() {
+    public boolean isPIE() {
         return mIsPIE;
     }
 
     private ReadElf(File file) throws IOException {
+        mPath = file.getPath();
         mFile = new RandomAccessFile(file, "r");
 
         readIdent();
@@ -261,6 +269,10 @@ class ReadElf {
 
     private void readHeader() throws IOException {
         mType = readHalf(getHeaderOffset(OFFSET_TYPE));
+        int e_machine = readHalf(getHeaderOffset(OFFSET_MACHINE));
+        if (e_machine != EM_386 && e_machine != EM_MIPS && e_machine != EM_ARM) {
+            throw new IOException("Invalid ELF e_machine: " + e_machine + ": " + mPath);
+        }
 
         final long shOffset = readWord(getHeaderOffset(OFFSET_SHOFF));
         final int shNumber = readHalf(getHeaderOffset(OFFSET_SHNUM));
@@ -441,18 +453,26 @@ class ReadElf {
 
         if ((mBuffer[0] != ELF_IDENT[0]) || (mBuffer[1] != ELF_IDENT[1])
                 || (mBuffer[2] != ELF_IDENT[2]) || (mBuffer[3] != ELF_IDENT[3])) {
-            throw new IllegalArgumentException("Invalid ELF file");
+            throw new IllegalArgumentException("Invalid ELF file: " + mPath);
         }
 
-        mClass = mBuffer[4];
-        if (mClass == ELFCLASS32) {
+        int elfClass = mBuffer[EI_CLASS];
+        if (elfClass == ELFCLASS32) {
             mWordSize = 4;
             mHalfWordSize = 2;
+        } else if (elfClass == ELFCLASS64) {
+            throw new IOException("Unsupported ELFCLASS64 file: " + mPath);
         } else {
-            throw new IOException("Invalid executable type " + mClass + ": not ELFCLASS32!");
+            throw new IOException("Invalid ELF EI_CLASS: " + elfClass + ": " + mPath);
         }
 
-        mEndian = mBuffer[5];
+        mEndian = mBuffer[EI_DATA];
+        if (mEndian == ELFDATA2LSB) {
+        } else if (mEndian == ELFDATA2MSB) {
+            throw new IOException("Unsupported ELFDATA2MSB file: " + mPath);
+        } else {
+            throw new IOException("Invalid ELF EI_DATA: " + mEndian + ": " + mPath);
+        }
     }
 
     public Symbol getSymbol(String name) {
