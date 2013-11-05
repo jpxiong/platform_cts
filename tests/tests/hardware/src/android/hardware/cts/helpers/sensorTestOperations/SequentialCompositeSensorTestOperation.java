@@ -16,8 +16,6 @@
 
 package android.hardware.cts.helpers.sensorTestOperations;
 
-import junit.framework.Assert;
-
 import android.hardware.cts.helpers.SensorTestOperation;
 
 import java.util.ArrayList;
@@ -29,10 +27,6 @@ import java.util.ArrayList;
  */
 public class SequentialCompositeSensorTestOperation extends SensorTestOperation {
     private final ArrayList<SensorTestOperation> mOperations = new ArrayList<SensorTestOperation>();
-
-    public SequentialCompositeSensorTestOperation(Assert assertionObject) {
-        super(assertionObject);
-    }
 
     /**
      * There is no synchronization

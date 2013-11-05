@@ -35,15 +35,9 @@ public abstract class SensorTestOperation {
     protected final long WAIT_TIMEOUT_IN_MILLISECONDS =
             TimeUnit.MILLISECONDS.convert(5, TimeUnit.MINUTES);
 
-    protected final Assert mAssert;
-
     private Thread mThread;
 
     protected int mIterationCount;
-
-    protected SensorTestOperation(Assert assertionObject) {
-        mAssert = assertionObject;
-    }
 
     /**
      * Public API definition.
@@ -84,7 +78,7 @@ public abstract class SensorTestOperation {
                     operationName,
                     this.toString(),
                     SensorCtsHelper.collectBugreport(operationName));
-            mAssert.fail(message);
+            Assert.fail(message);
         }
         mThread = null;
         mExceptionHandler.rethrow();

@@ -16,18 +16,21 @@
 
 package android.hardware.cts.helpers.sensorTestOperations;
 
+import junit.framework.Assert;
+
+import android.content.Context;
 import android.hardware.cts.helpers.SensorCtsHelper;
 import android.hardware.cts.helpers.SensorManagerTestVerifier;
 import android.hardware.cts.helpers.SensorTestInformation;
 import android.hardware.cts.helpers.SensorTestOperation;
 import android.hardware.cts.helpers.TestSensorEvent;
 
-import android.test.AndroidTestCase;
-
 import android.util.Log;
 
 import java.security.InvalidParameterException;
+
 import java.util.ArrayList;
+
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -44,18 +47,17 @@ public class VerifyJitteringOperation extends SensorTestOperation {
     protected long mThresholdInNs;
 
     public VerifyJitteringOperation(
-            AndroidTestCase testCase,
+            Context context,
             int sensorType,
             int reportLatencyInUs,
             int thresholdPercentageOfNs) throws InvalidParameterException {
-        super(testCase);
         if(thresholdPercentageOfNs < 0) {
             throw new InvalidParameterException("thresholdPercentageOfNs needs to be >= 0");
         }
         // use the max sampling frequency the sensor reports to guarantee the results
-        int maxSamplingRateInUs = SensorTestInformation.getMaxSamplingRateInUs(testCase, sensorType);
+        int maxSamplingRateInUs = SensorTestInformation.getMaxSamplingRateInUs(context, sensorType);
         mSensor = new SensorManagerTestVerifier(
-                testCase,
+                context,
                 sensorType,
                 maxSamplingRateInUs,
                 reportLatencyInUs);
@@ -88,7 +90,7 @@ public class VerifyJitteringOperation extends SensorTestOperation {
                     mThresholdPercentage,
                     percentile95InNs,
                     actualPercentValue);
-            mAssert.fail(message);
+            Assert.fail(message);
         }
     }
 }

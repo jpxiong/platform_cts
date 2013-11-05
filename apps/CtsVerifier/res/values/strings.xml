@@ -21,6 +21,7 @@
     <string name="pass_button_text">Pass</string>
     <string name="info_button_text">Info</string>
     <string name="fail_button_text">Fail</string>
+    <string name="next_button_text">Next</string>
 
     <!-- Strings for TestListActivity -->
     <string name="test_category_audio">Audio</string>
@@ -129,16 +130,16 @@
     <string name="bt_connection_access_client">Connection Access Client</string>
     <string name="bt_connection_access_server_info">
         Start the CTS Verifier on another device, start the Bluetooth test, and choose
-        \"Connection Access Client\" to setup the test. 
-        \n\nFirst, unpair the devices via Bluetooth settings. Then connect the devices together 
+        \"Connection Access Client\" to setup the test.
+        \n\nFirst, unpair the devices via Bluetooth settings. Then connect the devices together
         using the \"Make Discoverable\" and \"Pick Server\" buttons.
         \n\nA connection access request should appear on the server and enable the pass button.
     </string>
     <string name="bt_connection_access_client_info">
         Start the CTS Verifier on another device, start the Bluetooth test, and choose
-        \"Connection Access Server\" to complete the test. 
-        \n\nMake the device acting as the server discoverable and connect to it via the 
-        \"Pick Server\" button. Check that the server displays the connection access request 
+        \"Connection Access Server\" to complete the test.
+        \n\nMake the device acting as the server discoverable and connect to it via the
+        \"Pick Server\" button. Check that the server displays the connection access request
         dialog. The client device does not need to do anything else.
     </string>
     <string name="bt_ca_dialog">Was the connection access request dialog shown?</string>
@@ -211,7 +212,7 @@
     </string>
 
     <string name="nfc_not_enabled">NFC is not enabled!</string>
-    <string name="nfc_not_enabled_message">These tests require NFC to be enabled. Click the 
+    <string name="nfc_not_enabled_message">These tests require NFC to be enabled. Click the
         button below to goto Settings and enable it.</string>
     <string name="nfc_settings">NFC Settings</string>
 
@@ -241,7 +242,7 @@
         device running the \"CTS Verifier NDEF Sender\"...</string>
     <string name="nfc_ndef_push_receive_success">Successfully received the correct NDEF push
         message.</string>
-    <string name="nfc_ndef_push_receive_failure">Failed to receive the correct NDEF push 
+    <string name="nfc_ndef_push_receive_failure">Failed to receive the correct NDEF push
         message.</string>
 
     <string name="nfc_tag_verifier">NFC Tag Verifier</string>
@@ -343,10 +344,13 @@
     <string name="accessService">AccessService</string>
     <string name="offhostService">OffhostService</string>
 
-    <!-- Strings for AccelerometerTestActivity and GyroscopeTestActivity -->
+    <!-- Strings for Sensor Test Activities -->
+    <!-- Accelerometer -->
     <string name="snsr_accel_test">Accelerometer Test</string>
     <string name="snsr_accel_test_info">This test verifies that the accelerometer is working properly. As you move the device around through space, the triangle should always point down (i.e. in the direction of gravity.) If it does not, the accelerometer is improperly configured.</string>
+    <string name="snsr_accel_m_test">Accelerometer Measurement Tests</string>
 
+    <!-- Gyroscope -->
     <string name="snsr_gyro_test">Gyroscope Test</string>
     <string name="snsr_gyro_test_info">This test verifies that the gyroscope is working properly.\n\nRotate your device as shown by the 3D block. A green background or a check mark indicates that the gyroscope\'s value is correct. A red background or a X mark indicates that the gyroscope\'s value is not right.\n\nThere are 6 parts of the test corresponding to each rotation. Press Pass for all the stages to complete this test.</string>
     <string name="snsr_gyro_test_progress">Test %1$d of %2$d</string>
@@ -354,6 +358,10 @@
     <string name="snsr_gyro_test_no_gyro_message">It doesn\'t seem like you have a gyroscope, so you don\'t need to run this test.</string>
     <string name="snsr_gyro_test_degrees_title">Wrong units?</string>
     <string name="snsr_gyro_test_degrees_message">These values looks like degrees per second. These should be radians per second!</string>
+    <string name="snsr_gyro_m_test">Gyroscope Measurement Test</string>
+
+    <!-- Magnetic Field -->
+    <string name="snsr_mag_m_test">Magnetic Field Measurement Tests</string>
 
     <!-- Strings for SuidFilesActivity -->
     <string name="suid_files">SUID File Scanner</string>
@@ -475,7 +483,7 @@
     <!-- Strings for USB accessory test activity -->
     <string name="usb_accessory_test">USB Accessory Test</string>
     <string name="usb_accessory_test_info">
-        1. Connect your Android device to a computer and run the \'cts-usb-accessory\' program 
+        1. Connect your Android device to a computer and run the \'cts-usb-accessory\' program
         included with the CTS Verifier bundle.
         \n\n2. If you have not started the CTS Verifier, press \'OK\' when asked to open the CTS
         Verifier when the accessory is connected. \n\nIf you are already in this test,
@@ -673,9 +681,9 @@
         and disabled, and that once enabled the service is able to receive notificaitons and
         dismiss them.
     </string>
-    <string name="nls_enable_service">Please enable \"Notification Listener for CTS Verifier\" 
+    <string name="nls_enable_service">Please enable \"Notification Listener for CTS Verifier\"
         under Security > Notification Access and return here.</string>
-    <string name="nls_disable_service">Please disable \"Notification Listener for CTS Verifier\" 
+    <string name="nls_disable_service">Please disable \"Notification Listener for CTS Verifier\"
         under Security > Notification Access and return here.</string>
     <string name="nls_start_settings">Launch Settings</string>
     <string name="nls_service_started">Service should start once enabled.</string>
@@ -685,7 +693,7 @@
     <string name="nls_clear_all">Check that service can clear all notifications.</string>
     <string name="nls_service_stopped">Service should stop once disabled.</string>
     <string name="nls_note_missed">Check that notification was not received.</string>
-    
+
     <string name="cacert_test">CA Cert Notification Test</string>
     <string name="cacert_info">This test checks that when a CA Certificate is installed, the user is notified.</string>
     <string name="cacert_do_something">Do it</string>
@@ -764,7 +772,7 @@
            Repeating on: Monday and Wednesday. \n
     </string>
     <string name="dc_full_alarm_button">Create Alarm</string>
-    
+
     <string name="dc_set_timer_with_ui_test">Set Timer Test</string>
     <string name="dc_set_timer_with_ui_test_info">
         This test verifies that the ACTION_SET_TIMER API with no paramters open the UI\n
