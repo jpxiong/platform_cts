@@ -120,7 +120,6 @@ cts_host_libraries := \
 	$(PTS_HOST_CASES) \
 	CtsAdbTests \
 	CtsAppSecurityTests \
-	CtsLocationHostTests \
 	CtsMonkeyTestCases \
 	CtsUsbTests
 
