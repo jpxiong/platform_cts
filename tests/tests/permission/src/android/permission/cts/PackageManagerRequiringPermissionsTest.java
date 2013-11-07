@@ -16,6 +16,8 @@
 
 package android.permission.cts;
 
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.test.AndroidTestCase;
 import android.test.suitebuilder.annotation.SmallTest;
@@ -59,7 +61,9 @@ public class PackageManagerRequiringPermissionsTest extends AndroidTestCase {
      */
     public void testAddPreferredActivity() {
         try {
-            mPackageManager.addPreferredActivity(null, 0, null, null);
+            IntentFilter filter = new IntentFilter(Intent.ACTION_MAIN);
+            filter.addCategory(Intent.CATEGORY_HOME);
+            mPackageManager.addPreferredActivity(filter, 0, null, null);
             fail("PackageManager.addPreferredActivity did not throw" +
                     " SecurityException as expected");
         } catch (SecurityException e) {
