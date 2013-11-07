@@ -26,7 +26,6 @@ import android.test.AndroidTestCase;
 import android.util.Log;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.List;
 import java.util.ArrayList;
 
@@ -57,7 +56,7 @@ public class MediaCodecListTest extends AndroidTestCase {
 
     // Each component advertised by MediaCodecList should at least be
     // instantiate-able.
-    public void testComponentInstantiation() throws IOException {
+    public void testComponentInstantiation() {
         Log.d(TAG, "testComponentInstantiation");
 
         int codecCount = MediaCodecList.getCodecCount();

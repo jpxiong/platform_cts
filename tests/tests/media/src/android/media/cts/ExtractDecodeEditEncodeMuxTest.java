@@ -469,8 +469,7 @@ public class ExtractDecodeEditEncodeMuxTest extends AndroidTestCase {
      * @param inputFormat the format of the stream to decode
      * @param surface into which to decode the frames
      */
-    private MediaCodec createVideoDecoder(MediaFormat inputFormat, Surface surface)
-            throws IOException {
+    private MediaCodec createVideoDecoder(MediaFormat inputFormat, Surface surface) {
         MediaCodec decoder = MediaCodec.createDecoderByType(getMimeTypeFor(inputFormat));
         decoder.configure(inputFormat, surface, null, 0);
         decoder.start();
@@ -490,8 +489,7 @@ public class ExtractDecodeEditEncodeMuxTest extends AndroidTestCase {
     private MediaCodec createVideoEncoder(
             MediaCodecInfo codecInfo,
             MediaFormat format,
-            AtomicReference<Surface> surfaceReference)
-            throws IOException {
+            AtomicReference<Surface> surfaceReference) {
         MediaCodec encoder = MediaCodec.createByCodecName(codecInfo.getName());
         encoder.configure(format, null, null, MediaCodec.CONFIGURE_FLAG_ENCODE);
         // Must be called before start() is.
@@ -505,8 +503,7 @@ public class ExtractDecodeEditEncodeMuxTest extends AndroidTestCase {
      *
      * @param inputFormat the format of the stream to decode
      */
-    private MediaCodec createAudioDecoder(MediaFormat inputFormat)
-            throws IOException {
+    private MediaCodec createAudioDecoder(MediaFormat inputFormat) {
         MediaCodec decoder = MediaCodec.createDecoderByType(getMimeTypeFor(inputFormat));
         decoder.configure(inputFormat, null, null, 0);
         decoder.start();
@@ -519,8 +516,7 @@ public class ExtractDecodeEditEncodeMuxTest extends AndroidTestCase {
      * @param codecInfo of the codec to use
      * @param format of the stream to be produced
      */
-    private MediaCodec createAudioEncoder(MediaCodecInfo codecInfo, MediaFormat format) 
-            throws IOException {
+    private MediaCodec createAudioEncoder(MediaCodecInfo codecInfo, MediaFormat format) {
         MediaCodec encoder = MediaCodec.createByCodecName(codecInfo.getName());
         encoder.configure(format, null, null, MediaCodec.CONFIGURE_FLAG_ENCODE);
         encoder.start();
