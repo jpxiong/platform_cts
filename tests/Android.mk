@@ -35,7 +35,7 @@ LOCAL_AAPT_FLAGS = -c xx_YY -c cs -c small -c normal -c large -c xlarge \
 
 LOCAL_PACKAGE_NAME := CtsTestStubs
 
-LOCAL_STATIC_JAVA_LIBRARIES := ctsutil ctstestserver ctstestrunner
+LOCAL_STATIC_JAVA_LIBRARIES := ctsdeviceutil ctstestserver ctstestrunner
 
 LOCAL_DEX_PREOPT := false
 

@@ -69,9 +69,9 @@ class DocletRunner {
         sourcePath.add("./development/tools/hosttestlib/src");
         sourcePath.add("./libcore/dalvik/src/main/java");
         sourcePath.add("./cts/tests/src");
-        // PTS adds PtsAndroidTestCase
-        sourcePath.add("./cts/suite/pts/deviceTests/ptsutil/src");
-        sourcePath.add("./cts/libs/util/src");
+        sourcePath.add("./cts/libs/commonutil/src");
+        sourcePath.add("./cts/libs/deviceutil//src");
+        sourcePath.add("./cts/libs/hostutil/src");
         sourcePath.add("./frameworks/testing/uiautomator/library/testrunner-src");
         sourcePath.add("./frameworks/testing/uiautomator_test_libraries/src");
         sourcePath.add(sourceDir.toString());
