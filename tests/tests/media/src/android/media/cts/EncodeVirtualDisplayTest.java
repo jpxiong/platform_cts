@@ -153,7 +153,7 @@ public class EncodeVirtualDisplayTest extends AndroidTestCase {
     /**
      * Prepares the encoder, decoder, and virtual display.
      */
-    private void encodeVirtualDisplayTest() {
+    private void encodeVirtualDisplayTest() throws IOException {
         MediaCodec encoder = null;
         MediaCodec decoder = null;
         OutputSurface outputSurface = null;
