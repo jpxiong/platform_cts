@@ -99,7 +99,7 @@ public class CtsXmlResultReporter implements ITestInvocationListener {
     private File mLogDir;
     private String mSuiteName;
 
-    private static final Pattern mPtsLogPattern = Pattern.compile("(.*)\\+\\+\\+\\+(.*)");
+    private static final Pattern mCtsLogPattern = Pattern.compile("(.*)\\+\\+\\+\\+(.*)");
 
     public void setReportDir(File reportDir) {
         mReportDir = reportDir;
@@ -264,7 +264,7 @@ public class CtsXmlResultReporter implements ITestInvocationListener {
      */
     @Override
     public void testEnded(TestIdentifier test, Map<String, String> testMetrics) {
-        collectPtsResults(test, testMetrics);
+        collectCtsResults(test, testMetrics);
         mCurrentPkgResult.reportTestEnded(test);
         Test result = mCurrentPkgResult.findTest(test);
         String stack = result.getStackTrace() == null ? "" : "\n" + result.getStackTrace();
@@ -273,26 +273,26 @@ public class CtsXmlResultReporter implements ITestInvocationListener {
     }
 
     /**
-     * Collect Pts results for both device and host tests to the package result.
+     * Collect Cts results for both device and host tests to the package result.
      * @param test test ran
      * @param testMetrics test metrics which can contain performance result for device tests
      */
-    private void collectPtsResults(TestIdentifier test, Map<String, String> testMetrics) {
+    private void collectCtsResults(TestIdentifier test, Map<String, String> testMetrics) {
         // device test can have performance results in testMetrics
-        String perfResult = PtsReportUtil.getPtsResultFromMetrics(testMetrics);
-        // host test should be checked in PtsHostStore.
+        String perfResult = CtsReportUtil.getCtsResultFromMetrics(testMetrics);
+        // host test should be checked in CtsHostStore.
         if (perfResult == null) {
-            perfResult = PtsHostStore.removePtsResult(mDeviceSerial, test);
+            perfResult = CtsHostStore.removeCtsResult(mDeviceSerial, test);
         }
         if (perfResult != null) {
-            // PTS result is passed in Summary++++Details format.
+            // CTS result is passed in Summary++++Details format.
             // Extract Summary and Details, and pass them.
-            Matcher m = mPtsLogPattern.matcher(perfResult);
+            Matcher m = mCtsLogPattern.matcher(perfResult);
             if (m.find()) {
                 mCurrentPkgResult.reportPerformanceResult(test, CtsTestStatus.PASS, m.group(1),
                         m.group(2));
             } else {
-                logResult("PTS Result unrecognizable:" + perfResult);
+                logResult("CTS Result unrecognizable:" + perfResult);
             }
         }
     }
