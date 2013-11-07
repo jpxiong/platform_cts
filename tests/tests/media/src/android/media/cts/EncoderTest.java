@@ -187,13 +187,8 @@ public class EncoderTest extends AndroidTestCase {
     }
 
     private void testEncoder(String componentName, MediaFormat format) {
-        MediaCodec codec;
-        try {
-            codec = MediaCodec.createByCodecName(componentName);
-        } catch (Exception e) {
-            fail("codec '" + componentName + "' failed construction.");
-            return; /* does not get here, but avoids warning */
-        }
+        MediaCodec codec = MediaCodec.createByCodecName(componentName);
+
         try {
             codec.configure(
                     format,
@@ -201,7 +196,9 @@ public class EncoderTest extends AndroidTestCase {
                     null /* crypto */,
                     MediaCodec.CONFIGURE_FLAG_ENCODE);
         } catch (IllegalStateException e) {
-            fail("codec '" + componentName + "' failed configuration.");
+            Log.e(TAG, "codec '" + componentName + "' failed configuration.");
+
+            assertTrue("codec '" + componentName + "' failed configuration.", false);
         }
 
         codec.start();
