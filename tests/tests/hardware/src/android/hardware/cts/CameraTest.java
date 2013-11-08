@@ -345,6 +345,17 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
         mCamera.setPreviewCallback(null);
     }
 
+    /**
+     * Start preview and wait for the first preview callback, which indicates the
+     * preview becomes active.
+     */
+    private void blockingStartPreview() {
+        mCamera.setPreviewCallback(new SimplePreviewStreamCb(/*Id*/0));
+        mCamera.startPreview();
+        waitForPreviewDone();
+        mCamera.setPreviewCallback(null);
+    }
+
     /*
      * Test case 1: Take a picture and verify all the callback
      * functions are called properly.
@@ -1167,8 +1178,7 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
             for (int i = 0; i < ratios.size() - 1; i++) {
                 assertTrue(ratios.get(i) < ratios.get(i + 1));
             }
-            mCamera.startPreview();
-            waitForPreviewDone();
+            blockingStartPreview();
 
             // Test each zoom step.
             for (int i = 0; i <= maxZoom; i++) {
@@ -1331,8 +1341,8 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
 
     private void testFocusDistancesByCamera(int cameraId) throws Exception {
         initializeMessageLooper(cameraId);
-        mCamera.startPreview();
-        waitForPreviewDone();
+        blockingStartPreview();
+
         Parameters parameters = mCamera.getParameters();
 
         // Test every supported focus mode.
@@ -1916,8 +1926,7 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
 
             // Make sure scene mode settings are consistent before preview and
             // after preview.
-            mCamera.startPreview();
-            waitForPreviewDone();
+            blockingStartPreview();
             for (int i = 0; i < supportedSceneModes.size(); i++) {
                 String sceneMode = supportedSceneModes.get(i);
                 parameters.setSceneMode(sceneMode);
