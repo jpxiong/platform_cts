@@ -16,8 +16,8 @@
   bug: 11141002
 },
 {
-  name: "com.android.pts.opengl.primitive.GLPrimitiveBenchmark#testFullPipelineOffscreen",
-  name: "com.android.pts.opengl.primitive.GLPrimitiveBenchmark#testPixelOutputOffscreen",
+  name: "com.android.cts.opengl.primitive.GLPrimitiveBenchmark#testFullPipelineOffscreen",
+  name: "com.android.cts.opengl.primitive.GLPrimitiveBenchmark#testPixelOutputOffscreen",
   bug: 11238219
 },
 {
