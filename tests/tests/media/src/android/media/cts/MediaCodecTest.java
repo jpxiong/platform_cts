@@ -110,7 +110,6 @@ public class MediaCodecTest extends AndroidTestCase {
         assertNull(surface);
     }
 
-
     /**
      * Tests:
      * <br> signaling end-of-stream before any data is sent works
@@ -150,6 +149,57 @@ public class MediaCodecTest extends AndroidTestCase {
             } catch (Exception ex) {
                 // good
             }
+        } finally {
+            if (encoder != null) {
+                encoder.stop();
+                encoder.release();
+            }
+            if (inputSurface != null) {
+                inputSurface.release();
+            }
+        }
+    }
+
+    /**
+     * Tests:
+     * <br> stopping with buffers in flight doesn't crash or hang
+     */
+    public void testAbruptStop() {
+        // There appears to be a race, so run it several times with a short delay between runs
+        // to allow any previous activity to shut down.
+        for (int i = 0; i < 50; i++) {
+            Log.d(TAG, "testAbruptStop " + i);
+            doTestAbruptStop();
+            try { Thread.sleep(400); } catch (InterruptedException ignored) {}
+        }
+    }
+    private void doTestAbruptStop() {
+        MediaFormat format = createMediaFormat();
+        MediaCodec encoder = null;
+        InputSurface inputSurface = null;
+
+        try {
+            encoder = MediaCodec.createEncoderByType(MIME_TYPE);
+            encoder.configure(format, null, null, MediaCodec.CONFIGURE_FLAG_ENCODE);
+            inputSurface = new InputSurface(encoder.createInputSurface());
+            inputSurface.makeCurrent();
+            encoder.start();
+
+            int totalBuffers = encoder.getInputBuffers().length +
+                    encoder.getOutputBuffers().length;
+            if (VERBOSE) Log.d(TAG, "Total buffers: " + totalBuffers);
+
+            // Submit several frames quickly, without draining the encoder output, to try to
+            // ensure that we've got some queued up when we call stop().  If we do too many
+            // we'll block in swapBuffers().
+            for (int i = 0; i < totalBuffers; i++) {
+                GLES20.glClearColor(0.0f, (i % 8) / 8.0f, 0.0f, 1.0f);
+                GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT);
+                inputSurface.swapBuffers();
+            }
+            Log.d(TAG, "stopping");
+            encoder.stop();
+            Log.d(TAG, "stopped");
         } finally {
             if (encoder != null) {
                 encoder.stop();
