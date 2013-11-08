@@ -70,15 +70,16 @@
   <Entry uri="android.view"/>
   <Entry uri="android.webkit" exclude="android.webkit.cts.WebViewClientTest#testDoUpdateVisitedHistory;android.webkit.cts.WebViewClientTest#testLoadPage;android.webkit.cts.WebViewClientTest#testOnFormResubmission;android.webkit.cts.WebViewClientTest#testOnReceivedError;android.webkit.cts.WebViewClientTest#testOnReceivedHttpAuthRequest;android.webkit.cts.WebViewClientTest#testOnScaleChanged;android.webkit.cts.WebViewClientTest#testOnUnhandledKeyEvent;android.webkit.cts.WebViewTest#testSetInitialScale" />
   <Entry uri="android.widget" exclude="android.widget.cts.GridViewTest#testSetNumColumns" />
-  <Entry uri="com.android.pts.bootup"/>
-  <Entry uri="com.android.pts.browserbench"/>
-  <Entry uri="com.android.pts.dram"/>
-  <Entry uri="com.android.pts.filesystemperf"/>
-  <Entry uri="com.android.pts.jank"/>
-  <Entry uri="com.android.pts.opengl"/>
-  <Entry uri="com.android.pts.simplecpu"/>
-  <Entry uri="com.android.pts.ui"/>
-  <Entry uri="com.android.pts.uihost"/>
-  <Entry uri="com.android.pts.videoperf"/>
+  <Entry uri="com.android.cts.bootup"/>
+  <Entry uri="com.android.cts.browserbench"/>
+  <Entry uri="com.android.cts.dram"/>
+  <Entry uri="com.android.cts.filesystemperf"/>
+  <Entry uri="com.android.cts.jank.opengl"/>
+  <Entry uri="com.android.cts.jank.ui"/>
+  <Entry uri="com.android.cts.opengl"/>
+  <Entry uri="com.android.cts.simplecpu"/>
+  <Entry uri="com.android.cts.ui"/>
+  <Entry uri="com.android.cts.uihost"/>
+  <Entry uri="com.android.cts.videoperf"/>
   <Entry uri="zzz.android.monkey"/>
 </TestPlan>
