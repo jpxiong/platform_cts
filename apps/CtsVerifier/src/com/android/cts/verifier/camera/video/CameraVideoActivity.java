@@ -80,9 +80,9 @@ public class CameraVideoActivity extends PassFailButtons.Activity
 
     private MediaRecorder mMediaRecorder;
 
-    private List<Camera.Size> mPreviewSizes;
-    private Camera.Size mNextPreviewSize;
-    private Camera.Size mPreviewSize;
+    private List<Size> mPreviewSizes;
+    private Size mNextPreviewSize;
+    private Size mPreviewSize;
     private List<Integer> mVideoSizeIds;
     private int mCurrentVideoSizeId;
 
@@ -488,8 +488,7 @@ public class CameraVideoActivity extends PassFailButtons.Activity
         }
     }
 
-    // Match preview size with recording size
-    private Camera.Size matchPreviewRecordSize() {
+    private Size findRecordSize() {
         int[] possibleQuality = {
                 CamcorderProfile.QUALITY_QCIF,
                 CamcorderProfile.QUALITY_CIF,
@@ -506,8 +505,8 @@ public class CameraVideoActivity extends PassFailButtons.Activity
                 mCamera.new Size(1920, 1080)
         };
 
-        Camera.Size minSize = mCamera.new Size(Integer.MAX_VALUE, Integer.MAX_VALUE);
-        Camera.Size maxSize = mCamera.new Size(0, 0);
+        Size minSize = mCamera.new Size(Integer.MAX_VALUE, Integer.MAX_VALUE);
+        Size maxSize = mCamera.new Size(0, 0);
 
         for (int i = 0; i < possibleQuality.length; i++) {
             if (mVideoSizeIds.contains(possibleQuality[i])) {
@@ -530,22 +529,55 @@ public class CameraVideoActivity extends PassFailButtons.Activity
                     sizes[i].height));
         }
 
-        Camera.Size matchedSize = null;
+        Size recordSize = null;
         for (int i = 0; i < qualityList.size(); i++) {
             if (mCurrentVideoSizeId == qualityList.get(i).videoSizeId) {
-                matchedSize = mCamera.new Size(qualityList.get(i).width,
+                recordSize = mCamera.new Size(qualityList.get(i).width,
                         qualityList.get(i).height);
                 break;
             }
         }
 
-        if (VERBOSE) {
-            Log.v(TAG, "matchPreviewRecordSize: found a match");
+        if (recordSize == null) {
+            Log.e(TAG, "findRecordSize: did not find a match");
+            failTest("Cannot find video size");
         }
+        return recordSize;
+    }
+
+    // Match preview size with current recording size mCurrentVideoSizeId
+    private Size matchPreviewRecordSize() {
+        Size recordSize = findRecordSize();
+
+        Size matchedSize = null;
+        // First try to find exact match in size
+        for (int i = 0; i < mPreviewSizes.size(); i++) {
+            if (mPreviewSizes.get(i).equals(recordSize)) {
+                matchedSize = mCamera.new Size(recordSize.width, recordSize.height);
+                break;
+            }
+        }
+        // Second try to find one with similar if not the same aspect ratio
         if (matchedSize == null) {
-            Log.e(TAG, "matchPreviewRecordSize: did not find a match");
-            failTest("Cannot match preview size with video size");
+            for (int i = mPreviewSizes.size() - 1; i >= 0; i--) {
+                if (Math.abs((float)mPreviewSizes.get(i).width * recordSize.height /
+                        mPreviewSizes.get(i).height / recordSize.width - 1) < 0.1) {
+                    matchedSize = mCamera.new Size(mPreviewSizes.get(i).width,
+                            mPreviewSizes.get(i).height);
+                    break;
+                }
+            }
         }
+        // Last resort, just use the first preview size
+        if (matchedSize == null) {
+            matchedSize = mCamera.new Size(mPreviewSizes.get(0).width,
+                    mPreviewSizes.get(0).height);
+        }
+
+        if (VERBOSE) {
+            Log.v(TAG, "matchPreviewRecordSize " + matchedSize.width + "x" + matchedSize.height);
+        }
+
         return matchedSize;
     }
 
@@ -568,11 +600,11 @@ public class CameraVideoActivity extends PassFailButtons.Activity
         }
 
         // Get preview resolutions
-        List<Camera.Size> unsortedSizes = p.getSupportedPreviewSizes();
+        List<Size> unsortedSizes = p.getSupportedPreviewSizes();
 
-        class SizeCompare implements Comparator<Camera.Size> {
+        class SizeCompare implements Comparator<Size> {
             @Override
-            public int compare(Camera.Size lhs, Camera.Size rhs) {
+            public int compare(Size lhs, Size rhs) {
                 if (lhs.width < rhs.width) return -1;
                 if (lhs.width > rhs.width) return 1;
                 if (lhs.height < rhs.height) return -1;
@@ -582,10 +614,10 @@ public class CameraVideoActivity extends PassFailButtons.Activity
         };
 
         SizeCompare s = new SizeCompare();
-        TreeSet<Camera.Size> sortedResolutions = new TreeSet<Camera.Size>(s);
+        TreeSet<Size> sortedResolutions = new TreeSet<Size>(s);
         sortedResolutions.addAll(unsortedSizes);
 
-        mPreviewSizes = new ArrayList<Camera.Size>(sortedResolutions);
+        mPreviewSizes = new ArrayList<Size>(sortedResolutions);
 
         ArrayList<VideoSizeNamePair> availableVideoSizes = getVideoSizeNamePairs(id);
         String[] availableVideoSizeNames = new String[availableVideoSizes.size()];
@@ -609,8 +641,8 @@ public class CameraVideoActivity extends PassFailButtons.Activity
         }
 
         // Set initial values
-        mNextPreviewSize = mPreviewSizes.get(0);
         mCurrentVideoSizeId = mVideoSizeIds.get(0);
+        mNextPreviewSize = matchPreviewRecordSize();
         mResolutionSpinner.setSelection(0);
 
         // Set up correct display orientation
