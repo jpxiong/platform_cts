@@ -16,12 +16,16 @@
 
 package android.webkit.cts;
 
+import android.cts.util.EvaluateJsResultPollingCheck;
 import android.cts.util.PollingCheck;
 import android.graphics.Bitmap;
 import android.os.Message;
 import android.test.ActivityInstrumentationTestCase2;
 import android.view.KeyEvent;
+import android.view.ViewGroup;
 import android.webkit.HttpAuthHandler;
+import android.webkit.ValueCallback;
+import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
@@ -30,6 +34,7 @@ import android.webkit.cts.WebViewOnUiThread.WaitForLoadedClient;
 
 public class WebViewClientTest extends ActivityInstrumentationTestCase2<WebViewStubActivity> {
     private static final long TEST_TIMEOUT = 5000;
+    private static final String TEST_URL = "http://foo.com/";
 
     private WebViewOnUiThread mOnUiThread;
     private CtsTestServer mWebServer;
@@ -60,9 +65,70 @@ public class WebViewClientTest extends ActivityInstrumentationTestCase2<WebViewS
         super.tearDown();
     }
 
+    // Verify that the shouldoverrideurlloading is false by default
+    public void testShouldOverrideUrlLoadingDefault() {
+        final WebViewClient webViewClient = new WebViewClient();
+        assertFalse(webViewClient.shouldOverrideUrlLoading(mOnUiThread.getWebView(), null));
+    }
+
+    // Verify shouldoverrideurlloading called on top level navigation
     public void testShouldOverrideUrlLoading() {
         final MockWebViewClient webViewClient = new MockWebViewClient();
-        assertFalse(webViewClient.shouldOverrideUrlLoading(mOnUiThread.getWebView(), null));
+        mOnUiThread.setWebViewClient(webViewClient);
+        mOnUiThread.getSettings().setJavaScriptEnabled(true);
+        String data = "<html><body>" +
+                "<a href=\"" + TEST_URL + "\" id=\"link\">new page</a>" +
+                "</body></html>";
+        mOnUiThread.loadDataAndWaitForCompletion(data, "text/html", null);
+        clickOnLinkUsingJs("link");
+        assertEquals(TEST_URL, webViewClient.getLastShouldOverrideUrl());
+    }
+
+    // Verify shouldoverrideurlloading called on webview called via onCreateWindow
+    public void testShouldOverrideUrlLoadingOnCreateWindow() throws Exception {
+        mWebServer = new CtsTestServer(getActivity());
+        // WebViewClient for main window
+        final MockWebViewClient mainWebViewClient = new MockWebViewClient();
+        // WebViewClient for child window
+        final MockWebViewClient childWebViewClient = new MockWebViewClient();
+        mOnUiThread.setWebViewClient(mainWebViewClient);
+        mOnUiThread.getSettings().setJavaScriptEnabled(true);
+        mOnUiThread.getSettings().setJavaScriptCanOpenWindowsAutomatically(true);
+        mOnUiThread.getSettings().setSupportMultipleWindows(true);
+        mOnUiThread.setWebChromeClient(new WebChromeClient() {
+            @Override
+            public boolean onCreateWindow(
+                WebView view, boolean isDialog, boolean isUserGesture, Message resultMsg) {
+                WebView.WebViewTransport transport = (WebView.WebViewTransport) resultMsg.obj;
+                WebView childWebView = new WebView(view.getContext());
+                childWebView.setWebViewClient(childWebViewClient);
+                childWebView.getSettings().setJavaScriptEnabled(true);
+                transport.setWebView(childWebView);
+                getActivity().addContentView(childWebView, new ViewGroup.LayoutParams(
+                            ViewGroup.LayoutParams.FILL_PARENT,
+                            ViewGroup.LayoutParams.WRAP_CONTENT));
+                resultMsg.sendToTarget();
+                return true;
+            }
+        });
+        mOnUiThread.loadUrl(mWebServer.getAssetUrl(TestHtmlConstants.BLANK_TAG_URL));
+
+        new PollingCheck(TEST_TIMEOUT) {
+            @Override
+            protected boolean check() {
+                return childWebViewClient.hasOnPageFinishedCalled();
+            }
+        }.run();
+        assertEquals(mWebServer.getAssetUrl(TestHtmlConstants.HELLO_WORLD_URL),
+                childWebViewClient.getLastShouldOverrideUrl());
+    }
+
+    private void clickOnLinkUsingJs(final String linkId) {
+        EvaluateJsResultPollingCheck jsResult = new EvaluateJsResultPollingCheck("null");
+        mOnUiThread.evaluateJavascript(
+                "document.getElementById('" + linkId + "').click();" +
+                "console.log('element with id [" + linkId + "] clicked');", jsResult);
+        jsResult.run();
     }
 
     public void testLoadPage() throws Exception {
@@ -221,6 +287,7 @@ public class WebViewClientTest extends ActivityInstrumentationTestCase2<WebViewS
         private boolean mOnReceivedHttpAuthRequestCalled;
         private boolean mOnUnhandledKeyEventCalled;
         private boolean mOnScaleChangedCalled;
+        private String mLastShouldOverrideUrl;
 
         public MockWebViewClient() {
             super(mOnUiThread);
@@ -260,6 +327,10 @@ public class WebViewClientTest extends ActivityInstrumentationTestCase2<WebViewS
 
         public boolean hasOnScaleChangedCalled() {
             return mOnScaleChangedCalled;
+        }
+
+        public String getLastShouldOverrideUrl() {
+            return mLastShouldOverrideUrl;
         }
 
         @Override
@@ -319,6 +390,12 @@ public class WebViewClientTest extends ActivityInstrumentationTestCase2<WebViewS
         public void onScaleChanged(WebView view, float oldScale, float newScale) {
             super.onScaleChanged(view, oldScale, newScale);
             mOnScaleChangedCalled = true;
+        }
+
+        @Override
+        public boolean shouldOverrideUrlLoading(WebView view, String url) {
+            mLastShouldOverrideUrl = url;
+            return false;
         }
     }
 }
