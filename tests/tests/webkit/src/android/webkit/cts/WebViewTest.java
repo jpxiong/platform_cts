@@ -18,6 +18,7 @@ package android.webkit.cts;
 
 import android.content.Context;
 import android.content.res.AssetManager;
+import android.cts.util.EvaluateJsResultPollingCheck;
 import android.cts.util.PollingCheck;
 import android.graphics.Bitmap;
 import android.graphics.Bitmap.Config;
@@ -2256,26 +2257,6 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
         }
         public String errorUrl() {
             return mErrorUrl;
-        }
-    }
-
-    private static class EvaluateJsResultPollingCheck  extends PollingCheck
-            implements ValueCallback<String> {
-        private String mActualResult;
-        private String mExpectedResult;
-
-        public EvaluateJsResultPollingCheck(String expected) {
-            mExpectedResult = expected;
-        }
-
-        @Override
-        public synchronized boolean check() {
-            return mExpectedResult.equals(mActualResult);
-        }
-
-        @Override
-        public synchronized void onReceiveValue(String result) {
-            mActualResult = result;
         }
     }
 
