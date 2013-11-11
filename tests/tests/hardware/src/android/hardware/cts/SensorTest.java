@@ -233,7 +233,7 @@ public class SensorTest extends AndroidTestCase {
             handlerThread.start();
             Handler handler = new Handler(handlerThread.getLooper());
             boolean result = mSensorManager.registerListener(listener, sensor,
-                                            SensorManager.SENSOR_DELAY_FASTEST, 15000000,
+                                            SensorManager.SENSOR_DELAY_NORMAL, 15000000,
                                             handler);
             assertTrue(result);
             // Wait for 25 events and call flush.

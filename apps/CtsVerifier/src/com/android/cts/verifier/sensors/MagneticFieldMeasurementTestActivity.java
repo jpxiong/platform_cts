@@ -16,8 +16,11 @@
 
 package com.android.cts.verifier.sensors;
 
+import android.graphics.Color;
 import android.hardware.Sensor;
+import android.hardware.SensorEvent;
 import android.hardware.SensorManager;
+import android.hardware.cts.helpers.SensorManagerTestVerifier;
 import android.hardware.cts.helpers.sensorTestOperations.VerifyNormOperation;
 import android.hardware.cts.helpers.sensorTestOperations.VerifyStandardDeviationOperation;
 
@@ -30,16 +33,37 @@ import android.hardware.cts.helpers.sensorTestOperations.VerifyStandardDeviation
 public class MagneticFieldMeasurementTestActivity extends BaseSensorSemiAutomatedTestActivity {
     @Override
     protected void onRun() throws Throwable {
-        appendText("Please calibrate the Magnetometer by moving it in 8 shapes in different " +
-                "orientations.");
-        appendText("Then leave the device in a flat surface and press Next...\n");
-        waitForUser();
+        calibrateMagnetometer();
 
         appendText("Verifying the Norm...");
         verifyNorm();
 
         appendText("\nVerifying the Standard Deviation...");
         verifyStandardDeviation();
+    }
+
+    private void calibrateMagnetometer() {
+        SensorManagerTestVerifier magnetometer = new SensorManagerTestVerifier(
+                this.getApplicationContext(),
+                Sensor.TYPE_MAGNETIC_FIELD,
+                SensorManager.SENSOR_DELAY_NORMAL,
+                0 /*reportLatencyInUs*/) {
+            @Override
+            public void onSensorChanged(SensorEvent event) {
+                float values[] = event.values;
+                clearText();
+                appendText(
+                        "Please calibrate the Magnetometer by moving it in 8 shapes in different " +
+                                "orientations.");
+                appendText(
+                        String.format("->  (%.2f, %.2f, %.2f) uT", values[0], values[1], values[2]),
+                        Color.GRAY);
+                appendText("Then leave the device in a flat surface and press Next...\n");
+            }
+        };
+        magnetometer.registerListener();
+        waitForUser();
+        magnetometer.unregisterListener();
     }
 
     /**
