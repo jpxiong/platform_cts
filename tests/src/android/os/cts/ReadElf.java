@@ -252,8 +252,11 @@ public class ReadElf {
         mPath = file.getPath();
         mFile = new RandomAccessFile(file, "r");
 
-        readIdent();
+        if (mFile.length() < EI_NIDENT) {
+            throw new IllegalArgumentException("Too small to be an ELF file: " + file);
+        }
 
+        readIdent();
         readHeader();
     }
 
