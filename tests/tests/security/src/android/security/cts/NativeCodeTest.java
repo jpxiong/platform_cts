@@ -74,7 +74,7 @@ public class NativeCodeTest extends TestCase {
     private static native int doSockDiagTest();
 
     /**
-     * ANDROID-11234878
+     * ANDROID-11234878 / CVE-2013-6282
      *
      * Returns true if the device is patched against the vroot
      * vulnerability. Returns false if there was some problem running
