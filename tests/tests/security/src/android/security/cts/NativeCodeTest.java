@@ -24,10 +24,6 @@ public class NativeCodeTest extends TestCase {
         System.loadLibrary("ctssecurity_jni");
     }
 
-    public void testVroot() throws Exception {
-        assertTrue(doVrootTest());
-    }
-
     public void testPerfEvent() throws Exception {
         assertFalse("Device is vulnerable to CVE-2013-2094. Please apply security patch "
                     + "at http://git.kernel.org/cgit/linux/kernel/git/torvalds/linux.git/"
@@ -41,18 +37,4 @@ public class NativeCodeTest extends TestCase {
      * http://git.kernel.org/cgit/linux/kernel/git/torvalds/linux.git/commit/?id=8176cced706b5e5d15887584150764894e94e02f
      */
     private static native boolean doPerfEventTest();
-
-    /**
-     * ANDROID-11234878
-     *
-     * Returns true if the device is patched against the vroot
-     * vulnerability. Returns false if there was some problem running
-     * the test (for example, out of memory), or the test fails but wasn't
-     * able to crash the device. Most of the time, however, the device will
-     * crash if the vulnerability is present.
-     *
-     * The following patch addresses this bug:
-     * https://git.kernel.org/cgit/linux/kernel/git/torvalds/linux.git/commit/arch/arm/include/asm/uaccess.h?id=8404663f81d212918ff85f493649a7991209fa04
-     */
-    private static native boolean doVrootTest();
 }
