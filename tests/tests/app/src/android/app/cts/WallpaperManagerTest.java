@@ -17,7 +17,10 @@
 package android.app.cts;
 
 import android.app.WallpaperManager;
+import android.content.Context;
 import android.test.AndroidTestCase;
+import android.view.Display;
+import android.view.WindowManager;
 
 public class WallpaperManagerTest extends AndroidTestCase {
 
@@ -30,10 +33,30 @@ public class WallpaperManagerTest extends AndroidTestCase {
     }
 
     public void testSuggestDesiredDimensions() {
-        mWallpaperManager.suggestDesiredDimensions(320, 480);
-        int desiredMinimumWidth = mWallpaperManager.getDesiredMinimumWidth();
-        int desiredMinimumHeight = mWallpaperManager.getDesiredMinimumHeight();
-        assertEquals(320, desiredMinimumWidth);
-        assertEquals(480, desiredMinimumHeight);
+        int max = getMaximumSizeDimension();
+        int w = max * 3;
+        int h = max * 2;
+
+        mWallpaperManager.suggestDesiredDimensions(max / 2, max / 2);
+        assertEquals(max, mWallpaperManager.getDesiredMinimumWidth());
+        assertEquals(max, mWallpaperManager.getDesiredMinimumHeight());
+
+        mWallpaperManager.suggestDesiredDimensions(w, h);
+        assertEquals(w, mWallpaperManager.getDesiredMinimumWidth());
+        assertEquals(h, mWallpaperManager.getDesiredMinimumHeight());
+
+        mWallpaperManager.suggestDesiredDimensions(max / 2, h);
+        assertEquals(max, mWallpaperManager.getDesiredMinimumWidth());
+        assertEquals(h, mWallpaperManager.getDesiredMinimumHeight());
+
+        mWallpaperManager.suggestDesiredDimensions(w, max / 2);
+        assertEquals(w, mWallpaperManager.getDesiredMinimumWidth());
+        assertEquals(max, mWallpaperManager.getDesiredMinimumHeight());
+    }
+
+    private int getMaximumSizeDimension() {
+        WindowManager wm = (WindowManager)mContext.getSystemService(Context.WINDOW_SERVICE);
+        Display d = wm.getDefaultDisplay();
+        return d.getMaximumSizeDimension();
     }
 }
