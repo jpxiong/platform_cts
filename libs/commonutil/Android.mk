@@ -28,10 +28,7 @@ include $(BUILD_STATIC_JAVA_LIBRARY)
 
 include $(CLEAR_VARS)
 
-# only TimeoutReq annotation used from the libs/util, so add it here
-LOCAL_SRC_FILES := \
-    $(call all-java-files-under, src) \
-    ../deviceutil/src/android/cts/util/TimeoutReq.java
+LOCAL_SRC_FILES := $(call all-java-files-under, src)
 
 LOCAL_MODULE_TAGS := optional
 
