@@ -19,14 +19,14 @@ package com.android.cts.uihost;
 import android.cts.util.TimeoutReq;
 
 import com.android.cts.tradefed.build.CtsBuildHelper;
-import com.android.cts.tradefed.result.CtsHostStore;
 import com.android.cts.tradefed.result.CtsReportUtil;
+import com.android.cts.util.CtsHostStore;
+import com.android.cts.util.HostReportLog;
+import com.android.cts.util.ReportLog;
 import com.android.ddmlib.Log;
 import com.android.ddmlib.Log.LogLevel;
 import com.android.ddmlib.testrunner.RemoteAndroidTestRunner;
 import com.android.ddmlib.testrunner.TestIdentifier;
-import com.android.cts.util.HostReportLog;
-import com.android.cts.util.ReportLog;
 import com.android.tradefed.build.IBuildInfo;
 import com.android.tradefed.device.DeviceNotAvailableException;
 import com.android.tradefed.device.ITestDevice;

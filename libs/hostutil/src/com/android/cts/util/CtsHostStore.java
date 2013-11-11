@@ -13,10 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.android.cts.tradefed.result;
-
-import com.android.ddmlib.testrunner.TestIdentifier;
-import com.android.tradefed.device.ITestDevice;
+package com.android.cts.util;
 
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -47,16 +44,8 @@ public class CtsHostStore {
      * retrieves a CTS result for the given condition and remove it from the internal
      * storage. If there is no result for the given condition, it will return null.
      */
-    public static String removeCtsResult(String deviceSerial, TestIdentifier test) {
-        return mMap.remove(generateTestKey(deviceSerial, test));
-    }
-
-    /**
-     * return test key in the form of device_serial#class_name#method_name
-     */
-    private static String generateTestKey(String deviceSerial, TestIdentifier test) {
-        return String.format("%s#%s", deviceSerial, test.toString());
-
+    public static String removeCtsResult(String deviceSerial, String classMethodName) {
+        return mMap.remove(generateTestKey(deviceSerial, classMethodName));
     }
 
     /**
