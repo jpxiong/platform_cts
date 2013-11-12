@@ -204,7 +204,7 @@ public class AccessibilityRecordTest extends AndroidTestCase {
     static void assertNoNewNonStaticFieldsAdded(Class<?> clazz, int expectedCount) {
         int nonStaticFieldCount = 0;
 
-        while (clazz != null) {
+        while (clazz != Object.class) {
             for (Field field : clazz.getDeclaredFields()) {
                 if ((field.getModifiers() & Modifier.STATIC) == 0) {
                     nonStaticFieldCount++;
