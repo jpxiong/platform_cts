@@ -117,6 +117,15 @@ public abstract class BaseSensorSemiAutomatedTestActivity
         this.runOnUiThread(new TextAppender(mLogView, text));
     }
 
+    protected void clearText() {
+        this.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                mLogView.setText("");
+            }
+        });
+    }
+
     protected void updateButton(boolean enabled) {
         this.runOnUiThread(new ButtonEnabler(this.mNextView, enabled));
     }
