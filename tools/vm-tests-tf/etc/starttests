@@ -57,10 +57,10 @@ if [ "$selection" = "--portable" ]; then
     interpreter="portable"
 fi
 
-dalviktest=$progdir/../cts_dalviktests_tf
+dalviktest=$ANDROID_BUILD_TOP/out/host/common/obj/JAVA_LIBRARIES/vm-tests-tf_intermediates
 dalviktestdir=$dalviktest/tests
 dexcore=$dalviktest/tests/dot/junit/dexcore.jar
-scriptdata=$dalviktest/data/scriptdata
+scriptdata=$dalviktestdir/data/scriptdata
 report=$dalviktest/report.html
 curdate=`date`
 curmode=""
@@ -140,7 +140,7 @@ export jcolumns=0
 if [ "$TARGET_SIMULATOR" = "true" ]; then
     echo -n ""
 else
-    adb push $dexcore /data/dexcore.jar >> /dev/null 2>&1
+    adb push $dexcore /data/local/tmp/dexcore.jar >> /dev/null 2>&1
 fi
 
 function classnameToJar()
@@ -189,13 +189,13 @@ do
                 echo "Dalvik VM failed, result=${RESULTCODE}" >> $datadir/dalvikout 2>&1
             fi
         else
-            classpath="/data/dexcore.jar"
+            classpath="/data/local/tmp/dexcore.jar"
             deps=${deps}" "${mainclass}
             pushedjars=""
             for dep in ${deps}; do
                 depJar=`classnameToJar ${dep}`
                 depFileName=`basename ${depJar}`
-                deviceFileName=/data/${depFileName}
+                deviceFileName=/data/local/tmp/${depFileName}
                 adb push ${depJar} ${deviceFileName} &> /dev/null
                 classpath=${classpath}:${deviceFileName}
                 pushedjars=${pushedjars}" "${deviceFileName}
