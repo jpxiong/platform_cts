@@ -22,11 +22,10 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener2;
 import android.hardware.SensorManager;
-import android.hardware.TriggerEvent;
-import android.hardware.TriggerEventListener;
 
 import java.io.Closeable;
 
+import java.security.InvalidParameterException;
 import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
@@ -40,7 +39,7 @@ import junit.framework.Assert;
  * An object can be used to quickly writing tests that focus on the scenario that needs to be
  * verified, and not in the implicit verifications that need to take place at any step.
  */
-public class SensorManagerTestVerifier implements Closeable {
+public class SensorManagerTestVerifier implements Closeable, SensorEventListener2 {
     private final int WAIT_TIMEOUT_IN_SECONDS = 30;
 
     private final SensorManager mSensorManager;
@@ -63,8 +62,21 @@ public class SensorManagerTestVerifier implements Closeable {
         mSamplingRateInUs = samplingRateInUs;
         mReportLatencyInUs = reportLatencyInUs;
 
-        mEventListener = new TestSensorListener(mSensorUnderTest);
+        mEventListener = new TestSensorListener(mSensorUnderTest, this);
     }
+
+    /**
+     * Public listeners for Sensor events, these are available for subclasses to implement if they
+     * need access to the raw eventing model.
+     */
+    @Override
+    public void onAccuracyChanged(Sensor sensor, int accuracy) {}
+
+    @Override
+    public void onSensorChanged(SensorEvent event) {}
+
+    @Override
+    public void onFlushCompleted(Sensor sensor) {}
 
     /**
      * Members
@@ -149,6 +161,7 @@ public class SensorManagerTestVerifier implements Closeable {
      */
     private class TestSensorListener implements SensorEventListener2 {
         private final Sensor mSensorUnderTest;
+        private final SensorEventListener2 mListener;
 
         private final ConcurrentLinkedDeque<TestSensorEvent> mSensorEventsList =
                 new ConcurrentLinkedDeque<TestSensorEvent>();
@@ -156,8 +169,15 @@ public class SensorManagerTestVerifier implements Closeable {
         private volatile CountDownLatch mEventLatch;
         private volatile CountDownLatch mFlushLatch = new CountDownLatch(1);
 
-        public TestSensorListener(Sensor sensor) {
+        public TestSensorListener(Sensor sensor, SensorEventListener2 listener) {
+            if(sensor == null) {
+                throw new InvalidParameterException("sensor cannot be null");
+            }
+            if(listener == null) {
+                throw new InvalidParameterException("listener cannot be null");
+            }
             mSensorUnderTest = sensor;
+            mListener = listener;
         }
 
         @Override
@@ -167,20 +187,22 @@ public class SensorManagerTestVerifier implements Closeable {
             if(mEventLatch != null) {
                 mEventLatch.countDown();
             }
+            mListener.onSensorChanged(event);
         }
 
         @Override
         public void onAccuracyChanged(Sensor sensor, int accuracy) {
+            mListener.onAccuracyChanged(sensor, accuracy);
         }
 
         @Override
         public void onFlushCompleted(Sensor sensor) {
             CountDownLatch latch = mFlushLatch;
             mFlushLatch = new CountDownLatch(1);
-
             if(latch != null) {
                 latch.countDown();
             }
+            mListener.onFlushCompleted(sensor);
         }
 
         public void waitForFlushComplete() throws InterruptedException {
@@ -192,10 +214,6 @@ public class SensorManagerTestVerifier implements Closeable {
                         "" /* format */);
                 Assert.assertTrue(message, latch.await(WAIT_TIMEOUT_IN_SECONDS, TimeUnit.SECONDS));
             }
-        }
-
-        public void waitForEvents(int eventCount) {
-            waitForEvents(eventCount, "");
         }
 
         public void waitForEvents(int eventCount, String timeoutInfo) {
@@ -219,22 +237,12 @@ public class SensorManagerTestVerifier implements Closeable {
             }
         }
 
-        public TestSensorEvent getLastEvent() {
-            return mSensorEventsList.getLast();
-        }
-
         public TestSensorEvent[] getAllEvents() {
             return mSensorEventsList.toArray(new TestSensorEvent[0]);
         }
 
         public void clearEvents() {
             mSensorEventsList.clear();
-        }
-    }
-
-    public class TestTriggerListener extends TriggerEventListener {
-        @Override
-        public void onTrigger(TriggerEvent event) {
         }
     }
 }
