@@ -22,7 +22,7 @@ LOCAL_SRC_FILES := $(call all-java-files-under, src)
 
 LOCAL_MODULE := CtsHostJank
 
-LOCAL_JAVA_LIBRARIES := cts-tradefed tradefed-prebuilt ddmlib-prebuilt ctscommonutilhost
+LOCAL_JAVA_LIBRARIES := cts-tradefed tradefed-prebuilt ddmlib-prebuilt ctshostutil ctscommonutilhost
 
 LOCAL_CTS_TEST_PACKAGE := com.android.cts.jank
 
