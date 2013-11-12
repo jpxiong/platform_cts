@@ -19,6 +19,7 @@ package com.android.cts.tradefed.result;
 import com.android.cts.tradefed.build.CtsBuildHelper;
 import com.android.cts.tradefed.device.DeviceInfoCollector;
 import com.android.cts.tradefed.testtype.CtsTest;
+import com.android.cts.util.CtsHostStore;
 import com.android.ddmlib.Log;
 import com.android.ddmlib.Log.LogLevel;
 import com.android.ddmlib.testrunner.TestIdentifier;
@@ -281,7 +282,7 @@ public class CtsXmlResultReporter implements ITestInvocationListener {
         String perfResult = CtsReportUtil.getCtsResultFromMetrics(testMetrics);
         // host test should be checked in CtsHostStore.
         if (perfResult == null) {
-            perfResult = CtsHostStore.removeCtsResult(mDeviceSerial, test);
+            perfResult = CtsHostStore.removeCtsResult(mDeviceSerial, test.toString());
         }
         if (perfResult != null) {
             // CTS result is passed in Summary++++Details format.

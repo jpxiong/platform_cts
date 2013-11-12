@@ -16,9 +16,6 @@
 
 package com.android.cts.util;
 
-import com.android.cts.tradefed.result.CtsHostStore;
-
-
 /**
  * ReportLog for host tests
  * Note that setTestInfo should be set before throwing report
