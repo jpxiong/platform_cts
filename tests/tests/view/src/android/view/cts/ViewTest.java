@@ -2744,6 +2744,103 @@ public class ViewTest extends ActivityInstrumentationTestCase2<ViewTestStubActiv
         assertFalse(view.isPaddingOffsetRequired());
     }
 
+    @UiThreadTest
+    public void testPadding() {
+        MockView view = (MockView) mActivity.findViewById(R.id.mock_view_padding_full);
+        Drawable background = view.getBackground();
+        Rect backgroundPadding = new Rect();
+        background.getPadding(backgroundPadding);
+
+        // There is some background with a non null padding
+        assertNotNull(background);
+        assertTrue(backgroundPadding.left != 0);
+        assertTrue(backgroundPadding.right != 0);
+        assertTrue(backgroundPadding.top != 0);
+        assertTrue(backgroundPadding.bottom != 0);
+
+        // The XML defines android:padding="0dp" and that should be the resulting padding
+        assertEquals(0, view.getPaddingLeft());
+        assertEquals(0, view.getPaddingTop());
+        assertEquals(0, view.getPaddingRight());
+        assertEquals(0, view.getPaddingBottom());
+
+        // LEFT case
+        view = (MockView) mActivity.findViewById(R.id.mock_view_padding_left);
+        background = view.getBackground();
+        backgroundPadding = new Rect();
+        background.getPadding(backgroundPadding);
+
+        // There is some background with a non null padding
+        assertNotNull(background);
+        assertTrue(backgroundPadding.left != 0);
+        assertTrue(backgroundPadding.right != 0);
+        assertTrue(backgroundPadding.top != 0);
+        assertTrue(backgroundPadding.bottom != 0);
+
+        // The XML defines android:paddingLeft="0dp" and that should be the resulting padding
+        assertEquals(0, view.getPaddingLeft());
+        assertEquals(backgroundPadding.top, view.getPaddingTop());
+        assertEquals(backgroundPadding.right, view.getPaddingRight());
+        assertEquals(backgroundPadding.bottom, view.getPaddingBottom());
+
+        // RIGHT case
+        view = (MockView) mActivity.findViewById(R.id.mock_view_padding_right);
+        background = view.getBackground();
+        backgroundPadding = new Rect();
+        background.getPadding(backgroundPadding);
+
+        // There is some background with a non null padding
+        assertNotNull(background);
+        assertTrue(backgroundPadding.left != 0);
+        assertTrue(backgroundPadding.right != 0);
+        assertTrue(backgroundPadding.top != 0);
+        assertTrue(backgroundPadding.bottom != 0);
+
+        // The XML defines android:paddingRight="0dp" and that should be the resulting padding
+        assertEquals(backgroundPadding.left, view.getPaddingLeft());
+        assertEquals(backgroundPadding.top, view.getPaddingTop());
+        assertEquals(0, view.getPaddingRight());
+        assertEquals(backgroundPadding.bottom, view.getPaddingBottom());
+
+        // TOP case
+        view = (MockView) mActivity.findViewById(R.id.mock_view_padding_top);
+        background = view.getBackground();
+        backgroundPadding = new Rect();
+        background.getPadding(backgroundPadding);
+
+        // There is some background with a non null padding
+        assertNotNull(background);
+        assertTrue(backgroundPadding.left != 0);
+        assertTrue(backgroundPadding.right != 0);
+        assertTrue(backgroundPadding.top != 0);
+        assertTrue(backgroundPadding.bottom != 0);
+
+        // The XML defines android:paddingTop="0dp" and that should be the resulting padding
+        assertEquals(backgroundPadding.left, view.getPaddingLeft());
+        assertEquals(0, view.getPaddingTop());
+        assertEquals(backgroundPadding.right, view.getPaddingRight());
+        assertEquals(backgroundPadding.bottom, view.getPaddingBottom());
+
+        // BOTTOM case
+        view = (MockView) mActivity.findViewById(R.id.mock_view_padding_bottom);
+        background = view.getBackground();
+        backgroundPadding = new Rect();
+        background.getPadding(backgroundPadding);
+
+        // There is some background with a non null padding
+        assertNotNull(background);
+        assertTrue(backgroundPadding.left != 0);
+        assertTrue(backgroundPadding.right != 0);
+        assertTrue(backgroundPadding.top != 0);
+        assertTrue(backgroundPadding.bottom != 0);
+
+        // The XML defines android:paddingBottom="0dp" and that should be the resulting padding
+        assertEquals(backgroundPadding.left, view.getPaddingLeft());
+        assertEquals(backgroundPadding.top, view.getPaddingTop());
+        assertEquals(backgroundPadding.right, view.getPaddingRight());
+        assertEquals(0, view.getPaddingBottom());
+    }
+
     public void testGetWindowVisibleDisplayFrame() {
         Rect outRect = new Rect();
         View view = new View(mActivity);
