@@ -18,8 +18,10 @@ include $(CLEAR_VARS)
 
 LOCAL_SRC_FILES := $(call all-java-files-under, src)
 
+LOCAL_JAVA_LIBRARIES := ctscommonutilhost
+
 LOCAL_MODULE_TAGS := optional
 
 LOCAL_MODULE := ctshostutil
 
-include $(BUILD_STATIC_JAVA_LIBRARY)
+include $(BUILD_HOST_JAVA_LIBRARY)
