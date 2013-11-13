@@ -451,7 +451,8 @@
                        android:value="android.hardware.sensor.gyroscope"/>
         </activity>
 
-        <activity android:name=".sensors.MagneticFieldMeasurementTestActivity"
+        <!-- Disable the test until calibration routine is verified -->
+        <!--activity android:name=".sensors.MagneticFieldMeasurementTestActivity"
                   android:label="@string/snsr_mag_m_test"
                   android:screenOrientation="nosensor">
             <intent-filter>
@@ -461,7 +462,7 @@
             <meta-data android:name="test_category" android:value="@string/test_category_sensors" />
             <meta-data android:name="test_required_features"
                        android:value="android.hardware.sensor.compass" />
-        </activity>
+        </activity-->
 
         <activity android:name=".camera.formats.CameraFormatsActivity"
                  android:label="@string/camera_format"
