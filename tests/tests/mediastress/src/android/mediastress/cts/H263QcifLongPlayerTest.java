@@ -16,7 +16,7 @@
 
 package android.mediastress.cts;
 
-import android.cts.util.TimeoutReq;
+import com.android.cts.util.TimeoutReq;
 
 public class H263QcifLongPlayerTest extends MediaPlayerStressTest {
     private final static String VIDEO_PATH_MIDDLE = "bbb_full/176x144/3gp_h263_libfaac/";

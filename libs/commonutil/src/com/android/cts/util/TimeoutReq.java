@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package android.cts.util;
+package com.android.cts.util;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
