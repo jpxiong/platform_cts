@@ -8,6 +8,11 @@
   bug: 8148617
 },
 {
+  name: "android.nativeopengl.EGLCleanupTest#TestCorrect",
+  name: "android.nativeopengl.EGLCreateContextTest#BadAttributeFails",
+  bug: 11652564
+},
+{
   name: "android.hardware.camera2.cts.ImageReaderTest",
   name: "android.hardware.camera2.cts.CameraCharacteristicsTest",
   name: "android.hardware.camera2.cts.CameraCaptureResultTest",
