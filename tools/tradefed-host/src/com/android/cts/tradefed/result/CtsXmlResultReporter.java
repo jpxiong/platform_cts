@@ -19,7 +19,7 @@ package com.android.cts.tradefed.result;
 import com.android.cts.tradefed.build.CtsBuildHelper;
 import com.android.cts.tradefed.device.DeviceInfoCollector;
 import com.android.cts.tradefed.testtype.CtsTest;
-import com.android.cts.util.CtsHostStore;
+import com.android.cts.tradefed.util.CtsHostStore;
 import com.android.ddmlib.Log;
 import com.android.ddmlib.Log.LogLevel;
 import com.android.ddmlib.testrunner.TestIdentifier;

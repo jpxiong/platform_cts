@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.android.cts.util;
+package com.android.cts.tradefed.util;
 
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -32,8 +32,8 @@ public class CtsHostStore {
      * Stores CTS result. Existing result with the same key will be replaced.
      * Note that key is generated in the form of device_serial#class#method name.
      * So there should be no concurrent test for the same (serial, class, method).
-     * @param device
-     * @param test
+     * @param deviceSerial
+     * @param classMethodName
      * @param result CTS result string
      */
     public static void storeCtsResult(String deviceSerial, String classMethodName, String result) {
