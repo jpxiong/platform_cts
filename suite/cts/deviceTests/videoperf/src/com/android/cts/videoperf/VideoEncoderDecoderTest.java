@@ -144,7 +144,8 @@ public class VideoEncoderDecoderTest extends CtsAndroidTestCase {
         double[] decoderFpsResults = new double[numberRepeat];
         double[] totalFpsResults = new double[numberRepeat];
         double[] decoderRmsErrorResults = new double[numberRepeat];
-        for (int i = 0; i < numberRepeat; i++) {
+        boolean success = true;
+        for (int i = 0; i < numberRepeat && success; i++) {
             MediaFormat format = new MediaFormat();
             format.setString(MediaFormat.KEY_MIME, mimeType);
             format.setInteger(MediaFormat.KEY_BIT_RATE, infoEnc.mBitRate);
@@ -166,14 +167,14 @@ public class VideoEncoderDecoderTest extends CtsAndroidTestCase {
                         CodecCapabilities.COLOR_FormatYUV420Planar);
             double[] decoderResult = runDecoder(VIDEO_AVC, format);
             if (decoderResult == null) {
-                // color change in the middle. give up
-                return;
+                success = false;
+            } else {
+                double decodingTime = decoderResult[0];
+                decoderRmsErrorResults[i] = decoderResult[1];
+                encoderFpsResults[i] = (double)TOTAL_FRAMES / encodingTime * 1000.0;
+                decoderFpsResults[i] = (double)TOTAL_FRAMES / decodingTime * 1000.0;
+                totalFpsResults[i] = (double)TOTAL_FRAMES / (encodingTime + decodingTime) * 1000.0;
             }
-            double decodingTime = decoderResult[0];
-            decoderRmsErrorResults[i] = decoderResult[1];
-            encoderFpsResults[i] = (double)TOTAL_FRAMES / encodingTime * 1000.0;
-            decoderFpsResults[i] = (double)TOTAL_FRAMES / decodingTime * 1000.0;
-            totalFpsResults[i] = (double)TOTAL_FRAMES / (encodingTime + decodingTime) * 1000.0;
 
             // clear things for re-start
             mEncodedOutputBuffer.clear();
