@@ -16,10 +16,8 @@
 
 package com.android.cts.filesystemperf;
 
-import android.cts.util.TimeoutReq;
-
 import android.cts.util.CtsAndroidTestCase;
-
+import com.android.cts.util.TimeoutReq;
 
 public class RandomRWTest extends CtsAndroidTestCase {
     private static final String DIR_RANDOM_WR = "RANDOM_WR";

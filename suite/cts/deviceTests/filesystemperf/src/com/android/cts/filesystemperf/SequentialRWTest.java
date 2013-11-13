@@ -16,14 +16,14 @@
 
 package com.android.cts.filesystemperf;
 
-import android.cts.util.TimeoutReq;
+import android.cts.util.CtsAndroidTestCase;
 import com.android.cts.util.MeasureRun;
 import com.android.cts.util.MeasureTime;
 import com.android.cts.util.ResultType;
 import com.android.cts.util.ResultUnit;
-import android.cts.util.CtsAndroidTestCase;
 import com.android.cts.util.ReportLog;
 import com.android.cts.util.Stat;
+import com.android.cts.util.TimeoutReq;
 
 import java.io.File;
 import java.io.FileInputStream;

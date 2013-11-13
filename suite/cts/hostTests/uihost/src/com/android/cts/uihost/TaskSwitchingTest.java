@@ -16,13 +16,12 @@
 
 package com.android.cts.uihost;
 
-import android.cts.util.TimeoutReq;
-
 import com.android.cts.tradefed.build.CtsBuildHelper;
 import com.android.cts.tradefed.result.CtsReportUtil;
 import com.android.cts.tradefed.util.CtsHostStore;
 import com.android.cts.tradefed.util.HostReportLog;
 import com.android.cts.util.ReportLog;
+import com.android.cts.util.TimeoutReq;
 import com.android.ddmlib.Log;
 import com.android.ddmlib.Log.LogLevel;
 import com.android.ddmlib.testrunner.RemoteAndroidTestRunner;
