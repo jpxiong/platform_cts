@@ -27,7 +27,6 @@ public class ProtocolParamsReaderActivity extends PassFailButtons.Activity imple
         super.onCreate(savedInstanceState);
         setContentView(R.layout.pass_fail_text);
         setPassFailButtonClickListeners();
-        getPassButton().setEnabled(false);
 
         setTitle(R.string.nfc_hce_protocol_params_reader);
 
