@@ -709,7 +709,7 @@
             </intent-filter>
         </service>
 
-        <service  android:name="nls.NotificationListenerVerifierActivity$DismissService"/>
+        <service  android:name=".nls.NotificationListenerVerifierActivity$DismissService"/>
         <activity android:name=".security.CAInstallNotificationVerifierActivity"
                 android:label="@string/cacert_test">
             <intent-filter>
