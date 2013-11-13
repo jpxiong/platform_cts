@@ -16,10 +16,12 @@
 
 package android.renderscript.cts;
 
+import android.app.ActivityManager;
 import android.renderscript.Allocation;
 import android.renderscript.Element;
 import android.renderscript.Type;
 import android.util.Log;
+import android.content.Context;
 
 /*
 // -target-api 11
@@ -44,10 +46,16 @@ void print() {
  * bug, since it may have been compiled without .rs.dtor() support.
  */
 public class LeakTest extends RSBaseCompute {
-    private final static int x = 16 * 1024 * 1024;
     private static final String TAG = "LeakTest";
 
     public void testForLeaks() {
+        ActivityManager am = (ActivityManager) getContext().getSystemService("activity");
+        int mc = am.getLargeMemoryClass() / 32;
+        if (mc < 1) {
+            mc = 1;
+        }
+        int x = mc * 1024 * 1024;
+
         for (int i = 0; i < 100; i++) {
             Log.w(TAG, "Leak test iteration " + i);
             ScriptC_leak leak = new ScriptC_leak(mRS);
