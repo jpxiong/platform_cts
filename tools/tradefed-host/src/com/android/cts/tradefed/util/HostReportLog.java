@@ -14,7 +14,9 @@
  * limitations under the License.
  */
 
-package com.android.cts.util;
+package com.android.cts.tradefed.util;
+
+import com.android.cts.util.ReportLog;
 
 /**
  * ReportLog for host tests
