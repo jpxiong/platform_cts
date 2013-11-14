@@ -17,14 +17,14 @@
 package com.android.cts.uihost;
 
 import com.android.cts.tradefed.build.CtsBuildHelper;
-import com.android.ddmlib.Log;
-import com.android.cts.util.HostReportLog;
+import com.android.cts.tradefed.util.HostReportLog;
 import com.android.cts.util.MeasureRun;
 import com.android.cts.util.MeasureTime;
 import com.android.cts.util.ResultType;
 import com.android.cts.util.ResultUnit;
 import com.android.cts.util.ReportLog;
 import com.android.cts.util.Stat;
+import com.android.ddmlib.Log;
 import com.android.tradefed.build.IBuildInfo;
 import com.android.tradefed.device.ITestDevice;
 import com.android.tradefed.testtype.DeviceTestCase;

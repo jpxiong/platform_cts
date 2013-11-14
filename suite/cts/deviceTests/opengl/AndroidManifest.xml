@@ -19,7 +19,7 @@
         <uses-library android:name="android.test.runner" />
 
         <activity
-            android:name="com.android.cts.opengl.primitive.GLPrimitiveActivity"
+            android:name=".primitive.GLPrimitiveActivity"
             android:configChanges="keyboard|keyboardHidden|orientation|screenSize|uiMode"
             android:theme="@android:style/Theme.NoTitleBar.Fullscreen" >
             <intent-filter>
@@ -29,7 +29,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name="com.android.cts.opengl.reference.GLReferenceActivity"
+            android:name=".reference.GLReferenceActivity"
             android:configChanges="keyboard|keyboardHidden|orientation|screenSize|uiMode"
             android:theme="@android:style/Theme.NoTitleBar.Fullscreen" >
             <intent-filter>
@@ -39,7 +39,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name="com.android.cts.opengl.reference.GLGameActivity"
+            android:name=".reference.GLGameActivity"
             android:configChanges="keyboard|keyboardHidden|orientation|screenSize|uiMode"
             android:theme="@android:style/Theme.NoTitleBar.Fullscreen" >
         </activity>
