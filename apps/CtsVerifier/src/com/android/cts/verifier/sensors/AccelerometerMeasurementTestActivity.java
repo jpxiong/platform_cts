@@ -80,7 +80,7 @@ public class AccelerometerMeasurementTestActivity extends BaseSensorSemiAutomate
                 SensorManager.SENSOR_DELAY_FASTEST,
                 0 /*reportLatencyInUs*/,
                 expectations,
-                0.7f /* m / s^2 */);
+                1.95f /* m / s^2 */);
         verifyMeasurements.execute();
         logSuccess();
     }
