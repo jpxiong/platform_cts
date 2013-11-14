@@ -16,14 +16,16 @@ LOCAL_PATH := $(call my-dir)
 
 include $(CLEAR_VARS)
 
-LOCAL_SRC_FILES := $(call all-java-files-under, src)
+LOCAL_SRC_FILES := \
+    $(call all-java-files-under, src) \
+    $(call all-java-files-under, ../../libs/commonutil/src)
 
 LOCAL_JAVA_RESOURCE_DIRS := res
 
 LOCAL_MODULE := cts-tradefed
 LOCAL_MODULE_TAGS := optional
 LOCAL_JAVA_LIBRARIES := ddmlib-prebuilt tradefed-prebuilt hosttestlib
-LOCAL_STATIC_JAVA_LIBRARIES := ctsdeviceinfolib ctshostutil
+LOCAL_STATIC_JAVA_LIBRARIES := ctsdeviceinfolib
 
 LOCAL_ADDITIONAL_DEPENDENCIES := $(LOCAL_PATH)/Android.mk
 

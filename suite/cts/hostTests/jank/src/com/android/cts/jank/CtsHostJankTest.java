@@ -14,12 +14,12 @@
 package com.android.cts.jank;
 
 import com.android.cts.tradefed.build.CtsBuildHelper;
+import com.android.cts.tradefed.util.HostReportLog;
+import com.android.cts.util.ResultType;
+import com.android.cts.util.ResultUnit;
 import com.android.ddmlib.IShellOutputReceiver;
 import com.android.ddmlib.Log;
 import com.android.ddmlib.Log.LogLevel;
-import com.android.cts.util.HostReportLog;
-import com.android.cts.util.ResultType;
-import com.android.cts.util.ResultUnit;
 import com.android.tradefed.build.IBuildInfo;
 import com.android.tradefed.device.ITestDevice;
 import com.android.tradefed.testtype.DeviceTestCase;
