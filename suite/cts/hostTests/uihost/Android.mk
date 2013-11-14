@@ -22,7 +22,9 @@ LOCAL_MODULE_TAGS := optional
 
 LOCAL_MODULE := CtsHostUi
 
-LOCAL_JAVA_LIBRARIES := cts-tradefed tradefed-prebuilt ddmlib-prebuilt junit ctshostutil ctscommonutilhost
+LOCAL_JAVA_LIBRARIES := cts-tradefed tradefed-prebuilt ddmlib-prebuilt junit
+
+LOCAL_ADDITIONAL_DEPENDENCIES := $(LOCAL_PATH)/Android.mk
 
 LOCAL_CTS_TEST_PACKAGE := com.android.cts.uihost
 
