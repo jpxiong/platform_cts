@@ -2839,6 +2839,39 @@ public class ViewTest extends ActivityInstrumentationTestCase2<ViewTestStubActiv
         assertEquals(backgroundPadding.top, view.getPaddingTop());
         assertEquals(backgroundPadding.right, view.getPaddingRight());
         assertEquals(0, view.getPaddingBottom());
+
+        // Case for interleaved background/padding changes
+        view = (MockView) mActivity.findViewById(R.id.mock_view_padding_runtime_updated);
+        background = view.getBackground();
+        backgroundPadding = new Rect();
+        background.getPadding(backgroundPadding);
+
+        // There is some background with a null padding
+        assertNotNull(background);
+        assertTrue(backgroundPadding.left == 0);
+        assertTrue(backgroundPadding.right == 0);
+        assertTrue(backgroundPadding.top == 0);
+        assertTrue(backgroundPadding.bottom == 0);
+
+        final int paddingLeft = view.getPaddingLeft();
+        final int paddingRight = view.getPaddingRight();
+        final int paddingTop = view.getPaddingTop();
+        final int paddingBottom = view.getPaddingBottom();
+        assertEquals(24, paddingLeft);
+        assertEquals(0, paddingTop);
+        assertEquals(24, paddingRight);
+        assertEquals(0, paddingBottom);
+
+        // Manipulate background and padding
+        background.setState(view.getDrawableState());
+        background.jumpToCurrentState();
+        view.setBackground(background);
+        view.setPadding(paddingLeft, paddingTop, paddingRight, paddingBottom);
+
+        assertEquals(24, view.getPaddingLeft());
+        assertEquals(0, view.getPaddingTop());
+        assertEquals(24, view.getPaddingRight());
+        assertEquals(0, view.getPaddingBottom());
     }
 
     public void testGetWindowVisibleDisplayFrame() {
