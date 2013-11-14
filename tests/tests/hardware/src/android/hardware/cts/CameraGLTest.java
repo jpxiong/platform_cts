@@ -17,7 +17,6 @@
 package android.hardware.cts;
 
 import android.content.Context;
-import android.cts.util.TimeoutReq;
 import android.graphics.SurfaceTexture;
 import android.hardware.Camera;
 import android.hardware.Camera.Parameters;
@@ -40,6 +39,7 @@ import android.test.UiThreadTest;
 import android.test.suitebuilder.annotation.LargeTest;
 import android.util.Log;
 
+import com.android.cts.util.TimeoutReq;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;

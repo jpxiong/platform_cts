@@ -17,7 +17,6 @@
 package com.android.cts.browser;
 
 import android.content.Intent;
-import android.cts.util.TimeoutReq;
 import android.cts.util.WatchDog;
 import android.net.Uri;
 import android.provider.Browser;
@@ -28,6 +27,7 @@ import android.cts.util.CtsAndroidTestCase;
 import com.android.cts.util.ResultType;
 import com.android.cts.util.ResultUnit;
 import com.android.cts.util.Stat;
+import com.android.cts.util.TimeoutReq;
 
 import java.net.URLDecoder;
 import java.util.LinkedHashMap;
