@@ -18,7 +18,7 @@ import com.android.cts.opengl.GLActivityIntentKeys;
 import android.cts.util.CtsActivityInstrumentationTestCase2;
 import com.android.cts.util.ResultType;
 import com.android.cts.util.ResultUnit;
-import android.cts.util.TimeoutReq;
+import com.android.cts.util.TimeoutReq;
 
 import android.content.Intent;
 

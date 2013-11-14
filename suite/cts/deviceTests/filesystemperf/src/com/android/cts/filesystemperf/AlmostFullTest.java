@@ -16,11 +16,12 @@
 
 package com.android.cts.filesystemperf;
 
-import android.cts.util.TimeoutReq;
 import android.util.Log;
 
 import android.cts.util.CtsAndroidTestCase;
 import android.cts.util.SystemUtil;
+
+import com.android.cts.util.TimeoutReq;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;

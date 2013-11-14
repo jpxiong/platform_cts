@@ -16,13 +16,13 @@
 
 package com.android.cts.simplecpu;
 
-import android.cts.util.TimeoutReq;
 import android.util.Log;
 
 import com.android.cts.util.ResultType;
 import com.android.cts.util.ResultUnit;
 import android.cts.util.CtsAndroidTestCase;
 import com.android.cts.util.Stat;
+import com.android.cts.util.TimeoutReq;
 
 /**
  * Very simple CPU benchmarking to check the basic capability of CPU.

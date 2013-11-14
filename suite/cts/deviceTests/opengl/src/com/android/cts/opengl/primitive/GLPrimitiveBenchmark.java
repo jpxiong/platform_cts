@@ -19,7 +19,7 @@ import com.android.cts.util.ResultType;
 import com.android.cts.util.ResultUnit;
 
 import android.content.Intent;
-import android.cts.util.TimeoutReq;
+import com.android.cts.util.TimeoutReq;
 
 /**
  * Runs the Primitive OpenGL ES 2.0 Benchmarks.
