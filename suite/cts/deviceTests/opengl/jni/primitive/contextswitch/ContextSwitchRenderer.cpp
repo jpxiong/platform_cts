@@ -216,6 +216,8 @@ void ContextSwitchRenderer::drawWorkload() {
         }
     }
 
+    eglDestroySyncKHR(mEglDisplay, fence);
+
     // Switch back to the main context.
     eglMakeCurrent(mEglDisplay, mEglSurface, mEglSurface, mEglContext);
     if (mOffscreen) {
