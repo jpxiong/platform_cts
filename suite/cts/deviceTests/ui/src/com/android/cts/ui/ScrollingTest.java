@@ -15,13 +15,13 @@
  */
 package com.android.cts.ui;
 
-import android.cts.util.TimeoutReq;
 import com.android.cts.util.MeasureRun;
 import com.android.cts.util.MeasureTime;
 import com.android.cts.util.ResultType;
 import com.android.cts.util.ResultUnit;
 import android.cts.util.CtsActivityInstrumentationTestCase2;
 import com.android.cts.util.Stat;
+import com.android.cts.util.TimeoutReq;
 
 import java.io.IOException;
 
