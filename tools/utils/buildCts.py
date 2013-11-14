@@ -126,7 +126,13 @@ class CtsBuilder(object):
 
     plan = tools.TestPlan(packages)
     plan.Include(r'android\.core\.tests.*')
+    plan.Exclude(r'android\.core\.tests\.libcore.\package.\harmony*')
     self.__WritePlan(plan, 'Java')
+
+    # TODO: remove this once the tests are fixed and merged into Java plan above.
+    plan = tools.TestPlan(packages)
+    plan.Include(r'android\.core\.tests\.libcore.\package.\harmony*')
+    self.__WritePlan(plan, 'Harmony')
 
     plan = tools.TestPlan(packages)
     plan.Include(r'android\.core\.vm-tests-tf')
