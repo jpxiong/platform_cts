@@ -8,7 +8,7 @@
   bug: 8148617
 },
 {
-  name: "android.tests.sigtest.SimpleSignatureTest.testSignature",
+  name: "android.tests.sigtest.SimpleSignatureTest#testSignature",
   bug: 11436500
 },
 {
