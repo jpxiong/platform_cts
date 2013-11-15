@@ -21,6 +21,7 @@ import com.android.cts.stub.R;
 import android.content.Context;
 import android.content.res.Resources;
 import android.content.res.Resources.NotFoundException;
+import android.os.Environment;
 import android.os.cts.FileUtils;
 import android.os.storage.OnObbStateChangeListener;
 import android.os.storage.StorageManager;
@@ -30,6 +31,9 @@ import android.util.Log;
 
 import java.io.File;
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 public class StorageManagerTest extends AndroidTestCase {
 
@@ -49,8 +53,14 @@ public class StorageManagerTest extends AndroidTestCase {
     }
 
     public void testMountAndUnmountObbNormal() {
-        final File outFile = getFilePath("test1.obb");
+        for (File target : getTargetFiles()) {
+            target = new File(target, "test1.obb");
+            Log.d(TAG, "Testing path " + target);
+            doMountAndUnmountObbNormal(target);
+        }
+    }
 
+    private void doMountAndUnmountObbNormal(File outFile) {
         final String canonPath = mountObb(R.raw.test1, outFile, OnObbStateChangeListener.MOUNTED);
 
         mountObb(R.raw.test1, outFile, OnObbStateChangeListener.ERROR_ALREADY_MOUNTED);
@@ -64,8 +74,14 @@ public class StorageManagerTest extends AndroidTestCase {
     }
 
     public void testAttemptMountNonObb() {
-        final File outFile = getFilePath("test1_nosig.obb");
+        for (File target : getTargetFiles()) {
+            target = new File(target, "test1_nosig.obb");
+            Log.d(TAG, "Testing path " + target);
+            doAttemptMountNonObb(target);
+        }
+    }
 
+    private void doAttemptMountNonObb(File outFile) {
         mountObb(R.raw.test1_nosig, outFile, OnObbStateChangeListener.ERROR_INTERNAL);
 
         assertFalse("OBB should not be mounted",
@@ -76,8 +92,14 @@ public class StorageManagerTest extends AndroidTestCase {
     }
 
     public void testAttemptMountObbWrongPackage() {
-        final File outFile = getFilePath("test1_wrongpackage.obb");
+        for (File target : getTargetFiles()) {
+            target = new File(target, "test1_wrongpackage.obb");
+            Log.d(TAG, "Testing path " + target);
+            doAttemptMountObbWrongPackage(target);
+        }
+    }
 
+    private void doAttemptMountObbWrongPackage(File outFile) {
         mountObb(R.raw.test1_wrongpackage, outFile,
                 OnObbStateChangeListener.ERROR_PERMISSION_DENIED);
 
@@ -89,9 +111,15 @@ public class StorageManagerTest extends AndroidTestCase {
     }
 
     public void testMountAndUnmountTwoObbs() {
-        final File file1 = getFilePath("test1.obb");
-        final File file2 = getFilePath("test2.obb");
+        for (File target : getTargetFiles()) {
+            Log.d(TAG, "Testing target " + target);
+            final File test1 = new File(target, "test1.obb");
+            final File test2 = new File(target, "test2.obb");
+            doMountAndUnmountTwoObbs(test1, test2);
+        }
+    }
 
+    private void doMountAndUnmountTwoObbs(File file1, File file2) {
         ObbObserver oo1 = mountObbWithoutWait(R.raw.test1, file1);
         ObbObserver oo2 = mountObbWithoutWait(R.raw.test1, file2);
 
@@ -166,10 +194,16 @@ public class StorageManagerTest extends AndroidTestCase {
         }
     }
 
-    private File getFilePath(String name) {
-        final File filesDir = mContext.getFilesDir();
-        final File outFile = new File(filesDir, name);
-        return outFile;
+    private List<File> getTargetFiles() {
+        final List<File> targets = new ArrayList<File>();
+        targets.add(mContext.getFilesDir());
+        for (File dir : mContext.getObbDirs()) {
+            assertNotNull("Valid media must be inserted during CTS", dir);
+            assertEquals("Valid media must be inserted during CTS", Environment.MEDIA_MOUNTED,
+                    Environment.getStorageState(dir));
+            targets.add(dir);
+        }
+        return targets;
     }
 
     private void copyRawToFile(int rawResId, File outFile) {
