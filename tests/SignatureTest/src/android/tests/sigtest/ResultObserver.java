@@ -16,6 +16,7 @@
 
 package android.tests.sigtest;
 
+import android.tests.sigtest.SignatureTest.FAILURE_TYPE;
 /**
  * Interface for saving signature test result.
  */
@@ -26,7 +27,7 @@ public interface ResultObserver {
      * @param name Name of the failed element (interface/class/method/field)
      * @param errorMessage a descriptive message indicating why it failed.
      */
-    void notifyFailure(SignatureTestActivity.FAILURE_TYPE type,
+    void notifyFailure(FAILURE_TYPE type,
                        String name,
                        String errorMessage);
 
