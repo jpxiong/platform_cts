@@ -20,7 +20,11 @@ import android.os.cts.FileUtils;
 
 import junit.framework.TestCase;
 
+import java.io.DataInputStream;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 
 public class BannedFilesTest extends TestCase {
 
@@ -57,6 +61,34 @@ public class BannedFilesTest extends TestCase {
         for (String i : elems) {
             File f = new File(i, "su");
             assertFalse(f.getAbsolutePath() + " exists", f.exists());
+        }
+    }
+
+    public void testNoEnableRoot() throws UnsupportedEncodingException {
+        byte[] badPattern = "enable_root".getBytes("US-ASCII");
+        assertFileDoesNotContain("/system/bin/adb", badPattern);
+    }
+
+    private static void assertFileDoesNotContain(String filename, byte[] pattern) {
+        try {
+            File f = new File(filename);
+            byte[] fileData = new byte[(int) f.length()];
+            DataInputStream dis = new DataInputStream(new FileInputStream(f));
+            dis.readFully(fileData);
+            dis.close();
+
+            outer:
+            for (int i = 0; i < (fileData.length - pattern.length); i++) {
+                for (int j = 0; j < pattern.length; j++) {
+                    if (fileData[i+j] != pattern[j]) {
+                        continue outer;
+                    }
+                }
+                fail("Found banned pattern in " + filename);
+            }
+
+        } catch (IOException e) {
+            // ignore - no such file, or IO error. Assume OK.
         }
     }
 
