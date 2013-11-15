@@ -16,6 +16,8 @@
 
 package android.tests.sigtest;
 
+import android.tests.sigtest.SignatureTest.FAILURE_TYPE;
+
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.GenericArrayType;
@@ -81,7 +83,7 @@ public class JDiffClassDescription {
      */
     public JDiffClassDescription(String pkg, String className) {
         this(pkg, className, new ResultObserver() {
-            public void notifyFailure(SignatureTestActivity.FAILURE_TYPE type,
+            public void notifyFailure(FAILURE_TYPE type,
                     String name,
                     String errorMessage) {
                 // This is a null result observer that doesn't do anything.
@@ -498,7 +500,7 @@ public class JDiffClassDescription {
 
                 Method m = findMatchingMethod(method);
                 if (m == null) {
-                    mResultObserver.notifyFailure(SignatureTestActivity.FAILURE_TYPE.MISSING_METHOD,
+                    mResultObserver.notifyFailure(FAILURE_TYPE.MISSING_METHOD,
                             method.toReadableString(mAbsoluteClassName),
                             "No method with correct signature found:" +
                             method.toSignatureString());
@@ -519,7 +521,7 @@ public class JDiffClassDescription {
                     }
 
                     if (!areMethodModifiedCompatibile(method, m)) {
-                        mResultObserver.notifyFailure(SignatureTestActivity.FAILURE_TYPE.MISMATCH_METHOD,
+                        mResultObserver.notifyFailure(FAILURE_TYPE.MISMATCH_METHOD,
                                 method.toReadableString(mAbsoluteClassName),
                                 "Non-compatible method found when looking for " +
                                 method.toSignatureString());
@@ -527,7 +529,7 @@ public class JDiffClassDescription {
                 }
             } catch (Exception e) {
                 SignatureTestLog.e("Got exception when checking method compliance", e);
-                mResultObserver.notifyFailure(SignatureTestActivity.FAILURE_TYPE.CAUGHT_EXCEPTION,
+                mResultObserver.notifyFailure(FAILURE_TYPE.CAUGHT_EXCEPTION,
                         method.toReadableString(mAbsoluteClassName),
                 "Exception!");
             }
@@ -635,7 +637,7 @@ public class JDiffClassDescription {
             try {
                 Constructor<?> c = findMatchingConstructor(con);
                 if (c == null) {
-                    mResultObserver.notifyFailure(SignatureTestActivity.FAILURE_TYPE.MISSING_METHOD,
+                    mResultObserver.notifyFailure(FAILURE_TYPE.MISSING_METHOD,
                             con.toReadableString(mAbsoluteClassName),
                             "No method with correct signature found:" +
                             con.toSignatureString());
@@ -645,7 +647,7 @@ public class JDiffClassDescription {
                     }
                     if (c.getModifiers() != con.mModifier) {
                         mResultObserver.notifyFailure(
-                                SignatureTestActivity.FAILURE_TYPE.MISMATCH_METHOD,
+                                FAILURE_TYPE.MISMATCH_METHOD,
                                 con.toReadableString(mAbsoluteClassName),
                                 "Non-compatible method found when looking for " +
                                 con.toSignatureString());
@@ -653,7 +655,7 @@ public class JDiffClassDescription {
                 }
             } catch (Exception e) {
                 SignatureTestLog.e("Got exception when checking constructor compliance", e);
-                mResultObserver.notifyFailure(SignatureTestActivity.FAILURE_TYPE.CAUGHT_EXCEPTION,
+                mResultObserver.notifyFailure(FAILURE_TYPE.CAUGHT_EXCEPTION,
                         con.toReadableString(mAbsoluteClassName),
                 "Exception!");
             }
@@ -714,12 +716,12 @@ public class JDiffClassDescription {
             try {
                 Field f = findMatchingField(field);
                 if (f == null) {
-                    mResultObserver.notifyFailure(SignatureTestActivity.FAILURE_TYPE.MISSING_FIELD,
+                    mResultObserver.notifyFailure(FAILURE_TYPE.MISSING_FIELD,
                             field.toReadableString(mAbsoluteClassName),
                             "No field with correct signature found:" +
                             field.toSignatureString());
                 } else if (f.getModifiers() != field.mModifier) {
-                    mResultObserver.notifyFailure(SignatureTestActivity.FAILURE_TYPE.MISMATCH_FIELD,
+                    mResultObserver.notifyFailure(FAILURE_TYPE.MISMATCH_FIELD,
                             field.toReadableString(mAbsoluteClassName),
                             "Non-compatible field modifiers found when looking for " +
                             field.toSignatureString());
@@ -733,7 +735,7 @@ public class JDiffClassDescription {
                     }
                     if (genericTypeName == null || !genericTypeName.equals(field.mFieldType)) {
                         mResultObserver.notifyFailure(
-                                SignatureTestActivity.FAILURE_TYPE.MISMATCH_FIELD,
+                                FAILURE_TYPE.MISMATCH_FIELD,
                                 field.toReadableString(mAbsoluteClassName),
                                 "Non-compatible field type found when looking for " +
                                 field.toSignatureString());
@@ -742,7 +744,7 @@ public class JDiffClassDescription {
 
             } catch (Exception e) {
                 SignatureTestLog.e("Got exception when checking field compliance", e);
-                mResultObserver.notifyFailure(SignatureTestActivity.FAILURE_TYPE.CAUGHT_EXCEPTION,
+                mResultObserver.notifyFailure(FAILURE_TYPE.CAUGHT_EXCEPTION,
                         field.toReadableString(mAbsoluteClassName),
                 "Exception!");
             }
@@ -878,11 +880,11 @@ public class JDiffClassDescription {
             if (mClass == null) {
                 // No class found, notify the observer according to the class type
                 if (JDiffType.INTERFACE.equals(mClassType)) {
-                    mResultObserver.notifyFailure(SignatureTestActivity.FAILURE_TYPE.MISSING_INTERFACE,
+                    mResultObserver.notifyFailure(FAILURE_TYPE.MISSING_INTERFACE,
                             mAbsoluteClassName,
                             "Classloader is unable to find " + mAbsoluteClassName);
                 } else {
-                    mResultObserver.notifyFailure(SignatureTestActivity.FAILURE_TYPE.MISSING_CLASS,
+                    mResultObserver.notifyFailure(FAILURE_TYPE.MISSING_CLASS,
                             mAbsoluteClassName,
                             "Classloader is unable to find " + mAbsoluteClassName);
                 }
@@ -919,7 +921,7 @@ public class JDiffClassDescription {
             }
         } catch (Exception e) {
             SignatureTestLog.e("Got exception when checking field compliance", e);
-            mResultObserver.notifyFailure(SignatureTestActivity.FAILURE_TYPE.CAUGHT_EXCEPTION,
+            mResultObserver.notifyFailure(FAILURE_TYPE.CAUGHT_EXCEPTION,
                     mAbsoluteClassName,
             "Exception!");
         }
@@ -972,11 +974,11 @@ public class JDiffClassDescription {
 
     private void logMismatchInterfaceSignature(String classFullName, String errorMessage) {
         if (JDiffType.INTERFACE.equals(mClassType)) {
-            mResultObserver.notifyFailure(SignatureTestActivity.FAILURE_TYPE.MISMATCH_INTERFACE,
+            mResultObserver.notifyFailure(FAILURE_TYPE.MISMATCH_INTERFACE,
                     classFullName,
                     errorMessage);
         } else {
-            mResultObserver.notifyFailure(SignatureTestActivity.FAILURE_TYPE.MISMATCH_CLASS,
+            mResultObserver.notifyFailure(FAILURE_TYPE.MISMATCH_CLASS,
                     classFullName,
                     errorMessage);
         }
