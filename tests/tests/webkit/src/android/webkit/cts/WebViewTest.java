@@ -79,7 +79,9 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.Date;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.Callable;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.FutureTask;
 import java.util.concurrent.TimeUnit;
 import java.util.HashMap;
@@ -649,6 +651,42 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
                 "resultObject.setResult(removedObject.toString());\"></body></html>",
                 "text/html", null);
         assertEquals("removedObject", resultObject.getResult());
+    }
+
+    public void testAddJavascriptInterfaceExceptions() throws Exception {
+        WebSettings settings = mOnUiThread.getSettings();
+        settings.setJavaScriptEnabled(true);
+        settings.setJavaScriptCanOpenWindowsAutomatically(true);
+
+        final AtomicBoolean mJsInterfaceWasCalled = new AtomicBoolean(false) {
+            @JavascriptInterface
+            public synchronized void call() {
+                set(true);
+                // The main purpose of this test is to ensure an exception here does not
+                // crash the implementation.
+                throw new RuntimeException("Javascript Interface exception");
+            }
+        };
+
+        mOnUiThread.addJavascriptInterface(mJsInterfaceWasCalled, "dummy");
+
+        mOnUiThread.loadUrlAndWaitForCompletion("about:blank");
+
+        assertFalse(mJsInterfaceWasCalled.get());
+
+        final CountDownLatch resultLatch = new CountDownLatch(1);
+        mOnUiThread.evaluateJavascript(
+                "try {dummy.call(); 'fail'; } catch (exception) { 'pass'; } ",
+                new ValueCallback<String>() {
+                        @Override
+                        public void onReceiveValue(String result) {
+                            assertEquals("\"pass\"", result);
+                            resultLatch.countDown();
+                        }
+                    });
+
+        resultLatch.await();
+        assertTrue(mJsInterfaceWasCalled.get());
     }
 
     public void testCapturePicture() throws Exception, Throwable {
