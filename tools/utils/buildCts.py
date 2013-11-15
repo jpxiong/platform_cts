@@ -173,7 +173,7 @@ def GenerateSignatureCheckDescription(test_repository):
   package.AddAttribute('appNameSpace', 'android.tests.sigtest')
   package.AddAttribute('signatureCheck', 'true')
   package.AddAttribute('runner', '.InstrumentationRunner')
-  package.AddTest('android.tests.sigtest.SignatureTest.signatureTest')
+  package.AddTest('android.tests.sigtest.SignatureTest.testSignature')
   description = open(os.path.join(test_repository, 'SignatureTest.xml'), 'w')
   package.WriteDescription(description)
   description.close()
