@@ -55,7 +55,7 @@ class TestPackageDef implements ITestPackageDef {
     public static final String UIAUTOMATOR_TEST = "uiAutomator";
 
     private static final String SIGNATURE_TEST_METHOD = "testSignature";
-    private static final String SIGNATURE_TEST_CLASS = "android.tests.sigtest.SimpleSignatureTest";
+    private static final String SIGNATURE_TEST_CLASS = "android.tests.sigtest.SignatureTest";
 
     private String mUri = null;
     private String mAppNameSpace = null;

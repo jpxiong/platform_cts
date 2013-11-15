@@ -19,7 +19,7 @@ package android.tests.sigtest.tests;
 import android.test.InstrumentationTestCase;
 import android.tests.sigtest.JDiffClassDescription;
 import android.tests.sigtest.ResultObserver;
-import android.tests.sigtest.SignatureTestActivity;
+import android.tests.sigtest.SignatureTest.FAILURE_TYPE;
 
 import java.lang.reflect.Modifier;
 
@@ -28,20 +28,20 @@ import java.lang.reflect.Modifier;
  */
 public class JDiffClassDescriptionTest extends InstrumentationTestCase {
     private class NoFailures implements ResultObserver {
-        public void notifyFailure(SignatureTestActivity.FAILURE_TYPE type, String name, String errmsg) {
+        public void notifyFailure(FAILURE_TYPE type, String name, String errmsg) {
             JDiffClassDescriptionTest.this.fail("Saw unexpected test failure: " + name + " failure type: " + type);
         }
     }
 
     private class ExpectFailure implements ResultObserver {
-        private SignatureTestActivity.FAILURE_TYPE expectedType;
+        private FAILURE_TYPE expectedType;
         private boolean failureSeen;
 
-        public ExpectFailure(SignatureTestActivity.FAILURE_TYPE expectedType) {
+        public ExpectFailure(FAILURE_TYPE expectedType) {
             this.expectedType = expectedType;
         }
 
-        public void notifyFailure(SignatureTestActivity.FAILURE_TYPE type, String name, String errMsg) {
+        public void notifyFailure(FAILURE_TYPE type, String name, String errMsg) {
             if (type == expectedType) {
                 if (failureSeen) {
                     JDiffClassDescriptionTest.this.fail("Saw second test failure: " + name + " failure type: " + type);
@@ -88,7 +88,7 @@ public class JDiffClassDescriptionTest extends InstrumentationTestCase {
     }
 
     public void testMissingClass() {
-        ExpectFailure observer = new ExpectFailure(SignatureTestActivity.FAILURE_TYPE.MISSING_CLASS);
+        ExpectFailure observer = new ExpectFailure(FAILURE_TYPE.MISSING_CLASS);
         JDiffClassDescription clz = new JDiffClassDescription("android.tests.sigtest.tests.data",
                 "NoSuchClass",
                 observer);
@@ -280,7 +280,7 @@ public class JDiffClassDescriptionTest extends InstrumentationTestCase {
     /** Test the case where the API declares the method not
      *  synchronized, but it actually is. */
     public void testAddingSync() {
-        ExpectFailure observer = new ExpectFailure(SignatureTestActivity.FAILURE_TYPE.MISMATCH_METHOD);      
+        ExpectFailure observer = new ExpectFailure(FAILURE_TYPE.MISMATCH_METHOD);
         JDiffClassDescription clz = createNormalClass(observer);
         JDiffClassDescription.JDiffMethod method = new JDiffClassDescription.JDiffMethod("syncMethod", Modifier.PUBLIC, "void");
         clz.addMethod(method);
@@ -333,7 +333,7 @@ public class JDiffClassDescriptionTest extends InstrumentationTestCase {
      * http://b/1839622
      */
     public void testAddingAbstractToAClass() {
-        ExpectFailure observer = new ExpectFailure(SignatureTestActivity.FAILURE_TYPE.MISMATCH_CLASS);
+        ExpectFailure observer = new ExpectFailure(FAILURE_TYPE.MISMATCH_CLASS);
         JDiffClassDescription clz = new JDiffClassDescription("android.tests.sigtest.tests.data",
                 "AbstractClass", 
                 observer);
@@ -380,7 +380,7 @@ public class JDiffClassDescriptionTest extends InstrumentationTestCase {
      * http://b/1839589
      */  
     public void testAddingFinalToAMethodInANonFinalClass() {
-        ExpectFailure observer = new ExpectFailure(SignatureTestActivity.FAILURE_TYPE.MISMATCH_METHOD);
+        ExpectFailure observer = new ExpectFailure(FAILURE_TYPE.MISMATCH_METHOD);
         JDiffClassDescription clz = new JDiffClassDescription("android.tests.sigtest.tests.data", 
                 "NormalClass", 
                 observer);

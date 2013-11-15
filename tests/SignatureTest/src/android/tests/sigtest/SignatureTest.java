@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2008 The Android Open Source Project
+ * Copyright (C) 2011 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,8 @@
 
 package android.tests.sigtest;
 
+import android.content.res.Resources;
+import android.test.AndroidTestCase;
 import android.tests.sigtest.JDiffClassDescription.JDiffConstructor;
 import android.tests.sigtest.JDiffClassDescription.JDiffField;
 import android.tests.sigtest.JDiffClassDescription.JDiffMethod;
@@ -24,15 +26,17 @@ import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
 
 import java.io.IOException;
+import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 
 /**
- * Entry class for signature test.
+ * Performs the signature check via a JUnit test.
  */
-public class SignatureTest {
+public class SignatureTest extends AndroidTestCase {
+
     private static final String TAG_ROOT = "api";
     private static final String TAG_PACKAGE = "package";
     private static final String TAG_CLASS = "class";
@@ -64,22 +68,70 @@ public class SignatureTest {
     private static ArrayList<String> mDebugArray = new ArrayList<String>();
 
     private HashSet<String> mKeyTagSet;
+    private TestResultObserver mResultObserver;
 
-    private ArrayList<ResultObserver> mReportObserverList;
+    /**
+     * Define the type of the signature check failures.
+     */
+    public static enum FAILURE_TYPE {
+        MISSING_CLASS,
+        MISSING_INTERFACE,
+        MISSING_METHOD,
+        MISSING_FIELD,
+        MISMATCH_CLASS,
+        MISMATCH_INTERFACE,
+        MISMATCH_METHOD,
+        MISMATCH_FIELD,
+        CAUGHT_EXCEPTION,
+    }
 
-    private ResultObserver resultObserver;
+    private class TestResultObserver implements ResultObserver {
+        boolean mDidFail = false;
+        StringBuilder mErrorString = new StringBuilder();
 
-    public SignatureTest(ResultObserver resultObserver) {
-        this.resultObserver = resultObserver;
-        mReportObserverList = new ArrayList<ResultObserver>();
+        public void notifyFailure(FAILURE_TYPE type, String name, String errorMessage) {
+            mDidFail = true;
+            mErrorString.append("\n");
+            mErrorString.append(type.toString().toLowerCase());
+            mErrorString.append(":\t");
+            mErrorString.append(name);
+        }
+    }
+
+    @Override
+    protected void setUp() throws Exception {
+        super.setUp();
         mKeyTagSet = new HashSet<String>();
         mKeyTagSet.addAll(Arrays.asList(new String[] {
                 TAG_PACKAGE, TAG_CLASS, TAG_INTERFACE, TAG_IMPLEMENTS, TAG_CONSTRUCTOR,
                 TAG_METHOD, TAG_PARAM, TAG_EXCEPTION, TAG_FIELD }));
+        mResultObserver = new TestResultObserver();
     }
 
-    public static final void beginDocument(XmlPullParser parser, String firstElementName) throws XmlPullParserException, IOException
-    {
+    /**
+     * Tests that the device's API matches the expected set defined in xml.
+     * <p/>
+     * Will check the entire API, and then report the complete list of failures
+     */
+    public void testSignature() {
+        Resources r = getContext().getResources();
+        Class rClass = R.xml.class;
+        Field[] fs = rClass.getFields();
+        for (Field f : fs) {
+            try {
+                start(r.getXml(f.getInt(rClass)));
+            } catch (Exception e) {
+                mResultObserver.notifyFailure(FAILURE_TYPE.CAUGHT_EXCEPTION, e.getMessage(),
+                        e.getMessage());
+            }
+        }
+        if (mResultObserver.mDidFail) {
+            fail(mResultObserver.mErrorString.toString());
+        }
+    }
+
+    private  void beginDocument(XmlPullParser parser, String firstElementName)
+            throws XmlPullParserException, IOException {
         int type;
         while ((type=parser.next()) != XmlPullParser.START_TAG
                    && type != XmlPullParser.END_DOCUMENT) { }
@@ -97,12 +149,12 @@ public class SignatureTest {
     /**
      * Signature test entry point.
      */
-    public void start(XmlPullParser parser) throws XmlPullParserException, IOException {
+    private void start(XmlPullParser parser) throws XmlPullParserException, IOException {
         JDiffClassDescription currentClass = null;
         String currentPackage = "";
         JDiffMethod currentMethod = null;
 
-        SignatureTest.beginDocument(parser, TAG_ROOT);
+        beginDocument(parser, TAG_ROOT);
         int type;
         while (true) {
             type = XmlPullParser.START_DOCUMENT;
@@ -158,22 +210,6 @@ public class SignatureTest {
                         "unknow tag exception:" + tagname);
             }
         }
-    }
-
-    public static void log(final String msg) {
-        mDebugArray.add(msg);
-    }
-
-    public void addReportObserver(ResultObserver observer) {
-        mReportObserverList.add(observer);
-    }
-
-    public void removeReportObserver(ResultObserver observer) {
-        mReportObserverList.remove(observer);
-    }
-
-    public void clearReportObserverList() {
-        mReportObserverList.clear();
     }
 
     /**
@@ -232,7 +268,7 @@ public class SignatureTest {
         String className = parser.getAttributeValue(null, ATTRIBUTE_NAME);
         JDiffClassDescription currentClass = new JDiffClassDescription(pkg,
                                                                        className,
-                                                                       resultObserver);
+                                                                       mResultObserver);
         currentClass.setModifier(jdiffModifierToReflectionFormat(className, parser));
         currentClass.setType(isInterface ? JDiffClassDescription.JDiffType.INTERFACE :
                              JDiffClassDescription.JDiffType.CLASS);
