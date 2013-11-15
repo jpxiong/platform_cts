@@ -2857,9 +2857,9 @@ public class ViewTest extends ActivityInstrumentationTestCase2<ViewTestStubActiv
         final int paddingRight = view.getPaddingRight();
         final int paddingTop = view.getPaddingTop();
         final int paddingBottom = view.getPaddingBottom();
-        assertEquals(24, paddingLeft);
+        assertEquals(8, paddingLeft);
         assertEquals(0, paddingTop);
-        assertEquals(24, paddingRight);
+        assertEquals(8, paddingRight);
         assertEquals(0, paddingBottom);
 
         // Manipulate background and padding
@@ -2868,9 +2868,9 @@ public class ViewTest extends ActivityInstrumentationTestCase2<ViewTestStubActiv
         view.setBackground(background);
         view.setPadding(paddingLeft, paddingTop, paddingRight, paddingBottom);
 
-        assertEquals(24, view.getPaddingLeft());
+        assertEquals(8, view.getPaddingLeft());
         assertEquals(0, view.getPaddingTop());
-        assertEquals(24, view.getPaddingRight());
+        assertEquals(8, view.getPaddingRight());
         assertEquals(0, view.getPaddingBottom());
     }
 
