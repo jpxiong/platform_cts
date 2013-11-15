@@ -8,10 +8,6 @@
   bug: 8148617
 },
 {
-  name: "android.tests.sigtest.SimpleSignatureTest#testSignature",
-  bug: 11436500
-},
-{
   name: "android.nativeopengl.EGLCleanupTest#TestCorrect",
   name: "android.nativeopengl.EGLCreateContextTest#BadAttributeFails",
   bug: 11652564
