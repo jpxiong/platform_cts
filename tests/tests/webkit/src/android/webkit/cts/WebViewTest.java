@@ -142,7 +142,7 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
     protected void tearDown() throws Exception {
         mOnUiThread.cleanUp();
         if (mWebServer != null) {
-            mWebServer.shutdown();
+            stopWebServer();
         }
         if (mIconDb != null) {
             mIconDb.removeAllIcons();
@@ -1781,6 +1781,35 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
         assertEquals("Second page", mOnUiThread.getTitle());
     }
 
+    public void testSecureServerRequestingClientCertDoesNotCancelRequest() throws Throwable {
+        mWebServer = new CtsTestServer(getActivity(), CtsTestServer.SslMode.WANTS_CLIENT_AUTH);
+        final String url = mWebServer.getAssetUrl(TestHtmlConstants.HELLO_WORLD_URL);
+        final SslErrorWebViewClient webViewClient = new SslErrorWebViewClient();
+        mOnUiThread.setWebViewClient(webViewClient);
+        mOnUiThread.clearSslPreferences();
+        mOnUiThread.loadUrlAndWaitForCompletion(url);
+        // Page loaded OK...
+        assertTrue(webViewClient.wasOnReceivedSslErrorCalled());
+        assertEquals(TestHtmlConstants.HELLO_WORLD_TITLE, mOnUiThread.getTitle());
+        assertEquals(0, webViewClient.onReceivedErrorCode());
+    }
+
+    public void testSecureServerRequiringClientCertDoesCancelRequest() throws Throwable {
+        mWebServer = new CtsTestServer(getActivity(), CtsTestServer.SslMode.NEEDS_CLIENT_AUTH);
+        final String url = mWebServer.getAssetUrl(TestHtmlConstants.HELLO_WORLD_URL);
+        final SslErrorWebViewClient webViewClient = new SslErrorWebViewClient();
+        mOnUiThread.setWebViewClient(webViewClient);
+        mOnUiThread.clearSslPreferences();
+        mOnUiThread.loadUrlAndWaitForCompletion(url);
+        // Page NOT loaded OK...
+        // In this case, we must NOT have received the onReceivedSslError callback as that is for
+        // recoverable (e.g. server auth) errors, whereas failing mandatory client auth is non-
+        // recoverable and should drop straight through to a load error.
+        assertFalse(webViewClient.wasOnReceivedSslErrorCalled());
+        assertFalse(TestHtmlConstants.HELLO_WORLD_TITLE.equals(mOnUiThread.getTitle()));
+        assertEquals(WebViewClient.ERROR_FAILED_SSL_HANDSHAKE, webViewClient.onReceivedErrorCode());
+    }
+
     public void testRequestChildRectangleOnScreen() throws Throwable {
         DisplayMetrics metrics = mOnUiThread.getDisplayMetrics();
         final int dimension = 2 * Math.max(metrics.widthPixels, metrics.heightPixels);
@@ -2277,6 +2306,7 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
     final class SslErrorWebViewClient extends WaitForLoadedClient {
         private boolean mWasOnReceivedSslErrorCalled;
         private String mErrorUrl;
+        private int mErrorCode;
 
         public SslErrorWebViewClient() {
             super(mOnUiThread);
@@ -2287,6 +2317,11 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
             mErrorUrl = error.getUrl();
             handler.proceed();
         }
+        @Override
+        public void onReceivedError(WebView view, int errorCode, String description,
+                String failingUrl) {
+            mErrorCode = errorCode;
+        }
         public void resetWasOnReceivedSslErrorCalled() {
             mWasOnReceivedSslErrorCalled = false;
         }
@@ -2295,6 +2330,9 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
         }
         public String errorUrl() {
             return mErrorUrl;
+        }
+        public int onReceivedErrorCode() {
+            return mErrorCode;
         }
     }
 
