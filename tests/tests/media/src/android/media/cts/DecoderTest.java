@@ -652,21 +652,21 @@ public class DecoderTest extends MediaPlayerTestBase {
 //    }
 
     public void testCodecResetsMp3() throws Exception {
-        testCodecReconfig(R.raw.sinesweepmp3lame, null);
+        testCodecReconfig(R.raw.sinesweepmp3lame);
         // NOTE: replacing testCodecReconfig call soon
 //        testCodecResets(R.raw.sinesweepmp3lame, null);
     }
 
     public void testCodecResetsM4a() throws Exception {
-        testCodecReconfig(R.raw.sinesweepm4a, null);
+        testCodecReconfig(R.raw.sinesweepm4a);
         // NOTE: replacing testCodecReconfig call soon
 //        testCodecResets(R.raw.sinesweepm4a, null);
     }
 
-    private void testCodecReconfig(int video, Surface s) throws Exception {
-        int frames1 = countFrames(video, RESET_MODE_NONE, -1 /* eosframe */, s);
-        int frames2 = countFrames(video, RESET_MODE_RECONFIGURE, -1 /* eosframe */, s);
-        assertEquals("different number of frames when using reconfigured codec", frames1, frames2);
+    private void testCodecReconfig(int audio) throws Exception {
+        int size1 = countSize(audio, RESET_MODE_NONE, -1 /* eosframe */);
+        int size2 = countSize(audio, RESET_MODE_RECONFIGURE, -1 /* eosframe */);
+        assertEquals("different output size when using reconfigured codec", size1, size2);
     }
 
     private void testCodecResets(int video, Surface s) throws Exception {
@@ -677,7 +677,7 @@ public class DecoderTest extends MediaPlayerTestBase {
         assertEquals("different number of frames when using flushed codec", frames1, frames3);
     }
 
-    private MediaCodec createDecoder(String mime) {
+    private static MediaCodec createDecoder(String mime) {
         if (false) {
             // change to force testing software codecs
             if (mime.contains("avc")) {
@@ -695,37 +695,124 @@ public class DecoderTest extends MediaPlayerTestBase {
         return MediaCodec.createDecoderByType(mime);
     }
 
+    // for video
     private int countFrames(int video, int resetMode, int eosframe, Surface s)
             throws Exception {
-        int numframes = 0;
-
         AssetFileDescriptor testFd = mResources.openRawResourceFd(video);
+        MediaExtractor extractor = new MediaExtractor();
+        extractor.setDataSource(testFd.getFileDescriptor(), testFd.getStartOffset(),
+                testFd.getLength());
+        extractor.selectTrack(0);
 
-        MediaExtractor extractor;
-        MediaCodec codec = null;
+        int numframes = decodeWithChecks(extractor, CHECKFLAG_RETURN_OUTPUTFRAMES
+                | CHECKFLAG_COMPAREINPUTOUTPUTPTSMATCH, resetMode, s,
+                eosframe, null, null);
+
+        extractor.release();
+        testFd.close();
+        return numframes;
+    }
+
+    // for audio
+    private int countSize(int audio, int resetMode, int eosframe)
+            throws Exception {
+        AssetFileDescriptor testFd = mResources.openRawResourceFd(audio);
+        MediaExtractor extractor = new MediaExtractor();
+        extractor.setDataSource(testFd.getFileDescriptor(), testFd.getStartOffset(),
+                testFd.getLength());
+        extractor.selectTrack(0);
+
+        // fails CHECKFLAG_COMPAREINPUTOUTPUTPTSMATCH
+        int outputSize = decodeWithChecks(extractor, CHECKFLAG_RETURN_OUTPUTSIZE, resetMode, null,
+                eosframe, null, null);
+
+        extractor.release();
+        testFd.close();
+        return outputSize;
+    }
+
+    private void testEOSBehavior(int movie, int stopatsample) throws Exception {
+        testEOSBehavior(movie, new int[] {stopatsample});
+    }
+
+    private void testEOSBehavior(int movie, int[] stopAtSample) throws Exception {
+        Surface s = null;
+        AssetFileDescriptor testFd = mResources.openRawResourceFd(movie);
+        MediaExtractor extractor = new MediaExtractor();
+        extractor.setDataSource(testFd.getFileDescriptor(), testFd.getStartOffset(),
+                testFd.getLength());
+        extractor.selectTrack(0); // consider variable looping on track
+        List<Long> outputChecksums = new ArrayList<Long>();
+        List<Long> outputTimestamps = new ArrayList<Long>();
+        Arrays.sort(stopAtSample);
+        int last = stopAtSample.length - 1;
+
+        // decode reference (longest sequence to stop at + 100) and
+        // store checksums/pts in outputChecksums and outputTimestamps
+        // (will fail CHECKFLAG_COMPAREINPUTOUTPUTSAMPLEMATCH)
+        decodeWithChecks(extractor,
+                CHECKFLAG_SETCHECKSUM | CHECKFLAG_SETPTS | CHECKFLAG_COMPAREINPUTOUTPUTPTSMATCH,
+                RESET_MODE_NONE, s,
+                stopAtSample[last] + 100, outputChecksums, outputTimestamps);
+
+        // decode stopAtSample requests in reverse order (longest to
+        // shortest) and compare to reference checksums/pts in
+        // outputChecksums and outputTimestamps
+        for (int i = last; i >= 0; --i) {
+            if (true) { // reposition extractor
+                extractor.seekTo(0, MediaExtractor.SEEK_TO_NEXT_SYNC);
+            } else { // create new extractor
+                extractor.release();
+                extractor = new MediaExtractor();
+                extractor.setDataSource(testFd.getFileDescriptor(),
+                        testFd.getStartOffset(), testFd.getLength());
+                extractor.selectTrack(0); // consider variable looping on track
+            }
+            decodeWithChecks(extractor,
+                    CHECKFLAG_COMPARECHECKSUM | CHECKFLAG_COMPAREPTS
+                    | CHECKFLAG_COMPAREINPUTOUTPUTSAMPLEMATCH
+                    | CHECKFLAG_COMPAREINPUTOUTPUTPTSMATCH,
+                    RESET_MODE_NONE, s,
+                    stopAtSample[i], outputChecksums, outputTimestamps);
+        }
+        extractor.release();
+        testFd.close();
+    }
+
+    private static final int CHECKFLAG_SETCHECKSUM = 1 << 0;
+    private static final int CHECKFLAG_COMPARECHECKSUM = 1 << 1;
+    private static final int CHECKFLAG_SETPTS = 1 << 2;
+    private static final int CHECKFLAG_COMPAREPTS = 1 << 3;
+    private static final int CHECKFLAG_COMPAREINPUTOUTPUTSAMPLEMATCH = 1 << 4;
+    private static final int CHECKFLAG_COMPAREINPUTOUTPUTPTSMATCH = 1 << 5;
+    private static final int CHECKFLAG_RETURN_OUTPUTFRAMES = 1 << 6;
+    private static final int CHECKFLAG_RETURN_OUTPUTSIZE = 1 << 7;
+
+    /**
+     * Decodes frames with parameterized checks and return values.
+     * The integer return can be selected through the checkFlags variable.
+     */
+    private static int decodeWithChecks(MediaExtractor extractor, int checkFlags, int resetMode,
+            Surface surface, int stopAtSample,
+            List<Long> outputChecksums, List<Long> outputTimestamps)
+            throws Exception {
+        int trackIndex = extractor.getSampleTrackIndex();
+        MediaFormat format = extractor.getTrackFormat(trackIndex);
+        String mime = format.getString(MediaFormat.KEY_MIME);
+        boolean isAudio = mime.startsWith("audio/");
         ByteBuffer[] codecInputBuffers;
         ByteBuffer[] codecOutputBuffers;
 
-        extractor = new MediaExtractor();
-        extractor.setDataSource(testFd.getFileDescriptor(), testFd.getStartOffset(),
-                testFd.getLength());
-
-        MediaFormat format = extractor.getTrackFormat(0);
-        String mime = format.getString(MediaFormat.KEY_MIME);
-        boolean isAudio = mime.startsWith("audio/");
-
-        codec = createDecoder(mime);
-
-        assertNotNull("couldn't find codec", codec);
+        MediaCodec codec = createDecoder(mime);
         Log.i("@@@@", "using codec: " + codec.getName());
-        codec.configure(format, s /* surface */, null /* crypto */, 0 /* flags */);
+        codec.configure(format, surface, null /* crypto */, 0 /* flags */);
         codec.start();
         codecInputBuffers = codec.getInputBuffers();
         codecOutputBuffers = codec.getOutputBuffers();
 
         if (resetMode == RESET_MODE_RECONFIGURE) {
             codec.stop();
-            codec.configure(format, s /* surface */, null /* crypto */, 0 /* flags */);
+            codec.configure(format, surface, null /* crypto */, 0 /* flags */);
             codec.start();
             codecInputBuffers = codec.getInputBuffers();
             codecOutputBuffers = codec.getOutputBuffers();
@@ -733,19 +820,28 @@ public class DecoderTest extends MediaPlayerTestBase {
             codec.flush();
         }
 
-        Log.i("@@@@", "format: " + format);
-
-        extractor.selectTrack(0);
-
-        // start decoding
-        final long kTimeOutUs = 5000;
+        // start decode loop
         MediaCodec.BufferInfo info = new MediaCodec.BufferInfo();
+
+        final long kTimeOutUs = 5000; // 5ms timeout
         boolean sawInputEOS = false;
         boolean sawOutputEOS = false;
         int deadDecoderCounter = 0;
-        int samplecounter = 0;
+        int samplenum = 0;
+        int numframes = 0;
+        int outputSize = 0;
+        int width = 0;
+        int height = 0;
+        boolean dochecksum = false;
         ArrayList<Long> timestamps = new ArrayList<Long>();
+        if ((checkFlags & CHECKFLAG_SETPTS) != 0) {
+            outputTimestamps.clear();
+        }
+        if ((checkFlags & CHECKFLAG_SETCHECKSUM) != 0) {
+            outputChecksums.clear();
+        }
         while (!sawOutputEOS && deadDecoderCounter < 100) {
+            // handle input
             if (!sawInputEOS) {
                 int inputBufIndex = codec.dequeueInputBuffer(kTimeOutUs);
 
@@ -753,418 +849,285 @@ public class DecoderTest extends MediaPlayerTestBase {
                     ByteBuffer dstBuf = codecInputBuffers[inputBufIndex];
 
                     int sampleSize =
-                        extractor.readSampleData(dstBuf, 0 /* offset */);
-
-                    long presentationTimeUs = 0;
+                            extractor.readSampleData(dstBuf, 0 /* offset */);
+                    long presentationTimeUs = extractor.getSampleTime();
+                    boolean advanceDone = extractor.advance();
+                    // int flags = extractor.getSampleFlags();
+                    // Log.i("@@@@", "read sample " + samplenum + ":" +
+                    // extractor.getSampleFlags()
+                    // + " @ " + extractor.getSampleTime() + " size " +
+                    // sampleSize);
+                    assertEquals("extractor.advance() should match end of stream", sampleSize >= 0,
+                            advanceDone);
 
                     if (sampleSize < 0) {
                         Log.d(TAG, "saw input EOS.");
                         sawInputEOS = true;
-                        sampleSize = 0;
+                        assertEquals("extractor.readSampleData() must return -1 at end of stream",
+                                -1, sampleSize);
+                        assertEquals("extractor.getSampleTime() must return -1 at end of stream",
+                                -1, presentationTimeUs);
+                        sampleSize = 0; // required otherwise queueInputBuffer
+                                        // returns invalid.
                     } else {
-                        presentationTimeUs = extractor.getSampleTime();
-                        samplecounter++;
-                        if (samplecounter == eosframe) {
-                            sawInputEOS = true;
+                        timestamps.add(presentationTimeUs);
+                        samplenum++; // increment before comparing with stopAtSample
+                        if (samplenum == stopAtSample) {
+                            Log.d(TAG, "saw input EOS (stop at sample).");
+                            sawInputEOS = true; // tag this sample as EOS
                         }
                     }
-
-                    timestamps.add(presentationTimeUs);
-
-                    int flags = extractor.getSampleFlags();
-
                     codec.queueInputBuffer(
                             inputBufIndex,
                             0 /* offset */,
                             sampleSize,
                             presentationTimeUs,
                             sawInputEOS ? MediaCodec.BUFFER_FLAG_END_OF_STREAM : 0);
-
-                    if (!sawInputEOS) {
-                        extractor.advance();
-                    }
+                } else {
+                    assertEquals(
+                            "codec.dequeueInputBuffer() unrecognized return value: " + inputBufIndex,
+                            MediaCodec.INFO_TRY_AGAIN_LATER, inputBufIndex);
                 }
             }
 
-            int res = codec.dequeueOutputBuffer(info, kTimeOutUs);
+            // handle output
+            int outputBufIndex = codec.dequeueOutputBuffer(info, kTimeOutUs);
 
             deadDecoderCounter++;
-            if (res >= 0) {
-                //Log.d(TAG, "got frame, size " + info.size + "/" + info.presentationTimeUs);
-
-                // Some decoders output a 0-sized buffer at the end. Disregard those.
-                if (info.size > 0) {
+            if (outputBufIndex >= 0) {
+                if (info.size > 0) { // Disregard 0-sized buffers at the end.
                     deadDecoderCounter = 0;
                     if (resetMode != RESET_MODE_NONE) {
-                        // once we've gotten some data out of the decoder, reset and start again
+                        // once we've gotten some data out of the decoder, reset
+                        // and start again
                         if (resetMode == RESET_MODE_RECONFIGURE) {
                             codec.stop();
-                            codec.configure(format, s /* surface */, null /* crypto */,
+                            codec.configure(format, surface /* surface */, null /* crypto */,
                                     0 /* flags */);
                             codec.start();
                             codecInputBuffers = codec.getInputBuffers();
                             codecOutputBuffers = codec.getOutputBuffers();
-                        } else /* resetMode == RESET_MODE_FLUSH */ {
+                        } else if (resetMode == RESET_MODE_FLUSH) {
                             codec.flush();
+                        } else {
+                            fail("unknown resetMode: " + resetMode);
                         }
+                        // restart at beginning, clear resetMode
                         resetMode = RESET_MODE_NONE;
                         extractor.seekTo(0, MediaExtractor.SEEK_TO_NEXT_SYNC);
                         sawInputEOS = false;
                         numframes = 0;
                         timestamps.clear();
+                        if ((checkFlags & CHECKFLAG_SETPTS) != 0) {
+                            outputTimestamps.clear();
+                        }
+                        if ((checkFlags & CHECKFLAG_SETCHECKSUM) != 0) {
+                            outputChecksums.clear();
+                        }
                         continue;
                     }
-
-                    if (isAudio) {
-                        // for audio, count the number of bytes that were decoded, not the number
-                        // of access units
-                        numframes += info.size;
-                    } else {
-                        // for video, count the number of video frames and check the timestamp
-                        numframes++;
-                        assertTrue("invalid timestamp", timestamps.remove(info.presentationTimeUs));
+                    if ((checkFlags & CHECKFLAG_COMPAREPTS) != 0) {
+                        assertTrue("number of frames (" + numframes
+                                + ") exceeds number of reference timestamps",
+                                numframes < outputTimestamps.size());
+                        assertEquals("frame ts mismatch at frame " + numframes,
+                                (long) outputTimestamps.get(numframes), info.presentationTimeUs);
+                    } else if ((checkFlags & CHECKFLAG_SETPTS) != 0) {
+                        outputTimestamps.add(info.presentationTimeUs);
                     }
+                    if ((checkFlags & (CHECKFLAG_SETCHECKSUM | CHECKFLAG_COMPARECHECKSUM)) != 0) {
+                        long sum = 0;   // note: checksum is 0 if buffer format unrecognized
+                        if (dochecksum) {
+                            // TODO: add stride - right now just use info.size (as before)
+                            //sum = checksum(codecOutputBuffers[outputBufIndex], width, height,
+                            //        stride);
+                            sum = checksum(codecOutputBuffers[outputBufIndex], info.size);
+                        }
+                        if ((checkFlags & CHECKFLAG_COMPARECHECKSUM) != 0) {
+                            assertTrue("number of frames (" + numframes
+                                    + ") exceeds number of reference checksums",
+                                    numframes < outputChecksums.size());
+                            Log.d(TAG, "orig checksum: " + outputChecksums.get(numframes)
+                                    + " new checksum: " + sum);
+                            assertEquals("frame data mismatch at frame " + numframes,
+                                    (long) outputChecksums.get(numframes), sum);
+                        } else if ((checkFlags & CHECKFLAG_SETCHECKSUM) != 0) {
+                            outputChecksums.add(sum);
+                        }
+                    }
+                    if ((checkFlags & CHECKFLAG_COMPAREINPUTOUTPUTPTSMATCH) != 0) {
+                        assertTrue("output timestamp " + info.presentationTimeUs
+                                + " without corresponding input timestamp"
+                                , timestamps.remove(info.presentationTimeUs));
+                    }
+                    outputSize += info.size;
+                    numframes++;
                 }
-                int outputBufIndex = res;
+                // Log.d(TAG, "got frame, size " + info.size + "/" +
+                // info.presentationTimeUs +
+                // "/" + numframes + "/" + info.flags);
                 codec.releaseOutputBuffer(outputBufIndex, true /* render */);
-
                 if ((info.flags & MediaCodec.BUFFER_FLAG_END_OF_STREAM) != 0) {
                     Log.d(TAG, "saw output EOS.");
                     sawOutputEOS = true;
                 }
-            } else if (res == MediaCodec.INFO_OUTPUT_BUFFERS_CHANGED) {
+            } else if (outputBufIndex == MediaCodec.INFO_OUTPUT_BUFFERS_CHANGED) {
                 codecOutputBuffers = codec.getOutputBuffers();
-
                 Log.d(TAG, "output buffers have changed.");
-            } else if (res == MediaCodec.INFO_OUTPUT_FORMAT_CHANGED) {
+            } else if (outputBufIndex == MediaCodec.INFO_OUTPUT_FORMAT_CHANGED) {
                 MediaFormat oformat = codec.getOutputFormat();
-
-                Log.d(TAG, "output format has changed to " + oformat);
+                if (oformat.containsKey(MediaFormat.KEY_COLOR_FORMAT) &&
+                        oformat.containsKey(MediaFormat.KEY_WIDTH) &&
+                        oformat.containsKey(MediaFormat.KEY_HEIGHT)) {
+                    int colorFormat = oformat.getInteger(MediaFormat.KEY_COLOR_FORMAT);
+                    width = oformat.getInteger(MediaFormat.KEY_WIDTH);
+                    height = oformat.getInteger(MediaFormat.KEY_HEIGHT);
+                    dochecksum = isRecognizedFormat(colorFormat); // only checksum known raw
+                                                                  // buf formats
+                    Log.d(TAG, "checksum fmt: " + colorFormat + " dim " + width + "x" + height);
+                } else {
+                    dochecksum = false; // check with audio later
+                    width = height = 0;
+                    Log.d(TAG, "output format has changed to (unknown video) " + oformat);
+                }
             } else {
-                Log.d(TAG, "no output");
+                assertEquals(
+                        "codec.dequeueOutputBuffer() unrecognized return index: "
+                                + outputBufIndex,
+                        MediaCodec.INFO_TRY_AGAIN_LATER, outputBufIndex);
             }
         }
-
         codec.stop();
         codec.release();
-        testFd.close();
-        return numframes;
+
+        assertTrue("last frame didn't have EOS", sawOutputEOS);
+        if ((checkFlags & CHECKFLAG_COMPAREINPUTOUTPUTSAMPLEMATCH) != 0) {
+            assertEquals("I!=O", samplenum, numframes);
+            if (stopAtSample != 0) {
+                assertEquals("did not stop with right number of frames", stopAtSample, numframes);
+            }
+        }
+        return (checkFlags & CHECKFLAG_RETURN_OUTPUTSIZE) != 0 ? outputSize :
+                (checkFlags & CHECKFLAG_RETURN_OUTPUTFRAMES) != 0 ? numframes :
+                        0;
     }
 
     public void testEOSBehaviorH264() throws Exception {
         // this video has an I frame at 44
-        testEOSBehavior(R.raw.video_480x360_mp4_h264_1000kbps_25fps_aac_stereo_128kbps_44100hz, 44);
-        testEOSBehavior(R.raw.video_480x360_mp4_h264_1000kbps_25fps_aac_stereo_128kbps_44100hz, 45);
-        testEOSBehavior(R.raw.video_480x360_mp4_h264_1000kbps_25fps_aac_stereo_128kbps_44100hz, 55);
+        testEOSBehavior(R.raw.video_480x360_mp4_h264_1000kbps_25fps_aac_stereo_128kbps_44100hz,
+                new int[] {44, 45, 55});
     }
 
     public void testEOSBehaviorH263() throws Exception {
         // this video has an I frame every 12 frames.
-        testEOSBehavior(R.raw.video_176x144_3gp_h263_300kbps_12fps_aac_stereo_128kbps_22050hz, 24);
-        testEOSBehavior(R.raw.video_176x144_3gp_h263_300kbps_12fps_aac_stereo_128kbps_22050hz, 25);
-        testEOSBehavior(R.raw.video_176x144_3gp_h263_300kbps_12fps_aac_stereo_128kbps_22050hz, 48);
-        testEOSBehavior(R.raw.video_176x144_3gp_h263_300kbps_12fps_aac_stereo_128kbps_22050hz, 50);
+        testEOSBehavior(R.raw.video_176x144_3gp_h263_300kbps_12fps_aac_stereo_128kbps_22050hz,
+                new int[] {24, 25, 48, 50});
     }
 
     public void testEOSBehaviorMpeg4() throws Exception {
         // this video has an I frame every 12 frames
-        testEOSBehavior(R.raw.video_480x360_mp4_mpeg4_860kbps_25fps_aac_stereo_128kbps_44100hz, 24);
-        testEOSBehavior(R.raw.video_480x360_mp4_mpeg4_860kbps_25fps_aac_stereo_128kbps_44100hz, 25);
-        testEOSBehavior(R.raw.video_480x360_mp4_mpeg4_860kbps_25fps_aac_stereo_128kbps_44100hz, 48);
-        testEOSBehavior(R.raw.video_480x360_mp4_mpeg4_860kbps_25fps_aac_stereo_128kbps_44100hz, 50);
-        testEOSBehavior(R.raw.video_480x360_mp4_mpeg4_860kbps_25fps_aac_stereo_128kbps_44100hz, 2);
+        testEOSBehavior(R.raw.video_480x360_mp4_mpeg4_860kbps_25fps_aac_stereo_128kbps_44100hz,
+                new int[] {24, 25, 48, 50, 2});
     }
 
     public void testEOSBehaviorVP8() throws Exception {
         // this video has an I frame at 46
-        testEOSBehavior(R.raw.video_480x360_webm_vp8_333kbps_25fps_vorbis_stereo_128kbps_44100hz, 46);
-        testEOSBehavior(R.raw.video_480x360_webm_vp8_333kbps_25fps_vorbis_stereo_128kbps_44100hz, 47);
-        testEOSBehavior(R.raw.video_480x360_webm_vp8_333kbps_25fps_vorbis_stereo_128kbps_44100hz, 57);
-        testEOSBehavior(R.raw.video_480x360_webm_vp8_333kbps_25fps_vorbis_stereo_128kbps_44100hz, 45);
+        testEOSBehavior(R.raw.video_480x360_webm_vp8_333kbps_25fps_vorbis_stereo_128kbps_44100hz,
+                new int[] {46, 47, 57, 45});
     }
 
     public void testEOSBehaviorVP9() throws Exception {
         // this video has an I frame at 44
-        testEOSBehavior(R.raw.video_480x360_webm_vp9_333kbps_25fps_vorbis_stereo_128kbps_44100hz, 44);
-        testEOSBehavior(R.raw.video_480x360_webm_vp9_333kbps_25fps_vorbis_stereo_128kbps_44100hz, 45);
-        testEOSBehavior(R.raw.video_480x360_webm_vp9_333kbps_25fps_vorbis_stereo_128kbps_44100hz, 55);
-        testEOSBehavior(R.raw.video_480x360_webm_vp9_333kbps_25fps_vorbis_stereo_128kbps_44100hz, 43);
-    }
-
-    private void testEOSBehavior(int movie, int stopatsample) throws Exception {
-
-        int numframes = 0;
-
-        long [] checksums = new long[stopatsample];
-
-        AssetFileDescriptor testFd = mResources.openRawResourceFd(movie);
-
-        MediaExtractor extractor;
-        MediaCodec codec = null;
-        ByteBuffer[] codecInputBuffers;
-        ByteBuffer[] codecOutputBuffers;
-
-        extractor = new MediaExtractor();
-        extractor.setDataSource(testFd.getFileDescriptor(), testFd.getStartOffset(),
-                testFd.getLength());
-
-        MediaFormat format = extractor.getTrackFormat(0);
-        String mime = format.getString(MediaFormat.KEY_MIME);
-        boolean isAudio = mime.startsWith("audio/");
-
-        codec = createDecoder(mime);
-
-        assertNotNull("couldn't find codec", codec);
-        Log.i("@@@@", "using codec: " + codec.getName());
-        codec.configure(format, null /* surface */, null /* crypto */, 0 /* flags */);
-        codec.start();
-        codecInputBuffers = codec.getInputBuffers();
-        codecOutputBuffers = codec.getOutputBuffers();
-
-        extractor.selectTrack(0);
-
-        // start decoding
-        final long kTimeOutUs = 5000;
-        MediaCodec.BufferInfo info = new MediaCodec.BufferInfo();
-        boolean sawInputEOS = false;
-        boolean sawOutputEOS = false;
-        int deadDecoderCounter = 0;
-        int samplenum = 0;
-        boolean dochecksum = false;
-        while (!sawOutputEOS && deadDecoderCounter < 100) {
-            if (!sawInputEOS) {
-                int inputBufIndex = codec.dequeueInputBuffer(kTimeOutUs);
-
-                if (inputBufIndex >= 0) {
-                    ByteBuffer dstBuf = codecInputBuffers[inputBufIndex];
-
-                    int sampleSize =
-                        extractor.readSampleData(dstBuf, 0 /* offset */);
-//                    Log.i("@@@@", "read sample " + samplenum + ":" + extractor.getSampleFlags()
-//                            + " @ " + extractor.getSampleTime() + " size " + sampleSize);
-                    samplenum++;
-
-                    long presentationTimeUs = 0;
-
-                    if (sampleSize < 0 || samplenum >= (stopatsample + 100)) {
-                        Log.d(TAG, "saw input EOS.");
-                        sawInputEOS = true;
-                        sampleSize = 0;
-                    } else {
-                        presentationTimeUs = extractor.getSampleTime();
-                    }
-
-                    int flags = extractor.getSampleFlags();
-
-                    codec.queueInputBuffer(
-                            inputBufIndex,
-                            0 /* offset */,
-                            sampleSize,
-                            presentationTimeUs,
-                            sawInputEOS ? MediaCodec.BUFFER_FLAG_END_OF_STREAM : 0);
-
-                    if (!sawInputEOS) {
-                        extractor.advance();
-                    }
-                }
-            }
-
-            int res = codec.dequeueOutputBuffer(info, kTimeOutUs);
-
-            deadDecoderCounter++;
-            if (res >= 0) {
-
-                // Some decoders output a 0-sized buffer at the end. Disregard those.
-                if (info.size > 0) {
-                    deadDecoderCounter = 0;
-
-                    if (isAudio) {
-                        // for audio, count the number of bytes that were decoded, not the number
-                        // of access units
-                        numframes += info.size;
-                    } else {
-                        // for video, count the number of video frames
-                        long sum = dochecksum ? checksum(codecOutputBuffers[res], info.size) : 0;
-                        if (numframes < checksums.length) {
-                            checksums[numframes] = sum;
-                        }
-                        numframes++;
-                    }
-                }
-//                Log.d(TAG, "got frame, size " + info.size + "/" + info.presentationTimeUs +
-//                        "/" + numframes + "/" + info.flags);
-
-                int outputBufIndex = res;
-                codec.releaseOutputBuffer(outputBufIndex, true /* render */);
-
-                if ((info.flags & MediaCodec.BUFFER_FLAG_END_OF_STREAM) != 0) {
-                    Log.d(TAG, "saw output EOS.");
-                    sawOutputEOS = true;
-                }
-            } else if (res == MediaCodec.INFO_OUTPUT_BUFFERS_CHANGED) {
-                codecOutputBuffers = codec.getOutputBuffers();
-
-                Log.d(TAG, "output buffers have changed.");
-            } else if (res == MediaCodec.INFO_OUTPUT_FORMAT_CHANGED) {
-                MediaFormat oformat = codec.getOutputFormat();
-                int colorFormat = oformat.getInteger(MediaFormat.KEY_COLOR_FORMAT);
-                dochecksum = isRecognizedFormat(colorFormat);
-                Log.d(TAG, "output format has changed to " + oformat);
-            } else {
-                Log.d(TAG, "no output");
-            }
-        }
-
-        codec.stop();
-        codec.release();
-        extractor.release();
-
-
-        // We now have checksums for every frame.
-        // Now decode again, but signal EOS right before an index frame, and ensure the frames
-        // prior to that are the same.
-
-        extractor = new MediaExtractor();
-        extractor.setDataSource(testFd.getFileDescriptor(), testFd.getStartOffset(),
-                testFd.getLength());
-
-        codec = createDecoder(mime);
-        codec.configure(format, null /* surface */, null /* crypto */, 0 /* flags */);
-        codec.start();
-        codecInputBuffers = codec.getInputBuffers();
-        codecOutputBuffers = codec.getOutputBuffers();
-
-        extractor.selectTrack(0);
-
-        // start decoding
-        info = new MediaCodec.BufferInfo();
-        sawInputEOS = false;
-        sawOutputEOS = false;
-        deadDecoderCounter = 0;
-        samplenum = 0;
-        numframes = 0;
-        dochecksum = false;
-        while (!sawOutputEOS && deadDecoderCounter < 100) {
-            if (!sawInputEOS) {
-                int inputBufIndex = codec.dequeueInputBuffer(kTimeOutUs);
-
-                if (inputBufIndex >= 0) {
-                    ByteBuffer dstBuf = codecInputBuffers[inputBufIndex];
-
-                    int sampleSize =
-                        extractor.readSampleData(dstBuf, 0 /* offset */);
-//                    Log.i("@@@@", "read sample " + samplenum + ":" + extractor.getSampleFlags()
-//                            + " @ " + extractor.getSampleTime() + " size " + sampleSize);
-                    samplenum++;
-
-                    long presentationTimeUs = extractor.getSampleTime();
-
-                    if (sampleSize < 0 || samplenum >= stopatsample) {
-                        Log.d(TAG, "saw input EOS.");
-                        sawInputEOS = true;
-                        if (sampleSize < 0) {
-                            sampleSize = 0;
-                        }
-                    }
-
-                    int flags = extractor.getSampleFlags();
-
-                    codec.queueInputBuffer(
-                            inputBufIndex,
-                            0 /* offset */,
-                            sampleSize,
-                            presentationTimeUs,
-                            sawInputEOS ? MediaCodec.BUFFER_FLAG_END_OF_STREAM : 0);
-
-                    if (!sawInputEOS) {
-                        extractor.advance();
-                    }
-                }
-            }
-
-            int res = codec.dequeueOutputBuffer(info, kTimeOutUs);
-
-            deadDecoderCounter++;
-            if (res >= 0) {
-
-                // Some decoders output a 0-sized buffer at the end. Disregard those.
-                if (info.size > 0) {
-                    deadDecoderCounter = 0;
-
-                    if (isAudio) {
-                        // for audio, count the number of bytes that were decoded, not the number
-                        // of access units
-                        numframes += info.size;
-                    } else {
-                        // for video, count the number of video frames
-                        long sum = dochecksum ? checksum(codecOutputBuffers[res], info.size) : 0;
-                        if (numframes < checksums.length) {
-                            assertEquals("frame data mismatch at frame " + numframes,
-                                    checksums[numframes], sum);
-                        }
-                        numframes++;
-                    }
-                }
-//                Log.d(TAG, "got frame, size " + info.size + "/" + info.presentationTimeUs +
-//                        "/" + numframes + "/" + info.flags);
-
-                int outputBufIndex = res;
-                codec.releaseOutputBuffer(outputBufIndex, true /* render */);
-
-                if ((info.flags & MediaCodec.BUFFER_FLAG_END_OF_STREAM) != 0) {
-                    Log.d(TAG, "saw output EOS.");
-                    sawOutputEOS = true;
-                }
-            } else if (res == MediaCodec.INFO_OUTPUT_BUFFERS_CHANGED) {
-                codecOutputBuffers = codec.getOutputBuffers();
-
-                Log.d(TAG, "output buffers have changed.");
-            } else if (res == MediaCodec.INFO_OUTPUT_FORMAT_CHANGED) {
-                MediaFormat oformat = codec.getOutputFormat();
-                int colorFormat = oformat.getInteger(MediaFormat.KEY_COLOR_FORMAT);
-                dochecksum = isRecognizedFormat(colorFormat);
-                Log.d(TAG, "output format has changed to " + oformat);
-            } else {
-                Log.d(TAG, "no output");
-            }
-        }
-
-        codec.stop();
-        codec.release();
-        extractor.release();
-
-        assertEquals("I!=O", samplenum, numframes);
-        assertTrue("last frame didn't have EOS", sawOutputEOS);
-        assertEquals(stopatsample, numframes);
-
-        testFd.close();
+        testEOSBehavior(R.raw.video_480x360_webm_vp9_333kbps_25fps_vorbis_stereo_128kbps_44100hz,
+                new int[] {44, 45, 55, 43});
     }
 
     /* from EncodeDecodeTest */
     private static boolean isRecognizedFormat(int colorFormat) {
+        // Log.d(TAG, "color format: " + String.format("0x%08x", colorFormat));
         switch (colorFormat) {
-            // these are the formats we know how to handle for this test
+        // these are the formats we know how to handle for this test
             case MediaCodecInfo.CodecCapabilities.COLOR_FormatYUV420Planar:
             case MediaCodecInfo.CodecCapabilities.COLOR_FormatYUV420PackedPlanar:
             case MediaCodecInfo.CodecCapabilities.COLOR_FormatYUV420SemiPlanar:
             case MediaCodecInfo.CodecCapabilities.COLOR_FormatYUV420PackedSemiPlanar:
             case MediaCodecInfo.CodecCapabilities.COLOR_TI_FormatYUV420PackedSemiPlanar:
+            case MediaCodecInfo.CodecCapabilities.COLOR_QCOM_FormatYUV420SemiPlanar:
+                /*
+                 * TODO: Check newer formats or ignore.
+                 * OMX_SEC_COLOR_FormatNV12Tiled = 0x7FC00002
+                 * OMX_QCOM_COLOR_FormatYUV420PackedSemiPlanar64x32Tile2m8ka = 0x7FA30C03: N4/N7_2
+                 * OMX_QCOM_COLOR_FormatYUV420PackedSemiPlanar32m = 0x7FA30C04: N5
+                 */
                 return true;
             default:
                 return false;
         }
     }
 
-    private long checksum(ByteBuffer buf, int size) {
-        assertTrue(size != 0);
-        assertTrue(size <= buf.capacity());
+    private static long checksum(ByteBuffer buf, int size) {
+        int cap = buf.capacity();
+        assertTrue("checksum() params are invalid: size = " + size + " cap = " + cap,
+                size > 0 && size <= cap);
         CRC32 crc = new CRC32();
-        int pos = buf.position();
-        buf.rewind();
-        for (int i = 0; i < size; i++) {
-            crc.update(buf.get());
+        if (buf.hasArray()) {
+            crc.update(buf.array(), buf.arrayOffset(), size);
+        } else {
+            int pos = buf.position();
+            buf.rewind();
+            final int rdsize = Math.min(4096, size);
+            byte bb[] = new byte[rdsize];
+            int chk;
+            for (int i = 0; i < size; i += chk) {
+                chk = Math.min(rdsize, size - i);
+                buf.get(bb, 0, chk);
+                crc.update(bb, 0, chk);
+            }
+            buf.position(pos);
         }
-        buf.position(pos);
+        return crc.getValue();
+    }
+
+    private static long checksum(ByteBuffer buf, int width, int height, int stride) {
+        int cap = buf.capacity();
+        assertTrue("checksum() params are invalid: w x h , s = "
+                + width + " x " + height + " , " + stride + " cap = " + cap,
+                width > 0 && width <= stride && height > 0 && height * stride <= cap);
+        // YUV 4:2:0 should generally have a data storage height 1.5x greater
+        // than the declared image height, representing the UV planes.
+        //
+        // We only check Y frame for now. Somewhat unknown with tiling effects.
+        //
+        //long tm = System.nanoTime();
+        final int lineinterval = 1; // line sampling frequency
+        CRC32 crc = new CRC32();
+        if (buf.hasArray()) {
+            byte b[] = buf.array();
+            int offs = buf.arrayOffset();
+            for (int i = 0; i < height; i += lineinterval) {
+                crc.update(b, i * stride + offs, width);
+            }
+        } else { // almost always ends up here due to direct buffers
+            int pos = buf.position();
+            if (true) { // this {} is 80x times faster than else {} below.
+                byte[] bb = new byte[width]; // local line buffer
+                for (int i = 0; i < height; i += lineinterval) {
+                    buf.position(i * stride);
+                    buf.get(bb, 0, width);
+                    crc.update(bb, 0, width);
+                }
+            } else {
+                for (int i = 0; i < height; i += lineinterval) {
+                    buf.position(i * stride);
+                    for (int j = 0; j < width; ++j) {
+                        crc.update(buf.get());
+                    }
+                }
+            }
+            buf.position(pos);
+        }
+        //tm = System.nanoTime() - tm;
+        //Log.d(TAG, "checksum time " + tm);
         return crc.getValue();
     }
 
