@@ -70,6 +70,20 @@ public class DecoderTest extends MediaPlayerTestBase {
         masterFd.close();
     }
 
+    // TODO: add similar tests for other audio and video formats
+    public void testBug11696552() throws Exception {
+        MediaCodec mMediaCodec = MediaCodec.createDecoderByType("audio/mp4a-latm");
+        MediaFormat mFormat = MediaFormat.createAudioFormat("audio/mp4a-latm", 48000, 2);
+        mFormat.setByteBuffer("csd-0", ByteBuffer.wrap( new byte [] {0x13, 0x10} ));
+        mFormat.setInteger(MediaFormat.KEY_IS_ADTS, 1);
+        mMediaCodec.configure(mFormat, null, null, 0);
+        mMediaCodec.start();
+        int index = mMediaCodec.dequeueInputBuffer(250000);
+        mMediaCodec.queueInputBuffer(index, 0, 0, 0, MediaCodec.BUFFER_FLAG_END_OF_STREAM );
+        MediaCodec.BufferInfo info = new MediaCodec.BufferInfo();
+        mMediaCodec.dequeueOutputBuffer(info, 250000);
+    }
+
     // The allowed errors in the following tests are the actual maximum measured
     // errors with the standard decoders, plus 10%.
     // This should allow for some variation in decoders, while still detecting
