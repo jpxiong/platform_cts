@@ -30,12 +30,6 @@
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
-
-    <receiver android:name="android.tests.util.DisableKeyguardReceiver">
-            <intent-filter>
-                <action android:name="android.tests.util.disablekeyguard" />
-            </intent-filter>
-        </receiver>
     </application>
 
     <instrumentation android:name="android.tests.getinfo.DeviceInfoInstrument"

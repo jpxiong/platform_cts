@@ -60,7 +60,6 @@ public class DeviceInfoInstrument extends Instrumentation implements DeviceInfoC
 
     @Override
     public void onStart() {
-
         addResult(BUILD_ID, Build.ID);
         addResult(PRODUCT_NAME, Build.PRODUCT);
         addResult(BUILD_DEVICE, Build.DEVICE);

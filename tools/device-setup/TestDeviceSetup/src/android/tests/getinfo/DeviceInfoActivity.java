@@ -22,6 +22,8 @@ import android.content.Context;
 import android.content.pm.ConfigurationInfo;
 import android.content.res.Configuration;
 import android.os.Bundle;
+import android.view.Window;
+import android.view.WindowManager;
 
 import java.util.HashSet;
 import java.util.Locale;
@@ -54,9 +56,9 @@ public class DeviceInfoActivity extends Activity {
             final CountDownLatch done = new CountDownLatch(1);
             final int version = i;
             DeviceInfoActivity.this.runOnUiThread(new Runnable() {
-              public void run() {
-                setContentView(new GLESSurfaceView(DeviceInfoActivity.this, version, done));
-              }
+                public void run() {
+                    setContentView(new GLESSurfaceView(DeviceInfoActivity.this, version, done));
+                }
             });
             try {
                 done.await();
@@ -94,15 +96,18 @@ public class DeviceInfoActivity extends Activity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Window w = getWindow();
+        w.setFlags(WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED,
+                WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED);
 
         ActivityManager am =
                 (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
         ConfigurationInfo info = am.getDeviceConfigurationInfo();
         final int glVersion = (info.reqGlEsVersion & 0xffff0000) >> 16;
         new Thread() {
-          public void run() {
-            runIterations(glVersion);
-          }
+            public void run() {
+                runIterations(glVersion);
+            }
         }.start();
 
         Configuration con = getResources().getConfiguration();
