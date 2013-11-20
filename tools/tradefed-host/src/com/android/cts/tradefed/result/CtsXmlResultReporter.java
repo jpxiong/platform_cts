@@ -58,7 +58,7 @@ public class CtsXmlResultReporter implements ITestInvocationListener {
     private static final String LOG_TAG = "CtsXmlResultReporter";
 
     static final String TEST_RESULT_FILE_NAME = "testResult.xml";
-    private static final String CTS_RESULT_FILE_VERSION = "1.14";
+    private static final String CTS_RESULT_FILE_VERSION = "4.4";
     private static final String[] CTS_RESULT_RESOURCES = {"cts_result.xsl", "cts_result.css",
         "logo.gif", "newrule-green.png"};
 
