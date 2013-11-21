@@ -685,7 +685,7 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
                         }
                     });
 
-        resultLatch.await();
+        assertTrue(resultLatch.await(TEST_TIMEOUT, TimeUnit.MILLISECONDS));
         assertTrue(mJsInterfaceWasCalled.get());
     }
 
@@ -1476,16 +1476,6 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
     }
 
     @UiThreadTest
-    public void testGetFavicon() throws Exception {
-        startWebServer(false);
-        String url = mWebServer.getAssetUrl(TestHtmlConstants.TEST_FAVICON_URL);
-        mOnUiThread.loadUrlAndWaitForCompletion(url);
-        mWebView.getFavicon();
-        // ToBeFixed: Favicon is not loaded automatically.
-        // assertNotNull(mWebView.getFavicon());
-    }
-
-    @UiThreadTest
     public void testClearHistory() throws Exception {
         startWebServer(false);
         String url1 = mWebServer.getAssetUrl(TestHtmlConstants.HTML_URL1);
@@ -1547,7 +1537,7 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
         assertNotNull(restoreList);
         assertEquals(3, restoreList.getSize());
         assertEquals(2, saveList.getCurrentIndex());
-        /* ToBeFixed: The WebHistoryItems do not get inflated. Uncomment remaining tests when fixed.
+
         // wait for the list items to get inflated
         new PollingCheck(TEST_TIMEOUT) {
             @Override
@@ -1568,7 +1558,6 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
         assertEquals(url1, copyListAfterRestore.getItemAtIndex(0).getUrl());
         assertEquals(url2, copyListAfterRestore.getItemAtIndex(1).getUrl());
         assertEquals(url3, copyListAfterRestore.getItemAtIndex(2).getUrl());
-        */
     }
 
     public void testSetWebViewClient() throws Throwable {
@@ -1834,12 +1823,12 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
     }
 
     public void testSetDownloadListener() throws Throwable {
+        final CountDownLatch resultLatch = new CountDownLatch(1);
         final class MyDownloadListener implements DownloadListener {
             public String url;
             public String mimeType;
             public long contentLength;
             public String contentDisposition;
-            public boolean called;
 
             @Override
             public void onDownloadStart(String url, String userAgent, String contentDisposition,
@@ -1848,7 +1837,7 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
                 this.mimeType = mimetype;
                 this.contentLength = contentLength;
                 this.contentDisposition = contentDisposition;
-                this.called = true;
+                resultLatch.countDown();
             }
         }
 
@@ -1871,17 +1860,11 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
         // Wait for layout to complete before setting focus.
         getInstrumentation().waitForIdleSync();
 
-        new PollingCheck(TEST_TIMEOUT) {
-            @Override
-            protected boolean check() {
-                return listener.called;
-            }
-        }.run();
+        assertTrue(resultLatch.await(TEST_TIMEOUT, TimeUnit.MILLISECONDS));
         assertEquals(url, listener.url);
         assertTrue(listener.contentDisposition.contains("test.bin"));
-        // ToBeFixed: uncomment the following tests after fixing the framework
-        // assertEquals(mimeType, listener.mimeType);
-        // assertEquals(length, listener.contentLength);
+        assertEquals(length, listener.contentLength);
+        assertEquals(mimeType, listener.mimeType);
     }
 
     @UiThreadTest
@@ -2144,11 +2127,6 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
         });
     }
 
-    @UiThreadTest
-    public void testInternals() {
-        // Do not test these APIs. They are implementation details.
-    }
-
     private static class HrefCheckHandler extends Handler {
         private boolean mHadRecieved;
 
@@ -2230,51 +2208,6 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
             for (int j = 0; j < bitmap.getHeight(); j ++) {
                 assertEquals(color, bitmap.getPixel(i, j));
             }
-    }
-
-    // Find b1 inside b2
-    private boolean checkBitmapInsideAnother(Bitmap b1, Bitmap b2) {
-        int w = b1.getWidth();
-        int h = b1.getHeight();
-
-        for (int i = 0; i < (b2.getWidth()-w+1); i++) {
-            for (int j = 0; j < (b2.getHeight()-h+1); j++) {
-                if (checkBitmapInsideAnother(b1, b2, i, j))
-                    return true;
-            }
-        }
-        return false;
-    }
-
-    private boolean comparePixel(int p1, int p2, int maxError) {
-        int err;
-        err = Math.abs(((p1&0xff000000)>>>24) - ((p2&0xff000000)>>>24));
-        if (err > maxError)
-            return false;
-
-        err = Math.abs(((p1&0x00ff0000)>>>16) - ((p2&0x00ff0000)>>>16));
-        if (err > maxError)
-            return false;
-
-        err = Math.abs(((p1&0x0000ff00)>>>8) - ((p2&0x0000ff00)>>>8));
-        if (err > maxError)
-            return false;
-
-        err = Math.abs(((p1&0x000000ff)>>>0) - ((p2&0x000000ff)>>>0));
-        if (err > maxError)
-            return false;
-
-        return true;
-    }
-
-    private boolean checkBitmapInsideAnother(Bitmap b1, Bitmap b2, int x, int y) {
-        for (int i = 0; i < b1.getWidth(); i++)
-            for (int j = 0; j < b1.getHeight(); j++) {
-                if (!comparePixel(b1.getPixel(i, j), b2.getPixel(x + i, y + j), 10)) {
-                    return false;
-                }
-            }
-        return true;
     }
 
     /**

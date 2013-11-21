@@ -112,6 +112,7 @@ public class WebChromeClientTest extends ActivityInstrumentationTestCase2<WebVie
         Thread.sleep(100); // Wait for open to be received on the icon db thread.
 
         assertFalse(webChromeClient.hadOnReceivedIcon());
+        assertNull(mOnUiThread.getFavicon());
 
         String url = mWebServer.getAssetUrl(TestHtmlConstants.HELLO_WORLD_URL);
         mOnUiThread.loadUrlAndWaitForCompletion(url);
@@ -122,6 +123,7 @@ public class WebChromeClientTest extends ActivityInstrumentationTestCase2<WebVie
                 return webChromeClient.hadOnReceivedIcon();
             }
         }.run();
+        assertNotNull(mOnUiThread.getFavicon());
     }
 
     public void runWindowTest(boolean expectWindowClose) throws Exception {

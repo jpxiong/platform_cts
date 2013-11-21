@@ -570,6 +570,8 @@ public class CtsTestServer {
                     response = createResponse(HttpStatus.SC_OK);
                     response.setEntity(entity);
                     response.addHeader("Content-Disposition", "attachment; filename=test.bin");
+                    response.addHeader("Content-Type", mimeType);
+                    response.addHeader("Content-Length", "" + length);
                 } else {
                     // fall through, return 404 at the end
                 }
