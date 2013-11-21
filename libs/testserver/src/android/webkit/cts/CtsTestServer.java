@@ -84,6 +84,7 @@ import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.KeyManager;
 import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLServerSocket;
 import javax.net.ssl.SSLSession;
 import javax.net.ssl.X509TrustManager;
 
@@ -124,6 +125,13 @@ public class CtsTestServer {
     public static final String MESSAGE_403 = "403 forbidden";
     public static final String MESSAGE_404 = "404 not found";
 
+    public enum SslMode {
+        INSECURE,
+        NO_CLIENT_AUTH,
+        WANTS_CLIENT_AUTH,
+        NEEDS_CLIENT_AUTH,
+    }
+
     private static Hashtable<Integer, String> sReasons;
 
     private ServerThread mServerThread;
@@ -131,7 +139,7 @@ public class CtsTestServer {
     private AssetManager mAssets;
     private Context mContext;
     private Resources mResources;
-    private boolean mSsl;
+    private SslMode mSsl;
     private MimeTypeMap mMap;
     private Vector<String> mQueries;
     private ArrayList<HttpEntity> mRequestEntities;
@@ -166,19 +174,30 @@ public class CtsTestServer {
      * @throws Exception
      */
     public CtsTestServer(Context context, boolean ssl) throws Exception {
+        this(context, ssl ? SslMode.NO_CLIENT_AUTH : SslMode.INSECURE);
+    }
+
+    /**
+     * Create and start a local HTTP server instance.
+     * @param context The application context to use for fetching assets.
+     * @param sslMode Whether to use SSL, and if so, what client auth (if any) to use.
+     * @throws Exception
+     */
+    public CtsTestServer(Context context, SslMode sslMode) throws Exception {
         mContext = context;
         mAssets = mContext.getAssets();
         mResources = mContext.getResources();
-        mSsl = ssl;
+        mSsl = sslMode;
         mRequestEntities = new ArrayList<HttpEntity>();
         mMap = MimeTypeMap.getSingleton();
         mQueries = new Vector<String>();
         mServerThread = new ServerThread(this, mSsl);
-        if (mSsl) {
-            mServerUri = "https://localhost:" + mServerThread.mSocket.getLocalPort();
+        if (mSsl == SslMode.INSECURE) {
+            mServerUri = "http:";
         } else {
-            mServerUri = "http://localhost:" + mServerThread.mSocket.getLocalPort();
+            mServerUri = "https:";
         }
+        mServerUri += "//localhost:" + mServerThread.mSocket.getLocalPort();
         mServerThread.start();
     }
 
@@ -217,7 +236,9 @@ public class CtsTestServer {
 
     private URLConnection openConnection(URL url)
             throws IOException, NoSuchAlgorithmException, KeyManagementException {
-        if (mSsl) {
+        if (mSsl == SslMode.INSECURE) {
+            return url.openConnection();
+        } else {
             // Install hostname verifiers and trust managers that don't do
             // anything in order to get around the client not trusting
             // the test server due to a lack of certificates.
@@ -226,13 +247,14 @@ public class CtsTestServer {
             connection.setHostnameVerifier(new CtsHostnameVerifier());
 
             SSLContext context = SSLContext.getInstance("TLS");
-            CtsTrustManager trustManager = new CtsTrustManager();
-            context.init(null, new CtsTrustManager[] {trustManager}, null);
+            try {
+                context.init(ServerThread.getKeyManagers(), getTrustManagers(), null);
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
             connection.setSSLSocketFactory(context.getSocketFactory());
 
             return connection;
-        } else {
-            return url.openConnection();
         }
     }
 
@@ -244,7 +266,7 @@ public class CtsTestServer {
      */
     private static class CtsTrustManager implements X509TrustManager {
         public void checkClientTrusted(X509Certificate[] chain, String authType) {
-            // Trust the CtSTestServer...
+            // Trust the CtSTestServer's client...
         }
 
         public void checkServerTrusted(X509Certificate[] chain, String authType) {
@@ -254,6 +276,13 @@ public class CtsTestServer {
         public X509Certificate[] getAcceptedIssuers() {
             return null;
         }
+    }
+
+    /**
+     * @returns a trust manager array configured to permit any trust decision.
+     */
+    private static CtsTrustManager[] getTrustManagers() {
+        return new CtsTrustManager[] { new CtsTrustManager() };
     }
 
     /**
@@ -767,7 +796,7 @@ public class CtsTestServer {
     private static class ServerThread extends Thread {
         private CtsTestServer mServer;
         private ServerSocket mSocket;
-        private boolean mIsSsl;
+        private SslMode mSsl;
         private boolean mIsCancelled;
         private SSLContext mSslContext;
         private ExecutorService mExecutorService = Executors.newFixedThreadPool(20);
@@ -802,13 +831,13 @@ public class CtsTestServer {
             "1gaEjsC/0wGmmBDg1dTDH+F1p9TInzr3EFuYD0YiQ7YlAHq3cPuyGoLXJ5dXYuSBfhDXJSeddUkl" +
             "k1ufZyOOcskeInQge7jzaRfmKg3U94r+spMEvb0AzDQVOKvjjo1ivxMSgFRZaDb/4qw=";
 
-        private String PASSWORD = "android";
+        private static final String PASSWORD = "android";
 
         /**
          * Loads a keystore from a base64-encoded String. Returns the KeyManager[]
          * for the result.
          */
-        private KeyManager[] getKeyManagers() throws Exception {
+        private static KeyManager[] getKeyManagers() throws Exception {
             byte[] bytes = Base64.decode(SERVER_KEYS_BKS.getBytes());
             InputStream inputStream = new ByteArrayInputStream(bytes);
 
@@ -824,19 +853,24 @@ public class CtsTestServer {
         }
 
 
-        public ServerThread(CtsTestServer server, boolean ssl) throws Exception {
+        public ServerThread(CtsTestServer server, SslMode sslMode) throws Exception {
             super("ServerThread");
             mServer = server;
-            mIsSsl = ssl;
+            mSsl = sslMode;
             int retry = 3;
             while (true) {
                 try {
-                    if (mIsSsl) {
-                        mSslContext = SSLContext.getInstance("TLS");
-                        mSslContext.init(getKeyManagers(), null, null);
-                        mSocket = mSslContext.getServerSocketFactory().createServerSocket(0);
-                    } else {
+                    if (mSsl == SslMode.INSECURE) {
                         mSocket = new ServerSocket(0);
+                    } else {  // Use SSL
+                        mSslContext = SSLContext.getInstance("TLS");
+                        mSslContext.init(getKeyManagers(), getTrustManagers(), null);
+                        mSocket = mSslContext.getServerSocketFactory().createServerSocket(0);
+                        if (mSsl == SslMode.WANTS_CLIENT_AUTH) {
+                            ((SSLServerSocket) mSocket).setWantClientAuth(true);
+                        } else if (mSsl == SslMode.NEEDS_CLIENT_AUTH) {
+                            ((SSLServerSocket) mSocket).setNeedClientAuth(true);
+                        }
                     }
                     return;
                 } catch (IOException e) {
