@@ -44,8 +44,6 @@ LOCAL_RESOURCE_DIR := $(signature_res_dir) $(LOCAL_PATH)/res
 
 include $(BUILD_CTS_PACKAGE)
 
-$(info $(call local-intermediates-dir))
-
 generated_res_stamp := $(intermediates.COMMON)/genres.stamp
 api_ver_file := $(intermediates.COMMON)/api_ver_is_$(CTS_API_VERSION)
 
