@@ -32,6 +32,7 @@ import android.hardware.Camera.Size;
 import android.media.CamcorderProfile;
 import android.media.ExifInterface;
 import android.media.MediaRecorder;
+import android.os.Build;
 import android.os.ConditionVariable;
 import android.os.Environment;
 import android.os.Looper;
@@ -62,7 +63,7 @@ import junit.framework.AssertionFailedError;
 public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActivity> {
     private static String TAG = "CameraTest";
     private static final String PACKAGE = "com.android.cts.stub";
-    private static final boolean LOGV = false;
+    private static final boolean VERBOSE = Log.isLoggable(TAG, Log.VERBOSE);
     private final String JPEG_PATH = Environment.getExternalStorageDirectory().getPath() +
             "/test.jpg";
     private byte[] mJpegData;
@@ -107,7 +108,7 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
 
     public CameraTest() {
         super(PACKAGE, CameraStubActivity.class);
-        if (LOGV) Log.v(TAG, "Camera Constructor");
+        if (VERBOSE) Log.v(TAG, "Camera Constructor");
     }
 
     @Override
@@ -150,7 +151,7 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
                 Log.v(TAG, "camera is opened");
                 startDone.open();
                 Looper.loop(); // Blocks forever until Looper.quit() is called.
-                if (LOGV) Log.v(TAG, "initializeMessageLooper: quit.");
+                if (VERBOSE) Log.v(TAG, "initializeMessageLooper: quit.");
             }
         }.start();
 
@@ -186,7 +187,7 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
     private static int calculateBufferSize(int width, int height,
                                            int format, int bpp) {
 
-        if (LOGV) {
+        if (VERBOSE) {
             Log.v(TAG, "calculateBufferSize: w=" + width + ",h=" + height
             + ",f=" + format + ",bpp=" + bpp);
         }
@@ -203,7 +204,7 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
             int c_size = c_stride * height/2;
             int size = y_size + c_size * 2;
 
-            if (LOGV) {
+            if (VERBOSE) {
                 Log.v(TAG, "calculateBufferSize: YV12 size= " + size);
             }
 
@@ -237,9 +238,9 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
             }
             mPreviewCallbackResult = PREVIEW_CALLBACK_RECEIVED;
             mCamera.stopPreview();
-            if (LOGV) Log.v(TAG, "notify the preview callback");
+            if (VERBOSE) Log.v(TAG, "notify the preview callback");
             mPreviewDone.open();
-            if (LOGV) Log.v(TAG, "Preview callback stop");
+            if (VERBOSE) Log.v(TAG, "Preview callback stop");
         }
     }
 
@@ -247,7 +248,7 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
     private final class TestShutterCallback implements ShutterCallback {
         public void onShutter() {
             mShutterCallbackResult = true;
-            if (LOGV) Log.v(TAG, "onShutter called");
+            if (VERBOSE) Log.v(TAG, "onShutter called");
         }
     }
 
@@ -255,7 +256,7 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
     private final class RawPictureCallback implements PictureCallback {
         public void onPictureTaken(byte [] rawData, Camera camera) {
             mRawPictureCallbackResult = true;
-            if (LOGV) Log.v(TAG, "RawPictureCallback callback");
+            if (VERBOSE) Log.v(TAG, "RawPictureCallback callback");
         }
     }
 
@@ -272,14 +273,14 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
                     outStream.close();
                     mJpegPictureCallbackResult = true;
 
-                    if (LOGV) {
+                    if (VERBOSE) {
                         Log.v(TAG, "JpegPictureCallback rawDataLength = " + rawData.length);
                     }
                 } else {
                     mJpegPictureCallbackResult = false;
                 }
                 mSnapshotDone.open();
-                if (LOGV) Log.v(TAG, "Jpeg Picture callback");
+                if (VERBOSE) Log.v(TAG, "Jpeg Picture callback");
             } catch (IOException e) {
                 // no need to fail here; callback worked fine
                 Log.w(TAG, "Error writing picture to sd card.");
@@ -312,7 +313,7 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
     }
 
     private void waitForPreviewDone() {
-        if (LOGV) Log.v(TAG, "Wait for preview callback");
+        if (VERBOSE) Log.v(TAG, "Wait for preview callback");
         if (!mPreviewDone.block(WAIT_FOR_COMMAND_TO_COMPLETE)) {
             // timeout could be expected or unexpected. The caller will decide.
             Log.v(TAG, "waitForPreviewDone: timeout");
@@ -339,7 +340,7 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
     }
 
     private void checkPreviewCallback() throws Exception {
-        if (LOGV) Log.v(TAG, "check preview callback");
+        if (VERBOSE) Log.v(TAG, "check preview callback");
         mCamera.startPreview();
         waitForPreviewDone();
         mCamera.setPreviewCallback(null);
@@ -395,7 +396,7 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
             assertEquals(pictureSize.height, bmpOptions.outHeight);
         } else {
             int realArea = bmpOptions.outWidth * bmpOptions.outHeight;
-            if (LOGV) Log.v(TAG, "Video snapshot is " +
+            if (VERBOSE) Log.v(TAG, "Video snapshot is " +
                     bmpOptions.outWidth + " x " + bmpOptions.outHeight +
                     ", video size is " + videoWidth + " x " + videoHeight);
             assertTrue ("Video snapshot too small! Expected at least " +
@@ -860,8 +861,10 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
 
         // Test various exif tags.
         ExifInterface exif = new ExifInterface(JPEG_PATH);
-        assertNotNull(exif.getAttribute(ExifInterface.TAG_MAKE));
-        assertNotNull(exif.getAttribute(ExifInterface.TAG_MODEL));
+        StringBuffer failedCause = new StringBuffer("Jpeg exif test failed:\n");
+        boolean extraExiftestPassed = checkExtraExifTagsSucceeds(failedCause, exif, parameters);
+
+        if (VERBOSE) Log.v(TAG, "Testing exif tag TAG_DATETIME");
         String datetime = exif.getAttribute(ExifInterface.TAG_DATETIME);
         assertNotNull(datetime);
         // Datetime should be local time.
@@ -874,6 +877,7 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
         assertBitmapAndJpegSizeEqual(mJpegData, exif);
 
         // Test gps exif tags.
+        if (VERBOSE) Log.v(TAG, "Testing exif GPS tags");
         testGpsExifValues(parameters, 37.736071, -122.441983, 21, 1199145600,
             "GPS NETWORK HYBRID ARE ALL FINE.");
         testGpsExifValues(parameters, 0.736071, 0.441983, 1, 1199145601, "GPS");
@@ -881,6 +885,7 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
 
         // Test gps tags do not exist after calling removeGpsData. Also check if
         // image width and height exif match the jpeg when jpeg rotation is set.
+        if (VERBOSE) Log.v(TAG, "Testing exif GPS tag removal");
         if (!recording) mCamera.startPreview();
         parameters.removeGpsData();
         parameters.setRotation(90); // For testing image width and height exif.
@@ -890,9 +895,127 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
         exif = new ExifInterface(JPEG_PATH);
         checkGpsDataNull(exif);
         assertBitmapAndJpegSizeEqual(mJpegData, exif);
+        assertTrue(failedCause.toString(), extraExiftestPassed);
         // Reset the rotation to prevent from affecting other tests.
         parameters.setRotation(0);
         mCamera.setParameters(parameters);
+    }
+
+    /**
+     * Sanity check of some extra exif tags.
+     * <p>
+     * Sanity check some extra exif tags without asserting the check failures
+     * immediately. When a failure is detected, the failure cause is logged,
+     * the rest of the tests are still executed. The caller can assert with the
+     * failure cause based on the returned test status.
+     * </p>
+     *
+     * @param logBuf Log failure cause to this StringBuffer if there is
+     * any failure.
+     * @param exif The exif data associated with a jpeg image being tested.
+     * @return true if no test failure is found, false if there is any failure.
+     */
+    private boolean checkExtraExifTagsSucceeds(StringBuffer logBuf, ExifInterface exif,
+            Parameters parameters) {
+        if (logBuf == null || exif == null || parameters == null) {
+            throw new IllegalArgumentException("failureCause, exif and paremeters" +
+                    "shouldn't be null");
+        }
+
+        if (VERBOSE) Log.v(TAG, "Testing extra exif tags");
+        boolean allTestsPassed = true;
+        boolean passedSoFar = true;
+        String failureMsg;
+
+        // TAG_EXPOSURE_TIME
+        // ExifInterface API gives exposure time value in the form of float instead of rational
+        String exposureTime = exif.getAttribute(ExifInterface.TAG_EXPOSURE_TIME);
+        passedSoFar = expectNotNull("Exif TAG_EXPOSURE_TIME is null!", logBuf, exposureTime);
+        if (passedSoFar) {
+            double exposureTimeValue = Double.parseDouble(exposureTime);
+            failureMsg = "Exif exposure time " + exposureTime + " should be a positive value";
+            passedSoFar = expectTrue(failureMsg, logBuf, exposureTimeValue > 0);
+        }
+        allTestsPassed = allTestsPassed && passedSoFar;
+
+        // TAG_APERTURE
+        // ExifInterface API gives aperture value in the form of float instead of rational
+        String aperture = exif.getAttribute(ExifInterface.TAG_APERTURE);
+        passedSoFar = expectNotNull("Exif TAG_APERTURE is null!", logBuf, aperture);
+        if (passedSoFar) {
+            double apertureValue = Double.parseDouble(aperture);
+            passedSoFar = expectTrue("Exif TAG_APERTURE value " + aperture + " should be positive!",
+                    logBuf, apertureValue > 0);
+        }
+        allTestsPassed = allTestsPassed && passedSoFar;
+
+        // TAG_FLASH
+        String flash = exif.getAttribute(ExifInterface.TAG_FLASH);
+        passedSoFar = expectNotNull("Exif TAG_FLASH is null!", logBuf, flash);
+        allTestsPassed = allTestsPassed && passedSoFar;
+
+        // TAG_WHITE_BALANCE
+        String whiteBalance = exif.getAttribute(ExifInterface.TAG_WHITE_BALANCE);
+        passedSoFar = expectNotNull("Exif TAG_WHITE_BALANCE is null!", logBuf, whiteBalance);
+        allTestsPassed = allTestsPassed && passedSoFar;
+
+        // TAG_MAKE
+        String make = exif.getAttribute(ExifInterface.TAG_MAKE);
+        passedSoFar = expectNotNull("Exif TAG_MAKE is null!", logBuf, make);
+        if (passedSoFar) {
+            passedSoFar = expectTrue("Exif TAG_MODEL value: " + make
+                    + " should match build manufacturer: " + Build.MANUFACTURER, logBuf,
+                    make.equals(Build.MANUFACTURER));
+        }
+        allTestsPassed = allTestsPassed && passedSoFar;
+
+        // TAG_MODEL
+        String model = exif.getAttribute(ExifInterface.TAG_MODEL);
+        passedSoFar = expectNotNull("Exif TAG_MODEL is null!", logBuf, model);
+        if (passedSoFar) {
+            passedSoFar = expectTrue("Exif TAG_MODEL value: " + model
+                    + " should match build manufacturer: " + Build.MODEL, logBuf,
+                    model.equals(Build.MODEL));
+        }
+        allTestsPassed = allTestsPassed && passedSoFar;
+
+        // TAG_ISO
+        int iso = exif.getAttributeInt(ExifInterface.TAG_ISO, -1);
+        passedSoFar = expectTrue("Exif ISO value " + iso + " is invalid", logBuf, iso > 0);
+        allTestsPassed = allTestsPassed && passedSoFar;
+
+        return allTestsPassed;
+    }
+
+    /**
+     * Check if object is null and log failure msg.
+     *
+     * @param msg Failure msg.
+     * @param logBuffer StringBuffer to log the failure msg.
+     * @param obj Object to test.
+     * @return true if object is not null, otherwise return false.
+     */
+    private boolean expectNotNull(String msg, StringBuffer logBuffer, Object obj)
+    {
+        if (obj == null) {
+            logBuffer.append(msg + "\n");
+        }
+        return (obj != null);
+    }
+
+    /**
+     * Check if condition is false and log failure msg.
+     *
+     * @param msg Failure msg.
+     * @param logBuffer StringBuffer to log the failure msg.
+     * @param condition Condition to test.
+     * @return The value of the condition.
+     */
+    private boolean expectTrue(String msg, StringBuffer logBuffer, boolean condition) {
+        if (!condition) {
+            logBuffer.append(msg + "\n");
+        }
+        return condition;
     }
 
     private void assertBitmapAndJpegSizeEqual(byte[] jpegData, ExifInterface exif) {
@@ -1821,7 +1944,7 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
                 double intervalMargin = 0.9;
                 long lastArrivalTime = mFrames.get(mFrames.size() - 1);
                 double interval = arrivalTime - lastArrivalTime;
-                if (LOGV) Log.v(TAG, "Frame interval=" + interval);
+                if (VERBOSE) Log.v(TAG, "Frame interval=" + interval);
                 try {
                     assertTrue("Frame interval (" + interval + "ms) is too " +
                             "large. mMaxFrameInterval=" +
@@ -2099,7 +2222,7 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
     @UiThreadTest
     public void testMultiCameraRelease() throws Exception {
         // Verify that multiple cameras exist, and that they can be opened at the same time
-        if (LOGV) Log.v(TAG, "testMultiCameraRelease: Checking pre-conditions.");
+        if (VERBOSE) Log.v(TAG, "testMultiCameraRelease: Checking pre-conditions.");
         int nCameras = Camera.getNumberOfCameras();
         if (nCameras < 2) {
             Log.i(TAG, "Test multi-camera release: Skipping test because only 1 camera available");
@@ -2121,11 +2244,11 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
         testCamera1.release();
 
         // Start first camera
-        if (LOGV) Log.v(TAG, "testMultiCameraRelease: Opening camera 0");
+        if (VERBOSE) Log.v(TAG, "testMultiCameraRelease: Opening camera 0");
         initializeMessageLooper(0);
         SimplePreviewStreamCb callback0 = new SimplePreviewStreamCb(0);
         mCamera.setPreviewCallback(callback0);
-        if (LOGV) Log.v(TAG, "testMultiCameraRelease: Starting preview on camera 0");
+        if (VERBOSE) Log.v(TAG, "testMultiCameraRelease: Starting preview on camera 0");
         mCamera.startPreview();
         // Run preview for a bit
         for (int f = 0; f < 100; f++) {
@@ -2133,7 +2256,7 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
             assertTrue("testMultiCameraRelease: First camera preview timed out on frame " + f + "!",
                        mPreviewDone.block( WAIT_FOR_COMMAND_TO_COMPLETE));
         }
-        if (LOGV) Log.v(TAG, "testMultiCameraRelease: Stopping preview on camera 0");
+        if (VERBOSE) Log.v(TAG, "testMultiCameraRelease: Stopping preview on camera 0");
         mCamera.stopPreview();
         // Save message looper and camera to deterministically release them, instead
         // of letting GC do it at some point.
@@ -2145,11 +2268,11 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
 
         // Start second camera without releasing the first one (will
         // set mCamera and mLooper to new objects)
-        if (LOGV) Log.v(TAG, "testMultiCameraRelease: Opening camera 1");
+        if (VERBOSE) Log.v(TAG, "testMultiCameraRelease: Opening camera 1");
         initializeMessageLooper(1);
         SimplePreviewStreamCb callback1 = new SimplePreviewStreamCb(1);
         mCamera.setPreviewCallback(callback1);
-        if (LOGV) Log.v(TAG, "testMultiCameraRelease: Starting preview on camera 1");
+        if (VERBOSE) Log.v(TAG, "testMultiCameraRelease: Starting preview on camera 1");
         mCamera.startPreview();
         // Run preview for a bit - GC of first camera instance should not impact the second's
         // operation.
@@ -2159,11 +2282,11 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
                        mPreviewDone.block( WAIT_FOR_COMMAND_TO_COMPLETE));
             if (f == 50) {
                 // Release first camera mid-preview, should cause no problems
-                if (LOGV) Log.v(TAG, "testMultiCameraRelease: Releasing camera 0");
+                if (VERBOSE) Log.v(TAG, "testMultiCameraRelease: Releasing camera 0");
                 firstCamera.release();
             }
         }
-        if (LOGV) Log.v(TAG, "testMultiCameraRelease: Stopping preview on camera 0");
+        if (VERBOSE) Log.v(TAG, "testMultiCameraRelease: Stopping preview on camera 0");
         mCamera.stopPreview();
 
         firstLooper.quit();
@@ -2179,7 +2302,7 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
             mId = id;
         }
         public void onPreviewFrame(byte[] data, android.hardware.Camera camera) {
-            if (LOGV) Log.v(TAG, "Preview frame callback, id " + mId + ".");
+            if (VERBOSE) Log.v(TAG, "Preview frame callback, id " + mId + ".");
             mPreviewDone.open();
         }
     }
