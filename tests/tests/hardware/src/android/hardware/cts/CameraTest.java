@@ -1596,20 +1596,9 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
         PreviewCbForPreviewPictureSizesCombination callback =
             new PreviewCbForPreviewPictureSizesCombination();
 
-        // Test combination of preview sizes and picture sizes. Pick four of each to test.
-        // Do not test all combinations because it will timeout. Four is just a small number
-        // and the test will not timeout.
-        List<Size> previewSizes = parameters.getSupportedPreviewSizes();
-        List<Size> pictureSizes = parameters.getSupportedPictureSizes();
-        int previewSizeTestCount = Math.min(previewSizes.size(), 4);
-        int pictureSizeTestCount = Math.min(pictureSizes.size(), 4);
-        // Calculate the step so that the first one and the last one are always tested.
-        float previewSizeIndexStep = (float) (previewSizes.size() - 1) / (previewSizeTestCount - 1);
-        float pictureSizeIndexStep = (float) (pictureSizes.size() - 1) / (pictureSizeTestCount - 1);
-        for (int i = 0; i < previewSizeTestCount; i++) {
-            for (int j = 0; j < pictureSizeTestCount; j++) {
-                Size previewSize = previewSizes.get(Math.round(previewSizeIndexStep * i));
-                Size pictureSize = pictureSizes.get(Math.round(pictureSizeIndexStep * j));
+        // Test all combination of preview sizes and picture sizes.
+        for (Size previewSize: parameters.getSupportedPreviewSizes()) {
+            for (Size pictureSize: parameters.getSupportedPictureSizes()) {
                 Log.v(TAG, "Test previewSize=(" + previewSize.width + "," +
                         previewSize.height + ") pictureSize=(" +
                         pictureSize.width + "," + pictureSize.height + ")");
