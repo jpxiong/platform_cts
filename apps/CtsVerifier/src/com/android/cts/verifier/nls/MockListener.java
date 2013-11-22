@@ -49,12 +49,12 @@ public class MockListener extends NotificationListenerService {
     static final int RESULT_TIMEOUT = Activity.RESULT_FIRST_USER;
     static final int RESULT_NO_SERVER = Activity.RESULT_FIRST_USER + 1;
 
-    static final String JSON_FLAGS = "flag";
-    static final String JSON_ICON = "icon";
-    static final String JSON_ID = "id";
-    static final String JSON_PACKAGE = "pkg";
-    static final String JSON_WHEN = "when";
-    static final String JSON_TAG = "tag";
+    public static final String JSON_FLAGS = "flag";
+    public static final String JSON_ICON = "icon";
+    public static final String JSON_ID = "id";
+    public static final String JSON_PACKAGE = "pkg";
+    public static final String JSON_WHEN = "when";
+    public static final String JSON_TAG = "tag";
 
     private ArrayList<String> mPosted = new ArrayList<String>();
     private ArrayList<String> mPayloads = new ArrayList<String>();

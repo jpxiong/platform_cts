@@ -20,7 +20,7 @@ LOCAL_MODULE_TAGS := tests
 
 LOCAL_JAVA_LIBRARIES := android.test.runner
 
-LOCAL_STATIC_JAVA_LIBRARIES := ctstestrunner
+LOCAL_STATIC_JAVA_LIBRARIES := ctstestrunner mockito-target android-ex-camera2
 
 LOCAL_SRC_FILES := $(call all-java-files-under, src)
 

@@ -23,11 +23,13 @@ import android.renderscript.RSRuntimeException;
 public class CoshTest extends RSBaseCompute {
 
     private ScriptC_cosh_f32 script_f32;
+    private ScriptC_cosh_f32_relaxed script_f32_relaxed;
 
     @Override
     protected void setUp() throws Exception {
         super.setUp();
         script_f32 = new ScriptC_cosh_f32(mRS);
+        script_f32_relaxed = new ScriptC_cosh_f32_relaxed(mRS);
     }
 
     @Override
@@ -44,6 +46,19 @@ public class CoshTest extends RSBaseCompute {
             break;
         case TEST_F32_4:
             script_f32.forEach_cosh_f32_4(mIn, mOut);
+            break;
+
+        case TEST_RELAXED_F32:
+            script_f32_relaxed.forEach_cosh_f32_1(mIn, mOut);
+            break;
+        case TEST_RELAXED_F32_2:
+            script_f32_relaxed.forEach_cosh_f32_2(mIn, mOut);
+            break;
+        case TEST_RELAXED_F32_3:
+            script_f32_relaxed.forEach_cosh_f32_3(mIn, mOut);
+            break;
+        case TEST_RELAXED_F32_4:
+            script_f32_relaxed.forEach_cosh_f32_4(mIn, mOut);
             break;
         }
     }
@@ -65,15 +80,32 @@ public class CoshTest extends RSBaseCompute {
         doF32(0xfe, 4);
     }
 
+    public void testCoshF32_relaxed() {
+        doF32_relaxed(0xfe, 128);
+    }
+
     public void testCoshF32_2() {
         doF32_2(0x71, 4);
+    }
+
+    public void testCoshF32_2_relaxed() {
+        doF32_2_relaxed(0x71, 128);
     }
 
     public void testCoshF32_3() {
         doF32_3(0xa, 4);
     }
 
+    public void testCoshF32_3_relaxed() {
+        doF32_3_relaxed(0xa, 128);
+    }
+
     public void testCoshF32_4() {
         doF32_4(0xabe, 4);
+
     }
+    public void testCoshF32_4_relaxed() {
+        doF32_4_relaxed(0xabe, 128);
+    }
+
 }

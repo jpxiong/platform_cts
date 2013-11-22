@@ -16,19 +16,14 @@
 
 package android.text.method.cts;
 
-import com.android.cts.stub.R;
-
-
-import android.app.Instrumentation;
-import android.cts.util.PollingCheck;
 import android.os.SystemClock;
-import android.test.ActivityInstrumentationTestCase2;
 import android.test.UiThreadTest;
 import android.text.Editable;
 import android.text.InputType;
 import android.text.Selection;
 import android.text.Spannable;
 import android.text.SpannableStringBuilder;
+import android.text.method.cts.KeyListenerTestCase;
 import android.text.method.TextKeyListener;
 import android.text.method.TextKeyListener.Capitalize;
 import android.view.KeyCharacterMap;
@@ -37,33 +32,11 @@ import android.view.View;
 import android.widget.TextView;
 import android.widget.TextView.BufferType;
 
-public class TextKeyListenerTest extends
-        ActivityInstrumentationTestCase2<KeyListenerStubActivity> {
+public class TextKeyListenerTest extends KeyListenerTestCase {
     /**
      * time out of MultiTapKeyListener. longer than 2000ms in case the system is sluggish.
      */
     private static final long TIME_OUT = 3000;
-    private KeyListenerStubActivity mActivity;
-    private Instrumentation mInstrumentation;
-    private TextView mTextView;
-
-    public TextKeyListenerTest() {
-        super("com.android.cts.stub", KeyListenerStubActivity.class);
-    }
-
-    @Override
-    protected void setUp() throws Exception {
-        super.setUp();
-        mActivity = getActivity();
-        mInstrumentation = getInstrumentation();
-        mTextView = (TextView) mActivity.findViewById(R.id.keylistener_textview);
-        new PollingCheck(1000) {
-            @Override
-            protected boolean check() {
-                return mTextView.hasWindowFocus();
-            }
-        }.run();
-    }
 
     public void testConstructor() {
         new TextKeyListener(Capitalize.NONE, true);
@@ -104,22 +77,22 @@ public class TextKeyListenerTest extends
     }
 
     public void testOnSpanAdded() {
-        final MockTextKeyListener textKeyListener
+        final MockTextKeyListener mockTextKeyListener
                 = new MockTextKeyListener(Capitalize.CHARACTERS, true);
         final Spannable text = new SpannableStringBuilder("123456");
 
-        assertFalse(textKeyListener.hadAddedSpan());
+        assertFalse(mockTextKeyListener.hadAddedSpan());
         mActivity.runOnUiThread(new Runnable() {
             public void run() {
-                mTextView.setKeyListener(textKeyListener);
+                mTextView.setKeyListener(mockTextKeyListener);
                 mTextView.setText(text, BufferType.EDITABLE);
             }
         });
         mInstrumentation.waitForIdleSync();
 
-        assertTrue(textKeyListener.hadAddedSpan());
+        assertTrue(mockTextKeyListener.hadAddedSpan());
 
-        textKeyListener.release();
+        mockTextKeyListener.release();
     }
 
     public void testGetInstance1() {
@@ -243,7 +216,6 @@ public class TextKeyListenerTest extends
         mActivity.runOnUiThread(new Runnable() {
             public void run() {
                 mTextView.setText("", BufferType.EDITABLE);
-                mTextView.requestFocus();
                 Selection.setSelection((Editable) mTextView.getText(), 0, 0);
                 mTextView.setKeyListener(textKeyListener);
             }
@@ -275,6 +247,12 @@ public class TextKeyListenerTest extends
         listener.release();
     }
 
+    /**
+     * A mocked {@link android.text.method.TextKeyListener} for testing purposes.
+     *
+     * Tracks whether {@link MockTextKeyListener#onSpanAdded(Spannable, Object, int, int)} has been
+     * called.
+     */
     private class MockTextKeyListener extends TextKeyListener {
         private boolean mHadAddedSpan;
 

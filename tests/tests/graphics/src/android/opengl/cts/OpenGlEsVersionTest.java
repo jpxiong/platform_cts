@@ -68,9 +68,12 @@ public class OpenGlEsVersionTest
                 reportedVersion, getVersionFromPackageManager(mActivity));
 
         assertGlVersionString(1);
-        if (detectedVersion >= 2) {
+        if (detectedVersion == 2) {
             restartActivityWithClientVersion(2);
             assertGlVersionString(2);
+        } else if (detectedVersion == 3) {
+            restartActivityWithClientVersion(3);
+            assertGlVersionString(3);
         }
     }
 
@@ -190,9 +193,6 @@ public class OpenGlEsVersionTest
         String versionString = "" + majorVersion;
         String message = "OpenGL version string '" + mActivity.getVersionString()
                 + "' is not " + majorVersion + ".0+.";
-        if (majorVersion == 2) {
-             versionString = "(2|3)";
-        }
         assertTrue(message, Pattern.matches(".*OpenGL.*ES.*" + versionString + "\\.\\d.*",
                 mActivity.getVersionString()));
     }

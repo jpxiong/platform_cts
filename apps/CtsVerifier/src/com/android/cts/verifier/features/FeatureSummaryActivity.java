@@ -154,7 +154,7 @@ public class FeatureSummaryActivity extends PassFailButtons.ListActivity {
 
     public static final Feature[] ALL_HONEYCOMB_MR1_FEATURES = {
             new Feature("android.hardware.usb.host", false),
-            new Feature("android.hardware.usb.accessory", true),
+            new Feature("android.hardware.usb.accessory", false),
     };
 
     public static final Feature[] ALL_HONEYCOMB_MR2_FEATURES = {

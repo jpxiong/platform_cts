@@ -25,9 +25,12 @@
 .end method
 
 .method private declared_synchronized test()V
-.limit regs 1
+.limit regs 2
 
-    monitor-exit v0
+    new-instance v0, java/lang/Object
+    invoke-direct {v0}, java/lang/Object/<init>()V
+    monitor-enter v0
+    monitor-exit v1
     return-void
 .end method
 

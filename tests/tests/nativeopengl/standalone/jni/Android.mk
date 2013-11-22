@@ -27,7 +27,7 @@ LOCAL_MODULE := libgtest
 LOCAL_C_INCLUDES := $(MY_GTEST_PATH)/include
 LOCAL_SRC_FILES := src/gtest-all.cc
 
-include $(BUILD_SHARED_LIBRARY)
+include $(BUILD_STATIC_LIBRARY)
 
 # nativetests
 
@@ -37,12 +37,15 @@ include $(CLEAR_VARS)
 
 LIB_PATH := $(LOCAL_PATH)/../libs/$(TARGET_ARCH_ABI)/
 LOCAL_C_INCLUDES := $(MY_GTEST_PATH)/include
-LOCAL_LDLIBS    := -L$(LIB_PATH) -landroid -lEGL -lGLESv2 -llog -lgtest
+LOCAL_LDLIBS    := -L$(LIB_PATH) -landroid -lEGL -lGLESv2 -llog
+LOCAL_STATIC_LIBRARIES := libgtest
 LOCAL_MODULE    := nativeopengltests
 LOCAL_SRC_FILES := GLTestHelper.cpp \
                    register.cpp \
-                   tests/GLTest_test.cpp
+                   tests/GLTest_test.cpp \
+                   tests/EGLCleanup_test.cpp \
+                   tests/EGLCreateContext_test.cpp
 
-LOCAL_SHARE_LIBRARIES := libgtest
+LOCAL_SHARED_LIBRARIES := libgtest
 
 include $(BUILD_SHARED_LIBRARY)

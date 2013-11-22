@@ -29,5 +29,6 @@
 
        const/4 v5, 0
        monitor-enter v5
+       monitor-exit v5
        return-void
 .end method

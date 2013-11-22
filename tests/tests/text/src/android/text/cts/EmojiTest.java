@@ -222,6 +222,14 @@ public class EmojiTest extends ActivityInstrumentationTestCase2<EmojiStubActivit
 
             webViewOnUiThread.loadDataAndWaitForCompletion("<html><body>" + String.valueOf(c) + "</body></html>",
                     "text/html; charset=utf-8", "utf-8");
+            // The Chromium-powered WebView renders asynchronously and there's nothing reliable
+            // we can easily wait for to be sure that capturePicture will return a fresh frame.
+            // So, just sleep for a sufficient time.
+            try {
+                Thread.sleep(250);
+            } catch (InterruptedException e) {
+                return null;
+            }
 
             Picture picture = webViewOnUiThread.capturePicture();
             if (picture == null || picture.getHeight() <= 0 || picture.getWidth() <= 0) {

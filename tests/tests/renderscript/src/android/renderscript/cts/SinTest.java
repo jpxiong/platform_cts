@@ -22,11 +22,13 @@ import android.renderscript.RSRuntimeException;
 
 public class SinTest extends RSBaseCompute {
     private ScriptC_sin_f32 script_f32;
+    private ScriptC_sin_f32_relaxed script_f32_relaxed;
 
     @Override
     protected void setUp() throws Exception {
         super.setUp();
         script_f32 = new ScriptC_sin_f32(mRS);
+        script_f32_relaxed = new ScriptC_sin_f32_relaxed(mRS);
     }
 
     @Override
@@ -43,6 +45,19 @@ public class SinTest extends RSBaseCompute {
             break;
         case TEST_F32_4:
             script_f32.forEach_sin_f32_4(mIn, mOut);
+            break;
+
+        case TEST_RELAXED_F32:
+            script_f32_relaxed.forEach_sin_f32_1(mIn, mOut);
+            break;
+        case TEST_RELAXED_F32_2:
+            script_f32_relaxed.forEach_sin_f32_2(mIn, mOut);
+            break;
+        case TEST_RELAXED_F32_3:
+            script_f32_relaxed.forEach_sin_f32_3(mIn, mOut);
+            break;
+        case TEST_RELAXED_F32_4:
+            script_f32_relaxed.forEach_sin_f32_4(mIn, mOut);
             break;
         }
     }
@@ -64,15 +79,32 @@ public class SinTest extends RSBaseCompute {
         doF32(0xba, 4);
     }
 
+    public void testSinF32_relaxed() {
+        doF32_relaxed(0xba, 128);
+    }
+
     public void testSinF32_2() {
         doF32_2(0xbaa, 4);
+    }
+
+    public void testSinF32_2_relaxed() {
+        doF32_2_relaxed(0xbaa, 128);
     }
 
     public void testSinF32_3() {
         doF32_3(0xca, 4);
     }
 
+    public void testSinF32_3_relaxed() {
+        doF32_3_relaxed(0xca, 128);
+    }
+
     public void testSinF32_4() {
         doF32_4(0xda, 4);
+
     }
+    public void testSinF32_4_relaxed() {
+        doF32_4_relaxed(0xda, 128);
+    }
+
 }

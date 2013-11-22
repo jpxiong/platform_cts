@@ -16,7 +16,7 @@
 .class public dot.junit.opcodes.sput_byte.d.T_sput_byte_21
 .super java/lang/Object
 
-.field public static st_s I
+.field public static st_s S
 
 .method public <init>()V
 .limit regs 1
@@ -28,7 +28,7 @@
 .method public run()V
 .limit regs 4
        const v0, 12    
-       sput-byte v0, dot.junit.opcodes.sput_byte.d.T_sput_byte_21.st_s I
+       sput-byte v0, dot.junit.opcodes.sput_byte.d.T_sput_byte_21.st_s S
        return-void
 .end method
 

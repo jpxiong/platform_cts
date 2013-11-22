@@ -18,10 +18,10 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
       package="com.android.cts.verifier"
       android:versionCode="1"
-      android:versionName="4.3_r1">
+      android:versionName="4.4_r0">
 
-    <!-- Using 10 for more complete NFC support... -->
-    <uses-sdk android:minSdkVersion="11"></uses-sdk>
+    <!-- Using 10+ for more complete NFC support... -->
+    <uses-sdk android:minSdkVersion="12"></uses-sdk>
 
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
@@ -41,6 +41,8 @@
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="com.android.alarm.permission.SET_ALARM" />
+
     <uses-feature android:name="android.hardware.usb.accessory" />
 
     <!-- Needed by the Audio Quality Verifier to store the sound samples that will be mailed. -->
@@ -52,7 +54,6 @@
             android:debuggable="true"
             android:largeHeap="true">
 
-        <uses-library android:name="com.android.future.usb.accessory" />
         <meta-data android:name="com.google.android.backup.api_key"
                 android:value="AEdPqrEAAAAIbK6ldcOzoeRtQ1u1dFVJ1A7KetRhit-a1Xa82Q" />
 
@@ -87,6 +88,9 @@
             </intent-filter>
             <meta-data android:name="test_category" android:value="@string/test_category_device_admin" />
         </activity>
+
+        <!-- A generic activity for intent based tests -->
+        <activity android:name=".IntentDrivenTestActivity"/>
 
         <activity android:name=".admin.ScreenLockTestActivity"
                 android:label="@string/da_screen_lock_test"
@@ -354,7 +358,7 @@
             </intent-filter>
             <meta-data android:name="test_category" android:value="@string/test_category_camera" />
             <meta-data android:name="test_required_features" android:value="android.hardware.sensor.gyroscope" />
-            <meta-data android:name="test_required_features" android:value="android.hardware.camera.any"/>
+            <meta-data android:name="test_required_features" android:value="android.hardware.camera"/>
         </activity>
         <activity
             android:name=".camera.fov.DetermineFovActivity"
@@ -408,7 +412,23 @@
         </service>
         
         <service  android:name="nls.NotificationListenerVerifierActivity$DismissService"/>
-        
+        <activity android:name=".security.CAInstallNotificationVerifierActivity"
+                android:label="@string/cacert_test">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.cts.intent.category.MANUAL_TEST" />
+            </intent-filter>
+            <meta-data android:name="test_category" android:value="@string/test_category_notifications" />
+        </activity>
+        <activity android:name=".security.CANotifyOnBootActivity"
+                android:label="@string/caboot_test">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.cts.intent.category.MANUAL_TEST" />
+            </intent-filter>
+            <meta-data android:name="test_category" android:value="@string/test_category_notifications" />
+        </activity>
+
         <activity android:name=".p2p.GoNegRequesterTestListActivity"
                 android:label="@string/p2p_go_neg_requester"
                 android:configChanges="keyboardHidden|orientation|screenSize" />
@@ -460,6 +480,15 @@
                 <category android:name="android.cts.intent.category.MANUAL_TEST" />
             </intent-filter>
             <meta-data android:name="test_category" android:value="@string/test_category_other" />
+        </activity>
+
+        <activity android:name=".deskclock.DeskClockTestsActivity"
+                  android:label="@string/deskclock_tests">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.cts.intent.category.MANUAL_TEST" />
+            </intent-filter>
+            <meta-data android:name="test_category" android:value="@string/test_category_deskclock" />
         </activity>
 
         <receiver android:name=".widget.WidgetCtsProvider">

@@ -20,7 +20,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.android.gltest"
     android:versionCode="1"
-    android:versionName="1.0" >
+    android:versionName="1.0"
+    android:debuggable="true" >
 
     <uses-sdk
         android:minSdkVersion="8"
@@ -28,7 +29,7 @@
 
     <uses-permission android:name="android.permission.DISABLE_KEYGUARD" />
 
-    <application>
+    <application android:label="NativeGLTest">
         <activity android:name=".GLTestActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

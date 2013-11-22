@@ -131,7 +131,9 @@ public class ServicePermissionsTest extends AndroidTestCase {
             }
 
             if (lines.size() == 1) {
-                if (!lines.get(0).contains("Permission Denial")) {
+                String message = lines.get(0);
+                if (!message.contains("Permission Denial") &&
+                        !message.contains("android.permission.DUMP")) {
                     fail("dump() for " + service + " produced a single line which didn't "
                             + "reference a permission; it may be leaking sensitive data.");
                 }

@@ -642,8 +642,8 @@ public class ContentResolverTest extends AndroidTestCase {
 
         try {
             mContentResolver.openFileDescriptor(uri, "d");
-            fail("did not throw FileNotFoundException when mode is unknown.");
-        } catch (FileNotFoundException e) {
+            fail("did not throw IllegalArgumentException when mode is unknown.");
+        } catch (IllegalArgumentException e) {
             //expected.
         }
 

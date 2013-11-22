@@ -16,21 +16,24 @@
 
 package com.android.cts.appaccessdata;
 
+import java.io.BufferedReader;
+import java.io.DataInputStream;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.IOException;
 
 import android.test.AndroidTestCase;
 
 /**
- * Test that another app's private data cannot be accessed.
+ * Test that another app's private data cannot be accessed, while its public data can.
  *
- * Assumes that {@link APP_WITH_DATA_PKG} has already created the private data.
+ * Assumes that {@link APP_WITH_DATA_PKG} has already created the private and public data.
  */
 public class AccessPrivateDataTest extends AndroidTestCase {
 
     /**
-     * The Android package name of the application that owns the private data
+     * The Android package name of the application that owns the data
      */
     private static final String APP_WITH_DATA_PKG = "com.android.cts.appwithdata";
 
@@ -39,9 +42,15 @@ public class AccessPrivateDataTest extends AndroidTestCase {
      * {@link APP_WITH_DATA_PKG}.
      */
     private static final String PRIVATE_FILE_NAME = "private_file.txt";
+    /**
+     * Name of public file to access. This must match the name of the file created by
+     * {@link APP_WITH_DATA_PKG}.
+     */
+    private static final String PUBLIC_FILE_NAME = "public_file.txt";
 
     /**
-     * Tests that another app's private file cannot be accessed
+     * Tests that another app's private data cannot be accessed. It includes file
+     * and detailed traffic stats.
      * @throws IOException
      */
     public void testAccessPrivateData() throws IOException {
@@ -58,5 +67,60 @@ public class AccessPrivateDataTest extends AndroidTestCase {
         } catch (SecurityException e) {
             // also valid
         }
+        accessPrivateTrafficStats();
+    }
+
+    /**
+     * Tests that another app's public file can be accessed
+     * @throws IOException
+     */
+    public void testAccessPublicData() throws IOException {
+        try {
+            getOtherAppUid();
+        } catch (FileNotFoundException e) {
+            fail("Was not able to access another app's public file: " + e);
+        } catch (SecurityException e) {
+            fail("Was not able to access another app's public file: " + e);
+        }
+    }
+
+    private int getOtherAppUid() throws IOException, FileNotFoundException, SecurityException {
+        // construct the absolute file path to the other app's public file
+        String publicFilePath = String.format("/data/data/%s/files/%s", APP_WITH_DATA_PKG,
+                PUBLIC_FILE_NAME);
+        DataInputStream inputStream = new DataInputStream(new FileInputStream(publicFilePath));
+        int otherAppUid = (int)inputStream.readInt();
+        inputStream.close();
+        return otherAppUid;
+    }
+
+    private void accessPrivateTrafficStats() throws IOException {
+        int otherAppUid = -1;
+        try {
+            otherAppUid = getOtherAppUid();
+        } catch (FileNotFoundException e) {
+            fail("Was not able to access another app's public file: " + e);
+        } catch (SecurityException e) {
+            fail("Was not able to access another app's public file: " + e);
+        }
+
+        boolean foundOtherStats = false;
+        try {
+            BufferedReader qtaguidReader = new BufferedReader(new FileReader("/proc/net/xt_qtaguid/stats"));
+            String line;
+            while ((line = qtaguidReader.readLine()) != null) {
+                String tokens[] = line.split(" ");
+                if (tokens.length > 3 && tokens[3].equals(String.valueOf(otherAppUid))) {
+                    foundOtherStats = true;
+                    if (!tokens[2].equals("0x0")) {
+                        fail("Other apps detailed traffic stats leaked");
+                    }
+                }
+            }
+            qtaguidReader.close();
+        } catch (FileNotFoundException e) {
+            fail("Was not able to access qtaguid/stats: " + e);
+        }
+        assertTrue("Was expecting to find other apps' traffic stats", foundOtherStats);
     }
 }

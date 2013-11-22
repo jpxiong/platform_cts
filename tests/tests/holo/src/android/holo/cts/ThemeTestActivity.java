@@ -36,6 +36,7 @@ import java.util.concurrent.TimeoutException;
 public class ThemeTestActivity extends Activity {
 
     private static final String TAG = ThemeTestActivity.class.getSimpleName();
+    private static final boolean DEBUG = false;
 
     static final String EXTRA_TASK = "task";
     static final String EXTRA_THEME_INDEX = "themeIndex";
@@ -112,7 +113,10 @@ public class ThemeTestActivity extends Activity {
             mResultFuture.set(mPendingResult);
             if (mRequestCode == GENERATE_BITMAP_REQUEST_CODE) {
                 // finish with result so that generated bitmaps can be captured automatically
-                setResult(0);
+                if (DEBUG) {
+                    Log.i(TAG, "generateNextBitmap finishing");
+                }
+                setResult(RESULT_OK);
                 finish();
             }
         }
@@ -120,6 +124,9 @@ public class ThemeTestActivity extends Activity {
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (DEBUG) {
+            Log.i(TAG,  "onActivityResult req:" + requestCode + " res:" + resultCode);
+        }
         switch (requestCode) {
             case VIEW_TESTS_REQUEST_CODE:
                 return;

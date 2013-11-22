@@ -58,6 +58,22 @@ public class MediaDrmMockTest extends AndroidTestCase {
         }
     }
 
+    public void testIsMimeTypeSupported() throws Exception {
+        if (!isMockPluginInstalled()) {
+            return;
+        }
+        String mimeType = "video/mp4";
+        assertTrue(MediaDrm.isCryptoSchemeSupported(mockScheme, mimeType));
+    }
+
+    public void testIsMimeTypeNotSupported() throws Exception {
+        if (!isMockPluginInstalled()) {
+            return;
+        }
+        String mimeType = "video/foo";
+        assertFalse(MediaDrm.isCryptoSchemeSupported(mockScheme, mimeType));
+    }
+
     public void testMediaDrmConstructorFails() throws Exception {
         if (!isMockPluginInstalled()) {
             return;
@@ -290,7 +306,7 @@ public class MediaDrmMockTest extends AndroidTestCase {
 
         assertTrue(Arrays.equals(initData, md.getPropertyByteArray("mock-initdata")));
         assertTrue(mimeType.equals(md.getPropertyString("mock-mimetype")));
-        assertTrue(md.getPropertyString("mock-keytype").equals("2"));
+        assertTrue(md.getPropertyString("mock-keytype").equals("0"));
 
         md.closeSession(sessionId);
     }
@@ -317,7 +333,7 @@ public class MediaDrmMockTest extends AndroidTestCase {
         assertTrue(request.getDefaultUrl().equals(testDefaultUrl));
 
         assertTrue(mimeType.equals(md.getPropertyString("mock-mimetype")));
-        assertTrue(md.getPropertyString("mock-keytype").equals("3"));
+        assertTrue(md.getPropertyString("mock-keytype").equals("2"));
 
         md.closeSession(sessionId);
     }

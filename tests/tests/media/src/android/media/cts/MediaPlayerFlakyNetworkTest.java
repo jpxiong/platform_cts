@@ -63,7 +63,7 @@ public class MediaPlayerFlakyNetworkTest extends MediaPlayerTestBase {
         releaseHttpServer();
         super.tearDown();
     }
-/* disable the whole tests until someone could fix it.
+
     public void test_S0P0() throws Throwable {
         doPlayStreams(0, 0);
     }
@@ -91,7 +91,7 @@ public class MediaPlayerFlakyNetworkTest extends MediaPlayerTestBase {
     public void test_S6P00002() throws Throwable {
         doPlayStreams(6, 0.00002f);
     }
-*/
+
    private void doPlayStreams(int seed, float probability) throws Throwable {
         Random random = new Random(seed);
         createHttpServer(seed, probability);
@@ -309,8 +309,7 @@ public class MediaPlayerFlakyNetworkTest extends MediaPlayerTestBase {
                     try {
                         float random = mRandom.nextFloat();
                         if (random < probability) {
-                            // TODO restore 1000 to 6000 after fixing 6770717
-                            int sleepTimeMs = 1000 + mRandom.nextInt(500);
+                            int sleepTimeMs = 1000 + mRandom.nextInt(5000);
                             Thread.sleep(sleepTimeMs);
                             flush();
                         } else if (random < probability * 100) {

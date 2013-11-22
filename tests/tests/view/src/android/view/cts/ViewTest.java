@@ -38,6 +38,7 @@ import android.os.Vibrator;
 import android.test.ActivityInstrumentationTestCase2;
 import android.test.TouchUtils;
 import android.test.UiThreadTest;
+import android.text.format.DateUtils;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.util.SparseArray;
@@ -90,7 +91,7 @@ public class ViewTest extends ActivityInstrumentationTestCase2<ViewTestStubActiv
 
     private Resources mResources;
     private MockViewParent mMockParent;
-    private Activity mActivity;
+    private ViewTestStubActivity mActivity;
 
     /** timeout delta when wait in case the system is sluggish */
     private static final long TIMEOUT_DELTA = 10000;
@@ -109,6 +110,7 @@ public class ViewTest extends ActivityInstrumentationTestCase2<ViewTestStubActiv
         }.run();
         mResources = mActivity.getResources();
         mMockParent = new MockViewParent(mActivity);
+        assertTrue(mActivity.waitForWindowFocus(5 * DateUtils.SECOND_IN_MILLIS));
     }
 
     public void testConstructor() {
@@ -1860,25 +1862,17 @@ public class ViewTest extends ActivityInstrumentationTestCase2<ViewTestStubActiv
         });
         getInstrumentation().waitForIdleSync();
 
-        int[] xy = new int[2];
-        view.getLocationOnScreen(xy);
-
-        final int viewWidth = view.getWidth();
-        final int viewHeight = view.getHeight();
-        final float x = xy[0] + viewWidth / 2.0f;
-        final float y = xy[1] + viewHeight / 2.0f;
-
         long downTime = SystemClock.uptimeMillis();
-        long eventTime = SystemClock.uptimeMillis();
-        MotionEvent event = MotionEvent.obtain(downTime, eventTime, MotionEvent.ACTION_DOWN,
-                x, y, 0);
+        long eventTime = downTime;
+        MotionEvent event = MotionEvent.obtain(downTime, eventTime, MotionEvent.ACTION_MOVE,
+                1, 2, 0);
         getInstrumentation().sendTrackballEventSync(event);
         getInstrumentation().waitForIdleSync();
         assertTrue(view.hasCalledOnTrackballEvent());
     }
 
     @UiThreadTest
-    public void testDispatchTrackballEvent() {
+    public void testDispatchTrackballMoveEvent() {
         ViewGroup viewGroup = (ViewGroup) mActivity.findViewById(R.id.viewlayout_root);
         MockView mockView1 = new MockView(mActivity);
         MockView mockView2 = new MockView(mActivity);
@@ -1889,8 +1883,8 @@ public class ViewTest extends ActivityInstrumentationTestCase2<ViewTestStubActiv
         mockView2.requestFocus();
 
         long downTime = SystemClock.uptimeMillis();
-        long eventTime = SystemClock.uptimeMillis();
-        MotionEvent event = MotionEvent.obtain(downTime, eventTime, MotionEvent.ACTION_DOWN,
+        long eventTime = downTime;
+        MotionEvent event = MotionEvent.obtain(downTime, eventTime, MotionEvent.ACTION_MOVE,
                 1, 2, 0);
         mockView1.dispatchTrackballEvent(event);
         // issue 1695243
@@ -1901,8 +1895,8 @@ public class ViewTest extends ActivityInstrumentationTestCase2<ViewTestStubActiv
         mockView1.reset();
         mockView2.reset();
         downTime = SystemClock.uptimeMillis();
-        eventTime = SystemClock.uptimeMillis();
-        event = MotionEvent.obtain(downTime, eventTime, MotionEvent.ACTION_DOWN, 1, 2, 0);
+        eventTime = downTime;
+        event = MotionEvent.obtain(downTime, eventTime, MotionEvent.ACTION_MOVE, 1, 2, 0);
         mockView2.dispatchTrackballEvent(event);
         assertFalse(mockView1.hasCalledOnTrackballEvent());
         assertTrue(mockView2.hasCalledOnTrackballEvent());
@@ -3393,7 +3387,8 @@ public class ViewTest extends ActivityInstrumentationTestCase2<ViewTestStubActiv
         }
 
         @Override
-        public void childAccessibilityStateChanged(View child) {
+        public void notifySubtreeAccessibilityStateChanged(View child,
+            View source, int changeType) {
 
         }
     }

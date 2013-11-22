@@ -37,11 +37,10 @@ class InputSurface {
     private static final String TAG = "InputSurface";
 
     private static final int EGL_RECORDABLE_ANDROID = 0x3142;
-    private static final int EGL_OPENGL_ES2_BIT = 4;
 
-    private EGLDisplay mEGLDisplay;
-    private EGLContext mEGLContext;
-    private EGLSurface mEGLSurface;
+    private EGLDisplay mEGLDisplay = EGL14.EGL_NO_DISPLAY;
+    private EGLContext mEGLContext = EGL14.EGL_NO_CONTEXT;
+    private EGLSurface mEGLSurface = EGL14.EGL_NO_SURFACE;
 
     private Surface mSurface;
 
@@ -71,13 +70,13 @@ class InputSurface {
             throw new RuntimeException("unable to initialize EGL14");
         }
 
-        // Configure EGL for pbuffer and OpenGL ES 2.0.  We want enough RGB bits
-        // to be able to tell if the frame is reasonable.
+        // Configure EGL for recordable and OpenGL ES 2.0.  We want enough RGB bits
+        // to minimize artifacts from possible YUV conversion.
         int[] attribList = {
                 EGL14.EGL_RED_SIZE, 8,
                 EGL14.EGL_GREEN_SIZE, 8,
                 EGL14.EGL_BLUE_SIZE, 8,
-                EGL14.EGL_RENDERABLE_TYPE, EGL_OPENGL_ES2_BIT,
+                EGL14.EGL_RENDERABLE_TYPE, EGL14.EGL_OPENGL_ES2_BIT,
                 EGL_RECORDABLE_ANDROID, 1,
                 EGL14.EGL_NONE
         };
@@ -117,21 +116,18 @@ class InputSurface {
      * Surface that was passed to our constructor.
      */
     public void release() {
-        if (EGL14.eglGetCurrentContext().equals(mEGLContext)) {
-            // Clear the current context and surface to ensure they are discarded immediately.
-            EGL14.eglMakeCurrent(mEGLDisplay, EGL14.EGL_NO_SURFACE, EGL14.EGL_NO_SURFACE,
-                    EGL14.EGL_NO_CONTEXT);
+        if (mEGLDisplay != EGL14.EGL_NO_DISPLAY) {
+            EGL14.eglDestroySurface(mEGLDisplay, mEGLSurface);
+            EGL14.eglDestroyContext(mEGLDisplay, mEGLContext);
+            EGL14.eglReleaseThread();
+            EGL14.eglTerminate(mEGLDisplay);
         }
-        EGL14.eglDestroySurface(mEGLDisplay, mEGLSurface);
-        EGL14.eglDestroyContext(mEGLDisplay, mEGLContext);
-        //EGL14.eglTerminate(mEGLDisplay);
 
         mSurface.release();
 
-        // null everything out so future attempts to use this object will cause an NPE
-        mEGLDisplay = null;
-        mEGLContext = null;
-        mEGLSurface = null;
+        mEGLDisplay = EGL14.EGL_NO_DISPLAY;
+        mEGLContext = EGL14.EGL_NO_CONTEXT;
+        mEGLSurface = EGL14.EGL_NO_SURFACE;
 
         mSurface = null;
     }
@@ -141,6 +137,13 @@ class InputSurface {
      */
     public void makeCurrent() {
         if (!EGL14.eglMakeCurrent(mEGLDisplay, mEGLSurface, mEGLSurface, mEGLContext)) {
+            throw new RuntimeException("eglMakeCurrent failed");
+        }
+    }
+
+    public void makeUnCurrent() {
+        if (!EGL14.eglMakeCurrent(mEGLDisplay, EGL14.EGL_NO_SURFACE, EGL14.EGL_NO_SURFACE,
+                EGL14.EGL_NO_CONTEXT)) {
             throw new RuntimeException("eglMakeCurrent failed");
         }
     }
@@ -160,6 +163,24 @@ class InputSurface {
     }
 
     /**
+     * Queries the surface's width.
+     */
+    public int getWidth() {
+        int[] value = new int[1];
+        EGL14.eglQuerySurface(mEGLDisplay, mEGLSurface, EGL14.EGL_WIDTH, value, 0);
+        return value[0];
+    }
+
+    /**
+     * Queries the surface's height.
+     */
+    public int getHeight() {
+        int[] value = new int[1];
+        EGL14.eglQuerySurface(mEGLDisplay, mEGLSurface, EGL14.EGL_HEIGHT, value, 0);
+        return value[0];
+    }
+
+    /**
      * Sends the presentation time stamp to EGL.  Time is expressed in nanoseconds.
      */
     public void setPresentationTime(long nsecs) {
@@ -170,14 +191,9 @@ class InputSurface {
      * Checks for EGL errors.
      */
     private void checkEglError(String msg) {
-        boolean failed = false;
         int error;
-        while ((error = EGL14.eglGetError()) != EGL14.EGL_SUCCESS) {
-            Log.e(TAG, msg + ": EGL error: 0x" + Integer.toHexString(error));
-            failed = true;
-        }
-        if (failed) {
-            throw new RuntimeException("EGL error encountered (see log)");
+        if ((error = EGL14.eglGetError()) != EGL14.EGL_SUCCESS) {
+            throw new RuntimeException(msg + ": EGL error: 0x" + Integer.toHexString(error));
         }
     }
 }

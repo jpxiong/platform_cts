@@ -27,7 +27,7 @@
 .method public run()I
 .limit regs 3
 
-       invoke-direct/range {v1}, dot/junit/opcodes/invoke_direct_range/TSuper/toIntPvt()I
+       invoke-direct/range {v2}, dot/junit/opcodes/invoke_direct_range/TSuper/toIntPvt()I
        move-result v0
        return v0
 .end method

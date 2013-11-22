@@ -16,52 +16,71 @@
 
 package com.android.cts.externalstorageapp;
 
+import static com.android.cts.externalstorageapp.CommonExternalStorageTest.PACKAGE_NONE;
+import static com.android.cts.externalstorageapp.CommonExternalStorageTest.PACKAGE_READ;
+import static com.android.cts.externalstorageapp.CommonExternalStorageTest.PACKAGE_WRITE;
+import static com.android.cts.externalstorageapp.CommonExternalStorageTest.assertDirNoAccess;
+import static com.android.cts.externalstorageapp.CommonExternalStorageTest.assertDirReadWriteAccess;
+import static com.android.cts.externalstorageapp.CommonExternalStorageTest.assertFileNoAccess;
+import static com.android.cts.externalstorageapp.CommonExternalStorageTest.assertFileReadWriteAccess;
+import static com.android.cts.externalstorageapp.CommonExternalStorageTest.buildGiftForPackage;
+import static com.android.cts.externalstorageapp.CommonExternalStorageTest.getAllPackageSpecificPaths;
+import static com.android.cts.externalstorageapp.CommonExternalStorageTest.readInt;
+
 import android.os.Environment;
 import android.test.AndroidTestCase;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.util.List;
 
 /**
- * Test if {@link Environment#getExternalStorageDirectory()} is readable.
+ * Test external storage from an application that has no external storage
+ * permissions.
  */
 public class ExternalStorageTest extends AndroidTestCase {
 
-    private static final String TEST_FILE = "meow";
-
-    private void assertExternalStorageMounted() {
-        assertEquals(Environment.MEDIA_MOUNTED, Environment.getExternalStorageState());
+    public void testPrimaryNoAccess() throws Exception {
+        assertDirNoAccess(Environment.getExternalStorageDirectory());
     }
 
-    private void readExternalStorage() throws IOException {
-        final File file = new File(Environment.getExternalStorageDirectory(), TEST_FILE);
-        final InputStream is = new FileInputStream(file);
-        try {
-            is.read();
-        } finally {
-            is.close();
+    /**
+     * Verify that above our package directories we always have no access.
+     */
+    public void testAllWalkingUpTreeNoAccess() throws Exception {
+        final List<File> paths = getAllPackageSpecificPaths(getContext());
+        final String packageName = getContext().getPackageName();
+
+        for (File path : paths) {
+            if (path == null) continue;
+
+            assertTrue(path.getAbsolutePath().contains(packageName));
+
+            // Walk up until we drop our package
+            while (path.getAbsolutePath().contains(packageName)) {
+                assertDirReadWriteAccess(path);
+                path = path.getParentFile();
+            }
+
+            // Keep walking up until we leave device
+            while (Environment.MEDIA_MOUNTED.equals(Environment.getStorageState(path))) {
+                assertDirNoAccess(path);
+                path = path.getParentFile();
+            }
         }
     }
 
-    public void testReadExternalStorage() throws Exception {
-        assertExternalStorageMounted();
-        try {
-            readExternalStorage();
-        } catch (IOException e) {
-            fail("unable to read external file");
-        }
-    }
+    /**
+     * Verify we can read only our gifts.
+     */
+    public void doVerifyGifts() throws Exception {
+        final File none = buildGiftForPackage(getContext(), PACKAGE_NONE);
+        assertFileReadWriteAccess(none);
+        assertEquals(100, readInt(none));
 
-    public void testFailReadExternalStorage() throws Exception {
-        assertExternalStorageMounted();
-        try {
-            readExternalStorage();
-            fail("able read external file");
-        } catch (IOException e) {
-            // expected
-            e.printStackTrace();
-        }
+        final File read = buildGiftForPackage(getContext(), PACKAGE_READ);
+        assertFileNoAccess(read);
+
+        final File write = buildGiftForPackage(getContext(), PACKAGE_WRITE);
+        assertFileNoAccess(write);
     }
 }

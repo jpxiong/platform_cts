@@ -16,16 +16,11 @@
 
 package android.text.method.cts;
 
-import com.android.cts.stub.R;
-
-
-import android.app.Activity;
-import android.app.Instrumentation;
-import android.test.ActivityInstrumentationTestCase2;
 import android.text.InputType;
 import android.text.Selection;
 import android.text.Spannable;
 import android.text.SpannableStringBuilder;
+import android.text.method.cts.KeyListenerTestCase;
 import android.text.method.MultiTapKeyListener;
 import android.text.method.TextKeyListener.Capitalize;
 import android.view.KeyEvent;
@@ -34,27 +29,11 @@ import android.widget.TextView.BufferType;
 
 import java.util.concurrent.TimeUnit;
 
-public class MultiTapKeyListenerTest extends
-        ActivityInstrumentationTestCase2<KeyListenerStubActivity> {
+public class MultiTapKeyListenerTest extends KeyListenerTestCase {
     /**
      * time out of MultiTapKeyListener. longer than 2000ms in case the system is sluggish.
      */
     private static final long TIME_OUT = 3000;
-    private Activity mActivity;
-    private Instrumentation mInstrumentation;
-    private TextView mTextView;
-
-    public MultiTapKeyListenerTest() {
-        super("com.android.cts.stub", KeyListenerStubActivity.class);
-    }
-
-    @Override
-    protected void setUp() throws Exception {
-        super.setUp();
-        mActivity = getActivity();
-        mInstrumentation = getInstrumentation();
-        mTextView = (TextView) mActivity.findViewById(R.id.keylistener_textview);
-    }
 
     public void testConstructor() {
         new MultiTapKeyListener(Capitalize.NONE, true);
@@ -65,20 +44,20 @@ public class MultiTapKeyListenerTest extends
     }
 
     public void testOnSpanAdded() {
-        final MockMultiTapKeyListener multiTapKeyListener
+        final MockMultiTapKeyListener mockMultiTapKeyListener
                 = new MockMultiTapKeyListener(Capitalize.CHARACTERS, true);
         final Spannable text = new SpannableStringBuilder("123456");
 
-        assertFalse(multiTapKeyListener.hadAddedSpan());
+        assertFalse(mockMultiTapKeyListener.hadAddedSpan());
         mActivity.runOnUiThread(new Runnable() {
             public void run() {
-                mTextView.setKeyListener(multiTapKeyListener);
+                mTextView.setKeyListener(mockMultiTapKeyListener);
                 mTextView.setText(text, BufferType.EDITABLE);
             }
         });
         mInstrumentation.waitForIdleSync();
 
-        assertTrue(multiTapKeyListener.hadAddedSpan());
+        assertTrue(mockMultiTapKeyListener.hadAddedSpan());
     }
 
     public void testOnSpanChanged() {
@@ -263,6 +242,11 @@ public class MultiTapKeyListenerTest extends
         assertEquals(expected, listener.getInputType());
     }
 
+    /**
+     * A mocked {@link android.text.method.MultiTapKeyListener} for testing purposes.
+     *
+     * Tracks whether {@link MockMultiTapKeyListener#onSpanAdded()} has been called.
+     */
     private class MockMultiTapKeyListener extends MultiTapKeyListener {
         private boolean mHadAddedSpan;
 

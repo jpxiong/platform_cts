@@ -21,11 +21,16 @@ import com.android.cts.stub.R;
 
 public class RsFracTest extends RSBaseCompute {
     private ScriptC_rs_frac_f32 mScript;
+    private ScriptC_rs_frac_f32_relaxed mScript_relaxed;
 
     @Override
     public void forEach(int testId, Allocation mIn, Allocation mOut)
             throws RSRuntimeException {
-        mScript.forEach_root(mIn, mOut);
+        if (testId == TEST_F32) {
+            mScript.forEach_root(mIn, mOut);
+        } else if (testId == TEST_RELAXED_F32) {
+            mScript_relaxed.forEach_root(mIn, mOut);
+        }
     }
 
     @Override
@@ -45,4 +50,9 @@ public class RsFracTest extends RSBaseCompute {
         mScript = new ScriptC_rs_frac_f32(mRS, mRes, R.raw.rs_frac_f32);
         doF32(0x12, 0);
     }
+    public void testRsFrac_relaxed() {
+        mScript_relaxed = new ScriptC_rs_frac_f32_relaxed(mRS, mRes, R.raw.rs_frac_f32);
+        doF32_relaxed(0x12, 1);
+    }
+
 }

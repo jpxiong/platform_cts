@@ -17,20 +17,27 @@
 package android.view.inputmethod.cts;
 
 import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
+import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.content.pm.ServiceInfo;
+import android.content.res.Resources;
 import android.os.Parcel;
 import android.test.AndroidTestCase;
 import android.util.Printer;
 import android.view.inputmethod.InputMethod;
 import android.view.inputmethod.InputMethodInfo;
+import android.view.inputmethod.InputMethodManager;
 import android.view.inputmethod.InputMethodSubtype;
 
 import org.xmlpull.v1.XmlPullParserException;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 
 public class InputMethodInfoTest extends AndroidTestCase {
@@ -187,7 +194,46 @@ public class InputMethodInfoTest extends AndroidTestCase {
                 subtype.overridesImplicitlyEnabledSubtype());
     }
 
+    public void testInputMethodSubtypesOfSystemImes() {
+        final InputMethodManager imm = (InputMethodManager) mContext
+                .getSystemService(Context.INPUT_METHOD_SERVICE);
+        final List<InputMethodInfo> imis = imm.getInputMethodList();
+        final ArrayList<String> localeList = new ArrayList<String>(Arrays.asList(
+                Resources.getSystem().getAssets().getLocales()));
+        boolean foundEnabledSystemImeSubtypeWithValidLanguage = false;
+        for (InputMethodInfo imi : imis) {
+            if ((imi.getServiceInfo().applicationInfo.flags & ApplicationInfo.FLAG_SYSTEM) == 0) {
+                continue;
+            }
+            final int subtypeCount = imi.getSubtypeCount();
+            // System IME must have one subtype at least.
+            assertTrue(subtypeCount > 0);
+            if (foundEnabledSystemImeSubtypeWithValidLanguage) {
+                continue;
+            }
+            final List<InputMethodSubtype> enabledSubtypes =
+                    imm.getEnabledInputMethodSubtypeList(imi, true);
+            SUBTYPE_LOOP:
+            for (InputMethodSubtype subtype : enabledSubtypes) {
+                final String subtypeLocale = subtype.getLocale();
+                if (subtypeLocale.length() < 2) {
+                    continue;
+                }
+                // TODO: Detect language more strictly.
+                final String subtypeLanguage = subtypeLocale.substring(0, 2);
+                for (final String locale : localeList) {
+                    if (locale.startsWith(subtypeLanguage)) {
+                        foundEnabledSystemImeSubtypeWithValidLanguage = true;
+                        break SUBTYPE_LOOP;
+                    }
+                }
+            }
+        }
+        assertTrue(foundEnabledSystemImeSubtypeWithValidLanguage);
+    }
+
     class MockPrinter implements Printer {
+        @Override
         public void println(String x) {
         }
     }

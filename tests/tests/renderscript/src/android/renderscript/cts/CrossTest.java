@@ -23,12 +23,14 @@ import android.renderscript.RSRuntimeException;
 
 public class CrossTest extends RSBaseCompute {
     private ScriptC_cross_f32 script_f32;
+    private ScriptC_cross_f32_relaxed script_f32_relaxed;
     private Allocation mIn;
 
     @Override
     protected void setUp() throws Exception {
         super.setUp();
         script_f32 = new ScriptC_cross_f32(mRS);
+        script_f32_relaxed = new ScriptC_cross_f32_relaxed(mRS);
     }
 
     @Override
@@ -40,7 +42,14 @@ public class CrossTest extends RSBaseCompute {
         case TEST_F32_4:
             script_f32.forEach_cross_f32_4(mIn, mOut);
             break;
+        case TEST_RELAXED_F32_3:
+            script_f32_relaxed.forEach_cross_f32_3(mIn, mOut);
+            break;
+        case TEST_RELAXED_F32_4:
+            script_f32_relaxed.forEach_cross_f32_4(mIn, mOut);
+            break;
         }
+
     }
 
     @Override
@@ -77,6 +86,16 @@ public class CrossTest extends RSBaseCompute {
         doF32_3(0x12345678, 0);
     }
 
+    /*
+    Disable until we can add an absolute error metric
+    public void testCrossF32_3_relaxed() {
+        ScriptField__cross_f32_3_struct in = new ScriptField__cross_f32_3_struct(mRS, INPUTSIZE);
+        mIn = in.getAllocation();
+        doF32_3_relaxed(0x12345678, 2);
+    }
+    */
+
+
     /**
      * cross test for float4
      */
@@ -85,4 +104,14 @@ public class CrossTest extends RSBaseCompute {
         mIn = in.getAllocation();
         doF32_4(0x12ac5678, 0);
     }
+
+    /*
+    Disable until we can add an absolute error metric
+    public void testCrossF32_4_relaxed() {
+        ScriptField__cross_f32_4_struct in = new ScriptField__cross_f32_4_struct(mRS, INPUTSIZE);
+        mIn = in.getAllocation();
+        doF32_4_relaxed(0x12ac5678, 2);
+    }
+    */
+
 }

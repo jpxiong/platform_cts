@@ -16,44 +16,13 @@
 
 package android.text.method.cts;
 
-import com.android.cts.stub.R;
-
-
-import android.app.Activity;
-import android.app.Instrumentation;
-import android.cts.util.PollingCheck;
-import android.test.ActivityInstrumentationTestCase2;
 import android.text.InputType;
+import android.text.method.cts.KeyListenerTestCase;
 import android.text.method.TimeKeyListener;
 import android.view.KeyCharacterMap;
 import android.view.KeyEvent;
-import android.widget.TextView;
 
-public class TimeKeyListenerTest extends
-        ActivityInstrumentationTestCase2<KeyListenerStubActivity> {
-    private Activity mActivity;
-    private Instrumentation mInstrumentation;
-    private TextView mTextView;
-
-    public TimeKeyListenerTest(){
-        super("com.android.cts.stub", KeyListenerStubActivity.class);
-    }
-
-    @Override
-    protected void setUp() throws Exception {
-        super.setUp();
-
-        mActivity = getActivity();
-        mInstrumentation = getInstrumentation();
-        mTextView = (TextView) mActivity.findViewById(R.id.keylistener_textview);
-        new PollingCheck(1000) {
-            @Override
-            protected boolean check() {
-                return mTextView.hasWindowFocus();
-            }
-        }.run();
-    }
-
+public class TimeKeyListenerTest extends KeyListenerTestCase {
     public void testConstructor() {
         new TimeKeyListener();
     }
@@ -68,9 +37,9 @@ public class TimeKeyListenerTest extends
     }
 
     public void testGetAcceptedChars() {
-        MyTimeKeyListener timeKeyListener = new MyTimeKeyListener();
+        MockTimeKeyListener mockTimeKeyListener = new MockTimeKeyListener();
         TextMethodUtils.assertEquals(TimeKeyListener.CHARACTERS,
-                timeKeyListener.getAcceptedChars());
+                mockTimeKeyListener.getAcceptedChars());
     }
 
     public void testGetInputType() {
@@ -80,7 +49,7 @@ public class TimeKeyListenerTest extends
         assertEquals(expected, listener.getInputType());
     }
 
-    /**
+    /*
      * Scenario description:
      * 1. Press '1' key and check if the content of TextView becomes "1"
      * 2. Press '2' key and check if the content of TextView becomes "12"
@@ -94,13 +63,7 @@ public class TimeKeyListenerTest extends
         final TimeKeyListener timeKeyListener = TimeKeyListener.getInstance();
         String expectedText = "";
 
-        mActivity.runOnUiThread(new Runnable() {
-            public void run() {
-                mTextView.setKeyListener(timeKeyListener);
-                mTextView.requestFocus();
-            }
-        });
-        mInstrumentation.waitForIdleSync();
+        setKeyListenerSync(timeKeyListener);
         assertEquals(expectedText, mTextView.getText().toString());
 
         // press '1' key.
@@ -142,20 +105,20 @@ public class TimeKeyListenerTest extends
             assertEquals(expectedText, mTextView.getText().toString());
         }
 
-        mActivity.runOnUiThread(new Runnable() {
-            public void run() {
-                mTextView.setKeyListener(null);
-                mTextView.requestFocus();
-            }
-        });
-        mInstrumentation.waitForIdleSync();
+        setKeyListenerSync(null);
 
         // press '1' key.
         mInstrumentation.sendStringSync("1");
         assertEquals(expectedText, mTextView.getText().toString());
     }
 
-    private class MyTimeKeyListener extends TimeKeyListener {
+    /**
+     * A mocked {@link android.text.method.TimeKeyListener} for testing purposes.
+     *
+     * Allows {@link TimeKeyListenerTest} to call
+     * {@link android.text.method.TimeKeyListener#getAcceptedChars()}.
+     */
+    private class MockTimeKeyListener extends TimeKeyListener {
         @Override
         protected char[] getAcceptedChars() {
             return super.getAcceptedChars();

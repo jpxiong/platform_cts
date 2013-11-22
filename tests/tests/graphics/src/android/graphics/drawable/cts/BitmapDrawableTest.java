@@ -57,7 +57,7 @@ public class BitmapDrawableTest extends InstrumentationTestCase {
     public void testConstructor() {
         // TODO: should default paint flags be left as an untested implementation detail?
         final int defaultPaintFlags = Paint.FILTER_BITMAP_FLAG | Paint.DITHER_FLAG |
-            Paint.DEV_KERN_TEXT_FLAG;
+            Paint.DEV_KERN_TEXT_FLAG | Paint.EMBEDDED_BITMAP_TEXT_FLAG;
         BitmapDrawable bitmapDrawable = new BitmapDrawable();
         assertNotNull(bitmapDrawable.getPaint());
         assertEquals(defaultPaintFlags,

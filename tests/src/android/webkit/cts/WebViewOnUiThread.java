@@ -27,19 +27,23 @@ import android.os.SystemClock;
 import android.test.InstrumentationTestCase;
 import android.util.DisplayMetrics;
 import android.view.View;
+import android.view.ViewGroup;
+import android.view.ViewParent;
 import android.webkit.DownloadListener;
+import android.webkit.ValueCallback;
 import android.webkit.WebBackForwardList;
 import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
-import android.webkit.WebView;
 import android.webkit.WebView.HitTestResult;
 import android.webkit.WebView.PictureListener;
+import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
 import junit.framework.Assert;
 
 import java.io.File;
-
+import java.util.concurrent.Callable;
+import java.util.Map;
 
 /**
  * Many tests need to run WebView code in the UI thread. This class
@@ -236,11 +240,29 @@ public class WebViewOnUiThread {
         });
     }
 
-    public void zoomIn() {
+    public boolean zoomIn() {
+        return getValue(new ValueGetter<Boolean>() {
+            @Override
+            public Boolean capture() {
+                return mWebView.zoomIn();
+            }
+        });
+    }
+
+    public boolean zoomOut() {
+        return getValue(new ValueGetter<Boolean>() {
+            @Override
+            public Boolean capture() {
+                return mWebView.zoomOut();
+            }
+        });
+    }
+
+    public void setFindListener(final WebView.FindListener listener) {
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                mWebView.zoomIn();
+                mWebView.setFindListener(listener);
             }
         });
     }
@@ -350,6 +372,22 @@ public class WebViewOnUiThread {
         });
     }
 
+    /**
+     * Calls loadUrl on the WebView and then waits onPageFinished,
+     * onNewPicture and onProgressChange to reach 100.
+     * Test fails if the load timeout elapses.
+     * @param url The URL to load.
+     */
+    public void loadUrlAndWaitForCompletion(final String url,
+            final Map<String, String> extraHeaders) {
+        callAndWait(new Runnable() {
+            @Override
+            public void run() {
+                mWebView.loadUrl(url, extraHeaders);
+            }
+        });
+    }
+
     public void loadUrl(final String url) {
         runOnUiThread(new Runnable() {
             @Override
@@ -424,12 +462,22 @@ public class WebViewOnUiThread {
      * similar functions.
      */
     public void waitForLoadCompletion() {
-        if (isUiThread()) {
-            waitOnUiThread();
-        } else {
-            waitOnTestThread();
-        }
+        waitForCriteria(LOAD_TIMEOUT,
+                new Callable<Boolean>() {
+                    @Override
+                    public Boolean call() {
+                        return isLoaded();
+                    }
+                });
         clearLoad();
+    }
+
+    private void waitForCriteria(long timeout, Callable<Boolean> doneCriteria) {
+        if (isUiThread()) {
+            waitOnUiThread(timeout, doneCriteria);
+        } else {
+            waitOnTestThread(timeout, doneCriteria);
+        }
     }
 
     public String getTitle() {
@@ -627,6 +675,30 @@ public class WebViewOnUiThread {
         });
     }
 
+    public void evaluateJavascript(final String script, final ValueCallback<String> result) {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                mWebView.evaluateJavascript(script, result);
+            }
+        });
+    }
+
+    public void setLayoutHeightToMatchParent() {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                ViewParent parent = mWebView.getParent();
+                if (parent instanceof ViewGroup) {
+                    ((ViewGroup) parent).getLayoutParams().height =
+                        ViewGroup.LayoutParams.MATCH_PARENT;
+                }
+                mWebView.getLayoutParams().height = ViewGroup.LayoutParams.MATCH_PARENT;
+                mWebView.requestLayout();
+            }
+        });
+    }
+
     /**
      * Helper for running code on the UI thread where an exception is
      * a test failure. If this is already the UI thread then it runs
@@ -718,33 +790,42 @@ public class WebViewOnUiThread {
 
     /**
      * Uses a polling mechanism, while pumping messages to check when the
-     * load completes.
+     * criteria is met.
      */
-    private void waitOnUiThread() {
-        new PollingCheck(LOAD_TIMEOUT) {
+    private void waitOnUiThread(long timeout, final Callable<Boolean> doneCriteria) {
+        new PollingCheck(timeout) {
             @Override
             protected boolean check() {
                 pumpMessages();
-                return isLoaded();
+                try {
+                    return doneCriteria.call();
+                } catch (Exception e) {
+                    Assert.fail("Unexpected error while checking the criteria: "
+                            + e.getMessage());
+                    return true;
+                }
             }
         }.run();
     }
 
     /**
-     * Uses a wait/notify to check when the load completes.
+     * Uses a wait/notify to check when the criteria is met.
      */
-    private synchronized void waitOnTestThread() {
+    private synchronized void waitOnTestThread(long timeout, Callable<Boolean> doneCriteria) {
         try {
-            long waitEnd = SystemClock.uptimeMillis() + LOAD_TIMEOUT;
-            long timeRemaining = LOAD_TIMEOUT;
-            while (!isLoaded() && timeRemaining > 0) {
+            long waitEnd = SystemClock.uptimeMillis() + timeout;
+            long timeRemaining = timeout;
+            while (!doneCriteria.call() && timeRemaining > 0) {
                 this.wait(timeRemaining);
                 timeRemaining = waitEnd - SystemClock.uptimeMillis();
             }
+            Assert.assertTrue("Action failed to complete before timeout", doneCriteria.call());
         } catch (InterruptedException e) {
             // We'll just drop out of the loop and fail
+        } catch (Exception e) {
+            Assert.fail("Unexpected error while checking the criteria: "
+                    + e.getMessage());
         }
-        Assert.assertTrue("Load failed to complete before timeout", isLoaded());
     }
 
     /**

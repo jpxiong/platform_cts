@@ -15,7 +15,7 @@
 -->
 <resources>
     <string name="app_name">CTS Verifier</string>
-    
+
     <string name="title_version">CTS Verifier %1$s</string>
 
     <string name="pass_button_text">Pass</string>
@@ -32,6 +32,7 @@
     <string name="test_category_security">Security</string>
     <string name="test_category_streaming">Streaming</string>
     <string name="test_category_features">Features</string>
+    <string name="test_category_deskclock">Clock</string>
     <string name="test_category_other">Other</string>
     <string name="clear">Clear</string>
     <string name="test_results_cleared">Test results cleared.</string>
@@ -606,6 +607,24 @@
     <string name="nls_service_stopped">Service should stop once disabled.</string>
     <string name="nls_note_missed">Check that notification was not received.</string>
     
+    <string name="cacert_test">CA Cert Notification Test</string>
+    <string name="cacert_info">This test checks that when a CA Certificate is installed, the user is notified.</string>
+    <string name="cacert_do_something">Do it</string>
+    <string name="cacert_done">Done</string>
+    <string name="cacert_install_cert">Use the CertInstaller to install the certificate. When it opens, just tap "Okay". If this button does nothing, pass the test and move on.</string>
+    <string name="cacert_check_cert_in_settings">Visit the user-installed trusted credentials page and confirm that the "Internet Widgits Pty Ltd" cert appears in the list.</string>
+    <string name="cacert_check_notification">Please look at the new notification and confirm: It say the network may be monitored. Tapping it brings up a more detailed explanation and a button to check trusted credentials. Tapping that button brings up the Trusted Credentials page you just visited.</string>
+    <string name="cacert_dismiss_notification">Dismiss the notification. If it cannot be dismissed, fail the test.</string>
+
+    <string name="caboot_test">CA Cert Notification on Boot test</string>
+    <string name="caboot_info">This test is to confirm that when the user has installed a trusted credential, the system notifies the user when it boots.</string>
+    <string name="caboot_check_cert_installed">Please check here to see whether a certificate is already installed. (If this button does nothing, pass the test and move on.)</string>
+    <string name="caboot_check_creds">Check Credentials</string>
+    <string name="caboot_if_not_installed">Only if there is no credential currently installed, install one. (If this button does nothing, pass the test and move on.)</string>
+    <string name="caboot_install_cert">Install credential</string>
+    <string name="caboot_reboot_desc">Please reboot the device and return to this test.</string>
+    <string name="caboot_after_boot">AFTER REBOOTING: Check that there is a notification that the network may be monitored. Opening that notification should show a dialog box giving more information, with a button to check trusted credentials. This should open up the same view of trusted credentials that you get via the "Check credentials" button.</string>
+
     <!-- Strings for Widget -->
     <string name="widget_framework_test">Widget Framework Test</string>
     <string name="widget_framework_test_info">This test checks some basic features of the widget
@@ -614,4 +633,82 @@
     <string name="widget_name">Widget Framework Test</string>
     <string name="widget_pass">Pass</string>
     <string name="widget_fail">Fail</string>
+
+    <!-- Strings for DeskClock -->
+    <string name="deskclock_tests">Alarms and Timers Tests</string>
+    <string name="deskclock_tests_info">
+        The Alarms and Timers tests verify that the Clock app implements the AlarmClock API properly.
+    </string>
+    <string name="deskclock_group_alarms">Alarms</string>
+    <string name="deskclock_group_timers">Timers</string>
+
+    <string name="dc_show_alarms_test">Show Alarms Test</string>
+    <string name="dc_show_alarms_test_info">
+        This test verifies that the SHOW_ALARMS API works.\n
+        1. Press the "Show Alarms" button.\n
+        2. Verify that a UI of the clock app is launched and displays the list of alarms\n
+    </string>
+    <string name="dc_show_alarms_button">Show Alarms</string>
+
+    <string name="dc_set_alarm_with_ui_test">Set Alarm Test</string>
+    <string name="dc_set_alarm_with_ui_test_info">
+        This test verifies that the ACTION_SET_ALARM with no parameters API works.\n
+        1. Press the "Set Alarm" button.\n
+        2. Verify that the clock app is launched and displays a UI to manage alarms.\n
+    </string>
+    <string name="dc_set_alarm_button">Set Alarm</string>
+    <string name="dc_set_alarm_verify_button">Verify</string>
+
+    <string name="dc_start_alarm_test">Start Alarm Test</string>
+    <string name="dc_start_alarm_test_info">
+        This test verifies that the ACTION_SET_ALARM API actually starts an alarm.\n
+        1. Press the "Start Alarm" button.\n
+        2. Make sure the alarms UI is NOT shown\n
+        3. Wait for the alarm to fire (may take up to 2 minutes)\n
+        4. Verify that the alarm title is: "Start Alarm Test",\n
+           the alarm is silent and vibrating (if the device supports vibrate).\n
+        5. Dismiss the alarm.\n
+        6. Verify that the alarm is not in the Clock\'s alarms list. The Verify button opens
+           the alarm view.\n
+    </string>
+    <string name="dc_start_alarm_button">Start Alarm</string>
+
+    <string name="dc_full_alarm_test">Full Alarm Test</string>
+    <string name="dc_full_alarm_test_info">
+        This test verifies that the ACTION_SET_ALARM API supports all extras.\n
+        1. Press the "Create Alarm" button.\n
+        2. Verify that you see one alarm with the following information:\n
+           Name of alarm: Create Alarm Test. \n
+           Vibrate: on.\n
+           Ringtone: silent.\n
+           Time:  01:23. \n
+           Repeating on: Monday and Wednesday. \n
+    </string>
+    <string name="dc_full_alarm_button">Create Alarm</string>
+    
+    <string name="dc_set_timer_with_ui_test">Set Timer Test</string>
+    <string name="dc_set_timer_with_ui_test_info">
+        This test verifies that the ACTION_SET_TIMER API with no paramters open the UI\n
+        1. Press the "Set Timer" button.\n
+        2. Verify that the an app is launched and displays a UI to manage timers.\n
+    </string>
+    <string name="dc_set_timer_with_ui_button">Set Timer</string>
+
+    <string name="dc_start_timer_test">Start Timer Test</string>
+    <string name="dc_start_timer_test_info">
+        This test verifies that the ACTION_SET_TIMER API actually starts a timer\n
+        1. Press the "Start Timer" button.\n
+        2. Verify that a timer is started  and NO timers UI is shown.\n
+        3. Verify that the timer named "Start Timer Test" rings after 30 seconds. Dismiss it.\n
+        4. Verify that the timer is deleted after the dismissal.\n
+    </string>
+    <string name="dc_start_timer_button">Start Timer</string>
+
+    <string name="dc_start_timer_with_ui_test">Start Timer With UI Test</string>
+    <string name="dc_start_timer_with_ui_test_info">
+        This test verifies that the ACTION_SET_TIMER API actually starts a timer with UI\n
+        1. Press the "Start Timer" button.\n
+        2. Verify that a timer is started  and the timers UI is shown with a timer named "Start Timer Test".\n
+        3. Verify that the timer rings after 30 seconds.\n
+    </string>
 </resources>

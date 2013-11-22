@@ -32,7 +32,7 @@ public class ReceiveUriActivity extends Activity {
     private static final Object sLock = new Object();
     private static boolean sStarted;
     private static boolean sNewIntent;
-    private static boolean sDestroyed;
+    private static boolean sDestroyed = true;
     private static ReceiveUriActivity sCurInstance;
 
     private static final long TIMEOUT_MILLIS = 30 * SECOND_IN_MILLIS;

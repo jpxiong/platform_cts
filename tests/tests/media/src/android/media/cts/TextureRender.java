@@ -16,17 +16,17 @@
 
 package android.media.cts;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
 
-import javax.microedition.khronos.egl.EGLConfig;
-import javax.microedition.khronos.opengles.GL10;
-
+import android.graphics.Bitmap;
 import android.graphics.SurfaceTexture;
 import android.opengl.GLES11Ext;
 import android.opengl.GLES20;
-import android.opengl.GLSurfaceView;
 import android.opengl.Matrix;
 import android.util.Log;
 
@@ -44,9 +44,9 @@ class TextureRender {
     private final float[] mTriangleVerticesData = {
         // X, Y, Z, U, V
         -1.0f, -1.0f, 0, 0.f, 0.f,
-        1.0f, -1.0f, 0, 1.f, 0.f,
+         1.0f, -1.0f, 0, 1.f, 0.f,
         -1.0f,  1.0f, 0, 0.f, 1.f,
-        1.0f,  1.0f, 0, 1.f, 1.f,
+         1.0f,  1.0f, 0, 1.f, 1.f,
     };
 
     private FloatBuffer mTriangleVertices;
@@ -244,5 +244,59 @@ class TextureRender {
             Log.e(TAG, op + ": glError " + error);
             throw new RuntimeException(op + ": glError " + error);
         }
+    }
+
+    /**
+     * Saves the current frame to disk as a PNG image.  Frame starts from (0,0).
+     * <p>
+     * Useful for debugging.
+     */
+    public static void saveFrame(String filename, int width, int height) {
+        // glReadPixels gives us a ByteBuffer filled with what is essentially big-endian RGBA
+        // data (i.e. a byte of red, followed by a byte of green...).  We need an int[] filled
+        // with native-order ARGB data to feed to Bitmap.
+        //
+        // If we implement this as a series of buf.get() calls, we can spend 2.5 seconds just
+        // copying data around for a 720p frame.  It's better to do a bulk get() and then
+        // rearrange the data in memory.  (For comparison, the PNG compress takes about 500ms
+        // for a trivial frame.)
+        //
+        // So... we set the ByteBuffer to little-endian, which should turn the bulk IntBuffer
+        // get() into a straight memcpy on most Android devices.  Our ints will hold ABGR data.
+        // Swapping B and R gives us ARGB.  We need about 30ms for the bulk get(), and another
+        // 270ms for the color swap.
+        //
+        // Making this even more interesting is the upside-down nature of GL, which means we
+        // may want to flip the image vertically here.
+
+        ByteBuffer buf = ByteBuffer.allocateDirect(width * height * 4);
+        buf.order(ByteOrder.LITTLE_ENDIAN);
+        GLES20.glReadPixels(0, 0, width, height, GLES20.GL_RGBA, GLES20.GL_UNSIGNED_BYTE, buf);
+        buf.rewind();
+
+        int pixelCount = width * height;
+        int[] colors = new int[pixelCount];
+        buf.asIntBuffer().get(colors);
+        for (int i = 0; i < pixelCount; i++) {
+            int c = colors[i];
+            colors[i] = (c & 0xff00ff00) | ((c & 0x00ff0000) >> 16) | ((c & 0x000000ff) << 16);
+        }
+
+        FileOutputStream fos = null;
+        try {
+            fos = new FileOutputStream(filename);
+            Bitmap bmp = Bitmap.createBitmap(colors, width, height, Bitmap.Config.ARGB_8888);
+            bmp.compress(Bitmap.CompressFormat.PNG, 90, fos);
+            bmp.recycle();
+        } catch (IOException ioe) {
+            throw new RuntimeException("Failed to write file " + filename, ioe);
+        } finally {
+            try {
+                if (fos != null) fos.close();
+            } catch (IOException ioe2) {
+                throw new RuntimeException("Failed to close file " + filename, ioe2);
+            }
+        }
+        Log.d(TAG, "Saved " + width + "x" + height + " frame as '" + filename + "'");
     }
 }

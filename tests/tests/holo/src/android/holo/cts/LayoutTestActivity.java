@@ -42,6 +42,7 @@ import java.nio.ByteBuffer;
 public class LayoutTestActivity extends Activity {
 
     private static final String TAG = LayoutTestActivity.class.getSimpleName();
+    private static final boolean DEBUG = false;
 
     // Input extras
     static final String EXTRA_THEME_INDEX = "themeIndex";
@@ -68,6 +69,10 @@ public class LayoutTestActivity extends Activity {
         int layoutMode = getIntent().getIntExtra(EXTRA_LAYOUT_ADAPTER_MODE, -1);
         int task = getIntent().getIntExtra(EXTRA_TASK, -1);
 
+        if (DEBUG) {
+            Log.i(TAG, "onCreate theme:" + themeIndex + " layout:" + layoutIndex +
+                    " mode:" + layoutMode + " task:" + task);
+        }
         ThemeAdapter themeAdapter = new ThemeAdapter(getLayoutInflater());
         LayoutAdapter layoutAdapter = new LayoutAdapter(getLayoutInflater(), layoutMode);
 
@@ -292,6 +297,9 @@ public class LayoutTestActivity extends Activity {
     }
 
     private void finishWithResult(boolean success, String message) {
+        if (DEBUG) {
+            Log.i(TAG, "finishWithResult finishing:" + message);
+        }
         Intent data = new Intent();
         data.putExtra(EXTRA_SUCCESS, success);
         data.putExtra(EXTRA_MESSAGE, message);

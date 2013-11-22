@@ -42,6 +42,9 @@
 
     <uses-permission android:name="android.permission.WRITE_CONTACTS"/>
 
+    <!-- need app that has RECORD_AUDIO but not CAPTURE_AUDIO_OUTPUT -->
+    <uses-permission android:name="android.permission.RECORD_AUDIO"/>
+
     <instrumentation android:name="android.test.InstrumentationCtsTestRunner"
                      android:targetPackage="com.android.cts.permission2"
                      android:label="More CTS tests for permissions"/>

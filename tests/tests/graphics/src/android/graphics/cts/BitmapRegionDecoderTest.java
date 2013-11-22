@@ -186,6 +186,36 @@ public class BitmapRegionDecoderTest extends InstrumentationTestCase {
         }
     }
 
+    public void testDecodeRegionInputStreamInBitmap() throws IOException {
+        Options opts = new BitmapFactory.Options();
+        for (int i = 0; i < NUM_TEST_IMAGES; ++i) {
+            for (int j = 0; j < SAMPLESIZES.length; ++j) {
+                for (int k = 0; k < COLOR_CONFIGS.length; ++k) {
+                    opts.inSampleSize = SAMPLESIZES[j];
+                    opts.inPreferredConfig = COLOR_CONFIGS[k];
+                    opts.inBitmap = null;
+
+                    InputStream is1 = obtainInputStream(RES_IDS[i]);
+                    BitmapRegionDecoder decoder = BitmapRegionDecoder.newInstance(is1, false);
+                    InputStream is2 = obtainInputStream(RES_IDS[i]);
+                    Bitmap wholeImage = BitmapFactory.decodeStream(is2, null, opts);
+
+                    // setting inBitmap enables several checks within compareRegionByRegion
+                    opts.inBitmap = Bitmap.createBitmap(
+                            wholeImage.getWidth(), wholeImage.getHeight(), opts.inPreferredConfig);
+
+                    if (RES_IDS[i] == R.drawable.webp_test && COLOR_CONFIGS[k] == Config.RGB_565) {
+                        compareRegionByRegion(decoder, opts, mMseMarginWebPConfigRgb565,
+                                              wholeImage);
+                    } else {
+                        compareRegionByRegion(decoder, opts, mMseMargin, wholeImage);
+                    }
+                    wholeImage.recycle();
+                }
+            }
+        }
+    }
+
     public void testDecodeRegionByteArray() throws IOException {
         Options opts = new BitmapFactory.Options();
         for (int i = 0; i < NUM_TEST_IMAGES; ++i) {
@@ -292,9 +322,18 @@ public class BitmapRegionDecoderTest extends InstrumentationTestCase {
                 actual = decoder.decodeRegion(rect1, opts);
                 int left = rect1.left / opts.inSampleSize;
                 int top = rect1.top / opts.inSampleSize;
-                Rect rect2 = new Rect(left, top, left + actual.getWidth(),
+                if (opts.inBitmap != null) {
+                    // bitmap reuse path - ensure reuse worked
+                    assertSame(opts.inBitmap, actual);
+                    int currentWidth = rect1.width() / opts.inSampleSize;
+                    int currentHeight = rect1.height() / opts.inSampleSize;
+                    Rect actualRect = new Rect(0, 0, currentWidth, currentHeight);
+                    // crop 'actual' to the size to be tested (and avoid recycling inBitmap)
+                    actual = cropBitmap(actual, actualRect);
+                }
+                Rect expectedRect = new Rect(left, top, left + actual.getWidth(),
                         top + actual.getHeight());
-                expected = cropBitmap(wholeImage, rect2);
+                expected = cropBitmap(wholeImage, expectedRect);
                 compareBitmaps(expected, actual, mseMargin, true);
                 actual.recycle();
                 expected.recycle();

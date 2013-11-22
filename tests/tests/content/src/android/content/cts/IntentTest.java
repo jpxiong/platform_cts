@@ -17,6 +17,7 @@
 package android.content.cts;
 
 import com.android.internal.app.ResolverActivity;
+import com.android.internal.util.Objects;
 import com.android.internal.util.XmlUtils;
 
 
@@ -41,6 +42,7 @@ import android.os.ServiceManager;
 import android.provider.Contacts.People;
 import android.test.AndroidTestCase;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.util.Xml;
 
 import java.io.IOException;
@@ -57,6 +59,7 @@ public class IntentTest extends AndroidTestCase {
     private static final Uri ANOTHER_TEST_URI = People.CONTENT_FILTER_URI;
     private static final String TEST_EXTRA_NAME = "testExtraName";
     private Context mContext;
+    private PackageManager mPm;
     private ComponentName mComponentName;
     private ComponentName mAnotherComponentName;
     private static final String TEST_TYPE = "testType";
@@ -71,6 +74,7 @@ public class IntentTest extends AndroidTestCase {
         super.setUp();
         mIntent = new Intent();
         mContext = getContext();
+        mPm = mContext.getPackageManager();
         mComponentName = new ComponentName(mContext, MockActivity.class);
         mAnotherComponentName = new ComponentName(mContext, "tmp");
     }
@@ -713,26 +717,51 @@ public class IntentTest extends AndroidTestCase {
         assertEquals(expected, mIntent.getParcelableArrayExtra(TEST_EXTRA_NAME));
     }
 
-    public void testResolveActivity() {
-        final PackageManager pm = mContext.getPackageManager();
+    public void testResolveActivityEmpty() {
+        final Intent emptyIntent = new Intent();
 
-        ComponentName target = mIntent.resolveActivity(pm);
+        // Empty intent shouldn't resolve to anything
+        final ComponentName target = emptyIntent.resolveActivity(mPm);
         assertNull(target);
+    }
 
-        mIntent.setComponent(mComponentName);
-        target = mIntent.resolveActivity(pm);
-        assertEquals(mComponentName, target);
+    public void testResolveActivitySingleMatch() {
+        final Intent intent = new Intent("com.android.cts.content.action.TEST_ACTION");
+        intent.addCategory("com.android.cts.content.category.TEST_CATEGORY");
 
-        mIntent.setComponent(null);
-        mIntent.setData(TEST_URI);
-        target = mIntent.resolveActivity(pm);
-        assertEquals(ResolverActivity.class.getName(), target.getClassName());
-        assertEquals("android", target.getPackageName());
+        // Should only have one activity responding to narrow category
+        final ComponentName target = intent.resolveActivity(mPm);
+        assertEquals("com.android.cts.content", target.getPackageName());
+        assertEquals("android.app.cts.MockActivity", target.getClassName());
+    }
 
-        mIntent.setComponent(null);
-        mIntent.setAction(TEST_TYPE);
-        target = mIntent.resolveActivity(pm);
-        assertNull(target);
+    public void testResolveActivityShortcutMatch() {
+        final Intent intent = new Intent("com.android.cts.content.action.TEST_ACTION");
+        intent.setComponent(
+                new ComponentName("com.android.cts.content", "android.app.cts.MockActivity2"));
+
+        // Multiple activities match, but we asked for explicit component
+        final ComponentName target = intent.resolveActivity(mPm);
+        assertEquals("com.android.cts.content", target.getPackageName());
+        assertEquals("android.app.cts.MockActivity2", target.getClassName());
+    }
+
+    public void testResolveActivityMultipleMatch() {
+        final Intent intent = new Intent("com.android.cts.content.action.TEST_ACTION");
+
+        // Should have multiple activities, resulting in resolver dialog
+        final ComponentName target = intent.resolveActivity(mPm);
+        final String pkgName = target.getPackageName();
+        assertFalse("com.android.cts.content".equals(pkgName));
+
+        // Whoever they are must be able to set preferred activities
+        if (!"android".equals(pkgName)) {
+            if (mPm.checkPermission(android.Manifest.permission.SET_PREFERRED_APPLICATIONS, pkgName)
+                    != PackageManager.PERMISSION_GRANTED) {
+                fail("Resolved target " + target
+                        + " doesn't have SET_PREFERRED_APPLICATIONS permission");
+            }
+        }
     }
 
     public void testGetCharExtra() {

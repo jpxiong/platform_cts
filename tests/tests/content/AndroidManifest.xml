@@ -18,9 +18,25 @@
     package="com.android.cts.content">
 
     <uses-permission android:name="android.permission.DISABLE_KEYGUARD" />
-    <application>
-        <uses-library android:name="android.test.runner" />
 
+    <application>
+        <activity android:name="android.app.cts.MockActivity">
+            <intent-filter>
+                <action android:name="com.android.cts.content.action.TEST_ACTION" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="com.android.cts.content.category.TEST_CATEGORY" />
+            </intent-filter>
+        </activity>
+
+        <activity-alias android:name="android.app.cts.MockActivity2"
+                android:targetActivity="android.app.cts.MockActivity">
+            <intent-filter>
+                <action android:name="com.android.cts.content.action.TEST_ACTION" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity-alias>
+
+        <uses-library android:name="android.test.runner" />
     </application>
 
     <instrumentation android:name="android.test.InstrumentationCtsTestRunner"

@@ -27,6 +27,7 @@ import dot.junit.opcodes.invoke_super.d.T_invoke_super_18;
 import dot.junit.opcodes.invoke_super.d.T_invoke_super_19;
 import dot.junit.opcodes.invoke_super.d.T_invoke_super_2;
 import dot.junit.opcodes.invoke_super.d.T_invoke_super_20;
+import dot.junit.opcodes.invoke_super.d.T_invoke_super_24;
 import dot.junit.opcodes.invoke_super.d.T_invoke_super_4;
 import dot.junit.opcodes.invoke_super.d.T_invoke_super_5;
 import dot.junit.opcodes.invoke_super.d.T_invoke_super_6;
@@ -142,8 +143,9 @@ public class Test_invoke_super extends DxTestCase {
     public void testVFE3() {
         try {
             new T_invoke_super_10().run();
-            fail("expected IncompatibleClassChangeError");
-        } catch (IncompatibleClassChangeError t) {
+            fail("expected a verification exception");
+        } catch (Throwable t) {
+            DxUtil.checkVerifyException(t);
         }
     }
 
@@ -324,8 +326,9 @@ public class Test_invoke_super extends DxTestCase {
      * @title attempt to invoke interface method
      */
     public void testVFE18() {
+        //@uses dot.junit.opcodes.invoke_super.d.T_invoke_super_24
         try {
-            Class.forName("dot.junit.opcodes.invoke_super.d.T_invoke_super_24");
+            new T_invoke_super_24().run();
             fail("expected a verification exception");
         } catch (Throwable t) {
             DxUtil.checkVerifyException(t);

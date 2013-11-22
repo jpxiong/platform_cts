@@ -40,6 +40,17 @@
             </intent-filter>
         </receiver>
 
+        <!-- Device Admin that needs to be in the deactivated state in order
+             for tests to pass. -->
+        <receiver android:name="android.deviceadmin.cts.CtsDeviceAdminDeactivatedReceiver"
+                android:permission="android.permission.BIND_DEVICE_ADMIN">
+            <meta-data android:name="android.app.device_admin"
+                    android:resource="@xml/device_admin" />
+            <intent-filter>
+                <action android:name="android.app.action.DEVICE_ADMIN_ENABLED" />
+            </intent-filter>
+        </receiver>
+
         <!-- Helper Activity used by Device Admin activation tests -->
         <activity android:name="android.deviceadmin.cts.CtsDeviceAdminActivationTestActivity"
                 android:label="Device Admin activation test" />

@@ -16,8 +16,8 @@ LOCAL_PATH:= $(call my-dir)
 
 include $(CLEAR_VARS)
 
-# don't include this package in any target
-LOCAL_MODULE_TAGS := optional
+LOCAL_MODULE_TAGS := tests
+
 # and when built explicitly put it in the data partition
 LOCAL_MODULE_PATH := $(TARGET_OUT_DATA_APPS)
 
@@ -31,7 +31,13 @@ LOCAL_PACKAGE_NAME := CtsDrmTestCases
 
 LOCAL_INSTRUMENTATION_FOR := CtsTestStubs
 
+LOCAL_JNI_SHARED_LIBRARIES := \
+	libctsdrm_jni \
+	libdrmtestplugin
+
 # uncomment when dalvik.annotation.Test* are removed or part of SDK
 #LOCAL_SDK_VERSION := current
 
 include $(BUILD_CTS_PACKAGE)
+
+include $(call all-makefiles-under,$(LOCAL_PATH))

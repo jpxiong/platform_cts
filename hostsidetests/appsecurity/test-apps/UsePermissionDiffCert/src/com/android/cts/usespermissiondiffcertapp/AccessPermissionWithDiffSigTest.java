@@ -23,13 +23,17 @@ import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
+import android.content.UriPermission;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.SystemClock;
 import android.test.AndroidTestCase;
 import android.util.Log;
 
+import com.android.cts.permissiondeclareapp.GrantUriPermission;
+
 import java.io.IOException;
+import java.util.List;
 
 /**
  * Tests that signature-enforced permissions cannot be accessed by apps signed
@@ -53,6 +57,14 @@ public class AccessPermissionWithDiffSigTest extends AndroidTestCase {
     private static final Uri AMBIGUOUS_URI_COMPAT = Uri.parse("content://ctsambiguousprovidercompat");
     private static final String EXPECTED_MIME_TYPE_AMBIGUOUS = "got/theUnspecifiedMIME";
     private static final Uri AMBIGUOUS_URI = Uri.parse("content://ctsambiguousprovider");
+
+    @Override
+    protected void tearDown() throws Exception {
+        super.tearDown();
+
+        // Always dispose, usually to clean up from failed tests
+        ReceiveUriActivity.finishCurInstanceSync();
+    }
 
     private void assertReadingContentUriNotAllowed(Uri uri, String msg) {
         try {
@@ -423,11 +435,11 @@ public class AccessPermissionWithDiffSigTest extends AndroidTestCase {
             synchronized (this) {
                 mHaveResult = true;
                 switch (getResultCode()) {
-                    case 100:
+                    case GrantUriPermission.FAILURE:
                         mGoodResult = true;
                         mSucceeded = false;
                         break;
-                    case 101:
+                    case GrantUriPermission.SUCCESS:
                         mGoodResult = true;
                         mSucceeded = true;
                         break;
@@ -491,8 +503,9 @@ public class AccessPermissionWithDiffSigTest extends AndroidTestCase {
                 service ? ReceiveUriService.class : ReceiveUriActivity.class);
         Intent intent = new Intent();
         intent.setComponent(GRANT_URI_PERM_COMP);
-        intent.putExtra("intent", grantIntent);
-        intent.putExtra("service", service);
+        intent.setAction(service ? GrantUriPermission.ACTION_START_SERVICE
+                : GrantUriPermission.ACTION_START_ACTIVITY);
+        intent.putExtra(GrantUriPermission.EXTRA_INTENT, grantIntent);
         GrantResultReceiver receiver = new GrantResultReceiver();
         getContext().sendOrderedBroadcast(intent, null, receiver, null, 0, null, null);
         receiver.assertFailure("Able to grant URI permission to " + grantDataUri + " when should not");
@@ -502,8 +515,9 @@ public class AccessPermissionWithDiffSigTest extends AndroidTestCase {
                 service ? ReceiveUriService.class : ReceiveUriActivity.class);
         intent = new Intent();
         intent.setComponent(GRANT_URI_PERM_COMP);
-        intent.putExtra("intent", grantIntent);
-        intent.putExtra("service", service);
+        intent.setAction(service ? GrantUriPermission.ACTION_START_SERVICE
+                : GrantUriPermission.ACTION_START_ACTIVITY);
+        intent.putExtra(GrantUriPermission.EXTRA_INTENT, grantIntent);
         receiver = new GrantResultReceiver();
         getContext().sendOrderedBroadcast(intent, null, receiver, null, 0, null, null);
         receiver.assertFailure("Able to grant URI permission to " + grantIntent.getClipData()
@@ -578,8 +592,9 @@ public class AccessPermissionWithDiffSigTest extends AndroidTestCase {
                 service ? ReceiveUriService.class : ReceiveUriActivity.class);
         Intent intent = new Intent();
         intent.setComponent(GRANT_URI_PERM_COMP);
-        intent.putExtra("intent", grantIntent);
-        intent.putExtra("service", service);
+        intent.setAction(service ? GrantUriPermission.ACTION_START_SERVICE
+                : GrantUriPermission.ACTION_START_ACTIVITY);
+        intent.putExtra(GrantUriPermission.EXTRA_INTENT, grantIntent);
         getContext().sendBroadcast(intent);
     }
 
@@ -843,7 +858,7 @@ public class AccessPermissionWithDiffSigTest extends AndroidTestCase {
         doTestGrantActivityUriWritePermission(PRIV_URI_GRANTING, false);
     }
 
-    void doTestGrantServiceUriReadPermission(Uri uri, boolean useClip) {
+    private void doTestGrantServiceUriReadPermission(Uri uri, boolean useClip) {
         final Uri subUri = Uri.withAppendedPath(uri, "foo");
         final Uri subSubUri = Uri.withAppendedPath(subUri, "bar");
         final Uri sub2Uri = Uri.withAppendedPath(uri, "yes");
@@ -1206,5 +1221,138 @@ public class AccessPermissionWithDiffSigTest extends AndroidTestCase {
         // All apps should be able to get MIME type even if provider is private.
         assertEquals(EXPECTED_MIME_TYPE_AMBIGUOUS,
                 getContext().getContentResolver().getType(AMBIGUOUS_URI_COMPAT));
+    }
+
+    /**
+     * Validate behavior of persistable permission grants.
+     */
+    public void testGrantPersistableUriPermission() {
+        final ContentResolver resolver = getContext().getContentResolver();
+
+        final Uri target = Uri.withAppendedPath(PERM_URI_GRANTING, "foo");
+        final ClipData clip = makeSingleClipData(target);
+
+        // Make sure we can't see the target
+        assertReadingClipNotAllowed(clip, "reading should have failed");
+        assertWritingClipNotAllowed(clip, "writing should have failed");
+
+        // Make sure we can't take a grant we don't have
+        try {
+            resolver.takePersistableUriPermission(target, Intent.FLAG_GRANT_READ_URI_PERMISSION);
+            fail("taking read should have failed");
+        } catch (SecurityException expected) {
+        }
+
+        // And since we were just installed, no persisted grants yet
+        assertNoPersistedUriPermission();
+
+        // Now, let's grant ourselves some access
+        ReceiveUriActivity.clearStarted();
+        grantClipUriPermission(clip, Intent.FLAG_GRANT_READ_URI_PERMISSION
+                | Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION, false);
+        ReceiveUriActivity.waitForStart();
+
+        // We should now have reading access, even before taking the persistable
+        // grant. Persisted grants should still be empty.
+        assertReadingClipAllowed(clip);
+        assertWritingClipNotAllowed(clip, "writing should have failed");
+        assertNoPersistedUriPermission();
+
+        // Take the read grant and verify we have it!
+        long before = System.currentTimeMillis();
+        resolver.takePersistableUriPermission(target, Intent.FLAG_GRANT_READ_URI_PERMISSION);
+        long after = System.currentTimeMillis();
+        assertPersistedUriPermission(target, Intent.FLAG_GRANT_READ_URI_PERMISSION, before, after);
+
+        // Make sure we can't take a grant we don't have
+        try {
+            resolver.takePersistableUriPermission(target, Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
+            fail("taking write should have failed");
+        } catch (SecurityException expected) {
+        }
+
+        // Launch again giving ourselves persistable read and write access
+        ReceiveUriActivity.clearNewIntent();
+        grantClipUriPermission(clip, Intent.FLAG_GRANT_READ_URI_PERMISSION
+                | Intent.FLAG_GRANT_WRITE_URI_PERMISSION
+                | Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION, false);
+        ReceiveUriActivity.waitForNewIntent();
+
+        // Previous persisted grant should be unchanged
+        assertPersistedUriPermission(target, Intent.FLAG_GRANT_READ_URI_PERMISSION, before, after);
+
+        // We should have both read and write; read is persisted, and write
+        // isn't persisted yet.
+        assertReadingClipAllowed(clip);
+        assertWritingClipAllowed(clip);
+
+        // Take again, but still only read; should just update timestamp
+        before = System.currentTimeMillis();
+        resolver.takePersistableUriPermission(target, Intent.FLAG_GRANT_READ_URI_PERMISSION);
+        after = System.currentTimeMillis();
+        assertPersistedUriPermission(target, Intent.FLAG_GRANT_READ_URI_PERMISSION, before, after);
+
+        // And take yet again, both read and write
+        before = System.currentTimeMillis();
+        resolver.takePersistableUriPermission(target,
+                Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
+        after = System.currentTimeMillis();
+        assertPersistedUriPermission(target,
+                Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_WRITE_URI_PERMISSION,
+                before, after);
+
+        // Now drop the persisted grant; write first, then read
+        resolver.releasePersistableUriPermission(target, Intent.FLAG_GRANT_READ_URI_PERMISSION);
+        assertPersistedUriPermission(target, Intent.FLAG_GRANT_WRITE_URI_PERMISSION, before, after);
+        resolver.releasePersistableUriPermission(target, Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
+        assertNoPersistedUriPermission();
+
+        // And even though we dropped the persistable grants, our activity is
+        // still running with the global grants (until reboot).
+        assertReadingClipAllowed(clip);
+        assertWritingClipAllowed(clip);
+
+        ReceiveUriActivity.finishCurInstanceSync();
+    }
+
+    private void assertNoPersistedUriPermission() {
+        assertPersistedUriPermission(null, 0, -1, -1);
+    }
+
+    private void assertPersistedUriPermission(Uri uri, int flags, long before, long after) {
+        // Assert local
+        final List<UriPermission> perms = getContext()
+                .getContentResolver().getPersistedUriPermissions();
+        if (uri != null) {
+            assertEquals("expected exactly one permission", 1, perms.size());
+
+            final UriPermission perm = perms.get(0);
+            assertEquals("unexpected uri", uri, perm.getUri());
+
+            final long actual = perm.getPersistedTime();
+            if (before != -1) {
+                assertTrue("found " + actual + " before " + before, actual >= before);
+            }
+            if (after != -1) {
+                assertTrue("found " + actual + " after " + after, actual <= after);
+            }
+
+            final boolean expectedRead = (flags & Intent.FLAG_GRANT_READ_URI_PERMISSION) != 0;
+            final boolean expectedWrite = (flags & Intent.FLAG_GRANT_WRITE_URI_PERMISSION) != 0;
+            assertEquals("unexpected read status", expectedRead, perm.isReadPermission());
+            assertEquals("unexpected write status", expectedWrite, perm.isWritePermission());
+
+        } else {
+            assertEquals("expected zero permissions", 0, perms.size());
+        }
+
+        // And assert remote
+        Intent intent = new Intent();
+        intent.setComponent(GRANT_URI_PERM_COMP);
+        intent.setAction(GrantUriPermission.ACTION_VERIFY_OUTGOING_PERSISTED);
+        intent.putExtra(GrantUriPermission.EXTRA_URI, uri);
+        GrantResultReceiver receiver = new GrantResultReceiver();
+        getContext().sendOrderedBroadcast(intent, null, receiver, null, 0, null, null);
+        receiver.assertSuccess("unexpected outgoing persisted Uri status");
     }
 }

@@ -19,6 +19,7 @@
     package="com.android.cts.keystore">
 
     <uses-permission android:name="android.permission.DISABLE_KEYGUARD" />
+    <uses-permission android:name="android.permission.INTERNET" />
     <application>
         <uses-library android:name="android.test.runner" />
     </application>

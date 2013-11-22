@@ -155,4 +155,23 @@ public class SparseArrayTest extends AndroidTestCase {
         sparseArray.clear();
         assertEquals(0, sparseArray.size());
     }
+
+    public void testIterationOrder() {
+        SparseArray<Long> sparseArray = new SparseArray<Long>();
+        // No matter in which order they are inserted.
+        sparseArray.put(1, Long.valueOf(2L));
+        sparseArray.put(10, Long.valueOf(20L));
+        sparseArray.put(5, Long.valueOf(40L));
+        sparseArray.put(Integer.MAX_VALUE, Long.valueOf(Long.MIN_VALUE));
+        // The keys are returned in order.
+        assertEquals(1, sparseArray.keyAt(0));
+        assertEquals(5, sparseArray.keyAt(1));
+        assertEquals(10, sparseArray.keyAt(2));
+        assertEquals(Integer.MAX_VALUE, sparseArray.keyAt(3));
+        // The values are returned in the order of the corresponding keys.
+        assertEquals(2L, sparseArray.valueAt(0).longValue());
+        assertEquals(40L, sparseArray.valueAt(1).longValue());
+        assertEquals(20L, sparseArray.valueAt(2).longValue());
+        assertEquals(Long.MIN_VALUE, sparseArray.valueAt(3).longValue());
+    }
 }

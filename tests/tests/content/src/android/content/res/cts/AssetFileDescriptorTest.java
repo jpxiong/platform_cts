@@ -83,8 +83,8 @@ public class AssetFileDescriptorTest extends AndroidTestCase {
         mOutputStream = null;
         try {
             mOutputStream = mAssetFileDes.createOutputStream();
-            fail("Should throw IllegalArgumentException");
-        } catch (IllegalArgumentException e) {
+            fail("Should throw IOException");
+        } catch (IOException e) {
             // expect
         }
         try {
@@ -120,8 +120,8 @@ public class AssetFileDescriptorTest extends AndroidTestCase {
         }
         try {
             mOutputStream = mAssetFileDes.createOutputStream();
-            fail("Should throw IllegalArgumentException");
-        } catch (IllegalArgumentException e) {
+            fail("Should throw IOException");
+        } catch (IOException e) {
             // expect
         }
         mAssetFileDes.close();

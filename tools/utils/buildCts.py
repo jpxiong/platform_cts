@@ -19,6 +19,7 @@
 import glob
 import os
 import re
+import shutil
 import subprocess
 import sys
 import xml.dom.minidom as dom
@@ -71,6 +72,9 @@ class CtsBuilder(object):
 
     self.test_repository = os.path.join(self.out_dir, 'repository/testcases')
     self.plan_repository = os.path.join(self.out_dir, 'repository/plans')
+    
+    #dirty hack to copy over prepopulated CTS test plans, stable vs flaky, for autoCTS
+    self.definedplans_repository = os.path.join(self.android_root, 'cts/tests/plans')
 
   def GenerateTestDescriptions(self):
     """Generate test descriptions for all packages."""
@@ -101,12 +105,19 @@ class CtsBuilder(object):
     # sort the list to give the same sequence based on name
     packages.sort()
 
+    ptsPattern = r'com\.android\.pts\..*'
+    plan = tools.TestPlan(packages)
+    plan.Exclude('.*')
+    plan.Include(ptsPattern)
+    self.__WritePlan(plan, 'PTS')
+
     plan = tools.TestPlan(packages)
     plan.Exclude('android\.performance.*')
     self.__WritePlan(plan, 'CTS')
     self.__WritePlan(plan, 'CTS-TF')
 
     plan = tools.TestPlan(packages)
+    plan.Exclude(ptsPattern)
     plan.Exclude('android\.performance.*')
     plan.Exclude('android\.media\.cts\.StreamingMediaPlayerTest.*')
     # Test plan to not include media streaming tests
@@ -149,7 +160,15 @@ class CtsBuilder(object):
     plan.Include('android\.renderscript')
     plan.Include('android\.telephony')
     plan.Include('android\.nativemedia.*')
+    plan.Include('com\.android\.pts\..*')
+    plan.Exclude('com\.android\.pts\.bootup')
     self.__WritePlan(plan, 'PDK')
+
+    #dirty hack to copy over pre-populated CTS plans - flaky vs stable - to streamline autoCTS
+    shutil.copyfile(os.path.join(self.definedplans_repository, 'CTS-flaky.xml'),
+        os.path.join(self.plan_repository, 'CTS-flaky.xml'))
+    shutil.copyfile(os.path.join(self.definedplans_repository, 'CTS-stable.xml'),
+        os.path.join(self.plan_repository, 'CTS-stable.xml'))
 
 def LogGenerateDescription(name):
   print 'Generating test description for package %s' % name

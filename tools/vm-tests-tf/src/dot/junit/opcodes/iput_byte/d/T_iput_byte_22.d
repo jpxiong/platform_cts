@@ -16,7 +16,7 @@
 .class public dot.junit.opcodes.iput_byte.d.T_iput_byte_22
 .super java/lang/Object
 
-.field public  st_b I
+.field public  st_i I
 
 .method public <init>()V
 .limit regs 1
@@ -28,7 +28,7 @@
 .method public run()V
 .limit regs 4
        const v0, 1    
-       iput-byte v0, v3, dot.junit.opcodes.iput_byte.d.T_iput_byte_22.st_b I
+       iput-byte v0, v3, dot.junit.opcodes.iput_byte.d.T_iput_byte_22.st_i I
        return-void
 .end method
 

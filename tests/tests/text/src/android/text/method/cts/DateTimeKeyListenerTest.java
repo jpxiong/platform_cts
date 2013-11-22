@@ -16,47 +16,16 @@
 
 package android.text.method.cts;
 
-import com.android.cts.stub.R;
-
-
-import android.app.Activity;
-import android.app.Instrumentation;
-import android.cts.util.PollingCheck;
-import android.test.ActivityInstrumentationTestCase2;
 import android.text.InputType;
+import android.text.method.cts.KeyListenerTestCase;
 import android.text.method.DateTimeKeyListener;
 import android.view.KeyCharacterMap;
 import android.view.KeyEvent;
-import android.widget.TextView;
 
 /**
- * Test {@link DateTimeKeyListener}.
+ * Test {@link android.DateTimeKeyListener}.
  */
-public class DateTimeKeyListenerTest extends
-        ActivityInstrumentationTestCase2<KeyListenerStubActivity> {
-    private Activity mActivity;
-    private Instrumentation mInstrumentation;
-    private TextView mTextView;
-
-    public DateTimeKeyListenerTest(){
-        super("com.android.cts.stub", KeyListenerStubActivity.class);
-    }
-
-    @Override
-    protected void setUp() throws Exception {
-        super.setUp();
-
-        mActivity = getActivity();
-        new PollingCheck() {
-            @Override
-            protected boolean check() {
-                return mActivity.hasWindowFocus();
-            }
-        }.run();
-        mInstrumentation = getInstrumentation();
-        mTextView = (TextView) mActivity.findViewById(R.id.keylistener_textview);
-    }
-
+public class DateTimeKeyListenerTest extends KeyListenerTestCase {
     public void testConstructor() {
         new DateTimeKeyListener();
     }
@@ -71,10 +40,10 @@ public class DateTimeKeyListenerTest extends
     }
 
     public void testGetAcceptedChars() {
-        MyDateTimeKeyListener dataTimeKeyListener = new MyDateTimeKeyListener();
+        MockDateTimeKeyListener mockDateTimeKeyListener = new MockDateTimeKeyListener();
 
         TextMethodUtils.assertEquals(DateTimeKeyListener.CHARACTERS,
-                dataTimeKeyListener.getAcceptedChars());
+                mockDateTimeKeyListener.getAcceptedChars());
     }
 
     public void testGetInputType() {
@@ -85,7 +54,7 @@ public class DateTimeKeyListenerTest extends
         assertEquals(expected, listener.getInputType());
     }
 
-    /**
+    /*
      * Scenario description:
      * 1. Press '1' key and check if the content of TextView becomes "1"
      * 2. Press '2' key and check if the content of TextView becomes "12"
@@ -97,15 +66,8 @@ public class DateTimeKeyListenerTest extends
      */
     public void testDateTimeKeyListener() {
         final DateTimeKeyListener dateTimeKeyListener = DateTimeKeyListener.getInstance();
+        setKeyListenerSync(dateTimeKeyListener);
         String expectedText = "";
-
-        mActivity.runOnUiThread(new Runnable() {
-            public void run() {
-                mTextView.setKeyListener(dateTimeKeyListener);
-                mTextView.requestFocus();
-            }
-        });
-        mInstrumentation.waitForIdleSync();
         assertEquals(expectedText, mTextView.getText().toString());
 
         // press '1' key.
@@ -148,20 +110,21 @@ public class DateTimeKeyListenerTest extends
         }
 
         // remove DateTimeKeyListener
-        mActivity.runOnUiThread(new Runnable() {
-            public void run() {
-                mTextView.setKeyListener(null);
-                mTextView.requestFocus();
-            }
-        });
-        mInstrumentation.waitForIdleSync();
+        setKeyListenerSync(null);
         assertEquals(expectedText, mTextView.getText().toString());
 
         mInstrumentation.sendStringSync("1");
         assertEquals(expectedText, mTextView.getText().toString());
     }
 
-    private class MyDateTimeKeyListener extends DateTimeKeyListener {
+
+    /**
+     * A mocked {@link android.text.method.DateTimeKeyListener} for testing purposes.
+     *
+     * Allows {@link DateTimeKeyListenerTest} to call
+     * {@link android.text.method.DateTimeKeyListener#getAcceptedChars()}.
+     */
+    private class MockDateTimeKeyListener extends DateTimeKeyListener {
         @Override
         protected char[] getAcceptedChars() {
             return super.getAcceptedChars();

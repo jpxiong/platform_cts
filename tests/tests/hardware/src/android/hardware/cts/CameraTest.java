@@ -774,6 +774,7 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
         assertTrue(sizes.size() >= 2);
         assertTrue(sizes.contains(size));
         assertTrue(sizes.contains(mCamera.new Size(0, 0)));
+        Size pictureSize = p.getPictureSize();
 
         // Test if the thumbnail size matches the setting.
         if (!recording) mCamera.startPreview();

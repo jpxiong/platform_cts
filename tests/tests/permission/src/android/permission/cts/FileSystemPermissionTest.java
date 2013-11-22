@@ -27,9 +27,17 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeoutException;
+import java.util.concurrent.TimeUnit;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -389,6 +397,7 @@ public class FileSystemPermissionTest extends AndroidTestCase {
                     "/data/data/recovery/HTCFOTA",
                     "/data/data/recovery/OMADM",
                     "/data/data/shared",
+                    "/data/diag_logs",
                     "/data/dontpanic",
                     "/data/drm",
                     "/data/drm/fwdlock",
@@ -456,6 +465,7 @@ public class FileSystemPermissionTest extends AndroidTestCase {
                     "/data/property",
                     "/data/radio",
                     "/data/secure",
+                    "/data/security",
                     "/data/sensors",
                     "/data/shared",
                     "/data/simcom",
@@ -464,6 +474,7 @@ public class FileSystemPermissionTest extends AndroidTestCase {
                     "/data/system",
                     "/data/tmp",
                     "/data/tombstones",
+                    "/data/tombstones/ramdump",
                     "/data/tpapi",
                     "/data/tpapi/etc",
                     "/data/tpapi/etc/tpa",
@@ -526,11 +537,12 @@ public class FileSystemPermissionTest extends AndroidTestCase {
 
     @LargeTest
     public void testReadingSysFilesDoesntFail() throws Exception {
-        // TODO: fix b/8148087
-        // tryToReadFromAllIn(new File("/sys"));
+        ExecutorService executor = Executors.newCachedThreadPool();
+        tryToReadFromAllIn(new File("/sys"), executor);
+        executor.shutdownNow();
     }
 
-    private static void tryToReadFromAllIn(File dir) throws IOException {
+    private static void tryToReadFromAllIn(File dir, ExecutorService executor) throws IOException {
         assertTrue(dir.isDirectory());
 
         if (isSymbolicLink(dir)) {
@@ -543,26 +555,63 @@ public class FileSystemPermissionTest extends AndroidTestCase {
         if (files != null) {
             for (File f : files) {
                 if (f.isDirectory()) {
-                    tryToReadFromAllIn(f);
+                    tryToReadFromAllIn(f, executor);
                 } else {
-                    tryFileRead(f);
+                    tryFileOpenRead(f, executor);
                 }
             }
         }
     }
 
-    private static void tryFileRead(File f) {
+    private static void tryFileOpenRead(final File f, ExecutorService executor) throws IOException {
+        // Callable requires stack variables to be final.
+        Callable<Boolean> readFile = new Callable<Boolean>() {
+            @Override
+            public Boolean call() throws Exception {
+                return tryFileRead(f);
+            }
+        };
+
+        Boolean completed = false;
+        String fileName = null;
+        Future<Boolean> future = null;
+        try {
+            fileName = f.getCanonicalPath();
+
+            future = executor.submit(readFile);
+
+            // Block, waiting no more than set seconds.
+            completed = future.get(3, TimeUnit.SECONDS);
+        } catch (TimeoutException e) {
+            System.out.println("TIMEOUT: " + fileName);
+        } catch (InterruptedException e) {
+            System.out.println("INTERRUPTED: " + fileName);
+        } catch (ExecutionException e) {
+            System.out.println("TASK WAS ABORTED BY EXCEPTION: " + fileName);
+        } catch (IOException e) {
+            // File.getCanonicalPath() will throw this.
+        } finally {
+            if (future != null) {
+                future.cancel(true);
+            }
+        }
+    }
+
+    private static Boolean tryFileRead(File f) {
         byte[] b = new byte[1024];
         try {
             System.out.println("looking at " + f.getCanonicalPath());
+
             FileInputStream fis = new FileInputStream(f);
-            while(fis.read(b) != -1) {
+            while((fis.available() != 0) && (fis.read(b) != -1)) {
                 // throw away data
             }
+
             fis.close();
         } catch (IOException e) {
             // ignore
         }
+        return true;
     }
 
     private static final Set<File> SYS_EXCEPTIONS = new HashSet<File>(
@@ -716,9 +765,9 @@ public class FileSystemPermissionTest extends AndroidTestCase {
                 new File("/dev/urandom"),
                 new File("/dev/xt_qtaguid"),  // b/9088251
                 new File("/dev/zero"),
-		new File("/dev/fimg2d"),
-                new File("/dev/mobicore-user")
-	     ));
+                new File("/dev/fimg2d"),      // b/10428016
+                new File("/dev/mobicore-user") // b/10428016
+            ));
 
     public void testAllCharacterDevicesAreSecure() throws Exception {
         Set<File> insecure = getAllInsecureDevicesInDirAndSubdir(new File("/dev"), FileUtils.S_IFCHR);
@@ -727,6 +776,48 @@ public class FileSystemPermissionTest extends AndroidTestCase {
         insecure.removeAll(insecurePts);
         assertTrue("Found insecure character devices: " + insecure.toString(),
                 insecure.isEmpty());
+    }
+
+    public void testDevRandomWorldReadableAndWritable() throws Exception {
+        FileUtils.FileStatus status = new FileUtils.FileStatus();
+        assertTrue(FileUtils.getFileStatus("/dev/random", status, false));
+        assertTrue(
+                "/dev/random not world-readable/writable. Actual mode: 0"
+                        + Integer.toString(status.mode, 8),
+                (status.mode & 0666) == 0666);
+    }
+
+    public void testDevUrandomWorldReadableAndWritable() throws Exception {
+        FileUtils.FileStatus status = new FileUtils.FileStatus();
+        assertTrue(FileUtils.getFileStatus("/dev/urandom", status, false));
+        assertTrue(
+                "/dev/urandom not world-readable/writable. Actual mode: 0"
+                        + Integer.toString(status.mode, 8),
+                (status.mode & 0666) == 0666);
+    }
+
+    /**
+     * Test that the /system/bin/run-as command has setuid and setgid
+     * attributes set on the file.  If these calls fail, debugger
+     * breakpoints for native code will not work as run-as will not
+     * be able to perform required elevated-privilege functionality.
+     */
+    public void testRunAsHasCorrectCapabilities() throws Exception {
+        // ensure file is user and group read/executable
+        String filename = "/system/bin/run-as";
+        FileUtils.FileStatus status = new FileUtils.FileStatus();
+        assertTrue(FileUtils.getFileStatus(filename, status, false));
+        assertTrue(status.hasModeFlag(FileUtils.S_IRUSR | FileUtils.S_IXUSR));
+        assertTrue(status.hasModeFlag(FileUtils.S_IRGRP | FileUtils.S_IXGRP));
+
+        // ensure file owner/group is set correctly
+        File f = new File(filename);
+        assertFileOwnedBy(f, "root");
+        assertFileOwnedByGroup(f, "shell");
+
+        // ensure file has setuid/setgid enabled
+        assertTrue(FileUtils.hasSetUidCapability(filename));
+        assertTrue(FileUtils.hasSetGidCapability(filename));
     }
 
     private static Set<File>

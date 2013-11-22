@@ -397,6 +397,51 @@ public class AudioTrackTest extends AndroidTestCase {
         track.release();
     }
 
+    // Test case 5: getPlaybackHeadPosition() remains 0 after pause(); flush(); play();
+    public void testPlaybackHeadPositionAfterFlushAndPlay() throws Exception {
+        // constants for test
+        final String TEST_NAME = "testPlaybackHeadPositionAfterFlushAndPlay";
+        final int TEST_SR = 22050;
+        final int TEST_CONF = AudioFormat.CHANNEL_OUT_STEREO;
+        final int TEST_FORMAT = AudioFormat.ENCODING_PCM_16BIT;
+        final int TEST_MODE = AudioTrack.MODE_STREAM;
+        final int TEST_STREAM_TYPE = AudioManager.STREAM_MUSIC;
+
+        // -------- initialization --------------
+        int minBuffSize = AudioTrack.getMinBufferSize(TEST_SR, TEST_CONF, TEST_FORMAT);
+        AudioTrack track = new AudioTrack(TEST_STREAM_TYPE, TEST_SR, TEST_CONF, TEST_FORMAT,
+                2 * minBuffSize, TEST_MODE);
+        byte data[] = new byte[minBuffSize];
+        // -------- test --------------
+        assertTrue(TEST_NAME, track.getState() == AudioTrack.STATE_INITIALIZED);
+        track.write(data, OFFSET_DEFAULT, data.length);
+        track.write(data, OFFSET_DEFAULT, data.length);
+        track.play();
+        Thread.sleep(100);
+        track.pause();
+
+        int pos = track.getPlaybackHeadPosition();
+        log(TEST_NAME, "position after pause =" + pos);
+        assertTrue(TEST_NAME, pos > 0);
+
+        track.flush();
+        pos = track.getPlaybackHeadPosition();
+        log(TEST_NAME, "position after flush =" + pos);
+        assertTrue(TEST_NAME, pos == 0);
+
+        track.play();
+        pos = track.getPlaybackHeadPosition();
+        log(TEST_NAME, "position after play =" + pos);
+        assertTrue(TEST_NAME, pos == 0);
+
+        Thread.sleep(100);
+        pos = track.getPlaybackHeadPosition();
+        log(TEST_NAME, "position after 100 ms sleep =" + pos);
+        assertTrue(TEST_NAME, pos == 0);
+        // -------- tear down --------------
+        track.release();
+    }
+
     // -----------------------------------------------------------------
     // Playback properties
     // ----------------------------------

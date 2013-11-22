@@ -19,13 +19,15 @@
     package="com.android.cts.security">
 
     <uses-permission android:name="android.permission.DISABLE_KEYGUARD" />
+    <uses-permission android:name="android.permission.KILL_BACKGROUND_PROCESSES" />
+
     <application>
         <uses-library android:name="android.test.runner" />
     </application>
 
     <instrumentation android:name="android.test.InstrumentationCtsTestRunner"
                      android:targetPackage="com.android.cts.stub"
-                     android:label="CTS tests of com.android.cts.security"/>
+                     android:label="CTS tests of com.android.cts.stub"/>
 
 </manifest>
 

@@ -17,6 +17,8 @@
 # package XML needed by CTS.
 #
 
+LOCAL_DEX_PREOPT := false
+
 include $(BUILD_JAVA_LIBRARY)
 
 cts_library_xml := $(CTS_TESTCASES_OUT)/$(LOCAL_MODULE).xml 

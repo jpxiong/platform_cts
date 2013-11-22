@@ -16,18 +16,12 @@
 
 package android.text.method.cts;
 
-import com.android.cts.stub.R;
-
-
-import android.app.Activity;
-import android.app.Instrumentation;
-import android.cts.util.PollingCheck;
-import android.test.ActivityInstrumentationTestCase2;
 import android.text.Editable;
 import android.text.Selection;
 import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.Spanned;
+import android.text.method.cts.KeyListenerTestCase;
 import android.text.method.NumberKeyListener;
 import android.view.KeyEvent;
 import android.view.View;
@@ -35,31 +29,8 @@ import android.widget.TextView;
 import android.widget.TextView.BufferType;
 
 
-public class NumberKeyListenerTest extends
-        ActivityInstrumentationTestCase2<KeyListenerStubActivity> {
-
-    private MockNumberKeyListener mNumberKeyListener;
-    private Activity mActivity;
-    private Instrumentation mInstrumentation;
-    private TextView mTextView;
-
-    public NumberKeyListenerTest(){
-        super("com.android.cts.stub", KeyListenerStubActivity.class);
-    }
-
-    @Override
-    protected void setUp() throws Exception {
-        super.setUp();
-        mActivity = getActivity();
-        mInstrumentation = getInstrumentation();
-        mTextView = (TextView) mActivity.findViewById(R.id.keylistener_textview);
-        new PollingCheck(1000) {
-            @Override
-            protected boolean check() {
-                return mTextView.hasWindowFocus();
-            }
-        }.run();
-    }
+public class NumberKeyListenerTest extends KeyListenerTestCase {
+    private MockNumberKeyListener mMockNumberKeyListener;
 
     /**
      * Check point:
@@ -70,29 +41,31 @@ public class NumberKeyListenerTest extends
      * 5. Filter Spanned("12345 Android"), return Spanned("12345") and copy spans.
      */
     public void testFilter() {
-        mNumberKeyListener = new MockNumberKeyListener(MockNumberKeyListener.DIGITS);
+        mMockNumberKeyListener = new MockNumberKeyListener(MockNumberKeyListener.DIGITS);
         String source = "Android test";
         SpannableString dest = new SpannableString("012345");
-        assertEquals("", mNumberKeyListener.filter(source, 0, source.length(),
+        assertEquals("", mMockNumberKeyListener.filter(source, 0, source.length(),
                 dest, 0, dest.length()).toString());
 
         source = "12345";
         dest = new SpannableString("012345");
-        assertNull(mNumberKeyListener.filter(source, 0, source.length(), dest, 0, dest.length()));
+        assertNull(mMockNumberKeyListener.filter(source, 0, source.length(), dest, 0,
+                dest.length()));
 
         source = "";
         dest = new SpannableString("012345");
-        assertNull(mNumberKeyListener.filter(source, 0, source.length(), dest, 0, dest.length()));
+        assertNull(mMockNumberKeyListener.filter(source, 0, source.length(), dest, 0,
+                dest.length()));
 
         source = "12345 Android";
         dest = new SpannableString("012345 Android-test");
-        assertEquals("12345", mNumberKeyListener.filter(source, 0, source.length(),
+        assertEquals("12345", mMockNumberKeyListener.filter(source, 0, source.length(),
                 dest, 0, dest.length()).toString());
 
         Object what = new Object();
         Spannable spannableSource = new SpannableString("12345 Android");
         spannableSource.setSpan(what, 0, spannableSource.length(), Spanned.SPAN_POINT_POINT);
-        Spanned filtered = (Spanned) mNumberKeyListener.filter(spannableSource,
+        Spanned filtered = (Spanned) mMockNumberKeyListener.filter(spannableSource,
                 0, spannableSource.length(), dest, 0, dest.length());
         assertEquals("12345", filtered.toString());
         assertEquals(Spanned.SPAN_POINT_POINT, filtered.getSpanFlags(what));
@@ -100,7 +73,7 @@ public class NumberKeyListenerTest extends
         assertEquals("12345".length(), filtered.getSpanEnd(what));
 
         try {
-            mNumberKeyListener.filter(null, 0, 1, dest, 0, dest.length());
+            mMockNumberKeyListener.filter(null, 0, 1, dest, 0, dest.length());
             fail("should throw NullPointerException.");
         } catch (NullPointerException e) {
         }
@@ -112,18 +85,18 @@ public class NumberKeyListenerTest extends
      * key event, return the char; otherwise return '\0'.
      */
     public void testLookup() {
-        mNumberKeyListener = new MockNumberKeyListener(MockNumberKeyListener.DIGITS);
+        mMockNumberKeyListener = new MockNumberKeyListener(MockNumberKeyListener.DIGITS);
         KeyEvent event1 = new KeyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_0);
         SpannableString str = new SpannableString("012345");
-        assertEquals('0', mNumberKeyListener.lookup(event1, str));
+        assertEquals('0', mMockNumberKeyListener.lookup(event1, str));
 
-        mNumberKeyListener = new MockNumberKeyListener(MockNumberKeyListener.NOTHING);
+        mMockNumberKeyListener = new MockNumberKeyListener(MockNumberKeyListener.NOTHING);
         KeyEvent event2 = new KeyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_A);
         str = new SpannableString("ABCD");
-        assertEquals('\0', mNumberKeyListener.lookup(event2, str));
+        assertEquals('\0', mMockNumberKeyListener.lookup(event2, str));
 
         try {
-            mNumberKeyListener.lookup(null, str);
+            mMockNumberKeyListener.lookup(null, str);
             fail("should throw NullPointerException.");
         } catch (NullPointerException e) {
             // expected.
@@ -131,13 +104,13 @@ public class NumberKeyListenerTest extends
     }
 
     public void testOk() {
-        mNumberKeyListener = new MockNumberKeyListener(MockNumberKeyListener.DIGITS);
+        mMockNumberKeyListener = new MockNumberKeyListener(MockNumberKeyListener.DIGITS);
 
-        assertTrue(mNumberKeyListener.callOk(mNumberKeyListener.getAcceptedChars(), '3'));
-        assertFalse(mNumberKeyListener.callOk(mNumberKeyListener.getAcceptedChars(), 'e'));
+        assertTrue(mMockNumberKeyListener.callOk(mMockNumberKeyListener.getAcceptedChars(), '3'));
+        assertFalse(mMockNumberKeyListener.callOk(mMockNumberKeyListener.getAcceptedChars(), 'e'));
 
         try {
-            mNumberKeyListener.callOk(null, 'm');
+            mMockNumberKeyListener.callOk(null, 'm');
             fail("should throw NullPointerException.");
         } catch (NullPointerException e) {
         }
@@ -151,13 +124,13 @@ public class NumberKeyListenerTest extends
      */
     public void testPressKey() {
         final CharSequence text = "123456";
-        final MockNumberKeyListener numberKeyListener =
+        final MockNumberKeyListener mockNumberKeyListener =
             new MockNumberKeyListener(MockNumberKeyListener.DIGITS);
 
         mActivity.runOnUiThread(new Runnable() {
             public void run() {
                 mTextView.setText(text, BufferType.EDITABLE);
-                mTextView.setKeyListener(numberKeyListener);
+                mTextView.setKeyListener(mockNumberKeyListener);
                 mTextView.requestFocus();
                 Selection.setSelection((Editable) mTextView.getText(), 0, 0);
             }
@@ -188,8 +161,15 @@ public class NumberKeyListenerTest extends
         assertEquals("0123456", mTextView.getText().toString());
     }
 
+    /**
+     * A mocked {@link android.text.method.NumberKeyListener} for testing purposes.
+     *
+     * Allows {@link NumberKeyListenerTest} to call
+     * {@link android.text.method.NumberKeyListener#getAcceptedChars()},
+     * {@link android.text.method.NumberKeyListener#lookup(KeyEvent, Spannable)}, and
+     * {@link android.text.method.NumberKeyListener@ok(char[], char)}.
+     */
     private static class MockNumberKeyListener extends NumberKeyListener {
-
         static final char[] DIGITS =
                 new char[] {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9'};
 

@@ -77,7 +77,6 @@ public class GLTestActivity extends Activity {
         mSurfaceView.getHolder().addCallback(mHolderCallback);
         setContentView(mSurfaceView);
         System.loadLibrary("stlport_shared");
-        System.loadLibrary("gtest");
         System.loadLibrary("nativeopengltests");
     }
 

@@ -43,6 +43,7 @@ import java.io.ByteArrayInputStream;
 import java.io.UnsupportedEncodingException;
 import java.util.concurrent.Callable;
 import java.util.Date;
+import java.util.List;
 import java.util.Random;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -64,7 +65,7 @@ public class GeolocationTest extends ActivityInstrumentationTestCase2<WebViewStu
 
     private static final String JS_INTERFACE_NAME = "Android";
     private static final int POLLING_TIMEOUT = 60 * 1000;
-    private static final String PROVIDER_NAME = LocationManager.NETWORK_PROVIDER;
+    private static final int LOCATION_THREAD_UPDATE_WAIT_MS = 250;
 
     // static HTML page always injected instead of the url loaded
     private static final String RAW_HTML =
@@ -102,6 +103,9 @@ public class GeolocationTest extends ActivityInstrumentationTestCase2<WebViewStu
     private JavascriptStatusReceiver mJavascriptStatusReceiver;
     private LocationManager mLocationManager;
     private WebViewOnUiThread mOnUiThread;
+    private Thread mLocationUpdateThread;
+    private volatile boolean mLocationUpdateThreadExitRequested;
+    private List<String> mProviders;
 
     public GeolocationTest() throws Exception {
         super("com.android.cts.stub", WebViewStubActivity.class);
@@ -151,36 +155,100 @@ public class GeolocationTest extends ActivityInstrumentationTestCase2<WebViewStu
         mLocationManager = (LocationManager)getActivity().getApplicationContext()
                 .getSystemService(Context.LOCATION_SERVICE);
         // Add a test provider before each test to inject a location
-        addTestProvider(PROVIDER_NAME);
+        mProviders = mLocationManager.getAllProviders();
+        for (String provider : mProviders) {
+            // Can't mock passive provider.
+            if (provider.equals(LocationManager.PASSIVE_PROVIDER)) {
+                mProviders.remove(provider);
+                break;
+            }
+        }
+        addTestProviders();
     }
 
     @Override
     protected void tearDown() throws Exception {
+        stopUpdateLocationThread();
         // Remove the test provider after each test
-        try {
-          mLocationManager.removeTestProvider(PROVIDER_NAME);
-        } catch (IllegalArgumentException e) {} // Not much to do about this
+        for (String provider : mProviders) {
+            try {
+                mLocationManager.removeTestProvider(provider);
+            } catch (IllegalArgumentException e) {} // Not much to do about this
+        }
         mOnUiThread.cleanUp();
         // This will null all member and static variables
         super.tearDown();
     }
 
+    private void addTestProviders() {
+        for (String providerName : mProviders) {
+            LocationProvider provider = mLocationManager.getProvider(providerName);
+            mLocationManager.addTestProvider(provider.getName(),
+                    provider.requiresNetwork(), //requiresNetwork,
+                    provider.requiresSatellite(), // requiresSatellite,
+                    provider.requiresCell(),  // requiresCell,
+                    provider.hasMonetaryCost(), // hasMonetaryCost,
+                    provider.supportsAltitude(), // supportsAltitude,
+                    provider.supportsSpeed(), // supportsSpeed,
+                    provider.supportsBearing(), // supportsBearing,
+                    provider.getPowerRequirement(), // powerRequirement
+                    provider.getAccuracy()); // accuracy
+            mLocationManager.setTestProviderEnabled(provider.getName(), true);
+        }
+    }
+
+    private void startUpdateLocationThread() {
+        // Only start the thread once
+        if (mLocationUpdateThread == null) {
+            mLocationUpdateThreadExitRequested = false;
+            mLocationUpdateThread = new Thread() {
+                @Override
+                public void run() {
+                    while (!mLocationUpdateThreadExitRequested) {
+                        try {
+                            Thread.sleep(LOCATION_THREAD_UPDATE_WAIT_MS);
+                        } catch(Exception e) {
+                            // Do nothing, an extra update is no problem
+                        }
+                        updateLocation();
+                    }
+                }
+            };
+            mLocationUpdateThread.start();
+        }
+    }
+
+    private void stopUpdateLocationThread() {
+        // Only stop the thread if it was started
+        if (mLocationUpdateThread != null) {
+            mLocationUpdateThreadExitRequested = true;
+            try {
+                mLocationUpdateThread.join();
+            } catch (InterruptedException e) {
+                // Do nothing
+            }
+            mLocationUpdateThread = null;
+        }
+    }
+
     // Update location with a fixed latitude and longtitude, sets the time to the current time.
-    private void updateLocation(final String providerName) {
-        Location location = new Location(providerName);
-        location.setLatitude(40);
-        location.setLongitude(40);
-        location.setAccuracy(1.0f);
-        location.setTime(java.lang.System.currentTimeMillis());
-        location.setElapsedRealtimeNanos(SystemClock.elapsedRealtimeNanos());
-        mLocationManager.setTestProviderLocation(providerName, location);
+    private void updateLocation() {
+        for (int i = 0; i < mProviders.size(); i++) {
+            Location location = new Location(mProviders.get(i));
+            location.setLatitude(40);
+            location.setLongitude(40);
+            location.setAccuracy(1.0f);
+            location.setTime(java.lang.System.currentTimeMillis());
+            location.setElapsedRealtimeNanos(SystemClock.elapsedRealtimeNanos());
+            mLocationManager.setTestProviderLocation(mProviders.get(i), location);
+        }
     }
 
     // Need to set the location just after loading the url. Setting it after each load instead of
     // using a maximum age.
     private void loadUrlAndUpdateLocation(String url) {
         mOnUiThread.loadUrlAndWaitForCompletion(url);
-        updateLocation(PROVIDER_NAME);
+        startUpdateLocationThread();
     }
 
     // WebChromeClient that accepts each location for one load. WebChromeClient is used in
@@ -204,20 +272,6 @@ public class GeolocationTest extends ActivityInstrumentationTestCase2<WebViewStu
             mReceivedRequest = true;
             callback.invoke(origin, mAccept, mRetain);
         }
-    }
-
-    private void addTestProvider(final String providerName) {
-        mLocationManager.addTestProvider(providerName,
-                true, //requiresNetwork,
-                false, // requiresSatellite,
-                true,  // requiresCell,
-                false, // hasMonetaryCost,
-                false, // supportsAltitude,
-                false, // supportsSpeed,
-                false, // supportsBearing,
-                Criteria.POWER_MEDIUM, // powerRequirement
-                Criteria.ACCURACY_FINE); // accuracy
-        mLocationManager.setTestProviderEnabled(providerName, true);
     }
 
     // Test loading a page and accepting the domain for one load
@@ -430,7 +484,7 @@ public class GeolocationTest extends ActivityInstrumentationTestCase2<WebViewStu
         final TestSimpleGeolocationRequestWebChromeClient chromeClientRejectOnce =
                 new TestSimpleGeolocationRequestWebChromeClient(mOnUiThread, false, false);
         mOnUiThread.setWebChromeClient(chromeClientRejectOnce);
-        // Load url once, and the callback should accept the domain for all future loads
+        // Load url once, and the callback should reject it once
         mOnUiThread.loadUrlAndWaitForCompletion(URL_1);
         Callable<Boolean> receivedRequest = new Callable<Boolean>() {
             @Override
@@ -445,11 +499,12 @@ public class GeolocationTest extends ActivityInstrumentationTestCase2<WebViewStu
                 return mJavascriptStatusReceiver.mDenied;
             }
         };
-        PollingCheck.check("JS didn't get position", POLLING_TIMEOUT, locationDenied);
+        PollingCheck.check("JS got position", POLLING_TIMEOUT, locationDenied);
         // Same result should happen on next run
+        chromeClientRejectOnce.mReceivedRequest = false;
         mOnUiThread.loadUrlAndWaitForCompletion(URL_1);
         PollingCheck.check("Geolocation prompt not called", POLLING_TIMEOUT, receivedRequest);
-        PollingCheck.check("JS didn't get position", POLLING_TIMEOUT, locationDenied);
+        PollingCheck.check("JS got position", POLLING_TIMEOUT, locationDenied);
 
         // Try to reject forever
         final TestSimpleGeolocationRequestWebChromeClient chromeClientRejectAlways =

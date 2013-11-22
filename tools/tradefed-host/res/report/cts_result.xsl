@@ -298,6 +298,18 @@
                                             </pre>
                                         </TD>
                                     </TR>
+                                    <TR>
+                                        <TD class="rowtitle">Storage devices</TD>
+                                        <TD>
+                                            <xsl:value-of select="TestResult/DeviceInfo/BuildInfo/@storage_devices"/>
+                                        </TD>
+                                    </TR>
+                                    <TR>
+                                        <TD class="rowtitle">Multi-user support</TD>
+                                        <TD>
+                                            <xsl:value-of select="TestResult/DeviceInfo/BuildInfo/@multi_user"/>
+                                        </TD>
+                                    </TR>
                                 </TABLE>
                             </TD>
                         </TR>
@@ -526,7 +538,15 @@
                                                             <xsl:value-of select="@result"/>
                                                         </div>
                                                     </TD>
-                                                    <TD class="failuredetails"></TD>
+                                                    <TD class="failuredetails">
+                                                        <div class="details">
+                                                            <ul>
+                                                              <xsl:for-each select="Details/ValueArray/Value">
+                                                                <li><xsl:value-of select="."/></li>
+                                                              </xsl:for-each>
+                                                            </ul>
+                                                        </div>
+                                                    </TD>
                                                 </xsl:if>
 
                                                 <xsl:if test="@result='fail'">

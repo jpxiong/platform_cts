@@ -16,14 +16,16 @@
 
 package android.security.cts;
 
+import android.content.pm.PackageManager;
+import android.test.AndroidTestCase;
 import junit.framework.AssertionFailedError;
-import junit.framework.TestCase;
 
 import java.io.File;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Scanner;
 import java.util.regex.Pattern;
@@ -34,7 +36,7 @@ import java.util.regex.Pattern;
  * into computer systems remotely, and minimizing the number of open ports
  * is considered a security best practice.
  */
-public class ListeningPortsTest extends TestCase {
+public class ListeningPortsTest extends AndroidTestCase {
 
     /** Ports that are allowed to be listening. */
     private static final List<String> EXCEPTION_PATTERNS = new ArrayList<String>(6);
@@ -151,7 +153,7 @@ public class ListeningPortsTest extends TestCase {
     /**
      * UDP tests can be flaky due to DNS lookups.  Compensate.
      */
-    private static void assertNoRemotelyAccessibleListeningUdpPorts(
+    private void assertNoRemotelyAccessibleListeningUdpPorts(
             String procFilePath, boolean loopback)
             throws Exception {
         for (int i = 0; i < RETRIES_MAX; i++) {
@@ -177,7 +179,7 @@ public class ListeningPortsTest extends TestCase {
      * malicious locally installed programs to gain unauthorized access to
      * program data or cause system corruption.
      */
-    private static void assertNoAccessibleListeningPorts(
+    private void assertNoAccessibleListeningPorts(
             String procFilePath, boolean isTcp, boolean loopback) throws IOException {
         String errors = "";
         List<ParsedProcEntry> entries = ParsedProcEntry.parse(procFilePath);
@@ -189,13 +191,23 @@ public class ListeningPortsTest extends TestCase {
                 && (!entry.localAddress.isLoopbackAddress() ^ loopback)) {
                 errors += "\nFound port listening on addr="
                         + entry.localAddress.getHostAddress() + ", port="
-                        + entry.port + ", UID=" + entry.uid + " in "
+                        + entry.port + ", UID=" + entry.uid
+                        + " " + uidToPackage(entry.uid) + " in "
                         + procFilePath;
             }
         }
         if (!errors.equals("")) {
             fail(errors);
         }
+    }
+
+    private String uidToPackage(int uid) {
+        PackageManager pm = this.getContext().getPackageManager();
+        String[] packages = pm.getPackagesForUid(uid);
+        if (packages == null) {
+            return "[unknown]";
+        }
+        return Arrays.asList(packages).toString();
     }
 
     private static boolean isException(String localAddress) {

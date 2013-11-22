@@ -34,6 +34,8 @@ public class WebChromeClientTest extends ActivityInstrumentationTestCase2<WebVie
     private CtsTestServer mWebServer;
     private WebIconDatabase mIconDb;
     private WebViewOnUiThread mOnUiThread;
+    private boolean mBlockWindowCreationSync;
+    private boolean mBlockWindowCreationAsync;
 
     public WebChromeClientTest() {
         super(WebViewStubActivity.class);
@@ -122,7 +124,7 @@ public class WebChromeClientTest extends ActivityInstrumentationTestCase2<WebVie
         }.run();
     }
 
-    public void testWindows() throws Exception {
+    public void runWindowTest(boolean expectWindowClose) throws Exception {
         final MockWebChromeClient webChromeClient = new MockWebChromeClient();
         mOnUiThread.setWebChromeClient(webChromeClient);
 
@@ -144,12 +146,30 @@ public class WebChromeClientTest extends ActivityInstrumentationTestCase2<WebVie
                 return webChromeClient.hadOnCreateWindow();
             }
         }.run();
-        new PollingCheck(TEST_TIMEOUT) {
-            @Override
-            protected boolean check() {
-                return webChromeClient.hadOnCloseWindow();
-            }
-        }.run();
+
+        if (expectWindowClose) {
+            new PollingCheck(TEST_TIMEOUT) {
+                @Override
+                protected boolean check() {
+                    return webChromeClient.hadOnCloseWindow();
+                }
+            }.run();
+        } else {
+            assertFalse(webChromeClient.hadOnCloseWindow());
+        }
+    }
+    public void testWindows() throws Exception {
+        runWindowTest(true);
+    }
+
+    public void testBlockWindowsSync() throws Exception {
+        mBlockWindowCreationSync = true;
+        runWindowTest(false);
+    }
+
+    public void testBlockWindowsAsync() throws Exception {
+        mBlockWindowCreationAsync = true;
+        runWindowTest(false);
     }
 
     public void testOnJsBeforeUnload() throws Exception {
@@ -380,16 +400,23 @@ public class WebChromeClientTest extends ActivityInstrumentationTestCase2<WebVie
         @Override
         public boolean onCreateWindow(WebView view, boolean dialog, boolean userGesture,
                 Message resultMsg) {
-            WebView childView = new WebView(getActivity());
-            final WebSettings settings = childView.getSettings();
-            settings.setJavaScriptEnabled(true);
-            childView.setWebChromeClient(this);
-            WebView.WebViewTransport transport = (WebView.WebViewTransport) resultMsg.obj;
-            transport.setWebView(childView);
-            resultMsg.sendToTarget();
             mHadOnCreateWindow = true;
-            getActivity().addContentView(childView, new ViewGroup.LayoutParams(
-                    ViewGroup.LayoutParams.FILL_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+            if (mBlockWindowCreationSync) {
+                return false;
+            }
+            WebView.WebViewTransport transport = (WebView.WebViewTransport) resultMsg.obj;
+            if (mBlockWindowCreationAsync) {
+                transport.setWebView(null);
+            } else {
+                WebView childView = new WebView(getActivity());
+                final WebSettings settings = childView.getSettings();
+                settings.setJavaScriptEnabled(true);
+                childView.setWebChromeClient(this);
+                transport.setWebView(childView);
+                getActivity().addContentView(childView, new ViewGroup.LayoutParams(
+                        ViewGroup.LayoutParams.FILL_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+            }
+            resultMsg.sendToTarget();
             return true;
         }
 

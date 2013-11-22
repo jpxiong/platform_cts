@@ -24,11 +24,13 @@ LOCAL_MODULE_TAGS := optional
 LOCAL_SRC_FILES := \
 		CtsSecurityJniOnLoad.cpp \
 		android_security_cts_CharDeviceTest.cpp \
+		android_security_cts_LinuxRngTest.cpp \
+		android_security_cts_LoadEffectLibraryTest.cpp \
 		android_security_cts_NativeCodeTest.cpp \
 		android_security_cts_SELinuxTest.cpp
 
 LOCAL_C_INCLUDES := $(JNI_H_INCLUDE)
 
-LOCAL_SHARED_LIBRARIES := libnativehelper liblog libselinux
+LOCAL_SHARED_LIBRARIES := libnativehelper liblog libbinder libutils libmedia libselinux
 
 include $(BUILD_SHARED_LIBRARY)

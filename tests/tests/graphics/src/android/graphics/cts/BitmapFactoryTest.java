@@ -72,6 +72,22 @@ public class BitmapFactoryTest extends InstrumentationTestCase {
         Config.ARGB_4444};
     private static int[] COLOR_TOLS = new int[] {16, 49, 576};
 
+    private static int[] RAW_COLORS = new int[] {
+        // raw data from R.drawable.premul_data
+        Color.argb(255, 0, 0, 0),
+        Color.argb(128, 255, 0, 0),
+        Color.argb(128, 25, 26, 27),
+        Color.argb(2, 255, 254, 253),
+    };
+
+    private static int[] DEPREMUL_COLORS = new int[] {
+        // data from R.drawable.premul_data, after premultiplied store + un-premultiplied load
+        Color.argb(255, 0, 0, 0),
+        Color.argb(128, 255, 0, 0),
+        Color.argb(128, 26, 26, 28),
+        Color.argb(2, 255, 255, 255),
+    };
+
     @Override
     protected void setUp() throws Exception {
         super.setUp();
@@ -240,6 +256,138 @@ public class BitmapFactoryTest extends InstrumentationTestCase {
         // Test the bitmap size
         assertEquals(START_HEIGHT, b.getHeight());
         assertEquals(START_WIDTH, b.getWidth());
+    }
+
+    public void testDecodeReuseBasic() throws IOException {
+        BitmapFactory.Options options = new BitmapFactory.Options();
+        options.inMutable = true;
+        options.inSampleSize = 0; // treated as 1
+        options.inScaled = false;
+        Bitmap start = BitmapFactory.decodeResource(mRes, R.drawable.start, options);
+        int originalSize = start.getByteCount();
+        assertEquals(originalSize, start.getAllocationByteCount());
+
+        options.inBitmap = start;
+        options.inMutable = false; // will be overridden by non-null inBitmap
+        options.inSampleSize = -42; // treated as 1
+        Bitmap pass = BitmapFactory.decodeResource(mRes, R.drawable.pass, options);
+
+        assertEquals(originalSize, pass.getByteCount());
+        assertEquals(originalSize, pass.getAllocationByteCount());
+        assertSame(start, pass);
+        assertTrue(pass.isMutable());
+    }
+
+    public void testDecodeReuseFormats() throws IOException {
+        // reuse should support all image formats
+        for (int i = 0; i < RES_IDS.length; ++i) {
+            Bitmap reuseBuffer = Bitmap.createBitmap(1000000, 1, Bitmap.Config.ALPHA_8);
+
+            BitmapFactory.Options options = new BitmapFactory.Options();
+            options.inBitmap = reuseBuffer;
+            options.inSampleSize = 4;
+            options.inScaled = false;
+            Bitmap decoded = BitmapFactory.decodeResource(mRes, RES_IDS[i], options);
+            assertSame(reuseBuffer, decoded);
+        }
+    }
+
+    public void testDecodeReuseFailure() throws IOException {
+        BitmapFactory.Options options = new BitmapFactory.Options();
+        options.inMutable = true;
+        options.inScaled = false;
+        options.inSampleSize = 4;
+        Bitmap reduced = BitmapFactory.decodeResource(mRes, R.drawable.robot, options);
+
+        options.inBitmap = reduced;
+        options.inSampleSize = 1;
+        try {
+            Bitmap original = BitmapFactory.decodeResource(mRes, R.drawable.robot, options);
+            fail("should throw exception due to lack of space");
+        } catch (IllegalArgumentException e) {
+        }
+    }
+
+    public void testDecodeReuseScaling() throws IOException {
+        BitmapFactory.Options options = new BitmapFactory.Options();
+        options.inMutable = true;
+        options.inScaled = false;
+        Bitmap original = BitmapFactory.decodeResource(mRes, R.drawable.robot, options);
+        int originalSize = original.getByteCount();
+        assertEquals(originalSize, original.getAllocationByteCount());
+
+        options.inBitmap = original;
+        options.inSampleSize = 4;
+        Bitmap reduced = BitmapFactory.decodeResource(mRes, R.drawable.robot, options);
+
+        assertSame(original, reduced);
+        assertEquals(originalSize, reduced.getAllocationByteCount());
+        assertEquals(originalSize, reduced.getByteCount() * 16);
+    }
+
+    public void testDecodeReuseDoubleScaling() throws IOException {
+        BitmapFactory.Options options = new BitmapFactory.Options();
+        options.inMutable = true;
+        options.inScaled = false;
+        options.inSampleSize = 1;
+        Bitmap original = BitmapFactory.decodeResource(mRes, R.drawable.robot, options);
+        int originalSize = original.getByteCount();
+
+        // Verify that inSampleSize and density scaling both work with reuse concurrently
+        options.inBitmap = original;
+        options.inScaled = true;
+        options.inSampleSize = 2;
+        options.inDensity = 2;
+        options.inTargetDensity = 4;
+        Bitmap doubleScaled = BitmapFactory.decodeResource(mRes, R.drawable.robot, options);
+
+        assertSame(original, doubleScaled);
+        assertEquals(4, doubleScaled.getDensity());
+        assertEquals(originalSize, doubleScaled.getByteCount());
+    }
+
+    public void testDecodeReuseEquivalentScaling() throws IOException {
+        BitmapFactory.Options options = new BitmapFactory.Options();
+        options.inMutable = true;
+        options.inScaled = true;
+        options.inDensity = 4;
+        options.inTargetDensity = 2;
+        Bitmap densityReduced = BitmapFactory.decodeResource(mRes, R.drawable.robot, options);
+        assertEquals(2, densityReduced.getDensity());
+        options.inBitmap = densityReduced;
+        options.inDensity = 0;
+        options.inScaled = false;
+        options.inSampleSize = 2;
+        Bitmap scaleReduced = BitmapFactory.decodeResource(mRes, R.drawable.robot, options);
+        // verify that density isn't incorrectly carried over during bitmap reuse
+        assertFalse(densityReduced.getDensity() == 2);
+        assertFalse(densityReduced.getDensity() == 0);
+        assertSame(densityReduced, scaleReduced);
+    }
+
+    public void testDecodePremultipliedDefault() throws IOException {
+        Bitmap simplePremul = BitmapFactory.decodeResource(mRes, R.drawable.premul_data);
+        assertTrue(simplePremul.isPremultiplied());
+    }
+
+    public void testDecodePremultipliedData() throws IOException {
+        BitmapFactory.Options options = new BitmapFactory.Options();
+        options.inScaled = false;
+        Bitmap premul = BitmapFactory.decodeResource(mRes, R.drawable.premul_data, options);
+        options.inPremultiplied = false;
+        Bitmap unpremul = BitmapFactory.decodeResource(mRes, R.drawable.premul_data, options);
+        assertEquals(premul.getConfig(), Bitmap.Config.ARGB_8888);
+        assertEquals(unpremul.getConfig(), Bitmap.Config.ARGB_8888);
+        assertTrue(premul.getHeight() == 1 && unpremul.getHeight() == 1);
+        assertTrue(premul.getWidth() == unpremul.getWidth() &&
+                   DEPREMUL_COLORS.length == RAW_COLORS.length &&
+                   premul.getWidth() == DEPREMUL_COLORS.length);
+
+        // verify pixel data - unpremul should have raw values, premul will have rounding errors
+        for (int i = 0; i < premul.getWidth(); i++) {
+            assertEquals(premul.getPixel(i, 0), DEPREMUL_COLORS[i]);
+            assertEquals(unpremul.getPixel(i, 0), RAW_COLORS[i]);
+        }
     }
 
     private byte[] obtainArray() {

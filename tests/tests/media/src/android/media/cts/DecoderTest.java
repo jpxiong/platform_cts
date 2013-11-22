@@ -21,6 +21,7 @@ import com.android.cts.media.R;
 import android.content.res.AssetFileDescriptor;
 import android.content.res.Resources;
 import android.media.MediaCodec;
+import android.media.MediaCodecInfo;
 import android.media.MediaExtractor;
 import android.media.MediaFormat;
 import android.util.Log;
@@ -36,6 +37,10 @@ import java.util.zip.CRC32;
 
 public class DecoderTest extends MediaPlayerTestBase {
     private static final String TAG = "DecoderTest";
+
+    private static final int RESET_MODE_NONE = 0;
+    private static final int RESET_MODE_RECONFIGURE = 1;
+    private static final int RESET_MODE_FLUSH = 2;
 
     private Resources mResources;
     short[] mMasterBuffer;
@@ -69,33 +74,68 @@ public class DecoderTest extends MediaPlayerTestBase {
     // This should allow for some variation in decoders, while still detecting
     // phase and delay errors, channel swap, etc.
     public void testDecodeMp3Lame() throws Exception {
-        decode(R.raw.sinesweepmp3lame, 804.f, true);
+        decode(R.raw.sinesweepmp3lame, 804.f);
     }
     public void testDecodeMp3Smpb() throws Exception {
-        decode(R.raw.sinesweepmp3smpb, 413.f, true);
+        decode(R.raw.sinesweepmp3smpb, 413.f);
     }
     public void testDecodeM4a() throws Exception {
-        decode(R.raw.sinesweepm4a, 124.f, true);
+        decode(R.raw.sinesweepm4a, 124.f);
     }
     public void testDecodeOgg() throws Exception {
-        decode(R.raw.sinesweepogg, 168.f, false);
+        decode(R.raw.sinesweepogg, 168.f);
     }
     public void testDecodeWav() throws Exception {
-        decode(R.raw.sinesweepwav, 0.0f, true);
+        decode(R.raw.sinesweepwav, 0.0f);
     }
     public void testDecodeFlac() throws Exception {
-        decode(R.raw.sinesweepflac, 0.0f, true);
+        decode(R.raw.sinesweepflac, 0.0f);
+    }
+
+    public void testDecodeMonoMp3() throws Exception {
+        monoTest(R.raw.monotestmp3);
+    }
+
+    public void testDecodeMonoM4a() throws Exception {
+        monoTest(R.raw.monotestm4a);
+    }
+
+    public void testDecodeMonoOgg() throws Exception {
+        monoTest(R.raw.monotestogg);
+    }
+
+    private void monoTest(int res) throws Exception {
+        short [] mono = decodeToMemory(res, RESET_MODE_NONE);
+        if (mono.length == 44100) {
+            // expected
+        } else if (mono.length == 88200) {
+            // the decoder output 2 channels instead of 1, check that the left and right channel
+            // are identical
+            for (int i = 0; i < mono.length; i += 2) {
+                assertEquals("mismatched samples at " + i, mono[i], mono[i+1]);
+            }
+        } else {
+            fail("wrong number of samples: " + mono.length);
+        }
+
+        // we should get the same data when reconfiguring the codec
+        short [] mono2 = decodeToMemory(res, RESET_MODE_RECONFIGURE);
+        assertTrue(Arrays.equals(mono, mono2));
+
+        // NOTE: coming soon
+        // and when flushing it
+//        short [] mono3 = decodeToMemory(res, RESET_MODE_FLUSH);
+//        assertTrue(Arrays.equals(mono, mono3));
     }
 
     /**
      * @param testinput the file to decode
      * @param maxerror the maximum allowed root mean squared error
-     * @param testReconfigure whether to also test reconfiguring the codec
      * @throws IOException
      */
-    private void decode(int testinput, float maxerror, boolean reconfigure) throws IOException {
+    private void decode(int testinput, float maxerror) throws IOException {
 
-        short [] decoded = decodeToMemory(testinput, false);
+        short [] decoded = decodeToMemory(testinput, RESET_MODE_NONE);
 
         assertEquals("wrong data size", mMasterBuffer.length, decoded.length);
 
@@ -112,16 +152,21 @@ public class DecoderTest extends MediaPlayerTestBase {
         double rmse = Math.sqrt(avgErrorSquared);
         assertTrue("decoding error too big: " + rmse, rmse <= maxerror);
 
-        if (reconfigure) {
-            short [] decoded2 = decodeToMemory(testinput, true);
-            assertEquals("count different with reconfigure", decoded.length, decoded2.length);
-            for (int i = 0; i < decoded.length; i++) {
-                assertEquals("samples don't match", decoded[i], decoded2[i]);
-            }
+        short [] decoded2 = decodeToMemory(testinput, RESET_MODE_RECONFIGURE);
+        assertEquals("count different with reconfigure", decoded.length, decoded2.length);
+        for (int i = 0; i < decoded.length; i++) {
+            assertEquals("samples don't match", decoded[i], decoded2[i]);
         }
+
+        // NOTE: coming soon
+//        short [] decoded3 = decodeToMemory(testinput, RESET_MODE_FLUSH);
+//        assertEquals("count different with flush", decoded.length, decoded3.length);
+//        for (int i = 0; i < decoded.length; i++) {
+//            assertEquals("samples don't match", decoded[i], decoded3[i]);
+//        }
     }
 
-    private short[] decodeToMemory(int testinput, boolean reconfigure) throws IOException {
+    private short[] decodeToMemory(int testinput, int resetMode) throws IOException {
 
         short [] decoded = new short[0];
         int decodedIdx = 0;
@@ -149,12 +194,14 @@ public class DecoderTest extends MediaPlayerTestBase {
         codecInputBuffers = codec.getInputBuffers();
         codecOutputBuffers = codec.getOutputBuffers();
 
-        if (reconfigure) {
+        if (resetMode == RESET_MODE_RECONFIGURE) {
             codec.stop();
             codec.configure(format, null /* surface */, null /* crypto */, 0 /* flags */);
             codec.start();
             codecInputBuffers = codec.getInputBuffers();
             codecOutputBuffers = codec.getOutputBuffers();
+        } else if (resetMode == RESET_MODE_FLUSH) {
+            codec.flush();
         }
 
         extractor.selectTrack(0);
@@ -207,16 +254,21 @@ public class DecoderTest extends MediaPlayerTestBase {
                 if (info.size > 0) {
                     noOutputCounter = 0;
                 }
-                if (info.size > 0 && reconfigure) {
-                    // once we've gotten some data out of the decoder, reconfigure it again
-                    reconfigure = false;
+                if (info.size > 0 && resetMode != RESET_MODE_NONE) {
+                    // once we've gotten some data out of the decoder, reset and start again
+                    if (resetMode == RESET_MODE_RECONFIGURE) {
+                        codec.stop();
+                        codec.configure(format, null /* surface */, null /* crypto */,
+                                0 /* flags */);
+                        codec.start();
+                        codecInputBuffers = codec.getInputBuffers();
+                        codecOutputBuffers = codec.getOutputBuffers();
+                    } else /* resetMode == RESET_MODE_FLUSH */ {
+                        codec.flush();
+                    }
+                    resetMode = RESET_MODE_NONE;
                     extractor.seekTo(0, MediaExtractor.SEEK_TO_NEXT_SYNC);
                     sawInputEOS = false;
-                    codec.stop();
-                    codec.configure(format, null /* surface */, null /* crypto */, 0 /* flags */);
-                    codec.start();
-                    codecInputBuffers = codec.getInputBuffers();
-                    codecOutputBuffers = codec.getOutputBuffers();
                     continue;
                 }
 
@@ -259,12 +311,12 @@ public class DecoderTest extends MediaPlayerTestBase {
         Surface s = getActivity().getSurfaceHolder().getSurface();
         int frames1 = countFrames(
                 R.raw.video_480x360_mp4_h264_1000kbps_25fps_aac_stereo_128kbps_44100hz,
-                false, -1, s);
+                RESET_MODE_NONE, -1 /* eosframe */, s);
         assertEquals("wrong number of frames decoded", 240, frames1);
 
         int frames2 = countFrames(
                 R.raw.video_480x360_mp4_h264_1000kbps_25fps_aac_stereo_128kbps_44100hz,
-                false, -1, null);
+                RESET_MODE_NONE, -1 /* eosframe */, null);
         assertEquals("different number of frames when using Surface", frames1, frames2);
     }
 
@@ -272,12 +324,51 @@ public class DecoderTest extends MediaPlayerTestBase {
         Surface s = getActivity().getSurfaceHolder().getSurface();
         int frames1 = countFrames(
                 R.raw.video_176x144_3gp_h263_300kbps_12fps_aac_stereo_128kbps_22050hz,
-                false /* reconfigure */, -1 /* eosframe */, s);
+                RESET_MODE_NONE, -1 /* eosframe */, s);
         assertEquals("wrong number of frames decoded", 122, frames1);
 
         int frames2 = countFrames(
                 R.raw.video_176x144_3gp_h263_300kbps_12fps_aac_stereo_128kbps_22050hz,
-                false /* reconfigure */, -1 /* eosframe */, null);
+                RESET_MODE_NONE, -1 /* eosframe */, null);
+        assertEquals("different number of frames when using Surface", frames1, frames2);
+    }
+
+    public void testCodecBasicMpeg4() throws Exception {
+        Surface s = getActivity().getSurfaceHolder().getSurface();
+        int frames1 = countFrames(
+                R.raw.video_480x360_mp4_mpeg4_860kbps_25fps_aac_stereo_128kbps_44100hz,
+                RESET_MODE_NONE, -1 /* eosframe */, s);
+        assertEquals("wrong number of frames decoded", 249, frames1);
+
+        int frames2 = countFrames(
+                R.raw.video_480x360_mp4_mpeg4_860kbps_25fps_aac_stereo_128kbps_44100hz,
+                RESET_MODE_NONE, -1 /* eosframe */, null);
+        assertEquals("different number of frames when using Surface", frames1, frames2);
+    }
+
+    public void testCodecBasicVP8() throws Exception {
+        Surface s = getActivity().getSurfaceHolder().getSurface();
+        int frames1 = countFrames(
+                R.raw.video_480x360_webm_vp8_333kbps_25fps_vorbis_stereo_128kbps_44100hz,
+                RESET_MODE_NONE, -1 /* eosframe */, s);
+        assertEquals("wrong number of frames decoded", 240, frames1);
+
+        int frames2 = countFrames(
+                R.raw.video_480x360_webm_vp8_333kbps_25fps_vorbis_stereo_128kbps_44100hz,
+                RESET_MODE_NONE, -1 /* eosframe */, null);
+        assertEquals("different number of frames when using Surface", frames1, frames2);
+    }
+
+    public void testCodecBasicVP9() throws Exception {
+        Surface s = getActivity().getSurfaceHolder().getSurface();
+        int frames1 = countFrames(
+                R.raw.video_480x360_webm_vp9_333kbps_25fps_vorbis_stereo_128kbps_44100hz,
+                RESET_MODE_NONE, -1 /* eosframe */, s);
+        assertEquals("wrong number of frames decoded", 240, frames1);
+
+        int frames2 = countFrames(
+                R.raw.video_480x360_webm_vp9_333kbps_25fps_vorbis_stereo_128kbps_44100hz,
+                RESET_MODE_NONE, -1 /* eosframe */, null);
         assertEquals("different number of frames when using Surface", frames1, frames2);
     }
 
@@ -285,7 +376,7 @@ public class DecoderTest extends MediaPlayerTestBase {
         Surface s = getActivity().getSurfaceHolder().getSurface();
         int frames1 = countFrames(
                 R.raw.video_176x144_3gp_h263_300kbps_12fps_aac_stereo_128kbps_22050hz,
-                false, 64, s);
+                RESET_MODE_NONE, 64 /* eosframe */, s);
         assertEquals("wrong number of frames decoded", 64, frames1);
     }
 
@@ -293,51 +384,139 @@ public class DecoderTest extends MediaPlayerTestBase {
         Surface s = getActivity().getSurfaceHolder().getSurface();
         int frames1 = countFrames(
                 R.raw.video_480x360_mp4_h264_1000kbps_25fps_aac_stereo_128kbps_44100hz,
-                false, 120, s);
+                RESET_MODE_NONE, 120 /* eosframe */, s);
         assertEquals("wrong number of frames decoded", 120, frames1);
     }
 
-    public void testCodecReconfigH264WithoutSurface() throws Exception {
-        testCodecReconfig(
+    public void testCodecEarlyEOSMpeg4() throws Exception {
+        Surface s = getActivity().getSurfaceHolder().getSurface();
+        int frames1 = countFrames(
+                R.raw.video_480x360_mp4_mpeg4_860kbps_25fps_aac_stereo_128kbps_44100hz,
+                RESET_MODE_NONE, 120 /* eosframe */, s);
+        assertEquals("wrong number of frames decoded", 120, frames1);
+    }
+
+    public void testCodecEarlyEOSVP8() throws Exception {
+        Surface s = getActivity().getSurfaceHolder().getSurface();
+        int frames1 = countFrames(
+                R.raw.video_480x360_webm_vp8_333kbps_25fps_vorbis_stereo_128kbps_44100hz,
+                RESET_MODE_NONE, 120 /* eosframe */, s);
+        assertEquals("wrong number of frames decoded", 120, frames1);
+    }
+
+    public void testCodecEarlyEOSVP9() throws Exception {
+        Surface s = getActivity().getSurfaceHolder().getSurface();
+        int frames1 = countFrames(
+                R.raw.video_480x360_webm_vp9_333kbps_25fps_vorbis_stereo_128kbps_44100hz,
+                RESET_MODE_NONE, 120 /* eosframe */, s);
+        assertEquals("wrong number of frames decoded", 120, frames1);
+    }
+
+    public void testCodecResetsH264WithoutSurface() throws Exception {
+        testCodecResets(
                 R.raw.video_480x360_mp4_h264_1000kbps_25fps_aac_stereo_128kbps_44100hz, null);
     }
 
-    public void testCodecReconfigH264WithSurface() throws Exception {
+    public void testCodecResetsH264WithSurface() throws Exception {
         Surface s = getActivity().getSurfaceHolder().getSurface();
-        testCodecReconfig(
+        testCodecResets(
                 R.raw.video_480x360_mp4_h264_1000kbps_25fps_aac_stereo_128kbps_44100hz, s);
     }
 
-    public void testCodecReconfigH263WithoutSurface() throws Exception {
-        testCodecReconfig(
+    public void testCodecResetsH263WithoutSurface() throws Exception {
+        testCodecResets(
                 R.raw.video_176x144_3gp_h263_300kbps_12fps_aac_stereo_128kbps_22050hz, null);
     }
 
-    public void testCodecReconfigH263WithSurface() throws Exception {
+    public void testCodecResetsH263WithSurface() throws Exception {
         Surface s = getActivity().getSurfaceHolder().getSurface();
-        testCodecReconfig(
+        testCodecResets(
                 R.raw.video_176x144_3gp_h263_300kbps_12fps_aac_stereo_128kbps_22050hz, s);
     }
 
-//    public void testCodecReconfigOgg() throws Exception {
-//        testCodecReconfig(R.raw.sinesweepogg, null);
-//    }
-//
-    public void testCodecReconfigMp3() throws Exception {
-        testCodecReconfig(R.raw.sinesweepmp3lame, null);
+    public void testCodecResetsMpeg4WithoutSurface() throws Exception {
+        testCodecResets(
+                R.raw.video_480x360_mp4_mpeg4_860kbps_25fps_aac_stereo_128kbps_44100hz, null);
     }
 
-    public void testCodecReconfigM4a() throws Exception {
+    public void testCodecResetsMpeg4WithSurface() throws Exception {
+        Surface s = getActivity().getSurfaceHolder().getSurface();
+        testCodecResets(
+                R.raw.video_480x360_mp4_mpeg4_860kbps_25fps_aac_stereo_128kbps_44100hz, s);
+    }
+
+    public void testCodecResetsVP8WithoutSurface() throws Exception {
+        testCodecResets(
+                R.raw.video_480x360_webm_vp8_333kbps_25fps_vorbis_stereo_128kbps_44100hz, null);
+    }
+
+    public void testCodecResetsVP8WithSurface() throws Exception {
+        Surface s = getActivity().getSurfaceHolder().getSurface();
+        testCodecResets(
+                R.raw.video_480x360_webm_vp8_333kbps_25fps_vorbis_stereo_128kbps_44100hz, s);
+    }
+
+    public void testCodecResetsVP9WithoutSurface() throws Exception {
+        testCodecResets(
+                R.raw.video_480x360_webm_vp9_333kbps_25fps_vorbis_stereo_128kbps_44100hz, null);
+    }
+
+    public void testCodecResetsVP9WithSurface() throws Exception {
+        Surface s = getActivity().getSurfaceHolder().getSurface();
+        testCodecResets(
+                R.raw.video_480x360_webm_vp9_333kbps_25fps_vorbis_stereo_128kbps_44100hz, s);
+    }
+
+//    public void testCodecResetsOgg() throws Exception {
+//        testCodecResets(R.raw.sinesweepogg, null);
+//    }
+
+    public void testCodecResetsMp3() throws Exception {
+        testCodecReconfig(R.raw.sinesweepmp3lame, null);
+        // NOTE: replacing testCodecReconfig call soon
+//        testCodecResets(R.raw.sinesweepmp3lame, null);
+    }
+
+    public void testCodecResetsM4a() throws Exception {
         testCodecReconfig(R.raw.sinesweepm4a, null);
+        // NOTE: replacing testCodecReconfig call soon
+//        testCodecResets(R.raw.sinesweepm4a, null);
     }
 
     private void testCodecReconfig(int video, Surface s) throws Exception {
-        int frames1 = countFrames(video, false /* reconfigure */, -1 /* eosframe */, s);
-        int frames2 = countFrames(video, true /* reconfigure */, -1 /* eosframe */, s);
-        assertEquals("different number of frames when reusing codec", frames1, frames2);
+        int frames1 = countFrames(video, RESET_MODE_NONE, -1 /* eosframe */, s);
+        int frames2 = countFrames(video, RESET_MODE_RECONFIGURE, -1 /* eosframe */, s);
+        assertEquals("different number of frames when using reconfigured codec", frames1, frames2);
     }
 
-    private int countFrames(int video, boolean reconfigure, int eosframe, Surface s) throws Exception {
+    private void testCodecResets(int video, Surface s) throws Exception {
+        int frames1 = countFrames(video, RESET_MODE_NONE, -1 /* eosframe */, s);
+        int frames2 = countFrames(video, RESET_MODE_RECONFIGURE, -1 /* eosframe */, s);
+        int frames3 = countFrames(video, RESET_MODE_FLUSH, -1 /* eosframe */, s);
+        assertEquals("different number of frames when using reconfigured codec", frames1, frames2);
+        assertEquals("different number of frames when using flushed codec", frames1, frames3);
+    }
+
+    private MediaCodec createDecoder(String mime) {
+        if (false) {
+            // change to force testing software codecs
+            if (mime.contains("avc")) {
+                return MediaCodec.createByCodecName("OMX.google.h264.decoder");
+            } else if (mime.contains("3gpp")) {
+                return MediaCodec.createByCodecName("OMX.google.h263.decoder");
+            } else if (mime.contains("mp4v")) {
+                return MediaCodec.createByCodecName("OMX.google.mpeg4.decoder");
+            } else if (mime.contains("vp8")) {
+                return MediaCodec.createByCodecName("OMX.google.vp8.decoder");
+            } else if (mime.contains("vp9")) {
+                return MediaCodec.createByCodecName("OMX.google.vp9.decoder");
+            }
+        }
+        return MediaCodec.createDecoderByType(mime);
+    }
+
+    private int countFrames(int video, int resetMode, int eosframe, Surface s)
+            throws Exception {
         int numframes = 0;
 
         AssetFileDescriptor testFd = mResources.openRawResourceFd(video);
@@ -355,12 +534,8 @@ public class DecoderTest extends MediaPlayerTestBase {
         String mime = format.getString(MediaFormat.KEY_MIME);
         boolean isAudio = mime.startsWith("audio/");
 
-        codec = MediaCodec.createDecoderByType(mime);
-//        if (mime.contains("avc")) {
-//            codec = MediaCodec.createByCodecName("OMX.google.h264.decoder");
-//        } else if (mime.contains("3gpp")) {
-//            codec = MediaCodec.createByCodecName("OMX.google.h263.decoder");
-//        }
+        codec = createDecoder(mime);
+
         assertNotNull("couldn't find codec", codec);
         Log.i("@@@@", "using codec: " + codec.getName());
         codec.configure(format, s /* surface */, null /* crypto */, 0 /* flags */);
@@ -368,13 +543,16 @@ public class DecoderTest extends MediaPlayerTestBase {
         codecInputBuffers = codec.getInputBuffers();
         codecOutputBuffers = codec.getOutputBuffers();
 
-        if (reconfigure) {
+        if (resetMode == RESET_MODE_RECONFIGURE) {
             codec.stop();
             codec.configure(format, s /* surface */, null /* crypto */, 0 /* flags */);
             codec.start();
             codecInputBuffers = codec.getInputBuffers();
             codecOutputBuffers = codec.getOutputBuffers();
+        } else if (resetMode == RESET_MODE_FLUSH) {
+            codec.flush();
         }
+
         Log.i("@@@@", "format: " + format);
 
         extractor.selectTrack(0);
@@ -437,18 +615,23 @@ public class DecoderTest extends MediaPlayerTestBase {
                 // Some decoders output a 0-sized buffer at the end. Disregard those.
                 if (info.size > 0) {
                     deadDecoderCounter = 0;
-                    if (reconfigure) {
-                        // once we've gotten some data out of the decoder, reconfigure it again
-                        reconfigure = false;
-                        numframes = 0;
+                    if (resetMode != RESET_MODE_NONE) {
+                        // once we've gotten some data out of the decoder, reset and start again
+                        if (resetMode == RESET_MODE_RECONFIGURE) {
+                            codec.stop();
+                            codec.configure(format, s /* surface */, null /* crypto */,
+                                    0 /* flags */);
+                            codec.start();
+                            codecInputBuffers = codec.getInputBuffers();
+                            codecOutputBuffers = codec.getOutputBuffers();
+                        } else /* resetMode == RESET_MODE_FLUSH */ {
+                            codec.flush();
+                        }
+                        resetMode = RESET_MODE_NONE;
                         extractor.seekTo(0, MediaExtractor.SEEK_TO_NEXT_SYNC);
                         sawInputEOS = false;
+                        numframes = 0;
                         timestamps.clear();
-                        codec.stop();
-                        codec.configure(format, s /* surface */, null /* crypto */, 0 /* flags */);
-                        codec.start();
-                        codecInputBuffers = codec.getInputBuffers();
-                        codecOutputBuffers = codec.getOutputBuffers();
                         continue;
                     }
 
@@ -503,6 +686,31 @@ public class DecoderTest extends MediaPlayerTestBase {
         testEOSBehavior(R.raw.video_176x144_3gp_h263_300kbps_12fps_aac_stereo_128kbps_22050hz, 50);
     }
 
+    public void testEOSBehaviorMpeg4() throws Exception {
+        // this video has an I frame every 12 frames
+        testEOSBehavior(R.raw.video_480x360_mp4_mpeg4_860kbps_25fps_aac_stereo_128kbps_44100hz, 24);
+        testEOSBehavior(R.raw.video_480x360_mp4_mpeg4_860kbps_25fps_aac_stereo_128kbps_44100hz, 25);
+        testEOSBehavior(R.raw.video_480x360_mp4_mpeg4_860kbps_25fps_aac_stereo_128kbps_44100hz, 48);
+        testEOSBehavior(R.raw.video_480x360_mp4_mpeg4_860kbps_25fps_aac_stereo_128kbps_44100hz, 50);
+        testEOSBehavior(R.raw.video_480x360_mp4_mpeg4_860kbps_25fps_aac_stereo_128kbps_44100hz, 2);
+    }
+
+    public void testEOSBehaviorVP8() throws Exception {
+        // this video has an I frame at 46
+        testEOSBehavior(R.raw.video_480x360_webm_vp8_333kbps_25fps_vorbis_stereo_128kbps_44100hz, 46);
+        testEOSBehavior(R.raw.video_480x360_webm_vp8_333kbps_25fps_vorbis_stereo_128kbps_44100hz, 47);
+        testEOSBehavior(R.raw.video_480x360_webm_vp8_333kbps_25fps_vorbis_stereo_128kbps_44100hz, 57);
+        testEOSBehavior(R.raw.video_480x360_webm_vp8_333kbps_25fps_vorbis_stereo_128kbps_44100hz, 45);
+    }
+
+    public void testEOSBehaviorVP9() throws Exception {
+        // this video has an I frame at 44
+        testEOSBehavior(R.raw.video_480x360_webm_vp9_333kbps_25fps_vorbis_stereo_128kbps_44100hz, 44);
+        testEOSBehavior(R.raw.video_480x360_webm_vp9_333kbps_25fps_vorbis_stereo_128kbps_44100hz, 45);
+        testEOSBehavior(R.raw.video_480x360_webm_vp9_333kbps_25fps_vorbis_stereo_128kbps_44100hz, 55);
+        testEOSBehavior(R.raw.video_480x360_webm_vp9_333kbps_25fps_vorbis_stereo_128kbps_44100hz, 43);
+    }
+
     private void testEOSBehavior(int movie, int stopatsample) throws Exception {
 
         int numframes = 0;
@@ -524,12 +732,8 @@ public class DecoderTest extends MediaPlayerTestBase {
         String mime = format.getString(MediaFormat.KEY_MIME);
         boolean isAudio = mime.startsWith("audio/");
 
-        codec = MediaCodec.createDecoderByType(mime);
-//        if (mime.contains("avc")) {
-//            codec = MediaCodec.createByCodecName("OMX.google.h264.decoder");
-//        } else if (mime.contains("3gpp")) {
-//            codec = MediaCodec.createByCodecName("OMX.google.h263.decoder");
-//        }
+        codec = createDecoder(mime);
+
         assertNotNull("couldn't find codec", codec);
         Log.i("@@@@", "using codec: " + codec.getName());
         codec.configure(format, null /* surface */, null /* crypto */, 0 /* flags */);
@@ -546,6 +750,7 @@ public class DecoderTest extends MediaPlayerTestBase {
         boolean sawOutputEOS = false;
         int deadDecoderCounter = 0;
         int samplenum = 0;
+        boolean dochecksum = false;
         while (!sawOutputEOS && deadDecoderCounter < 100) {
             if (!sawInputEOS) {
                 int inputBufIndex = codec.dequeueInputBuffer(kTimeOutUs);
@@ -599,7 +804,7 @@ public class DecoderTest extends MediaPlayerTestBase {
                         numframes += info.size;
                     } else {
                         // for video, count the number of video frames
-                        long sum = checksum(codecOutputBuffers[res], info.size);
+                        long sum = dochecksum ? checksum(codecOutputBuffers[res], info.size) : 0;
                         if (numframes < checksums.length) {
                             checksums[numframes] = sum;
                         }
@@ -622,7 +827,8 @@ public class DecoderTest extends MediaPlayerTestBase {
                 Log.d(TAG, "output buffers have changed.");
             } else if (res == MediaCodec.INFO_OUTPUT_FORMAT_CHANGED) {
                 MediaFormat oformat = codec.getOutputFormat();
-
+                int colorFormat = oformat.getInteger(MediaFormat.KEY_COLOR_FORMAT);
+                dochecksum = isRecognizedFormat(colorFormat);
                 Log.d(TAG, "output format has changed to " + oformat);
             } else {
                 Log.d(TAG, "no output");
@@ -642,12 +848,7 @@ public class DecoderTest extends MediaPlayerTestBase {
         extractor.setDataSource(testFd.getFileDescriptor(), testFd.getStartOffset(),
                 testFd.getLength());
 
-        codec = MediaCodec.createDecoderByType(mime);
-//        if (mime.contains("avc")) {
-//            codec = MediaCodec.createByCodecName("OMX.google.h264.decoder");
-//        } else if (mime.contains("3gpp")) {
-//            codec = MediaCodec.createByCodecName("OMX.google.h263.decoder");
-//        }
+        codec = createDecoder(mime);
         codec.configure(format, null /* surface */, null /* crypto */, 0 /* flags */);
         codec.start();
         codecInputBuffers = codec.getInputBuffers();
@@ -662,6 +863,7 @@ public class DecoderTest extends MediaPlayerTestBase {
         deadDecoderCounter = 0;
         samplenum = 0;
         numframes = 0;
+        dochecksum = false;
         while (!sawOutputEOS && deadDecoderCounter < 100) {
             if (!sawInputEOS) {
                 int inputBufIndex = codec.dequeueInputBuffer(kTimeOutUs);
@@ -715,7 +917,7 @@ public class DecoderTest extends MediaPlayerTestBase {
                         numframes += info.size;
                     } else {
                         // for video, count the number of video frames
-                        long sum = checksum(codecOutputBuffers[res], info.size);
+                        long sum = dochecksum ? checksum(codecOutputBuffers[res], info.size) : 0;
                         if (numframes < checksums.length) {
                             assertEquals("frame data mismatch at frame " + numframes,
                                     checksums[numframes], sum);
@@ -739,7 +941,8 @@ public class DecoderTest extends MediaPlayerTestBase {
                 Log.d(TAG, "output buffers have changed.");
             } else if (res == MediaCodec.INFO_OUTPUT_FORMAT_CHANGED) {
                 MediaFormat oformat = codec.getOutputFormat();
-
+                int colorFormat = oformat.getInteger(MediaFormat.KEY_COLOR_FORMAT);
+                dochecksum = isRecognizedFormat(colorFormat);
                 Log.d(TAG, "output format has changed to " + oformat);
             } else {
                 Log.d(TAG, "no output");
@@ -755,6 +958,21 @@ public class DecoderTest extends MediaPlayerTestBase {
         assertEquals(stopatsample, numframes);
 
         testFd.close();
+    }
+
+    /* from EncodeDecodeTest */
+    private static boolean isRecognizedFormat(int colorFormat) {
+        switch (colorFormat) {
+            // these are the formats we know how to handle for this test
+            case MediaCodecInfo.CodecCapabilities.COLOR_FormatYUV420Planar:
+            case MediaCodecInfo.CodecCapabilities.COLOR_FormatYUV420PackedPlanar:
+            case MediaCodecInfo.CodecCapabilities.COLOR_FormatYUV420SemiPlanar:
+            case MediaCodecInfo.CodecCapabilities.COLOR_FormatYUV420PackedSemiPlanar:
+            case MediaCodecInfo.CodecCapabilities.COLOR_TI_FormatYUV420PackedSemiPlanar:
+                return true;
+            default:
+                return false;
+        }
     }
 
     private long checksum(ByteBuffer buf, int size) {
@@ -821,7 +1039,7 @@ public class DecoderTest extends MediaPlayerTestBase {
         codec.release();
 
     }
-    
+
     private short getAmplitude(MediaExtractor extractor, MediaCodec codec) {
         short maxvalue = 0;
         int numBytesDecoded = 0;
@@ -872,8 +1090,8 @@ public class DecoderTest extends MediaPlayerTestBase {
                 MediaFormat oformat = codec.getOutputFormat();
             }
         }
-        return maxvalue; 
+        return maxvalue;
     }
-    
+
 }
 

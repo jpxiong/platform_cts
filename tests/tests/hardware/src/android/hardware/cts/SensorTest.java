@@ -19,12 +19,14 @@ package android.hardware.cts;
 import java.lang.IllegalArgumentException;
 import java.lang.Override;
 import java.util.List;
+import java.util.concurrent.CountDownLatch;
 
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
+import android.hardware.SensorEventListener2;
 import android.hardware.SensorManager;
 import android.hardware.TriggerEvent;
 import android.hardware.TriggerEventListener;
@@ -59,6 +61,28 @@ public class SensorTest extends AndroidTestCase {
             assertNull(sensor);
         }
 
+        sensor = mSensorManager.getDefaultSensor(Sensor.TYPE_STEP_COUNTER);
+        boolean hasStepCounter = getContext().getPackageManager().hasSystemFeature(
+                                        PackageManager.FEATURE_SENSOR_STEP_COUNTER);
+        // stepcounter sensor is optional
+        if (hasStepCounter) {
+            assertEquals(Sensor.TYPE_STEP_COUNTER, sensor.getType());
+            assertSensorValues(sensor);
+        } else {
+            assertNull(sensor);
+        }
+
+        sensor = mSensorManager.getDefaultSensor(Sensor.TYPE_STEP_DETECTOR);
+        boolean hasStepDetector = getContext().getPackageManager().hasSystemFeature(
+                                        PackageManager.FEATURE_SENSOR_STEP_DETECTOR);
+        // stepdetector sensor is optional
+        if (hasStepDetector) {
+            assertEquals(Sensor.TYPE_STEP_DETECTOR, sensor.getType());
+            assertSensorValues(sensor);
+        } else {
+            assertNull(sensor);
+        }
+
         sensor = mSensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD);
         boolean hasCompass = getContext().getPackageManager().hasSystemFeature(
                 PackageManager.FEATURE_SENSOR_COMPASS);
@@ -82,6 +106,15 @@ public class SensorTest extends AndroidTestCase {
         if (sensor != null) {
             assertEquals(Sensor.TYPE_TEMPERATURE, sensor.getType());
             assertSensorValues(sensor);
+        }
+    }
+
+    public void testValuesForAllSensors() {
+        for (int i = Sensor.TYPE_ACCELEROMETER; i <= Sensor.TYPE_GEOMAGNETIC_ROTATION_VECTOR; ++i) {
+            Sensor sensor = mSensorManager.getDefaultSensor(i);
+            if (sensor != null) {
+                assertSensorValues(sensor);
+            }
         }
     }
 
@@ -126,12 +159,54 @@ public class SensorTest extends AndroidTestCase {
         }
     }
 
-        private void assertSensorValues(Sensor sensor) {
+    public void testBatchAndFlush() throws Exception {
+        for (int i = Sensor.TYPE_ACCELEROMETER; i <= Sensor.TYPE_GEOMAGNETIC_ROTATION_VECTOR; ++i) {
+            Sensor sensor = mSensorManager.getDefaultSensor(i);
+            // Skip all non-continuous mode sensors.
+            if (sensor == null || Sensor.TYPE_SIGNIFICANT_MOTION == i ||
+                Sensor.TYPE_STEP_COUNTER == i || Sensor.TYPE_STEP_DETECTOR == i ||
+                Sensor.TYPE_LIGHT == i || Sensor.TYPE_PROXIMITY == i ||
+                Sensor.TYPE_AMBIENT_TEMPERATURE == i) {
+                continue;
+            }
+
+            final CountDownLatch eventReceived = new CountDownLatch(25);
+            final CountDownLatch flushReceived = new CountDownLatch(1);
+            SensorEventListener2 listener = new SensorEventListener2() {
+                @Override
+                public void onSensorChanged(SensorEvent event) {
+                    eventReceived.countDown();
+                }
+
+                @Override
+                public void onAccuracyChanged(Sensor sensor, int accuracy) {
+                }
+
+                @Override
+                public void onFlushCompleted(Sensor sensor) {
+                    flushReceived.countDown();
+                }
+            };
+            boolean result = mSensorManager.registerListener(listener, sensor,
+                                            SensorManager.SENSOR_DELAY_NORMAL, 10000000);
+            assertTrue(result);
+            // Wait for 25 events and call flush.
+            eventReceived.await();
+            result = mSensorManager.flush(listener);
+            assertTrue(result);
+            flushReceived.await();
+            mSensorManager.unregisterListener(listener);
+        }
+    }
+
+    private void assertSensorValues(Sensor sensor) {
         assertTrue(sensor.getMaximumRange() >= 0);
         assertTrue(sensor.getPower() >= 0);
         assertTrue(sensor.getResolution() >= 0);
         assertNotNull(sensor.getVendor());
         assertTrue(sensor.getVersion() > 0);
+        assertTrue(sensor.getFifoMaxEventCount() >= 0);
+        assertTrue(sensor.getFifoReservedEventCount() >= 0);
     }
 
     @SuppressWarnings("deprecation")

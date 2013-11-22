@@ -16,46 +16,16 @@
 
 package android.text.method.cts;
 
-import com.android.cts.stub.R;
-
-
-import android.app.Activity;
-import android.app.Instrumentation;
-import android.cts.util.PollingCheck;
-import android.test.ActivityInstrumentationTestCase2;
 import android.text.InputType;
+import android.text.method.cts.KeyListenerTestCase;
 import android.text.method.DateKeyListener;
 import android.view.KeyEvent;
 import android.widget.TextView;
 
 /**
- * Test {@link DateKeyListener}.
+ * Test {@link android.text.method.DateKeyListener}.
  */
-public class DateKeyListenerTest extends
-        ActivityInstrumentationTestCase2<KeyListenerStubActivity> {
-    private Activity mActivity;
-    private Instrumentation mInstrumentation;
-    private TextView mTextView;
-
-    public DateKeyListenerTest(){
-        super("com.android.cts.stub", KeyListenerStubActivity.class);
-    }
-
-    @Override
-    protected void setUp() throws Exception {
-        super.setUp();
-
-        mActivity = getActivity();
-        mInstrumentation = getInstrumentation();
-        mTextView = (TextView) mActivity.findViewById(R.id.keylistener_textview);
-        new PollingCheck(1000) {
-            @Override
-            protected boolean check() {
-                return mTextView.hasWindowFocus();
-            }
-        }.run();
-    }
-
+public class DateKeyListenerTest extends KeyListenerTestCase {
     public void testConstructor() {
         new DateKeyListener();
     }
@@ -70,21 +40,20 @@ public class DateKeyListenerTest extends
     }
 
     public void testGetAcceptedChars() {
-        MyDataKeyListener dataKeyListener = new MyDataKeyListener();
+        MockDateKeyListener mockDateKeyListener = new MockDateKeyListener();
 
         TextMethodUtils.assertEquals(DateKeyListener.CHARACTERS,
-                dataKeyListener.getAcceptedChars());
+                mockDateKeyListener.getAcceptedChars());
     }
 
     public void testGetInputType() {
-        MyDataKeyListener dataKeyListener = new MyDataKeyListener();
+        DateKeyListener dateKeyListener = new DateKeyListener();
 
-        int expected = InputType.TYPE_CLASS_DATETIME
-                | InputType.TYPE_DATETIME_VARIATION_DATE;
-        assertEquals(expected, dataKeyListener.getInputType());
+        int expected = InputType.TYPE_CLASS_DATETIME | InputType.TYPE_DATETIME_VARIATION_DATE;
+        assertEquals(expected, dateKeyListener.getInputType());
     }
 
-    /**
+    /*
      * Scenario description:
      * 1. Press '1' key and check if the content of TextView becomes "1"
      * 2. Press '2' key and check if the content of TextView becomes "12"
@@ -96,13 +65,7 @@ public class DateKeyListenerTest extends
     public void testDateTimeKeyListener() {
         final DateKeyListener dateKeyListener = DateKeyListener.getInstance();
 
-        mActivity.runOnUiThread(new Runnable() {
-            public void run() {
-                mTextView.setKeyListener(dateKeyListener);
-                mTextView.requestFocus();
-            }
-        });
-        mInstrumentation.waitForIdleSync();
+        setKeyListenerSync(dateKeyListener);
         assertEquals("", mTextView.getText().toString());
 
         // press '1' key.
@@ -129,13 +92,7 @@ public class DateKeyListenerTest extends
         assertEquals("12-/", mTextView.getText().toString());
 
         // remove DateKeyListener
-        mActivity.runOnUiThread(new Runnable() {
-            public void run() {
-                mTextView.setKeyListener(null);
-                mTextView.requestFocus();
-            }
-        });
-        mInstrumentation.waitForIdleSync();
+        setKeyListenerSync(null);
         assertEquals("12-/", mTextView.getText().toString());
 
         // press '/' key, it will not be accepted.
@@ -143,7 +100,13 @@ public class DateKeyListenerTest extends
         assertEquals("12-/", mTextView.getText().toString());
     }
 
-    private class MyDataKeyListener extends DateKeyListener {
+    /**
+     * A mocked {@link android.text.method.DateKeyListener} for testing purposes.
+     *
+     * Allows {@link DateKeyListenerTest} to call
+     * {@link android.text.method.DateKeyListener#getAcceptedChars()}.
+     */
+    private class MockDateKeyListener extends DateKeyListener {
         @Override
         protected char[] getAcceptedChars() {
             return super.getAcceptedChars();

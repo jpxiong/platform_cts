@@ -18,6 +18,7 @@ package android.tests.getinfo;
 
 import android.content.Context;
 import android.opengl.GLES20;
+import android.opengl.GLES30;
 import android.opengl.GLSurfaceView;
 import android.util.Log;
 
@@ -30,22 +31,24 @@ import javax.microedition.khronos.opengles.GL10;
 class GLESSurfaceView extends GLSurfaceView {
     private static final String TAG = "GLESSurfaceView";
 
-    private boolean mUseGL20;
-    CountDownLatch mDone;
-
+    private int mGLVersion;//1, 2, 3
+    private CountDownLatch mDone;
+    private DeviceInfoActivity mParent;
     /**
      *
-     * @param context
+     * @param parent
      * @param useGL20 whether to use GLES2.0 API or not inside the view
      * @param done to notify the completion of the task
      */
-    public GLESSurfaceView(Context context, boolean useGL20, CountDownLatch done){
-        super(context);
+    public GLESSurfaceView(DeviceInfoActivity parent, int glVersion, CountDownLatch done){
+        super(parent);
 
-        mUseGL20 = useGL20;
+        mParent = parent;
+        mGLVersion = glVersion;
         mDone = done;
-        if (mUseGL20) {
-            setEGLContextClientVersion(2);
+        if (glVersion > 1) {
+            // Default is 1 so only set if bigger than 1
+            setEGLContextClientVersion(glVersion);
         }
         setRenderer(new OpenGLESRenderer());
     }
@@ -55,29 +58,25 @@ class GLESSurfaceView extends GLSurfaceView {
         @Override
         public void onSurfaceCreated(GL10 gl, EGLConfig config) {
             String extensions;
-            if (mUseGL20) {
+            if (mGLVersion == 2) {
                 extensions = GLES20.glGetString(GLES20.GL_EXTENSIONS);
+            } else if (mGLVersion == 3) {
+                extensions = GLES30.glGetString(GLES30.GL_EXTENSIONS);
             } else {
                 extensions = gl.glGetString(GL10.GL_EXTENSIONS);
             }
             Log.i(TAG, "extensions : " + extensions);
             Scanner scanner = new Scanner(extensions);
             scanner.useDelimiter(" ");
-            StringBuilder builder = new StringBuilder();
             while (scanner.hasNext()) {
                 String ext = scanner.next();
                 if (ext.contains("texture")) {
                     if (ext.contains("compression") || ext.contains("compressed")) {
                         Log.i(TAG, "Compression supported: " + ext);
-                        builder.append(ext);
-                        builder.append(";");
+                        mParent.addCompressedTextureFormat(ext);
                     }
                 }
             }
-
-            DeviceInfoInstrument.addResult(
-                    DeviceInfoConstants.OPEN_GL_COMPRESSED_TEXTURE_FORMATS,
-                    builder.toString());
 
             mDone.countDown();
         }

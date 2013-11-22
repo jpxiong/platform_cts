@@ -22,11 +22,13 @@ import android.renderscript.RSRuntimeException;
 
 public class AcosTest extends RSBaseCompute {
     private ScriptC_acos_f32 script_f32;
+    private ScriptC_acos_f32_relaxed script_f32_relaxed;
 
     @Override
     protected void setUp() throws Exception {
         super.setUp();
         script_f32 = new ScriptC_acos_f32(mRS);
+        script_f32_relaxed = new ScriptC_acos_f32_relaxed(mRS);
     }
 
     @Override
@@ -44,6 +46,19 @@ public class AcosTest extends RSBaseCompute {
         case TEST_F32_4:
             script_f32.forEach_acos_f32_4(mIn, mOut);
             break;
+        case TEST_RELAXED_F32:
+            script_f32.forEach_acos_f32_1(mIn, mOut);
+            break;
+        case TEST_RELAXED_F32_2:
+            script_f32.forEach_acos_f32_2(mIn, mOut);
+            break;
+        case TEST_RELAXED_F32_3:
+            script_f32.forEach_acos_f32_3(mIn, mOut);
+            break;
+        case TEST_RELAXED_F32_4:
+            script_f32.forEach_acos_f32_4(mIn, mOut);
+            break;
+
         }
     }
 
@@ -75,4 +90,22 @@ public class AcosTest extends RSBaseCompute {
     public void testAcosF32_4() {
         doF32_4(0x123, 4);
     }
+
+    public void testAcosF32_relaxed() {
+        doF32_relaxed(0x123e, 128);
+    }
+
+    public void testAcosF32_2_relaxed() {
+        doF32_2_relaxed(0x1e, 128);
+    }
+
+    public void testAcosF32_3_relaxed() {
+        doF32_3_relaxed(0xeaf, 128);
+    }
+
+    public void testAcosF32_4_relaxed() {
+        doF32_4_relaxed(0x123, 128);
+    }
+
+
 }

@@ -43,6 +43,11 @@ public class BitmapTest extends AndroidTestCase {
     private Bitmap mBitmap;
     private BitmapFactory.Options mOptions;
 
+    // small alpha values cause color values to be pre-multiplied down, losing accuracy
+    private final int PREMUL_COLOR = Color.argb(2, 255, 254, 253);
+    private final int PREMUL_ROUNDED_COLOR = Color.argb(2, 255, 255, 255);
+    private final int PREMUL_STORED_COLOR = Color.argb(2, 2, 2, 2);
+
     @Override
     protected void setUp() throws Exception {
         super.setUp();
@@ -376,6 +381,22 @@ public class BitmapTest extends AndroidTestCase {
         assertEquals(0x00, Color.alpha(color));
     }
 
+    public void testGetAllocationByteCount() {
+        mBitmap = Bitmap.createBitmap(100, 200, Bitmap.Config.ALPHA_8);
+        int alloc = mBitmap.getAllocationByteCount();
+        assertEquals(mBitmap.getByteCount(), alloc);
+
+        // reconfigure same size
+        mBitmap.reconfigure(50, 100, Bitmap.Config.ARGB_8888);
+        assertEquals(mBitmap.getByteCount(), alloc);
+        assertEquals(mBitmap.getAllocationByteCount(), alloc);
+
+        // reconfigure different size
+        mBitmap.reconfigure(10, 10, Bitmap.Config.ALPHA_8);
+        assertEquals(mBitmap.getByteCount(), 100);
+        assertEquals(mBitmap.getAllocationByteCount(), alloc);
+    }
+
     public void testGetConfig(){
         Bitmap bm0 = Bitmap.createBitmap(100, 200, Bitmap.Config.ALPHA_8);
         Bitmap bm1 = Bitmap.createBitmap(100, 200, Bitmap.Config.ARGB_8888);
@@ -385,7 +406,8 @@ public class BitmapTest extends AndroidTestCase {
         assertEquals(Bitmap.Config.ALPHA_8, bm0.getConfig());
         assertEquals(Bitmap.Config.ARGB_8888, bm1.getConfig());
         assertEquals(Bitmap.Config.RGB_565, bm2.getConfig());
-        assertEquals(Bitmap.Config.ARGB_4444, bm3.getConfig());
+        // Attempting to create a 4444 bitmap actually creates an 8888 bitmap.
+        assertEquals(Bitmap.Config.ARGB_8888, bm3.getConfig());
     }
 
     public void testGetHeight(){
@@ -438,7 +460,8 @@ public class BitmapTest extends AndroidTestCase {
         assertEquals(100, bm0.getRowBytes());
         assertEquals(400, bm1.getRowBytes());
         assertEquals(200, bm2.getRowBytes());
-        assertEquals(200, bm3.getRowBytes());
+        // Attempting to create a 4444 bitmap actually creates an 8888 bitmap.
+        assertEquals(400, bm3.getRowBytes());
     }
 
     public void testGetWidth(){
@@ -463,6 +486,81 @@ public class BitmapTest extends AndroidTestCase {
         assertFalse(mBitmap.isRecycled());
         mBitmap.recycle();
         assertTrue(mBitmap.isRecycled());
+    }
+
+    public void testReconfigure() {
+        mBitmap = Bitmap.createBitmap(100, 200, Bitmap.Config.RGB_565);
+        int alloc = mBitmap.getAllocationByteCount();
+
+        // test shrinking
+        mBitmap.reconfigure(50, 100, Bitmap.Config.ALPHA_8);
+        assertEquals(mBitmap.getAllocationByteCount(), alloc);
+        assertEquals(mBitmap.getByteCount() * 8, alloc);
+
+        // test expanding
+        try {
+            mBitmap.reconfigure(101, 201, Bitmap.Config.ARGB_8888);
+            fail("shouldn't come to here");
+        } catch (IllegalArgumentException e) {
+        }
+
+        // test mutable
+        mBitmap = BitmapFactory.decodeResource(mRes, R.drawable.start, mOptions);
+        try {
+            mBitmap.reconfigure(1, 1, Bitmap.Config.ALPHA_8);
+            fail("shouldn't come to here");
+        } catch (IllegalStateException e) {
+        }
+    }
+
+    public void testSetConfig() {
+        mBitmap = Bitmap.createBitmap(100, 200, Bitmap.Config.RGB_565);
+        int alloc = mBitmap.getAllocationByteCount();
+
+        // test shrinking
+        mBitmap.setConfig(Bitmap.Config.ALPHA_8);
+        assertEquals(mBitmap.getAllocationByteCount(), alloc);
+        assertEquals(mBitmap.getByteCount() * 2, alloc);
+
+        // test expanding
+        try {
+            mBitmap.setConfig(Bitmap.Config.ARGB_8888);
+            fail("shouldn't come to here");
+        } catch (IllegalArgumentException e) {
+        }
+
+        // test mutable
+        mBitmap = BitmapFactory.decodeResource(mRes, R.drawable.start, mOptions);
+        try {
+            mBitmap.setConfig(Bitmap.Config.ALPHA_8);
+            fail("shouldn't come to here");
+        } catch (IllegalStateException e) {
+        }
+    }
+
+    public void testSetHeight() {
+        mBitmap = Bitmap.createBitmap(100, 200, Bitmap.Config.ARGB_8888);
+        int alloc = mBitmap.getAllocationByteCount();
+
+        // test shrinking
+        mBitmap.setHeight(100);
+        assertEquals(mBitmap.getAllocationByteCount(), alloc);
+        assertEquals(mBitmap.getByteCount() * 2, alloc);
+
+        // test expanding
+        try {
+            mBitmap.setHeight(201);
+            fail("shouldn't come to here");
+        } catch (IllegalArgumentException e) {
+        }
+
+        // test mutable
+        mBitmap = BitmapFactory.decodeResource(mRes, R.drawable.start, mOptions);
+        try {
+            mBitmap.setHeight(1);
+            fail("shouldn't come to here");
+        } catch (IllegalStateException e) {
+        }
     }
 
     public void testSetPixel(){
@@ -601,6 +699,119 @@ public class BitmapTest extends AndroidTestCase {
 
         for(int i = 0; i < 10000; i++){
             assertEquals(ret[i], colors[i]);
+        }
+    }
+
+    private void checkPremultipliedBitmapConfig(Config config, boolean expectedPremul) {
+        Bitmap bitmap = Bitmap.createBitmap(1, 1, config);
+        bitmap.setPremultiplied(true);
+        bitmap.setPixel(0, 0, Color.TRANSPARENT);
+        assertTrue(bitmap.isPremultiplied() == expectedPremul);
+
+        bitmap.setHasAlpha(false);
+        assertFalse(bitmap.isPremultiplied());
+    }
+
+    public void testSetPremultipliedSimple() {
+        checkPremultipliedBitmapConfig(Bitmap.Config.ALPHA_8, true);
+        checkPremultipliedBitmapConfig(Bitmap.Config.RGB_565, false);
+        checkPremultipliedBitmapConfig(Bitmap.Config.ARGB_4444, true);
+        checkPremultipliedBitmapConfig(Bitmap.Config.ARGB_8888, true);
+    }
+
+    public void testSetPremultipliedData() {
+        // with premul, will store 2,2,2,2, so it doesn't get value correct
+        Bitmap bitmap = Bitmap.createBitmap(1, 1, Bitmap.Config.ARGB_8888);
+        bitmap.setPixel(0, 0, PREMUL_COLOR);
+        assertEquals(bitmap.getPixel(0, 0), PREMUL_ROUNDED_COLOR);
+
+        // read premultiplied value directly
+        bitmap.setPremultiplied(false);
+        assertEquals(bitmap.getPixel(0, 0), PREMUL_STORED_COLOR);
+
+        // value can now be stored/read correctly
+        bitmap.setPixel(0, 0, PREMUL_COLOR);
+        assertEquals(bitmap.getPixel(0, 0), PREMUL_COLOR);
+
+        // verify with array methods
+        int testArray[] = new int[] { PREMUL_COLOR };
+        bitmap.setPixels(testArray, 0, 1, 0, 0, 1, 1);
+        bitmap.getPixels(testArray, 0, 1, 0, 0, 1, 1);
+        assertEquals(bitmap.getPixel(0, 0), PREMUL_COLOR);
+    }
+
+    public void testPremultipliedCanvas() {
+        Bitmap bitmap = Bitmap.createBitmap(1, 1, Bitmap.Config.ARGB_8888);
+        bitmap.setHasAlpha(true);
+        bitmap.setPremultiplied(false);
+        assertFalse(bitmap.isPremultiplied());
+
+        Canvas c = new Canvas();
+        try {
+            c.drawBitmap(bitmap, 0, 0, null);
+            fail("canvas should fail with exception");
+        } catch (RuntimeException e) {
+        }
+    }
+
+    private int getBitmapRawInt(Bitmap bitmap) {
+        IntBuffer buffer = IntBuffer.allocate(1);
+        bitmap.copyPixelsToBuffer(buffer);
+        return buffer.get(0);
+    }
+
+    private void bitmapStoreRawInt(Bitmap bitmap, int value) {
+        IntBuffer buffer = IntBuffer.allocate(1);
+        buffer.put(0, value);
+        bitmap.copyPixelsFromBuffer(buffer);
+    }
+
+    public void testSetPremultipliedToBuffer() {
+        Bitmap bitmap = Bitmap.createBitmap(1, 1, Bitmap.Config.ARGB_8888);
+        bitmap.setPixel(0, 0, PREMUL_COLOR);
+        int storedPremul = getBitmapRawInt(bitmap);
+
+        bitmap = Bitmap.createBitmap(1, 1, Bitmap.Config.ARGB_8888);
+        bitmap.setPremultiplied(false);
+        bitmap.setPixel(0, 0, PREMUL_STORED_COLOR);
+
+        assertEquals(getBitmapRawInt(bitmap), storedPremul);
+    }
+
+    public void testSetPremultipliedFromBuffer() {
+        Bitmap bitmap = Bitmap.createBitmap(1, 1, Bitmap.Config.ARGB_8888);
+        bitmap.setPremultiplied(false);
+        bitmap.setPixel(0, 0, PREMUL_COLOR);
+        int rawTestColor = getBitmapRawInt(bitmap);
+
+        bitmap = Bitmap.createBitmap(1, 1, Bitmap.Config.ARGB_8888);
+        bitmap.setPremultiplied(false);
+        bitmapStoreRawInt(bitmap, rawTestColor);
+        assertEquals(bitmap.getPixel(0, 0), PREMUL_COLOR);
+    }
+
+    public void testSetWidth() {
+        mBitmap = Bitmap.createBitmap(100, 200, Bitmap.Config.ARGB_8888);
+        int alloc = mBitmap.getAllocationByteCount();
+
+        // test shrinking
+        mBitmap.setWidth(50);
+        assertEquals(mBitmap.getAllocationByteCount(), alloc);
+        assertEquals(mBitmap.getByteCount() * 2, alloc);
+
+        // test expanding
+        try {
+            mBitmap.setWidth(101);
+            fail("shouldn't come to here");
+        } catch (IllegalArgumentException e) {
+        }
+
+        // test mutable
+        mBitmap = BitmapFactory.decodeResource(mRes, R.drawable.start, mOptions);
+        try {
+            mBitmap.setWidth(1);
+            fail("shouldn't come to here");
+        } catch (IllegalStateException e) {
         }
     }
 

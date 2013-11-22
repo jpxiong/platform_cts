@@ -20,6 +20,9 @@ package android.provider.cts;
 import android.content.ContentProviderClient;
 import android.content.ContentResolver;
 import android.content.ContentValues;
+import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.content.pm.ResolveInfo;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteException;
 import android.net.Uri;
@@ -262,5 +265,12 @@ public class SettingsTest extends AndroidTestCase {
         tryBadTableAccess(" secure", "secure", "install_non_market_apps");
         tryBadTableAccess("secure ", "secure", "install_non_market_apps");
         tryBadTableAccess(" secure ", "secure", "install_non_market_apps");
+    }
+
+    public void testUserDictionarySettingsExists() throws RemoteException {
+        final Intent intent = new Intent(Settings.ACTION_USER_DICTIONARY_SETTINGS);
+        final ResolveInfo ri = mContext.getPackageManager().resolveActivity(
+                intent, PackageManager.MATCH_DEFAULT_ONLY);
+        assertTrue(ri != null);
     }
 }

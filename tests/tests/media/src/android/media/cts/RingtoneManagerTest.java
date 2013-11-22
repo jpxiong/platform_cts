@@ -83,11 +83,6 @@ public class RingtoneManagerTest
         Cursor c = mRingtoneManager.getCursor();
         assertTrue("Must have at least one ring tone available", c.getCount() > 0);
 
-        mRingtoneManager.setIncludeDrm(true);
-        assertTrue(mRingtoneManager.getIncludeDrm());
-        mRingtoneManager.setIncludeDrm(false);
-        assertFalse(mRingtoneManager.getIncludeDrm());
-
         assertNotNull(mRingtoneManager.getRingtone(0));
         assertNotNull(RingtoneManager.getRingtone(mContext, Settings.System.DEFAULT_RINGTONE_URI));
         int expectedPosition = 0;

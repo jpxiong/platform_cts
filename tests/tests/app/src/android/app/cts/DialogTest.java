@@ -17,7 +17,6 @@ package android.app.cts;
 
 import com.android.cts.stub.R;
 
-
 import android.app.Dialog;
 import android.app.Instrumentation;
 import android.content.Context;
@@ -371,10 +370,15 @@ public class DialogTest extends ActivityInstrumentationTestCase2<DialogStubActiv
 
         long now = SystemClock.uptimeMillis();
         MotionEvent touchMotionEvent = MotionEvent.obtain(now, now, MotionEvent.ACTION_DOWN,
-                -20.0f, -20.0f, 0);
+                1, 100, 0);
         mInstrumentation.sendPointerSync(touchMotionEvent);
 
-        assertFalse(d.dispatchTouchEventResult);
+        new PollingCheck(TEST_TIMEOUT) {
+            protected boolean check() {
+                return !d.dispatchTouchEventResult;
+            }
+        }.run();
+
         assertMotionEventEquals(touchMotionEvent, d.touchEvent);
 
         assertTrue(d.isOnTouchEventCalled);
@@ -386,11 +390,16 @@ public class DialogTest extends ActivityInstrumentationTestCase2<DialogStubActiv
         // because closeOnTouchOutside is true.
         d.setCanceledOnTouchOutside(true);
 
-        touchMotionEvent = MotionEvent.obtain(now + 1, now, MotionEvent.ACTION_DOWN,
-                -20.0f, -20.0f, 0);
+        touchMotionEvent = MotionEvent.obtain(now, now + 1, MotionEvent.ACTION_DOWN,
+                1, 100, 0);
         mInstrumentation.sendPointerSync(touchMotionEvent);
 
-        assertTrue(d.dispatchTouchEventResult);
+        new PollingCheck(TEST_TIMEOUT) {
+            protected boolean check() {
+                return d.dispatchTouchEventResult;
+            }
+        }.run();
+
         assertMotionEventEquals(touchMotionEvent, d.touchEvent);
 
         assertTrue(d.isOnTouchEventCalled);
@@ -403,7 +412,7 @@ public class DialogTest extends ActivityInstrumentationTestCase2<DialogStubActiv
         final TestDialog d = (TestDialog) mActivity.getDialog();
         long eventTime = SystemClock.uptimeMillis();
         final MotionEvent trackBallEvent = MotionEvent.obtain(eventTime, eventTime,
-                MotionEvent.ACTION_DOWN, -20.0f, -20.0f, 0);
+                MotionEvent.ACTION_DOWN, 0.0f, 0.0f, 0);
 
         assertNull(d.trackballEvent);
         assertNull(d.onTrackballEvent);

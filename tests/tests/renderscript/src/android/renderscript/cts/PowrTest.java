@@ -23,12 +23,14 @@ import com.android.cts.stub.R;
 
 public class PowrTest extends RSBaseCompute {
     private ScriptC_powr_f32 script_f32;
+    private ScriptC_powr_f32_relaxed script_f32_relaxed;
     private Allocation mIn;
 
     @Override
     protected void setUp() throws Exception {
         super.setUp();
         script_f32 = new ScriptC_powr_f32(mRS);
+        script_f32_relaxed = new ScriptC_powr_f32_relaxed(mRS);
     }
 
     @Override
@@ -45,6 +47,19 @@ public class PowrTest extends RSBaseCompute {
             break;
         case TEST_F32_4:
             script_f32.forEach_powr_f32_4(mIn, mOut);
+            break;
+
+        case TEST_RELAXED_F32:
+            script_f32_relaxed.forEach_powr_f32_1(mIn, mOut);
+            break;
+        case TEST_RELAXED_F32_2:
+            script_f32_relaxed.forEach_powr_f32_2(mIn, mOut);
+            break;
+        case TEST_RELAXED_F32_3:
+            script_f32_relaxed.forEach_powr_f32_3(mIn, mOut);
+            break;
+        case TEST_RELAXED_F32_4:
+            script_f32_relaxed.forEach_powr_f32_4(mIn, mOut);
             break;
         }
     }
@@ -83,10 +98,22 @@ public class PowrTest extends RSBaseCompute {
         doF32(0x12345678, 16);
     }
 
+    public void testPowrF32_relaxed() {
+        ScriptField_PowInputData in = new ScriptField_PowInputData(mRS, INPUTSIZE);
+        mIn = in.getAllocation();
+        doF32_relaxed(0x12345678, 128);
+    }
+
     public void testPowrF32_2() {
         ScriptField_PowInputData_2 in = new ScriptField_PowInputData_2(mRS, INPUTSIZE);
         mIn = in.getAllocation();
         doF32_2(0x12ab78, 16);
+    }
+
+    public void testPowrF32_2_relaxed() {
+        ScriptField_PowInputData_2 in = new ScriptField_PowInputData_2(mRS, INPUTSIZE);
+        mIn = in.getAllocation();
+        doF32_2(0x12ab78, 128);
     }
 
     public void testPowrF32_3() {
@@ -95,9 +122,21 @@ public class PowrTest extends RSBaseCompute {
         doF32_3(0x1f5678, 16);
     }
 
+    public void testPowrF32_3_relaxed() {
+        ScriptField_PowInputData_3 in = new ScriptField_PowInputData_3(mRS, INPUTSIZE);
+        mIn = in.getAllocation();
+        doF32_3_relaxed(0x1f5678, 128);
+    }
+
     public void testPowrF32_4() {
         ScriptField_PowInputData_4 in = new ScriptField_PowInputData_4(mRS, INPUTSIZE);
         mIn = in.getAllocation();
         doF32_4(0xc678, 16);
+    }
+
+    public void testPowrF32_4_relaxed() {
+        ScriptField_PowInputData_4 in = new ScriptField_PowInputData_4(mRS, INPUTSIZE);
+        mIn = in.getAllocation();
+        doF32_4_relaxed(0xc678, 128);
     }
 }

@@ -19,6 +19,7 @@ cts_security_apps_list := \
 	CtsInstrumentationAppDiffCert \
 	CtsPermissionDeclareApp \
 	CtsPermissionDeclareAppCompat \
+	CtsReadExternalStorageApp \
 	CtsSharedUidInstall \
 	CtsSharedUidInstallDiffCert \
 	CtsSimpleAppInstall \
@@ -29,6 +30,7 @@ cts_security_apps_list := \
 	CtsMultiUserStorageApp
 
 cts_support_packages := \
+	$(PTS_SUPPORT_PACKAGES) \
 	CtsAccelerationTestStubs \
 	CtsDeviceAdmin \
 	CtsMonkeyApp \
@@ -38,6 +40,7 @@ cts_support_packages := \
 	SignatureTest \
 	TestDeviceSetup \
 	CtsUiAutomatorApp \
+	CtsUsbSerialTestApp \
 	$(cts_security_apps_list)
 
 cts_external_packages := \
@@ -51,6 +54,7 @@ CTS_TEST_CASE_LIST := \
 
 # Test packages that require an associated test package XML.
 cts_test_packages := \
+	$(PTS_TEST_PACKAGES) \
 	CtsAccelerationTestCases \
 	CtsAccountManagerTestCases \
 	CtsAccessibilityServiceTestCases \
@@ -91,6 +95,8 @@ cts_test_packages := \
 	CtsPreference2TestCases \
 	CtsProviderTestCases \
 	CtsRenderscriptTestCases \
+	CtsRenderscriptGraphicsTestCases \
+	CtsRsCppTestCases \
 	CtsSaxTestCases \
 	CtsSecurityTestCases \
 	CtsSpeechTestCases \
@@ -111,9 +117,11 @@ CTS_COVERAGE_TEST_CASE_LIST := \
 
 # Host side only tests
 cts_host_libraries := \
+	$(PTS_HOST_CASES) \
 	CtsAdbTests \
 	CtsAppSecurityTests \
-	CtsMonkeyTestCases
+	CtsMonkeyTestCases \
+	CtsUsbTests
 
 
 # Native test executables that need to have associated test XMLs.
@@ -123,14 +131,15 @@ cts_native_exes := \
 	bionic-unit-tests-cts \
 
 cts_ui_tests := \
-        CtsUiAutomatorTests
+	CtsUiAutomatorTests
 
 # All the files that will end up under the repository/testcases
 # directory of the final CTS distribution.
 CTS_TEST_CASES := $(call cts-get-lib-paths,$(cts_host_libraries)) \
 		$(call cts-get-package-paths,$(cts_test_packages)) \
 		$(call cts-get-native-paths,$(cts_native_exes)) \
-		$(call cts-get-ui-lib-paths,$(cts_ui_tests))
+		$(call cts-get-ui-lib-paths,$(cts_ui_tests)) \
+		$(call cts-get-ui-lib-paths,$(pts_device_lib_tests))
 
 # All the XMLs that will end up under the repository/testcases
 # and that need to be created before making the final CTS distribution.

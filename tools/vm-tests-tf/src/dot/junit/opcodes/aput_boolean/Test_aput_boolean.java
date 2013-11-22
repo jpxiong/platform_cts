@@ -175,19 +175,6 @@ public class Test_aput_boolean extends DxTestCase {
             DxUtil.checkVerifyException(t);
         }
     }
-    
-    /**
-     * @constraint B15 
-     * @title put value 2 into boolean array
-     */
-    public void testVFE9() {
-        try {
-            Class.forName("dot.junit.opcodes.aput_boolean.d.T_aput_boolean_10");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
-        }
-    }
 
     /**
      * @constraint B1

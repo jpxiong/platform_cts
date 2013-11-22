@@ -16,16 +16,11 @@
 
 package android.text.method.cts;
 
-import com.android.cts.stub.R;
-
-
-import android.app.Activity;
-import android.app.Instrumentation;
-import android.test.ActivityInstrumentationTestCase2;
 import android.text.InputType;
 import android.text.Selection;
 import android.text.Spannable;
 import android.text.SpannableStringBuilder;
+import android.text.method.cts.KeyListenerTestCase;
 import android.text.method.QwertyKeyListener;
 import android.text.method.TextKeyListener;
 import android.text.method.TextKeyListener.Capitalize;
@@ -33,24 +28,7 @@ import android.view.KeyEvent;
 import android.widget.TextView;
 import android.widget.TextView.BufferType;
 
-public class QwertyKeyListenerTest extends
-        ActivityInstrumentationTestCase2<KeyListenerStubActivity> {
-    private Activity mActivity;
-    private Instrumentation mInstrumentation;
-    private TextView mTextView;
-
-    public QwertyKeyListenerTest() {
-        super("com.android.cts.stub", KeyListenerStubActivity.class);
-    }
-
-    @Override
-    protected void setUp() throws Exception {
-        super.setUp();
-        mActivity = getActivity();
-        mInstrumentation = getInstrumentation();
-        mTextView = (TextView) mActivity.findViewById(R.id.keylistener_textview);
-    }
-
+public class QwertyKeyListenerTest extends KeyListenerTestCase {
     public void testConstructor() {
         new QwertyKeyListener(Capitalize.NONE, false);
 

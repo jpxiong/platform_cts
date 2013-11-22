@@ -192,17 +192,4 @@ public class Test_aput_char extends DxTestCase {
         }
     }
 
-    /**
-     * @constraint B15 
-     * @title put value 65536 into char array
-     */
-    public void testVFE9() {
-        try {
-            Class.forName("dot.junit.opcodes.aput_char.d.T_aput_char_10");
-            fail("expected a verification exception");
-        } catch (Throwable t) {
-            DxUtil.checkVerifyException(t);
-        }
-    }
-
 }

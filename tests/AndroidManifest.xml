@@ -98,6 +98,10 @@
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.READ_LOGS" />
 
+    <!-- telephony provider tests -->
+    <uses-permission android:name="android.permission.READ_SMS"/>
+    <uses-permission android:name="android.permission.WRITE_SMS"/>
+
     <!-- content sync tests -->
     <uses-permission android:name="android.permission.MANAGE_ACCOUNTS" />
     <uses-permission android:name="android.permission.AUTHENTICATE_ACCOUNTS" />
@@ -106,6 +110,9 @@
     <uses-permission android:name="android.permission.READ_SYNC_SETTINGS" />
     <uses-permission android:name="android.permission.WRITE_SYNC_SETTINGS" />
     <uses-permission android:name="android.permission.READ_SYNC_STATS" />
+
+    <!-- Used for ClonedSecureRandomTest -->
+    <uses-permission android:name="android.permission.KILL_BACKGROUND_PROCESSES" />
 
     <!-- Used for PackageManager test, don't delete this permission-tree -->
     <permission-tree android:name="com.android.cts.stub.permission.TEST_DYNAMIC"
@@ -677,6 +684,15 @@
             </intent-filter>
         </activity>
 
+        <activity android:name="android.webkit.cts.WebViewStartupStubActivity"
+            android:label="WebViewStartupStubActivity"
+            android:screenOrientation="nosensor">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.FRAMEWORK_INSTRUMENTATION_TEST" />
+            </intent-filter>
+        </activity>
+
         <activity android:name="android.app.cts.ChildActivity"
                         android:label="ChildActivity" />
 
@@ -994,6 +1010,9 @@
 
         <activity android:name="android.renderscriptgraphics.cts.RenderscriptGLStubActivity"
                   android:label="RenderscriptGLStub"/>
+
+        <service android:name="android.security.cts.activity.SecureRandomService"
+                 android:process=":secureRandom"/>
     </application>
 
 

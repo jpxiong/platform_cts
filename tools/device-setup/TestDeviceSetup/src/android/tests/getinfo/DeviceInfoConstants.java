@@ -60,4 +60,6 @@ public interface DeviceInfoConstants {
     public static final String BUILD_VERSION = "buildVersion";
     public static final String BUILD_TAGS = "build_tags";
     public static final String SERIAL_NUMBER = "deviceID";
+    public static final String STORAGE_DEVICES = "storage_devices";
+    public static final String MULTI_USER = "multi_user";
 }

@@ -21,6 +21,8 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.WindowManager;
 
+import com.google.common.annotations.VisibleForTesting;
+
 /**
  * Helper {@link Activity} for CTS tests of Device Admin activation. The {@code Activity}
  * enables tests to capture the invocations of its {@link #onActivityResult(int, int, Intent)} by
@@ -45,6 +47,7 @@ public class CtsDeviceAdminActivationTestActivity extends Activity {
                 | WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
     }
 
+    @VisibleForTesting
     public void setOnActivityResultListener(OnActivityResultListener listener) {
         mOnActivityResultListener = listener;
     }

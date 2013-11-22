@@ -14,6 +14,7 @@
 # limitations under the License.
 #
 
+include cts/suite/pts/PtsBenchmarkingList.mk
 include cts/CtsBuild.mk
 include cts/CtsCoverage.mk
 include $(call all-subdir-makefiles)

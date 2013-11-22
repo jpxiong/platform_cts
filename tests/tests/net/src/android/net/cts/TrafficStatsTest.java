@@ -19,7 +19,11 @@ package android.net.cts;
 import android.net.TrafficStats;
 import android.os.Process;
 import android.test.AndroidTestCase;
+import android.util.Log;
 
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -29,6 +33,8 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
 public class TrafficStatsTest extends AndroidTestCase {
+    private static final String LOG_TAG = "TrafficStatsTest";
+
     public void testValidMobileStats() {
         // We can't assume a mobile network is even present in this test, so
         // we simply assert that a valid value is returned.
@@ -75,19 +81,39 @@ public class TrafficStatsTest extends AndroidTestCase {
         return packetCount * (20 + 32 + bytes);
     }
 
+    private void accessOwnTrafficStats() throws IOException {
+        final int ownAppUid = getContext().getApplicationInfo().uid;
+        Log.d(LOG_TAG, "accesOwnTrafficStatsWithTags(): about to read qtaguid stats for own uid " + ownAppUid);
+
+        boolean foundOwnDetailedStats = false;
+        try {
+            BufferedReader qtaguidReader = new BufferedReader(new FileReader("/proc/net/xt_qtaguid/stats"));
+            String line;
+            while ((line = qtaguidReader.readLine()) != null) {
+                String tokens[] = line.split(" ");
+                if (tokens.length > 3 && tokens[3].equals(String.valueOf(ownAppUid))) {
+                    Log.d(LOG_TAG, "accessOwnTrafficStatsWithTags(): got own stats: " + line);
+                }
+            }
+            qtaguidReader.close();
+        } catch (FileNotFoundException e) {
+            fail("Was not able to access qtaguid/stats: " + e);
+        }
+    }
+
     public void testTrafficStatsForLocalhost() throws IOException {
-        long mobileTxPacketsBefore = TrafficStats.getMobileTxPackets();
-        long mobileRxPacketsBefore = TrafficStats.getMobileRxPackets();
-        long mobileTxBytesBefore = TrafficStats.getMobileTxBytes();
-        long mobileRxBytesBefore = TrafficStats.getMobileRxBytes();
-        long totalTxPacketsBefore = TrafficStats.getTotalTxPackets();
-        long totalRxPacketsBefore = TrafficStats.getTotalRxPackets();
-        long totalTxBytesBefore = TrafficStats.getTotalTxBytes();
-        long totalRxBytesBefore = TrafficStats.getTotalRxBytes();
-        long uidTxBytesBefore = TrafficStats.getUidTxBytes(Process.myUid());
-        long uidRxBytesBefore = TrafficStats.getUidRxBytes(Process.myUid());
-        long uidTxPacketsBefore = TrafficStats.getUidTxPackets(Process.myUid());
-        long uidRxPacketsBefore = TrafficStats.getUidRxPackets(Process.myUid());
+        final long mobileTxPacketsBefore = TrafficStats.getMobileTxPackets();
+        final long mobileRxPacketsBefore = TrafficStats.getMobileRxPackets();
+        final long mobileTxBytesBefore = TrafficStats.getMobileTxBytes();
+        final long mobileRxBytesBefore = TrafficStats.getMobileRxBytes();
+        final long totalTxPacketsBefore = TrafficStats.getTotalTxPackets();
+        final long totalRxPacketsBefore = TrafficStats.getTotalRxPackets();
+        final long totalTxBytesBefore = TrafficStats.getTotalTxBytes();
+        final long totalRxBytesBefore = TrafficStats.getTotalRxBytes();
+        final long uidTxBytesBefore = TrafficStats.getUidTxBytes(Process.myUid());
+        final long uidRxBytesBefore = TrafficStats.getUidRxBytes(Process.myUid());
+        final long uidTxPacketsBefore = TrafficStats.getUidTxPackets(Process.myUid());
+        final long uidRxPacketsBefore = TrafficStats.getUidRxPackets(Process.myUid());
 
         // Transfer 1MB of data across an explicitly localhost socket.
         final int byteCount = 1024;
@@ -104,22 +130,36 @@ public class TrafficStatsTest extends AndroidTestCase {
                     socket.setTcpNoDelay(true);
                     OutputStream out = socket.getOutputStream();
                     byte[] buf = new byte[byteCount];
+                    TrafficStats.setThreadStatsTag(0x42);
+                    TrafficStats.tagSocket(socket);
+                    accessOwnTrafficStats();
                     for (int i = 0; i < packetCount; i++) {
                         out.write(buf);
                         out.flush();
+                        try {
+                            // Bug: 10668088, Even with Nagle disabled, and flushing the 1024 bytes
+                            // the kernel still regroups data into a larger packet.
+                            Thread.sleep(5);
+                        } catch (InterruptedException e) {
+                        }
                     }
                     out.close();
                     socket.close();
+                    accessOwnTrafficStats();
                 } catch (IOException e) {
+                    Log.i(LOG_TAG, "Badness during writes to socket: " + e);
                 }
             }
         }.start();
 
+        int read = 0;
         try {
             Socket socket = server.accept();
+            socket.setTcpNoDelay(true);
+            TrafficStats.setThreadStatsTag(0x43);
+            TrafficStats.tagSocket(socket);
             InputStream in = socket.getInputStream();
             byte[] buf = new byte[byteCount];
-            int read = 0;
             while (read < byteCount * packetCount) {
                 int n = in.read(buf);
                 assertTrue("Unexpected EOF", n > 0);
@@ -128,6 +168,7 @@ public class TrafficStatsTest extends AndroidTestCase {
         } finally {
             server.close();
         }
+        assertTrue("Not all data read back", read >= byteCount * packetCount);
 
         // It's too fast to call getUidTxBytes function.
         try {
@@ -163,18 +204,30 @@ public class TrafficStatsTest extends AndroidTestCase {
          *   + 7 approx.: syn, syn-ack, ack, fin-ack, ack, fin-ack, ack;
          *   but sometimes the last find-acks just vanish, so we set a lower limit of +5.
          */
-        assertTrue("uidtxp: " + uidTxPacketsBefore + " -> " + uidTxPacketsAfter + " delta=" + uidTxDeltaPackets,
-            uidTxDeltaPackets >= packetCount + 5 &&
-            uidTxDeltaPackets <= packetCount + packetCount + 7);
-        assertTrue("uidrxp: " + uidRxPacketsBefore + " -> " + uidRxPacketsAfter + " delta=" + uidRxDeltaPackets,
-            uidRxDeltaPackets >= packetCount + 5 &&
-            uidRxDeltaPackets <= packetCount + packetCount + 7);
-        assertTrue("uidtxb: " + uidTxBytesBefore + " -> " + uidTxBytesAfter + " delta=" + uidTxDeltaBytes,
-            uidTxDeltaBytes >= tcpPacketToIpBytes(packetCount, byteCount) + tcpPacketToIpBytes(5, 0) &&
-            uidTxDeltaBytes <= tcpPacketToIpBytes(packetCount, byteCount) + tcpPacketToIpBytes(packetCount + 7, 0));
-        assertTrue("uidrxb: " + uidRxBytesBefore + " -> " + uidRxBytesAfter + " delta=" + uidRxDeltaBytes,
-            uidRxDeltaBytes >= tcpPacketToIpBytes(packetCount, byteCount) + tcpPacketToIpBytes(5, 0) &&
-            uidRxDeltaBytes <= tcpPacketToIpBytes(packetCount, byteCount) + tcpPacketToIpBytes(packetCount + 7, 0));
+        final int maxExpectedExtraPackets = 7;
+        final int minExpectedExtraPackets = 5;
+
+
+        assertTrue("uidtxp: " + uidTxPacketsBefore + " -> " + uidTxPacketsAfter + " delta=" + uidTxDeltaPackets +
+            " Wanted: " + uidTxDeltaPackets + ">=" + packetCount + "+" + minExpectedExtraPackets + " && " +
+            uidTxDeltaPackets + "<=" + packetCount + "+" + packetCount + "+" + maxExpectedExtraPackets,
+            uidTxDeltaPackets >= packetCount + minExpectedExtraPackets &&
+            uidTxDeltaPackets <= packetCount + packetCount + maxExpectedExtraPackets);
+        assertTrue("uidrxp: " + uidRxPacketsBefore + " -> " + uidRxPacketsAfter + " delta=" + uidRxDeltaPackets +
+            " Wanted: " + uidRxDeltaPackets + ">=" + packetCount + "+" + minExpectedExtraPackets + " && " +
+            uidRxDeltaPackets + "<=" + packetCount + "+" + packetCount + "+" + maxExpectedExtraPackets,
+            uidRxDeltaPackets >= packetCount + minExpectedExtraPackets &&
+            uidRxDeltaPackets <= packetCount + packetCount + maxExpectedExtraPackets);
+        assertTrue("uidtxb: " + uidTxBytesBefore + " -> " + uidTxBytesAfter + " delta=" + uidTxDeltaBytes +
+            " Wanted: " + uidTxDeltaBytes + ">=" + tcpPacketToIpBytes(packetCount, byteCount) + "+" + tcpPacketToIpBytes(minExpectedExtraPackets, 0) + " && " +
+            uidTxDeltaBytes + "<=" + tcpPacketToIpBytes(packetCount, byteCount) + "+" + tcpPacketToIpBytes(packetCount + maxExpectedExtraPackets, 0),
+            uidTxDeltaBytes >= tcpPacketToIpBytes(packetCount, byteCount) + tcpPacketToIpBytes(minExpectedExtraPackets, 0) &&
+            uidTxDeltaBytes <= tcpPacketToIpBytes(packetCount, byteCount) + tcpPacketToIpBytes(packetCount + maxExpectedExtraPackets, 0));
+        assertTrue("uidrxb: " + uidRxBytesBefore + " -> " + uidRxBytesAfter + " delta=" + uidRxDeltaBytes +
+            " Wanted: " + uidRxDeltaBytes + ">=" + tcpPacketToIpBytes(packetCount, byteCount) + "+" + tcpPacketToIpBytes(minExpectedExtraPackets, 0) + " && " +
+            uidRxDeltaBytes + "<=" + tcpPacketToIpBytes(packetCount, byteCount) + "+" + tcpPacketToIpBytes(packetCount + maxExpectedExtraPackets, 0),
+            uidRxDeltaBytes >= tcpPacketToIpBytes(packetCount, byteCount) + tcpPacketToIpBytes(minExpectedExtraPackets, 0) &&
+            uidRxDeltaBytes <= tcpPacketToIpBytes(packetCount, byteCount) + tcpPacketToIpBytes(packetCount + maxExpectedExtraPackets, 0));
 
         // Localhost traffic *does* count against total stats.
         // Fudge by 132 packets of 1500 bytes not related to the test.

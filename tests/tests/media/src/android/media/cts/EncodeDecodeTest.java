@@ -333,7 +333,7 @@ public class EncodeDecodeTest extends AndroidTestCase {
             inputSurface = new InputSurface(encoder.createInputSurface());
             encoder.start();
 
-            doEncodeDecodeVideoFromSurfaceToSurface(encoder, inputSurface, colorFormat, decoder, outputSurface);
+            doEncodeDecodeVideoFromSurfaceToSurface(encoder, inputSurface, decoder, outputSurface);
         } finally {
             if (VERBOSE) Log.d(TAG, "releasing codecs");
             if (inputSurface != null) {
@@ -704,7 +704,7 @@ public class EncodeDecodeTest extends AndroidTestCase {
      * Does the actual work for encoding and decoding from Surface to Surface.
      */
     private void doEncodeDecodeVideoFromSurfaceToSurface(MediaCodec encoder,
-            InputSurface inputSurface, int encoderColorFormat, MediaCodec decoder,
+            InputSurface inputSurface, MediaCodec decoder,
             OutputSurface outputSurface) {
         final int TIMEOUT_USEC = 10000;
         ByteBuffer[] encoderOutputBuffers = encoder.getOutputBuffers();

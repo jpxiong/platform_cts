@@ -180,9 +180,10 @@ public class ArrowKeyMovementMethodTest extends ActivityInstrumentationTestCase2
         // last line
         Selection.setSelection(mEditable, SPACE_IN_2ND_LINE);
         pressBothShiftAlt();
+        KeyEvent event = new KeyEvent(0, 0, KeyEvent.ACTION_UP,
+            KeyEvent.KEYCODE_DPAD_UP, 0, KeyEvent.META_ALT_ON | KeyEvent.META_SHIFT_ON);
         assertTrue(mArrowKeyMovementMethod.onKeyDown(mTextView, mEditable,
-                KeyEvent.KEYCODE_DPAD_UP, new KeyEvent(KeyEvent.ACTION_DOWN,
-                        KeyEvent.KEYCODE_DPAD_UP)));
+                KeyEvent.KEYCODE_DPAD_UP, event));
         // |first line
         // second |line
         // last line
@@ -190,9 +191,10 @@ public class ArrowKeyMovementMethodTest extends ActivityInstrumentationTestCase2
 
         Selection.setSelection(mEditable, SPACE_IN_2ND_LINE);
         pressShift();
+        event = new KeyEvent(0, 0, KeyEvent.ACTION_UP,
+            KeyEvent.KEYCODE_DPAD_UP, 0, KeyEvent.META_SHIFT_ON);
         assertTrue(mArrowKeyMovementMethod.onKeyDown(mTextView, mEditable,
-                KeyEvent.KEYCODE_DPAD_UP, new KeyEvent(KeyEvent.ACTION_DOWN,
-                        KeyEvent.KEYCODE_DPAD_UP)));
+                KeyEvent.KEYCODE_DPAD_UP, event));
         // first lin|e
         // second |line
         // last line
@@ -212,9 +214,10 @@ public class ArrowKeyMovementMethodTest extends ActivityInstrumentationTestCase2
 
         Selection.setSelection(mEditable, SPACE_IN_2ND_LINE);
         pressAlt();
+        event = new KeyEvent(0, 0, KeyEvent.ACTION_UP,
+            KeyEvent.KEYCODE_DPAD_UP, 0, KeyEvent.META_ALT_ON);
         assertTrue(mArrowKeyMovementMethod.onKeyDown(mTextView, mEditable,
-                KeyEvent.KEYCODE_DPAD_UP, new KeyEvent(KeyEvent.ACTION_DOWN,
-                        KeyEvent.KEYCODE_DPAD_UP)));
+                KeyEvent.KEYCODE_DPAD_UP, event));
         // |first line
         // second line
         // last line
@@ -312,9 +315,10 @@ public class ArrowKeyMovementMethodTest extends ActivityInstrumentationTestCase2
         // last line
         Selection.setSelection(mEditable, SPACE_IN_2ND_LINE);
         pressBothShiftAlt();
+        KeyEvent event = new KeyEvent(0, 0, KeyEvent.ACTION_UP,
+            KeyEvent.KEYCODE_DPAD_LEFT, 0, KeyEvent.META_ALT_ON | KeyEvent.META_SHIFT_ON);
         assertTrue(mArrowKeyMovementMethod.onKeyDown(mTextView, mEditable,
-                KeyEvent.KEYCODE_DPAD_LEFT, new KeyEvent(KeyEvent.ACTION_DOWN,
-                        KeyEvent.KEYCODE_DPAD_LEFT)));
+                KeyEvent.KEYCODE_DPAD_LEFT, event));
         // first line
         // |second |line
         // last line
@@ -322,8 +326,7 @@ public class ArrowKeyMovementMethodTest extends ActivityInstrumentationTestCase2
 
         pressBothShiftAlt();
         assertTrue(mArrowKeyMovementMethod.onKeyDown(mTextView, mEditable,
-                KeyEvent.KEYCODE_DPAD_LEFT, new KeyEvent(KeyEvent.ACTION_DOWN,
-                        KeyEvent.KEYCODE_DPAD_LEFT)));
+                KeyEvent.KEYCODE_DPAD_LEFT, event));
         // first line
         // |second |line
         // last line
@@ -331,9 +334,10 @@ public class ArrowKeyMovementMethodTest extends ActivityInstrumentationTestCase2
 
         Selection.setSelection(mEditable, SPACE_IN_2ND_LINE);
         pressShift();
+        event = new KeyEvent(0, 0, KeyEvent.ACTION_UP,
+            KeyEvent.KEYCODE_DPAD_LEFT, 0, KeyEvent.META_SHIFT_ON);
         assertTrue(mArrowKeyMovementMethod.onKeyDown(mTextView, mEditable,
-                KeyEvent.KEYCODE_DPAD_LEFT, new KeyEvent(KeyEvent.ACTION_DOWN,
-                        KeyEvent.KEYCODE_DPAD_LEFT)));
+                KeyEvent.KEYCODE_DPAD_LEFT, event));
         // first line
         // second| |line
         // last line
@@ -350,9 +354,10 @@ public class ArrowKeyMovementMethodTest extends ActivityInstrumentationTestCase2
 
         Selection.setSelection(mEditable, SPACE_IN_2ND_LINE);
         pressAlt();
+        event = new KeyEvent(0, 0, KeyEvent.ACTION_UP,
+            KeyEvent.KEYCODE_DPAD_LEFT, 0, KeyEvent.META_ALT_ON);
         assertTrue(mArrowKeyMovementMethod.onKeyDown(mTextView, mEditable,
-                KeyEvent.KEYCODE_DPAD_LEFT, new KeyEvent(KeyEvent.ACTION_DOWN,
-                        KeyEvent.KEYCODE_DPAD_LEFT)));
+                KeyEvent.KEYCODE_DPAD_LEFT, event));
         // first line
         // |second line
         // last line
@@ -360,8 +365,7 @@ public class ArrowKeyMovementMethodTest extends ActivityInstrumentationTestCase2
 
         pressAlt();
         assertTrue(mArrowKeyMovementMethod.onKeyDown(mTextView, mEditable,
-                KeyEvent.KEYCODE_DPAD_LEFT, new KeyEvent(KeyEvent.ACTION_DOWN,
-                        KeyEvent.KEYCODE_DPAD_LEFT)));
+                KeyEvent.KEYCODE_DPAD_LEFT, event));
         // first line
         // |second line
         // last line
@@ -397,9 +401,10 @@ public class ArrowKeyMovementMethodTest extends ActivityInstrumentationTestCase2
         // last line
         Selection.setSelection(mEditable, SPACE_IN_2ND_LINE);
         pressBothShiftAlt();
+        KeyEvent event = new KeyEvent(0, 0, KeyEvent.ACTION_UP,
+            KeyEvent.KEYCODE_DPAD_RIGHT, 0, KeyEvent.META_ALT_ON | KeyEvent.META_SHIFT_ON);
         assertTrue(mArrowKeyMovementMethod.onKeyDown(mTextView, mEditable,
-                KeyEvent.KEYCODE_DPAD_RIGHT, new KeyEvent(KeyEvent.ACTION_DOWN,
-                        KeyEvent.KEYCODE_DPAD_RIGHT)));
+                KeyEvent.KEYCODE_DPAD_RIGHT, event));
         // first line
         // second |line|
         // last line
@@ -407,8 +412,7 @@ public class ArrowKeyMovementMethodTest extends ActivityInstrumentationTestCase2
 
         pressBothShiftAlt();
         assertTrue(mArrowKeyMovementMethod.onKeyDown(mTextView, mEditable,
-                KeyEvent.KEYCODE_DPAD_RIGHT, new KeyEvent(KeyEvent.ACTION_DOWN,
-                        KeyEvent.KEYCODE_DPAD_RIGHT)));
+                KeyEvent.KEYCODE_DPAD_RIGHT, event));
         // first line
         // second |line|
         // last line
@@ -416,9 +420,10 @@ public class ArrowKeyMovementMethodTest extends ActivityInstrumentationTestCase2
 
         Selection.setSelection(mEditable, SPACE_IN_2ND_LINE);
         pressShift();
+        event = new KeyEvent(0, 0, KeyEvent.ACTION_UP,
+            KeyEvent.KEYCODE_DPAD_RIGHT, 0, KeyEvent.META_SHIFT_ON);
         assertTrue(mArrowKeyMovementMethod.onKeyDown(mTextView, mEditable,
-                KeyEvent.KEYCODE_DPAD_RIGHT, new KeyEvent(KeyEvent.ACTION_DOWN,
-                        KeyEvent.KEYCODE_DPAD_RIGHT)));
+                KeyEvent.KEYCODE_DPAD_RIGHT, event));
         // first line
         // second |l|ine
         // last line
@@ -426,8 +431,7 @@ public class ArrowKeyMovementMethodTest extends ActivityInstrumentationTestCase2
 
         pressShift();
         assertTrue(mArrowKeyMovementMethod.onKeyDown(mTextView, mEditable,
-                KeyEvent.KEYCODE_DPAD_RIGHT, new KeyEvent(KeyEvent.ACTION_DOWN,
-                        KeyEvent.KEYCODE_DPAD_RIGHT)));
+                KeyEvent.KEYCODE_DPAD_RIGHT, event));
         // first line
         // second |li|ne
         // last line
@@ -435,9 +439,10 @@ public class ArrowKeyMovementMethodTest extends ActivityInstrumentationTestCase2
 
         Selection.setSelection(mEditable, SPACE_IN_2ND_LINE);
         pressAlt();
+        event = new KeyEvent(0, 0, KeyEvent.ACTION_UP,
+            KeyEvent.KEYCODE_DPAD_RIGHT, 0, KeyEvent.META_ALT_ON);
         assertTrue(mArrowKeyMovementMethod.onKeyDown(mTextView, mEditable,
-                KeyEvent.KEYCODE_DPAD_RIGHT, new KeyEvent(KeyEvent.ACTION_DOWN,
-                        KeyEvent.KEYCODE_DPAD_RIGHT)));
+                KeyEvent.KEYCODE_DPAD_RIGHT, event));
         // first line
         // second line|
         // last line
@@ -445,8 +450,7 @@ public class ArrowKeyMovementMethodTest extends ActivityInstrumentationTestCase2
 
         pressAlt();
         assertTrue(mArrowKeyMovementMethod.onKeyDown(mTextView, mEditable,
-                KeyEvent.KEYCODE_DPAD_RIGHT, new KeyEvent(KeyEvent.ACTION_DOWN,
-                        KeyEvent.KEYCODE_DPAD_RIGHT)));
+                KeyEvent.KEYCODE_DPAD_RIGHT, event));
         // first line
         // second line|
         // last line

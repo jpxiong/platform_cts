@@ -16,11 +16,13 @@
 
 package android.content.cts;
 
+import android.app.DownloadManager;
 import android.app.SearchManager;
 import android.content.ContentUris;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
+import android.media.RingtoneManager;
 import android.net.Uri;
 import android.provider.AlarmClock;
 import android.provider.MediaStore;
@@ -196,5 +198,48 @@ public class AvailableIntentsTest extends AndroidTestCase {
         intent.putExtra(AlarmClock.EXTRA_HOUR, 12);
         intent.putExtra(AlarmClock.EXTRA_MINUTES, 0);
         assertCanBeHandled(intent);
+    }
+
+    public void testOpenDocumentAny() {
+        Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
+        intent.addCategory(Intent.CATEGORY_OPENABLE);
+        intent.setType("*/*");
+        assertCanBeHandled(intent);
+    }
+
+    public void testOpenDocumentImage() {
+        Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
+        intent.addCategory(Intent.CATEGORY_OPENABLE);
+        intent.setType("image/*");
+        assertCanBeHandled(intent);
+    }
+
+    public void testCreateDocument() {
+        Intent intent = new Intent(Intent.ACTION_CREATE_DOCUMENT);
+        intent.addCategory(Intent.CATEGORY_OPENABLE);
+        intent.setType("text/plain");
+        assertCanBeHandled(intent);
+    }
+
+    public void testGetContentAny() {
+        Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+        intent.addCategory(Intent.CATEGORY_OPENABLE);
+        intent.setType("*/*");
+        assertCanBeHandled(intent);
+    }
+
+    public void testGetContentImage() {
+        Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+        intent.addCategory(Intent.CATEGORY_OPENABLE);
+        intent.setType("image/*");
+        assertCanBeHandled(intent);
+    }
+
+    public void testRingtonePicker() {
+        assertCanBeHandled(new Intent(RingtoneManager.ACTION_RINGTONE_PICKER));
+    }
+
+    public void testViewDownloads() {
+        assertCanBeHandled(new Intent(DownloadManager.ACTION_VIEW_DOWNLOADS));
     }
 }

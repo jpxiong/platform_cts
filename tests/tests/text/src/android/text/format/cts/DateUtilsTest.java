@@ -220,31 +220,6 @@ public class DateUtilsTest extends AndroidTestCase {
         assertFalse(DateUtils.isToday(mBaseTime - ONE_DAY_IN_MS));
     }
 
-    /**
-     * DateUtils used to use Time rather than Calendar, which is broken
-     * because Time uses a 32-bit time_t rather than Calendar's 64-bit Java long.
-     * http://code.google.com/p/android/issues/detail?id=13050
-     */
-    public void test2038() {
-        assertEquals("00:00, Thursday, January 1, 1970", formatFull(0L));
-        assertEquals("17:31, Sunday, November 24, 1833",
-                     formatFull(((long) Integer.MIN_VALUE + Integer.MIN_VALUE) * 1000L));
-        assertEquals("20:45, Friday, December 13, 1901", formatFull(Integer.MIN_VALUE * 1000L));
-        assertEquals("03:14, Tuesday, January 19, 2038", formatFull(Integer.MAX_VALUE * 1000L));
-        assertEquals("06:28, Sunday, February 7, 2106",
-                     formatFull((2L + Integer.MAX_VALUE + Integer.MAX_VALUE) * 1000L));
-    }
-
-    private String formatFull(long millis) {
-        Formatter formatter = new Formatter();
-        int flags = DateUtils.FORMAT_SHOW_DATE
-                | DateUtils.FORMAT_SHOW_WEEKDAY
-                | DateUtils.FORMAT_SHOW_TIME
-                | DateUtils.FORMAT_24HOUR;
-        DateUtils.formatDateRange(null, formatter, millis, millis, flags, "UTC");
-        return formatter.toString();
-    }
-
     public void test_bug_7548161() {
         long now = System.currentTimeMillis();
         long today = now;

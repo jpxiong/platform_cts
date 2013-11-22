@@ -99,7 +99,7 @@ public class AudioRecordTest extends AndroidTestCase {
         assertEquals(AudioFormat.ENCODING_PCM_16BIT, mAudioRecord.getAudioFormat());
         assertEquals(MediaRecorder.AudioSource.DEFAULT, mAudioRecord.getAudioSource());
         assertEquals(1, mAudioRecord.getChannelCount());
-        assertEquals(AudioFormat.CHANNEL_CONFIGURATION_MONO,
+        assertEquals(AudioFormat.CHANNEL_IN_MONO,
                 mAudioRecord.getChannelConfiguration());
         assertEquals(AudioRecord.STATE_INITIALIZED, mAudioRecord.getState());
         assertEquals(mHz, mAudioRecord.getSampleRate());

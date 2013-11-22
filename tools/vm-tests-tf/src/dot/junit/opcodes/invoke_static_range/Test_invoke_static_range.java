@@ -26,6 +26,7 @@ import dot.junit.opcodes.invoke_static_range.d.T_invoke_static_range_17;
 import dot.junit.opcodes.invoke_static_range.d.T_invoke_static_range_18;
 import dot.junit.opcodes.invoke_static_range.d.T_invoke_static_range_19;
 import dot.junit.opcodes.invoke_static_range.d.T_invoke_static_range_2;
+import dot.junit.opcodes.invoke_static_range.d.T_invoke_static_range_24;
 import dot.junit.opcodes.invoke_static_range.d.T_invoke_static_range_4;
 import dot.junit.opcodes.invoke_static_range.d.T_invoke_static_range_5;
 import dot.junit.opcodes.invoke_static_range.d.T_invoke_static_range_6;
@@ -155,8 +156,9 @@ public class Test_invoke_static_range extends DxTestCase {
     public void testVFE5() {
         try {
             new T_invoke_static_range_19().run();
-            fail("expected IncompatibleClassChangeError");
-        } catch (IncompatibleClassChangeError t) {
+            fail("expected a verification exception");
+        } catch (Throwable t) {
+            DxUtil.checkVerifyException(t);
         }
     }
 
@@ -259,8 +261,9 @@ public class Test_invoke_static_range extends DxTestCase {
      * @title attempt to invoke interface method
      */
     public void testVFE18() {
+        //@uses dot.junit.opcodes.invoke_static_range.d.T_invoke_static_range_24
         try {
-            Class.forName("dot.junit.opcodes.invoke_static_range.d.T_invoke_static_range_24");
+            new T_invoke_static_range_24().run();
             fail("expected a verification exception");
         } catch (Throwable t) {
             DxUtil.checkVerifyException(t);

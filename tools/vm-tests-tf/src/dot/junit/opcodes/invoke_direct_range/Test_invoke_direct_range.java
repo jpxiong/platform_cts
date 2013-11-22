@@ -23,6 +23,7 @@ import dot.junit.opcodes.invoke_direct_range.d.T_invoke_direct_range_13;
 import dot.junit.opcodes.invoke_direct_range.d.T_invoke_direct_range_16;
 import dot.junit.opcodes.invoke_direct_range.d.T_invoke_direct_range_2;
 import dot.junit.opcodes.invoke_direct_range.d.T_invoke_direct_range_21;
+import dot.junit.opcodes.invoke_direct_range.d.T_invoke_direct_range_26;
 import dot.junit.opcodes.invoke_direct_range.d.T_invoke_direct_range_6;
 import dot.junit.opcodes.invoke_direct_range.d.T_invoke_direct_range_7;
 import dot.junit.opcodes.invoke_direct_range.d.T_invoke_direct_range_8;
@@ -277,8 +278,10 @@ public class Test_invoke_direct_range extends DxTestCase {
         //@uses dot.junit.opcodes.invoke_direct_range.TAbstract
         try {
             new T_invoke_direct_range_13().run();
-            fail("expected NoSuchMethodError");
+            fail("expected NoSuchMethodError or verification exception");
         } catch (NoSuchMethodError t) {
+        } catch (Throwable t) {
+            DxUtil.checkVerifyException(t);
         }
     }
 
@@ -315,8 +318,9 @@ public class Test_invoke_direct_range extends DxTestCase {
      * @title attempt to invoke interface method
      */
     public void testVFE20() {
+        //@uses dot.junit.opcodes.invoke_direct_range.d.T_invoke_direct_range_26
         try {
-            Class.forName("dot.junit.opcodes.invoke_direct_range.d.T_invoke_direct_range_26");
+            new T_invoke_direct_range_26().run();
             fail("expected a verification exception");
         } catch (Throwable t) {
             DxUtil.checkVerifyException(t);

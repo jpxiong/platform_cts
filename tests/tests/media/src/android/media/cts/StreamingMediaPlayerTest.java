@@ -96,7 +96,7 @@ public class StreamingMediaPlayerTest extends MediaPlayerTestBase {
                 + "&sparams=ip,ipbits,expire,id,itag,source"
                 + "&signature=3CFCAFB87EB9FC943FACDC54FEC8C725A801642C."
                 + "7D77ACBC4CAF40349BF093E302B635757E45F345"
-                + "&key=test_key1&user=android-device-test", 480, 270);
+                + "&key=test_key1&user=android-device-test", 640, 360);
     }
     public void testHTTP_H264Base_AAC_Video2() throws Exception {
         playVideoTest("http://redirector.c.youtube.com/videoplayback?id=c80658495af60617"
@@ -104,7 +104,7 @@ public class StreamingMediaPlayerTest extends MediaPlayerTestBase {
                 + "&sparams=ip,ipbits,expire,id,itag,source"
                 + "&signature=A11D8BA0AA67A27F1409BE0C0B96B756625DB88B."
                 + "9BF4C93A130583ADBDF2B953AD5A8A58F518B012"
-                + "&key=test_key1&user=android-device-test", 480, 270);
+                + "&key=test_key1&user=android-device-test", 640, 360);
     }
 
     // Streaming HLS video from YouTube

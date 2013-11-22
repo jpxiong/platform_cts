@@ -116,13 +116,16 @@ public class ConfigTest extends AndroidTestCase {
                     break;
                 case WIDTH:
                     mMetrics.widthPixels = value;
+                    mMetrics.noncompatWidthPixels = value;
                     break;
                 case HEIGHT:
                     mMetrics.heightPixels = value;
+                    mMetrics.noncompatHeightPixels = value;
                     break;
                 case DENSITY:
                     // this is the ratio from the standard
                     mMetrics.density = (((float)value)/((float)DisplayMetrics.DENSITY_DEFAULT));
+                    mMetrics.noncompatDensity = mMetrics.density;
                     mConfig.densityDpi = value;
                     break;
                 case SCREENLAYOUT:
@@ -172,21 +175,21 @@ public class ConfigTest extends AndroidTestCase {
 
     public TotalConfig makeClassicConfig() {
         TotalConfig config = new TotalConfig();
-        config.mConfig.locale = new Locale("en", "US");
-        config.mConfig.mcc = 310;
-        config.mConfig.mnc = 001; // unused
-        config.mConfig.touchscreen = Configuration.TOUCHSCREEN_FINGER;
-        config.mConfig.keyboard = Configuration.KEYBOARD_QWERTY;
-        config.mConfig.keyboardHidden = Configuration.KEYBOARDHIDDEN_YES;
-        config.mConfig.navigation = Configuration.NAVIGATION_TRACKBALL;
-        config.mConfig.orientation = Configuration.ORIENTATION_PORTRAIT;
-        config.mConfig.smallestScreenWidthDp = 320;
-        config.mConfig.screenWidthDp = 320;
-        config.mConfig.screenHeightDp = 480;
-        config.mConfig.densityDpi = 160;
-        config.mMetrics.widthPixels = 200;
-        config.mMetrics.heightPixels = 320;
-        config.mMetrics.density = 1;
+        config.setProperty(Properties.LANGUAGE, "en");
+        config.setProperty(Properties.COUNTRY, "US");
+        config.setProperty(Properties.MCC, 310);
+        config.setProperty(Properties.MNC, 001); // unused
+        config.setProperty(Properties.TOUCHSCREEN, Configuration.TOUCHSCREEN_FINGER);
+        config.setProperty(Properties.KEYBOARD, Configuration.KEYBOARD_QWERTY);
+        config.setProperty(Properties.KEYBOARDHIDDEN, Configuration.KEYBOARDHIDDEN_YES);
+        config.setProperty(Properties.NAVIGATION, Configuration.NAVIGATION_TRACKBALL);
+        config.setProperty(Properties.ORIENTATION, Configuration.ORIENTATION_PORTRAIT);
+        config.setProperty(Properties.SWIDTH_DP, 320);
+        config.setProperty(Properties.WIDTH_DP, 320);
+        config.setProperty(Properties.HEIGHT_DP, 480);
+        config.setProperty(Properties.DENSITY, 160);
+        config.setProperty(Properties.WIDTH, 200);
+        config.setProperty(Properties.HEIGHT, 320);
         return config;
     }
 

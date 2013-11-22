@@ -23,9 +23,9 @@ import android.content.pm.ConfigurationInfo;
 import android.content.res.Configuration;
 import android.os.Bundle;
 
+import java.util.HashSet;
 import java.util.Locale;
 import java.util.concurrent.CountDownLatch;
-
 
 /**
  * Collect device information on target device.
@@ -34,7 +34,7 @@ public class DeviceInfoActivity extends Activity {
 
     // work done should be reported in GLES..View
     private CountDownLatch mDone = new CountDownLatch(1);
-    private GLESSurfaceView mGLView;
+    private HashSet<String> mFormats = new HashSet<String>();
 
     /**
      * Other classes can call this function to wait for this activity
@@ -47,6 +47,37 @@ public class DeviceInfoActivity extends Activity {
         }
     }
 
+    private void runIterations(int glVersion) {
+        for (int i = 1; i <= glVersion; i++) {
+            final CountDownLatch done = new CountDownLatch(1);
+            final int version = i;
+            DeviceInfoActivity.this.runOnUiThread(new Runnable() {
+              public void run() {
+                setContentView(new GLESSurfaceView(DeviceInfoActivity.this, version, done));
+              }
+            });
+            try {
+                done.await();
+            } catch (InterruptedException e) {
+                // just move on
+            }
+        }
+
+        StringBuilder builder = new StringBuilder();
+        for (String format: mFormats) {
+            builder.append(format);
+            builder.append(";");
+        }
+        DeviceInfoInstrument.addResult(
+                DeviceInfoConstants.OPEN_GL_COMPRESSED_TEXTURE_FORMATS,
+                builder.toString());
+        mDone.countDown();
+    }
+
+    public void addCompressedTextureFormat(String format) {
+        mFormats.add(format);
+    }
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -54,10 +85,12 @@ public class DeviceInfoActivity extends Activity {
         ActivityManager am =
                 (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
         ConfigurationInfo info = am.getDeviceConfigurationInfo();
-        boolean useGL20 = (info.reqGlEsVersion >= 0x20000);
-
-        mGLView = new GLESSurfaceView(this, useGL20, mDone);
-        setContentView(mGLView);
+        final int glVersion = (info.reqGlEsVersion & 0xffff0000) >> 16;
+        new Thread() {
+          public void run() {
+            runIterations(glVersion);
+          }
+        }.start();
 
         Configuration con = getResources().getConfiguration();
         String touchScreen = null;

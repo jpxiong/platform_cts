@@ -162,7 +162,7 @@ public class MediaStore_FilesTest extends AndroidTestCase {
         ContentValues values = new ContentValues();
         values.put(MediaStore.Images.Media.DISPLAY_NAME, "My Bitmap");
         values.put(MediaStore.Images.Media.MIME_TYPE, "image/jpeg");
-        values.put(MediaStore.Images.Media.DATA, "/mnt/sdcard/dummy.jpg");
+        values.put(MediaStore.Images.Media.DATA, "/foo/bar/dummy.jpg");
         Uri uri = mResolver.insert(MediaStore.Images.Media.INTERNAL_CONTENT_URI, values);
 
         // point _data at directory and try to get an fd for it
@@ -253,7 +253,8 @@ public class MediaStore_FilesTest extends AndroidTestCase {
             try {
                 pfd = mResolver.openFileDescriptor(uri, "r");
 
-                // get the real path from the file descriptor
+                // get the real path from the file descriptor (this relies on the media provider
+                // having opened the path via the real path instead of the emulated path).
                 File real = new File("/proc/self/fd/" + pfd.getFd());
                 values = new ContentValues();
                 values.put("_data", real.getCanonicalPath());
@@ -276,7 +277,7 @@ public class MediaStore_FilesTest extends AndroidTestCase {
         // clean up
         assertEquals(1, mResolver.delete(uri, null, null));
         if (sdfile != null) {
-            sdfile.delete();
+            assertEquals(true, sdfile.delete());
         }
     }
 

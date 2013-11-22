@@ -43,10 +43,13 @@ import android.util.DisplayMetrics;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewGroup;
 import android.webkit.ConsoleMessage;
+import android.webkit.CookieSyncManager;
 import android.webkit.DownloadListener;
 import android.webkit.JavascriptInterface;
 import android.webkit.SslErrorHandler;
+import android.webkit.ValueCallback;
 import android.webkit.WebBackForwardList;
 import android.webkit.WebChromeClient;
 import android.webkit.WebIconDatabase;
@@ -60,17 +63,24 @@ import android.webkit.cts.WebViewOnUiThread.WaitForLoadedClient;
 import android.webkit.cts.WebViewOnUiThread.WaitForProgressClient;
 import android.widget.LinearLayout;
 
-
 import junit.framework.Assert;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.util.Collections;
 import java.util.Date;
+import java.util.concurrent.FutureTask;
+import java.util.HashMap;
+
+import org.apache.http.Header;
+import org.apache.http.HttpRequest;
 
 public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubActivity> {
     private static final String LOGTAG = "WebViewTest";
     private static final int INITIAL_PROGRESS = 100;
     private static long TEST_TIMEOUT = 20000L;
+    private static final String X_REQUESTED_WITH = "X-Requested-With";
+
     /**
      * This is the minimum number of milliseconds to wait for scrolling to
      * start. If no scrolling has started before this timeout then it is
@@ -151,6 +161,12 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
     }
 
     @UiThreadTest
+    public void testCreatingWebViewCreatesCookieSyncManager() throws Exception {
+        new WebView(getActivity());
+        assertNotNull(CookieSyncManager.getInstance());
+    }
+
+    @UiThreadTest
     public void testFindAddress() {
         /*
          * Info about USPS
@@ -188,65 +204,87 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
         mWebView.invokeZoomPicker();
     }
 
-    @UiThreadTest
-    public void testZoom() {
-        WebSettings settings = mWebView.getSettings();
+    public void testZoom() throws Throwable {
+        // Pinch zoom is not supported in wrap_content layouts.
+        mOnUiThread.setLayoutHeightToMatchParent();
+
+        final ScaleChangedWebViewClient webViewClient = new ScaleChangedWebViewClient();
+        mOnUiThread.setWebViewClient(webViewClient);
+
+        mWebServer = new CtsTestServer(getActivity());
+        mOnUiThread.loadUrlAndWaitForCompletion(
+                mWebServer.getAssetUrl(TestHtmlConstants.HELLO_WORLD_URL));
+
+        WebSettings settings = mOnUiThread.getSettings();
         settings.setSupportZoom(false);
         assertFalse(settings.supportZoom());
-        float currScale = mWebView.getScale();
+        float currScale = mOnUiThread.getScale();
         float previousScale = currScale;
 
         // can zoom in or out although zoom support is disabled in web settings
-        assertTrue(mWebView.zoomIn());
-        currScale = mWebView.getScale();
+        assertTrue(mOnUiThread.zoomIn());
+        webViewClient.waitForScaleChanged();
+
+        currScale = mOnUiThread.getScale();
         assertTrue(currScale > previousScale);
 
-        // zoom in
-        assertTrue(mWebView.zoomOut());
+        assertTrue(mOnUiThread.zoomOut());
         previousScale = currScale;
-        currScale = mWebView.getScale();
+        webViewClient.waitForScaleChanged();
+
+        currScale = mOnUiThread.getScale();
         assertTrue(currScale < previousScale);
 
         // enable zoom support
         settings.setSupportZoom(true);
         assertTrue(settings.supportZoom());
-        currScale = mWebView.getScale();
+        previousScale = mOnUiThread.getScale();
 
-        assertTrue(mWebView.zoomIn());
-        previousScale = currScale;
-        currScale = mWebView.getScale();
+        assertTrue(mOnUiThread.zoomIn());
+        webViewClient.waitForScaleChanged();
+
+        currScale = mOnUiThread.getScale();
         assertTrue(currScale > previousScale);
 
         // zoom in until it reaches maximum scale
-        while (currScale > previousScale) {
-            mWebView.zoomIn();
+        while (mOnUiThread.zoomIn()) {
             previousScale = currScale;
-            currScale = mWebView.getScale();
+            webViewClient.waitForScaleChanged();
+            currScale = mOnUiThread.getScale();
+            assertTrue(currScale > previousScale);
         }
 
-        // can not zoom in further
-        assertFalse(mWebView.zoomIn());
         previousScale = currScale;
-        currScale = mWebView.getScale();
+        // can not zoom in further
+        assertFalse(mOnUiThread.zoomIn());
+        // We sleep to assert to the best of our ability
+        // that a scale change does *not* happen.
+        Thread.sleep(500);
+        currScale = mOnUiThread.getScale();
         assertEquals(currScale, previousScale);
 
         // zoom out
-        assertTrue(mWebView.zoomOut());
+        assertTrue(mOnUiThread.zoomOut());
         previousScale = currScale;
-        currScale = mWebView.getScale();
+        webViewClient.waitForScaleChanged();
+        currScale = mOnUiThread.getScale();
         assertTrue(currScale < previousScale);
 
         // zoom out until it reaches minimum scale
-        while (currScale < previousScale) {
-            mWebView.zoomOut();
+        while (mOnUiThread.zoomOut()) {
             previousScale = currScale;
-            currScale = mWebView.getScale();
+            webViewClient.waitForScaleChanged();
+            currScale = mOnUiThread.getScale();
+            assertTrue(currScale < previousScale);
         }
 
-        // can not zoom out further
-        assertFalse(mWebView.zoomOut());
         previousScale = currScale;
-        currScale = mWebView.getScale();
+        assertFalse(mOnUiThread.zoomOut());
+
+        // We sleep to assert to the best of our ability
+        // that a scale change does *not* happen.
+        Thread.sleep(500);
+        currScale = mOnUiThread.getScale();
         assertEquals(currScale, previousScale);
     }
 
@@ -295,6 +333,52 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
         assertEquals(url, mWebView.getUrl());
         assertEquals(url, mWebView.getOriginalUrl());
         assertEquals(TestHtmlConstants.HELLO_WORLD_TITLE, mWebView.getTitle());
+
+        // verify that the request also includes X-Requested-With header
+        HttpRequest request = mWebServer.getLastRequest(TestHtmlConstants.HELLO_WORLD_URL);
+        Header[] matchingHeaders = request.getHeaders(X_REQUESTED_WITH);
+        assertEquals(1, matchingHeaders.length);
+
+        Header header = matchingHeaders[0];
+        assertEquals(mWebView.getContext().getApplicationInfo().packageName, header.getValue());
+    }
+
+    @UiThreadTest
+    public void testAppInjectedXRequestedWithHeaderIsNotOverwritten() throws Exception {
+        startWebServer(false);
+        String url = mWebServer.getAssetUrl(TestHtmlConstants.HELLO_WORLD_URL);
+        HashMap<String, String> map = new HashMap<String, String>();
+        final String requester = "foo";
+        map.put(X_REQUESTED_WITH, requester);
+        mOnUiThread.loadUrlAndWaitForCompletion(url, map);
+
+        // verify that the request also includes X-Requested-With header
+        // but is not overwritten by the webview
+        HttpRequest request = mWebServer.getLastRequest(TestHtmlConstants.HELLO_WORLD_URL);
+        Header[] matchingHeaders = request.getHeaders(X_REQUESTED_WITH);
+        assertEquals(1, matchingHeaders.length);
+
+        Header header = matchingHeaders[0];
+        assertEquals(requester, header.getValue());
+    }
+
+    @UiThreadTest
+    public void testAppCanInjectHeadersViaImmutableMap() throws Exception {
+        startWebServer(false);
+        String url = mWebServer.getAssetUrl(TestHtmlConstants.HELLO_WORLD_URL);
+        HashMap<String, String> map = new HashMap<String, String>();
+        final String requester = "foo";
+        map.put(X_REQUESTED_WITH, requester);
+        mOnUiThread.loadUrlAndWaitForCompletion(url, Collections.unmodifiableMap(map));
+
+        // verify that the request also includes X-Requested-With header
+        // but is not overwritten by the webview
+        HttpRequest request = mWebServer.getLastRequest(TestHtmlConstants.HELLO_WORLD_URL);
+        Header[] matchingHeaders = request.getHeaders(X_REQUESTED_WITH);
+        assertEquals(1, matchingHeaders.length);
+
+        Header header = matchingHeaders[0];
+        assertEquals(requester, header.getValue());
     }
 
     @SuppressWarnings("deprecation")
@@ -779,16 +863,66 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
                 historyUrl);
         assertTrue("URL: " + mWebView.getUrl(), mWebView.getUrl().indexOf("data:text/html") == 0);
         assertTrue("URL: " + mWebView.getUrl(), mWebView.getUrl().indexOf("bar") > 0);
+
+        // Check that when a non-data: base URL is used, we treat the String to load as
+        // a raw string and just dump it into the WebView, i.e. not decoding any URL entities.
+        mOnUiThread.loadDataWithBaseURLAndWaitForCompletion("http://www.foo.com",
+                HTML_HEADER + "<title>Hello World%21</title><body>bar</body></html>",
+                "text/html", "UTF-8", null);
+        assertEquals("Hello World%21", mOnUiThread.getTitle());
+
+        // Check that when a data: base URL is used, we treat the String to load as a data: URL
+        // and run load steps such as decoding URL entities (i.e., contrary to the test case
+        // above.)
+        mOnUiThread.loadDataWithBaseURLAndWaitForCompletion("data:foo",
+                HTML_HEADER + "<title>Hello World%21</title></html>", "text/html", "UTF-8", null);
+        assertEquals("Hello World!", mOnUiThread.getTitle());
+
+        // Check the method is null input safe.
+        mOnUiThread.loadDataWithBaseURLAndWaitForCompletion(null, null, null, null, null);
+        assertEquals("about:blank", mOnUiThread.getUrl());
     }
 
-    @UiThreadTest
-    public void testFindAll() {
-        String p = "<p>Find all instances of find on the page and highlight them.</p>";
+    private static class WaitForFindResultsListener extends FutureTask<Integer>
+            implements WebView.FindListener {
+        public WaitForFindResultsListener() {
+            super(new Runnable() {
+                @Override
+                public void run() { }
+            }, null);
+        }
+
+        @Override
+        public void onFindResultReceived(int activeMatchOrdinal, int numberOfMatches,
+                boolean isDoneCounting) {
+            if (isDoneCounting) {
+                set(numberOfMatches);
+            }
+        }
+    }
+
+    public void testFindAll()  throws Throwable {
+        // Make the page scrollable, so we can detect the scrolling to make sure the
+        // content fully loaded.
+        mOnUiThread.setInitialScale(100);
+        DisplayMetrics metrics = mOnUiThread.getDisplayMetrics();
+        int dimension = Math.max(metrics.widthPixels, metrics.heightPixels);
+        // create a paragraph high enough to take up the entire screen
+        String p = "<p style=\"height:" + dimension + "px;\">" +
+                "Find all instances of find on the page and highlight them.</p>";
 
         mOnUiThread.loadDataAndWaitForCompletion("<html><body>" + p
                 + "</body></html>", "text/html", null);
 
-        assertEquals(2, mWebView.findAll("find"));
+        WaitForFindResultsListener l = new WaitForFindResultsListener();
+        int previousScrollY = mOnUiThread.getScrollY();
+        mOnUiThread.pageDown(true);
+        // Wait for content fully loaded.
+        waitForScrollingComplete(previousScrollY);
+        mOnUiThread.setFindListener(l);
+        mOnUiThread.findAll("find");
+
+        assertEquals(2, l.get().intValue());
     }
 
     public void testFindNext() throws Throwable {
@@ -903,9 +1037,15 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
                 "Scroll by half the size of the page.</p>";
         mOnUiThread.loadDataAndWaitForCompletion("<html><body>" + p
                 + p + "</body></html>", "text/html", null);
-        getInstrumentation().waitForIdleSync();
 
-        assertTrue(mOnUiThread.pageDown(false));
+        // Wait for UI thread to settle and receive page dimentions from renderer
+        // such that we can invoke page down.
+        new PollingCheck() {
+            @Override
+            protected boolean check() {
+                 return mOnUiThread.pageDown(false);
+            }
+        }.run();
 
         do {
             getInstrumentation().waitForIdleSync();
@@ -937,25 +1077,38 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
     public void testGetContentHeight() throws Throwable {
         mOnUiThread.loadDataAndWaitForCompletion(
                 "<html><body></body></html>", "text/html", null);
-        getInstrumentation().waitForIdleSync();
+        new PollingCheck() {
+            @Override
+            protected boolean check() {
+                return mOnUiThread.getScale() != 0 && mOnUiThread.getContentHeight() != 0
+                    && mOnUiThread.getHeight() != 0;
+            }
+        }.run();
+        assertEquals(mOnUiThread.getHeight(),
+                mOnUiThread.getContentHeight() * mOnUiThread.getScale(), 2f);
 
         final int pageHeight = 600;
         // set the margin to 0
         final String p = "<p style=\"height:" + pageHeight
                 + "px;margin:0px auto;\">Get the height of HTML content.</p>";
-        assertEquals(mOnUiThread.getHeight(), mOnUiThread.getContentHeight() * mOnUiThread.getScale(), 2f);
         mOnUiThread.loadDataAndWaitForCompletion("<html><body>" + p
                 + "</body></html>", "text/html", null);
-        getInstrumentation().waitForIdleSync();
+        new PollingCheck() {
+            @Override
+            protected boolean check() {
+                return mOnUiThread.getContentHeight() > pageHeight;
+            }
+        }.run();
 
-        assertTrue(mOnUiThread.getContentHeight() > pageHeight);
-        int extraSpace = mOnUiThread.getContentHeight() - pageHeight;
-
+        final int extraSpace = mOnUiThread.getContentHeight() - pageHeight;
         mOnUiThread.loadDataAndWaitForCompletion("<html><body>" + p
                 + p + "</body></html>", "text/html", null);
-        getInstrumentation().waitForIdleSync();
-        assertEquals(pageHeight + pageHeight + extraSpace,
-                mOnUiThread.getContentHeight());
+        new PollingCheck() {
+            @Override
+            protected boolean check() {
+                return pageHeight + pageHeight + extraSpace == mOnUiThread.getContentHeight();
+            }
+        }.run();
     }
 
     @UiThreadTest
@@ -981,34 +1134,31 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
 
     public void testFlingScroll() throws Throwable {
         DisplayMetrics metrics = mOnUiThread.getDisplayMetrics();
-        int dimension = 2 * Math.max(metrics.widthPixels, metrics.heightPixels);
+        final int dimension = 10 * Math.max(metrics.widthPixels, metrics.heightPixels);
         String p = "<p style=\"height:" + dimension + "px;" +
                 "width:" + dimension + "px\">Test fling scroll.</p>";
         mOnUiThread.loadDataAndWaitForCompletion("<html><body>" + p
                 + "</body></html>", "text/html", null);
+        new PollingCheck() {
+            @Override
+            protected boolean check() {
+                return mOnUiThread.getContentHeight() >= dimension;
+            }
+        }.run();
         getInstrumentation().waitForIdleSync();
 
-        int previousScrollX = mOnUiThread.getScrollX();
-        int previousScrollY = mOnUiThread.getScrollY();
+        final int previousScrollX = mOnUiThread.getScrollX();
+        final int previousScrollY = mOnUiThread.getScrollY();
 
         mOnUiThread.flingScroll(100, 100);
 
-        int timeSlice = 500;
-        Thread.sleep(timeSlice);
-        assertTrue(mOnUiThread.getScrollX() > previousScrollX);
-        assertTrue(mOnUiThread.getScrollY() > previousScrollY);
-
-        previousScrollY = mOnUiThread.getScrollY();
-        previousScrollX = mOnUiThread.getScrollX();
-        Thread.sleep(timeSlice);
-        assertTrue(mOnUiThread.getScrollX() >= previousScrollX);
-        assertTrue(mOnUiThread.getScrollY() >= previousScrollY);
-
-        previousScrollY = mOnUiThread.getScrollY();
-        previousScrollX = mOnUiThread.getScrollX();
-        Thread.sleep(timeSlice);
-        assertTrue(mOnUiThread.getScrollX() >= previousScrollX);
-        assertTrue(mOnUiThread.getScrollY() >= previousScrollY);
+        new PollingCheck() {
+            @Override
+            protected boolean check() {
+                return mOnUiThread.getScrollX() > previousScrollX &&
+                        mOnUiThread.getScrollY() > previousScrollY;
+            }
+        }.run();
     }
 
     public void testRequestFocusNodeHref() throws Throwable {
@@ -1230,31 +1380,47 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
 
         mOnUiThread.loadDataAndWaitForCompletion("<html><body>" + p
                 + "</body></html>", "text/html", null);
-        getInstrumentation().waitForIdleSync();
 
-        assertEquals(defaultScale, mOnUiThread.getScale(), .01f);
+        new PollingCheck(TEST_TIMEOUT) {
+            @Override
+            protected boolean check() {
+                return Math.abs(defaultScale - mOnUiThread.getScale()) < .01f;
+            }
+        }.run();
 
         mOnUiThread.setInitialScale(0);
         // modify content to fool WebKit into re-loading
         mOnUiThread.loadDataAndWaitForCompletion("<html><body>" + p
                 + "2" + "</body></html>", "text/html", null);
-        getInstrumentation().waitForIdleSync();
 
-        assertEquals(defaultScale, mOnUiThread.getScale(), .01f);
+        new PollingCheck(TEST_TIMEOUT) {
+            @Override
+            protected boolean check() {
+                return Math.abs(defaultScale - mOnUiThread.getScale()) < .01f;
+            }
+        }.run();
 
         mOnUiThread.setInitialScale(50);
         mOnUiThread.loadDataAndWaitForCompletion("<html><body>" + p
                 + "3" + "</body></html>", "text/html", null);
-        getInstrumentation().waitForIdleSync();
 
-        assertEquals(0.5f, mOnUiThread.getScale(), .02f);
+        new PollingCheck(TEST_TIMEOUT) {
+            @Override
+            protected boolean check() {
+                return Math.abs(0.5 - mOnUiThread.getScale()) < .01f;
+            }
+        }.run();
 
         mOnUiThread.setInitialScale(0);
         mOnUiThread.loadDataAndWaitForCompletion("<html><body>" + p
                 + "4" + "</body></html>", "text/html", null);
-        getInstrumentation().waitForIdleSync();
 
-        assertEquals(defaultScale, mOnUiThread.getScale(), .01f);
+        new PollingCheck(TEST_TIMEOUT) {
+            @Override
+            protected boolean check() {
+                return Math.abs(defaultScale - mOnUiThread.getScale()) < .01f;
+            }
+        }.run();
     }
 
     @UiThreadTest
@@ -1354,29 +1520,16 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
     }
 
     public void testSetWebViewClient() throws Throwable {
-        final class MockWebViewClient extends WaitForLoadedClient {
-            private boolean mOnScaleChangedCalled = false;
-            public MockWebViewClient() {
-                super(mOnUiThread);
-            }
-            @Override
-            public void onScaleChanged(WebView view, float oldScale, float newScale) {
-                super.onScaleChanged(view, oldScale, newScale);
-                mOnScaleChangedCalled = true;
-            }
-            public boolean onScaleChangedCalled() {
-                return mOnScaleChangedCalled;
-            }
-        }
-
-        final MockWebViewClient webViewClient = new MockWebViewClient();
+        final ScaleChangedWebViewClient webViewClient = new ScaleChangedWebViewClient();
         mOnUiThread.setWebViewClient(webViewClient);
-        getInstrumentation().waitForIdleSync();
+        startWebServer(false);
+
         assertFalse(webViewClient.onScaleChangedCalled());
+        String url1 = mWebServer.getAssetUrl(TestHtmlConstants.HELLO_WORLD_URL);
+        mOnUiThread.loadUrlAndWaitForCompletion(url1);
 
         mOnUiThread.zoomIn();
-        getInstrumentation().waitForIdleSync();
-        assertTrue(webViewClient.onScaleChangedCalled());
+        webViewClient.waitForScaleChanged();
     }
 
     @UiThreadTest
@@ -1578,17 +1731,20 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
 
     public void testRequestChildRectangleOnScreen() throws Throwable {
         DisplayMetrics metrics = mOnUiThread.getDisplayMetrics();
-        int dimension = 2 * Math.max(metrics.widthPixels, metrics.heightPixels);
+        final int dimension = 2 * Math.max(metrics.widthPixels, metrics.heightPixels);
         String p = "<p style=\"height:" + dimension + "px;width:" + dimension + "px\">&nbsp;</p>";
         mOnUiThread.loadDataAndWaitForCompletion("<html><body>" + p
                 + "</body></html>", "text/html", null);
-        getInstrumentation().waitForIdleSync();
+        new PollingCheck() {
+            @Override
+            protected boolean check() {
+                return mOnUiThread.getContentHeight() >= dimension;
+            }
+        }.run();
 
         int origX = mOnUiThread.getScrollX();
         int origY = mOnUiThread.getScrollY();
 
-        metrics = mOnUiThread.getDisplayMetrics();
-        dimension = 2 * Math.max(metrics.widthPixels, metrics.heightPixels);
         int half = dimension / 2;
         Rect rect = new Rect(half, half, half + 1, half + 1);
         assertTrue(mOnUiThread.requestChildRectangleOnScreen(mWebView, rect, true));
@@ -1802,6 +1958,27 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
         assertEquals("anchor", mOnUiThread.getTitle());
     }
 
+    public void testEvaluateJavascript() {
+        mOnUiThread.getSettings().setJavaScriptEnabled(true);
+        mOnUiThread.loadUrlAndWaitForCompletion("about:blank");
+
+        EvaluateJsResultPollingCheck jsResult = new EvaluateJsResultPollingCheck("2");
+        mOnUiThread.evaluateJavascript("1+1", jsResult);
+        jsResult.run();
+
+        jsResult = new EvaluateJsResultPollingCheck("9");
+        mOnUiThread.evaluateJavascript("1+1; 4+5", jsResult);
+        jsResult.run();
+
+        final String EXPECTED_TITLE = "test";
+        mOnUiThread.evaluateJavascript("document.title='" + EXPECTED_TITLE + "';", null);
+        new PollingCheck(TEST_TIMEOUT) {
+            @Override
+            protected boolean check() {
+                return mOnUiThread.getTitle().equals(EXPECTED_TITLE);
+            }
+        }.run();
+    }
 
     @UiThreadTest
     public void testInternals() {
@@ -1983,6 +2160,57 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
         }
         public String errorUrl() {
             return mErrorUrl;
+        }
+    }
+
+    private static class EvaluateJsResultPollingCheck  extends PollingCheck
+            implements ValueCallback<String> {
+        private String mActualResult;
+        private String mExpectedResult;
+
+        public EvaluateJsResultPollingCheck(String expected) {
+            mExpectedResult = expected;
+        }
+
+        @Override
+        public synchronized boolean check() {
+            return mExpectedResult.equals(mActualResult);
+        }
+
+        @Override
+        public synchronized void onReceiveValue(String result) {
+            mActualResult = result;
+        }
+    }
+
+    final class ScaleChangedWebViewClient extends WaitForLoadedClient {
+        private boolean mOnScaleChangedCalled = false;
+        public ScaleChangedWebViewClient() {
+            super(mOnUiThread);
+        }
+
+        @Override
+        public void onScaleChanged(WebView view, float oldScale, float newScale) {
+            super.onScaleChanged(view, oldScale, newScale);
+            synchronized (this) {
+                mOnScaleChangedCalled = true;
+            }
+        }
+
+        public void waitForScaleChanged() {
+            new PollingCheck(TEST_TIMEOUT) {
+                 @Override
+                 protected boolean check() {
+                     return onScaleChangedCalled();
+                 }
+            }.run();
+            synchronized (this) {
+                mOnScaleChangedCalled = false;
+            }
+        }
+
+        public synchronized boolean onScaleChangedCalled() {
+            return mOnScaleChangedCalled;
         }
     }
 }

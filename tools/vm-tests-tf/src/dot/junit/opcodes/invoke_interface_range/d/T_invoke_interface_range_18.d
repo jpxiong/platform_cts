@@ -20,14 +20,7 @@
 .method public <init>()V
 .limit regs 2
 
-       invoke-direct {v1}, java/lang/Object/<init>()V
-       return-void
-.end method
-
-.method public run(Ldot/junit/opcodes/invoke_interface_range/ITest;)V
-.limit regs 8
-       new-instance v2, dot/junit/opcodes/invoke_interface_range/ITestImplAbstract
-       invoke-interface/range {v2}, dot/junit/opcodes/invoke_interface_range/ITestImplAbstract/<init>()V
+       invoke-interface/range {v1}, java/lang/Object/<init>()V
        return-void
 .end method
 

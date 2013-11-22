@@ -155,6 +155,38 @@ public class MediaPlayerTest extends MediaPlayerTestBase {
         }
     }
 
+    public void testSetNextMediaPlayerWithReset() throws Exception {
+
+        initMediaPlayer(mMediaPlayer);
+
+        try {
+            initMediaPlayer(mMediaPlayer2);
+            mMediaPlayer2.reset();
+            mMediaPlayer.setNextMediaPlayer(mMediaPlayer2);
+            fail("setNextMediaPlayer() succeeded with unprepared player");
+        } catch (RuntimeException e) {
+            // expected
+        } finally {
+            mMediaPlayer.reset();
+        }
+    }
+
+    public void testSetNextMediaPlayerWithRelease() throws Exception {
+
+        initMediaPlayer(mMediaPlayer);
+
+        try {
+            initMediaPlayer(mMediaPlayer2);
+            mMediaPlayer2.release();
+            mMediaPlayer.setNextMediaPlayer(mMediaPlayer2);
+            fail("setNextMediaPlayer() succeeded with unprepared player");
+        } catch (RuntimeException e) {
+            // expected
+        } finally {
+            mMediaPlayer.reset();
+        }
+    }
+
     public void testSetNextMediaPlayer() throws Exception {
         initMediaPlayer(mMediaPlayer);
 
