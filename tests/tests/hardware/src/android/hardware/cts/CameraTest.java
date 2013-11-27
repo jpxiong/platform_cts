@@ -91,6 +91,13 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
     private static final int AUTOEXPOSURE_LOCK = 0;
     private static final int AUTOWHITEBALANCE_LOCK = 1;
 
+    // Some exif tags that are not defined by ExifInterface but supported.
+    private static final String TAG_DATETIME_DIGITIZED = "DateTimeDigitized";
+    private static final String TAG_SUBSEC_TIME = "SubSecTime";
+    private static final String TAG_SUBSEC_TIME_ORIG = "SubSecTimeOriginal";
+    private static final String TAG_SUBSEC_TIME_DIG = "SubSecTimeDigitized";
+
+
     private PreviewCallback mPreviewCallback = new PreviewCallback();
     private TestShutterCallback mShutterCallback = new TestShutterCallback();
     private RawPictureCallback mRawPictureCallback = new RawPictureCallback();
@@ -862,7 +869,7 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
         // Test various exif tags.
         ExifInterface exif = new ExifInterface(JPEG_PATH);
         StringBuffer failedCause = new StringBuffer("Jpeg exif test failed:\n");
-        boolean extraExiftestPassed = checkExtraExifTagsSucceeds(failedCause, exif, parameters);
+        boolean extraExiftestPassed = checkExtraExifTagsSucceeds(failedCause, exif);
 
         if (VERBOSE) Log.v(TAG, "Testing exif tag TAG_DATETIME");
         String datetime = exif.getAttribute(ExifInterface.TAG_DATETIME);
@@ -915,11 +922,9 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
      * @param exif The exif data associated with a jpeg image being tested.
      * @return true if no test failure is found, false if there is any failure.
      */
-    private boolean checkExtraExifTagsSucceeds(StringBuffer logBuf, ExifInterface exif,
-            Parameters parameters) {
-        if (logBuf == null || exif == null || parameters == null) {
-            throw new IllegalArgumentException("failureCause, exif and paremeters" +
-                    "shouldn't be null");
+    private boolean checkExtraExifTagsSucceeds(StringBuffer logBuf, ExifInterface exif) {
+        if (logBuf == null || exif == null) {
+            throw new IllegalArgumentException("failureCause and exif shouldn't be null");
         }
 
         if (VERBOSE) Log.v(TAG, "Testing extra exif tags");
@@ -982,6 +987,43 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
         // TAG_ISO
         int iso = exif.getAttributeInt(ExifInterface.TAG_ISO, -1);
         passedSoFar = expectTrue("Exif ISO value " + iso + " is invalid", logBuf, iso > 0);
+        allTestsPassed = allTestsPassed && passedSoFar;
+
+        // TAG_DATETIME_DIGITIZED (a.k.a Create time for digital cameras).
+        String digitizedTime = exif.getAttribute(TAG_DATETIME_DIGITIZED);
+        passedSoFar = expectNotNull("Exif TAG_DATETIME_DIGITIZED is null!", logBuf, digitizedTime);
+        if (passedSoFar) {
+            String datetime = exif.getAttribute(ExifInterface.TAG_DATETIME);
+            passedSoFar = expectNotNull("Exif TAG_DATETIME is null!", logBuf, datetime);
+            if (passedSoFar) {
+                passedSoFar = expectTrue("dataTime should match digitizedTime", logBuf,
+                        digitizedTime.equals(datetime));
+            }
+        }
+        allTestsPassed = allTestsPassed && passedSoFar;
+
+        /**
+         * TAG_SUBSEC_TIME. Since the sub second tag strings are truncated to at
+         * most 9 digits in ExifInterface implementation, use getAttributeInt to
+         * sanitize it. When the default value -1 is returned, it means that
+         * this exif tag either doesn't exist or is a non-numerical invalid
+         * string. Same rule applies to the rest of sub second tags.
+         */
+        int subSecTime = exif.getAttributeInt(TAG_SUBSEC_TIME, -1);
+        passedSoFar = expectTrue(
+                "Exif TAG_SUBSEC_TIME value is null or invalid!", logBuf, subSecTime > 0);
+        allTestsPassed = allTestsPassed && passedSoFar;
+
+        // TAG_SUBSEC_TIME_ORIG
+        int subSecTimeOrig = exif.getAttributeInt(TAG_SUBSEC_TIME_ORIG, -1);
+        passedSoFar = expectTrue(
+                "Exif TAG_SUBSEC_TIME_ORIG value is null or invalid!", logBuf, subSecTimeOrig > 0);
+        allTestsPassed = allTestsPassed && passedSoFar;
+
+        // TAG_SUBSEC_TIME_DIG
+        int subSecTimeDig = exif.getAttributeInt(TAG_SUBSEC_TIME_DIG, -1);
+        passedSoFar = expectTrue(
+                "Exif TAG_SUBSEC_TIME_DIG value is null or invalid!", logBuf, subSecTimeDig > 0);
         allTestsPassed = allTestsPassed && passedSoFar;
 
         return allTestsPassed;
