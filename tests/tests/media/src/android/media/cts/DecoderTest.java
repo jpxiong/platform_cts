@@ -43,6 +43,11 @@ public class DecoderTest extends MediaPlayerTestBase {
     private static final int RESET_MODE_RECONFIGURE = 1;
     private static final int RESET_MODE_FLUSH = 2;
 
+    private static final String[] CSD_KEYS = new String[] { "csd-0", "csd-1" };
+
+    private static final int CONFIG_MODE_NONE = 0;
+    private static final int CONFIG_MODE_QUEUE = 1;
+
     private Resources mResources;
     short[] mMasterBuffer;
 
@@ -120,7 +125,7 @@ public class DecoderTest extends MediaPlayerTestBase {
     }
 
     private void monoTest(int res) throws Exception {
-        short [] mono = decodeToMemory(res, RESET_MODE_NONE, -1, null);
+        short [] mono = decodeToMemory(res, RESET_MODE_NONE, CONFIG_MODE_NONE, -1, null);
         if (mono.length == 44100) {
             // expected
         } else if (mono.length == 88200) {
@@ -133,10 +138,10 @@ public class DecoderTest extends MediaPlayerTestBase {
             fail("wrong number of samples: " + mono.length);
         }
 
-        short [] mono2 = decodeToMemory(res, RESET_MODE_RECONFIGURE, -1, null);
+        short [] mono2 = decodeToMemory(res, RESET_MODE_RECONFIGURE, CONFIG_MODE_NONE, -1, null);
         assertTrue(Arrays.equals(mono, mono2));
 
-        short [] mono3 = decodeToMemory(res, RESET_MODE_FLUSH, -1, null);
+        short [] mono3 = decodeToMemory(res, RESET_MODE_FLUSH, CONFIG_MODE_NONE, -1, null);
         assertTrue(Arrays.equals(mono, mono3));
     }
 
@@ -147,7 +152,7 @@ public class DecoderTest extends MediaPlayerTestBase {
      */
     private void decode(int testinput, float maxerror) throws IOException {
 
-        short [] decoded = decodeToMemory(testinput, RESET_MODE_NONE, -1, null);
+        short[] decoded = decodeToMemory(testinput, RESET_MODE_NONE, CONFIG_MODE_NONE, -1, null);
 
         assertEquals("wrong data size", mMasterBuffer.length, decoded.length);
 
@@ -164,22 +169,53 @@ public class DecoderTest extends MediaPlayerTestBase {
         double rmse = Math.sqrt(avgErrorSquared);
         assertTrue("decoding error too big: " + rmse, rmse <= maxerror);
 
-        short [] decoded2 = decodeToMemory(testinput, RESET_MODE_RECONFIGURE, -1, null);
-        assertEquals("count different with reconfigure", decoded.length, decoded2.length);
-        for (int i = 0; i < decoded.length; i++) {
-            assertEquals("samples don't match", decoded[i], decoded2[i]);
-        }
+        int[] resetModes = new int[] { RESET_MODE_NONE, RESET_MODE_RECONFIGURE, RESET_MODE_FLUSH };
+        int[] configModes = new int[] { CONFIG_MODE_NONE, CONFIG_MODE_QUEUE };
 
-        short [] decoded3 = decodeToMemory(testinput, RESET_MODE_FLUSH, -1, null);
-        assertEquals("count different with flush", decoded.length, decoded3.length);
-        for (int i = 0; i < decoded.length; i++) {
-            assertEquals("samples don't match", decoded[i], decoded3[i]);
+        for (int conf : configModes) {
+            for (int reset : resetModes) {
+                if (conf == CONFIG_MODE_NONE && reset == RESET_MODE_NONE) {
+                    // default case done outside of loop
+                    continue;
+                }
+                if (conf == CONFIG_MODE_QUEUE && !hasAudioCsd(testinput)) {
+                    continue;
+                }
+
+                String params = String.format("(using reset: %d, config: %s)", reset, conf);
+                short[] decoded2 = decodeToMemory(testinput, reset, conf, -1, null);
+                assertEquals("count different with reconfigure" + params,
+                        decoded.length, decoded2.length);
+                for (int i = 0; i < decoded.length; i++) {
+                    assertEquals("samples don't match" + params, decoded[i], decoded2[i]);
+                }
+            }
         }
     }
 
-    private short[] decodeToMemory(int testinput, int resetMode,
+    private boolean hasAudioCsd(int testinput) throws IOException {
+        AssetFileDescriptor fd = null;
+        try {
+
+            fd = mResources.openRawResourceFd(testinput);
+            MediaExtractor extractor = new MediaExtractor();
+            extractor.setDataSource(fd.getFileDescriptor(), fd.getStartOffset(), fd.getLength());
+            MediaFormat format = extractor.getTrackFormat(0);
+
+            return format.containsKey(CSD_KEYS[0]);
+
+        } finally {
+            if (fd != null) {
+                fd.close();
+            }
+        }
+    }
+
+    private short[] decodeToMemory(int testinput, int resetMode, int configMode,
             int eossample, List<Long> timestamps) throws IOException {
 
+        String localTag = TAG + "#decodeToMemory";
+        Log.v(localTag, String.format("reset = %d; config: %s", resetMode, configMode));
         short [] decoded = new short[0];
         int decodedIdx = 0;
 
@@ -200,15 +236,32 @@ public class DecoderTest extends MediaPlayerTestBase {
         String mime = format.getString(MediaFormat.KEY_MIME);
         assertTrue("not an audio file", mime.startsWith("audio/"));
 
+        MediaFormat configFormat = format;
         codec = MediaCodec.createDecoderByType(mime);
-        codec.configure(format, null /* surface */, null /* crypto */, 0 /* flags */);
+        if (configMode == CONFIG_MODE_QUEUE && format.containsKey(CSD_KEYS[0])) {
+            configFormat = MediaFormat.createAudioFormat(mime,
+                    format.getInteger(MediaFormat.KEY_SAMPLE_RATE),
+                    format.getInteger(MediaFormat.KEY_CHANNEL_COUNT));
+
+            configFormat.setLong(MediaFormat.KEY_DURATION,
+                    format.getLong(MediaFormat.KEY_DURATION));
+            String[] keys = new String[] { "max-input-size", "encoder-delay", "encoder-padding" };
+            for (String k : keys) {
+                if (format.containsKey(k)) {
+                    configFormat.setInteger(k, format.getInteger(k));
+                }
+            }
+        }
+        Log.v(localTag, "configuring with " + configFormat);
+        codec.configure(configFormat, null /* surface */, null /* crypto */, 0 /* flags */);
+
         codec.start();
         codecInputBuffers = codec.getInputBuffers();
         codecOutputBuffers = codec.getOutputBuffers();
 
         if (resetMode == RESET_MODE_RECONFIGURE) {
             codec.stop();
-            codec.configure(format, null /* surface */, null /* crypto */, 0 /* flags */);
+            codec.configure(configFormat, null /* surface */, null /* crypto */, 0 /* flags */);
             codec.start();
             codecInputBuffers = codec.getInputBuffers();
             codecOutputBuffers = codec.getOutputBuffers();
@@ -217,6 +270,10 @@ public class DecoderTest extends MediaPlayerTestBase {
         }
 
         extractor.selectTrack(0);
+
+        if (configMode == CONFIG_MODE_QUEUE) {
+            queueConfig(codec, format);
+        }
 
         // start decoding
         final long kTimeOutUs = 5000;
@@ -280,11 +337,14 @@ public class DecoderTest extends MediaPlayerTestBase {
                     // once we've gotten some data out of the decoder, reset and start again
                     if (resetMode == RESET_MODE_RECONFIGURE) {
                         codec.stop();
-                        codec.configure(format, null /* surface */, null /* crypto */,
+                        codec.configure(configFormat, null /* surface */, null /* crypto */,
                                 0 /* flags */);
                         codec.start();
                         codecInputBuffers = codec.getInputBuffers();
                         codecOutputBuffers = codec.getOutputBuffers();
+                        if (configMode == CONFIG_MODE_QUEUE) {
+                            queueConfig(codec, format);
+                        }
                     } else /* resetMode == RESET_MODE_FLUSH */ {
                         codec.flush();
                     }
@@ -336,6 +396,29 @@ public class DecoderTest extends MediaPlayerTestBase {
         return decoded;
     }
 
+    private void queueConfig(MediaCodec codec, MediaFormat format) {
+        for (String csdKey : CSD_KEYS) {
+            if (!format.containsKey(csdKey)) {
+                continue;
+            }
+            ByteBuffer[] codecInputBuffers = codec.getInputBuffers();
+            int inputBufIndex = codec.dequeueInputBuffer(-1);
+            if (inputBufIndex < 0) {
+                fail("failed to queue configuration buffer " + csdKey);
+            } else {
+                ByteBuffer csd = (ByteBuffer) format.getByteBuffer(csdKey).rewind();
+                Log.v(TAG + "#queueConfig", String.format("queueing %s:%s", csdKey, csd));
+                codecInputBuffers[inputBufIndex].put(csd);
+                codec.queueInputBuffer(
+                        inputBufIndex,
+                        0 /* offset */,
+                        csd.limit(),
+                        0 /* presentation time (us) */,
+                        MediaCodec.BUFFER_FLAG_CODEC_CONFIG);
+            }
+        }
+    }
+
     public void testDecodeWithEOSOnLastBuffer() throws Exception {
         testDecodeWithEOSOnLastBuffer(R.raw.sinesweepm4a);
         testDecodeWithEOSOnLastBuffer(R.raw.sinesweepmp3lame);
@@ -352,10 +435,11 @@ public class DecoderTest extends MediaPlayerTestBase {
         assertTrue(numsamples != 0);
 
         List<Long> timestamps1 = new ArrayList<Long>();
-        short[] decode1 = decodeToMemory(res, RESET_MODE_NONE, -1, timestamps1);
+        short[] decode1 = decodeToMemory(res, RESET_MODE_NONE, CONFIG_MODE_NONE, -1, timestamps1);
 
         List<Long> timestamps2 = new ArrayList<Long>();
-        short[] decode2 = decodeToMemory(res, RESET_MODE_NONE, numsamples - 1, timestamps2);
+        short[] decode2 = decodeToMemory(res, RESET_MODE_NONE, CONFIG_MODE_NONE, numsamples - 1,
+                timestamps2);
 
         // check that the data and the timestamps are the same for EOS-on-last and EOS-after-last
         assertEquals(decode1.length, decode2.length);
@@ -365,22 +449,24 @@ public class DecoderTest extends MediaPlayerTestBase {
 
         // ... and that this is also true when reconfiguring the codec
         timestamps2.clear();
-        decode2 = decodeToMemory(res, RESET_MODE_RECONFIGURE, -1, timestamps2);
+        decode2 = decodeToMemory(res, RESET_MODE_RECONFIGURE, CONFIG_MODE_NONE, -1, timestamps2);
         assertTrue(Arrays.equals(decode1, decode2));
         assertTrue(timestamps1.equals(timestamps2));
         timestamps2.clear();
-        decode2 = decodeToMemory(res, RESET_MODE_RECONFIGURE, numsamples - 1, timestamps2);
+        decode2 = decodeToMemory(res, RESET_MODE_RECONFIGURE, CONFIG_MODE_NONE, numsamples - 1,
+                timestamps2);
         assertEquals(decode1.length, decode2.length);
         assertTrue(Arrays.equals(decode1, decode2));
         assertTrue(timestamps1.equals(timestamps2));
 
         // ... and that this is also true when flushing the codec
         timestamps2.clear();
-        decode2 = decodeToMemory(res, RESET_MODE_FLUSH, -1, timestamps2);
+        decode2 = decodeToMemory(res, RESET_MODE_FLUSH, CONFIG_MODE_NONE, -1, timestamps2);
         assertTrue(Arrays.equals(decode1, decode2));
         assertTrue(timestamps1.equals(timestamps2));
         timestamps2.clear();
-        decode2 = decodeToMemory(res, RESET_MODE_FLUSH, numsamples - 1, timestamps2);
+        decode2 = decodeToMemory(res, RESET_MODE_FLUSH, CONFIG_MODE_NONE, numsamples - 1,
+                timestamps2);
         assertEquals(decode1.length, decode2.length);
         assertTrue(Arrays.equals(decode1, decode2));
         assertTrue(timestamps1.equals(timestamps2));
