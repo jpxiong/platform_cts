@@ -133,6 +133,7 @@ public class GLProducerThread extends Thread {
     }
 
     void destroyGL() {
+        mEgl.eglMakeCurrent(mEglDisplay, EGL10.EGL_NO_SURFACE, EGL10.EGL_NO_SURFACE, EGL10.EGL_NO_CONTEXT);
         mEgl.eglDestroyContext(mEglDisplay, mEglContext);
         mEgl.eglDestroySurface(mEglDisplay, mEglSurface);
         mEglContext = EGL10.EGL_NO_CONTEXT;
