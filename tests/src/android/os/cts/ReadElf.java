@@ -38,6 +38,8 @@ public class ReadElf implements AutoCloseable {
     private static final int EM_386 = 3;
     private static final int EM_MIPS = 8;
     private static final int EM_ARM = 40;
+    // http://en.wikipedia.org/wiki/Qualcomm_Hexagon
+    private static final int EM_QDSP6 = 164;
 
     /** Size of the e_ident[] structure in the ELF header. */
     private static final int EI_NIDENT = 16;
@@ -278,7 +280,8 @@ public class ReadElf implements AutoCloseable {
     private void readHeader() throws IOException {
         mType = readHalf(getHeaderOffset(OFFSET_TYPE));
         int e_machine = readHalf(getHeaderOffset(OFFSET_MACHINE));
-        if (e_machine != EM_386 && e_machine != EM_MIPS && e_machine != EM_ARM) {
+        if (e_machine != EM_386 && e_machine != EM_MIPS && e_machine != EM_ARM &&
+                e_machine != EM_QDSP6) {
             throw new IOException("Invalid ELF e_machine: " + e_machine + ": " + mPath);
         }
 
