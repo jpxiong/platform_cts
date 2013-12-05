@@ -755,6 +755,7 @@ public class FileSystemPermissionTest extends AndroidTestCase {
                 new File("/dev/nvmap"),       // b/9088251
                 new File("/dev/ptmx"),        // b/9088251
                 new File("/dev/pvrsrvkm"),    // b/9108170
+                new File("/dev/pvr_sync"),
                 new File("/dev/random"),
                 new File("/dev/snfc_cen"),
                 new File("/dev/snfc_hsel"),
