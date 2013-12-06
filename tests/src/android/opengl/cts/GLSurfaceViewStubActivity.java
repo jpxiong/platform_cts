@@ -19,6 +19,7 @@ package android.opengl.cts;
 import android.app.Activity;
 import android.opengl.GLSurfaceView;
 import android.os.Bundle;
+import android.view.Window;
 
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
@@ -100,6 +101,7 @@ public class GLSurfaceViewStubActivity extends Activity {
         if (mRenderModeSet) {
             mView.setRenderMode(mRenderMode);
         }
+        this.requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(mView);
     }
 
