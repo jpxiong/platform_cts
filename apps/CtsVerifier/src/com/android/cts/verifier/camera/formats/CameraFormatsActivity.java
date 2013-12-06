@@ -172,6 +172,7 @@ public class CameraFormatsActivity extends PassFailButtons.Activity
         super.onPause();
 
         shutdownCamera();
+        mPreviewTexture = null;
     }
 
     @Override

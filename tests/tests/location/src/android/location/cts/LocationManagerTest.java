@@ -19,17 +19,18 @@ package android.location.cts;
 
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.location.Criteria;
 import android.location.GpsStatus;
+import android.location.GpsStatus.Listener;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.location.LocationProvider;
-import android.location.GpsStatus.Listener;
 import android.os.Bundle;
 import android.os.HandlerThread;
 import android.os.Looper;
@@ -38,7 +39,6 @@ import android.provider.Settings;
 import android.test.InstrumentationTestCase;
 
 import java.util.List;
-import java.lang.Thread;
 
 /**
  * Requires the permissions
@@ -81,7 +81,7 @@ public class LocationManagerTest extends InstrumentationTestCase {
         // remove test provider if left over from an aborted run
         LocationProvider lp = mManager.getProvider(TEST_MOCK_PROVIDER_NAME);
         if (lp != null) {
-            mManager.removeTestProvider(TEST_MOCK_PROVIDER_NAME);
+            removeTestProvider(TEST_MOCK_PROVIDER_NAME);
         }
 
         addTestProvider(TEST_MOCK_PROVIDER_NAME);
@@ -107,7 +107,7 @@ public class LocationManagerTest extends InstrumentationTestCase {
     protected void tearDown() throws Exception {
         LocationProvider provider = mManager.getProvider(TEST_MOCK_PROVIDER_NAME);
         if (provider != null) {
-            mManager.removeTestProvider(TEST_MOCK_PROVIDER_NAME);
+            removeTestProvider(TEST_MOCK_PROVIDER_NAME);
         }
         if (mPendingIntent != null) {
             mManager.removeProximityAlert(mPendingIntent);
@@ -138,12 +138,12 @@ public class LocationManagerTest extends InstrumentationTestCase {
             // expected
         }
 
-        mManager.removeTestProvider(TEST_MOCK_PROVIDER_NAME);
+        removeTestProvider(TEST_MOCK_PROVIDER_NAME);
         provider = mManager.getProvider(TEST_MOCK_PROVIDER_NAME);
         assertNull(provider);
 
         try {
-            mManager.removeTestProvider(UNKNOWN_PROVIDER_NAME);
+            removeTestProvider(UNKNOWN_PROVIDER_NAME);
             fail("Should throw IllegalArgumentException when no provider exists!");
         } catch (IllegalArgumentException e) {
             // expected
@@ -177,7 +177,7 @@ public class LocationManagerTest extends InstrumentationTestCase {
         assertEquals(oldSizeAllProviders, providers.size());
         assertTrue(hasTestProvider(providers));
 
-        mManager.removeTestProvider(TEST_MOCK_PROVIDER_NAME);
+        removeTestProvider(TEST_MOCK_PROVIDER_NAME);
         providers = mManager.getAllProviders();
         assertEquals(oldSizeAllProviders - 1, providers.size());
         assertFalse(hasTestProvider(providers));
@@ -255,6 +255,70 @@ public class LocationManagerTest extends InstrumentationTestCase {
         criteria.setPowerRequirement(Criteria.NO_REQUIREMENT);
         p = mManager.getBestProvider(criteria, false);
         assertNotNull(p);
+    }
+
+    /**
+     * Tests that location mode is consistent with which providers are enabled. Sadly we can only
+     * passively test whatever mode happens to be selected--actually changing the mode would require
+     * the test to be system-signed, and CTS tests aren't. Also mode changes that enable NLP require
+     * user consent. Thus we will have a manual CTS verifier test that is similar to this test but
+     * tests every location mode. This test is just a "backup" for that since verifier tests are
+     * less reliable.
+     */
+    public void testModeAndProviderApisConsistent() {
+        ContentResolver cr = mContext.getContentResolver();
+        int mode = Settings.Secure.getInt(
+                cr, Settings.Secure.LOCATION_MODE, Settings.Secure.LOCATION_MODE_OFF);
+        boolean gps = Settings.Secure.isLocationProviderEnabled(cr, LocationManager.GPS_PROVIDER);
+        boolean nlp = Settings.Secure.isLocationProviderEnabled(
+                cr, LocationManager.NETWORK_PROVIDER);
+
+        // Assert that if there are no test providers enabled, LocationManager just returns the
+        // values from Settings.Secure.
+        forceClearTestProvider(LocationManager.GPS_PROVIDER);
+        forceClearTestProvider(LocationManager.NETWORK_PROVIDER);
+        boolean lmGps = mManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
+        boolean lmNlp = mManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
+        assertEquals("Inconsistent GPS values", gps, lmGps);
+        assertEquals("Inconsistent NLP values", nlp, lmNlp);
+
+        // Assert that isLocationProviderEnabled() values are consistent with the location mode
+        switch (mode) {
+            case Settings.Secure.LOCATION_MODE_OFF:
+                assertFalse("Bad GPS for mode " + mode, gps);
+                assertFalse("Bad NLP for mode " + mode, nlp);
+                break;
+            case Settings.Secure.LOCATION_MODE_SENSORS_ONLY:
+                assertEquals("Bad GPS for mode " + mode, hasGpsFeature(), gps);
+                assertFalse("Bad NLP for mode " + mode, nlp);
+                break;
+            case Settings.Secure.LOCATION_MODE_BATTERY_SAVING:
+                assertFalse("Bad GPS for mode " + mode, gps);
+                assertTrue("Bad NLP for mode " + mode, nlp);
+                break;
+            case Settings.Secure.LOCATION_MODE_HIGH_ACCURACY:
+                assertEquals("Bad GPS for mode " + mode, hasGpsFeature(), gps);
+                assertTrue("Bad NLP for mode " + mode, nlp);
+                break;
+        }
+    }
+
+    /**
+     * Clears the test provider. Works around b/11446702 by temporarily adding the test provider
+     * so we are allowed to clear it.
+     */
+    private void forceClearTestProvider(String provider) {
+        addTestProvider(provider);
+        mManager.clearTestProviderEnabled(provider);
+        removeTestProvider(provider);
+    }
+
+    /**
+     * Work around b/11446702 by clearing the test provider before removing it
+     */
+    private void removeTestProvider(String provider) {
+        mManager.clearTestProviderEnabled(provider);
+        mManager.removeTestProvider(provider);
     }
 
     public void testLocationUpdatesWithLocationListener() throws InterruptedException {
@@ -349,7 +413,7 @@ public class LocationManagerTest extends InstrumentationTestCase {
                     // run the update location test logic to ensure location updates can be injected
                     doLocationUpdatesWithLocationListener(providerName);
                 } finally {
-                    mManager.removeTestProvider(providerName);
+                    removeTestProvider(providerName);
                 }
             }
         }
@@ -761,7 +825,7 @@ public class LocationManagerTest extends InstrumentationTestCase {
     }
 
     private void unmockFusedLocation() {
-        mManager.removeTestProvider(FUSED_PROVIDER_NAME);
+        removeTestProvider(FUSED_PROVIDER_NAME);
     }
 
     /**

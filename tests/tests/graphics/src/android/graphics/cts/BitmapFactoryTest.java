@@ -390,6 +390,17 @@ public class BitmapFactoryTest extends InstrumentationTestCase {
         }
     }
 
+    public void testDecodeInPurgeableAllocationCount() {
+        BitmapFactory.Options options = new BitmapFactory.Options();
+        options.inSampleSize = 1;
+        options.inJustDecodeBounds = false;
+        options.inPurgeable = true;
+        options.inInputShareable = false;
+        byte[] array = obtainArray();
+        Bitmap purgeableBitmap = BitmapFactory.decodeByteArray(array, 0, array.length, options);
+        assertFalse(purgeableBitmap.getAllocationByteCount() == 0);
+    }
+
     private byte[] obtainArray() {
         ByteArrayOutputStream stm = new ByteArrayOutputStream();
         Options opt = new BitmapFactory.Options();

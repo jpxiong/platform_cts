@@ -35,6 +35,8 @@ public class DeviceInfoActivity extends Activity {
     // work done should be reported in GLES..View
     private CountDownLatch mDone = new CountDownLatch(1);
     private HashSet<String> mFormats = new HashSet<String>();
+    private String mGraphicsVendor;
+    private String mGraphicsRenderer;
 
     /**
      * Other classes can call this function to wait for this activity
@@ -71,11 +73,22 @@ public class DeviceInfoActivity extends Activity {
         DeviceInfoInstrument.addResult(
                 DeviceInfoConstants.OPEN_GL_COMPRESSED_TEXTURE_FORMATS,
                 builder.toString());
+        DeviceInfoInstrument.addResult(
+                DeviceInfoConstants.GRAPHICS_VENDOR,
+                mGraphicsVendor);
+        DeviceInfoInstrument.addResult(
+                DeviceInfoConstants.GRAPHICS_RENDERER,
+                mGraphicsRenderer);
         mDone.countDown();
     }
 
     public void addCompressedTextureFormat(String format) {
         mFormats.add(format);
+    }
+
+    public void setGraphicsInfo(String vendor, String renderer) {
+        mGraphicsVendor = vendor;
+        mGraphicsRenderer = renderer;
     }
 
     @Override

@@ -197,7 +197,7 @@ public class ListeningPortsTest extends AndroidTestCase {
             }
         }
         if (!errors.equals("")) {
-            fail(errors);
+            throw new ListeningPortsAssertionError(errors);
         }
     }
 

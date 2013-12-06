@@ -105,19 +105,12 @@ class CtsBuilder(object):
     # sort the list to give the same sequence based on name
     packages.sort()
 
-    ptsPattern = r'com\.android\.pts\..*'
-    plan = tools.TestPlan(packages)
-    plan.Exclude('.*')
-    plan.Include(ptsPattern)
-    self.__WritePlan(plan, 'PTS')
-
     plan = tools.TestPlan(packages)
     plan.Exclude('android\.performance.*')
     self.__WritePlan(plan, 'CTS')
     self.__WritePlan(plan, 'CTS-TF')
 
     plan = tools.TestPlan(packages)
-    plan.Exclude(ptsPattern)
     plan.Exclude('android\.performance.*')
     plan.Exclude('android\.media\.cts\.StreamingMediaPlayerTest.*')
     # Test plan to not include media streaming tests
@@ -160,8 +153,8 @@ class CtsBuilder(object):
     plan.Include('android\.renderscript')
     plan.Include('android\.telephony')
     plan.Include('android\.nativemedia.*')
-    plan.Include('com\.android\.pts\..*')
-    plan.Exclude('com\.android\.pts\.bootup')
+    plan.Include('com\.android\.cts\..*')#TODO(stuartscott): Should PDK have all these?
+    #TODO(stuartscott): Maybe move away from com.android.* to android.* - less typing
     self.__WritePlan(plan, 'PDK')
 
     #dirty hack to copy over pre-populated CTS plans - flaky vs stable - to streamline autoCTS
@@ -180,7 +173,7 @@ def GenerateSignatureCheckDescription(test_repository):
   package.AddAttribute('appNameSpace', 'android.tests.sigtest')
   package.AddAttribute('signatureCheck', 'true')
   package.AddAttribute('runner', '.InstrumentationRunner')
-  package.AddTest('android.tests.sigtest.SignatureTest.signatureTest')
+  package.AddTest('android.tests.sigtest.SignatureTest.testSignature')
   description = open(os.path.join(test_repository, 'SignatureTest.xml'), 'w')
   package.WriteDescription(description)
   description.close()

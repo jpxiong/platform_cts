@@ -72,7 +72,7 @@
                                         </TD>
                                     </TR>
                                     <TR>
-                                        <TD class="rowtitle">Build Name</TD>
+                                        <TD class="rowtitle">Build Product</TD>
                                         <TD>
                                             <xsl:value-of select="TestResult/DeviceInfo/BuildInfo/@buildName"/>
                                         </TD>
@@ -96,13 +96,13 @@
                                         </TD>
                                     </TR>
                                     <TR>
-                                        <TD class="rowtitle">Firmware Version</TD>
+                                        <TD class="rowtitle">Android Version</TD>
                                         <TD>
                                             <xsl:value-of select="TestResult/DeviceInfo/BuildInfo/@buildVersion"/>
                                         </TD>
                                     </TR>
                                     <TR>
-                                        <TD class="rowtitle">Firmware Build Number</TD>
+                                        <TD class="rowtitle">Build ID</TD>
                                         <TD>
                                             <xsl:value-of select="TestResult/DeviceInfo/BuildInfo/@buildID"/>
                                         </TD>
@@ -128,7 +128,7 @@
                                         </TD>
                                     </TR>
                                     <TR>
-                                        <TD class="rowtitle">Android Platform Version</TD>
+                                        <TD class="rowtitle">Android API Level</TD>
                                         <TD>
                                             <xsl:value-of select="TestResult/DeviceInfo/BuildInfo/@androidPlatformVersion"/>
                                         </TD>

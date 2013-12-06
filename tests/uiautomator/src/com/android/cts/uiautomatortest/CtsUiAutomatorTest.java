@@ -51,6 +51,9 @@ public class CtsUiAutomatorTest extends UiAutomatorTestCase {
 
     private static final String SCREEN_SHOT_FILE_PATH_NAME = "/data/local/tmp/ctsScreenShot";
 
+    // Should match the value defined in UiObject
+    private static final int FINGER_TOUCH_HALF_WIDTH = 20;
+
     @Override
     protected void setUp() throws Exception {
         super.setUp();
@@ -885,10 +888,10 @@ public class CtsUiAutomatorTest extends UiAutomatorTestCase {
                 withinMarginOfError(0.1f, screenRect.right, p2s.x));
 
         assertTrue("Touch-up X coordinate for pointer 1 is invalid",
-                withinMarginOfError(0.1f, screenRect.centerX(), p1e.x));
+                withinMarginOfError(0.1f, screenRect.centerX() - FINGER_TOUCH_HALF_WIDTH, p1e.x));
 
         assertTrue("Touch-up X coordinate for pointer 2 is invalid",
-                withinMarginOfError(0.1f, screenRect.centerX(), p2e.x));
+                withinMarginOfError(0.1f, screenRect.centerX() + FINGER_TOUCH_HALF_WIDTH, p2e.x));
     }
 
     /**

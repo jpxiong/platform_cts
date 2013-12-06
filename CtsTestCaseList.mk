@@ -30,18 +30,22 @@ cts_security_apps_list := \
 	CtsMultiUserStorageApp
 
 cts_support_packages := \
-	$(PTS_SUPPORT_PACKAGES) \
-	CtsAccelerationTestStubs \
-	CtsDeviceAdmin \
-	CtsMonkeyApp \
-	CtsMonkeyApp2 \
-	CtsSomeAccessibilityServices \
-	CtsTestStubs \
-	SignatureTest \
-	TestDeviceSetup \
-	CtsUiAutomatorApp \
-	CtsUsbSerialTestApp \
-	$(cts_security_apps_list)
+    CtsDeviceOpenGl \
+    CtsDeviceTaskswitchingAppA \
+    CtsDeviceTaskswitchingAppB \
+    CtsDeviceTaskswitchingControl \
+    CtsDeviceUi \
+    CtsAccelerationTestStubs \
+    CtsDeviceAdmin \
+    CtsMonkeyApp \
+    CtsMonkeyApp2 \
+    CtsSomeAccessibilityServices \
+    CtsTestStubs \
+    SignatureTest \
+    TestDeviceSetup \
+    CtsUiAutomatorApp \
+    CtsUsbSerialTestApp \
+    $(cts_security_apps_list)
 
 cts_external_packages := \
 	com.replica.replicaisland
@@ -54,60 +58,66 @@ CTS_TEST_CASE_LIST := \
 
 # Test packages that require an associated test package XML.
 cts_test_packages := \
-	$(PTS_TEST_PACKAGES) \
-	CtsAccelerationTestCases \
-	CtsAccountManagerTestCases \
-	CtsAccessibilityServiceTestCases \
-	CtsAccessibilityTestCases \
-	CtsAdminTestCases \
-	CtsAnimationTestCases \
-	CtsAppTestCases \
-	CtsBluetoothTestCases \
-	CtsCalendarcommon2TestCases \
-	CtsContentTestCases \
-	CtsDatabaseTestCases \
-	CtsDisplayTestCases \
-	CtsDpiTestCases \
-	CtsDpiTestCases2 \
-	CtsDreamsTestCases \
-	CtsDrmTestCases \
-	CtsEffectTestCases \
-	CtsExampleTestCases \
-	CtsGestureTestCases \
-	CtsGraphicsTestCases \
-	CtsGraphics2TestCases \
-	CtsHardwareTestCases \
-	CtsHoloTestCases \
-	CtsJniTestCases \
-	CtsKeystoreTestCases \
-	CtsLocationTestCases \
-	CtsMediaStressTestCases \
-	CtsMediaTestCases \
-	CtsNativeOpenGLTestCases \
-	CtsNdefTestCases \
-	CtsNetTestCases \
-	CtsOpenGLTestCases \
-	CtsOpenGlPerfTestCases \
-	CtsOsTestCases \
-	CtsPermissionTestCases \
-	CtsPermission2TestCases \
-	CtsPreferenceTestCases \
-	CtsPreference2TestCases \
-	CtsProviderTestCases \
-	CtsRenderscriptTestCases \
-	CtsRenderscriptGraphicsTestCases \
-	CtsRsCppTestCases \
-	CtsSaxTestCases \
-	CtsSecurityTestCases \
-	CtsSpeechTestCases \
-	CtsTelephonyTestCases \
-	CtsTextTestCases \
-	CtsTextureViewTestCases \
-	CtsThemeTestCases \
-	CtsUtilTestCases \
-	CtsViewTestCases \
-	CtsWebkitTestCases \
-	CtsWidgetTestCases
+    CtsDeviceFilePerf \
+    CtsDeviceUi \
+    CtsDeviceDram \
+    CtsDeviceSimpleCpu \
+    CtsDeviceBrowserBench \
+    CtsDeviceVideoPerf \
+    CtsDeviceOpenGl \
+    CtsAccelerationTestCases \
+    CtsAccountManagerTestCases \
+    CtsAccessibilityServiceTestCases \
+    CtsAccessibilityTestCases \
+    CtsAdminTestCases \
+    CtsAnimationTestCases \
+    CtsAppTestCases \
+    CtsBluetoothTestCases \
+    CtsCalendarcommon2TestCases \
+    CtsContentTestCases \
+    CtsDatabaseTestCases \
+    CtsDisplayTestCases \
+    CtsDpiTestCases \
+    CtsDpiTestCases2 \
+    CtsDreamsTestCases \
+    CtsDrmTestCases \
+    CtsEffectTestCases \
+    CtsExampleTestCases \
+    CtsGestureTestCases \
+    CtsGraphicsTestCases \
+    CtsGraphics2TestCases \
+    CtsHardwareTestCases \
+    CtsHoloTestCases \
+    CtsJniTestCases \
+    CtsKeystoreTestCases \
+    CtsLocationTestCases \
+    CtsMediaStressTestCases \
+    CtsMediaTestCases \
+    CtsNativeOpenGLTestCases \
+    CtsNdefTestCases \
+    CtsNetTestCases \
+    CtsOpenGLTestCases \
+    CtsOpenGlPerfTestCases \
+    CtsOsTestCases \
+    CtsPermissionTestCases \
+    CtsPermission2TestCases \
+    CtsPreferenceTestCases \
+    CtsPreference2TestCases \
+    CtsProviderTestCases \
+    CtsRenderscriptTestCases \
+    CtsRenderscriptGraphicsTestCases \
+    CtsRsCppTestCases \
+    CtsSaxTestCases \
+    CtsSecurityTestCases \
+    CtsSpeechTestCases \
+    CtsTelephonyTestCases \
+    CtsTextTestCases \
+    CtsTextureViewTestCases \
+    CtsThemeTestCases \
+    CtsUtilTestCases \
+    CtsViewTestCases \
+    CtsWebkitTestCases \
+    CtsWidgetTestCases
 
 # All APKs that need to be scanned by the coverage utilities.
 CTS_COVERAGE_TEST_CASE_LIST := \
@@ -117,11 +127,12 @@ CTS_COVERAGE_TEST_CASE_LIST := \
 
 # Host side only tests
 cts_host_libraries := \
-	$(PTS_HOST_CASES) \
-	CtsAdbTests \
-	CtsAppSecurityTests \
-	CtsMonkeyTestCases \
-	CtsUsbTests
+    CtsHostUi \
+    CtsHostJank \
+    CtsAdbTests \
+    CtsAppSecurityTests \
+    CtsMonkeyTestCases \
+    CtsUsbTests
 
 
 # Native test executables that need to have associated test XMLs.
@@ -131,22 +142,25 @@ cts_native_exes := \
 	bionic-unit-tests-cts \
 
 cts_ui_tests := \
-	CtsUiAutomatorTests
+    CtsUiAutomatorTests
+
+cts_device_jars := \
+    CtsDeviceJank
 
 # All the files that will end up under the repository/testcases
 # directory of the final CTS distribution.
 CTS_TEST_CASES := $(call cts-get-lib-paths,$(cts_host_libraries)) \
-		$(call cts-get-package-paths,$(cts_test_packages)) \
-		$(call cts-get-native-paths,$(cts_native_exes)) \
-		$(call cts-get-ui-lib-paths,$(cts_ui_tests)) \
-		$(call cts-get-ui-lib-paths,$(pts_device_lib_tests))
+    $(call cts-get-package-paths,$(cts_test_packages)) \
+    $(call cts-get-native-paths,$(cts_native_exes)) \
+    $(call cts-get-ui-lib-paths,$(cts_ui_tests)) \
+    $(call cts-get-ui-lib-paths,$(cts_device_jars))
 
 # All the XMLs that will end up under the repository/testcases
 # and that need to be created before making the final CTS distribution.
 CTS_TEST_XMLS := $(call cts-get-test-xmls,$(cts_host_libraries)) \
-		$(call cts-get-test-xmls,$(cts_test_packages)) \
-		$(call cts-get-test-xmls,$(cts_native_exes)) \
-		$(call cts-get-test-xmls,$(cts_ui_tests))
+    $(call cts-get-test-xmls,$(cts_test_packages)) \
+    $(call cts-get-test-xmls,$(cts_native_exes)) \
+    $(call cts-get-test-xmls,$(cts_ui_tests))
 
 
 # The following files will be placed in the tools directory of the CTS distribution

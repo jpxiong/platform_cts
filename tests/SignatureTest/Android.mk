@@ -17,10 +17,6 @@ include $(CLEAR_VARS)
 
 # don't include this package in any target
 LOCAL_MODULE_TAGS := optional
-# and when built explicitly put it in the data partition
-LOCAL_MODULE_PATH := $(TARGET_OUT_DATA_APPS)
-# and because it is in data, do not strip classes.dex
-LOCAL_DEX_PREOPT := false
 
 LOCAL_SRC_FILES := $(call all-java-files-under, src)
 
@@ -32,7 +28,6 @@ LOCAL_SDK_VERSION := current
 
 # To be passed in on command line
 CTS_API_VERSION ?= current
-
 ifeq (current,$(CTS_API_VERSION))
 android_api_description := frameworks/base/api/$(CTS_API_VERSION).txt
 else
@@ -40,20 +35,22 @@ android_api_description := $(SRC_API_DIR)/$(CTS_API_VERSION).txt
 endif
 
 # Can't call local-intermediates-dir directly here because we have to
-# include BUILD_PACAKGE first.  Can't include BUILD_PACKAGE first
+# include BUILD_CTS_PACKAGE first.  Can't include BUILD_CTS_PACKAGE first
 # because we have to override LOCAL_RESOURCE_DIR first.  Hence this
 # hack.
 intermediates.COMMON := $(call intermediates-dir-for,APPS,$(LOCAL_PACKAGE_NAME),,COMMON)
 signature_res_dir := $(intermediates.COMMON)/genres
 LOCAL_RESOURCE_DIR := $(signature_res_dir) $(LOCAL_PATH)/res
 
-include $(BUILD_PACKAGE)
+include $(BUILD_CTS_PACKAGE)
+
+$(info $(call local-intermediates-dir))
 
 generated_res_stamp := $(intermediates.COMMON)/genres.stamp
 api_ver_file := $(intermediates.COMMON)/api_ver_is_$(CTS_API_VERSION)
 
 # The api_ver_file keeps track of which api version was last built.
-# By only ever having one of these magic files in existance and making
+# By only ever having one of these magic files in existence and making
 # sure the generated resources rule depend on it, we can ensure that
 # the proper version of the api resource gets generated.
 $(api_ver_file):
@@ -89,6 +86,5 @@ signature_res_dir :=
 android_api_description :=
 CTS_API_VERSION :=
 
-
-# Use the folloing include to make our test apk.
+# Use the following include to make our test apk.
 include $(call all-makefiles-under,$(LOCAL_PATH))

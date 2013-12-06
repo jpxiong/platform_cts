@@ -21,6 +21,7 @@
     <string name="pass_button_text">Pass</string>
     <string name="info_button_text">Info</string>
     <string name="fail_button_text">Fail</string>
+    <string name="next_button_text">Next</string>
 
     <!-- Strings for TestListActivity -->
     <string name="test_category_audio">Audio</string>
@@ -129,16 +130,16 @@
     <string name="bt_connection_access_client">Connection Access Client</string>
     <string name="bt_connection_access_server_info">
         Start the CTS Verifier on another device, start the Bluetooth test, and choose
-        \"Connection Access Client\" to setup the test. 
-        \n\nFirst, unpair the devices via Bluetooth settings. Then connect the devices together 
+        \"Connection Access Client\" to setup the test.
+        \n\nFirst, unpair the devices via Bluetooth settings. Then connect the devices together
         using the \"Make Discoverable\" and \"Pick Server\" buttons.
         \n\nA connection access request should appear on the server and enable the pass button.
     </string>
     <string name="bt_connection_access_client_info">
         Start the CTS Verifier on another device, start the Bluetooth test, and choose
-        \"Connection Access Server\" to complete the test. 
-        \n\nMake the device acting as the server discoverable and connect to it via the 
-        \"Pick Server\" button. Check that the server displays the connection access request 
+        \"Connection Access Server\" to complete the test.
+        \n\nMake the device acting as the server discoverable and connect to it via the
+        \"Pick Server\" button. Check that the server displays the connection access request
         dialog. The client device does not need to do anything else.
     </string>
     <string name="bt_ca_dialog">Was the connection access request dialog shown?</string>
@@ -206,10 +207,12 @@
         known to be compatible.\n\nThe Tag Verification tests check that your
         device can properly read and write to tags of different technologies. The MIFARE
         Ultralight test is only applicable for devices that support it.
+        \n\nThe Host-based card emulation tests check that your device has properly implemented
+             host-based card emulation.
     </string>
 
     <string name="nfc_not_enabled">NFC is not enabled!</string>
-    <string name="nfc_not_enabled_message">These tests require NFC to be enabled. Click the 
+    <string name="nfc_not_enabled_message">These tests require NFC to be enabled. Click the
         button below to goto Settings and enable it.</string>
     <string name="nfc_settings">NFC Settings</string>
 
@@ -239,7 +242,7 @@
         device running the \"CTS Verifier NDEF Sender\"...</string>
     <string name="nfc_ndef_push_receive_success">Successfully received the correct NDEF push
         message.</string>
-    <string name="nfc_ndef_push_receive_failure">Failed to receive the correct NDEF push 
+    <string name="nfc_ndef_push_receive_failure">Failed to receive the correct NDEF push
         message.</string>
 
     <string name="nfc_tag_verifier">NFC Tag Verifier</string>
@@ -264,10 +267,90 @@
     <string name="nfc_result_message">Written data:\n%1$s\n\nRead data:\n%2$s</string>
     <string name="nfc_ndef_content">Id: %1$s\nMime: %2$s\nPayload: %3$s</string>
 
-    <!-- Strings for AccelerometerTestActivity and GyroscopeTestActivity -->
+    <string name="nfc_hce">Host-based card emulation</string>
+    <string name="nfc_hce_reader_tests">HCE reader tests</string>
+    <string name="nfc_hce_emulator_tests">HCE emulator tests</string>
+    <string name="nfc_hce_emulator_test_info">The host-based card emulation
+        tests require two devices to be completed. The HCE emulator tests are used
+        to actually test the host-based card emulation feature of the device-under-test. So the
+        device running the emulator tests must be the candidate device running the software
+        to be tested. \n\nFor each emulator test, there is a corresponding "reader test"
+        in the "HCE reader tests" section. The "reader test" acts as a NFC terminal/POS
+        and makes sure the device-under-test implements card emulation correctly.
+    </string>
+    <string name="nfc_hce_reader_test_info">The host-based card emulation
+        tests require two devices to be completed. The HCE emulator tests are used
+        to actually test the host-based card emulation feature of the device-under-test. So the
+        device running the emulator tests must be the candidate device running the software
+        to be tested. \n\nFor each emulator test, there is a corresponding "reader test"
+        in the "HCE reader tests" section. The "reader test" acts as a NFC terminal/POS
+        and makes sure the device-under-test implements card emulation correctly.
+    </string>
+    <string name="nfc_hce_please_wait">Please wait</string>
+    <string name="nfc_hce_setting_up">Setting up card emulation services...</string>
+
+    <string name="nfc_hce_default_route_emulator">Default route (Emulator)</string>
+    <string name="nfc_hce_default_route_reader">Default route (Reader)</string>
+    <string name="nfc_hce_default_route_emulator_help">This test verifies that the default route for ISO-DEP (ISO14443-4) frames is the host CPU. It does this by selecting an AID that any Android HCE phone will respond to if the select command is routed to the host. Please verify that there is no rule in the routing table that points this AID to the host. This test may be passed if the "PASS" button on the reader side lights up after tapping the devices together.</string>
+
+    <string name="nfc_hce_protocol_params_emulator">Protocol parameters (Emulator)</string>
+    <string name="nfc_hce_protocol_params_reader">Protocol parameters (Reader)</string>
+    <string name="nfc_hce_protocol_params_emulator_help">This test verifies that the Nfc-A and ISO-DEP protocol parameters are being set correctly. The test may be passed when no FAIL entries show up in the results below. Note that the reader device may be different from the device under test - the DUT itself does not need to be able to act as the reader for this test. \n\n Note that for each test there are 3 possible outcomes:\n1) OK -> test has passed;\n2) FAIL -> test has failed and this must be fixed;\n3) FAIL EMVCO -> this protocol parameter is deviating from the requirements in the EMV Contactless Communication Protocol specification.\n\nWhile it is allowed to ship a HCE implementation with EMVCo failures, it may not perform optimal when EMVco based payment HCE apps are run on the device.</string>
+
+    <string name="nfc_hce_single_payment_emulator">Single payment (Emulator)</string>
+    <string name="nfc_hce_single_payment_reader">Single payment (Reader)</string>
+
+    <string name="nfc_hce_dual_payment_emulator">Two payment services (Emulator)</string>
+    <string name="nfc_hce_dual_payment_reader">Two payment services (Reader)</string>
+
+    <string name="nfc_hce_change_default_emulator">Change default payment service (Emulator)</string>
+    <string name="nfc_hce_change_default_reader">Change default payment service (Reader)</string>
+
+    <string name="nfc_hce_tap_reader_title">Tap reader</string>
+    <string name="nfc_hce_tap_reader_message">Select the corresponding reader test on the remote device, click OK on this dialog, and tap devices together. The pass button will be enabled if the test passes.</string>
+
+    <string name="nfc_hce_single_non_payment_emulator">Single non-payment (Emulator)</string>
+    <string name="nfc_hce_single_non_payment_reader">Single non-payment (Reader)</string>
+
+    <string name="nfc_hce_dual_non_payment_emulator">Two non-payment services (Emulator)</string>
+    <string name="nfc_hce_dual_non_payment_reader">Two non-payment services (Reader)</string>
+
+    <string name="nfc_hce_conflicting_non_payment_emulator">Two conflicting non-payment services (Emulator)</string>
+    <string name="nfc_hce_conflicting_non_payment_reader">Two conflicting non-payment services (Reader)</string>
+
+    <string name="nfc_hce_offhost_service_emulator">Off-host service (Emulator)</string>
+    <string name="nfc_hce_offhost_service_reader">Off-host service (Reader)</string>
+    <string name="nfc_hce_offhost_emulator_help">This tests enables a service that declares some AIDs to reside off-host. This test only needs to be passed if your device has a secure element (either embedded or UICC.). The responses from the secure element are not verified by the test - it is up to the tester to verify the responses are as expected.</string>
+
+    <string name="nfc_hce_on_and_offhost_service_emulator">On and off-host services (Emulator)</string>
+    <string name="nfc_hce_on_and_offhost_service_reader">On and off-host services (Reader)</string>
+    <string name="nfc_hce_on_and_offhost_emulator_help">This tests enables a service that declares some AIDs to reside off-host, and another service that runs on host. It then first sends an APDU sequence that goes off-host, and subsequently some APDUs that should go to the on-host service. This test only needs to be passed if your device has a secure element (either embedded or UICC.). The pass button will be enabled if the on-host sequence is performed as expected. The responses from the secure element are not verified by the test - it is up to the tester to verify the responses are as expected. </string>
+
+    <string name="nfc_hce_tap_test_emulator">50 successful taps test (Emulator)</string>
+    <string name="nfc_hce_tap_test_reader">50 successful taps test (Reader)</string>
+    <string name="nfc_hce_tap_test_emulator_help">This test requires you to complete at least 50 HCE taps, to ensure stability of the HCE feature. The NFC service and controller should not crash or hang during any of the 50 taps.</string>
+    <string name="nfc_hce_throughput_emulator">HCE throughput test (Emulator)</string>
+    <string name="nfc_hce_throughput_reader">HCE throughput test (Reader)</string>
+    <string name="nfc_hce_throughput_emulator_help">This tests verifies that your HCE implementation can reach a decent throughput. While Android does not have any requirements on HCE performance, many HCE applications such as transport and payment apps do. If the average APDU roundtrip time is more than 50ms, please take a look at your implementation to see where the delay is coming from.</string>
+    <string name="nfc_hce_change_default_help">You will now be asked whether you want to make Payment Service #1 the default app. Select yes.</string>
+    <string name="nfc_hce_conflicting_non_payment_help">When tapping the first time, you will be shown a dialog that asks you to choose between TransportService #1 and TransportService #2. Select TransportService #2. Verify a dialog is shown that asks you to tap again to complete. Now tap again, and if communication with TransportService #2 is successfull the pass button will be enabled."</string>
+    <string name="nfc_payment_service_desc">NFC Payment service</string>
+    <string name="ppse">PPSE</string>
+    <string name="mastercard">MasterCard</string>
+    <string name="paymentService1">Payment Service #1</string>
+    <string name="paymentService2">Payment Service #2</string>
+    <string name="transportService1">TransportService #1</string>
+    <string name="transportService2">TransportService #2</string>
+    <string name="accessService">AccessService</string>
+    <string name="offhostService">OffhostService</string>
+
+    <!-- Strings for Sensor Test Activities -->
+    <!-- Accelerometer -->
     <string name="snsr_accel_test">Accelerometer Test</string>
     <string name="snsr_accel_test_info">This test verifies that the accelerometer is working properly. As you move the device around through space, the triangle should always point down (i.e. in the direction of gravity.) If it does not, the accelerometer is improperly configured.</string>
+    <string name="snsr_accel_m_test">Accelerometer Measurement Tests</string>
 
+    <!-- Gyroscope -->
     <string name="snsr_gyro_test">Gyroscope Test</string>
     <string name="snsr_gyro_test_info">This test verifies that the gyroscope is working properly.\n\nRotate your device as shown by the 3D block. A green background or a check mark indicates that the gyroscope\'s value is correct. A red background or a X mark indicates that the gyroscope\'s value is not right.\n\nThere are 6 parts of the test corresponding to each rotation. Press Pass for all the stages to complete this test.</string>
     <string name="snsr_gyro_test_progress">Test %1$d of %2$d</string>
@@ -275,6 +358,10 @@
     <string name="snsr_gyro_test_no_gyro_message">It doesn\'t seem like you have a gyroscope, so you don\'t need to run this test.</string>
     <string name="snsr_gyro_test_degrees_title">Wrong units?</string>
     <string name="snsr_gyro_test_degrees_message">These values looks like degrees per second. These should be radians per second!</string>
+    <string name="snsr_gyro_m_test">Gyroscope Measurement Test</string>
+
+    <!-- Magnetic Field -->
+    <string name="snsr_mag_m_test">Magnetic Field Measurement Tests</string>
 
     <!-- Strings for SuidFilesActivity -->
     <string name="suid_files">SUID File Scanner</string>
@@ -393,10 +480,33 @@
     <string name="cf_preview_label">Normal preview</string>
     <string name="cf_format_label">Processed callback data</string>
 
+    <!-- Strings for Camera Video -->
+    <string name="record_button_text">Test</string>
+    <string name="camera_video">Camera Video</string>
+    <string name="video_info"> This test checks video capture
+    at different resolutions. \n - The left view window shows the preview.
+    \n - Pressing the test button will trigger three
+    seconds of video recording. Playback will show up in the right view
+    window after recording is complete. \n - Use the spinners to choose
+    camera and resolution combinations. The playback should be similar
+    to what you saw in preview. \n - After all possible combinations
+    are tested, the pass button will be enabled. You may press the pass
+    button to indicate a pass. \n - You may press fail button any time during
+    the test to indicate failure.
+    </string>
+    <string name="video_capture_label">Video capture</string>
+    <string name="video_playback_label">Video playback</string>
+    <string name="dialog_fail_test">Test failed</string>
+    <string name="fail_quit">Fail and quit</string>
+    <string name="cancel">Cancel</string>
+    <string name="status_ready">Ready</string>
+    <string name="status_recording">Recording</string>
+    <string name="status_playback">Playing back</string>
+
     <!-- Strings for USB accessory test activity -->
     <string name="usb_accessory_test">USB Accessory Test</string>
     <string name="usb_accessory_test_info">
-        1. Connect your Android device to a computer and run the \'cts-usb-accessory\' program 
+        1. Connect your Android device to a computer and run the \'cts-usb-accessory\' program
         included with the CTS Verifier bundle.
         \n\n2. If you have not started the CTS Verifier, press \'OK\' when asked to open the CTS
         Verifier when the accessory is connected. \n\nIf you are already in this test,
@@ -594,9 +704,9 @@
         and disabled, and that once enabled the service is able to receive notificaitons and
         dismiss them.
     </string>
-    <string name="nls_enable_service">Please enable \"Notification Listener for CTS Verifier\" 
+    <string name="nls_enable_service">Please enable \"Notification Listener for CTS Verifier\"
         under Security > Notification Access and return here.</string>
-    <string name="nls_disable_service">Please disable \"Notification Listener for CTS Verifier\" 
+    <string name="nls_disable_service">Please disable \"Notification Listener for CTS Verifier\"
         under Security > Notification Access and return here.</string>
     <string name="nls_start_settings">Launch Settings</string>
     <string name="nls_service_started">Service should start once enabled.</string>
@@ -606,7 +716,7 @@
     <string name="nls_clear_all">Check that service can clear all notifications.</string>
     <string name="nls_service_stopped">Service should stop once disabled.</string>
     <string name="nls_note_missed">Check that notification was not received.</string>
-    
+
     <string name="cacert_test">CA Cert Notification Test</string>
     <string name="cacert_info">This test checks that when a CA Certificate is installed, the user is notified.</string>
     <string name="cacert_do_something">Do it</string>
@@ -685,7 +795,7 @@
            Repeating on: Monday and Wednesday. \n
     </string>
     <string name="dc_full_alarm_button">Create Alarm</string>
-    
+
     <string name="dc_set_timer_with_ui_test">Set Timer Test</string>
     <string name="dc_set_timer_with_ui_test_info">
         This test verifies that the ACTION_SET_TIMER API with no paramters open the UI\n

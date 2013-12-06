@@ -38,8 +38,12 @@ Using cts-tradefed
 To run a test plan on a single device:
 
 1. Make sure you have at least one device connected
-2. Launch the cts-tradefed console by running the 'cts-tradefed' script at
-android-cts/tools/cts-tradefed
+2. Launch the cts-tradefed console by running the 'cts-tradefed'. If you've
+downloaded and extracted the CTS zip, the script can be found at
+  android-cts/tools/cts-tradefed
+Or else if you are working from the Android source tree and have run make cts,
+the script can be found at
+  out/host/linux-x86/cts/android-cts/tools/cts-tradefed
 3. Type:
 'run cts --plan CTS' to run the default CTS plan
 

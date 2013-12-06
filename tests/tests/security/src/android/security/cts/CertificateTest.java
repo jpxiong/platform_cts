@@ -28,6 +28,7 @@ import java.security.NoSuchAlgorithmException;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -35,11 +36,26 @@ import java.util.Set;
 
 public class CertificateTest extends AndroidTestCase {
 
-    public void testCertificates() throws Exception {
-        Set<String> expectedCertificates = getExpectedCertificates();
+    public void testNoRemovedCertificates() throws Exception {
+        Set<String> expectedCertificates = new HashSet<String>(
+                Arrays.asList(CertificateData.CERTIFICATE_DATA));
         Set<String> deviceCertificates = getDeviceCertificates();
         expectedCertificates.removeAll(deviceCertificates);
-        assertTrue("Missing certificates: " + expectedCertificates, expectedCertificates.isEmpty());
+        assertEquals("Missing CA certificates", Collections.EMPTY_SET, expectedCertificates);
+    }
+
+    /**
+     * {@see OEMCertificateWhitelist#OEM_CERTIFICATE_WHITELIST} for more information on this test.
+     */
+    public void testNoAddedCertificates() throws Exception {
+        Set<String> oemCertificateWhitelist = new HashSet<String>(
+                Arrays.asList(OEMCertificateWhitelist.OEM_CERTIFICATE_WHITELIST));
+        Set<String> expectedCertificates = new HashSet<String>(
+                Arrays.asList(CertificateData.CERTIFICATE_DATA));
+        Set<String> deviceCertificates = getDeviceCertificates();
+        deviceCertificates.removeAll(expectedCertificates);
+        deviceCertificates.removeAll(oemCertificateWhitelist);
+        assertEquals("Unknown CA certificates", Collections.EMPTY_SET, deviceCertificates);
     }
 
     public void testBlockCertificates() throws Exception {
@@ -48,15 +64,7 @@ public class CertificateTest extends AndroidTestCase {
 
         Set<String> deviceCertificates = getDeviceCertificates();
         deviceCertificates.retainAll(blockCertificates);
-        assertTrue("Blocked certificates: " + deviceCertificates, deviceCertificates.isEmpty());
-    }
-
-    private Set<String> getExpectedCertificates() {
-        Set<String> certificates = new HashSet<String>();
-        for (int i = 0; i < CertificateData.CERTIFICATE_DATA.length; i++) {
-            certificates.add(CertificateData.CERTIFICATE_DATA[i]);
-        }
-        return certificates;
+        assertEquals("Blocked CA certificates", Collections.EMPTY_SET, deviceCertificates);
     }
 
     private Set<String> getDeviceCertificates() throws KeyStoreException,

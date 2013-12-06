@@ -16,16 +16,15 @@
 
 package com.android.cts.multiuserstorageapp;
 
+import static com.android.cts.externalstorageapp.CommonExternalStorageTest.getAllPackageSpecificPathsExceptObb;
+import static com.android.cts.externalstorageapp.CommonExternalStorageTest.readInt;
+import static com.android.cts.externalstorageapp.CommonExternalStorageTest.writeInt;
+
 import android.os.Environment;
 import android.test.AndroidTestCase;
 import android.util.Log;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
 
 /**
  * Test multi-user emulated storage environment, ensuring that each user has
@@ -59,22 +58,44 @@ public class MultiUserStorageTest extends AndroidTestCase {
     }
 
     public void writeIsolatedStorage() throws Exception {
-        writeInt(buildApiPath(FILE_SINGLETON), android.os.Process.myUid());
-        writeInt(buildApiPath(FILE_MY_UID), android.os.Process.myUid());
+        final int uid = android.os.Process.myUid();
+
+        writeInt(buildApiPath(FILE_SINGLETON), uid);
+        writeInt(buildApiPath(FILE_MY_UID), uid);
+
+        // Write to every external path we think we have access to
+        for (File path : getAllPackageSpecificPathsExceptObb(getContext())) {
+            assertNotNull("Valid media must be inserted during CTS", path);
+            assertEquals("Valid media must be inserted during CTS", Environment.MEDIA_MOUNTED,
+                    Environment.getStorageState(path));
+
+            writeInt(new File(path, FILE_SINGLETON), uid);
+        }
     }
 
     public void readIsolatedStorage() throws Exception {
+        final int uid = android.os.Process.myUid();
+
         // Expect that the value we wrote earlier is still valid and wasn't
         // overwritten by us running as another user.
-        assertEquals("Failed to read singleton file from API path", android.os.Process.myUid(),
+        assertEquals("Failed to read singleton file from API path", uid,
                 readInt(buildApiPath(FILE_SINGLETON)));
-        assertEquals("Failed to read singleton file from env path", android.os.Process.myUid(),
+        assertEquals("Failed to read singleton file from env path", uid,
                 readInt(buildEnvPath(FILE_SINGLETON)));
-        assertEquals("Failed to read singleton file from raw path", android.os.Process.myUid(),
+        assertEquals("Failed to read singleton file from raw path", uid,
                 readInt(buildRawPath(FILE_SINGLETON)));
 
-        assertEquals("Failed to read UID file from API path", android.os.Process.myUid(),
+        assertEquals("Failed to read UID file from API path", uid,
                 readInt(buildApiPath(FILE_MY_UID)));
+
+        for (File path : getAllPackageSpecificPathsExceptObb(getContext())) {
+            assertNotNull("Valid media must be inserted during CTS", path);
+            assertEquals("Valid media must be inserted during CTS", Environment.MEDIA_MOUNTED,
+                    Environment.getStorageState(path));
+
+            assertEquals("Unexpected value in singleton file at " + path, uid,
+                    readInt(new File(path, FILE_SINGLETON)));
+        }
     }
 
     public void cleanObbStorage() throws Exception {
@@ -118,23 +139,5 @@ public class MultiUserStorageTest extends AndroidTestCase {
 
     private static File buildRawPath(String file) {
         return new File("/sdcard/", file);
-    }
-
-    private static void writeInt(File file, int value) throws IOException {
-        final DataOutputStream os = new DataOutputStream(new FileOutputStream(file));
-        try {
-            os.writeInt(value);
-        } finally {
-            os.close();
-        }
-    }
-
-    private static int readInt(File file) throws IOException {
-        final DataInputStream is = new DataInputStream(new FileInputStream(file));
-        try {
-            return is.readInt();
-        } finally {
-            is.close();
-        }
     }
 }

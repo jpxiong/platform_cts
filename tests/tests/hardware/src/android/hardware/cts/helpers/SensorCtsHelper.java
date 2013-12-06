@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2008 The Android Open Source Project
+ * Copyright (C) 2013 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,7 +15,13 @@
  */
 package android.hardware.cts.helpers;
 
+import android.content.Context;
+
+import android.hardware.Sensor;
+import android.hardware.SensorManager;
+
 import android.os.Environment;
+
 import android.util.Log;
 
 import java.io.DataOutputStream;
@@ -55,7 +61,20 @@ public class SensorCtsHelper {
         return arrayCopy.get(arrayIndex);
     }
 
-    // TODO: are there any internal libraries for this?
+    /**
+     * Calculates the mean for each of the values in the set of TestSensorEvents.
+     */
+    public static void getMeans(TestSensorEvent events[], double means[]) {
+        for(TestSensorEvent event : events) {
+            for(int i = 0; i < means.length; ++i) {
+                means[i] += event.values[i];
+            }
+        }
+        for(int i = 0; i < means.length; ++i) {
+            means[i] /= events.length;
+        }
+    }
+
     public static <TValue extends Number> double getMean(Collection<TValue> collection) {
         validateCollection(collection);
 
@@ -94,9 +113,7 @@ public class SensorCtsHelper {
      * @param jitterValues The Collection that will contain the computed jitter values.
      * @return The mean of the jitter Values.
      */
-    public static double getJitterMean(
-            TestSensorManager.SensorEventForTest events[],
-            Collection<Double> jitterValues) {
+    public static double getJitterMean(TestSensorEvent events[], Collection<Double> jitterValues) {
         ArrayList<Long> timestampDelayValues = new ArrayList<Long>();
         double averageTimestampDelay = SensorCtsHelper.getAverageTimestampDelayWithValues(events,
                 timestampDelayValues);
@@ -116,7 +133,7 @@ public class SensorCtsHelper {
      * @return The mean of the frequency values.
      */
     public static double getAverageTimestampDelayWithValues(
-            TestSensorManager.SensorEventForTest events[],
+            TestSensorEvent events[],
             Collection<Long> timestampDelayValues) {
         for(int i = 1; i < events.length; ++i) {
             long previousTimestamp = events[i-1].timestamp;
@@ -133,9 +150,14 @@ public class SensorCtsHelper {
     }
 
     /**
-     * NOTE: The bug report is usually written to /sdcard/Downloads
+     * NOTE:
+     * - The bug report is usually written to /sdcard/Downloads
+     * - In order for the test Instrumentation to gather useful data the following permissions are
+     *   required:
+     *      . android.permission.READ_LOGS
+     *      . android.permission.DUMP
      */
-    public static void collectBugreport(String collectorId)
+    public static String collectBugreport(String collectorId)
             throws IOException, InterruptedException {
         String commands[] = new String[] {
                 "dumpstate",
@@ -147,8 +169,8 @@ public class SensorCtsHelper {
         SimpleDateFormat dateFormat = new SimpleDateFormat("M-d-y_H:m:s.S");
         String outputFile = String.format(
                 "%s/%s_%s",
-                collectorId,
                 Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS),
+                collectorId,
                 dateFormat.format(new Date()));
 
         DataOutputStream processOutput = null;
@@ -171,19 +193,61 @@ public class SensorCtsHelper {
                 } catch(IOException e) {}
             }
         }
+
+        return outputFile;
     }
 
-    public static void performOperationInThreads(int numberOfThreadsToUse, Runnable operation)
-            throws InterruptedException {
-        ArrayList<Thread> threads = new ArrayList<Thread>();
-        for(int i = 0; i < numberOfThreadsToUse; ++i) {
-            threads.add(new Thread(operation));
+    public static Sensor getSensor(Context context, int sensorType) {
+        SensorManager sensorManager = (SensorManager)context.getSystemService(
+                Context.SENSOR_SERVICE);
+        if(sensorManager == null) {
+            throw new IllegalStateException("SensorService is not present in the system.");
         }
+        Sensor sensor = sensorManager.getDefaultSensor(sensorType);
+        if(sensor == null) {
+            throw new SensorNotSupportedException(sensorType);
+        }
+        return sensor;
+    }
 
-        while(!threads.isEmpty()) {
-            Thread thread = threads.remove(0);
-            thread.join();
+    public static <TReference extends Number> double getFrequencyInHz(TReference samplingRateInUs) {
+        return 1000000000 / samplingRateInUs.doubleValue();
+    }
+
+    public static String formatAssertionMessage(
+            String verificationName,
+            Sensor sensor,
+            String format,
+            Object ... params) {
+        return formatAssertionMessage(verificationName, null, sensor, format, params);
+    }
+
+    public static String formatAssertionMessage(
+            String verificationName,
+            SensorTestOperation test,
+            Sensor sensor,
+            String format,
+            Object ... params) {
+        StringBuilder builder = new StringBuilder();
+
+        // identify the verification
+        builder.append(verificationName);
+        builder.append("| ");
+        // add test context information
+        if(test != null) {
+            builder.append(test.toString());
+            builder.append("| ");
         }
+        // add context information
+        builder.append(
+                SensorTestInformation.getSensorName(sensor.getType()));
+        builder.append(", handle:");
+        builder.append(sensor.getHandle());
+        builder.append("| ");
+        // add the custom formatting
+        builder.append(String.format(format, params));
+
+        return builder.toString();
     }
 
     /**
@@ -195,7 +259,3 @@ public class SensorCtsHelper {
         }
     }
 }
-
-
-
-

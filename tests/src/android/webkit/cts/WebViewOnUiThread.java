@@ -24,6 +24,7 @@ import android.os.Bundle;
 import android.os.Looper;
 import android.os.Message;
 import android.os.SystemClock;
+import android.print.PrintDocumentAdapter;
 import android.test.InstrumentationTestCase;
 import android.util.DisplayMetrics;
 import android.view.View;
@@ -680,6 +681,15 @@ public class WebViewOnUiThread {
             @Override
             public void run() {
                 mWebView.evaluateJavascript(script, result);
+            }
+        });
+    }
+
+    public PrintDocumentAdapter createPrintDocumentAdapter() {
+        return getValue(new ValueGetter<PrintDocumentAdapter>() {
+            @Override
+            public PrintDocumentAdapter capture() {
+                return mWebView.createPrintDocumentAdapter();
             }
         });
     }

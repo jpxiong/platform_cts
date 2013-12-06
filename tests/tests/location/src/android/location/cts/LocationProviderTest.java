@@ -38,6 +38,8 @@ public class LocationProviderTest extends AndroidTestCase {
 
     @Override
     protected void tearDown() throws Exception {
+        // Work around b/11446702 by clearing the test provider before removing it
+        mLocationManager.clearTestProviderLocation(PROVIDER_NAME);
         mLocationManager.removeTestProvider(PROVIDER_NAME);
         super.tearDown();
     }

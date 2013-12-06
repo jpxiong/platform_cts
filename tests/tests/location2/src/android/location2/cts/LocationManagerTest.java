@@ -91,10 +91,17 @@ public class LocationManagerTest extends InstrumentationTestCase {
         try {
             mManager.getProvider(providerName);
             fail("LocationManager.getProvider() did not throw SecurityException as expected");
-        } catch (SecurityException e) {
-            // expected
+        } catch (SecurityException expected) {
+        } finally {
+            removeTestProvider(providerName);
         }
+    }
 
+    /**
+     * Work around b/11446702 by clearing the test provider before removing it
+     */
+    private void removeTestProvider(String providerName) {
+        mManager.clearTestProviderEnabled(providerName);
         mManager.removeTestProvider(providerName);
     }
 
@@ -107,9 +114,12 @@ public class LocationManagerTest extends InstrumentationTestCase {
     }
 
     public void doTestGetCoarseProvider_allowed(String providerName) {
-        addTestProvider(providerName, Criteria.ACCURACY_COARSE, true, false, true);
-        assertNotNull(mManager.getProvider(providerName));
-        mManager.removeTestProvider(providerName);
+        try {
+            addTestProvider(providerName, Criteria.ACCURACY_COARSE, true, false, true);
+            assertNotNull(mManager.getProvider(providerName));
+        } finally {
+            removeTestProvider(providerName);
+        }
     }
 
     public void testGetNetworkProviderLocationUpdates_withIntent() {
@@ -130,45 +140,53 @@ public class LocationManagerTest extends InstrumentationTestCase {
 
 
     private void doTestGetLocationUpdates_withIntent(String providerName) {
-        addTestProvider(providerName, Criteria.ACCURACY_COARSE, true, false, true);
-        registerIntentReceiver();
+        try {
+            addTestProvider(providerName, Criteria.ACCURACY_COARSE, true, false, true);
+            registerIntentReceiver();
 
-        mManager.requestLocationUpdates(providerName, 0, 0, mPendingIntent);
-        updateLocation(providerName, LAT, LNG);
-        waitForReceiveBroadcast();
+            mManager.requestLocationUpdates(providerName, 0, 0, mPendingIntent);
+            updateLocation(providerName, LAT, LNG);
+            waitForReceiveBroadcast();
 
-        assertNotNull(mIntentReceiver.getLastReceivedIntent());
-        final Location location = mManager.getLastKnownLocation(providerName);
-        assertEquals(providerName, location.getProvider());
+            assertNotNull(mIntentReceiver.getLastReceivedIntent());
+            final Location location = mManager.getLastKnownLocation(providerName);
+            assertEquals(providerName, location.getProvider());
 
-        assertEquals(3000.0f, location.getAccuracy());
-        assertEquals(LAT, location.getLatitude(), FUDGER_DELTA);
-        assertEquals(LNG, location.getLongitude(), FUDGER_DELTA);
+            assertEquals(3000.0f, location.getAccuracy());
+            assertEquals(LAT, location.getLatitude(), FUDGER_DELTA);
+            assertEquals(LNG, location.getLongitude(), FUDGER_DELTA);
 
-        mManager.removeUpdates(mPendingIntent);
-        mManager.removeTestProvider(providerName);
+            mManager.removeUpdates(mPendingIntent);
+        } finally {
+            removeTestProvider(providerName);
+        }
     }
 
     private void doTestGetLocationUpdates_withListener(String providerName) {
-        addTestProvider(providerName, Criteria.ACCURACY_COARSE, true, false, true);
+        try {
+            addTestProvider(providerName, Criteria.ACCURACY_COARSE, true, false, true);
 
-        MockLocationListener listener = new MockLocationListener();
-        HandlerThread handlerThread = new HandlerThread("testLocationUpdates for " + providerName);
-        handlerThread.start();
+            MockLocationListener listener = new MockLocationListener();
+            HandlerThread handlerThread = new HandlerThread("testLocationUpdates for "
+                    + providerName);
+            handlerThread.start();
 
-        mManager.requestLocationUpdates(providerName, 0, 0, listener, handlerThread.getLooper());
-        updateLocation(providerName, LAT, LNG);
+            mManager.requestLocationUpdates(
+                    providerName, 0, 0, listener, handlerThread.getLooper());
+            updateLocation(providerName, LAT, LNG);
 
-        assertTrue(listener.hasCalledOnLocationChanged(TEST_TIME_OUT_MS));
-        Location location = listener.getLocation();
-        assertEquals(providerName, location.getProvider());
+            assertTrue(listener.hasCalledOnLocationChanged(TEST_TIME_OUT_MS));
+            Location location = listener.getLocation();
+            assertEquals(providerName, location.getProvider());
 
-        assertEquals(3000.0f, location.getAccuracy());
-        assertEquals(LAT, location.getLatitude(), FUDGER_DELTA);
-        assertEquals(LNG, location.getLongitude(), FUDGER_DELTA);
+            assertEquals(3000.0f, location.getAccuracy());
+            assertEquals(LAT, location.getLatitude(), FUDGER_DELTA);
+            assertEquals(LNG, location.getLongitude(), FUDGER_DELTA);
 
-        mManager.removeUpdates(listener);
-        mManager.removeTestProvider(providerName);
+            mManager.removeUpdates(listener);
+        } finally {
+            removeTestProvider(providerName);
+        }
     }
 
     /**
@@ -231,12 +249,11 @@ public class LocationManagerTest extends InstrumentationTestCase {
         try {
             mManager.sendExtraCommand(LocationManager.GPS_PROVIDER, "unknown", new Bundle());
             fail("Should have failed to send a command to the gps provider");
-        } catch (SecurityException e) {
-            // expected
+        } catch (SecurityException expected) {
+        } finally {
+            removeTestProvider(LocationManager.GPS_PROVIDER);
+            removeTestProvider(LocationManager.NETWORK_PROVIDER);
         }
-
-        mManager.removeTestProvider(LocationManager.GPS_PROVIDER);
-        mManager.removeTestProvider(LocationManager.NETWORK_PROVIDER);
     }
 
     private void registerIntentReceiver() {
