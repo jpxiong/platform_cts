@@ -331,6 +331,7 @@ public class SystemFeaturesTest extends InstrumentationTestCase {
         ConfigurationInfo configInfo = mActivityManager.getDeviceConfigurationInfo();
         if (configInfo.reqTouchScreen != Configuration.TOUCHSCREEN_NOTOUCH) {
             assertAvailable(PackageManager.FEATURE_TOUCHSCREEN);
+            assertAvailable(PackageManager.FEATURE_FAKETOUCH);
         } else {
             assertNotAvailable(PackageManager.FEATURE_TOUCHSCREEN);
         }
