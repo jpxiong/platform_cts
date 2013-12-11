@@ -16,9 +16,13 @@
 
 package android.media.cts;
 
+import com.android.cts.media.R;
+
+import android.content.res.AssetFileDescriptor;
 import android.media.MediaCodec;
 import android.media.MediaCodecInfo;
 import android.media.MediaCodecList;
+import android.media.MediaExtractor;
 import android.media.MediaFormat;
 import android.media.MediaCodecInfo.CodecCapabilities;
 import android.media.MediaCodecInfo.CodecProfileLevel;
@@ -27,13 +31,19 @@ import android.test.AndroidTestCase;
 import android.util.Log;
 import android.view.Surface;
 
+import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 
 /**
  * General MediaCodec tests.
  *
  * In particular, check various API edge cases.
+ *
+ * <p>The file in res/raw used by testDecodeShortInput are (c) copyright 2008,
+ * Blender Foundation / www.bigbuckbunny.org, and are licensed under the Creative Commons
+ * Attribution 3.0 License at http://creativecommons.org/licenses/by/3.0/us/.
  */
 public class MediaCodecTest extends AndroidTestCase {
     private static final String TAG = "MediaCodecTest";
@@ -235,6 +245,112 @@ public class MediaCodecTest extends AndroidTestCase {
             }
             if (surface != null) {
                 surface.release();
+            }
+        }
+    }
+
+    /**
+     * Tests whether decoding a short group-of-pictures succeeds. The test queues a few video frames
+     * then signals end-of-stream. The test fails if the decoder doesn't output the queued frames.
+     */
+    public void testDecodeShortInput() throws InterruptedException {
+        // Input buffers from this input video are queued up to and including the video frame with
+        // timestamp LAST_BUFFER_TIMESTAMP_US.
+        final int INPUT_RESOURCE_ID =
+                R.raw.video_480x360_mp4_h264_1350kbps_30fps_aac_stereo_192kbps_44100hz;
+        final long LAST_BUFFER_TIMESTAMP_US = 166666;
+
+        // The test should fail if the decoder never produces output frames for the truncated input.
+        // Time out decoding, as we have no way to query whether the decoder will produce output.
+        final int DECODING_TIMEOUT_MS = 2000;
+
+        final AtomicBoolean completed = new AtomicBoolean();
+        Thread videoDecodingThread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                completed.set(runDecodeShortInput(INPUT_RESOURCE_ID, LAST_BUFFER_TIMESTAMP_US));
+            }
+        });
+        videoDecodingThread.start();
+        videoDecodingThread.join(DECODING_TIMEOUT_MS);
+        if (!completed.get()) {
+            throw new RuntimeException("timed out decoding to end-of-stream");
+        }
+    }
+
+    private boolean runDecodeShortInput(int inputResourceId, long lastBufferTimestampUs) {
+        final int NO_BUFFER_INDEX = -1;
+
+        OutputSurface outputSurface = null;
+        MediaExtractor mediaExtractor = null;
+        MediaCodec mediaCodec = null;
+        try {
+            outputSurface = new OutputSurface(1, 1);
+            mediaExtractor = getMediaExtractorForMimeType(inputResourceId, "video/");
+            MediaFormat mediaFormat =
+                    mediaExtractor.getTrackFormat(mediaExtractor.getSampleTrackIndex());
+            mediaCodec =
+                    MediaCodec.createDecoderByType(mediaFormat.getString(MediaFormat.KEY_MIME));
+            mediaCodec.configure(mediaFormat, outputSurface.getSurface(), null, 0);
+            mediaCodec.start();
+            boolean eos = false;
+            boolean signaledEos = false;
+            MediaCodec.BufferInfo outputBufferInfo = new MediaCodec.BufferInfo();
+            int outputBufferIndex = NO_BUFFER_INDEX;
+            while (!eos && !Thread.interrupted()) {
+                // Try to feed more data into the codec.
+                if (mediaExtractor.getSampleTrackIndex() != -1 && !signaledEos) {
+                    int bufferIndex = mediaCodec.dequeueInputBuffer(0);
+                    if (bufferIndex != NO_BUFFER_INDEX) {
+                        ByteBuffer buffer = mediaCodec.getInputBuffers()[bufferIndex];
+                        int size = mediaExtractor.readSampleData(buffer, 0);
+                        long timestampUs = mediaExtractor.getSampleTime();
+                        mediaExtractor.advance();
+                        signaledEos = mediaExtractor.getSampleTrackIndex() == -1
+                                || timestampUs == lastBufferTimestampUs;
+                        mediaCodec.queueInputBuffer(bufferIndex,
+                                0,
+                                size,
+                                timestampUs,
+                                signaledEos ? MediaCodec.BUFFER_FLAG_END_OF_STREAM : 0);
+                    }
+                }
+
+                // If we don't have an output buffer, try to get one now.
+                if (outputBufferIndex == NO_BUFFER_INDEX) {
+                    outputBufferIndex = mediaCodec.dequeueOutputBuffer(outputBufferInfo, 0);
+                }
+
+                if (outputBufferIndex == MediaCodec.INFO_OUTPUT_BUFFERS_CHANGED
+                        || outputBufferIndex == MediaCodec.INFO_OUTPUT_FORMAT_CHANGED
+                        || outputBufferIndex == MediaCodec.INFO_TRY_AGAIN_LATER) {
+                    outputBufferIndex = NO_BUFFER_INDEX;
+                } else if (outputBufferIndex != NO_BUFFER_INDEX) {
+                    eos = (outputBufferInfo.flags & MediaCodec.BUFFER_FLAG_END_OF_STREAM) != 0;
+
+                    boolean render = outputBufferInfo.size > 0;
+                    mediaCodec.releaseOutputBuffer(outputBufferIndex, render);
+                    if (render) {
+                        outputSurface.awaitNewImage();
+                    }
+
+                    outputBufferIndex = NO_BUFFER_INDEX;
+                }
+            }
+
+            return eos;
+        } catch (IOException e) {
+            throw new RuntimeException("error reading input resource", e);
+        } finally {
+            if (mediaCodec != null) {
+                mediaCodec.stop();
+                mediaCodec.release();
+            }
+            if (mediaExtractor != null) {
+                mediaExtractor.release();
+            }
+            if (outputSurface != null) {
+                outputSurface.release();
             }
         }
     }
@@ -504,5 +620,30 @@ public class MediaCodecTest extends AndroidTestCase {
         }
         fail("couldn't find a good color format for " + codecInfo.getName() + " / " + MIME_TYPE);
         return 0;   // not reached
+    }
+
+    private MediaExtractor getMediaExtractorForMimeType(int resourceId, String mimeTypePrefix)
+            throws IOException {
+        MediaExtractor mediaExtractor = new MediaExtractor();
+        AssetFileDescriptor afd = mContext.getResources().openRawResourceFd(resourceId);
+        try {
+            mediaExtractor.setDataSource(
+                    afd.getFileDescriptor(), afd.getStartOffset(), afd.getLength());
+        } finally {
+            afd.close();
+        }
+        int trackIndex;
+        for (trackIndex = 0; trackIndex < mediaExtractor.getTrackCount(); trackIndex++) {
+            MediaFormat trackMediaFormat = mediaExtractor.getTrackFormat(trackIndex);
+            if (trackMediaFormat.getString(MediaFormat.KEY_MIME).startsWith(mimeTypePrefix)) {
+                mediaExtractor.selectTrack(trackIndex);
+                break;
+            }
+        }
+        if (trackIndex == mediaExtractor.getTrackCount()) {
+            throw new IllegalStateException("couldn't get a video track");
+        }
+
+        return mediaExtractor;
     }
 }
