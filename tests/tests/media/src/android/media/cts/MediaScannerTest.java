@@ -367,6 +367,120 @@ public class MediaScannerTest extends AndroidTestCase {
         assertTrue(new File(path2).delete());
     }
 
+    static class MediaScanEntry {
+        MediaScanEntry(int r, String[] t) {
+            this.res = r;
+            this.tags = t;
+        }
+        int res;
+        String[] tags;
+    }
+
+    MediaScanEntry encodingtestfiles[] = {
+            new MediaScanEntry(R.raw.gb18030_1,
+                    new String[] {"罗志祥", "2009年11月新歌", "罗志祥", "爱不单行(TV Version)", null} ),
+            new MediaScanEntry(R.raw.gb18030_2,
+                    new String[] {"张杰", "明天过后", null, "明天过后", null} ),
+            new MediaScanEntry(R.raw.gb18030_3,
+                    new String[] {"电视原声带", "格斗天王(限量精装版)(预购版)", null, "11.Open Arms.( cn808.net )", null} ),
+            new MediaScanEntry(R.raw.gb18030_4,
+                    new String[] {"莫扎特", "黄金古典", "柏林爱乐乐团", "第25号交响曲", "莫扎特"} ),
+            new MediaScanEntry(R.raw.gb18030_5,
+                    new String[] {"光良", "童话", "光良", "02.童话", "鍏夎壇"} ),
+            new MediaScanEntry(R.raw.gb18030_6,
+                    new String[] {"张韶涵", "潘朵拉", "張韶涵", "隐形的翅膀", "王雅君"} ),
+            new MediaScanEntry(R.raw.gb18030_7,
+                    new String[] {"五月天", "后青春期的诗", null, "突然好想你", null} ),
+            new MediaScanEntry(R.raw.gb18030_8,
+                    new String[] {"周杰伦", "Jay", null, "反方向的钟", null} ),
+            new MediaScanEntry(R.raw.big5_1,
+                    new String[] {"蘇永康", "So I Sing 08 Live", "蘇永康", "囍帖街", null} ),
+            new MediaScanEntry(R.raw.big5_2,
+                    new String[] {"蘇永康", "So I Sing 08 Live", "蘇永康", "從不喜歡孤單一個 - 蘇永康／吳雨霏", null} ),
+            new MediaScanEntry(R.raw.cp1251_v1,
+                    new String[] {"Екатерина Железнова", "Корабль игрушек", null, "Раз, два, три", null} ),
+            new MediaScanEntry(R.raw.cp1251_v1v2,
+                    new String[] {"Мельница", "Перевал", null, "Королевна", null} ),
+            new MediaScanEntry(R.raw.cp1251_3,
+                    new String[] {"Тату (tATu)", "200 По Встречной [Limited edi", null, "Я Сошла С Ума", null} ),
+            new MediaScanEntry(R.raw.cp1251_4,
+                    new String[] {"Александр Розенбаум", "Философия любви", null, "Разговор в гостинице (Как жить без веры)", "А.Розенбаум"} ),
+            new MediaScanEntry(R.raw.cp1251_5,
+                    new String[] {"Александр Розенбаум", "Философия любви", null, "Четвертиночка", "А.Розенбаум"} ),
+            new MediaScanEntry(R.raw.cp1251_6,
+                    new String[] {"Александр Розенбаум", "Философия ремесла", null, "Ну, вот...", "А.Розенбаум"} ),
+            new MediaScanEntry(R.raw.shiftjis1,
+                    new String[] {"", "", null, "中島敦「山月記」（第１回）", null} ),
+            new MediaScanEntry(R.raw.shiftjis2,
+                    new String[] {"音人", "SoundEffects", null, "ファンファーレ", null} ),
+            new MediaScanEntry(R.raw.shiftjis3,
+                    new String[] {"音人", "SoundEffects", null, "シンキングタイム", null} ),
+            new MediaScanEntry(R.raw.shiftjis4,
+                    new String[] {"音人", "SoundEffects", null, "出題", null} ),
+            new MediaScanEntry(R.raw.shiftjis5,
+                    new String[] {"音人", "SoundEffects", null, "時報", null} ),
+            new MediaScanEntry(R.raw.shiftjis6,
+                    new String[] {"音人", "SoundEffects", null, "正解", null} ),
+            new MediaScanEntry(R.raw.shiftjis7,
+                    new String[] {"音人", "SoundEffects", null, "残念", null} ),
+            new MediaScanEntry(R.raw.shiftjis8,
+                    new String[] {"音人", "SoundEffects", null, "間違い", null} ),
+            new MediaScanEntry(R.raw.iso88591_1,
+                    new String[] {"Mozart", "Best of Mozart", null, "Overtüre (Die Hochzeit des Figaro)", null} ),
+            new MediaScanEntry(R.raw.hebrew,
+                    new String[] {"אריק סיני", "", null, "לי ולך", null } ),
+            new MediaScanEntry(R.raw.hebrew2,
+                    new String[] {"הפרוייקט של עידן רייכל", "Untitled - 11-11-02 (9)", null, "בואי", null } )
+    };
+
+    public void testEncodingDetection() throws Exception {
+        for (int i = 0; i< encodingtestfiles.length; i++) {
+            MediaScanEntry entry = encodingtestfiles[i];
+            String path =  mFileDir + "/" + "encodingtest" + i + ".mp3";
+            writeFile(entry.res, path);
+        }
+
+        startMediaScanAndWait();
+
+        String columns[] = {
+                MediaStore.Audio.Media.ARTIST,
+                MediaStore.Audio.Media.ALBUM,
+                MediaStore.Audio.Media.ALBUM_ARTIST,
+                MediaStore.Audio.Media.TITLE,
+                MediaStore.Audio.Media.COMPOSER
+        };
+        ContentResolver res = mContext.getContentResolver();
+        for (int i = 0; i< encodingtestfiles.length; i++) {
+            MediaScanEntry entry = encodingtestfiles[i];
+            String path =  mFileDir + "/" + "encodingtest" + i + ".mp3";
+            Cursor c = res.query(MediaStore.Audio.Media.getContentUri("external"), columns,
+                    MediaStore.Audio.Media.DATA + "=?", new String[] {path}, null);
+            assertNotNull("null cursor", c);
+            assertEquals("wrong number or results", 1, c.getCount());
+            assertTrue("failed to move cursor", c.moveToFirst());
+
+            for (int j =0; j < 5; j++) {
+                String expected = entry.tags[j];
+                if ("".equals(expected)) {
+                    // empty entry in the table means an unset id3 tag that is filled in by
+                    // the media scanner, e.g. by using "<unknown>". Since this may be localized,
+                    // don't check it for any particular value.
+                    assertNotNull("unexpected null entry " + i + " field " + j + "(" + path + ")",
+                            c.getString(j));
+                } else {
+                    assertEquals("mismatch on entry " + i + " field " + j + "(" + path + ")",
+                            expected, c.getString(j));
+                }
+            }
+            // clean up
+            new File(path).delete();
+            res.delete(MediaStore.Audio.Media.getContentUri("external"),
+                    MediaStore.Audio.Media.DATA + "=?", new String[] {path});
+
+            c.close();
+        }
+    }
+
     private void startMediaScanAndWait() throws InterruptedException {
         ScannerNotificationReceiver finishedReceiver = new ScannerNotificationReceiver(
                 Intent.ACTION_MEDIA_SCANNER_FINISHED);
