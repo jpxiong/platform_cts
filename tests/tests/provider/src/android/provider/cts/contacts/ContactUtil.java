@@ -22,6 +22,9 @@ import android.content.ContentValues;
 import android.database.Cursor;
 import android.net.Uri;
 import android.provider.ContactsContract;
+import android.provider.ContactsContract.AggregationExceptions;
+
+import junit.framework.Assert;
 
 /**
  * Convenience methods for operating on the Contacts table.
@@ -71,4 +74,64 @@ public class ContactUtil {
         }
         return CommonDatabaseUtils.NOT_FOUND;
     }
+
+    /**
+     * Verifies that the number of object parameters is either zero or even, inserts them
+     * into a new ContentValues object as a set of name-value pairs, and returns the newly created
+     * ContentValues object. Throws an exception if the number of string parameters is odd, or a
+     * single null parameter was provided.
+     *
+     * @param namesAndValues Zero or even number of object parameters to convert into name-value
+     * pairs
+     *
+     * @return newly created ContentValues containing the provided name-value pairs
+     */
+    public static ContentValues newContentValues(Object... namesAndValues) {
+        // Checks that the number of provided parameters is zero or even.
+        Assert.assertEquals(0, namesAndValues.length % 2);
+        final ContentValues contentValues = new ContentValues();
+        for (int i = 0; i < namesAndValues.length - 1; i += 2) {
+            Assert.assertNotNull(namesAndValues[i]);
+            final String name = namesAndValues[i].toString();
+            final Object value = namesAndValues[i + 1];
+            if (value == null) {
+                contentValues.putNull(name);
+            } else if (value instanceof String) {
+                contentValues.put(name, (String) value);
+            } else if (value instanceof Integer) {
+                contentValues.put(name, (Integer) value);
+            } else if (value instanceof Long) {
+                contentValues.put(name, (Long) value);
+            } else {
+                Assert.fail("Unsupported value type: " + value.getClass().getSimpleName() + " for "
+                    + " name: " + name);
+            }
+        }
+        return contentValues;
+    }
+
+    /**
+     * Updates the content resolver with two given raw contact ids and an aggregation type to
+     * manually trigger the forced aggregation, splitting of two raw contacts or specify that
+     * the provider should automatically decide whether or not to aggregate the two raw contacts.
+     *
+     * @param resolver ContentResolver from a valid context
+     * @param type One of the following aggregation exception types:
+     * {@link AggregationExceptions#TYPE_AUTOMATIC},
+     * {@link AggregationExceptions#TYPE_KEEP_SEPARATE},
+     * {@link AggregationExceptions#TYPE_KEEP_TOGETHER}
+     * @param rawContactId1 Id of the first raw contact
+     * @param rawContactId2 Id of the second raw contact
+     */
+    public static void setAggregationException(ContentResolver resolver, int type,
+        long rawContactId1, long rawContactId2) {
+        ContentValues values = new ContentValues();
+        values.put(AggregationExceptions.RAW_CONTACT_ID1, rawContactId1);
+        values.put(AggregationExceptions.RAW_CONTACT_ID2, rawContactId2);
+        values.put(AggregationExceptions.TYPE, type);
+        // Actually set the aggregation exception in the contacts database, and check that a
+        // single row was updated.
+        Assert.assertEquals(1, resolver.update(AggregationExceptions.CONTENT_URI, values, null,
+                  null));
+  }
 }

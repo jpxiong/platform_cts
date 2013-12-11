@@ -16,7 +16,10 @@
 
 package android.provider.cts.contacts;
 
+import android.content.ContentValues;
 import android.database.Cursor;
+
+import junit.framework.Assert;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -65,6 +68,23 @@ public class CommonDatabaseUtils {
     public static void closeQuietly(Cursor cursor) {
         if (cursor != null) {
             cursor.close();
+        }
+    }
+
+    /**
+     * Verifies that the number of string parameters is either zero or even, and inserts them
+     * into the provided ContentValues object as a set of name-value pairs. Throws an exception if
+     * the number of string parameters is odd, or a single null parameter was provided.
+     *
+     * @param values ContentValues object to insert name-value pairs into
+     * @param extras Zero or even number of string parameters
+     */
+    public static void extrasVarArgsToValues(ContentValues values, String... extras) {
+        Assert.assertNotNull(extras);
+        // Check that the number of provided string parameters is even.
+        Assert.assertEquals(0, extras.length % 2);
+        for (int i = 0; i < extras.length; i += 2) {
+            values.put(extras[i], extras[i + 1]);
         }
     }
 }
