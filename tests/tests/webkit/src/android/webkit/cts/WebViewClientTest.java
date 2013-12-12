@@ -80,11 +80,12 @@ public class WebViewClientTest extends ActivityInstrumentationTestCase2<WebViewS
                 "<a href=\"" + TEST_URL + "\" id=\"link\">new page</a>" +
                 "</body></html>";
         mOnUiThread.loadDataAndWaitForCompletion(data, "text/html", null);
-        clickOnLinkUsingJs("link");
+        clickOnLinkUsingJs("link", mOnUiThread);
         assertEquals(TEST_URL, webViewClient.getLastShouldOverrideUrl());
     }
 
     // Verify shouldoverrideurlloading called on webview called via onCreateWindow
+    // TODO(sgurun) upstream this test to Aw.
     public void testShouldOverrideUrlLoadingOnCreateWindow() throws Exception {
         mWebServer = new CtsTestServer(getActivity());
         // WebViewClient for main window
@@ -95,12 +96,14 @@ public class WebViewClientTest extends ActivityInstrumentationTestCase2<WebViewS
         mOnUiThread.getSettings().setJavaScriptEnabled(true);
         mOnUiThread.getSettings().setJavaScriptCanOpenWindowsAutomatically(true);
         mOnUiThread.getSettings().setSupportMultipleWindows(true);
+
+        final WebView childWebView = mOnUiThread.createWebView();
+
         mOnUiThread.setWebChromeClient(new WebChromeClient() {
             @Override
             public boolean onCreateWindow(
                 WebView view, boolean isDialog, boolean isUserGesture, Message resultMsg) {
                 WebView.WebViewTransport transport = (WebView.WebViewTransport) resultMsg.obj;
-                WebView childWebView = new WebView(view.getContext());
                 childWebView.setWebViewClient(childWebViewClient);
                 childWebView.getSettings().setJavaScriptEnabled(true);
                 transport.setWebView(childWebView);
@@ -119,13 +122,27 @@ public class WebViewClientTest extends ActivityInstrumentationTestCase2<WebViewS
                 return childWebViewClient.hasOnPageFinishedCalled();
             }
         }.run();
-        assertEquals(mWebServer.getAssetUrl(TestHtmlConstants.HELLO_WORLD_URL),
+        assertEquals(mWebServer.getAssetUrl(TestHtmlConstants.PAGE_WITH_LINK_URL),
                 childWebViewClient.getLastShouldOverrideUrl());
+
+        // Now test a navigation within the page
+        WebViewOnUiThread childWebViewOnUiThread = new WebViewOnUiThread(this, childWebView);
+        final int childCallCount = childWebViewClient.getShouldOverrideUrlLoadingCallCount();
+        final int mainCallCount = mainWebViewClient.getShouldOverrideUrlLoadingCallCount();
+        clickOnLinkUsingJs("link", childWebViewOnUiThread);
+        new PollingCheck(TEST_TIMEOUT) {
+            @Override
+            protected boolean check() {
+                return childWebViewClient.getShouldOverrideUrlLoadingCallCount() > childCallCount;
+            }
+        }.run();
+        assertEquals(mainCallCount, mainWebViewClient.getShouldOverrideUrlLoadingCallCount());
+        assertEquals(TEST_URL, childWebViewClient.getLastShouldOverrideUrl());
     }
 
-    private void clickOnLinkUsingJs(final String linkId) {
+    private void clickOnLinkUsingJs(final String linkId, WebViewOnUiThread webViewOnUiThread) {
         EvaluateJsResultPollingCheck jsResult = new EvaluateJsResultPollingCheck("null");
-        mOnUiThread.evaluateJavascript(
+        webViewOnUiThread.evaluateJavascript(
                 "document.getElementById('" + linkId + "').click();" +
                 "console.log('element with id [" + linkId + "] clicked');", jsResult);
         jsResult.run();
@@ -287,6 +304,7 @@ public class WebViewClientTest extends ActivityInstrumentationTestCase2<WebViewS
         private boolean mOnReceivedHttpAuthRequestCalled;
         private boolean mOnUnhandledKeyEventCalled;
         private boolean mOnScaleChangedCalled;
+        private int mShouldOverrideUrlLoadingCallCount;
         private String mLastShouldOverrideUrl;
 
         public MockWebViewClient() {
@@ -327,6 +345,10 @@ public class WebViewClientTest extends ActivityInstrumentationTestCase2<WebViewS
 
         public boolean hasOnScaleChangedCalled() {
             return mOnScaleChangedCalled;
+        }
+
+        public int getShouldOverrideUrlLoadingCallCount() {
+            return mShouldOverrideUrlLoadingCallCount;
         }
 
         public String getLastShouldOverrideUrl() {
@@ -395,6 +417,7 @@ public class WebViewClientTest extends ActivityInstrumentationTestCase2<WebViewS
         @Override
         public boolean shouldOverrideUrlLoading(WebView view, String url) {
             mLastShouldOverrideUrl = url;
+            mShouldOverrideUrlLoadingCallCount++;
             return false;
         }
     }
