@@ -355,6 +355,86 @@ public class MediaCodecTest extends AndroidTestCase {
         }
     }
 
+    /**
+     * Tests creating two decoders for {@link #MIME_TYPE_AUDIO} at the same time.
+     */
+    public void testCreateTwoAudioDecoders() {
+        final MediaFormat format = MediaFormat.createAudioFormat(
+                MIME_TYPE_AUDIO, AUDIO_SAMPLE_RATE, AUDIO_CHANNEL_COUNT);
+
+        MediaCodec audioDecoderA = null;
+        MediaCodec audioDecoderB = null;
+        try {
+            audioDecoderA = MediaCodec.createDecoderByType(MIME_TYPE_AUDIO);
+            audioDecoderA.configure(format, null, null, 0);
+            audioDecoderA.start();
+
+            audioDecoderB = MediaCodec.createDecoderByType(MIME_TYPE_AUDIO);
+            audioDecoderB.configure(format, null, null, 0);
+            audioDecoderB.start();
+        } finally {
+            if (audioDecoderB != null) {
+                try {
+                    audioDecoderB.stop();
+                    audioDecoderB.release();
+                } catch (RuntimeException e) {
+                    Log.w(TAG, "exception stopping/releasing codec", e);
+                }
+            }
+
+            if (audioDecoderA != null) {
+                try {
+                    audioDecoderA.stop();
+                    audioDecoderA.release();
+                } catch (RuntimeException e) {
+                    Log.w(TAG, "exception stopping/releasing codec", e);
+                }
+            }
+        }
+    }
+
+    /**
+     * Tests creating an encoder and decoder for {@link #MIME_TYPE_AUDIO} at the same time.
+     */
+    public void testCreateAudioDecoderAndEncoder() {
+        final MediaFormat encoderFormat = MediaFormat.createAudioFormat(
+                MIME_TYPE_AUDIO, AUDIO_SAMPLE_RATE, AUDIO_CHANNEL_COUNT);
+        encoderFormat.setInteger(MediaFormat.KEY_AAC_PROFILE, AUDIO_AAC_PROFILE);
+        encoderFormat.setInteger(MediaFormat.KEY_BIT_RATE, AUDIO_BIT_RATE);
+        final MediaFormat decoderFormat = MediaFormat.createAudioFormat(
+                MIME_TYPE_AUDIO, AUDIO_SAMPLE_RATE, AUDIO_CHANNEL_COUNT);
+
+        MediaCodec audioEncoder = null;
+        MediaCodec audioDecoder = null;
+        try {
+            audioEncoder = MediaCodec.createEncoderByType(MIME_TYPE_AUDIO);
+            audioEncoder.configure(encoderFormat, null, null, MediaCodec.CONFIGURE_FLAG_ENCODE);
+            audioEncoder.start();
+
+            audioDecoder = MediaCodec.createDecoderByType(MIME_TYPE_AUDIO);
+            audioDecoder.configure(decoderFormat, null, null, 0);
+            audioDecoder.start();
+        } finally {
+            if (audioDecoder != null) {
+                try {
+                    audioDecoder.stop();
+                    audioDecoder.release();
+                } catch (RuntimeException e) {
+                    Log.w(TAG, "exception stopping/releasing codec", e);
+                }
+            }
+
+            if (audioEncoder != null) {
+                try {
+                    audioEncoder.stop();
+                    audioEncoder.release();
+                } catch (RuntimeException e) {
+                    Log.w(TAG, "exception stopping/releasing codec", e);
+                }
+            }
+        }
+    }
+
     public void testConcurrentAudioVideoEncodings() throws InterruptedException {
         final int VIDEO_NUM_SWAPS = 100;
         // audio only checks this and stop
