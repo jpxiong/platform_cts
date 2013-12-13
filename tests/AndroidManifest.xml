@@ -836,7 +836,8 @@
         <provider android:name="android.content.cts.MockRemoteContentProvider"
             android:authorities="remotectstest"
             android:process=":remoteprovider" android:multiprocess="false" />
-
+        <provider android:name="android.webkit.cts.MockContentProvider"
+                  android:authorities="android.webkit.cts.MockContentProvider" />
         <activity android:name="android.app.cts.ChildTabActivity" android:label="ChildTabActivity" />
 
         <activity android:name="android.app.cts.LauncherActivityStub"
