@@ -54,10 +54,13 @@ static void createTypedHelper (sp<RS> mRS, sp<const Element> e) {
 }
 
 extern "C" JNIEXPORT jboolean JNICALL Java_android_cts_rscpp_RSAllocationTest_typedTest(JNIEnv * env,
-                                                                               jclass obj)
+                                                                                        jclass obj,
+                                                                                        jstring pathObj)
 {
+    const char * path = env->GetStringUTFChars(pathObj, NULL);
     sp<RS> mRS = new RS();
-    mRS->init();
+    mRS->init(path);
+    env->ReleaseStringUTFChars(pathObj, path);
 
     createTypedHelper(mRS, Element::A_8(mRS));
     createTypedHelper(mRS, Element::RGBA_4444(mRS));
@@ -116,7 +119,6 @@ extern "C" JNIEXPORT jboolean JNICALL Java_android_cts_rscpp_RSAllocationTest_ty
     createTypedHelper(mRS, Element::ALLOCATION(mRS));
 
     mRS->finish();
-
     return true;
 }
 
@@ -310,11 +312,13 @@ static bool helperFloatAllocationCopy(sp<RS> mRS, int nElems, int offset, int co
 static int elemsToTest = 20;
 
 extern "C" JNIEXPORT jboolean JNICALL Java_android_cts_rscpp_RSAllocationTest_test1DCopy(JNIEnv * env,
-                                                                               jclass obj)
+                                                                                         jclass obj,
+                                                                                         jstring pathObj)
 {
+    const char * path = env->GetStringUTFChars(pathObj, NULL);
     sp<RS> mRS = new RS();
-    mRS->init();
-
+    mRS->init(path);
+    env->ReleaseStringUTFChars(pathObj, path);
     bool passed = true;
 
     for (int s = 8; s <= elemsToTest; s += 2) {
@@ -346,15 +350,17 @@ extern "C" JNIEXPORT jboolean JNICALL Java_android_cts_rscpp_RSAllocationTest_te
             }
         }
     }
-
     return passed;
 }
 
 extern "C" JNIEXPORT jboolean JNICALL Java_android_cts_rscpp_RSAllocationTest_testSetElementAt(JNIEnv * env,
-                                                                                               jclass obj)
+                                                                                               jclass obj,
+                                                                                               jstring pathObj)
 {
+    const char * path = env->GetStringUTFChars(pathObj, NULL);
     sp<RS> mRS = new RS();
-    mRS->init();
+    mRS->init(path);
+    env->ReleaseStringUTFChars(pathObj, path);
 
     bool passed = true;
 
