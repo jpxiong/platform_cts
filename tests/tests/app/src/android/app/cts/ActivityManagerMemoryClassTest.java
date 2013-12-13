@@ -90,8 +90,16 @@ public class ActivityManagerMemoryClassTest
                 expectedMinimumMemory = isXLarge ? 128 : 64;
                 break;
 
+            case DisplayMetrics.DENSITY_400:
+                expectedMinimumMemory = isXLarge ? 192 : 128;
+                break;
+
             case DisplayMetrics.DENSITY_XXHIGH:
                 expectedMinimumMemory = isXLarge ? 256 : 128;
+                break;
+
+            case DisplayMetrics.DENSITY_XXXHIGH:
+                expectedMinimumMemory = isXLarge ? 512 : 256;
                 break;
 
             default:
