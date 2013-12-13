@@ -17,9 +17,7 @@
 package android.content.cts;
 
 import com.android.internal.app.ResolverActivity;
-import com.android.internal.util.Objects;
 import com.android.internal.util.XmlUtils;
-
 
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
