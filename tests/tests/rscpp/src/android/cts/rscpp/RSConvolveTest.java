@@ -33,7 +33,7 @@ public class RSConvolveTest extends RSCppTest {
     private final int X = 1024;
     private final int Y = 1024;
 
-    native boolean convolveTest(int X, int Y, byte[] input, byte[] output, float[] coeffs, boolean is3x3);
+    native boolean convolveTest(String path, int X, int Y, byte[] input, byte[] output, float[] coeffs, boolean is3x3);
     public void testConvolve3x3() {
         int[] baseAlloc = new int[X * Y];
         float[] coeffs = new float[9];
@@ -66,7 +66,7 @@ public class RSConvolveTest extends RSCppTest {
         convolve.forEach(rsOutput);
 
         byte[] nativeByteAlloc = new byte[X * Y];
-        convolveTest(X, Y, byteAlloc, nativeByteAlloc, coeffs, true);
+        convolveTest(this.getContext().getCacheDir().toString(), X, Y, byteAlloc, nativeByteAlloc, coeffs, true);
         rsOutput.copyTo(byteAlloc);
 
         for (int i = 0; i < X * Y; i++) {
@@ -124,7 +124,7 @@ public class RSConvolveTest extends RSCppTest {
         convolve.forEach(rsOutput);
 
         byte[] nativeByteAlloc = new byte[X * Y];
-        convolveTest(X, Y, byteAlloc, nativeByteAlloc, coeffs, false);
+        convolveTest(this.getContext().getCacheDir().toString(), X, Y, byteAlloc, nativeByteAlloc, coeffs, false);
         rsOutput.copyTo(byteAlloc);
 
         for (int i = 0; i < X * Y; i++) {

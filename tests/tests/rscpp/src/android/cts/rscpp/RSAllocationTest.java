@@ -29,19 +29,19 @@ public class RSAllocationTest extends RSCppTest {
         System.loadLibrary("rscpptest_jni");
     }
 
-    native boolean typedTest();
+    native boolean typedTest(String path);
     public void testRSAllocationTypes() {
-        assertTrue(typedTest());
+        assertTrue(typedTest(this.getContext().getCacheDir().toString()));
     }
 
-    native boolean test1DCopy();
+    native boolean test1DCopy(String path);
     public void testRSAllocationCopy() {
-        assertTrue(test1DCopy());
+        assertTrue(test1DCopy(this.getContext().getCacheDir().toString()));
     }
 
-    native boolean testSetElementAt();
+    native boolean testSetElementAt(String path);
     public void testRSAllocationSetElementAt() {
-        assertTrue(testSetElementAt());
+        assertTrue(testSetElementAt(this.getContext().getCacheDir().toString()));
     }
 
 

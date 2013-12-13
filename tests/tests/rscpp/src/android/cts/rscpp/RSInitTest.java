@@ -29,13 +29,13 @@ public class RSInitTest extends RSCppTest {
         System.loadLibrary("rscpptest_jni");
     }
 
-    native boolean initTest();
+    native boolean initTest(String path);
     public void testRSInit() {
         for (int i = 0; i < 1000; i++) {
             RenderScript mRS = RenderScript.create(getContext());
             mRS.destroy();
             Log.d("rscpptest", "Java iteration " + i);
         }
-        assertTrue(initTest());
+        assertTrue(initTest(this.getContext().getCacheDir().toString()));
     }
 }
