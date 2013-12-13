@@ -33,7 +33,7 @@ public class RSBlurTest extends RSCppTest {
     private final int X = 1024;
     private final int Y = 1024;
 
-    native boolean blurTest(int X, int Y, byte[] input, byte[] output, boolean singleChannel);
+    native boolean blurTest(String path, int X, int Y, byte[] input, byte[] output, boolean singleChannel);
     public void testRSBlurOneChannel() {
         int[] baseAlloc = new int[X * Y];
         RSUtils.genRandom(0x1DEFF, 255, 1, -128, baseAlloc);
@@ -55,7 +55,7 @@ public class RSBlurTest extends RSCppTest {
         blur.forEach(rsOutput);
 
         byte[] nativeByteAlloc = new byte[X * Y];
-        blurTest(X, Y, byteAlloc, nativeByteAlloc, true);
+        blurTest(this.getContext().getCacheDir().toString(), X, Y, byteAlloc, nativeByteAlloc, true);
         rsOutput.copyTo(byteAlloc);
 
         for (int i = 0; i < X * Y; i++) {
@@ -86,7 +86,7 @@ public class RSBlurTest extends RSCppTest {
         blur.forEach(rsOutput);
 
         byte[] nativeByteAlloc = new byte[X * Y * 4];
-        blurTest(X, Y, byteAlloc, nativeByteAlloc, false);
+        blurTest(this.getContext().getCacheDir().toString(), X, Y, byteAlloc, nativeByteAlloc, false);
         rsOutput.copyTo(byteAlloc);
 
         for (int i = 0; i < X * Y * 4; i++) {
