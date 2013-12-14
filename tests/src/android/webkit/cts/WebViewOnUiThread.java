@@ -685,6 +685,15 @@ public class WebViewOnUiThread {
         });
     }
 
+    public WebView createWebView() {
+        return getValue(new ValueGetter<WebView>() {
+            @Override
+            public WebView capture() {
+                return new WebView(mWebView.getContext());
+            }
+        });
+    }
+
     public PrintDocumentAdapter createPrintDocumentAdapter() {
         return getValue(new ValueGetter<PrintDocumentAdapter>() {
             @Override

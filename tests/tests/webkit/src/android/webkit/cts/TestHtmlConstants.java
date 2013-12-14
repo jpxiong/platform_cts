@@ -65,6 +65,7 @@ public class TestHtmlConstants {
     public static final String DATABASE_ACCESS_URL = "webkit/test_databaseaccess.html";
     public static final String STOP_LOADING_URL = "webkit/test_stop_loading.html";
     public static final String BLANK_TAG_URL = "webkit/blank_tag.html";
+    public static final String PAGE_WITH_LINK_URL = "webkit/page_with_link.html";
 
     // Must match the title of the page at
     // android/frameworks/base/core/res/res/raw/loaderror.html
