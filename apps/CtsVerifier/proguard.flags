@@ -6,5 +6,7 @@
     private <fields>;
 }
 
+-keepclasseswithmembers class * extends com.android.cts.verifier.location.LocationModeTestActivity
+
 -dontwarn android.hardware.Sensor
 -dontwarn java.util.concurrent.ConcurrentLinkedDeque
