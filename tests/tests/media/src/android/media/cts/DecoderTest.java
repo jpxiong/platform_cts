@@ -365,8 +365,9 @@ public class DecoderTest extends MediaPlayerTestBase {
                     decoded = Arrays.copyOf(decoded, decodedIdx + (info.size / 2));
                 }
 
+                buf.position(info.offset);
                 for (int i = 0; i < info.size; i += 2) {
-                    decoded[decodedIdx++] = buf.getShort(i);
+                    decoded[decodedIdx++] = buf.getShort();
                 }
 
                 codec.releaseOutputBuffer(outputBufIndex, false /* render */);
@@ -941,7 +942,9 @@ public class DecoderTest extends MediaPlayerTestBase {
                             // TODO: add stride - right now just use info.size (as before)
                             //sum = checksum(codecOutputBuffers[outputBufIndex], width, height,
                             //        stride);
-                            sum = checksum(codecOutputBuffers[outputBufIndex], info.size);
+                            ByteBuffer outputBuffer = codecOutputBuffers[outputBufIndex];
+                            outputBuffer.position(info.offset);
+                            sum = checksum(outputBuffer, info.size);
                         }
                         if ((checkFlags & CHECKFLAG_COMPARECHECKSUM) != 0) {
                             assertTrue("number of frames (" + numframes
@@ -1071,10 +1074,9 @@ public class DecoderTest extends MediaPlayerTestBase {
                 size > 0 && size <= cap);
         CRC32 crc = new CRC32();
         if (buf.hasArray()) {
-            crc.update(buf.array(), buf.arrayOffset(), size);
+            crc.update(buf.array(), buf.position() + buf.arrayOffset(), size);
         } else {
             int pos = buf.position();
-            buf.rewind();
             final int rdsize = Math.min(4096, size);
             byte bb[] = new byte[rdsize];
             int chk;
@@ -1216,8 +1218,9 @@ public class DecoderTest extends MediaPlayerTestBase {
                 int outputBufIndex = res;
                 ByteBuffer buf = codecOutputBuffers[outputBufIndex];
 
+                buf.position(info.offset);
                 for (int i = 0; i < info.size; i += 2) {
-                    short sample = buf.getShort(i);
+                    short sample = buf.getShort();
                     if (maxvalue < sample) {
                         maxvalue = sample;
                     }
