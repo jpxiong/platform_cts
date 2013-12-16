@@ -477,16 +477,15 @@ public class AndroidKeyPairGeneratorTest extends AndroidTestCase {
             final X509Certificate x509userCert) throws Exception {
         // TODO this should probably be in something like:
         // TestKeyStore.createForClientSelfSigned(...)
-        String provider = SSLContext.getDefault().getProvider().getName();
         TrustManager[] clientTrustManagers = TestKeyStore.createTrustManagers(
                 TestKeyStore.getIntermediateCa().keyStore);
-        SSLContext clientContext = TestSSLContext.createSSLContext("TLS", provider,
+        SSLContext clientContext = TestSSLContext.createSSLContext("TLS",
                 new KeyManager[] {
                     TestKeyManager.wrap(new MyKeyManager(privKey, x509userCert))
                 }, clientTrustManagers);
         TestKeyStore serverKeyStore = TestKeyStore.getServer();
         serverKeyStore.keyStore.setCertificateEntry("client-selfSigned", x509userCert);
-        SSLContext serverContext = TestSSLContext.createSSLContext("TLS", provider,
+        SSLContext serverContext = TestSSLContext.createSSLContext("TLS",
                 serverKeyStore.keyManagers,
                 TestKeyStore.createTrustManagers(serverKeyStore.keyStore));
         SSLServerSocket serverSocket = (SSLServerSocket) serverContext.getServerSocketFactory()
