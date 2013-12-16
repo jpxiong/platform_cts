@@ -30,6 +30,7 @@
     <string name="test_category_hardware">Hardware</string>
     <string name="test_category_networking">Networking</string>
     <string name="test_category_sensors">Sensors</string>
+    <string name="test_category_location">Location</string>
     <string name="test_category_security">Security</string>
     <string name="test_category_streaming">Streaming</string>
     <string name="test_category_features">Features</string>
@@ -716,6 +717,36 @@
     <string name="nls_clear_all">Check that service can clear all notifications.</string>
     <string name="nls_service_stopped">Service should stop once disabled.</string>
     <string name="nls_note_missed">Check that notification was not received.</string>
+
+    <string name="location_mode_high_accuracy_test">High Accuracy Mode Test</string>
+    <string name="location_mode_high_accuracy_info">
+        This test checks that the Location Mode API is consistent with the
+        Location Provider API when the device is in High Accuracy location mode.
+    </string>
+    <string name="location_mode_select_high_accuracy">
+        Please select the \"High accuracy\" mode at Settings > Location and return here.
+    </string>
+    <string name="location_mode_battery_saving_test">Battery Saving Mode Test</string>
+    <string name="location_mode_battery_saving_info">
+        This test checks that the Location Mode API is consistent with the
+        Location Provider API when the device is in Battery Saving location mode.
+    </string>
+    <string name="location_mode_select_battery_saving">
+        Please select the \"Battery Saving\" mode at Settings > Location and return here.
+    </string>
+
+    <string name="location_mode_start_settings">Launch Settings</string>
+    <string name="location_mode_turn_on">
+        Please turn ON the switch at the top of Settings > Location and return here.
+    </string>
+    <string name="location_mode_secure_gps_on">GPS provider should be ON in secure settings.</string>
+    <string name="location_mode_secure_gps_off">GPS provider should be OFF in secure settings.</string>
+    <string name="location_mode_secure_nlp_on">Network location provider should be ON in secure settings.</string>
+    <string name="location_mode_secure_nlp_off">Network location provider should be OFF in secure settings.</string>
+    <string name="location_mode_manager_gps_on">GPS provider should be ON in LocationManager.</string>
+    <string name="location_mode_manager_gps_off">GPS provider should be OFF in LocationManager.</string>
+    <string name="location_mode_manager_nlp_on">Network location provider should be ON in LocationManager.</string>
+    <string name="location_mode_manager_nlp_off">Network location provider should be OFF in LocationManager.</string>
 
     <string name="cacert_test">CA Cert Notification Test</string>
     <string name="cacert_info">This test checks that when a CA Certificate is installed, the user is notified.</string>
