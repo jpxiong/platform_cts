@@ -36,6 +36,10 @@ import com.android.cts.verifier.R;
  * {@link Secure#isLocationProviderEnabled(ContentResolver, String)} and {@link
  * LocationManager#isProviderEnabled(String)} have the expected values for GPS and Wi-Fi. For
  * example in battery saving mode, Wi-Fi should be on but GPS should be off.
+ *
+ * It would be hard to automate these tests because the {@link Secure#LOCATION_MODE} API is only
+ * accessible to apps in the system image. Furthermore, selecting two of the modes requires the user
+ * to accept the NLP confirmation dialog.
  */
 public abstract class LocationModeTestActivity
         extends PassFailButtons.Activity implements Runnable {

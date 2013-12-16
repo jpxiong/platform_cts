@@ -734,10 +734,29 @@
     <string name="location_mode_select_battery_saving">
         Please select the \"Battery Saving\" mode at Settings > Location and return here.
     </string>
+    <string name="location_mode_device_only_test">Device Only Mode Test</string>
+    <string name="location_mode_device_only_info">
+        This test checks that the Location Mode API is consistent with the
+        Location Provider API when the device is in Device Only location mode.
+    </string>
+    <string name="location_mode_select_device_only">
+        Please select the \"Device Only\" mode at
+        Settings > Location and return here.
+    </string>
+    <string name="location_mode_off_test">Location Mode Off Test</string>
+    <string name="location_mode_off_info">
+        This test checks that the Location Mode API is consistent with the
+        Location Provider API when the device is in the Off location mode.
+    </string>
 
     <string name="location_mode_start_settings">Launch Settings</string>
     <string name="location_mode_turn_on">
-        Please turn ON the switch at the top of Settings > Location and return here.
+        Please turn ON location access (the switch at the top of Settings > Location)
+        and return here.
+    </string>
+    <string name="location_mode_turn_off">
+        Please turn OFF location access (the switch at the top of Settings > Location)
+        and return here.
     </string>
     <string name="location_mode_secure_gps_on">GPS provider should be ON in secure settings.</string>
     <string name="location_mode_secure_gps_off">GPS provider should be OFF in secure settings.</string>
