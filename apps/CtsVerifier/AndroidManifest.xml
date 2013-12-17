@@ -580,6 +580,14 @@
                        android:value="android.hardware.sensor.compass" />
         </activity-->
 
+        <activity android:name=".location.LocationModeOffTestActivity"
+                android:label="@string/location_mode_off_test">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.cts.intent.category.MANUAL_TEST" />
+            </intent-filter>
+            <meta-data android:name="test_category" android:value="@string/test_category_location" />
+        </activity>
         <activity android:name=".location.LocationModeHighAccuracyTestActivity"
                 android:label="@string/location_mode_high_accuracy_test">
             <intent-filter>
@@ -590,6 +598,14 @@
         </activity>
         <activity android:name=".location.LocationModeBatterySavingTestActivity"
                 android:label="@string/location_mode_battery_saving_test">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.cts.intent.category.MANUAL_TEST" />
+            </intent-filter>
+            <meta-data android:name="test_category" android:value="@string/test_category_location" />
+        </activity>
+        <activity android:name=".location.LocationModeDeviceOnlyTestActivity"
+                android:label="@string/location_mode_device_only_test">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.cts.intent.category.MANUAL_TEST" />
