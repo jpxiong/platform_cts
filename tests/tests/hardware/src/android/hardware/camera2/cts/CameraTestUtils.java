@@ -343,4 +343,28 @@ class CameraTestUtils extends Assert {
             String cameraId, CameraManager cameraManager, Size bound) throws Exception {
         return getSupportedPreviewSizes(cameraId, cameraManager, bound);
     }
+
+    /**
+     * Get the largest size by area.
+     *
+     * @param sizes an array of sizes, must have at least 1 element
+     *
+     * @return Largest Size
+     *
+     * @throws IllegalArgumentException if sizes was null or had 0 elements
+     */
+    public static Size getMaxSize(Size[] sizes) {
+        if (sizes == null || sizes.length == 0) {
+            throw new IllegalArgumentException("sizes was empty");
+        }
+
+        Size sz = sizes[0];
+        for (Size size : sizes) {
+            if (size.getWidth() * size.getHeight() > sz.getWidth() * sz.getHeight()) {
+                sz = size;
+            }
+        }
+
+        return sz;
+    }
 }
