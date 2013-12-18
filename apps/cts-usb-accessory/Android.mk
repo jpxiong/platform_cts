@@ -26,7 +26,10 @@ LOCAL_SRC_FILES := cts-usb-accessory.c
 
 LOCAL_MODULE := cts-usb-accessory
 
-LOCAL_C_INCLUDES += bionic/libc/kernel/common
+LOCAL_C_INCLUDES += \
+	bionic/libc/kernel/uapi \
+	bionic/libc/kernel/uapi/asm-$(HOST_ARCH) \
+
 LOCAL_STATIC_LIBRARIES := libusbhost libcutils
 LOCAL_LDLIBS += -lpthread
 LOCAL_CFLAGS := -g -O0
