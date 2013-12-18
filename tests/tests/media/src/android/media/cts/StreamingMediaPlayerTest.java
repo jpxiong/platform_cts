@@ -110,10 +110,12 @@ public class StreamingMediaPlayerTest extends MediaPlayerTestBase {
     // Streaming HLS video from YouTube
     public void testHLS() throws Exception {
         // Play stream for 60 seconds
-        playLiveVideoTest("http://www.youtube.com/api/manifest/hls/ns/yt-live/id/UeHRu5LFHaU"
-                + "?ip=0.0.0.0&ipbits=0&expire=19000000000&sparams=ip,ipbits,expire&signature"
-                + "=313BE90526F2D815EB207156E1460C7E8EEC2503.799EE7B8B7CE3F2957060DB27C216077"
-                + "0303EBD2&key=test_key1&user=android-device-test&m3u8=1", 60 * 1000);
+        playLiveVideoTest("http://www.youtube.com/api/manifest/hls_variant/id/"
+                + "0168724d02bd9945/itag/5/source/youtube/playlist_type/DVR/ip/"
+                + "0.0.0.0/ipbits/0/expire/19000000000/sparams/ip,ipbits,expire"
+                + ",id,itag,source,playlist_type/signature/773AB8ACC68A96E5AA48"
+                + "1996AD6A1BBCB70DCB87.95733B544ACC5F01A1223A837D2CF04DF85A336"
+                + "0/key/ik0", 60 * 1000);
     }
 
     // Streaming audio from local HTTP server
