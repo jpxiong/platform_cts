@@ -741,6 +741,8 @@ public class FileSystemPermissionTest extends AndroidTestCase {
                 new File("/dev/genlock"),    // b/9035217
                 new File("/dev/hw_random"),  // b/9191279
                 new File("/dev/ion"),
+                new File("/dev/kgsl-2d0"),   // b/11271533
+                new File("/dev/kgsl-2d1"),   // b/11271533
                 new File("/dev/kgsl-3d0"),   // b/9035217
                 new File("/dev/log/events"), // b/9035217
                 new File("/dev/log/main"),   // b/9035217
