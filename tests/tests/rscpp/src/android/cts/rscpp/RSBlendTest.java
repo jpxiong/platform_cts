@@ -33,7 +33,7 @@ public class RSBlendTest extends RSCppTest {
     private static final int X = 256;
     private static final int Y = 256;
 
-    native boolean blendTest(int X, int Y, byte[] input, byte[] output, int optionFlag);
+    native boolean blendTest(String path, int X, int Y, byte[] input, byte[] output, int optionFlag);
     public void testRSBlend() {
         for (int iter = 0; iter < 15; iter++) {
             int[] baseAlloc = new int[X * Y * 4];
@@ -111,7 +111,7 @@ public class RSBlendTest extends RSCppTest {
                 break;
             }
 
-            blendTest(X, Y, byteAlloc, byteAlloc2, iter);
+            blendTest(this.getContext().getCacheDir().toString(), X, Y, byteAlloc, byteAlloc2, iter);
             rsOutput.copyTo(byteAlloc);
             for (int i = 0; i < X * Y * 4; i++) {
                 assertTrue(byteAlloc[i] == byteAlloc2[i]);

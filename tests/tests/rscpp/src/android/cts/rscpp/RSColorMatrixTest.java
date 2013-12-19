@@ -33,7 +33,7 @@ public class RSColorMatrixTest extends RSCppTest {
     private final int X = 1024;
     private final int Y = 1024;
 
-    native boolean colorMatrixTest(int X, int Y, byte[] input, byte[] output, float[] coeffs, int optionFlag);
+    native boolean colorMatrixTest(String path, int X, int Y, byte[] input, byte[] output, float[] coeffs, int optionFlag);
     public void testRSColorMatrix0() {
         int[] baseAlloc = new int[X * Y * 4];
         RSUtils.genRandom(0x251107, 255, 1, -128, baseAlloc);
@@ -67,7 +67,7 @@ public class RSColorMatrixTest extends RSCppTest {
         cm.forEach(rsInput, rsOutput);
 
         byte[] nativeByteAlloc = new byte[X * Y * 4];
-        colorMatrixTest(X, Y, byteAlloc, nativeByteAlloc, coeffs, 0);
+        colorMatrixTest(this.getContext().getCacheDir().toString(), X, Y, byteAlloc, nativeByteAlloc, coeffs, 0);
         rsOutput.copyTo(byteAlloc);
 
         for (int i = 0; i < X * Y * 4; i++) {
@@ -99,7 +99,7 @@ public class RSColorMatrixTest extends RSCppTest {
         cm.forEach(rsInput, rsOutput);
 
         byte[] nativeByteAlloc = new byte[X * Y * 4];
-        colorMatrixTest(X, Y, byteAlloc, nativeByteAlloc, coeffs, 1);
+        colorMatrixTest(this.getContext().getCacheDir().toString(), X, Y, byteAlloc, nativeByteAlloc, coeffs, 1);
         rsOutput.copyTo(byteAlloc);
 
         for (int i = 0; i < X * Y * 4; i++) {
@@ -135,7 +135,7 @@ public class RSColorMatrixTest extends RSCppTest {
         cm.forEach(rsInput, rsOutput);
 
         byte[] nativeByteAlloc = new byte[X * Y * 4];
-        colorMatrixTest(X, Y, byteAlloc, nativeByteAlloc, coeffs, 2);
+        colorMatrixTest(this.getContext().getCacheDir().toString(), X, Y, byteAlloc, nativeByteAlloc, coeffs, 2);
         rsOutput.copyTo(byteAlloc);
 
         for (int i = 0; i < X * Y * 4; i++) {
@@ -167,7 +167,7 @@ public class RSColorMatrixTest extends RSCppTest {
         cm.forEach(rsInput, rsOutput);
 
         byte[] nativeByteAlloc = new byte[X * Y * 4];
-        colorMatrixTest(X, Y, byteAlloc, nativeByteAlloc, coeffs, 3);
+        colorMatrixTest(this.getContext().getCacheDir().toString(), X, Y, byteAlloc, nativeByteAlloc, coeffs, 3);
         rsOutput.copyTo(byteAlloc);
 
         for (int i = 0; i < X * Y * 4; i++) {
@@ -199,7 +199,7 @@ public class RSColorMatrixTest extends RSCppTest {
         cm.forEach(rsInput, rsOutput);
 
         byte[] nativeByteAlloc = new byte[X * Y * 4];
-        colorMatrixTest(X, Y, byteAlloc, nativeByteAlloc, coeffs, 4);
+        colorMatrixTest(this.getContext().getCacheDir().toString(), X, Y, byteAlloc, nativeByteAlloc, coeffs, 4);
         rsOutput.copyTo(byteAlloc);
 
         for (int i = 0; i < X * Y * 4; i++) {
