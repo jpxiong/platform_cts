@@ -86,7 +86,7 @@ bool RemoteAudio::threadLoop()
         return false;
     }
     LOGD("adding fd %d to polling", mSocket.getFD());
-    mLooper->addFd(mSocket.getFD(), EIdSocket, ALOOPER_EVENT_INPUT, socketRxCallback, this);
+    mLooper->addFd(mSocket.getFD(), EIdSocket, android::Looper::EVENT_INPUT, socketRxCallback, this);
     wakeClient(true);
     while(!mExitRequested) {
         mLooper->pollOnce(10000);
@@ -138,7 +138,7 @@ bool RemoteAudio::handlePacket()
 int RemoteAudio::socketRxCallback(int fd, int events, void* data)
 {
     RemoteAudio* self = reinterpret_cast<RemoteAudio*>(data);
-    if (events & ALOOPER_EVENT_INPUT) {
+    if (events & android::Looper::EVENT_INPUT) {
         //LOGD("socketRxCallback input");
         if (!self->handlePacket()) { //error, stop polling
             LOGE("socketRxCallback, error in packet, stopping polling");
