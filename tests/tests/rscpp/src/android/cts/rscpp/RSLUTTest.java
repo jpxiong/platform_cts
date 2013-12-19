@@ -33,7 +33,7 @@ public class RSLUTTest extends RSCppTest {
     private final int X = 1024;
     private final int Y = 1024;
 
-    native boolean lutTest(int X, int Y, byte[] input, byte[] output);
+    native boolean lutTest(String path, int X, int Y, byte[] input, byte[] output);
     public void testRSLUT() {
         int[] baseAlloc = new int[X * Y * 4];
         RSUtils.genRandom(0x72727272, 255, 1, -128, baseAlloc);
@@ -59,7 +59,7 @@ public class RSLUTTest extends RSCppTest {
         lut.forEach(rsInput, rsOutput);
 
         byte[] nativeByteAlloc = new byte[X * Y * 4];
-        lutTest(X, Y, byteAlloc, nativeByteAlloc);
+        lutTest(this.getContext().getCacheDir().toString().toString(), X, Y, byteAlloc, nativeByteAlloc);
         rsOutput.copyTo(byteAlloc);
 
         for (int i = 0; i < X * Y * 4; i++) {
