@@ -25,71 +25,64 @@ import com.android.cts.stub.R;
  */
 public class VersionTest extends RSBaseCompute {
     public void testVersion11() {
-        ScriptC_set_target_api_11 test11 =
-                new ScriptC_set_target_api_11(mRS,
-                                              mRes,
-                                              R.raw.set_target_api_11);
+        ScriptC_set_target_api_11 test11 = new ScriptC_set_target_api_11(mRS);
         test11.invoke_check(11);
         waitForMessage();
         checkForErrors();
     }
 
     public void testVersion12() {
-        ScriptC_set_target_api_12 test12 =
-                new ScriptC_set_target_api_12(mRS,
-                                              mRes,
-                                              R.raw.set_target_api_12);
+        ScriptC_set_target_api_12 test12 = new ScriptC_set_target_api_12(mRS);
         test12.invoke_check(12);
         waitForMessage();
         checkForErrors();
     }
 
     public void testVersion13() {
-        ScriptC_set_target_api_13 test13 =
-                new ScriptC_set_target_api_13(mRS,
-                                              mRes,
-                                              R.raw.set_target_api_13);
+        ScriptC_set_target_api_13 test13 = new ScriptC_set_target_api_13(mRS);
         test13.invoke_check(13);
         waitForMessage();
         checkForErrors();
     }
 
     public void testVersion14() {
-        ScriptC_set_target_api_14 test14 =
-                new ScriptC_set_target_api_14(mRS,
-                                              mRes,
-                                              R.raw.set_target_api_14);
+        ScriptC_set_target_api_14 test14 = new ScriptC_set_target_api_14(mRS);
         test14.invoke_check(14);
         waitForMessage();
         checkForErrors();
     }
 
     public void testVersion15() {
-        ScriptC_set_target_api_15 test15 =
-                new ScriptC_set_target_api_15(mRS,
-                                              mRes,
-                                              R.raw.set_target_api_15);
+        ScriptC_set_target_api_15 test15 = new ScriptC_set_target_api_15(mRS);
         test15.invoke_check(15);
         waitForMessage();
         checkForErrors();
     }
 
     public void testVersion16() {
-        ScriptC_set_target_api_16 test16 =
-                new ScriptC_set_target_api_16(mRS,
-                                              mRes,
-                                              R.raw.set_target_api_16);
+        ScriptC_set_target_api_16 test16 = new ScriptC_set_target_api_16(mRS);
         test16.invoke_check(16);
         waitForMessage();
         checkForErrors();
     }
 
     public void testVersion17() {
-        ScriptC_set_target_api_17 test17 =
-                new ScriptC_set_target_api_17(mRS,
-                                              mRes,
-                                              R.raw.set_target_api_17);
+        ScriptC_set_target_api_17 test17 = new ScriptC_set_target_api_17(mRS);
         test17.invoke_check(17);
+        waitForMessage();
+        checkForErrors();
+    }
+
+    public void testVersion18() {
+        ScriptC_set_target_api_18 test18 = new ScriptC_set_target_api_18(mRS);
+        test18.invoke_check(18);
+        waitForMessage();
+        checkForErrors();
+    }
+
+    public void testVersion19() {
+        ScriptC_set_target_api_19 test19 = new ScriptC_set_target_api_19(mRS);
+        test19.invoke_check(19);
         waitForMessage();
         checkForErrors();
     }
