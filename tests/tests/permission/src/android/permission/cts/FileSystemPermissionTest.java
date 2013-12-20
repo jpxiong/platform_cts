@@ -727,6 +727,7 @@ public class FileSystemPermissionTest extends AndroidTestCase {
     private static final Set<File> CHAR_DEV_EXCEPTIONS = new HashSet<File>(
             Arrays.asList(
                 // All exceptions should be alphabetical and associated with a bug number.
+                new File("/dev/adsprpc-smd"), // b/11710243
                 new File("/dev/alarm"),      // b/9035217
                 new File("/dev/ashmem"),
                 new File("/dev/binder"),
