@@ -49,10 +49,15 @@ public class AbiTest extends TestCase {
             if (f.isDirectory()) {
                 checkElfFilesInDirectory(f);
             } else if (f.getName().endsWith(".so") || f.canExecute()) {
-                try {
-                    ReadElf.read(f);
+                ReadElf elf = null;
+                try { // TODO: switch to try-with-resources.
+                    elf = ReadElf.read(f);
                 } catch (IllegalArgumentException ignored) {
                     // If it's not actually an ELF file, we don't care.
+                } finally {
+                    if (elf != null) {
+                        elf.close();
+                    }
                 }
             }
         }
