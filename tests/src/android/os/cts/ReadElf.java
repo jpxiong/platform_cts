@@ -26,7 +26,7 @@ import java.util.Map;
  * A poor man's implementation of the readelf command. This program is
  * designed to parse ELF (Executable and Linkable Format) files.
  */
-public class ReadElf {
+public class ReadElf implements AutoCloseable {
     /** The magic values for the ELF identification. */
     private static final byte[] ELF_IDENT = {
             (byte) 0x7F, (byte) 'E', (byte) 'L', (byte) 'F',
@@ -260,11 +260,16 @@ public class ReadElf {
         readHeader();
     }
 
-    protected void finalize() throws Throwable {
+    public void close() {
         try {
             mFile.close();
-        } catch (IOException e) {
-            // nothing
+        } catch (IOException ignored) {
+        }
+    }
+
+    protected void finalize() throws Throwable {
+        try {
+            close();
         } finally {
             super.finalize();
         }
