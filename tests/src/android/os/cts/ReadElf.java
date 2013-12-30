@@ -409,7 +409,7 @@ public class ReadElf implements AutoCloseable {
         mFile.seek(offset);
         mFile.readFully(mBuffer, 0, 1);
 
-        return mBuffer[0];
+        return mBuffer[0] & 0xff;
     }
 
     private int readHalf(long offset) throws IOException {
@@ -418,9 +418,9 @@ public class ReadElf implements AutoCloseable {
 
         final int answer;
         if (mEndian == ELFDATA2LSB) {
-            answer = mBuffer[1] << 8 | mBuffer[0];
+            answer = mBuffer[1] << 8 | (mBuffer[0] & 0xff);
         } else {
-            answer = mBuffer[0] << 8 | mBuffer[1];
+            answer = mBuffer[0] << 8 | (mBuffer[1] & 0xff);
         }
 
         return answer;
@@ -433,12 +433,12 @@ public class ReadElf implements AutoCloseable {
         int answer = 0;
         if (mEndian == ELFDATA2LSB) {
             for (int i = mWordSize - 1; i >= 0; i--) {
-                answer = (answer << 8) | (mBuffer[i] & 0xFF);
+                answer = (answer << 8) | (mBuffer[i] & 0xff);
             }
         } else {
             final int N = mWordSize - 1;
             for (int i = 0; i <= N; i++) {
-                answer = (answer << 8) | mBuffer[i];
+                answer = (answer << 8) | (mBuffer[i] & 0xff);
             }
         }
 
