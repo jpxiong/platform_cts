@@ -19,6 +19,6 @@ ifeq ($(BUILD_CTSCORE_PACKAGE),)
 endif
 
 include $(CLEAR_VARS)
-LOCAL_PACKAGE_NAME := android.core.tests.libcore.package.harmony_support
-LOCAL_STATIC_JAVA_LIBRARIES := apache-harmony-tests
+LOCAL_PACKAGE_NAME := android.core.tests.libcore.package.harmony_java_nio
+LOCAL_STATIC_JAVA_LIBRARIES := core-tests
 include $(BUILD_CTSCORE_PACKAGE)
