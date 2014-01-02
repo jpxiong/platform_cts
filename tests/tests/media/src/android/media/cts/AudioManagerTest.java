@@ -40,6 +40,7 @@ import com.android.cts.media.R;
 
 
 import android.content.Context;
+import android.content.res.Resources;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.os.Vibrator;
@@ -63,7 +64,7 @@ public class AudioManagerTest extends AndroidTestCase {
         Vibrator vibrator = (Vibrator) mContext.getSystemService(Context.VIBRATOR_SERVICE);
         mHasVibrator = (vibrator != null) && vibrator.hasVibrator();
         mUseFixedVolume = mContext.getResources().getBoolean(
-                                            com.android.internal.R.bool.config_useFixedVolume);
+                Resources.getSystem().getIdentifier("config_useFixedVolume", "bool", "android"));
     }
 
     public void testMicrophoneMute() throws Exception {
