@@ -88,7 +88,7 @@ public class BitmapRegionDecoderTest extends InstrumentationTestCase {
     private int mMseMargin = 3 * (1 * 1);
 
     // MSE margin for WebP Region-Decoding for 'Config.RGB_565' is little bigger.
-    private int mMseMarginWebPConfigRgb565 = 5;
+    private int mMseMarginWebPConfigRgb565 = 8;
 
 
     @Override
