@@ -15,12 +15,13 @@
  */
 package com.android.cts.javascanner;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Scanner;
 
 class DocletRunner {
 
@@ -45,16 +46,21 @@ class DocletRunner {
         args.add(getClassPath());
         args.addAll(getSourceFiles(mSourceDir));
 
-        Process process = new ProcessBuilder(args).start();
-        Scanner scanner = null;
+
+        // NOTE: We redirect the error stream to make sure the child process
+        // isn't blocked due to a full pipe. (The javadoc tool writes source errors
+        // to stderr.)
+        Process process = new ProcessBuilder(args).redirectErrorStream(true).start();
+        BufferedReader reader = new BufferedReader(
+                new InputStreamReader(process.getInputStream()));
         try {
-            scanner = new Scanner(process.getInputStream());
-            while (scanner.hasNextLine()) {
-                System.out.println(scanner.nextLine());
+            String line = null;
+            while ((line = reader.readLine()) != null) {
+                System.out.println(line);
             }
         } finally {
-            if (scanner != null) {
-                scanner.close();
+            if (reader != null) {
+                reader.close();
             }
         }
 
