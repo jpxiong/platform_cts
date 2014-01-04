@@ -44,6 +44,10 @@ public class BannedFilesTest extends TestCase {
         assertNotSetugid("/system/bin/sync_agent");
     }
 
+    public void testNoInitRunIt() {
+        assertFalse("/dev/socket/init_runit", new File("/dev/socket/init_runit").exists());
+    }
+
     public void testNoSu() {
         assertFalse("/sbin/su",        new File("/sbin/su").exists());
         assertFalse("/system/bin/su",  new File("/system/bin/su").exists());
