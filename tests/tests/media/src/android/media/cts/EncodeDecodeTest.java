@@ -1000,16 +1000,17 @@ public class EncodeDecodeTest extends AndroidTestCase {
             x += cropLeft;
 
             int testY, testU, testV;
+            int off = frameData.position();
             if (semiPlanar) {
                 // Galaxy Nexus uses OMX_TI_COLOR_FormatYUV420PackedSemiPlanar
-                testY = frameData.get(y * width + x) & 0xff;
-                testU = frameData.get(width*height + 2*(y/2) * halfWidth + 2*(x/2)) & 0xff;
-                testV = frameData.get(width*height + 2*(y/2) * halfWidth + 2*(x/2) + 1) & 0xff;
+                testY = frameData.get(off + y * width + x) & 0xff;
+                testU = frameData.get(off + width*height + 2*(y/2) * halfWidth + 2*(x/2)) & 0xff;
+                testV = frameData.get(off + width*height + 2*(y/2) * halfWidth + 2*(x/2) + 1) & 0xff;
             } else {
                 // Nexus 10, Nexus 7 use COLOR_FormatYUV420Planar
-                testY = frameData.get(y * width + x) & 0xff;
-                testU = frameData.get(width*height + (y/2) * halfWidth + (x/2)) & 0xff;
-                testV = frameData.get(width*height + halfWidth * (height / 2) +
+                testY = frameData.get(off + y * width + x) & 0xff;
+                testU = frameData.get(off + width*height + (y/2) * halfWidth + (x/2)) & 0xff;
+                testV = frameData.get(off + width*height + halfWidth * (height / 2) +
                         (y/2) * halfWidth + (x/2)) & 0xff;
             }
 

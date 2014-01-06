@@ -286,7 +286,7 @@ public class Vp8EncoderTest extends AndroidTestCase {
                 if (result >= 0) {
                     int outputBufIndex = result;
                     byte[] buffer = new byte[mBufferInfo.size];
-                    mOutputBuffers[outputBufIndex].rewind();
+                    mOutputBuffers[outputBufIndex].position(mBufferInfo.offset);
                     mOutputBuffers[outputBufIndex].get(buffer, 0, mBufferInfo.size);
 
                     if ((outputFrameIndex == 0)
