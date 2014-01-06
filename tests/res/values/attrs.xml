@@ -125,4 +125,6 @@
         <attr name="textColorHint"/>
         <attr name="textColorLink"/>
     </declare-styleable>
+    <!-- Integer used to uniquely identify theme overrides. -->
+    <attr name="themeType" format="integer"/>
 </resources>

@@ -14,7 +14,7 @@
      limitations under the License.
 -->
 
-<resources>
+<resources xmlns:android="http://schemas.android.com/apk/res/android">
 
     <style name="Whatever">
         <item name="type1">true</item>
@@ -136,6 +136,14 @@
         <item name="android:windowNoTitle">true</item>
         <item name="android:panelColorForeground">#ff000000</item>
         <item name="android:panelColorBackground">#ffffffff</item>
+    </style>
+
+    <style name="Theme_OverrideOuter">
+        <item name="themeType">1</item>
+    </style>
+
+    <style name="Theme_OverrideInner">
+        <item name="themeType">2</item>
     </style>
 
 </resources>
