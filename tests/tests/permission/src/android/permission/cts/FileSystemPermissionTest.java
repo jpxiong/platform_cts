@@ -731,6 +731,8 @@ public class FileSystemPermissionTest extends AndroidTestCase {
                 new File("/dev/alarm"),      // b/9035217
                 new File("/dev/ashmem"),
                 new File("/dev/binder"),
+                new File("/dev/card0"),       // b/13159510
+                new File("/dev/dri/card0"),   // b/13159510
                 new File("/dev/quadd"),
                 new File("/dev/felica"),
                 new File("/dev/felica_ant"),
