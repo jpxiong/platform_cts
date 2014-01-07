@@ -23,6 +23,7 @@ import android.hardware.camera2.CameraCharacteristics;
 import android.hardware.camera2.CameraDevice;
 import android.hardware.camera2.CameraManager;
 import android.os.Handler;
+import android.os.HandlerThread;
 import android.test.AndroidTestCase;
 import android.util.Log;
 
@@ -40,7 +41,7 @@ public class CameraManagerTest extends AndroidTestCase {
     private PackageManager mPackageManager;
     private CameraManager mCameraManager;
     private NoopCameraListener mListener;
-    private CameraTestThread mLooperThread;
+    private HandlerThread mHandlerThread;
     private Handler mHandler;
 
     @Override
@@ -57,13 +58,14 @@ public class CameraManagerTest extends AndroidTestCase {
     protected void setUp() throws Exception {
         super.setUp();
 
-        mLooperThread = new CameraTestThread();
-        mHandler = mLooperThread.start();
+        mHandlerThread = new HandlerThread(TAG);
+        mHandlerThread.start();
+        mHandler = new Handler(mHandlerThread.getLooper());
     }
 
     @Override
     protected void tearDown() throws Exception {
-        mLooperThread.close();
+        mHandlerThread.quitSafely();
         mHandler = null;
 
         super.tearDown();
@@ -252,12 +254,9 @@ public class CameraManagerTest extends AndroidTestCase {
      * a listener that isn't registered should have no effect.
      */
     public void testCameraManagerListener() throws Exception {
-        CameraTestThread callbackThread = new CameraTestThread();
-        Handler callbackHandler = callbackThread.start();
-
         mCameraManager.removeAvailabilityListener(mListener);
-        mCameraManager.addAvailabilityListener(mListener, callbackHandler);
-        mCameraManager.addAvailabilityListener(mListener, callbackHandler);
+        mCameraManager.addAvailabilityListener(mListener, mHandler);
+        mCameraManager.addAvailabilityListener(mListener, mHandler);
         mCameraManager.removeAvailabilityListener(mListener);
         mCameraManager.removeAvailabilityListener(mListener);
     }

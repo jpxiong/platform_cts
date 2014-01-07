@@ -32,6 +32,7 @@ import android.media.Image;
 import android.media.ImageReader;
 import android.os.Environment;
 import android.os.Handler;
+import android.os.HandlerThread;
 import android.test.AndroidTestCase;
 import android.util.Log;
 import android.view.Surface;
@@ -72,7 +73,7 @@ public class ImageReaderTest extends AndroidTestCase {
     private ImageReader mReader;
     private Handler mHandler;
     private SimpleImageListener mListener;
-    private CameraTestThread mLooperThread;
+    private HandlerThread mHandlerThread;
 
     @Override
     public void setContext(Context context) {
@@ -85,8 +86,9 @@ public class ImageReaderTest extends AndroidTestCase {
     protected void setUp() throws Exception {
         super.setUp();
         mCameraIds = mCameraManager.getCameraIdList();
-        mLooperThread = new CameraTestThread();
-        mHandler = mLooperThread.start();
+        mHandlerThread = new HandlerThread(TAG);
+        mHandlerThread.start();
+        mHandler = new Handler(mHandlerThread.getLooper());
         mCameraListener = new BlockingStateListener();
     }
 
@@ -100,7 +102,7 @@ public class ImageReaderTest extends AndroidTestCase {
             mReader.close();
             mReader = null;
         }
-        mLooperThread.close();
+        mHandlerThread.quitSafely();
         mHandler = null;
         super.tearDown();
     }
@@ -285,7 +287,6 @@ public class ImageReaderTest extends AndroidTestCase {
             mCamera = null;
             fail("Fail to open camera, " + Log.getStackTraceString(e));
         }
-        mCameraListener.waitForState(STATE_OPENED, CAMERA_OPEN_TIMEOUT_MS);
     }
 
     private void closeDevice() {

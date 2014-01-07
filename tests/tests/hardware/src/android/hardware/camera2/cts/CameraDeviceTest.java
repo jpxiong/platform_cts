@@ -22,7 +22,6 @@ import static org.mockito.Mockito.*;
 
 import android.content.Context;
 import android.graphics.ImageFormat;
-import android.hardware.camera2.CameraCharacteristics;
 import android.hardware.camera2.CameraDevice;
 import android.hardware.camera2.CameraManager;
 import android.hardware.camera2.CameraMetadata;
@@ -32,6 +31,7 @@ import android.hardware.camera2.CaptureResult;
 import android.media.Image;
 import android.media.ImageReader;
 import android.os.Handler;
+import android.os.HandlerThread;
 import android.os.SystemClock;
 import android.test.AndroidTestCase;
 import android.util.Log;
@@ -52,19 +52,11 @@ public class CameraDeviceTest extends AndroidTestCase {
 
     private CameraManager mCameraManager;
     private BlockingStateListener mCameraListener;
-    private CameraTestThread mLooperThread;
+    private HandlerThread mHandlerThread;
     private Handler mCallbackHandler;
     private int mLatestState = STATE_UNINITIALIZED;
 
-    /**
-     * The error triggered flag starts out as false, and it will flip to true if any errors
-     * are ever caught; it won't be reset to false after that happens. This is due to the
-     * fact that when multiple tests are run back to back (as they are here), it's hard
-     * to associate the asynchronous error with the test that caused it (so we won't even try).
-     */
-    private boolean mErrorTriggered = false;
     private ImageReader mReader;
-    private CameraTestThread mDummyThread;
     private Surface mSurface;
 
     private static final int CAMERA_CONFIGURE_TIMEOUT_MS = 2000;
@@ -120,14 +112,15 @@ public class CameraDeviceTest extends AndroidTestCase {
 
         mCameraManager = (CameraManager)mContext.getSystemService(Context.CAMERA_SERVICE);
         assertNotNull("Can't connect to camera manager", mCameraManager);
+        mHandlerThread = new HandlerThread(TAG);
+        mHandlerThread.start();
+        mCallbackHandler = new Handler(mHandlerThread.getLooper());
         createDefaultSurface();
-        mLooperThread = new CameraTestThread();
-        mCallbackHandler = mLooperThread.start();
     }
 
     @Override
     protected void tearDown() throws Exception {
-        mDummyThread.close();
+        mHandlerThread.quitSafely();
         mReader.close();
         super.tearDown();
     }
@@ -401,8 +394,7 @@ public class CameraDeviceTest extends AndroidTestCase {
         mSurface = mReader.getSurface();
         // Create dummy image listener since we don't care the image data in this test.
         ImageReader.OnImageAvailableListener listener = new ImageDropperListener();
-        mDummyThread = new CameraTestThread();
-        mReader.setOnImageAvailableListener(listener, mDummyThread.start());
+        mReader.setOnImageAvailableListener(listener, mCallbackHandler);
     }
 
     private void waitForState(int state, long timeout) {
