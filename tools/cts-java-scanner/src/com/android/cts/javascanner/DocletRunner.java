@@ -77,8 +77,7 @@ class DocletRunner {
         sourcePath.add("./cts/tests/src");
         sourcePath.add("./cts/libs/commonutil/src");
         sourcePath.add("./cts/libs/deviceutil/src");
-        sourcePath.add("./frameworks/testing/uiautomator/library/testrunner-src");
-        sourcePath.add("./frameworks/testing/uiautomator_test_libraries/src");
+        sourcePath.add("./frameworks/uiautomator/src");
         sourcePath.add(sourceDir.toString());
         return join(sourcePath, ":");
     }

@@ -16,15 +16,24 @@
 
 package android.print.cts.services;
 
-public abstract class StubPrintService extends BasePrintService {
+import android.printservice.PrintJob;
+import android.printservice.PrintService;
 
-    private BasePrintService mHost;
+public abstract class PrintServiceCallbacks {
 
-    public void setHost(BasePrintService host) {
-        mHost = host;
+    private PrintService mService;
+
+    public PrintService getService() {
+        return mService;
     }
 
-    public BasePrintService getHost() {
-        return mHost;
+    public void setService(PrintService service) {
+        mService = service;
     }
+
+    public abstract PrinterDiscoverySessionCallbacks onCreatePrinterDiscoverySessionCallbacks();
+
+    public abstract void onRequestCancelPrintJob(PrintJob printJob);
+
+    public abstract void onPrintJobQueued(PrintJob printJob);
 }

@@ -17,9 +17,7 @@
 -->
 
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-        package="com.android.cts.print"
-        android:versionCode="1"
-        android:versionName="1">
+        package="com.android.cts.print">
 
     <application android:allowBackup="false" >
 
@@ -71,7 +69,7 @@
 
   </application>
 
-  <instrumentation android:name="com.android.uiautomator.testrunner.UiAutomatorInstrumentationTestRunner"
+  <instrumentation android:name="android.support.test.uiautomator.UiAutomatorInstrumentationTestRunner"
           android:targetPackage="com.android.cts.print"
           android:label="Tests for the print APIs."/>
 
