@@ -41,12 +41,15 @@
               android:name="android.accessibilityservice.cts.AccessibilityFocusAndInputFocusSyncActivity"/>
 
       <activity android:label="@string/accessibility_text_traversal_test_activity"
-              android:name="android.accessibilityservice.cts.AccessibilityTextTraversalActivity"/> 
+              android:name="android.accessibilityservice.cts.AccessibilityTextTraversalActivity"/>
 
   </application>
 
-  <instrumentation android:name="android.test.InstrumentationCtsTestRunner"
+  <instrumentation android:name="android.support.test.runner.AndroidJUnitRunner"
                    android:targetPackage="com.android.cts.accessibilityservice"
-                   android:label="Tests for the accessibility APIs."/>
+                   android:label="Tests for the accessibility APIs.">
+        <meta-data android:name="listener"
+            android:value="com.android.cts.runner.CtsTestRunListener" />
+    </instrumentation>
 
 </manifest>

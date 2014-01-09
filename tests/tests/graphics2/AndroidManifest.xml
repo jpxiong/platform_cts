@@ -24,7 +24,10 @@
 
     <instrumentation
         android:targetPackage="com.android.cts.graphics2"
-        android:name="android.test.InstrumentationCtsTestRunner" />
+        android:name="android.support.test.runner.AndroidJUnitRunner" >
+        <meta-data android:name="listener"
+            android:value="com.android.cts.runner.CtsTestRunListener" />
+    </instrumentation>
 
     <application>
         <uses-library android:name="android.test.runner" />

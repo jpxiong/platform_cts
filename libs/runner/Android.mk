@@ -18,10 +18,12 @@ include $(CLEAR_VARS)
 
 LOCAL_SRC_FILES := $(call all-java-files-under, ../../tests/core/runner/src)
 
-LOCAL_JAVA_LIBRARIES := android.test.runner
+LOCAL_STATIC_JAVA_LIBRARIES := android-support-test
 
 LOCAL_MODULE_TAGS := optional
 
 LOCAL_MODULE := ctstestrunner
+
+LOCAL_SDK_VERSION := current
 
 include $(BUILD_STATIC_JAVA_LIBRARY)

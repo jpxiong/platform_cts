@@ -24,8 +24,11 @@
       <uses-library android:name="android.test.runner" />
   </application>
 
-  <instrumentation android:name="android.test.InstrumentationCtsTestRunner"
+  <instrumentation android:name="android.support.test.runner.AndroidJUnitRunner"
                    android:targetPackage="com.android.cts.acceleration.stub"
-                   android:label="Tests for the Hardware Acceleration APIs." />
+                   android:label="Tests for the Hardware Acceleration APIs." >
+        <meta-data android:name="listener"
+            android:value="com.android.cts.runner.CtsTestRunListener" />
+    </instrumentation>
 
 </manifest>

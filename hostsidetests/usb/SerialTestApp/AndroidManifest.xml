@@ -22,5 +22,5 @@
     </application>
     <instrumentation
         android:targetPackage="com.android.cts.usb.serialtest"
-        android:name="android.test.InstrumentationCtsTestRunner" />
+        android:name="android.support.test.runner.AndroidJUnitRunner" />
 </manifest>

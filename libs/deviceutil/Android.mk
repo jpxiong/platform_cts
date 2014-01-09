@@ -20,12 +20,12 @@ LOCAL_SRC_FILES := \
     $(call all-java-files-under, src) \
     $(call all-java-files-under, ../commonutil/src)
 
-LOCAL_JAVA_LIBRARIES := android.test.runner
-
 LOCAL_ADDITIONAL_DEPENDENCIES := $(LOCAL_PATH)/Android.mk
 
 LOCAL_MODULE_TAGS := optional
 
 LOCAL_MODULE := ctsdeviceutil
+
+LOCAL_SDK_VERSION := current
 
 include $(BUILD_STATIC_JAVA_LIBRARY)

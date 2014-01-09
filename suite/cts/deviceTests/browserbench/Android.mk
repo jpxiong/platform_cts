@@ -18,8 +18,6 @@ include $(CLEAR_VARS)
 # don't include this package in any target
 LOCAL_MODULE_TAGS := optional
 
-LOCAL_JAVA_LIBRARIES := android.test.runner
-
 LOCAL_STATIC_JAVA_LIBRARIES := ctsdeviceutil ctstestrunner ctstestserver
 
 LOCAL_SRC_FILES := $(call all-java-files-under, src)

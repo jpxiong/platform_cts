@@ -34,7 +34,7 @@
     </application>
 
     <!--  self-instrumenting test package. -->
-    <instrumentation android:name="android.test.InstrumentationTestRunner"
+    <instrumentation android:name="android.support.test.runner.AndroidJUnitRunner"
                      android:targetPackage="android.holo.app"
                      android:label="Generates Holo reference images"/>
 

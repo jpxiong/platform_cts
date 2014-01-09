@@ -20,11 +20,11 @@ LOCAL_MODULE_TAGS := optional
 
 LOCAL_SRC_FILES := $(call all-java-files-under, src)
 
-LOCAL_JAVA_LIBRARIES := android.test.runner
-
 LOCAL_PACKAGE_NAME := SignatureTest
 
 LOCAL_SDK_VERSION := current
+
+LOCAL_STATIC_JAVA_LIBRARIES := android-support-test
 
 # To be passed in on command line
 CTS_API_VERSION ?= current

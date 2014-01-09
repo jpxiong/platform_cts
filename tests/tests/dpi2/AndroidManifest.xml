@@ -27,7 +27,10 @@
          properly for the screen size attributes. -->
     <uses-sdk android:targetSdkVersion="3" />
 
-    <instrumentation android:name="android.test.InstrumentationCtsTestRunner"
+    <instrumentation android:name="android.support.test.runner.AndroidJUnitRunner"
                      android:targetPackage="com.android.cts.dpi2"
-                     android:label="CTS tests for DPI"/>
+                     android:label="CTS tests for DPI">
+        <meta-data android:name="listener"
+            android:value="com.android.cts.runner.CtsTestRunListener" />
+    </instrumentation>
 </manifest>

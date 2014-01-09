@@ -27,7 +27,7 @@
         <uses-library android:name="android.test.runner" />
     </application>
 
-    <instrumentation android:name="android.test.InstrumentationTestRunner"
+    <instrumentation android:name="android.support.test.runner.AndroidJUnitRunner"
                      android:targetPackage="com.android.cts.appwithdata"
                      android:label="Test to create app data."/>
 </manifest>

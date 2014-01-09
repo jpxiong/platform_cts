@@ -22,8 +22,11 @@
         <uses-library android:name="android.test.runner" />
     </application>
 
-    <instrumentation android:name="android.test.InstrumentationCtsTestRunner"
+    <instrumentation android:name="android.support.test.runner.AndroidJUnitRunner"
                      android:targetPackage="android.core.tests.runner"
-                     android:label="cts framework tests"/>
+                     android:label="cts framework tests">
+        <meta-data android:name="listener"
+            android:value="com.android.cts.runner.CtsTestRunListener" />
+    </instrumentation>
 
 </manifest>

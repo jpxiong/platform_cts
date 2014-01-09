@@ -51,7 +51,7 @@ import java.util.regex.Pattern;
 public class TestUsbTest extends DeviceTestCase implements IBuildReceiver {
 
     private static final String LOG_TAG = "TestUsbTest";
-    private static final String CTS_RUNNER = "android.test.InstrumentationCtsTestRunner";
+    private static final String CTS_RUNNER = "android.support.test.runner.AndroidJUnitRunner";
     private static final String PACKAGE_NAME = "com.android.cts.usb.serialtest";
     private static final String APK_NAME="CtsUsbSerialTestApp.apk";
     private ITestDevice mDevice;

@@ -18,8 +18,6 @@ include $(CLEAR_VARS)
 
 LOCAL_MODULE_TAGS := tests
 
-LOCAL_JAVA_LIBRARIES := android.test.runner
-
 LOCAL_STATIC_JAVA_LIBRARIES := ctstestrunner
 
 LOCAL_JNI_SHARED_LIBRARIES := libctssecurity_jni

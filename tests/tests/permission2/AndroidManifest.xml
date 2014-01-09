@@ -56,9 +56,12 @@
             android:name="android.permission.FLASHLIGHT"
             android:maxSdkVersion="9000" />
 
-    <instrumentation android:name="android.test.InstrumentationCtsTestRunner"
+    <instrumentation android:name="android.support.test.runner.AndroidJUnitRunner"
                      android:targetPackage="com.android.cts.permission2"
-                     android:label="More CTS tests for permissions"/>
+                     android:label="More CTS tests for permissions">
+        <meta-data android:name="listener"
+            android:value="com.android.cts.runner.CtsTestRunListener" />
+    </instrumentation>
 
 </manifest>
 

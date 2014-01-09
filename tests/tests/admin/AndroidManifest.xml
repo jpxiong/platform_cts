@@ -26,8 +26,11 @@
 
   </application>
 
-  <instrumentation android:name="android.test.InstrumentationCtsTestRunner"
+  <instrumentation android:name="android.support.test.runner.AndroidJUnitRunner"
                    android:targetPackage="android.deviceadmin.cts"
-                   android:label="Tests for the admin APIs."/>
+                   android:label="Tests for the admin APIs.">
+        <meta-data android:name="listener"
+            android:value="com.android.cts.runner.CtsTestRunListener" />
+    </instrumentation>
 
 </manifest>

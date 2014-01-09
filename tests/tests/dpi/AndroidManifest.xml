@@ -26,7 +26,10 @@
                 android:configChanges="orientation" />
     </application>
 
-    <instrumentation android:name="android.test.InstrumentationCtsTestRunner"
+    <instrumentation android:name="android.support.test.runner.AndroidJUnitRunner"
                      android:targetPackage="com.android.cts.dpi"
-                     android:label="CTS tests for DPI"/>
+                     android:label="CTS tests for DPI">
+        <meta-data android:name="listener"
+            android:value="com.android.cts.runner.CtsTestRunListener" />
+    </instrumentation>
 </manifest>

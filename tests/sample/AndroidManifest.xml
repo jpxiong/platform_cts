@@ -31,9 +31,12 @@
 
     <!--  self-instrumenting test package. -->
     <instrumentation
-        android:name="android.test.InstrumentationCtsTestRunner"
+        android:name="android.support.test.runner.AndroidJUnitRunner"
         android:label="CTS sample tests"
-        android:targetPackage="android.sample.cts" />
-
+        android:targetPackage="android.sample.cts" >
+        <meta-data
+            android:name="listener"
+            android:value="com.android.cts.runner.CtsTestRunListener" />
+    </instrumentation>
 </manifest>
 

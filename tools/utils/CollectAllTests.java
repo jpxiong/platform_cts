@@ -324,19 +324,9 @@ public class CollectAllTests extends DescriptionGenerator {
         return getAnnotation(testClass, testName, KNOWN_FAILURE) != null;
     }
 
-    private static boolean isBrokenTest(final Class<? extends TestCase> testClass,
-            final String testName)  {
-        return getAnnotation(testClass, testName, BROKEN_TEST) != null;
-    }
-
     private static boolean isSuppressed(final Class<? extends TestCase> testClass,
             final String testName)  {
         return getAnnotation(testClass, testName, SUPPRESSED_TEST) != null;
-    }
-
-    private static boolean hasSideEffects(final Class<? extends TestCase> testClass,
-            final String testName) {
-        return getAnnotation(testClass, testName, SIDE_EFFECT) != null;
     }
 
     private static String getAnnotation(final Class<? extends TestCase> testClass,
@@ -413,14 +403,8 @@ public class CollectAllTests extends DescriptionGenerator {
         if (isKnownFailure(test, testName)) {
             System.out.println("ignoring known failure: " + test + "#" + testName);
             return;
-        } else if (isBrokenTest(test, testName)) {
-            System.out.println("ignoring broken test: " + test + "#" + testName);
-            return;
         } else if (isSuppressed(test, testName)) {
             System.out.println("ignoring suppressed test: " + test + "#" + testName);
-            return;
-        } else if (hasSideEffects(test, testName)) {
-            System.out.println("ignoring test with side effects: " + test + "#" + testName);
             return;
         } else if (VogarUtils.isVogarKnownFailure(expectations,
                                                   testClassName,

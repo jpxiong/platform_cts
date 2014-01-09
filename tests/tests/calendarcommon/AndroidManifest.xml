@@ -23,9 +23,12 @@
     </application>
 
     <!-- This is a self-instrumenting test package. -->
-    <instrumentation android:name="android.test.InstrumentationCtsTestRunner"
+    <instrumentation android:name="android.support.test.runner.AndroidJUnitRunner"
                      android:targetPackage="com.android.cts.calendarcommon2"
-                     android:label="CTS tests of calendarcommon"/>
+                     android:label="CTS tests of calendarcommon">
+        <meta-data android:name="listener"
+            android:value="com.android.cts.runner.CtsTestRunListener" />
+    </instrumentation>
 
     <uses-sdk android:minSdkVersion="15" android:targetSdkVersion="15"></uses-sdk>
 

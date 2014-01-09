@@ -23,9 +23,12 @@
     </application>
 
     <!-- This is a self-instrumenting test package. -->
-    <instrumentation android:name="android.test.InstrumentationCtsTestRunner"
+    <instrumentation android:name="android.support.test.runner.AndroidJUnitRunner"
                      android:targetPackage="com.android.cts.jni"
-                     android:label="CTS tests of calling native code via JNI"/>
+                     android:label="CTS tests of calling native code via JNI">
+        <meta-data android:name="listener"
+            android:value="com.android.cts.runner.CtsTestRunListener" />
+    </instrumentation>
 
 </manifest>
 

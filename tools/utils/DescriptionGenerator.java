@@ -66,8 +66,6 @@ import com.sun.javadoc.AnnotationDesc.ElementValuePair;
 public class DescriptionGenerator extends Doclet {
     static final String HOST_CONTROLLER = "dalvik.annotation.HostController";
     static final String KNOWN_FAILURE = "dalvik.annotation.KnownFailure";
-    static final String BROKEN_TEST = "dalvik.annotation.BrokenTest";
-    static final String SIDE_EFFECT = "dalvik.annotation.SideEffect";
     static final String SUPPRESSED_TEST = "android.test.suitebuilder.annotation.Suppress";
     static final String CTS_EXPECTATION_DIR = "cts/tests/expectations";
 
@@ -545,8 +543,6 @@ public class DescriptionGenerator extends Doclet {
                         controller = getAnnotationDescription(cAnnot);
                     } else if (atype.toString().equals(KNOWN_FAILURE)) {
                         knownFailure = getAnnotationDescription(cAnnot);
-                    } else if (atype.toString().equals(BROKEN_TEST)) {
-                        isBroken = true;
                     } else if (atype.toString().equals(SUPPRESSED_TEST)) {
                         isSuppressed = true;
                     }

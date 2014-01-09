@@ -18,8 +18,6 @@ package android.graphics.drawable.cts;
 
 import com.android.cts.stub.R;
 
-import dalvik.annotation.KnownFailure;
-
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
 
@@ -239,9 +237,9 @@ public class NinePatchDrawableTest extends InstrumentationTestCase {
         assertEquals(9, mNinePatchDrawable.getMinimumHeight());
     }
 
-    @KnownFailure("Bug 2834281 - Bitmap#hasAlpha seems to return true for "
-        + "images without alpha.")
-    public void testGetOpacity() {
+    // Known failure: Bug 2834281 - Bitmap#hasAlpha seems to return true for
+    // images without alpha
+    public void suppress_testGetOpacity() {
         assertEquals(PixelFormat.OPAQUE, mNinePatchDrawable.getOpacity());
 
         mNinePatchDrawable = getNinePatchDrawable(R.drawable.ninepatch_1);

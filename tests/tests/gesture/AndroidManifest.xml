@@ -24,9 +24,12 @@
     </application>
 
     <!--  self-instrumenting test package. -->
-    <instrumentation android:name="android.test.InstrumentationCtsTestRunner"
+    <instrumentation android:name="android.support.test.runner.AndroidJUnitRunner"
                      android:targetPackage="com.android.cts.gesture"
-                     android:label="CTS tests of android.gesture"/>
+                     android:label="CTS tests of android.gesture">
+        <meta-data android:name="listener"
+            android:value="com.android.cts.runner.CtsTestRunListener" />
+    </instrumentation>
 
 </manifest>
 

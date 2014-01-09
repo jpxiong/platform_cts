@@ -107,7 +107,7 @@
 
     </application>
 
-    <instrumentation android:name="android.test.InstrumentationTestRunner"
+    <instrumentation android:name="android.support.test.runner.AndroidJUnitRunner"
             android:targetPackage="com.android.cts.admin"
             android:label="Tests for the device admin APIs."/>
 </manifest>

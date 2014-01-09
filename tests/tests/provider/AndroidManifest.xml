@@ -40,9 +40,12 @@
 
     </application>
 
-    <instrumentation android:name="android.test.InstrumentationCtsTestRunner"
+    <instrumentation android:name="android.support.test.runner.AndroidJUnitRunner"
                      android:targetPackage="com.android.cts.stub"
-                     android:label="CTS tests of android.provider"/>
+                     android:label="CTS tests of android.provider">
+        <meta-data android:name="listener"
+            android:value="com.android.cts.runner.CtsTestRunListener" />
+    </instrumentation>
 
     <instrumentation android:name="android.provider.cts.CalendarTest$CalendarEmmaTestRunner"
                      android:targetPackage="com.android.cts.stub"

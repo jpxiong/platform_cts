@@ -36,8 +36,12 @@
     </application>
 
     <instrumentation
-        android:name="android.test.InstrumentationCtsTestRunner"
+        android:name="android.support.test.runner.AndroidJUnitRunner"
         android:label="UI Latency measurement"
-        android:targetPackage="com.android.cts.ui" />
+        android:targetPackage="com.android.cts.ui" >
+        <meta-data
+            android:name="listener"
+            android:value="com.android.cts.runner.CtsTestRunListener" />
+    </instrumentation>
 
 </manifest>

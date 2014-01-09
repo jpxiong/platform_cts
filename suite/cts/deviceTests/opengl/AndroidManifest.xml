@@ -46,7 +46,7 @@
     </application>
 
     <instrumentation
-        android:name="android.test.InstrumentationCtsTestRunner"
+        android:name="android.support.test.runner.AndroidJUnitRunner"
         android:label="OpenGL ES 2.0 Benchmark"
         android:targetPackage="com.android.cts.opengl" />
 

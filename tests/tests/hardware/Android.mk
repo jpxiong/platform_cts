@@ -32,8 +32,6 @@ include $(CLEAR_VARS)
 
 LOCAL_MODULE_TAGS := tests
 
-LOCAL_JAVA_LIBRARIES := android.test.runner
-
 LOCAL_STATIC_JAVA_LIBRARIES := ctstestrunner mockito-target android-ex-camera2
 
 LOCAL_SRC_FILES := $(call all-java-files-under, src)
@@ -42,7 +40,8 @@ LOCAL_PACKAGE_NAME := CtsHardwareTestCases
 
 LOCAL_INSTRUMENTATION_FOR := CtsTestStubs
 
-# uncomment when dalvik.annotation.Test* are removed or part of SDK
+# uncomment when b/13281332 is fixed
 #LOCAL_SDK_VERSION := current
+LOCAL_JAVA_LIBRARIES := android.test.runner
 
 include $(BUILD_CTS_PACKAGE)

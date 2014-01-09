@@ -25,9 +25,12 @@
 
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
 
-    <instrumentation android:name="android.test.InstrumentationCtsTestRunner"
+    <instrumentation android:name="android.support.test.runner.AndroidJUnitRunner"
                      android:targetPackage="com.android.cts.stub"
-                     android:label="CTS tests of android.speech"/>
+                     android:label="CTS tests of android.speech">
+        <meta-data android:name="listener"
+            android:value="com.android.cts.runner.CtsTestRunListener" />
+    </instrumentation>
 
 </manifest>
 

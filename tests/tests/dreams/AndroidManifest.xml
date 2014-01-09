@@ -22,9 +22,12 @@
     </application>
 
     <!-- This is a self-instrumenting test package. -->
-    <instrumentation android:name="android.test.InstrumentationCtsTestRunner"
+    <instrumentation android:name="android.support.test.runner.AndroidJUnitRunner"
                      android:targetPackage="com.android.cts.dreams"
-                     android:label="CTS tests for the android.service.dreams package"/>
+                     android:label="CTS tests for the android.service.dreams package">
+        <meta-data android:name="listener"
+            android:value="com.android.cts.runner.CtsTestRunListener" />
+    </instrumentation>
 
 </manifest>
 

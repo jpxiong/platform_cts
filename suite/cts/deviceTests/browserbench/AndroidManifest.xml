@@ -24,6 +24,6 @@
     <application>
         <uses-library android:name="android.test.runner" />
     </application>
-    <instrumentation android:name="android.test.InstrumentationCtsTestRunner"
+    <instrumentation android:name="android.support.test.runner.AndroidJUnitRunner"
             android:targetPackage="com.android.cts.browser" />
 </manifest>

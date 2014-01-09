@@ -20,7 +20,6 @@ import android.content.Context;
 import android.os.PowerManager;
 import android.test.AndroidTestCase;
 import android.test.suitebuilder.annotation.LargeTest;
-import dalvik.annotation.KnownFailure;
 
 /**
  * Verify that various PowerManagement functionality requires Permission.

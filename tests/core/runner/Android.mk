@@ -27,6 +27,6 @@ LOCAL_SRC_FILES := $(call all-java-files-under,src)
 
 LOCAL_PACKAGE_NAME := android.core.tests.runner
 
-LOCAL_STATIC_JAVA_LIBRARIES := core-tests
+LOCAL_STATIC_JAVA_LIBRARIES := core-tests android-support-test
 
 include $(BUILD_CTSCORE_PACKAGE)

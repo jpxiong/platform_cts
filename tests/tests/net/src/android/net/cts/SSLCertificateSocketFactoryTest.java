@@ -26,8 +26,6 @@ import javax.net.ssl.SSLPeerUnverifiedException;
 import android.net.SSLCertificateSocketFactory;
 import android.test.AndroidTestCase;
 
-import dalvik.annotation.BrokenTest;
-
 import libcore.javax.net.ssl.SSLDefaultConfigurationAsserts;
 
 public class SSLCertificateSocketFactoryTest extends AndroidTestCase {

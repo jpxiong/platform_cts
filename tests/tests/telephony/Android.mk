@@ -22,7 +22,7 @@ LOCAL_MODULE_TAGS := optional
 # and when built explicitly put it in the data partition
 LOCAL_MODULE_PATH := $(TARGET_OUT_DATA_APPS)
 
-LOCAL_JAVA_LIBRARIES := android.test.runner telephony-common mms-common
+LOCAL_JAVA_LIBRARIES := telephony-common mms-common
 
 LOCAL_STATIC_JAVA_LIBRARIES := ctstestrunner
 
@@ -32,7 +32,8 @@ LOCAL_PACKAGE_NAME := CtsTelephonyTestCases
 
 LOCAL_INSTRUMENTATION_FOR := CtsTestStubs
 
-# uncomment when dalvik.annotation.Test* are removed or part of SDK
-# #LOCAL_SDK_VERSION := current
+# uncomment when b/13250611 is fixed
+#LOCAL_SDK_VERSION := current
+LOCAL_JAVA_LIBRARIES += android.test.runner
 
 include $(BUILD_CTS_PACKAGE)

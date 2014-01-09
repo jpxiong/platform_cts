@@ -16,7 +16,6 @@
 
 package android.calendarcommon2.cts;
 
-import android.test.InstrumentationCtsTestRunner;
 import android.test.InstrumentationTestCase;
 import android.test.suitebuilder.annotation.MediumTest;
 import com.android.calendarcommon2.RecurrenceSet;

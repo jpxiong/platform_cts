@@ -20,8 +20,6 @@ LOCAL_MODULE_TAGS := optional
 # and when built explicitly put it in the data partition
 LOCAL_MODULE_PATH := $(TARGET_OUT_DATA_APPS)
 
-LOCAL_JAVA_LIBRARIES := android.test.runner
-
 LOCAL_AAPT_FLAGS = -c xx_YY -c cs
 
 LOCAL_SRC_FILES := $(call all-subdir-java-files)
@@ -30,6 +28,8 @@ LOCAL_PACKAGE_NAME := ProcessTests
 
 LOCAL_DEX_PREOPT := false
 LOCAL_PROGUARD_ENABLED := disabled
+
+LOCAL_SDK_VERSION := current
 
 include $(BUILD_PACKAGE)
 

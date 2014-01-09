@@ -40,6 +40,8 @@ import java.util.Map;
  */
 public class AppSecurityTests extends DeviceTestCase implements IBuildReceiver {
 
+    private static final String RUNNER = "android.support.test.runner.AndroidJUnitRunner";
+
     // testSharedUidDifferentCerts constants
     private static final String SHARED_UI_APK = "CtsSharedUidInstall.apk";
     private static final String SHARED_UI_PKG = "com.android.cts.shareuidinstall";
@@ -509,7 +511,7 @@ public class AppSecurityTests extends DeviceTestCase implements IBuildReceiver {
             String testMethodName) throws DeviceNotAvailableException {
 
         RemoteAndroidTestRunner testRunner = new RemoteAndroidTestRunner(pkgName,
-                getDevice().getIDevice());
+                RUNNER, getDevice().getIDevice());
         if (testClassName != null && testMethodName != null) {
             testRunner.setMethodName(testClassName, testMethodName);
         }
@@ -560,7 +562,7 @@ public class AppSecurityTests extends DeviceTestCase implements IBuildReceiver {
             throws DeviceNotAvailableException {
         // TODO: move this to RemoteAndroidTestRunner once it supports users
         final String cmd = "am instrument --user " + userId + " -w -r -e class " + testClassName
-                + "#" + testMethodName + " " + pkgName + "/android.test.InstrumentationTestRunner";
+                + "#" + testMethodName + " " + pkgName + "/" + RUNNER;
         Log.i(LOG_TAG, "Running " + cmd + " on " + getDevice().getSerialNumber());
 
         CollectingTestListener listener = new CollectingTestListener();

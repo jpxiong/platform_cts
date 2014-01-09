@@ -41,7 +41,6 @@ import android.provider.CalendarContract.ExtendedProperties;
 import android.provider.CalendarContract.Instances;
 import android.provider.CalendarContract.Reminders;
 import android.provider.CalendarContract.SyncState;
-import android.test.InstrumentationCtsTestRunner;
 import android.test.InstrumentationTestCase;
 import android.test.suitebuilder.annotation.MediumTest;
 import android.text.TextUtils;
@@ -3706,7 +3705,8 @@ public class CalendarTest extends InstrumentationTestCase {
     /**
      * Special version of the test runner that does some remote Emma coverage housekeeping.
      */
-    public static class CalendarEmmaTestRunner extends InstrumentationCtsTestRunner {
+    // TODO: find if this is still used and if so convert to AndroidJUnitRunner framework
+    public static class CalendarEmmaTestRunner extends android.test.InstrumentationTestRunner {
         private static final Uri EMMA_CONTENT_URI =
             Uri.parse("content://" + CalendarContract.AUTHORITY + "/emma");
         private ContentResolver mContentResolver;
