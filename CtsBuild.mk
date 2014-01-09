@@ -51,3 +51,7 @@ endef
 define cts-get-test-xmls
 	$(foreach name,$(1),$(CTS_TESTCASES_OUT)/$(name).xml)
 endef
+
+define cts-get-executable-paths
+	$(foreach executable,$(1),$(CTS_TESTCASES_OUT)/$(executable))
+endef

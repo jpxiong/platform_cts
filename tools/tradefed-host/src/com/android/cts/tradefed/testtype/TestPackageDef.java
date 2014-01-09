@@ -47,9 +47,11 @@ class TestPackageDef implements ITestPackageDef {
     public static final String WRAPPED_NATIVE_TEST = "wrappednative";
     public static final String VM_HOST_TEST = "vmHostTest";
     public static final String ACCESSIBILITY_TEST =
-        "com.android.cts.tradefed.testtype.AccessibilityTestRunner";
+            "com.android.cts.tradefed.testtype.AccessibilityTestRunner";
     public static final String ACCESSIBILITY_SERVICE_TEST =
-        "com.android.cts.tradefed.testtype.AccessibilityServiceTestRunner";
+            "com.android.cts.tradefed.testtype.AccessibilityServiceTestRunner";
+    public static final String PRINT_TEST =
+            "com.android.cts.tradefed.testtype.PrintTestRunner";
     public static final String DISPLAY_TEST =
             "com.android.cts.tradefed.testtype.DisplayTestRunner";
     public static final String UIAUTOMATOR_TEST = "uiAutomator";
@@ -61,7 +63,6 @@ class TestPackageDef implements ITestPackageDef {
     private String mAppNameSpace = null;
     private String mName = null;
     private String mRunner = null;
-    private boolean mIsVMHostTest = false;
     private String mTestType = null;
     private String mJarPath = null;
     private boolean mIsSignatureTest = false;
@@ -230,6 +231,9 @@ class TestPackageDef implements ITestPackageDef {
         } else if (ACCESSIBILITY_TEST.equals(mTestType)) {
             AccessibilityTestRunner test = new AccessibilityTestRunner();
             return setInstrumentationTest(test, testCaseDir);
+        } else if (PRINT_TEST.equals(mTestType)) {
+            PrintTestRunner test = new PrintTestRunner();
+            return setPrintTest(test, testCaseDir);
         } else if (ACCESSIBILITY_SERVICE_TEST.equals(mTestType)) {
             AccessibilityServiceTestRunner test = new AccessibilityServiceTestRunner();
             return setInstrumentationTest(test, testCaseDir);
@@ -268,6 +272,18 @@ class TestPackageDef implements ITestPackageDef {
             }
             return setInstrumentationTest(instrTest, testCaseDir);
         }
+    }
+
+    private PrintTestRunner setPrintTest(PrintTestRunner printTest,
+            File testCaseDir) {
+        printTest.setRunName(getUri());
+        printTest.setPackageName(mAppNameSpace);
+        printTest.setRunnerName(mRunner);
+        printTest.setTestPackageName(mTestPackageName);
+        printTest.setClassName(mClassName);
+        printTest.setMethodName(mMethodName);
+        mDigest = generateDigest(testCaseDir, String.format("%s.apk", mName));
+        return printTest;
     }
 
     /**
