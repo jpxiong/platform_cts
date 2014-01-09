@@ -19,7 +19,6 @@ package android.view.cts;
 import com.android.cts.stub.R;
 import com.android.internal.util.XmlUtils;
 
-
 import org.xmlpull.v1.XmlPullParser;
 
 import android.app.cts.MockActivity;
@@ -28,9 +27,11 @@ import android.content.Context;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.content.res.Resources;
+import android.content.res.Resources.Theme;
 import android.content.res.XmlResourceParser;
 import android.test.AndroidTestCase;
 import android.util.AttributeSet;
+import android.util.TypedValue;
 import android.util.Xml;
 import android.view.Gravity;
 import android.view.InflateException;
@@ -307,60 +308,76 @@ public class LayoutInflaterTest extends AndroidTestCase {
     }
 
     public void testInflate4() {
-       XmlResourceParser parser = getContext().getResources().getLayout(
-               R.layout.inflater_layout);
-       View view = mLayoutInflater.inflate(parser, null, false);
-       assertNotNull(view);
-       view = null;
-       try {
-           view = mLayoutInflater.inflate(null, null, false);
-           fail("should throw exception");
-       } catch (NullPointerException e) {
-       }
-       LinearLayout mLayout;
-       mLayout = new LinearLayout(mContext);
-       mLayout.setOrientation(LinearLayout.VERTICAL);
-       mLayout.setHorizontalGravity(Gravity.LEFT);
-       mLayout.setLayoutParams(new ViewGroup.LayoutParams(
-               ViewGroup.LayoutParams.MATCH_PARENT,
-               ViewGroup.LayoutParams.MATCH_PARENT));
-       assertEquals(0, mLayout.getChildCount());
+        XmlResourceParser parser = getContext().getResources().getLayout(
+                R.layout.inflater_layout);
+        View view = mLayoutInflater.inflate(parser, null, false);
+        assertNotNull(view);
+        view = null;
+        try {
+            view = mLayoutInflater.inflate(null, null, false);
+            fail("should throw exception");
+        } catch (NullPointerException e) {
+        }
+        LinearLayout mLayout;
+        mLayout = new LinearLayout(mContext);
+        mLayout.setOrientation(LinearLayout.VERTICAL);
+        mLayout.setHorizontalGravity(Gravity.LEFT);
+        mLayout.setLayoutParams(new ViewGroup.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.MATCH_PARENT));
+        assertEquals(0, mLayout.getChildCount());
 
-       try {
-           view = mLayoutInflater.inflate(parser, mLayout, false);
-           fail("should throw exception");
-       } catch (NullPointerException e) {
-       }
-       parser = getContext().getResources().getLayout(
-               R.layout.inflater_layout);
-       view = mLayoutInflater.inflate(parser, mLayout, false);
-       assertNull(view.getParent());
-       assertNotNull(view);
-       assertEquals(0, mLayout.getChildCount());
-       parser = getContext().getResources().getLayout(
-               R.layout.inflater_layout);
-       assertEquals(0, mLayout.getChildCount());
-       view = mLayoutInflater.inflate(parser, mLayout, true);
-       assertNotNull(view);
-       assertNull(view.getParent());
-       assertEquals(1, mLayout.getChildCount());
+        try {
+            view = mLayoutInflater.inflate(parser, mLayout, false);
+            fail("should throw exception");
+        } catch (NullPointerException e) {
+        }
+        parser = getContext().getResources().getLayout(
+                R.layout.inflater_layout);
+        view = mLayoutInflater.inflate(parser, mLayout, false);
+        assertNull(view.getParent());
+        assertNotNull(view);
+        assertEquals(0, mLayout.getChildCount());
+        parser = getContext().getResources().getLayout(
+                R.layout.inflater_layout);
+        assertEquals(0, mLayout.getChildCount());
+        view = mLayoutInflater.inflate(parser, mLayout, true);
+        assertNotNull(view);
+        assertNull(view.getParent());
+        assertEquals(1, mLayout.getChildCount());
 
-       parser = null;
-       parser = getParser();
-       try {
-           view = mLayoutInflater.inflate(parser, mLayout, false);
-           fail("should throw exception");
-       } catch (InflateException e) {
-       }
+        parser = null;
+        parser = getParser();
+        try {
+            view = mLayoutInflater.inflate(parser, mLayout, false);
+            fail("should throw exception");
+        } catch (InflateException e) {
+        }
 
-       parser = null;
-       view = null;
-       parser = getParser();
+        parser = null;
+        view = null;
+        parser = getParser();
 
-       view = mLayoutInflater.inflate(parser, mLayout, true);
-       assertNotNull(view);
-       assertEquals(2, mLayout.getChildCount());
-   }
+        view = mLayoutInflater.inflate(parser, mLayout, true);
+        assertNotNull(view);
+        assertEquals(2, mLayout.getChildCount());
+    }
+
+    public void testOverrideTheme() {
+        View container = mLayoutInflater.inflate(R.layout.inflater_override_theme_layout, null);
+        verifyThemeType(container, "view_outer", R.id.view_outer, 1);
+        verifyThemeType(container, "view_inner", R.id.view_inner, 2);
+    }
+
+    private void verifyThemeType(View container, String tag, int id, int type) {
+        TypedValue outValue = new TypedValue();
+        View view = container.findViewById(id);
+        assertNotNull("Found " + tag, view);
+        Theme theme = view.getContext().getTheme();
+        boolean resolved = theme.resolveAttribute(R.attr.themeType, outValue, true);
+        assertTrue("Resolved themeType for " + tag, resolved);
+        assertEquals(tag + " has themeType " + type, outValue.data, type);
+    }
 
     static class MockLayoutInflater extends LayoutInflater {
 
