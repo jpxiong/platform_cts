@@ -274,6 +274,7 @@ public class CameraCaptureResultTest extends AndroidTestCase {
         ArrayList<CameraMetadata.Key<?>> resultKeys = new ArrayList<CameraMetadata.Key<?>>();
         resultKeys.add(CaptureResult.COLOR_CORRECTION_TRANSFORM);
         resultKeys.add(CaptureResult.COLOR_CORRECTION_GAINS);
+        resultKeys.add(CaptureResult.CONTROL_AE_MODE);
         resultKeys.add(CaptureResult.CONTROL_AE_REGIONS);
         resultKeys.add(CaptureResult.CONTROL_AF_MODE);
         resultKeys.add(CaptureResult.CONTROL_AF_REGIONS);
