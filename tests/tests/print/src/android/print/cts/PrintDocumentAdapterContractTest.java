@@ -52,11 +52,11 @@ import android.printservice.PrintJob;
 import android.printservice.PrinterDiscoverySession;
 import android.util.DisplayMetrics;
 
-import com.android.uiautomator.core.UiDevice;
-import com.android.uiautomator.core.UiObject;
-import com.android.uiautomator.core.UiObjectNotFoundException;
-import com.android.uiautomator.core.UiSelector;
-import com.android.uiautomator.testrunner.UiAutomatorTestCase;
+import android.support.test.uiautomator.UiAutomatorTestCase;
+import android.support.test.uiautomator.UiDevice;
+import android.support.test.uiautomator.UiObject;
+import android.support.test.uiautomator.UiObjectNotFoundException;
+import android.support.test.uiautomator.UiSelector;
 
 import org.hamcrest.BaseMatcher;
 import org.hamcrest.Description;
