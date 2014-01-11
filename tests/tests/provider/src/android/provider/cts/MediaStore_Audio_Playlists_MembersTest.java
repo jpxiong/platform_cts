@@ -27,6 +27,9 @@ import android.provider.MediaStore.Audio.Playlists;
 import android.provider.MediaStore.Audio.Playlists.Members;
 import android.provider.cts.MediaStoreAudioTestHelper.Audio1;
 import android.provider.cts.MediaStoreAudioTestHelper.Audio2;
+import android.provider.cts.MediaStoreAudioTestHelper.Audio3;
+import android.provider.cts.MediaStoreAudioTestHelper.Audio4;
+import android.provider.cts.MediaStoreAudioTestHelper.Audio5;
 import android.provider.cts.MediaStoreAudioTestHelper.MockAudioMediaInfo;
 import android.test.InstrumentationTestCase;
 
@@ -114,9 +117,9 @@ public class MediaStore_Audio_Playlists_MembersTest extends InstrumentationTestC
         mContentResolver = getInstrumentation().getContext().getContentResolver();
         mIdOfAudio1 = insertAudioItem(Audio1.getInstance());
         mIdOfAudio2 = insertAudioItem(Audio2.getInstance());
-        mIdOfAudio3 = insertAudioItem(Audio1.getInstance());
-        mIdOfAudio4 = insertAudioItem(Audio1.getInstance());
-        mIdOfAudio5 = insertAudioItem(Audio1.getInstance());
+        mIdOfAudio3 = insertAudioItem(Audio3.getInstance());
+        mIdOfAudio4 = insertAudioItem(Audio4.getInstance());
+        mIdOfAudio5 = insertAudioItem(Audio5.getInstance());
     }
 
     @Override
