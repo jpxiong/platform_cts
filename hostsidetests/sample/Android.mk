@@ -1,4 +1,4 @@
-# Copyright (C) 2009 The Android Open Source Project
+# Copyright (C) 2014 The Android Open Source Project
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -12,26 +12,21 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-LOCAL_PATH:= $(call my-dir)
+LOCAL_PATH := $(call my-dir)
 
 include $(CLEAR_VARS)
 
-# Replace "Example" with your name.
-LOCAL_PACKAGE_NAME := CtsExampleTestCases
-
-# Don't include this package in any target.
-LOCAL_MODULE_TAGS := optional
-
-# When built, explicitly put it in the data partition.
-LOCAL_MODULE_PATH := $(TARGET_OUT_DATA_APPS)
-
-# All tests should include android.test.runner.
-LOCAL_JAVA_LIBRARIES := android.test.runner
-
-LOCAL_STATIC_JAVA_LIBRARIES := ctstestrunner
-
 LOCAL_SRC_FILES := $(call all-java-files-under, src)
 
-LOCAL_SDK_VERSION := current
+LOCAL_MODULE_TAGS := optional
 
-include $(BUILD_CTS_PACKAGE)
+# Must match the package name in CtsTestCaseList.mk
+LOCAL_MODULE := CtsSampleHostTestCases
+
+LOCAL_JAVA_LIBRARIES := cts-tradefed ddmlib-prebuilt tradefed-prebuilt
+
+LOCAL_CTS_TEST_PACKAGE := android.host.sample
+
+include $(BUILD_CTS_HOST_JAVA_LIBRARY)
+
+include $(call all-makefiles-under,$(LOCAL_PATH))
