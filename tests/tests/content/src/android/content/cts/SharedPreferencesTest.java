@@ -16,10 +16,6 @@
 
 package android.content.cts;
 
-import com.android.cts.stub.R;
-
-import dalvik.annotation.BrokenTest;
-
 import android.app.QueuedWork;
 import android.content.Context;
 import android.content.ContextWrapper;
@@ -28,7 +24,6 @@ import android.os.StrictMode;
 import android.preference.PreferenceManager;
 import android.test.AndroidTestCase;
 import android.util.Log;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -91,6 +86,19 @@ public class SharedPreferencesTest extends AndroidTestCase {
         assertEquals(123, prefs.getInt(key, 123));
         assertEquals(999L, prefs.getLong(key, 999L));
         assertEquals("default", prefs.getString(key, "default"));
+    }
+
+    public void testPutNullRemovesKey() {
+        SharedPreferences prefs = getPrefs();
+        prefs.edit().putString("test-key", "test-value").commit();
+        assertEquals("test-value", prefs.getString("test-key", null));
+
+        SharedPreferences.Editor editor = prefs.edit().putString("test-key", null);
+        assertEquals("test-value", prefs.getString("test-key", null));
+        editor.commit();
+
+        assertNull(prefs.getString("test-key", null));
+        assertFalse(prefs.contains("test-key"));
     }
 
     private abstract class RedundantWriteTest {
