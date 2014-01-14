@@ -186,10 +186,10 @@ public class DrawableContainerTest extends TestCase {
         assertConstantStateNotSet();
         assertNull(mDrawableContainer.getCurrent());
 
+        mDrawableContainer.setConstantState(mDrawableContainerState);
         mDrawableContainer.setColorFilter(null);
         mDrawableContainer.setColorFilter(new ColorFilter());
 
-        mDrawableContainer.setConstantState(mDrawableContainerState);
         MockDrawable dr = new MockDrawable();
         addAndSelectDrawable(dr);
 
