@@ -16,71 +16,37 @@
 
 package android.print.cts.services;
 
-import android.print.PrinterId;
 import android.printservice.PrintJob;
 import android.printservice.PrintService;
 import android.printservice.PrinterDiscoverySession;
 
-import java.util.List;
-
-public abstract class StubbablePrintService extends BasePrintService {
+public abstract class StubbablePrintService extends PrintService {
 
     @Override
     public PrinterDiscoverySession onCreatePrinterDiscoverySession() {
-        BasePrintService impl = getStub(this);
-        if (impl != null) {
-            return impl.onCreatePrinterDiscoverySession();
+        PrintServiceCallbacks callbacks = getCallbacks();
+        if (callbacks != null) {
+            return new StubbablePrinterDiscoverySession(this,
+                    getCallbacks().onCreatePrinterDiscoverySessionCallbacks());
         }
-        return new StubSession();
+        return null;
     }
 
     @Override
     public void onRequestCancelPrintJob(PrintJob printJob) {
-        BasePrintService impl = getStub(this);
-        if (impl != null) {
-            impl.onRequestCancelPrintJob(printJob);
+        PrintServiceCallbacks callbacks = getCallbacks();
+        if (callbacks != null) {
+            callbacks.onRequestCancelPrintJob(printJob);
         }
     }
 
     @Override
     public void onPrintJobQueued(PrintJob printJob) {
-        BasePrintService impl = getStub(this);
-        if (impl != null) {
-            impl.onPrintJobQueued(printJob);
+        PrintServiceCallbacks callbacks = getCallbacks();
+        if (callbacks != null) {
+            callbacks.onPrintJobQueued(printJob);
         }
     }
 
-    protected abstract BasePrintService getStub(PrintService host);
-
-    private final class StubSession extends PrinterDiscoverySession {
-        @Override
-        public void onValidatePrinters(List<PrinterId> printerIds) {
-            /* do nothing */
-        }
-
-        @Override
-        public void onStopPrinterStateTracking(PrinterId printerId) {
-            /* do nothing */
-        }
-
-        @Override
-        public void onStopPrinterDiscovery() {
-            /* do nothing */
-        }
-
-        @Override
-        public void onStartPrinterStateTracking(PrinterId printerId) {
-            /* do nothing */
-        }
-
-        @Override
-        public void onStartPrinterDiscovery(List<PrinterId> priorityList) {
-            /* do nothing */
-        }
-
-        @Override
-        public void onDestroy() {
-            /* do nothing */
-        }
-    }
+    protected abstract PrintServiceCallbacks getCallbacks();
 }

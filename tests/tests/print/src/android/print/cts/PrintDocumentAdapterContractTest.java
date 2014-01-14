@@ -17,21 +17,13 @@
 package android.print.cts;
 
 import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.argThat;
 import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.inOrder;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 
-import android.content.Context;
-import android.content.res.Configuration;
-import android.content.res.Resources;
-import android.os.Bundle;
 import android.os.CancellationSignal;
 import android.os.CancellationSignal.OnCancelListener;
 import android.os.ParcelFileDescriptor;
-import android.os.SystemClock;
 import android.print.PageRange;
 import android.print.PrintAttributes;
 import android.print.PrintAttributes.Margins;
@@ -41,25 +33,18 @@ import android.print.PrintDocumentAdapter;
 import android.print.PrintDocumentAdapter.LayoutResultCallback;
 import android.print.PrintDocumentAdapter.WriteResultCallback;
 import android.print.PrintDocumentInfo;
-import android.print.PrintManager;
 import android.print.PrinterCapabilitiesInfo;
 import android.print.PrinterId;
 import android.print.PrinterInfo;
 import android.print.cts.services.FirstPrintService;
+import android.print.cts.services.PrintServiceCallbacks;
+import android.print.cts.services.PrinterDiscoverySessionCallbacks;
 import android.print.cts.services.SecondPrintService;
-import android.print.cts.services.StubPrintService;
+import android.print.cts.services.StubbablePrinterDiscoverySession;
 import android.printservice.PrintJob;
-import android.printservice.PrinterDiscoverySession;
-import android.util.DisplayMetrics;
-
-import android.support.test.uiautomator.UiAutomatorTestCase;
+import android.printservice.PrintService;
 import android.support.test.uiautomator.UiDevice;
-import android.support.test.uiautomator.UiObject;
-import android.support.test.uiautomator.UiObjectNotFoundException;
-import android.support.test.uiautomator.UiSelector;
 
-import org.hamcrest.BaseMatcher;
-import org.hamcrest.Description;
 import org.mockito.InOrder;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
@@ -67,77 +52,17 @@ import org.mockito.stubbing.Answer;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
-import java.util.concurrent.TimeoutException;
 
 /**
  * This test verifies that the system respects the {@link PrintDocumentAdapter}
  * contract and invokes all callbacks as expected.
  */
-public class PrintDocumentAdapterContractTest extends UiAutomatorTestCase {
-
-    private static final long OPERATION_TIMEOUT = 10000;
-
-    private static final String ARG_PRIVILEGED_OPS = "ARG_PRIVILEGED_OPS";
-
-    private static final String PRINT_SPOOLER_PACKAGE_NAME = "com.android.printspooler";
-
-    private PrintDocumentAdapterContractActivity mActivity;
-
-    private Locale mOldLocale;
-
-    @Override
-    public void setUp() throws Exception {
-        // Make sure we start with a clean slate.
-        clearPrintSpoolerData();
-
-        // Workaround for dexmaker bug: https://code.google.com/p/dexmaker/issues/detail?id=2
-        // Dexmaker is used by mockito.
-        System.setProperty("dexmaker.dexcache", getInstrumentation()
-                .getTargetContext().getCacheDir().getPath());
-
-        // Set to US locale.
-        Resources resources = getInstrumentation().getTargetContext().getResources();
-        Configuration oldConfiguration = resources.getConfiguration();
-        if (!oldConfiguration.locale.equals(Locale.US)) {
-            mOldLocale = oldConfiguration.locale;
-            DisplayMetrics displayMetrics = resources.getDisplayMetrics();
-            Configuration newConfiguration = new Configuration(oldConfiguration);
-            newConfiguration.locale = Locale.US;
-            resources.updateConfiguration(newConfiguration, displayMetrics);
-        }
-
-        // Create the activity for the right locale.
-        createActivity();
-    }
-
-    @Override
-    public void tearDown() throws Exception {
-        // Done with the activity.
-        getActivity().finish();
-
-        // Restore the locale if needed.
-        if (mOldLocale != null) {
-            Resources resources = getInstrumentation().getTargetContext().getResources();
-            DisplayMetrics displayMetrics = resources.getDisplayMetrics();
-            Configuration newConfiguration = new Configuration(resources.getConfiguration());
-            newConfiguration.locale = mOldLocale;
-            mOldLocale = null;
-            resources.updateConfiguration(newConfiguration, displayMetrics);
-        }
-
-        // Make sure the spooler is cleaned.
-        clearPrintSpoolerData();
-    }
+public class PrintDocumentAdapterContractTest extends BasePrintTest {
 
     public void testNoPrintOptionsOrPrinterChange() throws Exception {
         // Configure the print services.
-        FirstPrintService.setImpl(new SimpleTwoPrintersService());
-        SecondPrintService.setImpl(null);
-
-        final CallCounter layoutCallCounter = new CallCounter();
-        final CallCounter writeCallCounter = new CallCounter();
-        final CallCounter finishCallCounter = new CallCounter();
+        FirstPrintService.setCallbacks(createFirstMockPrintServiceCallbacks());
+        SecondPrintService.setCallbacks(createSecondMockPrintServiceCallbacks());
 
         // Create a mock print adapter.
         final PrintDocumentAdapter adapter = createMockPrintDocumentAdapter(
@@ -145,11 +70,12 @@ public class PrintDocumentAdapterContractTest extends UiAutomatorTestCase {
             @Override
             public Void answer(InvocationOnMock invocation) throws Throwable {
                 LayoutResultCallback callback = (LayoutResultCallback) invocation.getArguments()[3];
-                PrintDocumentInfo info = new PrintDocumentInfo.Builder("Test")
+                PrintDocumentInfo info = new PrintDocumentInfo.Builder(PRINT_JOB_NAME)
                         .setContentType(PrintDocumentInfo.CONTENT_TYPE_DOCUMENT).setPageCount(1)
                         .build();
                 callback.onLayoutFinished(info, false);
-                layoutCallCounter.call();
+                // Mark layout was called.
+                onLayoutCalled();
                 return null;
             }
         }, new Answer<Void>() {
@@ -162,14 +88,14 @@ public class PrintDocumentAdapterContractTest extends UiAutomatorTestCase {
                 fd.close();
                 callback.onWriteFinished(pages);
                 // Mark write was called.
-                writeCallCounter.call();
+                onWriteCalled();
                 return null;
             }
         }, new Answer<Void>() {
             @Override
             public Void answer(InvocationOnMock invocation) throws Throwable {
                 // Mark finish was called.
-                finishCallCounter.call();
+                onFinishCalled();
                 return null;
             }
         });
@@ -178,19 +104,19 @@ public class PrintDocumentAdapterContractTest extends UiAutomatorTestCase {
         print(adapter);
 
         // Wait for write.
-        waitForWriteForAdapterCallback(writeCallCounter);
+        waitForWriteForAdapterCallback();
 
         // Select the second printer.
         selectPrinter("Second printer");
 
         // Wait for layout.
-        waitForLayoutAdapterCallbackCount(layoutCallCounter, 2);
+        waitForLayoutAdapterCallbackCount(2);
 
         // Click the print button.
         clickPrintButton();
 
         // Wait for finish.
-        waitForAdapterCallbackFinish(finishCallCounter);
+        waitForAdapterCallbackFinish();
 
         // Verify the expected calls.
         InOrder inOrder = inOrder(adapter);
@@ -244,11 +170,8 @@ public class PrintDocumentAdapterContractTest extends UiAutomatorTestCase {
 
     public void testNoPrintOptionsOrPrinterChangeCanceled() throws Exception {
         // Configure the print services.
-        FirstPrintService.setImpl(new SimpleTwoPrintersService());
-        SecondPrintService.setImpl(null);
-
-        final CallCounter writeCallCounter = new CallCounter();
-        final CallCounter finishCallCounter = new CallCounter();
+        FirstPrintService.setCallbacks(createFirstMockPrintServiceCallbacks());
+        SecondPrintService.setCallbacks(createSecondMockPrintServiceCallbacks());
 
         // Create a mock print adapter.
         final PrintDocumentAdapter adapter = createMockPrintDocumentAdapter(
@@ -257,7 +180,7 @@ public class PrintDocumentAdapterContractTest extends UiAutomatorTestCase {
             public Void answer(InvocationOnMock invocation) throws Throwable {
                 LayoutResultCallback callback = (LayoutResultCallback)
                         invocation.getArguments()[3];
-                PrintDocumentInfo info = new PrintDocumentInfo.Builder("Test")
+                PrintDocumentInfo info = new PrintDocumentInfo.Builder(PRINT_JOB_NAME)
                     .setContentType(PrintDocumentInfo.CONTENT_TYPE_DOCUMENT)
                     .setPageCount(1)
                     .build();
@@ -274,14 +197,14 @@ public class PrintDocumentAdapterContractTest extends UiAutomatorTestCase {
                 fd.close();
                 callback.onWriteFinished(pages);
                 // Mark write was called.
-                writeCallCounter.call();
+                onWriteCalled();
                 return null;
             }
         }, new Answer<Void>() {
             @Override
             public Void answer(InvocationOnMock invocation) throws Throwable {
                 // Mark finish was called.
-                finishCallCounter.call();
+                onFinishCalled();
                 return null;
             }
         });
@@ -290,13 +213,14 @@ public class PrintDocumentAdapterContractTest extends UiAutomatorTestCase {
         print(adapter);
 
         // Wait for write.
-        waitForWriteForAdapterCallback(writeCallCounter);
+        waitForWriteForAdapterCallback();
 
         // Cancel the printing.
+        UiDevice.getInstance().pressBack(); // wakes up the device.
         UiDevice.getInstance().pressBack();
 
         // Wait for finish.
-        waitForAdapterCallbackFinish(finishCallCounter);
+        waitForAdapterCallbackFinish();
 
         // Verify the expected calls.
         InOrder inOrder = inOrder(adapter);
@@ -329,12 +253,8 @@ public class PrintDocumentAdapterContractTest extends UiAutomatorTestCase {
 
     public void testPrintOptionsChangeAndNoPrinterChange() throws Exception {
         // Configure the print services.
-        FirstPrintService.setImpl(new SimpleTwoPrintersService());
-        SecondPrintService.setImpl(null);
-
-        final CallCounter layoutCallCounter = new CallCounter();
-        final CallCounter writeCallCounter = new CallCounter();
-        final CallCounter finishCallCounter = new CallCounter();
+        FirstPrintService.setCallbacks(createFirstMockPrintServiceCallbacks());
+        SecondPrintService.setCallbacks(createSecondMockPrintServiceCallbacks());
 
         // Create a mock print adapter.
         final PrintDocumentAdapter adapter = createMockPrintDocumentAdapter(
@@ -343,13 +263,13 @@ public class PrintDocumentAdapterContractTest extends UiAutomatorTestCase {
             public Void answer(InvocationOnMock invocation) throws Throwable {
                 LayoutResultCallback callback = (LayoutResultCallback)
                         invocation.getArguments()[3];
-                PrintDocumentInfo info = new PrintDocumentInfo.Builder("Test")
+                PrintDocumentInfo info = new PrintDocumentInfo.Builder(PRINT_JOB_NAME)
                     .setContentType(PrintDocumentInfo.CONTENT_TYPE_DOCUMENT)
                     .setPageCount(1)
                     .build();
                 callback.onLayoutFinished(info, false);
                 // Mark layout was called.
-                layoutCallCounter.call();
+                onLayoutCalled();
                 return null;
             }
         }, new Answer<Void>() {
@@ -362,14 +282,14 @@ public class PrintDocumentAdapterContractTest extends UiAutomatorTestCase {
                 fd.close();
                 callback.onWriteFinished(pages);
                 // Mark write was called.
-                writeCallCounter.call();
+                onWriteCalled();
                 return null;
             }
         }, new Answer<Void>() {
             @Override
             public Void answer(InvocationOnMock invocation) throws Throwable {
                 // Mark finish was called.
-                finishCallCounter.call();
+                onFinishCalled();
                 return null;
             }
         });
@@ -378,37 +298,37 @@ public class PrintDocumentAdapterContractTest extends UiAutomatorTestCase {
         print(adapter);
 
         // Wait for write.
-        waitForWriteForAdapterCallback(writeCallCounter);
+        waitForWriteForAdapterCallback();
 
         // Select the second printer.
         selectPrinter("Second printer");
 
         // Wait for layout.
-        waitForLayoutAdapterCallbackCount(layoutCallCounter, 2);
+        waitForLayoutAdapterCallbackCount(2);
 
         // Change the orientation.
         changeOrientation("Landscape");
 
         // Wait for layout.
-        waitForLayoutAdapterCallbackCount(layoutCallCounter, 3);
+        waitForLayoutAdapterCallbackCount(3);
 
         // Change the media size.
         changeMediaSize("ISO A4");
 
         // Wait for layout.
-        waitForLayoutAdapterCallbackCount(layoutCallCounter, 4);
+        waitForLayoutAdapterCallbackCount(4);
 
         // Change the color.
         changeColor("Black & White");
 
         // Wait for layout.
-        waitForLayoutAdapterCallbackCount(layoutCallCounter, 5);
+        waitForLayoutAdapterCallbackCount(5);
 
         // Click the print button.
         clickPrintButton();
 
         // Wait for a finish.
-        waitForAdapterCallbackFinish(finishCallCounter);
+        waitForAdapterCallbackFinish();
 
         // Verify the expected calls.
         InOrder inOrder = inOrder(adapter);
@@ -498,12 +418,8 @@ public class PrintDocumentAdapterContractTest extends UiAutomatorTestCase {
 
     public void testPrintOptionsChangeAndPrinterChange() throws Exception {
         // Configure the print services.
-        FirstPrintService.setImpl(new SimpleTwoPrintersService());
-        SecondPrintService.setImpl(null);
-
-        final CallCounter layoutCallCounter = new CallCounter();
-        final CallCounter writeCallCounter = new CallCounter();
-        final CallCounter finishCallCounter = new CallCounter();
+        FirstPrintService.setCallbacks(createFirstMockPrintServiceCallbacks());
+        SecondPrintService.setCallbacks(createSecondMockPrintServiceCallbacks());
 
         // Create a mock print adapter.
         final PrintDocumentAdapter adapter = createMockPrintDocumentAdapter(
@@ -512,13 +428,13 @@ public class PrintDocumentAdapterContractTest extends UiAutomatorTestCase {
             public Void answer(InvocationOnMock invocation) throws Throwable {
                 LayoutResultCallback callback = (LayoutResultCallback)
                         invocation.getArguments()[3];
-                PrintDocumentInfo info = new PrintDocumentInfo.Builder("Test")
+                PrintDocumentInfo info = new PrintDocumentInfo.Builder(PRINT_JOB_NAME)
                     .setContentType(PrintDocumentInfo.CONTENT_TYPE_DOCUMENT)
                     .setPageCount(1)
                     .build();
                 callback.onLayoutFinished(info, false);
                 // Mark layout was called.
-                layoutCallCounter.call();
+                onLayoutCalled();
                 return null;
             }
         }, new Answer<Void>() {
@@ -531,14 +447,14 @@ public class PrintDocumentAdapterContractTest extends UiAutomatorTestCase {
                 fd.close();
                 callback.onWriteFinished(pages);
                 // Mark write was called.
-                writeCallCounter.call();
+                onWriteCalled();
                 return null;
             }
         }, new Answer<Void>() {
             @Override
             public Void answer(InvocationOnMock invocation) throws Throwable {
                 // Mark finish was called.
-                finishCallCounter.call();
+                onFinishCalled();
                 return null;
             }
         });
@@ -547,32 +463,32 @@ public class PrintDocumentAdapterContractTest extends UiAutomatorTestCase {
         print(adapter);
 
         // Wait for write.
-        waitForWriteForAdapterCallback(writeCallCounter);
+        waitForWriteForAdapterCallback();
 
         // Select the second printer.
         selectPrinter("Second printer");
 
         // Wait for layout.
-        waitForLayoutAdapterCallbackCount(layoutCallCounter, 2);
+        waitForLayoutAdapterCallbackCount(2);
 
         // Change the color.
         changeColor("Black & White");
 
         // Wait for layout.
-        waitForLayoutAdapterCallbackCount(layoutCallCounter, 3);
+        waitForLayoutAdapterCallbackCount(3);
 
         // Change the printer to one which supports the current media size.
         // Select the second printer.
         selectPrinter("First printer");
 
         // Wait for layout.
-        waitForLayoutAdapterCallbackCount(layoutCallCounter, 4);
+        waitForLayoutAdapterCallbackCount(4);
 
         // Click the print button.
         clickPrintButton();
 
         // Wait for a finish.
-        waitForAdapterCallbackFinish(finishCallCounter);
+        waitForAdapterCallbackFinish();
 
         // Verify the expected calls.
         InOrder inOrder = inOrder(adapter);
@@ -649,12 +565,8 @@ public class PrintDocumentAdapterContractTest extends UiAutomatorTestCase {
     public void testPrintOptionsChangeAndNoPrinterChangeAndContentChange()
             throws Exception {
         // Configure the print services.
-        FirstPrintService.setImpl(new SimpleTwoPrintersService());
-        SecondPrintService.setImpl(null);
-
-        final CallCounter layoutCallCounter = new CallCounter();
-        final CallCounter writeCallCounter = new CallCounter();
-        final CallCounter finishCallCounter = new CallCounter();
+        FirstPrintService.setCallbacks(createFirstMockPrintServiceCallbacks());
+        SecondPrintService.setCallbacks(createSecondMockPrintServiceCallbacks());
 
         // Create a mock print adapter.
         final PrintDocumentAdapter adapter = createMockPrintDocumentAdapter(
@@ -662,13 +574,13 @@ public class PrintDocumentAdapterContractTest extends UiAutomatorTestCase {
             @Override
             public Void answer(InvocationOnMock invocation) throws Throwable {
                 LayoutResultCallback callback = (LayoutResultCallback) invocation.getArguments()[3];
-                PrintDocumentInfo info = new PrintDocumentInfo.Builder("Test")
+                PrintDocumentInfo info = new PrintDocumentInfo.Builder(PRINT_JOB_NAME)
                         .setContentType(PrintDocumentInfo.CONTENT_TYPE_DOCUMENT).setPageCount(1)
                         .build();
                 // The content changes after every layout.
                 callback.onLayoutFinished(info, true);
                 // Mark layout was called.
-                layoutCallCounter.call();
+                onLayoutCalled();
                 return null;
             }
         }, new Answer<Void>() {
@@ -681,14 +593,14 @@ public class PrintDocumentAdapterContractTest extends UiAutomatorTestCase {
                 fd.close();
                 callback.onWriteFinished(pages);
                 // Mark write was called.
-                writeCallCounter.call();
+                onWriteCalled();
                 return null;
             }
         }, new Answer<Void>() {
             @Override
             public Void answer(InvocationOnMock invocation) throws Throwable {
                 // Mark finish was called.
-                finishCallCounter.call();
+                onFinishCalled();
                 return null;
             }
         });
@@ -697,19 +609,19 @@ public class PrintDocumentAdapterContractTest extends UiAutomatorTestCase {
         print(adapter);
 
         // Wait for write.
-        waitForWriteForAdapterCallback(writeCallCounter);
+        waitForWriteForAdapterCallback();
 
         // Select the second printer.
         selectPrinter("Second printer");
 
         // Wait for layout.
-        waitForLayoutAdapterCallbackCount(layoutCallCounter, 2);
+        waitForLayoutAdapterCallbackCount(2);
 
         // Click the print button.
         clickPrintButton();
 
         // Wait for a finish.
-        waitForAdapterCallbackFinish(finishCallCounter);
+        waitForAdapterCallbackFinish();
 
         // Verify the expected calls.
         InOrder inOrder = inOrder(adapter);
@@ -765,11 +677,8 @@ public class PrintDocumentAdapterContractTest extends UiAutomatorTestCase {
 
     public void testNewPrinterSupportsSelectedPrintOptions() throws Exception {
         // Configure the print services.
-        FirstPrintService.setImpl(new SimpleTwoPrintersService());
-        SecondPrintService.setImpl(null);
-
-        final CallCounter writeCallCounter = new CallCounter();
-        final CallCounter finishCallCounter = new CallCounter();
+        FirstPrintService.setCallbacks(createFirstMockPrintServiceCallbacks());
+        SecondPrintService.setCallbacks(createSecondMockPrintServiceCallbacks());
 
         // Create a mock print adapter.
         final PrintDocumentAdapter adapter = createMockPrintDocumentAdapter(
@@ -777,7 +686,7 @@ public class PrintDocumentAdapterContractTest extends UiAutomatorTestCase {
             @Override
             public Void answer(InvocationOnMock invocation) throws Throwable {
                 LayoutResultCallback callback = (LayoutResultCallback) invocation.getArguments()[3];
-                PrintDocumentInfo info = new PrintDocumentInfo.Builder("Test")
+                PrintDocumentInfo info = new PrintDocumentInfo.Builder(PRINT_JOB_NAME)
                         .setContentType(PrintDocumentInfo.CONTENT_TYPE_DOCUMENT).setPageCount(1)
                         .build();
                 // The content changes after every layout.
@@ -794,14 +703,14 @@ public class PrintDocumentAdapterContractTest extends UiAutomatorTestCase {
                 fd.close();
                 callback.onWriteFinished(pages);
                 // Mark write was called.
-                writeCallCounter.call();
+                onWriteCalled();
                 return null;
             }
         }, new Answer<Void>() {
             @Override
             public Void answer(InvocationOnMock invocation) throws Throwable {
                 // Mark finish was called.
-                finishCallCounter.call();
+                onFinishCalled();
                 return null;
             }
         });
@@ -810,7 +719,7 @@ public class PrintDocumentAdapterContractTest extends UiAutomatorTestCase {
         print(adapter);
 
         // Wait for write.
-        waitForWriteForAdapterCallback(writeCallCounter);
+        waitForWriteForAdapterCallback();
 
         // Select the third printer.
         selectPrinter("Third printer");
@@ -819,7 +728,7 @@ public class PrintDocumentAdapterContractTest extends UiAutomatorTestCase {
         clickPrintButton();
 
         // Wait for a finish.
-        waitForAdapterCallbackFinish(finishCallCounter);
+        waitForAdapterCallbackFinish();
 
         // Verify the expected calls.
         InOrder inOrder = inOrder(adapter);
@@ -859,12 +768,8 @@ public class PrintDocumentAdapterContractTest extends UiAutomatorTestCase {
 
     public void testNothingChangesAllPagesWrittenFirstTime() throws Exception {
         // Configure the print services.
-        FirstPrintService.setImpl(new SimpleTwoPrintersService());
-        SecondPrintService.setImpl(null);
-
-        final CallCounter layoutCallCounter = new CallCounter();
-        final CallCounter writeCallCounter = new CallCounter();
-        final CallCounter finishCallCounter = new CallCounter();
+        FirstPrintService.setCallbacks(createFirstMockPrintServiceCallbacks());
+        SecondPrintService.setCallbacks(createSecondMockPrintServiceCallbacks());
 
         // Create a mock print adapter.
         final PrintDocumentAdapter adapter = createMockPrintDocumentAdapter(
@@ -872,12 +777,12 @@ public class PrintDocumentAdapterContractTest extends UiAutomatorTestCase {
             @Override
             public Void answer(InvocationOnMock invocation) throws Throwable {
                 LayoutResultCallback callback = (LayoutResultCallback) invocation.getArguments()[3];
-                PrintDocumentInfo info = new PrintDocumentInfo.Builder("Test")
+                PrintDocumentInfo info = new PrintDocumentInfo.Builder(PRINT_JOB_NAME)
                         .setContentType(PrintDocumentInfo.CONTENT_TYPE_DOCUMENT).setPageCount(3)
                         .build();
                 callback.onLayoutFinished(info, false);
                 // Mark layout was called.
-                layoutCallCounter.call();
+                onLayoutCalled();
                 return null;
             }
         }, new Answer<Void>() {
@@ -889,14 +794,14 @@ public class PrintDocumentAdapterContractTest extends UiAutomatorTestCase {
                 fd.close();
                 callback.onWriteFinished(new PageRange[] {PageRange.ALL_PAGES});
                 // Mark write was called.
-                writeCallCounter.call();
+                onWriteCalled();
                 return null;
             }
         }, new Answer<Void>() {
             @Override
             public Void answer(InvocationOnMock invocation) throws Throwable {
                 // Mark finish was called.
-                finishCallCounter.call();
+                onFinishCalled();
                 return null;
             }
         });
@@ -905,19 +810,19 @@ public class PrintDocumentAdapterContractTest extends UiAutomatorTestCase {
         print(adapter);
 
         // Wait for write.
-        waitForWriteForAdapterCallback(writeCallCounter);
+        waitForWriteForAdapterCallback();
 
         // Select the second printer.
         selectPrinter("Second printer");
 
         // Wait for layout.
-        waitForLayoutAdapterCallbackCount(layoutCallCounter, 2);
+        waitForLayoutAdapterCallbackCount(2);
 
         // Click the print button.
         clickPrintButton();
 
         // Wait for a finish.
-        waitForAdapterCallbackFinish(finishCallCounter);
+        waitForAdapterCallbackFinish();
 
         // Verify the expected calls.
         InOrder inOrder = inOrder(adapter);
@@ -972,11 +877,8 @@ public class PrintDocumentAdapterContractTest extends UiAutomatorTestCase {
 
     public void testCancelLongRunningLayout() throws Exception {
         // Configure the print services.
-        FirstPrintService.setImpl(new SimpleTwoPrintersService());
-        SecondPrintService.setImpl(null);
-
-        final CallCounter layoutCallCounter = new CallCounter();
-        final CallCounter finishCallCounter = new CallCounter();
+        FirstPrintService.setCallbacks(createFirstMockPrintServiceCallbacks());
+        SecondPrintService.setCallbacks(createSecondMockPrintServiceCallbacks());
 
         // Create a mock print adapter.
         final PrintDocumentAdapter adapter = createMockPrintDocumentAdapter(
@@ -992,14 +894,14 @@ public class PrintDocumentAdapterContractTest extends UiAutomatorTestCase {
                         callback.onLayoutCancelled();
                     }
                 });
-                layoutCallCounter.call();
+                onLayoutCalled();
                 return null;
             }
         }, null, new Answer<Void>() {
             @Override
             public Void answer(InvocationOnMock invocation) throws Throwable {
                 // Mark finish was called.
-                finishCallCounter.call();
+                onFinishCalled();
                 return null;
             }
         });
@@ -1008,14 +910,14 @@ public class PrintDocumentAdapterContractTest extends UiAutomatorTestCase {
         print(adapter);
 
         // Wait for layout.
-        waitForLayoutAdapterCallbackCount(layoutCallCounter, 1);
+        waitForLayoutAdapterCallbackCount(1);
 
         // Cancel printing.
         UiDevice.getInstance().pressBack(); // wakes up the device.
         UiDevice.getInstance().pressBack();
 
         // Wait for a finish.
-        waitForAdapterCallbackFinish(finishCallCounter);
+        waitForAdapterCallbackFinish();
 
         // Verify the expected calls.
         InOrder inOrder = inOrder(adapter);
@@ -1042,11 +944,8 @@ public class PrintDocumentAdapterContractTest extends UiAutomatorTestCase {
 
     public void testCancelLongRunningWrite() throws Exception {
         // Configure the print services.
-        FirstPrintService.setImpl(new SimpleTwoPrintersService());
-        SecondPrintService.setImpl(null);
-
-        final CallCounter writeCallCounter = new CallCounter();
-        final CallCounter finishCallCounter = new CallCounter();
+        FirstPrintService.setCallbacks(createFirstMockPrintServiceCallbacks());
+        SecondPrintService.setCallbacks(createSecondMockPrintServiceCallbacks());
 
         // Create a mock print adapter.
         final PrintDocumentAdapter adapter = createMockPrintDocumentAdapter(
@@ -1054,7 +953,7 @@ public class PrintDocumentAdapterContractTest extends UiAutomatorTestCase {
             @Override
             public Void answer(InvocationOnMock invocation) throws Throwable {
                 LayoutResultCallback callback = (LayoutResultCallback) invocation.getArguments()[3];
-                PrintDocumentInfo info = new PrintDocumentInfo.Builder("Test")
+                PrintDocumentInfo info = new PrintDocumentInfo.Builder(PRINT_JOB_NAME)
                         .setContentType(PrintDocumentInfo.CONTENT_TYPE_DOCUMENT).setPageCount(1)
                         .build();
                 callback.onLayoutFinished(info, false);
@@ -1079,14 +978,14 @@ public class PrintDocumentAdapterContractTest extends UiAutomatorTestCase {
                     }
                 });
                 // Mark write was called.
-                writeCallCounter.call();
+                onWriteCalled();
                 return null;
             }
         }, new Answer<Void>() {
             @Override
             public Void answer(InvocationOnMock invocation) throws Throwable {
                 // Mark finish was called.
-                finishCallCounter.call();
+                onFinishCalled();
                 return null;
             }
         });
@@ -1095,14 +994,14 @@ public class PrintDocumentAdapterContractTest extends UiAutomatorTestCase {
         print(adapter);
 
         // Wait for write.
-        waitForWriteForAdapterCallback(writeCallCounter);
+        waitForWriteForAdapterCallback();
 
         // Cancel printing.
         UiDevice.getInstance().pressBack(); // wakes up the device.
         UiDevice.getInstance().pressBack();
 
         // Wait for a finish.
-        waitForAdapterCallbackFinish(finishCallCounter);
+        waitForAdapterCallbackFinish();
 
         // Verify the expected calls.
         InOrder inOrder = inOrder(adapter);
@@ -1134,11 +1033,8 @@ public class PrintDocumentAdapterContractTest extends UiAutomatorTestCase {
 
     public void testFailedLayout() throws Exception {
         // Configure the print services.
-        FirstPrintService.setImpl(new SimpleTwoPrintersService());
-        SecondPrintService.setImpl(null);
-
-        final CallCounter layoutCallCounter = new CallCounter();
-        final CallCounter finishCallCounter = new CallCounter();
+        FirstPrintService.setCallbacks(createFirstMockPrintServiceCallbacks());
+        SecondPrintService.setCallbacks(createSecondMockPrintServiceCallbacks());
 
         // Create a mock print adapter.
         final PrintDocumentAdapter adapter = createMockPrintDocumentAdapter(
@@ -1148,14 +1044,14 @@ public class PrintDocumentAdapterContractTest extends UiAutomatorTestCase {
                 LayoutResultCallback callback = (LayoutResultCallback) invocation.getArguments()[3];
                 callback.onLayoutFailed(null);
                 // Mark layout was called.
-                layoutCallCounter.call();
+                onLayoutCalled();
                 return null;
             }
         }, null, new Answer<Void>() {
             @Override
             public Void answer(InvocationOnMock invocation) throws Throwable {
                 // Mark finish was called.
-                finishCallCounter.call();
+                onFinishCalled();
                 return null;
             }
         });
@@ -1164,14 +1060,14 @@ public class PrintDocumentAdapterContractTest extends UiAutomatorTestCase {
         print(adapter);
 
         // Wait for layout.
-        waitForLayoutAdapterCallbackCount(layoutCallCounter, 1);
+        waitForLayoutAdapterCallbackCount(1);
 
         // Cancel printing.
         UiDevice.getInstance().pressBack(); // wakes up the device.
         UiDevice.getInstance().pressBack();
 
         // Wait for a finish.
-        waitForAdapterCallbackFinish(finishCallCounter);
+        waitForAdapterCallbackFinish();
 
         // Verify the expected calls.
         InOrder inOrder = inOrder(adapter);
@@ -1200,11 +1096,8 @@ public class PrintDocumentAdapterContractTest extends UiAutomatorTestCase {
 
     public void testFailedWrite() throws Exception {
         // Configure the print services.
-        FirstPrintService.setImpl(new SimpleTwoPrintersService());
-        SecondPrintService.setImpl(null);
-
-        final CallCounter writeCallCounter = new CallCounter();
-        final CallCounter finishCallCounter = new CallCounter();
+        FirstPrintService.setCallbacks(createFirstMockPrintServiceCallbacks());
+        SecondPrintService.setCallbacks(createSecondMockPrintServiceCallbacks());
 
         // Create a mock print adapter.
         final PrintDocumentAdapter adapter = createMockPrintDocumentAdapter(
@@ -1212,7 +1105,7 @@ public class PrintDocumentAdapterContractTest extends UiAutomatorTestCase {
             @Override
             public Void answer(InvocationOnMock invocation) throws Throwable {
                 LayoutResultCallback callback = (LayoutResultCallback) invocation.getArguments()[3];
-                PrintDocumentInfo info = new PrintDocumentInfo.Builder("Test")
+                PrintDocumentInfo info = new PrintDocumentInfo.Builder(PRINT_JOB_NAME)
                         .setContentType(PrintDocumentInfo.CONTENT_TYPE_DOCUMENT).setPageCount(1)
                         .build();
                 callback.onLayoutFinished(info, false);
@@ -1227,14 +1120,14 @@ public class PrintDocumentAdapterContractTest extends UiAutomatorTestCase {
                 fd.close();
                 callback.onWriteFailed(null);
                 // Mark write was called.
-                writeCallCounter.call();
+                onWriteCalled();
                 return null;
             }
         }, new Answer<Void>() {
             @Override
             public Void answer(InvocationOnMock invocation) throws Throwable {
                 // Mark finish was called.
-                finishCallCounter.call();
+                onFinishCalled();
                 return null;
             }
         });
@@ -1243,14 +1136,14 @@ public class PrintDocumentAdapterContractTest extends UiAutomatorTestCase {
         print(adapter);
 
         // Wait for write.
-        waitForWriteForAdapterCallback(writeCallCounter);
+        waitForWriteForAdapterCallback();
 
         // Cancel printing.
         UiDevice.getInstance().pressBack(); // wakes up the device.
         UiDevice.getInstance().pressBack();
 
         // Wait for a finish.
-        waitForAdapterCallbackFinish(finishCallCounter);
+        waitForAdapterCallbackFinish();
 
         // Verify the expected calls.
         InOrder inOrder = inOrder(adapter);
@@ -1282,11 +1175,8 @@ public class PrintDocumentAdapterContractTest extends UiAutomatorTestCase {
 
     public void testRequestedPagesNotWritten() throws Exception {
         // Configure the print services.
-        FirstPrintService.setImpl(new SimpleTwoPrintersService());
-        SecondPrintService.setImpl(null);
-
-        final CallCounter writeCallCounter = new CallCounter();
-        final CallCounter finishCallCounter = new CallCounter();
+        FirstPrintService.setCallbacks(createFirstMockPrintServiceCallbacks());
+        SecondPrintService.setCallbacks(createSecondMockPrintServiceCallbacks());
 
         // Create a mock print adapter.
         final PrintDocumentAdapter adapter = createMockPrintDocumentAdapter(
@@ -1294,7 +1184,7 @@ public class PrintDocumentAdapterContractTest extends UiAutomatorTestCase {
             @Override
             public Void answer(InvocationOnMock invocation) throws Throwable {
                 LayoutResultCallback callback = (LayoutResultCallback) invocation.getArguments()[3];
-                PrintDocumentInfo info = new PrintDocumentInfo.Builder("Test")
+                PrintDocumentInfo info = new PrintDocumentInfo.Builder(PRINT_JOB_NAME)
                       .setContentType(PrintDocumentInfo.CONTENT_TYPE_DOCUMENT).setPageCount(1)
                       .build();
                 callback.onLayoutFinished(info, false);
@@ -1311,14 +1201,14 @@ public class PrintDocumentAdapterContractTest extends UiAutomatorTestCase {
                 callback.onWriteFinished(new PageRange[] {
                         new PageRange(Integer.MAX_VALUE,Integer.MAX_VALUE)});
                 // Mark write was called.
-                writeCallCounter.call();
+                onWriteCalled();
                 return null;
             }
         }, new Answer<Void>() {
             @Override
             public Void answer(InvocationOnMock invocation) throws Throwable {
                 // Mark finish was called.
-                finishCallCounter.call();
+                onFinishCalled();
                 return null;
             }
         });
@@ -1327,14 +1217,14 @@ public class PrintDocumentAdapterContractTest extends UiAutomatorTestCase {
         print(adapter);
 
         // Wait for write.
-        waitForWriteForAdapterCallback(writeCallCounter);
+        waitForWriteForAdapterCallback();
 
         // Cancel printing.
         UiDevice.getInstance().pressBack(); // wakes up the device.
         UiDevice.getInstance().pressBack();
 
         // Wait for a finish.
-        waitForAdapterCallbackFinish(finishCallCounter);
+        waitForAdapterCallbackFinish();
 
         // Verify the expected calls.
         InOrder inOrder = inOrder(adapter);
@@ -1366,11 +1256,8 @@ public class PrintDocumentAdapterContractTest extends UiAutomatorTestCase {
 
     public void testLayoutCallbackNotCalled() throws Exception {
         // Configure the print services.
-        FirstPrintService.setImpl(new SimpleTwoPrintersService());
-        SecondPrintService.setImpl(null);
-
-        final CallCounter layoutCallCounter = new CallCounter();
-        final CallCounter finishCallCounter = new CallCounter();
+        FirstPrintService.setCallbacks(createFirstMockPrintServiceCallbacks());
+        SecondPrintService.setCallbacks(createSecondMockPrintServiceCallbacks());
 
         // Create a mock print adapter.
         final PrintDocumentAdapter adapter = createMockPrintDocumentAdapter(
@@ -1379,14 +1266,14 @@ public class PrintDocumentAdapterContractTest extends UiAutomatorTestCase {
             public Void answer(InvocationOnMock invocation) throws Throwable {
                 // Break the contract and never call the callback.
                 // Mark layout called.
-                layoutCallCounter.call();
+                onLayoutCalled();
                 return null;
             }
         }, null, new Answer<Void>() {
             @Override
             public Void answer(InvocationOnMock invocation) throws Throwable {
                 // Mark finish was called.
-                finishCallCounter.call();
+                onFinishCalled();
                 return null;
             }
         });
@@ -1395,14 +1282,14 @@ public class PrintDocumentAdapterContractTest extends UiAutomatorTestCase {
         print(adapter);
 
         // Wait for layout.
-        waitForLayoutAdapterCallbackCount(layoutCallCounter, 1);
+        waitForLayoutAdapterCallbackCount(1);
 
         // Cancel printing.
         UiDevice.getInstance().pressBack(); // wakes up the device.
         UiDevice.getInstance().pressBack();
 
         // Wait for a finish.
-        waitForAdapterCallbackFinish(finishCallCounter);
+        waitForAdapterCallbackFinish();
 
         // Verify the expected calls.
         InOrder inOrder = inOrder(adapter);
@@ -1427,13 +1314,10 @@ public class PrintDocumentAdapterContractTest extends UiAutomatorTestCase {
         verifyNoMoreInteractions(adapter);
     }
 
-    public void testEriteCallbackNotCalled() throws Exception {
+    public void testWriteCallbackNotCalled() throws Exception {
         // Configure the print services.
-        FirstPrintService.setImpl(new SimpleTwoPrintersService());
-        SecondPrintService.setImpl(null);
-
-        final CallCounter writeCallCounter = new CallCounter();
-        final CallCounter finishCallCounter = new CallCounter();
+        FirstPrintService.setCallbacks(createFirstMockPrintServiceCallbacks());
+        SecondPrintService.setCallbacks(createSecondMockPrintServiceCallbacks());
 
         // Create a mock print adapter.
         final PrintDocumentAdapter adapter = createMockPrintDocumentAdapter(
@@ -1441,7 +1325,7 @@ public class PrintDocumentAdapterContractTest extends UiAutomatorTestCase {
             @Override
             public Void answer(InvocationOnMock invocation) throws Throwable {
                 LayoutResultCallback callback = (LayoutResultCallback) invocation.getArguments()[3];
-                PrintDocumentInfo info = new PrintDocumentInfo.Builder("Test")
+                PrintDocumentInfo info = new PrintDocumentInfo.Builder(PRINT_JOB_NAME)
                         .setContentType(PrintDocumentInfo.CONTENT_TYPE_DOCUMENT).setPageCount(1)
                         .build();
                 callback.onLayoutFinished(info, false);
@@ -1455,14 +1339,14 @@ public class PrintDocumentAdapterContractTest extends UiAutomatorTestCase {
                 fd.close();
                 // Break the contract and never call the callback.
                 // Mark write was called.
-                writeCallCounter.call();
+                onWriteCalled();
                 return null;
             }
         }, new Answer<Void>() {
             @Override
             public Void answer(InvocationOnMock invocation) throws Throwable {
                 // Mark finish was called.
-                finishCallCounter.call();
+                onFinishCalled();
                 return null;
             }
         });
@@ -1471,14 +1355,14 @@ public class PrintDocumentAdapterContractTest extends UiAutomatorTestCase {
         print(adapter);
 
         // Wait for write.
-        waitForWriteForAdapterCallback(writeCallCounter);
+        waitForWriteForAdapterCallback();
 
         // Cancel printing.
         UiDevice.getInstance().pressBack(); // wakes up the device.
         UiDevice.getInstance().pressBack();
 
         // Wait for a finish.
-        waitForAdapterCallbackFinish(finishCallCounter);
+        waitForAdapterCallbackFinish();
 
         // Verify the expected calls.
         InOrder inOrder = inOrder(adapter);
@@ -1508,260 +1392,91 @@ public class PrintDocumentAdapterContractTest extends UiAutomatorTestCase {
         verifyNoMoreInteractions(adapter);
     }
 
-    private void print(final PrintDocumentAdapter adapter) {
-        // Initiate printing as if coming from the app.
-        getInstrumentation().runOnMainSync(new Runnable() {
+    private PrintServiceCallbacks createFirstMockPrintServiceCallbacks() {
+        final PrinterDiscoverySessionCallbacks callbacks =
+                createMockPrinterDiscoverySessionCallbacks(new Answer<Void>() {
             @Override
-            public void run() {
-                PrintManager printManager = (PrintManager) getActivity()
-                        .getSystemService(Context.PRINT_SERVICE);
-                printManager.print("Print job", adapter, null);
+            public Void answer(InvocationOnMock invocation) {
+                PrinterDiscoverySessionCallbacks mock = (PrinterDiscoverySessionCallbacks)
+                        invocation.getMock();
+
+                StubbablePrinterDiscoverySession session = mock.getSession();
+                PrintService service = session.getService();
+
+                if (session.getPrinters().isEmpty()) {
+                    List<PrinterInfo> printers = new ArrayList<PrinterInfo>();
+
+                    // Add the first printer.
+                    PrinterId firstPrinterId = service.generatePrinterId("first_printer");
+                    PrinterCapabilitiesInfo firstCapabilities =
+                            new PrinterCapabilitiesInfo.Builder(firstPrinterId)
+                        .setMinMargins(new Margins(200, 200, 200, 200))
+                        .addMediaSize(MediaSize.ISO_A4, true)
+                        .addMediaSize(MediaSize.ISO_A5, false)
+                        .addResolution(new Resolution("300x300", "300x300", 300, 300), true)
+                        .setColorModes(PrintAttributes.COLOR_MODE_COLOR,
+                                PrintAttributes.COLOR_MODE_COLOR)
+                        .build();
+                    PrinterInfo firstPrinter = new PrinterInfo.Builder(firstPrinterId,
+                            "First printer", PrinterInfo.STATUS_IDLE)
+                        .setCapabilities(firstCapabilities)
+                        .build();
+                    printers.add(firstPrinter);
+
+                    // Add the second printer.
+                    PrinterId secondPrinterId = service.generatePrinterId("second_printer");
+                    PrinterCapabilitiesInfo secondCapabilities =
+                            new PrinterCapabilitiesInfo.Builder(secondPrinterId)
+                        .addMediaSize(MediaSize.ISO_A3, true)
+                        .addMediaSize(MediaSize.ISO_A4, false)
+                        .addResolution(new Resolution("200x200", "200x200", 200, 200), true)
+                        .addResolution(new Resolution("300x300", "300x300", 300, 300), false)
+                        .setColorModes(PrintAttributes.COLOR_MODE_COLOR
+                                | PrintAttributes.COLOR_MODE_MONOCHROME,
+                                PrintAttributes.COLOR_MODE_MONOCHROME)
+                        .build();
+                    PrinterInfo secondPrinter = new PrinterInfo.Builder(secondPrinterId,
+                            "Second printer", PrinterInfo.STATUS_IDLE)
+                        .setCapabilities(secondCapabilities)
+                        .build();
+                    printers.add(secondPrinter);
+
+                    // Add the third printer.
+                    PrinterId thirdPrinterId = service.generatePrinterId("third_printer");
+                    PrinterCapabilitiesInfo thirdCapabilities =
+                            new PrinterCapabilitiesInfo.Builder(thirdPrinterId)
+                        .addMediaSize(MediaSize.NA_LETTER, true)
+                        .addResolution(new Resolution("300x300", "300x300", 300, 300), true)
+                        .setColorModes(PrintAttributes.COLOR_MODE_COLOR,
+                                PrintAttributes.COLOR_MODE_COLOR)
+                        .build();
+                    PrinterInfo thirdPrinter = new PrinterInfo.Builder(thirdPrinterId,
+                            "Third printer", PrinterInfo.STATUS_IDLE)
+                        .setCapabilities(thirdCapabilities)
+                        .build();
+                    printers.add(thirdPrinter);
+
+                    session.addPrinters(printers);
+                }
+                return null;
             }
-        });
-    }
-
-    private void waitForAdapterCallbackFinish(CallCounter counter) {
-        waitForCallbackCallCount(counter, 1, "Did not get expected call to finish.");
-    }
-
-    private void waitForLayoutAdapterCallbackCount(CallCounter counter, int count) {
-        waitForCallbackCallCount(counter, count, "Did not get expected call to layout.");
-    }
-
-    private void waitForWriteForAdapterCallback(CallCounter counter) {
-        waitForCallbackCallCount(counter, 1, "Did not get expected call to write.");
-    }
-
-    private void waitForCallbackCallCount(CallCounter counter, int count, String message) {
-        try {
-            counter.waitForCount(count, OPERATION_TIMEOUT);
-        } catch (TimeoutException te) {
-            fail(message);
-        }
-    }
-
-    private void selectPrinter(String printerName) throws UiObjectNotFoundException {
-        UiObject destinationSpinner = new UiObject(new UiSelector().resourceId(
-                "com.android.printspooler:id/destination_spinner"));
-        destinationSpinner.click();
-        UiObject printerOption = new UiObject(new UiSelector().text(printerName));
-        printerOption.click();
-    }
-
-    private void changeOrientation(String orientation) throws UiObjectNotFoundException {
-        UiObject orientationSpinner = new UiObject(new UiSelector().resourceId(
-                "com.android.printspooler:id/orientation_spinner"));
-        orientationSpinner.click();
-        UiObject orientationOption = new UiObject(new UiSelector().text(orientation));
-        orientationOption.click();
-    }
-
-    private void changeMediaSize(String mediaSize) throws UiObjectNotFoundException {
-        UiObject mediaSizeSpinner = new UiObject(new UiSelector().resourceId(
-                "com.android.printspooler:id/paper_size_spinner"));
-        mediaSizeSpinner.click();
-        UiObject mediaSizeOption = new UiObject(new UiSelector().text(mediaSize));
-        mediaSizeOption.click();
-    }
-
-    private void changeColor(String color) throws UiObjectNotFoundException {
-        UiObject colorSpinner = new UiObject(new UiSelector().resourceId(
-                "com.android.printspooler:id/color_spinner"));
-        colorSpinner.click();
-        UiObject colorOption = new UiObject(new UiSelector().text(color));
-        colorOption.click();
-    }
-
-    private void clickPrintButton() throws UiObjectNotFoundException {
-        UiObject printButton = new UiObject(new UiSelector().resourceId(
-                "com.android.printspooler:id/print_button"));
-        printButton.click();
-    }
-
-    private PrintDocumentAdapterContractActivity getActivity() {
-        return mActivity;
-    }
-
-    private void createActivity() {
-        mActivity = launchActivity(
-                getInstrumentation().getTargetContext().getPackageName(),
-                PrintDocumentAdapterContractActivity.class, null);
-    }
-
-    private void clearPrintSpoolerData() throws Exception {
-        IPrivilegedOperations privilegedOps = IPrivilegedOperations.Stub.asInterface(
-                getParams().getBinder(ARG_PRIVILEGED_OPS));
-        privilegedOps.clearApplicationUserData(PRINT_SPOOLER_PACKAGE_NAME);
-    }
-
-    private PrintDocumentAdapter createMockPrintDocumentAdapter(Answer<Void> layoutAnswer,
-            Answer<Void> writeAnswer, Answer<Void> finishAnswer) {
-        // Create a mock print adapter.
-        PrintDocumentAdapter adapter = mock(PrintDocumentAdapter.class);
-        if (layoutAnswer != null) {
-            doAnswer(layoutAnswer).when(adapter).onLayout(any(PrintAttributes.class),
-                    any(PrintAttributes.class), any(CancellationSignal.class),
-                    any(LayoutResultCallback.class), any(Bundle.class));
-        }
-        if (writeAnswer != null) {
-            doAnswer(writeAnswer).when(adapter).onWrite(any(PageRange[].class),
-                    any(ParcelFileDescriptor.class), any(CancellationSignal.class),
-                    any(WriteResultCallback.class));
-        }
-        if (finishAnswer != null) {
-            doAnswer(finishAnswer).when(adapter).onFinish();
-        }
-        return adapter;
-    }
-
-    static class SimpleTwoPrintersService extends StubPrintService {
-        @Override
-        public PrinterDiscoverySession onCreatePrinterDiscoverySession() {
-            return new PrinterDiscoverySession() {
-                @Override
-                public void onStartPrinterDiscovery(List<PrinterId> priorityList) {
-                    if (getPrinters().isEmpty()) {
-                        List<PrinterInfo> printers = new ArrayList<PrinterInfo>();
-
-                        // Add the first printer.
-                        PrinterId firstPrinterId = getHost().generatePrinterId("first_printer");
-                        PrinterCapabilitiesInfo firstCapabilities =
-                                new PrinterCapabilitiesInfo.Builder(firstPrinterId)
-                            .setMinMargins(new Margins(200, 200, 200, 200))
-                            .addMediaSize(MediaSize.ISO_A4, true)
-                            .addMediaSize(MediaSize.ISO_A5, false)
-                            .addResolution(new Resolution("300x300", "300x300", 300, 300), true)
-                            .setColorModes(PrintAttributes.COLOR_MODE_COLOR,
-                                    PrintAttributes.COLOR_MODE_COLOR)
-                            .build();
-                        PrinterInfo firstPrinter = new PrinterInfo.Builder(firstPrinterId,
-                                "First printer", PrinterInfo.STATUS_IDLE)
-                            .setCapabilities(firstCapabilities)
-                            .build();
-                        printers.add(firstPrinter);
-
-                        // Add the second printer.
-                        PrinterId secondPrinterId = getHost().generatePrinterId("second_printer");
-                        PrinterCapabilitiesInfo secondCapabilities =
-                                new PrinterCapabilitiesInfo.Builder(secondPrinterId)
-                            .addMediaSize(MediaSize.ISO_A3, true)
-                            .addMediaSize(MediaSize.ISO_A4, false)
-                            .addResolution(new Resolution("200x200", "200x200", 200, 200), true)
-                            .addResolution(new Resolution("300x300", "300x300", 300, 300), false)
-                            .setColorModes(PrintAttributes.COLOR_MODE_COLOR
-                                    | PrintAttributes.COLOR_MODE_MONOCHROME,
-                                    PrintAttributes.COLOR_MODE_MONOCHROME)
-                            .build();
-                        PrinterInfo secondPrinter = new PrinterInfo.Builder(secondPrinterId,
-                                "Second printer", PrinterInfo.STATUS_IDLE)
-                            .setCapabilities(secondCapabilities)
-                            .build();
-                        printers.add(secondPrinter);
-
-                        // Add the third printer.
-                        PrinterId thirdPrinterId = getHost().generatePrinterId("third_printer");
-                        PrinterCapabilitiesInfo thirdCapabilities =
-                                new PrinterCapabilitiesInfo.Builder(thirdPrinterId)
-                            .addMediaSize(MediaSize.NA_LETTER, true)
-                            .addResolution(new Resolution("300x300", "300x300", 300, 300), true)
-                            .setColorModes(PrintAttributes.COLOR_MODE_COLOR,
-                                    PrintAttributes.COLOR_MODE_COLOR)
-                            .build();
-                        PrinterInfo thirdPrinter = new PrinterInfo.Builder(thirdPrinterId,
-                                "Third printer", PrinterInfo.STATUS_IDLE)
-                            .setCapabilities(thirdCapabilities)
-                            .build();
-                        printers.add(thirdPrinter);
-
-                        addPrinters(printers);
-                    }
-                }
-
-                @Override
-                public void onStopPrinterDiscovery() {
-                    /* do nothing */
-                }
-
-                @Override
-                public void onValidatePrinters(List<PrinterId> printerIds) {
-                    /* do nothing */
-                }
-
-                @Override
-                public void onStartPrinterStateTracking(PrinterId printerId) {
-                    /* do nothing */
-                }
-
-                @Override
-                public void onStopPrinterStateTracking(PrinterId printerId) {
-                    /* do nothing */
-                }
-
-                @Override
-                public void onDestroy() {
-                    /* do nothing */
-                }
-            };
-        }
-
-        @Override
-        public void onRequestCancelPrintJob(PrintJob printJob) {
-            /* do nothing */
-        }
-
-        @Override
-        public void onPrintJobQueued(PrintJob printJob) {
-            /* do nothing */
-        }
-    }
-
-    private void verifyLayoutCall(InOrder inOrder, PrintDocumentAdapter mock,
-            PrintAttributes oldAttributes, PrintAttributes newAttributes,
-            final boolean forPreview) {
-        inOrder.verify(mock).onLayout(eq(oldAttributes), eq(newAttributes),
-                any(CancellationSignal.class), any(LayoutResultCallback.class), argThat(
-                        new BaseMatcher<Bundle>() {
-                            @Override
-                            public boolean matches(Object item) {
-                                Bundle bundle = (Bundle) item;
-                                return forPreview == bundle.getBoolean(
-                                        PrintDocumentAdapter.EXTRA_PRINT_PREVIEW);
-                            }
-
-                            @Override
-                            public void describeTo(Description description) {
-                                /* do nothing */
-                            }
-                        }));
-    }
-
-    private final class CallCounter {
-        private final Object mLock = new Object();
-
-        private int mCallCount;
-
-        public void call() {
-            synchronized (mLock) {
-                mCallCount++;
+        }, null, null, null, null, null);
+        return createMockPrintServiceCallbacks(new Answer<PrinterDiscoverySessionCallbacks>() {
+            @Override
+            public PrinterDiscoverySessionCallbacks answer(InvocationOnMock invocation) {
+                return callbacks;
             }
-        }
-
-        public void waitForCount(int count, long timeoutMIllis) throws TimeoutException {
-            synchronized (mLock) {
-                final long startTimeMillis = SystemClock.uptimeMillis();
-                while (mCallCount < count) {
-                    try {
-                        final long elapsedTimeMillis = SystemClock.uptimeMillis() - startTimeMillis;
-                        final long remainingTimeMillis = timeoutMIllis - elapsedTimeMillis;
-                        if (remainingTimeMillis <= 0) {
-                            throw new TimeoutException();
-                        }
-                        mLock.wait(timeoutMIllis);
-                    } catch (InterruptedException ie) {
-                        /* ignore */
-                    }
-                }
+        }, new Answer<Void>() {
+            @Override
+            public Void answer(InvocationOnMock invocation) throws Throwable {
+                PrintJob printJob = (PrintJob) invocation.getArguments()[0];
+                printJob.complete();
+                return null;
             }
-        }
+        }, null);
+    }
+
+    private PrintServiceCallbacks createSecondMockPrintServiceCallbacks() {
+        return createMockPrintServiceCallbacks(null, null, null);
     }
 }

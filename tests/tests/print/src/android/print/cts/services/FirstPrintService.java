@@ -16,27 +16,25 @@
 
 package android.print.cts.services;
 
-import android.printservice.PrintService;
-
 public class FirstPrintService extends StubbablePrintService {
 
     private static final Object sLock = new Object();
 
-    private static StubPrintService sImpl;
+    private static PrintServiceCallbacks sCallbacks;
 
-    public static void setImpl(StubPrintService impl) {
+    public static void setCallbacks(PrintServiceCallbacks callbacks) {
         synchronized (sLock) {
-            sImpl = impl;
+            sCallbacks = callbacks;
         }
     }
 
     @Override
-    protected BasePrintService getStub(PrintService host) {
+    protected PrintServiceCallbacks getCallbacks() {
         synchronized (sLock) {
-            if (sImpl != null) {
-                sImpl.setHost(this);
+            if (sCallbacks != null) {
+                sCallbacks.setService(this);
             }
-            return sImpl;
+            return sCallbacks;
         }
     }
 }
