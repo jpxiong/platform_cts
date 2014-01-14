@@ -446,10 +446,9 @@ public class AudioTrackTest extends AndroidTestCase {
     // Playback properties
     // ----------------------------------
 
-    // Test case 1: setStereoVolume() with max volume returns SUCCESS
-    public void testSetStereoVolumeMax() throws Exception {
+    // Common code for the testSetStereoVolume* and testSetVolume* tests
+    private void testSetVolumeCommon(String testName, float vol, boolean isStereo) throws Exception {
         // constants for test
-        final String TEST_NAME = "testSetStereoVolumeMax";
         final int TEST_SR = 22050;
         final int TEST_CONF = AudioFormat.CHANNEL_CONFIGURATION_STEREO;
         final int TEST_FORMAT = AudioFormat.ENCODING_PCM_16BIT;
@@ -465,61 +464,35 @@ public class AudioTrackTest extends AndroidTestCase {
         track.write(data, OFFSET_DEFAULT, data.length);
         track.write(data, OFFSET_DEFAULT, data.length);
         track.play();
-        float maxVol = AudioTrack.getMaxVolume();
-        assertTrue(TEST_NAME, track.setStereoVolume(maxVol, maxVol) == AudioTrack.SUCCESS);
+        if (isStereo) {
+            // TODO to really test this, do a pan instead of using same value for left and right
+            assertTrue(testName, track.setStereoVolume(vol, vol) == AudioTrack.SUCCESS);
+        } else {
+            assertTrue(testName, track.setVolume(vol) == AudioTrack.SUCCESS);
+        }
         // -------- tear down --------------
         track.release();
+    }
+
+    // Test case 1: setStereoVolume() with max volume returns SUCCESS
+    public void testSetStereoVolumeMax() throws Exception {
+        final String TEST_NAME = "testSetStereoVolumeMax";
+        float maxVol = AudioTrack.getMaxVolume();
+        testSetVolumeCommon(TEST_NAME, maxVol, true /*isStereo*/);
     }
 
     // Test case 2: setStereoVolume() with min volume returns SUCCESS
     public void testSetStereoVolumeMin() throws Exception {
-        // constants for test
         final String TEST_NAME = "testSetStereoVolumeMin";
-        final int TEST_SR = 22050;
-        final int TEST_CONF = AudioFormat.CHANNEL_CONFIGURATION_STEREO;
-        final int TEST_FORMAT = AudioFormat.ENCODING_PCM_16BIT;
-        final int TEST_MODE = AudioTrack.MODE_STREAM;
-        final int TEST_STREAM_TYPE = AudioManager.STREAM_MUSIC;
-
-        // -------- initialization --------------
-        int minBuffSize = AudioTrack.getMinBufferSize(TEST_SR, TEST_CONF, TEST_FORMAT);
-        AudioTrack track = new AudioTrack(TEST_STREAM_TYPE, TEST_SR, TEST_CONF, TEST_FORMAT,
-                2 * minBuffSize, TEST_MODE);
-        byte data[] = new byte[minBuffSize];
-        // -------- test --------------
-        track.write(data, OFFSET_DEFAULT, data.length);
-        track.write(data, OFFSET_DEFAULT, data.length);
-        track.play();
         float minVol = AudioTrack.getMinVolume();
-        assertTrue(TEST_NAME, track.setStereoVolume(minVol, minVol) == AudioTrack.SUCCESS);
-        // -------- tear down --------------
-        track.release();
+        testSetVolumeCommon(TEST_NAME, minVol, true /*isStereo*/);
     }
 
     // Test case 3: setStereoVolume() with mid volume returns SUCCESS
     public void testSetStereoVolumeMid() throws Exception {
-        // constants for test
         final String TEST_NAME = "testSetStereoVolumeMid";
-        final int TEST_SR = 22050;
-        final int TEST_CONF = AudioFormat.CHANNEL_CONFIGURATION_STEREO;
-        final int TEST_FORMAT = AudioFormat.ENCODING_PCM_16BIT;
-        final int TEST_MODE = AudioTrack.MODE_STREAM;
-        final int TEST_STREAM_TYPE = AudioManager.STREAM_MUSIC;
-
-        // -------- initialization --------------
-        int minBuffSize = AudioTrack.getMinBufferSize(TEST_SR, TEST_CONF, TEST_FORMAT);
-        AudioTrack track = new AudioTrack(TEST_STREAM_TYPE, TEST_SR, TEST_CONF, TEST_FORMAT,
-                2 * minBuffSize, TEST_MODE);
-        byte data[] = new byte[minBuffSize];
-        // -------- test --------------
-
-        track.write(data, OFFSET_DEFAULT, data.length);
-        track.write(data, OFFSET_DEFAULT, data.length);
-        track.play();
         float midVol = (AudioTrack.getMaxVolume() - AudioTrack.getMinVolume()) / 2;
-        assertTrue(TEST_NAME, track.setStereoVolume(midVol, midVol) == AudioTrack.SUCCESS);
-        // -------- tear down --------------
-        track.release();
+        testSetVolumeCommon(TEST_NAME, midVol, true /*isStereo*/);
     }
 
     // Test case 4: setPlaybackRate() with half the content rate returns SUCCESS
@@ -642,6 +615,27 @@ public class AudioTrackTest extends AndroidTestCase {
                 track.setPlaybackRate(TEST_SR / 2));
         // -------- tear down --------------
         track.release();
+    }
+
+    // Test case 9: setVolume() with max volume returns SUCCESS
+    public void testSetVolumeMax() throws Exception {
+        final String TEST_NAME = "testSetVolumeMax";
+        float maxVol = AudioTrack.getMaxVolume();
+        testSetVolumeCommon(TEST_NAME, maxVol, false /*isStereo*/);
+    }
+
+    // Test case 10: setVolume() with min volume returns SUCCESS
+    public void testSetVolumeMin() throws Exception {
+        final String TEST_NAME = "testSetVolumeMin";
+        float minVol = AudioTrack.getMinVolume();
+        testSetVolumeCommon(TEST_NAME, minVol, false /*isStereo*/);
+    }
+
+    // Test case 11: setVolume() with mid volume returns SUCCESS
+    public void testSetVolumeMid() throws Exception {
+        final String TEST_NAME = "testSetVolumeMid";
+        float midVol = (AudioTrack.getMaxVolume() - AudioTrack.getMinVolume()) / 2;
+        testSetVolumeCommon(TEST_NAME, midVol, false /*isStereo*/);
     }
 
     // -----------------------------------------------------------------
