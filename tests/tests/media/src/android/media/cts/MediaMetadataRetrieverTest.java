@@ -70,4 +70,15 @@ public class MediaMetadataRetrieverTest extends AndroidTestCase {
         assertNull("Writer was unexpected present",
                 retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_WRITER));
     }
+
+    public void testSetDataSourceNull() {
+        MediaMetadataRetriever retriever = new MediaMetadataRetriever();
+
+        try {
+            retriever.setDataSource((String)null);
+            fail("Expected IllegalArgumentException.");
+        } catch (IllegalArgumentException ex) {
+            // Expected, test passed.
+        }
+    }
 }
