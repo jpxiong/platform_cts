@@ -20,6 +20,7 @@
 extern int register_android_security_cts_CharDeviceTest(JNIEnv*);
 extern int register_android_security_cts_LinuxRngTest(JNIEnv*);
 extern int register_android_security_cts_NativeCodeTest(JNIEnv*);
+extern int register_android_security_cts_LoadEffectLibraryTest(JNIEnv*);
 
 jint JNI_OnLoad(JavaVM *vm, void *reserved) {
     JNIEnv *env = NULL;
@@ -37,6 +38,10 @@ jint JNI_OnLoad(JavaVM *vm, void *reserved) {
     }
 
     if (register_android_security_cts_NativeCodeTest(env)) {
+        return JNI_ERR;
+    }
+
+    if (register_android_security_cts_LoadEffectLibraryTest(env)) {
         return JNI_ERR;
     }
 
