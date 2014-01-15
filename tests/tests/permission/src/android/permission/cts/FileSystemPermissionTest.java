@@ -402,6 +402,8 @@ public class FileSystemPermissionTest extends AndroidTestCase {
                     "/data/local/tmp/com.nuance.android.vsuite.vsuiteapp",
                     "/data/log",
                     "/data/logger",
+                    "/data/logs",
+                    "/data/logs/core",
                     "/data/lost+found",
                     "/data/misc",
                     "/data/misc/bluetooth",
