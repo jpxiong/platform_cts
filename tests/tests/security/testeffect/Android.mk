@@ -1,4 +1,4 @@
-# Copyright (C) 2012 The Android Open Source Project
+# Copyright (C) 2013 The Android Open Source Project
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,22 +14,21 @@
 
 LOCAL_PATH:= $(call my-dir)
 
+# Test effect library
 include $(CLEAR_VARS)
 
-LOCAL_MODULE := libctssecurity_jni
+LOCAL_MODULE_TAGS := tests
 
-# Don't include this package in any configuration by default.
-LOCAL_MODULE_TAGS := optional
+LOCAL_SRC_FILES:= \
+  CTSTestEffect.cpp
 
-LOCAL_SRC_FILES := \
-		CtsSecurityJniOnLoad.cpp \
-		android_security_cts_CharDeviceTest.cpp \
-		android_security_cts_LinuxRngTest.cpp \
-		android_security_cts_NativeCodeTest.cpp \
-		android_security_cts_LoadEffectLibraryTest.cpp
+LOCAL_CFLAGS+= -O2 -fvisibility=hidden
 
-LOCAL_C_INCLUDES := $(JNI_H_INCLUDE)
+LOCAL_MODULE_PATH := $(TARGET_OUT_SHARED_LIBRARIES)/soundfx
+LOCAL_MODULE:= libctstesteffect
 
-LOCAL_SHARED_LIBRARIES := libnativehelper liblog libbinder libutils libmedia
+LOCAL_C_INCLUDES := \
+  $(call include-path-for, audio-effects)
+
 
 include $(BUILD_SHARED_LIBRARY)
