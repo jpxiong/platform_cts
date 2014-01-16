@@ -742,7 +742,6 @@ public class FileSystemPermissionTest extends AndroidTestCase {
                 new File("/dev/felica_uicc"), // b/11142586
                 new File("/dev/full"),
                 new File("/dev/genlock"),    // b/9035217
-                new File("/dev/hw_random"),  // b/9191279
                 new File("/dev/ion"),
                 new File("/dev/kgsl-2d0"),   // b/11271533
                 new File("/dev/kgsl-2d1"),   // b/11271533
@@ -804,6 +803,24 @@ public class FileSystemPermissionTest extends AndroidTestCase {
                 "/dev/urandom not world-readable/writable. Actual mode: 0"
                         + Integer.toString(status.mode, 8),
                 (status.mode & 0666) == 0666);
+    }
+
+    public void testDevHwRandomLockedDown() throws Exception {
+        File f = new File("/dev/hw_random");
+        if (!f.exists()) {
+            // HW RNG is not required to be exposed on all devices.
+            return;
+        }
+
+        FileUtils.FileStatus status = new FileUtils.FileStatus();
+        assertTrue(FileUtils.getFileStatus(f.getCanonicalPath(), status, false));
+        assertTrue(
+                f + " has wrong file mode: 0"
+                        + Integer.toOctalString(status.mode),
+                (status.mode & 0777) == 0440);
+
+        assertFileOwnedBy(f, "root");
+        assertFileOwnedByGroup(f, "system");
     }
 
     /**
