@@ -19,7 +19,7 @@ package android.print.cts;
 import android.app.Activity;
 import android.os.Bundle;
 
-public class PrintDocumentAdapterContractActivity extends Activity {
+public class PrintDocumentActivity extends Activity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

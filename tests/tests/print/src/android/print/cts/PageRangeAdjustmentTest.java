@@ -139,7 +139,7 @@ public class PageRangeAdjustmentTest extends BasePrintTest {
         clickPrintButton();
 
         // Wait for finish.
-        waitForAdapterCallbackFinish();
+        waitForAdapterFinishCallbackCalled();
 
         // Wait for the print job.
         waitForServiceOnPrintJobQueuedCallbackCalled();
@@ -239,7 +239,7 @@ public class PageRangeAdjustmentTest extends BasePrintTest {
         clickPrintButton();
 
         // Wait for finish.
-        waitForAdapterCallbackFinish();
+        waitForAdapterFinishCallbackCalled();
 
         // Wait for the print job.
         waitForServiceOnPrintJobQueuedCallbackCalled();
@@ -351,7 +351,7 @@ public class PageRangeAdjustmentTest extends BasePrintTest {
         clickPrintButton();
 
         // Wait for finish.
-        waitForAdapterCallbackFinish();
+        waitForAdapterFinishCallbackCalled();
 
         // Wait for the print job.
         waitForServiceOnPrintJobQueuedCallbackCalled();
@@ -439,7 +439,7 @@ public class PageRangeAdjustmentTest extends BasePrintTest {
         UiDevice.getInstance().pressBack();
 
         // Wait for finish.
-        waitForAdapterCallbackFinish();
+        waitForAdapterFinishCallbackCalled();
 
         // Verify the expected calls.
         InOrder inOrder = inOrder(firstServiceCallbacks);
@@ -491,7 +491,7 @@ public class PageRangeAdjustmentTest extends BasePrintTest {
                                 PrintAttributes.COLOR_MODE_COLOR)
                         .build();
                     PrinterInfo firstPrinter = new PrinterInfo.Builder(firstPrinterId,
-                            "First printer", PrinterInfo.STATUS_IDLE)
+                            FIRST_PRINTER, PrinterInfo.STATUS_IDLE)
                         .setCapabilities(firstCapabilities)
                         .build();
                     printers.add(firstPrinter);

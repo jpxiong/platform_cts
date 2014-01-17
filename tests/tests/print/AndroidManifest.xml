@@ -23,7 +23,7 @@
 
         <uses-library android:name="android.test.runner"/>
 
-        <activity android:name="android.print.cts.PrintDocumentAdapterContractActivity"/>
+        <activity android:name="android.print.cts.PrintDocumentActivity"/>
 
         <service
             android:name="android.print.cts.services.FirstPrintService"

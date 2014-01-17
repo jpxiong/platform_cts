@@ -116,7 +116,7 @@ public class PrintDocumentAdapterContractTest extends BasePrintTest {
         clickPrintButton();
 
         // Wait for finish.
-        waitForAdapterCallbackFinish();
+        waitForAdapterFinishCallbackCalled();
 
         // Verify the expected calls.
         InOrder inOrder = inOrder(adapter);
@@ -220,7 +220,7 @@ public class PrintDocumentAdapterContractTest extends BasePrintTest {
         UiDevice.getInstance().pressBack();
 
         // Wait for finish.
-        waitForAdapterCallbackFinish();
+        waitForAdapterFinishCallbackCalled();
 
         // Verify the expected calls.
         InOrder inOrder = inOrder(adapter);
@@ -328,7 +328,7 @@ public class PrintDocumentAdapterContractTest extends BasePrintTest {
         clickPrintButton();
 
         // Wait for a finish.
-        waitForAdapterCallbackFinish();
+        waitForAdapterFinishCallbackCalled();
 
         // Verify the expected calls.
         InOrder inOrder = inOrder(adapter);
@@ -488,7 +488,7 @@ public class PrintDocumentAdapterContractTest extends BasePrintTest {
         clickPrintButton();
 
         // Wait for a finish.
-        waitForAdapterCallbackFinish();
+        waitForAdapterFinishCallbackCalled();
 
         // Verify the expected calls.
         InOrder inOrder = inOrder(adapter);
@@ -621,7 +621,7 @@ public class PrintDocumentAdapterContractTest extends BasePrintTest {
         clickPrintButton();
 
         // Wait for a finish.
-        waitForAdapterCallbackFinish();
+        waitForAdapterFinishCallbackCalled();
 
         // Verify the expected calls.
         InOrder inOrder = inOrder(adapter);
@@ -728,7 +728,7 @@ public class PrintDocumentAdapterContractTest extends BasePrintTest {
         clickPrintButton();
 
         // Wait for a finish.
-        waitForAdapterCallbackFinish();
+        waitForAdapterFinishCallbackCalled();
 
         // Verify the expected calls.
         InOrder inOrder = inOrder(adapter);
@@ -822,7 +822,7 @@ public class PrintDocumentAdapterContractTest extends BasePrintTest {
         clickPrintButton();
 
         // Wait for a finish.
-        waitForAdapterCallbackFinish();
+        waitForAdapterFinishCallbackCalled();
 
         // Verify the expected calls.
         InOrder inOrder = inOrder(adapter);
@@ -917,7 +917,7 @@ public class PrintDocumentAdapterContractTest extends BasePrintTest {
         UiDevice.getInstance().pressBack();
 
         // Wait for a finish.
-        waitForAdapterCallbackFinish();
+        waitForAdapterFinishCallbackCalled();
 
         // Verify the expected calls.
         InOrder inOrder = inOrder(adapter);
@@ -1001,7 +1001,7 @@ public class PrintDocumentAdapterContractTest extends BasePrintTest {
         UiDevice.getInstance().pressBack();
 
         // Wait for a finish.
-        waitForAdapterCallbackFinish();
+        waitForAdapterFinishCallbackCalled();
 
         // Verify the expected calls.
         InOrder inOrder = inOrder(adapter);
@@ -1067,7 +1067,7 @@ public class PrintDocumentAdapterContractTest extends BasePrintTest {
         UiDevice.getInstance().pressBack();
 
         // Wait for a finish.
-        waitForAdapterCallbackFinish();
+        waitForAdapterFinishCallbackCalled();
 
         // Verify the expected calls.
         InOrder inOrder = inOrder(adapter);
@@ -1143,7 +1143,7 @@ public class PrintDocumentAdapterContractTest extends BasePrintTest {
         UiDevice.getInstance().pressBack();
 
         // Wait for a finish.
-        waitForAdapterCallbackFinish();
+        waitForAdapterFinishCallbackCalled();
 
         // Verify the expected calls.
         InOrder inOrder = inOrder(adapter);
@@ -1224,7 +1224,7 @@ public class PrintDocumentAdapterContractTest extends BasePrintTest {
         UiDevice.getInstance().pressBack();
 
         // Wait for a finish.
-        waitForAdapterCallbackFinish();
+        waitForAdapterFinishCallbackCalled();
 
         // Verify the expected calls.
         InOrder inOrder = inOrder(adapter);
@@ -1289,7 +1289,7 @@ public class PrintDocumentAdapterContractTest extends BasePrintTest {
         UiDevice.getInstance().pressBack();
 
         // Wait for a finish.
-        waitForAdapterCallbackFinish();
+        waitForAdapterFinishCallbackCalled();
 
         // Verify the expected calls.
         InOrder inOrder = inOrder(adapter);
@@ -1362,7 +1362,7 @@ public class PrintDocumentAdapterContractTest extends BasePrintTest {
         UiDevice.getInstance().pressBack();
 
         // Wait for a finish.
-        waitForAdapterCallbackFinish();
+        waitForAdapterFinishCallbackCalled();
 
         // Verify the expected calls.
         InOrder inOrder = inOrder(adapter);
