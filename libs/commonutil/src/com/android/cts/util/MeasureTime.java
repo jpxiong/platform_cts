@@ -23,9 +23,9 @@ public class MeasureTime {
      * @param count
      * @param run
      * @return array of time taken in each run in msec.
-     * @throws IOException
+     * @throws Exception
      */
-    public static double[] measure(int count, MeasureRun run)  throws Exception {
+    public static double[] measure(int count, MeasureRun run) throws Exception {
         double[] result = new double[count];
 
         for (int i = 0; i < count; i++) {

@@ -36,12 +36,12 @@ $(cts_package_apk): $(call intermediates-dir-for,APPS,$(LOCAL_PACKAGE_NAME))/pac
 $(cts_package_xml): PRIVATE_PATH := $(LOCAL_PATH)
 $(cts_package_xml): PRIVATE_INSTRUMENTATION := $(LOCAL_INSTRUMENTATION_FOR)
 $(cts_package_xml): PRIVATE_PACKAGE := $(LOCAL_PACKAGE_NAME)
-ifneq ($(filter cts/suite/cts/%, $(LOCAL_PATH)),) # CTS
-PRIVATE_CTS_TEST_PACKAGE_NANE_ := com.android.cts.$(notdir $(LOCAL_PATH))
-else # CTS
-PRIVATE_CTS_TEST_PACKAGE_NANE_ := android.$(notdir $(LOCAL_PATH))
-endif # CTS
-$(cts_package_xml): PRIVATE_TEST_PACKAGE := $(PRIVATE_CTS_TEST_PACKAGE_NANE_)
+ifneq ($(filter cts/suite/cts/%, $(LOCAL_PATH)),)
+PRIVATE_CTS_TEST_PACKAGE_NAME_ := com.android.cts.$(notdir $(LOCAL_PATH))
+else
+PRIVATE_CTS_TEST_PACKAGE_NAME_ := android.$(notdir $(LOCAL_PATH))
+endif
+$(cts_package_xml): PRIVATE_TEST_PACKAGE := $(PRIVATE_CTS_TEST_PACKAGE_NAME_)
 $(cts_package_xml): PRIVATE_MANIFEST := $(LOCAL_PATH)/AndroidManifest.xml
 $(cts_package_xml): PRIVATE_TEST_TYPE := $(if $(LOCAL_CTS_TEST_RUNNER),$(LOCAL_CTS_TEST_RUNNER),'')
 $(cts_package_xml): $(call intermediates-dir-for,APPS,$(LOCAL_PACKAGE_NAME))/package.apk $(CTS_EXPECTATIONS) $(CTS_JAVA_TEST_SCANNER_DOCLET) $(CTS_JAVA_TEST_SCANNER) $(CTS_XML_GENERATOR)
