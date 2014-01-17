@@ -71,7 +71,7 @@ public abstract class BasePrintTest extends UiAutomatorTestCase {
 
     protected static final String PRINT_JOB_NAME = "Test";
 
-    private PrintDocumentAdapterContractActivity mActivity;
+    private PrintDocumentActivity mActivity;
 
     private Locale mOldLocale;
 
@@ -79,6 +79,7 @@ public abstract class BasePrintTest extends UiAutomatorTestCase {
     private CallCounter mWriteCallCounter;
     private CallCounter mFinishCallCounter;
     private CallCounter mPrintJobQueuedCallCounter;
+    private CallCounter mDestroySessionCallCounter;
 
     @Override
     public void setUp() throws Exception {
@@ -107,6 +108,7 @@ public abstract class BasePrintTest extends UiAutomatorTestCase {
         mWriteCallCounter = new CallCounter();
         mFinishCallCounter = new CallCounter();
         mPrintJobQueuedCallCounter = new CallCounter();
+        mDestroySessionCallCounter = new CallCounter();
 
         // Create the activity for the right locale.
         createActivity();
@@ -159,12 +161,21 @@ public abstract class BasePrintTest extends UiAutomatorTestCase {
         mPrintJobQueuedCallCounter.call();
     }
 
+    protected void onPrinterDiscoverySessionDestroyCalled() {
+        mDestroySessionCallCounter.call();
+    }
+
+    protected void waitForPrinterDiscoverySessionDestroyCallbackCalled() {
+        waitForCallbackCallCount(mDestroySessionCallCounter, 1,
+                "Did not get expected call to onDestroyPrinterDiscoverySession.");
+    }
+
     protected void waitForServiceOnPrintJobQueuedCallbackCalled() {
         waitForCallbackCallCount(mPrintJobQueuedCallCounter, 1,
                 "Did not get expected call to onPrintJobQueued.");
     }
 
-    protected void waitForAdapterCallbackFinish() {
+    protected void waitForAdapterFinishCallbackCalled() {
         waitForCallbackCallCount(mFinishCallCounter, 1,
                 "Did not get expected call to finish.");
     }
@@ -224,14 +235,14 @@ public abstract class BasePrintTest extends UiAutomatorTestCase {
         printButton.click();
     }
 
-    protected PrintDocumentAdapterContractActivity getActivity() {
+    protected PrintDocumentActivity getActivity() {
         return mActivity;
     }
 
     private void createActivity() {
         mActivity = launchActivity(
                 getInstrumentation().getTargetContext().getPackageName(),
-                PrintDocumentAdapterContractActivity.class, null);
+                PrintDocumentActivity.class, null);
     }
 
     protected void clearPrintSpoolerData() throws Exception {
