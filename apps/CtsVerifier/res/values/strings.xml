@@ -412,6 +412,12 @@
     <!-- Magnetic Field -->
     <string name="snsr_mag_m_test">Magnetic Field Measurement Tests</string>
 
+    <!-- Strings for Sample Test Activities -->
+    <string name="share_button_text">Share</string>
+    <string name="sample_framework_test">Sample Framework Test</string>
+    <string name="sample_test">Sample Test</string>
+    <string name="sample_test_info">This test verifies that bluetooth sharing is working properly.\nThe test assumes the Device Under Test has bluetooth enabled and is already paired with a second device, also with bluetooth enabled.\nStart this test by clicking share, choose bluetooth from the options, and then select a device to share with.\nNote: This is a sample test, used to demonstrate how to write CTS Verifier tests, so just click pass.</string>
+
     <!-- Strings for SuidFilesActivity -->
     <string name="suid_files">SUID File Scanner</string>
     <string name="suid_files_info">This test will attempt to find unauthorized SUID binaries, but it is not comprehensive due to permission restrictions.\n\nAuthorized SUID binaries will appear green, while unauthorized SUID binaries will appear red.\n\nPress OK to start the scan...</string>
