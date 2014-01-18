@@ -563,6 +563,29 @@ public class CameraCharacteristicsTest extends AndroidTestCase {
         }
     }
 
+    public void testCameraCharacteristicsAndroidRequestPipelineMaxDepth() throws Exception {
+        String[] ids = mCameraManager.getCameraIdList();
+        for (int i = 0; i < ids.length; i++) {
+            CameraCharacteristics props = mCameraManager.getCameraCharacteristics(ids[i]);
+            assertNotNull(String.format("Can't get camera characteristics from: ID %s", ids[i]),
+                                        props);
+
+            {
+
+                assertNotNull("Invalid property: android.request.pipelineMaxDepth",
+                        props.get(CameraCharacteristics.REQUEST_PIPELINE_MAX_DEPTH));
+
+                List<Key<?>> allKeys = props.getKeys();
+                assertNotNull(String.format("Can't get camera characteristics keys from: ID %s",
+                        ids[i], props));
+                assertTrue("Key not in keys list: android.request.pipelineMaxDepth", allKeys.contains(
+                        CameraCharacteristics.REQUEST_PIPELINE_MAX_DEPTH));
+
+            }
+
+        }
+    }
+
     public void testCameraCharacteristicsAndroidScalerAvailableFormats() throws Exception {
         String[] ids = mCameraManager.getCameraIdList();
         for (int i = 0; i < ids.length; i++) {
@@ -772,6 +795,33 @@ public class CameraCharacteristicsTest extends AndroidTestCase {
                         ids[i], props));
                 assertTrue("Key not in keys list: android.sensor.orientation", allKeys.contains(
                         CameraCharacteristics.SENSOR_ORIENTATION));
+
+            }
+
+        }
+    }
+
+    public void testCameraCharacteristicsAndroidSensorAvailableTestPatternModes() throws Exception {
+        String[] ids = mCameraManager.getCameraIdList();
+        for (int i = 0; i < ids.length; i++) {
+            CameraCharacteristics props = mCameraManager.getCameraCharacteristics(ids[i]);
+            assertNotNull(String.format("Can't get camera characteristics from: ID %s", ids[i]),
+                                        props);
+
+            Integer hwLevel = props.get(CameraCharacteristics.INFO_SUPPORTED_HARDWARE_LEVEL);
+            assertNotNull("No hardware level reported! android.info.supportedHardwareLevel",
+                    hwLevel);
+            if (hwLevel == CameraCharacteristics.INFO_SUPPORTED_HARDWARE_LEVEL_FULL)
+            {
+
+                assertNotNull("Invalid property: android.sensor.availableTestPatternModes",
+                        props.get(CameraCharacteristics.SENSOR_AVAILABLE_TEST_PATTERN_MODES));
+
+                List<Key<?>> allKeys = props.getKeys();
+                assertNotNull(String.format("Can't get camera characteristics keys from: ID %s",
+                        ids[i], props));
+                assertTrue("Key not in keys list: android.sensor.availableTestPatternModes", allKeys.contains(
+                        CameraCharacteristics.SENSOR_AVAILABLE_TEST_PATTERN_MODES));
 
             }
 

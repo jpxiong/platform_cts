@@ -303,12 +303,14 @@ public class CameraCaptureResultTest extends AndroidTestCase {
         resultKeys.add(CaptureResult.LENS_STATE);
         resultKeys.add(CaptureResult.NOISE_REDUCTION_MODE);
         resultKeys.add(CaptureResult.REQUEST_FRAME_COUNT);
+        resultKeys.add(CaptureResult.REQUEST_PIPELINE_DEPTH);
         resultKeys.add(CaptureResult.SCALER_CROP_REGION);
         resultKeys.add(CaptureResult.SENSOR_EXPOSURE_TIME);
         resultKeys.add(CaptureResult.SENSOR_FRAME_DURATION);
         resultKeys.add(CaptureResult.SENSOR_SENSITIVITY);
         resultKeys.add(CaptureResult.SENSOR_TIMESTAMP);
         resultKeys.add(CaptureResult.SENSOR_TEMPERATURE);
+        resultKeys.add(CaptureResult.SENSOR_TEST_PATTERN_MODE);
         resultKeys.add(CaptureResult.STATISTICS_FACE_DETECT_MODE);
         resultKeys.add(CaptureResult.STATISTICS_LENS_SHADING_MAP);
         resultKeys.add(CaptureResult.STATISTICS_SCENE_FLICKER);
