@@ -87,7 +87,11 @@ public class MediaCodecTest extends AndroidTestCase {
         format.setInteger(MediaFormat.KEY_COLOR_FORMAT, colorFormat);
 
         try {
-            encoder = MediaCodec.createByCodecName(codecInfo.getName());
+            try {
+                encoder = MediaCodec.createByCodecName(codecInfo.getName());
+            } catch (IOException e) {
+                fail("failed to create codec " + codecInfo.getName());
+            }
             try {
                 surface = encoder.createInputSurface();
                 fail("createInputSurface should not work pre-configure");
@@ -132,7 +136,11 @@ public class MediaCodecTest extends AndroidTestCase {
         InputSurface inputSurface = null;
 
         try {
-            encoder = MediaCodec.createEncoderByType(MIME_TYPE);
+            try {
+                encoder = MediaCodec.createEncoderByType(MIME_TYPE);
+            } catch (IOException e) {
+                fail("failed to create " + MIME_TYPE + " encoder");
+            }
             encoder.configure(format, null, null, MediaCodec.CONFIGURE_FLAG_ENCODE);
             inputSurface = new InputSurface(encoder.createInputSurface());
             inputSurface.makeCurrent();
@@ -189,7 +197,11 @@ public class MediaCodecTest extends AndroidTestCase {
         InputSurface inputSurface = null;
 
         try {
-            encoder = MediaCodec.createEncoderByType(MIME_TYPE);
+            try {
+                encoder = MediaCodec.createEncoderByType(MIME_TYPE);
+            } catch (IOException e) {
+                fail("failed to create " + MIME_TYPE + " encoder");
+            }
             encoder.configure(format, null, null, MediaCodec.CONFIGURE_FLAG_ENCODE);
             inputSurface = new InputSurface(encoder.createInputSurface());
             inputSurface.makeCurrent();
@@ -231,7 +243,11 @@ public class MediaCodecTest extends AndroidTestCase {
         Surface surface = null;
 
         try {
-            encoder = MediaCodec.createEncoderByType(MIME_TYPE);
+            try {
+                encoder = MediaCodec.createEncoderByType(MIME_TYPE);
+            } catch (IOException e) {
+                fail("failed to create " + MIME_TYPE + " encoder");
+            }
             encoder.configure(format, null, null, MediaCodec.CONFIGURE_FLAG_ENCODE);
             surface = encoder.createInputSurface();
             encoder.start();
@@ -265,7 +281,11 @@ public class MediaCodecTest extends AndroidTestCase {
         Surface surface = null;
 
         try {
-            encoder = MediaCodec.createEncoderByType(MIME_TYPE);
+            try {
+                encoder = MediaCodec.createEncoderByType(MIME_TYPE);
+            } catch (IOException e) {
+                fail("failed to create " + MIME_TYPE + " encoder");
+            }
             encoder.configure(format, null, null, MediaCodec.CONFIGURE_FLAG_ENCODE);
             surface = encoder.createInputSurface();
             encoder.start();
@@ -415,11 +435,19 @@ public class MediaCodecTest extends AndroidTestCase {
         MediaCodec audioDecoderA = null;
         MediaCodec audioDecoderB = null;
         try {
-            audioDecoderA = MediaCodec.createDecoderByType(MIME_TYPE_AUDIO);
+            try {
+                audioDecoderA = MediaCodec.createDecoderByType(MIME_TYPE_AUDIO);
+            } catch (IOException e) {
+                fail("failed to create first " + MIME_TYPE_AUDIO + " decoder");
+            }
             audioDecoderA.configure(format, null, null, 0);
             audioDecoderA.start();
 
-            audioDecoderB = MediaCodec.createDecoderByType(MIME_TYPE_AUDIO);
+            try {
+                audioDecoderB = MediaCodec.createDecoderByType(MIME_TYPE_AUDIO);
+            } catch (IOException e) {
+                fail("failed to create second " + MIME_TYPE_AUDIO + " decoder");
+            }
             audioDecoderB.configure(format, null, null, 0);
             audioDecoderB.start();
         } finally {
@@ -457,11 +485,19 @@ public class MediaCodecTest extends AndroidTestCase {
         MediaCodec audioEncoder = null;
         MediaCodec audioDecoder = null;
         try {
-            audioEncoder = MediaCodec.createEncoderByType(MIME_TYPE_AUDIO);
+            try {
+                audioEncoder = MediaCodec.createEncoderByType(MIME_TYPE_AUDIO);
+            } catch (IOException e) {
+                fail("failed to create " + MIME_TYPE_AUDIO + " encoder");
+            }
             audioEncoder.configure(encoderFormat, null, null, MediaCodec.CONFIGURE_FLAG_ENCODE);
             audioEncoder.start();
 
-            audioDecoder = MediaCodec.createDecoderByType(MIME_TYPE_AUDIO);
+            try {
+                audioDecoder = MediaCodec.createDecoderByType(MIME_TYPE_AUDIO);
+            } catch (IOException e) {
+                fail("failed to create " + MIME_TYPE_AUDIO + " decoder");
+            }
             audioDecoder.configure(decoderFormat, null, null, 0);
             audioDecoder.start();
         } finally {
