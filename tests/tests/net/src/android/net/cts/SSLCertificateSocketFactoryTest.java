@@ -28,6 +28,8 @@ import android.test.AndroidTestCase;
 
 import dalvik.annotation.BrokenTest;
 
+import libcore.javax.net.ssl.SSLDefaultConfigurationAsserts;
+
 public class SSLCertificateSocketFactoryTest extends AndroidTestCase {
     private SSLCertificateSocketFactory mFactory;
     private int mTimeout;
@@ -37,6 +39,10 @@ public class SSLCertificateSocketFactoryTest extends AndroidTestCase {
         super.setUp();
         mTimeout = 1000;
         mFactory = (SSLCertificateSocketFactory) SSLCertificateSocketFactory.getDefault(mTimeout);
+    }
+
+    public void testDefaultConfiguration() throws Exception {
+        SSLDefaultConfigurationAsserts.assertSSLSocketFactory(mFactory);
     }
 
     public void testAccessProperties() throws Exception {
