@@ -44,7 +44,7 @@ public class RsUnpackColor8888Test extends RSBaseCompute {
 
         mAllocationIn.copy1DRangeFrom(0, INPUTSIZE, inArray);
         try {
-            RSUtils.forEach(this, 0, mAllocationIn, mAllocationOut);
+            forEach(0, mAllocationIn, mAllocationOut);
         } catch (RSRuntimeException e) {
         }
         mAllocationOut.copyTo(outArray);
