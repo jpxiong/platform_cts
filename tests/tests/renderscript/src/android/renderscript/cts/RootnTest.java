@@ -80,7 +80,7 @@ public class RootnTest extends RSBaseCompute {
         Allocation nAlloc = Allocation.createSized(mRS, Element.I32(mRS), INPUTSIZE);
 
         n = new int[INPUTSIZE];
-        RSUtils.genRandom(0x12345678, 32, 1, 1, n);
+        RSUtils.genRandomInts(0x12345678, 32, 1, n);
         nAlloc.copyFrom(n);
         script_f32.set_n1(nAlloc);
 
@@ -91,7 +91,7 @@ public class RootnTest extends RSBaseCompute {
         Allocation nAlloc = Allocation.createSized(mRS, Element.I32(mRS), INPUTSIZE);
 
         n = new int[INPUTSIZE];
-        RSUtils.genRandom(0x12345678, 32, 1, 1, n);
+        RSUtils.genRandomInts(0x12345678, 32, 1, n);
         nAlloc.copyFrom(n);
         script_f32_relaxed.set_n1(nAlloc);
 
@@ -103,7 +103,7 @@ public class RootnTest extends RSBaseCompute {
         Allocation nAlloc = Allocation.createSized(mRS, Element.I32_2(mRS), INPUTSIZE);
 
         n = new int[INPUTSIZE*2];
-        RSUtils.genRandom(0xacdef1, 32, 1, 1, n);
+        RSUtils.genRandomInts(0xacdef1, 32, 1, n);
         nAlloc.copyFrom(n);
         script_f32.set_n2(nAlloc);
 
@@ -114,7 +114,7 @@ public class RootnTest extends RSBaseCompute {
         Allocation nAlloc = Allocation.createSized(mRS, Element.I32_2(mRS), INPUTSIZE);
 
         n = new int[INPUTSIZE*2];
-        RSUtils.genRandom(0xacdef1, 32, 1, 1, n);
+        RSUtils.genRandomInts(0xacdef1, 32, 1, n);
         nAlloc.copyFrom(n);
         script_f32_relaxed.set_n2(nAlloc);
 
@@ -126,7 +126,7 @@ public class RootnTest extends RSBaseCompute {
         Allocation nAlloc = Allocation.createSized(mRS, Element.I32_3(mRS), INPUTSIZE);
 
         n = new int[INPUTSIZE*4];
-        RSUtils.genRandom(0xa123f1, 32, 1, 1, n, 4, 1);
+        RSUtils.genRandomInts(0xa123f1, 32, 1, n);
         nAlloc.copyFrom(n);
         script_f32.set_n3(nAlloc);
 
@@ -137,7 +137,7 @@ public class RootnTest extends RSBaseCompute {
         Allocation nAlloc = Allocation.createSized(mRS, Element.I32_3(mRS), INPUTSIZE);
 
         n = new int[INPUTSIZE*4];
-        RSUtils.genRandom(0xa123f1, 32, 1, 1, n, 4, 1);
+        RSUtils.genRandomInts(0xa123f1, 32, 1, n);
         nAlloc.copyFrom(n);
         script_f32_relaxed.set_n3(nAlloc);
 
@@ -148,7 +148,7 @@ public class RootnTest extends RSBaseCompute {
         Allocation nAlloc = Allocation.createSized(mRS, Element.I32_4(mRS), INPUTSIZE);
 
         n = new int[INPUTSIZE*4];
-        RSUtils.genRandom(0x4323ca, 32, 1, 1, n);
+        RSUtils.genRandomInts(0x4323ca, 32, 1, n);
         nAlloc.copyFrom(n);
         script_f32.set_n4(nAlloc);
 
@@ -159,7 +159,7 @@ public class RootnTest extends RSBaseCompute {
         Allocation nAlloc = Allocation.createSized(mRS, Element.I32_4(mRS), INPUTSIZE);
 
         n = new int[INPUTSIZE*4];
-        RSUtils.genRandom(0x4323ca, 32, 1, 1, n);
+        RSUtils.genRandomInts(0x4323ca, 32, 1, n);
         nAlloc.copyFrom(n);
         script_f32_relaxed.set_n4(nAlloc);
 

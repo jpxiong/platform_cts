@@ -46,7 +46,7 @@ public class InitTest extends RSBaseCompute {
         mIn.copy1DRangeFrom(0, INPUTSIZE, in);
 
         try {
-            RSUtils.forEach(this, 0, mIn, mOut);
+            forEach(0, mIn, mOut);
         } catch (RSRuntimeException e) {
         }
         mOut.copyTo(out);

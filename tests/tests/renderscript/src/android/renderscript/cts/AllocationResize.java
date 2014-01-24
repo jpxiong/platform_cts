@@ -49,7 +49,7 @@ public class AllocationResize extends RSBaseCompute {
         mIn.copy1DRangeFrom(0, INPUTSIZE, inArray);
 
         try {
-            RSUtils.forEach(this, 0, mIn, mOut);
+            forEach(0, mIn, mOut);
         } catch (RSRuntimeException e) {
         }
 

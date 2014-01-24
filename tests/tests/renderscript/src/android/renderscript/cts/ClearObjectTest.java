@@ -66,7 +66,7 @@ public class ClearObjectTest extends RSBaseCompute {
         Allocation mOut = Allocation.createSized(mRS, Element.I32(mRS), ObjectNum);
         ms_clear.set_element(element);
         try {
-            RSUtils.forEach(this, TEST_ID_ELEMENT, mIn, mOut);
+            forEach(TEST_ID_ELEMENT, mIn, mOut);
         } catch (RSRuntimeException e) {
         }
         int[] tmpArray = new int[ObjectNum];
@@ -83,7 +83,7 @@ public class ClearObjectTest extends RSBaseCompute {
         ms_clear.set_type(type);
 
         try {
-            RSUtils.forEach(this, TEST_ID_TYPE, mIn, mOut);
+            forEach(TEST_ID_TYPE, mIn, mOut);
         } catch (RSRuntimeException e) {
         }
         int[] tmpArray = new int[ObjectNum];
@@ -99,7 +99,7 @@ public class ClearObjectTest extends RSBaseCompute {
         Allocation allocation = Allocation.createTyped(mRS, mIn.getType());
         ms_clear.set_allocation(allocation);
         try {
-            RSUtils.forEach(this, TEST_ID_ALLOCATION, mIn, mOut);
+            forEach(TEST_ID_ALLOCATION, mIn, mOut);
         } catch (RSRuntimeException e) {
         }
         int[] tmpArray = new int[ObjectNum];
@@ -115,7 +115,7 @@ public class ClearObjectTest extends RSBaseCompute {
         Allocation mIn = Allocation.createSized(mRS, Element.I32(mRS), ObjectNum);
         ms_clear.set_sampler(sampler);
         try {
-            RSUtils.forEach(this, TEST_ID_SAMPLER, mIn, mOut);
+            forEach(TEST_ID_SAMPLER, mIn, mOut);
         } catch (RSRuntimeException e) {
         }
         int[] tmpArray = new int[ObjectNum];
@@ -131,7 +131,7 @@ public class ClearObjectTest extends RSBaseCompute {
         Allocation mOut = Allocation.createSized(mRS, Element.I32(mRS), ObjectNum);
         ms_clear.set_script(script);
         try {
-            RSUtils.forEach(this, TEST_ID_SCRIPT, mIn, mOut);
+            forEach(TEST_ID_SCRIPT, mIn, mOut);
         } catch (RSRuntimeException e) {
         }
         int[] tmpArray = new int[ObjectNum];

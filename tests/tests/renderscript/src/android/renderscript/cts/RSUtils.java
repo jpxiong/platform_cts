@@ -27,65 +27,23 @@ import com.android.cts.stub.R;
  */
 public class RSUtils {
 
-    public static void genRandom(long seed, int factor, int offset, float array[]) {
+    /**
+     * Fills the array with random floats.  Values will be: offset + number between 0 and max.
+     */
+    public static void genRandomFloats(long seed, int max, int offset, float array[]) {
         Random r = new Random(seed);
         for (int i = 0; i < array.length; i++) {
-            array[i] = r.nextFloat() * factor + offset;
+            array[i] = r.nextFloat() * max + offset;
         }
     }
 
-    public static void genRandom(long seed, int factor, int offset, float array[],
-            int stride, int skip) {
-        Random r = new Random(seed);
-        for (int i = 0; i < array.length / stride; i++) {
-            for (int j = 0; j < stride; j++) {
-                if (j >= stride - skip)
-                    array[i * stride + j] = 0;
-                else
-                    array[i * stride + j] = r.nextFloat() * factor + offset;
-            }
-        }
-    }
-
-    public static void genRandom(long seed, int max, int factor, int offset, int array[]) {
+    /**
+     * Fills the array with random ints.  Values will be: offset + number between 0 and max (exclusive).
+     */
+    public static void genRandomInts(long seed, int max, int offset, int array[]) {
         Random r = new Random(seed);
         for (int i = 0; i < array.length; i++) {
-            array[i] = (r.nextInt(max) * factor + offset);
+            array[i] = (r.nextInt(max) + offset);
         }
-    }
-
-    public static void genRandom(long seed, int factor, int offset, int array[],
-            int stride, int skip) {
-        Random r = new Random(seed);
-        for (int i = 0; i < array.length / stride; i++) {
-            for (int j = 0; j < stride; j++) {
-                if (j >= stride - skip)
-                    array[i * stride + j] = 0;
-                else
-                    array[i * stride + j] = r.nextInt() * factor + offset;
-            }
-        }
-    }
-
-    public static void genRandom(long seed, int max, int factor, int offset, int array[],
-            int stride, int skip) {
-        Random r = new Random(seed);
-        for (int i = 0; i < array.length / stride; i++) {
-            for (int j = 0; j < stride; j++) {
-                if (j >= stride - skip)
-                    array[i * stride + j] = 0;
-                else
-                    array[i * stride + j] = r.nextInt(max) * factor + offset;
-            }
-        }
-    }
-
-    public static void forEach(RSBaseCompute base, int testId, Allocation in) throws RSRuntimeException {
-        base.forEach(testId, in);
-    }
-
-    public static void forEach(RSBaseCompute base, int testId, Allocation in, Allocation out)
-            throws RSRuntimeException {
-        base.forEach(testId, in,out);
     }
 }

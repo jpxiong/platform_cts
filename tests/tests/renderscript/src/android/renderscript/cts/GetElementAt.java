@@ -62,7 +62,7 @@ public class GetElementAt extends RSBaseCompute {
         mOut = Allocation.createTyped(mRS, gIn.getType());
         script_x.set_gIn(gIn);
         try {
-            RSUtils.forEach(this, TEST_ID_X, mOut);
+            forEach(TEST_ID_X, mOut);
         } catch (RSRuntimeException e) {
         }
         mOut.copyTo(out);
@@ -83,7 +83,7 @@ public class GetElementAt extends RSBaseCompute {
         mOut = Allocation.createTyped(mRS, gIn.getType());
         script_xy.set_gIn(gIn);
         try {
-            RSUtils.forEach(this, TEST_ID_XY, mOut);
+            forEach(TEST_ID_XY, mOut);
         } catch (RSRuntimeException e) {
         }
         mOut.copyTo(out);
