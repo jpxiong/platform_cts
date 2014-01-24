@@ -88,8 +88,8 @@ public class PowTest extends RSBaseCompute {
     }
 
     @Override
-    protected void fillRandom(long seed, int fact, int offset, float[] inArray, int rStride, int rSkip) {
-        RSUtils.genRandom(seed, 32, -16, inArray, rStride, rSkip);
+    protected void fillRandomFloats(long seed, int fact, int offset, float[] inArray) {
+        RSUtils.genRandomFloats(seed, 32, -16, inArray);
     }
 
     public void testPowF32() {

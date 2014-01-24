@@ -89,7 +89,7 @@ class RSBaseCompute extends RSBase {
                                 int offset, int rStride, int rSkip, int refStride, int outStride,
                                 int inStride, int skip, int ulp) {
         float[] inArray = makeInArray(INPUTSIZE * inStride);
-        fillRandom(seed, fact, offset, inArray, rStride, rSkip);
+        fillRandomFloats(seed, fact, offset, inArray);
         float[] refArray = getRefArray(inArray, INPUTSIZE, inStride, skip);
 
         Allocation mAllocationIn = setInAlloc(inElement);
@@ -97,7 +97,7 @@ class RSBaseCompute extends RSBase {
 
         Allocation mAllocationOut = setOutAlloc(outElement);
         try {
-            RSUtils.forEach(this, testid, mAllocationIn, mAllocationOut);
+            forEach(testid, mAllocationIn, mAllocationOut);
         } catch (RSRuntimeException e) {
             Log.e("RenderscriptCTS", "Caught RSRuntimeException: " +
                   e.getMessage());
@@ -173,8 +173,8 @@ class RSBaseCompute extends RSBase {
         return new float[size];
     }
 
-    protected void fillRandom(long seed, int fact, int offset, float[] inArray, int rStride, int rSkip) {
-        RSUtils.genRandom(seed, fact, offset, inArray, rStride, rSkip);
+    protected void fillRandomFloats(long seed, int fact, int offset, float[] inArray) {
+        RSUtils.genRandomFloats(seed, fact, offset, inArray);
     }
 
     protected void fillInAlloc(Allocation mIn, float[] inArray) {
