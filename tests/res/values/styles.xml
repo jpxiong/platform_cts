@@ -144,6 +144,11 @@
 
     <style name="Theme_OverrideInner">
         <item name="themeType">2</item>
+        <item name="themeOverrideAttr">@style/Theme_OverrideAttr</item>
+    </style>
+
+    <style name="Theme_OverrideAttr">
+        <item name="themeType">3</item>
     </style>
 
 </resources>
