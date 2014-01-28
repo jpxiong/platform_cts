@@ -205,16 +205,4 @@ public class TypedValueTest extends TestCase {
 
         assertEquals(TypedValue.complexToDimension(10, dm), tv.getDimension(dm));
     }
-
-    public void testComplexToDimensionNoisy() {
-        DisplayMetrics dm = new DisplayMetrics();
-        dm.density = 1.1f;
-        dm.heightPixels = 100;
-        dm.scaledDensity = 2.1f;
-        dm.xdpi = 200f;
-        dm.ydpi = 300f;
-
-        assertEquals(TypedValue.complexToDimension(1, dm),
-                                 TypedValue.complexToDimensionNoisy(1, dm));
-    }
 }
