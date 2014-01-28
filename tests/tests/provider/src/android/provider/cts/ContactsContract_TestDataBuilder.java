@@ -334,6 +334,10 @@ public class ContactsContract_TestDataBuilder {
             return getLong(Data.RAW_CONTACT_ID);
         }
 
+        public long getId() {
+            return getLong(Data._ID);
+        }
+
         public TestRawContact getRawContact() throws Exception {
             return mRawContact;
         }
