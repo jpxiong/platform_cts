@@ -39,7 +39,6 @@ cts_support_packages := \
     CtsDeviceAdmin \
     CtsMonkeyApp \
     CtsMonkeyApp2 \
-    CtsSampleDeviceApp \
     CtsSomeAccessibilityServices \
     CtsTestStubs \
     SignatureTest \
@@ -108,7 +107,6 @@ cts_test_packages := \
     CtsRenderscriptTestCases \
     CtsRenderscriptGraphicsTestCases \
     CtsRsCppTestCases \
-    CtsSampleDeviceTestCases \
     CtsSaxTestCases \
     CtsSecurityTestCases \
     CtsSpeechTestCases \
@@ -133,7 +131,6 @@ cts_host_libraries := \
     CtsAdbTests \
     CtsAppSecurityTests \
     CtsMonkeyTestCases \
-    CtsSampleHostTestCases \
     CtsUsbTests
 
 # Native test executables that need to have associated test XMLs.
