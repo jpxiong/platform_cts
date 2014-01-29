@@ -126,6 +126,8 @@ public class WebViewClientTest extends ActivityInstrumentationTestCase2<WebViewS
                 childWebViewClient.getLastShouldOverrideUrl());
 
         // Now test a navigation within the page
+        //TODO(hush) Enable this portion when b/12804986 is fixed.
+        /*
         WebViewOnUiThread childWebViewOnUiThread = new WebViewOnUiThread(this, childWebView);
         final int childCallCount = childWebViewClient.getShouldOverrideUrlLoadingCallCount();
         final int mainCallCount = mainWebViewClient.getShouldOverrideUrlLoadingCallCount();
@@ -138,6 +140,7 @@ public class WebViewClientTest extends ActivityInstrumentationTestCase2<WebViewS
         }.run();
         assertEquals(mainCallCount, mainWebViewClient.getShouldOverrideUrlLoadingCallCount());
         assertEquals(TEST_URL, childWebViewClient.getLastShouldOverrideUrl());
+        */
     }
 
     private void clickOnLinkUsingJs(final String linkId, WebViewOnUiThread webViewOnUiThread) {
