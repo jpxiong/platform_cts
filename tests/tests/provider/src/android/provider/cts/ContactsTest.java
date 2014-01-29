@@ -413,7 +413,10 @@ public class ContactsTest extends InstrumentationTestCase {
         final String[] CALLS_PROJECTION = new String[] {
                 Calls._ID, Calls.NUMBER, Calls.DATE, Calls.DURATION, Calls.TYPE,
                 Calls.NEW, Calls.CACHED_NAME, Calls.CACHED_NUMBER_TYPE,
-                Calls.CACHED_NUMBER_LABEL};
+                Calls.CACHED_NUMBER_LABEL, Calls.CACHED_FORMATTED_NUMBER,
+                Calls.CACHED_MATCHED_NUMBER, Calls.CACHED_NORMALIZED_NUMBER,
+                Calls.CACHED_LOOKUP_URI, Calls.CACHED_PHOTO_ID, Calls.COUNTRY_ISO,
+                Calls.GEOCODED_LOCATION};
         final int ID_INDEX = 0;
         final int NUMBER_INDEX = 1;
         final int DATE_INDEX = 2;
@@ -423,15 +426,30 @@ public class ContactsTest extends InstrumentationTestCase {
         final int CACHED_NAME_INDEX = 6;
         final int CACHED_NUMBER_TYPE_INDEX = 7;
         final int CACHED_NUMBER_LABEL_INDEX = 8;
+        final int CACHED_FORMATTED_NUMBER_INDEX = 9;
+        final int CACHED_MATCHED_NUMBER_INDEX = 10;
+        final int CACHED_NORMALIZED_NUMBER_INDEX = 11;
+        final int CACHED_LOOKUP_URI_INDEX = 12;
+        final int CACHED_PHOTO_ID_INDEX = 13;
+        final int COUNTRY_ISO_INDEX = 14;
+        final int GEOCODED_LOCATION_INDEX = 15;
 
         String insertCallsNumber = "0123456789";
         int insertCallsDuration = 120;
         String insertCallsName = "cached_name_insert";
         String insertCallsNumberLabel = "cached_label_insert";
-        String updateCallsNumber = "9876543210";
+
+        String updateCallsNumber = "987654321";
         int updateCallsDuration = 310;
         String updateCallsName = "cached_name_update";
         String updateCallsNumberLabel = "cached_label_update";
+        String updateCachedFormattedNumber = "987-654-4321";
+        String updateCachedMatchedNumber = "987-654-4321";
+        String updateCachedNormalizedNumber = "+1987654321";
+        String updateCachedLookupUri = "cached_lookup_uri_update";
+        long updateCachedPhotoId = 100;
+        String updateCountryIso = "hk";
+        String updateGeocodedLocation = "Hong Kong";
 
         try {
             // Test: insert
@@ -463,7 +481,8 @@ public class ContactsTest extends InstrumentationTestCase {
             int id = cursor.getInt(ID_INDEX);
             cursor.close();
 
-            // Test: update
+            // Test: update. Also add new cached fields to simulate extra cached fields being
+            // inserted into the call log after the initial lookup.
             int now = (int) new Date().getTime();
             value.clear();
             value.put(Calls.NUMBER, updateCallsNumber);
@@ -474,6 +493,13 @@ public class ContactsTest extends InstrumentationTestCase {
             value.put(Calls.CACHED_NAME, updateCallsName);
             value.put(Calls.CACHED_NUMBER_TYPE, Phones.TYPE_CUSTOM);
             value.put(Calls.CACHED_NUMBER_LABEL, updateCallsNumberLabel);
+            value.put(Calls.CACHED_FORMATTED_NUMBER, updateCachedFormattedNumber);
+            value.put(Calls.CACHED_MATCHED_NUMBER, updateCachedMatchedNumber);
+            value.put(Calls.CACHED_NORMALIZED_NUMBER, updateCachedNormalizedNumber);
+            value.put(Calls.CACHED_PHOTO_ID, updateCachedPhotoId);
+            value.put(Calls.COUNTRY_ISO, updateCountryIso);
+            value.put(Calls.GEOCODED_LOCATION, updateGeocodedLocation);
+            value.put(Calls.CACHED_LOOKUP_URI, updateCachedLookupUri);
 
             mCallLogProvider.update(uri, value, null, null);
             cursor = mCallLogProvider.query(Calls.CONTENT_URI, CALLS_PROJECTION,
@@ -487,6 +513,15 @@ public class ContactsTest extends InstrumentationTestCase {
             assertEquals(updateCallsName, cursor.getString(CACHED_NAME_INDEX));
             assertEquals(Phones.TYPE_CUSTOM, cursor.getInt(CACHED_NUMBER_TYPE_INDEX));
             assertEquals(updateCallsNumberLabel, cursor.getString(CACHED_NUMBER_LABEL_INDEX));
+            assertEquals(updateCachedFormattedNumber,
+                    cursor.getString(CACHED_FORMATTED_NUMBER_INDEX));
+            assertEquals(updateCachedMatchedNumber, cursor.getString(CACHED_MATCHED_NUMBER_INDEX));
+            assertEquals(updateCachedNormalizedNumber,
+                    cursor.getString(CACHED_NORMALIZED_NUMBER_INDEX));
+            assertEquals(updateCachedPhotoId, cursor.getLong(CACHED_PHOTO_ID_INDEX));
+            assertEquals(updateCountryIso, cursor.getString(COUNTRY_ISO_INDEX));
+            assertEquals(updateGeocodedLocation, cursor.getString(GEOCODED_LOCATION_INDEX));
+            assertEquals(updateCachedLookupUri, cursor.getString(CACHED_LOOKUP_URI_INDEX));
             cursor.close();
 
             // Test: delete
