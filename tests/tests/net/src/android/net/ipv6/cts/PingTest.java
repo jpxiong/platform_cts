@@ -34,6 +34,21 @@ import java.nio.ByteBuffer;
 import java.util.Arrays;
 import java.util.Random;
 
+/**
+ * Checks that the device has kernel support for the IPv6 ping socket. This allows ping6 to work
+ * without root privileges. The necessary kernel code is in Linux 3.11 or above, or the
+ * <code>common/android-3.x</code> kernel trees. If you are not running one of these kernels, the
+ * functionality can be obtained by cherry-picking the following patches from David Miller's
+ * <code>net-next</code> tree:
+ * <ul>
+ * <li>6d0bfe2 net: ipv6: Add IPv6 support to the ping socket.
+ * <li>c26d6b4 ping: always initialize ->sin6_scope_id and ->sin6_flowinfo
+ * <li>fbfe80c net: ipv6: fix wrong ping_v6_sendmsg return value
+ * <li>a1bdc45 net: ipv6: add missing lock in ping_v6_sendmsg
+ * <li>cf970c0 ping: prevent NULL pointer dereference on write to msg_name
+ * </ul>
+ * or the equivalent backports to the <code>common/android-3.x</code> trees.
+ */
 public class PingTest extends AndroidTestCase {
     /** Maximum size of the packets we're using to test. */
     private static final int MAX_SIZE = 4096;
