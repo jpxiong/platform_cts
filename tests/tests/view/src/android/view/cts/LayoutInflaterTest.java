@@ -43,20 +43,21 @@ import android.view.LayoutInflater.Filter;
 import android.widget.LinearLayout;
 
 public class LayoutInflaterTest extends AndroidTestCase {
-
     private LayoutInflater mLayoutInflater;
-    private Context mContext;
-    private final Factory mFactory = new Factory() {
-        public View onCreateView(String name, Context context,
-                AttributeSet attrs) {
 
+    @SuppressWarnings("hiding")
+    private Context mContext;
+
+    private final Factory mFactory = new Factory() {
+        @Override
+        public View onCreateView(String name, Context context, AttributeSet attrs) {
             return null;
         }
     };
     private boolean isOnLoadClass;
     private final Filter mFilter = new Filter() {
-
-        @SuppressWarnings("unchecked")
+        @SuppressWarnings({ "unchecked", "rawtypes" })
+        @Override
         public boolean onLoadClass(Class clazz) {
             isOnLoadClass = true;
             return true;
@@ -149,7 +150,8 @@ public class LayoutInflaterTest extends AndroidTestCase {
         mLayoutInflater = LayoutInflater.from(mContext);
         isOnLoadClass = false;
         mLayoutInflater.setFilter(new Filter() {
-            @SuppressWarnings("unchecked")
+            @SuppressWarnings({ "unchecked", "rawtypes" })
+            @Override
             public boolean onLoadClass(Class clazz) {
                 isOnLoadClass = true;
                 return false;
@@ -367,6 +369,7 @@ public class LayoutInflaterTest extends AndroidTestCase {
         View container = mLayoutInflater.inflate(R.layout.inflater_override_theme_layout, null);
         verifyThemeType(container, "view_outer", R.id.view_outer, 1);
         verifyThemeType(container, "view_inner", R.id.view_inner, 2);
+        verifyThemeType(container, "view_attr", R.id.view_attr, 3);
     }
 
     private void verifyThemeType(View container, String tag, int id, int type) {
@@ -376,7 +379,7 @@ public class LayoutInflaterTest extends AndroidTestCase {
         Theme theme = view.getContext().getTheme();
         boolean resolved = theme.resolveAttribute(R.attr.themeType, outValue, true);
         assertTrue("Resolved themeType for " + tag, resolved);
-        assertEquals(tag + " has themeType " + type, outValue.data, type);
+        assertEquals(tag + " has themeType " + type, type, outValue.data);
     }
 
     static class MockLayoutInflater extends LayoutInflater {

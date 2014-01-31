@@ -18,8 +18,8 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    theme="@style/Theme_OverrideOuter"
-    android:orientation="vertical" >
+    android:orientation="vertical"
+    android:theme="@style/Theme_OverrideOuter" >
 
     <View
         android:id="@+id/view_outer"
@@ -29,13 +29,19 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        theme="@style/Theme_OverrideInner"
-        android:orientation="vertical" >
+        android:orientation="vertical"
+        android:theme="@style/Theme_OverrideInner" >
 
         <View
             android:id="@+id/view_inner"
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />
+
+        <View
+            android:id="@+id/view_attr"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:theme="?attr/themeOverrideAttr" />
     </LinearLayout>
 
 </LinearLayout>

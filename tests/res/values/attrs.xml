@@ -127,4 +127,6 @@
     </declare-styleable>
     <!-- Integer used to uniquely identify theme overrides. -->
     <attr name="themeType" format="integer"/>
+    <!-- Theme reference used to override parent theme. -->
+    <attr name="themeOverrideAttr" format="reference"/>
 </resources>
