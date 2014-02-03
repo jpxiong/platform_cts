@@ -101,8 +101,9 @@ public class ContactsContract_DataTest extends InstrumentationTestCase {
         cv7.put(SipAddress.DATA, "mysip@sipaddress.com");
         cv7.put(SipAddress.TYPE, SipAddress.TYPE_HOME);
         sContentValues[6] = cv7;
-
     }
+
+    private TestRawContact[] mRawContacts = new TestRawContact[3];
 
     @Override
     protected void setUp() throws Exception {
@@ -299,6 +300,70 @@ public class ContactsContract_DataTest extends InstrumentationTestCase {
         RawContactUtil.delete(mResolver, ids.mRawContactId, true);
     }
 
+    /**
+     * Tests that specifying the {@link android.provider.ContactsContract#REMOVE_DUPLICATE_ENTRIES}
+     * boolean parameter correctly results in deduped phone numbers.
+     */
+    public void testPhoneQuery_removeDuplicateEntries() throws Exception{
+        long[] ids = setupContactablesTestData();
+
+        // Insert duplicate data entry for raw contact 3. (existing phone number 518-354-1111)
+        mRawContacts[2].newDataRow(Phone.CONTENT_ITEM_TYPE)
+                .with(Phone.DATA, "518-354-1111")
+                .with(Phone.TYPE, Phone.TYPE_HOME)
+                .insert();
+
+        ContentValues dupe = new ContentValues();
+        dupe.put(Contacts.DISPLAY_NAME, "John Doe");
+        dupe.put(Data.MIMETYPE, Phone.CONTENT_ITEM_TYPE);
+        dupe.put(Phone.DATA, "518-354-1111");
+        dupe.put(Phone.TYPE, Phone.TYPE_HOME);
+
+        // Query for all phone numbers in the contacts database (without deduping).
+        // The phone number above should be listed twice, in its duplicated forms.
+        assertCursorStoredValuesWithRawContactsFilter(Phone.CONTENT_URI, ids, sContentValues[1],
+                sContentValues[5], dupe);
+
+        // Now query for all phone numbers in the contacts database but request deduping.
+        // The phone number should now be listed only once.
+        Uri uri = Phone.CONTENT_URI.buildUpon().
+                appendQueryParameter(ContactsContract.REMOVE_DUPLICATE_ENTRIES, "true").build();
+        assertCursorStoredValuesWithRawContactsFilter(uri, ids, sContentValues[1],
+                sContentValues[5]);
+    }
+
+    /**
+     * Tests that specifying the {@link android.provider.ContactsContract#REMOVE_DUPLICATE_ENTRIES}
+     * boolean parameter correctly results in deduped email addresses.
+     */
+    public void testEmailQuery_removeDuplicateEntries() throws Exception{
+        long[] ids = setupContactablesTestData();
+
+        // Insert duplicate data entry for raw contact 3. (existing email doeassociates@deer.com)
+        mRawContacts[2].newDataRow(Email.CONTENT_ITEM_TYPE)
+                .with(Email.DATA, "doeassociates@deer.com")
+                .with(Email.TYPE, Email.TYPE_WORK)
+                .insert();
+
+        ContentValues dupe = new ContentValues();
+        dupe.put(Contacts.DISPLAY_NAME, "John Doe");
+        dupe.put(Data.MIMETYPE, Email.CONTENT_ITEM_TYPE);
+        dupe.put(Email.DATA, "doeassociates@deer.com");
+        dupe.put(Email.TYPE, Email.TYPE_WORK);
+
+        // Query for all email addresses in the contacts database (without deduping).
+        // The email address above should be listed twice, in its duplicated forms.
+        assertCursorStoredValuesWithRawContactsFilter(Email.CONTENT_URI, ids, sContentValues[0],
+                sContentValues[2], sContentValues[3], sContentValues[4], dupe);
+
+        // Now query for all email addresses in the contacts database but request deduping.
+        // The email address should now be listed only once.
+        Uri uri = Email.CONTENT_URI.buildUpon().
+                appendQueryParameter(ContactsContract.REMOVE_DUPLICATE_ENTRIES, "true").build();
+        assertCursorStoredValuesWithRawContactsFilter(uri, ids, sContentValues[0],
+                sContentValues[2], sContentValues[3], sContentValues[4]);
+    }
+
     public void testDataUpdate_updatesContactLastUpdatedTimestamp() {
         DatabaseAsserts.ContactIdPair ids = DatabaseAsserts.assertAndCreateContact(mResolver);
         long dataId = createData(ids.mRawContactId);
@@ -363,6 +428,7 @@ public class ContactsContract_DataTest extends InstrumentationTestCase {
                 .with(Phone.DATA, "510-123-5769")
                 .with(Email.TYPE, Phone.TYPE_HOME)
                 .insert();
+        mRawContacts[0] = rawContact;
 
         TestRawContact rawContact2 = mBuilder.newRawContact()
                 .with(RawContacts.ACCOUNT_TYPE, "test_account")
@@ -382,6 +448,7 @@ public class ContactsContract_DataTest extends InstrumentationTestCase {
         rawContact2.newDataRow(Organization.CONTENT_ITEM_TYPE)
                 .with(Organization.COMPANY, "Doe Corp")
                 .insert();
+        mRawContacts[1] = rawContact2;
 
         TestRawContact rawContact3 = mBuilder.newRawContact()
                 .with(RawContacts.ACCOUNT_TYPE, "test_account")
@@ -401,6 +468,7 @@ public class ContactsContract_DataTest extends InstrumentationTestCase {
         rawContact3.newDataRow(Organization.CONTENT_ITEM_TYPE)
                 .with(Organization.DATA, "Doe Industries")
                 .insert();
+        mRawContacts[2] = rawContact3;
         return new long[] {rawContact.getId(), rawContact2.getId(), rawContact3.getId()};
     }
 
