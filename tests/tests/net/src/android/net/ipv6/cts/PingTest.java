@@ -105,19 +105,25 @@ public class PingTest extends AndroidTestCase {
     /**
      * Checks that a socket has received a response appropriate to the specified packet.
      */
-    private void checkResponse(FileDescriptor s,
-            InetAddress dest, byte[] sent) throws ErrnoException, IOException {
-        // Receive the response.
-        InetSocketAddress from = new InetSocketAddress();
+    private void checkResponse(FileDescriptor s, InetAddress dest,
+            byte[] sent, boolean useRecvfrom) throws ErrnoException, IOException {
         ByteBuffer responseBuffer = ByteBuffer.allocate(MAX_SIZE);
-        int bytesRead = Libcore.os.recvfrom(s, responseBuffer, 0, from);
+        int bytesRead;
 
-        // Check the source address and scope ID.
-        assertTrue(from.getAddress() instanceof Inet6Address);
-        Inet6Address fromAddress = (Inet6Address) from.getAddress();
-        assertEquals(0, fromAddress.getScopeId());
-        assertNull(fromAddress.getScopedInterface());
-        assertEquals(dest.getHostAddress(), fromAddress.getHostAddress());
+        // Receive the response.
+        if (useRecvfrom) {
+            InetSocketAddress from = new InetSocketAddress();
+            bytesRead = Libcore.os.recvfrom(s, responseBuffer, 0, from);
+
+            // Check the source address and scope ID.
+            assertTrue(from.getAddress() instanceof Inet6Address);
+            Inet6Address fromAddress = (Inet6Address) from.getAddress();
+            assertEquals(0, fromAddress.getScopeId());
+            assertNull(fromAddress.getScopedInterface());
+            assertEquals(dest.getHostAddress(), fromAddress.getHostAddress());
+        } else {
+            bytesRead = Libcore.os.read(s, responseBuffer);
+        }
 
         // Check the packet length.
         assertEquals(sent.length, bytesRead);
@@ -150,8 +156,11 @@ public class PingTest extends AndroidTestCase {
         for (int i = 0; i < NUM_PACKETS; i++) {
             byte[] packet = pingPacket((int) (Math.random() * MAX_SIZE));
             FileDescriptor s = createPingSocket();
+            // Use both recvfrom and read().
             sendPing(s, ipv6Loopback, packet);
-            checkResponse(s, ipv6Loopback, packet);
+            checkResponse(s, ipv6Loopback, packet, true);
+            sendPing(s, ipv6Loopback, packet);
+            checkResponse(s, ipv6Loopback, packet, false);
             // Check closing the socket doesn't raise an exception.
             Libcore.os.close(s);
         }
