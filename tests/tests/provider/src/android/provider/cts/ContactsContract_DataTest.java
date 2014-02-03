@@ -26,10 +26,12 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.SystemClock;
 import android.provider.ContactsContract;
+import android.provider.ContactsContract.CommonDataKinds.Callable;
 import android.provider.ContactsContract.CommonDataKinds.Contactables;
 import android.provider.ContactsContract.CommonDataKinds.Email;
 import android.provider.ContactsContract.CommonDataKinds.Organization;
 import android.provider.ContactsContract.CommonDataKinds.Phone;
+import android.provider.ContactsContract.CommonDataKinds.SipAddress;
 import android.provider.ContactsContract.CommonDataKinds.StructuredName;
 import android.provider.ContactsContract.Contacts;
 import android.provider.ContactsContract.Data;
@@ -48,6 +50,59 @@ import java.util.ArrayList;
 public class ContactsContract_DataTest extends InstrumentationTestCase {
     private ContentResolver mResolver;
     private ContactsContract_TestDataBuilder mBuilder;
+
+    private static ContentValues[] sContentValues = new ContentValues[7];
+    static {
+        ContentValues cv1 = new ContentValues();
+        cv1.put(Contacts.DISPLAY_NAME, "Hot Tamale");
+        cv1.put(Data.MIMETYPE, Email.CONTENT_ITEM_TYPE);
+        cv1.put(Email.DATA, "tamale@acme.com");
+        cv1.put(Email.TYPE, Email.TYPE_HOME);
+        sContentValues[0] = cv1;
+
+        ContentValues cv2 = new ContentValues();
+        cv2.put(Contacts.DISPLAY_NAME, "Hot Tamale");
+        cv2.put(Data.MIMETYPE, Phone.CONTENT_ITEM_TYPE);
+        cv2.put(Phone.DATA, "510-123-5769");
+        cv2.put(Phone.TYPE, Phone.TYPE_HOME);
+        sContentValues[1] = cv2;
+
+        ContentValues cv3 = new ContentValues();
+        cv3.put(Contacts.DISPLAY_NAME, "Hot Tamale");
+        cv3.put(Data.MIMETYPE, Email.CONTENT_ITEM_TYPE);
+        cv3.put(Email.DATA, "hot@google.com");
+        cv3.put(Email.TYPE, Email.TYPE_WORK);
+        sContentValues[2] = cv3;
+
+        ContentValues cv4 = new ContentValues();
+        cv4.put(Contacts.DISPLAY_NAME, "Cold Tamago");
+        cv4.put(Data.MIMETYPE, Email.CONTENT_ITEM_TYPE);
+        cv4.put(Email.DATA, "eggs@farmers.org");
+        cv4.put(Email.TYPE, Email.TYPE_HOME);
+        sContentValues[3] = cv4;
+
+        ContentValues cv5 = new ContentValues();
+        cv5.put(Contacts.DISPLAY_NAME, "John Doe");
+        cv5.put(Data.MIMETYPE, Email.CONTENT_ITEM_TYPE);
+        cv5.put(Email.DATA, "doeassociates@deer.com");
+        cv5.put(Email.TYPE, Email.TYPE_WORK);
+        sContentValues[4] = cv5;
+
+        ContentValues cv6 = new ContentValues();
+        cv6.put(Contacts.DISPLAY_NAME, "John Doe");
+        cv6.put(Data.MIMETYPE, Phone.CONTENT_ITEM_TYPE);
+        cv6.put(Phone.DATA, "518-354-1111");
+        cv6.put(Phone.TYPE, Phone.TYPE_HOME);
+        sContentValues[5] = cv6;
+
+        ContentValues cv7 = new ContentValues();
+        cv7.put(Contacts.DISPLAY_NAME, "Cold Tamago");
+        cv7.put(Data.MIMETYPE, SipAddress.CONTENT_ITEM_TYPE);
+        cv7.put(SipAddress.DATA, "mysip@sipaddress.com");
+        cv7.put(SipAddress.TYPE, SipAddress.TYPE_HOME);
+        sContentValues[6] = cv7;
+
+    }
 
     @Override
     protected void setUp() throws Exception {
@@ -182,6 +237,37 @@ public class ContactsContract_DataTest extends InstrumentationTestCase {
         assertCursorStoredValuesWithRawContactsFilter(filterUri, ids, new ContentValues[0]);
     }
 
+    /**
+     * Verifies that Callable.CONTENT_URI returns only data items that can be called (i.e.
+     * phone numbers and sip addresses)
+     */
+    public void testCallableUri_returnsCorrectDataRows() throws Exception {
+        long[] ids = setupContactablesTestData();
+        Uri uri = Callable.CONTENT_URI;
+        assertCursorStoredValuesWithRawContactsFilter(uri, ids, sContentValues[1],
+                sContentValues[5], sContentValues[6]);
+    }
+
+    public void testCallableFilterByNameOrOrganization_returnsCorrectDataRows() throws Exception {
+        long[] ids = setupContactablesTestData();
+        Uri uri = Uri.withAppendedPath(Callable.CONTENT_FILTER_URI, "doe");
+        // Only callables belonging to John Doe (name) and Cold Tamago (organization) are returned.
+        assertCursorStoredValuesWithRawContactsFilter(uri, ids, sContentValues[5],
+                sContentValues[6]);
+    }
+
+    public void testCallableFilterByNumber_returnsCorrectDataRows() throws Exception {
+        long[] ids = setupContactablesTestData();
+        Uri uri = Uri.withAppendedPath(Callable.CONTENT_FILTER_URI, "510");
+        assertCursorStoredValuesWithRawContactsFilter(uri, ids, sContentValues[1]);
+    }
+
+    public void testCallableFilterBySipAddress_returnsCorrectDataRows() throws Exception {
+        long[] ids = setupContactablesTestData();
+        Uri uri = Uri.withAppendedPath(Callable.CONTENT_FILTER_URI, "mysip");
+        assertCursorStoredValuesWithRawContactsFilter(uri, ids, sContentValues[6]);
+    }
+
     public void testDataInsert_updatesContactLastUpdatedTimestamp() {
         DatabaseAsserts.ContactIdPair ids = DatabaseAsserts.assertAndCreateContact(mResolver);
         long baseTime = ContactUtil.queryContactLastUpdatedTimestamp(mResolver, ids.mContactId);
@@ -289,6 +375,13 @@ public class ContactsContract_DataTest extends InstrumentationTestCase {
                 .with(Email.DATA, "eggs@farmers.org")
                 .with(Email.TYPE, Email.TYPE_HOME)
                 .insert();
+        rawContact2.newDataRow(SipAddress.CONTENT_ITEM_TYPE)
+                .with(SipAddress.DATA, "mysip@sipaddress.com")
+                .with(SipAddress.TYPE, SipAddress.TYPE_HOME)
+                .insert();
+        rawContact2.newDataRow(Organization.CONTENT_ITEM_TYPE)
+                .with(Organization.COMPANY, "Doe Corp")
+                .insert();
 
         TestRawContact rawContact3 = mBuilder.newRawContact()
                 .with(RawContacts.ACCOUNT_TYPE, "test_account")
@@ -313,50 +406,6 @@ public class ContactsContract_DataTest extends InstrumentationTestCase {
 
     // Provides functionality to set up content values for the Contactables tests
     private static class ContactablesTestHelper {
-        private static ContentValues[] sContentValues = new ContentValues[6];
-        static {
-            ContentValues cv1 = new ContentValues();
-            cv1.put(Contacts.DISPLAY_NAME, "Hot Tamale");
-            cv1.put(Data.MIMETYPE, Email.CONTENT_ITEM_TYPE);
-            cv1.put(Email.DATA, "tamale@acme.com");
-            cv1.put(Email.TYPE, Email.TYPE_HOME);
-            sContentValues[0] = cv1;
-
-            ContentValues cv2 = new ContentValues();
-            cv2.put(Contacts.DISPLAY_NAME, "Hot Tamale");
-            cv2.put(Data.MIMETYPE, Phone.CONTENT_ITEM_TYPE);
-            cv2.put(Phone.DATA, "510-123-5769");
-            cv2.put(Phone.TYPE, Phone.TYPE_HOME);
-            sContentValues[1] = cv2;
-
-            ContentValues cv3 = new ContentValues();
-            cv3.put(Contacts.DISPLAY_NAME, "Hot Tamale");
-            cv3.put(Data.MIMETYPE, Email.CONTENT_ITEM_TYPE);
-            cv3.put(Email.DATA, "hot@google.com");
-            cv3.put(Email.TYPE, Email.TYPE_WORK);
-            sContentValues[2] = cv3;
-
-            ContentValues cv4 = new ContentValues();
-            cv4.put(Contacts.DISPLAY_NAME, "Cold Tamago");
-            cv4.put(Data.MIMETYPE, Email.CONTENT_ITEM_TYPE);
-            cv4.put(Email.DATA, "eggs@farmers.org");
-            cv4.put(Email.TYPE, Email.TYPE_HOME);
-            sContentValues[3] = cv4;
-
-            ContentValues cv5 = new ContentValues();
-            cv5.put(Contacts.DISPLAY_NAME, "John Doe");
-            cv5.put(Data.MIMETYPE, Email.CONTENT_ITEM_TYPE);
-            cv5.put(Email.DATA, "doeassociates@deer.com");
-            cv5.put(Email.TYPE, Email.TYPE_WORK);
-            sContentValues[4] = cv5;
-
-            ContentValues cv6 = new ContentValues();
-            cv6.put(Contacts.DISPLAY_NAME, "John Doe");
-            cv6.put(Data.MIMETYPE, Phone.CONTENT_ITEM_TYPE);
-            cv6.put(Phone.DATA, "518-354-1111");
-            cv6.put(Phone.TYPE, Phone.TYPE_HOME);
-            sContentValues[5] = cv6;
-        }
 
         /**
          * @return An arraylist of contentValues that correspond to the provided raw contacts
