@@ -85,11 +85,11 @@ class RSBaseCompute extends RSBase {
         }
     }
 
-    private void baseTestHelper(int testid, Element inElement, Element outElement, long seed, int fact,
-                                int offset, int rStride, int rSkip, int refStride, int outStride,
+    private void baseTestHelper(int testid, Element inElement, Element outElement, long seed, float min,
+                                float max, int rStride, int rSkip, int refStride, int outStride,
                                 int inStride, int skip, int ulp) {
         float[] inArray = makeInArray(INPUTSIZE * inStride);
-        fillRandomFloats(seed, fact, offset, inArray);
+        fillRandomFloats(seed, min, max, inArray);
         float[] refArray = getRefArray(inArray, INPUTSIZE, inStride, skip);
 
         Allocation mAllocationIn = setInAlloc(inElement);
@@ -108,39 +108,39 @@ class RSBaseCompute extends RSBase {
     }
 
     public void baseTest(int testid, long seed, int refStride, int outStride, int inStride, int skip, int ulp) {
-        baseTestHelper(testid, null, null, seed, 1, 0, 1, 0, refStride, outStride, inStride, skip, ulp);
+        baseTestHelper(testid, null, null, seed, 0.0f, 1.0f, 1, 0, refStride, outStride, inStride, skip, ulp);
     }
 
     public void doF32(long seed, int ulp) {
-        baseTestHelper(TEST_F32, Element.F32(mRS), Element.F32(mRS), seed, 1, 0, 1, 0, 1, 1, 1, 0, ulp);
+        baseTestHelper(TEST_F32, Element.F32(mRS), Element.F32(mRS), seed, 0.0f, 1.0f, 1, 0, 1, 1, 1, 0, ulp);
     }
 
     public void doF32_2(long seed, int ulp) {
-        baseTestHelper(TEST_F32_2, Element.F32_2(mRS), Element.F32_2(mRS), seed, 1, 0, 1, 0, 2, 2, 2, 0, ulp);
+        baseTestHelper(TEST_F32_2, Element.F32_2(mRS), Element.F32_2(mRS), seed, 0.0f, 1.0f, 1, 0, 2, 2, 2, 0, ulp);
     }
 
     public void doF32_3(long seed, int ulp) {
-        baseTestHelper(TEST_F32_3, Element.F32_3(mRS), Element.F32_3(mRS), seed, 1, 0, 4, 1, 3, 4, 4, 1, ulp);
+        baseTestHelper(TEST_F32_3, Element.F32_3(mRS), Element.F32_3(mRS), seed, 0.0f, 1.0f, 4, 1, 3, 4, 4, 1, ulp);
     }
 
     public void doF32_4(long seed, int ulp) {
-        baseTestHelper(TEST_F32_4, Element.F32_4(mRS), Element.F32_4(mRS), seed, 1, 0, 1, 0, 4, 4, 4, 0, ulp);
+        baseTestHelper(TEST_F32_4, Element.F32_4(mRS), Element.F32_4(mRS), seed, 0.0f, 1.0f, 1, 0, 4, 4, 4, 0, ulp);
     }
 
     public void doF32_relaxed(long seed, int ulp) {
-        baseTestHelper(TEST_RELAXED_F32, Element.F32(mRS), Element.F32(mRS), seed, 1, 0, 1, 0, 1, 1, 1, 0, ulp);
+        baseTestHelper(TEST_RELAXED_F32, Element.F32(mRS), Element.F32(mRS), seed, 0.0f, 1.0f, 1, 0, 1, 1, 1, 0, ulp);
     }
 
     public void doF32_2_relaxed(long seed, int ulp) {
-        baseTestHelper(TEST_RELAXED_F32_2, Element.F32_2(mRS), Element.F32_2(mRS), seed, 1, 0, 1, 0, 2, 2, 2, 0, ulp);
+        baseTestHelper(TEST_RELAXED_F32_2, Element.F32_2(mRS), Element.F32_2(mRS), seed, 0.0f, 1.0f, 1, 0, 2, 2, 2, 0, ulp);
     }
 
     public void doF32_3_relaxed(long seed, int ulp) {
-        baseTestHelper(TEST_RELAXED_F32_3, Element.F32_3(mRS), Element.F32_3(mRS), seed, 1, 0, 4, 1, 3, 4, 4, 1, ulp);
+        baseTestHelper(TEST_RELAXED_F32_3, Element.F32_3(mRS), Element.F32_3(mRS), seed, 0.0f, 1.0f, 4, 1, 3, 4, 4, 1, ulp);
     }
 
     public void doF32_4_relaxed(long seed, int ulp) {
-        baseTestHelper(TEST_RELAXED_F32_4, Element.F32_4(mRS), Element.F32_4(mRS), seed, 1, 0, 1, 0, 4, 4, 4, 0, ulp);
+        baseTestHelper(TEST_RELAXED_F32_4, Element.F32_4(mRS), Element.F32_4(mRS), seed, 0.0f, 1.0f, 1, 0, 4, 4, 4, 0, ulp);
     }
 
 
@@ -173,8 +173,8 @@ class RSBaseCompute extends RSBase {
         return new float[size];
     }
 
-    protected void fillRandomFloats(long seed, int fact, int offset, float[] inArray) {
-        RSUtils.genRandomFloats(seed, fact, offset, inArray);
+    protected void fillRandomFloats(long seed, float min, float max, float[] inArray) {
+        RSUtils.genRandomFloats(seed, min, max, inArray);
     }
 
     protected void fillInAlloc(Allocation mIn, float[] inArray) {
