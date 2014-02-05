@@ -72,6 +72,10 @@ public class BitmapFactoryTest extends InstrumentationTestCase {
         Config.ARGB_4444};
     private static int[] COLOR_TOLS = new int[] {16, 49, 576};
 
+    private static Config[] COLOR_CONFIGS_RGBA = new Config[] {Config.ARGB_8888,
+        Config.ARGB_4444};
+    private static int[] COLOR_TOLS_RGBA = new int[] {72, 124};
+
     private static int[] RAW_COLORS = new int[] {
         // raw data from R.drawable.premul_data
         Color.argb(255, 0, 0, 0),
@@ -200,11 +204,15 @@ public class BitmapFactoryTest extends InstrumentationTestCase {
             Bitmap bPng = BitmapFactory.decodeStream(iStreamPng, null, options);
             assertNotNull(bPng);
             assertEquals(bPng.getConfig(), COLOR_CONFIGS[k]);
+            assertFalse(bPng.isPremultiplied());
+            assertFalse(bPng.hasAlpha());
 
             InputStream iStreamWebp1 = obtainInputStream(R.drawable.webp_test);
             Bitmap bWebp1 = BitmapFactory.decodeStream(iStreamWebp1, null, options);
             assertNotNull(bWebp1);
-            compareBitmaps(bPng, bWebp1, COLOR_TOLS[k], true);
+            assertFalse(bWebp1.isPremultiplied());
+            assertFalse(bWebp1.hasAlpha());
+            compareBitmaps(bPng, bWebp1, COLOR_TOLS[k], true, bPng.isPremultiplied());
 
             // Compress the PNG image to WebP format (Quality=90) and decode it back.
             // This will test end-to-end WebP encoding and decoding.
@@ -213,7 +221,46 @@ public class BitmapFactoryTest extends InstrumentationTestCase {
             InputStream iStreamWebp2 = new ByteArrayInputStream(oStreamWebp.toByteArray());
             Bitmap bWebp2 = BitmapFactory.decodeStream(iStreamWebp2, null, options);
             assertNotNull(bWebp2);
-            compareBitmaps(bPng, bWebp2, COLOR_TOLS[k], true);
+            assertFalse(bWebp2.isPremultiplied());
+            assertFalse(bWebp2.hasAlpha());
+            compareBitmaps(bPng, bWebp2, COLOR_TOLS[k], true, bPng.isPremultiplied());
+        }
+    }
+
+    public void testDecodeStream5() throws IOException {
+        BitmapFactory.Options options = new BitmapFactory.Options();
+        for (int k = 0; k < COLOR_CONFIGS_RGBA.length; ++k) {
+            options.inPreferredConfig = COLOR_CONFIGS_RGBA[k];
+
+            // Decode the PNG & WebP (google_logo) images. The WebP image has
+            // been encoded from PNG image.
+            InputStream iStreamPng = obtainInputStream(R.drawable.google_logo_1);
+            Bitmap bPng = BitmapFactory.decodeStream(iStreamPng, null, options);
+            assertNotNull(bPng);
+            assertEquals(bPng.getConfig(), COLOR_CONFIGS_RGBA[k]);
+            assertTrue(bPng.isPremultiplied());
+            assertTrue(bPng.hasAlpha());
+
+            // Decode the corresponding WebP (transparent) image (google_logo_2.webp).
+            InputStream iStreamWebP1 = obtainInputStream(R.drawable.google_logo_2);
+            Bitmap bWebP1 = BitmapFactory.decodeStream(iStreamWebP1, null, options);
+            assertNotNull(bWebP1);
+            assertEquals(bWebP1.getConfig(), COLOR_CONFIGS_RGBA[k]);
+            assertTrue(bWebP1.isPremultiplied());
+            assertTrue(bWebP1.hasAlpha());
+            compareBitmaps(bPng, bWebP1, COLOR_TOLS_RGBA[k], true, bPng.isPremultiplied());
+
+            // Compress the PNG image to WebP format (Quality=90) and decode it back.
+            // This will test end-to-end WebP encoding and decoding.
+            ByteArrayOutputStream oStreamWebp = new ByteArrayOutputStream();
+            assertTrue(bPng.compress(CompressFormat.WEBP, 90, oStreamWebp));
+            InputStream iStreamWebp2 = new ByteArrayInputStream(oStreamWebp.toByteArray());
+            Bitmap bWebP2 = BitmapFactory.decodeStream(iStreamWebp2, null, options);
+            assertNotNull(bWebP2);
+            assertEquals(bWebP2.getConfig(), COLOR_CONFIGS_RGBA[k]);
+            assertTrue(bWebP2.isPremultiplied());
+            assertTrue(bWebP2.hasAlpha());
+            compareBitmaps(bPng, bWebP2, COLOR_TOLS_RGBA[k], true, bPng.isPremultiplied());
         }
     }
 
@@ -450,7 +497,7 @@ public class BitmapFactoryTest extends InstrumentationTestCase {
     // lessThanMargin is to indicate whether we expect the mean square error
     // to be "less than" or "no less than".
     private void compareBitmaps(Bitmap expected, Bitmap actual,
-            int mseMargin, boolean lessThanMargin) {
+            int mseMargin, boolean lessThanMargin, boolean isPremultiplied) {
         final int width = expected.getWidth();
         final int height = expected.getHeight();
 
@@ -463,30 +510,49 @@ public class BitmapFactoryTest extends InstrumentationTestCase {
         int[] expectedColors = new int [width * height];
         int[] actualColors = new int [width * height];
 
+        // Bitmap.getPixels() returns colors with non-premultiplied ARGB values.
         expected.getPixels(expectedColors, 0, width, 0, 0, width, height);
         actual.getPixels(actualColors, 0, width, 0, 0, width, height);
 
         for (int row = 0; row < height; ++row) {
             for (int col = 0; col < width; ++col) {
                 int idx = row * width + col;
-                mse += distance(expectedColors[idx], actualColors[idx]);
+                mse += distance(expectedColors[idx], actualColors[idx], isPremultiplied);
             }
         }
         mse /= width * height;
 
         if (lessThanMargin) {
-            assertTrue("MSE too large for normal case: " + mse,
+            assertTrue("MSE " + mse +  "larger than the threshold: " + mseMargin,
                     mse <= mseMargin);
         } else {
-            assertFalse("MSE too small for abnormal case: " + mse,
+            assertFalse("MSE " + mse +  "smaller than the threshold: " + mseMargin,
                     mse <= mseMargin);
         }
     }
 
-    private double distance(int expect, int actual) {
-        final int r = Color.red(actual) - Color.red(expect);
-        final int g = Color.green(actual) - Color.green(expect);
-        final int b = Color.blue(actual) - Color.blue(expect);
-        return r * r + g * g + b * b;
+    private int multiplyAlpha(int color, int alpha) {
+        return (color * alpha + 127) / 255;
+    }
+
+    // For the Bitmap with Alpha, multiply the Alpha values to get the effective
+    // RGB colors and then compute the color-distance.
+    private double distance(int expect, int actual, boolean isPremultiplied) {
+        if (isPremultiplied) {
+            final int a1 = Color.alpha(actual);
+            final int a2 = Color.alpha(expect);
+            final int r = multiplyAlpha(Color.red(actual), a1) -
+                    multiplyAlpha(Color.red(expect), a2);
+            final int g = multiplyAlpha(Color.green(actual), a1) -
+                    multiplyAlpha(Color.green(expect), a2);
+            final int b = multiplyAlpha(Color.blue(actual), a1) -
+                    multiplyAlpha(Color.blue(expect), a2);
+            return r * r + g * g + b * b;
+        } else {
+            final int r = Color.red(actual) - Color.red(expect);
+            final int g = Color.green(actual) - Color.green(expect);
+            final int b = Color.blue(actual) - Color.blue(expect);
+            return r * r + g * g + b * b;
+        }
     }
 }
