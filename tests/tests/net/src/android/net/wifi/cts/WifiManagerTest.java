@@ -407,6 +407,10 @@ public class WifiManagerTest extends AndroidTestCase {
      * To pass this CTS test, a connected WiFi link is required.
      */
     public void testWifiWatchdog() throws Exception {
+        if (!WifiFeature.isWifiSupported(getContext())) {
+            // skip the test if WiFi is not supported
+            return;
+        }
         // Make sure WiFi is enabled
         if (!mWifiManager.isWifiEnabled()) {
             setWifiEnabled(true);
