@@ -968,6 +968,41 @@ public class MediaPlayerTest extends MediaPlayerTestBase {
         assertEquals(4, count);
     }
 
+    /*
+     *  This test assumes the resources being tested are between 8 and 14 seconds long
+     *  The ones being used here are 10 seconds long.
+     */
+    public void testResumeAtEnd() throws Throwable {
+        testResumeAtEnd(R.raw.loudsoftmp3);
+        testResumeAtEnd(R.raw.loudsoftwav);
+        testResumeAtEnd(R.raw.loudsoftogg);
+        testResumeAtEnd(R.raw.loudsoftitunes);
+        testResumeAtEnd(R.raw.loudsoftfaac);
+        testResumeAtEnd(R.raw.loudsoftaac);
+    }
+
+    private void testResumeAtEnd(int res) throws Throwable {
+
+        loadResource(res);
+        mMediaPlayer.prepare();
+        mOnCompletionCalled.reset();
+        mMediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+            @Override
+            public void onCompletion(MediaPlayer mp) {
+                mOnCompletionCalled.signal();
+                mMediaPlayer.start();
+            }
+        });
+        // skip the first part of the file so we reach EOF sooner
+        mMediaPlayer.seekTo(5000);
+        mMediaPlayer.start();
+        // sleep long enough that we restart playback at least once, but no more
+        Thread.sleep(10000);
+        assertTrue("MediaPlayer should still be playing", mMediaPlayer.isPlaying());
+        mMediaPlayer.reset();
+        assertEquals("wrong number of repetitions", 1, mOnCompletionCalled.getNumSignal());
+    }
+
     public void testCallback() throws Throwable {
         final int mp4Duration = 8484;
 
