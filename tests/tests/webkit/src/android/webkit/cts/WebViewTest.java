@@ -88,7 +88,11 @@ import java.util.concurrent.TimeUnit;
 import java.util.HashMap;
 
 import org.apache.http.Header;
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpEntityEnclosingRequest;
 import org.apache.http.HttpRequest;
+import org.apache.http.util.EncodingUtils;
+import org.apache.http.util.EntityUtils;
 
 public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubActivity> {
     private static final String LOGTAG = "WebViewTest";
@@ -358,6 +362,36 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
 
         Header header = matchingHeaders[0];
         assertEquals(mWebView.getContext().getApplicationInfo().packageName, header.getValue());
+    }
+
+    @UiThreadTest
+    public void testPostUrlWithNonNetworkUrl() throws Exception {
+        final String nonNetworkUrl = "file:///android_asset/" + TestHtmlConstants.HELLO_WORLD_URL;
+
+        mOnUiThread.postUrlAndWaitForCompletion(nonNetworkUrl, new byte[1]);
+
+        // Test if the nonNetworkUrl is loaded
+        assertEquals(TestHtmlConstants.HELLO_WORLD_TITLE, mWebView.getTitle());
+    }
+
+    @UiThreadTest
+    public void testPostUrlWithNetworkUrl() throws Exception {
+        startWebServer(false);
+        final String networkUrl = mWebServer.getAssetUrl(TestHtmlConstants.HELLO_WORLD_URL);
+        final String postDataString = "username=my_username&password=my_password";
+        final byte[] postData = EncodingUtils.getBytes(postDataString, "BASE64");
+
+        mOnUiThread.postUrlAndWaitForCompletion(networkUrl, postData);
+
+        HttpRequest request = mWebServer.getLastRequest(TestHtmlConstants.HELLO_WORLD_URL);
+        // The last request should be POST
+        assertEquals(request.getRequestLine().getMethod(), "POST");
+
+        // The last request should have a request body
+        assertTrue(request instanceof HttpEntityEnclosingRequest);
+        HttpEntity entity = ((HttpEntityEnclosingRequest) request).getEntity();
+        String entityString = EntityUtils.toString(entity);
+        assertEquals(entityString, postDataString);
     }
 
     @UiThreadTest

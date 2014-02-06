@@ -378,6 +378,7 @@ public class WebViewOnUiThread {
      * onNewPicture and onProgressChange to reach 100.
      * Test fails if the load timeout elapses.
      * @param url The URL to load.
+     * @param extraHeaders The additional headers to be used in the HTTP request.
      */
     public void loadUrlAndWaitForCompletion(final String url,
             final Map<String, String> extraHeaders) {
@@ -403,6 +404,15 @@ public class WebViewOnUiThread {
             @Override
             public void run() {
                 mWebView.stopLoading();
+            }
+        });
+    }
+
+    public void postUrlAndWaitForCompletion(final String url, final byte[] postData) {
+        callAndWait(new Runnable() {
+            @Override
+            public void run() {
+                mWebView.postUrl(url, postData);
             }
         });
     }
