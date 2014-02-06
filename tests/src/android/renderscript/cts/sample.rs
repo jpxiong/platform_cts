@@ -8,46 +8,11 @@ rs_sampler gLinear;
 rs_sampler gMipNearest;
 rs_sampler gMipLinear;
 
-uint8_t *gAllocPtr;
-
 static uchar4 lod0Color = {255, 255, 0, 0};
 static uchar4 lod1Color = {255, 0, 255, 0};
 static uchar4 lod2Color = {0, 255, 255, 0};
 static uchar4 lod3Color = {255, 255, 255, 0};
 
-// Allocation has been bound to gAllocPtr
-void init_RGBA(rs_allocation a) {
-    // Fill base level with one color, mips with something else
-    uchar4 *allocPtr = (uchar4*)gAllocPtr;
-    uint32_t dimX = rsAllocationGetDimX(a);
-    uint32_t dimY = rsAllocationGetDimY(a);
-    uint32_t minSize = 1;
-    dimX = max(dimX, minSize);
-    dimY = max(dimY, minSize);
-
-    uint32_t numPixels = dimX * dimY;
-    for (uint32_t i = 0; i < numPixels; i ++) {
-        (*allocPtr++) = lod0Color;
-    }
-    dimX = max(dimX >> 1, minSize);
-    dimY = max(dimY >> 1, minSize);
-    numPixels = dimX * dimY;
-    for (uint32_t i = 0; i < numPixels; i ++) {
-        (*allocPtr++) = lod1Color;
-    }
-    dimX = max(dimX >> 1, minSize);
-    dimY = max(dimY >> 1, minSize);
-    numPixels = dimX * dimY;
-    for (uint32_t i = 0; i < numPixels; i ++) {
-        (*allocPtr++) = lod2Color;
-    }
-    dimX = max(dimX >> 1, minSize);
-    dimY = max(dimY >> 1, minSize);
-    numPixels = dimX * dimY;
-    for (uint32_t i = 0; i < numPixels; i ++) {
-        (*allocPtr++) = lod3Color;
-    }
-}
 
 static bool compare(float4 expected, float4 value) {
     float allowedDelta = 10.0f;
