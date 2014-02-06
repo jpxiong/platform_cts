@@ -1403,6 +1403,42 @@ public class MediaPlayerTest extends MediaPlayerTestBase {
         return 1;
     }
 
+    public void testPositionAtEnd() throws Throwable {
+        testPositionAtEnd(R.raw.test1m1shighstereo);
+        testPositionAtEnd(R.raw.loudsoftmp3);
+        testPositionAtEnd(R.raw.loudsoftmp3);
+        testPositionAtEnd(R.raw.loudsoftwav);
+        testPositionAtEnd(R.raw.loudsoftogg);
+        testPositionAtEnd(R.raw.loudsoftitunes);
+        testPositionAtEnd(R.raw.loudsoftfaac);
+        testPositionAtEnd(R.raw.loudsoftaac);
+    }
+
+    private void testPositionAtEnd(int res) throws Throwable {
+
+        loadResource(res);
+        mMediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
+        mMediaPlayer.prepare();
+        int duration = mMediaPlayer.getDuration();
+        assertTrue("resource too short", duration > 6000);
+        mOnCompletionCalled.reset();
+        mMediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+            @Override
+            public void onCompletion(MediaPlayer mp) {
+                mOnCompletionCalled.signal();
+            }
+        });
+        mMediaPlayer.seekTo(duration - 5000);
+        mMediaPlayer.start();
+        while (mMediaPlayer.isPlaying()) {
+            Log.i("@@@@", "position: " + mMediaPlayer.getCurrentPosition());
+            Thread.sleep(500);
+        }
+        Log.i("@@@@", "final position: " + mMediaPlayer.getCurrentPosition());
+        assertTrue(mMediaPlayer.getCurrentPosition() > duration - 1000);
+        mMediaPlayer.reset();
+    }
+
     public void testCallback() throws Throwable {
         final int mp4Duration = 8484;
 
