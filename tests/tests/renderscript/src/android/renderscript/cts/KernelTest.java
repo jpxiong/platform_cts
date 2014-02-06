@@ -470,7 +470,6 @@ public class KernelTest extends RSBaseCompute {
         s.set_dimY(Y);
         typeBuilder.setX(X).setY(Y);
         Allocation A = Allocation.createTyped(mRS, typeBuilder.create());
-        s.bind_a(A);
         s.set_aRaw(A);
         s.forEach_root(A);
         s.invoke_verify_root();
@@ -478,6 +477,7 @@ public class KernelTest extends RSBaseCompute {
         s.invoke_verify_foo();
         s.invoke_foreach_test();
         mRS.finish();
+        checkForErrors();
         waitForMessage();
     }
 
@@ -491,7 +491,6 @@ public class KernelTest extends RSBaseCompute {
         s.set_dimY(Y);
         typeBuilder.setX(X).setY(Y);
         Allocation A = Allocation.createTyped(mRS, typeBuilder.create());
-        s.bind_a(A);
         s.set_aRaw(A);
         s.forEach_foo(A, A);
         s.invoke_verify_foo();
