@@ -1468,19 +1468,28 @@ public class AndroidKeyStoreTest extends AndroidTestCase {
 
     private void assertPrivateKeyEntryEquals(PrivateKeyEntry keyEntry, PrivateKey expectedKey,
             Certificate expectedCert, Collection<Certificate> expectedChain) throws Exception {
+        final PrivateKey privKey = keyEntry.getPrivateKey();
+        final PublicKey pubKey = keyEntry.getCertificate().getPublicKey();
+
         if (expectedKey instanceof DSAPrivateKey) {
             assertEquals("Returned PrivateKey should be what we inserted",
                     ((DSAPrivateKey) expectedKey).getParams(),
-                    ((DSAPublicKey) keyEntry.getCertificate().getPublicKey()).getParams());
+                    ((DSAPublicKey) pubKey).getParams());
         } else if (expectedKey instanceof ECPrivateKey) {
             assertEquals("Returned PrivateKey should be what we inserted",
                     ((ECPrivateKey) expectedKey).getParams().getCurve(),
-                    ((ECPublicKey) keyEntry.getCertificate().getPublicKey()).getParams().getCurve());
+                    ((ECPublicKey) pubKey).getParams().getCurve());
         } else if (expectedKey instanceof RSAPrivateKey) {
             assertEquals("Returned PrivateKey should be what we inserted",
                     ((RSAPrivateKey) expectedKey).getModulus(),
-                    ((RSAPrivateKey) keyEntry.getPrivateKey()).getModulus());
+                    ((RSAPrivateKey) privKey).getModulus());
         }
+
+        assertNull("getFormat() should return null", privKey.getFormat());
+        assertNull("getEncoded() should return null", privKey.getEncoded());
+
+        assertEquals("Public keys should be in X.509 format", "X.509", pubKey.getFormat());
+        assertNotNull("Public keys should be encodable", pubKey.getEncoded());
 
         assertEquals("Returned Certificate should be what we inserted", expectedCert,
                 keyEntry.getCertificate());
