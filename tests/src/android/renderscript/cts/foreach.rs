@@ -1,6 +1,5 @@
 #include "shared.rsh"
 
-int *a;
 rs_allocation aRaw;
 int dimX;
 int dimY;
