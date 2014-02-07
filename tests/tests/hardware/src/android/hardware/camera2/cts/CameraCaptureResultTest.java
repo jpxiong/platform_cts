@@ -310,6 +310,7 @@ public class CameraCaptureResultTest extends AndroidTestCase {
         resultKeys.add(CaptureResult.SENSOR_SENSITIVITY);
         resultKeys.add(CaptureResult.SENSOR_TIMESTAMP);
         resultKeys.add(CaptureResult.SENSOR_TEMPERATURE);
+        resultKeys.add(CaptureResult.SENSOR_NEUTRAL_COLOR_POINT);
         resultKeys.add(CaptureResult.SENSOR_TEST_PATTERN_MODE);
         resultKeys.add(CaptureResult.STATISTICS_FACE_DETECT_MODE);
         resultKeys.add(CaptureResult.STATISTICS_LENS_SHADING_MAP);
