@@ -42,6 +42,7 @@ public class DecoderTest extends MediaPlayerTestBase {
     private static final int RESET_MODE_NONE = 0;
     private static final int RESET_MODE_RECONFIGURE = 1;
     private static final int RESET_MODE_FLUSH = 2;
+    private static final int RESET_MODE_EOS_FLUSH = 3;
 
     private static final String[] CSD_KEYS = new String[] { "csd-0", "csd-1" };
 
@@ -169,7 +170,8 @@ public class DecoderTest extends MediaPlayerTestBase {
         double rmse = Math.sqrt(avgErrorSquared);
         assertTrue("decoding error too big: " + rmse, rmse <= maxerror);
 
-        int[] resetModes = new int[] { RESET_MODE_NONE, RESET_MODE_RECONFIGURE, RESET_MODE_FLUSH };
+        int[] resetModes = new int[] { RESET_MODE_NONE, RESET_MODE_RECONFIGURE,
+                RESET_MODE_FLUSH, RESET_MODE_EOS_FLUSH };
         int[] configModes = new int[] { CONFIG_MODE_NONE, CONFIG_MODE_QUEUE };
 
         for (int conf : configModes) {
@@ -333,7 +335,8 @@ public class DecoderTest extends MediaPlayerTestBase {
                         timestamps.add(info.presentationTimeUs);
                     }
                 }
-                if (info.size > 0 && resetMode != RESET_MODE_NONE) {
+                if (info.size > 0 &&
+                        resetMode != RESET_MODE_NONE && resetMode != RESET_MODE_EOS_FLUSH) {
                     // once we've gotten some data out of the decoder, reset and start again
                     if (resetMode == RESET_MODE_RECONFIGURE) {
                         codec.stop();
@@ -374,7 +377,20 @@ public class DecoderTest extends MediaPlayerTestBase {
 
                 if ((info.flags & MediaCodec.BUFFER_FLAG_END_OF_STREAM) != 0) {
                     Log.d(TAG, "saw output EOS.");
-                    sawOutputEOS = true;
+                    if (resetMode == RESET_MODE_EOS_FLUSH) {
+                        resetMode = RESET_MODE_NONE;
+                        codec.flush();
+                        extractor.seekTo(0, MediaExtractor.SEEK_TO_NEXT_SYNC);
+                        sawInputEOS = false;
+                        samplecounter = 0;
+                        decoded = new short[0];
+                        decodedIdx = 0;
+                        if (timestamps != null) {
+                            timestamps.clear();
+                        }
+                    } else {
+                        sawOutputEOS = true;
+                    }
                 }
             } else if (res == MediaCodec.INFO_OUTPUT_BUFFERS_CHANGED) {
                 codecOutputBuffers = codec.getOutputBuffers();
