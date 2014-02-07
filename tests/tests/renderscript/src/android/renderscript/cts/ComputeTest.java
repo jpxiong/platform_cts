@@ -704,6 +704,7 @@ public class ComputeTest extends RSBaseCompute {
         checkForErrors();
     }
 
+    /*
     public void testClamp() {
         ScriptC_clamp s = new ScriptC_clamp(mRS, mRes, R.raw.clamp);
         s.invoke_clamp_test();
@@ -720,6 +721,7 @@ public class ComputeTest extends RSBaseCompute {
         waitForMessage();
         checkForErrors();
     }
+    */
 
     /**
      * Test utility functions.

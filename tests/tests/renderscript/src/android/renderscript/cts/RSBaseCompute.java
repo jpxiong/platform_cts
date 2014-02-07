@@ -28,15 +28,6 @@ import android.util.Log;
  */
 class RSBaseCompute extends RSBase {
     RenderScript mRS;
-
-    static final int TEST_F32 = 0;
-    static final int TEST_F32_2 = 1;
-    static final int TEST_F32_3 = 2;
-    static final int TEST_F32_4 = 3;
-    static final int TEST_RELAXED_F32 = 4;
-    static final int TEST_RELAXED_F32_2 = 5;
-    static final int TEST_RELAXED_F32_3 = 6;
-    static final int TEST_RELAXED_F32_4 = 7;
     protected int INPUTSIZE = 512;
 
     @Override
@@ -85,64 +76,90 @@ class RSBaseCompute extends RSBase {
         }
     }
 
-    private void baseTestHelper(int testid, Element inElement, Element outElement, long seed, float min,
-                                float max, int rStride, int rSkip, int refStride, int outStride,
-                                int inStride, int skip, int ulp) {
-        float[] inArray = makeInArray(INPUTSIZE * inStride);
-        fillRandomFloats(seed, min, max, inArray);
-        float[] refArray = getRefArray(inArray, INPUTSIZE, inStride, skip);
-
-        Allocation mAllocationIn = setInAlloc(inElement);
-        fillInAlloc(mAllocationIn, inArray);
-
-        Allocation mAllocationOut = setOutAlloc(outElement);
-        try {
-            forEach(testid, mAllocationIn, mAllocationOut);
-        } catch (RSRuntimeException e) {
-            Log.e("RenderscriptCTS", "Caught RSRuntimeException: " +
-                  e.getMessage());
+    // TODO Is there a better way to do this
+    protected Element GetElement(RenderScript rs, Element.DataType dataType, int size) {
+        Element element = null;
+        if (size == 1) {
+            if (dataType == Element.DataType.FLOAT_64) {
+                element = Element.F64(rs);
+            } else if (dataType == Element.DataType.FLOAT_32) {
+                element = Element.F32(rs);
+            } else if (dataType == Element.DataType.SIGNED_64) {
+                element = Element.I64(rs);
+            } else if (dataType == Element.DataType.UNSIGNED_64) {
+                element = Element.U64(rs);
+            } else if (dataType == Element.DataType.SIGNED_32) {
+                element = Element.I32(rs);
+            } else if (dataType == Element.DataType.UNSIGNED_32) {
+                element = Element.U32(rs);
+            } else if (dataType == Element.DataType.SIGNED_16) {
+                element = Element.I16(rs);
+            } else if (dataType == Element.DataType.UNSIGNED_16) {
+                element = Element.U16(rs);
+            } else if (dataType == Element.DataType.SIGNED_8) {
+                element = Element.I8(rs);
+            } else if (dataType == Element.DataType.UNSIGNED_8) {
+                element = Element.U8(rs);
+            } else {
+                android.util.Log.e("RenderscriptCTS", "Don't know how to create allocation of type" +
+                        dataType.toString());
+            }
+        } else {
+            element = Element.createVector(rs, dataType, size);
         }
-        float[] outArray = makeOutArray(INPUTSIZE * outStride);
-        mAllocationOut.copyTo(outArray);
-        checkArray(refArray, outArray, INPUTSIZE, refStride, outStride, ulp);
+        return element;
     }
-
-    public void baseTest(int testid, long seed, int refStride, int outStride, int inStride, int skip, int ulp) {
-        baseTestHelper(testid, null, null, seed, 0.0f, 1.0f, 1, 0, refStride, outStride, inStride, skip, ulp);
+    protected Allocation CreateRandomAllocation(RenderScript rs, Element.DataType dataType,
+            int size, long seed) {
+        Element element = GetElement(rs, dataType, size);
+        Allocation alloc = Allocation.createSized(rs, element, INPUTSIZE);
+        int width = (size == 3) ? 4 : size;
+        /* TODO copy1DRangeFrom does not work for double
+        if (dataType == Element.DataType.FLOAT_64) {
+            double[] inArray = new double[INPUTSIZE * width];
+            RSUtils.genRandomFloats(seed, 0.0f, 1.0f, inArray);
+            alloc.copy1DRangeFrom(0, INPUTSIZE, inArray);
+        } else
+        */
+        /* TODO The ranges for float is too small.  We need to accept a wider range of values.
+         * Same thing for the integer types.  For some functions (e.g. native*), we would like to
+         * specify a range in the spec file, as differs by function.  Besides generating random
+         * values, we'd also like to force specific values, like 0, 1, pi, pi/2, NaN, +inf, -inf.
+         */
+        if (dataType == Element.DataType.FLOAT_32) {
+            float[] inArray = new float[INPUTSIZE * width];
+            RSUtils.genRandomFloats(seed, 0.0f, 1.0f, inArray);
+            alloc.copy1DRangeFrom(0, INPUTSIZE, inArray);
+        } else if (dataType == Element.DataType.SIGNED_32) {
+            int[] inArray = new int[INPUTSIZE * width];
+            RSUtils.genRandomInts(seed, -4000, 4000, inArray);
+            alloc.copy1DRangeFrom(0, INPUTSIZE, inArray);
+        } else if (dataType == Element.DataType.UNSIGNED_32) {
+            int[] inArray = new int[INPUTSIZE * width];
+            RSUtils.genRandomInts(seed, 0, 4000, inArray);
+            alloc.copy1DRangeFrom(0, INPUTSIZE, inArray);
+        } else if (dataType == Element.DataType.SIGNED_16) {
+            short[] inArray = new short[INPUTSIZE * width];
+            RSUtils.genRandomShorts(seed, -4000, 4000, inArray);
+            alloc.copy1DRangeFrom(0, INPUTSIZE, inArray);
+        } else if (dataType == Element.DataType.UNSIGNED_16) {
+            short[] inArray = new short[INPUTSIZE * width];
+            RSUtils.genRandomShorts(seed, 0, 4000, inArray);
+            alloc.copy1DRangeFrom(0, INPUTSIZE, inArray);
+        } else if (dataType == Element.DataType.SIGNED_8) {
+            byte[] inArray = new byte[INPUTSIZE * width];
+            RSUtils.genRandomBytes(seed, -128, 127, inArray);
+            alloc.copy1DRangeFrom(0, INPUTSIZE, inArray);
+        } else if (dataType == Element.DataType.UNSIGNED_8) {
+            byte[] inArray = new byte[INPUTSIZE * width];
+            RSUtils.genRandomBytes(seed, 0, 255, inArray);
+            alloc.copy1DRangeFrom(0, INPUTSIZE, inArray);
+        } else {
+            android.util.Log.e("RenderscriptCTS", "Don't know how to create allocation of type" +
+                    dataType.toString());
+        }
+        return alloc;
     }
-
-    public void doF32(long seed, int ulp) {
-        baseTestHelper(TEST_F32, Element.F32(mRS), Element.F32(mRS), seed, 0.0f, 1.0f, 1, 0, 1, 1, 1, 0, ulp);
-    }
-
-    public void doF32_2(long seed, int ulp) {
-        baseTestHelper(TEST_F32_2, Element.F32_2(mRS), Element.F32_2(mRS), seed, 0.0f, 1.0f, 1, 0, 2, 2, 2, 0, ulp);
-    }
-
-    public void doF32_3(long seed, int ulp) {
-        baseTestHelper(TEST_F32_3, Element.F32_3(mRS), Element.F32_3(mRS), seed, 0.0f, 1.0f, 4, 1, 3, 4, 4, 1, ulp);
-    }
-
-    public void doF32_4(long seed, int ulp) {
-        baseTestHelper(TEST_F32_4, Element.F32_4(mRS), Element.F32_4(mRS), seed, 0.0f, 1.0f, 1, 0, 4, 4, 4, 0, ulp);
-    }
-
-    public void doF32_relaxed(long seed, int ulp) {
-        baseTestHelper(TEST_RELAXED_F32, Element.F32(mRS), Element.F32(mRS), seed, 0.0f, 1.0f, 1, 0, 1, 1, 1, 0, ulp);
-    }
-
-    public void doF32_2_relaxed(long seed, int ulp) {
-        baseTestHelper(TEST_RELAXED_F32_2, Element.F32_2(mRS), Element.F32_2(mRS), seed, 0.0f, 1.0f, 1, 0, 2, 2, 2, 0, ulp);
-    }
-
-    public void doF32_3_relaxed(long seed, int ulp) {
-        baseTestHelper(TEST_RELAXED_F32_3, Element.F32_3(mRS), Element.F32_3(mRS), seed, 0.0f, 1.0f, 4, 1, 3, 4, 4, 1, ulp);
-    }
-
-    public void doF32_4_relaxed(long seed, int ulp) {
-        baseTestHelper(TEST_RELAXED_F32_4, Element.F32_4(mRS), Element.F32_4(mRS), seed, 0.0f, 1.0f, 1, 0, 4, 4, 4, 0, ulp);
-    }
-
 
     public void forEach(int testId, Allocation mIn, Allocation mOut) throws RSRuntimeException {
         // Intentionally empty... subclass will likely define only one, but not both
@@ -150,34 +167,5 @@ class RSBaseCompute extends RSBase {
 
     public void forEach(int testId, Allocation mIn) throws RSRuntimeException {
         // Intentionally empty... subclass will likely define only one, but not both
-    }
-
-    //These are default actions for these functions, specific tests overload them
-    protected float[] getRefArray(float[] inArray, int size, int stride, int skip) {
-        return null;
-    }
-
-    protected Allocation setInAlloc(Element e) {
-        return Allocation.createSized(mRS, e, INPUTSIZE);
-    }
-
-    protected Allocation setOutAlloc(Element e) {
-        return Allocation.createSized(mRS, e, INPUTSIZE);
-    }
-
-    protected float[] makeInArray(int size) {
-        return new float[size];
-    }
-
-    protected float[] makeOutArray(int size) {
-        return new float[size];
-    }
-
-    protected void fillRandomFloats(long seed, float min, float max, float[] inArray) {
-        RSUtils.genRandomFloats(seed, min, max, inArray);
-    }
-
-    protected void fillInAlloc(Allocation mIn, float[] inArray) {
-        mIn.copy1DRangeFromUnchecked(0, INPUTSIZE, inArray);
     }
 }
