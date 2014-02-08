@@ -797,6 +797,29 @@ public class CameraCharacteristicsTest extends AndroidTestCase {
         }
     }
 
+    public void testCameraCharacteristicsAndroidScalerAvailableInputOutputFormatsMap() throws Exception {
+        String[] ids = mCameraManager.getCameraIdList();
+        for (int i = 0; i < ids.length; i++) {
+            CameraCharacteristics props = mCameraManager.getCameraCharacteristics(ids[i]);
+            assertNotNull(String.format("Can't get camera characteristics from: ID %s", ids[i]),
+                                        props);
+
+            {
+
+                assertNotNull("Invalid property: android.scaler.availableInputOutputFormatsMap",
+                        props.get(CameraCharacteristics.SCALER_AVAILABLE_INPUT_OUTPUT_FORMATS_MAP));
+
+                List<Key<?>> allKeys = props.getKeys();
+                assertNotNull(String.format("Can't get camera characteristics keys from: ID %s",
+                        ids[i], props));
+                assertTrue("Key not in keys list: android.scaler.availableInputOutputFormatsMap", allKeys.contains(
+                        CameraCharacteristics.SCALER_AVAILABLE_INPUT_OUTPUT_FORMATS_MAP));
+
+            }
+
+        }
+    }
+
     public void testCameraCharacteristicsAndroidSensorBaseGainFactor() throws Exception {
         String[] ids = mCameraManager.getCameraIdList();
         for (int i = 0; i < ids.length; i++) {
