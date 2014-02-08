@@ -478,6 +478,10 @@ public class CameraCharacteristicsTest extends AndroidTestCase {
             assertNotNull(String.format("Can't get camera characteristics from: ID %s", ids[i]),
                                         props);
 
+            Integer hwLevel = props.get(CameraCharacteristics.INFO_SUPPORTED_HARDWARE_LEVEL);
+            assertNotNull("No hardware level reported! android.info.supportedHardwareLevel",
+                    hwLevel);
+            if (hwLevel == CameraCharacteristics.INFO_SUPPORTED_HARDWARE_LEVEL_FULL)
             {
 
                 assertNotNull("Invalid property: android.lens.info.hyperfocalDistance",
@@ -540,6 +544,29 @@ public class CameraCharacteristicsTest extends AndroidTestCase {
         }
     }
 
+    public void testCameraCharacteristicsAndroidLensInfoFocusDistanceCalibration() throws Exception {
+        String[] ids = mCameraManager.getCameraIdList();
+        for (int i = 0; i < ids.length; i++) {
+            CameraCharacteristics props = mCameraManager.getCameraCharacteristics(ids[i]);
+            assertNotNull(String.format("Can't get camera characteristics from: ID %s", ids[i]),
+                                        props);
+
+            {
+
+                assertNotNull("Invalid property: android.lens.info.focusDistanceCalibration",
+                        props.get(CameraCharacteristics.LENS_INFO_FOCUS_DISTANCE_CALIBRATION));
+
+                List<Key<?>> allKeys = props.getKeys();
+                assertNotNull(String.format("Can't get camera characteristics keys from: ID %s",
+                        ids[i], props));
+                assertTrue("Key not in keys list: android.lens.info.focusDistanceCalibration", allKeys.contains(
+                        CameraCharacteristics.LENS_INFO_FOCUS_DISTANCE_CALIBRATION));
+
+            }
+
+        }
+    }
+
     public void testCameraCharacteristicsAndroidRequestMaxNumOutputStreams() throws Exception {
         String[] ids = mCameraManager.getCameraIdList();
         for (int i = 0; i < ids.length; i++) {
@@ -557,6 +584,29 @@ public class CameraCharacteristicsTest extends AndroidTestCase {
                         ids[i], props));
                 assertTrue("Key not in keys list: android.request.maxNumOutputStreams", allKeys.contains(
                         CameraCharacteristics.REQUEST_MAX_NUM_OUTPUT_STREAMS));
+
+            }
+
+        }
+    }
+
+    public void testCameraCharacteristicsAndroidRequestMaxNumInputStreams() throws Exception {
+        String[] ids = mCameraManager.getCameraIdList();
+        for (int i = 0; i < ids.length; i++) {
+            CameraCharacteristics props = mCameraManager.getCameraCharacteristics(ids[i]);
+            assertNotNull(String.format("Can't get camera characteristics from: ID %s", ids[i]),
+                                        props);
+
+            {
+
+                assertNotNull("Invalid property: android.request.maxNumInputStreams",
+                        props.get(CameraCharacteristics.REQUEST_MAX_NUM_INPUT_STREAMS));
+
+                List<Key<?>> allKeys = props.getKeys();
+                assertNotNull(String.format("Can't get camera characteristics keys from: ID %s",
+                        ids[i], props));
+                assertTrue("Key not in keys list: android.request.maxNumInputStreams", allKeys.contains(
+                        CameraCharacteristics.REQUEST_MAX_NUM_INPUT_STREAMS));
 
             }
 
@@ -768,6 +818,29 @@ public class CameraCharacteristicsTest extends AndroidTestCase {
                         ids[i], props));
                 assertTrue("Key not in keys list: android.sensor.baseGainFactor", allKeys.contains(
                         CameraCharacteristics.SENSOR_BASE_GAIN_FACTOR));
+
+            }
+
+        }
+    }
+
+    public void testCameraCharacteristicsAndroidSensorBlackLevelPattern() throws Exception {
+        String[] ids = mCameraManager.getCameraIdList();
+        for (int i = 0; i < ids.length; i++) {
+            CameraCharacteristics props = mCameraManager.getCameraCharacteristics(ids[i]);
+            assertNotNull(String.format("Can't get camera characteristics from: ID %s", ids[i]),
+                                        props);
+
+            {
+
+                assertNotNull("Invalid property: android.sensor.blackLevelPattern",
+                        props.get(CameraCharacteristics.SENSOR_BLACK_LEVEL_PATTERN));
+
+                List<Key<?>> allKeys = props.getKeys();
+                assertNotNull(String.format("Can't get camera characteristics keys from: ID %s",
+                        ids[i], props));
+                assertTrue("Key not in keys list: android.sensor.blackLevelPattern", allKeys.contains(
+                        CameraCharacteristics.SENSOR_BLACK_LEVEL_PATTERN));
 
             }
 
