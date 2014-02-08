@@ -287,6 +287,8 @@ public class CameraCaptureResultTest extends AndroidTestCase {
         resultKeys.add(CaptureResult.EDGE_MODE);
         resultKeys.add(CaptureResult.FLASH_MODE);
         resultKeys.add(CaptureResult.FLASH_STATE);
+        resultKeys.add(CaptureResult.HOT_PIXEL_MODE);
+        resultKeys.add(CaptureResult.HOT_PIXEL_MAP);
         resultKeys.add(CaptureResult.JPEG_GPS_COORDINATES);
         resultKeys.add(CaptureResult.JPEG_GPS_PROCESSING_METHOD);
         resultKeys.add(CaptureResult.JPEG_GPS_TIMESTAMP);
