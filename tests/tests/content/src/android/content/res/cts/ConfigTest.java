@@ -35,6 +35,8 @@ public class ConfigTest extends AndroidTestCase {
     enum Properties {
         LANGUAGE,
         COUNTRY,
+        SCRIPT,
+        VARIANT,
         MCC,
         MNC,
         TOUCHSCREEN,
@@ -88,7 +90,7 @@ public class ConfigTest extends AndroidTestCase {
         public TotalConfig() {
             mConfig = new Configuration();
             mMetrics = new DisplayMetrics();
-            mConfig.locale = new Locale("++", "++");
+            mConfig.locale = Locale.ROOT;
         }
 
         public void setProperty(final Properties p, final int value) {
@@ -149,12 +151,28 @@ public class ConfigTest extends AndroidTestCase {
         public void setProperty(final Properties p, final String value) {
             switch(p) {
                 case LANGUAGE:
-                    final String oldCountry = mConfig.locale.getCountry();
-                    mConfig.locale = new Locale(value, oldCountry);
+                    mConfig.locale = new Locale.Builder()
+                            .setLocale(mConfig.locale)
+                            .setLanguage(value)
+                            .build();
                     break;
                 case COUNTRY:
-                    final String oldLanguage = mConfig.locale.getLanguage();
-                    mConfig.locale = new Locale(oldLanguage, value);
+                    mConfig.locale = new Locale.Builder()
+                            .setLocale(mConfig.locale)
+                            .setRegion(value)
+                            .build();
+                    break;
+                case SCRIPT:
+                    mConfig.locale = new Locale.Builder()
+                            .setLocale(mConfig.locale)
+                            .setScript(value)
+                            .build();
+                    break;
+                case VARIANT:
+                    mConfig.locale = new Locale.Builder()
+                            .setLocale(mConfig.locale)
+                            .setVariant(value)
+                            .build();
                     break;
                 default:
                     assert(false);
@@ -1130,5 +1148,70 @@ public class ConfigTest extends AndroidTestCase {
         assertEquals(expected, mContext.getResources().getString(R.string.version_cur));
         assertEquals("base",  mContext.getResources().getString(R.string.version_old));
         assertEquals("v3",  mContext.getResources().getString(R.string.version_v3));
+    }
+
+    @MediumTest
+    public void testExtendedLocales() {
+        TotalConfig config = makeClassicConfig();
+        // BCP 47 Locale kok
+        config.setProperty(Properties.LANGUAGE, "kok");
+        Resources res = config.getResources();
+        checkValue(res, R.configVarying.simple, "simple kok");
+        checkValue(res, R.configVarying.bag,
+                R.styleable.TestConfig, new String[]{"bag kok"});
+
+        // BCP 47 Locale kok-IN
+        config.setProperty(Properties.COUNTRY, "IN");
+        res = config.getResources();
+        checkValue(res, R.configVarying.simple, "simple kok IN");
+        checkValue(res, R.configVarying.bag,
+                R.styleable.TestConfig, new String[]{"bag kok IN"});
+
+        // BCP 47 Locale kok-419
+        config.setProperty(Properties.COUNTRY, "419");
+        res = config.getResources();
+        checkValue(res, R.configVarying.simple, "simple kok 419");
+        checkValue(res, R.configVarying.bag,
+                R.styleable.TestConfig, new String[]{"bag kok 419"});
+
+
+        // BCP 47 Locale kok-419-VARIANT
+        config.setProperty(Properties.VARIANT, "VARIANT");
+        res = config.getResources();
+        checkValue(res, R.configVarying.simple, "simple kok 419 VARIANT");
+        checkValue(res, R.configVarying.bag,
+                R.styleable.TestConfig, new String[]{"bag kok 419 VARIANT"});
+
+        // BCP 47 Locale kok-Knda
+        config = makeClassicConfig();
+        config.setProperty(Properties.LANGUAGE, "kok");
+        config.setProperty(Properties.SCRIPT, "Knda");
+        res = config.getResources();
+        checkValue(res, R.configVarying.simple, "simple kok Knda");
+        checkValue(res, R.configVarying.bag,
+                R.styleable.TestConfig, new String[]{"bag kok Knda"});
+
+        // BCP 47 Locale kok-Knda-419
+        config.setProperty(Properties.COUNTRY, "419");
+        res = config.getResources();
+        checkValue(res, R.configVarying.simple, "simple kok Knda 419");
+        checkValue(res, R.configVarying.bag,
+                R.styleable.TestConfig, new String[]{"bag kok Knda 419"});
+
+        // BCP 47 Locale kok-Knda-419-VARIANT
+        config.setProperty(Properties.VARIANT, "VARIANT");
+        res = config.getResources();
+        checkValue(res, R.configVarying.simple, "simple kok Knda 419 VARIANT");
+        checkValue(res, R.configVarying.bag,
+                R.styleable.TestConfig, new String[]{"bag kok Knda 419 VARIANT"});
+
+        // BCP 47 Locale kok-VARIANT
+        config = makeClassicConfig();
+        config.setProperty(Properties.LANGUAGE, "kok");
+        config.setProperty(Properties.VARIANT, "VARIANT");
+        res = config.getResources();
+        checkValue(res, R.configVarying.simple, "simple kok VARIANT");
+        checkValue(res, R.configVarying.bag,
+                R.styleable.TestConfig, new String[]{"bag kok VARIANT"});
     }
 }
