@@ -17,6 +17,7 @@
 package android.security.cts;
 
 import junit.framework.TestCase;
+import java.io.File;
 
 /**
  * Verify that the SELinux configuration is sane.
@@ -49,6 +50,12 @@ public class SELinuxTest extends TestCase {
         assertFalse(checkSELinuxAccess("u:r:zygote:s0", "u:object_r:runas_exec:s0", "file", "getattr", "/system/bin/run-as"));
         // Also check init, just as a sanity check (init is unconfined, so it should pass)
         assertTrue(checkSELinuxAccess("u:r:init:s0", "u:object_r:runas_exec:s0", "file", "getattr", "/system/bin/run-as"));
+    }
+
+    public void testNoBooleans() throws Exception {
+        // Intentionally not using JNI bindings to keep things simple
+        File[] files = new File("/sys/fs/selinux/booleans/").listFiles();
+        assertEquals(0, files.length);
     }
 
     private static native boolean checkSELinuxAccess(String scon, String tcon, String tclass, String perm, String extra);
