@@ -16,21 +16,18 @@
 
 package android.hardware.cts.helpers.sensorTestOperations;
 
-import junit.framework.Assert;
-
 import android.content.Context;
 import android.hardware.cts.helpers.SensorCtsHelper;
 import android.hardware.cts.helpers.SensorManagerTestVerifier;
 import android.hardware.cts.helpers.SensorTestInformation;
 import android.hardware.cts.helpers.SensorTestOperation;
+import android.hardware.cts.helpers.SensorVerificationHelper;
+import android.hardware.cts.helpers.SensorVerificationHelper.VerificationResult;
 import android.hardware.cts.helpers.TestSensorEvent;
 
-import android.util.Log;
+import junit.framework.Assert;
 
 import java.security.InvalidParameterException;
-
-import java.util.ArrayList;
-
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -71,26 +68,14 @@ public class VerifyJitteringOperation extends SensorTestOperation {
 
     @Override
     public void doWork() {
-        TestSensorEvent events[] = mSensor.collectEvents(100);
-        ArrayList<Double> jitterValues = new ArrayList<Double>();
-        double jitterMean = SensorCtsHelper.getJitterMean(events, jitterValues);
-        double percentile95InNs = SensorCtsHelper.get95PercentileValue(jitterValues);
-
-        if(percentile95InNs > mThresholdInNs) {
-            for(double jitter : jitterValues) {
-                Log.e(LOG_TAG, "Jitter: " + jitter);
-            }
-            double actualPercentValue = (percentile95InNs * 100) / jitterMean;
-            String message = SensorCtsHelper.formatAssertionMessage(
-                    "Jitter(95%%ile)",
+        TestSensorEvent[] events = mSensor.collectEvents(100);
+        VerificationResult result = SensorVerificationHelper.verifyJitter(events, mThresholdInNs);
+        if (result.isFailed()) {
+            Assert.fail(SensorCtsHelper.formatAssertionMessage(
+                    "Jitter(95%ile)",
                     this,
                     mSensor.getUnderlyingSensor(),
-                    "expected:%dns(%d%%), actual:%fns(%.2f%%)",
-                    mThresholdInNs,
-                    mThresholdPercentage,
-                    percentile95InNs,
-                    actualPercentValue);
-            Assert.fail(message);
+                    result.getFailureMessage()));
         }
     }
 }

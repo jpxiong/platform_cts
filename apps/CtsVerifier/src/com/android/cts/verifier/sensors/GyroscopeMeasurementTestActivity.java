@@ -89,7 +89,7 @@ public class GyroscopeMeasurementTestActivity extends BaseSensorSemiAutomatedTes
     private void verifyMeasurements(
             String scenarioInstructions,
             boolean usePortraitOrientation,
-            double ... expectations) throws Throwable {
+            int ... expectations) throws Throwable {
         final String orientation = usePortraitOrientation ? "Portrait": "Landscape";
         appendText(String.format("\n[Device orientation]: %s", orientation));
         appendText(String.format("Press 'Next' and %s.", scenarioInstructions));
