@@ -30,6 +30,7 @@ import android.content.res.Resources;
 import android.content.res.Resources.Theme;
 import android.content.res.XmlResourceParser;
 import android.test.AndroidTestCase;
+import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.util.TypedValue;
 import android.util.Xml;
@@ -380,6 +381,28 @@ public class LayoutInflaterTest extends AndroidTestCase {
         boolean resolved = theme.resolveAttribute(R.attr.themeType, outValue, true);
         assertTrue("Resolved themeType for " + tag, resolved);
         assertEquals(tag + " has themeType " + type, type, outValue.data);
+    }
+
+    public void testInflateTags() {
+        final View view = mLayoutInflater.inflate(
+                com.android.cts.stub.R.layout.inflater_layout_tags, null);
+        assertNotNull(view);
+
+        checkViewTag(view, R.id.viewlayout_root, R.id.tag_viewlayout_root, R.string.tag1);
+        checkViewTag(view, R.id.mock_view, R.id.tag_mock_view, R.string.tag2);
+    }
+
+    private void checkViewTag(View parent, int viewId, int tagId, int valueResId) {
+        final View target = parent.findViewById(viewId);
+        assertNotNull("Found target view for " + viewId, target);
+
+        final Object tag = target.getTag(tagId);
+        assertNotNull("Tag is set", tag);
+        assertTrue("Tag is a character sequence", tag instanceof CharSequence);
+
+        final Context targetContext = target.getContext();
+        final CharSequence expectedValue = targetContext.getString(valueResId);
+        assertEquals(tagId + " has tag " + expectedValue, expectedValue, tag);
     }
 
     static class MockLayoutInflater extends LayoutInflater {
