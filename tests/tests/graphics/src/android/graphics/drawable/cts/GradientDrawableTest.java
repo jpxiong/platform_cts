@@ -259,13 +259,13 @@ public class GradientDrawableTest extends AndroidTestCase {
                 R.drawable.gradientdrawable_radius_base);
         gradientDrawable.setBounds(parentBounds);
         radius = gradientDrawable.getGradientRadius();
-        assertEquals(25, radius);
+        assertEquals(25.0f, radius, 0.0f);
 
         gradientDrawable = (GradientDrawable) resources.getDrawable(
                 R.drawable.gradientdrawable_radius_parent);
         gradientDrawable.setBounds(parentBounds);
         radius = gradientDrawable.getGradientRadius();
-        assertEquals(50, radius);
+        assertEquals(50.0f, radius, 0.0f);
     }
 
     public void testGetIntrinsicWidth() {
