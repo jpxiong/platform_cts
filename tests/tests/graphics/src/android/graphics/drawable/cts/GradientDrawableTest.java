@@ -248,6 +248,26 @@ public class GradientDrawableTest extends AndroidTestCase {
         }
     }
 
+    public void testInflateGradientRadius() throws XmlPullParserException, IOException {
+        Rect parentBounds = new Rect(0, 0, 100, 100);
+        Resources resources = mContext.getResources();
+
+        GradientDrawable gradientDrawable;
+        float radius;
+
+        gradientDrawable = (GradientDrawable) resources.getDrawable(
+                R.drawable.gradientdrawable_radius_base);
+        gradientDrawable.setBounds(parentBounds);
+        radius = gradientDrawable.getGradientRadius();
+        assertEquals(25, radius);
+
+        gradientDrawable = (GradientDrawable) resources.getDrawable(
+                R.drawable.gradientdrawable_radius_parent);
+        gradientDrawable.setBounds(parentBounds);
+        radius = gradientDrawable.getGradientRadius();
+        assertEquals(50, radius);
+    }
+
     public void testGetIntrinsicWidth() {
         GradientDrawable gradientDrawable = new GradientDrawable();
         gradientDrawable.setSize(6, 4);
