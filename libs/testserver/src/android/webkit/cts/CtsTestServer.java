@@ -59,6 +59,7 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.URI;
 import java.net.URL;
+import java.net.URLEncoder;
 import java.net.URLConnection;
 import java.security.KeyManagementException;
 import java.security.KeyStore;
@@ -106,6 +107,7 @@ public class CtsTestServer {
     public static final String APPCACHE_PATH = "/appcache.html";
     public static final String APPCACHE_MANIFEST_PATH = "/appcache.manifest";
     public static final String REDIRECT_PREFIX = "/redirect";
+    public static final String QUERY_REDIRECT_PATH = "/alt_redirect";
     public static final String DELAY_PREFIX = "/delayed";
     public static final String BINARY_PREFIX = "/binary";
     public static final String COOKIE_PREFIX = "/cookie";
@@ -336,6 +338,24 @@ public class CtsTestServer {
         }
         sb.append(ASSET_PREFIX);
         sb.append(path);
+        return sb.toString();
+    }
+
+    /**
+     * Return an absolute URL that indirectly refers to the given asset, without having
+     * the destination path be part of the redirecting path.
+     * When a client fetches this URL, the server will respond with a temporary redirect (302)
+     * referring to the absolute URL of the given asset.
+     * @param path The path of the asset. See {@link AssetManager#open(String)}
+     */
+    public String getQueryRedirectingAssetUrl(String path) {
+        StringBuilder sb = new StringBuilder(getBaseUri());
+        sb.append(QUERY_REDIRECT_PATH);
+        sb.append("?dest=");
+        try {
+            sb.append(URLEncoder.encode(getAssetUrl(path), "UTF-8"));
+        } catch (UnsupportedEncodingException e) {
+        }
         return sb.toString();
     }
 
@@ -585,6 +605,13 @@ public class CtsTestServer {
             String location = getBaseUri() + path.substring(REDIRECT_PREFIX.length());
             Log.i(TAG, "Redirecting to: " + location);
             response.addHeader("Location", location);
+        } else if (path.equals(QUERY_REDIRECT_PATH)) {
+            String location = Uri.parse(uriString).getQueryParameter("dest");
+            if (location != null) {
+                Log.i(TAG, "Redirecting to: " + location);
+                response = createResponse(HttpStatus.SC_MOVED_TEMPORARILY);
+                response.addHeader("Location", location);
+            }
         } else if (path.startsWith(COOKIE_PREFIX)) {
             /*
              * Return a page with a title containing a list of all incoming cookies,
