@@ -29,15 +29,5 @@
   name: "android.hardware.cts.SensorIntegrationTests#testSensorsWithSeveralClients",
   name: "android.hardware.cts.SensorIntegrationTests#testSensorsMovingRates",
   bug: 11352697
-},
-{
-  name: "android.bionic.DEATHTEST",
-  name: "android.bionic.TEST_NAME",
-  name: "android.bionic.dlfcn",
-  name: "android.bionic.math#isfinite",
-  name: "android.bionic.math#signbit",
-  name: "android.bionic.stack_protector",
-  name: "android.bionic.stack_unwinding_DeathTest",
-  bug: 11119006
 }
 ]
