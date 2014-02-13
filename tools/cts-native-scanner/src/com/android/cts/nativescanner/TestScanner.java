@@ -16,100 +16,60 @@
 
 package com.android.cts.nativescanner;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FilenameFilter;
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Scanner;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /**
- * Scanner of C++ gTest source files.
+ * Read from the BufferedReader a list of test case names and test cases.
  *
- * It looks for test declarations and outputs a file following this format:
- * suite:TestSuite
- * case:TestCase1
- * test:Test1
- * test:Test2
- * suite:TestSuite
- * case:TestCase2
- * test:Test1
- * test:Test2
+ * The expected format of the incoming test list:
+ *   TEST_CASE_NAME.
+ *     TEST_NAME1
+ *     TEST_NAME2
  *
+ * The output:
+ *   suite:TestSuite
+ *   case:TEST_CASE_NAME
+ *   test:TEST_NAME1
+ *   test:TEST_NAME2
  */
 class TestScanner {
 
-    /** Directory to recursively scan for gTest test declarations. */
-    private final File mSourceDir;
-
     private final String mTestSuite;
 
-    TestScanner(File sourceDir, String testSuite) {
-        mSourceDir = sourceDir;
+    private final BufferedReader mReader;
+
+    TestScanner(BufferedReader reader, String testSuite) {
         mTestSuite = testSuite;
+        mReader = reader;
     }
 
     public List<String> getTestNames() throws IOException {
         List<String> testNames = new ArrayList<String>();
-        scanDir(mSourceDir, testNames);
-        return testNames;
-    }
 
-    private void scanDir(File dir, List<String> testNames) throws FileNotFoundException {
-        // Find both C++ files to find tests and directories to look for more tests!
-        File[] files = dir.listFiles(new FilenameFilter() {
-            @Override
-            public boolean accept(File dir, String filename) {
-                return filename.endsWith(".cpp") || filename.endsWith(".cc")
-                        || new File(dir, filename).isDirectory();
-            }
-        });
-
-        for (int i = 0; i < files.length; i++) {
-            File file = files[i];
-            if (file.isDirectory()) {
-                scanDir(file, testNames);
+        String testCaseName = null;
+        String line;
+        while ((line = mReader.readLine()) != null) {
+          if (line.length() > 0) {
+            if (line.charAt(0) == ' ') {
+              if (testCaseName != null) {
+                testNames.add("test:" + line.trim());
+              } else {
+                throw new IOException("TEST_CASE_NAME not defined before first test.");
+              }
             } else {
-                scanFile(new Scanner(file), testNames);
+              testCaseName = line.trim();
+              if (testCaseName.endsWith(".")) {
+                testCaseName = testCaseName.substring(0, testCaseName.length()-1);
+              }
+              testNames.add("suite:" + mTestSuite);
+              testNames.add("case:" + testCaseName);
             }
+          }
         }
-    }
-
-    // We want to find lines like TEST_F(SLObjectCreationTest, testAudioPlayerFromFdCreation)
-    // or TEST(stdio, printf) { ...
-    // and extract the "SLObjectCreationTest" as group #1,
-    // "testAudioPlayerFromFdCreation" as group #2
-    // TODO: It would be better to concatenate the two parts.
-    private static final Pattern METHOD_REGEX =
-            Pattern.compile("\\s*TEST(?:_F)?\\((\\w+),\\s*(\\w+)\\).*");
-
-    public void scanFile(Scanner scanner, List<String> testNames) {
-        try {
-            String lastCase = "";
-            while (scanner.hasNextLine()) {
-                String line = scanner.nextLine();
-
-                Matcher matcher = METHOD_REGEX.matcher(line);
-
-                if (!matcher.matches()) {
-                    continue;
-                }
-
-                if (!lastCase.equals(matcher.group(1))) {
-                    testNames.add("suite:" + mTestSuite);
-                    testNames.add("case:" + matcher.group(1));
-                    lastCase = matcher.group(1);
-                }
-
-                testNames.add("test:" + matcher.group(2));
-            }
-        } finally {
-            if (scanner != null) {
-                scanner.close();
-            }
-        }
+        return testNames;
     }
 }
