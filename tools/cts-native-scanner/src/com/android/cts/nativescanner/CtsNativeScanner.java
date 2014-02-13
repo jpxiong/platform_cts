@@ -15,7 +15,8 @@
  */
 package com.android.cts.nativescanner;
 
-import java.io.File;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
 import java.util.Arrays;
 import java.util.List;
 
@@ -27,18 +28,18 @@ public class CtsNativeScanner {
 
     private static void usage(String[] args) {
         System.err.println("Arguments: " + Arrays.asList(args));
-        System.err.println("Usage: cts-native-scanner -s SOURCE_DIR -t TEST_SUITE");
+        System.err.println("Usage: cts-native-scanner -t TEST_SUITE");
+        System.err.println("  This code reads from stdin the list of tests.");
+        System.err.println("  The format expected:");
+        System.err.println("    TEST_CASE_NAME.");
+        System.err.println("      TEST_NAME");
         System.exit(1);
     }
 
     public static void main(String[] args) throws Exception {
-        File sourceDir = null;
         String testSuite = null;
-
         for (int i = 0; i < args.length; i++) {
-            if ("-s".equals(args[i])) {
-                sourceDir = new File(getArg(args, ++i, "Missing value for source directory"));
-            } else if ("-t".equals(args[i])) {
+            if ("-t".equals(args[i])) {
                 testSuite = getArg(args, ++i, "Missing value for test suite");
             } else {
                 System.err.println("Unsupported flag: " + args[i]);
@@ -46,19 +47,14 @@ public class CtsNativeScanner {
             }
         }
 
-        if (sourceDir == null) {
-            System.out.println("Source directory is required");
-            usage(args);
-        }
-
         if (testSuite == null) {
             System.out.println("Test suite is required");
             usage(args);
         }
 
-        TestScanner scanner = new TestScanner(sourceDir, testSuite);
-        List<String> testNames = scanner.getTestNames();
-        for (String name : testNames) {
+        BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
+        TestScanner scanner = new TestScanner(reader, testSuite);
+        for (String name : scanner.getTestNames()) {
             System.out.println(name);
         }
     }
