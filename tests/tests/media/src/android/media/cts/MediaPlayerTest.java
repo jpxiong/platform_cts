@@ -691,6 +691,14 @@ public class MediaPlayerTest extends MediaPlayerTestBase {
                 R.raw.video_480x360_mp4_h264_1350kbps_30fps_aac_stereo_128kbps_44100hz, 480, 360);
     }
 
+    public void testLocalVideo_MP4_H264_480x360_1350kbps_30fps_AAC_Stereo_128kbps_44110Hz_frag()
+            throws Exception {
+        playVideoTest(
+                R.raw.video_480x360_mp4_h264_1350kbps_30fps_aac_stereo_128kbps_44100hz_fragmented,
+                480, 360);
+    }
+
+
     public void testLocalVideo_MP4_H264_480x360_1350kbps_30fps_AAC_Stereo_192kbps_44110Hz()
             throws Exception {
         playVideoTest(
