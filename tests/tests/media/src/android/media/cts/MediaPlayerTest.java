@@ -34,7 +34,10 @@ import android.os.PowerManager;
 import android.os.SystemClock;
 import android.util.Log;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.StringTokenizer;
 import java.util.UUID;
 import java.util.Vector;
@@ -85,11 +88,74 @@ public class MediaPlayerTest extends MediaPlayerTestBase {
         }
     }
 
-    public void testPlayAudio() throws Exception {
+    public void testPlayAudioFromDataURI() throws Exception {
         final int mp3Duration = 34909;
         final int tolerance = 70;
         final int seekDuration = 100;
+
+        // This is "R.raw.testmp3_2", base64-encoded.
+        final int resid = R.raw.testmp3_3;
+
+        InputStream is = mContext.getResources().openRawResource(resid);
+        BufferedReader reader = new BufferedReader(new InputStreamReader(is));
+
+        StringBuilder builder = new StringBuilder();
+        builder.append("data:;base64,");
+        builder.append(reader.readLine());
+        Uri uri = Uri.parse(builder.toString());
+
+        MediaPlayer mp = MediaPlayer.create(mContext, uri);
+
+        try {
+            mp.setAudioStreamType(AudioManager.STREAM_MUSIC);
+            mp.setWakeMode(mContext, PowerManager.PARTIAL_WAKE_LOCK);
+
+            assertFalse(mp.isPlaying());
+            mp.start();
+            assertTrue(mp.isPlaying());
+
+            assertFalse(mp.isLooping());
+            mp.setLooping(true);
+            assertTrue(mp.isLooping());
+
+            assertEquals(mp3Duration, mp.getDuration(), tolerance);
+            int pos = mp.getCurrentPosition();
+            assertTrue(pos >= 0);
+            assertTrue(pos < mp3Duration - seekDuration);
+
+            mp.seekTo(pos + seekDuration);
+            assertEquals(pos + seekDuration, mp.getCurrentPosition(), tolerance);
+
+            // test pause and restart
+            mp.pause();
+            Thread.sleep(SLEEP_TIME);
+            assertFalse(mp.isPlaying());
+            mp.start();
+            assertTrue(mp.isPlaying());
+
+            // test stop and restart
+            mp.stop();
+            mp.reset();
+            mp.setDataSource(mContext, uri);
+            mp.prepare();
+            assertFalse(mp.isPlaying());
+            mp.start();
+            assertTrue(mp.isPlaying());
+
+            // waiting to complete
+            while(mp.isPlaying()) {
+                Thread.sleep(SLEEP_TIME);
+            }
+        } finally {
+            mp.release();
+        }
+    }
+
+    public void testPlayAudio() throws Exception {
         final int resid = R.raw.testmp3_2;
+        final int mp3Duration = 34909;
+        final int tolerance = 70;
+        final int seekDuration = 100;
 
         MediaPlayer mp = MediaPlayer.create(mContext, resid);
         try {
