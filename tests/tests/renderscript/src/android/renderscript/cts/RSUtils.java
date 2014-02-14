@@ -31,6 +31,17 @@ public class RSUtils {
      * Fills the array with random floats.  Values will be between min (inclusive) and
      * max (inclusive).
      */
+    public static void genRandomDoubles(long seed, float min, float max, double array[]) {
+        Random r = new Random(seed);
+        for (int i = 0; i < array.length; i++) {
+            array[i] = min + r.nextFloat() * (max - min);
+        }
+    }
+
+    /**
+     * Fills the array with random floats.  Values will be between min (inclusive) and
+     * max (inclusive).
+     */
     public static void genRandomFloats(long seed, float min, float max, float array[]) {
         Random r = new Random(seed);
         for (int i = 0; i < array.length; i++) {
@@ -46,6 +57,28 @@ public class RSUtils {
         Random r = new Random(seed);
         for (int i = 0; i < array.length; i++) {
             array[i] = min + r.nextInt(max - min + 1);
+        }
+    }
+
+    /**
+     * Fills the array with random floats.  Values will be between min (inclusive) and
+     * max (inclusive).
+     */
+    public static void genRandomShorts(long seed, int min, int max, short array[]) {
+        Random r = new Random(seed);
+        for (int i = 0; i < array.length; i++) {
+            array[i] = (short) (min + r.nextInt(max - min + 1));
+        }
+    }
+
+    /**
+     * Fills the array with random floats.  Values will be between min (inclusive) and
+     * max (inclusive).
+     */
+    public static void genRandomBytes(long seed, int min, int max, byte array[]) {
+        Random r = new Random(seed);
+        for (int i = 0; i < array.length; i++) {
+            array[i] = (byte) (min + r.nextInt(max - min + 1));
         }
     }
 }
