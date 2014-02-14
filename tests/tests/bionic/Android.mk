@@ -26,6 +26,7 @@ LOCAL_STATIC_LIBRARIES += \
 LOCAL_CTS_TEST_PACKAGE := android.bionic
 include $(BUILD_CTS_EXECUTABLE)
 
+ifeq ($(HOST_OS)-$(HOST_ARCH),$(filter $(HOST_OS)-$(HOST_ARCH),linux-x86 linux-x86_64))
 include $(CLEAR_VARS)
 
 LOCAL_MODULE_TAGS := optional
@@ -45,3 +46,4 @@ LOCAL_WHOLE_STATIC_LIBRARIES += \
     libBionicTests \
 
 include $(BUILD_HOST_NATIVE_TEST)
+endif  # ifeq ($(HOST_OS)-$(HOST_ARCH),$(filter $(HOST_OS)-$(HOST_ARCH),linux-x86 linux-x86_64))
