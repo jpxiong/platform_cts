@@ -31,9 +31,11 @@ import android.util.SparseArray;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Set;
 
 public class BundleTest extends AndroidTestCase {
+
     private static final boolean BOOLEANKEYVALUE = false;
 
     private static final int INTKEYVALUE = 20;
@@ -513,12 +515,37 @@ public class BundleTest extends AndroidTestCase {
         assertBundleEquals(bundle2, (Bundle) ret.get(1));
     }
 
-    public void testGetSerializable() {
+    public void testGetSerializableWithString() {
         assertNull(mBundle.getSerializable(KEY));
-        mBundle.putSerializable(KEY, "android");
-        assertEquals("android", mBundle.getSerializable(KEY));
+        String s = "android";
+        mBundle.putSerializable(KEY, s);
+        assertEquals(s, mBundle.getSerializable(KEY));
         roundtrip();
-        assertEquals("android", mBundle.getSerializable(KEY));
+        assertEquals(s, mBundle.getSerializable(KEY));
+    }
+
+    public void testGetSerializableWithStringArray() {
+        assertNull(mBundle.getSerializable(KEY));
+        String[] strings = new String[]{"first", "last"};
+        mBundle.putSerializable(KEY, strings);
+        assertEquals(Arrays.asList(strings),
+                Arrays.asList((String[]) mBundle.getSerializable(KEY)));
+        roundtrip();
+        assertEquals(Arrays.asList(strings),
+                Arrays.asList((String[]) mBundle.getSerializable(KEY)));
+    }
+
+    public void testGetSerializableWithMultiDimensionalObjectArray() {
+        assertNull(mBundle.getSerializable(KEY));
+        Object[][] objects = new Object[][] {
+                {"string", 1L}
+        };
+        mBundle.putSerializable(KEY, objects);
+        assertEquals(Arrays.asList(objects[0]),
+                Arrays.asList(((Object[][]) mBundle.getSerializable(KEY))[0]));
+        roundtrip();
+        assertEquals(Arrays.asList(objects[0]),
+                Arrays.asList(((Object[][]) mBundle.getSerializable(KEY))[0]));
     }
 
     public void testGetShort1() {
@@ -811,10 +838,6 @@ public class BundleTest extends AndroidTestCase {
     class MockClassLoader extends ClassLoader {
         MockClassLoader() {
             super();
-        }
-
-        MockClassLoader(ClassLoader parent) {
-            super(parent);
         }
     }
 }
