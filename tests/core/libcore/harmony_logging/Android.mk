@@ -19,7 +19,6 @@ ifeq ($(BUILD_CTSCORE_PACKAGE),)
 endif
 
 include $(CLEAR_VARS)
-LOCAL_SRC_FILES := ../src/Dummy.java
 LOCAL_PACKAGE_NAME := android.core.tests.libcore.package.harmony_logging
 LOCAL_STATIC_JAVA_LIBRARIES := apache-harmony-tests
 include $(BUILD_CTSCORE_PACKAGE)
