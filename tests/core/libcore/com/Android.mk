@@ -14,10 +14,6 @@
 
 LOCAL_PATH:= $(call my-dir)
 
-ifeq ($(BUILD_CTSCORE_PACKAGE),)
-    $(error BUILD_CTSCORE_PACKAGE must be defined)
-endif
-
 include $(CLEAR_VARS)
 LOCAL_PACKAGE_NAME := android.core.tests.libcore.package.com
 LOCAL_STATIC_JAVA_LIBRARIES := core-tests
