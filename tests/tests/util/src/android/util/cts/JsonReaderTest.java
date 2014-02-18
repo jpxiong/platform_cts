@@ -78,6 +78,38 @@ public final class JsonReaderTest extends TestCase {
         assertEquals(JsonToken.END_DOCUMENT, reader.peek());
     }
 
+    public void testSkipBeforeEndOfObject() throws IOException {
+        JsonReader reader = new JsonReader(new StringReader("{}"));
+        reader.beginObject();
+        try {
+            reader.skipValue();
+            fail("Should not be possible to skip without elements.");
+        } catch (IllegalStateException expected) {
+        }
+    }
+
+    public void testSkipBeforeEndOfArray() throws IOException {
+        JsonReader reader = new JsonReader(new StringReader("[]"));
+        reader.beginArray();
+        try {
+            reader.skipValue();
+            fail("Should not be possible to skip without elements.");
+        } catch (IllegalStateException expected) {
+        }
+    }
+
+    public void testSkipAfterEndOfDocument() throws IOException {
+        JsonReader reader = new JsonReader(new StringReader("{}"));
+        reader.beginObject();
+        reader.endObject();
+        assertEquals(JsonToken.END_DOCUMENT, reader.peek());
+        try {
+            reader.skipValue();
+            fail("Should not be possible to skip without elements.");
+        } catch (IllegalStateException expected) {
+        }
+    }
+
     public void testHelloWorld() throws IOException {
         String json = "{\n" +
                 "   \"hello\": true,\n" +
