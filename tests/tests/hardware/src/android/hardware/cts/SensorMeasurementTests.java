@@ -24,7 +24,7 @@ import android.hardware.SensorManager;
 
 import android.hardware.cts.helpers.SensorTestCase;
 
-import android.hardware.cts.helpers.sensorTestOperations.VerifyNormOperation;
+import android.hardware.cts.helpers.sensorTestOperations.VerifyMagnitudeOperation;
 import android.hardware.cts.helpers.sensorTestOperations.VerifyStandardDeviationOperation;
 
 /**
@@ -104,7 +104,7 @@ public class SensorMeasurementTests extends SensorTestCase {
      * - the values sampled from the sensor
      */
     public void testEventNorm() throws Throwable {
-        VerifyNormOperation operation = new VerifyNormOperation(
+        VerifyMagnitudeOperation operation = new VerifyMagnitudeOperation(
                 this.getContext(),
                 mSensorType,
                 mSamplingRateInUs,
