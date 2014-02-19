@@ -16,21 +16,18 @@
 
 package android.hardware.cts.helpers.sensorTestOperations;
 
-import junit.framework.Assert;
-
 import android.content.Context;
-
 import android.hardware.cts.helpers.SensorCtsHelper;
 import android.hardware.cts.helpers.SensorManagerTestVerifier;
 import android.hardware.cts.helpers.SensorTestInformation;
 import android.hardware.cts.helpers.SensorTestOperation;
+import android.hardware.cts.helpers.SensorVerificationHelper;
+import android.hardware.cts.helpers.SensorVerificationHelper.VerificationResult;
 import android.hardware.cts.helpers.TestSensorEvent;
 
-import android.util.Log;
+import junit.framework.Assert;
 
 import java.security.InvalidParameterException;
-import java.util.ArrayList;
-
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -71,28 +68,15 @@ public class VerifyMaximumFrequencyOperation extends SensorTestOperation {
 
     @Override
     public void doWork() {
-        TestSensorEvent events[] = mSensor.collectEvents(100);
-        ArrayList<Long> timestampDelayValues = new ArrayList<Long>();
-        Double frequencyMeanInUs = SensorCtsHelper.getAverageTimestampDelayWithValues(
-                events,
-                timestampDelayValues);
-
-        if(Math.abs(mExpectedTimestampInNs - frequencyMeanInUs) > mThresholdInNs) {
-            for(long value : timestampDelayValues) {
-                Log.e(LOG_TAG, "TimestampDelay: " + value);
-            }
-            String message = SensorCtsHelper.formatAssertionMessage(
+        TestSensorEvent[] events = mSensor.collectEvents(100);
+        VerificationResult result = SensorVerificationHelper.verifyFrequency(events,
+                mExpectedTimestampInNs, mThresholdInNs);
+        if (result.isFailed()) {
+            Assert.fail(SensorCtsHelper.formatAssertionMessage(
                     "Frequency",
                     this,
                     mSensor.getUnderlyingSensor(),
-                    "expected:%dns(%.2fHz), actual:%fns(%.2fHz), threshold:%dns(%d%%)",
-                    mExpectedTimestampInNs,
-                    SensorCtsHelper.getFrequencyInHz(mExpectedTimestampInNs),
-                    frequencyMeanInUs,
-                    SensorCtsHelper.getFrequencyInHz(frequencyMeanInUs),
-                    mThresholdInNs,
-                    mThresholdPercentage);
-            Assert.fail(message);
+                    result.getFailureMessage()));
         }
     }
 }

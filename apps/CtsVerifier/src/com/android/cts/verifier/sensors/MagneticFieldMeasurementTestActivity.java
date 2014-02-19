@@ -21,7 +21,7 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorManager;
 import android.hardware.cts.helpers.SensorManagerTestVerifier;
-import android.hardware.cts.helpers.sensorTestOperations.VerifyNormOperation;
+import android.hardware.cts.helpers.sensorTestOperations.VerifyMagnitudeOperation;
 import android.hardware.cts.helpers.sensorTestOperations.VerifyStandardDeviationOperation;
 
 /**
@@ -91,7 +91,7 @@ public class MagneticFieldMeasurementTestActivity extends BaseSensorSemiAutomate
                 (SensorManager.MAGNETIC_FIELD_EARTH_MAX + SensorManager.MAGNETIC_FIELD_EARTH_MIN) / 2;
         float magneticFieldEarthThreshold =
                 expectedMagneticFieldEarth - SensorManager.MAGNETIC_FIELD_EARTH_MIN;
-        VerifyNormOperation verifyNorm = new VerifyNormOperation(
+        VerifyMagnitudeOperation verifyNorm = new VerifyMagnitudeOperation(
                 this.getApplicationContext(),
                 Sensor.TYPE_MAGNETIC_FIELD,
                 SensorManager.SENSOR_DELAY_FASTEST,

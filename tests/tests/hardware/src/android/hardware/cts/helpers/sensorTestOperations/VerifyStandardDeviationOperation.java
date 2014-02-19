@@ -16,19 +16,16 @@
 
 package android.hardware.cts.helpers.sensorTestOperations;
 
-import junit.framework.Assert;
-
 import android.content.Context;
-
 import android.hardware.cts.helpers.SensorCtsHelper;
 import android.hardware.cts.helpers.SensorManagerTestVerifier;
 import android.hardware.cts.helpers.SensorTestInformation;
 import android.hardware.cts.helpers.SensorTestOperation;
+import android.hardware.cts.helpers.SensorVerificationHelper;
+import android.hardware.cts.helpers.SensorVerificationHelper.VerificationResult;
 import android.hardware.cts.helpers.TestSensorEvent;
 
-import android.util.Log;
-
-import java.util.ArrayList;
+import junit.framework.Assert;
 
 /**
  * Test Operation class that validates the standard deviation of a given sensor.
@@ -36,7 +33,7 @@ import java.util.ArrayList;
 public class VerifyStandardDeviationOperation extends SensorTestOperation {
     private SensorManagerTestVerifier mSensor;
     private int mAxisCount;
-    private double mExpectedStandardDeviation;
+    private double[] mExpectedStandardDeviation;
 
     public VerifyStandardDeviationOperation(
             Context context,
@@ -51,33 +48,23 @@ public class VerifyStandardDeviationOperation extends SensorTestOperation {
                 reportLatencyInUs);
         // set expectations
         mAxisCount = SensorTestInformation.getAxisCount(mSensor.getUnderlyingSensor().getType());
-        mExpectedStandardDeviation = expectedStandardDeviation;
+        mExpectedStandardDeviation = new double[mAxisCount];
+        for (int i = 0; i < mExpectedStandardDeviation.length; i++) {
+            mExpectedStandardDeviation[i] = expectedStandardDeviation;
+        }
     }
 
     @Override
     public void doWork() {
-        TestSensorEvent events[] = mSensor.collectEvents(100);
-        for(int i = 0; i < mAxisCount; ++i) {
-            ArrayList<Float> values = new ArrayList<Float>();
-            for(TestSensorEvent event : events) {
-                values.add(event.values[i]);
-            }
-
-            double standardDeviation = SensorCtsHelper.getStandardDeviation(values);
-            if(standardDeviation > mExpectedStandardDeviation) {
-                for(float value : values) {
-                    Log.e(LOG_TAG, String.format("SensorValue:%f", value));
-                }
-                String message = SensorCtsHelper.formatAssertionMessage(
-                        "StandardDeviation",
-                        this,
-                        mSensor.getUnderlyingSensor(),
-                        "axis:%d, expected:%f, actual:%f",
-                        i,
-                        mExpectedStandardDeviation,
-                        standardDeviation);
-                Assert.fail(message);
-            }
+        TestSensorEvent[] events = mSensor.collectEvents(100);
+        VerificationResult result = SensorVerificationHelper.verifyStandardDeviation(events,
+                mExpectedStandardDeviation);
+        if (result.isFailed()) {
+            Assert.fail(SensorCtsHelper.formatAssertionMessage(
+                    "StandardDeviation",
+                    this,
+                    mSensor.getUnderlyingSensor(),
+                    result.getFailureMessage()));
         }
     }
 }
