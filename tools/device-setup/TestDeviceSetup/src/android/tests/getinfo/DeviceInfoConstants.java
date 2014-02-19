@@ -23,11 +23,14 @@ package android.tests.getinfo;
  */
 public interface DeviceInfoConstants {
 
+    public static final String OPEN_GL_EXTENSIONS = "openGlExtensions";
     public static final String OPEN_GL_COMPRESSED_TEXTURE_FORMATS =
             "openGlCompressedTextureFormats";
     public static final String SYS_LIBRARIES = "systemlibraries";
     public static final String PARTITIONS = "partitions";
     public static final String OPEN_GL_ES_VERSION = "openGlEsVersion";
+    public static final String GRAPHICS_VENDOR = "graphicsVendor";
+    public static final String GRAPHICS_RENDERER = "graphicsRenderer";
     public static final String PROCESSES = "processes";
     public static final String FEATURES = "features";
     public static final String PHONE_NUMBER = "subscriberId";
