@@ -17,25 +17,23 @@
 package android.hardware.cts.helpers;
 
 import android.content.Context;
-
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener2;
 import android.hardware.SensorManager;
 
-import java.io.Closeable;
+import junit.framework.Assert;
 
+import java.io.Closeable;
 import java.security.InvalidParameterException;
 import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
-import junit.framework.Assert;
-
 /**
  * Test class to wrap SensorManager with verifications and test checks.
  * This class allows to perform operations in the Sensor Manager and performs all the expected test
- * verification on behalf of th owner.
+ * verification on behalf of the owner.
  * An object can be used to quickly writing tests that focus on the scenario that needs to be
  * verified, and not in the implicit verifications that need to take place at any step.
  */
@@ -66,30 +64,52 @@ public class SensorManagerTestVerifier implements Closeable, SensorEventListener
     }
 
     /**
-     * Public listeners for Sensor events, these are available for subclasses to implement if they
-     * need access to the raw eventing model.
+     * {@inheritDoc}
+     * <p>
+     * Available for subclasses to implement if they need access to the raw eventing model.
+     * </p>
      */
     @Override
     public void onAccuracyChanged(Sensor sensor, int accuracy) {}
 
+    /**
+     * {@inheritDoc}
+     * <p>
+     * Available for subclasses to implement if they need access to the raw eventing model.
+     * </p>
+     */
     @Override
     public void onSensorChanged(SensorEvent event) {}
 
+    /**
+     * {@inheritDoc}
+     * <p>
+     * Available for subclasses to implement if they need access to the raw eventing model.
+     * </p>
+     */
     @Override
     public void onFlushCompleted(Sensor sensor) {}
 
     /**
-     * Members
+     * Closes the {@link SensorManagerTestVerifier} and unregister the listener.
      */
+    @Override
     public void close() {
         this.unregisterListener();
         mEventListener = null;
     }
 
+    /**
+     * Get the sensor under test.
+     */
     public Sensor getUnderlyingSensor() {
         return mSensorUnderTest;
     }
 
+    /**
+     * Register the
+     * @param debugInfo
+     */
     public void registerListener(String debugInfo) {
         boolean result = mSensorManager.registerListener(
                 mEventListener,
