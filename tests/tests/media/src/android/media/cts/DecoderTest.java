@@ -125,6 +125,248 @@ public class DecoderTest extends MediaPlayerTestBase {
         monoTest(R.raw.monotestogg);
     }
 
+    public void testTrackSelection() throws Exception {
+        testTrackSelection(R.raw.video_480x360_mp4_h264_1350kbps_30fps_aac_stereo_128kbps_44100hz);
+        testTrackSelection(
+                R.raw.video_480x360_mp4_h264_1350kbps_30fps_aac_stereo_128kbps_44100hz_fragmented);
+    }
+
+    private void testTrackSelection(int resid) throws Exception {
+        AssetFileDescriptor fd1 = null;
+        try {
+            fd1 = mResources.openRawResourceFd(resid);
+            MediaExtractor ex1 = new MediaExtractor();
+            ex1.setDataSource(fd1.getFileDescriptor(), fd1.getStartOffset(), fd1.getLength());
+
+            ByteBuffer buf1 = ByteBuffer.allocate(1024*1024);
+            ArrayList<Integer> vid = new ArrayList<Integer>();
+            ArrayList<Integer> aud = new ArrayList<Integer>();
+
+            // scan the file once and build lists of audio and video samples
+            ex1.selectTrack(0);
+            ex1.selectTrack(1);
+            while(true) {
+                int n1 = ex1.readSampleData(buf1, 0);
+                if (n1 < 0) {
+                    break;
+                }
+                int idx = ex1.getSampleTrackIndex();
+                if (idx == 0) {
+                    vid.add(n1);
+                } else if (idx == 1) {
+                    aud.add(n1);
+                } else {
+                    fail("unexpected track index: " + idx);
+                }
+                ex1.advance();
+            }
+
+            // read the video track once, then rewind and do it again, and
+            // verify we get the right samples
+            ex1.release();
+            ex1 = new MediaExtractor();
+            ex1.setDataSource(fd1.getFileDescriptor(), fd1.getStartOffset(), fd1.getLength());
+            ex1.selectTrack(0);
+            for (int i = 0; i < 2; i++) {
+                ex1.seekTo(0, MediaExtractor.SEEK_TO_NEXT_SYNC);
+                int idx = 0;
+                while(true) {
+                    int n1 = ex1.readSampleData(buf1, 0);
+                    if (n1 < 0) {
+                        assertEquals(vid.size(), idx);
+                        break;
+                    }
+                    assertEquals(vid.get(idx++).intValue(), n1);
+                    ex1.advance();
+                }
+            }
+
+            // read the audio track once, then rewind and do it again, and
+            // verify we get the right samples
+            ex1.release();
+            ex1 = new MediaExtractor();
+            ex1.setDataSource(fd1.getFileDescriptor(), fd1.getStartOffset(), fd1.getLength());
+            ex1.selectTrack(1);
+            for (int i = 0; i < 2; i++) {
+                ex1.seekTo(0, MediaExtractor.SEEK_TO_NEXT_SYNC);
+                int idx = 0;
+                while(true) {
+                    int n1 = ex1.readSampleData(buf1, 0);
+                    if (n1 < 0) {
+                        assertEquals(aud.size(), idx);
+                        break;
+                    }
+                    assertEquals(aud.get(idx++).intValue(), n1);
+                    ex1.advance();
+                }
+            }
+
+            // read the video track first, then rewind and get the audio track instead, and
+            // verify we get the right samples
+            ex1.release();
+            ex1 = new MediaExtractor();
+            ex1.setDataSource(fd1.getFileDescriptor(), fd1.getStartOffset(), fd1.getLength());
+            for (int i = 0; i < 2; i++) {
+                ex1.selectTrack(i);
+                ex1.seekTo(0, MediaExtractor.SEEK_TO_NEXT_SYNC);
+                int idx = 0;
+                while(true) {
+                    int n1 = ex1.readSampleData(buf1, 0);
+                    if (i == 0) {
+                        if (n1 < 0) {
+                            assertEquals(vid.size(), idx);
+                            break;
+                        }
+                        assertEquals(vid.get(idx++).intValue(), n1);
+                    } else if (i == 1) {
+                        if (n1 < 0) {
+                            assertEquals(aud.size(), idx);
+                            break;
+                        }
+                        assertEquals(aud.get(idx++).intValue(), n1);
+                    } else {
+                        fail("unexpected track index: " + idx);
+                    }
+                    ex1.advance();
+                }
+                ex1.unselectTrack(i);
+            }
+
+            // read the video track first, then rewind, enable the audio track in addition
+            // to the video track, and verify we get the right samples
+            ex1.release();
+            ex1 = new MediaExtractor();
+            ex1.setDataSource(fd1.getFileDescriptor(), fd1.getStartOffset(), fd1.getLength());
+            for (int i = 0; i < 2; i++) {
+                ex1.selectTrack(i);
+                ex1.seekTo(0, MediaExtractor.SEEK_TO_NEXT_SYNC);
+                int vididx = 0;
+                int audidx = 0;
+                while(true) {
+                    int n1 = ex1.readSampleData(buf1, 0);
+                    if (n1 < 0) {
+                        // we should have read all audio and all video samples at this point
+                        assertEquals(vid.size(), vididx);
+                        if (i == 1) {
+                            assertEquals(aud.size(), audidx);
+                        }
+                        break;
+                    }
+                    int trackidx = ex1.getSampleTrackIndex();
+                    if (trackidx == 0) {
+                        assertEquals(vid.get(vididx++).intValue(), n1);
+                    } else if (trackidx == 1) {
+                        assertEquals(aud.get(audidx++).intValue(), n1);
+                    } else {
+                        fail("unexpected track index: " + trackidx);
+                    }
+                    ex1.advance();
+                }
+            }
+
+            // read both tracks from the start, then rewind and verify we get the right
+            // samples both times
+            ex1.release();
+            ex1 = new MediaExtractor();
+            ex1.setDataSource(fd1.getFileDescriptor(), fd1.getStartOffset(), fd1.getLength());
+            for (int i = 0; i < 2; i++) {
+                ex1.selectTrack(0);
+                ex1.selectTrack(1);
+                ex1.seekTo(0, MediaExtractor.SEEK_TO_NEXT_SYNC);
+                int vididx = 0;
+                int audidx = 0;
+                while(true) {
+                    int n1 = ex1.readSampleData(buf1, 0);
+                    if (n1 < 0) {
+                        // we should have read all audio and all video samples at this point
+                        assertEquals(vid.size(), vididx);
+                        assertEquals(aud.size(), audidx);
+                        break;
+                    }
+                    int trackidx = ex1.getSampleTrackIndex();
+                    if (trackidx == 0) {
+                        assertEquals(vid.get(vididx++).intValue(), n1);
+                    } else if (trackidx == 1) {
+                        assertEquals(aud.get(audidx++).intValue(), n1);
+                    } else {
+                        fail("unexpected track index: " + trackidx);
+                    }
+                    ex1.advance();
+                }
+            }
+
+        } finally {
+            if (fd1 != null) {
+                fd1.close();
+            }
+        }
+    }
+
+    public void testDecodeFragmented() throws Exception {
+        AssetFileDescriptor fd1 = null;
+        AssetFileDescriptor fd2 = null;
+        try {
+            fd1 = mResources.openRawResourceFd(
+                R.raw.video_480x360_mp4_h264_1350kbps_30fps_aac_stereo_128kbps_44100hz);
+            MediaExtractor ex1 = new MediaExtractor();
+            ex1.setDataSource(fd1.getFileDescriptor(), fd1.getStartOffset(), fd1.getLength());
+
+            fd2 = mResources.openRawResourceFd(
+                R.raw.video_480x360_mp4_h264_1350kbps_30fps_aac_stereo_128kbps_44100hz_fragmented);
+            MediaExtractor ex2 = new MediaExtractor();
+            ex2.setDataSource(fd2.getFileDescriptor(), fd2.getStartOffset(), fd2.getLength());
+
+            assertEquals("different track count", ex1.getTrackCount(), ex2.getTrackCount());
+
+            ByteBuffer buf1 = ByteBuffer.allocate(1024*1024);
+            ByteBuffer buf2 = ByteBuffer.allocate(1024*1024);
+
+            for (int i = 0; i < ex1.getTrackCount(); i++) {
+                // note: this assumes the tracks are reported in the order in which they appear
+                // in the file.
+                ex1.seekTo(0, MediaExtractor.SEEK_TO_NEXT_SYNC);
+                ex1.selectTrack(i);
+                ex2.seekTo(0, MediaExtractor.SEEK_TO_NEXT_SYNC);
+                ex2.selectTrack(i);
+
+                while(true) {
+                    int n1 = ex1.readSampleData(buf1, 0);
+                    int n2 = ex2.readSampleData(buf2, 0);
+                    assertEquals("different buffer size on track " + i, n1, n2);
+
+                    if (n1 < 0) {
+                        break;
+                    }
+                    // see bug 13008204
+                    buf1.limit(n1);
+                    buf2.limit(n2);
+                    buf1.rewind();
+                    buf2.rewind();
+
+                    assertEquals("limit does not match return value on track " + i,
+                            n1, buf1.limit());
+                    assertEquals("limit does not match return value on track " + i,
+                            n2, buf2.limit());
+
+                    assertEquals("buffer data did not match on track " + i, buf1, buf2);
+
+                    ex1.advance();
+                    ex2.advance();
+                }
+                ex1.unselectTrack(i);
+                ex2.unselectTrack(i);
+            }
+        } finally {
+            if (fd1 != null) {
+                fd1.close();
+            }
+            if (fd2 != null) {
+                fd2.close();
+            }
+        }
+    }
+
+
     private void monoTest(int res) throws Exception {
         short [] mono = decodeToMemory(res, RESET_MODE_NONE, CONFIG_MODE_NONE, -1, null);
         if (mono.length == 44100) {
