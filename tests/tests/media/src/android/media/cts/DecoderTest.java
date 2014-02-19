@@ -129,6 +129,8 @@ public class DecoderTest extends MediaPlayerTestBase {
         testTrackSelection(R.raw.video_480x360_mp4_h264_1350kbps_30fps_aac_stereo_128kbps_44100hz);
         testTrackSelection(
                 R.raw.video_480x360_mp4_h264_1350kbps_30fps_aac_stereo_128kbps_44100hz_fragmented);
+        testTrackSelection(
+                R.raw.video_480x360_mp4_h264_1350kbps_30fps_aac_stereo_128kbps_44100hz_dash);
     }
 
     private void testTrackSelection(int resid) throws Exception {
@@ -303,16 +305,21 @@ public class DecoderTest extends MediaPlayerTestBase {
     }
 
     public void testDecodeFragmented() throws Exception {
+        testDecodeFragmented(R.raw.video_480x360_mp4_h264_1350kbps_30fps_aac_stereo_128kbps_44100hz,
+                R.raw.video_480x360_mp4_h264_1350kbps_30fps_aac_stereo_128kbps_44100hz_fragmented);
+        testDecodeFragmented(R.raw.video_480x360_mp4_h264_1350kbps_30fps_aac_stereo_128kbps_44100hz,
+                R.raw.video_480x360_mp4_h264_1350kbps_30fps_aac_stereo_128kbps_44100hz_dash);
+    }
+
+    private void testDecodeFragmented(int reference, int teststream) throws Exception {
         AssetFileDescriptor fd1 = null;
         AssetFileDescriptor fd2 = null;
         try {
-            fd1 = mResources.openRawResourceFd(
-                R.raw.video_480x360_mp4_h264_1350kbps_30fps_aac_stereo_128kbps_44100hz);
+            fd1 = mResources.openRawResourceFd(reference);
             MediaExtractor ex1 = new MediaExtractor();
             ex1.setDataSource(fd1.getFileDescriptor(), fd1.getStartOffset(), fd1.getLength());
 
-            fd2 = mResources.openRawResourceFd(
-                R.raw.video_480x360_mp4_h264_1350kbps_30fps_aac_stereo_128kbps_44100hz_fragmented);
+            fd2 = mResources.openRawResourceFd(teststream);
             MediaExtractor ex2 = new MediaExtractor();
             ex2.setDataSource(fd2.getFileDescriptor(), fd2.getStartOffset(), fd2.getLength());
 
