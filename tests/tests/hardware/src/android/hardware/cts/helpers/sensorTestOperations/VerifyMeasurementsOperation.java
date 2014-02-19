@@ -16,15 +16,16 @@
 
 package android.hardware.cts.helpers.sensorTestOperations;
 
-import junit.framework.Assert;
-
 import android.content.Context;
-
 import android.hardware.cts.helpers.SensorCtsHelper;
 import android.hardware.cts.helpers.SensorManagerTestVerifier;
 import android.hardware.cts.helpers.SensorTestInformation;
 import android.hardware.cts.helpers.SensorTestOperation;
+import android.hardware.cts.helpers.SensorVerificationHelper;
+import android.hardware.cts.helpers.SensorVerificationHelper.VerificationResult;
 import android.hardware.cts.helpers.TestSensorEvent;
+
+import junit.framework.Assert;
 
 import java.security.InvalidParameterException;
 
@@ -37,8 +38,8 @@ import java.security.InvalidParameterException;
 public class VerifyMeasurementsOperation extends SensorTestOperation {
     private final SensorManagerTestVerifier mSensor;
     private final int mAxisCount;
-    private final double mReferenceValues[];
-    private final double mThreshold;
+    private final double[] mReferenceValues;
+    private final double[] mThreshold;
 
     public VerifyMeasurementsOperation(
             Context context,
@@ -59,39 +60,23 @@ public class VerifyMeasurementsOperation extends SensorTestOperation {
                 reportLatencyInUs);
         // set expectations
         mReferenceValues = referenceValues;
-        mThreshold = threshold;
+        mThreshold = new double[mAxisCount];
+        for (int i = 0; i < mThreshold.length; i++) {
+            mThreshold[i] = threshold;
+        }
     }
 
     @Override
     public void doWork() {
-        final String VALUE_SEPARATOR = ", ";
-        TestSensorEvent events[] = mSensor.collectEvents(100);
-        double measuredValues[] = new double[mReferenceValues.length];
-        SensorCtsHelper.getMeans(events, measuredValues);
-
-        boolean success = true;
-        StringBuilder referenceValuesBuilder = new StringBuilder();
-        StringBuilder measuredValuesBuilder = new StringBuilder();
-        for(int i = 0; i < mReferenceValues.length; i++) {
-            double reference = mReferenceValues[i];
-            double measurement = measuredValues[i];
-            double delta = Math.abs(reference - measurement);
-            success &= (delta <= mThreshold);
-            referenceValuesBuilder.append(reference);
-            referenceValuesBuilder.append(VALUE_SEPARATOR);
-            measuredValuesBuilder.append(measurement);
-            measuredValuesBuilder.append(VALUE_SEPARATOR);
-        }
-        if(!success) {
-            String message = SensorCtsHelper.formatAssertionMessage(
+        TestSensorEvent[] events = mSensor.collectEvents(100);
+        VerificationResult result = SensorVerificationHelper.verifyMean(events, mReferenceValues,
+                mThreshold);
+        if (result.isFailed()) {
+            Assert.fail(SensorCtsHelper.formatAssertionMessage(
                     "Measurement",
                     this,
                     mSensor.getUnderlyingSensor(),
-                    "expected:( %s), threshold:%f, actual: ( %s)",
-                    referenceValuesBuilder.toString(),
-                    mThreshold,
-                    measuredValuesBuilder.toString());
-            Assert.fail(message);
+                    result.getFailureMessage()));
         }
     }
 }
