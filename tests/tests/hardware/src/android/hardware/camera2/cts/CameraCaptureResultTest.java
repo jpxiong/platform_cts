@@ -87,13 +87,23 @@ public class CameraCaptureResultTest extends AndroidTestCase {
         super.tearDown();
     }
 
+    /**
+     * <p>
+     * Basic non-null check test for multiple capture results.
+     * </p>
+     * <p>
+     * When capturing many frames, some camera devices may return some results that have null keys
+     * randomly, which is an API violation and could cause application crash randomly. This test
+     * runs a typical flexible yuv capture many times, and checks if there is any null entries in
+     * a capture result.
+     * </p>
+     */
     public void testCameraCaptureResultAllKeys() throws Exception {
         /**
-         * Hardcode a key waiver list for the keys we want to skip the sanity check.
+         * Hardcode a key waiver list for the keys that are allowed to be null.
          * FIXME: We need get ride of this list, see bug 11116270.
          */
         List<CameraMetadata.Key<?>> waiverkeys = new ArrayList<CameraMetadata.Key<?>>();
-        waiverkeys.add(CaptureResult.EDGE_MODE);
         waiverkeys.add(CaptureResult.JPEG_GPS_COORDINATES);
         waiverkeys.add(CaptureResult.JPEG_GPS_PROCESSING_METHOD);
         waiverkeys.add(CaptureResult.JPEG_GPS_TIMESTAMP);
@@ -102,13 +112,6 @@ public class CameraCaptureResultTest extends AndroidTestCase {
         waiverkeys.add(CaptureResult.JPEG_THUMBNAIL_QUALITY);
         waiverkeys.add(CaptureResult.JPEG_THUMBNAIL_SIZE);
         waiverkeys.add(CaptureResult.SENSOR_TEMPERATURE);
-        waiverkeys.add(CaptureResult.TONEMAP_CURVE_BLUE);
-        waiverkeys.add(CaptureResult.TONEMAP_CURVE_GREEN);
-        waiverkeys.add(CaptureResult.TONEMAP_CURVE_RED);
-        waiverkeys.add(CaptureResult.TONEMAP_MODE);
-        waiverkeys.add(CaptureResult.STATISTICS_PREDICTED_COLOR_GAINS);
-        waiverkeys.add(CaptureResult.STATISTICS_PREDICTED_COLOR_TRANSFORM);
-        waiverkeys.add(CaptureResult.STATISTICS_SCENE_FLICKER);
 
         String[] ids = mCameraManager.getCameraIdList();
         for (int i = 0; i < ids.length; i++) {
