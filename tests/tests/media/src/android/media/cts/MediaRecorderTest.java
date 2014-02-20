@@ -36,6 +36,7 @@ import java.io.FileDescriptor;
 import java.io.FileOutputStream;
 import java.lang.InterruptedException;
 import java.lang.Runnable;
+import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
@@ -50,6 +51,8 @@ public class MediaRecorderTest extends ActivityInstrumentationTestCase2<MediaStu
     private static final int RECORDED_DUR_TOLERANCE_MS = 1000;
     private static final int VIDEO_WIDTH = 176;
     private static final int VIDEO_HEIGHT = 144;
+    private static int mVideoWidth = VIDEO_WIDTH;
+    private static int mVideoHeight = VIDEO_HEIGHT;
     private static final int VIDEO_BIT_RATE_IN_BPS = 128000;
     private static final double VIDEO_TIMELAPSE_CAPTURE_RATE_FPS = 1.0;
     private static final int AUDIO_BIT_RATE_IN_BPS = 12200;
@@ -187,11 +190,27 @@ public class MediaRecorderTest extends ActivityInstrumentationTestCase2<MediaStu
         int durMs = timelapse? RECORD_TIME_LAPSE_MS: RECORD_TIME_MS;
         for (int cameraId = 0; cameraId < nCamera; cameraId++) {
             mCamera = Camera.open(cameraId);
+            setSupportedResolution(mCamera);
             recordVideoUsingCamera(mCamera, OUTPUT_PATH, durMs, timelapse);
             mCamera.release();
             mCamera = null;
             assertTrue(checkLocationInFile(OUTPUT_PATH));
         }
+    }
+
+    private void setSupportedResolution(Camera camera) {
+        Camera.Parameters parameters = camera.getParameters();
+        List<Camera.Size> previewSizes = parameters.getSupportedPreviewSizes();
+        for (Camera.Size size : previewSizes)
+        {
+            if (size.width == VIDEO_WIDTH && size.height == VIDEO_HEIGHT) {
+                mVideoWidth = VIDEO_WIDTH;
+                mVideoHeight = VIDEO_HEIGHT;
+                return;
+            }
+        }
+        mVideoWidth = previewSizes.get(0).width;
+        mVideoHeight = previewSizes.get(0).height;
     }
 
     private void recordVideoUsingCamera(
@@ -210,7 +229,7 @@ public class MediaRecorderTest extends ActivityInstrumentationTestCase2<MediaStu
         mMediaRecorder.setVideoEncoder(MediaRecorder.VideoEncoder.DEFAULT);
         mMediaRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.DEFAULT);
         mMediaRecorder.setVideoFrameRate(frameRate);
-        mMediaRecorder.setVideoSize(VIDEO_WIDTH, VIDEO_HEIGHT);
+        mMediaRecorder.setVideoSize(mVideoWidth, mVideoHeight);
         mMediaRecorder.setPreviewDisplay(mActivity.getSurfaceHolder().getSurface());
         mMediaRecorder.setOutputFile(fileName);
         mMediaRecorder.setLocation(LATITUDE, LONGITUDE);
