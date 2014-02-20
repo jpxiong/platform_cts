@@ -31,7 +31,7 @@ public class CtsBuildProvider implements IBuildProvider {
     @Option(name="cts-install-path", description="the path to the cts installation to use")
     private String mCtsRootDirPath = System.getProperty("CTS_ROOT");
 
-    public static final String CTS_BUILD_VERSION = "4.2_r4";
+    public static final String CTS_BUILD_VERSION = "4.2_r5";
 
     /**
      * {@inheritDoc}
