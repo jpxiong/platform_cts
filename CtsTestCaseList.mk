@@ -30,13 +30,14 @@ cts_security_apps_list := \
 	CtsMultiUserStorageApp
 
 cts_support_packages := \
+    CtsAccelerationTestStubs \
+    CtsDeviceAdmin \
     CtsDeviceOpenGl \
     CtsDeviceTaskswitchingAppA \
     CtsDeviceTaskswitchingAppB \
     CtsDeviceTaskswitchingControl \
     CtsDeviceUi \
-    CtsAccelerationTestStubs \
-    CtsDeviceAdmin \
+		CtsHoloDeviceApp \
     CtsMonkeyApp \
     CtsMonkeyApp2 \
     CtsSomeAccessibilityServices \
@@ -126,10 +127,11 @@ CTS_COVERAGE_TEST_CASE_LIST := \
 
 # Host side only tests
 cts_host_libraries := \
-    CtsHostUi \
-    CtsHostJank \
     CtsAdbTests \
     CtsAppSecurityTests \
+		CtsHoloHostTestCases \
+    CtsHostJank \
+    CtsHostUi \
     CtsMonkeyTestCases \
     CtsUsbTests
 
