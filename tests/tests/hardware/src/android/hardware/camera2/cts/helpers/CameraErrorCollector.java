@@ -28,7 +28,25 @@ public class CameraErrorCollector extends ErrorCollector {
 
     @Override
     public void verify() throws Throwable {
+        // Do not remove if using JUnit 3 test runners. super.verify() is protected.
         super.verify();
+    }
+
+    /**
+     * Adds an unconditional error to the table. Execution continues, but test will fail at the end.
+     *
+     * @param message A string containing the failure reason.
+     */
+    public void addMessage(String message) {
+        super.addError(new Throwable(mCameraMsg + message));
+    }
+
+    /**
+     * Adds a Throwable to the table.  Execution continues, but the test will fail at the end.
+     */
+    @Override
+    public void addError(Throwable error) {
+        super.addError(new Throwable(mCameraMsg + error.getMessage(), error));
     }
 
     /**
