@@ -119,6 +119,14 @@ public class IntentDrivenTestActivity extends PassFailButtons.Activity implement
         private final ButtonInfo[] mButtons;
 
         public TestInfo(String testId,  int title, int infoText, ButtonInfo... buttons) {
+            /** The Intent Driven Test layout {@link R.layout.intent_driven_test} is designed for
+             *  up to 2 buttons and won't render well with more buttons on small screen devices.
+             *  If you need more than 2 buttons, please change the layout so it can properly render
+             *  them even on the smallest devices.
+             */
+            if (buttons.length > 2) {
+                throw new RuntimeException("Too many buttons");
+            }
             mTestId = testId;
             mTitle = title;
             mInfoText = infoText;
