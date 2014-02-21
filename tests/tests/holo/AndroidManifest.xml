@@ -23,21 +23,21 @@
     <application android:hardwareAccelerated="false">
         <uses-library android:name="android.test.runner" />
 
-        <activity android:name="android.holo.cts.HoloTestUtilitiesActivity" 
+        <activity android:name="android.holo.cts.HoloTestUtilitiesActivity"
                 android:label="@string/holo_test_utilities">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        
+
         <activity android:name="android.holo.cts.DisplayInfoActivity"
                 android:label="@string/display_info" />
 
-        <activity android:name="android.holo.cts.ThemePickerActivity" 
+        <activity android:name="android.holo.cts.ThemePickerActivity"
                 android:label="@string/pick_theme" />
 
-        <activity android:name="android.holo.cts.LayoutPickerActivity" 
+        <activity android:name="android.holo.cts.LayoutPickerActivity"
                 android:label="@string/pick_layout" />
 
         <activity android:name="android.holo.cts.ThemeTestActivity"
@@ -58,7 +58,7 @@
                 android:theme="@android:style/Theme.Translucent.NoTitleBar" />
 
     </application>
-    
+
     <instrumentation android:name="android.test.InstrumentationCtsTestRunner"
             android:targetPackage="com.android.cts.holo"
             android:label="CTS tests for the Holo theme" />
