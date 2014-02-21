@@ -731,6 +731,7 @@ public class FileSystemPermissionTest extends AndroidTestCase {
                 new File("/dev/alarm"),      // b/9035217
                 new File("/dev/ashmem"),
                 new File("/dev/binder"),
+                new File("/dev/quadd"),
                 new File("/dev/felica"),
                 new File("/dev/felica_ant"),
                 new File("/dev/felica_cen"),
@@ -752,6 +753,7 @@ public class FileSystemPermissionTest extends AndroidTestCase {
                 new File("/dev/nvhost-ctrl"), // b/9088251
                 new File("/dev/nvhost-gr2d"), // b/9088251
                 new File("/dev/nvhost-gr3d"), // b/9088251
+                new File("/dev/nvhost-tsec"),
                 new File("/dev/nvmap"),       // b/9088251
                 new File("/dev/ptmx"),        // b/9088251
                 new File("/dev/pvrsrvkm"),    // b/9108170
