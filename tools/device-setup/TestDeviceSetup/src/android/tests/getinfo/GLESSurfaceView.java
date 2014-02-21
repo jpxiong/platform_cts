@@ -55,17 +55,27 @@ class GLESSurfaceView extends GLSurfaceView {
         @Override
         public void onSurfaceCreated(GL10 gl, EGLConfig config) {
             String extensions;
+            String vendor;
+            String renderer;
             if (mUseGL20) {
                 extensions = GLES20.glGetString(GLES20.GL_EXTENSIONS);
+                vendor = GLES20.glGetString(GLES20.GL_VENDOR);
+                renderer = GLES20.glGetString(GLES20.GL_RENDERER);
             } else {
                 extensions = gl.glGetString(GL10.GL_EXTENSIONS);
+                vendor = gl.glGetString(GL10.GL_VENDOR);
+                renderer = gl.glGetString(GL10.GL_RENDERER);
             }
             Log.i(TAG, "extensions : " + extensions);
+            Log.i(TAG, "vendor : " + vendor);
+            Log.i(TAG, "renderer : " + renderer);
             Scanner scanner = new Scanner(extensions);
             scanner.useDelimiter(" ");
+            StringBuilder extensionsBuilder = new StringBuilder();
             StringBuilder builder = new StringBuilder();
             while (scanner.hasNext()) {
                 String ext = scanner.next();
+                extensionsBuilder.append(ext).append(";");
                 if (ext.contains("texture")) {
                     if (ext.contains("compression") || ext.contains("compressed")) {
                         Log.i(TAG, "Compression supported: " + ext);
@@ -78,6 +88,15 @@ class GLESSurfaceView extends GLSurfaceView {
             DeviceInfoInstrument.addResult(
                     DeviceInfoConstants.OPEN_GL_COMPRESSED_TEXTURE_FORMATS,
                     builder.toString());
+            DeviceInfoInstrument.addResult(
+                    DeviceInfoConstants.OPEN_GL_EXTENSIONS,
+                    extensionsBuilder.toString());
+            DeviceInfoInstrument.addResult(
+                    DeviceInfoConstants.GRAPHICS_VENDOR,
+                    vendor);
+            DeviceInfoInstrument.addResult(
+                    DeviceInfoConstants.GRAPHICS_RENDERER,
+                    renderer);
 
             mDone.countDown();
         }
