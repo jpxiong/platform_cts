@@ -37,7 +37,7 @@ cts_support_packages := \
     CtsDeviceTaskswitchingAppB \
     CtsDeviceTaskswitchingControl \
     CtsDeviceUi \
-		CtsHoloDeviceApp \
+    CtsHoloDeviceApp \
     CtsMonkeyApp \
     CtsMonkeyApp2 \
     CtsSomeAccessibilityServices \
@@ -129,7 +129,7 @@ CTS_COVERAGE_TEST_CASE_LIST := \
 cts_host_libraries := \
     CtsAdbTests \
     CtsAppSecurityTests \
-		CtsHoloHostTestCases \
+    CtsHoloHostTestCases \
     CtsHostJank \
     CtsHostUi \
     CtsMonkeyTestCases \
