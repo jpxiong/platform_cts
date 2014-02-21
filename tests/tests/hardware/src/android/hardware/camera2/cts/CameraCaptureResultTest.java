@@ -312,6 +312,7 @@ public class CameraCaptureResultTest extends AndroidTestCase {
         resultKeys.add(CaptureResult.SENSOR_SENSITIVITY);
         resultKeys.add(CaptureResult.SENSOR_TIMESTAMP);
         resultKeys.add(CaptureResult.SENSOR_TEMPERATURE);
+        resultKeys.add(CaptureResult.SENSOR_REFERENCE_ILLUMINANT);
         resultKeys.add(CaptureResult.SENSOR_CALIBRATION_TRANSFORM);
         resultKeys.add(CaptureResult.SENSOR_COLOR_TRANSFORM);
         resultKeys.add(CaptureResult.SENSOR_FORWARD_MATRIX);
