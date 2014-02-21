@@ -81,6 +81,7 @@ class GLESSurfaceView extends GLSurfaceView {
             scanner.useDelimiter(" ");
             while (scanner.hasNext()) {
                 String ext = scanner.next();
+                mParent.addOpenGlExtension(ext);
                 if (ext.contains("texture")) {
                     if (ext.contains("compression") || ext.contains("compressed")) {
                         Log.i(TAG, "Compression supported: " + ext);
