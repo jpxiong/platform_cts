@@ -372,15 +372,25 @@ public final class JsonReaderTest extends TestCase {
         assertEquals(JsonToken.END_DOCUMENT, reader.peek());
     }
 
-    /**
-     * This test fails because there's no double for 9223372036854775806, and
-     * our long parsing uses Double.parseDouble() for fractional values.
-     */
-    public void testHighPrecisionLong() throws IOException {
-        String json = "[9223372036854775806.000]";
+    public void testHighPrecisionDouble_losesPrecision() throws IOException {
+        // The presence of a fractional part forces us to use Double.parseDouble
+        // instead of Long.parseLong (even though the fractional part is 0).
+        //
+        // A 52 bit mantissa isn't sufficient to precisely represent any of these
+        // values, so we will lose some precision, thereby storing it as
+        // ~(9.223372036854776E18). This value is then implicitly converted into
+        // a long and is required by the JLS to be clamped to Long.MAX_VALUE since
+        // it's larger than the largest long.
+        String json = "["
+                + "9223372036854775806.000,"  // Long.MAX_VALUE - 1
+                + "9223372036854775807.000,"  // Long.MAX_VALUE
+                + "9223372036854775808.000"   // Long.MAX_VALUE + 1
+                + "]";
         JsonReader reader = new JsonReader(new StringReader(json));
         reader.beginArray();
-        assertEquals(9223372036854775806L, reader.nextLong());
+        assertEquals(Long.MAX_VALUE, reader.nextLong());
+        assertEquals(Long.MAX_VALUE, reader.nextLong());
+        assertEquals(Long.MAX_VALUE, reader.nextLong());
         reader.endArray();
     }
 
