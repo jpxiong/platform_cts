@@ -754,10 +754,16 @@ public class FileSystemPermissionTest extends AndroidTestCase {
                 new File("/dev/mali"),        // b/11142586
                 new File("/dev/msm_rotator"), // b/9035217
                 new File("/dev/null"),
+                new File("/dev/nvhost-as-gpu"),
                 new File("/dev/nvhost-ctrl"), // b/9088251
+                new File("/dev/nvhost-ctrl-gpu"),
+                new File("/dev/nvhost-dbg-gpu"),
+                new File("/dev/nvhost-gpu"),
                 new File("/dev/nvhost-gr2d"), // b/9088251
                 new File("/dev/nvhost-gr3d"), // b/9088251
                 new File("/dev/nvhost-tsec"),
+                new File("/dev/nvhost-prof-gpu"),
+                new File("/dev/nvhost-vic"),
                 new File("/dev/nvmap"),       // b/9088251
                 new File("/dev/ptmx"),        // b/9088251
                 new File("/dev/pvrsrvkm"),    // b/9108170
@@ -768,6 +774,7 @@ public class FileSystemPermissionTest extends AndroidTestCase {
                 new File("/dev/snfc_hsel"),   // b/11142586
                 new File("/dev/snfc_intu_poll"), // b/11142586
                 new File("/dev/snfc_rfs"),    // b/11142586
+                new File("/dev/tegra-throughput"),
                 new File("/dev/tiler"),       // b/9108170
                 new File("/dev/tty"),
                 new File("/dev/urandom"),
