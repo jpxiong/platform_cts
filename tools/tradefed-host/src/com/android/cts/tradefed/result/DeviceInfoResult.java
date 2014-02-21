@@ -53,6 +53,10 @@ class DeviceInfoResult extends AbstractXmlPullParser {
     private static final String OPENGL_TEXTURE_FORMAT_TAG = "TextureFormat";
     private static final String OPENGL_TEXTURE_FORMAT_DELIM = ";";
 
+    private static final String OPENGL_EXTENSIONS_TAG = "OpenGlExtensions";
+    private static final String OPENGL_EXTENSION_TAG = "OpenGlExtension";
+    private static final String OPENGL_EXTENSION_DELIM = ";";
+
     private static final String SYSLIB_INFO_TAG = "SystemLibrariesInfo";
     private static final String SYSLIB_TAG = "Library";
     private static final String SYSLIB_DELIM = ";";
@@ -73,47 +77,52 @@ class DeviceInfoResult extends AbstractXmlPullParser {
     public void serialize(KXmlSerializer serializer) throws IOException {
         serializer.startTag(ns, TAG);
 
-        if (!mMetrics.isEmpty()) {
-
-            // Extract metrics that need extra handling, and then dump the remainder into BuildInfo
-            Map<String, String> metricsCopy = new HashMap<String, String>(mMetrics);
-            serializer.startTag(ns, SCREEN_TAG);
-            serializer.attribute(ns, DeviceInfoConstants.RESOLUTION,
-                    getMetric(metricsCopy, DeviceInfoConstants.RESOLUTION));
-            serializer.attribute(ns, DeviceInfoConstants.SCREEN_DENSITY,
-                    getMetric(metricsCopy, DeviceInfoConstants.SCREEN_DENSITY));
-            serializer.attribute(ns, DeviceInfoConstants.SCREEN_DENSITY_BUCKET,
-                    getMetric(metricsCopy, DeviceInfoConstants.SCREEN_DENSITY_BUCKET));
-            serializer.attribute(ns, DeviceInfoConstants.SCREEN_SIZE,
-                    getMetric(metricsCopy, DeviceInfoConstants.SCREEN_SIZE));
-            serializer.endTag(ns, SCREEN_TAG);
-
-            serializer.startTag(ns, PHONE_TAG);
-            serializer.attribute(ns, DeviceInfoConstants.PHONE_NUMBER,
-                    getMetric(metricsCopy, DeviceInfoConstants.PHONE_NUMBER));
-            serializer.endTag(ns, PHONE_TAG);
-
-            String featureData = getMetric(metricsCopy, DeviceInfoConstants.FEATURES);
-            String processData = getMetric(metricsCopy, DeviceInfoConstants.PROCESSES);
-            String sysLibData = getMetric(metricsCopy, DeviceInfoConstants.SYS_LIBRARIES);
-            String textureData = getMetric(metricsCopy,
-                    DeviceInfoConstants.OPEN_GL_COMPRESSED_TEXTURE_FORMATS);
-
-            // dump the remaining metrics without translation
-            serializer.startTag(ns, BUILD_TAG);
-            for (Map.Entry<String, String> metricEntry : metricsCopy.entrySet()) {
-                serializer.attribute(ns, metricEntry.getKey(), metricEntry.getValue());
-            }
-            serializer.endTag(ns, BUILD_TAG);
-
-            serializeFeatureInfo(serializer, featureData);
-            serializeProcessInfo(serializer, processData);
-            serializeSystemLibrariesInfo(serializer, sysLibData);
-            serializeOpenGLCompressedTextureFormatsInfo(serializer, textureData);
-        } else {
+        if (mMetrics.isEmpty()) {
             // this might be expected, if device info collection was turned off
             CLog.d("Could not find device info");
+            serializer.endTag(ns, TAG);
+            return;
         }
+
+        // Extract metrics that need extra handling, and then dump the remainder into BuildInfo
+        Map<String, String> metricsCopy = new HashMap<String, String>(mMetrics);
+        serializer.startTag(ns, SCREEN_TAG);
+        serializer.attribute(ns, DeviceInfoConstants.RESOLUTION,
+                getMetric(metricsCopy, DeviceInfoConstants.RESOLUTION));
+        serializer.attribute(ns, DeviceInfoConstants.SCREEN_DENSITY,
+                getMetric(metricsCopy, DeviceInfoConstants.SCREEN_DENSITY));
+        serializer.attribute(ns, DeviceInfoConstants.SCREEN_DENSITY_BUCKET,
+                getMetric(metricsCopy, DeviceInfoConstants.SCREEN_DENSITY_BUCKET));
+        serializer.attribute(ns, DeviceInfoConstants.SCREEN_SIZE,
+                getMetric(metricsCopy, DeviceInfoConstants.SCREEN_SIZE));
+        serializer.endTag(ns, SCREEN_TAG);
+
+        serializer.startTag(ns, PHONE_TAG);
+        serializer.attribute(ns, DeviceInfoConstants.PHONE_NUMBER,
+                getMetric(metricsCopy, DeviceInfoConstants.PHONE_NUMBER));
+        serializer.endTag(ns, PHONE_TAG);
+
+        String featureData = getMetric(metricsCopy, DeviceInfoConstants.FEATURES);
+        String processData = getMetric(metricsCopy, DeviceInfoConstants.PROCESSES);
+        String sysLibData = getMetric(metricsCopy, DeviceInfoConstants.SYS_LIBRARIES);
+        String textureData = getMetric(metricsCopy,
+                DeviceInfoConstants.OPEN_GL_COMPRESSED_TEXTURE_FORMATS);
+        String openGlExtensionData = getMetric(metricsCopy,
+                DeviceInfoConstants.OPEN_GL_EXTENSIONS);
+
+        // dump the remaining metrics without translation
+        serializer.startTag(ns, BUILD_TAG);
+        for (Map.Entry<String, String> metricEntry : metricsCopy.entrySet()) {
+            serializer.attribute(ns, metricEntry.getKey(), metricEntry.getValue());
+        }
+        serializer.endTag(ns, BUILD_TAG);
+
+        serializeFeatureInfo(serializer, featureData);
+        serializeProcessInfo(serializer, processData);
+        serializeSystemLibrariesInfo(serializer, sysLibData);
+        serializeOpenGLCompressedTextureFormatsInfo(serializer, textureData);
+        serializeOpenGLExtensions(serializer, openGlExtensionData);
+        // End
         serializer.endTag(ns, TAG);
     }
 
@@ -146,6 +155,12 @@ class DeviceInfoResult extends AbstractXmlPullParser {
             String formats) throws IOException {
         serialize(serializer, OPENGL_TEXTURE_FORMATS_INFO_TAG, OPENGL_TEXTURE_FORMAT_TAG,
                 OPENGL_TEXTURE_FORMAT_DELIM, null, formats, "name");
+    }
+
+    private void serializeOpenGLExtensions(KXmlSerializer serializer, String extensions)
+            throws IOException {
+        serialize(serializer, OPENGL_EXTENSIONS_TAG, OPENGL_EXTENSION_TAG,
+                OPENGL_EXTENSION_DELIM, null, extensions, "name");
     }
 
     private void serializeSystemLibrariesInfo(KXmlSerializer serializer, String libs)
