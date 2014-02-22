@@ -35,15 +35,15 @@ public class TestNan extends RSBaseCompute {
     }
 
     private void checkNanUintFloat() {
-        Allocation in = CreateRandomAllocation(mRS, Element.DataType.UNSIGNED_32, 1, 0xbc42cb366a8a32d8L);
+        Allocation in = createRandomAllocation(mRS, Element.DataType.UNSIGNED_32, 1, 0x757e939c0e627774l, false);
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.FLOAT_32, 1), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 1), INPUTSIZE);
             script.forEach_testNanUintFloat(in, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testNanUintFloat: " + e.toString());
         }
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.FLOAT_32, 1), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 1), INPUTSIZE);
             scriptRelaxed.forEach_testNanUintFloat(in, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testNanUintFloat: " + e.toString());

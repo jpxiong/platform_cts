@@ -44,10 +44,10 @@ public class TestFmin extends RSBaseCompute {
     }
 
     private void checkFminFloatFloatFloat() {
-        Allocation inX = CreateRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0xb4de439bf3a81afcL);
-        Allocation inY = CreateRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0xb4de439bf3a81afcL);
+        Allocation inX = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0x7b46a8451d7b106fl, false);
+        Allocation inY = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0x7b46a8451d7b1070l, false);
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.FLOAT_32, 1), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 1), INPUTSIZE);
             script.set_gAllocInY(inY);
             script.forEach_testFminFloatFloatFloat(inX, out);
             verifyResultsFminFloatFloatFloat(inX, inY, out, false);
@@ -55,7 +55,7 @@ public class TestFmin extends RSBaseCompute {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testFminFloatFloatFloat: " + e.toString());
         }
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.FLOAT_32, 1), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 1), INPUTSIZE);
             scriptRelaxed.set_gAllocInY(inY);
             scriptRelaxed.forEach_testFminFloatFloatFloat(inX, out);
             verifyResultsFminFloatFloatFloat(inX, inY, out, true);
@@ -89,29 +89,34 @@ public class TestFmin extends RSBaseCompute {
                 }
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
-                    message.append(String.format("Input inX: %x %.16f", Float.floatToRawIntBits(args.inX), args.inX));
+                    message.append(String.format("Input inX: %14.8g %8x %15a",
+                            args.inX, Float.floatToRawIntBits(args.inX), args.inX));
                     message.append("\n");
-                    message.append(String.format("Input inY: %x %.16f", Float.floatToRawIntBits(args.inY), args.inY));
+                    message.append(String.format("Input inY: %14.8g %8x %15a",
+                            args.inY, Float.floatToRawIntBits(args.inY), args.inY));
                     message.append("\n");
-                    message.append(String.format("Expected output out: %x %.16f", Float.floatToRawIntBits(args.out), args.out));
+                    message.append(String.format("Expected output out: %14.8g %8x %15a",
+                            args.out, Float.floatToRawIntBits(args.out), args.out));
                     message.append("\n");
-                    message.append(String.format("Actual   output out: %x %.16f", Float.floatToRawIntBits(arrayOut[i * 1 + j]), arrayOut[i * 1 + j]));
+                    message.append(String.format("Actual   output out: %14.8g %8x %15a",
+                            arrayOut[i * 1 + j], Float.floatToRawIntBits(arrayOut[i * 1 + j]), arrayOut[i * 1 + j]));
                     neededUlf = (int) (Math.abs(args.out - arrayOut[i * 1 + j]) / Math.ulp(args.out) + 0.5);
                     if (neededUlf > ulf) {
                         message.append(String.format(" FAILED, ulf needed %d, specified %d", neededUlf, ulf));
                     }
                     message.append("\n");
-                    assertTrue("Incorrect output for checkFminFloatFloatFloat" + (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                    assertTrue("Incorrect output for checkFminFloatFloatFloat" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
                 }
             }
         }
     }
 
     private void checkFminFloat2Float2Float2() {
-        Allocation inX = CreateRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0x24f58c89dd0df54aL);
-        Allocation inY = CreateRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0x24f58c89dd0df54aL);
+        Allocation inX = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0x12b850a9e75faa59l, false);
+        Allocation inY = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0x12b850a9e75faa5al, false);
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.FLOAT_32, 2), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 2), INPUTSIZE);
             script.set_gAllocInY(inY);
             script.forEach_testFminFloat2Float2Float2(inX, out);
             verifyResultsFminFloat2Float2Float2(inX, inY, out, false);
@@ -119,7 +124,7 @@ public class TestFmin extends RSBaseCompute {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testFminFloat2Float2Float2: " + e.toString());
         }
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.FLOAT_32, 2), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 2), INPUTSIZE);
             scriptRelaxed.set_gAllocInY(inY);
             scriptRelaxed.forEach_testFminFloat2Float2Float2(inX, out);
             verifyResultsFminFloat2Float2Float2(inX, inY, out, true);
@@ -153,29 +158,34 @@ public class TestFmin extends RSBaseCompute {
                 }
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
-                    message.append(String.format("Input inX: %x %.16f", Float.floatToRawIntBits(args.inX), args.inX));
+                    message.append(String.format("Input inX: %14.8g %8x %15a",
+                            args.inX, Float.floatToRawIntBits(args.inX), args.inX));
                     message.append("\n");
-                    message.append(String.format("Input inY: %x %.16f", Float.floatToRawIntBits(args.inY), args.inY));
+                    message.append(String.format("Input inY: %14.8g %8x %15a",
+                            args.inY, Float.floatToRawIntBits(args.inY), args.inY));
                     message.append("\n");
-                    message.append(String.format("Expected output out: %x %.16f", Float.floatToRawIntBits(args.out), args.out));
+                    message.append(String.format("Expected output out: %14.8g %8x %15a",
+                            args.out, Float.floatToRawIntBits(args.out), args.out));
                     message.append("\n");
-                    message.append(String.format("Actual   output out: %x %.16f", Float.floatToRawIntBits(arrayOut[i * 2 + j]), arrayOut[i * 2 + j]));
+                    message.append(String.format("Actual   output out: %14.8g %8x %15a",
+                            arrayOut[i * 2 + j], Float.floatToRawIntBits(arrayOut[i * 2 + j]), arrayOut[i * 2 + j]));
                     neededUlf = (int) (Math.abs(args.out - arrayOut[i * 2 + j]) / Math.ulp(args.out) + 0.5);
                     if (neededUlf > ulf) {
                         message.append(String.format(" FAILED, ulf needed %d, specified %d", neededUlf, ulf));
                     }
                     message.append("\n");
-                    assertTrue("Incorrect output for checkFminFloat2Float2Float2" + (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                    assertTrue("Incorrect output for checkFminFloat2Float2Float2" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
                 }
             }
         }
     }
 
     private void checkFminFloat3Float3Float3() {
-        Allocation inX = CreateRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0x51e6dbea2d583b55L);
-        Allocation inY = CreateRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0x51e6dbea2d583b55L);
+        Allocation inX = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0x671d2ec9e93dabfal, false);
+        Allocation inY = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0x671d2ec9e93dabfbl, false);
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.FLOAT_32, 3), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 3), INPUTSIZE);
             script.set_gAllocInY(inY);
             script.forEach_testFminFloat3Float3Float3(inX, out);
             verifyResultsFminFloat3Float3Float3(inX, inY, out, false);
@@ -183,7 +193,7 @@ public class TestFmin extends RSBaseCompute {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testFminFloat3Float3Float3: " + e.toString());
         }
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.FLOAT_32, 3), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 3), INPUTSIZE);
             scriptRelaxed.set_gAllocInY(inY);
             scriptRelaxed.forEach_testFminFloat3Float3Float3(inX, out);
             verifyResultsFminFloat3Float3Float3(inX, inY, out, true);
@@ -217,29 +227,34 @@ public class TestFmin extends RSBaseCompute {
                 }
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
-                    message.append(String.format("Input inX: %x %.16f", Float.floatToRawIntBits(args.inX), args.inX));
+                    message.append(String.format("Input inX: %14.8g %8x %15a",
+                            args.inX, Float.floatToRawIntBits(args.inX), args.inX));
                     message.append("\n");
-                    message.append(String.format("Input inY: %x %.16f", Float.floatToRawIntBits(args.inY), args.inY));
+                    message.append(String.format("Input inY: %14.8g %8x %15a",
+                            args.inY, Float.floatToRawIntBits(args.inY), args.inY));
                     message.append("\n");
-                    message.append(String.format("Expected output out: %x %.16f", Float.floatToRawIntBits(args.out), args.out));
+                    message.append(String.format("Expected output out: %14.8g %8x %15a",
+                            args.out, Float.floatToRawIntBits(args.out), args.out));
                     message.append("\n");
-                    message.append(String.format("Actual   output out: %x %.16f", Float.floatToRawIntBits(arrayOut[i * 4 + j]), arrayOut[i * 4 + j]));
+                    message.append(String.format("Actual   output out: %14.8g %8x %15a",
+                            arrayOut[i * 4 + j], Float.floatToRawIntBits(arrayOut[i * 4 + j]), arrayOut[i * 4 + j]));
                     neededUlf = (int) (Math.abs(args.out - arrayOut[i * 4 + j]) / Math.ulp(args.out) + 0.5);
                     if (neededUlf > ulf) {
                         message.append(String.format(" FAILED, ulf needed %d, specified %d", neededUlf, ulf));
                     }
                     message.append("\n");
-                    assertTrue("Incorrect output for checkFminFloat3Float3Float3" + (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                    assertTrue("Incorrect output for checkFminFloat3Float3Float3" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
                 }
             }
         }
     }
 
     private void checkFminFloat4Float4Float4() {
-        Allocation inX = CreateRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0x7ed82b4a7da28160L);
-        Allocation inY = CreateRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0x7ed82b4a7da28160L);
+        Allocation inX = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0xbb820ce9eb1bad9bl, false);
+        Allocation inY = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0xbb820ce9eb1bad9cl, false);
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.FLOAT_32, 4), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 4), INPUTSIZE);
             script.set_gAllocInY(inY);
             script.forEach_testFminFloat4Float4Float4(inX, out);
             verifyResultsFminFloat4Float4Float4(inX, inY, out, false);
@@ -247,7 +262,7 @@ public class TestFmin extends RSBaseCompute {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testFminFloat4Float4Float4: " + e.toString());
         }
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.FLOAT_32, 4), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 4), INPUTSIZE);
             scriptRelaxed.set_gAllocInY(inY);
             scriptRelaxed.forEach_testFminFloat4Float4Float4(inX, out);
             verifyResultsFminFloat4Float4Float4(inX, inY, out, true);
@@ -281,29 +296,34 @@ public class TestFmin extends RSBaseCompute {
                 }
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
-                    message.append(String.format("Input inX: %x %.16f", Float.floatToRawIntBits(args.inX), args.inX));
+                    message.append(String.format("Input inX: %14.8g %8x %15a",
+                            args.inX, Float.floatToRawIntBits(args.inX), args.inX));
                     message.append("\n");
-                    message.append(String.format("Input inY: %x %.16f", Float.floatToRawIntBits(args.inY), args.inY));
+                    message.append(String.format("Input inY: %14.8g %8x %15a",
+                            args.inY, Float.floatToRawIntBits(args.inY), args.inY));
                     message.append("\n");
-                    message.append(String.format("Expected output out: %x %.16f", Float.floatToRawIntBits(args.out), args.out));
+                    message.append(String.format("Expected output out: %14.8g %8x %15a",
+                            args.out, Float.floatToRawIntBits(args.out), args.out));
                     message.append("\n");
-                    message.append(String.format("Actual   output out: %x %.16f", Float.floatToRawIntBits(arrayOut[i * 4 + j]), arrayOut[i * 4 + j]));
+                    message.append(String.format("Actual   output out: %14.8g %8x %15a",
+                            arrayOut[i * 4 + j], Float.floatToRawIntBits(arrayOut[i * 4 + j]), arrayOut[i * 4 + j]));
                     neededUlf = (int) (Math.abs(args.out - arrayOut[i * 4 + j]) / Math.ulp(args.out) + 0.5);
                     if (neededUlf > ulf) {
                         message.append(String.format(" FAILED, ulf needed %d, specified %d", neededUlf, ulf));
                     }
                     message.append("\n");
-                    assertTrue("Incorrect output for checkFminFloat4Float4Float4" + (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                    assertTrue("Incorrect output for checkFminFloat4Float4Float4" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
                 }
             }
         }
     }
 
     private void checkFminFloat2FloatFloat2() {
-        Allocation inX = CreateRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0x12dd9b6317a74104L);
-        Allocation inY = CreateRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0x12dd9b6317a74104L);
+        Allocation inX = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0x4dd5869724457687l, false);
+        Allocation inY = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0x4dd5869724457688l, false);
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.FLOAT_32, 2), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 2), INPUTSIZE);
             script.set_gAllocInY(inY);
             script.forEach_testFminFloat2FloatFloat2(inX, out);
             verifyResultsFminFloat2FloatFloat2(inX, inY, out, false);
@@ -311,7 +331,7 @@ public class TestFmin extends RSBaseCompute {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testFminFloat2FloatFloat2: " + e.toString());
         }
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.FLOAT_32, 2), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 2), INPUTSIZE);
             scriptRelaxed.set_gAllocInY(inY);
             scriptRelaxed.forEach_testFminFloat2FloatFloat2(inX, out);
             verifyResultsFminFloat2FloatFloat2(inX, inY, out, true);
@@ -345,29 +365,34 @@ public class TestFmin extends RSBaseCompute {
                 }
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
-                    message.append(String.format("Input inX: %x %.16f", Float.floatToRawIntBits(args.inX), args.inX));
+                    message.append(String.format("Input inX: %14.8g %8x %15a",
+                            args.inX, Float.floatToRawIntBits(args.inX), args.inX));
                     message.append("\n");
-                    message.append(String.format("Input inY: %x %.16f", Float.floatToRawIntBits(args.inY), args.inY));
+                    message.append(String.format("Input inY: %14.8g %8x %15a",
+                            args.inY, Float.floatToRawIntBits(args.inY), args.inY));
                     message.append("\n");
-                    message.append(String.format("Expected output out: %x %.16f", Float.floatToRawIntBits(args.out), args.out));
+                    message.append(String.format("Expected output out: %14.8g %8x %15a",
+                            args.out, Float.floatToRawIntBits(args.out), args.out));
                     message.append("\n");
-                    message.append(String.format("Actual   output out: %x %.16f", Float.floatToRawIntBits(arrayOut[i * 2 + j]), arrayOut[i * 2 + j]));
+                    message.append(String.format("Actual   output out: %14.8g %8x %15a",
+                            arrayOut[i * 2 + j], Float.floatToRawIntBits(arrayOut[i * 2 + j]), arrayOut[i * 2 + j]));
                     neededUlf = (int) (Math.abs(args.out - arrayOut[i * 2 + j]) / Math.ulp(args.out) + 0.5);
                     if (neededUlf > ulf) {
                         message.append(String.format(" FAILED, ulf needed %d, specified %d", neededUlf, ulf));
                     }
                     message.append("\n");
-                    assertTrue("Incorrect output for checkFminFloat2FloatFloat2" + (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                    assertTrue("Incorrect output for checkFminFloat2FloatFloat2" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
                 }
             }
         }
     }
 
     private void checkFminFloat3FloatFloat3() {
-        Allocation inX = CreateRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0x6740b068239e4c78L);
-        Allocation inY = CreateRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0x6740b068239e4c78L);
+        Allocation inX = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0xa32539af12b06ae3l, false);
+        Allocation inY = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0xa32539af12b06ae4l, false);
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.FLOAT_32, 3), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 3), INPUTSIZE);
             script.set_gAllocInY(inY);
             script.forEach_testFminFloat3FloatFloat3(inX, out);
             verifyResultsFminFloat3FloatFloat3(inX, inY, out, false);
@@ -375,7 +400,7 @@ public class TestFmin extends RSBaseCompute {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testFminFloat3FloatFloat3: " + e.toString());
         }
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.FLOAT_32, 3), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 3), INPUTSIZE);
             scriptRelaxed.set_gAllocInY(inY);
             scriptRelaxed.forEach_testFminFloat3FloatFloat3(inX, out);
             verifyResultsFminFloat3FloatFloat3(inX, inY, out, true);
@@ -409,29 +434,34 @@ public class TestFmin extends RSBaseCompute {
                 }
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
-                    message.append(String.format("Input inX: %x %.16f", Float.floatToRawIntBits(args.inX), args.inX));
+                    message.append(String.format("Input inX: %14.8g %8x %15a",
+                            args.inX, Float.floatToRawIntBits(args.inX), args.inX));
                     message.append("\n");
-                    message.append(String.format("Input inY: %x %.16f", Float.floatToRawIntBits(args.inY), args.inY));
+                    message.append(String.format("Input inY: %14.8g %8x %15a",
+                            args.inY, Float.floatToRawIntBits(args.inY), args.inY));
                     message.append("\n");
-                    message.append(String.format("Expected output out: %x %.16f", Float.floatToRawIntBits(args.out), args.out));
+                    message.append(String.format("Expected output out: %14.8g %8x %15a",
+                            args.out, Float.floatToRawIntBits(args.out), args.out));
                     message.append("\n");
-                    message.append(String.format("Actual   output out: %x %.16f", Float.floatToRawIntBits(arrayOut[i * 4 + j]), arrayOut[i * 4 + j]));
+                    message.append(String.format("Actual   output out: %14.8g %8x %15a",
+                            arrayOut[i * 4 + j], Float.floatToRawIntBits(arrayOut[i * 4 + j]), arrayOut[i * 4 + j]));
                     neededUlf = (int) (Math.abs(args.out - arrayOut[i * 4 + j]) / Math.ulp(args.out) + 0.5);
                     if (neededUlf > ulf) {
                         message.append(String.format(" FAILED, ulf needed %d, specified %d", neededUlf, ulf));
                     }
                     message.append("\n");
-                    assertTrue("Incorrect output for checkFminFloat3FloatFloat3" + (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                    assertTrue("Incorrect output for checkFminFloat3FloatFloat3" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
                 }
             }
         }
     }
 
     private void checkFminFloat4FloatFloat4() {
-        Allocation inX = CreateRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0xbba3c56d2f9557ecL);
-        Allocation inY = CreateRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0xbba3c56d2f9557ecL);
+        Allocation inX = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0xf874ecc7011b5f3fl, false);
+        Allocation inY = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0xf874ecc7011b5f40l, false);
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.FLOAT_32, 4), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 4), INPUTSIZE);
             script.set_gAllocInY(inY);
             script.forEach_testFminFloat4FloatFloat4(inX, out);
             verifyResultsFminFloat4FloatFloat4(inX, inY, out, false);
@@ -439,7 +469,7 @@ public class TestFmin extends RSBaseCompute {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testFminFloat4FloatFloat4: " + e.toString());
         }
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.FLOAT_32, 4), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 4), INPUTSIZE);
             scriptRelaxed.set_gAllocInY(inY);
             scriptRelaxed.forEach_testFminFloat4FloatFloat4(inX, out);
             verifyResultsFminFloat4FloatFloat4(inX, inY, out, true);
@@ -473,19 +503,24 @@ public class TestFmin extends RSBaseCompute {
                 }
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
-                    message.append(String.format("Input inX: %x %.16f", Float.floatToRawIntBits(args.inX), args.inX));
+                    message.append(String.format("Input inX: %14.8g %8x %15a",
+                            args.inX, Float.floatToRawIntBits(args.inX), args.inX));
                     message.append("\n");
-                    message.append(String.format("Input inY: %x %.16f", Float.floatToRawIntBits(args.inY), args.inY));
+                    message.append(String.format("Input inY: %14.8g %8x %15a",
+                            args.inY, Float.floatToRawIntBits(args.inY), args.inY));
                     message.append("\n");
-                    message.append(String.format("Expected output out: %x %.16f", Float.floatToRawIntBits(args.out), args.out));
+                    message.append(String.format("Expected output out: %14.8g %8x %15a",
+                            args.out, Float.floatToRawIntBits(args.out), args.out));
                     message.append("\n");
-                    message.append(String.format("Actual   output out: %x %.16f", Float.floatToRawIntBits(arrayOut[i * 4 + j]), arrayOut[i * 4 + j]));
+                    message.append(String.format("Actual   output out: %14.8g %8x %15a",
+                            arrayOut[i * 4 + j], Float.floatToRawIntBits(arrayOut[i * 4 + j]), arrayOut[i * 4 + j]));
                     neededUlf = (int) (Math.abs(args.out - arrayOut[i * 4 + j]) / Math.ulp(args.out) + 0.5);
                     if (neededUlf > ulf) {
                         message.append(String.format(" FAILED, ulf needed %d, specified %d", neededUlf, ulf));
                     }
                     message.append("\n");
-                    assertTrue("Incorrect output for checkFminFloat4FloatFloat4" + (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                    assertTrue("Incorrect output for checkFminFloat4FloatFloat4" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
                 }
             }
         }

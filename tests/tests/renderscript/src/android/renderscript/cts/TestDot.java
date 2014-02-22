@@ -35,17 +35,17 @@ public class TestDot extends RSBaseCompute {
     }
 
     private void checkDotFloatFloatFloat() {
-        Allocation inLhs = CreateRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0x84945ebed029514eL);
-        Allocation inRhs = CreateRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0x84945ebed029514eL);
+        Allocation inLhs = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0x93a0502d7b6ecc43l, false);
+        Allocation inRhs = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0x93a0502d7b6ef799l, false);
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.FLOAT_32, 1), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 1), INPUTSIZE);
             script.set_gAllocInRhs(inRhs);
             script.forEach_testDotFloatFloatFloat(inLhs, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testDotFloatFloatFloat: " + e.toString());
         }
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.FLOAT_32, 1), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 1), INPUTSIZE);
             scriptRelaxed.set_gAllocInRhs(inRhs);
             scriptRelaxed.forEach_testDotFloatFloatFloat(inLhs, out);
         } catch (Exception e) {
@@ -54,17 +54,17 @@ public class TestDot extends RSBaseCompute {
     }
 
     private void checkDotFloat2Float2Float() {
-        Allocation inLhs = CreateRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0x801f9d8e635785faL);
-        Allocation inRhs = CreateRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0x801f9d8e635785faL);
+        Allocation inLhs = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0x6458f96b84293a8fl, false);
+        Allocation inRhs = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0x6458f96b842965e5l, false);
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.FLOAT_32, 1), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 1), INPUTSIZE);
             script.set_gAllocInRhs(inRhs);
             script.forEach_testDotFloat2Float2Float(inLhs, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testDotFloat2Float2Float: " + e.toString());
         }
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.FLOAT_32, 1), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 1), INPUTSIZE);
             scriptRelaxed.set_gAllocInRhs(inRhs);
             scriptRelaxed.forEach_testDotFloat2Float2Float(inLhs, out);
         } catch (Exception e) {
@@ -73,17 +73,17 @@ public class TestDot extends RSBaseCompute {
     }
 
     private void checkDotFloat3Float3Float() {
-        Allocation inLhs = CreateRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0xd56f5b47b0c7d224L);
-        Allocation inRhs = CreateRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0xd56f5b47b0c7d224L);
+        Allocation inLhs = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0x914a48cbd43f55e9l, false);
+        Allocation inRhs = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0x914a48cbd43f813fl, false);
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.FLOAT_32, 1), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 1), INPUTSIZE);
             script.set_gAllocInRhs(inRhs);
             script.forEach_testDotFloat3Float3Float(inLhs, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testDotFloat3Float3Float: " + e.toString());
         }
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.FLOAT_32, 1), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 1), INPUTSIZE);
             scriptRelaxed.set_gAllocInRhs(inRhs);
             scriptRelaxed.forEach_testDotFloat3Float3Float(inLhs, out);
         } catch (Exception e) {
@@ -92,17 +92,17 @@ public class TestDot extends RSBaseCompute {
     }
 
     private void checkDotFloat4Float4Float() {
-        Allocation inLhs = CreateRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0x2abf1900fe381e4eL);
-        Allocation inRhs = CreateRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0x2abf1900fe381e4eL);
+        Allocation inLhs = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0xbe3b982c24557143l, false);
+        Allocation inRhs = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0xbe3b982c24559c99l, false);
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.FLOAT_32, 1), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 1), INPUTSIZE);
             script.set_gAllocInRhs(inRhs);
             script.forEach_testDotFloat4Float4Float(inLhs, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testDotFloat4Float4Float: " + e.toString());
         }
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.FLOAT_32, 1), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 1), INPUTSIZE);
             scriptRelaxed.set_gAllocInRhs(inRhs);
             scriptRelaxed.forEach_testDotFloat4Float4Float(inLhs, out);
         } catch (Exception e) {

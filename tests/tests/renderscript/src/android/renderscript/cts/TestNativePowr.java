@@ -35,17 +35,17 @@ public class TestNativePowr extends RSBaseCompute {
     }
 
     private void checkNativePowrFloatFloatFloat() {
-        Allocation inV = CreateRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0x3b156b9fa2feb73bL);
-        Allocation inY = CreateRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0x3b156b9fa2feb73bL);
+        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0x3c3550bdff7a10c2l, false);
+        Allocation inY = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0x3c3550bdff7a10c5l, false);
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.FLOAT_32, 1), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 1), INPUTSIZE);
             script.set_gAllocInY(inY);
             script.forEach_testNativePowrFloatFloatFloat(inV, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testNativePowrFloatFloatFloat: " + e.toString());
         }
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.FLOAT_32, 1), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 1), INPUTSIZE);
             scriptRelaxed.set_gAllocInY(inY);
             scriptRelaxed.forEach_testNativePowrFloatFloatFloat(inV, out);
         } catch (Exception e) {
@@ -54,17 +54,17 @@ public class TestNativePowr extends RSBaseCompute {
     }
 
     private void checkNativePowrFloat2Float2Float2() {
-        Allocation inV = CreateRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0x155505e172fd0d1fL);
-        Allocation inY = CreateRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0x155505e172fd0d1fL);
+        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0xdbc56fbe7733c926l, false);
+        Allocation inY = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0xdbc56fbe7733c929l, false);
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.FLOAT_32, 2), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 2), INPUTSIZE);
             script.set_gAllocInY(inY);
             script.forEach_testNativePowrFloat2Float2Float2(inV, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testNativePowrFloat2Float2Float2: " + e.toString());
         }
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.FLOAT_32, 2), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 2), INPUTSIZE);
             scriptRelaxed.set_gAllocInY(inY);
             scriptRelaxed.forEach_testNativePowrFloat2Float2Float2(inV, out);
         } catch (Exception e) {
@@ -73,17 +73,17 @@ public class TestNativePowr extends RSBaseCompute {
     }
 
     private void checkNativePowrFloat3Float3Float3() {
-        Allocation inV = CreateRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0xf0e3af1b15c8f920L);
-        Allocation inY = CreateRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0xf0e3af1b15c8f920L);
+        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0x302a4dde7911cac7l, false);
+        Allocation inY = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0x302a4dde7911cacal, false);
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.FLOAT_32, 3), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 3), INPUTSIZE);
             script.set_gAllocInY(inY);
             script.forEach_testNativePowrFloat3Float3Float3(inV, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testNativePowrFloat3Float3Float3: " + e.toString());
         }
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.FLOAT_32, 3), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 3), INPUTSIZE);
             scriptRelaxed.set_gAllocInY(inY);
             scriptRelaxed.forEach_testNativePowrFloat3Float3Float3(inV, out);
         } catch (Exception e) {
@@ -92,17 +92,17 @@ public class TestNativePowr extends RSBaseCompute {
     }
 
     private void checkNativePowrFloat4Float4Float4() {
-        Allocation inV = CreateRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0xcc725854b894e521L);
-        Allocation inY = CreateRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0xcc725854b894e521L);
+        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0x848f2bfe7aefcc68l, false);
+        Allocation inY = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0x848f2bfe7aefcc6bl, false);
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.FLOAT_32, 4), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 4), INPUTSIZE);
             script.set_gAllocInY(inY);
             script.forEach_testNativePowrFloat4Float4Float4(inV, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testNativePowrFloat4Float4Float4: " + e.toString());
         }
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.FLOAT_32, 4), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 4), INPUTSIZE);
             scriptRelaxed.set_gAllocInY(inY);
             scriptRelaxed.forEach_testNativePowrFloat4Float4Float4(inV, out);
         } catch (Exception e) {
