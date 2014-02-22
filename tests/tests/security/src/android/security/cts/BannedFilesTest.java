@@ -44,8 +44,18 @@ public class BannedFilesTest extends TestCase {
         assertNotSetugid("/system/bin/sync_agent");
     }
 
-    public void testNoInitRunIt() {
+    /**
+     * Detect devices allowing shell commands to be executed as root
+     * through sockets.
+     *
+     * References:
+     *
+     * https://plus.google.com/+JustinCaseAndroid/posts/e1r6c9Z9jgg
+     * https://plus.google.com/+JustinCaseAndroid/posts/5ofgPNrSu3J
+     */
+    public void testNoRootCmdSocket() {
         assertFalse("/dev/socket/init_runit", new File("/dev/socket/init_runit").exists());
+        assertFalse("/dev/socket/fotabinder", new File("/dev/socket/fotabinder").exists());
     }
 
     public void testNoSu() {
