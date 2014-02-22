@@ -18,7 +18,7 @@ package com.android.cts.verifier.sensors;
 
 import android.hardware.Sensor;
 import android.hardware.SensorManager;
-import android.hardware.cts.helpers.sensorTestOperations.VerifyMeasurementsOperation;
+import android.hardware.cts.helpers.sensorTestOperations.VerifySensorOperation;
 
 import java.util.concurrent.TimeUnit;
 
@@ -72,22 +72,24 @@ public class AccelerometerMeasurementTestActivity extends BaseSensorSemiAutomate
      * - the values representing the expectation of the test
      * - the mean of values sampled from the sensor
      */
-    private void verifyMeasurements(double ... expectations) throws Throwable {
+    private void verifyMeasurements(float ... expectations) throws Throwable {
         Thread.sleep(500 /*ms*/);
-        VerifyMeasurementsOperation verifyMeasurements = new VerifyMeasurementsOperation(
+        VerifySensorOperation verifyMeasurements = new VerifySensorOperation(
                 getApplicationContext(),
                 Sensor.TYPE_ACCELEROMETER,
                 SensorManager.SENSOR_DELAY_FASTEST,
                 0 /*reportLatencyInUs*/,
+                100 /* event count */);
+        verifyMeasurements.verifyMean(
                 expectations,
-                1.95f /* m / s^2 */);
+                new float[]{1.95f, 1.95f, 1.95f} /* m / s^2 */);
         verifyMeasurements.execute();
         logSuccess();
     }
 
     private void delayedVerifyMeasurements(
             String message,
-            double ... expectations) throws Throwable {
+            float ... expectations) throws Throwable {
         appendText(String.format("\n%s.", message));
         appendText("A sound will be played once the verification is complete...");
         waitForUser();
@@ -100,7 +102,7 @@ public class AccelerometerMeasurementTestActivity extends BaseSensorSemiAutomate
         }
     }
 
-    private void verifyMeasurements(String message, double ... expectations) throws Throwable {
+    private void verifyMeasurements(String message, float ... expectations) throws Throwable {
         appendText(String.format("\n%s.", message));
         appendText("Press 'Next' when ready and keep the device steady.");
         waitForUser();
