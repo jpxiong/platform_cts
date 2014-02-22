@@ -151,7 +151,7 @@ public class CtsConsole extends Console {
         helpBuilder.append("method\n");
         helpBuilder.append("  run cts --continue-session session_ID: run all not executed ");
         helpBuilder.append("tests from a previous CTS session\n");
-        helpBuilder.append("  run cts [options] --serial/s device_ID: run CTS on specified ");
+        helpBuilder.append("  run cts [options] --serial/-s device_ID: run CTS on specified ");
         helpBuilder.append("device\n");
         helpBuilder.append("  run cts [options] --shards number_of_shards: shard a CTS run into ");
         helpBuilder.append("given number of independent chunks, to run on multiple devices in");
