@@ -197,18 +197,27 @@ public class StreamingMediaPlayerTest extends MediaPlayerTestBase {
     }
 
     public void testPlayHlsStream() throws Throwable {
-        localHlsTest("hls.m3u8", false);
+        localHlsTest("hls.m3u8", false, false);
     }
 
     public void testPlayHlsStreamWithQueryString() throws Throwable {
-        localHlsTest("hls.m3u8", true);
+        localHlsTest("hls.m3u8", true, false);
     }
 
-    private void localHlsTest(final String name, boolean appendQueryString)
+    public void testPlayHlsStreamWithRedirect() throws Throwable {
+        localHlsTest("hls.m3u8", false, true);
+    }
+
+    private void localHlsTest(final String name, boolean appendQueryString, boolean redirect)
             throws Throwable {
         mServer = new CtsTestServer(mContext);
         try {
-            String stream_url = mServer.getAssetUrl(name);
+            String stream_url = null;
+            if (redirect) {
+                stream_url = mServer.getQueryRedirectingAssetUrl(name);
+            } else {
+                stream_url = mServer.getAssetUrl(name);
+            }
             if (appendQueryString) {
                 stream_url += "?foo=bar/baz";
             }
