@@ -370,6 +370,50 @@ public class BitmapFactoryTest extends InstrumentationTestCase {
         assertTrue(pass.isMutable());
     }
 
+    /**
+     * Create bitmap sized to load unscaled resources: start, pass, and alpha
+     */
+    private Bitmap createBitmapForReuse(int pixelCount) {
+        Bitmap bitmap = Bitmap.createBitmap(pixelCount, 1, Config.ARGB_8888);
+        bitmap.eraseColor(Color.BLACK);
+        bitmap.setHasAlpha(false);
+        return bitmap;
+    }
+
+    /**
+     * Decode resource with ResId into reuse bitmap without scaling, verifying expected hasAlpha
+     */
+    private void decodeResourceWithReuse(Bitmap reuse, int resId, boolean hasAlpha) {
+        BitmapFactory.Options options = new BitmapFactory.Options();
+        options.inMutable = true;
+        options.inSampleSize = 1;
+        options.inScaled = false;
+        options.inBitmap = reuse;
+        Bitmap output = BitmapFactory.decodeResource(mRes, resId, options);
+        assertSame(reuse, output);
+        assertEquals(output.hasAlpha(), hasAlpha);
+    }
+
+    public void testDecodeReuseHasAlpha() throws IOException {
+        final int bitmapSize = 31; // size in pixels of start, pass, and alpha resources
+        final int pixelCount = bitmapSize * bitmapSize;
+
+        // Test reuse, hasAlpha false and true
+        Bitmap bitmap = createBitmapForReuse(pixelCount);
+        decodeResourceWithReuse(bitmap, R.drawable.start, false);
+        decodeResourceWithReuse(bitmap, R.drawable.alpha, true);
+
+        // Test pre-reconfigure, hasAlpha false and true
+        bitmap = createBitmapForReuse(pixelCount);
+        bitmap.reconfigure(bitmapSize, bitmapSize, Config.ARGB_8888);
+        bitmap.setHasAlpha(true);
+        decodeResourceWithReuse(bitmap, R.drawable.start, false);
+
+        bitmap = createBitmapForReuse(pixelCount);
+        bitmap.reconfigure(bitmapSize, bitmapSize, Config.ARGB_8888);
+        decodeResourceWithReuse(bitmap, R.drawable.alpha, true);
+    }
+
     public void testDecodeReuseFormats() throws IOException {
         // reuse should support all image formats
         for (int i = 0; i < RES_IDS.length; ++i) {
