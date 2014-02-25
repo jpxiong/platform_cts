@@ -45,11 +45,11 @@ public class TestFma extends RSBaseCompute {
     }
 
     private void checkFmaFloatFloatFloatFloat() {
-        Allocation inA = CreateRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0x5f6b3ee0c34510cL);
-        Allocation inB = CreateRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0x5f6b3ee0c34510cL);
-        Allocation inC = CreateRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0x5f6b3ee0c34510cL);
+        Allocation inA = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0x5f6b3ee0c3466c2l, false);
+        Allocation inB = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0x5f6b3ee0c3466c3l, false);
+        Allocation inC = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0x5f6b3ee0c3466c4l, false);
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.FLOAT_32, 1), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 1), INPUTSIZE);
             script.set_gAllocInB(inB);
             script.set_gAllocInC(inC);
             script.forEach_testFmaFloatFloatFloatFloat(inA, out);
@@ -58,7 +58,7 @@ public class TestFma extends RSBaseCompute {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testFmaFloatFloatFloatFloat: " + e.toString());
         }
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.FLOAT_32, 1), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 1), INPUTSIZE);
             scriptRelaxed.set_gAllocInB(inB);
             scriptRelaxed.set_gAllocInC(inC);
             scriptRelaxed.forEach_testFmaFloatFloatFloatFloat(inA, out);
@@ -96,32 +96,38 @@ public class TestFma extends RSBaseCompute {
                 }
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
-                    message.append(String.format("Input inA: %x %.16f", Float.floatToRawIntBits(args.inA), args.inA));
+                    message.append(String.format("Input inA: %14.8g %8x %15a",
+                            args.inA, Float.floatToRawIntBits(args.inA), args.inA));
                     message.append("\n");
-                    message.append(String.format("Input inB: %x %.16f", Float.floatToRawIntBits(args.inB), args.inB));
+                    message.append(String.format("Input inB: %14.8g %8x %15a",
+                            args.inB, Float.floatToRawIntBits(args.inB), args.inB));
                     message.append("\n");
-                    message.append(String.format("Input inC: %x %.16f", Float.floatToRawIntBits(args.inC), args.inC));
+                    message.append(String.format("Input inC: %14.8g %8x %15a",
+                            args.inC, Float.floatToRawIntBits(args.inC), args.inC));
                     message.append("\n");
-                    message.append(String.format("Expected output out: %x %.16f", Float.floatToRawIntBits(args.out), args.out));
+                    message.append(String.format("Expected output out: %14.8g %8x %15a",
+                            args.out, Float.floatToRawIntBits(args.out), args.out));
                     message.append("\n");
-                    message.append(String.format("Actual   output out: %x %.16f", Float.floatToRawIntBits(arrayOut[i * 1 + j]), arrayOut[i * 1 + j]));
+                    message.append(String.format("Actual   output out: %14.8g %8x %15a",
+                            arrayOut[i * 1 + j], Float.floatToRawIntBits(arrayOut[i * 1 + j]), arrayOut[i * 1 + j]));
                     neededUlf = (int) (Math.abs(args.out - arrayOut[i * 1 + j]) / Math.ulp(args.out) + 0.5);
                     if (neededUlf > ulf) {
                         message.append(String.format(" FAILED, ulf needed %d, specified %d", neededUlf, ulf));
                     }
                     message.append("\n");
-                    assertTrue("Incorrect output for checkFmaFloatFloatFloatFloat" + (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                    assertTrue("Incorrect output for checkFmaFloatFloatFloatFloat" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
                 }
             }
         }
     }
 
     private void checkFmaFloat2Float2Float2Float2() {
-        Allocation inA = CreateRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0x47b62b8849bc2e24L);
-        Allocation inB = CreateRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0x47b62b8849bc2e24L);
-        Allocation inC = CreateRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0x47b62b8849bc2e24L);
+        Allocation inA = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0x47b62b8849bc43dal, false);
+        Allocation inB = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0x47b62b8849bc43dbl, false);
+        Allocation inC = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0x47b62b8849bc43dcl, false);
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.FLOAT_32, 2), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 2), INPUTSIZE);
             script.set_gAllocInB(inB);
             script.set_gAllocInC(inC);
             script.forEach_testFmaFloat2Float2Float2Float2(inA, out);
@@ -130,7 +136,7 @@ public class TestFma extends RSBaseCompute {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testFmaFloat2Float2Float2Float2: " + e.toString());
         }
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.FLOAT_32, 2), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 2), INPUTSIZE);
             scriptRelaxed.set_gAllocInB(inB);
             scriptRelaxed.set_gAllocInC(inC);
             scriptRelaxed.forEach_testFmaFloat2Float2Float2Float2(inA, out);
@@ -168,32 +174,38 @@ public class TestFma extends RSBaseCompute {
                 }
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
-                    message.append(String.format("Input inA: %x %.16f", Float.floatToRawIntBits(args.inA), args.inA));
+                    message.append(String.format("Input inA: %14.8g %8x %15a",
+                            args.inA, Float.floatToRawIntBits(args.inA), args.inA));
                     message.append("\n");
-                    message.append(String.format("Input inB: %x %.16f", Float.floatToRawIntBits(args.inB), args.inB));
+                    message.append(String.format("Input inB: %14.8g %8x %15a",
+                            args.inB, Float.floatToRawIntBits(args.inB), args.inB));
                     message.append("\n");
-                    message.append(String.format("Input inC: %x %.16f", Float.floatToRawIntBits(args.inC), args.inC));
+                    message.append(String.format("Input inC: %14.8g %8x %15a",
+                            args.inC, Float.floatToRawIntBits(args.inC), args.inC));
                     message.append("\n");
-                    message.append(String.format("Expected output out: %x %.16f", Float.floatToRawIntBits(args.out), args.out));
+                    message.append(String.format("Expected output out: %14.8g %8x %15a",
+                            args.out, Float.floatToRawIntBits(args.out), args.out));
                     message.append("\n");
-                    message.append(String.format("Actual   output out: %x %.16f", Float.floatToRawIntBits(arrayOut[i * 2 + j]), arrayOut[i * 2 + j]));
+                    message.append(String.format("Actual   output out: %14.8g %8x %15a",
+                            arrayOut[i * 2 + j], Float.floatToRawIntBits(arrayOut[i * 2 + j]), arrayOut[i * 2 + j]));
                     neededUlf = (int) (Math.abs(args.out - arrayOut[i * 2 + j]) / Math.ulp(args.out) + 0.5);
                     if (neededUlf > ulf) {
                         message.append(String.format(" FAILED, ulf needed %d, specified %d", neededUlf, ulf));
                     }
                     message.append("\n");
-                    assertTrue("Incorrect output for checkFmaFloat2Float2Float2Float2" + (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                    assertTrue("Incorrect output for checkFmaFloat2Float2Float2Float2" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
                 }
             }
         }
     }
 
     private void checkFmaFloat3Float3Float3Float3() {
-        Allocation inA = CreateRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0x1d2fcf231c2367c0L);
-        Allocation inB = CreateRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0x1d2fcf231c2367c0L);
-        Allocation inC = CreateRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0x1d2fcf231c2367c0L);
+        Allocation inA = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0x1d2fcf231c237d76l, false);
+        Allocation inB = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0x1d2fcf231c237d77l, false);
+        Allocation inC = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0x1d2fcf231c237d78l, false);
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.FLOAT_32, 3), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 3), INPUTSIZE);
             script.set_gAllocInB(inB);
             script.set_gAllocInC(inC);
             script.forEach_testFmaFloat3Float3Float3Float3(inA, out);
@@ -202,7 +214,7 @@ public class TestFma extends RSBaseCompute {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testFmaFloat3Float3Float3Float3: " + e.toString());
         }
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.FLOAT_32, 3), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 3), INPUTSIZE);
             scriptRelaxed.set_gAllocInB(inB);
             scriptRelaxed.set_gAllocInC(inC);
             scriptRelaxed.forEach_testFmaFloat3Float3Float3Float3(inA, out);
@@ -240,32 +252,38 @@ public class TestFma extends RSBaseCompute {
                 }
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
-                    message.append(String.format("Input inA: %x %.16f", Float.floatToRawIntBits(args.inA), args.inA));
+                    message.append(String.format("Input inA: %14.8g %8x %15a",
+                            args.inA, Float.floatToRawIntBits(args.inA), args.inA));
                     message.append("\n");
-                    message.append(String.format("Input inB: %x %.16f", Float.floatToRawIntBits(args.inB), args.inB));
+                    message.append(String.format("Input inB: %14.8g %8x %15a",
+                            args.inB, Float.floatToRawIntBits(args.inB), args.inB));
                     message.append("\n");
-                    message.append(String.format("Input inC: %x %.16f", Float.floatToRawIntBits(args.inC), args.inC));
+                    message.append(String.format("Input inC: %14.8g %8x %15a",
+                            args.inC, Float.floatToRawIntBits(args.inC), args.inC));
                     message.append("\n");
-                    message.append(String.format("Expected output out: %x %.16f", Float.floatToRawIntBits(args.out), args.out));
+                    message.append(String.format("Expected output out: %14.8g %8x %15a",
+                            args.out, Float.floatToRawIntBits(args.out), args.out));
                     message.append("\n");
-                    message.append(String.format("Actual   output out: %x %.16f", Float.floatToRawIntBits(arrayOut[i * 4 + j]), arrayOut[i * 4 + j]));
+                    message.append(String.format("Actual   output out: %14.8g %8x %15a",
+                            arrayOut[i * 4 + j], Float.floatToRawIntBits(arrayOut[i * 4 + j]), arrayOut[i * 4 + j]));
                     neededUlf = (int) (Math.abs(args.out - arrayOut[i * 4 + j]) / Math.ulp(args.out) + 0.5);
                     if (neededUlf > ulf) {
                         message.append(String.format(" FAILED, ulf needed %d, specified %d", neededUlf, ulf));
                     }
                     message.append("\n");
-                    assertTrue("Incorrect output for checkFmaFloat3Float3Float3Float3" + (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                    assertTrue("Incorrect output for checkFmaFloat3Float3Float3Float3" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
                 }
             }
         }
     }
 
     private void checkFmaFloat4Float4Float4Float4() {
-        Allocation inA = CreateRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0xf2a972bdee8aa15cL);
-        Allocation inB = CreateRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0xf2a972bdee8aa15cL);
-        Allocation inC = CreateRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0xf2a972bdee8aa15cL);
+        Allocation inA = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0xf2a972bdee8ab712l, false);
+        Allocation inB = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0xf2a972bdee8ab713l, false);
+        Allocation inC = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0xf2a972bdee8ab714l, false);
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.FLOAT_32, 4), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 4), INPUTSIZE);
             script.set_gAllocInB(inB);
             script.set_gAllocInC(inC);
             script.forEach_testFmaFloat4Float4Float4Float4(inA, out);
@@ -274,7 +292,7 @@ public class TestFma extends RSBaseCompute {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testFmaFloat4Float4Float4Float4: " + e.toString());
         }
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.FLOAT_32, 4), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 4), INPUTSIZE);
             scriptRelaxed.set_gAllocInB(inB);
             scriptRelaxed.set_gAllocInC(inC);
             scriptRelaxed.forEach_testFmaFloat4Float4Float4Float4(inA, out);
@@ -312,21 +330,27 @@ public class TestFma extends RSBaseCompute {
                 }
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
-                    message.append(String.format("Input inA: %x %.16f", Float.floatToRawIntBits(args.inA), args.inA));
+                    message.append(String.format("Input inA: %14.8g %8x %15a",
+                            args.inA, Float.floatToRawIntBits(args.inA), args.inA));
                     message.append("\n");
-                    message.append(String.format("Input inB: %x %.16f", Float.floatToRawIntBits(args.inB), args.inB));
+                    message.append(String.format("Input inB: %14.8g %8x %15a",
+                            args.inB, Float.floatToRawIntBits(args.inB), args.inB));
                     message.append("\n");
-                    message.append(String.format("Input inC: %x %.16f", Float.floatToRawIntBits(args.inC), args.inC));
+                    message.append(String.format("Input inC: %14.8g %8x %15a",
+                            args.inC, Float.floatToRawIntBits(args.inC), args.inC));
                     message.append("\n");
-                    message.append(String.format("Expected output out: %x %.16f", Float.floatToRawIntBits(args.out), args.out));
+                    message.append(String.format("Expected output out: %14.8g %8x %15a",
+                            args.out, Float.floatToRawIntBits(args.out), args.out));
                     message.append("\n");
-                    message.append(String.format("Actual   output out: %x %.16f", Float.floatToRawIntBits(arrayOut[i * 4 + j]), arrayOut[i * 4 + j]));
+                    message.append(String.format("Actual   output out: %14.8g %8x %15a",
+                            arrayOut[i * 4 + j], Float.floatToRawIntBits(arrayOut[i * 4 + j]), arrayOut[i * 4 + j]));
                     neededUlf = (int) (Math.abs(args.out - arrayOut[i * 4 + j]) / Math.ulp(args.out) + 0.5);
                     if (neededUlf > ulf) {
                         message.append(String.format(" FAILED, ulf needed %d, specified %d", neededUlf, ulf));
                     }
                     message.append("\n");
-                    assertTrue("Incorrect output for checkFmaFloat4Float4Float4Float4" + (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                    assertTrue("Incorrect output for checkFmaFloat4Float4Float4Float4" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
                 }
             }
         }

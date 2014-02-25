@@ -34,235 +34,67 @@ public class TestExp10 extends RSBaseCompute {
         scriptRelaxed = new ScriptC_TestExp10Relaxed(mRS);
     }
 
-    public class ArgumentsFloatFloat {
-        public float in;
-        public float out;
-
-        public int ulf;
-        public int ulfRelaxed;
-    }
-
     private void checkExp10FloatFloat() {
-        Allocation in = CreateRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0x2bee8d30fb6e3cf4L);
+        Allocation in = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0x9f6474a4cee90545l, false);
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.FLOAT_32, 1), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 1), INPUTSIZE);
             script.forEach_testExp10FloatFloat(in, out);
-            verifyResultsExp10FloatFloat(in, out, false);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testExp10FloatFloat: " + e.toString());
         }
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.FLOAT_32, 1), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 1), INPUTSIZE);
             scriptRelaxed.forEach_testExp10FloatFloat(in, out);
-            verifyResultsExp10FloatFloat(in, out, true);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testExp10FloatFloat: " + e.toString());
-        }
-    }
-
-    private void verifyResultsExp10FloatFloat(Allocation in, Allocation out, boolean relaxed) {
-        float[] arrayIn = new float[INPUTSIZE * 1];
-        in.copyTo(arrayIn);
-        float[] arrayOut = new float[INPUTSIZE * 1];
-        out.copyTo(arrayOut);
-        for (int i = 0; i < INPUTSIZE; i++) {
-            for (int j = 0; j < 1 ; j++) {
-                // Extract the inputs.
-                ArgumentsFloatFloat args = new ArgumentsFloatFloat();
-                args.in = arrayIn[i];
-                // Figure out what the outputs should have been.
-                CoreMathVerifier.computeExp10(args);
-                int ulf = relaxed ? args.ulfRelaxed : args.ulf;
-                // Figure out what the outputs should have been.
-                boolean valid = true;
-                int neededUlf = 0;
-                neededUlf = (int) (Math.abs(args.out - arrayOut[i * 1 + j]) / Math.ulp(args.out) + 0.5);
-                if (neededUlf > ulf) {
-                    valid = false;
-                }
-                if (!valid) {
-                    StringBuilder message = new StringBuilder();
-                    message.append(String.format("Input in: %x %.16f", Float.floatToRawIntBits(args.in), args.in));
-                    message.append("\n");
-                    message.append(String.format("Expected output out: %x %.16f", Float.floatToRawIntBits(args.out), args.out));
-                    message.append("\n");
-                    message.append(String.format("Actual   output out: %x %.16f", Float.floatToRawIntBits(arrayOut[i * 1 + j]), arrayOut[i * 1 + j]));
-                    neededUlf = (int) (Math.abs(args.out - arrayOut[i * 1 + j]) / Math.ulp(args.out) + 0.5);
-                    if (neededUlf > ulf) {
-                        message.append(String.format(" FAILED, ulf needed %d, specified %d", neededUlf, ulf));
-                    }
-                    message.append("\n");
-                    assertTrue("Incorrect output for checkExp10FloatFloat" + (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
-                }
-            }
         }
     }
 
     private void checkExp10Float2Float2() {
-        Allocation in = CreateRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0x40a112ee9b69b1d0L);
+        Allocation in = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0x3c8d9c56223f8a79l, false);
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.FLOAT_32, 2), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 2), INPUTSIZE);
             script.forEach_testExp10Float2Float2(in, out);
-            verifyResultsExp10Float2Float2(in, out, false);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testExp10Float2Float2: " + e.toString());
         }
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.FLOAT_32, 2), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 2), INPUTSIZE);
             scriptRelaxed.forEach_testExp10Float2Float2(in, out);
-            verifyResultsExp10Float2Float2(in, out, true);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testExp10Float2Float2: " + e.toString());
-        }
-    }
-
-    private void verifyResultsExp10Float2Float2(Allocation in, Allocation out, boolean relaxed) {
-        float[] arrayIn = new float[INPUTSIZE * 2];
-        in.copyTo(arrayIn);
-        float[] arrayOut = new float[INPUTSIZE * 2];
-        out.copyTo(arrayOut);
-        for (int i = 0; i < INPUTSIZE; i++) {
-            for (int j = 0; j < 2 ; j++) {
-                // Extract the inputs.
-                ArgumentsFloatFloat args = new ArgumentsFloatFloat();
-                args.in = arrayIn[i * 2 + j];
-                // Figure out what the outputs should have been.
-                CoreMathVerifier.computeExp10(args);
-                int ulf = relaxed ? args.ulfRelaxed : args.ulf;
-                // Figure out what the outputs should have been.
-                boolean valid = true;
-                int neededUlf = 0;
-                neededUlf = (int) (Math.abs(args.out - arrayOut[i * 2 + j]) / Math.ulp(args.out) + 0.5);
-                if (neededUlf > ulf) {
-                    valid = false;
-                }
-                if (!valid) {
-                    StringBuilder message = new StringBuilder();
-                    message.append(String.format("Input in: %x %.16f", Float.floatToRawIntBits(args.in), args.in));
-                    message.append("\n");
-                    message.append(String.format("Expected output out: %x %.16f", Float.floatToRawIntBits(args.out), args.out));
-                    message.append("\n");
-                    message.append(String.format("Actual   output out: %x %.16f", Float.floatToRawIntBits(arrayOut[i * 2 + j]), arrayOut[i * 2 + j]));
-                    neededUlf = (int) (Math.abs(args.out - arrayOut[i * 2 + j]) / Math.ulp(args.out) + 0.5);
-                    if (neededUlf > ulf) {
-                        message.append(String.format(" FAILED, ulf needed %d, specified %d", neededUlf, ulf));
-                    }
-                    message.append("\n");
-                    assertTrue("Incorrect output for checkExp10Float2Float2" + (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
-                }
-            }
         }
     }
 
     private void checkExp10Float3Float3() {
-        Allocation in = CreateRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0x4d8696aa255a153eL);
+        Allocation in = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0x3c8da6f781462013l, false);
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.FLOAT_32, 3), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 3), INPUTSIZE);
             script.forEach_testExp10Float3Float3(in, out);
-            verifyResultsExp10Float3Float3(in, out, false);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testExp10Float3Float3: " + e.toString());
         }
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.FLOAT_32, 3), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 3), INPUTSIZE);
             scriptRelaxed.forEach_testExp10Float3Float3(in, out);
-            verifyResultsExp10Float3Float3(in, out, true);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testExp10Float3Float3: " + e.toString());
-        }
-    }
-
-    private void verifyResultsExp10Float3Float3(Allocation in, Allocation out, boolean relaxed) {
-        float[] arrayIn = new float[INPUTSIZE * 4];
-        in.copyTo(arrayIn);
-        float[] arrayOut = new float[INPUTSIZE * 4];
-        out.copyTo(arrayOut);
-        for (int i = 0; i < INPUTSIZE; i++) {
-            for (int j = 0; j < 3 ; j++) {
-                // Extract the inputs.
-                ArgumentsFloatFloat args = new ArgumentsFloatFloat();
-                args.in = arrayIn[i * 4 + j];
-                // Figure out what the outputs should have been.
-                CoreMathVerifier.computeExp10(args);
-                int ulf = relaxed ? args.ulfRelaxed : args.ulf;
-                // Figure out what the outputs should have been.
-                boolean valid = true;
-                int neededUlf = 0;
-                neededUlf = (int) (Math.abs(args.out - arrayOut[i * 4 + j]) / Math.ulp(args.out) + 0.5);
-                if (neededUlf > ulf) {
-                    valid = false;
-                }
-                if (!valid) {
-                    StringBuilder message = new StringBuilder();
-                    message.append(String.format("Input in: %x %.16f", Float.floatToRawIntBits(args.in), args.in));
-                    message.append("\n");
-                    message.append(String.format("Expected output out: %x %.16f", Float.floatToRawIntBits(args.out), args.out));
-                    message.append("\n");
-                    message.append(String.format("Actual   output out: %x %.16f", Float.floatToRawIntBits(arrayOut[i * 4 + j]), arrayOut[i * 4 + j]));
-                    neededUlf = (int) (Math.abs(args.out - arrayOut[i * 4 + j]) / Math.ulp(args.out) + 0.5);
-                    if (neededUlf > ulf) {
-                        message.append(String.format(" FAILED, ulf needed %d, specified %d", neededUlf, ulf));
-                    }
-                    message.append("\n");
-                    assertTrue("Incorrect output for checkExp10Float3Float3" + (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
-                }
-            }
         }
     }
 
     private void checkExp10Float4Float4() {
-        Allocation in = CreateRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0x5a6c1a65af4a78acL);
+        Allocation in = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0x3c8db198e04cb5adl, false);
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.FLOAT_32, 4), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 4), INPUTSIZE);
             script.forEach_testExp10Float4Float4(in, out);
-            verifyResultsExp10Float4Float4(in, out, false);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testExp10Float4Float4: " + e.toString());
         }
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.FLOAT_32, 4), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 4), INPUTSIZE);
             scriptRelaxed.forEach_testExp10Float4Float4(in, out);
-            verifyResultsExp10Float4Float4(in, out, true);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testExp10Float4Float4: " + e.toString());
-        }
-    }
-
-    private void verifyResultsExp10Float4Float4(Allocation in, Allocation out, boolean relaxed) {
-        float[] arrayIn = new float[INPUTSIZE * 4];
-        in.copyTo(arrayIn);
-        float[] arrayOut = new float[INPUTSIZE * 4];
-        out.copyTo(arrayOut);
-        for (int i = 0; i < INPUTSIZE; i++) {
-            for (int j = 0; j < 4 ; j++) {
-                // Extract the inputs.
-                ArgumentsFloatFloat args = new ArgumentsFloatFloat();
-                args.in = arrayIn[i * 4 + j];
-                // Figure out what the outputs should have been.
-                CoreMathVerifier.computeExp10(args);
-                int ulf = relaxed ? args.ulfRelaxed : args.ulf;
-                // Figure out what the outputs should have been.
-                boolean valid = true;
-                int neededUlf = 0;
-                neededUlf = (int) (Math.abs(args.out - arrayOut[i * 4 + j]) / Math.ulp(args.out) + 0.5);
-                if (neededUlf > ulf) {
-                    valid = false;
-                }
-                if (!valid) {
-                    StringBuilder message = new StringBuilder();
-                    message.append(String.format("Input in: %x %.16f", Float.floatToRawIntBits(args.in), args.in));
-                    message.append("\n");
-                    message.append(String.format("Expected output out: %x %.16f", Float.floatToRawIntBits(args.out), args.out));
-                    message.append("\n");
-                    message.append(String.format("Actual   output out: %x %.16f", Float.floatToRawIntBits(arrayOut[i * 4 + j]), arrayOut[i * 4 + j]));
-                    neededUlf = (int) (Math.abs(args.out - arrayOut[i * 4 + j]) / Math.ulp(args.out) + 0.5);
-                    if (neededUlf > ulf) {
-                        message.append(String.format(" FAILED, ulf needed %d, specified %d", neededUlf, ulf));
-                    }
-                    message.append("\n");
-                    assertTrue("Incorrect output for checkExp10Float4Float4" + (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
-                }
-            }
         }
     }
 
