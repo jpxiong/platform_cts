@@ -21,6 +21,7 @@ import android.app.admin.DevicePolicyManager;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.deviceadmin.cts.CtsDeviceAdminBrokenReceiver;
 import android.deviceadmin.cts.CtsDeviceAdminBrokenReceiver2;
 import android.deviceadmin.cts.CtsDeviceAdminBrokenReceiver3;
@@ -31,6 +32,7 @@ import android.deviceadmin.cts.CtsDeviceAdminActivationTestActivity;
 import android.deviceadmin.cts.CtsDeviceAdminActivationTestActivity.OnActivityResultListener;
 import android.os.SystemClock;
 import android.test.ActivityInstrumentationTestCase2;
+import android.util.Log;
 
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
@@ -45,6 +47,8 @@ import org.mockito.MockitoAnnotations;
 public class DeviceAdminActivationTest
     extends ActivityInstrumentationTestCase2<CtsDeviceAdminActivationTestActivity> {
 
+    private static final String TAG = DeviceAdminActivationTest.class.getSimpleName();
+
     // IMPLEMENTATION NOTE: Because Device Admin activation requires the use of
     // Activity.startActivityForResult, this test creates an empty Activity which then invokes
     // startActivityForResult.
@@ -57,6 +61,7 @@ public class DeviceAdminActivationTest
      */
     private static final int UI_EFFECT_TIMEOUT_MILLIS = 5000;
 
+    private boolean mDeviceAdmin;
     @Mock private OnActivityResultListener mMockOnActivityResultListener;
 
     public DeviceAdminActivationTest() {
@@ -68,6 +73,8 @@ public class DeviceAdminActivationTest
         super.setUp();
         MockitoAnnotations.initMocks(this);
         getActivity().setOnActivityResultListener(mMockOnActivityResultListener);
+        mDeviceAdmin = getInstrumentation().getContext().getPackageManager().hasSystemFeature(
+                PackageManager.FEATURE_DEVICE_ADMIN);
     }
 
     @Override
@@ -80,6 +87,10 @@ public class DeviceAdminActivationTest
     }
 
     public void testActivateGoodReceiverDisplaysActivationUi() throws Exception {
+        if (!mDeviceAdmin) {
+            Log.w(TAG, "Skipping testActivateGoodReceiverDisplaysActivationUi");
+            return;
+        }
         assertDeviceAdminDeactivated(CtsDeviceAdminDeactivatedReceiver.class);
         startAddDeviceAdminActivityForResult(CtsDeviceAdminDeactivatedReceiver.class);
         assertWithTimeoutOnActivityResultNotInvoked();
@@ -91,6 +102,10 @@ public class DeviceAdminActivationTest
     }
 
     public void testActivateBrokenReceiverFails() throws Exception {
+        if (!mDeviceAdmin) {
+            Log.w(TAG, "Skipping testActivateBrokenReceiverFails");
+            return;
+        }
         assertDeviceAdminDeactivated(CtsDeviceAdminBrokenReceiver.class);
         startAddDeviceAdminActivityForResult(CtsDeviceAdminBrokenReceiver.class);
         assertWithTimeoutOnActivityResultInvokedWithResultCode(Activity.RESULT_CANCELED);
@@ -98,6 +113,10 @@ public class DeviceAdminActivationTest
     }
 
     public void testActivateBrokenReceiver2Fails() throws Exception {
+        if (!mDeviceAdmin) {
+            Log.w(TAG, "Skipping testActivateBrokenReceiver2Fails");
+            return;
+        }
         assertDeviceAdminDeactivated(CtsDeviceAdminBrokenReceiver2.class);
         startAddDeviceAdminActivityForResult(CtsDeviceAdminBrokenReceiver2.class);
         assertWithTimeoutOnActivityResultInvokedWithResultCode(Activity.RESULT_CANCELED);
@@ -105,6 +124,10 @@ public class DeviceAdminActivationTest
     }
 
     public void testActivateBrokenReceiver3Fails() throws Exception {
+        if (!mDeviceAdmin) {
+            Log.w(TAG, "Skipping testActivateBrokenReceiver3Fails");
+            return;
+        }
         assertDeviceAdminDeactivated(CtsDeviceAdminBrokenReceiver3.class);
         startAddDeviceAdminActivityForResult(CtsDeviceAdminBrokenReceiver3.class);
         assertWithTimeoutOnActivityResultInvokedWithResultCode(Activity.RESULT_CANCELED);
@@ -112,6 +135,10 @@ public class DeviceAdminActivationTest
     }
 
     public void testActivateBrokenReceiver4Fails() throws Exception {
+        if (!mDeviceAdmin) {
+            Log.w(TAG, "Skipping testActivateBrokenReceiver4Fails");
+            return;
+        }
         assertDeviceAdminDeactivated(CtsDeviceAdminBrokenReceiver4.class);
         startAddDeviceAdminActivityForResult(CtsDeviceAdminBrokenReceiver4.class);
         assertWithTimeoutOnActivityResultInvokedWithResultCode(Activity.RESULT_CANCELED);
@@ -119,6 +146,10 @@ public class DeviceAdminActivationTest
     }
 
     public void testActivateBrokenReceiver5Fails() throws Exception {
+        if (!mDeviceAdmin) {
+            Log.w(TAG, "Skipping testActivateBrokenReceiver5Fails");
+            return;
+        }
         assertDeviceAdminDeactivated(CtsDeviceAdminBrokenReceiver5.class);
         startAddDeviceAdminActivityForResult(CtsDeviceAdminBrokenReceiver5.class);
         assertWithTimeoutOnActivityResultInvokedWithResultCode(Activity.RESULT_CANCELED);
