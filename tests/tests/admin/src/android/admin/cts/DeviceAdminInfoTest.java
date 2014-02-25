@@ -21,14 +21,16 @@ import android.content.ComponentName;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.test.AndroidTestCase;
+import android.util.Log;
 
 public class DeviceAdminInfoTest extends AndroidTestCase {
 
+    private static final String TAG = DeviceAdminInfoTest.class.getSimpleName();
+
     private PackageManager mPackageManager;
-
     private ComponentName mComponent;
-
     private ComponentName mSecondComponent;
+    private boolean mDeviceAdmin;
 
     @Override
     protected void setUp() throws Exception {
@@ -36,6 +38,8 @@ public class DeviceAdminInfoTest extends AndroidTestCase {
         mPackageManager = mContext.getPackageManager();
         mComponent = getReceiverComponent();
         mSecondComponent = getSecondReceiverComponent();
+        mDeviceAdmin =
+                mContext.getPackageManager().hasSystemFeature(PackageManager.FEATURE_DEVICE_ADMIN);
     }
 
     static ComponentName getReceiverComponent() {
@@ -49,6 +53,10 @@ public class DeviceAdminInfoTest extends AndroidTestCase {
     }
 
     public void testDeviceAdminInfo() throws Exception {
+        if (!mDeviceAdmin) {
+            Log.w(TAG, "Skipping testDeviceAdminInfo");
+            return;
+        }
         ResolveInfo resolveInfo = new ResolveInfo();
         resolveInfo.activityInfo = mPackageManager.getReceiverInfo(mComponent,
                 PackageManager.GET_META_DATA);
@@ -77,6 +85,10 @@ public class DeviceAdminInfoTest extends AndroidTestCase {
     }
 
     public void testDeviceAdminInfo2() throws Exception {
+        if (!mDeviceAdmin) {
+            Log.w(TAG, "Skipping testDeviceAdminInfo2");
+            return;
+        }
         ResolveInfo resolveInfo = new ResolveInfo();
         resolveInfo.activityInfo = mPackageManager.getReceiverInfo(mSecondComponent,
                 PackageManager.GET_META_DATA);
