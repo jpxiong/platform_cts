@@ -19,12 +19,10 @@ import com.android.cts.nativescanner.TestScanner;
 
 import junit.framework.TestCase;
 
-import java.io.File;
+import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.StringReader;
-import java.lang.StringBuilder;
-import java.util.Scanner;
 import java.util.List;
-import java.util.ArrayList;
 import java.util.Iterator;
 
 /**
@@ -32,31 +30,49 @@ import java.util.Iterator;
  */
 public class TestScannerTest extends TestCase {
 
-    public void testScanFile() {
-        TestScanner testScanner = new TestScanner(new File("unused"), "TestSuite");
+    public void testSingleTestNamesCase() throws Exception {
+        StringReader singleTestString = new StringReader("FakeTestCase.\n  FakeTestName\n");
+        BufferedReader reader = new BufferedReader(singleTestString);
 
-        String newLine = System.getProperty("line.separator");
-        StringBuilder sb = new StringBuilder();
-        sb.append("foobar" + newLine);  // ignored
-        sb.append("TEST_F(TestCase1, TestName1)" + newLine);  // valid
-        sb.append("TEST_F(TestCase1, TestName2)" + newLine);  // valid
-        sb.append("TEST_F(TestCase2, TestName1) foo" + newLine);  // valid
-        sb.append("TEST_F(TestCase2, TestName1 foo)" + newLine);  // ignored
-        sb.append("foo TEST_F(TestCase2, TestName1)" + newLine);  // ignored
+        TestScanner testScanner = new TestScanner(reader, "TestSuite");
 
-        List<String> names = new ArrayList<String>();
-        Scanner scanner = new Scanner(new StringReader(sb.toString()));
-        testScanner.scanFile(scanner, names);
+        List<String> names = testScanner.getTestNames();
         Iterator it = names.iterator();
-
         assertEquals("suite:TestSuite", it.next());
-        assertEquals("case:TestCase1", it.next());
-        assertEquals("test:TestName1", it.next());
-        assertEquals("test:TestName2", it.next());
-        assertEquals("suite:TestSuite", it.next());
-        assertEquals("case:TestCase2", it.next());
-        assertEquals("test:TestName1", it.next());
+        assertEquals("case:FakeTestCase", it.next());
+        assertEquals("test:FakeTestName", it.next());
         assertFalse(it.hasNext());
-        scanner.close();
+    }
+
+    public void testMultipleTestNamesCase() throws Exception {
+        StringReader singleTestString = new StringReader(
+          "Case1.\n  Test1\n  Test2\nCase2.\n  Test3\n Test4\n");
+        BufferedReader reader = new BufferedReader(singleTestString);
+
+        TestScanner testScanner = new TestScanner(reader, "TestSuite");
+
+        List<String> names = testScanner.getTestNames();
+        Iterator it = names.iterator();
+        assertEquals("suite:TestSuite", it.next());
+        assertEquals("case:Case1", it.next());
+        assertEquals("test:Test1", it.next());
+        assertEquals("test:Test2", it.next());
+        assertEquals("case:Case2", it.next());
+        assertEquals("test:Test3", it.next());
+        assertEquals("test:Test4", it.next());
+        assertFalse(it.hasNext());
+    }
+
+    public void testMissingTestCaseNameCase() {
+        StringReader singleTestString = new StringReader("  Test1\n");
+        BufferedReader reader = new BufferedReader(singleTestString);
+
+        TestScanner testScanner = new TestScanner(reader, "TestSuite");
+
+        try {
+          List<String> names = testScanner.getTestNames();
+          fail();
+        } catch (IOException expected) {
+        }
     }
 }
