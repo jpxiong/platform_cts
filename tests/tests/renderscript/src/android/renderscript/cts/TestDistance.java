@@ -35,17 +35,17 @@ public class TestDistance extends RSBaseCompute {
     }
 
     private void checkDistanceFloatFloatFloat() {
-        Allocation inLhs = CreateRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0xc59ba39081863ae0L);
-        Allocation inRhs = CreateRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0xc59ba39081863ae0L);
+        Allocation inLhs = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0xf62f685ebafc5b67l, false);
+        Allocation inRhs = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0xf62f685ebafc86bdl, false);
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.FLOAT_32, 1), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 1), INPUTSIZE);
             script.set_gAllocInRhs(inRhs);
             script.forEach_testDistanceFloatFloatFloat(inLhs, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testDistanceFloatFloatFloat: " + e.toString());
         }
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.FLOAT_32, 1), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 1), INPUTSIZE);
             scriptRelaxed.set_gAllocInRhs(inRhs);
             scriptRelaxed.forEach_testDistanceFloatFloatFloat(inLhs, out);
         } catch (Exception e) {
@@ -54,17 +54,17 @@ public class TestDistance extends RSBaseCompute {
     }
 
     private void checkDistanceFloat2Float2Float() {
-        Allocation inLhs = CreateRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0x5c363077b8636a24L);
-        Allocation inRhs = CreateRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0x5c363077b8636a24L);
+        Allocation inLhs = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0x3fdeb51f89981593l, false);
+        Allocation inRhs = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0x3fdeb51f899840e9l, false);
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.FLOAT_32, 1), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 1), INPUTSIZE);
             script.set_gAllocInRhs(inRhs);
             script.forEach_testDistanceFloat2Float2Float(inLhs, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testDistanceFloat2Float2Float: " + e.toString());
         }
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.FLOAT_32, 1), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 1), INPUTSIZE);
             scriptRelaxed.set_gAllocInRhs(inRhs);
             scriptRelaxed.forEach_testDistanceFloat2Float2Float(inLhs, out);
         } catch (Exception e) {
@@ -73,17 +73,17 @@ public class TestDistance extends RSBaseCompute {
     }
 
     private void checkDistanceFloat3Float3Float() {
-        Allocation inLhs = CreateRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0x60e565c07a341ad2L);
-        Allocation inRhs = CreateRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0x60e565c07a341ad2L);
+        Allocation inLhs = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0x6cd0047fd9ae30edl, false);
+        Allocation inRhs = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0x6cd0047fd9ae5c43l, false);
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.FLOAT_32, 1), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 1), INPUTSIZE);
             script.set_gAllocInRhs(inRhs);
             script.forEach_testDistanceFloat3Float3Float(inLhs, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testDistanceFloat3Float3Float: " + e.toString());
         }
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.FLOAT_32, 1), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 1), INPUTSIZE);
             scriptRelaxed.set_gAllocInRhs(inRhs);
             scriptRelaxed.forEach_testDistanceFloat3Float3Float(inLhs, out);
         } catch (Exception e) {
@@ -92,17 +92,17 @@ public class TestDistance extends RSBaseCompute {
     }
 
     private void checkDistanceFloat4Float4Float() {
-        Allocation inLhs = CreateRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0x65949b093c04cb80L);
-        Allocation inRhs = CreateRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0x65949b093c04cb80L);
+        Allocation inLhs = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0x99c153e029c44c47l, false);
+        Allocation inRhs = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0x99c153e029c4779dl, false);
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.FLOAT_32, 1), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 1), INPUTSIZE);
             script.set_gAllocInRhs(inRhs);
             script.forEach_testDistanceFloat4Float4Float(inLhs, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testDistanceFloat4Float4Float: " + e.toString());
         }
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.FLOAT_32, 1), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 1), INPUTSIZE);
             scriptRelaxed.set_gAllocInRhs(inRhs);
             scriptRelaxed.forEach_testDistanceFloat4Float4Float(inLhs, out);
         } catch (Exception e) {

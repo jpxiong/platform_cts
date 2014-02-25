@@ -35,17 +35,17 @@ public class TestCross extends RSBaseCompute {
     }
 
     private void checkCrossFloat3Float3Float3() {
-        Allocation inLhs = CreateRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0xdec3726a2862c67fL);
-        Allocation inRhs = CreateRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0xdec3726a2862c67fL);
+        Allocation inLhs = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0xdec3726a2995edb5l, false);
+        Allocation inRhs = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0xdec3726a2996190bl, false);
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.FLOAT_32, 3), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 3), INPUTSIZE);
             script.set_gAllocInRhs(inRhs);
             script.forEach_testCrossFloat3Float3Float3(inLhs, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testCrossFloat3Float3Float3: " + e.toString());
         }
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.FLOAT_32, 3), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 3), INPUTSIZE);
             scriptRelaxed.set_gAllocInRhs(inRhs);
             scriptRelaxed.forEach_testCrossFloat3Float3Float3(inLhs, out);
         } catch (Exception e) {
@@ -54,17 +54,17 @@ public class TestCross extends RSBaseCompute {
     }
 
     private void checkCrossFloat4Float4Float4() {
-        Allocation inLhs = CreateRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0x6b4bc797a4dc8a58L);
-        Allocation inRhs = CreateRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0x6b4bc797a4dc8a58L);
+        Allocation inLhs = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0x6b4bc797a60fb18el, false);
+        Allocation inRhs = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0x6b4bc797a60fdce4l, false);
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.FLOAT_32, 4), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 4), INPUTSIZE);
             script.set_gAllocInRhs(inRhs);
             script.forEach_testCrossFloat4Float4Float4(inLhs, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testCrossFloat4Float4Float4: " + e.toString());
         }
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.FLOAT_32, 4), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 4), INPUTSIZE);
             scriptRelaxed.set_gAllocInRhs(inRhs);
             scriptRelaxed.forEach_testCrossFloat4Float4Float4(inLhs, out);
         } catch (Exception e) {

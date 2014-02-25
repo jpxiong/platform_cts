@@ -43,16 +43,16 @@ public class TestClz extends RSBaseCompute {
     }
 
     private void checkClzCharChar() {
-        Allocation inValue = CreateRandomAllocation(mRS, Element.DataType.SIGNED_8, 1, 0x4027c06bce499b9cL);
+        Allocation inValue = createRandomAllocation(mRS, Element.DataType.SIGNED_8, 1, 0xf6f3a15e2f7765afl, false);
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.SIGNED_8, 1), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_8, 1), INPUTSIZE);
             script.forEach_testClzCharChar(inValue, out);
             verifyResultsClzCharChar(inValue, out, false);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testClzCharChar: " + e.toString());
         }
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.SIGNED_8, 1), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_8, 1), INPUTSIZE);
             scriptRelaxed.forEach_testClzCharChar(inValue, out);
             verifyResultsClzCharChar(inValue, out, true);
         } catch (Exception e) {
@@ -81,32 +81,36 @@ public class TestClz extends RSBaseCompute {
                 }
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
-                    message.append(String.format("Input inValue: %d", args.inValue));
+                    message.append(String.format("Input inValue: %d",
+                            args.inValue));
                     message.append("\n");
-                    message.append(String.format("Expected output out: %d", args.out));
+                    message.append(String.format("Expected output out: %d",
+                            args.out));
                     message.append("\n");
-                    message.append(String.format("Actual   output out: %d", arrayOut[i * 1 + j]));
+                    message.append(String.format("Actual   output out: %d",
+                            arrayOut[i * 1 + j]));
                     if (args.out != arrayOut[i * 1 + j]) {
                         message.append(" FAIL");
                     }
                     message.append("\n");
-                    assertTrue("Incorrect output for checkClzCharChar" + (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                    assertTrue("Incorrect output for checkClzCharChar" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
                 }
             }
         }
     }
 
     private void checkClzChar2Char2() {
-        Allocation inValue = CreateRandomAllocation(mRS, Element.DataType.SIGNED_8, 2, 0x5f1c0cd1b86413c0L);
+        Allocation inValue = createRandomAllocation(mRS, Element.DataType.SIGNED_8, 2, 0xf718b99dcaca5e93l, false);
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.SIGNED_8, 2), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_8, 2), INPUTSIZE);
             script.forEach_testClzChar2Char2(inValue, out);
             verifyResultsClzChar2Char2(inValue, out, false);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testClzChar2Char2: " + e.toString());
         }
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.SIGNED_8, 2), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_8, 2), INPUTSIZE);
             scriptRelaxed.forEach_testClzChar2Char2(inValue, out);
             verifyResultsClzChar2Char2(inValue, out, true);
         } catch (Exception e) {
@@ -135,32 +139,36 @@ public class TestClz extends RSBaseCompute {
                 }
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
-                    message.append(String.format("Input inValue: %d", args.inValue));
+                    message.append(String.format("Input inValue: %d",
+                            args.inValue));
                     message.append("\n");
-                    message.append(String.format("Expected output out: %d", args.out));
+                    message.append(String.format("Expected output out: %d",
+                            args.out));
                     message.append("\n");
-                    message.append(String.format("Actual   output out: %d", arrayOut[i * 2 + j]));
+                    message.append(String.format("Actual   output out: %d",
+                            arrayOut[i * 2 + j]));
                     if (args.out != arrayOut[i * 2 + j]) {
                         message.append(" FAIL");
                     }
                     message.append("\n");
-                    assertTrue("Incorrect output for checkClzChar2Char2" + (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                    assertTrue("Incorrect output for checkClzChar2Char2" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
                 }
             }
         }
     }
 
     private void checkClzChar3Char3() {
-        Allocation inValue = CreateRandomAllocation(mRS, Element.DataType.SIGNED_8, 3, 0x5f1c1773176bd8b4L);
+        Allocation inValue = createRandomAllocation(mRS, Element.DataType.SIGNED_8, 3, 0x21a5da5bc7099347l, false);
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.SIGNED_8, 3), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_8, 3), INPUTSIZE);
             script.forEach_testClzChar3Char3(inValue, out);
             verifyResultsClzChar3Char3(inValue, out, false);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testClzChar3Char3: " + e.toString());
         }
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.SIGNED_8, 3), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_8, 3), INPUTSIZE);
             scriptRelaxed.forEach_testClzChar3Char3(inValue, out);
             verifyResultsClzChar3Char3(inValue, out, true);
         } catch (Exception e) {
@@ -189,32 +197,36 @@ public class TestClz extends RSBaseCompute {
                 }
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
-                    message.append(String.format("Input inValue: %d", args.inValue));
+                    message.append(String.format("Input inValue: %d",
+                            args.inValue));
                     message.append("\n");
-                    message.append(String.format("Expected output out: %d", args.out));
+                    message.append(String.format("Expected output out: %d",
+                            args.out));
                     message.append("\n");
-                    message.append(String.format("Actual   output out: %d", arrayOut[i * 4 + j]));
+                    message.append(String.format("Actual   output out: %d",
+                            arrayOut[i * 4 + j]));
                     if (args.out != arrayOut[i * 4 + j]) {
                         message.append(" FAIL");
                     }
                     message.append("\n");
-                    assertTrue("Incorrect output for checkClzChar3Char3" + (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                    assertTrue("Incorrect output for checkClzChar3Char3" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
                 }
             }
         }
     }
 
     private void checkClzChar4Char4() {
-        Allocation inValue = CreateRandomAllocation(mRS, Element.DataType.SIGNED_8, 4, 0x5f1c221476739da8L);
+        Allocation inValue = createRandomAllocation(mRS, Element.DataType.SIGNED_8, 4, 0x4c32fb19c348c7fbl, false);
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.SIGNED_8, 4), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_8, 4), INPUTSIZE);
             script.forEach_testClzChar4Char4(inValue, out);
             verifyResultsClzChar4Char4(inValue, out, false);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testClzChar4Char4: " + e.toString());
         }
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.SIGNED_8, 4), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_8, 4), INPUTSIZE);
             scriptRelaxed.forEach_testClzChar4Char4(inValue, out);
             verifyResultsClzChar4Char4(inValue, out, true);
         } catch (Exception e) {
@@ -243,16 +255,20 @@ public class TestClz extends RSBaseCompute {
                 }
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
-                    message.append(String.format("Input inValue: %d", args.inValue));
+                    message.append(String.format("Input inValue: %d",
+                            args.inValue));
                     message.append("\n");
-                    message.append(String.format("Expected output out: %d", args.out));
+                    message.append(String.format("Expected output out: %d",
+                            args.out));
                     message.append("\n");
-                    message.append(String.format("Actual   output out: %d", arrayOut[i * 4 + j]));
+                    message.append(String.format("Actual   output out: %d",
+                            arrayOut[i * 4 + j]));
                     if (args.out != arrayOut[i * 4 + j]) {
                         message.append(" FAIL");
                     }
                     message.append("\n");
-                    assertTrue("Incorrect output for checkClzChar4Char4" + (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                    assertTrue("Incorrect output for checkClzChar4Char4" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
                 }
             }
         }
@@ -267,16 +283,16 @@ public class TestClz extends RSBaseCompute {
     }
 
     private void checkClzUcharUchar() {
-        Allocation inValue = CreateRandomAllocation(mRS, Element.DataType.UNSIGNED_8, 1, 0x1e8a89bd939a7c6cL);
+        Allocation inValue = createRandomAllocation(mRS, Element.DataType.UNSIGNED_8, 1, 0xd2e451b48b84f57fl, false);
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.UNSIGNED_8, 1), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_8, 1), INPUTSIZE);
             script.forEach_testClzUcharUchar(inValue, out);
             verifyResultsClzUcharUchar(inValue, out, false);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testClzUcharUchar: " + e.toString());
         }
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.UNSIGNED_8, 1), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_8, 1), INPUTSIZE);
             scriptRelaxed.forEach_testClzUcharUchar(inValue, out);
             verifyResultsClzUcharUchar(inValue, out, true);
         } catch (Exception e) {
@@ -305,32 +321,36 @@ public class TestClz extends RSBaseCompute {
                 }
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
-                    message.append(String.format("Input inValue: %x", args.inValue));
+                    message.append(String.format("Input inValue: 0x%x",
+                            args.inValue));
                     message.append("\n");
-                    message.append(String.format("Expected output out: %x", args.out));
+                    message.append(String.format("Expected output out: 0x%x",
+                            args.out));
                     message.append("\n");
-                    message.append(String.format("Actual   output out: %x", arrayOut[i * 1 + j]));
+                    message.append(String.format("Actual   output out: 0x%x",
+                            arrayOut[i * 1 + j]));
                     if (args.out != arrayOut[i * 1 + j]) {
                         message.append(" FAIL");
                     }
                     message.append("\n");
-                    assertTrue("Incorrect output for checkClzUcharUchar" + (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                    assertTrue("Incorrect output for checkClzUcharUchar" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
                 }
             }
         }
     }
 
     private void checkClzUchar2Uchar2() {
-        Allocation inValue = CreateRandomAllocation(mRS, Element.DataType.UNSIGNED_8, 2, 0x965dc58989efa952L);
+        Allocation inValue = createRandomAllocation(mRS, Element.DataType.UNSIGNED_8, 2, 0x792e2970f47ebc85l, false);
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.UNSIGNED_8, 2), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_8, 2), INPUTSIZE);
             script.forEach_testClzUchar2Uchar2(inValue, out);
             verifyResultsClzUchar2Uchar2(inValue, out, false);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testClzUchar2Uchar2: " + e.toString());
         }
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.UNSIGNED_8, 2), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_8, 2), INPUTSIZE);
             scriptRelaxed.forEach_testClzUchar2Uchar2(inValue, out);
             verifyResultsClzUchar2Uchar2(inValue, out, true);
         } catch (Exception e) {
@@ -359,32 +379,36 @@ public class TestClz extends RSBaseCompute {
                 }
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
-                    message.append(String.format("Input inValue: %x", args.inValue));
+                    message.append(String.format("Input inValue: 0x%x",
+                            args.inValue));
                     message.append("\n");
-                    message.append(String.format("Expected output out: %x", args.out));
+                    message.append(String.format("Expected output out: 0x%x",
+                            args.out));
                     message.append("\n");
-                    message.append(String.format("Actual   output out: %x", arrayOut[i * 2 + j]));
+                    message.append(String.format("Actual   output out: 0x%x",
+                            arrayOut[i * 2 + j]));
                     if (args.out != arrayOut[i * 2 + j]) {
                         message.append(" FAIL");
                     }
                     message.append("\n");
-                    assertTrue("Incorrect output for checkClzUchar2Uchar2" + (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                    assertTrue("Incorrect output for checkClzUchar2Uchar2" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
                 }
             }
         }
     }
 
     private void checkClzUchar3Uchar3() {
-        Allocation inValue = CreateRandomAllocation(mRS, Element.DataType.UNSIGNED_8, 3, 0x965f8ea4800aca30L);
+        Allocation inValue = createRandomAllocation(mRS, Element.DataType.UNSIGNED_8, 3, 0x9ee29ef83dbce203l, false);
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.UNSIGNED_8, 3), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_8, 3), INPUTSIZE);
             script.forEach_testClzUchar3Uchar3(inValue, out);
             verifyResultsClzUchar3Uchar3(inValue, out, false);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testClzUchar3Uchar3: " + e.toString());
         }
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.UNSIGNED_8, 3), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_8, 3), INPUTSIZE);
             scriptRelaxed.forEach_testClzUchar3Uchar3(inValue, out);
             verifyResultsClzUchar3Uchar3(inValue, out, true);
         } catch (Exception e) {
@@ -413,32 +437,36 @@ public class TestClz extends RSBaseCompute {
                 }
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
-                    message.append(String.format("Input inValue: %x", args.inValue));
+                    message.append(String.format("Input inValue: 0x%x",
+                            args.inValue));
                     message.append("\n");
-                    message.append(String.format("Expected output out: %x", args.out));
+                    message.append(String.format("Expected output out: 0x%x",
+                            args.out));
                     message.append("\n");
-                    message.append(String.format("Actual   output out: %x", arrayOut[i * 4 + j]));
+                    message.append(String.format("Actual   output out: 0x%x",
+                            arrayOut[i * 4 + j]));
                     if (args.out != arrayOut[i * 4 + j]) {
                         message.append(" FAIL");
                     }
                     message.append("\n");
-                    assertTrue("Incorrect output for checkClzUchar3Uchar3" + (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                    assertTrue("Incorrect output for checkClzUchar3Uchar3" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
                 }
             }
         }
     }
 
     private void checkClzUchar4Uchar4() {
-        Allocation inValue = CreateRandomAllocation(mRS, Element.DataType.UNSIGNED_8, 4, 0x966157bf7625eb0eL);
+        Allocation inValue = createRandomAllocation(mRS, Element.DataType.UNSIGNED_8, 4, 0xc497147f86fb0781l, false);
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.UNSIGNED_8, 4), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_8, 4), INPUTSIZE);
             script.forEach_testClzUchar4Uchar4(inValue, out);
             verifyResultsClzUchar4Uchar4(inValue, out, false);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testClzUchar4Uchar4: " + e.toString());
         }
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.UNSIGNED_8, 4), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_8, 4), INPUTSIZE);
             scriptRelaxed.forEach_testClzUchar4Uchar4(inValue, out);
             verifyResultsClzUchar4Uchar4(inValue, out, true);
         } catch (Exception e) {
@@ -467,16 +495,20 @@ public class TestClz extends RSBaseCompute {
                 }
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
-                    message.append(String.format("Input inValue: %x", args.inValue));
+                    message.append(String.format("Input inValue: 0x%x",
+                            args.inValue));
                     message.append("\n");
-                    message.append(String.format("Expected output out: %x", args.out));
+                    message.append(String.format("Expected output out: 0x%x",
+                            args.out));
                     message.append("\n");
-                    message.append(String.format("Actual   output out: %x", arrayOut[i * 4 + j]));
+                    message.append(String.format("Actual   output out: 0x%x",
+                            arrayOut[i * 4 + j]));
                     if (args.out != arrayOut[i * 4 + j]) {
                         message.append(" FAIL");
                     }
                     message.append("\n");
-                    assertTrue("Incorrect output for checkClzUchar4Uchar4" + (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                    assertTrue("Incorrect output for checkClzUchar4Uchar4" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
                 }
             }
         }
@@ -491,16 +523,16 @@ public class TestClz extends RSBaseCompute {
     }
 
     private void checkClzShortShort() {
-        Allocation inValue = CreateRandomAllocation(mRS, Element.DataType.SIGNED_16, 1, 0xc23bfb32ff57e80L);
+        Allocation inValue = createRandomAllocation(mRS, Element.DataType.SIGNED_16, 1, 0x3290aea900d8ad53l, false);
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.SIGNED_16, 1), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_16, 1), INPUTSIZE);
             script.forEach_testClzShortShort(inValue, out);
             verifyResultsClzShortShort(inValue, out, false);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testClzShortShort: " + e.toString());
         }
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.SIGNED_16, 1), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_16, 1), INPUTSIZE);
             scriptRelaxed.forEach_testClzShortShort(inValue, out);
             verifyResultsClzShortShort(inValue, out, true);
         } catch (Exception e) {
@@ -529,32 +561,36 @@ public class TestClz extends RSBaseCompute {
                 }
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
-                    message.append(String.format("Input inValue: %d", args.inValue));
+                    message.append(String.format("Input inValue: %d",
+                            args.inValue));
                     message.append("\n");
-                    message.append(String.format("Expected output out: %d", args.out));
+                    message.append(String.format("Expected output out: %d",
+                            args.out));
                     message.append("\n");
-                    message.append(String.format("Actual   output out: %d", arrayOut[i * 1 + j]));
+                    message.append(String.format("Actual   output out: %d",
+                            arrayOut[i * 1 + j]));
                     if (args.out != arrayOut[i * 1 + j]) {
                         message.append(" FAIL");
                     }
                     message.append("\n");
-                    assertTrue("Incorrect output for checkClzShortShort" + (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                    assertTrue("Incorrect output for checkClzShortShort" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
                 }
             }
         }
     }
 
     private void checkClzShort2Short2() {
-        Allocation inValue = CreateRandomAllocation(mRS, Element.DataType.SIGNED_16, 2, 0xadf7c7bf62fe59acL);
+        Allocation inValue = createRandomAllocation(mRS, Element.DataType.SIGNED_16, 2, 0x81f69d4442dd6ebfl, false);
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.SIGNED_16, 2), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_16, 2), INPUTSIZE);
             script.forEach_testClzShort2Short2(inValue, out);
             verifyResultsClzShort2Short2(inValue, out, false);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testClzShort2Short2: " + e.toString());
         }
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.SIGNED_16, 2), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_16, 2), INPUTSIZE);
             scriptRelaxed.forEach_testClzShort2Short2(inValue, out);
             verifyResultsClzShort2Short2(inValue, out, true);
         } catch (Exception e) {
@@ -583,32 +619,36 @@ public class TestClz extends RSBaseCompute {
                 }
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
-                    message.append(String.format("Input inValue: %d", args.inValue));
+                    message.append(String.format("Input inValue: %d",
+                            args.inValue));
                     message.append("\n");
-                    message.append(String.format("Expected output out: %d", args.out));
+                    message.append(String.format("Expected output out: %d",
+                            args.out));
                     message.append("\n");
-                    message.append(String.format("Actual   output out: %d", arrayOut[i * 2 + j]));
+                    message.append(String.format("Actual   output out: %d",
+                            arrayOut[i * 2 + j]));
                     if (args.out != arrayOut[i * 2 + j]) {
                         message.append(" FAIL");
                     }
                     message.append("\n");
-                    assertTrue("Incorrect output for checkClzShort2Short2" + (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                    assertTrue("Incorrect output for checkClzShort2Short2" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
                 }
             }
         }
     }
 
     private void checkClzShort3Short3() {
-        Allocation inValue = CreateRandomAllocation(mRS, Element.DataType.SIGNED_16, 3, 0xadf990da59197a8aL);
+        Allocation inValue = createRandomAllocation(mRS, Element.DataType.SIGNED_16, 3, 0xa7ab12cb8c1b943dl, false);
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.SIGNED_16, 3), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_16, 3), INPUTSIZE);
             script.forEach_testClzShort3Short3(inValue, out);
             verifyResultsClzShort3Short3(inValue, out, false);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testClzShort3Short3: " + e.toString());
         }
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.SIGNED_16, 3), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_16, 3), INPUTSIZE);
             scriptRelaxed.forEach_testClzShort3Short3(inValue, out);
             verifyResultsClzShort3Short3(inValue, out, true);
         } catch (Exception e) {
@@ -637,32 +677,36 @@ public class TestClz extends RSBaseCompute {
                 }
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
-                    message.append(String.format("Input inValue: %d", args.inValue));
+                    message.append(String.format("Input inValue: %d",
+                            args.inValue));
                     message.append("\n");
-                    message.append(String.format("Expected output out: %d", args.out));
+                    message.append(String.format("Expected output out: %d",
+                            args.out));
                     message.append("\n");
-                    message.append(String.format("Actual   output out: %d", arrayOut[i * 4 + j]));
+                    message.append(String.format("Actual   output out: %d",
+                            arrayOut[i * 4 + j]));
                     if (args.out != arrayOut[i * 4 + j]) {
                         message.append(" FAIL");
                     }
                     message.append("\n");
-                    assertTrue("Incorrect output for checkClzShort3Short3" + (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                    assertTrue("Incorrect output for checkClzShort3Short3" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
                 }
             }
         }
     }
 
     private void checkClzShort4Short4() {
-        Allocation inValue = CreateRandomAllocation(mRS, Element.DataType.SIGNED_16, 4, 0xadfb59f54f349b68L);
+        Allocation inValue = createRandomAllocation(mRS, Element.DataType.SIGNED_16, 4, 0xcd5f8852d559b9bbl, false);
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.SIGNED_16, 4), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_16, 4), INPUTSIZE);
             script.forEach_testClzShort4Short4(inValue, out);
             verifyResultsClzShort4Short4(inValue, out, false);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testClzShort4Short4: " + e.toString());
         }
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.SIGNED_16, 4), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_16, 4), INPUTSIZE);
             scriptRelaxed.forEach_testClzShort4Short4(inValue, out);
             verifyResultsClzShort4Short4(inValue, out, true);
         } catch (Exception e) {
@@ -691,16 +735,20 @@ public class TestClz extends RSBaseCompute {
                 }
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
-                    message.append(String.format("Input inValue: %d", args.inValue));
+                    message.append(String.format("Input inValue: %d",
+                            args.inValue));
                     message.append("\n");
-                    message.append(String.format("Expected output out: %d", args.out));
+                    message.append(String.format("Expected output out: %d",
+                            args.out));
                     message.append("\n");
-                    message.append(String.format("Actual   output out: %d", arrayOut[i * 4 + j]));
+                    message.append(String.format("Actual   output out: %d",
+                            arrayOut[i * 4 + j]));
                     if (args.out != arrayOut[i * 4 + j]) {
                         message.append(" FAIL");
                     }
                     message.append("\n");
-                    assertTrue("Incorrect output for checkClzShort4Short4" + (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                    assertTrue("Incorrect output for checkClzShort4Short4" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
                 }
             }
         }
@@ -715,16 +763,16 @@ public class TestClz extends RSBaseCompute {
     }
 
     private void checkClzUshortUshort() {
-        Allocation inValue = CreateRandomAllocation(mRS, Element.DataType.UNSIGNED_16, 1, 0xa6a82b331bf5ea72L);
+        Allocation inValue = createRandomAllocation(mRS, Element.DataType.UNSIGNED_16, 1, 0x97bdeee92c0103a5l, false);
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.UNSIGNED_16, 1), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_16, 1), INPUTSIZE);
             script.forEach_testClzUshortUshort(inValue, out);
             verifyResultsClzUshortUshort(inValue, out, false);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testClzUshortUshort: " + e.toString());
         }
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.UNSIGNED_16, 1), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_16, 1), INPUTSIZE);
             scriptRelaxed.forEach_testClzUshortUshort(inValue, out);
             verifyResultsClzUshortUshort(inValue, out, true);
         } catch (Exception e) {
@@ -753,32 +801,36 @@ public class TestClz extends RSBaseCompute {
                 }
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
-                    message.append(String.format("Input inValue: %x", args.inValue));
+                    message.append(String.format("Input inValue: 0x%x",
+                            args.inValue));
                     message.append("\n");
-                    message.append(String.format("Expected output out: %x", args.out));
+                    message.append(String.format("Expected output out: 0x%x",
+                            args.out));
                     message.append("\n");
-                    message.append(String.format("Actual   output out: %x", arrayOut[i * 1 + j]));
+                    message.append(String.format("Actual   output out: 0x%x",
+                            arrayOut[i * 1 + j]));
                     if (args.out != arrayOut[i * 1 + j]) {
                         message.append(" FAIL");
                     }
                     message.append("\n");
-                    assertTrue("Incorrect output for checkClzUshortUshort" + (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                    assertTrue("Incorrect output for checkClzUshortUshort" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
                 }
             }
         }
     }
 
     private void checkClzUshort2Ushort2() {
-        Allocation inValue = CreateRandomAllocation(mRS, Element.DataType.UNSIGNED_16, 2, 0xa9eb9eaae6cf28a4L);
+        Allocation inValue = createRandomAllocation(mRS, Element.DataType.UNSIGNED_16, 2, 0x5ea7a024b2913837l, false);
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.UNSIGNED_16, 2), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_16, 2), INPUTSIZE);
             script.forEach_testClzUshort2Ushort2(inValue, out);
             verifyResultsClzUshort2Ushort2(inValue, out, false);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testClzUshort2Ushort2: " + e.toString());
         }
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.UNSIGNED_16, 2), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_16, 2), INPUTSIZE);
             scriptRelaxed.forEach_testClzUshort2Ushort2(inValue, out);
             verifyResultsClzUshort2Ushort2(inValue, out, true);
         } catch (Exception e) {
@@ -807,32 +859,36 @@ public class TestClz extends RSBaseCompute {
                 }
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
-                    message.append(String.format("Input inValue: %x", args.inValue));
+                    message.append(String.format("Input inValue: 0x%x",
+                            args.inValue));
                     message.append("\n");
-                    message.append(String.format("Expected output out: %x", args.out));
+                    message.append(String.format("Expected output out: 0x%x",
+                            args.out));
                     message.append("\n");
-                    message.append(String.format("Actual   output out: %x", arrayOut[i * 2 + j]));
+                    message.append(String.format("Actual   output out: 0x%x",
+                            arrayOut[i * 2 + j]));
                     if (args.out != arrayOut[i * 2 + j]) {
                         message.append(" FAIL");
                     }
                     message.append("\n");
-                    assertTrue("Incorrect output for checkClzUshort2Ushort2" + (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                    assertTrue("Incorrect output for checkClzUshort2Ushort2" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
                 }
             }
         }
     }
 
     private void checkClzUshort3Ushort3() {
-        Allocation inValue = CreateRandomAllocation(mRS, Element.DataType.UNSIGNED_16, 3, 0xaa3866323d2ab9d0L);
+        Allocation inValue = createRandomAllocation(mRS, Element.DataType.UNSIGNED_16, 3, 0xb3f7537beaa1cfa3l, false);
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.UNSIGNED_16, 3), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_16, 3), INPUTSIZE);
             script.forEach_testClzUshort3Ushort3(inValue, out);
             verifyResultsClzUshort3Ushort3(inValue, out, false);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testClzUshort3Ushort3: " + e.toString());
         }
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.UNSIGNED_16, 3), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_16, 3), INPUTSIZE);
             scriptRelaxed.forEach_testClzUshort3Ushort3(inValue, out);
             verifyResultsClzUshort3Ushort3(inValue, out, true);
         } catch (Exception e) {
@@ -861,32 +917,36 @@ public class TestClz extends RSBaseCompute {
                 }
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
-                    message.append(String.format("Input inValue: %x", args.inValue));
+                    message.append(String.format("Input inValue: 0x%x",
+                            args.inValue));
                     message.append("\n");
-                    message.append(String.format("Expected output out: %x", args.out));
+                    message.append(String.format("Expected output out: 0x%x",
+                            args.out));
                     message.append("\n");
-                    message.append(String.format("Actual   output out: %x", arrayOut[i * 4 + j]));
+                    message.append(String.format("Actual   output out: 0x%x",
+                            arrayOut[i * 4 + j]));
                     if (args.out != arrayOut[i * 4 + j]) {
                         message.append(" FAIL");
                     }
                     message.append("\n");
-                    assertTrue("Incorrect output for checkClzUshort3Ushort3" + (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                    assertTrue("Incorrect output for checkClzUshort3Ushort3" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
                 }
             }
         }
     }
 
     private void checkClzUshort4Ushort4() {
-        Allocation inValue = CreateRandomAllocation(mRS, Element.DataType.UNSIGNED_16, 4, 0xaa852db993864afcL);
+        Allocation inValue = createRandomAllocation(mRS, Element.DataType.UNSIGNED_16, 4, 0x94706d322b2670fl, false);
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.UNSIGNED_16, 4), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_16, 4), INPUTSIZE);
             script.forEach_testClzUshort4Ushort4(inValue, out);
             verifyResultsClzUshort4Ushort4(inValue, out, false);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testClzUshort4Ushort4: " + e.toString());
         }
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.UNSIGNED_16, 4), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_16, 4), INPUTSIZE);
             scriptRelaxed.forEach_testClzUshort4Ushort4(inValue, out);
             verifyResultsClzUshort4Ushort4(inValue, out, true);
         } catch (Exception e) {
@@ -915,16 +975,20 @@ public class TestClz extends RSBaseCompute {
                 }
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
-                    message.append(String.format("Input inValue: %x", args.inValue));
+                    message.append(String.format("Input inValue: 0x%x",
+                            args.inValue));
                     message.append("\n");
-                    message.append(String.format("Expected output out: %x", args.out));
+                    message.append(String.format("Expected output out: 0x%x",
+                            args.out));
                     message.append("\n");
-                    message.append(String.format("Actual   output out: %x", arrayOut[i * 4 + j]));
+                    message.append(String.format("Actual   output out: 0x%x",
+                            arrayOut[i * 4 + j]));
                     if (args.out != arrayOut[i * 4 + j]) {
                         message.append(" FAIL");
                     }
                     message.append("\n");
-                    assertTrue("Incorrect output for checkClzUshort4Ushort4" + (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                    assertTrue("Incorrect output for checkClzUshort4Ushort4" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
                 }
             }
         }
@@ -939,16 +1003,16 @@ public class TestClz extends RSBaseCompute {
     }
 
     private void checkClzIntInt() {
-        Allocation inValue = CreateRandomAllocation(mRS, Element.DataType.SIGNED_32, 1, 0x136b4d1a7cf62a04L);
+        Allocation inValue = createRandomAllocation(mRS, Element.DataType.SIGNED_32, 1, 0xb13809da3142eb97l, false);
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.SIGNED_32, 1), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_32, 1), INPUTSIZE);
             script.forEach_testClzIntInt(inValue, out);
             verifyResultsClzIntInt(inValue, out, false);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testClzIntInt: " + e.toString());
         }
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.SIGNED_32, 1), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_32, 1), INPUTSIZE);
             scriptRelaxed.forEach_testClzIntInt(inValue, out);
             verifyResultsClzIntInt(inValue, out, true);
         } catch (Exception e) {
@@ -977,32 +1041,36 @@ public class TestClz extends RSBaseCompute {
                 }
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
-                    message.append(String.format("Input inValue: %d", args.inValue));
+                    message.append(String.format("Input inValue: %d",
+                            args.inValue));
                     message.append("\n");
-                    message.append(String.format("Expected output out: %d", args.out));
+                    message.append(String.format("Expected output out: %d",
+                            args.out));
                     message.append("\n");
-                    message.append(String.format("Actual   output out: %d", arrayOut[i * 1 + j]));
+                    message.append(String.format("Actual   output out: %d",
+                            arrayOut[i * 1 + j]));
                     if (args.out != arrayOut[i * 1 + j]) {
                         message.append(" FAIL");
                     }
                     message.append("\n");
-                    assertTrue("Incorrect output for checkClzIntInt" + (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                    assertTrue("Incorrect output for checkClzIntInt" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
                 }
             }
         }
     }
 
     private void checkClzInt2Int2() {
-        Allocation inValue = CreateRandomAllocation(mRS, Element.DataType.SIGNED_32, 2, 0x41ffde6a49a000a2L);
+        Allocation inValue = createRandomAllocation(mRS, Element.DataType.SIGNED_32, 2, 0xc9fd2c1a27fe3ad5l, false);
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.SIGNED_32, 2), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_32, 2), INPUTSIZE);
             script.forEach_testClzInt2Int2(inValue, out);
             verifyResultsClzInt2Int2(inValue, out, false);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testClzInt2Int2: " + e.toString());
         }
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.SIGNED_32, 2), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_32, 2), INPUTSIZE);
             scriptRelaxed.forEach_testClzInt2Int2(inValue, out);
             verifyResultsClzInt2Int2(inValue, out, true);
         } catch (Exception e) {
@@ -1031,32 +1099,36 @@ public class TestClz extends RSBaseCompute {
                 }
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
-                    message.append(String.format("Input inValue: %d", args.inValue));
+                    message.append(String.format("Input inValue: %d",
+                            args.inValue));
                     message.append("\n");
-                    message.append(String.format("Expected output out: %d", args.out));
+                    message.append(String.format("Expected output out: %d",
+                            args.out));
                     message.append("\n");
-                    message.append(String.format("Actual   output out: %d", arrayOut[i * 2 + j]));
+                    message.append(String.format("Actual   output out: %d",
+                            arrayOut[i * 2 + j]));
                     if (args.out != arrayOut[i * 2 + j]) {
                         message.append(" FAIL");
                     }
                     message.append("\n");
-                    assertTrue("Incorrect output for checkClzInt2Int2" + (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                    assertTrue("Incorrect output for checkClzInt2Int2" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
                 }
             }
         }
     }
 
     private void checkClzInt3Int3() {
-        Allocation inValue = CreateRandomAllocation(mRS, Element.DataType.SIGNED_32, 3, 0x41ffdea9934810d8L);
+        Allocation inValue = createRandomAllocation(mRS, Element.DataType.SIGNED_32, 3, 0xd6e2b014f2d24c2bl, false);
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.SIGNED_32, 3), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_32, 3), INPUTSIZE);
             script.forEach_testClzInt3Int3(inValue, out);
             verifyResultsClzInt3Int3(inValue, out, false);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testClzInt3Int3: " + e.toString());
         }
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.SIGNED_32, 3), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_32, 3), INPUTSIZE);
             scriptRelaxed.forEach_testClzInt3Int3(inValue, out);
             verifyResultsClzInt3Int3(inValue, out, true);
         } catch (Exception e) {
@@ -1085,32 +1157,36 @@ public class TestClz extends RSBaseCompute {
                 }
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
-                    message.append(String.format("Input inValue: %d", args.inValue));
+                    message.append(String.format("Input inValue: %d",
+                            args.inValue));
                     message.append("\n");
-                    message.append(String.format("Expected output out: %d", args.out));
+                    message.append(String.format("Expected output out: %d",
+                            args.out));
                     message.append("\n");
-                    message.append(String.format("Actual   output out: %d", arrayOut[i * 4 + j]));
+                    message.append(String.format("Actual   output out: %d",
+                            arrayOut[i * 4 + j]));
                     if (args.out != arrayOut[i * 4 + j]) {
                         message.append(" FAIL");
                     }
                     message.append("\n");
-                    assertTrue("Incorrect output for checkClzInt3Int3" + (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                    assertTrue("Incorrect output for checkClzInt3Int3" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
                 }
             }
         }
     }
 
     private void checkClzInt4Int4() {
-        Allocation inValue = CreateRandomAllocation(mRS, Element.DataType.SIGNED_32, 4, 0x41ffdee8dcf0210eL);
+        Allocation inValue = createRandomAllocation(mRS, Element.DataType.SIGNED_32, 4, 0xe3c8340fbda65d81l, false);
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.SIGNED_32, 4), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_32, 4), INPUTSIZE);
             script.forEach_testClzInt4Int4(inValue, out);
             verifyResultsClzInt4Int4(inValue, out, false);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testClzInt4Int4: " + e.toString());
         }
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.SIGNED_32, 4), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_32, 4), INPUTSIZE);
             scriptRelaxed.forEach_testClzInt4Int4(inValue, out);
             verifyResultsClzInt4Int4(inValue, out, true);
         } catch (Exception e) {
@@ -1139,16 +1215,20 @@ public class TestClz extends RSBaseCompute {
                 }
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
-                    message.append(String.format("Input inValue: %d", args.inValue));
+                    message.append(String.format("Input inValue: %d",
+                            args.inValue));
                     message.append("\n");
-                    message.append(String.format("Expected output out: %d", args.out));
+                    message.append(String.format("Expected output out: %d",
+                            args.out));
                     message.append("\n");
-                    message.append(String.format("Actual   output out: %d", arrayOut[i * 4 + j]));
+                    message.append(String.format("Actual   output out: %d",
+                            arrayOut[i * 4 + j]));
                     if (args.out != arrayOut[i * 4 + j]) {
                         message.append(" FAIL");
                     }
                     message.append("\n");
-                    assertTrue("Incorrect output for checkClzInt4Int4" + (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                    assertTrue("Incorrect output for checkClzInt4Int4" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
                 }
             }
         }
@@ -1163,16 +1243,16 @@ public class TestClz extends RSBaseCompute {
     }
 
     private void checkClzUintUint() {
-        Allocation inValue = CreateRandomAllocation(mRS, Element.DataType.UNSIGNED_32, 1, 0x45901bd5c6e2ce1cL);
+        Allocation inValue = createRandomAllocation(mRS, Element.DataType.UNSIGNED_32, 1, 0x64a0b78a75ac502fl, false);
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.UNSIGNED_32, 1), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_32, 1), INPUTSIZE);
             script.forEach_testClzUintUint(inValue, out);
             verifyResultsClzUintUint(inValue, out, false);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testClzUintUint: " + e.toString());
         }
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.UNSIGNED_32, 1), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_32, 1), INPUTSIZE);
             scriptRelaxed.forEach_testClzUintUint(inValue, out);
             verifyResultsClzUintUint(inValue, out, true);
         } catch (Exception e) {
@@ -1201,32 +1281,36 @@ public class TestClz extends RSBaseCompute {
                 }
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
-                    message.append(String.format("Input inValue: %x", args.inValue));
+                    message.append(String.format("Input inValue: 0x%x",
+                            args.inValue));
                     message.append("\n");
-                    message.append(String.format("Expected output out: %x", args.out));
+                    message.append(String.format("Expected output out: 0x%x",
+                            args.out));
                     message.append("\n");
-                    message.append(String.format("Actual   output out: %x", arrayOut[i * 1 + j]));
+                    message.append(String.format("Actual   output out: 0x%x",
+                            arrayOut[i * 1 + j]));
                     if (args.out != arrayOut[i * 1 + j]) {
                         message.append(" FAIL");
                     }
                     message.append("\n");
-                    assertTrue("Incorrect output for checkClzUintUint" + (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                    assertTrue("Incorrect output for checkClzUintUint" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
                 }
             }
         }
     }
 
     private void checkClzUint2Uint2() {
-        Allocation inValue = CreateRandomAllocation(mRS, Element.DataType.UNSIGNED_32, 2, 0x6dd792002fe754c0L);
+        Allocation inValue = createRandomAllocation(mRS, Element.DataType.UNSIGNED_32, 2, 0xf809b50329344f93l, false);
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.UNSIGNED_32, 2), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_32, 2), INPUTSIZE);
             script.forEach_testClzUint2Uint2(inValue, out);
             verifyResultsClzUint2Uint2(inValue, out, false);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testClzUint2Uint2: " + e.toString());
         }
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.UNSIGNED_32, 2), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_32, 2), INPUTSIZE);
             scriptRelaxed.forEach_testClzUint2Uint2(inValue, out);
             verifyResultsClzUint2Uint2(inValue, out, true);
         } catch (Exception e) {
@@ -1255,32 +1339,36 @@ public class TestClz extends RSBaseCompute {
                 }
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
-                    message.append(String.format("Input inValue: %x", args.inValue));
+                    message.append(String.format("Input inValue: 0x%x",
+                            args.inValue));
                     message.append("\n");
-                    message.append(String.format("Expected output out: %x", args.out));
+                    message.append(String.format("Expected output out: 0x%x",
+                            args.out));
                     message.append("\n");
-                    message.append(String.format("Actual   output out: %x", arrayOut[i * 2 + j]));
+                    message.append(String.format("Actual   output out: 0x%x",
+                            arrayOut[i * 2 + j]));
                     if (args.out != arrayOut[i * 2 + j]) {
                         message.append(" FAIL");
                     }
                     message.append("\n");
-                    assertTrue("Incorrect output for checkClzUint2Uint2" + (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                    assertTrue("Incorrect output for checkClzUint2Uint2" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
                 }
             }
         }
     }
 
     private void checkClzUint3Uint3() {
-        Allocation inValue = CreateRandomAllocation(mRS, Element.DataType.UNSIGNED_32, 3, 0x6dd79ca18eef19b4L);
+        Allocation inValue = createRandomAllocation(mRS, Element.DataType.UNSIGNED_32, 3, 0x2296d5c125738447l, false);
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.UNSIGNED_32, 3), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_32, 3), INPUTSIZE);
             script.forEach_testClzUint3Uint3(inValue, out);
             verifyResultsClzUint3Uint3(inValue, out, false);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testClzUint3Uint3: " + e.toString());
         }
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.UNSIGNED_32, 3), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_32, 3), INPUTSIZE);
             scriptRelaxed.forEach_testClzUint3Uint3(inValue, out);
             verifyResultsClzUint3Uint3(inValue, out, true);
         } catch (Exception e) {
@@ -1309,32 +1397,36 @@ public class TestClz extends RSBaseCompute {
                 }
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
-                    message.append(String.format("Input inValue: %x", args.inValue));
+                    message.append(String.format("Input inValue: 0x%x",
+                            args.inValue));
                     message.append("\n");
-                    message.append(String.format("Expected output out: %x", args.out));
+                    message.append(String.format("Expected output out: 0x%x",
+                            args.out));
                     message.append("\n");
-                    message.append(String.format("Actual   output out: %x", arrayOut[i * 4 + j]));
+                    message.append(String.format("Actual   output out: 0x%x",
+                            arrayOut[i * 4 + j]));
                     if (args.out != arrayOut[i * 4 + j]) {
                         message.append(" FAIL");
                     }
                     message.append("\n");
-                    assertTrue("Incorrect output for checkClzUint3Uint3" + (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                    assertTrue("Incorrect output for checkClzUint3Uint3" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
                 }
             }
         }
     }
 
     private void checkClzUint4Uint4() {
-        Allocation inValue = CreateRandomAllocation(mRS, Element.DataType.UNSIGNED_32, 4, 0x6dd7a742edf6dea8L);
+        Allocation inValue = createRandomAllocation(mRS, Element.DataType.UNSIGNED_32, 4, 0x4d23f67f21b2b8fbl, false);
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.UNSIGNED_32, 4), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_32, 4), INPUTSIZE);
             script.forEach_testClzUint4Uint4(inValue, out);
             verifyResultsClzUint4Uint4(inValue, out, false);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testClzUint4Uint4: " + e.toString());
         }
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.UNSIGNED_32, 4), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_32, 4), INPUTSIZE);
             scriptRelaxed.forEach_testClzUint4Uint4(inValue, out);
             verifyResultsClzUint4Uint4(inValue, out, true);
         } catch (Exception e) {
@@ -1363,16 +1455,20 @@ public class TestClz extends RSBaseCompute {
                 }
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
-                    message.append(String.format("Input inValue: %x", args.inValue));
+                    message.append(String.format("Input inValue: 0x%x",
+                            args.inValue));
                     message.append("\n");
-                    message.append(String.format("Expected output out: %x", args.out));
+                    message.append(String.format("Expected output out: 0x%x",
+                            args.out));
                     message.append("\n");
-                    message.append(String.format("Actual   output out: %x", arrayOut[i * 4 + j]));
+                    message.append(String.format("Actual   output out: 0x%x",
+                            arrayOut[i * 4 + j]));
                     if (args.out != arrayOut[i * 4 + j]) {
                         message.append(" FAIL");
                     }
                     message.append("\n");
-                    assertTrue("Incorrect output for checkClzUint4Uint4" + (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                    assertTrue("Incorrect output for checkClzUint4Uint4" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
                 }
             }
         }

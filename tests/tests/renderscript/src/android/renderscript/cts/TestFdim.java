@@ -44,10 +44,10 @@ public class TestFdim extends RSBaseCompute {
     }
 
     private void checkFdimFloatFloatFloat() {
-        Allocation inA = CreateRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0x4c289249dc9b7d54L);
-        Allocation inB = CreateRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0x4c289249dc9b7d54L);
+        Allocation inA = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0xf5dd38fbc3a47366l, false);
+        Allocation inB = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0xf5dd38fbc3a47367l, false);
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.FLOAT_32, 1), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 1), INPUTSIZE);
             script.set_gAllocInB(inB);
             script.forEach_testFdimFloatFloatFloat(inA, out);
             verifyResultsFdimFloatFloatFloat(inA, inB, out, false);
@@ -55,7 +55,7 @@ public class TestFdim extends RSBaseCompute {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testFdimFloatFloatFloat: " + e.toString());
         }
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.FLOAT_32, 1), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 1), INPUTSIZE);
             scriptRelaxed.set_gAllocInB(inB);
             scriptRelaxed.forEach_testFdimFloatFloatFloat(inA, out);
             verifyResultsFdimFloatFloatFloat(inA, inB, out, true);
@@ -89,29 +89,34 @@ public class TestFdim extends RSBaseCompute {
                 }
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
-                    message.append(String.format("Input inA: %x %.16f", Float.floatToRawIntBits(args.inA), args.inA));
+                    message.append(String.format("Input inA: %14.8g %8x %15a",
+                            args.inA, Float.floatToRawIntBits(args.inA), args.inA));
                     message.append("\n");
-                    message.append(String.format("Input inB: %x %.16f", Float.floatToRawIntBits(args.inB), args.inB));
+                    message.append(String.format("Input inB: %14.8g %8x %15a",
+                            args.inB, Float.floatToRawIntBits(args.inB), args.inB));
                     message.append("\n");
-                    message.append(String.format("Expected output out: %x %.16f", Float.floatToRawIntBits(args.out), args.out));
+                    message.append(String.format("Expected output out: %14.8g %8x %15a",
+                            args.out, Float.floatToRawIntBits(args.out), args.out));
                     message.append("\n");
-                    message.append(String.format("Actual   output out: %x %.16f", Float.floatToRawIntBits(arrayOut[i * 1 + j]), arrayOut[i * 1 + j]));
+                    message.append(String.format("Actual   output out: %14.8g %8x %15a",
+                            arrayOut[i * 1 + j], Float.floatToRawIntBits(arrayOut[i * 1 + j]), arrayOut[i * 1 + j]));
                     neededUlf = (int) (Math.abs(args.out - arrayOut[i * 1 + j]) / Math.ulp(args.out) + 0.5);
                     if (neededUlf > ulf) {
                         message.append(String.format(" FAILED, ulf needed %d, specified %d", neededUlf, ulf));
                     }
                     message.append("\n");
-                    assertTrue("Incorrect output for checkFdimFloatFloatFloat" + (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                    assertTrue("Incorrect output for checkFdimFloatFloatFloat" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
                 }
             }
         }
     }
 
     private void checkFdimFloat2Float2Float2() {
-        Allocation inA = CreateRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0xffe7527da8c37cf6L);
-        Allocation inB = CreateRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0xffe7527da8c37cf6L);
+        Allocation inA = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0xca6a96c16f167f4cl, false);
+        Allocation inB = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0xca6a96c16f167f4dl, false);
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.FLOAT_32, 2), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 2), INPUTSIZE);
             script.set_gAllocInB(inB);
             script.forEach_testFdimFloat2Float2Float2(inA, out);
             verifyResultsFdimFloat2Float2Float2(inA, inB, out, false);
@@ -119,7 +124,7 @@ public class TestFdim extends RSBaseCompute {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testFdimFloat2Float2Float2: " + e.toString());
         }
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.FLOAT_32, 2), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 2), INPUTSIZE);
             scriptRelaxed.set_gAllocInB(inB);
             scriptRelaxed.forEach_testFdimFloat2Float2Float2(inA, out);
             verifyResultsFdimFloat2Float2Float2(inA, inB, out, true);
@@ -153,29 +158,34 @@ public class TestFdim extends RSBaseCompute {
                 }
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
-                    message.append(String.format("Input inA: %x %.16f", Float.floatToRawIntBits(args.inA), args.inA));
+                    message.append(String.format("Input inA: %14.8g %8x %15a",
+                            args.inA, Float.floatToRawIntBits(args.inA), args.inA));
                     message.append("\n");
-                    message.append(String.format("Input inB: %x %.16f", Float.floatToRawIntBits(args.inB), args.inB));
+                    message.append(String.format("Input inB: %14.8g %8x %15a",
+                            args.inB, Float.floatToRawIntBits(args.inB), args.inB));
                     message.append("\n");
-                    message.append(String.format("Expected output out: %x %.16f", Float.floatToRawIntBits(args.out), args.out));
+                    message.append(String.format("Expected output out: %14.8g %8x %15a",
+                            args.out, Float.floatToRawIntBits(args.out), args.out));
                     message.append("\n");
-                    message.append(String.format("Actual   output out: %x %.16f", Float.floatToRawIntBits(arrayOut[i * 2 + j]), arrayOut[i * 2 + j]));
+                    message.append(String.format("Actual   output out: %14.8g %8x %15a",
+                            arrayOut[i * 2 + j], Float.floatToRawIntBits(arrayOut[i * 2 + j]), arrayOut[i * 2 + j]));
                     neededUlf = (int) (Math.abs(args.out - arrayOut[i * 2 + j]) / Math.ulp(args.out) + 0.5);
                     if (neededUlf > ulf) {
                         message.append(String.format(" FAILED, ulf needed %d, specified %d", neededUlf, ulf));
                     }
                     message.append("\n");
-                    assertTrue("Incorrect output for checkFdimFloat2Float2Float2" + (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                    assertTrue("Incorrect output for checkFdimFloat2Float2Float2" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
                 }
             }
         }
     }
 
     private void checkFdimFloat3Float3Float3() {
-        Allocation inA = CreateRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0x2cd8a1ddf90dc301L);
-        Allocation inB = CreateRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0x2cd8a1ddf90dc301L);
+        Allocation inA = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0x1ecf74e170f480edl, false);
+        Allocation inB = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0x1ecf74e170f480eel, false);
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.FLOAT_32, 3), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 3), INPUTSIZE);
             script.set_gAllocInB(inB);
             script.forEach_testFdimFloat3Float3Float3(inA, out);
             verifyResultsFdimFloat3Float3Float3(inA, inB, out, false);
@@ -183,7 +193,7 @@ public class TestFdim extends RSBaseCompute {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testFdimFloat3Float3Float3: " + e.toString());
         }
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.FLOAT_32, 3), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 3), INPUTSIZE);
             scriptRelaxed.set_gAllocInB(inB);
             scriptRelaxed.forEach_testFdimFloat3Float3Float3(inA, out);
             verifyResultsFdimFloat3Float3Float3(inA, inB, out, true);
@@ -217,29 +227,34 @@ public class TestFdim extends RSBaseCompute {
                 }
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
-                    message.append(String.format("Input inA: %x %.16f", Float.floatToRawIntBits(args.inA), args.inA));
+                    message.append(String.format("Input inA: %14.8g %8x %15a",
+                            args.inA, Float.floatToRawIntBits(args.inA), args.inA));
                     message.append("\n");
-                    message.append(String.format("Input inB: %x %.16f", Float.floatToRawIntBits(args.inB), args.inB));
+                    message.append(String.format("Input inB: %14.8g %8x %15a",
+                            args.inB, Float.floatToRawIntBits(args.inB), args.inB));
                     message.append("\n");
-                    message.append(String.format("Expected output out: %x %.16f", Float.floatToRawIntBits(args.out), args.out));
+                    message.append(String.format("Expected output out: %14.8g %8x %15a",
+                            args.out, Float.floatToRawIntBits(args.out), args.out));
                     message.append("\n");
-                    message.append(String.format("Actual   output out: %x %.16f", Float.floatToRawIntBits(arrayOut[i * 4 + j]), arrayOut[i * 4 + j]));
+                    message.append(String.format("Actual   output out: %14.8g %8x %15a",
+                            arrayOut[i * 4 + j], Float.floatToRawIntBits(arrayOut[i * 4 + j]), arrayOut[i * 4 + j]));
                     neededUlf = (int) (Math.abs(args.out - arrayOut[i * 4 + j]) / Math.ulp(args.out) + 0.5);
                     if (neededUlf > ulf) {
                         message.append(String.format(" FAILED, ulf needed %d, specified %d", neededUlf, ulf));
                     }
                     message.append("\n");
-                    assertTrue("Incorrect output for checkFdimFloat3Float3Float3" + (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                    assertTrue("Incorrect output for checkFdimFloat3Float3Float3" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
                 }
             }
         }
     }
 
     private void checkFdimFloat4Float4Float4() {
-        Allocation inA = CreateRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0x59c9f13e4958090cL);
-        Allocation inB = CreateRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0x59c9f13e4958090cL);
+        Allocation inA = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0x7334530172d2828el, false);
+        Allocation inB = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0x7334530172d2828fl, false);
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.FLOAT_32, 4), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 4), INPUTSIZE);
             script.set_gAllocInB(inB);
             script.forEach_testFdimFloat4Float4Float4(inA, out);
             verifyResultsFdimFloat4Float4Float4(inA, inB, out, false);
@@ -247,7 +262,7 @@ public class TestFdim extends RSBaseCompute {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testFdimFloat4Float4Float4: " + e.toString());
         }
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.FLOAT_32, 4), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 4), INPUTSIZE);
             scriptRelaxed.set_gAllocInB(inB);
             scriptRelaxed.forEach_testFdimFloat4Float4Float4(inA, out);
             verifyResultsFdimFloat4Float4Float4(inA, inB, out, true);
@@ -281,19 +296,24 @@ public class TestFdim extends RSBaseCompute {
                 }
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
-                    message.append(String.format("Input inA: %x %.16f", Float.floatToRawIntBits(args.inA), args.inA));
+                    message.append(String.format("Input inA: %14.8g %8x %15a",
+                            args.inA, Float.floatToRawIntBits(args.inA), args.inA));
                     message.append("\n");
-                    message.append(String.format("Input inB: %x %.16f", Float.floatToRawIntBits(args.inB), args.inB));
+                    message.append(String.format("Input inB: %14.8g %8x %15a",
+                            args.inB, Float.floatToRawIntBits(args.inB), args.inB));
                     message.append("\n");
-                    message.append(String.format("Expected output out: %x %.16f", Float.floatToRawIntBits(args.out), args.out));
+                    message.append(String.format("Expected output out: %14.8g %8x %15a",
+                            args.out, Float.floatToRawIntBits(args.out), args.out));
                     message.append("\n");
-                    message.append(String.format("Actual   output out: %x %.16f", Float.floatToRawIntBits(arrayOut[i * 4 + j]), arrayOut[i * 4 + j]));
+                    message.append(String.format("Actual   output out: %14.8g %8x %15a",
+                            arrayOut[i * 4 + j], Float.floatToRawIntBits(arrayOut[i * 4 + j]), arrayOut[i * 4 + j]));
                     neededUlf = (int) (Math.abs(args.out - arrayOut[i * 4 + j]) / Math.ulp(args.out) + 0.5);
                     if (neededUlf > ulf) {
                         message.append(String.format(" FAILED, ulf needed %d, specified %d", neededUlf, ulf));
                     }
                     message.append("\n");
-                    assertTrue("Incorrect output for checkFdimFloat4Float4Float4" + (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                    assertTrue("Incorrect output for checkFdimFloat4Float4Float4" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
                 }
             }
         }
