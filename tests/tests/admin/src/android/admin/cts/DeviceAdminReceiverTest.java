@@ -19,10 +19,13 @@ package android.admin.cts;
 import android.app.admin.DeviceAdminReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.test.AndroidTestCase;
+import android.util.Log;
 
 public class DeviceAdminReceiverTest extends AndroidTestCase {
 
+    private static final String TAG = DeviceAdminReceiverTest.class.getSimpleName();
     private static final String DISABLE_WARNING = "Disable Warning";
 
     private static final int PASSWORD_CHANGED = 0x1;
@@ -33,14 +36,21 @@ public class DeviceAdminReceiverTest extends AndroidTestCase {
     private static final int DEVICE_ADMIN_DISABLED = 0x20;
 
     private TestReceiver mReceiver;
+    private boolean mDeviceAdmin;
 
     @Override
     protected void setUp() throws Exception {
         super.setUp();
         mReceiver = new TestReceiver();
+        mDeviceAdmin =
+                mContext.getPackageManager().hasSystemFeature(PackageManager.FEATURE_DEVICE_ADMIN);
     }
 
     public void testOnReceive() {
+        if (!mDeviceAdmin) {
+            Log.w(TAG, "Skipping testOnReceive");
+            return;
+        }
         mReceiver.reset();
         mReceiver.onReceive(mContext, new Intent(DeviceAdminReceiver.ACTION_PASSWORD_CHANGED));
         assertTrue(mReceiver.hasFlags(PASSWORD_CHANGED));
