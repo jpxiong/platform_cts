@@ -90,6 +90,7 @@
     <classpathentry kind="src" path="external/easymock/src"/>
     <classpathentry kind="src" path="out/target/common/obj/APPS/CtsAccessibilityServiceTestCases_intermediates/src/src"/>
     <classpathentry kind="src" path="out/target/common/obj/APPS/CtsTestStubs_intermediates/src/src"/>
+    <classpathentry kind="src" path="out/target/common/obj/APPS/CtsTestStubs_intermediates/src/renderscript/src"/>
     <classpathentry kind="src" path="out/target/common/obj/APPS/CtsVerifier_intermediates/src"/>
     <classpathentry kind="src" path="out/target/common/obj/APPS/CtsVerifierTests_intermediates/src"/>
 </classpath>
