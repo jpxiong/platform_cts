@@ -44,10 +44,10 @@ public class TestSincos extends RSBaseCompute {
     }
 
     private void checkSincosFloatFloatFloat() {
-        Allocation inV = CreateRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0xef9ac07a1196580L);
+        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0xb8748e13e46c48d4l, false);
         try {
-            Allocation outCosptr = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.FLOAT_32, 1), INPUTSIZE);
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.FLOAT_32, 1), INPUTSIZE);
+            Allocation outCosptr = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 1), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 1), INPUTSIZE);
             script.set_gAllocOutCosptr(outCosptr);
             script.forEach_testSincosFloatFloatFloat(inV, out);
             verifyResultsSincosFloatFloatFloat(inV, outCosptr, out, false);
@@ -55,8 +55,8 @@ public class TestSincos extends RSBaseCompute {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testSincosFloatFloatFloat: " + e.toString());
         }
         try {
-            Allocation outCosptr = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.FLOAT_32, 1), INPUTSIZE);
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.FLOAT_32, 1), INPUTSIZE);
+            Allocation outCosptr = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 1), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 1), INPUTSIZE);
             scriptRelaxed.set_gAllocOutCosptr(outCosptr);
             scriptRelaxed.forEach_testSincosFloatFloatFloat(inV, out);
             verifyResultsSincosFloatFloatFloat(inV, outCosptr, out, true);
@@ -93,35 +93,41 @@ public class TestSincos extends RSBaseCompute {
                 }
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
-                    message.append(String.format("Input inV: %x %.16f", Float.floatToRawIntBits(args.inV), args.inV));
+                    message.append(String.format("Input inV: %14.8g %8x %15a",
+                            args.inV, Float.floatToRawIntBits(args.inV), args.inV));
                     message.append("\n");
-                    message.append(String.format("Expected output outCosptr: %x %.16f", Float.floatToRawIntBits(args.outCosptr), args.outCosptr));
+                    message.append(String.format("Expected output outCosptr: %14.8g %8x %15a",
+                            args.outCosptr, Float.floatToRawIntBits(args.outCosptr), args.outCosptr));
                     message.append("\n");
-                    message.append(String.format("Actual   output outCosptr: %x %.16f", Float.floatToRawIntBits(arrayOutCosptr[i * 1 + j]), arrayOutCosptr[i * 1 + j]));
+                    message.append(String.format("Actual   output outCosptr: %14.8g %8x %15a",
+                            arrayOutCosptr[i * 1 + j], Float.floatToRawIntBits(arrayOutCosptr[i * 1 + j]), arrayOutCosptr[i * 1 + j]));
                     neededUlf = (int) (Math.abs(args.outCosptr - arrayOutCosptr[i * 1 + j]) / Math.ulp(args.outCosptr) + 0.5);
                     if (neededUlf > ulf) {
                         message.append(String.format(" FAILED, ulf needed %d, specified %d", neededUlf, ulf));
                     }
                     message.append("\n");
-                    message.append(String.format("Expected output out: %x %.16f", Float.floatToRawIntBits(args.out), args.out));
+                    message.append(String.format("Expected output out: %14.8g %8x %15a",
+                            args.out, Float.floatToRawIntBits(args.out), args.out));
                     message.append("\n");
-                    message.append(String.format("Actual   output out: %x %.16f", Float.floatToRawIntBits(arrayOut[i * 1 + j]), arrayOut[i * 1 + j]));
+                    message.append(String.format("Actual   output out: %14.8g %8x %15a",
+                            arrayOut[i * 1 + j], Float.floatToRawIntBits(arrayOut[i * 1 + j]), arrayOut[i * 1 + j]));
                     neededUlf = (int) (Math.abs(args.out - arrayOut[i * 1 + j]) / Math.ulp(args.out) + 0.5);
                     if (neededUlf > ulf) {
                         message.append(String.format(" FAILED, ulf needed %d, specified %d", neededUlf, ulf));
                     }
                     message.append("\n");
-                    assertTrue("Incorrect output for checkSincosFloatFloatFloat" + (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                    assertTrue("Incorrect output for checkSincosFloatFloatFloat" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
                 }
             }
         }
     }
 
     private void checkSincosFloat2Float2Float2() {
-        Allocation inV = CreateRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0xe141d3be7ba8ff8L);
+        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0xc85bab4e3e2fc77cl, false);
         try {
-            Allocation outCosptr = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.FLOAT_32, 2), INPUTSIZE);
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.FLOAT_32, 2), INPUTSIZE);
+            Allocation outCosptr = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 2), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 2), INPUTSIZE);
             script.set_gAllocOutCosptr(outCosptr);
             script.forEach_testSincosFloat2Float2Float2(inV, out);
             verifyResultsSincosFloat2Float2Float2(inV, outCosptr, out, false);
@@ -129,8 +135,8 @@ public class TestSincos extends RSBaseCompute {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testSincosFloat2Float2Float2: " + e.toString());
         }
         try {
-            Allocation outCosptr = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.FLOAT_32, 2), INPUTSIZE);
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.FLOAT_32, 2), INPUTSIZE);
+            Allocation outCosptr = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 2), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 2), INPUTSIZE);
             scriptRelaxed.set_gAllocOutCosptr(outCosptr);
             scriptRelaxed.forEach_testSincosFloat2Float2Float2(inV, out);
             verifyResultsSincosFloat2Float2Float2(inV, outCosptr, out, true);
@@ -167,35 +173,41 @@ public class TestSincos extends RSBaseCompute {
                 }
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
-                    message.append(String.format("Input inV: %x %.16f", Float.floatToRawIntBits(args.inV), args.inV));
+                    message.append(String.format("Input inV: %14.8g %8x %15a",
+                            args.inV, Float.floatToRawIntBits(args.inV), args.inV));
                     message.append("\n");
-                    message.append(String.format("Expected output outCosptr: %x %.16f", Float.floatToRawIntBits(args.outCosptr), args.outCosptr));
+                    message.append(String.format("Expected output outCosptr: %14.8g %8x %15a",
+                            args.outCosptr, Float.floatToRawIntBits(args.outCosptr), args.outCosptr));
                     message.append("\n");
-                    message.append(String.format("Actual   output outCosptr: %x %.16f", Float.floatToRawIntBits(arrayOutCosptr[i * 2 + j]), arrayOutCosptr[i * 2 + j]));
+                    message.append(String.format("Actual   output outCosptr: %14.8g %8x %15a",
+                            arrayOutCosptr[i * 2 + j], Float.floatToRawIntBits(arrayOutCosptr[i * 2 + j]), arrayOutCosptr[i * 2 + j]));
                     neededUlf = (int) (Math.abs(args.outCosptr - arrayOutCosptr[i * 2 + j]) / Math.ulp(args.outCosptr) + 0.5);
                     if (neededUlf > ulf) {
                         message.append(String.format(" FAILED, ulf needed %d, specified %d", neededUlf, ulf));
                     }
                     message.append("\n");
-                    message.append(String.format("Expected output out: %x %.16f", Float.floatToRawIntBits(args.out), args.out));
+                    message.append(String.format("Expected output out: %14.8g %8x %15a",
+                            args.out, Float.floatToRawIntBits(args.out), args.out));
                     message.append("\n");
-                    message.append(String.format("Actual   output out: %x %.16f", Float.floatToRawIntBits(arrayOut[i * 2 + j]), arrayOut[i * 2 + j]));
+                    message.append(String.format("Actual   output out: %14.8g %8x %15a",
+                            arrayOut[i * 2 + j], Float.floatToRawIntBits(arrayOut[i * 2 + j]), arrayOut[i * 2 + j]));
                     neededUlf = (int) (Math.abs(args.out - arrayOut[i * 2 + j]) / Math.ulp(args.out) + 0.5);
                     if (neededUlf > ulf) {
                         message.append(String.format(" FAILED, ulf needed %d, specified %d", neededUlf, ulf));
                     }
                     message.append("\n");
-                    assertTrue("Incorrect output for checkSincosFloat2Float2Float2" + (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                    assertTrue("Incorrect output for checkSincosFloat2Float2Float2" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
                 }
             }
         }
     }
 
     private void checkSincosFloat3Float3Float3() {
-        Allocation inV = CreateRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0xa8fa6bdfd02e756bL);
+        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0x1cc0896e400dc91dl, false);
         try {
-            Allocation outCosptr = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.FLOAT_32, 3), INPUTSIZE);
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.FLOAT_32, 3), INPUTSIZE);
+            Allocation outCosptr = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 3), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 3), INPUTSIZE);
             script.set_gAllocOutCosptr(outCosptr);
             script.forEach_testSincosFloat3Float3Float3(inV, out);
             verifyResultsSincosFloat3Float3Float3(inV, outCosptr, out, false);
@@ -203,8 +215,8 @@ public class TestSincos extends RSBaseCompute {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testSincosFloat3Float3Float3: " + e.toString());
         }
         try {
-            Allocation outCosptr = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.FLOAT_32, 3), INPUTSIZE);
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.FLOAT_32, 3), INPUTSIZE);
+            Allocation outCosptr = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 3), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 3), INPUTSIZE);
             scriptRelaxed.set_gAllocOutCosptr(outCosptr);
             scriptRelaxed.forEach_testSincosFloat3Float3Float3(inV, out);
             verifyResultsSincosFloat3Float3Float3(inV, outCosptr, out, true);
@@ -241,35 +253,41 @@ public class TestSincos extends RSBaseCompute {
                 }
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
-                    message.append(String.format("Input inV: %x %.16f", Float.floatToRawIntBits(args.inV), args.inV));
+                    message.append(String.format("Input inV: %14.8g %8x %15a",
+                            args.inV, Float.floatToRawIntBits(args.inV), args.inV));
                     message.append("\n");
-                    message.append(String.format("Expected output outCosptr: %x %.16f", Float.floatToRawIntBits(args.outCosptr), args.outCosptr));
+                    message.append(String.format("Expected output outCosptr: %14.8g %8x %15a",
+                            args.outCosptr, Float.floatToRawIntBits(args.outCosptr), args.outCosptr));
                     message.append("\n");
-                    message.append(String.format("Actual   output outCosptr: %x %.16f", Float.floatToRawIntBits(arrayOutCosptr[i * 4 + j]), arrayOutCosptr[i * 4 + j]));
+                    message.append(String.format("Actual   output outCosptr: %14.8g %8x %15a",
+                            arrayOutCosptr[i * 4 + j], Float.floatToRawIntBits(arrayOutCosptr[i * 4 + j]), arrayOutCosptr[i * 4 + j]));
                     neededUlf = (int) (Math.abs(args.outCosptr - arrayOutCosptr[i * 4 + j]) / Math.ulp(args.outCosptr) + 0.5);
                     if (neededUlf > ulf) {
                         message.append(String.format(" FAILED, ulf needed %d, specified %d", neededUlf, ulf));
                     }
                     message.append("\n");
-                    message.append(String.format("Expected output out: %x %.16f", Float.floatToRawIntBits(args.out), args.out));
+                    message.append(String.format("Expected output out: %14.8g %8x %15a",
+                            args.out, Float.floatToRawIntBits(args.out), args.out));
                     message.append("\n");
-                    message.append(String.format("Actual   output out: %x %.16f", Float.floatToRawIntBits(arrayOut[i * 4 + j]), arrayOut[i * 4 + j]));
+                    message.append(String.format("Actual   output out: %14.8g %8x %15a",
+                            arrayOut[i * 4 + j], Float.floatToRawIntBits(arrayOut[i * 4 + j]), arrayOut[i * 4 + j]));
                     neededUlf = (int) (Math.abs(args.out - arrayOut[i * 4 + j]) / Math.ulp(args.out) + 0.5);
                     if (neededUlf > ulf) {
                         message.append(String.format(" FAILED, ulf needed %d, specified %d", neededUlf, ulf));
                     }
                     message.append("\n");
-                    assertTrue("Incorrect output for checkSincosFloat3Float3Float3" + (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                    assertTrue("Incorrect output for checkSincosFloat3Float3Float3" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
                 }
             }
         }
     }
 
     private void checkSincosFloat4Float4Float4() {
-        Allocation inV = CreateRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0x43e0ba83b8a25adeL);
+        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0x7125678e41ebcabel, false);
         try {
-            Allocation outCosptr = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.FLOAT_32, 4), INPUTSIZE);
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.FLOAT_32, 4), INPUTSIZE);
+            Allocation outCosptr = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 4), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 4), INPUTSIZE);
             script.set_gAllocOutCosptr(outCosptr);
             script.forEach_testSincosFloat4Float4Float4(inV, out);
             verifyResultsSincosFloat4Float4Float4(inV, outCosptr, out, false);
@@ -277,8 +295,8 @@ public class TestSincos extends RSBaseCompute {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testSincosFloat4Float4Float4: " + e.toString());
         }
         try {
-            Allocation outCosptr = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.FLOAT_32, 4), INPUTSIZE);
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.FLOAT_32, 4), INPUTSIZE);
+            Allocation outCosptr = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 4), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 4), INPUTSIZE);
             scriptRelaxed.set_gAllocOutCosptr(outCosptr);
             scriptRelaxed.forEach_testSincosFloat4Float4Float4(inV, out);
             verifyResultsSincosFloat4Float4Float4(inV, outCosptr, out, true);
@@ -315,25 +333,31 @@ public class TestSincos extends RSBaseCompute {
                 }
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
-                    message.append(String.format("Input inV: %x %.16f", Float.floatToRawIntBits(args.inV), args.inV));
+                    message.append(String.format("Input inV: %14.8g %8x %15a",
+                            args.inV, Float.floatToRawIntBits(args.inV), args.inV));
                     message.append("\n");
-                    message.append(String.format("Expected output outCosptr: %x %.16f", Float.floatToRawIntBits(args.outCosptr), args.outCosptr));
+                    message.append(String.format("Expected output outCosptr: %14.8g %8x %15a",
+                            args.outCosptr, Float.floatToRawIntBits(args.outCosptr), args.outCosptr));
                     message.append("\n");
-                    message.append(String.format("Actual   output outCosptr: %x %.16f", Float.floatToRawIntBits(arrayOutCosptr[i * 4 + j]), arrayOutCosptr[i * 4 + j]));
+                    message.append(String.format("Actual   output outCosptr: %14.8g %8x %15a",
+                            arrayOutCosptr[i * 4 + j], Float.floatToRawIntBits(arrayOutCosptr[i * 4 + j]), arrayOutCosptr[i * 4 + j]));
                     neededUlf = (int) (Math.abs(args.outCosptr - arrayOutCosptr[i * 4 + j]) / Math.ulp(args.outCosptr) + 0.5);
                     if (neededUlf > ulf) {
                         message.append(String.format(" FAILED, ulf needed %d, specified %d", neededUlf, ulf));
                     }
                     message.append("\n");
-                    message.append(String.format("Expected output out: %x %.16f", Float.floatToRawIntBits(args.out), args.out));
+                    message.append(String.format("Expected output out: %14.8g %8x %15a",
+                            args.out, Float.floatToRawIntBits(args.out), args.out));
                     message.append("\n");
-                    message.append(String.format("Actual   output out: %x %.16f", Float.floatToRawIntBits(arrayOut[i * 4 + j]), arrayOut[i * 4 + j]));
+                    message.append(String.format("Actual   output out: %14.8g %8x %15a",
+                            arrayOut[i * 4 + j], Float.floatToRawIntBits(arrayOut[i * 4 + j]), arrayOut[i * 4 + j]));
                     neededUlf = (int) (Math.abs(args.out - arrayOut[i * 4 + j]) / Math.ulp(args.out) + 0.5);
                     if (neededUlf > ulf) {
                         message.append(String.format(" FAILED, ulf needed %d, specified %d", neededUlf, ulf));
                     }
                     message.append("\n");
-                    assertTrue("Incorrect output for checkSincosFloat4Float4Float4" + (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                    assertTrue("Incorrect output for checkSincosFloat4Float4Float4" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
                 }
             }
         }

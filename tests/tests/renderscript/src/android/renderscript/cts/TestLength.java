@@ -35,15 +35,15 @@ public class TestLength extends RSBaseCompute {
     }
 
     private void checkLengthFloatFloat() {
-        Allocation inV = CreateRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0xa7d45e56e3a725e0L);
+        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0x8119352509f7cc9fl, false);
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.FLOAT_32, 1), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 1), INPUTSIZE);
             script.forEach_testLengthFloatFloat(inV, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testLengthFloatFloat: " + e.toString());
         }
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.FLOAT_32, 1), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 1), INPUTSIZE);
             scriptRelaxed.forEach_testLengthFloatFloat(inV, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testLengthFloatFloat: " + e.toString());
@@ -51,15 +51,15 @@ public class TestLength extends RSBaseCompute {
     }
 
     private void checkLengthFloat2Float() {
-        Allocation inV = CreateRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0x235324b72e990afaL);
+        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0xaf3b0f345dd9595dl, false);
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.FLOAT_32, 1), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 1), INPUTSIZE);
             script.forEach_testLengthFloat2Float(inV, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testLengthFloat2Float: " + e.toString());
         }
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.FLOAT_32, 1), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 1), INPUTSIZE);
             scriptRelaxed.forEach_testLengthFloat2Float(inV, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testLengthFloat2Float: " + e.toString());
@@ -67,15 +67,15 @@ public class TestLength extends RSBaseCompute {
     }
 
     private void checkLengthFloat3Float() {
-        Allocation inV = CreateRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0x3038a872afc642adL);
+        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0xaf3b19d5bcdfe7bel, false);
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.FLOAT_32, 1), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 1), INPUTSIZE);
             script.forEach_testLengthFloat3Float(inV, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testLengthFloat3Float: " + e.toString());
         }
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.FLOAT_32, 1), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 1), INPUTSIZE);
             scriptRelaxed.forEach_testLengthFloat3Float(inV, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testLengthFloat3Float: " + e.toString());
@@ -83,15 +83,15 @@ public class TestLength extends RSBaseCompute {
     }
 
     private void checkLengthFloat4Float() {
-        Allocation inV = CreateRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0x3d1e2c2e30f37a60L);
+        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0xaf3b24771be6761fl, false);
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.FLOAT_32, 1), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 1), INPUTSIZE);
             script.forEach_testLengthFloat4Float(inV, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testLengthFloat4Float: " + e.toString());
         }
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.FLOAT_32, 1), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 1), INPUTSIZE);
             scriptRelaxed.forEach_testLengthFloat4Float(inV, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testLengthFloat4Float: " + e.toString());

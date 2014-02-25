@@ -43,16 +43,16 @@ public class TestRadians extends RSBaseCompute {
     }
 
     private void checkRadiansFloatFloat() {
-        Allocation inValue = CreateRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0xaa72f23429911decL);
+        Allocation inValue = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0xaa72f227598b8106l, false);
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.FLOAT_32, 1), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 1), INPUTSIZE);
             script.forEach_testRadiansFloatFloat(inValue, out);
             verifyResultsRadiansFloatFloat(inValue, out, false);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testRadiansFloatFloat: " + e.toString());
         }
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.FLOAT_32, 1), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 1), INPUTSIZE);
             scriptRelaxed.forEach_testRadiansFloatFloat(inValue, out);
             verifyResultsRadiansFloatFloat(inValue, out, true);
         } catch (Exception e) {
@@ -82,33 +82,37 @@ public class TestRadians extends RSBaseCompute {
                 }
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
-                    message.append(String.format("Input inValue: %x %.16f", Float.floatToRawIntBits(args.inValue), args.inValue));
+                    message.append(String.format("Input inValue: %14.8g %8x %15a",
+                            args.inValue, Float.floatToRawIntBits(args.inValue), args.inValue));
                     message.append("\n");
-                    message.append(String.format("Expected output out: %x %.16f", Float.floatToRawIntBits(args.out), args.out));
+                    message.append(String.format("Expected output out: %14.8g %8x %15a",
+                            args.out, Float.floatToRawIntBits(args.out), args.out));
                     message.append("\n");
-                    message.append(String.format("Actual   output out: %x %.16f", Float.floatToRawIntBits(arrayOut[i * 1 + j]), arrayOut[i * 1 + j]));
+                    message.append(String.format("Actual   output out: %14.8g %8x %15a",
+                            arrayOut[i * 1 + j], Float.floatToRawIntBits(arrayOut[i * 1 + j]), arrayOut[i * 1 + j]));
                     neededUlf = (int) (Math.abs(args.out - arrayOut[i * 1 + j]) / Math.ulp(args.out) + 0.5);
                     if (neededUlf > ulf) {
                         message.append(String.format(" FAILED, ulf needed %d, specified %d", neededUlf, ulf));
                     }
                     message.append("\n");
-                    assertTrue("Incorrect output for checkRadiansFloatFloat" + (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                    assertTrue("Incorrect output for checkRadiansFloatFloat" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
                 }
             }
         }
     }
 
     private void checkRadiansFloat2Float2() {
-        Allocation inValue = CreateRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0xb28bd93e3e0b3578L);
+        Allocation inValue = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0xb28bd9316e059892l, false);
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.FLOAT_32, 2), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 2), INPUTSIZE);
             script.forEach_testRadiansFloat2Float2(inValue, out);
             verifyResultsRadiansFloat2Float2(inValue, out, false);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testRadiansFloat2Float2: " + e.toString());
         }
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.FLOAT_32, 2), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 2), INPUTSIZE);
             scriptRelaxed.forEach_testRadiansFloat2Float2(inValue, out);
             verifyResultsRadiansFloat2Float2(inValue, out, true);
         } catch (Exception e) {
@@ -138,33 +142,37 @@ public class TestRadians extends RSBaseCompute {
                 }
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
-                    message.append(String.format("Input inValue: %x %.16f", Float.floatToRawIntBits(args.inValue), args.inValue));
+                    message.append(String.format("Input inValue: %14.8g %8x %15a",
+                            args.inValue, Float.floatToRawIntBits(args.inValue), args.inValue));
                     message.append("\n");
-                    message.append(String.format("Expected output out: %x %.16f", Float.floatToRawIntBits(args.out), args.out));
+                    message.append(String.format("Expected output out: %14.8g %8x %15a",
+                            args.out, Float.floatToRawIntBits(args.out), args.out));
                     message.append("\n");
-                    message.append(String.format("Actual   output out: %x %.16f", Float.floatToRawIntBits(arrayOut[i * 2 + j]), arrayOut[i * 2 + j]));
+                    message.append(String.format("Actual   output out: %14.8g %8x %15a",
+                            arrayOut[i * 2 + j], Float.floatToRawIntBits(arrayOut[i * 2 + j]), arrayOut[i * 2 + j]));
                     neededUlf = (int) (Math.abs(args.out - arrayOut[i * 2 + j]) / Math.ulp(args.out) + 0.5);
                     if (neededUlf > ulf) {
                         message.append(String.format(" FAILED, ulf needed %d, specified %d", neededUlf, ulf));
                     }
                     message.append("\n");
-                    assertTrue("Incorrect output for checkRadiansFloat2Float2" + (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                    assertTrue("Incorrect output for checkRadiansFloat2Float2" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
                 }
             }
         }
     }
 
     private void checkRadiansFloat3Float3() {
-        Allocation inValue = CreateRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0xd8404ec587495af6L);
+        Allocation inValue = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0xd8404eb8b743be10l, false);
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.FLOAT_32, 3), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 3), INPUTSIZE);
             script.forEach_testRadiansFloat3Float3(inValue, out);
             verifyResultsRadiansFloat3Float3(inValue, out, false);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testRadiansFloat3Float3: " + e.toString());
         }
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.FLOAT_32, 3), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 3), INPUTSIZE);
             scriptRelaxed.forEach_testRadiansFloat3Float3(inValue, out);
             verifyResultsRadiansFloat3Float3(inValue, out, true);
         } catch (Exception e) {
@@ -194,33 +202,37 @@ public class TestRadians extends RSBaseCompute {
                 }
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
-                    message.append(String.format("Input inValue: %x %.16f", Float.floatToRawIntBits(args.inValue), args.inValue));
+                    message.append(String.format("Input inValue: %14.8g %8x %15a",
+                            args.inValue, Float.floatToRawIntBits(args.inValue), args.inValue));
                     message.append("\n");
-                    message.append(String.format("Expected output out: %x %.16f", Float.floatToRawIntBits(args.out), args.out));
+                    message.append(String.format("Expected output out: %14.8g %8x %15a",
+                            args.out, Float.floatToRawIntBits(args.out), args.out));
                     message.append("\n");
-                    message.append(String.format("Actual   output out: %x %.16f", Float.floatToRawIntBits(arrayOut[i * 4 + j]), arrayOut[i * 4 + j]));
+                    message.append(String.format("Actual   output out: %14.8g %8x %15a",
+                            arrayOut[i * 4 + j], Float.floatToRawIntBits(arrayOut[i * 4 + j]), arrayOut[i * 4 + j]));
                     neededUlf = (int) (Math.abs(args.out - arrayOut[i * 4 + j]) / Math.ulp(args.out) + 0.5);
                     if (neededUlf > ulf) {
                         message.append(String.format(" FAILED, ulf needed %d, specified %d", neededUlf, ulf));
                     }
                     message.append("\n");
-                    assertTrue("Incorrect output for checkRadiansFloat3Float3" + (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                    assertTrue("Incorrect output for checkRadiansFloat3Float3" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
                 }
             }
         }
     }
 
     private void checkRadiansFloat4Float4() {
-        Allocation inValue = CreateRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0xfdf4c44cd0878074L);
+        Allocation inValue = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0xfdf4c4400081e38el, false);
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.FLOAT_32, 4), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 4), INPUTSIZE);
             script.forEach_testRadiansFloat4Float4(inValue, out);
             verifyResultsRadiansFloat4Float4(inValue, out, false);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testRadiansFloat4Float4: " + e.toString());
         }
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.FLOAT_32, 4), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 4), INPUTSIZE);
             scriptRelaxed.forEach_testRadiansFloat4Float4(inValue, out);
             verifyResultsRadiansFloat4Float4(inValue, out, true);
         } catch (Exception e) {
@@ -250,17 +262,21 @@ public class TestRadians extends RSBaseCompute {
                 }
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
-                    message.append(String.format("Input inValue: %x %.16f", Float.floatToRawIntBits(args.inValue), args.inValue));
+                    message.append(String.format("Input inValue: %14.8g %8x %15a",
+                            args.inValue, Float.floatToRawIntBits(args.inValue), args.inValue));
                     message.append("\n");
-                    message.append(String.format("Expected output out: %x %.16f", Float.floatToRawIntBits(args.out), args.out));
+                    message.append(String.format("Expected output out: %14.8g %8x %15a",
+                            args.out, Float.floatToRawIntBits(args.out), args.out));
                     message.append("\n");
-                    message.append(String.format("Actual   output out: %x %.16f", Float.floatToRawIntBits(arrayOut[i * 4 + j]), arrayOut[i * 4 + j]));
+                    message.append(String.format("Actual   output out: %14.8g %8x %15a",
+                            arrayOut[i * 4 + j], Float.floatToRawIntBits(arrayOut[i * 4 + j]), arrayOut[i * 4 + j]));
                     neededUlf = (int) (Math.abs(args.out - arrayOut[i * 4 + j]) / Math.ulp(args.out) + 0.5);
                     if (neededUlf > ulf) {
                         message.append(String.format(" FAILED, ulf needed %d, specified %d", neededUlf, ulf));
                     }
                     message.append("\n");
-                    assertTrue("Incorrect output for checkRadiansFloat4Float4" + (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                    assertTrue("Incorrect output for checkRadiansFloat4Float4" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
                 }
             }
         }

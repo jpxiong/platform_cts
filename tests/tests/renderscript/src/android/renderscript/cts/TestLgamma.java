@@ -35,15 +35,15 @@ public class TestLgamma extends RSBaseCompute {
     }
 
     private void checkLgammaFloatFloat() {
-        Allocation in = CreateRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0x2978c2583eece3baL);
+        Allocation in = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0xe748c67429cab138l, false);
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.FLOAT_32, 1), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 1), INPUTSIZE);
             script.forEach_testLgammaFloatFloat(in, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testLgammaFloatFloat: " + e.toString());
         }
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.FLOAT_32, 1), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 1), INPUTSIZE);
             scriptRelaxed.forEach_testLgammaFloatFloat(in, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testLgammaFloatFloat: " + e.toString());
@@ -51,15 +51,15 @@ public class TestLgamma extends RSBaseCompute {
     }
 
     private void checkLgammaFloat2Float2() {
-        Allocation in = CreateRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0x4b4d78396c12d256L);
+        Allocation in = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0x7ca07efd8a327894l, false);
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.FLOAT_32, 2), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 2), INPUTSIZE);
             script.forEach_testLgammaFloat2Float2(in, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testLgammaFloat2Float2: " + e.toString());
         }
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.FLOAT_32, 2), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 2), INPUTSIZE);
             scriptRelaxed.forEach_testLgammaFloat2Float2(in, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testLgammaFloat2Float2: " + e.toString());
@@ -67,15 +67,15 @@ public class TestLgamma extends RSBaseCompute {
     }
 
     private void checkLgammaFloat3Float3() {
-        Allocation in = CreateRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0x75da98b9977385d0L);
+        Allocation in = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0x7ca0899ee9390e2el, false);
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.FLOAT_32, 3), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 3), INPUTSIZE);
             script.forEach_testLgammaFloat3Float3(in, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testLgammaFloat3Float3: " + e.toString());
         }
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.FLOAT_32, 3), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 3), INPUTSIZE);
             scriptRelaxed.forEach_testLgammaFloat3Float3(in, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testLgammaFloat3Float3: " + e.toString());
@@ -83,15 +83,15 @@ public class TestLgamma extends RSBaseCompute {
     }
 
     private void checkLgammaFloat4Float4() {
-        Allocation in = CreateRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0xa067b939c2d4394aL);
+        Allocation in = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0x7ca09440483fa3c8l, false);
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.FLOAT_32, 4), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 4), INPUTSIZE);
             script.forEach_testLgammaFloat4Float4(in, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testLgammaFloat4Float4: " + e.toString());
         }
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.FLOAT_32, 4), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 4), INPUTSIZE);
             scriptRelaxed.forEach_testLgammaFloat4Float4(in, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testLgammaFloat4Float4: " + e.toString());
@@ -99,18 +99,18 @@ public class TestLgamma extends RSBaseCompute {
     }
 
     private void checkLgammaFloatIntFloat() {
-        Allocation inX = CreateRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0xa3a72c46b5beab5L);
+        Allocation inX = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0x2a62d992979c4bb9l, false);
         try {
-            Allocation outY = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.SIGNED_32, 1), INPUTSIZE);
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.FLOAT_32, 1), INPUTSIZE);
+            Allocation outY = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_32, 1), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 1), INPUTSIZE);
             script.set_gAllocOutY(outY);
             script.forEach_testLgammaFloatIntFloat(inX, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testLgammaFloatIntFloat: " + e.toString());
         }
         try {
-            Allocation outY = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.SIGNED_32, 1), INPUTSIZE);
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.FLOAT_32, 1), INPUTSIZE);
+            Allocation outY = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_32, 1), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 1), INPUTSIZE);
             scriptRelaxed.set_gAllocOutY(outY);
             scriptRelaxed.forEach_testLgammaFloatIntFloat(inX, out);
         } catch (Exception e) {
@@ -119,18 +119,18 @@ public class TestLgamma extends RSBaseCompute {
     }
 
     private void checkLgammaFloat2Int2Float2() {
-        Allocation inX = CreateRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0x8686208259b8c68dL);
+        Allocation inX = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0x409fb9a5984bcf81l, false);
         try {
-            Allocation outY = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.SIGNED_32, 2), INPUTSIZE);
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.FLOAT_32, 2), INPUTSIZE);
+            Allocation outY = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_32, 2), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 2), INPUTSIZE);
             script.set_gAllocOutY(outY);
             script.forEach_testLgammaFloat2Int2Float2(inX, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testLgammaFloat2Int2Float2: " + e.toString());
         }
         try {
-            Allocation outY = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.SIGNED_32, 2), INPUTSIZE);
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.FLOAT_32, 2), INPUTSIZE);
+            Allocation outY = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_32, 2), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 2), INPUTSIZE);
             scriptRelaxed.set_gAllocOutY(outY);
             scriptRelaxed.forEach_testLgammaFloat2Int2Float2(inX, out);
         } catch (Exception e) {
@@ -139,18 +139,18 @@ public class TestLgamma extends RSBaseCompute {
     }
 
     private void checkLgammaFloat3Int3Float3() {
-        Allocation inX = CreateRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0xddb7c8db7ed53ac8L);
+        Allocation inX = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0x6655f8088dfe3c3al, false);
         try {
-            Allocation outY = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.SIGNED_32, 3), INPUTSIZE);
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.FLOAT_32, 3), INPUTSIZE);
+            Allocation outY = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_32, 3), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 3), INPUTSIZE);
             script.set_gAllocOutY(outY);
             script.forEach_testLgammaFloat3Int3Float3(inX, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testLgammaFloat3Int3Float3: " + e.toString());
         }
         try {
-            Allocation outY = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.SIGNED_32, 3), INPUTSIZE);
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.FLOAT_32, 3), INPUTSIZE);
+            Allocation outY = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_32, 3), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 3), INPUTSIZE);
             scriptRelaxed.set_gAllocOutY(outY);
             scriptRelaxed.forEach_testLgammaFloat3Int3Float3(inX, out);
         } catch (Exception e) {
@@ -159,18 +159,18 @@ public class TestLgamma extends RSBaseCompute {
     }
 
     private void checkLgammaFloat4Int4Float4() {
-        Allocation inX = CreateRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0x34e97134a3f1af03L);
+        Allocation inX = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0x8c0c366b83b0a8f3l, false);
         try {
-            Allocation outY = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.SIGNED_32, 4), INPUTSIZE);
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.FLOAT_32, 4), INPUTSIZE);
+            Allocation outY = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_32, 4), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 4), INPUTSIZE);
             script.set_gAllocOutY(outY);
             script.forEach_testLgammaFloat4Int4Float4(inX, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testLgammaFloat4Int4Float4: " + e.toString());
         }
         try {
-            Allocation outY = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.SIGNED_32, 4), INPUTSIZE);
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.FLOAT_32, 4), INPUTSIZE);
+            Allocation outY = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_32, 4), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 4), INPUTSIZE);
             scriptRelaxed.set_gAllocOutY(outY);
             scriptRelaxed.forEach_testLgammaFloat4Int4Float4(inX, out);
         } catch (Exception e) {

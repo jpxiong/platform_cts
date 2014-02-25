@@ -44,10 +44,10 @@ public class TestRemainder extends RSBaseCompute {
     }
 
     private void checkRemainderFloatFloatFloat() {
-        Allocation inX = CreateRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0xa59164b80fbf665eL);
-        Allocation inY = CreateRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0xa59164b80fbf665eL);
+        Allocation inX = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0x27d6330966022888l, false);
+        Allocation inY = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0x27d6330966022889l, false);
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.FLOAT_32, 1), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 1), INPUTSIZE);
             script.set_gAllocInY(inY);
             script.forEach_testRemainderFloatFloatFloat(inX, out);
             verifyResultsRemainderFloatFloatFloat(inX, inY, out, false);
@@ -55,7 +55,7 @@ public class TestRemainder extends RSBaseCompute {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testRemainderFloatFloatFloat: " + e.toString());
         }
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.FLOAT_32, 1), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 1), INPUTSIZE);
             scriptRelaxed.set_gAllocInY(inY);
             scriptRelaxed.forEach_testRemainderFloatFloatFloat(inX, out);
             verifyResultsRemainderFloatFloatFloat(inX, inY, out, true);
@@ -89,29 +89,34 @@ public class TestRemainder extends RSBaseCompute {
                 }
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
-                    message.append(String.format("Input inX: %x %.16f", Float.floatToRawIntBits(args.inX), args.inX));
+                    message.append(String.format("Input inX: %14.8g %8x %15a",
+                            args.inX, Float.floatToRawIntBits(args.inX), args.inX));
                     message.append("\n");
-                    message.append(String.format("Input inY: %x %.16f", Float.floatToRawIntBits(args.inY), args.inY));
+                    message.append(String.format("Input inY: %14.8g %8x %15a",
+                            args.inY, Float.floatToRawIntBits(args.inY), args.inY));
                     message.append("\n");
-                    message.append(String.format("Expected output out: %x %.16f", Float.floatToRawIntBits(args.out), args.out));
+                    message.append(String.format("Expected output out: %14.8g %8x %15a",
+                            args.out, Float.floatToRawIntBits(args.out), args.out));
                     message.append("\n");
-                    message.append(String.format("Actual   output out: %x %.16f", Float.floatToRawIntBits(arrayOut[i * 1 + j]), arrayOut[i * 1 + j]));
+                    message.append(String.format("Actual   output out: %14.8g %8x %15a",
+                            arrayOut[i * 1 + j], Float.floatToRawIntBits(arrayOut[i * 1 + j]), arrayOut[i * 1 + j]));
                     neededUlf = (int) (Math.abs(args.out - arrayOut[i * 1 + j]) / Math.ulp(args.out) + 0.5);
                     if (neededUlf > ulf) {
                         message.append(String.format(" FAILED, ulf needed %d, specified %d", neededUlf, ulf));
                     }
                     message.append("\n");
-                    assertTrue("Incorrect output for checkRemainderFloatFloatFloat" + (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                    assertTrue("Incorrect output for checkRemainderFloatFloatFloat" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
                 }
             }
         }
     }
 
     private void checkRemainderFloat2Float2Float2() {
-        Allocation inX = CreateRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0xf642b6dc30d666aL);
-        Allocation inY = CreateRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0xf642b6dc30d666aL);
+        Allocation inX = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0xfb2eaf332420c6b4l, false);
+        Allocation inY = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0xfb2eaf332420c6b5l, false);
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.FLOAT_32, 2), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 2), INPUTSIZE);
             script.set_gAllocInY(inY);
             script.forEach_testRemainderFloat2Float2Float2(inX, out);
             verifyResultsRemainderFloat2Float2Float2(inX, inY, out, false);
@@ -119,7 +124,7 @@ public class TestRemainder extends RSBaseCompute {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testRemainderFloat2Float2Float2: " + e.toString());
         }
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.FLOAT_32, 2), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 2), INPUTSIZE);
             scriptRelaxed.set_gAllocInY(inY);
             scriptRelaxed.forEach_testRemainderFloat2Float2Float2(inX, out);
             verifyResultsRemainderFloat2Float2Float2(inX, inY, out, true);
@@ -153,29 +158,34 @@ public class TestRemainder extends RSBaseCompute {
                 }
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
-                    message.append(String.format("Input inX: %x %.16f", Float.floatToRawIntBits(args.inX), args.inX));
+                    message.append(String.format("Input inX: %14.8g %8x %15a",
+                            args.inX, Float.floatToRawIntBits(args.inX), args.inX));
                     message.append("\n");
-                    message.append(String.format("Input inY: %x %.16f", Float.floatToRawIntBits(args.inY), args.inY));
+                    message.append(String.format("Input inY: %14.8g %8x %15a",
+                            args.inY, Float.floatToRawIntBits(args.inY), args.inY));
                     message.append("\n");
-                    message.append(String.format("Expected output out: %x %.16f", Float.floatToRawIntBits(args.out), args.out));
+                    message.append(String.format("Expected output out: %14.8g %8x %15a",
+                            args.out, Float.floatToRawIntBits(args.out), args.out));
                     message.append("\n");
-                    message.append(String.format("Actual   output out: %x %.16f", Float.floatToRawIntBits(arrayOut[i * 2 + j]), arrayOut[i * 2 + j]));
+                    message.append(String.format("Actual   output out: %14.8g %8x %15a",
+                            arrayOut[i * 2 + j], Float.floatToRawIntBits(arrayOut[i * 2 + j]), arrayOut[i * 2 + j]));
                     neededUlf = (int) (Math.abs(args.out - arrayOut[i * 2 + j]) / Math.ulp(args.out) + 0.5);
                     if (neededUlf > ulf) {
                         message.append(String.format(" FAILED, ulf needed %d, specified %d", neededUlf, ulf));
                     }
                     message.append("\n");
-                    assertTrue("Incorrect output for checkRemainderFloat2Float2Float2" + (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                    assertTrue("Incorrect output for checkRemainderFloat2Float2Float2" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
                 }
             }
         }
     }
 
     private void checkRemainderFloat3Float3Float3() {
-        Allocation inX = CreateRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0xe4ddcf0895736973L);
-        Allocation inY = CreateRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0xe4ddcf0895736973L);
+        Allocation inX = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0x4f938d5325fec855l, false);
+        Allocation inY = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0x4f938d5325fec856l, false);
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.FLOAT_32, 3), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 3), INPUTSIZE);
             script.set_gAllocInY(inY);
             script.forEach_testRemainderFloat3Float3Float3(inX, out);
             verifyResultsRemainderFloat3Float3Float3(inX, inY, out, false);
@@ -183,7 +193,7 @@ public class TestRemainder extends RSBaseCompute {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testRemainderFloat3Float3Float3: " + e.toString());
         }
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.FLOAT_32, 3), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 3), INPUTSIZE);
             scriptRelaxed.set_gAllocInY(inY);
             scriptRelaxed.forEach_testRemainderFloat3Float3Float3(inX, out);
             verifyResultsRemainderFloat3Float3Float3(inX, inY, out, true);
@@ -217,29 +227,34 @@ public class TestRemainder extends RSBaseCompute {
                 }
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
-                    message.append(String.format("Input inX: %x %.16f", Float.floatToRawIntBits(args.inX), args.inX));
+                    message.append(String.format("Input inX: %14.8g %8x %15a",
+                            args.inX, Float.floatToRawIntBits(args.inX), args.inX));
                     message.append("\n");
-                    message.append(String.format("Input inY: %x %.16f", Float.floatToRawIntBits(args.inY), args.inY));
+                    message.append(String.format("Input inY: %14.8g %8x %15a",
+                            args.inY, Float.floatToRawIntBits(args.inY), args.inY));
                     message.append("\n");
-                    message.append(String.format("Expected output out: %x %.16f", Float.floatToRawIntBits(args.out), args.out));
+                    message.append(String.format("Expected output out: %14.8g %8x %15a",
+                            args.out, Float.floatToRawIntBits(args.out), args.out));
                     message.append("\n");
-                    message.append(String.format("Actual   output out: %x %.16f", Float.floatToRawIntBits(arrayOut[i * 4 + j]), arrayOut[i * 4 + j]));
+                    message.append(String.format("Actual   output out: %14.8g %8x %15a",
+                            arrayOut[i * 4 + j], Float.floatToRawIntBits(arrayOut[i * 4 + j]), arrayOut[i * 4 + j]));
                     neededUlf = (int) (Math.abs(args.out - arrayOut[i * 4 + j]) / Math.ulp(args.out) + 0.5);
                     if (neededUlf > ulf) {
                         message.append(String.format(" FAILED, ulf needed %d, specified %d", neededUlf, ulf));
                     }
                     message.append("\n");
-                    assertTrue("Incorrect output for checkRemainderFloat3Float3Float3" + (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                    assertTrue("Incorrect output for checkRemainderFloat3Float3Float3" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
                 }
             }
         }
     }
 
     private void checkRemainderFloat4Float4Float4() {
-        Allocation inX = CreateRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0xba5772a367d96c7cL);
-        Allocation inY = CreateRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0xba5772a367d96c7cL);
+        Allocation inX = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0xa3f86b7327dcc9f6l, false);
+        Allocation inY = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0xa3f86b7327dcc9f7l, false);
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.FLOAT_32, 4), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 4), INPUTSIZE);
             script.set_gAllocInY(inY);
             script.forEach_testRemainderFloat4Float4Float4(inX, out);
             verifyResultsRemainderFloat4Float4Float4(inX, inY, out, false);
@@ -247,7 +262,7 @@ public class TestRemainder extends RSBaseCompute {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testRemainderFloat4Float4Float4: " + e.toString());
         }
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.FLOAT_32, 4), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 4), INPUTSIZE);
             scriptRelaxed.set_gAllocInY(inY);
             scriptRelaxed.forEach_testRemainderFloat4Float4Float4(inX, out);
             verifyResultsRemainderFloat4Float4Float4(inX, inY, out, true);
@@ -281,19 +296,24 @@ public class TestRemainder extends RSBaseCompute {
                 }
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
-                    message.append(String.format("Input inX: %x %.16f", Float.floatToRawIntBits(args.inX), args.inX));
+                    message.append(String.format("Input inX: %14.8g %8x %15a",
+                            args.inX, Float.floatToRawIntBits(args.inX), args.inX));
                     message.append("\n");
-                    message.append(String.format("Input inY: %x %.16f", Float.floatToRawIntBits(args.inY), args.inY));
+                    message.append(String.format("Input inY: %14.8g %8x %15a",
+                            args.inY, Float.floatToRawIntBits(args.inY), args.inY));
                     message.append("\n");
-                    message.append(String.format("Expected output out: %x %.16f", Float.floatToRawIntBits(args.out), args.out));
+                    message.append(String.format("Expected output out: %14.8g %8x %15a",
+                            args.out, Float.floatToRawIntBits(args.out), args.out));
                     message.append("\n");
-                    message.append(String.format("Actual   output out: %x %.16f", Float.floatToRawIntBits(arrayOut[i * 4 + j]), arrayOut[i * 4 + j]));
+                    message.append(String.format("Actual   output out: %14.8g %8x %15a",
+                            arrayOut[i * 4 + j], Float.floatToRawIntBits(arrayOut[i * 4 + j]), arrayOut[i * 4 + j]));
                     neededUlf = (int) (Math.abs(args.out - arrayOut[i * 4 + j]) / Math.ulp(args.out) + 0.5);
                     if (neededUlf > ulf) {
                         message.append(String.format(" FAILED, ulf needed %d, specified %d", neededUlf, ulf));
                     }
                     message.append("\n");
-                    assertTrue("Incorrect output for checkRemainderFloat4Float4Float4" + (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                    assertTrue("Incorrect output for checkRemainderFloat4Float4Float4" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
                 }
             }
         }

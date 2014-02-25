@@ -35,17 +35,17 @@ public class TestFastDistance extends RSBaseCompute {
     }
 
     private void checkFastDistanceFloatFloatFloat() {
-        Allocation inLhs = CreateRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0x660a61c75e803475L);
-        Allocation inRhs = CreateRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0x660a61c75e803475L);
+        Allocation inLhs = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0xfe7e5e843bff0cb7l, false);
+        Allocation inRhs = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0xfe7e5e843bff380dl, false);
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.FLOAT_32, 1), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 1), INPUTSIZE);
             script.set_gAllocInRhs(inRhs);
             script.forEach_testFastDistanceFloatFloatFloat(inLhs, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testFastDistanceFloatFloatFloat: " + e.toString());
         }
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.FLOAT_32, 1), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 1), INPUTSIZE);
             scriptRelaxed.set_gAllocInRhs(inRhs);
             scriptRelaxed.forEach_testFastDistanceFloatFloatFloat(inLhs, out);
         } catch (Exception e) {
@@ -54,17 +54,17 @@ public class TestFastDistance extends RSBaseCompute {
     }
 
     private void checkFastDistanceFloat2Float2Float() {
-        Allocation inLhs = CreateRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0xacdd5d5ec4a0b0a1L);
-        Allocation inRhs = CreateRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0xacdd5d5ec4a0b0a1L);
+        Allocation inLhs = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0x422e8a00560ac063l, false);
+        Allocation inRhs = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0x422e8a00560aebb9l, false);
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.FLOAT_32, 1), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 1), INPUTSIZE);
             script.set_gAllocInRhs(inRhs);
             script.forEach_testFastDistanceFloat2Float2Float(inLhs, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testFastDistanceFloat2Float2Float: " + e.toString());
         }
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.FLOAT_32, 1), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 1), INPUTSIZE);
             scriptRelaxed.set_gAllocInRhs(inRhs);
             scriptRelaxed.forEach_testFastDistanceFloat2Float2Float(inLhs, out);
         } catch (Exception e) {
@@ -73,17 +73,17 @@ public class TestFastDistance extends RSBaseCompute {
     }
 
     private void checkFastDistanceFloat3Float3Float() {
-        Allocation inLhs = CreateRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0x6346a98e6a48f9bbL);
-        Allocation inRhs = CreateRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0x6346a98e6a48f9bbL);
+        Allocation inLhs = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0x6f1fd960a620dbbdl, false);
+        Allocation inRhs = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0x6f1fd960a6210713l, false);
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.FLOAT_32, 1), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 1), INPUTSIZE);
             script.set_gAllocInRhs(inRhs);
             script.forEach_testFastDistanceFloat3Float3Float(inLhs, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testFastDistanceFloat3Float3Float: " + e.toString());
         }
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.FLOAT_32, 1), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 1), INPUTSIZE);
             scriptRelaxed.set_gAllocInRhs(inRhs);
             scriptRelaxed.forEach_testFastDistanceFloat3Float3Float(inLhs, out);
         } catch (Exception e) {
@@ -92,17 +92,17 @@ public class TestFastDistance extends RSBaseCompute {
     }
 
     private void checkFastDistanceFloat4Float4Float() {
-        Allocation inLhs = CreateRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0x19aff5be0ff142d5L);
-        Allocation inRhs = CreateRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0x19aff5be0ff142d5L);
+        Allocation inLhs = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0x9c1128c0f636f717l, false);
+        Allocation inRhs = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0x9c1128c0f637226dl, false);
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.FLOAT_32, 1), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 1), INPUTSIZE);
             script.set_gAllocInRhs(inRhs);
             script.forEach_testFastDistanceFloat4Float4Float(inLhs, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testFastDistanceFloat4Float4Float: " + e.toString());
         }
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.FLOAT_32, 1), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 1), INPUTSIZE);
             scriptRelaxed.set_gAllocInRhs(inRhs);
             scriptRelaxed.forEach_testFastDistanceFloat4Float4Float(inLhs, out);
         } catch (Exception e) {

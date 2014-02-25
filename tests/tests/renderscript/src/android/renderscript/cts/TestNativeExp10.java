@@ -35,15 +35,15 @@ public class TestNativeExp10 extends RSBaseCompute {
     }
 
     private void checkNativeExp10FloatFloat() {
-        Allocation inV = CreateRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0x1ea468d5c9dc26f5L);
+        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0x562e4ea690352c54l, -37, 37);
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.FLOAT_32, 1), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 1), INPUTSIZE);
             script.forEach_testNativeExp10FloatFloat(inV, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testNativeExp10FloatFloat: " + e.toString());
         }
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.FLOAT_32, 1), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 1), INPUTSIZE);
             scriptRelaxed.forEach_testNativeExp10FloatFloat(inV, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testNativeExp10FloatFloat: " + e.toString());
@@ -51,15 +51,15 @@ public class TestNativeExp10 extends RSBaseCompute {
     }
 
     private void checkNativeExp10Float2Float2() {
-        Allocation inV = CreateRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0x1d70d62b016cd7e1L);
+        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0x7450c64e54876b98l, -37, 37);
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.FLOAT_32, 2), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 2), INPUTSIZE);
             script.forEach_testNativeExp10Float2Float2(inV, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testNativeExp10Float2Float2: " + e.toString());
         }
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.FLOAT_32, 2), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 2), INPUTSIZE);
             scriptRelaxed.forEach_testNativeExp10Float2Float2(inV, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testNativeExp10Float2Float2: " + e.toString());
@@ -67,15 +67,15 @@ public class TestNativeExp10 extends RSBaseCompute {
     }
 
     private void checkNativeExp10Float3Float3() {
-        Allocation inV = CreateRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0xb85724cd711864ebL);
+        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0x74528f694aa28c76l, -37, 37);
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.FLOAT_32, 3), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 3), INPUTSIZE);
             script.forEach_testNativeExp10Float3Float3(inV, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testNativeExp10Float3Float3: " + e.toString());
         }
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.FLOAT_32, 3), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 3), INPUTSIZE);
             scriptRelaxed.forEach_testNativeExp10Float3Float3(inV, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testNativeExp10Float3Float3: " + e.toString());
@@ -83,15 +83,15 @@ public class TestNativeExp10 extends RSBaseCompute {
     }
 
     private void checkNativeExp10Float4Float4() {
-        Allocation inV = CreateRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0x533d736fe0c3f1f5L);
+        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0x7454588440bdad54l, -37, 37);
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.FLOAT_32, 4), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 4), INPUTSIZE);
             script.forEach_testNativeExp10Float4Float4(inV, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testNativeExp10Float4Float4: " + e.toString());
         }
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.FLOAT_32, 4), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 4), INPUTSIZE);
             scriptRelaxed.forEach_testNativeExp10Float4Float4(inV, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testNativeExp10Float4Float4: " + e.toString());

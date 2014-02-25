@@ -35,11 +35,11 @@ public class TestRemquo extends RSBaseCompute {
     }
 
     private void checkRemquoFloatFloatIntFloat() {
-        Allocation inB = CreateRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0x5d326c1d386b6633L);
-        Allocation inC = CreateRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0x5d326c1d386b6633L);
+        Allocation inB = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0x118af9b82db63b13l, false);
+        Allocation inC = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0x118af9b82db63b14l, false);
         try {
-            Allocation outD = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.SIGNED_32, 1), INPUTSIZE);
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.FLOAT_32, 1), INPUTSIZE);
+            Allocation outD = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_32, 1), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 1), INPUTSIZE);
             script.set_gAllocInC(inC);
             script.set_gAllocOutD(outD);
             script.forEach_testRemquoFloatFloatIntFloat(inB, out);
@@ -47,8 +47,8 @@ public class TestRemquo extends RSBaseCompute {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testRemquoFloatFloatIntFloat: " + e.toString());
         }
         try {
-            Allocation outD = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.SIGNED_32, 1), INPUTSIZE);
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.FLOAT_32, 1), INPUTSIZE);
+            Allocation outD = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_32, 1), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 1), INPUTSIZE);
             scriptRelaxed.set_gAllocInC(inC);
             scriptRelaxed.set_gAllocOutD(outD);
             scriptRelaxed.forEach_testRemquoFloatFloatIntFloat(inB, out);
@@ -58,11 +58,11 @@ public class TestRemquo extends RSBaseCompute {
     }
 
     private void checkRemquoFloat2Float2Int2Float2() {
-        Allocation inB = CreateRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0x2c64ad3c01961703L);
-        Allocation inC = CreateRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0x2c64ad3c01961703L);
+        Allocation inB = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0x9b98a1a6b125f903l, false);
+        Allocation inC = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0x9b98a1a6b125f904l, false);
         try {
-            Allocation outD = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.SIGNED_32, 2), INPUTSIZE);
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.FLOAT_32, 2), INPUTSIZE);
+            Allocation outD = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_32, 2), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 2), INPUTSIZE);
             script.set_gAllocInC(inC);
             script.set_gAllocOutD(outD);
             script.forEach_testRemquoFloat2Float2Int2Float2(inB, out);
@@ -70,8 +70,8 @@ public class TestRemquo extends RSBaseCompute {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testRemquoFloat2Float2Int2Float2: " + e.toString());
         }
         try {
-            Allocation outD = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.SIGNED_32, 2), INPUTSIZE);
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.FLOAT_32, 2), INPUTSIZE);
+            Allocation outD = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_32, 2), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 2), INPUTSIZE);
             scriptRelaxed.set_gAllocInC(inC);
             scriptRelaxed.set_gAllocOutD(outD);
             scriptRelaxed.forEach_testRemquoFloat2Float2Int2Float2(inB, out);
@@ -81,11 +81,11 @@ public class TestRemquo extends RSBaseCompute {
     }
 
     private void checkRemquoFloat3Float3Int3Float3() {
-        Allocation inB = CreateRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0x321381362dbef267L);
-        Allocation inC = CreateRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0x321381362dbef267L);
+        Allocation inB = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0xa049a00a6911ca8fl, false);
+        Allocation inC = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0xa049a00a6911ca90l, false);
         try {
-            Allocation outD = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.SIGNED_32, 3), INPUTSIZE);
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.FLOAT_32, 3), INPUTSIZE);
+            Allocation outD = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_32, 3), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 3), INPUTSIZE);
             script.set_gAllocInC(inC);
             script.set_gAllocOutD(outD);
             script.forEach_testRemquoFloat3Float3Int3Float3(inB, out);
@@ -93,8 +93,8 @@ public class TestRemquo extends RSBaseCompute {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testRemquoFloat3Float3Int3Float3: " + e.toString());
         }
         try {
-            Allocation outD = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.SIGNED_32, 3), INPUTSIZE);
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.FLOAT_32, 3), INPUTSIZE);
+            Allocation outD = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_32, 3), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 3), INPUTSIZE);
             scriptRelaxed.set_gAllocInC(inC);
             scriptRelaxed.set_gAllocOutD(outD);
             scriptRelaxed.forEach_testRemquoFloat3Float3Int3Float3(inB, out);
@@ -104,11 +104,11 @@ public class TestRemquo extends RSBaseCompute {
     }
 
     private void checkRemquoFloat4Float4Int4Float4() {
-        Allocation inB = CreateRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0x37c2553059e7cdcbL);
-        Allocation inC = CreateRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0x37c2553059e7cdcbL);
+        Allocation inB = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0xa4fa9e6e20fd9c1bl, false);
+        Allocation inC = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0xa4fa9e6e20fd9c1cl, false);
         try {
-            Allocation outD = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.SIGNED_32, 4), INPUTSIZE);
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.FLOAT_32, 4), INPUTSIZE);
+            Allocation outD = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_32, 4), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 4), INPUTSIZE);
             script.set_gAllocInC(inC);
             script.set_gAllocOutD(outD);
             script.forEach_testRemquoFloat4Float4Int4Float4(inB, out);
@@ -116,8 +116,8 @@ public class TestRemquo extends RSBaseCompute {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testRemquoFloat4Float4Int4Float4: " + e.toString());
         }
         try {
-            Allocation outD = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.SIGNED_32, 4), INPUTSIZE);
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.FLOAT_32, 4), INPUTSIZE);
+            Allocation outD = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_32, 4), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 4), INPUTSIZE);
             scriptRelaxed.set_gAllocInC(inC);
             scriptRelaxed.set_gAllocOutD(outD);
             scriptRelaxed.forEach_testRemquoFloat4Float4Int4Float4(inB, out);

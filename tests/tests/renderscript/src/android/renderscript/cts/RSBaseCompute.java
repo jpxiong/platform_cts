@@ -77,7 +77,7 @@ class RSBaseCompute extends RSBase {
     }
 
     // TODO Is there a better way to do this
-    protected Element GetElement(RenderScript rs, Element.DataType dataType, int size) {
+    protected Element getElement(RenderScript rs, Element.DataType dataType, int size) {
         Element element = null;
         if (size == 1) {
             if (dataType == Element.DataType.FLOAT_64) {
@@ -109,56 +109,245 @@ class RSBaseCompute extends RSBase {
         }
         return element;
     }
-    protected Allocation CreateRandomAllocation(RenderScript rs, Element.DataType dataType,
-            int size, long seed) {
-        Element element = GetElement(rs, dataType, size);
+
+    protected Allocation createRandomAllocation(RenderScript rs, Element.DataType dataType,
+            int size, long seed, boolean includeExtremes) {
+        Element element = getElement(rs, dataType, size);
         Allocation alloc = Allocation.createSized(rs, element, INPUTSIZE);
         int width = (size == 3) ? 4 : size;
         /* TODO copy1DRangeFrom does not work for double
         if (dataType == Element.DataType.FLOAT_64) {
             double[] inArray = new double[INPUTSIZE * width];
-            RSUtils.genRandomFloats(seed, 0.0f, 1.0f, inArray);
+            RSUtils.genRandomDoubles(seed, inArray, includeExtremes);
             alloc.copy1DRangeFrom(0, INPUTSIZE, inArray);
         } else
         */
-        /* TODO The ranges for float is too small.  We need to accept a wider range of values.
-         * Same thing for the integer types.  For some functions (e.g. native*), we would like to
-         * specify a range in the spec file, as differs by function.  Besides generating random
-         * values, we'd also like to force specific values, like 0, 1, pi, pi/2, NaN, +inf, -inf.
-         */
         if (dataType == Element.DataType.FLOAT_32) {
             float[] inArray = new float[INPUTSIZE * width];
-            RSUtils.genRandomFloats(seed, 0.0f, 1.0f, inArray);
+            RSUtils.genRandomFloats(seed, inArray, includeExtremes);
             alloc.copy1DRangeFrom(0, INPUTSIZE, inArray);
+        /* TODO copy1DRangFrom does not work for long
+        } else if (dataType == Element.DataType.SIGNED_64) {
+            long[] inArray = new long[INPUTSIZE * width];
+            RSUtils.genRandomLongs(seed, inArray);
+            alloc.copy1DRangeFrom(0, INPUTSIZE, inArray);
+        } else if (dataType == Element.DataType.UNSIGNED_64) {
+            long[] inArray = new long[INPUTSIZE * width];
+            RSUtils.genRandomLongs(seed, inArray);
+            alloc.copy1DRangeFrom(0, INPUTSIZE, inArray);
+        */
         } else if (dataType == Element.DataType.SIGNED_32) {
             int[] inArray = new int[INPUTSIZE * width];
-            RSUtils.genRandomInts(seed, -4000, 4000, inArray);
+            RSUtils.genRandomInts(seed, inArray);
             alloc.copy1DRangeFrom(0, INPUTSIZE, inArray);
         } else if (dataType == Element.DataType.UNSIGNED_32) {
             int[] inArray = new int[INPUTSIZE * width];
-            RSUtils.genRandomInts(seed, 0, 4000, inArray);
+            RSUtils.genRandomInts(seed, inArray);
             alloc.copy1DRangeFrom(0, INPUTSIZE, inArray);
         } else if (dataType == Element.DataType.SIGNED_16) {
             short[] inArray = new short[INPUTSIZE * width];
-            RSUtils.genRandomShorts(seed, -4000, 4000, inArray);
+            RSUtils.genRandomShorts(seed, inArray);
             alloc.copy1DRangeFrom(0, INPUTSIZE, inArray);
         } else if (dataType == Element.DataType.UNSIGNED_16) {
             short[] inArray = new short[INPUTSIZE * width];
-            RSUtils.genRandomShorts(seed, 0, 4000, inArray);
+            RSUtils.genRandomShorts(seed, inArray);
             alloc.copy1DRangeFrom(0, INPUTSIZE, inArray);
         } else if (dataType == Element.DataType.SIGNED_8) {
             byte[] inArray = new byte[INPUTSIZE * width];
-            RSUtils.genRandomBytes(seed, -128, 127, inArray);
+            RSUtils.genRandomBytes(seed, inArray);
             alloc.copy1DRangeFrom(0, INPUTSIZE, inArray);
         } else if (dataType == Element.DataType.UNSIGNED_8) {
             byte[] inArray = new byte[INPUTSIZE * width];
-            RSUtils.genRandomBytes(seed, 0, 255, inArray);
+            RSUtils.genRandomBytes(seed, inArray);
             alloc.copy1DRangeFrom(0, INPUTSIZE, inArray);
         } else {
             android.util.Log.e("RenderscriptCTS", "Don't know how to create allocation of type" +
                     dataType.toString());
         }
         return alloc;
+    }
+
+    protected Allocation createRandomAllocation(RenderScript rs, Element.DataType dataType,
+            int size, long seed, double minValue, double maxValue) {
+        Element element = getElement(rs, dataType, size);
+        Allocation alloc = Allocation.createSized(rs, element, INPUTSIZE);
+        int width = (size == 3) ? 4 : size;
+        /* TODO copy1DRangeFrom does not work for double
+        if (dataType == Element.DataType.FLOAT_64) {
+            double[] inArray = new double[INPUTSIZE * width];
+            RSUtils.genRandomDoubles(seed, minValue, maxValue, inArray);
+            alloc.copy1DRangeFrom(0, INPUTSIZE, inArray);
+        } else */
+        if (dataType == Element.DataType.FLOAT_32) {
+            float[] inArray = new float[INPUTSIZE * width];
+            RSUtils.genRandomFloats(seed, (float) minValue, (float) maxValue, inArray);
+            alloc.copy1DRangeFrom(0, INPUTSIZE, inArray);
+        } else {
+            android.util.Log.e("RenderscriptCTS", "Range is only supported fro floats, not for " +
+                    dataType.toString());
+        }
+        return alloc;
+    }
+
+    protected <T> void enforceOrdering(/*RenderScript rs,*/ Allocation minAlloc, Allocation maxAlloc) {
+        Element element = minAlloc.getElement();
+        int stride = element.getVectorSize();
+        if (stride == 3) {
+            stride = 4;
+        }
+        int size = INPUTSIZE * stride;
+        Element.DataType dataType = element.getDataType();
+        /* TODO copy1DRangeFrom does not work for double
+        if (dataType == Element.DataType.FLOAT_64) {
+            double[] minArray = new double[size];
+            double[] maxArray = new double[size];
+            minAlloc.copyTo(minArray);
+            maxAlloc.copyTo(maxArray);
+            for (int i = 0; i < size; i++) {
+                if (minArray[i] > maxArray[i]) {
+                    double temp = minArray[i];
+                    minArray[i] = maxArray[i];
+                    maxArray[i] = temp;
+                }
+            }
+            minAlloc.copyFrom(minArray);
+            maxAlloc.copyFrom(maxArray);
+        } else */
+        if (dataType == Element.DataType.FLOAT_32) {
+            float[] minArray = new float[size];
+            float[] maxArray = new float[size];
+            minAlloc.copyTo(minArray);
+            maxAlloc.copyTo(maxArray);
+            for (int i = 0; i < size; i++) {
+                if (minArray[i] > maxArray[i]) {
+                    float temp = minArray[i];
+                    minArray[i] = maxArray[i];
+                    maxArray[i] = temp;
+                }
+            }
+            minAlloc.copyFrom(minArray);
+            maxAlloc.copyFrom(maxArray);
+        /* TODO copy1DRangFrom does not work for long
+        } else if (dataType == Element.DataType.SIGNED_64) {
+            long[] minArray = new long[size];
+            long[] maxArray = new long[size];
+            minAlloc.copyTo(minArray);
+            maxAlloc.copyTo(maxArray);
+            for (int i = 0; i < size; i++) {
+                if (minArray[i] > maxArray[i]) {
+                    long temp = minArray[i];
+                    minArray[i] = maxArray[i];
+                    maxArray[i] = temp;
+                }
+            }
+            minAlloc.copyFrom(minArray);
+            maxAlloc.copyFrom(maxArray);
+        } else if (dataType == Element.DataType.UNSIGNED_64) {
+            long[] minArray = new long[size];
+            long[] maxArray = new long[size];
+            minAlloc.copyTo(minArray);
+            maxAlloc.copyTo(maxArray);
+            for (int i = 0; i < size; i++) {
+                if (RSUtils.compareUnsignedLong(minArray[i], maxArray[i]) > 0) {
+                    long temp = minArray[i];
+                    minArray[i] = maxArray[i];
+                    maxArray[i] = temp;
+                }
+            }
+            minAlloc.copyFrom(minArray);
+            maxAlloc.copyFrom(maxArray);
+        */
+        } else if (dataType == Element.DataType.SIGNED_32) {
+            int[] minArray = new int[size];
+            int[] maxArray = new int[size];
+            minAlloc.copyTo(minArray);
+            maxAlloc.copyTo(maxArray);
+            for (int i = 0; i < size; i++) {
+                if (minArray[i] > maxArray[i]) {
+                    int temp = minArray[i];
+                    minArray[i] = maxArray[i];
+                    maxArray[i] = temp;
+                }
+            }
+            minAlloc.copyFrom(minArray);
+            maxAlloc.copyFrom(maxArray);
+        } else if (dataType == Element.DataType.UNSIGNED_32) {
+            int[] minArray = new int[size];
+            int[] maxArray = new int[size];
+            minAlloc.copyTo(minArray);
+            maxAlloc.copyTo(maxArray);
+            for (int i = 0; i < size; i++) {
+                long min = minArray[i] &0xffffffffl;
+                long max = maxArray[i] &0xffffffffl;
+                if (min > max) {
+                    minArray[i] = (int) max;
+                    maxArray[i] = (int) min;
+                }
+            }
+            minAlloc.copyFrom(minArray);
+            maxAlloc.copyFrom(maxArray);
+        } else if (dataType == Element.DataType.SIGNED_16) {
+            short[] minArray = new short[size];
+            short[] maxArray = new short[size];
+            minAlloc.copyTo(minArray);
+            maxAlloc.copyTo(maxArray);
+            for (int i = 0; i < size; i++) {
+                if (minArray[i] > maxArray[i]) {
+                    short temp = minArray[i];
+                    minArray[i] = maxArray[i];
+                    maxArray[i] = temp;
+                }
+            }
+            minAlloc.copyFrom(minArray);
+            maxAlloc.copyFrom(maxArray);
+        } else if (dataType == Element.DataType.UNSIGNED_16) {
+            short[] minArray = new short[size];
+            short[] maxArray = new short[size];
+            minAlloc.copyTo(minArray);
+            maxAlloc.copyTo(maxArray);
+            for (int i = 0; i < size; i++) {
+                int min = minArray[i] &0xffff;
+                int max = maxArray[i] &0xffff;
+                if (min > max) {
+                    minArray[i] = (short) max;
+                    maxArray[i] = (short) min;
+                }
+            }
+            minAlloc.copyFrom(minArray);
+            maxAlloc.copyFrom(maxArray);
+        } else if (dataType == Element.DataType.SIGNED_8) {
+            byte[] minArray = new byte[size];
+            byte[] maxArray = new byte[size];
+            minAlloc.copyTo(minArray);
+            maxAlloc.copyTo(maxArray);
+            for (int i = 0; i < size; i++) {
+                if (minArray[i] > maxArray[i]) {
+                    byte temp = minArray[i];
+                    minArray[i] = maxArray[i];
+                    maxArray[i] = temp;
+                }
+            }
+            minAlloc.copyFrom(minArray);
+            maxAlloc.copyFrom(maxArray);
+        } else if (dataType == Element.DataType.UNSIGNED_8) {
+            byte[] minArray = new byte[size];
+            byte[] maxArray = new byte[size];
+            minAlloc.copyTo(minArray);
+            maxAlloc.copyTo(maxArray);
+            for (int i = 0; i < size; i++) {
+                int min = minArray[i] &0xff;
+                int max = maxArray[i] &0xff;
+                if (min > max) {
+                    minArray[i] = (byte) max;
+                    maxArray[i] = (byte) min;
+                }
+            }
+            minAlloc.copyFrom(minArray);
+            maxAlloc.copyFrom(maxArray);
+        } else {
+            android.util.Log.e("RenderscriptCTS", "Ordering not supported for " +
+                    dataType.toString());
+        }
     }
 
     public void forEach(int testId, Allocation mIn, Allocation mOut) throws RSRuntimeException {
