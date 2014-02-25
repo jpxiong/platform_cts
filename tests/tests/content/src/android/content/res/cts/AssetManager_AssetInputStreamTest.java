@@ -42,8 +42,12 @@ public class AssetManager_AssetInputStreamTest extends AndroidTestCase {
     }
 
     public void testGetAssetInt() {
-        // the return value of getAssetInt is a random number
-        mAssetInputStream.getAssetInt();
+        try {
+            // getAssetInt is no longer supported.
+            mAssetInputStream.getAssetInt();
+            fail();
+        } catch (UnsupportedOperationException expected) {
+        }
     }
 
     public void testMarkReset() throws IOException {
