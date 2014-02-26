@@ -22,7 +22,6 @@ import android.hardware.camera2.CameraCharacteristics;
 import android.hardware.camera2.CameraDevice;
 import android.hardware.camera2.CameraManager;
 import android.hardware.camera2.CameraMetadata;
-import android.hardware.camera2.CaptureFailure;
 import android.hardware.camera2.CaptureRequest;
 import android.hardware.camera2.CaptureResult;
 import android.hardware.camera2.Size;
@@ -39,8 +38,6 @@ import static com.android.ex.camera2.blocking.BlockingStateListener.*;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.TimeUnit;
 
 public class CameraCaptureResultTest extends AndroidTestCase {
     private static final String TAG = "CameraCaptureResultTest";
@@ -213,42 +210,6 @@ public class CameraCaptureResultTest extends AndroidTestCase {
 
         assertTrue("Some keys have null values, " + failedKeyNames.toString(),
                 mFailedKeys.isEmpty());
-    }
-
-    private static class SimpleCaptureListener extends CameraDevice.CaptureListener {
-        LinkedBlockingQueue<CaptureResult> mQueue = new LinkedBlockingQueue<CaptureResult>();
-
-        @Override
-        public void onCaptureStarted(CameraDevice camera, CaptureRequest request, long timestamp)
-        {
-        }
-
-        @Override
-        public void onCaptureCompleted(CameraDevice camera, CaptureRequest request,
-                CaptureResult result) {
-            try {
-                mQueue.put(result);
-            } catch (InterruptedException e) {
-                throw new UnsupportedOperationException(
-                        "Can't handle InterruptedException in onCaptureCompleted");
-            }
-        }
-
-        @Override
-        public void onCaptureFailed(CameraDevice camera, CaptureRequest request,
-                CaptureFailure failure) {
-        }
-
-        @Override
-        public void onCaptureSequenceCompleted(CameraDevice camera, int sequenceId,
-                int frameNumber) {
-        }
-
-        public CaptureResult getCaptureResult(long timeout) throws InterruptedException {
-            CaptureResult result = mQueue.poll(timeout, TimeUnit.MILLISECONDS);
-            assertNotNull("Wait for a capture result timed out in " + timeout + "ms", result);
-            return result;
-        }
     }
 
     private void createDefaultSurface(Size sz) {
