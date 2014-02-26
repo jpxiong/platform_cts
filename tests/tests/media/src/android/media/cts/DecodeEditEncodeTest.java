@@ -317,7 +317,7 @@ public class DecodeEditEncodeTest extends AndroidTestCase {
                     encoderOutputBuffers = encoder.getOutputBuffers();
                     if (VERBOSE) Log.d(TAG, "encoder output buffers changed");
                 } else if (encoderStatus == MediaCodec.INFO_OUTPUT_FORMAT_CHANGED) {
-                    // not expected for an encoder
+                    // expected on API 18+
                     MediaFormat newFormat = encoder.getOutputFormat();
                     if (VERBOSE) Log.d(TAG, "encoder output format changed: " + newFormat);
                 } else if (encoderStatus < 0) {
