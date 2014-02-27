@@ -164,6 +164,7 @@ public class InputMethodInfoTest extends AndroidTestCase {
         mInputMethodInfo.writeToParcel(p, 0);
         p.setDataPosition(0);
         final InputMethodInfo imi = InputMethodInfo.CREATOR.createFromParcel(p);
+        p.recycle();
 
         assertEquals(mInputMethodInfo.getPackageName(), imi.getPackageName());
         assertEquals(mInputMethodInfo.getServiceName(), imi.getServiceName());
@@ -178,6 +179,7 @@ public class InputMethodInfoTest extends AndroidTestCase {
         mInputMethodSubtype.writeToParcel(p, 0);
         p.setDataPosition(0);
         final InputMethodSubtype subtype = InputMethodSubtype.CREATOR.createFromParcel(p);
+        p.recycle();
 
         assertEquals(mInputMethodSubtype.containsExtraValueKey(mSubtypeExtraValue_key),
                 subtype.containsExtraValueKey(mSubtypeExtraValue_key));
