@@ -102,20 +102,20 @@ public class CtsTestServer {
     private static final String DOWNLOAD_ID_PARAMETER = "downloadId";
     private static final String NUM_BYTES_PARAMETER = "numBytes";
 
-    public static final String ASSET_PREFIX = "/assets/";
-    public static final String RAW_PREFIX = "raw/";
-    public static final String FAVICON_ASSET_PATH = ASSET_PREFIX + "webkit/favicon.png";
-    public static final String APPCACHE_PATH = "/appcache.html";
-    public static final String APPCACHE_MANIFEST_PATH = "/appcache.manifest";
-    public static final String REDIRECT_PREFIX = "/redirect";
-    public static final String QUERY_REDIRECT_PATH = "/alt_redirect";
-    public static final String DELAY_PREFIX = "/delayed";
-    public static final String BINARY_PREFIX = "/binary";
-    public static final String COOKIE_PREFIX = "/cookie";
-    public static final String AUTH_PREFIX = "/auth";
-    public static final String SHUTDOWN_PREFIX = "/shutdown";
+    private static final String ASSET_PREFIX = "/assets/";
+    private static final String RAW_PREFIX = "raw/";
+    private static final String FAVICON_ASSET_PATH = ASSET_PREFIX + "webkit/favicon.png";
+    private static final String APPCACHE_PATH = "/appcache.html";
+    private static final String APPCACHE_MANIFEST_PATH = "/appcache.manifest";
+    private static final String REDIRECT_PREFIX = "/redirect";
+    private static final String QUERY_REDIRECT_PATH = "/alt_redirect";
+    private static final String DELAY_PREFIX = "/delayed";
+    private static final String BINARY_PREFIX = "/binary";
+    private static final String COOKIE_PREFIX = "/cookie";
+    private static final String AUTH_PREFIX = "/auth";
+    private static final String SHUTDOWN_PREFIX = "/shutdown";
     public static final String NOLENGTH_POSTFIX = "nolength";
-    public static final int DELAY_MILLIS = 2000;
+    private static final int DELAY_MILLIS = 2000;
 
     public static final String AUTH_REALM = "Android CTS";
     public static final String AUTH_USER = "cts";
@@ -322,8 +322,20 @@ public class CtsTestServer {
      * @param path The path of the asset. See {@link AssetManager#open(String)}
      */
     public String getDelayedAssetUrl(String path) {
+        return getDelayedAssetUrl(path, DELAY_MILLIS);
+    }
+
+    /**
+     * Return an artificially delayed absolute URL that refers to the given asset. This can be
+     * used to emulate a slow HTTP server or connection.
+     * @param path The path of the asset. See {@link AssetManager#open(String)}
+     * @param delayMs The number of milliseconds to delay the request
+     */
+    public String getDelayedAssetUrl(String path, int delayMs) {
         StringBuilder sb = new StringBuilder(getBaseUri());
         sb.append(DELAY_PREFIX);
+        sb.append("/");
+        sb.append(delayMs);
         sb.append(ASSET_PREFIX);
         sb.append(path);
         return sb.toString();
@@ -549,12 +561,14 @@ public class CtsTestServer {
             path = FAVICON_ASSET_PATH;
         }
         if (path.startsWith(DELAY_PREFIX)) {
+            String delayPath = path.substring(DELAY_PREFIX.length() + 1);
+            String delay = delayPath.substring(0, delayPath.indexOf('/'));
+            path = delayPath.substring(delay.length());
             try {
-                Thread.sleep(DELAY_MILLIS);
+                Thread.sleep(Integer.valueOf(delay));
             } catch (InterruptedException ignored) {
                 // ignore
             }
-            path = path.substring(DELAY_PREFIX.length());
         }
         if (path.startsWith(AUTH_PREFIX)) {
             // authentication required

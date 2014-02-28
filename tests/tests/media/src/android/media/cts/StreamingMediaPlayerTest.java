@@ -16,7 +16,12 @@
 package android.media.cts;
 
 import android.media.MediaPlayer;
+import android.os.Looper;
+import android.os.SystemClock;
+import android.util.Log;
 import android.webkit.cts.CtsTestServer;
+
+import java.io.IOException;
 
 
 /**
@@ -206,6 +211,93 @@ public class StreamingMediaPlayerTest extends MediaPlayerTestBase {
 
     public void testPlayHlsStreamWithRedirect() throws Throwable {
         localHlsTest("hls.m3u8", false, true);
+    }
+
+    private static class WorkerWithPlayer implements Runnable {
+        private final Object mLock = new Object();
+        private Looper mLooper;
+        private MediaPlayer mMediaPlayer;
+
+        /**
+         * Creates a worker thread with the given name. The thread
+         * then runs a {@link android.os.Looper}.
+         * @param name A name for the new thread
+         */
+        WorkerWithPlayer(String name) {
+            Thread t = new Thread(null, this, name);
+            t.setPriority(Thread.MIN_PRIORITY);
+            t.start();
+            synchronized (mLock) {
+                while (mLooper == null) {
+                    try {
+                        mLock.wait();
+                    } catch (InterruptedException ex) {
+                    }
+                }
+            }
+        }
+
+        public MediaPlayer getPlayer() {
+            return mMediaPlayer;
+        }
+
+        @Override
+        public void run() {
+            synchronized (mLock) {
+                Looper.prepare();
+                mLooper = Looper.myLooper();
+                mMediaPlayer = new MediaPlayer();
+                mLock.notifyAll();
+            }
+            Looper.loop();
+        }
+
+        public void quit() {
+            mLooper.quit();
+            mMediaPlayer.release();
+        }
+    }
+
+    public void testBlockingReadRelease() throws Throwable {
+
+        mServer = new CtsTestServer(mContext);
+
+        WorkerWithPlayer worker = new WorkerWithPlayer("player");
+        final MediaPlayer mp = worker.getPlayer();
+
+        try {
+            String path = mServer.getDelayedAssetUrl("noiseandchirps.ogg", 15000);
+            mp.setDataSource(path);
+            mp.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
+                @Override
+                public void onPrepared(MediaPlayer mp) {
+                    fail("prepare should not succeed");
+                }
+            });
+            mp.prepareAsync();
+            Thread.sleep(1000);
+            long start = SystemClock.elapsedRealtime();
+            mp.release();
+            long end = SystemClock.elapsedRealtime();
+            long releaseDuration = (end - start);
+            assertTrue("release took too long: " + releaseDuration, releaseDuration < 1000);
+        } catch (IllegalArgumentException e) {
+            fail(e.getMessage());
+        } catch (SecurityException e) {
+            fail(e.getMessage());
+        } catch (IllegalStateException e) {
+            fail(e.getMessage());
+        } catch (IOException e) {
+            fail(e.getMessage());
+        } catch (InterruptedException e) {
+            fail(e.getMessage());
+        } finally {
+            mServer.shutdown();
+        }
+
+        // give the worker a bit of time to start processing the message before shutting it down
+        Thread.sleep(5000);
+        worker.quit();
     }
 
     private void localHlsTest(final String name, boolean appendQueryString, boolean redirect)
