@@ -40,9 +40,14 @@ public class StaticMetadata {
     private static final int SENSOR_INFO_EXPOSURE_TIME_RANGE_SIZE = 2;
     private static final int SENSOR_INFO_EXPOSURE_TIME_RANGE_MIN = 0;
     private static final int SENSOR_INFO_EXPOSURE_TIME_RANGE_MAX = 1;
+    private static final long SENSOR_INFO_EXPOSURE_TIME_RANGE_MIN_AT_MOST = 100000L; // 100us
+    private static final long SENSOR_INFO_EXPOSURE_TIME_RANGE_MAX_AT_LEAST = 1000000000; // 1s
     private static final int SENSOR_INFO_SENSITIVITY_RANGE_SIZE = 2;
     private static final int SENSOR_INFO_SENSITIVITY_RANGE_MIN = 0;
     private static final int SENSOR_INFO_SENSITIVITY_RANGE_MAX = 1;
+    private static final int SENSOR_INFO_SENSITIVITY_RANGE_MIN_AT_MOST = 100;
+    private static final int SENSOR_INFO_SENSITIVITY_RANGE_MAX_AT_LEAST = 1600;
+
 
     // TODO: Consider making this work across any metadata object, not just camera characteristics
     private final CameraCharacteristics mCharacteristics;
@@ -105,6 +110,60 @@ public class StaticMetadata {
      */
     public boolean isHardwareLevelLimited() {
         return !isHardwareLevelFull();
+    }
+
+    /**
+     * Get the exposure time value and clamp to the range if needed.
+     *
+     * @param exposure Input exposure time value to check.
+     * @return Exposure value in the legal range.
+     */
+    public long getExposureClampToRange(long exposure) {
+        long minExposure = getExposureMinimumOrDefault(Long.MAX_VALUE);
+        long maxExposure = getExposureMaximumOrDefault(Long.MIN_VALUE);
+        if (minExposure > SENSOR_INFO_EXPOSURE_TIME_RANGE_MIN_AT_MOST) {
+            warnOnKey(CameraCharacteristics.SENSOR_INFO_EXPOSURE_TIME_RANGE,
+                    String.format(
+                    "Min value %d is too large, set to maximal legal value %d",
+                    minExposure, SENSOR_INFO_EXPOSURE_TIME_RANGE_MIN_AT_MOST));
+            minExposure = SENSOR_INFO_EXPOSURE_TIME_RANGE_MIN_AT_MOST;
+        }
+        if (maxExposure < SENSOR_INFO_EXPOSURE_TIME_RANGE_MAX_AT_LEAST) {
+            warnOnKey(CameraCharacteristics.SENSOR_INFO_EXPOSURE_TIME_RANGE,
+                    String.format(
+                    "Max value %d is too small, set to minimal legal value %d",
+                    maxExposure, SENSOR_INFO_EXPOSURE_TIME_RANGE_MAX_AT_LEAST));
+            maxExposure = SENSOR_INFO_EXPOSURE_TIME_RANGE_MAX_AT_LEAST;
+        }
+
+        return Math.max(minExposure, Math.min(maxExposure, exposure));
+    }
+
+    /**
+     * Get the sensitivity value and clamp to the range if needed.
+     *
+     * @param sensitivity Input sensitivity value to check.
+     * @return Sensitivity value in legal range.
+     */
+    public int getSensitivityClampToRange(int sensitivity) {
+        int minSensitivity = getSensitivityMinimumOrDefault(Integer.MAX_VALUE);
+        int maxSensitivity = getSensitivityMaximumOrDefault(Integer.MIN_VALUE);
+        if (minSensitivity > SENSOR_INFO_SENSITIVITY_RANGE_MIN_AT_MOST) {
+            warnOnKey(CameraCharacteristics.SENSOR_INFO_SENSITIVITY_RANGE,
+                    String.format(
+                    "Min value %d is too large, set to maximal legal value %d",
+                    minSensitivity, SENSOR_INFO_SENSITIVITY_RANGE_MIN_AT_MOST));
+            minSensitivity = SENSOR_INFO_SENSITIVITY_RANGE_MIN_AT_MOST;
+        }
+        if (maxSensitivity < SENSOR_INFO_SENSITIVITY_RANGE_MAX_AT_LEAST) {
+            warnOnKey(CameraCharacteristics.SENSOR_INFO_SENSITIVITY_RANGE,
+                    String.format(
+                    "Max value %d is too small, set to minimal legal value %d",
+                    maxSensitivity, SENSOR_INFO_SENSITIVITY_RANGE_MAX_AT_LEAST));
+            maxSensitivity = SENSOR_INFO_SENSITIVITY_RANGE_MAX_AT_LEAST;
+        }
+
+        return Math.max(minSensitivity, Math.min(maxSensitivity, sensitivity));
     }
 
     /**

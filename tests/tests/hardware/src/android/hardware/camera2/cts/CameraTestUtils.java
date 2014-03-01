@@ -16,21 +16,28 @@
 
 package android.hardware.camera2.cts;
 
+import static com.android.ex.camera2.blocking.BlockingStateListener.*;
+
 import android.graphics.ImageFormat;
 import android.hardware.camera2.CameraAccessException;
 import android.hardware.camera2.CameraDevice;
 import android.hardware.camera2.CameraManager;
 import android.hardware.camera2.CameraMetadata;
 import android.hardware.camera2.CameraCharacteristics;
+import android.hardware.camera2.CaptureFailure;
+import android.hardware.camera2.CaptureRequest;
+import android.hardware.camera2.CaptureResult;
 import android.hardware.camera2.Size;
 import android.media.Image;
 import android.media.ImageReader;
 import android.media.Image.Plane;
 import android.os.Handler;
 import android.util.Log;
+import android.view.Surface;
 
 import com.android.ex.camera2.blocking.BlockingCameraManager;
 import com.android.ex.camera2.blocking.BlockingCameraManager.BlockingOpenException;
+import com.android.ex.camera2.blocking.BlockingStateListener;
 
 import junit.framework.Assert;
 
@@ -43,6 +50,8 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.TimeUnit;
 
 /**
  * A package private utility class for wrapping up the camera2 cts test common utility functions
@@ -59,6 +68,7 @@ class CameraTestUtils extends Assert {
     public static final int CAMERA_IDLE_TIMEOUT_MS = 2000;
     public static final int CAMERA_ACTIVE_TIMEOUT_MS = 1000;
     public static final int CAMERA_BUSY_TIMEOUT_MS = 1000;
+    public static final int CAMERA_UNCONFIGURED_TIMEOUT_MS = 1000;
 
     public static class ImageDropperListener implements ImageReader.OnImageAvailableListener {
         @Override
@@ -71,6 +81,43 @@ class CameraTestUtils extends Assert {
                     image.close();
                 }
             }
+        }
+    }
+
+    public static class SimpleCaptureListener extends CameraDevice.CaptureListener {
+        private final LinkedBlockingQueue<CaptureResult> mQueue =
+                new LinkedBlockingQueue<CaptureResult>();
+
+        @Override
+        public void onCaptureStarted(CameraDevice camera, CaptureRequest request, long timestamp)
+        {
+        }
+
+        @Override
+        public void onCaptureCompleted(CameraDevice camera, CaptureRequest request,
+                CaptureResult result) {
+            try {
+                mQueue.put(result);
+            } catch (InterruptedException e) {
+                throw new UnsupportedOperationException(
+                        "Can't handle InterruptedException in onCaptureCompleted");
+            }
+        }
+
+        @Override
+        public void onCaptureFailed(CameraDevice camera, CaptureRequest request,
+                CaptureFailure failure) {
+        }
+
+        @Override
+        public void onCaptureSequenceCompleted(CameraDevice camera, int sequenceId,
+                int frameNumber) {
+        }
+
+        public CaptureResult getCaptureResult(long timeout) throws InterruptedException {
+            CaptureResult result = mQueue.poll(timeout, TimeUnit.MILLISECONDS);
+            assertNotNull("Wait for a capture result timed out in " + timeout + "ms", result);
+            return result;
         }
     }
 
@@ -116,6 +163,17 @@ class CameraTestUtils extends Assert {
             throws CameraAccessException,
             BlockingOpenException {
         return openCamera(manager, cameraId, /*listener*/null, handler);
+    }
+
+    public static void configureOutputs(CameraDevice camera, List<Surface> outputSurfaces,
+            BlockingStateListener listener) throws Exception {
+        camera.configureOutputs(outputSurfaces);
+        listener.waitForState(STATE_BUSY, CAMERA_BUSY_TIMEOUT_MS);
+        if (outputSurfaces == null || outputSurfaces.size() == 0) {
+            listener.waitForState(STATE_UNCONFIGURED, CAMERA_UNCONFIGURED_TIMEOUT_MS);
+        } else {
+            listener.waitForState(STATE_IDLE, CAMERA_IDLE_TIMEOUT_MS);
+        }
     }
 
     public static <T> void assertArrayNotEmpty(T arr, String message) {
@@ -344,6 +402,17 @@ class CameraTestUtils extends Assert {
         return getSupportedPreviewSizes(cameraId, cameraManager, bound);
     }
 
+    static public Size getMinPreviewSize(String cameraId, CameraManager cameraManager)
+            throws Exception {
+        List<Size> sizes = getSupportedPreviewSizes(cameraId, cameraManager, null);
+        return sizes.get(sizes.size() - 1);
+    }
+
+    static public Size getMaxPreviewSize(String cameraId, CameraManager cameraManager, Size bound)
+            throws Exception {
+        List<Size> sizes = getSupportedPreviewSizes(cameraId, cameraManager, bound);
+        return sizes.get(0);
+    }
     /**
      * Get the largest size by area.
      *
