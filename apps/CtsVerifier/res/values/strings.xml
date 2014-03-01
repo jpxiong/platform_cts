@@ -325,8 +325,7 @@
         device running the emulator tests must be the candidate device running the software
         to be tested. \n\nFor each emulator test, there is a corresponding "reader test"
         in the "HCE reader tests" section. The "reader test" acts as a NFC terminal/POS
-        and makes sure the device-under-test implements card emulation correctly.
-    </string>
+        and makes sure the device-under-test implements card emulation correctly.</string>
     <string name="nfc_hce_reader_test_info">The host-based card emulation
         tests require two devices to be completed. The HCE emulator tests are used
         to actually test the host-based card emulation feature of the device-under-test. So the
@@ -335,6 +334,7 @@
         in the "HCE reader tests" section. The "reader test" acts as a NFC terminal/POS
         and makes sure the device-under-test implements card emulation correctly.
     </string>
+    <string name="nfc_hce_type_selection">By default HCE applications must run on type A. If your device is restricted to type B (for example, because of a type B only UICC), select "Type B" from the drop-down box above. Note that all tests must be completed in the same mode (either "Type A" or "Type B").</string>
     <string name="nfc_hce_please_wait">Please wait</string>
     <string name="nfc_hce_setting_up">Setting up card emulation services...</string>
 
