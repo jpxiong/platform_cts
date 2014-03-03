@@ -53,7 +53,7 @@ public class CameraDeviceTest extends AndroidTestCase {
     private CameraManager mCameraManager;
     private BlockingStateListener mCameraListener;
     private HandlerThread mHandlerThread;
-    private Handler mCallbackHandler;
+    private Handler mHandler;
     private int mLatestState = STATE_UNINITIALIZED;
 
     private ImageReader mReader;
@@ -114,7 +114,7 @@ public class CameraDeviceTest extends AndroidTestCase {
         assertNotNull("Can't connect to camera manager", mCameraManager);
         mHandlerThread = new HandlerThread(TAG);
         mHandlerThread.start();
-        mCallbackHandler = new Handler(mHandlerThread.getLooper());
+        mHandler = new Handler(mHandlerThread.getLooper());
         createDefaultSurface();
     }
 
@@ -130,7 +130,7 @@ public class CameraDeviceTest extends AndroidTestCase {
         for (int i = 0; i < ids.length; i++) {
             CameraDevice camera = null;
             try {
-                camera = CameraTestUtils.openCamera(mCameraManager, ids[i], mCallbackHandler);
+                camera = CameraTestUtils.openCamera(mCameraManager, ids[i], mHandler);
                 assertNotNull(
                         String.format("Failed to open camera device ID: %s", ids[i]), camera);
 
@@ -163,7 +163,7 @@ public class CameraDeviceTest extends AndroidTestCase {
             CameraDevice camera = null;
             try {
                 camera = CameraTestUtils.openCamera(mCameraManager, ids[i],
-                        mCameraListener, mCallbackHandler);
+                        mCameraListener, mHandler);
                 assertNotNull(
                         String.format("Failed to open camera device %s", ids[i]), camera);
 
@@ -224,7 +224,7 @@ public class CameraDeviceTest extends AndroidTestCase {
             CameraDevice camera = null;
             try {
                 camera = CameraTestUtils.openCamera(mCameraManager, ids[i],
-                        mCameraListener, mCallbackHandler);
+                        mCameraListener, mHandler);
                 assertNotNull(
                         String.format("Failed to open camera device %s", ids[i]), camera);
                 waitForState(STATE_UNCONFIGURED, CAMERA_OPEN_TIMEOUT_MS);
@@ -291,11 +291,11 @@ public class CameraDeviceTest extends AndroidTestCase {
                     id, template));
         }
         if (!repeating) {
-            camera.capture(requestBuilder.build(), mockCaptureListener, mCallbackHandler);
+            camera.capture(requestBuilder.build(), mockCaptureListener, mHandler);
         }
         else {
             camera.setRepeatingRequest(requestBuilder.build(), mockCaptureListener,
-                    mCallbackHandler);
+                    mHandler);
         }
         waitForState(STATE_ACTIVE, CAMERA_CONFIGURE_TIMEOUT_MS);
 
@@ -334,10 +334,10 @@ public class CameraDeviceTest extends AndroidTestCase {
         }
 
         if (!repeating) {
-            camera.captureBurst(requests, mockCaptureListener, mCallbackHandler);
+            camera.captureBurst(requests, mockCaptureListener, mHandler);
         }
         else {
-            camera.setRepeatingBurst(requests, mockCaptureListener, mCallbackHandler);
+            camera.setRepeatingBurst(requests, mockCaptureListener, mHandler);
         }
         waitForState(STATE_ACTIVE, CAMERA_CONFIGURE_TIMEOUT_MS);
 
@@ -394,7 +394,7 @@ public class CameraDeviceTest extends AndroidTestCase {
         mSurface = mReader.getSurface();
         // Create dummy image listener since we don't care the image data in this test.
         ImageReader.OnImageAvailableListener listener = new ImageDropperListener();
-        mReader.setOnImageAvailableListener(listener, mCallbackHandler);
+        mReader.setOnImageAvailableListener(listener, mHandler);
     }
 
     private void waitForState(int state, long timeout) {

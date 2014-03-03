@@ -17,102 +17,59 @@
 package android.hardware.camera2.cts;
 
 import static android.hardware.camera2.cts.CameraTestUtils.*;
-import static com.android.ex.camera2.blocking.BlockingStateListener.*;
 
-import android.content.Context;
 import android.hardware.camera2.CameraDevice;
 import android.hardware.camera2.CameraDevice.CaptureListener;
-import android.hardware.camera2.CameraManager;
 import android.hardware.camera2.CaptureFailure;
 import android.hardware.camera2.CaptureRequest;
 import android.hardware.camera2.CaptureResult;
 import android.hardware.camera2.Size;
-import android.os.Handler;
-import android.os.HandlerThread;
-import android.os.Looper;
-import android.test.ActivityInstrumentationTestCase2;
+import android.hardware.camera2.cts.testcases.Camera2SurfaceViewTestCase;
 import android.util.Log;
-import android.view.SurfaceHolder;
-import android.view.Surface;
-
-import com.android.ex.camera2.blocking.BlockingStateListener;
 
 import org.mockito.ArgumentCaptor;
 import org.mockito.ArgumentMatcher;
+
 import static org.mockito.Mockito.*;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
- * CameraDevice capture use case tests, including preview, still capture, burst
- * capture etc.
+ * CameraDevice preview test by using SurfaceView.
  */
-public class CameraSurfaceViewPreviewTest
-        extends ActivityInstrumentationTestCase2<Camera2SurfaceViewStubActivity> {
-    // Can not use class name exactly as it exceed the log tag character limit.
-    private static final String TAG = "CameraPreviewTest";
+public class SurfaceViewPreviewTest extends Camera2SurfaceViewTestCase {
+    private static final String TAG = "SurfaceViewPreviewTest";
     private static final boolean VERBOSE = Log.isLoggable(TAG, Log.VERBOSE);
-    private static final int WAIT_FOR_SURFACE_CHANGE_TIMEOUT_MS = 1000;
-    private static final int FRAME_TIMEOUT_MS = 500;
+    private static final int FRAME_TIMEOUT_MS = 1000;
     private static final int NUM_FRAMES_VERIFIED = 30;
-
-    private Context mContext;
-    private CameraManager mCameraManager;
-    private String[] mCameraIds;
-    private CameraDevice mCamera;
-    private HandlerThread mHandlerThread;
-    private Handler mHandler;
-    private BlockingStateListener mCameraListener;
-
-    public CameraSurfaceViewPreviewTest() {
-        super(Camera2SurfaceViewStubActivity.class);
-    }
 
     @Override
     protected void setUp() throws Exception {
         super.setUp();
-        mContext = getActivity();
-        mCameraManager = (CameraManager) mContext.getSystemService(Context.CAMERA_SERVICE);
-        assertNotNull("Unable to get CameraManager", mCameraManager);
-        mCameraIds = mCameraManager.getCameraIdList();
-        assertNotNull("Unable to get camera ids", mCameraIds);
-        mHandlerThread = new HandlerThread(TAG);
-        mHandlerThread.start();
-        mHandler = new Handler(mHandlerThread.getLooper());
-        mCameraListener = new BlockingStateListener();
-
-        /**
-         * Workaround for mockito and JB-MR2 incompatibility
-         *
-         * Avoid java.lang.IllegalArgumentException: dexcache == null
-         * https://code.google.com/p/dexmaker/issues/detail?id=2
-         */
-        System.setProperty("dexmaker.dexcache", mContext.getCacheDir().toString());
     }
 
     @Override
     protected void tearDown() throws Exception {
-        mHandlerThread.quitSafely();
-        mHandler = null;
-        mCameraListener = null;
         super.tearDown();
     }
 
+    /**
+     * Test all supported preview sizes for each camera device.
+     * <p>
+     * For the first  {@link #NUM_FRAMES_VERIFIED}  of capture results,
+     * the {@link CaptureListener} callback availability and the capture timestamp
+     * (monotonically increasing) ordering are verified.
+     * </p>
+     */
     public void testCameraPreview() throws Exception {
         for (int i = 0; i < mCameraIds.length; i++) {
             try {
                 Log.i(TAG, "Testing preview for Camera " + mCameraIds[i]);
-                mCamera = openCamera(mCameraManager, mCameraIds[i], mCameraListener, mHandler);
-                assertNotNull(
-                        String.format("Failed to open camera device ID: %s", mCameraIds[i]),
-                        mCamera);
+                openDevice(mCameraIds[i]);
+
                 previewTestByCamera();
             } finally {
-                if (mCamera != null) {
-                    mCamera.close();
-                    mCamera = null;
-                }
+                closeDevice();
             }
         }
     }
@@ -125,61 +82,23 @@ public class CameraSurfaceViewPreviewTest
     private void previewTestByCamera() throws Exception {
         List<Size> previewSizes = getSupportedPreviewSizes(
                 mCamera.getId(), mCameraManager, PREVIEW_SIZE_BOUND);
-        Camera2SurfaceViewStubActivity stubActivity = getActivity();
 
         for (final Size sz : previewSizes) {
             if (VERBOSE) {
                 Log.v(TAG, "Testing camera preview size: " + sz.toString());
             }
-            // Change the preview size
-            final SurfaceHolder holder = stubActivity.getSurfaceView().getHolder();
-            Handler handler = new Handler(Looper.getMainLooper());
-            handler.post(new Runnable() {
-                @Override
-                public void run() {
-                    holder.setFixedSize(sz.getWidth(), sz.getHeight());
-                }
-            });
 
-            boolean res = stubActivity.waitForSurfaceSizeChanged(
-                    WAIT_FOR_SURFACE_CHANGE_TIMEOUT_MS, sz.getWidth(), sz.getHeight());
-            assertTrue("wait for surface change to " + sz.toString() + " timed out", res);
-            Surface previewSurface = holder.getSurface();
-            assertTrue("Preview surface is invalid", previewSurface.isValid());
-
+            // TODO: vary the different settings like crop region to cover more cases.
+            CaptureRequest.Builder requestBuilder =
+                    mCamera.createCaptureRequest(CameraDevice.TEMPLATE_PREVIEW);
             CaptureListener mockCaptureListener =
                     mock(CameraDevice.CaptureListener.class);
 
-            startPreview(previewSurface, mockCaptureListener);
-
+            startPreview(requestBuilder, sz, mockCaptureListener);
             verifyCaptureResults(mCamera, mockCaptureListener, NUM_FRAMES_VERIFIED,
                     NUM_FRAMES_VERIFIED * FRAME_TIMEOUT_MS);
-
             stopPreview();
         }
-    }
-
-    private void startPreview(Surface surface, CaptureListener listener) throws Exception {
-        List<Surface> outputSurfaces = new ArrayList<Surface>(/*capacity*/1);
-        outputSurfaces.add(surface);
-        mCamera.configureOutputs(outputSurfaces);
-        mCameraListener.waitForState(STATE_BUSY, CAMERA_BUSY_TIMEOUT_MS);
-        mCameraListener.waitForState(STATE_IDLE, CAMERA_IDLE_TIMEOUT_MS);
-
-        // TODO: vary the different settings like crop region to cover more cases.
-        CaptureRequest.Builder captureBuilder =
-                mCamera.createCaptureRequest(CameraDevice.TEMPLATE_PREVIEW);
-
-        captureBuilder.addTarget(surface);
-        mCamera.setRepeatingRequest(captureBuilder.build(), listener, mHandler);
-    }
-
-    private void stopPreview() throws Exception {
-        if (VERBOSE) Log.v(TAG, "Stopping preview and waiting for idle");
-        // Stop repeat, wait for captures to complete, and disconnect from surfaces
-        mCamera.configureOutputs(/*outputs*/ null);
-        mCameraListener.waitForState(STATE_BUSY, CAMERA_BUSY_TIMEOUT_MS);
-        mCameraListener.waitForState(STATE_UNCONFIGURED, CAMERA_IDLE_TIMEOUT_MS);
     }
 
     private class IsCaptureResultValid extends ArgumentMatcher<CaptureResult> {
@@ -212,6 +131,7 @@ public class CameraSurfaceViewPreviewTest
         long timestamp = 0;
         for (Long nextTimestamp : timestamps.getAllValues()) {
             Log.v(TAG, "next t: " + nextTimestamp + " current t: " + timestamp);
+            assertNotNull("Next timestamp is null!", nextTimestamp);
             assertTrue("Captures are out of order", timestamp < nextTimestamp);
             timestamp = nextTimestamp;
         }

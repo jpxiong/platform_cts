@@ -56,7 +56,7 @@ import java.util.concurrent.TimeUnit;
 /**
  * A package private utility class for wrapping up the camera2 cts test common utility functions
  */
-class CameraTestUtils extends Assert {
+public class CameraTestUtils extends Assert {
     private static final String TAG = "CameraTestUtils";
     private static final boolean VERBOSE = Log.isLoggable(TAG, Log.VERBOSE);
 
@@ -165,7 +165,14 @@ class CameraTestUtils extends Assert {
         return openCamera(manager, cameraId, /*listener*/null, handler);
     }
 
-    public static void configureOutputs(CameraDevice camera, List<Surface> outputSurfaces,
+    /**
+     * Configure camera output surfaces.
+     *
+     * @param camera The CameraDevice to be configured.
+     * @param outputSurfaces The surface list that used for camera output.
+     * @param listener The callback CameraDevice will notify when capture results are available.
+     */
+    public static void configureCameraOutputs(CameraDevice camera, List<Surface> outputSurfaces,
             BlockingStateListener listener) throws Exception {
         camera.configureOutputs(outputSurfaces);
         listener.waitForState(STATE_BUSY, CAMERA_BUSY_TIMEOUT_MS);

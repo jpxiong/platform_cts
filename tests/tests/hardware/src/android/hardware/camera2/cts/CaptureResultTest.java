@@ -39,8 +39,8 @@ import static com.android.ex.camera2.blocking.BlockingStateListener.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class CameraCaptureResultTest extends AndroidTestCase {
-    private static final String TAG = "CameraCaptureResultTest";
+public class CaptureResultTest extends AndroidTestCase {
+    private static final String TAG = "CaptureResultTest";
     private static final boolean VERBOSE = Log.isLoggable(TAG, Log.VERBOSE);
 
     private CameraManager mCameraManager;
