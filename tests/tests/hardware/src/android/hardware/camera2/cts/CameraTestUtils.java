@@ -73,6 +73,7 @@ public class CameraTestUtils extends Assert {
     public static final int CAMERA_BUSY_TIMEOUT_MS = 1000;
     public static final int CAMERA_UNCONFIGURED_TIMEOUT_MS = 1000;
     public static final int CAMERA_CONFIGURE_TIMEOUT_MS = 2000;
+    public static final int CAPTURE_RESULT_TIMEOUT_MS = 1000;
 
     /**
      * Dummy listener that release the image immediately once it is available.
@@ -125,10 +126,14 @@ public class CameraTestUtils extends Assert {
                 int frameNumber) {
         }
 
-        public CaptureResult getCaptureResult(long timeout) throws InterruptedException {
-            CaptureResult result = mQueue.poll(timeout, TimeUnit.MILLISECONDS);
-            assertNotNull("Wait for a capture result timed out in " + timeout + "ms", result);
-            return result;
+        public CaptureResult getCaptureResult(long timeout) {
+            try {
+                CaptureResult result = mQueue.poll(timeout, TimeUnit.MILLISECONDS);
+                assertNotNull("Wait for a capture result timed out in " + timeout + "ms", result);
+                return result;
+            } catch (InterruptedException e) {
+                throw new UnsupportedOperationException("Unhandled interrupted exception", e);
+            }
         }
     }
 

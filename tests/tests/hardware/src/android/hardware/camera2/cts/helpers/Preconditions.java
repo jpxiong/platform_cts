@@ -1,0 +1,112 @@
+/*
+ * Copyright 2014 The Android Open Source Project
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package android.hardware.camera2.cts.helpers;
+
+import java.util.Objects;
+
+/**
+ * Helper set of methods to perform precondition checks before starting method execution.
+ *
+ * <p>Typically used to sanity check arguments or the current object state.</p>
+ */
+public final class Preconditions {
+
+    /**
+     * Checks that the value has the expected bitwise flags set.
+     *
+     * @param argName Name of the argument
+     * @param arg Argument to check
+     * @param flagsName Name of the bitwise flags
+     * @param flags Bit flags to check.
+     * @return arg
+     *
+     * @throws IllegalArgumentException if the bitwise flags weren't set
+     */
+    public static int checkBitFlags(String argName, int arg, String flagsName, int flags) {
+        if ((arg & flags) == 0) {
+            throw new IllegalArgumentException(
+                    String.format("Argument '%s' must have flags '%s' set", argName, flagsName));
+        }
+
+        return arg;
+    }
+
+    /**
+     * Checks that the value is {@link Object#equals equal} to the expected value.
+     *
+     * @param argName Name of the argument
+     * @param arg Argument to check
+     * @param expectedName Name of the expected value
+     * @param expectedValue Expected value
+     * @return arg
+     *
+     * @throws IllegalArgumentException if the values were not equal
+     */
+    public static <T> T checkEquals(String argName, T arg,
+            String expectedName, T expectedValue) {
+        if (!Objects.equals(arg, expectedValue)) {
+            throw new IllegalArgumentException(
+                    String.format(
+                            "Argument '%s' must be equal to '%s' (was '%s', but expected '%s')",
+                            argName, expectedName, arg, expectedValue));
+        }
+
+        return arg;
+    }
+
+    /**
+     * Checks that the value is not {@code null}.
+     *
+     * <p>
+     * Returns the value directly, so you can use {@code checkNotNull("value", value)} inline.
+     * </p>
+     *
+     * @param argName Name of the argument
+     * @param arg Argument to check
+     * @return arg
+     *
+     * @throws NullPointerException if arg was {@code null}
+     */
+    public static <T> T checkNotNull(String argName, T arg) {
+        if (arg == null) {
+            throw new NullPointerException("Argument '" + argName + "' must not be null");
+        }
+
+        return arg;
+    }
+
+    /**
+     * Checks that the state is currently {@link true}.
+     *
+     * @param message Message to raise an exception with if the state checking fails.
+     * @param state State to check
+     *
+     * @throws IllegalStateException if state was {@code false}
+     *
+     * @return The state value (always {@code true}).
+     */
+    public static boolean checkState(String message, boolean state) {
+        if (!state) {
+            throw new IllegalStateException(message);
+        }
+
+        return state;
+    }
+
+    // Suppress default constructor for noninstantiability
+    private Preconditions() { throw new AssertionError(); }
+}

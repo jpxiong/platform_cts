@@ -252,6 +252,19 @@ public class StaticMetadata {
      * Get the minimum value for a sensitivity range from android.sensor.info.sensitivityRange.
      *
      * <p>If the camera is incorrectly reporting values, log a warning and return
+     * the default value instead, which is the largest minimum value required to be supported
+     * by all camera devices.</p>
+     *
+     * @return The value reported by the camera device or the defaultValue otherwise.
+     */
+    public int getSensitivityMinimumOrDefault() {
+        return getSensitivityMinimumOrDefault(SENSOR_INFO_SENSITIVITY_RANGE_MIN_AT_MOST);
+    }
+
+    /**
+     * Get the minimum value for a sensitivity range from android.sensor.info.sensitivityRange.
+     *
+     * <p>If the camera is incorrectly reporting values, log a warning and return
      * the default value instead.</p>
      *
      * @param defaultValue Value to return if no legal value is available
@@ -264,6 +277,19 @@ public class StaticMetadata {
                 "minimum",
                 SENSOR_INFO_SENSITIVITY_RANGE_MIN,
                 SENSOR_INFO_SENSITIVITY_RANGE_SIZE);
+    }
+
+    /**
+     * Get the maximum value for a sensitivity range from android.sensor.info.sensitivityRange.
+     *
+     * <p>If the camera is incorrectly reporting values, log a warning and return
+     * the default value instead, which is the smallest maximum value required to be supported
+     * by all camera devices.</p>
+     *
+     * @return The value reported by the camera device or the defaultValue otherwise.
+     */
+    public int getSensitivityMaximumOrDefault() {
+        return getSensitivityMaximumOrDefault(SENSOR_INFO_SENSITIVITY_RANGE_MAX_AT_LEAST);
     }
 
     /**
@@ -303,6 +329,19 @@ public class StaticMetadata {
     }
 
     /**
+     * Get the minimum value for an exposure range from android.sensor.info.exposureTimeRange.
+     *
+     * <p>If the camera is incorrectly reporting values, log a warning and return
+     * the default value instead, which is the largest minimum value required to be supported
+     * by all camera devices.</p>
+     *
+     * @return The value reported by the camera device or the defaultValue otherwise.
+     */
+    public long getExposureMinimumOrDefault() {
+        return getExposureMinimumOrDefault(SENSOR_INFO_EXPOSURE_TIME_RANGE_MIN_AT_MOST);
+    }
+
+    /**
      * Get the maximum value for an exposure range from android.sensor.info.exposureTimeRange.
      *
      * <p>If the camera is incorrectly reporting values, log a warning and return
@@ -318,6 +357,19 @@ public class StaticMetadata {
                 "maximum",
                 SENSOR_INFO_EXPOSURE_TIME_RANGE_MAX,
                 SENSOR_INFO_EXPOSURE_TIME_RANGE_SIZE);
+    }
+
+    /**
+     * Get the maximum value for an exposure range from android.sensor.info.exposureTimeRange.
+     *
+     * <p>If the camera is incorrectly reporting values, log a warning and return
+     * the default value instead, which is the smallest maximum value required to be supported
+     * by all camera devices.</p>
+     *
+     * @return The value reported by the camera device or the defaultValue otherwise.
+     */
+    public long getExposureMaximumOrDefault() {
+        return getExposureMaximumOrDefault(SENSOR_INFO_EXPOSURE_TIME_RANGE_MAX_AT_LEAST);
     }
 
     /**
