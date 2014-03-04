@@ -231,6 +231,70 @@ public class MessageTest extends AndroidTestCase {
         assertFalse(message.isAsynchronous());
     }
 
+    public void testRecycleThrowsIfMessageAlreadyRecycled() {
+        Message message = Message.obtain();
+        message.recycle();
+
+        try {
+            message.recycle();
+            fail("should throw IllegalStateException");
+        } catch (IllegalStateException ex) {
+            // expected
+        }
+    }
+
+    public void testSendMessageThrowsIfMessageAlreadyRecycled() {
+        Message message = Message.obtain();
+        message.recycle();
+
+        try {
+            mHandler.sendMessage(message);
+            fail("should throw IllegalStateException");
+        } catch (IllegalStateException ex) {
+            // expected
+        }
+    }
+
+    public void testRecycleThrowsIfMessageIsBeingDelivered() {
+        final Exception[] caught = new Exception[1];
+        Handler handler = new Handler(mHandler.getLooper()) {
+            @Override
+            public void handleMessage(Message msg) {
+                try {
+                    msg.recycle();
+                } catch (IllegalStateException ex) {
+                    caught[0] = ex; // expected
+                }
+            }
+        };
+        handler.sendEmptyMessage(WHAT);
+        sleep(SLEEP_TIME);
+
+        if (caught[0] == null) {
+            fail("should throw IllegalStateException");
+        }
+    }
+
+    public void testSendMessageThrowsIfMessageIsBeingDelivered() {
+        final Exception[] caught = new Exception[1];
+        Handler handler = new Handler(mHandler.getLooper()) {
+            @Override
+            public void handleMessage(Message msg) {
+                try {
+                    mHandler.sendMessage(msg);
+                } catch (IllegalStateException ex) {
+                    caught[0] = ex; // expected
+                }
+            }
+        };
+        handler.sendEmptyMessage(WHAT);
+        sleep(SLEEP_TIME);
+
+        if (caught[0] == null) {
+            fail("should throw IllegalStateException");
+        }
+    }
+
     private void sleep(long time) {
         try {
             Thread.sleep(time);
