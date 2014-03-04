@@ -310,6 +310,29 @@ public class CameraCharacteristicsTest extends AndroidTestCase {
         }
     }
 
+    public void testCameraCharacteristicsAndroidEdgeAvailableEdgeModes() throws Exception {
+        String[] ids = mCameraManager.getCameraIdList();
+        for (int i = 0; i < ids.length; i++) {
+            CameraCharacteristics props = mCameraManager.getCameraCharacteristics(ids[i]);
+            assertNotNull(String.format("Can't get camera characteristics from: ID %s", ids[i]),
+                                        props);
+
+            {
+
+                assertNotNull("Invalid property: android.edge.availableEdgeModes",
+                        props.get(CameraCharacteristics.EDGE_AVAILABLE_EDGE_MODES));
+
+                List<Key<?>> allKeys = props.getKeys();
+                assertNotNull(String.format("Can't get camera characteristics keys from: ID %s",
+                        ids[i], props));
+                assertTrue("Key not in keys list: android.edge.availableEdgeModes", allKeys.contains(
+                        CameraCharacteristics.EDGE_AVAILABLE_EDGE_MODES));
+
+            }
+
+        }
+    }
+
     public void testCameraCharacteristicsAndroidFlashInfoAvailable() throws Exception {
         String[] ids = mCameraManager.getCameraIdList();
         for (int i = 0; i < ids.length; i++) {
@@ -584,6 +607,29 @@ public class CameraCharacteristicsTest extends AndroidTestCase {
                         ids[i], props));
                 assertTrue("Key not in keys list: android.lens.info.focusDistanceCalibration", allKeys.contains(
                         CameraCharacteristics.LENS_INFO_FOCUS_DISTANCE_CALIBRATION));
+
+            }
+
+        }
+    }
+
+    public void testCameraCharacteristicsAndroidNoiseReductionAvailableNoiseReductionModes() throws Exception {
+        String[] ids = mCameraManager.getCameraIdList();
+        for (int i = 0; i < ids.length; i++) {
+            CameraCharacteristics props = mCameraManager.getCameraCharacteristics(ids[i]);
+            assertNotNull(String.format("Can't get camera characteristics from: ID %s", ids[i]),
+                                        props);
+
+            {
+
+                assertNotNull("Invalid property: android.noiseReduction.availableNoiseReductionModes",
+                        props.get(CameraCharacteristics.NOISE_REDUCTION_AVAILABLE_NOISE_REDUCTION_MODES));
+
+                List<Key<?>> allKeys = props.getKeys();
+                assertNotNull(String.format("Can't get camera characteristics keys from: ID %s",
+                        ids[i], props));
+                assertTrue("Key not in keys list: android.noiseReduction.availableNoiseReductionModes", allKeys.contains(
+                        CameraCharacteristics.NOISE_REDUCTION_AVAILABLE_NOISE_REDUCTION_MODES));
 
             }
 
@@ -1340,6 +1386,29 @@ public class CameraCharacteristicsTest extends AndroidTestCase {
                         ids[i], props));
                 assertTrue("Key not in keys list: android.tonemap.maxCurvePoints", allKeys.contains(
                         CameraCharacteristics.TONEMAP_MAX_CURVE_POINTS));
+
+            }
+
+        }
+    }
+
+    public void testCameraCharacteristicsAndroidTonemapAvailableToneMapModes() throws Exception {
+        String[] ids = mCameraManager.getCameraIdList();
+        for (int i = 0; i < ids.length; i++) {
+            CameraCharacteristics props = mCameraManager.getCameraCharacteristics(ids[i]);
+            assertNotNull(String.format("Can't get camera characteristics from: ID %s", ids[i]),
+                                        props);
+
+            {
+
+                assertNotNull("Invalid property: android.tonemap.availableToneMapModes",
+                        props.get(CameraCharacteristics.TONEMAP_AVAILABLE_TONE_MAP_MODES));
+
+                List<Key<?>> allKeys = props.getKeys();
+                assertNotNull(String.format("Can't get camera characteristics keys from: ID %s",
+                        ids[i], props));
+                assertTrue("Key not in keys list: android.tonemap.availableToneMapModes", allKeys.contains(
+                        CameraCharacteristics.TONEMAP_AVAILABLE_TONE_MAP_MODES));
 
             }
 
