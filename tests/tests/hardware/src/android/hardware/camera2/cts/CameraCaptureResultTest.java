@@ -285,6 +285,7 @@ public class CameraCaptureResultTest extends AndroidTestCase {
         resultKeys.add(CaptureResult.SENSOR_PROFILE_TONE_CURVE);
         resultKeys.add(CaptureResult.SENSOR_GREEN_SPLIT);
         resultKeys.add(CaptureResult.SENSOR_TEST_PATTERN_MODE);
+        resultKeys.add(CaptureResult.SHADING_MODE);
         resultKeys.add(CaptureResult.STATISTICS_FACE_DETECT_MODE);
         resultKeys.add(CaptureResult.STATISTICS_LENS_SHADING_MAP);
         resultKeys.add(CaptureResult.STATISTICS_SCENE_FLICKER);
