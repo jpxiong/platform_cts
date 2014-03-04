@@ -186,9 +186,7 @@ class CameraTestUtils extends Assert {
     public static void checkYuvFormat(int format) {
         if ((format != ImageFormat.YUV_420_888) &&
                 (format != ImageFormat.NV21) &&
-                (format != ImageFormat.YV12) &&
-                (format != ImageFormat.Y8) &&
-                (format != ImageFormat.Y16)) {
+                (format != ImageFormat.YV12)) {
             fail("Wrong formats: " + format);
         }
     }
@@ -288,7 +286,7 @@ class CameraTestUtils extends Assert {
     /**
      * <p>Check android image format validity for an image, only support below formats:</p>
      *
-     * <p>YUV_420_888/NV21/YV12/Y8/Y16, can add more for future</p>
+     * <p>YUV_420_888/NV21/YV12, can add more for future</p>
      */
     public static void checkAndroidImageFormat(Image image) {
         int format = image.getFormat();
@@ -298,10 +296,6 @@ class CameraTestUtils extends Assert {
             case ImageFormat.NV21:
             case ImageFormat.YV12:
                 assertEquals("YUV420 format Images should have 3 planes", 3, planes.length);
-                break;
-            case ImageFormat.Y8:
-            case ImageFormat.Y16:
-                assertEquals("Y8/Y16 Image should have 1 plane", 1, planes.length);
                 break;
             case ImageFormat.JPEG:
                 assertEquals("Jpeg Image should have one plane", 1, planes.length);
@@ -343,8 +337,6 @@ class CameraTestUtils extends Assert {
             case ImageFormat.YUV_420_888:
             case ImageFormat.YV12:
             case ImageFormat.NV21:
-            case ImageFormat.Y8:
-            case ImageFormat.Y16:
                 key = CameraCharacteristics.SCALER_AVAILABLE_PROCESSED_SIZES;
                 break;
             default:
