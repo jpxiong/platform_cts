@@ -333,6 +333,29 @@ public class CameraCharacteristicsTest extends AndroidTestCase {
         }
     }
 
+    public void testCameraCharacteristicsAndroidHotPixelAvailableHotPixelModes() throws Exception {
+        String[] ids = mCameraManager.getCameraIdList();
+        for (int i = 0; i < ids.length; i++) {
+            CameraCharacteristics props = mCameraManager.getCameraCharacteristics(ids[i]);
+            assertNotNull(String.format("Can't get camera characteristics from: ID %s", ids[i]),
+                                        props);
+
+            {
+
+                assertNotNull("Invalid property: android.hotPixel.availableHotPixelModes",
+                        props.get(CameraCharacteristics.HOT_PIXEL_AVAILABLE_HOT_PIXEL_MODES));
+
+                List<Key<?>> allKeys = props.getKeys();
+                assertNotNull(String.format("Can't get camera characteristics keys from: ID %s",
+                        ids[i], props));
+                assertTrue("Key not in keys list: android.hotPixel.availableHotPixelModes", allKeys.contains(
+                        CameraCharacteristics.HOT_PIXEL_AVAILABLE_HOT_PIXEL_MODES));
+
+            }
+
+        }
+    }
+
     public void testCameraCharacteristicsAndroidJpegAvailableThumbnailSizes() throws Exception {
         String[] ids = mCameraManager.getCameraIdList();
         for (int i = 0; i < ids.length; i++) {
@@ -1271,6 +1294,29 @@ public class CameraCharacteristicsTest extends AndroidTestCase {
                         ids[i], props));
                 assertTrue("Key not in keys list: android.statistics.info.maxFaceCount", allKeys.contains(
                         CameraCharacteristics.STATISTICS_INFO_MAX_FACE_COUNT));
+
+            }
+
+        }
+    }
+
+    public void testCameraCharacteristicsAndroidStatisticsInfoAvailableHotPixelMapModes() throws Exception {
+        String[] ids = mCameraManager.getCameraIdList();
+        for (int i = 0; i < ids.length; i++) {
+            CameraCharacteristics props = mCameraManager.getCameraCharacteristics(ids[i]);
+            assertNotNull(String.format("Can't get camera characteristics from: ID %s", ids[i]),
+                                        props);
+
+            {
+
+                assertNotNull("Invalid property: android.statistics.info.availableHotPixelMapModes",
+                        props.get(CameraCharacteristics.STATISTICS_INFO_AVAILABLE_HOT_PIXEL_MAP_MODES));
+
+                List<Key<?>> allKeys = props.getKeys();
+                assertNotNull(String.format("Can't get camera characteristics keys from: ID %s",
+                        ids[i], props));
+                assertTrue("Key not in keys list: android.statistics.info.availableHotPixelMapModes", allKeys.contains(
+                        CameraCharacteristics.STATISTICS_INFO_AVAILABLE_HOT_PIXEL_MAP_MODES));
 
             }
 

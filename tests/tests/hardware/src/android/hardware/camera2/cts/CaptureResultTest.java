@@ -252,7 +252,6 @@ public class CaptureResultTest extends AndroidTestCase {
         resultKeys.add(CaptureResult.FLASH_MODE);
         resultKeys.add(CaptureResult.FLASH_STATE);
         resultKeys.add(CaptureResult.HOT_PIXEL_MODE);
-        resultKeys.add(CaptureResult.HOT_PIXEL_MAP);
         resultKeys.add(CaptureResult.JPEG_GPS_COORDINATES);
         resultKeys.add(CaptureResult.JPEG_GPS_PROCESSING_METHOD);
         resultKeys.add(CaptureResult.JPEG_GPS_TIMESTAMP);
@@ -287,8 +286,10 @@ public class CaptureResultTest extends AndroidTestCase {
         resultKeys.add(CaptureResult.SENSOR_TEST_PATTERN_MODE);
         resultKeys.add(CaptureResult.SHADING_MODE);
         resultKeys.add(CaptureResult.STATISTICS_FACE_DETECT_MODE);
+        resultKeys.add(CaptureResult.STATISTICS_HOT_PIXEL_MAP_MODE);
         resultKeys.add(CaptureResult.STATISTICS_LENS_SHADING_MAP);
         resultKeys.add(CaptureResult.STATISTICS_SCENE_FLICKER);
+        resultKeys.add(CaptureResult.STATISTICS_HOT_PIXEL_MAP);
         resultKeys.add(CaptureResult.TONEMAP_CURVE_BLUE);
         resultKeys.add(CaptureResult.TONEMAP_CURVE_GREEN);
         resultKeys.add(CaptureResult.TONEMAP_CURVE_RED);
