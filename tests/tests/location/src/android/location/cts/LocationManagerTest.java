@@ -81,7 +81,7 @@ public class LocationManagerTest extends InstrumentationTestCase {
         // remove test provider if left over from an aborted run
         LocationProvider lp = mManager.getProvider(TEST_MOCK_PROVIDER_NAME);
         if (lp != null) {
-            removeTestProvider(TEST_MOCK_PROVIDER_NAME);
+            mManager.removeTestProvider(TEST_MOCK_PROVIDER_NAME);
         }
 
         addTestProvider(TEST_MOCK_PROVIDER_NAME);
@@ -107,7 +107,7 @@ public class LocationManagerTest extends InstrumentationTestCase {
     protected void tearDown() throws Exception {
         LocationProvider provider = mManager.getProvider(TEST_MOCK_PROVIDER_NAME);
         if (provider != null) {
-            removeTestProvider(TEST_MOCK_PROVIDER_NAME);
+            mManager.removeTestProvider(TEST_MOCK_PROVIDER_NAME);
         }
         if (mPendingIntent != null) {
             mManager.removeProximityAlert(mPendingIntent);
@@ -138,12 +138,12 @@ public class LocationManagerTest extends InstrumentationTestCase {
             // expected
         }
 
-        removeTestProvider(TEST_MOCK_PROVIDER_NAME);
+        mManager.removeTestProvider(TEST_MOCK_PROVIDER_NAME);
         provider = mManager.getProvider(TEST_MOCK_PROVIDER_NAME);
         assertNull(provider);
 
         try {
-            removeTestProvider(UNKNOWN_PROVIDER_NAME);
+            mManager.removeTestProvider(UNKNOWN_PROVIDER_NAME);
             fail("Should throw IllegalArgumentException when no provider exists!");
         } catch (IllegalArgumentException e) {
             // expected
@@ -177,7 +177,7 @@ public class LocationManagerTest extends InstrumentationTestCase {
         assertEquals(oldSizeAllProviders, providers.size());
         assertTrue(hasTestProvider(providers));
 
-        removeTestProvider(TEST_MOCK_PROVIDER_NAME);
+        mManager.removeTestProvider(TEST_MOCK_PROVIDER_NAME);
         providers = mManager.getAllProviders();
         assertEquals(oldSizeAllProviders - 1, providers.size());
         assertFalse(hasTestProvider(providers));
@@ -275,8 +275,8 @@ public class LocationManagerTest extends InstrumentationTestCase {
 
         // Assert that if there are no test providers enabled, LocationManager just returns the
         // values from Settings.Secure.
-        forceClearTestProvider(LocationManager.GPS_PROVIDER);
-        forceClearTestProvider(LocationManager.NETWORK_PROVIDER);
+        forceRemoveTestProvider(LocationManager.GPS_PROVIDER);
+        forceRemoveTestProvider(LocationManager.NETWORK_PROVIDER);
         boolean lmGps = mManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
         boolean lmNlp = mManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
         assertEquals("Inconsistent GPS values", gps, lmGps);
@@ -304,20 +304,12 @@ public class LocationManagerTest extends InstrumentationTestCase {
     }
 
     /**
-     * Clears the test provider. Works around b/11446702 by temporarily adding the test provider
-     * so we are allowed to clear it.
+     * Ensures the test provider is removed. {@link LocationManager#removeTestProvider(String)}
+     * throws an {@link java.lang.IllegalArgumentException} if there is no such test provider,
+     * so we have to add it before we clear it.
      */
-    private void forceClearTestProvider(String provider) {
+    private void forceRemoveTestProvider(String provider) {
         addTestProvider(provider);
-        mManager.clearTestProviderEnabled(provider);
-        removeTestProvider(provider);
-    }
-
-    /**
-     * Work around b/11446702 by clearing the test provider before removing it
-     */
-    private void removeTestProvider(String provider) {
-        mManager.clearTestProviderEnabled(provider);
         mManager.removeTestProvider(provider);
     }
 
@@ -413,7 +405,7 @@ public class LocationManagerTest extends InstrumentationTestCase {
                     // run the update location test logic to ensure location updates can be injected
                     doLocationUpdatesWithLocationListener(providerName);
                 } finally {
-                    removeTestProvider(providerName);
+                    mManager.removeTestProvider(providerName);
                 }
             }
         }
@@ -825,7 +817,7 @@ public class LocationManagerTest extends InstrumentationTestCase {
     }
 
     private void unmockFusedLocation() {
-        removeTestProvider(FUSED_PROVIDER_NAME);
+        mManager.removeTestProvider(FUSED_PROVIDER_NAME);
     }
 
     /**
