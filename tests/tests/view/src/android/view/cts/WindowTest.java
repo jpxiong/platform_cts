@@ -1088,5 +1088,8 @@ public class WindowTest extends ActivityInstrumentationTestCase2<WindowStubActiv
 
         public void onActionModeFinished(ActionMode mode) {
         }
+
+        public void onWindowDismissed() {
+        }
     }
 }
