@@ -47,12 +47,14 @@ import android.view.SurfaceHolder;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.text.ParsePosition;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
+import java.util.TimeZone;
 
 import junit.framework.AssertionFailedError;
 
@@ -1096,7 +1098,26 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraStubActiv
         assertEquals((float)latitude, latLong[0], 0.0001f);
         assertEquals((float)longitude, latLong[1], 0.0001f);
         assertEquals(altitude, exif.getAltitude(-1), 1);
-        assertEquals(timestamp, exif.getGpsDateTime() / 1000);
+        assertEquals(timestamp, getGpsDateTimeFromJpeg(exif) / 1000);
+    }
+
+    private long getGpsDateTimeFromJpeg(ExifInterface exif) {
+        String date = exif.getAttribute(ExifInterface.TAG_GPS_DATESTAMP);
+        String time = exif.getAttribute(ExifInterface.TAG_GPS_TIMESTAMP);
+        if (date == null || time == null) return -1;
+
+        String dateTimeString = date + ' ' + time;
+        ParsePosition pos = new ParsePosition(0);
+        try {
+            SimpleDateFormat formatter = new SimpleDateFormat("yyyy:MM:dd HH:mm:ss");
+            formatter.setTimeZone(TimeZone.getTimeZone("UTC"));
+
+            Date datetime = formatter.parse(dateTimeString, pos);
+            if (datetime == null) return -1;
+            return datetime.getTime();
+        } catch (IllegalArgumentException ex) {
+            return -1;
+        }
     }
 
     private void checkGpsDataNull(ExifInterface exif) {
