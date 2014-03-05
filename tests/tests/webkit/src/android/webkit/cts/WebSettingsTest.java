@@ -209,7 +209,14 @@ public class WebSettingsTest extends ActivityInstrumentationTestCase2<WebViewStu
             }
         }.run();
         int firstFetch = mWebServer.getRequestCount();
+        iconListener.mReceivedIcon = false;
         loadAssetUrl(TestHtmlConstants.HELLO_WORLD_URL);
+        new PollingCheck(WEBVIEW_TIMEOUT) {
+            @Override
+            protected boolean check() {
+                return iconListener.mReceivedIcon;
+            }
+        }.run();
         assertEquals(firstFetch, mWebServer.getRequestCount());
 
         mSettings.setCacheMode(WebSettings.LOAD_NO_CACHE);
