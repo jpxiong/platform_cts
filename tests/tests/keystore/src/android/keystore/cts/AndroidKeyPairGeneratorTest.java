@@ -406,6 +406,8 @@ public class AndroidKeyPairGeneratorTest extends AndroidTestCase {
         final PublicKey pubKey = pair.getPublic();
         assertNotNull("The PublicKey for the KeyPair should be not null", pubKey);
         assertEquals(keyType, pubKey.getAlgorithm());
+        assertEquals("Public keys should be in X.509 format", "X.509", pubKey.getFormat());
+        assertNotNull("Public keys should be encodable", pubKey.getEncoded());
 
         if ("DSA".equalsIgnoreCase(keyType)) {
             DSAPublicKey dsaPubKey = (DSAPublicKey) pubKey;
@@ -434,6 +436,8 @@ public class AndroidKeyPairGeneratorTest extends AndroidTestCase {
         final PrivateKey privKey = pair.getPrivate();
         assertNotNull("The PrivateKey for the KeyPair should be not null", privKey);
         assertEquals(keyType, privKey.getAlgorithm());
+        assertNull("getFormat() should return null", privKey.getFormat());
+        assertNull("getEncoded() should return null", privKey.getEncoded());
 
         KeyStore.Entry entry = mKeyStore.getEntry(alias, null);
         assertNotNull("Entry should exist", entry);
@@ -471,6 +475,9 @@ public class AndroidKeyPairGeneratorTest extends AndroidTestCase {
                 chain.length);
 
         assertUsableInSSLConnection(privKey, x509userCert);
+
+        assertEquals("Retrieved key and generated key should be equal", privKey,
+                privEntry.getPrivateKey());
     }
 
     private static void assertUsableInSSLConnection(final PrivateKey privKey,
