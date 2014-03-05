@@ -43,7 +43,6 @@ import android.print.cts.services.SecondPrintService;
 import android.print.cts.services.StubbablePrinterDiscoverySession;
 import android.printservice.PrintJob;
 import android.printservice.PrintService;
-import android.support.test.uiautomator.UiDevice;
 
 import org.mockito.InOrder;
 import org.mockito.invocation.InvocationOnMock;
@@ -216,8 +215,8 @@ public class PrintDocumentAdapterContractTest extends BasePrintTest {
         waitForWriteForAdapterCallback();
 
         // Cancel the printing.
-        UiDevice.getInstance().pressBack(); // wakes up the device.
-        UiDevice.getInstance().pressBack();
+        getUiDevice().pressBack(); // wakes up the device.
+        getUiDevice().pressBack();
 
         // Wait for finish.
         waitForAdapterFinishCallbackCalled();
@@ -913,8 +912,8 @@ public class PrintDocumentAdapterContractTest extends BasePrintTest {
         waitForLayoutAdapterCallbackCount(1);
 
         // Cancel printing.
-        UiDevice.getInstance().pressBack(); // wakes up the device.
-        UiDevice.getInstance().pressBack();
+        getUiDevice().pressBack(); // wakes up the device.
+        getUiDevice().pressBack();
 
         // Wait for a finish.
         waitForAdapterFinishCallbackCalled();
@@ -997,8 +996,8 @@ public class PrintDocumentAdapterContractTest extends BasePrintTest {
         waitForWriteForAdapterCallback();
 
         // Cancel printing.
-        UiDevice.getInstance().pressBack(); // wakes up the device.
-        UiDevice.getInstance().pressBack();
+        getUiDevice().pressBack(); // wakes up the device.
+        getUiDevice().pressBack();
 
         // Wait for a finish.
         waitForAdapterFinishCallbackCalled();
@@ -1063,8 +1062,8 @@ public class PrintDocumentAdapterContractTest extends BasePrintTest {
         waitForLayoutAdapterCallbackCount(1);
 
         // Cancel printing.
-        UiDevice.getInstance().pressBack(); // wakes up the device.
-        UiDevice.getInstance().pressBack();
+        getUiDevice().pressBack(); // wakes up the device.
+        getUiDevice().pressBack();
 
         // Wait for a finish.
         waitForAdapterFinishCallbackCalled();
@@ -1139,8 +1138,8 @@ public class PrintDocumentAdapterContractTest extends BasePrintTest {
         waitForWriteForAdapterCallback();
 
         // Cancel printing.
-        UiDevice.getInstance().pressBack(); // wakes up the device.
-        UiDevice.getInstance().pressBack();
+        getUiDevice().pressBack(); // wakes up the device.
+        getUiDevice().pressBack();
 
         // Wait for a finish.
         waitForAdapterFinishCallbackCalled();
@@ -1220,8 +1219,8 @@ public class PrintDocumentAdapterContractTest extends BasePrintTest {
         waitForWriteForAdapterCallback();
 
         // Cancel printing.
-        UiDevice.getInstance().pressBack(); // wakes up the device.
-        UiDevice.getInstance().pressBack();
+        getUiDevice().pressBack(); // wakes up the device.
+        getUiDevice().pressBack();
 
         // Wait for a finish.
         waitForAdapterFinishCallbackCalled();
@@ -1285,8 +1284,8 @@ public class PrintDocumentAdapterContractTest extends BasePrintTest {
         waitForLayoutAdapterCallbackCount(1);
 
         // Cancel printing.
-        UiDevice.getInstance().pressBack(); // wakes up the device.
-        UiDevice.getInstance().pressBack();
+        getUiDevice().pressBack(); // wakes up the device.
+        getUiDevice().pressBack();
 
         // Wait for a finish.
         waitForAdapterFinishCallbackCalled();
@@ -1358,8 +1357,8 @@ public class PrintDocumentAdapterContractTest extends BasePrintTest {
         waitForWriteForAdapterCallback();
 
         // Cancel printing.
-        UiDevice.getInstance().pressBack(); // wakes up the device.
-        UiDevice.getInstance().pressBack();
+        getUiDevice().pressBack(); // wakes up the device.
+        getUiDevice().pressBack();
 
         // Wait for a finish.
         waitForAdapterFinishCallbackCalled();

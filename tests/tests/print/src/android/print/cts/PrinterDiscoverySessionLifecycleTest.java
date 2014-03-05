@@ -38,7 +38,6 @@ import android.print.cts.services.SecondPrintService;
 import android.print.cts.services.StubbablePrinterDiscoverySession;
 import android.printservice.PrintJob;
 import android.printservice.PrinterDiscoverySession;
-import android.support.test.uiautomator.UiDevice;
 
 import org.mockito.InOrder;
 import org.mockito.invocation.InvocationOnMock;
@@ -220,8 +219,8 @@ public class PrinterDiscoverySessionLifecycleTest extends BasePrintTest {
         waitForLayoutAdapterCallbackCount(4);
 
         // Cancel the printing.
-        UiDevice.getInstance().pressBack(); // wakes up the device.
-        UiDevice.getInstance().pressBack();
+        getUiDevice().pressBack(); // wakes up the device.
+        getUiDevice().pressBack();
 
         // Wait for all print jobs to be handled after which the session destroyed.
         waitForPrinterDiscoverySessionDestroyCallbackCalled();

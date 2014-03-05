@@ -40,7 +40,6 @@ import android.print.cts.services.SecondPrintService;
 import android.print.cts.services.StubbablePrinterDiscoverySession;
 import android.printservice.PrintJob;
 import android.printservice.PrintService;
-import android.support.test.uiautomator.UiDevice;
 import android.support.test.uiautomator.UiObject;
 import android.support.test.uiautomator.UiObjectNotFoundException;
 import android.support.test.uiautomator.UiSelector;
@@ -435,8 +434,8 @@ public class PageRangeAdjustmentTest extends BasePrintTest {
         waitForWriteForAdapterCallback();
 
         // Cancel printing.
-        UiDevice.getInstance().pressBack(); // wakes up the device.
-        UiDevice.getInstance().pressBack();
+        getUiDevice().pressBack(); // wakes up the device.
+        getUiDevice().pressBack();
 
         // Wait for finish.
         waitForAdapterFinishCallbackCalled();
@@ -454,14 +453,14 @@ public class PageRangeAdjustmentTest extends BasePrintTest {
     }
 
     private void selectPages(String pages) throws UiObjectNotFoundException {
-        UiObject pagesSpinner = new UiObject(new UiSelector().resourceId(
+        UiObject pagesSpinner = getUiDevice().findObject(new UiSelector().resourceId(
                 "com.android.printspooler:id/range_options_spinner"));
         pagesSpinner.click();
 
-        UiObject rangeOption = new UiObject(new UiSelector().text("Range"));
+        UiObject rangeOption = getUiDevice().findObject(new UiSelector().text("Range"));
         rangeOption.click();
 
-        UiObject pagesEditText = new UiObject(new UiSelector().resourceId(
+        UiObject pagesEditText = getUiDevice().findObject(new UiSelector().resourceId(
                 "com.android.printspooler:id/page_range_edittext"));
         pagesEditText.setText(pages);
     }
