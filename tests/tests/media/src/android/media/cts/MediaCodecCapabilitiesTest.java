@@ -21,6 +21,8 @@ import android.media.MediaCodecInfo.CodecProfileLevel;
 import android.media.MediaCodecList;
 import android.media.MediaPlayer;
 
+import android.os.Build;
+
 import android.util.Log;
 
 /**
@@ -93,12 +95,16 @@ public class MediaCodecCapabilitiesTest extends MediaPlayerTestBase {
             Log.i(TAG, "AvcHigh40 not supported");
             return;
         }
+        if (Build.VERSION.SDK_INT < 18) {
+            Log.i(TAG, "fragmented mp4 not supported");
+            return;
+        }
         playVideoWithRetries("http://redirector.c.youtube.com/videoplayback?id=271de9756065677e"
-                + "&itag=37&source=youtube&user=android-device-test"
+                + "&itag=137&source=youtube&user=android-device-test"
                 + "&sparams=ip,ipbits,expire,id,itag,source,user"
                 + "&ip=0.0.0.0&ipbits=0&expire=999999999999999999"
-                + "&signature=7C3BBFB2F493E1BC396B6D31DDAF2E1367624487."
-                + "64197F3BB46039669E912297DCD68D1FB2811D9F"
+                + "&signature=2C836E04C4DDC98649CD44C8B91813D98342D1D1."
+                + "870A848D54CA08C197E5FDC34ED45E6ED7DB5CDA"
                 + "&key=test_key1", 1920, 1080, PLAY_TIME_MS);
     }
 
