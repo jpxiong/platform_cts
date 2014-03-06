@@ -18,7 +18,7 @@ package com.android.cts.verifier.sensors;
 
 import android.hardware.Sensor;
 import android.hardware.SensorManager;
-import android.hardware.cts.helpers.sensorTestOperations.VerifySensorOperation;
+import android.hardware.cts.helpers.sensoroperations.VerifySensorOperation;
 
 import java.util.concurrent.TimeUnit;
 
