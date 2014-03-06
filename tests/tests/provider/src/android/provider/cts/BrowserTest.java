@@ -28,9 +28,6 @@ import android.os.RemoteException;
 import android.provider.Browser;
 import android.provider.Browser.BookmarkColumns;
 import android.provider.Browser.SearchColumns;
-import android.provider.BrowserContract;
-import android.provider.BrowserContract.Bookmarks;
-import android.provider.BrowserContract.History;
 import android.test.ActivityInstrumentationTestCase2;
 
 import java.util.ArrayList;
@@ -73,39 +70,30 @@ public class BrowserTest extends ActivityInstrumentationTestCase2<BrowserStubAct
         ContentResolver.setMasterSyncAutomatically(false);
 
         // backup the current contents in database
-        Cursor cursor = mProvider.query(Bookmarks.CONTENT_URI, null, null, null, null, null);
-        if (cursor.moveToFirst()) {
+        Cursor cursor = mProvider.query(Browser.BOOKMARKS_URI, null, null, null, null, null);
+        while (cursor.moveToNext()) {
             String[] colNames = cursor.getColumnNames();
-            while (!cursor.isAfterLast()) {
-                ContentValues value = new ContentValues();
+            ContentValues value = new ContentValues();
 
-                for (int i = 0; i < colNames.length; i++) {
-                    if (Bookmarks.PARENT_SOURCE_ID.equals(colNames[i])
-                            || Bookmarks.INSERT_AFTER_SOURCE_ID.equals(colNames[i])
-                            || Bookmarks.TYPE.equals(colNames[i])) {
-                        // These aren't actual columns, so skip them in the backup
-                        continue;
-                    }
-                    switch (cursor.getType(i)) {
-                    case Cursor.FIELD_TYPE_BLOB:
-                        value.put(colNames[i], cursor.getBlob(i));
-                        break;
-                    case Cursor.FIELD_TYPE_FLOAT:
-                        value.put(colNames[i], cursor.getFloat(i));
-                        break;
-                    case Cursor.FIELD_TYPE_INTEGER:
-                        value.put(colNames[i], cursor.getLong(i));
-                        break;
-                    case Cursor.FIELD_TYPE_STRING:
-                        value.put(colNames[i], cursor.getString(i));
-                        break;
-                    }
+            for (int i = 0; i < colNames.length; i++) {
+                switch (cursor.getType(i)) {
+                case Cursor.FIELD_TYPE_BLOB:
+                    value.put(colNames[i], cursor.getBlob(i));
+                    break;
+                case Cursor.FIELD_TYPE_FLOAT:
+                    value.put(colNames[i], cursor.getFloat(i));
+                    break;
+                case Cursor.FIELD_TYPE_INTEGER:
+                    value.put(colNames[i], cursor.getLong(i));
+                    break;
+                case Cursor.FIELD_TYPE_STRING:
+                    value.put(colNames[i], cursor.getString(i));
+                    break;
                 }
-                mBookmarksBackup.add(value);
-
-                cursor.moveToNext();
-            };
+            }
+            mBookmarksBackup.add(value);
         }
+
         cursor.close();
 
         cursor = mProvider.query(Browser.SEARCHES_URI, null, null, null, null, null);
@@ -123,12 +111,8 @@ public class BrowserTest extends ActivityInstrumentationTestCase2<BrowserStubAct
         }
         cursor.close();
 
-        Uri uri = Bookmarks.CONTENT_URI.buildUpon()
-                .appendQueryParameter(BrowserContract.CALLER_IS_SYNCADAPTER, "true")
-                .build();
-        mProvider.delete(uri, null, null);
+        mProvider.delete(Browser.BOOKMARKS_URI, null, null);
         mProvider.delete(Browser.SEARCHES_URI, null, null);
-        mProvider.delete(History.CONTENT_URI, null, null);
 
         mActivity = getActivity();
     }
@@ -136,17 +120,13 @@ public class BrowserTest extends ActivityInstrumentationTestCase2<BrowserStubAct
     @Override
     protected void tearDown() throws Exception {
         try {
-
             // clear all new contents added in test cases.
-            Uri uri = Bookmarks.CONTENT_URI.buildUpon()
-                .appendQueryParameter(BrowserContract.CALLER_IS_SYNCADAPTER, "true")
-                .build();
-            mProvider.delete(uri, null, null);
+            mProvider.delete(Browser.BOOKMARKS_URI, null, null);
             mProvider.delete(Browser.SEARCHES_URI, null, null);
 
             // recover the old backup contents
             for (ContentValues value : mBookmarksBackup) {
-                mProvider.insert(uri, value);
+                mProvider.insert(Browser.BOOKMARKS_URI, value);
             }
 
             for (ContentValues value : mSearchesBackup) {
