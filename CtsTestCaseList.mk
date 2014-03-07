@@ -141,7 +141,10 @@ cts_host_libraries := \
 cts_native_exes := \
 	NativeMediaTest_SL \
 	NativeMediaTest_XA \
-	bionic-unit-tests-cts \
+
+ifeq ($(HOST_OS)-$(HOST_ARCH),$(filter $(HOST_OS)-$(HOST_ARCH),linux-x86 linux-x86_64))
+cts_native_exes += bionic-unit-tests-cts
+endif
 
 cts_ui_tests := \
     CtsUiAutomatorTests
