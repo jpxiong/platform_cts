@@ -27,6 +27,7 @@ import com.android.tradefed.build.IBuildInfo;
 import com.android.tradefed.config.ConfigurationException;
 import com.android.tradefed.config.Option;
 import com.android.tradefed.config.Option.Importance;
+import com.android.tradefed.config.OptionCopier;
 import com.android.tradefed.device.DeviceNotAvailableException;
 import com.android.tradefed.device.ITestDevice;
 import com.android.tradefed.device.TestDeviceOptions;
@@ -167,8 +168,8 @@ public class CtsTest implements IDeviceTest, IResumableTest, IShardableTest, IBu
     /** data structure for a {@link IRemoteTest} and its known tests */
     class TestPackage {
         private final IRemoteTest mTestForPackage;
-        private final Collection<TestIdentifier> mKnownTests;
         private final ITestPackageDef mPackageDef;
+        private final Collection<TestIdentifier> mKnownTests;
 
         TestPackage(ITestPackageDef packageDef, IRemoteTest testForPackage,
                 Collection<TestIdentifier> knownTests) {
@@ -467,6 +468,12 @@ public class CtsTest implements IDeviceTest, IResumableTest, IShardableTest, IBu
 
             uninstallPrequisiteApks(uninstallPackages);
 
+        } catch (RuntimeException e) {
+            CLog.e(e);
+            throw e;
+        } catch (Error e) {
+            CLog.e(e);
+            throw e;
         } finally {
             filter.reportUnexecutedTests();
         }
@@ -736,6 +743,8 @@ public class CtsTest implements IDeviceTest, IResumableTest, IShardableTest, IBu
         // don't create more shards than the number of tests we have!
         for (int i = 0; i < mShards && i < allTests.size(); i++) {
             CtsTest shard = new CtsTest();
+            OptionCopier.copyOptionsNoThrow(this, shard);
+            shard.mShards = 0;
             shard.mRemainingTestPkgs = new LinkedList<TestPackage>();
             shardQueue.add(shard);
         }

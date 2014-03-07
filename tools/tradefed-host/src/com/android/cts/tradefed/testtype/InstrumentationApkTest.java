@@ -23,11 +23,11 @@ import com.android.tradefed.result.ITestInvocationListener;
 import com.android.tradefed.testtype.IBuildReceiver;
 import com.android.tradefed.testtype.InstrumentationTest;
 
+import junit.framework.Assert;
+
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.Collection;
-
-import junit.framework.Assert;
 
 /**
  * A {@link InstrumentationTest] that will install CTS apks before test execution,

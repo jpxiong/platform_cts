@@ -17,7 +17,6 @@
 package com.android.cts.tradefed.result;
 
 import com.android.cts.tradefed.build.CtsBuildHelper;
-import com.android.cts.tradefed.device.DeviceInfoCollector;
 import com.android.cts.tradefed.testtype.CtsTest;
 import com.android.cts.tradefed.util.CtsHostStore;
 import com.android.ddmlib.Log;
@@ -69,6 +68,9 @@ public class CtsXmlResultReporter implements ITestInvocationListener {
     static final String PLAN_ATTR = "testPlan";
     static final String STARTTIME_ATTR = "starttime";
 
+    @Option(name = "quiet-output", description = "Mute display of test results.")
+    private boolean mQuietOutput = false;
+
     private static final String REPORT_DIR_NAME = "output-file-path";
     @Option(name=REPORT_DIR_NAME, description="root file system path to directory to store xml " +
             "test results and associated logs. If not specified, results will be stored at " +
@@ -82,9 +84,6 @@ public class CtsXmlResultReporter implements ITestInvocationListener {
     // listen in on the continue-session option provided to CtsTest
     @Option(name = CtsTest.CONTINUE_OPTION, description = "the test result session to continue.")
     private Integer mContinueSessionId = null;
-
-    @Option(name = "quiet-output", description = "Mute display of test results.")
-    private boolean mQuietOutput = false;
 
     @Option(name = "result-server", description = "Server to publish test results.")
     private String mResultServer;
@@ -220,27 +219,10 @@ public class CtsXmlResultReporter implements ITestInvocationListener {
         return new LogFileSaver(mLogDir);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+
     @Override
     public void testRunStarted(String name, int numTests) {
-        if (mCurrentPkgResult != null && !name.equals(mCurrentPkgResult.getAppPackageName())) {
-            // display results from previous run
-            logCompleteRun(mCurrentPkgResult);
-        }
-        mIsDeviceInfoRun = name.equals(DeviceInfoCollector.APP_PACKAGE_NAME);
-        if (mIsDeviceInfoRun) {
-            logResult("Collecting device info");
-        } else  {
-            if (mCurrentPkgResult == null || !name.equals(mCurrentPkgResult.getAppPackageName())) {
-                logResult("-----------------------------------------");
-                logResult("Test package %s started", name);
-                logResult("-----------------------------------------");
-            }
-            mCurrentPkgResult = mResults.getOrCreatePackage(name);
-        }
-
+        mCurrentPkgResult = mResults.getOrCreatePackage(name);
     }
 
     /**
@@ -266,10 +248,6 @@ public class CtsXmlResultReporter implements ITestInvocationListener {
     public void testEnded(TestIdentifier test, Map<String, String> testMetrics) {
         collectCtsResults(test, testMetrics);
         mCurrentPkgResult.reportTestEnded(test);
-        Test result = mCurrentPkgResult.findTest(test);
-        String stack = result.getStackTrace() == null ? "" : "\n" + result.getStackTrace();
-        logResult("%s#%s %s %s", test.getClassName(), test.getTestName(), result.getResult(),
-                stack);
     }
 
     /**
@@ -314,10 +292,6 @@ public class CtsXmlResultReporter implements ITestInvocationListener {
      */
     @Override
     public void invocationEnded(long elapsedTime) {
-        // display the results of the last completed run
-        if (mCurrentPkgResult != null) {
-            logCompleteRun(mCurrentPkgResult);
-        }
         if (mReportDir == null || mStartTime == null) {
             // invocationStarted must have failed, abort
             CLog.w("Unable to create XML report");
@@ -342,17 +316,6 @@ public class CtsXmlResultReporter implements ITestInvocationListener {
         } else {
             Log.logAndDisplay(LogLevel.INFO, mDeviceSerial, String.format(format, args));
         }
-    }
-
-    private void logCompleteRun(TestPackageResult pkgResult) {
-        if (pkgResult.getAppPackageName().equals(DeviceInfoCollector.APP_PACKAGE_NAME)) {
-            logResult("Device info collection complete");
-            return;
-        }
-        logResult("%s package complete: Passed %d, Failed %d, Not Executed %d",
-                pkgResult.getAppPackageName(), pkgResult.countTests(CtsTestStatus.PASS),
-                pkgResult.countTests(CtsTestStatus.FAIL),
-                pkgResult.countTests(CtsTestStatus.NOT_EXECUTED));
     }
 
     /**
@@ -382,7 +345,7 @@ public class CtsXmlResultReporter implements ITestInvocationListener {
         } catch (IOException e) {
             Log.e(LOG_TAG, "Failed to generate report data");
         } finally {
-            StreamUtil.closeStream(stream);
+            StreamUtil.close(stream);
         }
     }
 
