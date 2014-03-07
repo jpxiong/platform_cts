@@ -82,7 +82,7 @@ public class PownTest extends RSBaseCompute {
         Allocation nAlloc = Allocation.createSized(mRS, Element.I32(mRS), INPUTSIZE);
 
         n = new int[INPUTSIZE];
-        RSUtils.genRandomInts(0x12345678, 32, -16, n);
+        RSUtils.genRandomInts(0x12345678, -16, 15, n);
         nAlloc.copyFrom(n);
         script_f32.set_n1(nAlloc);
 
@@ -93,7 +93,7 @@ public class PownTest extends RSBaseCompute {
         Allocation nAlloc = Allocation.createSized(mRS, Element.I32(mRS), INPUTSIZE);
 
         n = new int[INPUTSIZE];
-        RSUtils.genRandomInts(0x12345678, 32, -16, n);
+        RSUtils.genRandomInts(0x12345678, -16, 15, n);
         nAlloc.copyFrom(n);
         script_f32_relaxed.set_n1(nAlloc);
 
@@ -104,7 +104,7 @@ public class PownTest extends RSBaseCompute {
         Allocation nAlloc = Allocation.createSized(mRS, Element.I32_2(mRS), INPUTSIZE);
 
         n = new int[INPUTSIZE*2];
-        RSUtils.genRandomInts(0xacdef1, 32, -16, n);
+        RSUtils.genRandomInts(0xacdef1, -16, 15, n);
         nAlloc.copyFrom(n);
         script_f32.set_n2(nAlloc);
 
@@ -115,7 +115,7 @@ public class PownTest extends RSBaseCompute {
         Allocation nAlloc = Allocation.createSized(mRS, Element.I32_2(mRS), INPUTSIZE);
 
         n = new int[INPUTSIZE*2];
-        RSUtils.genRandomInts(0xacdef1, 32, -16, n);
+        RSUtils.genRandomInts(0xacdef1, -16, 15, n);
         nAlloc.copyFrom(n);
         script_f32_relaxed.set_n2(nAlloc);
 
@@ -126,7 +126,7 @@ public class PownTest extends RSBaseCompute {
         Allocation nAlloc = Allocation.createSized(mRS, Element.I32_3(mRS), INPUTSIZE);
 
         n = new int[INPUTSIZE*4];
-        RSUtils.genRandomInts(0xa123f1, 32, -16, n);
+        RSUtils.genRandomInts(0xa123f1, -16, 15, n);
         nAlloc.copyFrom(n);
         script_f32.set_n3(nAlloc);
 
@@ -137,7 +137,7 @@ public class PownTest extends RSBaseCompute {
         Allocation nAlloc = Allocation.createSized(mRS, Element.I32_3(mRS), INPUTSIZE);
 
         n = new int[INPUTSIZE*4];
-        RSUtils.genRandomInts(0xa123f1, 32, -16, n);
+        RSUtils.genRandomInts(0xa123f1, -16, 15, n);
         nAlloc.copyFrom(n);
         script_f32_relaxed.set_n3(nAlloc);
 
@@ -148,7 +148,7 @@ public class PownTest extends RSBaseCompute {
         Allocation nAlloc = Allocation.createSized(mRS, Element.I32_4(mRS), INPUTSIZE);
 
         n = new int[INPUTSIZE*4];
-        RSUtils.genRandomInts(0x4323ca, 32, -16, n);
+        RSUtils.genRandomInts(0x4323ca, -16, 15, n);
         nAlloc.copyFrom(n);
         script_f32.set_n4(nAlloc);
 
@@ -159,7 +159,7 @@ public class PownTest extends RSBaseCompute {
         Allocation nAlloc = Allocation.createSized(mRS, Element.I32_4(mRS), INPUTSIZE);
 
         n = new int[INPUTSIZE*4];
-        RSUtils.genRandomInts(0x4323ca, 32, -16, n);
+        RSUtils.genRandomInts(0x4323ca, -16, 15, n);
         nAlloc.copyFrom(n);
         script_f32_relaxed.set_n4(nAlloc);
 

@@ -88,8 +88,8 @@ public class PowrTest extends RSBaseCompute {
     }
 
     @Override
-    protected void fillRandomFloats(long seed, int fact, int offset, float[] inArray) {
-        RSUtils.genRandomFloats(seed, 64, 0, inArray);
+    protected void fillRandomFloats(long seed, float min, float max, float[] inArray) {
+        RSUtils.genRandomFloats(seed, 0.0f, 64.0f, inArray);
     }
 
     public void testPowrF32() {

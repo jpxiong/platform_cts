@@ -28,22 +28,24 @@ import com.android.cts.stub.R;
 public class RSUtils {
 
     /**
-     * Fills the array with random floats.  Values will be: offset + number between 0 and max.
+     * Fills the array with random floats.  Values will be between min (inclusive) and
+     * max (inclusive).
      */
-    public static void genRandomFloats(long seed, int max, int offset, float array[]) {
+    public static void genRandomFloats(long seed, float min, float max, float array[]) {
         Random r = new Random(seed);
         for (int i = 0; i < array.length; i++) {
-            array[i] = r.nextFloat() * max + offset;
+            array[i] = min + r.nextFloat() * (max - min);
         }
     }
 
     /**
-     * Fills the array with random ints.  Values will be: offset + number between 0 and max (exclusive).
+     * Fills the array with random floats.  Values will be between min (inclusive) and
+     * max (inclusive).
      */
-    public static void genRandomInts(long seed, int max, int offset, int array[]) {
+    public static void genRandomInts(long seed, int min, int max, int array[]) {
         Random r = new Random(seed);
         for (int i = 0; i < array.length; i++) {
-            array[i] = (r.nextInt(max) + offset);
+            array[i] = min + r.nextInt(max - min + 1);
         }
     }
 }
