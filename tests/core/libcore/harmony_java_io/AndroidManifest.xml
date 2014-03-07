@@ -16,7 +16,7 @@
  -->
 
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="android.core.tests.libcore.package.harmony_luni">
+    package="android.core.tests.libcore.package.harmony_java_io">
     <uses-permission android:name="android.permission.INTERNET" />
     <application>
         <uses-library android:name="android.test.runner" />
