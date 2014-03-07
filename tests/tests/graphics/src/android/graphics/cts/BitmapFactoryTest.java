@@ -40,6 +40,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.RandomAccessFile;
 
 public class BitmapFactoryTest extends InstrumentationTestCase {
     private Resources mRes;
@@ -240,6 +241,50 @@ public class BitmapFactoryTest extends InstrumentationTestCase {
         assertEquals(START_WIDTH, b.getWidth());
     }
 
+    public void testDecodeFileDescriptor3() throws IOException {
+        // Arbitrary offsets to use. If the offset of the FD matches the offset of the image,
+        // decoding should succeed, but if they do not match, decoding should fail.
+        long ACTUAL_OFFSETS[] = new long[] { 0, 17 };
+        for (int RES_ID : RES_IDS) {
+            for (int j = 0; j < ACTUAL_OFFSETS.length; ++j) {
+                // FIXME: The purgeable test should attempt to purge the memory
+                // to force a re-decode.
+                for (boolean TEST_PURGEABLE : new boolean[] { false, true }) {
+                    BitmapFactory.Options opts = new BitmapFactory.Options();
+                    opts.inPurgeable = TEST_PURGEABLE;
+                    opts.inInputShareable = TEST_PURGEABLE;
+
+                    long actualOffset = ACTUAL_OFFSETS[j];
+                    String path = obtainPath(RES_ID, actualOffset);
+                    RandomAccessFile file = new RandomAccessFile(path, "r");
+                    FileDescriptor fd = file.getFD();
+                    assertTrue(fd.valid());
+
+                    // Set the offset to ACTUAL_OFFSET
+                    file.seek(actualOffset);
+                    assertEquals(file.getFilePointer(), actualOffset);
+
+                    // Now decode. This should be successful and leave the offset
+                    // unchanged.
+                    Bitmap b = BitmapFactory.decodeFileDescriptor(fd, null, opts);
+                    assertNotNull(b);
+                    assertEquals(file.getFilePointer(), actualOffset);
+
+                    // Now use the other offset. It should fail to decode, and
+                    // the offset should remain unchanged.
+                    long otherOffset = ACTUAL_OFFSETS[(j + 1) % ACTUAL_OFFSETS.length];
+                    assertFalse(otherOffset == actualOffset);
+                    file.seek(otherOffset);
+                    assertEquals(file.getFilePointer(), otherOffset);
+
+                    b = BitmapFactory.decodeFileDescriptor(fd, null, opts);
+                    assertNull(b);
+                    assertEquals(file.getFilePointer(), otherOffset);
+                }
+            }
+        }
+    }
+
     public void testDecodeFile1() throws IOException {
         Bitmap b = BitmapFactory.decodeFile(obtainPath(), mOpt1);
         assertNotNull(b);
@@ -426,17 +471,32 @@ public class BitmapFactoryTest extends InstrumentationTestCase {
     }
 
     private String obtainPath() throws IOException {
+        return obtainPath(R.drawable.start, 0);
+    }
+
+    /*
+     * Create a new file and return a path to it.
+     * @param resId Original file. It will be copied into the new file.
+     * @param offset Number of zeroes to write to the new file before the
+     *               copied file. This allows testing decodeFileDescriptor
+     *               with an offset. Must be less than or equal to 1024
+     */
+    private String obtainPath(int resId, long offset) throws IOException {
         File dir = getInstrumentation().getTargetContext().getFilesDir();
         dir.mkdirs();
+        // The suffix does not necessarily represent theactual file type.
         File file = new File(dir, "test.jpg");
         if (!file.createNewFile()) {
             if (!file.exists()) {
                 fail("Failed to create new File!");
             }
         }
-        InputStream is = obtainInputStream();
+        InputStream is = obtainInputStream(resId);
         FileOutputStream fOutput = new FileOutputStream(file);
         byte[] dataBuffer = new byte[1024];
+        // Write a bunch of zeroes before the image.
+        assertTrue(offset <= 1024);
+        fOutput.write(dataBuffer, 0, (int) offset);
         int readLength = 0;
         while ((readLength = is.read(dataBuffer)) != -1) {
             fOutput.write(dataBuffer, 0, readLength);
