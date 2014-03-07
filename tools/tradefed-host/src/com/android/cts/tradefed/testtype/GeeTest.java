@@ -40,6 +40,8 @@ import java.io.File;
 public class GeeTest implements IBuildReceiver, IDeviceTest, IRemoteTest {
 
     private static final String NATIVE_TESTS_DIRECTORY = "/data/local/tmp/cts-native-tests";
+    private static final String NATIVE_TESTS_DIRECTORY_TMP = "/data/local/tmp";
+    private static final String ANDROID_PATH_SEPARATOR = "/";
 
     private int mMaxTestTimeMs = 1 * 60 * 1000;
 
@@ -75,8 +77,8 @@ public class GeeTest implements IBuildReceiver, IDeviceTest, IRemoteTest {
             return false;
         }
 
-        File devicePath = new File(NATIVE_TESTS_DIRECTORY, mExeName);
-        if (!mDevice.pushFile(nativeExe, devicePath.toString())) {
+        String devicePath = NATIVE_TESTS_DIRECTORY + ANDROID_PATH_SEPARATOR + mExeName;
+        if (!mDevice.pushFile(nativeExe, devicePath)) {
             CLog.e("Failed to push native test to device");
             return false;
         }
@@ -87,13 +89,11 @@ public class GeeTest implements IBuildReceiver, IDeviceTest, IRemoteTest {
         if (mDevice.doesFileExist(remoteFilePath)) {
             return true;
         }
-        File remoteFile = new File(remoteFilePath);
-        String parentPath = remoteFile.getParent();
-        if (parentPath != null) {
-            if (!createRemoteDir(parentPath)) {
-                return false;
-            }
+        if (!(mDevice.doesFileExist(NATIVE_TESTS_DIRECTORY_TMP))) {
+            CLog.e("Could not find the /data/local/tmp directory");
+            return false;
         }
+
         mDevice.executeShellCommand(String.format("mkdir %s", remoteFilePath));
         return mDevice.doesFileExist(remoteFilePath);
     }
@@ -102,7 +102,7 @@ public class GeeTest implements IBuildReceiver, IDeviceTest, IRemoteTest {
         GeeTestResultParser resultParser = new GeeTestResultParser(mPackageName, listener);
         resultParser.setFakePackagePrefix(mPackageName + ".");
 
-        String fullPath = NATIVE_TESTS_DIRECTORY + File.separator + mExeName;
+        String fullPath = NATIVE_TESTS_DIRECTORY + ANDROID_PATH_SEPARATOR + mExeName;
         String flags = "";
         CLog.v("Running gtest %s %s on %s", fullPath, flags, mDevice.getSerialNumber());
         // force file to be executable
