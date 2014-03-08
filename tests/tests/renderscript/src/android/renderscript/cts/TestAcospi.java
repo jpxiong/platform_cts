@@ -35,64 +35,60 @@ public class TestAcospi extends RSBaseCompute {
     }
 
     public class ArgumentsFloatFloat {
-        public float in;
-        public float out;
-
-        public int ulf;
-        public int ulfRelaxed;
+        public float inV;
+        public Floaty out;
     }
 
     private void checkAcospiFloatFloat() {
-        Allocation in = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0x1b8763cea5a00314l, false);
+        Allocation inV = createRandomFloatAllocation(mRS, Element.DataType.FLOAT_32, 1, 0x9fbdc3b5d1e084b2l, -1, 1);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 1), INPUTSIZE);
-            script.forEach_testAcospiFloatFloat(in, out);
-            verifyResultsAcospiFloatFloat(in, out, false);
+            script.forEach_testAcospiFloatFloat(inV, out);
+            verifyResultsAcospiFloatFloat(inV, out, false);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testAcospiFloatFloat: " + e.toString());
         }
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 1), INPUTSIZE);
-            scriptRelaxed.forEach_testAcospiFloatFloat(in, out);
-            verifyResultsAcospiFloatFloat(in, out, true);
+            scriptRelaxed.forEach_testAcospiFloatFloat(inV, out);
+            verifyResultsAcospiFloatFloat(inV, out, true);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testAcospiFloatFloat: " + e.toString());
         }
     }
 
-    private void verifyResultsAcospiFloatFloat(Allocation in, Allocation out, boolean relaxed) {
-        float[] arrayIn = new float[INPUTSIZE * 1];
-        in.copyTo(arrayIn);
+    private void verifyResultsAcospiFloatFloat(Allocation inV, Allocation out, boolean relaxed) {
+        float[] arrayInV = new float[INPUTSIZE * 1];
+        inV.copyTo(arrayInV);
         float[] arrayOut = new float[INPUTSIZE * 1];
         out.copyTo(arrayOut);
         for (int i = 0; i < INPUTSIZE; i++) {
             for (int j = 0; j < 1 ; j++) {
                 // Extract the inputs.
                 ArgumentsFloatFloat args = new ArgumentsFloatFloat();
-                args.in = arrayIn[i];
+                args.inV = arrayInV[i];
                 // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeAcospi(args);
-                int ulf = relaxed ? args.ulfRelaxed : args.ulf;
                 // Figure out what the outputs should have been.
                 boolean valid = true;
-                int neededUlf = 0;
-                neededUlf = (int) (Math.abs(args.out - arrayOut[i * 1 + j]) / Math.ulp(args.out) + 0.5);
-                if (neededUlf > ulf) {
+                if (!args.out.couldBe(arrayOut[i * 1 + j])) {
                     valid = false;
                 }
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
-                    message.append(String.format("Input in: %14.8g %8x %15a",
-                            args.in, Float.floatToRawIntBits(args.in), args.in));
+                    message.append("Input inV: ");
+                    message.append(String.format("%14.8g %8x %15a",
+                            args.inV, Float.floatToRawIntBits(args.inV), args.inV));
                     message.append("\n");
-                    message.append(String.format("Expected output out: %14.8g %8x %15a",
-                            args.out, Float.floatToRawIntBits(args.out), args.out));
+                    message.append("Expected output out: ");
+                    message.append(args.out.toString());
                     message.append("\n");
-                    message.append(String.format("Actual   output out: %14.8g %8x %15a",
+                    message.append("Actual   output out: ");
+                    message.append(String.format("%14.8g %8x %15a",
                             arrayOut[i * 1 + j], Float.floatToRawIntBits(arrayOut[i * 1 + j]), arrayOut[i * 1 + j]));
-                    neededUlf = (int) (Math.abs(args.out - arrayOut[i * 1 + j]) / Math.ulp(args.out) + 0.5);
-                    if (neededUlf > ulf) {
-                        message.append(String.format(" FAILED, ulf needed %d, specified %d", neededUlf, ulf));
+                    if (!args.out.couldBe(arrayOut[i * 1 + j])) {
+                        message.append(" FAIL");
                     }
                     message.append("\n");
                     assertTrue("Incorrect output for checkAcospiFloatFloat" +
@@ -103,56 +99,55 @@ public class TestAcospi extends RSBaseCompute {
     }
 
     private void checkAcospiFloat2Float2() {
-        Allocation in = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0xd4df0185f1eeb690l, false);
+        Allocation inV = createRandomFloatAllocation(mRS, Element.DataType.FLOAT_32, 2, 0xc175417fa318aa86l, -1, 1);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 2), INPUTSIZE);
-            script.forEach_testAcospiFloat2Float2(in, out);
-            verifyResultsAcospiFloat2Float2(in, out, false);
+            script.forEach_testAcospiFloat2Float2(inV, out);
+            verifyResultsAcospiFloat2Float2(inV, out, false);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testAcospiFloat2Float2: " + e.toString());
         }
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 2), INPUTSIZE);
-            scriptRelaxed.forEach_testAcospiFloat2Float2(in, out);
-            verifyResultsAcospiFloat2Float2(in, out, true);
+            scriptRelaxed.forEach_testAcospiFloat2Float2(inV, out);
+            verifyResultsAcospiFloat2Float2(inV, out, true);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testAcospiFloat2Float2: " + e.toString());
         }
     }
 
-    private void verifyResultsAcospiFloat2Float2(Allocation in, Allocation out, boolean relaxed) {
-        float[] arrayIn = new float[INPUTSIZE * 2];
-        in.copyTo(arrayIn);
+    private void verifyResultsAcospiFloat2Float2(Allocation inV, Allocation out, boolean relaxed) {
+        float[] arrayInV = new float[INPUTSIZE * 2];
+        inV.copyTo(arrayInV);
         float[] arrayOut = new float[INPUTSIZE * 2];
         out.copyTo(arrayOut);
         for (int i = 0; i < INPUTSIZE; i++) {
             for (int j = 0; j < 2 ; j++) {
                 // Extract the inputs.
                 ArgumentsFloatFloat args = new ArgumentsFloatFloat();
-                args.in = arrayIn[i * 2 + j];
+                args.inV = arrayInV[i * 2 + j];
                 // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeAcospi(args);
-                int ulf = relaxed ? args.ulfRelaxed : args.ulf;
                 // Figure out what the outputs should have been.
                 boolean valid = true;
-                int neededUlf = 0;
-                neededUlf = (int) (Math.abs(args.out - arrayOut[i * 2 + j]) / Math.ulp(args.out) + 0.5);
-                if (neededUlf > ulf) {
+                if (!args.out.couldBe(arrayOut[i * 2 + j])) {
                     valid = false;
                 }
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
-                    message.append(String.format("Input in: %14.8g %8x %15a",
-                            args.in, Float.floatToRawIntBits(args.in), args.in));
+                    message.append("Input inV: ");
+                    message.append(String.format("%14.8g %8x %15a",
+                            args.inV, Float.floatToRawIntBits(args.inV), args.inV));
                     message.append("\n");
-                    message.append(String.format("Expected output out: %14.8g %8x %15a",
-                            args.out, Float.floatToRawIntBits(args.out), args.out));
+                    message.append("Expected output out: ");
+                    message.append(args.out.toString());
                     message.append("\n");
-                    message.append(String.format("Actual   output out: %14.8g %8x %15a",
+                    message.append("Actual   output out: ");
+                    message.append(String.format("%14.8g %8x %15a",
                             arrayOut[i * 2 + j], Float.floatToRawIntBits(arrayOut[i * 2 + j]), arrayOut[i * 2 + j]));
-                    neededUlf = (int) (Math.abs(args.out - arrayOut[i * 2 + j]) / Math.ulp(args.out) + 0.5);
-                    if (neededUlf > ulf) {
-                        message.append(String.format(" FAILED, ulf needed %d, specified %d", neededUlf, ulf));
+                    if (!args.out.couldBe(arrayOut[i * 2 + j])) {
+                        message.append(" FAIL");
                     }
                     message.append("\n");
                     assertTrue("Incorrect output for checkAcospiFloat2Float2" +
@@ -163,56 +158,55 @@ public class TestAcospi extends RSBaseCompute {
     }
 
     private void checkAcospiFloat3Float3() {
-        Allocation in = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0xd4df0c2750f54c2al, false);
+        Allocation inV = createRandomFloatAllocation(mRS, Element.DataType.FLOAT_32, 3, 0xc1770a9a9933cb64l, -1, 1);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 3), INPUTSIZE);
-            script.forEach_testAcospiFloat3Float3(in, out);
-            verifyResultsAcospiFloat3Float3(in, out, false);
+            script.forEach_testAcospiFloat3Float3(inV, out);
+            verifyResultsAcospiFloat3Float3(inV, out, false);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testAcospiFloat3Float3: " + e.toString());
         }
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 3), INPUTSIZE);
-            scriptRelaxed.forEach_testAcospiFloat3Float3(in, out);
-            verifyResultsAcospiFloat3Float3(in, out, true);
+            scriptRelaxed.forEach_testAcospiFloat3Float3(inV, out);
+            verifyResultsAcospiFloat3Float3(inV, out, true);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testAcospiFloat3Float3: " + e.toString());
         }
     }
 
-    private void verifyResultsAcospiFloat3Float3(Allocation in, Allocation out, boolean relaxed) {
-        float[] arrayIn = new float[INPUTSIZE * 4];
-        in.copyTo(arrayIn);
+    private void verifyResultsAcospiFloat3Float3(Allocation inV, Allocation out, boolean relaxed) {
+        float[] arrayInV = new float[INPUTSIZE * 4];
+        inV.copyTo(arrayInV);
         float[] arrayOut = new float[INPUTSIZE * 4];
         out.copyTo(arrayOut);
         for (int i = 0; i < INPUTSIZE; i++) {
             for (int j = 0; j < 3 ; j++) {
                 // Extract the inputs.
                 ArgumentsFloatFloat args = new ArgumentsFloatFloat();
-                args.in = arrayIn[i * 4 + j];
+                args.inV = arrayInV[i * 4 + j];
                 // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeAcospi(args);
-                int ulf = relaxed ? args.ulfRelaxed : args.ulf;
                 // Figure out what the outputs should have been.
                 boolean valid = true;
-                int neededUlf = 0;
-                neededUlf = (int) (Math.abs(args.out - arrayOut[i * 4 + j]) / Math.ulp(args.out) + 0.5);
-                if (neededUlf > ulf) {
+                if (!args.out.couldBe(arrayOut[i * 4 + j])) {
                     valid = false;
                 }
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
-                    message.append(String.format("Input in: %14.8g %8x %15a",
-                            args.in, Float.floatToRawIntBits(args.in), args.in));
+                    message.append("Input inV: ");
+                    message.append(String.format("%14.8g %8x %15a",
+                            args.inV, Float.floatToRawIntBits(args.inV), args.inV));
                     message.append("\n");
-                    message.append(String.format("Expected output out: %14.8g %8x %15a",
-                            args.out, Float.floatToRawIntBits(args.out), args.out));
+                    message.append("Expected output out: ");
+                    message.append(args.out.toString());
                     message.append("\n");
-                    message.append(String.format("Actual   output out: %14.8g %8x %15a",
+                    message.append("Actual   output out: ");
+                    message.append(String.format("%14.8g %8x %15a",
                             arrayOut[i * 4 + j], Float.floatToRawIntBits(arrayOut[i * 4 + j]), arrayOut[i * 4 + j]));
-                    neededUlf = (int) (Math.abs(args.out - arrayOut[i * 4 + j]) / Math.ulp(args.out) + 0.5);
-                    if (neededUlf > ulf) {
-                        message.append(String.format(" FAILED, ulf needed %d, specified %d", neededUlf, ulf));
+                    if (!args.out.couldBe(arrayOut[i * 4 + j])) {
+                        message.append(" FAIL");
                     }
                     message.append("\n");
                     assertTrue("Incorrect output for checkAcospiFloat3Float3" +
@@ -223,56 +217,55 @@ public class TestAcospi extends RSBaseCompute {
     }
 
     private void checkAcospiFloat4Float4() {
-        Allocation in = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0xd4df16c8affbe1c4l, false);
+        Allocation inV = createRandomFloatAllocation(mRS, Element.DataType.FLOAT_32, 4, 0xc178d3b58f4eec42l, -1, 1);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 4), INPUTSIZE);
-            script.forEach_testAcospiFloat4Float4(in, out);
-            verifyResultsAcospiFloat4Float4(in, out, false);
+            script.forEach_testAcospiFloat4Float4(inV, out);
+            verifyResultsAcospiFloat4Float4(inV, out, false);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testAcospiFloat4Float4: " + e.toString());
         }
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 4), INPUTSIZE);
-            scriptRelaxed.forEach_testAcospiFloat4Float4(in, out);
-            verifyResultsAcospiFloat4Float4(in, out, true);
+            scriptRelaxed.forEach_testAcospiFloat4Float4(inV, out);
+            verifyResultsAcospiFloat4Float4(inV, out, true);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testAcospiFloat4Float4: " + e.toString());
         }
     }
 
-    private void verifyResultsAcospiFloat4Float4(Allocation in, Allocation out, boolean relaxed) {
-        float[] arrayIn = new float[INPUTSIZE * 4];
-        in.copyTo(arrayIn);
+    private void verifyResultsAcospiFloat4Float4(Allocation inV, Allocation out, boolean relaxed) {
+        float[] arrayInV = new float[INPUTSIZE * 4];
+        inV.copyTo(arrayInV);
         float[] arrayOut = new float[INPUTSIZE * 4];
         out.copyTo(arrayOut);
         for (int i = 0; i < INPUTSIZE; i++) {
             for (int j = 0; j < 4 ; j++) {
                 // Extract the inputs.
                 ArgumentsFloatFloat args = new ArgumentsFloatFloat();
-                args.in = arrayIn[i * 4 + j];
+                args.inV = arrayInV[i * 4 + j];
                 // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeAcospi(args);
-                int ulf = relaxed ? args.ulfRelaxed : args.ulf;
                 // Figure out what the outputs should have been.
                 boolean valid = true;
-                int neededUlf = 0;
-                neededUlf = (int) (Math.abs(args.out - arrayOut[i * 4 + j]) / Math.ulp(args.out) + 0.5);
-                if (neededUlf > ulf) {
+                if (!args.out.couldBe(arrayOut[i * 4 + j])) {
                     valid = false;
                 }
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
-                    message.append(String.format("Input in: %14.8g %8x %15a",
-                            args.in, Float.floatToRawIntBits(args.in), args.in));
+                    message.append("Input inV: ");
+                    message.append(String.format("%14.8g %8x %15a",
+                            args.inV, Float.floatToRawIntBits(args.inV), args.inV));
                     message.append("\n");
-                    message.append(String.format("Expected output out: %14.8g %8x %15a",
-                            args.out, Float.floatToRawIntBits(args.out), args.out));
+                    message.append("Expected output out: ");
+                    message.append(args.out.toString());
                     message.append("\n");
-                    message.append(String.format("Actual   output out: %14.8g %8x %15a",
+                    message.append("Actual   output out: ");
+                    message.append(String.format("%14.8g %8x %15a",
                             arrayOut[i * 4 + j], Float.floatToRawIntBits(arrayOut[i * 4 + j]), arrayOut[i * 4 + j]));
-                    neededUlf = (int) (Math.abs(args.out - arrayOut[i * 4 + j]) / Math.ulp(args.out) + 0.5);
-                    if (neededUlf > ulf) {
-                        message.append(String.format(" FAILED, ulf needed %d, specified %d", neededUlf, ulf));
+                    if (!args.out.couldBe(arrayOut[i * 4 + j])) {
+                        message.append(" FAIL");
                     }
                     message.append("\n");
                     assertTrue("Incorrect output for checkAcospiFloat4Float4" +

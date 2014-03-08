@@ -37,14 +37,11 @@ public class TestPowr extends RSBaseCompute {
     public class ArgumentsFloatFloatFloat {
         public float inX;
         public float inY;
-        public float out;
-
-        public int ulf;
-        public int ulfRelaxed;
+        public Floaty out;
     }
 
     private void checkPowrFloatFloatFloat() {
-        Allocation inX = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0x616e17ec158f6a8dl, 0, 200);
+        Allocation inX = createRandomFloatAllocation(mRS, Element.DataType.FLOAT_32, 1, 0x616e17ec158f6a8dl, 0, 3000);
         Allocation inY = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0x616e17ec158f6a8el, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 1), INPUTSIZE);
@@ -78,31 +75,31 @@ public class TestPowr extends RSBaseCompute {
                 args.inX = arrayInX[i];
                 args.inY = arrayInY[i];
                 // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computePowr(args);
-                int ulf = relaxed ? args.ulfRelaxed : args.ulf;
                 // Figure out what the outputs should have been.
                 boolean valid = true;
-                int neededUlf = 0;
-                neededUlf = (int) (Math.abs(args.out - arrayOut[i * 1 + j]) / Math.ulp(args.out) + 0.5);
-                if (neededUlf > ulf) {
+                if (!args.out.couldBe(arrayOut[i * 1 + j])) {
                     valid = false;
                 }
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
-                    message.append(String.format("Input inX: %14.8g %8x %15a",
+                    message.append("Input inX: ");
+                    message.append(String.format("%14.8g %8x %15a",
                             args.inX, Float.floatToRawIntBits(args.inX), args.inX));
                     message.append("\n");
-                    message.append(String.format("Input inY: %14.8g %8x %15a",
+                    message.append("Input inY: ");
+                    message.append(String.format("%14.8g %8x %15a",
                             args.inY, Float.floatToRawIntBits(args.inY), args.inY));
                     message.append("\n");
-                    message.append(String.format("Expected output out: %14.8g %8x %15a",
-                            args.out, Float.floatToRawIntBits(args.out), args.out));
+                    message.append("Expected output out: ");
+                    message.append(args.out.toString());
                     message.append("\n");
-                    message.append(String.format("Actual   output out: %14.8g %8x %15a",
+                    message.append("Actual   output out: ");
+                    message.append(String.format("%14.8g %8x %15a",
                             arrayOut[i * 1 + j], Float.floatToRawIntBits(arrayOut[i * 1 + j]), arrayOut[i * 1 + j]));
-                    neededUlf = (int) (Math.abs(args.out - arrayOut[i * 1 + j]) / Math.ulp(args.out) + 0.5);
-                    if (neededUlf > ulf) {
-                        message.append(String.format(" FAILED, ulf needed %d, specified %d", neededUlf, ulf));
+                    if (!args.out.couldBe(arrayOut[i * 1 + j])) {
+                        message.append(" FAIL");
                     }
                     message.append("\n");
                     assertTrue("Incorrect output for checkPowrFloatFloatFloat" +
@@ -113,7 +110,7 @@ public class TestPowr extends RSBaseCompute {
     }
 
     private void checkPowrFloat2Float2Float2() {
-        Allocation inX = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0xfc919df3002fbd93l, 0, 200);
+        Allocation inX = createRandomFloatAllocation(mRS, Element.DataType.FLOAT_32, 2, 0xfc919df3002fbd93l, 0, 3000);
         Allocation inY = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0xfc919df3002fbd94l, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 2), INPUTSIZE);
@@ -147,31 +144,31 @@ public class TestPowr extends RSBaseCompute {
                 args.inX = arrayInX[i * 2 + j];
                 args.inY = arrayInY[i * 2 + j];
                 // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computePowr(args);
-                int ulf = relaxed ? args.ulfRelaxed : args.ulf;
                 // Figure out what the outputs should have been.
                 boolean valid = true;
-                int neededUlf = 0;
-                neededUlf = (int) (Math.abs(args.out - arrayOut[i * 2 + j]) / Math.ulp(args.out) + 0.5);
-                if (neededUlf > ulf) {
+                if (!args.out.couldBe(arrayOut[i * 2 + j])) {
                     valid = false;
                 }
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
-                    message.append(String.format("Input inX: %14.8g %8x %15a",
+                    message.append("Input inX: ");
+                    message.append(String.format("%14.8g %8x %15a",
                             args.inX, Float.floatToRawIntBits(args.inX), args.inX));
                     message.append("\n");
-                    message.append(String.format("Input inY: %14.8g %8x %15a",
+                    message.append("Input inY: ");
+                    message.append(String.format("%14.8g %8x %15a",
                             args.inY, Float.floatToRawIntBits(args.inY), args.inY));
                     message.append("\n");
-                    message.append(String.format("Expected output out: %14.8g %8x %15a",
-                            args.out, Float.floatToRawIntBits(args.out), args.out));
+                    message.append("Expected output out: ");
+                    message.append(args.out.toString());
                     message.append("\n");
-                    message.append(String.format("Actual   output out: %14.8g %8x %15a",
+                    message.append("Actual   output out: ");
+                    message.append(String.format("%14.8g %8x %15a",
                             arrayOut[i * 2 + j], Float.floatToRawIntBits(arrayOut[i * 2 + j]), arrayOut[i * 2 + j]));
-                    neededUlf = (int) (Math.abs(args.out - arrayOut[i * 2 + j]) / Math.ulp(args.out) + 0.5);
-                    if (neededUlf > ulf) {
-                        message.append(String.format(" FAILED, ulf needed %d, specified %d", neededUlf, ulf));
+                    if (!args.out.couldBe(arrayOut[i * 2 + j])) {
+                        message.append(" FAIL");
                     }
                     message.append("\n");
                     assertTrue("Incorrect output for checkPowrFloat2Float2Float2" +
@@ -182,7 +179,7 @@ public class TestPowr extends RSBaseCompute {
     }
 
     private void checkPowrFloat3Float3Float3() {
-        Allocation inX = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0x50f67c13020dbf34l, 0, 200);
+        Allocation inX = createRandomFloatAllocation(mRS, Element.DataType.FLOAT_32, 3, 0x50f67c13020dbf34l, 0, 3000);
         Allocation inY = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0x50f67c13020dbf35l, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 3), INPUTSIZE);
@@ -216,31 +213,31 @@ public class TestPowr extends RSBaseCompute {
                 args.inX = arrayInX[i * 4 + j];
                 args.inY = arrayInY[i * 4 + j];
                 // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computePowr(args);
-                int ulf = relaxed ? args.ulfRelaxed : args.ulf;
                 // Figure out what the outputs should have been.
                 boolean valid = true;
-                int neededUlf = 0;
-                neededUlf = (int) (Math.abs(args.out - arrayOut[i * 4 + j]) / Math.ulp(args.out) + 0.5);
-                if (neededUlf > ulf) {
+                if (!args.out.couldBe(arrayOut[i * 4 + j])) {
                     valid = false;
                 }
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
-                    message.append(String.format("Input inX: %14.8g %8x %15a",
+                    message.append("Input inX: ");
+                    message.append(String.format("%14.8g %8x %15a",
                             args.inX, Float.floatToRawIntBits(args.inX), args.inX));
                     message.append("\n");
-                    message.append(String.format("Input inY: %14.8g %8x %15a",
+                    message.append("Input inY: ");
+                    message.append(String.format("%14.8g %8x %15a",
                             args.inY, Float.floatToRawIntBits(args.inY), args.inY));
                     message.append("\n");
-                    message.append(String.format("Expected output out: %14.8g %8x %15a",
-                            args.out, Float.floatToRawIntBits(args.out), args.out));
+                    message.append("Expected output out: ");
+                    message.append(args.out.toString());
                     message.append("\n");
-                    message.append(String.format("Actual   output out: %14.8g %8x %15a",
+                    message.append("Actual   output out: ");
+                    message.append(String.format("%14.8g %8x %15a",
                             arrayOut[i * 4 + j], Float.floatToRawIntBits(arrayOut[i * 4 + j]), arrayOut[i * 4 + j]));
-                    neededUlf = (int) (Math.abs(args.out - arrayOut[i * 4 + j]) / Math.ulp(args.out) + 0.5);
-                    if (neededUlf > ulf) {
-                        message.append(String.format(" FAILED, ulf needed %d, specified %d", neededUlf, ulf));
+                    if (!args.out.couldBe(arrayOut[i * 4 + j])) {
+                        message.append(" FAIL");
                     }
                     message.append("\n");
                     assertTrue("Incorrect output for checkPowrFloat3Float3Float3" +
@@ -251,7 +248,7 @@ public class TestPowr extends RSBaseCompute {
     }
 
     private void checkPowrFloat4Float4Float4() {
-        Allocation inX = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0xa55b5a3303ebc0d5l, 0, 200);
+        Allocation inX = createRandomFloatAllocation(mRS, Element.DataType.FLOAT_32, 4, 0xa55b5a3303ebc0d5l, 0, 3000);
         Allocation inY = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0xa55b5a3303ebc0d6l, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 4), INPUTSIZE);
@@ -285,31 +282,31 @@ public class TestPowr extends RSBaseCompute {
                 args.inX = arrayInX[i * 4 + j];
                 args.inY = arrayInY[i * 4 + j];
                 // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computePowr(args);
-                int ulf = relaxed ? args.ulfRelaxed : args.ulf;
                 // Figure out what the outputs should have been.
                 boolean valid = true;
-                int neededUlf = 0;
-                neededUlf = (int) (Math.abs(args.out - arrayOut[i * 4 + j]) / Math.ulp(args.out) + 0.5);
-                if (neededUlf > ulf) {
+                if (!args.out.couldBe(arrayOut[i * 4 + j])) {
                     valid = false;
                 }
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
-                    message.append(String.format("Input inX: %14.8g %8x %15a",
+                    message.append("Input inX: ");
+                    message.append(String.format("%14.8g %8x %15a",
                             args.inX, Float.floatToRawIntBits(args.inX), args.inX));
                     message.append("\n");
-                    message.append(String.format("Input inY: %14.8g %8x %15a",
+                    message.append("Input inY: ");
+                    message.append(String.format("%14.8g %8x %15a",
                             args.inY, Float.floatToRawIntBits(args.inY), args.inY));
                     message.append("\n");
-                    message.append(String.format("Expected output out: %14.8g %8x %15a",
-                            args.out, Float.floatToRawIntBits(args.out), args.out));
+                    message.append("Expected output out: ");
+                    message.append(args.out.toString());
                     message.append("\n");
-                    message.append(String.format("Actual   output out: %14.8g %8x %15a",
+                    message.append("Actual   output out: ");
+                    message.append(String.format("%14.8g %8x %15a",
                             arrayOut[i * 4 + j], Float.floatToRawIntBits(arrayOut[i * 4 + j]), arrayOut[i * 4 + j]));
-                    neededUlf = (int) (Math.abs(args.out - arrayOut[i * 4 + j]) / Math.ulp(args.out) + 0.5);
-                    if (neededUlf > ulf) {
-                        message.append(String.format(" FAILED, ulf needed %d, specified %d", neededUlf, ulf));
+                    if (!args.out.couldBe(arrayOut[i * 4 + j])) {
+                        message.append(" FAIL");
                     }
                     message.append("\n");
                     assertTrue("Incorrect output for checkPowrFloat4Float4Float4" +

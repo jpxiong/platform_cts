@@ -35,64 +35,60 @@ public class TestAsin extends RSBaseCompute {
     }
 
     public class ArgumentsFloatFloat {
-        public float in;
-        public float out;
-
-        public int ulf;
-        public int ulfRelaxed;
+        public float inV;
+        public Floaty out;
     }
 
     private void checkAsinFloatFloat() {
-        Allocation in = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0xfd0a2c13b8687334l, false);
+        Allocation inV = createRandomFloatAllocation(mRS, Element.DataType.FLOAT_32, 1, 0x80b5674ff98b5a12l, -1, 1);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 1), INPUTSIZE);
-            script.forEach_testAsinFloatFloat(in, out);
-            verifyResultsAsinFloatFloat(in, out, false);
+            script.forEach_testAsinFloatFloat(inV, out);
+            verifyResultsAsinFloatFloat(inV, out, false);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testAsinFloatFloat: " + e.toString());
         }
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 1), INPUTSIZE);
-            scriptRelaxed.forEach_testAsinFloatFloat(in, out);
-            verifyResultsAsinFloatFloat(in, out, true);
+            scriptRelaxed.forEach_testAsinFloatFloat(inV, out);
+            verifyResultsAsinFloatFloat(inV, out, true);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testAsinFloatFloat: " + e.toString());
         }
     }
 
-    private void verifyResultsAsinFloatFloat(Allocation in, Allocation out, boolean relaxed) {
-        float[] arrayIn = new float[INPUTSIZE * 1];
-        in.copyTo(arrayIn);
+    private void verifyResultsAsinFloatFloat(Allocation inV, Allocation out, boolean relaxed) {
+        float[] arrayInV = new float[INPUTSIZE * 1];
+        inV.copyTo(arrayInV);
         float[] arrayOut = new float[INPUTSIZE * 1];
         out.copyTo(arrayOut);
         for (int i = 0; i < INPUTSIZE; i++) {
             for (int j = 0; j < 1 ; j++) {
                 // Extract the inputs.
                 ArgumentsFloatFloat args = new ArgumentsFloatFloat();
-                args.in = arrayIn[i];
+                args.inV = arrayInV[i];
                 // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeAsin(args);
-                int ulf = relaxed ? args.ulfRelaxed : args.ulf;
                 // Figure out what the outputs should have been.
                 boolean valid = true;
-                int neededUlf = 0;
-                neededUlf = (int) (Math.abs(args.out - arrayOut[i * 1 + j]) / Math.ulp(args.out) + 0.5);
-                if (neededUlf > ulf) {
+                if (!args.out.couldBe(arrayOut[i * 1 + j])) {
                     valid = false;
                 }
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
-                    message.append(String.format("Input in: %14.8g %8x %15a",
-                            args.in, Float.floatToRawIntBits(args.in), args.in));
+                    message.append("Input inV: ");
+                    message.append(String.format("%14.8g %8x %15a",
+                            args.inV, Float.floatToRawIntBits(args.inV), args.inV));
                     message.append("\n");
-                    message.append(String.format("Expected output out: %14.8g %8x %15a",
-                            args.out, Float.floatToRawIntBits(args.out), args.out));
+                    message.append("Expected output out: ");
+                    message.append(args.out.toString());
                     message.append("\n");
-                    message.append(String.format("Actual   output out: %14.8g %8x %15a",
+                    message.append("Actual   output out: ");
+                    message.append(String.format("%14.8g %8x %15a",
                             arrayOut[i * 1 + j], Float.floatToRawIntBits(arrayOut[i * 1 + j]), arrayOut[i * 1 + j]));
-                    neededUlf = (int) (Math.abs(args.out - arrayOut[i * 1 + j]) / Math.ulp(args.out) + 0.5);
-                    if (neededUlf > ulf) {
-                        message.append(String.format(" FAILED, ulf needed %d, specified %d", neededUlf, ulf));
+                    if (!args.out.couldBe(arrayOut[i * 1 + j])) {
+                        message.append(" FAIL");
                     }
                     message.append("\n");
                     assertTrue("Incorrect output for checkAsinFloatFloat" +
@@ -103,56 +99,55 @@ public class TestAsin extends RSBaseCompute {
     }
 
     private void checkAsinFloat2Float2() {
-        Allocation in = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0x9e777c6a9ba08db0l, false);
+        Allocation inV = createRandomFloatAllocation(mRS, Element.DataType.FLOAT_32, 2, 0x9e11e5e823f7cce6l, -1, 1);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 2), INPUTSIZE);
-            script.forEach_testAsinFloat2Float2(in, out);
-            verifyResultsAsinFloat2Float2(in, out, false);
+            script.forEach_testAsinFloat2Float2(inV, out);
+            verifyResultsAsinFloat2Float2(inV, out, false);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testAsinFloat2Float2: " + e.toString());
         }
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 2), INPUTSIZE);
-            scriptRelaxed.forEach_testAsinFloat2Float2(in, out);
-            verifyResultsAsinFloat2Float2(in, out, true);
+            scriptRelaxed.forEach_testAsinFloat2Float2(inV, out);
+            verifyResultsAsinFloat2Float2(inV, out, true);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testAsinFloat2Float2: " + e.toString());
         }
     }
 
-    private void verifyResultsAsinFloat2Float2(Allocation in, Allocation out, boolean relaxed) {
-        float[] arrayIn = new float[INPUTSIZE * 2];
-        in.copyTo(arrayIn);
+    private void verifyResultsAsinFloat2Float2(Allocation inV, Allocation out, boolean relaxed) {
+        float[] arrayInV = new float[INPUTSIZE * 2];
+        inV.copyTo(arrayInV);
         float[] arrayOut = new float[INPUTSIZE * 2];
         out.copyTo(arrayOut);
         for (int i = 0; i < INPUTSIZE; i++) {
             for (int j = 0; j < 2 ; j++) {
                 // Extract the inputs.
                 ArgumentsFloatFloat args = new ArgumentsFloatFloat();
-                args.in = arrayIn[i * 2 + j];
+                args.inV = arrayInV[i * 2 + j];
                 // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeAsin(args);
-                int ulf = relaxed ? args.ulfRelaxed : args.ulf;
                 // Figure out what the outputs should have been.
                 boolean valid = true;
-                int neededUlf = 0;
-                neededUlf = (int) (Math.abs(args.out - arrayOut[i * 2 + j]) / Math.ulp(args.out) + 0.5);
-                if (neededUlf > ulf) {
+                if (!args.out.couldBe(arrayOut[i * 2 + j])) {
                     valid = false;
                 }
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
-                    message.append(String.format("Input in: %14.8g %8x %15a",
-                            args.in, Float.floatToRawIntBits(args.in), args.in));
+                    message.append("Input inV: ");
+                    message.append(String.format("%14.8g %8x %15a",
+                            args.inV, Float.floatToRawIntBits(args.inV), args.inV));
                     message.append("\n");
-                    message.append(String.format("Expected output out: %14.8g %8x %15a",
-                            args.out, Float.floatToRawIntBits(args.out), args.out));
+                    message.append("Expected output out: ");
+                    message.append(args.out.toString());
                     message.append("\n");
-                    message.append(String.format("Actual   output out: %14.8g %8x %15a",
+                    message.append("Actual   output out: ");
+                    message.append(String.format("%14.8g %8x %15a",
                             arrayOut[i * 2 + j], Float.floatToRawIntBits(arrayOut[i * 2 + j]), arrayOut[i * 2 + j]));
-                    neededUlf = (int) (Math.abs(args.out - arrayOut[i * 2 + j]) / Math.ulp(args.out) + 0.5);
-                    if (neededUlf > ulf) {
-                        message.append(String.format(" FAILED, ulf needed %d, specified %d", neededUlf, ulf));
+                    if (!args.out.couldBe(arrayOut[i * 2 + j])) {
+                        message.append(" FAIL");
                     }
                     message.append("\n");
                     assertTrue("Incorrect output for checkAsinFloat2Float2" +
@@ -163,56 +158,55 @@ public class TestAsin extends RSBaseCompute {
     }
 
     private void checkAsinFloat3Float3() {
-        Allocation in = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0x9e77870bfaa7234al, false);
+        Allocation inV = createRandomFloatAllocation(mRS, Element.DataType.FLOAT_32, 3, 0x9e13af031a12edc4l, -1, 1);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 3), INPUTSIZE);
-            script.forEach_testAsinFloat3Float3(in, out);
-            verifyResultsAsinFloat3Float3(in, out, false);
+            script.forEach_testAsinFloat3Float3(inV, out);
+            verifyResultsAsinFloat3Float3(inV, out, false);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testAsinFloat3Float3: " + e.toString());
         }
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 3), INPUTSIZE);
-            scriptRelaxed.forEach_testAsinFloat3Float3(in, out);
-            verifyResultsAsinFloat3Float3(in, out, true);
+            scriptRelaxed.forEach_testAsinFloat3Float3(inV, out);
+            verifyResultsAsinFloat3Float3(inV, out, true);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testAsinFloat3Float3: " + e.toString());
         }
     }
 
-    private void verifyResultsAsinFloat3Float3(Allocation in, Allocation out, boolean relaxed) {
-        float[] arrayIn = new float[INPUTSIZE * 4];
-        in.copyTo(arrayIn);
+    private void verifyResultsAsinFloat3Float3(Allocation inV, Allocation out, boolean relaxed) {
+        float[] arrayInV = new float[INPUTSIZE * 4];
+        inV.copyTo(arrayInV);
         float[] arrayOut = new float[INPUTSIZE * 4];
         out.copyTo(arrayOut);
         for (int i = 0; i < INPUTSIZE; i++) {
             for (int j = 0; j < 3 ; j++) {
                 // Extract the inputs.
                 ArgumentsFloatFloat args = new ArgumentsFloatFloat();
-                args.in = arrayIn[i * 4 + j];
+                args.inV = arrayInV[i * 4 + j];
                 // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeAsin(args);
-                int ulf = relaxed ? args.ulfRelaxed : args.ulf;
                 // Figure out what the outputs should have been.
                 boolean valid = true;
-                int neededUlf = 0;
-                neededUlf = (int) (Math.abs(args.out - arrayOut[i * 4 + j]) / Math.ulp(args.out) + 0.5);
-                if (neededUlf > ulf) {
+                if (!args.out.couldBe(arrayOut[i * 4 + j])) {
                     valid = false;
                 }
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
-                    message.append(String.format("Input in: %14.8g %8x %15a",
-                            args.in, Float.floatToRawIntBits(args.in), args.in));
+                    message.append("Input inV: ");
+                    message.append(String.format("%14.8g %8x %15a",
+                            args.inV, Float.floatToRawIntBits(args.inV), args.inV));
                     message.append("\n");
-                    message.append(String.format("Expected output out: %14.8g %8x %15a",
-                            args.out, Float.floatToRawIntBits(args.out), args.out));
+                    message.append("Expected output out: ");
+                    message.append(args.out.toString());
                     message.append("\n");
-                    message.append(String.format("Actual   output out: %14.8g %8x %15a",
+                    message.append("Actual   output out: ");
+                    message.append(String.format("%14.8g %8x %15a",
                             arrayOut[i * 4 + j], Float.floatToRawIntBits(arrayOut[i * 4 + j]), arrayOut[i * 4 + j]));
-                    neededUlf = (int) (Math.abs(args.out - arrayOut[i * 4 + j]) / Math.ulp(args.out) + 0.5);
-                    if (neededUlf > ulf) {
-                        message.append(String.format(" FAILED, ulf needed %d, specified %d", neededUlf, ulf));
+                    if (!args.out.couldBe(arrayOut[i * 4 + j])) {
+                        message.append(" FAIL");
                     }
                     message.append("\n");
                     assertTrue("Incorrect output for checkAsinFloat3Float3" +
@@ -223,56 +217,55 @@ public class TestAsin extends RSBaseCompute {
     }
 
     private void checkAsinFloat4Float4() {
-        Allocation in = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0x9e7791ad59adb8e4l, false);
+        Allocation inV = createRandomFloatAllocation(mRS, Element.DataType.FLOAT_32, 4, 0x9e15781e102e0ea2l, -1, 1);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 4), INPUTSIZE);
-            script.forEach_testAsinFloat4Float4(in, out);
-            verifyResultsAsinFloat4Float4(in, out, false);
+            script.forEach_testAsinFloat4Float4(inV, out);
+            verifyResultsAsinFloat4Float4(inV, out, false);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testAsinFloat4Float4: " + e.toString());
         }
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 4), INPUTSIZE);
-            scriptRelaxed.forEach_testAsinFloat4Float4(in, out);
-            verifyResultsAsinFloat4Float4(in, out, true);
+            scriptRelaxed.forEach_testAsinFloat4Float4(inV, out);
+            verifyResultsAsinFloat4Float4(inV, out, true);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testAsinFloat4Float4: " + e.toString());
         }
     }
 
-    private void verifyResultsAsinFloat4Float4(Allocation in, Allocation out, boolean relaxed) {
-        float[] arrayIn = new float[INPUTSIZE * 4];
-        in.copyTo(arrayIn);
+    private void verifyResultsAsinFloat4Float4(Allocation inV, Allocation out, boolean relaxed) {
+        float[] arrayInV = new float[INPUTSIZE * 4];
+        inV.copyTo(arrayInV);
         float[] arrayOut = new float[INPUTSIZE * 4];
         out.copyTo(arrayOut);
         for (int i = 0; i < INPUTSIZE; i++) {
             for (int j = 0; j < 4 ; j++) {
                 // Extract the inputs.
                 ArgumentsFloatFloat args = new ArgumentsFloatFloat();
-                args.in = arrayIn[i * 4 + j];
+                args.inV = arrayInV[i * 4 + j];
                 // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeAsin(args);
-                int ulf = relaxed ? args.ulfRelaxed : args.ulf;
                 // Figure out what the outputs should have been.
                 boolean valid = true;
-                int neededUlf = 0;
-                neededUlf = (int) (Math.abs(args.out - arrayOut[i * 4 + j]) / Math.ulp(args.out) + 0.5);
-                if (neededUlf > ulf) {
+                if (!args.out.couldBe(arrayOut[i * 4 + j])) {
                     valid = false;
                 }
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
-                    message.append(String.format("Input in: %14.8g %8x %15a",
-                            args.in, Float.floatToRawIntBits(args.in), args.in));
+                    message.append("Input inV: ");
+                    message.append(String.format("%14.8g %8x %15a",
+                            args.inV, Float.floatToRawIntBits(args.inV), args.inV));
                     message.append("\n");
-                    message.append(String.format("Expected output out: %14.8g %8x %15a",
-                            args.out, Float.floatToRawIntBits(args.out), args.out));
+                    message.append("Expected output out: ");
+                    message.append(args.out.toString());
                     message.append("\n");
-                    message.append(String.format("Actual   output out: %14.8g %8x %15a",
+                    message.append("Actual   output out: ");
+                    message.append(String.format("%14.8g %8x %15a",
                             arrayOut[i * 4 + j], Float.floatToRawIntBits(arrayOut[i * 4 + j]), arrayOut[i * 4 + j]));
-                    neededUlf = (int) (Math.abs(args.out - arrayOut[i * 4 + j]) / Math.ulp(args.out) + 0.5);
-                    if (neededUlf > ulf) {
-                        message.append(String.format(" FAILED, ulf needed %d, specified %d", neededUlf, ulf));
+                    if (!args.out.couldBe(arrayOut[i * 4 + j])) {
+                        message.append(" FAIL");
                     }
                     message.append("\n");
                     assertTrue("Incorrect output for checkAsinFloat4Float4" +
