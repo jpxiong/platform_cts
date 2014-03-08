@@ -34,67 +34,244 @@ public class TestNativeLog extends RSBaseCompute {
         scriptRelaxed = new ScriptC_TestNativeLogRelaxed(mRS);
     }
 
+    public class ArgumentsFloatFloat {
+        public float inV;
+        public Floaty out;
+    }
+
     private void checkNativeLogFloatFloat() {
-        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0x6237b14ee6418d2cl, false);
+        Allocation inV = createRandomFloatAllocation(mRS, Element.DataType.FLOAT_32, 1, 0x6237b14ee6418d2cl, 10e-10, 10e10);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 1), INPUTSIZE);
             script.forEach_testNativeLogFloatFloat(inV, out);
+            verifyResultsNativeLogFloatFloat(inV, out, false);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testNativeLogFloatFloat: " + e.toString());
         }
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 1), INPUTSIZE);
             scriptRelaxed.forEach_testNativeLogFloatFloat(inV, out);
+            verifyResultsNativeLogFloatFloat(inV, out, true);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testNativeLogFloatFloat: " + e.toString());
         }
     }
 
+    private void verifyResultsNativeLogFloatFloat(Allocation inV, Allocation out, boolean relaxed) {
+        float[] arrayInV = new float[INPUTSIZE * 1];
+        inV.copyTo(arrayInV);
+        float[] arrayOut = new float[INPUTSIZE * 1];
+        out.copyTo(arrayOut);
+        for (int i = 0; i < INPUTSIZE; i++) {
+            for (int j = 0; j < 1 ; j++) {
+                // Extract the inputs.
+                ArgumentsFloatFloat args = new ArgumentsFloatFloat();
+                args.inV = arrayInV[i];
+                // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
+                CoreMathVerifier.computeNativeLog(args);
+                // Figure out what the outputs should have been.
+                boolean valid = true;
+                if (!args.out.couldBe(arrayOut[i * 1 + j], 0.0002)) {
+                    valid = false;
+                }
+                if (!valid) {
+                    StringBuilder message = new StringBuilder();
+                    message.append("Input inV: ");
+                    message.append(String.format("%14.8g %8x %15a",
+                            args.inV, Float.floatToRawIntBits(args.inV), args.inV));
+                    message.append("\n");
+                    message.append("Expected output out: ");
+                    message.append(args.out.toString());
+                    message.append("\n");
+                    message.append("Actual   output out: ");
+                    message.append(String.format("%14.8g %8x %15a",
+                            arrayOut[i * 1 + j], Float.floatToRawIntBits(arrayOut[i * 1 + j]), arrayOut[i * 1 + j]));
+                    if (!args.out.couldBe(arrayOut[i * 1 + j], 0.0002)) {
+                        message.append(" FAIL");
+                    }
+                    message.append("\n");
+                    assertTrue("Incorrect output for checkNativeLogFloatFloat" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                }
+            }
+        }
+    }
+
     private void checkNativeLogFloat2Float2() {
-        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0x641a5823d3eee3b0l, false);
+        Allocation inV = createRandomFloatAllocation(mRS, Element.DataType.FLOAT_32, 2, 0x641a5823d3eee3b0l, 10e-10, 10e10);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 2), INPUTSIZE);
             script.forEach_testNativeLogFloat2Float2(inV, out);
+            verifyResultsNativeLogFloat2Float2(inV, out, false);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testNativeLogFloat2Float2: " + e.toString());
         }
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 2), INPUTSIZE);
             scriptRelaxed.forEach_testNativeLogFloat2Float2(inV, out);
+            verifyResultsNativeLogFloat2Float2(inV, out, true);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testNativeLogFloat2Float2: " + e.toString());
         }
     }
 
+    private void verifyResultsNativeLogFloat2Float2(Allocation inV, Allocation out, boolean relaxed) {
+        float[] arrayInV = new float[INPUTSIZE * 2];
+        inV.copyTo(arrayInV);
+        float[] arrayOut = new float[INPUTSIZE * 2];
+        out.copyTo(arrayOut);
+        for (int i = 0; i < INPUTSIZE; i++) {
+            for (int j = 0; j < 2 ; j++) {
+                // Extract the inputs.
+                ArgumentsFloatFloat args = new ArgumentsFloatFloat();
+                args.inV = arrayInV[i * 2 + j];
+                // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
+                CoreMathVerifier.computeNativeLog(args);
+                // Figure out what the outputs should have been.
+                boolean valid = true;
+                if (!args.out.couldBe(arrayOut[i * 2 + j], 0.0002)) {
+                    valid = false;
+                }
+                if (!valid) {
+                    StringBuilder message = new StringBuilder();
+                    message.append("Input inV: ");
+                    message.append(String.format("%14.8g %8x %15a",
+                            args.inV, Float.floatToRawIntBits(args.inV), args.inV));
+                    message.append("\n");
+                    message.append("Expected output out: ");
+                    message.append(args.out.toString());
+                    message.append("\n");
+                    message.append("Actual   output out: ");
+                    message.append(String.format("%14.8g %8x %15a",
+                            arrayOut[i * 2 + j], Float.floatToRawIntBits(arrayOut[i * 2 + j]), arrayOut[i * 2 + j]));
+                    if (!args.out.couldBe(arrayOut[i * 2 + j], 0.0002)) {
+                        message.append(" FAIL");
+                    }
+                    message.append("\n");
+                    assertTrue("Incorrect output for checkNativeLogFloat2Float2" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                }
+            }
+        }
+    }
+
     private void checkNativeLogFloat3Float3() {
-        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0x641c213eca0a048el, false);
+        Allocation inV = createRandomFloatAllocation(mRS, Element.DataType.FLOAT_32, 3, 0x641c213eca0a048el, 10e-10, 10e10);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 3), INPUTSIZE);
             script.forEach_testNativeLogFloat3Float3(inV, out);
+            verifyResultsNativeLogFloat3Float3(inV, out, false);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testNativeLogFloat3Float3: " + e.toString());
         }
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 3), INPUTSIZE);
             scriptRelaxed.forEach_testNativeLogFloat3Float3(inV, out);
+            verifyResultsNativeLogFloat3Float3(inV, out, true);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testNativeLogFloat3Float3: " + e.toString());
         }
     }
 
+    private void verifyResultsNativeLogFloat3Float3(Allocation inV, Allocation out, boolean relaxed) {
+        float[] arrayInV = new float[INPUTSIZE * 4];
+        inV.copyTo(arrayInV);
+        float[] arrayOut = new float[INPUTSIZE * 4];
+        out.copyTo(arrayOut);
+        for (int i = 0; i < INPUTSIZE; i++) {
+            for (int j = 0; j < 3 ; j++) {
+                // Extract the inputs.
+                ArgumentsFloatFloat args = new ArgumentsFloatFloat();
+                args.inV = arrayInV[i * 4 + j];
+                // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
+                CoreMathVerifier.computeNativeLog(args);
+                // Figure out what the outputs should have been.
+                boolean valid = true;
+                if (!args.out.couldBe(arrayOut[i * 4 + j], 0.0002)) {
+                    valid = false;
+                }
+                if (!valid) {
+                    StringBuilder message = new StringBuilder();
+                    message.append("Input inV: ");
+                    message.append(String.format("%14.8g %8x %15a",
+                            args.inV, Float.floatToRawIntBits(args.inV), args.inV));
+                    message.append("\n");
+                    message.append("Expected output out: ");
+                    message.append(args.out.toString());
+                    message.append("\n");
+                    message.append("Actual   output out: ");
+                    message.append(String.format("%14.8g %8x %15a",
+                            arrayOut[i * 4 + j], Float.floatToRawIntBits(arrayOut[i * 4 + j]), arrayOut[i * 4 + j]));
+                    if (!args.out.couldBe(arrayOut[i * 4 + j], 0.0002)) {
+                        message.append(" FAIL");
+                    }
+                    message.append("\n");
+                    assertTrue("Incorrect output for checkNativeLogFloat3Float3" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                }
+            }
+        }
+    }
+
     private void checkNativeLogFloat4Float4() {
-        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0x641dea59c025256cl, false);
+        Allocation inV = createRandomFloatAllocation(mRS, Element.DataType.FLOAT_32, 4, 0x641dea59c025256cl, 10e-10, 10e10);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 4), INPUTSIZE);
             script.forEach_testNativeLogFloat4Float4(inV, out);
+            verifyResultsNativeLogFloat4Float4(inV, out, false);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testNativeLogFloat4Float4: " + e.toString());
         }
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 4), INPUTSIZE);
             scriptRelaxed.forEach_testNativeLogFloat4Float4(inV, out);
+            verifyResultsNativeLogFloat4Float4(inV, out, true);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testNativeLogFloat4Float4: " + e.toString());
+        }
+    }
+
+    private void verifyResultsNativeLogFloat4Float4(Allocation inV, Allocation out, boolean relaxed) {
+        float[] arrayInV = new float[INPUTSIZE * 4];
+        inV.copyTo(arrayInV);
+        float[] arrayOut = new float[INPUTSIZE * 4];
+        out.copyTo(arrayOut);
+        for (int i = 0; i < INPUTSIZE; i++) {
+            for (int j = 0; j < 4 ; j++) {
+                // Extract the inputs.
+                ArgumentsFloatFloat args = new ArgumentsFloatFloat();
+                args.inV = arrayInV[i * 4 + j];
+                // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
+                CoreMathVerifier.computeNativeLog(args);
+                // Figure out what the outputs should have been.
+                boolean valid = true;
+                if (!args.out.couldBe(arrayOut[i * 4 + j], 0.0002)) {
+                    valid = false;
+                }
+                if (!valid) {
+                    StringBuilder message = new StringBuilder();
+                    message.append("Input inV: ");
+                    message.append(String.format("%14.8g %8x %15a",
+                            args.inV, Float.floatToRawIntBits(args.inV), args.inV));
+                    message.append("\n");
+                    message.append("Expected output out: ");
+                    message.append(args.out.toString());
+                    message.append("\n");
+                    message.append("Actual   output out: ");
+                    message.append(String.format("%14.8g %8x %15a",
+                            arrayOut[i * 4 + j], Float.floatToRawIntBits(arrayOut[i * 4 + j]), arrayOut[i * 4 + j]));
+                    if (!args.out.couldBe(arrayOut[i * 4 + j], 0.0002)) {
+                        message.append(" FAIL");
+                    }
+                    message.append("\n");
+                    assertTrue("Incorrect output for checkNativeLogFloat4Float4" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                }
+            }
         }
     }
 

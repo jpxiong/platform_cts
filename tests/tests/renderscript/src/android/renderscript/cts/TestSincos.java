@@ -36,11 +36,8 @@ public class TestSincos extends RSBaseCompute {
 
     public class ArgumentsFloatFloatFloat {
         public float inV;
-        public float outCosptr;
-        public float out;
-
-        public int ulf;
-        public int ulfRelaxed;
+        public Floaty outCosptr;
+        public Floaty out;
     }
 
     private void checkSincosFloatFloatFloat() {
@@ -78,42 +75,40 @@ public class TestSincos extends RSBaseCompute {
                 ArgumentsFloatFloatFloat args = new ArgumentsFloatFloatFloat();
                 args.inV = arrayInV[i];
                 // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeSincos(args);
-                int ulf = relaxed ? args.ulfRelaxed : args.ulf;
                 // Figure out what the outputs should have been.
                 boolean valid = true;
-                int neededUlf = 0;
-                neededUlf = (int) (Math.abs(args.outCosptr - arrayOutCosptr[i * 1 + j]) / Math.ulp(args.outCosptr) + 0.5);
-                if (neededUlf > ulf) {
+                if (!args.outCosptr.couldBe(arrayOutCosptr[i * 1 + j])) {
                     valid = false;
                 }
-                neededUlf = (int) (Math.abs(args.out - arrayOut[i * 1 + j]) / Math.ulp(args.out) + 0.5);
-                if (neededUlf > ulf) {
+                if (!args.out.couldBe(arrayOut[i * 1 + j])) {
                     valid = false;
                 }
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
-                    message.append(String.format("Input inV: %14.8g %8x %15a",
+                    message.append("Input inV: ");
+                    message.append(String.format("%14.8g %8x %15a",
                             args.inV, Float.floatToRawIntBits(args.inV), args.inV));
                     message.append("\n");
-                    message.append(String.format("Expected output outCosptr: %14.8g %8x %15a",
-                            args.outCosptr, Float.floatToRawIntBits(args.outCosptr), args.outCosptr));
+                    message.append("Expected output outCosptr: ");
+                    message.append(args.outCosptr.toString());
                     message.append("\n");
-                    message.append(String.format("Actual   output outCosptr: %14.8g %8x %15a",
+                    message.append("Actual   output outCosptr: ");
+                    message.append(String.format("%14.8g %8x %15a",
                             arrayOutCosptr[i * 1 + j], Float.floatToRawIntBits(arrayOutCosptr[i * 1 + j]), arrayOutCosptr[i * 1 + j]));
-                    neededUlf = (int) (Math.abs(args.outCosptr - arrayOutCosptr[i * 1 + j]) / Math.ulp(args.outCosptr) + 0.5);
-                    if (neededUlf > ulf) {
-                        message.append(String.format(" FAILED, ulf needed %d, specified %d", neededUlf, ulf));
+                    if (!args.outCosptr.couldBe(arrayOutCosptr[i * 1 + j])) {
+                        message.append(" FAIL");
                     }
                     message.append("\n");
-                    message.append(String.format("Expected output out: %14.8g %8x %15a",
-                            args.out, Float.floatToRawIntBits(args.out), args.out));
+                    message.append("Expected output out: ");
+                    message.append(args.out.toString());
                     message.append("\n");
-                    message.append(String.format("Actual   output out: %14.8g %8x %15a",
+                    message.append("Actual   output out: ");
+                    message.append(String.format("%14.8g %8x %15a",
                             arrayOut[i * 1 + j], Float.floatToRawIntBits(arrayOut[i * 1 + j]), arrayOut[i * 1 + j]));
-                    neededUlf = (int) (Math.abs(args.out - arrayOut[i * 1 + j]) / Math.ulp(args.out) + 0.5);
-                    if (neededUlf > ulf) {
-                        message.append(String.format(" FAILED, ulf needed %d, specified %d", neededUlf, ulf));
+                    if (!args.out.couldBe(arrayOut[i * 1 + j])) {
+                        message.append(" FAIL");
                     }
                     message.append("\n");
                     assertTrue("Incorrect output for checkSincosFloatFloatFloat" +
@@ -158,42 +153,40 @@ public class TestSincos extends RSBaseCompute {
                 ArgumentsFloatFloatFloat args = new ArgumentsFloatFloatFloat();
                 args.inV = arrayInV[i * 2 + j];
                 // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeSincos(args);
-                int ulf = relaxed ? args.ulfRelaxed : args.ulf;
                 // Figure out what the outputs should have been.
                 boolean valid = true;
-                int neededUlf = 0;
-                neededUlf = (int) (Math.abs(args.outCosptr - arrayOutCosptr[i * 2 + j]) / Math.ulp(args.outCosptr) + 0.5);
-                if (neededUlf > ulf) {
+                if (!args.outCosptr.couldBe(arrayOutCosptr[i * 2 + j])) {
                     valid = false;
                 }
-                neededUlf = (int) (Math.abs(args.out - arrayOut[i * 2 + j]) / Math.ulp(args.out) + 0.5);
-                if (neededUlf > ulf) {
+                if (!args.out.couldBe(arrayOut[i * 2 + j])) {
                     valid = false;
                 }
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
-                    message.append(String.format("Input inV: %14.8g %8x %15a",
+                    message.append("Input inV: ");
+                    message.append(String.format("%14.8g %8x %15a",
                             args.inV, Float.floatToRawIntBits(args.inV), args.inV));
                     message.append("\n");
-                    message.append(String.format("Expected output outCosptr: %14.8g %8x %15a",
-                            args.outCosptr, Float.floatToRawIntBits(args.outCosptr), args.outCosptr));
+                    message.append("Expected output outCosptr: ");
+                    message.append(args.outCosptr.toString());
                     message.append("\n");
-                    message.append(String.format("Actual   output outCosptr: %14.8g %8x %15a",
+                    message.append("Actual   output outCosptr: ");
+                    message.append(String.format("%14.8g %8x %15a",
                             arrayOutCosptr[i * 2 + j], Float.floatToRawIntBits(arrayOutCosptr[i * 2 + j]), arrayOutCosptr[i * 2 + j]));
-                    neededUlf = (int) (Math.abs(args.outCosptr - arrayOutCosptr[i * 2 + j]) / Math.ulp(args.outCosptr) + 0.5);
-                    if (neededUlf > ulf) {
-                        message.append(String.format(" FAILED, ulf needed %d, specified %d", neededUlf, ulf));
+                    if (!args.outCosptr.couldBe(arrayOutCosptr[i * 2 + j])) {
+                        message.append(" FAIL");
                     }
                     message.append("\n");
-                    message.append(String.format("Expected output out: %14.8g %8x %15a",
-                            args.out, Float.floatToRawIntBits(args.out), args.out));
+                    message.append("Expected output out: ");
+                    message.append(args.out.toString());
                     message.append("\n");
-                    message.append(String.format("Actual   output out: %14.8g %8x %15a",
+                    message.append("Actual   output out: ");
+                    message.append(String.format("%14.8g %8x %15a",
                             arrayOut[i * 2 + j], Float.floatToRawIntBits(arrayOut[i * 2 + j]), arrayOut[i * 2 + j]));
-                    neededUlf = (int) (Math.abs(args.out - arrayOut[i * 2 + j]) / Math.ulp(args.out) + 0.5);
-                    if (neededUlf > ulf) {
-                        message.append(String.format(" FAILED, ulf needed %d, specified %d", neededUlf, ulf));
+                    if (!args.out.couldBe(arrayOut[i * 2 + j])) {
+                        message.append(" FAIL");
                     }
                     message.append("\n");
                     assertTrue("Incorrect output for checkSincosFloat2Float2Float2" +
@@ -238,42 +231,40 @@ public class TestSincos extends RSBaseCompute {
                 ArgumentsFloatFloatFloat args = new ArgumentsFloatFloatFloat();
                 args.inV = arrayInV[i * 4 + j];
                 // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeSincos(args);
-                int ulf = relaxed ? args.ulfRelaxed : args.ulf;
                 // Figure out what the outputs should have been.
                 boolean valid = true;
-                int neededUlf = 0;
-                neededUlf = (int) (Math.abs(args.outCosptr - arrayOutCosptr[i * 4 + j]) / Math.ulp(args.outCosptr) + 0.5);
-                if (neededUlf > ulf) {
+                if (!args.outCosptr.couldBe(arrayOutCosptr[i * 4 + j])) {
                     valid = false;
                 }
-                neededUlf = (int) (Math.abs(args.out - arrayOut[i * 4 + j]) / Math.ulp(args.out) + 0.5);
-                if (neededUlf > ulf) {
+                if (!args.out.couldBe(arrayOut[i * 4 + j])) {
                     valid = false;
                 }
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
-                    message.append(String.format("Input inV: %14.8g %8x %15a",
+                    message.append("Input inV: ");
+                    message.append(String.format("%14.8g %8x %15a",
                             args.inV, Float.floatToRawIntBits(args.inV), args.inV));
                     message.append("\n");
-                    message.append(String.format("Expected output outCosptr: %14.8g %8x %15a",
-                            args.outCosptr, Float.floatToRawIntBits(args.outCosptr), args.outCosptr));
+                    message.append("Expected output outCosptr: ");
+                    message.append(args.outCosptr.toString());
                     message.append("\n");
-                    message.append(String.format("Actual   output outCosptr: %14.8g %8x %15a",
+                    message.append("Actual   output outCosptr: ");
+                    message.append(String.format("%14.8g %8x %15a",
                             arrayOutCosptr[i * 4 + j], Float.floatToRawIntBits(arrayOutCosptr[i * 4 + j]), arrayOutCosptr[i * 4 + j]));
-                    neededUlf = (int) (Math.abs(args.outCosptr - arrayOutCosptr[i * 4 + j]) / Math.ulp(args.outCosptr) + 0.5);
-                    if (neededUlf > ulf) {
-                        message.append(String.format(" FAILED, ulf needed %d, specified %d", neededUlf, ulf));
+                    if (!args.outCosptr.couldBe(arrayOutCosptr[i * 4 + j])) {
+                        message.append(" FAIL");
                     }
                     message.append("\n");
-                    message.append(String.format("Expected output out: %14.8g %8x %15a",
-                            args.out, Float.floatToRawIntBits(args.out), args.out));
+                    message.append("Expected output out: ");
+                    message.append(args.out.toString());
                     message.append("\n");
-                    message.append(String.format("Actual   output out: %14.8g %8x %15a",
+                    message.append("Actual   output out: ");
+                    message.append(String.format("%14.8g %8x %15a",
                             arrayOut[i * 4 + j], Float.floatToRawIntBits(arrayOut[i * 4 + j]), arrayOut[i * 4 + j]));
-                    neededUlf = (int) (Math.abs(args.out - arrayOut[i * 4 + j]) / Math.ulp(args.out) + 0.5);
-                    if (neededUlf > ulf) {
-                        message.append(String.format(" FAILED, ulf needed %d, specified %d", neededUlf, ulf));
+                    if (!args.out.couldBe(arrayOut[i * 4 + j])) {
+                        message.append(" FAIL");
                     }
                     message.append("\n");
                     assertTrue("Incorrect output for checkSincosFloat3Float3Float3" +
@@ -318,42 +309,40 @@ public class TestSincos extends RSBaseCompute {
                 ArgumentsFloatFloatFloat args = new ArgumentsFloatFloatFloat();
                 args.inV = arrayInV[i * 4 + j];
                 // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeSincos(args);
-                int ulf = relaxed ? args.ulfRelaxed : args.ulf;
                 // Figure out what the outputs should have been.
                 boolean valid = true;
-                int neededUlf = 0;
-                neededUlf = (int) (Math.abs(args.outCosptr - arrayOutCosptr[i * 4 + j]) / Math.ulp(args.outCosptr) + 0.5);
-                if (neededUlf > ulf) {
+                if (!args.outCosptr.couldBe(arrayOutCosptr[i * 4 + j])) {
                     valid = false;
                 }
-                neededUlf = (int) (Math.abs(args.out - arrayOut[i * 4 + j]) / Math.ulp(args.out) + 0.5);
-                if (neededUlf > ulf) {
+                if (!args.out.couldBe(arrayOut[i * 4 + j])) {
                     valid = false;
                 }
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
-                    message.append(String.format("Input inV: %14.8g %8x %15a",
+                    message.append("Input inV: ");
+                    message.append(String.format("%14.8g %8x %15a",
                             args.inV, Float.floatToRawIntBits(args.inV), args.inV));
                     message.append("\n");
-                    message.append(String.format("Expected output outCosptr: %14.8g %8x %15a",
-                            args.outCosptr, Float.floatToRawIntBits(args.outCosptr), args.outCosptr));
+                    message.append("Expected output outCosptr: ");
+                    message.append(args.outCosptr.toString());
                     message.append("\n");
-                    message.append(String.format("Actual   output outCosptr: %14.8g %8x %15a",
+                    message.append("Actual   output outCosptr: ");
+                    message.append(String.format("%14.8g %8x %15a",
                             arrayOutCosptr[i * 4 + j], Float.floatToRawIntBits(arrayOutCosptr[i * 4 + j]), arrayOutCosptr[i * 4 + j]));
-                    neededUlf = (int) (Math.abs(args.outCosptr - arrayOutCosptr[i * 4 + j]) / Math.ulp(args.outCosptr) + 0.5);
-                    if (neededUlf > ulf) {
-                        message.append(String.format(" FAILED, ulf needed %d, specified %d", neededUlf, ulf));
+                    if (!args.outCosptr.couldBe(arrayOutCosptr[i * 4 + j])) {
+                        message.append(" FAIL");
                     }
                     message.append("\n");
-                    message.append(String.format("Expected output out: %14.8g %8x %15a",
-                            args.out, Float.floatToRawIntBits(args.out), args.out));
+                    message.append("Expected output out: ");
+                    message.append(args.out.toString());
                     message.append("\n");
-                    message.append(String.format("Actual   output out: %14.8g %8x %15a",
+                    message.append("Actual   output out: ");
+                    message.append(String.format("%14.8g %8x %15a",
                             arrayOut[i * 4 + j], Float.floatToRawIntBits(arrayOut[i * 4 + j]), arrayOut[i * 4 + j]));
-                    neededUlf = (int) (Math.abs(args.out - arrayOut[i * 4 + j]) / Math.ulp(args.out) + 0.5);
-                    if (neededUlf > ulf) {
-                        message.append(String.format(" FAILED, ulf needed %d, specified %d", neededUlf, ulf));
+                    if (!args.out.couldBe(arrayOut[i * 4 + j])) {
+                        message.append(" FAIL");
                     }
                     message.append("\n");
                     assertTrue("Incorrect output for checkSincosFloat4Float4Float4" +

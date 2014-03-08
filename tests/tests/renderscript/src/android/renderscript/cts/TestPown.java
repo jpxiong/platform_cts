@@ -34,6 +34,12 @@ public class TestPown extends RSBaseCompute {
         scriptRelaxed = new ScriptC_TestPownRelaxed(mRS);
     }
 
+    public class ArgumentsFloatIntFloat {
+        public float inX;
+        public int inY;
+        public Floaty out;
+    }
+
     private void checkPownFloatIntFloat() {
         Allocation inX = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0xde633e0d2c462948l, false);
         Allocation inY = createRandomAllocation(mRS, Element.DataType.SIGNED_32, 1, 0xde633e0d2c462949l, false);
@@ -41,6 +47,7 @@ public class TestPown extends RSBaseCompute {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 1), INPUTSIZE);
             script.set_gAllocInY(inY);
             script.forEach_testPownFloatIntFloat(inX, out);
+            verifyResultsPownFloatIntFloat(inX, inY, out, false);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testPownFloatIntFloat: " + e.toString());
         }
@@ -48,8 +55,56 @@ public class TestPown extends RSBaseCompute {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 1), INPUTSIZE);
             scriptRelaxed.set_gAllocInY(inY);
             scriptRelaxed.forEach_testPownFloatIntFloat(inX, out);
+            verifyResultsPownFloatIntFloat(inX, inY, out, true);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testPownFloatIntFloat: " + e.toString());
+        }
+    }
+
+    private void verifyResultsPownFloatIntFloat(Allocation inX, Allocation inY, Allocation out, boolean relaxed) {
+        float[] arrayInX = new float[INPUTSIZE * 1];
+        inX.copyTo(arrayInX);
+        int[] arrayInY = new int[INPUTSIZE * 1];
+        inY.copyTo(arrayInY);
+        float[] arrayOut = new float[INPUTSIZE * 1];
+        out.copyTo(arrayOut);
+        for (int i = 0; i < INPUTSIZE; i++) {
+            for (int j = 0; j < 1 ; j++) {
+                // Extract the inputs.
+                ArgumentsFloatIntFloat args = new ArgumentsFloatIntFloat();
+                args.inX = arrayInX[i];
+                args.inY = arrayInY[i];
+                // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
+                CoreMathVerifier.computePown(args);
+                // Figure out what the outputs should have been.
+                boolean valid = true;
+                if (!args.out.couldBe(arrayOut[i * 1 + j])) {
+                    valid = false;
+                }
+                if (!valid) {
+                    StringBuilder message = new StringBuilder();
+                    message.append("Input inX: ");
+                    message.append(String.format("%14.8g %8x %15a",
+                            args.inX, Float.floatToRawIntBits(args.inX), args.inX));
+                    message.append("\n");
+                    message.append("Input inY: ");
+                    message.append(String.format("%d", args.inY));
+                    message.append("\n");
+                    message.append("Expected output out: ");
+                    message.append(args.out.toString());
+                    message.append("\n");
+                    message.append("Actual   output out: ");
+                    message.append(String.format("%14.8g %8x %15a",
+                            arrayOut[i * 1 + j], Float.floatToRawIntBits(arrayOut[i * 1 + j]), arrayOut[i * 1 + j]));
+                    if (!args.out.couldBe(arrayOut[i * 1 + j])) {
+                        message.append(" FAIL");
+                    }
+                    message.append("\n");
+                    assertTrue("Incorrect output for checkPownFloatIntFloat" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                }
+            }
         }
     }
 
@@ -60,6 +115,7 @@ public class TestPown extends RSBaseCompute {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 2), INPUTSIZE);
             script.set_gAllocInY(inY);
             script.forEach_testPownFloat2Int2Float2(inX, out);
+            verifyResultsPownFloat2Int2Float2(inX, inY, out, false);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testPownFloat2Int2Float2: " + e.toString());
         }
@@ -67,8 +123,56 @@ public class TestPown extends RSBaseCompute {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 2), INPUTSIZE);
             scriptRelaxed.set_gAllocInY(inY);
             scriptRelaxed.forEach_testPownFloat2Int2Float2(inX, out);
+            verifyResultsPownFloat2Int2Float2(inX, inY, out, true);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testPownFloat2Int2Float2: " + e.toString());
+        }
+    }
+
+    private void verifyResultsPownFloat2Int2Float2(Allocation inX, Allocation inY, Allocation out, boolean relaxed) {
+        float[] arrayInX = new float[INPUTSIZE * 2];
+        inX.copyTo(arrayInX);
+        int[] arrayInY = new int[INPUTSIZE * 2];
+        inY.copyTo(arrayInY);
+        float[] arrayOut = new float[INPUTSIZE * 2];
+        out.copyTo(arrayOut);
+        for (int i = 0; i < INPUTSIZE; i++) {
+            for (int j = 0; j < 2 ; j++) {
+                // Extract the inputs.
+                ArgumentsFloatIntFloat args = new ArgumentsFloatIntFloat();
+                args.inX = arrayInX[i * 2 + j];
+                args.inY = arrayInY[i * 2 + j];
+                // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
+                CoreMathVerifier.computePown(args);
+                // Figure out what the outputs should have been.
+                boolean valid = true;
+                if (!args.out.couldBe(arrayOut[i * 2 + j])) {
+                    valid = false;
+                }
+                if (!valid) {
+                    StringBuilder message = new StringBuilder();
+                    message.append("Input inX: ");
+                    message.append(String.format("%14.8g %8x %15a",
+                            args.inX, Float.floatToRawIntBits(args.inX), args.inX));
+                    message.append("\n");
+                    message.append("Input inY: ");
+                    message.append(String.format("%d", args.inY));
+                    message.append("\n");
+                    message.append("Expected output out: ");
+                    message.append(args.out.toString());
+                    message.append("\n");
+                    message.append("Actual   output out: ");
+                    message.append(String.format("%14.8g %8x %15a",
+                            arrayOut[i * 2 + j], Float.floatToRawIntBits(arrayOut[i * 2 + j]), arrayOut[i * 2 + j]));
+                    if (!args.out.couldBe(arrayOut[i * 2 + j])) {
+                        message.append(" FAIL");
+                    }
+                    message.append("\n");
+                    assertTrue("Incorrect output for checkPownFloat2Int2Float2" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                }
+            }
         }
     }
 
@@ -79,6 +183,7 @@ public class TestPown extends RSBaseCompute {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 3), INPUTSIZE);
             script.set_gAllocInY(inY);
             script.forEach_testPownFloat3Int3Float3(inX, out);
+            verifyResultsPownFloat3Int3Float3(inX, inY, out, false);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testPownFloat3Int3Float3: " + e.toString());
         }
@@ -86,8 +191,56 @@ public class TestPown extends RSBaseCompute {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 3), INPUTSIZE);
             scriptRelaxed.set_gAllocInY(inY);
             scriptRelaxed.forEach_testPownFloat3Int3Float3(inX, out);
+            verifyResultsPownFloat3Int3Float3(inX, inY, out, true);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testPownFloat3Int3Float3: " + e.toString());
+        }
+    }
+
+    private void verifyResultsPownFloat3Int3Float3(Allocation inX, Allocation inY, Allocation out, boolean relaxed) {
+        float[] arrayInX = new float[INPUTSIZE * 4];
+        inX.copyTo(arrayInX);
+        int[] arrayInY = new int[INPUTSIZE * 4];
+        inY.copyTo(arrayInY);
+        float[] arrayOut = new float[INPUTSIZE * 4];
+        out.copyTo(arrayOut);
+        for (int i = 0; i < INPUTSIZE; i++) {
+            for (int j = 0; j < 3 ; j++) {
+                // Extract the inputs.
+                ArgumentsFloatIntFloat args = new ArgumentsFloatIntFloat();
+                args.inX = arrayInX[i * 4 + j];
+                args.inY = arrayInY[i * 4 + j];
+                // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
+                CoreMathVerifier.computePown(args);
+                // Figure out what the outputs should have been.
+                boolean valid = true;
+                if (!args.out.couldBe(arrayOut[i * 4 + j])) {
+                    valid = false;
+                }
+                if (!valid) {
+                    StringBuilder message = new StringBuilder();
+                    message.append("Input inX: ");
+                    message.append(String.format("%14.8g %8x %15a",
+                            args.inX, Float.floatToRawIntBits(args.inX), args.inX));
+                    message.append("\n");
+                    message.append("Input inY: ");
+                    message.append(String.format("%d", args.inY));
+                    message.append("\n");
+                    message.append("Expected output out: ");
+                    message.append(args.out.toString());
+                    message.append("\n");
+                    message.append("Actual   output out: ");
+                    message.append(String.format("%14.8g %8x %15a",
+                            arrayOut[i * 4 + j], Float.floatToRawIntBits(arrayOut[i * 4 + j]), arrayOut[i * 4 + j]));
+                    if (!args.out.couldBe(arrayOut[i * 4 + j])) {
+                        message.append(" FAIL");
+                    }
+                    message.append("\n");
+                    assertTrue("Incorrect output for checkPownFloat3Int3Float3" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                }
+            }
         }
     }
 
@@ -98,6 +251,7 @@ public class TestPown extends RSBaseCompute {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 4), INPUTSIZE);
             script.set_gAllocInY(inY);
             script.forEach_testPownFloat4Int4Float4(inX, out);
+            verifyResultsPownFloat4Int4Float4(inX, inY, out, false);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testPownFloat4Int4Float4: " + e.toString());
         }
@@ -105,8 +259,56 @@ public class TestPown extends RSBaseCompute {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 4), INPUTSIZE);
             scriptRelaxed.set_gAllocInY(inY);
             scriptRelaxed.forEach_testPownFloat4Int4Float4(inX, out);
+            verifyResultsPownFloat4Int4Float4(inX, inY, out, true);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testPownFloat4Int4Float4: " + e.toString());
+        }
+    }
+
+    private void verifyResultsPownFloat4Int4Float4(Allocation inX, Allocation inY, Allocation out, boolean relaxed) {
+        float[] arrayInX = new float[INPUTSIZE * 4];
+        inX.copyTo(arrayInX);
+        int[] arrayInY = new int[INPUTSIZE * 4];
+        inY.copyTo(arrayInY);
+        float[] arrayOut = new float[INPUTSIZE * 4];
+        out.copyTo(arrayOut);
+        for (int i = 0; i < INPUTSIZE; i++) {
+            for (int j = 0; j < 4 ; j++) {
+                // Extract the inputs.
+                ArgumentsFloatIntFloat args = new ArgumentsFloatIntFloat();
+                args.inX = arrayInX[i * 4 + j];
+                args.inY = arrayInY[i * 4 + j];
+                // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
+                CoreMathVerifier.computePown(args);
+                // Figure out what the outputs should have been.
+                boolean valid = true;
+                if (!args.out.couldBe(arrayOut[i * 4 + j])) {
+                    valid = false;
+                }
+                if (!valid) {
+                    StringBuilder message = new StringBuilder();
+                    message.append("Input inX: ");
+                    message.append(String.format("%14.8g %8x %15a",
+                            args.inX, Float.floatToRawIntBits(args.inX), args.inX));
+                    message.append("\n");
+                    message.append("Input inY: ");
+                    message.append(String.format("%d", args.inY));
+                    message.append("\n");
+                    message.append("Expected output out: ");
+                    message.append(args.out.toString());
+                    message.append("\n");
+                    message.append("Actual   output out: ");
+                    message.append(String.format("%14.8g %8x %15a",
+                            arrayOut[i * 4 + j], Float.floatToRawIntBits(arrayOut[i * 4 + j]), arrayOut[i * 4 + j]));
+                    if (!args.out.couldBe(arrayOut[i * 4 + j])) {
+                        message.append(" FAIL");
+                    }
+                    message.append("\n");
+                    assertTrue("Incorrect output for checkPownFloat4Int4Float4" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                }
+            }
         }
     }
 

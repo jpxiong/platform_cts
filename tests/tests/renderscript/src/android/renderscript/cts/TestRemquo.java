@@ -34,6 +34,13 @@ public class TestRemquo extends RSBaseCompute {
         scriptRelaxed = new ScriptC_TestRemquoRelaxed(mRS);
     }
 
+    public class ArgumentsFloatFloatIntFloat {
+        public float inB;
+        public float inC;
+        public int outD;
+        public Floaty out;
+    }
+
     private void checkRemquoFloatFloatIntFloat() {
         Allocation inB = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0x118af9b82db63b13l, false);
         Allocation inC = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0x118af9b82db63b14l, false);
@@ -43,6 +50,7 @@ public class TestRemquo extends RSBaseCompute {
             script.set_gAllocInC(inC);
             script.set_gAllocOutD(outD);
             script.forEach_testRemquoFloatFloatIntFloat(inB, out);
+            verifyResultsRemquoFloatFloatIntFloat(inB, inC, outD, out, false);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testRemquoFloatFloatIntFloat: " + e.toString());
         }
@@ -52,8 +60,71 @@ public class TestRemquo extends RSBaseCompute {
             scriptRelaxed.set_gAllocInC(inC);
             scriptRelaxed.set_gAllocOutD(outD);
             scriptRelaxed.forEach_testRemquoFloatFloatIntFloat(inB, out);
+            verifyResultsRemquoFloatFloatIntFloat(inB, inC, outD, out, true);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testRemquoFloatFloatIntFloat: " + e.toString());
+        }
+    }
+
+    private void verifyResultsRemquoFloatFloatIntFloat(Allocation inB, Allocation inC, Allocation outD, Allocation out, boolean relaxed) {
+        float[] arrayInB = new float[INPUTSIZE * 1];
+        inB.copyTo(arrayInB);
+        float[] arrayInC = new float[INPUTSIZE * 1];
+        inC.copyTo(arrayInC);
+        int[] arrayOutD = new int[INPUTSIZE * 1];
+        outD.copyTo(arrayOutD);
+        float[] arrayOut = new float[INPUTSIZE * 1];
+        out.copyTo(arrayOut);
+        for (int i = 0; i < INPUTSIZE; i++) {
+            for (int j = 0; j < 1 ; j++) {
+                // Extract the inputs.
+                ArgumentsFloatFloatIntFloat args = new ArgumentsFloatFloatIntFloat();
+                args.inB = arrayInB[i];
+                args.inC = arrayInC[i];
+                // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
+                CoreMathVerifier.computeRemquo(args);
+                // Figure out what the outputs should have been.
+                boolean valid = true;
+                if (args.outD != arrayOutD[i * 1 + j] && args.out.isNaN()) {
+                    valid = false;
+                }
+                if (!args.out.couldBe(arrayOut[i * 1 + j])) {
+                    valid = false;
+                }
+                if (!valid) {
+                    StringBuilder message = new StringBuilder();
+                    message.append("Input inB: ");
+                    message.append(String.format("%14.8g %8x %15a",
+                            args.inB, Float.floatToRawIntBits(args.inB), args.inB));
+                    message.append("\n");
+                    message.append("Input inC: ");
+                    message.append(String.format("%14.8g %8x %15a",
+                            args.inC, Float.floatToRawIntBits(args.inC), args.inC));
+                    message.append("\n");
+                    message.append("Expected output outD: ");
+                    message.append(String.format("%d", args.outD));
+                    message.append("\n");
+                    message.append("Actual   output outD: ");
+                    message.append(String.format("%d", arrayOutD[i * 1 + j]));
+                    if (args.outD != arrayOutD[i * 1 + j] && args.out.isNaN()) {
+                        message.append(" FAIL");
+                    }
+                    message.append("\n");
+                    message.append("Expected output out: ");
+                    message.append(args.out.toString());
+                    message.append("\n");
+                    message.append("Actual   output out: ");
+                    message.append(String.format("%14.8g %8x %15a",
+                            arrayOut[i * 1 + j], Float.floatToRawIntBits(arrayOut[i * 1 + j]), arrayOut[i * 1 + j]));
+                    if (!args.out.couldBe(arrayOut[i * 1 + j])) {
+                        message.append(" FAIL");
+                    }
+                    message.append("\n");
+                    assertTrue("Incorrect output for checkRemquoFloatFloatIntFloat" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                }
+            }
         }
     }
 
@@ -66,6 +137,7 @@ public class TestRemquo extends RSBaseCompute {
             script.set_gAllocInC(inC);
             script.set_gAllocOutD(outD);
             script.forEach_testRemquoFloat2Float2Int2Float2(inB, out);
+            verifyResultsRemquoFloat2Float2Int2Float2(inB, inC, outD, out, false);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testRemquoFloat2Float2Int2Float2: " + e.toString());
         }
@@ -75,8 +147,71 @@ public class TestRemquo extends RSBaseCompute {
             scriptRelaxed.set_gAllocInC(inC);
             scriptRelaxed.set_gAllocOutD(outD);
             scriptRelaxed.forEach_testRemquoFloat2Float2Int2Float2(inB, out);
+            verifyResultsRemquoFloat2Float2Int2Float2(inB, inC, outD, out, true);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testRemquoFloat2Float2Int2Float2: " + e.toString());
+        }
+    }
+
+    private void verifyResultsRemquoFloat2Float2Int2Float2(Allocation inB, Allocation inC, Allocation outD, Allocation out, boolean relaxed) {
+        float[] arrayInB = new float[INPUTSIZE * 2];
+        inB.copyTo(arrayInB);
+        float[] arrayInC = new float[INPUTSIZE * 2];
+        inC.copyTo(arrayInC);
+        int[] arrayOutD = new int[INPUTSIZE * 2];
+        outD.copyTo(arrayOutD);
+        float[] arrayOut = new float[INPUTSIZE * 2];
+        out.copyTo(arrayOut);
+        for (int i = 0; i < INPUTSIZE; i++) {
+            for (int j = 0; j < 2 ; j++) {
+                // Extract the inputs.
+                ArgumentsFloatFloatIntFloat args = new ArgumentsFloatFloatIntFloat();
+                args.inB = arrayInB[i * 2 + j];
+                args.inC = arrayInC[i * 2 + j];
+                // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
+                CoreMathVerifier.computeRemquo(args);
+                // Figure out what the outputs should have been.
+                boolean valid = true;
+                if (args.outD != arrayOutD[i * 2 + j] && args.out.isNaN()) {
+                    valid = false;
+                }
+                if (!args.out.couldBe(arrayOut[i * 2 + j])) {
+                    valid = false;
+                }
+                if (!valid) {
+                    StringBuilder message = new StringBuilder();
+                    message.append("Input inB: ");
+                    message.append(String.format("%14.8g %8x %15a",
+                            args.inB, Float.floatToRawIntBits(args.inB), args.inB));
+                    message.append("\n");
+                    message.append("Input inC: ");
+                    message.append(String.format("%14.8g %8x %15a",
+                            args.inC, Float.floatToRawIntBits(args.inC), args.inC));
+                    message.append("\n");
+                    message.append("Expected output outD: ");
+                    message.append(String.format("%d", args.outD));
+                    message.append("\n");
+                    message.append("Actual   output outD: ");
+                    message.append(String.format("%d", arrayOutD[i * 2 + j]));
+                    if (args.outD != arrayOutD[i * 2 + j] && args.out.isNaN()) {
+                        message.append(" FAIL");
+                    }
+                    message.append("\n");
+                    message.append("Expected output out: ");
+                    message.append(args.out.toString());
+                    message.append("\n");
+                    message.append("Actual   output out: ");
+                    message.append(String.format("%14.8g %8x %15a",
+                            arrayOut[i * 2 + j], Float.floatToRawIntBits(arrayOut[i * 2 + j]), arrayOut[i * 2 + j]));
+                    if (!args.out.couldBe(arrayOut[i * 2 + j])) {
+                        message.append(" FAIL");
+                    }
+                    message.append("\n");
+                    assertTrue("Incorrect output for checkRemquoFloat2Float2Int2Float2" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                }
+            }
         }
     }
 
@@ -89,6 +224,7 @@ public class TestRemquo extends RSBaseCompute {
             script.set_gAllocInC(inC);
             script.set_gAllocOutD(outD);
             script.forEach_testRemquoFloat3Float3Int3Float3(inB, out);
+            verifyResultsRemquoFloat3Float3Int3Float3(inB, inC, outD, out, false);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testRemquoFloat3Float3Int3Float3: " + e.toString());
         }
@@ -98,8 +234,71 @@ public class TestRemquo extends RSBaseCompute {
             scriptRelaxed.set_gAllocInC(inC);
             scriptRelaxed.set_gAllocOutD(outD);
             scriptRelaxed.forEach_testRemquoFloat3Float3Int3Float3(inB, out);
+            verifyResultsRemquoFloat3Float3Int3Float3(inB, inC, outD, out, true);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testRemquoFloat3Float3Int3Float3: " + e.toString());
+        }
+    }
+
+    private void verifyResultsRemquoFloat3Float3Int3Float3(Allocation inB, Allocation inC, Allocation outD, Allocation out, boolean relaxed) {
+        float[] arrayInB = new float[INPUTSIZE * 4];
+        inB.copyTo(arrayInB);
+        float[] arrayInC = new float[INPUTSIZE * 4];
+        inC.copyTo(arrayInC);
+        int[] arrayOutD = new int[INPUTSIZE * 4];
+        outD.copyTo(arrayOutD);
+        float[] arrayOut = new float[INPUTSIZE * 4];
+        out.copyTo(arrayOut);
+        for (int i = 0; i < INPUTSIZE; i++) {
+            for (int j = 0; j < 3 ; j++) {
+                // Extract the inputs.
+                ArgumentsFloatFloatIntFloat args = new ArgumentsFloatFloatIntFloat();
+                args.inB = arrayInB[i * 4 + j];
+                args.inC = arrayInC[i * 4 + j];
+                // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
+                CoreMathVerifier.computeRemquo(args);
+                // Figure out what the outputs should have been.
+                boolean valid = true;
+                if (args.outD != arrayOutD[i * 4 + j] && args.out.isNaN()) {
+                    valid = false;
+                }
+                if (!args.out.couldBe(arrayOut[i * 4 + j])) {
+                    valid = false;
+                }
+                if (!valid) {
+                    StringBuilder message = new StringBuilder();
+                    message.append("Input inB: ");
+                    message.append(String.format("%14.8g %8x %15a",
+                            args.inB, Float.floatToRawIntBits(args.inB), args.inB));
+                    message.append("\n");
+                    message.append("Input inC: ");
+                    message.append(String.format("%14.8g %8x %15a",
+                            args.inC, Float.floatToRawIntBits(args.inC), args.inC));
+                    message.append("\n");
+                    message.append("Expected output outD: ");
+                    message.append(String.format("%d", args.outD));
+                    message.append("\n");
+                    message.append("Actual   output outD: ");
+                    message.append(String.format("%d", arrayOutD[i * 4 + j]));
+                    if (args.outD != arrayOutD[i * 4 + j] && args.out.isNaN()) {
+                        message.append(" FAIL");
+                    }
+                    message.append("\n");
+                    message.append("Expected output out: ");
+                    message.append(args.out.toString());
+                    message.append("\n");
+                    message.append("Actual   output out: ");
+                    message.append(String.format("%14.8g %8x %15a",
+                            arrayOut[i * 4 + j], Float.floatToRawIntBits(arrayOut[i * 4 + j]), arrayOut[i * 4 + j]));
+                    if (!args.out.couldBe(arrayOut[i * 4 + j])) {
+                        message.append(" FAIL");
+                    }
+                    message.append("\n");
+                    assertTrue("Incorrect output for checkRemquoFloat3Float3Int3Float3" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                }
+            }
         }
     }
 
@@ -112,6 +311,7 @@ public class TestRemquo extends RSBaseCompute {
             script.set_gAllocInC(inC);
             script.set_gAllocOutD(outD);
             script.forEach_testRemquoFloat4Float4Int4Float4(inB, out);
+            verifyResultsRemquoFloat4Float4Int4Float4(inB, inC, outD, out, false);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testRemquoFloat4Float4Int4Float4: " + e.toString());
         }
@@ -121,8 +321,71 @@ public class TestRemquo extends RSBaseCompute {
             scriptRelaxed.set_gAllocInC(inC);
             scriptRelaxed.set_gAllocOutD(outD);
             scriptRelaxed.forEach_testRemquoFloat4Float4Int4Float4(inB, out);
+            verifyResultsRemquoFloat4Float4Int4Float4(inB, inC, outD, out, true);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testRemquoFloat4Float4Int4Float4: " + e.toString());
+        }
+    }
+
+    private void verifyResultsRemquoFloat4Float4Int4Float4(Allocation inB, Allocation inC, Allocation outD, Allocation out, boolean relaxed) {
+        float[] arrayInB = new float[INPUTSIZE * 4];
+        inB.copyTo(arrayInB);
+        float[] arrayInC = new float[INPUTSIZE * 4];
+        inC.copyTo(arrayInC);
+        int[] arrayOutD = new int[INPUTSIZE * 4];
+        outD.copyTo(arrayOutD);
+        float[] arrayOut = new float[INPUTSIZE * 4];
+        out.copyTo(arrayOut);
+        for (int i = 0; i < INPUTSIZE; i++) {
+            for (int j = 0; j < 4 ; j++) {
+                // Extract the inputs.
+                ArgumentsFloatFloatIntFloat args = new ArgumentsFloatFloatIntFloat();
+                args.inB = arrayInB[i * 4 + j];
+                args.inC = arrayInC[i * 4 + j];
+                // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
+                CoreMathVerifier.computeRemquo(args);
+                // Figure out what the outputs should have been.
+                boolean valid = true;
+                if (args.outD != arrayOutD[i * 4 + j] && args.out.isNaN()) {
+                    valid = false;
+                }
+                if (!args.out.couldBe(arrayOut[i * 4 + j])) {
+                    valid = false;
+                }
+                if (!valid) {
+                    StringBuilder message = new StringBuilder();
+                    message.append("Input inB: ");
+                    message.append(String.format("%14.8g %8x %15a",
+                            args.inB, Float.floatToRawIntBits(args.inB), args.inB));
+                    message.append("\n");
+                    message.append("Input inC: ");
+                    message.append(String.format("%14.8g %8x %15a",
+                            args.inC, Float.floatToRawIntBits(args.inC), args.inC));
+                    message.append("\n");
+                    message.append("Expected output outD: ");
+                    message.append(String.format("%d", args.outD));
+                    message.append("\n");
+                    message.append("Actual   output outD: ");
+                    message.append(String.format("%d", arrayOutD[i * 4 + j]));
+                    if (args.outD != arrayOutD[i * 4 + j] && args.out.isNaN()) {
+                        message.append(" FAIL");
+                    }
+                    message.append("\n");
+                    message.append("Expected output out: ");
+                    message.append(args.out.toString());
+                    message.append("\n");
+                    message.append("Actual   output out: ");
+                    message.append(String.format("%14.8g %8x %15a",
+                            arrayOut[i * 4 + j], Float.floatToRawIntBits(arrayOut[i * 4 + j]), arrayOut[i * 4 + j]));
+                    if (!args.out.couldBe(arrayOut[i * 4 + j])) {
+                        message.append(" FAIL");
+                    }
+                    message.append("\n");
+                    assertTrue("Incorrect output for checkRemquoFloat4Float4Int4Float4" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                }
+            }
         }
     }
 

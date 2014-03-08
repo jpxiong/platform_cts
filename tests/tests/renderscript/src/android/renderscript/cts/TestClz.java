@@ -37,9 +37,6 @@ public class TestClz extends RSBaseCompute {
     public class ArgumentsCharChar {
         public byte inValue;
         public byte out;
-
-        public int ulf;
-        public int ulfRelaxed;
     }
 
     private void checkClzCharChar() {
@@ -71,24 +68,23 @@ public class TestClz extends RSBaseCompute {
                 ArgumentsCharChar args = new ArgumentsCharChar();
                 args.inValue = arrayInValue[i];
                 // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeClz(args);
-                int ulf = relaxed ? args.ulfRelaxed : args.ulf;
                 // Figure out what the outputs should have been.
                 boolean valid = true;
-                int neededUlf = 0;
                 if (args.out != arrayOut[i * 1 + j]) {
                     valid = false;
                 }
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
-                    message.append(String.format("Input inValue: %d",
-                            args.inValue));
+                    message.append("Input inValue: ");
+                    message.append(String.format("%d", args.inValue));
                     message.append("\n");
-                    message.append(String.format("Expected output out: %d",
-                            args.out));
+                    message.append("Expected output out: ");
+                    message.append(String.format("%d", args.out));
                     message.append("\n");
-                    message.append(String.format("Actual   output out: %d",
-                            arrayOut[i * 1 + j]));
+                    message.append("Actual   output out: ");
+                    message.append(String.format("%d", arrayOut[i * 1 + j]));
                     if (args.out != arrayOut[i * 1 + j]) {
                         message.append(" FAIL");
                     }
@@ -129,24 +125,23 @@ public class TestClz extends RSBaseCompute {
                 ArgumentsCharChar args = new ArgumentsCharChar();
                 args.inValue = arrayInValue[i * 2 + j];
                 // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeClz(args);
-                int ulf = relaxed ? args.ulfRelaxed : args.ulf;
                 // Figure out what the outputs should have been.
                 boolean valid = true;
-                int neededUlf = 0;
                 if (args.out != arrayOut[i * 2 + j]) {
                     valid = false;
                 }
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
-                    message.append(String.format("Input inValue: %d",
-                            args.inValue));
+                    message.append("Input inValue: ");
+                    message.append(String.format("%d", args.inValue));
                     message.append("\n");
-                    message.append(String.format("Expected output out: %d",
-                            args.out));
+                    message.append("Expected output out: ");
+                    message.append(String.format("%d", args.out));
                     message.append("\n");
-                    message.append(String.format("Actual   output out: %d",
-                            arrayOut[i * 2 + j]));
+                    message.append("Actual   output out: ");
+                    message.append(String.format("%d", arrayOut[i * 2 + j]));
                     if (args.out != arrayOut[i * 2 + j]) {
                         message.append(" FAIL");
                     }
@@ -187,24 +182,23 @@ public class TestClz extends RSBaseCompute {
                 ArgumentsCharChar args = new ArgumentsCharChar();
                 args.inValue = arrayInValue[i * 4 + j];
                 // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeClz(args);
-                int ulf = relaxed ? args.ulfRelaxed : args.ulf;
                 // Figure out what the outputs should have been.
                 boolean valid = true;
-                int neededUlf = 0;
                 if (args.out != arrayOut[i * 4 + j]) {
                     valid = false;
                 }
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
-                    message.append(String.format("Input inValue: %d",
-                            args.inValue));
+                    message.append("Input inValue: ");
+                    message.append(String.format("%d", args.inValue));
                     message.append("\n");
-                    message.append(String.format("Expected output out: %d",
-                            args.out));
+                    message.append("Expected output out: ");
+                    message.append(String.format("%d", args.out));
                     message.append("\n");
-                    message.append(String.format("Actual   output out: %d",
-                            arrayOut[i * 4 + j]));
+                    message.append("Actual   output out: ");
+                    message.append(String.format("%d", arrayOut[i * 4 + j]));
                     if (args.out != arrayOut[i * 4 + j]) {
                         message.append(" FAIL");
                     }
@@ -245,24 +239,23 @@ public class TestClz extends RSBaseCompute {
                 ArgumentsCharChar args = new ArgumentsCharChar();
                 args.inValue = arrayInValue[i * 4 + j];
                 // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeClz(args);
-                int ulf = relaxed ? args.ulfRelaxed : args.ulf;
                 // Figure out what the outputs should have been.
                 boolean valid = true;
-                int neededUlf = 0;
                 if (args.out != arrayOut[i * 4 + j]) {
                     valid = false;
                 }
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
-                    message.append(String.format("Input inValue: %d",
-                            args.inValue));
+                    message.append("Input inValue: ");
+                    message.append(String.format("%d", args.inValue));
                     message.append("\n");
-                    message.append(String.format("Expected output out: %d",
-                            args.out));
+                    message.append("Expected output out: ");
+                    message.append(String.format("%d", args.out));
                     message.append("\n");
-                    message.append(String.format("Actual   output out: %d",
-                            arrayOut[i * 4 + j]));
+                    message.append("Actual   output out: ");
+                    message.append(String.format("%d", arrayOut[i * 4 + j]));
                     if (args.out != arrayOut[i * 4 + j]) {
                         message.append(" FAIL");
                     }
@@ -277,9 +270,6 @@ public class TestClz extends RSBaseCompute {
     public class ArgumentsUcharUchar {
         public byte inValue;
         public byte out;
-
-        public int ulf;
-        public int ulfRelaxed;
     }
 
     private void checkClzUcharUchar() {
@@ -311,24 +301,23 @@ public class TestClz extends RSBaseCompute {
                 ArgumentsUcharUchar args = new ArgumentsUcharUchar();
                 args.inValue = arrayInValue[i];
                 // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeClz(args);
-                int ulf = relaxed ? args.ulfRelaxed : args.ulf;
                 // Figure out what the outputs should have been.
                 boolean valid = true;
-                int neededUlf = 0;
                 if (args.out != arrayOut[i * 1 + j]) {
                     valid = false;
                 }
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
-                    message.append(String.format("Input inValue: 0x%x",
-                            args.inValue));
+                    message.append("Input inValue: ");
+                    message.append(String.format("0x%x", args.inValue));
                     message.append("\n");
-                    message.append(String.format("Expected output out: 0x%x",
-                            args.out));
+                    message.append("Expected output out: ");
+                    message.append(String.format("0x%x", args.out));
                     message.append("\n");
-                    message.append(String.format("Actual   output out: 0x%x",
-                            arrayOut[i * 1 + j]));
+                    message.append("Actual   output out: ");
+                    message.append(String.format("0x%x", arrayOut[i * 1 + j]));
                     if (args.out != arrayOut[i * 1 + j]) {
                         message.append(" FAIL");
                     }
@@ -369,24 +358,23 @@ public class TestClz extends RSBaseCompute {
                 ArgumentsUcharUchar args = new ArgumentsUcharUchar();
                 args.inValue = arrayInValue[i * 2 + j];
                 // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeClz(args);
-                int ulf = relaxed ? args.ulfRelaxed : args.ulf;
                 // Figure out what the outputs should have been.
                 boolean valid = true;
-                int neededUlf = 0;
                 if (args.out != arrayOut[i * 2 + j]) {
                     valid = false;
                 }
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
-                    message.append(String.format("Input inValue: 0x%x",
-                            args.inValue));
+                    message.append("Input inValue: ");
+                    message.append(String.format("0x%x", args.inValue));
                     message.append("\n");
-                    message.append(String.format("Expected output out: 0x%x",
-                            args.out));
+                    message.append("Expected output out: ");
+                    message.append(String.format("0x%x", args.out));
                     message.append("\n");
-                    message.append(String.format("Actual   output out: 0x%x",
-                            arrayOut[i * 2 + j]));
+                    message.append("Actual   output out: ");
+                    message.append(String.format("0x%x", arrayOut[i * 2 + j]));
                     if (args.out != arrayOut[i * 2 + j]) {
                         message.append(" FAIL");
                     }
@@ -427,24 +415,23 @@ public class TestClz extends RSBaseCompute {
                 ArgumentsUcharUchar args = new ArgumentsUcharUchar();
                 args.inValue = arrayInValue[i * 4 + j];
                 // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeClz(args);
-                int ulf = relaxed ? args.ulfRelaxed : args.ulf;
                 // Figure out what the outputs should have been.
                 boolean valid = true;
-                int neededUlf = 0;
                 if (args.out != arrayOut[i * 4 + j]) {
                     valid = false;
                 }
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
-                    message.append(String.format("Input inValue: 0x%x",
-                            args.inValue));
+                    message.append("Input inValue: ");
+                    message.append(String.format("0x%x", args.inValue));
                     message.append("\n");
-                    message.append(String.format("Expected output out: 0x%x",
-                            args.out));
+                    message.append("Expected output out: ");
+                    message.append(String.format("0x%x", args.out));
                     message.append("\n");
-                    message.append(String.format("Actual   output out: 0x%x",
-                            arrayOut[i * 4 + j]));
+                    message.append("Actual   output out: ");
+                    message.append(String.format("0x%x", arrayOut[i * 4 + j]));
                     if (args.out != arrayOut[i * 4 + j]) {
                         message.append(" FAIL");
                     }
@@ -485,24 +472,23 @@ public class TestClz extends RSBaseCompute {
                 ArgumentsUcharUchar args = new ArgumentsUcharUchar();
                 args.inValue = arrayInValue[i * 4 + j];
                 // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeClz(args);
-                int ulf = relaxed ? args.ulfRelaxed : args.ulf;
                 // Figure out what the outputs should have been.
                 boolean valid = true;
-                int neededUlf = 0;
                 if (args.out != arrayOut[i * 4 + j]) {
                     valid = false;
                 }
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
-                    message.append(String.format("Input inValue: 0x%x",
-                            args.inValue));
+                    message.append("Input inValue: ");
+                    message.append(String.format("0x%x", args.inValue));
                     message.append("\n");
-                    message.append(String.format("Expected output out: 0x%x",
-                            args.out));
+                    message.append("Expected output out: ");
+                    message.append(String.format("0x%x", args.out));
                     message.append("\n");
-                    message.append(String.format("Actual   output out: 0x%x",
-                            arrayOut[i * 4 + j]));
+                    message.append("Actual   output out: ");
+                    message.append(String.format("0x%x", arrayOut[i * 4 + j]));
                     if (args.out != arrayOut[i * 4 + j]) {
                         message.append(" FAIL");
                     }
@@ -517,9 +503,6 @@ public class TestClz extends RSBaseCompute {
     public class ArgumentsShortShort {
         public short inValue;
         public short out;
-
-        public int ulf;
-        public int ulfRelaxed;
     }
 
     private void checkClzShortShort() {
@@ -551,24 +534,23 @@ public class TestClz extends RSBaseCompute {
                 ArgumentsShortShort args = new ArgumentsShortShort();
                 args.inValue = arrayInValue[i];
                 // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeClz(args);
-                int ulf = relaxed ? args.ulfRelaxed : args.ulf;
                 // Figure out what the outputs should have been.
                 boolean valid = true;
-                int neededUlf = 0;
                 if (args.out != arrayOut[i * 1 + j]) {
                     valid = false;
                 }
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
-                    message.append(String.format("Input inValue: %d",
-                            args.inValue));
+                    message.append("Input inValue: ");
+                    message.append(String.format("%d", args.inValue));
                     message.append("\n");
-                    message.append(String.format("Expected output out: %d",
-                            args.out));
+                    message.append("Expected output out: ");
+                    message.append(String.format("%d", args.out));
                     message.append("\n");
-                    message.append(String.format("Actual   output out: %d",
-                            arrayOut[i * 1 + j]));
+                    message.append("Actual   output out: ");
+                    message.append(String.format("%d", arrayOut[i * 1 + j]));
                     if (args.out != arrayOut[i * 1 + j]) {
                         message.append(" FAIL");
                     }
@@ -609,24 +591,23 @@ public class TestClz extends RSBaseCompute {
                 ArgumentsShortShort args = new ArgumentsShortShort();
                 args.inValue = arrayInValue[i * 2 + j];
                 // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeClz(args);
-                int ulf = relaxed ? args.ulfRelaxed : args.ulf;
                 // Figure out what the outputs should have been.
                 boolean valid = true;
-                int neededUlf = 0;
                 if (args.out != arrayOut[i * 2 + j]) {
                     valid = false;
                 }
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
-                    message.append(String.format("Input inValue: %d",
-                            args.inValue));
+                    message.append("Input inValue: ");
+                    message.append(String.format("%d", args.inValue));
                     message.append("\n");
-                    message.append(String.format("Expected output out: %d",
-                            args.out));
+                    message.append("Expected output out: ");
+                    message.append(String.format("%d", args.out));
                     message.append("\n");
-                    message.append(String.format("Actual   output out: %d",
-                            arrayOut[i * 2 + j]));
+                    message.append("Actual   output out: ");
+                    message.append(String.format("%d", arrayOut[i * 2 + j]));
                     if (args.out != arrayOut[i * 2 + j]) {
                         message.append(" FAIL");
                     }
@@ -667,24 +648,23 @@ public class TestClz extends RSBaseCompute {
                 ArgumentsShortShort args = new ArgumentsShortShort();
                 args.inValue = arrayInValue[i * 4 + j];
                 // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeClz(args);
-                int ulf = relaxed ? args.ulfRelaxed : args.ulf;
                 // Figure out what the outputs should have been.
                 boolean valid = true;
-                int neededUlf = 0;
                 if (args.out != arrayOut[i * 4 + j]) {
                     valid = false;
                 }
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
-                    message.append(String.format("Input inValue: %d",
-                            args.inValue));
+                    message.append("Input inValue: ");
+                    message.append(String.format("%d", args.inValue));
                     message.append("\n");
-                    message.append(String.format("Expected output out: %d",
-                            args.out));
+                    message.append("Expected output out: ");
+                    message.append(String.format("%d", args.out));
                     message.append("\n");
-                    message.append(String.format("Actual   output out: %d",
-                            arrayOut[i * 4 + j]));
+                    message.append("Actual   output out: ");
+                    message.append(String.format("%d", arrayOut[i * 4 + j]));
                     if (args.out != arrayOut[i * 4 + j]) {
                         message.append(" FAIL");
                     }
@@ -725,24 +705,23 @@ public class TestClz extends RSBaseCompute {
                 ArgumentsShortShort args = new ArgumentsShortShort();
                 args.inValue = arrayInValue[i * 4 + j];
                 // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeClz(args);
-                int ulf = relaxed ? args.ulfRelaxed : args.ulf;
                 // Figure out what the outputs should have been.
                 boolean valid = true;
-                int neededUlf = 0;
                 if (args.out != arrayOut[i * 4 + j]) {
                     valid = false;
                 }
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
-                    message.append(String.format("Input inValue: %d",
-                            args.inValue));
+                    message.append("Input inValue: ");
+                    message.append(String.format("%d", args.inValue));
                     message.append("\n");
-                    message.append(String.format("Expected output out: %d",
-                            args.out));
+                    message.append("Expected output out: ");
+                    message.append(String.format("%d", args.out));
                     message.append("\n");
-                    message.append(String.format("Actual   output out: %d",
-                            arrayOut[i * 4 + j]));
+                    message.append("Actual   output out: ");
+                    message.append(String.format("%d", arrayOut[i * 4 + j]));
                     if (args.out != arrayOut[i * 4 + j]) {
                         message.append(" FAIL");
                     }
@@ -757,9 +736,6 @@ public class TestClz extends RSBaseCompute {
     public class ArgumentsUshortUshort {
         public short inValue;
         public short out;
-
-        public int ulf;
-        public int ulfRelaxed;
     }
 
     private void checkClzUshortUshort() {
@@ -791,24 +767,23 @@ public class TestClz extends RSBaseCompute {
                 ArgumentsUshortUshort args = new ArgumentsUshortUshort();
                 args.inValue = arrayInValue[i];
                 // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeClz(args);
-                int ulf = relaxed ? args.ulfRelaxed : args.ulf;
                 // Figure out what the outputs should have been.
                 boolean valid = true;
-                int neededUlf = 0;
                 if (args.out != arrayOut[i * 1 + j]) {
                     valid = false;
                 }
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
-                    message.append(String.format("Input inValue: 0x%x",
-                            args.inValue));
+                    message.append("Input inValue: ");
+                    message.append(String.format("0x%x", args.inValue));
                     message.append("\n");
-                    message.append(String.format("Expected output out: 0x%x",
-                            args.out));
+                    message.append("Expected output out: ");
+                    message.append(String.format("0x%x", args.out));
                     message.append("\n");
-                    message.append(String.format("Actual   output out: 0x%x",
-                            arrayOut[i * 1 + j]));
+                    message.append("Actual   output out: ");
+                    message.append(String.format("0x%x", arrayOut[i * 1 + j]));
                     if (args.out != arrayOut[i * 1 + j]) {
                         message.append(" FAIL");
                     }
@@ -849,24 +824,23 @@ public class TestClz extends RSBaseCompute {
                 ArgumentsUshortUshort args = new ArgumentsUshortUshort();
                 args.inValue = arrayInValue[i * 2 + j];
                 // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeClz(args);
-                int ulf = relaxed ? args.ulfRelaxed : args.ulf;
                 // Figure out what the outputs should have been.
                 boolean valid = true;
-                int neededUlf = 0;
                 if (args.out != arrayOut[i * 2 + j]) {
                     valid = false;
                 }
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
-                    message.append(String.format("Input inValue: 0x%x",
-                            args.inValue));
+                    message.append("Input inValue: ");
+                    message.append(String.format("0x%x", args.inValue));
                     message.append("\n");
-                    message.append(String.format("Expected output out: 0x%x",
-                            args.out));
+                    message.append("Expected output out: ");
+                    message.append(String.format("0x%x", args.out));
                     message.append("\n");
-                    message.append(String.format("Actual   output out: 0x%x",
-                            arrayOut[i * 2 + j]));
+                    message.append("Actual   output out: ");
+                    message.append(String.format("0x%x", arrayOut[i * 2 + j]));
                     if (args.out != arrayOut[i * 2 + j]) {
                         message.append(" FAIL");
                     }
@@ -907,24 +881,23 @@ public class TestClz extends RSBaseCompute {
                 ArgumentsUshortUshort args = new ArgumentsUshortUshort();
                 args.inValue = arrayInValue[i * 4 + j];
                 // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeClz(args);
-                int ulf = relaxed ? args.ulfRelaxed : args.ulf;
                 // Figure out what the outputs should have been.
                 boolean valid = true;
-                int neededUlf = 0;
                 if (args.out != arrayOut[i * 4 + j]) {
                     valid = false;
                 }
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
-                    message.append(String.format("Input inValue: 0x%x",
-                            args.inValue));
+                    message.append("Input inValue: ");
+                    message.append(String.format("0x%x", args.inValue));
                     message.append("\n");
-                    message.append(String.format("Expected output out: 0x%x",
-                            args.out));
+                    message.append("Expected output out: ");
+                    message.append(String.format("0x%x", args.out));
                     message.append("\n");
-                    message.append(String.format("Actual   output out: 0x%x",
-                            arrayOut[i * 4 + j]));
+                    message.append("Actual   output out: ");
+                    message.append(String.format("0x%x", arrayOut[i * 4 + j]));
                     if (args.out != arrayOut[i * 4 + j]) {
                         message.append(" FAIL");
                     }
@@ -965,24 +938,23 @@ public class TestClz extends RSBaseCompute {
                 ArgumentsUshortUshort args = new ArgumentsUshortUshort();
                 args.inValue = arrayInValue[i * 4 + j];
                 // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeClz(args);
-                int ulf = relaxed ? args.ulfRelaxed : args.ulf;
                 // Figure out what the outputs should have been.
                 boolean valid = true;
-                int neededUlf = 0;
                 if (args.out != arrayOut[i * 4 + j]) {
                     valid = false;
                 }
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
-                    message.append(String.format("Input inValue: 0x%x",
-                            args.inValue));
+                    message.append("Input inValue: ");
+                    message.append(String.format("0x%x", args.inValue));
                     message.append("\n");
-                    message.append(String.format("Expected output out: 0x%x",
-                            args.out));
+                    message.append("Expected output out: ");
+                    message.append(String.format("0x%x", args.out));
                     message.append("\n");
-                    message.append(String.format("Actual   output out: 0x%x",
-                            arrayOut[i * 4 + j]));
+                    message.append("Actual   output out: ");
+                    message.append(String.format("0x%x", arrayOut[i * 4 + j]));
                     if (args.out != arrayOut[i * 4 + j]) {
                         message.append(" FAIL");
                     }
@@ -997,9 +969,6 @@ public class TestClz extends RSBaseCompute {
     public class ArgumentsIntInt {
         public int inValue;
         public int out;
-
-        public int ulf;
-        public int ulfRelaxed;
     }
 
     private void checkClzIntInt() {
@@ -1031,24 +1000,23 @@ public class TestClz extends RSBaseCompute {
                 ArgumentsIntInt args = new ArgumentsIntInt();
                 args.inValue = arrayInValue[i];
                 // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeClz(args);
-                int ulf = relaxed ? args.ulfRelaxed : args.ulf;
                 // Figure out what the outputs should have been.
                 boolean valid = true;
-                int neededUlf = 0;
                 if (args.out != arrayOut[i * 1 + j]) {
                     valid = false;
                 }
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
-                    message.append(String.format("Input inValue: %d",
-                            args.inValue));
+                    message.append("Input inValue: ");
+                    message.append(String.format("%d", args.inValue));
                     message.append("\n");
-                    message.append(String.format("Expected output out: %d",
-                            args.out));
+                    message.append("Expected output out: ");
+                    message.append(String.format("%d", args.out));
                     message.append("\n");
-                    message.append(String.format("Actual   output out: %d",
-                            arrayOut[i * 1 + j]));
+                    message.append("Actual   output out: ");
+                    message.append(String.format("%d", arrayOut[i * 1 + j]));
                     if (args.out != arrayOut[i * 1 + j]) {
                         message.append(" FAIL");
                     }
@@ -1089,24 +1057,23 @@ public class TestClz extends RSBaseCompute {
                 ArgumentsIntInt args = new ArgumentsIntInt();
                 args.inValue = arrayInValue[i * 2 + j];
                 // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeClz(args);
-                int ulf = relaxed ? args.ulfRelaxed : args.ulf;
                 // Figure out what the outputs should have been.
                 boolean valid = true;
-                int neededUlf = 0;
                 if (args.out != arrayOut[i * 2 + j]) {
                     valid = false;
                 }
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
-                    message.append(String.format("Input inValue: %d",
-                            args.inValue));
+                    message.append("Input inValue: ");
+                    message.append(String.format("%d", args.inValue));
                     message.append("\n");
-                    message.append(String.format("Expected output out: %d",
-                            args.out));
+                    message.append("Expected output out: ");
+                    message.append(String.format("%d", args.out));
                     message.append("\n");
-                    message.append(String.format("Actual   output out: %d",
-                            arrayOut[i * 2 + j]));
+                    message.append("Actual   output out: ");
+                    message.append(String.format("%d", arrayOut[i * 2 + j]));
                     if (args.out != arrayOut[i * 2 + j]) {
                         message.append(" FAIL");
                     }
@@ -1147,24 +1114,23 @@ public class TestClz extends RSBaseCompute {
                 ArgumentsIntInt args = new ArgumentsIntInt();
                 args.inValue = arrayInValue[i * 4 + j];
                 // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeClz(args);
-                int ulf = relaxed ? args.ulfRelaxed : args.ulf;
                 // Figure out what the outputs should have been.
                 boolean valid = true;
-                int neededUlf = 0;
                 if (args.out != arrayOut[i * 4 + j]) {
                     valid = false;
                 }
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
-                    message.append(String.format("Input inValue: %d",
-                            args.inValue));
+                    message.append("Input inValue: ");
+                    message.append(String.format("%d", args.inValue));
                     message.append("\n");
-                    message.append(String.format("Expected output out: %d",
-                            args.out));
+                    message.append("Expected output out: ");
+                    message.append(String.format("%d", args.out));
                     message.append("\n");
-                    message.append(String.format("Actual   output out: %d",
-                            arrayOut[i * 4 + j]));
+                    message.append("Actual   output out: ");
+                    message.append(String.format("%d", arrayOut[i * 4 + j]));
                     if (args.out != arrayOut[i * 4 + j]) {
                         message.append(" FAIL");
                     }
@@ -1205,24 +1171,23 @@ public class TestClz extends RSBaseCompute {
                 ArgumentsIntInt args = new ArgumentsIntInt();
                 args.inValue = arrayInValue[i * 4 + j];
                 // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeClz(args);
-                int ulf = relaxed ? args.ulfRelaxed : args.ulf;
                 // Figure out what the outputs should have been.
                 boolean valid = true;
-                int neededUlf = 0;
                 if (args.out != arrayOut[i * 4 + j]) {
                     valid = false;
                 }
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
-                    message.append(String.format("Input inValue: %d",
-                            args.inValue));
+                    message.append("Input inValue: ");
+                    message.append(String.format("%d", args.inValue));
                     message.append("\n");
-                    message.append(String.format("Expected output out: %d",
-                            args.out));
+                    message.append("Expected output out: ");
+                    message.append(String.format("%d", args.out));
                     message.append("\n");
-                    message.append(String.format("Actual   output out: %d",
-                            arrayOut[i * 4 + j]));
+                    message.append("Actual   output out: ");
+                    message.append(String.format("%d", arrayOut[i * 4 + j]));
                     if (args.out != arrayOut[i * 4 + j]) {
                         message.append(" FAIL");
                     }
@@ -1237,9 +1202,6 @@ public class TestClz extends RSBaseCompute {
     public class ArgumentsUintUint {
         public int inValue;
         public int out;
-
-        public int ulf;
-        public int ulfRelaxed;
     }
 
     private void checkClzUintUint() {
@@ -1271,24 +1233,23 @@ public class TestClz extends RSBaseCompute {
                 ArgumentsUintUint args = new ArgumentsUintUint();
                 args.inValue = arrayInValue[i];
                 // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeClz(args);
-                int ulf = relaxed ? args.ulfRelaxed : args.ulf;
                 // Figure out what the outputs should have been.
                 boolean valid = true;
-                int neededUlf = 0;
                 if (args.out != arrayOut[i * 1 + j]) {
                     valid = false;
                 }
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
-                    message.append(String.format("Input inValue: 0x%x",
-                            args.inValue));
+                    message.append("Input inValue: ");
+                    message.append(String.format("0x%x", args.inValue));
                     message.append("\n");
-                    message.append(String.format("Expected output out: 0x%x",
-                            args.out));
+                    message.append("Expected output out: ");
+                    message.append(String.format("0x%x", args.out));
                     message.append("\n");
-                    message.append(String.format("Actual   output out: 0x%x",
-                            arrayOut[i * 1 + j]));
+                    message.append("Actual   output out: ");
+                    message.append(String.format("0x%x", arrayOut[i * 1 + j]));
                     if (args.out != arrayOut[i * 1 + j]) {
                         message.append(" FAIL");
                     }
@@ -1329,24 +1290,23 @@ public class TestClz extends RSBaseCompute {
                 ArgumentsUintUint args = new ArgumentsUintUint();
                 args.inValue = arrayInValue[i * 2 + j];
                 // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeClz(args);
-                int ulf = relaxed ? args.ulfRelaxed : args.ulf;
                 // Figure out what the outputs should have been.
                 boolean valid = true;
-                int neededUlf = 0;
                 if (args.out != arrayOut[i * 2 + j]) {
                     valid = false;
                 }
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
-                    message.append(String.format("Input inValue: 0x%x",
-                            args.inValue));
+                    message.append("Input inValue: ");
+                    message.append(String.format("0x%x", args.inValue));
                     message.append("\n");
-                    message.append(String.format("Expected output out: 0x%x",
-                            args.out));
+                    message.append("Expected output out: ");
+                    message.append(String.format("0x%x", args.out));
                     message.append("\n");
-                    message.append(String.format("Actual   output out: 0x%x",
-                            arrayOut[i * 2 + j]));
+                    message.append("Actual   output out: ");
+                    message.append(String.format("0x%x", arrayOut[i * 2 + j]));
                     if (args.out != arrayOut[i * 2 + j]) {
                         message.append(" FAIL");
                     }
@@ -1387,24 +1347,23 @@ public class TestClz extends RSBaseCompute {
                 ArgumentsUintUint args = new ArgumentsUintUint();
                 args.inValue = arrayInValue[i * 4 + j];
                 // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeClz(args);
-                int ulf = relaxed ? args.ulfRelaxed : args.ulf;
                 // Figure out what the outputs should have been.
                 boolean valid = true;
-                int neededUlf = 0;
                 if (args.out != arrayOut[i * 4 + j]) {
                     valid = false;
                 }
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
-                    message.append(String.format("Input inValue: 0x%x",
-                            args.inValue));
+                    message.append("Input inValue: ");
+                    message.append(String.format("0x%x", args.inValue));
                     message.append("\n");
-                    message.append(String.format("Expected output out: 0x%x",
-                            args.out));
+                    message.append("Expected output out: ");
+                    message.append(String.format("0x%x", args.out));
                     message.append("\n");
-                    message.append(String.format("Actual   output out: 0x%x",
-                            arrayOut[i * 4 + j]));
+                    message.append("Actual   output out: ");
+                    message.append(String.format("0x%x", arrayOut[i * 4 + j]));
                     if (args.out != arrayOut[i * 4 + j]) {
                         message.append(" FAIL");
                     }
@@ -1445,24 +1404,23 @@ public class TestClz extends RSBaseCompute {
                 ArgumentsUintUint args = new ArgumentsUintUint();
                 args.inValue = arrayInValue[i * 4 + j];
                 // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeClz(args);
-                int ulf = relaxed ? args.ulfRelaxed : args.ulf;
                 // Figure out what the outputs should have been.
                 boolean valid = true;
-                int neededUlf = 0;
                 if (args.out != arrayOut[i * 4 + j]) {
                     valid = false;
                 }
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
-                    message.append(String.format("Input inValue: 0x%x",
-                            args.inValue));
+                    message.append("Input inValue: ");
+                    message.append(String.format("0x%x", args.inValue));
                     message.append("\n");
-                    message.append(String.format("Expected output out: 0x%x",
-                            args.out));
+                    message.append("Expected output out: ");
+                    message.append(String.format("0x%x", args.out));
                     message.append("\n");
-                    message.append(String.format("Actual   output out: 0x%x",
-                            arrayOut[i * 4 + j]));
+                    message.append("Actual   output out: ");
+                    message.append(String.format("0x%x", arrayOut[i * 4 + j]));
                     if (args.out != arrayOut[i * 4 + j]) {
                         message.append(" FAIL");
                     }
