@@ -34,19 +34,66 @@ public class TestNan extends RSBaseCompute {
         scriptRelaxed = new ScriptC_TestNanRelaxed(mRS);
     }
 
+    public class ArgumentsUintFloat {
+        public int in;
+        public Floaty out;
+    }
+
     private void checkNanUintFloat() {
         Allocation in = createRandomAllocation(mRS, Element.DataType.UNSIGNED_32, 1, 0x757e939c0e627774l, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 1), INPUTSIZE);
             script.forEach_testNanUintFloat(in, out);
+            verifyResultsNanUintFloat(in, out, false);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testNanUintFloat: " + e.toString());
         }
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 1), INPUTSIZE);
             scriptRelaxed.forEach_testNanUintFloat(in, out);
+            verifyResultsNanUintFloat(in, out, true);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testNanUintFloat: " + e.toString());
+        }
+    }
+
+    private void verifyResultsNanUintFloat(Allocation in, Allocation out, boolean relaxed) {
+        int[] arrayIn = new int[INPUTSIZE * 1];
+        in.copyTo(arrayIn);
+        float[] arrayOut = new float[INPUTSIZE * 1];
+        out.copyTo(arrayOut);
+        for (int i = 0; i < INPUTSIZE; i++) {
+            for (int j = 0; j < 1 ; j++) {
+                // Extract the inputs.
+                ArgumentsUintFloat args = new ArgumentsUintFloat();
+                args.in = arrayIn[i];
+                // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
+                CoreMathVerifier.computeNan(args);
+                // Figure out what the outputs should have been.
+                boolean valid = true;
+                if (!args.out.couldBe(arrayOut[i * 1 + j])) {
+                    valid = false;
+                }
+                if (!valid) {
+                    StringBuilder message = new StringBuilder();
+                    message.append("Input in: ");
+                    message.append(String.format("0x%x", args.in));
+                    message.append("\n");
+                    message.append("Expected output out: ");
+                    message.append(args.out.toString());
+                    message.append("\n");
+                    message.append("Actual   output out: ");
+                    message.append(String.format("%14.8g %8x %15a",
+                            arrayOut[i * 1 + j], Float.floatToRawIntBits(arrayOut[i * 1 + j]), arrayOut[i * 1 + j]));
+                    if (!args.out.couldBe(arrayOut[i * 1 + j])) {
+                        message.append(" FAIL");
+                    }
+                    message.append("\n");
+                    assertTrue("Incorrect output for checkNanUintFloat" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                }
+            }
         }
     }
 

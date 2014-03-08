@@ -34,19 +34,66 @@ public class TestIlogb extends RSBaseCompute {
         scriptRelaxed = new ScriptC_TestIlogbRelaxed(mRS);
     }
 
+    public class ArgumentsFloatInt {
+        public float in;
+        public int out;
+    }
+
     private void checkIlogbFloatInt() {
         Allocation in = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0xc0c48da27f084aefl, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_32, 1), INPUTSIZE);
             script.forEach_testIlogbFloatInt(in, out);
+            verifyResultsIlogbFloatInt(in, out, false);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testIlogbFloatInt: " + e.toString());
         }
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_32, 1), INPUTSIZE);
             scriptRelaxed.forEach_testIlogbFloatInt(in, out);
+            verifyResultsIlogbFloatInt(in, out, true);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testIlogbFloatInt: " + e.toString());
+        }
+    }
+
+    private void verifyResultsIlogbFloatInt(Allocation in, Allocation out, boolean relaxed) {
+        float[] arrayIn = new float[INPUTSIZE * 1];
+        in.copyTo(arrayIn);
+        int[] arrayOut = new int[INPUTSIZE * 1];
+        out.copyTo(arrayOut);
+        for (int i = 0; i < INPUTSIZE; i++) {
+            for (int j = 0; j < 1 ; j++) {
+                // Extract the inputs.
+                ArgumentsFloatInt args = new ArgumentsFloatInt();
+                args.in = arrayIn[i];
+                // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
+                CoreMathVerifier.computeIlogb(args);
+                // Figure out what the outputs should have been.
+                boolean valid = true;
+                if (args.out != arrayOut[i * 1 + j]) {
+                    valid = false;
+                }
+                if (!valid) {
+                    StringBuilder message = new StringBuilder();
+                    message.append("Input in: ");
+                    message.append(String.format("%14.8g %8x %15a",
+                            args.in, Float.floatToRawIntBits(args.in), args.in));
+                    message.append("\n");
+                    message.append("Expected output out: ");
+                    message.append(String.format("%d", args.out));
+                    message.append("\n");
+                    message.append("Actual   output out: ");
+                    message.append(String.format("%d", arrayOut[i * 1 + j]));
+                    if (args.out != arrayOut[i * 1 + j]) {
+                        message.append(" FAIL");
+                    }
+                    message.append("\n");
+                    assertTrue("Incorrect output for checkIlogbFloatInt" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                }
+            }
         }
     }
 
@@ -55,14 +102,56 @@ public class TestIlogb extends RSBaseCompute {
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_32, 2), INPUTSIZE);
             script.forEach_testIlogbFloat2Int2(in, out);
+            verifyResultsIlogbFloat2Int2(in, out, false);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testIlogbFloat2Int2: " + e.toString());
         }
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_32, 2), INPUTSIZE);
             scriptRelaxed.forEach_testIlogbFloat2Int2(in, out);
+            verifyResultsIlogbFloat2Int2(in, out, true);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testIlogbFloat2Int2: " + e.toString());
+        }
+    }
+
+    private void verifyResultsIlogbFloat2Int2(Allocation in, Allocation out, boolean relaxed) {
+        float[] arrayIn = new float[INPUTSIZE * 2];
+        in.copyTo(arrayIn);
+        int[] arrayOut = new int[INPUTSIZE * 2];
+        out.copyTo(arrayOut);
+        for (int i = 0; i < INPUTSIZE; i++) {
+            for (int j = 0; j < 2 ; j++) {
+                // Extract the inputs.
+                ArgumentsFloatInt args = new ArgumentsFloatInt();
+                args.in = arrayIn[i * 2 + j];
+                // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
+                CoreMathVerifier.computeIlogb(args);
+                // Figure out what the outputs should have been.
+                boolean valid = true;
+                if (args.out != arrayOut[i * 2 + j]) {
+                    valid = false;
+                }
+                if (!valid) {
+                    StringBuilder message = new StringBuilder();
+                    message.append("Input in: ");
+                    message.append(String.format("%14.8g %8x %15a",
+                            args.in, Float.floatToRawIntBits(args.in), args.in));
+                    message.append("\n");
+                    message.append("Expected output out: ");
+                    message.append(String.format("%d", args.out));
+                    message.append("\n");
+                    message.append("Actual   output out: ");
+                    message.append(String.format("%d", arrayOut[i * 2 + j]));
+                    if (args.out != arrayOut[i * 2 + j]) {
+                        message.append(" FAIL");
+                    }
+                    message.append("\n");
+                    assertTrue("Incorrect output for checkIlogbFloat2Int2" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                }
+            }
         }
     }
 
@@ -71,14 +160,56 @@ public class TestIlogb extends RSBaseCompute {
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_32, 3), INPUTSIZE);
             script.forEach_testIlogbFloat3Int3(in, out);
+            verifyResultsIlogbFloat3Int3(in, out, false);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testIlogbFloat3Int3: " + e.toString());
         }
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_32, 3), INPUTSIZE);
             scriptRelaxed.forEach_testIlogbFloat3Int3(in, out);
+            verifyResultsIlogbFloat3Int3(in, out, true);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testIlogbFloat3Int3: " + e.toString());
+        }
+    }
+
+    private void verifyResultsIlogbFloat3Int3(Allocation in, Allocation out, boolean relaxed) {
+        float[] arrayIn = new float[INPUTSIZE * 4];
+        in.copyTo(arrayIn);
+        int[] arrayOut = new int[INPUTSIZE * 4];
+        out.copyTo(arrayOut);
+        for (int i = 0; i < INPUTSIZE; i++) {
+            for (int j = 0; j < 3 ; j++) {
+                // Extract the inputs.
+                ArgumentsFloatInt args = new ArgumentsFloatInt();
+                args.in = arrayIn[i * 4 + j];
+                // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
+                CoreMathVerifier.computeIlogb(args);
+                // Figure out what the outputs should have been.
+                boolean valid = true;
+                if (args.out != arrayOut[i * 4 + j]) {
+                    valid = false;
+                }
+                if (!valid) {
+                    StringBuilder message = new StringBuilder();
+                    message.append("Input in: ");
+                    message.append(String.format("%14.8g %8x %15a",
+                            args.in, Float.floatToRawIntBits(args.in), args.in));
+                    message.append("\n");
+                    message.append("Expected output out: ");
+                    message.append(String.format("%d", args.out));
+                    message.append("\n");
+                    message.append("Actual   output out: ");
+                    message.append(String.format("%d", arrayOut[i * 4 + j]));
+                    if (args.out != arrayOut[i * 4 + j]) {
+                        message.append(" FAIL");
+                    }
+                    message.append("\n");
+                    assertTrue("Incorrect output for checkIlogbFloat3Int3" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                }
+            }
         }
     }
 
@@ -87,14 +218,56 @@ public class TestIlogb extends RSBaseCompute {
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_32, 4), INPUTSIZE);
             script.forEach_testIlogbFloat4Int4(in, out);
+            verifyResultsIlogbFloat4Int4(in, out, false);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testIlogbFloat4Int4: " + e.toString());
         }
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_32, 4), INPUTSIZE);
             scriptRelaxed.forEach_testIlogbFloat4Int4(in, out);
+            verifyResultsIlogbFloat4Int4(in, out, true);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testIlogbFloat4Int4: " + e.toString());
+        }
+    }
+
+    private void verifyResultsIlogbFloat4Int4(Allocation in, Allocation out, boolean relaxed) {
+        float[] arrayIn = new float[INPUTSIZE * 4];
+        in.copyTo(arrayIn);
+        int[] arrayOut = new int[INPUTSIZE * 4];
+        out.copyTo(arrayOut);
+        for (int i = 0; i < INPUTSIZE; i++) {
+            for (int j = 0; j < 4 ; j++) {
+                // Extract the inputs.
+                ArgumentsFloatInt args = new ArgumentsFloatInt();
+                args.in = arrayIn[i * 4 + j];
+                // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
+                CoreMathVerifier.computeIlogb(args);
+                // Figure out what the outputs should have been.
+                boolean valid = true;
+                if (args.out != arrayOut[i * 4 + j]) {
+                    valid = false;
+                }
+                if (!valid) {
+                    StringBuilder message = new StringBuilder();
+                    message.append("Input in: ");
+                    message.append(String.format("%14.8g %8x %15a",
+                            args.in, Float.floatToRawIntBits(args.in), args.in));
+                    message.append("\n");
+                    message.append("Expected output out: ");
+                    message.append(String.format("%d", args.out));
+                    message.append("\n");
+                    message.append("Actual   output out: ");
+                    message.append(String.format("%d", arrayOut[i * 4 + j]));
+                    if (args.out != arrayOut[i * 4 + j]) {
+                        message.append(" FAIL");
+                    }
+                    message.append("\n");
+                    assertTrue("Incorrect output for checkIlogbFloat4Int4" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                }
+            }
         }
     }
 

@@ -118,47 +118,53 @@ class RSBaseCompute extends RSBase {
         /* TODO copy1DRangeFrom does not work for double
         if (dataType == Element.DataType.FLOAT_64) {
             double[] inArray = new double[INPUTSIZE * width];
-            RSUtils.genRandomDoubles(seed, inArray, includeExtremes);
+            // TODO The ranges for float is too small.  We need to accept a wider range of values.
+            double min = -4.0 * Math.PI;
+            double max = 4.0 * Math.PI;
+            RSUtils.genRandomDoubles(seed, min, max, inArray, includeExtremes);
             alloc.copy1DRangeFrom(0, INPUTSIZE, inArray);
         } else
         */
         if (dataType == Element.DataType.FLOAT_32) {
             float[] inArray = new float[INPUTSIZE * width];
-            RSUtils.genRandomFloats(seed, inArray, includeExtremes);
+            // TODO The ranges for float is too small.  We need to accept a wider range of values.
+            float min = -4.0f * (float) Math.PI;
+            float max = 4.0f * (float) Math.PI;
+            RSUtils.genRandomFloats(seed, min, max, inArray, includeExtremes);
             alloc.copy1DRangeFrom(0, INPUTSIZE, inArray);
         /* TODO copy1DRangFrom does not work for long
         } else if (dataType == Element.DataType.SIGNED_64) {
             long[] inArray = new long[INPUTSIZE * width];
-            RSUtils.genRandomLongs(seed, inArray);
+            RSUtils.genRandomLongs(seed, inArray, true, 63);
             alloc.copy1DRangeFrom(0, INPUTSIZE, inArray);
         } else if (dataType == Element.DataType.UNSIGNED_64) {
             long[] inArray = new long[INPUTSIZE * width];
-            RSUtils.genRandomLongs(seed, inArray);
+            RSUtils.genRandomLongs(seed, inArray, false, 64);
             alloc.copy1DRangeFrom(0, INPUTSIZE, inArray);
         */
         } else if (dataType == Element.DataType.SIGNED_32) {
             int[] inArray = new int[INPUTSIZE * width];
-            RSUtils.genRandomInts(seed, inArray);
+            RSUtils.genRandomInts(seed, inArray, true, 31);
             alloc.copy1DRangeFrom(0, INPUTSIZE, inArray);
         } else if (dataType == Element.DataType.UNSIGNED_32) {
             int[] inArray = new int[INPUTSIZE * width];
-            RSUtils.genRandomInts(seed, inArray);
+            RSUtils.genRandomInts(seed, inArray, false, 32);
             alloc.copy1DRangeFrom(0, INPUTSIZE, inArray);
         } else if (dataType == Element.DataType.SIGNED_16) {
             short[] inArray = new short[INPUTSIZE * width];
-            RSUtils.genRandomShorts(seed, inArray);
+            RSUtils.genRandomShorts(seed, inArray, true, 15);
             alloc.copy1DRangeFrom(0, INPUTSIZE, inArray);
         } else if (dataType == Element.DataType.UNSIGNED_16) {
             short[] inArray = new short[INPUTSIZE * width];
-            RSUtils.genRandomShorts(seed, inArray);
+            RSUtils.genRandomShorts(seed, inArray, false, 16);
             alloc.copy1DRangeFrom(0, INPUTSIZE, inArray);
         } else if (dataType == Element.DataType.SIGNED_8) {
             byte[] inArray = new byte[INPUTSIZE * width];
-            RSUtils.genRandomBytes(seed, inArray);
+            RSUtils.genRandomBytes(seed, inArray, true, 7);
             alloc.copy1DRangeFrom(0, INPUTSIZE, inArray);
         } else if (dataType == Element.DataType.UNSIGNED_8) {
             byte[] inArray = new byte[INPUTSIZE * width];
-            RSUtils.genRandomBytes(seed, inArray);
+            RSUtils.genRandomBytes(seed, inArray, true, 8);
             alloc.copy1DRangeFrom(0, INPUTSIZE, inArray);
         } else {
             android.util.Log.e("RenderscriptCTS", "Don't know how to create allocation of type" +
@@ -167,7 +173,7 @@ class RSBaseCompute extends RSBase {
         return alloc;
     }
 
-    protected Allocation createRandomAllocation(RenderScript rs, Element.DataType dataType,
+    protected Allocation createRandomFloatAllocation(RenderScript rs, Element.DataType dataType,
             int size, long seed, double minValue, double maxValue) {
         Element element = getElement(rs, dataType, size);
         Allocation alloc = Allocation.createSized(rs, element, INPUTSIZE);
@@ -175,16 +181,52 @@ class RSBaseCompute extends RSBase {
         /* TODO copy1DRangeFrom does not work for double
         if (dataType == Element.DataType.FLOAT_64) {
             double[] inArray = new double[INPUTSIZE * width];
-            RSUtils.genRandomDoubles(seed, minValue, maxValue, inArray);
+            RSUtils.genRandomDoubles(seed, minValue, maxValue, inArray, false);
             alloc.copy1DRangeFrom(0, INPUTSIZE, inArray);
         } else */
         if (dataType == Element.DataType.FLOAT_32) {
             float[] inArray = new float[INPUTSIZE * width];
-            RSUtils.genRandomFloats(seed, (float) minValue, (float) maxValue, inArray);
+            RSUtils.genRandomFloats(seed, (float) minValue, (float) maxValue, inArray, false);
             alloc.copy1DRangeFrom(0, INPUTSIZE, inArray);
         } else {
-            android.util.Log.e("RenderscriptCTS", "Range is only supported fro floats, not for " +
-                    dataType.toString());
+            android.util.Log.e("RenderscriptCTS",
+                               "Don't know how to create a random float allocation for " +
+                                           dataType.toString());
+        }
+        return alloc;
+    }
+
+    protected Allocation createRandomIntegerAllocation(RenderScript rs, Element.DataType dataType,
+            int size, long seed, boolean signed, int numberOfBits) {
+        Element element = getElement(rs, dataType, size);
+        Allocation alloc = Allocation.createSized(rs, element, INPUTSIZE);
+        int width = (size == 3) ? 4 : size;
+        /* TODO copy1DRangFrom does not work for long
+        if (dataType == Element.DataType.SIGNED_64 ||
+                dataType == Element.DataType.UNSIGNED_64) {
+            long[] inArray = new long[INPUTSIZE * width];
+            RSUtils.genRandomLongs(seed, inArray, signed, numberOfBits);
+            alloc.copy1DRangeFrom(0, INPUTSIZE, inArray);
+        } else */
+        if (dataType == Element.DataType.SIGNED_32 ||
+                dataType == Element.DataType.UNSIGNED_32) {
+            int[] inArray = new int[INPUTSIZE * width];
+            RSUtils.genRandomInts(seed, inArray, signed, numberOfBits);
+            alloc.copy1DRangeFrom(0, INPUTSIZE, inArray);
+        } else if (dataType == Element.DataType.SIGNED_16 ||
+                dataType == Element.DataType.UNSIGNED_16) {
+            short[] inArray = new short[INPUTSIZE * width];
+            RSUtils.genRandomShorts(seed, inArray, signed, numberOfBits);
+            alloc.copy1DRangeFrom(0, INPUTSIZE, inArray);
+        } else if (dataType == Element.DataType.SIGNED_8 ||
+                dataType == Element.DataType.UNSIGNED_8) {
+            byte[] inArray = new byte[INPUTSIZE * width];
+            RSUtils.genRandomBytes(seed, inArray, signed, numberOfBits);
+            alloc.copy1DRangeFrom(0, INPUTSIZE, inArray);
+        } else {
+            android.util.Log.e("RenderscriptCTS",
+                               "Don't know how to create an integer allocation of type" +
+                                           dataType.toString());
         }
         return alloc;
     }

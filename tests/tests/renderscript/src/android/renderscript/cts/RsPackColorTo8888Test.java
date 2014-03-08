@@ -72,7 +72,7 @@ public class RsPackColorTo8888Test extends RSBaseCompute {
         float[] inArray = new float[INPUTSIZE * 4];
         byte[] outArray = new byte[INPUTSIZE * 4];
         byte[] refArray = new byte[INPUTSIZE * 4];
-        RSUtils.genRandomFloats(seed, 0.0f, 1.0f, inArray);
+        RSUtils.genRandomFloats(seed, 0.0f, 1.0f, inArray, false);
         mAllocationIn.copy1DRangeFrom(0, INPUTSIZE, inArray);
         try {
             forEach(testId, mAllocationIn, mAllocationOut);
@@ -99,7 +99,7 @@ public class RsPackColorTo8888Test extends RSBaseCompute {
         float[] inArray = new float[INPUTSIZE * 4];
         byte[] outArray = new byte[INPUTSIZE * 4];
         byte[] refArray = new byte[INPUTSIZE * 4];
-        RSUtils.genRandomFloats(seed, 0.0f, 1.0f, inArray);
+        RSUtils.genRandomFloats(seed, 0.0f, 1.0f, inArray, false);
         mAllocationIn.copy1DRangeFrom(0, INPUTSIZE, inArray);
         try {
             forEach(testId, mAllocationIn, mAllocationOut);

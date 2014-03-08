@@ -37,10 +37,7 @@ public class TestMin extends RSBaseCompute {
     public class ArgumentsFloatFloatFloat {
         public float in;
         public float in1;
-        public float out;
-
-        public int ulf;
-        public int ulfRelaxed;
+        public Floaty out;
     }
 
     private void checkMinFloatFloatFloat() {
@@ -78,31 +75,31 @@ public class TestMin extends RSBaseCompute {
                 args.in = arrayIn[i];
                 args.in1 = arrayIn1[i];
                 // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeMin(args);
-                int ulf = relaxed ? args.ulfRelaxed : args.ulf;
                 // Figure out what the outputs should have been.
                 boolean valid = true;
-                int neededUlf = 0;
-                neededUlf = (int) (Math.abs(args.out - arrayOut[i * 1 + j]) / Math.ulp(args.out) + 0.5);
-                if (neededUlf > ulf) {
+                if (!args.out.couldBe(arrayOut[i * 1 + j])) {
                     valid = false;
                 }
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
-                    message.append(String.format("Input in: %14.8g %8x %15a",
+                    message.append("Input in: ");
+                    message.append(String.format("%14.8g %8x %15a",
                             args.in, Float.floatToRawIntBits(args.in), args.in));
                     message.append("\n");
-                    message.append(String.format("Input in1: %14.8g %8x %15a",
+                    message.append("Input in1: ");
+                    message.append(String.format("%14.8g %8x %15a",
                             args.in1, Float.floatToRawIntBits(args.in1), args.in1));
                     message.append("\n");
-                    message.append(String.format("Expected output out: %14.8g %8x %15a",
-                            args.out, Float.floatToRawIntBits(args.out), args.out));
+                    message.append("Expected output out: ");
+                    message.append(args.out.toString());
                     message.append("\n");
-                    message.append(String.format("Actual   output out: %14.8g %8x %15a",
+                    message.append("Actual   output out: ");
+                    message.append(String.format("%14.8g %8x %15a",
                             arrayOut[i * 1 + j], Float.floatToRawIntBits(arrayOut[i * 1 + j]), arrayOut[i * 1 + j]));
-                    neededUlf = (int) (Math.abs(args.out - arrayOut[i * 1 + j]) / Math.ulp(args.out) + 0.5);
-                    if (neededUlf > ulf) {
-                        message.append(String.format(" FAILED, ulf needed %d, specified %d", neededUlf, ulf));
+                    if (!args.out.couldBe(arrayOut[i * 1 + j])) {
+                        message.append(" FAIL");
                     }
                     message.append("\n");
                     assertTrue("Incorrect output for checkMinFloatFloatFloat" +
@@ -147,31 +144,31 @@ public class TestMin extends RSBaseCompute {
                 args.in = arrayIn[i * 2 + j];
                 args.in1 = arrayIn1[i * 2 + j];
                 // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeMin(args);
-                int ulf = relaxed ? args.ulfRelaxed : args.ulf;
                 // Figure out what the outputs should have been.
                 boolean valid = true;
-                int neededUlf = 0;
-                neededUlf = (int) (Math.abs(args.out - arrayOut[i * 2 + j]) / Math.ulp(args.out) + 0.5);
-                if (neededUlf > ulf) {
+                if (!args.out.couldBe(arrayOut[i * 2 + j])) {
                     valid = false;
                 }
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
-                    message.append(String.format("Input in: %14.8g %8x %15a",
+                    message.append("Input in: ");
+                    message.append(String.format("%14.8g %8x %15a",
                             args.in, Float.floatToRawIntBits(args.in), args.in));
                     message.append("\n");
-                    message.append(String.format("Input in1: %14.8g %8x %15a",
+                    message.append("Input in1: ");
+                    message.append(String.format("%14.8g %8x %15a",
                             args.in1, Float.floatToRawIntBits(args.in1), args.in1));
                     message.append("\n");
-                    message.append(String.format("Expected output out: %14.8g %8x %15a",
-                            args.out, Float.floatToRawIntBits(args.out), args.out));
+                    message.append("Expected output out: ");
+                    message.append(args.out.toString());
                     message.append("\n");
-                    message.append(String.format("Actual   output out: %14.8g %8x %15a",
+                    message.append("Actual   output out: ");
+                    message.append(String.format("%14.8g %8x %15a",
                             arrayOut[i * 2 + j], Float.floatToRawIntBits(arrayOut[i * 2 + j]), arrayOut[i * 2 + j]));
-                    neededUlf = (int) (Math.abs(args.out - arrayOut[i * 2 + j]) / Math.ulp(args.out) + 0.5);
-                    if (neededUlf > ulf) {
-                        message.append(String.format(" FAILED, ulf needed %d, specified %d", neededUlf, ulf));
+                    if (!args.out.couldBe(arrayOut[i * 2 + j])) {
+                        message.append(" FAIL");
                     }
                     message.append("\n");
                     assertTrue("Incorrect output for checkMinFloat2Float2Float2" +
@@ -216,31 +213,31 @@ public class TestMin extends RSBaseCompute {
                 args.in = arrayIn[i * 4 + j];
                 args.in1 = arrayIn1[i * 4 + j];
                 // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeMin(args);
-                int ulf = relaxed ? args.ulfRelaxed : args.ulf;
                 // Figure out what the outputs should have been.
                 boolean valid = true;
-                int neededUlf = 0;
-                neededUlf = (int) (Math.abs(args.out - arrayOut[i * 4 + j]) / Math.ulp(args.out) + 0.5);
-                if (neededUlf > ulf) {
+                if (!args.out.couldBe(arrayOut[i * 4 + j])) {
                     valid = false;
                 }
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
-                    message.append(String.format("Input in: %14.8g %8x %15a",
+                    message.append("Input in: ");
+                    message.append(String.format("%14.8g %8x %15a",
                             args.in, Float.floatToRawIntBits(args.in), args.in));
                     message.append("\n");
-                    message.append(String.format("Input in1: %14.8g %8x %15a",
+                    message.append("Input in1: ");
+                    message.append(String.format("%14.8g %8x %15a",
                             args.in1, Float.floatToRawIntBits(args.in1), args.in1));
                     message.append("\n");
-                    message.append(String.format("Expected output out: %14.8g %8x %15a",
-                            args.out, Float.floatToRawIntBits(args.out), args.out));
+                    message.append("Expected output out: ");
+                    message.append(args.out.toString());
                     message.append("\n");
-                    message.append(String.format("Actual   output out: %14.8g %8x %15a",
+                    message.append("Actual   output out: ");
+                    message.append(String.format("%14.8g %8x %15a",
                             arrayOut[i * 4 + j], Float.floatToRawIntBits(arrayOut[i * 4 + j]), arrayOut[i * 4 + j]));
-                    neededUlf = (int) (Math.abs(args.out - arrayOut[i * 4 + j]) / Math.ulp(args.out) + 0.5);
-                    if (neededUlf > ulf) {
-                        message.append(String.format(" FAILED, ulf needed %d, specified %d", neededUlf, ulf));
+                    if (!args.out.couldBe(arrayOut[i * 4 + j])) {
+                        message.append(" FAIL");
                     }
                     message.append("\n");
                     assertTrue("Incorrect output for checkMinFloat3Float3Float3" +
@@ -285,31 +282,31 @@ public class TestMin extends RSBaseCompute {
                 args.in = arrayIn[i * 4 + j];
                 args.in1 = arrayIn1[i * 4 + j];
                 // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeMin(args);
-                int ulf = relaxed ? args.ulfRelaxed : args.ulf;
                 // Figure out what the outputs should have been.
                 boolean valid = true;
-                int neededUlf = 0;
-                neededUlf = (int) (Math.abs(args.out - arrayOut[i * 4 + j]) / Math.ulp(args.out) + 0.5);
-                if (neededUlf > ulf) {
+                if (!args.out.couldBe(arrayOut[i * 4 + j])) {
                     valid = false;
                 }
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
-                    message.append(String.format("Input in: %14.8g %8x %15a",
+                    message.append("Input in: ");
+                    message.append(String.format("%14.8g %8x %15a",
                             args.in, Float.floatToRawIntBits(args.in), args.in));
                     message.append("\n");
-                    message.append(String.format("Input in1: %14.8g %8x %15a",
+                    message.append("Input in1: ");
+                    message.append(String.format("%14.8g %8x %15a",
                             args.in1, Float.floatToRawIntBits(args.in1), args.in1));
                     message.append("\n");
-                    message.append(String.format("Expected output out: %14.8g %8x %15a",
-                            args.out, Float.floatToRawIntBits(args.out), args.out));
+                    message.append("Expected output out: ");
+                    message.append(args.out.toString());
                     message.append("\n");
-                    message.append(String.format("Actual   output out: %14.8g %8x %15a",
+                    message.append("Actual   output out: ");
+                    message.append(String.format("%14.8g %8x %15a",
                             arrayOut[i * 4 + j], Float.floatToRawIntBits(arrayOut[i * 4 + j]), arrayOut[i * 4 + j]));
-                    neededUlf = (int) (Math.abs(args.out - arrayOut[i * 4 + j]) / Math.ulp(args.out) + 0.5);
-                    if (neededUlf > ulf) {
-                        message.append(String.format(" FAILED, ulf needed %d, specified %d", neededUlf, ulf));
+                    if (!args.out.couldBe(arrayOut[i * 4 + j])) {
+                        message.append(" FAIL");
                     }
                     message.append("\n");
                     assertTrue("Incorrect output for checkMinFloat4Float4Float4" +
@@ -323,9 +320,6 @@ public class TestMin extends RSBaseCompute {
         public byte inV1;
         public byte inV2;
         public byte out;
-
-        public int ulf;
-        public int ulfRelaxed;
     }
 
     private void checkMinCharCharChar() {
@@ -363,27 +357,26 @@ public class TestMin extends RSBaseCompute {
                 args.inV1 = arrayInV1[i];
                 args.inV2 = arrayInV2[i];
                 // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeMin(args);
-                int ulf = relaxed ? args.ulfRelaxed : args.ulf;
                 // Figure out what the outputs should have been.
                 boolean valid = true;
-                int neededUlf = 0;
                 if (args.out != arrayOut[i * 1 + j]) {
                     valid = false;
                 }
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
-                    message.append(String.format("Input inV1: %d",
-                            args.inV1));
+                    message.append("Input inV1: ");
+                    message.append(String.format("%d", args.inV1));
                     message.append("\n");
-                    message.append(String.format("Input inV2: %d",
-                            args.inV2));
+                    message.append("Input inV2: ");
+                    message.append(String.format("%d", args.inV2));
                     message.append("\n");
-                    message.append(String.format("Expected output out: %d",
-                            args.out));
+                    message.append("Expected output out: ");
+                    message.append(String.format("%d", args.out));
                     message.append("\n");
-                    message.append(String.format("Actual   output out: %d",
-                            arrayOut[i * 1 + j]));
+                    message.append("Actual   output out: ");
+                    message.append(String.format("%d", arrayOut[i * 1 + j]));
                     if (args.out != arrayOut[i * 1 + j]) {
                         message.append(" FAIL");
                     }
@@ -399,9 +392,6 @@ public class TestMin extends RSBaseCompute {
         public byte inV1;
         public byte inV2;
         public byte out;
-
-        public int ulf;
-        public int ulfRelaxed;
     }
 
     private void checkMinUcharUcharUchar() {
@@ -439,27 +429,26 @@ public class TestMin extends RSBaseCompute {
                 args.inV1 = arrayInV1[i];
                 args.inV2 = arrayInV2[i];
                 // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeMin(args);
-                int ulf = relaxed ? args.ulfRelaxed : args.ulf;
                 // Figure out what the outputs should have been.
                 boolean valid = true;
-                int neededUlf = 0;
                 if (args.out != arrayOut[i * 1 + j]) {
                     valid = false;
                 }
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
-                    message.append(String.format("Input inV1: 0x%x",
-                            args.inV1));
+                    message.append("Input inV1: ");
+                    message.append(String.format("0x%x", args.inV1));
                     message.append("\n");
-                    message.append(String.format("Input inV2: 0x%x",
-                            args.inV2));
+                    message.append("Input inV2: ");
+                    message.append(String.format("0x%x", args.inV2));
                     message.append("\n");
-                    message.append(String.format("Expected output out: 0x%x",
-                            args.out));
+                    message.append("Expected output out: ");
+                    message.append(String.format("0x%x", args.out));
                     message.append("\n");
-                    message.append(String.format("Actual   output out: 0x%x",
-                            arrayOut[i * 1 + j]));
+                    message.append("Actual   output out: ");
+                    message.append(String.format("0x%x", arrayOut[i * 1 + j]));
                     if (args.out != arrayOut[i * 1 + j]) {
                         message.append(" FAIL");
                     }
@@ -475,9 +464,6 @@ public class TestMin extends RSBaseCompute {
         public short inV1;
         public short inV2;
         public short out;
-
-        public int ulf;
-        public int ulfRelaxed;
     }
 
     private void checkMinShortShortShort() {
@@ -515,27 +501,26 @@ public class TestMin extends RSBaseCompute {
                 args.inV1 = arrayInV1[i];
                 args.inV2 = arrayInV2[i];
                 // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeMin(args);
-                int ulf = relaxed ? args.ulfRelaxed : args.ulf;
                 // Figure out what the outputs should have been.
                 boolean valid = true;
-                int neededUlf = 0;
                 if (args.out != arrayOut[i * 1 + j]) {
                     valid = false;
                 }
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
-                    message.append(String.format("Input inV1: %d",
-                            args.inV1));
+                    message.append("Input inV1: ");
+                    message.append(String.format("%d", args.inV1));
                     message.append("\n");
-                    message.append(String.format("Input inV2: %d",
-                            args.inV2));
+                    message.append("Input inV2: ");
+                    message.append(String.format("%d", args.inV2));
                     message.append("\n");
-                    message.append(String.format("Expected output out: %d",
-                            args.out));
+                    message.append("Expected output out: ");
+                    message.append(String.format("%d", args.out));
                     message.append("\n");
-                    message.append(String.format("Actual   output out: %d",
-                            arrayOut[i * 1 + j]));
+                    message.append("Actual   output out: ");
+                    message.append(String.format("%d", arrayOut[i * 1 + j]));
                     if (args.out != arrayOut[i * 1 + j]) {
                         message.append(" FAIL");
                     }
@@ -551,9 +536,6 @@ public class TestMin extends RSBaseCompute {
         public short inV1;
         public short inV2;
         public short out;
-
-        public int ulf;
-        public int ulfRelaxed;
     }
 
     private void checkMinUshortUshortUshort() {
@@ -591,27 +573,26 @@ public class TestMin extends RSBaseCompute {
                 args.inV1 = arrayInV1[i];
                 args.inV2 = arrayInV2[i];
                 // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeMin(args);
-                int ulf = relaxed ? args.ulfRelaxed : args.ulf;
                 // Figure out what the outputs should have been.
                 boolean valid = true;
-                int neededUlf = 0;
                 if (args.out != arrayOut[i * 1 + j]) {
                     valid = false;
                 }
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
-                    message.append(String.format("Input inV1: 0x%x",
-                            args.inV1));
+                    message.append("Input inV1: ");
+                    message.append(String.format("0x%x", args.inV1));
                     message.append("\n");
-                    message.append(String.format("Input inV2: 0x%x",
-                            args.inV2));
+                    message.append("Input inV2: ");
+                    message.append(String.format("0x%x", args.inV2));
                     message.append("\n");
-                    message.append(String.format("Expected output out: 0x%x",
-                            args.out));
+                    message.append("Expected output out: ");
+                    message.append(String.format("0x%x", args.out));
                     message.append("\n");
-                    message.append(String.format("Actual   output out: 0x%x",
-                            arrayOut[i * 1 + j]));
+                    message.append("Actual   output out: ");
+                    message.append(String.format("0x%x", arrayOut[i * 1 + j]));
                     if (args.out != arrayOut[i * 1 + j]) {
                         message.append(" FAIL");
                     }
@@ -627,9 +608,6 @@ public class TestMin extends RSBaseCompute {
         public int inV1;
         public int inV2;
         public int out;
-
-        public int ulf;
-        public int ulfRelaxed;
     }
 
     private void checkMinIntIntInt() {
@@ -667,27 +645,26 @@ public class TestMin extends RSBaseCompute {
                 args.inV1 = arrayInV1[i];
                 args.inV2 = arrayInV2[i];
                 // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeMin(args);
-                int ulf = relaxed ? args.ulfRelaxed : args.ulf;
                 // Figure out what the outputs should have been.
                 boolean valid = true;
-                int neededUlf = 0;
                 if (args.out != arrayOut[i * 1 + j]) {
                     valid = false;
                 }
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
-                    message.append(String.format("Input inV1: %d",
-                            args.inV1));
+                    message.append("Input inV1: ");
+                    message.append(String.format("%d", args.inV1));
                     message.append("\n");
-                    message.append(String.format("Input inV2: %d",
-                            args.inV2));
+                    message.append("Input inV2: ");
+                    message.append(String.format("%d", args.inV2));
                     message.append("\n");
-                    message.append(String.format("Expected output out: %d",
-                            args.out));
+                    message.append("Expected output out: ");
+                    message.append(String.format("%d", args.out));
                     message.append("\n");
-                    message.append(String.format("Actual   output out: %d",
-                            arrayOut[i * 1 + j]));
+                    message.append("Actual   output out: ");
+                    message.append(String.format("%d", arrayOut[i * 1 + j]));
                     if (args.out != arrayOut[i * 1 + j]) {
                         message.append(" FAIL");
                     }
@@ -703,9 +680,6 @@ public class TestMin extends RSBaseCompute {
         public int inV1;
         public int inV2;
         public int out;
-
-        public int ulf;
-        public int ulfRelaxed;
     }
 
     private void checkMinUintUintUint() {
@@ -743,27 +717,26 @@ public class TestMin extends RSBaseCompute {
                 args.inV1 = arrayInV1[i];
                 args.inV2 = arrayInV2[i];
                 // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeMin(args);
-                int ulf = relaxed ? args.ulfRelaxed : args.ulf;
                 // Figure out what the outputs should have been.
                 boolean valid = true;
-                int neededUlf = 0;
                 if (args.out != arrayOut[i * 1 + j]) {
                     valid = false;
                 }
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
-                    message.append(String.format("Input inV1: 0x%x",
-                            args.inV1));
+                    message.append("Input inV1: ");
+                    message.append(String.format("0x%x", args.inV1));
                     message.append("\n");
-                    message.append(String.format("Input inV2: 0x%x",
-                            args.inV2));
+                    message.append("Input inV2: ");
+                    message.append(String.format("0x%x", args.inV2));
                     message.append("\n");
-                    message.append(String.format("Expected output out: 0x%x",
-                            args.out));
+                    message.append("Expected output out: ");
+                    message.append(String.format("0x%x", args.out));
                     message.append("\n");
-                    message.append(String.format("Actual   output out: 0x%x",
-                            arrayOut[i * 1 + j]));
+                    message.append("Actual   output out: ");
+                    message.append(String.format("0x%x", arrayOut[i * 1 + j]));
                     if (args.out != arrayOut[i * 1 + j]) {
                         message.append(" FAIL");
                     }
@@ -810,27 +783,26 @@ public class TestMin extends RSBaseCompute {
                 args.inV1 = arrayInV1[i * 2 + j];
                 args.inV2 = arrayInV2[i * 2 + j];
                 // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeMin(args);
-                int ulf = relaxed ? args.ulfRelaxed : args.ulf;
                 // Figure out what the outputs should have been.
                 boolean valid = true;
-                int neededUlf = 0;
                 if (args.out != arrayOut[i * 2 + j]) {
                     valid = false;
                 }
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
-                    message.append(String.format("Input inV1: %d",
-                            args.inV1));
+                    message.append("Input inV1: ");
+                    message.append(String.format("%d", args.inV1));
                     message.append("\n");
-                    message.append(String.format("Input inV2: %d",
-                            args.inV2));
+                    message.append("Input inV2: ");
+                    message.append(String.format("%d", args.inV2));
                     message.append("\n");
-                    message.append(String.format("Expected output out: %d",
-                            args.out));
+                    message.append("Expected output out: ");
+                    message.append(String.format("%d", args.out));
                     message.append("\n");
-                    message.append(String.format("Actual   output out: %d",
-                            arrayOut[i * 2 + j]));
+                    message.append("Actual   output out: ");
+                    message.append(String.format("%d", arrayOut[i * 2 + j]));
                     if (args.out != arrayOut[i * 2 + j]) {
                         message.append(" FAIL");
                     }
@@ -877,27 +849,26 @@ public class TestMin extends RSBaseCompute {
                 args.inV1 = arrayInV1[i * 2 + j];
                 args.inV2 = arrayInV2[i * 2 + j];
                 // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeMin(args);
-                int ulf = relaxed ? args.ulfRelaxed : args.ulf;
                 // Figure out what the outputs should have been.
                 boolean valid = true;
-                int neededUlf = 0;
                 if (args.out != arrayOut[i * 2 + j]) {
                     valid = false;
                 }
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
-                    message.append(String.format("Input inV1: 0x%x",
-                            args.inV1));
+                    message.append("Input inV1: ");
+                    message.append(String.format("0x%x", args.inV1));
                     message.append("\n");
-                    message.append(String.format("Input inV2: 0x%x",
-                            args.inV2));
+                    message.append("Input inV2: ");
+                    message.append(String.format("0x%x", args.inV2));
                     message.append("\n");
-                    message.append(String.format("Expected output out: 0x%x",
-                            args.out));
+                    message.append("Expected output out: ");
+                    message.append(String.format("0x%x", args.out));
                     message.append("\n");
-                    message.append(String.format("Actual   output out: 0x%x",
-                            arrayOut[i * 2 + j]));
+                    message.append("Actual   output out: ");
+                    message.append(String.format("0x%x", arrayOut[i * 2 + j]));
                     if (args.out != arrayOut[i * 2 + j]) {
                         message.append(" FAIL");
                     }
@@ -944,27 +915,26 @@ public class TestMin extends RSBaseCompute {
                 args.inV1 = arrayInV1[i * 2 + j];
                 args.inV2 = arrayInV2[i * 2 + j];
                 // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeMin(args);
-                int ulf = relaxed ? args.ulfRelaxed : args.ulf;
                 // Figure out what the outputs should have been.
                 boolean valid = true;
-                int neededUlf = 0;
                 if (args.out != arrayOut[i * 2 + j]) {
                     valid = false;
                 }
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
-                    message.append(String.format("Input inV1: %d",
-                            args.inV1));
+                    message.append("Input inV1: ");
+                    message.append(String.format("%d", args.inV1));
                     message.append("\n");
-                    message.append(String.format("Input inV2: %d",
-                            args.inV2));
+                    message.append("Input inV2: ");
+                    message.append(String.format("%d", args.inV2));
                     message.append("\n");
-                    message.append(String.format("Expected output out: %d",
-                            args.out));
+                    message.append("Expected output out: ");
+                    message.append(String.format("%d", args.out));
                     message.append("\n");
-                    message.append(String.format("Actual   output out: %d",
-                            arrayOut[i * 2 + j]));
+                    message.append("Actual   output out: ");
+                    message.append(String.format("%d", arrayOut[i * 2 + j]));
                     if (args.out != arrayOut[i * 2 + j]) {
                         message.append(" FAIL");
                     }
@@ -1011,27 +981,26 @@ public class TestMin extends RSBaseCompute {
                 args.inV1 = arrayInV1[i * 2 + j];
                 args.inV2 = arrayInV2[i * 2 + j];
                 // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeMin(args);
-                int ulf = relaxed ? args.ulfRelaxed : args.ulf;
                 // Figure out what the outputs should have been.
                 boolean valid = true;
-                int neededUlf = 0;
                 if (args.out != arrayOut[i * 2 + j]) {
                     valid = false;
                 }
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
-                    message.append(String.format("Input inV1: 0x%x",
-                            args.inV1));
+                    message.append("Input inV1: ");
+                    message.append(String.format("0x%x", args.inV1));
                     message.append("\n");
-                    message.append(String.format("Input inV2: 0x%x",
-                            args.inV2));
+                    message.append("Input inV2: ");
+                    message.append(String.format("0x%x", args.inV2));
                     message.append("\n");
-                    message.append(String.format("Expected output out: 0x%x",
-                            args.out));
+                    message.append("Expected output out: ");
+                    message.append(String.format("0x%x", args.out));
                     message.append("\n");
-                    message.append(String.format("Actual   output out: 0x%x",
-                            arrayOut[i * 2 + j]));
+                    message.append("Actual   output out: ");
+                    message.append(String.format("0x%x", arrayOut[i * 2 + j]));
                     if (args.out != arrayOut[i * 2 + j]) {
                         message.append(" FAIL");
                     }
@@ -1078,27 +1047,26 @@ public class TestMin extends RSBaseCompute {
                 args.inV1 = arrayInV1[i * 2 + j];
                 args.inV2 = arrayInV2[i * 2 + j];
                 // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeMin(args);
-                int ulf = relaxed ? args.ulfRelaxed : args.ulf;
                 // Figure out what the outputs should have been.
                 boolean valid = true;
-                int neededUlf = 0;
                 if (args.out != arrayOut[i * 2 + j]) {
                     valid = false;
                 }
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
-                    message.append(String.format("Input inV1: %d",
-                            args.inV1));
+                    message.append("Input inV1: ");
+                    message.append(String.format("%d", args.inV1));
                     message.append("\n");
-                    message.append(String.format("Input inV2: %d",
-                            args.inV2));
+                    message.append("Input inV2: ");
+                    message.append(String.format("%d", args.inV2));
                     message.append("\n");
-                    message.append(String.format("Expected output out: %d",
-                            args.out));
+                    message.append("Expected output out: ");
+                    message.append(String.format("%d", args.out));
                     message.append("\n");
-                    message.append(String.format("Actual   output out: %d",
-                            arrayOut[i * 2 + j]));
+                    message.append("Actual   output out: ");
+                    message.append(String.format("%d", arrayOut[i * 2 + j]));
                     if (args.out != arrayOut[i * 2 + j]) {
                         message.append(" FAIL");
                     }
@@ -1145,27 +1113,26 @@ public class TestMin extends RSBaseCompute {
                 args.inV1 = arrayInV1[i * 2 + j];
                 args.inV2 = arrayInV2[i * 2 + j];
                 // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeMin(args);
-                int ulf = relaxed ? args.ulfRelaxed : args.ulf;
                 // Figure out what the outputs should have been.
                 boolean valid = true;
-                int neededUlf = 0;
                 if (args.out != arrayOut[i * 2 + j]) {
                     valid = false;
                 }
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
-                    message.append(String.format("Input inV1: 0x%x",
-                            args.inV1));
+                    message.append("Input inV1: ");
+                    message.append(String.format("0x%x", args.inV1));
                     message.append("\n");
-                    message.append(String.format("Input inV2: 0x%x",
-                            args.inV2));
+                    message.append("Input inV2: ");
+                    message.append(String.format("0x%x", args.inV2));
                     message.append("\n");
-                    message.append(String.format("Expected output out: 0x%x",
-                            args.out));
+                    message.append("Expected output out: ");
+                    message.append(String.format("0x%x", args.out));
                     message.append("\n");
-                    message.append(String.format("Actual   output out: 0x%x",
-                            arrayOut[i * 2 + j]));
+                    message.append("Actual   output out: ");
+                    message.append(String.format("0x%x", arrayOut[i * 2 + j]));
                     if (args.out != arrayOut[i * 2 + j]) {
                         message.append(" FAIL");
                     }
@@ -1212,27 +1179,26 @@ public class TestMin extends RSBaseCompute {
                 args.inV1 = arrayInV1[i * 4 + j];
                 args.inV2 = arrayInV2[i * 4 + j];
                 // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeMin(args);
-                int ulf = relaxed ? args.ulfRelaxed : args.ulf;
                 // Figure out what the outputs should have been.
                 boolean valid = true;
-                int neededUlf = 0;
                 if (args.out != arrayOut[i * 4 + j]) {
                     valid = false;
                 }
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
-                    message.append(String.format("Input inV1: %d",
-                            args.inV1));
+                    message.append("Input inV1: ");
+                    message.append(String.format("%d", args.inV1));
                     message.append("\n");
-                    message.append(String.format("Input inV2: %d",
-                            args.inV2));
+                    message.append("Input inV2: ");
+                    message.append(String.format("%d", args.inV2));
                     message.append("\n");
-                    message.append(String.format("Expected output out: %d",
-                            args.out));
+                    message.append("Expected output out: ");
+                    message.append(String.format("%d", args.out));
                     message.append("\n");
-                    message.append(String.format("Actual   output out: %d",
-                            arrayOut[i * 4 + j]));
+                    message.append("Actual   output out: ");
+                    message.append(String.format("%d", arrayOut[i * 4 + j]));
                     if (args.out != arrayOut[i * 4 + j]) {
                         message.append(" FAIL");
                     }
@@ -1279,27 +1245,26 @@ public class TestMin extends RSBaseCompute {
                 args.inV1 = arrayInV1[i * 4 + j];
                 args.inV2 = arrayInV2[i * 4 + j];
                 // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeMin(args);
-                int ulf = relaxed ? args.ulfRelaxed : args.ulf;
                 // Figure out what the outputs should have been.
                 boolean valid = true;
-                int neededUlf = 0;
                 if (args.out != arrayOut[i * 4 + j]) {
                     valid = false;
                 }
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
-                    message.append(String.format("Input inV1: 0x%x",
-                            args.inV1));
+                    message.append("Input inV1: ");
+                    message.append(String.format("0x%x", args.inV1));
                     message.append("\n");
-                    message.append(String.format("Input inV2: 0x%x",
-                            args.inV2));
+                    message.append("Input inV2: ");
+                    message.append(String.format("0x%x", args.inV2));
                     message.append("\n");
-                    message.append(String.format("Expected output out: 0x%x",
-                            args.out));
+                    message.append("Expected output out: ");
+                    message.append(String.format("0x%x", args.out));
                     message.append("\n");
-                    message.append(String.format("Actual   output out: 0x%x",
-                            arrayOut[i * 4 + j]));
+                    message.append("Actual   output out: ");
+                    message.append(String.format("0x%x", arrayOut[i * 4 + j]));
                     if (args.out != arrayOut[i * 4 + j]) {
                         message.append(" FAIL");
                     }
@@ -1346,27 +1311,26 @@ public class TestMin extends RSBaseCompute {
                 args.inV1 = arrayInV1[i * 4 + j];
                 args.inV2 = arrayInV2[i * 4 + j];
                 // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeMin(args);
-                int ulf = relaxed ? args.ulfRelaxed : args.ulf;
                 // Figure out what the outputs should have been.
                 boolean valid = true;
-                int neededUlf = 0;
                 if (args.out != arrayOut[i * 4 + j]) {
                     valid = false;
                 }
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
-                    message.append(String.format("Input inV1: %d",
-                            args.inV1));
+                    message.append("Input inV1: ");
+                    message.append(String.format("%d", args.inV1));
                     message.append("\n");
-                    message.append(String.format("Input inV2: %d",
-                            args.inV2));
+                    message.append("Input inV2: ");
+                    message.append(String.format("%d", args.inV2));
                     message.append("\n");
-                    message.append(String.format("Expected output out: %d",
-                            args.out));
+                    message.append("Expected output out: ");
+                    message.append(String.format("%d", args.out));
                     message.append("\n");
-                    message.append(String.format("Actual   output out: %d",
-                            arrayOut[i * 4 + j]));
+                    message.append("Actual   output out: ");
+                    message.append(String.format("%d", arrayOut[i * 4 + j]));
                     if (args.out != arrayOut[i * 4 + j]) {
                         message.append(" FAIL");
                     }
@@ -1413,27 +1377,26 @@ public class TestMin extends RSBaseCompute {
                 args.inV1 = arrayInV1[i * 4 + j];
                 args.inV2 = arrayInV2[i * 4 + j];
                 // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeMin(args);
-                int ulf = relaxed ? args.ulfRelaxed : args.ulf;
                 // Figure out what the outputs should have been.
                 boolean valid = true;
-                int neededUlf = 0;
                 if (args.out != arrayOut[i * 4 + j]) {
                     valid = false;
                 }
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
-                    message.append(String.format("Input inV1: 0x%x",
-                            args.inV1));
+                    message.append("Input inV1: ");
+                    message.append(String.format("0x%x", args.inV1));
                     message.append("\n");
-                    message.append(String.format("Input inV2: 0x%x",
-                            args.inV2));
+                    message.append("Input inV2: ");
+                    message.append(String.format("0x%x", args.inV2));
                     message.append("\n");
-                    message.append(String.format("Expected output out: 0x%x",
-                            args.out));
+                    message.append("Expected output out: ");
+                    message.append(String.format("0x%x", args.out));
                     message.append("\n");
-                    message.append(String.format("Actual   output out: 0x%x",
-                            arrayOut[i * 4 + j]));
+                    message.append("Actual   output out: ");
+                    message.append(String.format("0x%x", arrayOut[i * 4 + j]));
                     if (args.out != arrayOut[i * 4 + j]) {
                         message.append(" FAIL");
                     }
@@ -1480,27 +1443,26 @@ public class TestMin extends RSBaseCompute {
                 args.inV1 = arrayInV1[i * 4 + j];
                 args.inV2 = arrayInV2[i * 4 + j];
                 // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeMin(args);
-                int ulf = relaxed ? args.ulfRelaxed : args.ulf;
                 // Figure out what the outputs should have been.
                 boolean valid = true;
-                int neededUlf = 0;
                 if (args.out != arrayOut[i * 4 + j]) {
                     valid = false;
                 }
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
-                    message.append(String.format("Input inV1: %d",
-                            args.inV1));
+                    message.append("Input inV1: ");
+                    message.append(String.format("%d", args.inV1));
                     message.append("\n");
-                    message.append(String.format("Input inV2: %d",
-                            args.inV2));
+                    message.append("Input inV2: ");
+                    message.append(String.format("%d", args.inV2));
                     message.append("\n");
-                    message.append(String.format("Expected output out: %d",
-                            args.out));
+                    message.append("Expected output out: ");
+                    message.append(String.format("%d", args.out));
                     message.append("\n");
-                    message.append(String.format("Actual   output out: %d",
-                            arrayOut[i * 4 + j]));
+                    message.append("Actual   output out: ");
+                    message.append(String.format("%d", arrayOut[i * 4 + j]));
                     if (args.out != arrayOut[i * 4 + j]) {
                         message.append(" FAIL");
                     }
@@ -1547,27 +1509,26 @@ public class TestMin extends RSBaseCompute {
                 args.inV1 = arrayInV1[i * 4 + j];
                 args.inV2 = arrayInV2[i * 4 + j];
                 // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeMin(args);
-                int ulf = relaxed ? args.ulfRelaxed : args.ulf;
                 // Figure out what the outputs should have been.
                 boolean valid = true;
-                int neededUlf = 0;
                 if (args.out != arrayOut[i * 4 + j]) {
                     valid = false;
                 }
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
-                    message.append(String.format("Input inV1: 0x%x",
-                            args.inV1));
+                    message.append("Input inV1: ");
+                    message.append(String.format("0x%x", args.inV1));
                     message.append("\n");
-                    message.append(String.format("Input inV2: 0x%x",
-                            args.inV2));
+                    message.append("Input inV2: ");
+                    message.append(String.format("0x%x", args.inV2));
                     message.append("\n");
-                    message.append(String.format("Expected output out: 0x%x",
-                            args.out));
+                    message.append("Expected output out: ");
+                    message.append(String.format("0x%x", args.out));
                     message.append("\n");
-                    message.append(String.format("Actual   output out: 0x%x",
-                            arrayOut[i * 4 + j]));
+                    message.append("Actual   output out: ");
+                    message.append(String.format("0x%x", arrayOut[i * 4 + j]));
                     if (args.out != arrayOut[i * 4 + j]) {
                         message.append(" FAIL");
                     }
@@ -1614,27 +1575,26 @@ public class TestMin extends RSBaseCompute {
                 args.inV1 = arrayInV1[i * 4 + j];
                 args.inV2 = arrayInV2[i * 4 + j];
                 // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeMin(args);
-                int ulf = relaxed ? args.ulfRelaxed : args.ulf;
                 // Figure out what the outputs should have been.
                 boolean valid = true;
-                int neededUlf = 0;
                 if (args.out != arrayOut[i * 4 + j]) {
                     valid = false;
                 }
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
-                    message.append(String.format("Input inV1: %d",
-                            args.inV1));
+                    message.append("Input inV1: ");
+                    message.append(String.format("%d", args.inV1));
                     message.append("\n");
-                    message.append(String.format("Input inV2: %d",
-                            args.inV2));
+                    message.append("Input inV2: ");
+                    message.append(String.format("%d", args.inV2));
                     message.append("\n");
-                    message.append(String.format("Expected output out: %d",
-                            args.out));
+                    message.append("Expected output out: ");
+                    message.append(String.format("%d", args.out));
                     message.append("\n");
-                    message.append(String.format("Actual   output out: %d",
-                            arrayOut[i * 4 + j]));
+                    message.append("Actual   output out: ");
+                    message.append(String.format("%d", arrayOut[i * 4 + j]));
                     if (args.out != arrayOut[i * 4 + j]) {
                         message.append(" FAIL");
                     }
@@ -1681,27 +1641,26 @@ public class TestMin extends RSBaseCompute {
                 args.inV1 = arrayInV1[i * 4 + j];
                 args.inV2 = arrayInV2[i * 4 + j];
                 // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeMin(args);
-                int ulf = relaxed ? args.ulfRelaxed : args.ulf;
                 // Figure out what the outputs should have been.
                 boolean valid = true;
-                int neededUlf = 0;
                 if (args.out != arrayOut[i * 4 + j]) {
                     valid = false;
                 }
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
-                    message.append(String.format("Input inV1: 0x%x",
-                            args.inV1));
+                    message.append("Input inV1: ");
+                    message.append(String.format("0x%x", args.inV1));
                     message.append("\n");
-                    message.append(String.format("Input inV2: 0x%x",
-                            args.inV2));
+                    message.append("Input inV2: ");
+                    message.append(String.format("0x%x", args.inV2));
                     message.append("\n");
-                    message.append(String.format("Expected output out: 0x%x",
-                            args.out));
+                    message.append("Expected output out: ");
+                    message.append(String.format("0x%x", args.out));
                     message.append("\n");
-                    message.append(String.format("Actual   output out: 0x%x",
-                            arrayOut[i * 4 + j]));
+                    message.append("Actual   output out: ");
+                    message.append(String.format("0x%x", arrayOut[i * 4 + j]));
                     if (args.out != arrayOut[i * 4 + j]) {
                         message.append(" FAIL");
                     }
@@ -1748,27 +1707,26 @@ public class TestMin extends RSBaseCompute {
                 args.inV1 = arrayInV1[i * 4 + j];
                 args.inV2 = arrayInV2[i * 4 + j];
                 // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeMin(args);
-                int ulf = relaxed ? args.ulfRelaxed : args.ulf;
                 // Figure out what the outputs should have been.
                 boolean valid = true;
-                int neededUlf = 0;
                 if (args.out != arrayOut[i * 4 + j]) {
                     valid = false;
                 }
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
-                    message.append(String.format("Input inV1: %d",
-                            args.inV1));
+                    message.append("Input inV1: ");
+                    message.append(String.format("%d", args.inV1));
                     message.append("\n");
-                    message.append(String.format("Input inV2: %d",
-                            args.inV2));
+                    message.append("Input inV2: ");
+                    message.append(String.format("%d", args.inV2));
                     message.append("\n");
-                    message.append(String.format("Expected output out: %d",
-                            args.out));
+                    message.append("Expected output out: ");
+                    message.append(String.format("%d", args.out));
                     message.append("\n");
-                    message.append(String.format("Actual   output out: %d",
-                            arrayOut[i * 4 + j]));
+                    message.append("Actual   output out: ");
+                    message.append(String.format("%d", arrayOut[i * 4 + j]));
                     if (args.out != arrayOut[i * 4 + j]) {
                         message.append(" FAIL");
                     }
@@ -1815,27 +1773,26 @@ public class TestMin extends RSBaseCompute {
                 args.inV1 = arrayInV1[i * 4 + j];
                 args.inV2 = arrayInV2[i * 4 + j];
                 // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeMin(args);
-                int ulf = relaxed ? args.ulfRelaxed : args.ulf;
                 // Figure out what the outputs should have been.
                 boolean valid = true;
-                int neededUlf = 0;
                 if (args.out != arrayOut[i * 4 + j]) {
                     valid = false;
                 }
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
-                    message.append(String.format("Input inV1: 0x%x",
-                            args.inV1));
+                    message.append("Input inV1: ");
+                    message.append(String.format("0x%x", args.inV1));
                     message.append("\n");
-                    message.append(String.format("Input inV2: 0x%x",
-                            args.inV2));
+                    message.append("Input inV2: ");
+                    message.append(String.format("0x%x", args.inV2));
                     message.append("\n");
-                    message.append(String.format("Expected output out: 0x%x",
-                            args.out));
+                    message.append("Expected output out: ");
+                    message.append(String.format("0x%x", args.out));
                     message.append("\n");
-                    message.append(String.format("Actual   output out: 0x%x",
-                            arrayOut[i * 4 + j]));
+                    message.append("Actual   output out: ");
+                    message.append(String.format("0x%x", arrayOut[i * 4 + j]));
                     if (args.out != arrayOut[i * 4 + j]) {
                         message.append(" FAIL");
                     }
@@ -1882,27 +1839,26 @@ public class TestMin extends RSBaseCompute {
                 args.inV1 = arrayInV1[i * 4 + j];
                 args.inV2 = arrayInV2[i * 4 + j];
                 // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeMin(args);
-                int ulf = relaxed ? args.ulfRelaxed : args.ulf;
                 // Figure out what the outputs should have been.
                 boolean valid = true;
-                int neededUlf = 0;
                 if (args.out != arrayOut[i * 4 + j]) {
                     valid = false;
                 }
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
-                    message.append(String.format("Input inV1: %d",
-                            args.inV1));
+                    message.append("Input inV1: ");
+                    message.append(String.format("%d", args.inV1));
                     message.append("\n");
-                    message.append(String.format("Input inV2: %d",
-                            args.inV2));
+                    message.append("Input inV2: ");
+                    message.append(String.format("%d", args.inV2));
                     message.append("\n");
-                    message.append(String.format("Expected output out: %d",
-                            args.out));
+                    message.append("Expected output out: ");
+                    message.append(String.format("%d", args.out));
                     message.append("\n");
-                    message.append(String.format("Actual   output out: %d",
-                            arrayOut[i * 4 + j]));
+                    message.append("Actual   output out: ");
+                    message.append(String.format("%d", arrayOut[i * 4 + j]));
                     if (args.out != arrayOut[i * 4 + j]) {
                         message.append(" FAIL");
                     }
@@ -1949,27 +1905,26 @@ public class TestMin extends RSBaseCompute {
                 args.inV1 = arrayInV1[i * 4 + j];
                 args.inV2 = arrayInV2[i * 4 + j];
                 // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeMin(args);
-                int ulf = relaxed ? args.ulfRelaxed : args.ulf;
                 // Figure out what the outputs should have been.
                 boolean valid = true;
-                int neededUlf = 0;
                 if (args.out != arrayOut[i * 4 + j]) {
                     valid = false;
                 }
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
-                    message.append(String.format("Input inV1: 0x%x",
-                            args.inV1));
+                    message.append("Input inV1: ");
+                    message.append(String.format("0x%x", args.inV1));
                     message.append("\n");
-                    message.append(String.format("Input inV2: 0x%x",
-                            args.inV2));
+                    message.append("Input inV2: ");
+                    message.append(String.format("0x%x", args.inV2));
                     message.append("\n");
-                    message.append(String.format("Expected output out: 0x%x",
-                            args.out));
+                    message.append("Expected output out: ");
+                    message.append(String.format("0x%x", args.out));
                     message.append("\n");
-                    message.append(String.format("Actual   output out: 0x%x",
-                            arrayOut[i * 4 + j]));
+                    message.append("Actual   output out: ");
+                    message.append(String.format("0x%x", arrayOut[i * 4 + j]));
                     if (args.out != arrayOut[i * 4 + j]) {
                         message.append(" FAIL");
                     }
