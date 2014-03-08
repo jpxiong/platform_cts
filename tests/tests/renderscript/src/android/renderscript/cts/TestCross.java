@@ -34,6 +34,12 @@ public class TestCross extends RSBaseCompute {
         scriptRelaxed = new ScriptC_TestCrossRelaxed(mRS);
     }
 
+    public class ArgumentsFloatNFloatNFloatN {
+        public float[] inLhs;
+        public float[] inRhs;
+        public Floaty[] out;
+    }
+
     private void checkCrossFloat3Float3Float3() {
         Allocation inLhs = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0xdec3726a2995edb5l, false);
         Allocation inRhs = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0xdec3726a2996190bl, false);
@@ -41,6 +47,7 @@ public class TestCross extends RSBaseCompute {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 3), INPUTSIZE);
             script.set_gAllocInRhs(inRhs);
             script.forEach_testCrossFloat3Float3Float3(inLhs, out);
+            verifyResultsCrossFloat3Float3Float3(inLhs, inRhs, out, false);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testCrossFloat3Float3Float3: " + e.toString());
         }
@@ -48,8 +55,71 @@ public class TestCross extends RSBaseCompute {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 3), INPUTSIZE);
             scriptRelaxed.set_gAllocInRhs(inRhs);
             scriptRelaxed.forEach_testCrossFloat3Float3Float3(inLhs, out);
+            verifyResultsCrossFloat3Float3Float3(inLhs, inRhs, out, true);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testCrossFloat3Float3Float3: " + e.toString());
+        }
+    }
+
+    private void verifyResultsCrossFloat3Float3Float3(Allocation inLhs, Allocation inRhs, Allocation out, boolean relaxed) {
+        float[] arrayInLhs = new float[INPUTSIZE * 4];
+        inLhs.copyTo(arrayInLhs);
+        float[] arrayInRhs = new float[INPUTSIZE * 4];
+        inRhs.copyTo(arrayInRhs);
+        float[] arrayOut = new float[INPUTSIZE * 4];
+        out.copyTo(arrayOut);
+        for (int i = 0; i < INPUTSIZE; i++) {
+            ArgumentsFloatNFloatNFloatN args = new ArgumentsFloatNFloatNFloatN();
+            // Create the appropriate sized arrays in args
+            args.inLhs = new float[3];
+            args.inRhs = new float[3];
+            args.out = new Floaty[3];
+            // Fill args with the input values
+            for (int j = 0; j < 3 ; j++) {
+                args.inLhs[j] = arrayInLhs[i * 4 + j];
+            }
+            for (int j = 0; j < 3 ; j++) {
+                args.inRhs[j] = arrayInRhs[i * 4 + j];
+            }
+            Floaty.setRelaxed(relaxed);
+            CoreMathVerifier.computeCross(args);
+
+            // Compare the expected outputs to the actual values returned by RS.
+            boolean valid = true;
+            for (int j = 0; j < 3 ; j++) {
+                if (!args.out[j].couldBe(arrayOut[i * 4 + j])) {
+                    valid = false;
+                }
+            }
+            if (!valid) {
+                StringBuilder message = new StringBuilder();
+                for (int j = 0; j < 3 ; j++) {
+                    message.append("Input inLhs: ");
+                    message.append(String.format("%14.8g %8x %15a",
+                            arrayInLhs[i * 4 + j], Float.floatToRawIntBits(arrayInLhs[i * 4 + j]), arrayInLhs[i * 4 + j]));
+                    message.append("\n");
+                }
+                for (int j = 0; j < 3 ; j++) {
+                    message.append("Input inRhs: ");
+                    message.append(String.format("%14.8g %8x %15a",
+                            arrayInRhs[i * 4 + j], Float.floatToRawIntBits(arrayInRhs[i * 4 + j]), arrayInRhs[i * 4 + j]));
+                    message.append("\n");
+                }
+                for (int j = 0; j < 3 ; j++) {
+                    message.append("Expected output out: ");
+                    message.append(args.out[j].toString());
+                    message.append("\n");
+                    message.append("Actual   output out: ");
+                    message.append(String.format("%14.8g %8x %15a",
+                            arrayOut[i * 4 + j], Float.floatToRawIntBits(arrayOut[i * 4 + j]), arrayOut[i * 4 + j]));
+                    if (!args.out[j].couldBe(arrayOut[i * 4 + j])) {
+                        message.append(" FAIL");
+                    }
+                    message.append("\n");
+                }
+                assertTrue("Incorrect output for checkCrossFloat3Float3Float3" +
+                        (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+            }
         }
     }
 
@@ -60,6 +130,7 @@ public class TestCross extends RSBaseCompute {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 4), INPUTSIZE);
             script.set_gAllocInRhs(inRhs);
             script.forEach_testCrossFloat4Float4Float4(inLhs, out);
+            verifyResultsCrossFloat4Float4Float4(inLhs, inRhs, out, false);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testCrossFloat4Float4Float4: " + e.toString());
         }
@@ -67,8 +138,71 @@ public class TestCross extends RSBaseCompute {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 4), INPUTSIZE);
             scriptRelaxed.set_gAllocInRhs(inRhs);
             scriptRelaxed.forEach_testCrossFloat4Float4Float4(inLhs, out);
+            verifyResultsCrossFloat4Float4Float4(inLhs, inRhs, out, true);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testCrossFloat4Float4Float4: " + e.toString());
+        }
+    }
+
+    private void verifyResultsCrossFloat4Float4Float4(Allocation inLhs, Allocation inRhs, Allocation out, boolean relaxed) {
+        float[] arrayInLhs = new float[INPUTSIZE * 4];
+        inLhs.copyTo(arrayInLhs);
+        float[] arrayInRhs = new float[INPUTSIZE * 4];
+        inRhs.copyTo(arrayInRhs);
+        float[] arrayOut = new float[INPUTSIZE * 4];
+        out.copyTo(arrayOut);
+        for (int i = 0; i < INPUTSIZE; i++) {
+            ArgumentsFloatNFloatNFloatN args = new ArgumentsFloatNFloatNFloatN();
+            // Create the appropriate sized arrays in args
+            args.inLhs = new float[4];
+            args.inRhs = new float[4];
+            args.out = new Floaty[4];
+            // Fill args with the input values
+            for (int j = 0; j < 4 ; j++) {
+                args.inLhs[j] = arrayInLhs[i * 4 + j];
+            }
+            for (int j = 0; j < 4 ; j++) {
+                args.inRhs[j] = arrayInRhs[i * 4 + j];
+            }
+            Floaty.setRelaxed(relaxed);
+            CoreMathVerifier.computeCross(args);
+
+            // Compare the expected outputs to the actual values returned by RS.
+            boolean valid = true;
+            for (int j = 0; j < 4 ; j++) {
+                if (!args.out[j].couldBe(arrayOut[i * 4 + j])) {
+                    valid = false;
+                }
+            }
+            if (!valid) {
+                StringBuilder message = new StringBuilder();
+                for (int j = 0; j < 4 ; j++) {
+                    message.append("Input inLhs: ");
+                    message.append(String.format("%14.8g %8x %15a",
+                            arrayInLhs[i * 4 + j], Float.floatToRawIntBits(arrayInLhs[i * 4 + j]), arrayInLhs[i * 4 + j]));
+                    message.append("\n");
+                }
+                for (int j = 0; j < 4 ; j++) {
+                    message.append("Input inRhs: ");
+                    message.append(String.format("%14.8g %8x %15a",
+                            arrayInRhs[i * 4 + j], Float.floatToRawIntBits(arrayInRhs[i * 4 + j]), arrayInRhs[i * 4 + j]));
+                    message.append("\n");
+                }
+                for (int j = 0; j < 4 ; j++) {
+                    message.append("Expected output out: ");
+                    message.append(args.out[j].toString());
+                    message.append("\n");
+                    message.append("Actual   output out: ");
+                    message.append(String.format("%14.8g %8x %15a",
+                            arrayOut[i * 4 + j], Float.floatToRawIntBits(arrayOut[i * 4 + j]), arrayOut[i * 4 + j]));
+                    if (!args.out[j].couldBe(arrayOut[i * 4 + j])) {
+                        message.append(" FAIL");
+                    }
+                    message.append("\n");
+                }
+                assertTrue("Incorrect output for checkCrossFloat4Float4Float4" +
+                        (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+            }
         }
     }
 
