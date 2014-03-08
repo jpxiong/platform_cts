@@ -38,8 +38,11 @@ import android.view.Surface;
 import com.android.ex.camera2.blocking.BlockingCameraManager;
 import com.android.ex.camera2.blocking.BlockingCameraManager.BlockingOpenException;
 import com.android.ex.camera2.blocking.BlockingStateListener;
+import com.android.ex.camera2.exceptions.TimeoutRuntimeException;
 
 import junit.framework.Assert;
+
+import org.mockito.Mockito;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -128,9 +131,15 @@ public class CameraTestUtils extends Assert {
      * an AssertionError if it fails to open the camera device.</p>
      *
      * @return CameraDevice opened camera device
-     * @throws BlockingOpenException
      *
-     * @throws AssertionError if the camera fails to open (or times out)
+     * @throws IllegalArgumentException
+     *            If the handler is null, or if the handler's looper is current.
+     * @throws CameraAccessException
+     *            If open fails immediately.
+     * @throws BlockingOpenException
+     *            If open fails after blocking for some amount of time.
+     * @throws TimeoutRuntimeException
+     *            If opening times out. Typically unrecoverable.
      */
     public static CameraDevice openCamera(CameraManager manager, String cameraId,
             CameraDevice.StateListener listener, Handler handler) throws CameraAccessException,
@@ -155,9 +164,14 @@ public class CameraTestUtils extends Assert {
      * <p>Don't use this to test #onDisconnected/#onError since this will throw
      * an AssertionError if it fails to open the camera device.</p>
      *
-     * @return CameraDevice opened camera device
-     *
-     * @throws AssertionError if the camera fails to open (or times out)
+     * @throws IllegalArgumentException
+     *            If the handler is null, or if the handler's looper is current.
+     * @throws CameraAccessException
+     *            If open fails immediately.
+     * @throws BlockingOpenException
+     *            If open fails after blocking for some amount of time.
+     * @throws TimeoutRuntimeException
+     *            If opening times out. Typically unrecoverable.
      */
     public static CameraDevice openCamera(CameraManager manager, String cameraId, Handler handler)
             throws CameraAccessException,
@@ -434,5 +448,42 @@ public class CameraTestUtils extends Assert {
         }
 
         return sz;
+    }
+
+    /**
+     * Provide a mock for {@link CameraDevice.StateListener}.
+     *
+     * <p>Only useful because mockito can't mock {@link CameraDevice.StateListener} which is an
+     * abstract class.</p>
+     *
+     * <p>
+     * Use this instead of other classes when needing to verify interactions, since
+     * trying to spy on {@link BlockingStateListener} (or others) will cause unnecessary extra
+     * interactions which will cause false test failures.
+     * </p>
+     *
+     */
+    public static class MockStateListener extends CameraDevice.StateListener {
+
+        @Override
+        public void onOpened(CameraDevice camera) {
+        }
+
+        @Override
+        public void onDisconnected(CameraDevice camera) {
+        }
+
+        @Override
+        public void onError(CameraDevice camera, int error) {
+        }
+
+        private MockStateListener() {}
+
+        /**
+         * Create a Mockito-ready mocked StateListener.
+         */
+        public static MockStateListener mock() {
+            return Mockito.spy(new MockStateListener());
+        }
     }
 }
