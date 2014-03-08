@@ -16,6 +16,7 @@
 
 package android.webkit.cts;
 
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.res.AssetManager;
 import android.cts.util.EvaluateJsResultPollingCheck;
@@ -356,6 +357,18 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
 
         Header header = matchingHeaders[0];
         assertEquals(mWebView.getContext().getApplicationInfo().packageName, header.getValue());
+    }
+
+    @UiThreadTest
+    public void testLoadUrlDoesNotStripParamsWhenLoadingContentUrls() throws Exception {
+        Uri.Builder uriBuilder = new Uri.Builder().scheme(
+                ContentResolver.SCHEME_CONTENT).authority(MockContentProvider.AUTHORITY);
+        uriBuilder.appendPath("foo.html").appendQueryParameter("param","bar");
+        String url = uriBuilder.build().toString();
+        mOnUiThread.loadUrlAndWaitForCompletion(url);
+        // verify the parameter is not stripped.
+        Uri uri = Uri.parse(mWebView.getTitle());
+        assertEquals("bar", uri.getQueryParameter("param"));
     }
 
     @UiThreadTest

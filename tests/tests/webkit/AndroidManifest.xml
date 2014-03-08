@@ -22,6 +22,9 @@
     <uses-permission android:name="android.permission.ACCESS_LOCATION_EXTRA_COMMANDS"/>
     <uses-permission android:name="android.permission.ACCESS_MOCK_LOCATION"/>
     <application>
+        <provider android:name="android.webkit.cts.MockContentProvider"
+                  android:exported="true"
+                  android:authorities="android.webkit.cts.MockContentProvider" />
         <uses-library android:name="android.test.runner" />
     </application>
 
