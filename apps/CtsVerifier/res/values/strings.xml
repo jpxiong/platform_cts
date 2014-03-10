@@ -614,4 +614,15 @@
     <string name="widget_name">Widget Framework Test</string>
     <string name="widget_pass">Pass</string>
     <string name="widget_fail">Fail</string>
+    
+    <!-- Strings for LockConfirmBypassTest -->
+    <string name="lock_confirm_test_title">Keyguard Password Verification</string>
+    <string name="lock_set_button_text">Set password</string>
+    <string name="lock_change_button_text">Change password</string>
+    <string name="lock_confirm_message">
+        This test verifies that the user is prompted for the current keyguard password before prompting for a new password.\n
+        \nClick the \"Set password\" button if you currently don\'t have a password set.\n
+        \nThen click the \"Change password\" button to change it. You should be prompted for the current password first. If you are not, then mark the test as failed.
+    </string>
+
 </resources>
