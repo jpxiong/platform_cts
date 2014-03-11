@@ -38,10 +38,7 @@ public class TestClamp extends RSBaseCompute {
         public float inValue;
         public float inMinValue;
         public float inMaxValue;
-        public float out;
-
-        public int ulf;
-        public int ulfRelaxed;
+        public Floaty out;
     }
 
     private void checkClampFloatFloatFloatFloat() {
@@ -86,34 +83,35 @@ public class TestClamp extends RSBaseCompute {
                 args.inMinValue = arrayInMinValue[i];
                 args.inMaxValue = arrayInMaxValue[i];
                 // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeClamp(args);
-                int ulf = relaxed ? args.ulfRelaxed : args.ulf;
                 // Figure out what the outputs should have been.
                 boolean valid = true;
-                int neededUlf = 0;
-                neededUlf = (int) (Math.abs(args.out - arrayOut[i * 1 + j]) / Math.ulp(args.out) + 0.5);
-                if (neededUlf > ulf) {
+                if (!args.out.couldBe(arrayOut[i * 1 + j])) {
                     valid = false;
                 }
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
-                    message.append(String.format("Input inValue: %14.8g %8x %15a",
+                    message.append("Input inValue: ");
+                    message.append(String.format("%14.8g %8x %15a",
                             args.inValue, Float.floatToRawIntBits(args.inValue), args.inValue));
                     message.append("\n");
-                    message.append(String.format("Input inMinValue: %14.8g %8x %15a",
+                    message.append("Input inMinValue: ");
+                    message.append(String.format("%14.8g %8x %15a",
                             args.inMinValue, Float.floatToRawIntBits(args.inMinValue), args.inMinValue));
                     message.append("\n");
-                    message.append(String.format("Input inMaxValue: %14.8g %8x %15a",
+                    message.append("Input inMaxValue: ");
+                    message.append(String.format("%14.8g %8x %15a",
                             args.inMaxValue, Float.floatToRawIntBits(args.inMaxValue), args.inMaxValue));
                     message.append("\n");
-                    message.append(String.format("Expected output out: %14.8g %8x %15a",
-                            args.out, Float.floatToRawIntBits(args.out), args.out));
+                    message.append("Expected output out: ");
+                    message.append(args.out.toString());
                     message.append("\n");
-                    message.append(String.format("Actual   output out: %14.8g %8x %15a",
+                    message.append("Actual   output out: ");
+                    message.append(String.format("%14.8g %8x %15a",
                             arrayOut[i * 1 + j], Float.floatToRawIntBits(arrayOut[i * 1 + j]), arrayOut[i * 1 + j]));
-                    neededUlf = (int) (Math.abs(args.out - arrayOut[i * 1 + j]) / Math.ulp(args.out) + 0.5);
-                    if (neededUlf > ulf) {
-                        message.append(String.format(" FAILED, ulf needed %d, specified %d", neededUlf, ulf));
+                    if (!args.out.couldBe(arrayOut[i * 1 + j])) {
+                        message.append(" FAIL");
                     }
                     message.append("\n");
                     assertTrue("Incorrect output for checkClampFloatFloatFloatFloat" +
@@ -165,34 +163,35 @@ public class TestClamp extends RSBaseCompute {
                 args.inMinValue = arrayInMinValue[i * 2 + j];
                 args.inMaxValue = arrayInMaxValue[i * 2 + j];
                 // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeClamp(args);
-                int ulf = relaxed ? args.ulfRelaxed : args.ulf;
                 // Figure out what the outputs should have been.
                 boolean valid = true;
-                int neededUlf = 0;
-                neededUlf = (int) (Math.abs(args.out - arrayOut[i * 2 + j]) / Math.ulp(args.out) + 0.5);
-                if (neededUlf > ulf) {
+                if (!args.out.couldBe(arrayOut[i * 2 + j])) {
                     valid = false;
                 }
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
-                    message.append(String.format("Input inValue: %14.8g %8x %15a",
+                    message.append("Input inValue: ");
+                    message.append(String.format("%14.8g %8x %15a",
                             args.inValue, Float.floatToRawIntBits(args.inValue), args.inValue));
                     message.append("\n");
-                    message.append(String.format("Input inMinValue: %14.8g %8x %15a",
+                    message.append("Input inMinValue: ");
+                    message.append(String.format("%14.8g %8x %15a",
                             args.inMinValue, Float.floatToRawIntBits(args.inMinValue), args.inMinValue));
                     message.append("\n");
-                    message.append(String.format("Input inMaxValue: %14.8g %8x %15a",
+                    message.append("Input inMaxValue: ");
+                    message.append(String.format("%14.8g %8x %15a",
                             args.inMaxValue, Float.floatToRawIntBits(args.inMaxValue), args.inMaxValue));
                     message.append("\n");
-                    message.append(String.format("Expected output out: %14.8g %8x %15a",
-                            args.out, Float.floatToRawIntBits(args.out), args.out));
+                    message.append("Expected output out: ");
+                    message.append(args.out.toString());
                     message.append("\n");
-                    message.append(String.format("Actual   output out: %14.8g %8x %15a",
+                    message.append("Actual   output out: ");
+                    message.append(String.format("%14.8g %8x %15a",
                             arrayOut[i * 2 + j], Float.floatToRawIntBits(arrayOut[i * 2 + j]), arrayOut[i * 2 + j]));
-                    neededUlf = (int) (Math.abs(args.out - arrayOut[i * 2 + j]) / Math.ulp(args.out) + 0.5);
-                    if (neededUlf > ulf) {
-                        message.append(String.format(" FAILED, ulf needed %d, specified %d", neededUlf, ulf));
+                    if (!args.out.couldBe(arrayOut[i * 2 + j])) {
+                        message.append(" FAIL");
                     }
                     message.append("\n");
                     assertTrue("Incorrect output for checkClampFloat2Float2Float2Float2" +
@@ -244,34 +243,35 @@ public class TestClamp extends RSBaseCompute {
                 args.inMinValue = arrayInMinValue[i * 4 + j];
                 args.inMaxValue = arrayInMaxValue[i * 4 + j];
                 // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeClamp(args);
-                int ulf = relaxed ? args.ulfRelaxed : args.ulf;
                 // Figure out what the outputs should have been.
                 boolean valid = true;
-                int neededUlf = 0;
-                neededUlf = (int) (Math.abs(args.out - arrayOut[i * 4 + j]) / Math.ulp(args.out) + 0.5);
-                if (neededUlf > ulf) {
+                if (!args.out.couldBe(arrayOut[i * 4 + j])) {
                     valid = false;
                 }
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
-                    message.append(String.format("Input inValue: %14.8g %8x %15a",
+                    message.append("Input inValue: ");
+                    message.append(String.format("%14.8g %8x %15a",
                             args.inValue, Float.floatToRawIntBits(args.inValue), args.inValue));
                     message.append("\n");
-                    message.append(String.format("Input inMinValue: %14.8g %8x %15a",
+                    message.append("Input inMinValue: ");
+                    message.append(String.format("%14.8g %8x %15a",
                             args.inMinValue, Float.floatToRawIntBits(args.inMinValue), args.inMinValue));
                     message.append("\n");
-                    message.append(String.format("Input inMaxValue: %14.8g %8x %15a",
+                    message.append("Input inMaxValue: ");
+                    message.append(String.format("%14.8g %8x %15a",
                             args.inMaxValue, Float.floatToRawIntBits(args.inMaxValue), args.inMaxValue));
                     message.append("\n");
-                    message.append(String.format("Expected output out: %14.8g %8x %15a",
-                            args.out, Float.floatToRawIntBits(args.out), args.out));
+                    message.append("Expected output out: ");
+                    message.append(args.out.toString());
                     message.append("\n");
-                    message.append(String.format("Actual   output out: %14.8g %8x %15a",
+                    message.append("Actual   output out: ");
+                    message.append(String.format("%14.8g %8x %15a",
                             arrayOut[i * 4 + j], Float.floatToRawIntBits(arrayOut[i * 4 + j]), arrayOut[i * 4 + j]));
-                    neededUlf = (int) (Math.abs(args.out - arrayOut[i * 4 + j]) / Math.ulp(args.out) + 0.5);
-                    if (neededUlf > ulf) {
-                        message.append(String.format(" FAILED, ulf needed %d, specified %d", neededUlf, ulf));
+                    if (!args.out.couldBe(arrayOut[i * 4 + j])) {
+                        message.append(" FAIL");
                     }
                     message.append("\n");
                     assertTrue("Incorrect output for checkClampFloat3Float3Float3Float3" +
@@ -323,34 +323,35 @@ public class TestClamp extends RSBaseCompute {
                 args.inMinValue = arrayInMinValue[i * 4 + j];
                 args.inMaxValue = arrayInMaxValue[i * 4 + j];
                 // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeClamp(args);
-                int ulf = relaxed ? args.ulfRelaxed : args.ulf;
                 // Figure out what the outputs should have been.
                 boolean valid = true;
-                int neededUlf = 0;
-                neededUlf = (int) (Math.abs(args.out - arrayOut[i * 4 + j]) / Math.ulp(args.out) + 0.5);
-                if (neededUlf > ulf) {
+                if (!args.out.couldBe(arrayOut[i * 4 + j])) {
                     valid = false;
                 }
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
-                    message.append(String.format("Input inValue: %14.8g %8x %15a",
+                    message.append("Input inValue: ");
+                    message.append(String.format("%14.8g %8x %15a",
                             args.inValue, Float.floatToRawIntBits(args.inValue), args.inValue));
                     message.append("\n");
-                    message.append(String.format("Input inMinValue: %14.8g %8x %15a",
+                    message.append("Input inMinValue: ");
+                    message.append(String.format("%14.8g %8x %15a",
                             args.inMinValue, Float.floatToRawIntBits(args.inMinValue), args.inMinValue));
                     message.append("\n");
-                    message.append(String.format("Input inMaxValue: %14.8g %8x %15a",
+                    message.append("Input inMaxValue: ");
+                    message.append(String.format("%14.8g %8x %15a",
                             args.inMaxValue, Float.floatToRawIntBits(args.inMaxValue), args.inMaxValue));
                     message.append("\n");
-                    message.append(String.format("Expected output out: %14.8g %8x %15a",
-                            args.out, Float.floatToRawIntBits(args.out), args.out));
+                    message.append("Expected output out: ");
+                    message.append(args.out.toString());
                     message.append("\n");
-                    message.append(String.format("Actual   output out: %14.8g %8x %15a",
+                    message.append("Actual   output out: ");
+                    message.append(String.format("%14.8g %8x %15a",
                             arrayOut[i * 4 + j], Float.floatToRawIntBits(arrayOut[i * 4 + j]), arrayOut[i * 4 + j]));
-                    neededUlf = (int) (Math.abs(args.out - arrayOut[i * 4 + j]) / Math.ulp(args.out) + 0.5);
-                    if (neededUlf > ulf) {
-                        message.append(String.format(" FAILED, ulf needed %d, specified %d", neededUlf, ulf));
+                    if (!args.out.couldBe(arrayOut[i * 4 + j])) {
+                        message.append(" FAIL");
                     }
                     message.append("\n");
                     assertTrue("Incorrect output for checkClampFloat4Float4Float4Float4" +
@@ -402,34 +403,35 @@ public class TestClamp extends RSBaseCompute {
                 args.inMinValue = arrayInMinValue[i];
                 args.inMaxValue = arrayInMaxValue[i];
                 // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeClamp(args);
-                int ulf = relaxed ? args.ulfRelaxed : args.ulf;
                 // Figure out what the outputs should have been.
                 boolean valid = true;
-                int neededUlf = 0;
-                neededUlf = (int) (Math.abs(args.out - arrayOut[i * 2 + j]) / Math.ulp(args.out) + 0.5);
-                if (neededUlf > ulf) {
+                if (!args.out.couldBe(arrayOut[i * 2 + j])) {
                     valid = false;
                 }
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
-                    message.append(String.format("Input inValue: %14.8g %8x %15a",
+                    message.append("Input inValue: ");
+                    message.append(String.format("%14.8g %8x %15a",
                             args.inValue, Float.floatToRawIntBits(args.inValue), args.inValue));
                     message.append("\n");
-                    message.append(String.format("Input inMinValue: %14.8g %8x %15a",
+                    message.append("Input inMinValue: ");
+                    message.append(String.format("%14.8g %8x %15a",
                             args.inMinValue, Float.floatToRawIntBits(args.inMinValue), args.inMinValue));
                     message.append("\n");
-                    message.append(String.format("Input inMaxValue: %14.8g %8x %15a",
+                    message.append("Input inMaxValue: ");
+                    message.append(String.format("%14.8g %8x %15a",
                             args.inMaxValue, Float.floatToRawIntBits(args.inMaxValue), args.inMaxValue));
                     message.append("\n");
-                    message.append(String.format("Expected output out: %14.8g %8x %15a",
-                            args.out, Float.floatToRawIntBits(args.out), args.out));
+                    message.append("Expected output out: ");
+                    message.append(args.out.toString());
                     message.append("\n");
-                    message.append(String.format("Actual   output out: %14.8g %8x %15a",
+                    message.append("Actual   output out: ");
+                    message.append(String.format("%14.8g %8x %15a",
                             arrayOut[i * 2 + j], Float.floatToRawIntBits(arrayOut[i * 2 + j]), arrayOut[i * 2 + j]));
-                    neededUlf = (int) (Math.abs(args.out - arrayOut[i * 2 + j]) / Math.ulp(args.out) + 0.5);
-                    if (neededUlf > ulf) {
-                        message.append(String.format(" FAILED, ulf needed %d, specified %d", neededUlf, ulf));
+                    if (!args.out.couldBe(arrayOut[i * 2 + j])) {
+                        message.append(" FAIL");
                     }
                     message.append("\n");
                     assertTrue("Incorrect output for checkClampFloat2FloatFloatFloat2" +
@@ -481,34 +483,35 @@ public class TestClamp extends RSBaseCompute {
                 args.inMinValue = arrayInMinValue[i];
                 args.inMaxValue = arrayInMaxValue[i];
                 // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeClamp(args);
-                int ulf = relaxed ? args.ulfRelaxed : args.ulf;
                 // Figure out what the outputs should have been.
                 boolean valid = true;
-                int neededUlf = 0;
-                neededUlf = (int) (Math.abs(args.out - arrayOut[i * 4 + j]) / Math.ulp(args.out) + 0.5);
-                if (neededUlf > ulf) {
+                if (!args.out.couldBe(arrayOut[i * 4 + j])) {
                     valid = false;
                 }
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
-                    message.append(String.format("Input inValue: %14.8g %8x %15a",
+                    message.append("Input inValue: ");
+                    message.append(String.format("%14.8g %8x %15a",
                             args.inValue, Float.floatToRawIntBits(args.inValue), args.inValue));
                     message.append("\n");
-                    message.append(String.format("Input inMinValue: %14.8g %8x %15a",
+                    message.append("Input inMinValue: ");
+                    message.append(String.format("%14.8g %8x %15a",
                             args.inMinValue, Float.floatToRawIntBits(args.inMinValue), args.inMinValue));
                     message.append("\n");
-                    message.append(String.format("Input inMaxValue: %14.8g %8x %15a",
+                    message.append("Input inMaxValue: ");
+                    message.append(String.format("%14.8g %8x %15a",
                             args.inMaxValue, Float.floatToRawIntBits(args.inMaxValue), args.inMaxValue));
                     message.append("\n");
-                    message.append(String.format("Expected output out: %14.8g %8x %15a",
-                            args.out, Float.floatToRawIntBits(args.out), args.out));
+                    message.append("Expected output out: ");
+                    message.append(args.out.toString());
                     message.append("\n");
-                    message.append(String.format("Actual   output out: %14.8g %8x %15a",
+                    message.append("Actual   output out: ");
+                    message.append(String.format("%14.8g %8x %15a",
                             arrayOut[i * 4 + j], Float.floatToRawIntBits(arrayOut[i * 4 + j]), arrayOut[i * 4 + j]));
-                    neededUlf = (int) (Math.abs(args.out - arrayOut[i * 4 + j]) / Math.ulp(args.out) + 0.5);
-                    if (neededUlf > ulf) {
-                        message.append(String.format(" FAILED, ulf needed %d, specified %d", neededUlf, ulf));
+                    if (!args.out.couldBe(arrayOut[i * 4 + j])) {
+                        message.append(" FAIL");
                     }
                     message.append("\n");
                     assertTrue("Incorrect output for checkClampFloat3FloatFloatFloat3" +
@@ -560,34 +563,35 @@ public class TestClamp extends RSBaseCompute {
                 args.inMinValue = arrayInMinValue[i];
                 args.inMaxValue = arrayInMaxValue[i];
                 // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeClamp(args);
-                int ulf = relaxed ? args.ulfRelaxed : args.ulf;
                 // Figure out what the outputs should have been.
                 boolean valid = true;
-                int neededUlf = 0;
-                neededUlf = (int) (Math.abs(args.out - arrayOut[i * 4 + j]) / Math.ulp(args.out) + 0.5);
-                if (neededUlf > ulf) {
+                if (!args.out.couldBe(arrayOut[i * 4 + j])) {
                     valid = false;
                 }
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
-                    message.append(String.format("Input inValue: %14.8g %8x %15a",
+                    message.append("Input inValue: ");
+                    message.append(String.format("%14.8g %8x %15a",
                             args.inValue, Float.floatToRawIntBits(args.inValue), args.inValue));
                     message.append("\n");
-                    message.append(String.format("Input inMinValue: %14.8g %8x %15a",
+                    message.append("Input inMinValue: ");
+                    message.append(String.format("%14.8g %8x %15a",
                             args.inMinValue, Float.floatToRawIntBits(args.inMinValue), args.inMinValue));
                     message.append("\n");
-                    message.append(String.format("Input inMaxValue: %14.8g %8x %15a",
+                    message.append("Input inMaxValue: ");
+                    message.append(String.format("%14.8g %8x %15a",
                             args.inMaxValue, Float.floatToRawIntBits(args.inMaxValue), args.inMaxValue));
                     message.append("\n");
-                    message.append(String.format("Expected output out: %14.8g %8x %15a",
-                            args.out, Float.floatToRawIntBits(args.out), args.out));
+                    message.append("Expected output out: ");
+                    message.append(args.out.toString());
                     message.append("\n");
-                    message.append(String.format("Actual   output out: %14.8g %8x %15a",
+                    message.append("Actual   output out: ");
+                    message.append(String.format("%14.8g %8x %15a",
                             arrayOut[i * 4 + j], Float.floatToRawIntBits(arrayOut[i * 4 + j]), arrayOut[i * 4 + j]));
-                    neededUlf = (int) (Math.abs(args.out - arrayOut[i * 4 + j]) / Math.ulp(args.out) + 0.5);
-                    if (neededUlf > ulf) {
-                        message.append(String.format(" FAILED, ulf needed %d, specified %d", neededUlf, ulf));
+                    if (!args.out.couldBe(arrayOut[i * 4 + j])) {
+                        message.append(" FAIL");
                     }
                     message.append("\n");
                     assertTrue("Incorrect output for checkClampFloat4FloatFloatFloat4" +
@@ -602,9 +606,6 @@ public class TestClamp extends RSBaseCompute {
         public byte inMinValue;
         public byte inMaxValue;
         public byte out;
-
-        public int ulf;
-        public int ulfRelaxed;
     }
 
     private void checkClampCharCharCharChar() {
@@ -649,30 +650,29 @@ public class TestClamp extends RSBaseCompute {
                 args.inMinValue = arrayInMinValue[i];
                 args.inMaxValue = arrayInMaxValue[i];
                 // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeClamp(args);
-                int ulf = relaxed ? args.ulfRelaxed : args.ulf;
                 // Figure out what the outputs should have been.
                 boolean valid = true;
-                int neededUlf = 0;
                 if (args.out != arrayOut[i * 1 + j]) {
                     valid = false;
                 }
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
-                    message.append(String.format("Input inValue: %d",
-                            args.inValue));
+                    message.append("Input inValue: ");
+                    message.append(String.format("%d", args.inValue));
                     message.append("\n");
-                    message.append(String.format("Input inMinValue: %d",
-                            args.inMinValue));
+                    message.append("Input inMinValue: ");
+                    message.append(String.format("%d", args.inMinValue));
                     message.append("\n");
-                    message.append(String.format("Input inMaxValue: %d",
-                            args.inMaxValue));
+                    message.append("Input inMaxValue: ");
+                    message.append(String.format("%d", args.inMaxValue));
                     message.append("\n");
-                    message.append(String.format("Expected output out: %d",
-                            args.out));
+                    message.append("Expected output out: ");
+                    message.append(String.format("%d", args.out));
                     message.append("\n");
-                    message.append(String.format("Actual   output out: %d",
-                            arrayOut[i * 1 + j]));
+                    message.append("Actual   output out: ");
+                    message.append(String.format("%d", arrayOut[i * 1 + j]));
                     if (args.out != arrayOut[i * 1 + j]) {
                         message.append(" FAIL");
                     }
@@ -726,30 +726,29 @@ public class TestClamp extends RSBaseCompute {
                 args.inMinValue = arrayInMinValue[i * 2 + j];
                 args.inMaxValue = arrayInMaxValue[i * 2 + j];
                 // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeClamp(args);
-                int ulf = relaxed ? args.ulfRelaxed : args.ulf;
                 // Figure out what the outputs should have been.
                 boolean valid = true;
-                int neededUlf = 0;
                 if (args.out != arrayOut[i * 2 + j]) {
                     valid = false;
                 }
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
-                    message.append(String.format("Input inValue: %d",
-                            args.inValue));
+                    message.append("Input inValue: ");
+                    message.append(String.format("%d", args.inValue));
                     message.append("\n");
-                    message.append(String.format("Input inMinValue: %d",
-                            args.inMinValue));
+                    message.append("Input inMinValue: ");
+                    message.append(String.format("%d", args.inMinValue));
                     message.append("\n");
-                    message.append(String.format("Input inMaxValue: %d",
-                            args.inMaxValue));
+                    message.append("Input inMaxValue: ");
+                    message.append(String.format("%d", args.inMaxValue));
                     message.append("\n");
-                    message.append(String.format("Expected output out: %d",
-                            args.out));
+                    message.append("Expected output out: ");
+                    message.append(String.format("%d", args.out));
                     message.append("\n");
-                    message.append(String.format("Actual   output out: %d",
-                            arrayOut[i * 2 + j]));
+                    message.append("Actual   output out: ");
+                    message.append(String.format("%d", arrayOut[i * 2 + j]));
                     if (args.out != arrayOut[i * 2 + j]) {
                         message.append(" FAIL");
                     }
@@ -803,30 +802,29 @@ public class TestClamp extends RSBaseCompute {
                 args.inMinValue = arrayInMinValue[i * 4 + j];
                 args.inMaxValue = arrayInMaxValue[i * 4 + j];
                 // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeClamp(args);
-                int ulf = relaxed ? args.ulfRelaxed : args.ulf;
                 // Figure out what the outputs should have been.
                 boolean valid = true;
-                int neededUlf = 0;
                 if (args.out != arrayOut[i * 4 + j]) {
                     valid = false;
                 }
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
-                    message.append(String.format("Input inValue: %d",
-                            args.inValue));
+                    message.append("Input inValue: ");
+                    message.append(String.format("%d", args.inValue));
                     message.append("\n");
-                    message.append(String.format("Input inMinValue: %d",
-                            args.inMinValue));
+                    message.append("Input inMinValue: ");
+                    message.append(String.format("%d", args.inMinValue));
                     message.append("\n");
-                    message.append(String.format("Input inMaxValue: %d",
-                            args.inMaxValue));
+                    message.append("Input inMaxValue: ");
+                    message.append(String.format("%d", args.inMaxValue));
                     message.append("\n");
-                    message.append(String.format("Expected output out: %d",
-                            args.out));
+                    message.append("Expected output out: ");
+                    message.append(String.format("%d", args.out));
                     message.append("\n");
-                    message.append(String.format("Actual   output out: %d",
-                            arrayOut[i * 4 + j]));
+                    message.append("Actual   output out: ");
+                    message.append(String.format("%d", arrayOut[i * 4 + j]));
                     if (args.out != arrayOut[i * 4 + j]) {
                         message.append(" FAIL");
                     }
@@ -880,30 +878,29 @@ public class TestClamp extends RSBaseCompute {
                 args.inMinValue = arrayInMinValue[i * 4 + j];
                 args.inMaxValue = arrayInMaxValue[i * 4 + j];
                 // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeClamp(args);
-                int ulf = relaxed ? args.ulfRelaxed : args.ulf;
                 // Figure out what the outputs should have been.
                 boolean valid = true;
-                int neededUlf = 0;
                 if (args.out != arrayOut[i * 4 + j]) {
                     valid = false;
                 }
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
-                    message.append(String.format("Input inValue: %d",
-                            args.inValue));
+                    message.append("Input inValue: ");
+                    message.append(String.format("%d", args.inValue));
                     message.append("\n");
-                    message.append(String.format("Input inMinValue: %d",
-                            args.inMinValue));
+                    message.append("Input inMinValue: ");
+                    message.append(String.format("%d", args.inMinValue));
                     message.append("\n");
-                    message.append(String.format("Input inMaxValue: %d",
-                            args.inMaxValue));
+                    message.append("Input inMaxValue: ");
+                    message.append(String.format("%d", args.inMaxValue));
                     message.append("\n");
-                    message.append(String.format("Expected output out: %d",
-                            args.out));
+                    message.append("Expected output out: ");
+                    message.append(String.format("%d", args.out));
                     message.append("\n");
-                    message.append(String.format("Actual   output out: %d",
-                            arrayOut[i * 4 + j]));
+                    message.append("Actual   output out: ");
+                    message.append(String.format("%d", arrayOut[i * 4 + j]));
                     if (args.out != arrayOut[i * 4 + j]) {
                         message.append(" FAIL");
                     }
@@ -920,9 +917,6 @@ public class TestClamp extends RSBaseCompute {
         public byte inMinValue;
         public byte inMaxValue;
         public byte out;
-
-        public int ulf;
-        public int ulfRelaxed;
     }
 
     private void checkClampUcharUcharUcharUchar() {
@@ -967,30 +961,29 @@ public class TestClamp extends RSBaseCompute {
                 args.inMinValue = arrayInMinValue[i];
                 args.inMaxValue = arrayInMaxValue[i];
                 // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeClamp(args);
-                int ulf = relaxed ? args.ulfRelaxed : args.ulf;
                 // Figure out what the outputs should have been.
                 boolean valid = true;
-                int neededUlf = 0;
                 if (args.out != arrayOut[i * 1 + j]) {
                     valid = false;
                 }
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
-                    message.append(String.format("Input inValue: 0x%x",
-                            args.inValue));
+                    message.append("Input inValue: ");
+                    message.append(String.format("0x%x", args.inValue));
                     message.append("\n");
-                    message.append(String.format("Input inMinValue: 0x%x",
-                            args.inMinValue));
+                    message.append("Input inMinValue: ");
+                    message.append(String.format("0x%x", args.inMinValue));
                     message.append("\n");
-                    message.append(String.format("Input inMaxValue: 0x%x",
-                            args.inMaxValue));
+                    message.append("Input inMaxValue: ");
+                    message.append(String.format("0x%x", args.inMaxValue));
                     message.append("\n");
-                    message.append(String.format("Expected output out: 0x%x",
-                            args.out));
+                    message.append("Expected output out: ");
+                    message.append(String.format("0x%x", args.out));
                     message.append("\n");
-                    message.append(String.format("Actual   output out: 0x%x",
-                            arrayOut[i * 1 + j]));
+                    message.append("Actual   output out: ");
+                    message.append(String.format("0x%x", arrayOut[i * 1 + j]));
                     if (args.out != arrayOut[i * 1 + j]) {
                         message.append(" FAIL");
                     }
@@ -1044,30 +1037,29 @@ public class TestClamp extends RSBaseCompute {
                 args.inMinValue = arrayInMinValue[i * 2 + j];
                 args.inMaxValue = arrayInMaxValue[i * 2 + j];
                 // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeClamp(args);
-                int ulf = relaxed ? args.ulfRelaxed : args.ulf;
                 // Figure out what the outputs should have been.
                 boolean valid = true;
-                int neededUlf = 0;
                 if (args.out != arrayOut[i * 2 + j]) {
                     valid = false;
                 }
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
-                    message.append(String.format("Input inValue: 0x%x",
-                            args.inValue));
+                    message.append("Input inValue: ");
+                    message.append(String.format("0x%x", args.inValue));
                     message.append("\n");
-                    message.append(String.format("Input inMinValue: 0x%x",
-                            args.inMinValue));
+                    message.append("Input inMinValue: ");
+                    message.append(String.format("0x%x", args.inMinValue));
                     message.append("\n");
-                    message.append(String.format("Input inMaxValue: 0x%x",
-                            args.inMaxValue));
+                    message.append("Input inMaxValue: ");
+                    message.append(String.format("0x%x", args.inMaxValue));
                     message.append("\n");
-                    message.append(String.format("Expected output out: 0x%x",
-                            args.out));
+                    message.append("Expected output out: ");
+                    message.append(String.format("0x%x", args.out));
                     message.append("\n");
-                    message.append(String.format("Actual   output out: 0x%x",
-                            arrayOut[i * 2 + j]));
+                    message.append("Actual   output out: ");
+                    message.append(String.format("0x%x", arrayOut[i * 2 + j]));
                     if (args.out != arrayOut[i * 2 + j]) {
                         message.append(" FAIL");
                     }
@@ -1121,30 +1113,29 @@ public class TestClamp extends RSBaseCompute {
                 args.inMinValue = arrayInMinValue[i * 4 + j];
                 args.inMaxValue = arrayInMaxValue[i * 4 + j];
                 // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeClamp(args);
-                int ulf = relaxed ? args.ulfRelaxed : args.ulf;
                 // Figure out what the outputs should have been.
                 boolean valid = true;
-                int neededUlf = 0;
                 if (args.out != arrayOut[i * 4 + j]) {
                     valid = false;
                 }
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
-                    message.append(String.format("Input inValue: 0x%x",
-                            args.inValue));
+                    message.append("Input inValue: ");
+                    message.append(String.format("0x%x", args.inValue));
                     message.append("\n");
-                    message.append(String.format("Input inMinValue: 0x%x",
-                            args.inMinValue));
+                    message.append("Input inMinValue: ");
+                    message.append(String.format("0x%x", args.inMinValue));
                     message.append("\n");
-                    message.append(String.format("Input inMaxValue: 0x%x",
-                            args.inMaxValue));
+                    message.append("Input inMaxValue: ");
+                    message.append(String.format("0x%x", args.inMaxValue));
                     message.append("\n");
-                    message.append(String.format("Expected output out: 0x%x",
-                            args.out));
+                    message.append("Expected output out: ");
+                    message.append(String.format("0x%x", args.out));
                     message.append("\n");
-                    message.append(String.format("Actual   output out: 0x%x",
-                            arrayOut[i * 4 + j]));
+                    message.append("Actual   output out: ");
+                    message.append(String.format("0x%x", arrayOut[i * 4 + j]));
                     if (args.out != arrayOut[i * 4 + j]) {
                         message.append(" FAIL");
                     }
@@ -1198,30 +1189,29 @@ public class TestClamp extends RSBaseCompute {
                 args.inMinValue = arrayInMinValue[i * 4 + j];
                 args.inMaxValue = arrayInMaxValue[i * 4 + j];
                 // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeClamp(args);
-                int ulf = relaxed ? args.ulfRelaxed : args.ulf;
                 // Figure out what the outputs should have been.
                 boolean valid = true;
-                int neededUlf = 0;
                 if (args.out != arrayOut[i * 4 + j]) {
                     valid = false;
                 }
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
-                    message.append(String.format("Input inValue: 0x%x",
-                            args.inValue));
+                    message.append("Input inValue: ");
+                    message.append(String.format("0x%x", args.inValue));
                     message.append("\n");
-                    message.append(String.format("Input inMinValue: 0x%x",
-                            args.inMinValue));
+                    message.append("Input inMinValue: ");
+                    message.append(String.format("0x%x", args.inMinValue));
                     message.append("\n");
-                    message.append(String.format("Input inMaxValue: 0x%x",
-                            args.inMaxValue));
+                    message.append("Input inMaxValue: ");
+                    message.append(String.format("0x%x", args.inMaxValue));
                     message.append("\n");
-                    message.append(String.format("Expected output out: 0x%x",
-                            args.out));
+                    message.append("Expected output out: ");
+                    message.append(String.format("0x%x", args.out));
                     message.append("\n");
-                    message.append(String.format("Actual   output out: 0x%x",
-                            arrayOut[i * 4 + j]));
+                    message.append("Actual   output out: ");
+                    message.append(String.format("0x%x", arrayOut[i * 4 + j]));
                     if (args.out != arrayOut[i * 4 + j]) {
                         message.append(" FAIL");
                     }
@@ -1238,9 +1228,6 @@ public class TestClamp extends RSBaseCompute {
         public short inMinValue;
         public short inMaxValue;
         public short out;
-
-        public int ulf;
-        public int ulfRelaxed;
     }
 
     private void checkClampShortShortShortShort() {
@@ -1285,30 +1272,29 @@ public class TestClamp extends RSBaseCompute {
                 args.inMinValue = arrayInMinValue[i];
                 args.inMaxValue = arrayInMaxValue[i];
                 // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeClamp(args);
-                int ulf = relaxed ? args.ulfRelaxed : args.ulf;
                 // Figure out what the outputs should have been.
                 boolean valid = true;
-                int neededUlf = 0;
                 if (args.out != arrayOut[i * 1 + j]) {
                     valid = false;
                 }
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
-                    message.append(String.format("Input inValue: %d",
-                            args.inValue));
+                    message.append("Input inValue: ");
+                    message.append(String.format("%d", args.inValue));
                     message.append("\n");
-                    message.append(String.format("Input inMinValue: %d",
-                            args.inMinValue));
+                    message.append("Input inMinValue: ");
+                    message.append(String.format("%d", args.inMinValue));
                     message.append("\n");
-                    message.append(String.format("Input inMaxValue: %d",
-                            args.inMaxValue));
+                    message.append("Input inMaxValue: ");
+                    message.append(String.format("%d", args.inMaxValue));
                     message.append("\n");
-                    message.append(String.format("Expected output out: %d",
-                            args.out));
+                    message.append("Expected output out: ");
+                    message.append(String.format("%d", args.out));
                     message.append("\n");
-                    message.append(String.format("Actual   output out: %d",
-                            arrayOut[i * 1 + j]));
+                    message.append("Actual   output out: ");
+                    message.append(String.format("%d", arrayOut[i * 1 + j]));
                     if (args.out != arrayOut[i * 1 + j]) {
                         message.append(" FAIL");
                     }
@@ -1362,30 +1348,29 @@ public class TestClamp extends RSBaseCompute {
                 args.inMinValue = arrayInMinValue[i * 2 + j];
                 args.inMaxValue = arrayInMaxValue[i * 2 + j];
                 // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeClamp(args);
-                int ulf = relaxed ? args.ulfRelaxed : args.ulf;
                 // Figure out what the outputs should have been.
                 boolean valid = true;
-                int neededUlf = 0;
                 if (args.out != arrayOut[i * 2 + j]) {
                     valid = false;
                 }
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
-                    message.append(String.format("Input inValue: %d",
-                            args.inValue));
+                    message.append("Input inValue: ");
+                    message.append(String.format("%d", args.inValue));
                     message.append("\n");
-                    message.append(String.format("Input inMinValue: %d",
-                            args.inMinValue));
+                    message.append("Input inMinValue: ");
+                    message.append(String.format("%d", args.inMinValue));
                     message.append("\n");
-                    message.append(String.format("Input inMaxValue: %d",
-                            args.inMaxValue));
+                    message.append("Input inMaxValue: ");
+                    message.append(String.format("%d", args.inMaxValue));
                     message.append("\n");
-                    message.append(String.format("Expected output out: %d",
-                            args.out));
+                    message.append("Expected output out: ");
+                    message.append(String.format("%d", args.out));
                     message.append("\n");
-                    message.append(String.format("Actual   output out: %d",
-                            arrayOut[i * 2 + j]));
+                    message.append("Actual   output out: ");
+                    message.append(String.format("%d", arrayOut[i * 2 + j]));
                     if (args.out != arrayOut[i * 2 + j]) {
                         message.append(" FAIL");
                     }
@@ -1439,30 +1424,29 @@ public class TestClamp extends RSBaseCompute {
                 args.inMinValue = arrayInMinValue[i * 4 + j];
                 args.inMaxValue = arrayInMaxValue[i * 4 + j];
                 // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeClamp(args);
-                int ulf = relaxed ? args.ulfRelaxed : args.ulf;
                 // Figure out what the outputs should have been.
                 boolean valid = true;
-                int neededUlf = 0;
                 if (args.out != arrayOut[i * 4 + j]) {
                     valid = false;
                 }
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
-                    message.append(String.format("Input inValue: %d",
-                            args.inValue));
+                    message.append("Input inValue: ");
+                    message.append(String.format("%d", args.inValue));
                     message.append("\n");
-                    message.append(String.format("Input inMinValue: %d",
-                            args.inMinValue));
+                    message.append("Input inMinValue: ");
+                    message.append(String.format("%d", args.inMinValue));
                     message.append("\n");
-                    message.append(String.format("Input inMaxValue: %d",
-                            args.inMaxValue));
+                    message.append("Input inMaxValue: ");
+                    message.append(String.format("%d", args.inMaxValue));
                     message.append("\n");
-                    message.append(String.format("Expected output out: %d",
-                            args.out));
+                    message.append("Expected output out: ");
+                    message.append(String.format("%d", args.out));
                     message.append("\n");
-                    message.append(String.format("Actual   output out: %d",
-                            arrayOut[i * 4 + j]));
+                    message.append("Actual   output out: ");
+                    message.append(String.format("%d", arrayOut[i * 4 + j]));
                     if (args.out != arrayOut[i * 4 + j]) {
                         message.append(" FAIL");
                     }
@@ -1516,30 +1500,29 @@ public class TestClamp extends RSBaseCompute {
                 args.inMinValue = arrayInMinValue[i * 4 + j];
                 args.inMaxValue = arrayInMaxValue[i * 4 + j];
                 // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeClamp(args);
-                int ulf = relaxed ? args.ulfRelaxed : args.ulf;
                 // Figure out what the outputs should have been.
                 boolean valid = true;
-                int neededUlf = 0;
                 if (args.out != arrayOut[i * 4 + j]) {
                     valid = false;
                 }
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
-                    message.append(String.format("Input inValue: %d",
-                            args.inValue));
+                    message.append("Input inValue: ");
+                    message.append(String.format("%d", args.inValue));
                     message.append("\n");
-                    message.append(String.format("Input inMinValue: %d",
-                            args.inMinValue));
+                    message.append("Input inMinValue: ");
+                    message.append(String.format("%d", args.inMinValue));
                     message.append("\n");
-                    message.append(String.format("Input inMaxValue: %d",
-                            args.inMaxValue));
+                    message.append("Input inMaxValue: ");
+                    message.append(String.format("%d", args.inMaxValue));
                     message.append("\n");
-                    message.append(String.format("Expected output out: %d",
-                            args.out));
+                    message.append("Expected output out: ");
+                    message.append(String.format("%d", args.out));
                     message.append("\n");
-                    message.append(String.format("Actual   output out: %d",
-                            arrayOut[i * 4 + j]));
+                    message.append("Actual   output out: ");
+                    message.append(String.format("%d", arrayOut[i * 4 + j]));
                     if (args.out != arrayOut[i * 4 + j]) {
                         message.append(" FAIL");
                     }
@@ -1556,9 +1539,6 @@ public class TestClamp extends RSBaseCompute {
         public short inMinValue;
         public short inMaxValue;
         public short out;
-
-        public int ulf;
-        public int ulfRelaxed;
     }
 
     private void checkClampUshortUshortUshortUshort() {
@@ -1603,30 +1583,29 @@ public class TestClamp extends RSBaseCompute {
                 args.inMinValue = arrayInMinValue[i];
                 args.inMaxValue = arrayInMaxValue[i];
                 // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeClamp(args);
-                int ulf = relaxed ? args.ulfRelaxed : args.ulf;
                 // Figure out what the outputs should have been.
                 boolean valid = true;
-                int neededUlf = 0;
                 if (args.out != arrayOut[i * 1 + j]) {
                     valid = false;
                 }
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
-                    message.append(String.format("Input inValue: 0x%x",
-                            args.inValue));
+                    message.append("Input inValue: ");
+                    message.append(String.format("0x%x", args.inValue));
                     message.append("\n");
-                    message.append(String.format("Input inMinValue: 0x%x",
-                            args.inMinValue));
+                    message.append("Input inMinValue: ");
+                    message.append(String.format("0x%x", args.inMinValue));
                     message.append("\n");
-                    message.append(String.format("Input inMaxValue: 0x%x",
-                            args.inMaxValue));
+                    message.append("Input inMaxValue: ");
+                    message.append(String.format("0x%x", args.inMaxValue));
                     message.append("\n");
-                    message.append(String.format("Expected output out: 0x%x",
-                            args.out));
+                    message.append("Expected output out: ");
+                    message.append(String.format("0x%x", args.out));
                     message.append("\n");
-                    message.append(String.format("Actual   output out: 0x%x",
-                            arrayOut[i * 1 + j]));
+                    message.append("Actual   output out: ");
+                    message.append(String.format("0x%x", arrayOut[i * 1 + j]));
                     if (args.out != arrayOut[i * 1 + j]) {
                         message.append(" FAIL");
                     }
@@ -1680,30 +1659,29 @@ public class TestClamp extends RSBaseCompute {
                 args.inMinValue = arrayInMinValue[i * 2 + j];
                 args.inMaxValue = arrayInMaxValue[i * 2 + j];
                 // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeClamp(args);
-                int ulf = relaxed ? args.ulfRelaxed : args.ulf;
                 // Figure out what the outputs should have been.
                 boolean valid = true;
-                int neededUlf = 0;
                 if (args.out != arrayOut[i * 2 + j]) {
                     valid = false;
                 }
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
-                    message.append(String.format("Input inValue: 0x%x",
-                            args.inValue));
+                    message.append("Input inValue: ");
+                    message.append(String.format("0x%x", args.inValue));
                     message.append("\n");
-                    message.append(String.format("Input inMinValue: 0x%x",
-                            args.inMinValue));
+                    message.append("Input inMinValue: ");
+                    message.append(String.format("0x%x", args.inMinValue));
                     message.append("\n");
-                    message.append(String.format("Input inMaxValue: 0x%x",
-                            args.inMaxValue));
+                    message.append("Input inMaxValue: ");
+                    message.append(String.format("0x%x", args.inMaxValue));
                     message.append("\n");
-                    message.append(String.format("Expected output out: 0x%x",
-                            args.out));
+                    message.append("Expected output out: ");
+                    message.append(String.format("0x%x", args.out));
                     message.append("\n");
-                    message.append(String.format("Actual   output out: 0x%x",
-                            arrayOut[i * 2 + j]));
+                    message.append("Actual   output out: ");
+                    message.append(String.format("0x%x", arrayOut[i * 2 + j]));
                     if (args.out != arrayOut[i * 2 + j]) {
                         message.append(" FAIL");
                     }
@@ -1757,30 +1735,29 @@ public class TestClamp extends RSBaseCompute {
                 args.inMinValue = arrayInMinValue[i * 4 + j];
                 args.inMaxValue = arrayInMaxValue[i * 4 + j];
                 // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeClamp(args);
-                int ulf = relaxed ? args.ulfRelaxed : args.ulf;
                 // Figure out what the outputs should have been.
                 boolean valid = true;
-                int neededUlf = 0;
                 if (args.out != arrayOut[i * 4 + j]) {
                     valid = false;
                 }
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
-                    message.append(String.format("Input inValue: 0x%x",
-                            args.inValue));
+                    message.append("Input inValue: ");
+                    message.append(String.format("0x%x", args.inValue));
                     message.append("\n");
-                    message.append(String.format("Input inMinValue: 0x%x",
-                            args.inMinValue));
+                    message.append("Input inMinValue: ");
+                    message.append(String.format("0x%x", args.inMinValue));
                     message.append("\n");
-                    message.append(String.format("Input inMaxValue: 0x%x",
-                            args.inMaxValue));
+                    message.append("Input inMaxValue: ");
+                    message.append(String.format("0x%x", args.inMaxValue));
                     message.append("\n");
-                    message.append(String.format("Expected output out: 0x%x",
-                            args.out));
+                    message.append("Expected output out: ");
+                    message.append(String.format("0x%x", args.out));
                     message.append("\n");
-                    message.append(String.format("Actual   output out: 0x%x",
-                            arrayOut[i * 4 + j]));
+                    message.append("Actual   output out: ");
+                    message.append(String.format("0x%x", arrayOut[i * 4 + j]));
                     if (args.out != arrayOut[i * 4 + j]) {
                         message.append(" FAIL");
                     }
@@ -1834,30 +1811,29 @@ public class TestClamp extends RSBaseCompute {
                 args.inMinValue = arrayInMinValue[i * 4 + j];
                 args.inMaxValue = arrayInMaxValue[i * 4 + j];
                 // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeClamp(args);
-                int ulf = relaxed ? args.ulfRelaxed : args.ulf;
                 // Figure out what the outputs should have been.
                 boolean valid = true;
-                int neededUlf = 0;
                 if (args.out != arrayOut[i * 4 + j]) {
                     valid = false;
                 }
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
-                    message.append(String.format("Input inValue: 0x%x",
-                            args.inValue));
+                    message.append("Input inValue: ");
+                    message.append(String.format("0x%x", args.inValue));
                     message.append("\n");
-                    message.append(String.format("Input inMinValue: 0x%x",
-                            args.inMinValue));
+                    message.append("Input inMinValue: ");
+                    message.append(String.format("0x%x", args.inMinValue));
                     message.append("\n");
-                    message.append(String.format("Input inMaxValue: 0x%x",
-                            args.inMaxValue));
+                    message.append("Input inMaxValue: ");
+                    message.append(String.format("0x%x", args.inMaxValue));
                     message.append("\n");
-                    message.append(String.format("Expected output out: 0x%x",
-                            args.out));
+                    message.append("Expected output out: ");
+                    message.append(String.format("0x%x", args.out));
                     message.append("\n");
-                    message.append(String.format("Actual   output out: 0x%x",
-                            arrayOut[i * 4 + j]));
+                    message.append("Actual   output out: ");
+                    message.append(String.format("0x%x", arrayOut[i * 4 + j]));
                     if (args.out != arrayOut[i * 4 + j]) {
                         message.append(" FAIL");
                     }
@@ -1874,9 +1850,6 @@ public class TestClamp extends RSBaseCompute {
         public int inMinValue;
         public int inMaxValue;
         public int out;
-
-        public int ulf;
-        public int ulfRelaxed;
     }
 
     private void checkClampIntIntIntInt() {
@@ -1921,30 +1894,29 @@ public class TestClamp extends RSBaseCompute {
                 args.inMinValue = arrayInMinValue[i];
                 args.inMaxValue = arrayInMaxValue[i];
                 // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeClamp(args);
-                int ulf = relaxed ? args.ulfRelaxed : args.ulf;
                 // Figure out what the outputs should have been.
                 boolean valid = true;
-                int neededUlf = 0;
                 if (args.out != arrayOut[i * 1 + j]) {
                     valid = false;
                 }
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
-                    message.append(String.format("Input inValue: %d",
-                            args.inValue));
+                    message.append("Input inValue: ");
+                    message.append(String.format("%d", args.inValue));
                     message.append("\n");
-                    message.append(String.format("Input inMinValue: %d",
-                            args.inMinValue));
+                    message.append("Input inMinValue: ");
+                    message.append(String.format("%d", args.inMinValue));
                     message.append("\n");
-                    message.append(String.format("Input inMaxValue: %d",
-                            args.inMaxValue));
+                    message.append("Input inMaxValue: ");
+                    message.append(String.format("%d", args.inMaxValue));
                     message.append("\n");
-                    message.append(String.format("Expected output out: %d",
-                            args.out));
+                    message.append("Expected output out: ");
+                    message.append(String.format("%d", args.out));
                     message.append("\n");
-                    message.append(String.format("Actual   output out: %d",
-                            arrayOut[i * 1 + j]));
+                    message.append("Actual   output out: ");
+                    message.append(String.format("%d", arrayOut[i * 1 + j]));
                     if (args.out != arrayOut[i * 1 + j]) {
                         message.append(" FAIL");
                     }
@@ -1998,30 +1970,29 @@ public class TestClamp extends RSBaseCompute {
                 args.inMinValue = arrayInMinValue[i * 2 + j];
                 args.inMaxValue = arrayInMaxValue[i * 2 + j];
                 // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeClamp(args);
-                int ulf = relaxed ? args.ulfRelaxed : args.ulf;
                 // Figure out what the outputs should have been.
                 boolean valid = true;
-                int neededUlf = 0;
                 if (args.out != arrayOut[i * 2 + j]) {
                     valid = false;
                 }
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
-                    message.append(String.format("Input inValue: %d",
-                            args.inValue));
+                    message.append("Input inValue: ");
+                    message.append(String.format("%d", args.inValue));
                     message.append("\n");
-                    message.append(String.format("Input inMinValue: %d",
-                            args.inMinValue));
+                    message.append("Input inMinValue: ");
+                    message.append(String.format("%d", args.inMinValue));
                     message.append("\n");
-                    message.append(String.format("Input inMaxValue: %d",
-                            args.inMaxValue));
+                    message.append("Input inMaxValue: ");
+                    message.append(String.format("%d", args.inMaxValue));
                     message.append("\n");
-                    message.append(String.format("Expected output out: %d",
-                            args.out));
+                    message.append("Expected output out: ");
+                    message.append(String.format("%d", args.out));
                     message.append("\n");
-                    message.append(String.format("Actual   output out: %d",
-                            arrayOut[i * 2 + j]));
+                    message.append("Actual   output out: ");
+                    message.append(String.format("%d", arrayOut[i * 2 + j]));
                     if (args.out != arrayOut[i * 2 + j]) {
                         message.append(" FAIL");
                     }
@@ -2075,30 +2046,29 @@ public class TestClamp extends RSBaseCompute {
                 args.inMinValue = arrayInMinValue[i * 4 + j];
                 args.inMaxValue = arrayInMaxValue[i * 4 + j];
                 // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeClamp(args);
-                int ulf = relaxed ? args.ulfRelaxed : args.ulf;
                 // Figure out what the outputs should have been.
                 boolean valid = true;
-                int neededUlf = 0;
                 if (args.out != arrayOut[i * 4 + j]) {
                     valid = false;
                 }
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
-                    message.append(String.format("Input inValue: %d",
-                            args.inValue));
+                    message.append("Input inValue: ");
+                    message.append(String.format("%d", args.inValue));
                     message.append("\n");
-                    message.append(String.format("Input inMinValue: %d",
-                            args.inMinValue));
+                    message.append("Input inMinValue: ");
+                    message.append(String.format("%d", args.inMinValue));
                     message.append("\n");
-                    message.append(String.format("Input inMaxValue: %d",
-                            args.inMaxValue));
+                    message.append("Input inMaxValue: ");
+                    message.append(String.format("%d", args.inMaxValue));
                     message.append("\n");
-                    message.append(String.format("Expected output out: %d",
-                            args.out));
+                    message.append("Expected output out: ");
+                    message.append(String.format("%d", args.out));
                     message.append("\n");
-                    message.append(String.format("Actual   output out: %d",
-                            arrayOut[i * 4 + j]));
+                    message.append("Actual   output out: ");
+                    message.append(String.format("%d", arrayOut[i * 4 + j]));
                     if (args.out != arrayOut[i * 4 + j]) {
                         message.append(" FAIL");
                     }
@@ -2152,30 +2122,29 @@ public class TestClamp extends RSBaseCompute {
                 args.inMinValue = arrayInMinValue[i * 4 + j];
                 args.inMaxValue = arrayInMaxValue[i * 4 + j];
                 // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeClamp(args);
-                int ulf = relaxed ? args.ulfRelaxed : args.ulf;
                 // Figure out what the outputs should have been.
                 boolean valid = true;
-                int neededUlf = 0;
                 if (args.out != arrayOut[i * 4 + j]) {
                     valid = false;
                 }
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
-                    message.append(String.format("Input inValue: %d",
-                            args.inValue));
+                    message.append("Input inValue: ");
+                    message.append(String.format("%d", args.inValue));
                     message.append("\n");
-                    message.append(String.format("Input inMinValue: %d",
-                            args.inMinValue));
+                    message.append("Input inMinValue: ");
+                    message.append(String.format("%d", args.inMinValue));
                     message.append("\n");
-                    message.append(String.format("Input inMaxValue: %d",
-                            args.inMaxValue));
+                    message.append("Input inMaxValue: ");
+                    message.append(String.format("%d", args.inMaxValue));
                     message.append("\n");
-                    message.append(String.format("Expected output out: %d",
-                            args.out));
+                    message.append("Expected output out: ");
+                    message.append(String.format("%d", args.out));
                     message.append("\n");
-                    message.append(String.format("Actual   output out: %d",
-                            arrayOut[i * 4 + j]));
+                    message.append("Actual   output out: ");
+                    message.append(String.format("%d", arrayOut[i * 4 + j]));
                     if (args.out != arrayOut[i * 4 + j]) {
                         message.append(" FAIL");
                     }
@@ -2192,9 +2161,6 @@ public class TestClamp extends RSBaseCompute {
         public int inMinValue;
         public int inMaxValue;
         public int out;
-
-        public int ulf;
-        public int ulfRelaxed;
     }
 
     private void checkClampUintUintUintUint() {
@@ -2239,30 +2205,29 @@ public class TestClamp extends RSBaseCompute {
                 args.inMinValue = arrayInMinValue[i];
                 args.inMaxValue = arrayInMaxValue[i];
                 // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeClamp(args);
-                int ulf = relaxed ? args.ulfRelaxed : args.ulf;
                 // Figure out what the outputs should have been.
                 boolean valid = true;
-                int neededUlf = 0;
                 if (args.out != arrayOut[i * 1 + j]) {
                     valid = false;
                 }
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
-                    message.append(String.format("Input inValue: 0x%x",
-                            args.inValue));
+                    message.append("Input inValue: ");
+                    message.append(String.format("0x%x", args.inValue));
                     message.append("\n");
-                    message.append(String.format("Input inMinValue: 0x%x",
-                            args.inMinValue));
+                    message.append("Input inMinValue: ");
+                    message.append(String.format("0x%x", args.inMinValue));
                     message.append("\n");
-                    message.append(String.format("Input inMaxValue: 0x%x",
-                            args.inMaxValue));
+                    message.append("Input inMaxValue: ");
+                    message.append(String.format("0x%x", args.inMaxValue));
                     message.append("\n");
-                    message.append(String.format("Expected output out: 0x%x",
-                            args.out));
+                    message.append("Expected output out: ");
+                    message.append(String.format("0x%x", args.out));
                     message.append("\n");
-                    message.append(String.format("Actual   output out: 0x%x",
-                            arrayOut[i * 1 + j]));
+                    message.append("Actual   output out: ");
+                    message.append(String.format("0x%x", arrayOut[i * 1 + j]));
                     if (args.out != arrayOut[i * 1 + j]) {
                         message.append(" FAIL");
                     }
@@ -2316,30 +2281,29 @@ public class TestClamp extends RSBaseCompute {
                 args.inMinValue = arrayInMinValue[i * 2 + j];
                 args.inMaxValue = arrayInMaxValue[i * 2 + j];
                 // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeClamp(args);
-                int ulf = relaxed ? args.ulfRelaxed : args.ulf;
                 // Figure out what the outputs should have been.
                 boolean valid = true;
-                int neededUlf = 0;
                 if (args.out != arrayOut[i * 2 + j]) {
                     valid = false;
                 }
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
-                    message.append(String.format("Input inValue: 0x%x",
-                            args.inValue));
+                    message.append("Input inValue: ");
+                    message.append(String.format("0x%x", args.inValue));
                     message.append("\n");
-                    message.append(String.format("Input inMinValue: 0x%x",
-                            args.inMinValue));
+                    message.append("Input inMinValue: ");
+                    message.append(String.format("0x%x", args.inMinValue));
                     message.append("\n");
-                    message.append(String.format("Input inMaxValue: 0x%x",
-                            args.inMaxValue));
+                    message.append("Input inMaxValue: ");
+                    message.append(String.format("0x%x", args.inMaxValue));
                     message.append("\n");
-                    message.append(String.format("Expected output out: 0x%x",
-                            args.out));
+                    message.append("Expected output out: ");
+                    message.append(String.format("0x%x", args.out));
                     message.append("\n");
-                    message.append(String.format("Actual   output out: 0x%x",
-                            arrayOut[i * 2 + j]));
+                    message.append("Actual   output out: ");
+                    message.append(String.format("0x%x", arrayOut[i * 2 + j]));
                     if (args.out != arrayOut[i * 2 + j]) {
                         message.append(" FAIL");
                     }
@@ -2393,30 +2357,29 @@ public class TestClamp extends RSBaseCompute {
                 args.inMinValue = arrayInMinValue[i * 4 + j];
                 args.inMaxValue = arrayInMaxValue[i * 4 + j];
                 // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeClamp(args);
-                int ulf = relaxed ? args.ulfRelaxed : args.ulf;
                 // Figure out what the outputs should have been.
                 boolean valid = true;
-                int neededUlf = 0;
                 if (args.out != arrayOut[i * 4 + j]) {
                     valid = false;
                 }
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
-                    message.append(String.format("Input inValue: 0x%x",
-                            args.inValue));
+                    message.append("Input inValue: ");
+                    message.append(String.format("0x%x", args.inValue));
                     message.append("\n");
-                    message.append(String.format("Input inMinValue: 0x%x",
-                            args.inMinValue));
+                    message.append("Input inMinValue: ");
+                    message.append(String.format("0x%x", args.inMinValue));
                     message.append("\n");
-                    message.append(String.format("Input inMaxValue: 0x%x",
-                            args.inMaxValue));
+                    message.append("Input inMaxValue: ");
+                    message.append(String.format("0x%x", args.inMaxValue));
                     message.append("\n");
-                    message.append(String.format("Expected output out: 0x%x",
-                            args.out));
+                    message.append("Expected output out: ");
+                    message.append(String.format("0x%x", args.out));
                     message.append("\n");
-                    message.append(String.format("Actual   output out: 0x%x",
-                            arrayOut[i * 4 + j]));
+                    message.append("Actual   output out: ");
+                    message.append(String.format("0x%x", arrayOut[i * 4 + j]));
                     if (args.out != arrayOut[i * 4 + j]) {
                         message.append(" FAIL");
                     }
@@ -2470,30 +2433,29 @@ public class TestClamp extends RSBaseCompute {
                 args.inMinValue = arrayInMinValue[i * 4 + j];
                 args.inMaxValue = arrayInMaxValue[i * 4 + j];
                 // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeClamp(args);
-                int ulf = relaxed ? args.ulfRelaxed : args.ulf;
                 // Figure out what the outputs should have been.
                 boolean valid = true;
-                int neededUlf = 0;
                 if (args.out != arrayOut[i * 4 + j]) {
                     valid = false;
                 }
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
-                    message.append(String.format("Input inValue: 0x%x",
-                            args.inValue));
+                    message.append("Input inValue: ");
+                    message.append(String.format("0x%x", args.inValue));
                     message.append("\n");
-                    message.append(String.format("Input inMinValue: 0x%x",
-                            args.inMinValue));
+                    message.append("Input inMinValue: ");
+                    message.append(String.format("0x%x", args.inMinValue));
                     message.append("\n");
-                    message.append(String.format("Input inMaxValue: 0x%x",
-                            args.inMaxValue));
+                    message.append("Input inMaxValue: ");
+                    message.append(String.format("0x%x", args.inMaxValue));
                     message.append("\n");
-                    message.append(String.format("Expected output out: 0x%x",
-                            args.out));
+                    message.append("Expected output out: ");
+                    message.append(String.format("0x%x", args.out));
                     message.append("\n");
-                    message.append(String.format("Actual   output out: 0x%x",
-                            arrayOut[i * 4 + j]));
+                    message.append("Actual   output out: ");
+                    message.append(String.format("0x%x", arrayOut[i * 4 + j]));
                     if (args.out != arrayOut[i * 4 + j]) {
                         message.append(" FAIL");
                     }
@@ -2547,30 +2509,29 @@ public class TestClamp extends RSBaseCompute {
                 args.inMinValue = arrayInMinValue[i];
                 args.inMaxValue = arrayInMaxValue[i];
                 // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeClamp(args);
-                int ulf = relaxed ? args.ulfRelaxed : args.ulf;
                 // Figure out what the outputs should have been.
                 boolean valid = true;
-                int neededUlf = 0;
                 if (args.out != arrayOut[i * 2 + j]) {
                     valid = false;
                 }
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
-                    message.append(String.format("Input inValue: %d",
-                            args.inValue));
+                    message.append("Input inValue: ");
+                    message.append(String.format("%d", args.inValue));
                     message.append("\n");
-                    message.append(String.format("Input inMinValue: %d",
-                            args.inMinValue));
+                    message.append("Input inMinValue: ");
+                    message.append(String.format("%d", args.inMinValue));
                     message.append("\n");
-                    message.append(String.format("Input inMaxValue: %d",
-                            args.inMaxValue));
+                    message.append("Input inMaxValue: ");
+                    message.append(String.format("%d", args.inMaxValue));
                     message.append("\n");
-                    message.append(String.format("Expected output out: %d",
-                            args.out));
+                    message.append("Expected output out: ");
+                    message.append(String.format("%d", args.out));
                     message.append("\n");
-                    message.append(String.format("Actual   output out: %d",
-                            arrayOut[i * 2 + j]));
+                    message.append("Actual   output out: ");
+                    message.append(String.format("%d", arrayOut[i * 2 + j]));
                     if (args.out != arrayOut[i * 2 + j]) {
                         message.append(" FAIL");
                     }
@@ -2624,30 +2585,29 @@ public class TestClamp extends RSBaseCompute {
                 args.inMinValue = arrayInMinValue[i];
                 args.inMaxValue = arrayInMaxValue[i];
                 // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeClamp(args);
-                int ulf = relaxed ? args.ulfRelaxed : args.ulf;
                 // Figure out what the outputs should have been.
                 boolean valid = true;
-                int neededUlf = 0;
                 if (args.out != arrayOut[i * 4 + j]) {
                     valid = false;
                 }
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
-                    message.append(String.format("Input inValue: %d",
-                            args.inValue));
+                    message.append("Input inValue: ");
+                    message.append(String.format("%d", args.inValue));
                     message.append("\n");
-                    message.append(String.format("Input inMinValue: %d",
-                            args.inMinValue));
+                    message.append("Input inMinValue: ");
+                    message.append(String.format("%d", args.inMinValue));
                     message.append("\n");
-                    message.append(String.format("Input inMaxValue: %d",
-                            args.inMaxValue));
+                    message.append("Input inMaxValue: ");
+                    message.append(String.format("%d", args.inMaxValue));
                     message.append("\n");
-                    message.append(String.format("Expected output out: %d",
-                            args.out));
+                    message.append("Expected output out: ");
+                    message.append(String.format("%d", args.out));
                     message.append("\n");
-                    message.append(String.format("Actual   output out: %d",
-                            arrayOut[i * 4 + j]));
+                    message.append("Actual   output out: ");
+                    message.append(String.format("%d", arrayOut[i * 4 + j]));
                     if (args.out != arrayOut[i * 4 + j]) {
                         message.append(" FAIL");
                     }
@@ -2701,30 +2661,29 @@ public class TestClamp extends RSBaseCompute {
                 args.inMinValue = arrayInMinValue[i];
                 args.inMaxValue = arrayInMaxValue[i];
                 // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeClamp(args);
-                int ulf = relaxed ? args.ulfRelaxed : args.ulf;
                 // Figure out what the outputs should have been.
                 boolean valid = true;
-                int neededUlf = 0;
                 if (args.out != arrayOut[i * 4 + j]) {
                     valid = false;
                 }
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
-                    message.append(String.format("Input inValue: %d",
-                            args.inValue));
+                    message.append("Input inValue: ");
+                    message.append(String.format("%d", args.inValue));
                     message.append("\n");
-                    message.append(String.format("Input inMinValue: %d",
-                            args.inMinValue));
+                    message.append("Input inMinValue: ");
+                    message.append(String.format("%d", args.inMinValue));
                     message.append("\n");
-                    message.append(String.format("Input inMaxValue: %d",
-                            args.inMaxValue));
+                    message.append("Input inMaxValue: ");
+                    message.append(String.format("%d", args.inMaxValue));
                     message.append("\n");
-                    message.append(String.format("Expected output out: %d",
-                            args.out));
+                    message.append("Expected output out: ");
+                    message.append(String.format("%d", args.out));
                     message.append("\n");
-                    message.append(String.format("Actual   output out: %d",
-                            arrayOut[i * 4 + j]));
+                    message.append("Actual   output out: ");
+                    message.append(String.format("%d", arrayOut[i * 4 + j]));
                     if (args.out != arrayOut[i * 4 + j]) {
                         message.append(" FAIL");
                     }
@@ -2778,30 +2737,29 @@ public class TestClamp extends RSBaseCompute {
                 args.inMinValue = arrayInMinValue[i];
                 args.inMaxValue = arrayInMaxValue[i];
                 // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeClamp(args);
-                int ulf = relaxed ? args.ulfRelaxed : args.ulf;
                 // Figure out what the outputs should have been.
                 boolean valid = true;
-                int neededUlf = 0;
                 if (args.out != arrayOut[i * 2 + j]) {
                     valid = false;
                 }
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
-                    message.append(String.format("Input inValue: 0x%x",
-                            args.inValue));
+                    message.append("Input inValue: ");
+                    message.append(String.format("0x%x", args.inValue));
                     message.append("\n");
-                    message.append(String.format("Input inMinValue: 0x%x",
-                            args.inMinValue));
+                    message.append("Input inMinValue: ");
+                    message.append(String.format("0x%x", args.inMinValue));
                     message.append("\n");
-                    message.append(String.format("Input inMaxValue: 0x%x",
-                            args.inMaxValue));
+                    message.append("Input inMaxValue: ");
+                    message.append(String.format("0x%x", args.inMaxValue));
                     message.append("\n");
-                    message.append(String.format("Expected output out: 0x%x",
-                            args.out));
+                    message.append("Expected output out: ");
+                    message.append(String.format("0x%x", args.out));
                     message.append("\n");
-                    message.append(String.format("Actual   output out: 0x%x",
-                            arrayOut[i * 2 + j]));
+                    message.append("Actual   output out: ");
+                    message.append(String.format("0x%x", arrayOut[i * 2 + j]));
                     if (args.out != arrayOut[i * 2 + j]) {
                         message.append(" FAIL");
                     }
@@ -2855,30 +2813,29 @@ public class TestClamp extends RSBaseCompute {
                 args.inMinValue = arrayInMinValue[i];
                 args.inMaxValue = arrayInMaxValue[i];
                 // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeClamp(args);
-                int ulf = relaxed ? args.ulfRelaxed : args.ulf;
                 // Figure out what the outputs should have been.
                 boolean valid = true;
-                int neededUlf = 0;
                 if (args.out != arrayOut[i * 4 + j]) {
                     valid = false;
                 }
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
-                    message.append(String.format("Input inValue: 0x%x",
-                            args.inValue));
+                    message.append("Input inValue: ");
+                    message.append(String.format("0x%x", args.inValue));
                     message.append("\n");
-                    message.append(String.format("Input inMinValue: 0x%x",
-                            args.inMinValue));
+                    message.append("Input inMinValue: ");
+                    message.append(String.format("0x%x", args.inMinValue));
                     message.append("\n");
-                    message.append(String.format("Input inMaxValue: 0x%x",
-                            args.inMaxValue));
+                    message.append("Input inMaxValue: ");
+                    message.append(String.format("0x%x", args.inMaxValue));
                     message.append("\n");
-                    message.append(String.format("Expected output out: 0x%x",
-                            args.out));
+                    message.append("Expected output out: ");
+                    message.append(String.format("0x%x", args.out));
                     message.append("\n");
-                    message.append(String.format("Actual   output out: 0x%x",
-                            arrayOut[i * 4 + j]));
+                    message.append("Actual   output out: ");
+                    message.append(String.format("0x%x", arrayOut[i * 4 + j]));
                     if (args.out != arrayOut[i * 4 + j]) {
                         message.append(" FAIL");
                     }
@@ -2932,30 +2889,29 @@ public class TestClamp extends RSBaseCompute {
                 args.inMinValue = arrayInMinValue[i];
                 args.inMaxValue = arrayInMaxValue[i];
                 // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeClamp(args);
-                int ulf = relaxed ? args.ulfRelaxed : args.ulf;
                 // Figure out what the outputs should have been.
                 boolean valid = true;
-                int neededUlf = 0;
                 if (args.out != arrayOut[i * 4 + j]) {
                     valid = false;
                 }
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
-                    message.append(String.format("Input inValue: 0x%x",
-                            args.inValue));
+                    message.append("Input inValue: ");
+                    message.append(String.format("0x%x", args.inValue));
                     message.append("\n");
-                    message.append(String.format("Input inMinValue: 0x%x",
-                            args.inMinValue));
+                    message.append("Input inMinValue: ");
+                    message.append(String.format("0x%x", args.inMinValue));
                     message.append("\n");
-                    message.append(String.format("Input inMaxValue: 0x%x",
-                            args.inMaxValue));
+                    message.append("Input inMaxValue: ");
+                    message.append(String.format("0x%x", args.inMaxValue));
                     message.append("\n");
-                    message.append(String.format("Expected output out: 0x%x",
-                            args.out));
+                    message.append("Expected output out: ");
+                    message.append(String.format("0x%x", args.out));
                     message.append("\n");
-                    message.append(String.format("Actual   output out: 0x%x",
-                            arrayOut[i * 4 + j]));
+                    message.append("Actual   output out: ");
+                    message.append(String.format("0x%x", arrayOut[i * 4 + j]));
                     if (args.out != arrayOut[i * 4 + j]) {
                         message.append(" FAIL");
                     }
@@ -3009,30 +2965,29 @@ public class TestClamp extends RSBaseCompute {
                 args.inMinValue = arrayInMinValue[i];
                 args.inMaxValue = arrayInMaxValue[i];
                 // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeClamp(args);
-                int ulf = relaxed ? args.ulfRelaxed : args.ulf;
                 // Figure out what the outputs should have been.
                 boolean valid = true;
-                int neededUlf = 0;
                 if (args.out != arrayOut[i * 2 + j]) {
                     valid = false;
                 }
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
-                    message.append(String.format("Input inValue: %d",
-                            args.inValue));
+                    message.append("Input inValue: ");
+                    message.append(String.format("%d", args.inValue));
                     message.append("\n");
-                    message.append(String.format("Input inMinValue: %d",
-                            args.inMinValue));
+                    message.append("Input inMinValue: ");
+                    message.append(String.format("%d", args.inMinValue));
                     message.append("\n");
-                    message.append(String.format("Input inMaxValue: %d",
-                            args.inMaxValue));
+                    message.append("Input inMaxValue: ");
+                    message.append(String.format("%d", args.inMaxValue));
                     message.append("\n");
-                    message.append(String.format("Expected output out: %d",
-                            args.out));
+                    message.append("Expected output out: ");
+                    message.append(String.format("%d", args.out));
                     message.append("\n");
-                    message.append(String.format("Actual   output out: %d",
-                            arrayOut[i * 2 + j]));
+                    message.append("Actual   output out: ");
+                    message.append(String.format("%d", arrayOut[i * 2 + j]));
                     if (args.out != arrayOut[i * 2 + j]) {
                         message.append(" FAIL");
                     }
@@ -3086,30 +3041,29 @@ public class TestClamp extends RSBaseCompute {
                 args.inMinValue = arrayInMinValue[i];
                 args.inMaxValue = arrayInMaxValue[i];
                 // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeClamp(args);
-                int ulf = relaxed ? args.ulfRelaxed : args.ulf;
                 // Figure out what the outputs should have been.
                 boolean valid = true;
-                int neededUlf = 0;
                 if (args.out != arrayOut[i * 4 + j]) {
                     valid = false;
                 }
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
-                    message.append(String.format("Input inValue: %d",
-                            args.inValue));
+                    message.append("Input inValue: ");
+                    message.append(String.format("%d", args.inValue));
                     message.append("\n");
-                    message.append(String.format("Input inMinValue: %d",
-                            args.inMinValue));
+                    message.append("Input inMinValue: ");
+                    message.append(String.format("%d", args.inMinValue));
                     message.append("\n");
-                    message.append(String.format("Input inMaxValue: %d",
-                            args.inMaxValue));
+                    message.append("Input inMaxValue: ");
+                    message.append(String.format("%d", args.inMaxValue));
                     message.append("\n");
-                    message.append(String.format("Expected output out: %d",
-                            args.out));
+                    message.append("Expected output out: ");
+                    message.append(String.format("%d", args.out));
                     message.append("\n");
-                    message.append(String.format("Actual   output out: %d",
-                            arrayOut[i * 4 + j]));
+                    message.append("Actual   output out: ");
+                    message.append(String.format("%d", arrayOut[i * 4 + j]));
                     if (args.out != arrayOut[i * 4 + j]) {
                         message.append(" FAIL");
                     }
@@ -3163,30 +3117,29 @@ public class TestClamp extends RSBaseCompute {
                 args.inMinValue = arrayInMinValue[i];
                 args.inMaxValue = arrayInMaxValue[i];
                 // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeClamp(args);
-                int ulf = relaxed ? args.ulfRelaxed : args.ulf;
                 // Figure out what the outputs should have been.
                 boolean valid = true;
-                int neededUlf = 0;
                 if (args.out != arrayOut[i * 4 + j]) {
                     valid = false;
                 }
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
-                    message.append(String.format("Input inValue: %d",
-                            args.inValue));
+                    message.append("Input inValue: ");
+                    message.append(String.format("%d", args.inValue));
                     message.append("\n");
-                    message.append(String.format("Input inMinValue: %d",
-                            args.inMinValue));
+                    message.append("Input inMinValue: ");
+                    message.append(String.format("%d", args.inMinValue));
                     message.append("\n");
-                    message.append(String.format("Input inMaxValue: %d",
-                            args.inMaxValue));
+                    message.append("Input inMaxValue: ");
+                    message.append(String.format("%d", args.inMaxValue));
                     message.append("\n");
-                    message.append(String.format("Expected output out: %d",
-                            args.out));
+                    message.append("Expected output out: ");
+                    message.append(String.format("%d", args.out));
                     message.append("\n");
-                    message.append(String.format("Actual   output out: %d",
-                            arrayOut[i * 4 + j]));
+                    message.append("Actual   output out: ");
+                    message.append(String.format("%d", arrayOut[i * 4 + j]));
                     if (args.out != arrayOut[i * 4 + j]) {
                         message.append(" FAIL");
                     }
@@ -3240,30 +3193,29 @@ public class TestClamp extends RSBaseCompute {
                 args.inMinValue = arrayInMinValue[i];
                 args.inMaxValue = arrayInMaxValue[i];
                 // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeClamp(args);
-                int ulf = relaxed ? args.ulfRelaxed : args.ulf;
                 // Figure out what the outputs should have been.
                 boolean valid = true;
-                int neededUlf = 0;
                 if (args.out != arrayOut[i * 2 + j]) {
                     valid = false;
                 }
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
-                    message.append(String.format("Input inValue: 0x%x",
-                            args.inValue));
+                    message.append("Input inValue: ");
+                    message.append(String.format("0x%x", args.inValue));
                     message.append("\n");
-                    message.append(String.format("Input inMinValue: 0x%x",
-                            args.inMinValue));
+                    message.append("Input inMinValue: ");
+                    message.append(String.format("0x%x", args.inMinValue));
                     message.append("\n");
-                    message.append(String.format("Input inMaxValue: 0x%x",
-                            args.inMaxValue));
+                    message.append("Input inMaxValue: ");
+                    message.append(String.format("0x%x", args.inMaxValue));
                     message.append("\n");
-                    message.append(String.format("Expected output out: 0x%x",
-                            args.out));
+                    message.append("Expected output out: ");
+                    message.append(String.format("0x%x", args.out));
                     message.append("\n");
-                    message.append(String.format("Actual   output out: 0x%x",
-                            arrayOut[i * 2 + j]));
+                    message.append("Actual   output out: ");
+                    message.append(String.format("0x%x", arrayOut[i * 2 + j]));
                     if (args.out != arrayOut[i * 2 + j]) {
                         message.append(" FAIL");
                     }
@@ -3317,30 +3269,29 @@ public class TestClamp extends RSBaseCompute {
                 args.inMinValue = arrayInMinValue[i];
                 args.inMaxValue = arrayInMaxValue[i];
                 // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeClamp(args);
-                int ulf = relaxed ? args.ulfRelaxed : args.ulf;
                 // Figure out what the outputs should have been.
                 boolean valid = true;
-                int neededUlf = 0;
                 if (args.out != arrayOut[i * 4 + j]) {
                     valid = false;
                 }
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
-                    message.append(String.format("Input inValue: 0x%x",
-                            args.inValue));
+                    message.append("Input inValue: ");
+                    message.append(String.format("0x%x", args.inValue));
                     message.append("\n");
-                    message.append(String.format("Input inMinValue: 0x%x",
-                            args.inMinValue));
+                    message.append("Input inMinValue: ");
+                    message.append(String.format("0x%x", args.inMinValue));
                     message.append("\n");
-                    message.append(String.format("Input inMaxValue: 0x%x",
-                            args.inMaxValue));
+                    message.append("Input inMaxValue: ");
+                    message.append(String.format("0x%x", args.inMaxValue));
                     message.append("\n");
-                    message.append(String.format("Expected output out: 0x%x",
-                            args.out));
+                    message.append("Expected output out: ");
+                    message.append(String.format("0x%x", args.out));
                     message.append("\n");
-                    message.append(String.format("Actual   output out: 0x%x",
-                            arrayOut[i * 4 + j]));
+                    message.append("Actual   output out: ");
+                    message.append(String.format("0x%x", arrayOut[i * 4 + j]));
                     if (args.out != arrayOut[i * 4 + j]) {
                         message.append(" FAIL");
                     }
@@ -3394,30 +3345,29 @@ public class TestClamp extends RSBaseCompute {
                 args.inMinValue = arrayInMinValue[i];
                 args.inMaxValue = arrayInMaxValue[i];
                 // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeClamp(args);
-                int ulf = relaxed ? args.ulfRelaxed : args.ulf;
                 // Figure out what the outputs should have been.
                 boolean valid = true;
-                int neededUlf = 0;
                 if (args.out != arrayOut[i * 4 + j]) {
                     valid = false;
                 }
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
-                    message.append(String.format("Input inValue: 0x%x",
-                            args.inValue));
+                    message.append("Input inValue: ");
+                    message.append(String.format("0x%x", args.inValue));
                     message.append("\n");
-                    message.append(String.format("Input inMinValue: 0x%x",
-                            args.inMinValue));
+                    message.append("Input inMinValue: ");
+                    message.append(String.format("0x%x", args.inMinValue));
                     message.append("\n");
-                    message.append(String.format("Input inMaxValue: 0x%x",
-                            args.inMaxValue));
+                    message.append("Input inMaxValue: ");
+                    message.append(String.format("0x%x", args.inMaxValue));
                     message.append("\n");
-                    message.append(String.format("Expected output out: 0x%x",
-                            args.out));
+                    message.append("Expected output out: ");
+                    message.append(String.format("0x%x", args.out));
                     message.append("\n");
-                    message.append(String.format("Actual   output out: 0x%x",
-                            arrayOut[i * 4 + j]));
+                    message.append("Actual   output out: ");
+                    message.append(String.format("0x%x", arrayOut[i * 4 + j]));
                     if (args.out != arrayOut[i * 4 + j]) {
                         message.append(" FAIL");
                     }
@@ -3471,30 +3421,29 @@ public class TestClamp extends RSBaseCompute {
                 args.inMinValue = arrayInMinValue[i];
                 args.inMaxValue = arrayInMaxValue[i];
                 // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeClamp(args);
-                int ulf = relaxed ? args.ulfRelaxed : args.ulf;
                 // Figure out what the outputs should have been.
                 boolean valid = true;
-                int neededUlf = 0;
                 if (args.out != arrayOut[i * 2 + j]) {
                     valid = false;
                 }
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
-                    message.append(String.format("Input inValue: %d",
-                            args.inValue));
+                    message.append("Input inValue: ");
+                    message.append(String.format("%d", args.inValue));
                     message.append("\n");
-                    message.append(String.format("Input inMinValue: %d",
-                            args.inMinValue));
+                    message.append("Input inMinValue: ");
+                    message.append(String.format("%d", args.inMinValue));
                     message.append("\n");
-                    message.append(String.format("Input inMaxValue: %d",
-                            args.inMaxValue));
+                    message.append("Input inMaxValue: ");
+                    message.append(String.format("%d", args.inMaxValue));
                     message.append("\n");
-                    message.append(String.format("Expected output out: %d",
-                            args.out));
+                    message.append("Expected output out: ");
+                    message.append(String.format("%d", args.out));
                     message.append("\n");
-                    message.append(String.format("Actual   output out: %d",
-                            arrayOut[i * 2 + j]));
+                    message.append("Actual   output out: ");
+                    message.append(String.format("%d", arrayOut[i * 2 + j]));
                     if (args.out != arrayOut[i * 2 + j]) {
                         message.append(" FAIL");
                     }
@@ -3548,30 +3497,29 @@ public class TestClamp extends RSBaseCompute {
                 args.inMinValue = arrayInMinValue[i];
                 args.inMaxValue = arrayInMaxValue[i];
                 // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeClamp(args);
-                int ulf = relaxed ? args.ulfRelaxed : args.ulf;
                 // Figure out what the outputs should have been.
                 boolean valid = true;
-                int neededUlf = 0;
                 if (args.out != arrayOut[i * 4 + j]) {
                     valid = false;
                 }
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
-                    message.append(String.format("Input inValue: %d",
-                            args.inValue));
+                    message.append("Input inValue: ");
+                    message.append(String.format("%d", args.inValue));
                     message.append("\n");
-                    message.append(String.format("Input inMinValue: %d",
-                            args.inMinValue));
+                    message.append("Input inMinValue: ");
+                    message.append(String.format("%d", args.inMinValue));
                     message.append("\n");
-                    message.append(String.format("Input inMaxValue: %d",
-                            args.inMaxValue));
+                    message.append("Input inMaxValue: ");
+                    message.append(String.format("%d", args.inMaxValue));
                     message.append("\n");
-                    message.append(String.format("Expected output out: %d",
-                            args.out));
+                    message.append("Expected output out: ");
+                    message.append(String.format("%d", args.out));
                     message.append("\n");
-                    message.append(String.format("Actual   output out: %d",
-                            arrayOut[i * 4 + j]));
+                    message.append("Actual   output out: ");
+                    message.append(String.format("%d", arrayOut[i * 4 + j]));
                     if (args.out != arrayOut[i * 4 + j]) {
                         message.append(" FAIL");
                     }
@@ -3625,30 +3573,29 @@ public class TestClamp extends RSBaseCompute {
                 args.inMinValue = arrayInMinValue[i];
                 args.inMaxValue = arrayInMaxValue[i];
                 // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeClamp(args);
-                int ulf = relaxed ? args.ulfRelaxed : args.ulf;
                 // Figure out what the outputs should have been.
                 boolean valid = true;
-                int neededUlf = 0;
                 if (args.out != arrayOut[i * 4 + j]) {
                     valid = false;
                 }
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
-                    message.append(String.format("Input inValue: %d",
-                            args.inValue));
+                    message.append("Input inValue: ");
+                    message.append(String.format("%d", args.inValue));
                     message.append("\n");
-                    message.append(String.format("Input inMinValue: %d",
-                            args.inMinValue));
+                    message.append("Input inMinValue: ");
+                    message.append(String.format("%d", args.inMinValue));
                     message.append("\n");
-                    message.append(String.format("Input inMaxValue: %d",
-                            args.inMaxValue));
+                    message.append("Input inMaxValue: ");
+                    message.append(String.format("%d", args.inMaxValue));
                     message.append("\n");
-                    message.append(String.format("Expected output out: %d",
-                            args.out));
+                    message.append("Expected output out: ");
+                    message.append(String.format("%d", args.out));
                     message.append("\n");
-                    message.append(String.format("Actual   output out: %d",
-                            arrayOut[i * 4 + j]));
+                    message.append("Actual   output out: ");
+                    message.append(String.format("%d", arrayOut[i * 4 + j]));
                     if (args.out != arrayOut[i * 4 + j]) {
                         message.append(" FAIL");
                     }
@@ -3702,30 +3649,29 @@ public class TestClamp extends RSBaseCompute {
                 args.inMinValue = arrayInMinValue[i];
                 args.inMaxValue = arrayInMaxValue[i];
                 // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeClamp(args);
-                int ulf = relaxed ? args.ulfRelaxed : args.ulf;
                 // Figure out what the outputs should have been.
                 boolean valid = true;
-                int neededUlf = 0;
                 if (args.out != arrayOut[i * 2 + j]) {
                     valid = false;
                 }
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
-                    message.append(String.format("Input inValue: 0x%x",
-                            args.inValue));
+                    message.append("Input inValue: ");
+                    message.append(String.format("0x%x", args.inValue));
                     message.append("\n");
-                    message.append(String.format("Input inMinValue: 0x%x",
-                            args.inMinValue));
+                    message.append("Input inMinValue: ");
+                    message.append(String.format("0x%x", args.inMinValue));
                     message.append("\n");
-                    message.append(String.format("Input inMaxValue: 0x%x",
-                            args.inMaxValue));
+                    message.append("Input inMaxValue: ");
+                    message.append(String.format("0x%x", args.inMaxValue));
                     message.append("\n");
-                    message.append(String.format("Expected output out: 0x%x",
-                            args.out));
+                    message.append("Expected output out: ");
+                    message.append(String.format("0x%x", args.out));
                     message.append("\n");
-                    message.append(String.format("Actual   output out: 0x%x",
-                            arrayOut[i * 2 + j]));
+                    message.append("Actual   output out: ");
+                    message.append(String.format("0x%x", arrayOut[i * 2 + j]));
                     if (args.out != arrayOut[i * 2 + j]) {
                         message.append(" FAIL");
                     }
@@ -3779,30 +3725,29 @@ public class TestClamp extends RSBaseCompute {
                 args.inMinValue = arrayInMinValue[i];
                 args.inMaxValue = arrayInMaxValue[i];
                 // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeClamp(args);
-                int ulf = relaxed ? args.ulfRelaxed : args.ulf;
                 // Figure out what the outputs should have been.
                 boolean valid = true;
-                int neededUlf = 0;
                 if (args.out != arrayOut[i * 4 + j]) {
                     valid = false;
                 }
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
-                    message.append(String.format("Input inValue: 0x%x",
-                            args.inValue));
+                    message.append("Input inValue: ");
+                    message.append(String.format("0x%x", args.inValue));
                     message.append("\n");
-                    message.append(String.format("Input inMinValue: 0x%x",
-                            args.inMinValue));
+                    message.append("Input inMinValue: ");
+                    message.append(String.format("0x%x", args.inMinValue));
                     message.append("\n");
-                    message.append(String.format("Input inMaxValue: 0x%x",
-                            args.inMaxValue));
+                    message.append("Input inMaxValue: ");
+                    message.append(String.format("0x%x", args.inMaxValue));
                     message.append("\n");
-                    message.append(String.format("Expected output out: 0x%x",
-                            args.out));
+                    message.append("Expected output out: ");
+                    message.append(String.format("0x%x", args.out));
                     message.append("\n");
-                    message.append(String.format("Actual   output out: 0x%x",
-                            arrayOut[i * 4 + j]));
+                    message.append("Actual   output out: ");
+                    message.append(String.format("0x%x", arrayOut[i * 4 + j]));
                     if (args.out != arrayOut[i * 4 + j]) {
                         message.append(" FAIL");
                     }
@@ -3856,30 +3801,29 @@ public class TestClamp extends RSBaseCompute {
                 args.inMinValue = arrayInMinValue[i];
                 args.inMaxValue = arrayInMaxValue[i];
                 // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeClamp(args);
-                int ulf = relaxed ? args.ulfRelaxed : args.ulf;
                 // Figure out what the outputs should have been.
                 boolean valid = true;
-                int neededUlf = 0;
                 if (args.out != arrayOut[i * 4 + j]) {
                     valid = false;
                 }
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
-                    message.append(String.format("Input inValue: 0x%x",
-                            args.inValue));
+                    message.append("Input inValue: ");
+                    message.append(String.format("0x%x", args.inValue));
                     message.append("\n");
-                    message.append(String.format("Input inMinValue: 0x%x",
-                            args.inMinValue));
+                    message.append("Input inMinValue: ");
+                    message.append(String.format("0x%x", args.inMinValue));
                     message.append("\n");
-                    message.append(String.format("Input inMaxValue: 0x%x",
-                            args.inMaxValue));
+                    message.append("Input inMaxValue: ");
+                    message.append(String.format("0x%x", args.inMaxValue));
                     message.append("\n");
-                    message.append(String.format("Expected output out: 0x%x",
-                            args.out));
+                    message.append("Expected output out: ");
+                    message.append(String.format("0x%x", args.out));
                     message.append("\n");
-                    message.append(String.format("Actual   output out: 0x%x",
-                            arrayOut[i * 4 + j]));
+                    message.append("Actual   output out: ");
+                    message.append(String.format("0x%x", arrayOut[i * 4 + j]));
                     if (args.out != arrayOut[i * 4 + j]) {
                         message.append(" FAIL");
                     }

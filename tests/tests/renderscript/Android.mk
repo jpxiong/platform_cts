@@ -29,6 +29,7 @@ LOCAL_MODULE_PATH := $(TARGET_OUT_DATA_APPS)
 LOCAL_JAVA_LIBRARIES := android.test.runner
 
 LOCAL_STATIC_JAVA_LIBRARIES := ctstestrunner
+LOCAL_JNI_SHARED_LIBRARIES := libcoremathtestcpp_jni
 
 LOCAL_SRC_FILES := $(call all-java-files-under, src)
 
@@ -37,3 +38,4 @@ LOCAL_INSTRUMENTATION_FOR := CtsTestStubs
 LOCAL_SDK_VERSION := current
 
 include $(BUILD_CTS_PACKAGE)
+include $(LOCAL_PATH)/libcoremathtestcpp/Android.mk

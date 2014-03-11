@@ -36,11 +36,8 @@ public class TestModf extends RSBaseCompute {
 
     public class ArgumentsFloatFloatFloat {
         public float inX;
-        public float outIret;
-        public float out;
-
-        public int ulf;
-        public int ulfRelaxed;
+        public Floaty outIret;
+        public Floaty out;
     }
 
     private void checkModfFloatFloatFloat() {
@@ -78,42 +75,40 @@ public class TestModf extends RSBaseCompute {
                 ArgumentsFloatFloatFloat args = new ArgumentsFloatFloatFloat();
                 args.inX = arrayInX[i];
                 // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeModf(args);
-                int ulf = relaxed ? args.ulfRelaxed : args.ulf;
                 // Figure out what the outputs should have been.
                 boolean valid = true;
-                int neededUlf = 0;
-                neededUlf = (int) (Math.abs(args.outIret - arrayOutIret[i * 1 + j]) / Math.ulp(args.outIret) + 0.5);
-                if (neededUlf > ulf) {
+                if (!args.outIret.couldBe(arrayOutIret[i * 1 + j])) {
                     valid = false;
                 }
-                neededUlf = (int) (Math.abs(args.out - arrayOut[i * 1 + j]) / Math.ulp(args.out) + 0.5);
-                if (neededUlf > ulf) {
+                if (!args.out.couldBe(arrayOut[i * 1 + j])) {
                     valid = false;
                 }
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
-                    message.append(String.format("Input inX: %14.8g %8x %15a",
+                    message.append("Input inX: ");
+                    message.append(String.format("%14.8g %8x %15a",
                             args.inX, Float.floatToRawIntBits(args.inX), args.inX));
                     message.append("\n");
-                    message.append(String.format("Expected output outIret: %14.8g %8x %15a",
-                            args.outIret, Float.floatToRawIntBits(args.outIret), args.outIret));
+                    message.append("Expected output outIret: ");
+                    message.append(args.outIret.toString());
                     message.append("\n");
-                    message.append(String.format("Actual   output outIret: %14.8g %8x %15a",
+                    message.append("Actual   output outIret: ");
+                    message.append(String.format("%14.8g %8x %15a",
                             arrayOutIret[i * 1 + j], Float.floatToRawIntBits(arrayOutIret[i * 1 + j]), arrayOutIret[i * 1 + j]));
-                    neededUlf = (int) (Math.abs(args.outIret - arrayOutIret[i * 1 + j]) / Math.ulp(args.outIret) + 0.5);
-                    if (neededUlf > ulf) {
-                        message.append(String.format(" FAILED, ulf needed %d, specified %d", neededUlf, ulf));
+                    if (!args.outIret.couldBe(arrayOutIret[i * 1 + j])) {
+                        message.append(" FAIL");
                     }
                     message.append("\n");
-                    message.append(String.format("Expected output out: %14.8g %8x %15a",
-                            args.out, Float.floatToRawIntBits(args.out), args.out));
+                    message.append("Expected output out: ");
+                    message.append(args.out.toString());
                     message.append("\n");
-                    message.append(String.format("Actual   output out: %14.8g %8x %15a",
+                    message.append("Actual   output out: ");
+                    message.append(String.format("%14.8g %8x %15a",
                             arrayOut[i * 1 + j], Float.floatToRawIntBits(arrayOut[i * 1 + j]), arrayOut[i * 1 + j]));
-                    neededUlf = (int) (Math.abs(args.out - arrayOut[i * 1 + j]) / Math.ulp(args.out) + 0.5);
-                    if (neededUlf > ulf) {
-                        message.append(String.format(" FAILED, ulf needed %d, specified %d", neededUlf, ulf));
+                    if (!args.out.couldBe(arrayOut[i * 1 + j])) {
+                        message.append(" FAIL");
                     }
                     message.append("\n");
                     assertTrue("Incorrect output for checkModfFloatFloatFloat" +
@@ -158,42 +153,40 @@ public class TestModf extends RSBaseCompute {
                 ArgumentsFloatFloatFloat args = new ArgumentsFloatFloatFloat();
                 args.inX = arrayInX[i * 2 + j];
                 // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeModf(args);
-                int ulf = relaxed ? args.ulfRelaxed : args.ulf;
                 // Figure out what the outputs should have been.
                 boolean valid = true;
-                int neededUlf = 0;
-                neededUlf = (int) (Math.abs(args.outIret - arrayOutIret[i * 2 + j]) / Math.ulp(args.outIret) + 0.5);
-                if (neededUlf > ulf) {
+                if (!args.outIret.couldBe(arrayOutIret[i * 2 + j])) {
                     valid = false;
                 }
-                neededUlf = (int) (Math.abs(args.out - arrayOut[i * 2 + j]) / Math.ulp(args.out) + 0.5);
-                if (neededUlf > ulf) {
+                if (!args.out.couldBe(arrayOut[i * 2 + j])) {
                     valid = false;
                 }
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
-                    message.append(String.format("Input inX: %14.8g %8x %15a",
+                    message.append("Input inX: ");
+                    message.append(String.format("%14.8g %8x %15a",
                             args.inX, Float.floatToRawIntBits(args.inX), args.inX));
                     message.append("\n");
-                    message.append(String.format("Expected output outIret: %14.8g %8x %15a",
-                            args.outIret, Float.floatToRawIntBits(args.outIret), args.outIret));
+                    message.append("Expected output outIret: ");
+                    message.append(args.outIret.toString());
                     message.append("\n");
-                    message.append(String.format("Actual   output outIret: %14.8g %8x %15a",
+                    message.append("Actual   output outIret: ");
+                    message.append(String.format("%14.8g %8x %15a",
                             arrayOutIret[i * 2 + j], Float.floatToRawIntBits(arrayOutIret[i * 2 + j]), arrayOutIret[i * 2 + j]));
-                    neededUlf = (int) (Math.abs(args.outIret - arrayOutIret[i * 2 + j]) / Math.ulp(args.outIret) + 0.5);
-                    if (neededUlf > ulf) {
-                        message.append(String.format(" FAILED, ulf needed %d, specified %d", neededUlf, ulf));
+                    if (!args.outIret.couldBe(arrayOutIret[i * 2 + j])) {
+                        message.append(" FAIL");
                     }
                     message.append("\n");
-                    message.append(String.format("Expected output out: %14.8g %8x %15a",
-                            args.out, Float.floatToRawIntBits(args.out), args.out));
+                    message.append("Expected output out: ");
+                    message.append(args.out.toString());
                     message.append("\n");
-                    message.append(String.format("Actual   output out: %14.8g %8x %15a",
+                    message.append("Actual   output out: ");
+                    message.append(String.format("%14.8g %8x %15a",
                             arrayOut[i * 2 + j], Float.floatToRawIntBits(arrayOut[i * 2 + j]), arrayOut[i * 2 + j]));
-                    neededUlf = (int) (Math.abs(args.out - arrayOut[i * 2 + j]) / Math.ulp(args.out) + 0.5);
-                    if (neededUlf > ulf) {
-                        message.append(String.format(" FAILED, ulf needed %d, specified %d", neededUlf, ulf));
+                    if (!args.out.couldBe(arrayOut[i * 2 + j])) {
+                        message.append(" FAIL");
                     }
                     message.append("\n");
                     assertTrue("Incorrect output for checkModfFloat2Float2Float2" +
@@ -238,42 +231,40 @@ public class TestModf extends RSBaseCompute {
                 ArgumentsFloatFloatFloat args = new ArgumentsFloatFloatFloat();
                 args.inX = arrayInX[i * 4 + j];
                 // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeModf(args);
-                int ulf = relaxed ? args.ulfRelaxed : args.ulf;
                 // Figure out what the outputs should have been.
                 boolean valid = true;
-                int neededUlf = 0;
-                neededUlf = (int) (Math.abs(args.outIret - arrayOutIret[i * 4 + j]) / Math.ulp(args.outIret) + 0.5);
-                if (neededUlf > ulf) {
+                if (!args.outIret.couldBe(arrayOutIret[i * 4 + j])) {
                     valid = false;
                 }
-                neededUlf = (int) (Math.abs(args.out - arrayOut[i * 4 + j]) / Math.ulp(args.out) + 0.5);
-                if (neededUlf > ulf) {
+                if (!args.out.couldBe(arrayOut[i * 4 + j])) {
                     valid = false;
                 }
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
-                    message.append(String.format("Input inX: %14.8g %8x %15a",
+                    message.append("Input inX: ");
+                    message.append(String.format("%14.8g %8x %15a",
                             args.inX, Float.floatToRawIntBits(args.inX), args.inX));
                     message.append("\n");
-                    message.append(String.format("Expected output outIret: %14.8g %8x %15a",
-                            args.outIret, Float.floatToRawIntBits(args.outIret), args.outIret));
+                    message.append("Expected output outIret: ");
+                    message.append(args.outIret.toString());
                     message.append("\n");
-                    message.append(String.format("Actual   output outIret: %14.8g %8x %15a",
+                    message.append("Actual   output outIret: ");
+                    message.append(String.format("%14.8g %8x %15a",
                             arrayOutIret[i * 4 + j], Float.floatToRawIntBits(arrayOutIret[i * 4 + j]), arrayOutIret[i * 4 + j]));
-                    neededUlf = (int) (Math.abs(args.outIret - arrayOutIret[i * 4 + j]) / Math.ulp(args.outIret) + 0.5);
-                    if (neededUlf > ulf) {
-                        message.append(String.format(" FAILED, ulf needed %d, specified %d", neededUlf, ulf));
+                    if (!args.outIret.couldBe(arrayOutIret[i * 4 + j])) {
+                        message.append(" FAIL");
                     }
                     message.append("\n");
-                    message.append(String.format("Expected output out: %14.8g %8x %15a",
-                            args.out, Float.floatToRawIntBits(args.out), args.out));
+                    message.append("Expected output out: ");
+                    message.append(args.out.toString());
                     message.append("\n");
-                    message.append(String.format("Actual   output out: %14.8g %8x %15a",
+                    message.append("Actual   output out: ");
+                    message.append(String.format("%14.8g %8x %15a",
                             arrayOut[i * 4 + j], Float.floatToRawIntBits(arrayOut[i * 4 + j]), arrayOut[i * 4 + j]));
-                    neededUlf = (int) (Math.abs(args.out - arrayOut[i * 4 + j]) / Math.ulp(args.out) + 0.5);
-                    if (neededUlf > ulf) {
-                        message.append(String.format(" FAILED, ulf needed %d, specified %d", neededUlf, ulf));
+                    if (!args.out.couldBe(arrayOut[i * 4 + j])) {
+                        message.append(" FAIL");
                     }
                     message.append("\n");
                     assertTrue("Incorrect output for checkModfFloat3Float3Float3" +
@@ -318,42 +309,40 @@ public class TestModf extends RSBaseCompute {
                 ArgumentsFloatFloatFloat args = new ArgumentsFloatFloatFloat();
                 args.inX = arrayInX[i * 4 + j];
                 // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeModf(args);
-                int ulf = relaxed ? args.ulfRelaxed : args.ulf;
                 // Figure out what the outputs should have been.
                 boolean valid = true;
-                int neededUlf = 0;
-                neededUlf = (int) (Math.abs(args.outIret - arrayOutIret[i * 4 + j]) / Math.ulp(args.outIret) + 0.5);
-                if (neededUlf > ulf) {
+                if (!args.outIret.couldBe(arrayOutIret[i * 4 + j])) {
                     valid = false;
                 }
-                neededUlf = (int) (Math.abs(args.out - arrayOut[i * 4 + j]) / Math.ulp(args.out) + 0.5);
-                if (neededUlf > ulf) {
+                if (!args.out.couldBe(arrayOut[i * 4 + j])) {
                     valid = false;
                 }
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
-                    message.append(String.format("Input inX: %14.8g %8x %15a",
+                    message.append("Input inX: ");
+                    message.append(String.format("%14.8g %8x %15a",
                             args.inX, Float.floatToRawIntBits(args.inX), args.inX));
                     message.append("\n");
-                    message.append(String.format("Expected output outIret: %14.8g %8x %15a",
-                            args.outIret, Float.floatToRawIntBits(args.outIret), args.outIret));
+                    message.append("Expected output outIret: ");
+                    message.append(args.outIret.toString());
                     message.append("\n");
-                    message.append(String.format("Actual   output outIret: %14.8g %8x %15a",
+                    message.append("Actual   output outIret: ");
+                    message.append(String.format("%14.8g %8x %15a",
                             arrayOutIret[i * 4 + j], Float.floatToRawIntBits(arrayOutIret[i * 4 + j]), arrayOutIret[i * 4 + j]));
-                    neededUlf = (int) (Math.abs(args.outIret - arrayOutIret[i * 4 + j]) / Math.ulp(args.outIret) + 0.5);
-                    if (neededUlf > ulf) {
-                        message.append(String.format(" FAILED, ulf needed %d, specified %d", neededUlf, ulf));
+                    if (!args.outIret.couldBe(arrayOutIret[i * 4 + j])) {
+                        message.append(" FAIL");
                     }
                     message.append("\n");
-                    message.append(String.format("Expected output out: %14.8g %8x %15a",
-                            args.out, Float.floatToRawIntBits(args.out), args.out));
+                    message.append("Expected output out: ");
+                    message.append(args.out.toString());
                     message.append("\n");
-                    message.append(String.format("Actual   output out: %14.8g %8x %15a",
+                    message.append("Actual   output out: ");
+                    message.append(String.format("%14.8g %8x %15a",
                             arrayOut[i * 4 + j], Float.floatToRawIntBits(arrayOut[i * 4 + j]), arrayOut[i * 4 + j]));
-                    neededUlf = (int) (Math.abs(args.out - arrayOut[i * 4 + j]) / Math.ulp(args.out) + 0.5);
-                    if (neededUlf > ulf) {
-                        message.append(String.format(" FAILED, ulf needed %d, specified %d", neededUlf, ulf));
+                    if (!args.out.couldBe(arrayOut[i * 4 + j])) {
+                        message.append(" FAIL");
                     }
                     message.append("\n");
                     assertTrue("Incorrect output for checkModfFloat4Float4Float4" +

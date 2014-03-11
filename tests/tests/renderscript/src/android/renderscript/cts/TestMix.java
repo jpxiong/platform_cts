@@ -38,10 +38,7 @@ public class TestMix extends RSBaseCompute {
         public float inStart;
         public float inStop;
         public float inAmount;
-        public float out;
-
-        public int ulf;
-        public int ulfRelaxed;
+        public Floaty out;
     }
 
     private void checkMixFloatFloatFloatFloat() {
@@ -85,34 +82,35 @@ public class TestMix extends RSBaseCompute {
                 args.inStop = arrayInStop[i];
                 args.inAmount = arrayInAmount[i];
                 // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeMix(args);
-                int ulf = relaxed ? args.ulfRelaxed : args.ulf;
                 // Figure out what the outputs should have been.
                 boolean valid = true;
-                int neededUlf = 0;
-                neededUlf = (int) (Math.abs(args.out - arrayOut[i * 1 + j]) / Math.ulp(args.out) + 0.5);
-                if (neededUlf > ulf) {
+                if (!args.out.couldBe(arrayOut[i * 1 + j])) {
                     valid = false;
                 }
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
-                    message.append(String.format("Input inStart: %14.8g %8x %15a",
+                    message.append("Input inStart: ");
+                    message.append(String.format("%14.8g %8x %15a",
                             args.inStart, Float.floatToRawIntBits(args.inStart), args.inStart));
                     message.append("\n");
-                    message.append(String.format("Input inStop: %14.8g %8x %15a",
+                    message.append("Input inStop: ");
+                    message.append(String.format("%14.8g %8x %15a",
                             args.inStop, Float.floatToRawIntBits(args.inStop), args.inStop));
                     message.append("\n");
-                    message.append(String.format("Input inAmount: %14.8g %8x %15a",
+                    message.append("Input inAmount: ");
+                    message.append(String.format("%14.8g %8x %15a",
                             args.inAmount, Float.floatToRawIntBits(args.inAmount), args.inAmount));
                     message.append("\n");
-                    message.append(String.format("Expected output out: %14.8g %8x %15a",
-                            args.out, Float.floatToRawIntBits(args.out), args.out));
+                    message.append("Expected output out: ");
+                    message.append(args.out.toString());
                     message.append("\n");
-                    message.append(String.format("Actual   output out: %14.8g %8x %15a",
+                    message.append("Actual   output out: ");
+                    message.append(String.format("%14.8g %8x %15a",
                             arrayOut[i * 1 + j], Float.floatToRawIntBits(arrayOut[i * 1 + j]), arrayOut[i * 1 + j]));
-                    neededUlf = (int) (Math.abs(args.out - arrayOut[i * 1 + j]) / Math.ulp(args.out) + 0.5);
-                    if (neededUlf > ulf) {
-                        message.append(String.format(" FAILED, ulf needed %d, specified %d", neededUlf, ulf));
+                    if (!args.out.couldBe(arrayOut[i * 1 + j])) {
+                        message.append(" FAIL");
                     }
                     message.append("\n");
                     assertTrue("Incorrect output for checkMixFloatFloatFloatFloat" +
@@ -163,34 +161,35 @@ public class TestMix extends RSBaseCompute {
                 args.inStop = arrayInStop[i * 2 + j];
                 args.inAmount = arrayInAmount[i * 2 + j];
                 // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeMix(args);
-                int ulf = relaxed ? args.ulfRelaxed : args.ulf;
                 // Figure out what the outputs should have been.
                 boolean valid = true;
-                int neededUlf = 0;
-                neededUlf = (int) (Math.abs(args.out - arrayOut[i * 2 + j]) / Math.ulp(args.out) + 0.5);
-                if (neededUlf > ulf) {
+                if (!args.out.couldBe(arrayOut[i * 2 + j])) {
                     valid = false;
                 }
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
-                    message.append(String.format("Input inStart: %14.8g %8x %15a",
+                    message.append("Input inStart: ");
+                    message.append(String.format("%14.8g %8x %15a",
                             args.inStart, Float.floatToRawIntBits(args.inStart), args.inStart));
                     message.append("\n");
-                    message.append(String.format("Input inStop: %14.8g %8x %15a",
+                    message.append("Input inStop: ");
+                    message.append(String.format("%14.8g %8x %15a",
                             args.inStop, Float.floatToRawIntBits(args.inStop), args.inStop));
                     message.append("\n");
-                    message.append(String.format("Input inAmount: %14.8g %8x %15a",
+                    message.append("Input inAmount: ");
+                    message.append(String.format("%14.8g %8x %15a",
                             args.inAmount, Float.floatToRawIntBits(args.inAmount), args.inAmount));
                     message.append("\n");
-                    message.append(String.format("Expected output out: %14.8g %8x %15a",
-                            args.out, Float.floatToRawIntBits(args.out), args.out));
+                    message.append("Expected output out: ");
+                    message.append(args.out.toString());
                     message.append("\n");
-                    message.append(String.format("Actual   output out: %14.8g %8x %15a",
+                    message.append("Actual   output out: ");
+                    message.append(String.format("%14.8g %8x %15a",
                             arrayOut[i * 2 + j], Float.floatToRawIntBits(arrayOut[i * 2 + j]), arrayOut[i * 2 + j]));
-                    neededUlf = (int) (Math.abs(args.out - arrayOut[i * 2 + j]) / Math.ulp(args.out) + 0.5);
-                    if (neededUlf > ulf) {
-                        message.append(String.format(" FAILED, ulf needed %d, specified %d", neededUlf, ulf));
+                    if (!args.out.couldBe(arrayOut[i * 2 + j])) {
+                        message.append(" FAIL");
                     }
                     message.append("\n");
                     assertTrue("Incorrect output for checkMixFloat2Float2Float2Float2" +
@@ -241,34 +240,35 @@ public class TestMix extends RSBaseCompute {
                 args.inStop = arrayInStop[i * 4 + j];
                 args.inAmount = arrayInAmount[i * 4 + j];
                 // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeMix(args);
-                int ulf = relaxed ? args.ulfRelaxed : args.ulf;
                 // Figure out what the outputs should have been.
                 boolean valid = true;
-                int neededUlf = 0;
-                neededUlf = (int) (Math.abs(args.out - arrayOut[i * 4 + j]) / Math.ulp(args.out) + 0.5);
-                if (neededUlf > ulf) {
+                if (!args.out.couldBe(arrayOut[i * 4 + j])) {
                     valid = false;
                 }
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
-                    message.append(String.format("Input inStart: %14.8g %8x %15a",
+                    message.append("Input inStart: ");
+                    message.append(String.format("%14.8g %8x %15a",
                             args.inStart, Float.floatToRawIntBits(args.inStart), args.inStart));
                     message.append("\n");
-                    message.append(String.format("Input inStop: %14.8g %8x %15a",
+                    message.append("Input inStop: ");
+                    message.append(String.format("%14.8g %8x %15a",
                             args.inStop, Float.floatToRawIntBits(args.inStop), args.inStop));
                     message.append("\n");
-                    message.append(String.format("Input inAmount: %14.8g %8x %15a",
+                    message.append("Input inAmount: ");
+                    message.append(String.format("%14.8g %8x %15a",
                             args.inAmount, Float.floatToRawIntBits(args.inAmount), args.inAmount));
                     message.append("\n");
-                    message.append(String.format("Expected output out: %14.8g %8x %15a",
-                            args.out, Float.floatToRawIntBits(args.out), args.out));
+                    message.append("Expected output out: ");
+                    message.append(args.out.toString());
                     message.append("\n");
-                    message.append(String.format("Actual   output out: %14.8g %8x %15a",
+                    message.append("Actual   output out: ");
+                    message.append(String.format("%14.8g %8x %15a",
                             arrayOut[i * 4 + j], Float.floatToRawIntBits(arrayOut[i * 4 + j]), arrayOut[i * 4 + j]));
-                    neededUlf = (int) (Math.abs(args.out - arrayOut[i * 4 + j]) / Math.ulp(args.out) + 0.5);
-                    if (neededUlf > ulf) {
-                        message.append(String.format(" FAILED, ulf needed %d, specified %d", neededUlf, ulf));
+                    if (!args.out.couldBe(arrayOut[i * 4 + j])) {
+                        message.append(" FAIL");
                     }
                     message.append("\n");
                     assertTrue("Incorrect output for checkMixFloat3Float3Float3Float3" +
@@ -319,34 +319,35 @@ public class TestMix extends RSBaseCompute {
                 args.inStop = arrayInStop[i * 4 + j];
                 args.inAmount = arrayInAmount[i * 4 + j];
                 // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeMix(args);
-                int ulf = relaxed ? args.ulfRelaxed : args.ulf;
                 // Figure out what the outputs should have been.
                 boolean valid = true;
-                int neededUlf = 0;
-                neededUlf = (int) (Math.abs(args.out - arrayOut[i * 4 + j]) / Math.ulp(args.out) + 0.5);
-                if (neededUlf > ulf) {
+                if (!args.out.couldBe(arrayOut[i * 4 + j])) {
                     valid = false;
                 }
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
-                    message.append(String.format("Input inStart: %14.8g %8x %15a",
+                    message.append("Input inStart: ");
+                    message.append(String.format("%14.8g %8x %15a",
                             args.inStart, Float.floatToRawIntBits(args.inStart), args.inStart));
                     message.append("\n");
-                    message.append(String.format("Input inStop: %14.8g %8x %15a",
+                    message.append("Input inStop: ");
+                    message.append(String.format("%14.8g %8x %15a",
                             args.inStop, Float.floatToRawIntBits(args.inStop), args.inStop));
                     message.append("\n");
-                    message.append(String.format("Input inAmount: %14.8g %8x %15a",
+                    message.append("Input inAmount: ");
+                    message.append(String.format("%14.8g %8x %15a",
                             args.inAmount, Float.floatToRawIntBits(args.inAmount), args.inAmount));
                     message.append("\n");
-                    message.append(String.format("Expected output out: %14.8g %8x %15a",
-                            args.out, Float.floatToRawIntBits(args.out), args.out));
+                    message.append("Expected output out: ");
+                    message.append(args.out.toString());
                     message.append("\n");
-                    message.append(String.format("Actual   output out: %14.8g %8x %15a",
+                    message.append("Actual   output out: ");
+                    message.append(String.format("%14.8g %8x %15a",
                             arrayOut[i * 4 + j], Float.floatToRawIntBits(arrayOut[i * 4 + j]), arrayOut[i * 4 + j]));
-                    neededUlf = (int) (Math.abs(args.out - arrayOut[i * 4 + j]) / Math.ulp(args.out) + 0.5);
-                    if (neededUlf > ulf) {
-                        message.append(String.format(" FAILED, ulf needed %d, specified %d", neededUlf, ulf));
+                    if (!args.out.couldBe(arrayOut[i * 4 + j])) {
+                        message.append(" FAIL");
                     }
                     message.append("\n");
                     assertTrue("Incorrect output for checkMixFloat4Float4Float4Float4" +
@@ -397,34 +398,35 @@ public class TestMix extends RSBaseCompute {
                 args.inStop = arrayInStop[i * 2 + j];
                 args.inAmount = arrayInAmount[i];
                 // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeMix(args);
-                int ulf = relaxed ? args.ulfRelaxed : args.ulf;
                 // Figure out what the outputs should have been.
                 boolean valid = true;
-                int neededUlf = 0;
-                neededUlf = (int) (Math.abs(args.out - arrayOut[i * 2 + j]) / Math.ulp(args.out) + 0.5);
-                if (neededUlf > ulf) {
+                if (!args.out.couldBe(arrayOut[i * 2 + j])) {
                     valid = false;
                 }
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
-                    message.append(String.format("Input inStart: %14.8g %8x %15a",
+                    message.append("Input inStart: ");
+                    message.append(String.format("%14.8g %8x %15a",
                             args.inStart, Float.floatToRawIntBits(args.inStart), args.inStart));
                     message.append("\n");
-                    message.append(String.format("Input inStop: %14.8g %8x %15a",
+                    message.append("Input inStop: ");
+                    message.append(String.format("%14.8g %8x %15a",
                             args.inStop, Float.floatToRawIntBits(args.inStop), args.inStop));
                     message.append("\n");
-                    message.append(String.format("Input inAmount: %14.8g %8x %15a",
+                    message.append("Input inAmount: ");
+                    message.append(String.format("%14.8g %8x %15a",
                             args.inAmount, Float.floatToRawIntBits(args.inAmount), args.inAmount));
                     message.append("\n");
-                    message.append(String.format("Expected output out: %14.8g %8x %15a",
-                            args.out, Float.floatToRawIntBits(args.out), args.out));
+                    message.append("Expected output out: ");
+                    message.append(args.out.toString());
                     message.append("\n");
-                    message.append(String.format("Actual   output out: %14.8g %8x %15a",
+                    message.append("Actual   output out: ");
+                    message.append(String.format("%14.8g %8x %15a",
                             arrayOut[i * 2 + j], Float.floatToRawIntBits(arrayOut[i * 2 + j]), arrayOut[i * 2 + j]));
-                    neededUlf = (int) (Math.abs(args.out - arrayOut[i * 2 + j]) / Math.ulp(args.out) + 0.5);
-                    if (neededUlf > ulf) {
-                        message.append(String.format(" FAILED, ulf needed %d, specified %d", neededUlf, ulf));
+                    if (!args.out.couldBe(arrayOut[i * 2 + j])) {
+                        message.append(" FAIL");
                     }
                     message.append("\n");
                     assertTrue("Incorrect output for checkMixFloat2Float2FloatFloat2" +
@@ -475,34 +477,35 @@ public class TestMix extends RSBaseCompute {
                 args.inStop = arrayInStop[i * 4 + j];
                 args.inAmount = arrayInAmount[i];
                 // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeMix(args);
-                int ulf = relaxed ? args.ulfRelaxed : args.ulf;
                 // Figure out what the outputs should have been.
                 boolean valid = true;
-                int neededUlf = 0;
-                neededUlf = (int) (Math.abs(args.out - arrayOut[i * 4 + j]) / Math.ulp(args.out) + 0.5);
-                if (neededUlf > ulf) {
+                if (!args.out.couldBe(arrayOut[i * 4 + j])) {
                     valid = false;
                 }
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
-                    message.append(String.format("Input inStart: %14.8g %8x %15a",
+                    message.append("Input inStart: ");
+                    message.append(String.format("%14.8g %8x %15a",
                             args.inStart, Float.floatToRawIntBits(args.inStart), args.inStart));
                     message.append("\n");
-                    message.append(String.format("Input inStop: %14.8g %8x %15a",
+                    message.append("Input inStop: ");
+                    message.append(String.format("%14.8g %8x %15a",
                             args.inStop, Float.floatToRawIntBits(args.inStop), args.inStop));
                     message.append("\n");
-                    message.append(String.format("Input inAmount: %14.8g %8x %15a",
+                    message.append("Input inAmount: ");
+                    message.append(String.format("%14.8g %8x %15a",
                             args.inAmount, Float.floatToRawIntBits(args.inAmount), args.inAmount));
                     message.append("\n");
-                    message.append(String.format("Expected output out: %14.8g %8x %15a",
-                            args.out, Float.floatToRawIntBits(args.out), args.out));
+                    message.append("Expected output out: ");
+                    message.append(args.out.toString());
                     message.append("\n");
-                    message.append(String.format("Actual   output out: %14.8g %8x %15a",
+                    message.append("Actual   output out: ");
+                    message.append(String.format("%14.8g %8x %15a",
                             arrayOut[i * 4 + j], Float.floatToRawIntBits(arrayOut[i * 4 + j]), arrayOut[i * 4 + j]));
-                    neededUlf = (int) (Math.abs(args.out - arrayOut[i * 4 + j]) / Math.ulp(args.out) + 0.5);
-                    if (neededUlf > ulf) {
-                        message.append(String.format(" FAILED, ulf needed %d, specified %d", neededUlf, ulf));
+                    if (!args.out.couldBe(arrayOut[i * 4 + j])) {
+                        message.append(" FAIL");
                     }
                     message.append("\n");
                     assertTrue("Incorrect output for checkMixFloat3Float3FloatFloat3" +
@@ -553,34 +556,35 @@ public class TestMix extends RSBaseCompute {
                 args.inStop = arrayInStop[i * 4 + j];
                 args.inAmount = arrayInAmount[i];
                 // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
                 CoreMathVerifier.computeMix(args);
-                int ulf = relaxed ? args.ulfRelaxed : args.ulf;
                 // Figure out what the outputs should have been.
                 boolean valid = true;
-                int neededUlf = 0;
-                neededUlf = (int) (Math.abs(args.out - arrayOut[i * 4 + j]) / Math.ulp(args.out) + 0.5);
-                if (neededUlf > ulf) {
+                if (!args.out.couldBe(arrayOut[i * 4 + j])) {
                     valid = false;
                 }
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
-                    message.append(String.format("Input inStart: %14.8g %8x %15a",
+                    message.append("Input inStart: ");
+                    message.append(String.format("%14.8g %8x %15a",
                             args.inStart, Float.floatToRawIntBits(args.inStart), args.inStart));
                     message.append("\n");
-                    message.append(String.format("Input inStop: %14.8g %8x %15a",
+                    message.append("Input inStop: ");
+                    message.append(String.format("%14.8g %8x %15a",
                             args.inStop, Float.floatToRawIntBits(args.inStop), args.inStop));
                     message.append("\n");
-                    message.append(String.format("Input inAmount: %14.8g %8x %15a",
+                    message.append("Input inAmount: ");
+                    message.append(String.format("%14.8g %8x %15a",
                             args.inAmount, Float.floatToRawIntBits(args.inAmount), args.inAmount));
                     message.append("\n");
-                    message.append(String.format("Expected output out: %14.8g %8x %15a",
-                            args.out, Float.floatToRawIntBits(args.out), args.out));
+                    message.append("Expected output out: ");
+                    message.append(args.out.toString());
                     message.append("\n");
-                    message.append(String.format("Actual   output out: %14.8g %8x %15a",
+                    message.append("Actual   output out: ");
+                    message.append(String.format("%14.8g %8x %15a",
                             arrayOut[i * 4 + j], Float.floatToRawIntBits(arrayOut[i * 4 + j]), arrayOut[i * 4 + j]));
-                    neededUlf = (int) (Math.abs(args.out - arrayOut[i * 4 + j]) / Math.ulp(args.out) + 0.5);
-                    if (neededUlf > ulf) {
-                        message.append(String.format(" FAILED, ulf needed %d, specified %d", neededUlf, ulf));
+                    if (!args.out.couldBe(arrayOut[i * 4 + j])) {
+                        message.append(" FAIL");
                     }
                     message.append("\n");
                     assertTrue("Incorrect output for checkMixFloat4Float4FloatFloat4" +
