@@ -17,6 +17,65 @@
 package android.renderscript.cts;
 
 public class CoreMathVerifier {
+    // Return the distance between two points in n-dimensional space.
+    static private float distance(float[] lhs, float[] rhs) {
+        float sum = 0.0f;
+        for (int i = 0; i < lhs.length; i++) {
+            float diff = lhs[i] - rhs[i];
+            sum += diff * diff;
+        }
+        return (float) StrictMath.sqrt(sum);
+    }
+
+    // Return the length of the n-dimensional vector.
+    static private float length(float[] array) {
+        float sum = 0.0f;
+        for (int i = 0; i < array.length; i++) {
+            sum += array[i] * array[i];
+        }
+        return (float) StrictMath.sqrt(sum);
+    }
+
+    // Normalize the n-dimensional vector, i.e. make it length 1.
+    static private void normalize(float[] in, float[] out) {
+        float l = length(in);
+        for (int i = 0; i < in.length; i++) {
+            out[i] = in[i] / l;
+        }
+    }
+
+    // Return the integer quotient and the remainder of dividing two floats.
+    static class RemainderAndQuotient {
+        public int quotient;
+        public float remainder;
+    }
+    static RemainderAndQuotient remainderAndQuotient(float numerator, float denominator) {
+        RemainderAndQuotient result = new RemainderAndQuotient();
+        if (denominator == 0.0f) {
+            result.quotient = 0;
+            result.remainder = Float.NaN;
+        } else {
+            result.quotient = (int) StrictMath.round(numerator / denominator);
+            result.remainder = numerator - result.quotient * denominator;
+        }
+        return result;
+    }
+
+    // Return the error function using Euler's method.
+    static float erf(float x) {
+        double t = 1.0 / (1.0 + 0.5 * StrictMath.abs(x));
+        double[] coeff = new double[] {
+            -1.26551223, 1.00002368 , 0.37409196, 0.09678418, -0.18628806,
+            0.27886807, -1.13520398, +1.48851587, -0.82215223, 0.17087277
+        };
+        double sum = 0.0;
+        for (int i = coeff.length - 1; i >= 0; i--) {
+            sum = coeff[i] + t * sum;
+        }
+        double tau  = t * Math.exp(sum -(x * x));
+        return (float)((x >= 0.0) ? 1.0 - tau : tau - 1.0);
+    }
+
     static public void computeAbs(TestAbs.ArgumentsCharUchar args) {
         args.ulf = 0;
         args.ulfRelaxed = 0;
@@ -45,7 +104,7 @@ public class CoreMathVerifier {
         args.ulf = 4;
         args.ulfRelaxed = 4;
         double x = (double) args.in;
-        args.out = (float) StrictMath.sqrt((x - 1.0) / 2.0);
+        args.out = (float) StrictMath.log(x + StrictMath.sqrt(x * x - 1.0));
     }
 
     static public void computeAcospi(TestAcospi.ArgumentsFloatFloat args) {
@@ -63,8 +122,8 @@ public class CoreMathVerifier {
     static public void computeAsinh(TestAsinh.ArgumentsFloatFloat args) {
         args.ulf = 5;
         args.ulfRelaxed = 5;
-        args.out = (float) (StrictMath.log(
-                args.in + StrictMath.sqrt(1 + StrictMath.pow(args.in, 2))));
+        double x = (double) args.in;
+        args.out = (float) (StrictMath.log(x + StrictMath.sqrt(x * x + 1.0)));
     }
 
     static public void computeAsinpi(TestAsinpi.ArgumentsFloatFloat args) {
@@ -83,7 +142,7 @@ public class CoreMathVerifier {
         args.ulf = 5;
         args.ulfRelaxed = 128;
         double x = (double) args.in;
-        args.out = (float) ((StrictMath.log(1 + x) - StrictMath.log(1 - x)) / 2);
+        args.out = (float) (StrictMath.log((x + 1.0) / (x - 1.0)) / 2.0);
     }
 
     static public void computeAtanpi(TestAtanpi.ArgumentsFloatFloat args) {
@@ -154,9 +213,9 @@ public class CoreMathVerifier {
     static public void computeClamp(TestClamp.ArgumentsUintUintUintUint args) {
         args.ulf = 0;
         args.ulfRelaxed = 0;
-        long max = args.inMaxValue & 0xffffffff;
-        long min = args.inMinValue & 0xffffffff;
-        long in = args.inValue & 0xffffffff;
+        long min = args.inMinValue & 0xffffffffl;
+        long max = args.inMaxValue & 0xffffffffl;
+        long in = args.inValue & 0xffffffffl;
         args.out = (int) StrictMath.min(max, StrictMath.max(in, min));
     }
 
@@ -178,9 +237,13 @@ public class CoreMathVerifier {
     static public void computeClamp(TestClamp.ArgumentsUlongUlongUlongUlong args) {
         args.ulf = 0;
         args.ulfRelaxed = 0;
-        // TODO This is not correct for the very largest values.
-        args.out = StrictMath.min(args.inMaxValue,
-                StrictMath.max(args.inValue, args.inMinValue));
+        if (RSUtils.compareUnsignedLong(args.inValue, args.inMinValue) < 0) {
+            args.out = args.inMinValue;
+        } else if (RSUtils.compareUnsignedLong(args.inValue, args.inMaxValue) > 0) {
+            args.out = args.inMaxValue;
+        } else {
+            args.out = args.inValue;
+        }
     }
     */
 
@@ -241,10 +304,9 @@ public class CoreMathVerifier {
     }
 
     static public void computeCospi(TestCospi.ArgumentsFloatFloat args) {
-        // TODO The ulfs have been relaxed from 5, 128.  Revisit.
-        args.ulf = 4096;
-        args.ulfRelaxed = 4096;
-        args.out = (float) StrictMath.cos(args.in * StrictMath.PI);
+        args.ulf = 5;
+        args.ulfRelaxed = 128;
+        args.out = (float) StrictMath.cos(args.in * (float)StrictMath.PI);
     }
 
     /* TODO To be implemented
@@ -271,11 +333,17 @@ public class CoreMathVerifier {
     static public void computeDistance(TestDistance.ArgumentsFloatFloatFloat args) {
         args.ulf = 4;
         args.ulfRelaxed = 12;
-        args.out = length(lhs - rhs);
+        args.out = distance(new float[] {args.inLhs}, new float[] {args.inRhs});
     }
     */
 
     /* TODO To be implemented
+    static public void computeDistance(TestDistance.ArgumentsFloatNFloatNFloat args) {
+        args.ulf = 4;
+        args.ulfRelaxed = 12;
+        args.out = distance(args.inLhs, args.inRhs);
+    }
+
     static public void computeDot(TestDot.ArgumentsFloatFloatFloat args) {
         // TODO new implementation.  Ulf?
         args.ulf = 0;
@@ -297,17 +365,17 @@ public class CoreMathVerifier {
 
     /* TODO To be implemented
     static public void computeErf(TestErf.ArgumentsFloatFloat args) {
-        args.ulf = 4;
-        args.ulfRelaxed = 12;
-        args.out = 987654;
+        args.ulf = 4096;  // TODO ulf not correct way to evaluate
+        args.ulfRelaxed = 4096;
+        args.out = erf(args.in);
     }
     */
 
     /* TODO To be implemented
     static public void computeErfc(TestErfc.ArgumentsFloatFloat args) {
-        args.ulf = 4;
-        args.ulfRelaxed = 12;
-        args.out = 987654;
+        args.ulf = 4096;  // TODO ulf not correct way to evaluate
+        args.ulfRelaxed = 4096;
+        args.out = 1.0f - erf(args.in);
     }
     */
 
@@ -317,20 +385,22 @@ public class CoreMathVerifier {
         args.out = (float) StrictMath.exp(args.in);
     }
 
+    /* TODO implement
     static public void computeExp10(TestExp10.ArgumentsFloatFloat args) {
-        args.ulf = 3;
+        args.ulf = 4;
         args.ulfRelaxed = 16;
         args.out = (float) StrictMath.pow(10.0, args.in);
     }
+    */
 
     static public void computeExp2(TestExp2.ArgumentsFloatFloat args) {
-        args.ulf = 3;
+        args.ulf = 4;
         args.ulfRelaxed = 16;
         args.out = (float) StrictMath.pow(2.0, args.in);
     }
 
     static public void computeExpm1(TestExpm1.ArgumentsFloatFloat args) {
-        args.ulf = 3;
+        args.ulf = 4;
         args.ulfRelaxed = 16;
         args.out = (float) StrictMath.expm1(args.in);
     }
@@ -345,8 +415,15 @@ public class CoreMathVerifier {
     static public void computeFastDistance(TestFastDistance.ArgumentsFloatFloatFloat args) {
         args.ulf = 4096;
         args.ulfRelaxed = 4096;
-        args.out = 987654;
+        args.out = distance(new float[] {args.inLhs}, new float[] {args.inRhs});
     }
+
+    static public void computeFastDistance(TestFastDistance.ArgumentsFloatNFloatNFloat args) {
+        args.ulf = 4096;
+        args.ulfRelaxed = 4096;
+        args.out = distance(args.inLhs, args.inRhs);
+    }
+
     */
 
     /* TODO To be implemented
@@ -362,11 +439,7 @@ public class CoreMathVerifier {
         // TODO ulf was relaxed from 4096, 4096.  Revisit
         args.ulf = 128000;
         args.ulfRelaxed = 128000;
-        double sum = 0.0f;
-        for (int i = 0; i < args.inV.length; i++) {
-            sum += args.inV[i] * args.inV[i];
-        }
-        args.out = (float) StrictMath.sqrt(sum);
+        args.out = length(args.inV);
     }
     */
 
@@ -374,7 +447,15 @@ public class CoreMathVerifier {
     static public void computeFastNormalize(TestFastNormalize.ArgumentsFloatFloat args) {
         args.ulf = 4096;
         args.ulfRelaxed = 4096;
-        args.out = 987654;
+        float[] out = new float[1];
+        normalize(new float[] {args.inV}, out);
+        args.out = out[0];
+    }
+
+    static public void computeFastNormalize(TestFastNormalize.ArgumentsFloatNFloatN args) {
+        args.ulf = 4096;
+        args.ulfRelaxed = 4096;
+        normalize(args.inV, args.out);
     }
     */
 
@@ -467,12 +548,14 @@ public class CoreMathVerifier {
         args.out = (float) StrictMath.hypot(args.inX, args.inY);
     }
 
+    /* TODO implement
     static public void computeIlogb(TestIlogb.ArgumentsFloatInt args) {
         // TODO verify, this is a guess.  Also check the ulf.
         args.ulf = 4;
         args.ulfRelaxed = 12;
         args.out = (int) (((Float.floatToIntBits(args.in) >> 23) & 0xFF) - 127.0f);
     }
+    */
 
     static public void computeLdexp(TestLdexp.ArgumentsFloatIntFloat args) {
         // TODO verify, this is a guess.  Also check the ulf.
@@ -485,18 +568,13 @@ public class CoreMathVerifier {
     static public void computeLength(TestLength.ArgumentsFloatFloat args) {
         args.ulf = 4;
         args.ulfRelaxed = 12;
-        double sum = args.inV * args.inV;
-        args.out = (float) StrictMath.sqrt(sum);
+        args.out = length(new float[] {args.inV});
     }
 
     static public void computeLength(TestLength.ArgumentsFloatNFloat args) {
         args.ulf = 4;
         args.ulfRelaxed = 12;
-        double sum = 0.0f;
-        for (int i = 0; i < args.inV.length; i++) {
-            sum += args.inV[i] * args.inV[i];
-        }
-        args.out = (float) StrictMath.sqrt(sum);
+        args.out = length(args.inV);
     }
     */
 
@@ -540,16 +618,18 @@ public class CoreMathVerifier {
         args.out = (float) (StrictMath.log10(args.in) / StrictMath.log10(2.0));
     }
 
+    /* TODO implement
     static public void computeLogb(TestLogb.ArgumentsFloatFloat args) {
         args.ulf = 0;
         args.ulfRelaxed = 0;
         args.out = ((Float.floatToIntBits(args.in) >> 23) & 0xFF) - 127.0f;
     }
+    */
 
     static public void computeMad(TestMad.ArgumentsFloatFloatFloatFloat args) {
         args.ulf = 4;
         args.ulfRelaxed = 4;
-        args.out = (float)((double)args.inA * (double)args.inB + (double)args.inC);
+        args.out = args.inA * args.inB + args.inC;
     }
 
     static public void computeMax(TestMax.ArgumentsCharCharChar args) {
@@ -724,7 +804,15 @@ public class CoreMathVerifier {
     static public void computeNormalize(TestNormalize.ArgumentsFloatFloat args) {
         args.ulf = 4;
         args.ulfRelaxed = 12;
-        args.out = 987654;
+        float[] out = new float[1];
+        normalize(new float[] {args.inV}, out);
+        args.out = out[0];
+    }
+
+    static public void computeNormalize(TestNormalize.ArgumentsFloatNFloatN args) {
+        args.ulf = 4;
+        args.ulfRelaxed = 12;
+        normalize(args.inV, args.out);
     }
     */
 
@@ -734,11 +822,13 @@ public class CoreMathVerifier {
         args.out = (float) StrictMath.pow(args.inX, args.inY);
     }
 
+    /* TODO implement
     static public void computePown(TestPown.ArgumentsFloatIntFloat args) {
         args.ulf = 16;
         args.ulfRelaxed = 128;
         args.out = (float) StrictMath.pow(args.inX, args.inY);
     }
+    */
 
     static public void computePowr(TestPowr.ArgumentsFloatFloatFloat args) {
         args.ulf = 16;
@@ -753,18 +843,18 @@ public class CoreMathVerifier {
     }
 
     static public void computeRemainder(TestRemainder.ArgumentsFloatFloatFloat args) {
-        args.ulf = 0;
-        args.ulfRelaxed = 0;
-        double num = (double)args.inX;
-        double den = (double)args.inY;
-        args.out = (float)(num - StrictMath.round(num / den) * den);
+        args.ulf = 64;  // TODO Correct ULF?
+        args.ulfRelaxed = 128;
+        args.out = remainderAndQuotient(args.inX, args.inY).remainder;
     }
 
     /* TODO To be implemented
     static public void computeRemquo(TestRemquo.ArgumentsFloatFloatIntFloat args) {
-        args.ulf = 4;
-        args.ulfRelaxed = 12;
-        args.out = 987654;  // TODO
+        args.ulf = 64;  // TODO Correct ULF?
+        args.ulfRelaxed = 128;
+        RemainderAndQuotient r = remainderAndQuotient(args.inB, args.inC);
+        args.out = r.remainder;
+        args.outD = r.quotient;
     }
     */
 
@@ -780,14 +870,11 @@ public class CoreMathVerifier {
         args.out = (float) StrictMath.pow(args.inV, 1.0 / (double)args.inN);
     }
 
-    /* TODO To be implemented
     static public void computeRound(TestRound.ArgumentsFloatFloat args) {
-        args.ulf = 4;
-        args.ulfRelaxed = 12;
-        args.out = 987654;
-
+        args.ulf = 0;
+        args.ulfRelaxed = 0;
+        args.out = StrictMath.round(args.in);
     }
-    */
 
     static public void computeRsqrt(TestRsqrt.ArgumentsFloatFloat args) {
         args.ulf = 2;
@@ -798,12 +885,7 @@ public class CoreMathVerifier {
     static public void computeSign(TestSign.ArgumentsFloatFloat args) {
         args.ulf = 0;
         args.ulfRelaxed = 0;
-        // TODO how should we handle NaN?
-        // if (args.in != args.in) {
-        //    args.out = args.in;  // NaN case
-        //} else {
-        args.out = args.inV < 0.f ? -1.f : 1.f;
-        //}
+        args.out = Math.signum(args.inV);
     }
 
     static public void computeSin(TestSin.ArgumentsFloatFloat args) {
@@ -827,10 +909,9 @@ public class CoreMathVerifier {
     }
 
     static public void computeSinpi(TestSinpi.ArgumentsFloatFloat args) {
-        // TODO The ulfs have been relaxed from 5, 128.  Revisit.
-        args.ulf = 4096;
-        args.ulfRelaxed = 4096;
-        args.out = (float) StrictMath.sin(args.in * StrictMath.PI);
+        args.ulf = 5;
+        args.ulfRelaxed = 128;
+        args.out = (float) StrictMath.sin(args.in * (float) StrictMath.PI);
     }
 
     static public void computeSqrt(TestSqrt.ArgumentsFloatFloat args) {
@@ -858,10 +939,9 @@ public class CoreMathVerifier {
     }
 
     static public void computeTanpi(TestTanpi.ArgumentsFloatFloat args) {
-        // TODO The ulfs have been relaxed from 5, 128.  Revisit.
-        args.ulf = 4096;
-        args.ulfRelaxed = 4096;
-        args.out = (float) StrictMath.tan(args.in * StrictMath.PI);
+        args.ulf = 5;
+        args.ulfRelaxed = 128;
+        args.out = (float) StrictMath.tan(args.in * (float) StrictMath.PI);
     }
 
     /* TODO To be implemented

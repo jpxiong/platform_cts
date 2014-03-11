@@ -43,16 +43,16 @@ public class TestAbs extends RSBaseCompute {
     }
 
     private void checkAbsCharUchar() {
-        Allocation inValue = CreateRandomAllocation(mRS, Element.DataType.SIGNED_8, 1, 0x79257810f73902f7L);
+        Allocation inValue = createRandomAllocation(mRS, Element.DataType.SIGNED_8, 1, 0x4c0d03eb0d0c5a91l, false);
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.UNSIGNED_8, 1), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_8, 1), INPUTSIZE);
             script.forEach_testAbsCharUchar(inValue, out);
             verifyResultsAbsCharUchar(inValue, out, false);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testAbsCharUchar: " + e.toString());
         }
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.UNSIGNED_8, 1), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_8, 1), INPUTSIZE);
             scriptRelaxed.forEach_testAbsCharUchar(inValue, out);
             verifyResultsAbsCharUchar(inValue, out, true);
         } catch (Exception e) {
@@ -81,32 +81,36 @@ public class TestAbs extends RSBaseCompute {
                 }
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
-                    message.append(String.format("Input inValue: %d", args.inValue));
+                    message.append(String.format("Input inValue: %d",
+                            args.inValue));
                     message.append("\n");
-                    message.append(String.format("Expected output out: %x", args.out));
+                    message.append(String.format("Expected output out: 0x%x",
+                            args.out));
                     message.append("\n");
-                    message.append(String.format("Actual   output out: %x", arrayOut[i * 1 + j]));
+                    message.append(String.format("Actual   output out: 0x%x",
+                            arrayOut[i * 1 + j]));
                     if (args.out != arrayOut[i * 1 + j]) {
                         message.append(" FAIL");
                     }
                     message.append("\n");
-                    assertTrue("Incorrect output for checkAbsCharUchar" + (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                    assertTrue("Incorrect output for checkAbsCharUchar" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
                 }
             }
         }
     }
 
     private void checkAbsChar2Uchar2() {
-        Allocation inValue = CreateRandomAllocation(mRS, Element.DataType.SIGNED_8, 2, 0xff611dd40e5e04cdL);
+        Allocation inValue = createRandomAllocation(mRS, Element.DataType.SIGNED_8, 2, 0x901d551e7f67bb87l, false);
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.UNSIGNED_8, 2), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_8, 2), INPUTSIZE);
             script.forEach_testAbsChar2Uchar2(inValue, out);
             verifyResultsAbsChar2Uchar2(inValue, out, false);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testAbsChar2Uchar2: " + e.toString());
         }
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.UNSIGNED_8, 2), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_8, 2), INPUTSIZE);
             scriptRelaxed.forEach_testAbsChar2Uchar2(inValue, out);
             verifyResultsAbsChar2Uchar2(inValue, out, true);
         } catch (Exception e) {
@@ -135,32 +139,36 @@ public class TestAbs extends RSBaseCompute {
                 }
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
-                    message.append(String.format("Input inValue: %d", args.inValue));
+                    message.append(String.format("Input inValue: %d",
+                            args.inValue));
                     message.append("\n");
-                    message.append(String.format("Expected output out: %x", args.out));
+                    message.append(String.format("Expected output out: 0x%x",
+                            args.out));
                     message.append("\n");
-                    message.append(String.format("Actual   output out: %x", arrayOut[i * 2 + j]));
+                    message.append(String.format("Actual   output out: 0x%x",
+                            arrayOut[i * 2 + j]));
                     if (args.out != arrayOut[i * 2 + j]) {
                         message.append(" FAIL");
                     }
                     message.append("\n");
-                    assertTrue("Incorrect output for checkAbsChar2Uchar2" + (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                    assertTrue("Incorrect output for checkAbsChar2Uchar2" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
                 }
             }
         }
     }
 
     private void checkAbsChar3Uchar3() {
-        Allocation inValue = CreateRandomAllocation(mRS, Element.DataType.SIGNED_8, 3, 0xff62e6ef047925abL);
+        Allocation inValue = createRandomAllocation(mRS, Element.DataType.SIGNED_8, 3, 0xb5d1caa5c8a5e105l, false);
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.UNSIGNED_8, 3), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_8, 3), INPUTSIZE);
             script.forEach_testAbsChar3Uchar3(inValue, out);
             verifyResultsAbsChar3Uchar3(inValue, out, false);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testAbsChar3Uchar3: " + e.toString());
         }
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.UNSIGNED_8, 3), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_8, 3), INPUTSIZE);
             scriptRelaxed.forEach_testAbsChar3Uchar3(inValue, out);
             verifyResultsAbsChar3Uchar3(inValue, out, true);
         } catch (Exception e) {
@@ -189,32 +197,36 @@ public class TestAbs extends RSBaseCompute {
                 }
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
-                    message.append(String.format("Input inValue: %d", args.inValue));
+                    message.append(String.format("Input inValue: %d",
+                            args.inValue));
                     message.append("\n");
-                    message.append(String.format("Expected output out: %x", args.out));
+                    message.append(String.format("Expected output out: 0x%x",
+                            args.out));
                     message.append("\n");
-                    message.append(String.format("Actual   output out: %x", arrayOut[i * 4 + j]));
+                    message.append(String.format("Actual   output out: 0x%x",
+                            arrayOut[i * 4 + j]));
                     if (args.out != arrayOut[i * 4 + j]) {
                         message.append(" FAIL");
                     }
                     message.append("\n");
-                    assertTrue("Incorrect output for checkAbsChar3Uchar3" + (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                    assertTrue("Incorrect output for checkAbsChar3Uchar3" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
                 }
             }
         }
     }
 
     private void checkAbsChar4Uchar4() {
-        Allocation inValue = CreateRandomAllocation(mRS, Element.DataType.SIGNED_8, 4, 0xff64b009fa944689L);
+        Allocation inValue = createRandomAllocation(mRS, Element.DataType.SIGNED_8, 4, 0xdb86402d11e40683l, false);
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.UNSIGNED_8, 4), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_8, 4), INPUTSIZE);
             script.forEach_testAbsChar4Uchar4(inValue, out);
             verifyResultsAbsChar4Uchar4(inValue, out, false);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testAbsChar4Uchar4: " + e.toString());
         }
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.UNSIGNED_8, 4), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_8, 4), INPUTSIZE);
             scriptRelaxed.forEach_testAbsChar4Uchar4(inValue, out);
             verifyResultsAbsChar4Uchar4(inValue, out, true);
         } catch (Exception e) {
@@ -243,16 +255,20 @@ public class TestAbs extends RSBaseCompute {
                 }
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
-                    message.append(String.format("Input inValue: %d", args.inValue));
+                    message.append(String.format("Input inValue: %d",
+                            args.inValue));
                     message.append("\n");
-                    message.append(String.format("Expected output out: %x", args.out));
+                    message.append(String.format("Expected output out: 0x%x",
+                            args.out));
                     message.append("\n");
-                    message.append(String.format("Actual   output out: %x", arrayOut[i * 4 + j]));
+                    message.append(String.format("Actual   output out: 0x%x",
+                            arrayOut[i * 4 + j]));
                     if (args.out != arrayOut[i * 4 + j]) {
                         message.append(" FAIL");
                     }
                     message.append("\n");
-                    assertTrue("Incorrect output for checkAbsChar4Uchar4" + (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                    assertTrue("Incorrect output for checkAbsChar4Uchar4" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
                 }
             }
         }
@@ -267,16 +283,16 @@ public class TestAbs extends RSBaseCompute {
     }
 
     private void checkAbsShortUshort() {
-        Allocation inValue = CreateRandomAllocation(mRS, Element.DataType.SIGNED_16, 1, 0xfab837da06445edL);
+        Allocation inValue = createRandomAllocation(mRS, Element.DataType.SIGNED_16, 1, 0xaead1a96b6ea02a7l, false);
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.UNSIGNED_16, 1), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_16, 1), INPUTSIZE);
             script.forEach_testAbsShortUshort(inValue, out);
             verifyResultsAbsShortUshort(inValue, out, false);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testAbsShortUshort: " + e.toString());
         }
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.UNSIGNED_16, 1), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_16, 1), INPUTSIZE);
             scriptRelaxed.forEach_testAbsShortUshort(inValue, out);
             verifyResultsAbsShortUshort(inValue, out, true);
         } catch (Exception e) {
@@ -305,32 +321,36 @@ public class TestAbs extends RSBaseCompute {
                 }
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
-                    message.append(String.format("Input inValue: %d", args.inValue));
+                    message.append(String.format("Input inValue: %d",
+                            args.inValue));
                     message.append("\n");
-                    message.append(String.format("Expected output out: %x", args.out));
+                    message.append(String.format("Expected output out: 0x%x",
+                            args.out));
                     message.append("\n");
-                    message.append(String.format("Actual   output out: %x", arrayOut[i * 1 + j]));
+                    message.append(String.format("Actual   output out: 0x%x",
+                            arrayOut[i * 1 + j]));
                     if (args.out != arrayOut[i * 1 + j]) {
                         message.append(" FAIL");
                     }
                     message.append("\n");
-                    assertTrue("Incorrect output for checkAbsShortUshort" + (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                    assertTrue("Incorrect output for checkAbsShortUshort" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
                 }
             }
         }
     }
 
     private void checkAbsShort2Ushort2() {
-        Allocation inValue = CreateRandomAllocation(mRS, Element.DataType.SIGNED_16, 2, 0x231450e168567d8fL);
+        Allocation inValue = createRandomAllocation(mRS, Element.DataType.SIGNED_16, 2, 0x41a1894ff6b0da9l, false);
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.UNSIGNED_16, 2), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_16, 2), INPUTSIZE);
             script.forEach_testAbsShort2Ushort2(inValue, out);
             verifyResultsAbsShort2Ushort2(inValue, out, false);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testAbsShort2Ushort2: " + e.toString());
         }
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.UNSIGNED_16, 2), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_16, 2), INPUTSIZE);
             scriptRelaxed.forEach_testAbsShort2Ushort2(inValue, out);
             verifyResultsAbsShort2Ushort2(inValue, out, true);
         } catch (Exception e) {
@@ -359,32 +379,36 @@ public class TestAbs extends RSBaseCompute {
                 }
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
-                    message.append(String.format("Input inValue: %d", args.inValue));
+                    message.append(String.format("Input inValue: %d",
+                            args.inValue));
                     message.append("\n");
-                    message.append(String.format("Expected output out: %x", args.out));
+                    message.append(String.format("Expected output out: 0x%x",
+                            args.out));
                     message.append("\n");
-                    message.append(String.format("Actual   output out: %x", arrayOut[i * 2 + j]));
+                    message.append(String.format("Actual   output out: 0x%x",
+                            arrayOut[i * 2 + j]));
                     if (args.out != arrayOut[i * 2 + j]) {
                         message.append(" FAIL");
                     }
                     message.append("\n");
-                    assertTrue("Incorrect output for checkAbsShort2Ushort2" + (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                    assertTrue("Incorrect output for checkAbsShort2Ushort2" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
                 }
             }
         }
     }
 
     private void checkAbsShort3Ushort3() {
-        Allocation inValue = CreateRandomAllocation(mRS, Element.DataType.SIGNED_16, 3, 0x23611868beb20ebbL);
+        Allocation inValue = createRandomAllocation(mRS, Element.DataType.SIGNED_16, 3, 0x5969cbec377ba515l, false);
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.UNSIGNED_16, 3), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_16, 3), INPUTSIZE);
             script.forEach_testAbsShort3Ushort3(inValue, out);
             verifyResultsAbsShort3Ushort3(inValue, out, false);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testAbsShort3Ushort3: " + e.toString());
         }
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.UNSIGNED_16, 3), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_16, 3), INPUTSIZE);
             scriptRelaxed.forEach_testAbsShort3Ushort3(inValue, out);
             verifyResultsAbsShort3Ushort3(inValue, out, true);
         } catch (Exception e) {
@@ -413,32 +437,36 @@ public class TestAbs extends RSBaseCompute {
                 }
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
-                    message.append(String.format("Input inValue: %d", args.inValue));
+                    message.append(String.format("Input inValue: %d",
+                            args.inValue));
                     message.append("\n");
-                    message.append(String.format("Expected output out: %x", args.out));
+                    message.append(String.format("Expected output out: 0x%x",
+                            args.out));
                     message.append("\n");
-                    message.append(String.format("Actual   output out: %x", arrayOut[i * 4 + j]));
+                    message.append(String.format("Actual   output out: 0x%x",
+                            arrayOut[i * 4 + j]));
                     if (args.out != arrayOut[i * 4 + j]) {
                         message.append(" FAIL");
                     }
                     message.append("\n");
-                    assertTrue("Incorrect output for checkAbsShort3Ushort3" + (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                    assertTrue("Incorrect output for checkAbsShort3Ushort3" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
                 }
             }
         }
     }
 
     private void checkAbsShort4Ushort4() {
-        Allocation inValue = CreateRandomAllocation(mRS, Element.DataType.SIGNED_16, 4, 0x23addff0150d9fe7L);
+        Allocation inValue = createRandomAllocation(mRS, Element.DataType.SIGNED_16, 4, 0xaeb97f436f8c3c81l, false);
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.UNSIGNED_16, 4), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_16, 4), INPUTSIZE);
             script.forEach_testAbsShort4Ushort4(inValue, out);
             verifyResultsAbsShort4Ushort4(inValue, out, false);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testAbsShort4Ushort4: " + e.toString());
         }
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.UNSIGNED_16, 4), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_16, 4), INPUTSIZE);
             scriptRelaxed.forEach_testAbsShort4Ushort4(inValue, out);
             verifyResultsAbsShort4Ushort4(inValue, out, true);
         } catch (Exception e) {
@@ -467,16 +495,20 @@ public class TestAbs extends RSBaseCompute {
                 }
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
-                    message.append(String.format("Input inValue: %d", args.inValue));
+                    message.append(String.format("Input inValue: %d",
+                            args.inValue));
                     message.append("\n");
-                    message.append(String.format("Expected output out: %x", args.out));
+                    message.append(String.format("Expected output out: 0x%x",
+                            args.out));
                     message.append("\n");
-                    message.append(String.format("Actual   output out: %x", arrayOut[i * 4 + j]));
+                    message.append(String.format("Actual   output out: 0x%x",
+                            arrayOut[i * 4 + j]));
                     if (args.out != arrayOut[i * 4 + j]) {
                         message.append(" FAIL");
                     }
                     message.append("\n");
-                    assertTrue("Incorrect output for checkAbsShort4Ushort4" + (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                    assertTrue("Incorrect output for checkAbsShort4Ushort4" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
                 }
             }
         }
@@ -491,16 +523,16 @@ public class TestAbs extends RSBaseCompute {
     }
 
     private void checkAbsIntUint() {
-        Allocation inValue = CreateRandomAllocation(mRS, Element.DataType.SIGNED_32, 1, 0x6adb1880ac5b4837L);
+        Allocation inValue = createRandomAllocation(mRS, Element.DataType.SIGNED_32, 1, 0xcda40fd4fa1abbd1l, false);
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.UNSIGNED_32, 1), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_32, 1), INPUTSIZE);
             script.forEach_testAbsIntUint(inValue, out);
             verifyResultsAbsIntUint(inValue, out, false);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testAbsIntUint: " + e.toString());
         }
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.UNSIGNED_32, 1), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_32, 1), INPUTSIZE);
             scriptRelaxed.forEach_testAbsIntUint(inValue, out);
             verifyResultsAbsIntUint(inValue, out, true);
         } catch (Exception e) {
@@ -529,32 +561,36 @@ public class TestAbs extends RSBaseCompute {
                 }
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
-                    message.append(String.format("Input inValue: %d", args.inValue));
+                    message.append(String.format("Input inValue: %d",
+                            args.inValue));
                     message.append("\n");
-                    message.append(String.format("Expected output out: %x", args.out));
+                    message.append(String.format("Expected output out: 0x%x",
+                            args.out));
                     message.append("\n");
-                    message.append(String.format("Actual   output out: %x", arrayOut[i * 1 + j]));
+                    message.append(String.format("Actual   output out: 0x%x",
+                            arrayOut[i * 1 + j]));
                     if (args.out != arrayOut[i * 1 + j]) {
                         message.append(" FAIL");
                     }
                     message.append("\n");
-                    assertTrue("Incorrect output for checkAbsIntUint" + (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                    assertTrue("Incorrect output for checkAbsIntUint" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
                 }
             }
         }
     }
 
     private void checkAbsInt2Uint2() {
-        Allocation inValue = CreateRandomAllocation(mRS, Element.DataType.SIGNED_32, 2, 0xc87280539385db4bL);
+        Allocation inValue = createRandomAllocation(mRS, Element.DataType.SIGNED_32, 2, 0x71326739aabbb4a5l, false);
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.UNSIGNED_32, 2), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_32, 2), INPUTSIZE);
             script.forEach_testAbsInt2Uint2(inValue, out);
             verifyResultsAbsInt2Uint2(inValue, out, false);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testAbsInt2Uint2: " + e.toString());
         }
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.UNSIGNED_32, 2), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_32, 2), INPUTSIZE);
             scriptRelaxed.forEach_testAbsInt2Uint2(inValue, out);
             verifyResultsAbsInt2Uint2(inValue, out, true);
         } catch (Exception e) {
@@ -583,32 +619,36 @@ public class TestAbs extends RSBaseCompute {
                 }
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
-                    message.append(String.format("Input inValue: %d", args.inValue));
+                    message.append(String.format("Input inValue: %d",
+                            args.inValue));
                     message.append("\n");
-                    message.append(String.format("Expected output out: %x", args.out));
+                    message.append(String.format("Expected output out: 0x%x",
+                            args.out));
                     message.append("\n");
-                    message.append(String.format("Actual   output out: %x", arrayOut[i * 2 + j]));
+                    message.append(String.format("Actual   output out: 0x%x",
+                            arrayOut[i * 2 + j]));
                     if (args.out != arrayOut[i * 2 + j]) {
                         message.append(" FAIL");
                     }
                     message.append("\n");
-                    assertTrue("Incorrect output for checkAbsInt2Uint2" + (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                    assertTrue("Incorrect output for checkAbsInt2Uint2" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
                 }
             }
         }
     }
 
     private void checkAbsInt3Uint3() {
-        Allocation inValue = CreateRandomAllocation(mRS, Element.DataType.SIGNED_32, 3, 0xc8728af4f28da03fL);
+        Allocation inValue = createRandomAllocation(mRS, Element.DataType.SIGNED_32, 3, 0x9bbf87f7a6fae959l, false);
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.UNSIGNED_32, 3), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_32, 3), INPUTSIZE);
             script.forEach_testAbsInt3Uint3(inValue, out);
             verifyResultsAbsInt3Uint3(inValue, out, false);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testAbsInt3Uint3: " + e.toString());
         }
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.UNSIGNED_32, 3), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_32, 3), INPUTSIZE);
             scriptRelaxed.forEach_testAbsInt3Uint3(inValue, out);
             verifyResultsAbsInt3Uint3(inValue, out, true);
         } catch (Exception e) {
@@ -637,32 +677,36 @@ public class TestAbs extends RSBaseCompute {
                 }
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
-                    message.append(String.format("Input inValue: %d", args.inValue));
+                    message.append(String.format("Input inValue: %d",
+                            args.inValue));
                     message.append("\n");
-                    message.append(String.format("Expected output out: %x", args.out));
+                    message.append(String.format("Expected output out: 0x%x",
+                            args.out));
                     message.append("\n");
-                    message.append(String.format("Actual   output out: %x", arrayOut[i * 4 + j]));
+                    message.append(String.format("Actual   output out: 0x%x",
+                            arrayOut[i * 4 + j]));
                     if (args.out != arrayOut[i * 4 + j]) {
                         message.append(" FAIL");
                     }
                     message.append("\n");
-                    assertTrue("Incorrect output for checkAbsInt3Uint3" + (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                    assertTrue("Incorrect output for checkAbsInt3Uint3" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
                 }
             }
         }
     }
 
     private void checkAbsInt4Uint4() {
-        Allocation inValue = CreateRandomAllocation(mRS, Element.DataType.SIGNED_32, 4, 0xc872959651956533L);
+        Allocation inValue = createRandomAllocation(mRS, Element.DataType.SIGNED_32, 4, 0xc64ca8b5a33a1e0dl, false);
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.UNSIGNED_32, 4), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_32, 4), INPUTSIZE);
             script.forEach_testAbsInt4Uint4(inValue, out);
             verifyResultsAbsInt4Uint4(inValue, out, false);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testAbsInt4Uint4: " + e.toString());
         }
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.UNSIGNED_32, 4), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_32, 4), INPUTSIZE);
             scriptRelaxed.forEach_testAbsInt4Uint4(inValue, out);
             verifyResultsAbsInt4Uint4(inValue, out, true);
         } catch (Exception e) {
@@ -691,16 +735,20 @@ public class TestAbs extends RSBaseCompute {
                 }
                 if (!valid) {
                     StringBuilder message = new StringBuilder();
-                    message.append(String.format("Input inValue: %d", args.inValue));
+                    message.append(String.format("Input inValue: %d",
+                            args.inValue));
                     message.append("\n");
-                    message.append(String.format("Expected output out: %x", args.out));
+                    message.append(String.format("Expected output out: 0x%x",
+                            args.out));
                     message.append("\n");
-                    message.append(String.format("Actual   output out: %x", arrayOut[i * 4 + j]));
+                    message.append(String.format("Actual   output out: 0x%x",
+                            arrayOut[i * 4 + j]));
                     if (args.out != arrayOut[i * 4 + j]) {
                         message.append(" FAIL");
                     }
                     message.append("\n");
-                    assertTrue("Incorrect output for checkAbsInt4Uint4" + (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                    assertTrue("Incorrect output for checkAbsInt4Uint4" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
                 }
             }
         }

@@ -34,235 +34,67 @@ public class TestLogb extends RSBaseCompute {
         scriptRelaxed = new ScriptC_TestLogbRelaxed(mRS);
     }
 
-    public class ArgumentsFloatFloat {
-        public float in;
-        public float out;
-
-        public int ulf;
-        public int ulfRelaxed;
-    }
-
     private void checkLogbFloatFloat() {
-        Allocation in = CreateRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0xbf62abc72ae949d8L);
+        Allocation in = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0xfe06d66b21ce47efl, false);
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.FLOAT_32, 1), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 1), INPUTSIZE);
             script.forEach_testLogbFloatFloat(in, out);
-            verifyResultsLogbFloatFloat(in, out, false);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testLogbFloatFloat: " + e.toString());
         }
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.FLOAT_32, 1), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 1), INPUTSIZE);
             scriptRelaxed.forEach_testLogbFloatFloat(in, out);
-            verifyResultsLogbFloatFloat(in, out, true);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testLogbFloatFloat: " + e.toString());
-        }
-    }
-
-    private void verifyResultsLogbFloatFloat(Allocation in, Allocation out, boolean relaxed) {
-        float[] arrayIn = new float[INPUTSIZE * 1];
-        in.copyTo(arrayIn);
-        float[] arrayOut = new float[INPUTSIZE * 1];
-        out.copyTo(arrayOut);
-        for (int i = 0; i < INPUTSIZE; i++) {
-            for (int j = 0; j < 1 ; j++) {
-                // Extract the inputs.
-                ArgumentsFloatFloat args = new ArgumentsFloatFloat();
-                args.in = arrayIn[i];
-                // Figure out what the outputs should have been.
-                CoreMathVerifier.computeLogb(args);
-                int ulf = relaxed ? args.ulfRelaxed : args.ulf;
-                // Figure out what the outputs should have been.
-                boolean valid = true;
-                int neededUlf = 0;
-                neededUlf = (int) (Math.abs(args.out - arrayOut[i * 1 + j]) / Math.ulp(args.out) + 0.5);
-                if (neededUlf > ulf) {
-                    valid = false;
-                }
-                if (!valid) {
-                    StringBuilder message = new StringBuilder();
-                    message.append(String.format("Input in: %x %.16f", Float.floatToRawIntBits(args.in), args.in));
-                    message.append("\n");
-                    message.append(String.format("Expected output out: %x %.16f", Float.floatToRawIntBits(args.out), args.out));
-                    message.append("\n");
-                    message.append(String.format("Actual   output out: %x %.16f", Float.floatToRawIntBits(arrayOut[i * 1 + j]), arrayOut[i * 1 + j]));
-                    neededUlf = (int) (Math.abs(args.out - arrayOut[i * 1 + j]) / Math.ulp(args.out) + 0.5);
-                    if (neededUlf > ulf) {
-                        message.append(String.format(" FAILED, ulf needed %d, specified %d", neededUlf, ulf));
-                    }
-                    message.append("\n");
-                    assertTrue("Incorrect output for checkLogbFloatFloat" + (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
-                }
-            }
         }
     }
 
     private void checkLogbFloat2Float2() {
-        Allocation in = CreateRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0x49672467d4eddc1cL);
+        Allocation in = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0xbf61cdc2dc1e0853l, false);
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.FLOAT_32, 2), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 2), INPUTSIZE);
             script.forEach_testLogbFloat2Float2(in, out);
-            verifyResultsLogbFloat2Float2(in, out, false);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testLogbFloat2Float2: " + e.toString());
         }
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.FLOAT_32, 2), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 2), INPUTSIZE);
             scriptRelaxed.forEach_testLogbFloat2Float2(in, out);
-            verifyResultsLogbFloat2Float2(in, out, true);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testLogbFloat2Float2: " + e.toString());
-        }
-    }
-
-    private void verifyResultsLogbFloat2Float2(Allocation in, Allocation out, boolean relaxed) {
-        float[] arrayIn = new float[INPUTSIZE * 2];
-        in.copyTo(arrayIn);
-        float[] arrayOut = new float[INPUTSIZE * 2];
-        out.copyTo(arrayOut);
-        for (int i = 0; i < INPUTSIZE; i++) {
-            for (int j = 0; j < 2 ; j++) {
-                // Extract the inputs.
-                ArgumentsFloatFloat args = new ArgumentsFloatFloat();
-                args.in = arrayIn[i * 2 + j];
-                // Figure out what the outputs should have been.
-                CoreMathVerifier.computeLogb(args);
-                int ulf = relaxed ? args.ulfRelaxed : args.ulf;
-                // Figure out what the outputs should have been.
-                boolean valid = true;
-                int neededUlf = 0;
-                neededUlf = (int) (Math.abs(args.out - arrayOut[i * 2 + j]) / Math.ulp(args.out) + 0.5);
-                if (neededUlf > ulf) {
-                    valid = false;
-                }
-                if (!valid) {
-                    StringBuilder message = new StringBuilder();
-                    message.append(String.format("Input in: %x %.16f", Float.floatToRawIntBits(args.in), args.in));
-                    message.append("\n");
-                    message.append(String.format("Expected output out: %x %.16f", Float.floatToRawIntBits(args.out), args.out));
-                    message.append("\n");
-                    message.append(String.format("Actual   output out: %x %.16f", Float.floatToRawIntBits(arrayOut[i * 2 + j]), arrayOut[i * 2 + j]));
-                    neededUlf = (int) (Math.abs(args.out - arrayOut[i * 2 + j]) / Math.ulp(args.out) + 0.5);
-                    if (neededUlf > ulf) {
-                        message.append(String.format(" FAILED, ulf needed %d, specified %d", neededUlf, ulf));
-                    }
-                    message.append("\n");
-                    assertTrue("Incorrect output for checkLogbFloat2Float2" + (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
-                }
-            }
         }
     }
 
     private void checkLogbFloat3Float3() {
-        Allocation in = CreateRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0x49b3ebef2b7c6166L);
+        Allocation in = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0xbf61d8643b249dedl, false);
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.FLOAT_32, 3), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 3), INPUTSIZE);
             script.forEach_testLogbFloat3Float3(in, out);
-            verifyResultsLogbFloat3Float3(in, out, false);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testLogbFloat3Float3: " + e.toString());
         }
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.FLOAT_32, 3), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 3), INPUTSIZE);
             scriptRelaxed.forEach_testLogbFloat3Float3(in, out);
-            verifyResultsLogbFloat3Float3(in, out, true);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testLogbFloat3Float3: " + e.toString());
-        }
-    }
-
-    private void verifyResultsLogbFloat3Float3(Allocation in, Allocation out, boolean relaxed) {
-        float[] arrayIn = new float[INPUTSIZE * 4];
-        in.copyTo(arrayIn);
-        float[] arrayOut = new float[INPUTSIZE * 4];
-        out.copyTo(arrayOut);
-        for (int i = 0; i < INPUTSIZE; i++) {
-            for (int j = 0; j < 3 ; j++) {
-                // Extract the inputs.
-                ArgumentsFloatFloat args = new ArgumentsFloatFloat();
-                args.in = arrayIn[i * 4 + j];
-                // Figure out what the outputs should have been.
-                CoreMathVerifier.computeLogb(args);
-                int ulf = relaxed ? args.ulfRelaxed : args.ulf;
-                // Figure out what the outputs should have been.
-                boolean valid = true;
-                int neededUlf = 0;
-                neededUlf = (int) (Math.abs(args.out - arrayOut[i * 4 + j]) / Math.ulp(args.out) + 0.5);
-                if (neededUlf > ulf) {
-                    valid = false;
-                }
-                if (!valid) {
-                    StringBuilder message = new StringBuilder();
-                    message.append(String.format("Input in: %x %.16f", Float.floatToRawIntBits(args.in), args.in));
-                    message.append("\n");
-                    message.append(String.format("Expected output out: %x %.16f", Float.floatToRawIntBits(args.out), args.out));
-                    message.append("\n");
-                    message.append(String.format("Actual   output out: %x %.16f", Float.floatToRawIntBits(arrayOut[i * 4 + j]), arrayOut[i * 4 + j]));
-                    neededUlf = (int) (Math.abs(args.out - arrayOut[i * 4 + j]) / Math.ulp(args.out) + 0.5);
-                    if (neededUlf > ulf) {
-                        message.append(String.format(" FAILED, ulf needed %d, specified %d", neededUlf, ulf));
-                    }
-                    message.append("\n");
-                    assertTrue("Incorrect output for checkLogbFloat3Float3" + (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
-                }
-            }
         }
     }
 
     private void checkLogbFloat4Float4() {
-        Allocation in = CreateRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0x4a00b376820ae6b0L);
+        Allocation in = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0xbf61e3059a2b3387l, false);
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.FLOAT_32, 4), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 4), INPUTSIZE);
             script.forEach_testLogbFloat4Float4(in, out);
-            verifyResultsLogbFloat4Float4(in, out, false);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testLogbFloat4Float4: " + e.toString());
         }
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.FLOAT_32, 4), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 4), INPUTSIZE);
             scriptRelaxed.forEach_testLogbFloat4Float4(in, out);
-            verifyResultsLogbFloat4Float4(in, out, true);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testLogbFloat4Float4: " + e.toString());
-        }
-    }
-
-    private void verifyResultsLogbFloat4Float4(Allocation in, Allocation out, boolean relaxed) {
-        float[] arrayIn = new float[INPUTSIZE * 4];
-        in.copyTo(arrayIn);
-        float[] arrayOut = new float[INPUTSIZE * 4];
-        out.copyTo(arrayOut);
-        for (int i = 0; i < INPUTSIZE; i++) {
-            for (int j = 0; j < 4 ; j++) {
-                // Extract the inputs.
-                ArgumentsFloatFloat args = new ArgumentsFloatFloat();
-                args.in = arrayIn[i * 4 + j];
-                // Figure out what the outputs should have been.
-                CoreMathVerifier.computeLogb(args);
-                int ulf = relaxed ? args.ulfRelaxed : args.ulf;
-                // Figure out what the outputs should have been.
-                boolean valid = true;
-                int neededUlf = 0;
-                neededUlf = (int) (Math.abs(args.out - arrayOut[i * 4 + j]) / Math.ulp(args.out) + 0.5);
-                if (neededUlf > ulf) {
-                    valid = false;
-                }
-                if (!valid) {
-                    StringBuilder message = new StringBuilder();
-                    message.append(String.format("Input in: %x %.16f", Float.floatToRawIntBits(args.in), args.in));
-                    message.append("\n");
-                    message.append(String.format("Expected output out: %x %.16f", Float.floatToRawIntBits(args.out), args.out));
-                    message.append("\n");
-                    message.append(String.format("Actual   output out: %x %.16f", Float.floatToRawIntBits(arrayOut[i * 4 + j]), arrayOut[i * 4 + j]));
-                    neededUlf = (int) (Math.abs(args.out - arrayOut[i * 4 + j]) / Math.ulp(args.out) + 0.5);
-                    if (neededUlf > ulf) {
-                        message.append(String.format(" FAILED, ulf needed %d, specified %d", neededUlf, ulf));
-                    }
-                    message.append("\n");
-                    assertTrue("Incorrect output for checkLogbFloat4Float4" + (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
-                }
-            }
         }
     }
 

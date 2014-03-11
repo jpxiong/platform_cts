@@ -35,15 +35,15 @@ public class TestConvert extends RSBaseCompute {
     }
 
     private void checkConvertFloat2Float2() {
-        Allocation in = CreateRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0xad9a2981b90cee7dL);
+        Allocation in = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0x239cb31c61129750l, false);
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.FLOAT_32, 2), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 2), INPUTSIZE);
             script.forEach_testConvertFloat2Float2Float2(in, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertFloat2Float2Float2: " + e.toString());
         }
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.FLOAT_32, 2), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 2), INPUTSIZE);
             scriptRelaxed.forEach_testConvertFloat2Float2Float2(in, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertFloat2Float2Float2: " + e.toString());
@@ -51,15 +51,15 @@ public class TestConvert extends RSBaseCompute {
     }
 
     private void checkConvertFloat3Float3() {
-        Allocation in = CreateRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0x77081cba471a9bb8L);
+        Allocation in = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0x239cbdbdc0192ceal, false);
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.FLOAT_32, 3), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 3), INPUTSIZE);
             script.forEach_testConvertFloat3Float3Float3(in, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertFloat3Float3Float3: " + e.toString());
         }
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.FLOAT_32, 3), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 3), INPUTSIZE);
             scriptRelaxed.forEach_testConvertFloat3Float3Float3(in, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertFloat3Float3Float3: " + e.toString());
@@ -67,15 +67,15 @@ public class TestConvert extends RSBaseCompute {
     }
 
     private void checkConvertFloat4Float4() {
-        Allocation in = CreateRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0x40760ff2d52848f3L);
+        Allocation in = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0x239cc85f1f1fc284l, false);
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.FLOAT_32, 4), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 4), INPUTSIZE);
             script.forEach_testConvertFloat4Float4Float4(in, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertFloat4Float4Float4: " + e.toString());
         }
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.FLOAT_32, 4), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 4), INPUTSIZE);
             scriptRelaxed.forEach_testConvertFloat4Float4Float4(in, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertFloat4Float4Float4: " + e.toString());
@@ -83,15 +83,15 @@ public class TestConvert extends RSBaseCompute {
     }
 
     private void checkConvertChar2Float2() {
-        Allocation in = CreateRandomAllocation(mRS, Element.DataType.SIGNED_8, 2, 0xb07a652a8d1df9bdL);
+        Allocation in = createRandomAllocation(mRS, Element.DataType.SIGNED_8, 2, 0xd861883c0ca26e90l, false);
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.FLOAT_32, 2), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 2), INPUTSIZE);
             script.forEach_testConvertFloat2Char2Float2(in, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertFloat2Char2Float2: " + e.toString());
         }
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.FLOAT_32, 2), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 2), INPUTSIZE);
             scriptRelaxed.forEach_testConvertFloat2Char2Float2(in, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertFloat2Char2Float2: " + e.toString());
@@ -99,15 +99,15 @@ public class TestConvert extends RSBaseCompute {
     }
 
     private void checkConvertChar3Float3() {
-        Allocation in = CreateRandomAllocation(mRS, Element.DataType.SIGNED_8, 3, 0x79e858631b2ba6f8L);
+        Allocation in = createRandomAllocation(mRS, Element.DataType.SIGNED_8, 3, 0xd86192dd6ba9042al, false);
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.FLOAT_32, 3), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 3), INPUTSIZE);
             script.forEach_testConvertFloat3Char3Float3(in, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertFloat3Char3Float3: " + e.toString());
         }
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.FLOAT_32, 3), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 3), INPUTSIZE);
             scriptRelaxed.forEach_testConvertFloat3Char3Float3(in, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertFloat3Char3Float3: " + e.toString());
@@ -115,15 +115,15 @@ public class TestConvert extends RSBaseCompute {
     }
 
     private void checkConvertChar4Float4() {
-        Allocation in = CreateRandomAllocation(mRS, Element.DataType.SIGNED_8, 4, 0x43564b9ba9395433L);
+        Allocation in = createRandomAllocation(mRS, Element.DataType.SIGNED_8, 4, 0xd8619d7ecaaf99c4l, false);
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.FLOAT_32, 4), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 4), INPUTSIZE);
             script.forEach_testConvertFloat4Char4Float4(in, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertFloat4Char4Float4: " + e.toString());
         }
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.FLOAT_32, 4), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 4), INPUTSIZE);
             scriptRelaxed.forEach_testConvertFloat4Char4Float4(in, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertFloat4Char4Float4: " + e.toString());
@@ -131,15 +131,15 @@ public class TestConvert extends RSBaseCompute {
     }
 
     private void checkConvertUchar2Float2() {
-        Allocation in = CreateRandomAllocation(mRS, Element.DataType.UNSIGNED_8, 2, 0x924ef7cca0caa94eL);
+        Allocation in = createRandomAllocation(mRS, Element.DataType.UNSIGNED_8, 2, 0x7fef41899f247b11l, false);
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.FLOAT_32, 2), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 2), INPUTSIZE);
             script.forEach_testConvertFloat2Uchar2Float2(in, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertFloat2Uchar2Float2: " + e.toString());
         }
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.FLOAT_32, 2), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 2), INPUTSIZE);
             scriptRelaxed.forEach_testConvertFloat2Uchar2Float2(in, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertFloat2Uchar2Float2: " + e.toString());
@@ -147,15 +147,15 @@ public class TestConvert extends RSBaseCompute {
     }
 
     private void checkConvertUchar3Float3() {
-        Allocation in = CreateRandomAllocation(mRS, Element.DataType.UNSIGNED_8, 3, 0x5bbceb052ed85689L);
+        Allocation in = createRandomAllocation(mRS, Element.DataType.UNSIGNED_8, 3, 0x7fef4c2afe2b10abl, false);
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.FLOAT_32, 3), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 3), INPUTSIZE);
             script.forEach_testConvertFloat3Uchar3Float3(in, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertFloat3Uchar3Float3: " + e.toString());
         }
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.FLOAT_32, 3), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 3), INPUTSIZE);
             scriptRelaxed.forEach_testConvertFloat3Uchar3Float3(in, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertFloat3Uchar3Float3: " + e.toString());
@@ -163,15 +163,15 @@ public class TestConvert extends RSBaseCompute {
     }
 
     private void checkConvertUchar4Float4() {
-        Allocation in = CreateRandomAllocation(mRS, Element.DataType.UNSIGNED_8, 4, 0x252ade3dbce603c4L);
+        Allocation in = createRandomAllocation(mRS, Element.DataType.UNSIGNED_8, 4, 0x7fef56cc5d31a645l, false);
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.FLOAT_32, 4), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 4), INPUTSIZE);
             script.forEach_testConvertFloat4Uchar4Float4(in, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertFloat4Uchar4Float4: " + e.toString());
         }
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.FLOAT_32, 4), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 4), INPUTSIZE);
             scriptRelaxed.forEach_testConvertFloat4Uchar4Float4(in, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertFloat4Uchar4Float4: " + e.toString());
@@ -179,15 +179,15 @@ public class TestConvert extends RSBaseCompute {
     }
 
     private void checkConvertShort2Float2() {
-        Allocation in = CreateRandomAllocation(mRS, Element.DataType.SIGNED_16, 2, 0x28db33046c18ecc1L);
+        Allocation in = createRandomAllocation(mRS, Element.DataType.SIGNED_16, 2, 0x68ab65c64d600954l, false);
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.FLOAT_32, 2), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 2), INPUTSIZE);
             script.forEach_testConvertFloat2Short2Float2(in, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertFloat2Short2Float2: " + e.toString());
         }
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.FLOAT_32, 2), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 2), INPUTSIZE);
             scriptRelaxed.forEach_testConvertFloat2Short2Float2(in, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertFloat2Short2Float2: " + e.toString());
@@ -195,15 +195,15 @@ public class TestConvert extends RSBaseCompute {
     }
 
     private void checkConvertShort3Float3() {
-        Allocation in = CreateRandomAllocation(mRS, Element.DataType.SIGNED_16, 3, 0xf249263cfa2699fcL);
+        Allocation in = createRandomAllocation(mRS, Element.DataType.SIGNED_16, 3, 0x68ab7067ac669eeel, false);
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.FLOAT_32, 3), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 3), INPUTSIZE);
             script.forEach_testConvertFloat3Short3Float3(in, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertFloat3Short3Float3: " + e.toString());
         }
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.FLOAT_32, 3), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 3), INPUTSIZE);
             scriptRelaxed.forEach_testConvertFloat3Short3Float3(in, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertFloat3Short3Float3: " + e.toString());
@@ -211,15 +211,15 @@ public class TestConvert extends RSBaseCompute {
     }
 
     private void checkConvertShort4Float4() {
-        Allocation in = CreateRandomAllocation(mRS, Element.DataType.SIGNED_16, 4, 0xbbb7197588344737L);
+        Allocation in = createRandomAllocation(mRS, Element.DataType.SIGNED_16, 4, 0x68ab7b090b6d3488l, false);
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.FLOAT_32, 4), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 4), INPUTSIZE);
             script.forEach_testConvertFloat4Short4Float4(in, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertFloat4Short4Float4: " + e.toString());
         }
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.FLOAT_32, 4), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 4), INPUTSIZE);
             scriptRelaxed.forEach_testConvertFloat4Short4Float4(in, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertFloat4Short4Float4: " + e.toString());
@@ -227,15 +227,15 @@ public class TestConvert extends RSBaseCompute {
     }
 
     private void checkConvertUshort2Float2() {
-        Allocation in = CreateRandomAllocation(mRS, Element.DataType.UNSIGNED_16, 2, 0x178fd43dba1a6a1cL);
+        Allocation in = createRandomAllocation(mRS, Element.DataType.UNSIGNED_16, 2, 0x8d7985cde93822ffl, false);
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.FLOAT_32, 2), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 2), INPUTSIZE);
             script.forEach_testConvertFloat2Ushort2Float2(in, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertFloat2Ushort2Float2: " + e.toString());
         }
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.FLOAT_32, 2), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 2), INPUTSIZE);
             scriptRelaxed.forEach_testConvertFloat2Ushort2Float2(in, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertFloat2Ushort2Float2: " + e.toString());
@@ -243,15 +243,15 @@ public class TestConvert extends RSBaseCompute {
     }
 
     private void checkConvertUshort3Float3() {
-        Allocation in = CreateRandomAllocation(mRS, Element.DataType.UNSIGNED_16, 3, 0xe0fdc77648281757L);
+        Allocation in = createRandomAllocation(mRS, Element.DataType.UNSIGNED_16, 3, 0x8d79906f483eb899l, false);
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.FLOAT_32, 3), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 3), INPUTSIZE);
             script.forEach_testConvertFloat3Ushort3Float3(in, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertFloat3Ushort3Float3: " + e.toString());
         }
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.FLOAT_32, 3), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 3), INPUTSIZE);
             scriptRelaxed.forEach_testConvertFloat3Ushort3Float3(in, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertFloat3Ushort3Float3: " + e.toString());
@@ -259,15 +259,15 @@ public class TestConvert extends RSBaseCompute {
     }
 
     private void checkConvertUshort4Float4() {
-        Allocation in = CreateRandomAllocation(mRS, Element.DataType.UNSIGNED_16, 4, 0xaa6bbaaed635c492L);
+        Allocation in = createRandomAllocation(mRS, Element.DataType.UNSIGNED_16, 4, 0x8d799b10a7454e33l, false);
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.FLOAT_32, 4), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 4), INPUTSIZE);
             script.forEach_testConvertFloat4Ushort4Float4(in, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertFloat4Ushort4Float4: " + e.toString());
         }
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.FLOAT_32, 4), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 4), INPUTSIZE);
             scriptRelaxed.forEach_testConvertFloat4Ushort4Float4(in, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertFloat4Ushort4Float4: " + e.toString());
@@ -275,15 +275,15 @@ public class TestConvert extends RSBaseCompute {
     }
 
     private void checkConvertInt2Float2() {
-        Allocation in = CreateRandomAllocation(mRS, Element.DataType.SIGNED_32, 2, 0xb9feee147e1725caL);
+        Allocation in = createRandomAllocation(mRS, Element.DataType.SIGNED_32, 2, 0xd74f520b6ddc57cdl, false);
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.FLOAT_32, 2), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 2), INPUTSIZE);
             script.forEach_testConvertFloat2Int2Float2(in, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertFloat2Int2Float2: " + e.toString());
         }
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.FLOAT_32, 2), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 2), INPUTSIZE);
             scriptRelaxed.forEach_testConvertFloat2Int2Float2(in, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertFloat2Int2Float2: " + e.toString());
@@ -291,15 +291,15 @@ public class TestConvert extends RSBaseCompute {
     }
 
     private void checkConvertInt3Float3() {
-        Allocation in = CreateRandomAllocation(mRS, Element.DataType.SIGNED_32, 3, 0x836ce14d0c24d305L);
+        Allocation in = createRandomAllocation(mRS, Element.DataType.SIGNED_32, 3, 0xd74f5caccce2ed67l, false);
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.FLOAT_32, 3), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 3), INPUTSIZE);
             script.forEach_testConvertFloat3Int3Float3(in, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertFloat3Int3Float3: " + e.toString());
         }
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.FLOAT_32, 3), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 3), INPUTSIZE);
             scriptRelaxed.forEach_testConvertFloat3Int3Float3(in, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertFloat3Int3Float3: " + e.toString());
@@ -307,15 +307,15 @@ public class TestConvert extends RSBaseCompute {
     }
 
     private void checkConvertInt4Float4() {
-        Allocation in = CreateRandomAllocation(mRS, Element.DataType.SIGNED_32, 4, 0x4cdad4859a328040L);
+        Allocation in = createRandomAllocation(mRS, Element.DataType.SIGNED_32, 4, 0xd74f674e2be98301l, false);
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.FLOAT_32, 4), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 4), INPUTSIZE);
             script.forEach_testConvertFloat4Int4Float4(in, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertFloat4Int4Float4: " + e.toString());
         }
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.FLOAT_32, 4), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 4), INPUTSIZE);
             scriptRelaxed.forEach_testConvertFloat4Int4Float4(in, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertFloat4Int4Float4: " + e.toString());
@@ -323,15 +323,15 @@ public class TestConvert extends RSBaseCompute {
     }
 
     private void checkConvertUint2Float2() {
-        Allocation in = CreateRandomAllocation(mRS, Element.DataType.UNSIGNED_32, 2, 0xcb27983013629afdL);
+        Allocation in = createRandomAllocation(mRS, Element.DataType.UNSIGNED_32, 2, 0xe71d08f56b507bd0l, false);
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.FLOAT_32, 2), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 2), INPUTSIZE);
             script.forEach_testConvertFloat2Uint2Float2(in, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertFloat2Uint2Float2: " + e.toString());
         }
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.FLOAT_32, 2), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 2), INPUTSIZE);
             scriptRelaxed.forEach_testConvertFloat2Uint2Float2(in, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertFloat2Uint2Float2: " + e.toString());
@@ -339,15 +339,15 @@ public class TestConvert extends RSBaseCompute {
     }
 
     private void checkConvertUint3Float3() {
-        Allocation in = CreateRandomAllocation(mRS, Element.DataType.UNSIGNED_32, 3, 0x94958b68a1704838L);
+        Allocation in = createRandomAllocation(mRS, Element.DataType.UNSIGNED_32, 3, 0xe71d1396ca57116al, false);
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.FLOAT_32, 3), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 3), INPUTSIZE);
             script.forEach_testConvertFloat3Uint3Float3(in, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertFloat3Uint3Float3: " + e.toString());
         }
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.FLOAT_32, 3), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 3), INPUTSIZE);
             scriptRelaxed.forEach_testConvertFloat3Uint3Float3(in, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertFloat3Uint3Float3: " + e.toString());
@@ -355,15 +355,15 @@ public class TestConvert extends RSBaseCompute {
     }
 
     private void checkConvertUint4Float4() {
-        Allocation in = CreateRandomAllocation(mRS, Element.DataType.UNSIGNED_32, 4, 0x5e037ea12f7df573L);
+        Allocation in = createRandomAllocation(mRS, Element.DataType.UNSIGNED_32, 4, 0xe71d1e38295da704l, false);
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.FLOAT_32, 4), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 4), INPUTSIZE);
             script.forEach_testConvertFloat4Uint4Float4(in, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertFloat4Uint4Float4: " + e.toString());
         }
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.FLOAT_32, 4), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 4), INPUTSIZE);
             scriptRelaxed.forEach_testConvertFloat4Uint4Float4(in, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertFloat4Uint4Float4: " + e.toString());
@@ -371,15 +371,15 @@ public class TestConvert extends RSBaseCompute {
     }
 
     private void checkConvertFloat2Char2() {
-        Allocation in = CreateRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0x67c9e452c2fc5b9L);
+        Allocation in = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0x8fb63faeb391b024l, false);
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.SIGNED_8, 2), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_8, 2), INPUTSIZE);
             script.forEach_testConvertChar2Float2Char2(in, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertChar2Float2Char2: " + e.toString());
         }
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.SIGNED_8, 2), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_8, 2), INPUTSIZE);
             scriptRelaxed.forEach_testConvertChar2Float2Char2(in, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertChar2Float2Char2: " + e.toString());
@@ -387,15 +387,15 @@ public class TestConvert extends RSBaseCompute {
     }
 
     private void checkConvertFloat3Char3() {
-        Allocation in = CreateRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0x9c8a41b0e8da438eL);
+        Allocation in = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0x8fb63fedfd389100l, false);
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.SIGNED_8, 3), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_8, 3), INPUTSIZE);
             script.forEach_testConvertChar3Float3Char3(in, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertChar3Float3Char3: " + e.toString());
         }
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.SIGNED_8, 3), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_8, 3), INPUTSIZE);
             scriptRelaxed.forEach_testConvertChar3Float3Char3(in, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertChar3Float3Char3: " + e.toString());
@@ -403,15 +403,15 @@ public class TestConvert extends RSBaseCompute {
     }
 
     private void checkConvertFloat4Char4() {
-        Allocation in = CreateRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0x3297e51ca584c163L);
+        Allocation in = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0x8fb6402d46df71dcl, false);
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.SIGNED_8, 4), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_8, 4), INPUTSIZE);
             script.forEach_testConvertChar4Float4Char4(in, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertChar4Float4Char4: " + e.toString());
         }
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.SIGNED_8, 4), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_8, 4), INPUTSIZE);
             scriptRelaxed.forEach_testConvertChar4Float4Char4(in, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertChar4Float4Char4: " + e.toString());
@@ -419,15 +419,15 @@ public class TestConvert extends RSBaseCompute {
     }
 
     private void checkConvertChar2Char2() {
-        Allocation in = CreateRandomAllocation(mRS, Element.DataType.SIGNED_8, 2, 0x3ff06247353eaf9L);
+        Allocation in = createRandomAllocation(mRS, Element.DataType.SIGNED_8, 2, 0x880244a387ee55e4l, false);
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.SIGNED_8, 2), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_8, 2), INPUTSIZE);
             script.forEach_testConvertChar2Char2Char2(in, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertChar2Char2Char2: " + e.toString());
         }
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.SIGNED_8, 2), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_8, 2), INPUTSIZE);
             scriptRelaxed.forEach_testConvertChar2Char2Char2(in, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertChar2Char2Char2: " + e.toString());
@@ -435,15 +435,15 @@ public class TestConvert extends RSBaseCompute {
     }
 
     private void checkConvertChar3Char3() {
-        Allocation in = CreateRandomAllocation(mRS, Element.DataType.SIGNED_8, 3, 0x9a0ca9902ffe68ceL);
+        Allocation in = createRandomAllocation(mRS, Element.DataType.SIGNED_8, 3, 0x880244e2d19536c0l, false);
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.SIGNED_8, 3), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_8, 3), INPUTSIZE);
             script.forEach_testConvertChar3Char3Char3(in, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertChar3Char3Char3: " + e.toString());
         }
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.SIGNED_8, 3), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_8, 3), INPUTSIZE);
             scriptRelaxed.forEach_testConvertChar3Char3Char3(in, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertChar3Char3Char3: " + e.toString());
@@ -451,15 +451,15 @@ public class TestConvert extends RSBaseCompute {
     }
 
     private void checkConvertChar4Char4() {
-        Allocation in = CreateRandomAllocation(mRS, Element.DataType.SIGNED_8, 4, 0x301a4cfbeca8e6a3L);
+        Allocation in = createRandomAllocation(mRS, Element.DataType.SIGNED_8, 4, 0x880245221b3c179cl, false);
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.SIGNED_8, 4), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_8, 4), INPUTSIZE);
             script.forEach_testConvertChar4Char4Char4(in, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertChar4Char4Char4: " + e.toString());
         }
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.SIGNED_8, 4), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_8, 4), INPUTSIZE);
             scriptRelaxed.forEach_testConvertChar4Char4Char4(in, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertChar4Char4Char4: " + e.toString());
@@ -467,15 +467,15 @@ public class TestConvert extends RSBaseCompute {
     }
 
     private void checkConvertUchar2Char2() {
-        Allocation in = CreateRandomAllocation(mRS, Element.DataType.UNSIGNED_8, 2, 0x3fee1bf576ccbe12L);
+        Allocation in = createRandomAllocation(mRS, Element.DataType.UNSIGNED_8, 2, 0x97cffb8d856279e7l, false);
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.SIGNED_8, 2), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_8, 2), INPUTSIZE);
             script.forEach_testConvertChar2Uchar2Char2(in, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertChar2Uchar2Char2: " + e.toString());
         }
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.SIGNED_8, 2), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_8, 2), INPUTSIZE);
             scriptRelaxed.forEach_testConvertChar2Uchar2Char2(in, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertChar2Uchar2Char2: " + e.toString());
@@ -483,15 +483,15 @@ public class TestConvert extends RSBaseCompute {
     }
 
     private void checkConvertUchar3Char3() {
-        Allocation in = CreateRandomAllocation(mRS, Element.DataType.UNSIGNED_8, 3, 0xd5fbbf6133773be7L);
+        Allocation in = createRandomAllocation(mRS, Element.DataType.UNSIGNED_8, 3, 0x97cffbcccf095ac3l, false);
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.SIGNED_8, 3), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_8, 3), INPUTSIZE);
             script.forEach_testConvertChar3Uchar3Char3(in, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertChar3Uchar3Char3: " + e.toString());
         }
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.SIGNED_8, 3), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_8, 3), INPUTSIZE);
             scriptRelaxed.forEach_testConvertChar3Uchar3Char3(in, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertChar3Uchar3Char3: " + e.toString());
@@ -499,15 +499,15 @@ public class TestConvert extends RSBaseCompute {
     }
 
     private void checkConvertUchar4Char4() {
-        Allocation in = CreateRandomAllocation(mRS, Element.DataType.UNSIGNED_8, 4, 0x6c0962ccf021b9bcL);
+        Allocation in = createRandomAllocation(mRS, Element.DataType.UNSIGNED_8, 4, 0x97cffc0c18b03b9fl, false);
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.SIGNED_8, 4), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_8, 4), INPUTSIZE);
             script.forEach_testConvertChar4Uchar4Char4(in, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertChar4Uchar4Char4: " + e.toString());
         }
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.SIGNED_8, 4), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_8, 4), INPUTSIZE);
             scriptRelaxed.forEach_testConvertChar4Uchar4Char4(in, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertChar4Uchar4Char4: " + e.toString());
@@ -515,15 +515,15 @@ public class TestConvert extends RSBaseCompute {
     }
 
     private void checkConvertShort2Char2() {
-        Allocation in = CreateRandomAllocation(mRS, Element.DataType.SIGNED_16, 2, 0x5dc768a0df6521dL);
+        Allocation in = createRandomAllocation(mRS, Element.DataType.SIGNED_16, 2, 0x856931fa18520030l, false);
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.SIGNED_8, 2), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_8, 2), INPUTSIZE);
             script.forEach_testConvertChar2Short2Char2(in, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertChar2Short2Char2: " + e.toString());
         }
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.SIGNED_8, 2), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_8, 2), INPUTSIZE);
             scriptRelaxed.forEach_testConvertChar2Short2Char2(in, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertChar2Short2Char2: " + e.toString());
@@ -531,15 +531,15 @@ public class TestConvert extends RSBaseCompute {
     }
 
     private void checkConvertShort3Char3() {
-        Allocation in = CreateRandomAllocation(mRS, Element.DataType.SIGNED_16, 3, 0x9bea19f5caa0cff2L);
+        Allocation in = createRandomAllocation(mRS, Element.DataType.SIGNED_16, 3, 0x8569323961f8e10cl, false);
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.SIGNED_8, 3), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_8, 3), INPUTSIZE);
             script.forEach_testConvertChar3Short3Char3(in, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertChar3Short3Char3: " + e.toString());
         }
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.SIGNED_8, 3), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_8, 3), INPUTSIZE);
             scriptRelaxed.forEach_testConvertChar3Short3Char3(in, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertChar3Short3Char3: " + e.toString());
@@ -547,15 +547,15 @@ public class TestConvert extends RSBaseCompute {
     }
 
     private void checkConvertShort4Char4() {
-        Allocation in = CreateRandomAllocation(mRS, Element.DataType.SIGNED_16, 4, 0x31f7bd61874b4dc7L);
+        Allocation in = createRandomAllocation(mRS, Element.DataType.SIGNED_16, 4, 0x85693278ab9fc1e8l, false);
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.SIGNED_8, 4), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_8, 4), INPUTSIZE);
             script.forEach_testConvertChar4Short4Char4(in, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertChar4Short4Char4: " + e.toString());
         }
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.SIGNED_8, 4), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_8, 4), INPUTSIZE);
             scriptRelaxed.forEach_testConvertChar4Short4Char4(in, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertChar4Short4Char4: " + e.toString());
@@ -563,15 +563,15 @@ public class TestConvert extends RSBaseCompute {
     }
 
     private void checkConvertUshort2Char2() {
-        Allocation in = CreateRandomAllocation(mRS, Element.DataType.UNSIGNED_16, 2, 0x170520a5a341c750L);
+        Allocation in = createRandomAllocation(mRS, Element.DataType.UNSIGNED_16, 2, 0x2cf6eb47aad40cb1l, false);
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.SIGNED_8, 2), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_8, 2), INPUTSIZE);
             script.forEach_testConvertChar2Ushort2Char2(in, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertChar2Ushort2Char2: " + e.toString());
         }
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.SIGNED_8, 2), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_8, 2), INPUTSIZE);
             scriptRelaxed.forEach_testConvertChar2Ushort2Char2(in, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertChar2Ushort2Char2: " + e.toString());
@@ -579,15 +579,15 @@ public class TestConvert extends RSBaseCompute {
     }
 
     private void checkConvertUshort3Char3() {
-        Allocation in = CreateRandomAllocation(mRS, Element.DataType.UNSIGNED_16, 3, 0xad12c4115fec4525L);
+        Allocation in = createRandomAllocation(mRS, Element.DataType.UNSIGNED_16, 3, 0x2cf6eb86f47aed8dl, false);
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.SIGNED_8, 3), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_8, 3), INPUTSIZE);
             script.forEach_testConvertChar3Ushort3Char3(in, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertChar3Ushort3Char3: " + e.toString());
         }
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.SIGNED_8, 3), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_8, 3), INPUTSIZE);
             scriptRelaxed.forEach_testConvertChar3Ushort3Char3(in, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertChar3Ushort3Char3: " + e.toString());
@@ -595,15 +595,15 @@ public class TestConvert extends RSBaseCompute {
     }
 
     private void checkConvertUshort4Char4() {
-        Allocation in = CreateRandomAllocation(mRS, Element.DataType.UNSIGNED_16, 4, 0x4320677d1c96c2faL);
+        Allocation in = createRandomAllocation(mRS, Element.DataType.UNSIGNED_16, 4, 0x2cf6ebc63e21ce69l, false);
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.SIGNED_8, 4), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_8, 4), INPUTSIZE);
             script.forEach_testConvertChar4Ushort4Char4(in, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertChar4Ushort4Char4: " + e.toString());
         }
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.SIGNED_8, 4), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_8, 4), INPUTSIZE);
             scriptRelaxed.forEach_testConvertChar4Ushort4Char4(in, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertChar4Ushort4Char4: " + e.toString());
@@ -611,15 +611,15 @@ public class TestConvert extends RSBaseCompute {
     }
 
     private void checkConvertInt2Char2() {
-        Allocation in = CreateRandomAllocation(mRS, Element.DataType.SIGNED_32, 2, 0x1e9598256861c26eL);
+        Allocation in = createRandomAllocation(mRS, Element.DataType.SIGNED_32, 2, 0x501d8373ccbf61bl, false);
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.SIGNED_8, 2), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_8, 2), INPUTSIZE);
             script.forEach_testConvertChar2Int2Char2(in, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertChar2Int2Char2: " + e.toString());
         }
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.SIGNED_8, 2), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_8, 2), INPUTSIZE);
             scriptRelaxed.forEach_testConvertChar2Int2Char2(in, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertChar2Int2Char2: " + e.toString());
@@ -627,15 +627,15 @@ public class TestConvert extends RSBaseCompute {
     }
 
     private void checkConvertInt3Char3() {
-        Allocation in = CreateRandomAllocation(mRS, Element.DataType.SIGNED_32, 3, 0xb4a33b91250c4043L);
+        Allocation in = createRandomAllocation(mRS, Element.DataType.SIGNED_32, 3, 0x501d8768672d6f7l, false);
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.SIGNED_8, 3), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_8, 3), INPUTSIZE);
             script.forEach_testConvertChar3Int3Char3(in, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertChar3Int3Char3: " + e.toString());
         }
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.SIGNED_8, 3), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_8, 3), INPUTSIZE);
             scriptRelaxed.forEach_testConvertChar3Int3Char3(in, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertChar3Int3Char3: " + e.toString());
@@ -643,15 +643,15 @@ public class TestConvert extends RSBaseCompute {
     }
 
     private void checkConvertInt4Char4() {
-        Allocation in = CreateRandomAllocation(mRS, Element.DataType.SIGNED_32, 4, 0x4ab0defce1b6be18L);
+        Allocation in = createRandomAllocation(mRS, Element.DataType.SIGNED_32, 4, 0x501d8b5d019b7d3l, false);
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.SIGNED_8, 4), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_8, 4), INPUTSIZE);
             script.forEach_testConvertChar4Int4Char4(in, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertChar4Int4Char4: " + e.toString());
         }
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.SIGNED_8, 4), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_8, 4), INPUTSIZE);
             scriptRelaxed.forEach_testConvertChar4Int4Char4(in, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertChar4Int4Char4: " + e.toString());
@@ -659,15 +659,15 @@ public class TestConvert extends RSBaseCompute {
     }
 
     private void checkConvertUint2Char2() {
-        Allocation in = CreateRandomAllocation(mRS, Element.DataType.UNSIGNED_32, 2, 0x6d5f9e9b62825639L);
+        Allocation in = createRandomAllocation(mRS, Element.DataType.UNSIGNED_32, 2, 0x70899afb30d49da4l, false);
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.SIGNED_8, 2), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_8, 2), INPUTSIZE);
             script.forEach_testConvertChar2Uint2Char2(in, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertChar2Uint2Char2: " + e.toString());
         }
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.SIGNED_8, 2), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_8, 2), INPUTSIZE);
             scriptRelaxed.forEach_testConvertChar2Uint2Char2(in, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertChar2Uint2Char2: " + e.toString());
@@ -675,15 +675,15 @@ public class TestConvert extends RSBaseCompute {
     }
 
     private void checkConvertUint3Char3() {
-        Allocation in = CreateRandomAllocation(mRS, Element.DataType.UNSIGNED_32, 3, 0x36d42071f2cd40eL);
+        Allocation in = createRandomAllocation(mRS, Element.DataType.UNSIGNED_32, 3, 0x70899b3a7a7b7e80l, false);
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.SIGNED_8, 3), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_8, 3), INPUTSIZE);
             script.forEach_testConvertChar3Uint3Char3(in, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertChar3Uint3Char3: " + e.toString());
         }
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.SIGNED_8, 3), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_8, 3), INPUTSIZE);
             scriptRelaxed.forEach_testConvertChar3Uint3Char3(in, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertChar3Uint3Char3: " + e.toString());
@@ -691,15 +691,15 @@ public class TestConvert extends RSBaseCompute {
     }
 
     private void checkConvertUint4Char4() {
-        Allocation in = CreateRandomAllocation(mRS, Element.DataType.UNSIGNED_32, 4, 0x997ae572dbd751e3L);
+        Allocation in = createRandomAllocation(mRS, Element.DataType.UNSIGNED_32, 4, 0x70899b79c4225f5cl, false);
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.SIGNED_8, 4), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_8, 4), INPUTSIZE);
             script.forEach_testConvertChar4Uint4Char4(in, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertChar4Uint4Char4: " + e.toString());
         }
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.SIGNED_8, 4), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_8, 4), INPUTSIZE);
             scriptRelaxed.forEach_testConvertChar4Uint4Char4(in, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertChar4Uint4Char4: " + e.toString());
@@ -707,15 +707,15 @@ public class TestConvert extends RSBaseCompute {
     }
 
     private void checkConvertFloat2Uchar2() {
-        Allocation in = CreateRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0xa4eee6243d074207L);
+        Allocation in = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0x239cb6c435759ce9l, false);
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.UNSIGNED_8, 2), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_8, 2), INPUTSIZE);
             script.forEach_testConvertUchar2Float2Uchar2(in, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertUchar2Float2Uchar2: " + e.toString());
         }
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.UNSIGNED_8, 2), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_8, 2), INPUTSIZE);
             scriptRelaxed.forEach_testConvertUchar2Float2Uchar2(in, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertUchar2Float2Uchar2: " + e.toString());
@@ -723,15 +723,15 @@ public class TestConvert extends RSBaseCompute {
     }
 
     private void checkConvertFloat3Uchar3() {
-        Allocation in = CreateRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0x6e5cd95ccb14ef42L);
+        Allocation in = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0x239cc165947c3283l, false);
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.UNSIGNED_8, 3), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_8, 3), INPUTSIZE);
             script.forEach_testConvertUchar3Float3Uchar3(in, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertUchar3Float3Uchar3: " + e.toString());
         }
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.UNSIGNED_8, 3), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_8, 3), INPUTSIZE);
             scriptRelaxed.forEach_testConvertUchar3Float3Uchar3(in, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertUchar3Float3Uchar3: " + e.toString());
@@ -739,15 +739,15 @@ public class TestConvert extends RSBaseCompute {
     }
 
     private void checkConvertFloat4Uchar4() {
-        Allocation in = CreateRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0x37cacc9559229c7dL);
+        Allocation in = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0x239ccc06f382c81dl, false);
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.UNSIGNED_8, 4), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_8, 4), INPUTSIZE);
             script.forEach_testConvertUchar4Float4Uchar4(in, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertUchar4Float4Uchar4: " + e.toString());
         }
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.UNSIGNED_8, 4), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_8, 4), INPUTSIZE);
             scriptRelaxed.forEach_testConvertUchar4Float4Uchar4(in, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertUchar4Float4Uchar4: " + e.toString());
@@ -755,15 +755,15 @@ public class TestConvert extends RSBaseCompute {
     }
 
     private void checkConvertChar2Uchar2() {
-        Allocation in = CreateRandomAllocation(mRS, Element.DataType.SIGNED_8, 2, 0xa7cf21cd11184d47L);
+        Allocation in = createRandomAllocation(mRS, Element.DataType.SIGNED_8, 2, 0xd8618be3e1057429l, false);
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.UNSIGNED_8, 2), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_8, 2), INPUTSIZE);
             script.forEach_testConvertUchar2Char2Uchar2(in, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertUchar2Char2Uchar2: " + e.toString());
         }
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.UNSIGNED_8, 2), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_8, 2), INPUTSIZE);
             scriptRelaxed.forEach_testConvertUchar2Char2Uchar2(in, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertUchar2Char2Uchar2: " + e.toString());
@@ -771,15 +771,15 @@ public class TestConvert extends RSBaseCompute {
     }
 
     private void checkConvertChar3Uchar3() {
-        Allocation in = CreateRandomAllocation(mRS, Element.DataType.SIGNED_8, 3, 0x713d15059f25fa82L);
+        Allocation in = createRandomAllocation(mRS, Element.DataType.SIGNED_8, 3, 0xd8619685400c09c3l, false);
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.UNSIGNED_8, 3), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_8, 3), INPUTSIZE);
             script.forEach_testConvertUchar3Char3Uchar3(in, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertUchar3Char3Uchar3: " + e.toString());
         }
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.UNSIGNED_8, 3), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_8, 3), INPUTSIZE);
             scriptRelaxed.forEach_testConvertUchar3Char3Uchar3(in, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertUchar3Char3Uchar3: " + e.toString());
@@ -787,15 +787,15 @@ public class TestConvert extends RSBaseCompute {
     }
 
     private void checkConvertChar4Uchar4() {
-        Allocation in = CreateRandomAllocation(mRS, Element.DataType.SIGNED_8, 4, 0x3aab083e2d33a7bdL);
+        Allocation in = createRandomAllocation(mRS, Element.DataType.SIGNED_8, 4, 0xd861a1269f129f5dl, false);
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.UNSIGNED_8, 4), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_8, 4), INPUTSIZE);
             script.forEach_testConvertUchar4Char4Uchar4(in, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertUchar4Char4Uchar4: " + e.toString());
         }
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.UNSIGNED_8, 4), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_8, 4), INPUTSIZE);
             scriptRelaxed.forEach_testConvertUchar4Char4Uchar4(in, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertUchar4Char4Uchar4: " + e.toString());
@@ -803,15 +803,15 @@ public class TestConvert extends RSBaseCompute {
     }
 
     private void checkConvertUchar2Uchar2() {
-        Allocation in = CreateRandomAllocation(mRS, Element.DataType.UNSIGNED_8, 2, 0x89a3b46f24c4fcd8L);
+        Allocation in = createRandomAllocation(mRS, Element.DataType.UNSIGNED_8, 2, 0x7fef4531738780aal, false);
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.UNSIGNED_8, 2), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_8, 2), INPUTSIZE);
             script.forEach_testConvertUchar2Uchar2Uchar2(in, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertUchar2Uchar2Uchar2: " + e.toString());
         }
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.UNSIGNED_8, 2), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_8, 2), INPUTSIZE);
             scriptRelaxed.forEach_testConvertUchar2Uchar2Uchar2(in, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertUchar2Uchar2Uchar2: " + e.toString());
@@ -819,15 +819,15 @@ public class TestConvert extends RSBaseCompute {
     }
 
     private void checkConvertUchar3Uchar3() {
-        Allocation in = CreateRandomAllocation(mRS, Element.DataType.UNSIGNED_8, 3, 0x5311a7a7b2d2aa13L);
+        Allocation in = createRandomAllocation(mRS, Element.DataType.UNSIGNED_8, 3, 0x7fef4fd2d28e1644l, false);
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.UNSIGNED_8, 3), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_8, 3), INPUTSIZE);
             script.forEach_testConvertUchar3Uchar3Uchar3(in, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertUchar3Uchar3Uchar3: " + e.toString());
         }
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.UNSIGNED_8, 3), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_8, 3), INPUTSIZE);
             scriptRelaxed.forEach_testConvertUchar3Uchar3Uchar3(in, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertUchar3Uchar3Uchar3: " + e.toString());
@@ -835,15 +835,15 @@ public class TestConvert extends RSBaseCompute {
     }
 
     private void checkConvertUchar4Uchar4() {
-        Allocation in = CreateRandomAllocation(mRS, Element.DataType.UNSIGNED_8, 4, 0x1c7f9ae040e0574eL);
+        Allocation in = createRandomAllocation(mRS, Element.DataType.UNSIGNED_8, 4, 0x7fef5a743194abdel, false);
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.UNSIGNED_8, 4), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_8, 4), INPUTSIZE);
             script.forEach_testConvertUchar4Uchar4Uchar4(in, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertUchar4Uchar4Uchar4: " + e.toString());
         }
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.UNSIGNED_8, 4), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_8, 4), INPUTSIZE);
             scriptRelaxed.forEach_testConvertUchar4Uchar4Uchar4(in, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertUchar4Uchar4Uchar4: " + e.toString());
@@ -851,15 +851,15 @@ public class TestConvert extends RSBaseCompute {
     }
 
     private void checkConvertShort2Uchar2() {
-        Allocation in = CreateRandomAllocation(mRS, Element.DataType.SIGNED_16, 2, 0x202fefa6f013404bL);
+        Allocation in = createRandomAllocation(mRS, Element.DataType.SIGNED_16, 2, 0x68ab696e21c30eedl, false);
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.UNSIGNED_8, 2), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_8, 2), INPUTSIZE);
             script.forEach_testConvertUchar2Short2Uchar2(in, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertUchar2Short2Uchar2: " + e.toString());
         }
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.UNSIGNED_8, 2), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_8, 2), INPUTSIZE);
             scriptRelaxed.forEach_testConvertUchar2Short2Uchar2(in, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertUchar2Short2Uchar2: " + e.toString());
@@ -867,15 +867,15 @@ public class TestConvert extends RSBaseCompute {
     }
 
     private void checkConvertShort3Uchar3() {
-        Allocation in = CreateRandomAllocation(mRS, Element.DataType.SIGNED_16, 3, 0xe99de2df7e20ed86L);
+        Allocation in = createRandomAllocation(mRS, Element.DataType.SIGNED_16, 3, 0x68ab740f80c9a487l, false);
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.UNSIGNED_8, 3), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_8, 3), INPUTSIZE);
             script.forEach_testConvertUchar3Short3Uchar3(in, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertUchar3Short3Uchar3: " + e.toString());
         }
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.UNSIGNED_8, 3), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_8, 3), INPUTSIZE);
             scriptRelaxed.forEach_testConvertUchar3Short3Uchar3(in, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertUchar3Short3Uchar3: " + e.toString());
@@ -883,15 +883,15 @@ public class TestConvert extends RSBaseCompute {
     }
 
     private void checkConvertShort4Uchar4() {
-        Allocation in = CreateRandomAllocation(mRS, Element.DataType.SIGNED_16, 4, 0xb30bd6180c2e9ac1L);
+        Allocation in = createRandomAllocation(mRS, Element.DataType.SIGNED_16, 4, 0x68ab7eb0dfd03a21l, false);
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.UNSIGNED_8, 4), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_8, 4), INPUTSIZE);
             script.forEach_testConvertUchar4Short4Uchar4(in, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertUchar4Short4Uchar4: " + e.toString());
         }
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.UNSIGNED_8, 4), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_8, 4), INPUTSIZE);
             scriptRelaxed.forEach_testConvertUchar4Short4Uchar4(in, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertUchar4Short4Uchar4: " + e.toString());
@@ -899,15 +899,15 @@ public class TestConvert extends RSBaseCompute {
     }
 
     private void checkConvertUshort2Uchar2() {
-        Allocation in = CreateRandomAllocation(mRS, Element.DataType.UNSIGNED_16, 2, 0xee490e03e14bda6L);
+        Allocation in = createRandomAllocation(mRS, Element.DataType.UNSIGNED_16, 2, 0x8d798975bd9b2898l, false);
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.UNSIGNED_8, 2), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_8, 2), INPUTSIZE);
             script.forEach_testConvertUchar2Ushort2Uchar2(in, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertUchar2Ushort2Uchar2: " + e.toString());
         }
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.UNSIGNED_8, 2), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_8, 2), INPUTSIZE);
             scriptRelaxed.forEach_testConvertUchar2Ushort2Uchar2(in, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertUchar2Ushort2Uchar2: " + e.toString());
@@ -915,15 +915,15 @@ public class TestConvert extends RSBaseCompute {
     }
 
     private void checkConvertUshort3Uchar3() {
-        Allocation in = CreateRandomAllocation(mRS, Element.DataType.UNSIGNED_16, 3, 0xd8528418cc226ae1L);
+        Allocation in = createRandomAllocation(mRS, Element.DataType.UNSIGNED_16, 3, 0x8d7994171ca1be32l, false);
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.UNSIGNED_8, 3), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_8, 3), INPUTSIZE);
             script.forEach_testConvertUchar3Ushort3Uchar3(in, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertUchar3Ushort3Uchar3: " + e.toString());
         }
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.UNSIGNED_8, 3), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_8, 3), INPUTSIZE);
             scriptRelaxed.forEach_testConvertUchar3Ushort3Uchar3(in, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertUchar3Ushort3Uchar3: " + e.toString());
@@ -931,15 +931,15 @@ public class TestConvert extends RSBaseCompute {
     }
 
     private void checkConvertUshort4Uchar4() {
-        Allocation in = CreateRandomAllocation(mRS, Element.DataType.UNSIGNED_16, 4, 0xa1c077515a30181cL);
+        Allocation in = createRandomAllocation(mRS, Element.DataType.UNSIGNED_16, 4, 0x8d799eb87ba853ccl, false);
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.UNSIGNED_8, 4), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_8, 4), INPUTSIZE);
             script.forEach_testConvertUchar4Ushort4Uchar4(in, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertUchar4Ushort4Uchar4: " + e.toString());
         }
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.UNSIGNED_8, 4), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_8, 4), INPUTSIZE);
             scriptRelaxed.forEach_testConvertUchar4Ushort4Uchar4(in, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertUchar4Ushort4Uchar4: " + e.toString());
@@ -947,15 +947,15 @@ public class TestConvert extends RSBaseCompute {
     }
 
     private void checkConvertInt2Uchar2() {
-        Allocation in = CreateRandomAllocation(mRS, Element.DataType.SIGNED_32, 2, 0xb153aab702117954L);
+        Allocation in = createRandomAllocation(mRS, Element.DataType.SIGNED_32, 2, 0xd74f55b3423f5d66l, false);
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.UNSIGNED_8, 2), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_8, 2), INPUTSIZE);
             script.forEach_testConvertUchar2Int2Uchar2(in, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertUchar2Int2Uchar2: " + e.toString());
         }
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.UNSIGNED_8, 2), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_8, 2), INPUTSIZE);
             scriptRelaxed.forEach_testConvertUchar2Int2Uchar2(in, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertUchar2Int2Uchar2: " + e.toString());
@@ -963,15 +963,15 @@ public class TestConvert extends RSBaseCompute {
     }
 
     private void checkConvertInt3Uchar3() {
-        Allocation in = CreateRandomAllocation(mRS, Element.DataType.SIGNED_32, 3, 0x7ac19def901f268fL);
+        Allocation in = createRandomAllocation(mRS, Element.DataType.SIGNED_32, 3, 0xd74f6054a145f300l, false);
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.UNSIGNED_8, 3), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_8, 3), INPUTSIZE);
             script.forEach_testConvertUchar3Int3Uchar3(in, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertUchar3Int3Uchar3: " + e.toString());
         }
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.UNSIGNED_8, 3), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_8, 3), INPUTSIZE);
             scriptRelaxed.forEach_testConvertUchar3Int3Uchar3(in, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertUchar3Int3Uchar3: " + e.toString());
@@ -979,15 +979,15 @@ public class TestConvert extends RSBaseCompute {
     }
 
     private void checkConvertInt4Uchar4() {
-        Allocation in = CreateRandomAllocation(mRS, Element.DataType.SIGNED_32, 4, 0x442f91281e2cd3caL);
+        Allocation in = createRandomAllocation(mRS, Element.DataType.SIGNED_32, 4, 0xd74f6af6004c889al, false);
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.UNSIGNED_8, 4), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_8, 4), INPUTSIZE);
             script.forEach_testConvertUchar4Int4Uchar4(in, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertUchar4Int4Uchar4: " + e.toString());
         }
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.UNSIGNED_8, 4), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_8, 4), INPUTSIZE);
             scriptRelaxed.forEach_testConvertUchar4Int4Uchar4(in, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertUchar4Int4Uchar4: " + e.toString());
@@ -995,15 +995,15 @@ public class TestConvert extends RSBaseCompute {
     }
 
     private void checkConvertUint2Uchar2() {
-        Allocation in = CreateRandomAllocation(mRS, Element.DataType.UNSIGNED_32, 2, 0xc27c54d2975cee87L);
+        Allocation in = createRandomAllocation(mRS, Element.DataType.UNSIGNED_32, 2, 0xe71d0c9d3fb38169l, false);
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.UNSIGNED_8, 2), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_8, 2), INPUTSIZE);
             script.forEach_testConvertUchar2Uint2Uchar2(in, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertUchar2Uint2Uchar2: " + e.toString());
         }
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.UNSIGNED_8, 2), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_8, 2), INPUTSIZE);
             scriptRelaxed.forEach_testConvertUchar2Uint2Uchar2(in, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertUchar2Uint2Uchar2: " + e.toString());
@@ -1011,15 +1011,15 @@ public class TestConvert extends RSBaseCompute {
     }
 
     private void checkConvertUint3Uchar3() {
-        Allocation in = CreateRandomAllocation(mRS, Element.DataType.UNSIGNED_32, 3, 0x8bea480b256a9bc2L);
+        Allocation in = createRandomAllocation(mRS, Element.DataType.UNSIGNED_32, 3, 0xe71d173e9eba1703l, false);
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.UNSIGNED_8, 3), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_8, 3), INPUTSIZE);
             script.forEach_testConvertUchar3Uint3Uchar3(in, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertUchar3Uint3Uchar3: " + e.toString());
         }
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.UNSIGNED_8, 3), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_8, 3), INPUTSIZE);
             scriptRelaxed.forEach_testConvertUchar3Uint3Uchar3(in, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertUchar3Uint3Uchar3: " + e.toString());
@@ -1027,15 +1027,15 @@ public class TestConvert extends RSBaseCompute {
     }
 
     private void checkConvertUint4Uchar4() {
-        Allocation in = CreateRandomAllocation(mRS, Element.DataType.UNSIGNED_32, 4, 0x55583b43b37848fdL);
+        Allocation in = createRandomAllocation(mRS, Element.DataType.UNSIGNED_32, 4, 0xe71d21dffdc0ac9dl, false);
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.UNSIGNED_8, 4), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_8, 4), INPUTSIZE);
             script.forEach_testConvertUchar4Uint4Uchar4(in, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertUchar4Uint4Uchar4: " + e.toString());
         }
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.UNSIGNED_8, 4), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_8, 4), INPUTSIZE);
             scriptRelaxed.forEach_testConvertUchar4Uint4Uchar4(in, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertUchar4Uint4Uchar4: " + e.toString());
@@ -1043,15 +1043,15 @@ public class TestConvert extends RSBaseCompute {
     }
 
     private void checkConvertFloat2Short2() {
-        Allocation in = CreateRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0x35de3665a83b1aa5L);
+        Allocation in = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0x239cb64d3ee118b4l, false);
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.SIGNED_16, 2), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_16, 2), INPUTSIZE);
             script.forEach_testConvertShort2Float2Short2(in, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertShort2Float2Short2: " + e.toString());
         }
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.SIGNED_16, 2), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_16, 2), INPUTSIZE);
             scriptRelaxed.forEach_testConvertShort2Float2Short2(in, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertShort2Float2Short2: " + e.toString());
@@ -1059,15 +1059,15 @@ public class TestConvert extends RSBaseCompute {
     }
 
     private void checkConvertFloat3Short3() {
-        Allocation in = CreateRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0xff4c299e3648c7e0L);
+        Allocation in = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0x239cc0ee9de7ae4el, false);
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.SIGNED_16, 3), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_16, 3), INPUTSIZE);
             script.forEach_testConvertShort3Float3Short3(in, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertShort3Float3Short3: " + e.toString());
         }
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.SIGNED_16, 3), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_16, 3), INPUTSIZE);
             scriptRelaxed.forEach_testConvertShort3Float3Short3(in, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertShort3Float3Short3: " + e.toString());
@@ -1075,15 +1075,15 @@ public class TestConvert extends RSBaseCompute {
     }
 
     private void checkConvertFloat4Short4() {
-        Allocation in = CreateRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0xc8ba1cd6c456751bL);
+        Allocation in = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0x239ccb8ffcee43e8l, false);
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.SIGNED_16, 4), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_16, 4), INPUTSIZE);
             script.forEach_testConvertShort4Float4Short4(in, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertShort4Float4Short4: " + e.toString());
         }
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.SIGNED_16, 4), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_16, 4), INPUTSIZE);
             scriptRelaxed.forEach_testConvertShort4Float4Short4(in, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertShort4Float4Short4: " + e.toString());
@@ -1091,15 +1091,15 @@ public class TestConvert extends RSBaseCompute {
     }
 
     private void checkConvertChar2Short2() {
-        Allocation in = CreateRandomAllocation(mRS, Element.DataType.SIGNED_8, 2, 0x38be720e7c4c25e5L);
+        Allocation in = createRandomAllocation(mRS, Element.DataType.SIGNED_8, 2, 0xd8618b6cea70eff4l, false);
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.SIGNED_16, 2), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_16, 2), INPUTSIZE);
             script.forEach_testConvertShort2Char2Short2(in, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertShort2Char2Short2: " + e.toString());
         }
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.SIGNED_16, 2), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_16, 2), INPUTSIZE);
             scriptRelaxed.forEach_testConvertShort2Char2Short2(in, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertShort2Char2Short2: " + e.toString());
@@ -1107,15 +1107,15 @@ public class TestConvert extends RSBaseCompute {
     }
 
     private void checkConvertChar3Short3() {
-        Allocation in = CreateRandomAllocation(mRS, Element.DataType.SIGNED_8, 3, 0x22c65470a59d320L);
+        Allocation in = createRandomAllocation(mRS, Element.DataType.SIGNED_8, 3, 0xd861960e4977858el, false);
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.SIGNED_16, 3), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_16, 3), INPUTSIZE);
             script.forEach_testConvertShort3Char3Short3(in, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertShort3Char3Short3: " + e.toString());
         }
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.SIGNED_16, 3), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_16, 3), INPUTSIZE);
             scriptRelaxed.forEach_testConvertShort3Char3Short3(in, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertShort3Char3Short3: " + e.toString());
@@ -1123,15 +1123,15 @@ public class TestConvert extends RSBaseCompute {
     }
 
     private void checkConvertChar4Short4() {
-        Allocation in = CreateRandomAllocation(mRS, Element.DataType.SIGNED_8, 4, 0xcb9a587f9867805bL);
+        Allocation in = createRandomAllocation(mRS, Element.DataType.SIGNED_8, 4, 0xd861a0afa87e1b28l, false);
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.SIGNED_16, 4), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_16, 4), INPUTSIZE);
             script.forEach_testConvertShort4Char4Short4(in, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertShort4Char4Short4: " + e.toString());
         }
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.SIGNED_16, 4), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_16, 4), INPUTSIZE);
             scriptRelaxed.forEach_testConvertShort4Char4Short4(in, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertShort4Char4Short4: " + e.toString());
@@ -1139,15 +1139,15 @@ public class TestConvert extends RSBaseCompute {
     }
 
     private void checkConvertUchar2Short2() {
-        Allocation in = CreateRandomAllocation(mRS, Element.DataType.UNSIGNED_8, 2, 0x1a9304b08ff8d576L);
+        Allocation in = createRandomAllocation(mRS, Element.DataType.UNSIGNED_8, 2, 0x7fef44ba7cf2fc75l, false);
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.SIGNED_16, 2), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_16, 2), INPUTSIZE);
             script.forEach_testConvertShort2Uchar2Short2(in, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertShort2Uchar2Short2: " + e.toString());
         }
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.SIGNED_16, 2), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_16, 2), INPUTSIZE);
             scriptRelaxed.forEach_testConvertShort2Uchar2Short2(in, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertShort2Uchar2Short2: " + e.toString());
@@ -1155,15 +1155,15 @@ public class TestConvert extends RSBaseCompute {
     }
 
     private void checkConvertUchar3Short3() {
-        Allocation in = CreateRandomAllocation(mRS, Element.DataType.UNSIGNED_8, 3, 0xe400f7e91e0682b1L);
+        Allocation in = createRandomAllocation(mRS, Element.DataType.UNSIGNED_8, 3, 0x7fef4f5bdbf9920fl, false);
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.SIGNED_16, 3), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_16, 3), INPUTSIZE);
             script.forEach_testConvertShort3Uchar3Short3(in, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertShort3Uchar3Short3: " + e.toString());
         }
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.SIGNED_16, 3), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_16, 3), INPUTSIZE);
             scriptRelaxed.forEach_testConvertShort3Uchar3Short3(in, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertShort3Uchar3Short3: " + e.toString());
@@ -1171,15 +1171,15 @@ public class TestConvert extends RSBaseCompute {
     }
 
     private void checkConvertUchar4Short4() {
-        Allocation in = CreateRandomAllocation(mRS, Element.DataType.UNSIGNED_8, 4, 0xad6eeb21ac142fecL);
+        Allocation in = createRandomAllocation(mRS, Element.DataType.UNSIGNED_8, 4, 0x7fef59fd3b0027a9l, false);
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.SIGNED_16, 4), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_16, 4), INPUTSIZE);
             script.forEach_testConvertShort4Uchar4Short4(in, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertShort4Uchar4Short4: " + e.toString());
         }
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.SIGNED_16, 4), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_16, 4), INPUTSIZE);
             scriptRelaxed.forEach_testConvertShort4Uchar4Short4(in, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertShort4Uchar4Short4: " + e.toString());
@@ -1187,15 +1187,15 @@ public class TestConvert extends RSBaseCompute {
     }
 
     private void checkConvertShort2Short2() {
-        Allocation in = CreateRandomAllocation(mRS, Element.DataType.SIGNED_16, 2, 0xb11f3fe85b4718e9L);
+        Allocation in = createRandomAllocation(mRS, Element.DataType.SIGNED_16, 2, 0x68ab68f72b2e8ab8l, false);
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.SIGNED_16, 2), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_16, 2), INPUTSIZE);
             script.forEach_testConvertShort2Short2Short2(in, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertShort2Short2Short2: " + e.toString());
         }
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.SIGNED_16, 2), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_16, 2), INPUTSIZE);
             scriptRelaxed.forEach_testConvertShort2Short2Short2(in, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertShort2Short2Short2: " + e.toString());
@@ -1203,15 +1203,15 @@ public class TestConvert extends RSBaseCompute {
     }
 
     private void checkConvertShort3Short3() {
-        Allocation in = CreateRandomAllocation(mRS, Element.DataType.SIGNED_16, 3, 0x7a8d3320e954c624L);
+        Allocation in = createRandomAllocation(mRS, Element.DataType.SIGNED_16, 3, 0x68ab73988a352052l, false);
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.SIGNED_16, 3), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_16, 3), INPUTSIZE);
             script.forEach_testConvertShort3Short3Short3(in, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertShort3Short3Short3: " + e.toString());
         }
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.SIGNED_16, 3), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_16, 3), INPUTSIZE);
             scriptRelaxed.forEach_testConvertShort3Short3Short3(in, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertShort3Short3Short3: " + e.toString());
@@ -1219,15 +1219,15 @@ public class TestConvert extends RSBaseCompute {
     }
 
     private void checkConvertShort4Short4() {
-        Allocation in = CreateRandomAllocation(mRS, Element.DataType.SIGNED_16, 4, 0x43fb26597762735fL);
+        Allocation in = createRandomAllocation(mRS, Element.DataType.SIGNED_16, 4, 0x68ab7e39e93bb5ecl, false);
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.SIGNED_16, 4), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_16, 4), INPUTSIZE);
             script.forEach_testConvertShort4Short4Short4(in, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertShort4Short4Short4: " + e.toString());
         }
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.SIGNED_16, 4), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_16, 4), INPUTSIZE);
             scriptRelaxed.forEach_testConvertShort4Short4Short4(in, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertShort4Short4Short4: " + e.toString());
@@ -1235,15 +1235,15 @@ public class TestConvert extends RSBaseCompute {
     }
 
     private void checkConvertUshort2Short2() {
-        Allocation in = CreateRandomAllocation(mRS, Element.DataType.UNSIGNED_16, 2, 0x9fd3e121a9489644L);
+        Allocation in = createRandomAllocation(mRS, Element.DataType.UNSIGNED_16, 2, 0x8d7988fec706a463l, false);
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.SIGNED_16, 2), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_16, 2), INPUTSIZE);
             script.forEach_testConvertShort2Ushort2Short2(in, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertShort2Ushort2Short2: " + e.toString());
         }
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.SIGNED_16, 2), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_16, 2), INPUTSIZE);
             scriptRelaxed.forEach_testConvertShort2Ushort2Short2(in, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertShort2Ushort2Short2: " + e.toString());
@@ -1251,15 +1251,15 @@ public class TestConvert extends RSBaseCompute {
     }
 
     private void checkConvertUshort3Short3() {
-        Allocation in = CreateRandomAllocation(mRS, Element.DataType.UNSIGNED_16, 3, 0x6941d45a3756437fL);
+        Allocation in = createRandomAllocation(mRS, Element.DataType.UNSIGNED_16, 3, 0x8d7993a0260d39fdl, false);
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.SIGNED_16, 3), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_16, 3), INPUTSIZE);
             script.forEach_testConvertShort3Ushort3Short3(in, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertShort3Ushort3Short3: " + e.toString());
         }
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.SIGNED_16, 3), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_16, 3), INPUTSIZE);
             scriptRelaxed.forEach_testConvertShort3Ushort3Short3(in, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertShort3Ushort3Short3: " + e.toString());
@@ -1267,15 +1267,15 @@ public class TestConvert extends RSBaseCompute {
     }
 
     private void checkConvertUshort4Short4() {
-        Allocation in = CreateRandomAllocation(mRS, Element.DataType.UNSIGNED_16, 4, 0x32afc792c563f0baL);
+        Allocation in = createRandomAllocation(mRS, Element.DataType.UNSIGNED_16, 4, 0x8d799e418513cf97l, false);
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.SIGNED_16, 4), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_16, 4), INPUTSIZE);
             script.forEach_testConvertShort4Ushort4Short4(in, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertShort4Ushort4Short4: " + e.toString());
         }
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.SIGNED_16, 4), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_16, 4), INPUTSIZE);
             scriptRelaxed.forEach_testConvertShort4Ushort4Short4(in, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertShort4Ushort4Short4: " + e.toString());
@@ -1283,15 +1283,15 @@ public class TestConvert extends RSBaseCompute {
     }
 
     private void checkConvertInt2Short2() {
-        Allocation in = CreateRandomAllocation(mRS, Element.DataType.SIGNED_32, 2, 0x4242faf86d4551f2L);
+        Allocation in = createRandomAllocation(mRS, Element.DataType.SIGNED_32, 2, 0xd74f553c4baad931l, false);
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.SIGNED_16, 2), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_16, 2), INPUTSIZE);
             script.forEach_testConvertShort2Int2Short2(in, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertShort2Int2Short2: " + e.toString());
         }
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.SIGNED_16, 2), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_16, 2), INPUTSIZE);
             scriptRelaxed.forEach_testConvertShort2Int2Short2(in, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertShort2Int2Short2: " + e.toString());
@@ -1299,15 +1299,15 @@ public class TestConvert extends RSBaseCompute {
     }
 
     private void checkConvertInt3Short3() {
-        Allocation in = CreateRandomAllocation(mRS, Element.DataType.SIGNED_32, 3, 0xbb0ee30fb52ff2dL);
+        Allocation in = createRandomAllocation(mRS, Element.DataType.SIGNED_32, 3, 0xd74f5fddaab16ecbl, false);
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.SIGNED_16, 3), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_16, 3), INPUTSIZE);
             script.forEach_testConvertShort3Int3Short3(in, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertShort3Int3Short3: " + e.toString());
         }
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.SIGNED_16, 3), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_16, 3), INPUTSIZE);
             scriptRelaxed.forEach_testConvertShort3Int3Short3(in, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertShort3Int3Short3: " + e.toString());
@@ -1315,15 +1315,15 @@ public class TestConvert extends RSBaseCompute {
     }
 
     private void checkConvertInt4Short4() {
-        Allocation in = CreateRandomAllocation(mRS, Element.DataType.SIGNED_32, 4, 0xd51ee1698960ac68L);
+        Allocation in = createRandomAllocation(mRS, Element.DataType.SIGNED_32, 4, 0xd74f6a7f09b80465l, false);
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.SIGNED_16, 4), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_16, 4), INPUTSIZE);
             script.forEach_testConvertShort4Int4Short4(in, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertShort4Int4Short4: " + e.toString());
         }
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.SIGNED_16, 4), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_16, 4), INPUTSIZE);
             scriptRelaxed.forEach_testConvertShort4Int4Short4(in, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertShort4Int4Short4: " + e.toString());
@@ -1331,15 +1331,15 @@ public class TestConvert extends RSBaseCompute {
     }
 
     private void checkConvertUint2Short2() {
-        Allocation in = CreateRandomAllocation(mRS, Element.DataType.UNSIGNED_32, 2, 0x536ba5140290c725L);
+        Allocation in = createRandomAllocation(mRS, Element.DataType.UNSIGNED_32, 2, 0xe71d0c26491efd34l, false);
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.SIGNED_16, 2), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_16, 2), INPUTSIZE);
             script.forEach_testConvertShort2Uint2Short2(in, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertShort2Uint2Short2: " + e.toString());
         }
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.SIGNED_16, 2), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_16, 2), INPUTSIZE);
             scriptRelaxed.forEach_testConvertShort2Uint2Short2(in, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertShort2Uint2Short2: " + e.toString());
@@ -1347,15 +1347,15 @@ public class TestConvert extends RSBaseCompute {
     }
 
     private void checkConvertUint3Short3() {
-        Allocation in = CreateRandomAllocation(mRS, Element.DataType.UNSIGNED_32, 3, 0x1cd9984c909e7460L);
+        Allocation in = createRandomAllocation(mRS, Element.DataType.UNSIGNED_32, 3, 0xe71d16c7a82592cel, false);
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.SIGNED_16, 3), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_16, 3), INPUTSIZE);
             script.forEach_testConvertShort3Uint3Short3(in, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertShort3Uint3Short3: " + e.toString());
         }
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.SIGNED_16, 3), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_16, 3), INPUTSIZE);
             scriptRelaxed.forEach_testConvertShort3Uint3Short3(in, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertShort3Uint3Short3: " + e.toString());
@@ -1363,15 +1363,15 @@ public class TestConvert extends RSBaseCompute {
     }
 
     private void checkConvertUint4Short4() {
-        Allocation in = CreateRandomAllocation(mRS, Element.DataType.UNSIGNED_32, 4, 0xe6478b851eac219bL);
+        Allocation in = createRandomAllocation(mRS, Element.DataType.UNSIGNED_32, 4, 0xe71d2169072c2868l, false);
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.SIGNED_16, 4), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_16, 4), INPUTSIZE);
             script.forEach_testConvertShort4Uint4Short4(in, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertShort4Uint4Short4: " + e.toString());
         }
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.SIGNED_16, 4), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_16, 4), INPUTSIZE);
             scriptRelaxed.forEach_testConvertShort4Uint4Short4(in, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertShort4Uint4Short4: " + e.toString());
@@ -1379,15 +1379,15 @@ public class TestConvert extends RSBaseCompute {
     }
 
     private void checkConvertFloat2Ushort2() {
-        Allocation in = CreateRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0xac98b52d16ff9185L);
+        Allocation in = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0xfb52b6ea1029ddcbl, false);
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.UNSIGNED_16, 2), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_16, 2), INPUTSIZE);
             script.forEach_testConvertUshort2Float2Ushort2(in, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertUshort2Float2Ushort2: " + e.toString());
         }
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.UNSIGNED_16, 2), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_16, 2), INPUTSIZE);
             scriptRelaxed.forEach_testConvertUshort2Float2Ushort2(in, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertUshort2Float2Ushort2: " + e.toString());
@@ -1395,15 +1395,15 @@ public class TestConvert extends RSBaseCompute {
     }
 
     private void checkConvertFloat3Ushort3() {
-        Allocation in = CreateRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0xaf78f5d329ced972L);
+        Allocation in = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0xfb5480050643cf4fl, false);
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.UNSIGNED_16, 3), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_16, 3), INPUTSIZE);
             script.forEach_testConvertUshort3Float3Ushort3(in, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertUshort3Float3Ushort3: " + e.toString());
         }
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.UNSIGNED_16, 3), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_16, 3), INPUTSIZE);
             scriptRelaxed.forEach_testConvertUshort3Float3Ushort3(in, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertUshort3Float3Ushort3: " + e.toString());
@@ -1411,15 +1411,15 @@ public class TestConvert extends RSBaseCompute {
     }
 
     private void checkConvertFloat4Ushort4() {
-        Allocation in = CreateRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0xb25936793c9e215fL);
+        Allocation in = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0xfb56491ffc5dc0d3l, false);
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.UNSIGNED_16, 4), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_16, 4), INPUTSIZE);
             script.forEach_testConvertUshort4Float4Ushort4(in, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertUshort4Float4Ushort4: " + e.toString());
         }
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.UNSIGNED_16, 4), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_16, 4), INPUTSIZE);
             scriptRelaxed.forEach_testConvertUshort4Float4Ushort4(in, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertUshort4Float4Ushort4: " + e.toString());
@@ -1427,15 +1427,15 @@ public class TestConvert extends RSBaseCompute {
     }
 
     private void checkConvertChar2Ushort2() {
-        Allocation in = CreateRandomAllocation(mRS, Element.DataType.SIGNED_8, 2, 0x72279b90c619d2c5L);
+        Allocation in = createRandomAllocation(mRS, Element.DataType.SIGNED_8, 2, 0x5862833be153058bl, false);
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.UNSIGNED_16, 2), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_16, 2), INPUTSIZE);
             script.forEach_testConvertUshort2Char2Ushort2(in, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertUshort2Char2Ushort2: " + e.toString());
         }
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.UNSIGNED_16, 2), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_16, 2), INPUTSIZE);
             scriptRelaxed.forEach_testConvertUshort2Char2Ushort2(in, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertUshort2Char2Ushort2: " + e.toString());
@@ -1443,15 +1443,15 @@ public class TestConvert extends RSBaseCompute {
     }
 
     private void checkConvertChar3Ushort3() {
-        Allocation in = CreateRandomAllocation(mRS, Element.DataType.SIGNED_8, 3, 0x7507dc36d8e91ab2L);
+        Allocation in = createRandomAllocation(mRS, Element.DataType.SIGNED_8, 3, 0x58644c56d76cf70fl, false);
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.UNSIGNED_16, 3), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_16, 3), INPUTSIZE);
             script.forEach_testConvertUshort3Char3Ushort3(in, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertUshort3Char3Ushort3: " + e.toString());
         }
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.UNSIGNED_16, 3), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_16, 3), INPUTSIZE);
             scriptRelaxed.forEach_testConvertUshort3Char3Ushort3(in, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertUshort3Char3Ushort3: " + e.toString());
@@ -1459,15 +1459,15 @@ public class TestConvert extends RSBaseCompute {
     }
 
     private void checkConvertChar4Ushort4() {
-        Allocation in = CreateRandomAllocation(mRS, Element.DataType.SIGNED_8, 4, 0x77e81cdcebb8629fL);
+        Allocation in = createRandomAllocation(mRS, Element.DataType.SIGNED_8, 4, 0x58661571cd86e893l, false);
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.UNSIGNED_16, 4), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_16, 4), INPUTSIZE);
             script.forEach_testConvertUshort4Char4Ushort4(in, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertUshort4Char4Ushort4: " + e.toString());
         }
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.UNSIGNED_16, 4), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_16, 4), INPUTSIZE);
             scriptRelaxed.forEach_testConvertUshort4Char4Ushort4(in, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertUshort4Char4Ushort4: " + e.toString());
@@ -1475,15 +1475,15 @@ public class TestConvert extends RSBaseCompute {
     }
 
     private void checkConvertUchar2Ushort2() {
-        Allocation in = CreateRandomAllocation(mRS, Element.DataType.UNSIGNED_8, 2, 0x8a7eb030e059e10eL);
+        Allocation in = createRandomAllocation(mRS, Element.DataType.UNSIGNED_8, 2, 0x7d30a3437d2b1f36l, false);
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.UNSIGNED_16, 2), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_16, 2), INPUTSIZE);
             script.forEach_testConvertUshort2Uchar2Ushort2(in, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertUshort2Uchar2Ushort2: " + e.toString());
         }
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.UNSIGNED_16, 2), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_16, 2), INPUTSIZE);
             scriptRelaxed.forEach_testConvertUshort2Uchar2Ushort2(in, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertUshort2Uchar2Ushort2: " + e.toString());
@@ -1491,15 +1491,15 @@ public class TestConvert extends RSBaseCompute {
     }
 
     private void checkConvertUchar3Ushort3() {
-        Allocation in = CreateRandomAllocation(mRS, Element.DataType.UNSIGNED_8, 3, 0x8d5ef0d6f32928fbL);
+        Allocation in = createRandomAllocation(mRS, Element.DataType.UNSIGNED_8, 3, 0x7d326c5e734510bal, false);
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.UNSIGNED_16, 3), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_16, 3), INPUTSIZE);
             script.forEach_testConvertUshort3Uchar3Ushort3(in, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertUshort3Uchar3Ushort3: " + e.toString());
         }
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.UNSIGNED_16, 3), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_16, 3), INPUTSIZE);
             scriptRelaxed.forEach_testConvertUshort3Uchar3Ushort3(in, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertUshort3Uchar3Ushort3: " + e.toString());
@@ -1507,15 +1507,15 @@ public class TestConvert extends RSBaseCompute {
     }
 
     private void checkConvertUchar4Ushort4() {
-        Allocation in = CreateRandomAllocation(mRS, Element.DataType.UNSIGNED_8, 4, 0x903f317d05f870e8L);
+        Allocation in = createRandomAllocation(mRS, Element.DataType.UNSIGNED_8, 4, 0x7d343579695f023el, false);
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.UNSIGNED_16, 4), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_16, 4), INPUTSIZE);
             script.forEach_testConvertUshort4Uchar4Ushort4(in, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertUshort4Uchar4Ushort4: " + e.toString());
         }
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.UNSIGNED_16, 4), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_16, 4), INPUTSIZE);
             scriptRelaxed.forEach_testConvertUshort4Uchar4Ushort4(in, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertUshort4Uchar4Ushort4: " + e.toString());
@@ -1523,15 +1523,15 @@ public class TestConvert extends RSBaseCompute {
     }
 
     private void checkConvertShort2Ushort2() {
-        Allocation in = CreateRandomAllocation(mRS, Element.DataType.SIGNED_16, 2, 0xe556662c489f0aa9L);
+        Allocation in = createRandomAllocation(mRS, Element.DataType.SIGNED_16, 2, 0x94cab974c12c0477l, false);
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.UNSIGNED_16, 2), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_16, 2), INPUTSIZE);
             script.forEach_testConvertUshort2Short2Ushort2(in, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertUshort2Short2Ushort2: " + e.toString());
         }
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.UNSIGNED_16, 2), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_16, 2), INPUTSIZE);
             scriptRelaxed.forEach_testConvertUshort2Short2Ushort2(in, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertUshort2Short2Ushort2: " + e.toString());
@@ -1539,15 +1539,15 @@ public class TestConvert extends RSBaseCompute {
     }
 
     private void checkConvertShort3Ushort3() {
-        Allocation in = CreateRandomAllocation(mRS, Element.DataType.SIGNED_16, 3, 0xe836a6d25b6e5296L);
+        Allocation in = createRandomAllocation(mRS, Element.DataType.SIGNED_16, 3, 0x94cc828fb745f5fbl, false);
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.UNSIGNED_16, 3), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_16, 3), INPUTSIZE);
             script.forEach_testConvertUshort3Short3Ushort3(in, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertUshort3Short3Ushort3: " + e.toString());
         }
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.UNSIGNED_16, 3), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_16, 3), INPUTSIZE);
             scriptRelaxed.forEach_testConvertUshort3Short3Ushort3(in, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertUshort3Short3Ushort3: " + e.toString());
@@ -1555,15 +1555,15 @@ public class TestConvert extends RSBaseCompute {
     }
 
     private void checkConvertShort4Ushort4() {
-        Allocation in = CreateRandomAllocation(mRS, Element.DataType.SIGNED_16, 4, 0xeb16e7786e3d9a83L);
+        Allocation in = createRandomAllocation(mRS, Element.DataType.SIGNED_16, 4, 0x94ce4baaad5fe77fl, false);
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.UNSIGNED_16, 4), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_16, 4), INPUTSIZE);
             script.forEach_testConvertUshort4Short4Ushort4(in, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertUshort4Short4Ushort4: " + e.toString());
         }
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.UNSIGNED_16, 4), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_16, 4), INPUTSIZE);
             scriptRelaxed.forEach_testConvertUshort4Short4Ushort4(in, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertUshort4Short4Ushort4: " + e.toString());
@@ -1571,15 +1571,15 @@ public class TestConvert extends RSBaseCompute {
     }
 
     private void checkConvertUshort2Ushort2() {
-        Allocation in = CreateRandomAllocation(mRS, Element.DataType.UNSIGNED_16, 2, 0xfbf6dd10b16170ecL);
+        Allocation in = createRandomAllocation(mRS, Element.DataType.UNSIGNED_16, 2, 0xc36a1abbee785430l, false);
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.UNSIGNED_16, 2), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_16, 2), INPUTSIZE);
             script.forEach_testConvertUshort2Ushort2Ushort2(in, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertUshort2Ushort2Ushort2: " + e.toString());
         }
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.UNSIGNED_16, 2), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_16, 2), INPUTSIZE);
             scriptRelaxed.forEach_testConvertUshort2Ushort2Ushort2(in, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertUshort2Ushort2Ushort2: " + e.toString());
@@ -1587,15 +1587,15 @@ public class TestConvert extends RSBaseCompute {
     }
 
     private void checkConvertUshort3Ushort3() {
-        Allocation in = CreateRandomAllocation(mRS, Element.DataType.UNSIGNED_16, 3, 0xfed71db6c430b8d9L);
+        Allocation in = createRandomAllocation(mRS, Element.DataType.UNSIGNED_16, 3, 0xc36be3d6e49245b4l, false);
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.UNSIGNED_16, 3), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_16, 3), INPUTSIZE);
             script.forEach_testConvertUshort3Ushort3Ushort3(in, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertUshort3Ushort3Ushort3: " + e.toString());
         }
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.UNSIGNED_16, 3), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_16, 3), INPUTSIZE);
             scriptRelaxed.forEach_testConvertUshort3Ushort3Ushort3(in, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertUshort3Ushort3Ushort3: " + e.toString());
@@ -1603,15 +1603,15 @@ public class TestConvert extends RSBaseCompute {
     }
 
     private void checkConvertUshort4Ushort4() {
-        Allocation in = CreateRandomAllocation(mRS, Element.DataType.UNSIGNED_16, 4, 0x1b75e5cd70000c6L);
+        Allocation in = createRandomAllocation(mRS, Element.DataType.UNSIGNED_16, 4, 0xc36dacf1daac3738l, false);
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.UNSIGNED_16, 4), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_16, 4), INPUTSIZE);
             script.forEach_testConvertUshort4Ushort4Ushort4(in, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertUshort4Ushort4Ushort4: " + e.toString());
         }
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.UNSIGNED_16, 4), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_16, 4), INPUTSIZE);
             scriptRelaxed.forEach_testConvertUshort4Ushort4Ushort4(in, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertUshort4Ushort4Ushort4: " + e.toString());
@@ -1619,15 +1619,15 @@ public class TestConvert extends RSBaseCompute {
     }
 
     private void checkConvertInt2Ushort2() {
-        Allocation in = CreateRandomAllocation(mRS, Element.DataType.SIGNED_32, 2, 0x30687d3e3dc8fcaaL);
+        Allocation in = createRandomAllocation(mRS, Element.DataType.SIGNED_32, 2, 0x2a536911360d32cal, false);
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.UNSIGNED_16, 2), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_16, 2), INPUTSIZE);
             script.forEach_testConvertUshort2Int2Ushort2(in, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertUshort2Int2Ushort2: " + e.toString());
         }
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.UNSIGNED_16, 2), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_16, 2), INPUTSIZE);
             scriptRelaxed.forEach_testConvertUshort2Int2Ushort2(in, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertUshort2Int2Ushort2: " + e.toString());
@@ -1635,15 +1635,15 @@ public class TestConvert extends RSBaseCompute {
     }
 
     private void checkConvertInt3Ushort3() {
-        Allocation in = CreateRandomAllocation(mRS, Element.DataType.SIGNED_32, 3, 0x3348bde450984497L);
+        Allocation in = createRandomAllocation(mRS, Element.DataType.SIGNED_32, 3, 0x2a55322c2c27244el, false);
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.UNSIGNED_16, 3), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_16, 3), INPUTSIZE);
             script.forEach_testConvertUshort3Int3Ushort3(in, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertUshort3Int3Ushort3: " + e.toString());
         }
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.UNSIGNED_16, 3), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_16, 3), INPUTSIZE);
             scriptRelaxed.forEach_testConvertUshort3Int3Ushort3(in, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertUshort3Int3Ushort3: " + e.toString());
@@ -1651,15 +1651,15 @@ public class TestConvert extends RSBaseCompute {
     }
 
     private void checkConvertInt4Ushort4() {
-        Allocation in = CreateRandomAllocation(mRS, Element.DataType.SIGNED_32, 4, 0x3628fe8a63678c84L);
+        Allocation in = createRandomAllocation(mRS, Element.DataType.SIGNED_32, 4, 0x2a56fb47224115d2l, false);
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.UNSIGNED_16, 4), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_16, 4), INPUTSIZE);
             script.forEach_testConvertUshort4Int4Ushort4(in, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertUshort4Int4Ushort4: " + e.toString());
         }
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.UNSIGNED_16, 4), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_16, 4), INPUTSIZE);
             scriptRelaxed.forEach_testConvertUshort4Int4Ushort4(in, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertUshort4Int4Ushort4: " + e.toString());
@@ -1667,15 +1667,15 @@ public class TestConvert extends RSBaseCompute {
     }
 
     private void checkConvertUint2Ushort2() {
-        Allocation in = CreateRandomAllocation(mRS, Element.DataType.UNSIGNED_32, 2, 0x1f1d1e778bca7a05L);
+        Allocation in = createRandomAllocation(mRS, Element.DataType.UNSIGNED_32, 2, 0xd1e1225ec88f3f4bl, false);
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.UNSIGNED_16, 2), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_16, 2), INPUTSIZE);
             script.forEach_testConvertUshort2Uint2Ushort2(in, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertUshort2Uint2Ushort2: " + e.toString());
         }
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.UNSIGNED_16, 2), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_16, 2), INPUTSIZE);
             scriptRelaxed.forEach_testConvertUshort2Uint2Ushort2(in, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertUshort2Uint2Ushort2: " + e.toString());
@@ -1683,15 +1683,15 @@ public class TestConvert extends RSBaseCompute {
     }
 
     private void checkConvertUint3Ushort3() {
-        Allocation in = CreateRandomAllocation(mRS, Element.DataType.UNSIGNED_32, 3, 0x21fd5f1d9e99c1f2L);
+        Allocation in = createRandomAllocation(mRS, Element.DataType.UNSIGNED_32, 3, 0xd1e2eb79bea930cfl, false);
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.UNSIGNED_16, 3), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_16, 3), INPUTSIZE);
             script.forEach_testConvertUshort3Uint3Ushort3(in, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertUshort3Uint3Ushort3: " + e.toString());
         }
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.UNSIGNED_16, 3), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_16, 3), INPUTSIZE);
             scriptRelaxed.forEach_testConvertUshort3Uint3Ushort3(in, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertUshort3Uint3Ushort3: " + e.toString());
@@ -1699,15 +1699,15 @@ public class TestConvert extends RSBaseCompute {
     }
 
     private void checkConvertUint4Ushort4() {
-        Allocation in = CreateRandomAllocation(mRS, Element.DataType.UNSIGNED_32, 4, 0x24dd9fc3b16909dfL);
+        Allocation in = createRandomAllocation(mRS, Element.DataType.UNSIGNED_32, 4, 0xd1e4b494b4c32253l, false);
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.UNSIGNED_16, 4), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_16, 4), INPUTSIZE);
             script.forEach_testConvertUshort4Uint4Ushort4(in, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertUshort4Uint4Ushort4: " + e.toString());
         }
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.UNSIGNED_16, 4), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_16, 4), INPUTSIZE);
             scriptRelaxed.forEach_testConvertUshort4Uint4Ushort4(in, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertUshort4Uint4Ushort4: " + e.toString());
@@ -1715,15 +1715,15 @@ public class TestConvert extends RSBaseCompute {
     }
 
     private void checkConvertFloat2Int2() {
-        Allocation in = CreateRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0xb68131e53287f557L);
+        Allocation in = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0xaffe48ec75974c95l, false);
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.SIGNED_32, 2), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_32, 2), INPUTSIZE);
             script.forEach_testConvertInt2Float2Int2(in, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertInt2Float2Int2: " + e.toString());
         }
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.SIGNED_32, 2), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_32, 2), INPUTSIZE);
             scriptRelaxed.forEach_testConvertInt2Float2Int2(in, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertInt2Float2Int2: " + e.toString());
@@ -1731,15 +1731,15 @@ public class TestConvert extends RSBaseCompute {
     }
 
     private void checkConvertFloat3Int3() {
-        Allocation in = CreateRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0xdb2da3cdedc112aL);
+        Allocation in = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0xaffe48edee5fac37l, false);
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.SIGNED_32, 3), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_32, 3), INPUTSIZE);
             script.forEach_testConvertInt3Float3Int3(in, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertInt3Float3Int3: " + e.toString());
         }
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.SIGNED_32, 3), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_32, 3), INPUTSIZE);
             scriptRelaxed.forEach_testConvertInt3Float3Int3(in, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertInt3Float3Int3: " + e.toString());
@@ -1747,15 +1747,15 @@ public class TestConvert extends RSBaseCompute {
     }
 
     private void checkConvertFloat4Int4() {
-        Allocation in = CreateRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0x64e482948b302cfdL);
+        Allocation in = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0xaffe48ef67280bd9l, false);
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.SIGNED_32, 4), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_32, 4), INPUTSIZE);
             script.forEach_testConvertInt4Float4Int4(in, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertInt4Float4Int4: " + e.toString());
         }
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.SIGNED_32, 4), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_32, 4), INPUTSIZE);
             scriptRelaxed.forEach_testConvertInt4Float4Int4(in, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertInt4Float4Int4: " + e.toString());
@@ -1763,15 +1763,15 @@ public class TestConvert extends RSBaseCompute {
     }
 
     private void checkConvertChar2Int2() {
-        Allocation in = CreateRandomAllocation(mRS, Element.DataType.SIGNED_8, 2, 0xa694c98ec8ee0497L);
+        Allocation in = createRandomAllocation(mRS, Element.DataType.SIGNED_8, 2, 0x329ba27bc049dd5l, false);
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.SIGNED_32, 2), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_32, 2), INPUTSIZE);
             script.forEach_testConvertInt2Char2Int2(in, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertInt2Char2Int2: " + e.toString());
         }
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.SIGNED_32, 2), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_32, 2), INPUTSIZE);
             scriptRelaxed.forEach_testConvertInt2Char2Int2(in, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertInt2Char2Int2: " + e.toString());
@@ -1779,15 +1779,15 @@ public class TestConvert extends RSBaseCompute {
     }
 
     private void checkConvertChar3Int3() {
-        Allocation in = CreateRandomAllocation(mRS, Element.DataType.SIGNED_8, 3, 0xfdc671e67542206aL);
+        Allocation in = createRandomAllocation(mRS, Element.DataType.SIGNED_8, 3, 0x329ba2934ccfd77l, false);
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.SIGNED_32, 3), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_32, 3), INPUTSIZE);
             script.forEach_testConvertInt3Char3Int3(in, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertInt3Char3Int3: " + e.toString());
         }
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.SIGNED_32, 3), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_32, 3), INPUTSIZE);
             scriptRelaxed.forEach_testConvertInt3Char3Int3(in, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertInt3Char3Int3: " + e.toString());
@@ -1795,15 +1795,15 @@ public class TestConvert extends RSBaseCompute {
     }
 
     private void checkConvertChar4Int4() {
-        Allocation in = CreateRandomAllocation(mRS, Element.DataType.SIGNED_8, 4, 0x54f81a3e21963c3dL);
+        Allocation in = createRandomAllocation(mRS, Element.DataType.SIGNED_8, 4, 0x329ba2aad955d19l, false);
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.SIGNED_32, 4), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_32, 4), INPUTSIZE);
             script.forEach_testConvertInt4Char4Int4(in, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertInt4Char4Int4: " + e.toString());
         }
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.SIGNED_32, 4), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_32, 4), INPUTSIZE);
             scriptRelaxed.forEach_testConvertInt4Char4Int4(in, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertInt4Char4Int4: " + e.toString());
@@ -1811,15 +1811,15 @@ public class TestConvert extends RSBaseCompute {
     }
 
     private void checkConvertUchar2Int2() {
-        Allocation in = CreateRandomAllocation(mRS, Element.DataType.UNSIGNED_8, 2, 0x1987a008992a4f78L);
+        Allocation in = createRandomAllocation(mRS, Element.DataType.UNSIGNED_8, 2, 0x6eb17cebb00d455el, false);
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.SIGNED_32, 2), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_32, 2), INPUTSIZE);
             script.forEach_testConvertInt2Uchar2Int2(in, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertInt2Uchar2Int2: " + e.toString());
         }
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.SIGNED_32, 2), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_32, 2), INPUTSIZE);
             scriptRelaxed.forEach_testConvertInt2Uchar2Int2(in, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertInt2Uchar2Int2: " + e.toString());
@@ -1827,15 +1827,15 @@ public class TestConvert extends RSBaseCompute {
     }
 
     private void checkConvertUchar3Int3() {
-        Allocation in = CreateRandomAllocation(mRS, Element.DataType.UNSIGNED_8, 3, 0x70b94860457e6b4bL);
+        Allocation in = createRandomAllocation(mRS, Element.DataType.UNSIGNED_8, 3, 0x6eb17ced28d5a500l, false);
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.SIGNED_32, 3), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_32, 3), INPUTSIZE);
             script.forEach_testConvertInt3Uchar3Int3(in, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertInt3Uchar3Int3: " + e.toString());
         }
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.SIGNED_32, 3), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_32, 3), INPUTSIZE);
             scriptRelaxed.forEach_testConvertInt3Uchar3Int3(in, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertInt3Uchar3Int3: " + e.toString());
@@ -1843,15 +1843,15 @@ public class TestConvert extends RSBaseCompute {
     }
 
     private void checkConvertUchar4Int4() {
-        Allocation in = CreateRandomAllocation(mRS, Element.DataType.UNSIGNED_8, 4, 0xc7eaf0b7f1d2871eL);
+        Allocation in = createRandomAllocation(mRS, Element.DataType.UNSIGNED_8, 4, 0x6eb17ceea19e04a2l, false);
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.SIGNED_32, 4), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_32, 4), INPUTSIZE);
             script.forEach_testConvertInt4Uchar4Int4(in, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertInt4Uchar4Int4: " + e.toString());
         }
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.SIGNED_32, 4), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_32, 4), INPUTSIZE);
             scriptRelaxed.forEach_testConvertInt4Uchar4Int4(in, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertInt4Uchar4Int4: " + e.toString());
@@ -1859,15 +1859,15 @@ public class TestConvert extends RSBaseCompute {
     }
 
     private void checkConvertShort2Int2() {
-        Allocation in = CreateRandomAllocation(mRS, Element.DataType.SIGNED_16, 2, 0xea0248fed93660dbL);
+        Allocation in = createRandomAllocation(mRS, Element.DataType.SIGNED_16, 2, 0x5673900bfae92ab9l, false);
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.SIGNED_32, 2), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_32, 2), INPUTSIZE);
             script.forEach_testConvertInt2Short2Int2(in, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertInt2Short2Int2: " + e.toString());
         }
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.SIGNED_32, 2), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_32, 2), INPUTSIZE);
             scriptRelaxed.forEach_testConvertInt2Short2Int2(in, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertInt2Short2Int2: " + e.toString());
@@ -1875,15 +1875,15 @@ public class TestConvert extends RSBaseCompute {
     }
 
     private void checkConvertShort3Int3() {
-        Allocation in = CreateRandomAllocation(mRS, Element.DataType.SIGNED_16, 3, 0x4133f156858a7caeL);
+        Allocation in = createRandomAllocation(mRS, Element.DataType.SIGNED_16, 3, 0x5673900d73b18a5bl, false);
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.SIGNED_32, 3), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_32, 3), INPUTSIZE);
             script.forEach_testConvertInt3Short3Int3(in, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertInt3Short3Int3: " + e.toString());
         }
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.SIGNED_32, 3), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_32, 3), INPUTSIZE);
             scriptRelaxed.forEach_testConvertInt3Short3Int3(in, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertInt3Short3Int3: " + e.toString());
@@ -1891,15 +1891,15 @@ public class TestConvert extends RSBaseCompute {
     }
 
     private void checkConvertShort4Int4() {
-        Allocation in = CreateRandomAllocation(mRS, Element.DataType.SIGNED_16, 4, 0x986599ae31de9881L);
+        Allocation in = createRandomAllocation(mRS, Element.DataType.SIGNED_16, 4, 0x5673900eec79e9fdl, false);
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.SIGNED_32, 4), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_32, 4), INPUTSIZE);
             script.forEach_testConvertInt4Short4Int4(in, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertInt4Short4Int4: " + e.toString());
         }
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.SIGNED_32, 4), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_32, 4), INPUTSIZE);
             scriptRelaxed.forEach_testConvertInt4Short4Int4(in, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertInt4Short4Int4: " + e.toString());
@@ -1907,15 +1907,15 @@ public class TestConvert extends RSBaseCompute {
     }
 
     private void checkConvertUshort2Int2() {
-        Allocation in = CreateRandomAllocation(mRS, Element.DataType.UNSIGNED_16, 2, 0x38cc4f74d356f4a6L);
+        Allocation in = createRandomAllocation(mRS, Element.DataType.UNSIGNED_16, 2, 0x664146f5f85d4ebcl, false);
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.SIGNED_32, 2), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_32, 2), INPUTSIZE);
             script.forEach_testConvertInt2Ushort2Int2(in, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertInt2Ushort2Int2: " + e.toString());
         }
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.SIGNED_32, 2), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_32, 2), INPUTSIZE);
             scriptRelaxed.forEach_testConvertInt2Ushort2Int2(in, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertInt2Ushort2Int2: " + e.toString());
@@ -1923,15 +1923,15 @@ public class TestConvert extends RSBaseCompute {
     }
 
     private void checkConvertUshort3Int3() {
-        Allocation in = CreateRandomAllocation(mRS, Element.DataType.UNSIGNED_16, 3, 0x8ffdf7cc7fab1079L);
+        Allocation in = createRandomAllocation(mRS, Element.DataType.UNSIGNED_16, 3, 0x664146f77125ae5el, false);
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.SIGNED_32, 3), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_32, 3), INPUTSIZE);
             script.forEach_testConvertInt3Ushort3Int3(in, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertInt3Ushort3Int3: " + e.toString());
         }
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.SIGNED_32, 3), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_32, 3), INPUTSIZE);
             scriptRelaxed.forEach_testConvertInt3Ushort3Int3(in, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertInt3Ushort3Int3: " + e.toString());
@@ -1939,15 +1939,15 @@ public class TestConvert extends RSBaseCompute {
     }
 
     private void checkConvertUshort4Int4() {
-        Allocation in = CreateRandomAllocation(mRS, Element.DataType.UNSIGNED_16, 4, 0xe72fa0242bff2c4cL);
+        Allocation in = createRandomAllocation(mRS, Element.DataType.UNSIGNED_16, 4, 0x664146f8e9ee0e00l, false);
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.SIGNED_32, 4), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_32, 4), INPUTSIZE);
             script.forEach_testConvertInt4Ushort4Int4(in, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertInt4Ushort4Int4: " + e.toString());
         }
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.SIGNED_32, 4), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_32, 4), INPUTSIZE);
             scriptRelaxed.forEach_testConvertInt4Ushort4Int4(in, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertInt4Ushort4Int4: " + e.toString());
@@ -1955,15 +1955,15 @@ public class TestConvert extends RSBaseCompute {
     }
 
     private void checkConvertInt2Int2() {
-        Allocation in = CreateRandomAllocation(mRS, Element.DataType.SIGNED_32, 2, 0x3d181f56d9ad3ab4L);
+        Allocation in = createRandomAllocation(mRS, Element.DataType.SIGNED_32, 2, 0xd67128c001b66bfal, false);
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.SIGNED_32, 2), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_32, 2), INPUTSIZE);
             script.forEach_testConvertInt2Int2Int2(in, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertInt2Int2Int2: " + e.toString());
         }
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.SIGNED_32, 2), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_32, 2), INPUTSIZE);
             scriptRelaxed.forEach_testConvertInt2Int2Int2(in, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertInt2Int2Int2: " + e.toString());
@@ -1971,15 +1971,15 @@ public class TestConvert extends RSBaseCompute {
     }
 
     private void checkConvertInt3Int3() {
-        Allocation in = CreateRandomAllocation(mRS, Element.DataType.SIGNED_32, 3, 0x9449c7ae86015687L);
+        Allocation in = createRandomAllocation(mRS, Element.DataType.SIGNED_32, 3, 0xd67128c17a7ecb9cl, false);
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.SIGNED_32, 3), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_32, 3), INPUTSIZE);
             script.forEach_testConvertInt3Int3Int3(in, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertInt3Int3Int3: " + e.toString());
         }
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.SIGNED_32, 3), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_32, 3), INPUTSIZE);
             scriptRelaxed.forEach_testConvertInt3Int3Int3(in, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertInt3Int3Int3: " + e.toString());
@@ -1987,15 +1987,15 @@ public class TestConvert extends RSBaseCompute {
     }
 
     private void checkConvertInt4Int4() {
-        Allocation in = CreateRandomAllocation(mRS, Element.DataType.SIGNED_32, 4, 0xeb7b70063255725aL);
+        Allocation in = createRandomAllocation(mRS, Element.DataType.SIGNED_32, 4, 0xd67128c2f3472b3el, false);
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.SIGNED_32, 4), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_32, 4), INPUTSIZE);
             script.forEach_testConvertInt4Int4Int4(in, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertInt4Int4Int4: " + e.toString());
         }
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.SIGNED_32, 4), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_32, 4), INPUTSIZE);
             scriptRelaxed.forEach_testConvertInt4Int4Int4(in, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertInt4Int4Int4: " + e.toString());
@@ -2003,15 +2003,15 @@ public class TestConvert extends RSBaseCompute {
     }
 
     private void checkConvertUint2Int2() {
-        Allocation in = CreateRandomAllocation(mRS, Element.DataType.UNSIGNED_32, 2, 0x637d068f43ba89d7L);
+        Allocation in = createRandomAllocation(mRS, Element.DataType.UNSIGNED_32, 2, 0x89215772b1bd515l, false);
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.SIGNED_32, 2), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_32, 2), INPUTSIZE);
             script.forEach_testConvertInt2Uint2Int2(in, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertInt2Uint2Int2: " + e.toString());
         }
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.SIGNED_32, 2), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_32, 2), INPUTSIZE);
             scriptRelaxed.forEach_testConvertInt2Uint2Int2(in, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertInt2Uint2Int2: " + e.toString());
@@ -2019,15 +2019,15 @@ public class TestConvert extends RSBaseCompute {
     }
 
     private void checkConvertUint3Int3() {
-        Allocation in = CreateRandomAllocation(mRS, Element.DataType.UNSIGNED_32, 3, 0xbaaeaee6f00ea5aaL);
+        Allocation in = createRandomAllocation(mRS, Element.DataType.UNSIGNED_32, 3, 0x8921578a3e434b7l, false);
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.SIGNED_32, 3), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_32, 3), INPUTSIZE);
             script.forEach_testConvertInt3Uint3Int3(in, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertInt3Uint3Int3: " + e.toString());
         }
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.SIGNED_32, 3), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_32, 3), INPUTSIZE);
             scriptRelaxed.forEach_testConvertInt3Uint3Int3(in, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertInt3Uint3Int3: " + e.toString());
@@ -2035,15 +2035,15 @@ public class TestConvert extends RSBaseCompute {
     }
 
     private void checkConvertUint4Int4() {
-        Allocation in = CreateRandomAllocation(mRS, Element.DataType.UNSIGNED_32, 4, 0x11e0573e9c62c17dL);
+        Allocation in = createRandomAllocation(mRS, Element.DataType.UNSIGNED_32, 4, 0x892157a1cac9459l, false);
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.SIGNED_32, 4), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_32, 4), INPUTSIZE);
             script.forEach_testConvertInt4Uint4Int4(in, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertInt4Uint4Int4: " + e.toString());
         }
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.SIGNED_32, 4), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_32, 4), INPUTSIZE);
             scriptRelaxed.forEach_testConvertInt4Uint4Int4(in, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertInt4Uint4Int4: " + e.toString());
@@ -2051,15 +2051,15 @@ public class TestConvert extends RSBaseCompute {
     }
 
     private void checkConvertFloat2Uint2() {
-        Allocation in = CreateRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0x203b5792acf9c8b9L);
+        Allocation in = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0x8fb63fc93d13ab64l, false);
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.UNSIGNED_32, 2), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_32, 2), INPUTSIZE);
             script.forEach_testConvertUint2Float2Uint2(in, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertUint2Float2Uint2: " + e.toString());
         }
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.UNSIGNED_32, 2), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_32, 2), INPUTSIZE);
             scriptRelaxed.forEach_testConvertUint2Float2Uint2(in, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertUint2Float2Uint2: " + e.toString());
@@ -2067,15 +2067,15 @@ public class TestConvert extends RSBaseCompute {
     }
 
     private void checkConvertFloat3Uint3() {
-        Allocation in = CreateRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0xb648fafe69a4468eL);
+        Allocation in = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0x8fb6400886ba8c40l, false);
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.UNSIGNED_32, 3), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_32, 3), INPUTSIZE);
             script.forEach_testConvertUint3Float3Uint3(in, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertUint3Float3Uint3: " + e.toString());
         }
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.UNSIGNED_32, 3), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_32, 3), INPUTSIZE);
             scriptRelaxed.forEach_testConvertUint3Float3Uint3(in, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertUint3Float3Uint3: " + e.toString());
@@ -2083,15 +2083,15 @@ public class TestConvert extends RSBaseCompute {
     }
 
     private void checkConvertFloat4Uint4() {
-        Allocation in = CreateRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0x4c569e6a264ec463L);
+        Allocation in = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0x8fb64047d0616d1cl, false);
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.UNSIGNED_32, 4), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_32, 4), INPUTSIZE);
             script.forEach_testConvertUint4Float4Uint4(in, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertUint4Float4Uint4: " + e.toString());
         }
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.UNSIGNED_32, 4), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_32, 4), INPUTSIZE);
             scriptRelaxed.forEach_testConvertUint4Float4Uint4(in, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertUint4Float4Uint4: " + e.toString());
@@ -2099,15 +2099,15 @@ public class TestConvert extends RSBaseCompute {
     }
 
     private void checkConvertChar2Uint2() {
-        Allocation in = CreateRandomAllocation(mRS, Element.DataType.SIGNED_8, 2, 0x1dbdbf71f41dedf9L);
+        Allocation in = createRandomAllocation(mRS, Element.DataType.SIGNED_8, 2, 0x880244be11705124l, false);
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.UNSIGNED_32, 2), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_32, 2), INPUTSIZE);
             script.forEach_testConvertUint2Char2Uint2(in, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertUint2Char2Uint2: " + e.toString());
         }
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.UNSIGNED_32, 2), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_32, 2), INPUTSIZE);
             scriptRelaxed.forEach_testConvertUint2Char2Uint2(in, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertUint2Char2Uint2: " + e.toString());
@@ -2115,15 +2115,15 @@ public class TestConvert extends RSBaseCompute {
     }
 
     private void checkConvertChar3Uint3() {
-        Allocation in = CreateRandomAllocation(mRS, Element.DataType.SIGNED_8, 3, 0xb3cb62ddb0c86bceL);
+        Allocation in = createRandomAllocation(mRS, Element.DataType.SIGNED_8, 3, 0x880244fd5b173200l, false);
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.UNSIGNED_32, 3), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_32, 3), INPUTSIZE);
             script.forEach_testConvertUint3Char3Uint3(in, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertUint3Char3Uint3: " + e.toString());
         }
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.UNSIGNED_32, 3), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_32, 3), INPUTSIZE);
             scriptRelaxed.forEach_testConvertUint3Char3Uint3(in, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertUint3Char3Uint3: " + e.toString());
@@ -2131,15 +2131,15 @@ public class TestConvert extends RSBaseCompute {
     }
 
     private void checkConvertChar4Uint4() {
-        Allocation in = CreateRandomAllocation(mRS, Element.DataType.SIGNED_8, 4, 0x49d906496d72e9a3L);
+        Allocation in = createRandomAllocation(mRS, Element.DataType.SIGNED_8, 4, 0x8802453ca4be12dcl, false);
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.UNSIGNED_32, 4), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_32, 4), INPUTSIZE);
             script.forEach_testConvertUint4Char4Uint4(in, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertUint4Char4Uint4: " + e.toString());
         }
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.UNSIGNED_32, 4), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_32, 4), INPUTSIZE);
             scriptRelaxed.forEach_testConvertUint4Char4Uint4(in, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertUint4Char4Uint4: " + e.toString());
@@ -2147,15 +2147,15 @@ public class TestConvert extends RSBaseCompute {
     }
 
     private void checkConvertUchar2Uint2() {
-        Allocation in = CreateRandomAllocation(mRS, Element.DataType.UNSIGNED_8, 2, 0x59acd542f796c112L);
+        Allocation in = createRandomAllocation(mRS, Element.DataType.UNSIGNED_8, 2, 0x97cffba80ee47527l, false);
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.UNSIGNED_32, 2), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_32, 2), INPUTSIZE);
             script.forEach_testConvertUint2Uchar2Uint2(in, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertUint2Uchar2Uint2: " + e.toString());
         }
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.UNSIGNED_32, 2), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_32, 2), INPUTSIZE);
             scriptRelaxed.forEach_testConvertUint2Uchar2Uint2(in, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertUint2Uchar2Uint2: " + e.toString());
@@ -2163,15 +2163,15 @@ public class TestConvert extends RSBaseCompute {
     }
 
     private void checkConvertUchar3Uint3() {
-        Allocation in = CreateRandomAllocation(mRS, Element.DataType.UNSIGNED_8, 3, 0xefba78aeb4413ee7L);
+        Allocation in = createRandomAllocation(mRS, Element.DataType.UNSIGNED_8, 3, 0x97cffbe7588b5603l, false);
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.UNSIGNED_32, 3), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_32, 3), INPUTSIZE);
             script.forEach_testConvertUint3Uchar3Uint3(in, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertUint3Uchar3Uint3: " + e.toString());
         }
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.UNSIGNED_32, 3), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_32, 3), INPUTSIZE);
             scriptRelaxed.forEach_testConvertUint3Uchar3Uint3(in, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertUint3Uchar3Uint3: " + e.toString());
@@ -2179,15 +2179,15 @@ public class TestConvert extends RSBaseCompute {
     }
 
     private void checkConvertUchar4Uint4() {
-        Allocation in = CreateRandomAllocation(mRS, Element.DataType.UNSIGNED_8, 4, 0x85c81c1a70ebbcbcL);
+        Allocation in = createRandomAllocation(mRS, Element.DataType.UNSIGNED_8, 4, 0x97cffc26a23236dfl, false);
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.UNSIGNED_32, 4), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_32, 4), INPUTSIZE);
             script.forEach_testConvertUint4Uchar4Uint4(in, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertUint4Uchar4Uint4: " + e.toString());
         }
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.UNSIGNED_32, 4), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_32, 4), INPUTSIZE);
             scriptRelaxed.forEach_testConvertUint4Uchar4Uint4(in, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertUint4Uchar4Uint4: " + e.toString());
@@ -2195,15 +2195,15 @@ public class TestConvert extends RSBaseCompute {
     }
 
     private void checkConvertShort2Uint2() {
-        Allocation in = CreateRandomAllocation(mRS, Element.DataType.SIGNED_16, 2, 0x1f9b2fd78ec0551dL);
+        Allocation in = createRandomAllocation(mRS, Element.DataType.SIGNED_16, 2, 0x85693214a1d3fb70l, false);
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.UNSIGNED_32, 2), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_32, 2), INPUTSIZE);
             script.forEach_testConvertUint2Short2Uint2(in, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertUint2Short2Uint2: " + e.toString());
         }
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.UNSIGNED_32, 2), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_32, 2), INPUTSIZE);
             scriptRelaxed.forEach_testConvertUint2Short2Uint2(in, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertUint2Short2Uint2: " + e.toString());
@@ -2211,15 +2211,15 @@ public class TestConvert extends RSBaseCompute {
     }
 
     private void checkConvertShort3Uint3() {
-        Allocation in = CreateRandomAllocation(mRS, Element.DataType.SIGNED_16, 3, 0xb5a8d3434b6ad2f2L);
+        Allocation in = createRandomAllocation(mRS, Element.DataType.SIGNED_16, 3, 0x85693253eb7adc4cl, false);
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.UNSIGNED_32, 3), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_32, 3), INPUTSIZE);
             script.forEach_testConvertUint3Short3Uint3(in, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertUint3Short3Uint3: " + e.toString());
         }
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.UNSIGNED_32, 3), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_32, 3), INPUTSIZE);
             scriptRelaxed.forEach_testConvertUint3Short3Uint3(in, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertUint3Short3Uint3: " + e.toString());
@@ -2227,15 +2227,15 @@ public class TestConvert extends RSBaseCompute {
     }
 
     private void checkConvertShort4Uint4() {
-        Allocation in = CreateRandomAllocation(mRS, Element.DataType.SIGNED_16, 4, 0x4bb676af081550c7L);
+        Allocation in = createRandomAllocation(mRS, Element.DataType.SIGNED_16, 4, 0x856932933521bd28l, false);
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.UNSIGNED_32, 4), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_32, 4), INPUTSIZE);
             script.forEach_testConvertUint4Short4Uint4(in, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertUint4Short4Uint4: " + e.toString());
         }
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.UNSIGNED_32, 4), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_32, 4), INPUTSIZE);
             scriptRelaxed.forEach_testConvertUint4Short4Uint4(in, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertUint4Short4Uint4: " + e.toString());
@@ -2243,15 +2243,15 @@ public class TestConvert extends RSBaseCompute {
     }
 
     private void checkConvertUshort2Uint2() {
-        Allocation in = CreateRandomAllocation(mRS, Element.DataType.UNSIGNED_16, 2, 0x30c3d9f3240bca50L);
+        Allocation in = createRandomAllocation(mRS, Element.DataType.UNSIGNED_16, 2, 0x2cf6eb62345607f1l, false);
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.UNSIGNED_32, 2), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_32, 2), INPUTSIZE);
             script.forEach_testConvertUint2Ushort2Uint2(in, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertUint2Ushort2Uint2: " + e.toString());
         }
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.UNSIGNED_32, 2), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_32, 2), INPUTSIZE);
             scriptRelaxed.forEach_testConvertUint2Ushort2Uint2(in, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertUint2Ushort2Uint2: " + e.toString());
@@ -2259,15 +2259,15 @@ public class TestConvert extends RSBaseCompute {
     }
 
     private void checkConvertUshort3Uint3() {
-        Allocation in = CreateRandomAllocation(mRS, Element.DataType.UNSIGNED_16, 3, 0xc6d17d5ee0b64825L);
+        Allocation in = createRandomAllocation(mRS, Element.DataType.UNSIGNED_16, 3, 0x2cf6eba17dfce8cdl, false);
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.UNSIGNED_32, 3), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_32, 3), INPUTSIZE);
             script.forEach_testConvertUint3Ushort3Uint3(in, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertUint3Ushort3Uint3: " + e.toString());
         }
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.UNSIGNED_32, 3), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_32, 3), INPUTSIZE);
             scriptRelaxed.forEach_testConvertUint3Ushort3Uint3(in, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertUint3Ushort3Uint3: " + e.toString());
@@ -2275,15 +2275,15 @@ public class TestConvert extends RSBaseCompute {
     }
 
     private void checkConvertUshort4Uint4() {
-        Allocation in = CreateRandomAllocation(mRS, Element.DataType.UNSIGNED_16, 4, 0x5cdf20ca9d60c5faL);
+        Allocation in = createRandomAllocation(mRS, Element.DataType.UNSIGNED_16, 4, 0x2cf6ebe0c7a3c9a9l, false);
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.UNSIGNED_32, 4), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_32, 4), INPUTSIZE);
             script.forEach_testConvertUint4Ushort4Uint4(in, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertUint4Ushort4Uint4: " + e.toString());
         }
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.UNSIGNED_32, 4), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_32, 4), INPUTSIZE);
             scriptRelaxed.forEach_testConvertUint4Ushort4Uint4(in, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertUint4Ushort4Uint4: " + e.toString());
@@ -2291,15 +2291,15 @@ public class TestConvert extends RSBaseCompute {
     }
 
     private void checkConvertInt2Uint2() {
-        Allocation in = CreateRandomAllocation(mRS, Element.DataType.SIGNED_32, 2, 0x38545172e92bc56eL);
+        Allocation in = createRandomAllocation(mRS, Element.DataType.SIGNED_32, 2, 0x501d851c64df15bl, false);
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.UNSIGNED_32, 2), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_32, 2), INPUTSIZE);
             script.forEach_testConvertUint2Int2Uint2(in, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertUint2Int2Uint2: " + e.toString());
         }
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.UNSIGNED_32, 2), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_32, 2), INPUTSIZE);
             scriptRelaxed.forEach_testConvertUint2Int2Uint2(in, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertUint2Int2Uint2: " + e.toString());
@@ -2307,15 +2307,15 @@ public class TestConvert extends RSBaseCompute {
     }
 
     private void checkConvertInt3Uint3() {
-        Allocation in = CreateRandomAllocation(mRS, Element.DataType.SIGNED_32, 3, 0xce61f4dea5d64343L);
+        Allocation in = createRandomAllocation(mRS, Element.DataType.SIGNED_32, 3, 0x501d8910ff4d237l, false);
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.UNSIGNED_32, 3), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_32, 3), INPUTSIZE);
             script.forEach_testConvertUint3Int3Uint3(in, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertUint3Int3Uint3: " + e.toString());
         }
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.UNSIGNED_32, 3), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_32, 3), INPUTSIZE);
             scriptRelaxed.forEach_testConvertUint3Int3Uint3(in, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertUint3Int3Uint3: " + e.toString());
@@ -2323,15 +2323,15 @@ public class TestConvert extends RSBaseCompute {
     }
 
     private void checkConvertInt4Uint4() {
-        Allocation in = CreateRandomAllocation(mRS, Element.DataType.SIGNED_32, 4, 0x646f984a6280c118L);
+        Allocation in = createRandomAllocation(mRS, Element.DataType.SIGNED_32, 4, 0x501d8d0599bb313l, false);
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.UNSIGNED_32, 4), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_32, 4), INPUTSIZE);
             script.forEach_testConvertUint4Int4Uint4(in, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertUint4Int4Uint4: " + e.toString());
         }
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.UNSIGNED_32, 4), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_32, 4), INPUTSIZE);
             scriptRelaxed.forEach_testConvertUint4Int4Uint4(in, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertUint4Int4Uint4: " + e.toString());
@@ -2339,15 +2339,15 @@ public class TestConvert extends RSBaseCompute {
     }
 
     private void checkConvertUint2Uint2() {
-        Allocation in = CreateRandomAllocation(mRS, Element.DataType.UNSIGNED_32, 2, 0x871e57e8e34c5939L);
+        Allocation in = createRandomAllocation(mRS, Element.DataType.UNSIGNED_32, 2, 0x70899b15ba5698e4l, false);
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.UNSIGNED_32, 2), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_32, 2), INPUTSIZE);
             script.forEach_testConvertUint2Uint2Uint2(in, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertUint2Uint2Uint2: " + e.toString());
         }
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.UNSIGNED_32, 2), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_32, 2), INPUTSIZE);
             scriptRelaxed.forEach_testConvertUint2Uint2Uint2(in, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertUint2Uint2Uint2: " + e.toString());
@@ -2355,15 +2355,15 @@ public class TestConvert extends RSBaseCompute {
     }
 
     private void checkConvertUint3Uint3() {
-        Allocation in = CreateRandomAllocation(mRS, Element.DataType.UNSIGNED_32, 3, 0x1d2bfb549ff6d70eL);
+        Allocation in = createRandomAllocation(mRS, Element.DataType.UNSIGNED_32, 3, 0x70899b5503fd79c0l, false);
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.UNSIGNED_32, 3), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_32, 3), INPUTSIZE);
             script.forEach_testConvertUint3Uint3Uint3(in, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertUint3Uint3Uint3: " + e.toString());
         }
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.UNSIGNED_32, 3), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_32, 3), INPUTSIZE);
             scriptRelaxed.forEach_testConvertUint3Uint3Uint3(in, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertUint3Uint3Uint3: " + e.toString());
@@ -2371,15 +2371,15 @@ public class TestConvert extends RSBaseCompute {
     }
 
     private void checkConvertUint4Uint4() {
-        Allocation in = CreateRandomAllocation(mRS, Element.DataType.UNSIGNED_32, 4, 0xb3399ec05ca154e3L);
+        Allocation in = createRandomAllocation(mRS, Element.DataType.UNSIGNED_32, 4, 0x70899b944da45a9cl, false);
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.UNSIGNED_32, 4), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_32, 4), INPUTSIZE);
             script.forEach_testConvertUint4Uint4Uint4(in, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertUint4Uint4Uint4: " + e.toString());
         }
         try {
-            Allocation out = Allocation.createSized(mRS, GetElement(mRS, Element.DataType.UNSIGNED_32, 4), INPUTSIZE);
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_32, 4), INPUTSIZE);
             scriptRelaxed.forEach_testConvertUint4Uint4Uint4(in, out);
         } catch (Exception e) {
             throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertUint4Uint4Uint4: " + e.toString());
