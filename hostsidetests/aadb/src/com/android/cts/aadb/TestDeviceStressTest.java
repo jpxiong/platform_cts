@@ -36,7 +36,7 @@ import java.io.IOException;
  */
 public class TestDeviceStressTest extends DeviceTestCase {
 
-    private int mIterations = 50;
+    private int mIterations = 25;
 
     private static final String LOG_TAG = "TestDeviceStressTest";
     private static final int TEST_FILE_COUNT= 200;
