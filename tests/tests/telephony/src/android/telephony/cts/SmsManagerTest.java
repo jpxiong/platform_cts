@@ -75,6 +75,7 @@ public class SmsManagerTest extends AndroidTestCase {
                     "44074",    // KDDI
                     "44075",    // KDDI
                     "44076",    // KDDI
+                    "50502",    // OPS
                     "51502",    // Globe Telecoms
                     "51503",    // Smart Communications
                     "51505",    // Sun Cellular
