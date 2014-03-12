@@ -29,6 +29,7 @@ LOCAL_PACKAGE_NAME := CtsLocation2TestCases
 
 LOCAL_INSTRUMENTATION_FOR := CtsTestStubs
 
-LOCAL_SDK_VERSION := current
+# uncomment when Location.EXTRA_NO_GPS_LOCATION is removed
+#LOCAL_SDK_VERSION := curren
 
 include $(BUILD_CTS_PACKAGE)
