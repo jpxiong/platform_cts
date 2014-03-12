@@ -926,4 +926,15 @@
         2. Verify that a timer is started  and the timers UI is shown with a timer named "Start Timer Test".\n
         3. Verify that the timer rings after 30 seconds.\n
     </string>
+    
+    <!-- Strings for LockConfirmBypassTest -->
+    <string name="lock_confirm_test_title">Keyguard Password Verification</string>
+    <string name="lock_set_button_text">Set password</string>
+    <string name="lock_change_button_text">Change password</string>
+    <string name="lock_confirm_message">
+        This test verifies that the user is prompted for the current keyguard password before prompting for a new password.\n
+        \nClick the \"Set password\" button if you currently don\'t have a password set.\n
+        \nThen click the \"Change password\" button to change it. You should be prompted for the current password first. If you are not, then mark the test as failed.
+    </string>
+
 </resources>
