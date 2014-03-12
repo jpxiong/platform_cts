@@ -18,7 +18,7 @@ include $(CLEAR_VARS)
 
 LOCAL_MODULE_TAGS := tests
 
-LOCAL_STATIC_JAVA_LIBRARIES := ctstestrunner guava
+LOCAL_STATIC_JAVA_LIBRARIES := ctstestrunner guava ctstestserver
 
 LOCAL_JNI_SHARED_LIBRARIES := libctssecurity_jni
 
