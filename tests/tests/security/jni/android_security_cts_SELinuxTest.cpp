@@ -50,10 +50,25 @@ static jboolean android_security_cts_SELinuxTest_checkSELinuxAccess(JNIEnv *env,
     return (accessGranted == 0) ? true : false;
 }
 
+static jboolean android_security_cts_SELinuxTest_checkSELinuxContext(JNIEnv *env, jobject, jstring contextStr) {
+    if (contextStr == NULL) {
+        jniThrowNullPointerException(env, NULL);
+        return false;
+    }
+
+    ScopedUtfChars context(env, contextStr);
+
+    char *tmp = const_cast<char *>(context.c_str());
+    int validContext = security_check_context(tmp);
+    return (validContext == 0) ? true : false;
+}
+
 
 static JNINativeMethod gMethods[] = {
     {  "checkSELinuxAccess", "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)Z",
             (void *) android_security_cts_SELinuxTest_checkSELinuxAccess },
+    {  "checkSELinuxContext", "(Ljava/lang/String;)Z",
+            (void *) android_security_cts_SELinuxTest_checkSELinuxContext },
 };
 
 int register_android_security_cts_SELinuxTest(JNIEnv* env)
