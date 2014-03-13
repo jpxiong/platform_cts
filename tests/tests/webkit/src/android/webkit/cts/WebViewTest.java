@@ -877,6 +877,7 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
         // Verify that the resource request makes it to the server.
         assertTrue(mWebServer.wasResourceRequested(imgUrl));
         assertEquals(historyUrl, mWebView.getUrl());
+        assertEquals(historyUrl, mWebView.getOriginalUrl());
 
         // Check that reported URL is "about:blank" when supplied history URL
         // is null.
@@ -886,6 +887,7 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
                 "text/html", "UTF-8", null);
         assertTrue(mWebServer.wasResourceRequested(imgUrl));
         assertEquals("about:blank", mWebView.getUrl());
+        assertEquals("about:blank", mWebView.getOriginalUrl());
 
         // Test that JavaScript can access content from the same origin as the base URL.
         mWebView.getSettings().setJavaScriptEnabled(true);
@@ -910,18 +912,19 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
         mOnUiThread.loadDataWithBaseURLAndWaitForCompletion("http://www.foo.com",
                 HTML_HEADER + "<title>Hello World%21</title><body>bar</body></html>",
                 "text/html", "UTF-8", null);
-        assertEquals("Hello World%21", mOnUiThread.getTitle());
+        assertEquals("Hello World%21", mWebView.getTitle());
 
         // Check that when a data: base URL is used, we treat the String to load as a data: URL
         // and run load steps such as decoding URL entities (i.e., contrary to the test case
         // above.)
         mOnUiThread.loadDataWithBaseURLAndWaitForCompletion("data:foo",
                 HTML_HEADER + "<title>Hello World%21</title></html>", "text/html", "UTF-8", null);
-        assertEquals("Hello World!", mOnUiThread.getTitle());
+        assertEquals("Hello World!", mWebView.getTitle());
 
         // Check the method is null input safe.
         mOnUiThread.loadDataWithBaseURLAndWaitForCompletion(null, null, null, null, null);
-        assertEquals("about:blank", mOnUiThread.getUrl());
+        assertEquals("about:blank", mWebView.getUrl());
+        assertEquals("about:blank", mWebView.getOriginalUrl());
     }
 
     private static class WaitForFindResultsListener extends FutureTask<Integer>
