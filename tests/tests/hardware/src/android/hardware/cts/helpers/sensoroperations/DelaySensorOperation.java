@@ -16,6 +16,7 @@
 
 package android.hardware.cts.helpers.sensoroperations;
 
+import android.hardware.cts.helpers.SensorCtsHelper;
 import android.hardware.cts.helpers.SensorStats;
 
 import java.util.concurrent.TimeUnit;
@@ -52,7 +53,7 @@ public class DelaySensorOperation implements ISensorOperation {
      */
     @Override
     public void execute() {
-        sleep(TimeUnit.NANOSECONDS.convert(mDelay, mTimeUnit));
+        sleep(mDelay, mTimeUnit);
         mOperation.execute();
     }
 
@@ -75,11 +76,7 @@ public class DelaySensorOperation implements ISensorOperation {
     /**
      * Helper method to sleep for a given number of ns. Exposed for unit testing.
      */
-    void sleep(long delayNs) {
-        try {
-            Thread.sleep(delayNs / NANOS_PER_MILLI, (int) (delayNs % NANOS_PER_MILLI));
-        } catch (InterruptedException e) {
-            // Ignore
-        }
+    void sleep(long delay, TimeUnit timeUnit) {
+        SensorCtsHelper.sleep(delay, timeUnit);
     }
 }

@@ -20,11 +20,11 @@ import android.content.Context;
 import android.hardware.Sensor;
 import android.hardware.SensorManager;
 import android.hardware.cts.helpers.SensorCtsHelper;
-import android.hardware.cts.helpers.SensorManagerTestVerifier;
 import android.hardware.cts.helpers.SensorTestInformation;
 import android.hardware.cts.helpers.SensorVerificationHelper;
 import android.hardware.cts.helpers.SensorVerificationHelper.VerificationResult;
 import android.hardware.cts.helpers.TestSensorEvent;
+import android.hardware.cts.helpers.TestSensorManager;
 import android.util.Log;
 
 import junit.framework.Assert;
@@ -50,7 +50,7 @@ public class VerifySensorOperation extends AbstractSensorOperation {
     // threshold is (100 - 10)% expected to (100 + 110)% expected
     private static final int[] DEFAULT_FREQUENCY_THRESHOLDS = {10, 110};
 
-    private SensorManagerTestVerifier mSensor;
+    private TestSensorManager mSensorManager;
     private Context mContext = null;
     private int mSensorType = 0;
     private int mRateUs = 0;
@@ -101,7 +101,7 @@ public class VerifySensorOperation extends AbstractSensorOperation {
         mRateUs = rateUs;
         mMaxBatchReportLatencyUs = maxBatchReportLatencyUs;
         mEventCount = eventCount;
-        mSensor = new SensorManagerTestVerifier(mContext, mSensorType, mRateUs,
+        mSensorManager = new TestSensorManager(mContext, mSensorType, mRateUs,
                 mMaxBatchReportLatencyUs);
     }
 
@@ -123,7 +123,7 @@ public class VerifySensorOperation extends AbstractSensorOperation {
         mMaxBatchReportLatencyUs = maxBatchReportLatencyUs;
         mDuration = duration;
         mTimeUnit = timeUnit;
-        mSensor = new SensorManagerTestVerifier(mContext, mSensorType, mRateUs,
+        mSensorManager = new TestSensorManager(mContext, mSensorType, mRateUs,
                 mMaxBatchReportLatencyUs);
     }
 
@@ -229,7 +229,7 @@ public class VerifySensorOperation extends AbstractSensorOperation {
         if (defaults.containsKey(mSensorType)) {
             // Expected frequency in Hz
             double expected = SensorCtsHelper.getFrequency(
-                    SensorCtsHelper.getDelay(mSensor.getUnderlyingSensor(), mRateUs),
+                    SensorCtsHelper.getDelay(mSensorManager.getSensor(), mRateUs),
                     TimeUnit.MICROSECONDS);
             // Expected frequency * threshold percentage
             double lowerThreshold = expected * defaults.get(mSensorType)[0] / 100;
@@ -286,7 +286,7 @@ public class VerifySensorOperation extends AbstractSensorOperation {
 
         if (defaults.containsKey(mSensorType)) {
             int expected = (int) TimeUnit.NANOSECONDS.convert(
-                    SensorCtsHelper.getDelay(mSensor.getUnderlyingSensor(), mRateUs),
+                    SensorCtsHelper.getDelay(mSensorManager.getSensor(), mRateUs),
                     TimeUnit.MICROSECONDS);
             verifyJitter(expected, defaults.get(mSensorType));
         }
@@ -475,13 +475,13 @@ public class VerifySensorOperation extends AbstractSensorOperation {
     @Override
     public void execute() {
         addValue("sensor_name", SensorTestInformation.getSensorName(mSensorType));
-        addValue("sensor_handle", mSensor.getUnderlyingSensor().getHandle());
+        addValue("sensor_handle", mSensorManager.getSensor().getHandle());
 
         TestSensorEvent[] events;
         if (mEventCount != null) {
-            events = mSensor.collectEvents(mEventCount);
+            events = mSensorManager.collectEvents(mEventCount);
         } else {
-            events = mSensor.collectEvents(mDuration, mTimeUnit);
+            events = mSensorManager.collectEvents(mDuration, mTimeUnit);
         }
 
         boolean failed = false;
@@ -536,7 +536,7 @@ public class VerifySensorOperation extends AbstractSensorOperation {
         if (failed) {
             Assert.fail(String.format("%s, handle %d: %s",
                     SensorTestInformation.getSensorName(mSensorType),
-                    mSensor.getUnderlyingSensor().getHandle(), sb.toString()));
+                    mSensorManager.getSensor().getHandle(), sb.toString()));
         }
     }
 
@@ -648,7 +648,7 @@ public class VerifySensorOperation extends AbstractSensorOperation {
 
         Log.v(TAG, String.format(
                 "Sensor %d: Event %d: device_timestamp=%d, delta_timestamp=%s, jitter=%s, "
-                + "values=%s", mSensor.getUnderlyingSensor().getType(), index, event.timestamp,
+                + "values=%s", mSensorManager.getSensor().getType(), index, event.timestamp,
                 deltaStr, jitterStr, valuesSb.toString()));
     }
 }
