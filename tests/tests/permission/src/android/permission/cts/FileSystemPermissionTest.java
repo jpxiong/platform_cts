@@ -754,7 +754,9 @@ public class FileSystemPermissionTest extends AndroidTestCase {
                 new File("/dev/felica_rws"), // b/11142586
                 new File("/dev/felica_uicc"), // b/11142586
                 new File("/dev/full"),
+                new File("/dev/galcore"),
                 new File("/dev/genlock"),    // b/9035217
+                new File("/dev/graphics/galcore"),
                 new File("/dev/ion"),
                 new File("/dev/kgsl-2d0"),   // b/11271533
                 new File("/dev/kgsl-2d1"),   // b/11271533
