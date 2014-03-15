@@ -145,6 +145,9 @@ public class StreamingMediaPlayerTest extends MediaPlayerTestBase {
     public void testPlayOggStreamNoLength() throws Throwable {
         localHttpAudioStreamTest("noiseandchirps.ogg", false, true);
     }
+    public void testPlayMp3Stream1Ssl() throws Throwable {
+        localHttpsAudioStreamTest("ringer.mp3", false, false);
+    }
 
     private void localHttpAudioStreamTest(final String name, boolean redirect, boolean nolength)
             throws Throwable {
@@ -196,6 +199,53 @@ public class StreamingMediaPlayerTest extends MediaPlayerTestBase {
             }
             mMediaPlayer.stop();
             mMediaPlayer.reset();
+        } finally {
+            mServer.shutdown();
+        }
+    }
+    private void localHttpsAudioStreamTest(final String name, boolean redirect, boolean nolength)
+            throws Throwable {
+        mServer = new CtsTestServer(mContext, true);
+        try {
+            String stream_url = null;
+            if (redirect) {
+                // Stagefright doesn't have a limit, but we can't test support of infinite redirects
+                // Up to 4 redirects seems reasonable though.
+                stream_url = mServer.getRedirectingAssetUrl(name, 4);
+            } else {
+                stream_url = mServer.getAssetUrl(name);
+            }
+            if (nolength) {
+                stream_url = stream_url + "?" + CtsTestServer.NOLENGTH_POSTFIX;
+            }
+
+            mMediaPlayer.setDataSource(stream_url);
+
+            mMediaPlayer.setDisplay(getActivity().getSurfaceHolder());
+            mMediaPlayer.setScreenOnWhilePlaying(true);
+
+            mOnBufferingUpdateCalled.reset();
+            mMediaPlayer.setOnBufferingUpdateListener(new MediaPlayer.OnBufferingUpdateListener() {
+                @Override
+                public void onBufferingUpdate(MediaPlayer mp, int percent) {
+                    mOnBufferingUpdateCalled.signal();
+                }
+            });
+            mMediaPlayer.setOnErrorListener(new MediaPlayer.OnErrorListener() {
+                @Override
+                public boolean onError(MediaPlayer mp, int what, int extra) {
+                    fail("Media player had error " + what + " playing " + name);
+                    return true;
+                }
+            });
+
+            assertFalse(mOnBufferingUpdateCalled.isSignalled());
+            try {
+                mMediaPlayer.prepare();
+            } catch (Exception ex) {
+                return;
+            }
+            fail("https playback should have failed");
         } finally {
             mServer.shutdown();
         }
