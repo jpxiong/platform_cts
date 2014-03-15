@@ -26,24 +26,17 @@ import android.content.Context;
 import android.graphics.ImageFormat;
 import android.hardware.camera2.CameraCharacteristics;
 import android.hardware.camera2.CameraDevice;
-import android.hardware.camera2.CameraManager;
 import android.hardware.camera2.CameraMetadata;
 import android.hardware.camera2.CaptureFailure;
 import android.hardware.camera2.CaptureRequest;
 import android.hardware.camera2.CaptureResult;
-import android.hardware.camera2.cts.helpers.CameraErrorCollector;
-import android.media.Image;
-import android.media.ImageReader;
-import android.os.Handler;
-import android.os.HandlerThread;
+import android.hardware.camera2.cts.testcases.Camera2AndroidTestCase;
 import android.os.SystemClock;
-import android.test.AndroidTestCase;
 import android.util.Log;
 import android.view.Surface;
 
 import com.android.ex.camera2.blocking.BlockingStateListener;
 
-import org.hamcrest.CoreMatchers;
 import org.mockito.ArgumentMatcher;
 
 import java.util.ArrayList;
@@ -53,32 +46,19 @@ import java.util.List;
 /**
  * <p>Basic test for CameraDevice APIs.</p>
  */
-public class CameraDeviceTest extends AndroidTestCase {
+public class CameraDeviceTest extends Camera2AndroidTestCase {
     private static final String TAG = "CameraDeviceTest";
     private static final boolean VERBOSE = Log.isLoggable(TAG, Log.VERBOSE);
-    private static final int CAMERA_CONFIGURE_TIMEOUT_MS = 2000;
-    private static final int CAPTURE_WAIT_TIMEOUT_MS = 2000;
     private static final int ERROR_LISTENER_WAIT_TIMEOUT_MS = 1000;
     private static final int REPEATING_CAPTURE_EXPECTED_RESULT_COUNT = 5;
-    // VGA size capture is required by CDD.
-    private static final int DEFAULT_CAPTURE_WIDTH = 640;
-    private static final int DEFAULT_CAPTURE_HEIGHT = 480;
     private static final int MAX_NUM_IMAGES = 5;
     private static final int MIN_FPS_REQUIRED_FOR_STREAMING = 20;
     private static final int AE_REGION_INDEX = 0;
     private static final int AWB_REGION_INDEX = 1;
     private static final int AF_REGION_INDEX = 2;
 
-    private CameraManager mCameraManager;
-    private BlockingStateListener mCameraListener;
-    private HandlerThread mHandlerThread;
-    private Handler mHandler;
+    private BlockingStateListener mCameraMockListener;
     private int mLatestState = STATE_UNINITIALIZED;
-
-    private ImageReader mReader;
-    private Surface mSurface;
-    private String[] mCameraIds;
-    private CameraErrorCollector mCollector;
 
     private static int[] mTemplates = new int[] {
             CameraDevice.TEMPLATE_PREVIEW,
@@ -91,18 +71,11 @@ public class CameraDeviceTest extends AndroidTestCase {
     public void setContext(Context context) {
         super.setContext(context);
         /**
-         * Workaround for mockito and JB-MR2 incompatibility
-         *
-         * Avoid java.lang.IllegalArgumentException: dexcache == null
-         * https://code.google.com/p/dexmaker/issues/detail?id=2
-         */
-        System.setProperty("dexmaker.dexcache", mContext.getCacheDir().toString());
-        /**
-         * Create errorlistener in context scope, to catch asynchronous device error.
+         * Create error listener in context scope, to catch asynchronous device error.
          * Use spy object here since we want to use the SimpleDeviceListener callback
          * implementation (spy doesn't stub the functions unless we ask it to do so).
          */
-        mCameraListener = spy(new BlockingStateListener());
+        mCameraMockListener = spy(new BlockingStateListener());
     }
 
     @Override
@@ -114,37 +87,21 @@ public class CameraDeviceTest extends AndroidTestCase {
          * fail the rest of the tests. This is especially needed when error
          * callback is fired too late.
          */
-        verify(mCameraListener, never())
+        verify(mCameraMockListener, never())
                 .onError(
                     any(CameraDevice.class),
                     anyInt());
-        verify(mCameraListener, never())
+        verify(mCameraMockListener, never())
                 .onDisconnected(
                     any(CameraDevice.class));
 
-        mCameraManager = (CameraManager)mContext.getSystemService(Context.CAMERA_SERVICE);
-        assertNotNull("Can't connect to camera manager", mCameraManager);
-        mCameraIds = mCameraManager.getCameraIdList();
-        mCollector = new CameraErrorCollector();
-        assertNotNull("Camera ids shouldn't be null", mCameraIds);
-        mHandlerThread = new HandlerThread(TAG);
-        mHandlerThread.start();
-        mHandler = new Handler(mHandlerThread.getLooper());
-        createDefaultSurface();
+
+        createImageReader(DEFAULT_CAPTURE_SIZE, ImageFormat.YUV_420_888, MAX_NUM_IMAGES,
+                new ImageDropperListener());
     }
 
     @Override
     protected void tearDown() throws Exception {
-        mHandlerThread.quitSafely();
-        mReader.close();
-
-        try {
-            mCollector.verify();
-        } catch (Throwable e) {
-            // When new Exception(e) is used, exception info will be printed twice.
-            throw new Exception(e.getMessage());
-        }
-
         super.tearDown();
     }
 
@@ -273,20 +230,15 @@ public class CameraDeviceTest extends AndroidTestCase {
     }
 
     public void testCameraDeviceCreateCaptureBuilder() throws Exception {
-        String[] ids = mCameraManager.getCameraIdList();
-        for (int i = 0; i < ids.length; i++) {
-            CameraDevice camera = null;
+        for (int i = 0; i < mCameraIds.length; i++) {
             try {
-                camera = CameraTestUtils.openCamera(mCameraManager, ids[i], mHandler);
-                assertNotNull(
-                        String.format("Failed to open camera device ID: %s", ids[i]), camera);
-
+                openDevice(mCameraIds[i], mCameraMockListener);
                 /**
                  * Test: that each template type is supported, and that its required fields are
                  * present.
                  */
                 for (int j = 0; j < mTemplates.length; j++) {
-                    CaptureRequest.Builder capReq = camera.createCaptureRequest(mTemplates[j]);
+                    CaptureRequest.Builder capReq = mCamera.createCaptureRequest(mTemplates[j]);
                     assertNotNull("Failed to create capture request", capReq);
                     assertNotNull("Missing field: SENSOR_EXPOSURE_TIME",
                             capReq.get(CaptureRequest.SENSOR_EXPOSURE_TIME));
@@ -295,37 +247,27 @@ public class CameraDeviceTest extends AndroidTestCase {
                 }
             }
             finally {
-                if (camera != null) {
-                    camera.close();
-                }
+                closeDevice(mCameraIds[i], mCameraMockListener);
             }
         }
     }
 
     public void testCameraDeviceSetErrorListener() throws Exception {
-        String[] ids = mCameraManager.getCameraIdList();
-        for (int i = 0; i < ids.length; i++) {
-            CameraDevice camera = null;
+        for (int i = 0; i < mCameraIds.length; i++) {
             try {
-                camera = CameraTestUtils.openCamera(mCameraManager, ids[i],
-                        mCameraListener, mHandler);
-                assertNotNull(
-                        String.format("Failed to open camera device %s", ids[i]), camera);
-
+                openDevice(mCameraIds[i], mCameraMockListener);
                 /**
                  * Test: that the error listener can be set without problems.
                  * Also, wait some time to check if device doesn't run into error.
                  */
                 SystemClock.sleep(ERROR_LISTENER_WAIT_TIMEOUT_MS);
-                verify(mCameraListener, never())
+                verify(mCameraMockListener, never())
                         .onError(
                                 any(CameraDevice.class),
                                 anyInt());
             }
             finally {
-                if (camera != null) {
-                    camera.close();
-                }
+                closeDevice(mCameraIds[i], mCameraMockListener);
             }
         }
     }
@@ -364,30 +306,25 @@ public class CameraDeviceTest extends AndroidTestCase {
     }
 
     private void runCaptureTest(boolean burst, boolean repeating) throws Exception {
-        String[] ids = mCameraManager.getCameraIdList();
-        for (int i = 0; i < ids.length; i++) {
-            CameraDevice camera = null;
+        for (int i = 0; i < mCameraIds.length; i++) {
             try {
-                camera = CameraTestUtils.openCamera(mCameraManager, ids[i],
-                        mCameraListener, mHandler);
-                assertNotNull(
-                        String.format("Failed to open camera device %s", ids[i]), camera);
+                openDevice(mCameraIds[i], mCameraMockListener);
                 waitForState(STATE_UNCONFIGURED, CAMERA_OPEN_TIMEOUT_MS);
 
-                prepareCapture(camera);
+                prepareCapture();
 
                 if (!burst) {
                     // Test: that a single capture of each template type succeeds.
                     for (int j = 0; j < mTemplates.length; j++) {
-                        captureSingleShot(camera, ids[i], mTemplates[j], repeating);
+                        captureSingleShot(mCameraIds[i], mTemplates[j], repeating);
                     }
                 }
                 else {
                     // Test: burst of zero shots
-                    captureBurstShot(camera, ids[i], mTemplates, 0, repeating);
+                    captureBurstShot(mCameraIds[i], mTemplates, 0, repeating);
 
                     // Test: burst of one shot
-                    captureBurstShot(camera, ids[i], mTemplates, 1, repeating);
+                    captureBurstShot(mCameraIds[i], mTemplates, 1, repeating);
 
                     int[] templates = new int[] {
                             CameraDevice.TEMPLATE_STILL_CAPTURE,
@@ -398,26 +335,23 @@ public class CameraDeviceTest extends AndroidTestCase {
                             };
 
                     // Test: burst of 5 shots of the same template type
-                    captureBurstShot(camera, ids[i], templates, templates.length, repeating);
+                    captureBurstShot(mCameraIds[i], templates, templates.length, repeating);
 
                     // Test: burst of 5 shots of different template types
-                    captureBurstShot(camera, ids[i], mTemplates, mTemplates.length, repeating);
+                    captureBurstShot(mCameraIds[i], mTemplates, mTemplates.length, repeating);
                 }
-                verify(mCameraListener, never())
+                verify(mCameraMockListener, never())
                         .onError(
                                 any(CameraDevice.class),
                                 anyInt());
             }
             finally {
-                if (camera != null) {
-                    camera.close();
-                }
+                closeDevice(mCameraIds[i], mCameraMockListener);
             }
         }
     }
 
     private void captureSingleShot(
-            CameraDevice camera,
             String id,
             int template,
             boolean repeating) throws Exception {
@@ -425,9 +359,9 @@ public class CameraDeviceTest extends AndroidTestCase {
         assertEquals("Bad initial state for preparing to capture",
                 mLatestState, STATE_IDLE);
 
-        CaptureRequest.Builder requestBuilder = camera.createCaptureRequest(template);
+        CaptureRequest.Builder requestBuilder = mCamera.createCaptureRequest(template);
         assertNotNull("Failed to create capture request", requestBuilder);
-        requestBuilder.addTarget(mSurface);
+        requestBuilder.addTarget(mReaderSurface);
         CameraDevice.CaptureListener mockCaptureListener =
                 mock(CameraDevice.CaptureListener.class);
 
@@ -435,26 +369,20 @@ public class CameraDeviceTest extends AndroidTestCase {
             Log.v(TAG, String.format("Capturing shot for device %s, template %d",
                     id, template));
         }
-        if (!repeating) {
-            camera.capture(requestBuilder.build(), mockCaptureListener, mHandler);
-        }
-        else {
-            camera.setRepeatingRequest(requestBuilder.build(), mockCaptureListener,
-                    mHandler);
-        }
+
+        startCapture(requestBuilder.build(), repeating, mockCaptureListener, mHandler);
         waitForState(STATE_ACTIVE, CAMERA_CONFIGURE_TIMEOUT_MS);
 
         int expectedCaptureResultCount = repeating ? REPEATING_CAPTURE_EXPECTED_RESULT_COUNT : 1;
-        verifyCaptureResults(camera, mockCaptureListener, expectedCaptureResultCount);
+        verifyCaptureResults(mockCaptureListener, expectedCaptureResultCount);
 
         if (repeating) {
-            camera.stopRepeating();
+            mCamera.stopRepeating();
         }
         waitForState(STATE_IDLE, CAMERA_CONFIGURE_TIMEOUT_MS);
     }
 
     private void captureBurstShot(
-            CameraDevice camera,
             String id,
             int[] templates,
             int len,
@@ -466,9 +394,9 @@ public class CameraDeviceTest extends AndroidTestCase {
         assertTrue("Invalid args to capture function", len <= templates.length);
         List<CaptureRequest> requests = new ArrayList<CaptureRequest>();
         for (int i = 0; i < len; i++) {
-            CaptureRequest.Builder requestBuilder = camera.createCaptureRequest(templates[i]);
+            CaptureRequest.Builder requestBuilder = mCamera.createCaptureRequest(templates[i]);
             assertNotNull("Failed to create capture request", requestBuilder);
-            requestBuilder.addTarget(mSurface);
+            requestBuilder.addTarget(mReaderSurface);
             requests.add(requestBuilder.build());
         }
         CameraDevice.CaptureListener mockCaptureListener =
@@ -479,10 +407,10 @@ public class CameraDeviceTest extends AndroidTestCase {
         }
 
         if (!repeating) {
-            camera.captureBurst(requests, mockCaptureListener, mHandler);
+            mCamera.captureBurst(requests, mockCaptureListener, mHandler);
         }
         else {
-            camera.setRepeatingBurst(requests, mockCaptureListener, mHandler);
+            mCamera.setRepeatingBurst(requests, mockCaptureListener, mHandler);
         }
         waitForState(STATE_ACTIVE, CAMERA_CONFIGURE_TIMEOUT_MS);
 
@@ -491,140 +419,62 @@ public class CameraDeviceTest extends AndroidTestCase {
             expectedResultCount *= REPEATING_CAPTURE_EXPECTED_RESULT_COUNT;
         }
 
-        verifyCaptureResults(camera, mockCaptureListener, expectedResultCount);
+        verifyCaptureResults(mockCaptureListener, expectedResultCount);
 
         if (repeating) {
-            camera.stopRepeating();
+            mCamera.stopRepeating();
         }
         waitForState(STATE_IDLE, CAMERA_CONFIGURE_TIMEOUT_MS);
     }
 
     // Precondition: Device must be in known IDLE/UNCONFIGURED state (has been waited for)
-    private void prepareCapture(CameraDevice camera) throws Exception {
+    private void prepareCapture() throws Exception {
         assertTrue("Bad initial state for preparing to capture",
                 mLatestState == STATE_IDLE || mLatestState == STATE_UNCONFIGURED);
 
         List<Surface> outputSurfaces = new ArrayList<Surface>(1);
-        outputSurfaces.add(mSurface);
-        camera.configureOutputs(outputSurfaces);
+        outputSurfaces.add(mReaderSurface);
+        mCamera.configureOutputs(outputSurfaces);
         waitForState(STATE_BUSY, CAMERA_BUSY_TIMEOUT_MS);
         waitForState(STATE_IDLE, CAMERA_IDLE_TIMEOUT_MS);
-    }
-
-    /**
-     * Dummy listener that release the image immediately once it is available.
-     * It can be used for the case where we don't care the image data at all.
-     * TODO: move it to the CameraTestUtil class.
-     */
-    private class ImageDropperListener implements ImageReader.OnImageAvailableListener {
-        @Override
-        public void onImageAvailable(ImageReader reader) {
-            Image image = null;
-            try {
-                image = reader.acquireNextImage();
-            } finally {
-                if (image != null) {
-                    image.close();
-                }
-            }
-        }
-    }
-
-    private void createDefaultSurface() throws Exception {
-        mReader =
-                ImageReader.newInstance(DEFAULT_CAPTURE_WIDTH,
-                        DEFAULT_CAPTURE_HEIGHT,
-                        ImageFormat.YUV_420_888,
-                        MAX_NUM_IMAGES);
-        mSurface = mReader.getSurface();
-        // Create dummy image listener since we don't care the image data in this test.
-        ImageReader.OnImageAvailableListener listener = new ImageDropperListener();
-        mReader.setOnImageAvailableListener(listener, mHandler);
-    }
+}
 
     private void waitForState(int state, long timeout) {
-        mCameraListener.waitForState(state, timeout);
+        mCameraMockListener.waitForState(state, timeout);
         mLatestState = state;
     }
 
     private void verifyCaptureResults(
-            CameraDevice camera,
             CameraDevice.CaptureListener mockListener,
             int expectResultCount) {
         // Should receive expected number of capture results.
         verify(mockListener,
                 timeout(CAPTURE_WAIT_TIMEOUT_MS).atLeast(expectResultCount))
                         .onCaptureCompleted(
-                                eq(camera),
+                                eq(mCamera),
                                 isA(CaptureRequest.class),
                                 argThat(new IsCameraMetadataNotEmpty<CaptureResult>()));
         // Should not receive any capture failed callbacks.
         verify(mockListener, never())
                         .onCaptureFailed(
-                                eq(camera),
+                                eq(mCamera),
                                 argThat(new IsCameraMetadataNotEmpty<CaptureRequest>()),
                                 isA(CaptureFailure.class));
         // Should receive expected number of capture shutter calls
         verify(mockListener,
                 atLeast(expectResultCount))
                         .onCaptureStarted(
-                               eq(camera),
+                               eq(mCamera),
                                isA(CaptureRequest.class),
                                anyLong());
 
     }
 
-    /**
-     * Check if the key is non-null and the value is equal to target.
-     * Only check non-null if the target is null.
-     */
-    private <T> void expectKeyEquals(CaptureRequest.Builder request,
-            CameraMetadata.Key<T> key, T target) {
-        assertTrue("request, key and target shouldn't be null",
-                request != null && key != null && target != null);
-
-        if (!expectKeyNotNull(request, key)) {
-            return;
-        }
-
-        T value = request.get(key);
-        String reason = "Key " + key.getName() + " value " + value.toString()
-                + " doesn't match the expected value " + target.toString();
-        mCollector.checkThat(reason, value, CoreMatchers.equalTo(target));
-    }
-
-    /**
-     * Check if the key is non-null and the value is not equal to target.
-     */
-    private <T> void expectKeyValueNotEquals(CaptureRequest.Builder request,
-            CameraMetadata.Key<T> key, T target) {
-        assertTrue("request, key and target shouldn't be null",
-                request != null && key != null && target != null);
-
-        if (!expectKeyNotNull(request, key)) {
-            return;
-        }
-
-        T value = request.get(key);
-        String reason = "Key " + key.getName() + " shouldn't have value " + value.toString();
-        mCollector.checkThat(reason, value, CoreMatchers.not(target));
-    }
-
-    private <T> boolean expectKeyNotNull(CaptureRequest.Builder request,
-            CameraMetadata.Key<T> key) {
-
-        T value = request.get(key);
-        if (value == null) {
-            mCollector.addMessage("Key " + key.getName() + " shouldn't be null");
-            return false;
-        }
-
-        return true;
-    }
-
     private void checkFpsRange(CaptureRequest.Builder request, int template,
             CameraCharacteristics props) {
-        if (!expectKeyNotNull(request, CONTROL_AE_TARGET_FPS_RANGE)) {
+        Key<int[]> fpsRangeKey = CONTROL_AE_TARGET_FPS_RANGE;
+        int[] fpsRange;
+        if ((fpsRange = mCollector.expectKeyValueNotNull(request, fpsRangeKey)) == null) {
             return;
         }
 
@@ -633,12 +483,8 @@ public class CameraDeviceTest extends AndroidTestCase {
         final int CONTROL_AE_TARGET_FPS_RANGE_MIN = 0;
         final int CONTROL_AE_TARGET_FPS_RANGE_MAX = 1;
 
-        Key<int[]> key = CONTROL_AE_TARGET_FPS_RANGE;
-        int[] fpsRange = request.get(key);
-        if (fpsRange.length != CONTROL_AE_TARGET_FPS_RANGE_SIZE) {
-            mCollector.addMessage("Expected array length of " + key.getName()
-                    + " is " + CONTROL_AE_TARGET_FPS_RANGE_SIZE
-                    + ", actual length is " + fpsRange.length);
+        String cause = "Failed with fps range size check";
+        if (!mCollector.expectEquals(cause, CONTROL_AE_TARGET_FPS_RANGE_SIZE, fpsRange.length)) {
             return;
         }
 
@@ -711,8 +557,8 @@ public class CameraDeviceTest extends AndroidTestCase {
             targetAfMode = CONTROL_AF_MODE_OFF;
         }
 
-        expectKeyEquals(request, CONTROL_AF_MODE, targetAfMode);
-        expectKeyNotNull(request, LENS_FOCUS_DISTANCE);
+        mCollector.expectKeyValueEquals(request, CONTROL_AF_MODE, targetAfMode);
+        mCollector.expectKeyValueNotNull(request, LENS_FOCUS_DISTANCE);
     }
 
     /**
@@ -729,7 +575,7 @@ public class CameraDeviceTest extends AndroidTestCase {
             CameraCharacteristics props) {
         // 3A settings--control.mode.
         if (template != CameraDevice.TEMPLATE_MANUAL) {
-            expectKeyEquals(request, CONTROL_MODE, CONTROL_MODE_AUTO);
+            mCollector.expectKeyValueEquals(request, CONTROL_MODE, CONTROL_MODE_AUTO);
         }
 
         // 3A settings--AE/AWB/AF.
@@ -737,114 +583,113 @@ public class CameraDeviceTest extends AndroidTestCase {
         checkAfMode(request, template, props);
         checkFpsRange(request, template, props);
         if (template == CameraDevice.TEMPLATE_MANUAL) {
-            expectKeyEquals(request, CONTROL_MODE, CONTROL_MODE_OFF);
-            expectKeyEquals(request, CONTROL_AE_MODE, CONTROL_AE_MODE_OFF);
-            expectKeyEquals(request, CONTROL_AWB_MODE, CONTROL_AWB_MODE_OFF);
+            mCollector.expectKeyValueEquals(request, CONTROL_MODE, CONTROL_MODE_OFF);
+            mCollector.expectKeyValueEquals(request, CONTROL_AE_MODE, CONTROL_AE_MODE_OFF);
+            mCollector.expectKeyValueEquals(request, CONTROL_AWB_MODE, CONTROL_AWB_MODE_OFF);
 
         } else {
-            expectKeyEquals(request, CONTROL_AE_MODE, CONTROL_AE_MODE_ON);
-            expectKeyValueNotEquals(request, CONTROL_AE_ANTIBANDING_MODE,
+            mCollector.expectKeyValueEquals(request, CONTROL_AE_MODE, CONTROL_AE_MODE_ON);
+            mCollector.expectKeyValueNotEquals(request, CONTROL_AE_ANTIBANDING_MODE,
                     CONTROL_AE_ANTIBANDING_MODE_OFF);
-            expectKeyEquals(request, CONTROL_AE_EXPOSURE_COMPENSATION, 0);
-            expectKeyEquals(request, CONTROL_AE_LOCK, false);
-            expectKeyEquals(request, CONTROL_AE_PRECAPTURE_TRIGGER,
+            mCollector.expectKeyValueEquals(request, CONTROL_AE_EXPOSURE_COMPENSATION, 0);
+            mCollector.expectKeyValueEquals(request, CONTROL_AE_LOCK, false);
+            mCollector.expectKeyValueEquals(request, CONTROL_AE_PRECAPTURE_TRIGGER,
                     CONTROL_AE_PRECAPTURE_TRIGGER_IDLE);
 
-            expectKeyEquals(request, CONTROL_AF_TRIGGER, CONTROL_AF_TRIGGER_IDLE);
+            mCollector.expectKeyValueEquals(request, CONTROL_AF_TRIGGER, CONTROL_AF_TRIGGER_IDLE);
 
-            expectKeyEquals(request, CONTROL_AWB_MODE, CONTROL_AWB_MODE_AUTO);
-            expectKeyEquals(request, CONTROL_AWB_LOCK, false);
+            mCollector.expectKeyValueEquals(request, CONTROL_AWB_MODE, CONTROL_AWB_MODE_AUTO);
+            mCollector.expectKeyValueEquals(request, CONTROL_AWB_LOCK, false);
 
             // Check 3A regions.
             if (VERBOSE) {
                 Log.v(TAG, "maxRegions is: " + Arrays.toString(maxRegions));
             }
             if (maxRegions[AE_REGION_INDEX] > 0) {
-                expectKeyNotNull(request, CONTROL_AE_REGIONS);
+                mCollector.expectKeyValueNotNull(request, CONTROL_AE_REGIONS);
             }
             if (maxRegions[AWB_REGION_INDEX] > 0) {
-                expectKeyNotNull(request, CONTROL_AWB_REGIONS);
+                mCollector.expectKeyValueNotNull(request, CONTROL_AWB_REGIONS);
             }
             if (maxRegions[AF_REGION_INDEX] > 0) {
-                expectKeyNotNull(request, CONTROL_AF_REGIONS);
+                mCollector.expectKeyValueNotNull(request, CONTROL_AF_REGIONS);
             }
         }
 
         // Sensor settings.
-        float[] availableApertures = props.get(CameraCharacteristics.LENS_INFO_AVAILABLE_APERTURES);
+        float[] availableApertures =
+                props.get(CameraCharacteristics.LENS_INFO_AVAILABLE_APERTURES);
         if (availableApertures.length > 1) {
-            expectKeyNotNull(request, LENS_APERTURE);
+            mCollector.expectKeyValueNotNull(request, LENS_APERTURE);
         }
 
         float[] availableFilters =
                 props.get(CameraCharacteristics.LENS_INFO_AVAILABLE_FILTER_DENSITIES);
         if (availableFilters.length > 1) {
-            expectKeyNotNull(request, LENS_FILTER_DENSITY);
+            mCollector.expectKeyValueNotNull(request, LENS_FILTER_DENSITY);
         }
 
         float[] availableFocalLen =
                 props.get(CameraCharacteristics.LENS_INFO_AVAILABLE_FOCAL_LENGTHS);
         if (availableFocalLen.length > 1) {
-            expectKeyNotNull(request, LENS_FOCAL_LENGTH);
+            mCollector.expectKeyValueNotNull(request, LENS_FOCAL_LENGTH);
         }
 
         byte[] availableOIS =
                 props.get(CameraCharacteristics.LENS_INFO_AVAILABLE_OPTICAL_STABILIZATION);
         if (availableOIS.length > 1) {
-            expectKeyNotNull(request, LENS_OPTICAL_STABILIZATION_MODE);
+            mCollector.expectKeyValueNotNull(request, LENS_OPTICAL_STABILIZATION_MODE);
         }
 
-        expectKeyEquals(request, BLACK_LEVEL_LOCK, false);
-        expectKeyNotNull(request, SENSOR_FRAME_DURATION);
-        expectKeyNotNull(request, SENSOR_EXPOSURE_TIME);
-        expectKeyNotNull(request, SENSOR_SENSITIVITY);
+        mCollector.expectKeyValueEquals(request, BLACK_LEVEL_LOCK, false);
+        mCollector.expectKeyValueNotNull(request, SENSOR_FRAME_DURATION);
+        mCollector.expectKeyValueNotNull(request, SENSOR_EXPOSURE_TIME);
+        mCollector.expectKeyValueNotNull(request, SENSOR_SENSITIVITY);
 
         // ISP-processing settings.
-        expectKeyEquals(request, STATISTICS_FACE_DETECT_MODE, STATISTICS_FACE_DETECT_MODE_OFF);
-        expectKeyEquals(request, FLASH_MODE, FLASH_MODE_OFF);
-        expectKeyEquals(
+        mCollector.expectKeyValueEquals(
+                request, STATISTICS_FACE_DETECT_MODE, STATISTICS_FACE_DETECT_MODE_OFF);
+        mCollector.expectKeyValueEquals(request, FLASH_MODE, FLASH_MODE_OFF);
+        mCollector.expectKeyValueEquals(
                 request, STATISTICS_LENS_SHADING_MAP_MODE, STATISTICS_LENS_SHADING_MAP_MODE_OFF);
 
         if (template == CameraDevice.TEMPLATE_STILL_CAPTURE) {
             // TODO: Update these to check for availability (e.g. availableColorCorrectionModes)
-            expectKeyEquals(
+            mCollector.expectKeyValueEquals(
                     request, COLOR_CORRECTION_MODE, COLOR_CORRECTION_MODE_HIGH_QUALITY);
-            expectKeyEquals(request, EDGE_MODE, EDGE_MODE_HIGH_QUALITY);
-            expectKeyEquals(
+            mCollector.expectKeyValueEquals(request, EDGE_MODE, EDGE_MODE_HIGH_QUALITY);
+            mCollector.expectKeyValueEquals(
                     request, NOISE_REDUCTION_MODE, NOISE_REDUCTION_MODE_HIGH_QUALITY);
-            expectKeyEquals(request, TONEMAP_MODE, TONEMAP_MODE_HIGH_QUALITY);
+            mCollector.expectKeyValueEquals(request, TONEMAP_MODE, TONEMAP_MODE_HIGH_QUALITY);
         } else {
-            expectKeyNotNull(request, EDGE_MODE);
-            expectKeyNotNull(request, NOISE_REDUCTION_MODE);
-            expectKeyValueNotEquals(request, TONEMAP_MODE, TONEMAP_MODE_CONTRAST_CURVE);
+            mCollector.expectKeyValueNotNull(request, EDGE_MODE);
+            mCollector.expectKeyValueNotNull(request, NOISE_REDUCTION_MODE);
+            mCollector.expectKeyValueNotEquals(request, TONEMAP_MODE, TONEMAP_MODE_CONTRAST_CURVE);
         }
 
-        expectKeyEquals(request, CONTROL_CAPTURE_INTENT, template);
+        mCollector.expectKeyValueEquals(request, CONTROL_CAPTURE_INTENT, template);
 
         // TODO: use the list of keys from CameraCharacteristics to avoid expecting
         //       keys which are not available by this CameraDevice.
     }
 
     private void captureTemplateTestByCamera(String cameraId, int template) throws Exception {
-        CameraDevice camera = null;
         try {
-            camera = CameraTestUtils.openCamera(mCameraManager, cameraId, mHandler);
-            assertNotNull(String.format("Failed to open camera device ID: %s", cameraId), camera);
+            openDevice(cameraId, mCameraMockListener);
+
             assertTrue("Camera template " + template + " is out of range!",
                     template >= CameraDevice.TEMPLATE_PREVIEW
                             && template <= CameraDevice.TEMPLATE_MANUAL);
 
             mCollector.setCameraId(cameraId);
-            CaptureRequest.Builder request = camera.createCaptureRequest(template);
+            CaptureRequest.Builder request = mCamera.createCaptureRequest(template);
             assertNotNull("Failed to create capture request for template " + template, request);
 
-            CameraCharacteristics props = mCameraManager.getCameraCharacteristics(cameraId);
+            CameraCharacteristics props = mStaticInfo.getCharacteristics();
             checkRequestForTemplate(request, template, props);
         }
         finally {
-            if (camera != null) {
-                camera.close();
-            }
+            closeDevice(cameraId, mCameraMockListener);
         }
     }
 }

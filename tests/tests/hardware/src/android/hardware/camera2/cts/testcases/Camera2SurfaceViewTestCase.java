@@ -89,14 +89,6 @@ public class Camera2SurfaceViewTestCase extends
         mHandlerThread.start();
         mHandler = new Handler(mHandlerThread.getLooper());
         mCameraListener = new BlockingStateListener();
-
-        /**
-         * Workaround for mockito and JB-MR2 incompatibility
-         *
-         * Avoid java.lang.IllegalArgumentException: dexcache == null
-         * https://code.google.com/p/dexmaker/issues/detail?id=2
-         */
-        System.setProperty("dexmaker.dexcache", mContext.getCacheDir().toString());
     }
 
     @Override
@@ -167,7 +159,6 @@ public class Camera2SurfaceViewTestCase extends
     protected void openDevice(String cameraId) throws Exception {
         mCamera = CameraTestUtils.openCamera(
                 mCameraManager, cameraId, mCameraListener, mHandler);
-        assertNotNull("Failed to open camera device " + cameraId, mCamera);
         mStaticInfo = new StaticMetadata(mCameraManager.getCameraCharacteristics(cameraId));
     }
 

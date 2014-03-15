@@ -72,7 +72,15 @@ public class CameraTestUtils extends Assert {
     public static final int CAMERA_ACTIVE_TIMEOUT_MS = 1000;
     public static final int CAMERA_BUSY_TIMEOUT_MS = 1000;
     public static final int CAMERA_UNCONFIGURED_TIMEOUT_MS = 1000;
+    public static final int CAMERA_CONFIGURE_TIMEOUT_MS = 2000;
 
+    /**
+     * Dummy listener that release the image immediately once it is available.
+     *
+     * <p>
+     * It can be used for the case where we don't care the image data at all.
+     * </p>
+     */
     public static class ImageDropperListener implements ImageReader.OnImageAvailableListener {
         @Override
         public void onImageAvailable(ImageReader reader) {
@@ -187,7 +195,7 @@ public class CameraTestUtils extends Assert {
      * @param listener The callback CameraDevice will notify when capture results are available.
      */
     public static void configureCameraOutputs(CameraDevice camera, List<Surface> outputSurfaces,
-            BlockingStateListener listener) throws Exception {
+            BlockingStateListener listener) throws CameraAccessException {
         camera.configureOutputs(outputSurfaces);
         listener.waitForState(STATE_BUSY, CAMERA_BUSY_TIMEOUT_MS);
         if (outputSurfaces == null || outputSurfaces.size() == 0) {
@@ -344,7 +352,7 @@ public class CameraTestUtils extends Assert {
     }
 
     public static Size[] getSupportedSizeForFormat(int format, String cameraId,
-            CameraManager cameraManager) throws Exception {
+            CameraManager cameraManager) throws CameraAccessException {
         CameraMetadata.Key<Size[]> key = null;
         CameraCharacteristics properties = cameraManager.getCameraCharacteristics(cameraId);
         assertNotNull("Can't get camera characteristics!", properties);
@@ -386,13 +394,13 @@ public class CameraTestUtils extends Assert {
      * Get sorted size list in descending order. Remove the sizes larger than
      * the bound. If the bound is null, don't do the size bound filtering.
      */
-    static public List<Size> getSupportedPreviewSizes(
-            String cameraId, CameraManager cameraManager, Size bound) throws Exception {
+    static public List<Size> getSupportedPreviewSizes(String cameraId,
+            CameraManager cameraManager, Size bound) throws CameraAccessException {
         Comparator<Size> comparator = new SizeComparator();
         Size[] sizes = getSupportedSizeForFormat(ImageFormat.YUV_420_888, cameraId, cameraManager);
         List<Size> supportedPreviewSizes = null;
         if (bound != null) {
-            supportedPreviewSizes = new ArrayList<Size>(/* capacity */1);
+            supportedPreviewSizes = new ArrayList<Size>(/*capacity*/1);
             for (Size sz : sizes) {
                 if (comparator.compare(sz, bound) <= 0) {
                     supportedPreviewSizes.add(sz);
@@ -410,19 +418,39 @@ public class CameraTestUtils extends Assert {
         return supportedPreviewSizes;
     }
 
-    static public List<Size> getSupportedVideoSizes(
-            String cameraId, CameraManager cameraManager, Size bound) throws Exception {
+    /**
+     * Get supported video size list for a given camera device.
+     *
+     * <p>
+     * Filter out the sizes that are larger than the bound. If the bound is
+     * null, don't do the size bound filtering.
+     * </p>
+     */
+    static public List<Size> getSupportedVideoSizes(String cameraId,
+            CameraManager cameraManager, Size bound) throws CameraAccessException {
         return getSupportedPreviewSizes(cameraId, cameraManager, bound);
     }
 
     static public Size getMinPreviewSize(String cameraId, CameraManager cameraManager)
-            throws Exception {
+            throws CameraAccessException {
         List<Size> sizes = getSupportedPreviewSizes(cameraId, cameraManager, null);
         return sizes.get(sizes.size() - 1);
     }
 
+    /**
+     * Get max supported preview size for a camera device.
+     */
+    static public Size getMaxPreviewSize(String cameraId, CameraManager cameraManager)
+            throws CameraAccessException {
+        return getMaxPreviewSize(cameraId, cameraManager, /*bound*/null);
+    }
+
+    /**
+     * Get max preview size for a camera device in the supported sizes that are no larger
+     * than the bound.
+     */
     static public Size getMaxPreviewSize(String cameraId, CameraManager cameraManager, Size bound)
-            throws Exception {
+            throws CameraAccessException {
         List<Size> sizes = getSupportedPreviewSizes(cameraId, cameraManager, bound);
         return sizes.get(0);
     }
