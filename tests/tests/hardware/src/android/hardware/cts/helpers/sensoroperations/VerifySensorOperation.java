@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package android.hardware.cts.helpers.sensorTestOperations;
+package android.hardware.cts.helpers.sensoroperations;
 
 import android.content.Context;
 import android.hardware.Sensor;
@@ -22,7 +22,6 @@ import android.hardware.SensorManager;
 import android.hardware.cts.helpers.SensorCtsHelper;
 import android.hardware.cts.helpers.SensorManagerTestVerifier;
 import android.hardware.cts.helpers.SensorTestInformation;
-import android.hardware.cts.helpers.SensorTestOperation;
 import android.hardware.cts.helpers.SensorVerificationHelper;
 import android.hardware.cts.helpers.SensorVerificationHelper.VerificationResult;
 import android.hardware.cts.helpers.TestSensorEvent;
@@ -30,22 +29,20 @@ import android.util.Log;
 
 import junit.framework.Assert;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 /**
- * A {@link SensorTestOperation} used to verify that sensor events and sensor values are correct.
+ * A {@link ISensorOperation} used to verify that sensor events and sensor values are correct.
  * <p>
  * Provides methods to set test expectations as well as providing a set of default expectations
  * depending on sensor type.  When {{@link #execute()} is called, the sensor will collect the
  * events and then run all the tests.
  * </p>
  */
-public class VerifySensorOperation extends SensorTestOperation {
+public class VerifySensorOperation extends AbstractSensorOperation {
     private static final String TAG = "VerifySensorOperation";
 
     private static final boolean DEBUG = false;
@@ -55,7 +52,9 @@ public class VerifySensorOperation extends SensorTestOperation {
     private int mSensorType = 0;
     private int mRateUs = 0;
     private int mMaxBatchReportLatencyUs = 0;
-    private int mEventCount = 0;
+    private Integer mEventCount = null;
+    private Long mDuration = null;
+    private TimeUnit mTimeUnit = null;
 
     private boolean mVerifyEventOrdering = false;
 
@@ -98,6 +97,28 @@ public class VerifySensorOperation extends SensorTestOperation {
         mRateUs = rateUs;
         mMaxBatchReportLatencyUs = maxBatchReportLatencyUs;
         mEventCount = eventCount;
+        mSensor = new SensorManagerTestVerifier(mContext, mSensorType, mRateUs,
+                mMaxBatchReportLatencyUs);
+    }
+
+    /**
+     * Create a {@link VerifySensorOperation}.
+     *
+     * @param context the {@link Context}.
+     * @param sensorType the sensor type
+     * @param rateUs the rate that
+     * @param maxBatchReportLatencyUs the max batch report latency
+     * @param duration the duration to gather events for
+     * @param timeUnit the time unit of the duration
+     */
+    public VerifySensorOperation(Context context, int sensorType, int rateUs,
+            int maxBatchReportLatencyUs, long duration, TimeUnit timeUnit) {
+        mContext = context;
+        mSensorType = sensorType;
+        mRateUs = rateUs;
+        mMaxBatchReportLatencyUs = maxBatchReportLatencyUs;
+        mDuration = duration;
+        mTimeUnit = timeUnit;
         mSensor = new SensorManagerTestVerifier(mContext, mSensorType, mRateUs,
                 mMaxBatchReportLatencyUs);
     }
@@ -434,62 +455,108 @@ public class VerifySensorOperation extends SensorTestOperation {
      * Collect the specified number of events from the sensor and run all enabled verifications.
      */
     @Override
-    public void doWork() {
-        TestSensorEvent[] events = mSensor.collectEvents(mEventCount);
+    public void execute() {
+        addValue("sensor_name", SensorTestInformation.getSensorName(mSensorType));
+        addValue("sensor_handle", mSensor.getUnderlyingSensor().getHandle());
+
+        TestSensorEvent[] events;
+        if (mEventCount != null) {
+            events = mSensor.collectEvents(mEventCount);
+        } else {
+            events = mSensor.collectEvents(mDuration, mTimeUnit);
+        }
 
         boolean failed = false;
         StringBuilder sb = new StringBuilder();
         VerificationResult result = null;
-        Map<String, Object> stats = new HashMap<String, Object>();
 
         if (mVerifyEventOrdering) {
             result = SensorVerificationHelper.verifyEventOrdering(events);
             // evaluateResults first so it is always called.
-            failed = evaluateResults(result, sb, stats) || failed;
+            failed |= evaluateResults(result, sb);
         }
 
         if (mVerifyFrequency) {
             result = SensorVerificationHelper.verifyFrequency(events, mFrequencyExpected,
                     mFrequencyThreshold);
-            failed = evaluateResults(result, sb, stats) || failed;
+            failed |= evaluateResults(result, sb);
         }
 
         if (mVerifyJitter) {
             result = SensorVerificationHelper.verifyJitter(events, mJitterExpected,
                     mJitterThreshold);
-            failed = evaluateResults(result, sb, stats) || failed;
+            failed |= evaluateResults(result, sb);
         }
 
         if (mVerifyMean) {
             result = SensorVerificationHelper.verifyMean(events, mMeanExpected, mMeanThreshold);
-            failed = evaluateResults(result, sb, stats) || failed;
+            failed |= evaluateResults(result, sb);
         }
 
         if (mVerifyMagnitude) {
             result = SensorVerificationHelper.verifyMagnitude(events, mMagnitudeExpected,
                     mMagnitudeThreshold);
-            failed = evaluateResults(result, sb, stats) || failed;
+            failed |= evaluateResults(result, sb);
         }
 
         if (mVerifySignum) {
             result = SensorVerificationHelper.verifySignum(events, mSignumExpected,
                     mSignumThreshold);
-            failed = evaluateResults(result, sb, stats) || failed;
+            failed |= evaluateResults(result, sb);
         }
 
         if (mVerifyStandardDeviation) {
             result = SensorVerificationHelper.verifyStandardDeviation(events,
                     mStandardDeviationThreshold);
-            failed = evaluateResults(result, sb, stats) || failed;
+            failed |= evaluateResults(result, sb);
         }
 
-        logStats(events, stats);
+        if (DEBUG) {
+            logStats(events);
+        }
 
         if (failed) {
             Assert.fail(String.format("%s, handle %d: %s",
                     SensorTestInformation.getSensorName(mSensorType),
                     mSensor.getUnderlyingSensor().getHandle(), sb.toString()));
         }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public VerifySensorOperation clone() {
+        VerifySensorOperation operation;
+        if (mEventCount != null) {
+            operation = new VerifySensorOperation(mContext, mSensorType, mRateUs,
+                    mMaxBatchReportLatencyUs, mEventCount);
+        } else {
+            operation = new VerifySensorOperation(mContext, mSensorType, mRateUs,
+                    mMaxBatchReportLatencyUs, mDuration, mTimeUnit);
+        }
+        if (mVerifyEventOrdering) {
+            operation.verifyEventOrdering();
+        }
+        if (mVerifyFrequency) {
+            operation.verifyFrequency(mFrequencyExpected, mFrequencyThreshold);
+        }
+        if (mVerifyJitter) {
+            operation.verifyJitter(mJitterExpected, mJitterThreshold);
+        }
+        if (mVerifyMean) {
+            operation.verifyMean(mMeanExpected, mMeanThreshold);
+        }
+        if (mVerifyMagnitude) {
+            operation.verifyMagnitude(mMagnitudeExpected, mMagnitudeThreshold);
+        }
+        if (mVerifySignum) {
+            operation.verifySignum(mSignumExpected, mSignumThreshold);
+        }
+        if (mVerifyStandardDeviation) {
+            operation.verifyStandardDeviation(mStandardDeviationThreshold);
+        }
+        return operation;
     }
 
     /**
@@ -505,10 +572,9 @@ public class VerifySensorOperation extends SensorTestOperation {
     /**
      * Evaluate the results of a test, aggregate the stats, and build the error message.
      */
-    private boolean evaluateResults(VerificationResult result, StringBuilder sb,
-            Map<String, Object> stats) {
+    private boolean evaluateResults(VerificationResult result, StringBuilder sb) {
         for (String key : result.getKeys()) {
-            stats.put(key, result.getValue(key));
+            addValue(key, result.getValue(key));
         }
 
         if (result.isFailed()) {
@@ -522,33 +588,22 @@ public class VerifySensorOperation extends SensorTestOperation {
     }
 
     /**
-     * Log the stats to the logcat.
+     * Log the events to the logcat.
      */
-    private void logStats(TestSensorEvent[] events, Map<String, Object> stats) {
+    private void logStats(TestSensorEvent[] events) {
         if (events.length <= 0) {
             return;
         }
 
-        if (DEBUG) {
-            List<Double> jitterValues = null;
-            if (events.length > 1) {
-                jitterValues = SensorCtsHelper.getJitterValues(events);
-            }
-
-            logTestSensorEvent(0, events[0], null, null);
-            for (int i = 1; i < events.length; i++) {
-                Double jitter = jitterValues == null ? null : jitterValues.get(i - 1);
-                logTestSensorEvent(i, events[i], events[i - 1], jitter);
-            }
+        List<Double> jitterValues = null;
+        if (events.length > 1) {
+            jitterValues = SensorCtsHelper.getJitterValues(events);
         }
 
-        List<String> keys = new ArrayList<String>(stats.keySet());
-        Collections.sort(keys);
-        Log.v(TAG, String.format("Stats for %s, handle %d:",
-                SensorTestInformation.getSensorName(mSensorType),
-                mSensor.getUnderlyingSensor().getHandle()));
-        for (String key : keys) {
-            Log.v(TAG, String.format("%s: %s", key, stats.get(key).toString()));
+        logTestSensorEvent(0, events[0], null, null);
+        for (int i = 1; i < events.length; i++) {
+            Double jitter = jitterValues == null ? null : jitterValues.get(i - 1);
+            logTestSensorEvent(i, events[i], events[i - 1], jitter);
         }
     }
 

@@ -19,9 +19,10 @@ package android.hardware.cts;
 import android.hardware.Sensor;
 import android.hardware.SensorManager;
 import android.hardware.cts.helpers.SensorCtsHelper;
+import android.hardware.cts.helpers.SensorStats;
 import android.hardware.cts.helpers.SensorTestCase;
 import android.hardware.cts.helpers.SensorTestInformation;
-import android.hardware.cts.helpers.sensorTestOperations.VerifySensorOperation;
+import android.hardware.cts.helpers.sensoroperations.VerifySensorOperation;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -83,6 +84,7 @@ import java.util.Map.Entry;
  * </p>
  */
 public class SingleSensorTests extends SensorTestCase {
+    private static final String TAG = "SingleSensorTests";
 
     /**
      * This test verifies that the sensor's properties complies with the required properites set in
@@ -206,5 +208,6 @@ public class SingleSensorTests extends SensorTestCase {
                 SensorManager.SENSOR_DELAY_FASTEST, 0, 100);
         op.setDefaultVerifications();
         op.execute();
+        SensorStats.logStats(TAG, op.getStats());
     }
 }
