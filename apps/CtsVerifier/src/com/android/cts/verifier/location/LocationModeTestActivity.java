@@ -176,6 +176,11 @@ public abstract class LocationModeTestActivity
         }
 
         testAdvance(mState);
+
+        if (mState == mStatus.length - 1 && mStatus[mState] == PASS) {
+            // All tests run and pass
+            getPassButton().setEnabled(true);
+        }
     }
 
     /**
