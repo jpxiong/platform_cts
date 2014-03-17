@@ -38,8 +38,13 @@ public class DeletedContactUtil {
         };
         Uri uri = ContentUris.withAppendedId(URI, contactId);
         Cursor cursor = resolver.query(uri, projection, null, null, null);
-        if (cursor.moveToNext()) {
-            return cursor.getLong(0);
+        if (null != cursor) {
+           long deletedTime = -1;
+           if (cursor.moveToNext()) {
+               deletedTime = cursor.getLong(0);
+               cursor.close();
+               return deletedTime;
+           }
         }
         return CommonDatabaseUtils.NOT_FOUND;
     }
