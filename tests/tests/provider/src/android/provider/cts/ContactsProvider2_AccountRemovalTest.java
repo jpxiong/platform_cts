@@ -113,6 +113,7 @@ public class ContactsProvider2_AccountRemovalTest extends AndroidTestCase {
      */
     public void testAccountRemovalWithMergedContact_doesNotDeleteContactAndTimestampUpdated() {
         mAccountManager.addAccountExplicitly(ACCT_1, null, null);
+        mAccountManager.addAccountExplicitly(ACCT_2, null, null);
         ArrayList<ContactIdPair> idList = createAndAssertMergedContact(ACCT_1, ACCT_2);
         long contactId = idList.get(0).mContactId;
 
@@ -125,6 +126,7 @@ public class ContactsProvider2_AccountRemovalTest extends AndroidTestCase {
                     "Contact " + contactId + " last updated timestamp has not been updated.");
             SystemClock.sleep(SLEEP_BETWEEN_POLL_MS);
         }
+        mAccountManager.removeAccount(ACCT_2, null, null);
     }
 
     public void testAccountRemovalWithMergedContact_hasDeleteLogsForContacts() {
