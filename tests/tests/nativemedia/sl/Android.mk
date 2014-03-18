@@ -33,6 +33,7 @@ LOCAL_STATIC_LIBRARIES := \
     libgtest
 
 LOCAL_CTS_TEST_PACKAGE := android.nativemedia.sl
+LOCAL_32_BIT_ONLY := true
 include $(BUILD_CTS_EXECUTABLE)
 
 include $(CLEAR_VARS)
