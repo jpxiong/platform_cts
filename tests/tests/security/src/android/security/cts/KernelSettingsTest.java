@@ -30,6 +30,10 @@ import java.io.IOException;
  */
 public class KernelSettingsTest extends TestCase {
 
+    static {
+        System.loadLibrary("ctssecurity_jni");
+    }
+
     /**
      * Ensure that SELinux is in enforcing mode.
      */
@@ -110,6 +114,23 @@ public class KernelSettingsTest extends TestCase {
                         + "kernel with CONFIG_IKCONFIG_PROC disabled",
                 new File("/proc/config.gz").exists());
     }
+
+    /**
+     * Verify that ext4 extended attributes (xattrs) are enabled in the
+     * Linux kernel.
+     *
+     * To fix this failure, you need to enable the following kernel options:
+     * - CONFIG_EXT4_FS_XATTR
+     * - CONFIG_EXT4_FS_SECURITY
+     *
+     * Failure to enable this option may result in upgrade problems when
+     * trying to upgrade to Android 4.4.
+     */
+    public void testXattrInKernel() {
+        assertTrue(supportsXattr());
+    }
+
+    private static native boolean supportsXattr();
 
     private String getFile(String filename) throws IOException {
         BufferedReader in = null;
