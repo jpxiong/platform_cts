@@ -43,8 +43,7 @@ import javax.net.ssl.SSLSocketFactory;
 /**
  * A {@link RunListener} for CTS. Sets the system properties necessary for many
  * core tests to run. This is needed because there are some core tests that need
- * writing access to the file system. We also need to set the harness Thread's
- * context ClassLoader. Otherwise some classes and resources will not be found.
+ * writing access to the file system.
  * Finally, we add a means to free memory allocated by a TestCase after its
  * execution.
  */
@@ -94,9 +93,6 @@ public class CtsTestRunListener extends InstrumentationRunListener {
             lastClass = description.getTestClass();
             printMemory(description.getTestClass());
         }
-
-        Thread.currentThread().setContextClassLoader(
-                description.getTestClass().getClass().getClassLoader());
 
         mEnvironment.reset();
     }
