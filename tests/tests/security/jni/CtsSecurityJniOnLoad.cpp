@@ -17,6 +17,7 @@
 #include <jni.h>
 #include <stdio.h>
 
+extern int register_android_security_cts_KernelSettingsTest(JNIEnv*);
 extern int register_android_security_cts_CharDeviceTest(JNIEnv*);
 extern int register_android_security_cts_LinuxRngTest(JNIEnv*);
 extern int register_android_security_cts_NativeCodeTest(JNIEnv*);
@@ -42,6 +43,10 @@ jint JNI_OnLoad(JavaVM *vm, void *reserved) {
     }
 
     if (register_android_security_cts_LoadEffectLibraryTest(env)) {
+        return JNI_ERR;
+    }
+
+    if (register_android_security_cts_KernelSettingsTest(env)) {
         return JNI_ERR;
     }
 
