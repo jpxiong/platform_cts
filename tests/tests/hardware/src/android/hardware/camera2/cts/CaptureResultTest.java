@@ -20,36 +20,23 @@ import android.content.Context;
 import android.graphics.ImageFormat;
 import android.hardware.camera2.CameraCharacteristics;
 import android.hardware.camera2.CameraDevice;
-import android.hardware.camera2.CameraManager;
 import android.hardware.camera2.CameraMetadata;
 import android.hardware.camera2.CaptureRequest;
 import android.hardware.camera2.CaptureResult;
 import android.hardware.camera2.Size;
+import android.hardware.camera2.cts.testcases.Camera2AndroidTestCase;
+
 import static android.hardware.camera2.cts.CameraTestUtils.*;
-import android.media.ImageReader;
-import android.os.Handler;
-import android.os.HandlerThread;
-import android.test.AndroidTestCase;
+
 import android.util.Log;
 import android.view.Surface;
-
-import com.android.ex.camera2.blocking.BlockingStateListener;
-import static com.android.ex.camera2.blocking.BlockingStateListener.*;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class CaptureResultTest extends AndroidTestCase {
+public class CaptureResultTest extends Camera2AndroidTestCase {
     private static final String TAG = "CaptureResultTest";
     private static final boolean VERBOSE = Log.isLoggable(TAG, Log.VERBOSE);
-
-    private CameraManager mCameraManager;
-    private HandlerThread mHandlerThread;
-    private Handler mHandler;
-    private ImageReader mImageReader;
-    private Surface mSurface;
-    private BlockingStateListener mCameraListener;
-
     private static final int MAX_NUM_IMAGES = 5;
     private static final int NUM_FRAMES_VERIFIED = 300;
     private static final long WAIT_FOR_RESULT_TIMEOUT_MS = 3000;
@@ -69,18 +56,11 @@ public class CaptureResultTest extends AndroidTestCase {
     @Override
     protected void setUp() throws Exception {
         super.setUp();
-        mCameraManager = (CameraManager) mContext.getSystemService(Context.CAMERA_SERVICE);
-        assertNotNull("Can't connect to camera manager", mCameraManager);
-        mHandlerThread = new HandlerThread(TAG);
-        mHandlerThread.start();
-        mHandler = new Handler(mHandlerThread.getLooper());
-        mCameraListener = new BlockingStateListener();
         mFailedKeys.clear();
     }
 
     @Override
     protected void tearDown() throws Exception {
-        mHandlerThread.quitSafely();
         super.tearDown();
     }
 
@@ -120,33 +100,27 @@ public class CaptureResultTest extends AndroidTestCase {
             }
             // TODO: check for LIMITED keys
 
-            CameraDevice camera = null;
             try {
-                Size[] sizes = CameraTestUtils.getSupportedSizeForFormat(
-                        ImageFormat.YUV_420_888, ids[i], mCameraManager);
-                CameraTestUtils.assertArrayNotEmpty(sizes, "Available sizes shouldn't be empty");
-                createDefaultSurface(sizes[0]);
-
+                // Create image reader and surface.
+                Size sz = getMaxPreviewSize(ids[i], mCameraManager);
+                createImageReader(sz, ImageFormat.YUV_420_888, MAX_NUM_IMAGES,
+                        new ImageDropperListener());
                 if (VERBOSE) {
-                    Log.v(TAG, "Testing camera " + ids[i] + "for size " + sizes[0].toString());
+                    Log.v(TAG, "Testing camera " + ids[i] + "for size " + sz.toString());
                 }
 
-                camera = CameraTestUtils.openCamera(
-                        mCameraManager, ids[i], mCameraListener, mHandler);
-                assertNotNull(
-                        String.format("Failed to open camera device %s", ids[i]), camera);
-                mCameraListener.waitForState(STATE_UNCONFIGURED, CAMERA_OPEN_TIMEOUT_MS);
+                // Open camera.
+                openDevice(ids[i]);
 
+                // Configure output streams.
                 List<Surface> outputSurfaces = new ArrayList<Surface>(1);
-                outputSurfaces.add(mSurface);
-                camera.configureOutputs(outputSurfaces);
-                mCameraListener.waitForState(STATE_BUSY, CAMERA_BUSY_TIMEOUT_MS);
-                mCameraListener.waitForState(STATE_IDLE, CAMERA_IDLE_TIMEOUT_MS);
+                outputSurfaces.add(mReaderSurface);
+                configureCameraOutputs(mCamera, outputSurfaces, mCameraListener);;
 
                 CaptureRequest.Builder requestBuilder =
-                        camera.createCaptureRequest(CameraDevice.TEMPLATE_PREVIEW);
+                        mCamera.createCaptureRequest(CameraDevice.TEMPLATE_PREVIEW);
                 assertNotNull("Failed to create capture request", requestBuilder);
-                requestBuilder.addTarget(mSurface);
+                requestBuilder.addTarget(mReaderSurface);
 
                 // Enable face detection if supported
                 byte[] faceModes = props.get(
@@ -167,59 +141,41 @@ public class CaptureResultTest extends AndroidTestCase {
                 requestBuilder.set(CaptureRequest.STATISTICS_LENS_SHADING_MAP_MODE,
                         CameraMetadata.STATISTICS_LENS_SHADING_MAP_MODE_ON);
 
+                // Start capture
                 SimpleCaptureListener captureListener = new SimpleCaptureListener();
-                camera.setRepeatingRequest(requestBuilder.build(), captureListener, mHandler);
+                startCapture(requestBuilder.build(), /*repeating*/true, captureListener, mHandler);
 
-                for (int m = 0; m < NUM_FRAMES_VERIFIED; m++) {
-                    if(VERBOSE) {
-                        Log.v(TAG, "Testing frame " + m);
-                    }
-                    validateCaptureResult(
-                            captureListener.getCaptureResult(WAIT_FOR_RESULT_TIMEOUT_MS),
-                            waiverkeys);
-                }
+                // Verify results
+                validateCaptureResult(captureListener, waiverkeys, NUM_FRAMES_VERIFIED);
 
-                // Stop repeat, wait for captures to complete, and disconnect from surfaces
-                camera.configureOutputs(/*outputs*/ null);
-                mCameraListener.waitForState(STATE_BUSY, CAMERA_BUSY_TIMEOUT_MS);
-                mCameraListener.waitForState(STATE_UNCONFIGURED, CAMERA_IDLE_TIMEOUT_MS);
-                // Camera has disconnected, clear out the reader
-                mSurface.release();
-                mImageReader.close();
+                stopCapture(/*fast*/false);
             } finally {
-                if (camera != null) {
-                    camera.close();
+                closeDevice(ids[i]);
+                closeImageReader();
+            }
+
+        }
+    }
+
+    private void validateCaptureResult(SimpleCaptureListener captureListener,
+            List<CameraMetadata.Key<?>> skippedKeys, int numFramesVerified) throws Exception {
+        CaptureResult result = null;
+        for (int i = 0; i < numFramesVerified; i++) {
+            result = captureListener.getCaptureResult(WAIT_FOR_RESULT_TIMEOUT_MS);
+            for (CameraMetadata.Key<?> key : mAllKeys) {
+                if (!skippedKeys.contains(key) && result.get(key) == null) {
+                    mFailedKeys.add(key);
                 }
             }
 
-        }
-    }
-
-    private void validateCaptureResult(CaptureResult result,
-            List<CameraMetadata.Key<?>> skippedKeys) throws Exception {
-        for (CameraMetadata.Key<?> key : mAllKeys) {
-            if (!skippedKeys.contains(key) && result.get(key) == null) {
-                mFailedKeys.add(key);
+            StringBuffer failedKeyNames = new StringBuffer("Below Keys have null values:\n");
+            for (CameraMetadata.Key<?> key : mFailedKeys) {
+                failedKeyNames.append(key.getName() + "\n");
             }
+
+            assertTrue("Some keys have null values, " + failedKeyNames.toString(),
+                    mFailedKeys.isEmpty());
         }
-
-        StringBuffer failedKeyNames = new StringBuffer("Below Keys have null values:\n");
-        for (CameraMetadata.Key<?> key : mFailedKeys) {
-            failedKeyNames.append(key.getName() + "\n");
-        }
-
-        assertTrue("Some keys have null values, " + failedKeyNames.toString(),
-                mFailedKeys.isEmpty());
-    }
-
-    private void createDefaultSurface(Size sz) {
-        mImageReader =
-                ImageReader.newInstance(sz.getWidth(),
-                        sz.getHeight(),
-                        ImageFormat.YUV_420_888,
-                        MAX_NUM_IMAGES);
-        mImageReader.setOnImageAvailableListener(new ImageDropperListener(), mHandler);
-        mSurface = mImageReader.getSurface();
     }
 
     /**

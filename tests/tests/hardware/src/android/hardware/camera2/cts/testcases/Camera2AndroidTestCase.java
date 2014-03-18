@@ -1,0 +1,243 @@
+/*
+ * Copyright (C) 2014 The Android Open Source Project
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package android.hardware.camera2.cts.testcases;
+
+import static android.hardware.camera2.cts.CameraTestUtils.*;
+import static com.android.ex.camera2.blocking.BlockingStateListener.*;
+
+import android.content.Context;
+import android.hardware.camera2.CameraDevice;
+import android.hardware.camera2.CameraDevice.CaptureListener;
+import android.hardware.camera2.CameraManager;
+import android.hardware.camera2.CaptureRequest;
+import android.hardware.camera2.Size;
+import android.hardware.camera2.cts.CameraTestUtils;
+import android.hardware.camera2.cts.helpers.CameraErrorCollector;
+import android.hardware.camera2.cts.helpers.StaticMetadata;
+import android.media.Image;
+import android.media.ImageReader;
+import android.os.Environment;
+import android.os.Handler;
+import android.os.HandlerThread;
+import android.test.AndroidTestCase;
+import android.util.Log;
+import android.view.Surface;
+
+import com.android.ex.camera2.blocking.BlockingStateListener;
+
+public class Camera2AndroidTestCase extends AndroidTestCase {
+    private static final String TAG = "Camera2AndroidTestCase";
+    private static final boolean VERBOSE = Log.isLoggable(TAG, Log.VERBOSE);
+
+    protected static final String DEBUG_FILE_NAME_BASE =
+            Environment.getExternalStorageDirectory().getPath();
+    // Default capture size: VGA size is required by CDD.
+    protected static final Size DEFAULT_CAPTURE_SIZE = new Size(640, 480);
+    protected static final int CAPTURE_WAIT_TIMEOUT_MS = 5000;
+
+    protected CameraManager mCameraManager;
+    protected CameraDevice mCamera;
+    protected BlockingStateListener mCameraListener;
+    protected String[] mCameraIds;
+    protected ImageReader mReader;
+    protected Surface mReaderSurface;
+    protected Handler mHandler;
+    protected HandlerThread mHandlerThread;
+    protected StaticMetadata mStaticInfo;
+    protected CameraErrorCollector mCollector;
+
+    @Override
+    public void setContext(Context context) {
+        super.setContext(context);
+        mCameraManager = (CameraManager) context.getSystemService(Context.CAMERA_SERVICE);
+        assertNotNull("Can't connect to camera manager!", mCameraManager);
+    }
+
+    /**
+     * Set up the camera2 test case required environments, including CameraManager,
+     * HandlerThread, Camera IDs, and CameraStateListener etc.
+     */
+    @Override
+    protected void setUp() throws Exception {
+        super.setUp();
+        mCameraIds = mCameraManager.getCameraIdList();
+        assertNotNull("Camera ids shouldn't be null", mCameraIds);
+        mHandlerThread = new HandlerThread(TAG);
+        mHandlerThread.start();
+        mHandler = new Handler(mHandlerThread.getLooper());
+        mCameraListener = new BlockingStateListener();
+        mCollector = new CameraErrorCollector();
+    }
+
+    @Override
+    protected void tearDown() throws Exception {
+        mHandlerThread.quitSafely();
+        mHandler = null;
+        closeImageReader();
+
+        try {
+            mCollector.verify();
+        } catch (Throwable e) {
+            // When new Exception(e) is used, exception info will be printed twice.
+            throw new Exception(e.getMessage());
+        }
+
+        super.tearDown();
+    }
+
+    /**
+     * Start capture with given {@link #CaptureRequest}.
+     *
+     * @param request The {@link #CaptureRequest} to be captured.
+     * @param repeating If the capture is single capture or repeating.
+     * @param listener The {@link #CaptureListener} camera device used to notify callbacks.
+     * @param handler The handler camera device used to post callbacks.
+     */
+    protected void startCapture(CaptureRequest request, boolean repeating,
+            CaptureListener listener, Handler handler) throws Exception {
+        if (VERBOSE) Log.v(TAG, "Starting capture");
+
+        if (repeating) {
+            mCamera.setRepeatingRequest(request, listener, handler);
+        } else {
+            mCamera.capture(request, listener, handler);
+        }
+    }
+
+    /**
+     * Stop the current active capture.
+     *
+     * @param fast When it is true, {@link CameraDevice#flush} is called, the stop capture
+     * could be faster.
+     */
+    protected void stopCapture(boolean fast) throws Exception {
+        if (VERBOSE) Log.v(TAG, "Stopping capture");
+
+        if (fast) {
+            /**
+             * Flush is useful for canceling long exposure single capture, it also could help
+             * to make the streaming capture stop sooner.
+             */
+            mCamera.flush();
+            mCameraListener.waitForState(STATE_UNCONFIGURED, CAMERA_UNCONFIGURED_TIMEOUT_MS);
+        } else {
+            configureCameraOutputs(mCamera, /*outputSurfaces*/null, mCameraListener);
+        }
+    }
+
+    /**
+     * Open a {@link #CameraDevice camera device} and get the StaticMetadata for a given camera id.
+     * The default mCameraListener is used to wait for states.
+     *
+     * @param cameraId The id of the camera device to be opened.
+     */
+    protected void openDevice(String cameraId) throws Exception {
+        openDevice(cameraId, mCameraListener);
+    }
+
+    /**
+     * Open a {@link #CameraDevice} and get the StaticMetadata for a given camera id and listener.
+     *
+     * @param cameraId The id of the camera device to be opened.
+     * @param listener The {@link #BlockingStateListener} used to wait for states.
+     */
+    protected void openDevice(String cameraId, BlockingStateListener listener) throws Exception {
+        mCamera = CameraTestUtils.openCamera(
+                mCameraManager, cameraId, listener, mHandler);
+        mStaticInfo = new StaticMetadata(mCameraManager.getCameraCharacteristics(cameraId));
+        if (VERBOSE) {
+            Log.v(TAG, "Camera " + cameraId + " is opened");
+        }
+    }
+
+    /**
+     * Close a {@link #CameraDevice camera device} and clear the associated StaticInfo field for a
+     * given camera id. The default mCameraListener is used to wait for states.
+     * <p>
+     * This function must be used along with the {@link #openDevice} for the
+     * same camera id.
+     * </p>
+     *
+     * @param cameraId The id of the {@link #CameraDevice camera device} to be closed.
+     */
+    protected void closeDevice(String cameraId) {
+        closeDevice(cameraId, mCameraListener);
+    }
+
+    /**
+     * Close a {@link #CameraDevice camera device} and clear the associated StaticInfo field for a
+     * given camera id and listener.
+     * <p>
+     * This function must be used along with the {@link #openDevice} for the
+     * same camera id.
+     * </p>
+     *
+     * @param cameraId The id of the camera device to be closed.
+     * @param listener The BlockingStateListener used to wait for states.
+     */
+    protected void closeDevice(String cameraId, BlockingStateListener listener) {
+        if (mCamera != null) {
+            if (!cameraId.equals(mCamera.getId())) {
+                throw new IllegalStateException("Try to close a device that is not opened yet");
+            }
+            mCamera.close();
+            listener.waitForState(STATE_CLOSED, CAMERA_CLOSE_TIMEOUT_MS);
+            mCamera = null;
+            mStaticInfo = null;
+
+            if (VERBOSE) {
+                Log.v(TAG, "Camera " + cameraId + " is closed");
+            }
+        }
+    }
+
+    /**
+     * Create an {@link #ImageReader} object and get the surface.
+     *
+     * @param size The size of this ImageReader to be created.
+     * @param format The format of this ImageReader to be created
+     * @param maxNumImages The max number of images that can be acquired simultaneously.
+     * @param listener The listener used by this ImageReader to notify callbacks.
+     */
+    protected void createImageReader(Size size, int format, int maxNumImages,
+            ImageReader.OnImageAvailableListener listener) throws Exception {
+        closeImageReader();
+
+        mReader = ImageReader.newInstance(size.getWidth(), size.getHeight(), format, maxNumImages);
+        mReaderSurface = mReader.getSurface();
+        mReader.setOnImageAvailableListener(listener, mHandler);
+        if (VERBOSE) Log.v(TAG, "Created ImageReader size " + size.toString());
+    }
+
+    /**
+     * Close the pending images then close current active {@link #ImageReader} object.
+     */
+    protected void closeImageReader() {
+        if (mReader != null) {
+            try {
+                // Close all possible pending images first.
+                Image image = mReader.acquireLatestImage();
+                if (image != null) {
+                    image.close();
+                }
+            } finally {
+                mReader.close();
+                mReader = null;
+            }
+        }
+    }
+}
