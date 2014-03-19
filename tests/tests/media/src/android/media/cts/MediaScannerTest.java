@@ -76,6 +76,7 @@ public class MediaScannerTest extends AndroidTestCase {
 
     @Override
     protected void tearDown() throws Exception {
+        cleanup();
         super.tearDown();
     }
 
@@ -84,10 +85,12 @@ public class MediaScannerTest extends AndroidTestCase {
             mMediaFile.delete();
         }
         if (mFileDir != null) {
-            new File(mFileDir + "/testmp3.mp3").delete();
-            new File(mFileDir + "/testmp3_2.mp3").delete();
-            new File(mFileDir + "/ctsmediascanplaylist1.pls").delete();
-            new File(mFileDir + "/ctsmediascanplaylist2.m3u").delete();
+            String files[] = new File(mFileDir).list();
+            if (files != null) {
+                for (String f: files) {
+                    new File(mFileDir + "/" + f).delete();
+                }
+            }
             new File(mFileDir).delete();
         }
 
@@ -389,7 +392,7 @@ public class MediaScannerTest extends AndroidTestCase {
                     new String[] {"光良", "童话", "光良", "02.童话", "鍏夎壇"} ),
             new MediaScanEntry(R.raw.gb18030_6,
                     new String[] {"张韶涵", "潘朵拉", "張韶涵", "隐形的翅膀", "王雅君"} ),
-            new MediaScanEntry(R.raw.gb18030_7,
+            new MediaScanEntry(R.raw.gb18030_7, // this is actually utf-8
                     new String[] {"五月天", "后青春期的诗", null, "突然好想你", null} ),
             new MediaScanEntry(R.raw.gb18030_8,
                     new String[] {"周杰伦", "Jay", null, "反方向的钟", null} ),
@@ -403,6 +406,7 @@ public class MediaScannerTest extends AndroidTestCase {
                     new String[] {"Мельница", "Перевал", null, "Королевна", null} ),
             new MediaScanEntry(R.raw.cp1251_3,
                     new String[] {"Тату (tATu)", "200 По Встречной [Limited edi", null, "Я Сошла С Ума", null} ),
+            // The following 3 use cp1251 encoding, expanded to 16 bits and stored as utf16 
             new MediaScanEntry(R.raw.cp1251_4,
                     new String[] {"Александр Розенбаум", "Философия любви", null, "Разговор в гостинице (Как жить без веры)", "А.Розенбаум"} ),
             new MediaScanEntry(R.raw.cp1251_5,
@@ -427,6 +431,8 @@ public class MediaScannerTest extends AndroidTestCase {
                     new String[] {"音人", "SoundEffects", null, "間違い", null} ),
             new MediaScanEntry(R.raw.iso88591_1,
                     new String[] {"Mozart", "Best of Mozart", null, "Overtüre (Die Hochzeit des Figaro)", null} ),
+            new MediaScanEntry(R.raw.iso88591_2, // actually UTF16, but only uses iso8859-1 chars
+                    new String[] {"Björk", "Telegram", "Björk", "Possibly Maybe (Lucy Mix)", null} ),
             new MediaScanEntry(R.raw.hebrew,
                     new String[] {"אריק סיני", "", null, "לי ולך", null } ),
             new MediaScanEntry(R.raw.hebrew2,
@@ -436,7 +442,8 @@ public class MediaScannerTest extends AndroidTestCase {
     public void testEncodingDetection() throws Exception {
         for (int i = 0; i< encodingtestfiles.length; i++) {
             MediaScanEntry entry = encodingtestfiles[i];
-            String path =  mFileDir + "/" + "encodingtest" + i + ".mp3";
+            String name = mContext.getResources().getResourceEntryName(entry.res);
+            String path =  mFileDir + "/" + name + ".mp3";
             writeFile(entry.res, path);
         }
 
@@ -452,7 +459,8 @@ public class MediaScannerTest extends AndroidTestCase {
         ContentResolver res = mContext.getContentResolver();
         for (int i = 0; i< encodingtestfiles.length; i++) {
             MediaScanEntry entry = encodingtestfiles[i];
-            String path =  mFileDir + "/" + "encodingtest" + i + ".mp3";
+            String name = mContext.getResources().getResourceEntryName(entry.res);
+            String path =  mFileDir + "/" + name + ".mp3";
             Cursor c = res.query(MediaStore.Audio.Media.getContentUri("external"), columns,
                     MediaStore.Audio.Media.DATA + "=?", new String[] {path}, null);
             assertNotNull("null cursor", c);
