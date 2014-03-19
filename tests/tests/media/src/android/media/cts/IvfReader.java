@@ -22,18 +22,19 @@ import java.io.RandomAccessFile;
 /**
  * A simple reader for an IVF file.
  *
- * IVF format is a simple container format for VP8 encoded frames.
+ * IVF format is a simple container format for VP8 encoded frames defined at
+ * http://wiki.multimedia.cx/index.php?title=IVF.
  * This reader is capable of getting frame count, width and height
  * from the header, and access individual frames randomly by
  * frame number.
  */
 
 public class IvfReader {
-    private static final byte HEADER_END = 32;
-    private static final byte FOURCC_HEAD = 8;
-    private static final byte WIDTH_HEAD = 12;
-    private static final byte HEIGHT_HEAD = 14;
-    private static final byte FRAMECOUNT_HEAD = 24;
+    private static final byte HEADER_SIZE = 32;
+    private static final byte FOURCC_OFFSET = 8;
+    private static final byte WIDTH_OFFSET = 12;
+    private static final byte HEIGHT_OFFSET = 14;
+    private static final byte FRAMECOUNT_OFFSET = 24;
     private static final byte FRAME_HEADER_SIZE = 12;
 
     private RandomAccessFile mIvfFile;
@@ -101,7 +102,7 @@ public class IvfReader {
      * than 0 and less than frameCount.
      */
     public byte[] readFrame(int frameIndex) throws IOException {
-        if (frameIndex > mFrameCount | frameIndex < 0){
+        if (frameIndex > mFrameCount || frameIndex < 0){
             return null;
         }
         int frameSize = mFrameSizes[frameIndex];
@@ -124,7 +125,7 @@ public class IvfReader {
     private boolean verifyHeader() throws IOException{
         mIvfFile.seek(0);
 
-        if (mIvfFile.length() < HEADER_END){
+        if (mIvfFile.length() < HEADER_SIZE){
             return false;
         }
 
@@ -135,7 +136,7 @@ public class IvfReader {
                 (mIvfFile.readByte() == (byte)'F'));
 
         // Fourcc
-        mIvfFile.seek(FOURCC_HEAD);
+        mIvfFile.seek(FOURCC_OFFSET);
         boolean fourccMatch = ((mIvfFile.readByte() == (byte)'V') &&
                 (mIvfFile.readByte() == (byte)'P') &&
                 (mIvfFile.readByte() == (byte)'8') &&
@@ -146,15 +147,15 @@ public class IvfReader {
 
     private void readHeaderData() throws IOException{
         // width
-        mIvfFile.seek(WIDTH_HEAD);
+        mIvfFile.seek(WIDTH_OFFSET);
         mWidth = (int) changeEndianness(mIvfFile.readShort());
 
         // height
-        mIvfFile.seek(HEIGHT_HEAD);
+        mIvfFile.seek(HEIGHT_OFFSET);
         mHeight = (int) changeEndianness(mIvfFile.readShort());
 
         // frame count
-        mIvfFile.seek(FRAMECOUNT_HEAD);
+        mIvfFile.seek(FRAMECOUNT_OFFSET);
         mFrameCount = changeEndianness(mIvfFile.readInt());
 
         // allocate frame metadata
@@ -163,7 +164,7 @@ public class IvfReader {
     }
 
     private void readFrameMetadata() throws IOException{
-        int frameHead = HEADER_END;
+        int frameHead = HEADER_SIZE;
         for(int i = 0; i < mFrameCount; i++){
             mIvfFile.seek(frameHead);
             int frameSize = changeEndianness(mIvfFile.readInt());
