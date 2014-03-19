@@ -45,7 +45,9 @@ public class SELinuxDomainTest extends TestCase {
      */
     private void assertDomainEmpty(String domain) throws FileNotFoundException {
         List<ProcessDetails> procs = ProcessDetails.getProcessMap().get(domain);
-        assertNull(procs);
+        String msg = "Expected no processes in SELinux domain \"" + domain + "\""
+                + " Found: \"" + procs + "\"";
+        assertNull(msg, procs);
     }
 
     /**
@@ -59,9 +61,14 @@ public class SELinuxDomainTest extends TestCase {
      */
     private void assertDomainOne(String domain, String executable) throws FileNotFoundException {
         List<ProcessDetails> procs = ProcessDetails.getProcessMap().get(domain);
-        assertNotNull(procs);
-        assertEquals(1, procs.size());
-        assertEquals(executable, procs.get(0).procTitle);
+        String msg = "Expected 1 process in SELinux domain \"" + domain + "\""
+                + " Found \"" + procs + "\"";
+        assertNotNull(msg, procs);
+        assertEquals(msg, 1, procs.size());
+
+        msg = "Expected executable \"" + executable + "\" in SELinux domain \"" + domain + "\""
+                + "Found: \"" + procs + "\"";
+        assertEquals(msg, executable, procs.get(0).procTitle);
     }
 
     /**
@@ -81,8 +88,37 @@ public class SELinuxDomainTest extends TestCase {
             /* not on all devices */
             return;
         }
-        assertEquals(1, procs.size());
-        assertEquals(executable, procs.get(0).procTitle);
+
+        String msg = "Expected 1 process in SELinux domain \"" + domain + "\""
+                + " Found: \"" + procs + "\"";
+        assertEquals(msg, 1, procs.size());
+
+        msg = "Expected executable \"" + executable + "\" in SELinux domain \"" + domain + "\""
+                + "Found: \"" + procs.get(0) + "\"";
+        assertEquals(msg, executable, procs.get(0).procTitle);
+    }
+
+    /**
+     * Asserts that a domain must exist, and that the cardinality is greater
+     * than or equal to 1.
+     *
+     * @param domain
+     *  The domain or SELinux context to check.
+     * @param executable
+     *  The path of the executable or application package name.
+     */
+    private void assertDomainN(String domain, String executable)
+            throws FileNotFoundException {
+        List<ProcessDetails> procs = ProcessDetails.getProcessMap().get(domain);
+        String msg = "Expected 1 or more processes in SELinux domain \"" + domain + "\""
+                + " Found \"" + procs + "\"";
+        assertNotNull(msg, procs);
+
+        for(ProcessDetails p : procs) {
+            msg = "Expected executable \"" + executable + "\" in SELinux domain \"" + domain + "\""
+                + "Found: \"" + p + "\"";
+            assertEquals(msg, executable, p.procTitle);
+        }
     }
 
     /* Init is always there */
@@ -137,7 +173,7 @@ public class SELinuxDomainTest extends TestCase {
 
     /* Media server is always running */
     public void testMediaserverDomain() throws FileNotFoundException {
-        assertDomainOne("u:r:mediaserver:s0", "/system/bin/mediaserver");
+        assertDomainN("u:r:mediaserver:s0", "/system/bin/mediaserver");
     }
 
     /* Installd is always running */
@@ -203,7 +239,7 @@ public class SELinuxDomainTest extends TestCase {
         List<ProcessDetails> procs = ProcessDetails.getProcessMap().get(domain);
         assertNotNull(procs);
         for (ProcessDetails p : procs) {
-            assertTrue("Non Kernel thread \"" + p.procTitle + "\" found!", p.isKernel());
+            assertTrue("Non Kernel thread \"" + p + "\" found!", p.isKernel());
         }
     }
 
