@@ -53,73 +53,6 @@ public class SensorCtsHelperTest extends TestCase {
     }
 
     /**
-     * Test {@link SensorCtsHelper#getMeans(TestSensorEvent[])}.
-     */
-    public void testGetMeans() {
-        long[] timestamps = {0, 1, 2, 3, 4};
-
-        float[] values = {0, 1, 2, 3, 4};  // 2.0
-        Float[] means = SensorCtsHelper.getMeans(getSensorEvents(timestamps, values));
-        assertEquals(1, means.length);
-        assertEquals(2.0, means[0], 0.00001);
-
-        float[] values1 = {0, 1, 2, 3, 4};  // 2.0
-        float[] values2 = {1, 2, 3, 4, 5};  // 3.0
-        float[] values3 = {0, 1, 4, 9, 16};  // 6.0
-        means = SensorCtsHelper.getMeans(
-                getSensorEvents(timestamps, values1, values2, values3));
-        assertEquals(3, means.length);
-        assertEquals(2.0, means[0], 0.00001);
-        assertEquals(3.0, means[1], 0.00001);
-        assertEquals(6.0, means[2], 0.00001);
-    }
-
-    /**
-     * Test {@link SensorCtsHelper#getVariances(TestSensorEvent[])}.
-     */
-    public void testGetVariences() {
-        long[] timestamps = {0, 1, 2, 3, 4};
-
-        float[] values = {0, 1, 2, 3, 4};  // 2.5
-        Float[] variances = SensorCtsHelper.getVariances(getSensorEvents(timestamps, values));
-        assertEquals(1, variances.length);
-        assertEquals(2.5, variances[0], 0.00001);
-
-        float[] values1 = {0, 1, 2, 3, 4};  // 2.5
-        float[] values2 = {1, 2, 3, 4, 5};  // 2.5
-        float[] values3 = {0, 2, 4, 6, 8};  // 10.0
-        variances = SensorCtsHelper.getVariances(
-                getSensorEvents(timestamps, values1, values2, values3));
-        assertEquals(3, variances.length);
-        assertEquals(2.5, variances[0], 0.00001);
-        assertEquals(2.5, variances[1], 0.00001);
-        assertEquals(10.0, variances[2], 0.00001);
-    }
-
-    /**
-     * Test {@link SensorCtsHelper#getStandardDeviations(TestSensorEvent[])}.
-     */
-    public void testGetStandardDeviations() {
-        long[] timestamps = {0, 1, 2, 3, 4};
-
-        float[] values = {0, 1, 2, 3, 4};  // sqrt(2.5)
-        Float[] stddev = SensorCtsHelper.getStandardDeviations(
-                getSensorEvents(timestamps, values));
-        assertEquals(1, stddev.length);
-        assertEquals(Math.sqrt(2.5), stddev[0], 0.00001);
-
-        float[] values1 = {0, 1, 2, 3, 4};  // sqrt(2.5)
-        float[] values2 = {1, 2, 3, 4, 5};  // sqrt(2.5)
-        float[] values3 = {0, 2, 4, 6, 8};  // sqrt(10.0)
-        stddev = SensorCtsHelper.getStandardDeviations(
-                getSensorEvents(timestamps, values1, values2, values3));
-        assertEquals(3, stddev.length);
-        assertEquals(Math.sqrt(2.5), stddev[0], 0.00001);
-        assertEquals(Math.sqrt(2.5), stddev[1], 0.00001);
-        assertEquals(Math.sqrt(10.0), stddev[2], 0.00001);
-    }
-
-    /**
      * Test {@link SensorCtsHelper#getMean(Collection)}.
      */
     public void testGetMean() {
@@ -171,22 +104,6 @@ public class SensorCtsHelperTest extends TestCase {
     }
 
     /**
-     * Test {@link SensorCtsHelper#getTimestampDelayValues(TestSensorEvent[])}.
-     */
-    public void testGetTimestampDelayValues() {
-        float[] values = {0, 1, 2, 3, 4};
-
-        long[] timestamps = {0, 0, 1, 3, 100};
-        List<Long> timestampDelayValues = SensorCtsHelper.getTimestampDelayValues(
-                getSensorEvents(timestamps, values));
-        assertEquals(4, timestampDelayValues.size());
-        assertEquals(0, (long) timestampDelayValues.get(0));
-        assertEquals(1, (long) timestampDelayValues.get(1));
-        assertEquals(2, (long) timestampDelayValues.get(2));
-        assertEquals(97, (long) timestampDelayValues.get(3));
-    }
-
-    /**
      * Test {@link SensorCtsHelper#getFrequency(Number, TimeUnit)}.
      */
     public void testGetFrequency() {
@@ -216,51 +133,5 @@ public class SensorCtsHelperTest extends TestCase {
         assertEquals(0.1, SensorCtsHelper.getPeriod(10000000, TimeUnit.MICROSECONDS), 0.001);
         assertEquals(100, SensorCtsHelper.getPeriod(10000000, TimeUnit.NANOSECONDS), 0.001);
         assertEquals(1, SensorCtsHelper.getPeriod(1000000000, TimeUnit.NANOSECONDS), 0.001);
-    }
-
-    /**
-     * Test {@link SensorCtsHelper#getJitterValues(TestSensorEvent[])}.
-     */
-    public void testGetJitterValues() {
-        float[] values = {0, 1, 2, 3, 4};
-
-        long[] timestamps1 = {0, 1, 2, 3, 4};
-        List<Double> jitterValues = SensorCtsHelper.getJitterValues(
-                getSensorEvents(timestamps1, values));
-        assertEquals(4, jitterValues.size());
-        assertEquals(0.0, (double) jitterValues.get(0));
-        assertEquals(0.0, (double) jitterValues.get(1));
-        assertEquals(0.0, (double) jitterValues.get(2));
-        assertEquals(0.0, (double) jitterValues.get(3));
-
-        long[] timestamps2 = {0, 0, 2, 4, 4};
-        jitterValues = SensorCtsHelper.getJitterValues(
-                getSensorEvents(timestamps2, values));
-        assertEquals(4, jitterValues.size());
-        assertEquals(1.0, (double) jitterValues.get(0));
-        assertEquals(1.0, (double) jitterValues.get(1));
-        assertEquals(1.0, (double) jitterValues.get(2));
-        assertEquals(1.0, (double) jitterValues.get(3));
-
-        long[] timestamps3 = {0, 1, 4, 9, 16};
-        jitterValues = SensorCtsHelper.getJitterValues(
-                getSensorEvents(timestamps3, values));
-        assertEquals(4, jitterValues.size());
-        assertEquals(3.0, (double) jitterValues.get(0));
-        assertEquals(1.0, (double) jitterValues.get(1));
-        assertEquals(1.0, (double) jitterValues.get(2));
-        assertEquals(3.0, (double) jitterValues.get(3));
-    }
-
-    private TestSensorEvent[] getSensorEvents(long[] timestamps, float[] ... values) {
-        TestSensorEvent[] events = new TestSensorEvent[timestamps.length];
-        for (int i = 0; i < timestamps.length; i++) {
-            float[] eventValues = new float[values.length];
-            for (int j = 0; j < values.length; j++) {
-                eventValues[j] = values[j][i];
-            }
-            events[i] = new TestSensorEvent(null, timestamps[i], 0, eventValues);
-        }
-        return events;
     }
 }

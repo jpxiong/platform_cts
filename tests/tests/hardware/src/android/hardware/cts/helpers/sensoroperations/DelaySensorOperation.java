@@ -26,8 +26,6 @@ import java.util.concurrent.TimeUnit;
  * {@link ISensorOperation}.
  */
 public class DelaySensorOperation implements ISensorOperation {
-    private static final int NANOS_PER_MILLI = 1000000;
-
     private final ISensorOperation mOperation;
     private final long mDelay;
     private final TimeUnit mTimeUnit;

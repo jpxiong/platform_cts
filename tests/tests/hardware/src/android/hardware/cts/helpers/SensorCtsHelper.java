@@ -56,72 +56,6 @@ public class SensorCtsHelper {
     }
 
     /**
-     * Calculates the mean for each of the values in the set of TestSensorEvents.
-     *
-     * @throws IllegalArgumentException if there are no events
-     */
-    public static Float[] getMeans(TestSensorEvent[] events) {
-        if (events.length == 0) {
-            throw new IllegalArgumentException("Events cannot be empty");
-        }
-
-        Float[] means = new Float[events[0].values.length];
-        for (int i = 0; i < means.length; i++) {
-            means[i] = 0.0f;
-        }
-        for (TestSensorEvent event : events) {
-            for (int i = 0; i < means.length; i++) {
-                means[i] += event.values[i];
-            }
-        }
-        for (int i = 0; i < means.length; i++) {
-            means[i] /= events.length;
-        }
-        return means;
-    }
-
-    /**
-     * Calculates the bias-corrected variance for each of the values in the set of TestSensorEvents.
-     *
-     * @throws IllegalArgumentException if there are no events
-     */
-    public static Float[] getVariances(TestSensorEvent[] events) {
-        Float[] means = getMeans(events);
-        Float[] variances = new Float[means.length];
-        for (int i = 0; i < variances.length; i++) {
-            variances[i] = 0.0f;
-        }
-        for (int i = 0; i < means.length; i++) {
-            Collection<Float> squaredDiffs = new ArrayList<Float>(events.length);
-            for (TestSensorEvent event : events) {
-                float diff = event.values[i] - means[i];
-                squaredDiffs.add(diff * diff);
-            }
-            float sum = 0.0f;
-            for (float value : squaredDiffs) {
-                sum += value;
-            }
-            variances[i] = sum / (events.length - 1);
-        }
-        return variances;
-    }
-
-    /**
-     * Calculates the bias-corrected standard deviation for each of the values in the set of
-     * TestSensorEvents.
-     *
-     * @throws IllegalArgumentException if there are no events
-     */
-    public static Float[] getStandardDeviations(TestSensorEvent[] events) {
-        Float[] variances = getVariances(events);
-        Float[] stdDevs = new Float[variances.length];
-        for (int i = 0; i < variances.length; i++) {
-            stdDevs[i] = (float) Math.sqrt(variances[i]);
-        }
-        return stdDevs;
-    }
-
-    /**
      * Calculate the mean of a collection.
      *
      * @throws IllegalArgumentException if the collection is null or empty
@@ -166,41 +100,6 @@ public class SensorCtsHelper {
     public static <TValue extends Number> double getStandardDeviation(
             Collection<TValue> collection) {
         return Math.sqrt(getVariance(collection));
-    }
-
-    /**
-     * Get a list containing the delay between sensor events.
-     *
-     * @param events The array of {@link TestSensorEvent}.
-     * @return A list containing the delay between sensor events in nanoseconds.
-     */
-    public static List<Long> getTimestampDelayValues(TestSensorEvent[] events) {
-        if (events.length < 2) {
-            return new ArrayList<Long>();
-        }
-        List<Long> timestampDelayValues = new ArrayList<Long>(events.length - 1);
-        for (int i = 1; i < events.length; i++) {
-            timestampDelayValues.add(events[i].timestamp - events[i - 1].timestamp);
-        }
-        return timestampDelayValues;
-    }
-
-    /**
-     * Get a list containing the jitter values for a collection of sensor events.
-     *
-     * @param events The array of {@link TestSensorEvent}.
-     * @return A list containing the jitter values between each event.
-     * @throws IllegalArgumentException if the number of events is less that 2.
-     */
-    public static List<Double> getJitterValues(TestSensorEvent[] events) {
-        List<Long> timestampDelayValues = getTimestampDelayValues(events);
-        double averageTimestampDelay = getMean(timestampDelayValues);
-
-        List<Double> jitterValues = new ArrayList<Double>(timestampDelayValues.size());
-        for (long timestampDelay : timestampDelayValues) {
-            jitterValues.add(Math.abs(timestampDelay - averageTimestampDelay));
-        }
-        return jitterValues;
     }
 
     /**
@@ -279,6 +178,16 @@ public class SensorCtsHelper {
     }
 
     /**
+     * Return true if the operation rate is not one of {@link SensorManager#SENSOR_DELAY_GAME},
+     * {@link SensorManager#SENSOR_DELAY_UI}, or {@link SensorManager#SENSOR_DELAY_NORMAL}.
+     */
+    public boolean isDelayRateTestable(int rateUs) {
+        return (rateUs != SensorManager.SENSOR_DELAY_GAME
+                && rateUs != SensorManager.SENSOR_DELAY_UI
+                && rateUs != SensorManager.SENSOR_DELAY_NORMAL);
+    }
+
+    /**
      * Helper method to sleep for a given duration.
      */
     public static void sleep(long duration, TimeUnit timeUnit) {
@@ -288,6 +197,34 @@ public class SensorCtsHelper {
         } catch (InterruptedException e) {
             // Ignore
         }
+    }
+
+    /**
+     * Format an assertion message.
+     *
+     * @param sensor the {@link Sensor}
+     * @param label the verification name
+     * @return The formatted string
+     */
+    public static String formatAssertionMessage(Sensor sensor, String label) {
+        return String.format("%s | %s, handle: %d", label,
+                SensorTestInformation.getSensorName(sensor.getType()), sensor.getHandle());
+    }
+
+    /**
+     * Format an assertion message with a custom message.
+     *
+     * @param sensor the {@link Sensor}
+     * @param label the verification name
+     * @param format the additional format string
+     * @param params the additional format params
+     * @return The formatted string
+     */
+    public static String formatAssertionMessage(Sensor sensor, String label, String format,
+            Object ... params) {
+        return String.format("%s | %s, handle: %d | %s", label,
+                SensorTestInformation.getSensorName(sensor.getType()), sensor.getHandle(),
+                String.format(format, params));
     }
 
     /**
