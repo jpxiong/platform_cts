@@ -247,4 +247,27 @@ public class StreamingMediaPlayerTest extends MediaPlayerTestBase {
             mServer.shutdown();
         }
     }
+
+    public void testPlayHlsStream() throws Throwable {
+        localHlsTest("hls.m3u8", false);
+    }
+
+    public void testPlayHlsStreamWithQueryString() throws Throwable {
+        localHlsTest("hls.m3u8", true);
+    }
+
+    private void localHlsTest(final String name, boolean appendQueryString)
+            throws Throwable {
+        mServer = new CtsTestServer(mContext);
+        try {
+            String stream_url = mServer.getAssetUrl(name);
+            if (appendQueryString) {
+                stream_url += "?foo=bar/baz";
+            }
+
+            playLiveVideoTest(stream_url, 10);
+        } finally {
+            mServer.shutdown();
+        }
+    }
 }
