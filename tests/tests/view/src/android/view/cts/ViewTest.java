@@ -48,11 +48,13 @@ import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.view.Display;
 import android.view.HapticFeedbackConstants;
+import android.view.InputDevice;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.SoundEffectConstants;
 import android.view.TouchDelegate;
 import android.view.View;
+import android.view.MotionEvent.PointerProperties;
 import android.view.View.BaseSavedState;
 import android.view.View.OnClickListener;
 import android.view.View.OnCreateContextMenuListener;
@@ -3283,6 +3285,57 @@ public class ViewTest extends ActivityInstrumentationTestCase2<ViewTestStubActiv
                 assertTrue(editText.hasCalledCheckInputConnectionProxy());
             }
         });
+    }
+
+    public void testFilterTouchesWhenObscured() throws Throwable {
+        OnTouchListenerImpl touchListener = new OnTouchListenerImpl();
+        View view = new View(mActivity);
+        view.setOnTouchListener(touchListener);
+
+        MotionEvent.PointerProperties[] props = new MotionEvent.PointerProperties[] {
+                new MotionEvent.PointerProperties()
+        };
+        MotionEvent.PointerCoords[] coords = new MotionEvent.PointerCoords[] {
+                new MotionEvent.PointerCoords()
+        };
+        MotionEvent obscuredTouch = MotionEvent.obtain(0, 0, MotionEvent.ACTION_DOWN,
+                1, props, coords, 0, 0, 0, 0, -1, 0, InputDevice.SOURCE_TOUCHSCREEN,
+                MotionEvent.FLAG_WINDOW_IS_OBSCURED);
+        MotionEvent unobscuredTouch = MotionEvent.obtain(0, 0, MotionEvent.ACTION_DOWN,
+                1, props, coords, 0, 0, 0, 0, -1, 0, InputDevice.SOURCE_TOUCHSCREEN,
+                0);
+
+        // Initially filter touches is false so all touches are dispatched.
+        assertFalse(view.getFilterTouchesWhenObscured());
+
+        view.dispatchTouchEvent(unobscuredTouch);
+        assertTrue(touchListener.hasOnTouch());
+        touchListener.reset();
+        view.dispatchTouchEvent(obscuredTouch);
+        assertTrue(touchListener.hasOnTouch());
+        touchListener.reset();
+
+        // Set filter touches to true so only unobscured touches are dispatched.
+        view.setFilterTouchesWhenObscured(true);
+        assertTrue(view.getFilterTouchesWhenObscured());
+
+        view.dispatchTouchEvent(unobscuredTouch);
+        assertTrue(touchListener.hasOnTouch());
+        touchListener.reset();
+        view.dispatchTouchEvent(obscuredTouch);
+        assertFalse(touchListener.hasOnTouch());
+        touchListener.reset();
+
+        // Set filter touches to false so all touches are dispatched.
+        view.setFilterTouchesWhenObscured(false);
+        assertFalse(view.getFilterTouchesWhenObscured());
+
+        view.dispatchTouchEvent(unobscuredTouch);
+        assertTrue(touchListener.hasOnTouch());
+        touchListener.reset();
+        view.dispatchTouchEvent(obscuredTouch);
+        assertTrue(touchListener.hasOnTouch());
+        touchListener.reset();
     }
 
     private static class MockEditText extends EditText {
