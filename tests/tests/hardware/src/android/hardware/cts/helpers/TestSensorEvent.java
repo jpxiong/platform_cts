@@ -51,14 +51,14 @@ public class TestSensorEvent {
     /**
      * Constructor for TestSensorEvent. Exposed for unit testing.
      */
-    TestSensorEvent(Sensor sensor, long timestamp, int accuracy, float[] values) {
+    public TestSensorEvent(Sensor sensor, long timestamp, int accuracy, float[] values) {
         this(sensor, timestamp, timestamp, accuracy, values);
     }
 
     /**
      * Constructor for TestSensorEvent. Exposed for unit testing.
      */
-    TestSensorEvent(Sensor sensor, long timestamp, long receivedTimestamp, int accuracy,
+    public TestSensorEvent(Sensor sensor, long timestamp, long receivedTimestamp, int accuracy,
             float[] values) {
         this.sensor = sensor;
         this.timestamp = timestamp;

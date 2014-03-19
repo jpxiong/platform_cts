@@ -25,7 +25,8 @@ import android.hardware.cts.helpers.SensorTestInformation;
 import android.hardware.cts.helpers.sensoroperations.ParallelSensorOperation;
 import android.hardware.cts.helpers.sensoroperations.RepeatingSensorOperation;
 import android.hardware.cts.helpers.sensoroperations.SequentialSensorOperation;
-import android.hardware.cts.helpers.sensoroperations.VerifySensorOperation;
+import android.hardware.cts.helpers.sensoroperations.TestSensorOperation;
+import android.hardware.cts.helpers.sensorverification.EventOrderingVerification;
 
 import junit.framework.Test;
 import junit.framework.TestSuite;
@@ -96,22 +97,22 @@ public class SensorIntegrationTests extends SensorTestCase {
 
         ParallelSensorOperation operation = new ParallelSensorOperation();
         for(int sensorType : sensorTypes) {
-            VerifySensorOperation continuousOperation = new VerifySensorOperation(
+            TestSensorOperation continuousOperation = new TestSensorOperation(
                     context,
                     sensorType,
                     SensorManager.SENSOR_DELAY_NORMAL,
                     0 /* reportLatencyInUs */,
                     100 /* event count */);
-            continuousOperation.verifyEventOrdering();
+            continuousOperation.addVerification(new EventOrderingVerification());
             operation.add(new RepeatingSensorOperation(continuousOperation, ITERATIONS));
 
-            VerifySensorOperation batchingOperation = new VerifySensorOperation(
+            TestSensorOperation batchingOperation = new TestSensorOperation(
                     context,
                     sensorType,
                     SensorTestInformation.getMaxSamplingRateInUs(context, sensorType),
                     SensorCtsHelper.getSecondsAsMicroSeconds(BATCHING_RATE_IN_SECONDS),
                     100);
-            batchingOperation.verifyEventOrdering();
+            batchingOperation.addVerification(new EventOrderingVerification());
             operation.add(new RepeatingSensorOperation(batchingOperation, ITERATIONS));
         }
         operation.execute();
@@ -154,13 +155,13 @@ public class SensorIntegrationTests extends SensorTestCase {
             for(int instance = 0; instance < INSTANCES_TO_USE; ++instance) {
                 SequentialSensorOperation sequentialOperation = new SequentialSensorOperation();
                 for(int iteration = 0; iteration < ITERATIONS_TO_EXECUTE; ++iteration) {
-                    VerifySensorOperation sensorOperation = new VerifySensorOperation(
+                    TestSensorOperation sensorOperation = new TestSensorOperation(
                             this.getContext(),
                             sensorType,
                             this.generateSamplingRateInUs(sensorType),
                             this.generateReportLatencyInUs(),
                             100);
-                    sensorOperation.verifyEventOrdering();
+                    sensorOperation.addVerification(new EventOrderingVerification());
                     sequentialOperation.add(sensorOperation);
                 }
                 operation.add(sequentialOperation);
@@ -218,21 +219,21 @@ public class SensorIntegrationTests extends SensorTestCase {
     public void testSensorStoppingInteraction() throws Throwable {
         Context context = this.getContext();
 
-        VerifySensorOperation tester = new VerifySensorOperation(
+        TestSensorOperation tester = new TestSensorOperation(
                 context,
                 mSensorTypeTester,
                 SensorManager.SENSOR_DELAY_NORMAL,
                 0 /*reportLatencyInUs*/,
                 100 /* event count */);
-        tester.verifyEventOrdering();
+        tester.addVerification(new EventOrderingVerification());
 
-        VerifySensorOperation testee = new VerifySensorOperation(
+        TestSensorOperation testee = new TestSensorOperation(
                 context,
                 mSensorTypeTestee,
                 SensorManager.SENSOR_DELAY_UI,
                 0 /*reportLatencyInUs*/,
                 100 /* event count */);
-        testee.verifyEventOrdering();
+        testee.addVerification(new EventOrderingVerification());
 
         ParallelSensorOperation operation = new ParallelSensorOperation();
         operation.add(tester, testee);
