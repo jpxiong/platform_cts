@@ -19,8 +19,9 @@ package com.android.cts.verifier.sensors;
 import android.graphics.Color;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener2;
 import android.hardware.SensorManager;
-import android.hardware.cts.helpers.SensorManagerTestVerifier;
+import android.hardware.cts.helpers.TestSensorManager;
 import android.hardware.cts.helpers.sensoroperations.VerifySensorOperation;
 
 /**
@@ -42,27 +43,34 @@ public class MagneticFieldMeasurementTestActivity extends BaseSensorSemiAutomate
     }
 
     private void calibrateMagnetometer() {
-        SensorManagerTestVerifier magnetometer = new SensorManagerTestVerifier(
-                this.getApplicationContext(),
-                Sensor.TYPE_MAGNETIC_FIELD,
-                SensorManager.SENSOR_DELAY_NORMAL,
-                0 /*reportLatencyInUs*/) {
+        SensorEventListener2 listener = new SensorEventListener2() {
             @Override
             public void onSensorChanged(SensorEvent event) {
                 float values[] = event.values;
                 clearText();
-                appendText(
-                        "Please calibrate the Magnetometer by moving it in 8 shapes in different " +
-                                "orientations.");
-                appendText(
-                        String.format("->  (%.2f, %.2f, %.2f) uT", values[0], values[1], values[2]),
-                        Color.GRAY);
+                appendText("Please calibrate the Magnetometer by moving it in 8 shapes in "
+                        + "different orientations.");
+                appendText(String.format("->  (%.2f, %.2f, %.2f) uT", values[0], values[1],
+                        values[2]), Color.GRAY);
                 appendText("Then leave the device in a flat surface and press Next...\n");
             }
+
+            @Override
+            public void onAccuracyChanged(Sensor sensor, int accuracy) {}
+
+            @Override
+            public void onFlushCompleted(Sensor sensor) {}
         };
-        magnetometer.registerListener();
-        waitForUser();
-        magnetometer.unregisterListener();
+
+        TestSensorManager magnetometer = new TestSensorManager(
+                this.getApplicationContext(), Sensor.TYPE_MAGNETIC_FIELD,
+                SensorManager.SENSOR_DELAY_NORMAL, 0, listener);
+        try {
+            magnetometer.registerListener();
+            waitForUser();
+        } finally {
+            magnetometer.unregisterListener();
+        }
     }
 
     /**
