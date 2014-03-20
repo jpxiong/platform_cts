@@ -39,10 +39,6 @@ public interface ITestPackageDef {
      * Creates a runnable {@link IRemoteTest} from info stored in this definition.
      *
      * @param testCaseDir {@link File} representing directory of test case data
-     * @param className the test class to restrict this run to or <code>null</code> to run all tests
-     *            in package
-     * @param methodName the optional test method to restrict this run to, or <code>null</code> to
-     *            run all tests in class/package
      * @return a {@link IRemoteTest} with all necessary data populated to run the test or
      *         <code>null</code> if test could not be created
      */
