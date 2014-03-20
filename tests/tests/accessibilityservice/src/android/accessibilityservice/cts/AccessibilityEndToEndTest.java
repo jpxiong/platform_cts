@@ -46,10 +46,8 @@ public class AccessibilityEndToEndTest extends
 
     /**
      * Creates a new instance for testing {@link AccessibilityEndToEndActivity}.
-     *
-     * @throws Exception If any error occurs.
      */
-    public AccessibilityEndToEndTest() throws Exception {
+    public AccessibilityEndToEndTest() {
         super(AccessibilityEndToEndActivity.class);
     }
 
