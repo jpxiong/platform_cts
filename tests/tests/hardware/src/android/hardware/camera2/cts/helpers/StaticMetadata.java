@@ -21,6 +21,8 @@ import android.hardware.camera2.CameraMetadata;
 import android.hardware.camera2.CameraMetadata.Key;
 import android.util.Log;
 
+import junit.framework.Assert;
+
 import java.lang.reflect.Array;
 
 /**
@@ -41,29 +43,83 @@ public class StaticMetadata {
     private static final int SENSOR_INFO_EXPOSURE_TIME_RANGE_MIN = 0;
     private static final int SENSOR_INFO_EXPOSURE_TIME_RANGE_MAX = 1;
     private static final long SENSOR_INFO_EXPOSURE_TIME_RANGE_MIN_AT_MOST = 100000L; // 100us
-    private static final long SENSOR_INFO_EXPOSURE_TIME_RANGE_MAX_AT_LEAST = 1000000000; // 1s
+    private static final long SENSOR_INFO_EXPOSURE_TIME_RANGE_MAX_AT_LEAST = 100000000; // 100ms
     private static final int SENSOR_INFO_SENSITIVITY_RANGE_SIZE = 2;
     private static final int SENSOR_INFO_SENSITIVITY_RANGE_MIN = 0;
     private static final int SENSOR_INFO_SENSITIVITY_RANGE_MAX = 1;
     private static final int SENSOR_INFO_SENSITIVITY_RANGE_MIN_AT_MOST = 100;
     private static final int SENSOR_INFO_SENSITIVITY_RANGE_MAX_AT_LEAST = 1600;
 
-
     // TODO: Consider making this work across any metadata object, not just camera characteristics
     private final CameraCharacteristics mCharacteristics;
+    private final CheckLevel mLevel;
+    private final CameraErrorCollector mCollector;
+
+    public enum CheckLevel {
+        /** Only log warnings for metadata check failures. Execution continues. */
+        WARN,
+        /**
+         * Use ErrorCollector to collect the metadata check failures, Execution
+         * continues.
+         */
+        COLLECT,
+        /** Assert the metadata check failures. Execution aborts. */
+        ASSERT
+    }
 
     /**
      * Construct a new StaticMetadata object.
+     *
+     *<p> Default constructor, only log warnings for the static metadata check failures</p>
      *
      * @param characteristics static info for a camera
      * @throws IllegalArgumentException if characteristics was null
      */
     public StaticMetadata(CameraCharacteristics characteristics) {
+        this(characteristics, CheckLevel.WARN, /*collector*/null);
+    }
+
+    /**
+     * Construct a new StaticMetadata object with {@link CameraErrorCollector}.
+     * <p>
+     * When level is not {@link CheckLevel.COLLECT}, the {@link CameraErrorCollector} will be
+     * ignored, otherwise, it will be used to log the check failures.
+     * </p>
+     *
+     * @param characteristics static info for a camera
+     * @param collector The {@link CameraErrorCollector} used by this StaticMetadata
+     * @throws IllegalArgumentException if characteristics or collector was null.
+     */
+    public StaticMetadata(CameraCharacteristics characteristics, CameraErrorCollector collector) {
+        this(characteristics, CheckLevel.COLLECT, collector);
+    }
+
+    /**
+     * Construct a new StaticMetadata object with {@link CheckLevel} and
+     * {@link CameraErrorCollector}.
+     * <p>
+     * When level is not {@link CheckLevel.COLLECT}, the {@link CameraErrorCollector} will be
+     * ignored, otherwise, it will be used to log the check failures.
+     * </p>
+     *
+     * @param characteristics static info for a camera
+     * @param level The {@link CheckLevel} of this StaticMetadata
+     * @param collector The {@link CameraErrorCollector} used by this StaticMetadata
+     * @throws IllegalArgumentException if characteristics was null or level was
+     *         {@link CheckLevel.COLLECT} but collector was null.
+     */
+    public StaticMetadata(CameraCharacteristics characteristics, CheckLevel level,
+            CameraErrorCollector collector) {
         if (characteristics == null) {
             throw new IllegalArgumentException("characteristics was null");
         }
+        if (level == CheckLevel.COLLECT && collector == null) {
+            throw new IllegalArgumentException("collector must valid when COLLECT level is set");
+        }
 
         mCharacteristics = characteristics;
+        mLevel = level;
+        mCollector = collector;
     }
 
     /**
@@ -122,14 +178,14 @@ public class StaticMetadata {
         long minExposure = getExposureMinimumOrDefault(Long.MAX_VALUE);
         long maxExposure = getExposureMaximumOrDefault(Long.MIN_VALUE);
         if (minExposure > SENSOR_INFO_EXPOSURE_TIME_RANGE_MIN_AT_MOST) {
-            warnOnKey(CameraCharacteristics.SENSOR_INFO_EXPOSURE_TIME_RANGE,
+            failKeyCheck(CameraCharacteristics.SENSOR_INFO_EXPOSURE_TIME_RANGE,
                     String.format(
                     "Min value %d is too large, set to maximal legal value %d",
                     minExposure, SENSOR_INFO_EXPOSURE_TIME_RANGE_MIN_AT_MOST));
             minExposure = SENSOR_INFO_EXPOSURE_TIME_RANGE_MIN_AT_MOST;
         }
         if (maxExposure < SENSOR_INFO_EXPOSURE_TIME_RANGE_MAX_AT_LEAST) {
-            warnOnKey(CameraCharacteristics.SENSOR_INFO_EXPOSURE_TIME_RANGE,
+            failKeyCheck(CameraCharacteristics.SENSOR_INFO_EXPOSURE_TIME_RANGE,
                     String.format(
                     "Max value %d is too small, set to minimal legal value %d",
                     maxExposure, SENSOR_INFO_EXPOSURE_TIME_RANGE_MAX_AT_LEAST));
@@ -137,6 +193,32 @@ public class StaticMetadata {
         }
 
         return Math.max(minExposure, Math.min(maxExposure, exposure));
+    }
+
+    /**
+     * Get the available anti-banding modes.
+     *
+     * @return The array contains available anti-banding modes.
+     */
+    public byte[] getAeAvailableAntiBandingModesChecked() {
+        CameraMetadata.Key<byte[]> key =
+                CameraCharacteristics.CONTROL_AE_AVAILABLE_ANTIBANDING_MODES;
+        byte[] modes = getValueFromKeyNonNull(key);
+
+        boolean foundAuto = false;
+        for (byte mode : modes) {
+            checkTrueForKey(key, "mode value " + mode + " is out if range",
+                    mode >= CameraMetadata.CONTROL_AE_ANTIBANDING_MODE_OFF ||
+                    mode <= CameraMetadata.CONTROL_AE_ANTIBANDING_MODE_AUTO);
+            if (mode == CameraMetadata.CONTROL_AE_ANTIBANDING_MODE_AUTO) {
+                foundAuto = true;
+                return modes;
+            }
+        }
+        // Must contain AUTO mode.
+        checkTrueForKey(key, "AUTO mode is missing", foundAuto);
+
+        return modes;
     }
 
     /**
@@ -149,14 +231,14 @@ public class StaticMetadata {
         int minSensitivity = getSensitivityMinimumOrDefault(Integer.MAX_VALUE);
         int maxSensitivity = getSensitivityMaximumOrDefault(Integer.MIN_VALUE);
         if (minSensitivity > SENSOR_INFO_SENSITIVITY_RANGE_MIN_AT_MOST) {
-            warnOnKey(CameraCharacteristics.SENSOR_INFO_SENSITIVITY_RANGE,
+            failKeyCheck(CameraCharacteristics.SENSOR_INFO_SENSITIVITY_RANGE,
                     String.format(
                     "Min value %d is too large, set to maximal legal value %d",
                     minSensitivity, SENSOR_INFO_SENSITIVITY_RANGE_MIN_AT_MOST));
             minSensitivity = SENSOR_INFO_SENSITIVITY_RANGE_MIN_AT_MOST;
         }
         if (maxSensitivity < SENSOR_INFO_SENSITIVITY_RANGE_MAX_AT_LEAST) {
-            warnOnKey(CameraCharacteristics.SENSOR_INFO_SENSITIVITY_RANGE,
+            failKeyCheck(CameraCharacteristics.SENSOR_INFO_SENSITIVITY_RANGE,
                     String.format(
                     "Max value %d is too small, set to minimal legal value %d",
                     maxSensitivity, SENSOR_INFO_SENSITIVITY_RANGE_MAX_AT_LEAST));
@@ -260,7 +342,7 @@ public class StaticMetadata {
                 size);
 
         if (elementValue == null) {
-            warnOnKey(key,
+            failKeyCheck(key,
                     "had no valid " + name + " value; using default of " + defaultValue);
             elementValue = defaultValue;
         }
@@ -308,7 +390,7 @@ public class StaticMetadata {
         if (size != IGNORE_SIZE_CHECK) {
             int actualLength = Array.getLength(array);
             if (actualLength != size) {
-                warnOnKey(key,
+                failKeyCheck(key,
                         String.format("had the wrong number of elements (%d), expected (%d)",
                                 actualLength, size));
                 return null;
@@ -319,7 +401,7 @@ public class StaticMetadata {
         T val = (T) Array.get(array, element);
 
         if (val == null) {
-            warnOnKey(key, "had a null element at index" + element);
+            failKeyCheck(key, "had a null element at index" + element);
             return null;
         }
 
@@ -337,15 +419,33 @@ public class StaticMetadata {
         T value = mCharacteristics.get(key);
 
         if (value == null) {
-            warnOnKey(key, "was null");
+            failKeyCheck(key, "was null");
         }
 
         return value;
     }
 
-    private static  <T> void warnOnKey(Key<T> key, String message) {
+    private <T> void checkTrueForKey(Key<T> key, String message, boolean condition) {
+        if (!condition) {
+            failKeyCheck(key, message);
+        }
+    }
+
+    private <T> void failKeyCheck(Key<T> key, String message) {
         // TODO: Consider only warning once per key/message combination if it's too spammy.
         // TODO: Consider offering other options such as throwing an assertion exception
-        Log.w(TAG, String.format("The static info key '%s' %s", key.getName(), message));
+        String failureCause = String.format("The static info key '%s' %s", key.getName(), message);
+        switch (mLevel) {
+            case WARN:
+                Log.w(TAG, failureCause);
+                break;
+            case COLLECT:
+                mCollector.addMessage(failureCause);
+                break;
+            case ASSERT:
+                Assert.fail(failureCause);
+            default:
+                throw new UnsupportedOperationException("Unhandled level " + mLevel);
+        }
     }
 }

@@ -17,6 +17,7 @@
 package android.hardware.camera2.cts.testcases;
 
 import static android.hardware.camera2.cts.CameraTestUtils.*;
+import static com.android.ex.camera2.blocking.BlockingStateListener.STATE_CLOSED;
 
 import android.os.Handler;
 import android.os.HandlerThread;
@@ -33,7 +34,9 @@ import android.hardware.camera2.Size;
 import android.hardware.camera2.CameraDevice.CaptureListener;
 import android.hardware.camera2.cts.Camera2SurfaceViewStubActivity;
 import android.hardware.camera2.cts.CameraTestUtils;
+import android.hardware.camera2.cts.helpers.CameraErrorCollector;
 import android.hardware.camera2.cts.helpers.StaticMetadata;
+import android.hardware.camera2.cts.helpers.StaticMetadata.CheckLevel;
 
 import com.android.ex.camera2.blocking.BlockingStateListener;
 
@@ -65,6 +68,7 @@ public class Camera2SurfaceViewTestCase extends
     protected HandlerThread mHandlerThread;
     protected Handler mHandler;
     protected BlockingStateListener mCameraListener;
+    protected CameraErrorCollector mCollector;
     // Per device fields:
     protected StaticMetadata mStaticInfo;
     protected CameraDevice mCamera;
@@ -89,6 +93,7 @@ public class Camera2SurfaceViewTestCase extends
         mHandlerThread.start();
         mHandler = new Handler(mHandlerThread.getLooper());
         mCameraListener = new BlockingStateListener();
+        mCollector = new CameraErrorCollector();
     }
 
     @Override
@@ -98,16 +103,29 @@ public class Camera2SurfaceViewTestCase extends
         mHandler = null;
         mCameraListener = null;
 
-        super.tearDown();
+        try {
+            mCollector.verify();
+        } catch (Throwable e) {
+            // When new Exception(e) is used, exception info will be printed twice.
+            throw new Exception(e.getMessage());
+        } finally {
+            super.tearDown();
+        }
     }
 
     /**
-     * Start camera preview by using the given request, preview size and capture listener.
+     * Start camera preview by using the given request, preview size and capture
+     * listener.
+     * <p>
+     * If preview is already started, calling this function will stop the
+     * current preview stream and start a new preview stream with given
+     * parameters. No need to call stopPreview between two startPreview calls.
+     * </p>
      *
      * @param request The request builder used to start the preview.
      * @param previewSz The size of the camera device output preview stream.
-     * @param listener The callbacks the camera device will notify when preview capture is
-     * available.
+     * @param listener The callbacks the camera device will notify when preview
+     *            capture is available.
      */
     protected void startPreview(CaptureRequest.Builder request, Size previewSz,
             CaptureListener listener) throws Exception {
@@ -159,7 +177,9 @@ public class Camera2SurfaceViewTestCase extends
     protected void openDevice(String cameraId) throws Exception {
         mCamera = CameraTestUtils.openCamera(
                 mCameraManager, cameraId, mCameraListener, mHandler);
-        mStaticInfo = new StaticMetadata(mCameraManager.getCameraCharacteristics(cameraId));
+        mCollector.setCameraId(cameraId);
+        mStaticInfo = new StaticMetadata(mCameraManager.getCameraCharacteristics(cameraId),
+                CheckLevel.ASSERT, /*collector*/null);
     }
 
     /**
@@ -168,6 +188,7 @@ public class Camera2SurfaceViewTestCase extends
     protected void closeDevice() {
         if (mCamera != null) {
             mCamera.close();
+            mCameraListener.waitForState(STATE_CLOSED, CAMERA_CLOSE_TIMEOUT_MS);
             mCamera = null;
         }
         mStaticInfo = null;

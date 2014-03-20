@@ -28,6 +28,7 @@ import android.hardware.camera2.Size;
 import android.hardware.camera2.cts.CameraTestUtils;
 import android.hardware.camera2.cts.helpers.CameraErrorCollector;
 import android.hardware.camera2.cts.helpers.StaticMetadata;
+import android.hardware.camera2.cts.helpers.StaticMetadata.CheckLevel;
 import android.media.Image;
 import android.media.ImageReader;
 import android.os.Environment;
@@ -94,9 +95,9 @@ public class Camera2AndroidTestCase extends AndroidTestCase {
         } catch (Throwable e) {
             // When new Exception(e) is used, exception info will be printed twice.
             throw new Exception(e.getMessage());
+        } finally {
+            super.tearDown();
         }
-
-        super.tearDown();
     }
 
     /**
@@ -158,7 +159,9 @@ public class Camera2AndroidTestCase extends AndroidTestCase {
     protected void openDevice(String cameraId, BlockingStateListener listener) throws Exception {
         mCamera = CameraTestUtils.openCamera(
                 mCameraManager, cameraId, listener, mHandler);
-        mStaticInfo = new StaticMetadata(mCameraManager.getCameraCharacteristics(cameraId));
+        mCollector.setCameraId(cameraId);
+        mStaticInfo = new StaticMetadata(mCameraManager.getCameraCharacteristics(cameraId),
+                CheckLevel.ASSERT, /*collector*/null);
         if (VERBOSE) {
             Log.v(TAG, "Camera " + cameraId + " is opened");
         }
