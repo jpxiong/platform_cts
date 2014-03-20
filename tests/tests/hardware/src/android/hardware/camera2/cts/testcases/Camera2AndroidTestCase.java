@@ -40,6 +40,8 @@ import android.view.Surface;
 
 import com.android.ex.camera2.blocking.BlockingStateListener;
 
+import java.util.List;
+
 public class Camera2AndroidTestCase extends AndroidTestCase {
     private static final String TAG = "Camera2AndroidTestCase";
     private static final boolean VERBOSE = Log.isLoggable(TAG, Log.VERBOSE);
@@ -60,6 +62,9 @@ public class Camera2AndroidTestCase extends AndroidTestCase {
     protected HandlerThread mHandlerThread;
     protected StaticMetadata mStaticInfo;
     protected CameraErrorCollector mCollector;
+    protected List<Size> mOrderedPreviewSizes; // In descending order.
+    protected List<Size> mOrderedVideoSizes; // In descending order.
+    protected List<Size> mOrderedStillSizes; // In descending order.
 
     @Override
     public void setContext(Context context) {
@@ -162,6 +167,11 @@ public class Camera2AndroidTestCase extends AndroidTestCase {
         mCollector.setCameraId(cameraId);
         mStaticInfo = new StaticMetadata(mCameraManager.getCameraCharacteristics(cameraId),
                 CheckLevel.ASSERT, /*collector*/null);
+        mOrderedPreviewSizes = getSupportedPreviewSizes(
+                cameraId, mCameraManager, PREVIEW_SIZE_BOUND);
+        mOrderedVideoSizes = getSupportedVideoSizes(cameraId, mCameraManager, PREVIEW_SIZE_BOUND);
+        mOrderedStillSizes = getSupportedStillSizes(cameraId, mCameraManager, null);
+
         if (VERBOSE) {
             Log.v(TAG, "Camera " + cameraId + " is opened");
         }
@@ -201,6 +211,9 @@ public class Camera2AndroidTestCase extends AndroidTestCase {
             listener.waitForState(STATE_CLOSED, CAMERA_CLOSE_TIMEOUT_MS);
             mCamera = null;
             mStaticInfo = null;
+            mOrderedPreviewSizes = null;
+            mOrderedVideoSizes = null;
+            mOrderedStillSizes = null;
 
             if (VERBOSE) {
                 Log.v(TAG, "Camera " + cameraId + " is closed");
@@ -209,7 +222,7 @@ public class Camera2AndroidTestCase extends AndroidTestCase {
     }
 
     /**
-     * Create an {@link #ImageReader} object and get the surface.
+     * Create an {@link ImageReader} object and get the surface.
      *
      * @param size The size of this ImageReader to be created.
      * @param format The format of this ImageReader to be created
@@ -227,7 +240,7 @@ public class Camera2AndroidTestCase extends AndroidTestCase {
     }
 
     /**
-     * Close the pending images then close current active {@link #ImageReader} object.
+     * Close the pending images then close current active {@link ImageReader} object.
      */
     protected void closeImageReader() {
         if (mReader != null) {

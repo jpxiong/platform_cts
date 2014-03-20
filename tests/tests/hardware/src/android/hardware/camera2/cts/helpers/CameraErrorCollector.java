@@ -127,6 +127,10 @@ public class CameraErrorCollector extends ErrorCollector {
         return true;
     }
 
+    public void expectNotNull(String msg, Object obj) {
+        checkThat(msg, obj, CoreMatchers.notNullValue());
+    }
+
     /**
      * Check if the key value is not null and return the value.
      *

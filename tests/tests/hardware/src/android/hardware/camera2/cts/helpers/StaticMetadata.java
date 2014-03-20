@@ -24,6 +24,8 @@ import android.util.Log;
 import junit.framework.Assert;
 
 import java.lang.reflect.Array;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Helpers to get common static info out of the camera.
@@ -370,6 +372,69 @@ public class StaticMetadata {
      */
     public long getExposureMaximumOrDefault() {
         return getExposureMaximumOrDefault(SENSOR_INFO_EXPOSURE_TIME_RANGE_MAX_AT_LEAST);
+    }
+
+    /**
+     * Get aeAvailableModes and do the sanity check.
+     *
+     * <p>Depending on the check level this class has, for WAR or COLLECT levels,
+     * If the aeMode list is invalid, return an empty mode array. The the caller doesn't
+     * have to abort the execution even the aeMode list is invalid.</p>
+     * @return AE available modes
+     */
+    public byte[] getAeAvailableModesChecked() {
+        CameraMetadata.Key<byte[]> modesKey = CameraCharacteristics.CONTROL_AE_AVAILABLE_MODES;
+        byte[] modes = getValueFromKeyNonNull(modesKey);
+        if (modes == null) {
+            modes = new byte[0];
+        }
+        List<Integer> modeList = new ArrayList<Integer>();
+        for (byte mode : modes) {
+            modeList.add((int)(mode));
+        }
+        checkTrueForKey(modesKey, "value is empty", !modeList.isEmpty());
+
+        // All camera device must support ON
+        checkTrueForKey(modesKey, "values " + modeList.toString() + " must contain ON mode",
+                modeList.contains(CameraMetadata.CONTROL_AE_MODE_ON));
+
+        // All camera devices with flash units support ON_AUTO_FLASH and ON_ALWAYS_FLASH
+        CameraMetadata.Key<Boolean> flashKey= CameraCharacteristics.FLASH_INFO_AVAILABLE;
+        Boolean hasFlash = getValueFromKeyNonNull(flashKey);
+        if (hasFlash == null) {
+            hasFlash = false;
+        }
+        if (hasFlash) {
+            boolean flashModeConsistentWithFlash =
+                    modeList.contains(CameraMetadata.CONTROL_AE_MODE_ON_AUTO_FLASH) &&
+                    modeList.contains(CameraMetadata.CONTROL_AE_MODE_ON_ALWAYS_FLASH);
+            checkTrueForKey(modesKey,
+                    "value must contain ON_AUTO_FLASH and ON_ALWAYS_FLASH and  when flash is" +
+                    "available", flashModeConsistentWithFlash);
+        } else {
+            boolean flashModeConsistentWithoutFlash =
+                    !(modeList.contains(CameraMetadata.CONTROL_AE_MODE_ON_AUTO_FLASH) ||
+                    modeList.contains(CameraMetadata.CONTROL_AE_MODE_ON_ALWAYS_FLASH) ||
+                    modeList.contains(CameraMetadata.CONTROL_AE_MODE_ON_AUTO_FLASH_REDEYE));
+            checkTrueForKey(modesKey,
+                    "value must not contain ON_AUTO_FLASH, ON_ALWAYS_FLASH and" +
+                    "ON_AUTO_FLASH_REDEYE when flash is unavailable",
+                    flashModeConsistentWithoutFlash);
+        }
+
+        // FULL mode camera devices always support OFF mode.
+        boolean condition =
+                !isHardwareLevelFull() || modeList.contains(CameraMetadata.CONTROL_AE_MODE_OFF);
+        checkTrueForKey(modesKey, "Full capability device must have OFF mode", condition);
+
+        // Boundary check.
+        for (byte mode : modes) {
+            checkTrueForKey(modesKey, "Value " + mode + " is out of bound",
+                    mode >= CameraMetadata.CONTROL_AE_MODE_OFF
+                    && mode <= CameraMetadata.CONTROL_AE_MODE_ON_AUTO_FLASH_REDEYE);
+        }
+
+        return modes;
     }
 
     /**

@@ -96,6 +96,34 @@ public class CameraTestUtils extends Assert {
         }
     }
 
+    public static class SimpleImageReaderListener
+            implements ImageReader.OnImageAvailableListener {
+        private final LinkedBlockingQueue<Image> mQueue =
+                new LinkedBlockingQueue<Image>();
+
+        @Override
+        public void onImageAvailable(ImageReader reader) {
+            try {
+                mQueue.put(reader.acquireNextImage());
+            } catch (InterruptedException e) {
+                throw new UnsupportedOperationException(
+                        "Can't handle InterruptedException in onImageAvailable");
+            }
+        }
+
+        /**
+         * Get an image from the image reader.
+         *
+         * @param timeout Timeout value for the wait.
+         * @return The image from the image reader.
+         */
+        public Image getImage(long timeout) throws InterruptedException {
+            Image image = mQueue.poll(timeout, TimeUnit.MILLISECONDS);
+            assertNotNull("Wait for an image timed out in " + timeout + "ms", image);
+            return image;
+        }
+    }
+
     public static class SimpleCaptureListener extends CameraDevice.CaptureListener {
         private final LinkedBlockingQueue<CaptureResult> mQueue =
                 new LinkedBlockingQueue<CaptureResult>();
@@ -401,26 +429,35 @@ public class CameraTestUtils extends Assert {
      */
     static public List<Size> getSupportedPreviewSizes(String cameraId,
             CameraManager cameraManager, Size bound) throws CameraAccessException {
+        return getSortedSizesForFormat(cameraId, cameraManager, ImageFormat.YUV_420_888, bound);
+    }
+
+    /**
+     * Get sorted (descending order) size list for given format. Remove the sizes larger than
+     * the bound. If the bound is null, don't do the size bound filtering.
+     */
+    static private List<Size> getSortedSizesForFormat(String cameraId,
+            CameraManager cameraManager, int format, Size bound) throws CameraAccessException {
         Comparator<Size> comparator = new SizeComparator();
-        Size[] sizes = getSupportedSizeForFormat(ImageFormat.YUV_420_888, cameraId, cameraManager);
-        List<Size> supportedPreviewSizes = null;
+        Size[] sizes = getSupportedSizeForFormat(format, cameraId, cameraManager);
+        List<Size> sortedSizes = null;
         if (bound != null) {
-            supportedPreviewSizes = new ArrayList<Size>(/*capacity*/1);
+            sortedSizes = new ArrayList<Size>(/*capacity*/1);
             for (Size sz : sizes) {
                 if (comparator.compare(sz, bound) <= 0) {
-                    supportedPreviewSizes.add(sz);
+                    sortedSizes.add(sz);
                 }
             }
         } else {
-            supportedPreviewSizes = Arrays.asList(sizes);
+            sortedSizes = Arrays.asList(sizes);
         }
-        assertTrue("Supported preview size should have at least one element",
-                supportedPreviewSizes.size() > 0);
+        assertTrue("Supported size list should have at least one element",
+                sortedSizes.size() > 0);
 
-        Collections.sort(supportedPreviewSizes, comparator);
+        Collections.sort(sortedSizes, comparator);
         // Make it in descending order.
-        Collections.reverse(supportedPreviewSizes);
-        return supportedPreviewSizes;
+        Collections.reverse(sortedSizes);
+        return sortedSizes;
     }
 
     /**
@@ -433,7 +470,20 @@ public class CameraTestUtils extends Assert {
      */
     static public List<Size> getSupportedVideoSizes(String cameraId,
             CameraManager cameraManager, Size bound) throws CameraAccessException {
-        return getSupportedPreviewSizes(cameraId, cameraManager, bound);
+        return getSortedSizesForFormat(cameraId, cameraManager, ImageFormat.YUV_420_888, bound);
+    }
+
+    /**
+     * Get supported video size list (descending order) for a given camera device.
+     *
+     * <p>
+     * Filter out the sizes that are larger than the bound. If the bound is
+     * null, don't do the size bound filtering.
+     * </p>
+     */
+    static public List<Size> getSupportedStillSizes(String cameraId,
+            CameraManager cameraManager, Size bound) throws CameraAccessException {
+        return getSortedSizesForFormat(cameraId, cameraManager, ImageFormat.JPEG, bound);
     }
 
     static public Size getMinPreviewSize(String cameraId, CameraManager cameraManager)
@@ -459,6 +509,7 @@ public class CameraTestUtils extends Assert {
         List<Size> sizes = getSupportedPreviewSizes(cameraId, cameraManager, bound);
         return sizes.get(0);
     }
+
     /**
      * Get the largest size by area.
      *

@@ -19,6 +19,8 @@ package android.hardware.camera2.cts.testcases;
 import static android.hardware.camera2.cts.CameraTestUtils.*;
 import static com.android.ex.camera2.blocking.BlockingStateListener.STATE_CLOSED;
 
+import android.media.Image;
+import android.media.ImageReader;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.Looper;
@@ -27,6 +29,8 @@ import android.util.Log;
 import android.view.Surface;
 import android.view.SurfaceHolder;
 import android.content.Context;
+import android.graphics.ImageFormat;
+import android.hardware.camera2.CameraAccessException;
 import android.hardware.camera2.CameraDevice;
 import android.hardware.camera2.CameraManager;
 import android.hardware.camera2.CaptureRequest;
@@ -58,6 +62,7 @@ public class Camera2SurfaceViewTestCase extends
     private static final String TAG = "SurfaceViewTestCase";
     private static final boolean VERBOSE = Log.isLoggable(TAG, Log.VERBOSE);
     private static final int WAIT_FOR_SURFACE_CHANGE_TIMEOUT_MS = 1000;
+    private static final int MAX_READER_IMAGES = 5;
 
     private Size mPreviewSize;
     private Surface mPreviewSurface;
@@ -72,6 +77,11 @@ public class Camera2SurfaceViewTestCase extends
     // Per device fields:
     protected StaticMetadata mStaticInfo;
     protected CameraDevice mCamera;
+    protected ImageReader mReader;
+    protected Surface mReaderSurface;
+    protected List<Size> mOrderedPreviewSizes; // In descending order.
+    protected List<Size> mOrderedVideoSizes; // In descending order.
+    protected List<Size> mOrderedStillSizes; // In descending order.
 
     public Camera2SurfaceViewTestCase() {
         super(Camera2SurfaceViewStubActivity.class);
@@ -129,37 +139,31 @@ public class Camera2SurfaceViewTestCase extends
      */
     protected void startPreview(CaptureRequest.Builder request, Size previewSz,
             CaptureListener listener) throws Exception {
-        if (!previewSz.equals(mPreviewSize)) {
-            mPreviewSize = previewSz;
-            Camera2SurfaceViewStubActivity stubActivity = getActivity();
-            final SurfaceHolder holder = getActivity().getSurfaceView().getHolder();
-            Handler handler = new Handler(Looper.getMainLooper());
-            handler.post(new Runnable() {
-                @Override
-                public void run() {
-                    holder.setFixedSize(mPreviewSize.getWidth(), mPreviewSize.getHeight());
-                }
-            });
-
-            boolean res = stubActivity.waitForSurfaceSizeChanged(
-                    WAIT_FOR_SURFACE_CHANGE_TIMEOUT_MS, mPreviewSize.getWidth(), mPreviewSize.getHeight());
-            assertTrue("wait for surface change to " + mPreviewSize.toString() + " timed out", res);
-            mPreviewSurface = holder.getSurface();
-            assertTrue("Preview surface is invalid", mPreviewSurface.isValid());
-        }
-
+        // Update preview size.
+        updatePreviewSurface(previewSz);
         if (VERBOSE) {
             Log.v(TAG, "start preview with size " + mPreviewSize.toString());
         }
 
+        configurePreviewOutput(request);
+
+        mCamera.setRepeatingRequest(request.build(), listener, mHandler);
+    }
+
+    /**
+     * Configure the preview output stream.
+     *
+     * @param request The request to be configured with preview surface
+     */
+    protected void configurePreviewOutput(CaptureRequest.Builder request)
+            throws CameraAccessException {
         List<Surface> outputSurfaces = new ArrayList<Surface>(/*capacity*/1);
         outputSurfaces.add(mPreviewSurface);
         configureCameraOutputs(mCamera, outputSurfaces, mCameraListener);
 
         request.addTarget(mPreviewSurface);
-
-        mCamera.setRepeatingRequest(request.build(), listener, mHandler);
     }
+
     /**
      * Stop preview for current camera device.
      */
@@ -167,6 +171,77 @@ public class Camera2SurfaceViewTestCase extends
         if (VERBOSE) Log.v(TAG, "Stopping preview and waiting for idle");
         // Stop repeat, wait for captures to complete, and disconnect from surfaces
         configureCameraOutputs(mCamera, /*outputSurfaces*/null, mCameraListener);
+    }
+
+    /**
+     * Setup still capture configuration and start preview.
+     *
+     * @param request The capture request to be captured
+     * @param previewSz Preview size
+     * @param stillSz Still capture size
+     * @param resultListener Capture result listener
+     * @param imageListener Still capture image listener
+     */
+    protected void prepareStillCaptureAndStartPreview(CaptureRequest.Builder request,
+            Size previewSz, Size stillSz, CaptureListener resultListener,
+            ImageReader.OnImageAvailableListener imageListener) throws Exception {
+        if (VERBOSE) {
+            Log.v(TAG, String.format("Prepare still (%s) and preview (%s)", previewSz.toString(),
+                    stillSz.toString()));
+        }
+
+        // Update preview size.
+        updatePreviewSurface(previewSz);
+
+        // Create ImageReader.
+        createImageReader(stillSz, ImageFormat.JPEG, MAX_READER_IMAGES, imageListener);
+
+        // Configure output streams and request.
+        List<Surface> outputSurfaces = new ArrayList<Surface>(/*capacity*/1);
+        outputSurfaces.add(mPreviewSurface);
+        outputSurfaces.add(mReaderSurface);
+        configureCameraOutputs(mCamera, outputSurfaces, mCameraListener);
+        request.addTarget(mPreviewSurface);
+        request.addTarget(mReaderSurface);
+
+        // Start preview.
+        mCamera.setRepeatingRequest(request.build(), resultListener, mHandler);
+    }
+
+    /**
+     * Create an {@link ImageReader} object and get the surface.
+     *
+     * @param size The size of this ImageReader to be created.
+     * @param format The format of this ImageReader to be created
+     * @param maxNumImages The max number of images that can be acquired simultaneously.
+     * @param listener The listener used by this ImageReader to notify callbacks.
+     */
+    protected void createImageReader(Size size, int format, int maxNumImages,
+            ImageReader.OnImageAvailableListener listener) throws Exception {
+        closeImageReader();
+
+        mReader = ImageReader.newInstance(size.getWidth(), size.getHeight(), format, maxNumImages);
+        mReaderSurface = mReader.getSurface();
+        mReader.setOnImageAvailableListener(listener, mHandler);
+        if (VERBOSE) Log.v(TAG, "Created ImageReader size " + size.toString());
+    }
+
+    /**
+     * Close the pending images then close current active {@link ImageReader} object.
+     */
+    protected void closeImageReader() {
+        if (mReader != null) {
+            try {
+                // Close all possible pending images first.
+                Image image = mReader.acquireLatestImage();
+                if (image != null) {
+                    image.close();
+                }
+            } finally {
+                mReader.close();
+                mReader = null;
+            }
+        }
     }
 
     /**
@@ -180,6 +255,9 @@ public class Camera2SurfaceViewTestCase extends
         mCollector.setCameraId(cameraId);
         mStaticInfo = new StaticMetadata(mCameraManager.getCameraCharacteristics(cameraId),
                 CheckLevel.ASSERT, /*collector*/null);
+        mOrderedPreviewSizes = getSupportedPreviewSizes(cameraId, mCameraManager, PREVIEW_SIZE_BOUND);
+        mOrderedVideoSizes = getSupportedVideoSizes(cameraId, mCameraManager, PREVIEW_SIZE_BOUND);
+        mOrderedStillSizes = getSupportedStillSizes(cameraId, mCameraManager, null);
     }
 
     /**
@@ -190,7 +268,34 @@ public class Camera2SurfaceViewTestCase extends
             mCamera.close();
             mCameraListener.waitForState(STATE_CLOSED, CAMERA_CLOSE_TIMEOUT_MS);
             mCamera = null;
+            mStaticInfo = null;
+            mOrderedPreviewSizes = null;
+            mOrderedVideoSizes = null;
+            mOrderedStillSizes = null;
         }
-        mStaticInfo = null;
+    }
+
+    protected void updatePreviewSurface(Size size) {
+        if (size.equals(mPreviewSize)) {
+            return;
+        }
+
+        mPreviewSize = size;
+        Camera2SurfaceViewStubActivity stubActivity = getActivity();
+        final SurfaceHolder holder = stubActivity.getSurfaceView().getHolder();
+        Handler handler = new Handler(Looper.getMainLooper());
+        handler.post(new Runnable() {
+                @Override
+            public void run() {
+                holder.setFixedSize(mPreviewSize.getWidth(), mPreviewSize.getHeight());
+            }
+        });
+
+        boolean res = stubActivity.waitForSurfaceSizeChanged(
+                WAIT_FOR_SURFACE_CHANGE_TIMEOUT_MS, mPreviewSize.getWidth(),
+                mPreviewSize.getHeight());
+        assertTrue("wait for surface change to " + mPreviewSize.toString() + " timed out", res);
+        mPreviewSurface = holder.getSurface();
+        assertTrue("Preview surface is invalid", mPreviewSurface.isValid());
     }
 }

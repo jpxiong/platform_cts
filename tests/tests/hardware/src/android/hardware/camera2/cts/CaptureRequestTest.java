@@ -23,6 +23,7 @@ import android.hardware.camera2.CameraDevice;
 import android.hardware.camera2.CaptureRequest;
 import android.hardware.camera2.CaptureResult;
 import android.hardware.camera2.Size;
+import android.hardware.camera2.cts.CameraTestUtils.SimpleCaptureListener;
 import android.hardware.camera2.cts.testcases.Camera2SurfaceViewTestCase;
 import android.util.Log;
 
@@ -52,6 +53,10 @@ public class CaptureRequestTest extends Camera2SurfaceViewTestCase {
     private static final long EXPOSURE_TIME_BOUNDARY_50HZ_NS = 10000000L; // 10ms
     private static final long EXPOSURE_TIME_BOUNDARY_60HZ_NS = 8300000L; // 8.3ms, Approximation.
     private static final long EXPOSURE_TIME_ERROR_MARGIN_NS = 100000L; // 100us, Approximation.
+    private static final int SENSITIVITY_ERROR_MARGIN = 10; // 10
+    private static final int DEFAULT_NUM_EXPOSURE_TIME_STEPS = 10;
+    private static final int DEFAULT_NUM_SENSITIVITY_STEPS = 16;
+    private static final int DEFAULT_SENSITIVITY_STEP_SIZE = 100;
 
     @Override
     protected void setUp() throws Exception {
@@ -209,6 +214,42 @@ public class CaptureRequestTest extends Camera2SurfaceViewTestCase {
 
     }
 
+    /**
+     * Test AE mode and lock.
+     *
+     * <p>
+     * For AE lock, when it is locked, exposure parameters shouldn't be changed.
+     * For AE modes, each mode should satisfy the per frame controls defined in
+     * API specifications.
+     * </p>
+     */
+    public void testAeModeAndLock() throws Exception {
+        for (int i = 0; i < mCameraIds.length; i++) {
+            try {
+                openDevice(mCameraIds[i]);
+
+                // Can only test full capability because test relies on per frame control
+                // and synchronization.
+                if (!mStaticInfo.isHardwareLevelFull()) {
+                    continue;
+                }
+
+                Size maxPreviewSz = mOrderedPreviewSizes.get(0); // Max preview size.
+
+                // Update preview surface with given size for all sub-tests.
+                updatePreviewSurface(maxPreviewSz);
+
+                // Test aeMode and lock
+                byte[] aeModes = mStaticInfo.getAeAvailableModesChecked();
+                for (byte mode : aeModes) {
+                    aeModeAndLockTestByMode(mode);
+                }
+            } finally {
+                closeDevice();
+            }
+        }
+    }
+
     // TODO: add 3A state machine test.
 
     private void verifyAntiBandingMode(SimpleCaptureListener listener, int numFramesVerified,
@@ -224,11 +265,8 @@ public class CaptureRequestTest extends Camera2SurfaceViewTestCase {
                     flicker <= STATISTICS_SCENE_FLICKER_60HZ);
 
             if (isAeManual) {
-                // Don't need test the rest of the logic for manual AE mode.
-                long expTimeDelta = requestExpTime - resultExpTime;
                 // First, round down not up, second, need close enough.
-                mCollector.expectTrue("Anti-banding doesn't adjust exposure for manual AE mode",
-                        expTimeDelta < EXPOSURE_TIME_ERROR_MARGIN_NS && expTimeDelta >= 0);
+                validateExposureTime(requestExpTime, resultExpTime);
                 return;
             }
 
@@ -288,6 +326,141 @@ public class CaptureRequestTest extends Camera2SurfaceViewTestCase {
                 TEST_MANUAL_EXP_TIME_NS);
 
         stopPreview();
+    }
+
+    /**
+     * Test the all available AE modes and AE lock.
+     * <p>
+     * For manual AE mode, test iterates through different sensitivities and
+     * exposure times, validate the result exposure time correctness. For
+     * CONTROL_AE_MODE_ON_ALWAYS_FLASH mode, the AE lock and flash are tested.
+     * For the rest of the AUTO mode, AE lock is tested.
+     * </p>
+     *
+     * @param mode
+     */
+    private void aeModeAndLockTestByMode(int mode)
+            throws Exception {
+        switch (mode) {
+            case CONTROL_AE_MODE_OFF:
+                // Test manual exposure control.
+                aeManualControlTest();
+                break;
+            case CONTROL_AE_MODE_ON:
+            case CONTROL_AE_MODE_ON_AUTO_FLASH:
+            case CONTROL_AE_MODE_ON_AUTO_FLASH_REDEYE:
+            case CONTROL_AE_MODE_ON_ALWAYS_FLASH:
+                // Test AE lock for above AUTO modes.
+                aeAutoModeTestLock(mode);
+                break;
+            default:
+                throw new UnsupportedOperationException("Unhandled AE mode " + mode);
+        }
+    }
+
+    /**
+     * Test AE auto modes.
+     * <p>
+     * Use single request rather than repeating request to test AE lock per frame control.
+     * </p>
+     */
+    private void aeAutoModeTestLock(int mode) throws Exception {
+        CaptureRequest.Builder requestBuilder =
+                mCamera.createCaptureRequest(CameraDevice.TEMPLATE_PREVIEW);
+        requestBuilder.set(CaptureRequest.CONTROL_AE_LOCK, false);
+        requestBuilder.set(CaptureRequest.CONTROL_AE_MODE, mode);
+        configurePreviewOutput(requestBuilder);
+
+        final int MAX_NUM_CAPTURES_BEFORE_LOCK = 5;
+        for (int i = 1; i <= MAX_NUM_CAPTURES_BEFORE_LOCK; i++) {
+            autoAeMultipleCapturesThenTestLock(requestBuilder, mode, i);
+        }
+    }
+
+    /**
+     * Issue multiple auto AE captures, then lock AE, validate the AE lock vs.
+     * the last capture result before the AE lock.
+     */
+    private void autoAeMultipleCapturesThenTestLock(
+            CaptureRequest.Builder requestBuilder, int aeMode, int numCapturesBeforeLock)
+            throws Exception {
+        if (numCapturesBeforeLock < 1) {
+            throw new IllegalArgumentException("numCapturesBeforeLock must be no less than 1");
+        }
+        if (VERBOSE) {
+            Log.v(TAG, "Camera " + mCamera.getId() + ": Testing auto AE mode and lock for mode "
+                    + aeMode + " with " + numCapturesBeforeLock + " captures before lock");
+        }
+
+        SimpleCaptureListener listener =  new SimpleCaptureListener();
+        CaptureResult latestResult = null;
+
+        CaptureRequest request = requestBuilder.build();
+        for (int i = 0; i < numCapturesBeforeLock; i++) {
+            // Fire a capture, auto AE, lock off.
+            mCamera.capture(request, listener, mHandler);
+        }
+        // Then fire a capture to lock the AE,
+        requestBuilder.set(CaptureRequest.CONTROL_AE_LOCK, true);
+        mCamera.capture(requestBuilder.build(), listener, mHandler);
+
+        // Get the latest exposure values of the last AE lock off requests.
+        for (int i = 0; i < numCapturesBeforeLock; i++) {
+            latestResult = listener.getCaptureResult(WAIT_FOR_RESULT_TIMEOUT_MS);
+        }
+        int sensitivity = getValueNotNull(latestResult, CaptureResult.SENSOR_SENSITIVITY);
+        long expTime = getValueNotNull(latestResult, CaptureResult.SENSOR_EXPOSURE_TIME);
+
+        // Get the AE lock on result and validate the exposure values.
+        latestResult = listener.getCaptureResult(WAIT_FOR_RESULT_TIMEOUT_MS);
+        int sensitivityLocked = getValueNotNull(latestResult, CaptureResult.SENSOR_SENSITIVITY);
+        long expTimeLocked = getValueNotNull(latestResult, CaptureResult.SENSOR_EXPOSURE_TIME);
+        mCollector.expectEquals("Locked exposure time shouldn't be changed for AE auto mode "
+                + aeMode + "after " + numCapturesBeforeLock + " captures", expTime, expTimeLocked);
+        mCollector.expectEquals("Locked sensitivity shouldn't be changed for AE auto mode " + aeMode
+                + "after " + numCapturesBeforeLock + " captures", sensitivity, sensitivityLocked);
+    }
+
+    /**
+     * Iterate through exposure times and sensitivities for manual AE control.
+     * <p>
+     * Use single request rather than repeating request to test manual exposure
+     * value change per frame control.
+     * </p>
+     */
+    private void aeManualControlTest()
+            throws Exception {
+        CaptureRequest.Builder requestBuilder =
+                mCamera.createCaptureRequest(CameraDevice.TEMPLATE_PREVIEW);
+
+        requestBuilder.set(CaptureRequest.CONTROL_AE_MODE, CONTROL_AE_MODE_OFF);
+        configurePreviewOutput(requestBuilder);
+        SimpleCaptureListener listener =  new SimpleCaptureListener();
+
+        long[] expTimes = getExposureTimeTestValues();
+        int[] sensitivities = getSensitivityTestValues();
+        // Submit single request at a time, then verify the result.
+        for (int i = 0; i < expTimes.length; i++) {
+            for (int j = 0; j < sensitivities.length; j++) {
+                if (VERBOSE) {
+                    Log.v(TAG, "Camera " + mCamera.getId() + ": Testing sensitivity "
+                            + sensitivities[j] + ", exposure time " + expTimes[i] + "ns");
+                }
+
+                changeExposure(requestBuilder, expTimes[i], sensitivities[j]);
+                mCamera.capture(requestBuilder.build(), listener, mHandler);
+
+                CaptureResult result = listener.getCaptureResult(WAIT_FOR_RESULT_TIMEOUT_MS);
+                long resultExpTime = getValueNotNull(result, CaptureResult.SENSOR_EXPOSURE_TIME);
+                int resultSensitivity = getValueNotNull(result, CaptureResult.SENSOR_SENSITIVITY);
+                validateExposureTime(expTimes[i], resultExpTime);
+                validateSensitivity(sensitivities[j], resultSensitivity);
+            }
+        }
+        // TODO: Add another case to test where we can submit all requests, then wait for
+        // results, which will hide the pipeline latency. this is not only faster, but also
+        // test high speed per frame control and synchronization.
+
     }
 
     /**
@@ -390,5 +563,92 @@ public class CaptureRequestTest extends Camera2SurfaceViewTestCase {
      */
     private void changeExposure(CaptureRequest.Builder requestBuilder, int sensitivity) {
         changeExposure(requestBuilder, DEFAULT_EXP_TIME_NS, sensitivity);
+    }
+
+    /**
+     * Get the exposure time array that contains multiple exposure time steps in
+     * the exposure time range.
+     */
+    private long[] getExposureTimeTestValues() {
+        long[] testValues = new long[DEFAULT_NUM_EXPOSURE_TIME_STEPS + 1];
+        long maxExpTime = mStaticInfo.getExposureMaximumOrDefault(DEFAULT_EXP_TIME_NS);
+        long minxExpTime = mStaticInfo.getExposureMinimumOrDefault(DEFAULT_EXP_TIME_NS);
+
+        long range = maxExpTime - minxExpTime;
+        double stepSize = range / (double)DEFAULT_NUM_EXPOSURE_TIME_STEPS;
+        for (int i = 0; i < testValues.length; i++) {
+            testValues[i] = minxExpTime + (long)(stepSize * i);
+            testValues[i] = mStaticInfo.getExposureClampToRange(testValues[i]);
+        }
+
+        return testValues;
+    }
+
+    /**
+     * Get the sensitivity array that contains multiple sensitivity steps in the
+     * sensitivity range.
+     * <p>
+     * Sensitivity number of test values is determined by
+     * {@value #DEFAULT_SENSITIVITY_STEP_SIZE} and sensitivity range, and
+     * bounded by {@value #DEFAULT_NUM_SENSITIVITY_STEPS}.
+     * </p>
+     */
+    private int[] getSensitivityTestValues() {
+        int maxSensitivity = mStaticInfo.getSensitivityMaximumOrDefault(
+                DEFAULT_SENSITIVITY);
+        int minSensitivity = mStaticInfo.getSensitivityMinimumOrDefault(
+                DEFAULT_SENSITIVITY);
+
+        int range = maxSensitivity - minSensitivity;
+        int stepSize = DEFAULT_SENSITIVITY_STEP_SIZE;
+        int numSteps = range / stepSize;
+        // Bound the test steps to avoid supper long test.
+        if (numSteps > DEFAULT_NUM_SENSITIVITY_STEPS) {
+            numSteps = DEFAULT_NUM_SENSITIVITY_STEPS;
+            stepSize = range / numSteps;
+        }
+        int[] testValues = new int[numSteps + 1];
+        for (int i = 0; i < testValues.length; i++) {
+            testValues[i] = minSensitivity + stepSize * i;
+            testValues[i] = mStaticInfo.getSensitivityClampToRange(testValues[i]);
+        }
+
+        return testValues;
+    }
+
+    /**
+     * Validate the AE manual control exposure time.
+     *
+     * <p>Exposure should be close enough, and only round down if they are not equal.</p>
+     *
+     * @param request Request exposure time
+     * @param result Result exposure time
+     */
+    private void validateExposureTime(long request, long result) {
+        long expTimeDelta = request - result;
+        // First, round down not up, second, need close enough.
+        mCollector.expectTrue("Exposture time is invalid for AE manaul control test, request: "
+                + request + " result: " + result,
+                expTimeDelta < EXPOSURE_TIME_ERROR_MARGIN_NS && expTimeDelta >= 0);
+    }
+
+    /**
+     * Validate AE manual control sensitivity.
+     *
+     * @param request Request sensitivity
+     * @param result Result sensitivity
+     */
+    private void validateSensitivity(int request, int result) {
+        int sensitivityDelta = request - result;
+        // First, round down not up, second, need close enough.
+        mCollector.expectTrue("Sensitivity is invalid for AE manaul control test, request: "
+                + request + " result: " + result,
+                sensitivityDelta < SENSITIVITY_ERROR_MARGIN && sensitivityDelta >= 0);
+    }
+
+    private <T> T getValueNotNull(CaptureResult result, Key<T> key) {
+        T value = result.get(key);
+        assertNotNull("Value of Key " + key.getName() + "shouldn't be null", value);
+        return value;
     }
 }
