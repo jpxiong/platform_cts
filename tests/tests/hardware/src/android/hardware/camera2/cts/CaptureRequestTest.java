@@ -17,8 +17,7 @@
 package android.hardware.camera2.cts;
 
 import static android.hardware.camera2.cts.CameraTestUtils.*;
-import static android.hardware.camera2.CameraCharacteristics.LENS_INFO_SHADING_MAP_SIZE;
-import static android.hardware.camera2.CameraMetadata.*;
+import static android.hardware.camera2.CameraCharacteristics.*;
 
 import android.hardware.camera2.CameraDevice;
 import android.hardware.camera2.CaptureRequest;
@@ -43,11 +42,16 @@ public class CaptureRequestTest extends Camera2SurfaceViewTestCase {
     private static final boolean VERBOSE = Log.isLoggable(TAG, Log.VERBOSE);
     private static final int NUM_FRAMES_VERIFIED = 15;
     private static final long WAIT_FOR_RESULT_TIMEOUT_MS = 3000;
-    private static final long DEFAULT_EXP_TIME_NS = 30000000L; // 30ms
-    private static final int DEFAULT_SENSITIVITY = 100; // 10ms
+    /** 30ms exposure time must be supported by full capability devices. */
+    private static final long DEFAULT_EXP_TIME_NS = 30000000L;
+    private static final int DEFAULT_SENSITIVITY = 100;
     private static final int RGGB_COLOR_CHANNEL_COUNT = 4;
     private static final int MAX_SHADING_MAP_SIZE = 64 * 64 * RGGB_COLOR_CHANNEL_COUNT;
     private static final int MIN_SHADING_MAP_SIZE = 1 * 1 * RGGB_COLOR_CHANNEL_COUNT;
+    private static final long IGORE_REQUESTED_EXPOSURE_TIME_CHECK = -1L;
+    private static final long EXPOSURE_TIME_BOUNDARY_50HZ_NS = 10000000L; // 10ms
+    private static final long EXPOSURE_TIME_BOUNDARY_60HZ_NS = 8300000L; // 8.3ms, Approximation.
+    private static final long EXPOSURE_TIME_ERROR_MARGIN_NS = 100000L; // 100us, Approximation.
 
     @Override
     protected void setUp() throws Exception {
@@ -172,7 +176,119 @@ public class CaptureRequestTest extends Camera2SurfaceViewTestCase {
         }
     }
 
+    /**
+     * Test {@link CaptureRequest#CONTROL_AE_ANTIBANDING_MODE} control.
+     * <p>
+     * Test all available anti-banding modes, check if the exposure time adjustment is
+     * correct.
+     * </p>
+     */
+    public void testAntiBandingModes() throws Exception {
+        for (int i = 0; i < mCameraIds.length; i++) {
+            try {
+                openDevice(mCameraIds[i]);
+
+                if (!mStaticInfo.isHardwareLevelFull()) {
+                    continue;
+                }
+
+                SimpleCaptureListener listener = new SimpleCaptureListener();
+
+                byte[] modes = mStaticInfo.getAeAvailableAntiBandingModesChecked();
+
+                Size previewSz =
+                        getMaxPreviewSize(mCamera.getId(), mCameraManager, PREVIEW_SIZE_BOUND);
+
+                for (byte mode : modes) {
+                    antiBandingTestByMode(listener, previewSz, mode);
+                }
+            } finally {
+                closeDevice();
+            }
+        }
+
+    }
+
     // TODO: add 3A state machine test.
+
+    private void verifyAntiBandingMode(SimpleCaptureListener listener, int numFramesVerified,
+            int mode, boolean isAeManual, long requestExpTime) throws Exception {
+        for (int i = 0; i < numFramesVerified; i++) {
+            CaptureResult result = listener.getCaptureResult(WAIT_FOR_RESULT_TIMEOUT_MS);
+            Long resultExpTime = result.get(CaptureRequest.SENSOR_EXPOSURE_TIME);
+            assertNotNull("Exposure time shouldn't be null", resultExpTime);
+            Integer flicker = result.get(CaptureResult.STATISTICS_SCENE_FLICKER);
+            // Scene flicker result should be always available.
+            assertNotNull("Scene flicker must not be null", flicker);
+            assertTrue("Scene flicker is invalid", flicker >= STATISTICS_SCENE_FLICKER_NONE &&
+                    flicker <= STATISTICS_SCENE_FLICKER_60HZ);
+
+            if (isAeManual) {
+                // Don't need test the rest of the logic for manual AE mode.
+                long expTimeDelta = requestExpTime - resultExpTime;
+                // First, round down not up, second, need close enough.
+                mCollector.expectTrue("Anti-banding doesn't adjust exposure for manual AE mode",
+                        expTimeDelta < EXPOSURE_TIME_ERROR_MARGIN_NS && expTimeDelta >= 0);
+                return;
+            }
+
+            long expectedExpTime = resultExpTime; // Default, no exposure adjustment.
+            if (mode == CONTROL_AE_ANTIBANDING_MODE_50HZ) {
+                // result exposure time must be adjusted by 50Hz illuminant source.
+                expectedExpTime =
+                        resultExpTime - (resultExpTime % EXPOSURE_TIME_BOUNDARY_50HZ_NS);
+            } else if (mode == CONTROL_AE_ANTIBANDING_MODE_60HZ) {
+                // result exposure time must be adjusted by 60Hz illuminant source.
+                expectedExpTime =
+                        resultExpTime - (resultExpTime % EXPOSURE_TIME_BOUNDARY_60HZ_NS);
+            } else if (mode == CONTROL_AE_ANTIBANDING_MODE_AUTO){
+                /**
+                 * Use STATISTICS_SCENE_FLICKER to tell the illuminant source
+                 * and do the exposure adjustment.
+                 */
+                expectedExpTime = resultExpTime;
+                if (flicker == STATISTICS_SCENE_FLICKER_60HZ) {
+                    expectedExpTime = resultExpTime
+                            - (resultExpTime % EXPOSURE_TIME_BOUNDARY_60HZ_NS);
+                } else if (flicker == STATISTICS_SCENE_FLICKER_50HZ) {
+                    expectedExpTime = resultExpTime
+                            - (resultExpTime % EXPOSURE_TIME_BOUNDARY_50HZ_NS);
+                }
+            }
+
+            if (Math.abs(resultExpTime - expectedExpTime) > EXPOSURE_TIME_ERROR_MARGIN_NS) {
+                mCollector.addMessage(String.format("Result exposure time %dns diverges too much"
+                        + " from expected exposure time %dns for mode %d when AE is auto",
+                        resultExpTime, expectedExpTime, mode));
+            }
+        }
+    }
+
+    private void antiBandingTestByMode(SimpleCaptureListener listener, Size size, int mode)
+            throws Exception {
+        if(VERBOSE) {
+            Log.v(TAG, "Anti-banding test for mode " + mode + " for camera " + mCamera.getId());
+        }
+        CaptureRequest.Builder requestBuilder =
+                mCamera.createCaptureRequest(CameraDevice.TEMPLATE_PREVIEW);
+
+        requestBuilder.set(CaptureRequest.CONTROL_AE_ANTIBANDING_MODE, mode);
+
+        // Test auto AE mode anti-banding behavior
+        startPreview(requestBuilder, size, listener);
+        verifyAntiBandingMode(listener, NUM_FRAMES_VERIFIED, mode, /*isAeManual*/false,
+                IGORE_REQUESTED_EXPOSURE_TIME_CHECK);
+
+        // Test manual AE mode anti-banding behavior
+        // 65ms, must be supported by full capability devices.
+        final long TEST_MANUAL_EXP_TIME_NS = 65000000L;
+        changeExposure(requestBuilder, TEST_MANUAL_EXP_TIME_NS);
+        startPreview(requestBuilder, size, listener);
+        verifyAntiBandingMode(listener, NUM_FRAMES_VERIFIED, mode, /*isAeManual*/true,
+                TEST_MANUAL_EXP_TIME_NS);
+
+        stopPreview();
+    }
 
     /**
      * Verify black level lock control.
@@ -255,5 +371,24 @@ public class CaptureRequestTest extends Camera2SurfaceViewTestCase {
         requestBuilder.set(CaptureRequest.CONTROL_AE_MODE, CONTROL_AE_MODE_OFF);
         requestBuilder.set(CaptureRequest.SENSOR_EXPOSURE_TIME, expTime);
         requestBuilder.set(CaptureRequest.SENSOR_SENSITIVITY, sensitivity);
+    }
+    /**
+     * Enable exposure manual control and change exposure time and
+     * clamp the value into the supported range.
+     *
+     * <p>The sensitivity is set to default value.</p>
+     */
+    private void changeExposure(CaptureRequest.Builder requestBuilder, long expTime) {
+        changeExposure(requestBuilder, expTime, DEFAULT_SENSITIVITY);
+    }
+
+    /**
+     * Enable exposure manual control and change sensitivity and
+     * clamp the value into the supported range.
+     *
+     * <p>The exposure time is set to default value.</p>
+     */
+    private void changeExposure(CaptureRequest.Builder requestBuilder, int sensitivity) {
+        changeExposure(requestBuilder, DEFAULT_EXP_TIME_NS, sensitivity);
     }
 }

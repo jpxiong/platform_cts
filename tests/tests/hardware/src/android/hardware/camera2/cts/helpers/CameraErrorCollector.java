@@ -92,6 +92,24 @@ public class CameraErrorCollector extends ErrorCollector {
     }
 
     /**
+     * Adds a failure to the table if {@code condition} is not {@code true}.
+     * <p>
+     * Execution continues, but the test will fail at the end if the condition
+     * failed.
+     * </p>
+     *
+     * @param msg Message to be logged when check fails.
+     * @param condition Log the failure if it is not true.
+     */
+    public boolean expectTrue(String msg, boolean condition) {
+        if (!condition) {
+            addMessage(msg);
+        }
+
+        return condition;
+    }
+
+    /**
      * Check if the two values are equal.
      *
      * @param msg Message to be logged when check fails.
