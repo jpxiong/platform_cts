@@ -28,6 +28,7 @@ import android.hardware.camera2.CameraDevice;
 import android.hardware.camera2.CameraDevice.StateListener;
 import android.hardware.camera2.CameraManager;
 import android.hardware.camera2.cts.CameraTestUtils.MockStateListener;
+import android.hardware.camera2.cts.helpers.CameraErrorCollector;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.test.AndroidTestCase;
@@ -56,6 +57,7 @@ public class CameraManagerTest extends AndroidTestCase {
     private HandlerThread mHandlerThread;
     private Handler mHandler;
     private BlockingStateListener mCameraListener;
+    private CameraErrorCollector mCollector;
 
     @Override
     public void setContext(Context context) {
@@ -76,6 +78,7 @@ public class CameraManagerTest extends AndroidTestCase {
         mHandlerThread = new HandlerThread(TAG);
         mHandlerThread.start();
         mHandler = new Handler(mHandlerThread.getLooper());
+        mCollector = new CameraErrorCollector();
     }
 
     @Override
@@ -83,7 +86,14 @@ public class CameraManagerTest extends AndroidTestCase {
         mHandlerThread.quitSafely();
         mHandler = null;
 
-        super.tearDown();
+        try {
+            mCollector.verify();
+        } catch (Throwable e) {
+            // When new Exception(e) is used, exception info will be printed twice.
+            throw new Exception(e.getMessage());
+        } finally {
+            super.tearDown();
+        }
     }
 
     /**
@@ -388,14 +398,10 @@ public class CameraManagerTest extends AndroidTestCase {
     public void testCameraManagerOpenCameraTwice() throws Exception {
         String[] ids = mCameraManager.getCameraIdList();
 
-        // No cameras available. Trivial pass.
-        if (ids.length == 0) {
-            return;
-        }
-
         // Test across every camera device.
         for (int i = 0; i < ids.length; ++i) {
             CameraDevice successCamera = null;
+            mCollector.setCameraId(ids[i]);
 
             try {
                 MockStateListener mockSuccessListener = MockStateListener.mock();
@@ -413,18 +419,30 @@ public class CameraManagerTest extends AndroidTestCase {
                             mHandler);
                 } catch (CameraAccessException e) {
                     // Optional (but common). Camera might fail asynchronously only.
-                    assertEquals("If second camera open fails immediately, " +
-                            "must be due to camera being busy for ID: " + ids[i],
-                            CameraAccessException.CAMERA_ERROR,
-                            e.getReason());
+                    // Don't assert here, otherwise, all subsequent tests will fail because the
+                    // opened camera is never closed.
+                    mCollector.expectEquals(
+                            "If second camera open fails immediately, must be due to"
+                            + "camera being busy for ID: " + ids[i],
+                            CameraAccessException.CAMERA_ERROR, e.getReason());
                 }
 
+                successListener.waitForState(BlockingStateListener.STATE_OPENED,
+                        CameraTestUtils.CAMERA_IDLE_TIMEOUT_MS);
+                // Have to get the successCamera here, otherwise, it won't be
+                // closed if STATE_ERROR timeout exception occurs.
+                ArgumentCaptor<CameraDevice> argument =
+                        ArgumentCaptor.forClass(CameraDevice.class);
+                verify(mockSuccessListener, atLeastOnce()).onOpened(argument.capture());
+                successCamera = argument.getValue();
                 successListener.waitForState(BlockingStateListener.STATE_UNCONFIGURED,
                         CameraTestUtils.CAMERA_IDLE_TIMEOUT_MS);
+
                 failListener.waitForState(BlockingStateListener.STATE_ERROR,
                         CameraTestUtils.CAMERA_IDLE_TIMEOUT_MS);
 
-                successCamera = verifyCameraStateOpenedThenUnconfigured(ids[i], mockSuccessListener);
+                successCamera = verifyCameraStateOpenedThenUnconfigured(
+                        ids[i], mockSuccessListener);
 
                 verify(mockFailListener)
                         .onError(
