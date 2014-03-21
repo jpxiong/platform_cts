@@ -29,11 +29,16 @@ import android.os.ParcelFileDescriptor;
 import android.provider.MediaStore;
 import android.provider.MediaStore.MediaColumns;
 import android.test.AndroidTestCase;
+import android.util.Log;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 
 public class MediaStore_FilesTest extends AndroidTestCase {
 
@@ -279,6 +284,83 @@ public class MediaStore_FilesTest extends AndroidTestCase {
         if (sdfile != null) {
             assertEquals(true, sdfile.delete());
         }
+
+        // test secondary storage if present
+        List<File> allpaths = getSecondaryPackageSpecificPaths(mContext);
+        List<String> trimmedPaths = new ArrayList<String>();
+
+        for (File extpath: allpaths) {
+            assertNotNull("Valid media must be inserted during CTS", extpath);
+            assertEquals("Valid media must be inserted during CTS", Environment.MEDIA_MOUNTED,
+                    Environment.getStorageState(extpath));
+
+            File child = extpath;
+            while (true) {
+                File parent = child.getParentFile();
+                if (parent == null) {
+                    fail("didn't expect to be here");
+                }
+                if (!Environment.MEDIA_MOUNTED.equals(Environment.getStorageState(parent))) {
+                    // we went past the root
+                    String abspath = child.getAbsolutePath();
+                    if (!trimmedPaths.contains(abspath)) {
+                        trimmedPaths.add(abspath);
+                    }
+                    break;
+                }
+                child = parent;
+            }
+        }
+
+        for (String s: trimmedPaths) {
+            File dir = new File(s + "/foobardir");
+            File file = new File(dir, "foobar.jpg");
+
+            values = new ContentValues();
+            values.put(MediaStore.Files.FileColumns.DATA, dir.getAbsolutePath());
+            Uri dirUri = mResolver.insert(MediaStore.Files.getContentUri("external"), values);
+            assertNotNull(dirUri);
+
+            values = new ContentValues();
+            values.put(MediaStore.Files.FileColumns.DATA, file.getAbsolutePath());
+            Uri fileUri = mResolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values);
+            assertNotNull(fileUri);
+
+            // check that adding the file or its folder didn't cause either one to be created
+            assertFalse(dir.exists());
+            assertFalse(file.exists());
+
+            // check if opening the file for write works
+            try {
+                mResolver.openOutputStream(fileUri).close();
+                fail("shouldn't have been able to create output stream");
+            } catch (SecurityException e) {
+                // expected
+            }
+            // check that deleting the file or its folder doesn't cause either one to be created
+            mResolver.delete(fileUri, null, null);
+            assertFalse(dir.exists());
+            assertFalse(file.exists());
+            mResolver.delete(dirUri, null, null);
+            assertFalse(dir.exists());
+            assertFalse(file.exists());
+        }
+    }
+
+    public static List<File> getSecondaryPackageSpecificPaths(Context context) {
+        final List<File> paths = new ArrayList<File>();
+        Collections.addAll(paths, dropFirst(context.getExternalCacheDirs()));
+        Collections.addAll(paths, dropFirst(context.getExternalFilesDirs(null)));
+        Collections.addAll(
+                paths, dropFirst(context.getExternalFilesDirs(Environment.DIRECTORY_PICTURES)));
+        Collections.addAll(paths, dropFirst(context.getObbDirs()));
+        return paths;
+    }
+
+    private static File[] dropFirst(File[] before) {
+        final File[] after = new File[before.length - 1];
+        System.arraycopy(before, 1, after, 0, after.length);
+        return after;
     }
 
     private void writeFile(int resid, String path) throws IOException {
