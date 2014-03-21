@@ -74,4 +74,14 @@ public class NativeCodeTest extends TestCase {
      * https://git.kernel.org/cgit/linux/kernel/git/torvalds/linux.git/commit/arch/arm/include/asm/uaccess.h?id=8404663f81d212918ff85f493649a7991209fa04
      */
     private static native boolean doVrootTest();
+
+    public void testCVE20141710() throws Exception {
+        assertTrue("Device is vulnerable to CVE-2014-1710", doCVE20141710Test());
+    }
+
+    /**
+     * Returns true if the device is immune to CVE-2014-1710,
+     * false if the device is vulnerable.
+     */
+    private static native boolean doCVE20141710Test();
 }
