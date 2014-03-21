@@ -179,7 +179,7 @@ public class SensorVerificationHelperTest extends TestCase {
         VerificationResult result = SensorVerificationHelper.verifyMagnitude(events, expected,
                 threshold);
         assertFalse(result.isFailed());
-        assertEquals(5.0, (Double) result.getValue("norm"), 0.01);
+        assertEquals(5.0, (Double) result.getValue("magnitude"), 0.01);
 
         expected = 4.5;
         threshold = 0.6;
