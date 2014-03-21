@@ -168,7 +168,7 @@ static jboolean android_security_cts_NativeCodeTest_doVrootTest(JNIEnv*, jobject
 
 static void* mmap_syscall(void* addr, size_t len, int prot, int flags, int fd, off_t offset)
 {
-    return (void*) syscall(SYS_mmap2, addr, len, prot, flags, fd, offset);
+    return (void*) syscall(__NR_mmap2, addr, len, prot, flags, fd, offset);
 }
 
 #define KBASE_REG_COOKIE_TB         2
