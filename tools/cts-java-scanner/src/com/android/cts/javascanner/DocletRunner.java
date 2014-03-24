@@ -77,7 +77,6 @@ class DocletRunner {
         sourcePath.add("./cts/tests/src");
         sourcePath.add("./cts/libs/commonutil/src");
         sourcePath.add("./cts/libs/deviceutil/src");
-        sourcePath.add("./frameworks/uiautomator/src");
         sourcePath.add(sourceDir.toString());
         return join(sourcePath, ":");
     }
@@ -85,6 +84,7 @@ class DocletRunner {
     private String getClassPath() {
         List<String> classPath = new ArrayList<String>();
         classPath.add("./prebuilts/misc/common/tradefed/tradefed-prebuilt.jar");
+        classPath.add("./prebuilts/misc/common/ub-uiautomator/ub-uiautomator.jar");
         return join(classPath, ":");
     }
 
