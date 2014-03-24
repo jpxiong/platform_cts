@@ -16,6 +16,8 @@
 
 package android.hardware.cts.helpers.sensoroperations;
 
+import android.hardware.cts.helpers.SensorStats;
+
 import java.util.LinkedList;
 import java.util.List;
 
@@ -53,6 +55,7 @@ public class SequentialSensorOperation extends AbstractSensorOperation {
                 operation.execute();
             } catch (AssertionError e) {
                 String msg = String.format("Operation %d failed: \"%s\"", i, e.getMessage());
+                getStats().addValue(SensorStats.ERROR, msg);
                 throw new AssertionError(msg, e);
             } finally {
                 addSensorStats(STATS_TAG, i, operation.getStats());
