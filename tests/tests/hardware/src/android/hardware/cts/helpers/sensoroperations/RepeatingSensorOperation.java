@@ -16,6 +16,8 @@
 
 package android.hardware.cts.helpers.sensoroperations;
 
+import android.hardware.cts.helpers.SensorStats;
+
 /**
  * A {@link ISensorOperation} that executes a single {@link ISensorOperation} a given number of
  * times. This class can be combined to compose complex {@link ISensorOperation}s.
@@ -53,6 +55,7 @@ public class RepeatingSensorOperation extends AbstractSensorOperation {
                 operation.execute();
             } catch (AssertionError e) {
                 String msg = String.format("Iteration %d failed: \"%s\"", i, e.getMessage());
+                getStats().addValue(SensorStats.ERROR, msg);
                 throw new AssertionError(msg, e);
             } finally {
                 addSensorStats(STATS_TAG, i, operation.getStats());

@@ -16,6 +16,7 @@
 
 package android.hardware.cts.helpers.sensoroperations;
 
+import android.hardware.cts.helpers.SensorStats;
 import android.util.Log;
 
 import junit.framework.Assert;
@@ -123,6 +124,7 @@ public class ParallelSensorOperation extends AbstractSensorOperation {
             }
         } else if (earliestException instanceof AssertionError) {
             String msg = getExceptionMessage(exceptions, timeoutIndices);
+            getStats().addValue(SensorStats.ERROR, msg);
             throw new AssertionError(msg, earliestException);
         } else if (earliestException instanceof RuntimeException) {
             throw (RuntimeException) earliestException;
