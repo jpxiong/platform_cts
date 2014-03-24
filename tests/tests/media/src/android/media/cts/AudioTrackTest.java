@@ -18,6 +18,7 @@ package android.media.cts;
 
 import android.media.AudioFormat;
 import android.media.AudioManager;
+import android.media.AudioTimestamp;
 import android.media.AudioTrack;
 import android.test.AndroidTestCase;
 import android.util.Log;
@@ -1354,6 +1355,76 @@ public class AudioTrackTest extends AndroidTestCase {
         Thread.sleep(WAIT_MSEC);
         track.stop();
         Thread.sleep(WAIT_MSEC);
+        // -------- tear down --------------
+        track.release();
+    }
+
+    public void testGetTimestamp() throws Exception {
+        // constants for test
+        final String TEST_NAME = "testGetTimestamp";
+        final int TEST_SR = 22050;
+        final int TEST_CONF = AudioFormat.CHANNEL_CONFIGURATION_MONO;
+        final int TEST_FORMAT = AudioFormat.ENCODING_PCM_16BIT;
+        final int TEST_MODE = AudioTrack.MODE_STREAM;
+        final int TEST_STREAM_TYPE = AudioManager.STREAM_MUSIC;
+        final int TEST_LOOP_CNT = 10;
+
+        final int MILLIS_PER_SEC = 1000;
+        final int NANOS_PER_MILLI = 1000000;
+
+        // -------- initialization --------------
+        final int BYTES_PER_FRAME = 2;
+        final int FRAMES_PER_100_MILLIS =
+                AudioTrack.getMinBufferSize(TEST_SR, TEST_CONF, TEST_FORMAT);
+        final int FRAMES_PER_SEC = FRAMES_PER_100_MILLIS * 10;
+        byte[] data = new byte[FRAMES_PER_100_MILLIS * BYTES_PER_FRAME];
+        AudioTrack track = new AudioTrack(TEST_STREAM_TYPE, TEST_SR, TEST_CONF, TEST_FORMAT,
+                 FRAMES_PER_SEC * BYTES_PER_FRAME, TEST_MODE);
+        // -------- test --------------
+        assertTrue(TEST_NAME, track.getState() == AudioTrack.STATE_INITIALIZED);
+
+        long framesWritten = 0, framesSeen = 0, framesPresented = 0;
+        long lastFramesPresented = 0, lastFrameTime = 0, lastOutputFrequency = FRAMES_PER_SEC;
+        AudioTimestamp timestamp = new AudioTimestamp();
+
+        for (int i = 0; i < TEST_LOOP_CNT; i++) {
+            for (int j = 0; j < FRAMES_PER_SEC; j += FRAMES_PER_100_MILLIS) {
+                track.write(data, 0, data.length);
+                framesWritten += FRAMES_PER_100_MILLIS;
+            }
+
+            track.play();
+            Thread.sleep(MILLIS_PER_SEC);
+            track.pause();
+
+            framesSeen = track.getPlaybackHeadPosition();
+            assertTrue(TEST_NAME, framesWritten >= framesSeen);
+
+            assertTrue(TEST_NAME, track.getTimestamp(timestamp));
+            framesPresented = timestamp.framePosition;
+            assertTrue(TEST_NAME, framesSeen >= framesPresented);
+
+            // check output frequency
+            long outFrequency = framesPresented - lastFramesPresented;
+            long freqDiff = Math.abs(FRAMES_PER_SEC - outFrequency);
+            assertTrue(TEST_NAME, freqDiff < FRAMES_PER_100_MILLIS);
+
+            // check output frequency jitter
+            freqDiff = Math.abs(outFrequency - lastOutputFrequency);
+            assertTrue(TEST_NAME, freqDiff < FRAMES_PER_100_MILLIS);
+
+            lastFramesPresented = framesPresented;
+            lastOutputFrequency = outFrequency;
+
+            long frameTime = timestamp.nanoTime;
+            assertTrue(TEST_NAME, frameTime >= lastFrameTime);
+            lastFrameTime = frameTime;
+
+            long curTime = System.nanoTime();
+            assertTrue(TEST_NAME, curTime >= frameTime);
+            assertTrue(TEST_NAME, curTime - frameTime < 100 * NANOS_PER_MILLI);
+        }
+        track.stop();
         // -------- tear down --------------
         track.release();
     }
