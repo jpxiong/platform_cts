@@ -250,6 +250,35 @@ class OutputSurface implements SurfaceTexture.OnFrameAvailableListener {
     }
 
     /**
+     * Wait up to given timeout until new image become available.
+     * @param timeoutMs
+     * @return true if new image is available. false for no new image until timeout.
+     */
+    public boolean checkForNewImage(int timeoutMs) {
+        synchronized (mFrameSyncObject) {
+            while (!mFrameAvailable) {
+                try {
+                    // Wait for onFrameAvailable() to signal us.  Use a timeout to avoid
+                    // stalling the test if it doesn't arrive.
+                    mFrameSyncObject.wait(timeoutMs);
+                    if (!mFrameAvailable) {
+                        return false;
+                    }
+                } catch (InterruptedException ie) {
+                    // shouldn't happen
+                    throw new RuntimeException(ie);
+                }
+            }
+            mFrameAvailable = false;
+        }
+
+        // Latch the data.
+        mTextureRender.checkGlError("before updateTexImage");
+        mSurfaceTexture.updateTexImage();
+        return true;
+    }
+
+    /**
      * Draws the data from SurfaceTexture onto the current EGL surface.
      */
     public void drawImage() {
