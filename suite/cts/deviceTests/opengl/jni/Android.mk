@@ -21,7 +21,7 @@ LOCAL_MODULE := libctsopengl_jni
 LOCAL_MODULE_TAGS := optional
 
 # Needed in order to use fences for synchronization
-LOCAL_CFLAGS += -DEGL_EGLEXT_PROTOTYPES
+LOCAL_CFLAGS += -DEGL_EGLEXT_PROTOTYPES -funsigned-char
 
 # Get all cpp files but not hidden files
 LOCAL_SRC_FILES := $(patsubst ./%,%, $(shell cd $(LOCAL_PATH); \
