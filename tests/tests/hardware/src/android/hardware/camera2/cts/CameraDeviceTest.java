@@ -95,7 +95,7 @@ public class CameraDeviceTest extends Camera2AndroidTestCase {
                 .onDisconnected(
                     any(CameraDevice.class));
 
-
+        mCameraListener = mCameraMockListener;
         createImageReader(DEFAULT_CAPTURE_SIZE, ImageFormat.YUV_420_888, MAX_NUM_IMAGES,
                 new ImageDropperListener());
     }
@@ -273,19 +273,48 @@ public class CameraDeviceTest extends Camera2AndroidTestCase {
     }
 
     public void testCameraDeviceCapture() throws Exception {
-        runCaptureTest(false, false);
+        runCaptureTest(/*burst*/false, /*repeating*/false, /*flush*/false);
     }
 
     public void testCameraDeviceCaptureBurst() throws Exception {
-        runCaptureTest(true, false);
+        runCaptureTest(/*burst*/true, /*repeating*/false, /*flush*/false);
     }
 
     public void testCameraDeviceRepeatingRequest() throws Exception {
-        runCaptureTest(false, true);
+        runCaptureTest(/*burst*/false, /*repeating*/true, /*flush*/false);
     }
 
     public void testCameraDeviceRepeatingBurst() throws Exception {
-        runCaptureTest(true, true);
+        runCaptureTest(/*burst*/true, /*repeating*/true, /*flush*/false);
+    }
+
+    /**
+     * Test {@link CameraDevice#flush} API.
+     *
+     * <p>
+     * Flush is the fastest way to idle the camera device for reconfiguration
+     * with {@link #configureOutputs}, at the cost of discarding in-progress
+     * work. Once the flush is complete, the idle callback will be called.
+     * </p>
+     */
+    public void testCameraDeviceFlush() throws Exception {
+        runCaptureTest(/*burst*/false, /*repeating*/true, /*flush*/true);
+        runCaptureTest(/*burst*/true, /*repeating*/true, /*flush*/true);
+        /**
+         * TODO: this is only basic test of flush. we probably should also test below cases:
+         *
+         * 1. Performance. Make sure flush is faster than stopRepeating, we can test each one
+         * a couple of times, then compare the average. Also, for flush() alone, we should make
+         * sure it doesn't take too long time (e.g. <100ms for full devices, <500ms for limited
+         * devices), after the flush, we should be able to get all results back very quickly.
+         * This can be done in performance test.
+         *
+         * 2. Make sure all in-flight request comes back after flush, e.g. submit a couple of
+         * long exposure single captures, then flush, then check if we can get the pending
+         * request back quickly.
+         *
+         * 3. Also need check onCaptureSequenceCompleted for repeating burst after flush().
+         */
     }
 
     private class IsCameraMetadataNotEmpty<T extends CameraMetadata>
@@ -305,7 +334,17 @@ public class CameraDeviceTest extends Camera2AndroidTestCase {
         }
     }
 
-    private void runCaptureTest(boolean burst, boolean repeating) throws Exception {
+    /**
+     * Run capture test with different test configurations.
+     *
+     * @param burst If the test uses {@link CameraDevice#captureBurst} or
+     * {@link CameraDevice#setRepeatingBurst} to capture the burst.
+     * @param repeating If the test uses {@link CameraDevice#setRepeatingBurst} or
+     * {@link CameraDevice#setRepeatingRequest} for repeating capture.
+     * @param flush If the test uses {@link CameraDevice#flush} to stop the repeating capture.
+     * It has no effect if repeating is false.
+     */
+    private void runCaptureTest(boolean burst, boolean repeating, boolean flush) throws Exception {
         for (int i = 0; i < mCameraIds.length; i++) {
             try {
                 openDevice(mCameraIds[i], mCameraMockListener);
@@ -316,15 +355,15 @@ public class CameraDeviceTest extends Camera2AndroidTestCase {
                 if (!burst) {
                     // Test: that a single capture of each template type succeeds.
                     for (int j = 0; j < mTemplates.length; j++) {
-                        captureSingleShot(mCameraIds[i], mTemplates[j], repeating);
+                        captureSingleShot(mCameraIds[i], mTemplates[j], repeating, flush);
                     }
                 }
                 else {
                     // Test: burst of zero shots
-                    captureBurstShot(mCameraIds[i], mTemplates, 0, repeating);
+                    captureBurstShot(mCameraIds[i], mTemplates, 0, repeating, flush);
 
                     // Test: burst of one shot
-                    captureBurstShot(mCameraIds[i], mTemplates, 1, repeating);
+                    captureBurstShot(mCameraIds[i], mTemplates, 1, repeating, flush);
 
                     int[] templates = new int[] {
                             CameraDevice.TEMPLATE_STILL_CAPTURE,
@@ -335,10 +374,11 @@ public class CameraDeviceTest extends Camera2AndroidTestCase {
                             };
 
                     // Test: burst of 5 shots of the same template type
-                    captureBurstShot(mCameraIds[i], templates, templates.length, repeating);
+                    captureBurstShot(mCameraIds[i], templates, templates.length, repeating, flush);
 
                     // Test: burst of 5 shots of different template types
-                    captureBurstShot(mCameraIds[i], mTemplates, mTemplates.length, repeating);
+                    captureBurstShot(
+                            mCameraIds[i], mTemplates, mTemplates.length, repeating, flush);
                 }
                 verify(mCameraMockListener, never())
                         .onError(
@@ -354,7 +394,7 @@ public class CameraDeviceTest extends Camera2AndroidTestCase {
     private void captureSingleShot(
             String id,
             int template,
-            boolean repeating) throws Exception {
+            boolean repeating, boolean flush) throws Exception {
 
         assertEquals("Bad initial state for preparing to capture",
                 mLatestState, STATE_IDLE);
@@ -377,7 +417,11 @@ public class CameraDeviceTest extends Camera2AndroidTestCase {
         verifyCaptureResults(mockCaptureListener, expectedCaptureResultCount);
 
         if (repeating) {
-            mCamera.stopRepeating();
+            if (flush) {
+                mCamera.flush();
+            } else {
+                mCamera.stopRepeating();
+            }
         }
         waitForState(STATE_IDLE, CAMERA_CONFIGURE_TIMEOUT_MS);
     }
@@ -386,7 +430,8 @@ public class CameraDeviceTest extends Camera2AndroidTestCase {
             String id,
             int[] templates,
             int len,
-            boolean repeating) throws Exception {
+            boolean repeating,
+            boolean flush) throws Exception {
 
         assertEquals("Bad initial state for preparing to capture",
                 mLatestState, STATE_IDLE);
@@ -422,7 +467,11 @@ public class CameraDeviceTest extends Camera2AndroidTestCase {
         verifyCaptureResults(mockCaptureListener, expectedResultCount);
 
         if (repeating) {
-            mCamera.stopRepeating();
+            if (flush) {
+                mCamera.flush();
+            } else {
+                mCamera.stopRepeating();
+            }
         }
         waitForState(STATE_IDLE, CAMERA_CONFIGURE_TIMEOUT_MS);
     }
