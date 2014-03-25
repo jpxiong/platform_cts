@@ -150,5 +150,19 @@
     <style name="Theme_OverrideAttr">
         <item name="themeType">3</item>
     </style>
+    
+    <style name="Theme_ThemedDrawableTest">
+        <item name="themeBoolean">true</item>
+        <item name="themeColor">@android:color/black</item>
+        <item name="themeFloat">1.0</item>
+        <item name="themeAngle">45.0</item>
+        <item name="themeInteger">1</item>
+        <item name="themeDimension">1px</item>
+        <item name="themeDrawable">@drawable/icon_black</item>
+        <item name="themeBitmap">@drawable/icon_black</item>
+        <item name="themeNinePatch">@drawable/ninepatch_0</item>
+        <item name="themeGravity">48</item>
+        <item name="themeTileMode">2</item>
+    </style>
 
 </resources>

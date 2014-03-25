@@ -129,4 +129,17 @@
     <attr name="themeType" format="integer"/>
     <!-- Theme reference used to override parent theme. -->
     <attr name="themeOverrideAttr" format="reference"/>
+
+    <!-- Drawable theming attributes -->
+    <attr name="themeBoolean" />
+    <attr name="themeColor" />
+    <attr name="themeFloat" />
+    <attr name="themeInteger" />
+    <attr name="themeDimension" />
+    <attr name="themeDrawable" />
+    <attr name="themeBitmap" />
+    <attr name="themeNinePatch" />
+    <attr name="themeGravity" />
+    <attr name="themeTileMode" />
+    <attr name="themeAngle" />
 </resources>
