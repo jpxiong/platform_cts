@@ -84,6 +84,7 @@ public class CameraGLTest extends ActivityInstrumentationTestCase2<GLSurfaceView
 
     Camera mCamera;
     SurfaceTexture mSurfaceTexture;
+    private final Object mSurfaceTextureSyncLock = new Object();
     Renderer mRenderer;
     GLSurfaceView mGLView;
 
@@ -165,7 +166,9 @@ public class CameraGLTest extends ActivityInstrumentationTestCase2<GLSurfaceView
         // the method. So we need to join the looper thread here.
         mLooper.getThread().join();
         mCamera = null;
-        mSurfaceTexture = null;
+        synchronized(mSurfaceTextureSyncLock) {
+            mSurfaceTexture = null;
+        }
         if (LOGV) Log.v(TAG, "Shutdown of camera complete.");
     }
 
@@ -662,10 +665,12 @@ public class CameraGLTest extends ActivityInstrumentationTestCase2<GLSurfaceView
 
         public void onDrawFrame(GL10 glUnused) {
             if (LOGVV) Log.v(TAG, "onDrawFrame()");
-            if (CameraGLTest.this.mSurfaceTexture != null) {
-                CameraGLTest.this.mSurfaceTexture.updateTexImage();
-                CameraGLTest.this.mSurfaceTexture.getTransformMatrix(mSTMatrix);
-                mDrawDone.open();
+            synchronized(mSurfaceTextureSyncLock) {
+                if (CameraGLTest.this.mSurfaceTexture != null) {
+                    CameraGLTest.this.mSurfaceTexture.updateTexImage();
+                    CameraGLTest.this.mSurfaceTexture.getTransformMatrix(mSTMatrix);
+                    mDrawDone.open();
+                }
             }
 
             // Ignore the passed-in GL10 interface, and use the GLES20
