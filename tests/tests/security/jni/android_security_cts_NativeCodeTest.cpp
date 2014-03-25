@@ -28,6 +28,8 @@
 #include <fcntl.h>
 #include <cutils/log.h>
 #include <linux/perf_event.h>
+#include <errno.h>
+#include <inttypes.h>
 
 /*
  * Returns true iff this device is vulnerable to CVE-2013-2094.
@@ -126,7 +128,7 @@ static jboolean parent(pid_t child) {
             // We found an address which isn't in our our, or our child's,
             // address space, but yet which is still writable. Scribble
             // all over it.
-            ALOGE("parent: found writable at %x", addr);
+            ALOGE("parent: found writable at %" PRIxPTR, addr);
             uintptr_t addr2;
             for (addr2 = addr; addr2 < addr + SEARCH_SIZE; addr2++) {
                 syscall(__NR_ptrace, PTRACE_PEEKDATA, child, &secret, addr2);
@@ -168,7 +170,11 @@ static jboolean android_security_cts_NativeCodeTest_doVrootTest(JNIEnv*, jobject
 
 static void* mmap_syscall(void* addr, size_t len, int prot, int flags, int fd, off_t offset)
 {
+#ifdef __LP64__
+    return mmap(addr, len, prot, flags, fd, offset);
+#else
     return (void*) syscall(__NR_mmap2, addr, len, prot, flags, fd, offset);
+#endif
 }
 
 #define KBASE_REG_COOKIE_TB         2
