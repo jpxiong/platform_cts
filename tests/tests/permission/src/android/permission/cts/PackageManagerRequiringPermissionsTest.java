@@ -27,7 +27,9 @@ import android.test.suitebuilder.annotation.SmallTest;
  */
 @SmallTest
 public class PackageManagerRequiringPermissionsTest extends AndroidTestCase {
-    private static final String PACKAGE_NAME = "com.android.cts.stub";
+    // Must be a known-present application package other than the one hosting this class
+    private static final String PACKAGE_NAME = "android";
+
     private PackageManager mPackageManager;
 
     @Override
