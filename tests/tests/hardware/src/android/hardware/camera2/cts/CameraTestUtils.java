@@ -163,6 +163,39 @@ public class CameraTestUtils extends Assert {
                 throw new UnsupportedOperationException("Unhandled interrupted exception", e);
             }
         }
+
+        /**
+         * Get the {@link #CaptureResult capture result} for a given
+         * {@link #CaptureRequest capture request}.
+         *
+         * @param myRequest The {@link #CaptureRequest capture request} whose
+         *            corresponding {@link #CaptureResult capture result} was
+         *            being waited for
+         * @param numResultsWait Number of frames to wait for the capture result
+         *            before timeout.
+         * @throws TimeoutRuntimeException If more than numResultsWait results are
+         *            seen before the result matching myRequest arrives, or each
+         *            individual wait for result times out after
+         *            {@value #CAPTURE_RESULT_TIMEOUT_MS}ms.
+         */
+        public CaptureResult getCaptureResultForRequest(CaptureRequest myRequest,
+                int numResultsWait) {
+            if (numResultsWait < 0) {
+                throw new IllegalArgumentException("numResultsWait must be no less than 0");
+            }
+
+            CaptureResult result;
+            int i = 0;
+            do {
+                result = getCaptureResult(CAPTURE_RESULT_TIMEOUT_MS);
+                if (result.getRequest().equals(myRequest)) {
+                    return result;
+                }
+            } while (i++ < numResultsWait);
+
+            throw new TimeoutRuntimeException("Unable to get the expected capture result after "
+                    + "waiting for " + numResultsWait + " results");
+        }
     }
 
     /**

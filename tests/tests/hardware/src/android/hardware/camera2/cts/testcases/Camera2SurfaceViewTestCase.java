@@ -33,7 +33,9 @@ import android.graphics.ImageFormat;
 import android.hardware.camera2.CameraAccessException;
 import android.hardware.camera2.CameraDevice;
 import android.hardware.camera2.CameraManager;
+import android.hardware.camera2.CameraMetadata.Key;
 import android.hardware.camera2.CaptureRequest;
+import android.hardware.camera2.CaptureResult;
 import android.hardware.camera2.Size;
 import android.hardware.camera2.CameraDevice.CaptureListener;
 import android.hardware.camera2.cts.Camera2SurfaceViewStubActivity;
@@ -43,6 +45,7 @@ import android.hardware.camera2.cts.helpers.StaticMetadata;
 import android.hardware.camera2.cts.helpers.StaticMetadata.CheckLevel;
 
 import com.android.ex.camera2.blocking.BlockingStateListener;
+import com.android.ex.camera2.exceptions.TimeoutRuntimeException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -66,6 +69,8 @@ public class Camera2SurfaceViewTestCase extends
 
     private Size mPreviewSize;
     private Surface mPreviewSurface;
+
+    protected static final int WAIT_FOR_RESULT_TIMEOUT_MS = 3000;
 
     protected Context mContext;
     protected CameraManager mCameraManager;
@@ -165,6 +170,19 @@ public class Camera2SurfaceViewTestCase extends
     }
 
     /**
+     * Create a {@link CaptureRequest#Builder} and add the default preview surface.
+     *
+     * @return The {@link CaptureRequest#Builder} to be created
+     * @throws CameraAccessException When create capture request from camera fails
+     */
+    protected CaptureRequest.Builder createRequestForPreview() throws CameraAccessException {
+        CaptureRequest.Builder requestBuilder =
+                mCamera.createCaptureRequest(CameraDevice.TEMPLATE_PREVIEW);
+        requestBuilder.addTarget(mPreviewSurface);
+        return requestBuilder;
+    }
+
+    /**
      * Stop preview for current camera device.
      */
     protected void stopPreview() throws Exception {
@@ -206,6 +224,43 @@ public class Camera2SurfaceViewTestCase extends
 
         // Start preview.
         mCamera.setRepeatingRequest(request.build(), resultListener, mHandler);
+    }
+
+    /**
+     * Wait for expected result key value available in a certain number of results.
+     *
+     * <p>
+     * Check the result immediately if numFramesWait is 0.
+     * </p>
+     *
+     * @param listener The capture listener to get capture result
+     * @param resultKey The capture result key associated with the result value
+     * @param expectedValue The result value need to be waited for
+     * @param numResultsWait Number of frame to wait before times out
+     * @throws TimeoutRuntimeException If more than numResultsWait results are
+     * seen before the result matching myRequest arrives, or each individual wait
+     * for result times out after {@value #WAIT_FOR_RESULT_TIMEOUT_MS}ms.
+     */
+    protected <T> void waitForResultValue(SimpleCaptureListener listener, Key<T> resultKey,
+            T expectedValue, int numResultsWait) {
+        if (numResultsWait < 0 || listener == null) {
+            throw new IllegalArgumentException(
+                    "Input must be non-negative number and listener must be non-null");
+        }
+
+        int i = 0;
+        CaptureResult result;
+        do {
+            result = listener.getCaptureResult(WAIT_FOR_RESULT_TIMEOUT_MS);
+            T value = result.get(resultKey);
+            if (value.equals(expectedValue)) {
+                return;
+            }
+        } while (i++ < numResultsWait);
+
+        throw new TimeoutRuntimeException(
+                "Unable to get the expected result value " + expectedValue + " for key " +
+                        resultKey.getName() + " after waiting for " + numResultsWait + " results");
     }
 
     /**

@@ -42,7 +42,6 @@ public class CaptureRequestTest extends Camera2SurfaceViewTestCase {
     private static final String TAG = "CaptureRequestTest";
     private static final boolean VERBOSE = Log.isLoggable(TAG, Log.VERBOSE);
     private static final int NUM_FRAMES_VERIFIED = 15;
-    private static final long WAIT_FOR_RESULT_TIMEOUT_MS = 3000;
     /** 30ms exposure time must be supported by full capability devices. */
     private static final long DEFAULT_EXP_TIME_NS = 30000000L;
     private static final int DEFAULT_SENSITIVITY = 100;
@@ -57,6 +56,7 @@ public class CaptureRequestTest extends Camera2SurfaceViewTestCase {
     private static final int DEFAULT_NUM_EXPOSURE_TIME_STEPS = 10;
     private static final int DEFAULT_NUM_SENSITIVITY_STEPS = 16;
     private static final int DEFAULT_SENSITIVITY_STEP_SIZE = 100;
+    private static final int NUM_RESULTS_WAIT_TIMEOUT = 100;
 
     @Override
     protected void setUp() throws Exception {
@@ -250,7 +250,123 @@ public class CaptureRequestTest extends Camera2SurfaceViewTestCase {
         }
     }
 
+    /** Test {@link CaptureRequest#FLASH_MODE} control.
+     * <p>
+     * For each {@link CaptureRequest#FLASH_MODE} mode, test the flash control
+     * and {@link CaptureResult#FLASH_STATE} result.
+     * </p>
+     */
+    public void testFlashControl() throws Exception {
+        for (int i = 0; i < mCameraIds.length; i++) {
+            try {
+                openDevice(mCameraIds[i]);
+
+                // Can only test full capability because test relies on per frame control
+                // and synchronization.
+                if (!mStaticInfo.isHardwareLevelFull()) {
+                    continue;
+                }
+
+                SimpleCaptureListener listener = new SimpleCaptureListener();
+                CaptureRequest.Builder requestBuilder =
+                        mCamera.createCaptureRequest(CameraDevice.TEMPLATE_PREVIEW);
+
+                Size maxPreviewSz = mOrderedPreviewSizes.get(0); // Max preview size.
+
+                startPreview(requestBuilder, maxPreviewSz, listener);
+
+                // Flash control can only be used when the AE mode is ON or OFF.
+                flashTestByAeMode(listener, CaptureRequest.CONTROL_AE_MODE_ON);
+                flashTestByAeMode(listener, CaptureRequest.CONTROL_AE_MODE_OFF);
+
+                stopPreview();
+            } finally {
+                closeDevice();
+            }
+        }
+    }
+
     // TODO: add 3A state machine test.
+
+    /**
+     * Test flash mode control by AE mode.
+     * <p>
+     * Only allow AE mode ON or OFF, because other AE mode could run into conflict with
+     * flash manual control. This function expects the camera to already have an active
+     * repeating request and be sending results to the listener.
+     * </p>
+     *
+     * @param listener The Capture listener that is used to wait for capture result
+     * @param aeMode The AE mode for flash to test with
+     */
+    private void flashTestByAeMode(SimpleCaptureListener listener, int aeMode) throws Exception {
+        CaptureRequest request;
+        CaptureResult result;
+        final int NUM_FLASH_REQUESTS_TESTED = 10;
+        CaptureRequest.Builder requestBuilder = createRequestForPreview();
+
+        if (aeMode == CaptureRequest.CONTROL_AE_MODE_ON) {
+            requestBuilder.set(CaptureRequest.CONTROL_AE_MODE, aeMode);
+        } else if (aeMode == CaptureRequest.CONTROL_AE_MODE_OFF) {
+            changeExposure(requestBuilder, DEFAULT_EXP_TIME_NS, DEFAULT_SENSITIVITY);
+        } else {
+            throw new IllegalArgumentException("This test only works when AE mode is ON or OFF");
+        }
+
+        // For camera that doesn't have flash unit, flash state should always be UNAVAILABLE.
+        if (mStaticInfo.getFlashInfoChecked() == false) {
+            for (int i = 0; i < NUM_FLASH_REQUESTS_TESTED; i++) {
+                result = listener.getCaptureResult(CAPTURE_RESULT_TIMEOUT_MS);
+                mCollector.expectEquals("No flash unit available, flash state must be UNAVAILABLE"
+                        + "for AE mode " + aeMode, CaptureResult.FLASH_STATE_UNAVAILABLE,
+                        result.get(CaptureResult.FLASH_STATE));
+            }
+
+            return;
+        }
+
+        // Test flash SINGLE mode control. Wait for flash state to be READY first.
+        waitForResultValue(listener, CaptureResult.FLASH_STATE, CaptureResult.FLASH_STATE_READY,
+                NUM_RESULTS_WAIT_TIMEOUT);
+        requestBuilder.set(CaptureRequest.FLASH_MODE, CaptureRequest.FLASH_MODE_SINGLE);
+        request = requestBuilder.build();
+        mCamera.capture(request, listener, mHandler);
+        result = listener.getCaptureResultForRequest(request,
+                NUM_RESULTS_WAIT_TIMEOUT);
+        // Result mode must be SINGLE, state must be FIRED.
+        mCollector.expectEquals("Flash mode result must be SINGLE",
+                CaptureResult.FLASH_MODE_SINGLE, result.get(CaptureResult.FLASH_MODE));
+        mCollector.expectEquals("Flash state result must be FIRED",
+                CaptureResult.FLASH_STATE_FIRED, result.get(CaptureResult.FLASH_STATE));
+
+        // Test flash TORCH mode control.
+        CaptureRequest[] requests = new CaptureRequest[NUM_FLASH_REQUESTS_TESTED];
+        requestBuilder.set(CaptureRequest.FLASH_MODE, CaptureRequest.FLASH_MODE_TORCH);
+        for (int i = 0; i < NUM_FLASH_REQUESTS_TESTED; i++) {
+            requests[i] = requestBuilder.build();
+            mCamera.capture(requests[i], listener, mHandler);
+        }
+        // Verify the results
+        for (int i = 0; i < NUM_FLASH_REQUESTS_TESTED; i++) {
+            result = listener.getCaptureResultForRequest(requests[i],
+                    NUM_RESULTS_WAIT_TIMEOUT);
+
+            // Result mode must be TORCH, state must be FIRED
+            mCollector.expectEquals("Flash mode result must be TORCH",
+                    CaptureResult.FLASH_MODE_TORCH, result.get(CaptureResult.FLASH_MODE));
+            mCollector.expectEquals("Flash state result must be FIRED",
+                    CaptureResult.FLASH_STATE_FIRED, result.get(CaptureResult.FLASH_STATE));
+        }
+
+        // Test flash OFF mode control
+        requestBuilder.set(CaptureRequest.FLASH_MODE, CaptureRequest.FLASH_MODE_OFF);
+        request = requestBuilder.build();
+        mCamera.capture(request, listener, mHandler);
+        result = listener.getCaptureResultForRequest(request,
+                NUM_RESULTS_WAIT_TIMEOUT);
+        mCollector.expectEquals("Flash mode result must be OFF", CaptureResult.FLASH_MODE_OFF,
+                result.get(CaptureResult.FLASH_MODE));
+    }
 
     private void verifyAntiBandingMode(SimpleCaptureListener listener, int numFramesVerified,
             int mode, boolean isAeManual, long requestExpTime) throws Exception {

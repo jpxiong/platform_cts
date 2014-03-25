@@ -223,6 +223,18 @@ public class StaticMetadata {
         return modes;
     }
 
+    public Boolean getFlashInfoChecked() {
+        CameraMetadata.Key<Boolean> key = CameraCharacteristics.FLASH_INFO_AVAILABLE;
+        Boolean hasFlash = getValueFromKeyNonNull(key);
+
+        // In case the failOnKey only gives warning.
+        if (hasFlash == null) {
+            return false;
+        }
+
+        return hasFlash;
+    }
+
     /**
      * Get the sensitivity value and clamp to the range if needed.
      *
