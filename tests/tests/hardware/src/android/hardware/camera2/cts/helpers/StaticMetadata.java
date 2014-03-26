@@ -19,13 +19,18 @@ package android.hardware.camera2.cts.helpers;
 import android.hardware.camera2.CameraCharacteristics;
 import android.hardware.camera2.CameraMetadata;
 import android.hardware.camera2.CameraMetadata.Key;
+import android.hardware.camera2.Size;
+import android.hardware.camera2.cts.CameraTestUtils;
 import android.util.Log;
 
 import junit.framework.Assert;
 
 import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Helpers to get common static info out of the camera.
@@ -233,6 +238,75 @@ public class StaticMetadata {
         }
 
         return hasFlash;
+    }
+
+    /**
+     * Get available thumbnail sizes and do the sanity check.
+     *
+     * @return The array of available thumbnail sizes
+     */
+    public Size[] getAvailableThumbnailSizesChecked() {
+        CameraMetadata.Key<Size[]> key = CameraCharacteristics.JPEG_AVAILABLE_THUMBNAIL_SIZES;
+        Size[] sizes = getValueFromKeyNonNull(key);
+        final List<Size> sizeList = Arrays.asList(sizes);
+
+        // Size must contain (0, 0).
+        checkTrueForKey(key, "size should contain (0, 0)", sizeList.contains(new Size(0, 0)));
+
+        // Each size must be distinct.
+        Set<Size> sizeSet = new HashSet<Size>(sizeList);
+        checkTrueForKey(key, "Each size must be distinct", sizeSet.size() == sizeList.size());
+
+        // Must be sorted in ascending order by area, by width if areas are same.
+        List<Size> orderedSizes =
+                CameraTestUtils.getAscendingOrderSizes(sizeList, /*ascending*/true);
+        checkTrueForKey(key, "Sizes should be in ascending order: Original " + sizeList.toString()
+                + ", Expected " + orderedSizes.toString(), orderedSizes.equals(sizeList));
+
+        // TODO: Aspect ratio match, need wait for android.scaler.availableStreamConfigurations
+        // implementation see b/12958122.
+
+        return sizes;
+    }
+
+    /**
+     * Get available focal lengths and do the sanity check.
+     *
+     * @return The array of available focal lengths
+     */
+    public float[] getAvailableFocalLengthsChecked() {
+        CameraMetadata.Key<float[]> key = CameraCharacteristics.LENS_INFO_AVAILABLE_FOCAL_LENGTHS;
+        float[] focalLengths = getValueFromKeyNonNull(key);
+
+        checkTrueForKey(key, "Array should contain at least one element", focalLengths.length >= 1);
+
+        for (int i = 0; i < focalLengths.length; i++) {
+            checkTrueForKey(key,
+                    String.format("focalLength[%d] %f should be positive.", i, focalLengths[i]),
+                    focalLengths[i] > 0);
+        }
+
+        return focalLengths;
+    }
+
+    /**
+     * Get available apertures and do the sanity check.
+     *
+     * @return The array of available focal lengths
+     */
+    public float[] getAvailableAperturesChecked() {
+        CameraMetadata.Key<float[]> key = CameraCharacteristics.LENS_INFO_AVAILABLE_APERTURES;
+        float[] apertures = getValueFromKeyNonNull(key);
+
+        checkTrueForKey(key, "Array should contain at least one element", apertures.length >= 1);
+
+        for (int i = 0; i < apertures.length; i++) {
+            checkTrueForKey(key,
+                    String.format("apertures[%d] %f should be positive.", i, apertures[i]),
+                    apertures[i] > 0);
+        }
+
+        return apertures;
     }
 
     /**

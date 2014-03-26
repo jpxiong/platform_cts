@@ -74,6 +74,7 @@ public class CameraTestUtils extends Assert {
     public static final int CAMERA_UNCONFIGURED_TIMEOUT_MS = 1000;
     public static final int CAMERA_CONFIGURE_TIMEOUT_MS = 2000;
     public static final int CAPTURE_RESULT_TIMEOUT_MS = 1000;
+    public static final int CAPTURE_IMAGE_TIMEOUT_MS = 3000;
 
     /**
      * Dummy listener that release the image immediately once it is available.
@@ -446,12 +447,18 @@ public class CameraTestUtils extends Assert {
 
     /**
      * Size comparator that compares the number of pixels it covers.
+     *
+     * <p>If two the areas of two sizes are same, compare the widths.</p>
      */
     public static class SizeComparator implements Comparator<Size> {
         @Override
         public int compare(Size lhs, Size rhs) {
             long left = lhs.getWidth() * lhs.getHeight();
             long right = rhs.getWidth() * rhs.getHeight();
+            if (left == right) {
+                left = lhs.getWidth();
+                right = rhs.getWidth();
+            }
             return (left < right) ? -1 : (left > right ? 1 : 0);
         }
     }
@@ -463,6 +470,34 @@ public class CameraTestUtils extends Assert {
     static public List<Size> getSupportedPreviewSizes(String cameraId,
             CameraManager cameraManager, Size bound) throws CameraAccessException {
         return getSortedSizesForFormat(cameraId, cameraManager, ImageFormat.YUV_420_888, bound);
+    }
+
+    /**
+     * Get a sorted list of sizes from a given size list.
+     *
+     * <p>
+     * The size is compare by area it covers, if the areas are same, then
+     * compare the widths.
+     * </p>
+     *
+     * @param sizeList The input size list to be sorted
+     * @param ascending True if the order is ascending, otherwise descending order
+     * @return The ordered list of sizes
+     */
+    static public List<Size> getAscendingOrderSizes(final List<Size> sizeList, boolean ascending) {
+        if (sizeList == null) {
+            throw new IllegalArgumentException("sizeList shouldn't be null");
+        }
+
+        Comparator<Size> comparator = new SizeComparator();
+        List<Size> sortedSizes = new ArrayList<Size>();
+        sortedSizes.addAll(sizeList);
+        Collections.sort(sortedSizes, comparator);
+        if (!ascending) {
+            Collections.reverse(sortedSizes);
+        }
+
+        return sortedSizes;
     }
 
     /**
@@ -565,6 +600,68 @@ public class CameraTestUtils extends Assert {
         }
 
         return sz;
+    }
+
+    /**
+     * Get object array from byte array.
+     *
+     * @param array Input byte array to be converted
+     * @return Byte object array converted from input byte array
+     */
+    public static Byte[] toObject(byte[] array) {
+        return convertPrimitiveArrayToObjectArray(array, array.length, Byte.class);
+    }
+
+    /**
+     * Get object array from int array.
+     *
+     * @param array Input int array to be converted
+     * @return Integer object array converted from input int array
+     */
+    public static Integer[] toObject(int[] array) {
+        return convertPrimitiveArrayToObjectArray(array, array.length, Integer.class);
+    }
+
+    /**
+     * Get object array from float array.
+     *
+     * @param array Input float array to be converted
+     * @return Float object array converted from input float array
+     */
+    public static Float[] toObject(float[] array) {
+        return convertPrimitiveArrayToObjectArray(array, array.length, Float.class);
+    }
+
+    /**
+     * Get object array from double array.
+     *
+     * @param array Input double array to be converted
+     * @return Double object array converted from input double array
+     */
+    public static Double[] toObject(double[] array) {
+        return convertPrimitiveArrayToObjectArray(array, array.length, Double.class);
+    }
+
+    /**
+     * Convert a primitive input array into its object array version (e.g. from int[] to Integer[]).
+     *
+     * @param array Input array object
+     * @param arrayLength The length of the input array
+     * @param wrapperClass The boxed class it converts to
+     * @return Boxed version of primitive array
+     */
+    private static <T> T[] convertPrimitiveArrayToObjectArray(
+            final Object array, final int arrayLength, final Class<T> wrapperClass) {
+        if (array == null || arrayLength <= 0) {
+            throw new IllegalArgumentException("Input array shouldn't be null or empty");
+        }
+
+        @SuppressWarnings("unchecked")
+        final T[] result = (T[]) Array.newInstance(wrapperClass, arrayLength);
+        for (int i = 0; i < arrayLength; i++) {
+            Array.set(result, i, Array.get(array, i));
+        }
+        return result;
     }
 
     /**

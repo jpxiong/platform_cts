@@ -21,6 +21,7 @@ import static com.android.ex.camera2.blocking.BlockingStateListener.STATE_CLOSED
 
 import android.media.Image;
 import android.media.ImageReader;
+import android.os.Environment;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.Looper;
@@ -70,6 +71,9 @@ public class Camera2SurfaceViewTestCase extends
     private Size mPreviewSize;
     private Surface mPreviewSurface;
 
+    // TODO: Use internal storage for this to make sure the file is only visible to test.
+    protected static final String DEBUG_FILE_NAME_BASE =
+            Environment.getExternalStorageDirectory().getPath();
     protected static final int WAIT_FOR_RESULT_TIMEOUT_MS = 3000;
 
     protected Context mContext;
@@ -194,18 +198,20 @@ public class Camera2SurfaceViewTestCase extends
     /**
      * Setup still capture configuration and start preview.
      *
-     * @param request The capture request to be captured
+     * @param previewRequest The capture request to be used for preview
+     * @param stillRequest The capture request to be used for still capture
      * @param previewSz Preview size
      * @param stillSz Still capture size
      * @param resultListener Capture result listener
      * @param imageListener Still capture image listener
      */
-    protected void prepareStillCaptureAndStartPreview(CaptureRequest.Builder request,
-            Size previewSz, Size stillSz, CaptureListener resultListener,
+    protected void prepareStillCaptureAndStartPreview(CaptureRequest.Builder previewRequest,
+            CaptureRequest.Builder stillRequest, Size previewSz, Size stillSz,
+            CaptureListener resultListener,
             ImageReader.OnImageAvailableListener imageListener) throws Exception {
         if (VERBOSE) {
-            Log.v(TAG, String.format("Prepare still (%s) and preview (%s)", previewSz.toString(),
-                    stillSz.toString()));
+            Log.v(TAG, String.format("Prepare still (%s) and preview (%s)", stillSz.toString(),
+                    previewSz.toString()));
         }
 
         // Update preview size.
@@ -214,16 +220,19 @@ public class Camera2SurfaceViewTestCase extends
         // Create ImageReader.
         createImageReader(stillSz, ImageFormat.JPEG, MAX_READER_IMAGES, imageListener);
 
-        // Configure output streams and request.
+        // Configure output streams with preview and jpeg streams.
         List<Surface> outputSurfaces = new ArrayList<Surface>(/*capacity*/1);
         outputSurfaces.add(mPreviewSurface);
         outputSurfaces.add(mReaderSurface);
         configureCameraOutputs(mCamera, outputSurfaces, mCameraListener);
-        request.addTarget(mPreviewSurface);
-        request.addTarget(mReaderSurface);
+
+        // Configure the requests.
+        previewRequest.addTarget(mPreviewSurface);
+        stillRequest.addTarget(mPreviewSurface);
+        stillRequest.addTarget(mReaderSurface);
 
         // Start preview.
-        mCamera.setRepeatingRequest(request.build(), resultListener, mHandler);
+        mCamera.setRepeatingRequest(previewRequest.build(), resultListener, mHandler);
     }
 
     /**
