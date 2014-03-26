@@ -24,8 +24,7 @@ LOCAL_STATIC_JAVA_LIBRARIES := ctstestrunner
 
 LOCAL_JNI_SHARED_LIBRARIES := libctssecurity_jni
 
-LOCAL_SRC_FILES := $(call all-java-files-under, src) \
-    src/android/security/cts/activity/ISecureRandomService.aidl
+LOCAL_SRC_FILES := $(call all-java-files-under, src)
 
 LOCAL_PACKAGE_NAME := CtsSecurityTestCases
 
