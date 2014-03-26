@@ -134,7 +134,7 @@ public class Camera2AndroidTestCase extends AndroidTestCase {
              * to make the streaming capture stop sooner.
              */
             mCamera.flush();
-            mCameraListener.waitForState(STATE_UNCONFIGURED, CAMERA_UNCONFIGURED_TIMEOUT_MS);
+            mCameraListener.waitForState(STATE_IDLE, CAMERA_IDLE_TIMEOUT_MS);
         } else {
             configureCameraOutputs(mCamera, /*outputSurfaces*/null, mCameraListener);
         }
