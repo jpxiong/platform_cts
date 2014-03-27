@@ -2833,6 +2833,17 @@ public class TextViewTest extends ActivityInstrumentationTestCase2<TextViewStubA
     }
 
     @UiThreadTest
+    public void testSetTextLong() {
+        final int MAX_COUNT = 1 << 21;
+        char[] longText = new char[MAX_COUNT];
+        for (int n = 0; n < MAX_COUNT; n++) {
+            longText[n] = 'm';
+        }
+        mTextView = findTextView(R.id.textview_text);
+        mTextView.setText(new String(longText));
+    }
+
+    @UiThreadTest
     public void testSetExtractedText() {
         mTextView = findTextView(R.id.textview_text);
         assertEquals(mActivity.getResources().getString(R.string.text_view_hello),
