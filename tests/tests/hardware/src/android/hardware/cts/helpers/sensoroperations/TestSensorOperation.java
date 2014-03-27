@@ -19,6 +19,7 @@ package android.hardware.cts.helpers.sensoroperations;
 import android.content.Context;
 import android.hardware.Sensor;
 import android.hardware.cts.helpers.SensorCtsHelper;
+import android.hardware.cts.helpers.SensorStats;
 import android.hardware.cts.helpers.SensorTestInformation;
 import android.hardware.cts.helpers.TestSensorManager;
 import android.hardware.cts.helpers.ValidatingSensorEventListener;
@@ -127,8 +128,8 @@ public class TestSensorOperation extends AbstractSensorOperation {
      */
     @Override
     public void execute() {
-        mStats.addValue("sensor_name", SensorTestInformation.getSensorName(mSensorType));
-        mStats.addValue("sensor_handle", mSensorManager.getSensor().getHandle());
+        getStats().addValue("sensor_name", SensorTestInformation.getSensorName(mSensorType));
+        getStats().addValue("sensor_handle", mSensorManager.getSensor().getHandle());
 
         ValidatingSensorEventListener listener = new ValidatingSensorEventListener(mVerifications);
 
@@ -146,8 +147,10 @@ public class TestSensorOperation extends AbstractSensorOperation {
         }
 
         if (failed) {
-            Assert.fail(SensorCtsHelper.formatAssertionMessage(mSensorManager.getSensor(),
-                    "VerifySensorOperation", sb.toString()));
+            String msg = SensorCtsHelper.formatAssertionMessage(mSensorManager.getSensor(),
+                    "VerifySensorOperation", sb.toString());
+            getStats().addValue(SensorStats.ERROR, msg);
+            Assert.fail(msg);
         }
     }
 
@@ -176,7 +179,7 @@ public class TestSensorOperation extends AbstractSensorOperation {
      */
     private boolean evaluateResults(ISensorVerification verification, StringBuilder sb) {
         try {
-            verification.verify(mStats);
+            verification.verify(getStats());
         } catch (AssertionError e) {
             if (sb.length() > 0) {
                 sb.append(", ");
