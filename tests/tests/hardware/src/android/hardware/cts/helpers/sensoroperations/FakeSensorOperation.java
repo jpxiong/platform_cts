@@ -58,7 +58,7 @@ public class FakeSensorOperation extends AbstractSensorOperation {
         long delayNs = TimeUnit.NANOSECONDS.convert(mDelay, mTimeUnit);
         try {
             Thread.sleep(delayNs / NANOS_PER_MILLI, (int) (delayNs % NANOS_PER_MILLI));
-            addValue("executed", new Boolean(true));
+            mStats.addValue("executed", true);
             if (mFail) {
                 Assert.fail("FakeSensorOperation failed");
             }
