@@ -24,6 +24,11 @@
 
     <application>
         <uses-library android:name="android.test.runner" />
+
+        <service android:name="android.security.cts.SeccompDeathTestService"
+                 android:process=":death_test_service"
+                 android:isolatedProcess="true"
+                 android:exported="true"/>
     </application>
 
     <instrumentation android:name="android.test.InstrumentationCtsTestRunner"
