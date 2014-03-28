@@ -71,7 +71,7 @@ public class EncodeVirtualDisplayTest extends AndroidTestCase {
     private static final int HEIGHT = 720;
     private static final int DENSITY = DisplayMetrics.DENSITY_HIGH;
     private static final int UI_TIMEOUT_MS = 2000;
-    private static final int UI_RENDER_PAUSE_MS = 200;
+    private static final int UI_RENDER_PAUSE_MS = 400;
 
     // Encoder parameters.  We use the same width/height as the virtual display.
     private static final String MIME_TYPE = "video/avc";
