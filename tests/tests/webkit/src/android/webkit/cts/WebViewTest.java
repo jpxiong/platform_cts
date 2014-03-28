@@ -1828,9 +1828,13 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
         // the WebView will load the new URL.
         mOnUiThread.setDownloadListener(listener);
         mOnUiThread.getSettings().setJavaScriptEnabled(true);
+
+        // See b/13675265 for discussion on why the setTimeout is necessary.
+        // Works around a Blink bug.
         mOnUiThread.loadDataAndWaitForCompletion(
-                "<html><body onload=\"window.location = \'" + url + "\'\"></body></html>",
-                "text/html", null);
+                "<html><body onload=\"setTimeout(" +
+                "function() { window.location = \'" + url + "\'; }, 100);\">" +
+                "</body></html>", "text/html", null);
         // Wait for layout to complete before setting focus.
         getInstrumentation().waitForIdleSync();
 
