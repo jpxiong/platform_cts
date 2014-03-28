@@ -240,6 +240,23 @@ public class StaticMetadata {
         return hasFlash;
     }
 
+    public int[] getAvailableTestPatternModesChecked() {
+        CameraMetadata.Key<int[]> key =
+                CameraCharacteristics.SENSOR_AVAILABLE_TEST_PATTERN_MODES;
+        int[] modes = getValueFromKeyNonNull(key);
+
+        if (modes == null) {
+            return new int[0];
+        }
+
+        int expectValue = CameraCharacteristics.SENSOR_TEST_PATTERN_MODE_OFF;
+        Integer[] boxedModes = CameraTestUtils.toObject(modes);
+        checkTrueForKey(key, " value must contain OFF mode",
+                Arrays.asList(boxedModes).contains(expectValue));
+
+        return modes;
+    }
+
     /**
      * Get available thumbnail sizes and do the sanity check.
      *

@@ -42,6 +42,7 @@ public class SurfaceViewPreviewTest extends Camera2SurfaceViewTestCase {
     private static final boolean VERBOSE = Log.isLoggable(TAG, Log.VERBOSE);
     private static final int FRAME_TIMEOUT_MS = 1000;
     private static final int NUM_FRAMES_VERIFIED = 30;
+    private static final int NUM_TEST_PATTERN_FRAMES_VERIFIED = 60;
 
     @Override
     protected void setUp() throws Exception {
@@ -75,6 +76,26 @@ public class SurfaceViewPreviewTest extends Camera2SurfaceViewTestCase {
     }
 
     /**
+     * Basic test pattern mode preview.
+     * <p>
+     * Only test the test pattern preview and capture result, the image buffer
+     * is not validated.
+     * </p>
+     */
+    public void testBasicTestPatternPreview() throws Exception{
+        for (int i = 0; i < mCameraIds.length; i++) {
+            try {
+                Log.i(TAG, "Testing preview for Camera " + mCameraIds[i]);
+                openDevice(mCameraIds[i]);
+
+                previewTestPatternTestByCamera();
+            } finally {
+                closeDevice();
+            }
+        }
+    }
+
+    /**
      * Test all supported preview sizes for a camera device
      *
      * @throws Exception
@@ -99,6 +120,32 @@ public class SurfaceViewPreviewTest extends Camera2SurfaceViewTestCase {
                     NUM_FRAMES_VERIFIED * FRAME_TIMEOUT_MS);
             stopPreview();
         }
+    }
+
+    private void previewTestPatternTestByCamera() throws Exception {
+        Size maxPreviewSize = mOrderedPreviewSizes.get(0);
+        int[] testPatternModes = mStaticInfo.getAvailableTestPatternModesChecked();
+        CaptureRequest.Builder requestBuilder =
+                mCamera.createCaptureRequest(CameraDevice.TEMPLATE_PREVIEW);
+        CaptureListener mockCaptureListener;
+
+        final int[] TEST_PATTERN_DATA = {0, 0xFFFFFFFF, 0xFFFFFFFF, 0}; // G:100%, RB:0.
+        for (int mode : testPatternModes) {
+            if (VERBOSE) {
+                Log.v(TAG, "Test pattern mode: " + mode);
+            }
+            requestBuilder.set(CaptureRequest.SENSOR_TEST_PATTERN_MODE, mode);
+            if (mode == CaptureRequest.SENSOR_TEST_PATTERN_MODE_SOLID_COLOR) {
+                // Assign color pattern to SENSOR_TEST_PATTERN_MODE_DATA
+                requestBuilder.set(CaptureRequest.SENSOR_TEST_PATTERN_DATA, TEST_PATTERN_DATA);
+            }
+            mockCaptureListener = mock(CameraDevice.CaptureListener.class);
+            startPreview(requestBuilder, maxPreviewSize, mockCaptureListener);
+            verifyCaptureResults(mCamera, mockCaptureListener, NUM_TEST_PATTERN_FRAMES_VERIFIED,
+                    NUM_TEST_PATTERN_FRAMES_VERIFIED * FRAME_TIMEOUT_MS);
+        }
+
+        stopPreview();
     }
 
     private class IsCaptureResultValid extends ArgumentMatcher<CaptureResult> {
@@ -130,7 +177,6 @@ public class SurfaceViewPreviewTest extends Camera2SurfaceViewTestCase {
         // Validate timestamps: all timestamps should be larger than 0 and monotonically increase.
         long timestamp = 0;
         for (Long nextTimestamp : timestamps.getAllValues()) {
-            Log.v(TAG, "next t: " + nextTimestamp + " current t: " + timestamp);
             assertNotNull("Next timestamp is null!", nextTimestamp);
             assertTrue("Captures are out of order", timestamp < nextTimestamp);
             timestamp = nextTimestamp;
