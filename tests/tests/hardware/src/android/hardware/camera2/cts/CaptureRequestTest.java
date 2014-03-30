@@ -19,15 +19,21 @@ package android.hardware.camera2.cts;
 import static android.hardware.camera2.cts.CameraTestUtils.*;
 import static android.hardware.camera2.CameraCharacteristics.*;
 
+import android.graphics.Point;
+import android.graphics.Rect;
 import android.hardware.camera2.CameraDevice;
 import android.hardware.camera2.CaptureRequest;
 import android.hardware.camera2.CaptureResult;
+import android.hardware.camera2.Face;
 import android.hardware.camera2.Size;
+import android.hardware.camera2.CameraMetadata.Key;
 import android.hardware.camera2.cts.CameraTestUtils.SimpleCaptureListener;
 import android.hardware.camera2.cts.testcases.Camera2SurfaceViewTestCase;
 import android.util.Log;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 /**
  * <p>
@@ -42,6 +48,7 @@ public class CaptureRequestTest extends Camera2SurfaceViewTestCase {
     private static final String TAG = "CaptureRequestTest";
     private static final boolean VERBOSE = Log.isLoggable(TAG, Log.VERBOSE);
     private static final int NUM_FRAMES_VERIFIED = 15;
+    private static final int NUM_FACE_DETECTION_FRAMES_VERIFIED = 60;
     /** 30ms exposure time must be supported by full capability devices. */
     private static final long DEFAULT_EXP_TIME_NS = 30000000L;
     private static final int DEFAULT_SENSITIVITY = 100;
@@ -53,10 +60,19 @@ public class CaptureRequestTest extends Camera2SurfaceViewTestCase {
     private static final long EXPOSURE_TIME_BOUNDARY_60HZ_NS = 8300000L; // 8.3ms, Approximation.
     private static final long EXPOSURE_TIME_ERROR_MARGIN_NS = 100000L; // 100us, Approximation.
     private static final int SENSITIVITY_ERROR_MARGIN = 10; // 10
-    private static final int DEFAULT_NUM_EXPOSURE_TIME_STEPS = 10;
+    private static final int DEFAULT_NUM_EXPOSURE_TIME_STEPS = 3;
     private static final int DEFAULT_NUM_SENSITIVITY_STEPS = 16;
     private static final int DEFAULT_SENSITIVITY_STEP_SIZE = 100;
     private static final int NUM_RESULTS_WAIT_TIMEOUT = 100;
+    // Linear tone mapping curve example.
+    private static final float[] TONEMAP_CURVE_LINEAR = {0, 0, 1.0f, 1.0f};
+    // Standard sRGB tone mapping, per IEC 61966-2-1:1999, with 16 control points.
+    private static final float[] TONEMAP_CURVE_SRGB = {
+            0.0000f, 0.0000f, 0.0667f, 0.2864f, 0.1333f, 0.4007f, 0.2000f, 0.4845f,
+            0.2667f, 0.5532f, 0.3333f, 0.6125f, 0.4000f, 0.6652f, 0.4667f, 0.7130f,
+            0.5333f, 0.7569f, 0.6000f, 0.7977f, 0.6667f, 0.8360f, 0.7333f, 0.8721f,
+            0.8000f, 0.9063f, 0.8667f, 0.9389f, 0.9333f, 0.9701f, 1.0000f, 1.0000f
+    };
 
     @Override
     protected void setUp() throws Exception {
@@ -280,6 +296,36 @@ public class CaptureRequestTest extends Camera2SurfaceViewTestCase {
                 flashTestByAeMode(listener, CaptureRequest.CONTROL_AE_MODE_OFF);
 
                 stopPreview();
+            } finally {
+                closeDevice();
+            }
+        }
+    }
+
+    /**
+     * Test face detection modes and results.
+     */
+    public void testFaceDetection() throws Exception {
+        for (int i = 0; i < mCameraIds.length; i++) {
+            try {
+                openDevice(mCameraIds[i]);
+
+                faceDetectionTestByCamera();
+            } finally {
+                closeDevice();
+            }
+        }
+    }
+
+    /**
+     * Test tone map modes and controls.
+     */
+    public void testToneMapControl() throws Exception {
+        for (int i = 0; i < mCameraIds.length; i++) {
+            try {
+                openDevice(mCameraIds[i]);
+
+                toneMapTestByCamera();
             } finally {
                 closeDevice();
             }
@@ -571,13 +617,14 @@ public class CaptureRequestTest extends Camera2SurfaceViewTestCase {
                 int resultSensitivity = getValueNotNull(result, CaptureResult.SENSOR_SENSITIVITY);
                 validateExposureTime(expTimes[i], resultExpTime);
                 validateSensitivity(sensitivities[j], resultSensitivity);
+                validateFrameDurationForCapture(result);
             }
         }
         // TODO: Add another case to test where we can submit all requests, then wait for
         // results, which will hide the pipeline latency. this is not only faster, but also
         // test high speed per frame control and synchronization.
-
     }
+
 
     /**
      * Verify black level lock control.
@@ -640,6 +687,241 @@ public class CaptureRequestTest extends Camera2SurfaceViewTestCase {
                 // Map mode is OFF, expect to receive a unity map.
                 assertTrue("Result map " + Arrays.toString(map) + " must be an unity map",
                         Arrays.equals(unityMap, map));
+            }
+        }
+    }
+
+    /**
+     * Test face detection for a camera.
+     */
+    private void faceDetectionTestByCamera() throws Exception {
+        // Can only test full capability because test relies on per frame control
+        // and synchronization.
+        if (!mStaticInfo.isHardwareLevelFull()) {
+            return;
+        }
+        byte[] faceDetectModes = mStaticInfo.getAvailableFaceDetectModesChecked();
+
+        SimpleCaptureListener listener;
+        CaptureRequest.Builder requestBuilder =
+                mCamera.createCaptureRequest(CameraDevice.TEMPLATE_PREVIEW);
+
+        Size maxPreviewSz = mOrderedPreviewSizes.get(0); // Max preview size.
+        for (byte mode : faceDetectModes) {
+            requestBuilder.set(CaptureRequest.STATISTICS_FACE_DETECT_MODE, (int)mode);
+            if (VERBOSE) {
+                Log.v(TAG, "Start testing face detection mode " + mode);
+            }
+
+            // Create a new listener for each run to avoid the results from one run spill
+            // into another run.
+            listener = new SimpleCaptureListener();
+            startPreview(requestBuilder, maxPreviewSz, listener);
+            verifyFaceDetectionResults(listener, NUM_FACE_DETECTION_FRAMES_VERIFIED, mode);
+        }
+
+        stopPreview();
+    }
+
+    /**
+     * Verify face detection results for different face detection modes.
+     *
+     * @param listener The listener to get capture result
+     * @param numFramesVerified Number of results to be verified
+     * @param faceDetectionMode Face detection mode to be verified against
+     */
+    private void verifyFaceDetectionResults(SimpleCaptureListener listener, int numFramesVerified,
+            int faceDetectionMode) {
+        for (int i = 0; i < numFramesVerified; i++) {
+            CaptureResult result = listener.getCaptureResult(WAIT_FOR_RESULT_TIMEOUT_MS);
+            mCollector.expectEquals("Result face detection mode should match the request",
+                    faceDetectionMode, result.get(CaptureResult.STATISTICS_FACE_DETECT_MODE));
+
+            Face[] faces = result.get(CaptureResult.STATISTICS_FACES);
+            List<Integer> faceIds = new ArrayList<Integer>(faces.length);
+            List<Integer> faceScores = new ArrayList<Integer>(faces.length);
+            if (faceDetectionMode == CaptureResult.STATISTICS_FACE_DETECT_MODE_OFF) {
+                mCollector.expectEquals("Number of detection faces should always 0 for OFF mode",
+                        0, faces.length);
+            } else if (faceDetectionMode == CaptureResult.STATISTICS_FACE_DETECT_MODE_SIMPLE) {
+                for (Face face : faces) {
+                    mCollector.expectNotNull("Face rectangle shouldn't be null", face.getBounds());
+                    faceScores.add(face.getScore());
+                    mCollector.expectTrue("Face id is expected to be -1 for SIMPLE mode",
+                            face.getId() == Face.ID_UNSUPPORTED);
+                }
+            } else if (faceDetectionMode == CaptureResult.STATISTICS_FACE_DETECT_MODE_FULL) {
+                if (VERBOSE) {
+                    Log.v(TAG, "Number of faces detected: " + faces.length);
+                }
+
+                for (Face face : faces) {
+                    Rect faceBound = null;
+                    boolean faceRectAvailable =  mCollector.expectTrue("Face rectangle "
+                            + "shouldn't be null", face.getBounds() != null);
+                    if (!faceRectAvailable) {
+                        continue;
+                    }
+                    faceBound = face.getBounds();
+
+                    faceScores.add(face.getScore());
+                    faceIds.add(face.getId());
+
+                    mCollector.expectTrue("Face id is shouldn't be -1 for FULL mode",
+                            face.getId() != Face.ID_UNSUPPORTED);
+                    boolean leftEyeAvailable =
+                            mCollector.expectTrue("Left eye position shouldn't be null",
+                                    face.getLeftEyePosition() != null);
+                    boolean rightEyeAvailable =
+                            mCollector.expectTrue("Right eye position shouldn't be null",
+                                    face.getRightEyePosition() != null);
+                    boolean mouthAvailable =
+                            mCollector.expectTrue("Mouth position shouldn't be null",
+                            face.getMouthPosition() != null);
+                    // Eyes/mouth position should be inside of the face rect.
+                    if (leftEyeAvailable) {
+                        Point leftEye = face.getLeftEyePosition();
+                        mCollector.expectTrue("Left eye " + leftEye.toString() + "should be"
+                                + "inside of face rect " + faceBound.toString(),
+                                faceBound.contains(leftEye.x, leftEye.y));
+                    }
+                    if (rightEyeAvailable) {
+                        Point rightEye = face.getRightEyePosition();
+                        mCollector.expectTrue("Right eye " + rightEye.toString() + "should be"
+                                + "inside of face rect " + faceBound.toString(),
+                                faceBound.contains(rightEye.x, rightEye.y));
+                    }
+                    if (mouthAvailable) {
+                        Point mouth = face.getMouthPosition();
+                        mCollector.expectTrue("Mouth " + mouth.toString() +  " should be inside of"
+                                + " face rect " + faceBound.toString(),
+                                faceBound.contains(mouth.x, mouth.y));
+                    }
+                }
+            }
+            mCollector.expectValuesInRange("Face scores are invalid", faceIds,
+                    Face.SCORE_MIN, Face.SCORE_MAX);
+            mCollector.expectValuesUnique("Face ids are invalid", faceIds);
+        }
+    }
+
+    /**
+     * Test tone map mode and result by camera
+     */
+    private void toneMapTestByCamera() throws Exception {
+        // Can only test full capability because test relies on per frame control
+        // and synchronization.
+        if (!mStaticInfo.isHardwareLevelFull()) {
+            return;
+        }
+
+        SimpleCaptureListener listener;
+        CaptureRequest.Builder requestBuilder =
+                mCamera.createCaptureRequest(CameraDevice.TEMPLATE_PREVIEW);
+
+        Size maxPreviewSz = mOrderedPreviewSizes.get(0); // Max preview size.
+
+        byte[] toneMapModes = mStaticInfo.getAvailableToneMapModesChecked();
+        for (byte mode : toneMapModes) {
+            requestBuilder.set(CaptureRequest.TONEMAP_MODE, (int)mode);
+            if (VERBOSE) {
+                Log.v(TAG, "Testing tonemap mode " + mode);
+            }
+
+            if (mode == CaptureRequest.TONEMAP_MODE_CONTRAST_CURVE) {
+                requestBuilder.set(CaptureRequest.TONEMAP_CURVE_RED, TONEMAP_CURVE_LINEAR);
+                requestBuilder.set(CaptureRequest.TONEMAP_CURVE_GREEN, TONEMAP_CURVE_LINEAR);
+                requestBuilder.set(CaptureRequest.TONEMAP_CURVE_BLUE, TONEMAP_CURVE_LINEAR);
+                // Create a new listener for each run to avoid the results from one run spill
+                // into another run.
+                listener = new SimpleCaptureListener();
+                startPreview(requestBuilder, maxPreviewSz, listener);
+                verifyToneMapModeResults(listener, NUM_FRAMES_VERIFIED, mode,
+                        TONEMAP_CURVE_LINEAR);
+
+                requestBuilder.set(CaptureRequest.TONEMAP_CURVE_RED, TONEMAP_CURVE_SRGB);
+                requestBuilder.set(CaptureRequest.TONEMAP_CURVE_GREEN, TONEMAP_CURVE_SRGB);
+                requestBuilder.set(CaptureRequest.TONEMAP_CURVE_BLUE, TONEMAP_CURVE_SRGB);
+                // Create a new listener for each run to avoid the results from one run spill
+                // into another run.
+                listener = new SimpleCaptureListener();
+                startPreview(requestBuilder, maxPreviewSz, listener);
+                verifyToneMapModeResults(listener, NUM_FRAMES_VERIFIED, mode,
+                        TONEMAP_CURVE_SRGB);
+            } else {
+                // Create a new listener for each run to avoid the results from one run spill
+                // into another run.
+                listener = new SimpleCaptureListener();
+                startPreview(requestBuilder, maxPreviewSz, listener);
+                verifyToneMapModeResults(listener, NUM_FRAMES_VERIFIED, mode,
+                        /*inputToneCurve*/null);
+            }
+        }
+
+        stopPreview();
+    }
+
+    /**
+     * Verify tonemap results.
+     * <p>
+     * Assumes R,G,B channels use the same tone curve
+     * </p>
+     *
+     * @param listener The capture listener used to get the capture results
+     * @param numFramesVerified Number of results to be verified
+     * @param tonemapMode Tonemap mode to verify
+     * @param inputToneCurve Tonemap curve used by all 3 channels, ignored when
+     * map mode is not CONTRAST_CURVE.
+     */
+    private void verifyToneMapModeResults(SimpleCaptureListener listener, int numFramesVerified,
+            int tonemapMode, float[] inputToneCurve) {
+        final int MIN_TONEMAP_CURVE_POINTS = 2;
+        final Float ZERO = new Float(0);
+        final Float ONE = new Float(1.0f);
+
+        int maxCurvePoints = mStaticInfo.getMaxTonemapCurvePointChecked();
+        for (int i = 0; i < numFramesVerified; i++) {
+            CaptureResult result = listener.getCaptureResult(WAIT_FOR_RESULT_TIMEOUT_MS);
+            mCollector.expectEquals("Capture result tonemap mode should match request", tonemapMode,
+                    result.get(CaptureRequest.TONEMAP_MODE));
+            float[] mapRed = result.get(CaptureResult.TONEMAP_CURVE_RED);
+            float[] mapGreen = result.get(CaptureResult.TONEMAP_CURVE_GREEN);
+            float[] mapBlue = result.get(CaptureResult.TONEMAP_CURVE_BLUE);
+            boolean redAvailable =
+                    mCollector.expectTrue("Tonemap curve red shouldn't be null for mode "
+                            + tonemapMode, mapRed != null);
+            boolean greenAvailable =
+                    mCollector.expectTrue("Tonemap curve red shouldn't be null for mode "
+                            + tonemapMode, mapGreen != null);
+            boolean blueAvailable =
+                    mCollector.expectTrue("Tonemap curve red shouldn't be null for mode "
+                            + tonemapMode, mapBlue != null);
+            if (tonemapMode == CaptureResult.TONEMAP_MODE_CONTRAST_CURVE) {
+                /**
+                 * TODO: need figure out a good way to measure the difference
+                 * between request and result, as they may have different array
+                 * size.
+                 */
+            }
+
+            // Tonemap curve result availability and basic sanity check for all modes.
+            if (redAvailable) {
+                mCollector.expectValuesInRange("Tonemap curve red values are out of range",
+                        CameraTestUtils.toObject(mapRed), /*min*/ZERO, /*max*/ONE);
+                mCollector.expectInRange("Tonemap curve red length is out of range",
+                        mapRed.length, MIN_TONEMAP_CURVE_POINTS, maxCurvePoints * 2);
+            }
+            if (greenAvailable) {
+                mCollector.expectValuesInRange("Tonemap curve green values are out of range",
+                        CameraTestUtils.toObject(mapGreen), /*min*/ZERO, /*max*/ONE);
+                mCollector.expectInRange("Tonemap curve green length is out of range",
+                        mapGreen.length, MIN_TONEMAP_CURVE_POINTS, maxCurvePoints * 2);
+            }
+            if (blueAvailable) {
+                mCollector.expectValuesInRange("Tonemap curve blue values are out of range",
+                        CameraTestUtils.toObject(mapBlue), /*min*/ZERO, /*max*/ONE);
+                mCollector.expectInRange("Tonemap curve blue length is out of range",
+                        mapBlue.length, MIN_TONEMAP_CURVE_POINTS, maxCurvePoints * 2);
             }
         }
     }
@@ -760,6 +1042,25 @@ public class CaptureRequestTest extends Camera2SurfaceViewTestCase {
         mCollector.expectTrue("Sensitivity is invalid for AE manaul control test, request: "
                 + request + " result: " + result,
                 sensitivityDelta < SENSITIVITY_ERROR_MARGIN && sensitivityDelta >= 0);
+    }
+
+    /**
+     * Validate frame duration for a given capture.
+     *
+     * <p>Frame duration should be longer than exposure time.</p>
+     *
+     * @param result The capture result for a given capture
+     */
+    private void validateFrameDurationForCapture(CaptureResult result) {
+        long expTime = getValueNotNull(result, CaptureResult.SENSOR_EXPOSURE_TIME);
+        long frameDuration = getValueNotNull(result, CaptureResult.SENSOR_FRAME_DURATION);
+        if (VERBOSE) {
+            Log.v(TAG, "frame duration: " + frameDuration + " Exposure time: " + expTime);
+        }
+
+        mCollector.expectTrue(String.format("Frame duration (%d) should be longer than exposure"
+                + " time (%d) for a given capture", frameDuration, expTime),
+                frameDuration > expTime);
     }
 
     private <T> T getValueNotNull(CaptureResult result, Key<T> key) {

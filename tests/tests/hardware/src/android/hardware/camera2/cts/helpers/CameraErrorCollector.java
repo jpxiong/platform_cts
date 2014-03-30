@@ -25,7 +25,10 @@ import org.hamcrest.Matcher;
 import org.junit.rules.ErrorCollector;
 
 import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 
 /**
  * A camera test ErrorCollector class to gather the test failures during a test,
@@ -211,6 +214,52 @@ public class CameraErrorCollector extends ErrorCollector {
         return true;
     }
 
+    /**
+     * Expect the list of values are in the range.
+     *
+     * @param msg Message to be logged
+     * @param list The list of values to be checked
+     * @param min The min value of the range
+     * @param max The max value of the range
+     */
+    public <T extends Comparable<? super T>> void expectValuesInRange(String msg, List<T> list,
+            T min, T max) {
+        for (T value : list) {
+            expectTrue(msg + String.format(", array value " + value.toString() +
+                    " is out of range [%s, %s]",
+                    min.toString(), max.toString()),
+                    value.compareTo(max)<= 0 && value.compareTo(min) >= 0);
+        }
+    }
+
+    /**
+     * Expect the array of values are in the range.
+     *
+     * @param msg Message to be logged
+     * @param array The array of values to be checked
+     * @param min The min value of the range
+     * @param max The max value of the range
+     */
+    public <T extends Comparable<? super T>> void expectValuesInRange(String msg, T[] array,
+            T min, T max) {
+        expectValuesInRange(msg, Arrays.asList(array), min, max);
+    }
+
+    /**
+     * Expect the value is in the range.
+     *
+     * @param msg Message to be logged
+     * @param value The value to be checked
+     * @param min The min value of the range
+     * @param max The max value of the range
+     */
+    public <T extends Comparable<? super T>> void expectInRange(String msg, T value,
+            T min, T max) {
+        expectTrue(msg + String.format(", value " + value.toString() + " is out of range [%s, %s]",
+                min.toString(), max.toString()),
+                value.compareTo(max)<= 0 && value.compareTo(min) >= 0);
+    }
+
     public void expectNotNull(String msg, Object obj) {
         checkThat(msg, obj, CoreMatchers.notNullValue());
     }
@@ -275,5 +324,16 @@ public class CameraErrorCollector extends ErrorCollector {
         String reason = "Key " + key.getName() + " value " + value.toString()
                 + " doesn't match the expected value " + expected.toString();
         checkThat(reason, value, CoreMatchers.equalTo(expected));
+    }
+
+    /**
+     * Check if the element inside of the list are unique.
+     *
+     * @param msg The message to be logged
+     * @param list The list of values to be checked
+     */
+    public <T> void expectValuesUnique(String msg, List<T> list) {
+        Set<T> sizeSet = new HashSet<T>(list);
+        expectTrue(msg + " each size must be distinct", sizeSet.size() == list.size());
     }
 }

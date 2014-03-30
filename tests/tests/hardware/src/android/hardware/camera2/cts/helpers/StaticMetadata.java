@@ -16,6 +16,7 @@
 
 package android.hardware.camera2.cts.helpers;
 
+import android.graphics.Rect;
 import android.hardware.camera2.CameraCharacteristics;
 import android.hardware.camera2.CameraMetadata;
 import android.hardware.camera2.CameraMetadata.Key;
@@ -56,6 +57,8 @@ public class StaticMetadata {
     private static final int SENSOR_INFO_SENSITIVITY_RANGE_MAX = 1;
     private static final int SENSOR_INFO_SENSITIVITY_RANGE_MIN_AT_MOST = 100;
     private static final int SENSOR_INFO_SENSITIVITY_RANGE_MAX_AT_LEAST = 1600;
+    private static final int STATISTICS_INFO_MAX_FACE_COUNT_MIN_AT_LEAST = 4;
+    private static final int TONEMAP_MAX_CURVE_POINTS_AT_LEAST = 64;
 
     // TODO: Consider making this work across any metadata object, not just camera characteristics
     private final CameraCharacteristics mCharacteristics;
@@ -208,8 +211,7 @@ public class StaticMetadata {
      * @return The array contains available anti-banding modes.
      */
     public byte[] getAeAvailableAntiBandingModesChecked() {
-        CameraMetadata.Key<byte[]> key =
-                CameraCharacteristics.CONTROL_AE_AVAILABLE_ANTIBANDING_MODES;
+        Key<byte[]> key = CameraCharacteristics.CONTROL_AE_AVAILABLE_ANTIBANDING_MODES;
         byte[] modes = getValueFromKeyNonNull(key);
 
         boolean foundAuto = false;
@@ -229,7 +231,7 @@ public class StaticMetadata {
     }
 
     public Boolean getFlashInfoChecked() {
-        CameraMetadata.Key<Boolean> key = CameraCharacteristics.FLASH_INFO_AVAILABLE;
+        Key<Boolean> key = CameraCharacteristics.FLASH_INFO_AVAILABLE;
         Boolean hasFlash = getValueFromKeyNonNull(key);
 
         // In case the failOnKey only gives warning.
@@ -263,7 +265,7 @@ public class StaticMetadata {
      * @return The array of available thumbnail sizes
      */
     public Size[] getAvailableThumbnailSizesChecked() {
-        CameraMetadata.Key<Size[]> key = CameraCharacteristics.JPEG_AVAILABLE_THUMBNAIL_SIZES;
+        Key<Size[]> key = CameraCharacteristics.JPEG_AVAILABLE_THUMBNAIL_SIZES;
         Size[] sizes = getValueFromKeyNonNull(key);
         final List<Size> sizeList = Arrays.asList(sizes);
 
@@ -271,8 +273,7 @@ public class StaticMetadata {
         checkTrueForKey(key, "size should contain (0, 0)", sizeList.contains(new Size(0, 0)));
 
         // Each size must be distinct.
-        Set<Size> sizeSet = new HashSet<Size>(sizeList);
-        checkTrueForKey(key, "Each size must be distinct", sizeSet.size() == sizeList.size());
+        checkElementDistinct(key, sizeList);
 
         // Must be sorted in ascending order by area, by width if areas are same.
         List<Size> orderedSizes =
@@ -292,7 +293,7 @@ public class StaticMetadata {
      * @return The array of available focal lengths
      */
     public float[] getAvailableFocalLengthsChecked() {
-        CameraMetadata.Key<float[]> key = CameraCharacteristics.LENS_INFO_AVAILABLE_FOCAL_LENGTHS;
+        Key<float[]> key = CameraCharacteristics.LENS_INFO_AVAILABLE_FOCAL_LENGTHS;
         float[] focalLengths = getValueFromKeyNonNull(key);
 
         checkTrueForKey(key, "Array should contain at least one element", focalLengths.length >= 1);
@@ -302,6 +303,7 @@ public class StaticMetadata {
                     String.format("focalLength[%d] %f should be positive.", i, focalLengths[i]),
                     focalLengths[i] > 0);
         }
+        checkElementDistinct(key, Arrays.asList(CameraTestUtils.toObject(focalLengths)));
 
         return focalLengths;
     }
@@ -309,10 +311,10 @@ public class StaticMetadata {
     /**
      * Get available apertures and do the sanity check.
      *
-     * @return The array of available focal lengths
+     * @return The non-null array of available apertures
      */
     public float[] getAvailableAperturesChecked() {
-        CameraMetadata.Key<float[]> key = CameraCharacteristics.LENS_INFO_AVAILABLE_APERTURES;
+        Key<float[]> key = CameraCharacteristics.LENS_INFO_AVAILABLE_APERTURES;
         float[] apertures = getValueFromKeyNonNull(key);
 
         checkTrueForKey(key, "Array should contain at least one element", apertures.length >= 1);
@@ -322,8 +324,145 @@ public class StaticMetadata {
                     String.format("apertures[%d] %f should be positive.", i, apertures[i]),
                     apertures[i] > 0);
         }
+        checkElementDistinct(key, Arrays.asList(CameraTestUtils.toObject(apertures)));
 
         return apertures;
+    }
+
+    /**
+     * Get and check available face detection modes.
+     *
+     * @return The non-null array of available face detection modes
+     */
+    public byte[] getAvailableFaceDetectModesChecked() {
+        Key<byte[]> key = CameraCharacteristics.STATISTICS_INFO_AVAILABLE_FACE_DETECT_MODES;
+        byte[] modes = getValueFromKeyNonNull(key);
+
+        if (modes == null) {
+            return new byte[0];
+        }
+
+        List<Byte> modeList = Arrays.asList(CameraTestUtils.toObject(modes));
+        checkTrueForKey(key, "Array should contain OFF mode",
+                modeList.contains((byte)CameraMetadata.STATISTICS_FACE_DETECT_MODE_OFF));
+        checkElementDistinct(key, modeList);
+        checkArrayValuesInRange(key, modes, (byte)CameraMetadata.STATISTICS_FACE_DETECT_MODE_OFF,
+                (byte)CameraMetadata.STATISTICS_FACE_DETECT_MODE_FULL);
+
+        return modes;
+    }
+
+    /**
+     * Get and check max face detected count.
+     *
+     * @return max number of faces that can be detected
+     */
+    public int getMaxFaceCountChecked() {
+        Key<Integer> key = CameraCharacteristics.STATISTICS_INFO_MAX_FACE_COUNT;
+        Integer count = getValueFromKeyNonNull(key);
+
+        if (count == null) {
+            return 0;
+        }
+
+        List<Byte> faceDetectModes =
+                Arrays.asList(CameraTestUtils.toObject(getAvailableFaceDetectModesChecked()));
+        if (faceDetectModes.contains((byte)CameraMetadata.STATISTICS_FACE_DETECT_MODE_OFF) &&
+                faceDetectModes.size() == 1) {
+            checkTrueForKey(key, " value must be 0 if only OFF mode is supported in "
+                    + "availableFaceDetectionModes", count == 0);
+        } else {
+            int maxFaceCountAtLeat = STATISTICS_INFO_MAX_FACE_COUNT_MIN_AT_LEAST;
+            checkTrueForKey(key, " value must be no less than " + maxFaceCountAtLeat + " if SIMPLE"
+                    + "or FULL is also supported in availableFaceDetectionModes",
+                    count >= maxFaceCountAtLeat);
+        }
+
+        return count;
+    }
+
+    /**
+     * Get and check the available tone map modes.
+     *
+     * @return the availalbe tone map modes
+     */
+    public byte[] getAvailableToneMapModesChecked() {
+        Key<byte[]> key = CameraCharacteristics.TONEMAP_AVAILABLE_TONE_MAP_MODES;
+        byte[] modes = getValueFromKeyNonNull(key);
+
+        if (modes == null) {
+            return new byte[0];
+        }
+
+        List<Byte> modeList = Arrays.asList(CameraTestUtils.toObject(modes));
+        if (isHardwareLevelFull()) {
+            checkTrueForKey(key, "Full-capability camera devices must always support"
+                    + "CONTRAST_CURVE and FAST",
+                    modeList.contains((byte)CameraMetadata.TONEMAP_MODE_CONTRAST_CURVE) &&
+                    modeList.contains((byte)CameraMetadata.TONEMAP_MODE_FAST));
+        }
+        checkElementDistinct(key, modeList);
+        checkArrayValuesInRange(key, modes, (byte)CameraMetadata.TONEMAP_MODE_CONTRAST_CURVE,
+                (byte)CameraMetadata.TONEMAP_MODE_HIGH_QUALITY);
+
+        return modes;
+    }
+
+    /**
+     * Get and check max tonemap curve point.
+     *
+     * @return Max tonemap curve points.
+     */
+    public int getMaxTonemapCurvePointChecked() {
+        Key<Integer> key = CameraCharacteristics.TONEMAP_MAX_CURVE_POINTS;
+        Integer count = getValueFromKeyNonNull(key);
+
+        if (count == null) {
+            return 0;
+        }
+
+        List<Byte> modeList =
+                Arrays.asList(CameraTestUtils.toObject(getAvailableToneMapModesChecked()));
+        if (modeList.contains((byte)CameraMetadata.TONEMAP_MODE_CONTRAST_CURVE)) {
+            checkTrueForKey(key, "Full-capability camera device must support maxCurvePoints "
+                    + ">= " + TONEMAP_MAX_CURVE_POINTS_AT_LEAST,
+                    count >= TONEMAP_MAX_CURVE_POINTS_AT_LEAST);
+        }
+
+        return count;
+    }
+
+    /**
+     * Get and check pixel array size.
+     */
+    public Size getPixelArraySizeChecked() {
+        Key<Size> key = CameraCharacteristics.SENSOR_INFO_PIXEL_ARRAY_SIZE;
+        Size pixelArray = getValueFromKeyNonNull(key);
+        if (pixelArray == null) {
+            return new Size(0, 0);
+        }
+
+        return pixelArray;
+    }
+
+    /**
+     * Get and check active array size.
+     */
+    public Rect getActiveArraySizeChecked() {
+        Key<Rect> key = CameraCharacteristics.SENSOR_INFO_ACTIVE_ARRAY_SIZE;
+        Rect activeArray = getValueFromKeyNonNull(key);
+
+        if (activeArray == null) {
+            return new Rect(0, 0, 0, 0);
+        }
+
+        Size pixelArraySize = getPixelArraySizeChecked();
+        checkTrueForKey(key, "values left/top are invalid", activeArray.left >= 0 && activeArray.top >= 0);
+        checkTrueForKey(key, "values width/height are invalid",
+                activeArray.width() <= pixelArraySize.getWidth() &&
+                activeArray.height() <= pixelArraySize.getHeight());
+
+        return activeArray;
     }
 
     /**
@@ -643,6 +782,25 @@ public class StaticMetadata {
         }
 
         return value;
+    }
+
+    private void checkArrayValuesInRange(Key<byte[]> key, byte[] array, byte min, byte max) {
+        for (byte value : array) {
+            checkTrueForKey(key, String.format(" value is out of range [%d, %d]", min, max),
+                    value <= max && value >= min);
+        }
+    }
+
+    /**
+     * Check the uniqueness of the values in a list.
+     *
+     * @param key The key to be checked
+     * @param list The list contains the value of the key
+     */
+    private <U, T> void checkElementDistinct(Key<U> key, List<T> list) {
+        // Each size must be distinct.
+        Set<T> sizeSet = new HashSet<T>(list);
+        checkTrueForKey(key, "Each size must be distinct", sizeSet.size() == list.size());
     }
 
     private <T> void checkTrueForKey(Key<T> key, String message, boolean condition) {
