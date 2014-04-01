@@ -20,7 +20,6 @@ import android.hardware.Sensor;
 import android.hardware.SensorManager;
 import android.hardware.cts.helpers.SensorCtsHelper;
 import android.hardware.cts.helpers.SensorStats;
-import android.hardware.cts.helpers.SensorTestCase;
 import android.hardware.cts.helpers.sensoroperations.ParallelSensorOperation;
 import android.hardware.cts.helpers.sensoroperations.RepeatingSensorOperation;
 import android.hardware.cts.helpers.sensoroperations.SequentialSensorOperation;
