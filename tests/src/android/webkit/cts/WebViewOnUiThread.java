@@ -241,6 +241,15 @@ public class WebViewOnUiThread {
         });
     }
 
+    public boolean canZoomIn() {
+        return getValue(new ValueGetter<Boolean>() {
+            @Override
+            public Boolean capture() {
+                return mWebView.canZoomIn();
+            }
+        });
+    }
+
     public boolean zoomIn() {
         return getValue(new ValueGetter<Boolean>() {
             @Override

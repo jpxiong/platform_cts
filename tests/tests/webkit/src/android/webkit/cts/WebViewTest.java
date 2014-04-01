@@ -236,6 +236,7 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
         mWebServer = new CtsTestServer(getActivity());
         mOnUiThread.loadUrlAndWaitForCompletion(
                 mWebServer.getAssetUrl(TestHtmlConstants.HELLO_WORLD_URL));
+        pollingCheckForCanZoomIn();
 
         WebSettings settings = mOnUiThread.getSettings();
         settings.setSupportZoom(false);
@@ -1629,8 +1630,9 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
         assertFalse(webViewClient.onScaleChangedCalled());
         String url1 = mWebServer.getAssetUrl(TestHtmlConstants.HELLO_WORLD_URL);
         mOnUiThread.loadUrlAndWaitForCompletion(url1);
+        pollingCheckForCanZoomIn();
 
-        mOnUiThread.zoomIn();
+        assertTrue(mOnUiThread.zoomIn());
         webViewClient.waitForScaleChanged();
     }
 
@@ -2343,6 +2345,15 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
         public int onReceivedErrorCode() {
             return mErrorCode;
         }
+    }
+
+    private void pollingCheckForCanZoomIn() {
+        new PollingCheck(TEST_TIMEOUT) {
+            @Override
+            protected boolean check() {
+                return mOnUiThread.canZoomIn();
+            }
+        }.run();
     }
 
     final class ScaleChangedWebViewClient extends WaitForLoadedClient {

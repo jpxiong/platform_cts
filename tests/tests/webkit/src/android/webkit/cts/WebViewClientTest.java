@@ -284,7 +284,14 @@ public class WebViewClientTest extends ActivityInstrumentationTestCase2<WebViewS
         String url1 = mWebServer.getAssetUrl(TestHtmlConstants.HELLO_WORLD_URL);
         mOnUiThread.loadUrlAndWaitForCompletion(url1);
 
-        mOnUiThread.zoomIn();
+        new PollingCheck(TEST_TIMEOUT) {
+            @Override
+            protected boolean check() {
+                return mOnUiThread.canZoomIn();
+            }
+        }.run();
+
+        assertTrue(mOnUiThread.zoomIn());
         new PollingCheck(TEST_TIMEOUT) {
             @Override
             protected boolean check() {
