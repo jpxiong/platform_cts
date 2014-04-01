@@ -30,8 +30,6 @@ LOCAL_INSTRUMENTATION_FOR := CtsTestStubs
 
 LOCAL_SDK_VERSION := current
 
-LOCAL_ASSET_DIR := $(LOCAL_PATH)/assets
-
 include $(BUILD_CTS_PACKAGE)
 
 include $(call all-makefiles-under,$(LOCAL_PATH))
