@@ -16,9 +16,16 @@
 
 package android.hardware.cts.helpers;
 
+import android.app.Instrumentation;
+import android.cts.util.DeviceReportLog;
 import android.hardware.cts.helpers.sensoroperations.ISensorOperation;
+import android.os.Bundle;
 import android.os.Environment;
 import android.util.Log;
+
+import com.android.cts.util.ReportLog;
+import com.android.cts.util.ResultType;
+import com.android.cts.util.ResultUnit;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -146,6 +153,36 @@ public class SensorStats {
             writer.flush();
             writer.close();
         }
+    }
+
+    /**
+     * Utility method to log selected stats to a {@link ReportLog} object.  The stats must be
+     * a number or an array of numbers.
+     */
+    public static void logSelectedStatsToReportLog(Instrumentation instrumentation, int depth,
+            String[] keys, SensorStats stats) {
+        DeviceReportLog reportLog = new DeviceReportLog(depth);
+
+        for (String key : keys) {
+            Object value = stats.getValue(key);
+            if (value instanceof Integer) {
+                reportLog.printValue(key, (Integer) value, ResultType.NEUTRAL, ResultUnit.NONE);
+            } else if (value instanceof Double) {
+                reportLog.printValue(key, (Double) value, ResultType.NEUTRAL, ResultUnit.NONE);
+            } else if (value instanceof Float) {
+                reportLog.printValue(key, (Float) value, ResultType.NEUTRAL, ResultUnit.NONE);
+            } else if (value instanceof double[]) {
+                reportLog.printArray(key, (double[]) value, ResultType.NEUTRAL, ResultUnit.NONE);
+            } else if (value instanceof float[]) {
+                float[] tmpFloat = (float[]) value;
+                double[] tmpDouble = new double[tmpFloat.length];
+                for (int i = 0; i < tmpDouble.length; i++) tmpDouble[i] = tmpFloat[i];
+                reportLog.printArray(key, tmpDouble, ResultType.NEUTRAL, ResultUnit.NONE);
+            }
+        }
+
+        reportLog.printSummary("summary", 0, ResultType.NEUTRAL, ResultUnit.NONE);
+        reportLog.deliverReportToHost(instrumentation);
     }
 
     private static List<String> getSortedKeys(Map<String, Object> flattenedStats) {
