@@ -22,6 +22,7 @@ import android.content.pm.PackageManager;
 import android.content.res.AssetFileDescriptor;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
+import android.media.MediaPlayer.OnErrorListener;
 import android.media.MediaRecorder;
 import android.media.MediaMetadataRetriever;
 import android.media.TimedText;
@@ -30,7 +31,9 @@ import android.media.audiofx.Visualizer;
 import android.media.cts.MediaPlayerTestBase.Monitor;
 import android.net.Uri;
 import android.os.Environment;
+import android.os.IBinder;
 import android.os.PowerManager;
+import android.os.ServiceManager;
 import android.os.SystemClock;
 import android.util.Log;
 
@@ -79,6 +82,35 @@ public class MediaPlayerTest extends MediaPlayerTestBase {
             mOutFile.delete();
         }
     }
+
+    // Bug 13652927
+    public void testVorbisCrash() throws Exception {
+        MediaPlayer mp = mMediaPlayer;
+        MediaPlayer mp2 = mMediaPlayer2;
+        AssetFileDescriptor afd2 = mResources.openRawResourceFd(R.raw.testmp3_2);
+        mp2.setDataSource(afd2.getFileDescriptor(), afd2.getStartOffset(), afd2.getLength());
+        afd2.close();
+        mp2.prepare();
+        mp2.setLooping(true);
+        mp2.start();
+
+        for (int i = 0; i < 20; i++) {
+            try {
+                AssetFileDescriptor afd = mResources.openRawResourceFd(R.raw.bug13652927);
+                mp.setDataSource(afd.getFileDescriptor(), afd.getStartOffset(), afd.getLength());
+                afd.close();
+                mp.prepare();
+                fail("shouldn't be here");
+            } catch (Exception e) {
+                // expected to fail
+                Log.i("@@@", "failed: " + e);
+            }
+            Thread.sleep(500);
+            assertTrue("media server died", mp2.isPlaying());
+            mp.reset();
+        }
+    }
+
     public void testPlayNullSource() throws Exception {
         try {
             mMediaPlayer.setDataSource((String) null);
