@@ -68,6 +68,13 @@ public class MediaStore_Images_ThumbnailsTest extends InstrumentationTestCase {
 
         mHelper = new FileCopyHelper(mContext);
         mRowsAdded = new ArrayList<Uri>();
+
+        String campath = Environment.getExternalStorageDirectory() + File.separator +
+                Environment.DIRECTORY_DCIM + File.separator + "Camera";
+        File camfile = new File(campath);
+        if (!camfile.exists()) {
+            assertTrue("failed to create " + campath, camfile.mkdir());
+        }
     }
 
     public void testQueryInternalThumbnails() throws Exception {
