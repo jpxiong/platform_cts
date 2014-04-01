@@ -58,6 +58,8 @@ public class TestSensorOperation extends AbstractSensorOperation {
     private final Collection<ISensorVerification> mVerifications =
             new HashSet<ISensorVerification>();
 
+    private boolean mLogEvents = false;
+
     /**
      * Create a {@link TestSensorOperation}.
      *
@@ -104,6 +106,13 @@ public class TestSensorOperation extends AbstractSensorOperation {
     }
 
     /**
+     * Set whether to log events.
+     */
+    public void setLogEvents(boolean logEvents) {
+        mLogEvents = logEvents;
+    }
+
+    /**
      * Set all of the default test expectations.
      */
     public void setDefaultVerifications() {
@@ -132,6 +141,7 @@ public class TestSensorOperation extends AbstractSensorOperation {
         getStats().addValue("sensor_handle", mSensorManager.getSensor().getHandle());
 
         ValidatingSensorEventListener listener = new ValidatingSensorEventListener(mVerifications);
+        listener.setLogEvents(mLogEvents);
 
         if (mEventCount != null) {
             mSensorManager.runSensor(listener, mEventCount);
@@ -148,7 +158,7 @@ public class TestSensorOperation extends AbstractSensorOperation {
 
         if (failed) {
             String msg = SensorCtsHelper.formatAssertionMessage(mSensorManager.getSensor(),
-                    "VerifySensorOperation", sb.toString());
+                    "VerifySensorOperation", mRateUs, mMaxBatchReportLatencyUs, sb.toString());
             getStats().addValue(SensorStats.ERROR, msg);
             Assert.fail(msg);
         }

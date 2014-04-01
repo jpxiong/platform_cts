@@ -204,9 +204,12 @@ public class SensorCtsHelper {
      *
      * @param sensor the {@link Sensor}
      * @param label the verification name
+     * @param rateUs the rate of the sensor
+     * @param maxBatchReportLatencyUs the max batch report latency of the sensor
      * @return The formatted string
      */
-    public static String formatAssertionMessage(Sensor sensor, String label) {
+    public static String formatAssertionMessage(Sensor sensor, String label, int rateUs,
+            int maxBatchReportLatencyUs) {
         return String.format("%s | %s, handle: %d", label,
                 SensorTestInformation.getSensorName(sensor.getType()), sensor.getHandle());
     }
@@ -216,15 +219,17 @@ public class SensorCtsHelper {
      *
      * @param sensor the {@link Sensor}
      * @param label the verification name
+     * @param rateUs the rate of the sensor
+     * @param maxBatchReportLatencyUs the max batch report latency of the sensor
      * @param format the additional format string
      * @param params the additional format params
      * @return The formatted string
      */
-    public static String formatAssertionMessage(Sensor sensor, String label, String format,
-            Object ... params) {
-        return String.format("%s | %s, handle: %d | %s", label,
-                SensorTestInformation.getSensorName(sensor.getType()), sensor.getHandle(),
-                String.format(format, params));
+    public static String formatAssertionMessage(Sensor sensor, String label, int rateUs,
+            int maxBatchReportLatencyUs, String format, Object ... params) {
+        return String.format("%s | %s, handle: %d, rateUs: %d, maxBatchReportLatencyUs: %d | %s",
+                label, SensorTestInformation.getSensorName(sensor.getType()), sensor.getHandle(),
+                rateUs, maxBatchReportLatencyUs, String.format(format, params));
     }
 
     /**
