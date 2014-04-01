@@ -19,6 +19,7 @@ package android.hardware.cts.helpers;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener2;
 import android.hardware.cts.helpers.sensorverification.ISensorVerification;
+import android.os.SystemClock;
 
 import java.util.Collection;
 import java.util.LinkedList;
@@ -73,7 +74,7 @@ public class ValidatingSensorEventListener extends TestSensorEventListener {
      */
     @Override
     public void onSensorChanged(SensorEvent event) {
-        TestSensorEvent testEvent = new TestSensorEvent(event, System.nanoTime());
+        TestSensorEvent testEvent = new TestSensorEvent(event, SystemClock.elapsedRealtimeNanos());
         for (ISensorVerification verification : mVerifications) {
             verification.addSensorEvent(testEvent);
         }
