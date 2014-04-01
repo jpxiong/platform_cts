@@ -20,7 +20,6 @@ import android.hardware.Sensor;
 import android.hardware.SensorManager;
 import android.hardware.cts.helpers.SensorCtsHelper;
 import android.hardware.cts.helpers.SensorStats;
-import android.hardware.cts.helpers.SensorTestCase;
 import android.hardware.cts.helpers.SensorTestInformation;
 import android.hardware.cts.helpers.sensoroperations.TestSensorOperation;
 
@@ -98,6 +97,15 @@ public class SingleSensorTests extends SensorTestCase {
     private static final int RATE_5HZ = 200000;
     private static final int RATE_1HZ = 1000000;
 
+    private static final String[] STAT_KEYS = {
+        SensorStats.FREQUENCY_KEY,
+        SensorStats.JITTER_95_PERCENTILE_KEY,
+        SensorStats.EVENT_OUT_OF_ORDER_COUNT_KEY,
+        SensorStats.MAGNITUDE_KEY,
+        SensorStats.MEAN_KEY,
+        SensorStats.STANDARD_DEVIATION_KEY,
+    };
+
     /**
      * This test verifies that the sensor's properties complies with the required properites set in
      * the CDD.
@@ -123,7 +131,6 @@ public class SingleSensorTests extends SensorTestCase {
                         sensorName, sensor.getMinDelay(), expected);
                 assertTrue(msg, sensor.getMinDelay() <= expected);
             }
-
         }
     }
 
@@ -214,6 +221,7 @@ public class SingleSensorTests extends SensorTestCase {
         runSensorTest(Sensor.TYPE_ORIENTATION, SensorManager.SENSOR_DELAY_FASTEST, BATCHING_OFF);
     }
 
+    @SuppressWarnings("deprecation")
     public void testOrientation_100hz() throws Throwable {
         runSensorTest(Sensor.TYPE_ORIENTATION, RATE_100HZ, BATCHING_OFF);
     }
@@ -594,6 +602,10 @@ public class SingleSensorTests extends SensorTestCase {
         op.setLogEvents(true);
         try {
             op.execute();
+
+            // Only report stats if it passes.
+            logSelectedStatsToReportLog(getInstrumentation(), 2, STAT_KEYS,
+                    op.getStats());
         } finally {
             SensorStats.logStats(TAG, op.getStats());
 
@@ -609,6 +621,8 @@ public class SingleSensorTests extends SensorTestCase {
             String fileName = String.format("single_sensor_%s_%s%s.txt",
                     sensorName, sensorRate, batching);
             SensorStats.logStatsToFile(fileName, op.getStats());
+
+
         }
     }
 }
