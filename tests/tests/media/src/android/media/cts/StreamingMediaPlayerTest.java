@@ -116,7 +116,7 @@ public class StreamingMediaPlayerTest extends MediaPlayerTestBase {
                 + "0.0.0.0/ipbits/0/expire/19000000000/sparams/ip,ipbits,expire"
                 + ",id,itag,source,playlist_type/signature/773AB8ACC68A96E5AA48"
                 + "1996AD6A1BBCB70DCB87.95733B544ACC5F01A1223A837D2CF04DF85A336"
-                + "0/key/ik0", 60 * 1000);
+                + "0/key/ik0/file/m3u8", 60 * 1000);
     }
 
     // Streaming audio from local HTTP server
