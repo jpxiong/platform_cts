@@ -22,7 +22,8 @@ import java.io.RandomAccessFile;
 /**
  * Writes an IVF file.
  *
- * IVF format is a simple container format for VP8 encoded frames.
+ * IVF format is a simple container format for VP8 encoded frames defined at
+ * http://wiki.multimedia.cx/index.php?title=IVF.
  */
 
 public class IvfWriter {
@@ -56,12 +57,12 @@ public class IvfWriter {
         mScale = scale;
         mRate = rate;
         mFrameCount = 0;
+        mOutputFile.setLength(0);
         mOutputFile.seek(HEADER_END);  // Skip the header for now, as framecount is unknown
     }
 
     /**
      * Initializes the IVF file writer with a microsecond timebase.
-     *
      *
      * Microsecond timebase is default for OMX thus stagefright.
      *
@@ -87,7 +88,7 @@ public class IvfWriter {
      * Writes a single encoded VP8 frame with its frame header.
      *
      * @param frame     actual contents of the encoded frame data
-     * @param width     timestamp of the frame (in accordance to specified timebase)
+     * @param timeStamp timestamp of the frame (in accordance to specified timebase)
      */
     public void writeFrame(byte[] frame, long timeStamp) throws IOException {
         mOutputFile.write(makeIvfFrameHeader(frame.length, timeStamp));
