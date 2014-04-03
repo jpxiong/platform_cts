@@ -109,7 +109,7 @@ public class SigNumVerification extends AbstractMeanVerification {
         stats.addValue(SensorStats.MEAN_KEY, means);
 
         if (failed) {
-            Assert.fail(String.format("Signum out of range: mean=%s, expected=%s",
+            Assert.fail(String.format("Signum out of range: mean=%s (expected %s)",
                     meanSb.toString(), expectedSb.toString()));
         }
     }

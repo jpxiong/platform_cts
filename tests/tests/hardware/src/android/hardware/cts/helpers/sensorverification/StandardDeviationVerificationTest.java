@@ -62,12 +62,14 @@ public class StandardDeviationVerificationTest extends TestCase {
         if (pass) {
             verification.verify(stats);
         } else {
+            boolean failed = false;
             try {
                 verification.verify(stats);
-                fail("Expected an AssertionError");
             } catch (AssertionError e) {
                 // Expected;
+                failed = true;
             }
+            assertTrue("Expected an AssertionError", failed);
         }
         assertEquals(pass, stats.getValue(StandardDeviationVerification.PASSED_KEY));
         float[] actual = (float[]) stats.getValue(SensorStats.STANDARD_DEVIATION_KEY);
