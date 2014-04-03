@@ -866,8 +866,7 @@ public class EncodeVirtualDisplayWithCompositionTest extends AndroidTestCase {
                         } break;
                     }
                 } catch (GlException e) {
-                    // should stop rendering
-                    mLooper.quit();
+                    //ignore as this can happen during tearing down
                 }
             }
         }
