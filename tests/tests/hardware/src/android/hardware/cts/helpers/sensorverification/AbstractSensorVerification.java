@@ -51,4 +51,20 @@ public abstract class AbstractSensorVerification implements ISensorVerification 
      * Used by implementing classes to add a sensor event.
      */
     protected abstract void addSensorEventInternal(TestSensorEvent event);
+
+    /**
+     * Helper class to store the index, previous event, and current event.
+     */
+    protected class IndexedEventPair {
+        public final int index;
+        public final TestSensorEvent event;
+        public final TestSensorEvent previousEvent;
+
+        public IndexedEventPair(int index, TestSensorEvent event,
+                TestSensorEvent previousEvent) {
+            this.index = index;
+            this.event = event;
+            this.previousEvent = previousEvent;
+        }
+    }
 }

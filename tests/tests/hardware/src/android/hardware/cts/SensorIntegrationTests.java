@@ -21,7 +21,6 @@ import android.hardware.SensorManager;
 import android.hardware.cts.helpers.SensorCtsHelper;
 import android.hardware.cts.helpers.SensorStats;
 import android.hardware.cts.helpers.SensorTestCase;
-import android.hardware.cts.helpers.SensorTestInformation;
 import android.hardware.cts.helpers.sensoroperations.ParallelSensorOperation;
 import android.hardware.cts.helpers.sensoroperations.RepeatingSensorOperation;
 import android.hardware.cts.helpers.sensoroperations.SequentialSensorOperation;
@@ -87,7 +86,7 @@ public class SensorIntegrationTests extends SensorTestCase {
      */
     public void testSensorsWithSeveralClients() throws Throwable {
         final int ITERATIONS = 50;
-        final int BATCHING_RATE_IN_SECONDS = 5;
+        final int MAX_REPORTING_LATENCY_IN_SECONDS = 5;
         final Context context = this.getContext();
 
         int sensorTypes[] = {
@@ -109,8 +108,8 @@ public class SensorIntegrationTests extends SensorTestCase {
             TestSensorOperation batchingOperation = new TestSensorOperation(
                     context,
                     sensorType,
-                    SensorTestInformation.getMaxSamplingRateInUs(context, sensorType),
-                    SensorCtsHelper.getSecondsAsMicroSeconds(BATCHING_RATE_IN_SECONDS),
+                    SensorCtsHelper.getSensor(getContext(), sensorType).getMinDelay(),
+                    SensorCtsHelper.getSecondsAsMicroSeconds(MAX_REPORTING_LATENCY_IN_SECONDS),
                     100);
             batchingOperation.addVerification(new EventOrderingVerification());
             operation.add(new RepeatingSensorOperation(batchingOperation, ITERATIONS));
@@ -267,9 +266,8 @@ public class SensorIntegrationTests extends SensorTestCase {
                 break;
             case 4:
             default:
-                int maxSamplingRate = SensorTestInformation.getMaxSamplingRateInUs(
-                        this.getContext(),
-                        sensorType);
+                int maxSamplingRate = SensorCtsHelper.getSensor(getContext(), sensorType)
+                        .getMinDelay();
                 rate = maxSamplingRate * mGenerator.nextInt(10);
         }
         return rate;
