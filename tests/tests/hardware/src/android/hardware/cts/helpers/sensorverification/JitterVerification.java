@@ -98,8 +98,8 @@ public class JitterVerification extends AbstractSensorVerification {
         stats.addValue(SensorStats.JITTER_95_PERCENTILE_KEY, jitter95Percentile);
 
         if (failed) {
-            Assert.fail(String.format("Jitter out of range: jitter at 95th percentile=%.0fns, "
-                    + "expected=<%.0fns", jitter95Percentile, mExpected * (mThreshold / 100.0)));
+            Assert.fail(String.format("Jitter out of range: jitter at 95th percentile=%.0fns "
+                    + "(expected <%.0fns)", jitter95Percentile, mExpected * (mThreshold / 100.0)));
         }
     }
 

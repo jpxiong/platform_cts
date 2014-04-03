@@ -112,7 +112,7 @@ public class StandardDeviationVerification extends AbstractSensorVerification {
         stats.addValue(SensorStats.STANDARD_DEVIATION_KEY, stdDevs);
 
         if (failed) {
-            Assert.fail(String.format("Standard deviation out of range: stddev=%s, expected=%s",
+            Assert.fail(String.format("Standard deviation out of range: stddev=%s (expected %s)",
                     stddevSb.toString(), expectedSb.toString()));
         }
     }

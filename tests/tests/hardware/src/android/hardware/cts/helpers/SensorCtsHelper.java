@@ -28,6 +28,7 @@ import java.util.concurrent.TimeUnit;
 /**
  * Set of static helper methods for CTS tests.
  */
+//TODO: Refactor this class and SensorTestInformation into several more well defined helper classes
 public class SensorCtsHelper {
 
     private static long NANOS_PER_MILLI = 1000000;
@@ -156,23 +157,14 @@ public class SensorCtsHelper {
      * </p>
      */
     public static int getDelay(Sensor sensor, int rateUs) {
-        int delay = -1;
-        switch (rateUs) {
-            case SensorManager.SENSOR_DELAY_FASTEST:
-                delay = 0;
-                break;
-            case SensorManager.SENSOR_DELAY_GAME:
-                delay = 20000;
-                break;
-            case SensorManager.SENSOR_DELAY_UI:
-                delay = 66667;
-                break;
-            case SensorManager.SENSOR_DELAY_NORMAL:
-                delay = 200000;
-                break;
-            default:
-                delay = rateUs;
-                break;
+        if (!isDelayRateTestable(rateUs)) {
+            throw new IllegalArgumentException("rateUs cannot be SENSOR_DELAY_[GAME|UI|NORMAL]");
+        }
+        int delay;
+        if (rateUs == SensorManager.SENSOR_DELAY_FASTEST) {
+            delay = 0;
+        } else {
+            delay = rateUs;
         }
         return Math.max(delay, sensor.getMinDelay());
     }
@@ -181,7 +173,7 @@ public class SensorCtsHelper {
      * Return true if the operation rate is not one of {@link SensorManager#SENSOR_DELAY_GAME},
      * {@link SensorManager#SENSOR_DELAY_UI}, or {@link SensorManager#SENSOR_DELAY_NORMAL}.
      */
-    public boolean isDelayRateTestable(int rateUs) {
+    public static boolean isDelayRateTestable(int rateUs) {
         return (rateUs != SensorManager.SENSOR_DELAY_GAME
                 && rateUs != SensorManager.SENSOR_DELAY_UI
                 && rateUs != SensorManager.SENSOR_DELAY_NORMAL);

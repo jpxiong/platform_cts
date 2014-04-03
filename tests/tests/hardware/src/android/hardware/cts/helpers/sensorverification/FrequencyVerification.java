@@ -19,12 +19,12 @@ package android.hardware.cts.helpers.sensorverification;
 import android.hardware.Sensor;
 import android.hardware.cts.helpers.SensorCtsHelper;
 import android.hardware.cts.helpers.SensorStats;
+import android.hardware.cts.helpers.SensorTestInformation;
+import android.hardware.cts.helpers.SensorTestInformation.SensorReportingMode;
 import android.hardware.cts.helpers.TestSensorEvent;
 
 import junit.framework.Assert;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -34,15 +34,10 @@ import java.util.concurrent.TimeUnit;
 public class FrequencyVerification extends AbstractSensorVerification {
     public static final String PASSED_KEY = "frequency_passed";
 
-    // threshold is (100 - 10)% expected to (100 + 110)% expected
-    private static final int[] DEFAULT_THRESHOLDS = {10, 110};
-
-    // sensorType: lowerThreshold, upperThreshold (% of expected frequency)
-    private final static Map<Integer, int[]> DEFAULTS = new HashMap<Integer, int[]>(12);
-    static {
-        // Use a method so that the @deprecation warning can be set for that method only
-        setDefaults();
-    }
+    // lower threshold is (100 - 10)% expected
+    private static final int DEFAULT_LOWER_THRESHOLD = 10;
+    // upper threshold is (100 + 110)% expected
+    private static final int DEFAULT_UPPER_THRESHOLD = 110;
 
     private final double mExpected;
     private final double mLowerThreshold;
@@ -75,7 +70,8 @@ public class FrequencyVerification extends AbstractSensorVerification {
      * @return the verification or null if the verification does not apply to the sensor.
      */
     public static FrequencyVerification getDefault(Sensor sensor, int rateUs) {
-        if (!DEFAULTS.containsKey(sensor.getType())) {
+        if (!SensorReportingMode.CONTINUOUS.equals(
+                SensorTestInformation.getReportingMode(sensor.getType()))) {
             return null;
         }
 
@@ -83,8 +79,8 @@ public class FrequencyVerification extends AbstractSensorVerification {
         double expected = SensorCtsHelper.getFrequency(SensorCtsHelper.getDelay(sensor, rateUs),
                 TimeUnit.MICROSECONDS);
         // Expected frequency * threshold percentage
-        double lowerThreshold = expected * DEFAULTS.get(sensor.getType())[0] / 100;
-        double upperThreshold = expected * DEFAULTS.get(sensor.getType())[1] / 100;
+        double lowerThreshold = expected * DEFAULT_LOWER_THRESHOLD / 100;
+        double upperThreshold = expected * DEFAULT_UPPER_THRESHOLD / 100;
         return new FrequencyVerification(expected, lowerThreshold, upperThreshold);
     }
 
@@ -110,9 +106,9 @@ public class FrequencyVerification extends AbstractSensorVerification {
         stats.addValue(PASSED_KEY, !failed);
 
         if (failed) {
-            Assert.fail(String.format("Frequency out of range: frequency=%.2fHz, "
-                    + "expected=(%.2f-%.2fHz, %.2f+%.2fHz)", frequency, mExpected, mLowerThreshold,
-                    mExpected, mUpperThreshold));
+            Assert.fail(String.format("Frequency out of range: frequency=%.2fHz "
+                    + "(expected (%.2f-%.2fHz, %.2f+%.2fHz))", frequency, mExpected,
+                    mLowerThreshold, mExpected, mUpperThreshold));
         }
     }
 
@@ -141,20 +137,5 @@ public class FrequencyVerification extends AbstractSensorVerification {
             }
         }
         mCount++;
-    }
-
-    @SuppressWarnings("deprecation")
-    private static void setDefaults() {
-        DEFAULTS.put(Sensor.TYPE_ACCELEROMETER, DEFAULT_THRESHOLDS);
-        DEFAULTS.put(Sensor.TYPE_MAGNETIC_FIELD, DEFAULT_THRESHOLDS);
-        DEFAULTS.put(Sensor.TYPE_GYROSCOPE, DEFAULT_THRESHOLDS);
-        DEFAULTS.put(Sensor.TYPE_ORIENTATION, DEFAULT_THRESHOLDS);
-        DEFAULTS.put(Sensor.TYPE_PRESSURE, DEFAULT_THRESHOLDS);
-        DEFAULTS.put(Sensor.TYPE_GRAVITY, DEFAULT_THRESHOLDS);
-        DEFAULTS.put(Sensor.TYPE_LINEAR_ACCELERATION, DEFAULT_THRESHOLDS);
-        DEFAULTS.put(Sensor.TYPE_ROTATION_VECTOR, DEFAULT_THRESHOLDS);
-        DEFAULTS.put(Sensor.TYPE_MAGNETIC_FIELD_UNCALIBRATED, DEFAULT_THRESHOLDS);
-        DEFAULTS.put(Sensor.TYPE_GAME_ROTATION_VECTOR, DEFAULT_THRESHOLDS);
-        DEFAULTS.put(Sensor.TYPE_GYROSCOPE_UNCALIBRATED, DEFAULT_THRESHOLDS);
     }
 }
