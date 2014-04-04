@@ -394,6 +394,7 @@ public class CameraTestUtils extends Assert {
                 assertEquals("YUV420 format Images should have 3 planes", 3, planes.length);
                 break;
             case ImageFormat.JPEG:
+            case ImageFormat.RAW_SENSOR:
                 assertEquals("Jpeg Image should have one plane", 1, planes.length);
                 break;
             default:
@@ -609,7 +610,7 @@ public class CameraTestUtils extends Assert {
      * @return Byte object array converted from input byte array
      */
     public static Byte[] toObject(byte[] array) {
-        return convertPrimitiveArrayToObjectArray(array, array.length, Byte.class);
+        return convertPrimitiveArrayToObjectArray(array, Byte.class);
     }
 
     /**
@@ -619,7 +620,7 @@ public class CameraTestUtils extends Assert {
      * @return Integer object array converted from input int array
      */
     public static Integer[] toObject(int[] array) {
-        return convertPrimitiveArrayToObjectArray(array, array.length, Integer.class);
+        return convertPrimitiveArrayToObjectArray(array, Integer.class);
     }
 
     /**
@@ -629,7 +630,7 @@ public class CameraTestUtils extends Assert {
      * @return Float object array converted from input float array
      */
     public static Float[] toObject(float[] array) {
-        return convertPrimitiveArrayToObjectArray(array, array.length, Float.class);
+        return convertPrimitiveArrayToObjectArray(array, Float.class);
     }
 
     /**
@@ -639,21 +640,22 @@ public class CameraTestUtils extends Assert {
      * @return Double object array converted from input double array
      */
     public static Double[] toObject(double[] array) {
-        return convertPrimitiveArrayToObjectArray(array, array.length, Double.class);
+        return convertPrimitiveArrayToObjectArray(array, Double.class);
     }
 
     /**
      * Convert a primitive input array into its object array version (e.g. from int[] to Integer[]).
      *
      * @param array Input array object
-     * @param arrayLength The length of the input array
      * @param wrapperClass The boxed class it converts to
      * @return Boxed version of primitive array
      */
-    private static <T> T[] convertPrimitiveArrayToObjectArray(
-            final Object array, final int arrayLength, final Class<T> wrapperClass) {
-        if (array == null || arrayLength <= 0) {
-            throw new IllegalArgumentException("Input array shouldn't be null or empty");
+    private static <T> T[] convertPrimitiveArrayToObjectArray(final Object array,
+            final Class<T> wrapperClass) {
+        // getLength does the null check and isArray check already.
+        int arrayLength = Array.getLength(array);
+        if (arrayLength == 0) {
+            throw new IllegalArgumentException("Input array shouldn't be empty");
         }
 
         @SuppressWarnings("unchecked")

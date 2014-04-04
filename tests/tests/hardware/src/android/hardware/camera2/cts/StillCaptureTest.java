@@ -21,6 +21,7 @@ import static android.hardware.camera2.cts.CameraTestUtils.*;
 import android.graphics.ImageFormat;
 import android.graphics.Rect;
 import android.hardware.camera2.CameraDevice;
+import android.hardware.camera2.CameraMetadata.Key;
 import android.hardware.camera2.CaptureRequest;
 import android.hardware.camera2.CaptureResult;
 import android.hardware.camera2.Size;
@@ -45,6 +46,7 @@ import java.util.List;
 public class StillCaptureTest extends Camera2SurfaceViewTestCase {
     private static final String TAG = "StillCaptureTest";
     private static final boolean VERBOSE = Log.isLoggable(TAG, Log.VERBOSE);
+    private static final boolean DEBUG = Log.isLoggable(TAG, Log.DEBUG);;
     private static final String JPEG_FILE_NAME = DEBUG_FILE_NAME_BASE + "/test.jpeg";
     private static final int NUM_RESULTS_WAIT_TIMEOUT = 100;
     // 60 second to accommodate the possible long exposure time.
@@ -145,6 +147,23 @@ public class StillCaptureTest extends Camera2SurfaceViewTestCase {
             }
         }
     }
+
+    /**
+     * Test basic Raw capture. Raw buffer avaiablility is checked, but raw buffer data is not.
+     */
+   public void testBasicRawCapture()  throws Exception {
+       for (int i = 0; i < mCameraIds.length; i++) {
+           try {
+               Log.i(TAG, "Testing raw capture for Camera " + mCameraIds[i]);
+               openDevice(mCameraIds[i]);
+
+               rawCaptureTestByCamera();
+           } finally {
+               closeDevice();
+               closeImageReader();
+           }
+       }
+   }
 
     /**
      * Test touch for focus.
@@ -281,6 +300,52 @@ public class StillCaptureTest extends Camera2SurfaceViewTestCase {
     }
 
     /**
+     * Basic raw capture test for each camera.
+     */
+    private void rawCaptureTestByCamera() throws Exception {
+        Size maxPreviewSz = mOrderedPreviewSizes.get(0);
+        Size[] rawSizes = mStaticInfo.getRawOutputSizesChecked();
+        for (Size size : rawSizes) {
+            if (VERBOSE) {
+                Log.v(TAG, "Testing Raw capture with size " + size.toString()
+                        + ", preview size " + maxPreviewSz);
+            }
+
+            // Prepare raw capture and start preview.
+            CaptureRequest.Builder previewBuilder =
+                    mCamera.createCaptureRequest(CameraDevice.TEMPLATE_PREVIEW);
+            CaptureRequest.Builder rawBuilder =
+                    mCamera.createCaptureRequest(CameraDevice.TEMPLATE_STILL_CAPTURE);
+            SimpleCaptureListener resultListener = new SimpleCaptureListener();
+            SimpleImageReaderListener imageListener = new SimpleImageReaderListener();
+            prepareRawCaptureAndStartPreview(previewBuilder, rawBuilder, maxPreviewSz, size,
+                    resultListener, imageListener);
+
+            CaptureRequest rawRequest = rawBuilder.build();
+            mCamera.capture(rawRequest, resultListener, mHandler);
+
+            Image image = imageListener.getImage(CAPTURE_IMAGE_TIMEOUT_MS);
+            validateRaw16Image(image, size);
+            if (DEBUG) {
+                byte[] rawBuffer = getDataFromImage(image);
+                String rawFileName =
+                        DEBUG_FILE_NAME_BASE + "/test" + "_" + size.toString() +
+                        "_cam" + mCamera.getId() +  ".raw16";
+                Log.d(TAG, "Dump raw file into " + rawFileName);
+                dumpFile(rawFileName, rawBuffer);
+            }
+
+            verifyRawCaptureResult(rawRequest, resultListener);
+            stopPreview();
+        }
+    }
+
+    private void verifyRawCaptureResult(CaptureRequest rawRequest,
+            SimpleCaptureListener resultListener) {
+        // TODO: validate DNG metadata tags.
+    }
+
+    /**
      * Issue a Jpeg capture and validate the exif information.
      * <p>
      * TODO: Differentiate full and limited device, some of the checks rely on
@@ -379,9 +444,12 @@ public class StillCaptureTest extends Camera2SurfaceViewTestCase {
             mCollector.expectEquals("JPEG thumbnail size result and request should match",
                     testThumbnailSizes[i],
                     stillResult.get(CaptureResult.JPEG_THUMBNAIL_SIZE));
-            mCollector.expectEquals("GPS coordinates result and request should match.",
-                    toObject(EXIF_TEST_DATA[i].gpsCoordinates),
-                    toObject(stillResult.get(CaptureResult.JPEG_GPS_COORDINATES)));
+            Key<double[]> gpsCoordsKey = CaptureResult.JPEG_GPS_COORDINATES;
+            if (mCollector.expectKeyValueNotNull(stillResult, gpsCoordsKey) != null) {
+                mCollector.expectEquals("GPS coordinates result and request should match.",
+                        toObject(EXIF_TEST_DATA[i].gpsCoordinates),
+                        toObject(stillResult.get(gpsCoordsKey)));
+            }
             mCollector.expectEquals("GPS processing method result and request should match",
                     EXIF_TEST_DATA[i].gpsProcessingMethod,
                     stillResult.get(CaptureResult.JPEG_GPS_PROCESSING_METHOD));
@@ -424,32 +492,36 @@ public class StillCaptureTest extends Camera2SurfaceViewTestCase {
         int exifOrientation = exif.getAttributeInt(ExifInterface.TAG_ORIENTATION,
                 /*defaultValue*/-1);
         // Get requested orientation from result, because they should be same.
-        int requestedOrientation = result.get(CaptureResult.JPEG_ORIENTATION);
-        final int ORIENTATION_MIN = ExifInterface.ORIENTATION_UNDEFINED;
-        final int ORIENTATION_MAX = ExifInterface.ORIENTATION_ROTATE_270;
-        boolean orientationValid = mCollector.expectTrue(String.format(
-                "Exif orientation must be in range of [%d, %d]", ORIENTATION_MIN, ORIENTATION_MAX),
-                exifOrientation >= ORIENTATION_MIN && exifOrientation <= ORIENTATION_MAX);
-        if (orientationValid) {
-            /**
-             * Device captured image doesn't respect the requested orientation,
-             * which means it rotates the image buffer physically. Then we
-             * should swap the exif width/height accordingly to compare.
-             */
-            boolean deviceRotatedImage = exifOrientation == ExifInterface.ORIENTATION_UNDEFINED;
+        if (mCollector.expectKeyValueNotNull(result, CaptureResult.JPEG_ORIENTATION) != null) {
+            int requestedOrientation = result.get(CaptureResult.JPEG_ORIENTATION);
+            final int ORIENTATION_MIN = ExifInterface.ORIENTATION_UNDEFINED;
+            final int ORIENTATION_MAX = ExifInterface.ORIENTATION_ROTATE_270;
+            boolean orientationValid = mCollector.expectTrue(String.format(
+                    "Exif orientation must be in range of [%d, %d]",
+                    ORIENTATION_MIN, ORIENTATION_MAX),
+                    exifOrientation >= ORIENTATION_MIN && exifOrientation <= ORIENTATION_MAX);
+            if (orientationValid) {
+                /**
+                 * Device captured image doesn't respect the requested orientation,
+                 * which means it rotates the image buffer physically. Then we
+                 * should swap the exif width/height accordingly to compare.
+                 */
+                boolean deviceRotatedImage = exifOrientation == ExifInterface.ORIENTATION_UNDEFINED;
 
-            if (deviceRotatedImage) {
-                // Case 1.
-                boolean needSwap = (requestedOrientation % 180 == 90);
-                if (needSwap) {
-                    exifSize = new Size(exifHeight, exifWidth);
+                if (deviceRotatedImage) {
+                    // Case 1.
+                    boolean needSwap = (requestedOrientation % 180 == 90);
+                    if (needSwap) {
+                        exifSize = new Size(exifHeight, exifWidth);
+                    }
+                } else {
+                    // Case 2.
+                    mCollector.expectEquals("Exif orientaiton should match requested orientation",
+                            requestedOrientation, getExifOrientationInDegress(exifOrientation));
                 }
-            } else {
-                // Case 2.
-                mCollector.expectEquals("Exif orientaiton should match requested orientation",
-                        requestedOrientation, getExifOrientationInDegress(exifOrientation));
             }
         }
+
         /**
          * Ideally, need check exifSize == jpegSize == actual buffer size. But
          * jpegSize == jpeg decode bounds size(from jpeg jpeg frame
@@ -641,7 +713,18 @@ public class StillCaptureTest extends Camera2SurfaceViewTestCase {
     }
 
     /**
-     * Verify JPEG capture image object sanity and test.
+     * Validate standard raw (RAW16) capture image.
+     *
+     * @param image The raw16 format image captured
+     * @param rawSize The expected raw size
+     */
+    private static void validateRaw16Image(Image image, Size rawSize) {
+        CameraTestUtils.validateImage(image, rawSize.getWidth(), rawSize.getHeight(),
+                ImageFormat.RAW_SENSOR, /*filePath*/null);
+    }
+
+    /**
+     * Validate JPEG capture image object sanity and test.
      * <p>
      * In addition to image object sanity, this function also does the decoding
      * test, which is slower.
@@ -650,7 +733,7 @@ public class StillCaptureTest extends Camera2SurfaceViewTestCase {
      * @param image The JPEG image to be verified.
      * @param jpegSize The JPEG capture size to be verified against.
      */
-    private void validateJpegCapture(Image image, Size jpegSize) {
+    private static void validateJpegCapture(Image image, Size jpegSize) {
         CameraTestUtils.validateImage(image, jpegSize.getWidth(), jpegSize.getHeight(),
                 ImageFormat.JPEG, /*filePath*/null);
     }
