@@ -24,6 +24,7 @@ import org.hamcrest.CoreMatchers;
 import org.hamcrest.Matcher;
 import org.junit.rules.ErrorCollector;
 
+import java.util.Arrays;
 import java.util.Objects;
 
 /**
@@ -118,9 +119,92 @@ public class CameraErrorCollector extends ErrorCollector {
      * @return {@code true} if the two values are equal, {@code false} otherwise.
      */
     public <T> boolean expectEquals(String msg, T expected, T actual) {
+        if (expected == null) {
+            throw new IllegalArgumentException("expected value shouldn't be null");
+        }
+
         if (!Objects.equals(expected, actual)) {
+            if (actual == null) {
+                addMessage(msg + ", actual value is null");
+                return false;
+            }
+
             addMessage(String.format("%s (expected = %s, actual = %s) ", msg, expected.toString(),
                     actual.toString()));
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * Check if the two arrays of values are deeply equal.
+     *
+     * @param msg Message to be logged when check fails.
+     * @param expected Expected array of values to be checked against.
+     * @param actual Actual array of values to be checked.
+     * @return {@code true} if the two arrays of values are deeply equal, {@code false} otherwise.
+     */
+    public <T> boolean expectEquals(String msg, T[] expected, T[] actual) {
+        if (expected == null) {
+            throw new IllegalArgumentException("expected value shouldn't be null");
+        }
+
+        if (!Arrays.deepEquals(expected, actual)) {
+            if (actual == null) {
+                addMessage(msg + ", actual value is null");
+                return false;
+            }
+
+            addMessage(String.format("%s (expected = %s, actual = %s) ", msg,
+                    Arrays.deepToString(expected), Arrays.deepToString(actual)));
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * Check if the two float values are equal with given error tolerance.
+     *
+     * @param msg Message to be logged when check fails.
+     * @param expected Expected value to be checked against.
+     * @param actual Actual value to be checked.
+     * @param tolerance The error margin for the equality check.
+     * @return {@code true} if the two values are equal, {@code false} otherwise.
+     */
+    public <T> boolean expectEquals(String msg, float expected, float actual, float tolerance) {
+        if (expected == actual) {
+            return true;
+        }
+
+        if (!(Math.abs(expected - actual) <= tolerance)) {
+            addMessage(String.format("%s (expected = %s, actual = %s, tolerance = %s) ", msg,
+                    expected, actual, tolerance));
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * Check if the two double values are equal with given error tolerance.
+     *
+     * @param msg Message to be logged when check fails.
+     * @param expected Expected value to be checked against.
+     * @param actual Actual value to be checked.
+     * @param tolerance The error margin for the equality check
+     * @return {@code true} if the two values are equal, {@code false} otherwise.
+     */
+    public <T> boolean expectEquals(String msg, double expected, double actual, double tolerance) {
+        if (expected == actual)
+        {
+            return true;
+        }
+
+        if (!(Math.abs(expected - actual) <= tolerance)) {
+            addMessage(String.format("%s (expected = %s, actual = %s, tolerance = %s) ", msg,
+                    expected, actual, tolerance));
             return false;
         }
 
