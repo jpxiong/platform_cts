@@ -25,9 +25,12 @@ import java.io.InputStreamReader;
 import java.lang.Runtime;
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Scanner;
+import java.util.Set;
 
 /**
  * Verify that the processes running within an SELinux domain are sane.
@@ -104,20 +107,22 @@ public class SELinuxDomainTest extends TestCase {
      *
      * @param domain
      *  The domain or SELinux context to check.
-     * @param executable
-     *  The path of the executable or application package name.
+     * @param executables
+     *  The path of the allowed executables or application package names.
      */
-    private void assertDomainN(String domain, String executable)
+    private void assertDomainN(String domain, String... executables)
             throws FileNotFoundException {
         List<ProcessDetails> procs = ProcessDetails.getProcessMap().get(domain);
         String msg = "Expected 1 or more processes in SELinux domain \"" + domain + "\""
                 + " Found \"" + procs + "\"";
         assertNotNull(msg, procs);
 
-        for(ProcessDetails p : procs) {
-            msg = "Expected executable \"" + executable + "\" in SELinux domain \"" + domain + "\""
-                + "Found: \"" + p + "\"";
-            assertEquals(msg, executable, p.procTitle);
+        Set<String> execList = new HashSet<String>(Arrays.asList(executables));
+
+        for (ProcessDetails p : procs) {
+            msg = "Expected one of \"" + execList + "\" in SELinux domain \"" + domain + "\""
+                + " Found: \"" + p + "\"";
+            assertTrue(msg, execList.contains(p.procTitle));
         }
     }
 
@@ -173,7 +178,7 @@ public class SELinuxDomainTest extends TestCase {
 
     /* Media server is always running */
     public void testMediaserverDomain() throws FileNotFoundException {
-        assertDomainN("u:r:mediaserver:s0", "/system/bin/mediaserver");
+        assertDomainN("u:r:mediaserver:s0", "media.log", "/system/bin/mediaserver");
     }
 
     /* Installd is always running */
