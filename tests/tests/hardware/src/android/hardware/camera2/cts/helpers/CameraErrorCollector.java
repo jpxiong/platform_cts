@@ -19,6 +19,7 @@ package android.hardware.camera2.cts.helpers;
 import android.hardware.camera2.CameraMetadata.Key;
 import android.hardware.camera2.CaptureRequest;
 import android.hardware.camera2.CaptureRequest.Builder;
+import android.hardware.camera2.CaptureResult;
 
 import org.hamcrest.CoreMatchers;
 import org.hamcrest.Matcher;
@@ -282,6 +283,23 @@ public class CameraErrorCollector extends ErrorCollector {
     }
 
     /**
+     * Check if the key value is not null and return the value.
+     *
+     * @param result The {@link CaptureResult} to get the key from.
+     * @param key The {@link CaptureResult} key to be checked.
+     * @return The value of the key.
+     */
+    public <T> T expectKeyValueNotNull(CaptureResult result, Key<T> key) {
+
+        T value = result.get(key);
+        if (value == null) {
+            addMessage("Key " + key.getName() + " shouldn't be null");
+        }
+
+        return value;
+    }
+
+    /**
      * Check if the key is non-null and the value is not equal to target.
      *
      * @param request The The {@link CaptureRequest#Builder} to get the key from.
@@ -295,6 +313,27 @@ public class CameraErrorCollector extends ErrorCollector {
 
         T value;
         if ((value = expectKeyValueNotNull(request, key)) == null) {
+            return;
+        }
+
+        String reason = "Key " + key.getName() + " shouldn't have value " + value.toString();
+        checkThat(reason, value, CoreMatchers.not(expected));
+    }
+
+    /**
+     * Check if the key is non-null and the value is not equal to target.
+     *
+     * @param result The The {@link CaptureResult} to get the key from.
+     * @param key The {@link CaptureResult} key to be checked.
+     * @param expected The expected value of the CaptureResult key.
+     */
+    public <T> void expectKeyValueNotEquals(CaptureResult result, Key<T> key, T expected) {
+        if (result == null || key == null || expected == null) {
+            throw new IllegalArgumentException("result, key and target shouldn't be null");
+        }
+
+        T value;
+        if ((value = expectKeyValueNotNull(result, key)) == null) {
             return;
         }
 

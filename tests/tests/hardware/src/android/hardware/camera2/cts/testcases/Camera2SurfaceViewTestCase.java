@@ -180,6 +180,11 @@ public class Camera2SurfaceViewTestCase extends
      * @throws CameraAccessException When create capture request from camera fails
      */
     protected CaptureRequest.Builder createRequestForPreview() throws CameraAccessException {
+        if (mPreviewSurface == null) {
+            throw new IllegalStateException(
+                    "Preview surface is not set yet, call updatePreviewSurface or startPreview"
+                    + "first to set the preview surface properly.");
+        }
         CaptureRequest.Builder requestBuilder =
                 mCamera.createCaptureRequest(CameraDevice.TEMPLATE_PREVIEW);
         requestBuilder.addTarget(mPreviewSurface);

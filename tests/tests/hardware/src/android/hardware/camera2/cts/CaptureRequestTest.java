@@ -21,10 +21,12 @@ import static android.hardware.camera2.CameraCharacteristics.*;
 
 import android.graphics.Point;
 import android.graphics.Rect;
+import android.hardware.camera2.CameraAccessException;
 import android.hardware.camera2.CameraDevice;
 import android.hardware.camera2.CaptureRequest;
 import android.hardware.camera2.CaptureResult;
 import android.hardware.camera2.Face;
+import android.hardware.camera2.Rational;
 import android.hardware.camera2.Size;
 import android.hardware.camera2.CameraMetadata.Key;
 import android.hardware.camera2.cts.CameraTestUtils.SimpleCaptureListener;
@@ -73,6 +75,8 @@ public class CaptureRequestTest extends Camera2SurfaceViewTestCase {
             0.5333f, 0.7569f, 0.6000f, 0.7977f, 0.6667f, 0.8360f, 0.7333f, 0.8721f,
             0.8000f, 0.9063f, 0.8667f, 0.9389f, 0.9333f, 0.9701f, 1.0000f, 1.0000f
     };
+    private final Rational ZERO_R = new Rational(0, 1);
+    private final Rational ONE_R = new Rational(1, 1);
 
     @Override
     protected void setUp() throws Exception {
@@ -332,7 +336,111 @@ public class CaptureRequestTest extends Camera2SurfaceViewTestCase {
         }
     }
 
+    /**
+     * Test color correction modes and controls.
+     */
+    public void testColorCorrectionControl() throws Exception {
+        for (String id : mCameraIds) {
+            try {
+                openDevice(id);
+
+                colorCorrectionTestByCamera();
+            } finally {
+                closeDevice();
+            }
+        }
+    }
+
     // TODO: add 3A state machine test.
+
+    /**
+     * Test color correction controls.
+     *
+     * <p>Test different color correction modes. For TRANSFORM_MATRIX, only test
+     * the unit gain and identity transform.</p>
+     */
+    private void colorCorrectionTestByCamera() throws Exception {
+        CaptureRequest request;
+        CaptureResult result;
+        Size maxPreviewSz = mOrderedPreviewSizes.get(0); // Max preview size.
+        updatePreviewSurface(maxPreviewSz);
+        CaptureRequest.Builder manualRequestBuilder = createRequestForPreview();
+        CaptureRequest.Builder previewRequestBuilder = createRequestForPreview();
+        SimpleCaptureListener listener = new SimpleCaptureListener();
+
+        startPreview(previewRequestBuilder, maxPreviewSz, listener);
+
+        // Default preview result should give valid color correction metadata.
+        result = listener.getCaptureResult(WAIT_FOR_RESULT_TIMEOUT_MS);
+        validateColorCorrectionResult(result);
+
+        // TRANSFORM_MATRIX mode
+        // Only test unit gain and identity transform
+        float[] UNIT_GAIN = {1.0f, 1.0f, 1.0f, 1.0f};
+        Rational[] IDENTITY_TRANSFORM = {
+                ONE_R, ZERO_R, ZERO_R,
+                ZERO_R, ONE_R, ZERO_R,
+                ZERO_R, ZERO_R, ONE_R
+        };
+        manualRequestBuilder.set(CaptureRequest.CONTROL_MODE, CaptureRequest.CONTROL_MODE_OFF);
+        manualRequestBuilder.set(CaptureRequest.COLOR_CORRECTION_MODE,
+                CaptureRequest.COLOR_CORRECTION_MODE_TRANSFORM_MATRIX);
+        manualRequestBuilder.set(CaptureRequest.COLOR_CORRECTION_GAINS, UNIT_GAIN);
+        manualRequestBuilder.set(CaptureRequest.COLOR_CORRECTION_TRANSFORM, IDENTITY_TRANSFORM);
+        request = manualRequestBuilder.build();
+        mCamera.capture(request, listener, mHandler);
+        result = listener.getCaptureResultForRequest(request, NUM_RESULTS_WAIT_TIMEOUT);
+        float[] gains = result.get(CaptureResult.COLOR_CORRECTION_GAINS);
+        Rational[] transform = result.get(CaptureResult.COLOR_CORRECTION_TRANSFORM);
+        validateColorCorrectionResult(result);
+        mCollector.expectEquals("Color correction gain result/request mismatch",
+                CameraTestUtils.toObject(UNIT_GAIN), CameraTestUtils.toObject(gains));
+        mCollector.expectEquals("Color correction gain result/request mismatch",
+                IDENTITY_TRANSFORM, transform);
+
+        // FAST mode
+        manualRequestBuilder.set(CaptureRequest.CONTROL_MODE, CaptureRequest.CONTROL_MODE_AUTO);
+        manualRequestBuilder.set(CaptureRequest.COLOR_CORRECTION_MODE,
+                CaptureRequest.COLOR_CORRECTION_MODE_FAST);
+        request = manualRequestBuilder.build();
+        mCamera.capture(request, listener, mHandler);
+        result = listener.getCaptureResultForRequest(request, NUM_RESULTS_WAIT_TIMEOUT);
+        validateColorCorrectionResult(result);
+
+        // HIGH_QUALITY mode
+        manualRequestBuilder.set(CaptureRequest.CONTROL_MODE, CaptureRequest.CONTROL_MODE_AUTO);
+        manualRequestBuilder.set(CaptureRequest.COLOR_CORRECTION_MODE,
+                CaptureRequest.COLOR_CORRECTION_MODE_FAST);
+        request = manualRequestBuilder.build();
+        mCamera.capture(request, listener, mHandler);
+        result = listener.getCaptureResultForRequest(request, NUM_RESULTS_WAIT_TIMEOUT);
+        validateColorCorrectionResult(result);
+    }
+
+    private void validateColorCorrectionResult(CaptureResult result) {
+        float[] ZERO_GAINS = {0, 0, 0, 0};
+        final int TRANSFORM_SIZE = 9;
+        Rational[] zeroTransform = new Rational[TRANSFORM_SIZE];
+        Arrays.fill(zeroTransform, ZERO_R);
+
+        float[] resultGain;
+        if ((resultGain = mCollector.expectKeyValueNotNull(result,
+                CaptureResult.COLOR_CORRECTION_GAINS)) != null) {
+            mCollector.expectEquals("Color correction gain size in incorrect",
+                    ZERO_GAINS.length, resultGain.length);
+            mCollector.expectKeyValueNotEquals(result,
+                    CaptureResult.COLOR_CORRECTION_GAINS, ZERO_GAINS);
+        }
+
+        Rational[] resultTransform;
+        if ((resultTransform = mCollector.expectKeyValueNotNull(result,
+                CaptureResult.COLOR_CORRECTION_TRANSFORM)) != null) {
+            mCollector.expectEquals("Color correction transform size is incorrect",
+                    zeroTransform.length, resultTransform.length);
+            mCollector.expectKeyValueNotEquals(result,
+                    CaptureResult.COLOR_CORRECTION_TRANSFORM, zeroTransform);
+        }
+    }
 
     /**
      * Test flash mode control by AE mode.
