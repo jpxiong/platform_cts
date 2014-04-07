@@ -33,9 +33,9 @@ class PlanetsSurfaceView extends GLSurfaceViewCustom {
 
     @Override
     public void onPause() {
-        mWatchDog.stop();
         super.onPause();
         setRenderMode(RENDERMODE_WHEN_DIRTY);
+        mWatchDog.stop();
     }
 
     @Override
