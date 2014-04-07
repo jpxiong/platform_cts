@@ -26,6 +26,7 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.Environment;
 import android.os.ParcelFileDescriptor;
+import android.os.SystemClock;
 import android.provider.MediaStore;
 import android.provider.MediaStore.MediaColumns;
 import android.test.AndroidTestCase;
@@ -34,6 +35,7 @@ import android.util.Log;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.FilenameFilter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -48,6 +50,40 @@ public class MediaStore_FilesTest extends AndroidTestCase {
     protected void setUp() throws Exception {
         super.setUp();
         mResolver = mContext.getContentResolver();
+        cleanup();
+    }
+
+    @Override
+    protected void tearDown() throws Exception {
+        super.tearDown();
+        cleanup();
+    }
+
+    void cleanup() {
+        final String testName = getClass().getCanonicalName();
+        mResolver.delete(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
+                "_data LIKE ?1", new String[] {"%" + testName + "%"});
+        File ext = Environment.getExternalStorageDirectory();
+        File[] junk = ext.listFiles(new FilenameFilter() {
+
+            @Override
+            public boolean accept(File dir, String filename) {
+                return filename.contains(testName);
+            }
+        });
+        for (File f: junk) {
+            deleteAll(f);
+        }
+    }
+
+    void deleteAll(File f) {
+        if (f.isDirectory()) {
+            File [] sub = f.listFiles();
+            for (File s: sub) {
+                deleteAll(s);
+            }
+        }
+        f.delete();
     }
 
     public void testGetContentUri() {
@@ -158,6 +194,15 @@ public class MediaStore_FilesTest extends AndroidTestCase {
         }
     }
 
+    String realPathFor(ParcelFileDescriptor pfd) {
+        File real = new File("/proc/self/fd/" + pfd.getFd());
+        try {
+            return real.getCanonicalPath();
+        } catch (IOException e) {
+            return null;
+        }
+    }
+
     public void testAccess() throws IOException {
         // clean up from previous run
         mResolver.delete(MediaStore.Images.Media.INTERNAL_CONTENT_URI,
@@ -260,19 +305,19 @@ public class MediaStore_FilesTest extends AndroidTestCase {
 
                 // get the real path from the file descriptor (this relies on the media provider
                 // having opened the path via the real path instead of the emulated path).
-                File real = new File("/proc/self/fd/" + pfd.getFd());
                 values = new ContentValues();
-                values.put("_data", real.getCanonicalPath());
+                values.put("_data", realPathFor(pfd));
                 mResolver.update(uri, values, null, null);
                 pfd.close();
 
                 // we shouldn't be able to access this
                 try {
                     pfd = mResolver.openFileDescriptor(uri, "r");
-                    pfd.close();
-                    fail("shouldn't be here");
+                    fail("shouldn't have fd for " + realPathFor(pfd));
                 } catch (FileNotFoundException e) {
                     // expected
+                } finally {
+                    pfd.close();
                 }
             } catch (FileNotFoundException e) {
                 fail("couldn't open file");
@@ -291,7 +336,8 @@ public class MediaStore_FilesTest extends AndroidTestCase {
 
         for (File extpath: allpaths) {
             assertNotNull("Valid media must be inserted during CTS", extpath);
-            assertEquals("Valid media must be inserted during CTS", Environment.MEDIA_MOUNTED,
+            assertEquals("Valid media must be inserted for " + extpath
+                    + " during CTS", Environment.MEDIA_MOUNTED,
                     Environment.getStorageState(extpath));
 
             File child = extpath;
@@ -312,18 +358,99 @@ public class MediaStore_FilesTest extends AndroidTestCase {
             }
         }
 
+        String fileDir = Environment.getExternalStorageDirectory() +
+                "/" + getClass().getCanonicalName() + "-" + SystemClock.elapsedRealtime();
+        String fileName = fileDir + "/TestSecondary.Mp3";
+        writeFile(R.raw.testmp3_2, fileName); // file without album art
+
+
+        // insert temp file
+        values = new ContentValues();
+        values.put(MediaStore.Audio.Media.DATA, fileName);
+        values.put(MediaStore.Audio.Media.ARTIST, "Artist-" + SystemClock.elapsedRealtime());
+        values.put(MediaStore.Audio.Media.ALBUM, "Album-" + SystemClock.elapsedRealtime());
+        values.put(MediaStore.Audio.Media.MIME_TYPE, "audio/mp3");
+        Uri fileUri = mResolver.insert(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, values);
+        // give media provider some time to realize there's no album art
+        //SystemClock.sleep(1000);
+        // get its album id
+        Cursor c = mResolver.query(fileUri, new String[] { MediaStore.Audio.Media.ALBUM_ID},
+                null, null, null);
+        assertTrue(c.moveToFirst());
+        int albumid = c.getInt(0);
+        Uri albumArtUriBase = Uri.parse("content://media/external/audio/albumart");
+        Uri albumArtUri = ContentUris.withAppendedId(albumArtUriBase, albumid);
+        try {
+            pfd = mResolver.openFileDescriptor(albumArtUri, "r");
+            fail(("no album art, shouldn't be here. Got: " + realPathFor(pfd));
+        } catch (Exception e) {
+            // expected
+        }
+
+        // replace file with one that has album art
+        writeFile(R.raw.testmp3, fileName); // file with album art
+
+        for (String s: trimmedPaths) {
+            File dir = new File(s + "/foobardir-" + SystemClock.elapsedRealtime());
+            assertFalse("please remove " + dir.getAbsolutePath()
+                    + " before running", dir.exists());
+            File file = new File(dir, "foobar");
+            values = new ContentValues();
+            values.put(MediaStore.Audio.Media.ALBUM_ID, albumid);
+            values.put(MediaStore.Audio.Media.DATA, file.getAbsolutePath());
+            mResolver.insert(albumArtUriBase, values);
+            try {
+                pfd = mResolver.openFileDescriptor(albumArtUri, "r");
+                fail("shouldn't have fd for album " + albumid + ", got " + realPathFor(pfd));
+            } catch (Exception e) {
+                // expected
+            } finally {
+                pfd.close();
+            }
+            assertFalse(dir.getAbsolutePath() + " was created", dir.exists());
+        }
+        mResolver.delete(fileUri, null, null);
+        new File(fileName).delete();
+
+        // try creating files in root
+        for (String s: trimmedPaths) {
+            File dir = new File(s);
+            File file = new File(dir, "foobar.jpg");
+
+            values = new ContentValues();
+            values.put(MediaStore.Files.FileColumns.DATA, file.getAbsolutePath());
+            fileUri = mResolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values);
+            assertNotNull(fileUri);
+
+            // check that adding the file doesn't cause it to be created
+            assertFalse(file.exists());
+
+            // check if opening the file for write works
+            try {
+                mResolver.openOutputStream(fileUri).close();
+                fail("shouldn't have been able to create output stream");
+            } catch (SecurityException e) {
+                // expected
+            }
+            // check that deleting the file doesn't cause it to be created
+            mResolver.delete(fileUri, null, null);
+            assertFalse(file.exists());
+        }
+
+        // try creating files in new subdir
         for (String s: trimmedPaths) {
             File dir = new File(s + "/foobardir");
             File file = new File(dir, "foobar.jpg");
 
             values = new ContentValues();
             values.put(MediaStore.Files.FileColumns.DATA, dir.getAbsolutePath());
+
             Uri dirUri = mResolver.insert(MediaStore.Files.getContentUri("external"), values);
             assertNotNull(dirUri);
 
             values = new ContentValues();
             values.put(MediaStore.Files.FileColumns.DATA, file.getAbsolutePath());
-            Uri fileUri = mResolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values);
+            fileUri = mResolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values);
             assertNotNull(fileUri);
 
             // check that adding the file or its folder didn't cause either one to be created
