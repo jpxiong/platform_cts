@@ -19,6 +19,7 @@ package android.media.cts;
 import android.app.Presentation;
 import android.media.MediaCodec;
 import android.media.MediaCodecInfo;
+import android.media.MediaCodecList;
 import android.media.MediaFormat;
 import android.content.Context;
 import android.graphics.drawable.ColorDrawable;
@@ -64,20 +65,29 @@ public class EncodeVirtualDisplayTest extends AndroidTestCase {
     private static final boolean DEBUG_SAVE_FILE = false;   // save copy of encoded movie
     private static final String DEBUG_FILE_NAME_BASE = "/sdcard/test.";
 
+    // Encoder parameters table, sort by encoder level from high to low.
+    private static final int[][] ENCODER_PARAM_TABLE = {
+        // encoder level,                             width,   height,  bitrate,    framerate
+        {MediaCodecInfo.CodecProfileLevel.AVCLevel31, 1280,     720,    14000000,   30},
+        {MediaCodecInfo.CodecProfileLevel.AVCLevel3,   720,     480,    10000000,   30},
+        {MediaCodecInfo.CodecProfileLevel.AVCLevel22,  720,     480,    4000000,    15},
+        {MediaCodecInfo.CodecProfileLevel.AVCLevel21,  352,     576,    4000000,    25},
+    };
+
     // Virtual display characteristics.  Scaled down from full display size because not all
     // devices can encode at the resolution of their own display.
     private static final String NAME = TAG;
-    private static final int WIDTH = 1280;
-    private static final int HEIGHT = 720;
+    private static int sWidth = ENCODER_PARAM_TABLE[ENCODER_PARAM_TABLE.length-1][1];
+    private static int sHeight = ENCODER_PARAM_TABLE[ENCODER_PARAM_TABLE.length-1][2];
     private static final int DENSITY = DisplayMetrics.DENSITY_HIGH;
     private static final int UI_TIMEOUT_MS = 2000;
     private static final int UI_RENDER_PAUSE_MS = 400;
 
     // Encoder parameters.  We use the same width/height as the virtual display.
     private static final String MIME_TYPE = "video/avc";
-    private static final int FRAME_RATE = 15;               // 15fps
-    private static final int IFRAME_INTERVAL = 10;          // 10 seconds between I-frames
-    private static final int BIT_RATE = 6000000;            // 6Mbps
+    private static int sFrameRate = 15;               // 15fps
+    private static final int IFRAME_INTERVAL = 10;    // 10 seconds between I-frames
+    private static int sBitRate = 6000000;            // 6Mbps
 
     // Colors to test (RGB).  These must convert cleanly to and from BT.601 YUV.
     private static final int TEST_COLORS[] = {
@@ -105,6 +115,7 @@ public class EncodeVirtualDisplayTest extends AndroidTestCase {
 
         mUiHandler = new Handler(Looper.getMainLooper());
         mDisplayManager = (DisplayManager)mContext.getSystemService(Context.DISPLAY_SERVICE);
+        setupEncoderParameters();
     }
 
     /**
@@ -151,6 +162,62 @@ public class EncodeVirtualDisplayTest extends AndroidTestCase {
     }
 
     /**
+     * Returns true if the encoder level, specified in the ENCODER_PARAM_TABLE, can be supported.
+     */
+    private static boolean verifySupportForEncoderLevel(int index) {
+        int numCodecs = MediaCodecList.getCodecCount();
+        for (int i = 0; i < numCodecs; i++) {
+            MediaCodecInfo codecInfo = MediaCodecList.getCodecInfoAt(i);
+
+            if (!codecInfo.isEncoder()) {
+                continue;
+            }
+
+            String[] types = codecInfo.getSupportedTypes();
+            for (int j = 0; j < types.length; j++) {
+
+                if (false == types[j].equalsIgnoreCase(MIME_TYPE)) {
+                    continue;
+                }
+
+                MediaCodecInfo.CodecCapabilities caps = codecInfo.getCapabilitiesForType(types[j]);
+                for (int k = 0; k < caps.profileLevels.length; k++) {
+                    int profile = caps.profileLevels[k].profile;
+                    int level = caps.profileLevels[k].level;
+                    //Log.d(TAG, "[" + k + "] supported profile = " + profile + ", level = " + level);
+                    if (caps.profileLevels[k].level >= ENCODER_PARAM_TABLE[index][0]) {
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Initialize the encoder parameters according to the device capability.
+     */
+    private static void setupEncoderParameters() {
+
+        // Loop over each tabel entry until a proper encoder setting is found.
+        for (int i = 0; i < ENCODER_PARAM_TABLE.length; i++) {
+
+            // Check if we can support it?
+            if (verifySupportForEncoderLevel(i)) {
+
+                sWidth = ENCODER_PARAM_TABLE[i][1];
+                sHeight = ENCODER_PARAM_TABLE[i][2];
+                sBitRate = ENCODER_PARAM_TABLE[i][3];
+                sFrameRate = ENCODER_PARAM_TABLE[i][4];
+
+                Log.d(TAG, "encoder parameters changed: width = " + sWidth + ", height = " + sHeight
+                    + ", bitrate = " + sBitRate + ", framerate = " + sFrameRate);
+                break;
+            }
+        }
+    }
+
+    /**
      * Prepares the encoder, decoder, and virtual display.
      */
     private void encodeVirtualDisplayTest() throws IOException {
@@ -161,11 +228,11 @@ public class EncodeVirtualDisplayTest extends AndroidTestCase {
 
         try {
             // Encoded video resolution matches virtual display.
-            MediaFormat encoderFormat = MediaFormat.createVideoFormat(MIME_TYPE, WIDTH, HEIGHT);
+            MediaFormat encoderFormat = MediaFormat.createVideoFormat(MIME_TYPE, sWidth, sHeight);
             encoderFormat.setInteger(MediaFormat.KEY_COLOR_FORMAT,
                     MediaCodecInfo.CodecCapabilities.COLOR_FormatSurface);
-            encoderFormat.setInteger(MediaFormat.KEY_BIT_RATE, BIT_RATE);
-            encoderFormat.setInteger(MediaFormat.KEY_FRAME_RATE, FRAME_RATE);
+            encoderFormat.setInteger(MediaFormat.KEY_BIT_RATE, sBitRate);
+            encoderFormat.setInteger(MediaFormat.KEY_FRAME_RATE, sFrameRate);
             encoderFormat.setInteger(MediaFormat.KEY_I_FRAME_INTERVAL, IFRAME_INTERVAL);
 
             encoder = MediaCodec.createEncoderByType(MIME_TYPE);
@@ -175,12 +242,12 @@ public class EncodeVirtualDisplayTest extends AndroidTestCase {
 
             // Create a virtual display that will output to our encoder.
             virtualDisplay = mDisplayManager.createVirtualDisplay(NAME,
-                    WIDTH, HEIGHT, DENSITY, inputSurface, 0);
+                    sWidth, sHeight, DENSITY, inputSurface, 0);
 
             // We also need a decoder to check the output of the encoder.
             decoder = MediaCodec.createDecoderByType(MIME_TYPE);
-            MediaFormat decoderFormat = MediaFormat.createVideoFormat(MIME_TYPE, WIDTH, HEIGHT);
-            outputSurface = new OutputSurface(WIDTH, HEIGHT);
+            MediaFormat decoderFormat = MediaFormat.createVideoFormat(MIME_TYPE, sWidth, sHeight);
+            outputSurface = new OutputSurface(sWidth, sHeight);
             decoder.configure(decoderFormat, outputSurface.getSurface(), null, 0);
             decoder.start();
 
@@ -228,7 +295,7 @@ public class EncodeVirtualDisplayTest extends AndroidTestCase {
         // stream, not a .mp4 file, so not all players will know what to do with it.
         FileOutputStream outputStream = null;
         if (DEBUG_SAVE_FILE) {
-            String fileName = DEBUG_FILE_NAME_BASE + WIDTH + "x" + HEIGHT + ".mp4";
+            String fileName = DEBUG_FILE_NAME_BASE + sWidth + "x" + sHeight + ".mp4";
             try {
                 outputStream = new FileOutputStream(fileName);
                 Log.d(TAG, "encoded output will be saved as " + fileName);
@@ -422,8 +489,8 @@ public class EncodeVirtualDisplayTest extends AndroidTestCase {
 
         // Read a pixel from the center of the surface.  Might want to read from multiple points
         // and average them together.
-        int x = WIDTH / 2;
-        int y = HEIGHT / 2;
+        int x = sWidth / 2;
+        int y = sHeight / 2;
         GLES20.glReadPixels(x, y, 1, 1, GLES20.GL_RGBA, GLES20.GL_UNSIGNED_BYTE, mPixelBuf);
         int r = mPixelBuf.get(0) & 0xff;
         int g = mPixelBuf.get(1) & 0xff;
