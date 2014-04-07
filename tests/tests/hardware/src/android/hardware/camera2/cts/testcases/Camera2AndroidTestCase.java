@@ -93,7 +93,7 @@ public class Camera2AndroidTestCase extends AndroidTestCase {
     protected void tearDown() throws Exception {
         mHandlerThread.quitSafely();
         mHandler = null;
-        closeImageReader();
+        closeDefaultImageReader();
 
         try {
             mCollector.verify();
@@ -223,36 +223,74 @@ public class Camera2AndroidTestCase extends AndroidTestCase {
 
     /**
      * Create an {@link ImageReader} object and get the surface.
+     * <p>
+     * This function creates {@link ImageReader} object and surface, then assign
+     * to the default {@link mReader} and {@link mReaderSurface}. It closes the
+     * current default active {@link ImageReader} if it exists.
+     * </p>
+     *
+     * @param size The size of this ImageReader to be created.
+     * @param format The format of this ImageReader to be created
+     * @param maxNumImages The max number of images that can be acquired
+     *            simultaneously.
+     * @param listener The listener used by this ImageReader to notify
+     *            callbacks.
+     */
+    protected void createDefaultImageReader(Size size, int format, int maxNumImages,
+            ImageReader.OnImageAvailableListener listener) throws Exception {
+        closeDefaultImageReader();
+
+        mReader = createImageReader(size, format, maxNumImages, listener);
+        mReaderSurface = mReader.getSurface();
+        if (VERBOSE) Log.v(TAG, "Created ImageReader size " + size.toString());
+    }
+
+    /**
+     * Create an {@link ImageReader} object.
+     *
+     * <p>This function creates image reader object for given format, maxImages, and size.</p>
      *
      * @param size The size of this ImageReader to be created.
      * @param format The format of this ImageReader to be created
      * @param maxNumImages The max number of images that can be acquired simultaneously.
      * @param listener The listener used by this ImageReader to notify callbacks.
      */
-    protected void createImageReader(Size size, int format, int maxNumImages,
-            ImageReader.OnImageAvailableListener listener) throws Exception {
-        closeImageReader();
 
-        mReader = ImageReader.newInstance(size.getWidth(), size.getHeight(), format, maxNumImages);
-        mReaderSurface = mReader.getSurface();
-        mReader.setOnImageAvailableListener(listener, mHandler);
+    protected ImageReader createImageReader(Size size, int format, int maxNumImages,
+            ImageReader.OnImageAvailableListener listener) throws Exception {
+
+        ImageReader reader = ImageReader.newInstance(size.getWidth(), size.getHeight(),
+                format, maxNumImages);
+        reader.setOnImageAvailableListener(listener, mHandler);
         if (VERBOSE) Log.v(TAG, "Created ImageReader size " + size.toString());
+        return reader;
     }
 
     /**
-     * Close the pending images then close current active {@link ImageReader} object.
+     * Close the pending images then close current default {@link ImageReader} object.
      */
-    protected void closeImageReader() {
-        if (mReader != null) {
+    protected void closeDefaultImageReader() {
+        closeImageReader(mReader);
+        mReader = null;
+        mReaderSurface = null;
+    }
+
+    /**
+     * Close an image reader instance.
+     *
+     * @param reader
+     */
+    protected void closeImageReader(ImageReader reader) {
+        if (reader != null) {
             try {
                 // Close all possible pending images first.
-                Image image = mReader.acquireLatestImage();
+                Image image = reader.acquireLatestImage();
                 if (image != null) {
                     image.close();
                 }
             } finally {
-                mReader.close();
-                mReader = null;
+                reader.close();
+                reader = null;
             }
         }
     }

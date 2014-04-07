@@ -206,6 +206,39 @@ public class StaticMetadata {
     }
 
     /**
+     * Check if the camera device support focuser.
+     *
+     * @return true if camera device support focuser, false otherwise.
+     */
+    public boolean hasFocuser() {
+        Key<Float> key = CameraCharacteristics.LENS_INFO_MINIMUM_FOCUS_DISTANCE;
+        Float minFocusDistance = getValueFromKeyNonNull(key);
+
+        if (minFocusDistance == null) {
+            return false;
+        }
+
+        return (minFocusDistance > 0);
+    }
+
+    /**
+     * Get max 3A regions and do sanity check.
+     *
+     * @return 3A max regions supported by the camera device
+     */
+    public int[] get3aMaxRegionsChecked() {
+        Key<int[]> key = CameraCharacteristics.CONTROL_MAX_REGIONS;
+        int[] regionCounts = getValueFromKeyNonNull(key);
+
+        if (regionCounts == null) {
+            return new int[]{0, 0, 0};
+        }
+
+        checkTrueForKey(key, " value should contain 3 elements", regionCounts.length == 3);
+        return regionCounts;
+    }
+
+    /**
      * Get the available anti-banding modes.
      *
      * @return The array contains available anti-banding modes.

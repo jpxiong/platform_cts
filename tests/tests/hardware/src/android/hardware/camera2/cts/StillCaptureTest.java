@@ -19,17 +19,22 @@ package android.hardware.camera2.cts;
 import static android.hardware.camera2.cts.CameraTestUtils.*;
 
 import android.graphics.ImageFormat;
+import android.graphics.Rect;
 import android.hardware.camera2.CameraDevice;
 import android.hardware.camera2.CaptureRequest;
 import android.hardware.camera2.CaptureResult;
 import android.hardware.camera2.Size;
 import android.hardware.camera2.cts.CameraTestUtils.SimpleCaptureListener;
 import android.hardware.camera2.cts.CameraTestUtils.SimpleImageReaderListener;
+import android.hardware.camera2.cts.helpers.Camera2Focuser;
 import android.hardware.camera2.cts.testcases.Camera2SurfaceViewTestCase;
 import android.media.ExifInterface;
 import android.media.Image;
 import android.os.Build;
+import android.os.ConditionVariable;
 import android.util.Log;
+
+import com.android.ex.camera2.exceptions.TimeoutRuntimeException;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -85,6 +90,10 @@ public class StillCaptureTest extends Camera2SurfaceViewTestCase {
     private static final String TAG_SUBSEC_TIME_ORIG = "SubSecTimeOriginal";
     private static final String TAG_SUBSEC_TIME_DIG = "SubSecTimeDigitized";
     private static final int EXIF_DATETIME_LENGTH = 19;
+    private static final int MAX_REGIONS_AE_INDEX = 0;
+    private static final int MAX_REGIONS_AWB_INDEX = 1;
+    private static final int MAX_REGIONS_AF_INDEX = 2;
+    private static final int WAIT_FOR_FOCUS_DONE_TIMEOUT_MS = 3000;
 
     @Override
     protected void setUp() throws Exception {
@@ -111,6 +120,164 @@ public class StillCaptureTest extends Camera2SurfaceViewTestCase {
                 closeImageReader();
             }
         }
+    }
+
+    /**
+     * Test normal still capture sequence.
+     * <p>
+     * Preview and and jpeg output streams are configured. Max still capture
+     * size is used for jpeg capture. The sequnce of still capture being test
+     * is: start preview, auto focus, precapture metering (if AE is not
+     * converged), then capture jpeg. The AWB and AE are in auto modes. AF mode
+     * is CONTINUOUS_PICTURE.
+     * </p>
+     */
+    public void testTakePicture() throws Exception{
+        for (String id : mCameraIds) {
+            try {
+                Log.i(TAG, "Testing touch for focus for Camera " + id);
+                openDevice(id);
+
+                takePictureTestByCamera();
+            } finally {
+                closeDevice();
+                closeImageReader();
+            }
+        }
+    }
+
+    /**
+     * Test touch for focus.
+     * <p>
+     * AF is in CAF mode when preview is started, test uses several pre-selected
+     * regions to simulate touches. Active scan is triggered to make sure the AF
+     * converges in reasonable time.
+     * </p>
+     */
+    public void testTouchForFocus() throws Exception {
+        for (String id : mCameraIds) {
+            try {
+                Log.i(TAG, "Testing touch for focus for Camera " + id);
+                openDevice(id);
+                int[] max3ARegions = mStaticInfo.get3aMaxRegionsChecked();
+                if (!(mStaticInfo.hasFocuser() && max3ARegions[MAX_REGIONS_AF_INDEX] > 0)) {
+                    continue;
+                }
+
+                touchForFocusTestByCamera();
+            } finally {
+                closeDevice();
+                closeImageReader();
+            }
+        }
+    }
+
+    /**
+     * Test all combination of available preview sizes and still sizes.
+     * <p>
+     * For each still capture, Only the jpeg buffer is validated, capture
+     * result validation is covered by {@link #jpegExifTestByCamera} test.
+     * </p>
+     */
+    public void testStillPreviewCombination() throws Exception {
+        for (String id : mCameraIds) {
+            try {
+                Log.i(TAG, "Testing Still preview capture combination for Camera " + id);
+                openDevice(id);
+
+                previewStillCombinationTestByCamera();
+            } finally {
+                closeDevice();
+                closeImageReader();
+            }
+        }
+    }
+
+    private void takePictureTestByCamera() throws Exception {
+        boolean hasFocuser = mStaticInfo.hasFocuser();
+
+        Size maxStillSz = mOrderedStillSizes.get(0);
+        Size maxPreviewSz = mOrderedPreviewSizes.get(0);
+        SimpleCaptureListener resultListener = new SimpleCaptureListener();
+        SimpleImageReaderListener imageListener = new SimpleImageReaderListener();
+        CaptureRequest.Builder previewRequest =
+                mCamera.createCaptureRequest(CameraDevice.TEMPLATE_PREVIEW);
+        CaptureRequest.Builder stillRequest =
+                mCamera.createCaptureRequest(CameraDevice.TEMPLATE_STILL_CAPTURE);
+        prepareStillCaptureAndStartPreview(previewRequest, stillRequest, maxPreviewSz,
+                maxStillSz, resultListener, imageListener);
+
+        Camera2Focuser focuser = null;
+        if (hasFocuser) {
+            SimpleAutoFocusListener afListener = new SimpleAutoFocusListener();
+            focuser = new Camera2Focuser(mCamera, mPreviewSurface, afListener,
+                    mStaticInfo.getCharacteristics(), mHandler);
+
+            // Auto focus.
+            focuser.startAutoFocus(/*afRegions*/null);
+            afListener.waitForAutoFocusDone(WAIT_FOR_FOCUS_DONE_TIMEOUT_MS);
+        }
+
+        // TODO: Add AE precapture metering sequence here.
+
+        mCamera.capture(stillRequest.build(), /*listener*/null, /*handler*/null);
+        if (hasFocuser) {
+            focuser.cancelAutoFocus();
+        }
+
+        Image image = imageListener.getImage(CAPTURE_IMAGE_TIMEOUT_MS);
+        validateJpegCapture(image, maxStillSz);
+        // stopPreview must be called here to make sure next time a preview stream
+        // is created with new size.
+        stopPreview();
+    }
+
+    /**
+     * Test touch region for focus by camera.
+     */
+    private void touchForFocusTestByCamera() throws Exception {
+        SimpleCaptureListener listener = new SimpleCaptureListener();
+        CaptureRequest.Builder requestBuilder =
+                mCamera.createCaptureRequest(CameraDevice.TEMPLATE_PREVIEW);
+        Size maxPreviewSz = mOrderedPreviewSizes.get(0);
+        startPreview(requestBuilder, maxPreviewSz, listener);
+
+        SimpleAutoFocusListener afListener = new SimpleAutoFocusListener();
+        Camera2Focuser focuser = new Camera2Focuser(mCamera, mPreviewSurface, afListener,
+                mStaticInfo.getCharacteristics(), mHandler);
+        int[][] testAfRegions = get3ATestRegionsForCamera();
+
+        for (int i = 0; i < testAfRegions.length; i++) {
+            focuser.touchForAutoFocus(testAfRegions[i]);
+            afListener.waitForAutoFocusDone(WAIT_FOR_FOCUS_DONE_TIMEOUT_MS);
+            focuser.cancelAutoFocus();
+        }
+    }
+
+    private void previewStillCombinationTestByCamera() throws Exception {
+        SimpleCaptureListener resultListener = new SimpleCaptureListener();
+        SimpleImageReaderListener imageListener = new SimpleImageReaderListener();
+
+        for (Size stillSz : mOrderedStillSizes)
+            for (Size previewSz : mOrderedPreviewSizes) {
+                if (VERBOSE) {
+                    Log.v(TAG, "Testing JPEG capture size " + stillSz.toString()
+                            + " with preview size " + previewSz.toString() + " for camera "
+                            + mCamera.getId());
+                }
+                CaptureRequest.Builder previewRequest =
+                        mCamera.createCaptureRequest(CameraDevice.TEMPLATE_PREVIEW);
+                CaptureRequest.Builder stillRequest =
+                        mCamera.createCaptureRequest(CameraDevice.TEMPLATE_STILL_CAPTURE);
+                prepareStillCaptureAndStartPreview(previewRequest, stillRequest, previewSz,
+                        stillSz, resultListener, imageListener);
+                mCamera.capture(stillRequest.build(), resultListener, mHandler);
+                Image image = imageListener.getImage(CAPTURE_IMAGE_TIMEOUT_MS);
+                validateJpegCapture(image, stillSz);
+                // stopPreview must be called here to make sure next time a preview stream
+                // is created with new size.
+                stopPreview();
+            }
     }
 
     /**
@@ -141,7 +308,10 @@ public class StillCaptureTest extends Camera2SurfaceViewTestCase {
         // Set the jpeg keys, then issue a capture
         Size[] thumbnailSizes = mStaticInfo.getAvailableThumbnailSizesChecked();
         Size maxThumbnailSize = thumbnailSizes[thumbnailSizes.length - 1];
-        stillBuilder.set(CaptureRequest.JPEG_THUMBNAIL_SIZE, maxThumbnailSize);
+        Size[] testThumbnailSizes = new Size[EXIF_TEST_DATA.length];
+        Arrays.fill(testThumbnailSizes, maxThumbnailSize);
+        // Make sure thumbnail size (0, 0) is covered.
+        testThumbnailSizes[0] = new Size(0, 0);
 
         for (int i = 0; i < EXIF_TEST_DATA.length; i++) {
             /**
@@ -154,6 +324,7 @@ public class StillCaptureTest extends Camera2SurfaceViewTestCase {
              * - new tags in the result set by the camera service are
              *   present and semantically correct.
              */
+            stillBuilder.set(CaptureRequest.JPEG_THUMBNAIL_SIZE, testThumbnailSizes[i]);
             stillBuilder.set(CaptureRequest.JPEG_GPS_COORDINATES, EXIF_TEST_DATA[i].gpsCoordinates);
             stillBuilder.set(CaptureRequest.JPEG_GPS_PROCESSING_METHOD,
                     EXIF_TEST_DATA[i].gpsProcessingMethod);
@@ -164,23 +335,26 @@ public class StillCaptureTest extends Camera2SurfaceViewTestCase {
                     EXIF_TEST_DATA[i].thumbnailQuality);
 
             // Validate request set and get.
-            mCollector.expectEquals("GPS coordinates result and request should match.",
+            mCollector.expectEquals("JPEG thumbnail size request set and get should match",
+                    testThumbnailSizes[i],
+                    stillBuilder.get(CaptureRequest.JPEG_THUMBNAIL_SIZE));
+            mCollector.expectEquals("GPS coordinates request set and get should match.",
                     toObject(EXIF_TEST_DATA[i].gpsCoordinates),
-                    toObject(stillBuilder.get(CaptureResult.JPEG_GPS_COORDINATES)));
-            mCollector.expectEquals("GPS processing method result and request should match",
+                    toObject(stillBuilder.get(CaptureRequest.JPEG_GPS_COORDINATES)));
+            mCollector.expectEquals("GPS processing method request set and get should match",
                     EXIF_TEST_DATA[i].gpsProcessingMethod,
-                    stillBuilder.get(CaptureResult.JPEG_GPS_PROCESSING_METHOD));
-            mCollector.expectEquals("GPS time stamp result and request should match",
+                    stillBuilder.get(CaptureRequest.JPEG_GPS_PROCESSING_METHOD));
+            mCollector.expectEquals("GPS time stamp request set and get should match",
                     EXIF_TEST_DATA[i].gpsTimeStamp,
-                    stillBuilder.get(CaptureResult.JPEG_GPS_TIMESTAMP));
-            mCollector.expectEquals("JPEG orientation result and request should match",
+                    stillBuilder.get(CaptureRequest.JPEG_GPS_TIMESTAMP));
+            mCollector.expectEquals("JPEG orientation request set and get should match",
                     EXIF_TEST_DATA[i].jpegOrientation,
-                    stillBuilder.get(CaptureResult.JPEG_ORIENTATION));
-            mCollector.expectEquals("JPEG quality result and request should match",
-                    EXIF_TEST_DATA[i].jpegQuality, stillBuilder.get(CaptureResult.JPEG_QUALITY));
-            mCollector.expectEquals("JPEG thumbnail quality result and request should match",
+                    stillBuilder.get(CaptureRequest.JPEG_ORIENTATION));
+            mCollector.expectEquals("JPEG quality request set and get should match",
+                    EXIF_TEST_DATA[i].jpegQuality, stillBuilder.get(CaptureRequest.JPEG_QUALITY));
+            mCollector.expectEquals("JPEG thumbnail quality request set and get should match",
                     EXIF_TEST_DATA[i].thumbnailQuality,
-                    stillBuilder.get(CaptureResult.JPEG_THUMBNAIL_QUALITY));
+                    stillBuilder.get(CaptureRequest.JPEG_THUMBNAIL_QUALITY));
 
             // Capture a jpeg image.
             CaptureRequest request = stillBuilder.build();
@@ -188,14 +362,23 @@ public class StillCaptureTest extends Camera2SurfaceViewTestCase {
             CaptureResult stillResult =
                     resultListener.getCaptureResultForRequest(request, NUM_RESULTS_WAIT_TIMEOUT);
             Image image = imageListener.getImage(CAPTURE_IMAGE_TIMEOUT_MS);
-            validateJpegImage(image, maxStillSz);
+            basicValidateJpegImage(image, maxStillSz);
 
             byte[] jpegBuffer = getDataFromImage(image);
             // Have to dump into a file to be able to use ExifInterface
             dumpFile(JPEG_FILE_NAME, jpegBuffer);
             ExifInterface exif = new ExifInterface(JPEG_FILE_NAME);
 
+            if (testThumbnailSizes[i].equals(new Size(0,0))) {
+                mCollector.expectTrue(
+                        "Jpeg shouldn't have thumbnail when thumbnail size is (0, 0)",
+                        !exif.hasThumbnail());
+            }
+
             // Validate capture result vs. request
+            mCollector.expectEquals("JPEG thumbnail size result and request should match",
+                    testThumbnailSizes[i],
+                    stillResult.get(CaptureResult.JPEG_THUMBNAIL_SIZE));
             mCollector.expectEquals("GPS coordinates result and request should match.",
                     toObject(EXIF_TEST_DATA[i].gpsCoordinates),
                     toObject(stillResult.get(CaptureResult.JPEG_GPS_COORDINATES)));
@@ -435,16 +618,17 @@ public class StillCaptureTest extends Camera2SurfaceViewTestCase {
     //----------------------------------------------------------------
 
     /**
-     * Validate JPEG image size and format.
+     * Simple validation of JPEG image size and format.
      * <p>
-     * Assert is used here as it make no sense to continue the test if the jpeg image
-     * captured has some serious failures.
+     * Only validate the image object sanity. It is fast, but doesn't actually
+     * check the buffer data. Assert is used here as it make no sense to
+     * continue the test if the jpeg image captured has some serious failures.
      * </p>
      *
      * @param image The captured jpeg image
      * @param expectedSize Expected capture jpeg size
      */
-    private static void validateJpegImage(Image image, Size expectedSize) {
+    private static void basicValidateJpegImage(Image image, Size expectedSize) {
         Size imageSz = new Size(image.getWidth(), image.getHeight());
         assertTrue(
                 String.format("Image size doesn't match (expected %s, actual %s) ",
@@ -454,6 +638,21 @@ public class StillCaptureTest extends Camera2SurfaceViewTestCase {
         assertEquals("Image plane number should be 1", 1, image.getPlanes().length);
 
         // Jpeg decoding validate was done in ImageReaderTest, no need to duplicate the test here.
+    }
+
+    /**
+     * Verify JPEG capture image object sanity and test.
+     * <p>
+     * In addition to image object sanity, this function also does the decoding
+     * test, which is slower.
+     * </p>
+     *
+     * @param image The JPEG image to be verified.
+     * @param jpegSize The JPEG capture size to be verified against.
+     */
+    private void validateJpegCapture(Image image, Size jpegSize) {
+        CameraTestUtils.validateImage(image, jpegSize.getWidth(), jpegSize.getHeight(),
+                ImageFormat.JPEG, /*filePath*/null);
     }
 
     private static float getClosestValueInArray(float[] values, float target) {
@@ -510,4 +709,88 @@ public class StillCaptureTest extends Camera2SurfaceViewTestCase {
         return -1;
     }
 
+    private static class SimpleAutoFocusListener implements Camera2Focuser.AutoFocusListener {
+        final ConditionVariable focusDone = new ConditionVariable();
+        @Override
+        public void onAutoFocusLocked(boolean success) {
+            focusDone.open();
+        }
+
+        public void waitForAutoFocusDone(long timeoutMs) {
+            if (focusDone.block(timeoutMs)) {
+                focusDone.close();
+            } else {
+                throw new TimeoutRuntimeException("Wait for auto focus done timed out after "
+                        + timeoutMs + "ms");
+            }
+        }
+    }
+
+    /**
+     * Get 5 3A test square regions, one is at center, the other four are at corners of
+     * active array rectangle.
+     *
+     * @return array of test 3A regions
+     */
+    private int[][] get3ATestRegionsForCamera() {
+        final int TEST_3A_REGION_NUM = 5;
+        final int NUM_ELEMENT_IN_REGION = 5;
+        final int DEFAULT_REGION_WEIGHT = 30;
+        final int DEFAULT_REGION_SCALE_RATIO = 8;
+        int[][] regions = new int[TEST_3A_REGION_NUM][NUM_ELEMENT_IN_REGION];
+        final Rect activeArraySize = mStaticInfo.getActiveArraySizeChecked();
+        int regionWidth = activeArraySize.width() / DEFAULT_REGION_SCALE_RATIO;
+        int regionHeight = activeArraySize.height() / DEFAULT_REGION_SCALE_RATIO;
+        int centerX = activeArraySize.width() / 2;
+        int centerY = activeArraySize.height() / 2;
+        int bottomRightX = activeArraySize.width() - 1;
+        int bottomRightY = activeArraySize.height() - 1;
+
+        // Center region
+        int i = 0;
+        regions[i][0] = centerX - regionWidth / 2;       // xmin
+        regions[i][1] = centerY - regionHeight / 2;      // ymin
+        regions[i][2] = centerX + regionWidth / 2 - 1;   // xmax
+        regions[i][3] = centerY + regionHeight / 2 - 1;  // ymax
+        regions[i][4] = DEFAULT_REGION_WEIGHT;
+        i++;
+
+        // Upper left corner
+        regions[i][0] = 0;                // xmin
+        regions[i][1] = 0;                // ymin
+        regions[i][2] = regionWidth - 1;  // xmax
+        regions[i][3] = regionHeight - 1; // ymax
+        regions[i][4] = DEFAULT_REGION_WEIGHT;
+        i++;
+
+        // Upper right corner
+        regions[i][0] = activeArraySize.width() - regionWidth; // xmin
+        regions[i][1] = 0;                                     // ymin
+        regions[i][2] = bottomRightX;                          // xmax
+        regions[i][3] = regionHeight - 1;                      // ymax
+        regions[i][4] = DEFAULT_REGION_WEIGHT;
+        i++;
+
+        // Bootom left corner
+        regions[i][0] = 0;                                       // xmin
+        regions[i][1] = activeArraySize.height() - regionHeight; // ymin
+        regions[i][2] = regionWidth - 1;                         // xmax
+        regions[i][3] = bottomRightY;                            // ymax
+        regions[i][4] = DEFAULT_REGION_WEIGHT;
+        i++;
+
+        // Bootom right corner
+        regions[i][0] = activeArraySize.width() - regionWidth;   // xmin
+        regions[i][1] = activeArraySize.height() - regionHeight; // ymin
+        regions[i][2] = bottomRightX;                            // xmax
+        regions[i][3] = bottomRightY;                            // ymax
+        regions[i][4] = DEFAULT_REGION_WEIGHT;
+        i++;
+
+        if (VERBOSE) {
+            Log.v(TAG, "Generated test regions are: " + Arrays.deepToString(regions));
+        }
+
+        return regions;
+    }
 }

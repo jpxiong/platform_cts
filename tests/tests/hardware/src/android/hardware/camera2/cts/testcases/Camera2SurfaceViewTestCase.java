@@ -69,7 +69,6 @@ public class Camera2SurfaceViewTestCase extends
     private static final int MAX_READER_IMAGES = 5;
 
     private Size mPreviewSize;
-    private Surface mPreviewSurface;
 
     // TODO: Use internal storage for this to make sure the file is only visible to test.
     protected static final String DEBUG_FILE_NAME_BASE =
@@ -88,6 +87,7 @@ public class Camera2SurfaceViewTestCase extends
     protected CameraDevice mCamera;
     protected ImageReader mReader;
     protected Surface mReaderSurface;
+    protected Surface mPreviewSurface;
     protected List<Size> mOrderedPreviewSizes; // In descending order.
     protected List<Size> mOrderedVideoSizes; // In descending order.
     protected List<Size> mOrderedStillSizes; // In descending order.
