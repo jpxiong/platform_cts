@@ -186,6 +186,8 @@ public class HoloHostTest extends DeviceTestCase implements IBuildReceiver {
             ref.delete();
         }
         mExecutionService.shutdown();
+        // Remove the APK.
+        mDevice.uninstallPackage(PACKAGE);
         super.tearDown();
     }
 
