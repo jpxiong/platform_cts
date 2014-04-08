@@ -446,6 +446,7 @@ public class FileSystemPermissionTest extends AndroidTestCase {
                     "/data/logs",
                     "/data/logs/core",
                     "/data/lost+found",
+                    "/data/mdl",
                     "/data/misc",
                     "/data/misc/bluetooth",
                     "/data/misc/dhcp",
