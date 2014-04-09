@@ -14,25 +14,13 @@
 
 LOCAL_PATH:= $(call my-dir)
 
-# Reusable Sensor test classes and helpers
-
-include $(CLEAR_VARS)
-
-LOCAL_MODULE := cts-sensors-tests
-LOCAL_MODULE_TAGS := tests
-
-LOCAL_SRC_FILES := $(call all-java-files-under, src/android/hardware/cts/helpers)
-
-include $(BUILD_STATIC_JAVA_LIBRARY)
-
-
 # CtsHardwareTestCases package
 
 include $(CLEAR_VARS)
 
 LOCAL_MODULE_TAGS := tests
 
-LOCAL_STATIC_JAVA_LIBRARIES := ctstestrunner mockito-target android-ex-camera2
+LOCAL_STATIC_JAVA_LIBRARIES := ctsdeviceutil ctstestrunner mockito-target android-ex-camera2
 
 LOCAL_SRC_FILES := $(call all-java-files-under, src)
 
