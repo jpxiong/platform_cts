@@ -33,13 +33,11 @@ public class MemoryFileTest extends TestCase {
     }
 
     public void testConstructor() throws IOException {
-        // new the MemoryFile instance
         new MemoryFile("Test File", 1024);
     }
 
     public void testWriteBytes() throws IOException {
         byte[] data = new byte[512];
-        // new the MemoryFile instance
         mMemoryFile = new MemoryFile("Test File", 1024);
 
         mMemoryFile.writeBytes(data, 0, 0, 512);
@@ -103,11 +101,14 @@ public class MemoryFileTest extends TestCase {
         mMemoryFile = new MemoryFile("Test File", 512);
         assertEquals(512, mMemoryFile.length());
 
-        mMemoryFile = new MemoryFile("Test File", Integer.MAX_VALUE);
-        assertEquals(Integer.MAX_VALUE, mMemoryFile.length());
+        mMemoryFile = new MemoryFile("Test File", 0);
+        assertEquals(0, mMemoryFile.length());
 
-        mMemoryFile = new MemoryFile("Test File", Integer.MIN_VALUE);
-        assertEquals(Integer.MIN_VALUE, mMemoryFile.length());
+        try {
+            mMemoryFile = new MemoryFile("Test File", -512);
+            fail();
+        } catch (IOException expected) {
+        }
     }
 
     public void testReadBytes() throws IOException {
