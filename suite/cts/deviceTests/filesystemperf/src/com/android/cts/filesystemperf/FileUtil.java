@@ -244,12 +244,16 @@ public class FileUtil {
         long memSize = SystemUtil.getTotalMemory(context);
         long diskSizeTarget = (2 * memSize / bufferSize) * bufferSize;
         final long minimumDiskSize = (512L * 1024L * 1024L / bufferSize) * bufferSize;
+        final long reservedDiskSize = (50L * 1024L * 1024L / bufferSize) * bufferSize;
         if ( diskSizeTarget < minimumDiskSize ) {
             diskSizeTarget = minimumDiskSize;
         }
         if (diskSizeTarget > freeDisk) {
             Log.i(TAG, "Free disk size " + freeDisk + " too small");
             return 0;
+        }
+        if ((freeDisk - diskSizeTarget) < reservedDiskSize) {
+            diskSizeTarget -= reservedDiskSize;
         }
         return diskSizeTarget;
     }
