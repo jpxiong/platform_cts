@@ -58,7 +58,7 @@ public class AccessibilityWindowQueryTest
     public void testFindByText() throws Exception {
         // find a view by text
         List<AccessibilityNodeInfo> buttons = getInstrumentation().getUiAutomation()
-                .getRootInActiveWindow().findAccessibilityNodeInfosByText("butto");
+                .getRootInActiveWindow().findAccessibilityNodeInfosByText("b");
         assertEquals(9, buttons.size());
     }
 
@@ -638,15 +638,15 @@ public class AccessibilityWindowQueryTest
             classNameAndTextList.add("android.widget.LinearLayout");
             classNameAndTextList.add("android.widget.LinearLayout");
             classNameAndTextList.add("android.widget.LinearLayout");
-            classNameAndTextList.add("android.widget.ButtonButton1");
-            classNameAndTextList.add("android.widget.ButtonButton2");
-            classNameAndTextList.add("android.widget.ButtonButton3");
-            classNameAndTextList.add("android.widget.ButtonButton4");
-            classNameAndTextList.add("android.widget.ButtonButton5");
-            classNameAndTextList.add("android.widget.ButtonButton6");
-            classNameAndTextList.add("android.widget.ButtonButton7");
-            classNameAndTextList.add("android.widget.ButtonButton8");
-            classNameAndTextList.add("android.widget.ButtonButton9");
+            classNameAndTextList.add("android.widget.ButtonB1");
+            classNameAndTextList.add("android.widget.ButtonB2");
+            classNameAndTextList.add("android.widget.ButtonB3");
+            classNameAndTextList.add("android.widget.ButtonB4");
+            classNameAndTextList.add("android.widget.ButtonB5");
+            classNameAndTextList.add("android.widget.ButtonB6");
+            classNameAndTextList.add("android.widget.ButtonB7");
+            classNameAndTextList.add("android.widget.ButtonB8");
+            classNameAndTextList.add("android.widget.ButtonB9");
 
             Queue<AccessibilityNodeInfo> fringe = new LinkedList<AccessibilityNodeInfo>();
             fringe.add(root);
