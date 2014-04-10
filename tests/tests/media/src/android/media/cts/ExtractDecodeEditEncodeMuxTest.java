@@ -95,6 +95,8 @@ public class ExtractDecodeEditEncodeMuxTest extends AndroidTestCase {
     private boolean mCopyVideo;
     /** Whether to copy the audio from the test video. */
     private boolean mCopyAudio;
+    /** Whether to verify the audio format. */
+    private boolean mVerifyAudioFormat;
     /** Width of the output frames. */
     private int mWidth = -1;
     /** Height of the output frames. */
@@ -131,6 +133,7 @@ public class ExtractDecodeEditEncodeMuxTest extends AndroidTestCase {
         setSize(1280, 720);
         setSource(R.raw.video_480x360_mp4_h264_500kbps_30fps_aac_stereo_128kbps_44100hz);
         setCopyAudio();
+        setVerifyAudioFormat();
         TestWrapper.runTest(this);
     }
 
@@ -139,6 +142,7 @@ public class ExtractDecodeEditEncodeMuxTest extends AndroidTestCase {
         setSource(R.raw.video_480x360_mp4_h264_500kbps_30fps_aac_stereo_128kbps_44100hz);
         setCopyAudio();
         setCopyVideo();
+        setVerifyAudioFormat();
         TestWrapper.runTest(this);
     }
 
@@ -187,6 +191,13 @@ public class ExtractDecodeEditEncodeMuxTest extends AndroidTestCase {
      */
     private void setCopyAudio() {
         mCopyAudio = true;
+    }
+
+    /**
+     * Sets the test to verify the output audio format.
+     */
+    private void setVerifyAudioFormat() {
+        mVerifyAudioFormat = true;
     }
 
     /**
@@ -449,6 +460,43 @@ public class ExtractDecodeEditEncodeMuxTest extends AndroidTestCase {
         if (exception != null) {
             throw exception;
         }
+
+        MediaExtractor mediaExtractor = null;
+        try {
+            mediaExtractor = new MediaExtractor();
+            mediaExtractor.setDataSource(mOutputFile);
+
+            assertEquals("incorrect number of tracks", (mCopyAudio ? 1 : 0) + (mCopyVideo ? 1 : 0),
+                    mediaExtractor.getTrackCount());
+            if (mVerifyAudioFormat) {
+                boolean foundAudio = false;
+                for (int i = 0; i < mediaExtractor.getTrackCount(); i++) {
+                    MediaFormat trackFormat = mediaExtractor.getTrackFormat(i);
+                    if (isAudioFormat(trackFormat)) {
+                        foundAudio = true;
+                        int expectedSampleRate = OUTPUT_AUDIO_SAMPLE_RATE_HZ;
+
+                        // SBR mode halves the sample rate in the format.
+                        if (OUTPUT_AUDIO_AAC_PROFILE ==
+                                MediaCodecInfo.CodecProfileLevel.AACObjectHE) {
+                            expectedSampleRate /= 2;
+                        }
+                        assertEquals("sample rates should match", expectedSampleRate,
+                                trackFormat.getInteger(MediaFormat.KEY_SAMPLE_RATE));
+                    }
+                }
+
+                assertTrue("output should have an audio track", foundAudio || !mCopyAudio);
+            }
+        } catch (IOException e) {
+            throw new IllegalStateException("exception verifying output file", e);
+        } finally {
+            if (mediaExtractor != null) {
+                mediaExtractor.release();
+            }
+        }
+
+        // TODO: Check the generated output file's video format and sample data.
     }
 
     /**
@@ -1061,8 +1109,6 @@ public class ExtractDecodeEditEncodeMuxTest extends AndroidTestCase {
         if (mCopyAudio) {
             assertEquals("no frame should be pending", -1, pendingAudioDecoderOutputBufferIndex);
         }
-
-        // TODO: Check the generated output file.
     }
 
     private static boolean isVideoFormat(MediaFormat format) {
