@@ -44,6 +44,8 @@ public class VectorDrawableTest extends AndroidTestCase {
             R.drawable.vector_icon_heart,
             R.drawable.vector_icon_schedule,
             R.drawable.vector_icon_settings,
+            R.drawable.vector_icon_random_path_1,
+            R.drawable.vector_icon_random_path_2,
     };
 
     private int[] mGoldenImages = new int[] {
@@ -52,10 +54,12 @@ public class VectorDrawableTest extends AndroidTestCase {
             R.drawable.vector_icon_heart_golden,
             R.drawable.vector_icon_schedule_golden,
             R.drawable.vector_icon_settings_golden,
+            R.drawable.vector_icon_random_path_1_golden,
+            R.drawable.vector_icon_random_path_2_golden,
     };
 
-    private static final int IMAGE_WIDTH = 32;
-    private static final int IMAGE_HEIGHT = 32;
+    private static final int IMAGE_WIDTH = 64;
+    private static final int IMAGE_HEIGHT = 64;
     // A small value is actually making sure that the values are matching
     // exactly with the golden image.
     // We can increase the threshold if the Skia is drawing with some variance
@@ -86,7 +90,7 @@ public class VectorDrawableTest extends AndroidTestCase {
             XmlPullParser xpp = mResources.getXml(mVectorIcons[i]);
             AttributeSet attrs = Xml.asAttributeSet(xpp);
 
-            vectorDrawable.inflate(mResources, xpp, attrs);
+            vectorDrawable.inflate(mResources, xpp, attrs, null);
             vectorDrawable.setAnimationFraction(0);
 
             bitmap.eraseColor(0);
