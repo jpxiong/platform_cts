@@ -36,9 +36,9 @@ public class DisplayMetricsTest extends AndroidTestCase {
         outMetrics.setToDefaults();
         assertEquals(0, outMetrics.widthPixels);
         assertEquals(0, outMetrics.heightPixels);
-        // according to Android enmulator doc UI -scale confine density should between 0.1 to 3
-        assertTrue((0.1 <= outMetrics.density) && (outMetrics.density <= 3));
-        assertTrue((0.1 <= outMetrics.scaledDensity) && (outMetrics.scaledDensity <= 3));
+        // according to Android emulator doc UI -scale confine density should between 0.1 to 4
+        assertTrue((0.1 <= outMetrics.density) && (outMetrics.density <= 4));
+        assertTrue((0.1 <= outMetrics.scaledDensity) && (outMetrics.scaledDensity <= 4));
         assertTrue(0 < outMetrics.xdpi);
         assertTrue(0 < outMetrics.ydpi);
 
@@ -48,9 +48,9 @@ public class DisplayMetricsTest extends AndroidTestCase {
         metrics.setTo(outMetrics);
         assertEquals(display.getHeight(), metrics.heightPixels);
         assertEquals(display.getWidth(), metrics.widthPixels);
-        // according to Android enmulator doc UI -scale confine density should between 0.1 to 3
-        assertTrue((0.1 <= metrics.density) && (metrics.density <= 3));
-        assertTrue((0.1 <= metrics.scaledDensity) && (metrics.scaledDensity <= 3));
+        // according to Android emulator doc UI -scale confine density should between 0.1 to 4
+        assertTrue((0.1 <= metrics.density) && (metrics.density <= 4));
+        assertTrue((0.1 <= metrics.scaledDensity) && (metrics.scaledDensity <= 4));
         assertTrue(0 < metrics.xdpi);
         assertTrue(0 < metrics.ydpi);
     }
