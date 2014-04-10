@@ -16,13 +16,14 @@
 
 package android.hardware.cts.helpers;
 
-import android.cts.util.CtsAndroidTestCase;
+import android.test.AndroidTestCase;
+
 import android.util.Log;
 
 /**
  * Test Case class that handles gracefully sensors that are not available in the device.
  */
-public abstract class SensorTestCase extends CtsAndroidTestCase {
+public abstract class SensorTestCase extends AndroidTestCase {
     protected final String LOG_TAG = "TestRunner";
 
     protected SensorTestCase() {}

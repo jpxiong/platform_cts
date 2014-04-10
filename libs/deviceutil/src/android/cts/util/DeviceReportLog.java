@@ -16,24 +16,19 @@
 
 package android.cts.util;
 
+import com.android.cts.util.ReportLog;
+
 import android.app.Instrumentation;
 import android.os.Bundle;
 import android.util.Log;
-
-import com.android.cts.util.ReportLog;
 
 public class DeviceReportLog extends ReportLog {
     private static final String TAG = "DeviceCtsReport";
     private static final String CTS_RESULT = "CTS_RESULT";
     private static final int INST_STATUS_IN_PROGRESS = 2;
-    private static final int BASE_DEPTH = 4;
 
-    public DeviceReportLog() {
-        mDepth = BASE_DEPTH;
-    }
-
-    public DeviceReportLog(int depth) {
-        mDepth = BASE_DEPTH + depth;
+    DeviceReportLog() {
+        mDepth = 4;
     }
 
     @Override
