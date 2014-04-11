@@ -96,7 +96,7 @@ public class CameraDeviceTest extends Camera2AndroidTestCase {
                     any(CameraDevice.class));
 
         mCameraListener = mCameraMockListener;
-        createImageReader(DEFAULT_CAPTURE_SIZE, ImageFormat.YUV_420_888, MAX_NUM_IMAGES,
+        createDefaultImageReader(DEFAULT_CAPTURE_SIZE, ImageFormat.YUV_420_888, MAX_NUM_IMAGES,
                 new ImageDropperListener());
     }
 

@@ -103,7 +103,7 @@ public class CaptureResultTest extends Camera2AndroidTestCase {
             try {
                 // Create image reader and surface.
                 Size sz = getMaxPreviewSize(ids[i], mCameraManager);
-                createImageReader(sz, ImageFormat.YUV_420_888, MAX_NUM_IMAGES,
+                createDefaultImageReader(sz, ImageFormat.YUV_420_888, MAX_NUM_IMAGES,
                         new ImageDropperListener());
                 if (VERBOSE) {
                     Log.v(TAG, "Testing camera " + ids[i] + "for size " + sz.toString());
@@ -151,7 +151,7 @@ public class CaptureResultTest extends Camera2AndroidTestCase {
                 stopCapture(/*fast*/false);
             } finally {
                 closeDevice(ids[i]);
-                closeImageReader();
+                closeDefaultImageReader();
             }
 
         }

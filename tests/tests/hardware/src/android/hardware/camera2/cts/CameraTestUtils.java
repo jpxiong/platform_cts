@@ -18,6 +18,7 @@ package android.hardware.camera2.cts;
 
 import static com.android.ex.camera2.blocking.BlockingStateListener.*;
 
+import android.graphics.BitmapFactory;
 import android.graphics.ImageFormat;
 import android.hardware.camera2.CameraAccessException;
 import android.hardware.camera2.CameraDevice;
@@ -62,7 +63,7 @@ import java.util.concurrent.TimeUnit;
 public class CameraTestUtils extends Assert {
     private static final String TAG = "CameraTestUtils";
     private static final boolean VERBOSE = Log.isLoggable(TAG, Log.VERBOSE);
-
+    private static final boolean DEBUG = Log.isLoggable(TAG, Log.DEBUG);
     // Only test the preview and video size that is no larger than 1080p.
     public static final Size PREVIEW_SIZE_BOUND = new Size(1920, 1080);
     // Default timeouts for reaching various states
@@ -342,7 +343,6 @@ public class CameraTestUtils extends Assert {
             buffer = planes[i].getBuffer();
             assertNotNull("Fail to get bytebuffer from plane", buffer);
             rowStride = planes[i].getRowStride();
-            assertTrue("rowStride should be no less than width", rowStride >= width);
             pixelStride = planes[i].getPixelStride();
             assertTrue("pixel stride " + pixelStride + " is invalid", pixelStride > 0);
             if (VERBOSE) {
@@ -665,6 +665,52 @@ public class CameraTestUtils extends Assert {
     }
 
     /**
+     * Validate image based on format and size.
+     * <p>
+     * Only RAW_SENSOR, YUV420_888 and JPEG formats are supported. Calling this
+     * method with other formats will cause a UnsupportedOperationException.
+     * </p>
+     *
+     * @param image The image to be validated.
+     * @param width The image width.
+     * @param height The image height.
+     * @param format The image format.
+     * @param filePath The debug dump file path, null if don't want to dump to
+     *            file.
+     * @throws UnsupportedOperationException if calling with format other than
+     *             RAW_SENSOR, YUV420_888 or JPEG.
+     */
+    public static void validateImage(Image image, int width, int height, int format,
+            String filePath) {
+        checkImage(image, width, height, format);
+
+        /**
+         * TODO: validate timestamp:
+         * 1. capture result timestamp against the image timestamp (need
+         * consider frame drops)
+         * 2. timestamps should be monotonically increasing for different requests
+         */
+        if(VERBOSE) Log.v(TAG, "validating Image");
+        byte[] data = getDataFromImage(image);
+        assertTrue("Invalid image data", data != null && data.length > 0);
+
+        switch (format) {
+            case ImageFormat.JPEG:
+                validateJpegData(data, width, height, filePath);
+                break;
+            case ImageFormat.YUV_420_888:
+                validateYuvData(data, width, height, format, image.getTimestamp(), filePath);
+                break;
+            case ImageFormat.RAW_SENSOR:
+                validateRaw16Data(data, width, height, format, image.getTimestamp(), filePath);
+                break;
+            default:
+                throw new UnsupportedOperationException("Unsupported format for validation: "
+                        + format);
+        }
+    }
+
+    /**
      * Provide a mock for {@link CameraDevice.StateListener}.
      *
      * <p>Only useful because mockito can't mock {@link CameraDevice.StateListener} which is an
@@ -699,5 +745,58 @@ public class CameraTestUtils extends Assert {
         public static MockStateListener mock() {
             return Mockito.spy(new MockStateListener());
         }
+    }
+
+    private static void validateJpegData(byte[] jpegData, int width, int height, String filePath) {
+        BitmapFactory.Options bmpOptions = new BitmapFactory.Options();
+        // DecodeBound mode: only parse the frame header to get width/height.
+        // it doesn't decode the pixel.
+        bmpOptions.inJustDecodeBounds = true;
+        BitmapFactory.decodeByteArray(jpegData, 0, jpegData.length, bmpOptions);
+        assertEquals(width, bmpOptions.outWidth);
+        assertEquals(height, bmpOptions.outHeight);
+
+        // Pixel decoding mode: decode whole image. check if the image data
+        // is decodable here.
+        assertNotNull("Decoding jpeg failed",
+                BitmapFactory.decodeByteArray(jpegData, 0, jpegData.length));
+        if (DEBUG && filePath != null) {
+            String fileName =
+                    filePath + "/" + width + "x" + height + ".jpeg";
+            dumpFile(fileName, jpegData);
+        }
+    }
+
+    private static void validateYuvData(byte[] yuvData, int width, int height, int format,
+            long ts, String filePath) {
+        checkYuvFormat(format);
+        if (VERBOSE) Log.v(TAG, "Validating YUV data");
+        int expectedSize = width * height * ImageFormat.getBitsPerPixel(format) / 8;
+        assertEquals("Yuv data doesn't match", expectedSize, yuvData.length);
+
+        // TODO: Can add data validation for test pattern.
+
+        if (DEBUG && filePath != null) {
+            String fileName =
+                    filePath + "/" + width + "x" + height + "_" + ts / 1e6 + ".yuv";
+            dumpFile(fileName, yuvData);
+        }
+    }
+
+    private static void validateRaw16Data(byte[] rawData, int width, int height, int format,
+            long ts, String filePath) {
+        if (VERBOSE) Log.v(TAG, "Validating raw data");
+        int expectedSize = width * height * ImageFormat.getBitsPerPixel(format) / 8;
+        assertEquals("Yuv data doesn't match", expectedSize, rawData.length);
+
+        // TODO: Can add data validation for test pattern.
+
+        if (DEBUG && filePath != null) {
+            String fileName =
+                    filePath + "/" + width + "x" + height + "_" + ts / 1e6 + ".raw16";
+            dumpFile(fileName, rawData);
+        }
+
+        return;
     }
 }

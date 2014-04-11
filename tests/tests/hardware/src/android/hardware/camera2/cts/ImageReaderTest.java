@@ -19,7 +19,6 @@ package android.hardware.camera2.cts;
 import static android.hardware.camera2.cts.CameraTestUtils.*;
 
 import android.content.Context;
-import android.graphics.BitmapFactory;
 import android.graphics.ImageFormat;
 import android.hardware.camera2.CameraDevice;
 import android.hardware.camera2.CameraCharacteristics;
@@ -49,7 +48,6 @@ import java.util.List;
 public class ImageReaderTest extends Camera2AndroidTestCase {
     private static final String TAG = "ImageReaderTest";
     private static final boolean VERBOSE = Log.isLoggable(TAG, Log.VERBOSE);
-    private static final boolean DUMP_FILE = false;
     // number of frame (for streaming requests) to be verified.
     // TODO: Need extend it to bigger number
     private static final int NUM_FRAME_VERIFIED = 1;
@@ -106,6 +104,100 @@ public class ImageReaderTest extends Camera2AndroidTestCase {
         // exceptions
     }
 
+    /**
+     * Test two image stream (YUV420_888 and JPEG) capture by using ImageReader.
+     *
+     * <p>Both stream formats are mandatory for Camera2 API</p>
+     */
+    public void testImageReaderYuvAndJpeg() throws Exception {
+        for (String id : mCameraIds) {
+            try {
+                Log.v(TAG, "YUV and JPEG testing for camera " + id);
+                openDevice(id);
+
+                yuvAndJpegTestByCamera();
+            } finally {
+                closeDevice(id);
+            }
+        }
+    }
+
+    /**
+     * Test yuv and jpeg capture simultaneously.
+     *
+     * <p>Use fixed yuv size, varies jpeg capture size. Single capture is tested.</p>
+     */
+    private void yuvAndJpegTestByCamera() throws Exception {
+        final int NUM_SINGLE_CAPTURE_TESTED = MAX_NUM_IMAGES - 1;
+        Size maxYuvSz = mOrderedPreviewSizes.get(0);
+
+        for (Size jpegSz : mOrderedStillSizes) {
+            if (VERBOSE) {
+                Log.v(TAG, "Testing yuv size " + maxYuvSz.toString() + " and jpeg size "
+                        + jpegSz.toString() + " for camera " + mCamera.getId());
+            }
+
+            ImageReader jpegReader = null;
+            ImageReader yuvReader = null;
+            try {
+                // Create YUV image reader
+                SimpleImageReaderListener yuvListener  = new SimpleImageReaderListener();
+                yuvReader = createImageReader(maxYuvSz, ImageFormat.YUV_420_888, MAX_NUM_IMAGES,
+                        yuvListener);
+                Surface yuvSurface = yuvReader.getSurface();
+
+                // Create Jpeg image reader
+                SimpleImageReaderListener jpegListener = new SimpleImageReaderListener();
+                jpegReader = createImageReader(jpegSz, ImageFormat.JPEG, MAX_NUM_IMAGES,
+                        jpegListener);
+                Surface jpegSurface = jpegReader.getSurface();
+
+                // Capture images.
+                List<Surface> outputSurfaces = new ArrayList<Surface>();
+                outputSurfaces.add(yuvSurface);
+                outputSurfaces.add(jpegSurface);
+                CaptureRequest.Builder request = prepareCaptureRequestForSurfaces(outputSurfaces);
+                SimpleCaptureListener resultListener = new SimpleCaptureListener();
+
+                for (int i = 0; i < NUM_SINGLE_CAPTURE_TESTED; i++) {
+                    startCapture(request.build(), /*repeating*/false, resultListener, mHandler);
+                }
+
+                // Verify capture result and images
+                for (int i = 0; i < NUM_SINGLE_CAPTURE_TESTED; i++) {
+                    resultListener.getCaptureResult(CAPTURE_WAIT_TIMEOUT_MS);
+                    if (VERBOSE) {
+                        Log.v(TAG, " Got the capture result back for " + i + "th capture");
+                    }
+
+                    Image yuvImage = yuvListener.getImage(CAPTURE_WAIT_TIMEOUT_MS);
+                    if (VERBOSE) {
+                        Log.v(TAG, " Got the yuv image back for " + i + "th capture");
+                    }
+
+                    Image jpegImage = jpegListener.getImage(CAPTURE_WAIT_TIMEOUT_MS);
+                    if (VERBOSE) {
+                        Log.v(TAG, " Got the jpeg image back for " + i + "th capture");
+                    }
+
+                    //Validate captured images.
+                    CameraTestUtils.validateImage(yuvImage, maxYuvSz.getWidth(),
+                            maxYuvSz.getHeight(), ImageFormat.YUV_420_888, /*filePath*/null);
+                    CameraTestUtils.validateImage(jpegImage, jpegSz.getWidth(),
+                            jpegSz.getHeight(), ImageFormat.JPEG, /*filePath*/null);
+                }
+
+                // Stop capture, delete the streams.
+                stopCapture(/*fast*/false);
+            } finally {
+                closeImageReader(jpegReader);
+                jpegReader = null;
+                closeImageReader(yuvReader);
+                yuvReader = null;
+            }
+        }
+    }
+
     private void bufferFormatTestByCamera(int format, String cameraId) throws Exception {
         CameraCharacteristics properties = mCameraManager.getCameraCharacteristics(cameraId);
         assertNotNull("Can't get camera properties!", properties);
@@ -127,7 +219,7 @@ public class ImageReaderTest extends Camera2AndroidTestCase {
 
                 // Create ImageReader.
                 mListener  = new SimpleImageListener();
-                createImageReader(sz, format, MAX_NUM_IMAGES, mListener);
+                createDefaultImageReader(sz, format, MAX_NUM_IMAGES, mListener);
 
                 // Start capture.
                 CaptureRequest request = prepareCaptureRequest();
@@ -140,7 +232,7 @@ public class ImageReaderTest extends Camera2AndroidTestCase {
                 // stop capture.
                 stopCapture(/*fast*/false);
             } finally {
-                closeImageReader();
+                closeDefaultImageReader();
             }
 
         }
@@ -168,18 +260,25 @@ public class ImageReaderTest extends Camera2AndroidTestCase {
     }
 
     private CaptureRequest prepareCaptureRequest() throws Exception {
-        List<Surface> outputSurfaces = new ArrayList<Surface>(1);
+        List<Surface> outputSurfaces = new ArrayList<Surface>();
         Surface surface = mReader.getSurface();
         assertNotNull("Fail to get surface from ImageReader", surface);
         outputSurfaces.add(surface);
-        configureCameraOutputs(mCamera, outputSurfaces, mCameraListener);
+        return prepareCaptureRequestForSurfaces(outputSurfaces).build();
+    }
+
+    private CaptureRequest.Builder prepareCaptureRequestForSurfaces(List<Surface> surfaces)
+            throws Exception {
+        configureCameraOutputs(mCamera, surfaces, mCameraListener);
 
         CaptureRequest.Builder captureBuilder =
                 mCamera.createCaptureRequest(CameraDevice.TEMPLATE_PREVIEW);
         assertNotNull("Fail to get captureRequest", captureBuilder);
-        captureBuilder.addTarget(mReader.getSurface());
+        for (Surface surface : surfaces) {
+            captureBuilder.addTarget(surface);
+        }
 
-        return captureBuilder.build();
+        return captureBuilder;
     }
 
     private void validateImage(Size sz, int format) throws Exception {
@@ -203,63 +302,9 @@ public class ImageReaderTest extends Camera2AndroidTestCase {
             img = mReader.acquireLatestImage();
             assertNotNull("Unable to acquire the latest image", img);
             if (VERBOSE) Log.v(TAG, "Got the latest image");
-            validateImage(img, sz.getWidth(), sz.getHeight(), format);
+            CameraTestUtils.validateImage(img, sz.getWidth(), sz.getHeight(), format,
+                    DEBUG_FILE_NAME_BASE);
             img.close();
-        }
-    }
-
-    private void validateImage(Image image, int width, int height, int format) {
-        checkImage(image, width, height, format);
-
-        /**
-         * TODO: validate timestamp:
-         * 1. capture result timestamp against the image timestamp (need
-         * consider frame drops)
-         * 2. timestamps should be monotonically increasing for different requests
-         */
-        if(VERBOSE) Log.v(TAG, "validating Image");
-        byte[] data = getDataFromImage(image);
-        assertTrue("Invalid image data", data != null && data.length > 0);
-
-        if (format == ImageFormat.JPEG) {
-            validateJpegData(data, width, height);
-        } else {
-            validateYuvData(data, width, height, format, image.getTimestamp());
-        }
-    }
-
-    private void validateJpegData(byte[] jpegData, int width, int height) {
-        BitmapFactory.Options bmpOptions = new BitmapFactory.Options();
-        // DecodeBound mode: only parse the frame header to get width/height.
-        // it doesn't decode the pixel.
-        bmpOptions.inJustDecodeBounds = true;
-        BitmapFactory.decodeByteArray(jpegData, 0, jpegData.length, bmpOptions);
-        assertEquals(width, bmpOptions.outWidth);
-        assertEquals(height, bmpOptions.outHeight);
-
-        // Pixel decoding mode: decode whole image. check if the image data
-        // is decodable here.
-        assertNotNull("Decoding jpeg failed",
-                BitmapFactory.decodeByteArray(jpegData, 0, jpegData.length));
-        if (DUMP_FILE) {
-            String fileName =
-                    DEBUG_FILE_NAME_BASE + "/" + width + "x" + height + ".jpeg";
-            dumpFile(fileName, jpegData);
-        }
-    }
-
-    private void validateYuvData(byte[] yuvData, int width, int height, int format, long ts) {
-        checkYuvFormat(format);
-        if (VERBOSE) Log.v(TAG, "Validating YUV data");
-        int expectedSize = width * height * ImageFormat.getBitsPerPixel(format) / 8;
-        assertEquals("Yuv data doesn't match", expectedSize, yuvData.length);
-
-        // TODO: Can add data validation if we have test pattern(tracked by b/9625427)
-
-        if (DUMP_FILE) {
-            String fileName =
-                    DEBUG_FILE_NAME_BASE + "/" + width + "x" + height + "_" + ts / 1e6 + ".yuv";
-            dumpFile(fileName, yuvData);
         }
     }
 }
