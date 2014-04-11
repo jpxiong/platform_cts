@@ -310,6 +310,93 @@ public class AccessibilityWindowQueryTest
     }
 
     @MediumTest
+    public void testSingleAccessibilityFocusAcrossWindows() throws Exception {
+        setAccessInteractiveWindowsFlag();
+        try {
+            UiAutomation uiAutomation = getInstrumentation().getUiAutomation();
+
+            uiAutomation.waitForIdle(TIMEOUT_WINDOW_STATE_IDLE, TIMEOUT_ASYNC_PROCESSING);
+
+            List<AccessibilityWindowInfo> windows = uiAutomation.getWindows();
+
+            AccessibilityNodeInfo firstWindowRoot = windows.get(0).getRoot();
+            AccessibilityNodeInfo secondWindowRoot = windows.get(1).getRoot();
+            AccessibilityNodeInfo thirdWindowRoot = windows.get(2).getRoot();
+
+
+            // Set focus in the first window.
+            assertTrue(firstWindowRoot.performAction(
+                    AccessibilityNodeInfo.ACTION_ACCESSIBILITY_FOCUS));
+
+            // Wait for things to settle.
+            uiAutomation.waitForIdle(TIMEOUT_WINDOW_STATE_IDLE, TIMEOUT_ASYNC_PROCESSING);
+
+            // Make sure there only one accessibility focus.
+            assertEquals(uiAutomation.findFocus(
+                    AccessibilityNodeInfo.FOCUS_ACCESSIBILITY), firstWindowRoot);
+            assertEquals(firstWindowRoot.findFocus(
+                    AccessibilityNodeInfo.FOCUS_ACCESSIBILITY), firstWindowRoot);
+            assertNull(secondWindowRoot.findFocus(
+                    AccessibilityNodeInfo.FOCUS_ACCESSIBILITY));
+            assertNull(thirdWindowRoot.findFocus(
+                    AccessibilityNodeInfo.FOCUS_ACCESSIBILITY));
+
+
+            // Set focus in the second window.
+            assertTrue(secondWindowRoot.performAction(
+                    AccessibilityNodeInfo.ACTION_ACCESSIBILITY_FOCUS));
+
+            // Wait for things to settle.
+            uiAutomation.waitForIdle(TIMEOUT_WINDOW_STATE_IDLE, TIMEOUT_ASYNC_PROCESSING);
+
+            // Make sure there only one accessibility focus.
+            assertEquals(uiAutomation.findFocus(
+                    AccessibilityNodeInfo.FOCUS_ACCESSIBILITY), secondWindowRoot);
+            assertEquals(secondWindowRoot.findFocus(
+                    AccessibilityNodeInfo.FOCUS_ACCESSIBILITY), secondWindowRoot);
+            assertNull(firstWindowRoot.findFocus(
+                    AccessibilityNodeInfo.FOCUS_ACCESSIBILITY));
+            assertNull(thirdWindowRoot.findFocus(
+                    AccessibilityNodeInfo.FOCUS_ACCESSIBILITY));
+
+
+            // Set focus in the third window.
+            assertTrue(thirdWindowRoot.performAction(
+                    AccessibilityNodeInfo.ACTION_ACCESSIBILITY_FOCUS));
+
+            // Wait for things to settle.
+            uiAutomation.waitForIdle(TIMEOUT_WINDOW_STATE_IDLE, TIMEOUT_ASYNC_PROCESSING);
+
+            // Make sure there only one accessibility focus.
+            assertEquals(uiAutomation.findFocus(
+                    AccessibilityNodeInfo.FOCUS_ACCESSIBILITY), thirdWindowRoot);
+            assertEquals(thirdWindowRoot.findFocus(
+                    AccessibilityNodeInfo.FOCUS_ACCESSIBILITY), thirdWindowRoot);
+            assertNull(firstWindowRoot.findFocus(
+                    AccessibilityNodeInfo.FOCUS_ACCESSIBILITY));
+            assertNull(secondWindowRoot.findFocus(
+                    AccessibilityNodeInfo.FOCUS_ACCESSIBILITY));
+
+
+            // Clear focus.
+            assertTrue(thirdWindowRoot.performAction(
+                    AccessibilityNodeInfo.ACTION_CLEAR_ACCESSIBILITY_FOCUS));
+
+            // Make sure there is not accessibility focus.
+            assertNull(uiAutomation.findFocus(
+                    AccessibilityNodeInfo.FOCUS_ACCESSIBILITY));
+            assertNull(firstWindowRoot.findFocus(
+                    AccessibilityNodeInfo.FOCUS_ACCESSIBILITY));
+            assertNull(secondWindowRoot.findFocus(
+                    AccessibilityNodeInfo.FOCUS_ACCESSIBILITY));
+            assertNull(thirdWindowRoot.findFocus(
+                    AccessibilityNodeInfo.FOCUS_ACCESSIBILITY));
+        } finally {
+            clearAccessInteractiveWindowsFlag();
+        }
+    }
+
+    @MediumTest
     public void testPerformActionFocus() throws Exception {
         // find a view and make sure it is not focused
         AccessibilityNodeInfo button = getInstrumentation().getUiAutomation()
