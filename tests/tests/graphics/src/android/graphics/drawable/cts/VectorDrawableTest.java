@@ -38,6 +38,7 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 
 public class VectorDrawableTest extends AndroidTestCase {
+    private static final String LOGTAG = VectorDrawableTest.class.getSimpleName();
     private int[] mVectorIcons = new int[] {
             R.drawable.vector_icon_create,
             R.drawable.vector_icon_delete,
@@ -46,6 +47,9 @@ public class VectorDrawableTest extends AndroidTestCase {
             R.drawable.vector_icon_settings,
             R.drawable.vector_icon_random_path_1,
             R.drawable.vector_icon_random_path_2,
+            R.drawable.vector_icon_repeated_cq,
+            R.drawable.vector_icon_repeated_st,
+
     };
 
     private int[] mGoldenImages = new int[] {
@@ -56,6 +60,8 @@ public class VectorDrawableTest extends AndroidTestCase {
             R.drawable.vector_icon_settings_golden,
             R.drawable.vector_icon_random_path_1_golden,
             R.drawable.vector_icon_random_path_2_golden,
+            R.drawable.vector_icon_repeated_cq_golden,
+            R.drawable.vector_icon_repeated_st_golden,
     };
 
     private static final int IMAGE_WIDTH = 64;
@@ -92,7 +98,7 @@ public class VectorDrawableTest extends AndroidTestCase {
             XmlPullParser xpp = mResources.getXml(mVectorIcons[i]);
             AttributeSet attrs = Xml.asAttributeSet(xpp);
 
-            vectorDrawable.inflate(mResources, xpp, attrs, null);
+            vectorDrawable.inflate(mResources, xpp, attrs);
             vectorDrawable.setAnimationFraction(0);
 
             bitmap.eraseColor(0);
@@ -100,11 +106,11 @@ public class VectorDrawableTest extends AndroidTestCase {
 
             if (DBG_DUMP_PNG) {
                 saveVectorDrawableIntoPNG(bitmap, i);
+            } else {
+                // Start to compare
+                Bitmap golden = BitmapFactory.decodeResource(mResources, mGoldenImages[i], options);
+                compareImages(bitmap, golden, mResources.getString(mVectorIcons[i]));
             }
-
-            // Start to compare
-            Bitmap golden = BitmapFactory.decodeResource(mResources, mGoldenImages[i], options);
-            compareImages(bitmap, golden);
         }
     }
 
@@ -125,6 +131,7 @@ public class VectorDrawableTest extends AndroidTestCase {
 
             out = new FileOutputStream(outputFile, false);
             bitmap.compress(Bitmap.CompressFormat.PNG, 100, out);
+            Log.v(LOGTAG, "Write test No." + index + " to file successfully.");
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
@@ -134,7 +141,7 @@ public class VectorDrawableTest extends AndroidTestCase {
         }
     }
 
-    public void compareImages(Bitmap ideal, Bitmap given) {
+    public void compareImages(Bitmap ideal, Bitmap given, String filename) {
         int idealWidth = ideal.getWidth();
         int idealHeight = ideal.getHeight();
 
@@ -156,10 +163,16 @@ public class VectorDrawableTest extends AndroidTestCase {
                 totalError += Math.abs(Color.blue(idealColor) - Color.blue(givenColor));
                 totalError += Math.abs(Color.alpha(idealColor) - Color.alpha(givenColor));
 
-                assertTrue((totalError / 1024.0f) < PIXEL_ERROR_THRESHOLD);
+                if ((totalError / 1024.0f) >= PIXEL_ERROR_THRESHOLD) {
+                    fail((filename + ": totalError is " + totalError));
+                }
+
                 totalDiffPixelCount++;
             }
         }
-        assertTrue((totalDiffPixelCount / totalPixelCount) < PIXEL_ERROR_THRESHOLD);
+        if ((totalDiffPixelCount / totalPixelCount) >= PIXEL_ERROR_THRESHOLD) {
+            fail((filename +": totalDiffPixelCount is " + totalDiffPixelCount));
+        }
+
     }
 }
