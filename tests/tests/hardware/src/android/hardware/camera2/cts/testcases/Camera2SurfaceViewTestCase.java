@@ -201,43 +201,39 @@ public class Camera2SurfaceViewTestCase extends
     }
 
     /**
-     * Setup still capture configuration and start preview.
+     * Setup still (JPEG) capture configuration and start preview.
      *
      * @param previewRequest The capture request to be used for preview
      * @param stillRequest The capture request to be used for still capture
      * @param previewSz Preview size
-     * @param stillSz Still capture size
+     * @param stillSz The still capture size
      * @param resultListener Capture result listener
-     * @param imageListener Still capture image listener
+     * @param imageListener The still capture image listener
      */
     protected void prepareStillCaptureAndStartPreview(CaptureRequest.Builder previewRequest,
             CaptureRequest.Builder stillRequest, Size previewSz, Size stillSz,
             CaptureListener resultListener,
             ImageReader.OnImageAvailableListener imageListener) throws Exception {
-        if (VERBOSE) {
-            Log.v(TAG, String.format("Prepare still (%s) and preview (%s)", stillSz.toString(),
-                    previewSz.toString()));
-        }
+        prepareCaptureAndStartPreview(previewRequest, stillRequest, previewSz, stillSz,
+                ImageFormat.JPEG, resultListener, imageListener);
+    }
 
-        // Update preview size.
-        updatePreviewSurface(previewSz);
-
-        // Create ImageReader.
-        createImageReader(stillSz, ImageFormat.JPEG, MAX_READER_IMAGES, imageListener);
-
-        // Configure output streams with preview and jpeg streams.
-        List<Surface> outputSurfaces = new ArrayList<Surface>(/*capacity*/1);
-        outputSurfaces.add(mPreviewSurface);
-        outputSurfaces.add(mReaderSurface);
-        configureCameraOutputs(mCamera, outputSurfaces, mCameraListener);
-
-        // Configure the requests.
-        previewRequest.addTarget(mPreviewSurface);
-        stillRequest.addTarget(mPreviewSurface);
-        stillRequest.addTarget(mReaderSurface);
-
-        // Start preview.
-        mCamera.setRepeatingRequest(previewRequest.build(), resultListener, mHandler);
+    /**
+     * Setup raw capture configuration and start preview.
+     *
+     * @param previewRequest The capture request to be used for preview
+     * @param rawRequest The capture request to be used for raw capture
+     * @param previewSz Preview size
+     * @param rawSz The raw capture size
+     * @param resultListener Capture result listener
+     * @param imageListener The raw capture image listener
+     */
+    protected void prepareRawCaptureAndStartPreview(CaptureRequest.Builder previewRequest,
+            CaptureRequest.Builder rawRequest, Size previewSz, Size rawSz,
+            CaptureListener resultListener,
+            ImageReader.OnImageAvailableListener imageListener) throws Exception {
+        prepareCaptureAndStartPreview(previewRequest, rawRequest, previewSz, rawSz,
+                ImageFormat.RAW_SENSOR, resultListener, imageListener);
     }
 
     /**
@@ -367,4 +363,46 @@ public class Camera2SurfaceViewTestCase extends
         mPreviewSurface = holder.getSurface();
         assertTrue("Preview surface is invalid", mPreviewSurface.isValid());
     }
+
+    /**
+     * Setup single capture configuration and start preview.
+     *
+     * @param previewRequest The capture request to be used for preview
+     * @param stillRequest The capture request to be used for still capture
+     * @param previewSz Preview size
+     * @param captureSz Still capture size
+     * @param format The single capture image format
+     * @param resultListener Capture result listener
+     * @param imageListener The single capture capture image listener
+     */
+    private void prepareCaptureAndStartPreview(CaptureRequest.Builder previewRequest,
+            CaptureRequest.Builder stillRequest, Size previewSz, Size captureSz, int format,
+            CaptureListener resultListener,
+            ImageReader.OnImageAvailableListener imageListener) throws Exception {
+        if (VERBOSE) {
+            Log.v(TAG, String.format("Prepare single capture (%s) and preview (%s)",
+                    captureSz.toString(), previewSz.toString()));
+        }
+
+        // Update preview size.
+        updatePreviewSurface(previewSz);
+
+        // Create ImageReader.
+        createImageReader(captureSz, format, MAX_READER_IMAGES, imageListener);
+
+        // Configure output streams with preview and jpeg streams.
+        List<Surface> outputSurfaces = new ArrayList<Surface>();
+        outputSurfaces.add(mPreviewSurface);
+        outputSurfaces.add(mReaderSurface);
+        configureCameraOutputs(mCamera, outputSurfaces, mCameraListener);
+
+        // Configure the requests.
+        previewRequest.addTarget(mPreviewSurface);
+        stillRequest.addTarget(mPreviewSurface);
+        stillRequest.addTarget(mReaderSurface);
+
+        // Start preview.
+        mCamera.setRepeatingRequest(previewRequest.build(), resultListener, mHandler);
+    }
+
 }

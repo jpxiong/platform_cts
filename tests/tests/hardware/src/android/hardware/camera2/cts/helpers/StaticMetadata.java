@@ -17,6 +17,7 @@
 package android.hardware.camera2.cts.helpers;
 
 import android.graphics.Rect;
+import android.graphics.ImageFormat;
 import android.hardware.camera2.CameraCharacteristics;
 import android.hardware.camera2.CameraMetadata;
 import android.hardware.camera2.CameraMetadata.Key;
@@ -710,6 +711,60 @@ public class StaticMetadata {
         }
 
         return modes;
+    }
+
+    /**
+     * Get supported raw output sizes and do the check.
+     *
+     * @return Empty size array if raw output is not supported
+     */
+    public Size[] getRawOutputSizesChecked() {
+        return getAvailableSizesForFormatChecked(ImageFormat.RAW_SENSOR,
+                CameraCharacteristics.SCALER_AVAILABLE_STREAM_CONFIGURATIONS_OUTPUT);
+    }
+
+    /**
+     * Get supported jpeg output sizes and do the check.
+     *
+     * @return Empty size array if jpeg output is not supported
+     */
+    public Size[] getJpegOutputSizeChecked() {
+        return getAvailableSizesForFormatChecked(ImageFormat.JPEG,
+                CameraCharacteristics.SCALER_AVAILABLE_STREAM_CONFIGURATIONS_OUTPUT);
+    }
+
+    /**
+     * Get available sizes for given format
+     *
+     * @param format The format for the requested size array.
+     * @param direction The stream direction, input or output.
+     * @return The sizes of the given format, empty array if no available size is found.
+     */
+    private Size[] getAvailableSizesForFormatChecked(int format, int direction) {
+        final int NUM_ELEMENTS_IN_STREAM_CONFIG = 4;
+        ArrayList<Size> sizeList = new ArrayList<Size>();
+        CameraMetadata.Key<int[]> key =
+                CameraCharacteristics.SCALER_AVAILABLE_STREAM_CONFIGURATIONS;
+        int[] config = getValueFromKeyNonNull(key);
+
+        if (config == null) {
+            return new Size[0];
+        }
+
+        checkTrueForKey(key, "array length is invalid", config.length
+                % NUM_ELEMENTS_IN_STREAM_CONFIG == 0);
+        // Round down to 4 boundary if it is not integer times of 4, to avoid array out of bound
+        // in case the above check fails.
+        int configLength = (config.length / NUM_ELEMENTS_IN_STREAM_CONFIG)
+                * NUM_ELEMENTS_IN_STREAM_CONFIG;
+        for (int i = 0; i < configLength; i += NUM_ELEMENTS_IN_STREAM_CONFIG) {
+            if (config[i] == format && config[i+3] == direction) {
+                sizeList.add(new Size(config[i+1], config[i+2]));
+            }
+        }
+
+        Size[] sizes = new Size[sizeList.size()];
+        return sizeList.toArray(sizes);
     }
 
     /**
