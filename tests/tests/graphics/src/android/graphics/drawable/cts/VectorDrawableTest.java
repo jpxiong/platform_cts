@@ -76,6 +76,8 @@ public class VectorDrawableTest extends AndroidTestCase {
         Bitmap bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
         Canvas canvas = new Canvas(bitmap);
         VectorDrawable vectorDrawable = new VectorDrawable();
+        vectorDrawable.setBounds(0, 0, IMAGE_WIDTH, IMAGE_HEIGHT);
+
         mResources = mContext.getResources();
         XmlPullParserFactory factory = XmlPullParserFactory.newInstance();
         factory.setNamespaceAware(true);
