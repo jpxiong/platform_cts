@@ -249,7 +249,7 @@ public final class PrintInstrument extends BaseCommand {
             final long identity = Binder.clearCallingIdentity();
             try {
                 final AtomicBoolean success = new AtomicBoolean();
-                final CountDownLatch completionLacth = new CountDownLatch(1);
+                final CountDownLatch completionLatch = new CountDownLatch(1);
 
                 mAm.clearApplicationUserData(clearedPackageName,
                         new IPackageDataObserver.Stub() {
@@ -260,12 +260,12 @@ public final class PrintInstrument extends BaseCommand {
                                 } else {
                                     success.set(false);
                                 }
-                                completionLacth.countDown();
+                                completionLatch.countDown();
                             }
                 }, UserHandle.USER_CURRENT);
 
                 try {
-                    completionLacth.await();
+                    completionLatch.await();
                 } catch (InterruptedException ie) {
                     /* ignore */
                 }
