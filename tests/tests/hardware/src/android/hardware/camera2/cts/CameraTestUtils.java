@@ -375,6 +375,7 @@ public class CameraTestUtils extends Assert {
                 }
             }
             if (VERBOSE) Log.v(TAG, "Finished reading data from plane " + i);
+            buffer.rewind();
         }
         return data;
     }
