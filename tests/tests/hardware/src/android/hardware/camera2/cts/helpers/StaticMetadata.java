@@ -30,6 +30,7 @@ import junit.framework.Assert;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -765,6 +766,95 @@ public class StaticMetadata {
 
         Size[] sizes = new Size[sizeList.size()];
         return sizeList.toArray(sizes);
+    }
+
+    /**
+     * Get available AE target fps ranges.
+     *
+     * @return Empty int array if aeAvailableTargetFpsRanges is invalid.
+     */
+    public int[] getAeAvailableTargetFpsRangesChecked() {
+        final int NUM_ELEMENTS_IN_FPS_RANGE = 2;
+        CameraMetadata.Key<int[]> key =
+                CameraCharacteristics.CONTROL_AE_AVAILABLE_TARGET_FPS_RANGES;
+        int[] fpsRanges = getValueFromKeyNonNull(key);
+
+        if (fpsRanges == null) {
+            return new int[0];
+        }
+
+        checkTrueForKey(key, "array length is invalid", fpsRanges.length
+                % NUM_ELEMENTS_IN_FPS_RANGE == 0);
+        // Round down to 2 boundary if it is not integer times of 2, to avoid array out of bound
+        // in case the above check fails.
+        int fpsRangeLength = (fpsRanges.length / NUM_ELEMENTS_IN_FPS_RANGE)
+                * NUM_ELEMENTS_IN_FPS_RANGE;
+        int minFps, maxFps;
+        long maxFrameDuration = getMaxFrameDurationChecked();
+        for (int i = 0; i < fpsRangeLength; i += NUM_ELEMENTS_IN_FPS_RANGE) {
+            minFps = fpsRanges[i];
+            maxFps = fpsRanges[i + 1];
+            checkTrueForKey(key, " min fps must be no larger than max fps!",
+                    minFps > 0 && maxFps >= minFps);
+            long maxDuration = (long) (1e9 / minFps);
+            checkTrueForKey(key, String.format(
+                    " the frame duration %d for min fps %d must smaller than maxFrameDuration %d",
+                    maxDuration, minFps, maxFrameDuration), maxDuration <= maxFrameDuration);
+        }
+
+        return fpsRanges;
+    }
+
+    /**
+     * Get max frame duration.
+     *
+     * @return 0 if maxFrameDuration is null
+     */
+    public long getMaxFrameDurationChecked() {
+        CameraMetadata.Key<Long> key =
+                CameraCharacteristics.SENSOR_INFO_MAX_FRAME_DURATION;
+        Long maxDuration = getValueFromKeyNonNull(key);
+
+        if (maxDuration == null) {
+            return 0;
+        }
+
+        return maxDuration;
+    }
+
+    /**
+     * Get available minimal frame durations for a given format.
+     *
+     * @param format One of the format from {@link ImageFormat}.
+     * @return HashMap of minimal frame durations for different sizes, empty HashMap
+     *         if availableMinFrameDurations is null.
+     */
+    public HashMap<Size, Long> getAvailableMinFrameDurationsForFormatChecked(int format) {
+        final int NUM_ELEMENTS_IN_DURATIONS = 4;
+        CameraMetadata.Key<long[]> key =
+                CameraCharacteristics.SCALER_AVAILABLE_MIN_FRAME_DURATIONS;
+        long[] minDurations = getValueFromKeyNonNull(key);
+        HashMap<Size, Long> minDurationMap = new HashMap<Size, Long>();
+
+        if (minDurations == null) {
+            return minDurationMap;
+        }
+
+        checkTrueForKey(key, "array length is invalid", minDurations.length
+                % NUM_ELEMENTS_IN_DURATIONS == 0);
+        // Round down to 4 boundary if it is not integer times of 4, to avoid array out of bound
+        // in case the above check fails.
+        int durationLength = (minDurations.length / NUM_ELEMENTS_IN_DURATIONS)
+                * NUM_ELEMENTS_IN_DURATIONS;
+        for (int i = 0; i < durationLength; i += NUM_ELEMENTS_IN_DURATIONS) {
+            if (minDurations[i] == format) {
+                Size size = new Size((int)minDurations[i+1], (int)minDurations[i+2]);
+                Long value = minDurations[i + 3];
+                minDurationMap.put(size, value);
+            }
+        }
+
+        return minDurationMap;
     }
 
     /**

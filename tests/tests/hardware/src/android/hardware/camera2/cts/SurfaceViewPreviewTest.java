@@ -24,6 +24,7 @@ import android.hardware.camera2.CaptureFailure;
 import android.hardware.camera2.CaptureRequest;
 import android.hardware.camera2.CaptureResult;
 import android.hardware.camera2.Size;
+import android.hardware.camera2.cts.CameraTestUtils.SimpleCaptureListener;
 import android.hardware.camera2.cts.testcases.Camera2SurfaceViewTestCase;
 import android.util.Log;
 
@@ -32,6 +33,7 @@ import org.mockito.ArgumentMatcher;
 
 import static org.mockito.Mockito.*;
 
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -43,6 +45,7 @@ public class SurfaceViewPreviewTest extends Camera2SurfaceViewTestCase {
     private static final int FRAME_TIMEOUT_MS = 1000;
     private static final int NUM_FRAMES_VERIFIED = 30;
     private static final int NUM_TEST_PATTERN_FRAMES_VERIFIED = 60;
+    private static final float FRAME_DURATION_ERROR_MARGIN = 0.005f; // 0.5 percent error margin.
 
     @Override
     protected void setUp() throws Exception {
@@ -92,6 +95,74 @@ public class SurfaceViewPreviewTest extends Camera2SurfaceViewTestCase {
             } finally {
                 closeDevice();
             }
+        }
+    }
+
+    /**
+     * Test {@link CaptureRequest#CONTROL_AE_TARGET_FPS_RANGE} for preview, validate the preview
+     * frame duration and exposure time.
+     */
+    public void testPreviewFpsRange() throws Exception {
+        for (String id : mCameraIds) {
+            try {
+                openDevice(id);
+
+                previewFpsRangeTestByCamera();
+            } finally {
+                closeDevice();
+            }
+        }
+    }
+
+    /**
+     * Test preview fps range for all supported ranges. The exposure time are frame duration are
+     * validated.
+     */
+    private void previewFpsRangeTestByCamera() throws Exception {
+        final int FPS_RANGE_SIZE = 2;
+        Size maxPreviewSz = mOrderedPreviewSizes.get(0);
+        int[] fpsRanges = mStaticInfo.getAeAvailableTargetFpsRangesChecked();
+        int[] fpsRange = new int[FPS_RANGE_SIZE];
+        CaptureRequest.Builder requestBuilder =
+                mCamera.createCaptureRequest(CameraDevice.TEMPLATE_PREVIEW);
+        SimpleCaptureListener resultListener = new SimpleCaptureListener();
+        startPreview(requestBuilder, maxPreviewSz, resultListener);
+
+        for (int i = 0; i < fpsRanges.length; i += FPS_RANGE_SIZE) {
+            fpsRange[0] = fpsRanges[i];
+            fpsRange[1] = fpsRanges[i + 1];
+
+            requestBuilder.set(CaptureRequest.CONTROL_AE_TARGET_FPS_RANGE, fpsRange);
+            resultListener = new SimpleCaptureListener();
+            mCamera.setRepeatingRequest(requestBuilder.build(), resultListener, mHandler);
+
+            verifyPreviewTargetFpsRange(resultListener, NUM_FRAMES_VERIFIED, fpsRange,
+                    maxPreviewSz);
+        }
+
+        stopPreview();
+    }
+
+    private void verifyPreviewTargetFpsRange(SimpleCaptureListener resultListener,
+            int numFramesVerified, int[] fpsRange, Size previewSz) {
+        CaptureResult result = resultListener.getCaptureResult(WAIT_FOR_RESULT_TIMEOUT_MS);
+        long frameDuration = getValueNotNull(result, CaptureResult.SENSOR_FRAME_DURATION);
+        long[] frameDurationRange =
+                new long[]{(long) (1e9 / fpsRange[1]), (long) (1e9 / fpsRange[0])};
+        mCollector.expectInRange(
+                "Frame duration must be in the range of " + Arrays.toString(frameDurationRange),
+                frameDuration, (long) (frameDurationRange[0] * (1 - FRAME_DURATION_ERROR_MARGIN)),
+                (long) (frameDurationRange[1] * (1 + FRAME_DURATION_ERROR_MARGIN)));
+        long expTime = getValueNotNull(result, CaptureResult.SENSOR_EXPOSURE_TIME);
+        mCollector.expectTrue(String.format("Exposure time %d must be no larger than frame"
+                + "duration %d", expTime, frameDuration), expTime <= frameDuration);
+
+        Long minFrameDuration = mMinPreviewFrameDurationMap.get(previewSz);
+        boolean findDuration = mCollector.expectTrue("Unable to find minFrameDuration for size "
+                + previewSz.toString(), minFrameDuration != null);
+        if (findDuration) {
+            mCollector.expectTrue("Frame duration " + frameDuration + " must be no smaller than"
+                    + " minFrameDuration " + minFrameDuration, frameDuration >= minFrameDuration);
         }
     }
 

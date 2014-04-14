@@ -29,6 +29,7 @@ import android.hardware.camera2.CaptureFailure;
 import android.hardware.camera2.CaptureRequest;
 import android.hardware.camera2.CaptureResult;
 import android.hardware.camera2.Size;
+import android.hardware.camera2.CameraMetadata.Key;
 import android.media.Image;
 import android.media.ImageReader;
 import android.media.Image.Plane;
@@ -802,4 +803,15 @@ public class CameraTestUtils extends Assert {
 
         return;
     }
+
+    public static <T> T getValueNotNull(CaptureResult result, Key<T> key) {
+        if (result == null) {
+            throw new IllegalArgumentException("Result must not be null");
+        }
+
+        T value = result.get(key);
+        assertNotNull("Value of Key " + key.getName() + "shouldn't be null", value);
+        return value;
+    }
+
 }

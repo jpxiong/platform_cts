@@ -49,6 +49,7 @@ import com.android.ex.camera2.blocking.BlockingStateListener;
 import com.android.ex.camera2.exceptions.TimeoutRuntimeException;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -91,6 +92,7 @@ public class Camera2SurfaceViewTestCase extends
     protected List<Size> mOrderedPreviewSizes; // In descending order.
     protected List<Size> mOrderedVideoSizes; // In descending order.
     protected List<Size> mOrderedStillSizes; // In descending order.
+    protected HashMap<Size, Long> mMinPreviewFrameDurationMap;
 
     public Camera2SurfaceViewTestCase() {
         super(Camera2SurfaceViewStubActivity.class);
@@ -323,6 +325,10 @@ public class Camera2SurfaceViewTestCase extends
         mOrderedPreviewSizes = getSupportedPreviewSizes(cameraId, mCameraManager, PREVIEW_SIZE_BOUND);
         mOrderedVideoSizes = getSupportedVideoSizes(cameraId, mCameraManager, PREVIEW_SIZE_BOUND);
         mOrderedStillSizes = getSupportedStillSizes(cameraId, mCameraManager, null);
+        // Use ImageFormat.YUV_420_888 for now. TODO: need figure out what's format for preview
+        // in public API side.
+        mMinPreviewFrameDurationMap =
+                mStaticInfo.getAvailableMinFrameDurationsForFormatChecked(ImageFormat.YUV_420_888);
     }
 
     /**
