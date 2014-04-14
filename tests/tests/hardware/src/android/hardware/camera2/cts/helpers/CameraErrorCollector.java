@@ -266,6 +266,31 @@ public class CameraErrorCollector extends ErrorCollector {
     }
 
     /**
+     * Check if the values in the array are monotonically increasing (decreasing) and not all
+     * equal.
+     *
+     * @param array The array of values to be checked
+     * @param ascendingOrder The monotonicity ordering to be checked with
+     */
+    public <T extends Comparable<? super T>>  void checkArrayMonotonicityAndNotAllEqual(T[] array,
+            boolean ascendingOrder) {
+        String orderMsg = ascendingOrder ? ("increasing order") : ("decreasing order");
+        for (int i = 0; i < array.length - 1; i++) {
+            int compareResult = array[i + 1].compareTo(array[i]);
+            boolean condition = compareResult >= 0;
+            if (!ascendingOrder) {
+                condition = compareResult <= 0;
+            }
+
+            expectTrue(String.format("Adjacent values (%s and %s) %s monotonicity is broken",
+                    array[i].toString(), array[i + 1].toString(), orderMsg), condition);
+        }
+
+        expectTrue("All values of this array are equal: " + array[0].toString(),
+                array[0].compareTo(array[array.length - 1]) != 0);
+    }
+
+    /**
      * Check if the key value is not null and return the value.
      *
      * @param request The {@link CaptureRequest#Builder} to get the key from.

@@ -228,14 +228,49 @@ public class StaticMetadata {
      * @return true if camera device support focuser, false otherwise.
      */
     public boolean hasFocuser() {
+        return (getMinimumFocusDistanceChecked() > 0);
+    }
+
+    /**
+     * Get minimum focus distance.
+     *
+     * @return minimum focus distance, 0 if minimum focus distance is invalid.
+     */
+    public float getMinimumFocusDistanceChecked() {
         Key<Float> key = CameraCharacteristics.LENS_INFO_MINIMUM_FOCUS_DISTANCE;
         Float minFocusDistance = getValueFromKeyNonNull(key);
 
         if (minFocusDistance == null) {
-            return false;
+            return 0.0f;
         }
 
-        return (minFocusDistance > 0);
+        checkTrueForKey(key, " minFocusDistance value shouldn't be negative",
+                minFocusDistance >= 0);
+        if (minFocusDistance < 0) {
+            minFocusDistance = 0.0f;
+        }
+
+        return minFocusDistance;
+    }
+
+    /**
+     * Get focusDistanceCalibration.
+     *
+     * @return focusDistanceCalibration, UNCALIBRATED if value is invalid.
+     */
+    public int getFocusDistanceCalibrationChecked() {
+        Key<Integer> key = CameraCharacteristics.LENS_INFO_FOCUS_DISTANCE_CALIBRATION;
+        Integer calibration = getValueFromKeyNonNull(key);
+
+        if (calibration == null) {
+            return CameraMetadata.LENS_INFO_FOCUS_DISTANCE_CALIBRATION_UNCALIBRATED;
+        }
+
+        checkTrueForKey(key, " value is out of range" ,
+                calibration >= CameraMetadata.LENS_INFO_FOCUS_DISTANCE_CALIBRATION_UNCALIBRATED &&
+                calibration <= CameraMetadata.LENS_INFO_FOCUS_DISTANCE_CALIBRATION_CALIBRATED);
+
+        return calibration;
     }
 
     /**

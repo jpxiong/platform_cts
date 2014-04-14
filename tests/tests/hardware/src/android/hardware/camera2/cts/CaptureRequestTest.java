@@ -21,7 +21,7 @@ import static android.hardware.camera2.CameraCharacteristics.*;
 
 import android.graphics.Point;
 import android.graphics.Rect;
-import android.hardware.camera2.CameraAccessException;
+import android.hardware.camera2.CameraCharacteristics;
 import android.hardware.camera2.CameraDevice;
 import android.hardware.camera2.CaptureRequest;
 import android.hardware.camera2.CaptureResult;
@@ -66,6 +66,9 @@ public class CaptureRequestTest extends Camera2SurfaceViewTestCase {
     private static final int DEFAULT_NUM_SENSITIVITY_STEPS = 16;
     private static final int DEFAULT_SENSITIVITY_STEP_SIZE = 100;
     private static final int NUM_RESULTS_WAIT_TIMEOUT = 100;
+    private static final int NUM_TEST_FOCUS_DISTANCES = 10;
+    private static final float FOCUS_DISTANCE_ERROR_PERCENT = 0.05f; // 5 percent error margin
+
     // Linear tone mapping curve example.
     private static final float[] TONEMAP_CURVE_LINEAR = {0, 0, 1.0f, 1.0f};
     // Standard sRGB tone mapping, per IEC 61966-2-1:1999, with 16 control points.
@@ -370,7 +373,88 @@ public class CaptureRequestTest extends Camera2SurfaceViewTestCase {
         }
     }
 
+    /**
+     * Test focus distance control.
+     */
+    public void testFocusDistanceControl() throws Exception {
+        for (String id : mCameraIds) {
+            try {
+                openDevice(id);
+                if (!mStaticInfo.isPerFrameControlSupported() || !mStaticInfo.hasFocuser()) {
+                    Log.i(TAG, "Camera " + id
+                            + "Doesn't support per frame control or has no focuser");
+                    continue;
+                }
+
+                focusDistanceTestByCamera();
+            } finally {
+                closeDevice();
+            }
+        }
+    }
+
     // TODO: add 3A state machine test.
+
+    private void focusDistanceTestByCamera() throws Exception {
+        Size maxPrevSize = mOrderedPreviewSizes.get(0);
+        float[] testDistances = getFocusDistanceTestValuesInOrder();
+        CaptureRequest.Builder requestBuilder =
+                mCamera.createCaptureRequest(CameraDevice.TEMPLATE_PREVIEW);
+        requestBuilder.set(CaptureRequest.CONTROL_AF_MODE, CaptureRequest.CONTROL_AF_MODE_OFF);
+        SimpleCaptureListener resultListener = new SimpleCaptureListener();
+        startPreview(requestBuilder, maxPrevSize, resultListener);
+
+        CaptureRequest request;
+        float[] resultDistances = new float[testDistances.length];
+        for (int i = 0; i < testDistances.length; i++) {
+            requestBuilder.set(CaptureRequest.LENS_FOCUS_DISTANCE, testDistances[i]);
+            request = requestBuilder.build();
+            resultListener = new SimpleCaptureListener();
+            mCamera.setRepeatingRequest(request, resultListener, mHandler);
+            resultDistances[i] = verifyFocusDistanceControl(testDistances[i], request,
+                    resultListener);
+            if (VERBOSE) {
+                Log.v(TAG, "Capture request focus distance: " + testDistances[i] + " result: "
+                        + resultDistances[i]);
+            }
+        }
+
+        // Verify the monotonicity
+        mCollector.checkArrayMonotonicityAndNotAllEqual(CameraTestUtils.toObject(resultDistances),
+                /*ascendingOrder*/true);
+    }
+
+    /**
+     * Verify focus distance control.
+     *
+     * @param distance The focus distance requested
+     * @param request The capture request to control the manual focus distance
+     * @param resultListener The capture listener to recieve capture result callbacks
+     * @return the result focus distance
+     */
+    private float verifyFocusDistanceControl(float distance, CaptureRequest request,
+            SimpleCaptureListener resultListener) {
+        // Need make sure the result corresponding to the request is back, then check.
+        CaptureResult result =
+                resultListener.getCaptureResultForRequest(request, NUM_RESULTS_WAIT_TIMEOUT);
+        // Then wait for the lens.state to be stationary.
+        waitForResultValue(resultListener, CaptureResult.LENS_STATE,
+                CaptureResult.LENS_STATE_STATIONARY, NUM_RESULTS_WAIT_TIMEOUT);
+        // Then check the focus distance.
+        result = resultListener.getCaptureResultForRequest(request, NUM_RESULTS_WAIT_TIMEOUT);
+        Float resultDistance = getValueNotNull(result, CaptureResult.LENS_FOCUS_DISTANCE);
+        if (mStaticInfo.getFocusDistanceCalibrationChecked() ==
+                CameraCharacteristics.LENS_INFO_FOCUS_DISTANCE_CALIBRATION_CALIBRATED) {
+            // TODO: what's more to test for CALIBRATED devices?
+        }
+
+        float minValue = 0;
+        float maxValue = mStaticInfo.getMinimumFocusDistanceChecked();
+        mCollector.expectInRange("Result focus distance is out of range",
+                resultDistance, minValue, maxValue);
+
+        return resultDistance;
+    }
 
     /**
      * Verify edge mode control results.
@@ -1143,6 +1227,23 @@ public class CaptureRequestTest extends Camera2SurfaceViewTestCase {
     }
 
     /**
+     * Generate test focus distances in range of [0, minFocusDistance] in increasing order.
+     */
+    private float[] getFocusDistanceTestValuesInOrder() {
+        float[] testValues = new float[NUM_TEST_FOCUS_DISTANCES + 1];
+        float minValue = 0;
+        float maxValue = mStaticInfo.getMinimumFocusDistanceChecked();
+
+        float range = maxValue - minValue;
+        float stepSize = range / NUM_TEST_FOCUS_DISTANCES;
+        for (int i = 0; i < testValues.length; i++) {
+            testValues[i] = minValue + stepSize * i;
+        }
+
+        return testValues;
+    }
+
+    /**
      * Get the sensitivity array that contains multiple sensitivity steps in the
      * sensitivity range.
      * <p>
@@ -1220,7 +1321,7 @@ public class CaptureRequestTest extends Camera2SurfaceViewTestCase {
 
         mCollector.expectTrue(String.format("Frame duration (%d) should be longer than exposure"
                 + " time (%d) for a given capture", frameDuration, expTime),
-                frameDuration > expTime);
+                frameDuration >= expTime);
     }
 
     private <T> T getValueNotNull(CaptureResult result, Key<T> key) {
