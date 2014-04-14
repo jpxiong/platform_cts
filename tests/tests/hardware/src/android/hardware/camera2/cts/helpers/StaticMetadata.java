@@ -740,7 +740,7 @@ public class StaticMetadata {
      * @param direction The stream direction, input or output.
      * @return The sizes of the given format, empty array if no available size is found.
      */
-    private Size[] getAvailableSizesForFormatChecked(int format, int direction) {
+    public Size[] getAvailableSizesForFormatChecked(int format, int direction) {
         final int NUM_ELEMENTS_IN_STREAM_CONFIG = 4;
         ArrayList<Size> sizeList = new ArrayList<Size>();
         CameraMetadata.Key<int[]> key =
