@@ -354,7 +354,52 @@ public class CaptureRequestTest extends Camera2SurfaceViewTestCase {
         }
     }
 
+    public void testEdgeModeControl() throws Exception {
+        for (String id : mCameraIds) {
+            try {
+                openDevice(id);
+                if (!mStaticInfo.isPerFrameControlSupported()) {
+                    Log.i(TAG, "Camera " + id + "Doesn't support per frame control");
+                    continue;
+                }
+
+                edgeModesTestByCamera();
+            } finally {
+                closeDevice();
+            }
+        }
+    }
+
     // TODO: add 3A state machine test.
+
+    /**
+     * Verify edge mode control results.
+     */
+    private void edgeModesTestByCamera() throws Exception {
+        Size maxPrevSize = mOrderedPreviewSizes.get(0);
+        byte[] edgeModes = mStaticInfo.getAvailableEdgeModesChecked();
+        CaptureRequest.Builder requestBuilder =
+                mCamera.createCaptureRequest(CameraDevice.TEMPLATE_PREVIEW);
+        SimpleCaptureListener resultListener = new SimpleCaptureListener();
+        startPreview(requestBuilder, maxPrevSize, resultListener);
+
+        for (byte mode : edgeModes) {
+            requestBuilder.set(CaptureRequest.EDGE_MODE, (int)mode);
+            resultListener = new SimpleCaptureListener();
+            mCamera.setRepeatingRequest(requestBuilder.build(), resultListener, mHandler);
+
+            verifyEdgeModeControl(mode, resultListener, NUM_FRAMES_VERIFIED);
+        }
+    }
+
+    private void verifyEdgeModeControl(byte mode, SimpleCaptureListener listener,
+            int numFramesVerified) {
+        for (int i = 0; i < numFramesVerified; i++) {
+            CaptureResult result = listener.getCaptureResult(WAIT_FOR_RESULT_TIMEOUT_MS);
+            int edgeMode = getValueNotNull(result, CaptureResult.EDGE_MODE);
+            mCollector.expectEquals("Edge mode result should match request", (int)mode, edgeMode);
+        }
+    }
 
     /**
      * Test color correction controls.
@@ -1180,7 +1225,7 @@ public class CaptureRequestTest extends Camera2SurfaceViewTestCase {
 
     private <T> T getValueNotNull(CaptureResult result, Key<T> key) {
         T value = result.get(key);
-        assertNotNull("Value of Key " + key.getName() + "shouldn't be null", value);
+        assertNotNull("Value of Key " + key.getName() + " shouldn't be null", value);
         return value;
     }
 }

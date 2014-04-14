@@ -168,6 +168,21 @@ public class StaticMetadata {
     }
 
     /**
+     * Whether or not the per frame control is supported by the camera device.
+     *
+     * @return true if per frame control is supported, false otherwise.
+     */
+    public boolean isPerFrameControlSupported() {
+        Integer perFrameControl = getValueFromKeyNonNull(CameraCharacteristics.SYNC_MAX_LATENCY);
+
+        if (perFrameControl == null) {
+            return false;
+        }
+
+        return perFrameControl == CameraMetadata.SYNC_MAX_LATENCY_PER_FRAME_CONTROL;
+    }
+
+    /**
      * Whether or not the hardware level reported by android.info.supportedHardwareLevel
      * is {@value CameraMetadata#INFO_SUPPORTED_HARDWARE_LEVEL_LIMITED}.
      *
@@ -855,6 +870,25 @@ public class StaticMetadata {
         }
 
         return minDurationMap;
+    }
+
+    public byte[] getAvailableEdgeModesChecked() {
+        CameraMetadata.Key<byte[]> key = CameraCharacteristics.EDGE_AVAILABLE_EDGE_MODES;
+        byte[] edgeModes = getValueFromKeyNonNull(key);
+
+        if (edgeModes == null) {
+            return new byte[0];
+        }
+
+        // Full device should always include OFF and FAST
+        if (isHardwareLevelFull()) {
+            List<Byte> modeList = Arrays.asList(CameraTestUtils.toObject(edgeModes));
+            checkTrueForKey(key, "Full device must contain OFF and FAST edge modes",
+                    modeList.contains((byte)CameraMetadata.EDGE_MODE_OFF) &&
+                    modeList.contains((byte)CameraMetadata.EDGE_MODE_FAST));
+        }
+
+        return edgeModes;
     }
 
     /**
