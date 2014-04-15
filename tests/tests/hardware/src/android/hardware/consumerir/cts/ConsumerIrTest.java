@@ -77,12 +77,12 @@ public class ConsumerIrTest extends AndroidTestCase {
 
         ConsumerIrManager.CarrierFrequencyRange[] freqs = mCIR.getCarrierFrequencies();
         // Transmit two seconds for min and max for each frequency range
-        int[] pattern = {1111, 2222, 3333, 4444, 5555, 6666, 7777, 8888, 9999};
+        int[] pattern = {11111, 22222, 33333, 44444, 55555, 66666, 77777, 88888, 99999};
         long totalXmitTimeNanos = 0; // get the length of the pattern
         for (int slice : pattern) {
             totalXmitTimeNanos += slice * 1000; // add the time in nanoseconds
         }
-        double margin = 0.1; // max fraction xmit is allowed to be off timing
+        double margin = 0.5; // max fraction xmit is allowed to be off timing
 
         for (ConsumerIrManager.CarrierFrequencyRange range : freqs) {
             // test min freq
