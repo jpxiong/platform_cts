@@ -600,6 +600,30 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
         String url = mWebServer.getAssetUrl(TestHtmlConstants.ADD_JAVA_SCRIPT_INTERFACE_URL);
         mOnUiThread.loadUrlAndWaitForCompletion(url);
         assertEquals("Original title", obj.waitForResult());
+
+        // Verify that only methods annotated with @JavascriptInterface are exposed
+        // on the JavaScript interface object.
+        mOnUiThread.evaluateJavascript("typeof dummy.provideResult",
+                new ValueCallback<String>() {
+                    @Override
+                    public void onReceiveValue(String result) {
+                        assertEquals("\"function\"", result);
+                    }
+                });
+        mOnUiThread.evaluateJavascript("typeof dummy.wasProvideResultCalled",
+                new ValueCallback<String>() {
+                    @Override
+                    public void onReceiveValue(String result) {
+                        assertEquals("\"undefined\"", result);
+                    }
+                });
+        mOnUiThread.evaluateJavascript("typeof dummy.getClass",
+                new ValueCallback<String>() {
+                    @Override
+                    public void onReceiveValue(String result) {
+                        assertEquals("\"undefined\"", result);
+                    }
+                });
     }
 
     @UiThreadTest
