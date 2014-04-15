@@ -30,16 +30,14 @@ import android.util.Xml;
 import com.android.cts.stub.R;
 
 import org.xmlpull.v1.XmlPullParser;
-import org.xmlpull.v1.XmlPullParserFactory;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.nio.ByteBuffer;
 
 public class VectorDrawableTest extends AndroidTestCase {
     private static final String LOGTAG = VectorDrawableTest.class.getSimpleName();
-    private int[] mVectorIcons = new int[] {
+    private int[] mIconResIds = new int[] {
             R.drawable.vector_icon_create,
             R.drawable.vector_icon_delete,
             R.drawable.vector_icon_heart,
@@ -67,6 +65,28 @@ public class VectorDrawableTest extends AndroidTestCase {
             R.drawable.vector_icon_repeated_a_2_golden,
     };
 
+    private int[] mAnimatedIconResIds = new int[] {
+            R.drawable.vector_animation_battery,
+            R.drawable.vector_animation_clip_circle,
+            R.drawable.vector_animation_clip_rect,
+            R.drawable.vector_animation_rotate_curve,
+            R.drawable.vector_animation_rotate_pie,
+            R.drawable.vector_animation_trim_path,
+            R.drawable.vector_animation_wifi,
+    };
+
+    // These golden images are capturing the snapshot of the animated vector drawables
+    // at 50% of the time interval.
+    private int[] mAnimatedGoldenImages = new int[] {
+            R.drawable.vector_animation_battery_golden,
+            R.drawable.vector_animation_clip_circle_golden,
+            R.drawable.vector_animation_clip_rect_golden,
+            R.drawable.vector_animation_rotate_curve_golden,
+            R.drawable.vector_animation_rotate_pie_golden,
+            R.drawable.vector_animation_trim_path_golden,
+            R.drawable.vector_animation_wifi_golden,
+    };
+
     private static final int IMAGE_WIDTH = 64;
     private static final int IMAGE_HEIGHT = 64;
     // A small value is actually making sure that the values are matching
@@ -78,51 +98,66 @@ public class VectorDrawableTest extends AndroidTestCase {
     private static final boolean DBG_DUMP_PNG = false;
 
     private Resources mResources;
+    private VectorDrawable mVectorDrawable;
+    private BitmapFactory.Options mOptions;
+    private Bitmap mBitmap;
+    private Canvas mCanvas;
 
-    public void testSimpleVectorDrawables() throws Exception {
+    @Override
+    protected void setUp() throws Exception {
+        super.setUp();
         final int width = IMAGE_WIDTH;
         final int height = IMAGE_HEIGHT;
-        Bitmap bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
-        Canvas canvas = new Canvas(bitmap);
-        VectorDrawable vectorDrawable = new VectorDrawable();
-        vectorDrawable.setBounds(0, 0, IMAGE_WIDTH, IMAGE_HEIGHT);
+
+        mBitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+        mCanvas = new Canvas(mBitmap);
+        mVectorDrawable = new VectorDrawable();
+        mVectorDrawable.setBounds(0, 0, width, height);
 
         mResources = mContext.getResources();
-        XmlPullParserFactory factory = XmlPullParserFactory.newInstance();
-        factory.setNamespaceAware(true);
 
-        BitmapFactory.Options options = new BitmapFactory.Options();
-        options.inScaled = false;
+        mOptions = new BitmapFactory.Options();
+        mOptions.inScaled = false;
+    }
 
-        for (int i = 0; i < mVectorIcons.length; i++) {
+    public void testSimpleVectorDrawables() throws Exception {
+        verifyVectorDrawables(mIconResIds, mGoldenImages, 0);
+    }
+
+    public void testAnimatedVectorDrawables() throws Exception {
+        verifyVectorDrawables(mAnimatedIconResIds, mAnimatedGoldenImages, 0.5f);
+    }
+
+    private void verifyVectorDrawables(int[] resIds, int[] goldenImages, float fraction) throws Exception {
+        for (int i = 0; i < resIds.length; i++) {
             // Setup VectorDrawable from xml file and draw into the bitmap.
             // TODO: use the VectorDrawable.create() function if it is
             // publicized.
-            XmlPullParser xpp = mResources.getXml(mVectorIcons[i]);
+            XmlPullParser xpp = mResources.getXml(resIds[i]);
             AttributeSet attrs = Xml.asAttributeSet(xpp);
 
-            vectorDrawable.inflate(mResources, xpp, attrs);
-            vectorDrawable.setAnimationFraction(0);
+            mVectorDrawable.inflate(mResources, xpp, attrs);
+            mVectorDrawable.setAnimationFraction(fraction);
 
-            bitmap.eraseColor(0);
-            vectorDrawable.draw(canvas);
+            mBitmap.eraseColor(0);
+            mVectorDrawable.draw(mCanvas);
 
             if (DBG_DUMP_PNG) {
-                saveVectorDrawableIntoPNG(bitmap, i);
+                saveVectorDrawableIntoPNG(mBitmap, resIds, i);
             } else {
                 // Start to compare
-                Bitmap golden = BitmapFactory.decodeResource(mResources, mGoldenImages[i], options);
-                compareImages(bitmap, golden, mResources.getString(mVectorIcons[i]));
+                Bitmap golden = BitmapFactory.decodeResource(mResources, goldenImages[i], mOptions);
+                compareImages(mBitmap, golden, mResources.getString(resIds[i]));
             }
         }
     }
 
     // This is only for debugging or golden image (re)generation purpose.
-    private void saveVectorDrawableIntoPNG(Bitmap bitmap, int index) throws IOException {
+    private void saveVectorDrawableIntoPNG(Bitmap bitmap, int[] resIds, int index) throws IOException {
         // Save the image to the disk.
         FileOutputStream out = null;
         try {
-            String originalFilePath = mResources.getString(mVectorIcons[index]);
+            String originalFilePath = mResources.getString(resIds[index]);
             File originalFile = new File(originalFilePath);
             String fileFullName = originalFile.getName();
             String fileTitle = fileFullName.substring(0, fileFullName.lastIndexOf("."));
@@ -144,7 +179,7 @@ public class VectorDrawableTest extends AndroidTestCase {
         }
     }
 
-    public void compareImages(Bitmap ideal, Bitmap given, String filename) {
+    private void compareImages(Bitmap ideal, Bitmap given, String filename) {
         int idealWidth = ideal.getWidth();
         int idealHeight = ideal.getHeight();
 
