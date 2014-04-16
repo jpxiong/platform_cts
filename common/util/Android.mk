@@ -12,6 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+###############################################################################
+# Build the common utility library for use device-side
+###############################################################################
+
 LOCAL_PATH:= $(call my-dir)
 
 include $(CLEAR_VARS)
@@ -20,12 +24,14 @@ LOCAL_SRC_FILES := $(call all-java-files-under, src)
 
 LOCAL_MODULE_TAGS := optional
 
-LOCAL_MODULE := cts-common-util-device_v2
+LOCAL_MODULE := compatibility-common-util-devicesidelib_v2
 
 LOCAL_SDK_VERSION := current
 
 include $(BUILD_STATIC_JAVA_LIBRARY)
 
+###############################################################################
+# Build the common utility library for use host-side
 ###############################################################################
 
 include $(CLEAR_VARS)
@@ -34,6 +40,22 @@ LOCAL_SRC_FILES := $(call all-java-files-under, src)
 
 LOCAL_MODULE_TAGS := optional
 
-LOCAL_MODULE := cts-common-util-host_v2
+LOCAL_MODULE := compatibility-common-util-hostsidelib_v2
+
+include $(BUILD_HOST_JAVA_LIBRARY)
+
+###############################################################################
+# Build the tests
+###############################################################################
+
+include $(CLEAR_VARS)
+
+LOCAL_SRC_FILES := $(call all-java-files-under, tests/src)
+
+LOCAL_JAVA_LIBRARIES := junit
+
+LOCAL_MODULE := compatibility-common-util-tests_v2
+
+LOCAL_MODULE_TAGS := optional
 
 include $(BUILD_HOST_JAVA_LIBRARY)
