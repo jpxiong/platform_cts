@@ -20,8 +20,24 @@ LOCAL_SRC_FILES := $(call all-java-files-under, src)
 
 LOCAL_MODULE_TAGS := optional
 
-LOCAL_MODULE := cts-common-device-setup_v2
+LOCAL_MODULE := compatibility-device-setup_v2
 
 LOCAL_SDK_VERSION := current
 
 include $(BUILD_STATIC_JAVA_LIBRARY)
+
+###############################################################################
+# Build the tests
+###############################################################################
+
+include $(CLEAR_VARS)
+
+LOCAL_SRC_FILES := $(call all-java-files-under, tests/src)
+
+LOCAL_JAVA_LIBRARIES := junit
+
+LOCAL_MODULE_TAGS := optional
+
+LOCAL_MODULE := compatibility-device-setup-tests_v2
+
+include $(BUILD_HOST_JAVA_LIBRARY)
