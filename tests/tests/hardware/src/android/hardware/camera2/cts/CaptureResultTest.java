@@ -231,10 +231,6 @@ public class CaptureResultTest extends Camera2AndroidTestCase {
         resultKeys.add(CaptureResult.SENSOR_SENSITIVITY);
         resultKeys.add(CaptureResult.SENSOR_TIMESTAMP);
         resultKeys.add(CaptureResult.SENSOR_TEMPERATURE);
-        resultKeys.add(CaptureResult.SENSOR_REFERENCE_ILLUMINANT);
-        resultKeys.add(CaptureResult.SENSOR_CALIBRATION_TRANSFORM);
-        resultKeys.add(CaptureResult.SENSOR_COLOR_TRANSFORM);
-        resultKeys.add(CaptureResult.SENSOR_FORWARD_MATRIX);
         resultKeys.add(CaptureResult.SENSOR_NEUTRAL_COLOR_POINT);
         resultKeys.add(CaptureResult.SENSOR_PROFILE_HUE_SAT_MAP);
         resultKeys.add(CaptureResult.SENSOR_PROFILE_TONE_CURVE);
