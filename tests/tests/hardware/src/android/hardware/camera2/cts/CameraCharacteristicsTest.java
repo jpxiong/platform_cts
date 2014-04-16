@@ -981,6 +981,214 @@ public class CameraCharacteristicsTest extends AndroidTestCase {
         }
     }
 
+    public void testCameraCharacteristicsAndroidSensorReferenceIlluminant1() throws Exception {
+        String[] ids = mCameraManager.getCameraIdList();
+        for (int i = 0; i < ids.length; i++) {
+            CameraCharacteristics props = mCameraManager.getCameraCharacteristics(ids[i]);
+            assertNotNull(String.format("Can't get camera characteristics from: ID %s", ids[i]),
+                                        props);
+
+            {
+
+                assertNotNull("Invalid property: android.sensor.referenceIlluminant1",
+                        props.get(CameraCharacteristics.SENSOR_REFERENCE_ILLUMINANT1));
+
+                List<Key<?>> allKeys = props.getKeys();
+                assertNotNull(String.format("Can't get camera characteristics keys from: ID %s",
+                        ids[i], props));
+                assertTrue("Key not in keys list: android.sensor.referenceIlluminant1", allKeys.contains(
+                        CameraCharacteristics.SENSOR_REFERENCE_ILLUMINANT1));
+
+            }
+
+        }
+    }
+
+    public void testCameraCharacteristicsAndroidSensorReferenceIlluminant2() throws Exception {
+        String[] ids = mCameraManager.getCameraIdList();
+        for (int i = 0; i < ids.length; i++) {
+            CameraCharacteristics props = mCameraManager.getCameraCharacteristics(ids[i]);
+            assertNotNull(String.format("Can't get camera characteristics from: ID %s", ids[i]),
+                                        props);
+
+            {
+
+                assertNotNull("Invalid property: android.sensor.referenceIlluminant2",
+                        props.get(CameraCharacteristics.SENSOR_REFERENCE_ILLUMINANT2));
+
+                List<Key<?>> allKeys = props.getKeys();
+                assertNotNull(String.format("Can't get camera characteristics keys from: ID %s",
+                        ids[i], props));
+                assertTrue("Key not in keys list: android.sensor.referenceIlluminant2", allKeys.contains(
+                        CameraCharacteristics.SENSOR_REFERENCE_ILLUMINANT2));
+
+            }
+
+        }
+    }
+
+    public void testCameraCharacteristicsAndroidSensorCalibrationTransform1() throws Exception {
+        String[] ids = mCameraManager.getCameraIdList();
+        for (int i = 0; i < ids.length; i++) {
+            CameraCharacteristics props = mCameraManager.getCameraCharacteristics(ids[i]);
+            assertNotNull(String.format("Can't get camera characteristics from: ID %s", ids[i]),
+                                        props);
+
+            Integer hwLevel = props.get(CameraCharacteristics.INFO_SUPPORTED_HARDWARE_LEVEL);
+            assertNotNull("No hardware level reported! android.info.supportedHardwareLevel",
+                    hwLevel);
+            if (hwLevel == CameraCharacteristics.INFO_SUPPORTED_HARDWARE_LEVEL_FULL)
+            {
+
+                assertNotNull("Invalid property: android.sensor.calibrationTransform1",
+                        props.get(CameraCharacteristics.SENSOR_CALIBRATION_TRANSFORM1));
+
+                List<Key<?>> allKeys = props.getKeys();
+                assertNotNull(String.format("Can't get camera characteristics keys from: ID %s",
+                        ids[i], props));
+                assertTrue("Key not in keys list: android.sensor.calibrationTransform1", allKeys.contains(
+                        CameraCharacteristics.SENSOR_CALIBRATION_TRANSFORM1));
+
+            }
+
+        }
+    }
+
+    public void testCameraCharacteristicsAndroidSensorCalibrationTransform2() throws Exception {
+        String[] ids = mCameraManager.getCameraIdList();
+        for (int i = 0; i < ids.length; i++) {
+            CameraCharacteristics props = mCameraManager.getCameraCharacteristics(ids[i]);
+            assertNotNull(String.format("Can't get camera characteristics from: ID %s", ids[i]),
+                                        props);
+
+            Integer hwLevel = props.get(CameraCharacteristics.INFO_SUPPORTED_HARDWARE_LEVEL);
+            assertNotNull("No hardware level reported! android.info.supportedHardwareLevel",
+                    hwLevel);
+            if (hwLevel == CameraCharacteristics.INFO_SUPPORTED_HARDWARE_LEVEL_FULL)
+            {
+
+                assertNotNull("Invalid property: android.sensor.calibrationTransform2",
+                        props.get(CameraCharacteristics.SENSOR_CALIBRATION_TRANSFORM2));
+
+                List<Key<?>> allKeys = props.getKeys();
+                assertNotNull(String.format("Can't get camera characteristics keys from: ID %s",
+                        ids[i], props));
+                assertTrue("Key not in keys list: android.sensor.calibrationTransform2", allKeys.contains(
+                        CameraCharacteristics.SENSOR_CALIBRATION_TRANSFORM2));
+
+            }
+
+        }
+    }
+
+    public void testCameraCharacteristicsAndroidSensorColorTransform1() throws Exception {
+        String[] ids = mCameraManager.getCameraIdList();
+        for (int i = 0; i < ids.length; i++) {
+            CameraCharacteristics props = mCameraManager.getCameraCharacteristics(ids[i]);
+            assertNotNull(String.format("Can't get camera characteristics from: ID %s", ids[i]),
+                                        props);
+
+            Integer hwLevel = props.get(CameraCharacteristics.INFO_SUPPORTED_HARDWARE_LEVEL);
+            assertNotNull("No hardware level reported! android.info.supportedHardwareLevel",
+                    hwLevel);
+            if (hwLevel == CameraCharacteristics.INFO_SUPPORTED_HARDWARE_LEVEL_FULL)
+            {
+
+                assertNotNull("Invalid property: android.sensor.colorTransform1",
+                        props.get(CameraCharacteristics.SENSOR_COLOR_TRANSFORM1));
+
+                List<Key<?>> allKeys = props.getKeys();
+                assertNotNull(String.format("Can't get camera characteristics keys from: ID %s",
+                        ids[i], props));
+                assertTrue("Key not in keys list: android.sensor.colorTransform1", allKeys.contains(
+                        CameraCharacteristics.SENSOR_COLOR_TRANSFORM1));
+
+            }
+
+        }
+    }
+
+    public void testCameraCharacteristicsAndroidSensorColorTransform2() throws Exception {
+        String[] ids = mCameraManager.getCameraIdList();
+        for (int i = 0; i < ids.length; i++) {
+            CameraCharacteristics props = mCameraManager.getCameraCharacteristics(ids[i]);
+            assertNotNull(String.format("Can't get camera characteristics from: ID %s", ids[i]),
+                                        props);
+
+            Integer hwLevel = props.get(CameraCharacteristics.INFO_SUPPORTED_HARDWARE_LEVEL);
+            assertNotNull("No hardware level reported! android.info.supportedHardwareLevel",
+                    hwLevel);
+            if (hwLevel == CameraCharacteristics.INFO_SUPPORTED_HARDWARE_LEVEL_FULL)
+            {
+
+                assertNotNull("Invalid property: android.sensor.colorTransform2",
+                        props.get(CameraCharacteristics.SENSOR_COLOR_TRANSFORM2));
+
+                List<Key<?>> allKeys = props.getKeys();
+                assertNotNull(String.format("Can't get camera characteristics keys from: ID %s",
+                        ids[i], props));
+                assertTrue("Key not in keys list: android.sensor.colorTransform2", allKeys.contains(
+                        CameraCharacteristics.SENSOR_COLOR_TRANSFORM2));
+
+            }
+
+        }
+    }
+
+    public void testCameraCharacteristicsAndroidSensorForwardMatrix1() throws Exception {
+        String[] ids = mCameraManager.getCameraIdList();
+        for (int i = 0; i < ids.length; i++) {
+            CameraCharacteristics props = mCameraManager.getCameraCharacteristics(ids[i]);
+            assertNotNull(String.format("Can't get camera characteristics from: ID %s", ids[i]),
+                                        props);
+
+            Integer hwLevel = props.get(CameraCharacteristics.INFO_SUPPORTED_HARDWARE_LEVEL);
+            assertNotNull("No hardware level reported! android.info.supportedHardwareLevel",
+                    hwLevel);
+            if (hwLevel == CameraCharacteristics.INFO_SUPPORTED_HARDWARE_LEVEL_FULL)
+            {
+
+                assertNotNull("Invalid property: android.sensor.forwardMatrix1",
+                        props.get(CameraCharacteristics.SENSOR_FORWARD_MATRIX1));
+
+                List<Key<?>> allKeys = props.getKeys();
+                assertNotNull(String.format("Can't get camera characteristics keys from: ID %s",
+                        ids[i], props));
+                assertTrue("Key not in keys list: android.sensor.forwardMatrix1", allKeys.contains(
+                        CameraCharacteristics.SENSOR_FORWARD_MATRIX1));
+
+            }
+
+        }
+    }
+
+    public void testCameraCharacteristicsAndroidSensorForwardMatrix2() throws Exception {
+        String[] ids = mCameraManager.getCameraIdList();
+        for (int i = 0; i < ids.length; i++) {
+            CameraCharacteristics props = mCameraManager.getCameraCharacteristics(ids[i]);
+            assertNotNull(String.format("Can't get camera characteristics from: ID %s", ids[i]),
+                                        props);
+
+            Integer hwLevel = props.get(CameraCharacteristics.INFO_SUPPORTED_HARDWARE_LEVEL);
+            assertNotNull("No hardware level reported! android.info.supportedHardwareLevel",
+                    hwLevel);
+            if (hwLevel == CameraCharacteristics.INFO_SUPPORTED_HARDWARE_LEVEL_FULL)
+            {
+
+                assertNotNull("Invalid property: android.sensor.forwardMatrix2",
+                        props.get(CameraCharacteristics.SENSOR_FORWARD_MATRIX2));
+
+                List<Key<?>> allKeys = props.getKeys();
+                assertNotNull(String.format("Can't get camera characteristics keys from: ID %s",
+                        ids[i], props));
+                assertTrue("Key not in keys list: android.sensor.forwardMatrix2", allKeys.contains(
+                        CameraCharacteristics.SENSOR_FORWARD_MATRIX2));
+
+            }
+
+        }
+    }
+
     public void testCameraCharacteristicsAndroidSensorBaseGainFactor() throws Exception {
         String[] ids = mCameraManager.getCameraIdList();
         for (int i = 0; i < ids.length; i++) {
