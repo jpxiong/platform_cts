@@ -39,6 +39,12 @@ public class NativeCodeTest extends TestCase {
         assertTrue(doPerfEventTest2());
     }
 
+    public void testSockDiag() throws Exception {
+        int result = doSockDiagTest();
+        assertFalse("Encountered unexpected error: " + result + ".", (result == -1));
+        assertEquals(0, result);
+    }
+
     /**
      * Returns true iff this device is vulnerable to CVE-2013-2094.
      * A patch for CVE-2013-2094 can be found at
@@ -84,4 +90,10 @@ public class NativeCodeTest extends TestCase {
      * false if the device is vulnerable.
      */
     private static native boolean doCVE20141710Test();
+
+    /**
+     * Hangs if device is vulnerable to CVE-2013-1763, returns -1 if
+     * unexpected error occurs, 0 otherwise.
+     */
+    private static native int doSockDiagTest();
 }
