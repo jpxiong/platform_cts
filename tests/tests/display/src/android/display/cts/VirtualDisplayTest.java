@@ -117,6 +117,7 @@ public class VirtualDisplayTest extends AndroidTestCase {
         Display display = virtualDisplay.getDisplay();
         try {
             assertDisplayRegistered(display, Display.FLAG_PRIVATE);
+            assertEquals(mSurface, virtualDisplay.getSurface());
 
             // Show a private presentation on the display.
             assertDisplayCanShowPresentation("private presentation window",
@@ -141,11 +142,44 @@ public class VirtualDisplayTest extends AndroidTestCase {
         Display display = virtualDisplay.getDisplay();
         try {
             assertDisplayRegistered(display, Display.FLAG_PRIVATE | Display.FLAG_PRESENTATION);
+            assertEquals(mSurface, virtualDisplay.getSurface());
 
             // Show a private presentation on the display.
             assertDisplayCanShowPresentation("private presentation window",
                     display, BLUEISH,
                     WindowManager.LayoutParams.TYPE_PRIVATE_PRESENTATION, 0);
+        } finally {
+            virtualDisplay.release();
+        }
+        assertDisplayUnregistered(display);
+    }
+
+    /**
+     * Ensures that an application can create a private virtual display and show
+     * its own windows on it where the surface is attached or detached dynamically.
+     */
+    public void testPrivateVirtualDisplayWithDynamicSurface() throws Exception {
+        VirtualDisplay virtualDisplay = mDisplayManager.createVirtualDisplay(NAME,
+                WIDTH, HEIGHT, DENSITY, null, 0);
+        assertNotNull("virtual display must not be null", virtualDisplay);
+
+        Display display = virtualDisplay.getDisplay();
+        try {
+            assertDisplayRegistered(display, Display.FLAG_PRIVATE);
+            assertNull(virtualDisplay.getSurface());
+
+            // Attach the surface.
+            virtualDisplay.setSurface(mSurface);
+            assertEquals(mSurface, virtualDisplay.getSurface());
+
+            // Show a private presentation on the display.
+            assertDisplayCanShowPresentation("private presentation window",
+                    display, BLUEISH,
+                    WindowManager.LayoutParams.TYPE_PRIVATE_PRESENTATION, 0);
+
+            // Detach the surface.
+            virtualDisplay.setSurface(null);
+            assertNull(virtualDisplay.getSurface());
         } finally {
             virtualDisplay.release();
         }
