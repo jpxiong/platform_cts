@@ -221,6 +221,60 @@ public class MediaStoreAudioTestHelper {
         }
     }
 
+    public static class Audio3 extends Audio1 {
+        private Audio3() {
+        }
+
+        private static Audio3 sInstance = new Audio3();
+
+        public static Audio3 getInstance() {
+            return sInstance;
+        }
+
+        @Override
+        public ContentValues getContentValues(boolean isInternal) {
+            ContentValues values = super.getContentValues(isInternal);
+            values.put(Media.DATA, values.getAsString(Media.DATA) + "_3");
+            return values;
+        }
+    }
+
+    public static class Audio4 extends Audio1 {
+        private Audio4() {
+        }
+
+        private static Audio4 sInstance = new Audio4();
+
+        public static Audio4 getInstance() {
+            return sInstance;
+        }
+
+        @Override
+        public ContentValues getContentValues(boolean isInternal) {
+            ContentValues values = super.getContentValues(isInternal);
+            values.put(Media.DATA, values.getAsString(Media.DATA) + "_4");
+            return values;
+        }
+    }
+
+    public static class Audio5 extends Audio1 {
+        private Audio5() {
+        }
+
+        private static Audio5 sInstance = new Audio5();
+
+        public static Audio5 getInstance() {
+            return sInstance;
+        }
+
+        @Override
+        public ContentValues getContentValues(boolean isInternal) {
+            ContentValues values = super.getContentValues(isInternal);
+            values.put(Media.DATA, values.getAsString(Media.DATA) + "_5");
+            return values;
+        }
+    }
+
     // These constants are not part of the public API
     public static final String EXTERNAL_VOLUME_NAME = "external";
     public static final String INTERNAL_VOLUME_NAME = "internal";
