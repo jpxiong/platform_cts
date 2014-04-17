@@ -252,6 +252,7 @@ public class BitmapDrawableTest extends InstrumentationTestCase {
         bitmapDrawable.setGravity(Gravity.BOTTOM);
         assertEquals(PixelFormat.TRANSLUCENT, bitmapDrawable.getOpacity());
 
+        source = mContext.getResources().openRawResource(R.raw.testimage);
         bitmapDrawable = new BitmapDrawable(source);
         assertEquals(Gravity.FILL, bitmapDrawable.getGravity());
         assertEquals(PixelFormat.OPAQUE, bitmapDrawable.getOpacity());
