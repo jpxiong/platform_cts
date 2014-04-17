@@ -17,13 +17,14 @@
 package com.android.compatibility.common.tradefed.command;
 
 import com.android.tradefed.command.Console;
+import com.android.tradefed.config.ConfigurationException;
 
 /**
  * An extension of Tradefed's console which adds features specific to compatibility testing.
  */
 public class CompatibilityConsole extends Console {
 
-    public static void main(String[] args) throws InterruptedException {
+    public static void main(String[] args) throws InterruptedException, ConfigurationException {
         CompatibilityConsole console = new CompatibilityConsole();
         Console.startConsole(console, args);
     }
