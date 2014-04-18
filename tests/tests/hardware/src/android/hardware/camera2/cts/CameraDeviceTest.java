@@ -822,13 +822,39 @@ public class CameraDeviceTest extends Camera2AndroidTestCase {
                 request, STATISTICS_LENS_SHADING_MAP_MODE, STATISTICS_LENS_SHADING_MAP_MODE_OFF);
 
         if (template == CameraDevice.TEMPLATE_STILL_CAPTURE) {
-            // TODO: Update these to check for availability (e.g. availableColorCorrectionModes)
             mCollector.expectKeyValueEquals(
                     request, COLOR_CORRECTION_MODE, COLOR_CORRECTION_MODE_HIGH_QUALITY);
-            mCollector.expectKeyValueEquals(request, EDGE_MODE, EDGE_MODE_HIGH_QUALITY);
-            mCollector.expectKeyValueEquals(
-                    request, NOISE_REDUCTION_MODE, NOISE_REDUCTION_MODE_HIGH_QUALITY);
-            mCollector.expectKeyValueEquals(request, TONEMAP_MODE, TONEMAP_MODE_HIGH_QUALITY);
+
+            List<Byte> availableEdgeModes =
+                    Arrays.asList(toObject(mStaticInfo.getAvailableEdgeModesChecked()));
+            if (availableEdgeModes.contains((byte)EDGE_MODE_HIGH_QUALITY)) {
+                mCollector.expectKeyValueEquals(request, EDGE_MODE, EDGE_MODE_HIGH_QUALITY);
+            } else if (availableEdgeModes.contains((byte)EDGE_MODE_FAST)) {
+                mCollector.expectKeyValueEquals(request, EDGE_MODE, EDGE_MODE_FAST);
+            } else {
+                mCollector.expectKeyValueEquals(request, EDGE_MODE, EDGE_MODE_OFF);
+            }
+
+            List<Byte> availableNoiseReductionModes =
+                    Arrays.asList(toObject(mStaticInfo.getAvailableNoiseReductionModesChecked()));
+            if (availableNoiseReductionModes.contains((byte)NOISE_REDUCTION_MODE_HIGH_QUALITY)) {
+                mCollector.expectKeyValueEquals(
+                        request, NOISE_REDUCTION_MODE, NOISE_REDUCTION_MODE_HIGH_QUALITY);
+            } else if (availableNoiseReductionModes.contains((byte)NOISE_REDUCTION_MODE_FAST)) {
+                mCollector.expectKeyValueEquals(
+                        request, NOISE_REDUCTION_MODE, NOISE_REDUCTION_MODE_FAST);
+            } else {
+                mCollector.expectKeyValueEquals(
+                        request, NOISE_REDUCTION_MODE, NOISE_REDUCTION_MODE_OFF);
+            }
+
+            List<Byte> availableToneMapModes =
+                    Arrays.asList(toObject(mStaticInfo.getAvailableToneMapModesChecked()));
+            if (availableToneMapModes.contains((byte)TONEMAP_MODE_HIGH_QUALITY)) {
+                mCollector.expectKeyValueEquals(request, TONEMAP_MODE, TONEMAP_MODE_HIGH_QUALITY);
+            } else {
+                mCollector.expectKeyValueEquals(request, TONEMAP_MODE, TONEMAP_MODE_FAST);
+            }
         } else {
             mCollector.expectKeyValueNotNull(request, EDGE_MODE);
             mCollector.expectKeyValueNotNull(request, NOISE_REDUCTION_MODE);

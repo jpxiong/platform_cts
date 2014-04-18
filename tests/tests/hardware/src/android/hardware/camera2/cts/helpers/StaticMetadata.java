@@ -480,9 +480,11 @@ public class StaticMetadata {
         }
 
         List<Byte> modeList = Arrays.asList(CameraTestUtils.toObject(modes));
+        checkTrueForKey(key, " Camera devices must always support FAST mode",
+                modeList.contains((byte)CameraMetadata.TONEMAP_MODE_FAST));
         if (isHardwareLevelFull()) {
-            checkTrueForKey(key, "Full-capability camera devices must always support"
-                    + "CONTRAST_CURVE and FAST",
+            checkTrueForKey(key, "Full-capability camera devices must support"
+                    + "CONTRAST_CURVE mode",
                     modeList.contains((byte)CameraMetadata.TONEMAP_MODE_CONTRAST_CURVE) &&
                     modeList.contains((byte)CameraMetadata.TONEMAP_MODE_FAST));
         }
