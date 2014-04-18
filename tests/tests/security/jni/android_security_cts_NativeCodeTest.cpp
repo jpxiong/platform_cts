@@ -26,6 +26,7 @@
 #include <sys/wait.h>
 #include <signal.h>
 #include <unistd.h>
+#include <errno.h>
 
 #define PASSED 0
 #define UNKNOWN_ERROR -1
@@ -236,7 +237,16 @@ static jint android_security_cts_NativeCodeTest_doSockDiagTest(JNIEnv* env, jobj
 
     fd = socket(AF_NETLINK, SOCK_RAW, NETLINK_SOCK_DIAG);
     if (fd == -1) {
-        return UNKNOWN_ERROR;
+        switch (errno) {
+            /* NETLINK_SOCK_DIAG not accessible, vector dne */
+            case EACCES:
+            case EAFNOSUPPORT:
+            case EPERM:
+            case EPROTONOSUPPORT:
+                return PASSED;
+            default:
+                return UNKNOWN_ERROR;
+        }
     }
     /* prepare and send netlink packet */
     memset(&nladdr, 0, sizeof(nladdr));
