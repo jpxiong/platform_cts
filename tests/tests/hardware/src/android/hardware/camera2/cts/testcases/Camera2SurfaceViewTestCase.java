@@ -75,6 +75,7 @@ public class Camera2SurfaceViewTestCase extends
     protected static final String DEBUG_FILE_NAME_BASE =
             Environment.getExternalStorageDirectory().getPath();
     protected static final int WAIT_FOR_RESULT_TIMEOUT_MS = 3000;
+    protected static final float FRAME_DURATION_ERROR_MARGIN = 0.005f; // 0.5 percent error margin.
 
     protected Context mContext;
     protected CameraManager mCameraManager;
@@ -409,6 +410,33 @@ public class Camera2SurfaceViewTestCase extends
 
         // Start preview.
         mCamera.setRepeatingRequest(previewRequest.build(), resultListener, mHandler);
+    }
+
+    /**
+     * Get the max preview size that supports the given fpsRange.
+     *
+     * @param fpsRange The fps range the returned size must support.
+     * @return max size that support the given fps range.
+     */
+    protected Size getMaxPreviewSizeForFpsRange(int[] fpsRange) {
+        if (fpsRange == null || fpsRange[0] <= 0 || fpsRange[1] <= 0) {
+            throw new IllegalArgumentException("Invalid fps range argument");
+        }
+        if (mOrderedPreviewSizes == null || mMinPreviewFrameDurationMap == null) {
+            throw new IllegalStateException("mOrderedPreviewSizes and mMinPreviewFrameDurationMap"
+                    + " must be initialized");
+        }
+
+        long[] frameDurationRange =
+                new long[]{(long) (1e9 / fpsRange[1]), (long) (1e9 / fpsRange[0])};
+        for (Size size : mOrderedPreviewSizes) {
+            long minDuration = mMinPreviewFrameDurationMap.get(size);
+            if (minDuration <= frameDurationRange[0]) {
+                return size;
+            }
+        }
+
+        return null;
     }
 
 }
