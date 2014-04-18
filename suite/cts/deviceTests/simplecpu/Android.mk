@@ -16,7 +16,7 @@ LOCAL_PATH:= $(call my-dir)
 include $(CLEAR_VARS)
 
 # don't include this package in any target
-LOCAL_MODULE_TAGS := optional
+LOCAL_MODULE_TAGS := tests
 
 LOCAL_STATIC_JAVA_LIBRARIES := ctsdeviceutil ctstestrunner
 
