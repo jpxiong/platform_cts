@@ -382,7 +382,7 @@ public class MediaStore_FilesTest extends AndroidTestCase {
         Uri albumArtUri = ContentUris.withAppendedId(albumArtUriBase, albumid);
         try {
             pfd = mResolver.openFileDescriptor(albumArtUri, "r");
-            fail(("no album art, shouldn't be here. Got: " + realPathFor(pfd));
+            fail("no album art, shouldn't be here. Got: " + realPathFor(pfd));
         } catch (Exception e) {
             // expected
         }
