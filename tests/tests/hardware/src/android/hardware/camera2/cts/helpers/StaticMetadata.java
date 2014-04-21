@@ -926,6 +926,26 @@ public class StaticMetadata {
         return edgeModes;
     }
 
+    public byte[] getAvailableNoiseReductionModesChecked() {
+        CameraMetadata.Key<byte[]> key =
+                CameraCharacteristics.NOISE_REDUCTION_AVAILABLE_NOISE_REDUCTION_MODES;
+        byte[] noiseReductionModes = getValueFromKeyNonNull(key);
+
+        if (noiseReductionModes == null) {
+            return new byte[0];
+        }
+
+        // Full device should always include OFF and FAST
+        if (isHardwareLevelFull()) {
+            List<Byte> modeList = Arrays.asList(CameraTestUtils.toObject(noiseReductionModes));
+            checkTrueForKey(key, "Full device must contain OFF and FAST noise reduction modes",
+                    modeList.contains((byte)CameraMetadata.NOISE_REDUCTION_MODE_OFF) &&
+                    modeList.contains((byte)CameraMetadata.NOISE_REDUCTION_MODE_FAST));
+        }
+
+        return noiseReductionModes;
+    }
+
     /**
      * Get the value in index for a fixed-size array from a given key.
      *

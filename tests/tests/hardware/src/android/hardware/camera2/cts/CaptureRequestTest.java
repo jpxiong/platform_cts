@@ -393,7 +393,49 @@ public class CaptureRequestTest extends Camera2SurfaceViewTestCase {
         }
     }
 
+    public void testNoiseReductionModeControl() throws Exception {
+        for (String id : mCameraIds) {
+            try {
+                openDevice(id);
+                if (!mStaticInfo.isPerFrameControlSupported()) {
+                    Log.i(TAG, "Camera " + id + "Doesn't support per frame control");
+                    continue;
+                }
+
+                noiseReductionModeTestByCamera();
+            } finally {
+                closeDevice();
+            }
+        }
+    }
+
     // TODO: add 3A state machine test.
+
+    private void noiseReductionModeTestByCamera() throws Exception {
+        Size maxPrevSize = mOrderedPreviewSizes.get(0);
+        CaptureRequest.Builder requestBuilder =
+                mCamera.createCaptureRequest(CameraDevice.TEMPLATE_PREVIEW);
+        byte[] availableModes = mStaticInfo.getAvailableNoiseReductionModesChecked();
+        SimpleCaptureListener resultListener = new SimpleCaptureListener();
+        startPreview(requestBuilder, maxPrevSize, resultListener);
+
+        for (byte mode : availableModes) {
+            requestBuilder.set(CaptureRequest.NOISE_REDUCTION_MODE, (int)mode);
+            resultListener = new SimpleCaptureListener();
+            mCamera.setRepeatingRequest(requestBuilder.build(), resultListener, mHandler);
+
+            verifyCaptureResultForKey(CaptureResult.NOISE_REDUCTION_MODE, (int)mode,
+                    resultListener, NUM_FRAMES_VERIFIED);
+
+            // Test that OFF and FAST mode should not slow down the frame rate.
+            if (mode == CaptureRequest.NOISE_REDUCTION_MODE_OFF ||
+                    mode == CaptureRequest.NOISE_REDUCTION_MODE_FAST) {
+                verifyFpsNotSlowDown(requestBuilder, NUM_FRAMES_VERIFIED);
+            }
+        }
+
+        stopPreview();
+    }
 
     private void focusDistanceTestByCamera() throws Exception {
         Size maxPrevSize = mOrderedPreviewSizes.get(0);
@@ -472,17 +514,17 @@ public class CaptureRequestTest extends Camera2SurfaceViewTestCase {
             resultListener = new SimpleCaptureListener();
             mCamera.setRepeatingRequest(requestBuilder.build(), resultListener, mHandler);
 
-            verifyEdgeModeControl(mode, resultListener, NUM_FRAMES_VERIFIED);
-        }
-    }
+            verifyCaptureResultForKey(CaptureResult.EDGE_MODE, (int)mode, resultListener,
+                    NUM_FRAMES_VERIFIED);
 
-    private void verifyEdgeModeControl(byte mode, SimpleCaptureListener listener,
-            int numFramesVerified) {
-        for (int i = 0; i < numFramesVerified; i++) {
-            CaptureResult result = listener.getCaptureResult(WAIT_FOR_RESULT_TIMEOUT_MS);
-            int edgeMode = getValueNotNull(result, CaptureResult.EDGE_MODE);
-            mCollector.expectEquals("Edge mode result should match request", (int)mode, edgeMode);
+            // Test that OFF and FAST mode should not slow down the frame rate.
+            if (mode == CaptureRequest.EDGE_MODE_OFF ||
+                    mode == CaptureRequest.EDGE_MODE_FAST) {
+                verifyFpsNotSlowDown(requestBuilder, NUM_FRAMES_VERIFIED);
+            }
         }
+
+        stopPreview();
     }
 
     /**
@@ -1328,5 +1370,82 @@ public class CaptureRequestTest extends Camera2SurfaceViewTestCase {
         T value = result.get(key);
         assertNotNull("Value of Key " + key.getName() + " shouldn't be null", value);
         return value;
+    }
+
+    /**
+     * Basic verification for the control mode capture result.
+     *
+     * @param key The capture result key to be verified against
+     * @param requestMode The request mode for this result
+     * @param listener The capture listener to get capture results
+     * @param numFramesVerified The number of capture results to be verified
+     */
+    private <T> void verifyCaptureResultForKey(Key<T> key, T requestMode,
+            SimpleCaptureListener listener, int numFramesVerified) {
+        for (int i = 0; i < numFramesVerified; i++) {
+            CaptureResult result = listener.getCaptureResult(WAIT_FOR_RESULT_TIMEOUT_MS);
+            T resultMode = getValueNotNull(result, key);
+            mCollector.expectEquals("Key " + key.getName() + " result should match request",
+                    requestMode, resultMode);
+        }
+    }
+
+    /**
+     * Verify if the fps is slow down for given input request with certain
+     * controls inside.
+     * <p>
+     * This method selects a max preview size for each fps range, and then
+     * configure the preview stream. Preview is started with the max preview
+     * size, and then verify if the result frame duration is in the frame
+     * duration range.
+     * </p>
+     *
+     * @param requestBuilder The request builder that contains post-processing
+     *            controls that could impact the output frame rate, such as
+     *            {@link CaptureRequest.NOISE_REDUCTION_MODE}. The value of
+     *            these controls must be set to some values such that the frame
+     *            rate is not slow down.
+     * @param numFramesVerified The number of frames to be verified
+     */
+    private void verifyFpsNotSlowDown(CaptureRequest.Builder requestBuilder,
+            int numFramesVerified)  throws Exception {
+        int[] fpsRanges = mStaticInfo.getAeAvailableTargetFpsRangesChecked();
+        final int FPS_RANGE_SIZE = 2;
+        int[] fpsRange = new int[FPS_RANGE_SIZE];
+        SimpleCaptureListener resultListener;
+
+        for (int i = 0; i < fpsRanges.length; i += FPS_RANGE_SIZE) {
+            fpsRange[0] = fpsRanges[i];
+            fpsRange[1] = fpsRanges[i + 1];
+            Size previewSz = getMaxPreviewSizeForFpsRange(fpsRange);
+            // If unable to find a preview size, then log the failure, and skip this run.
+            if (!mCollector.expectTrue(String.format(
+                    "Unable to find a preview size supporting given fps range [%d, %d]",
+                    fpsRange[0], fpsRange[1]), previewSz != null)) {
+                continue;
+            }
+
+            if (VERBOSE) {
+                Log.v(TAG, String.format("Test fps range [%d, %d] for preview size %s",
+                        fpsRange[0], fpsRange[1], previewSz.toString()));
+            }
+            requestBuilder.set(CaptureRequest.CONTROL_AE_TARGET_FPS_RANGE, fpsRange);
+            resultListener = new SimpleCaptureListener();
+            startPreview(requestBuilder, previewSz, resultListener);
+            long[] frameDurationRange =
+                    new long[]{(long) (1e9 / fpsRange[1]), (long) (1e9 / fpsRange[0])};
+            for (int j = 0; j < numFramesVerified; j++) {
+                CaptureResult result =
+                        resultListener.getCaptureResult(WAIT_FOR_RESULT_TIMEOUT_MS);
+                long frameDuration = getValueNotNull(result, CaptureResult.SENSOR_FRAME_DURATION);
+                mCollector.expectInRange(
+                        "Frame duration must be in the range of " + Arrays.toString(frameDurationRange),
+                        frameDuration,
+                        (long) (frameDurationRange[0] * (1 - FRAME_DURATION_ERROR_MARGIN)),
+                        (long) (frameDurationRange[1] * (1 + FRAME_DURATION_ERROR_MARGIN)));
+            }
+        }
+
+        mCamera.stopRepeating();
     }
 }
