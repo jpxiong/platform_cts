@@ -215,10 +215,23 @@ public class OpenSSLHeartbleedTest extends InstrumentationTestCase {
             }
         });
 
+        // Wait for both client and server to terminate, to ensure that we observe all the traffic
+        // exchanged between them. Throw an exception if one of them failed.
         Log.i(TAG, "Waiting for client");
-        clientFuture.get(10, TimeUnit.SECONDS);
+        // Wait for the client, but don't yet throw an exception if it failed.
+        Exception clientException = null;
+        try {
+            clientFuture.get(10, TimeUnit.SECONDS);
+        } catch (Exception e) {
+            clientException = e;
+        }
         Log.i(TAG, "Waiting for server");
-        serverFuture.get(1, TimeUnit.SECONDS);
+        // Wait for the server and throw an exception if it failed.
+        serverFuture.get(5, TimeUnit.SECONDS);
+        // Throw an exception if the client failed.
+        if (clientException != null) {
+            throw clientException;
+        }
         Log.i(TAG, "Handshake completed and application data exchanged");
     }
 
