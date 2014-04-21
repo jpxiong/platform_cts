@@ -161,9 +161,7 @@ public class ImageReaderTest extends Camera2AndroidTestCase {
             throw new IllegalArgumentException("Unsupported format: " + format);
         }
 
-        // FIXME: Need change revert to MAX_NUM_IMAGES - 1 when bug 11595505 is fixed, otherwise
-        // It will fail all subsequent tests.
-        final int NUM_SINGLE_CAPTURE_TESTED = 1; // MAX_NUM_IMAGES - 1;
+        final int NUM_SINGLE_CAPTURE_TESTED = MAX_NUM_IMAGES - 1;
         Size maxYuvSz = mOrderedPreviewSizes.get(0);
         Size[] targetCaptureSizes = mStaticInfo.getAvailableSizesForFormatChecked(format,
                 CameraCharacteristics.SCALER_AVAILABLE_STREAM_CONFIGURATIONS_OUTPUT);
