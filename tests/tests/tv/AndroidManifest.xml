@@ -22,8 +22,16 @@
     <uses-permission android:name="android.permission.DISABLE_KEYGUARD" />
     <application>
         <uses-library android:name="android.test.runner"/>
-        <service android:name="android.tv.cts.TvInputManagerTest$MockTvInputService"
+        <service android:name="android.tv.cts.TvInputManagerTest$MockTvInputInternalService"
                 android:permission="android.permission.BIND_TV_INPUT">
+            <intent-filter>
+                <action android:name="android.tv.TvInputService" />
+            </intent-filter>
+        </service>
+        <service android:name="android.tv.cts.TvInputManagerTest$MockTvInputRemoteService"
+                android:permission="android.permission.BIND_TV_INPUT"
+                android:process=":remoteTvInputForTest"
+                android:isolatedProcess="true">
             <intent-filter>
                 <action android:name="android.tv.TvInputService" />
             </intent-filter>

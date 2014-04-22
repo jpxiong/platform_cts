@@ -17,11 +17,13 @@
 package android.tv.cts;
 
 import android.content.ComponentName;
+import android.content.ContentUris;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Handler;
 import android.os.HandlerThread;
+import android.provider.TvContract;
 import android.test.AndroidTestCase;
 import android.text.TextUtils;
 import android.tv.TvInputInfo;
@@ -42,7 +44,7 @@ import java.util.concurrent.TimeUnit;
  */
 public class TvInputManagerTest extends AndroidTestCase {
     private static final String TAG = "TvInputManagerTest";
-    private static final long OPERATION_TIMEOUT_MS = 500;
+    private static final long OPERATION_TIMEOUT_MS = 1500;
 
     private TvInputManager mManager;
     private Session mSession;
@@ -51,8 +53,10 @@ public class TvInputManagerTest extends AndroidTestCase {
     private TvInputListener mTvInputListener;
     private HandlerThread mCallbackThread;
     private Handler mCallbackHandler;
+
     private CountDownLatch mAvailabilityChangeLatch;
     private CountDownLatch mSessionCreationLatch;
+    private CountDownLatch mSessionReleaseLatch;
 
     public TvInputManagerTest() {
         mSessionCallback = new MockSessionCallback();
@@ -61,11 +65,17 @@ public class TvInputManagerTest extends AndroidTestCase {
     @Override
     public void setContext(Context context) {
         super.setContext(context);
-        if (TextUtils.isEmpty(MockTvInputService.sInputId)) {
+        if (TextUtils.isEmpty(MockTvInputInternalService.sInputId)) {
             ComponentName componentName = new ComponentName(
-                    context.getPackageName(), MockTvInputService.class.getName());
+                    context.getPackageName(), MockTvInputInternalService.class.getName());
             // TODO: Do not directly generate an input id.
-            MockTvInputService.sInputId = componentName.flattenToShortString();
+            MockTvInputInternalService.sInputId = componentName.flattenToShortString();
+        }
+        if (TextUtils.isEmpty(MockTvInputRemoteService.sInputId)) {
+            ComponentName componentName = new ComponentName(
+                    context.getPackageName(), MockTvInputRemoteService.class.getName());
+            // TODO: Do not directly generate an input id.
+            MockTvInputRemoteService.sInputId = componentName.flattenToShortString();
         }
         mManager = (TvInputManager) context.getSystemService(Context.TV_INPUT_SERVICE);
     }
@@ -74,9 +84,9 @@ public class TvInputManagerTest extends AndroidTestCase {
     protected void setUp() {
         mAvailability = false;
         mSession = null;
-        MockTvInputService.sInstance = null;
-        MockTvInputService.sSession = null;
-        MockTvInputService.sFailOnCreateSession = false;
+        MockTvInputInternalService.sInstance = null;
+        MockTvInputInternalService.sSession = null;
+        MockTvInputInternalService.sFailOnCreateSession = false;
         mCallbackThread = new HandlerThread("CallbackThread");
         mCallbackThread.start();
         mCallbackHandler = new Handler(mCallbackThread.getLooper());
@@ -85,7 +95,8 @@ public class TvInputManagerTest extends AndroidTestCase {
     @Override
     protected void tearDown() throws InterruptedException {
         if (mTvInputListener != null) {
-            mManager.unregisterListener(MockTvInputService.sInputId, mTvInputListener);
+            mManager.unregisterListener(MockTvInputInternalService.sInputId, mTvInputListener);
+            mManager.unregisterListener(MockTvInputRemoteService.sInputId, mTvInputListener);
             mTvInputListener = null;
         }
         mCallbackThread.quit();
@@ -93,35 +104,39 @@ public class TvInputManagerTest extends AndroidTestCase {
     }
 
     public void testGetTvInputList() throws Exception {
-        // Check if the returned list includes the mock tv input service.
-        boolean mockServiceInstalled = false;
+        // Check if the returned list includes the mock tv input services.
+        int mockServiceInstalled = 0;
         for (TvInputInfo info : mManager.getTvInputList()) {
-            if (MockTvInputService.sInputId.equals(info.getId())) {
-                mockServiceInstalled = true;
+            if (MockTvInputInternalService.sInputId.equals(info.getId())) {
+                ++mockServiceInstalled;
+            }
+            if (MockTvInputRemoteService.sInputId.equals(info.getId())) {
+                ++mockServiceInstalled;
             }
         }
 
         // Verify the result.
-        assertTrue("Mock service must be listed", mockServiceInstalled);
+        assertEquals("Mock services must be listed", 2, mockServiceInstalled);
     }
 
     public void testCreateSession() throws Exception {
         mSessionCreationLatch = new CountDownLatch(1);
         // Make the mock service return a session on request.
-        mManager.createSession(MockTvInputService.sInputId, mSessionCallback,
+        mManager.createSession(MockTvInputInternalService.sInputId, mSessionCallback,
                 mCallbackHandler);
 
         // Verify the result.
         assertTrue(mSessionCreationLatch.await(OPERATION_TIMEOUT_MS, TimeUnit.MILLISECONDS));
         assertNotNull(mSession);
+
         mSession.release();
     }
 
     public void testCreateSessionFailure() throws Exception {
         mSessionCreationLatch = new CountDownLatch(1);
         // Make the mock service return {@code null} on request.
-        MockTvInputService.sFailOnCreateSession = true;
-        mManager.createSession(MockTvInputService.sInputId, mSessionCallback,
+        MockTvInputInternalService.sFailOnCreateSession = true;
+        mManager.createSession(MockTvInputInternalService.sInputId, mSessionCallback,
                 mCallbackHandler);
 
         // Verify the result.
@@ -131,32 +146,78 @@ public class TvInputManagerTest extends AndroidTestCase {
 
     public void testAvailabilityChanged() throws Exception {
         // Register a listener for availability change.
-        MockTvInputService.sInstanceLatch = new CountDownLatch(1);
+        MockTvInputInternalService.sInstanceLatch = new CountDownLatch(1);
         mTvInputListener = new MockTvInputListener();
-        mManager.registerListener(MockTvInputService.sInputId, mTvInputListener,
+        mManager.registerListener(MockTvInputInternalService.sInputId, mTvInputListener,
                 mCallbackHandler);
 
         // Make sure that the mock service is created.
-        if (MockTvInputService.sInstance == null) {
-            assertTrue(MockTvInputService.sInstanceLatch.await(
+        if (MockTvInputInternalService.sInstance == null) {
+            assertTrue(MockTvInputInternalService.sInstanceLatch.await(
                     OPERATION_TIMEOUT_MS, TimeUnit.MILLISECONDS));
         }
 
         // Change the availability of the mock service.
-        mAvailability = mManager.getAvailability(MockTvInputService.sInputId);
+        mAvailability = mManager.getAvailability(MockTvInputInternalService.sInputId);
         boolean newAvailiability = !mAvailability;
         mAvailabilityChangeLatch = new CountDownLatch(1);
-        MockTvInputService.sInstance.setAvailable(newAvailiability);
+        MockTvInputInternalService.sInstance.setAvailable(newAvailiability);
 
         // Verify the result.
         assertTrue(mAvailabilityChangeLatch.await(OPERATION_TIMEOUT_MS, TimeUnit.MILLISECONDS));
         assertEquals(newAvailiability, mAvailability);
     }
 
+    public void testCrashOnCreateSession() throws Exception {
+        mSessionCreationLatch = new CountDownLatch(
+                MockTvInputRemoteService.MAX_SESSION_CREATION_BEFORE_CRASH + 1);
+        mSessionReleaseLatch =  new CountDownLatch(
+                MockTvInputRemoteService.MAX_SESSION_CREATION_BEFORE_CRASH);
+        // availability should be changed three times:
+        // 1) false -> true, when connected, 2) true -> false after crash, and
+        // 3) false -> true, after reconnected.
+        mAvailabilityChangeLatch = new CountDownLatch(3);
+        mTvInputListener = new MockTvInputListener();
+        mManager.registerListener(MockTvInputRemoteService.sInputId, mTvInputListener,
+                mCallbackHandler);
+
+        for (int i = 0; i < MockTvInputRemoteService.MAX_SESSION_CREATION_BEFORE_CRASH + 1; ++i) {
+            mManager.createSession(MockTvInputRemoteService.sInputId, mSessionCallback,
+                    mCallbackHandler);
+        }
+
+        // Verify the result.
+        assertTrue(mSessionReleaseLatch.await(OPERATION_TIMEOUT_MS, TimeUnit.MILLISECONDS));
+        assertTrue(mSessionCreationLatch.await(OPERATION_TIMEOUT_MS, TimeUnit.MILLISECONDS));
+        assertTrue(mAvailabilityChangeLatch.await(OPERATION_TIMEOUT_MS, TimeUnit.MILLISECONDS));
+    }
+
+    public void testCrashOnTune() throws Exception {
+        mSessionCreationLatch = new CountDownLatch(1);
+        mSessionReleaseLatch =  new CountDownLatch(1);
+        // availability should be changed three times:
+        // 1) false -> true, when connected, 2) true -> false after crash, and
+        // 3) false -> true, after reconnected.
+        mAvailabilityChangeLatch = new CountDownLatch(3);
+
+        mTvInputListener = new MockTvInputListener();
+        mManager.registerListener(MockTvInputRemoteService.sInputId, mTvInputListener,
+                mCallbackHandler);
+        mManager.createSession(MockTvInputRemoteService.sInputId, mSessionCallback,
+                mCallbackHandler);
+
+        assertTrue(mSessionCreationLatch.await(OPERATION_TIMEOUT_MS, TimeUnit.MILLISECONDS));
+
+        Uri channelUri = ContentUris.withAppendedId(TvContract.Channels.CONTENT_URI, 0);
+        mSession.tune(channelUri);
+        assertTrue(mSessionReleaseLatch.await(OPERATION_TIMEOUT_MS, TimeUnit.MILLISECONDS));
+        assertNull(mSession);
+        assertTrue(mAvailabilityChangeLatch.await(OPERATION_TIMEOUT_MS, TimeUnit.MILLISECONDS));
+    }
+
     private class MockTvInputListener extends TvInputListener {
         @Override
         public void onAvailabilityChanged(String inputId, boolean isAvailable) {
-            assertEquals(MockTvInputService.sInputId, inputId);
             mAvailability = isAvailable;
             if (mAvailabilityChangeLatch != null) {
                 mAvailabilityChangeLatch.countDown();
@@ -172,12 +233,20 @@ public class TvInputManagerTest extends AndroidTestCase {
                 mSessionCreationLatch.countDown();
             }
         }
+
+        @Override
+        public void onSessionReleased(Session session) {
+            mSession = null;
+            if (mSessionReleaseLatch != null) {
+                mSessionReleaseLatch.countDown();
+            }
+        }
     }
 
-    public static class MockTvInputService extends TvInputService {
+    public static class MockTvInputInternalService extends TvInputService {
         static String sInputId;
         static CountDownLatch sInstanceLatch;
-        static MockTvInputService sInstance;
+        static MockTvInputInternalService sInstance;
         static TvInputSessionImpl sSession;
 
         static boolean sFailOnCreateSession;
@@ -186,7 +255,7 @@ public class TvInputManagerTest extends AndroidTestCase {
         public void onCreate() {
             super.onCreate();
             sInstance = this;
-            sSession = new MockTvInputSessionImpl();
+            sSession = new MockTvInputInternalSessionImpl();
             if (sInstanceLatch != null) {
                 sInstanceLatch.countDown();
             }
@@ -197,8 +266,8 @@ public class TvInputManagerTest extends AndroidTestCase {
             return sFailOnCreateSession ? null : sSession;
         }
 
-        class MockTvInputSessionImpl extends TvInputSessionImpl {
-            public MockTvInputSessionImpl() { }
+        class MockTvInputInternalSessionImpl extends TvInputSessionImpl {
+            public MockTvInputInternalSessionImpl() { }
 
             @Override
             public void onRelease() { }
@@ -213,6 +282,51 @@ public class TvInputManagerTest extends AndroidTestCase {
 
             @Override
             public boolean onTune(Uri channelUri) {
+                return false;
+            }
+        }
+    }
+
+    public static class MockTvInputRemoteService extends TvInputService {
+        public static final int MAX_SESSION_CREATION_BEFORE_CRASH = 2;
+        static String sInputId;
+
+        private int mSessionCreationBeforeCrash;
+
+        @Override
+        public void onCreate() {
+            super.onCreate();
+            mSessionCreationBeforeCrash = MAX_SESSION_CREATION_BEFORE_CRASH;
+            setAvailable(true);
+        }
+
+        @Override
+        public TvInputSessionImpl onCreateSession() {
+            if (mSessionCreationBeforeCrash > 0) {
+                --mSessionCreationBeforeCrash;
+                return new MockTvInputRemoteSessionImpl();
+            }
+            android.os.Process.killProcess(android.os.Process.myPid());
+            return null;
+        }
+
+        class MockTvInputRemoteSessionImpl extends TvInputSessionImpl {
+            public MockTvInputRemoteSessionImpl() { }
+
+            @Override
+            public void onRelease() { }
+
+            @Override
+            public boolean onSetSurface(Surface surface) {
+                return false;
+            }
+
+            @Override
+            public void onSetVolume(float volume) { }
+
+            @Override
+            public boolean onTune(Uri channelUri) {
+                android.os.Process.killProcess(android.os.Process.myPid());
                 return false;
             }
         }
