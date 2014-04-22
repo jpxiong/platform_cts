@@ -50,7 +50,8 @@ public class TvInputManagerTest extends AndroidTestCase {
     private TvInputListener mTvInputListener;
     private HandlerThread mCallbackThread;
     private Handler mCallbackHandler;
-    private CountDownLatch mEventLatch;
+    private CountDownLatch mAvailabilityChangeLatch;
+    private CountDownLatch mSessionCreationLatch;
 
     public TvInputManagerTest() {
         mSessionCallback = new MockSessionCreateCallback();
@@ -72,10 +73,10 @@ public class TvInputManagerTest extends AndroidTestCase {
         mSession = null;
         MockTvInputService.sInstance = null;
         MockTvInputService.sSession = null;
+        MockTvInputService.sFailOnCreateSession = false;
         mCallbackThread = new HandlerThread("CallbackThread");
         mCallbackThread.start();
         mCallbackHandler = new Handler(mCallbackThread.getLooper());
-        mEventLatch = new CountDownLatch(1);
     }
 
     @Override
@@ -102,47 +103,50 @@ public class TvInputManagerTest extends AndroidTestCase {
     }
 
     public void testCreateSession() throws Exception {
+        mSessionCreationLatch = new CountDownLatch(1);
         // Make the mock service return a session on request.
         mManager.createSession(MockTvInputService.sComponentName, mSessionCallback,
                 mCallbackHandler);
 
         // Verify the result.
-        assertTrue(mEventLatch.await(OPERATION_TIMEOUT_MS, TimeUnit.MILLISECONDS));
+        assertTrue(mSessionCreationLatch.await(OPERATION_TIMEOUT_MS, TimeUnit.MILLISECONDS));
         assertNotNull(mSession);
         mSession.release();
     }
 
     public void testCreateSessionFailure() throws Exception {
+        mSessionCreationLatch = new CountDownLatch(1);
         // Make the mock service return {@code null} on request.
-        MockTvInputService.sSession = null;
+        MockTvInputService.sFailOnCreateSession = true;
         mManager.createSession(MockTvInputService.sComponentName, mSessionCallback,
                 mCallbackHandler);
 
         // Verify the result.
-        assertTrue(mEventLatch.await(OPERATION_TIMEOUT_MS, TimeUnit.MILLISECONDS));
+        assertTrue(mSessionCreationLatch.await(OPERATION_TIMEOUT_MS, TimeUnit.MILLISECONDS));
         assertNull(mSession);
     }
 
     public void testAvailabilityChanged() throws Exception {
         // Register a listener for availability change.
-        MockTvInputService.sInstanceLatch = mEventLatch;
+        MockTvInputService.sInstanceLatch = new CountDownLatch(1);
         mTvInputListener = new MockTvInputListener();
         mManager.registerListener(MockTvInputService.sComponentName, mTvInputListener,
                 mCallbackHandler);
 
         // Make sure that the mock service is created.
         if (MockTvInputService.sInstance == null) {
-            assertTrue(mEventLatch.await(OPERATION_TIMEOUT_MS, TimeUnit.MILLISECONDS));
+            assertTrue(MockTvInputService.sInstanceLatch.await(
+                    OPERATION_TIMEOUT_MS, TimeUnit.MILLISECONDS));
         }
 
         // Change the availability of the mock service.
         mAvailability = mManager.getAvailability(MockTvInputService.sComponentName);
         boolean newAvailiability = !mAvailability;
-        mEventLatch = new CountDownLatch(1);
+        mAvailabilityChangeLatch = new CountDownLatch(1);
         MockTvInputService.sInstance.setAvailable(newAvailiability);
 
         // Verify the result.
-        assertTrue(mEventLatch.await(OPERATION_TIMEOUT_MS, TimeUnit.MILLISECONDS));
+        assertTrue(mAvailabilityChangeLatch.await(OPERATION_TIMEOUT_MS, TimeUnit.MILLISECONDS));
         assertEquals(newAvailiability, mAvailability);
     }
 
@@ -151,7 +155,9 @@ public class TvInputManagerTest extends AndroidTestCase {
         public void onAvailabilityChanged(ComponentName name, boolean isAvailable) {
             assertEquals(MockTvInputService.sComponentName, name);
             mAvailability = isAvailable;
-            mEventLatch.countDown();
+            if (mAvailabilityChangeLatch != null) {
+                mAvailabilityChangeLatch.countDown();
+            }
         }
     }
 
@@ -159,7 +165,9 @@ public class TvInputManagerTest extends AndroidTestCase {
         @Override
         public void onSessionCreated(Session session) {
             mSession = session;
-            mEventLatch.countDown();
+            if (mSessionCreationLatch != null) {
+                mSessionCreationLatch.countDown();
+            }
         }
     }
 
@@ -169,10 +177,13 @@ public class TvInputManagerTest extends AndroidTestCase {
         static MockTvInputService sInstance;
         static TvInputSessionImpl sSession;
 
+        static boolean sFailOnCreateSession;
+
         @Override
         public void onCreate() {
             super.onCreate();
             sInstance = this;
+            sSession = new MockTvInputSessionImpl();
             if (sInstanceLatch != null) {
                 sInstanceLatch.countDown();
             }
@@ -180,8 +191,7 @@ public class TvInputManagerTest extends AndroidTestCase {
 
         @Override
         public TvInputSessionImpl onCreateSession() {
-            sSession = new MockTvInputSessionImpl();
-            return sSession;
+            return sFailOnCreateSession ? null : sSession;
         }
 
         class MockTvInputSessionImpl extends TvInputSessionImpl {
