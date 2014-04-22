@@ -27,7 +27,7 @@ import android.text.TextUtils;
 import android.tv.TvInputInfo;
 import android.tv.TvInputManager;
 import android.tv.TvInputManager.Session;
-import android.tv.TvInputManager.SessionCreateCallback;
+import android.tv.TvInputManager.SessionCallback;
 import android.tv.TvInputManager.TvInputListener;
 import android.tv.TvInputService;
 import android.tv.TvInputService.TvInputSessionImpl;
@@ -46,7 +46,7 @@ public class TvInputManagerTest extends AndroidTestCase {
 
     private TvInputManager mManager;
     private Session mSession;
-    private SessionCreateCallback mSessionCallback;
+    private SessionCallback mSessionCallback;
     private boolean mAvailability;
     private TvInputListener mTvInputListener;
     private HandlerThread mCallbackThread;
@@ -55,7 +55,7 @@ public class TvInputManagerTest extends AndroidTestCase {
     private CountDownLatch mSessionCreationLatch;
 
     public TvInputManagerTest() {
-        mSessionCallback = new MockSessionCreateCallback();
+        mSessionCallback = new MockSessionCallback();
     }
 
     @Override
@@ -164,7 +164,7 @@ public class TvInputManagerTest extends AndroidTestCase {
         }
     }
 
-    private class MockSessionCreateCallback implements SessionCreateCallback {
+    private class MockSessionCallback extends SessionCallback {
         @Override
         public void onSessionCreated(Session session) {
             mSession = session;
