@@ -103,7 +103,6 @@ public class TvInputManagerTest extends AndroidTestCase {
 
     public void testCreateSession() throws Exception {
         // Make the mock service return a session on request.
-        MockTvInputService.sSession = new MockTvInputSessionImpl();
         mManager.createSession(MockTvInputService.sComponentName, mSessionCallback,
                 mCallbackHandler);
 
@@ -181,25 +180,28 @@ public class TvInputManagerTest extends AndroidTestCase {
 
         @Override
         public TvInputSessionImpl onCreateSession() {
+            sSession = new MockTvInputSessionImpl();
             return sSession;
         }
-    }
 
-    private static class MockTvInputSessionImpl extends TvInputSessionImpl {
-        @Override
-        public void onRelease() { }
+        class MockTvInputSessionImpl extends TvInputSessionImpl {
+            public MockTvInputSessionImpl() { }
 
-        @Override
-        public boolean onSetSurface(Surface surface) {
-            return false;
-        }
+            @Override
+            public void onRelease() { }
 
-        @Override
-        public void onSetVolume(float volume) { }
+            @Override
+            public boolean onSetSurface(Surface surface) {
+                return false;
+            }
 
-        @Override
-        public boolean onTune(Uri channelUri) {
-            return false;
+            @Override
+            public void onSetVolume(float volume) { }
+
+            @Override
+            public boolean onTune(Uri channelUri) {
+                return false;
+            }
         }
     }
 }
