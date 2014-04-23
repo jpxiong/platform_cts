@@ -445,6 +445,7 @@ public class CameraVideoActivity extends PassFailButtons.Activity
                 CamcorderProfile.QUALITY_LOW,
                 CamcorderProfile.QUALITY_HIGH,
                 CamcorderProfile.QUALITY_QCIF,
+                CamcorderProfile.QUALITY_QVGA,
                 CamcorderProfile.QUALITY_CIF,
                 CamcorderProfile.QUALITY_480P,
                 CamcorderProfile.QUALITY_720P,
@@ -455,6 +456,7 @@ public class CameraVideoActivity extends PassFailButtons.Activity
                 "LOW",
                 "HIGH",
                 "QCIF",
+                "QVGA",
                 "CIF",
                 "480P",
                 "720P",
@@ -488,45 +490,25 @@ public class CameraVideoActivity extends PassFailButtons.Activity
         }
     }
 
-    private Size findRecordSize() {
+    private Size findRecordSize(int cameraId) {
         int[] possibleQuality = {
+                CamcorderProfile.QUALITY_LOW,
+                CamcorderProfile.QUALITY_HIGH,
                 CamcorderProfile.QUALITY_QCIF,
+                CamcorderProfile.QUALITY_QVGA,
                 CamcorderProfile.QUALITY_CIF,
                 CamcorderProfile.QUALITY_480P,
                 CamcorderProfile.QUALITY_720P,
                 CamcorderProfile.QUALITY_1080P
         };
 
-        Size[] sizes = new Size[] {
-                mCamera.new Size(176, 144),
-                mCamera.new Size(352, 288),
-                mCamera.new Size(720, 480),
-                mCamera.new Size(1280, 720),
-                mCamera.new Size(1920, 1080)
-        };
-
-        Size minSize = mCamera.new Size(Integer.MAX_VALUE, Integer.MAX_VALUE);
-        Size maxSize = mCamera.new Size(0, 0);
-
-        for (int i = 0; i < possibleQuality.length; i++) {
-            if (mVideoSizeIds.contains(possibleQuality[i])) {
-                if (sizes[i].height < minSize.height) {
-                    minSize = sizes[i];
-                }
-                if (sizes[i].height > maxSize.height) {
-                    maxSize = sizes[i];
-                }
-            }
-        }
-
         ArrayList<ResolutionQuality> qualityList = new ArrayList<ResolutionQuality>();
-        qualityList.add(new ResolutionQuality(CamcorderProfile.QUALITY_LOW, minSize.width,
-                minSize.height));
-        qualityList.add(new ResolutionQuality(CamcorderProfile.QUALITY_HIGH, maxSize.width,
-                maxSize.height));
         for (int i = 0; i < possibleQuality.length; i++) {
-            qualityList.add(new ResolutionQuality(possibleQuality[i], sizes[i].width,
-                    sizes[i].height));
+            if (CamcorderProfile.hasProfile(cameraId, possibleQuality[i])) {
+                CamcorderProfile profile = CamcorderProfile.get(cameraId, possibleQuality[i]);
+                qualityList.add(new ResolutionQuality(possibleQuality[i],
+                        profile.videoFrameWidth, profile.videoFrameHeight));
+            }
         }
 
         Size recordSize = null;
@@ -547,7 +529,7 @@ public class CameraVideoActivity extends PassFailButtons.Activity
 
     // Match preview size with current recording size mCurrentVideoSizeId
     private Size matchPreviewRecordSize() {
-        Size recordSize = findRecordSize();
+        Size recordSize = findRecordSize(mCurrentCameraId);
 
         Size matchedSize = null;
         // First try to find exact match in size
