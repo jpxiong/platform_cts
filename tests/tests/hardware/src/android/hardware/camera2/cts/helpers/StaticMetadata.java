@@ -21,6 +21,7 @@ import android.graphics.ImageFormat;
 import android.hardware.camera2.CameraCharacteristics;
 import android.hardware.camera2.CameraMetadata;
 import android.hardware.camera2.CameraMetadata.Key;
+import android.hardware.camera2.Rational;
 import android.hardware.camera2.Size;
 import android.hardware.camera2.cts.CameraTestUtils;
 import android.util.Log;
@@ -61,6 +62,9 @@ public class StaticMetadata {
     private static final int SENSOR_INFO_SENSITIVITY_RANGE_MAX_AT_LEAST = 1600;
     private static final int STATISTICS_INFO_MAX_FACE_COUNT_MIN_AT_LEAST = 4;
     private static final int TONEMAP_MAX_CURVE_POINTS_AT_LEAST = 64;
+    private static final int CONTROL_AE_COMPENSATION_RANGE_DEFAULT_MIN = -2;
+    private static final int CONTROL_AE_COMPENSATION_RANGE_DEFAULT_MAX = 2;
+    private static final Rational CONTROL_AE_COMPENSATION_STEP_DEFAULT = new Rational(1, 2);
 
     // TODO: Consider making this work across any metadata object, not just camera characteristics
     private final CameraCharacteristics mCharacteristics;
@@ -948,6 +952,53 @@ public class StaticMetadata {
         return noiseReductionModes;
     }
 
+    /**
+     * Get value of key android.control.aeCompensationStep and do the sanity check.
+     *
+     * @return default value if the value is null.
+     */
+    public Rational getAeCompensationStepChecked() {
+        CameraMetadata.Key<Rational> key =
+                CameraCharacteristics.CONTROL_AE_COMPENSATION_STEP;
+        Rational compensationStep = getValueFromKeyNonNull(key);
+
+        if (compensationStep == null) {
+            // Return default step.
+            return CONTROL_AE_COMPENSATION_STEP_DEFAULT;
+        }
+
+        checkTrueForKey(key, " value must be no more than 1/2", compensationStep.toFloat() < 0.5f);
+        return compensationStep;
+    }
+
+    /**
+     * Get value of key android.control.aeCompensationRange and do the sanity check.
+     *
+     * @return default value if the value is null or malformed.
+     */
+    public int[] getAeCompensationRangeChecked() {
+        CameraMetadata.Key<int[]> key =
+                CameraCharacteristics.CONTROL_AE_COMPENSATION_RANGE;
+        int[] compensationRange = getValueFromKeyNonNull(key);
+        float compensationStep = getAeCompensationStepChecked().toFloat();
+        final int[] DEFAULT_RANGE = new int[] {
+                (int)(CONTROL_AE_COMPENSATION_RANGE_DEFAULT_MIN / compensationStep),
+                (int)(CONTROL_AE_COMPENSATION_RANGE_DEFAULT_MAX / compensationStep)};
+        if (compensationRange == null) {
+            return DEFAULT_RANGE;
+        }
+
+        checkTrueForKey(key, " value must have 2 elements", compensationRange.length == 2);
+        if (compensationRange.length != 2) {
+            return DEFAULT_RANGE;
+        }
+
+        checkTrueForKey(key, " range value must be at least " + Arrays.toString(DEFAULT_RANGE),
+               compensationRange[0] <= DEFAULT_RANGE[0] &&
+               compensationRange[1] >= DEFAULT_RANGE[1]);
+
+        return compensationRange;
+    }
     /**
      * Get the value in index for a fixed-size array from a given key.
      *

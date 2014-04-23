@@ -39,6 +39,7 @@ import com.android.ex.camera2.exceptions.TimeoutRuntimeException;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
@@ -48,7 +49,6 @@ public class StillCaptureTest extends Camera2SurfaceViewTestCase {
     private static final boolean VERBOSE = Log.isLoggable(TAG, Log.VERBOSE);
     private static final boolean DEBUG = Log.isLoggable(TAG, Log.DEBUG);;
     private static final String JPEG_FILE_NAME = DEBUG_FILE_NAME_BASE + "/test.jpeg";
-    private static final int NUM_RESULTS_WAIT_TIMEOUT = 100;
     // 60 second to accommodate the possible long exposure time.
     private static final int EXIF_DATETIME_ERROR_MARGIN_SEC = 60;
     private static final float EXIF_FOCAL_LENGTH_ERROR_MARGIN = 0.001f;
@@ -151,7 +151,7 @@ public class StillCaptureTest extends Camera2SurfaceViewTestCase {
     /**
      * Test basic Raw capture. Raw buffer avaiablility is checked, but raw buffer data is not.
      */
-   public void testBasicRawCapture()  throws Exception {
+    public void testBasicRawCapture()  throws Exception {
        for (int i = 0; i < mCameraIds.length; i++) {
            try {
                Log.i(TAG, "Testing raw capture for Camera " + mCameraIds[i]);
@@ -205,6 +205,30 @@ public class StillCaptureTest extends Camera2SurfaceViewTestCase {
                 openDevice(id);
 
                 previewStillCombinationTestByCamera();
+            } finally {
+                closeDevice();
+                closeImageReader();
+            }
+        }
+    }
+
+    /**
+     * Test AE compensation.
+     * <p>
+     * Wait for AE to converge, issue a burst of still capture with different AE
+     * compensation value, verify the capture result.
+     * </p>
+     */
+    public void testAeCompensation() throws Exception {
+        for (String id : mCameraIds) {
+            try {
+                Log.i(TAG, "Testing AE compensation for Camera " + id);
+                openDevice(id);
+                if (!mStaticInfo.isPerFrameControlSupported()) {
+                    continue;
+                }
+
+                aeCompensationTestByCamera();
             } finally {
                 closeDevice();
                 closeImageReader();
@@ -682,6 +706,73 @@ public class StillCaptureTest extends Camera2SurfaceViewTestCase {
             jpegOrientation = orientation;
             jpegQuality = jpgQuality;
             thumbnailQuality = thumbQuality;
+        }
+    }
+
+    private void aeCompensationTestByCamera() throws Exception {
+        int[] compensationRange = mStaticInfo.getAeCompensationRangeChecked();
+        int numSteps = compensationRange[1] - compensationRange[0] + 1;
+
+        Size maxStillSz = mOrderedStillSizes.get(0);
+        Size maxPreviewSz = mOrderedPreviewSizes.get(0);
+
+        SimpleCaptureListener resultListener = new SimpleCaptureListener();
+        SimpleImageReaderListener imageListener = new SimpleImageReaderListener();
+        CaptureRequest.Builder previewRequest =
+                mCamera.createCaptureRequest(CameraDevice.TEMPLATE_PREVIEW);
+        CaptureRequest.Builder stillRequest =
+                mCamera.createCaptureRequest(CameraDevice.TEMPLATE_STILL_CAPTURE);
+
+        // Set the max number of images to be same as the burst count, as the verification
+        // could be much slower than producing rate, and we don't want to starve producer.
+        prepareStillCaptureAndStartPreview(previewRequest, stillRequest, maxPreviewSz,
+                maxStillSz, resultListener, numSteps, imageListener);
+
+        // Wait for AE to be stabilized before capture: CONVERGED or FLASH_REQUIRED.
+        waitForAeStable(resultListener);
+
+        CaptureRequest[] requests = new CaptureRequest[numSteps];
+        for (int i = 0; i < numSteps; i++) {
+            stillRequest.set(CaptureRequest.CONTROL_AE_EXPOSURE_COMPENSATION,
+                    i + compensationRange[0]);
+            requests[i] = stillRequest.build();
+            mCamera.capture(requests[i], resultListener, mHandler);
+        }
+
+        // Verify capture result. Exposure values are not checked as they can not be
+        // accurately predicted if test fixture is not defined.
+        long currentExposureValue = 0;
+        long prevExposureValue = 0;
+        for (int i = 0; i < numSteps; i++) {
+            int aeCompensationValue = i + compensationRange[0];
+
+            if (VERBOSE) {
+                Log.v(TAG, "Verifying capture result for ae compensation value "
+                        + aeCompensationValue);
+            }
+
+            CaptureResult result = resultListener.getCaptureResultForRequest(requests[i],
+                    NUM_RESULTS_WAIT_TIMEOUT);
+
+            // TODO: enable below code once bug 14059883 is fixed.
+            /*
+            mCollector.expectEquals("Exposure compensation result should match requested value.",
+                    aeCompensationValue,
+                    result.get(CaptureResult.CONTROL_AE_EXPOSURE_COMPENSATION));
+            */
+
+            // Verify exposure value is increasing.
+            int expTimeUs = (int)(result.get(CaptureResult.SENSOR_EXPOSURE_TIME) / 1000);
+            int sensitivity = result.get(CaptureResult.SENSOR_SENSITIVITY);
+            currentExposureValue = expTimeUs * sensitivity;
+            mCollector.expectTrue(String.format("Exposure value should be increasing as AE"
+                    + " compensation (%d) is increasing.", aeCompensationValue),
+                    currentExposureValue > prevExposureValue);
+            prevExposureValue = currentExposureValue;
+
+            Image image = imageListener.getImage(CAPTURE_IMAGE_TIMEOUT_MS);
+            validateJpegCapture(image, maxStillSz);
+            image.close();
         }
     }
 

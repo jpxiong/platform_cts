@@ -41,6 +41,7 @@ import android.hardware.camera2.Size;
 import android.hardware.camera2.CameraDevice.CaptureListener;
 import android.hardware.camera2.cts.Camera2SurfaceViewStubActivity;
 import android.hardware.camera2.cts.CameraTestUtils;
+import android.hardware.camera2.cts.CameraTestUtils.SimpleCaptureListener;
 import android.hardware.camera2.cts.helpers.CameraErrorCollector;
 import android.hardware.camera2.cts.helpers.StaticMetadata;
 import android.hardware.camera2.cts.helpers.StaticMetadata.CheckLevel;
@@ -76,6 +77,7 @@ public class Camera2SurfaceViewTestCase extends
             Environment.getExternalStorageDirectory().getPath();
     protected static final int WAIT_FOR_RESULT_TIMEOUT_MS = 3000;
     protected static final float FRAME_DURATION_ERROR_MARGIN = 0.005f; // 0.5 percent error margin.
+    protected static final int NUM_RESULTS_WAIT_TIMEOUT = 100;
 
     protected Context mContext;
     protected CameraManager mCameraManager;
@@ -205,6 +207,9 @@ public class Camera2SurfaceViewTestCase extends
 
     /**
      * Setup still (JPEG) capture configuration and start preview.
+     * <p>
+     * The default max number of image is set to image reader.
+     * </p>
      *
      * @param previewRequest The capture request to be used for preview
      * @param stillRequest The capture request to be used for still capture
@@ -218,11 +223,34 @@ public class Camera2SurfaceViewTestCase extends
             CaptureListener resultListener,
             ImageReader.OnImageAvailableListener imageListener) throws Exception {
         prepareCaptureAndStartPreview(previewRequest, stillRequest, previewSz, stillSz,
-                ImageFormat.JPEG, resultListener, imageListener);
+                ImageFormat.JPEG, resultListener, MAX_READER_IMAGES, imageListener);
+    }
+
+    /**
+     * Setup still (JPEG) capture configuration and start preview.
+     *
+     * @param previewRequest The capture request to be used for preview
+     * @param stillRequest The capture request to be used for still capture
+     * @param previewSz Preview size
+     * @param stillSz The still capture size
+     * @param resultListener Capture result listener
+     * @param maxNumImages The max number of images set to the image reader
+     * @param imageListener The still capture image listener
+     */
+    protected void prepareStillCaptureAndStartPreview(CaptureRequest.Builder previewRequest,
+            CaptureRequest.Builder stillRequest, Size previewSz, Size stillSz,
+            CaptureListener resultListener, int maxNumImages,
+            ImageReader.OnImageAvailableListener imageListener) throws Exception {
+        prepareCaptureAndStartPreview(previewRequest, stillRequest, previewSz, stillSz,
+                ImageFormat.JPEG, resultListener, maxNumImages, imageListener);
     }
 
     /**
      * Setup raw capture configuration and start preview.
+     *
+     * <p>
+     * The default max number of image is set to image reader.
+     * </p>
      *
      * @param previewRequest The capture request to be used for preview
      * @param rawRequest The capture request to be used for raw capture
@@ -236,7 +264,7 @@ public class Camera2SurfaceViewTestCase extends
             CaptureListener resultListener,
             ImageReader.OnImageAvailableListener imageListener) throws Exception {
         prepareCaptureAndStartPreview(previewRequest, rawRequest, previewSz, rawSz,
-                ImageFormat.RAW_SENSOR, resultListener, imageListener);
+                ImageFormat.RAW_SENSOR, resultListener, MAX_READER_IMAGES, imageListener);
     }
 
     /**
@@ -254,11 +282,35 @@ public class Camera2SurfaceViewTestCase extends
      * seen before the result matching myRequest arrives, or each individual wait
      * for result times out after {@value #WAIT_FOR_RESULT_TIMEOUT_MS}ms.
      */
-    protected <T> void waitForResultValue(SimpleCaptureListener listener, Key<T> resultKey,
+    protected static <T> void waitForResultValue(SimpleCaptureListener listener, Key<T> resultKey,
             T expectedValue, int numResultsWait) {
-        if (numResultsWait < 0 || listener == null) {
+        List<T> expectedValues = new ArrayList<T>();
+        expectedValues.add(expectedValue);
+        waitForAnyResultValue(listener, resultKey, expectedValues, numResultsWait);
+    }
+
+    /**
+     * Wait for any expected result key values available in a certain number of results.
+     *
+     * <p>
+     * Check the result immediately if numFramesWait is 0.
+     * </p>
+     *
+     * @param listener The capture listener to get capture result.
+     * @param resultKey The capture result key associated with the result value.
+     * @param expectedValues The list of result value need to be waited for,
+     * return immediately if the list is empty.
+     * @param numResultsWait Number of frame to wait before times out.
+     * @throws TimeoutRuntimeException If more than numResultsWait results are.
+     * seen before the result matching myRequest arrives, or each individual wait
+     * for result times out after {@value #WAIT_FOR_RESULT_TIMEOUT_MS}ms.
+     */
+    protected static <T> void waitForAnyResultValue(SimpleCaptureListener listener, Key<T> resultKey,
+            List<T> expectedValues, int numResultsWait) {
+        if (numResultsWait < 0 || listener == null || expectedValues == null) {
             throw new IllegalArgumentException(
-                    "Input must be non-negative number and listener must be non-null");
+                    "Input must be non-negative number and listener/expectedValues "
+                    + "must be non-null");
         }
 
         int i = 0;
@@ -266,14 +318,29 @@ public class Camera2SurfaceViewTestCase extends
         do {
             result = listener.getCaptureResult(WAIT_FOR_RESULT_TIMEOUT_MS);
             T value = result.get(resultKey);
-            if (value.equals(expectedValue)) {
-                return;
+            for ( T expectedValue : expectedValues) {
+                if (value.equals(expectedValue)) {
+                    return;
+                }
             }
         } while (i++ < numResultsWait);
 
         throw new TimeoutRuntimeException(
-                "Unable to get the expected result value " + expectedValue + " for key " +
+                "Unable to get the expected result value " + expectedValues + " for key " +
                         resultKey.getName() + " after waiting for " + numResultsWait + " results");
+    }
+
+    /**
+     * Wait for AE to be stabilized before capture: CONVERGED or FLASH_REQUIRED.
+     *
+     * @param resultListener The capture listener to get capture result back.
+     */
+    protected static void waitForAeStable(SimpleCaptureListener resultListener) {
+        List<Integer> expectedAeStates = new ArrayList<Integer>();
+        expectedAeStates.add(new Integer(CaptureResult.CONTROL_AE_STATE_CONVERGED));
+        expectedAeStates.add(new Integer(CaptureResult.CONTROL_AE_STATE_FLASH_REQUIRED));
+        waitForAnyResultValue(resultListener, CaptureResult.CONTROL_AE_STATE, expectedAeStates,
+                NUM_RESULTS_WAIT_TIMEOUT);
     }
 
     /**
@@ -380,11 +447,12 @@ public class Camera2SurfaceViewTestCase extends
      * @param captureSz Still capture size
      * @param format The single capture image format
      * @param resultListener Capture result listener
+     * @param maxNumImages The max number of images set to the image reader
      * @param imageListener The single capture capture image listener
      */
     private void prepareCaptureAndStartPreview(CaptureRequest.Builder previewRequest,
             CaptureRequest.Builder stillRequest, Size previewSz, Size captureSz, int format,
-            CaptureListener resultListener,
+            CaptureListener resultListener, int maxNumImages,
             ImageReader.OnImageAvailableListener imageListener) throws Exception {
         if (VERBOSE) {
             Log.v(TAG, String.format("Prepare single capture (%s) and preview (%s)",
@@ -395,7 +463,7 @@ public class Camera2SurfaceViewTestCase extends
         updatePreviewSurface(previewSz);
 
         // Create ImageReader.
-        createImageReader(captureSz, format, MAX_READER_IMAGES, imageListener);
+        createImageReader(captureSz, format, maxNumImages, imageListener);
 
         // Configure output streams with preview and jpeg streams.
         List<Surface> outputSurfaces = new ArrayList<Surface>();
