@@ -26,6 +26,6 @@ LOCAL_C_INCLUDES += frameworks/rs/cpp
 LOCAL_C_INCLUDES += frameworks/rs
 LOCAL_C_INCLUDES += external/stlport/stlport bionic/ bionic/libstdc++/include
 
-LOCAL_SHARED_LIBRARIES := libdl liblog
-LOCAL_STATIC_LIBRARIES := libRScpp_static libstlport_static libcutils
+LOCAL_SHARED_LIBRARIES := libdl liblog libRScpp libstlport
+LOCAL_STATIC_LIBRARIES := libcutils
 include $(BUILD_SHARED_LIBRARY)
