@@ -19,10 +19,10 @@ package android.net.ipv6.cts;
 import android.test.AndroidTestCase;
 import android.util.Log;
 
-import libcore.io.ErrnoException;
-import libcore.io.Libcore;
-import libcore.io.StructTimeval;
-import static libcore.io.OsConstants.*;
+import android.system.ErrnoException;
+import android.system.Os;
+import android.system.StructTimeval;
+import static android.system.OsConstants.*;
 
 import java.io.FileDescriptor;
 import java.io.IOException;
@@ -84,8 +84,8 @@ public class PingTest extends AndroidTestCase {
      * Creates an IPv6 ping socket and sets a receive timeout of 100ms.
      */
     private FileDescriptor createPingSocket() throws ErrnoException {
-        FileDescriptor s = Libcore.os.socket(AF_INET6, SOCK_DGRAM, IPPROTO_ICMPV6);
-        Libcore.os.setsockoptTimeval(s, SOL_SOCKET, SO_RCVTIMEO, StructTimeval.fromMillis(100));
+        FileDescriptor s = Os.socket(AF_INET6, SOCK_DGRAM, IPPROTO_ICMPV6);
+        Os.setsockoptTimeval(s, SOL_SOCKET, SO_RCVTIMEO, StructTimeval.fromMillis(100));
         return s;
     }
 
@@ -98,7 +98,7 @@ public class PingTest extends AndroidTestCase {
         int port = (int) (Math.random() * 2048);
 
         // Send the packet.
-        int ret = Libcore.os.sendto(s, ByteBuffer.wrap(packet), 0, address, port);
+        int ret = Os.sendto(s, ByteBuffer.wrap(packet), 0, address, port);
         assertEquals(packet.length, ret);
     }
 
@@ -113,7 +113,7 @@ public class PingTest extends AndroidTestCase {
         // Receive the response.
         if (useRecvfrom) {
             InetSocketAddress from = new InetSocketAddress();
-            bytesRead = Libcore.os.recvfrom(s, responseBuffer, 0, from);
+            bytesRead = Os.recvfrom(s, responseBuffer, 0, from);
 
             // Check the source address and scope ID.
             assertTrue(from.getAddress() instanceof Inet6Address);
@@ -122,7 +122,7 @@ public class PingTest extends AndroidTestCase {
             assertNull(fromAddress.getScopedInterface());
             assertEquals(dest.getHostAddress(), fromAddress.getHostAddress());
         } else {
-            bytesRead = Libcore.os.read(s, responseBuffer);
+            bytesRead = Os.read(s, responseBuffer);
         }
 
         // Check the packet length.
@@ -134,7 +134,7 @@ public class PingTest extends AndroidTestCase {
         assertEquals((byte) 0x81, response[0]);
 
         // Find out what ICMP ID was used in the packet that was sent.
-        int id = ((InetSocketAddress) Libcore.os.getsockname(s)).getPort();
+        int id = ((InetSocketAddress) Os.getsockname(s)).getPort();
         sent[4] = (byte) (id / 256);
         sent[5] = (byte) (id % 256);
 
@@ -162,7 +162,7 @@ public class PingTest extends AndroidTestCase {
             sendPing(s, ipv6Loopback, packet);
             checkResponse(s, ipv6Loopback, packet, false);
             // Check closing the socket doesn't raise an exception.
-            Libcore.os.close(s);
+            Os.close(s);
         }
     }
 }
