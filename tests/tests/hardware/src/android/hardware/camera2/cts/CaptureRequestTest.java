@@ -59,7 +59,7 @@ public class CaptureRequestTest extends Camera2SurfaceViewTestCase {
     private static final int MIN_SHADING_MAP_SIZE = 1 * 1 * RGGB_COLOR_CHANNEL_COUNT;
     private static final long IGORE_REQUESTED_EXPOSURE_TIME_CHECK = -1L;
     private static final long EXPOSURE_TIME_BOUNDARY_50HZ_NS = 10000000L; // 10ms
-    private static final long EXPOSURE_TIME_BOUNDARY_60HZ_NS = 8300000L; // 8.3ms, Approximation.
+    private static final long EXPOSURE_TIME_BOUNDARY_60HZ_NS = 8333333L; // 8.3ms, Approximation.
     private static final long EXPOSURE_TIME_ERROR_MARGIN_NS = 100000L; // 100us, Approximation.
     private static final int SENSITIVITY_ERROR_MARGIN = 10; // 10
     private static final int DEFAULT_NUM_EXPOSURE_TIME_STEPS = 3;
@@ -68,6 +68,8 @@ public class CaptureRequestTest extends Camera2SurfaceViewTestCase {
     private static final int NUM_RESULTS_WAIT_TIMEOUT = 100;
     private static final int NUM_TEST_FOCUS_DISTANCES = 10;
     private static final float FOCUS_DISTANCE_ERROR_PERCENT = 0.05f; // 5 percent error margin
+    private static final int ANTI_FLICKERING_50HZ = 1;
+    private static final int ANTI_FLICKERING_60HZ = 2;
 
     // Linear tone mapping curve example.
     private static final float[] TONEMAP_CURVE_LINEAR = {0, 0, 1.0f, 1.0f};
@@ -223,15 +225,13 @@ public class CaptureRequestTest extends Camera2SurfaceViewTestCase {
                     continue;
                 }
 
-                SimpleCaptureListener listener = new SimpleCaptureListener();
-
                 byte[] modes = mStaticInfo.getAeAvailableAntiBandingModesChecked();
 
                 Size previewSz =
                         getMaxPreviewSize(mCamera.getId(), mCameraManager, PREVIEW_SIZE_BOUND);
 
                 for (byte mode : modes) {
-                    antiBandingTestByMode(listener, previewSz, mode);
+                    antiBandingTestByMode(previewSz, mode);
                 }
             } finally {
                 closeDevice();
@@ -698,6 +698,12 @@ public class CaptureRequestTest extends Camera2SurfaceViewTestCase {
 
     private void verifyAntiBandingMode(SimpleCaptureListener listener, int numFramesVerified,
             int mode, boolean isAeManual, long requestExpTime) throws Exception {
+        // Skip the first a couple of frames as antibanding may not be fully up yet.
+        final int NUM_FRAMES_SKIPPED = 5;
+        for (int i = 0; i < NUM_FRAMES_SKIPPED; i++) {
+            listener.getCaptureResult(WAIT_FOR_RESULT_TIMEOUT_MS);
+        }
+
         for (int i = 0; i < numFramesVerified; i++) {
             CaptureResult result = listener.getCaptureResult(WAIT_FOR_RESULT_TIMEOUT_MS);
             Long resultExpTime = result.get(CaptureRequest.SENSOR_EXPOSURE_TIME);
@@ -718,11 +724,11 @@ public class CaptureRequestTest extends Camera2SurfaceViewTestCase {
             if (mode == CONTROL_AE_ANTIBANDING_MODE_50HZ) {
                 // result exposure time must be adjusted by 50Hz illuminant source.
                 expectedExpTime =
-                        resultExpTime - (resultExpTime % EXPOSURE_TIME_BOUNDARY_50HZ_NS);
+                        getAntiFlickeringExposureTime(ANTI_FLICKERING_50HZ, resultExpTime);
             } else if (mode == CONTROL_AE_ANTIBANDING_MODE_60HZ) {
                 // result exposure time must be adjusted by 60Hz illuminant source.
                 expectedExpTime =
-                        resultExpTime - (resultExpTime % EXPOSURE_TIME_BOUNDARY_60HZ_NS);
+                        getAntiFlickeringExposureTime(ANTI_FLICKERING_60HZ, resultExpTime);
             } else if (mode == CONTROL_AE_ANTIBANDING_MODE_AUTO){
                 /**
                  * Use STATISTICS_SCENE_FLICKER to tell the illuminant source
@@ -730,11 +736,11 @@ public class CaptureRequestTest extends Camera2SurfaceViewTestCase {
                  */
                 expectedExpTime = resultExpTime;
                 if (flicker == STATISTICS_SCENE_FLICKER_60HZ) {
-                    expectedExpTime = resultExpTime
-                            - (resultExpTime % EXPOSURE_TIME_BOUNDARY_60HZ_NS);
+                    expectedExpTime =
+                            getAntiFlickeringExposureTime(ANTI_FLICKERING_60HZ, resultExpTime);
                 } else if (flicker == STATISTICS_SCENE_FLICKER_50HZ) {
-                    expectedExpTime = resultExpTime
-                            - (resultExpTime % EXPOSURE_TIME_BOUNDARY_50HZ_NS);
+                    expectedExpTime =
+                            getAntiFlickeringExposureTime(ANTI_FLICKERING_50HZ, resultExpTime);
                 }
             }
 
@@ -746,7 +752,7 @@ public class CaptureRequestTest extends Camera2SurfaceViewTestCase {
         }
     }
 
-    private void antiBandingTestByMode(SimpleCaptureListener listener, Size size, int mode)
+    private void antiBandingTestByMode(Size size, int mode)
             throws Exception {
         if(VERBOSE) {
             Log.v(TAG, "Anti-banding test for mode " + mode + " for camera " + mCamera.getId());
@@ -757,17 +763,20 @@ public class CaptureRequestTest extends Camera2SurfaceViewTestCase {
         requestBuilder.set(CaptureRequest.CONTROL_AE_ANTIBANDING_MODE, mode);
 
         // Test auto AE mode anti-banding behavior
-        startPreview(requestBuilder, size, listener);
-        verifyAntiBandingMode(listener, NUM_FRAMES_VERIFIED, mode, /*isAeManual*/false,
+        SimpleCaptureListener resultListener = new SimpleCaptureListener();
+        startPreview(requestBuilder, size, resultListener);
+        verifyAntiBandingMode(resultListener, NUM_FRAMES_VERIFIED, mode, /*isAeManual*/false,
                 IGORE_REQUESTED_EXPOSURE_TIME_CHECK);
 
         // Test manual AE mode anti-banding behavior
         // 65ms, must be supported by full capability devices.
         final long TEST_MANUAL_EXP_TIME_NS = 65000000L;
-        changeExposure(requestBuilder, TEST_MANUAL_EXP_TIME_NS);
-        startPreview(requestBuilder, size, listener);
-        verifyAntiBandingMode(listener, NUM_FRAMES_VERIFIED, mode, /*isAeManual*/true,
-                TEST_MANUAL_EXP_TIME_NS);
+        long manualExpTime = mStaticInfo.getExposureClampToRange(TEST_MANUAL_EXP_TIME_NS);
+        changeExposure(requestBuilder, manualExpTime);
+        resultListener = new SimpleCaptureListener();
+        startPreview(requestBuilder, size, resultListener);
+        verifyAntiBandingMode(resultListener, NUM_FRAMES_VERIFIED, mode, /*isAeManual*/true,
+                manualExpTime);
 
         stopPreview();
     }
@@ -1447,5 +1456,40 @@ public class CaptureRequestTest extends Camera2SurfaceViewTestCase {
         }
 
         mCamera.stopRepeating();
+    }
+
+    /**
+     * Calculate the anti-flickering corrected exposure time.
+     * <p>
+     * If the input exposure time is very short (shorter than flickering
+     * boundary), which indicate the scene is bright and very likely at outdoor
+     * environment, skip the correction, as it doesn't make much sense by doing so.
+     * </p>
+     * <p>
+     * For long exposure time (larger than the flickering boundary), find the
+     * exposure time that is closest to the flickering boundary.
+     * </p>
+     *
+     * @param flickeringMode The flickering mode
+     * @param exposureTime The input exposureTime to be corrected
+     * @return anti-flickering corrected exposure time
+     */
+    private long getAntiFlickeringExposureTime(int flickeringMode, long exposureTime) {
+        if (flickeringMode != ANTI_FLICKERING_50HZ && flickeringMode != ANTI_FLICKERING_60HZ) {
+            throw new IllegalArgumentException("Input anti-flickering mode must be 50 or 60Hz");
+        }
+        long flickeringBoundary = EXPOSURE_TIME_BOUNDARY_50HZ_NS;
+        if (flickeringMode == ANTI_FLICKERING_60HZ) {
+            flickeringBoundary = EXPOSURE_TIME_BOUNDARY_60HZ_NS;
+        }
+
+        if (exposureTime <= flickeringBoundary) {
+            return exposureTime;
+        }
+
+        // Find the closest anti-flickering corrected exposure time
+        long correctedExpTime = exposureTime + (flickeringBoundary / 2);
+        correctedExpTime = correctedExpTime - (correctedExpTime % flickeringBoundary);
+        return correctedExpTime;
     }
 }
