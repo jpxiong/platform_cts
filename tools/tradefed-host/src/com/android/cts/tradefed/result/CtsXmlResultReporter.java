@@ -17,6 +17,7 @@
 package com.android.cts.tradefed.result;
 
 import com.android.cts.tradefed.build.CtsBuildHelper;
+import com.android.cts.tradefed.device.DeviceInfoCollector;
 import com.android.cts.tradefed.testtype.CtsTest;
 import com.android.cts.tradefed.util.CtsHostStore;
 import com.android.ddmlib.Log;
@@ -223,6 +224,7 @@ public class CtsXmlResultReporter implements ITestInvocationListener {
     @Override
     public void testRunStarted(String name, int numTests) {
         mCurrentPkgResult = mResults.getOrCreatePackage(name);
+        mIsDeviceInfoRun = name.equals(DeviceInfoCollector.APP_PACKAGE_NAME);
     }
 
     /**
