@@ -29,6 +29,8 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.Scanner;
 import java.util.Set;
 
@@ -271,6 +273,19 @@ public class SELinuxDomainTest extends TestCase {
             return vSize == 0;
         }
 
+        private static long getVsizeFromStat(String stat) {
+            // Get the vSize, item #23 from the stat file
+            //                   1        2             3   4    5    6    7      8    9   10   11
+            String pattern = "^\\d+ \\(\\p{Print}*\\) \\w \\d+ \\d+ \\d+ \\d+ -?\\d+ \\d+ \\d+ \\d+ "
+                //  12   13   14   15   16   17     18     19   20   21   22    23
+                + "\\d+ \\d+ \\d+ \\d+ \\d+ \\d+ -?\\d+ -?\\d+ \\d+ \\d+ \\d+ (\\d+) .*$";
+
+            Pattern p = Pattern.compile(pattern);
+            Matcher m = p.matcher(stat);
+            assertTrue("failed match: \"" + stat + "\"", m.matches());
+            return Long.parseLong(m.group(1));
+        }
+
         private static HashMap<String, ArrayList<ProcessDetails>> getProcessMap()
                 throws FileNotFoundException {
 
@@ -299,10 +314,9 @@ public class SELinuxDomainTest extends TestCase {
                 String context = new Scanner(new File(f, "attr/current")).next();
                 context = context.trim();
 
-                // Get the vSize, index 22 from the stat file
+                // Get the vSize, item #23 from the stat file
                 String x = new Scanner(new File(f, "stat")).nextLine();
-                String[] chunks = x.split("\\s+");
-                long vSize = Long.parseLong(chunks[22]);
+                long vSize = getVsizeFromStat(x);
 
                 StringBuilder sb = new StringBuilder();
                 Scanner tmp = new Scanner(new File(f, "cmdline"));
