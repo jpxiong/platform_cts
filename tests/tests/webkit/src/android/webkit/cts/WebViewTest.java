@@ -87,6 +87,7 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.FutureTask;
 import java.util.concurrent.TimeUnit;
 import java.util.HashMap;
+import java.util.Map;
 
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
@@ -444,6 +445,28 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
 
         Header header = matchingHeaders[0];
         assertEquals(requester, header.getValue());
+    }
+
+    public void testCanInjectHeaders() throws Exception {
+        final String X_FOO = "X-foo";
+        final String X_FOO_VALUE = "test";
+
+        final String X_REFERER = "Referer";
+        final String X_REFERER_VALUE = "http://www.example.com/";
+        startWebServer(false);
+        String url = mWebServer.getAssetUrl(TestHtmlConstants.HELLO_WORLD_URL);
+        HashMap<String, String> map = new HashMap<String, String>();
+        map.put(X_FOO, X_FOO_VALUE);
+        map.put(X_REFERER, X_REFERER_VALUE);
+        mOnUiThread.loadUrlAndWaitForCompletion(url, map);
+
+        HttpRequest request = mWebServer.getLastRequest(TestHtmlConstants.HELLO_WORLD_URL);
+        for (Map.Entry<String,String> value : map.entrySet()) {
+            String header = value.getKey();
+            Header[] matchingHeaders = request.getHeaders(header);
+            assertEquals("header " + header + " not found", 1, matchingHeaders.length);
+            assertEquals(value.getValue(), matchingHeaders[0].getValue());
+        }
     }
 
     @SuppressWarnings("deprecation")
