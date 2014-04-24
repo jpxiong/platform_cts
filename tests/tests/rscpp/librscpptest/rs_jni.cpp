@@ -372,53 +372,6 @@ Java_android_cts_rscpp_RSBlendTest_blendTest(JNIEnv * env, jclass obj, jstring p
 }
 
 extern "C" JNIEXPORT jboolean JNICALL
-Java_android_cts_rscpp_RSInterPredTest_interpredTest(JNIEnv * env,
-                                                     jclass obj,
-                                                     jstring pathObj,
-                                                     jbyteArray jRef,
-                                                     jintArray jParam,
-                                                     jint jFirCount,
-                                                     jint jSecCount,
-                                                     jint jParamOffset)
-{
-    const char * path = env->GetStringUTFChars(pathObj, NULL);
-    jint * pParam = env->GetIntArrayElements(jParam, NULL);
-    jbyte * pRef = (jbyte *) env->GetPrimitiveArrayCritical(jRef, 0);
-
-    sp<RS> rs = new RS();
-    rs->init(path);
-
-    sp<const Element> e = Element::U8(rs);
-    Type::Builder builder(rs, e);
-
-    size_t frame_size = env->GetArrayLength(jRef);
-    uint8_t * frame_buffer_ptr = (uint8_t *) aligned_alloc(128, frame_size);
-    memcpy(frame_buffer_ptr, pRef, frame_size);
-
-    sp<Allocation> refAlloc = Allocation::createTyped(rs, builder.create(), RS_ALLOCATION_MIPMAP_NONE,
-                                                      RS_ALLOCATION_USAGE_SHARED | RS_ALLOCATION_USAGE_SCRIPT,
-                                                      frame_buffer_ptr);
-    sp<Allocation> paramAlloc = Allocation::createTyped(rs, builder.create(), RS_ALLOCATION_MIPMAP_NONE,
-                                                        RS_ALLOCATION_USAGE_SHARED | RS_ALLOCATION_USAGE_SCRIPT,
-                                                        pParam);
-    sp<Allocation> kernelAllocation = Allocation::createTyped(rs, builder.create());
-
-    sp<android::RSC::ScriptIntrinsicVP9InterPred> interPred = ScriptIntrinsicVP9InterPred::create(rs, e);
-    interPred->setRef(refAlloc);
-    interPred->setParamCount(jFirCount, jSecCount, jParamOffset * 11 * 4);
-    interPred->setParam(paramAlloc);
-    interPred->forEach(kernelAllocation);
-    rs->finish();
-
-    memcpy(pRef, frame_buffer_ptr, frame_size);
-    aligned_free(frame_buffer_ptr);
-    env->ReleasePrimitiveArrayCritical(jRef, pRef, 0);
-    env->ReleaseIntArrayElements(jParam, pParam, JNI_ABORT);
-    env->ReleaseStringUTFChars(pathObj, path);
-    return (rs->getError() == RS_SUCCESS);
-}
-
-extern "C" JNIEXPORT jboolean JNICALL
 Java_android_cts_rscpp_RSLoopFilterTest_loopfilterTest(JNIEnv * env, jclass obj, jstring pathObj,
                                                        jint start, jint stop, jint num_planes,
                                                        jint mi_rows, jint mi_cols,
@@ -493,3 +446,4 @@ Java_android_cts_rscpp_RSLoopFilterTest_loopfilterTest(JNIEnv * env, jclass obj,
     env->ReleaseStringUTFChars(pathObj, path);
     return (rs->getError() == RS_SUCCESS);
 }
+
