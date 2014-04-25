@@ -3574,6 +3574,33 @@ public class ViewTest extends ActivityInstrumentationTestCase2<ViewTestStubActiv
             View source, int changeType) {
 
         }
+
+        @Override
+        public boolean onStartNestedScroll(View child, View target, int nestedScrollAxes) {
+            return false;
+        }
+
+        @Override
+        public void onNestedScrollAccepted(View child, View target, int nestedScrollAxes) {
+        }
+
+        @Override
+        public void onStopNestedScroll(View target) {
+        }
+
+        @Override
+        public void onNestedScroll(View target, int dxConsumed, int dyConsumed,
+                                   int dxUnconsumed, int dyUnconsumed) {
+        }
+
+        @Override
+        public void onNestedPreScroll(View target, int dx, int dy, int[] consumed) {
+        }
+
+        @Override
+        public boolean onNestedFling(View target, float velocityX, float velocityY) {
+            return false;
+        }
     }
 
     private final class OnCreateContextMenuListenerImpl implements OnCreateContextMenuListener {
