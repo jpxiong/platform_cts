@@ -88,6 +88,7 @@ public class SmsManagerTest extends AndroidTestCase {
                     "302370",   // Fido
                     "30237",    // Fido
                     "311490",   // Virgin Mobile
+                    "312530",   // Sprint Prepaid
                     "310000",   // Tracfone
                     "46003",    // China Telecom
                     "311230",   // C SPire Wireless + Celluar South
