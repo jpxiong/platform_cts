@@ -409,6 +409,45 @@ public class CaptureRequestTest extends Camera2SurfaceViewTestCase {
         }
     }
 
+    /**
+     * Test AWB lock control. The color correction gain and transform shouldn't be changed
+     * when AWB is locked.
+     */
+    public void testAwbModeAndLock() throws Exception {
+        for (String id : mCameraIds) {
+            try {
+                openDevice(id);
+                if (!mStaticInfo.isPerFrameControlSupported()) {
+                    Log.i(TAG, "Camera " + id + "Doesn't support per frame control");
+                    continue;
+                }
+
+                awbModeAndLockTestByCamera();
+            } finally {
+                closeDevice();
+            }
+        }
+    }
+
+    /**
+     * Test different AF modes.
+     */
+    public void testAfModes() throws Exception {
+        for (String id : mCameraIds) {
+            try {
+                openDevice(id);
+                if (!mStaticInfo.isPerFrameControlSupported()) {
+                    Log.i(TAG, "Camera " + id + "Doesn't support per frame control");
+                    continue;
+                }
+
+                afModeTestByCamera();
+            } finally {
+                closeDevice();
+            }
+        }
+    }
+
     // TODO: add 3A state machine test.
 
     private void noiseReductionModeTestByCamera() throws Exception {
@@ -1221,6 +1260,100 @@ public class CaptureRequestTest extends Camera2SurfaceViewTestCase {
         }
     }
 
+    /**
+     * Test awb mode control.
+     * <p>
+     * Test each supported AWB mode, verify the AWB mode in capture result
+     * matches request. When AWB is locked, the color correction gains and
+     * transform should remain unchanged.
+     * </p>
+     */
+    private void awbModeAndLockTestByCamera() throws Exception {
+        byte[] awbModes = mStaticInfo.getAwbAvailableModesChecked();
+        Size maxPreviewSize = mOrderedPreviewSizes.get(0);
+        CaptureRequest.Builder requestBuilder =
+                mCamera.createCaptureRequest(CameraDevice.TEMPLATE_PREVIEW);
+        startPreview(requestBuilder, maxPreviewSize, /*listener*/null);
+
+        for (byte mode : awbModes) {
+            SimpleCaptureListener listener;
+            requestBuilder.set(CaptureRequest.CONTROL_AWB_MODE, (int)mode);
+            listener = new SimpleCaptureListener();
+            mCamera.setRepeatingRequest(requestBuilder.build(), listener, mHandler);
+
+            // Verify AWB mode in capture result.
+            verifyCaptureResultForKey(CaptureResult.CONTROL_AWB_MODE, (int)mode, listener,
+                    NUM_FRAMES_VERIFIED);
+
+            // Verify color correction transform and gains stay unchanged after a lock.
+            requestBuilder.set(CaptureRequest.CONTROL_AWB_LOCK, true);
+            listener = new SimpleCaptureListener();
+            mCamera.setRepeatingRequest(requestBuilder.build(), listener, mHandler);
+            waitForResultValue(listener, CaptureResult.CONTROL_AWB_STATE,
+                    CaptureResult.CONTROL_AWB_STATE_LOCKED, NUM_RESULTS_WAIT_TIMEOUT);
+            verifyAwbCaptureResultUnchanged(listener, NUM_FRAMES_VERIFIED);
+        }
+    }
+
+    private void verifyAwbCaptureResultUnchanged(SimpleCaptureListener listener,
+            int numFramesVerified) {
+        CaptureResult result = listener.getCaptureResult(WAIT_FOR_RESULT_TIMEOUT_MS);
+        float[] lockedGains = getValueNotNull(result, CaptureResult.COLOR_CORRECTION_GAINS);
+        Rational[] lockedTransform =
+                getValueNotNull(result, CaptureResult.COLOR_CORRECTION_TRANSFORM);
+
+        for (int i = 0; i < numFramesVerified; i++) {
+            result = listener.getCaptureResult(WAIT_FOR_RESULT_TIMEOUT_MS);
+            validateColorCorrectionResult(result);
+
+            float[] gains = getValueNotNull(result, CaptureResult.COLOR_CORRECTION_GAINS);
+            Rational[] transform =
+                    getValueNotNull(result, CaptureResult.COLOR_CORRECTION_TRANSFORM);
+            mCollector.expectEquals("Color correction gains should remain unchanged after awb lock",
+                    toObject(lockedGains), toObject(gains));
+            mCollector.expectEquals("Color correction transform should remain unchanged after"
+                    + " awb lock", lockedTransform, transform);
+        }
+    }
+
+    /**
+     * Test AF mode control.
+     * <p>
+     * Test all supported AF modes, verify the AF mode in capture result matches
+     * request. When AF mode is one of the CONTROL_AF_MODE_CONTINUOUS_* mode,
+     * verify if the AF can converge to PASSIVE_FOCUSED or PASSIVE_UNFOCUSED
+     * state within certain amount of frames.
+     * </p>
+     */
+    private void afModeTestByCamera() throws Exception {
+        byte[] afModes = mStaticInfo.getAfAvailableModesChecked();
+        Size maxPreviewSize = mOrderedPreviewSizes.get(0);
+        CaptureRequest.Builder requestBuilder =
+                mCamera.createCaptureRequest(CameraDevice.TEMPLATE_PREVIEW);
+        startPreview(requestBuilder, maxPreviewSize, /*listener*/null);
+
+        for (byte mode : afModes) {
+            SimpleCaptureListener listener;
+            requestBuilder.set(CaptureRequest.CONTROL_AF_MODE, (int)mode);
+            listener = new SimpleCaptureListener();
+            mCamera.setRepeatingRequest(requestBuilder.build(), listener, mHandler);
+
+            // Verify AF mode in capture result.
+            verifyCaptureResultForKey(CaptureResult.CONTROL_AF_MODE, (int)mode, listener,
+                    NUM_FRAMES_VERIFIED);
+
+            // Verify AF can finish a scan for CONTROL_AF_MODE_CONTINUOUS_* modes
+            if ((int)mode == CaptureRequest.CONTROL_AF_MODE_CONTINUOUS_PICTURE ||
+                    (int)mode == CaptureRequest.CONTROL_AF_MODE_CONTINUOUS_VIDEO) {
+                List<Integer> afStateList = new ArrayList<Integer>();
+                afStateList.add(CaptureResult.CONTROL_AF_STATE_PASSIVE_FOCUSED);
+                afStateList.add(CaptureResult.CONTROL_AF_STATE_PASSIVE_UNFOCUSED);
+                waitForAnyResultValue(listener, CaptureResult.CONTROL_AF_STATE, afStateList,
+                        NUM_RESULTS_WAIT_TIMEOUT);
+            }
+        }
+    }
+
     //----------------------------------------------------------------
     //---------Below are common functions for all tests.--------------
     //----------------------------------------------------------------
@@ -1394,6 +1527,10 @@ public class CaptureRequestTest extends Camera2SurfaceViewTestCase {
         for (int i = 0; i < numFramesVerified; i++) {
             CaptureResult result = listener.getCaptureResult(WAIT_FOR_RESULT_TIMEOUT_MS);
             T resultMode = getValueNotNull(result, key);
+            if (VERBOSE) {
+                Log.v(TAG, "Expect value: " + requestMode.toString() + " result value: "
+                        + resultMode.toString());
+            }
             mCollector.expectEquals("Key " + key.getName() + " result should match request",
                     requestMode, resultMode);
         }

@@ -140,7 +140,7 @@ public class StillCaptureTest extends Camera2SurfaceViewTestCase {
                 Log.i(TAG, "Testing touch for focus for Camera " + id);
                 openDevice(id);
 
-                takePictureTestByCamera();
+                takePictureTestByCamera(/*aeRegions*/null, /*awbRegions*/null, /*afRegions*/null);
             } finally {
                 closeDevice();
                 closeImageReader();
@@ -236,11 +236,101 @@ public class StillCaptureTest extends Camera2SurfaceViewTestCase {
         }
     }
 
-    private void takePictureTestByCamera() throws Exception {
+    /**
+     * Test Ae region for still capture.
+     */
+    public void testAeRegions() throws Exception {
+        for (String id : mCameraIds) {
+            try {
+                Log.i(TAG, "Testing AE regions for Camera " + id);
+                openDevice(id);
+
+                boolean aeRegionsSupported = isRegionsSupportedFor3A(MAX_REGIONS_AE_INDEX);
+                if (!mStaticInfo.isPerFrameControlSupported() || !aeRegionsSupported) {
+                    continue;
+                }
+
+                int[][] aeRegions = get3ATestRegionsForCamera();
+                for (int i = 0; i < aeRegions.length; i++) {
+                    takePictureTestByCamera(aeRegions[i], /*awbRegions*/null, /*afRegions*/null);
+                }
+            } finally {
+                closeDevice();
+                closeImageReader();
+            }
+        }
+    }
+
+    /**
+     * Test AWB region for still capture.
+     */
+    public void testAwbRegions() throws Exception {
+        for (String id : mCameraIds) {
+            try {
+                Log.i(TAG, "Testing AE regions for Camera " + id);
+                openDevice(id);
+
+                boolean awbRegionsSupported = isRegionsSupportedFor3A(MAX_REGIONS_AWB_INDEX);
+                if (!mStaticInfo.isPerFrameControlSupported() || !awbRegionsSupported) {
+                    continue;
+                }
+
+                int[][] awbRegions = get3ATestRegionsForCamera();
+                for (int i = 0; i < awbRegions.length; i++) {
+                    takePictureTestByCamera(/*aeRegions*/null, awbRegions[i], /*afRegions*/null);
+                }
+            } finally {
+                closeDevice();
+                closeImageReader();
+            }
+        }
+    }
+
+    /**
+     * Test Af region for still capture.
+     */
+    public void testAfRegions() throws Exception {
+        for (String id : mCameraIds) {
+            try {
+                Log.i(TAG, "Testing AE regions for Camera " + id);
+                openDevice(id);
+
+                boolean afRegionsSupported = isRegionsSupportedFor3A(MAX_REGIONS_AF_INDEX);
+                if (!mStaticInfo.isPerFrameControlSupported() || !afRegionsSupported) {
+                    continue;
+                }
+
+                int[][] afRegions = get3ATestRegionsForCamera();
+                for (int i = 0; i < afRegions.length; i++) {
+                    takePictureTestByCamera(/*aeRegions*/null, /*awbRegions*/null, afRegions[i]);
+                }
+            } finally {
+                closeDevice();
+                closeImageReader();
+            }
+        }
+    }
+
+    /**
+     * Take a picture for a given set of 3A regions for a particular camera.
+     * <p>
+     * Before take a still capture, it triggers an auto focus and lock it first,
+     * then wait for AWB to converge and lock it, then trigger a precapture
+     * metering sequence and wait for AE converged. After capture is received, the
+     * capture result and image are validated.
+     * </p>
+     *
+     * @param aeRegions AE regions for this capture
+     * @param awbRegions AWB regions for this capture
+     * @param afRegions AF regions for this capture
+     */
+    private void takePictureTestByCamera(int[] aeRegions, int[] awbRegions, int[] afRegions)
+            throws Exception {
         boolean hasFocuser = mStaticInfo.hasFocuser();
 
         Size maxStillSz = mOrderedStillSizes.get(0);
         Size maxPreviewSz = mOrderedPreviewSizes.get(0);
+        CaptureResult result;
         SimpleCaptureListener resultListener = new SimpleCaptureListener();
         SimpleImageReaderListener imageListener = new SimpleImageReaderListener();
         CaptureRequest.Builder previewRequest =
@@ -250,26 +340,128 @@ public class StillCaptureTest extends Camera2SurfaceViewTestCase {
         prepareStillCaptureAndStartPreview(previewRequest, stillRequest, maxPreviewSz,
                 maxStillSz, resultListener, imageListener);
 
+        // Set AE mode to ON_AUTO_FLASH if flash is available.
+        if (mStaticInfo.hasFlash()) {
+            previewRequest.set(CaptureRequest.CONTROL_AE_MODE,
+                    CaptureRequest.CONTROL_AE_MODE_ON_AUTO_FLASH);
+            stillRequest.set(CaptureRequest.CONTROL_AE_MODE,
+                    CaptureRequest.CONTROL_AE_MODE_ON_AUTO_FLASH);
+        }
+
         Camera2Focuser focuser = null;
+        /**
+         * Step 1: trigger an auto focus run, and wait for AF locked.
+         */
+        boolean canSetAfRegion = hasFocuser && (afRegions != null) &&
+                isRegionsSupportedFor3A(MAX_REGIONS_AF_INDEX);
         if (hasFocuser) {
             SimpleAutoFocusListener afListener = new SimpleAutoFocusListener();
             focuser = new Camera2Focuser(mCamera, mPreviewSurface, afListener,
                     mStaticInfo.getCharacteristics(), mHandler);
-
-            // Auto focus.
-            focuser.startAutoFocus(/*afRegions*/null);
+            if (canSetAfRegion) {
+                stillRequest.set(CaptureRequest.CONTROL_AF_REGIONS, afRegions);
+            }
+            focuser.startAutoFocus(afRegions);
             afListener.waitForAutoFocusDone(WAIT_FOR_FOCUS_DONE_TIMEOUT_MS);
         }
 
-        // TODO: Add AE precapture metering sequence here.
-
-        mCamera.capture(stillRequest.build(), /*listener*/null, /*handler*/null);
+        /**
+         * Have to get the current AF mode to be used for other 3A repeating
+         * request, otherwise, the new AF mode in AE/AWB request could be
+         * different with existing repeating requests being sent by focuser,
+         * then it could make AF unlocked too early. Beside that, for still
+         * capture, AF mode must not be different with the one in current
+         * repeating request, otherwise, the still capture itself would trigger
+         * an AF mode change, and the AF lock would be lost for this capture.
+         */
+        int currentAfMode = CaptureRequest.CONTROL_AF_MODE_OFF;
         if (hasFocuser) {
+            currentAfMode = focuser.getCurrentAfMode();
+        }
+        previewRequest.set(CaptureRequest.CONTROL_AF_MODE, currentAfMode);
+        stillRequest.set(CaptureRequest.CONTROL_AF_MODE, currentAfMode);
+
+        /**
+         * Step 2: AF is already locked, wait for AWB converged, then lock it.
+         */
+        resultListener = new SimpleCaptureListener();
+        boolean canSetAwbRegion =
+                (awbRegions != null) && isRegionsSupportedFor3A(MAX_REGIONS_AWB_INDEX);
+        if (canSetAwbRegion) {
+            previewRequest.set(CaptureRequest.CONTROL_AWB_REGIONS, awbRegions);
+            stillRequest.set(CaptureRequest.CONTROL_AWB_REGIONS, awbRegions);
+        }
+        mCamera.setRepeatingRequest(previewRequest.build(), resultListener, mHandler);
+        waitForResultValue(resultListener, CaptureResult.CONTROL_AWB_STATE,
+                CaptureResult.CONTROL_AWB_STATE_CONVERGED, NUM_RESULTS_WAIT_TIMEOUT);
+        previewRequest.set(CaptureRequest.CONTROL_AWB_LOCK, true);
+        mCamera.setRepeatingRequest(previewRequest.build(), resultListener, mHandler);
+        // Validate the next result immediately for region and mode.
+        result = resultListener.getCaptureResult(WAIT_FOR_RESULT_TIMEOUT_MS);
+        mCollector.expectEquals("AWB mode in result and request should be same",
+                previewRequest.get(CaptureRequest.CONTROL_AWB_MODE),
+                result.get(CaptureResult.CONTROL_AWB_MODE));
+        if (canSetAwbRegion) {
+            int[] resultAwbRegions = getValueNotNull(result, CaptureRequest.CONTROL_AWB_REGIONS);
+            mCollector.expectEquals("AWB regions in result and request should be same",
+                    toObject(awbRegions),
+                    toObject(resultAwbRegions));
+        }
+
+        /**
+         * Step 3: trigger an AE precapture metering sequence and wait for AE converged.
+         */
+        resultListener = new SimpleCaptureListener();
+        boolean canSetAeRegion =
+                (aeRegions != null) && isRegionsSupportedFor3A(MAX_REGIONS_AE_INDEX);
+        if (canSetAeRegion) {
+            previewRequest.set(CaptureRequest.CONTROL_AE_REGIONS, awbRegions);
+            stillRequest.set(CaptureRequest.CONTROL_AE_REGIONS, awbRegions);
+        }
+        mCamera.setRepeatingRequest(previewRequest.build(), resultListener, mHandler);
+        previewRequest.set(CaptureRequest.CONTROL_AE_PRECAPTURE_TRIGGER,
+                CaptureRequest.CONTROL_AE_PRECAPTURE_TRIGGER_START);
+        mCamera.capture(previewRequest.build(), resultListener, mHandler);
+        waitForAeStable(resultListener);
+        // Validate the next result immediately for region and mode.
+        result = resultListener.getCaptureResult(WAIT_FOR_RESULT_TIMEOUT_MS);
+        mCollector.expectEquals("AE mode in result and request should be same",
+                previewRequest.get(CaptureRequest.CONTROL_AE_MODE),
+                result.get(CaptureResult.CONTROL_AE_MODE));
+        if (canSetAeRegion) {
+            int[] resultAeRegions = getValueNotNull(result, CaptureRequest.CONTROL_AE_REGIONS);
+            mCollector.expectEquals("AE regions in result and request should be same",
+                    toObject(aeRegions),
+                    toObject(resultAeRegions));
+        }
+
+        /**
+         * Step 4: take a picture when all 3A are in good state.
+         */
+        resultListener = new SimpleCaptureListener();
+        CaptureRequest request = stillRequest.build();
+        mCamera.capture(request, resultListener, mHandler);
+        // Validate the next result immediately for region and mode.
+        result = resultListener.getCaptureResultForRequest(request, WAIT_FOR_RESULT_TIMEOUT_MS);
+        mCollector.expectEquals("AF mode in result and request should be same",
+                stillRequest.get(CaptureRequest.CONTROL_AF_MODE),
+                result.get(CaptureResult.CONTROL_AF_MODE));
+        if (canSetAfRegion) {
+            int[] resultAfRegions = getValueNotNull(result, CaptureRequest.CONTROL_AF_REGIONS);
+            mCollector.expectEquals("AF regions in result and request should be same",
+                    toObject(afRegions),
+                    toObject(resultAfRegions));
+        }
+
+        if (hasFocuser) {
+            // Unlock auto focus.
             focuser.cancelAutoFocus();
         }
 
+        // validate image
         Image image = imageListener.getImage(CAPTURE_IMAGE_TIMEOUT_MS);
         validateJpegCapture(image, maxStillSz);
+
         // stopPreview must be called here to make sure next time a preview stream
         // is created with new size.
         stopPreview();
@@ -966,5 +1158,17 @@ public class StillCaptureTest extends Camera2SurfaceViewTestCase {
         }
 
         return regions;
+    }
+
+    private boolean isRegionsSupportedFor3A(int index) {
+        boolean isRegionsSupported = mStaticInfo.get3aMaxRegionsChecked()[index] > 0;
+        if (index == MAX_REGIONS_AF_INDEX && isRegionsSupported) {
+            mCollector.expectTrue(
+                    "Device reports non-zero max AF region count for a camera without focuser!",
+                    mStaticInfo.hasFocuser());
+            isRegionsSupported = isRegionsSupported && mStaticInfo.hasFocuser();
+        }
+
+        return isRegionsSupported;
     }
 }

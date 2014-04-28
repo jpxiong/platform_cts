@@ -236,6 +236,14 @@ public class StaticMetadata {
     }
 
     /**
+     * Check if the camera device has flash unit.
+     * @return true if flash unit is available, false otherwise.
+     */
+    public boolean hasFlash() {
+        return getFlashInfoChecked();
+    }
+
+    /**
      * Get minimum focus distance.
      *
      * @return minimum focus distance, 0 if minimum focus distance is invalid.
@@ -771,6 +779,58 @@ public class StaticMetadata {
     }
 
     /**
+     * Get available AWB modes and do the sanity check.
+     *
+     * @return array that contains available AWB modes, empty array if awbAvailableModes is
+     * unavailable.
+     */
+    public byte[] getAwbAvailableModesChecked() {
+        CameraMetadata.Key<byte[]> key =
+                CameraCharacteristics.CONTROL_AWB_AVAILABLE_MODES;
+        byte[] awbModes = getValueFromKeyNonNull(key);
+
+        if (awbModes == null) {
+            return new byte[0];
+        }
+
+        List<Byte> modesList = Arrays.asList(CameraTestUtils.toObject(awbModes));
+        checkTrueForKey(key, " All camera devices must support AUTO mode",
+                modesList.contains((byte)CameraMetadata.CONTROL_AWB_MODE_AUTO));
+        if (isHardwareLevelFull()) {
+            checkTrueForKey(key, " Full capability camera devices must support OFF mode",
+                    modesList.contains((byte)CameraMetadata.CONTROL_AWB_MODE_OFF));
+        }
+
+        return awbModes;
+    }
+
+    /**
+     * Get available AF modes and do the sanity check.
+     *
+     * @return array that contains available AF modes, empty array if afAvailableModes is
+     * unavailable.
+     */
+    public byte[] getAfAvailableModesChecked() {
+        CameraMetadata.Key<byte[]> key =
+                CameraCharacteristics.CONTROL_AF_AVAILABLE_MODES;
+        byte[] afModes = getValueFromKeyNonNull(key);
+
+        if (afModes == null) {
+            return new byte[0];
+        }
+
+        List<Byte> modesList = Arrays.asList(CameraTestUtils.toObject(afModes));
+        checkTrueForKey(key, " All camera devices must support OFF mode",
+                modesList.contains((byte)CameraMetadata.CONTROL_AF_MODE_OFF));
+        if (hasFocuser()) {
+            checkTrueForKey(key, " Camera devices that have focuser units must support AUTO mode",
+                    modesList.contains((byte)CameraMetadata.CONTROL_AF_MODE_AUTO));
+        }
+
+        return afModes;
+    }
+
+    /**
      * Get supported raw output sizes and do the check.
      *
      * @return Empty size array if raw output is not supported
@@ -999,6 +1059,7 @@ public class StaticMetadata {
 
         return compensationRange;
     }
+
     /**
      * Get the value in index for a fixed-size array from a given key.
      *

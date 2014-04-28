@@ -319,6 +319,10 @@ public class Camera2SurfaceViewTestCase extends
             result = listener.getCaptureResult(WAIT_FOR_RESULT_TIMEOUT_MS);
             T value = result.get(resultKey);
             for ( T expectedValue : expectedValues) {
+                if (VERBOSE) {
+                    Log.v(TAG, "Current result value for key " + resultKey.getName() + " is: "
+                            + value.toString());
+                }
                 if (value.equals(expectedValue)) {
                     return;
                 }

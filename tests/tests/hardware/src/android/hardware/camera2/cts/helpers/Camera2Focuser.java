@@ -56,6 +56,7 @@ public class Camera2Focuser implements AutoFocusStateListener {
     private int[] mAfRegions; // int x AF_REGION_NUM_ELEMENTS array.
     private boolean mLocked = false;
     private boolean mSuccess = false;
+    private CaptureRequest.Builder mRepeatingBuilder;
 
     /**
      * The callback interface to notify auto focus result.
@@ -198,22 +199,34 @@ public class Camera2Focuser implements AutoFocusStateListener {
         setAfRegions(null);
 
         // Create request builders, the af regions are automatically updated.
-        CaptureRequest.Builder repeatingBuilder = createRequestBuilder();
+        mRepeatingBuilder = createRequestBuilder();
         CaptureRequest.Builder requestBuilder = createRequestBuilder();
-        mAutoFocus.setPassiveAutoFocus(/*picture*/true, repeatingBuilder);
-        mAutoFocus.unlockAutoFocus(repeatingBuilder, requestBuilder);
+        mAutoFocus.setPassiveAutoFocus(/*picture*/true, mRepeatingBuilder);
+        mAutoFocus.unlockAutoFocus(mRepeatingBuilder, requestBuilder);
         CaptureListener listener = createCaptureListener();
-        mCamera.setRepeatingRequest(repeatingBuilder.build(), listener, mHandler);
+        mCamera.setRepeatingRequest(mRepeatingBuilder.build(), listener, mHandler);
         mCamera.capture(requestBuilder.build(), listener, mHandler);
     }
 
+    /**
+     * Get current AF mode.
+     * @return current AF mode
+     * @throws IllegalStateException if there auto focus is not running.
+     */
+    public synchronized int getCurrentAfMode() {
+        if (mRepeatingBuilder == null) {
+            throw new IllegalStateException("Auto focus is not running, unable to get AF mode");
+        }
+
+        return mRepeatingBuilder.get(CaptureRequest.CONTROL_AF_MODE);
+    }
 
     private void startAutoFocusLocked(boolean forceActive, int[] afRegions) throws CameraAccessException {
         setAfRegions(afRegions);
         mAfRun++;
 
         // Create request builders, the af regions are automatically updated.
-        CaptureRequest.Builder repeatingBuilder = createRequestBuilder();
+        mRepeatingBuilder = createRequestBuilder();
         CaptureRequest.Builder requestBuilder = createRequestBuilder();
         if (forceActive) {
             startAutoFocusFullActiveLocked();
@@ -224,9 +237,9 @@ public class Camera2Focuser implements AutoFocusStateListener {
                 dispatchAutoFocusStatusLocked(/*success*/true);
                 return;
             } else if (mSuccess) {
-                mAutoFocus.lockAutoFocus(repeatingBuilder, requestBuilder);
+                mAutoFocus.lockAutoFocus(mRepeatingBuilder, requestBuilder);
                 CaptureListener listener = createCaptureListener();
-                mCamera.setRepeatingRequest(repeatingBuilder.build(), listener, mHandler);
+                mCamera.setRepeatingRequest(mRepeatingBuilder.build(), listener, mHandler);
                 mCamera.capture(requestBuilder.build(), listener, mHandler);
             } else {
                 startAutoFocusFullActiveLocked();
@@ -236,10 +249,10 @@ public class Camera2Focuser implements AutoFocusStateListener {
 
     private void startAutoFocusFullActiveLocked() throws CameraAccessException {
         // Create request builders, the af regions are automatically updated.
-        CaptureRequest.Builder repeatingBuilder = createRequestBuilder();
+        mRepeatingBuilder = createRequestBuilder();
         CaptureRequest.Builder requestBuilder = createRequestBuilder();
-        mAutoFocus.setActiveAutoFocus(repeatingBuilder, requestBuilder);
-        if (repeatingBuilder.get(CaptureRequest.CONTROL_AF_TRIGGER)
+        mAutoFocus.setActiveAutoFocus(mRepeatingBuilder, requestBuilder);
+        if (mRepeatingBuilder.get(CaptureRequest.CONTROL_AF_TRIGGER)
                 != CaptureRequest.CONTROL_AF_TRIGGER_IDLE) {
             throw new AssertionError("Wrong trigger set in repeating request");
         }
@@ -250,7 +263,7 @@ public class Camera2Focuser implements AutoFocusStateListener {
         mAutoFocus.resetState();
 
         CaptureListener listener = createCaptureListener();
-        mCamera.setRepeatingRequest(repeatingBuilder.build(), listener, mHandler);
+        mCamera.setRepeatingRequest(mRepeatingBuilder.build(), listener, mHandler);
         mCamera.capture(requestBuilder.build(), listener, mHandler);
     }
 
