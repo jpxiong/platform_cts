@@ -18,10 +18,10 @@ package android.permission.cts;
 
 import com.google.common.primitives.Ints;
 
+import android.system.OsConstants;
+
 import java.util.HashSet;
 import java.util.Set;
-
-import libcore.io.OsConstants;
 
 /** Bits and pieces copied from hidden API of android.os.FileUtils. */
 public class FileUtils {
