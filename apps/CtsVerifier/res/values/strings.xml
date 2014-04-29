@@ -30,6 +30,7 @@
     <string name="test_category_hardware">Hardware</string>
     <string name="test_category_networking">Networking</string>
     <string name="test_category_sensors">Sensors</string>
+    <string name="test_category_location">Location</string>
     <string name="test_category_security">Security</string>
     <string name="test_category_streaming">Streaming</string>
     <string name="test_category_features">Features</string>
@@ -118,6 +119,7 @@
 
     <string name="bt_control">Bluetooth Control</string>
     <string name="bt_device_communication">Device Communication</string>
+    <string name="bt_le">Bluetooth Low Energy</string>
 
     <string name="bt_toggle_bluetooth">Toggle Bluetooth</string>
     <string name="bt_toggle_instructions">Disable and enable Bluetooth to successfully complete this test.</string>
@@ -177,6 +179,53 @@
     <string name="bt_scanning">Scanning...</string>
     <string name="bt_unpair">Device must be unpaired via Bluetooth settings before completing the test.\n\nUnpair the device in settings, make the server discoverable, and rescan to pick this device.</string>
     <string name="bt_settings">Bluetooth Settings</string>
+
+    <!-- BLE client side strings -->
+    <string name="ble_client_service_name">Bluetooth LE GATT Client Handler Service</string>
+    <string name="ble_client_test_name">BLE Client Test</string>
+    <string name="ble_client_connect_name">1. BLE Client Connect</string>
+    <string name="ble_discover_service_name">2. BLE Discover Service</string>
+    <string name="ble_client_characteristic_name">3. BLE Read/Write Characteristic</string>
+    <string name="ble_reliable_write_name">4. BLE Reliable Write</string>
+    <string name="ble_notify_characteristic_name">5. BLE Notify Characteristic</string>
+    <string name="ble_client_descriptor_name">6. BLE Read/Write Descriptor</string>
+    <string name="ble_read_rssi_name">7. BLE Read RSSI</string>
+    <string name="ble_client_disconnect_name">8. BLE Client Disconnect</string>
+    <string name="ble_client_test_info">The BLE test must be done simultaneously on two devices. This device is the client. All tests listed here must be done in order.</string>
+    <string name="ble_client_send_connect_info">Type in the Bluetooth address of the remote device to connect to, and verify that the devices are connected.</string>
+    <string name="ble_discover_service_info">Verify that the service is discovered when you press the "Discover Service" button.</string>
+    <string name="ble_read_write_info">Write values to and read values from the server to verify that the write and read functionalities are working correctly.</string>
+    <string name="ble_reliable_write_info">A Reliable Write has two steps.\n\n1) Write to the device. This will trigger a callback from the server to verify that the value written was correct.\n2) Execute the write, if the value written is valid.</string>
+    <string name="ble_notify_characteristic_info">Start accepting notifications, and verify that notifications are being reported correctly. The server should be notifying this device with the time every second.</string>
+    <string name="ble_read_rssi_info">Press button to read the RSSI value. Verify that the RSSI changes as you move the two devices further apart or closer together.</string>
+    <string name="ble_client_disconnect_info">Verify that the device is disconnected when you press the "Disconnect" button</string>
+    <string name="ble_address">Bluetooth address</string>
+    <string name="ble_connect">Connect</string>
+    <string name="ble_discover_service">Discover service</string>
+    <string name="ble_write_hint">Nothing to write yet</string>
+    <string name="ble_read_hint">Nothing read yet</string>
+    <string name="ble_write">Write</string>
+    <string name="ble_read">Read</string>
+    <string name="ble_begin_write">Begin write</string>
+    <string name="ble_execute_write">Execute write</string>
+    <string name="ble_begin_notification">Begin notification</string>
+    <string name="ble_stop_notification">Stop notification</string>
+    <string name="ble_waiting_notification">Waiting on notification</string>
+    <string name="ble_read_rssi">Read RSSI</string>
+    <string name="ble_disconnect">Disconnect</string>
+
+    <!-- BLE server side strings -->
+    <string name="ble_server_service_name">Bluetooth LE GATT Server Handler Service</string>
+    <string name="ble_server_start_name">BLE Server Test</string>
+    <string name="ble_server_start_info">The BLE test must be done simultaneously on two devices, a server device and a client device. This device is the server.</string>
+    <string name="ble_server_receiving_connect">Waiting on connection from BLE client.</string>
+    <string name="ble_server_add_service">Adding service to BLE server.</string>
+    <string name="ble_server_write_characteristic">Waiting on write characteristic request</string>
+    <string name="ble_server_read_characteristic">Waiting on read characteristic request</string>
+    <string name="ble_server_write_descriptor">Waiting on write descriptor request</string>
+    <string name="ble_server_read_descriptor">Waiting on read descriptor request</string>
+    <string name="ble_server_reliable_write">Waiting on reliable write from client</string>
+    <string name="ble_server_receiving_disconnect">Waiting on disconnection from BLE client</string>
 
     <!-- Strings for FeatureSummaryActivity -->
     <string name="feature_summary">Hardware/Software Feature Summary</string>
@@ -276,8 +325,7 @@
         device running the emulator tests must be the candidate device running the software
         to be tested. \n\nFor each emulator test, there is a corresponding "reader test"
         in the "HCE reader tests" section. The "reader test" acts as a NFC terminal/POS
-        and makes sure the device-under-test implements card emulation correctly.
-    </string>
+        and makes sure the device-under-test implements card emulation correctly.</string>
     <string name="nfc_hce_reader_test_info">The host-based card emulation
         tests require two devices to be completed. The HCE emulator tests are used
         to actually test the host-based card emulation feature of the device-under-test. So the
@@ -286,6 +334,7 @@
         in the "HCE reader tests" section. The "reader test" acts as a NFC terminal/POS
         and makes sure the device-under-test implements card emulation correctly.
     </string>
+    <string name="nfc_hce_type_selection">By default HCE applications must run on type A. If your device is restricted to type B (for example, because of a type B only UICC), select "Type B" from the drop-down box above. Note that all tests must be completed in the same mode (either "Type A" or "Type B").</string>
     <string name="nfc_hce_please_wait">Please wait</string>
     <string name="nfc_hce_setting_up">Setting up card emulation services...</string>
 
@@ -332,6 +381,7 @@
     <string name="nfc_hce_throughput_emulator">HCE throughput test (Emulator)</string>
     <string name="nfc_hce_throughput_reader">HCE throughput test (Reader)</string>
     <string name="nfc_hce_throughput_emulator_help">This tests verifies that your HCE implementation can reach a decent throughput. While Android does not have any requirements on HCE performance, many HCE applications such as transport and payment apps do. If the average APDU roundtrip time is more than 50ms, please take a look at your implementation to see where the delay is coming from.</string>
+    <string name="nfc_hce_change_preinstalled_wallet">The device has an installed payment application that is currently set as default. To complete the test, you will be asked whether you want to make Payment Service #1 or #2 the default app. Select yes.</string>
     <string name="nfc_hce_change_default_help">You will now be asked whether you want to make Payment Service #1 the default app. Select yes.</string>
     <string name="nfc_hce_conflicting_non_payment_help">When tapping the first time, you will be shown a dialog that asks you to choose between TransportService #1 and TransportService #2. Select TransportService #2. Verify a dialog is shown that asks you to tap again to complete. Now tap again, and if communication with TransportService #2 is successfull the pass button will be enabled."</string>
     <string name="nfc_payment_service_desc">NFC Payment service</string>
@@ -362,6 +412,12 @@
 
     <!-- Magnetic Field -->
     <string name="snsr_mag_m_test">Magnetic Field Measurement Tests</string>
+
+    <!-- Strings for Sample Test Activities -->
+    <string name="share_button_text">Share</string>
+    <string name="sample_framework_test">Sample Framework Test</string>
+    <string name="sample_test">Sample Test</string>
+    <string name="sample_test_info">This test verifies that bluetooth sharing is working properly.\nThe test assumes the Device Under Test has bluetooth enabled and is already paired with a second device, also with bluetooth enabled.\nStart this test by clicking share, choose bluetooth from the options, and then select a device to share with.\nNote: This is a sample test, used to demonstrate how to write CTS Verifier tests, so just click pass.</string>
 
     <!-- Strings for SuidFilesActivity -->
     <string name="suid_files">SUID File Scanner</string>
@@ -717,6 +773,55 @@
     <string name="nls_service_stopped">Service should stop once disabled.</string>
     <string name="nls_note_missed">Check that notification was not received.</string>
 
+    <string name="location_mode_high_accuracy_test">High Accuracy Mode Test</string>
+    <string name="location_mode_high_accuracy_info">
+        This test checks that the Location Mode API is consistent with the
+        Location Provider API when the device is in High Accuracy location mode.
+    </string>
+    <string name="location_mode_select_high_accuracy">
+        Please select the \"High accuracy\" mode at Settings > Location and return here.
+    </string>
+    <string name="location_mode_battery_saving_test">Battery Saving Mode Test</string>
+    <string name="location_mode_battery_saving_info">
+        This test checks that the Location Mode API is consistent with the
+        Location Provider API when the device is in Battery Saving location mode.
+    </string>
+    <string name="location_mode_select_battery_saving">
+        Please select the \"Battery Saving\" mode at Settings > Location and return here.
+    </string>
+    <string name="location_mode_device_only_test">Device Only Mode Test</string>
+    <string name="location_mode_device_only_info">
+        This test checks that the Location Mode API is consistent with the
+        Location Provider API when the device is in Device Only location mode.
+    </string>
+    <string name="location_mode_select_device_only">
+        Please select the \"Device Only\" mode at
+        Settings > Location and return here.
+    </string>
+    <string name="location_mode_off_test">Location Mode Off Test</string>
+    <string name="location_mode_off_info">
+        This test checks that the Location Mode API is consistent with the
+        Location Provider API when the device is in the Off location mode.
+    </string>
+
+    <string name="location_mode_start_settings">Launch Settings</string>
+    <string name="location_mode_turn_on">
+        Please turn ON location access (the switch at the top of Settings > Location)
+        and return here.
+    </string>
+    <string name="location_mode_turn_off">
+        Please turn OFF location access (the switch at the top of Settings > Location)
+        and return here.
+    </string>
+    <string name="location_mode_secure_gps_on">GPS provider should be ON in secure settings.</string>
+    <string name="location_mode_secure_gps_off">GPS provider should be OFF in secure settings.</string>
+    <string name="location_mode_secure_nlp_on">Network location provider should be ON in secure settings.</string>
+    <string name="location_mode_secure_nlp_off">Network location provider should be OFF in secure settings.</string>
+    <string name="location_mode_manager_gps_on">GPS provider should be ON in LocationManager.</string>
+    <string name="location_mode_manager_gps_off">GPS provider should be OFF in LocationManager.</string>
+    <string name="location_mode_manager_nlp_on">Network location provider should be ON in LocationManager.</string>
+    <string name="location_mode_manager_nlp_off">Network location provider should be OFF in LocationManager.</string>
+
     <string name="cacert_test">CA Cert Notification Test</string>
     <string name="cacert_info">This test checks that when a CA Certificate is installed, the user is notified.</string>
     <string name="cacert_do_something">Do it</string>
@@ -821,4 +926,15 @@
         2. Verify that a timer is started  and the timers UI is shown with a timer named "Start Timer Test".\n
         3. Verify that the timer rings after 30 seconds.\n
     </string>
+    
+    <!-- Strings for LockConfirmBypassTest -->
+    <string name="lock_confirm_test_title">Keyguard Password Verification</string>
+    <string name="lock_set_button_text">Set password</string>
+    <string name="lock_change_button_text">Change password</string>
+    <string name="lock_confirm_message">
+        This test verifies that the user is prompted for the current keyguard password before prompting for a new password.\n
+        \nClick the \"Set password\" button if you currently don\'t have a password set.\n
+        \nThen click the \"Change password\" button to change it. You should be prompted for the current password first. If you are not, then mark the test as failed.
+    </string>
+
 </resources>

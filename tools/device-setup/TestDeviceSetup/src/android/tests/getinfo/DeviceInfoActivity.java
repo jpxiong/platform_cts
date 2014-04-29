@@ -22,6 +22,8 @@ import android.content.Context;
 import android.content.pm.ConfigurationInfo;
 import android.content.res.Configuration;
 import android.os.Bundle;
+import android.view.Window;
+import android.view.WindowManager;
 
 import java.util.HashSet;
 import java.util.Locale;
@@ -34,6 +36,7 @@ public class DeviceInfoActivity extends Activity {
 
     // work done should be reported in GLES..View
     private CountDownLatch mDone = new CountDownLatch(1);
+    private HashSet<String> mOpenGlExtensions = new HashSet<String>();
     private HashSet<String> mFormats = new HashSet<String>();
     private String mGraphicsVendor;
     private String mGraphicsRenderer;
@@ -54,9 +57,9 @@ public class DeviceInfoActivity extends Activity {
             final CountDownLatch done = new CountDownLatch(1);
             final int version = i;
             DeviceInfoActivity.this.runOnUiThread(new Runnable() {
-              public void run() {
-                setContentView(new GLESSurfaceView(DeviceInfoActivity.this, version, done));
-              }
+                public void run() {
+                    setContentView(new GLESSurfaceView(DeviceInfoActivity.this, version, done));
+                }
             });
             try {
                 done.await();
@@ -65,14 +68,20 @@ public class DeviceInfoActivity extends Activity {
             }
         }
 
-        StringBuilder builder = new StringBuilder();
+        StringBuilder textureBuilder = new StringBuilder();
         for (String format: mFormats) {
-            builder.append(format);
-            builder.append(";");
+            textureBuilder.append(format).append(";");
+        }
+        StringBuilder extensionBuilder = new StringBuilder();
+        for (String extension : mOpenGlExtensions) {
+            extensionBuilder.append(extension).append(";");
         }
         DeviceInfoInstrument.addResult(
+                DeviceInfoConstants.OPEN_GL_EXTENSIONS,
+                extensionBuilder.toString());
+        DeviceInfoInstrument.addResult(
                 DeviceInfoConstants.OPEN_GL_COMPRESSED_TEXTURE_FORMATS,
-                builder.toString());
+                textureBuilder.toString());
         DeviceInfoInstrument.addResult(
                 DeviceInfoConstants.GRAPHICS_VENDOR,
                 mGraphicsVendor);
@@ -80,6 +89,10 @@ public class DeviceInfoActivity extends Activity {
                 DeviceInfoConstants.GRAPHICS_RENDERER,
                 mGraphicsRenderer);
         mDone.countDown();
+    }
+
+    public void addOpenGlExtension(String openGlExtension) {
+        mOpenGlExtensions.add(openGlExtension);
     }
 
     public void addCompressedTextureFormat(String format) {
@@ -94,15 +107,18 @@ public class DeviceInfoActivity extends Activity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Window w = getWindow();
+        w.setFlags(WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED,
+                WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED);
 
         ActivityManager am =
                 (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
         ConfigurationInfo info = am.getDeviceConfigurationInfo();
         final int glVersion = (info.reqGlEsVersion & 0xffff0000) >> 16;
         new Thread() {
-          public void run() {
-            runIterations(glVersion);
-          }
+            public void run() {
+                runIterations(glVersion);
+            }
         }.start();
 
         Configuration con = getResources().getConfiguration();

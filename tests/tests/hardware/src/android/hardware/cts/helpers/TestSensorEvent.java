@@ -38,4 +38,14 @@ public class TestSensorEvent {
         timestamp = event.timestamp;
         accuracy = event.accuracy;
     }
+
+    /**
+     * Constructor for TestSensorEvent. Exposed for unit testing.
+     */
+    protected TestSensorEvent(Sensor sensor, long timestamp, int accuracy, float[] values) {
+        this.sensor = sensor;
+        this.timestamp = timestamp;
+        this.accuracy = accuracy;
+        this.values = values;
+    }
 }

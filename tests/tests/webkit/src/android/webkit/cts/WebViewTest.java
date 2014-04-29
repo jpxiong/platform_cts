@@ -16,6 +16,7 @@
 
 package android.webkit.cts;
 
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.res.AssetManager;
 import android.cts.util.EvaluateJsResultPollingCheck;
@@ -79,6 +80,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.Date;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.concurrent.Callable;
 import java.util.concurrent.FutureTask;
 import java.util.concurrent.TimeUnit;
@@ -355,6 +357,18 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
 
         Header header = matchingHeaders[0];
         assertEquals(mWebView.getContext().getApplicationInfo().packageName, header.getValue());
+    }
+
+    @UiThreadTest
+    public void testLoadUrlDoesNotStripParamsWhenLoadingContentUrls() throws Exception {
+        Uri.Builder uriBuilder = new Uri.Builder().scheme(
+                ContentResolver.SCHEME_CONTENT).authority(MockContentProvider.AUTHORITY);
+        uriBuilder.appendPath("foo.html").appendQueryParameter("param","bar");
+        String url = uriBuilder.build().toString();
+        mOnUiThread.loadUrlAndWaitForCompletion(url);
+        // verify the parameter is not stripped.
+        Uri uri = Uri.parse(mWebView.getTitle());
+        assertEquals("bar", uri.getQueryParameter("param"));
     }
 
     @UiThreadTest
@@ -651,51 +665,64 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
         assertEquals("removedObject", resultObject.getResult());
     }
 
+    private final class TestPictureListener implements PictureListener {
+        public int callCount;
+
+        @Override
+        public void onNewPicture(WebView view, Picture picture) {
+            // Need to inform the listener tracking new picture
+            // for the "page loaded" knowledge since it has been replaced.
+            mOnUiThread.onNewPicture();
+            this.callCount += 1;
+        }
+    }
+
+    private Picture waitForPictureToHaveColor(int color,
+            final TestPictureListener listener) throws Throwable {
+        final int MAX_ON_NEW_PICTURE_ITERATIONS = 5;
+        final AtomicReference<Picture> pictureRef = new AtomicReference<Picture>();
+        for (int i = 0; i < MAX_ON_NEW_PICTURE_ITERATIONS; i++) {
+            final int oldCallCount = listener.callCount;
+            runTestOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    pictureRef.set(mWebView.capturePicture());
+                }
+            });
+            if (isPictureFilledWithColor(pictureRef.get(), color))
+                break;
+            new PollingCheck(TEST_TIMEOUT) {
+                @Override
+                protected boolean check() {
+                    return listener.callCount > oldCallCount;
+                }
+            }.run();
+        }
+        return pictureRef.get();
+    }
+
     public void testCapturePicture() throws Exception, Throwable {
+        final TestPictureListener listener = new TestPictureListener();
+
         startWebServer(false);
         final String url = mWebServer.getAssetUrl(TestHtmlConstants.BLANK_PAGE_URL);
-        // showing the blank page will make the picture filled with background color
+        mOnUiThread.setPictureListener(listener);
+        // Showing the blank page will fill the picture with the background color.
         mOnUiThread.loadUrlAndWaitForCompletion(url);
-        getInstrumentation().waitForIdleSync();
-
-        class PictureRunnable implements Runnable {
-            private Picture mPicture;
-            @Override
-            public void run() {
-                mPicture = mWebView.capturePicture();
-                Bitmap b = Bitmap.createBitmap(mPicture.getWidth(), mPicture.getHeight(),
-                        Config.ARGB_8888);
-                mPicture.draw(new Canvas(b));
-                // default color is white
-                assertBitmapFillWithColor(b, Color.WHITE);
-
-                mWebView.setBackgroundColor(Color.CYAN);
-                mOnUiThread.reloadAndWaitForCompletion();
-            }
-            public Picture getPicture() {
-                return mPicture;
-            }
-        }
-        PictureRunnable runnable = new PictureRunnable();
-        runTestOnUiThread(runnable);
-        getInstrumentation().waitForIdleSync();
-
-        // the content of the picture will not be updated automatically
-        Picture picture = runnable.getPicture();
-        Bitmap b = Bitmap.createBitmap(picture.getWidth(), picture.getHeight(), Config.ARGB_8888);
-        picture.draw(new Canvas(b));
-        assertBitmapFillWithColor(b, Color.WHITE);
+        // The default background color is white.
+        Picture oldPicture = waitForPictureToHaveColor(Color.WHITE, listener);
 
         runTestOnUiThread(new Runnable() {
             @Override
             public void run() {
-                // update the content
-                Picture p = mWebView.capturePicture();
-                Bitmap b = Bitmap.createBitmap(p.getWidth(), p.getHeight(), Config.ARGB_8888);
-                p.draw(new Canvas(b));
-                assertBitmapFillWithColor(b, Color.CYAN);
+                mWebView.setBackgroundColor(Color.CYAN);
             }
         });
+        mOnUiThread.reloadAndWaitForCompletion();
+        waitForPictureToHaveColor(Color.CYAN, listener);
+
+        // The content of the previously captured picture will not be updated automatically.
+        assertTrue(isPictureFilledWithColor(oldPicture, Color.WHITE));
     }
 
     public void testSetPictureListener() throws Exception, Throwable {
@@ -850,6 +877,7 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
         // Verify that the resource request makes it to the server.
         assertTrue(mWebServer.wasResourceRequested(imgUrl));
         assertEquals(historyUrl, mWebView.getUrl());
+        assertEquals(historyUrl, mWebView.getOriginalUrl());
 
         // Check that reported URL is "about:blank" when supplied history URL
         // is null.
@@ -859,6 +887,7 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
                 "text/html", "UTF-8", null);
         assertTrue(mWebServer.wasResourceRequested(imgUrl));
         assertEquals("about:blank", mWebView.getUrl());
+        assertEquals("about:blank", mWebView.getOriginalUrl());
 
         // Test that JavaScript can access content from the same origin as the base URL.
         mWebView.getSettings().setJavaScriptEnabled(true);
@@ -883,18 +912,19 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
         mOnUiThread.loadDataWithBaseURLAndWaitForCompletion("http://www.foo.com",
                 HTML_HEADER + "<title>Hello World%21</title><body>bar</body></html>",
                 "text/html", "UTF-8", null);
-        assertEquals("Hello World%21", mOnUiThread.getTitle());
+        assertEquals("Hello World%21", mWebView.getTitle());
 
         // Check that when a data: base URL is used, we treat the String to load as a data: URL
         // and run load steps such as decoding URL entities (i.e., contrary to the test case
         // above.)
         mOnUiThread.loadDataWithBaseURLAndWaitForCompletion("data:foo",
                 HTML_HEADER + "<title>Hello World%21</title></html>", "text/html", "UTF-8", null);
-        assertEquals("Hello World!", mOnUiThread.getTitle());
+        assertEquals("Hello World!", mWebView.getTitle());
 
         // Check the method is null input safe.
         mOnUiThread.loadDataWithBaseURLAndWaitForCompletion(null, null, null, null, null);
-        assertEquals("about:blank", mOnUiThread.getUrl());
+        assertEquals("about:blank", mWebView.getUrl());
+        assertEquals("about:blank", mWebView.getOriginalUrl());
     }
 
     private static class WaitForFindResultsListener extends FutureTask<Integer>
@@ -2158,11 +2188,22 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
         }
     }
 
-    private void assertBitmapFillWithColor(Bitmap bitmap, int color) {
-        for (int i = 0; i < bitmap.getWidth(); i ++)
+    private boolean isPictureFilledWithColor(Picture picture, int color) {
+        if (picture.getWidth() == 0 || picture.getHeight() == 0)
+            return false;
+
+        Bitmap bitmap = Bitmap.createBitmap(picture.getWidth(), picture.getHeight(),
+                Config.ARGB_8888);
+        picture.draw(new Canvas(bitmap));
+
+        for (int i = 0; i < bitmap.getWidth(); i ++) {
             for (int j = 0; j < bitmap.getHeight(); j ++) {
-                assertEquals(color, bitmap.getPixel(i, j));
+                if (color != bitmap.getPixel(i, j)) {
+                    return false;
+                }
             }
+        }
+        return true;
     }
 
     // Find b1 inside b2

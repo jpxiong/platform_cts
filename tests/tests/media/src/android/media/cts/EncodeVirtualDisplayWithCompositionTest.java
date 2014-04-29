@@ -18,12 +18,17 @@ package android.media.cts;
 
 
 import android.app.Presentation;
+import android.content.ComponentName;
 import android.content.Context;
+import android.content.Intent;
+import android.content.ServiceConnection;
 import android.graphics.SurfaceTexture;
 import android.graphics.Typeface;
+import android.graphics.drawable.ColorDrawable;
 import android.hardware.display.DisplayManager;
 import android.hardware.display.VirtualDisplay;
 import android.media.MediaCodec;
+import android.media.MediaCodec.BufferInfo;
 import android.media.MediaCodecInfo;
 import android.media.MediaCodecInfo.CodecCapabilities;
 import android.media.MediaCodecInfo.CodecProfileLevel;
@@ -34,14 +39,26 @@ import android.opengl.GLES20;
 import android.opengl.Matrix;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.IBinder;
 import android.os.Looper;
 import android.os.Message;
+import android.os.Parcel;
 import android.test.AndroidTestCase;
+import android.util.AttributeSet;
 import android.util.Log;
+import android.util.Pair;
 import android.view.Display;
 import android.view.Surface;
+import android.view.TextureView;
+import android.view.View;
+import android.view.ViewGroup;
+import android.view.ViewGroup.LayoutParams;
 import android.view.WindowManager;
+import android.widget.FrameLayout;
+import android.widget.ImageView;
 import android.widget.TextView;
+
+import com.android.cts.media.R;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -49,7 +66,8 @@ import java.nio.FloatBuffer;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.concurrent.Semaphore;
-import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Tests to check if MediaCodec encoding works with composition of multiple virtual displays
@@ -61,11 +79,38 @@ public class EncodeVirtualDisplayWithCompositionTest extends AndroidTestCase {
     private static final String TAG = "EncodeVirtualDisplayWithCompositionTest";
     private static final boolean DBG = false;
     private static final String MIME_TYPE = "video/avc";
-    private Handler mHandler;
-    private Surface mSurface;
-    private CodecInfo mCodecInfo;
+
+    private static final long DEFAULT_WAIT_TIMEOUT_MS = 5000;
+    private static final long DEFAULT_WAIT_TIMEOUT_US = 5000000;
+
+    private static final int COLOR_RED =  makeColor(100, 0, 0);
+    private static final int COLOR_BLUE =  makeColor(0, 100, 0);
+    private static final int COLOR_GREEN =  makeColor(0, 0, 100);
+    private static final int COLOR_GREY =  makeColor(100, 100, 100);
+
+    private static final int BITRATE_1080p = 20000000;
+    private static final int BITRATE_720p = 14000000;
+    private static final int BITRATE_800x480 = 14000000;
+    private static final int IFRAME_INTERVAL = 10;
+
+    private static final int MAX_NUM_WINDOWS = 3;
+
+    private static Handler sHandlerForRunOnMain = new Handler(Looper.getMainLooper());
+
+    private Surface mEncodingSurface;
+    private OutputSurface mDecodingSurface;
     private volatile boolean mCodecConfigReceived = false;
     private volatile boolean mCodecBufferReceived = false;
+    private EncodingHelper mEncodingHelper;
+    private MediaCodec mDecoder;
+    private final ByteBuffer mPixelBuf = ByteBuffer.allocateDirect(4);
+    private volatile boolean mIsQuitting = false;
+    private Throwable mTestException;
+    private VirtualDisplayPresentation mLocalPresentation;
+    private RemoteVirtualDisplayPresentation mRemotePresentation;
+    private ByteBuffer[] mDecoderInputBuffers;
+
+    /** event listener for test without verifying output */
     private EncoderEventListener mEncoderEventListener = new EncoderEventListener() {
         @Override
         public void onCodecConfig(ByteBuffer data, MediaCodec.BufferInfo info) {
@@ -81,24 +126,280 @@ public class EncodeVirtualDisplayWithCompositionTest extends AndroidTestCase {
         }
     };
 
-    @Override
-    protected void setUp() {
-        mHandler = new Handler(Looper.getMainLooper());
-        mCodecInfo = getAvcSupportedFormatInfo();
+    /* TEST_COLORS static initialization; need ARGB for ColorDrawable */
+    private static int makeColor(int red, int green, int blue) {
+        return 0xff << 24 | (red & 0xff) << 16 | (green & 0xff) << 8 | (blue & 0xff);
     }
 
-    public void testSingleVirtualDisplay() throws Exception {
-        doTestVirtualDisplays(1);
+    public void testVirtualDisplayRecycles() throws Exception {
+        doTestVirtualDisplayRecycles(3);
     }
 
-    public void testMultipleVirtualDisplays() throws Exception {
-        doTestVirtualDisplays(3);
+    public void testRendering800x480Locally() throws Throwable {
+        Log.i(TAG, "testRendering800x480Locally");
+        Pair<Integer, Integer> maxRes = checkMaxConcurrentEncodingDecodingResolution();
+        if (maxRes.first >= 800 && maxRes.second >= 480) {
+            runTestRenderingInSeparateThread(800, 480, false, false);
+        } else {
+            Log.w(TAG, "This H/W does not support 800x480");
+        }
     }
 
-    void doTestVirtualDisplays(int numDisplays) throws Exception {
-        final int NUM_CODEC_CREATION = 10;
-        final int NUM_DISPLAY_CREATION = 20;
-        final int NUM_RENDERING = 10;
+    public void testRenderingMaxResolutionLocally() throws Throwable {
+        Log.i(TAG, "testRenderingMaxResolutionLocally");
+        Pair<Integer, Integer> maxRes = checkMaxConcurrentEncodingDecodingResolution();
+        Log.w(TAG, "Trying resolution w:" + maxRes.first + " h:" + maxRes.second);
+        runTestRenderingInSeparateThread(maxRes.first, maxRes.second, false, false);
+    }
+
+    public void testRendering800x480Remotely() throws Throwable {
+        Log.i(TAG, "testRendering800x480Remotely");
+        Pair<Integer, Integer> maxRes = checkMaxConcurrentEncodingDecodingResolution();
+        if (maxRes.first >= 800 && maxRes.second >= 480) {
+            runTestRenderingInSeparateThread(800, 480, true, false);
+        } else {
+            Log.w(TAG, "This H/W does not support 800x480");
+        }
+    }
+
+    public void testRenderingMaxResolutionRemotely() throws Throwable {
+        Log.i(TAG, "testRenderingMaxResolutionRemotely");
+        Pair<Integer, Integer> maxRes = checkMaxConcurrentEncodingDecodingResolution();
+        Log.w(TAG, "Trying resolution w:" + maxRes.first + " h:" + maxRes.second);
+        runTestRenderingInSeparateThread(maxRes.first, maxRes.second, true, false);
+    }
+
+    public void testRendering800x480RemotelyWith3Windows() throws Throwable {
+        Log.i(TAG, "testRendering800x480RemotelyWith3Windows");
+        Pair<Integer, Integer> maxRes = checkMaxConcurrentEncodingDecodingResolution();
+        if (maxRes.first >= 800 && maxRes.second >= 480) {
+            runTestRenderingInSeparateThread(800, 480, true, true);
+        } else {
+            Log.w(TAG, "This H/W does not support 800x480");
+        }
+    }
+
+    public void testRendering800x480LocallyWith3Windows() throws Throwable {
+        Log.i(TAG, "testRendering800x480LocallyWith3Windows");
+        Pair<Integer, Integer> maxRes = checkMaxConcurrentEncodingDecodingResolution();
+        if (maxRes.first >= 800 && maxRes.second >= 480) {
+            runTestRenderingInSeparateThread(800, 480, false, true);
+        } else {
+            Log.w(TAG, "This H/W does not support 800x480");
+        }
+    }
+
+    /**
+     * Run rendering test in a separate thread. This is necessary as {@link OutputSurface} requires
+     * constructing it in a non-test thread.
+     * @param w
+     * @param h
+     * @throws Exception
+     */
+    private void runTestRenderingInSeparateThread(final int w, final int h,
+            final boolean runRemotely, final boolean multipleWindows) throws Throwable {
+        mTestException = null;
+        Thread renderingThread = new Thread(new Runnable() {
+            public void run() {
+                try {
+                    doTestRenderingOutput(w, h, runRemotely, multipleWindows);
+                } catch (Throwable t) {
+                    t.printStackTrace();
+                    mTestException = t;
+                }
+            }
+        });
+        renderingThread.start();
+        renderingThread.join(20000);
+        assertTrue(!renderingThread.isAlive());
+        if (mTestException != null) {
+            throw mTestException;
+        }
+    }
+
+    private void doTestRenderingOutput(int w, int h, boolean runRemotely, boolean multipleWindows)
+            throws Throwable {
+        if (DBG) {
+            Log.i(TAG, "doTestRenderingOutput for w:" + w + " h:" + h);
+        }
+        try {
+            mIsQuitting = false;
+            mDecoder = MediaCodec.createDecoderByType(MIME_TYPE);
+            MediaFormat decoderFormat = MediaFormat.createVideoFormat(MIME_TYPE, w, h);
+            mDecodingSurface = new OutputSurface(w, h);
+            mDecoder.configure(decoderFormat, mDecodingSurface.getSurface(), null, 0);
+            mDecoder.start();
+            mDecoderInputBuffers = mDecoder.getInputBuffers();
+
+            mEncodingHelper = new EncodingHelper();
+            mEncodingSurface = mEncodingHelper.startEncoding(w, h,
+                    new EncoderEventListener() {
+                @Override
+                public void onCodecConfig(ByteBuffer data, BufferInfo info) {
+                    if (DBG) {
+                        Log.i(TAG, "onCodecConfig l:" + info.size);
+                    }
+                    handleEncodedData(data, info);
+                }
+
+                @Override
+                public void onBufferReady(ByteBuffer data, BufferInfo info) {
+                    if (DBG) {
+                        Log.i(TAG, "onBufferReady l:" + info.size);
+                    }
+                    handleEncodedData(data, info);
+                }
+
+                @Override
+                public void onError(String errorMessage) {
+                    fail(errorMessage);
+                }
+
+                private void handleEncodedData(ByteBuffer data, BufferInfo info) {
+                    if (mIsQuitting) {
+                        if (DBG) {
+                            Log.i(TAG, "ignore data as test is quitting");
+                        }
+                        return;
+                    }
+                    int inputBufferIndex = mDecoder.dequeueInputBuffer(DEFAULT_WAIT_TIMEOUT_US);
+                    if (inputBufferIndex < 0) {
+                        if (DBG) {
+                            Log.i(TAG, "dequeueInputBuffer returned:" + inputBufferIndex);
+                        }
+                        return;
+                    }
+                    assertTrue(inputBufferIndex >= 0);
+                    ByteBuffer inputBuffer = mDecoderInputBuffers[inputBufferIndex];
+                    inputBuffer.clear();
+                    inputBuffer.put(data);
+                    mDecoder.queueInputBuffer(inputBufferIndex, 0, info.size,
+                            info.presentationTimeUs, info.flags);
+                }
+            });
+            GlCompositor compositor = new GlCompositor();
+            if (DBG) {
+                Log.i(TAG, "start composition");
+            }
+            compositor.startComposition(mEncodingSurface, w, h, multipleWindows ? 3 : 1);
+
+            if (DBG) {
+                Log.i(TAG, "create display");
+            }
+
+            Renderer renderer = null;
+            if (runRemotely) {
+                mRemotePresentation = new RemoteVirtualDisplayPresentation(getContext(),
+                        compositor.getWindowSurface(multipleWindows? 1 : 0), w, h);
+                mRemotePresentation.connect();
+                mRemotePresentation.start();
+                renderer = mRemotePresentation;
+            } else {
+                mLocalPresentation = new VirtualDisplayPresentation(getContext(),
+                        compositor.getWindowSurface(multipleWindows? 1 : 0), w, h);
+                mLocalPresentation.createVirtualDisplay();
+                mLocalPresentation.createPresentation();
+                renderer = mLocalPresentation;
+            }
+
+            if (DBG) {
+                Log.i(TAG, "start rendering and check");
+            }
+            renderColorAndCheckResult(renderer, w, h, COLOR_RED);
+            renderColorAndCheckResult(renderer, w, h, COLOR_BLUE);
+            renderColorAndCheckResult(renderer, w, h, COLOR_GREEN);
+            renderColorAndCheckResult(renderer, w, h, COLOR_GREY);
+
+            mIsQuitting = true;
+            if (runRemotely) {
+                mRemotePresentation.disconnect();
+            } else {
+                mLocalPresentation.dismissPresentation();
+                mLocalPresentation.destroyVirtualDisplay();
+            }
+
+            compositor.stopComposition();
+        } finally {
+            if (mEncodingHelper != null) {
+                mEncodingHelper.stopEncoding();
+                mEncodingHelper = null;
+            }
+            if (mDecoder != null) {
+                mDecoder.stop();
+                mDecoder.release();
+                mDecoder = null;
+            }
+            if (mDecodingSurface != null) {
+                mDecodingSurface.release();
+                mDecodingSurface = null;
+            }
+        }
+    }
+
+    private static final int NUM_MAX_RETRY = 120;
+    private static final int IMAGE_WAIT_TIMEOUT_MS = 1000;
+
+    private void renderColorAndCheckResult(Renderer renderer, int w, int h,
+            int color) throws Exception {
+        BufferInfo info = new BufferInfo();
+        for (int i = 0; i < NUM_MAX_RETRY; i++) {
+            renderer.doRendering(color);
+            int bufferIndex = mDecoder.dequeueOutputBuffer(info,  DEFAULT_WAIT_TIMEOUT_US);
+            if (DBG) {
+                Log.i(TAG, "decoder dequeueOutputBuffer returned " + bufferIndex);
+            }
+            if (bufferIndex < 0) {
+                continue;
+            }
+            mDecoder.releaseOutputBuffer(bufferIndex, true);
+            if (mDecodingSurface.checkForNewImage(IMAGE_WAIT_TIMEOUT_MS)) {
+                mDecodingSurface.drawImage();
+                if (checkSurfaceFrameColor(w, h, color)) {
+                    Log.i(TAG, "color " + Integer.toHexString(color) + " matched");
+                    return;
+                }
+            } else if(DBG) {
+                Log.i(TAG, "no rendering yet");
+            }
+        }
+        fail("Color did not match");
+    }
+
+    private boolean checkSurfaceFrameColor(int w, int h, int color) {
+        // Read a pixel from the center of the surface.  Might want to read from multiple points
+        // and average them together.
+        int x = w / 2;
+        int y = h / 2;
+        GLES20.glReadPixels(x, y, 1, 1, GLES20.GL_RGBA, GLES20.GL_UNSIGNED_BYTE, mPixelBuf);
+        int r = mPixelBuf.get(0) & 0xff;
+        int g = mPixelBuf.get(1) & 0xff;
+        int b = mPixelBuf.get(2) & 0xff;
+
+        int redExpected = (color >> 16) & 0xff;
+        int greenExpected = (color >> 8) & 0xff;
+        int blueExpected = color & 0xff;
+        if (approxEquals(redExpected, r) && approxEquals(greenExpected, g)
+                && approxEquals(blueExpected, b)) {
+            return true;
+        }
+        Log.i(TAG, "expected 0x" + Integer.toHexString(color) + " got 0x"
+                + Integer.toHexString(makeColor(r, g, b)));
+        return false;
+    }
+
+    /**
+     * Determines if two color values are approximately equal.
+     */
+    private static boolean approxEquals(int expected, int actual) {
+        final int MAX_DELTA = 4;
+        return Math.abs(expected - actual) <= MAX_DELTA;
+    }
+
+    private static final int NUM_CODEC_CREATION = 5;
+    private static final int NUM_DISPLAY_CREATION = 10;
+    private static final int NUM_RENDERING = 10;
+    private void doTestVirtualDisplayRecycles(int numDisplays) throws Exception {
+        CodecInfo codecInfo = getAvcSupportedFormatInfo();
         VirtualDisplayPresentation[] virtualDisplays = new VirtualDisplayPresentation[numDisplays];
         for (int i = 0; i < NUM_CODEC_CREATION; i++) {
             mCodecConfigReceived = false;
@@ -107,12 +408,13 @@ public class EncodeVirtualDisplayWithCompositionTest extends AndroidTestCase {
                 Log.i(TAG, "start encoding");
             }
             EncodingHelper encodingHelper = new EncodingHelper();
-            mSurface = encodingHelper.startEncoding(mCodecInfo, mEncoderEventListener);
+            mEncodingSurface = encodingHelper.startEncoding(codecInfo.mMaxW, codecInfo.mMaxH,
+                    mEncoderEventListener);
             GlCompositor compositor = new GlCompositor();
             if (DBG) {
                 Log.i(TAG, "start composition");
             }
-            compositor.startComposition(mSurface, mCodecInfo.mMaxW, mCodecInfo.mMaxH,
+            compositor.startComposition(mEncodingSurface, codecInfo.mMaxW, codecInfo.mMaxH,
                     numDisplays);
             for (int j = 0; j < NUM_DISPLAY_CREATION; j++) {
                 if (DBG) {
@@ -122,8 +424,7 @@ public class EncodeVirtualDisplayWithCompositionTest extends AndroidTestCase {
                     virtualDisplays[k] =
                         new VirtualDisplayPresentation(getContext(),
                                 compositor.getWindowSurface(k),
-                                mCodecInfo.mMaxW/numDisplays, mCodecInfo.mMaxH,
-                                VirtualDisplayPresentation.RENDERING_VIEW_HIERARCHY);
+                                codecInfo.mMaxW/numDisplays, codecInfo.mMaxH);
                     virtualDisplays[k].createVirtualDisplay();
                     virtualDisplays[k].createPresentation();
                 }
@@ -132,7 +433,7 @@ public class EncodeVirtualDisplayWithCompositionTest extends AndroidTestCase {
                 }
                 for (int k = 0; k < NUM_RENDERING; k++) {
                     for (int l = 0; l < numDisplays; l++) {
-                        virtualDisplays[l].doRendering();
+                        virtualDisplays[l].doRendering(COLOR_RED);
                     }
                     // do not care how many frames are actually rendered.
                     Thread.sleep(1);
@@ -166,14 +467,16 @@ public class EncodeVirtualDisplayWithCompositionTest extends AndroidTestCase {
         private MediaCodec mEncoder;
         private volatile boolean mStopEncoding = false;
         private EncoderEventListener mEventListener;
-        private CodecInfo mCodecInfo;
+        private int mW;
+        private int mH;
         private Thread mEncodingThread;
-        private Surface mSurface;
-        private static final int IFRAME_INTERVAL = 10;
+        private Surface mEncodingSurface;
         private Semaphore mInitCompleted = new Semaphore(0);
 
-        Surface startEncoding(CodecInfo codecInfo, EncoderEventListener eventListener) {
-            mCodecInfo = codecInfo;
+        Surface startEncoding(int w, int h, EncoderEventListener eventListener) {
+            mStopEncoding = false;
+            mW = w;
+            mH = h;
             mEventListener = eventListener;
             mEncodingThread = new Thread(new Runnable() {
                 @Override
@@ -181,6 +484,7 @@ public class EncodeVirtualDisplayWithCompositionTest extends AndroidTestCase {
                     try {
                         doEncoding();
                     } catch (Exception e) {
+                        e.printStackTrace();
                         mEventListener.onError(e.toString());
                     }
                 }
@@ -197,7 +501,7 @@ public class EncodeVirtualDisplayWithCompositionTest extends AndroidTestCase {
             } catch (InterruptedException e) {
                 fail("should not happen");
             }
-            return mSurface;
+            return mEncodingSurface;
         }
 
         void stopEncoding() {
@@ -213,25 +517,36 @@ public class EncodeVirtualDisplayWithCompositionTest extends AndroidTestCase {
 
         private void doEncoding() throws Exception {
             final int TIMEOUT_USEC_NORMAL = 1000000;
-            MediaFormat format = MediaFormat.createVideoFormat(MIME_TYPE, mCodecInfo.mMaxW,
-                    mCodecInfo.mMaxH);
+            MediaFormat format = MediaFormat.createVideoFormat(MIME_TYPE, mW, mH);
             format.setInteger(MediaFormat.KEY_COLOR_FORMAT,
                     MediaCodecInfo.CodecCapabilities.COLOR_FormatSurface);
-            format.setInteger(MediaFormat.KEY_BIT_RATE, mCodecInfo.mBitRate);
-            format.setInteger(MediaFormat.KEY_FRAME_RATE, mCodecInfo.mFps);
+            int bitRate = 10000000;
+            if (mW == 1920 && mH == 1080) {
+                bitRate = BITRATE_1080p;
+            } else if (mW == 1280 && mH == 720) {
+                bitRate = BITRATE_720p;
+            } else if (mW == 800 && mH == 480) {
+                bitRate = BITRATE_800x480;
+            }
+            format.setInteger(MediaFormat.KEY_BIT_RATE, bitRate);
+            format.setInteger(MediaFormat.KEY_FRAME_RATE, 30);
             format.setInteger(MediaFormat.KEY_I_FRAME_INTERVAL, IFRAME_INTERVAL);
-            // Create a MediaCodec for the desired codec, then configure it as an encoder with
-            // our desired properties.  Request a Surface to use for input.
-            mEncoder = MediaCodec.createByCodecName(mCodecInfo.mCodecName);
+            mEncoder = MediaCodec.createEncoderByType(MIME_TYPE);
             mEncoder.configure(format, null, null, MediaCodec.CONFIGURE_FLAG_ENCODE);
-            mSurface = mEncoder.createInputSurface();
+            mEncodingSurface = mEncoder.createInputSurface();
             mEncoder.start();
             mInitCompleted.release();
+            if (DBG) {
+                Log.i(TAG, "starting encoder");
+            }
             try {
                 ByteBuffer[] encoderOutputBuffers = mEncoder.getOutputBuffers();
                 MediaCodec.BufferInfo info = new MediaCodec.BufferInfo();
                 while (!mStopEncoding) {
                     int index = mEncoder.dequeueOutputBuffer(info, TIMEOUT_USEC_NORMAL);
+                    if (DBG) {
+                        Log.i(TAG, "dequeOutputBuffer returned " + index);
+                    }
                     if (index >= 0) {
                         if ((info.flags & MediaCodec.BUFFER_FLAG_CODEC_CONFIG) != 0) {
                             Log.i(TAG, "codec config data");
@@ -241,6 +556,7 @@ public class EncodeVirtualDisplayWithCompositionTest extends AndroidTestCase {
                             mEventListener.onCodecConfig(encodedData, info);
                             mEncoder.releaseOutputBuffer(index, false);
                         } else if ((info.flags & MediaCodec.BUFFER_FLAG_END_OF_STREAM) != 0) {
+                            Log.i(TAG, "EOS, stopping encoding");
                             break;
                         } else {
                             ByteBuffer encodedData = encoderOutputBuffers[index];
@@ -251,10 +567,15 @@ public class EncodeVirtualDisplayWithCompositionTest extends AndroidTestCase {
                         }
                     }
                 }
+            } catch (Exception e) {
+                e.printStackTrace();
+                throw e;
             } finally {
                 mEncoder.stop();
                 mEncoder.release();
                 mEncoder = null;
+                mEncodingSurface.release();
+                mEncodingSurface = null;
             }
         }
     }
@@ -266,10 +587,8 @@ public class EncodeVirtualDisplayWithCompositionTest extends AndroidTestCase {
         private Surface mSurface;
         private int mWidth;
         private int mHeight;
-        private int mNumWindows;
-        private ArrayList<GlWindow> mWindows = new ArrayList<GlWindow>();
-        private HashMap<SurfaceTexture, GlWindow> mSurfaceTextureToWindowMap =
-                new HashMap<SurfaceTexture, GlWindow>();
+        private volatile int mNumWindows;
+        private GlWindow mTopWindow;
         private Thread mCompositionThread;
         private Semaphore mStartCompletionSemaphore;
         private Semaphore mRecreationCompletionSemaphore;
@@ -282,6 +601,7 @@ public class EncodeVirtualDisplayWithCompositionTest extends AndroidTestCase {
         private int mGlaPositionHandle;
         private int mGlaTextureHandle;
         private float[] mMVPMatrix = new float[16];
+        private TopWindowVirtualDisplayPresentation mTopPresentation;
 
         private static final String VERTEX_SHADER =
                 "uniform mat4 uMVPMatrix;\n" +
@@ -303,7 +623,7 @@ public class EncodeVirtualDisplayWithCompositionTest extends AndroidTestCase {
                 "  gl_FragColor = texture2D(sTexture, vTextureCoord);\n" +
                 "}\n";
 
-        void startComposition(Surface surface, int w, int h, int numWindows) {
+        void startComposition(Surface surface, int w, int h, int numWindows) throws Exception {
             mSurface = surface;
             mWidth = w;
             mHeight = h;
@@ -329,14 +649,18 @@ public class EncodeVirtualDisplayWithCompositionTest extends AndroidTestCase {
         }
 
         Surface getWindowSurface(int windowIndex) {
-            return mWindows.get(windowIndex).getSurface();
+            return mTopPresentation.getSurface(windowIndex);
         }
 
         void recreateWindows() throws Exception {
             mRecreationCompletionSemaphore = new Semaphore(0);
             Message msg = mHandler.obtainMessage(CompositionHandler.DO_RECREATE_WINDOWS);
             mHandler.sendMessage(msg);
-            mRecreationCompletionSemaphore.acquire();
+            if(!mRecreationCompletionSemaphore.tryAcquire(DEFAULT_WAIT_TIMEOUT_MS,
+                    TimeUnit.MILLISECONDS)) {
+                fail("recreation timeout");
+            }
+            mTopPresentation.waitForSurfaceReady(DEFAULT_WAIT_TIMEOUT_MS);
         }
 
         @Override
@@ -344,16 +668,20 @@ public class EncodeVirtualDisplayWithCompositionTest extends AndroidTestCase {
             if (DBG) {
                 Log.i(TAG, "onFrameAvailable " + surface);
             }
-            GlWindow w = mSurfaceTextureToWindowMap.get(surface);
+            GlWindow w = mTopWindow;
             if (w != null) {
                 w.markTextureUpdated();
                 requestUpdate();
             } else {
-                Log.w(TAG, "cannot map Surface " + surface + " to window");
+                Log.w(TAG, "top window gone");
             }
         }
 
         private void requestUpdate() {
+            Thread compositionThread = mCompositionThread;
+            if (compositionThread == null || !compositionThread.isAlive()) {
+                return;
+            }
             Message msg = mHandler.obtainMessage(CompositionHandler.DO_RENDERING);
             mHandler.sendMessage(msg);
         }
@@ -442,25 +770,27 @@ public class EncodeVirtualDisplayWithCompositionTest extends AndroidTestCase {
             Matrix.orthoM(projMatrix, 0, -wMid, wMid, -hMid, hMid, 1, 10);
             Matrix.multiplyMM(mMVPMatrix, 0, projMatrix, 0, vMatrix, 0);
             createWindows();
+
         }
 
         private void createWindows() throws GlException {
-            // windows placed horizontally
-            int windowWidth = mWidth / mNumWindows;
-            for (int i = 0; i < mNumWindows; i++) {
-                GlWindow window = new GlWindow(this, i * windowWidth, 0, windowWidth, mHeight);
-                window.init();
-                mSurfaceTextureToWindowMap.put(window.getSurfaceTexture(), window);
-                mWindows.add(window);
-            }
+            mTopWindow = new GlWindow(this, 0, 0, mWidth, mHeight);
+            mTopWindow.init();
+            mTopPresentation = new TopWindowVirtualDisplayPresentation(mContext,
+                    mTopWindow.getSurface(), mWidth, mHeight, mNumWindows);
+            mTopPresentation.createVirtualDisplay();
+            mTopPresentation.createPresentation();
+            ((TopWindowPresentation) mTopPresentation.getPresentation()).populateWindows();
         }
 
         private void cleanupGl() {
-            for (GlWindow w: mWindows) {
-                w.cleanup();
+            if (mTopPresentation != null) {
+                mTopPresentation.dismissPresentation();
+                mTopPresentation.destroyVirtualDisplay();
             }
-            mWindows.clear();
-            mSurfaceTextureToWindowMap.clear();
+            if (mTopWindow != null) {
+                mTopWindow.cleanup();
+            }
             if (mEglHelper != null) {
                 mEglHelper.release();
             }
@@ -470,52 +800,48 @@ public class EncodeVirtualDisplayWithCompositionTest extends AndroidTestCase {
             if (DBG) {
                 Log.i(TAG, "doGlRendering");
             }
-            for (GlWindow w: mWindows) {
-                w.updateTexImageIfNecessary();
-            }
+            mTopWindow.updateTexImageIfNecessary();
             GLES20.glClearColor(0.0f, 1.0f, 0.0f, 1.0f);
             GLES20.glClear(GLES20.GL_DEPTH_BUFFER_BIT | GLES20.GL_COLOR_BUFFER_BIT);
 
             GLES20.glUseProgram(mGlProgramId);
-            for (GlWindow w: mWindows) {
-                GLES20.glUniformMatrix4fv(mGluMVPMatrixHandle, 1, false, mMVPMatrix, 0);
-                w.onDraw(mGluSTMatrixHandle, mGlaPositionHandle, mGlaTextureHandle);
-                checkGlError("window draw");
-            }
+            GLES20.glUniformMatrix4fv(mGluMVPMatrixHandle, 1, false, mMVPMatrix, 0);
+            mTopWindow.onDraw(mGluSTMatrixHandle, mGlaPositionHandle, mGlaTextureHandle);
+            checkGlError("window draw");
             mEglHelper.swapBuffers();
         }
+
         private void doRecreateWindows() throws GlException {
-            for (GlWindow w: mWindows) {
-                w.cleanup();
-            }
-            mWindows.clear();
-            mSurfaceTextureToWindowMap.clear();
+            mTopPresentation.dismissPresentation();
+            mTopPresentation.destroyVirtualDisplay();
+            mTopWindow.cleanup();
             createWindows();
             mRecreationCompletionSemaphore.release();
         }
 
-        private void waitForStartCompletion() {
-            try {
-                mStartCompletionSemaphore.acquire();
-            } catch (InterruptedException e) {
-                //ignore
+        private void waitForStartCompletion() throws Exception {
+            if (!mStartCompletionSemaphore.tryAcquire(DEFAULT_WAIT_TIMEOUT_MS,
+                    TimeUnit.MILLISECONDS)) {
+                fail("start timeout");
             }
             mStartCompletionSemaphore = null;
+            mTopPresentation.waitForSurfaceReady(DEFAULT_WAIT_TIMEOUT_MS);
         }
 
         private class CompositionRunnable implements Runnable {
             @Override
             public void run() {
                 try {
-                    initGl();
-                    Looper.prepare();
                     mLooper = Looper.myLooper();
+                    Looper.prepare();
                     mHandler = new CompositionHandler();
+                    initGl();
                     // init done
                     mStartCompletionSemaphore.release();
                     Looper.loop();
                 } catch (GlException e) {
-                    // ignore and clean-up
+                    e.printStackTrace();
+                    fail("got gl exception");
                 } finally {
                     cleanupGl();
                     mHandler = null;
@@ -560,7 +886,7 @@ public class EncodeVirtualDisplayWithCompositionTest extends AndroidTestCase {
             private volatile Surface mSurface;
             private FloatBuffer mVerticesData;
             private float[] mSTMatrix = new float[16];
-            private AtomicBoolean mTextureUpdated = new AtomicBoolean(false);
+            private AtomicInteger mNumTextureUpdated = new AtomicInteger(0);
             private GlCompositor mCompositor;
 
             /**
@@ -620,7 +946,7 @@ public class EncodeVirtualDisplayWithCompositionTest extends AndroidTestCase {
             }
 
             public void cleanup() {
-                mTextureUpdated.set(false);
+                mNumTextureUpdated.set(0);
                 if (mTextureId != 0) {
                     int[] textures = new int[] {
                             mTextureId
@@ -628,29 +954,37 @@ public class EncodeVirtualDisplayWithCompositionTest extends AndroidTestCase {
                     GLES20.glDeleteTextures(1, textures, 0);
                 }
                 GLES20.glFinish();
-                mSurface.release();
-                mSurface = null;
-                mSurfaceTexture.release();
-                mSurfaceTexture = null;
+                if (mSurface != null) {
+                    mSurface.release();
+                    mSurface = null;
+                }
+                if (mSurfaceTexture != null) {
+                    mSurfaceTexture.release();
+                    mSurfaceTexture = null;
+                }
             }
 
             /**
              * make texture as updated so that it can be updated in the next rendering.
              */
             public void markTextureUpdated() {
-                mTextureUpdated.set(true);
+                mNumTextureUpdated.incrementAndGet();
             }
 
             /**
              * update texture for rendering if it is updated.
              */
             public void updateTexImageIfNecessary() {
-                if (mTextureUpdated.getAndSet(false)) {
+                int numTextureUpdated = mNumTextureUpdated.getAndDecrement();
+                if (numTextureUpdated > 0) {
                     if (DBG) {
                         Log.i(TAG, "updateTexImageIfNecessary " + this);
                     }
                     mSurfaceTexture.updateTexImage();
                     mSurfaceTexture.getTransformMatrix(mSTMatrix);
+                }
+                if (numTextureUpdated < 0) {
+                    fail("should not happen");
                 }
             }
 
@@ -701,26 +1035,24 @@ public class EncodeVirtualDisplayWithCompositionTest extends AndroidTestCase {
         }
     }
 
-    private class VirtualDisplayPresentation {
-        public static final int RENDERING_OPENGL = 0;
-        public static final int RENDERING_VIEW_HIERARCHY = 1;
+    private interface Renderer {
+        void doRendering(final int color) throws Exception;
+    }
 
-        private Context mContext;
-        private Surface mSurface;
-        private int mWidth;
-        private int mHeight;
-        private int mRenderingType;
+    private static class VirtualDisplayPresentation implements Renderer {
+        protected final Context mContext;
+        protected final Surface mSurface;
+        protected final int mWidth;
+        protected final int mHeight;
+        protected VirtualDisplay mVirtualDisplay;
+        protected TestPresentationBase mPresentation;
         private final DisplayManager mDisplayManager;
-        private VirtualDisplay mVirtualDisplay;
-        private TestPresentation mPresentation;
 
-        VirtualDisplayPresentation(Context context, Surface surface, int w, int h,
-                int renderingType) {
+        VirtualDisplayPresentation(Context context, Surface surface, int w, int h) {
             mContext = context;
             mSurface = surface;
             mWidth = w;
             mHeight = h;
-            mRenderingType = renderingType;
             mDisplayManager = (DisplayManager)context.getSystemService(Context.DISPLAY_SERVICE);
         }
 
@@ -747,11 +1079,18 @@ public class EncodeVirtualDisplayWithCompositionTest extends AndroidTestCase {
             runOnMainSync(new Runnable() {
                 @Override
                 public void run() {
-                    mPresentation = new TestPresentation(getContext(),
-                            mVirtualDisplay.getDisplay());
+                    mPresentation = doCreatePresentation();
                     mPresentation.show();
                 }
             });
+        }
+
+        protected TestPresentationBase doCreatePresentation() {
+            return new TestPresentation(mContext, mVirtualDisplay.getDisplay());
+        }
+
+        TestPresentationBase getPresentation() {
+            return mPresentation;
         }
 
         void dismissPresentation() {
@@ -763,46 +1102,192 @@ public class EncodeVirtualDisplayWithCompositionTest extends AndroidTestCase {
             });
         }
 
-        void doRendering() {
+        @Override
+        public void doRendering(final int color) throws Exception {
             runOnMainSync(new Runnable() {
                 @Override
                 public void run() {
-                    mPresentation.doRendering();
+                    mPresentation.doRendering(color);
+                }
+            });
+        }
+    }
+
+    private static class TestPresentationBase extends Presentation {
+
+        public TestPresentationBase(Context outerContext, Display display) {
+            super(outerContext, display);
+            getWindow().setType(WindowManager.LayoutParams.TYPE_PRIVATE_PRESENTATION);
+            getWindow().addFlags(WindowManager.LayoutParams.FLAG_LOCAL_FOCUS_MODE);
+            getWindow().addFlags(WindowManager.LayoutParams.FLAG_HARDWARE_ACCELERATED);
+        }
+
+        public void doRendering(int color) {
+            // to be implemented by child
+        }
+    }
+
+    private static class TestPresentation extends TestPresentationBase {
+        private ImageView mImageView;
+
+        public TestPresentation(Context outerContext, Display display) {
+            super(outerContext, display);
+        }
+
+        @Override
+        protected void onCreate(Bundle savedInstanceState) {
+            super.onCreate(savedInstanceState);
+            mImageView = new ImageView(getContext());
+            mImageView.setImageDrawable(new ColorDrawable(COLOR_RED));
+            mImageView.setLayoutParams(new LayoutParams(
+                    LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT));
+            setContentView(mImageView);
+        }
+
+        public void doRendering(int color) {
+            mImageView.setImageDrawable(new ColorDrawable(color));
+        }
+    }
+
+    private static class TopWindowPresentation extends TestPresentationBase {
+        private FrameLayout[] mWindowsLayout = new FrameLayout[MAX_NUM_WINDOWS];
+        private CompositionTextureView[] mWindows = new CompositionTextureView[MAX_NUM_WINDOWS];
+        private final int mNumWindows;
+        private final Semaphore mWindowWaitSemaphore = new Semaphore(0);
+
+        public TopWindowPresentation(int numWindows, Context outerContext, Display display) {
+            super(outerContext, display);
+            mNumWindows = numWindows;
+        }
+
+        @Override
+        protected void onCreate(Bundle savedInstanceState) {
+            super.onCreate(savedInstanceState);
+            if (DBG) {
+                Log.i(TAG, "TopWindowPresentation onCreate, numWindows " + mNumWindows);
+            }
+            setContentView(R.layout.composition_layout);
+            mWindowsLayout[0] = (FrameLayout) findViewById(R.id.window0);
+            mWindowsLayout[1] = (FrameLayout) findViewById(R.id.window1);
+            mWindowsLayout[2] = (FrameLayout) findViewById(R.id.window2);
+        }
+
+        public void populateWindows() {
+            runOnMain(new Runnable() {
+                public void run() {
+                    for (int i = 0; i < mNumWindows; i++) {
+                        mWindows[i] = new CompositionTextureView(getContext());
+                        mWindows[i].setLayoutParams(new ViewGroup.LayoutParams(
+                                ViewGroup.LayoutParams.MATCH_PARENT,
+                                ViewGroup.LayoutParams.MATCH_PARENT));
+                        mWindowsLayout[i].setVisibility(View.VISIBLE);
+                        mWindowsLayout[i].addView(mWindows[i]);
+                        mWindows[i].startListening();
+                    }
+                    mWindowWaitSemaphore.release();
                 }
             });
         }
 
-        private class TestPresentation extends Presentation {
-            private TextView mTextView;
-            private int mRenderingCount = 0;
-
-            public TestPresentation(Context outerContext, Display display) {
-                super(outerContext, display);
-                getWindow().setType(WindowManager.LayoutParams.TYPE_PRIVATE_PRESENTATION);
-            }
-
-            @Override
-            protected void onCreate(Bundle savedInstanceState) {
-                super.onCreate(savedInstanceState);
-                if (VirtualDisplayPresentation.this.mRenderingType == RENDERING_OPENGL) {
-                    //TODO add init for opengl renderer
-                } else {
-                    mTextView = new TextView(getContext());
-                    mTextView.setTextSize(14);
-                    mTextView.setTypeface(Typeface.DEFAULT_BOLD);
-                    mTextView.setText(Integer.toString(mRenderingCount));
-                    setContentView(mTextView);
+        public void waitForSurfaceReady(long timeoutMs) throws Exception {
+            mWindowWaitSemaphore.tryAcquire(DEFAULT_WAIT_TIMEOUT_MS, TimeUnit.MILLISECONDS);
+            for (int i = 0; i < mNumWindows; i++) {
+                if(!mWindows[i].waitForSurfaceReady(timeoutMs)) {
+                    fail("surface wait timeout");
                 }
             }
+        }
 
-            public void doRendering() {
-                if (VirtualDisplayPresentation.this.mRenderingType == RENDERING_OPENGL) {
-                    //TODO add opengl rendering
-                } else {
-                    mRenderingCount++;
-                    mTextView.setText(Integer.toString(mRenderingCount));
-                }
+        public Surface getSurface(int windowIndex) {
+            Surface surface = mWindows[windowIndex].getSurface();
+            assertNotNull(surface);
+            return surface;
+        }
+    }
+
+    private static class TopWindowVirtualDisplayPresentation extends VirtualDisplayPresentation {
+        private final int mNumWindows;
+
+        TopWindowVirtualDisplayPresentation(Context context, Surface surface, int w, int h,
+                int numWindows) {
+            super(context, surface, w, h);
+            assertNotNull(surface);
+            mNumWindows = numWindows;
+        }
+
+        void waitForSurfaceReady(long timeoutMs) throws Exception {
+            ((TopWindowPresentation) mPresentation).waitForSurfaceReady(timeoutMs);
+        }
+
+        Surface getSurface(int windowIndex) {
+            return ((TopWindowPresentation) mPresentation).getSurface(windowIndex);
+        }
+
+        protected TestPresentationBase doCreatePresentation() {
+            return new TopWindowPresentation(mNumWindows, mContext, mVirtualDisplay.getDisplay());
+        }
+    }
+
+    private static class RemoteVirtualDisplayPresentation implements Renderer {
+        /** argument: Surface, int w, int h, return none */
+        private static final int BINDER_CMD_START = IBinder.FIRST_CALL_TRANSACTION;
+        /** argument: int color, return none */
+        private static final int BINDER_CMD_RENDER = IBinder.FIRST_CALL_TRANSACTION + 1;
+
+        private final Context mContext;
+        private final Surface mSurface;
+        private final int mWidth;
+        private final int mHeight;
+
+        private IBinder mService;
+        private final Semaphore mConnectionWait = new Semaphore(0);
+        private final ServiceConnection mConnection = new ServiceConnection() {
+
+            public void onServiceConnected(ComponentName arg0, IBinder arg1) {
+                mService = arg1;
+                mConnectionWait.release();
             }
+
+            public void onServiceDisconnected(ComponentName arg0) {
+                //ignore
+            }
+
+        };
+
+        RemoteVirtualDisplayPresentation(Context context, Surface surface, int w, int h) {
+            mContext = context;
+            mSurface = surface;
+            mWidth = w;
+            mHeight = h;
+        }
+
+        void connect() throws Exception {
+            Intent intent = new Intent();
+            intent.setClassName("com.android.cts.media",
+                    "android.media.cts.RemoteVirtualDisplayService");
+            mContext.bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
+            if (!mConnectionWait.tryAcquire(DEFAULT_WAIT_TIMEOUT_MS, TimeUnit.MILLISECONDS)) {
+                fail("cannot bind to service");
+            }
+        }
+
+        void disconnect() {
+            mContext.unbindService(mConnection);
+        }
+
+        void start() throws Exception {
+            Parcel parcel = Parcel.obtain();
+            mSurface.writeToParcel(parcel, 0);
+            parcel.writeInt(mWidth);
+            parcel.writeInt(mHeight);
+            mService.transact(BINDER_CMD_START, parcel, null, 0);
+        }
+
+        @Override
+        public void doRendering(int color) throws Exception {
+            Parcel parcel = Parcel.obtain();
+            parcel.writeInt(color);
+            mService.transact(BINDER_CMD_RENDER, parcel, null, 0);
         }
     }
 
@@ -813,6 +1298,7 @@ public class EncodeVirtualDisplayWithCompositionTest extends AndroidTestCase {
         public int mBitRate;
         public String mCodecName;
     };
+
     /**
      * Returns the first codec capable of encoding the specified MIME type, or null if no
      * match was found.
@@ -911,9 +1397,93 @@ public class EncodeVirtualDisplayWithCompositionTest extends AndroidTestCase {
         return info;
     }
 
-    public void runOnMainSync(Runnable runner) {
+    /**
+     * Check maximum concurrent encoding / decoding resolution allowed.
+     * Some H/Ws cannot support maximum resolution reported in encoder if decoder is running
+     * at the same time.
+     * Check is done for 4 different levels: 1080p, 720p, 800x480 and max of encoder if is is
+     * smaller than 800x480.
+     */
+    private Pair<Integer, Integer> checkMaxConcurrentEncodingDecodingResolution() {
+        CodecInfo codecInfo = getAvcSupportedFormatInfo();
+        int maxW = codecInfo.mMaxW;
+        int maxH = codecInfo.mMaxH;
+        if (maxW >= 1920 && maxH >= 1080) {
+            if (isConcurrentEncodingDecodingSupported(1920, 1080, BITRATE_1080p)) {
+                return new Pair<Integer, Integer>(1920, 1080);
+            }
+        }
+        if (maxW >= 1280 && maxH >= 720) {
+            if (isConcurrentEncodingDecodingSupported(1280, 720, BITRATE_720p)) {
+                return new Pair<Integer, Integer>(1280, 720);
+            }
+        }
+        if (maxW >= 800 && maxH >= 480) {
+            if (isConcurrentEncodingDecodingSupported(800, 480, BITRATE_800x480)) {
+                return new Pair<Integer, Integer>(800, 480);
+            }
+        }
+        if (!isConcurrentEncodingDecodingSupported(codecInfo.mMaxW, codecInfo.mMaxH,
+                codecInfo.mBitRate)) {
+            fail("should work with advertised resolution");
+        }
+        return new Pair<Integer, Integer>(maxW, maxH);
+    }
+
+    private boolean isConcurrentEncodingDecodingSupported(int w, int h, int bitRate) {
+        MediaCodec decoder = null;
+        OutputSurface decodingSurface = null;
+        MediaCodec encoder = null;
+        Surface encodingSurface = null;
+        try {
+            decoder = MediaCodec.createDecoderByType(MIME_TYPE);
+            MediaFormat decoderFormat = MediaFormat.createVideoFormat(MIME_TYPE, w, h);
+            decodingSurface = new OutputSurface(w, h);
+            decodingSurface.makeCurrent();
+            decoder.configure(decoderFormat, decodingSurface.getSurface(), null, 0);
+            decoder.start();
+
+            MediaFormat format = MediaFormat.createVideoFormat(MIME_TYPE, w, h);
+            format.setInteger(MediaFormat.KEY_COLOR_FORMAT,
+                    MediaCodecInfo.CodecCapabilities.COLOR_FormatSurface);
+            format.setInteger(MediaFormat.KEY_BIT_RATE, bitRate);
+            format.setInteger(MediaFormat.KEY_FRAME_RATE, 30);
+            format.setInteger(MediaFormat.KEY_I_FRAME_INTERVAL, IFRAME_INTERVAL);
+            encoder = MediaCodec.createEncoderByType(MIME_TYPE);;
+            encoder.configure(format, null, null, MediaCodec.CONFIGURE_FLAG_ENCODE);
+            encodingSurface = encoder.createInputSurface();
+            encoder.start();
+
+            encoder.stop();
+            decoder.stop();
+        } catch (Exception e) {
+            e.printStackTrace();
+            Log.i(TAG, "This H/W does not support w:" + w + " h:" + h);
+            return false;
+        } finally {
+            if (encodingSurface != null) {
+                encodingSurface.release();
+            }
+            if (encoder != null) {
+                encoder.release();
+            }
+            if (decoder != null) {
+                decoder.release();
+            }
+            if (decodingSurface != null) {
+                decodingSurface.release();
+            }
+        }
+        return true;
+    }
+
+    private static void runOnMain(Runnable runner) {
+        sHandlerForRunOnMain.post(runner);
+    }
+
+    private static void runOnMainSync(Runnable runner) {
         SyncRunnable sr = new SyncRunnable(runner);
-        mHandler.post(sr);
+        sHandlerForRunOnMain.post(sr);
         sr.waitForComplete();
     }
 
@@ -939,6 +1509,7 @@ public class EncodeVirtualDisplayWithCompositionTest extends AndroidTestCase {
                     try {
                         wait();
                     } catch (InterruptedException e) {
+                        //ignore
                     }
                 }
             }

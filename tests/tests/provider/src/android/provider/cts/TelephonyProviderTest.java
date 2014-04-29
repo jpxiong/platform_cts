@@ -22,6 +22,8 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.ParcelFileDescriptor;
 import android.provider.Telephony.Carriers;
+import android.net.Uri;
+import android.os.ParcelFileDescriptor;
 import android.test.InstrumentationTestCase;
 
 import java.lang.reflect.Field;

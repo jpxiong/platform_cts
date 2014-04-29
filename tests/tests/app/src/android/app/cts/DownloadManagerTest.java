@@ -44,9 +44,9 @@ public class DownloadManagerTest extends AndroidTestCase {
 
     /**
      * According to the CDD Section 7.6.1, the DownloadManager implementation must be able to
-     * download individual files of 55 MB.
+     * download individual files of 100 MB.
      */
-    private static final int MINIMUM_DOWNLOAD_BYTES = 55 * 1024 * 1024;
+    private static final int MINIMUM_DOWNLOAD_BYTES = 100 * 1024 * 1024;
 
     private static final long SHORT_TIMEOUT = 5 * DateUtils.SECOND_IN_MILLIS;
     private static final long LONG_TIMEOUT = 2 * DateUtils.MINUTE_IN_MILLIS;

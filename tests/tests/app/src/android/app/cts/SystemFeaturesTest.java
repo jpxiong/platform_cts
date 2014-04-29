@@ -200,6 +200,7 @@ public class SystemFeaturesTest extends InstrumentationTestCase {
     public void testNfcFeatures() {
         if (NfcAdapter.getDefaultAdapter(mContext) != null) {
             assertAvailable(PackageManager.FEATURE_NFC);
+            assertAvailable(PackageManager.FEATURE_NFC_HOST_CARD_EMULATION);
         } else {
             assertNotAvailable(PackageManager.FEATURE_NFC);
         }
@@ -337,6 +338,7 @@ public class SystemFeaturesTest extends InstrumentationTestCase {
         ConfigurationInfo configInfo = mActivityManager.getDeviceConfigurationInfo();
         if (configInfo.reqTouchScreen != Configuration.TOUCHSCREEN_NOTOUCH) {
             assertAvailable(PackageManager.FEATURE_TOUCHSCREEN);
+            assertAvailable(PackageManager.FEATURE_FAKETOUCH);
         } else {
             assertNotAvailable(PackageManager.FEATURE_TOUCHSCREEN);
         }

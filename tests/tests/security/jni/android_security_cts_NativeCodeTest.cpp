@@ -23,6 +23,9 @@
 #include <sys/wait.h>
 #include <signal.h>
 #include <stdlib.h>
+#include <sys/mman.h>
+#include <sys/stat.h>
+#include <fcntl.h>
 #include <cutils/log.h>
 #include <linux/perf_event.h>
 
@@ -163,6 +166,54 @@ static jboolean android_security_cts_NativeCodeTest_doVrootTest(JNIEnv*, jobject
     return parent(pid);
 }
 
+static void* mmap_syscall(void* addr, size_t len, int prot, int flags, int fd, off_t offset)
+{
+    return (void*) syscall(__NR_mmap2, addr, len, prot, flags, fd, offset);
+}
+
+#define KBASE_REG_COOKIE_TB         2
+#define KBASE_REG_COOKIE_MTP        3
+
+/*
+ * Returns true if the device is immune to CVE-2014-1710,
+ * false if the device is vulnerable.
+ */
+static jboolean android_security_cts_NativeCodeTest_doCVE20141710Test(JNIEnv*, jobject)
+{
+    jboolean result = false;
+    int fd = open("/dev/mali0", O_RDWR);
+    if (fd < 0) {
+        return true; /* not vulnerable */
+    }
+
+    void* a = mmap_syscall(NULL, 0x1000, PROT_READ, MAP_SHARED, fd, KBASE_REG_COOKIE_MTP);
+    void* b = mmap_syscall(NULL, 0x1000, PROT_READ, MAP_SHARED, fd, KBASE_REG_COOKIE_TB);
+
+    if (a == MAP_FAILED) {
+        result = true; /* assume not vulnerable */
+        goto done;
+    }
+
+    if (b == MAP_FAILED) {
+        result = true; /* assume not vulnerable */
+        goto done;
+    }
+
+    /* mprotect should return an error if not vulnerable */
+    result = (mprotect(b, 0x1000, PROT_READ | PROT_WRITE) == -1);
+
+ done:
+    if (a != MAP_FAILED) {
+        munmap(a, 0x1000);
+    }
+    if (b != MAP_FAILED) {
+        munmap(b, 0x1000);
+    }
+    close(fd);
+    return result;
+}
+
+
 static JNINativeMethod gMethods[] = {
     {  "doPerfEventTest", "()Z",
             (void *) android_security_cts_NativeCodeTest_doPerfEventTest },
@@ -170,6 +221,8 @@ static JNINativeMethod gMethods[] = {
             (void *) android_security_cts_NativeCodeTest_doPerfEventTest2 },
     {  "doVrootTest", "()Z",
             (void *) android_security_cts_NativeCodeTest_doVrootTest },
+    {  "doCVE20141710Test", "()Z",
+            (void *) android_security_cts_NativeCodeTest_doCVE20141710Test },
 };
 
 int register_android_security_cts_NativeCodeTest(JNIEnv* env)

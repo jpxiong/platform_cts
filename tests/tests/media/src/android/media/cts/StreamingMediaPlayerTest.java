@@ -16,6 +16,7 @@
 package android.media.cts;
 
 import android.media.MediaPlayer;
+import android.util.Log;
 import android.webkit.cts.CtsTestServer;
 
 
@@ -110,10 +111,12 @@ public class StreamingMediaPlayerTest extends MediaPlayerTestBase {
     // Streaming HLS video from YouTube
     public void testHLS() throws Exception {
         // Play stream for 60 seconds
-        playLiveVideoTest("http://www.youtube.com/api/manifest/hls/ns/yt-live/id/UeHRu5LFHaU"
-                + "?ip=0.0.0.0&ipbits=0&expire=19000000000&sparams=ip,ipbits,expire&signature"
-                + "=313BE90526F2D815EB207156E1460C7E8EEC2503.799EE7B8B7CE3F2957060DB27C216077"
-                + "0303EBD2&key=test_key1&user=android-device-test&m3u8=1", 60 * 1000);
+        playLiveVideoTest("http://www.youtube.com/api/manifest/hls_variant/id/"
+                + "0168724d02bd9945/itag/5/source/youtube/playlist_type/DVR/ip/"
+                + "0.0.0.0/ipbits/0/expire/19000000000/sparams/ip,ipbits,expire"
+                + ",id,itag,source,playlist_type/signature/773AB8ACC68A96E5AA48"
+                + "1996AD6A1BBCB70DCB87.95733B544ACC5F01A1223A837D2CF04DF85A336"
+                + "0/key/ik0", 60 * 1000);
     }
 
     // Streaming audio from local HTTP server
@@ -137,6 +140,9 @@ public class StreamingMediaPlayerTest extends MediaPlayerTestBase {
     }
     public void testPlayOggStreamNoLength() throws Throwable {
         localHttpAudioStreamTest("noiseandchirps.ogg", false, true);
+    }
+    public void testPlayMp3Stream1Ssl() throws Throwable {
+        localHttpsAudioStreamTest("ringer.mp3", false, false);
     }
 
     private void localHttpAudioStreamTest(final String name, boolean redirect, boolean nolength)
@@ -189,6 +195,53 @@ public class StreamingMediaPlayerTest extends MediaPlayerTestBase {
             }
             mMediaPlayer.stop();
             mMediaPlayer.reset();
+        } finally {
+            mServer.shutdown();
+        }
+    }
+    private void localHttpsAudioStreamTest(final String name, boolean redirect, boolean nolength)
+            throws Throwable {
+        mServer = new CtsTestServer(mContext, true);
+        try {
+            String stream_url = null;
+            if (redirect) {
+                // Stagefright doesn't have a limit, but we can't test support of infinite redirects
+                // Up to 4 redirects seems reasonable though.
+                stream_url = mServer.getRedirectingAssetUrl(name, 4);
+            } else {
+                stream_url = mServer.getAssetUrl(name);
+            }
+            if (nolength) {
+                stream_url = stream_url + "?" + CtsTestServer.NOLENGTH_POSTFIX;
+            }
+
+            mMediaPlayer.setDataSource(stream_url);
+
+            mMediaPlayer.setDisplay(getActivity().getSurfaceHolder());
+            mMediaPlayer.setScreenOnWhilePlaying(true);
+
+            mOnBufferingUpdateCalled.reset();
+            mMediaPlayer.setOnBufferingUpdateListener(new MediaPlayer.OnBufferingUpdateListener() {
+                @Override
+                public void onBufferingUpdate(MediaPlayer mp, int percent) {
+                    mOnBufferingUpdateCalled.signal();
+                }
+            });
+            mMediaPlayer.setOnErrorListener(new MediaPlayer.OnErrorListener() {
+                @Override
+                public boolean onError(MediaPlayer mp, int what, int extra) {
+                    fail("Media player had error " + what + " playing " + name);
+                    return true;
+                }
+            });
+
+            assertFalse(mOnBufferingUpdateCalled.isSignalled());
+            try {
+                mMediaPlayer.prepare();
+            } catch (Exception ex) {
+                return;
+            }
+            fail("https playback should have failed");
         } finally {
             mServer.shutdown();
         }

@@ -18,7 +18,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
       package="com.android.cts.verifier"
       android:versionCode="1"
-      android:versionName="4.4_r1">
+      android:versionName="4.4_r1.95">
 
     <!-- Using 10+ for more complete NFC support... -->
     <uses-sdk android:minSdkVersion="12"></uses-sdk>
@@ -208,9 +208,135 @@
                 android:label="@string/bt_device_picker"
                 android:configChanges="keyboardHidden|orientation|screenSize" />
 
+        <service android:name=".bluetooth.BleClientService"
+                android:label="@string/ble_client_service_name" />
+
+        <service android:name=".bluetooth.BleServerService"
+                android:label="ble_server_service_name" />
+
+        <activity android:name=".bluetooth.BleClientTestActivity"
+                android:label="@string/ble_client_test_name"
+                android:configChanges="keyboardHidden|orientation|screenSize">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.cts.intent.category.MANUAL_TEST" />
+            </intent-filter>
+            <meta-data android:name="test_category" android:value="@string/bt_le" />
+            <meta-data android:name="test_parent" android:value="com.android.cts.verifier.bluetooth.BluetoothTestActivity" />
+        </activity>
+
+        <activity android:name=".bluetooth.BleClientConnectActivity"
+                android:label="@string/ble_client_connect_name"
+                android:configChanges="keyboardHidden|orientation|screenSize">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.cts.intent.category.MANUAL_TEST" />
+            </intent-filter>
+            <meta-data android:name="test_category" android:value="@string/bt_le" />
+            <meta-data android:name="test_parent" android:value="com.android.cts.verifier.bluetooth.BleClientTestActivity" />
+        </activity>
+
+        <activity android:name=".bluetooth.BleDiscoverServiceActivity"
+                android:label="@string/ble_discover_service_name"
+                android:configChanges="keyboardHidden|orientation|screenSize">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.cts.intent.category.MANUAL_TEST" />
+            </intent-filter>
+            <meta-data android:name="test_category" android:value="@string/bt_le" />
+            <meta-data android:name="test_parent" android:value="com.android.cts.verifier.bluetooth.BleClientTestActivity" />
+        </activity>
+
+        <activity android:name=".bluetooth.BleClientCharacteristicActivity"
+                android:label="@string/ble_client_characteristic_name"
+                android:configChanges="keyboardHidden|orientation|screenSize">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.cts.intent.category.MANUAL_TEST" />
+            </intent-filter>
+            <meta-data android:name="test_category" android:value="@string/bt_le" />
+            <meta-data android:name="test_parent" android:value="com.android.cts.verifier.bluetooth.BleClientTestActivity" />
+        </activity>
+
+        <activity android:name=".bluetooth.BleNotifyCharacteristicActivity"
+                android:label="@string/ble_notify_characteristic_name"
+                android:configChanges="keyboardHidden|orientation|screenSize">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.cts.intent.category.MANUAL_TEST" />
+            </intent-filter>
+            <meta-data android:name="test_category" android:value="@string/bt_le" />
+            <meta-data android:name="test_parent" android:value="com.android.cts.verifier.bluetooth.BleClientTestActivity" />
+        </activity>
+
+        <activity android:name=".bluetooth.BleClientDescriptorActivity"
+                android:label="@string/ble_client_descriptor_name"
+                android:configChanges="keyboardHidden|orientation|screenSize">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.cts.intent.category.MANUAL_TEST" />
+            </intent-filter>
+            <meta-data android:name="test_category" android:value="@string/bt_le" />
+            <meta-data android:name="test_parent" android:value="com.android.cts.verifier.bluetooth.BleClientTestActivity" />
+        </activity>
+
+        <activity android:name=".bluetooth.BleReliableWriteActivity"
+                android:label="@string/ble_reliable_write_name"
+                android:configChanges="keyboardHidden|orientation|screenSize">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.cts.intent.category.MANUAL_TEST" />
+            </intent-filter>
+            <meta-data android:name="test_category" android:value="@string/bt_le" />
+            <meta-data android:name="test_parent" android:value="com.android.cts.verifier.bluetooth.BleClientTestActivity" />
+        </activity>
+
+        <activity android:name=".bluetooth.BleReadRssiActivity"
+                android:label="@string/ble_read_rssi_name"
+                android:configChanges="keyboardHidden|orientation|screenSize">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.cts.intent.category.MANUAL_TEST" />
+            </intent-filter>
+            <meta-data android:name="test_category" android:value="@string/bt_le" />
+            <meta-data android:name="test_parent" android:value="com.android.cts.verifier.bluetooth.BleClientTestActivity" />
+        </activity>
+
+        <activity android:name=".bluetooth.BleClientDisconnectActivity"
+                android:label="@string/ble_client_disconnect_name"
+                android:configChanges="keyboardHidden|orientation|screenSize">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.cts.intent.category.MANUAL_TEST" />
+            </intent-filter>
+            <meta-data android:name="test_category" android:value="@string/bt_le" />
+            <meta-data android:name="test_parent" android:value="com.android.cts.verifier.bluetooth.BleClientTestActivity" />
+        </activity>
+
+        <activity android:name=".bluetooth.BleServerStartActivity"
+                android:label="@string/ble_server_start_name"
+                android:configChanges="keyboardHidden|orientation|screenSize">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.cts.intent.category.MANUAL_TEST" />
+            </intent-filter>
+            <meta-data android:name="test_category" android:value="@string/bt_le" />
+            <meta-data android:name="test_parent" android:value="com.android.cts.verifier.bluetooth.BluetoothTestActivity" />
+        </activity>
+
         <activity android:name=".suid.SuidFilesActivity"
                 android:label="@string/suid_files"
                 android:configChanges="keyboardHidden|orientation|screenSize">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.cts.intent.category.MANUAL_TEST" />
+            </intent-filter>
+            <meta-data android:name="test_category" android:value="@string/test_category_security" />
+        </activity>
+
+        <activity android:name=".security.LockConfirmBypassTest"
+                android:label="@string/lock_confirm_test_title"
+                android:configChanges="keyboardHidden|orientation|screenSize" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.cts.intent.category.MANUAL_TEST" />
@@ -464,6 +590,39 @@
                        android:value="android.hardware.sensor.compass" />
         </activity-->
 
+        <activity android:name=".location.LocationModeOffTestActivity"
+                android:label="@string/location_mode_off_test">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.cts.intent.category.MANUAL_TEST" />
+            </intent-filter>
+            <meta-data android:name="test_category" android:value="@string/test_category_location" />
+        </activity>
+        <activity android:name=".location.LocationModeHighAccuracyTestActivity"
+                android:label="@string/location_mode_high_accuracy_test">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.cts.intent.category.MANUAL_TEST" />
+            </intent-filter>
+            <meta-data android:name="test_category" android:value="@string/test_category_location" />
+        </activity>
+        <activity android:name=".location.LocationModeBatterySavingTestActivity"
+                android:label="@string/location_mode_battery_saving_test">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.cts.intent.category.MANUAL_TEST" />
+            </intent-filter>
+            <meta-data android:name="test_category" android:value="@string/test_category_location" />
+        </activity>
+        <activity android:name=".location.LocationModeDeviceOnlyTestActivity"
+                android:label="@string/location_mode_device_only_test">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.cts.intent.category.MANUAL_TEST" />
+            </intent-filter>
+            <meta-data android:name="test_category" android:value="@string/test_category_location" />
+        </activity>
+
         <activity android:name=".camera.formats.CameraFormatsActivity"
                  android:label="@string/camera_format"
                  android:screenOrientation="landscape">
@@ -528,7 +687,7 @@
             </intent-filter>
             <meta-data android:name="test_category" android:value="@string/test_category_camera" />
             <meta-data android:name="test_required_features" android:value="android.hardware.sensor.gyroscope" />
-            <meta-data android:name="test_required_features" android:value="android.hardware.camera"/>
+            <meta-data android:name="test_required_features" android:value="android.hardware.camera.any"/>
         </activity>
         <activity
             android:name=".camera.fov.DetermineFovActivity"
@@ -655,6 +814,15 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity-alias>
+
+        <activity android:name=".sample.SampleTestActivity"
+                  android:label="@string/sample_framework_test">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.cts.intent.category.MANUAL_TEST" />
+            </intent-filter>
+            <meta-data android:name="test_category" android:value="@string/test_category_other" />
+        </activity>
 
         <activity android:name=".widget.WidgetTestActivity"
                 android:label="@string/widget_framework_test">

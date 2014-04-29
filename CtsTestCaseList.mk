@@ -30,15 +30,17 @@ cts_security_apps_list := \
 	CtsMultiUserStorageApp
 
 cts_support_packages := \
+    CtsAccelerationTestStubs \
+    CtsDeviceAdmin \
     CtsDeviceOpenGl \
     CtsDeviceTaskswitchingAppA \
     CtsDeviceTaskswitchingAppB \
     CtsDeviceTaskswitchingControl \
     CtsDeviceUi \
-    CtsAccelerationTestStubs \
-    CtsDeviceAdmin \
+    CtsHoloDeviceApp \
     CtsMonkeyApp \
     CtsMonkeyApp2 \
+    CtsSampleDeviceApp \
     CtsSomeAccessibilityServices \
     CtsTestStubs \
     SignatureTest \
@@ -82,7 +84,6 @@ cts_test_packages := \
     CtsDreamsTestCases \
     CtsDrmTestCases \
     CtsEffectTestCases \
-    CtsExampleTestCases \
     CtsGestureTestCases \
     CtsGraphicsTestCases \
     CtsGraphics2TestCases \
@@ -107,6 +108,7 @@ cts_test_packages := \
     CtsRenderscriptTestCases \
     CtsRenderscriptGraphicsTestCases \
     CtsRsCppTestCases \
+    CtsSampleDeviceTestCases \
     CtsSaxTestCases \
     CtsSecurityTestCases \
     CtsSpeechTestCases \
@@ -124,16 +126,16 @@ CTS_COVERAGE_TEST_CASE_LIST := \
 	$(cts_support_packages) \
 	$(cts_test_packages)
 
-
 # Host side only tests
 cts_host_libraries := \
-    CtsHostUi \
-    CtsHostJank \
     CtsAdbTests \
     CtsAppSecurityTests \
+    CtsHoloHostTestCases \
+    CtsHostJank \
+    CtsHostUi \
     CtsMonkeyTestCases \
+    CtsSampleHostTestCases \
     CtsUsbTests
-
 
 # Native test executables that need to have associated test XMLs.
 cts_native_exes := \

@@ -1,31 +1,27 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-    >
+          android:layout_width="match_parent"
+          android:layout_height="match_parent"
+          android:orientation="vertical" >
 
-    <LinearLayout android:orientation="vertical"
-                  android:layout_width="match_parent"
-                  android:layout_height="wrap_content"
-                  android:layout_alignParentTop="true"
-                  android:padding="5dp"
-        >
+  <LinearLayout
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content" >
+    <TextView android:id="@+id/info"
+              android:layout_width="match_parent"
+              android:layout_height="wrap_content"
+              android:textSize="18sp"
+              android:padding="5dp"
+              android:text="@string/dc_start_alarm_test_info" />
 
-        <TextView android:id="@+id/info"
+    <LinearLayout android:id="@+id/buttons"
+                  android:orientation="horizontal"
                   android:layout_width="wrap_content"
-                  android:textSize="18sp"
                   android:layout_height="wrap_content"
-                  android:text="@string/dc_show_alarms_test_info"
-            />
+                  android:layout_alignParentTop="true"/>
 
-        <LinearLayout android:id="@+id/buttons"
-                      android:orientation="horizontal"
-                      android:layout_width="wrap_content"
-                      android:layout_height="wrap_content"
-                      android:layout_alignParentTop="true"/>
-
-        <include layout="@layout/pass_fail_buttons"/>
-    </LinearLayout>
+    <include layout="@layout/pass_fail_buttons"/>
+  </LinearLayout>
 
 </ScrollView>
