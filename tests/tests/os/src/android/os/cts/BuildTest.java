@@ -198,6 +198,24 @@ public class BuildTest extends TestCase {
         assertNotEmpty(Build.USER);
     }
 
+    private static final String RO_DEBUGGABLE = "ro.debuggable";
+    private static final String RO_SECURE = "ro.secure";
+
+    /**
+     * Assert that the device is a secure, not debuggable user build.
+     *
+     * Debuggable devices allow adb root and have the su command, allowing
+     * escalations to root and unauthorized access to application data.
+     *
+     * Note: This test will fail on userdebug / eng devices, but should pass
+     * on production (user) builds.
+     */
+    public void testIsSecureUserBuild() throws IOException {
+        assertEquals("Must be a user build", "user", Build.TYPE);
+        assertProperty("Must be a non-debuggable build", RO_DEBUGGABLE, "0");
+        assertProperty("Must be a secure build", RO_SECURE, "1");
+    }
+
     private void assertNotEmpty(String value) {
         assertNotNull(value);
         assertFalse(value.isEmpty());
