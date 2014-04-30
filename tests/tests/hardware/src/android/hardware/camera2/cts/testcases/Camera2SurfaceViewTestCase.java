@@ -428,7 +428,7 @@ public class Camera2SurfaceViewTestCase extends
         final SurfaceHolder holder = stubActivity.getSurfaceView().getHolder();
         Handler handler = new Handler(Looper.getMainLooper());
         handler.post(new Runnable() {
-                @Override
+            @Override
             public void run() {
                 holder.setFixedSize(mPreviewSize.getWidth(), mPreviewSize.getHeight());
             }
@@ -510,5 +510,4 @@ public class Camera2SurfaceViewTestCase extends
 
         return null;
     }
-
 }
