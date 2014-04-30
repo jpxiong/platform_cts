@@ -36,6 +36,8 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
 public class ClonedSecureRandomTest extends AndroidTestCase {
+    private static final int MAX_SHUTDOWN_TRIES = 10;
+
     private static final int ANSWER_TIMEOUT_SECONDS = 60;
 
     private static final String SEPARATE_PROCESS_NAME = ":secureRandom";
@@ -129,11 +131,35 @@ public class ClonedSecureRandomTest extends AndroidTestCase {
                 fail("Timeout waiting for answer from SecureRandomService; cannot complete test");
             }
 
-            pid = mSecureRandomService.getRandomBytesAndPid(output);
+            // Create another latch we'll use to ensure the service has stopped.
+            final CountDownLatch serviceStopLatch = new CountDownLatch(1);
+            mSecureRandomService.asBinder().linkToDeath(new IBinder.DeathRecipient() {
+                @Override
+                public void binderDied() {
+                    serviceStopLatch.countDown();
+                }
+            }, 0);
 
+            pid = mSecureRandomService.getRandomBytesAndPid(output);
             getContext().unbindService(mServiceConnection);
-            getContext().stopService(mSeparateIntent);
-            am.killBackgroundProcesses(packageName);
+
+            /*
+             * Ensure the background process has stopped by waiting for the
+             * latch to fire.
+             */
+            int tries = 0;
+            do {
+                /*
+                 * If this has looped more than once, try to yield to
+                 * system_server.
+                 */
+                if (tries > 0) {
+                    Thread.yield();
+                }
+                getContext().stopService(mSeparateIntent);
+                am.killBackgroundProcesses(packageName);
+            } while (!serviceStopLatch.await(100, TimeUnit.MILLISECONDS) && tries++ < MAX_SHUTDOWN_TRIES);
+            assertTrue("Background process should have stopped already", tries < MAX_SHUTDOWN_TRIES);
 
             /*
              * Make sure the AndroidManifest.xml wasn't altered in a way that
