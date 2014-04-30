@@ -448,6 +448,25 @@ public class CaptureRequestTest extends Camera2SurfaceViewTestCase {
         }
     }
 
+    /**
+     * Test video and optical stabilizations.
+     */
+    public void testCameraStabilizations() throws Exception {
+        for (String id : mCameraIds) {
+            try {
+                openDevice(id);
+                if (!mStaticInfo.isPerFrameControlSupported()) {
+                    Log.i(TAG, "Camera " + id + "Doesn't support per frame control");
+                    continue;
+                }
+
+                stabilizationTestByCamera();
+            } finally {
+                closeDevice();
+            }
+        }
+    }
+
     // TODO: add 3A state machine test.
 
     private void noiseReductionModeTestByCamera() throws Exception {
@@ -1352,6 +1371,41 @@ public class CaptureRequestTest extends Camera2SurfaceViewTestCase {
                         NUM_RESULTS_WAIT_TIMEOUT);
             }
         }
+    }
+
+    /**
+     * Test video and optical stabilizations if they are supported by a given camera.
+     */
+    private void stabilizationTestByCamera() throws Exception {
+        // video stabilization test.
+        byte[] videoStabModes = mStaticInfo.getAvailableVideoStabilizationModesChecked();
+        byte[] opticalStabModes = mStaticInfo.getAvailableOpticalStabilizationChecked();
+        Size maxPreviewSize = mOrderedPreviewSizes.get(0);
+        CaptureRequest.Builder requestBuilder =
+                mCamera.createCaptureRequest(CameraDevice.TEMPLATE_PREVIEW);
+        SimpleCaptureListener listener = new SimpleCaptureListener();
+        startPreview(requestBuilder, maxPreviewSize, listener);
+
+        for ( byte mode : videoStabModes) {
+            listener = new SimpleCaptureListener();
+            requestBuilder.set(CaptureRequest.CONTROL_VIDEO_STABILIZATION_MODE, (int) mode);
+            mCamera.setRepeatingRequest(requestBuilder.build(), listener, mHandler);
+            // TODO: enable below code when b/14059883 is fixed.
+            /*
+            verifyCaptureResultForKey(CaptureResult.CONTROL_VIDEO_STABILIZATION_MODE, (int)mode,
+                    listener, NUM_FRAMES_VERIFIED);
+            */
+        }
+
+        for (int mode : opticalStabModes) {
+            listener = new SimpleCaptureListener();
+            requestBuilder.set(CaptureRequest.LENS_OPTICAL_STABILIZATION_MODE, (int) mode);
+            mCamera.setRepeatingRequest(requestBuilder.build(), listener, mHandler);
+            verifyCaptureResultForKey(CaptureResult.LENS_OPTICAL_STABILIZATION_MODE, (int)mode,
+                    listener, NUM_FRAMES_VERIFIED);
+        }
+
+        stopPreview();
     }
 
     //----------------------------------------------------------------

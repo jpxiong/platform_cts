@@ -1061,6 +1061,51 @@ public class StaticMetadata {
     }
 
     /**
+     * Get availableVideoStabilizationModes and do the sanity check.
+     *
+     * @return available video stabilization modes, empty array if it is unavailable.
+     */
+    public byte[] getAvailableVideoStabilizationModesChecked() {
+        CameraMetadata.Key<byte[]> key =
+                CameraCharacteristics.CONTROL_AVAILABLE_VIDEO_STABILIZATION_MODES;
+        byte[] modes = getValueFromKeyNonNull(key);
+
+        if (modes == null) {
+            return new byte[0];
+        }
+
+        List<Byte> modeList = Arrays.asList(CameraTestUtils.toObject(modes));
+        checkTrueForKey(key, " All device should support OFF mode",
+                modeList.contains((byte)CameraMetadata.CONTROL_VIDEO_STABILIZATION_MODE_OFF));
+        checkArrayValuesInRange(key, modes,
+                (byte)CameraMetadata.CONTROL_VIDEO_STABILIZATION_MODE_OFF,
+                (byte)CameraMetadata.CONTROL_VIDEO_STABILIZATION_MODE_ON);
+
+        return modes;
+    }
+
+    /**
+     * Get availableOpticalStabilization and do the sanity check.
+     *
+     * @return available optical stabilization modes, empty array if it is unavailable.
+     */
+    public byte[] getAvailableOpticalStabilizationChecked() {
+        CameraMetadata.Key<byte[]> key =
+                CameraCharacteristics.LENS_INFO_AVAILABLE_OPTICAL_STABILIZATION;
+        byte[] modes = getValueFromKeyNonNull(key);
+
+        if (modes == null) {
+            return new byte[0];
+        }
+
+        checkArrayValuesInRange(key, modes,
+                (byte)CameraMetadata.LENS_OPTICAL_STABILIZATION_MODE_OFF,
+                (byte)CameraMetadata.LENS_OPTICAL_STABILIZATION_MODE_ON);
+
+        return modes;
+    }
+
+    /**
      * Get the value in index for a fixed-size array from a given key.
      *
      * <p>If the camera device is incorrectly reporting values, log a warning and return
