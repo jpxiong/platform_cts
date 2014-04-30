@@ -410,6 +410,12 @@
     <string name="snsr_gyro_test_degrees_message">These values looks like degrees per second. These should be radians per second!</string>
     <string name="snsr_gyro_m_test">Gyroscope Measurement Test</string>
 
+    <!-- Heart Rate -->
+    <string name="snsr_heartrate_test">Heart Rate Test</string>
+    <string name="snsr_heartrate_test_info">This test verifies that the heart rate monitor is working properly.\n\nVerify that the resting heart rate is between 0 and 100.</string>
+    <string name="snsr_heartrate_test_no_heartrate_title">No heart rate monitor?</string>
+    <string name="snsr_heartrate_test_no_heartrate_message">It doesn\'t seem like you have a heart rate monitor, so you don\'t need to run this test.</string>
+
     <!-- Magnetic Field -->
     <string name="snsr_mag_m_test">Magnetic Field Measurement Tests</string>
 
