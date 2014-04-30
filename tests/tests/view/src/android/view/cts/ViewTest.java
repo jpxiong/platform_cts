@@ -3598,7 +3598,8 @@ public class ViewTest extends ActivityInstrumentationTestCase2<ViewTestStubActiv
         }
 
         @Override
-        public boolean onNestedFling(View target, float velocityX, float velocityY) {
+        public boolean onNestedFling(View target, float velocityX, float velocityY,
+                boolean consumed) {
             return false;
         }
     }
