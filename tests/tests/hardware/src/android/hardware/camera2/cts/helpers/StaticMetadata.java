@@ -1183,6 +1183,42 @@ public class StaticMetadata {
         return maxZoom;
     }
 
+    public byte[] getAvailableSceneModesChecked() {
+        CameraMetadata.Key<byte[]> key =
+                CameraCharacteristics.CONTROL_AVAILABLE_SCENE_MODES;
+        byte[] modes = getValueFromKeyNonNull(key);
+
+        if (modes == null) {
+            return new byte[0];
+        }
+
+        List<Byte> modeList = Arrays.asList(CameraTestUtils.toObject(modes));
+        // FACE_PRIORITY must be included if face detection is supported.
+        if (getMaxFaceCountChecked() > 0) {
+            checkTrueForKey(key, " FACE_PRIORITY must be included if face detection is supported",
+                    modeList.contains((byte)CameraMetadata.CONTROL_SCENE_MODE_FACE_PRIORITY));
+        }
+
+        return modes;
+    }
+
+    public byte[] getAvailableEffectModesChecked() {
+        CameraMetadata.Key<byte[]> key =
+                CameraCharacteristics.CONTROL_AVAILABLE_EFFECTS;
+        byte[] modes = getValueFromKeyNonNull(key);
+
+        if (modes == null) {
+            return new byte[0];
+        }
+
+        List<Byte> modeList = Arrays.asList(CameraTestUtils.toObject(modes));
+        // OFF must be included.
+        checkTrueForKey(key, " OFF must be included",
+                modeList.contains((byte)CameraMetadata.CONTROL_EFFECT_MODE_OFF));
+
+        return modes;
+    }
+
     /**
      * Get the value in index for a fixed-size array from a given key.
      *

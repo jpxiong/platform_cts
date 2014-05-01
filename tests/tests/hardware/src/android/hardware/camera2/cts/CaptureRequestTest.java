@@ -487,6 +487,44 @@ public class CaptureRequestTest extends Camera2SurfaceViewTestCase {
         }
     }
 
+    /**
+     * Test scene mode controls.
+     */
+    public void testSceneModes() throws Exception {
+        for (String id : mCameraIds) {
+            try {
+                openDevice(id);
+                if (!mStaticInfo.isPerFrameControlSupported()) {
+                    Log.i(TAG, "Camera " + id + "Doesn't support per frame control");
+                    continue;
+                }
+
+                sceneModeTestByCamera();
+            } finally {
+                closeDevice();
+            }
+        }
+    }
+
+    /**
+     * Test effect mode controls.
+     */
+    public void testEffectModes() throws Exception {
+        for (String id : mCameraIds) {
+            try {
+                openDevice(id);
+                if (!mStaticInfo.isPerFrameControlSupported()) {
+                    Log.i(TAG, "Camera " + id + "Doesn't support per frame control");
+                    continue;
+                }
+
+                effectModeTestByCamera();
+            } finally {
+                closeDevice();
+            }
+        }
+    }
+
     // TODO: add 3A state machine test.
 
     private void noiseReductionModeTestByCamera() throws Exception {
@@ -1489,6 +1527,54 @@ public class CaptureRequestTest extends Camera2SurfaceViewTestCase {
         }
 
         stopPreview();
+    }
+
+    private void sceneModeTestByCamera() throws Exception {
+        byte[] sceneModes = mStaticInfo.getAvailableSceneModesChecked();
+        Size maxPreviewSize = mOrderedPreviewSizes.get(0);
+        CaptureRequest.Builder requestBuilder =
+                mCamera.createCaptureRequest(CameraDevice.TEMPLATE_PREVIEW);
+        SimpleCaptureListener listener = new SimpleCaptureListener();
+        requestBuilder.set(CaptureRequest.CONTROL_MODE, CaptureRequest.CONTROL_MODE_USE_SCENE_MODE);
+        startPreview(requestBuilder, maxPreviewSize, listener);
+
+        for(byte mode : sceneModes) {
+            requestBuilder.set(CaptureRequest.CONTROL_SCENE_MODE, (int)mode);
+            listener = new SimpleCaptureListener();
+            mCamera.setRepeatingRequest(requestBuilder.build(), listener, mHandler);
+            // Enable below check  when b/14059883 is fixed.
+            /*
+            verifyCaptureResultForKey(CaptureResult.CONTROL_SCENE_MODE,
+                    CaptureRequest.CONTROL_SCENE_MODE, listener, NUM_FRAMES_VERIFIED);
+            */
+            // This also serves as purpose of showing preview for NUM_FRAMES_VERIFIED
+            verifyCaptureResultForKey(CaptureResult.CONTROL_MODE,
+                    CaptureRequest.CONTROL_MODE_USE_SCENE_MODE, listener, NUM_FRAMES_VERIFIED);
+        }
+    }
+
+    private void effectModeTestByCamera() throws Exception {
+        byte[] effectModes = mStaticInfo.getAvailableEffectModesChecked();
+        Size maxPreviewSize = mOrderedPreviewSizes.get(0);
+        CaptureRequest.Builder requestBuilder =
+                mCamera.createCaptureRequest(CameraDevice.TEMPLATE_PREVIEW);
+        requestBuilder.set(CaptureRequest.CONTROL_MODE, CaptureRequest.CONTROL_MODE_AUTO);
+        SimpleCaptureListener listener = new SimpleCaptureListener();
+        startPreview(requestBuilder, maxPreviewSize, listener);
+
+        for(byte mode : effectModes) {
+            requestBuilder.set(CaptureRequest.CONTROL_EFFECT_MODE, (int)mode);
+            listener = new SimpleCaptureListener();
+            mCamera.setRepeatingRequest(requestBuilder.build(), listener, mHandler);
+            // Enable below check  when b/14059883 is fixed.
+            /*
+            verifyCaptureResultForKey(CaptureResult.CONTROL_SCENE_MODE,
+                    CaptureRequest.CONTROL_SCENE_MODE, listener, NUM_FRAMES_VERIFIED);
+            */
+            // This also serves as purpose of showing preview for NUM_FRAMES_VERIFIED
+            verifyCaptureResultForKey(CaptureResult.CONTROL_MODE,
+                    CaptureRequest.CONTROL_MODE_AUTO, listener, NUM_FRAMES_VERIFIED);
+        }
     }
 
     //----------------------------------------------------------------
