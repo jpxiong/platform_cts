@@ -822,8 +822,10 @@ public class CameraDeviceTest extends Camera2AndroidTestCase {
                 request, STATISTICS_LENS_SHADING_MAP_MODE, STATISTICS_LENS_SHADING_MAP_MODE_OFF);
 
         if (template == CameraDevice.TEMPLATE_STILL_CAPTURE) {
-            mCollector.expectKeyValueEquals(
-                    request, COLOR_CORRECTION_MODE, COLOR_CORRECTION_MODE_HIGH_QUALITY);
+            // Not enforce high quality here, as some devices may not effectively have high quality
+            // mode.
+            mCollector.expectKeyValueNotEquals(
+                    request, COLOR_CORRECTION_MODE, COLOR_CORRECTION_MODE_TRANSFORM_MATRIX);
 
             List<Byte> availableEdgeModes =
                     Arrays.asList(toObject(mStaticInfo.getAvailableEdgeModesChecked()));
