@@ -77,7 +77,8 @@ GLuint GLUtils::loadTexture(const char* path) {
 }
 
 static int readInt(char* b) {
-    return (((int) b[0]) << 24) | (((int) b[1]) << 16) | (((int) b[2]) << 8) | ((int) b[3]);
+    unsigned char* ub = (unsigned char*) b;
+    return (((int) ub[0]) << 24) | (((int) ub[1]) << 16) | (((int) ub[2]) << 8) | ((int) ub[3]);
 }
 
 static float readFloat(char* b) {
