@@ -315,10 +315,22 @@ public class CameraErrorCollector extends ErrorCollector {
      * @return The value of the key.
      */
     public <T> T expectKeyValueNotNull(CaptureResult result, Key<T> key) {
+        return expectKeyValueNotNull("", result, key);
+    }
+
+    /**
+     * Check if the key value is not null and return the value.
+     *
+     * @param msg The message to be logged.
+     * @param result The {@link CaptureResult} to get the key from.
+     * @param key The {@link CaptureResult} key to be checked.
+     * @return The value of the key.
+     */
+    public <T> T expectKeyValueNotNull(String msg, CaptureResult result, Key<T> key) {
 
         T value = result.get(key);
         if (value == null) {
-            addMessage("Key " + key.getName() + " shouldn't be null");
+            addMessage(msg + " Key " + key.getName() + " shouldn't be null");
         }
 
         return value;
