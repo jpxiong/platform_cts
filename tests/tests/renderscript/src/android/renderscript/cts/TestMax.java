@@ -388,6 +388,204 @@ public class TestMax extends RSBaseCompute {
         }
     }
 
+    private void checkMaxChar2Char2Char2() {
+        Allocation inV1 = createRandomAllocation(mRS, Element.DataType.SIGNED_8, 2, 0x12084b25952bc64l, false);
+        Allocation inV2 = createRandomAllocation(mRS, Element.DataType.SIGNED_8, 2, 0x12084b25952bc65l, false);
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_8, 2), INPUTSIZE);
+            script.set_gAllocInV2(inV2);
+            script.forEach_testMaxChar2Char2Char2(inV1, out);
+            verifyResultsMaxChar2Char2Char2(inV1, inV2, out, false);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testMaxChar2Char2Char2: " + e.toString());
+        }
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_8, 2), INPUTSIZE);
+            scriptRelaxed.set_gAllocInV2(inV2);
+            scriptRelaxed.forEach_testMaxChar2Char2Char2(inV1, out);
+            verifyResultsMaxChar2Char2Char2(inV1, inV2, out, true);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testMaxChar2Char2Char2: " + e.toString());
+        }
+    }
+
+    private void verifyResultsMaxChar2Char2Char2(Allocation inV1, Allocation inV2, Allocation out, boolean relaxed) {
+        byte[] arrayInV1 = new byte[INPUTSIZE * 2];
+        inV1.copyTo(arrayInV1);
+        byte[] arrayInV2 = new byte[INPUTSIZE * 2];
+        inV2.copyTo(arrayInV2);
+        byte[] arrayOut = new byte[INPUTSIZE * 2];
+        out.copyTo(arrayOut);
+        for (int i = 0; i < INPUTSIZE; i++) {
+            for (int j = 0; j < 2 ; j++) {
+                // Extract the inputs.
+                ArgumentsCharCharChar args = new ArgumentsCharCharChar();
+                args.inV1 = arrayInV1[i * 2 + j];
+                args.inV2 = arrayInV2[i * 2 + j];
+                // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
+                CoreMathVerifier.computeMax(args);
+                // Figure out what the outputs should have been.
+                boolean valid = true;
+                if (args.out != arrayOut[i * 2 + j]) {
+                    valid = false;
+                }
+                if (!valid) {
+                    StringBuilder message = new StringBuilder();
+                    message.append("Input inV1: ");
+                    message.append(String.format("%d", args.inV1));
+                    message.append("\n");
+                    message.append("Input inV2: ");
+                    message.append(String.format("%d", args.inV2));
+                    message.append("\n");
+                    message.append("Expected output out: ");
+                    message.append(String.format("%d", args.out));
+                    message.append("\n");
+                    message.append("Actual   output out: ");
+                    message.append(String.format("%d", arrayOut[i * 2 + j]));
+                    if (args.out != arrayOut[i * 2 + j]) {
+                        message.append(" FAIL");
+                    }
+                    message.append("\n");
+                    assertTrue("Incorrect output for checkMaxChar2Char2Char2" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                }
+            }
+        }
+    }
+
+    private void checkMaxChar3Char3Char3() {
+        Allocation inV1 = createRandomAllocation(mRS, Element.DataType.SIGNED_8, 3, 0x567200e53e0a8f29l, false);
+        Allocation inV2 = createRandomAllocation(mRS, Element.DataType.SIGNED_8, 3, 0x567200e53e0a8f2al, false);
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_8, 3), INPUTSIZE);
+            script.set_gAllocInV2(inV2);
+            script.forEach_testMaxChar3Char3Char3(inV1, out);
+            verifyResultsMaxChar3Char3Char3(inV1, inV2, out, false);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testMaxChar3Char3Char3: " + e.toString());
+        }
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_8, 3), INPUTSIZE);
+            scriptRelaxed.set_gAllocInV2(inV2);
+            scriptRelaxed.forEach_testMaxChar3Char3Char3(inV1, out);
+            verifyResultsMaxChar3Char3Char3(inV1, inV2, out, true);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testMaxChar3Char3Char3: " + e.toString());
+        }
+    }
+
+    private void verifyResultsMaxChar3Char3Char3(Allocation inV1, Allocation inV2, Allocation out, boolean relaxed) {
+        byte[] arrayInV1 = new byte[INPUTSIZE * 4];
+        inV1.copyTo(arrayInV1);
+        byte[] arrayInV2 = new byte[INPUTSIZE * 4];
+        inV2.copyTo(arrayInV2);
+        byte[] arrayOut = new byte[INPUTSIZE * 4];
+        out.copyTo(arrayOut);
+        for (int i = 0; i < INPUTSIZE; i++) {
+            for (int j = 0; j < 3 ; j++) {
+                // Extract the inputs.
+                ArgumentsCharCharChar args = new ArgumentsCharCharChar();
+                args.inV1 = arrayInV1[i * 4 + j];
+                args.inV2 = arrayInV2[i * 4 + j];
+                // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
+                CoreMathVerifier.computeMax(args);
+                // Figure out what the outputs should have been.
+                boolean valid = true;
+                if (args.out != arrayOut[i * 4 + j]) {
+                    valid = false;
+                }
+                if (!valid) {
+                    StringBuilder message = new StringBuilder();
+                    message.append("Input inV1: ");
+                    message.append(String.format("%d", args.inV1));
+                    message.append("\n");
+                    message.append("Input inV2: ");
+                    message.append(String.format("%d", args.inV2));
+                    message.append("\n");
+                    message.append("Expected output out: ");
+                    message.append(String.format("%d", args.out));
+                    message.append("\n");
+                    message.append("Actual   output out: ");
+                    message.append(String.format("%d", arrayOut[i * 4 + j]));
+                    if (args.out != arrayOut[i * 4 + j]) {
+                        message.append(" FAIL");
+                    }
+                    message.append("\n");
+                    assertTrue("Incorrect output for checkMaxChar3Char3Char3" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                }
+            }
+        }
+    }
+
+    private void checkMaxChar4Char4Char4() {
+        Allocation inV1 = createRandomAllocation(mRS, Element.DataType.SIGNED_8, 4, 0xabc37d1822c261eel, false);
+        Allocation inV2 = createRandomAllocation(mRS, Element.DataType.SIGNED_8, 4, 0xabc37d1822c261efl, false);
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_8, 4), INPUTSIZE);
+            script.set_gAllocInV2(inV2);
+            script.forEach_testMaxChar4Char4Char4(inV1, out);
+            verifyResultsMaxChar4Char4Char4(inV1, inV2, out, false);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testMaxChar4Char4Char4: " + e.toString());
+        }
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_8, 4), INPUTSIZE);
+            scriptRelaxed.set_gAllocInV2(inV2);
+            scriptRelaxed.forEach_testMaxChar4Char4Char4(inV1, out);
+            verifyResultsMaxChar4Char4Char4(inV1, inV2, out, true);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testMaxChar4Char4Char4: " + e.toString());
+        }
+    }
+
+    private void verifyResultsMaxChar4Char4Char4(Allocation inV1, Allocation inV2, Allocation out, boolean relaxed) {
+        byte[] arrayInV1 = new byte[INPUTSIZE * 4];
+        inV1.copyTo(arrayInV1);
+        byte[] arrayInV2 = new byte[INPUTSIZE * 4];
+        inV2.copyTo(arrayInV2);
+        byte[] arrayOut = new byte[INPUTSIZE * 4];
+        out.copyTo(arrayOut);
+        for (int i = 0; i < INPUTSIZE; i++) {
+            for (int j = 0; j < 4 ; j++) {
+                // Extract the inputs.
+                ArgumentsCharCharChar args = new ArgumentsCharCharChar();
+                args.inV1 = arrayInV1[i * 4 + j];
+                args.inV2 = arrayInV2[i * 4 + j];
+                // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
+                CoreMathVerifier.computeMax(args);
+                // Figure out what the outputs should have been.
+                boolean valid = true;
+                if (args.out != arrayOut[i * 4 + j]) {
+                    valid = false;
+                }
+                if (!valid) {
+                    StringBuilder message = new StringBuilder();
+                    message.append("Input inV1: ");
+                    message.append(String.format("%d", args.inV1));
+                    message.append("\n");
+                    message.append("Input inV2: ");
+                    message.append(String.format("%d", args.inV2));
+                    message.append("\n");
+                    message.append("Expected output out: ");
+                    message.append(String.format("%d", args.out));
+                    message.append("\n");
+                    message.append("Actual   output out: ");
+                    message.append(String.format("%d", arrayOut[i * 4 + j]));
+                    if (args.out != arrayOut[i * 4 + j]) {
+                        message.append(" FAIL");
+                    }
+                    message.append("\n");
+                    assertTrue("Incorrect output for checkMaxChar4Char4Char4" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                }
+            }
+        }
+    }
+
     public class ArgumentsUcharUcharUchar {
         public byte inV1;
         public byte inV2;
@@ -454,6 +652,204 @@ public class TestMax extends RSBaseCompute {
                     }
                     message.append("\n");
                     assertTrue("Incorrect output for checkMaxUcharUcharUchar" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                }
+            }
+        }
+    }
+
+    private void checkMaxUchar2Uchar2Uchar2() {
+        Allocation inV1 = createRandomAllocation(mRS, Element.DataType.UNSIGNED_8, 2, 0x75eda605e43f8b81l, false);
+        Allocation inV2 = createRandomAllocation(mRS, Element.DataType.UNSIGNED_8, 2, 0x75eda605e43f8b82l, false);
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_8, 2), INPUTSIZE);
+            script.set_gAllocInV2(inV2);
+            script.forEach_testMaxUchar2Uchar2Uchar2(inV1, out);
+            verifyResultsMaxUchar2Uchar2Uchar2(inV1, inV2, out, false);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testMaxUchar2Uchar2Uchar2: " + e.toString());
+        }
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_8, 2), INPUTSIZE);
+            scriptRelaxed.set_gAllocInV2(inV2);
+            scriptRelaxed.forEach_testMaxUchar2Uchar2Uchar2(inV1, out);
+            verifyResultsMaxUchar2Uchar2Uchar2(inV1, inV2, out, true);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testMaxUchar2Uchar2Uchar2: " + e.toString());
+        }
+    }
+
+    private void verifyResultsMaxUchar2Uchar2Uchar2(Allocation inV1, Allocation inV2, Allocation out, boolean relaxed) {
+        byte[] arrayInV1 = new byte[INPUTSIZE * 2];
+        inV1.copyTo(arrayInV1);
+        byte[] arrayInV2 = new byte[INPUTSIZE * 2];
+        inV2.copyTo(arrayInV2);
+        byte[] arrayOut = new byte[INPUTSIZE * 2];
+        out.copyTo(arrayOut);
+        for (int i = 0; i < INPUTSIZE; i++) {
+            for (int j = 0; j < 2 ; j++) {
+                // Extract the inputs.
+                ArgumentsUcharUcharUchar args = new ArgumentsUcharUcharUchar();
+                args.inV1 = arrayInV1[i * 2 + j];
+                args.inV2 = arrayInV2[i * 2 + j];
+                // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
+                CoreMathVerifier.computeMax(args);
+                // Figure out what the outputs should have been.
+                boolean valid = true;
+                if (args.out != arrayOut[i * 2 + j]) {
+                    valid = false;
+                }
+                if (!valid) {
+                    StringBuilder message = new StringBuilder();
+                    message.append("Input inV1: ");
+                    message.append(String.format("0x%x", args.inV1));
+                    message.append("\n");
+                    message.append("Input inV2: ");
+                    message.append(String.format("0x%x", args.inV2));
+                    message.append("\n");
+                    message.append("Expected output out: ");
+                    message.append(String.format("0x%x", args.out));
+                    message.append("\n");
+                    message.append("Actual   output out: ");
+                    message.append(String.format("0x%x", arrayOut[i * 2 + j]));
+                    if (args.out != arrayOut[i * 2 + j]) {
+                        message.append(" FAIL");
+                    }
+                    message.append("\n");
+                    assertTrue("Incorrect output for checkMaxUchar2Uchar2Uchar2" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                }
+            }
+        }
+    }
+
+    private void checkMaxUchar3Uchar3Uchar3() {
+        Allocation inV1 = createRandomAllocation(mRS, Element.DataType.UNSIGNED_8, 3, 0xa2def5663489d18cl, false);
+        Allocation inV2 = createRandomAllocation(mRS, Element.DataType.UNSIGNED_8, 3, 0xa2def5663489d18dl, false);
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_8, 3), INPUTSIZE);
+            script.set_gAllocInV2(inV2);
+            script.forEach_testMaxUchar3Uchar3Uchar3(inV1, out);
+            verifyResultsMaxUchar3Uchar3Uchar3(inV1, inV2, out, false);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testMaxUchar3Uchar3Uchar3: " + e.toString());
+        }
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_8, 3), INPUTSIZE);
+            scriptRelaxed.set_gAllocInV2(inV2);
+            scriptRelaxed.forEach_testMaxUchar3Uchar3Uchar3(inV1, out);
+            verifyResultsMaxUchar3Uchar3Uchar3(inV1, inV2, out, true);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testMaxUchar3Uchar3Uchar3: " + e.toString());
+        }
+    }
+
+    private void verifyResultsMaxUchar3Uchar3Uchar3(Allocation inV1, Allocation inV2, Allocation out, boolean relaxed) {
+        byte[] arrayInV1 = new byte[INPUTSIZE * 4];
+        inV1.copyTo(arrayInV1);
+        byte[] arrayInV2 = new byte[INPUTSIZE * 4];
+        inV2.copyTo(arrayInV2);
+        byte[] arrayOut = new byte[INPUTSIZE * 4];
+        out.copyTo(arrayOut);
+        for (int i = 0; i < INPUTSIZE; i++) {
+            for (int j = 0; j < 3 ; j++) {
+                // Extract the inputs.
+                ArgumentsUcharUcharUchar args = new ArgumentsUcharUcharUchar();
+                args.inV1 = arrayInV1[i * 4 + j];
+                args.inV2 = arrayInV2[i * 4 + j];
+                // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
+                CoreMathVerifier.computeMax(args);
+                // Figure out what the outputs should have been.
+                boolean valid = true;
+                if (args.out != arrayOut[i * 4 + j]) {
+                    valid = false;
+                }
+                if (!valid) {
+                    StringBuilder message = new StringBuilder();
+                    message.append("Input inV1: ");
+                    message.append(String.format("0x%x", args.inV1));
+                    message.append("\n");
+                    message.append("Input inV2: ");
+                    message.append(String.format("0x%x", args.inV2));
+                    message.append("\n");
+                    message.append("Expected output out: ");
+                    message.append(String.format("0x%x", args.out));
+                    message.append("\n");
+                    message.append("Actual   output out: ");
+                    message.append(String.format("0x%x", arrayOut[i * 4 + j]));
+                    if (args.out != arrayOut[i * 4 + j]) {
+                        message.append(" FAIL");
+                    }
+                    message.append("\n");
+                    assertTrue("Incorrect output for checkMaxUchar3Uchar3Uchar3" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                }
+            }
+        }
+    }
+
+    private void checkMaxUchar4Uchar4Uchar4() {
+        Allocation inV1 = createRandomAllocation(mRS, Element.DataType.UNSIGNED_8, 4, 0xcfd044c684d41797l, false);
+        Allocation inV2 = createRandomAllocation(mRS, Element.DataType.UNSIGNED_8, 4, 0xcfd044c684d41798l, false);
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_8, 4), INPUTSIZE);
+            script.set_gAllocInV2(inV2);
+            script.forEach_testMaxUchar4Uchar4Uchar4(inV1, out);
+            verifyResultsMaxUchar4Uchar4Uchar4(inV1, inV2, out, false);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testMaxUchar4Uchar4Uchar4: " + e.toString());
+        }
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_8, 4), INPUTSIZE);
+            scriptRelaxed.set_gAllocInV2(inV2);
+            scriptRelaxed.forEach_testMaxUchar4Uchar4Uchar4(inV1, out);
+            verifyResultsMaxUchar4Uchar4Uchar4(inV1, inV2, out, true);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testMaxUchar4Uchar4Uchar4: " + e.toString());
+        }
+    }
+
+    private void verifyResultsMaxUchar4Uchar4Uchar4(Allocation inV1, Allocation inV2, Allocation out, boolean relaxed) {
+        byte[] arrayInV1 = new byte[INPUTSIZE * 4];
+        inV1.copyTo(arrayInV1);
+        byte[] arrayInV2 = new byte[INPUTSIZE * 4];
+        inV2.copyTo(arrayInV2);
+        byte[] arrayOut = new byte[INPUTSIZE * 4];
+        out.copyTo(arrayOut);
+        for (int i = 0; i < INPUTSIZE; i++) {
+            for (int j = 0; j < 4 ; j++) {
+                // Extract the inputs.
+                ArgumentsUcharUcharUchar args = new ArgumentsUcharUcharUchar();
+                args.inV1 = arrayInV1[i * 4 + j];
+                args.inV2 = arrayInV2[i * 4 + j];
+                // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
+                CoreMathVerifier.computeMax(args);
+                // Figure out what the outputs should have been.
+                boolean valid = true;
+                if (args.out != arrayOut[i * 4 + j]) {
+                    valid = false;
+                }
+                if (!valid) {
+                    StringBuilder message = new StringBuilder();
+                    message.append("Input inV1: ");
+                    message.append(String.format("0x%x", args.inV1));
+                    message.append("\n");
+                    message.append("Input inV2: ");
+                    message.append(String.format("0x%x", args.inV2));
+                    message.append("\n");
+                    message.append("Expected output out: ");
+                    message.append(String.format("0x%x", args.out));
+                    message.append("\n");
+                    message.append("Actual   output out: ");
+                    message.append(String.format("0x%x", arrayOut[i * 4 + j]));
+                    if (args.out != arrayOut[i * 4 + j]) {
+                        message.append(" FAIL");
+                    }
+                    message.append("\n");
+                    assertTrue("Incorrect output for checkMaxUchar4Uchar4Uchar4" +
                             (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
                 }
             }
@@ -532,6 +928,204 @@ public class TestMax extends RSBaseCompute {
         }
     }
 
+    private void checkMaxShort2Short2Short2() {
+        Allocation inV1 = createRandomAllocation(mRS, Element.DataType.SIGNED_16, 2, 0x3d46ae0799c33c02l, false);
+        Allocation inV2 = createRandomAllocation(mRS, Element.DataType.SIGNED_16, 2, 0x3d46ae0799c33c03l, false);
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_16, 2), INPUTSIZE);
+            script.set_gAllocInV2(inV2);
+            script.forEach_testMaxShort2Short2Short2(inV1, out);
+            verifyResultsMaxShort2Short2Short2(inV1, inV2, out, false);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testMaxShort2Short2Short2: " + e.toString());
+        }
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_16, 2), INPUTSIZE);
+            scriptRelaxed.set_gAllocInV2(inV2);
+            scriptRelaxed.forEach_testMaxShort2Short2Short2(inV1, out);
+            verifyResultsMaxShort2Short2Short2(inV1, inV2, out, true);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testMaxShort2Short2Short2: " + e.toString());
+        }
+    }
+
+    private void verifyResultsMaxShort2Short2Short2(Allocation inV1, Allocation inV2, Allocation out, boolean relaxed) {
+        short[] arrayInV1 = new short[INPUTSIZE * 2];
+        inV1.copyTo(arrayInV1);
+        short[] arrayInV2 = new short[INPUTSIZE * 2];
+        inV2.copyTo(arrayInV2);
+        short[] arrayOut = new short[INPUTSIZE * 2];
+        out.copyTo(arrayOut);
+        for (int i = 0; i < INPUTSIZE; i++) {
+            for (int j = 0; j < 2 ; j++) {
+                // Extract the inputs.
+                ArgumentsShortShortShort args = new ArgumentsShortShortShort();
+                args.inV1 = arrayInV1[i * 2 + j];
+                args.inV2 = arrayInV2[i * 2 + j];
+                // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
+                CoreMathVerifier.computeMax(args);
+                // Figure out what the outputs should have been.
+                boolean valid = true;
+                if (args.out != arrayOut[i * 2 + j]) {
+                    valid = false;
+                }
+                if (!valid) {
+                    StringBuilder message = new StringBuilder();
+                    message.append("Input inV1: ");
+                    message.append(String.format("%d", args.inV1));
+                    message.append("\n");
+                    message.append("Input inV2: ");
+                    message.append(String.format("%d", args.inV2));
+                    message.append("\n");
+                    message.append("Expected output out: ");
+                    message.append(String.format("%d", args.out));
+                    message.append("\n");
+                    message.append("Actual   output out: ");
+                    message.append(String.format("%d", arrayOut[i * 2 + j]));
+                    if (args.out != arrayOut[i * 2 + j]) {
+                        message.append(" FAIL");
+                    }
+                    message.append("\n");
+                    assertTrue("Incorrect output for checkMaxShort2Short2Short2" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                }
+            }
+        }
+    }
+
+    private void checkMaxShort3Short3Short3() {
+        Allocation inV1 = createRandomAllocation(mRS, Element.DataType.SIGNED_16, 3, 0x6a37fd67ea0d820dl, false);
+        Allocation inV2 = createRandomAllocation(mRS, Element.DataType.SIGNED_16, 3, 0x6a37fd67ea0d820el, false);
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_16, 3), INPUTSIZE);
+            script.set_gAllocInV2(inV2);
+            script.forEach_testMaxShort3Short3Short3(inV1, out);
+            verifyResultsMaxShort3Short3Short3(inV1, inV2, out, false);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testMaxShort3Short3Short3: " + e.toString());
+        }
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_16, 3), INPUTSIZE);
+            scriptRelaxed.set_gAllocInV2(inV2);
+            scriptRelaxed.forEach_testMaxShort3Short3Short3(inV1, out);
+            verifyResultsMaxShort3Short3Short3(inV1, inV2, out, true);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testMaxShort3Short3Short3: " + e.toString());
+        }
+    }
+
+    private void verifyResultsMaxShort3Short3Short3(Allocation inV1, Allocation inV2, Allocation out, boolean relaxed) {
+        short[] arrayInV1 = new short[INPUTSIZE * 4];
+        inV1.copyTo(arrayInV1);
+        short[] arrayInV2 = new short[INPUTSIZE * 4];
+        inV2.copyTo(arrayInV2);
+        short[] arrayOut = new short[INPUTSIZE * 4];
+        out.copyTo(arrayOut);
+        for (int i = 0; i < INPUTSIZE; i++) {
+            for (int j = 0; j < 3 ; j++) {
+                // Extract the inputs.
+                ArgumentsShortShortShort args = new ArgumentsShortShortShort();
+                args.inV1 = arrayInV1[i * 4 + j];
+                args.inV2 = arrayInV2[i * 4 + j];
+                // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
+                CoreMathVerifier.computeMax(args);
+                // Figure out what the outputs should have been.
+                boolean valid = true;
+                if (args.out != arrayOut[i * 4 + j]) {
+                    valid = false;
+                }
+                if (!valid) {
+                    StringBuilder message = new StringBuilder();
+                    message.append("Input inV1: ");
+                    message.append(String.format("%d", args.inV1));
+                    message.append("\n");
+                    message.append("Input inV2: ");
+                    message.append(String.format("%d", args.inV2));
+                    message.append("\n");
+                    message.append("Expected output out: ");
+                    message.append(String.format("%d", args.out));
+                    message.append("\n");
+                    message.append("Actual   output out: ");
+                    message.append(String.format("%d", arrayOut[i * 4 + j]));
+                    if (args.out != arrayOut[i * 4 + j]) {
+                        message.append(" FAIL");
+                    }
+                    message.append("\n");
+                    assertTrue("Incorrect output for checkMaxShort3Short3Short3" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                }
+            }
+        }
+    }
+
+    private void checkMaxShort4Short4Short4() {
+        Allocation inV1 = createRandomAllocation(mRS, Element.DataType.SIGNED_16, 4, 0x97294cc83a57c818l, false);
+        Allocation inV2 = createRandomAllocation(mRS, Element.DataType.SIGNED_16, 4, 0x97294cc83a57c819l, false);
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_16, 4), INPUTSIZE);
+            script.set_gAllocInV2(inV2);
+            script.forEach_testMaxShort4Short4Short4(inV1, out);
+            verifyResultsMaxShort4Short4Short4(inV1, inV2, out, false);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testMaxShort4Short4Short4: " + e.toString());
+        }
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_16, 4), INPUTSIZE);
+            scriptRelaxed.set_gAllocInV2(inV2);
+            scriptRelaxed.forEach_testMaxShort4Short4Short4(inV1, out);
+            verifyResultsMaxShort4Short4Short4(inV1, inV2, out, true);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testMaxShort4Short4Short4: " + e.toString());
+        }
+    }
+
+    private void verifyResultsMaxShort4Short4Short4(Allocation inV1, Allocation inV2, Allocation out, boolean relaxed) {
+        short[] arrayInV1 = new short[INPUTSIZE * 4];
+        inV1.copyTo(arrayInV1);
+        short[] arrayInV2 = new short[INPUTSIZE * 4];
+        inV2.copyTo(arrayInV2);
+        short[] arrayOut = new short[INPUTSIZE * 4];
+        out.copyTo(arrayOut);
+        for (int i = 0; i < INPUTSIZE; i++) {
+            for (int j = 0; j < 4 ; j++) {
+                // Extract the inputs.
+                ArgumentsShortShortShort args = new ArgumentsShortShortShort();
+                args.inV1 = arrayInV1[i * 4 + j];
+                args.inV2 = arrayInV2[i * 4 + j];
+                // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
+                CoreMathVerifier.computeMax(args);
+                // Figure out what the outputs should have been.
+                boolean valid = true;
+                if (args.out != arrayOut[i * 4 + j]) {
+                    valid = false;
+                }
+                if (!valid) {
+                    StringBuilder message = new StringBuilder();
+                    message.append("Input inV1: ");
+                    message.append(String.format("%d", args.inV1));
+                    message.append("\n");
+                    message.append("Input inV2: ");
+                    message.append(String.format("%d", args.inV2));
+                    message.append("\n");
+                    message.append("Expected output out: ");
+                    message.append(String.format("%d", args.out));
+                    message.append("\n");
+                    message.append("Actual   output out: ");
+                    message.append(String.format("%d", arrayOut[i * 4 + j]));
+                    if (args.out != arrayOut[i * 4 + j]) {
+                        message.append(" FAIL");
+                    }
+                    message.append("\n");
+                    assertTrue("Incorrect output for checkMaxShort4Short4Short4" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                }
+            }
+        }
+    }
+
     public class ArgumentsUshortUshortUshort {
         public short inV1;
         public short inV2;
@@ -598,6 +1192,204 @@ public class TestMax extends RSBaseCompute {
                     }
                     message.append("\n");
                     assertTrue("Incorrect output for checkMaxUshortUshortUshort" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                }
+            }
+        }
+    }
+
+    private void checkMaxUshort2Ushort2Ushort2() {
+        Allocation inV1 = createRandomAllocation(mRS, Element.DataType.UNSIGNED_16, 2, 0xf42196a588de51bfl, false);
+        Allocation inV2 = createRandomAllocation(mRS, Element.DataType.UNSIGNED_16, 2, 0xf42196a588de51c0l, false);
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_16, 2), INPUTSIZE);
+            script.set_gAllocInV2(inV2);
+            script.forEach_testMaxUshort2Ushort2Ushort2(inV1, out);
+            verifyResultsMaxUshort2Ushort2Ushort2(inV1, inV2, out, false);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testMaxUshort2Ushort2Ushort2: " + e.toString());
+        }
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_16, 2), INPUTSIZE);
+            scriptRelaxed.set_gAllocInV2(inV2);
+            scriptRelaxed.forEach_testMaxUshort2Ushort2Ushort2(inV1, out);
+            verifyResultsMaxUshort2Ushort2Ushort2(inV1, inV2, out, true);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testMaxUshort2Ushort2Ushort2: " + e.toString());
+        }
+    }
+
+    private void verifyResultsMaxUshort2Ushort2Ushort2(Allocation inV1, Allocation inV2, Allocation out, boolean relaxed) {
+        short[] arrayInV1 = new short[INPUTSIZE * 2];
+        inV1.copyTo(arrayInV1);
+        short[] arrayInV2 = new short[INPUTSIZE * 2];
+        inV2.copyTo(arrayInV2);
+        short[] arrayOut = new short[INPUTSIZE * 2];
+        out.copyTo(arrayOut);
+        for (int i = 0; i < INPUTSIZE; i++) {
+            for (int j = 0; j < 2 ; j++) {
+                // Extract the inputs.
+                ArgumentsUshortUshortUshort args = new ArgumentsUshortUshortUshort();
+                args.inV1 = arrayInV1[i * 2 + j];
+                args.inV2 = arrayInV2[i * 2 + j];
+                // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
+                CoreMathVerifier.computeMax(args);
+                // Figure out what the outputs should have been.
+                boolean valid = true;
+                if (args.out != arrayOut[i * 2 + j]) {
+                    valid = false;
+                }
+                if (!valid) {
+                    StringBuilder message = new StringBuilder();
+                    message.append("Input inV1: ");
+                    message.append(String.format("0x%x", args.inV1));
+                    message.append("\n");
+                    message.append("Input inV2: ");
+                    message.append(String.format("0x%x", args.inV2));
+                    message.append("\n");
+                    message.append("Expected output out: ");
+                    message.append(String.format("0x%x", args.out));
+                    message.append("\n");
+                    message.append("Actual   output out: ");
+                    message.append(String.format("0x%x", arrayOut[i * 2 + j]));
+                    if (args.out != arrayOut[i * 2 + j]) {
+                        message.append(" FAIL");
+                    }
+                    message.append("\n");
+                    assertTrue("Incorrect output for checkMaxUshort2Ushort2Ushort2" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                }
+            }
+        }
+    }
+
+    private void checkMaxUshort3Ushort3Ushort3() {
+        Allocation inV1 = createRandomAllocation(mRS, Element.DataType.UNSIGNED_16, 3, 0x71604884c752e61cl, false);
+        Allocation inV2 = createRandomAllocation(mRS, Element.DataType.UNSIGNED_16, 3, 0x71604884c752e61dl, false);
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_16, 3), INPUTSIZE);
+            script.set_gAllocInV2(inV2);
+            script.forEach_testMaxUshort3Ushort3Ushort3(inV1, out);
+            verifyResultsMaxUshort3Ushort3Ushort3(inV1, inV2, out, false);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testMaxUshort3Ushort3Ushort3: " + e.toString());
+        }
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_16, 3), INPUTSIZE);
+            scriptRelaxed.set_gAllocInV2(inV2);
+            scriptRelaxed.forEach_testMaxUshort3Ushort3Ushort3(inV1, out);
+            verifyResultsMaxUshort3Ushort3Ushort3(inV1, inV2, out, true);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testMaxUshort3Ushort3Ushort3: " + e.toString());
+        }
+    }
+
+    private void verifyResultsMaxUshort3Ushort3Ushort3(Allocation inV1, Allocation inV2, Allocation out, boolean relaxed) {
+        short[] arrayInV1 = new short[INPUTSIZE * 4];
+        inV1.copyTo(arrayInV1);
+        short[] arrayInV2 = new short[INPUTSIZE * 4];
+        inV2.copyTo(arrayInV2);
+        short[] arrayOut = new short[INPUTSIZE * 4];
+        out.copyTo(arrayOut);
+        for (int i = 0; i < INPUTSIZE; i++) {
+            for (int j = 0; j < 3 ; j++) {
+                // Extract the inputs.
+                ArgumentsUshortUshortUshort args = new ArgumentsUshortUshortUshort();
+                args.inV1 = arrayInV1[i * 4 + j];
+                args.inV2 = arrayInV2[i * 4 + j];
+                // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
+                CoreMathVerifier.computeMax(args);
+                // Figure out what the outputs should have been.
+                boolean valid = true;
+                if (args.out != arrayOut[i * 4 + j]) {
+                    valid = false;
+                }
+                if (!valid) {
+                    StringBuilder message = new StringBuilder();
+                    message.append("Input inV1: ");
+                    message.append(String.format("0x%x", args.inV1));
+                    message.append("\n");
+                    message.append("Input inV2: ");
+                    message.append(String.format("0x%x", args.inV2));
+                    message.append("\n");
+                    message.append("Expected output out: ");
+                    message.append(String.format("0x%x", args.out));
+                    message.append("\n");
+                    message.append("Actual   output out: ");
+                    message.append(String.format("0x%x", arrayOut[i * 4 + j]));
+                    if (args.out != arrayOut[i * 4 + j]) {
+                        message.append(" FAIL");
+                    }
+                    message.append("\n");
+                    assertTrue("Incorrect output for checkMaxUshort3Ushort3Ushort3" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                }
+            }
+        }
+    }
+
+    private void checkMaxUshort4Ushort4Ushort4() {
+        Allocation inV1 = createRandomAllocation(mRS, Element.DataType.UNSIGNED_16, 4, 0xee9efa6405c77a79l, false);
+        Allocation inV2 = createRandomAllocation(mRS, Element.DataType.UNSIGNED_16, 4, 0xee9efa6405c77a7al, false);
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_16, 4), INPUTSIZE);
+            script.set_gAllocInV2(inV2);
+            script.forEach_testMaxUshort4Ushort4Ushort4(inV1, out);
+            verifyResultsMaxUshort4Ushort4Ushort4(inV1, inV2, out, false);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testMaxUshort4Ushort4Ushort4: " + e.toString());
+        }
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_16, 4), INPUTSIZE);
+            scriptRelaxed.set_gAllocInV2(inV2);
+            scriptRelaxed.forEach_testMaxUshort4Ushort4Ushort4(inV1, out);
+            verifyResultsMaxUshort4Ushort4Ushort4(inV1, inV2, out, true);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testMaxUshort4Ushort4Ushort4: " + e.toString());
+        }
+    }
+
+    private void verifyResultsMaxUshort4Ushort4Ushort4(Allocation inV1, Allocation inV2, Allocation out, boolean relaxed) {
+        short[] arrayInV1 = new short[INPUTSIZE * 4];
+        inV1.copyTo(arrayInV1);
+        short[] arrayInV2 = new short[INPUTSIZE * 4];
+        inV2.copyTo(arrayInV2);
+        short[] arrayOut = new short[INPUTSIZE * 4];
+        out.copyTo(arrayOut);
+        for (int i = 0; i < INPUTSIZE; i++) {
+            for (int j = 0; j < 4 ; j++) {
+                // Extract the inputs.
+                ArgumentsUshortUshortUshort args = new ArgumentsUshortUshortUshort();
+                args.inV1 = arrayInV1[i * 4 + j];
+                args.inV2 = arrayInV2[i * 4 + j];
+                // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
+                CoreMathVerifier.computeMax(args);
+                // Figure out what the outputs should have been.
+                boolean valid = true;
+                if (args.out != arrayOut[i * 4 + j]) {
+                    valid = false;
+                }
+                if (!valid) {
+                    StringBuilder message = new StringBuilder();
+                    message.append("Input inV1: ");
+                    message.append(String.format("0x%x", args.inV1));
+                    message.append("\n");
+                    message.append("Input inV2: ");
+                    message.append(String.format("0x%x", args.inV2));
+                    message.append("\n");
+                    message.append("Expected output out: ");
+                    message.append(String.format("0x%x", args.out));
+                    message.append("\n");
+                    message.append("Actual   output out: ");
+                    message.append(String.format("0x%x", arrayOut[i * 4 + j]));
+                    if (args.out != arrayOut[i * 4 + j]) {
+                        message.append(" FAIL");
+                    }
+                    message.append("\n");
+                    assertTrue("Incorrect output for checkMaxUshort4Ushort4Ushort4" +
                             (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
                 }
             }
@@ -676,342 +1468,6 @@ public class TestMax extends RSBaseCompute {
         }
     }
 
-    public class ArgumentsUintUintUint {
-        public int inV1;
-        public int inV2;
-        public int out;
-    }
-
-    private void checkMaxUintUintUint() {
-        Allocation inV1 = createRandomAllocation(mRS, Element.DataType.UNSIGNED_32, 1, 0x75328d17808776cal, false);
-        Allocation inV2 = createRandomAllocation(mRS, Element.DataType.UNSIGNED_32, 1, 0x75328d17808776cbl, false);
-        try {
-            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_32, 1), INPUTSIZE);
-            script.set_gAllocInV2(inV2);
-            script.forEach_testMaxUintUintUint(inV1, out);
-            verifyResultsMaxUintUintUint(inV1, inV2, out, false);
-        } catch (Exception e) {
-            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testMaxUintUintUint: " + e.toString());
-        }
-        try {
-            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_32, 1), INPUTSIZE);
-            scriptRelaxed.set_gAllocInV2(inV2);
-            scriptRelaxed.forEach_testMaxUintUintUint(inV1, out);
-            verifyResultsMaxUintUintUint(inV1, inV2, out, true);
-        } catch (Exception e) {
-            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testMaxUintUintUint: " + e.toString());
-        }
-    }
-
-    private void verifyResultsMaxUintUintUint(Allocation inV1, Allocation inV2, Allocation out, boolean relaxed) {
-        int[] arrayInV1 = new int[INPUTSIZE * 1];
-        inV1.copyTo(arrayInV1);
-        int[] arrayInV2 = new int[INPUTSIZE * 1];
-        inV2.copyTo(arrayInV2);
-        int[] arrayOut = new int[INPUTSIZE * 1];
-        out.copyTo(arrayOut);
-        for (int i = 0; i < INPUTSIZE; i++) {
-            for (int j = 0; j < 1 ; j++) {
-                // Extract the inputs.
-                ArgumentsUintUintUint args = new ArgumentsUintUintUint();
-                args.inV1 = arrayInV1[i];
-                args.inV2 = arrayInV2[i];
-                // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
-                CoreMathVerifier.computeMax(args);
-                // Figure out what the outputs should have been.
-                boolean valid = true;
-                if (args.out != arrayOut[i * 1 + j]) {
-                    valid = false;
-                }
-                if (!valid) {
-                    StringBuilder message = new StringBuilder();
-                    message.append("Input inV1: ");
-                    message.append(String.format("0x%x", args.inV1));
-                    message.append("\n");
-                    message.append("Input inV2: ");
-                    message.append(String.format("0x%x", args.inV2));
-                    message.append("\n");
-                    message.append("Expected output out: ");
-                    message.append(String.format("0x%x", args.out));
-                    message.append("\n");
-                    message.append("Actual   output out: ");
-                    message.append(String.format("0x%x", arrayOut[i * 1 + j]));
-                    if (args.out != arrayOut[i * 1 + j]) {
-                        message.append(" FAIL");
-                    }
-                    message.append("\n");
-                    assertTrue("Incorrect output for checkMaxUintUintUint" +
-                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
-                }
-            }
-        }
-    }
-
-    private void checkMaxChar2Char2Char2() {
-        Allocation inV1 = createRandomAllocation(mRS, Element.DataType.SIGNED_8, 2, 0x12084b25952bc64l, false);
-        Allocation inV2 = createRandomAllocation(mRS, Element.DataType.SIGNED_8, 2, 0x12084b25952bc65l, false);
-        try {
-            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_8, 2), INPUTSIZE);
-            script.set_gAllocInV2(inV2);
-            script.forEach_testMaxChar2Char2Char2(inV1, out);
-            verifyResultsMaxChar2Char2Char2(inV1, inV2, out, false);
-        } catch (Exception e) {
-            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testMaxChar2Char2Char2: " + e.toString());
-        }
-        try {
-            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_8, 2), INPUTSIZE);
-            scriptRelaxed.set_gAllocInV2(inV2);
-            scriptRelaxed.forEach_testMaxChar2Char2Char2(inV1, out);
-            verifyResultsMaxChar2Char2Char2(inV1, inV2, out, true);
-        } catch (Exception e) {
-            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testMaxChar2Char2Char2: " + e.toString());
-        }
-    }
-
-    private void verifyResultsMaxChar2Char2Char2(Allocation inV1, Allocation inV2, Allocation out, boolean relaxed) {
-        byte[] arrayInV1 = new byte[INPUTSIZE * 2];
-        inV1.copyTo(arrayInV1);
-        byte[] arrayInV2 = new byte[INPUTSIZE * 2];
-        inV2.copyTo(arrayInV2);
-        byte[] arrayOut = new byte[INPUTSIZE * 2];
-        out.copyTo(arrayOut);
-        for (int i = 0; i < INPUTSIZE; i++) {
-            for (int j = 0; j < 2 ; j++) {
-                // Extract the inputs.
-                ArgumentsCharCharChar args = new ArgumentsCharCharChar();
-                args.inV1 = arrayInV1[i * 2 + j];
-                args.inV2 = arrayInV2[i * 2 + j];
-                // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
-                CoreMathVerifier.computeMax(args);
-                // Figure out what the outputs should have been.
-                boolean valid = true;
-                if (args.out != arrayOut[i * 2 + j]) {
-                    valid = false;
-                }
-                if (!valid) {
-                    StringBuilder message = new StringBuilder();
-                    message.append("Input inV1: ");
-                    message.append(String.format("%d", args.inV1));
-                    message.append("\n");
-                    message.append("Input inV2: ");
-                    message.append(String.format("%d", args.inV2));
-                    message.append("\n");
-                    message.append("Expected output out: ");
-                    message.append(String.format("%d", args.out));
-                    message.append("\n");
-                    message.append("Actual   output out: ");
-                    message.append(String.format("%d", arrayOut[i * 2 + j]));
-                    if (args.out != arrayOut[i * 2 + j]) {
-                        message.append(" FAIL");
-                    }
-                    message.append("\n");
-                    assertTrue("Incorrect output for checkMaxChar2Char2Char2" +
-                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
-                }
-            }
-        }
-    }
-
-    private void checkMaxUchar2Uchar2Uchar2() {
-        Allocation inV1 = createRandomAllocation(mRS, Element.DataType.UNSIGNED_8, 2, 0x75eda605e43f8b81l, false);
-        Allocation inV2 = createRandomAllocation(mRS, Element.DataType.UNSIGNED_8, 2, 0x75eda605e43f8b82l, false);
-        try {
-            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_8, 2), INPUTSIZE);
-            script.set_gAllocInV2(inV2);
-            script.forEach_testMaxUchar2Uchar2Uchar2(inV1, out);
-            verifyResultsMaxUchar2Uchar2Uchar2(inV1, inV2, out, false);
-        } catch (Exception e) {
-            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testMaxUchar2Uchar2Uchar2: " + e.toString());
-        }
-        try {
-            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_8, 2), INPUTSIZE);
-            scriptRelaxed.set_gAllocInV2(inV2);
-            scriptRelaxed.forEach_testMaxUchar2Uchar2Uchar2(inV1, out);
-            verifyResultsMaxUchar2Uchar2Uchar2(inV1, inV2, out, true);
-        } catch (Exception e) {
-            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testMaxUchar2Uchar2Uchar2: " + e.toString());
-        }
-    }
-
-    private void verifyResultsMaxUchar2Uchar2Uchar2(Allocation inV1, Allocation inV2, Allocation out, boolean relaxed) {
-        byte[] arrayInV1 = new byte[INPUTSIZE * 2];
-        inV1.copyTo(arrayInV1);
-        byte[] arrayInV2 = new byte[INPUTSIZE * 2];
-        inV2.copyTo(arrayInV2);
-        byte[] arrayOut = new byte[INPUTSIZE * 2];
-        out.copyTo(arrayOut);
-        for (int i = 0; i < INPUTSIZE; i++) {
-            for (int j = 0; j < 2 ; j++) {
-                // Extract the inputs.
-                ArgumentsUcharUcharUchar args = new ArgumentsUcharUcharUchar();
-                args.inV1 = arrayInV1[i * 2 + j];
-                args.inV2 = arrayInV2[i * 2 + j];
-                // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
-                CoreMathVerifier.computeMax(args);
-                // Figure out what the outputs should have been.
-                boolean valid = true;
-                if (args.out != arrayOut[i * 2 + j]) {
-                    valid = false;
-                }
-                if (!valid) {
-                    StringBuilder message = new StringBuilder();
-                    message.append("Input inV1: ");
-                    message.append(String.format("0x%x", args.inV1));
-                    message.append("\n");
-                    message.append("Input inV2: ");
-                    message.append(String.format("0x%x", args.inV2));
-                    message.append("\n");
-                    message.append("Expected output out: ");
-                    message.append(String.format("0x%x", args.out));
-                    message.append("\n");
-                    message.append("Actual   output out: ");
-                    message.append(String.format("0x%x", arrayOut[i * 2 + j]));
-                    if (args.out != arrayOut[i * 2 + j]) {
-                        message.append(" FAIL");
-                    }
-                    message.append("\n");
-                    assertTrue("Incorrect output for checkMaxUchar2Uchar2Uchar2" +
-                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
-                }
-            }
-        }
-    }
-
-    private void checkMaxShort2Short2Short2() {
-        Allocation inV1 = createRandomAllocation(mRS, Element.DataType.SIGNED_16, 2, 0x3d46ae0799c33c02l, false);
-        Allocation inV2 = createRandomAllocation(mRS, Element.DataType.SIGNED_16, 2, 0x3d46ae0799c33c03l, false);
-        try {
-            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_16, 2), INPUTSIZE);
-            script.set_gAllocInV2(inV2);
-            script.forEach_testMaxShort2Short2Short2(inV1, out);
-            verifyResultsMaxShort2Short2Short2(inV1, inV2, out, false);
-        } catch (Exception e) {
-            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testMaxShort2Short2Short2: " + e.toString());
-        }
-        try {
-            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_16, 2), INPUTSIZE);
-            scriptRelaxed.set_gAllocInV2(inV2);
-            scriptRelaxed.forEach_testMaxShort2Short2Short2(inV1, out);
-            verifyResultsMaxShort2Short2Short2(inV1, inV2, out, true);
-        } catch (Exception e) {
-            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testMaxShort2Short2Short2: " + e.toString());
-        }
-    }
-
-    private void verifyResultsMaxShort2Short2Short2(Allocation inV1, Allocation inV2, Allocation out, boolean relaxed) {
-        short[] arrayInV1 = new short[INPUTSIZE * 2];
-        inV1.copyTo(arrayInV1);
-        short[] arrayInV2 = new short[INPUTSIZE * 2];
-        inV2.copyTo(arrayInV2);
-        short[] arrayOut = new short[INPUTSIZE * 2];
-        out.copyTo(arrayOut);
-        for (int i = 0; i < INPUTSIZE; i++) {
-            for (int j = 0; j < 2 ; j++) {
-                // Extract the inputs.
-                ArgumentsShortShortShort args = new ArgumentsShortShortShort();
-                args.inV1 = arrayInV1[i * 2 + j];
-                args.inV2 = arrayInV2[i * 2 + j];
-                // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
-                CoreMathVerifier.computeMax(args);
-                // Figure out what the outputs should have been.
-                boolean valid = true;
-                if (args.out != arrayOut[i * 2 + j]) {
-                    valid = false;
-                }
-                if (!valid) {
-                    StringBuilder message = new StringBuilder();
-                    message.append("Input inV1: ");
-                    message.append(String.format("%d", args.inV1));
-                    message.append("\n");
-                    message.append("Input inV2: ");
-                    message.append(String.format("%d", args.inV2));
-                    message.append("\n");
-                    message.append("Expected output out: ");
-                    message.append(String.format("%d", args.out));
-                    message.append("\n");
-                    message.append("Actual   output out: ");
-                    message.append(String.format("%d", arrayOut[i * 2 + j]));
-                    if (args.out != arrayOut[i * 2 + j]) {
-                        message.append(" FAIL");
-                    }
-                    message.append("\n");
-                    assertTrue("Incorrect output for checkMaxShort2Short2Short2" +
-                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
-                }
-            }
-        }
-    }
-
-    private void checkMaxUshort2Ushort2Ushort2() {
-        Allocation inV1 = createRandomAllocation(mRS, Element.DataType.UNSIGNED_16, 2, 0xf42196a588de51bfl, false);
-        Allocation inV2 = createRandomAllocation(mRS, Element.DataType.UNSIGNED_16, 2, 0xf42196a588de51c0l, false);
-        try {
-            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_16, 2), INPUTSIZE);
-            script.set_gAllocInV2(inV2);
-            script.forEach_testMaxUshort2Ushort2Ushort2(inV1, out);
-            verifyResultsMaxUshort2Ushort2Ushort2(inV1, inV2, out, false);
-        } catch (Exception e) {
-            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testMaxUshort2Ushort2Ushort2: " + e.toString());
-        }
-        try {
-            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_16, 2), INPUTSIZE);
-            scriptRelaxed.set_gAllocInV2(inV2);
-            scriptRelaxed.forEach_testMaxUshort2Ushort2Ushort2(inV1, out);
-            verifyResultsMaxUshort2Ushort2Ushort2(inV1, inV2, out, true);
-        } catch (Exception e) {
-            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testMaxUshort2Ushort2Ushort2: " + e.toString());
-        }
-    }
-
-    private void verifyResultsMaxUshort2Ushort2Ushort2(Allocation inV1, Allocation inV2, Allocation out, boolean relaxed) {
-        short[] arrayInV1 = new short[INPUTSIZE * 2];
-        inV1.copyTo(arrayInV1);
-        short[] arrayInV2 = new short[INPUTSIZE * 2];
-        inV2.copyTo(arrayInV2);
-        short[] arrayOut = new short[INPUTSIZE * 2];
-        out.copyTo(arrayOut);
-        for (int i = 0; i < INPUTSIZE; i++) {
-            for (int j = 0; j < 2 ; j++) {
-                // Extract the inputs.
-                ArgumentsUshortUshortUshort args = new ArgumentsUshortUshortUshort();
-                args.inV1 = arrayInV1[i * 2 + j];
-                args.inV2 = arrayInV2[i * 2 + j];
-                // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
-                CoreMathVerifier.computeMax(args);
-                // Figure out what the outputs should have been.
-                boolean valid = true;
-                if (args.out != arrayOut[i * 2 + j]) {
-                    valid = false;
-                }
-                if (!valid) {
-                    StringBuilder message = new StringBuilder();
-                    message.append("Input inV1: ");
-                    message.append(String.format("0x%x", args.inV1));
-                    message.append("\n");
-                    message.append("Input inV2: ");
-                    message.append(String.format("0x%x", args.inV2));
-                    message.append("\n");
-                    message.append("Expected output out: ");
-                    message.append(String.format("0x%x", args.out));
-                    message.append("\n");
-                    message.append("Actual   output out: ");
-                    message.append(String.format("0x%x", arrayOut[i * 2 + j]));
-                    if (args.out != arrayOut[i * 2 + j]) {
-                        message.append(" FAIL");
-                    }
-                    message.append("\n");
-                    assertTrue("Incorrect output for checkMaxUshort2Ushort2Ushort2" +
-                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
-                }
-            }
-        }
-    }
-
     private void checkMaxInt2Int2Int2() {
         Allocation inV1 = createRandomAllocation(mRS, Element.DataType.SIGNED_32, 2, 0x7bba1e4a83816bd5l, false);
         Allocation inV2 = createRandomAllocation(mRS, Element.DataType.SIGNED_32, 2, 0x7bba1e4a83816bd6l, false);
@@ -1072,336 +1528,6 @@ public class TestMax extends RSBaseCompute {
                     }
                     message.append("\n");
                     assertTrue("Incorrect output for checkMaxInt2Int2Int2" +
-                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
-                }
-            }
-        }
-    }
-
-    private void checkMaxUint2Uint2Uint2() {
-        Allocation inV1 = createRandomAllocation(mRS, Element.DataType.UNSIGNED_32, 2, 0xcda90384705016a4l, false);
-        Allocation inV2 = createRandomAllocation(mRS, Element.DataType.UNSIGNED_32, 2, 0xcda90384705016a5l, false);
-        try {
-            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_32, 2), INPUTSIZE);
-            script.set_gAllocInV2(inV2);
-            script.forEach_testMaxUint2Uint2Uint2(inV1, out);
-            verifyResultsMaxUint2Uint2Uint2(inV1, inV2, out, false);
-        } catch (Exception e) {
-            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testMaxUint2Uint2Uint2: " + e.toString());
-        }
-        try {
-            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_32, 2), INPUTSIZE);
-            scriptRelaxed.set_gAllocInV2(inV2);
-            scriptRelaxed.forEach_testMaxUint2Uint2Uint2(inV1, out);
-            verifyResultsMaxUint2Uint2Uint2(inV1, inV2, out, true);
-        } catch (Exception e) {
-            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testMaxUint2Uint2Uint2: " + e.toString());
-        }
-    }
-
-    private void verifyResultsMaxUint2Uint2Uint2(Allocation inV1, Allocation inV2, Allocation out, boolean relaxed) {
-        int[] arrayInV1 = new int[INPUTSIZE * 2];
-        inV1.copyTo(arrayInV1);
-        int[] arrayInV2 = new int[INPUTSIZE * 2];
-        inV2.copyTo(arrayInV2);
-        int[] arrayOut = new int[INPUTSIZE * 2];
-        out.copyTo(arrayOut);
-        for (int i = 0; i < INPUTSIZE; i++) {
-            for (int j = 0; j < 2 ; j++) {
-                // Extract the inputs.
-                ArgumentsUintUintUint args = new ArgumentsUintUintUint();
-                args.inV1 = arrayInV1[i * 2 + j];
-                args.inV2 = arrayInV2[i * 2 + j];
-                // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
-                CoreMathVerifier.computeMax(args);
-                // Figure out what the outputs should have been.
-                boolean valid = true;
-                if (args.out != arrayOut[i * 2 + j]) {
-                    valid = false;
-                }
-                if (!valid) {
-                    StringBuilder message = new StringBuilder();
-                    message.append("Input inV1: ");
-                    message.append(String.format("0x%x", args.inV1));
-                    message.append("\n");
-                    message.append("Input inV2: ");
-                    message.append(String.format("0x%x", args.inV2));
-                    message.append("\n");
-                    message.append("Expected output out: ");
-                    message.append(String.format("0x%x", args.out));
-                    message.append("\n");
-                    message.append("Actual   output out: ");
-                    message.append(String.format("0x%x", arrayOut[i * 2 + j]));
-                    if (args.out != arrayOut[i * 2 + j]) {
-                        message.append(" FAIL");
-                    }
-                    message.append("\n");
-                    assertTrue("Incorrect output for checkMaxUint2Uint2Uint2" +
-                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
-                }
-            }
-        }
-    }
-
-    private void checkMaxChar3Char3Char3() {
-        Allocation inV1 = createRandomAllocation(mRS, Element.DataType.SIGNED_8, 3, 0x567200e53e0a8f29l, false);
-        Allocation inV2 = createRandomAllocation(mRS, Element.DataType.SIGNED_8, 3, 0x567200e53e0a8f2al, false);
-        try {
-            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_8, 3), INPUTSIZE);
-            script.set_gAllocInV2(inV2);
-            script.forEach_testMaxChar3Char3Char3(inV1, out);
-            verifyResultsMaxChar3Char3Char3(inV1, inV2, out, false);
-        } catch (Exception e) {
-            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testMaxChar3Char3Char3: " + e.toString());
-        }
-        try {
-            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_8, 3), INPUTSIZE);
-            scriptRelaxed.set_gAllocInV2(inV2);
-            scriptRelaxed.forEach_testMaxChar3Char3Char3(inV1, out);
-            verifyResultsMaxChar3Char3Char3(inV1, inV2, out, true);
-        } catch (Exception e) {
-            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testMaxChar3Char3Char3: " + e.toString());
-        }
-    }
-
-    private void verifyResultsMaxChar3Char3Char3(Allocation inV1, Allocation inV2, Allocation out, boolean relaxed) {
-        byte[] arrayInV1 = new byte[INPUTSIZE * 4];
-        inV1.copyTo(arrayInV1);
-        byte[] arrayInV2 = new byte[INPUTSIZE * 4];
-        inV2.copyTo(arrayInV2);
-        byte[] arrayOut = new byte[INPUTSIZE * 4];
-        out.copyTo(arrayOut);
-        for (int i = 0; i < INPUTSIZE; i++) {
-            for (int j = 0; j < 3 ; j++) {
-                // Extract the inputs.
-                ArgumentsCharCharChar args = new ArgumentsCharCharChar();
-                args.inV1 = arrayInV1[i * 4 + j];
-                args.inV2 = arrayInV2[i * 4 + j];
-                // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
-                CoreMathVerifier.computeMax(args);
-                // Figure out what the outputs should have been.
-                boolean valid = true;
-                if (args.out != arrayOut[i * 4 + j]) {
-                    valid = false;
-                }
-                if (!valid) {
-                    StringBuilder message = new StringBuilder();
-                    message.append("Input inV1: ");
-                    message.append(String.format("%d", args.inV1));
-                    message.append("\n");
-                    message.append("Input inV2: ");
-                    message.append(String.format("%d", args.inV2));
-                    message.append("\n");
-                    message.append("Expected output out: ");
-                    message.append(String.format("%d", args.out));
-                    message.append("\n");
-                    message.append("Actual   output out: ");
-                    message.append(String.format("%d", arrayOut[i * 4 + j]));
-                    if (args.out != arrayOut[i * 4 + j]) {
-                        message.append(" FAIL");
-                    }
-                    message.append("\n");
-                    assertTrue("Incorrect output for checkMaxChar3Char3Char3" +
-                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
-                }
-            }
-        }
-    }
-
-    private void checkMaxUchar3Uchar3Uchar3() {
-        Allocation inV1 = createRandomAllocation(mRS, Element.DataType.UNSIGNED_8, 3, 0xa2def5663489d18cl, false);
-        Allocation inV2 = createRandomAllocation(mRS, Element.DataType.UNSIGNED_8, 3, 0xa2def5663489d18dl, false);
-        try {
-            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_8, 3), INPUTSIZE);
-            script.set_gAllocInV2(inV2);
-            script.forEach_testMaxUchar3Uchar3Uchar3(inV1, out);
-            verifyResultsMaxUchar3Uchar3Uchar3(inV1, inV2, out, false);
-        } catch (Exception e) {
-            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testMaxUchar3Uchar3Uchar3: " + e.toString());
-        }
-        try {
-            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_8, 3), INPUTSIZE);
-            scriptRelaxed.set_gAllocInV2(inV2);
-            scriptRelaxed.forEach_testMaxUchar3Uchar3Uchar3(inV1, out);
-            verifyResultsMaxUchar3Uchar3Uchar3(inV1, inV2, out, true);
-        } catch (Exception e) {
-            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testMaxUchar3Uchar3Uchar3: " + e.toString());
-        }
-    }
-
-    private void verifyResultsMaxUchar3Uchar3Uchar3(Allocation inV1, Allocation inV2, Allocation out, boolean relaxed) {
-        byte[] arrayInV1 = new byte[INPUTSIZE * 4];
-        inV1.copyTo(arrayInV1);
-        byte[] arrayInV2 = new byte[INPUTSIZE * 4];
-        inV2.copyTo(arrayInV2);
-        byte[] arrayOut = new byte[INPUTSIZE * 4];
-        out.copyTo(arrayOut);
-        for (int i = 0; i < INPUTSIZE; i++) {
-            for (int j = 0; j < 3 ; j++) {
-                // Extract the inputs.
-                ArgumentsUcharUcharUchar args = new ArgumentsUcharUcharUchar();
-                args.inV1 = arrayInV1[i * 4 + j];
-                args.inV2 = arrayInV2[i * 4 + j];
-                // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
-                CoreMathVerifier.computeMax(args);
-                // Figure out what the outputs should have been.
-                boolean valid = true;
-                if (args.out != arrayOut[i * 4 + j]) {
-                    valid = false;
-                }
-                if (!valid) {
-                    StringBuilder message = new StringBuilder();
-                    message.append("Input inV1: ");
-                    message.append(String.format("0x%x", args.inV1));
-                    message.append("\n");
-                    message.append("Input inV2: ");
-                    message.append(String.format("0x%x", args.inV2));
-                    message.append("\n");
-                    message.append("Expected output out: ");
-                    message.append(String.format("0x%x", args.out));
-                    message.append("\n");
-                    message.append("Actual   output out: ");
-                    message.append(String.format("0x%x", arrayOut[i * 4 + j]));
-                    if (args.out != arrayOut[i * 4 + j]) {
-                        message.append(" FAIL");
-                    }
-                    message.append("\n");
-                    assertTrue("Incorrect output for checkMaxUchar3Uchar3Uchar3" +
-                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
-                }
-            }
-        }
-    }
-
-    private void checkMaxShort3Short3Short3() {
-        Allocation inV1 = createRandomAllocation(mRS, Element.DataType.SIGNED_16, 3, 0x6a37fd67ea0d820dl, false);
-        Allocation inV2 = createRandomAllocation(mRS, Element.DataType.SIGNED_16, 3, 0x6a37fd67ea0d820el, false);
-        try {
-            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_16, 3), INPUTSIZE);
-            script.set_gAllocInV2(inV2);
-            script.forEach_testMaxShort3Short3Short3(inV1, out);
-            verifyResultsMaxShort3Short3Short3(inV1, inV2, out, false);
-        } catch (Exception e) {
-            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testMaxShort3Short3Short3: " + e.toString());
-        }
-        try {
-            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_16, 3), INPUTSIZE);
-            scriptRelaxed.set_gAllocInV2(inV2);
-            scriptRelaxed.forEach_testMaxShort3Short3Short3(inV1, out);
-            verifyResultsMaxShort3Short3Short3(inV1, inV2, out, true);
-        } catch (Exception e) {
-            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testMaxShort3Short3Short3: " + e.toString());
-        }
-    }
-
-    private void verifyResultsMaxShort3Short3Short3(Allocation inV1, Allocation inV2, Allocation out, boolean relaxed) {
-        short[] arrayInV1 = new short[INPUTSIZE * 4];
-        inV1.copyTo(arrayInV1);
-        short[] arrayInV2 = new short[INPUTSIZE * 4];
-        inV2.copyTo(arrayInV2);
-        short[] arrayOut = new short[INPUTSIZE * 4];
-        out.copyTo(arrayOut);
-        for (int i = 0; i < INPUTSIZE; i++) {
-            for (int j = 0; j < 3 ; j++) {
-                // Extract the inputs.
-                ArgumentsShortShortShort args = new ArgumentsShortShortShort();
-                args.inV1 = arrayInV1[i * 4 + j];
-                args.inV2 = arrayInV2[i * 4 + j];
-                // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
-                CoreMathVerifier.computeMax(args);
-                // Figure out what the outputs should have been.
-                boolean valid = true;
-                if (args.out != arrayOut[i * 4 + j]) {
-                    valid = false;
-                }
-                if (!valid) {
-                    StringBuilder message = new StringBuilder();
-                    message.append("Input inV1: ");
-                    message.append(String.format("%d", args.inV1));
-                    message.append("\n");
-                    message.append("Input inV2: ");
-                    message.append(String.format("%d", args.inV2));
-                    message.append("\n");
-                    message.append("Expected output out: ");
-                    message.append(String.format("%d", args.out));
-                    message.append("\n");
-                    message.append("Actual   output out: ");
-                    message.append(String.format("%d", arrayOut[i * 4 + j]));
-                    if (args.out != arrayOut[i * 4 + j]) {
-                        message.append(" FAIL");
-                    }
-                    message.append("\n");
-                    assertTrue("Incorrect output for checkMaxShort3Short3Short3" +
-                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
-                }
-            }
-        }
-    }
-
-    private void checkMaxUshort3Ushort3Ushort3() {
-        Allocation inV1 = createRandomAllocation(mRS, Element.DataType.UNSIGNED_16, 3, 0x71604884c752e61cl, false);
-        Allocation inV2 = createRandomAllocation(mRS, Element.DataType.UNSIGNED_16, 3, 0x71604884c752e61dl, false);
-        try {
-            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_16, 3), INPUTSIZE);
-            script.set_gAllocInV2(inV2);
-            script.forEach_testMaxUshort3Ushort3Ushort3(inV1, out);
-            verifyResultsMaxUshort3Ushort3Ushort3(inV1, inV2, out, false);
-        } catch (Exception e) {
-            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testMaxUshort3Ushort3Ushort3: " + e.toString());
-        }
-        try {
-            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_16, 3), INPUTSIZE);
-            scriptRelaxed.set_gAllocInV2(inV2);
-            scriptRelaxed.forEach_testMaxUshort3Ushort3Ushort3(inV1, out);
-            verifyResultsMaxUshort3Ushort3Ushort3(inV1, inV2, out, true);
-        } catch (Exception e) {
-            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testMaxUshort3Ushort3Ushort3: " + e.toString());
-        }
-    }
-
-    private void verifyResultsMaxUshort3Ushort3Ushort3(Allocation inV1, Allocation inV2, Allocation out, boolean relaxed) {
-        short[] arrayInV1 = new short[INPUTSIZE * 4];
-        inV1.copyTo(arrayInV1);
-        short[] arrayInV2 = new short[INPUTSIZE * 4];
-        inV2.copyTo(arrayInV2);
-        short[] arrayOut = new short[INPUTSIZE * 4];
-        out.copyTo(arrayOut);
-        for (int i = 0; i < INPUTSIZE; i++) {
-            for (int j = 0; j < 3 ; j++) {
-                // Extract the inputs.
-                ArgumentsUshortUshortUshort args = new ArgumentsUshortUshortUshort();
-                args.inV1 = arrayInV1[i * 4 + j];
-                args.inV2 = arrayInV2[i * 4 + j];
-                // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
-                CoreMathVerifier.computeMax(args);
-                // Figure out what the outputs should have been.
-                boolean valid = true;
-                if (args.out != arrayOut[i * 4 + j]) {
-                    valid = false;
-                }
-                if (!valid) {
-                    StringBuilder message = new StringBuilder();
-                    message.append("Input inV1: ");
-                    message.append(String.format("0x%x", args.inV1));
-                    message.append("\n");
-                    message.append("Input inV2: ");
-                    message.append(String.format("0x%x", args.inV2));
-                    message.append("\n");
-                    message.append("Expected output out: ");
-                    message.append(String.format("0x%x", args.out));
-                    message.append("\n");
-                    message.append("Actual   output out: ");
-                    message.append(String.format("0x%x", arrayOut[i * 4 + j]));
-                    if (args.out != arrayOut[i * 4 + j]) {
-                        message.append(" FAIL");
-                    }
-                    message.append("\n");
-                    assertTrue("Incorrect output for checkMaxUshort3Ushort3Ushort3" +
                             (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
                 }
             }
@@ -1474,336 +1600,6 @@ public class TestMax extends RSBaseCompute {
         }
     }
 
-    private void checkMaxUint3Uint3Uint3() {
-        Allocation inV1 = createRandomAllocation(mRS, Element.DataType.UNSIGNED_32, 3, 0x22fa7fb75507e969l, false);
-        Allocation inV2 = createRandomAllocation(mRS, Element.DataType.UNSIGNED_32, 3, 0x22fa7fb75507e96al, false);
-        try {
-            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_32, 3), INPUTSIZE);
-            script.set_gAllocInV2(inV2);
-            script.forEach_testMaxUint3Uint3Uint3(inV1, out);
-            verifyResultsMaxUint3Uint3Uint3(inV1, inV2, out, false);
-        } catch (Exception e) {
-            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testMaxUint3Uint3Uint3: " + e.toString());
-        }
-        try {
-            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_32, 3), INPUTSIZE);
-            scriptRelaxed.set_gAllocInV2(inV2);
-            scriptRelaxed.forEach_testMaxUint3Uint3Uint3(inV1, out);
-            verifyResultsMaxUint3Uint3Uint3(inV1, inV2, out, true);
-        } catch (Exception e) {
-            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testMaxUint3Uint3Uint3: " + e.toString());
-        }
-    }
-
-    private void verifyResultsMaxUint3Uint3Uint3(Allocation inV1, Allocation inV2, Allocation out, boolean relaxed) {
-        int[] arrayInV1 = new int[INPUTSIZE * 4];
-        inV1.copyTo(arrayInV1);
-        int[] arrayInV2 = new int[INPUTSIZE * 4];
-        inV2.copyTo(arrayInV2);
-        int[] arrayOut = new int[INPUTSIZE * 4];
-        out.copyTo(arrayOut);
-        for (int i = 0; i < INPUTSIZE; i++) {
-            for (int j = 0; j < 3 ; j++) {
-                // Extract the inputs.
-                ArgumentsUintUintUint args = new ArgumentsUintUintUint();
-                args.inV1 = arrayInV1[i * 4 + j];
-                args.inV2 = arrayInV2[i * 4 + j];
-                // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
-                CoreMathVerifier.computeMax(args);
-                // Figure out what the outputs should have been.
-                boolean valid = true;
-                if (args.out != arrayOut[i * 4 + j]) {
-                    valid = false;
-                }
-                if (!valid) {
-                    StringBuilder message = new StringBuilder();
-                    message.append("Input inV1: ");
-                    message.append(String.format("0x%x", args.inV1));
-                    message.append("\n");
-                    message.append("Input inV2: ");
-                    message.append(String.format("0x%x", args.inV2));
-                    message.append("\n");
-                    message.append("Expected output out: ");
-                    message.append(String.format("0x%x", args.out));
-                    message.append("\n");
-                    message.append("Actual   output out: ");
-                    message.append(String.format("0x%x", arrayOut[i * 4 + j]));
-                    if (args.out != arrayOut[i * 4 + j]) {
-                        message.append(" FAIL");
-                    }
-                    message.append("\n");
-                    assertTrue("Incorrect output for checkMaxUint3Uint3Uint3" +
-                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
-                }
-            }
-        }
-    }
-
-    private void checkMaxChar4Char4Char4() {
-        Allocation inV1 = createRandomAllocation(mRS, Element.DataType.SIGNED_8, 4, 0xabc37d1822c261eel, false);
-        Allocation inV2 = createRandomAllocation(mRS, Element.DataType.SIGNED_8, 4, 0xabc37d1822c261efl, false);
-        try {
-            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_8, 4), INPUTSIZE);
-            script.set_gAllocInV2(inV2);
-            script.forEach_testMaxChar4Char4Char4(inV1, out);
-            verifyResultsMaxChar4Char4Char4(inV1, inV2, out, false);
-        } catch (Exception e) {
-            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testMaxChar4Char4Char4: " + e.toString());
-        }
-        try {
-            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_8, 4), INPUTSIZE);
-            scriptRelaxed.set_gAllocInV2(inV2);
-            scriptRelaxed.forEach_testMaxChar4Char4Char4(inV1, out);
-            verifyResultsMaxChar4Char4Char4(inV1, inV2, out, true);
-        } catch (Exception e) {
-            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testMaxChar4Char4Char4: " + e.toString());
-        }
-    }
-
-    private void verifyResultsMaxChar4Char4Char4(Allocation inV1, Allocation inV2, Allocation out, boolean relaxed) {
-        byte[] arrayInV1 = new byte[INPUTSIZE * 4];
-        inV1.copyTo(arrayInV1);
-        byte[] arrayInV2 = new byte[INPUTSIZE * 4];
-        inV2.copyTo(arrayInV2);
-        byte[] arrayOut = new byte[INPUTSIZE * 4];
-        out.copyTo(arrayOut);
-        for (int i = 0; i < INPUTSIZE; i++) {
-            for (int j = 0; j < 4 ; j++) {
-                // Extract the inputs.
-                ArgumentsCharCharChar args = new ArgumentsCharCharChar();
-                args.inV1 = arrayInV1[i * 4 + j];
-                args.inV2 = arrayInV2[i * 4 + j];
-                // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
-                CoreMathVerifier.computeMax(args);
-                // Figure out what the outputs should have been.
-                boolean valid = true;
-                if (args.out != arrayOut[i * 4 + j]) {
-                    valid = false;
-                }
-                if (!valid) {
-                    StringBuilder message = new StringBuilder();
-                    message.append("Input inV1: ");
-                    message.append(String.format("%d", args.inV1));
-                    message.append("\n");
-                    message.append("Input inV2: ");
-                    message.append(String.format("%d", args.inV2));
-                    message.append("\n");
-                    message.append("Expected output out: ");
-                    message.append(String.format("%d", args.out));
-                    message.append("\n");
-                    message.append("Actual   output out: ");
-                    message.append(String.format("%d", arrayOut[i * 4 + j]));
-                    if (args.out != arrayOut[i * 4 + j]) {
-                        message.append(" FAIL");
-                    }
-                    message.append("\n");
-                    assertTrue("Incorrect output for checkMaxChar4Char4Char4" +
-                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
-                }
-            }
-        }
-    }
-
-    private void checkMaxUchar4Uchar4Uchar4() {
-        Allocation inV1 = createRandomAllocation(mRS, Element.DataType.UNSIGNED_8, 4, 0xcfd044c684d41797l, false);
-        Allocation inV2 = createRandomAllocation(mRS, Element.DataType.UNSIGNED_8, 4, 0xcfd044c684d41798l, false);
-        try {
-            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_8, 4), INPUTSIZE);
-            script.set_gAllocInV2(inV2);
-            script.forEach_testMaxUchar4Uchar4Uchar4(inV1, out);
-            verifyResultsMaxUchar4Uchar4Uchar4(inV1, inV2, out, false);
-        } catch (Exception e) {
-            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testMaxUchar4Uchar4Uchar4: " + e.toString());
-        }
-        try {
-            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_8, 4), INPUTSIZE);
-            scriptRelaxed.set_gAllocInV2(inV2);
-            scriptRelaxed.forEach_testMaxUchar4Uchar4Uchar4(inV1, out);
-            verifyResultsMaxUchar4Uchar4Uchar4(inV1, inV2, out, true);
-        } catch (Exception e) {
-            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testMaxUchar4Uchar4Uchar4: " + e.toString());
-        }
-    }
-
-    private void verifyResultsMaxUchar4Uchar4Uchar4(Allocation inV1, Allocation inV2, Allocation out, boolean relaxed) {
-        byte[] arrayInV1 = new byte[INPUTSIZE * 4];
-        inV1.copyTo(arrayInV1);
-        byte[] arrayInV2 = new byte[INPUTSIZE * 4];
-        inV2.copyTo(arrayInV2);
-        byte[] arrayOut = new byte[INPUTSIZE * 4];
-        out.copyTo(arrayOut);
-        for (int i = 0; i < INPUTSIZE; i++) {
-            for (int j = 0; j < 4 ; j++) {
-                // Extract the inputs.
-                ArgumentsUcharUcharUchar args = new ArgumentsUcharUcharUchar();
-                args.inV1 = arrayInV1[i * 4 + j];
-                args.inV2 = arrayInV2[i * 4 + j];
-                // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
-                CoreMathVerifier.computeMax(args);
-                // Figure out what the outputs should have been.
-                boolean valid = true;
-                if (args.out != arrayOut[i * 4 + j]) {
-                    valid = false;
-                }
-                if (!valid) {
-                    StringBuilder message = new StringBuilder();
-                    message.append("Input inV1: ");
-                    message.append(String.format("0x%x", args.inV1));
-                    message.append("\n");
-                    message.append("Input inV2: ");
-                    message.append(String.format("0x%x", args.inV2));
-                    message.append("\n");
-                    message.append("Expected output out: ");
-                    message.append(String.format("0x%x", args.out));
-                    message.append("\n");
-                    message.append("Actual   output out: ");
-                    message.append(String.format("0x%x", arrayOut[i * 4 + j]));
-                    if (args.out != arrayOut[i * 4 + j]) {
-                        message.append(" FAIL");
-                    }
-                    message.append("\n");
-                    assertTrue("Incorrect output for checkMaxUchar4Uchar4Uchar4" +
-                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
-                }
-            }
-        }
-    }
-
-    private void checkMaxShort4Short4Short4() {
-        Allocation inV1 = createRandomAllocation(mRS, Element.DataType.SIGNED_16, 4, 0x97294cc83a57c818l, false);
-        Allocation inV2 = createRandomAllocation(mRS, Element.DataType.SIGNED_16, 4, 0x97294cc83a57c819l, false);
-        try {
-            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_16, 4), INPUTSIZE);
-            script.set_gAllocInV2(inV2);
-            script.forEach_testMaxShort4Short4Short4(inV1, out);
-            verifyResultsMaxShort4Short4Short4(inV1, inV2, out, false);
-        } catch (Exception e) {
-            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testMaxShort4Short4Short4: " + e.toString());
-        }
-        try {
-            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_16, 4), INPUTSIZE);
-            scriptRelaxed.set_gAllocInV2(inV2);
-            scriptRelaxed.forEach_testMaxShort4Short4Short4(inV1, out);
-            verifyResultsMaxShort4Short4Short4(inV1, inV2, out, true);
-        } catch (Exception e) {
-            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testMaxShort4Short4Short4: " + e.toString());
-        }
-    }
-
-    private void verifyResultsMaxShort4Short4Short4(Allocation inV1, Allocation inV2, Allocation out, boolean relaxed) {
-        short[] arrayInV1 = new short[INPUTSIZE * 4];
-        inV1.copyTo(arrayInV1);
-        short[] arrayInV2 = new short[INPUTSIZE * 4];
-        inV2.copyTo(arrayInV2);
-        short[] arrayOut = new short[INPUTSIZE * 4];
-        out.copyTo(arrayOut);
-        for (int i = 0; i < INPUTSIZE; i++) {
-            for (int j = 0; j < 4 ; j++) {
-                // Extract the inputs.
-                ArgumentsShortShortShort args = new ArgumentsShortShortShort();
-                args.inV1 = arrayInV1[i * 4 + j];
-                args.inV2 = arrayInV2[i * 4 + j];
-                // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
-                CoreMathVerifier.computeMax(args);
-                // Figure out what the outputs should have been.
-                boolean valid = true;
-                if (args.out != arrayOut[i * 4 + j]) {
-                    valid = false;
-                }
-                if (!valid) {
-                    StringBuilder message = new StringBuilder();
-                    message.append("Input inV1: ");
-                    message.append(String.format("%d", args.inV1));
-                    message.append("\n");
-                    message.append("Input inV2: ");
-                    message.append(String.format("%d", args.inV2));
-                    message.append("\n");
-                    message.append("Expected output out: ");
-                    message.append(String.format("%d", args.out));
-                    message.append("\n");
-                    message.append("Actual   output out: ");
-                    message.append(String.format("%d", arrayOut[i * 4 + j]));
-                    if (args.out != arrayOut[i * 4 + j]) {
-                        message.append(" FAIL");
-                    }
-                    message.append("\n");
-                    assertTrue("Incorrect output for checkMaxShort4Short4Short4" +
-                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
-                }
-            }
-        }
-    }
-
-    private void checkMaxUshort4Ushort4Ushort4() {
-        Allocation inV1 = createRandomAllocation(mRS, Element.DataType.UNSIGNED_16, 4, 0xee9efa6405c77a79l, false);
-        Allocation inV2 = createRandomAllocation(mRS, Element.DataType.UNSIGNED_16, 4, 0xee9efa6405c77a7al, false);
-        try {
-            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_16, 4), INPUTSIZE);
-            script.set_gAllocInV2(inV2);
-            script.forEach_testMaxUshort4Ushort4Ushort4(inV1, out);
-            verifyResultsMaxUshort4Ushort4Ushort4(inV1, inV2, out, false);
-        } catch (Exception e) {
-            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testMaxUshort4Ushort4Ushort4: " + e.toString());
-        }
-        try {
-            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_16, 4), INPUTSIZE);
-            scriptRelaxed.set_gAllocInV2(inV2);
-            scriptRelaxed.forEach_testMaxUshort4Ushort4Ushort4(inV1, out);
-            verifyResultsMaxUshort4Ushort4Ushort4(inV1, inV2, out, true);
-        } catch (Exception e) {
-            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testMaxUshort4Ushort4Ushort4: " + e.toString());
-        }
-    }
-
-    private void verifyResultsMaxUshort4Ushort4Ushort4(Allocation inV1, Allocation inV2, Allocation out, boolean relaxed) {
-        short[] arrayInV1 = new short[INPUTSIZE * 4];
-        inV1.copyTo(arrayInV1);
-        short[] arrayInV2 = new short[INPUTSIZE * 4];
-        inV2.copyTo(arrayInV2);
-        short[] arrayOut = new short[INPUTSIZE * 4];
-        out.copyTo(arrayOut);
-        for (int i = 0; i < INPUTSIZE; i++) {
-            for (int j = 0; j < 4 ; j++) {
-                // Extract the inputs.
-                ArgumentsUshortUshortUshort args = new ArgumentsUshortUshortUshort();
-                args.inV1 = arrayInV1[i * 4 + j];
-                args.inV2 = arrayInV2[i * 4 + j];
-                // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
-                CoreMathVerifier.computeMax(args);
-                // Figure out what the outputs should have been.
-                boolean valid = true;
-                if (args.out != arrayOut[i * 4 + j]) {
-                    valid = false;
-                }
-                if (!valid) {
-                    StringBuilder message = new StringBuilder();
-                    message.append("Input inV1: ");
-                    message.append(String.format("0x%x", args.inV1));
-                    message.append("\n");
-                    message.append("Input inV2: ");
-                    message.append(String.format("0x%x", args.inV2));
-                    message.append("\n");
-                    message.append("Expected output out: ");
-                    message.append(String.format("0x%x", args.out));
-                    message.append("\n");
-                    message.append("Actual   output out: ");
-                    message.append(String.format("0x%x", arrayOut[i * 4 + j]));
-                    if (args.out != arrayOut[i * 4 + j]) {
-                        message.append(" FAIL");
-                    }
-                    message.append("\n");
-                    assertTrue("Incorrect output for checkMaxUshort4Ushort4Ushort4" +
-                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
-                }
-            }
-        }
-    }
-
     private void checkMaxInt4Int4Int4() {
         Allocation inV1 = createRandomAllocation(mRS, Element.DataType.SIGNED_32, 4, 0xd0d4748aa727941bl, false);
         Allocation inV2 = createRandomAllocation(mRS, Element.DataType.SIGNED_32, 4, 0xd0d4748aa727941cl, false);
@@ -1864,6 +1660,210 @@ public class TestMax extends RSBaseCompute {
                     }
                     message.append("\n");
                     assertTrue("Incorrect output for checkMaxInt4Int4Int4" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                }
+            }
+        }
+    }
+
+    public class ArgumentsUintUintUint {
+        public int inV1;
+        public int inV2;
+        public int out;
+    }
+
+    private void checkMaxUintUintUint() {
+        Allocation inV1 = createRandomAllocation(mRS, Element.DataType.UNSIGNED_32, 1, 0x75328d17808776cal, false);
+        Allocation inV2 = createRandomAllocation(mRS, Element.DataType.UNSIGNED_32, 1, 0x75328d17808776cbl, false);
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_32, 1), INPUTSIZE);
+            script.set_gAllocInV2(inV2);
+            script.forEach_testMaxUintUintUint(inV1, out);
+            verifyResultsMaxUintUintUint(inV1, inV2, out, false);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testMaxUintUintUint: " + e.toString());
+        }
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_32, 1), INPUTSIZE);
+            scriptRelaxed.set_gAllocInV2(inV2);
+            scriptRelaxed.forEach_testMaxUintUintUint(inV1, out);
+            verifyResultsMaxUintUintUint(inV1, inV2, out, true);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testMaxUintUintUint: " + e.toString());
+        }
+    }
+
+    private void verifyResultsMaxUintUintUint(Allocation inV1, Allocation inV2, Allocation out, boolean relaxed) {
+        int[] arrayInV1 = new int[INPUTSIZE * 1];
+        inV1.copyTo(arrayInV1);
+        int[] arrayInV2 = new int[INPUTSIZE * 1];
+        inV2.copyTo(arrayInV2);
+        int[] arrayOut = new int[INPUTSIZE * 1];
+        out.copyTo(arrayOut);
+        for (int i = 0; i < INPUTSIZE; i++) {
+            for (int j = 0; j < 1 ; j++) {
+                // Extract the inputs.
+                ArgumentsUintUintUint args = new ArgumentsUintUintUint();
+                args.inV1 = arrayInV1[i];
+                args.inV2 = arrayInV2[i];
+                // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
+                CoreMathVerifier.computeMax(args);
+                // Figure out what the outputs should have been.
+                boolean valid = true;
+                if (args.out != arrayOut[i * 1 + j]) {
+                    valid = false;
+                }
+                if (!valid) {
+                    StringBuilder message = new StringBuilder();
+                    message.append("Input inV1: ");
+                    message.append(String.format("0x%x", args.inV1));
+                    message.append("\n");
+                    message.append("Input inV2: ");
+                    message.append(String.format("0x%x", args.inV2));
+                    message.append("\n");
+                    message.append("Expected output out: ");
+                    message.append(String.format("0x%x", args.out));
+                    message.append("\n");
+                    message.append("Actual   output out: ");
+                    message.append(String.format("0x%x", arrayOut[i * 1 + j]));
+                    if (args.out != arrayOut[i * 1 + j]) {
+                        message.append(" FAIL");
+                    }
+                    message.append("\n");
+                    assertTrue("Incorrect output for checkMaxUintUintUint" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                }
+            }
+        }
+    }
+
+    private void checkMaxUint2Uint2Uint2() {
+        Allocation inV1 = createRandomAllocation(mRS, Element.DataType.UNSIGNED_32, 2, 0xcda90384705016a4l, false);
+        Allocation inV2 = createRandomAllocation(mRS, Element.DataType.UNSIGNED_32, 2, 0xcda90384705016a5l, false);
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_32, 2), INPUTSIZE);
+            script.set_gAllocInV2(inV2);
+            script.forEach_testMaxUint2Uint2Uint2(inV1, out);
+            verifyResultsMaxUint2Uint2Uint2(inV1, inV2, out, false);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testMaxUint2Uint2Uint2: " + e.toString());
+        }
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_32, 2), INPUTSIZE);
+            scriptRelaxed.set_gAllocInV2(inV2);
+            scriptRelaxed.forEach_testMaxUint2Uint2Uint2(inV1, out);
+            verifyResultsMaxUint2Uint2Uint2(inV1, inV2, out, true);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testMaxUint2Uint2Uint2: " + e.toString());
+        }
+    }
+
+    private void verifyResultsMaxUint2Uint2Uint2(Allocation inV1, Allocation inV2, Allocation out, boolean relaxed) {
+        int[] arrayInV1 = new int[INPUTSIZE * 2];
+        inV1.copyTo(arrayInV1);
+        int[] arrayInV2 = new int[INPUTSIZE * 2];
+        inV2.copyTo(arrayInV2);
+        int[] arrayOut = new int[INPUTSIZE * 2];
+        out.copyTo(arrayOut);
+        for (int i = 0; i < INPUTSIZE; i++) {
+            for (int j = 0; j < 2 ; j++) {
+                // Extract the inputs.
+                ArgumentsUintUintUint args = new ArgumentsUintUintUint();
+                args.inV1 = arrayInV1[i * 2 + j];
+                args.inV2 = arrayInV2[i * 2 + j];
+                // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
+                CoreMathVerifier.computeMax(args);
+                // Figure out what the outputs should have been.
+                boolean valid = true;
+                if (args.out != arrayOut[i * 2 + j]) {
+                    valid = false;
+                }
+                if (!valid) {
+                    StringBuilder message = new StringBuilder();
+                    message.append("Input inV1: ");
+                    message.append(String.format("0x%x", args.inV1));
+                    message.append("\n");
+                    message.append("Input inV2: ");
+                    message.append(String.format("0x%x", args.inV2));
+                    message.append("\n");
+                    message.append("Expected output out: ");
+                    message.append(String.format("0x%x", args.out));
+                    message.append("\n");
+                    message.append("Actual   output out: ");
+                    message.append(String.format("0x%x", arrayOut[i * 2 + j]));
+                    if (args.out != arrayOut[i * 2 + j]) {
+                        message.append(" FAIL");
+                    }
+                    message.append("\n");
+                    assertTrue("Incorrect output for checkMaxUint2Uint2Uint2" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                }
+            }
+        }
+    }
+
+    private void checkMaxUint3Uint3Uint3() {
+        Allocation inV1 = createRandomAllocation(mRS, Element.DataType.UNSIGNED_32, 3, 0x22fa7fb75507e969l, false);
+        Allocation inV2 = createRandomAllocation(mRS, Element.DataType.UNSIGNED_32, 3, 0x22fa7fb75507e96al, false);
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_32, 3), INPUTSIZE);
+            script.set_gAllocInV2(inV2);
+            script.forEach_testMaxUint3Uint3Uint3(inV1, out);
+            verifyResultsMaxUint3Uint3Uint3(inV1, inV2, out, false);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testMaxUint3Uint3Uint3: " + e.toString());
+        }
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_32, 3), INPUTSIZE);
+            scriptRelaxed.set_gAllocInV2(inV2);
+            scriptRelaxed.forEach_testMaxUint3Uint3Uint3(inV1, out);
+            verifyResultsMaxUint3Uint3Uint3(inV1, inV2, out, true);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testMaxUint3Uint3Uint3: " + e.toString());
+        }
+    }
+
+    private void verifyResultsMaxUint3Uint3Uint3(Allocation inV1, Allocation inV2, Allocation out, boolean relaxed) {
+        int[] arrayInV1 = new int[INPUTSIZE * 4];
+        inV1.copyTo(arrayInV1);
+        int[] arrayInV2 = new int[INPUTSIZE * 4];
+        inV2.copyTo(arrayInV2);
+        int[] arrayOut = new int[INPUTSIZE * 4];
+        out.copyTo(arrayOut);
+        for (int i = 0; i < INPUTSIZE; i++) {
+            for (int j = 0; j < 3 ; j++) {
+                // Extract the inputs.
+                ArgumentsUintUintUint args = new ArgumentsUintUintUint();
+                args.inV1 = arrayInV1[i * 4 + j];
+                args.inV2 = arrayInV2[i * 4 + j];
+                // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
+                CoreMathVerifier.computeMax(args);
+                // Figure out what the outputs should have been.
+                boolean valid = true;
+                if (args.out != arrayOut[i * 4 + j]) {
+                    valid = false;
+                }
+                if (!valid) {
+                    StringBuilder message = new StringBuilder();
+                    message.append("Input inV1: ");
+                    message.append(String.format("0x%x", args.inV1));
+                    message.append("\n");
+                    message.append("Input inV2: ");
+                    message.append(String.format("0x%x", args.inV2));
+                    message.append("\n");
+                    message.append("Expected output out: ");
+                    message.append(String.format("0x%x", args.out));
+                    message.append("\n");
+                    message.append("Actual   output out: ");
+                    message.append(String.format("0x%x", arrayOut[i * 4 + j]));
+                    if (args.out != arrayOut[i * 4 + j]) {
+                        message.append(" FAIL");
+                    }
+                    message.append("\n");
+                    assertTrue("Incorrect output for checkMaxUint3Uint3Uint3" +
                             (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
                 }
             }
@@ -1936,34 +1936,582 @@ public class TestMax extends RSBaseCompute {
         }
     }
 
+    public class ArgumentsLongLongLong {
+        public long inV1;
+        public long inV2;
+        public long out;
+    }
+
+    private void checkMaxLongLongLong() {
+        Allocation inV1 = createRandomAllocation(mRS, Element.DataType.SIGNED_64, 1, 0xe224db3c7ecb92e4l, false);
+        Allocation inV2 = createRandomAllocation(mRS, Element.DataType.SIGNED_64, 1, 0xe224db3c7ecb92e5l, false);
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_64, 1), INPUTSIZE);
+            script.set_gAllocInV2(inV2);
+            script.forEach_testMaxLongLongLong(inV1, out);
+            verifyResultsMaxLongLongLong(inV1, inV2, out, false);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testMaxLongLongLong: " + e.toString());
+        }
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_64, 1), INPUTSIZE);
+            scriptRelaxed.set_gAllocInV2(inV2);
+            scriptRelaxed.forEach_testMaxLongLongLong(inV1, out);
+            verifyResultsMaxLongLongLong(inV1, inV2, out, true);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testMaxLongLongLong: " + e.toString());
+        }
+    }
+
+    private void verifyResultsMaxLongLongLong(Allocation inV1, Allocation inV2, Allocation out, boolean relaxed) {
+        long[] arrayInV1 = new long[INPUTSIZE * 1];
+        inV1.copyTo(arrayInV1);
+        long[] arrayInV2 = new long[INPUTSIZE * 1];
+        inV2.copyTo(arrayInV2);
+        long[] arrayOut = new long[INPUTSIZE * 1];
+        out.copyTo(arrayOut);
+        for (int i = 0; i < INPUTSIZE; i++) {
+            for (int j = 0; j < 1 ; j++) {
+                // Extract the inputs.
+                ArgumentsLongLongLong args = new ArgumentsLongLongLong();
+                args.inV1 = arrayInV1[i];
+                args.inV2 = arrayInV2[i];
+                // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
+                CoreMathVerifier.computeMax(args);
+                // Figure out what the outputs should have been.
+                boolean valid = true;
+                if (args.out != arrayOut[i * 1 + j]) {
+                    valid = false;
+                }
+                if (!valid) {
+                    StringBuilder message = new StringBuilder();
+                    message.append("Input inV1: ");
+                    message.append(String.format("%d", args.inV1));
+                    message.append("\n");
+                    message.append("Input inV2: ");
+                    message.append(String.format("%d", args.inV2));
+                    message.append("\n");
+                    message.append("Expected output out: ");
+                    message.append(String.format("%d", args.out));
+                    message.append("\n");
+                    message.append("Actual   output out: ");
+                    message.append(String.format("%d", arrayOut[i * 1 + j]));
+                    if (args.out != arrayOut[i * 1 + j]) {
+                        message.append(" FAIL");
+                    }
+                    message.append("\n");
+                    assertTrue("Incorrect output for checkMaxLongLongLong" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                }
+            }
+        }
+    }
+
+    private void checkMaxLong2Long2Long2() {
+        Allocation inV1 = createRandomAllocation(mRS, Element.DataType.SIGNED_64, 2, 0x375f5f0ca264eb56l, false);
+        Allocation inV2 = createRandomAllocation(mRS, Element.DataType.SIGNED_64, 2, 0x375f5f0ca264eb57l, false);
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_64, 2), INPUTSIZE);
+            script.set_gAllocInV2(inV2);
+            script.forEach_testMaxLong2Long2Long2(inV1, out);
+            verifyResultsMaxLong2Long2Long2(inV1, inV2, out, false);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testMaxLong2Long2Long2: " + e.toString());
+        }
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_64, 2), INPUTSIZE);
+            scriptRelaxed.set_gAllocInV2(inV2);
+            scriptRelaxed.forEach_testMaxLong2Long2Long2(inV1, out);
+            verifyResultsMaxLong2Long2Long2(inV1, inV2, out, true);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testMaxLong2Long2Long2: " + e.toString());
+        }
+    }
+
+    private void verifyResultsMaxLong2Long2Long2(Allocation inV1, Allocation inV2, Allocation out, boolean relaxed) {
+        long[] arrayInV1 = new long[INPUTSIZE * 2];
+        inV1.copyTo(arrayInV1);
+        long[] arrayInV2 = new long[INPUTSIZE * 2];
+        inV2.copyTo(arrayInV2);
+        long[] arrayOut = new long[INPUTSIZE * 2];
+        out.copyTo(arrayOut);
+        for (int i = 0; i < INPUTSIZE; i++) {
+            for (int j = 0; j < 2 ; j++) {
+                // Extract the inputs.
+                ArgumentsLongLongLong args = new ArgumentsLongLongLong();
+                args.inV1 = arrayInV1[i * 2 + j];
+                args.inV2 = arrayInV2[i * 2 + j];
+                // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
+                CoreMathVerifier.computeMax(args);
+                // Figure out what the outputs should have been.
+                boolean valid = true;
+                if (args.out != arrayOut[i * 2 + j]) {
+                    valid = false;
+                }
+                if (!valid) {
+                    StringBuilder message = new StringBuilder();
+                    message.append("Input inV1: ");
+                    message.append(String.format("%d", args.inV1));
+                    message.append("\n");
+                    message.append("Input inV2: ");
+                    message.append(String.format("%d", args.inV2));
+                    message.append("\n");
+                    message.append("Expected output out: ");
+                    message.append(String.format("%d", args.out));
+                    message.append("\n");
+                    message.append("Actual   output out: ");
+                    message.append(String.format("%d", arrayOut[i * 2 + j]));
+                    if (args.out != arrayOut[i * 2 + j]) {
+                        message.append(" FAIL");
+                    }
+                    message.append("\n");
+                    assertTrue("Incorrect output for checkMaxLong2Long2Long2" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                }
+            }
+        }
+    }
+
+    private void checkMaxLong3Long3Long3() {
+        Allocation inV1 = createRandomAllocation(mRS, Element.DataType.SIGNED_64, 3, 0x8cb0db3f871cbe1bl, false);
+        Allocation inV2 = createRandomAllocation(mRS, Element.DataType.SIGNED_64, 3, 0x8cb0db3f871cbe1cl, false);
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_64, 3), INPUTSIZE);
+            script.set_gAllocInV2(inV2);
+            script.forEach_testMaxLong3Long3Long3(inV1, out);
+            verifyResultsMaxLong3Long3Long3(inV1, inV2, out, false);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testMaxLong3Long3Long3: " + e.toString());
+        }
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_64, 3), INPUTSIZE);
+            scriptRelaxed.set_gAllocInV2(inV2);
+            scriptRelaxed.forEach_testMaxLong3Long3Long3(inV1, out);
+            verifyResultsMaxLong3Long3Long3(inV1, inV2, out, true);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testMaxLong3Long3Long3: " + e.toString());
+        }
+    }
+
+    private void verifyResultsMaxLong3Long3Long3(Allocation inV1, Allocation inV2, Allocation out, boolean relaxed) {
+        long[] arrayInV1 = new long[INPUTSIZE * 4];
+        inV1.copyTo(arrayInV1);
+        long[] arrayInV2 = new long[INPUTSIZE * 4];
+        inV2.copyTo(arrayInV2);
+        long[] arrayOut = new long[INPUTSIZE * 4];
+        out.copyTo(arrayOut);
+        for (int i = 0; i < INPUTSIZE; i++) {
+            for (int j = 0; j < 3 ; j++) {
+                // Extract the inputs.
+                ArgumentsLongLongLong args = new ArgumentsLongLongLong();
+                args.inV1 = arrayInV1[i * 4 + j];
+                args.inV2 = arrayInV2[i * 4 + j];
+                // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
+                CoreMathVerifier.computeMax(args);
+                // Figure out what the outputs should have been.
+                boolean valid = true;
+                if (args.out != arrayOut[i * 4 + j]) {
+                    valid = false;
+                }
+                if (!valid) {
+                    StringBuilder message = new StringBuilder();
+                    message.append("Input inV1: ");
+                    message.append(String.format("%d", args.inV1));
+                    message.append("\n");
+                    message.append("Input inV2: ");
+                    message.append(String.format("%d", args.inV2));
+                    message.append("\n");
+                    message.append("Expected output out: ");
+                    message.append(String.format("%d", args.out));
+                    message.append("\n");
+                    message.append("Actual   output out: ");
+                    message.append(String.format("%d", arrayOut[i * 4 + j]));
+                    if (args.out != arrayOut[i * 4 + j]) {
+                        message.append(" FAIL");
+                    }
+                    message.append("\n");
+                    assertTrue("Incorrect output for checkMaxLong3Long3Long3" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                }
+            }
+        }
+    }
+
+    private void checkMaxLong4Long4Long4() {
+        Allocation inV1 = createRandomAllocation(mRS, Element.DataType.SIGNED_64, 4, 0xe20257726bd490e0l, false);
+        Allocation inV2 = createRandomAllocation(mRS, Element.DataType.SIGNED_64, 4, 0xe20257726bd490e1l, false);
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_64, 4), INPUTSIZE);
+            script.set_gAllocInV2(inV2);
+            script.forEach_testMaxLong4Long4Long4(inV1, out);
+            verifyResultsMaxLong4Long4Long4(inV1, inV2, out, false);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testMaxLong4Long4Long4: " + e.toString());
+        }
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_64, 4), INPUTSIZE);
+            scriptRelaxed.set_gAllocInV2(inV2);
+            scriptRelaxed.forEach_testMaxLong4Long4Long4(inV1, out);
+            verifyResultsMaxLong4Long4Long4(inV1, inV2, out, true);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testMaxLong4Long4Long4: " + e.toString());
+        }
+    }
+
+    private void verifyResultsMaxLong4Long4Long4(Allocation inV1, Allocation inV2, Allocation out, boolean relaxed) {
+        long[] arrayInV1 = new long[INPUTSIZE * 4];
+        inV1.copyTo(arrayInV1);
+        long[] arrayInV2 = new long[INPUTSIZE * 4];
+        inV2.copyTo(arrayInV2);
+        long[] arrayOut = new long[INPUTSIZE * 4];
+        out.copyTo(arrayOut);
+        for (int i = 0; i < INPUTSIZE; i++) {
+            for (int j = 0; j < 4 ; j++) {
+                // Extract the inputs.
+                ArgumentsLongLongLong args = new ArgumentsLongLongLong();
+                args.inV1 = arrayInV1[i * 4 + j];
+                args.inV2 = arrayInV2[i * 4 + j];
+                // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
+                CoreMathVerifier.computeMax(args);
+                // Figure out what the outputs should have been.
+                boolean valid = true;
+                if (args.out != arrayOut[i * 4 + j]) {
+                    valid = false;
+                }
+                if (!valid) {
+                    StringBuilder message = new StringBuilder();
+                    message.append("Input inV1: ");
+                    message.append(String.format("%d", args.inV1));
+                    message.append("\n");
+                    message.append("Input inV2: ");
+                    message.append(String.format("%d", args.inV2));
+                    message.append("\n");
+                    message.append("Expected output out: ");
+                    message.append(String.format("%d", args.out));
+                    message.append("\n");
+                    message.append("Actual   output out: ");
+                    message.append(String.format("%d", arrayOut[i * 4 + j]));
+                    if (args.out != arrayOut[i * 4 + j]) {
+                        message.append(" FAIL");
+                    }
+                    message.append("\n");
+                    assertTrue("Incorrect output for checkMaxLong4Long4Long4" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                }
+            }
+        }
+    }
+
+    public class ArgumentsUlongUlongUlong {
+        public long inV1;
+        public long inV2;
+        public long out;
+    }
+
+    private void checkMaxUlongUlongUlong() {
+        Allocation inV1 = createRandomAllocation(mRS, Element.DataType.UNSIGNED_64, 1, 0xb38270e909275f1dl, false);
+        Allocation inV2 = createRandomAllocation(mRS, Element.DataType.UNSIGNED_64, 1, 0xb38270e909275f1el, false);
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_64, 1), INPUTSIZE);
+            script.set_gAllocInV2(inV2);
+            script.forEach_testMaxUlongUlongUlong(inV1, out);
+            verifyResultsMaxUlongUlongUlong(inV1, inV2, out, false);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testMaxUlongUlongUlong: " + e.toString());
+        }
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_64, 1), INPUTSIZE);
+            scriptRelaxed.set_gAllocInV2(inV2);
+            scriptRelaxed.forEach_testMaxUlongUlongUlong(inV1, out);
+            verifyResultsMaxUlongUlongUlong(inV1, inV2, out, true);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testMaxUlongUlongUlong: " + e.toString());
+        }
+    }
+
+    private void verifyResultsMaxUlongUlongUlong(Allocation inV1, Allocation inV2, Allocation out, boolean relaxed) {
+        long[] arrayInV1 = new long[INPUTSIZE * 1];
+        inV1.copyTo(arrayInV1);
+        long[] arrayInV2 = new long[INPUTSIZE * 1];
+        inV2.copyTo(arrayInV2);
+        long[] arrayOut = new long[INPUTSIZE * 1];
+        out.copyTo(arrayOut);
+        for (int i = 0; i < INPUTSIZE; i++) {
+            for (int j = 0; j < 1 ; j++) {
+                // Extract the inputs.
+                ArgumentsUlongUlongUlong args = new ArgumentsUlongUlongUlong();
+                args.inV1 = arrayInV1[i];
+                args.inV2 = arrayInV2[i];
+                // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
+                CoreMathVerifier.computeMax(args);
+                // Figure out what the outputs should have been.
+                boolean valid = true;
+                if (args.out != arrayOut[i * 1 + j]) {
+                    valid = false;
+                }
+                if (!valid) {
+                    StringBuilder message = new StringBuilder();
+                    message.append("Input inV1: ");
+                    message.append(String.format("0x%x", args.inV1));
+                    message.append("\n");
+                    message.append("Input inV2: ");
+                    message.append(String.format("0x%x", args.inV2));
+                    message.append("\n");
+                    message.append("Expected output out: ");
+                    message.append(String.format("0x%x", args.out));
+                    message.append("\n");
+                    message.append("Actual   output out: ");
+                    message.append(String.format("0x%x", arrayOut[i * 1 + j]));
+                    if (args.out != arrayOut[i * 1 + j]) {
+                        message.append(" FAIL");
+                    }
+                    message.append("\n");
+                    assertTrue("Incorrect output for checkMaxUlongUlongUlong" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                }
+            }
+        }
+    }
+
+    private void checkMaxUlong2Ulong2Ulong2() {
+        Allocation inV1 = createRandomAllocation(mRS, Element.DataType.UNSIGNED_64, 2, 0x7f6c5ec5fee1a8afl, false);
+        Allocation inV2 = createRandomAllocation(mRS, Element.DataType.UNSIGNED_64, 2, 0x7f6c5ec5fee1a8b0l, false);
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_64, 2), INPUTSIZE);
+            script.set_gAllocInV2(inV2);
+            script.forEach_testMaxUlong2Ulong2Ulong2(inV1, out);
+            verifyResultsMaxUlong2Ulong2Ulong2(inV1, inV2, out, false);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testMaxUlong2Ulong2Ulong2: " + e.toString());
+        }
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_64, 2), INPUTSIZE);
+            scriptRelaxed.set_gAllocInV2(inV2);
+            scriptRelaxed.forEach_testMaxUlong2Ulong2Ulong2(inV1, out);
+            verifyResultsMaxUlong2Ulong2Ulong2(inV1, inV2, out, true);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testMaxUlong2Ulong2Ulong2: " + e.toString());
+        }
+    }
+
+    private void verifyResultsMaxUlong2Ulong2Ulong2(Allocation inV1, Allocation inV2, Allocation out, boolean relaxed) {
+        long[] arrayInV1 = new long[INPUTSIZE * 2];
+        inV1.copyTo(arrayInV1);
+        long[] arrayInV2 = new long[INPUTSIZE * 2];
+        inV2.copyTo(arrayInV2);
+        long[] arrayOut = new long[INPUTSIZE * 2];
+        out.copyTo(arrayOut);
+        for (int i = 0; i < INPUTSIZE; i++) {
+            for (int j = 0; j < 2 ; j++) {
+                // Extract the inputs.
+                ArgumentsUlongUlongUlong args = new ArgumentsUlongUlongUlong();
+                args.inV1 = arrayInV1[i * 2 + j];
+                args.inV2 = arrayInV2[i * 2 + j];
+                // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
+                CoreMathVerifier.computeMax(args);
+                // Figure out what the outputs should have been.
+                boolean valid = true;
+                if (args.out != arrayOut[i * 2 + j]) {
+                    valid = false;
+                }
+                if (!valid) {
+                    StringBuilder message = new StringBuilder();
+                    message.append("Input inV1: ");
+                    message.append(String.format("0x%x", args.inV1));
+                    message.append("\n");
+                    message.append("Input inV2: ");
+                    message.append(String.format("0x%x", args.inV2));
+                    message.append("\n");
+                    message.append("Expected output out: ");
+                    message.append(String.format("0x%x", args.out));
+                    message.append("\n");
+                    message.append("Actual   output out: ");
+                    message.append(String.format("0x%x", arrayOut[i * 2 + j]));
+                    if (args.out != arrayOut[i * 2 + j]) {
+                        message.append(" FAIL");
+                    }
+                    message.append("\n");
+                    assertTrue("Incorrect output for checkMaxUlong2Ulong2Ulong2" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                }
+            }
+        }
+    }
+
+    private void checkMaxUlong3Ulong3Ulong3() {
+        Allocation inV1 = createRandomAllocation(mRS, Element.DataType.UNSIGNED_64, 3, 0xac5dae264f2beebal, false);
+        Allocation inV2 = createRandomAllocation(mRS, Element.DataType.UNSIGNED_64, 3, 0xac5dae264f2beebbl, false);
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_64, 3), INPUTSIZE);
+            script.set_gAllocInV2(inV2);
+            script.forEach_testMaxUlong3Ulong3Ulong3(inV1, out);
+            verifyResultsMaxUlong3Ulong3Ulong3(inV1, inV2, out, false);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testMaxUlong3Ulong3Ulong3: " + e.toString());
+        }
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_64, 3), INPUTSIZE);
+            scriptRelaxed.set_gAllocInV2(inV2);
+            scriptRelaxed.forEach_testMaxUlong3Ulong3Ulong3(inV1, out);
+            verifyResultsMaxUlong3Ulong3Ulong3(inV1, inV2, out, true);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testMaxUlong3Ulong3Ulong3: " + e.toString());
+        }
+    }
+
+    private void verifyResultsMaxUlong3Ulong3Ulong3(Allocation inV1, Allocation inV2, Allocation out, boolean relaxed) {
+        long[] arrayInV1 = new long[INPUTSIZE * 4];
+        inV1.copyTo(arrayInV1);
+        long[] arrayInV2 = new long[INPUTSIZE * 4];
+        inV2.copyTo(arrayInV2);
+        long[] arrayOut = new long[INPUTSIZE * 4];
+        out.copyTo(arrayOut);
+        for (int i = 0; i < INPUTSIZE; i++) {
+            for (int j = 0; j < 3 ; j++) {
+                // Extract the inputs.
+                ArgumentsUlongUlongUlong args = new ArgumentsUlongUlongUlong();
+                args.inV1 = arrayInV1[i * 4 + j];
+                args.inV2 = arrayInV2[i * 4 + j];
+                // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
+                CoreMathVerifier.computeMax(args);
+                // Figure out what the outputs should have been.
+                boolean valid = true;
+                if (args.out != arrayOut[i * 4 + j]) {
+                    valid = false;
+                }
+                if (!valid) {
+                    StringBuilder message = new StringBuilder();
+                    message.append("Input inV1: ");
+                    message.append(String.format("0x%x", args.inV1));
+                    message.append("\n");
+                    message.append("Input inV2: ");
+                    message.append(String.format("0x%x", args.inV2));
+                    message.append("\n");
+                    message.append("Expected output out: ");
+                    message.append(String.format("0x%x", args.out));
+                    message.append("\n");
+                    message.append("Actual   output out: ");
+                    message.append(String.format("0x%x", arrayOut[i * 4 + j]));
+                    if (args.out != arrayOut[i * 4 + j]) {
+                        message.append(" FAIL");
+                    }
+                    message.append("\n");
+                    assertTrue("Incorrect output for checkMaxUlong3Ulong3Ulong3" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                }
+            }
+        }
+    }
+
+    private void checkMaxUlong4Ulong4Ulong4() {
+        Allocation inV1 = createRandomAllocation(mRS, Element.DataType.UNSIGNED_64, 4, 0xd94efd869f7634c5l, false);
+        Allocation inV2 = createRandomAllocation(mRS, Element.DataType.UNSIGNED_64, 4, 0xd94efd869f7634c6l, false);
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_64, 4), INPUTSIZE);
+            script.set_gAllocInV2(inV2);
+            script.forEach_testMaxUlong4Ulong4Ulong4(inV1, out);
+            verifyResultsMaxUlong4Ulong4Ulong4(inV1, inV2, out, false);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testMaxUlong4Ulong4Ulong4: " + e.toString());
+        }
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_64, 4), INPUTSIZE);
+            scriptRelaxed.set_gAllocInV2(inV2);
+            scriptRelaxed.forEach_testMaxUlong4Ulong4Ulong4(inV1, out);
+            verifyResultsMaxUlong4Ulong4Ulong4(inV1, inV2, out, true);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testMaxUlong4Ulong4Ulong4: " + e.toString());
+        }
+    }
+
+    private void verifyResultsMaxUlong4Ulong4Ulong4(Allocation inV1, Allocation inV2, Allocation out, boolean relaxed) {
+        long[] arrayInV1 = new long[INPUTSIZE * 4];
+        inV1.copyTo(arrayInV1);
+        long[] arrayInV2 = new long[INPUTSIZE * 4];
+        inV2.copyTo(arrayInV2);
+        long[] arrayOut = new long[INPUTSIZE * 4];
+        out.copyTo(arrayOut);
+        for (int i = 0; i < INPUTSIZE; i++) {
+            for (int j = 0; j < 4 ; j++) {
+                // Extract the inputs.
+                ArgumentsUlongUlongUlong args = new ArgumentsUlongUlongUlong();
+                args.inV1 = arrayInV1[i * 4 + j];
+                args.inV2 = arrayInV2[i * 4 + j];
+                // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
+                CoreMathVerifier.computeMax(args);
+                // Figure out what the outputs should have been.
+                boolean valid = true;
+                if (args.out != arrayOut[i * 4 + j]) {
+                    valid = false;
+                }
+                if (!valid) {
+                    StringBuilder message = new StringBuilder();
+                    message.append("Input inV1: ");
+                    message.append(String.format("0x%x", args.inV1));
+                    message.append("\n");
+                    message.append("Input inV2: ");
+                    message.append(String.format("0x%x", args.inV2));
+                    message.append("\n");
+                    message.append("Expected output out: ");
+                    message.append(String.format("0x%x", args.out));
+                    message.append("\n");
+                    message.append("Actual   output out: ");
+                    message.append(String.format("0x%x", arrayOut[i * 4 + j]));
+                    if (args.out != arrayOut[i * 4 + j]) {
+                        message.append(" FAIL");
+                    }
+                    message.append("\n");
+                    assertTrue("Incorrect output for checkMaxUlong4Ulong4Ulong4" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                }
+            }
+        }
+    }
+
     public void testMax() {
         checkMaxFloatFloatFloat();
         checkMaxFloat2Float2Float2();
         checkMaxFloat3Float3Float3();
         checkMaxFloat4Float4Float4();
         checkMaxCharCharChar();
-        checkMaxUcharUcharUchar();
-        checkMaxShortShortShort();
-        checkMaxUshortUshortUshort();
-        checkMaxIntIntInt();
-        checkMaxUintUintUint();
         checkMaxChar2Char2Char2();
-        checkMaxUchar2Uchar2Uchar2();
-        checkMaxShort2Short2Short2();
-        checkMaxUshort2Ushort2Ushort2();
-        checkMaxInt2Int2Int2();
-        checkMaxUint2Uint2Uint2();
         checkMaxChar3Char3Char3();
-        checkMaxUchar3Uchar3Uchar3();
-        checkMaxShort3Short3Short3();
-        checkMaxUshort3Ushort3Ushort3();
-        checkMaxInt3Int3Int3();
-        checkMaxUint3Uint3Uint3();
         checkMaxChar4Char4Char4();
+        checkMaxUcharUcharUchar();
+        checkMaxUchar2Uchar2Uchar2();
+        checkMaxUchar3Uchar3Uchar3();
         checkMaxUchar4Uchar4Uchar4();
+        checkMaxShortShortShort();
+        checkMaxShort2Short2Short2();
+        checkMaxShort3Short3Short3();
         checkMaxShort4Short4Short4();
+        checkMaxUshortUshortUshort();
+        checkMaxUshort2Ushort2Ushort2();
+        checkMaxUshort3Ushort3Ushort3();
         checkMaxUshort4Ushort4Ushort4();
+        checkMaxIntIntInt();
+        checkMaxInt2Int2Int2();
+        checkMaxInt3Int3Int3();
         checkMaxInt4Int4Int4();
+        checkMaxUintUintUint();
+        checkMaxUint2Uint2Uint2();
+        checkMaxUint3Uint3Uint3();
         checkMaxUint4Uint4Uint4();
+        checkMaxLongLongLong();
+        checkMaxLong2Long2Long2();
+        checkMaxLong3Long3Long3();
+        checkMaxLong4Long4Long4();
+        checkMaxUlongUlongUlong();
+        checkMaxUlong2Ulong2Ulong2();
+        checkMaxUlong3Ulong3Ulong3();
+        checkMaxUlong4Ulong4Ulong4();
     }
 }

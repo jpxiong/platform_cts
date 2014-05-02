@@ -115,7 +115,6 @@ public class RSBaseCompute extends RSBase {
         Element element = getElement(rs, dataType, size);
         Allocation alloc = Allocation.createSized(rs, element, INPUTSIZE);
         int width = (size == 3) ? 4 : size;
-        /* TODO copy1DRangeFrom does not work for double
         if (dataType == Element.DataType.FLOAT_64) {
             double[] inArray = new double[INPUTSIZE * width];
             // TODO The ranges for float is too small.  We need to accept a wider range of values.
@@ -123,16 +122,13 @@ public class RSBaseCompute extends RSBase {
             double max = 4.0 * Math.PI;
             RSUtils.genRandomDoubles(seed, min, max, inArray, includeExtremes);
             alloc.copy1DRangeFrom(0, INPUTSIZE, inArray);
-        } else
-        */
-        if (dataType == Element.DataType.FLOAT_32) {
+        } else if (dataType == Element.DataType.FLOAT_32) {
             float[] inArray = new float[INPUTSIZE * width];
             // TODO The ranges for float is too small.  We need to accept a wider range of values.
             float min = -4.0f * (float) Math.PI;
             float max = 4.0f * (float) Math.PI;
             RSUtils.genRandomFloats(seed, min, max, inArray, includeExtremes);
             alloc.copy1DRangeFrom(0, INPUTSIZE, inArray);
-        /* TODO copy1DRangFrom does not work for long
         } else if (dataType == Element.DataType.SIGNED_64) {
             long[] inArray = new long[INPUTSIZE * width];
             RSUtils.genRandomLongs(seed, inArray, true, 63);
@@ -141,7 +137,6 @@ public class RSBaseCompute extends RSBase {
             long[] inArray = new long[INPUTSIZE * width];
             RSUtils.genRandomLongs(seed, inArray, false, 64);
             alloc.copy1DRangeFrom(0, INPUTSIZE, inArray);
-        */
         } else if (dataType == Element.DataType.SIGNED_32) {
             int[] inArray = new int[INPUTSIZE * width];
             RSUtils.genRandomInts(seed, inArray, true, 31);
@@ -178,13 +173,11 @@ public class RSBaseCompute extends RSBase {
         Element element = getElement(rs, dataType, size);
         Allocation alloc = Allocation.createSized(rs, element, INPUTSIZE);
         int width = (size == 3) ? 4 : size;
-        /* TODO copy1DRangeFrom does not work for double
         if (dataType == Element.DataType.FLOAT_64) {
             double[] inArray = new double[INPUTSIZE * width];
             RSUtils.genRandomDoubles(seed, minValue, maxValue, inArray, false);
             alloc.copy1DRangeFrom(0, INPUTSIZE, inArray);
-        } else */
-        if (dataType == Element.DataType.FLOAT_32) {
+        } else if (dataType == Element.DataType.FLOAT_32) {
             float[] inArray = new float[INPUTSIZE * width];
             RSUtils.genRandomFloats(seed, (float) minValue, (float) maxValue, inArray, false);
             alloc.copy1DRangeFrom(0, INPUTSIZE, inArray);
@@ -201,13 +194,12 @@ public class RSBaseCompute extends RSBase {
         Element element = getElement(rs, dataType, size);
         Allocation alloc = Allocation.createSized(rs, element, INPUTSIZE);
         int width = (size == 3) ? 4 : size;
-        /* TODO copy1DRangFrom does not work for long
         if (dataType == Element.DataType.SIGNED_64 ||
                 dataType == Element.DataType.UNSIGNED_64) {
             long[] inArray = new long[INPUTSIZE * width];
             RSUtils.genRandomLongs(seed, inArray, signed, numberOfBits);
             alloc.copy1DRangeFrom(0, INPUTSIZE, inArray);
-        } else */
+        } else
         if (dataType == Element.DataType.SIGNED_32 ||
                 dataType == Element.DataType.UNSIGNED_32) {
             int[] inArray = new int[INPUTSIZE * width];
@@ -239,7 +231,6 @@ public class RSBaseCompute extends RSBase {
         }
         int size = INPUTSIZE * stride;
         Element.DataType dataType = element.getDataType();
-        /* TODO copy1DRangeFrom does not work for double
         if (dataType == Element.DataType.FLOAT_64) {
             double[] minArray = new double[size];
             double[] maxArray = new double[size];
@@ -254,7 +245,7 @@ public class RSBaseCompute extends RSBase {
             }
             minAlloc.copyFrom(minArray);
             maxAlloc.copyFrom(maxArray);
-        } else */
+        } else
         if (dataType == Element.DataType.FLOAT_32) {
             float[] minArray = new float[size];
             float[] maxArray = new float[size];
@@ -269,7 +260,6 @@ public class RSBaseCompute extends RSBase {
             }
             minAlloc.copyFrom(minArray);
             maxAlloc.copyFrom(maxArray);
-        /* TODO copy1DRangFrom does not work for long
         } else if (dataType == Element.DataType.SIGNED_64) {
             long[] minArray = new long[size];
             long[] maxArray = new long[size];
@@ -298,7 +288,6 @@ public class RSBaseCompute extends RSBase {
             }
             minAlloc.copyFrom(minArray);
             maxAlloc.copyFrom(maxArray);
-        */
         } else if (dataType == Element.DataType.SIGNED_32) {
             int[] minArray = new int[size];
             int[] maxArray = new int[size];

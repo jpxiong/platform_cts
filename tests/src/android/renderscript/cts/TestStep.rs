@@ -55,3 +55,18 @@ float4 __attribute__((kernel)) testStepFloat4FloatFloat4(float4 inEdge, unsigned
     float inV = rsGetElementAt_float(gAllocInV, x);
     return step(inEdge, inV);
 }
+
+float2 __attribute__((kernel)) testStepFloatFloat2Float2(float inEdge, unsigned int x) {
+    float2 inV = rsGetElementAt_float2(gAllocInV, x);
+    return step(inEdge, inV);
+}
+
+float3 __attribute__((kernel)) testStepFloatFloat3Float3(float inEdge, unsigned int x) {
+    float3 inV = rsGetElementAt_float3(gAllocInV, x);
+    return step(inEdge, inV);
+}
+
+float4 __attribute__((kernel)) testStepFloatFloat4Float4(float inEdge, unsigned int x) {
+    float4 inV = rsGetElementAt_float4(gAllocInV, x);
+    return step(inEdge, inV);
+}

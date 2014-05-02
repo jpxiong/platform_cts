@@ -388,6 +388,204 @@ public class TestMin extends RSBaseCompute {
         }
     }
 
+    private void checkMinChar2Char2Char2() {
+        Allocation inV1 = createRandomAllocation(mRS, Element.DataType.SIGNED_8, 2, 0xec4705afc03447ael, false);
+        Allocation inV2 = createRandomAllocation(mRS, Element.DataType.SIGNED_8, 2, 0xec4705afc03447afl, false);
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_8, 2), INPUTSIZE);
+            script.set_gAllocInV2(inV2);
+            script.forEach_testMinChar2Char2Char2(inV1, out);
+            verifyResultsMinChar2Char2Char2(inV1, inV2, out, false);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testMinChar2Char2Char2: " + e.toString());
+        }
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_8, 2), INPUTSIZE);
+            scriptRelaxed.set_gAllocInV2(inV2);
+            scriptRelaxed.forEach_testMinChar2Char2Char2(inV1, out);
+            verifyResultsMinChar2Char2Char2(inV1, inV2, out, true);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testMinChar2Char2Char2: " + e.toString());
+        }
+    }
+
+    private void verifyResultsMinChar2Char2Char2(Allocation inV1, Allocation inV2, Allocation out, boolean relaxed) {
+        byte[] arrayInV1 = new byte[INPUTSIZE * 2];
+        inV1.copyTo(arrayInV1);
+        byte[] arrayInV2 = new byte[INPUTSIZE * 2];
+        inV2.copyTo(arrayInV2);
+        byte[] arrayOut = new byte[INPUTSIZE * 2];
+        out.copyTo(arrayOut);
+        for (int i = 0; i < INPUTSIZE; i++) {
+            for (int j = 0; j < 2 ; j++) {
+                // Extract the inputs.
+                ArgumentsCharCharChar args = new ArgumentsCharCharChar();
+                args.inV1 = arrayInV1[i * 2 + j];
+                args.inV2 = arrayInV2[i * 2 + j];
+                // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
+                CoreMathVerifier.computeMin(args);
+                // Figure out what the outputs should have been.
+                boolean valid = true;
+                if (args.out != arrayOut[i * 2 + j]) {
+                    valid = false;
+                }
+                if (!valid) {
+                    StringBuilder message = new StringBuilder();
+                    message.append("Input inV1: ");
+                    message.append(String.format("%d", args.inV1));
+                    message.append("\n");
+                    message.append("Input inV2: ");
+                    message.append(String.format("%d", args.inV2));
+                    message.append("\n");
+                    message.append("Expected output out: ");
+                    message.append(String.format("%d", args.out));
+                    message.append("\n");
+                    message.append("Actual   output out: ");
+                    message.append(String.format("%d", arrayOut[i * 2 + j]));
+                    if (args.out != arrayOut[i * 2 + j]) {
+                        message.append(" FAIL");
+                    }
+                    message.append("\n");
+                    assertTrue("Incorrect output for checkMinChar2Char2Char2" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                }
+            }
+        }
+    }
+
+    private void checkMinChar3Char3Char3() {
+        Allocation inV1 = createRandomAllocation(mRS, Element.DataType.SIGNED_8, 3, 0x419881e2a4ec1a73l, false);
+        Allocation inV2 = createRandomAllocation(mRS, Element.DataType.SIGNED_8, 3, 0x419881e2a4ec1a74l, false);
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_8, 3), INPUTSIZE);
+            script.set_gAllocInV2(inV2);
+            script.forEach_testMinChar3Char3Char3(inV1, out);
+            verifyResultsMinChar3Char3Char3(inV1, inV2, out, false);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testMinChar3Char3Char3: " + e.toString());
+        }
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_8, 3), INPUTSIZE);
+            scriptRelaxed.set_gAllocInV2(inV2);
+            scriptRelaxed.forEach_testMinChar3Char3Char3(inV1, out);
+            verifyResultsMinChar3Char3Char3(inV1, inV2, out, true);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testMinChar3Char3Char3: " + e.toString());
+        }
+    }
+
+    private void verifyResultsMinChar3Char3Char3(Allocation inV1, Allocation inV2, Allocation out, boolean relaxed) {
+        byte[] arrayInV1 = new byte[INPUTSIZE * 4];
+        inV1.copyTo(arrayInV1);
+        byte[] arrayInV2 = new byte[INPUTSIZE * 4];
+        inV2.copyTo(arrayInV2);
+        byte[] arrayOut = new byte[INPUTSIZE * 4];
+        out.copyTo(arrayOut);
+        for (int i = 0; i < INPUTSIZE; i++) {
+            for (int j = 0; j < 3 ; j++) {
+                // Extract the inputs.
+                ArgumentsCharCharChar args = new ArgumentsCharCharChar();
+                args.inV1 = arrayInV1[i * 4 + j];
+                args.inV2 = arrayInV2[i * 4 + j];
+                // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
+                CoreMathVerifier.computeMin(args);
+                // Figure out what the outputs should have been.
+                boolean valid = true;
+                if (args.out != arrayOut[i * 4 + j]) {
+                    valid = false;
+                }
+                if (!valid) {
+                    StringBuilder message = new StringBuilder();
+                    message.append("Input inV1: ");
+                    message.append(String.format("%d", args.inV1));
+                    message.append("\n");
+                    message.append("Input inV2: ");
+                    message.append(String.format("%d", args.inV2));
+                    message.append("\n");
+                    message.append("Expected output out: ");
+                    message.append(String.format("%d", args.out));
+                    message.append("\n");
+                    message.append("Actual   output out: ");
+                    message.append(String.format("%d", arrayOut[i * 4 + j]));
+                    if (args.out != arrayOut[i * 4 + j]) {
+                        message.append(" FAIL");
+                    }
+                    message.append("\n");
+                    assertTrue("Incorrect output for checkMinChar3Char3Char3" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                }
+            }
+        }
+    }
+
+    private void checkMinChar4Char4Char4() {
+        Allocation inV1 = createRandomAllocation(mRS, Element.DataType.SIGNED_8, 4, 0x96e9fe1589a3ed38l, false);
+        Allocation inV2 = createRandomAllocation(mRS, Element.DataType.SIGNED_8, 4, 0x96e9fe1589a3ed39l, false);
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_8, 4), INPUTSIZE);
+            script.set_gAllocInV2(inV2);
+            script.forEach_testMinChar4Char4Char4(inV1, out);
+            verifyResultsMinChar4Char4Char4(inV1, inV2, out, false);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testMinChar4Char4Char4: " + e.toString());
+        }
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_8, 4), INPUTSIZE);
+            scriptRelaxed.set_gAllocInV2(inV2);
+            scriptRelaxed.forEach_testMinChar4Char4Char4(inV1, out);
+            verifyResultsMinChar4Char4Char4(inV1, inV2, out, true);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testMinChar4Char4Char4: " + e.toString());
+        }
+    }
+
+    private void verifyResultsMinChar4Char4Char4(Allocation inV1, Allocation inV2, Allocation out, boolean relaxed) {
+        byte[] arrayInV1 = new byte[INPUTSIZE * 4];
+        inV1.copyTo(arrayInV1);
+        byte[] arrayInV2 = new byte[INPUTSIZE * 4];
+        inV2.copyTo(arrayInV2);
+        byte[] arrayOut = new byte[INPUTSIZE * 4];
+        out.copyTo(arrayOut);
+        for (int i = 0; i < INPUTSIZE; i++) {
+            for (int j = 0; j < 4 ; j++) {
+                // Extract the inputs.
+                ArgumentsCharCharChar args = new ArgumentsCharCharChar();
+                args.inV1 = arrayInV1[i * 4 + j];
+                args.inV2 = arrayInV2[i * 4 + j];
+                // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
+                CoreMathVerifier.computeMin(args);
+                // Figure out what the outputs should have been.
+                boolean valid = true;
+                if (args.out != arrayOut[i * 4 + j]) {
+                    valid = false;
+                }
+                if (!valid) {
+                    StringBuilder message = new StringBuilder();
+                    message.append("Input inV1: ");
+                    message.append(String.format("%d", args.inV1));
+                    message.append("\n");
+                    message.append("Input inV2: ");
+                    message.append(String.format("%d", args.inV2));
+                    message.append("\n");
+                    message.append("Expected output out: ");
+                    message.append(String.format("%d", args.out));
+                    message.append("\n");
+                    message.append("Actual   output out: ");
+                    message.append(String.format("%d", arrayOut[i * 4 + j]));
+                    if (args.out != arrayOut[i * 4 + j]) {
+                        message.append(" FAIL");
+                    }
+                    message.append("\n");
+                    assertTrue("Incorrect output for checkMinChar4Char4Char4" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                }
+            }
+        }
+    }
+
     public class ArgumentsUcharUcharUchar {
         public byte inV1;
         public byte inV2;
@@ -454,6 +652,204 @@ public class TestMin extends RSBaseCompute {
                     }
                     message.append("\n");
                     assertTrue("Incorrect output for checkMinUcharUcharUchar" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                }
+            }
+        }
+    }
+
+    private void checkMinUchar2Uchar2Uchar2() {
+        Allocation inV1 = createRandomAllocation(mRS, Element.DataType.UNSIGNED_8, 2, 0x1d3c921d166e22ffl, false);
+        Allocation inV2 = createRandomAllocation(mRS, Element.DataType.UNSIGNED_8, 2, 0x1d3c921d166e2300l, false);
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_8, 2), INPUTSIZE);
+            script.set_gAllocInV2(inV2);
+            script.forEach_testMinUchar2Uchar2Uchar2(inV1, out);
+            verifyResultsMinUchar2Uchar2Uchar2(inV1, inV2, out, false);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testMinUchar2Uchar2Uchar2: " + e.toString());
+        }
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_8, 2), INPUTSIZE);
+            scriptRelaxed.set_gAllocInV2(inV2);
+            scriptRelaxed.forEach_testMinUchar2Uchar2Uchar2(inV1, out);
+            verifyResultsMinUchar2Uchar2Uchar2(inV1, inV2, out, true);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testMinUchar2Uchar2Uchar2: " + e.toString());
+        }
+    }
+
+    private void verifyResultsMinUchar2Uchar2Uchar2(Allocation inV1, Allocation inV2, Allocation out, boolean relaxed) {
+        byte[] arrayInV1 = new byte[INPUTSIZE * 2];
+        inV1.copyTo(arrayInV1);
+        byte[] arrayInV2 = new byte[INPUTSIZE * 2];
+        inV2.copyTo(arrayInV2);
+        byte[] arrayOut = new byte[INPUTSIZE * 2];
+        out.copyTo(arrayOut);
+        for (int i = 0; i < INPUTSIZE; i++) {
+            for (int j = 0; j < 2 ; j++) {
+                // Extract the inputs.
+                ArgumentsUcharUcharUchar args = new ArgumentsUcharUcharUchar();
+                args.inV1 = arrayInV1[i * 2 + j];
+                args.inV2 = arrayInV2[i * 2 + j];
+                // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
+                CoreMathVerifier.computeMin(args);
+                // Figure out what the outputs should have been.
+                boolean valid = true;
+                if (args.out != arrayOut[i * 2 + j]) {
+                    valid = false;
+                }
+                if (!valid) {
+                    StringBuilder message = new StringBuilder();
+                    message.append("Input inV1: ");
+                    message.append(String.format("0x%x", args.inV1));
+                    message.append("\n");
+                    message.append("Input inV2: ");
+                    message.append(String.format("0x%x", args.inV2));
+                    message.append("\n");
+                    message.append("Expected output out: ");
+                    message.append(String.format("0x%x", args.out));
+                    message.append("\n");
+                    message.append("Actual   output out: ");
+                    message.append(String.format("0x%x", arrayOut[i * 2 + j]));
+                    if (args.out != arrayOut[i * 2 + j]) {
+                        message.append(" FAIL");
+                    }
+                    message.append("\n");
+                    assertTrue("Incorrect output for checkMinUchar2Uchar2Uchar2" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                }
+            }
+        }
+    }
+
+    private void checkMinUchar3Uchar3Uchar3() {
+        Allocation inV1 = createRandomAllocation(mRS, Element.DataType.UNSIGNED_8, 3, 0x4a2de17d66b8690al, false);
+        Allocation inV2 = createRandomAllocation(mRS, Element.DataType.UNSIGNED_8, 3, 0x4a2de17d66b8690bl, false);
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_8, 3), INPUTSIZE);
+            script.set_gAllocInV2(inV2);
+            script.forEach_testMinUchar3Uchar3Uchar3(inV1, out);
+            verifyResultsMinUchar3Uchar3Uchar3(inV1, inV2, out, false);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testMinUchar3Uchar3Uchar3: " + e.toString());
+        }
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_8, 3), INPUTSIZE);
+            scriptRelaxed.set_gAllocInV2(inV2);
+            scriptRelaxed.forEach_testMinUchar3Uchar3Uchar3(inV1, out);
+            verifyResultsMinUchar3Uchar3Uchar3(inV1, inV2, out, true);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testMinUchar3Uchar3Uchar3: " + e.toString());
+        }
+    }
+
+    private void verifyResultsMinUchar3Uchar3Uchar3(Allocation inV1, Allocation inV2, Allocation out, boolean relaxed) {
+        byte[] arrayInV1 = new byte[INPUTSIZE * 4];
+        inV1.copyTo(arrayInV1);
+        byte[] arrayInV2 = new byte[INPUTSIZE * 4];
+        inV2.copyTo(arrayInV2);
+        byte[] arrayOut = new byte[INPUTSIZE * 4];
+        out.copyTo(arrayOut);
+        for (int i = 0; i < INPUTSIZE; i++) {
+            for (int j = 0; j < 3 ; j++) {
+                // Extract the inputs.
+                ArgumentsUcharUcharUchar args = new ArgumentsUcharUcharUchar();
+                args.inV1 = arrayInV1[i * 4 + j];
+                args.inV2 = arrayInV2[i * 4 + j];
+                // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
+                CoreMathVerifier.computeMin(args);
+                // Figure out what the outputs should have been.
+                boolean valid = true;
+                if (args.out != arrayOut[i * 4 + j]) {
+                    valid = false;
+                }
+                if (!valid) {
+                    StringBuilder message = new StringBuilder();
+                    message.append("Input inV1: ");
+                    message.append(String.format("0x%x", args.inV1));
+                    message.append("\n");
+                    message.append("Input inV2: ");
+                    message.append(String.format("0x%x", args.inV2));
+                    message.append("\n");
+                    message.append("Expected output out: ");
+                    message.append(String.format("0x%x", args.out));
+                    message.append("\n");
+                    message.append("Actual   output out: ");
+                    message.append(String.format("0x%x", arrayOut[i * 4 + j]));
+                    if (args.out != arrayOut[i * 4 + j]) {
+                        message.append(" FAIL");
+                    }
+                    message.append("\n");
+                    assertTrue("Incorrect output for checkMinUchar3Uchar3Uchar3" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                }
+            }
+        }
+    }
+
+    private void checkMinUchar4Uchar4Uchar4() {
+        Allocation inV1 = createRandomAllocation(mRS, Element.DataType.UNSIGNED_8, 4, 0x771f30ddb702af15l, false);
+        Allocation inV2 = createRandomAllocation(mRS, Element.DataType.UNSIGNED_8, 4, 0x771f30ddb702af16l, false);
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_8, 4), INPUTSIZE);
+            script.set_gAllocInV2(inV2);
+            script.forEach_testMinUchar4Uchar4Uchar4(inV1, out);
+            verifyResultsMinUchar4Uchar4Uchar4(inV1, inV2, out, false);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testMinUchar4Uchar4Uchar4: " + e.toString());
+        }
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_8, 4), INPUTSIZE);
+            scriptRelaxed.set_gAllocInV2(inV2);
+            scriptRelaxed.forEach_testMinUchar4Uchar4Uchar4(inV1, out);
+            verifyResultsMinUchar4Uchar4Uchar4(inV1, inV2, out, true);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testMinUchar4Uchar4Uchar4: " + e.toString());
+        }
+    }
+
+    private void verifyResultsMinUchar4Uchar4Uchar4(Allocation inV1, Allocation inV2, Allocation out, boolean relaxed) {
+        byte[] arrayInV1 = new byte[INPUTSIZE * 4];
+        inV1.copyTo(arrayInV1);
+        byte[] arrayInV2 = new byte[INPUTSIZE * 4];
+        inV2.copyTo(arrayInV2);
+        byte[] arrayOut = new byte[INPUTSIZE * 4];
+        out.copyTo(arrayOut);
+        for (int i = 0; i < INPUTSIZE; i++) {
+            for (int j = 0; j < 4 ; j++) {
+                // Extract the inputs.
+                ArgumentsUcharUcharUchar args = new ArgumentsUcharUcharUchar();
+                args.inV1 = arrayInV1[i * 4 + j];
+                args.inV2 = arrayInV2[i * 4 + j];
+                // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
+                CoreMathVerifier.computeMin(args);
+                // Figure out what the outputs should have been.
+                boolean valid = true;
+                if (args.out != arrayOut[i * 4 + j]) {
+                    valid = false;
+                }
+                if (!valid) {
+                    StringBuilder message = new StringBuilder();
+                    message.append("Input inV1: ");
+                    message.append(String.format("0x%x", args.inV1));
+                    message.append("\n");
+                    message.append("Input inV2: ");
+                    message.append(String.format("0x%x", args.inV2));
+                    message.append("\n");
+                    message.append("Expected output out: ");
+                    message.append(String.format("0x%x", args.out));
+                    message.append("\n");
+                    message.append("Actual   output out: ");
+                    message.append(String.format("0x%x", arrayOut[i * 4 + j]));
+                    if (args.out != arrayOut[i * 4 + j]) {
+                        message.append(" FAIL");
+                    }
+                    message.append("\n");
+                    assertTrue("Incorrect output for checkMinUchar4Uchar4Uchar4" +
                             (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
                 }
             }
@@ -532,6 +928,204 @@ public class TestMin extends RSBaseCompute {
         }
     }
 
+    private void checkMinShort2Short2Short2() {
+        Allocation inV1 = createRandomAllocation(mRS, Element.DataType.SIGNED_16, 2, 0xe4959a1ecbf1d380l, false);
+        Allocation inV2 = createRandomAllocation(mRS, Element.DataType.SIGNED_16, 2, 0xe4959a1ecbf1d381l, false);
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_16, 2), INPUTSIZE);
+            script.set_gAllocInV2(inV2);
+            script.forEach_testMinShort2Short2Short2(inV1, out);
+            verifyResultsMinShort2Short2Short2(inV1, inV2, out, false);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testMinShort2Short2Short2: " + e.toString());
+        }
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_16, 2), INPUTSIZE);
+            scriptRelaxed.set_gAllocInV2(inV2);
+            scriptRelaxed.forEach_testMinShort2Short2Short2(inV1, out);
+            verifyResultsMinShort2Short2Short2(inV1, inV2, out, true);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testMinShort2Short2Short2: " + e.toString());
+        }
+    }
+
+    private void verifyResultsMinShort2Short2Short2(Allocation inV1, Allocation inV2, Allocation out, boolean relaxed) {
+        short[] arrayInV1 = new short[INPUTSIZE * 2];
+        inV1.copyTo(arrayInV1);
+        short[] arrayInV2 = new short[INPUTSIZE * 2];
+        inV2.copyTo(arrayInV2);
+        short[] arrayOut = new short[INPUTSIZE * 2];
+        out.copyTo(arrayOut);
+        for (int i = 0; i < INPUTSIZE; i++) {
+            for (int j = 0; j < 2 ; j++) {
+                // Extract the inputs.
+                ArgumentsShortShortShort args = new ArgumentsShortShortShort();
+                args.inV1 = arrayInV1[i * 2 + j];
+                args.inV2 = arrayInV2[i * 2 + j];
+                // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
+                CoreMathVerifier.computeMin(args);
+                // Figure out what the outputs should have been.
+                boolean valid = true;
+                if (args.out != arrayOut[i * 2 + j]) {
+                    valid = false;
+                }
+                if (!valid) {
+                    StringBuilder message = new StringBuilder();
+                    message.append("Input inV1: ");
+                    message.append(String.format("%d", args.inV1));
+                    message.append("\n");
+                    message.append("Input inV2: ");
+                    message.append(String.format("%d", args.inV2));
+                    message.append("\n");
+                    message.append("Expected output out: ");
+                    message.append(String.format("%d", args.out));
+                    message.append("\n");
+                    message.append("Actual   output out: ");
+                    message.append(String.format("%d", arrayOut[i * 2 + j]));
+                    if (args.out != arrayOut[i * 2 + j]) {
+                        message.append(" FAIL");
+                    }
+                    message.append("\n");
+                    assertTrue("Incorrect output for checkMinShort2Short2Short2" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                }
+            }
+        }
+    }
+
+    private void checkMinShort3Short3Short3() {
+        Allocation inV1 = createRandomAllocation(mRS, Element.DataType.SIGNED_16, 3, 0x1186e97f1c3c198bl, false);
+        Allocation inV2 = createRandomAllocation(mRS, Element.DataType.SIGNED_16, 3, 0x1186e97f1c3c198cl, false);
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_16, 3), INPUTSIZE);
+            script.set_gAllocInV2(inV2);
+            script.forEach_testMinShort3Short3Short3(inV1, out);
+            verifyResultsMinShort3Short3Short3(inV1, inV2, out, false);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testMinShort3Short3Short3: " + e.toString());
+        }
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_16, 3), INPUTSIZE);
+            scriptRelaxed.set_gAllocInV2(inV2);
+            scriptRelaxed.forEach_testMinShort3Short3Short3(inV1, out);
+            verifyResultsMinShort3Short3Short3(inV1, inV2, out, true);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testMinShort3Short3Short3: " + e.toString());
+        }
+    }
+
+    private void verifyResultsMinShort3Short3Short3(Allocation inV1, Allocation inV2, Allocation out, boolean relaxed) {
+        short[] arrayInV1 = new short[INPUTSIZE * 4];
+        inV1.copyTo(arrayInV1);
+        short[] arrayInV2 = new short[INPUTSIZE * 4];
+        inV2.copyTo(arrayInV2);
+        short[] arrayOut = new short[INPUTSIZE * 4];
+        out.copyTo(arrayOut);
+        for (int i = 0; i < INPUTSIZE; i++) {
+            for (int j = 0; j < 3 ; j++) {
+                // Extract the inputs.
+                ArgumentsShortShortShort args = new ArgumentsShortShortShort();
+                args.inV1 = arrayInV1[i * 4 + j];
+                args.inV2 = arrayInV2[i * 4 + j];
+                // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
+                CoreMathVerifier.computeMin(args);
+                // Figure out what the outputs should have been.
+                boolean valid = true;
+                if (args.out != arrayOut[i * 4 + j]) {
+                    valid = false;
+                }
+                if (!valid) {
+                    StringBuilder message = new StringBuilder();
+                    message.append("Input inV1: ");
+                    message.append(String.format("%d", args.inV1));
+                    message.append("\n");
+                    message.append("Input inV2: ");
+                    message.append(String.format("%d", args.inV2));
+                    message.append("\n");
+                    message.append("Expected output out: ");
+                    message.append(String.format("%d", args.out));
+                    message.append("\n");
+                    message.append("Actual   output out: ");
+                    message.append(String.format("%d", arrayOut[i * 4 + j]));
+                    if (args.out != arrayOut[i * 4 + j]) {
+                        message.append(" FAIL");
+                    }
+                    message.append("\n");
+                    assertTrue("Incorrect output for checkMinShort3Short3Short3" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                }
+            }
+        }
+    }
+
+    private void checkMinShort4Short4Short4() {
+        Allocation inV1 = createRandomAllocation(mRS, Element.DataType.SIGNED_16, 4, 0x3e7838df6c865f96l, false);
+        Allocation inV2 = createRandomAllocation(mRS, Element.DataType.SIGNED_16, 4, 0x3e7838df6c865f97l, false);
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_16, 4), INPUTSIZE);
+            script.set_gAllocInV2(inV2);
+            script.forEach_testMinShort4Short4Short4(inV1, out);
+            verifyResultsMinShort4Short4Short4(inV1, inV2, out, false);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testMinShort4Short4Short4: " + e.toString());
+        }
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_16, 4), INPUTSIZE);
+            scriptRelaxed.set_gAllocInV2(inV2);
+            scriptRelaxed.forEach_testMinShort4Short4Short4(inV1, out);
+            verifyResultsMinShort4Short4Short4(inV1, inV2, out, true);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testMinShort4Short4Short4: " + e.toString());
+        }
+    }
+
+    private void verifyResultsMinShort4Short4Short4(Allocation inV1, Allocation inV2, Allocation out, boolean relaxed) {
+        short[] arrayInV1 = new short[INPUTSIZE * 4];
+        inV1.copyTo(arrayInV1);
+        short[] arrayInV2 = new short[INPUTSIZE * 4];
+        inV2.copyTo(arrayInV2);
+        short[] arrayOut = new short[INPUTSIZE * 4];
+        out.copyTo(arrayOut);
+        for (int i = 0; i < INPUTSIZE; i++) {
+            for (int j = 0; j < 4 ; j++) {
+                // Extract the inputs.
+                ArgumentsShortShortShort args = new ArgumentsShortShortShort();
+                args.inV1 = arrayInV1[i * 4 + j];
+                args.inV2 = arrayInV2[i * 4 + j];
+                // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
+                CoreMathVerifier.computeMin(args);
+                // Figure out what the outputs should have been.
+                boolean valid = true;
+                if (args.out != arrayOut[i * 4 + j]) {
+                    valid = false;
+                }
+                if (!valid) {
+                    StringBuilder message = new StringBuilder();
+                    message.append("Input inV1: ");
+                    message.append(String.format("%d", args.inV1));
+                    message.append("\n");
+                    message.append("Input inV2: ");
+                    message.append(String.format("%d", args.inV2));
+                    message.append("\n");
+                    message.append("Expected output out: ");
+                    message.append(String.format("%d", args.out));
+                    message.append("\n");
+                    message.append("Actual   output out: ");
+                    message.append(String.format("%d", arrayOut[i * 4 + j]));
+                    if (args.out != arrayOut[i * 4 + j]) {
+                        message.append(" FAIL");
+                    }
+                    message.append("\n");
+                    assertTrue("Incorrect output for checkMinShort4Short4Short4" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                }
+            }
+        }
+    }
+
     public class ArgumentsUshortUshortUshort {
         public short inV1;
         public short inV2;
@@ -598,6 +1192,204 @@ public class TestMin extends RSBaseCompute {
                     }
                     message.append("\n");
                     assertTrue("Incorrect output for checkMinUshortUshortUshort" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                }
+            }
+        }
+    }
+
+    private void checkMinUshort2Ushort2Ushort2() {
+        Allocation inV1 = createRandomAllocation(mRS, Element.DataType.UNSIGNED_16, 2, 0x98573ebbc511e319l, false);
+        Allocation inV2 = createRandomAllocation(mRS, Element.DataType.UNSIGNED_16, 2, 0x98573ebbc511e31al, false);
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_16, 2), INPUTSIZE);
+            script.set_gAllocInV2(inV2);
+            script.forEach_testMinUshort2Ushort2Ushort2(inV1, out);
+            verifyResultsMinUshort2Ushort2Ushort2(inV1, inV2, out, false);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testMinUshort2Ushort2Ushort2: " + e.toString());
+        }
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_16, 2), INPUTSIZE);
+            scriptRelaxed.set_gAllocInV2(inV2);
+            scriptRelaxed.forEach_testMinUshort2Ushort2Ushort2(inV1, out);
+            verifyResultsMinUshort2Ushort2Ushort2(inV1, inV2, out, true);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testMinUshort2Ushort2Ushort2: " + e.toString());
+        }
+    }
+
+    private void verifyResultsMinUshort2Ushort2Ushort2(Allocation inV1, Allocation inV2, Allocation out, boolean relaxed) {
+        short[] arrayInV1 = new short[INPUTSIZE * 2];
+        inV1.copyTo(arrayInV1);
+        short[] arrayInV2 = new short[INPUTSIZE * 2];
+        inV2.copyTo(arrayInV2);
+        short[] arrayOut = new short[INPUTSIZE * 2];
+        out.copyTo(arrayOut);
+        for (int i = 0; i < INPUTSIZE; i++) {
+            for (int j = 0; j < 2 ; j++) {
+                // Extract the inputs.
+                ArgumentsUshortUshortUshort args = new ArgumentsUshortUshortUshort();
+                args.inV1 = arrayInV1[i * 2 + j];
+                args.inV2 = arrayInV2[i * 2 + j];
+                // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
+                CoreMathVerifier.computeMin(args);
+                // Figure out what the outputs should have been.
+                boolean valid = true;
+                if (args.out != arrayOut[i * 2 + j]) {
+                    valid = false;
+                }
+                if (!valid) {
+                    StringBuilder message = new StringBuilder();
+                    message.append("Input inV1: ");
+                    message.append(String.format("0x%x", args.inV1));
+                    message.append("\n");
+                    message.append("Input inV2: ");
+                    message.append(String.format("0x%x", args.inV2));
+                    message.append("\n");
+                    message.append("Expected output out: ");
+                    message.append(String.format("0x%x", args.out));
+                    message.append("\n");
+                    message.append("Actual   output out: ");
+                    message.append(String.format("0x%x", arrayOut[i * 2 + j]));
+                    if (args.out != arrayOut[i * 2 + j]) {
+                        message.append(" FAIL");
+                    }
+                    message.append("\n");
+                    assertTrue("Incorrect output for checkMinUshort2Ushort2Ushort2" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                }
+            }
+        }
+    }
+
+    private void checkMinUshort3Ushort3Ushort3() {
+        Allocation inV1 = createRandomAllocation(mRS, Element.DataType.UNSIGNED_16, 3, 0x1595f09b03867776l, false);
+        Allocation inV2 = createRandomAllocation(mRS, Element.DataType.UNSIGNED_16, 3, 0x1595f09b03867777l, false);
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_16, 3), INPUTSIZE);
+            script.set_gAllocInV2(inV2);
+            script.forEach_testMinUshort3Ushort3Ushort3(inV1, out);
+            verifyResultsMinUshort3Ushort3Ushort3(inV1, inV2, out, false);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testMinUshort3Ushort3Ushort3: " + e.toString());
+        }
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_16, 3), INPUTSIZE);
+            scriptRelaxed.set_gAllocInV2(inV2);
+            scriptRelaxed.forEach_testMinUshort3Ushort3Ushort3(inV1, out);
+            verifyResultsMinUshort3Ushort3Ushort3(inV1, inV2, out, true);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testMinUshort3Ushort3Ushort3: " + e.toString());
+        }
+    }
+
+    private void verifyResultsMinUshort3Ushort3Ushort3(Allocation inV1, Allocation inV2, Allocation out, boolean relaxed) {
+        short[] arrayInV1 = new short[INPUTSIZE * 4];
+        inV1.copyTo(arrayInV1);
+        short[] arrayInV2 = new short[INPUTSIZE * 4];
+        inV2.copyTo(arrayInV2);
+        short[] arrayOut = new short[INPUTSIZE * 4];
+        out.copyTo(arrayOut);
+        for (int i = 0; i < INPUTSIZE; i++) {
+            for (int j = 0; j < 3 ; j++) {
+                // Extract the inputs.
+                ArgumentsUshortUshortUshort args = new ArgumentsUshortUshortUshort();
+                args.inV1 = arrayInV1[i * 4 + j];
+                args.inV2 = arrayInV2[i * 4 + j];
+                // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
+                CoreMathVerifier.computeMin(args);
+                // Figure out what the outputs should have been.
+                boolean valid = true;
+                if (args.out != arrayOut[i * 4 + j]) {
+                    valid = false;
+                }
+                if (!valid) {
+                    StringBuilder message = new StringBuilder();
+                    message.append("Input inV1: ");
+                    message.append(String.format("0x%x", args.inV1));
+                    message.append("\n");
+                    message.append("Input inV2: ");
+                    message.append(String.format("0x%x", args.inV2));
+                    message.append("\n");
+                    message.append("Expected output out: ");
+                    message.append(String.format("0x%x", args.out));
+                    message.append("\n");
+                    message.append("Actual   output out: ");
+                    message.append(String.format("0x%x", arrayOut[i * 4 + j]));
+                    if (args.out != arrayOut[i * 4 + j]) {
+                        message.append(" FAIL");
+                    }
+                    message.append("\n");
+                    assertTrue("Incorrect output for checkMinUshort3Ushort3Ushort3" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                }
+            }
+        }
+    }
+
+    private void checkMinUshort4Ushort4Ushort4() {
+        Allocation inV1 = createRandomAllocation(mRS, Element.DataType.UNSIGNED_16, 4, 0x92d4a27a41fb0bd3l, false);
+        Allocation inV2 = createRandomAllocation(mRS, Element.DataType.UNSIGNED_16, 4, 0x92d4a27a41fb0bd4l, false);
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_16, 4), INPUTSIZE);
+            script.set_gAllocInV2(inV2);
+            script.forEach_testMinUshort4Ushort4Ushort4(inV1, out);
+            verifyResultsMinUshort4Ushort4Ushort4(inV1, inV2, out, false);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testMinUshort4Ushort4Ushort4: " + e.toString());
+        }
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_16, 4), INPUTSIZE);
+            scriptRelaxed.set_gAllocInV2(inV2);
+            scriptRelaxed.forEach_testMinUshort4Ushort4Ushort4(inV1, out);
+            verifyResultsMinUshort4Ushort4Ushort4(inV1, inV2, out, true);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testMinUshort4Ushort4Ushort4: " + e.toString());
+        }
+    }
+
+    private void verifyResultsMinUshort4Ushort4Ushort4(Allocation inV1, Allocation inV2, Allocation out, boolean relaxed) {
+        short[] arrayInV1 = new short[INPUTSIZE * 4];
+        inV1.copyTo(arrayInV1);
+        short[] arrayInV2 = new short[INPUTSIZE * 4];
+        inV2.copyTo(arrayInV2);
+        short[] arrayOut = new short[INPUTSIZE * 4];
+        out.copyTo(arrayOut);
+        for (int i = 0; i < INPUTSIZE; i++) {
+            for (int j = 0; j < 4 ; j++) {
+                // Extract the inputs.
+                ArgumentsUshortUshortUshort args = new ArgumentsUshortUshortUshort();
+                args.inV1 = arrayInV1[i * 4 + j];
+                args.inV2 = arrayInV2[i * 4 + j];
+                // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
+                CoreMathVerifier.computeMin(args);
+                // Figure out what the outputs should have been.
+                boolean valid = true;
+                if (args.out != arrayOut[i * 4 + j]) {
+                    valid = false;
+                }
+                if (!valid) {
+                    StringBuilder message = new StringBuilder();
+                    message.append("Input inV1: ");
+                    message.append(String.format("0x%x", args.inV1));
+                    message.append("\n");
+                    message.append("Input inV2: ");
+                    message.append(String.format("0x%x", args.inV2));
+                    message.append("\n");
+                    message.append("Expected output out: ");
+                    message.append(String.format("0x%x", args.out));
+                    message.append("\n");
+                    message.append("Actual   output out: ");
+                    message.append(String.format("0x%x", arrayOut[i * 4 + j]));
+                    if (args.out != arrayOut[i * 4 + j]) {
+                        message.append(" FAIL");
+                    }
+                    message.append("\n");
+                    assertTrue("Incorrect output for checkMinUshort4Ushort4Ushort4" +
                             (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
                 }
             }
@@ -676,342 +1468,6 @@ public class TestMin extends RSBaseCompute {
         }
     }
 
-    public class ArgumentsUintUintUint {
-        public int inV1;
-        public int inV2;
-        public int out;
-    }
-
-    private void checkMinUintUintUint() {
-        Allocation inV1 = createRandomAllocation(mRS, Element.DataType.UNSIGNED_32, 1, 0xb3dbca2d537cf298l, false);
-        Allocation inV2 = createRandomAllocation(mRS, Element.DataType.UNSIGNED_32, 1, 0xb3dbca2d537cf299l, false);
-        try {
-            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_32, 1), INPUTSIZE);
-            script.set_gAllocInV2(inV2);
-            script.forEach_testMinUintUintUint(inV1, out);
-            verifyResultsMinUintUintUint(inV1, inV2, out, false);
-        } catch (Exception e) {
-            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testMinUintUintUint: " + e.toString());
-        }
-        try {
-            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_32, 1), INPUTSIZE);
-            scriptRelaxed.set_gAllocInV2(inV2);
-            scriptRelaxed.forEach_testMinUintUintUint(inV1, out);
-            verifyResultsMinUintUintUint(inV1, inV2, out, true);
-        } catch (Exception e) {
-            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testMinUintUintUint: " + e.toString());
-        }
-    }
-
-    private void verifyResultsMinUintUintUint(Allocation inV1, Allocation inV2, Allocation out, boolean relaxed) {
-        int[] arrayInV1 = new int[INPUTSIZE * 1];
-        inV1.copyTo(arrayInV1);
-        int[] arrayInV2 = new int[INPUTSIZE * 1];
-        inV2.copyTo(arrayInV2);
-        int[] arrayOut = new int[INPUTSIZE * 1];
-        out.copyTo(arrayOut);
-        for (int i = 0; i < INPUTSIZE; i++) {
-            for (int j = 0; j < 1 ; j++) {
-                // Extract the inputs.
-                ArgumentsUintUintUint args = new ArgumentsUintUintUint();
-                args.inV1 = arrayInV1[i];
-                args.inV2 = arrayInV2[i];
-                // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
-                CoreMathVerifier.computeMin(args);
-                // Figure out what the outputs should have been.
-                boolean valid = true;
-                if (args.out != arrayOut[i * 1 + j]) {
-                    valid = false;
-                }
-                if (!valid) {
-                    StringBuilder message = new StringBuilder();
-                    message.append("Input inV1: ");
-                    message.append(String.format("0x%x", args.inV1));
-                    message.append("\n");
-                    message.append("Input inV2: ");
-                    message.append(String.format("0x%x", args.inV2));
-                    message.append("\n");
-                    message.append("Expected output out: ");
-                    message.append(String.format("0x%x", args.out));
-                    message.append("\n");
-                    message.append("Actual   output out: ");
-                    message.append(String.format("0x%x", arrayOut[i * 1 + j]));
-                    if (args.out != arrayOut[i * 1 + j]) {
-                        message.append(" FAIL");
-                    }
-                    message.append("\n");
-                    assertTrue("Incorrect output for checkMinUintUintUint" +
-                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
-                }
-            }
-        }
-    }
-
-    private void checkMinChar2Char2Char2() {
-        Allocation inV1 = createRandomAllocation(mRS, Element.DataType.SIGNED_8, 2, 0xec4705afc03447ael, false);
-        Allocation inV2 = createRandomAllocation(mRS, Element.DataType.SIGNED_8, 2, 0xec4705afc03447afl, false);
-        try {
-            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_8, 2), INPUTSIZE);
-            script.set_gAllocInV2(inV2);
-            script.forEach_testMinChar2Char2Char2(inV1, out);
-            verifyResultsMinChar2Char2Char2(inV1, inV2, out, false);
-        } catch (Exception e) {
-            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testMinChar2Char2Char2: " + e.toString());
-        }
-        try {
-            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_8, 2), INPUTSIZE);
-            scriptRelaxed.set_gAllocInV2(inV2);
-            scriptRelaxed.forEach_testMinChar2Char2Char2(inV1, out);
-            verifyResultsMinChar2Char2Char2(inV1, inV2, out, true);
-        } catch (Exception e) {
-            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testMinChar2Char2Char2: " + e.toString());
-        }
-    }
-
-    private void verifyResultsMinChar2Char2Char2(Allocation inV1, Allocation inV2, Allocation out, boolean relaxed) {
-        byte[] arrayInV1 = new byte[INPUTSIZE * 2];
-        inV1.copyTo(arrayInV1);
-        byte[] arrayInV2 = new byte[INPUTSIZE * 2];
-        inV2.copyTo(arrayInV2);
-        byte[] arrayOut = new byte[INPUTSIZE * 2];
-        out.copyTo(arrayOut);
-        for (int i = 0; i < INPUTSIZE; i++) {
-            for (int j = 0; j < 2 ; j++) {
-                // Extract the inputs.
-                ArgumentsCharCharChar args = new ArgumentsCharCharChar();
-                args.inV1 = arrayInV1[i * 2 + j];
-                args.inV2 = arrayInV2[i * 2 + j];
-                // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
-                CoreMathVerifier.computeMin(args);
-                // Figure out what the outputs should have been.
-                boolean valid = true;
-                if (args.out != arrayOut[i * 2 + j]) {
-                    valid = false;
-                }
-                if (!valid) {
-                    StringBuilder message = new StringBuilder();
-                    message.append("Input inV1: ");
-                    message.append(String.format("%d", args.inV1));
-                    message.append("\n");
-                    message.append("Input inV2: ");
-                    message.append(String.format("%d", args.inV2));
-                    message.append("\n");
-                    message.append("Expected output out: ");
-                    message.append(String.format("%d", args.out));
-                    message.append("\n");
-                    message.append("Actual   output out: ");
-                    message.append(String.format("%d", arrayOut[i * 2 + j]));
-                    if (args.out != arrayOut[i * 2 + j]) {
-                        message.append(" FAIL");
-                    }
-                    message.append("\n");
-                    assertTrue("Incorrect output for checkMinChar2Char2Char2" +
-                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
-                }
-            }
-        }
-    }
-
-    private void checkMinUchar2Uchar2Uchar2() {
-        Allocation inV1 = createRandomAllocation(mRS, Element.DataType.UNSIGNED_8, 2, 0x1d3c921d166e22ffl, false);
-        Allocation inV2 = createRandomAllocation(mRS, Element.DataType.UNSIGNED_8, 2, 0x1d3c921d166e2300l, false);
-        try {
-            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_8, 2), INPUTSIZE);
-            script.set_gAllocInV2(inV2);
-            script.forEach_testMinUchar2Uchar2Uchar2(inV1, out);
-            verifyResultsMinUchar2Uchar2Uchar2(inV1, inV2, out, false);
-        } catch (Exception e) {
-            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testMinUchar2Uchar2Uchar2: " + e.toString());
-        }
-        try {
-            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_8, 2), INPUTSIZE);
-            scriptRelaxed.set_gAllocInV2(inV2);
-            scriptRelaxed.forEach_testMinUchar2Uchar2Uchar2(inV1, out);
-            verifyResultsMinUchar2Uchar2Uchar2(inV1, inV2, out, true);
-        } catch (Exception e) {
-            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testMinUchar2Uchar2Uchar2: " + e.toString());
-        }
-    }
-
-    private void verifyResultsMinUchar2Uchar2Uchar2(Allocation inV1, Allocation inV2, Allocation out, boolean relaxed) {
-        byte[] arrayInV1 = new byte[INPUTSIZE * 2];
-        inV1.copyTo(arrayInV1);
-        byte[] arrayInV2 = new byte[INPUTSIZE * 2];
-        inV2.copyTo(arrayInV2);
-        byte[] arrayOut = new byte[INPUTSIZE * 2];
-        out.copyTo(arrayOut);
-        for (int i = 0; i < INPUTSIZE; i++) {
-            for (int j = 0; j < 2 ; j++) {
-                // Extract the inputs.
-                ArgumentsUcharUcharUchar args = new ArgumentsUcharUcharUchar();
-                args.inV1 = arrayInV1[i * 2 + j];
-                args.inV2 = arrayInV2[i * 2 + j];
-                // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
-                CoreMathVerifier.computeMin(args);
-                // Figure out what the outputs should have been.
-                boolean valid = true;
-                if (args.out != arrayOut[i * 2 + j]) {
-                    valid = false;
-                }
-                if (!valid) {
-                    StringBuilder message = new StringBuilder();
-                    message.append("Input inV1: ");
-                    message.append(String.format("0x%x", args.inV1));
-                    message.append("\n");
-                    message.append("Input inV2: ");
-                    message.append(String.format("0x%x", args.inV2));
-                    message.append("\n");
-                    message.append("Expected output out: ");
-                    message.append(String.format("0x%x", args.out));
-                    message.append("\n");
-                    message.append("Actual   output out: ");
-                    message.append(String.format("0x%x", arrayOut[i * 2 + j]));
-                    if (args.out != arrayOut[i * 2 + j]) {
-                        message.append(" FAIL");
-                    }
-                    message.append("\n");
-                    assertTrue("Incorrect output for checkMinUchar2Uchar2Uchar2" +
-                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
-                }
-            }
-        }
-    }
-
-    private void checkMinShort2Short2Short2() {
-        Allocation inV1 = createRandomAllocation(mRS, Element.DataType.SIGNED_16, 2, 0xe4959a1ecbf1d380l, false);
-        Allocation inV2 = createRandomAllocation(mRS, Element.DataType.SIGNED_16, 2, 0xe4959a1ecbf1d381l, false);
-        try {
-            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_16, 2), INPUTSIZE);
-            script.set_gAllocInV2(inV2);
-            script.forEach_testMinShort2Short2Short2(inV1, out);
-            verifyResultsMinShort2Short2Short2(inV1, inV2, out, false);
-        } catch (Exception e) {
-            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testMinShort2Short2Short2: " + e.toString());
-        }
-        try {
-            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_16, 2), INPUTSIZE);
-            scriptRelaxed.set_gAllocInV2(inV2);
-            scriptRelaxed.forEach_testMinShort2Short2Short2(inV1, out);
-            verifyResultsMinShort2Short2Short2(inV1, inV2, out, true);
-        } catch (Exception e) {
-            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testMinShort2Short2Short2: " + e.toString());
-        }
-    }
-
-    private void verifyResultsMinShort2Short2Short2(Allocation inV1, Allocation inV2, Allocation out, boolean relaxed) {
-        short[] arrayInV1 = new short[INPUTSIZE * 2];
-        inV1.copyTo(arrayInV1);
-        short[] arrayInV2 = new short[INPUTSIZE * 2];
-        inV2.copyTo(arrayInV2);
-        short[] arrayOut = new short[INPUTSIZE * 2];
-        out.copyTo(arrayOut);
-        for (int i = 0; i < INPUTSIZE; i++) {
-            for (int j = 0; j < 2 ; j++) {
-                // Extract the inputs.
-                ArgumentsShortShortShort args = new ArgumentsShortShortShort();
-                args.inV1 = arrayInV1[i * 2 + j];
-                args.inV2 = arrayInV2[i * 2 + j];
-                // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
-                CoreMathVerifier.computeMin(args);
-                // Figure out what the outputs should have been.
-                boolean valid = true;
-                if (args.out != arrayOut[i * 2 + j]) {
-                    valid = false;
-                }
-                if (!valid) {
-                    StringBuilder message = new StringBuilder();
-                    message.append("Input inV1: ");
-                    message.append(String.format("%d", args.inV1));
-                    message.append("\n");
-                    message.append("Input inV2: ");
-                    message.append(String.format("%d", args.inV2));
-                    message.append("\n");
-                    message.append("Expected output out: ");
-                    message.append(String.format("%d", args.out));
-                    message.append("\n");
-                    message.append("Actual   output out: ");
-                    message.append(String.format("%d", arrayOut[i * 2 + j]));
-                    if (args.out != arrayOut[i * 2 + j]) {
-                        message.append(" FAIL");
-                    }
-                    message.append("\n");
-                    assertTrue("Incorrect output for checkMinShort2Short2Short2" +
-                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
-                }
-            }
-        }
-    }
-
-    private void checkMinUshort2Ushort2Ushort2() {
-        Allocation inV1 = createRandomAllocation(mRS, Element.DataType.UNSIGNED_16, 2, 0x98573ebbc511e319l, false);
-        Allocation inV2 = createRandomAllocation(mRS, Element.DataType.UNSIGNED_16, 2, 0x98573ebbc511e31al, false);
-        try {
-            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_16, 2), INPUTSIZE);
-            script.set_gAllocInV2(inV2);
-            script.forEach_testMinUshort2Ushort2Ushort2(inV1, out);
-            verifyResultsMinUshort2Ushort2Ushort2(inV1, inV2, out, false);
-        } catch (Exception e) {
-            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testMinUshort2Ushort2Ushort2: " + e.toString());
-        }
-        try {
-            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_16, 2), INPUTSIZE);
-            scriptRelaxed.set_gAllocInV2(inV2);
-            scriptRelaxed.forEach_testMinUshort2Ushort2Ushort2(inV1, out);
-            verifyResultsMinUshort2Ushort2Ushort2(inV1, inV2, out, true);
-        } catch (Exception e) {
-            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testMinUshort2Ushort2Ushort2: " + e.toString());
-        }
-    }
-
-    private void verifyResultsMinUshort2Ushort2Ushort2(Allocation inV1, Allocation inV2, Allocation out, boolean relaxed) {
-        short[] arrayInV1 = new short[INPUTSIZE * 2];
-        inV1.copyTo(arrayInV1);
-        short[] arrayInV2 = new short[INPUTSIZE * 2];
-        inV2.copyTo(arrayInV2);
-        short[] arrayOut = new short[INPUTSIZE * 2];
-        out.copyTo(arrayOut);
-        for (int i = 0; i < INPUTSIZE; i++) {
-            for (int j = 0; j < 2 ; j++) {
-                // Extract the inputs.
-                ArgumentsUshortUshortUshort args = new ArgumentsUshortUshortUshort();
-                args.inV1 = arrayInV1[i * 2 + j];
-                args.inV2 = arrayInV2[i * 2 + j];
-                // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
-                CoreMathVerifier.computeMin(args);
-                // Figure out what the outputs should have been.
-                boolean valid = true;
-                if (args.out != arrayOut[i * 2 + j]) {
-                    valid = false;
-                }
-                if (!valid) {
-                    StringBuilder message = new StringBuilder();
-                    message.append("Input inV1: ");
-                    message.append(String.format("0x%x", args.inV1));
-                    message.append("\n");
-                    message.append("Input inV2: ");
-                    message.append(String.format("0x%x", args.inV2));
-                    message.append("\n");
-                    message.append("Expected output out: ");
-                    message.append(String.format("0x%x", args.out));
-                    message.append("\n");
-                    message.append("Actual   output out: ");
-                    message.append(String.format("0x%x", arrayOut[i * 2 + j]));
-                    if (args.out != arrayOut[i * 2 + j]) {
-                        message.append(" FAIL");
-                    }
-                    message.append("\n");
-                    assertTrue("Incorrect output for checkMinUshort2Ushort2Ushort2" +
-                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
-                }
-            }
-        }
-    }
-
     private void checkMinInt2Int2Int2() {
         Allocation inV1 = createRandomAllocation(mRS, Element.DataType.SIGNED_32, 2, 0xba635b605676e7a3l, false);
         Allocation inV2 = createRandomAllocation(mRS, Element.DataType.SIGNED_32, 2, 0xba635b605676e7a4l, false);
@@ -1072,336 +1528,6 @@ public class TestMin extends RSBaseCompute {
                     }
                     message.append("\n");
                     assertTrue("Incorrect output for checkMinInt2Int2Int2" +
-                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
-                }
-            }
-        }
-    }
-
-    private void checkMinUint2Uint2Uint2() {
-        Allocation inV1 = createRandomAllocation(mRS, Element.DataType.UNSIGNED_32, 2, 0xb8cf8481d731a1eel, false);
-        Allocation inV2 = createRandomAllocation(mRS, Element.DataType.UNSIGNED_32, 2, 0xb8cf8481d731a1efl, false);
-        try {
-            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_32, 2), INPUTSIZE);
-            script.set_gAllocInV2(inV2);
-            script.forEach_testMinUint2Uint2Uint2(inV1, out);
-            verifyResultsMinUint2Uint2Uint2(inV1, inV2, out, false);
-        } catch (Exception e) {
-            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testMinUint2Uint2Uint2: " + e.toString());
-        }
-        try {
-            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_32, 2), INPUTSIZE);
-            scriptRelaxed.set_gAllocInV2(inV2);
-            scriptRelaxed.forEach_testMinUint2Uint2Uint2(inV1, out);
-            verifyResultsMinUint2Uint2Uint2(inV1, inV2, out, true);
-        } catch (Exception e) {
-            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testMinUint2Uint2Uint2: " + e.toString());
-        }
-    }
-
-    private void verifyResultsMinUint2Uint2Uint2(Allocation inV1, Allocation inV2, Allocation out, boolean relaxed) {
-        int[] arrayInV1 = new int[INPUTSIZE * 2];
-        inV1.copyTo(arrayInV1);
-        int[] arrayInV2 = new int[INPUTSIZE * 2];
-        inV2.copyTo(arrayInV2);
-        int[] arrayOut = new int[INPUTSIZE * 2];
-        out.copyTo(arrayOut);
-        for (int i = 0; i < INPUTSIZE; i++) {
-            for (int j = 0; j < 2 ; j++) {
-                // Extract the inputs.
-                ArgumentsUintUintUint args = new ArgumentsUintUintUint();
-                args.inV1 = arrayInV1[i * 2 + j];
-                args.inV2 = arrayInV2[i * 2 + j];
-                // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
-                CoreMathVerifier.computeMin(args);
-                // Figure out what the outputs should have been.
-                boolean valid = true;
-                if (args.out != arrayOut[i * 2 + j]) {
-                    valid = false;
-                }
-                if (!valid) {
-                    StringBuilder message = new StringBuilder();
-                    message.append("Input inV1: ");
-                    message.append(String.format("0x%x", args.inV1));
-                    message.append("\n");
-                    message.append("Input inV2: ");
-                    message.append(String.format("0x%x", args.inV2));
-                    message.append("\n");
-                    message.append("Expected output out: ");
-                    message.append(String.format("0x%x", args.out));
-                    message.append("\n");
-                    message.append("Actual   output out: ");
-                    message.append(String.format("0x%x", arrayOut[i * 2 + j]));
-                    if (args.out != arrayOut[i * 2 + j]) {
-                        message.append(" FAIL");
-                    }
-                    message.append("\n");
-                    assertTrue("Incorrect output for checkMinUint2Uint2Uint2" +
-                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
-                }
-            }
-        }
-    }
-
-    private void checkMinChar3Char3Char3() {
-        Allocation inV1 = createRandomAllocation(mRS, Element.DataType.SIGNED_8, 3, 0x419881e2a4ec1a73l, false);
-        Allocation inV2 = createRandomAllocation(mRS, Element.DataType.SIGNED_8, 3, 0x419881e2a4ec1a74l, false);
-        try {
-            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_8, 3), INPUTSIZE);
-            script.set_gAllocInV2(inV2);
-            script.forEach_testMinChar3Char3Char3(inV1, out);
-            verifyResultsMinChar3Char3Char3(inV1, inV2, out, false);
-        } catch (Exception e) {
-            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testMinChar3Char3Char3: " + e.toString());
-        }
-        try {
-            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_8, 3), INPUTSIZE);
-            scriptRelaxed.set_gAllocInV2(inV2);
-            scriptRelaxed.forEach_testMinChar3Char3Char3(inV1, out);
-            verifyResultsMinChar3Char3Char3(inV1, inV2, out, true);
-        } catch (Exception e) {
-            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testMinChar3Char3Char3: " + e.toString());
-        }
-    }
-
-    private void verifyResultsMinChar3Char3Char3(Allocation inV1, Allocation inV2, Allocation out, boolean relaxed) {
-        byte[] arrayInV1 = new byte[INPUTSIZE * 4];
-        inV1.copyTo(arrayInV1);
-        byte[] arrayInV2 = new byte[INPUTSIZE * 4];
-        inV2.copyTo(arrayInV2);
-        byte[] arrayOut = new byte[INPUTSIZE * 4];
-        out.copyTo(arrayOut);
-        for (int i = 0; i < INPUTSIZE; i++) {
-            for (int j = 0; j < 3 ; j++) {
-                // Extract the inputs.
-                ArgumentsCharCharChar args = new ArgumentsCharCharChar();
-                args.inV1 = arrayInV1[i * 4 + j];
-                args.inV2 = arrayInV2[i * 4 + j];
-                // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
-                CoreMathVerifier.computeMin(args);
-                // Figure out what the outputs should have been.
-                boolean valid = true;
-                if (args.out != arrayOut[i * 4 + j]) {
-                    valid = false;
-                }
-                if (!valid) {
-                    StringBuilder message = new StringBuilder();
-                    message.append("Input inV1: ");
-                    message.append(String.format("%d", args.inV1));
-                    message.append("\n");
-                    message.append("Input inV2: ");
-                    message.append(String.format("%d", args.inV2));
-                    message.append("\n");
-                    message.append("Expected output out: ");
-                    message.append(String.format("%d", args.out));
-                    message.append("\n");
-                    message.append("Actual   output out: ");
-                    message.append(String.format("%d", arrayOut[i * 4 + j]));
-                    if (args.out != arrayOut[i * 4 + j]) {
-                        message.append(" FAIL");
-                    }
-                    message.append("\n");
-                    assertTrue("Incorrect output for checkMinChar3Char3Char3" +
-                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
-                }
-            }
-        }
-    }
-
-    private void checkMinUchar3Uchar3Uchar3() {
-        Allocation inV1 = createRandomAllocation(mRS, Element.DataType.UNSIGNED_8, 3, 0x4a2de17d66b8690al, false);
-        Allocation inV2 = createRandomAllocation(mRS, Element.DataType.UNSIGNED_8, 3, 0x4a2de17d66b8690bl, false);
-        try {
-            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_8, 3), INPUTSIZE);
-            script.set_gAllocInV2(inV2);
-            script.forEach_testMinUchar3Uchar3Uchar3(inV1, out);
-            verifyResultsMinUchar3Uchar3Uchar3(inV1, inV2, out, false);
-        } catch (Exception e) {
-            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testMinUchar3Uchar3Uchar3: " + e.toString());
-        }
-        try {
-            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_8, 3), INPUTSIZE);
-            scriptRelaxed.set_gAllocInV2(inV2);
-            scriptRelaxed.forEach_testMinUchar3Uchar3Uchar3(inV1, out);
-            verifyResultsMinUchar3Uchar3Uchar3(inV1, inV2, out, true);
-        } catch (Exception e) {
-            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testMinUchar3Uchar3Uchar3: " + e.toString());
-        }
-    }
-
-    private void verifyResultsMinUchar3Uchar3Uchar3(Allocation inV1, Allocation inV2, Allocation out, boolean relaxed) {
-        byte[] arrayInV1 = new byte[INPUTSIZE * 4];
-        inV1.copyTo(arrayInV1);
-        byte[] arrayInV2 = new byte[INPUTSIZE * 4];
-        inV2.copyTo(arrayInV2);
-        byte[] arrayOut = new byte[INPUTSIZE * 4];
-        out.copyTo(arrayOut);
-        for (int i = 0; i < INPUTSIZE; i++) {
-            for (int j = 0; j < 3 ; j++) {
-                // Extract the inputs.
-                ArgumentsUcharUcharUchar args = new ArgumentsUcharUcharUchar();
-                args.inV1 = arrayInV1[i * 4 + j];
-                args.inV2 = arrayInV2[i * 4 + j];
-                // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
-                CoreMathVerifier.computeMin(args);
-                // Figure out what the outputs should have been.
-                boolean valid = true;
-                if (args.out != arrayOut[i * 4 + j]) {
-                    valid = false;
-                }
-                if (!valid) {
-                    StringBuilder message = new StringBuilder();
-                    message.append("Input inV1: ");
-                    message.append(String.format("0x%x", args.inV1));
-                    message.append("\n");
-                    message.append("Input inV2: ");
-                    message.append(String.format("0x%x", args.inV2));
-                    message.append("\n");
-                    message.append("Expected output out: ");
-                    message.append(String.format("0x%x", args.out));
-                    message.append("\n");
-                    message.append("Actual   output out: ");
-                    message.append(String.format("0x%x", arrayOut[i * 4 + j]));
-                    if (args.out != arrayOut[i * 4 + j]) {
-                        message.append(" FAIL");
-                    }
-                    message.append("\n");
-                    assertTrue("Incorrect output for checkMinUchar3Uchar3Uchar3" +
-                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
-                }
-            }
-        }
-    }
-
-    private void checkMinShort3Short3Short3() {
-        Allocation inV1 = createRandomAllocation(mRS, Element.DataType.SIGNED_16, 3, 0x1186e97f1c3c198bl, false);
-        Allocation inV2 = createRandomAllocation(mRS, Element.DataType.SIGNED_16, 3, 0x1186e97f1c3c198cl, false);
-        try {
-            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_16, 3), INPUTSIZE);
-            script.set_gAllocInV2(inV2);
-            script.forEach_testMinShort3Short3Short3(inV1, out);
-            verifyResultsMinShort3Short3Short3(inV1, inV2, out, false);
-        } catch (Exception e) {
-            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testMinShort3Short3Short3: " + e.toString());
-        }
-        try {
-            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_16, 3), INPUTSIZE);
-            scriptRelaxed.set_gAllocInV2(inV2);
-            scriptRelaxed.forEach_testMinShort3Short3Short3(inV1, out);
-            verifyResultsMinShort3Short3Short3(inV1, inV2, out, true);
-        } catch (Exception e) {
-            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testMinShort3Short3Short3: " + e.toString());
-        }
-    }
-
-    private void verifyResultsMinShort3Short3Short3(Allocation inV1, Allocation inV2, Allocation out, boolean relaxed) {
-        short[] arrayInV1 = new short[INPUTSIZE * 4];
-        inV1.copyTo(arrayInV1);
-        short[] arrayInV2 = new short[INPUTSIZE * 4];
-        inV2.copyTo(arrayInV2);
-        short[] arrayOut = new short[INPUTSIZE * 4];
-        out.copyTo(arrayOut);
-        for (int i = 0; i < INPUTSIZE; i++) {
-            for (int j = 0; j < 3 ; j++) {
-                // Extract the inputs.
-                ArgumentsShortShortShort args = new ArgumentsShortShortShort();
-                args.inV1 = arrayInV1[i * 4 + j];
-                args.inV2 = arrayInV2[i * 4 + j];
-                // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
-                CoreMathVerifier.computeMin(args);
-                // Figure out what the outputs should have been.
-                boolean valid = true;
-                if (args.out != arrayOut[i * 4 + j]) {
-                    valid = false;
-                }
-                if (!valid) {
-                    StringBuilder message = new StringBuilder();
-                    message.append("Input inV1: ");
-                    message.append(String.format("%d", args.inV1));
-                    message.append("\n");
-                    message.append("Input inV2: ");
-                    message.append(String.format("%d", args.inV2));
-                    message.append("\n");
-                    message.append("Expected output out: ");
-                    message.append(String.format("%d", args.out));
-                    message.append("\n");
-                    message.append("Actual   output out: ");
-                    message.append(String.format("%d", arrayOut[i * 4 + j]));
-                    if (args.out != arrayOut[i * 4 + j]) {
-                        message.append(" FAIL");
-                    }
-                    message.append("\n");
-                    assertTrue("Incorrect output for checkMinShort3Short3Short3" +
-                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
-                }
-            }
-        }
-    }
-
-    private void checkMinUshort3Ushort3Ushort3() {
-        Allocation inV1 = createRandomAllocation(mRS, Element.DataType.UNSIGNED_16, 3, 0x1595f09b03867776l, false);
-        Allocation inV2 = createRandomAllocation(mRS, Element.DataType.UNSIGNED_16, 3, 0x1595f09b03867777l, false);
-        try {
-            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_16, 3), INPUTSIZE);
-            script.set_gAllocInV2(inV2);
-            script.forEach_testMinUshort3Ushort3Ushort3(inV1, out);
-            verifyResultsMinUshort3Ushort3Ushort3(inV1, inV2, out, false);
-        } catch (Exception e) {
-            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testMinUshort3Ushort3Ushort3: " + e.toString());
-        }
-        try {
-            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_16, 3), INPUTSIZE);
-            scriptRelaxed.set_gAllocInV2(inV2);
-            scriptRelaxed.forEach_testMinUshort3Ushort3Ushort3(inV1, out);
-            verifyResultsMinUshort3Ushort3Ushort3(inV1, inV2, out, true);
-        } catch (Exception e) {
-            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testMinUshort3Ushort3Ushort3: " + e.toString());
-        }
-    }
-
-    private void verifyResultsMinUshort3Ushort3Ushort3(Allocation inV1, Allocation inV2, Allocation out, boolean relaxed) {
-        short[] arrayInV1 = new short[INPUTSIZE * 4];
-        inV1.copyTo(arrayInV1);
-        short[] arrayInV2 = new short[INPUTSIZE * 4];
-        inV2.copyTo(arrayInV2);
-        short[] arrayOut = new short[INPUTSIZE * 4];
-        out.copyTo(arrayOut);
-        for (int i = 0; i < INPUTSIZE; i++) {
-            for (int j = 0; j < 3 ; j++) {
-                // Extract the inputs.
-                ArgumentsUshortUshortUshort args = new ArgumentsUshortUshortUshort();
-                args.inV1 = arrayInV1[i * 4 + j];
-                args.inV2 = arrayInV2[i * 4 + j];
-                // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
-                CoreMathVerifier.computeMin(args);
-                // Figure out what the outputs should have been.
-                boolean valid = true;
-                if (args.out != arrayOut[i * 4 + j]) {
-                    valid = false;
-                }
-                if (!valid) {
-                    StringBuilder message = new StringBuilder();
-                    message.append("Input inV1: ");
-                    message.append(String.format("0x%x", args.inV1));
-                    message.append("\n");
-                    message.append("Input inV2: ");
-                    message.append(String.format("0x%x", args.inV2));
-                    message.append("\n");
-                    message.append("Expected output out: ");
-                    message.append(String.format("0x%x", args.out));
-                    message.append("\n");
-                    message.append("Actual   output out: ");
-                    message.append(String.format("0x%x", arrayOut[i * 4 + j]));
-                    if (args.out != arrayOut[i * 4 + j]) {
-                        message.append(" FAIL");
-                    }
-                    message.append("\n");
-                    assertTrue("Incorrect output for checkMinUshort3Ushort3Ushort3" +
                             (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
                 }
             }
@@ -1474,336 +1600,6 @@ public class TestMin extends RSBaseCompute {
         }
     }
 
-    private void checkMinUint3Uint3Uint3() {
-        Allocation inV1 = createRandomAllocation(mRS, Element.DataType.UNSIGNED_32, 3, 0xe2100b4bbe974b3l, false);
-        Allocation inV2 = createRandomAllocation(mRS, Element.DataType.UNSIGNED_32, 3, 0xe2100b4bbe974b4l, false);
-        try {
-            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_32, 3), INPUTSIZE);
-            script.set_gAllocInV2(inV2);
-            script.forEach_testMinUint3Uint3Uint3(inV1, out);
-            verifyResultsMinUint3Uint3Uint3(inV1, inV2, out, false);
-        } catch (Exception e) {
-            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testMinUint3Uint3Uint3: " + e.toString());
-        }
-        try {
-            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_32, 3), INPUTSIZE);
-            scriptRelaxed.set_gAllocInV2(inV2);
-            scriptRelaxed.forEach_testMinUint3Uint3Uint3(inV1, out);
-            verifyResultsMinUint3Uint3Uint3(inV1, inV2, out, true);
-        } catch (Exception e) {
-            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testMinUint3Uint3Uint3: " + e.toString());
-        }
-    }
-
-    private void verifyResultsMinUint3Uint3Uint3(Allocation inV1, Allocation inV2, Allocation out, boolean relaxed) {
-        int[] arrayInV1 = new int[INPUTSIZE * 4];
-        inV1.copyTo(arrayInV1);
-        int[] arrayInV2 = new int[INPUTSIZE * 4];
-        inV2.copyTo(arrayInV2);
-        int[] arrayOut = new int[INPUTSIZE * 4];
-        out.copyTo(arrayOut);
-        for (int i = 0; i < INPUTSIZE; i++) {
-            for (int j = 0; j < 3 ; j++) {
-                // Extract the inputs.
-                ArgumentsUintUintUint args = new ArgumentsUintUintUint();
-                args.inV1 = arrayInV1[i * 4 + j];
-                args.inV2 = arrayInV2[i * 4 + j];
-                // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
-                CoreMathVerifier.computeMin(args);
-                // Figure out what the outputs should have been.
-                boolean valid = true;
-                if (args.out != arrayOut[i * 4 + j]) {
-                    valid = false;
-                }
-                if (!valid) {
-                    StringBuilder message = new StringBuilder();
-                    message.append("Input inV1: ");
-                    message.append(String.format("0x%x", args.inV1));
-                    message.append("\n");
-                    message.append("Input inV2: ");
-                    message.append(String.format("0x%x", args.inV2));
-                    message.append("\n");
-                    message.append("Expected output out: ");
-                    message.append(String.format("0x%x", args.out));
-                    message.append("\n");
-                    message.append("Actual   output out: ");
-                    message.append(String.format("0x%x", arrayOut[i * 4 + j]));
-                    if (args.out != arrayOut[i * 4 + j]) {
-                        message.append(" FAIL");
-                    }
-                    message.append("\n");
-                    assertTrue("Incorrect output for checkMinUint3Uint3Uint3" +
-                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
-                }
-            }
-        }
-    }
-
-    private void checkMinChar4Char4Char4() {
-        Allocation inV1 = createRandomAllocation(mRS, Element.DataType.SIGNED_8, 4, 0x96e9fe1589a3ed38l, false);
-        Allocation inV2 = createRandomAllocation(mRS, Element.DataType.SIGNED_8, 4, 0x96e9fe1589a3ed39l, false);
-        try {
-            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_8, 4), INPUTSIZE);
-            script.set_gAllocInV2(inV2);
-            script.forEach_testMinChar4Char4Char4(inV1, out);
-            verifyResultsMinChar4Char4Char4(inV1, inV2, out, false);
-        } catch (Exception e) {
-            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testMinChar4Char4Char4: " + e.toString());
-        }
-        try {
-            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_8, 4), INPUTSIZE);
-            scriptRelaxed.set_gAllocInV2(inV2);
-            scriptRelaxed.forEach_testMinChar4Char4Char4(inV1, out);
-            verifyResultsMinChar4Char4Char4(inV1, inV2, out, true);
-        } catch (Exception e) {
-            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testMinChar4Char4Char4: " + e.toString());
-        }
-    }
-
-    private void verifyResultsMinChar4Char4Char4(Allocation inV1, Allocation inV2, Allocation out, boolean relaxed) {
-        byte[] arrayInV1 = new byte[INPUTSIZE * 4];
-        inV1.copyTo(arrayInV1);
-        byte[] arrayInV2 = new byte[INPUTSIZE * 4];
-        inV2.copyTo(arrayInV2);
-        byte[] arrayOut = new byte[INPUTSIZE * 4];
-        out.copyTo(arrayOut);
-        for (int i = 0; i < INPUTSIZE; i++) {
-            for (int j = 0; j < 4 ; j++) {
-                // Extract the inputs.
-                ArgumentsCharCharChar args = new ArgumentsCharCharChar();
-                args.inV1 = arrayInV1[i * 4 + j];
-                args.inV2 = arrayInV2[i * 4 + j];
-                // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
-                CoreMathVerifier.computeMin(args);
-                // Figure out what the outputs should have been.
-                boolean valid = true;
-                if (args.out != arrayOut[i * 4 + j]) {
-                    valid = false;
-                }
-                if (!valid) {
-                    StringBuilder message = new StringBuilder();
-                    message.append("Input inV1: ");
-                    message.append(String.format("%d", args.inV1));
-                    message.append("\n");
-                    message.append("Input inV2: ");
-                    message.append(String.format("%d", args.inV2));
-                    message.append("\n");
-                    message.append("Expected output out: ");
-                    message.append(String.format("%d", args.out));
-                    message.append("\n");
-                    message.append("Actual   output out: ");
-                    message.append(String.format("%d", arrayOut[i * 4 + j]));
-                    if (args.out != arrayOut[i * 4 + j]) {
-                        message.append(" FAIL");
-                    }
-                    message.append("\n");
-                    assertTrue("Incorrect output for checkMinChar4Char4Char4" +
-                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
-                }
-            }
-        }
-    }
-
-    private void checkMinUchar4Uchar4Uchar4() {
-        Allocation inV1 = createRandomAllocation(mRS, Element.DataType.UNSIGNED_8, 4, 0x771f30ddb702af15l, false);
-        Allocation inV2 = createRandomAllocation(mRS, Element.DataType.UNSIGNED_8, 4, 0x771f30ddb702af16l, false);
-        try {
-            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_8, 4), INPUTSIZE);
-            script.set_gAllocInV2(inV2);
-            script.forEach_testMinUchar4Uchar4Uchar4(inV1, out);
-            verifyResultsMinUchar4Uchar4Uchar4(inV1, inV2, out, false);
-        } catch (Exception e) {
-            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testMinUchar4Uchar4Uchar4: " + e.toString());
-        }
-        try {
-            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_8, 4), INPUTSIZE);
-            scriptRelaxed.set_gAllocInV2(inV2);
-            scriptRelaxed.forEach_testMinUchar4Uchar4Uchar4(inV1, out);
-            verifyResultsMinUchar4Uchar4Uchar4(inV1, inV2, out, true);
-        } catch (Exception e) {
-            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testMinUchar4Uchar4Uchar4: " + e.toString());
-        }
-    }
-
-    private void verifyResultsMinUchar4Uchar4Uchar4(Allocation inV1, Allocation inV2, Allocation out, boolean relaxed) {
-        byte[] arrayInV1 = new byte[INPUTSIZE * 4];
-        inV1.copyTo(arrayInV1);
-        byte[] arrayInV2 = new byte[INPUTSIZE * 4];
-        inV2.copyTo(arrayInV2);
-        byte[] arrayOut = new byte[INPUTSIZE * 4];
-        out.copyTo(arrayOut);
-        for (int i = 0; i < INPUTSIZE; i++) {
-            for (int j = 0; j < 4 ; j++) {
-                // Extract the inputs.
-                ArgumentsUcharUcharUchar args = new ArgumentsUcharUcharUchar();
-                args.inV1 = arrayInV1[i * 4 + j];
-                args.inV2 = arrayInV2[i * 4 + j];
-                // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
-                CoreMathVerifier.computeMin(args);
-                // Figure out what the outputs should have been.
-                boolean valid = true;
-                if (args.out != arrayOut[i * 4 + j]) {
-                    valid = false;
-                }
-                if (!valid) {
-                    StringBuilder message = new StringBuilder();
-                    message.append("Input inV1: ");
-                    message.append(String.format("0x%x", args.inV1));
-                    message.append("\n");
-                    message.append("Input inV2: ");
-                    message.append(String.format("0x%x", args.inV2));
-                    message.append("\n");
-                    message.append("Expected output out: ");
-                    message.append(String.format("0x%x", args.out));
-                    message.append("\n");
-                    message.append("Actual   output out: ");
-                    message.append(String.format("0x%x", arrayOut[i * 4 + j]));
-                    if (args.out != arrayOut[i * 4 + j]) {
-                        message.append(" FAIL");
-                    }
-                    message.append("\n");
-                    assertTrue("Incorrect output for checkMinUchar4Uchar4Uchar4" +
-                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
-                }
-            }
-        }
-    }
-
-    private void checkMinShort4Short4Short4() {
-        Allocation inV1 = createRandomAllocation(mRS, Element.DataType.SIGNED_16, 4, 0x3e7838df6c865f96l, false);
-        Allocation inV2 = createRandomAllocation(mRS, Element.DataType.SIGNED_16, 4, 0x3e7838df6c865f97l, false);
-        try {
-            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_16, 4), INPUTSIZE);
-            script.set_gAllocInV2(inV2);
-            script.forEach_testMinShort4Short4Short4(inV1, out);
-            verifyResultsMinShort4Short4Short4(inV1, inV2, out, false);
-        } catch (Exception e) {
-            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testMinShort4Short4Short4: " + e.toString());
-        }
-        try {
-            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_16, 4), INPUTSIZE);
-            scriptRelaxed.set_gAllocInV2(inV2);
-            scriptRelaxed.forEach_testMinShort4Short4Short4(inV1, out);
-            verifyResultsMinShort4Short4Short4(inV1, inV2, out, true);
-        } catch (Exception e) {
-            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testMinShort4Short4Short4: " + e.toString());
-        }
-    }
-
-    private void verifyResultsMinShort4Short4Short4(Allocation inV1, Allocation inV2, Allocation out, boolean relaxed) {
-        short[] arrayInV1 = new short[INPUTSIZE * 4];
-        inV1.copyTo(arrayInV1);
-        short[] arrayInV2 = new short[INPUTSIZE * 4];
-        inV2.copyTo(arrayInV2);
-        short[] arrayOut = new short[INPUTSIZE * 4];
-        out.copyTo(arrayOut);
-        for (int i = 0; i < INPUTSIZE; i++) {
-            for (int j = 0; j < 4 ; j++) {
-                // Extract the inputs.
-                ArgumentsShortShortShort args = new ArgumentsShortShortShort();
-                args.inV1 = arrayInV1[i * 4 + j];
-                args.inV2 = arrayInV2[i * 4 + j];
-                // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
-                CoreMathVerifier.computeMin(args);
-                // Figure out what the outputs should have been.
-                boolean valid = true;
-                if (args.out != arrayOut[i * 4 + j]) {
-                    valid = false;
-                }
-                if (!valid) {
-                    StringBuilder message = new StringBuilder();
-                    message.append("Input inV1: ");
-                    message.append(String.format("%d", args.inV1));
-                    message.append("\n");
-                    message.append("Input inV2: ");
-                    message.append(String.format("%d", args.inV2));
-                    message.append("\n");
-                    message.append("Expected output out: ");
-                    message.append(String.format("%d", args.out));
-                    message.append("\n");
-                    message.append("Actual   output out: ");
-                    message.append(String.format("%d", arrayOut[i * 4 + j]));
-                    if (args.out != arrayOut[i * 4 + j]) {
-                        message.append(" FAIL");
-                    }
-                    message.append("\n");
-                    assertTrue("Incorrect output for checkMinShort4Short4Short4" +
-                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
-                }
-            }
-        }
-    }
-
-    private void checkMinUshort4Ushort4Ushort4() {
-        Allocation inV1 = createRandomAllocation(mRS, Element.DataType.UNSIGNED_16, 4, 0x92d4a27a41fb0bd3l, false);
-        Allocation inV2 = createRandomAllocation(mRS, Element.DataType.UNSIGNED_16, 4, 0x92d4a27a41fb0bd4l, false);
-        try {
-            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_16, 4), INPUTSIZE);
-            script.set_gAllocInV2(inV2);
-            script.forEach_testMinUshort4Ushort4Ushort4(inV1, out);
-            verifyResultsMinUshort4Ushort4Ushort4(inV1, inV2, out, false);
-        } catch (Exception e) {
-            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testMinUshort4Ushort4Ushort4: " + e.toString());
-        }
-        try {
-            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_16, 4), INPUTSIZE);
-            scriptRelaxed.set_gAllocInV2(inV2);
-            scriptRelaxed.forEach_testMinUshort4Ushort4Ushort4(inV1, out);
-            verifyResultsMinUshort4Ushort4Ushort4(inV1, inV2, out, true);
-        } catch (Exception e) {
-            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testMinUshort4Ushort4Ushort4: " + e.toString());
-        }
-    }
-
-    private void verifyResultsMinUshort4Ushort4Ushort4(Allocation inV1, Allocation inV2, Allocation out, boolean relaxed) {
-        short[] arrayInV1 = new short[INPUTSIZE * 4];
-        inV1.copyTo(arrayInV1);
-        short[] arrayInV2 = new short[INPUTSIZE * 4];
-        inV2.copyTo(arrayInV2);
-        short[] arrayOut = new short[INPUTSIZE * 4];
-        out.copyTo(arrayOut);
-        for (int i = 0; i < INPUTSIZE; i++) {
-            for (int j = 0; j < 4 ; j++) {
-                // Extract the inputs.
-                ArgumentsUshortUshortUshort args = new ArgumentsUshortUshortUshort();
-                args.inV1 = arrayInV1[i * 4 + j];
-                args.inV2 = arrayInV2[i * 4 + j];
-                // Figure out what the outputs should have been.
-                Floaty.setRelaxed(relaxed);
-                CoreMathVerifier.computeMin(args);
-                // Figure out what the outputs should have been.
-                boolean valid = true;
-                if (args.out != arrayOut[i * 4 + j]) {
-                    valid = false;
-                }
-                if (!valid) {
-                    StringBuilder message = new StringBuilder();
-                    message.append("Input inV1: ");
-                    message.append(String.format("0x%x", args.inV1));
-                    message.append("\n");
-                    message.append("Input inV2: ");
-                    message.append(String.format("0x%x", args.inV2));
-                    message.append("\n");
-                    message.append("Expected output out: ");
-                    message.append(String.format("0x%x", args.out));
-                    message.append("\n");
-                    message.append("Actual   output out: ");
-                    message.append(String.format("0x%x", arrayOut[i * 4 + j]));
-                    if (args.out != arrayOut[i * 4 + j]) {
-                        message.append(" FAIL");
-                    }
-                    message.append("\n");
-                    assertTrue("Incorrect output for checkMinUshort4Ushort4Ushort4" +
-                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
-                }
-            }
-        }
-    }
-
     private void checkMinInt4Int4Int4() {
         Allocation inV1 = createRandomAllocation(mRS, Element.DataType.SIGNED_32, 4, 0xf7db1a07a1d0fe9l, false);
         Allocation inV2 = createRandomAllocation(mRS, Element.DataType.SIGNED_32, 4, 0xf7db1a07a1d0feal, false);
@@ -1864,6 +1660,210 @@ public class TestMin extends RSBaseCompute {
                     }
                     message.append("\n");
                     assertTrue("Incorrect output for checkMinInt4Int4Int4" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                }
+            }
+        }
+    }
+
+    public class ArgumentsUintUintUint {
+        public int inV1;
+        public int inV2;
+        public int out;
+    }
+
+    private void checkMinUintUintUint() {
+        Allocation inV1 = createRandomAllocation(mRS, Element.DataType.UNSIGNED_32, 1, 0xb3dbca2d537cf298l, false);
+        Allocation inV2 = createRandomAllocation(mRS, Element.DataType.UNSIGNED_32, 1, 0xb3dbca2d537cf299l, false);
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_32, 1), INPUTSIZE);
+            script.set_gAllocInV2(inV2);
+            script.forEach_testMinUintUintUint(inV1, out);
+            verifyResultsMinUintUintUint(inV1, inV2, out, false);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testMinUintUintUint: " + e.toString());
+        }
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_32, 1), INPUTSIZE);
+            scriptRelaxed.set_gAllocInV2(inV2);
+            scriptRelaxed.forEach_testMinUintUintUint(inV1, out);
+            verifyResultsMinUintUintUint(inV1, inV2, out, true);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testMinUintUintUint: " + e.toString());
+        }
+    }
+
+    private void verifyResultsMinUintUintUint(Allocation inV1, Allocation inV2, Allocation out, boolean relaxed) {
+        int[] arrayInV1 = new int[INPUTSIZE * 1];
+        inV1.copyTo(arrayInV1);
+        int[] arrayInV2 = new int[INPUTSIZE * 1];
+        inV2.copyTo(arrayInV2);
+        int[] arrayOut = new int[INPUTSIZE * 1];
+        out.copyTo(arrayOut);
+        for (int i = 0; i < INPUTSIZE; i++) {
+            for (int j = 0; j < 1 ; j++) {
+                // Extract the inputs.
+                ArgumentsUintUintUint args = new ArgumentsUintUintUint();
+                args.inV1 = arrayInV1[i];
+                args.inV2 = arrayInV2[i];
+                // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
+                CoreMathVerifier.computeMin(args);
+                // Figure out what the outputs should have been.
+                boolean valid = true;
+                if (args.out != arrayOut[i * 1 + j]) {
+                    valid = false;
+                }
+                if (!valid) {
+                    StringBuilder message = new StringBuilder();
+                    message.append("Input inV1: ");
+                    message.append(String.format("0x%x", args.inV1));
+                    message.append("\n");
+                    message.append("Input inV2: ");
+                    message.append(String.format("0x%x", args.inV2));
+                    message.append("\n");
+                    message.append("Expected output out: ");
+                    message.append(String.format("0x%x", args.out));
+                    message.append("\n");
+                    message.append("Actual   output out: ");
+                    message.append(String.format("0x%x", arrayOut[i * 1 + j]));
+                    if (args.out != arrayOut[i * 1 + j]) {
+                        message.append(" FAIL");
+                    }
+                    message.append("\n");
+                    assertTrue("Incorrect output for checkMinUintUintUint" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                }
+            }
+        }
+    }
+
+    private void checkMinUint2Uint2Uint2() {
+        Allocation inV1 = createRandomAllocation(mRS, Element.DataType.UNSIGNED_32, 2, 0xb8cf8481d731a1eel, false);
+        Allocation inV2 = createRandomAllocation(mRS, Element.DataType.UNSIGNED_32, 2, 0xb8cf8481d731a1efl, false);
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_32, 2), INPUTSIZE);
+            script.set_gAllocInV2(inV2);
+            script.forEach_testMinUint2Uint2Uint2(inV1, out);
+            verifyResultsMinUint2Uint2Uint2(inV1, inV2, out, false);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testMinUint2Uint2Uint2: " + e.toString());
+        }
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_32, 2), INPUTSIZE);
+            scriptRelaxed.set_gAllocInV2(inV2);
+            scriptRelaxed.forEach_testMinUint2Uint2Uint2(inV1, out);
+            verifyResultsMinUint2Uint2Uint2(inV1, inV2, out, true);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testMinUint2Uint2Uint2: " + e.toString());
+        }
+    }
+
+    private void verifyResultsMinUint2Uint2Uint2(Allocation inV1, Allocation inV2, Allocation out, boolean relaxed) {
+        int[] arrayInV1 = new int[INPUTSIZE * 2];
+        inV1.copyTo(arrayInV1);
+        int[] arrayInV2 = new int[INPUTSIZE * 2];
+        inV2.copyTo(arrayInV2);
+        int[] arrayOut = new int[INPUTSIZE * 2];
+        out.copyTo(arrayOut);
+        for (int i = 0; i < INPUTSIZE; i++) {
+            for (int j = 0; j < 2 ; j++) {
+                // Extract the inputs.
+                ArgumentsUintUintUint args = new ArgumentsUintUintUint();
+                args.inV1 = arrayInV1[i * 2 + j];
+                args.inV2 = arrayInV2[i * 2 + j];
+                // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
+                CoreMathVerifier.computeMin(args);
+                // Figure out what the outputs should have been.
+                boolean valid = true;
+                if (args.out != arrayOut[i * 2 + j]) {
+                    valid = false;
+                }
+                if (!valid) {
+                    StringBuilder message = new StringBuilder();
+                    message.append("Input inV1: ");
+                    message.append(String.format("0x%x", args.inV1));
+                    message.append("\n");
+                    message.append("Input inV2: ");
+                    message.append(String.format("0x%x", args.inV2));
+                    message.append("\n");
+                    message.append("Expected output out: ");
+                    message.append(String.format("0x%x", args.out));
+                    message.append("\n");
+                    message.append("Actual   output out: ");
+                    message.append(String.format("0x%x", arrayOut[i * 2 + j]));
+                    if (args.out != arrayOut[i * 2 + j]) {
+                        message.append(" FAIL");
+                    }
+                    message.append("\n");
+                    assertTrue("Incorrect output for checkMinUint2Uint2Uint2" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                }
+            }
+        }
+    }
+
+    private void checkMinUint3Uint3Uint3() {
+        Allocation inV1 = createRandomAllocation(mRS, Element.DataType.UNSIGNED_32, 3, 0xe2100b4bbe974b3l, false);
+        Allocation inV2 = createRandomAllocation(mRS, Element.DataType.UNSIGNED_32, 3, 0xe2100b4bbe974b4l, false);
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_32, 3), INPUTSIZE);
+            script.set_gAllocInV2(inV2);
+            script.forEach_testMinUint3Uint3Uint3(inV1, out);
+            verifyResultsMinUint3Uint3Uint3(inV1, inV2, out, false);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testMinUint3Uint3Uint3: " + e.toString());
+        }
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_32, 3), INPUTSIZE);
+            scriptRelaxed.set_gAllocInV2(inV2);
+            scriptRelaxed.forEach_testMinUint3Uint3Uint3(inV1, out);
+            verifyResultsMinUint3Uint3Uint3(inV1, inV2, out, true);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testMinUint3Uint3Uint3: " + e.toString());
+        }
+    }
+
+    private void verifyResultsMinUint3Uint3Uint3(Allocation inV1, Allocation inV2, Allocation out, boolean relaxed) {
+        int[] arrayInV1 = new int[INPUTSIZE * 4];
+        inV1.copyTo(arrayInV1);
+        int[] arrayInV2 = new int[INPUTSIZE * 4];
+        inV2.copyTo(arrayInV2);
+        int[] arrayOut = new int[INPUTSIZE * 4];
+        out.copyTo(arrayOut);
+        for (int i = 0; i < INPUTSIZE; i++) {
+            for (int j = 0; j < 3 ; j++) {
+                // Extract the inputs.
+                ArgumentsUintUintUint args = new ArgumentsUintUintUint();
+                args.inV1 = arrayInV1[i * 4 + j];
+                args.inV2 = arrayInV2[i * 4 + j];
+                // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
+                CoreMathVerifier.computeMin(args);
+                // Figure out what the outputs should have been.
+                boolean valid = true;
+                if (args.out != arrayOut[i * 4 + j]) {
+                    valid = false;
+                }
+                if (!valid) {
+                    StringBuilder message = new StringBuilder();
+                    message.append("Input inV1: ");
+                    message.append(String.format("0x%x", args.inV1));
+                    message.append("\n");
+                    message.append("Input inV2: ");
+                    message.append(String.format("0x%x", args.inV2));
+                    message.append("\n");
+                    message.append("Expected output out: ");
+                    message.append(String.format("0x%x", args.out));
+                    message.append("\n");
+                    message.append("Actual   output out: ");
+                    message.append(String.format("0x%x", arrayOut[i * 4 + j]));
+                    if (args.out != arrayOut[i * 4 + j]) {
+                        message.append(" FAIL");
+                    }
+                    message.append("\n");
+                    assertTrue("Incorrect output for checkMinUint3Uint3Uint3" +
                             (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
                 }
             }
@@ -1936,34 +1936,582 @@ public class TestMin extends RSBaseCompute {
         }
     }
 
+    public class ArgumentsLongLongLong {
+        public long inV1;
+        public long inV2;
+        public long out;
+    }
+
+    private void checkMinLongLongLong() {
+        Allocation inV1 = createRandomAllocation(mRS, Element.DataType.SIGNED_64, 1, 0x20ce185251c10eb2l, false);
+        Allocation inV2 = createRandomAllocation(mRS, Element.DataType.SIGNED_64, 1, 0x20ce185251c10eb3l, false);
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_64, 1), INPUTSIZE);
+            script.set_gAllocInV2(inV2);
+            script.forEach_testMinLongLongLong(inV1, out);
+            verifyResultsMinLongLongLong(inV1, inV2, out, false);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testMinLongLongLong: " + e.toString());
+        }
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_64, 1), INPUTSIZE);
+            scriptRelaxed.set_gAllocInV2(inV2);
+            scriptRelaxed.forEach_testMinLongLongLong(inV1, out);
+            verifyResultsMinLongLongLong(inV1, inV2, out, true);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testMinLongLongLong: " + e.toString());
+        }
+    }
+
+    private void verifyResultsMinLongLongLong(Allocation inV1, Allocation inV2, Allocation out, boolean relaxed) {
+        long[] arrayInV1 = new long[INPUTSIZE * 1];
+        inV1.copyTo(arrayInV1);
+        long[] arrayInV2 = new long[INPUTSIZE * 1];
+        inV2.copyTo(arrayInV2);
+        long[] arrayOut = new long[INPUTSIZE * 1];
+        out.copyTo(arrayOut);
+        for (int i = 0; i < INPUTSIZE; i++) {
+            for (int j = 0; j < 1 ; j++) {
+                // Extract the inputs.
+                ArgumentsLongLongLong args = new ArgumentsLongLongLong();
+                args.inV1 = arrayInV1[i];
+                args.inV2 = arrayInV2[i];
+                // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
+                CoreMathVerifier.computeMin(args);
+                // Figure out what the outputs should have been.
+                boolean valid = true;
+                if (args.out != arrayOut[i * 1 + j]) {
+                    valid = false;
+                }
+                if (!valid) {
+                    StringBuilder message = new StringBuilder();
+                    message.append("Input inV1: ");
+                    message.append(String.format("%d", args.inV1));
+                    message.append("\n");
+                    message.append("Input inV2: ");
+                    message.append(String.format("%d", args.inV2));
+                    message.append("\n");
+                    message.append("Expected output out: ");
+                    message.append(String.format("%d", args.out));
+                    message.append("\n");
+                    message.append("Actual   output out: ");
+                    message.append(String.format("%d", arrayOut[i * 1 + j]));
+                    if (args.out != arrayOut[i * 1 + j]) {
+                        message.append(" FAIL");
+                    }
+                    message.append("\n");
+                    assertTrue("Incorrect output for checkMinLongLongLong" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                }
+            }
+        }
+    }
+
+    private void checkMinLong2Long2Long2() {
+        Allocation inV1 = createRandomAllocation(mRS, Element.DataType.SIGNED_64, 2, 0x2285e00a094676a0l, false);
+        Allocation inV2 = createRandomAllocation(mRS, Element.DataType.SIGNED_64, 2, 0x2285e00a094676a1l, false);
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_64, 2), INPUTSIZE);
+            script.set_gAllocInV2(inV2);
+            script.forEach_testMinLong2Long2Long2(inV1, out);
+            verifyResultsMinLong2Long2Long2(inV1, inV2, out, false);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testMinLong2Long2Long2: " + e.toString());
+        }
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_64, 2), INPUTSIZE);
+            scriptRelaxed.set_gAllocInV2(inV2);
+            scriptRelaxed.forEach_testMinLong2Long2Long2(inV1, out);
+            verifyResultsMinLong2Long2Long2(inV1, inV2, out, true);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testMinLong2Long2Long2: " + e.toString());
+        }
+    }
+
+    private void verifyResultsMinLong2Long2Long2(Allocation inV1, Allocation inV2, Allocation out, boolean relaxed) {
+        long[] arrayInV1 = new long[INPUTSIZE * 2];
+        inV1.copyTo(arrayInV1);
+        long[] arrayInV2 = new long[INPUTSIZE * 2];
+        inV2.copyTo(arrayInV2);
+        long[] arrayOut = new long[INPUTSIZE * 2];
+        out.copyTo(arrayOut);
+        for (int i = 0; i < INPUTSIZE; i++) {
+            for (int j = 0; j < 2 ; j++) {
+                // Extract the inputs.
+                ArgumentsLongLongLong args = new ArgumentsLongLongLong();
+                args.inV1 = arrayInV1[i * 2 + j];
+                args.inV2 = arrayInV2[i * 2 + j];
+                // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
+                CoreMathVerifier.computeMin(args);
+                // Figure out what the outputs should have been.
+                boolean valid = true;
+                if (args.out != arrayOut[i * 2 + j]) {
+                    valid = false;
+                }
+                if (!valid) {
+                    StringBuilder message = new StringBuilder();
+                    message.append("Input inV1: ");
+                    message.append(String.format("%d", args.inV1));
+                    message.append("\n");
+                    message.append("Input inV2: ");
+                    message.append(String.format("%d", args.inV2));
+                    message.append("\n");
+                    message.append("Expected output out: ");
+                    message.append(String.format("%d", args.out));
+                    message.append("\n");
+                    message.append("Actual   output out: ");
+                    message.append(String.format("%d", arrayOut[i * 2 + j]));
+                    if (args.out != arrayOut[i * 2 + j]) {
+                        message.append(" FAIL");
+                    }
+                    message.append("\n");
+                    assertTrue("Incorrect output for checkMinLong2Long2Long2" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                }
+            }
+        }
+    }
+
+    private void checkMinLong3Long3Long3() {
+        Allocation inV1 = createRandomAllocation(mRS, Element.DataType.SIGNED_64, 3, 0x77d75c3cedfe4965l, false);
+        Allocation inV2 = createRandomAllocation(mRS, Element.DataType.SIGNED_64, 3, 0x77d75c3cedfe4966l, false);
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_64, 3), INPUTSIZE);
+            script.set_gAllocInV2(inV2);
+            script.forEach_testMinLong3Long3Long3(inV1, out);
+            verifyResultsMinLong3Long3Long3(inV1, inV2, out, false);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testMinLong3Long3Long3: " + e.toString());
+        }
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_64, 3), INPUTSIZE);
+            scriptRelaxed.set_gAllocInV2(inV2);
+            scriptRelaxed.forEach_testMinLong3Long3Long3(inV1, out);
+            verifyResultsMinLong3Long3Long3(inV1, inV2, out, true);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testMinLong3Long3Long3: " + e.toString());
+        }
+    }
+
+    private void verifyResultsMinLong3Long3Long3(Allocation inV1, Allocation inV2, Allocation out, boolean relaxed) {
+        long[] arrayInV1 = new long[INPUTSIZE * 4];
+        inV1.copyTo(arrayInV1);
+        long[] arrayInV2 = new long[INPUTSIZE * 4];
+        inV2.copyTo(arrayInV2);
+        long[] arrayOut = new long[INPUTSIZE * 4];
+        out.copyTo(arrayOut);
+        for (int i = 0; i < INPUTSIZE; i++) {
+            for (int j = 0; j < 3 ; j++) {
+                // Extract the inputs.
+                ArgumentsLongLongLong args = new ArgumentsLongLongLong();
+                args.inV1 = arrayInV1[i * 4 + j];
+                args.inV2 = arrayInV2[i * 4 + j];
+                // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
+                CoreMathVerifier.computeMin(args);
+                // Figure out what the outputs should have been.
+                boolean valid = true;
+                if (args.out != arrayOut[i * 4 + j]) {
+                    valid = false;
+                }
+                if (!valid) {
+                    StringBuilder message = new StringBuilder();
+                    message.append("Input inV1: ");
+                    message.append(String.format("%d", args.inV1));
+                    message.append("\n");
+                    message.append("Input inV2: ");
+                    message.append(String.format("%d", args.inV2));
+                    message.append("\n");
+                    message.append("Expected output out: ");
+                    message.append(String.format("%d", args.out));
+                    message.append("\n");
+                    message.append("Actual   output out: ");
+                    message.append(String.format("%d", arrayOut[i * 4 + j]));
+                    if (args.out != arrayOut[i * 4 + j]) {
+                        message.append(" FAIL");
+                    }
+                    message.append("\n");
+                    assertTrue("Incorrect output for checkMinLong3Long3Long3" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                }
+            }
+        }
+    }
+
+    private void checkMinLong4Long4Long4() {
+        Allocation inV1 = createRandomAllocation(mRS, Element.DataType.SIGNED_64, 4, 0xcd28d86fd2b61c2al, false);
+        Allocation inV2 = createRandomAllocation(mRS, Element.DataType.SIGNED_64, 4, 0xcd28d86fd2b61c2bl, false);
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_64, 4), INPUTSIZE);
+            script.set_gAllocInV2(inV2);
+            script.forEach_testMinLong4Long4Long4(inV1, out);
+            verifyResultsMinLong4Long4Long4(inV1, inV2, out, false);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testMinLong4Long4Long4: " + e.toString());
+        }
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_64, 4), INPUTSIZE);
+            scriptRelaxed.set_gAllocInV2(inV2);
+            scriptRelaxed.forEach_testMinLong4Long4Long4(inV1, out);
+            verifyResultsMinLong4Long4Long4(inV1, inV2, out, true);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testMinLong4Long4Long4: " + e.toString());
+        }
+    }
+
+    private void verifyResultsMinLong4Long4Long4(Allocation inV1, Allocation inV2, Allocation out, boolean relaxed) {
+        long[] arrayInV1 = new long[INPUTSIZE * 4];
+        inV1.copyTo(arrayInV1);
+        long[] arrayInV2 = new long[INPUTSIZE * 4];
+        inV2.copyTo(arrayInV2);
+        long[] arrayOut = new long[INPUTSIZE * 4];
+        out.copyTo(arrayOut);
+        for (int i = 0; i < INPUTSIZE; i++) {
+            for (int j = 0; j < 4 ; j++) {
+                // Extract the inputs.
+                ArgumentsLongLongLong args = new ArgumentsLongLongLong();
+                args.inV1 = arrayInV1[i * 4 + j];
+                args.inV2 = arrayInV2[i * 4 + j];
+                // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
+                CoreMathVerifier.computeMin(args);
+                // Figure out what the outputs should have been.
+                boolean valid = true;
+                if (args.out != arrayOut[i * 4 + j]) {
+                    valid = false;
+                }
+                if (!valid) {
+                    StringBuilder message = new StringBuilder();
+                    message.append("Input inV1: ");
+                    message.append(String.format("%d", args.inV1));
+                    message.append("\n");
+                    message.append("Input inV2: ");
+                    message.append(String.format("%d", args.inV2));
+                    message.append("\n");
+                    message.append("Expected output out: ");
+                    message.append(String.format("%d", args.out));
+                    message.append("\n");
+                    message.append("Actual   output out: ");
+                    message.append(String.format("%d", arrayOut[i * 4 + j]));
+                    if (args.out != arrayOut[i * 4 + j]) {
+                        message.append(" FAIL");
+                    }
+                    message.append("\n");
+                    assertTrue("Incorrect output for checkMinLong4Long4Long4" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                }
+            }
+        }
+    }
+
+    public class ArgumentsUlongUlongUlong {
+        public long inV1;
+        public long inV2;
+        public long out;
+    }
+
+    private void checkMinUlongUlongUlong() {
+        Allocation inV1 = createRandomAllocation(mRS, Element.DataType.UNSIGNED_64, 1, 0x9ea8f1e67008ea67l, false);
+        Allocation inV2 = createRandomAllocation(mRS, Element.DataType.UNSIGNED_64, 1, 0x9ea8f1e67008ea68l, false);
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_64, 1), INPUTSIZE);
+            script.set_gAllocInV2(inV2);
+            script.forEach_testMinUlongUlongUlong(inV1, out);
+            verifyResultsMinUlongUlongUlong(inV1, inV2, out, false);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testMinUlongUlongUlong: " + e.toString());
+        }
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_64, 1), INPUTSIZE);
+            scriptRelaxed.set_gAllocInV2(inV2);
+            scriptRelaxed.forEach_testMinUlongUlongUlong(inV1, out);
+            verifyResultsMinUlongUlongUlong(inV1, inV2, out, true);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testMinUlongUlongUlong: " + e.toString());
+        }
+    }
+
+    private void verifyResultsMinUlongUlongUlong(Allocation inV1, Allocation inV2, Allocation out, boolean relaxed) {
+        long[] arrayInV1 = new long[INPUTSIZE * 1];
+        inV1.copyTo(arrayInV1);
+        long[] arrayInV2 = new long[INPUTSIZE * 1];
+        inV2.copyTo(arrayInV2);
+        long[] arrayOut = new long[INPUTSIZE * 1];
+        out.copyTo(arrayOut);
+        for (int i = 0; i < INPUTSIZE; i++) {
+            for (int j = 0; j < 1 ; j++) {
+                // Extract the inputs.
+                ArgumentsUlongUlongUlong args = new ArgumentsUlongUlongUlong();
+                args.inV1 = arrayInV1[i];
+                args.inV2 = arrayInV2[i];
+                // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
+                CoreMathVerifier.computeMin(args);
+                // Figure out what the outputs should have been.
+                boolean valid = true;
+                if (args.out != arrayOut[i * 1 + j]) {
+                    valid = false;
+                }
+                if (!valid) {
+                    StringBuilder message = new StringBuilder();
+                    message.append("Input inV1: ");
+                    message.append(String.format("0x%x", args.inV1));
+                    message.append("\n");
+                    message.append("Input inV2: ");
+                    message.append(String.format("0x%x", args.inV2));
+                    message.append("\n");
+                    message.append("Expected output out: ");
+                    message.append(String.format("0x%x", args.out));
+                    message.append("\n");
+                    message.append("Actual   output out: ");
+                    message.append(String.format("0x%x", arrayOut[i * 1 + j]));
+                    if (args.out != arrayOut[i * 1 + j]) {
+                        message.append(" FAIL");
+                    }
+                    message.append("\n");
+                    assertTrue("Incorrect output for checkMinUlongUlongUlong" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                }
+            }
+        }
+    }
+
+    private void checkMinUlong2Ulong2Ulong2() {
+        Allocation inV1 = createRandomAllocation(mRS, Element.DataType.UNSIGNED_64, 2, 0x26bb4add3110402dl, false);
+        Allocation inV2 = createRandomAllocation(mRS, Element.DataType.UNSIGNED_64, 2, 0x26bb4add3110402el, false);
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_64, 2), INPUTSIZE);
+            script.set_gAllocInV2(inV2);
+            script.forEach_testMinUlong2Ulong2Ulong2(inV1, out);
+            verifyResultsMinUlong2Ulong2Ulong2(inV1, inV2, out, false);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testMinUlong2Ulong2Ulong2: " + e.toString());
+        }
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_64, 2), INPUTSIZE);
+            scriptRelaxed.set_gAllocInV2(inV2);
+            scriptRelaxed.forEach_testMinUlong2Ulong2Ulong2(inV1, out);
+            verifyResultsMinUlong2Ulong2Ulong2(inV1, inV2, out, true);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testMinUlong2Ulong2Ulong2: " + e.toString());
+        }
+    }
+
+    private void verifyResultsMinUlong2Ulong2Ulong2(Allocation inV1, Allocation inV2, Allocation out, boolean relaxed) {
+        long[] arrayInV1 = new long[INPUTSIZE * 2];
+        inV1.copyTo(arrayInV1);
+        long[] arrayInV2 = new long[INPUTSIZE * 2];
+        inV2.copyTo(arrayInV2);
+        long[] arrayOut = new long[INPUTSIZE * 2];
+        out.copyTo(arrayOut);
+        for (int i = 0; i < INPUTSIZE; i++) {
+            for (int j = 0; j < 2 ; j++) {
+                // Extract the inputs.
+                ArgumentsUlongUlongUlong args = new ArgumentsUlongUlongUlong();
+                args.inV1 = arrayInV1[i * 2 + j];
+                args.inV2 = arrayInV2[i * 2 + j];
+                // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
+                CoreMathVerifier.computeMin(args);
+                // Figure out what the outputs should have been.
+                boolean valid = true;
+                if (args.out != arrayOut[i * 2 + j]) {
+                    valid = false;
+                }
+                if (!valid) {
+                    StringBuilder message = new StringBuilder();
+                    message.append("Input inV1: ");
+                    message.append(String.format("0x%x", args.inV1));
+                    message.append("\n");
+                    message.append("Input inV2: ");
+                    message.append(String.format("0x%x", args.inV2));
+                    message.append("\n");
+                    message.append("Expected output out: ");
+                    message.append(String.format("0x%x", args.out));
+                    message.append("\n");
+                    message.append("Actual   output out: ");
+                    message.append(String.format("0x%x", arrayOut[i * 2 + j]));
+                    if (args.out != arrayOut[i * 2 + j]) {
+                        message.append(" FAIL");
+                    }
+                    message.append("\n");
+                    assertTrue("Incorrect output for checkMinUlong2Ulong2Ulong2" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                }
+            }
+        }
+    }
+
+    private void checkMinUlong3Ulong3Ulong3() {
+        Allocation inV1 = createRandomAllocation(mRS, Element.DataType.UNSIGNED_64, 3, 0x53ac9a3d815a8638l, false);
+        Allocation inV2 = createRandomAllocation(mRS, Element.DataType.UNSIGNED_64, 3, 0x53ac9a3d815a8639l, false);
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_64, 3), INPUTSIZE);
+            script.set_gAllocInV2(inV2);
+            script.forEach_testMinUlong3Ulong3Ulong3(inV1, out);
+            verifyResultsMinUlong3Ulong3Ulong3(inV1, inV2, out, false);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testMinUlong3Ulong3Ulong3: " + e.toString());
+        }
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_64, 3), INPUTSIZE);
+            scriptRelaxed.set_gAllocInV2(inV2);
+            scriptRelaxed.forEach_testMinUlong3Ulong3Ulong3(inV1, out);
+            verifyResultsMinUlong3Ulong3Ulong3(inV1, inV2, out, true);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testMinUlong3Ulong3Ulong3: " + e.toString());
+        }
+    }
+
+    private void verifyResultsMinUlong3Ulong3Ulong3(Allocation inV1, Allocation inV2, Allocation out, boolean relaxed) {
+        long[] arrayInV1 = new long[INPUTSIZE * 4];
+        inV1.copyTo(arrayInV1);
+        long[] arrayInV2 = new long[INPUTSIZE * 4];
+        inV2.copyTo(arrayInV2);
+        long[] arrayOut = new long[INPUTSIZE * 4];
+        out.copyTo(arrayOut);
+        for (int i = 0; i < INPUTSIZE; i++) {
+            for (int j = 0; j < 3 ; j++) {
+                // Extract the inputs.
+                ArgumentsUlongUlongUlong args = new ArgumentsUlongUlongUlong();
+                args.inV1 = arrayInV1[i * 4 + j];
+                args.inV2 = arrayInV2[i * 4 + j];
+                // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
+                CoreMathVerifier.computeMin(args);
+                // Figure out what the outputs should have been.
+                boolean valid = true;
+                if (args.out != arrayOut[i * 4 + j]) {
+                    valid = false;
+                }
+                if (!valid) {
+                    StringBuilder message = new StringBuilder();
+                    message.append("Input inV1: ");
+                    message.append(String.format("0x%x", args.inV1));
+                    message.append("\n");
+                    message.append("Input inV2: ");
+                    message.append(String.format("0x%x", args.inV2));
+                    message.append("\n");
+                    message.append("Expected output out: ");
+                    message.append(String.format("0x%x", args.out));
+                    message.append("\n");
+                    message.append("Actual   output out: ");
+                    message.append(String.format("0x%x", arrayOut[i * 4 + j]));
+                    if (args.out != arrayOut[i * 4 + j]) {
+                        message.append(" FAIL");
+                    }
+                    message.append("\n");
+                    assertTrue("Incorrect output for checkMinUlong3Ulong3Ulong3" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                }
+            }
+        }
+    }
+
+    private void checkMinUlong4Ulong4Ulong4() {
+        Allocation inV1 = createRandomAllocation(mRS, Element.DataType.UNSIGNED_64, 4, 0x809de99dd1a4cc43l, false);
+        Allocation inV2 = createRandomAllocation(mRS, Element.DataType.UNSIGNED_64, 4, 0x809de99dd1a4cc44l, false);
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_64, 4), INPUTSIZE);
+            script.set_gAllocInV2(inV2);
+            script.forEach_testMinUlong4Ulong4Ulong4(inV1, out);
+            verifyResultsMinUlong4Ulong4Ulong4(inV1, inV2, out, false);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testMinUlong4Ulong4Ulong4: " + e.toString());
+        }
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_64, 4), INPUTSIZE);
+            scriptRelaxed.set_gAllocInV2(inV2);
+            scriptRelaxed.forEach_testMinUlong4Ulong4Ulong4(inV1, out);
+            verifyResultsMinUlong4Ulong4Ulong4(inV1, inV2, out, true);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testMinUlong4Ulong4Ulong4: " + e.toString());
+        }
+    }
+
+    private void verifyResultsMinUlong4Ulong4Ulong4(Allocation inV1, Allocation inV2, Allocation out, boolean relaxed) {
+        long[] arrayInV1 = new long[INPUTSIZE * 4];
+        inV1.copyTo(arrayInV1);
+        long[] arrayInV2 = new long[INPUTSIZE * 4];
+        inV2.copyTo(arrayInV2);
+        long[] arrayOut = new long[INPUTSIZE * 4];
+        out.copyTo(arrayOut);
+        for (int i = 0; i < INPUTSIZE; i++) {
+            for (int j = 0; j < 4 ; j++) {
+                // Extract the inputs.
+                ArgumentsUlongUlongUlong args = new ArgumentsUlongUlongUlong();
+                args.inV1 = arrayInV1[i * 4 + j];
+                args.inV2 = arrayInV2[i * 4 + j];
+                // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
+                CoreMathVerifier.computeMin(args);
+                // Figure out what the outputs should have been.
+                boolean valid = true;
+                if (args.out != arrayOut[i * 4 + j]) {
+                    valid = false;
+                }
+                if (!valid) {
+                    StringBuilder message = new StringBuilder();
+                    message.append("Input inV1: ");
+                    message.append(String.format("0x%x", args.inV1));
+                    message.append("\n");
+                    message.append("Input inV2: ");
+                    message.append(String.format("0x%x", args.inV2));
+                    message.append("\n");
+                    message.append("Expected output out: ");
+                    message.append(String.format("0x%x", args.out));
+                    message.append("\n");
+                    message.append("Actual   output out: ");
+                    message.append(String.format("0x%x", arrayOut[i * 4 + j]));
+                    if (args.out != arrayOut[i * 4 + j]) {
+                        message.append(" FAIL");
+                    }
+                    message.append("\n");
+                    assertTrue("Incorrect output for checkMinUlong4Ulong4Ulong4" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                }
+            }
+        }
+    }
+
     public void testMin() {
         checkMinFloatFloatFloat();
         checkMinFloat2Float2Float2();
         checkMinFloat3Float3Float3();
         checkMinFloat4Float4Float4();
         checkMinCharCharChar();
-        checkMinUcharUcharUchar();
-        checkMinShortShortShort();
-        checkMinUshortUshortUshort();
-        checkMinIntIntInt();
-        checkMinUintUintUint();
         checkMinChar2Char2Char2();
-        checkMinUchar2Uchar2Uchar2();
-        checkMinShort2Short2Short2();
-        checkMinUshort2Ushort2Ushort2();
-        checkMinInt2Int2Int2();
-        checkMinUint2Uint2Uint2();
         checkMinChar3Char3Char3();
-        checkMinUchar3Uchar3Uchar3();
-        checkMinShort3Short3Short3();
-        checkMinUshort3Ushort3Ushort3();
-        checkMinInt3Int3Int3();
-        checkMinUint3Uint3Uint3();
         checkMinChar4Char4Char4();
+        checkMinUcharUcharUchar();
+        checkMinUchar2Uchar2Uchar2();
+        checkMinUchar3Uchar3Uchar3();
         checkMinUchar4Uchar4Uchar4();
+        checkMinShortShortShort();
+        checkMinShort2Short2Short2();
+        checkMinShort3Short3Short3();
         checkMinShort4Short4Short4();
+        checkMinUshortUshortUshort();
+        checkMinUshort2Ushort2Ushort2();
+        checkMinUshort3Ushort3Ushort3();
         checkMinUshort4Ushort4Ushort4();
+        checkMinIntIntInt();
+        checkMinInt2Int2Int2();
+        checkMinInt3Int3Int3();
         checkMinInt4Int4Int4();
+        checkMinUintUintUint();
+        checkMinUint2Uint2Uint2();
+        checkMinUint3Uint3Uint3();
         checkMinUint4Uint4Uint4();
+        checkMinLongLongLong();
+        checkMinLong2Long2Long2();
+        checkMinLong3Long3Long3();
+        checkMinLong4Long4Long4();
+        checkMinUlongUlongUlong();
+        checkMinUlong2Ulong2Ulong2();
+        checkMinUlong3Ulong3Ulong3();
+        checkMinUlong4Ulong4Ulong4();
     }
 }

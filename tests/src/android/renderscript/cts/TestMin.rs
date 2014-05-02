@@ -47,58 +47,8 @@ char __attribute__((kernel)) testMinCharCharChar(char inV1, unsigned int x) {
     return min(inV1, inV2);
 }
 
-uchar __attribute__((kernel)) testMinUcharUcharUchar(uchar inV1, unsigned int x) {
-    uchar inV2 = rsGetElementAt_uchar(gAllocInV2, x);
-    return min(inV1, inV2);
-}
-
-short __attribute__((kernel)) testMinShortShortShort(short inV1, unsigned int x) {
-    short inV2 = rsGetElementAt_short(gAllocInV2, x);
-    return min(inV1, inV2);
-}
-
-ushort __attribute__((kernel)) testMinUshortUshortUshort(ushort inV1, unsigned int x) {
-    ushort inV2 = rsGetElementAt_ushort(gAllocInV2, x);
-    return min(inV1, inV2);
-}
-
-int __attribute__((kernel)) testMinIntIntInt(int inV1, unsigned int x) {
-    int inV2 = rsGetElementAt_int(gAllocInV2, x);
-    return min(inV1, inV2);
-}
-
-uint __attribute__((kernel)) testMinUintUintUint(uint inV1, unsigned int x) {
-    uint inV2 = rsGetElementAt_uint(gAllocInV2, x);
-    return min(inV1, inV2);
-}
-
 char2 __attribute__((kernel)) testMinChar2Char2Char2(char2 inV1, unsigned int x) {
     char2 inV2 = rsGetElementAt_char2(gAllocInV2, x);
-    return min(inV1, inV2);
-}
-
-uchar2 __attribute__((kernel)) testMinUchar2Uchar2Uchar2(uchar2 inV1, unsigned int x) {
-    uchar2 inV2 = rsGetElementAt_uchar2(gAllocInV2, x);
-    return min(inV1, inV2);
-}
-
-short2 __attribute__((kernel)) testMinShort2Short2Short2(short2 inV1, unsigned int x) {
-    short2 inV2 = rsGetElementAt_short2(gAllocInV2, x);
-    return min(inV1, inV2);
-}
-
-ushort2 __attribute__((kernel)) testMinUshort2Ushort2Ushort2(ushort2 inV1, unsigned int x) {
-    ushort2 inV2 = rsGetElementAt_ushort2(gAllocInV2, x);
-    return min(inV1, inV2);
-}
-
-int2 __attribute__((kernel)) testMinInt2Int2Int2(int2 inV1, unsigned int x) {
-    int2 inV2 = rsGetElementAt_int2(gAllocInV2, x);
-    return min(inV1, inV2);
-}
-
-uint2 __attribute__((kernel)) testMinUint2Uint2Uint2(uint2 inV1, unsigned int x) {
-    uint2 inV2 = rsGetElementAt_uint2(gAllocInV2, x);
     return min(inV1, inV2);
 }
 
@@ -107,33 +57,23 @@ char3 __attribute__((kernel)) testMinChar3Char3Char3(char3 inV1, unsigned int x)
     return min(inV1, inV2);
 }
 
-uchar3 __attribute__((kernel)) testMinUchar3Uchar3Uchar3(uchar3 inV1, unsigned int x) {
-    uchar3 inV2 = rsGetElementAt_uchar3(gAllocInV2, x);
-    return min(inV1, inV2);
-}
-
-short3 __attribute__((kernel)) testMinShort3Short3Short3(short3 inV1, unsigned int x) {
-    short3 inV2 = rsGetElementAt_short3(gAllocInV2, x);
-    return min(inV1, inV2);
-}
-
-ushort3 __attribute__((kernel)) testMinUshort3Ushort3Ushort3(ushort3 inV1, unsigned int x) {
-    ushort3 inV2 = rsGetElementAt_ushort3(gAllocInV2, x);
-    return min(inV1, inV2);
-}
-
-int3 __attribute__((kernel)) testMinInt3Int3Int3(int3 inV1, unsigned int x) {
-    int3 inV2 = rsGetElementAt_int3(gAllocInV2, x);
-    return min(inV1, inV2);
-}
-
-uint3 __attribute__((kernel)) testMinUint3Uint3Uint3(uint3 inV1, unsigned int x) {
-    uint3 inV2 = rsGetElementAt_uint3(gAllocInV2, x);
-    return min(inV1, inV2);
-}
-
 char4 __attribute__((kernel)) testMinChar4Char4Char4(char4 inV1, unsigned int x) {
     char4 inV2 = rsGetElementAt_char4(gAllocInV2, x);
+    return min(inV1, inV2);
+}
+
+uchar __attribute__((kernel)) testMinUcharUcharUchar(uchar inV1, unsigned int x) {
+    uchar inV2 = rsGetElementAt_uchar(gAllocInV2, x);
+    return min(inV1, inV2);
+}
+
+uchar2 __attribute__((kernel)) testMinUchar2Uchar2Uchar2(uchar2 inV1, unsigned int x) {
+    uchar2 inV2 = rsGetElementAt_uchar2(gAllocInV2, x);
+    return min(inV1, inV2);
+}
+
+uchar3 __attribute__((kernel)) testMinUchar3Uchar3Uchar3(uchar3 inV1, unsigned int x) {
+    uchar3 inV2 = rsGetElementAt_uchar3(gAllocInV2, x);
     return min(inV1, inV2);
 }
 
@@ -142,8 +82,38 @@ uchar4 __attribute__((kernel)) testMinUchar4Uchar4Uchar4(uchar4 inV1, unsigned i
     return min(inV1, inV2);
 }
 
+short __attribute__((kernel)) testMinShortShortShort(short inV1, unsigned int x) {
+    short inV2 = rsGetElementAt_short(gAllocInV2, x);
+    return min(inV1, inV2);
+}
+
+short2 __attribute__((kernel)) testMinShort2Short2Short2(short2 inV1, unsigned int x) {
+    short2 inV2 = rsGetElementAt_short2(gAllocInV2, x);
+    return min(inV1, inV2);
+}
+
+short3 __attribute__((kernel)) testMinShort3Short3Short3(short3 inV1, unsigned int x) {
+    short3 inV2 = rsGetElementAt_short3(gAllocInV2, x);
+    return min(inV1, inV2);
+}
+
 short4 __attribute__((kernel)) testMinShort4Short4Short4(short4 inV1, unsigned int x) {
     short4 inV2 = rsGetElementAt_short4(gAllocInV2, x);
+    return min(inV1, inV2);
+}
+
+ushort __attribute__((kernel)) testMinUshortUshortUshort(ushort inV1, unsigned int x) {
+    ushort inV2 = rsGetElementAt_ushort(gAllocInV2, x);
+    return min(inV1, inV2);
+}
+
+ushort2 __attribute__((kernel)) testMinUshort2Ushort2Ushort2(ushort2 inV1, unsigned int x) {
+    ushort2 inV2 = rsGetElementAt_ushort2(gAllocInV2, x);
+    return min(inV1, inV2);
+}
+
+ushort3 __attribute__((kernel)) testMinUshort3Ushort3Ushort3(ushort3 inV1, unsigned int x) {
+    ushort3 inV2 = rsGetElementAt_ushort3(gAllocInV2, x);
     return min(inV1, inV2);
 }
 
@@ -152,12 +122,82 @@ ushort4 __attribute__((kernel)) testMinUshort4Ushort4Ushort4(ushort4 inV1, unsig
     return min(inV1, inV2);
 }
 
+int __attribute__((kernel)) testMinIntIntInt(int inV1, unsigned int x) {
+    int inV2 = rsGetElementAt_int(gAllocInV2, x);
+    return min(inV1, inV2);
+}
+
+int2 __attribute__((kernel)) testMinInt2Int2Int2(int2 inV1, unsigned int x) {
+    int2 inV2 = rsGetElementAt_int2(gAllocInV2, x);
+    return min(inV1, inV2);
+}
+
+int3 __attribute__((kernel)) testMinInt3Int3Int3(int3 inV1, unsigned int x) {
+    int3 inV2 = rsGetElementAt_int3(gAllocInV2, x);
+    return min(inV1, inV2);
+}
+
 int4 __attribute__((kernel)) testMinInt4Int4Int4(int4 inV1, unsigned int x) {
     int4 inV2 = rsGetElementAt_int4(gAllocInV2, x);
     return min(inV1, inV2);
 }
 
+uint __attribute__((kernel)) testMinUintUintUint(uint inV1, unsigned int x) {
+    uint inV2 = rsGetElementAt_uint(gAllocInV2, x);
+    return min(inV1, inV2);
+}
+
+uint2 __attribute__((kernel)) testMinUint2Uint2Uint2(uint2 inV1, unsigned int x) {
+    uint2 inV2 = rsGetElementAt_uint2(gAllocInV2, x);
+    return min(inV1, inV2);
+}
+
+uint3 __attribute__((kernel)) testMinUint3Uint3Uint3(uint3 inV1, unsigned int x) {
+    uint3 inV2 = rsGetElementAt_uint3(gAllocInV2, x);
+    return min(inV1, inV2);
+}
+
 uint4 __attribute__((kernel)) testMinUint4Uint4Uint4(uint4 inV1, unsigned int x) {
     uint4 inV2 = rsGetElementAt_uint4(gAllocInV2, x);
+    return min(inV1, inV2);
+}
+
+long __attribute__((kernel)) testMinLongLongLong(long inV1, unsigned int x) {
+    long inV2 = rsGetElementAt_long(gAllocInV2, x);
+    return min(inV1, inV2);
+}
+
+long2 __attribute__((kernel)) testMinLong2Long2Long2(long2 inV1, unsigned int x) {
+    long2 inV2 = rsGetElementAt_long2(gAllocInV2, x);
+    return min(inV1, inV2);
+}
+
+long3 __attribute__((kernel)) testMinLong3Long3Long3(long3 inV1, unsigned int x) {
+    long3 inV2 = rsGetElementAt_long3(gAllocInV2, x);
+    return min(inV1, inV2);
+}
+
+long4 __attribute__((kernel)) testMinLong4Long4Long4(long4 inV1, unsigned int x) {
+    long4 inV2 = rsGetElementAt_long4(gAllocInV2, x);
+    return min(inV1, inV2);
+}
+
+ulong __attribute__((kernel)) testMinUlongUlongUlong(ulong inV1, unsigned int x) {
+    ulong inV2 = rsGetElementAt_ulong(gAllocInV2, x);
+    return min(inV1, inV2);
+}
+
+ulong2 __attribute__((kernel)) testMinUlong2Ulong2Ulong2(ulong2 inV1, unsigned int x) {
+    ulong2 inV2 = rsGetElementAt_ulong2(gAllocInV2, x);
+    return min(inV1, inV2);
+}
+
+ulong3 __attribute__((kernel)) testMinUlong3Ulong3Ulong3(ulong3 inV1, unsigned int x) {
+    ulong3 inV2 = rsGetElementAt_ulong3(gAllocInV2, x);
+    return min(inV1, inV2);
+}
+
+ulong4 __attribute__((kernel)) testMinUlong4Ulong4Ulong4(ulong4 inV1, unsigned int x) {
+    ulong4 inV2 = rsGetElementAt_ulong4(gAllocInV2, x);
     return min(inV1, inV2);
 }

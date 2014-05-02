@@ -364,7 +364,6 @@ public class CoreMathVerifier {
                         Math.max(args.inValue, args.inMinValue)), 0, 0);
     }
 
-    /* TODO Not supporting long arguments currently
     static public void computeClamp(TestClamp.ArgumentsLongLongLongLong args) {
         args.out = minI64(args.inMaxValue, maxI64(args.inValue, args.inMinValue));
     }
@@ -372,7 +371,6 @@ public class CoreMathVerifier {
     static public void computeClamp(TestClamp.ArgumentsUlongUlongUlongUlong args) {
         args.out = minU64(args.inMaxValue, maxU64(args.inValue, args.inMinValue));
     }
-    */
 
     static public void computeClz(TestClz.ArgumentsCharChar args) {
         int x = args.inValue;
@@ -419,22 +417,18 @@ public class CoreMathVerifier {
     static public void computeConvert(TestConvert.ArgumentsCharUint args) {
         args.out = convertCharToUint(args.inV);
     }
-    /* TODO Not supporting long arguments currently
     static public void computeConvert(TestConvert.ArgumentsCharLong args) {
         args.out = convertCharToLong(args.inV);
     }
     static public void computeConvert(TestConvert.ArgumentsCharUlong args) {
         args.out = convertCharToUlong(args.inV);
     }
-    */
     static public void computeConvert(TestConvert.ArgumentsCharFloat args) {
         args.out = new Floaty(convertCharToFloat(args.inV), 0, 0);
     }
-    /* TODO Not supporting double arguments currently
     static public void computeConvert(TestConvert.ArgumentsCharDouble args) {
         args.out = new Floaty(convertCharToDouble(args.inV), 0, 0);
     }
-    */
 
     static public void computeConvert(TestConvert.ArgumentsUcharChar args) {
         args.out = convertUcharToChar(args.inV);
@@ -454,22 +448,18 @@ public class CoreMathVerifier {
     static public void computeConvert(TestConvert.ArgumentsUcharUint args) {
         args.out = convertUcharToUint(args.inV);
     }
-    /* TODO Not supporting long arguments currently
     static public void computeConvert(TestConvert.ArgumentsUcharLong args) {
         args.out = convertUcharToLong(args.inV);
     }
     static public void computeConvert(TestConvert.ArgumentsUcharUlong args) {
         args.out = convertUcharToUlong(args.inV);
     }
-    */
     static public void computeConvert(TestConvert.ArgumentsUcharFloat args) {
         args.out = new Floaty(convertUcharToFloat(args.inV), 0, 0);
     }
-    /* TODO Not supporting double arguments currently
     static public void computeConvert(TestConvert.ArgumentsUcharDouble args) {
         args.out = new Floaty(convertUcharToDouble(args.inV), 0, 0);
     }
-    */
 
     static public void computeConvert(TestConvert.ArgumentsShortChar args) {
         args.out = convertShortToChar(args.inV);
@@ -489,22 +479,18 @@ public class CoreMathVerifier {
     static public void computeConvert(TestConvert.ArgumentsShortUint args) {
         args.out = convertShortToUint(args.inV);
     }
-    /* TODO Not supporting long arguments currently
     static public void computeConvert(TestConvert.ArgumentsShortLong args) {
         args.out = convertShortToLong(args.inV);
     }
     static public void computeConvert(TestConvert.ArgumentsShortUlong args) {
         args.out = convertShortToUlong(args.inV);
     }
-    */
     static public void computeConvert(TestConvert.ArgumentsShortFloat args) {
         args.out = new Floaty(convertShortToFloat(args.inV), 0, 0);
     }
-    /* TODO Not supporting double arguments currently
     static public void computeConvert(TestConvert.ArgumentsShortDouble args) {
         args.out = new Floaty(convertShortToDouble(args.inV), 0, 0);
     }
-    */
 
     static public void computeConvert(TestConvert.ArgumentsUshortChar args) {
         args.out = convertUshortToChar(args.inV);
@@ -524,22 +510,18 @@ public class CoreMathVerifier {
     static public void computeConvert(TestConvert.ArgumentsUshortUint args) {
         args.out = convertUshortToUint(args.inV);
     }
-    /* TODO Not supporting long arguments currently
     static public void computeConvert(TestConvert.ArgumentsUshortLong args) {
         args.out = convertUshortToLong(args.inV);
     }
     static public void computeConvert(TestConvert.ArgumentsUshortUlong args) {
         args.out = convertUshortToUlong(args.inV);
     }
-    */
     static public void computeConvert(TestConvert.ArgumentsUshortFloat args) {
         args.out = new Floaty(convertUshortToFloat(args.inV), 0, 0);
     }
-    /* TODO Not supporting double arguments currently
     static public void computeConvert(TestConvert.ArgumentsUshortDouble args) {
         args.out = new Floaty(convertUshortToDouble(args.inV), 0, 0);
     }
-    */
 
     static public void computeConvert(TestConvert.ArgumentsIntChar args) {
         args.out = convertIntToChar(args.inV);
@@ -559,22 +541,18 @@ public class CoreMathVerifier {
     static public void computeConvert(TestConvert.ArgumentsIntUint args) {
         args.out = convertIntToUint(args.inV);
     }
-    /* TODO Not supporting long arguments currently
     static public void computeConvert(TestConvert.ArgumentsIntLong args) {
         args.out = convertIntToLong(args.inV);
     }
     static public void computeConvert(TestConvert.ArgumentsIntUlong args) {
         args.out = convertIntToUlong(args.inV);
     }
-    */
     static public void computeConvert(TestConvert.ArgumentsIntFloat args) {
         args.out = new Floaty(convertIntToFloat(args.inV), 1, 1);
     }
-    /* TODO Not supporting double arguments currently
     static public void computeConvert(TestConvert.ArgumentsIntDouble args) {
         args.out = new Floaty(convertIntToDouble(args.inV), 0, 0);
     }
-    */
 
     static public void computeConvert(TestConvert.ArgumentsUintChar args) {
         args.out = convertUintToChar(args.inV);
@@ -594,24 +572,19 @@ public class CoreMathVerifier {
     static public void computeConvert(TestConvert.ArgumentsUintUint args) {
         args.out = convertUintToUint(args.inV);
     }
-    /* TODO Not supporting long arguments currently
     static public void computeConvert(TestConvert.ArgumentsUintLong args) {
         args.out = convertUintToLong(args.inV);
     }
     static public void computeConvert(TestConvert.ArgumentsUintUlong args) {
         args.out = convertUintToUlong(args.inV);
     }
-    */
     static public void computeConvert(TestConvert.ArgumentsUintFloat args) {
         args.out = new Floaty(convertUintToFloat(args.inV), 1, 1);
     }
-    /* TODO Not supporting double arguments currently
     static public void computeConvert(TestConvert.ArgumentsUintDouble args) {
         args.out = new Floaty(convertUintToDouble(args.inV), 0, 0);
     }
-    */
 
-    /* TODO Not supporting long arguments currently
     static public void computeConvert(TestConvert.ArgumentsLongChar args) {
         args.out = convertLongToChar(args.inV);
     }
@@ -673,7 +646,6 @@ public class CoreMathVerifier {
     static public void computeConvert(TestConvert.ArgumentsUlongDouble args) {
         args.out = new Floaty(convertUlongToDouble(args.inV), 1, 1);
     }
-    */
 
     static public void computeConvert(TestConvert.ArgumentsFloatChar args) {
         args.out = convertFloatToChar(args.inV);
@@ -693,24 +665,19 @@ public class CoreMathVerifier {
     static public void computeConvert(TestConvert.ArgumentsFloatUint args) {
         args.out = convertFloatToUint(args.inV);
     }
-    /* TODO Not supporting long arguments currently
     static public void computeConvert(TestConvert.ArgumentsFloatLong args) {
         args.out = convertFloatToLong(args.inV);
     }
     static public void computeConvert(TestConvert.ArgumentsFloatUlong args) {
         args.out = convertFloatToUlong(args.inV);
     }
-    */
     static public void computeConvert(TestConvert.ArgumentsFloatFloat args) {
         args.out = new Floaty(convertFloatToFloat(args.inV), 0, 0);
     }
-    /* TODO Not supporting double arguments currently
     static public void computeConvert(TestConvert.ArgumentsFloatDouble args) {
         args.out = new Floaty(convertFloatToDouble(args.inV), 0, 0);
     }
-    */
 
-    /* TODO Not supporting double arguments currently
     static public void computeConvert(TestConvert.ArgumentsDoubleChar args) {
         args.out = convertDoubleToChar(args.inV);
     }
@@ -741,7 +708,6 @@ public class CoreMathVerifier {
     static public void computeConvert(TestConvert.ArgumentsDoubleDouble args) {
         args.out = new Floaty(convertDoubleToDouble(args.inV), 0, 0);
     }
-    */
 
     static public void computeCopysign(TestCopysign.ArgumentsFloatFloatFloat args) {
         args.out = new Floaty(Math.copySign(args.inX, args.inY), 0, 0);
@@ -986,7 +952,6 @@ public class CoreMathVerifier {
         args.out = maxU32(args.inV1, args.inV2);
     }
 
-    /* TODO enable once precision has been improved.
     static public void computeMax(TestMax.ArgumentsLongLongLong args) {
         args.out = maxI64(args.inV1, args.inV2);
     }
@@ -994,7 +959,6 @@ public class CoreMathVerifier {
     static public void computeMax(TestMax.ArgumentsUlongUlongUlong args) {
         args.out = maxU64(args.inV1, args.inV2);
     }
-    */
 
     static public void computeMax(TestMax.ArgumentsFloatFloatFloat args) {
         args.out = new Floaty(Math.max(args.in, args.in1), 0, 0);
@@ -1024,7 +988,6 @@ public class CoreMathVerifier {
         args.out = minU32(args.inV1, args.inV2);
     }
 
-    /* TODO enable once precision has been improved.
     static public void computeMin(TestMin.ArgumentsLongLongLong args) {
         args.out = minI64(args.inV1, args.inV2);
     }
@@ -1032,7 +995,6 @@ public class CoreMathVerifier {
     static public void computeMin(TestMin.ArgumentsUlongUlongUlong args) {
         args.out = minU64(args.inV1, args.inV2);
     }
-    */
 
     static public void computeMin(TestMin.ArgumentsFloatFloatFloat args) {
         args.out = new Floaty(Math.min(args.in, args.in1), 0, 0);

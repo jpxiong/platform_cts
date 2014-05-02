@@ -523,6 +523,213 @@ public class TestStep extends RSBaseCompute {
         }
     }
 
+    private void checkStepFloatFloat2Float2() {
+        Allocation inEdge = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0x70a0554e664b1852l, false);
+        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0xdd7f0d444e2f7c5l, false);
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 2), INPUTSIZE);
+            script.set_gAllocInV(inV);
+            script.forEach_testStepFloatFloat2Float2(inEdge, out);
+            verifyResultsStepFloatFloat2Float2(inEdge, inV, out, false);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testStepFloatFloat2Float2: " + e.toString());
+        }
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 2), INPUTSIZE);
+            scriptRelaxed.set_gAllocInV(inV);
+            scriptRelaxed.forEach_testStepFloatFloat2Float2(inEdge, out);
+            verifyResultsStepFloatFloat2Float2(inEdge, inV, out, true);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testStepFloatFloat2Float2: " + e.toString());
+        }
+    }
+
+    private void verifyResultsStepFloatFloat2Float2(Allocation inEdge, Allocation inV, Allocation out, boolean relaxed) {
+        float[] arrayInEdge = new float[INPUTSIZE * 1];
+        inEdge.copyTo(arrayInEdge);
+        float[] arrayInV = new float[INPUTSIZE * 2];
+        inV.copyTo(arrayInV);
+        float[] arrayOut = new float[INPUTSIZE * 2];
+        out.copyTo(arrayOut);
+        for (int i = 0; i < INPUTSIZE; i++) {
+            for (int j = 0; j < 2 ; j++) {
+                // Extract the inputs.
+                ArgumentsFloatFloatFloat args = new ArgumentsFloatFloatFloat();
+                args.inEdge = arrayInEdge[i];
+                args.inV = arrayInV[i * 2 + j];
+                // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
+                CoreMathVerifier.computeStep(args);
+                // Figure out what the outputs should have been.
+                boolean valid = true;
+                if (!args.out.couldBe(arrayOut[i * 2 + j])) {
+                    valid = false;
+                }
+                if (!valid) {
+                    StringBuilder message = new StringBuilder();
+                    message.append("Input inEdge: ");
+                    message.append(String.format("%14.8g %8x %15a",
+                            args.inEdge, Float.floatToRawIntBits(args.inEdge), args.inEdge));
+                    message.append("\n");
+                    message.append("Input inV: ");
+                    message.append(String.format("%14.8g %8x %15a",
+                            args.inV, Float.floatToRawIntBits(args.inV), args.inV));
+                    message.append("\n");
+                    message.append("Expected output out: ");
+                    message.append(args.out.toString());
+                    message.append("\n");
+                    message.append("Actual   output out: ");
+                    message.append(String.format("%14.8g %8x %15a",
+                            arrayOut[i * 2 + j], Float.floatToRawIntBits(arrayOut[i * 2 + j]), arrayOut[i * 2 + j]));
+                    if (!args.out.couldBe(arrayOut[i * 2 + j])) {
+                        message.append(" FAIL");
+                    }
+                    message.append("\n");
+                    assertTrue("Incorrect output for checkStepFloatFloat2Float2" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                }
+            }
+        }
+    }
+
+    private void checkStepFloatFloat3Float3() {
+        Allocation inEdge = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0x9b2d75ce91abcbccl, false);
+        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0xdd9b9ef3afe18a3l, false);
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 3), INPUTSIZE);
+            script.set_gAllocInV(inV);
+            script.forEach_testStepFloatFloat3Float3(inEdge, out);
+            verifyResultsStepFloatFloat3Float3(inEdge, inV, out, false);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testStepFloatFloat3Float3: " + e.toString());
+        }
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 3), INPUTSIZE);
+            scriptRelaxed.set_gAllocInV(inV);
+            scriptRelaxed.forEach_testStepFloatFloat3Float3(inEdge, out);
+            verifyResultsStepFloatFloat3Float3(inEdge, inV, out, true);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testStepFloatFloat3Float3: " + e.toString());
+        }
+    }
+
+    private void verifyResultsStepFloatFloat3Float3(Allocation inEdge, Allocation inV, Allocation out, boolean relaxed) {
+        float[] arrayInEdge = new float[INPUTSIZE * 1];
+        inEdge.copyTo(arrayInEdge);
+        float[] arrayInV = new float[INPUTSIZE * 4];
+        inV.copyTo(arrayInV);
+        float[] arrayOut = new float[INPUTSIZE * 4];
+        out.copyTo(arrayOut);
+        for (int i = 0; i < INPUTSIZE; i++) {
+            for (int j = 0; j < 3 ; j++) {
+                // Extract the inputs.
+                ArgumentsFloatFloatFloat args = new ArgumentsFloatFloatFloat();
+                args.inEdge = arrayInEdge[i];
+                args.inV = arrayInV[i * 4 + j];
+                // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
+                CoreMathVerifier.computeStep(args);
+                // Figure out what the outputs should have been.
+                boolean valid = true;
+                if (!args.out.couldBe(arrayOut[i * 4 + j])) {
+                    valid = false;
+                }
+                if (!valid) {
+                    StringBuilder message = new StringBuilder();
+                    message.append("Input inEdge: ");
+                    message.append(String.format("%14.8g %8x %15a",
+                            args.inEdge, Float.floatToRawIntBits(args.inEdge), args.inEdge));
+                    message.append("\n");
+                    message.append("Input inV: ");
+                    message.append(String.format("%14.8g %8x %15a",
+                            args.inV, Float.floatToRawIntBits(args.inV), args.inV));
+                    message.append("\n");
+                    message.append("Expected output out: ");
+                    message.append(args.out.toString());
+                    message.append("\n");
+                    message.append("Actual   output out: ");
+                    message.append(String.format("%14.8g %8x %15a",
+                            arrayOut[i * 4 + j], Float.floatToRawIntBits(arrayOut[i * 4 + j]), arrayOut[i * 4 + j]));
+                    if (!args.out.couldBe(arrayOut[i * 4 + j])) {
+                        message.append(" FAIL");
+                    }
+                    message.append("\n");
+                    assertTrue("Incorrect output for checkStepFloatFloat3Float3" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                }
+            }
+        }
+    }
+
+    private void checkStepFloatFloat4Float4() {
+        Allocation inEdge = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0xc5ba964ebd0c7f46l, false);
+        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0xddb830a31193981l, false);
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 4), INPUTSIZE);
+            script.set_gAllocInV(inV);
+            script.forEach_testStepFloatFloat4Float4(inEdge, out);
+            verifyResultsStepFloatFloat4Float4(inEdge, inV, out, false);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testStepFloatFloat4Float4: " + e.toString());
+        }
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 4), INPUTSIZE);
+            scriptRelaxed.set_gAllocInV(inV);
+            scriptRelaxed.forEach_testStepFloatFloat4Float4(inEdge, out);
+            verifyResultsStepFloatFloat4Float4(inEdge, inV, out, true);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testStepFloatFloat4Float4: " + e.toString());
+        }
+    }
+
+    private void verifyResultsStepFloatFloat4Float4(Allocation inEdge, Allocation inV, Allocation out, boolean relaxed) {
+        float[] arrayInEdge = new float[INPUTSIZE * 1];
+        inEdge.copyTo(arrayInEdge);
+        float[] arrayInV = new float[INPUTSIZE * 4];
+        inV.copyTo(arrayInV);
+        float[] arrayOut = new float[INPUTSIZE * 4];
+        out.copyTo(arrayOut);
+        for (int i = 0; i < INPUTSIZE; i++) {
+            for (int j = 0; j < 4 ; j++) {
+                // Extract the inputs.
+                ArgumentsFloatFloatFloat args = new ArgumentsFloatFloatFloat();
+                args.inEdge = arrayInEdge[i];
+                args.inV = arrayInV[i * 4 + j];
+                // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
+                CoreMathVerifier.computeStep(args);
+                // Figure out what the outputs should have been.
+                boolean valid = true;
+                if (!args.out.couldBe(arrayOut[i * 4 + j])) {
+                    valid = false;
+                }
+                if (!valid) {
+                    StringBuilder message = new StringBuilder();
+                    message.append("Input inEdge: ");
+                    message.append(String.format("%14.8g %8x %15a",
+                            args.inEdge, Float.floatToRawIntBits(args.inEdge), args.inEdge));
+                    message.append("\n");
+                    message.append("Input inV: ");
+                    message.append(String.format("%14.8g %8x %15a",
+                            args.inV, Float.floatToRawIntBits(args.inV), args.inV));
+                    message.append("\n");
+                    message.append("Expected output out: ");
+                    message.append(args.out.toString());
+                    message.append("\n");
+                    message.append("Actual   output out: ");
+                    message.append(String.format("%14.8g %8x %15a",
+                            arrayOut[i * 4 + j], Float.floatToRawIntBits(arrayOut[i * 4 + j]), arrayOut[i * 4 + j]));
+                    if (!args.out.couldBe(arrayOut[i * 4 + j])) {
+                        message.append(" FAIL");
+                    }
+                    message.append("\n");
+                    assertTrue("Incorrect output for checkStepFloatFloat4Float4" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                }
+            }
+        }
+    }
+
     public void testStep() {
         checkStepFloatFloatFloat();
         checkStepFloat2Float2Float2();
@@ -531,5 +738,8 @@ public class TestStep extends RSBaseCompute {
         checkStepFloat2FloatFloat2();
         checkStepFloat3FloatFloat3();
         checkStepFloat4FloatFloat4();
+        checkStepFloatFloat2Float2();
+        checkStepFloatFloat3Float3();
+        checkStepFloatFloat4Float4();
     }
 }

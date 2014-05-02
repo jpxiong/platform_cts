@@ -208,6 +208,54 @@ uint4 __attribute__((kernel)) testClampUint4Uint4Uint4Uint4(uint4 inValue, unsig
     return clamp(inValue, inMinValue, inMaxValue);
 }
 
+long __attribute__((kernel)) testClampLongLongLongLong(long inValue, unsigned int x) {
+    long inMinValue = rsGetElementAt_long(gAllocInMinValue, x);
+    long inMaxValue = rsGetElementAt_long(gAllocInMaxValue, x);
+    return clamp(inValue, inMinValue, inMaxValue);
+}
+
+long2 __attribute__((kernel)) testClampLong2Long2Long2Long2(long2 inValue, unsigned int x) {
+    long2 inMinValue = rsGetElementAt_long2(gAllocInMinValue, x);
+    long2 inMaxValue = rsGetElementAt_long2(gAllocInMaxValue, x);
+    return clamp(inValue, inMinValue, inMaxValue);
+}
+
+long3 __attribute__((kernel)) testClampLong3Long3Long3Long3(long3 inValue, unsigned int x) {
+    long3 inMinValue = rsGetElementAt_long3(gAllocInMinValue, x);
+    long3 inMaxValue = rsGetElementAt_long3(gAllocInMaxValue, x);
+    return clamp(inValue, inMinValue, inMaxValue);
+}
+
+long4 __attribute__((kernel)) testClampLong4Long4Long4Long4(long4 inValue, unsigned int x) {
+    long4 inMinValue = rsGetElementAt_long4(gAllocInMinValue, x);
+    long4 inMaxValue = rsGetElementAt_long4(gAllocInMaxValue, x);
+    return clamp(inValue, inMinValue, inMaxValue);
+}
+
+ulong __attribute__((kernel)) testClampUlongUlongUlongUlong(ulong inValue, unsigned int x) {
+    ulong inMinValue = rsGetElementAt_ulong(gAllocInMinValue, x);
+    ulong inMaxValue = rsGetElementAt_ulong(gAllocInMaxValue, x);
+    return clamp(inValue, inMinValue, inMaxValue);
+}
+
+ulong2 __attribute__((kernel)) testClampUlong2Ulong2Ulong2Ulong2(ulong2 inValue, unsigned int x) {
+    ulong2 inMinValue = rsGetElementAt_ulong2(gAllocInMinValue, x);
+    ulong2 inMaxValue = rsGetElementAt_ulong2(gAllocInMaxValue, x);
+    return clamp(inValue, inMinValue, inMaxValue);
+}
+
+ulong3 __attribute__((kernel)) testClampUlong3Ulong3Ulong3Ulong3(ulong3 inValue, unsigned int x) {
+    ulong3 inMinValue = rsGetElementAt_ulong3(gAllocInMinValue, x);
+    ulong3 inMaxValue = rsGetElementAt_ulong3(gAllocInMaxValue, x);
+    return clamp(inValue, inMinValue, inMaxValue);
+}
+
+ulong4 __attribute__((kernel)) testClampUlong4Ulong4Ulong4Ulong4(ulong4 inValue, unsigned int x) {
+    ulong4 inMinValue = rsGetElementAt_ulong4(gAllocInMinValue, x);
+    ulong4 inMaxValue = rsGetElementAt_ulong4(gAllocInMaxValue, x);
+    return clamp(inValue, inMinValue, inMaxValue);
+}
+
 char2 __attribute__((kernel)) testClampChar2CharCharChar2(char2 inValue, unsigned int x) {
     char inMinValue = rsGetElementAt_char(gAllocInMinValue, x);
     char inMaxValue = rsGetElementAt_char(gAllocInMaxValue, x);
@@ -313,5 +361,41 @@ uint3 __attribute__((kernel)) testClampUint3UintUintUint3(uint3 inValue, unsigne
 uint4 __attribute__((kernel)) testClampUint4UintUintUint4(uint4 inValue, unsigned int x) {
     uint inMinValue = rsGetElementAt_uint(gAllocInMinValue, x);
     uint inMaxValue = rsGetElementAt_uint(gAllocInMaxValue, x);
+    return clamp(inValue, inMinValue, inMaxValue);
+}
+
+long2 __attribute__((kernel)) testClampLong2LongLongLong2(long2 inValue, unsigned int x) {
+    long inMinValue = rsGetElementAt_long(gAllocInMinValue, x);
+    long inMaxValue = rsGetElementAt_long(gAllocInMaxValue, x);
+    return clamp(inValue, inMinValue, inMaxValue);
+}
+
+long3 __attribute__((kernel)) testClampLong3LongLongLong3(long3 inValue, unsigned int x) {
+    long inMinValue = rsGetElementAt_long(gAllocInMinValue, x);
+    long inMaxValue = rsGetElementAt_long(gAllocInMaxValue, x);
+    return clamp(inValue, inMinValue, inMaxValue);
+}
+
+long4 __attribute__((kernel)) testClampLong4LongLongLong4(long4 inValue, unsigned int x) {
+    long inMinValue = rsGetElementAt_long(gAllocInMinValue, x);
+    long inMaxValue = rsGetElementAt_long(gAllocInMaxValue, x);
+    return clamp(inValue, inMinValue, inMaxValue);
+}
+
+ulong2 __attribute__((kernel)) testClampUlong2UlongUlongUlong2(ulong2 inValue, unsigned int x) {
+    ulong inMinValue = rsGetElementAt_ulong(gAllocInMinValue, x);
+    ulong inMaxValue = rsGetElementAt_ulong(gAllocInMaxValue, x);
+    return clamp(inValue, inMinValue, inMaxValue);
+}
+
+ulong3 __attribute__((kernel)) testClampUlong3UlongUlongUlong3(ulong3 inValue, unsigned int x) {
+    ulong inMinValue = rsGetElementAt_ulong(gAllocInMinValue, x);
+    ulong inMaxValue = rsGetElementAt_ulong(gAllocInMaxValue, x);
+    return clamp(inValue, inMinValue, inMaxValue);
+}
+
+ulong4 __attribute__((kernel)) testClampUlong4UlongUlongUlong4(ulong4 inValue, unsigned int x) {
+    ulong inMinValue = rsGetElementAt_ulong(gAllocInMinValue, x);
+    ulong inMaxValue = rsGetElementAt_ulong(gAllocInMaxValue, x);
     return clamp(inValue, inMinValue, inMaxValue);
 }

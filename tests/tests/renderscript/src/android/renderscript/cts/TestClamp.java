@@ -2467,6 +2467,628 @@ public class TestClamp extends RSBaseCompute {
         }
     }
 
+    public class ArgumentsLongLongLongLong {
+        public long inValue;
+        public long inMinValue;
+        public long inMaxValue;
+        public long out;
+    }
+
+    private void checkClampLongLongLongLong() {
+        Allocation inValue = createRandomAllocation(mRS, Element.DataType.SIGNED_64, 1, 0x63fd360531c9c41dl, false);
+        Allocation inMinValue = createRandomAllocation(mRS, Element.DataType.SIGNED_64, 1, 0x9d04d1824ef4907l, false);
+        Allocation inMaxValue = createRandomAllocation(mRS, Element.DataType.SIGNED_64, 1, 0x9d04d0cb64c3b0dl, false);
+        enforceOrdering(inMinValue, inMaxValue);
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_64, 1), INPUTSIZE);
+            script.set_gAllocInMinValue(inMinValue);
+            script.set_gAllocInMaxValue(inMaxValue);
+            script.forEach_testClampLongLongLongLong(inValue, out);
+            verifyResultsClampLongLongLongLong(inValue, inMinValue, inMaxValue, out, false);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testClampLongLongLongLong: " + e.toString());
+        }
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_64, 1), INPUTSIZE);
+            scriptRelaxed.set_gAllocInMinValue(inMinValue);
+            scriptRelaxed.set_gAllocInMaxValue(inMaxValue);
+            scriptRelaxed.forEach_testClampLongLongLongLong(inValue, out);
+            verifyResultsClampLongLongLongLong(inValue, inMinValue, inMaxValue, out, true);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testClampLongLongLongLong: " + e.toString());
+        }
+    }
+
+    private void verifyResultsClampLongLongLongLong(Allocation inValue, Allocation inMinValue, Allocation inMaxValue, Allocation out, boolean relaxed) {
+        long[] arrayInValue = new long[INPUTSIZE * 1];
+        inValue.copyTo(arrayInValue);
+        long[] arrayInMinValue = new long[INPUTSIZE * 1];
+        inMinValue.copyTo(arrayInMinValue);
+        long[] arrayInMaxValue = new long[INPUTSIZE * 1];
+        inMaxValue.copyTo(arrayInMaxValue);
+        long[] arrayOut = new long[INPUTSIZE * 1];
+        out.copyTo(arrayOut);
+        for (int i = 0; i < INPUTSIZE; i++) {
+            for (int j = 0; j < 1 ; j++) {
+                // Extract the inputs.
+                ArgumentsLongLongLongLong args = new ArgumentsLongLongLongLong();
+                args.inValue = arrayInValue[i];
+                args.inMinValue = arrayInMinValue[i];
+                args.inMaxValue = arrayInMaxValue[i];
+                // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
+                CoreMathVerifier.computeClamp(args);
+                // Figure out what the outputs should have been.
+                boolean valid = true;
+                if (args.out != arrayOut[i * 1 + j]) {
+                    valid = false;
+                }
+                if (!valid) {
+                    StringBuilder message = new StringBuilder();
+                    message.append("Input inValue: ");
+                    message.append(String.format("%d", args.inValue));
+                    message.append("\n");
+                    message.append("Input inMinValue: ");
+                    message.append(String.format("%d", args.inMinValue));
+                    message.append("\n");
+                    message.append("Input inMaxValue: ");
+                    message.append(String.format("%d", args.inMaxValue));
+                    message.append("\n");
+                    message.append("Expected output out: ");
+                    message.append(String.format("%d", args.out));
+                    message.append("\n");
+                    message.append("Actual   output out: ");
+                    message.append(String.format("%d", arrayOut[i * 1 + j]));
+                    if (args.out != arrayOut[i * 1 + j]) {
+                        message.append(" FAIL");
+                    }
+                    message.append("\n");
+                    assertTrue("Incorrect output for checkClampLongLongLongLong" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                }
+            }
+        }
+    }
+
+    private void checkClampLong2Long2Long2Long2() {
+        Allocation inValue = createRandomAllocation(mRS, Element.DataType.SIGNED_64, 2, 0xccbae869c2b0f12dl, false);
+        Allocation inMinValue = createRandomAllocation(mRS, Element.DataType.SIGNED_64, 2, 0xe4c3844f4a3f8937l, false);
+        Allocation inMaxValue = createRandomAllocation(mRS, Element.DataType.SIGNED_64, 2, 0xe4c38443db9c7b3dl, false);
+        enforceOrdering(inMinValue, inMaxValue);
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_64, 2), INPUTSIZE);
+            script.set_gAllocInMinValue(inMinValue);
+            script.set_gAllocInMaxValue(inMaxValue);
+            script.forEach_testClampLong2Long2Long2Long2(inValue, out);
+            verifyResultsClampLong2Long2Long2Long2(inValue, inMinValue, inMaxValue, out, false);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testClampLong2Long2Long2Long2: " + e.toString());
+        }
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_64, 2), INPUTSIZE);
+            scriptRelaxed.set_gAllocInMinValue(inMinValue);
+            scriptRelaxed.set_gAllocInMaxValue(inMaxValue);
+            scriptRelaxed.forEach_testClampLong2Long2Long2Long2(inValue, out);
+            verifyResultsClampLong2Long2Long2Long2(inValue, inMinValue, inMaxValue, out, true);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testClampLong2Long2Long2Long2: " + e.toString());
+        }
+    }
+
+    private void verifyResultsClampLong2Long2Long2Long2(Allocation inValue, Allocation inMinValue, Allocation inMaxValue, Allocation out, boolean relaxed) {
+        long[] arrayInValue = new long[INPUTSIZE * 2];
+        inValue.copyTo(arrayInValue);
+        long[] arrayInMinValue = new long[INPUTSIZE * 2];
+        inMinValue.copyTo(arrayInMinValue);
+        long[] arrayInMaxValue = new long[INPUTSIZE * 2];
+        inMaxValue.copyTo(arrayInMaxValue);
+        long[] arrayOut = new long[INPUTSIZE * 2];
+        out.copyTo(arrayOut);
+        for (int i = 0; i < INPUTSIZE; i++) {
+            for (int j = 0; j < 2 ; j++) {
+                // Extract the inputs.
+                ArgumentsLongLongLongLong args = new ArgumentsLongLongLongLong();
+                args.inValue = arrayInValue[i * 2 + j];
+                args.inMinValue = arrayInMinValue[i * 2 + j];
+                args.inMaxValue = arrayInMaxValue[i * 2 + j];
+                // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
+                CoreMathVerifier.computeClamp(args);
+                // Figure out what the outputs should have been.
+                boolean valid = true;
+                if (args.out != arrayOut[i * 2 + j]) {
+                    valid = false;
+                }
+                if (!valid) {
+                    StringBuilder message = new StringBuilder();
+                    message.append("Input inValue: ");
+                    message.append(String.format("%d", args.inValue));
+                    message.append("\n");
+                    message.append("Input inMinValue: ");
+                    message.append(String.format("%d", args.inMinValue));
+                    message.append("\n");
+                    message.append("Input inMaxValue: ");
+                    message.append(String.format("%d", args.inMaxValue));
+                    message.append("\n");
+                    message.append("Expected output out: ");
+                    message.append(String.format("%d", args.out));
+                    message.append("\n");
+                    message.append("Actual   output out: ");
+                    message.append(String.format("%d", arrayOut[i * 2 + j]));
+                    if (args.out != arrayOut[i * 2 + j]) {
+                        message.append(" FAIL");
+                    }
+                    message.append("\n");
+                    assertTrue("Incorrect output for checkClampLong2Long2Long2Long2" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                }
+            }
+        }
+    }
+
+    private void checkClampLong3Long3Long3Long3() {
+        Allocation inValue = createRandomAllocation(mRS, Element.DataType.SIGNED_64, 3, 0x2568063ab885ed75l, false);
+        Allocation inMinValue = createRandomAllocation(mRS, Element.DataType.SIGNED_64, 3, 0x7246acfc5d0b968fl, false);
+        Allocation inMaxValue = createRandomAllocation(mRS, Element.DataType.SIGNED_64, 3, 0x7246acf0ee688895l, false);
+        enforceOrdering(inMinValue, inMaxValue);
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_64, 3), INPUTSIZE);
+            script.set_gAllocInMinValue(inMinValue);
+            script.set_gAllocInMaxValue(inMaxValue);
+            script.forEach_testClampLong3Long3Long3Long3(inValue, out);
+            verifyResultsClampLong3Long3Long3Long3(inValue, inMinValue, inMaxValue, out, false);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testClampLong3Long3Long3Long3: " + e.toString());
+        }
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_64, 3), INPUTSIZE);
+            scriptRelaxed.set_gAllocInMinValue(inMinValue);
+            scriptRelaxed.set_gAllocInMaxValue(inMaxValue);
+            scriptRelaxed.forEach_testClampLong3Long3Long3Long3(inValue, out);
+            verifyResultsClampLong3Long3Long3Long3(inValue, inMinValue, inMaxValue, out, true);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testClampLong3Long3Long3Long3: " + e.toString());
+        }
+    }
+
+    private void verifyResultsClampLong3Long3Long3Long3(Allocation inValue, Allocation inMinValue, Allocation inMaxValue, Allocation out, boolean relaxed) {
+        long[] arrayInValue = new long[INPUTSIZE * 4];
+        inValue.copyTo(arrayInValue);
+        long[] arrayInMinValue = new long[INPUTSIZE * 4];
+        inMinValue.copyTo(arrayInMinValue);
+        long[] arrayInMaxValue = new long[INPUTSIZE * 4];
+        inMaxValue.copyTo(arrayInMaxValue);
+        long[] arrayOut = new long[INPUTSIZE * 4];
+        out.copyTo(arrayOut);
+        for (int i = 0; i < INPUTSIZE; i++) {
+            for (int j = 0; j < 3 ; j++) {
+                // Extract the inputs.
+                ArgumentsLongLongLongLong args = new ArgumentsLongLongLongLong();
+                args.inValue = arrayInValue[i * 4 + j];
+                args.inMinValue = arrayInMinValue[i * 4 + j];
+                args.inMaxValue = arrayInMaxValue[i * 4 + j];
+                // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
+                CoreMathVerifier.computeClamp(args);
+                // Figure out what the outputs should have been.
+                boolean valid = true;
+                if (args.out != arrayOut[i * 4 + j]) {
+                    valid = false;
+                }
+                if (!valid) {
+                    StringBuilder message = new StringBuilder();
+                    message.append("Input inValue: ");
+                    message.append(String.format("%d", args.inValue));
+                    message.append("\n");
+                    message.append("Input inMinValue: ");
+                    message.append(String.format("%d", args.inMinValue));
+                    message.append("\n");
+                    message.append("Input inMaxValue: ");
+                    message.append(String.format("%d", args.inMaxValue));
+                    message.append("\n");
+                    message.append("Expected output out: ");
+                    message.append(String.format("%d", args.out));
+                    message.append("\n");
+                    message.append("Actual   output out: ");
+                    message.append(String.format("%d", arrayOut[i * 4 + j]));
+                    if (args.out != arrayOut[i * 4 + j]) {
+                        message.append(" FAIL");
+                    }
+                    message.append("\n");
+                    assertTrue("Incorrect output for checkClampLong3Long3Long3Long3" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                }
+            }
+        }
+    }
+
+    private void checkClampLong4Long4Long4Long4() {
+        Allocation inValue = createRandomAllocation(mRS, Element.DataType.SIGNED_64, 4, 0x7e15240bae5ae9bdl, false);
+        Allocation inMinValue = createRandomAllocation(mRS, Element.DataType.SIGNED_64, 4, 0xffc9d5a96fd7a3e7l, false);
+        Allocation inMaxValue = createRandomAllocation(mRS, Element.DataType.SIGNED_64, 4, 0xffc9d59e013495edl, false);
+        enforceOrdering(inMinValue, inMaxValue);
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_64, 4), INPUTSIZE);
+            script.set_gAllocInMinValue(inMinValue);
+            script.set_gAllocInMaxValue(inMaxValue);
+            script.forEach_testClampLong4Long4Long4Long4(inValue, out);
+            verifyResultsClampLong4Long4Long4Long4(inValue, inMinValue, inMaxValue, out, false);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testClampLong4Long4Long4Long4: " + e.toString());
+        }
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_64, 4), INPUTSIZE);
+            scriptRelaxed.set_gAllocInMinValue(inMinValue);
+            scriptRelaxed.set_gAllocInMaxValue(inMaxValue);
+            scriptRelaxed.forEach_testClampLong4Long4Long4Long4(inValue, out);
+            verifyResultsClampLong4Long4Long4Long4(inValue, inMinValue, inMaxValue, out, true);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testClampLong4Long4Long4Long4: " + e.toString());
+        }
+    }
+
+    private void verifyResultsClampLong4Long4Long4Long4(Allocation inValue, Allocation inMinValue, Allocation inMaxValue, Allocation out, boolean relaxed) {
+        long[] arrayInValue = new long[INPUTSIZE * 4];
+        inValue.copyTo(arrayInValue);
+        long[] arrayInMinValue = new long[INPUTSIZE * 4];
+        inMinValue.copyTo(arrayInMinValue);
+        long[] arrayInMaxValue = new long[INPUTSIZE * 4];
+        inMaxValue.copyTo(arrayInMaxValue);
+        long[] arrayOut = new long[INPUTSIZE * 4];
+        out.copyTo(arrayOut);
+        for (int i = 0; i < INPUTSIZE; i++) {
+            for (int j = 0; j < 4 ; j++) {
+                // Extract the inputs.
+                ArgumentsLongLongLongLong args = new ArgumentsLongLongLongLong();
+                args.inValue = arrayInValue[i * 4 + j];
+                args.inMinValue = arrayInMinValue[i * 4 + j];
+                args.inMaxValue = arrayInMaxValue[i * 4 + j];
+                // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
+                CoreMathVerifier.computeClamp(args);
+                // Figure out what the outputs should have been.
+                boolean valid = true;
+                if (args.out != arrayOut[i * 4 + j]) {
+                    valid = false;
+                }
+                if (!valid) {
+                    StringBuilder message = new StringBuilder();
+                    message.append("Input inValue: ");
+                    message.append(String.format("%d", args.inValue));
+                    message.append("\n");
+                    message.append("Input inMinValue: ");
+                    message.append(String.format("%d", args.inMinValue));
+                    message.append("\n");
+                    message.append("Input inMaxValue: ");
+                    message.append(String.format("%d", args.inMaxValue));
+                    message.append("\n");
+                    message.append("Expected output out: ");
+                    message.append(String.format("%d", args.out));
+                    message.append("\n");
+                    message.append("Actual   output out: ");
+                    message.append(String.format("%d", arrayOut[i * 4 + j]));
+                    if (args.out != arrayOut[i * 4 + j]) {
+                        message.append(" FAIL");
+                    }
+                    message.append("\n");
+                    assertTrue("Incorrect output for checkClampLong4Long4Long4Long4" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                }
+            }
+        }
+    }
+
+    public class ArgumentsUlongUlongUlongUlong {
+        public long inValue;
+        public long inMinValue;
+        public long inMaxValue;
+        public long out;
+    }
+
+    private void checkClampUlongUlongUlongUlong() {
+        Allocation inValue = createRandomAllocation(mRS, Element.DataType.UNSIGNED_64, 1, 0x2b378139749bf4c5l, false);
+        Allocation inMinValue = createRandomAllocation(mRS, Element.DataType.UNSIGNED_64, 1, 0x75ac5050a8ca97fl, false);
+        Allocation inMaxValue = createRandomAllocation(mRS, Element.DataType.UNSIGNED_64, 1, 0x75ac4f99be99b85l, false);
+        enforceOrdering(inMinValue, inMaxValue);
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_64, 1), INPUTSIZE);
+            script.set_gAllocInMinValue(inMinValue);
+            script.set_gAllocInMaxValue(inMaxValue);
+            script.forEach_testClampUlongUlongUlongUlong(inValue, out);
+            verifyResultsClampUlongUlongUlongUlong(inValue, inMinValue, inMaxValue, out, false);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testClampUlongUlongUlongUlong: " + e.toString());
+        }
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_64, 1), INPUTSIZE);
+            scriptRelaxed.set_gAllocInMinValue(inMinValue);
+            scriptRelaxed.set_gAllocInMaxValue(inMaxValue);
+            scriptRelaxed.forEach_testClampUlongUlongUlongUlong(inValue, out);
+            verifyResultsClampUlongUlongUlongUlong(inValue, inMinValue, inMaxValue, out, true);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testClampUlongUlongUlongUlong: " + e.toString());
+        }
+    }
+
+    private void verifyResultsClampUlongUlongUlongUlong(Allocation inValue, Allocation inMinValue, Allocation inMaxValue, Allocation out, boolean relaxed) {
+        long[] arrayInValue = new long[INPUTSIZE * 1];
+        inValue.copyTo(arrayInValue);
+        long[] arrayInMinValue = new long[INPUTSIZE * 1];
+        inMinValue.copyTo(arrayInMinValue);
+        long[] arrayInMaxValue = new long[INPUTSIZE * 1];
+        inMaxValue.copyTo(arrayInMaxValue);
+        long[] arrayOut = new long[INPUTSIZE * 1];
+        out.copyTo(arrayOut);
+        for (int i = 0; i < INPUTSIZE; i++) {
+            for (int j = 0; j < 1 ; j++) {
+                // Extract the inputs.
+                ArgumentsUlongUlongUlongUlong args = new ArgumentsUlongUlongUlongUlong();
+                args.inValue = arrayInValue[i];
+                args.inMinValue = arrayInMinValue[i];
+                args.inMaxValue = arrayInMaxValue[i];
+                // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
+                CoreMathVerifier.computeClamp(args);
+                // Figure out what the outputs should have been.
+                boolean valid = true;
+                if (args.out != arrayOut[i * 1 + j]) {
+                    valid = false;
+                }
+                if (!valid) {
+                    StringBuilder message = new StringBuilder();
+                    message.append("Input inValue: ");
+                    message.append(String.format("0x%x", args.inValue));
+                    message.append("\n");
+                    message.append("Input inMinValue: ");
+                    message.append(String.format("0x%x", args.inMinValue));
+                    message.append("\n");
+                    message.append("Input inMaxValue: ");
+                    message.append(String.format("0x%x", args.inMaxValue));
+                    message.append("\n");
+                    message.append("Expected output out: ");
+                    message.append(String.format("0x%x", args.out));
+                    message.append("\n");
+                    message.append("Actual   output out: ");
+                    message.append(String.format("0x%x", arrayOut[i * 1 + j]));
+                    if (args.out != arrayOut[i * 1 + j]) {
+                        message.append(" FAIL");
+                    }
+                    message.append("\n");
+                    assertTrue("Incorrect output for checkClampUlongUlongUlongUlong" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                }
+            }
+        }
+    }
+
+    private void checkClampUlong2Ulong2Ulong2Ulong2() {
+        Allocation inValue = createRandomAllocation(mRS, Element.DataType.UNSIGNED_64, 2, 0xa8c7fb17a09bb299l, false);
+        Allocation inMinValue = createRandomAllocation(mRS, Element.DataType.UNSIGNED_64, 2, 0x14e3c8dffe45623bl, false);
+        Allocation inMaxValue = createRandomAllocation(mRS, Element.DataType.UNSIGNED_64, 2, 0x14e3c8d48fa25441l, false);
+        enforceOrdering(inMinValue, inMaxValue);
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_64, 2), INPUTSIZE);
+            script.set_gAllocInMinValue(inMinValue);
+            script.set_gAllocInMaxValue(inMaxValue);
+            script.forEach_testClampUlong2Ulong2Ulong2Ulong2(inValue, out);
+            verifyResultsClampUlong2Ulong2Ulong2Ulong2(inValue, inMinValue, inMaxValue, out, false);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testClampUlong2Ulong2Ulong2Ulong2: " + e.toString());
+        }
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_64, 2), INPUTSIZE);
+            scriptRelaxed.set_gAllocInMinValue(inMinValue);
+            scriptRelaxed.set_gAllocInMaxValue(inMaxValue);
+            scriptRelaxed.forEach_testClampUlong2Ulong2Ulong2Ulong2(inValue, out);
+            verifyResultsClampUlong2Ulong2Ulong2Ulong2(inValue, inMinValue, inMaxValue, out, true);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testClampUlong2Ulong2Ulong2Ulong2: " + e.toString());
+        }
+    }
+
+    private void verifyResultsClampUlong2Ulong2Ulong2Ulong2(Allocation inValue, Allocation inMinValue, Allocation inMaxValue, Allocation out, boolean relaxed) {
+        long[] arrayInValue = new long[INPUTSIZE * 2];
+        inValue.copyTo(arrayInValue);
+        long[] arrayInMinValue = new long[INPUTSIZE * 2];
+        inMinValue.copyTo(arrayInMinValue);
+        long[] arrayInMaxValue = new long[INPUTSIZE * 2];
+        inMaxValue.copyTo(arrayInMaxValue);
+        long[] arrayOut = new long[INPUTSIZE * 2];
+        out.copyTo(arrayOut);
+        for (int i = 0; i < INPUTSIZE; i++) {
+            for (int j = 0; j < 2 ; j++) {
+                // Extract the inputs.
+                ArgumentsUlongUlongUlongUlong args = new ArgumentsUlongUlongUlongUlong();
+                args.inValue = arrayInValue[i * 2 + j];
+                args.inMinValue = arrayInMinValue[i * 2 + j];
+                args.inMaxValue = arrayInMaxValue[i * 2 + j];
+                // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
+                CoreMathVerifier.computeClamp(args);
+                // Figure out what the outputs should have been.
+                boolean valid = true;
+                if (args.out != arrayOut[i * 2 + j]) {
+                    valid = false;
+                }
+                if (!valid) {
+                    StringBuilder message = new StringBuilder();
+                    message.append("Input inValue: ");
+                    message.append(String.format("0x%x", args.inValue));
+                    message.append("\n");
+                    message.append("Input inMinValue: ");
+                    message.append(String.format("0x%x", args.inMinValue));
+                    message.append("\n");
+                    message.append("Input inMaxValue: ");
+                    message.append(String.format("0x%x", args.inMaxValue));
+                    message.append("\n");
+                    message.append("Expected output out: ");
+                    message.append(String.format("0x%x", args.out));
+                    message.append("\n");
+                    message.append("Actual   output out: ");
+                    message.append(String.format("0x%x", arrayOut[i * 2 + j]));
+                    if (args.out != arrayOut[i * 2 + j]) {
+                        message.append(" FAIL");
+                    }
+                    message.append("\n");
+                    assertTrue("Incorrect output for checkClampUlong2Ulong2Ulong2Ulong2" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                }
+            }
+        }
+    }
+
+    private void checkClampUlong3Ulong3Ulong3Ulong3() {
+        Allocation inValue = createRandomAllocation(mRS, Element.DataType.UNSIGNED_64, 3, 0x722c3c9fbd1e1f75l, false);
+        Allocation inMinValue = createRandomAllocation(mRS, Element.DataType.UNSIGNED_64, 3, 0x20d03c8e4cfc4c8fl, false);
+        Allocation inMaxValue = createRandomAllocation(mRS, Element.DataType.UNSIGNED_64, 3, 0x20d03c82de593e95l, false);
+        enforceOrdering(inMinValue, inMaxValue);
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_64, 3), INPUTSIZE);
+            script.set_gAllocInMinValue(inMinValue);
+            script.set_gAllocInMaxValue(inMaxValue);
+            script.forEach_testClampUlong3Ulong3Ulong3Ulong3(inValue, out);
+            verifyResultsClampUlong3Ulong3Ulong3Ulong3(inValue, inMinValue, inMaxValue, out, false);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testClampUlong3Ulong3Ulong3Ulong3: " + e.toString());
+        }
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_64, 3), INPUTSIZE);
+            scriptRelaxed.set_gAllocInMinValue(inMinValue);
+            scriptRelaxed.set_gAllocInMaxValue(inMaxValue);
+            scriptRelaxed.forEach_testClampUlong3Ulong3Ulong3Ulong3(inValue, out);
+            verifyResultsClampUlong3Ulong3Ulong3Ulong3(inValue, inMinValue, inMaxValue, out, true);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testClampUlong3Ulong3Ulong3Ulong3: " + e.toString());
+        }
+    }
+
+    private void verifyResultsClampUlong3Ulong3Ulong3Ulong3(Allocation inValue, Allocation inMinValue, Allocation inMaxValue, Allocation out, boolean relaxed) {
+        long[] arrayInValue = new long[INPUTSIZE * 4];
+        inValue.copyTo(arrayInValue);
+        long[] arrayInMinValue = new long[INPUTSIZE * 4];
+        inMinValue.copyTo(arrayInMinValue);
+        long[] arrayInMaxValue = new long[INPUTSIZE * 4];
+        inMaxValue.copyTo(arrayInMaxValue);
+        long[] arrayOut = new long[INPUTSIZE * 4];
+        out.copyTo(arrayOut);
+        for (int i = 0; i < INPUTSIZE; i++) {
+            for (int j = 0; j < 3 ; j++) {
+                // Extract the inputs.
+                ArgumentsUlongUlongUlongUlong args = new ArgumentsUlongUlongUlongUlong();
+                args.inValue = arrayInValue[i * 4 + j];
+                args.inMinValue = arrayInMinValue[i * 4 + j];
+                args.inMaxValue = arrayInMaxValue[i * 4 + j];
+                // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
+                CoreMathVerifier.computeClamp(args);
+                // Figure out what the outputs should have been.
+                boolean valid = true;
+                if (args.out != arrayOut[i * 4 + j]) {
+                    valid = false;
+                }
+                if (!valid) {
+                    StringBuilder message = new StringBuilder();
+                    message.append("Input inValue: ");
+                    message.append(String.format("0x%x", args.inValue));
+                    message.append("\n");
+                    message.append("Input inMinValue: ");
+                    message.append(String.format("0x%x", args.inMinValue));
+                    message.append("\n");
+                    message.append("Input inMaxValue: ");
+                    message.append(String.format("0x%x", args.inMaxValue));
+                    message.append("\n");
+                    message.append("Expected output out: ");
+                    message.append(String.format("0x%x", args.out));
+                    message.append("\n");
+                    message.append("Actual   output out: ");
+                    message.append(String.format("0x%x", arrayOut[i * 4 + j]));
+                    if (args.out != arrayOut[i * 4 + j]) {
+                        message.append(" FAIL");
+                    }
+                    message.append("\n");
+                    assertTrue("Incorrect output for checkClampUlong3Ulong3Ulong3Ulong3" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                }
+            }
+        }
+    }
+
+    private void checkClampUlong4Ulong4Ulong4Ulong4() {
+        Allocation inValue = createRandomAllocation(mRS, Element.DataType.UNSIGNED_64, 4, 0x3b907e27d9a08c51l, false);
+        Allocation inMinValue = createRandomAllocation(mRS, Element.DataType.UNSIGNED_64, 4, 0x2cbcb03c9bb336e3l, false);
+        Allocation inMaxValue = createRandomAllocation(mRS, Element.DataType.UNSIGNED_64, 4, 0x2cbcb0312d1028e9l, false);
+        enforceOrdering(inMinValue, inMaxValue);
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_64, 4), INPUTSIZE);
+            script.set_gAllocInMinValue(inMinValue);
+            script.set_gAllocInMaxValue(inMaxValue);
+            script.forEach_testClampUlong4Ulong4Ulong4Ulong4(inValue, out);
+            verifyResultsClampUlong4Ulong4Ulong4Ulong4(inValue, inMinValue, inMaxValue, out, false);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testClampUlong4Ulong4Ulong4Ulong4: " + e.toString());
+        }
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_64, 4), INPUTSIZE);
+            scriptRelaxed.set_gAllocInMinValue(inMinValue);
+            scriptRelaxed.set_gAllocInMaxValue(inMaxValue);
+            scriptRelaxed.forEach_testClampUlong4Ulong4Ulong4Ulong4(inValue, out);
+            verifyResultsClampUlong4Ulong4Ulong4Ulong4(inValue, inMinValue, inMaxValue, out, true);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testClampUlong4Ulong4Ulong4Ulong4: " + e.toString());
+        }
+    }
+
+    private void verifyResultsClampUlong4Ulong4Ulong4Ulong4(Allocation inValue, Allocation inMinValue, Allocation inMaxValue, Allocation out, boolean relaxed) {
+        long[] arrayInValue = new long[INPUTSIZE * 4];
+        inValue.copyTo(arrayInValue);
+        long[] arrayInMinValue = new long[INPUTSIZE * 4];
+        inMinValue.copyTo(arrayInMinValue);
+        long[] arrayInMaxValue = new long[INPUTSIZE * 4];
+        inMaxValue.copyTo(arrayInMaxValue);
+        long[] arrayOut = new long[INPUTSIZE * 4];
+        out.copyTo(arrayOut);
+        for (int i = 0; i < INPUTSIZE; i++) {
+            for (int j = 0; j < 4 ; j++) {
+                // Extract the inputs.
+                ArgumentsUlongUlongUlongUlong args = new ArgumentsUlongUlongUlongUlong();
+                args.inValue = arrayInValue[i * 4 + j];
+                args.inMinValue = arrayInMinValue[i * 4 + j];
+                args.inMaxValue = arrayInMaxValue[i * 4 + j];
+                // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
+                CoreMathVerifier.computeClamp(args);
+                // Figure out what the outputs should have been.
+                boolean valid = true;
+                if (args.out != arrayOut[i * 4 + j]) {
+                    valid = false;
+                }
+                if (!valid) {
+                    StringBuilder message = new StringBuilder();
+                    message.append("Input inValue: ");
+                    message.append(String.format("0x%x", args.inValue));
+                    message.append("\n");
+                    message.append("Input inMinValue: ");
+                    message.append(String.format("0x%x", args.inMinValue));
+                    message.append("\n");
+                    message.append("Input inMaxValue: ");
+                    message.append(String.format("0x%x", args.inMaxValue));
+                    message.append("\n");
+                    message.append("Expected output out: ");
+                    message.append(String.format("0x%x", args.out));
+                    message.append("\n");
+                    message.append("Actual   output out: ");
+                    message.append(String.format("0x%x", arrayOut[i * 4 + j]));
+                    if (args.out != arrayOut[i * 4 + j]) {
+                        message.append(" FAIL");
+                    }
+                    message.append("\n");
+                    assertTrue("Incorrect output for checkClampUlong4Ulong4Ulong4Ulong4" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                }
+            }
+        }
+    }
+
     private void checkClampChar2CharCharChar2() {
         Allocation inValue = createRandomAllocation(mRS, Element.DataType.SIGNED_8, 2, 0xd6884bbb7c57a5d1l, false);
         Allocation inMinValue = createRandomAllocation(mRS, Element.DataType.SIGNED_8, 1, 0x3bf8830cc3b7db63l, false);
@@ -3835,6 +4457,462 @@ public class TestClamp extends RSBaseCompute {
         }
     }
 
+    private void checkClampLong2LongLongLong2() {
+        Allocation inValue = createRandomAllocation(mRS, Element.DataType.SIGNED_64, 2, 0x19353a9f7c535bb5l, false);
+        Allocation inMinValue = createRandomAllocation(mRS, Element.DataType.SIGNED_64, 1, 0xee8dc7f38f83654fl, false);
+        Allocation inMaxValue = createRandomAllocation(mRS, Element.DataType.SIGNED_64, 1, 0xee8dc7e820e05755l, false);
+        enforceOrdering(inMinValue, inMaxValue);
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_64, 2), INPUTSIZE);
+            script.set_gAllocInMinValue(inMinValue);
+            script.set_gAllocInMaxValue(inMaxValue);
+            script.forEach_testClampLong2LongLongLong2(inValue, out);
+            verifyResultsClampLong2LongLongLong2(inValue, inMinValue, inMaxValue, out, false);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testClampLong2LongLongLong2: " + e.toString());
+        }
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_64, 2), INPUTSIZE);
+            scriptRelaxed.set_gAllocInMinValue(inMinValue);
+            scriptRelaxed.set_gAllocInMaxValue(inMaxValue);
+            scriptRelaxed.forEach_testClampLong2LongLongLong2(inValue, out);
+            verifyResultsClampLong2LongLongLong2(inValue, inMinValue, inMaxValue, out, true);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testClampLong2LongLongLong2: " + e.toString());
+        }
+    }
+
+    private void verifyResultsClampLong2LongLongLong2(Allocation inValue, Allocation inMinValue, Allocation inMaxValue, Allocation out, boolean relaxed) {
+        long[] arrayInValue = new long[INPUTSIZE * 2];
+        inValue.copyTo(arrayInValue);
+        long[] arrayInMinValue = new long[INPUTSIZE * 1];
+        inMinValue.copyTo(arrayInMinValue);
+        long[] arrayInMaxValue = new long[INPUTSIZE * 1];
+        inMaxValue.copyTo(arrayInMaxValue);
+        long[] arrayOut = new long[INPUTSIZE * 2];
+        out.copyTo(arrayOut);
+        for (int i = 0; i < INPUTSIZE; i++) {
+            for (int j = 0; j < 2 ; j++) {
+                // Extract the inputs.
+                ArgumentsLongLongLongLong args = new ArgumentsLongLongLongLong();
+                args.inValue = arrayInValue[i * 2 + j];
+                args.inMinValue = arrayInMinValue[i];
+                args.inMaxValue = arrayInMaxValue[i];
+                // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
+                CoreMathVerifier.computeClamp(args);
+                // Figure out what the outputs should have been.
+                boolean valid = true;
+                if (args.out != arrayOut[i * 2 + j]) {
+                    valid = false;
+                }
+                if (!valid) {
+                    StringBuilder message = new StringBuilder();
+                    message.append("Input inValue: ");
+                    message.append(String.format("%d", args.inValue));
+                    message.append("\n");
+                    message.append("Input inMinValue: ");
+                    message.append(String.format("%d", args.inMinValue));
+                    message.append("\n");
+                    message.append("Input inMaxValue: ");
+                    message.append(String.format("%d", args.inMaxValue));
+                    message.append("\n");
+                    message.append("Expected output out: ");
+                    message.append(String.format("%d", args.out));
+                    message.append("\n");
+                    message.append("Actual   output out: ");
+                    message.append(String.format("%d", arrayOut[i * 2 + j]));
+                    if (args.out != arrayOut[i * 2 + j]) {
+                        message.append(" FAIL");
+                    }
+                    message.append("\n");
+                    assertTrue("Incorrect output for checkClampLong2LongLongLong2" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                }
+            }
+        }
+    }
+
+    private void checkClampLong3LongLongLong3() {
+        Allocation inValue = createRandomAllocation(mRS, Element.DataType.SIGNED_64, 3, 0x8d537aff659e24c9l, false);
+        Allocation inMinValue = createRandomAllocation(mRS, Element.DataType.SIGNED_64, 1, 0x3de0e38714f313cbl, false);
+        Allocation inMaxValue = createRandomAllocation(mRS, Element.DataType.SIGNED_64, 1, 0x3de0e37ba65005d1l, false);
+        enforceOrdering(inMinValue, inMaxValue);
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_64, 3), INPUTSIZE);
+            script.set_gAllocInMinValue(inMinValue);
+            script.set_gAllocInMaxValue(inMaxValue);
+            script.forEach_testClampLong3LongLongLong3(inValue, out);
+            verifyResultsClampLong3LongLongLong3(inValue, inMinValue, inMaxValue, out, false);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testClampLong3LongLongLong3: " + e.toString());
+        }
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_64, 3), INPUTSIZE);
+            scriptRelaxed.set_gAllocInMinValue(inMinValue);
+            scriptRelaxed.set_gAllocInMaxValue(inMaxValue);
+            scriptRelaxed.forEach_testClampLong3LongLongLong3(inValue, out);
+            verifyResultsClampLong3LongLongLong3(inValue, inMinValue, inMaxValue, out, true);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testClampLong3LongLongLong3: " + e.toString());
+        }
+    }
+
+    private void verifyResultsClampLong3LongLongLong3(Allocation inValue, Allocation inMinValue, Allocation inMaxValue, Allocation out, boolean relaxed) {
+        long[] arrayInValue = new long[INPUTSIZE * 4];
+        inValue.copyTo(arrayInValue);
+        long[] arrayInMinValue = new long[INPUTSIZE * 1];
+        inMinValue.copyTo(arrayInMinValue);
+        long[] arrayInMaxValue = new long[INPUTSIZE * 1];
+        inMaxValue.copyTo(arrayInMaxValue);
+        long[] arrayOut = new long[INPUTSIZE * 4];
+        out.copyTo(arrayOut);
+        for (int i = 0; i < INPUTSIZE; i++) {
+            for (int j = 0; j < 3 ; j++) {
+                // Extract the inputs.
+                ArgumentsLongLongLongLong args = new ArgumentsLongLongLongLong();
+                args.inValue = arrayInValue[i * 4 + j];
+                args.inMinValue = arrayInMinValue[i];
+                args.inMaxValue = arrayInMaxValue[i];
+                // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
+                CoreMathVerifier.computeClamp(args);
+                // Figure out what the outputs should have been.
+                boolean valid = true;
+                if (args.out != arrayOut[i * 4 + j]) {
+                    valid = false;
+                }
+                if (!valid) {
+                    StringBuilder message = new StringBuilder();
+                    message.append("Input inValue: ");
+                    message.append(String.format("%d", args.inValue));
+                    message.append("\n");
+                    message.append("Input inMinValue: ");
+                    message.append(String.format("%d", args.inMinValue));
+                    message.append("\n");
+                    message.append("Input inMaxValue: ");
+                    message.append(String.format("%d", args.inMaxValue));
+                    message.append("\n");
+                    message.append("Expected output out: ");
+                    message.append(String.format("%d", args.out));
+                    message.append("\n");
+                    message.append("Actual   output out: ");
+                    message.append(String.format("%d", arrayOut[i * 4 + j]));
+                    if (args.out != arrayOut[i * 4 + j]) {
+                        message.append(" FAIL");
+                    }
+                    message.append("\n");
+                    assertTrue("Incorrect output for checkClampLong3LongLongLong3" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                }
+            }
+        }
+    }
+
+    private void checkClampLong4LongLongLong4() {
+        Allocation inValue = createRandomAllocation(mRS, Element.DataType.SIGNED_64, 4, 0x171bb5f4ee8edddl, false);
+        Allocation inMinValue = createRandomAllocation(mRS, Element.DataType.SIGNED_64, 1, 0x8d33ff1a9a62c247l, false);
+        Allocation inMaxValue = createRandomAllocation(mRS, Element.DataType.SIGNED_64, 1, 0x8d33ff0f2bbfb44dl, false);
+        enforceOrdering(inMinValue, inMaxValue);
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_64, 4), INPUTSIZE);
+            script.set_gAllocInMinValue(inMinValue);
+            script.set_gAllocInMaxValue(inMaxValue);
+            script.forEach_testClampLong4LongLongLong4(inValue, out);
+            verifyResultsClampLong4LongLongLong4(inValue, inMinValue, inMaxValue, out, false);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testClampLong4LongLongLong4: " + e.toString());
+        }
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_64, 4), INPUTSIZE);
+            scriptRelaxed.set_gAllocInMinValue(inMinValue);
+            scriptRelaxed.set_gAllocInMaxValue(inMaxValue);
+            scriptRelaxed.forEach_testClampLong4LongLongLong4(inValue, out);
+            verifyResultsClampLong4LongLongLong4(inValue, inMinValue, inMaxValue, out, true);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testClampLong4LongLongLong4: " + e.toString());
+        }
+    }
+
+    private void verifyResultsClampLong4LongLongLong4(Allocation inValue, Allocation inMinValue, Allocation inMaxValue, Allocation out, boolean relaxed) {
+        long[] arrayInValue = new long[INPUTSIZE * 4];
+        inValue.copyTo(arrayInValue);
+        long[] arrayInMinValue = new long[INPUTSIZE * 1];
+        inMinValue.copyTo(arrayInMinValue);
+        long[] arrayInMaxValue = new long[INPUTSIZE * 1];
+        inMaxValue.copyTo(arrayInMaxValue);
+        long[] arrayOut = new long[INPUTSIZE * 4];
+        out.copyTo(arrayOut);
+        for (int i = 0; i < INPUTSIZE; i++) {
+            for (int j = 0; j < 4 ; j++) {
+                // Extract the inputs.
+                ArgumentsLongLongLongLong args = new ArgumentsLongLongLongLong();
+                args.inValue = arrayInValue[i * 4 + j];
+                args.inMinValue = arrayInMinValue[i];
+                args.inMaxValue = arrayInMaxValue[i];
+                // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
+                CoreMathVerifier.computeClamp(args);
+                // Figure out what the outputs should have been.
+                boolean valid = true;
+                if (args.out != arrayOut[i * 4 + j]) {
+                    valid = false;
+                }
+                if (!valid) {
+                    StringBuilder message = new StringBuilder();
+                    message.append("Input inValue: ");
+                    message.append(String.format("%d", args.inValue));
+                    message.append("\n");
+                    message.append("Input inMinValue: ");
+                    message.append(String.format("%d", args.inMinValue));
+                    message.append("\n");
+                    message.append("Input inMaxValue: ");
+                    message.append(String.format("%d", args.inMaxValue));
+                    message.append("\n");
+                    message.append("Expected output out: ");
+                    message.append(String.format("%d", args.out));
+                    message.append("\n");
+                    message.append("Actual   output out: ");
+                    message.append(String.format("%d", arrayOut[i * 4 + j]));
+                    if (args.out != arrayOut[i * 4 + j]) {
+                        message.append(" FAIL");
+                    }
+                    message.append("\n");
+                    assertTrue("Incorrect output for checkClampLong4LongLongLong4" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                }
+            }
+        }
+    }
+
+    private void checkClampUlong2UlongUlongUlong2() {
+        Allocation inValue = createRandomAllocation(mRS, Element.DataType.UNSIGNED_64, 2, 0xf275dabaa7fa1bf7l, false);
+        Allocation inMinValue = createRandomAllocation(mRS, Element.DataType.UNSIGNED_64, 1, 0xf08a9e698d13b735l, false);
+        Allocation inMaxValue = createRandomAllocation(mRS, Element.DataType.UNSIGNED_64, 1, 0xf08a9e5e1e70a93bl, false);
+        enforceOrdering(inMinValue, inMaxValue);
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_64, 2), INPUTSIZE);
+            script.set_gAllocInMinValue(inMinValue);
+            script.set_gAllocInMaxValue(inMaxValue);
+            script.forEach_testClampUlong2UlongUlongUlong2(inValue, out);
+            verifyResultsClampUlong2UlongUlongUlong2(inValue, inMinValue, inMaxValue, out, false);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testClampUlong2UlongUlongUlong2: " + e.toString());
+        }
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_64, 2), INPUTSIZE);
+            scriptRelaxed.set_gAllocInMinValue(inMinValue);
+            scriptRelaxed.set_gAllocInMaxValue(inMaxValue);
+            scriptRelaxed.forEach_testClampUlong2UlongUlongUlong2(inValue, out);
+            verifyResultsClampUlong2UlongUlongUlong2(inValue, inMinValue, inMaxValue, out, true);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testClampUlong2UlongUlongUlong2: " + e.toString());
+        }
+    }
+
+    private void verifyResultsClampUlong2UlongUlongUlong2(Allocation inValue, Allocation inMinValue, Allocation inMaxValue, Allocation out, boolean relaxed) {
+        long[] arrayInValue = new long[INPUTSIZE * 2];
+        inValue.copyTo(arrayInValue);
+        long[] arrayInMinValue = new long[INPUTSIZE * 1];
+        inMinValue.copyTo(arrayInMinValue);
+        long[] arrayInMaxValue = new long[INPUTSIZE * 1];
+        inMaxValue.copyTo(arrayInMaxValue);
+        long[] arrayOut = new long[INPUTSIZE * 2];
+        out.copyTo(arrayOut);
+        for (int i = 0; i < INPUTSIZE; i++) {
+            for (int j = 0; j < 2 ; j++) {
+                // Extract the inputs.
+                ArgumentsUlongUlongUlongUlong args = new ArgumentsUlongUlongUlongUlong();
+                args.inValue = arrayInValue[i * 2 + j];
+                args.inMinValue = arrayInMinValue[i];
+                args.inMaxValue = arrayInMaxValue[i];
+                // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
+                CoreMathVerifier.computeClamp(args);
+                // Figure out what the outputs should have been.
+                boolean valid = true;
+                if (args.out != arrayOut[i * 2 + j]) {
+                    valid = false;
+                }
+                if (!valid) {
+                    StringBuilder message = new StringBuilder();
+                    message.append("Input inValue: ");
+                    message.append(String.format("0x%x", args.inValue));
+                    message.append("\n");
+                    message.append("Input inMinValue: ");
+                    message.append(String.format("0x%x", args.inMinValue));
+                    message.append("\n");
+                    message.append("Input inMaxValue: ");
+                    message.append(String.format("0x%x", args.inMaxValue));
+                    message.append("\n");
+                    message.append("Expected output out: ");
+                    message.append(String.format("0x%x", args.out));
+                    message.append("\n");
+                    message.append("Actual   output out: ");
+                    message.append(String.format("0x%x", arrayOut[i * 2 + j]));
+                    if (args.out != arrayOut[i * 2 + j]) {
+                        message.append(" FAIL");
+                    }
+                    message.append("\n");
+                    assertTrue("Incorrect output for checkClampUlong2UlongUlongUlong2" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                }
+            }
+        }
+    }
+
+    private void checkClampUlong3UlongUlongUlong3() {
+        Allocation inValue = createRandomAllocation(mRS, Element.DataType.UNSIGNED_64, 3, 0x417c2f0620b6497dl, false);
+        Allocation inMinValue = createRandomAllocation(mRS, Element.DataType.UNSIGNED_64, 1, 0xfb4069f3c0421f27l, false);
+        Allocation inMaxValue = createRandomAllocation(mRS, Element.DataType.UNSIGNED_64, 1, 0xfb4069e8519f112dl, false);
+        enforceOrdering(inMinValue, inMaxValue);
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_64, 3), INPUTSIZE);
+            script.set_gAllocInMinValue(inMinValue);
+            script.set_gAllocInMaxValue(inMaxValue);
+            script.forEach_testClampUlong3UlongUlongUlong3(inValue, out);
+            verifyResultsClampUlong3UlongUlongUlong3(inValue, inMinValue, inMaxValue, out, false);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testClampUlong3UlongUlongUlong3: " + e.toString());
+        }
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_64, 3), INPUTSIZE);
+            scriptRelaxed.set_gAllocInMinValue(inMinValue);
+            scriptRelaxed.set_gAllocInMaxValue(inMaxValue);
+            scriptRelaxed.forEach_testClampUlong3UlongUlongUlong3(inValue, out);
+            verifyResultsClampUlong3UlongUlongUlong3(inValue, inMinValue, inMaxValue, out, true);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testClampUlong3UlongUlongUlong3: " + e.toString());
+        }
+    }
+
+    private void verifyResultsClampUlong3UlongUlongUlong3(Allocation inValue, Allocation inMinValue, Allocation inMaxValue, Allocation out, boolean relaxed) {
+        long[] arrayInValue = new long[INPUTSIZE * 4];
+        inValue.copyTo(arrayInValue);
+        long[] arrayInMinValue = new long[INPUTSIZE * 1];
+        inMinValue.copyTo(arrayInMinValue);
+        long[] arrayInMaxValue = new long[INPUTSIZE * 1];
+        inMaxValue.copyTo(arrayInMaxValue);
+        long[] arrayOut = new long[INPUTSIZE * 4];
+        out.copyTo(arrayOut);
+        for (int i = 0; i < INPUTSIZE; i++) {
+            for (int j = 0; j < 3 ; j++) {
+                // Extract the inputs.
+                ArgumentsUlongUlongUlongUlong args = new ArgumentsUlongUlongUlongUlong();
+                args.inValue = arrayInValue[i * 4 + j];
+                args.inMinValue = arrayInMinValue[i];
+                args.inMaxValue = arrayInMaxValue[i];
+                // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
+                CoreMathVerifier.computeClamp(args);
+                // Figure out what the outputs should have been.
+                boolean valid = true;
+                if (args.out != arrayOut[i * 4 + j]) {
+                    valid = false;
+                }
+                if (!valid) {
+                    StringBuilder message = new StringBuilder();
+                    message.append("Input inValue: ");
+                    message.append(String.format("0x%x", args.inValue));
+                    message.append("\n");
+                    message.append("Input inMinValue: ");
+                    message.append(String.format("0x%x", args.inMinValue));
+                    message.append("\n");
+                    message.append("Input inMaxValue: ");
+                    message.append(String.format("0x%x", args.inMaxValue));
+                    message.append("\n");
+                    message.append("Expected output out: ");
+                    message.append(String.format("0x%x", args.out));
+                    message.append("\n");
+                    message.append("Actual   output out: ");
+                    message.append(String.format("0x%x", arrayOut[i * 4 + j]));
+                    if (args.out != arrayOut[i * 4 + j]) {
+                        message.append(" FAIL");
+                    }
+                    message.append("\n");
+                    assertTrue("Incorrect output for checkClampUlong3UlongUlongUlong3" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                }
+            }
+        }
+    }
+
+    private void checkClampUlong4UlongUlongUlong4() {
+        Allocation inValue = createRandomAllocation(mRS, Element.DataType.UNSIGNED_64, 4, 0x9082835199727703l, false);
+        Allocation inMinValue = createRandomAllocation(mRS, Element.DataType.UNSIGNED_64, 1, 0x5f6357df3708719l, false);
+        Allocation inMaxValue = createRandomAllocation(mRS, Element.DataType.UNSIGNED_64, 1, 0x5f6357284cd791fl, false);
+        enforceOrdering(inMinValue, inMaxValue);
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_64, 4), INPUTSIZE);
+            script.set_gAllocInMinValue(inMinValue);
+            script.set_gAllocInMaxValue(inMaxValue);
+            script.forEach_testClampUlong4UlongUlongUlong4(inValue, out);
+            verifyResultsClampUlong4UlongUlongUlong4(inValue, inMinValue, inMaxValue, out, false);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testClampUlong4UlongUlongUlong4: " + e.toString());
+        }
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_64, 4), INPUTSIZE);
+            scriptRelaxed.set_gAllocInMinValue(inMinValue);
+            scriptRelaxed.set_gAllocInMaxValue(inMaxValue);
+            scriptRelaxed.forEach_testClampUlong4UlongUlongUlong4(inValue, out);
+            verifyResultsClampUlong4UlongUlongUlong4(inValue, inMinValue, inMaxValue, out, true);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testClampUlong4UlongUlongUlong4: " + e.toString());
+        }
+    }
+
+    private void verifyResultsClampUlong4UlongUlongUlong4(Allocation inValue, Allocation inMinValue, Allocation inMaxValue, Allocation out, boolean relaxed) {
+        long[] arrayInValue = new long[INPUTSIZE * 4];
+        inValue.copyTo(arrayInValue);
+        long[] arrayInMinValue = new long[INPUTSIZE * 1];
+        inMinValue.copyTo(arrayInMinValue);
+        long[] arrayInMaxValue = new long[INPUTSIZE * 1];
+        inMaxValue.copyTo(arrayInMaxValue);
+        long[] arrayOut = new long[INPUTSIZE * 4];
+        out.copyTo(arrayOut);
+        for (int i = 0; i < INPUTSIZE; i++) {
+            for (int j = 0; j < 4 ; j++) {
+                // Extract the inputs.
+                ArgumentsUlongUlongUlongUlong args = new ArgumentsUlongUlongUlongUlong();
+                args.inValue = arrayInValue[i * 4 + j];
+                args.inMinValue = arrayInMinValue[i];
+                args.inMaxValue = arrayInMaxValue[i];
+                // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
+                CoreMathVerifier.computeClamp(args);
+                // Figure out what the outputs should have been.
+                boolean valid = true;
+                if (args.out != arrayOut[i * 4 + j]) {
+                    valid = false;
+                }
+                if (!valid) {
+                    StringBuilder message = new StringBuilder();
+                    message.append("Input inValue: ");
+                    message.append(String.format("0x%x", args.inValue));
+                    message.append("\n");
+                    message.append("Input inMinValue: ");
+                    message.append(String.format("0x%x", args.inMinValue));
+                    message.append("\n");
+                    message.append("Input inMaxValue: ");
+                    message.append(String.format("0x%x", args.inMaxValue));
+                    message.append("\n");
+                    message.append("Expected output out: ");
+                    message.append(String.format("0x%x", args.out));
+                    message.append("\n");
+                    message.append("Actual   output out: ");
+                    message.append(String.format("0x%x", arrayOut[i * 4 + j]));
+                    if (args.out != arrayOut[i * 4 + j]) {
+                        message.append(" FAIL");
+                    }
+                    message.append("\n");
+                    assertTrue("Incorrect output for checkClampUlong4UlongUlongUlong4" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                }
+            }
+        }
+    }
+
     public void testClamp() {
         checkClampFloatFloatFloatFloat();
         checkClampFloat2Float2Float2Float2();
@@ -3867,6 +4945,14 @@ public class TestClamp extends RSBaseCompute {
         checkClampUint2Uint2Uint2Uint2();
         checkClampUint3Uint3Uint3Uint3();
         checkClampUint4Uint4Uint4Uint4();
+        checkClampLongLongLongLong();
+        checkClampLong2Long2Long2Long2();
+        checkClampLong3Long3Long3Long3();
+        checkClampLong4Long4Long4Long4();
+        checkClampUlongUlongUlongUlong();
+        checkClampUlong2Ulong2Ulong2Ulong2();
+        checkClampUlong3Ulong3Ulong3Ulong3();
+        checkClampUlong4Ulong4Ulong4Ulong4();
         checkClampChar2CharCharChar2();
         checkClampChar3CharCharChar3();
         checkClampChar4CharCharChar4();
@@ -3885,5 +4971,11 @@ public class TestClamp extends RSBaseCompute {
         checkClampUint2UintUintUint2();
         checkClampUint3UintUintUint3();
         checkClampUint4UintUintUint4();
+        checkClampLong2LongLongLong2();
+        checkClampLong3LongLongLong3();
+        checkClampLong4LongLongLong4();
+        checkClampUlong2UlongUlongUlong2();
+        checkClampUlong3UlongUlongUlong3();
+        checkClampUlong4UlongUlongUlong4();
     }
 }

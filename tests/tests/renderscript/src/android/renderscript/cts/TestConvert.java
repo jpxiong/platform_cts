@@ -8700,6 +8700,9060 @@ public class TestConvert extends RSBaseCompute {
         }
     }
 
+    public class ArgumentsDoubleDouble {
+        public double inV;
+        public Floaty out;
+    }
+
+    private void checkConvertDouble2Double2() {
+        Allocation inV = createRandomFloatAllocation(mRS, Element.DataType.FLOAT_64, 2, 0x345b4a823902786el, -8.5390423905960001625e+307, 8.5390423905960001625e+307);
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_64, 2), INPUTSIZE);
+            script.forEach_testConvertDouble2Double2Double2(inV, out);
+            verifyResultsConvertDouble2Double2(inV, out, false);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertDouble2Double2Double2: " + e.toString());
+        }
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_64, 2), INPUTSIZE);
+            scriptRelaxed.forEach_testConvertDouble2Double2Double2(inV, out);
+            verifyResultsConvertDouble2Double2(inV, out, true);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertDouble2Double2Double2: " + e.toString());
+        }
+    }
+
+    private void verifyResultsConvertDouble2Double2(Allocation inV, Allocation out, boolean relaxed) {
+        double[] arrayInV = new double[INPUTSIZE * 2];
+        inV.copyTo(arrayInV);
+        double[] arrayOut = new double[INPUTSIZE * 2];
+        out.copyTo(arrayOut);
+        for (int i = 0; i < INPUTSIZE; i++) {
+            for (int j = 0; j < 2 ; j++) {
+                // Extract the inputs.
+                ArgumentsDoubleDouble args = new ArgumentsDoubleDouble();
+                args.inV = arrayInV[i * 2 + j];
+                // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
+                CoreMathVerifier.computeConvert(args);
+                // Figure out what the outputs should have been.
+                boolean valid = true;
+                if (!args.out.couldBe(arrayOut[i * 2 + j])) {
+                    valid = false;
+                }
+                if (!valid) {
+                    StringBuilder message = new StringBuilder();
+                    message.append("Input inV: ");
+                    message.append(String.format("%24.8g %16x %31a",
+                            args.inV, Double.doubleToRawLongBits(args.inV), args.inV));
+                    message.append("\n");
+                    message.append("Expected output out: ");
+                    message.append(args.out.toString());
+                    message.append("\n");
+                    message.append("Actual   output out: ");
+                    message.append(String.format("%24.8g %16x %31a",
+                            arrayOut[i * 2 + j], Double.doubleToRawLongBits(arrayOut[i * 2 + j]), arrayOut[i * 2 + j]));
+                    if (!args.out.couldBe(arrayOut[i * 2 + j])) {
+                        message.append(" FAIL");
+                    }
+                    message.append("\n");
+                    assertTrue("Incorrect output for checkConvertDouble2Double2" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                }
+            }
+        }
+    }
+
+    private void checkConvertDouble3Double3() {
+        Allocation inV = createRandomFloatAllocation(mRS, Element.DataType.FLOAT_64, 3, 0x34a812098f5e099al, -8.5390423905960001625e+307, 8.5390423905960001625e+307);
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_64, 3), INPUTSIZE);
+            script.forEach_testConvertDouble3Double3Double3(inV, out);
+            verifyResultsConvertDouble3Double3(inV, out, false);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertDouble3Double3Double3: " + e.toString());
+        }
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_64, 3), INPUTSIZE);
+            scriptRelaxed.forEach_testConvertDouble3Double3Double3(inV, out);
+            verifyResultsConvertDouble3Double3(inV, out, true);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertDouble3Double3Double3: " + e.toString());
+        }
+    }
+
+    private void verifyResultsConvertDouble3Double3(Allocation inV, Allocation out, boolean relaxed) {
+        double[] arrayInV = new double[INPUTSIZE * 4];
+        inV.copyTo(arrayInV);
+        double[] arrayOut = new double[INPUTSIZE * 4];
+        out.copyTo(arrayOut);
+        for (int i = 0; i < INPUTSIZE; i++) {
+            for (int j = 0; j < 3 ; j++) {
+                // Extract the inputs.
+                ArgumentsDoubleDouble args = new ArgumentsDoubleDouble();
+                args.inV = arrayInV[i * 4 + j];
+                // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
+                CoreMathVerifier.computeConvert(args);
+                // Figure out what the outputs should have been.
+                boolean valid = true;
+                if (!args.out.couldBe(arrayOut[i * 4 + j])) {
+                    valid = false;
+                }
+                if (!valid) {
+                    StringBuilder message = new StringBuilder();
+                    message.append("Input inV: ");
+                    message.append(String.format("%24.8g %16x %31a",
+                            args.inV, Double.doubleToRawLongBits(args.inV), args.inV));
+                    message.append("\n");
+                    message.append("Expected output out: ");
+                    message.append(args.out.toString());
+                    message.append("\n");
+                    message.append("Actual   output out: ");
+                    message.append(String.format("%24.8g %16x %31a",
+                            arrayOut[i * 4 + j], Double.doubleToRawLongBits(arrayOut[i * 4 + j]), arrayOut[i * 4 + j]));
+                    if (!args.out.couldBe(arrayOut[i * 4 + j])) {
+                        message.append(" FAIL");
+                    }
+                    message.append("\n");
+                    assertTrue("Incorrect output for checkConvertDouble3Double3" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                }
+            }
+        }
+    }
+
+    private void checkConvertDouble4Double4() {
+        Allocation inV = createRandomFloatAllocation(mRS, Element.DataType.FLOAT_64, 4, 0x34f4d990e5b99ac6l, -8.5390423905960001625e+307, 8.5390423905960001625e+307);
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_64, 4), INPUTSIZE);
+            script.forEach_testConvertDouble4Double4Double4(inV, out);
+            verifyResultsConvertDouble4Double4(inV, out, false);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertDouble4Double4Double4: " + e.toString());
+        }
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_64, 4), INPUTSIZE);
+            scriptRelaxed.forEach_testConvertDouble4Double4Double4(inV, out);
+            verifyResultsConvertDouble4Double4(inV, out, true);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertDouble4Double4Double4: " + e.toString());
+        }
+    }
+
+    private void verifyResultsConvertDouble4Double4(Allocation inV, Allocation out, boolean relaxed) {
+        double[] arrayInV = new double[INPUTSIZE * 4];
+        inV.copyTo(arrayInV);
+        double[] arrayOut = new double[INPUTSIZE * 4];
+        out.copyTo(arrayOut);
+        for (int i = 0; i < INPUTSIZE; i++) {
+            for (int j = 0; j < 4 ; j++) {
+                // Extract the inputs.
+                ArgumentsDoubleDouble args = new ArgumentsDoubleDouble();
+                args.inV = arrayInV[i * 4 + j];
+                // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
+                CoreMathVerifier.computeConvert(args);
+                // Figure out what the outputs should have been.
+                boolean valid = true;
+                if (!args.out.couldBe(arrayOut[i * 4 + j])) {
+                    valid = false;
+                }
+                if (!valid) {
+                    StringBuilder message = new StringBuilder();
+                    message.append("Input inV: ");
+                    message.append(String.format("%24.8g %16x %31a",
+                            args.inV, Double.doubleToRawLongBits(args.inV), args.inV));
+                    message.append("\n");
+                    message.append("Expected output out: ");
+                    message.append(args.out.toString());
+                    message.append("\n");
+                    message.append("Actual   output out: ");
+                    message.append(String.format("%24.8g %16x %31a",
+                            arrayOut[i * 4 + j], Double.doubleToRawLongBits(arrayOut[i * 4 + j]), arrayOut[i * 4 + j]));
+                    if (!args.out.couldBe(arrayOut[i * 4 + j])) {
+                        message.append(" FAIL");
+                    }
+                    message.append("\n");
+                    assertTrue("Incorrect output for checkConvertDouble4Double4" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                }
+            }
+        }
+    }
+
+    public class ArgumentsLongDouble {
+        public long inV;
+        public Floaty out;
+    }
+
+    private void checkConvertLong2Double2() {
+        Allocation inV = createRandomIntegerAllocation(mRS, Element.DataType.SIGNED_64, 2, 0x7b7807124c70299bl, true, 63);
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_64, 2), INPUTSIZE);
+            script.forEach_testConvertDouble2Long2Double2(inV, out);
+            verifyResultsConvertLong2Double2(inV, out, false);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertDouble2Long2Double2: " + e.toString());
+        }
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_64, 2), INPUTSIZE);
+            scriptRelaxed.forEach_testConvertDouble2Long2Double2(inV, out);
+            verifyResultsConvertLong2Double2(inV, out, true);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertDouble2Long2Double2: " + e.toString());
+        }
+    }
+
+    private void verifyResultsConvertLong2Double2(Allocation inV, Allocation out, boolean relaxed) {
+        long[] arrayInV = new long[INPUTSIZE * 2];
+        inV.copyTo(arrayInV);
+        double[] arrayOut = new double[INPUTSIZE * 2];
+        out.copyTo(arrayOut);
+        for (int i = 0; i < INPUTSIZE; i++) {
+            for (int j = 0; j < 2 ; j++) {
+                // Extract the inputs.
+                ArgumentsLongDouble args = new ArgumentsLongDouble();
+                args.inV = arrayInV[i * 2 + j];
+                // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
+                CoreMathVerifier.computeConvert(args);
+                // Figure out what the outputs should have been.
+                boolean valid = true;
+                if (!args.out.couldBe(arrayOut[i * 2 + j])) {
+                    valid = false;
+                }
+                if (!valid) {
+                    StringBuilder message = new StringBuilder();
+                    message.append("Input inV: ");
+                    message.append(String.format("%d", args.inV));
+                    message.append("\n");
+                    message.append("Expected output out: ");
+                    message.append(args.out.toString());
+                    message.append("\n");
+                    message.append("Actual   output out: ");
+                    message.append(String.format("%24.8g %16x %31a",
+                            arrayOut[i * 2 + j], Double.doubleToRawLongBits(arrayOut[i * 2 + j]), arrayOut[i * 2 + j]));
+                    if (!args.out.couldBe(arrayOut[i * 2 + j])) {
+                        message.append(" FAIL");
+                    }
+                    message.append("\n");
+                    assertTrue("Incorrect output for checkConvertLong2Double2" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                }
+            }
+        }
+    }
+
+    private void checkConvertLong3Double3() {
+        Allocation inV = createRandomIntegerAllocation(mRS, Element.DataType.SIGNED_64, 3, 0x7bc4ce99a2cbbac7l, true, 63);
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_64, 3), INPUTSIZE);
+            script.forEach_testConvertDouble3Long3Double3(inV, out);
+            verifyResultsConvertLong3Double3(inV, out, false);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertDouble3Long3Double3: " + e.toString());
+        }
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_64, 3), INPUTSIZE);
+            scriptRelaxed.forEach_testConvertDouble3Long3Double3(inV, out);
+            verifyResultsConvertLong3Double3(inV, out, true);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertDouble3Long3Double3: " + e.toString());
+        }
+    }
+
+    private void verifyResultsConvertLong3Double3(Allocation inV, Allocation out, boolean relaxed) {
+        long[] arrayInV = new long[INPUTSIZE * 4];
+        inV.copyTo(arrayInV);
+        double[] arrayOut = new double[INPUTSIZE * 4];
+        out.copyTo(arrayOut);
+        for (int i = 0; i < INPUTSIZE; i++) {
+            for (int j = 0; j < 3 ; j++) {
+                // Extract the inputs.
+                ArgumentsLongDouble args = new ArgumentsLongDouble();
+                args.inV = arrayInV[i * 4 + j];
+                // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
+                CoreMathVerifier.computeConvert(args);
+                // Figure out what the outputs should have been.
+                boolean valid = true;
+                if (!args.out.couldBe(arrayOut[i * 4 + j])) {
+                    valid = false;
+                }
+                if (!valid) {
+                    StringBuilder message = new StringBuilder();
+                    message.append("Input inV: ");
+                    message.append(String.format("%d", args.inV));
+                    message.append("\n");
+                    message.append("Expected output out: ");
+                    message.append(args.out.toString());
+                    message.append("\n");
+                    message.append("Actual   output out: ");
+                    message.append(String.format("%24.8g %16x %31a",
+                            arrayOut[i * 4 + j], Double.doubleToRawLongBits(arrayOut[i * 4 + j]), arrayOut[i * 4 + j]));
+                    if (!args.out.couldBe(arrayOut[i * 4 + j])) {
+                        message.append(" FAIL");
+                    }
+                    message.append("\n");
+                    assertTrue("Incorrect output for checkConvertLong3Double3" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                }
+            }
+        }
+    }
+
+    private void checkConvertLong4Double4() {
+        Allocation inV = createRandomIntegerAllocation(mRS, Element.DataType.SIGNED_64, 4, 0x7c119620f9274bf3l, true, 63);
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_64, 4), INPUTSIZE);
+            script.forEach_testConvertDouble4Long4Double4(inV, out);
+            verifyResultsConvertLong4Double4(inV, out, false);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertDouble4Long4Double4: " + e.toString());
+        }
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_64, 4), INPUTSIZE);
+            scriptRelaxed.forEach_testConvertDouble4Long4Double4(inV, out);
+            verifyResultsConvertLong4Double4(inV, out, true);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertDouble4Long4Double4: " + e.toString());
+        }
+    }
+
+    private void verifyResultsConvertLong4Double4(Allocation inV, Allocation out, boolean relaxed) {
+        long[] arrayInV = new long[INPUTSIZE * 4];
+        inV.copyTo(arrayInV);
+        double[] arrayOut = new double[INPUTSIZE * 4];
+        out.copyTo(arrayOut);
+        for (int i = 0; i < INPUTSIZE; i++) {
+            for (int j = 0; j < 4 ; j++) {
+                // Extract the inputs.
+                ArgumentsLongDouble args = new ArgumentsLongDouble();
+                args.inV = arrayInV[i * 4 + j];
+                // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
+                CoreMathVerifier.computeConvert(args);
+                // Figure out what the outputs should have been.
+                boolean valid = true;
+                if (!args.out.couldBe(arrayOut[i * 4 + j])) {
+                    valid = false;
+                }
+                if (!valid) {
+                    StringBuilder message = new StringBuilder();
+                    message.append("Input inV: ");
+                    message.append(String.format("%d", args.inV));
+                    message.append("\n");
+                    message.append("Expected output out: ");
+                    message.append(args.out.toString());
+                    message.append("\n");
+                    message.append("Actual   output out: ");
+                    message.append(String.format("%24.8g %16x %31a",
+                            arrayOut[i * 4 + j], Double.doubleToRawLongBits(arrayOut[i * 4 + j]), arrayOut[i * 4 + j]));
+                    if (!args.out.couldBe(arrayOut[i * 4 + j])) {
+                        message.append(" FAIL");
+                    }
+                    message.append("\n");
+                    assertTrue("Incorrect output for checkConvertLong4Double4" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                }
+            }
+        }
+    }
+
+    public class ArgumentsUlongDouble {
+        public long inV;
+        public Floaty out;
+    }
+
+    private void checkConvertUlong2Double2() {
+        Allocation inV = createRandomIntegerAllocation(mRS, Element.DataType.UNSIGNED_64, 2, 0xaa17685979bc7954l, false, 64);
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_64, 2), INPUTSIZE);
+            script.forEach_testConvertDouble2Ulong2Double2(inV, out);
+            verifyResultsConvertUlong2Double2(inV, out, false);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertDouble2Ulong2Double2: " + e.toString());
+        }
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_64, 2), INPUTSIZE);
+            scriptRelaxed.forEach_testConvertDouble2Ulong2Double2(inV, out);
+            verifyResultsConvertUlong2Double2(inV, out, true);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertDouble2Ulong2Double2: " + e.toString());
+        }
+    }
+
+    private void verifyResultsConvertUlong2Double2(Allocation inV, Allocation out, boolean relaxed) {
+        long[] arrayInV = new long[INPUTSIZE * 2];
+        inV.copyTo(arrayInV);
+        double[] arrayOut = new double[INPUTSIZE * 2];
+        out.copyTo(arrayOut);
+        for (int i = 0; i < INPUTSIZE; i++) {
+            for (int j = 0; j < 2 ; j++) {
+                // Extract the inputs.
+                ArgumentsUlongDouble args = new ArgumentsUlongDouble();
+                args.inV = arrayInV[i * 2 + j];
+                // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
+                CoreMathVerifier.computeConvert(args);
+                // Figure out what the outputs should have been.
+                boolean valid = true;
+                if (!args.out.couldBe(arrayOut[i * 2 + j])) {
+                    valid = false;
+                }
+                if (!valid) {
+                    StringBuilder message = new StringBuilder();
+                    message.append("Input inV: ");
+                    message.append(String.format("0x%x", args.inV));
+                    message.append("\n");
+                    message.append("Expected output out: ");
+                    message.append(args.out.toString());
+                    message.append("\n");
+                    message.append("Actual   output out: ");
+                    message.append(String.format("%24.8g %16x %31a",
+                            arrayOut[i * 2 + j], Double.doubleToRawLongBits(arrayOut[i * 2 + j]), arrayOut[i * 2 + j]));
+                    if (!args.out.couldBe(arrayOut[i * 2 + j])) {
+                        message.append(" FAIL");
+                    }
+                    message.append("\n");
+                    assertTrue("Incorrect output for checkConvertUlong2Double2" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                }
+            }
+        }
+    }
+
+    private void checkConvertUlong3Double3() {
+        Allocation inV = createRandomIntegerAllocation(mRS, Element.DataType.UNSIGNED_64, 3, 0xaa642fe0d0180a80l, false, 64);
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_64, 3), INPUTSIZE);
+            script.forEach_testConvertDouble3Ulong3Double3(inV, out);
+            verifyResultsConvertUlong3Double3(inV, out, false);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertDouble3Ulong3Double3: " + e.toString());
+        }
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_64, 3), INPUTSIZE);
+            scriptRelaxed.forEach_testConvertDouble3Ulong3Double3(inV, out);
+            verifyResultsConvertUlong3Double3(inV, out, true);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertDouble3Ulong3Double3: " + e.toString());
+        }
+    }
+
+    private void verifyResultsConvertUlong3Double3(Allocation inV, Allocation out, boolean relaxed) {
+        long[] arrayInV = new long[INPUTSIZE * 4];
+        inV.copyTo(arrayInV);
+        double[] arrayOut = new double[INPUTSIZE * 4];
+        out.copyTo(arrayOut);
+        for (int i = 0; i < INPUTSIZE; i++) {
+            for (int j = 0; j < 3 ; j++) {
+                // Extract the inputs.
+                ArgumentsUlongDouble args = new ArgumentsUlongDouble();
+                args.inV = arrayInV[i * 4 + j];
+                // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
+                CoreMathVerifier.computeConvert(args);
+                // Figure out what the outputs should have been.
+                boolean valid = true;
+                if (!args.out.couldBe(arrayOut[i * 4 + j])) {
+                    valid = false;
+                }
+                if (!valid) {
+                    StringBuilder message = new StringBuilder();
+                    message.append("Input inV: ");
+                    message.append(String.format("0x%x", args.inV));
+                    message.append("\n");
+                    message.append("Expected output out: ");
+                    message.append(args.out.toString());
+                    message.append("\n");
+                    message.append("Actual   output out: ");
+                    message.append(String.format("%24.8g %16x %31a",
+                            arrayOut[i * 4 + j], Double.doubleToRawLongBits(arrayOut[i * 4 + j]), arrayOut[i * 4 + j]));
+                    if (!args.out.couldBe(arrayOut[i * 4 + j])) {
+                        message.append(" FAIL");
+                    }
+                    message.append("\n");
+                    assertTrue("Incorrect output for checkConvertUlong3Double3" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                }
+            }
+        }
+    }
+
+    private void checkConvertUlong4Double4() {
+        Allocation inV = createRandomIntegerAllocation(mRS, Element.DataType.UNSIGNED_64, 4, 0xaab0f76826739bacl, false, 64);
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_64, 4), INPUTSIZE);
+            script.forEach_testConvertDouble4Ulong4Double4(inV, out);
+            verifyResultsConvertUlong4Double4(inV, out, false);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertDouble4Ulong4Double4: " + e.toString());
+        }
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_64, 4), INPUTSIZE);
+            scriptRelaxed.forEach_testConvertDouble4Ulong4Double4(inV, out);
+            verifyResultsConvertUlong4Double4(inV, out, true);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertDouble4Ulong4Double4: " + e.toString());
+        }
+    }
+
+    private void verifyResultsConvertUlong4Double4(Allocation inV, Allocation out, boolean relaxed) {
+        long[] arrayInV = new long[INPUTSIZE * 4];
+        inV.copyTo(arrayInV);
+        double[] arrayOut = new double[INPUTSIZE * 4];
+        out.copyTo(arrayOut);
+        for (int i = 0; i < INPUTSIZE; i++) {
+            for (int j = 0; j < 4 ; j++) {
+                // Extract the inputs.
+                ArgumentsUlongDouble args = new ArgumentsUlongDouble();
+                args.inV = arrayInV[i * 4 + j];
+                // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
+                CoreMathVerifier.computeConvert(args);
+                // Figure out what the outputs should have been.
+                boolean valid = true;
+                if (!args.out.couldBe(arrayOut[i * 4 + j])) {
+                    valid = false;
+                }
+                if (!valid) {
+                    StringBuilder message = new StringBuilder();
+                    message.append("Input inV: ");
+                    message.append(String.format("0x%x", args.inV));
+                    message.append("\n");
+                    message.append("Expected output out: ");
+                    message.append(args.out.toString());
+                    message.append("\n");
+                    message.append("Actual   output out: ");
+                    message.append(String.format("%24.8g %16x %31a",
+                            arrayOut[i * 4 + j], Double.doubleToRawLongBits(arrayOut[i * 4 + j]), arrayOut[i * 4 + j]));
+                    if (!args.out.couldBe(arrayOut[i * 4 + j])) {
+                        message.append(" FAIL");
+                    }
+                    message.append("\n");
+                    assertTrue("Incorrect output for checkConvertUlong4Double4" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                }
+            }
+        }
+    }
+
+    public class ArgumentsDoubleLong {
+        public double inV;
+        public long out;
+    }
+
+    private void checkConvertDouble2Long2() {
+        Allocation inV = createRandomFloatAllocation(mRS, Element.DataType.FLOAT_64, 2, 0xcbf84dc0430cbe95l, -9.2233720368547747840e+18, 9.2233720368547747840e+18);
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_64, 2), INPUTSIZE);
+            script.forEach_testConvertLong2Double2Long2(inV, out);
+            verifyResultsConvertDouble2Long2(inV, out, false);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertLong2Double2Long2: " + e.toString());
+        }
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_64, 2), INPUTSIZE);
+            scriptRelaxed.forEach_testConvertLong2Double2Long2(inV, out);
+            verifyResultsConvertDouble2Long2(inV, out, true);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertLong2Double2Long2: " + e.toString());
+        }
+    }
+
+    private void verifyResultsConvertDouble2Long2(Allocation inV, Allocation out, boolean relaxed) {
+        double[] arrayInV = new double[INPUTSIZE * 2];
+        inV.copyTo(arrayInV);
+        long[] arrayOut = new long[INPUTSIZE * 2];
+        out.copyTo(arrayOut);
+        for (int i = 0; i < INPUTSIZE; i++) {
+            for (int j = 0; j < 2 ; j++) {
+                // Extract the inputs.
+                ArgumentsDoubleLong args = new ArgumentsDoubleLong();
+                args.inV = arrayInV[i * 2 + j];
+                // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
+                CoreMathVerifier.computeConvert(args);
+                // Figure out what the outputs should have been.
+                boolean valid = true;
+                if (args.out != arrayOut[i * 2 + j]) {
+                    valid = false;
+                }
+                if (!valid) {
+                    StringBuilder message = new StringBuilder();
+                    message.append("Input inV: ");
+                    message.append(String.format("%24.8g %16x %31a",
+                            args.inV, Double.doubleToRawLongBits(args.inV), args.inV));
+                    message.append("\n");
+                    message.append("Expected output out: ");
+                    message.append(String.format("%d", args.out));
+                    message.append("\n");
+                    message.append("Actual   output out: ");
+                    message.append(String.format("%d", arrayOut[i * 2 + j]));
+                    if (args.out != arrayOut[i * 2 + j]) {
+                        message.append(" FAIL");
+                    }
+                    message.append("\n");
+                    assertTrue("Incorrect output for checkConvertDouble2Long2" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                }
+            }
+        }
+    }
+
+    private void checkConvertDouble3Long3() {
+        Allocation inV = createRandomFloatAllocation(mRS, Element.DataType.FLOAT_64, 3, 0xcbf85861a2148389l, -9.2233720368547747840e+18, 9.2233720368547747840e+18);
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_64, 3), INPUTSIZE);
+            script.forEach_testConvertLong3Double3Long3(inV, out);
+            verifyResultsConvertDouble3Long3(inV, out, false);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertLong3Double3Long3: " + e.toString());
+        }
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_64, 3), INPUTSIZE);
+            scriptRelaxed.forEach_testConvertLong3Double3Long3(inV, out);
+            verifyResultsConvertDouble3Long3(inV, out, true);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertLong3Double3Long3: " + e.toString());
+        }
+    }
+
+    private void verifyResultsConvertDouble3Long3(Allocation inV, Allocation out, boolean relaxed) {
+        double[] arrayInV = new double[INPUTSIZE * 4];
+        inV.copyTo(arrayInV);
+        long[] arrayOut = new long[INPUTSIZE * 4];
+        out.copyTo(arrayOut);
+        for (int i = 0; i < INPUTSIZE; i++) {
+            for (int j = 0; j < 3 ; j++) {
+                // Extract the inputs.
+                ArgumentsDoubleLong args = new ArgumentsDoubleLong();
+                args.inV = arrayInV[i * 4 + j];
+                // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
+                CoreMathVerifier.computeConvert(args);
+                // Figure out what the outputs should have been.
+                boolean valid = true;
+                if (args.out != arrayOut[i * 4 + j]) {
+                    valid = false;
+                }
+                if (!valid) {
+                    StringBuilder message = new StringBuilder();
+                    message.append("Input inV: ");
+                    message.append(String.format("%24.8g %16x %31a",
+                            args.inV, Double.doubleToRawLongBits(args.inV), args.inV));
+                    message.append("\n");
+                    message.append("Expected output out: ");
+                    message.append(String.format("%d", args.out));
+                    message.append("\n");
+                    message.append("Actual   output out: ");
+                    message.append(String.format("%d", arrayOut[i * 4 + j]));
+                    if (args.out != arrayOut[i * 4 + j]) {
+                        message.append(" FAIL");
+                    }
+                    message.append("\n");
+                    assertTrue("Incorrect output for checkConvertDouble3Long3" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                }
+            }
+        }
+    }
+
+    private void checkConvertDouble4Long4() {
+        Allocation inV = createRandomFloatAllocation(mRS, Element.DataType.FLOAT_64, 4, 0xcbf86303011c487dl, -9.2233720368547747840e+18, 9.2233720368547747840e+18);
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_64, 4), INPUTSIZE);
+            script.forEach_testConvertLong4Double4Long4(inV, out);
+            verifyResultsConvertDouble4Long4(inV, out, false);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertLong4Double4Long4: " + e.toString());
+        }
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_64, 4), INPUTSIZE);
+            scriptRelaxed.forEach_testConvertLong4Double4Long4(inV, out);
+            verifyResultsConvertDouble4Long4(inV, out, true);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertLong4Double4Long4: " + e.toString());
+        }
+    }
+
+    private void verifyResultsConvertDouble4Long4(Allocation inV, Allocation out, boolean relaxed) {
+        double[] arrayInV = new double[INPUTSIZE * 4];
+        inV.copyTo(arrayInV);
+        long[] arrayOut = new long[INPUTSIZE * 4];
+        out.copyTo(arrayOut);
+        for (int i = 0; i < INPUTSIZE; i++) {
+            for (int j = 0; j < 4 ; j++) {
+                // Extract the inputs.
+                ArgumentsDoubleLong args = new ArgumentsDoubleLong();
+                args.inV = arrayInV[i * 4 + j];
+                // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
+                CoreMathVerifier.computeConvert(args);
+                // Figure out what the outputs should have been.
+                boolean valid = true;
+                if (args.out != arrayOut[i * 4 + j]) {
+                    valid = false;
+                }
+                if (!valid) {
+                    StringBuilder message = new StringBuilder();
+                    message.append("Input inV: ");
+                    message.append(String.format("%24.8g %16x %31a",
+                            args.inV, Double.doubleToRawLongBits(args.inV), args.inV));
+                    message.append("\n");
+                    message.append("Expected output out: ");
+                    message.append(String.format("%d", args.out));
+                    message.append("\n");
+                    message.append("Actual   output out: ");
+                    message.append(String.format("%d", arrayOut[i * 4 + j]));
+                    if (args.out != arrayOut[i * 4 + j]) {
+                        message.append(" FAIL");
+                    }
+                    message.append("\n");
+                    assertTrue("Incorrect output for checkConvertDouble4Long4" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                }
+            }
+        }
+    }
+
+    public class ArgumentsLongLong {
+        public long inV;
+        public long out;
+    }
+
+    private void checkConvertLong2Long2() {
+        Allocation inV = createRandomIntegerAllocation(mRS, Element.DataType.SIGNED_64, 2, 0xb570c607c81d242al, true, 63);
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_64, 2), INPUTSIZE);
+            script.forEach_testConvertLong2Long2Long2(inV, out);
+            verifyResultsConvertLong2Long2(inV, out, false);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertLong2Long2Long2: " + e.toString());
+        }
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_64, 2), INPUTSIZE);
+            scriptRelaxed.forEach_testConvertLong2Long2Long2(inV, out);
+            verifyResultsConvertLong2Long2(inV, out, true);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertLong2Long2Long2: " + e.toString());
+        }
+    }
+
+    private void verifyResultsConvertLong2Long2(Allocation inV, Allocation out, boolean relaxed) {
+        long[] arrayInV = new long[INPUTSIZE * 2];
+        inV.copyTo(arrayInV);
+        long[] arrayOut = new long[INPUTSIZE * 2];
+        out.copyTo(arrayOut);
+        for (int i = 0; i < INPUTSIZE; i++) {
+            for (int j = 0; j < 2 ; j++) {
+                // Extract the inputs.
+                ArgumentsLongLong args = new ArgumentsLongLong();
+                args.inV = arrayInV[i * 2 + j];
+                // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
+                CoreMathVerifier.computeConvert(args);
+                // Figure out what the outputs should have been.
+                boolean valid = true;
+                if (args.out != arrayOut[i * 2 + j]) {
+                    valid = false;
+                }
+                if (!valid) {
+                    StringBuilder message = new StringBuilder();
+                    message.append("Input inV: ");
+                    message.append(String.format("%d", args.inV));
+                    message.append("\n");
+                    message.append("Expected output out: ");
+                    message.append(String.format("%d", args.out));
+                    message.append("\n");
+                    message.append("Actual   output out: ");
+                    message.append(String.format("%d", arrayOut[i * 2 + j]));
+                    if (args.out != arrayOut[i * 2 + j]) {
+                        message.append(" FAIL");
+                    }
+                    message.append("\n");
+                    assertTrue("Incorrect output for checkConvertLong2Long2" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                }
+            }
+        }
+    }
+
+    private void checkConvertLong3Long3() {
+        Allocation inV = createRandomIntegerAllocation(mRS, Element.DataType.SIGNED_64, 3, 0xb570d0a92724e91el, true, 63);
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_64, 3), INPUTSIZE);
+            script.forEach_testConvertLong3Long3Long3(inV, out);
+            verifyResultsConvertLong3Long3(inV, out, false);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertLong3Long3Long3: " + e.toString());
+        }
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_64, 3), INPUTSIZE);
+            scriptRelaxed.forEach_testConvertLong3Long3Long3(inV, out);
+            verifyResultsConvertLong3Long3(inV, out, true);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertLong3Long3Long3: " + e.toString());
+        }
+    }
+
+    private void verifyResultsConvertLong3Long3(Allocation inV, Allocation out, boolean relaxed) {
+        long[] arrayInV = new long[INPUTSIZE * 4];
+        inV.copyTo(arrayInV);
+        long[] arrayOut = new long[INPUTSIZE * 4];
+        out.copyTo(arrayOut);
+        for (int i = 0; i < INPUTSIZE; i++) {
+            for (int j = 0; j < 3 ; j++) {
+                // Extract the inputs.
+                ArgumentsLongLong args = new ArgumentsLongLong();
+                args.inV = arrayInV[i * 4 + j];
+                // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
+                CoreMathVerifier.computeConvert(args);
+                // Figure out what the outputs should have been.
+                boolean valid = true;
+                if (args.out != arrayOut[i * 4 + j]) {
+                    valid = false;
+                }
+                if (!valid) {
+                    StringBuilder message = new StringBuilder();
+                    message.append("Input inV: ");
+                    message.append(String.format("%d", args.inV));
+                    message.append("\n");
+                    message.append("Expected output out: ");
+                    message.append(String.format("%d", args.out));
+                    message.append("\n");
+                    message.append("Actual   output out: ");
+                    message.append(String.format("%d", arrayOut[i * 4 + j]));
+                    if (args.out != arrayOut[i * 4 + j]) {
+                        message.append(" FAIL");
+                    }
+                    message.append("\n");
+                    assertTrue("Incorrect output for checkConvertLong3Long3" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                }
+            }
+        }
+    }
+
+    private void checkConvertLong4Long4() {
+        Allocation inV = createRandomIntegerAllocation(mRS, Element.DataType.SIGNED_64, 4, 0xb570db4a862cae12l, true, 63);
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_64, 4), INPUTSIZE);
+            script.forEach_testConvertLong4Long4Long4(inV, out);
+            verifyResultsConvertLong4Long4(inV, out, false);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertLong4Long4Long4: " + e.toString());
+        }
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_64, 4), INPUTSIZE);
+            scriptRelaxed.forEach_testConvertLong4Long4Long4(inV, out);
+            verifyResultsConvertLong4Long4(inV, out, true);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertLong4Long4Long4: " + e.toString());
+        }
+    }
+
+    private void verifyResultsConvertLong4Long4(Allocation inV, Allocation out, boolean relaxed) {
+        long[] arrayInV = new long[INPUTSIZE * 4];
+        inV.copyTo(arrayInV);
+        long[] arrayOut = new long[INPUTSIZE * 4];
+        out.copyTo(arrayOut);
+        for (int i = 0; i < INPUTSIZE; i++) {
+            for (int j = 0; j < 4 ; j++) {
+                // Extract the inputs.
+                ArgumentsLongLong args = new ArgumentsLongLong();
+                args.inV = arrayInV[i * 4 + j];
+                // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
+                CoreMathVerifier.computeConvert(args);
+                // Figure out what the outputs should have been.
+                boolean valid = true;
+                if (args.out != arrayOut[i * 4 + j]) {
+                    valid = false;
+                }
+                if (!valid) {
+                    StringBuilder message = new StringBuilder();
+                    message.append("Input inV: ");
+                    message.append(String.format("%d", args.inV));
+                    message.append("\n");
+                    message.append("Expected output out: ");
+                    message.append(String.format("%d", args.out));
+                    message.append("\n");
+                    message.append("Actual   output out: ");
+                    message.append(String.format("%d", arrayOut[i * 4 + j]));
+                    if (args.out != arrayOut[i * 4 + j]) {
+                        message.append(" FAIL");
+                    }
+                    message.append("\n");
+                    assertTrue("Incorrect output for checkConvertLong4Long4" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                }
+            }
+        }
+    }
+
+    public class ArgumentsUlongLong {
+        public long inV;
+        public long out;
+    }
+
+    private void checkConvertUlong2Long2() {
+        Allocation inV = createRandomIntegerAllocation(mRS, Element.DataType.UNSIGNED_64, 2, 0x5cfe7f555a9f30abl, false, 63);
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_64, 2), INPUTSIZE);
+            script.forEach_testConvertLong2Ulong2Long2(inV, out);
+            verifyResultsConvertUlong2Long2(inV, out, false);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertLong2Ulong2Long2: " + e.toString());
+        }
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_64, 2), INPUTSIZE);
+            scriptRelaxed.forEach_testConvertLong2Ulong2Long2(inV, out);
+            verifyResultsConvertUlong2Long2(inV, out, true);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertLong2Ulong2Long2: " + e.toString());
+        }
+    }
+
+    private void verifyResultsConvertUlong2Long2(Allocation inV, Allocation out, boolean relaxed) {
+        long[] arrayInV = new long[INPUTSIZE * 2];
+        inV.copyTo(arrayInV);
+        long[] arrayOut = new long[INPUTSIZE * 2];
+        out.copyTo(arrayOut);
+        for (int i = 0; i < INPUTSIZE; i++) {
+            for (int j = 0; j < 2 ; j++) {
+                // Extract the inputs.
+                ArgumentsUlongLong args = new ArgumentsUlongLong();
+                args.inV = arrayInV[i * 2 + j];
+                // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
+                CoreMathVerifier.computeConvert(args);
+                // Figure out what the outputs should have been.
+                boolean valid = true;
+                if (args.out != arrayOut[i * 2 + j]) {
+                    valid = false;
+                }
+                if (!valid) {
+                    StringBuilder message = new StringBuilder();
+                    message.append("Input inV: ");
+                    message.append(String.format("0x%x", args.inV));
+                    message.append("\n");
+                    message.append("Expected output out: ");
+                    message.append(String.format("%d", args.out));
+                    message.append("\n");
+                    message.append("Actual   output out: ");
+                    message.append(String.format("%d", arrayOut[i * 2 + j]));
+                    if (args.out != arrayOut[i * 2 + j]) {
+                        message.append(" FAIL");
+                    }
+                    message.append("\n");
+                    assertTrue("Incorrect output for checkConvertUlong2Long2" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                }
+            }
+        }
+    }
+
+    private void checkConvertUlong3Long3() {
+        Allocation inV = createRandomIntegerAllocation(mRS, Element.DataType.UNSIGNED_64, 3, 0x5cfe89f6b9a6f59fl, false, 63);
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_64, 3), INPUTSIZE);
+            script.forEach_testConvertLong3Ulong3Long3(inV, out);
+            verifyResultsConvertUlong3Long3(inV, out, false);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertLong3Ulong3Long3: " + e.toString());
+        }
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_64, 3), INPUTSIZE);
+            scriptRelaxed.forEach_testConvertLong3Ulong3Long3(inV, out);
+            verifyResultsConvertUlong3Long3(inV, out, true);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertLong3Ulong3Long3: " + e.toString());
+        }
+    }
+
+    private void verifyResultsConvertUlong3Long3(Allocation inV, Allocation out, boolean relaxed) {
+        long[] arrayInV = new long[INPUTSIZE * 4];
+        inV.copyTo(arrayInV);
+        long[] arrayOut = new long[INPUTSIZE * 4];
+        out.copyTo(arrayOut);
+        for (int i = 0; i < INPUTSIZE; i++) {
+            for (int j = 0; j < 3 ; j++) {
+                // Extract the inputs.
+                ArgumentsUlongLong args = new ArgumentsUlongLong();
+                args.inV = arrayInV[i * 4 + j];
+                // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
+                CoreMathVerifier.computeConvert(args);
+                // Figure out what the outputs should have been.
+                boolean valid = true;
+                if (args.out != arrayOut[i * 4 + j]) {
+                    valid = false;
+                }
+                if (!valid) {
+                    StringBuilder message = new StringBuilder();
+                    message.append("Input inV: ");
+                    message.append(String.format("0x%x", args.inV));
+                    message.append("\n");
+                    message.append("Expected output out: ");
+                    message.append(String.format("%d", args.out));
+                    message.append("\n");
+                    message.append("Actual   output out: ");
+                    message.append(String.format("%d", arrayOut[i * 4 + j]));
+                    if (args.out != arrayOut[i * 4 + j]) {
+                        message.append(" FAIL");
+                    }
+                    message.append("\n");
+                    assertTrue("Incorrect output for checkConvertUlong3Long3" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                }
+            }
+        }
+    }
+
+    private void checkConvertUlong4Long4() {
+        Allocation inV = createRandomIntegerAllocation(mRS, Element.DataType.UNSIGNED_64, 4, 0x5cfe949818aeba93l, false, 63);
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_64, 4), INPUTSIZE);
+            script.forEach_testConvertLong4Ulong4Long4(inV, out);
+            verifyResultsConvertUlong4Long4(inV, out, false);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertLong4Ulong4Long4: " + e.toString());
+        }
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_64, 4), INPUTSIZE);
+            scriptRelaxed.forEach_testConvertLong4Ulong4Long4(inV, out);
+            verifyResultsConvertUlong4Long4(inV, out, true);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertLong4Ulong4Long4: " + e.toString());
+        }
+    }
+
+    private void verifyResultsConvertUlong4Long4(Allocation inV, Allocation out, boolean relaxed) {
+        long[] arrayInV = new long[INPUTSIZE * 4];
+        inV.copyTo(arrayInV);
+        long[] arrayOut = new long[INPUTSIZE * 4];
+        out.copyTo(arrayOut);
+        for (int i = 0; i < INPUTSIZE; i++) {
+            for (int j = 0; j < 4 ; j++) {
+                // Extract the inputs.
+                ArgumentsUlongLong args = new ArgumentsUlongLong();
+                args.inV = arrayInV[i * 4 + j];
+                // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
+                CoreMathVerifier.computeConvert(args);
+                // Figure out what the outputs should have been.
+                boolean valid = true;
+                if (args.out != arrayOut[i * 4 + j]) {
+                    valid = false;
+                }
+                if (!valid) {
+                    StringBuilder message = new StringBuilder();
+                    message.append("Input inV: ");
+                    message.append(String.format("0x%x", args.inV));
+                    message.append("\n");
+                    message.append("Expected output out: ");
+                    message.append(String.format("%d", args.out));
+                    message.append("\n");
+                    message.append("Actual   output out: ");
+                    message.append(String.format("%d", arrayOut[i * 4 + j]));
+                    if (args.out != arrayOut[i * 4 + j]) {
+                        message.append(" FAIL");
+                    }
+                    message.append("\n");
+                    assertTrue("Incorrect output for checkConvertUlong4Long4" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                }
+            }
+        }
+    }
+
+    public class ArgumentsDoubleUlong {
+        public double inV;
+        public long out;
+    }
+
+    private void checkConvertDouble2Ulong2() {
+        Allocation inV = createRandomFloatAllocation(mRS, Element.DataType.FLOAT_64, 2, 0x42b56e3b7e12ff5el, 0.0000000000000000000e+00, 1.8446744073709549568e+19);
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_64, 2), INPUTSIZE);
+            script.forEach_testConvertUlong2Double2Ulong2(inV, out);
+            verifyResultsConvertDouble2Ulong2(inV, out, false);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertUlong2Double2Ulong2: " + e.toString());
+        }
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_64, 2), INPUTSIZE);
+            scriptRelaxed.forEach_testConvertUlong2Double2Ulong2(inV, out);
+            verifyResultsConvertDouble2Ulong2(inV, out, true);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertUlong2Double2Ulong2: " + e.toString());
+        }
+    }
+
+    private void verifyResultsConvertDouble2Ulong2(Allocation inV, Allocation out, boolean relaxed) {
+        double[] arrayInV = new double[INPUTSIZE * 2];
+        inV.copyTo(arrayInV);
+        long[] arrayOut = new long[INPUTSIZE * 2];
+        out.copyTo(arrayOut);
+        for (int i = 0; i < INPUTSIZE; i++) {
+            for (int j = 0; j < 2 ; j++) {
+                // Extract the inputs.
+                ArgumentsDoubleUlong args = new ArgumentsDoubleUlong();
+                args.inV = arrayInV[i * 2 + j];
+                // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
+                CoreMathVerifier.computeConvert(args);
+                // Figure out what the outputs should have been.
+                boolean valid = true;
+                if (args.out != arrayOut[i * 2 + j]) {
+                    valid = false;
+                }
+                if (!valid) {
+                    StringBuilder message = new StringBuilder();
+                    message.append("Input inV: ");
+                    message.append(String.format("%24.8g %16x %31a",
+                            args.inV, Double.doubleToRawLongBits(args.inV), args.inV));
+                    message.append("\n");
+                    message.append("Expected output out: ");
+                    message.append(String.format("0x%x", args.out));
+                    message.append("\n");
+                    message.append("Actual   output out: ");
+                    message.append(String.format("0x%x", arrayOut[i * 2 + j]));
+                    if (args.out != arrayOut[i * 2 + j]) {
+                        message.append(" FAIL");
+                    }
+                    message.append("\n");
+                    assertTrue("Incorrect output for checkConvertDouble2Ulong2" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                }
+            }
+        }
+    }
+
+    private void checkConvertDouble3Ulong3() {
+        Allocation inV = createRandomFloatAllocation(mRS, Element.DataType.FLOAT_64, 3, 0x42b73756742e203cl, 0.0000000000000000000e+00, 1.8446744073709549568e+19);
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_64, 3), INPUTSIZE);
+            script.forEach_testConvertUlong3Double3Ulong3(inV, out);
+            verifyResultsConvertDouble3Ulong3(inV, out, false);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertUlong3Double3Ulong3: " + e.toString());
+        }
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_64, 3), INPUTSIZE);
+            scriptRelaxed.forEach_testConvertUlong3Double3Ulong3(inV, out);
+            verifyResultsConvertDouble3Ulong3(inV, out, true);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertUlong3Double3Ulong3: " + e.toString());
+        }
+    }
+
+    private void verifyResultsConvertDouble3Ulong3(Allocation inV, Allocation out, boolean relaxed) {
+        double[] arrayInV = new double[INPUTSIZE * 4];
+        inV.copyTo(arrayInV);
+        long[] arrayOut = new long[INPUTSIZE * 4];
+        out.copyTo(arrayOut);
+        for (int i = 0; i < INPUTSIZE; i++) {
+            for (int j = 0; j < 3 ; j++) {
+                // Extract the inputs.
+                ArgumentsDoubleUlong args = new ArgumentsDoubleUlong();
+                args.inV = arrayInV[i * 4 + j];
+                // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
+                CoreMathVerifier.computeConvert(args);
+                // Figure out what the outputs should have been.
+                boolean valid = true;
+                if (args.out != arrayOut[i * 4 + j]) {
+                    valid = false;
+                }
+                if (!valid) {
+                    StringBuilder message = new StringBuilder();
+                    message.append("Input inV: ");
+                    message.append(String.format("%24.8g %16x %31a",
+                            args.inV, Double.doubleToRawLongBits(args.inV), args.inV));
+                    message.append("\n");
+                    message.append("Expected output out: ");
+                    message.append(String.format("0x%x", args.out));
+                    message.append("\n");
+                    message.append("Actual   output out: ");
+                    message.append(String.format("0x%x", arrayOut[i * 4 + j]));
+                    if (args.out != arrayOut[i * 4 + j]) {
+                        message.append(" FAIL");
+                    }
+                    message.append("\n");
+                    assertTrue("Incorrect output for checkConvertDouble3Ulong3" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                }
+            }
+        }
+    }
+
+    private void checkConvertDouble4Ulong4() {
+        Allocation inV = createRandomFloatAllocation(mRS, Element.DataType.FLOAT_64, 4, 0x42b900716a49411al, 0.0000000000000000000e+00, 1.8446744073709549568e+19);
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_64, 4), INPUTSIZE);
+            script.forEach_testConvertUlong4Double4Ulong4(inV, out);
+            verifyResultsConvertDouble4Ulong4(inV, out, false);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertUlong4Double4Ulong4: " + e.toString());
+        }
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_64, 4), INPUTSIZE);
+            scriptRelaxed.forEach_testConvertUlong4Double4Ulong4(inV, out);
+            verifyResultsConvertDouble4Ulong4(inV, out, true);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertUlong4Double4Ulong4: " + e.toString());
+        }
+    }
+
+    private void verifyResultsConvertDouble4Ulong4(Allocation inV, Allocation out, boolean relaxed) {
+        double[] arrayInV = new double[INPUTSIZE * 4];
+        inV.copyTo(arrayInV);
+        long[] arrayOut = new long[INPUTSIZE * 4];
+        out.copyTo(arrayOut);
+        for (int i = 0; i < INPUTSIZE; i++) {
+            for (int j = 0; j < 4 ; j++) {
+                // Extract the inputs.
+                ArgumentsDoubleUlong args = new ArgumentsDoubleUlong();
+                args.inV = arrayInV[i * 4 + j];
+                // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
+                CoreMathVerifier.computeConvert(args);
+                // Figure out what the outputs should have been.
+                boolean valid = true;
+                if (args.out != arrayOut[i * 4 + j]) {
+                    valid = false;
+                }
+                if (!valid) {
+                    StringBuilder message = new StringBuilder();
+                    message.append("Input inV: ");
+                    message.append(String.format("%24.8g %16x %31a",
+                            args.inV, Double.doubleToRawLongBits(args.inV), args.inV));
+                    message.append("\n");
+                    message.append("Expected output out: ");
+                    message.append(String.format("0x%x", args.out));
+                    message.append("\n");
+                    message.append("Actual   output out: ");
+                    message.append(String.format("0x%x", arrayOut[i * 4 + j]));
+                    if (args.out != arrayOut[i * 4 + j]) {
+                        message.append(" FAIL");
+                    }
+                    message.append("\n");
+                    assertTrue("Incorrect output for checkConvertDouble4Ulong4" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                }
+            }
+        }
+    }
+
+    public class ArgumentsLongUlong {
+        public long inV;
+        public long out;
+    }
+
+    private void checkConvertLong2Ulong2() {
+        Allocation inV = createRandomIntegerAllocation(mRS, Element.DataType.SIGNED_64, 2, 0x79f1a23ed7d40f65l, false, 63);
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_64, 2), INPUTSIZE);
+            script.forEach_testConvertUlong2Long2Ulong2(inV, out);
+            verifyResultsConvertLong2Ulong2(inV, out, false);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertUlong2Long2Ulong2: " + e.toString());
+        }
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_64, 2), INPUTSIZE);
+            scriptRelaxed.forEach_testConvertUlong2Long2Ulong2(inV, out);
+            verifyResultsConvertLong2Ulong2(inV, out, true);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertUlong2Long2Ulong2: " + e.toString());
+        }
+    }
+
+    private void verifyResultsConvertLong2Ulong2(Allocation inV, Allocation out, boolean relaxed) {
+        long[] arrayInV = new long[INPUTSIZE * 2];
+        inV.copyTo(arrayInV);
+        long[] arrayOut = new long[INPUTSIZE * 2];
+        out.copyTo(arrayOut);
+        for (int i = 0; i < INPUTSIZE; i++) {
+            for (int j = 0; j < 2 ; j++) {
+                // Extract the inputs.
+                ArgumentsLongUlong args = new ArgumentsLongUlong();
+                args.inV = arrayInV[i * 2 + j];
+                // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
+                CoreMathVerifier.computeConvert(args);
+                // Figure out what the outputs should have been.
+                boolean valid = true;
+                if (args.out != arrayOut[i * 2 + j]) {
+                    valid = false;
+                }
+                if (!valid) {
+                    StringBuilder message = new StringBuilder();
+                    message.append("Input inV: ");
+                    message.append(String.format("%d", args.inV));
+                    message.append("\n");
+                    message.append("Expected output out: ");
+                    message.append(String.format("0x%x", args.out));
+                    message.append("\n");
+                    message.append("Actual   output out: ");
+                    message.append(String.format("0x%x", arrayOut[i * 2 + j]));
+                    if (args.out != arrayOut[i * 2 + j]) {
+                        message.append(" FAIL");
+                    }
+                    message.append("\n");
+                    assertTrue("Incorrect output for checkConvertLong2Ulong2" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                }
+            }
+        }
+    }
+
+    private void checkConvertLong3Ulong3() {
+        Allocation inV = createRandomIntegerAllocation(mRS, Element.DataType.SIGNED_64, 3, 0x79f36b59cdef3043l, false, 63);
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_64, 3), INPUTSIZE);
+            script.forEach_testConvertUlong3Long3Ulong3(inV, out);
+            verifyResultsConvertLong3Ulong3(inV, out, false);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertUlong3Long3Ulong3: " + e.toString());
+        }
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_64, 3), INPUTSIZE);
+            scriptRelaxed.forEach_testConvertUlong3Long3Ulong3(inV, out);
+            verifyResultsConvertLong3Ulong3(inV, out, true);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertUlong3Long3Ulong3: " + e.toString());
+        }
+    }
+
+    private void verifyResultsConvertLong3Ulong3(Allocation inV, Allocation out, boolean relaxed) {
+        long[] arrayInV = new long[INPUTSIZE * 4];
+        inV.copyTo(arrayInV);
+        long[] arrayOut = new long[INPUTSIZE * 4];
+        out.copyTo(arrayOut);
+        for (int i = 0; i < INPUTSIZE; i++) {
+            for (int j = 0; j < 3 ; j++) {
+                // Extract the inputs.
+                ArgumentsLongUlong args = new ArgumentsLongUlong();
+                args.inV = arrayInV[i * 4 + j];
+                // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
+                CoreMathVerifier.computeConvert(args);
+                // Figure out what the outputs should have been.
+                boolean valid = true;
+                if (args.out != arrayOut[i * 4 + j]) {
+                    valid = false;
+                }
+                if (!valid) {
+                    StringBuilder message = new StringBuilder();
+                    message.append("Input inV: ");
+                    message.append(String.format("%d", args.inV));
+                    message.append("\n");
+                    message.append("Expected output out: ");
+                    message.append(String.format("0x%x", args.out));
+                    message.append("\n");
+                    message.append("Actual   output out: ");
+                    message.append(String.format("0x%x", arrayOut[i * 4 + j]));
+                    if (args.out != arrayOut[i * 4 + j]) {
+                        message.append(" FAIL");
+                    }
+                    message.append("\n");
+                    assertTrue("Incorrect output for checkConvertLong3Ulong3" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                }
+            }
+        }
+    }
+
+    private void checkConvertLong4Ulong4() {
+        Allocation inV = createRandomIntegerAllocation(mRS, Element.DataType.SIGNED_64, 4, 0x79f53474c40a5121l, false, 63);
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_64, 4), INPUTSIZE);
+            script.forEach_testConvertUlong4Long4Ulong4(inV, out);
+            verifyResultsConvertLong4Ulong4(inV, out, false);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertUlong4Long4Ulong4: " + e.toString());
+        }
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_64, 4), INPUTSIZE);
+            scriptRelaxed.forEach_testConvertUlong4Long4Ulong4(inV, out);
+            verifyResultsConvertLong4Ulong4(inV, out, true);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertUlong4Long4Ulong4: " + e.toString());
+        }
+    }
+
+    private void verifyResultsConvertLong4Ulong4(Allocation inV, Allocation out, boolean relaxed) {
+        long[] arrayInV = new long[INPUTSIZE * 4];
+        inV.copyTo(arrayInV);
+        long[] arrayOut = new long[INPUTSIZE * 4];
+        out.copyTo(arrayOut);
+        for (int i = 0; i < INPUTSIZE; i++) {
+            for (int j = 0; j < 4 ; j++) {
+                // Extract the inputs.
+                ArgumentsLongUlong args = new ArgumentsLongUlong();
+                args.inV = arrayInV[i * 4 + j];
+                // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
+                CoreMathVerifier.computeConvert(args);
+                // Figure out what the outputs should have been.
+                boolean valid = true;
+                if (args.out != arrayOut[i * 4 + j]) {
+                    valid = false;
+                }
+                if (!valid) {
+                    StringBuilder message = new StringBuilder();
+                    message.append("Input inV: ");
+                    message.append(String.format("%d", args.inV));
+                    message.append("\n");
+                    message.append("Expected output out: ");
+                    message.append(String.format("0x%x", args.out));
+                    message.append("\n");
+                    message.append("Actual   output out: ");
+                    message.append(String.format("0x%x", arrayOut[i * 4 + j]));
+                    if (args.out != arrayOut[i * 4 + j]) {
+                        message.append(" FAIL");
+                    }
+                    message.append("\n");
+                    assertTrue("Incorrect output for checkConvertLong4Ulong4" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                }
+            }
+        }
+    }
+
+    public class ArgumentsUlongUlong {
+        public long inV;
+        public long out;
+    }
+
+    private void checkConvertUlong2Ulong2() {
+        Allocation inV = createRandomIntegerAllocation(mRS, Element.DataType.UNSIGNED_64, 2, 0x9ebfc24673ac2910l, false, 64);
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_64, 2), INPUTSIZE);
+            script.forEach_testConvertUlong2Ulong2Ulong2(inV, out);
+            verifyResultsConvertUlong2Ulong2(inV, out, false);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertUlong2Ulong2Ulong2: " + e.toString());
+        }
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_64, 2), INPUTSIZE);
+            scriptRelaxed.forEach_testConvertUlong2Ulong2Ulong2(inV, out);
+            verifyResultsConvertUlong2Ulong2(inV, out, true);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertUlong2Ulong2Ulong2: " + e.toString());
+        }
+    }
+
+    private void verifyResultsConvertUlong2Ulong2(Allocation inV, Allocation out, boolean relaxed) {
+        long[] arrayInV = new long[INPUTSIZE * 2];
+        inV.copyTo(arrayInV);
+        long[] arrayOut = new long[INPUTSIZE * 2];
+        out.copyTo(arrayOut);
+        for (int i = 0; i < INPUTSIZE; i++) {
+            for (int j = 0; j < 2 ; j++) {
+                // Extract the inputs.
+                ArgumentsUlongUlong args = new ArgumentsUlongUlong();
+                args.inV = arrayInV[i * 2 + j];
+                // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
+                CoreMathVerifier.computeConvert(args);
+                // Figure out what the outputs should have been.
+                boolean valid = true;
+                if (args.out != arrayOut[i * 2 + j]) {
+                    valid = false;
+                }
+                if (!valid) {
+                    StringBuilder message = new StringBuilder();
+                    message.append("Input inV: ");
+                    message.append(String.format("0x%x", args.inV));
+                    message.append("\n");
+                    message.append("Expected output out: ");
+                    message.append(String.format("0x%x", args.out));
+                    message.append("\n");
+                    message.append("Actual   output out: ");
+                    message.append(String.format("0x%x", arrayOut[i * 2 + j]));
+                    if (args.out != arrayOut[i * 2 + j]) {
+                        message.append(" FAIL");
+                    }
+                    message.append("\n");
+                    assertTrue("Incorrect output for checkConvertUlong2Ulong2" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                }
+            }
+        }
+    }
+
+    private void checkConvertUlong3Ulong3() {
+        Allocation inV = createRandomIntegerAllocation(mRS, Element.DataType.UNSIGNED_64, 3, 0x9ec18b6169c749eel, false, 64);
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_64, 3), INPUTSIZE);
+            script.forEach_testConvertUlong3Ulong3Ulong3(inV, out);
+            verifyResultsConvertUlong3Ulong3(inV, out, false);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertUlong3Ulong3Ulong3: " + e.toString());
+        }
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_64, 3), INPUTSIZE);
+            scriptRelaxed.forEach_testConvertUlong3Ulong3Ulong3(inV, out);
+            verifyResultsConvertUlong3Ulong3(inV, out, true);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertUlong3Ulong3Ulong3: " + e.toString());
+        }
+    }
+
+    private void verifyResultsConvertUlong3Ulong3(Allocation inV, Allocation out, boolean relaxed) {
+        long[] arrayInV = new long[INPUTSIZE * 4];
+        inV.copyTo(arrayInV);
+        long[] arrayOut = new long[INPUTSIZE * 4];
+        out.copyTo(arrayOut);
+        for (int i = 0; i < INPUTSIZE; i++) {
+            for (int j = 0; j < 3 ; j++) {
+                // Extract the inputs.
+                ArgumentsUlongUlong args = new ArgumentsUlongUlong();
+                args.inV = arrayInV[i * 4 + j];
+                // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
+                CoreMathVerifier.computeConvert(args);
+                // Figure out what the outputs should have been.
+                boolean valid = true;
+                if (args.out != arrayOut[i * 4 + j]) {
+                    valid = false;
+                }
+                if (!valid) {
+                    StringBuilder message = new StringBuilder();
+                    message.append("Input inV: ");
+                    message.append(String.format("0x%x", args.inV));
+                    message.append("\n");
+                    message.append("Expected output out: ");
+                    message.append(String.format("0x%x", args.out));
+                    message.append("\n");
+                    message.append("Actual   output out: ");
+                    message.append(String.format("0x%x", arrayOut[i * 4 + j]));
+                    if (args.out != arrayOut[i * 4 + j]) {
+                        message.append(" FAIL");
+                    }
+                    message.append("\n");
+                    assertTrue("Incorrect output for checkConvertUlong3Ulong3" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                }
+            }
+        }
+    }
+
+    private void checkConvertUlong4Ulong4() {
+        Allocation inV = createRandomIntegerAllocation(mRS, Element.DataType.UNSIGNED_64, 4, 0x9ec3547c5fe26accl, false, 64);
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_64, 4), INPUTSIZE);
+            script.forEach_testConvertUlong4Ulong4Ulong4(inV, out);
+            verifyResultsConvertUlong4Ulong4(inV, out, false);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertUlong4Ulong4Ulong4: " + e.toString());
+        }
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_64, 4), INPUTSIZE);
+            scriptRelaxed.forEach_testConvertUlong4Ulong4Ulong4(inV, out);
+            verifyResultsConvertUlong4Ulong4(inV, out, true);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertUlong4Ulong4Ulong4: " + e.toString());
+        }
+    }
+
+    private void verifyResultsConvertUlong4Ulong4(Allocation inV, Allocation out, boolean relaxed) {
+        long[] arrayInV = new long[INPUTSIZE * 4];
+        inV.copyTo(arrayInV);
+        long[] arrayOut = new long[INPUTSIZE * 4];
+        out.copyTo(arrayOut);
+        for (int i = 0; i < INPUTSIZE; i++) {
+            for (int j = 0; j < 4 ; j++) {
+                // Extract the inputs.
+                ArgumentsUlongUlong args = new ArgumentsUlongUlong();
+                args.inV = arrayInV[i * 4 + j];
+                // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
+                CoreMathVerifier.computeConvert(args);
+                // Figure out what the outputs should have been.
+                boolean valid = true;
+                if (args.out != arrayOut[i * 4 + j]) {
+                    valid = false;
+                }
+                if (!valid) {
+                    StringBuilder message = new StringBuilder();
+                    message.append("Input inV: ");
+                    message.append(String.format("0x%x", args.inV));
+                    message.append("\n");
+                    message.append("Expected output out: ");
+                    message.append(String.format("0x%x", args.out));
+                    message.append("\n");
+                    message.append("Actual   output out: ");
+                    message.append(String.format("0x%x", arrayOut[i * 4 + j]));
+                    if (args.out != arrayOut[i * 4 + j]) {
+                        message.append(" FAIL");
+                    }
+                    message.append("\n");
+                    assertTrue("Incorrect output for checkConvertUlong4Ulong4" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                }
+            }
+        }
+    }
+
+    public class ArgumentsDoubleFloat {
+        public double inV;
+        public Floaty out;
+    }
+
+    private void checkConvertDouble2Float2() {
+        Allocation inV = createRandomFloatAllocation(mRS, Element.DataType.FLOAT_64, 2, 0x42b4cec67d6d9a2dl, -1.6163412428744576259e+38, 1.6163412428744576259e+38);
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 2), INPUTSIZE);
+            script.forEach_testConvertFloat2Double2Float2(inV, out);
+            verifyResultsConvertDouble2Float2(inV, out, false);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertFloat2Double2Float2: " + e.toString());
+        }
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 2), INPUTSIZE);
+            scriptRelaxed.forEach_testConvertFloat2Double2Float2(inV, out);
+            verifyResultsConvertDouble2Float2(inV, out, true);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertFloat2Double2Float2: " + e.toString());
+        }
+    }
+
+    private void verifyResultsConvertDouble2Float2(Allocation inV, Allocation out, boolean relaxed) {
+        double[] arrayInV = new double[INPUTSIZE * 2];
+        inV.copyTo(arrayInV);
+        float[] arrayOut = new float[INPUTSIZE * 2];
+        out.copyTo(arrayOut);
+        for (int i = 0; i < INPUTSIZE; i++) {
+            for (int j = 0; j < 2 ; j++) {
+                // Extract the inputs.
+                ArgumentsDoubleFloat args = new ArgumentsDoubleFloat();
+                args.inV = arrayInV[i * 2 + j];
+                // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
+                CoreMathVerifier.computeConvert(args);
+                // Figure out what the outputs should have been.
+                boolean valid = true;
+                if (!args.out.couldBe(arrayOut[i * 2 + j])) {
+                    valid = false;
+                }
+                if (!valid) {
+                    StringBuilder message = new StringBuilder();
+                    message.append("Input inV: ");
+                    message.append(String.format("%24.8g %16x %31a",
+                            args.inV, Double.doubleToRawLongBits(args.inV), args.inV));
+                    message.append("\n");
+                    message.append("Expected output out: ");
+                    message.append(args.out.toString());
+                    message.append("\n");
+                    message.append("Actual   output out: ");
+                    message.append(String.format("%14.8g %8x %15a",
+                            arrayOut[i * 2 + j], Float.floatToRawIntBits(arrayOut[i * 2 + j]), arrayOut[i * 2 + j]));
+                    if (!args.out.couldBe(arrayOut[i * 2 + j])) {
+                        message.append(" FAIL");
+                    }
+                    message.append("\n");
+                    assertTrue("Incorrect output for checkConvertDouble2Float2" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                }
+            }
+        }
+    }
+
+    private void checkConvertDouble3Float3() {
+        Allocation inV = createRandomFloatAllocation(mRS, Element.DataType.FLOAT_64, 3, 0x42b697e17388bb0bl, -1.6163412428744576259e+38, 1.6163412428744576259e+38);
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 3), INPUTSIZE);
+            script.forEach_testConvertFloat3Double3Float3(inV, out);
+            verifyResultsConvertDouble3Float3(inV, out, false);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertFloat3Double3Float3: " + e.toString());
+        }
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 3), INPUTSIZE);
+            scriptRelaxed.forEach_testConvertFloat3Double3Float3(inV, out);
+            verifyResultsConvertDouble3Float3(inV, out, true);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertFloat3Double3Float3: " + e.toString());
+        }
+    }
+
+    private void verifyResultsConvertDouble3Float3(Allocation inV, Allocation out, boolean relaxed) {
+        double[] arrayInV = new double[INPUTSIZE * 4];
+        inV.copyTo(arrayInV);
+        float[] arrayOut = new float[INPUTSIZE * 4];
+        out.copyTo(arrayOut);
+        for (int i = 0; i < INPUTSIZE; i++) {
+            for (int j = 0; j < 3 ; j++) {
+                // Extract the inputs.
+                ArgumentsDoubleFloat args = new ArgumentsDoubleFloat();
+                args.inV = arrayInV[i * 4 + j];
+                // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
+                CoreMathVerifier.computeConvert(args);
+                // Figure out what the outputs should have been.
+                boolean valid = true;
+                if (!args.out.couldBe(arrayOut[i * 4 + j])) {
+                    valid = false;
+                }
+                if (!valid) {
+                    StringBuilder message = new StringBuilder();
+                    message.append("Input inV: ");
+                    message.append(String.format("%24.8g %16x %31a",
+                            args.inV, Double.doubleToRawLongBits(args.inV), args.inV));
+                    message.append("\n");
+                    message.append("Expected output out: ");
+                    message.append(args.out.toString());
+                    message.append("\n");
+                    message.append("Actual   output out: ");
+                    message.append(String.format("%14.8g %8x %15a",
+                            arrayOut[i * 4 + j], Float.floatToRawIntBits(arrayOut[i * 4 + j]), arrayOut[i * 4 + j]));
+                    if (!args.out.couldBe(arrayOut[i * 4 + j])) {
+                        message.append(" FAIL");
+                    }
+                    message.append("\n");
+                    assertTrue("Incorrect output for checkConvertDouble3Float3" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                }
+            }
+        }
+    }
+
+    private void checkConvertDouble4Float4() {
+        Allocation inV = createRandomFloatAllocation(mRS, Element.DataType.FLOAT_64, 4, 0x42b860fc69a3dbe9l, -1.6163412428744576259e+38, 1.6163412428744576259e+38);
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 4), INPUTSIZE);
+            script.forEach_testConvertFloat4Double4Float4(inV, out);
+            verifyResultsConvertDouble4Float4(inV, out, false);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertFloat4Double4Float4: " + e.toString());
+        }
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 4), INPUTSIZE);
+            scriptRelaxed.forEach_testConvertFloat4Double4Float4(inV, out);
+            verifyResultsConvertDouble4Float4(inV, out, true);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertFloat4Double4Float4: " + e.toString());
+        }
+    }
+
+    private void verifyResultsConvertDouble4Float4(Allocation inV, Allocation out, boolean relaxed) {
+        double[] arrayInV = new double[INPUTSIZE * 4];
+        inV.copyTo(arrayInV);
+        float[] arrayOut = new float[INPUTSIZE * 4];
+        out.copyTo(arrayOut);
+        for (int i = 0; i < INPUTSIZE; i++) {
+            for (int j = 0; j < 4 ; j++) {
+                // Extract the inputs.
+                ArgumentsDoubleFloat args = new ArgumentsDoubleFloat();
+                args.inV = arrayInV[i * 4 + j];
+                // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
+                CoreMathVerifier.computeConvert(args);
+                // Figure out what the outputs should have been.
+                boolean valid = true;
+                if (!args.out.couldBe(arrayOut[i * 4 + j])) {
+                    valid = false;
+                }
+                if (!valid) {
+                    StringBuilder message = new StringBuilder();
+                    message.append("Input inV: ");
+                    message.append(String.format("%24.8g %16x %31a",
+                            args.inV, Double.doubleToRawLongBits(args.inV), args.inV));
+                    message.append("\n");
+                    message.append("Expected output out: ");
+                    message.append(args.out.toString());
+                    message.append("\n");
+                    message.append("Actual   output out: ");
+                    message.append(String.format("%14.8g %8x %15a",
+                            arrayOut[i * 4 + j], Float.floatToRawIntBits(arrayOut[i * 4 + j]), arrayOut[i * 4 + j]));
+                    if (!args.out.couldBe(arrayOut[i * 4 + j])) {
+                        message.append(" FAIL");
+                    }
+                    message.append("\n");
+                    assertTrue("Incorrect output for checkConvertDouble4Float4" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                }
+            }
+        }
+    }
+
+    public class ArgumentsLongFloat {
+        public long inV;
+        public Floaty out;
+    }
+
+    private void checkConvertLong2Float2() {
+        Allocation inV = createRandomIntegerAllocation(mRS, Element.DataType.SIGNED_64, 2, 0x79f102c9d72eaa34l, true, 63);
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 2), INPUTSIZE);
+            script.forEach_testConvertFloat2Long2Float2(inV, out);
+            verifyResultsConvertLong2Float2(inV, out, false);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertFloat2Long2Float2: " + e.toString());
+        }
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 2), INPUTSIZE);
+            scriptRelaxed.forEach_testConvertFloat2Long2Float2(inV, out);
+            verifyResultsConvertLong2Float2(inV, out, true);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertFloat2Long2Float2: " + e.toString());
+        }
+    }
+
+    private void verifyResultsConvertLong2Float2(Allocation inV, Allocation out, boolean relaxed) {
+        long[] arrayInV = new long[INPUTSIZE * 2];
+        inV.copyTo(arrayInV);
+        float[] arrayOut = new float[INPUTSIZE * 2];
+        out.copyTo(arrayOut);
+        for (int i = 0; i < INPUTSIZE; i++) {
+            for (int j = 0; j < 2 ; j++) {
+                // Extract the inputs.
+                ArgumentsLongFloat args = new ArgumentsLongFloat();
+                args.inV = arrayInV[i * 2 + j];
+                // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
+                CoreMathVerifier.computeConvert(args);
+                // Figure out what the outputs should have been.
+                boolean valid = true;
+                if (!args.out.couldBe(arrayOut[i * 2 + j])) {
+                    valid = false;
+                }
+                if (!valid) {
+                    StringBuilder message = new StringBuilder();
+                    message.append("Input inV: ");
+                    message.append(String.format("%d", args.inV));
+                    message.append("\n");
+                    message.append("Expected output out: ");
+                    message.append(args.out.toString());
+                    message.append("\n");
+                    message.append("Actual   output out: ");
+                    message.append(String.format("%14.8g %8x %15a",
+                            arrayOut[i * 2 + j], Float.floatToRawIntBits(arrayOut[i * 2 + j]), arrayOut[i * 2 + j]));
+                    if (!args.out.couldBe(arrayOut[i * 2 + j])) {
+                        message.append(" FAIL");
+                    }
+                    message.append("\n");
+                    assertTrue("Incorrect output for checkConvertLong2Float2" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                }
+            }
+        }
+    }
+
+    private void checkConvertLong3Float3() {
+        Allocation inV = createRandomIntegerAllocation(mRS, Element.DataType.SIGNED_64, 3, 0x79f2cbe4cd49cb12l, true, 63);
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 3), INPUTSIZE);
+            script.forEach_testConvertFloat3Long3Float3(inV, out);
+            verifyResultsConvertLong3Float3(inV, out, false);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertFloat3Long3Float3: " + e.toString());
+        }
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 3), INPUTSIZE);
+            scriptRelaxed.forEach_testConvertFloat3Long3Float3(inV, out);
+            verifyResultsConvertLong3Float3(inV, out, true);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertFloat3Long3Float3: " + e.toString());
+        }
+    }
+
+    private void verifyResultsConvertLong3Float3(Allocation inV, Allocation out, boolean relaxed) {
+        long[] arrayInV = new long[INPUTSIZE * 4];
+        inV.copyTo(arrayInV);
+        float[] arrayOut = new float[INPUTSIZE * 4];
+        out.copyTo(arrayOut);
+        for (int i = 0; i < INPUTSIZE; i++) {
+            for (int j = 0; j < 3 ; j++) {
+                // Extract the inputs.
+                ArgumentsLongFloat args = new ArgumentsLongFloat();
+                args.inV = arrayInV[i * 4 + j];
+                // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
+                CoreMathVerifier.computeConvert(args);
+                // Figure out what the outputs should have been.
+                boolean valid = true;
+                if (!args.out.couldBe(arrayOut[i * 4 + j])) {
+                    valid = false;
+                }
+                if (!valid) {
+                    StringBuilder message = new StringBuilder();
+                    message.append("Input inV: ");
+                    message.append(String.format("%d", args.inV));
+                    message.append("\n");
+                    message.append("Expected output out: ");
+                    message.append(args.out.toString());
+                    message.append("\n");
+                    message.append("Actual   output out: ");
+                    message.append(String.format("%14.8g %8x %15a",
+                            arrayOut[i * 4 + j], Float.floatToRawIntBits(arrayOut[i * 4 + j]), arrayOut[i * 4 + j]));
+                    if (!args.out.couldBe(arrayOut[i * 4 + j])) {
+                        message.append(" FAIL");
+                    }
+                    message.append("\n");
+                    assertTrue("Incorrect output for checkConvertLong3Float3" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                }
+            }
+        }
+    }
+
+    private void checkConvertLong4Float4() {
+        Allocation inV = createRandomIntegerAllocation(mRS, Element.DataType.SIGNED_64, 4, 0x79f494ffc364ebf0l, true, 63);
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 4), INPUTSIZE);
+            script.forEach_testConvertFloat4Long4Float4(inV, out);
+            verifyResultsConvertLong4Float4(inV, out, false);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertFloat4Long4Float4: " + e.toString());
+        }
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 4), INPUTSIZE);
+            scriptRelaxed.forEach_testConvertFloat4Long4Float4(inV, out);
+            verifyResultsConvertLong4Float4(inV, out, true);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertFloat4Long4Float4: " + e.toString());
+        }
+    }
+
+    private void verifyResultsConvertLong4Float4(Allocation inV, Allocation out, boolean relaxed) {
+        long[] arrayInV = new long[INPUTSIZE * 4];
+        inV.copyTo(arrayInV);
+        float[] arrayOut = new float[INPUTSIZE * 4];
+        out.copyTo(arrayOut);
+        for (int i = 0; i < INPUTSIZE; i++) {
+            for (int j = 0; j < 4 ; j++) {
+                // Extract the inputs.
+                ArgumentsLongFloat args = new ArgumentsLongFloat();
+                args.inV = arrayInV[i * 4 + j];
+                // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
+                CoreMathVerifier.computeConvert(args);
+                // Figure out what the outputs should have been.
+                boolean valid = true;
+                if (!args.out.couldBe(arrayOut[i * 4 + j])) {
+                    valid = false;
+                }
+                if (!valid) {
+                    StringBuilder message = new StringBuilder();
+                    message.append("Input inV: ");
+                    message.append(String.format("%d", args.inV));
+                    message.append("\n");
+                    message.append("Expected output out: ");
+                    message.append(args.out.toString());
+                    message.append("\n");
+                    message.append("Actual   output out: ");
+                    message.append(String.format("%14.8g %8x %15a",
+                            arrayOut[i * 4 + j], Float.floatToRawIntBits(arrayOut[i * 4 + j]), arrayOut[i * 4 + j]));
+                    if (!args.out.couldBe(arrayOut[i * 4 + j])) {
+                        message.append(" FAIL");
+                    }
+                    message.append("\n");
+                    assertTrue("Incorrect output for checkConvertLong4Float4" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                }
+            }
+        }
+    }
+
+    public class ArgumentsUlongFloat {
+        public long inV;
+        public Floaty out;
+    }
+
+    private void checkConvertUlong2Float2() {
+        Allocation inV = createRandomIntegerAllocation(mRS, Element.DataType.UNSIGNED_64, 2, 0x9ebf22d17306c3dfl, false, 64);
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 2), INPUTSIZE);
+            script.forEach_testConvertFloat2Ulong2Float2(inV, out);
+            verifyResultsConvertUlong2Float2(inV, out, false);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertFloat2Ulong2Float2: " + e.toString());
+        }
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 2), INPUTSIZE);
+            scriptRelaxed.forEach_testConvertFloat2Ulong2Float2(inV, out);
+            verifyResultsConvertUlong2Float2(inV, out, true);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertFloat2Ulong2Float2: " + e.toString());
+        }
+    }
+
+    private void verifyResultsConvertUlong2Float2(Allocation inV, Allocation out, boolean relaxed) {
+        long[] arrayInV = new long[INPUTSIZE * 2];
+        inV.copyTo(arrayInV);
+        float[] arrayOut = new float[INPUTSIZE * 2];
+        out.copyTo(arrayOut);
+        for (int i = 0; i < INPUTSIZE; i++) {
+            for (int j = 0; j < 2 ; j++) {
+                // Extract the inputs.
+                ArgumentsUlongFloat args = new ArgumentsUlongFloat();
+                args.inV = arrayInV[i * 2 + j];
+                // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
+                CoreMathVerifier.computeConvert(args);
+                // Figure out what the outputs should have been.
+                boolean valid = true;
+                if (!args.out.couldBe(arrayOut[i * 2 + j])) {
+                    valid = false;
+                }
+                if (!valid) {
+                    StringBuilder message = new StringBuilder();
+                    message.append("Input inV: ");
+                    message.append(String.format("0x%x", args.inV));
+                    message.append("\n");
+                    message.append("Expected output out: ");
+                    message.append(args.out.toString());
+                    message.append("\n");
+                    message.append("Actual   output out: ");
+                    message.append(String.format("%14.8g %8x %15a",
+                            arrayOut[i * 2 + j], Float.floatToRawIntBits(arrayOut[i * 2 + j]), arrayOut[i * 2 + j]));
+                    if (!args.out.couldBe(arrayOut[i * 2 + j])) {
+                        message.append(" FAIL");
+                    }
+                    message.append("\n");
+                    assertTrue("Incorrect output for checkConvertUlong2Float2" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                }
+            }
+        }
+    }
+
+    private void checkConvertUlong3Float3() {
+        Allocation inV = createRandomIntegerAllocation(mRS, Element.DataType.UNSIGNED_64, 3, 0x9ec0ebec6921e4bdl, false, 64);
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 3), INPUTSIZE);
+            script.forEach_testConvertFloat3Ulong3Float3(inV, out);
+            verifyResultsConvertUlong3Float3(inV, out, false);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertFloat3Ulong3Float3: " + e.toString());
+        }
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 3), INPUTSIZE);
+            scriptRelaxed.forEach_testConvertFloat3Ulong3Float3(inV, out);
+            verifyResultsConvertUlong3Float3(inV, out, true);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertFloat3Ulong3Float3: " + e.toString());
+        }
+    }
+
+    private void verifyResultsConvertUlong3Float3(Allocation inV, Allocation out, boolean relaxed) {
+        long[] arrayInV = new long[INPUTSIZE * 4];
+        inV.copyTo(arrayInV);
+        float[] arrayOut = new float[INPUTSIZE * 4];
+        out.copyTo(arrayOut);
+        for (int i = 0; i < INPUTSIZE; i++) {
+            for (int j = 0; j < 3 ; j++) {
+                // Extract the inputs.
+                ArgumentsUlongFloat args = new ArgumentsUlongFloat();
+                args.inV = arrayInV[i * 4 + j];
+                // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
+                CoreMathVerifier.computeConvert(args);
+                // Figure out what the outputs should have been.
+                boolean valid = true;
+                if (!args.out.couldBe(arrayOut[i * 4 + j])) {
+                    valid = false;
+                }
+                if (!valid) {
+                    StringBuilder message = new StringBuilder();
+                    message.append("Input inV: ");
+                    message.append(String.format("0x%x", args.inV));
+                    message.append("\n");
+                    message.append("Expected output out: ");
+                    message.append(args.out.toString());
+                    message.append("\n");
+                    message.append("Actual   output out: ");
+                    message.append(String.format("%14.8g %8x %15a",
+                            arrayOut[i * 4 + j], Float.floatToRawIntBits(arrayOut[i * 4 + j]), arrayOut[i * 4 + j]));
+                    if (!args.out.couldBe(arrayOut[i * 4 + j])) {
+                        message.append(" FAIL");
+                    }
+                    message.append("\n");
+                    assertTrue("Incorrect output for checkConvertUlong3Float3" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                }
+            }
+        }
+    }
+
+    private void checkConvertUlong4Float4() {
+        Allocation inV = createRandomIntegerAllocation(mRS, Element.DataType.UNSIGNED_64, 4, 0x9ec2b5075f3d059bl, false, 64);
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 4), INPUTSIZE);
+            script.forEach_testConvertFloat4Ulong4Float4(inV, out);
+            verifyResultsConvertUlong4Float4(inV, out, false);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertFloat4Ulong4Float4: " + e.toString());
+        }
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 4), INPUTSIZE);
+            scriptRelaxed.forEach_testConvertFloat4Ulong4Float4(inV, out);
+            verifyResultsConvertUlong4Float4(inV, out, true);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertFloat4Ulong4Float4: " + e.toString());
+        }
+    }
+
+    private void verifyResultsConvertUlong4Float4(Allocation inV, Allocation out, boolean relaxed) {
+        long[] arrayInV = new long[INPUTSIZE * 4];
+        inV.copyTo(arrayInV);
+        float[] arrayOut = new float[INPUTSIZE * 4];
+        out.copyTo(arrayOut);
+        for (int i = 0; i < INPUTSIZE; i++) {
+            for (int j = 0; j < 4 ; j++) {
+                // Extract the inputs.
+                ArgumentsUlongFloat args = new ArgumentsUlongFloat();
+                args.inV = arrayInV[i * 4 + j];
+                // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
+                CoreMathVerifier.computeConvert(args);
+                // Figure out what the outputs should have been.
+                boolean valid = true;
+                if (!args.out.couldBe(arrayOut[i * 4 + j])) {
+                    valid = false;
+                }
+                if (!valid) {
+                    StringBuilder message = new StringBuilder();
+                    message.append("Input inV: ");
+                    message.append(String.format("0x%x", args.inV));
+                    message.append("\n");
+                    message.append("Expected output out: ");
+                    message.append(args.out.toString());
+                    message.append("\n");
+                    message.append("Actual   output out: ");
+                    message.append(String.format("%14.8g %8x %15a",
+                            arrayOut[i * 4 + j], Float.floatToRawIntBits(arrayOut[i * 4 + j]), arrayOut[i * 4 + j]));
+                    if (!args.out.couldBe(arrayOut[i * 4 + j])) {
+                        message.append(" FAIL");
+                    }
+                    message.append("\n");
+                    assertTrue("Incorrect output for checkConvertUlong4Float4" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                }
+            }
+        }
+    }
+
+    public class ArgumentsDoubleChar {
+        public double inV;
+        public byte out;
+    }
+
+    private void checkConvertDouble2Char2() {
+        Allocation inV = createRandomFloatAllocation(mRS, Element.DataType.FLOAT_64, 2, 0xcbf84b7bef094a17l, -1.2800000000000000000e+02, 1.2700000000000000000e+02);
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_8, 2), INPUTSIZE);
+            script.forEach_testConvertChar2Double2Char2(inV, out);
+            verifyResultsConvertDouble2Char2(inV, out, false);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertChar2Double2Char2: " + e.toString());
+        }
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_8, 2), INPUTSIZE);
+            scriptRelaxed.forEach_testConvertChar2Double2Char2(inV, out);
+            verifyResultsConvertDouble2Char2(inV, out, true);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertChar2Double2Char2: " + e.toString());
+        }
+    }
+
+    private void verifyResultsConvertDouble2Char2(Allocation inV, Allocation out, boolean relaxed) {
+        double[] arrayInV = new double[INPUTSIZE * 2];
+        inV.copyTo(arrayInV);
+        byte[] arrayOut = new byte[INPUTSIZE * 2];
+        out.copyTo(arrayOut);
+        for (int i = 0; i < INPUTSIZE; i++) {
+            for (int j = 0; j < 2 ; j++) {
+                // Extract the inputs.
+                ArgumentsDoubleChar args = new ArgumentsDoubleChar();
+                args.inV = arrayInV[i * 2 + j];
+                // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
+                CoreMathVerifier.computeConvert(args);
+                // Figure out what the outputs should have been.
+                boolean valid = true;
+                if (args.out != arrayOut[i * 2 + j]) {
+                    valid = false;
+                }
+                if (!valid) {
+                    StringBuilder message = new StringBuilder();
+                    message.append("Input inV: ");
+                    message.append(String.format("%24.8g %16x %31a",
+                            args.inV, Double.doubleToRawLongBits(args.inV), args.inV));
+                    message.append("\n");
+                    message.append("Expected output out: ");
+                    message.append(String.format("%d", args.out));
+                    message.append("\n");
+                    message.append("Actual   output out: ");
+                    message.append(String.format("%d", arrayOut[i * 2 + j]));
+                    if (args.out != arrayOut[i * 2 + j]) {
+                        message.append(" FAIL");
+                    }
+                    message.append("\n");
+                    assertTrue("Incorrect output for checkConvertDouble2Char2" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                }
+            }
+        }
+    }
+
+    private void checkConvertDouble3Char3() {
+        Allocation inV = createRandomFloatAllocation(mRS, Element.DataType.FLOAT_64, 3, 0xcbf8561d4e110f0bl, -1.2800000000000000000e+02, 1.2700000000000000000e+02);
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_8, 3), INPUTSIZE);
+            script.forEach_testConvertChar3Double3Char3(inV, out);
+            verifyResultsConvertDouble3Char3(inV, out, false);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertChar3Double3Char3: " + e.toString());
+        }
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_8, 3), INPUTSIZE);
+            scriptRelaxed.forEach_testConvertChar3Double3Char3(inV, out);
+            verifyResultsConvertDouble3Char3(inV, out, true);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertChar3Double3Char3: " + e.toString());
+        }
+    }
+
+    private void verifyResultsConvertDouble3Char3(Allocation inV, Allocation out, boolean relaxed) {
+        double[] arrayInV = new double[INPUTSIZE * 4];
+        inV.copyTo(arrayInV);
+        byte[] arrayOut = new byte[INPUTSIZE * 4];
+        out.copyTo(arrayOut);
+        for (int i = 0; i < INPUTSIZE; i++) {
+            for (int j = 0; j < 3 ; j++) {
+                // Extract the inputs.
+                ArgumentsDoubleChar args = new ArgumentsDoubleChar();
+                args.inV = arrayInV[i * 4 + j];
+                // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
+                CoreMathVerifier.computeConvert(args);
+                // Figure out what the outputs should have been.
+                boolean valid = true;
+                if (args.out != arrayOut[i * 4 + j]) {
+                    valid = false;
+                }
+                if (!valid) {
+                    StringBuilder message = new StringBuilder();
+                    message.append("Input inV: ");
+                    message.append(String.format("%24.8g %16x %31a",
+                            args.inV, Double.doubleToRawLongBits(args.inV), args.inV));
+                    message.append("\n");
+                    message.append("Expected output out: ");
+                    message.append(String.format("%d", args.out));
+                    message.append("\n");
+                    message.append("Actual   output out: ");
+                    message.append(String.format("%d", arrayOut[i * 4 + j]));
+                    if (args.out != arrayOut[i * 4 + j]) {
+                        message.append(" FAIL");
+                    }
+                    message.append("\n");
+                    assertTrue("Incorrect output for checkConvertDouble3Char3" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                }
+            }
+        }
+    }
+
+    private void checkConvertDouble4Char4() {
+        Allocation inV = createRandomFloatAllocation(mRS, Element.DataType.FLOAT_64, 4, 0xcbf860bead18d3ffl, -1.2800000000000000000e+02, 1.2700000000000000000e+02);
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_8, 4), INPUTSIZE);
+            script.forEach_testConvertChar4Double4Char4(inV, out);
+            verifyResultsConvertDouble4Char4(inV, out, false);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertChar4Double4Char4: " + e.toString());
+        }
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_8, 4), INPUTSIZE);
+            scriptRelaxed.forEach_testConvertChar4Double4Char4(inV, out);
+            verifyResultsConvertDouble4Char4(inV, out, true);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertChar4Double4Char4: " + e.toString());
+        }
+    }
+
+    private void verifyResultsConvertDouble4Char4(Allocation inV, Allocation out, boolean relaxed) {
+        double[] arrayInV = new double[INPUTSIZE * 4];
+        inV.copyTo(arrayInV);
+        byte[] arrayOut = new byte[INPUTSIZE * 4];
+        out.copyTo(arrayOut);
+        for (int i = 0; i < INPUTSIZE; i++) {
+            for (int j = 0; j < 4 ; j++) {
+                // Extract the inputs.
+                ArgumentsDoubleChar args = new ArgumentsDoubleChar();
+                args.inV = arrayInV[i * 4 + j];
+                // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
+                CoreMathVerifier.computeConvert(args);
+                // Figure out what the outputs should have been.
+                boolean valid = true;
+                if (args.out != arrayOut[i * 4 + j]) {
+                    valid = false;
+                }
+                if (!valid) {
+                    StringBuilder message = new StringBuilder();
+                    message.append("Input inV: ");
+                    message.append(String.format("%24.8g %16x %31a",
+                            args.inV, Double.doubleToRawLongBits(args.inV), args.inV));
+                    message.append("\n");
+                    message.append("Expected output out: ");
+                    message.append(String.format("%d", args.out));
+                    message.append("\n");
+                    message.append("Actual   output out: ");
+                    message.append(String.format("%d", arrayOut[i * 4 + j]));
+                    if (args.out != arrayOut[i * 4 + j]) {
+                        message.append(" FAIL");
+                    }
+                    message.append("\n");
+                    assertTrue("Incorrect output for checkConvertDouble4Char4" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                }
+            }
+        }
+    }
+
+    public class ArgumentsLongChar {
+        public long inV;
+        public byte out;
+    }
+
+    private void checkConvertLong2Char2() {
+        Allocation inV = createRandomIntegerAllocation(mRS, Element.DataType.SIGNED_64, 2, 0xb570c3c37419afacl, true, 7);
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_8, 2), INPUTSIZE);
+            script.forEach_testConvertChar2Long2Char2(inV, out);
+            verifyResultsConvertLong2Char2(inV, out, false);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertChar2Long2Char2: " + e.toString());
+        }
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_8, 2), INPUTSIZE);
+            scriptRelaxed.forEach_testConvertChar2Long2Char2(inV, out);
+            verifyResultsConvertLong2Char2(inV, out, true);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertChar2Long2Char2: " + e.toString());
+        }
+    }
+
+    private void verifyResultsConvertLong2Char2(Allocation inV, Allocation out, boolean relaxed) {
+        long[] arrayInV = new long[INPUTSIZE * 2];
+        inV.copyTo(arrayInV);
+        byte[] arrayOut = new byte[INPUTSIZE * 2];
+        out.copyTo(arrayOut);
+        for (int i = 0; i < INPUTSIZE; i++) {
+            for (int j = 0; j < 2 ; j++) {
+                // Extract the inputs.
+                ArgumentsLongChar args = new ArgumentsLongChar();
+                args.inV = arrayInV[i * 2 + j];
+                // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
+                CoreMathVerifier.computeConvert(args);
+                // Figure out what the outputs should have been.
+                boolean valid = true;
+                if (args.out != arrayOut[i * 2 + j]) {
+                    valid = false;
+                }
+                if (!valid) {
+                    StringBuilder message = new StringBuilder();
+                    message.append("Input inV: ");
+                    message.append(String.format("%d", args.inV));
+                    message.append("\n");
+                    message.append("Expected output out: ");
+                    message.append(String.format("%d", args.out));
+                    message.append("\n");
+                    message.append("Actual   output out: ");
+                    message.append(String.format("%d", arrayOut[i * 2 + j]));
+                    if (args.out != arrayOut[i * 2 + j]) {
+                        message.append(" FAIL");
+                    }
+                    message.append("\n");
+                    assertTrue("Incorrect output for checkConvertLong2Char2" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                }
+            }
+        }
+    }
+
+    private void checkConvertLong3Char3() {
+        Allocation inV = createRandomIntegerAllocation(mRS, Element.DataType.SIGNED_64, 3, 0xb570ce64d32174a0l, true, 7);
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_8, 3), INPUTSIZE);
+            script.forEach_testConvertChar3Long3Char3(inV, out);
+            verifyResultsConvertLong3Char3(inV, out, false);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertChar3Long3Char3: " + e.toString());
+        }
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_8, 3), INPUTSIZE);
+            scriptRelaxed.forEach_testConvertChar3Long3Char3(inV, out);
+            verifyResultsConvertLong3Char3(inV, out, true);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertChar3Long3Char3: " + e.toString());
+        }
+    }
+
+    private void verifyResultsConvertLong3Char3(Allocation inV, Allocation out, boolean relaxed) {
+        long[] arrayInV = new long[INPUTSIZE * 4];
+        inV.copyTo(arrayInV);
+        byte[] arrayOut = new byte[INPUTSIZE * 4];
+        out.copyTo(arrayOut);
+        for (int i = 0; i < INPUTSIZE; i++) {
+            for (int j = 0; j < 3 ; j++) {
+                // Extract the inputs.
+                ArgumentsLongChar args = new ArgumentsLongChar();
+                args.inV = arrayInV[i * 4 + j];
+                // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
+                CoreMathVerifier.computeConvert(args);
+                // Figure out what the outputs should have been.
+                boolean valid = true;
+                if (args.out != arrayOut[i * 4 + j]) {
+                    valid = false;
+                }
+                if (!valid) {
+                    StringBuilder message = new StringBuilder();
+                    message.append("Input inV: ");
+                    message.append(String.format("%d", args.inV));
+                    message.append("\n");
+                    message.append("Expected output out: ");
+                    message.append(String.format("%d", args.out));
+                    message.append("\n");
+                    message.append("Actual   output out: ");
+                    message.append(String.format("%d", arrayOut[i * 4 + j]));
+                    if (args.out != arrayOut[i * 4 + j]) {
+                        message.append(" FAIL");
+                    }
+                    message.append("\n");
+                    assertTrue("Incorrect output for checkConvertLong3Char3" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                }
+            }
+        }
+    }
+
+    private void checkConvertLong4Char4() {
+        Allocation inV = createRandomIntegerAllocation(mRS, Element.DataType.SIGNED_64, 4, 0xb570d90632293994l, true, 7);
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_8, 4), INPUTSIZE);
+            script.forEach_testConvertChar4Long4Char4(inV, out);
+            verifyResultsConvertLong4Char4(inV, out, false);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertChar4Long4Char4: " + e.toString());
+        }
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_8, 4), INPUTSIZE);
+            scriptRelaxed.forEach_testConvertChar4Long4Char4(inV, out);
+            verifyResultsConvertLong4Char4(inV, out, true);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertChar4Long4Char4: " + e.toString());
+        }
+    }
+
+    private void verifyResultsConvertLong4Char4(Allocation inV, Allocation out, boolean relaxed) {
+        long[] arrayInV = new long[INPUTSIZE * 4];
+        inV.copyTo(arrayInV);
+        byte[] arrayOut = new byte[INPUTSIZE * 4];
+        out.copyTo(arrayOut);
+        for (int i = 0; i < INPUTSIZE; i++) {
+            for (int j = 0; j < 4 ; j++) {
+                // Extract the inputs.
+                ArgumentsLongChar args = new ArgumentsLongChar();
+                args.inV = arrayInV[i * 4 + j];
+                // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
+                CoreMathVerifier.computeConvert(args);
+                // Figure out what the outputs should have been.
+                boolean valid = true;
+                if (args.out != arrayOut[i * 4 + j]) {
+                    valid = false;
+                }
+                if (!valid) {
+                    StringBuilder message = new StringBuilder();
+                    message.append("Input inV: ");
+                    message.append(String.format("%d", args.inV));
+                    message.append("\n");
+                    message.append("Expected output out: ");
+                    message.append(String.format("%d", args.out));
+                    message.append("\n");
+                    message.append("Actual   output out: ");
+                    message.append(String.format("%d", arrayOut[i * 4 + j]));
+                    if (args.out != arrayOut[i * 4 + j]) {
+                        message.append(" FAIL");
+                    }
+                    message.append("\n");
+                    assertTrue("Incorrect output for checkConvertLong4Char4" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                }
+            }
+        }
+    }
+
+    public class ArgumentsUlongChar {
+        public long inV;
+        public byte out;
+    }
+
+    private void checkConvertUlong2Char2() {
+        Allocation inV = createRandomIntegerAllocation(mRS, Element.DataType.UNSIGNED_64, 2, 0x5cfe7d11069bbc2dl, false, 7);
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_8, 2), INPUTSIZE);
+            script.forEach_testConvertChar2Ulong2Char2(inV, out);
+            verifyResultsConvertUlong2Char2(inV, out, false);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertChar2Ulong2Char2: " + e.toString());
+        }
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_8, 2), INPUTSIZE);
+            scriptRelaxed.forEach_testConvertChar2Ulong2Char2(inV, out);
+            verifyResultsConvertUlong2Char2(inV, out, true);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertChar2Ulong2Char2: " + e.toString());
+        }
+    }
+
+    private void verifyResultsConvertUlong2Char2(Allocation inV, Allocation out, boolean relaxed) {
+        long[] arrayInV = new long[INPUTSIZE * 2];
+        inV.copyTo(arrayInV);
+        byte[] arrayOut = new byte[INPUTSIZE * 2];
+        out.copyTo(arrayOut);
+        for (int i = 0; i < INPUTSIZE; i++) {
+            for (int j = 0; j < 2 ; j++) {
+                // Extract the inputs.
+                ArgumentsUlongChar args = new ArgumentsUlongChar();
+                args.inV = arrayInV[i * 2 + j];
+                // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
+                CoreMathVerifier.computeConvert(args);
+                // Figure out what the outputs should have been.
+                boolean valid = true;
+                if (args.out != arrayOut[i * 2 + j]) {
+                    valid = false;
+                }
+                if (!valid) {
+                    StringBuilder message = new StringBuilder();
+                    message.append("Input inV: ");
+                    message.append(String.format("0x%x", args.inV));
+                    message.append("\n");
+                    message.append("Expected output out: ");
+                    message.append(String.format("%d", args.out));
+                    message.append("\n");
+                    message.append("Actual   output out: ");
+                    message.append(String.format("%d", arrayOut[i * 2 + j]));
+                    if (args.out != arrayOut[i * 2 + j]) {
+                        message.append(" FAIL");
+                    }
+                    message.append("\n");
+                    assertTrue("Incorrect output for checkConvertUlong2Char2" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                }
+            }
+        }
+    }
+
+    private void checkConvertUlong3Char3() {
+        Allocation inV = createRandomIntegerAllocation(mRS, Element.DataType.UNSIGNED_64, 3, 0x5cfe87b265a38121l, false, 7);
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_8, 3), INPUTSIZE);
+            script.forEach_testConvertChar3Ulong3Char3(inV, out);
+            verifyResultsConvertUlong3Char3(inV, out, false);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertChar3Ulong3Char3: " + e.toString());
+        }
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_8, 3), INPUTSIZE);
+            scriptRelaxed.forEach_testConvertChar3Ulong3Char3(inV, out);
+            verifyResultsConvertUlong3Char3(inV, out, true);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertChar3Ulong3Char3: " + e.toString());
+        }
+    }
+
+    private void verifyResultsConvertUlong3Char3(Allocation inV, Allocation out, boolean relaxed) {
+        long[] arrayInV = new long[INPUTSIZE * 4];
+        inV.copyTo(arrayInV);
+        byte[] arrayOut = new byte[INPUTSIZE * 4];
+        out.copyTo(arrayOut);
+        for (int i = 0; i < INPUTSIZE; i++) {
+            for (int j = 0; j < 3 ; j++) {
+                // Extract the inputs.
+                ArgumentsUlongChar args = new ArgumentsUlongChar();
+                args.inV = arrayInV[i * 4 + j];
+                // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
+                CoreMathVerifier.computeConvert(args);
+                // Figure out what the outputs should have been.
+                boolean valid = true;
+                if (args.out != arrayOut[i * 4 + j]) {
+                    valid = false;
+                }
+                if (!valid) {
+                    StringBuilder message = new StringBuilder();
+                    message.append("Input inV: ");
+                    message.append(String.format("0x%x", args.inV));
+                    message.append("\n");
+                    message.append("Expected output out: ");
+                    message.append(String.format("%d", args.out));
+                    message.append("\n");
+                    message.append("Actual   output out: ");
+                    message.append(String.format("%d", arrayOut[i * 4 + j]));
+                    if (args.out != arrayOut[i * 4 + j]) {
+                        message.append(" FAIL");
+                    }
+                    message.append("\n");
+                    assertTrue("Incorrect output for checkConvertUlong3Char3" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                }
+            }
+        }
+    }
+
+    private void checkConvertUlong4Char4() {
+        Allocation inV = createRandomIntegerAllocation(mRS, Element.DataType.UNSIGNED_64, 4, 0x5cfe9253c4ab4615l, false, 7);
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_8, 4), INPUTSIZE);
+            script.forEach_testConvertChar4Ulong4Char4(inV, out);
+            verifyResultsConvertUlong4Char4(inV, out, false);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertChar4Ulong4Char4: " + e.toString());
+        }
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_8, 4), INPUTSIZE);
+            scriptRelaxed.forEach_testConvertChar4Ulong4Char4(inV, out);
+            verifyResultsConvertUlong4Char4(inV, out, true);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertChar4Ulong4Char4: " + e.toString());
+        }
+    }
+
+    private void verifyResultsConvertUlong4Char4(Allocation inV, Allocation out, boolean relaxed) {
+        long[] arrayInV = new long[INPUTSIZE * 4];
+        inV.copyTo(arrayInV);
+        byte[] arrayOut = new byte[INPUTSIZE * 4];
+        out.copyTo(arrayOut);
+        for (int i = 0; i < INPUTSIZE; i++) {
+            for (int j = 0; j < 4 ; j++) {
+                // Extract the inputs.
+                ArgumentsUlongChar args = new ArgumentsUlongChar();
+                args.inV = arrayInV[i * 4 + j];
+                // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
+                CoreMathVerifier.computeConvert(args);
+                // Figure out what the outputs should have been.
+                boolean valid = true;
+                if (args.out != arrayOut[i * 4 + j]) {
+                    valid = false;
+                }
+                if (!valid) {
+                    StringBuilder message = new StringBuilder();
+                    message.append("Input inV: ");
+                    message.append(String.format("0x%x", args.inV));
+                    message.append("\n");
+                    message.append("Expected output out: ");
+                    message.append(String.format("%d", args.out));
+                    message.append("\n");
+                    message.append("Actual   output out: ");
+                    message.append(String.format("%d", arrayOut[i * 4 + j]));
+                    if (args.out != arrayOut[i * 4 + j]) {
+                        message.append(" FAIL");
+                    }
+                    message.append("\n");
+                    assertTrue("Incorrect output for checkConvertUlong4Char4" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                }
+            }
+        }
+    }
+
+    public class ArgumentsDoubleUchar {
+        public double inV;
+        public byte out;
+    }
+
+    private void checkConvertDouble2Uchar2() {
+        Allocation inV = createRandomFloatAllocation(mRS, Element.DataType.FLOAT_64, 2, 0x42b56bf72a0f8ae0l, 0.0000000000000000000e+00, 2.5500000000000000000e+02);
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_8, 2), INPUTSIZE);
+            script.forEach_testConvertUchar2Double2Uchar2(inV, out);
+            verifyResultsConvertDouble2Uchar2(inV, out, false);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertUchar2Double2Uchar2: " + e.toString());
+        }
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_8, 2), INPUTSIZE);
+            scriptRelaxed.forEach_testConvertUchar2Double2Uchar2(inV, out);
+            verifyResultsConvertDouble2Uchar2(inV, out, true);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertUchar2Double2Uchar2: " + e.toString());
+        }
+    }
+
+    private void verifyResultsConvertDouble2Uchar2(Allocation inV, Allocation out, boolean relaxed) {
+        double[] arrayInV = new double[INPUTSIZE * 2];
+        inV.copyTo(arrayInV);
+        byte[] arrayOut = new byte[INPUTSIZE * 2];
+        out.copyTo(arrayOut);
+        for (int i = 0; i < INPUTSIZE; i++) {
+            for (int j = 0; j < 2 ; j++) {
+                // Extract the inputs.
+                ArgumentsDoubleUchar args = new ArgumentsDoubleUchar();
+                args.inV = arrayInV[i * 2 + j];
+                // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
+                CoreMathVerifier.computeConvert(args);
+                // Figure out what the outputs should have been.
+                boolean valid = true;
+                if (args.out != arrayOut[i * 2 + j]) {
+                    valid = false;
+                }
+                if (!valid) {
+                    StringBuilder message = new StringBuilder();
+                    message.append("Input inV: ");
+                    message.append(String.format("%24.8g %16x %31a",
+                            args.inV, Double.doubleToRawLongBits(args.inV), args.inV));
+                    message.append("\n");
+                    message.append("Expected output out: ");
+                    message.append(String.format("0x%x", args.out));
+                    message.append("\n");
+                    message.append("Actual   output out: ");
+                    message.append(String.format("0x%x", arrayOut[i * 2 + j]));
+                    if (args.out != arrayOut[i * 2 + j]) {
+                        message.append(" FAIL");
+                    }
+                    message.append("\n");
+                    assertTrue("Incorrect output for checkConvertDouble2Uchar2" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                }
+            }
+        }
+    }
+
+    private void checkConvertDouble3Uchar3() {
+        Allocation inV = createRandomFloatAllocation(mRS, Element.DataType.FLOAT_64, 3, 0x42b73512202aabbel, 0.0000000000000000000e+00, 2.5500000000000000000e+02);
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_8, 3), INPUTSIZE);
+            script.forEach_testConvertUchar3Double3Uchar3(inV, out);
+            verifyResultsConvertDouble3Uchar3(inV, out, false);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertUchar3Double3Uchar3: " + e.toString());
+        }
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_8, 3), INPUTSIZE);
+            scriptRelaxed.forEach_testConvertUchar3Double3Uchar3(inV, out);
+            verifyResultsConvertDouble3Uchar3(inV, out, true);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertUchar3Double3Uchar3: " + e.toString());
+        }
+    }
+
+    private void verifyResultsConvertDouble3Uchar3(Allocation inV, Allocation out, boolean relaxed) {
+        double[] arrayInV = new double[INPUTSIZE * 4];
+        inV.copyTo(arrayInV);
+        byte[] arrayOut = new byte[INPUTSIZE * 4];
+        out.copyTo(arrayOut);
+        for (int i = 0; i < INPUTSIZE; i++) {
+            for (int j = 0; j < 3 ; j++) {
+                // Extract the inputs.
+                ArgumentsDoubleUchar args = new ArgumentsDoubleUchar();
+                args.inV = arrayInV[i * 4 + j];
+                // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
+                CoreMathVerifier.computeConvert(args);
+                // Figure out what the outputs should have been.
+                boolean valid = true;
+                if (args.out != arrayOut[i * 4 + j]) {
+                    valid = false;
+                }
+                if (!valid) {
+                    StringBuilder message = new StringBuilder();
+                    message.append("Input inV: ");
+                    message.append(String.format("%24.8g %16x %31a",
+                            args.inV, Double.doubleToRawLongBits(args.inV), args.inV));
+                    message.append("\n");
+                    message.append("Expected output out: ");
+                    message.append(String.format("0x%x", args.out));
+                    message.append("\n");
+                    message.append("Actual   output out: ");
+                    message.append(String.format("0x%x", arrayOut[i * 4 + j]));
+                    if (args.out != arrayOut[i * 4 + j]) {
+                        message.append(" FAIL");
+                    }
+                    message.append("\n");
+                    assertTrue("Incorrect output for checkConvertDouble3Uchar3" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                }
+            }
+        }
+    }
+
+    private void checkConvertDouble4Uchar4() {
+        Allocation inV = createRandomFloatAllocation(mRS, Element.DataType.FLOAT_64, 4, 0x42b8fe2d1645cc9cl, 0.0000000000000000000e+00, 2.5500000000000000000e+02);
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_8, 4), INPUTSIZE);
+            script.forEach_testConvertUchar4Double4Uchar4(inV, out);
+            verifyResultsConvertDouble4Uchar4(inV, out, false);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertUchar4Double4Uchar4: " + e.toString());
+        }
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_8, 4), INPUTSIZE);
+            scriptRelaxed.forEach_testConvertUchar4Double4Uchar4(inV, out);
+            verifyResultsConvertDouble4Uchar4(inV, out, true);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertUchar4Double4Uchar4: " + e.toString());
+        }
+    }
+
+    private void verifyResultsConvertDouble4Uchar4(Allocation inV, Allocation out, boolean relaxed) {
+        double[] arrayInV = new double[INPUTSIZE * 4];
+        inV.copyTo(arrayInV);
+        byte[] arrayOut = new byte[INPUTSIZE * 4];
+        out.copyTo(arrayOut);
+        for (int i = 0; i < INPUTSIZE; i++) {
+            for (int j = 0; j < 4 ; j++) {
+                // Extract the inputs.
+                ArgumentsDoubleUchar args = new ArgumentsDoubleUchar();
+                args.inV = arrayInV[i * 4 + j];
+                // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
+                CoreMathVerifier.computeConvert(args);
+                // Figure out what the outputs should have been.
+                boolean valid = true;
+                if (args.out != arrayOut[i * 4 + j]) {
+                    valid = false;
+                }
+                if (!valid) {
+                    StringBuilder message = new StringBuilder();
+                    message.append("Input inV: ");
+                    message.append(String.format("%24.8g %16x %31a",
+                            args.inV, Double.doubleToRawLongBits(args.inV), args.inV));
+                    message.append("\n");
+                    message.append("Expected output out: ");
+                    message.append(String.format("0x%x", args.out));
+                    message.append("\n");
+                    message.append("Actual   output out: ");
+                    message.append(String.format("0x%x", arrayOut[i * 4 + j]));
+                    if (args.out != arrayOut[i * 4 + j]) {
+                        message.append(" FAIL");
+                    }
+                    message.append("\n");
+                    assertTrue("Incorrect output for checkConvertDouble4Uchar4" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                }
+            }
+        }
+    }
+
+    public class ArgumentsLongUchar {
+        public long inV;
+        public byte out;
+    }
+
+    private void checkConvertLong2Uchar2() {
+        Allocation inV = createRandomIntegerAllocation(mRS, Element.DataType.SIGNED_64, 2, 0x79f19ffa83d09ae7l, false, 8);
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_8, 2), INPUTSIZE);
+            script.forEach_testConvertUchar2Long2Uchar2(inV, out);
+            verifyResultsConvertLong2Uchar2(inV, out, false);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertUchar2Long2Uchar2: " + e.toString());
+        }
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_8, 2), INPUTSIZE);
+            scriptRelaxed.forEach_testConvertUchar2Long2Uchar2(inV, out);
+            verifyResultsConvertLong2Uchar2(inV, out, true);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertUchar2Long2Uchar2: " + e.toString());
+        }
+    }
+
+    private void verifyResultsConvertLong2Uchar2(Allocation inV, Allocation out, boolean relaxed) {
+        long[] arrayInV = new long[INPUTSIZE * 2];
+        inV.copyTo(arrayInV);
+        byte[] arrayOut = new byte[INPUTSIZE * 2];
+        out.copyTo(arrayOut);
+        for (int i = 0; i < INPUTSIZE; i++) {
+            for (int j = 0; j < 2 ; j++) {
+                // Extract the inputs.
+                ArgumentsLongUchar args = new ArgumentsLongUchar();
+                args.inV = arrayInV[i * 2 + j];
+                // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
+                CoreMathVerifier.computeConvert(args);
+                // Figure out what the outputs should have been.
+                boolean valid = true;
+                if (args.out != arrayOut[i * 2 + j]) {
+                    valid = false;
+                }
+                if (!valid) {
+                    StringBuilder message = new StringBuilder();
+                    message.append("Input inV: ");
+                    message.append(String.format("%d", args.inV));
+                    message.append("\n");
+                    message.append("Expected output out: ");
+                    message.append(String.format("0x%x", args.out));
+                    message.append("\n");
+                    message.append("Actual   output out: ");
+                    message.append(String.format("0x%x", arrayOut[i * 2 + j]));
+                    if (args.out != arrayOut[i * 2 + j]) {
+                        message.append(" FAIL");
+                    }
+                    message.append("\n");
+                    assertTrue("Incorrect output for checkConvertLong2Uchar2" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                }
+            }
+        }
+    }
+
+    private void checkConvertLong3Uchar3() {
+        Allocation inV = createRandomIntegerAllocation(mRS, Element.DataType.SIGNED_64, 3, 0x79f3691579ebbbc5l, false, 8);
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_8, 3), INPUTSIZE);
+            script.forEach_testConvertUchar3Long3Uchar3(inV, out);
+            verifyResultsConvertLong3Uchar3(inV, out, false);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertUchar3Long3Uchar3: " + e.toString());
+        }
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_8, 3), INPUTSIZE);
+            scriptRelaxed.forEach_testConvertUchar3Long3Uchar3(inV, out);
+            verifyResultsConvertLong3Uchar3(inV, out, true);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertUchar3Long3Uchar3: " + e.toString());
+        }
+    }
+
+    private void verifyResultsConvertLong3Uchar3(Allocation inV, Allocation out, boolean relaxed) {
+        long[] arrayInV = new long[INPUTSIZE * 4];
+        inV.copyTo(arrayInV);
+        byte[] arrayOut = new byte[INPUTSIZE * 4];
+        out.copyTo(arrayOut);
+        for (int i = 0; i < INPUTSIZE; i++) {
+            for (int j = 0; j < 3 ; j++) {
+                // Extract the inputs.
+                ArgumentsLongUchar args = new ArgumentsLongUchar();
+                args.inV = arrayInV[i * 4 + j];
+                // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
+                CoreMathVerifier.computeConvert(args);
+                // Figure out what the outputs should have been.
+                boolean valid = true;
+                if (args.out != arrayOut[i * 4 + j]) {
+                    valid = false;
+                }
+                if (!valid) {
+                    StringBuilder message = new StringBuilder();
+                    message.append("Input inV: ");
+                    message.append(String.format("%d", args.inV));
+                    message.append("\n");
+                    message.append("Expected output out: ");
+                    message.append(String.format("0x%x", args.out));
+                    message.append("\n");
+                    message.append("Actual   output out: ");
+                    message.append(String.format("0x%x", arrayOut[i * 4 + j]));
+                    if (args.out != arrayOut[i * 4 + j]) {
+                        message.append(" FAIL");
+                    }
+                    message.append("\n");
+                    assertTrue("Incorrect output for checkConvertLong3Uchar3" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                }
+            }
+        }
+    }
+
+    private void checkConvertLong4Uchar4() {
+        Allocation inV = createRandomIntegerAllocation(mRS, Element.DataType.SIGNED_64, 4, 0x79f532307006dca3l, false, 8);
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_8, 4), INPUTSIZE);
+            script.forEach_testConvertUchar4Long4Uchar4(inV, out);
+            verifyResultsConvertLong4Uchar4(inV, out, false);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertUchar4Long4Uchar4: " + e.toString());
+        }
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_8, 4), INPUTSIZE);
+            scriptRelaxed.forEach_testConvertUchar4Long4Uchar4(inV, out);
+            verifyResultsConvertLong4Uchar4(inV, out, true);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertUchar4Long4Uchar4: " + e.toString());
+        }
+    }
+
+    private void verifyResultsConvertLong4Uchar4(Allocation inV, Allocation out, boolean relaxed) {
+        long[] arrayInV = new long[INPUTSIZE * 4];
+        inV.copyTo(arrayInV);
+        byte[] arrayOut = new byte[INPUTSIZE * 4];
+        out.copyTo(arrayOut);
+        for (int i = 0; i < INPUTSIZE; i++) {
+            for (int j = 0; j < 4 ; j++) {
+                // Extract the inputs.
+                ArgumentsLongUchar args = new ArgumentsLongUchar();
+                args.inV = arrayInV[i * 4 + j];
+                // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
+                CoreMathVerifier.computeConvert(args);
+                // Figure out what the outputs should have been.
+                boolean valid = true;
+                if (args.out != arrayOut[i * 4 + j]) {
+                    valid = false;
+                }
+                if (!valid) {
+                    StringBuilder message = new StringBuilder();
+                    message.append("Input inV: ");
+                    message.append(String.format("%d", args.inV));
+                    message.append("\n");
+                    message.append("Expected output out: ");
+                    message.append(String.format("0x%x", args.out));
+                    message.append("\n");
+                    message.append("Actual   output out: ");
+                    message.append(String.format("0x%x", arrayOut[i * 4 + j]));
+                    if (args.out != arrayOut[i * 4 + j]) {
+                        message.append(" FAIL");
+                    }
+                    message.append("\n");
+                    assertTrue("Incorrect output for checkConvertLong4Uchar4" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                }
+            }
+        }
+    }
+
+    public class ArgumentsUlongUchar {
+        public long inV;
+        public byte out;
+    }
+
+    private void checkConvertUlong2Uchar2() {
+        Allocation inV = createRandomIntegerAllocation(mRS, Element.DataType.UNSIGNED_64, 2, 0x9ebfc0021fa8b492l, false, 8);
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_8, 2), INPUTSIZE);
+            script.forEach_testConvertUchar2Ulong2Uchar2(inV, out);
+            verifyResultsConvertUlong2Uchar2(inV, out, false);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertUchar2Ulong2Uchar2: " + e.toString());
+        }
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_8, 2), INPUTSIZE);
+            scriptRelaxed.forEach_testConvertUchar2Ulong2Uchar2(inV, out);
+            verifyResultsConvertUlong2Uchar2(inV, out, true);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertUchar2Ulong2Uchar2: " + e.toString());
+        }
+    }
+
+    private void verifyResultsConvertUlong2Uchar2(Allocation inV, Allocation out, boolean relaxed) {
+        long[] arrayInV = new long[INPUTSIZE * 2];
+        inV.copyTo(arrayInV);
+        byte[] arrayOut = new byte[INPUTSIZE * 2];
+        out.copyTo(arrayOut);
+        for (int i = 0; i < INPUTSIZE; i++) {
+            for (int j = 0; j < 2 ; j++) {
+                // Extract the inputs.
+                ArgumentsUlongUchar args = new ArgumentsUlongUchar();
+                args.inV = arrayInV[i * 2 + j];
+                // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
+                CoreMathVerifier.computeConvert(args);
+                // Figure out what the outputs should have been.
+                boolean valid = true;
+                if (args.out != arrayOut[i * 2 + j]) {
+                    valid = false;
+                }
+                if (!valid) {
+                    StringBuilder message = new StringBuilder();
+                    message.append("Input inV: ");
+                    message.append(String.format("0x%x", args.inV));
+                    message.append("\n");
+                    message.append("Expected output out: ");
+                    message.append(String.format("0x%x", args.out));
+                    message.append("\n");
+                    message.append("Actual   output out: ");
+                    message.append(String.format("0x%x", arrayOut[i * 2 + j]));
+                    if (args.out != arrayOut[i * 2 + j]) {
+                        message.append(" FAIL");
+                    }
+                    message.append("\n");
+                    assertTrue("Incorrect output for checkConvertUlong2Uchar2" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                }
+            }
+        }
+    }
+
+    private void checkConvertUlong3Uchar3() {
+        Allocation inV = createRandomIntegerAllocation(mRS, Element.DataType.UNSIGNED_64, 3, 0x9ec1891d15c3d570l, false, 8);
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_8, 3), INPUTSIZE);
+            script.forEach_testConvertUchar3Ulong3Uchar3(inV, out);
+            verifyResultsConvertUlong3Uchar3(inV, out, false);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertUchar3Ulong3Uchar3: " + e.toString());
+        }
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_8, 3), INPUTSIZE);
+            scriptRelaxed.forEach_testConvertUchar3Ulong3Uchar3(inV, out);
+            verifyResultsConvertUlong3Uchar3(inV, out, true);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertUchar3Ulong3Uchar3: " + e.toString());
+        }
+    }
+
+    private void verifyResultsConvertUlong3Uchar3(Allocation inV, Allocation out, boolean relaxed) {
+        long[] arrayInV = new long[INPUTSIZE * 4];
+        inV.copyTo(arrayInV);
+        byte[] arrayOut = new byte[INPUTSIZE * 4];
+        out.copyTo(arrayOut);
+        for (int i = 0; i < INPUTSIZE; i++) {
+            for (int j = 0; j < 3 ; j++) {
+                // Extract the inputs.
+                ArgumentsUlongUchar args = new ArgumentsUlongUchar();
+                args.inV = arrayInV[i * 4 + j];
+                // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
+                CoreMathVerifier.computeConvert(args);
+                // Figure out what the outputs should have been.
+                boolean valid = true;
+                if (args.out != arrayOut[i * 4 + j]) {
+                    valid = false;
+                }
+                if (!valid) {
+                    StringBuilder message = new StringBuilder();
+                    message.append("Input inV: ");
+                    message.append(String.format("0x%x", args.inV));
+                    message.append("\n");
+                    message.append("Expected output out: ");
+                    message.append(String.format("0x%x", args.out));
+                    message.append("\n");
+                    message.append("Actual   output out: ");
+                    message.append(String.format("0x%x", arrayOut[i * 4 + j]));
+                    if (args.out != arrayOut[i * 4 + j]) {
+                        message.append(" FAIL");
+                    }
+                    message.append("\n");
+                    assertTrue("Incorrect output for checkConvertUlong3Uchar3" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                }
+            }
+        }
+    }
+
+    private void checkConvertUlong4Uchar4() {
+        Allocation inV = createRandomIntegerAllocation(mRS, Element.DataType.UNSIGNED_64, 4, 0x9ec352380bdef64el, false, 8);
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_8, 4), INPUTSIZE);
+            script.forEach_testConvertUchar4Ulong4Uchar4(inV, out);
+            verifyResultsConvertUlong4Uchar4(inV, out, false);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertUchar4Ulong4Uchar4: " + e.toString());
+        }
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_8, 4), INPUTSIZE);
+            scriptRelaxed.forEach_testConvertUchar4Ulong4Uchar4(inV, out);
+            verifyResultsConvertUlong4Uchar4(inV, out, true);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertUchar4Ulong4Uchar4: " + e.toString());
+        }
+    }
+
+    private void verifyResultsConvertUlong4Uchar4(Allocation inV, Allocation out, boolean relaxed) {
+        long[] arrayInV = new long[INPUTSIZE * 4];
+        inV.copyTo(arrayInV);
+        byte[] arrayOut = new byte[INPUTSIZE * 4];
+        out.copyTo(arrayOut);
+        for (int i = 0; i < INPUTSIZE; i++) {
+            for (int j = 0; j < 4 ; j++) {
+                // Extract the inputs.
+                ArgumentsUlongUchar args = new ArgumentsUlongUchar();
+                args.inV = arrayInV[i * 4 + j];
+                // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
+                CoreMathVerifier.computeConvert(args);
+                // Figure out what the outputs should have been.
+                boolean valid = true;
+                if (args.out != arrayOut[i * 4 + j]) {
+                    valid = false;
+                }
+                if (!valid) {
+                    StringBuilder message = new StringBuilder();
+                    message.append("Input inV: ");
+                    message.append(String.format("0x%x", args.inV));
+                    message.append("\n");
+                    message.append("Expected output out: ");
+                    message.append(String.format("0x%x", args.out));
+                    message.append("\n");
+                    message.append("Actual   output out: ");
+                    message.append(String.format("0x%x", arrayOut[i * 4 + j]));
+                    if (args.out != arrayOut[i * 4 + j]) {
+                        message.append(" FAIL");
+                    }
+                    message.append("\n");
+                    assertTrue("Incorrect output for checkConvertUlong4Uchar4" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                }
+            }
+        }
+    }
+
+    public class ArgumentsDoubleShort {
+        public double inV;
+        public short out;
+    }
+
+    private void checkConvertDouble2Short2() {
+        Allocation inV = createRandomFloatAllocation(mRS, Element.DataType.FLOAT_64, 2, 0x42b557fbbf1d55f9l, -3.2768000000000000000e+04, 3.2767000000000000000e+04);
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_16, 2), INPUTSIZE);
+            script.forEach_testConvertShort2Double2Short2(inV, out);
+            verifyResultsConvertDouble2Short2(inV, out, false);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertShort2Double2Short2: " + e.toString());
+        }
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_16, 2), INPUTSIZE);
+            scriptRelaxed.forEach_testConvertShort2Double2Short2(inV, out);
+            verifyResultsConvertDouble2Short2(inV, out, true);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertShort2Double2Short2: " + e.toString());
+        }
+    }
+
+    private void verifyResultsConvertDouble2Short2(Allocation inV, Allocation out, boolean relaxed) {
+        double[] arrayInV = new double[INPUTSIZE * 2];
+        inV.copyTo(arrayInV);
+        short[] arrayOut = new short[INPUTSIZE * 2];
+        out.copyTo(arrayOut);
+        for (int i = 0; i < INPUTSIZE; i++) {
+            for (int j = 0; j < 2 ; j++) {
+                // Extract the inputs.
+                ArgumentsDoubleShort args = new ArgumentsDoubleShort();
+                args.inV = arrayInV[i * 2 + j];
+                // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
+                CoreMathVerifier.computeConvert(args);
+                // Figure out what the outputs should have been.
+                boolean valid = true;
+                if (args.out != arrayOut[i * 2 + j]) {
+                    valid = false;
+                }
+                if (!valid) {
+                    StringBuilder message = new StringBuilder();
+                    message.append("Input inV: ");
+                    message.append(String.format("%24.8g %16x %31a",
+                            args.inV, Double.doubleToRawLongBits(args.inV), args.inV));
+                    message.append("\n");
+                    message.append("Expected output out: ");
+                    message.append(String.format("%d", args.out));
+                    message.append("\n");
+                    message.append("Actual   output out: ");
+                    message.append(String.format("%d", arrayOut[i * 2 + j]));
+                    if (args.out != arrayOut[i * 2 + j]) {
+                        message.append(" FAIL");
+                    }
+                    message.append("\n");
+                    assertTrue("Incorrect output for checkConvertDouble2Short2" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                }
+            }
+        }
+    }
+
+    private void checkConvertDouble3Short3() {
+        Allocation inV = createRandomFloatAllocation(mRS, Element.DataType.FLOAT_64, 3, 0x42b72116b53876d7l, -3.2768000000000000000e+04, 3.2767000000000000000e+04);
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_16, 3), INPUTSIZE);
+            script.forEach_testConvertShort3Double3Short3(inV, out);
+            verifyResultsConvertDouble3Short3(inV, out, false);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertShort3Double3Short3: " + e.toString());
+        }
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_16, 3), INPUTSIZE);
+            scriptRelaxed.forEach_testConvertShort3Double3Short3(inV, out);
+            verifyResultsConvertDouble3Short3(inV, out, true);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertShort3Double3Short3: " + e.toString());
+        }
+    }
+
+    private void verifyResultsConvertDouble3Short3(Allocation inV, Allocation out, boolean relaxed) {
+        double[] arrayInV = new double[INPUTSIZE * 4];
+        inV.copyTo(arrayInV);
+        short[] arrayOut = new short[INPUTSIZE * 4];
+        out.copyTo(arrayOut);
+        for (int i = 0; i < INPUTSIZE; i++) {
+            for (int j = 0; j < 3 ; j++) {
+                // Extract the inputs.
+                ArgumentsDoubleShort args = new ArgumentsDoubleShort();
+                args.inV = arrayInV[i * 4 + j];
+                // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
+                CoreMathVerifier.computeConvert(args);
+                // Figure out what the outputs should have been.
+                boolean valid = true;
+                if (args.out != arrayOut[i * 4 + j]) {
+                    valid = false;
+                }
+                if (!valid) {
+                    StringBuilder message = new StringBuilder();
+                    message.append("Input inV: ");
+                    message.append(String.format("%24.8g %16x %31a",
+                            args.inV, Double.doubleToRawLongBits(args.inV), args.inV));
+                    message.append("\n");
+                    message.append("Expected output out: ");
+                    message.append(String.format("%d", args.out));
+                    message.append("\n");
+                    message.append("Actual   output out: ");
+                    message.append(String.format("%d", arrayOut[i * 4 + j]));
+                    if (args.out != arrayOut[i * 4 + j]) {
+                        message.append(" FAIL");
+                    }
+                    message.append("\n");
+                    assertTrue("Incorrect output for checkConvertDouble3Short3" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                }
+            }
+        }
+    }
+
+    private void checkConvertDouble4Short4() {
+        Allocation inV = createRandomFloatAllocation(mRS, Element.DataType.FLOAT_64, 4, 0x42b8ea31ab5397b5l, -3.2768000000000000000e+04, 3.2767000000000000000e+04);
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_16, 4), INPUTSIZE);
+            script.forEach_testConvertShort4Double4Short4(inV, out);
+            verifyResultsConvertDouble4Short4(inV, out, false);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertShort4Double4Short4: " + e.toString());
+        }
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_16, 4), INPUTSIZE);
+            scriptRelaxed.forEach_testConvertShort4Double4Short4(inV, out);
+            verifyResultsConvertDouble4Short4(inV, out, true);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertShort4Double4Short4: " + e.toString());
+        }
+    }
+
+    private void verifyResultsConvertDouble4Short4(Allocation inV, Allocation out, boolean relaxed) {
+        double[] arrayInV = new double[INPUTSIZE * 4];
+        inV.copyTo(arrayInV);
+        short[] arrayOut = new short[INPUTSIZE * 4];
+        out.copyTo(arrayOut);
+        for (int i = 0; i < INPUTSIZE; i++) {
+            for (int j = 0; j < 4 ; j++) {
+                // Extract the inputs.
+                ArgumentsDoubleShort args = new ArgumentsDoubleShort();
+                args.inV = arrayInV[i * 4 + j];
+                // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
+                CoreMathVerifier.computeConvert(args);
+                // Figure out what the outputs should have been.
+                boolean valid = true;
+                if (args.out != arrayOut[i * 4 + j]) {
+                    valid = false;
+                }
+                if (!valid) {
+                    StringBuilder message = new StringBuilder();
+                    message.append("Input inV: ");
+                    message.append(String.format("%24.8g %16x %31a",
+                            args.inV, Double.doubleToRawLongBits(args.inV), args.inV));
+                    message.append("\n");
+                    message.append("Expected output out: ");
+                    message.append(String.format("%d", args.out));
+                    message.append("\n");
+                    message.append("Actual   output out: ");
+                    message.append(String.format("%d", arrayOut[i * 4 + j]));
+                    if (args.out != arrayOut[i * 4 + j]) {
+                        message.append(" FAIL");
+                    }
+                    message.append("\n");
+                    assertTrue("Incorrect output for checkConvertDouble4Short4" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                }
+            }
+        }
+    }
+
+    public class ArgumentsLongShort {
+        public long inV;
+        public short out;
+    }
+
+    private void checkConvertLong2Short2() {
+        Allocation inV = createRandomIntegerAllocation(mRS, Element.DataType.SIGNED_64, 2, 0x79f18bff18de6600l, true, 15);
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_16, 2), INPUTSIZE);
+            script.forEach_testConvertShort2Long2Short2(inV, out);
+            verifyResultsConvertLong2Short2(inV, out, false);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertShort2Long2Short2: " + e.toString());
+        }
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_16, 2), INPUTSIZE);
+            scriptRelaxed.forEach_testConvertShort2Long2Short2(inV, out);
+            verifyResultsConvertLong2Short2(inV, out, true);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertShort2Long2Short2: " + e.toString());
+        }
+    }
+
+    private void verifyResultsConvertLong2Short2(Allocation inV, Allocation out, boolean relaxed) {
+        long[] arrayInV = new long[INPUTSIZE * 2];
+        inV.copyTo(arrayInV);
+        short[] arrayOut = new short[INPUTSIZE * 2];
+        out.copyTo(arrayOut);
+        for (int i = 0; i < INPUTSIZE; i++) {
+            for (int j = 0; j < 2 ; j++) {
+                // Extract the inputs.
+                ArgumentsLongShort args = new ArgumentsLongShort();
+                args.inV = arrayInV[i * 2 + j];
+                // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
+                CoreMathVerifier.computeConvert(args);
+                // Figure out what the outputs should have been.
+                boolean valid = true;
+                if (args.out != arrayOut[i * 2 + j]) {
+                    valid = false;
+                }
+                if (!valid) {
+                    StringBuilder message = new StringBuilder();
+                    message.append("Input inV: ");
+                    message.append(String.format("%d", args.inV));
+                    message.append("\n");
+                    message.append("Expected output out: ");
+                    message.append(String.format("%d", args.out));
+                    message.append("\n");
+                    message.append("Actual   output out: ");
+                    message.append(String.format("%d", arrayOut[i * 2 + j]));
+                    if (args.out != arrayOut[i * 2 + j]) {
+                        message.append(" FAIL");
+                    }
+                    message.append("\n");
+                    assertTrue("Incorrect output for checkConvertLong2Short2" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                }
+            }
+        }
+    }
+
+    private void checkConvertLong3Short3() {
+        Allocation inV = createRandomIntegerAllocation(mRS, Element.DataType.SIGNED_64, 3, 0x79f3551a0ef986del, true, 15);
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_16, 3), INPUTSIZE);
+            script.forEach_testConvertShort3Long3Short3(inV, out);
+            verifyResultsConvertLong3Short3(inV, out, false);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertShort3Long3Short3: " + e.toString());
+        }
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_16, 3), INPUTSIZE);
+            scriptRelaxed.forEach_testConvertShort3Long3Short3(inV, out);
+            verifyResultsConvertLong3Short3(inV, out, true);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertShort3Long3Short3: " + e.toString());
+        }
+    }
+
+    private void verifyResultsConvertLong3Short3(Allocation inV, Allocation out, boolean relaxed) {
+        long[] arrayInV = new long[INPUTSIZE * 4];
+        inV.copyTo(arrayInV);
+        short[] arrayOut = new short[INPUTSIZE * 4];
+        out.copyTo(arrayOut);
+        for (int i = 0; i < INPUTSIZE; i++) {
+            for (int j = 0; j < 3 ; j++) {
+                // Extract the inputs.
+                ArgumentsLongShort args = new ArgumentsLongShort();
+                args.inV = arrayInV[i * 4 + j];
+                // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
+                CoreMathVerifier.computeConvert(args);
+                // Figure out what the outputs should have been.
+                boolean valid = true;
+                if (args.out != arrayOut[i * 4 + j]) {
+                    valid = false;
+                }
+                if (!valid) {
+                    StringBuilder message = new StringBuilder();
+                    message.append("Input inV: ");
+                    message.append(String.format("%d", args.inV));
+                    message.append("\n");
+                    message.append("Expected output out: ");
+                    message.append(String.format("%d", args.out));
+                    message.append("\n");
+                    message.append("Actual   output out: ");
+                    message.append(String.format("%d", arrayOut[i * 4 + j]));
+                    if (args.out != arrayOut[i * 4 + j]) {
+                        message.append(" FAIL");
+                    }
+                    message.append("\n");
+                    assertTrue("Incorrect output for checkConvertLong3Short3" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                }
+            }
+        }
+    }
+
+    private void checkConvertLong4Short4() {
+        Allocation inV = createRandomIntegerAllocation(mRS, Element.DataType.SIGNED_64, 4, 0x79f51e350514a7bcl, true, 15);
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_16, 4), INPUTSIZE);
+            script.forEach_testConvertShort4Long4Short4(inV, out);
+            verifyResultsConvertLong4Short4(inV, out, false);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertShort4Long4Short4: " + e.toString());
+        }
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_16, 4), INPUTSIZE);
+            scriptRelaxed.forEach_testConvertShort4Long4Short4(inV, out);
+            verifyResultsConvertLong4Short4(inV, out, true);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertShort4Long4Short4: " + e.toString());
+        }
+    }
+
+    private void verifyResultsConvertLong4Short4(Allocation inV, Allocation out, boolean relaxed) {
+        long[] arrayInV = new long[INPUTSIZE * 4];
+        inV.copyTo(arrayInV);
+        short[] arrayOut = new short[INPUTSIZE * 4];
+        out.copyTo(arrayOut);
+        for (int i = 0; i < INPUTSIZE; i++) {
+            for (int j = 0; j < 4 ; j++) {
+                // Extract the inputs.
+                ArgumentsLongShort args = new ArgumentsLongShort();
+                args.inV = arrayInV[i * 4 + j];
+                // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
+                CoreMathVerifier.computeConvert(args);
+                // Figure out what the outputs should have been.
+                boolean valid = true;
+                if (args.out != arrayOut[i * 4 + j]) {
+                    valid = false;
+                }
+                if (!valid) {
+                    StringBuilder message = new StringBuilder();
+                    message.append("Input inV: ");
+                    message.append(String.format("%d", args.inV));
+                    message.append("\n");
+                    message.append("Expected output out: ");
+                    message.append(String.format("%d", args.out));
+                    message.append("\n");
+                    message.append("Actual   output out: ");
+                    message.append(String.format("%d", arrayOut[i * 4 + j]));
+                    if (args.out != arrayOut[i * 4 + j]) {
+                        message.append(" FAIL");
+                    }
+                    message.append("\n");
+                    assertTrue("Incorrect output for checkConvertLong4Short4" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                }
+            }
+        }
+    }
+
+    public class ArgumentsUlongShort {
+        public long inV;
+        public short out;
+    }
+
+    private void checkConvertUlong2Short2() {
+        Allocation inV = createRandomIntegerAllocation(mRS, Element.DataType.UNSIGNED_64, 2, 0x9ebfac06b4b67fabl, false, 15);
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_16, 2), INPUTSIZE);
+            script.forEach_testConvertShort2Ulong2Short2(inV, out);
+            verifyResultsConvertUlong2Short2(inV, out, false);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertShort2Ulong2Short2: " + e.toString());
+        }
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_16, 2), INPUTSIZE);
+            scriptRelaxed.forEach_testConvertShort2Ulong2Short2(inV, out);
+            verifyResultsConvertUlong2Short2(inV, out, true);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertShort2Ulong2Short2: " + e.toString());
+        }
+    }
+
+    private void verifyResultsConvertUlong2Short2(Allocation inV, Allocation out, boolean relaxed) {
+        long[] arrayInV = new long[INPUTSIZE * 2];
+        inV.copyTo(arrayInV);
+        short[] arrayOut = new short[INPUTSIZE * 2];
+        out.copyTo(arrayOut);
+        for (int i = 0; i < INPUTSIZE; i++) {
+            for (int j = 0; j < 2 ; j++) {
+                // Extract the inputs.
+                ArgumentsUlongShort args = new ArgumentsUlongShort();
+                args.inV = arrayInV[i * 2 + j];
+                // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
+                CoreMathVerifier.computeConvert(args);
+                // Figure out what the outputs should have been.
+                boolean valid = true;
+                if (args.out != arrayOut[i * 2 + j]) {
+                    valid = false;
+                }
+                if (!valid) {
+                    StringBuilder message = new StringBuilder();
+                    message.append("Input inV: ");
+                    message.append(String.format("0x%x", args.inV));
+                    message.append("\n");
+                    message.append("Expected output out: ");
+                    message.append(String.format("%d", args.out));
+                    message.append("\n");
+                    message.append("Actual   output out: ");
+                    message.append(String.format("%d", arrayOut[i * 2 + j]));
+                    if (args.out != arrayOut[i * 2 + j]) {
+                        message.append(" FAIL");
+                    }
+                    message.append("\n");
+                    assertTrue("Incorrect output for checkConvertUlong2Short2" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                }
+            }
+        }
+    }
+
+    private void checkConvertUlong3Short3() {
+        Allocation inV = createRandomIntegerAllocation(mRS, Element.DataType.UNSIGNED_64, 3, 0x9ec17521aad1a089l, false, 15);
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_16, 3), INPUTSIZE);
+            script.forEach_testConvertShort3Ulong3Short3(inV, out);
+            verifyResultsConvertUlong3Short3(inV, out, false);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertShort3Ulong3Short3: " + e.toString());
+        }
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_16, 3), INPUTSIZE);
+            scriptRelaxed.forEach_testConvertShort3Ulong3Short3(inV, out);
+            verifyResultsConvertUlong3Short3(inV, out, true);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertShort3Ulong3Short3: " + e.toString());
+        }
+    }
+
+    private void verifyResultsConvertUlong3Short3(Allocation inV, Allocation out, boolean relaxed) {
+        long[] arrayInV = new long[INPUTSIZE * 4];
+        inV.copyTo(arrayInV);
+        short[] arrayOut = new short[INPUTSIZE * 4];
+        out.copyTo(arrayOut);
+        for (int i = 0; i < INPUTSIZE; i++) {
+            for (int j = 0; j < 3 ; j++) {
+                // Extract the inputs.
+                ArgumentsUlongShort args = new ArgumentsUlongShort();
+                args.inV = arrayInV[i * 4 + j];
+                // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
+                CoreMathVerifier.computeConvert(args);
+                // Figure out what the outputs should have been.
+                boolean valid = true;
+                if (args.out != arrayOut[i * 4 + j]) {
+                    valid = false;
+                }
+                if (!valid) {
+                    StringBuilder message = new StringBuilder();
+                    message.append("Input inV: ");
+                    message.append(String.format("0x%x", args.inV));
+                    message.append("\n");
+                    message.append("Expected output out: ");
+                    message.append(String.format("%d", args.out));
+                    message.append("\n");
+                    message.append("Actual   output out: ");
+                    message.append(String.format("%d", arrayOut[i * 4 + j]));
+                    if (args.out != arrayOut[i * 4 + j]) {
+                        message.append(" FAIL");
+                    }
+                    message.append("\n");
+                    assertTrue("Incorrect output for checkConvertUlong3Short3" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                }
+            }
+        }
+    }
+
+    private void checkConvertUlong4Short4() {
+        Allocation inV = createRandomIntegerAllocation(mRS, Element.DataType.UNSIGNED_64, 4, 0x9ec33e3ca0ecc167l, false, 15);
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_16, 4), INPUTSIZE);
+            script.forEach_testConvertShort4Ulong4Short4(inV, out);
+            verifyResultsConvertUlong4Short4(inV, out, false);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertShort4Ulong4Short4: " + e.toString());
+        }
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_16, 4), INPUTSIZE);
+            scriptRelaxed.forEach_testConvertShort4Ulong4Short4(inV, out);
+            verifyResultsConvertUlong4Short4(inV, out, true);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertShort4Ulong4Short4: " + e.toString());
+        }
+    }
+
+    private void verifyResultsConvertUlong4Short4(Allocation inV, Allocation out, boolean relaxed) {
+        long[] arrayInV = new long[INPUTSIZE * 4];
+        inV.copyTo(arrayInV);
+        short[] arrayOut = new short[INPUTSIZE * 4];
+        out.copyTo(arrayOut);
+        for (int i = 0; i < INPUTSIZE; i++) {
+            for (int j = 0; j < 4 ; j++) {
+                // Extract the inputs.
+                ArgumentsUlongShort args = new ArgumentsUlongShort();
+                args.inV = arrayInV[i * 4 + j];
+                // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
+                CoreMathVerifier.computeConvert(args);
+                // Figure out what the outputs should have been.
+                boolean valid = true;
+                if (args.out != arrayOut[i * 4 + j]) {
+                    valid = false;
+                }
+                if (!valid) {
+                    StringBuilder message = new StringBuilder();
+                    message.append("Input inV: ");
+                    message.append(String.format("0x%x", args.inV));
+                    message.append("\n");
+                    message.append("Expected output out: ");
+                    message.append(String.format("%d", args.out));
+                    message.append("\n");
+                    message.append("Actual   output out: ");
+                    message.append(String.format("%d", arrayOut[i * 4 + j]));
+                    if (args.out != arrayOut[i * 4 + j]) {
+                        message.append(" FAIL");
+                    }
+                    message.append("\n");
+                    assertTrue("Incorrect output for checkConvertUlong4Short4" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                }
+            }
+        }
+    }
+
+    public class ArgumentsDoubleUshort {
+        public double inV;
+        public short out;
+    }
+
+    private void checkConvertDouble2Ushort2() {
+        Allocation inV = createRandomFloatAllocation(mRS, Element.DataType.FLOAT_64, 2, 0x3479ccaea92a37bcl, 0.0000000000000000000e+00, 6.5535000000000000000e+04);
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_16, 2), INPUTSIZE);
+            script.forEach_testConvertUshort2Double2Ushort2(inV, out);
+            verifyResultsConvertDouble2Ushort2(inV, out, false);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertUshort2Double2Ushort2: " + e.toString());
+        }
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_16, 2), INPUTSIZE);
+            scriptRelaxed.forEach_testConvertUshort2Double2Ushort2(inV, out);
+            verifyResultsConvertDouble2Ushort2(inV, out, true);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertUshort2Double2Ushort2: " + e.toString());
+        }
+    }
+
+    private void verifyResultsConvertDouble2Ushort2(Allocation inV, Allocation out, boolean relaxed) {
+        double[] arrayInV = new double[INPUTSIZE * 2];
+        inV.copyTo(arrayInV);
+        short[] arrayOut = new short[INPUTSIZE * 2];
+        out.copyTo(arrayOut);
+        for (int i = 0; i < INPUTSIZE; i++) {
+            for (int j = 0; j < 2 ; j++) {
+                // Extract the inputs.
+                ArgumentsDoubleUshort args = new ArgumentsDoubleUshort();
+                args.inV = arrayInV[i * 2 + j];
+                // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
+                CoreMathVerifier.computeConvert(args);
+                // Figure out what the outputs should have been.
+                boolean valid = true;
+                if (args.out != arrayOut[i * 2 + j]) {
+                    valid = false;
+                }
+                if (!valid) {
+                    StringBuilder message = new StringBuilder();
+                    message.append("Input inV: ");
+                    message.append(String.format("%24.8g %16x %31a",
+                            args.inV, Double.doubleToRawLongBits(args.inV), args.inV));
+                    message.append("\n");
+                    message.append("Expected output out: ");
+                    message.append(String.format("0x%x", args.out));
+                    message.append("\n");
+                    message.append("Actual   output out: ");
+                    message.append(String.format("0x%x", arrayOut[i * 2 + j]));
+                    if (args.out != arrayOut[i * 2 + j]) {
+                        message.append(" FAIL");
+                    }
+                    message.append("\n");
+                    assertTrue("Incorrect output for checkConvertDouble2Ushort2" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                }
+            }
+        }
+    }
+
+    private void checkConvertDouble3Ushort3() {
+        Allocation inV = createRandomFloatAllocation(mRS, Element.DataType.FLOAT_64, 3, 0x34c69435ff85c8e8l, 0.0000000000000000000e+00, 6.5535000000000000000e+04);
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_16, 3), INPUTSIZE);
+            script.forEach_testConvertUshort3Double3Ushort3(inV, out);
+            verifyResultsConvertDouble3Ushort3(inV, out, false);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertUshort3Double3Ushort3: " + e.toString());
+        }
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_16, 3), INPUTSIZE);
+            scriptRelaxed.forEach_testConvertUshort3Double3Ushort3(inV, out);
+            verifyResultsConvertDouble3Ushort3(inV, out, true);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertUshort3Double3Ushort3: " + e.toString());
+        }
+    }
+
+    private void verifyResultsConvertDouble3Ushort3(Allocation inV, Allocation out, boolean relaxed) {
+        double[] arrayInV = new double[INPUTSIZE * 4];
+        inV.copyTo(arrayInV);
+        short[] arrayOut = new short[INPUTSIZE * 4];
+        out.copyTo(arrayOut);
+        for (int i = 0; i < INPUTSIZE; i++) {
+            for (int j = 0; j < 3 ; j++) {
+                // Extract the inputs.
+                ArgumentsDoubleUshort args = new ArgumentsDoubleUshort();
+                args.inV = arrayInV[i * 4 + j];
+                // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
+                CoreMathVerifier.computeConvert(args);
+                // Figure out what the outputs should have been.
+                boolean valid = true;
+                if (args.out != arrayOut[i * 4 + j]) {
+                    valid = false;
+                }
+                if (!valid) {
+                    StringBuilder message = new StringBuilder();
+                    message.append("Input inV: ");
+                    message.append(String.format("%24.8g %16x %31a",
+                            args.inV, Double.doubleToRawLongBits(args.inV), args.inV));
+                    message.append("\n");
+                    message.append("Expected output out: ");
+                    message.append(String.format("0x%x", args.out));
+                    message.append("\n");
+                    message.append("Actual   output out: ");
+                    message.append(String.format("0x%x", arrayOut[i * 4 + j]));
+                    if (args.out != arrayOut[i * 4 + j]) {
+                        message.append(" FAIL");
+                    }
+                    message.append("\n");
+                    assertTrue("Incorrect output for checkConvertDouble3Ushort3" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                }
+            }
+        }
+    }
+
+    private void checkConvertDouble4Ushort4() {
+        Allocation inV = createRandomFloatAllocation(mRS, Element.DataType.FLOAT_64, 4, 0x35135bbd55e15a14l, 0.0000000000000000000e+00, 6.5535000000000000000e+04);
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_16, 4), INPUTSIZE);
+            script.forEach_testConvertUshort4Double4Ushort4(inV, out);
+            verifyResultsConvertDouble4Ushort4(inV, out, false);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertUshort4Double4Ushort4: " + e.toString());
+        }
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_16, 4), INPUTSIZE);
+            scriptRelaxed.forEach_testConvertUshort4Double4Ushort4(inV, out);
+            verifyResultsConvertDouble4Ushort4(inV, out, true);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertUshort4Double4Ushort4: " + e.toString());
+        }
+    }
+
+    private void verifyResultsConvertDouble4Ushort4(Allocation inV, Allocation out, boolean relaxed) {
+        double[] arrayInV = new double[INPUTSIZE * 4];
+        inV.copyTo(arrayInV);
+        short[] arrayOut = new short[INPUTSIZE * 4];
+        out.copyTo(arrayOut);
+        for (int i = 0; i < INPUTSIZE; i++) {
+            for (int j = 0; j < 4 ; j++) {
+                // Extract the inputs.
+                ArgumentsDoubleUshort args = new ArgumentsDoubleUshort();
+                args.inV = arrayInV[i * 4 + j];
+                // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
+                CoreMathVerifier.computeConvert(args);
+                // Figure out what the outputs should have been.
+                boolean valid = true;
+                if (args.out != arrayOut[i * 4 + j]) {
+                    valid = false;
+                }
+                if (!valid) {
+                    StringBuilder message = new StringBuilder();
+                    message.append("Input inV: ");
+                    message.append(String.format("%24.8g %16x %31a",
+                            args.inV, Double.doubleToRawLongBits(args.inV), args.inV));
+                    message.append("\n");
+                    message.append("Expected output out: ");
+                    message.append(String.format("0x%x", args.out));
+                    message.append("\n");
+                    message.append("Actual   output out: ");
+                    message.append(String.format("0x%x", arrayOut[i * 4 + j]));
+                    if (args.out != arrayOut[i * 4 + j]) {
+                        message.append(" FAIL");
+                    }
+                    message.append("\n");
+                    assertTrue("Incorrect output for checkConvertDouble4Ushort4" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                }
+            }
+        }
+    }
+
+    public class ArgumentsLongUshort {
+        public long inV;
+        public short out;
+    }
+
+    private void checkConvertLong2Ushort2() {
+        Allocation inV = createRandomIntegerAllocation(mRS, Element.DataType.SIGNED_64, 2, 0x7b96893ebc97e8e9l, false, 16);
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_16, 2), INPUTSIZE);
+            script.forEach_testConvertUshort2Long2Ushort2(inV, out);
+            verifyResultsConvertLong2Ushort2(inV, out, false);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertUshort2Long2Ushort2: " + e.toString());
+        }
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_16, 2), INPUTSIZE);
+            scriptRelaxed.forEach_testConvertUshort2Long2Ushort2(inV, out);
+            verifyResultsConvertLong2Ushort2(inV, out, true);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertUshort2Long2Ushort2: " + e.toString());
+        }
+    }
+
+    private void verifyResultsConvertLong2Ushort2(Allocation inV, Allocation out, boolean relaxed) {
+        long[] arrayInV = new long[INPUTSIZE * 2];
+        inV.copyTo(arrayInV);
+        short[] arrayOut = new short[INPUTSIZE * 2];
+        out.copyTo(arrayOut);
+        for (int i = 0; i < INPUTSIZE; i++) {
+            for (int j = 0; j < 2 ; j++) {
+                // Extract the inputs.
+                ArgumentsLongUshort args = new ArgumentsLongUshort();
+                args.inV = arrayInV[i * 2 + j];
+                // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
+                CoreMathVerifier.computeConvert(args);
+                // Figure out what the outputs should have been.
+                boolean valid = true;
+                if (args.out != arrayOut[i * 2 + j]) {
+                    valid = false;
+                }
+                if (!valid) {
+                    StringBuilder message = new StringBuilder();
+                    message.append("Input inV: ");
+                    message.append(String.format("%d", args.inV));
+                    message.append("\n");
+                    message.append("Expected output out: ");
+                    message.append(String.format("0x%x", args.out));
+                    message.append("\n");
+                    message.append("Actual   output out: ");
+                    message.append(String.format("0x%x", arrayOut[i * 2 + j]));
+                    if (args.out != arrayOut[i * 2 + j]) {
+                        message.append(" FAIL");
+                    }
+                    message.append("\n");
+                    assertTrue("Incorrect output for checkConvertLong2Ushort2" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                }
+            }
+        }
+    }
+
+    private void checkConvertLong3Ushort3() {
+        Allocation inV = createRandomIntegerAllocation(mRS, Element.DataType.SIGNED_64, 3, 0x7be350c612f37a15l, false, 16);
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_16, 3), INPUTSIZE);
+            script.forEach_testConvertUshort3Long3Ushort3(inV, out);
+            verifyResultsConvertLong3Ushort3(inV, out, false);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertUshort3Long3Ushort3: " + e.toString());
+        }
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_16, 3), INPUTSIZE);
+            scriptRelaxed.forEach_testConvertUshort3Long3Ushort3(inV, out);
+            verifyResultsConvertLong3Ushort3(inV, out, true);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertUshort3Long3Ushort3: " + e.toString());
+        }
+    }
+
+    private void verifyResultsConvertLong3Ushort3(Allocation inV, Allocation out, boolean relaxed) {
+        long[] arrayInV = new long[INPUTSIZE * 4];
+        inV.copyTo(arrayInV);
+        short[] arrayOut = new short[INPUTSIZE * 4];
+        out.copyTo(arrayOut);
+        for (int i = 0; i < INPUTSIZE; i++) {
+            for (int j = 0; j < 3 ; j++) {
+                // Extract the inputs.
+                ArgumentsLongUshort args = new ArgumentsLongUshort();
+                args.inV = arrayInV[i * 4 + j];
+                // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
+                CoreMathVerifier.computeConvert(args);
+                // Figure out what the outputs should have been.
+                boolean valid = true;
+                if (args.out != arrayOut[i * 4 + j]) {
+                    valid = false;
+                }
+                if (!valid) {
+                    StringBuilder message = new StringBuilder();
+                    message.append("Input inV: ");
+                    message.append(String.format("%d", args.inV));
+                    message.append("\n");
+                    message.append("Expected output out: ");
+                    message.append(String.format("0x%x", args.out));
+                    message.append("\n");
+                    message.append("Actual   output out: ");
+                    message.append(String.format("0x%x", arrayOut[i * 4 + j]));
+                    if (args.out != arrayOut[i * 4 + j]) {
+                        message.append(" FAIL");
+                    }
+                    message.append("\n");
+                    assertTrue("Incorrect output for checkConvertLong3Ushort3" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                }
+            }
+        }
+    }
+
+    private void checkConvertLong4Ushort4() {
+        Allocation inV = createRandomIntegerAllocation(mRS, Element.DataType.SIGNED_64, 4, 0x7c30184d694f0b41l, false, 16);
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_16, 4), INPUTSIZE);
+            script.forEach_testConvertUshort4Long4Ushort4(inV, out);
+            verifyResultsConvertLong4Ushort4(inV, out, false);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertUshort4Long4Ushort4: " + e.toString());
+        }
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_16, 4), INPUTSIZE);
+            scriptRelaxed.forEach_testConvertUshort4Long4Ushort4(inV, out);
+            verifyResultsConvertLong4Ushort4(inV, out, true);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertUshort4Long4Ushort4: " + e.toString());
+        }
+    }
+
+    private void verifyResultsConvertLong4Ushort4(Allocation inV, Allocation out, boolean relaxed) {
+        long[] arrayInV = new long[INPUTSIZE * 4];
+        inV.copyTo(arrayInV);
+        short[] arrayOut = new short[INPUTSIZE * 4];
+        out.copyTo(arrayOut);
+        for (int i = 0; i < INPUTSIZE; i++) {
+            for (int j = 0; j < 4 ; j++) {
+                // Extract the inputs.
+                ArgumentsLongUshort args = new ArgumentsLongUshort();
+                args.inV = arrayInV[i * 4 + j];
+                // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
+                CoreMathVerifier.computeConvert(args);
+                // Figure out what the outputs should have been.
+                boolean valid = true;
+                if (args.out != arrayOut[i * 4 + j]) {
+                    valid = false;
+                }
+                if (!valid) {
+                    StringBuilder message = new StringBuilder();
+                    message.append("Input inV: ");
+                    message.append(String.format("%d", args.inV));
+                    message.append("\n");
+                    message.append("Expected output out: ");
+                    message.append(String.format("0x%x", args.out));
+                    message.append("\n");
+                    message.append("Actual   output out: ");
+                    message.append(String.format("0x%x", arrayOut[i * 4 + j]));
+                    if (args.out != arrayOut[i * 4 + j]) {
+                        message.append(" FAIL");
+                    }
+                    message.append("\n");
+                    assertTrue("Incorrect output for checkConvertLong4Ushort4" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                }
+            }
+        }
+    }
+
+    public class ArgumentsUlongUshort {
+        public long inV;
+        public short out;
+    }
+
+    private void checkConvertUlong2Ushort2() {
+        Allocation inV = createRandomIntegerAllocation(mRS, Element.DataType.UNSIGNED_64, 2, 0xaa35ea85e9e438a2l, false, 16);
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_16, 2), INPUTSIZE);
+            script.forEach_testConvertUshort2Ulong2Ushort2(inV, out);
+            verifyResultsConvertUlong2Ushort2(inV, out, false);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertUshort2Ulong2Ushort2: " + e.toString());
+        }
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_16, 2), INPUTSIZE);
+            scriptRelaxed.forEach_testConvertUshort2Ulong2Ushort2(inV, out);
+            verifyResultsConvertUlong2Ushort2(inV, out, true);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertUshort2Ulong2Ushort2: " + e.toString());
+        }
+    }
+
+    private void verifyResultsConvertUlong2Ushort2(Allocation inV, Allocation out, boolean relaxed) {
+        long[] arrayInV = new long[INPUTSIZE * 2];
+        inV.copyTo(arrayInV);
+        short[] arrayOut = new short[INPUTSIZE * 2];
+        out.copyTo(arrayOut);
+        for (int i = 0; i < INPUTSIZE; i++) {
+            for (int j = 0; j < 2 ; j++) {
+                // Extract the inputs.
+                ArgumentsUlongUshort args = new ArgumentsUlongUshort();
+                args.inV = arrayInV[i * 2 + j];
+                // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
+                CoreMathVerifier.computeConvert(args);
+                // Figure out what the outputs should have been.
+                boolean valid = true;
+                if (args.out != arrayOut[i * 2 + j]) {
+                    valid = false;
+                }
+                if (!valid) {
+                    StringBuilder message = new StringBuilder();
+                    message.append("Input inV: ");
+                    message.append(String.format("0x%x", args.inV));
+                    message.append("\n");
+                    message.append("Expected output out: ");
+                    message.append(String.format("0x%x", args.out));
+                    message.append("\n");
+                    message.append("Actual   output out: ");
+                    message.append(String.format("0x%x", arrayOut[i * 2 + j]));
+                    if (args.out != arrayOut[i * 2 + j]) {
+                        message.append(" FAIL");
+                    }
+                    message.append("\n");
+                    assertTrue("Incorrect output for checkConvertUlong2Ushort2" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                }
+            }
+        }
+    }
+
+    private void checkConvertUlong3Ushort3() {
+        Allocation inV = createRandomIntegerAllocation(mRS, Element.DataType.UNSIGNED_64, 3, 0xaa82b20d403fc9cel, false, 16);
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_16, 3), INPUTSIZE);
+            script.forEach_testConvertUshort3Ulong3Ushort3(inV, out);
+            verifyResultsConvertUlong3Ushort3(inV, out, false);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertUshort3Ulong3Ushort3: " + e.toString());
+        }
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_16, 3), INPUTSIZE);
+            scriptRelaxed.forEach_testConvertUshort3Ulong3Ushort3(inV, out);
+            verifyResultsConvertUlong3Ushort3(inV, out, true);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertUshort3Ulong3Ushort3: " + e.toString());
+        }
+    }
+
+    private void verifyResultsConvertUlong3Ushort3(Allocation inV, Allocation out, boolean relaxed) {
+        long[] arrayInV = new long[INPUTSIZE * 4];
+        inV.copyTo(arrayInV);
+        short[] arrayOut = new short[INPUTSIZE * 4];
+        out.copyTo(arrayOut);
+        for (int i = 0; i < INPUTSIZE; i++) {
+            for (int j = 0; j < 3 ; j++) {
+                // Extract the inputs.
+                ArgumentsUlongUshort args = new ArgumentsUlongUshort();
+                args.inV = arrayInV[i * 4 + j];
+                // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
+                CoreMathVerifier.computeConvert(args);
+                // Figure out what the outputs should have been.
+                boolean valid = true;
+                if (args.out != arrayOut[i * 4 + j]) {
+                    valid = false;
+                }
+                if (!valid) {
+                    StringBuilder message = new StringBuilder();
+                    message.append("Input inV: ");
+                    message.append(String.format("0x%x", args.inV));
+                    message.append("\n");
+                    message.append("Expected output out: ");
+                    message.append(String.format("0x%x", args.out));
+                    message.append("\n");
+                    message.append("Actual   output out: ");
+                    message.append(String.format("0x%x", arrayOut[i * 4 + j]));
+                    if (args.out != arrayOut[i * 4 + j]) {
+                        message.append(" FAIL");
+                    }
+                    message.append("\n");
+                    assertTrue("Incorrect output for checkConvertUlong3Ushort3" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                }
+            }
+        }
+    }
+
+    private void checkConvertUlong4Ushort4() {
+        Allocation inV = createRandomIntegerAllocation(mRS, Element.DataType.UNSIGNED_64, 4, 0xaacf7994969b5afal, false, 16);
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_16, 4), INPUTSIZE);
+            script.forEach_testConvertUshort4Ulong4Ushort4(inV, out);
+            verifyResultsConvertUlong4Ushort4(inV, out, false);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertUshort4Ulong4Ushort4: " + e.toString());
+        }
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_16, 4), INPUTSIZE);
+            scriptRelaxed.forEach_testConvertUshort4Ulong4Ushort4(inV, out);
+            verifyResultsConvertUlong4Ushort4(inV, out, true);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertUshort4Ulong4Ushort4: " + e.toString());
+        }
+    }
+
+    private void verifyResultsConvertUlong4Ushort4(Allocation inV, Allocation out, boolean relaxed) {
+        long[] arrayInV = new long[INPUTSIZE * 4];
+        inV.copyTo(arrayInV);
+        short[] arrayOut = new short[INPUTSIZE * 4];
+        out.copyTo(arrayOut);
+        for (int i = 0; i < INPUTSIZE; i++) {
+            for (int j = 0; j < 4 ; j++) {
+                // Extract the inputs.
+                ArgumentsUlongUshort args = new ArgumentsUlongUshort();
+                args.inV = arrayInV[i * 4 + j];
+                // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
+                CoreMathVerifier.computeConvert(args);
+                // Figure out what the outputs should have been.
+                boolean valid = true;
+                if (args.out != arrayOut[i * 4 + j]) {
+                    valid = false;
+                }
+                if (!valid) {
+                    StringBuilder message = new StringBuilder();
+                    message.append("Input inV: ");
+                    message.append(String.format("0x%x", args.inV));
+                    message.append("\n");
+                    message.append("Expected output out: ");
+                    message.append(String.format("0x%x", args.out));
+                    message.append("\n");
+                    message.append("Actual   output out: ");
+                    message.append(String.format("0x%x", arrayOut[i * 4 + j]));
+                    if (args.out != arrayOut[i * 4 + j]) {
+                        message.append(" FAIL");
+                    }
+                    message.append("\n");
+                    assertTrue("Incorrect output for checkConvertUlong4Ushort4" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                }
+            }
+        }
+    }
+
+    public class ArgumentsDoubleInt {
+        public double inV;
+        public int out;
+    }
+
+    private void checkConvertDouble2Int2() {
+        Allocation inV = createRandomFloatAllocation(mRS, Element.DataType.FLOAT_64, 2, 0xa57cd81dcaf628fcl, -2.1474836480000000000e+09, 2.1474836470000000000e+09);
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_32, 2), INPUTSIZE);
+            script.forEach_testConvertInt2Double2Int2(inV, out);
+            verifyResultsConvertDouble2Int2(inV, out, false);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertInt2Double2Int2: " + e.toString());
+        }
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_32, 2), INPUTSIZE);
+            scriptRelaxed.forEach_testConvertInt2Double2Int2(inV, out);
+            verifyResultsConvertDouble2Int2(inV, out, true);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertInt2Double2Int2: " + e.toString());
+        }
+    }
+
+    private void verifyResultsConvertDouble2Int2(Allocation inV, Allocation out, boolean relaxed) {
+        double[] arrayInV = new double[INPUTSIZE * 2];
+        inV.copyTo(arrayInV);
+        int[] arrayOut = new int[INPUTSIZE * 2];
+        out.copyTo(arrayOut);
+        for (int i = 0; i < INPUTSIZE; i++) {
+            for (int j = 0; j < 2 ; j++) {
+                // Extract the inputs.
+                ArgumentsDoubleInt args = new ArgumentsDoubleInt();
+                args.inV = arrayInV[i * 2 + j];
+                // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
+                CoreMathVerifier.computeConvert(args);
+                // Figure out what the outputs should have been.
+                boolean valid = true;
+                if (args.out != arrayOut[i * 2 + j]) {
+                    valid = false;
+                }
+                if (!valid) {
+                    StringBuilder message = new StringBuilder();
+                    message.append("Input inV: ");
+                    message.append(String.format("%24.8g %16x %31a",
+                            args.inV, Double.doubleToRawLongBits(args.inV), args.inV));
+                    message.append("\n");
+                    message.append("Expected output out: ");
+                    message.append(String.format("%d", args.out));
+                    message.append("\n");
+                    message.append("Actual   output out: ");
+                    message.append(String.format("%d", arrayOut[i * 2 + j]));
+                    if (args.out != arrayOut[i * 2 + j]) {
+                        message.append(" FAIL");
+                    }
+                    message.append("\n");
+                    assertTrue("Incorrect output for checkConvertDouble2Int2" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                }
+            }
+        }
+    }
+
+    private void checkConvertDouble3Int3() {
+        Allocation inV = createRandomFloatAllocation(mRS, Element.DataType.FLOAT_64, 3, 0xa57cd85d149e3932l, -2.1474836480000000000e+09, 2.1474836470000000000e+09);
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_32, 3), INPUTSIZE);
+            script.forEach_testConvertInt3Double3Int3(inV, out);
+            verifyResultsConvertDouble3Int3(inV, out, false);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertInt3Double3Int3: " + e.toString());
+        }
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_32, 3), INPUTSIZE);
+            scriptRelaxed.forEach_testConvertInt3Double3Int3(inV, out);
+            verifyResultsConvertDouble3Int3(inV, out, true);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertInt3Double3Int3: " + e.toString());
+        }
+    }
+
+    private void verifyResultsConvertDouble3Int3(Allocation inV, Allocation out, boolean relaxed) {
+        double[] arrayInV = new double[INPUTSIZE * 4];
+        inV.copyTo(arrayInV);
+        int[] arrayOut = new int[INPUTSIZE * 4];
+        out.copyTo(arrayOut);
+        for (int i = 0; i < INPUTSIZE; i++) {
+            for (int j = 0; j < 3 ; j++) {
+                // Extract the inputs.
+                ArgumentsDoubleInt args = new ArgumentsDoubleInt();
+                args.inV = arrayInV[i * 4 + j];
+                // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
+                CoreMathVerifier.computeConvert(args);
+                // Figure out what the outputs should have been.
+                boolean valid = true;
+                if (args.out != arrayOut[i * 4 + j]) {
+                    valid = false;
+                }
+                if (!valid) {
+                    StringBuilder message = new StringBuilder();
+                    message.append("Input inV: ");
+                    message.append(String.format("%24.8g %16x %31a",
+                            args.inV, Double.doubleToRawLongBits(args.inV), args.inV));
+                    message.append("\n");
+                    message.append("Expected output out: ");
+                    message.append(String.format("%d", args.out));
+                    message.append("\n");
+                    message.append("Actual   output out: ");
+                    message.append(String.format("%d", arrayOut[i * 4 + j]));
+                    if (args.out != arrayOut[i * 4 + j]) {
+                        message.append(" FAIL");
+                    }
+                    message.append("\n");
+                    assertTrue("Incorrect output for checkConvertDouble3Int3" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                }
+            }
+        }
+    }
+
+    private void checkConvertDouble4Int4() {
+        Allocation inV = createRandomFloatAllocation(mRS, Element.DataType.FLOAT_64, 4, 0xa57cd89c5e464968l, -2.1474836480000000000e+09, 2.1474836470000000000e+09);
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_32, 4), INPUTSIZE);
+            script.forEach_testConvertInt4Double4Int4(inV, out);
+            verifyResultsConvertDouble4Int4(inV, out, false);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertInt4Double4Int4: " + e.toString());
+        }
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_32, 4), INPUTSIZE);
+            scriptRelaxed.forEach_testConvertInt4Double4Int4(inV, out);
+            verifyResultsConvertDouble4Int4(inV, out, true);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertInt4Double4Int4: " + e.toString());
+        }
+    }
+
+    private void verifyResultsConvertDouble4Int4(Allocation inV, Allocation out, boolean relaxed) {
+        double[] arrayInV = new double[INPUTSIZE * 4];
+        inV.copyTo(arrayInV);
+        int[] arrayOut = new int[INPUTSIZE * 4];
+        out.copyTo(arrayOut);
+        for (int i = 0; i < INPUTSIZE; i++) {
+            for (int j = 0; j < 4 ; j++) {
+                // Extract the inputs.
+                ArgumentsDoubleInt args = new ArgumentsDoubleInt();
+                args.inV = arrayInV[i * 4 + j];
+                // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
+                CoreMathVerifier.computeConvert(args);
+                // Figure out what the outputs should have been.
+                boolean valid = true;
+                if (args.out != arrayOut[i * 4 + j]) {
+                    valid = false;
+                }
+                if (!valid) {
+                    StringBuilder message = new StringBuilder();
+                    message.append("Input inV: ");
+                    message.append(String.format("%24.8g %16x %31a",
+                            args.inV, Double.doubleToRawLongBits(args.inV), args.inV));
+                    message.append("\n");
+                    message.append("Expected output out: ");
+                    message.append(String.format("%d", args.out));
+                    message.append("\n");
+                    message.append("Actual   output out: ");
+                    message.append(String.format("%d", arrayOut[i * 4 + j]));
+                    if (args.out != arrayOut[i * 4 + j]) {
+                        message.append(" FAIL");
+                    }
+                    message.append("\n");
+                    assertTrue("Incorrect output for checkConvertDouble4Int4" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                }
+            }
+        }
+    }
+
+    public class ArgumentsLongInt {
+        public long inV;
+        public int out;
+    }
+
+    private void checkConvertLong2Int2() {
+        Allocation inV = createRandomIntegerAllocation(mRS, Element.DataType.SIGNED_64, 2, 0xfe441c66e5deba3bl, true, 31);
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_32, 2), INPUTSIZE);
+            script.forEach_testConvertInt2Long2Int2(inV, out);
+            verifyResultsConvertLong2Int2(inV, out, false);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertInt2Long2Int2: " + e.toString());
+        }
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_32, 2), INPUTSIZE);
+            scriptRelaxed.forEach_testConvertInt2Long2Int2(inV, out);
+            verifyResultsConvertLong2Int2(inV, out, true);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertInt2Long2Int2: " + e.toString());
+        }
+    }
+
+    private void verifyResultsConvertLong2Int2(Allocation inV, Allocation out, boolean relaxed) {
+        long[] arrayInV = new long[INPUTSIZE * 2];
+        inV.copyTo(arrayInV);
+        int[] arrayOut = new int[INPUTSIZE * 2];
+        out.copyTo(arrayOut);
+        for (int i = 0; i < INPUTSIZE; i++) {
+            for (int j = 0; j < 2 ; j++) {
+                // Extract the inputs.
+                ArgumentsLongInt args = new ArgumentsLongInt();
+                args.inV = arrayInV[i * 2 + j];
+                // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
+                CoreMathVerifier.computeConvert(args);
+                // Figure out what the outputs should have been.
+                boolean valid = true;
+                if (args.out != arrayOut[i * 2 + j]) {
+                    valid = false;
+                }
+                if (!valid) {
+                    StringBuilder message = new StringBuilder();
+                    message.append("Input inV: ");
+                    message.append(String.format("%d", args.inV));
+                    message.append("\n");
+                    message.append("Expected output out: ");
+                    message.append(String.format("%d", args.out));
+                    message.append("\n");
+                    message.append("Actual   output out: ");
+                    message.append(String.format("%d", arrayOut[i * 2 + j]));
+                    if (args.out != arrayOut[i * 2 + j]) {
+                        message.append(" FAIL");
+                    }
+                    message.append("\n");
+                    assertTrue("Incorrect output for checkConvertLong2Int2" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                }
+            }
+        }
+    }
+
+    private void checkConvertLong3Int3() {
+        Allocation inV = createRandomIntegerAllocation(mRS, Element.DataType.SIGNED_64, 3, 0xfe441ca62f86ca71l, true, 31);
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_32, 3), INPUTSIZE);
+            script.forEach_testConvertInt3Long3Int3(inV, out);
+            verifyResultsConvertLong3Int3(inV, out, false);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertInt3Long3Int3: " + e.toString());
+        }
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_32, 3), INPUTSIZE);
+            scriptRelaxed.forEach_testConvertInt3Long3Int3(inV, out);
+            verifyResultsConvertLong3Int3(inV, out, true);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertInt3Long3Int3: " + e.toString());
+        }
+    }
+
+    private void verifyResultsConvertLong3Int3(Allocation inV, Allocation out, boolean relaxed) {
+        long[] arrayInV = new long[INPUTSIZE * 4];
+        inV.copyTo(arrayInV);
+        int[] arrayOut = new int[INPUTSIZE * 4];
+        out.copyTo(arrayOut);
+        for (int i = 0; i < INPUTSIZE; i++) {
+            for (int j = 0; j < 3 ; j++) {
+                // Extract the inputs.
+                ArgumentsLongInt args = new ArgumentsLongInt();
+                args.inV = arrayInV[i * 4 + j];
+                // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
+                CoreMathVerifier.computeConvert(args);
+                // Figure out what the outputs should have been.
+                boolean valid = true;
+                if (args.out != arrayOut[i * 4 + j]) {
+                    valid = false;
+                }
+                if (!valid) {
+                    StringBuilder message = new StringBuilder();
+                    message.append("Input inV: ");
+                    message.append(String.format("%d", args.inV));
+                    message.append("\n");
+                    message.append("Expected output out: ");
+                    message.append(String.format("%d", args.out));
+                    message.append("\n");
+                    message.append("Actual   output out: ");
+                    message.append(String.format("%d", arrayOut[i * 4 + j]));
+                    if (args.out != arrayOut[i * 4 + j]) {
+                        message.append(" FAIL");
+                    }
+                    message.append("\n");
+                    assertTrue("Incorrect output for checkConvertLong3Int3" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                }
+            }
+        }
+    }
+
+    private void checkConvertLong4Int4() {
+        Allocation inV = createRandomIntegerAllocation(mRS, Element.DataType.SIGNED_64, 4, 0xfe441ce5792edaa7l, true, 31);
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_32, 4), INPUTSIZE);
+            script.forEach_testConvertInt4Long4Int4(inV, out);
+            verifyResultsConvertLong4Int4(inV, out, false);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertInt4Long4Int4: " + e.toString());
+        }
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_32, 4), INPUTSIZE);
+            scriptRelaxed.forEach_testConvertInt4Long4Int4(inV, out);
+            verifyResultsConvertLong4Int4(inV, out, true);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertInt4Long4Int4: " + e.toString());
+        }
+    }
+
+    private void verifyResultsConvertLong4Int4(Allocation inV, Allocation out, boolean relaxed) {
+        long[] arrayInV = new long[INPUTSIZE * 4];
+        inV.copyTo(arrayInV);
+        int[] arrayOut = new int[INPUTSIZE * 4];
+        out.copyTo(arrayOut);
+        for (int i = 0; i < INPUTSIZE; i++) {
+            for (int j = 0; j < 4 ; j++) {
+                // Extract the inputs.
+                ArgumentsLongInt args = new ArgumentsLongInt();
+                args.inV = arrayInV[i * 4 + j];
+                // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
+                CoreMathVerifier.computeConvert(args);
+                // Figure out what the outputs should have been.
+                boolean valid = true;
+                if (args.out != arrayOut[i * 4 + j]) {
+                    valid = false;
+                }
+                if (!valid) {
+                    StringBuilder message = new StringBuilder();
+                    message.append("Input inV: ");
+                    message.append(String.format("%d", args.inV));
+                    message.append("\n");
+                    message.append("Expected output out: ");
+                    message.append(String.format("%d", args.out));
+                    message.append("\n");
+                    message.append("Actual   output out: ");
+                    message.append(String.format("%d", arrayOut[i * 4 + j]));
+                    if (args.out != arrayOut[i * 4 + j]) {
+                        message.append(" FAIL");
+                    }
+                    message.append("\n");
+                    assertTrue("Incorrect output for checkConvertLong4Int4" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                }
+            }
+        }
+    }
+
+    public class ArgumentsUlongInt {
+        public long inV;
+        public int out;
+    }
+
+    private void checkConvertUlong2Int2() {
+        Allocation inV = createRandomIntegerAllocation(mRS, Element.DataType.UNSIGNED_64, 2, 0xe11d350e352de3el, false, 31);
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_32, 2), INPUTSIZE);
+            script.forEach_testConvertInt2Ulong2Int2(inV, out);
+            verifyResultsConvertUlong2Int2(inV, out, false);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertInt2Ulong2Int2: " + e.toString());
+        }
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_32, 2), INPUTSIZE);
+            scriptRelaxed.forEach_testConvertInt2Ulong2Int2(inV, out);
+            verifyResultsConvertUlong2Int2(inV, out, true);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertInt2Ulong2Int2: " + e.toString());
+        }
+    }
+
+    private void verifyResultsConvertUlong2Int2(Allocation inV, Allocation out, boolean relaxed) {
+        long[] arrayInV = new long[INPUTSIZE * 2];
+        inV.copyTo(arrayInV);
+        int[] arrayOut = new int[INPUTSIZE * 2];
+        out.copyTo(arrayOut);
+        for (int i = 0; i < INPUTSIZE; i++) {
+            for (int j = 0; j < 2 ; j++) {
+                // Extract the inputs.
+                ArgumentsUlongInt args = new ArgumentsUlongInt();
+                args.inV = arrayInV[i * 2 + j];
+                // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
+                CoreMathVerifier.computeConvert(args);
+                // Figure out what the outputs should have been.
+                boolean valid = true;
+                if (args.out != arrayOut[i * 2 + j]) {
+                    valid = false;
+                }
+                if (!valid) {
+                    StringBuilder message = new StringBuilder();
+                    message.append("Input inV: ");
+                    message.append(String.format("0x%x", args.inV));
+                    message.append("\n");
+                    message.append("Expected output out: ");
+                    message.append(String.format("%d", args.out));
+                    message.append("\n");
+                    message.append("Actual   output out: ");
+                    message.append(String.format("%d", arrayOut[i * 2 + j]));
+                    if (args.out != arrayOut[i * 2 + j]) {
+                        message.append(" FAIL");
+                    }
+                    message.append("\n");
+                    assertTrue("Incorrect output for checkConvertUlong2Int2" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                }
+            }
+        }
+    }
+
+    private void checkConvertUlong3Int3() {
+        Allocation inV = createRandomIntegerAllocation(mRS, Element.DataType.UNSIGNED_64, 3, 0xe11d3902cfaee74l, false, 31);
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_32, 3), INPUTSIZE);
+            script.forEach_testConvertInt3Ulong3Int3(inV, out);
+            verifyResultsConvertUlong3Int3(inV, out, false);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertInt3Ulong3Int3: " + e.toString());
+        }
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_32, 3), INPUTSIZE);
+            scriptRelaxed.forEach_testConvertInt3Ulong3Int3(inV, out);
+            verifyResultsConvertUlong3Int3(inV, out, true);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertInt3Ulong3Int3: " + e.toString());
+        }
+    }
+
+    private void verifyResultsConvertUlong3Int3(Allocation inV, Allocation out, boolean relaxed) {
+        long[] arrayInV = new long[INPUTSIZE * 4];
+        inV.copyTo(arrayInV);
+        int[] arrayOut = new int[INPUTSIZE * 4];
+        out.copyTo(arrayOut);
+        for (int i = 0; i < INPUTSIZE; i++) {
+            for (int j = 0; j < 3 ; j++) {
+                // Extract the inputs.
+                ArgumentsUlongInt args = new ArgumentsUlongInt();
+                args.inV = arrayInV[i * 4 + j];
+                // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
+                CoreMathVerifier.computeConvert(args);
+                // Figure out what the outputs should have been.
+                boolean valid = true;
+                if (args.out != arrayOut[i * 4 + j]) {
+                    valid = false;
+                }
+                if (!valid) {
+                    StringBuilder message = new StringBuilder();
+                    message.append("Input inV: ");
+                    message.append(String.format("0x%x", args.inV));
+                    message.append("\n");
+                    message.append("Expected output out: ");
+                    message.append(String.format("%d", args.out));
+                    message.append("\n");
+                    message.append("Actual   output out: ");
+                    message.append(String.format("%d", arrayOut[i * 4 + j]));
+                    if (args.out != arrayOut[i * 4 + j]) {
+                        message.append(" FAIL");
+                    }
+                    message.append("\n");
+                    assertTrue("Incorrect output for checkConvertUlong3Int3" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                }
+            }
+        }
+    }
+
+    private void checkConvertUlong4Int4() {
+        Allocation inV = createRandomIntegerAllocation(mRS, Element.DataType.UNSIGNED_64, 4, 0xe11d3cf76a2feaal, false, 31);
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_32, 4), INPUTSIZE);
+            script.forEach_testConvertInt4Ulong4Int4(inV, out);
+            verifyResultsConvertUlong4Int4(inV, out, false);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertInt4Ulong4Int4: " + e.toString());
+        }
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_32, 4), INPUTSIZE);
+            scriptRelaxed.forEach_testConvertInt4Ulong4Int4(inV, out);
+            verifyResultsConvertUlong4Int4(inV, out, true);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertInt4Ulong4Int4: " + e.toString());
+        }
+    }
+
+    private void verifyResultsConvertUlong4Int4(Allocation inV, Allocation out, boolean relaxed) {
+        long[] arrayInV = new long[INPUTSIZE * 4];
+        inV.copyTo(arrayInV);
+        int[] arrayOut = new int[INPUTSIZE * 4];
+        out.copyTo(arrayOut);
+        for (int i = 0; i < INPUTSIZE; i++) {
+            for (int j = 0; j < 4 ; j++) {
+                // Extract the inputs.
+                ArgumentsUlongInt args = new ArgumentsUlongInt();
+                args.inV = arrayInV[i * 4 + j];
+                // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
+                CoreMathVerifier.computeConvert(args);
+                // Figure out what the outputs should have been.
+                boolean valid = true;
+                if (args.out != arrayOut[i * 4 + j]) {
+                    valid = false;
+                }
+                if (!valid) {
+                    StringBuilder message = new StringBuilder();
+                    message.append("Input inV: ");
+                    message.append(String.format("0x%x", args.inV));
+                    message.append("\n");
+                    message.append("Expected output out: ");
+                    message.append(String.format("%d", args.out));
+                    message.append("\n");
+                    message.append("Actual   output out: ");
+                    message.append(String.format("%d", arrayOut[i * 4 + j]));
+                    if (args.out != arrayOut[i * 4 + j]) {
+                        message.append(" FAIL");
+                    }
+                    message.append("\n");
+                    assertTrue("Incorrect output for checkConvertUlong4Int4" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                }
+            }
+        }
+    }
+
+    public class ArgumentsDoubleUint {
+        public double inV;
+        public int out;
+    }
+
+    private void checkConvertDouble2Uint2() {
+        Allocation inV = createRandomFloatAllocation(mRS, Element.DataType.FLOAT_64, 2, 0xcbf84ff107de7dd7l, 0.0000000000000000000e+00, 4.2949672950000000000e+09);
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_32, 2), INPUTSIZE);
+            script.forEach_testConvertUint2Double2Uint2(inV, out);
+            verifyResultsConvertDouble2Uint2(inV, out, false);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertUint2Double2Uint2: " + e.toString());
+        }
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_32, 2), INPUTSIZE);
+            scriptRelaxed.forEach_testConvertUint2Double2Uint2(inV, out);
+            verifyResultsConvertDouble2Uint2(inV, out, true);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertUint2Double2Uint2: " + e.toString());
+        }
+    }
+
+    private void verifyResultsConvertDouble2Uint2(Allocation inV, Allocation out, boolean relaxed) {
+        double[] arrayInV = new double[INPUTSIZE * 2];
+        inV.copyTo(arrayInV);
+        int[] arrayOut = new int[INPUTSIZE * 2];
+        out.copyTo(arrayOut);
+        for (int i = 0; i < INPUTSIZE; i++) {
+            for (int j = 0; j < 2 ; j++) {
+                // Extract the inputs.
+                ArgumentsDoubleUint args = new ArgumentsDoubleUint();
+                args.inV = arrayInV[i * 2 + j];
+                // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
+                CoreMathVerifier.computeConvert(args);
+                // Figure out what the outputs should have been.
+                boolean valid = true;
+                if (args.out != arrayOut[i * 2 + j]) {
+                    valid = false;
+                }
+                if (!valid) {
+                    StringBuilder message = new StringBuilder();
+                    message.append("Input inV: ");
+                    message.append(String.format("%24.8g %16x %31a",
+                            args.inV, Double.doubleToRawLongBits(args.inV), args.inV));
+                    message.append("\n");
+                    message.append("Expected output out: ");
+                    message.append(String.format("0x%x", args.out));
+                    message.append("\n");
+                    message.append("Actual   output out: ");
+                    message.append(String.format("0x%x", arrayOut[i * 2 + j]));
+                    if (args.out != arrayOut[i * 2 + j]) {
+                        message.append(" FAIL");
+                    }
+                    message.append("\n");
+                    assertTrue("Incorrect output for checkConvertDouble2Uint2" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                }
+            }
+        }
+    }
+
+    private void checkConvertDouble3Uint3() {
+        Allocation inV = createRandomFloatAllocation(mRS, Element.DataType.FLOAT_64, 3, 0xcbf85a9266e642cbl, 0.0000000000000000000e+00, 4.2949672950000000000e+09);
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_32, 3), INPUTSIZE);
+            script.forEach_testConvertUint3Double3Uint3(inV, out);
+            verifyResultsConvertDouble3Uint3(inV, out, false);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertUint3Double3Uint3: " + e.toString());
+        }
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_32, 3), INPUTSIZE);
+            scriptRelaxed.forEach_testConvertUint3Double3Uint3(inV, out);
+            verifyResultsConvertDouble3Uint3(inV, out, true);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertUint3Double3Uint3: " + e.toString());
+        }
+    }
+
+    private void verifyResultsConvertDouble3Uint3(Allocation inV, Allocation out, boolean relaxed) {
+        double[] arrayInV = new double[INPUTSIZE * 4];
+        inV.copyTo(arrayInV);
+        int[] arrayOut = new int[INPUTSIZE * 4];
+        out.copyTo(arrayOut);
+        for (int i = 0; i < INPUTSIZE; i++) {
+            for (int j = 0; j < 3 ; j++) {
+                // Extract the inputs.
+                ArgumentsDoubleUint args = new ArgumentsDoubleUint();
+                args.inV = arrayInV[i * 4 + j];
+                // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
+                CoreMathVerifier.computeConvert(args);
+                // Figure out what the outputs should have been.
+                boolean valid = true;
+                if (args.out != arrayOut[i * 4 + j]) {
+                    valid = false;
+                }
+                if (!valid) {
+                    StringBuilder message = new StringBuilder();
+                    message.append("Input inV: ");
+                    message.append(String.format("%24.8g %16x %31a",
+                            args.inV, Double.doubleToRawLongBits(args.inV), args.inV));
+                    message.append("\n");
+                    message.append("Expected output out: ");
+                    message.append(String.format("0x%x", args.out));
+                    message.append("\n");
+                    message.append("Actual   output out: ");
+                    message.append(String.format("0x%x", arrayOut[i * 4 + j]));
+                    if (args.out != arrayOut[i * 4 + j]) {
+                        message.append(" FAIL");
+                    }
+                    message.append("\n");
+                    assertTrue("Incorrect output for checkConvertDouble3Uint3" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                }
+            }
+        }
+    }
+
+    private void checkConvertDouble4Uint4() {
+        Allocation inV = createRandomFloatAllocation(mRS, Element.DataType.FLOAT_64, 4, 0xcbf86533c5ee07bfl, 0.0000000000000000000e+00, 4.2949672950000000000e+09);
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_32, 4), INPUTSIZE);
+            script.forEach_testConvertUint4Double4Uint4(inV, out);
+            verifyResultsConvertDouble4Uint4(inV, out, false);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertUint4Double4Uint4: " + e.toString());
+        }
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_32, 4), INPUTSIZE);
+            scriptRelaxed.forEach_testConvertUint4Double4Uint4(inV, out);
+            verifyResultsConvertDouble4Uint4(inV, out, true);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertUint4Double4Uint4: " + e.toString());
+        }
+    }
+
+    private void verifyResultsConvertDouble4Uint4(Allocation inV, Allocation out, boolean relaxed) {
+        double[] arrayInV = new double[INPUTSIZE * 4];
+        inV.copyTo(arrayInV);
+        int[] arrayOut = new int[INPUTSIZE * 4];
+        out.copyTo(arrayOut);
+        for (int i = 0; i < INPUTSIZE; i++) {
+            for (int j = 0; j < 4 ; j++) {
+                // Extract the inputs.
+                ArgumentsDoubleUint args = new ArgumentsDoubleUint();
+                args.inV = arrayInV[i * 4 + j];
+                // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
+                CoreMathVerifier.computeConvert(args);
+                // Figure out what the outputs should have been.
+                boolean valid = true;
+                if (args.out != arrayOut[i * 4 + j]) {
+                    valid = false;
+                }
+                if (!valid) {
+                    StringBuilder message = new StringBuilder();
+                    message.append("Input inV: ");
+                    message.append(String.format("%24.8g %16x %31a",
+                            args.inV, Double.doubleToRawLongBits(args.inV), args.inV));
+                    message.append("\n");
+                    message.append("Expected output out: ");
+                    message.append(String.format("0x%x", args.out));
+                    message.append("\n");
+                    message.append("Actual   output out: ");
+                    message.append(String.format("0x%x", arrayOut[i * 4 + j]));
+                    if (args.out != arrayOut[i * 4 + j]) {
+                        message.append(" FAIL");
+                    }
+                    message.append("\n");
+                    assertTrue("Incorrect output for checkConvertDouble4Uint4" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                }
+            }
+        }
+    }
+
+    public class ArgumentsLongUint {
+        public long inV;
+        public int out;
+    }
+
+    private void checkConvertLong2Uint2() {
+        Allocation inV = createRandomIntegerAllocation(mRS, Element.DataType.SIGNED_64, 2, 0xb570c8388ceee36cl, false, 32);
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_32, 2), INPUTSIZE);
+            script.forEach_testConvertUint2Long2Uint2(inV, out);
+            verifyResultsConvertLong2Uint2(inV, out, false);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertUint2Long2Uint2: " + e.toString());
+        }
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_32, 2), INPUTSIZE);
+            scriptRelaxed.forEach_testConvertUint2Long2Uint2(inV, out);
+            verifyResultsConvertLong2Uint2(inV, out, true);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertUint2Long2Uint2: " + e.toString());
+        }
+    }
+
+    private void verifyResultsConvertLong2Uint2(Allocation inV, Allocation out, boolean relaxed) {
+        long[] arrayInV = new long[INPUTSIZE * 2];
+        inV.copyTo(arrayInV);
+        int[] arrayOut = new int[INPUTSIZE * 2];
+        out.copyTo(arrayOut);
+        for (int i = 0; i < INPUTSIZE; i++) {
+            for (int j = 0; j < 2 ; j++) {
+                // Extract the inputs.
+                ArgumentsLongUint args = new ArgumentsLongUint();
+                args.inV = arrayInV[i * 2 + j];
+                // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
+                CoreMathVerifier.computeConvert(args);
+                // Figure out what the outputs should have been.
+                boolean valid = true;
+                if (args.out != arrayOut[i * 2 + j]) {
+                    valid = false;
+                }
+                if (!valid) {
+                    StringBuilder message = new StringBuilder();
+                    message.append("Input inV: ");
+                    message.append(String.format("%d", args.inV));
+                    message.append("\n");
+                    message.append("Expected output out: ");
+                    message.append(String.format("0x%x", args.out));
+                    message.append("\n");
+                    message.append("Actual   output out: ");
+                    message.append(String.format("0x%x", arrayOut[i * 2 + j]));
+                    if (args.out != arrayOut[i * 2 + j]) {
+                        message.append(" FAIL");
+                    }
+                    message.append("\n");
+                    assertTrue("Incorrect output for checkConvertLong2Uint2" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                }
+            }
+        }
+    }
+
+    private void checkConvertLong3Uint3() {
+        Allocation inV = createRandomIntegerAllocation(mRS, Element.DataType.SIGNED_64, 3, 0xb570d2d9ebf6a860l, false, 32);
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_32, 3), INPUTSIZE);
+            script.forEach_testConvertUint3Long3Uint3(inV, out);
+            verifyResultsConvertLong3Uint3(inV, out, false);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertUint3Long3Uint3: " + e.toString());
+        }
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_32, 3), INPUTSIZE);
+            scriptRelaxed.forEach_testConvertUint3Long3Uint3(inV, out);
+            verifyResultsConvertLong3Uint3(inV, out, true);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertUint3Long3Uint3: " + e.toString());
+        }
+    }
+
+    private void verifyResultsConvertLong3Uint3(Allocation inV, Allocation out, boolean relaxed) {
+        long[] arrayInV = new long[INPUTSIZE * 4];
+        inV.copyTo(arrayInV);
+        int[] arrayOut = new int[INPUTSIZE * 4];
+        out.copyTo(arrayOut);
+        for (int i = 0; i < INPUTSIZE; i++) {
+            for (int j = 0; j < 3 ; j++) {
+                // Extract the inputs.
+                ArgumentsLongUint args = new ArgumentsLongUint();
+                args.inV = arrayInV[i * 4 + j];
+                // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
+                CoreMathVerifier.computeConvert(args);
+                // Figure out what the outputs should have been.
+                boolean valid = true;
+                if (args.out != arrayOut[i * 4 + j]) {
+                    valid = false;
+                }
+                if (!valid) {
+                    StringBuilder message = new StringBuilder();
+                    message.append("Input inV: ");
+                    message.append(String.format("%d", args.inV));
+                    message.append("\n");
+                    message.append("Expected output out: ");
+                    message.append(String.format("0x%x", args.out));
+                    message.append("\n");
+                    message.append("Actual   output out: ");
+                    message.append(String.format("0x%x", arrayOut[i * 4 + j]));
+                    if (args.out != arrayOut[i * 4 + j]) {
+                        message.append(" FAIL");
+                    }
+                    message.append("\n");
+                    assertTrue("Incorrect output for checkConvertLong3Uint3" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                }
+            }
+        }
+    }
+
+    private void checkConvertLong4Uint4() {
+        Allocation inV = createRandomIntegerAllocation(mRS, Element.DataType.SIGNED_64, 4, 0xb570dd7b4afe6d54l, false, 32);
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_32, 4), INPUTSIZE);
+            script.forEach_testConvertUint4Long4Uint4(inV, out);
+            verifyResultsConvertLong4Uint4(inV, out, false);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertUint4Long4Uint4: " + e.toString());
+        }
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_32, 4), INPUTSIZE);
+            scriptRelaxed.forEach_testConvertUint4Long4Uint4(inV, out);
+            verifyResultsConvertLong4Uint4(inV, out, true);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertUint4Long4Uint4: " + e.toString());
+        }
+    }
+
+    private void verifyResultsConvertLong4Uint4(Allocation inV, Allocation out, boolean relaxed) {
+        long[] arrayInV = new long[INPUTSIZE * 4];
+        inV.copyTo(arrayInV);
+        int[] arrayOut = new int[INPUTSIZE * 4];
+        out.copyTo(arrayOut);
+        for (int i = 0; i < INPUTSIZE; i++) {
+            for (int j = 0; j < 4 ; j++) {
+                // Extract the inputs.
+                ArgumentsLongUint args = new ArgumentsLongUint();
+                args.inV = arrayInV[i * 4 + j];
+                // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
+                CoreMathVerifier.computeConvert(args);
+                // Figure out what the outputs should have been.
+                boolean valid = true;
+                if (args.out != arrayOut[i * 4 + j]) {
+                    valid = false;
+                }
+                if (!valid) {
+                    StringBuilder message = new StringBuilder();
+                    message.append("Input inV: ");
+                    message.append(String.format("%d", args.inV));
+                    message.append("\n");
+                    message.append("Expected output out: ");
+                    message.append(String.format("0x%x", args.out));
+                    message.append("\n");
+                    message.append("Actual   output out: ");
+                    message.append(String.format("0x%x", arrayOut[i * 4 + j]));
+                    if (args.out != arrayOut[i * 4 + j]) {
+                        message.append(" FAIL");
+                    }
+                    message.append("\n");
+                    assertTrue("Incorrect output for checkConvertLong4Uint4" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                }
+            }
+        }
+    }
+
+    public class ArgumentsUlongUint {
+        public long inV;
+        public int out;
+    }
+
+    private void checkConvertUlong2Uint2() {
+        Allocation inV = createRandomIntegerAllocation(mRS, Element.DataType.UNSIGNED_64, 2, 0x5cfe81861f70efedl, false, 32);
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_32, 2), INPUTSIZE);
+            script.forEach_testConvertUint2Ulong2Uint2(inV, out);
+            verifyResultsConvertUlong2Uint2(inV, out, false);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertUint2Ulong2Uint2: " + e.toString());
+        }
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_32, 2), INPUTSIZE);
+            scriptRelaxed.forEach_testConvertUint2Ulong2Uint2(inV, out);
+            verifyResultsConvertUlong2Uint2(inV, out, true);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertUint2Ulong2Uint2: " + e.toString());
+        }
+    }
+
+    private void verifyResultsConvertUlong2Uint2(Allocation inV, Allocation out, boolean relaxed) {
+        long[] arrayInV = new long[INPUTSIZE * 2];
+        inV.copyTo(arrayInV);
+        int[] arrayOut = new int[INPUTSIZE * 2];
+        out.copyTo(arrayOut);
+        for (int i = 0; i < INPUTSIZE; i++) {
+            for (int j = 0; j < 2 ; j++) {
+                // Extract the inputs.
+                ArgumentsUlongUint args = new ArgumentsUlongUint();
+                args.inV = arrayInV[i * 2 + j];
+                // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
+                CoreMathVerifier.computeConvert(args);
+                // Figure out what the outputs should have been.
+                boolean valid = true;
+                if (args.out != arrayOut[i * 2 + j]) {
+                    valid = false;
+                }
+                if (!valid) {
+                    StringBuilder message = new StringBuilder();
+                    message.append("Input inV: ");
+                    message.append(String.format("0x%x", args.inV));
+                    message.append("\n");
+                    message.append("Expected output out: ");
+                    message.append(String.format("0x%x", args.out));
+                    message.append("\n");
+                    message.append("Actual   output out: ");
+                    message.append(String.format("0x%x", arrayOut[i * 2 + j]));
+                    if (args.out != arrayOut[i * 2 + j]) {
+                        message.append(" FAIL");
+                    }
+                    message.append("\n");
+                    assertTrue("Incorrect output for checkConvertUlong2Uint2" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                }
+            }
+        }
+    }
+
+    private void checkConvertUlong3Uint3() {
+        Allocation inV = createRandomIntegerAllocation(mRS, Element.DataType.UNSIGNED_64, 3, 0x5cfe8c277e78b4e1l, false, 32);
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_32, 3), INPUTSIZE);
+            script.forEach_testConvertUint3Ulong3Uint3(inV, out);
+            verifyResultsConvertUlong3Uint3(inV, out, false);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertUint3Ulong3Uint3: " + e.toString());
+        }
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_32, 3), INPUTSIZE);
+            scriptRelaxed.forEach_testConvertUint3Ulong3Uint3(inV, out);
+            verifyResultsConvertUlong3Uint3(inV, out, true);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertUint3Ulong3Uint3: " + e.toString());
+        }
+    }
+
+    private void verifyResultsConvertUlong3Uint3(Allocation inV, Allocation out, boolean relaxed) {
+        long[] arrayInV = new long[INPUTSIZE * 4];
+        inV.copyTo(arrayInV);
+        int[] arrayOut = new int[INPUTSIZE * 4];
+        out.copyTo(arrayOut);
+        for (int i = 0; i < INPUTSIZE; i++) {
+            for (int j = 0; j < 3 ; j++) {
+                // Extract the inputs.
+                ArgumentsUlongUint args = new ArgumentsUlongUint();
+                args.inV = arrayInV[i * 4 + j];
+                // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
+                CoreMathVerifier.computeConvert(args);
+                // Figure out what the outputs should have been.
+                boolean valid = true;
+                if (args.out != arrayOut[i * 4 + j]) {
+                    valid = false;
+                }
+                if (!valid) {
+                    StringBuilder message = new StringBuilder();
+                    message.append("Input inV: ");
+                    message.append(String.format("0x%x", args.inV));
+                    message.append("\n");
+                    message.append("Expected output out: ");
+                    message.append(String.format("0x%x", args.out));
+                    message.append("\n");
+                    message.append("Actual   output out: ");
+                    message.append(String.format("0x%x", arrayOut[i * 4 + j]));
+                    if (args.out != arrayOut[i * 4 + j]) {
+                        message.append(" FAIL");
+                    }
+                    message.append("\n");
+                    assertTrue("Incorrect output for checkConvertUlong3Uint3" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                }
+            }
+        }
+    }
+
+    private void checkConvertUlong4Uint4() {
+        Allocation inV = createRandomIntegerAllocation(mRS, Element.DataType.UNSIGNED_64, 4, 0x5cfe96c8dd8079d5l, false, 32);
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_32, 4), INPUTSIZE);
+            script.forEach_testConvertUint4Ulong4Uint4(inV, out);
+            verifyResultsConvertUlong4Uint4(inV, out, false);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertUint4Ulong4Uint4: " + e.toString());
+        }
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_32, 4), INPUTSIZE);
+            scriptRelaxed.forEach_testConvertUint4Ulong4Uint4(inV, out);
+            verifyResultsConvertUlong4Uint4(inV, out, true);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertUint4Ulong4Uint4: " + e.toString());
+        }
+    }
+
+    private void verifyResultsConvertUlong4Uint4(Allocation inV, Allocation out, boolean relaxed) {
+        long[] arrayInV = new long[INPUTSIZE * 4];
+        inV.copyTo(arrayInV);
+        int[] arrayOut = new int[INPUTSIZE * 4];
+        out.copyTo(arrayOut);
+        for (int i = 0; i < INPUTSIZE; i++) {
+            for (int j = 0; j < 4 ; j++) {
+                // Extract the inputs.
+                ArgumentsUlongUint args = new ArgumentsUlongUint();
+                args.inV = arrayInV[i * 4 + j];
+                // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
+                CoreMathVerifier.computeConvert(args);
+                // Figure out what the outputs should have been.
+                boolean valid = true;
+                if (args.out != arrayOut[i * 4 + j]) {
+                    valid = false;
+                }
+                if (!valid) {
+                    StringBuilder message = new StringBuilder();
+                    message.append("Input inV: ");
+                    message.append(String.format("0x%x", args.inV));
+                    message.append("\n");
+                    message.append("Expected output out: ");
+                    message.append(String.format("0x%x", args.out));
+                    message.append("\n");
+                    message.append("Actual   output out: ");
+                    message.append(String.format("0x%x", arrayOut[i * 4 + j]));
+                    if (args.out != arrayOut[i * 4 + j]) {
+                        message.append(" FAIL");
+                    }
+                    message.append("\n");
+                    assertTrue("Incorrect output for checkConvertUlong4Uint4" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                }
+            }
+        }
+    }
+
+    public class ArgumentsFloatDouble {
+        public float inV;
+        public Floaty out;
+    }
+
+    private void checkConvertFloat2Double2() {
+        Allocation inV = createRandomFloatAllocation(mRS, Element.DataType.FLOAT_32, 2, 0x36c6372446e08221l, -1.6163412428744576259e+38, 1.6163412428744576259e+38);
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_64, 2), INPUTSIZE);
+            script.forEach_testConvertDouble2Float2Double2(inV, out);
+            verifyResultsConvertFloat2Double2(inV, out, false);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertDouble2Float2Double2: " + e.toString());
+        }
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_64, 2), INPUTSIZE);
+            scriptRelaxed.forEach_testConvertDouble2Float2Double2(inV, out);
+            verifyResultsConvertFloat2Double2(inV, out, true);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertDouble2Float2Double2: " + e.toString());
+        }
+    }
+
+    private void verifyResultsConvertFloat2Double2(Allocation inV, Allocation out, boolean relaxed) {
+        float[] arrayInV = new float[INPUTSIZE * 2];
+        inV.copyTo(arrayInV);
+        double[] arrayOut = new double[INPUTSIZE * 2];
+        out.copyTo(arrayOut);
+        for (int i = 0; i < INPUTSIZE; i++) {
+            for (int j = 0; j < 2 ; j++) {
+                // Extract the inputs.
+                ArgumentsFloatDouble args = new ArgumentsFloatDouble();
+                args.inV = arrayInV[i * 2 + j];
+                // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
+                CoreMathVerifier.computeConvert(args);
+                // Figure out what the outputs should have been.
+                boolean valid = true;
+                if (!args.out.couldBe(arrayOut[i * 2 + j])) {
+                    valid = false;
+                }
+                if (!valid) {
+                    StringBuilder message = new StringBuilder();
+                    message.append("Input inV: ");
+                    message.append(String.format("%14.8g %8x %15a",
+                            args.inV, Float.floatToRawIntBits(args.inV), args.inV));
+                    message.append("\n");
+                    message.append("Expected output out: ");
+                    message.append(args.out.toString());
+                    message.append("\n");
+                    message.append("Actual   output out: ");
+                    message.append(String.format("%24.8g %16x %31a",
+                            arrayOut[i * 2 + j], Double.doubleToRawLongBits(arrayOut[i * 2 + j]), arrayOut[i * 2 + j]));
+                    if (!args.out.couldBe(arrayOut[i * 2 + j])) {
+                        message.append(" FAIL");
+                    }
+                    message.append("\n");
+                    assertTrue("Incorrect output for checkConvertFloat2Double2" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                }
+            }
+        }
+    }
+
+    private void checkConvertFloat3Double3() {
+        Allocation inV = createRandomFloatAllocation(mRS, Element.DataType.FLOAT_32, 3, 0x3712feab9d3c134dl, -1.6163412428744576259e+38, 1.6163412428744576259e+38);
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_64, 3), INPUTSIZE);
+            script.forEach_testConvertDouble3Float3Double3(inV, out);
+            verifyResultsConvertFloat3Double3(inV, out, false);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertDouble3Float3Double3: " + e.toString());
+        }
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_64, 3), INPUTSIZE);
+            scriptRelaxed.forEach_testConvertDouble3Float3Double3(inV, out);
+            verifyResultsConvertFloat3Double3(inV, out, true);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertDouble3Float3Double3: " + e.toString());
+        }
+    }
+
+    private void verifyResultsConvertFloat3Double3(Allocation inV, Allocation out, boolean relaxed) {
+        float[] arrayInV = new float[INPUTSIZE * 4];
+        inV.copyTo(arrayInV);
+        double[] arrayOut = new double[INPUTSIZE * 4];
+        out.copyTo(arrayOut);
+        for (int i = 0; i < INPUTSIZE; i++) {
+            for (int j = 0; j < 3 ; j++) {
+                // Extract the inputs.
+                ArgumentsFloatDouble args = new ArgumentsFloatDouble();
+                args.inV = arrayInV[i * 4 + j];
+                // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
+                CoreMathVerifier.computeConvert(args);
+                // Figure out what the outputs should have been.
+                boolean valid = true;
+                if (!args.out.couldBe(arrayOut[i * 4 + j])) {
+                    valid = false;
+                }
+                if (!valid) {
+                    StringBuilder message = new StringBuilder();
+                    message.append("Input inV: ");
+                    message.append(String.format("%14.8g %8x %15a",
+                            args.inV, Float.floatToRawIntBits(args.inV), args.inV));
+                    message.append("\n");
+                    message.append("Expected output out: ");
+                    message.append(args.out.toString());
+                    message.append("\n");
+                    message.append("Actual   output out: ");
+                    message.append(String.format("%24.8g %16x %31a",
+                            arrayOut[i * 4 + j], Double.doubleToRawLongBits(arrayOut[i * 4 + j]), arrayOut[i * 4 + j]));
+                    if (!args.out.couldBe(arrayOut[i * 4 + j])) {
+                        message.append(" FAIL");
+                    }
+                    message.append("\n");
+                    assertTrue("Incorrect output for checkConvertFloat3Double3" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                }
+            }
+        }
+    }
+
+    private void checkConvertFloat4Double4() {
+        Allocation inV = createRandomFloatAllocation(mRS, Element.DataType.FLOAT_32, 4, 0x375fc632f397a479l, -1.6163412428744576259e+38, 1.6163412428744576259e+38);
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_64, 4), INPUTSIZE);
+            script.forEach_testConvertDouble4Float4Double4(inV, out);
+            verifyResultsConvertFloat4Double4(inV, out, false);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertDouble4Float4Double4: " + e.toString());
+        }
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_64, 4), INPUTSIZE);
+            scriptRelaxed.forEach_testConvertDouble4Float4Double4(inV, out);
+            verifyResultsConvertFloat4Double4(inV, out, true);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertDouble4Float4Double4: " + e.toString());
+        }
+    }
+
+    private void verifyResultsConvertFloat4Double4(Allocation inV, Allocation out, boolean relaxed) {
+        float[] arrayInV = new float[INPUTSIZE * 4];
+        inV.copyTo(arrayInV);
+        double[] arrayOut = new double[INPUTSIZE * 4];
+        out.copyTo(arrayOut);
+        for (int i = 0; i < INPUTSIZE; i++) {
+            for (int j = 0; j < 4 ; j++) {
+                // Extract the inputs.
+                ArgumentsFloatDouble args = new ArgumentsFloatDouble();
+                args.inV = arrayInV[i * 4 + j];
+                // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
+                CoreMathVerifier.computeConvert(args);
+                // Figure out what the outputs should have been.
+                boolean valid = true;
+                if (!args.out.couldBe(arrayOut[i * 4 + j])) {
+                    valid = false;
+                }
+                if (!valid) {
+                    StringBuilder message = new StringBuilder();
+                    message.append("Input inV: ");
+                    message.append(String.format("%14.8g %8x %15a",
+                            args.inV, Float.floatToRawIntBits(args.inV), args.inV));
+                    message.append("\n");
+                    message.append("Expected output out: ");
+                    message.append(args.out.toString());
+                    message.append("\n");
+                    message.append("Actual   output out: ");
+                    message.append(String.format("%24.8g %16x %31a",
+                            arrayOut[i * 4 + j], Double.doubleToRawLongBits(arrayOut[i * 4 + j]), arrayOut[i * 4 + j]));
+                    if (!args.out.couldBe(arrayOut[i * 4 + j])) {
+                        message.append(" FAIL");
+                    }
+                    message.append("\n");
+                    assertTrue("Incorrect output for checkConvertFloat4Double4" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                }
+            }
+        }
+    }
+
+    public class ArgumentsCharDouble {
+        public byte inV;
+        public Floaty out;
+    }
+
+    private void checkConvertChar2Double2() {
+        Allocation inV = createRandomIntegerAllocation(mRS, Element.DataType.SIGNED_8, 2, 0xd86d88e268ca2f61l, true, 7);
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_64, 2), INPUTSIZE);
+            script.forEach_testConvertDouble2Char2Double2(inV, out);
+            verifyResultsConvertChar2Double2(inV, out, false);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertDouble2Char2Double2: " + e.toString());
+        }
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_64, 2), INPUTSIZE);
+            scriptRelaxed.forEach_testConvertDouble2Char2Double2(inV, out);
+            verifyResultsConvertChar2Double2(inV, out, true);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertDouble2Char2Double2: " + e.toString());
+        }
+    }
+
+    private void verifyResultsConvertChar2Double2(Allocation inV, Allocation out, boolean relaxed) {
+        byte[] arrayInV = new byte[INPUTSIZE * 2];
+        inV.copyTo(arrayInV);
+        double[] arrayOut = new double[INPUTSIZE * 2];
+        out.copyTo(arrayOut);
+        for (int i = 0; i < INPUTSIZE; i++) {
+            for (int j = 0; j < 2 ; j++) {
+                // Extract the inputs.
+                ArgumentsCharDouble args = new ArgumentsCharDouble();
+                args.inV = arrayInV[i * 2 + j];
+                // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
+                CoreMathVerifier.computeConvert(args);
+                // Figure out what the outputs should have been.
+                boolean valid = true;
+                if (!args.out.couldBe(arrayOut[i * 2 + j])) {
+                    valid = false;
+                }
+                if (!valid) {
+                    StringBuilder message = new StringBuilder();
+                    message.append("Input inV: ");
+                    message.append(String.format("%d", args.inV));
+                    message.append("\n");
+                    message.append("Expected output out: ");
+                    message.append(args.out.toString());
+                    message.append("\n");
+                    message.append("Actual   output out: ");
+                    message.append(String.format("%24.8g %16x %31a",
+                            arrayOut[i * 2 + j], Double.doubleToRawLongBits(arrayOut[i * 2 + j]), arrayOut[i * 2 + j]));
+                    if (!args.out.couldBe(arrayOut[i * 2 + j])) {
+                        message.append(" FAIL");
+                    }
+                    message.append("\n");
+                    assertTrue("Incorrect output for checkConvertChar2Double2" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                }
+            }
+        }
+    }
+
+    private void checkConvertChar3Double3() {
+        Allocation inV = createRandomIntegerAllocation(mRS, Element.DataType.SIGNED_8, 3, 0xd8ba5069bf25c08dl, true, 7);
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_64, 3), INPUTSIZE);
+            script.forEach_testConvertDouble3Char3Double3(inV, out);
+            verifyResultsConvertChar3Double3(inV, out, false);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertDouble3Char3Double3: " + e.toString());
+        }
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_64, 3), INPUTSIZE);
+            scriptRelaxed.forEach_testConvertDouble3Char3Double3(inV, out);
+            verifyResultsConvertChar3Double3(inV, out, true);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertDouble3Char3Double3: " + e.toString());
+        }
+    }
+
+    private void verifyResultsConvertChar3Double3(Allocation inV, Allocation out, boolean relaxed) {
+        byte[] arrayInV = new byte[INPUTSIZE * 4];
+        inV.copyTo(arrayInV);
+        double[] arrayOut = new double[INPUTSIZE * 4];
+        out.copyTo(arrayOut);
+        for (int i = 0; i < INPUTSIZE; i++) {
+            for (int j = 0; j < 3 ; j++) {
+                // Extract the inputs.
+                ArgumentsCharDouble args = new ArgumentsCharDouble();
+                args.inV = arrayInV[i * 4 + j];
+                // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
+                CoreMathVerifier.computeConvert(args);
+                // Figure out what the outputs should have been.
+                boolean valid = true;
+                if (!args.out.couldBe(arrayOut[i * 4 + j])) {
+                    valid = false;
+                }
+                if (!valid) {
+                    StringBuilder message = new StringBuilder();
+                    message.append("Input inV: ");
+                    message.append(String.format("%d", args.inV));
+                    message.append("\n");
+                    message.append("Expected output out: ");
+                    message.append(args.out.toString());
+                    message.append("\n");
+                    message.append("Actual   output out: ");
+                    message.append(String.format("%24.8g %16x %31a",
+                            arrayOut[i * 4 + j], Double.doubleToRawLongBits(arrayOut[i * 4 + j]), arrayOut[i * 4 + j]));
+                    if (!args.out.couldBe(arrayOut[i * 4 + j])) {
+                        message.append(" FAIL");
+                    }
+                    message.append("\n");
+                    assertTrue("Incorrect output for checkConvertChar3Double3" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                }
+            }
+        }
+    }
+
+    private void checkConvertChar4Double4() {
+        Allocation inV = createRandomIntegerAllocation(mRS, Element.DataType.SIGNED_8, 4, 0xd90717f1158151b9l, true, 7);
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_64, 4), INPUTSIZE);
+            script.forEach_testConvertDouble4Char4Double4(inV, out);
+            verifyResultsConvertChar4Double4(inV, out, false);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertDouble4Char4Double4: " + e.toString());
+        }
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_64, 4), INPUTSIZE);
+            scriptRelaxed.forEach_testConvertDouble4Char4Double4(inV, out);
+            verifyResultsConvertChar4Double4(inV, out, true);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertDouble4Char4Double4: " + e.toString());
+        }
+    }
+
+    private void verifyResultsConvertChar4Double4(Allocation inV, Allocation out, boolean relaxed) {
+        byte[] arrayInV = new byte[INPUTSIZE * 4];
+        inV.copyTo(arrayInV);
+        double[] arrayOut = new double[INPUTSIZE * 4];
+        out.copyTo(arrayOut);
+        for (int i = 0; i < INPUTSIZE; i++) {
+            for (int j = 0; j < 4 ; j++) {
+                // Extract the inputs.
+                ArgumentsCharDouble args = new ArgumentsCharDouble();
+                args.inV = arrayInV[i * 4 + j];
+                // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
+                CoreMathVerifier.computeConvert(args);
+                // Figure out what the outputs should have been.
+                boolean valid = true;
+                if (!args.out.couldBe(arrayOut[i * 4 + j])) {
+                    valid = false;
+                }
+                if (!valid) {
+                    StringBuilder message = new StringBuilder();
+                    message.append("Input inV: ");
+                    message.append(String.format("%d", args.inV));
+                    message.append("\n");
+                    message.append("Expected output out: ");
+                    message.append(args.out.toString());
+                    message.append("\n");
+                    message.append("Actual   output out: ");
+                    message.append(String.format("%24.8g %16x %31a",
+                            arrayOut[i * 4 + j], Double.doubleToRawLongBits(arrayOut[i * 4 + j]), arrayOut[i * 4 + j]));
+                    if (!args.out.couldBe(arrayOut[i * 4 + j])) {
+                        message.append(" FAIL");
+                    }
+                    message.append("\n");
+                    assertTrue("Incorrect output for checkConvertChar4Double4" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                }
+            }
+        }
+    }
+
+    public class ArgumentsUcharDouble {
+        public byte inV;
+        public Floaty out;
+    }
+
+    private void checkConvertUchar2Double2() {
+        Allocation inV = createRandomIntegerAllocation(mRS, Element.DataType.UNSIGNED_8, 2, 0x70cea2996167f1al, false, 8);
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_64, 2), INPUTSIZE);
+            script.forEach_testConvertDouble2Uchar2Double2(inV, out);
+            verifyResultsConvertUchar2Double2(inV, out, false);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertDouble2Uchar2Double2: " + e.toString());
+        }
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_64, 2), INPUTSIZE);
+            scriptRelaxed.forEach_testConvertDouble2Uchar2Double2(inV, out);
+            verifyResultsConvertUchar2Double2(inV, out, true);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertDouble2Uchar2Double2: " + e.toString());
+        }
+    }
+
+    private void verifyResultsConvertUchar2Double2(Allocation inV, Allocation out, boolean relaxed) {
+        byte[] arrayInV = new byte[INPUTSIZE * 2];
+        inV.copyTo(arrayInV);
+        double[] arrayOut = new double[INPUTSIZE * 2];
+        out.copyTo(arrayOut);
+        for (int i = 0; i < INPUTSIZE; i++) {
+            for (int j = 0; j < 2 ; j++) {
+                // Extract the inputs.
+                ArgumentsUcharDouble args = new ArgumentsUcharDouble();
+                args.inV = arrayInV[i * 2 + j];
+                // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
+                CoreMathVerifier.computeConvert(args);
+                // Figure out what the outputs should have been.
+                boolean valid = true;
+                if (!args.out.couldBe(arrayOut[i * 2 + j])) {
+                    valid = false;
+                }
+                if (!valid) {
+                    StringBuilder message = new StringBuilder();
+                    message.append("Input inV: ");
+                    message.append(String.format("0x%x", args.inV));
+                    message.append("\n");
+                    message.append("Expected output out: ");
+                    message.append(args.out.toString());
+                    message.append("\n");
+                    message.append("Actual   output out: ");
+                    message.append(String.format("%24.8g %16x %31a",
+                            arrayOut[i * 2 + j], Double.doubleToRawLongBits(arrayOut[i * 2 + j]), arrayOut[i * 2 + j]));
+                    if (!args.out.couldBe(arrayOut[i * 2 + j])) {
+                        message.append(" FAIL");
+                    }
+                    message.append("\n");
+                    assertTrue("Incorrect output for checkConvertUchar2Double2" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                }
+            }
+        }
+    }
+
+    private void checkConvertUchar3Double3() {
+        Allocation inV = createRandomIntegerAllocation(mRS, Element.DataType.UNSIGNED_8, 3, 0x759b1b0ec721046l, false, 8);
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_64, 3), INPUTSIZE);
+            script.forEach_testConvertDouble3Uchar3Double3(inV, out);
+            verifyResultsConvertUchar3Double3(inV, out, false);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertDouble3Uchar3Double3: " + e.toString());
+        }
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_64, 3), INPUTSIZE);
+            scriptRelaxed.forEach_testConvertDouble3Uchar3Double3(inV, out);
+            verifyResultsConvertUchar3Double3(inV, out, true);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertDouble3Uchar3Double3: " + e.toString());
+        }
+    }
+
+    private void verifyResultsConvertUchar3Double3(Allocation inV, Allocation out, boolean relaxed) {
+        byte[] arrayInV = new byte[INPUTSIZE * 4];
+        inV.copyTo(arrayInV);
+        double[] arrayOut = new double[INPUTSIZE * 4];
+        out.copyTo(arrayOut);
+        for (int i = 0; i < INPUTSIZE; i++) {
+            for (int j = 0; j < 3 ; j++) {
+                // Extract the inputs.
+                ArgumentsUcharDouble args = new ArgumentsUcharDouble();
+                args.inV = arrayInV[i * 4 + j];
+                // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
+                CoreMathVerifier.computeConvert(args);
+                // Figure out what the outputs should have been.
+                boolean valid = true;
+                if (!args.out.couldBe(arrayOut[i * 4 + j])) {
+                    valid = false;
+                }
+                if (!valid) {
+                    StringBuilder message = new StringBuilder();
+                    message.append("Input inV: ");
+                    message.append(String.format("0x%x", args.inV));
+                    message.append("\n");
+                    message.append("Expected output out: ");
+                    message.append(args.out.toString());
+                    message.append("\n");
+                    message.append("Actual   output out: ");
+                    message.append(String.format("%24.8g %16x %31a",
+                            arrayOut[i * 4 + j], Double.doubleToRawLongBits(arrayOut[i * 4 + j]), arrayOut[i * 4 + j]));
+                    if (!args.out.couldBe(arrayOut[i * 4 + j])) {
+                        message.append(" FAIL");
+                    }
+                    message.append("\n");
+                    assertTrue("Incorrect output for checkConvertUchar3Double3" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                }
+            }
+        }
+    }
+
+    private void checkConvertUchar4Double4() {
+        Allocation inV = createRandomIntegerAllocation(mRS, Element.DataType.UNSIGNED_8, 4, 0x7a6793842cda172l, false, 8);
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_64, 4), INPUTSIZE);
+            script.forEach_testConvertDouble4Uchar4Double4(inV, out);
+            verifyResultsConvertUchar4Double4(inV, out, false);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertDouble4Uchar4Double4: " + e.toString());
+        }
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_64, 4), INPUTSIZE);
+            scriptRelaxed.forEach_testConvertDouble4Uchar4Double4(inV, out);
+            verifyResultsConvertUchar4Double4(inV, out, true);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertDouble4Uchar4Double4: " + e.toString());
+        }
+    }
+
+    private void verifyResultsConvertUchar4Double4(Allocation inV, Allocation out, boolean relaxed) {
+        byte[] arrayInV = new byte[INPUTSIZE * 4];
+        inV.copyTo(arrayInV);
+        double[] arrayOut = new double[INPUTSIZE * 4];
+        out.copyTo(arrayOut);
+        for (int i = 0; i < INPUTSIZE; i++) {
+            for (int j = 0; j < 4 ; j++) {
+                // Extract the inputs.
+                ArgumentsUcharDouble args = new ArgumentsUcharDouble();
+                args.inV = arrayInV[i * 4 + j];
+                // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
+                CoreMathVerifier.computeConvert(args);
+                // Figure out what the outputs should have been.
+                boolean valid = true;
+                if (!args.out.couldBe(arrayOut[i * 4 + j])) {
+                    valid = false;
+                }
+                if (!valid) {
+                    StringBuilder message = new StringBuilder();
+                    message.append("Input inV: ");
+                    message.append(String.format("0x%x", args.inV));
+                    message.append("\n");
+                    message.append("Expected output out: ");
+                    message.append(args.out.toString());
+                    message.append("\n");
+                    message.append("Actual   output out: ");
+                    message.append(String.format("%24.8g %16x %31a",
+                            arrayOut[i * 4 + j], Double.doubleToRawLongBits(arrayOut[i * 4 + j]), arrayOut[i * 4 + j]));
+                    if (!args.out.couldBe(arrayOut[i * 4 + j])) {
+                        message.append(" FAIL");
+                    }
+                    message.append("\n");
+                    assertTrue("Incorrect output for checkConvertUchar4Double4" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                }
+            }
+        }
+    }
+
+    public class ArgumentsShortDouble {
+        public short inV;
+        public Floaty out;
+    }
+
+    private void checkConvertShort2Double2() {
+        Allocation inV = createRandomIntegerAllocation(mRS, Element.DataType.SIGNED_16, 2, 0xfdeea470023d0105l, true, 15);
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_64, 2), INPUTSIZE);
+            script.forEach_testConvertDouble2Short2Double2(inV, out);
+            verifyResultsConvertShort2Double2(inV, out, false);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertDouble2Short2Double2: " + e.toString());
+        }
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_64, 2), INPUTSIZE);
+            scriptRelaxed.forEach_testConvertDouble2Short2Double2(inV, out);
+            verifyResultsConvertShort2Double2(inV, out, true);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertDouble2Short2Double2: " + e.toString());
+        }
+    }
+
+    private void verifyResultsConvertShort2Double2(Allocation inV, Allocation out, boolean relaxed) {
+        short[] arrayInV = new short[INPUTSIZE * 2];
+        inV.copyTo(arrayInV);
+        double[] arrayOut = new double[INPUTSIZE * 2];
+        out.copyTo(arrayOut);
+        for (int i = 0; i < INPUTSIZE; i++) {
+            for (int j = 0; j < 2 ; j++) {
+                // Extract the inputs.
+                ArgumentsShortDouble args = new ArgumentsShortDouble();
+                args.inV = arrayInV[i * 2 + j];
+                // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
+                CoreMathVerifier.computeConvert(args);
+                // Figure out what the outputs should have been.
+                boolean valid = true;
+                if (!args.out.couldBe(arrayOut[i * 2 + j])) {
+                    valid = false;
+                }
+                if (!valid) {
+                    StringBuilder message = new StringBuilder();
+                    message.append("Input inV: ");
+                    message.append(String.format("%d", args.inV));
+                    message.append("\n");
+                    message.append("Expected output out: ");
+                    message.append(args.out.toString());
+                    message.append("\n");
+                    message.append("Actual   output out: ");
+                    message.append(String.format("%24.8g %16x %31a",
+                            arrayOut[i * 2 + j], Double.doubleToRawLongBits(arrayOut[i * 2 + j]), arrayOut[i * 2 + j]));
+                    if (!args.out.couldBe(arrayOut[i * 2 + j])) {
+                        message.append(" FAIL");
+                    }
+                    message.append("\n");
+                    assertTrue("Incorrect output for checkConvertShort2Double2" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                }
+            }
+        }
+    }
+
+    private void checkConvertShort3Double3() {
+        Allocation inV = createRandomIntegerAllocation(mRS, Element.DataType.SIGNED_16, 3, 0xfe3b6bf758989231l, true, 15);
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_64, 3), INPUTSIZE);
+            script.forEach_testConvertDouble3Short3Double3(inV, out);
+            verifyResultsConvertShort3Double3(inV, out, false);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertDouble3Short3Double3: " + e.toString());
+        }
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_64, 3), INPUTSIZE);
+            scriptRelaxed.forEach_testConvertDouble3Short3Double3(inV, out);
+            verifyResultsConvertShort3Double3(inV, out, true);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertDouble3Short3Double3: " + e.toString());
+        }
+    }
+
+    private void verifyResultsConvertShort3Double3(Allocation inV, Allocation out, boolean relaxed) {
+        short[] arrayInV = new short[INPUTSIZE * 4];
+        inV.copyTo(arrayInV);
+        double[] arrayOut = new double[INPUTSIZE * 4];
+        out.copyTo(arrayOut);
+        for (int i = 0; i < INPUTSIZE; i++) {
+            for (int j = 0; j < 3 ; j++) {
+                // Extract the inputs.
+                ArgumentsShortDouble args = new ArgumentsShortDouble();
+                args.inV = arrayInV[i * 4 + j];
+                // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
+                CoreMathVerifier.computeConvert(args);
+                // Figure out what the outputs should have been.
+                boolean valid = true;
+                if (!args.out.couldBe(arrayOut[i * 4 + j])) {
+                    valid = false;
+                }
+                if (!valid) {
+                    StringBuilder message = new StringBuilder();
+                    message.append("Input inV: ");
+                    message.append(String.format("%d", args.inV));
+                    message.append("\n");
+                    message.append("Expected output out: ");
+                    message.append(args.out.toString());
+                    message.append("\n");
+                    message.append("Actual   output out: ");
+                    message.append(String.format("%24.8g %16x %31a",
+                            arrayOut[i * 4 + j], Double.doubleToRawLongBits(arrayOut[i * 4 + j]), arrayOut[i * 4 + j]));
+                    if (!args.out.couldBe(arrayOut[i * 4 + j])) {
+                        message.append(" FAIL");
+                    }
+                    message.append("\n");
+                    assertTrue("Incorrect output for checkConvertShort3Double3" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                }
+            }
+        }
+    }
+
+    private void checkConvertShort4Double4() {
+        Allocation inV = createRandomIntegerAllocation(mRS, Element.DataType.SIGNED_16, 4, 0xfe88337eaef4235dl, true, 15);
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_64, 4), INPUTSIZE);
+            script.forEach_testConvertDouble4Short4Double4(inV, out);
+            verifyResultsConvertShort4Double4(inV, out, false);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertDouble4Short4Double4: " + e.toString());
+        }
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_64, 4), INPUTSIZE);
+            scriptRelaxed.forEach_testConvertDouble4Short4Double4(inV, out);
+            verifyResultsConvertShort4Double4(inV, out, true);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertDouble4Short4Double4: " + e.toString());
+        }
+    }
+
+    private void verifyResultsConvertShort4Double4(Allocation inV, Allocation out, boolean relaxed) {
+        short[] arrayInV = new short[INPUTSIZE * 4];
+        inV.copyTo(arrayInV);
+        double[] arrayOut = new double[INPUTSIZE * 4];
+        out.copyTo(arrayOut);
+        for (int i = 0; i < INPUTSIZE; i++) {
+            for (int j = 0; j < 4 ; j++) {
+                // Extract the inputs.
+                ArgumentsShortDouble args = new ArgumentsShortDouble();
+                args.inV = arrayInV[i * 4 + j];
+                // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
+                CoreMathVerifier.computeConvert(args);
+                // Figure out what the outputs should have been.
+                boolean valid = true;
+                if (!args.out.couldBe(arrayOut[i * 4 + j])) {
+                    valid = false;
+                }
+                if (!valid) {
+                    StringBuilder message = new StringBuilder();
+                    message.append("Input inV: ");
+                    message.append(String.format("%d", args.inV));
+                    message.append("\n");
+                    message.append("Expected output out: ");
+                    message.append(args.out.toString());
+                    message.append("\n");
+                    message.append("Actual   output out: ");
+                    message.append(String.format("%24.8g %16x %31a",
+                            arrayOut[i * 4 + j], Double.doubleToRawLongBits(arrayOut[i * 4 + j]), arrayOut[i * 4 + j]));
+                    if (!args.out.couldBe(arrayOut[i * 4 + j])) {
+                        message.append(" FAIL");
+                    }
+                    message.append("\n");
+                    assertTrue("Incorrect output for checkConvertShort4Double4" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                }
+            }
+        }
+    }
+
+    public class ArgumentsUshortDouble {
+        public short inV;
+        public Floaty out;
+    }
+
+    private void checkConvertUshort2Double2() {
+        Allocation inV = createRandomIntegerAllocation(mRS, Element.DataType.UNSIGNED_16, 2, 0xd2b3fb649e0e6518l, false, 16);
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_64, 2), INPUTSIZE);
+            script.forEach_testConvertDouble2Ushort2Double2(inV, out);
+            verifyResultsConvertUshort2Double2(inV, out, false);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertDouble2Ushort2Double2: " + e.toString());
+        }
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_64, 2), INPUTSIZE);
+            scriptRelaxed.forEach_testConvertDouble2Ushort2Double2(inV, out);
+            verifyResultsConvertUshort2Double2(inV, out, true);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertDouble2Ushort2Double2: " + e.toString());
+        }
+    }
+
+    private void verifyResultsConvertUshort2Double2(Allocation inV, Allocation out, boolean relaxed) {
+        short[] arrayInV = new short[INPUTSIZE * 2];
+        inV.copyTo(arrayInV);
+        double[] arrayOut = new double[INPUTSIZE * 2];
+        out.copyTo(arrayOut);
+        for (int i = 0; i < INPUTSIZE; i++) {
+            for (int j = 0; j < 2 ; j++) {
+                // Extract the inputs.
+                ArgumentsUshortDouble args = new ArgumentsUshortDouble();
+                args.inV = arrayInV[i * 2 + j];
+                // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
+                CoreMathVerifier.computeConvert(args);
+                // Figure out what the outputs should have been.
+                boolean valid = true;
+                if (!args.out.couldBe(arrayOut[i * 2 + j])) {
+                    valid = false;
+                }
+                if (!valid) {
+                    StringBuilder message = new StringBuilder();
+                    message.append("Input inV: ");
+                    message.append(String.format("0x%x", args.inV));
+                    message.append("\n");
+                    message.append("Expected output out: ");
+                    message.append(args.out.toString());
+                    message.append("\n");
+                    message.append("Actual   output out: ");
+                    message.append(String.format("%24.8g %16x %31a",
+                            arrayOut[i * 2 + j], Double.doubleToRawLongBits(arrayOut[i * 2 + j]), arrayOut[i * 2 + j]));
+                    if (!args.out.couldBe(arrayOut[i * 2 + j])) {
+                        message.append(" FAIL");
+                    }
+                    message.append("\n");
+                    assertTrue("Incorrect output for checkConvertUshort2Double2" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                }
+            }
+        }
+    }
+
+    private void checkConvertUshort3Double3() {
+        Allocation inV = createRandomIntegerAllocation(mRS, Element.DataType.UNSIGNED_16, 3, 0xd300c2ebf469f644l, false, 16);
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_64, 3), INPUTSIZE);
+            script.forEach_testConvertDouble3Ushort3Double3(inV, out);
+            verifyResultsConvertUshort3Double3(inV, out, false);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertDouble3Ushort3Double3: " + e.toString());
+        }
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_64, 3), INPUTSIZE);
+            scriptRelaxed.forEach_testConvertDouble3Ushort3Double3(inV, out);
+            verifyResultsConvertUshort3Double3(inV, out, true);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertDouble3Ushort3Double3: " + e.toString());
+        }
+    }
+
+    private void verifyResultsConvertUshort3Double3(Allocation inV, Allocation out, boolean relaxed) {
+        short[] arrayInV = new short[INPUTSIZE * 4];
+        inV.copyTo(arrayInV);
+        double[] arrayOut = new double[INPUTSIZE * 4];
+        out.copyTo(arrayOut);
+        for (int i = 0; i < INPUTSIZE; i++) {
+            for (int j = 0; j < 3 ; j++) {
+                // Extract the inputs.
+                ArgumentsUshortDouble args = new ArgumentsUshortDouble();
+                args.inV = arrayInV[i * 4 + j];
+                // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
+                CoreMathVerifier.computeConvert(args);
+                // Figure out what the outputs should have been.
+                boolean valid = true;
+                if (!args.out.couldBe(arrayOut[i * 4 + j])) {
+                    valid = false;
+                }
+                if (!valid) {
+                    StringBuilder message = new StringBuilder();
+                    message.append("Input inV: ");
+                    message.append(String.format("0x%x", args.inV));
+                    message.append("\n");
+                    message.append("Expected output out: ");
+                    message.append(args.out.toString());
+                    message.append("\n");
+                    message.append("Actual   output out: ");
+                    message.append(String.format("%24.8g %16x %31a",
+                            arrayOut[i * 4 + j], Double.doubleToRawLongBits(arrayOut[i * 4 + j]), arrayOut[i * 4 + j]));
+                    if (!args.out.couldBe(arrayOut[i * 4 + j])) {
+                        message.append(" FAIL");
+                    }
+                    message.append("\n");
+                    assertTrue("Incorrect output for checkConvertUshort3Double3" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                }
+            }
+        }
+    }
+
+    private void checkConvertUshort4Double4() {
+        Allocation inV = createRandomIntegerAllocation(mRS, Element.DataType.UNSIGNED_16, 4, 0xd34d8a734ac58770l, false, 16);
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_64, 4), INPUTSIZE);
+            script.forEach_testConvertDouble4Ushort4Double4(inV, out);
+            verifyResultsConvertUshort4Double4(inV, out, false);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertDouble4Ushort4Double4: " + e.toString());
+        }
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_64, 4), INPUTSIZE);
+            scriptRelaxed.forEach_testConvertDouble4Ushort4Double4(inV, out);
+            verifyResultsConvertUshort4Double4(inV, out, true);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertDouble4Ushort4Double4: " + e.toString());
+        }
+    }
+
+    private void verifyResultsConvertUshort4Double4(Allocation inV, Allocation out, boolean relaxed) {
+        short[] arrayInV = new short[INPUTSIZE * 4];
+        inV.copyTo(arrayInV);
+        double[] arrayOut = new double[INPUTSIZE * 4];
+        out.copyTo(arrayOut);
+        for (int i = 0; i < INPUTSIZE; i++) {
+            for (int j = 0; j < 4 ; j++) {
+                // Extract the inputs.
+                ArgumentsUshortDouble args = new ArgumentsUshortDouble();
+                args.inV = arrayInV[i * 4 + j];
+                // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
+                CoreMathVerifier.computeConvert(args);
+                // Figure out what the outputs should have been.
+                boolean valid = true;
+                if (!args.out.couldBe(arrayOut[i * 4 + j])) {
+                    valid = false;
+                }
+                if (!valid) {
+                    StringBuilder message = new StringBuilder();
+                    message.append("Input inV: ");
+                    message.append(String.format("0x%x", args.inV));
+                    message.append("\n");
+                    message.append("Expected output out: ");
+                    message.append(args.out.toString());
+                    message.append("\n");
+                    message.append("Actual   output out: ");
+                    message.append(String.format("%24.8g %16x %31a",
+                            arrayOut[i * 4 + j], Double.doubleToRawLongBits(arrayOut[i * 4 + j]), arrayOut[i * 4 + j]));
+                    if (!args.out.couldBe(arrayOut[i * 4 + j])) {
+                        message.append(" FAIL");
+                    }
+                    message.append("\n");
+                    assertTrue("Incorrect output for checkConvertUshort4Double4" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                }
+            }
+        }
+    }
+
+    public class ArgumentsIntDouble {
+        public int inV;
+        public Floaty out;
+    }
+
+    private void checkConvertInt2Double2() {
+        Allocation inV = createRandomIntegerAllocation(mRS, Element.DataType.SIGNED_32, 2, 0x1be423b7a40fc8f6l, true, 31);
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_64, 2), INPUTSIZE);
+            script.forEach_testConvertDouble2Int2Double2(inV, out);
+            verifyResultsConvertInt2Double2(inV, out, false);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertDouble2Int2Double2: " + e.toString());
+        }
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_64, 2), INPUTSIZE);
+            scriptRelaxed.forEach_testConvertDouble2Int2Double2(inV, out);
+            verifyResultsConvertInt2Double2(inV, out, true);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertDouble2Int2Double2: " + e.toString());
+        }
+    }
+
+    private void verifyResultsConvertInt2Double2(Allocation inV, Allocation out, boolean relaxed) {
+        int[] arrayInV = new int[INPUTSIZE * 2];
+        inV.copyTo(arrayInV);
+        double[] arrayOut = new double[INPUTSIZE * 2];
+        out.copyTo(arrayOut);
+        for (int i = 0; i < INPUTSIZE; i++) {
+            for (int j = 0; j < 2 ; j++) {
+                // Extract the inputs.
+                ArgumentsIntDouble args = new ArgumentsIntDouble();
+                args.inV = arrayInV[i * 2 + j];
+                // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
+                CoreMathVerifier.computeConvert(args);
+                // Figure out what the outputs should have been.
+                boolean valid = true;
+                if (!args.out.couldBe(arrayOut[i * 2 + j])) {
+                    valid = false;
+                }
+                if (!valid) {
+                    StringBuilder message = new StringBuilder();
+                    message.append("Input inV: ");
+                    message.append(String.format("%d", args.inV));
+                    message.append("\n");
+                    message.append("Expected output out: ");
+                    message.append(args.out.toString());
+                    message.append("\n");
+                    message.append("Actual   output out: ");
+                    message.append(String.format("%24.8g %16x %31a",
+                            arrayOut[i * 2 + j], Double.doubleToRawLongBits(arrayOut[i * 2 + j]), arrayOut[i * 2 + j]));
+                    if (!args.out.couldBe(arrayOut[i * 2 + j])) {
+                        message.append(" FAIL");
+                    }
+                    message.append("\n");
+                    assertTrue("Incorrect output for checkConvertInt2Double2" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                }
+            }
+        }
+    }
+
+    private void checkConvertInt3Double3() {
+        Allocation inV = createRandomIntegerAllocation(mRS, Element.DataType.SIGNED_32, 3, 0x1c30eb3efa6b5a22l, true, 31);
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_64, 3), INPUTSIZE);
+            script.forEach_testConvertDouble3Int3Double3(inV, out);
+            verifyResultsConvertInt3Double3(inV, out, false);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertDouble3Int3Double3: " + e.toString());
+        }
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_64, 3), INPUTSIZE);
+            scriptRelaxed.forEach_testConvertDouble3Int3Double3(inV, out);
+            verifyResultsConvertInt3Double3(inV, out, true);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertDouble3Int3Double3: " + e.toString());
+        }
+    }
+
+    private void verifyResultsConvertInt3Double3(Allocation inV, Allocation out, boolean relaxed) {
+        int[] arrayInV = new int[INPUTSIZE * 4];
+        inV.copyTo(arrayInV);
+        double[] arrayOut = new double[INPUTSIZE * 4];
+        out.copyTo(arrayOut);
+        for (int i = 0; i < INPUTSIZE; i++) {
+            for (int j = 0; j < 3 ; j++) {
+                // Extract the inputs.
+                ArgumentsIntDouble args = new ArgumentsIntDouble();
+                args.inV = arrayInV[i * 4 + j];
+                // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
+                CoreMathVerifier.computeConvert(args);
+                // Figure out what the outputs should have been.
+                boolean valid = true;
+                if (!args.out.couldBe(arrayOut[i * 4 + j])) {
+                    valid = false;
+                }
+                if (!valid) {
+                    StringBuilder message = new StringBuilder();
+                    message.append("Input inV: ");
+                    message.append(String.format("%d", args.inV));
+                    message.append("\n");
+                    message.append("Expected output out: ");
+                    message.append(args.out.toString());
+                    message.append("\n");
+                    message.append("Actual   output out: ");
+                    message.append(String.format("%24.8g %16x %31a",
+                            arrayOut[i * 4 + j], Double.doubleToRawLongBits(arrayOut[i * 4 + j]), arrayOut[i * 4 + j]));
+                    if (!args.out.couldBe(arrayOut[i * 4 + j])) {
+                        message.append(" FAIL");
+                    }
+                    message.append("\n");
+                    assertTrue("Incorrect output for checkConvertInt3Double3" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                }
+            }
+        }
+    }
+
+    private void checkConvertInt4Double4() {
+        Allocation inV = createRandomIntegerAllocation(mRS, Element.DataType.SIGNED_32, 4, 0x1c7db2c650c6eb4el, true, 31);
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_64, 4), INPUTSIZE);
+            script.forEach_testConvertDouble4Int4Double4(inV, out);
+            verifyResultsConvertInt4Double4(inV, out, false);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertDouble4Int4Double4: " + e.toString());
+        }
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_64, 4), INPUTSIZE);
+            scriptRelaxed.forEach_testConvertDouble4Int4Double4(inV, out);
+            verifyResultsConvertInt4Double4(inV, out, true);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertDouble4Int4Double4: " + e.toString());
+        }
+    }
+
+    private void verifyResultsConvertInt4Double4(Allocation inV, Allocation out, boolean relaxed) {
+        int[] arrayInV = new int[INPUTSIZE * 4];
+        inV.copyTo(arrayInV);
+        double[] arrayOut = new double[INPUTSIZE * 4];
+        out.copyTo(arrayOut);
+        for (int i = 0; i < INPUTSIZE; i++) {
+            for (int j = 0; j < 4 ; j++) {
+                // Extract the inputs.
+                ArgumentsIntDouble args = new ArgumentsIntDouble();
+                args.inV = arrayInV[i * 4 + j];
+                // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
+                CoreMathVerifier.computeConvert(args);
+                // Figure out what the outputs should have been.
+                boolean valid = true;
+                if (!args.out.couldBe(arrayOut[i * 4 + j])) {
+                    valid = false;
+                }
+                if (!valid) {
+                    StringBuilder message = new StringBuilder();
+                    message.append("Input inV: ");
+                    message.append(String.format("%d", args.inV));
+                    message.append("\n");
+                    message.append("Expected output out: ");
+                    message.append(args.out.toString());
+                    message.append("\n");
+                    message.append("Actual   output out: ");
+                    message.append(String.format("%24.8g %16x %31a",
+                            arrayOut[i * 4 + j], Double.doubleToRawLongBits(arrayOut[i * 4 + j]), arrayOut[i * 4 + j]));
+                    if (!args.out.couldBe(arrayOut[i * 4 + j])) {
+                        message.append(" FAIL");
+                    }
+                    message.append("\n");
+                    assertTrue("Incorrect output for checkConvertInt4Double4" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                }
+            }
+        }
+    }
+
+    public class ArgumentsUintDouble {
+        public int inV;
+        public Floaty out;
+    }
+
+    private void checkConvertUint2Double2() {
+        Allocation inV = createRandomIntegerAllocation(mRS, Element.DataType.UNSIGNED_32, 2, 0x40b243bf3fe7e2a1l, false, 32);
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_64, 2), INPUTSIZE);
+            script.forEach_testConvertDouble2Uint2Double2(inV, out);
+            verifyResultsConvertUint2Double2(inV, out, false);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertDouble2Uint2Double2: " + e.toString());
+        }
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_64, 2), INPUTSIZE);
+            scriptRelaxed.forEach_testConvertDouble2Uint2Double2(inV, out);
+            verifyResultsConvertUint2Double2(inV, out, true);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertDouble2Uint2Double2: " + e.toString());
+        }
+    }
+
+    private void verifyResultsConvertUint2Double2(Allocation inV, Allocation out, boolean relaxed) {
+        int[] arrayInV = new int[INPUTSIZE * 2];
+        inV.copyTo(arrayInV);
+        double[] arrayOut = new double[INPUTSIZE * 2];
+        out.copyTo(arrayOut);
+        for (int i = 0; i < INPUTSIZE; i++) {
+            for (int j = 0; j < 2 ; j++) {
+                // Extract the inputs.
+                ArgumentsUintDouble args = new ArgumentsUintDouble();
+                args.inV = arrayInV[i * 2 + j];
+                // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
+                CoreMathVerifier.computeConvert(args);
+                // Figure out what the outputs should have been.
+                boolean valid = true;
+                if (!args.out.couldBe(arrayOut[i * 2 + j])) {
+                    valid = false;
+                }
+                if (!valid) {
+                    StringBuilder message = new StringBuilder();
+                    message.append("Input inV: ");
+                    message.append(String.format("0x%x", args.inV));
+                    message.append("\n");
+                    message.append("Expected output out: ");
+                    message.append(args.out.toString());
+                    message.append("\n");
+                    message.append("Actual   output out: ");
+                    message.append(String.format("%24.8g %16x %31a",
+                            arrayOut[i * 2 + j], Double.doubleToRawLongBits(arrayOut[i * 2 + j]), arrayOut[i * 2 + j]));
+                    if (!args.out.couldBe(arrayOut[i * 2 + j])) {
+                        message.append(" FAIL");
+                    }
+                    message.append("\n");
+                    assertTrue("Incorrect output for checkConvertUint2Double2" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                }
+            }
+        }
+    }
+
+    private void checkConvertUint3Double3() {
+        Allocation inV = createRandomIntegerAllocation(mRS, Element.DataType.UNSIGNED_32, 3, 0x40ff0b46964373cdl, false, 32);
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_64, 3), INPUTSIZE);
+            script.forEach_testConvertDouble3Uint3Double3(inV, out);
+            verifyResultsConvertUint3Double3(inV, out, false);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertDouble3Uint3Double3: " + e.toString());
+        }
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_64, 3), INPUTSIZE);
+            scriptRelaxed.forEach_testConvertDouble3Uint3Double3(inV, out);
+            verifyResultsConvertUint3Double3(inV, out, true);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertDouble3Uint3Double3: " + e.toString());
+        }
+    }
+
+    private void verifyResultsConvertUint3Double3(Allocation inV, Allocation out, boolean relaxed) {
+        int[] arrayInV = new int[INPUTSIZE * 4];
+        inV.copyTo(arrayInV);
+        double[] arrayOut = new double[INPUTSIZE * 4];
+        out.copyTo(arrayOut);
+        for (int i = 0; i < INPUTSIZE; i++) {
+            for (int j = 0; j < 3 ; j++) {
+                // Extract the inputs.
+                ArgumentsUintDouble args = new ArgumentsUintDouble();
+                args.inV = arrayInV[i * 4 + j];
+                // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
+                CoreMathVerifier.computeConvert(args);
+                // Figure out what the outputs should have been.
+                boolean valid = true;
+                if (!args.out.couldBe(arrayOut[i * 4 + j])) {
+                    valid = false;
+                }
+                if (!valid) {
+                    StringBuilder message = new StringBuilder();
+                    message.append("Input inV: ");
+                    message.append(String.format("0x%x", args.inV));
+                    message.append("\n");
+                    message.append("Expected output out: ");
+                    message.append(args.out.toString());
+                    message.append("\n");
+                    message.append("Actual   output out: ");
+                    message.append(String.format("%24.8g %16x %31a",
+                            arrayOut[i * 4 + j], Double.doubleToRawLongBits(arrayOut[i * 4 + j]), arrayOut[i * 4 + j]));
+                    if (!args.out.couldBe(arrayOut[i * 4 + j])) {
+                        message.append(" FAIL");
+                    }
+                    message.append("\n");
+                    assertTrue("Incorrect output for checkConvertUint3Double3" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                }
+            }
+        }
+    }
+
+    private void checkConvertUint4Double4() {
+        Allocation inV = createRandomIntegerAllocation(mRS, Element.DataType.UNSIGNED_32, 4, 0x414bd2cdec9f04f9l, false, 32);
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_64, 4), INPUTSIZE);
+            script.forEach_testConvertDouble4Uint4Double4(inV, out);
+            verifyResultsConvertUint4Double4(inV, out, false);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertDouble4Uint4Double4: " + e.toString());
+        }
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_64, 4), INPUTSIZE);
+            scriptRelaxed.forEach_testConvertDouble4Uint4Double4(inV, out);
+            verifyResultsConvertUint4Double4(inV, out, true);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertDouble4Uint4Double4: " + e.toString());
+        }
+    }
+
+    private void verifyResultsConvertUint4Double4(Allocation inV, Allocation out, boolean relaxed) {
+        int[] arrayInV = new int[INPUTSIZE * 4];
+        inV.copyTo(arrayInV);
+        double[] arrayOut = new double[INPUTSIZE * 4];
+        out.copyTo(arrayOut);
+        for (int i = 0; i < INPUTSIZE; i++) {
+            for (int j = 0; j < 4 ; j++) {
+                // Extract the inputs.
+                ArgumentsUintDouble args = new ArgumentsUintDouble();
+                args.inV = arrayInV[i * 4 + j];
+                // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
+                CoreMathVerifier.computeConvert(args);
+                // Figure out what the outputs should have been.
+                boolean valid = true;
+                if (!args.out.couldBe(arrayOut[i * 4 + j])) {
+                    valid = false;
+                }
+                if (!valid) {
+                    StringBuilder message = new StringBuilder();
+                    message.append("Input inV: ");
+                    message.append(String.format("0x%x", args.inV));
+                    message.append("\n");
+                    message.append("Expected output out: ");
+                    message.append(args.out.toString());
+                    message.append("\n");
+                    message.append("Actual   output out: ");
+                    message.append(String.format("%24.8g %16x %31a",
+                            arrayOut[i * 4 + j], Double.doubleToRawLongBits(arrayOut[i * 4 + j]), arrayOut[i * 4 + j]));
+                    if (!args.out.couldBe(arrayOut[i * 4 + j])) {
+                        message.append(" FAIL");
+                    }
+                    message.append("\n");
+                    assertTrue("Incorrect output for checkConvertUint4Double4" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                }
+            }
+        }
+    }
+
+    public class ArgumentsFloatLong {
+        public float inV;
+        public long out;
+    }
+
+    private void checkConvertFloat2Long2() {
+        Allocation inV = createRandomFloatAllocation(mRS, Element.DataType.FLOAT_32, 2, 0x239cb49c7d7c0ae0l, -9.2233714870989619200e+18, 9.2233714870989619200e+18);
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_64, 2), INPUTSIZE);
+            script.forEach_testConvertLong2Float2Long2(inV, out);
+            verifyResultsConvertFloat2Long2(inV, out, false);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertLong2Float2Long2: " + e.toString());
+        }
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_64, 2), INPUTSIZE);
+            scriptRelaxed.forEach_testConvertLong2Float2Long2(inV, out);
+            verifyResultsConvertFloat2Long2(inV, out, true);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertLong2Float2Long2: " + e.toString());
+        }
+    }
+
+    private void verifyResultsConvertFloat2Long2(Allocation inV, Allocation out, boolean relaxed) {
+        float[] arrayInV = new float[INPUTSIZE * 2];
+        inV.copyTo(arrayInV);
+        long[] arrayOut = new long[INPUTSIZE * 2];
+        out.copyTo(arrayOut);
+        for (int i = 0; i < INPUTSIZE; i++) {
+            for (int j = 0; j < 2 ; j++) {
+                // Extract the inputs.
+                ArgumentsFloatLong args = new ArgumentsFloatLong();
+                args.inV = arrayInV[i * 2 + j];
+                // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
+                CoreMathVerifier.computeConvert(args);
+                // Figure out what the outputs should have been.
+                boolean valid = true;
+                if (args.out != arrayOut[i * 2 + j]) {
+                    valid = false;
+                }
+                if (!valid) {
+                    StringBuilder message = new StringBuilder();
+                    message.append("Input inV: ");
+                    message.append(String.format("%14.8g %8x %15a",
+                            args.inV, Float.floatToRawIntBits(args.inV), args.inV));
+                    message.append("\n");
+                    message.append("Expected output out: ");
+                    message.append(String.format("%d", args.out));
+                    message.append("\n");
+                    message.append("Actual   output out: ");
+                    message.append(String.format("%d", arrayOut[i * 2 + j]));
+                    if (args.out != arrayOut[i * 2 + j]) {
+                        message.append(" FAIL");
+                    }
+                    message.append("\n");
+                    assertTrue("Incorrect output for checkConvertFloat2Long2" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                }
+            }
+        }
+    }
+
+    private void checkConvertFloat3Long3() {
+        Allocation inV = createRandomFloatAllocation(mRS, Element.DataType.FLOAT_32, 3, 0x239cbf3ddc83cfd4l, -9.2233714870989619200e+18, 9.2233714870989619200e+18);
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_64, 3), INPUTSIZE);
+            script.forEach_testConvertLong3Float3Long3(inV, out);
+            verifyResultsConvertFloat3Long3(inV, out, false);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertLong3Float3Long3: " + e.toString());
+        }
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_64, 3), INPUTSIZE);
+            scriptRelaxed.forEach_testConvertLong3Float3Long3(inV, out);
+            verifyResultsConvertFloat3Long3(inV, out, true);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertLong3Float3Long3: " + e.toString());
+        }
+    }
+
+    private void verifyResultsConvertFloat3Long3(Allocation inV, Allocation out, boolean relaxed) {
+        float[] arrayInV = new float[INPUTSIZE * 4];
+        inV.copyTo(arrayInV);
+        long[] arrayOut = new long[INPUTSIZE * 4];
+        out.copyTo(arrayOut);
+        for (int i = 0; i < INPUTSIZE; i++) {
+            for (int j = 0; j < 3 ; j++) {
+                // Extract the inputs.
+                ArgumentsFloatLong args = new ArgumentsFloatLong();
+                args.inV = arrayInV[i * 4 + j];
+                // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
+                CoreMathVerifier.computeConvert(args);
+                // Figure out what the outputs should have been.
+                boolean valid = true;
+                if (args.out != arrayOut[i * 4 + j]) {
+                    valid = false;
+                }
+                if (!valid) {
+                    StringBuilder message = new StringBuilder();
+                    message.append("Input inV: ");
+                    message.append(String.format("%14.8g %8x %15a",
+                            args.inV, Float.floatToRawIntBits(args.inV), args.inV));
+                    message.append("\n");
+                    message.append("Expected output out: ");
+                    message.append(String.format("%d", args.out));
+                    message.append("\n");
+                    message.append("Actual   output out: ");
+                    message.append(String.format("%d", arrayOut[i * 4 + j]));
+                    if (args.out != arrayOut[i * 4 + j]) {
+                        message.append(" FAIL");
+                    }
+                    message.append("\n");
+                    assertTrue("Incorrect output for checkConvertFloat3Long3" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                }
+            }
+        }
+    }
+
+    private void checkConvertFloat4Long4() {
+        Allocation inV = createRandomFloatAllocation(mRS, Element.DataType.FLOAT_32, 4, 0x239cc9df3b8b94c8l, -9.2233714870989619200e+18, 9.2233714870989619200e+18);
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_64, 4), INPUTSIZE);
+            script.forEach_testConvertLong4Float4Long4(inV, out);
+            verifyResultsConvertFloat4Long4(inV, out, false);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertLong4Float4Long4: " + e.toString());
+        }
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_64, 4), INPUTSIZE);
+            scriptRelaxed.forEach_testConvertLong4Float4Long4(inV, out);
+            verifyResultsConvertFloat4Long4(inV, out, true);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertLong4Float4Long4: " + e.toString());
+        }
+    }
+
+    private void verifyResultsConvertFloat4Long4(Allocation inV, Allocation out, boolean relaxed) {
+        float[] arrayInV = new float[INPUTSIZE * 4];
+        inV.copyTo(arrayInV);
+        long[] arrayOut = new long[INPUTSIZE * 4];
+        out.copyTo(arrayOut);
+        for (int i = 0; i < INPUTSIZE; i++) {
+            for (int j = 0; j < 4 ; j++) {
+                // Extract the inputs.
+                ArgumentsFloatLong args = new ArgumentsFloatLong();
+                args.inV = arrayInV[i * 4 + j];
+                // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
+                CoreMathVerifier.computeConvert(args);
+                // Figure out what the outputs should have been.
+                boolean valid = true;
+                if (args.out != arrayOut[i * 4 + j]) {
+                    valid = false;
+                }
+                if (!valid) {
+                    StringBuilder message = new StringBuilder();
+                    message.append("Input inV: ");
+                    message.append(String.format("%14.8g %8x %15a",
+                            args.inV, Float.floatToRawIntBits(args.inV), args.inV));
+                    message.append("\n");
+                    message.append("Expected output out: ");
+                    message.append(String.format("%d", args.out));
+                    message.append("\n");
+                    message.append("Actual   output out: ");
+                    message.append(String.format("%d", arrayOut[i * 4 + j]));
+                    if (args.out != arrayOut[i * 4 + j]) {
+                        message.append(" FAIL");
+                    }
+                    message.append("\n");
+                    assertTrue("Incorrect output for checkConvertFloat4Long4" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                }
+            }
+        }
+    }
+
+    public class ArgumentsCharLong {
+        public byte inV;
+        public long out;
+    }
+
+    private void checkConvertChar2Long2() {
+        Allocation inV = createRandomIntegerAllocation(mRS, Element.DataType.SIGNED_8, 2, 0xd86189bc290be220l, true, 7);
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_64, 2), INPUTSIZE);
+            script.forEach_testConvertLong2Char2Long2(inV, out);
+            verifyResultsConvertChar2Long2(inV, out, false);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertLong2Char2Long2: " + e.toString());
+        }
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_64, 2), INPUTSIZE);
+            scriptRelaxed.forEach_testConvertLong2Char2Long2(inV, out);
+            verifyResultsConvertChar2Long2(inV, out, true);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertLong2Char2Long2: " + e.toString());
+        }
+    }
+
+    private void verifyResultsConvertChar2Long2(Allocation inV, Allocation out, boolean relaxed) {
+        byte[] arrayInV = new byte[INPUTSIZE * 2];
+        inV.copyTo(arrayInV);
+        long[] arrayOut = new long[INPUTSIZE * 2];
+        out.copyTo(arrayOut);
+        for (int i = 0; i < INPUTSIZE; i++) {
+            for (int j = 0; j < 2 ; j++) {
+                // Extract the inputs.
+                ArgumentsCharLong args = new ArgumentsCharLong();
+                args.inV = arrayInV[i * 2 + j];
+                // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
+                CoreMathVerifier.computeConvert(args);
+                // Figure out what the outputs should have been.
+                boolean valid = true;
+                if (args.out != arrayOut[i * 2 + j]) {
+                    valid = false;
+                }
+                if (!valid) {
+                    StringBuilder message = new StringBuilder();
+                    message.append("Input inV: ");
+                    message.append(String.format("%d", args.inV));
+                    message.append("\n");
+                    message.append("Expected output out: ");
+                    message.append(String.format("%d", args.out));
+                    message.append("\n");
+                    message.append("Actual   output out: ");
+                    message.append(String.format("%d", arrayOut[i * 2 + j]));
+                    if (args.out != arrayOut[i * 2 + j]) {
+                        message.append(" FAIL");
+                    }
+                    message.append("\n");
+                    assertTrue("Incorrect output for checkConvertChar2Long2" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                }
+            }
+        }
+    }
+
+    private void checkConvertChar3Long3() {
+        Allocation inV = createRandomIntegerAllocation(mRS, Element.DataType.SIGNED_8, 3, 0xd861945d8813a714l, true, 7);
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_64, 3), INPUTSIZE);
+            script.forEach_testConvertLong3Char3Long3(inV, out);
+            verifyResultsConvertChar3Long3(inV, out, false);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertLong3Char3Long3: " + e.toString());
+        }
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_64, 3), INPUTSIZE);
+            scriptRelaxed.forEach_testConvertLong3Char3Long3(inV, out);
+            verifyResultsConvertChar3Long3(inV, out, true);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertLong3Char3Long3: " + e.toString());
+        }
+    }
+
+    private void verifyResultsConvertChar3Long3(Allocation inV, Allocation out, boolean relaxed) {
+        byte[] arrayInV = new byte[INPUTSIZE * 4];
+        inV.copyTo(arrayInV);
+        long[] arrayOut = new long[INPUTSIZE * 4];
+        out.copyTo(arrayOut);
+        for (int i = 0; i < INPUTSIZE; i++) {
+            for (int j = 0; j < 3 ; j++) {
+                // Extract the inputs.
+                ArgumentsCharLong args = new ArgumentsCharLong();
+                args.inV = arrayInV[i * 4 + j];
+                // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
+                CoreMathVerifier.computeConvert(args);
+                // Figure out what the outputs should have been.
+                boolean valid = true;
+                if (args.out != arrayOut[i * 4 + j]) {
+                    valid = false;
+                }
+                if (!valid) {
+                    StringBuilder message = new StringBuilder();
+                    message.append("Input inV: ");
+                    message.append(String.format("%d", args.inV));
+                    message.append("\n");
+                    message.append("Expected output out: ");
+                    message.append(String.format("%d", args.out));
+                    message.append("\n");
+                    message.append("Actual   output out: ");
+                    message.append(String.format("%d", arrayOut[i * 4 + j]));
+                    if (args.out != arrayOut[i * 4 + j]) {
+                        message.append(" FAIL");
+                    }
+                    message.append("\n");
+                    assertTrue("Incorrect output for checkConvertChar3Long3" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                }
+            }
+        }
+    }
+
+    private void checkConvertChar4Long4() {
+        Allocation inV = createRandomIntegerAllocation(mRS, Element.DataType.SIGNED_8, 4, 0xd8619efee71b6c08l, true, 7);
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_64, 4), INPUTSIZE);
+            script.forEach_testConvertLong4Char4Long4(inV, out);
+            verifyResultsConvertChar4Long4(inV, out, false);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertLong4Char4Long4: " + e.toString());
+        }
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_64, 4), INPUTSIZE);
+            scriptRelaxed.forEach_testConvertLong4Char4Long4(inV, out);
+            verifyResultsConvertChar4Long4(inV, out, true);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertLong4Char4Long4: " + e.toString());
+        }
+    }
+
+    private void verifyResultsConvertChar4Long4(Allocation inV, Allocation out, boolean relaxed) {
+        byte[] arrayInV = new byte[INPUTSIZE * 4];
+        inV.copyTo(arrayInV);
+        long[] arrayOut = new long[INPUTSIZE * 4];
+        out.copyTo(arrayOut);
+        for (int i = 0; i < INPUTSIZE; i++) {
+            for (int j = 0; j < 4 ; j++) {
+                // Extract the inputs.
+                ArgumentsCharLong args = new ArgumentsCharLong();
+                args.inV = arrayInV[i * 4 + j];
+                // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
+                CoreMathVerifier.computeConvert(args);
+                // Figure out what the outputs should have been.
+                boolean valid = true;
+                if (args.out != arrayOut[i * 4 + j]) {
+                    valid = false;
+                }
+                if (!valid) {
+                    StringBuilder message = new StringBuilder();
+                    message.append("Input inV: ");
+                    message.append(String.format("%d", args.inV));
+                    message.append("\n");
+                    message.append("Expected output out: ");
+                    message.append(String.format("%d", args.out));
+                    message.append("\n");
+                    message.append("Actual   output out: ");
+                    message.append(String.format("%d", arrayOut[i * 4 + j]));
+                    if (args.out != arrayOut[i * 4 + j]) {
+                        message.append(" FAIL");
+                    }
+                    message.append("\n");
+                    assertTrue("Incorrect output for checkConvertChar4Long4" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                }
+            }
+        }
+    }
+
+    public class ArgumentsUcharLong {
+        public byte inV;
+        public long out;
+    }
+
+    private void checkConvertUchar2Long2() {
+        Allocation inV = createRandomIntegerAllocation(mRS, Element.DataType.UNSIGNED_8, 2, 0x7fef4309bb8deea1l, false, 8);
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_64, 2), INPUTSIZE);
+            script.forEach_testConvertLong2Uchar2Long2(inV, out);
+            verifyResultsConvertUchar2Long2(inV, out, false);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertLong2Uchar2Long2: " + e.toString());
+        }
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_64, 2), INPUTSIZE);
+            scriptRelaxed.forEach_testConvertLong2Uchar2Long2(inV, out);
+            verifyResultsConvertUchar2Long2(inV, out, true);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertLong2Uchar2Long2: " + e.toString());
+        }
+    }
+
+    private void verifyResultsConvertUchar2Long2(Allocation inV, Allocation out, boolean relaxed) {
+        byte[] arrayInV = new byte[INPUTSIZE * 2];
+        inV.copyTo(arrayInV);
+        long[] arrayOut = new long[INPUTSIZE * 2];
+        out.copyTo(arrayOut);
+        for (int i = 0; i < INPUTSIZE; i++) {
+            for (int j = 0; j < 2 ; j++) {
+                // Extract the inputs.
+                ArgumentsUcharLong args = new ArgumentsUcharLong();
+                args.inV = arrayInV[i * 2 + j];
+                // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
+                CoreMathVerifier.computeConvert(args);
+                // Figure out what the outputs should have been.
+                boolean valid = true;
+                if (args.out != arrayOut[i * 2 + j]) {
+                    valid = false;
+                }
+                if (!valid) {
+                    StringBuilder message = new StringBuilder();
+                    message.append("Input inV: ");
+                    message.append(String.format("0x%x", args.inV));
+                    message.append("\n");
+                    message.append("Expected output out: ");
+                    message.append(String.format("%d", args.out));
+                    message.append("\n");
+                    message.append("Actual   output out: ");
+                    message.append(String.format("%d", arrayOut[i * 2 + j]));
+                    if (args.out != arrayOut[i * 2 + j]) {
+                        message.append(" FAIL");
+                    }
+                    message.append("\n");
+                    assertTrue("Incorrect output for checkConvertUchar2Long2" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                }
+            }
+        }
+    }
+
+    private void checkConvertUchar3Long3() {
+        Allocation inV = createRandomIntegerAllocation(mRS, Element.DataType.UNSIGNED_8, 3, 0x7fef4dab1a95b395l, false, 8);
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_64, 3), INPUTSIZE);
+            script.forEach_testConvertLong3Uchar3Long3(inV, out);
+            verifyResultsConvertUchar3Long3(inV, out, false);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertLong3Uchar3Long3: " + e.toString());
+        }
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_64, 3), INPUTSIZE);
+            scriptRelaxed.forEach_testConvertLong3Uchar3Long3(inV, out);
+            verifyResultsConvertUchar3Long3(inV, out, true);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertLong3Uchar3Long3: " + e.toString());
+        }
+    }
+
+    private void verifyResultsConvertUchar3Long3(Allocation inV, Allocation out, boolean relaxed) {
+        byte[] arrayInV = new byte[INPUTSIZE * 4];
+        inV.copyTo(arrayInV);
+        long[] arrayOut = new long[INPUTSIZE * 4];
+        out.copyTo(arrayOut);
+        for (int i = 0; i < INPUTSIZE; i++) {
+            for (int j = 0; j < 3 ; j++) {
+                // Extract the inputs.
+                ArgumentsUcharLong args = new ArgumentsUcharLong();
+                args.inV = arrayInV[i * 4 + j];
+                // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
+                CoreMathVerifier.computeConvert(args);
+                // Figure out what the outputs should have been.
+                boolean valid = true;
+                if (args.out != arrayOut[i * 4 + j]) {
+                    valid = false;
+                }
+                if (!valid) {
+                    StringBuilder message = new StringBuilder();
+                    message.append("Input inV: ");
+                    message.append(String.format("0x%x", args.inV));
+                    message.append("\n");
+                    message.append("Expected output out: ");
+                    message.append(String.format("%d", args.out));
+                    message.append("\n");
+                    message.append("Actual   output out: ");
+                    message.append(String.format("%d", arrayOut[i * 4 + j]));
+                    if (args.out != arrayOut[i * 4 + j]) {
+                        message.append(" FAIL");
+                    }
+                    message.append("\n");
+                    assertTrue("Incorrect output for checkConvertUchar3Long3" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                }
+            }
+        }
+    }
+
+    private void checkConvertUchar4Long4() {
+        Allocation inV = createRandomIntegerAllocation(mRS, Element.DataType.UNSIGNED_8, 4, 0x7fef584c799d7889l, false, 8);
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_64, 4), INPUTSIZE);
+            script.forEach_testConvertLong4Uchar4Long4(inV, out);
+            verifyResultsConvertUchar4Long4(inV, out, false);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertLong4Uchar4Long4: " + e.toString());
+        }
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_64, 4), INPUTSIZE);
+            scriptRelaxed.forEach_testConvertLong4Uchar4Long4(inV, out);
+            verifyResultsConvertUchar4Long4(inV, out, true);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertLong4Uchar4Long4: " + e.toString());
+        }
+    }
+
+    private void verifyResultsConvertUchar4Long4(Allocation inV, Allocation out, boolean relaxed) {
+        byte[] arrayInV = new byte[INPUTSIZE * 4];
+        inV.copyTo(arrayInV);
+        long[] arrayOut = new long[INPUTSIZE * 4];
+        out.copyTo(arrayOut);
+        for (int i = 0; i < INPUTSIZE; i++) {
+            for (int j = 0; j < 4 ; j++) {
+                // Extract the inputs.
+                ArgumentsUcharLong args = new ArgumentsUcharLong();
+                args.inV = arrayInV[i * 4 + j];
+                // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
+                CoreMathVerifier.computeConvert(args);
+                // Figure out what the outputs should have been.
+                boolean valid = true;
+                if (args.out != arrayOut[i * 4 + j]) {
+                    valid = false;
+                }
+                if (!valid) {
+                    StringBuilder message = new StringBuilder();
+                    message.append("Input inV: ");
+                    message.append(String.format("0x%x", args.inV));
+                    message.append("\n");
+                    message.append("Expected output out: ");
+                    message.append(String.format("%d", args.out));
+                    message.append("\n");
+                    message.append("Actual   output out: ");
+                    message.append(String.format("%d", arrayOut[i * 4 + j]));
+                    if (args.out != arrayOut[i * 4 + j]) {
+                        message.append(" FAIL");
+                    }
+                    message.append("\n");
+                    assertTrue("Incorrect output for checkConvertUchar4Long4" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                }
+            }
+        }
+    }
+
+    public class ArgumentsShortLong {
+        public short inV;
+        public long out;
+    }
+
+    private void checkConvertShort2Long2() {
+        Allocation inV = createRandomIntegerAllocation(mRS, Element.DataType.SIGNED_16, 2, 0x68ab674669c97ce4l, true, 15);
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_64, 2), INPUTSIZE);
+            script.forEach_testConvertLong2Short2Long2(inV, out);
+            verifyResultsConvertShort2Long2(inV, out, false);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertLong2Short2Long2: " + e.toString());
+        }
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_64, 2), INPUTSIZE);
+            scriptRelaxed.forEach_testConvertLong2Short2Long2(inV, out);
+            verifyResultsConvertShort2Long2(inV, out, true);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertLong2Short2Long2: " + e.toString());
+        }
+    }
+
+    private void verifyResultsConvertShort2Long2(Allocation inV, Allocation out, boolean relaxed) {
+        short[] arrayInV = new short[INPUTSIZE * 2];
+        inV.copyTo(arrayInV);
+        long[] arrayOut = new long[INPUTSIZE * 2];
+        out.copyTo(arrayOut);
+        for (int i = 0; i < INPUTSIZE; i++) {
+            for (int j = 0; j < 2 ; j++) {
+                // Extract the inputs.
+                ArgumentsShortLong args = new ArgumentsShortLong();
+                args.inV = arrayInV[i * 2 + j];
+                // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
+                CoreMathVerifier.computeConvert(args);
+                // Figure out what the outputs should have been.
+                boolean valid = true;
+                if (args.out != arrayOut[i * 2 + j]) {
+                    valid = false;
+                }
+                if (!valid) {
+                    StringBuilder message = new StringBuilder();
+                    message.append("Input inV: ");
+                    message.append(String.format("%d", args.inV));
+                    message.append("\n");
+                    message.append("Expected output out: ");
+                    message.append(String.format("%d", args.out));
+                    message.append("\n");
+                    message.append("Actual   output out: ");
+                    message.append(String.format("%d", arrayOut[i * 2 + j]));
+                    if (args.out != arrayOut[i * 2 + j]) {
+                        message.append(" FAIL");
+                    }
+                    message.append("\n");
+                    assertTrue("Incorrect output for checkConvertShort2Long2" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                }
+            }
+        }
+    }
+
+    private void checkConvertShort3Long3() {
+        Allocation inV = createRandomIntegerAllocation(mRS, Element.DataType.SIGNED_16, 3, 0x68ab71e7c8d141d8l, true, 15);
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_64, 3), INPUTSIZE);
+            script.forEach_testConvertLong3Short3Long3(inV, out);
+            verifyResultsConvertShort3Long3(inV, out, false);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertLong3Short3Long3: " + e.toString());
+        }
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_64, 3), INPUTSIZE);
+            scriptRelaxed.forEach_testConvertLong3Short3Long3(inV, out);
+            verifyResultsConvertShort3Long3(inV, out, true);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertLong3Short3Long3: " + e.toString());
+        }
+    }
+
+    private void verifyResultsConvertShort3Long3(Allocation inV, Allocation out, boolean relaxed) {
+        short[] arrayInV = new short[INPUTSIZE * 4];
+        inV.copyTo(arrayInV);
+        long[] arrayOut = new long[INPUTSIZE * 4];
+        out.copyTo(arrayOut);
+        for (int i = 0; i < INPUTSIZE; i++) {
+            for (int j = 0; j < 3 ; j++) {
+                // Extract the inputs.
+                ArgumentsShortLong args = new ArgumentsShortLong();
+                args.inV = arrayInV[i * 4 + j];
+                // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
+                CoreMathVerifier.computeConvert(args);
+                // Figure out what the outputs should have been.
+                boolean valid = true;
+                if (args.out != arrayOut[i * 4 + j]) {
+                    valid = false;
+                }
+                if (!valid) {
+                    StringBuilder message = new StringBuilder();
+                    message.append("Input inV: ");
+                    message.append(String.format("%d", args.inV));
+                    message.append("\n");
+                    message.append("Expected output out: ");
+                    message.append(String.format("%d", args.out));
+                    message.append("\n");
+                    message.append("Actual   output out: ");
+                    message.append(String.format("%d", arrayOut[i * 4 + j]));
+                    if (args.out != arrayOut[i * 4 + j]) {
+                        message.append(" FAIL");
+                    }
+                    message.append("\n");
+                    assertTrue("Incorrect output for checkConvertShort3Long3" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                }
+            }
+        }
+    }
+
+    private void checkConvertShort4Long4() {
+        Allocation inV = createRandomIntegerAllocation(mRS, Element.DataType.SIGNED_16, 4, 0x68ab7c8927d906ccl, true, 15);
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_64, 4), INPUTSIZE);
+            script.forEach_testConvertLong4Short4Long4(inV, out);
+            verifyResultsConvertShort4Long4(inV, out, false);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertLong4Short4Long4: " + e.toString());
+        }
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_64, 4), INPUTSIZE);
+            scriptRelaxed.forEach_testConvertLong4Short4Long4(inV, out);
+            verifyResultsConvertShort4Long4(inV, out, true);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertLong4Short4Long4: " + e.toString());
+        }
+    }
+
+    private void verifyResultsConvertShort4Long4(Allocation inV, Allocation out, boolean relaxed) {
+        short[] arrayInV = new short[INPUTSIZE * 4];
+        inV.copyTo(arrayInV);
+        long[] arrayOut = new long[INPUTSIZE * 4];
+        out.copyTo(arrayOut);
+        for (int i = 0; i < INPUTSIZE; i++) {
+            for (int j = 0; j < 4 ; j++) {
+                // Extract the inputs.
+                ArgumentsShortLong args = new ArgumentsShortLong();
+                args.inV = arrayInV[i * 4 + j];
+                // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
+                CoreMathVerifier.computeConvert(args);
+                // Figure out what the outputs should have been.
+                boolean valid = true;
+                if (args.out != arrayOut[i * 4 + j]) {
+                    valid = false;
+                }
+                if (!valid) {
+                    StringBuilder message = new StringBuilder();
+                    message.append("Input inV: ");
+                    message.append(String.format("%d", args.inV));
+                    message.append("\n");
+                    message.append("Expected output out: ");
+                    message.append(String.format("%d", args.out));
+                    message.append("\n");
+                    message.append("Actual   output out: ");
+                    message.append(String.format("%d", arrayOut[i * 4 + j]));
+                    if (args.out != arrayOut[i * 4 + j]) {
+                        message.append(" FAIL");
+                    }
+                    message.append("\n");
+                    assertTrue("Incorrect output for checkConvertShort4Long4" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                }
+            }
+        }
+    }
+
+    public class ArgumentsUshortLong {
+        public short inV;
+        public long out;
+    }
+
+    private void checkConvertUshort2Long2() {
+        Allocation inV = createRandomIntegerAllocation(mRS, Element.DataType.UNSIGNED_16, 2, 0x8d79874e05a1968fl, false, 16);
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_64, 2), INPUTSIZE);
+            script.forEach_testConvertLong2Ushort2Long2(inV, out);
+            verifyResultsConvertUshort2Long2(inV, out, false);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertLong2Ushort2Long2: " + e.toString());
+        }
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_64, 2), INPUTSIZE);
+            scriptRelaxed.forEach_testConvertLong2Ushort2Long2(inV, out);
+            verifyResultsConvertUshort2Long2(inV, out, true);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertLong2Ushort2Long2: " + e.toString());
+        }
+    }
+
+    private void verifyResultsConvertUshort2Long2(Allocation inV, Allocation out, boolean relaxed) {
+        short[] arrayInV = new short[INPUTSIZE * 2];
+        inV.copyTo(arrayInV);
+        long[] arrayOut = new long[INPUTSIZE * 2];
+        out.copyTo(arrayOut);
+        for (int i = 0; i < INPUTSIZE; i++) {
+            for (int j = 0; j < 2 ; j++) {
+                // Extract the inputs.
+                ArgumentsUshortLong args = new ArgumentsUshortLong();
+                args.inV = arrayInV[i * 2 + j];
+                // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
+                CoreMathVerifier.computeConvert(args);
+                // Figure out what the outputs should have been.
+                boolean valid = true;
+                if (args.out != arrayOut[i * 2 + j]) {
+                    valid = false;
+                }
+                if (!valid) {
+                    StringBuilder message = new StringBuilder();
+                    message.append("Input inV: ");
+                    message.append(String.format("0x%x", args.inV));
+                    message.append("\n");
+                    message.append("Expected output out: ");
+                    message.append(String.format("%d", args.out));
+                    message.append("\n");
+                    message.append("Actual   output out: ");
+                    message.append(String.format("%d", arrayOut[i * 2 + j]));
+                    if (args.out != arrayOut[i * 2 + j]) {
+                        message.append(" FAIL");
+                    }
+                    message.append("\n");
+                    assertTrue("Incorrect output for checkConvertUshort2Long2" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                }
+            }
+        }
+    }
+
+    private void checkConvertUshort3Long3() {
+        Allocation inV = createRandomIntegerAllocation(mRS, Element.DataType.UNSIGNED_16, 3, 0x8d7991ef64a95b83l, false, 16);
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_64, 3), INPUTSIZE);
+            script.forEach_testConvertLong3Ushort3Long3(inV, out);
+            verifyResultsConvertUshort3Long3(inV, out, false);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertLong3Ushort3Long3: " + e.toString());
+        }
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_64, 3), INPUTSIZE);
+            scriptRelaxed.forEach_testConvertLong3Ushort3Long3(inV, out);
+            verifyResultsConvertUshort3Long3(inV, out, true);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertLong3Ushort3Long3: " + e.toString());
+        }
+    }
+
+    private void verifyResultsConvertUshort3Long3(Allocation inV, Allocation out, boolean relaxed) {
+        short[] arrayInV = new short[INPUTSIZE * 4];
+        inV.copyTo(arrayInV);
+        long[] arrayOut = new long[INPUTSIZE * 4];
+        out.copyTo(arrayOut);
+        for (int i = 0; i < INPUTSIZE; i++) {
+            for (int j = 0; j < 3 ; j++) {
+                // Extract the inputs.
+                ArgumentsUshortLong args = new ArgumentsUshortLong();
+                args.inV = arrayInV[i * 4 + j];
+                // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
+                CoreMathVerifier.computeConvert(args);
+                // Figure out what the outputs should have been.
+                boolean valid = true;
+                if (args.out != arrayOut[i * 4 + j]) {
+                    valid = false;
+                }
+                if (!valid) {
+                    StringBuilder message = new StringBuilder();
+                    message.append("Input inV: ");
+                    message.append(String.format("0x%x", args.inV));
+                    message.append("\n");
+                    message.append("Expected output out: ");
+                    message.append(String.format("%d", args.out));
+                    message.append("\n");
+                    message.append("Actual   output out: ");
+                    message.append(String.format("%d", arrayOut[i * 4 + j]));
+                    if (args.out != arrayOut[i * 4 + j]) {
+                        message.append(" FAIL");
+                    }
+                    message.append("\n");
+                    assertTrue("Incorrect output for checkConvertUshort3Long3" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                }
+            }
+        }
+    }
+
+    private void checkConvertUshort4Long4() {
+        Allocation inV = createRandomIntegerAllocation(mRS, Element.DataType.UNSIGNED_16, 4, 0x8d799c90c3b12077l, false, 16);
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_64, 4), INPUTSIZE);
+            script.forEach_testConvertLong4Ushort4Long4(inV, out);
+            verifyResultsConvertUshort4Long4(inV, out, false);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertLong4Ushort4Long4: " + e.toString());
+        }
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_64, 4), INPUTSIZE);
+            scriptRelaxed.forEach_testConvertLong4Ushort4Long4(inV, out);
+            verifyResultsConvertUshort4Long4(inV, out, true);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertLong4Ushort4Long4: " + e.toString());
+        }
+    }
+
+    private void verifyResultsConvertUshort4Long4(Allocation inV, Allocation out, boolean relaxed) {
+        short[] arrayInV = new short[INPUTSIZE * 4];
+        inV.copyTo(arrayInV);
+        long[] arrayOut = new long[INPUTSIZE * 4];
+        out.copyTo(arrayOut);
+        for (int i = 0; i < INPUTSIZE; i++) {
+            for (int j = 0; j < 4 ; j++) {
+                // Extract the inputs.
+                ArgumentsUshortLong args = new ArgumentsUshortLong();
+                args.inV = arrayInV[i * 4 + j];
+                // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
+                CoreMathVerifier.computeConvert(args);
+                // Figure out what the outputs should have been.
+                boolean valid = true;
+                if (args.out != arrayOut[i * 4 + j]) {
+                    valid = false;
+                }
+                if (!valid) {
+                    StringBuilder message = new StringBuilder();
+                    message.append("Input inV: ");
+                    message.append(String.format("0x%x", args.inV));
+                    message.append("\n");
+                    message.append("Expected output out: ");
+                    message.append(String.format("%d", args.out));
+                    message.append("\n");
+                    message.append("Actual   output out: ");
+                    message.append(String.format("%d", arrayOut[i * 4 + j]));
+                    if (args.out != arrayOut[i * 4 + j]) {
+                        message.append(" FAIL");
+                    }
+                    message.append("\n");
+                    assertTrue("Incorrect output for checkConvertUshort4Long4" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                }
+            }
+        }
+    }
+
+    public class ArgumentsIntLong {
+        public int inV;
+        public long out;
+    }
+
+    private void checkConvertInt2Long2() {
+        Allocation inV = createRandomIntegerAllocation(mRS, Element.DataType.SIGNED_32, 2, 0xd74f538b8a45cb5dl, true, 31);
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_64, 2), INPUTSIZE);
+            script.forEach_testConvertLong2Int2Long2(inV, out);
+            verifyResultsConvertInt2Long2(inV, out, false);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertLong2Int2Long2: " + e.toString());
+        }
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_64, 2), INPUTSIZE);
+            scriptRelaxed.forEach_testConvertLong2Int2Long2(inV, out);
+            verifyResultsConvertInt2Long2(inV, out, true);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertLong2Int2Long2: " + e.toString());
+        }
+    }
+
+    private void verifyResultsConvertInt2Long2(Allocation inV, Allocation out, boolean relaxed) {
+        int[] arrayInV = new int[INPUTSIZE * 2];
+        inV.copyTo(arrayInV);
+        long[] arrayOut = new long[INPUTSIZE * 2];
+        out.copyTo(arrayOut);
+        for (int i = 0; i < INPUTSIZE; i++) {
+            for (int j = 0; j < 2 ; j++) {
+                // Extract the inputs.
+                ArgumentsIntLong args = new ArgumentsIntLong();
+                args.inV = arrayInV[i * 2 + j];
+                // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
+                CoreMathVerifier.computeConvert(args);
+                // Figure out what the outputs should have been.
+                boolean valid = true;
+                if (args.out != arrayOut[i * 2 + j]) {
+                    valid = false;
+                }
+                if (!valid) {
+                    StringBuilder message = new StringBuilder();
+                    message.append("Input inV: ");
+                    message.append(String.format("%d", args.inV));
+                    message.append("\n");
+                    message.append("Expected output out: ");
+                    message.append(String.format("%d", args.out));
+                    message.append("\n");
+                    message.append("Actual   output out: ");
+                    message.append(String.format("%d", arrayOut[i * 2 + j]));
+                    if (args.out != arrayOut[i * 2 + j]) {
+                        message.append(" FAIL");
+                    }
+                    message.append("\n");
+                    assertTrue("Incorrect output for checkConvertInt2Long2" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                }
+            }
+        }
+    }
+
+    private void checkConvertInt3Long3() {
+        Allocation inV = createRandomIntegerAllocation(mRS, Element.DataType.SIGNED_32, 3, 0xd74f5e2ce94d9051l, true, 31);
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_64, 3), INPUTSIZE);
+            script.forEach_testConvertLong3Int3Long3(inV, out);
+            verifyResultsConvertInt3Long3(inV, out, false);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertLong3Int3Long3: " + e.toString());
+        }
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_64, 3), INPUTSIZE);
+            scriptRelaxed.forEach_testConvertLong3Int3Long3(inV, out);
+            verifyResultsConvertInt3Long3(inV, out, true);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertLong3Int3Long3: " + e.toString());
+        }
+    }
+
+    private void verifyResultsConvertInt3Long3(Allocation inV, Allocation out, boolean relaxed) {
+        int[] arrayInV = new int[INPUTSIZE * 4];
+        inV.copyTo(arrayInV);
+        long[] arrayOut = new long[INPUTSIZE * 4];
+        out.copyTo(arrayOut);
+        for (int i = 0; i < INPUTSIZE; i++) {
+            for (int j = 0; j < 3 ; j++) {
+                // Extract the inputs.
+                ArgumentsIntLong args = new ArgumentsIntLong();
+                args.inV = arrayInV[i * 4 + j];
+                // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
+                CoreMathVerifier.computeConvert(args);
+                // Figure out what the outputs should have been.
+                boolean valid = true;
+                if (args.out != arrayOut[i * 4 + j]) {
+                    valid = false;
+                }
+                if (!valid) {
+                    StringBuilder message = new StringBuilder();
+                    message.append("Input inV: ");
+                    message.append(String.format("%d", args.inV));
+                    message.append("\n");
+                    message.append("Expected output out: ");
+                    message.append(String.format("%d", args.out));
+                    message.append("\n");
+                    message.append("Actual   output out: ");
+                    message.append(String.format("%d", arrayOut[i * 4 + j]));
+                    if (args.out != arrayOut[i * 4 + j]) {
+                        message.append(" FAIL");
+                    }
+                    message.append("\n");
+                    assertTrue("Incorrect output for checkConvertInt3Long3" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                }
+            }
+        }
+    }
+
+    private void checkConvertInt4Long4() {
+        Allocation inV = createRandomIntegerAllocation(mRS, Element.DataType.SIGNED_32, 4, 0xd74f68ce48555545l, true, 31);
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_64, 4), INPUTSIZE);
+            script.forEach_testConvertLong4Int4Long4(inV, out);
+            verifyResultsConvertInt4Long4(inV, out, false);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertLong4Int4Long4: " + e.toString());
+        }
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_64, 4), INPUTSIZE);
+            scriptRelaxed.forEach_testConvertLong4Int4Long4(inV, out);
+            verifyResultsConvertInt4Long4(inV, out, true);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertLong4Int4Long4: " + e.toString());
+        }
+    }
+
+    private void verifyResultsConvertInt4Long4(Allocation inV, Allocation out, boolean relaxed) {
+        int[] arrayInV = new int[INPUTSIZE * 4];
+        inV.copyTo(arrayInV);
+        long[] arrayOut = new long[INPUTSIZE * 4];
+        out.copyTo(arrayOut);
+        for (int i = 0; i < INPUTSIZE; i++) {
+            for (int j = 0; j < 4 ; j++) {
+                // Extract the inputs.
+                ArgumentsIntLong args = new ArgumentsIntLong();
+                args.inV = arrayInV[i * 4 + j];
+                // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
+                CoreMathVerifier.computeConvert(args);
+                // Figure out what the outputs should have been.
+                boolean valid = true;
+                if (args.out != arrayOut[i * 4 + j]) {
+                    valid = false;
+                }
+                if (!valid) {
+                    StringBuilder message = new StringBuilder();
+                    message.append("Input inV: ");
+                    message.append(String.format("%d", args.inV));
+                    message.append("\n");
+                    message.append("Expected output out: ");
+                    message.append(String.format("%d", args.out));
+                    message.append("\n");
+                    message.append("Actual   output out: ");
+                    message.append(String.format("%d", arrayOut[i * 4 + j]));
+                    if (args.out != arrayOut[i * 4 + j]) {
+                        message.append(" FAIL");
+                    }
+                    message.append("\n");
+                    assertTrue("Incorrect output for checkConvertInt4Long4" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                }
+            }
+        }
+    }
+
+    public class ArgumentsUintLong {
+        public int inV;
+        public long out;
+    }
+
+    private void checkConvertUint2Long2() {
+        Allocation inV = createRandomIntegerAllocation(mRS, Element.DataType.UNSIGNED_32, 2, 0xe71d0a7587b9ef60l, false, 32);
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_64, 2), INPUTSIZE);
+            script.forEach_testConvertLong2Uint2Long2(inV, out);
+            verifyResultsConvertUint2Long2(inV, out, false);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertLong2Uint2Long2: " + e.toString());
+        }
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_64, 2), INPUTSIZE);
+            scriptRelaxed.forEach_testConvertLong2Uint2Long2(inV, out);
+            verifyResultsConvertUint2Long2(inV, out, true);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertLong2Uint2Long2: " + e.toString());
+        }
+    }
+
+    private void verifyResultsConvertUint2Long2(Allocation inV, Allocation out, boolean relaxed) {
+        int[] arrayInV = new int[INPUTSIZE * 2];
+        inV.copyTo(arrayInV);
+        long[] arrayOut = new long[INPUTSIZE * 2];
+        out.copyTo(arrayOut);
+        for (int i = 0; i < INPUTSIZE; i++) {
+            for (int j = 0; j < 2 ; j++) {
+                // Extract the inputs.
+                ArgumentsUintLong args = new ArgumentsUintLong();
+                args.inV = arrayInV[i * 2 + j];
+                // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
+                CoreMathVerifier.computeConvert(args);
+                // Figure out what the outputs should have been.
+                boolean valid = true;
+                if (args.out != arrayOut[i * 2 + j]) {
+                    valid = false;
+                }
+                if (!valid) {
+                    StringBuilder message = new StringBuilder();
+                    message.append("Input inV: ");
+                    message.append(String.format("0x%x", args.inV));
+                    message.append("\n");
+                    message.append("Expected output out: ");
+                    message.append(String.format("%d", args.out));
+                    message.append("\n");
+                    message.append("Actual   output out: ");
+                    message.append(String.format("%d", arrayOut[i * 2 + j]));
+                    if (args.out != arrayOut[i * 2 + j]) {
+                        message.append(" FAIL");
+                    }
+                    message.append("\n");
+                    assertTrue("Incorrect output for checkConvertUint2Long2" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                }
+            }
+        }
+    }
+
+    private void checkConvertUint3Long3() {
+        Allocation inV = createRandomIntegerAllocation(mRS, Element.DataType.UNSIGNED_32, 3, 0xe71d1516e6c1b454l, false, 32);
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_64, 3), INPUTSIZE);
+            script.forEach_testConvertLong3Uint3Long3(inV, out);
+            verifyResultsConvertUint3Long3(inV, out, false);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertLong3Uint3Long3: " + e.toString());
+        }
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_64, 3), INPUTSIZE);
+            scriptRelaxed.forEach_testConvertLong3Uint3Long3(inV, out);
+            verifyResultsConvertUint3Long3(inV, out, true);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertLong3Uint3Long3: " + e.toString());
+        }
+    }
+
+    private void verifyResultsConvertUint3Long3(Allocation inV, Allocation out, boolean relaxed) {
+        int[] arrayInV = new int[INPUTSIZE * 4];
+        inV.copyTo(arrayInV);
+        long[] arrayOut = new long[INPUTSIZE * 4];
+        out.copyTo(arrayOut);
+        for (int i = 0; i < INPUTSIZE; i++) {
+            for (int j = 0; j < 3 ; j++) {
+                // Extract the inputs.
+                ArgumentsUintLong args = new ArgumentsUintLong();
+                args.inV = arrayInV[i * 4 + j];
+                // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
+                CoreMathVerifier.computeConvert(args);
+                // Figure out what the outputs should have been.
+                boolean valid = true;
+                if (args.out != arrayOut[i * 4 + j]) {
+                    valid = false;
+                }
+                if (!valid) {
+                    StringBuilder message = new StringBuilder();
+                    message.append("Input inV: ");
+                    message.append(String.format("0x%x", args.inV));
+                    message.append("\n");
+                    message.append("Expected output out: ");
+                    message.append(String.format("%d", args.out));
+                    message.append("\n");
+                    message.append("Actual   output out: ");
+                    message.append(String.format("%d", arrayOut[i * 4 + j]));
+                    if (args.out != arrayOut[i * 4 + j]) {
+                        message.append(" FAIL");
+                    }
+                    message.append("\n");
+                    assertTrue("Incorrect output for checkConvertUint3Long3" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                }
+            }
+        }
+    }
+
+    private void checkConvertUint4Long4() {
+        Allocation inV = createRandomIntegerAllocation(mRS, Element.DataType.UNSIGNED_32, 4, 0xe71d1fb845c97948l, false, 32);
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_64, 4), INPUTSIZE);
+            script.forEach_testConvertLong4Uint4Long4(inV, out);
+            verifyResultsConvertUint4Long4(inV, out, false);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertLong4Uint4Long4: " + e.toString());
+        }
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_64, 4), INPUTSIZE);
+            scriptRelaxed.forEach_testConvertLong4Uint4Long4(inV, out);
+            verifyResultsConvertUint4Long4(inV, out, true);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertLong4Uint4Long4: " + e.toString());
+        }
+    }
+
+    private void verifyResultsConvertUint4Long4(Allocation inV, Allocation out, boolean relaxed) {
+        int[] arrayInV = new int[INPUTSIZE * 4];
+        inV.copyTo(arrayInV);
+        long[] arrayOut = new long[INPUTSIZE * 4];
+        out.copyTo(arrayOut);
+        for (int i = 0; i < INPUTSIZE; i++) {
+            for (int j = 0; j < 4 ; j++) {
+                // Extract the inputs.
+                ArgumentsUintLong args = new ArgumentsUintLong();
+                args.inV = arrayInV[i * 4 + j];
+                // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
+                CoreMathVerifier.computeConvert(args);
+                // Figure out what the outputs should have been.
+                boolean valid = true;
+                if (args.out != arrayOut[i * 4 + j]) {
+                    valid = false;
+                }
+                if (!valid) {
+                    StringBuilder message = new StringBuilder();
+                    message.append("Input inV: ");
+                    message.append(String.format("0x%x", args.inV));
+                    message.append("\n");
+                    message.append("Expected output out: ");
+                    message.append(String.format("%d", args.out));
+                    message.append("\n");
+                    message.append("Actual   output out: ");
+                    message.append(String.format("%d", arrayOut[i * 4 + j]));
+                    if (args.out != arrayOut[i * 4 + j]) {
+                        message.append(" FAIL");
+                    }
+                    message.append("\n");
+                    assertTrue("Incorrect output for checkConvertUint4Long4" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                }
+            }
+        }
+    }
+
+    public class ArgumentsFloatUlong {
+        public float inV;
+        public long out;
+    }
+
+    private void checkConvertFloat2Ulong2() {
+        Allocation inV = createRandomFloatAllocation(mRS, Element.DataType.FLOAT_32, 2, 0xfb52b5394ec4cff7l, 0.0000000000000000000e+00, 1.8446742974197923840e+19);
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_64, 2), INPUTSIZE);
+            script.forEach_testConvertUlong2Float2Ulong2(inV, out);
+            verifyResultsConvertFloat2Ulong2(inV, out, false);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertUlong2Float2Ulong2: " + e.toString());
+        }
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_64, 2), INPUTSIZE);
+            scriptRelaxed.forEach_testConvertUlong2Float2Ulong2(inV, out);
+            verifyResultsConvertFloat2Ulong2(inV, out, true);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertUlong2Float2Ulong2: " + e.toString());
+        }
+    }
+
+    private void verifyResultsConvertFloat2Ulong2(Allocation inV, Allocation out, boolean relaxed) {
+        float[] arrayInV = new float[INPUTSIZE * 2];
+        inV.copyTo(arrayInV);
+        long[] arrayOut = new long[INPUTSIZE * 2];
+        out.copyTo(arrayOut);
+        for (int i = 0; i < INPUTSIZE; i++) {
+            for (int j = 0; j < 2 ; j++) {
+                // Extract the inputs.
+                ArgumentsFloatUlong args = new ArgumentsFloatUlong();
+                args.inV = arrayInV[i * 2 + j];
+                // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
+                CoreMathVerifier.computeConvert(args);
+                // Figure out what the outputs should have been.
+                boolean valid = true;
+                if (args.out != arrayOut[i * 2 + j]) {
+                    valid = false;
+                }
+                if (!valid) {
+                    StringBuilder message = new StringBuilder();
+                    message.append("Input inV: ");
+                    message.append(String.format("%14.8g %8x %15a",
+                            args.inV, Float.floatToRawIntBits(args.inV), args.inV));
+                    message.append("\n");
+                    message.append("Expected output out: ");
+                    message.append(String.format("0x%x", args.out));
+                    message.append("\n");
+                    message.append("Actual   output out: ");
+                    message.append(String.format("0x%x", arrayOut[i * 2 + j]));
+                    if (args.out != arrayOut[i * 2 + j]) {
+                        message.append(" FAIL");
+                    }
+                    message.append("\n");
+                    assertTrue("Incorrect output for checkConvertFloat2Ulong2" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                }
+            }
+        }
+    }
+
+    private void checkConvertFloat3Ulong3() {
+        Allocation inV = createRandomFloatAllocation(mRS, Element.DataType.FLOAT_32, 3, 0xfb547e5444dff0d5l, 0.0000000000000000000e+00, 1.8446742974197923840e+19);
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_64, 3), INPUTSIZE);
+            script.forEach_testConvertUlong3Float3Ulong3(inV, out);
+            verifyResultsConvertFloat3Ulong3(inV, out, false);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertUlong3Float3Ulong3: " + e.toString());
+        }
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_64, 3), INPUTSIZE);
+            scriptRelaxed.forEach_testConvertUlong3Float3Ulong3(inV, out);
+            verifyResultsConvertFloat3Ulong3(inV, out, true);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertUlong3Float3Ulong3: " + e.toString());
+        }
+    }
+
+    private void verifyResultsConvertFloat3Ulong3(Allocation inV, Allocation out, boolean relaxed) {
+        float[] arrayInV = new float[INPUTSIZE * 4];
+        inV.copyTo(arrayInV);
+        long[] arrayOut = new long[INPUTSIZE * 4];
+        out.copyTo(arrayOut);
+        for (int i = 0; i < INPUTSIZE; i++) {
+            for (int j = 0; j < 3 ; j++) {
+                // Extract the inputs.
+                ArgumentsFloatUlong args = new ArgumentsFloatUlong();
+                args.inV = arrayInV[i * 4 + j];
+                // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
+                CoreMathVerifier.computeConvert(args);
+                // Figure out what the outputs should have been.
+                boolean valid = true;
+                if (args.out != arrayOut[i * 4 + j]) {
+                    valid = false;
+                }
+                if (!valid) {
+                    StringBuilder message = new StringBuilder();
+                    message.append("Input inV: ");
+                    message.append(String.format("%14.8g %8x %15a",
+                            args.inV, Float.floatToRawIntBits(args.inV), args.inV));
+                    message.append("\n");
+                    message.append("Expected output out: ");
+                    message.append(String.format("0x%x", args.out));
+                    message.append("\n");
+                    message.append("Actual   output out: ");
+                    message.append(String.format("0x%x", arrayOut[i * 4 + j]));
+                    if (args.out != arrayOut[i * 4 + j]) {
+                        message.append(" FAIL");
+                    }
+                    message.append("\n");
+                    assertTrue("Incorrect output for checkConvertFloat3Ulong3" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                }
+            }
+        }
+    }
+
+    private void checkConvertFloat4Ulong4() {
+        Allocation inV = createRandomFloatAllocation(mRS, Element.DataType.FLOAT_32, 4, 0xfb56476f3afb11b3l, 0.0000000000000000000e+00, 1.8446742974197923840e+19);
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_64, 4), INPUTSIZE);
+            script.forEach_testConvertUlong4Float4Ulong4(inV, out);
+            verifyResultsConvertFloat4Ulong4(inV, out, false);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertUlong4Float4Ulong4: " + e.toString());
+        }
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_64, 4), INPUTSIZE);
+            scriptRelaxed.forEach_testConvertUlong4Float4Ulong4(inV, out);
+            verifyResultsConvertFloat4Ulong4(inV, out, true);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertUlong4Float4Ulong4: " + e.toString());
+        }
+    }
+
+    private void verifyResultsConvertFloat4Ulong4(Allocation inV, Allocation out, boolean relaxed) {
+        float[] arrayInV = new float[INPUTSIZE * 4];
+        inV.copyTo(arrayInV);
+        long[] arrayOut = new long[INPUTSIZE * 4];
+        out.copyTo(arrayOut);
+        for (int i = 0; i < INPUTSIZE; i++) {
+            for (int j = 0; j < 4 ; j++) {
+                // Extract the inputs.
+                ArgumentsFloatUlong args = new ArgumentsFloatUlong();
+                args.inV = arrayInV[i * 4 + j];
+                // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
+                CoreMathVerifier.computeConvert(args);
+                // Figure out what the outputs should have been.
+                boolean valid = true;
+                if (args.out != arrayOut[i * 4 + j]) {
+                    valid = false;
+                }
+                if (!valid) {
+                    StringBuilder message = new StringBuilder();
+                    message.append("Input inV: ");
+                    message.append(String.format("%14.8g %8x %15a",
+                            args.inV, Float.floatToRawIntBits(args.inV), args.inV));
+                    message.append("\n");
+                    message.append("Expected output out: ");
+                    message.append(String.format("0x%x", args.out));
+                    message.append("\n");
+                    message.append("Actual   output out: ");
+                    message.append(String.format("0x%x", arrayOut[i * 4 + j]));
+                    if (args.out != arrayOut[i * 4 + j]) {
+                        message.append(" FAIL");
+                    }
+                    message.append("\n");
+                    assertTrue("Incorrect output for checkConvertFloat4Ulong4" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                }
+            }
+        }
+    }
+
+    public class ArgumentsCharUlong {
+        public byte inV;
+        public long out;
+    }
+
+    private void checkConvertChar2Ulong2() {
+        Allocation inV = createRandomIntegerAllocation(mRS, Element.DataType.SIGNED_8, 2, 0x5862818b1fedf7b7l, false, 7);
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_64, 2), INPUTSIZE);
+            script.forEach_testConvertUlong2Char2Ulong2(inV, out);
+            verifyResultsConvertChar2Ulong2(inV, out, false);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertUlong2Char2Ulong2: " + e.toString());
+        }
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_64, 2), INPUTSIZE);
+            scriptRelaxed.forEach_testConvertUlong2Char2Ulong2(inV, out);
+            verifyResultsConvertChar2Ulong2(inV, out, true);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertUlong2Char2Ulong2: " + e.toString());
+        }
+    }
+
+    private void verifyResultsConvertChar2Ulong2(Allocation inV, Allocation out, boolean relaxed) {
+        byte[] arrayInV = new byte[INPUTSIZE * 2];
+        inV.copyTo(arrayInV);
+        long[] arrayOut = new long[INPUTSIZE * 2];
+        out.copyTo(arrayOut);
+        for (int i = 0; i < INPUTSIZE; i++) {
+            for (int j = 0; j < 2 ; j++) {
+                // Extract the inputs.
+                ArgumentsCharUlong args = new ArgumentsCharUlong();
+                args.inV = arrayInV[i * 2 + j];
+                // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
+                CoreMathVerifier.computeConvert(args);
+                // Figure out what the outputs should have been.
+                boolean valid = true;
+                if (args.out != arrayOut[i * 2 + j]) {
+                    valid = false;
+                }
+                if (!valid) {
+                    StringBuilder message = new StringBuilder();
+                    message.append("Input inV: ");
+                    message.append(String.format("%d", args.inV));
+                    message.append("\n");
+                    message.append("Expected output out: ");
+                    message.append(String.format("0x%x", args.out));
+                    message.append("\n");
+                    message.append("Actual   output out: ");
+                    message.append(String.format("0x%x", arrayOut[i * 2 + j]));
+                    if (args.out != arrayOut[i * 2 + j]) {
+                        message.append(" FAIL");
+                    }
+                    message.append("\n");
+                    assertTrue("Incorrect output for checkConvertChar2Ulong2" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                }
+            }
+        }
+    }
+
+    private void checkConvertChar3Ulong3() {
+        Allocation inV = createRandomIntegerAllocation(mRS, Element.DataType.SIGNED_8, 3, 0x58644aa616091895l, false, 7);
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_64, 3), INPUTSIZE);
+            script.forEach_testConvertUlong3Char3Ulong3(inV, out);
+            verifyResultsConvertChar3Ulong3(inV, out, false);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertUlong3Char3Ulong3: " + e.toString());
+        }
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_64, 3), INPUTSIZE);
+            scriptRelaxed.forEach_testConvertUlong3Char3Ulong3(inV, out);
+            verifyResultsConvertChar3Ulong3(inV, out, true);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertUlong3Char3Ulong3: " + e.toString());
+        }
+    }
+
+    private void verifyResultsConvertChar3Ulong3(Allocation inV, Allocation out, boolean relaxed) {
+        byte[] arrayInV = new byte[INPUTSIZE * 4];
+        inV.copyTo(arrayInV);
+        long[] arrayOut = new long[INPUTSIZE * 4];
+        out.copyTo(arrayOut);
+        for (int i = 0; i < INPUTSIZE; i++) {
+            for (int j = 0; j < 3 ; j++) {
+                // Extract the inputs.
+                ArgumentsCharUlong args = new ArgumentsCharUlong();
+                args.inV = arrayInV[i * 4 + j];
+                // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
+                CoreMathVerifier.computeConvert(args);
+                // Figure out what the outputs should have been.
+                boolean valid = true;
+                if (args.out != arrayOut[i * 4 + j]) {
+                    valid = false;
+                }
+                if (!valid) {
+                    StringBuilder message = new StringBuilder();
+                    message.append("Input inV: ");
+                    message.append(String.format("%d", args.inV));
+                    message.append("\n");
+                    message.append("Expected output out: ");
+                    message.append(String.format("0x%x", args.out));
+                    message.append("\n");
+                    message.append("Actual   output out: ");
+                    message.append(String.format("0x%x", arrayOut[i * 4 + j]));
+                    if (args.out != arrayOut[i * 4 + j]) {
+                        message.append(" FAIL");
+                    }
+                    message.append("\n");
+                    assertTrue("Incorrect output for checkConvertChar3Ulong3" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                }
+            }
+        }
+    }
+
+    private void checkConvertChar4Ulong4() {
+        Allocation inV = createRandomIntegerAllocation(mRS, Element.DataType.SIGNED_8, 4, 0x586613c10c243973l, false, 7);
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_64, 4), INPUTSIZE);
+            script.forEach_testConvertUlong4Char4Ulong4(inV, out);
+            verifyResultsConvertChar4Ulong4(inV, out, false);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertUlong4Char4Ulong4: " + e.toString());
+        }
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_64, 4), INPUTSIZE);
+            scriptRelaxed.forEach_testConvertUlong4Char4Ulong4(inV, out);
+            verifyResultsConvertChar4Ulong4(inV, out, true);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertUlong4Char4Ulong4: " + e.toString());
+        }
+    }
+
+    private void verifyResultsConvertChar4Ulong4(Allocation inV, Allocation out, boolean relaxed) {
+        byte[] arrayInV = new byte[INPUTSIZE * 4];
+        inV.copyTo(arrayInV);
+        long[] arrayOut = new long[INPUTSIZE * 4];
+        out.copyTo(arrayOut);
+        for (int i = 0; i < INPUTSIZE; i++) {
+            for (int j = 0; j < 4 ; j++) {
+                // Extract the inputs.
+                ArgumentsCharUlong args = new ArgumentsCharUlong();
+                args.inV = arrayInV[i * 4 + j];
+                // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
+                CoreMathVerifier.computeConvert(args);
+                // Figure out what the outputs should have been.
+                boolean valid = true;
+                if (args.out != arrayOut[i * 4 + j]) {
+                    valid = false;
+                }
+                if (!valid) {
+                    StringBuilder message = new StringBuilder();
+                    message.append("Input inV: ");
+                    message.append(String.format("%d", args.inV));
+                    message.append("\n");
+                    message.append("Expected output out: ");
+                    message.append(String.format("0x%x", args.out));
+                    message.append("\n");
+                    message.append("Actual   output out: ");
+                    message.append(String.format("0x%x", arrayOut[i * 4 + j]));
+                    if (args.out != arrayOut[i * 4 + j]) {
+                        message.append(" FAIL");
+                    }
+                    message.append("\n");
+                    assertTrue("Incorrect output for checkConvertChar4Ulong4" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                }
+            }
+        }
+    }
+
+    public class ArgumentsUcharUlong {
+        public byte inV;
+        public long out;
+    }
+
+    private void checkConvertUchar2Ulong2() {
+        Allocation inV = createRandomIntegerAllocation(mRS, Element.DataType.UNSIGNED_8, 2, 0x7d30a192bbc61162l, false, 8);
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_64, 2), INPUTSIZE);
+            script.forEach_testConvertUlong2Uchar2Ulong2(inV, out);
+            verifyResultsConvertUchar2Ulong2(inV, out, false);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertUlong2Uchar2Ulong2: " + e.toString());
+        }
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_64, 2), INPUTSIZE);
+            scriptRelaxed.forEach_testConvertUlong2Uchar2Ulong2(inV, out);
+            verifyResultsConvertUchar2Ulong2(inV, out, true);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertUlong2Uchar2Ulong2: " + e.toString());
+        }
+    }
+
+    private void verifyResultsConvertUchar2Ulong2(Allocation inV, Allocation out, boolean relaxed) {
+        byte[] arrayInV = new byte[INPUTSIZE * 2];
+        inV.copyTo(arrayInV);
+        long[] arrayOut = new long[INPUTSIZE * 2];
+        out.copyTo(arrayOut);
+        for (int i = 0; i < INPUTSIZE; i++) {
+            for (int j = 0; j < 2 ; j++) {
+                // Extract the inputs.
+                ArgumentsUcharUlong args = new ArgumentsUcharUlong();
+                args.inV = arrayInV[i * 2 + j];
+                // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
+                CoreMathVerifier.computeConvert(args);
+                // Figure out what the outputs should have been.
+                boolean valid = true;
+                if (args.out != arrayOut[i * 2 + j]) {
+                    valid = false;
+                }
+                if (!valid) {
+                    StringBuilder message = new StringBuilder();
+                    message.append("Input inV: ");
+                    message.append(String.format("0x%x", args.inV));
+                    message.append("\n");
+                    message.append("Expected output out: ");
+                    message.append(String.format("0x%x", args.out));
+                    message.append("\n");
+                    message.append("Actual   output out: ");
+                    message.append(String.format("0x%x", arrayOut[i * 2 + j]));
+                    if (args.out != arrayOut[i * 2 + j]) {
+                        message.append(" FAIL");
+                    }
+                    message.append("\n");
+                    assertTrue("Incorrect output for checkConvertUchar2Ulong2" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                }
+            }
+        }
+    }
+
+    private void checkConvertUchar3Ulong3() {
+        Allocation inV = createRandomIntegerAllocation(mRS, Element.DataType.UNSIGNED_8, 3, 0x7d326aadb1e13240l, false, 8);
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_64, 3), INPUTSIZE);
+            script.forEach_testConvertUlong3Uchar3Ulong3(inV, out);
+            verifyResultsConvertUchar3Ulong3(inV, out, false);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertUlong3Uchar3Ulong3: " + e.toString());
+        }
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_64, 3), INPUTSIZE);
+            scriptRelaxed.forEach_testConvertUlong3Uchar3Ulong3(inV, out);
+            verifyResultsConvertUchar3Ulong3(inV, out, true);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertUlong3Uchar3Ulong3: " + e.toString());
+        }
+    }
+
+    private void verifyResultsConvertUchar3Ulong3(Allocation inV, Allocation out, boolean relaxed) {
+        byte[] arrayInV = new byte[INPUTSIZE * 4];
+        inV.copyTo(arrayInV);
+        long[] arrayOut = new long[INPUTSIZE * 4];
+        out.copyTo(arrayOut);
+        for (int i = 0; i < INPUTSIZE; i++) {
+            for (int j = 0; j < 3 ; j++) {
+                // Extract the inputs.
+                ArgumentsUcharUlong args = new ArgumentsUcharUlong();
+                args.inV = arrayInV[i * 4 + j];
+                // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
+                CoreMathVerifier.computeConvert(args);
+                // Figure out what the outputs should have been.
+                boolean valid = true;
+                if (args.out != arrayOut[i * 4 + j]) {
+                    valid = false;
+                }
+                if (!valid) {
+                    StringBuilder message = new StringBuilder();
+                    message.append("Input inV: ");
+                    message.append(String.format("0x%x", args.inV));
+                    message.append("\n");
+                    message.append("Expected output out: ");
+                    message.append(String.format("0x%x", args.out));
+                    message.append("\n");
+                    message.append("Actual   output out: ");
+                    message.append(String.format("0x%x", arrayOut[i * 4 + j]));
+                    if (args.out != arrayOut[i * 4 + j]) {
+                        message.append(" FAIL");
+                    }
+                    message.append("\n");
+                    assertTrue("Incorrect output for checkConvertUchar3Ulong3" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                }
+            }
+        }
+    }
+
+    private void checkConvertUchar4Ulong4() {
+        Allocation inV = createRandomIntegerAllocation(mRS, Element.DataType.UNSIGNED_8, 4, 0x7d3433c8a7fc531el, false, 8);
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_64, 4), INPUTSIZE);
+            script.forEach_testConvertUlong4Uchar4Ulong4(inV, out);
+            verifyResultsConvertUchar4Ulong4(inV, out, false);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertUlong4Uchar4Ulong4: " + e.toString());
+        }
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_64, 4), INPUTSIZE);
+            scriptRelaxed.forEach_testConvertUlong4Uchar4Ulong4(inV, out);
+            verifyResultsConvertUchar4Ulong4(inV, out, true);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertUlong4Uchar4Ulong4: " + e.toString());
+        }
+    }
+
+    private void verifyResultsConvertUchar4Ulong4(Allocation inV, Allocation out, boolean relaxed) {
+        byte[] arrayInV = new byte[INPUTSIZE * 4];
+        inV.copyTo(arrayInV);
+        long[] arrayOut = new long[INPUTSIZE * 4];
+        out.copyTo(arrayOut);
+        for (int i = 0; i < INPUTSIZE; i++) {
+            for (int j = 0; j < 4 ; j++) {
+                // Extract the inputs.
+                ArgumentsUcharUlong args = new ArgumentsUcharUlong();
+                args.inV = arrayInV[i * 4 + j];
+                // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
+                CoreMathVerifier.computeConvert(args);
+                // Figure out what the outputs should have been.
+                boolean valid = true;
+                if (args.out != arrayOut[i * 4 + j]) {
+                    valid = false;
+                }
+                if (!valid) {
+                    StringBuilder message = new StringBuilder();
+                    message.append("Input inV: ");
+                    message.append(String.format("0x%x", args.inV));
+                    message.append("\n");
+                    message.append("Expected output out: ");
+                    message.append(String.format("0x%x", args.out));
+                    message.append("\n");
+                    message.append("Actual   output out: ");
+                    message.append(String.format("0x%x", arrayOut[i * 4 + j]));
+                    if (args.out != arrayOut[i * 4 + j]) {
+                        message.append(" FAIL");
+                    }
+                    message.append("\n");
+                    assertTrue("Incorrect output for checkConvertUchar4Ulong4" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                }
+            }
+        }
+    }
+
+    public class ArgumentsShortUlong {
+        public short inV;
+        public long out;
+    }
+
+    private void checkConvertShort2Ulong2() {
+        Allocation inV = createRandomIntegerAllocation(mRS, Element.DataType.SIGNED_16, 2, 0x94cab7c3ffc6f6a3l, false, 15);
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_64, 2), INPUTSIZE);
+            script.forEach_testConvertUlong2Short2Ulong2(inV, out);
+            verifyResultsConvertShort2Ulong2(inV, out, false);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertUlong2Short2Ulong2: " + e.toString());
+        }
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_64, 2), INPUTSIZE);
+            scriptRelaxed.forEach_testConvertUlong2Short2Ulong2(inV, out);
+            verifyResultsConvertShort2Ulong2(inV, out, true);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertUlong2Short2Ulong2: " + e.toString());
+        }
+    }
+
+    private void verifyResultsConvertShort2Ulong2(Allocation inV, Allocation out, boolean relaxed) {
+        short[] arrayInV = new short[INPUTSIZE * 2];
+        inV.copyTo(arrayInV);
+        long[] arrayOut = new long[INPUTSIZE * 2];
+        out.copyTo(arrayOut);
+        for (int i = 0; i < INPUTSIZE; i++) {
+            for (int j = 0; j < 2 ; j++) {
+                // Extract the inputs.
+                ArgumentsShortUlong args = new ArgumentsShortUlong();
+                args.inV = arrayInV[i * 2 + j];
+                // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
+                CoreMathVerifier.computeConvert(args);
+                // Figure out what the outputs should have been.
+                boolean valid = true;
+                if (args.out != arrayOut[i * 2 + j]) {
+                    valid = false;
+                }
+                if (!valid) {
+                    StringBuilder message = new StringBuilder();
+                    message.append("Input inV: ");
+                    message.append(String.format("%d", args.inV));
+                    message.append("\n");
+                    message.append("Expected output out: ");
+                    message.append(String.format("0x%x", args.out));
+                    message.append("\n");
+                    message.append("Actual   output out: ");
+                    message.append(String.format("0x%x", arrayOut[i * 2 + j]));
+                    if (args.out != arrayOut[i * 2 + j]) {
+                        message.append(" FAIL");
+                    }
+                    message.append("\n");
+                    assertTrue("Incorrect output for checkConvertShort2Ulong2" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                }
+            }
+        }
+    }
+
+    private void checkConvertShort3Ulong3() {
+        Allocation inV = createRandomIntegerAllocation(mRS, Element.DataType.SIGNED_16, 3, 0x94cc80def5e21781l, false, 15);
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_64, 3), INPUTSIZE);
+            script.forEach_testConvertUlong3Short3Ulong3(inV, out);
+            verifyResultsConvertShort3Ulong3(inV, out, false);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertUlong3Short3Ulong3: " + e.toString());
+        }
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_64, 3), INPUTSIZE);
+            scriptRelaxed.forEach_testConvertUlong3Short3Ulong3(inV, out);
+            verifyResultsConvertShort3Ulong3(inV, out, true);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertUlong3Short3Ulong3: " + e.toString());
+        }
+    }
+
+    private void verifyResultsConvertShort3Ulong3(Allocation inV, Allocation out, boolean relaxed) {
+        short[] arrayInV = new short[INPUTSIZE * 4];
+        inV.copyTo(arrayInV);
+        long[] arrayOut = new long[INPUTSIZE * 4];
+        out.copyTo(arrayOut);
+        for (int i = 0; i < INPUTSIZE; i++) {
+            for (int j = 0; j < 3 ; j++) {
+                // Extract the inputs.
+                ArgumentsShortUlong args = new ArgumentsShortUlong();
+                args.inV = arrayInV[i * 4 + j];
+                // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
+                CoreMathVerifier.computeConvert(args);
+                // Figure out what the outputs should have been.
+                boolean valid = true;
+                if (args.out != arrayOut[i * 4 + j]) {
+                    valid = false;
+                }
+                if (!valid) {
+                    StringBuilder message = new StringBuilder();
+                    message.append("Input inV: ");
+                    message.append(String.format("%d", args.inV));
+                    message.append("\n");
+                    message.append("Expected output out: ");
+                    message.append(String.format("0x%x", args.out));
+                    message.append("\n");
+                    message.append("Actual   output out: ");
+                    message.append(String.format("0x%x", arrayOut[i * 4 + j]));
+                    if (args.out != arrayOut[i * 4 + j]) {
+                        message.append(" FAIL");
+                    }
+                    message.append("\n");
+                    assertTrue("Incorrect output for checkConvertShort3Ulong3" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                }
+            }
+        }
+    }
+
+    private void checkConvertShort4Ulong4() {
+        Allocation inV = createRandomIntegerAllocation(mRS, Element.DataType.SIGNED_16, 4, 0x94ce49f9ebfd385fl, false, 15);
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_64, 4), INPUTSIZE);
+            script.forEach_testConvertUlong4Short4Ulong4(inV, out);
+            verifyResultsConvertShort4Ulong4(inV, out, false);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertUlong4Short4Ulong4: " + e.toString());
+        }
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_64, 4), INPUTSIZE);
+            scriptRelaxed.forEach_testConvertUlong4Short4Ulong4(inV, out);
+            verifyResultsConvertShort4Ulong4(inV, out, true);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertUlong4Short4Ulong4: " + e.toString());
+        }
+    }
+
+    private void verifyResultsConvertShort4Ulong4(Allocation inV, Allocation out, boolean relaxed) {
+        short[] arrayInV = new short[INPUTSIZE * 4];
+        inV.copyTo(arrayInV);
+        long[] arrayOut = new long[INPUTSIZE * 4];
+        out.copyTo(arrayOut);
+        for (int i = 0; i < INPUTSIZE; i++) {
+            for (int j = 0; j < 4 ; j++) {
+                // Extract the inputs.
+                ArgumentsShortUlong args = new ArgumentsShortUlong();
+                args.inV = arrayInV[i * 4 + j];
+                // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
+                CoreMathVerifier.computeConvert(args);
+                // Figure out what the outputs should have been.
+                boolean valid = true;
+                if (args.out != arrayOut[i * 4 + j]) {
+                    valid = false;
+                }
+                if (!valid) {
+                    StringBuilder message = new StringBuilder();
+                    message.append("Input inV: ");
+                    message.append(String.format("%d", args.inV));
+                    message.append("\n");
+                    message.append("Expected output out: ");
+                    message.append(String.format("0x%x", args.out));
+                    message.append("\n");
+                    message.append("Actual   output out: ");
+                    message.append(String.format("0x%x", arrayOut[i * 4 + j]));
+                    if (args.out != arrayOut[i * 4 + j]) {
+                        message.append(" FAIL");
+                    }
+                    message.append("\n");
+                    assertTrue("Incorrect output for checkConvertShort4Ulong4" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                }
+            }
+        }
+    }
+
+    public class ArgumentsUshortUlong {
+        public short inV;
+        public long out;
+    }
+
+    private void checkConvertUshort2Ulong2() {
+        Allocation inV = createRandomIntegerAllocation(mRS, Element.DataType.UNSIGNED_16, 2, 0xc36a190b2d13465cl, false, 16);
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_64, 2), INPUTSIZE);
+            script.forEach_testConvertUlong2Ushort2Ulong2(inV, out);
+            verifyResultsConvertUshort2Ulong2(inV, out, false);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertUlong2Ushort2Ulong2: " + e.toString());
+        }
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_64, 2), INPUTSIZE);
+            scriptRelaxed.forEach_testConvertUlong2Ushort2Ulong2(inV, out);
+            verifyResultsConvertUshort2Ulong2(inV, out, true);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertUlong2Ushort2Ulong2: " + e.toString());
+        }
+    }
+
+    private void verifyResultsConvertUshort2Ulong2(Allocation inV, Allocation out, boolean relaxed) {
+        short[] arrayInV = new short[INPUTSIZE * 2];
+        inV.copyTo(arrayInV);
+        long[] arrayOut = new long[INPUTSIZE * 2];
+        out.copyTo(arrayOut);
+        for (int i = 0; i < INPUTSIZE; i++) {
+            for (int j = 0; j < 2 ; j++) {
+                // Extract the inputs.
+                ArgumentsUshortUlong args = new ArgumentsUshortUlong();
+                args.inV = arrayInV[i * 2 + j];
+                // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
+                CoreMathVerifier.computeConvert(args);
+                // Figure out what the outputs should have been.
+                boolean valid = true;
+                if (args.out != arrayOut[i * 2 + j]) {
+                    valid = false;
+                }
+                if (!valid) {
+                    StringBuilder message = new StringBuilder();
+                    message.append("Input inV: ");
+                    message.append(String.format("0x%x", args.inV));
+                    message.append("\n");
+                    message.append("Expected output out: ");
+                    message.append(String.format("0x%x", args.out));
+                    message.append("\n");
+                    message.append("Actual   output out: ");
+                    message.append(String.format("0x%x", arrayOut[i * 2 + j]));
+                    if (args.out != arrayOut[i * 2 + j]) {
+                        message.append(" FAIL");
+                    }
+                    message.append("\n");
+                    assertTrue("Incorrect output for checkConvertUshort2Ulong2" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                }
+            }
+        }
+    }
+
+    private void checkConvertUshort3Ulong3() {
+        Allocation inV = createRandomIntegerAllocation(mRS, Element.DataType.UNSIGNED_16, 3, 0xc36be226232e673al, false, 16);
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_64, 3), INPUTSIZE);
+            script.forEach_testConvertUlong3Ushort3Ulong3(inV, out);
+            verifyResultsConvertUshort3Ulong3(inV, out, false);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertUlong3Ushort3Ulong3: " + e.toString());
+        }
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_64, 3), INPUTSIZE);
+            scriptRelaxed.forEach_testConvertUlong3Ushort3Ulong3(inV, out);
+            verifyResultsConvertUshort3Ulong3(inV, out, true);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertUlong3Ushort3Ulong3: " + e.toString());
+        }
+    }
+
+    private void verifyResultsConvertUshort3Ulong3(Allocation inV, Allocation out, boolean relaxed) {
+        short[] arrayInV = new short[INPUTSIZE * 4];
+        inV.copyTo(arrayInV);
+        long[] arrayOut = new long[INPUTSIZE * 4];
+        out.copyTo(arrayOut);
+        for (int i = 0; i < INPUTSIZE; i++) {
+            for (int j = 0; j < 3 ; j++) {
+                // Extract the inputs.
+                ArgumentsUshortUlong args = new ArgumentsUshortUlong();
+                args.inV = arrayInV[i * 4 + j];
+                // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
+                CoreMathVerifier.computeConvert(args);
+                // Figure out what the outputs should have been.
+                boolean valid = true;
+                if (args.out != arrayOut[i * 4 + j]) {
+                    valid = false;
+                }
+                if (!valid) {
+                    StringBuilder message = new StringBuilder();
+                    message.append("Input inV: ");
+                    message.append(String.format("0x%x", args.inV));
+                    message.append("\n");
+                    message.append("Expected output out: ");
+                    message.append(String.format("0x%x", args.out));
+                    message.append("\n");
+                    message.append("Actual   output out: ");
+                    message.append(String.format("0x%x", arrayOut[i * 4 + j]));
+                    if (args.out != arrayOut[i * 4 + j]) {
+                        message.append(" FAIL");
+                    }
+                    message.append("\n");
+                    assertTrue("Incorrect output for checkConvertUshort3Ulong3" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                }
+            }
+        }
+    }
+
+    private void checkConvertUshort4Ulong4() {
+        Allocation inV = createRandomIntegerAllocation(mRS, Element.DataType.UNSIGNED_16, 4, 0xc36dab4119498818l, false, 16);
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_64, 4), INPUTSIZE);
+            script.forEach_testConvertUlong4Ushort4Ulong4(inV, out);
+            verifyResultsConvertUshort4Ulong4(inV, out, false);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertUlong4Ushort4Ulong4: " + e.toString());
+        }
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_64, 4), INPUTSIZE);
+            scriptRelaxed.forEach_testConvertUlong4Ushort4Ulong4(inV, out);
+            verifyResultsConvertUshort4Ulong4(inV, out, true);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertUlong4Ushort4Ulong4: " + e.toString());
+        }
+    }
+
+    private void verifyResultsConvertUshort4Ulong4(Allocation inV, Allocation out, boolean relaxed) {
+        short[] arrayInV = new short[INPUTSIZE * 4];
+        inV.copyTo(arrayInV);
+        long[] arrayOut = new long[INPUTSIZE * 4];
+        out.copyTo(arrayOut);
+        for (int i = 0; i < INPUTSIZE; i++) {
+            for (int j = 0; j < 4 ; j++) {
+                // Extract the inputs.
+                ArgumentsUshortUlong args = new ArgumentsUshortUlong();
+                args.inV = arrayInV[i * 4 + j];
+                // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
+                CoreMathVerifier.computeConvert(args);
+                // Figure out what the outputs should have been.
+                boolean valid = true;
+                if (args.out != arrayOut[i * 4 + j]) {
+                    valid = false;
+                }
+                if (!valid) {
+                    StringBuilder message = new StringBuilder();
+                    message.append("Input inV: ");
+                    message.append(String.format("0x%x", args.inV));
+                    message.append("\n");
+                    message.append("Expected output out: ");
+                    message.append(String.format("0x%x", args.out));
+                    message.append("\n");
+                    message.append("Actual   output out: ");
+                    message.append(String.format("0x%x", arrayOut[i * 4 + j]));
+                    if (args.out != arrayOut[i * 4 + j]) {
+                        message.append(" FAIL");
+                    }
+                    message.append("\n");
+                    assertTrue("Incorrect output for checkConvertUshort4Ulong4" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                }
+            }
+        }
+    }
+
+    public class ArgumentsIntUlong {
+        public int inV;
+        public long out;
+    }
+
+    private void checkConvertInt2Ulong2() {
+        Allocation inV = createRandomIntegerAllocation(mRS, Element.DataType.SIGNED_32, 2, 0x2a53676074a824f6l, false, 31);
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_64, 2), INPUTSIZE);
+            script.forEach_testConvertUlong2Int2Ulong2(inV, out);
+            verifyResultsConvertInt2Ulong2(inV, out, false);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertUlong2Int2Ulong2: " + e.toString());
+        }
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_64, 2), INPUTSIZE);
+            scriptRelaxed.forEach_testConvertUlong2Int2Ulong2(inV, out);
+            verifyResultsConvertInt2Ulong2(inV, out, true);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertUlong2Int2Ulong2: " + e.toString());
+        }
+    }
+
+    private void verifyResultsConvertInt2Ulong2(Allocation inV, Allocation out, boolean relaxed) {
+        int[] arrayInV = new int[INPUTSIZE * 2];
+        inV.copyTo(arrayInV);
+        long[] arrayOut = new long[INPUTSIZE * 2];
+        out.copyTo(arrayOut);
+        for (int i = 0; i < INPUTSIZE; i++) {
+            for (int j = 0; j < 2 ; j++) {
+                // Extract the inputs.
+                ArgumentsIntUlong args = new ArgumentsIntUlong();
+                args.inV = arrayInV[i * 2 + j];
+                // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
+                CoreMathVerifier.computeConvert(args);
+                // Figure out what the outputs should have been.
+                boolean valid = true;
+                if (args.out != arrayOut[i * 2 + j]) {
+                    valid = false;
+                }
+                if (!valid) {
+                    StringBuilder message = new StringBuilder();
+                    message.append("Input inV: ");
+                    message.append(String.format("%d", args.inV));
+                    message.append("\n");
+                    message.append("Expected output out: ");
+                    message.append(String.format("0x%x", args.out));
+                    message.append("\n");
+                    message.append("Actual   output out: ");
+                    message.append(String.format("0x%x", arrayOut[i * 2 + j]));
+                    if (args.out != arrayOut[i * 2 + j]) {
+                        message.append(" FAIL");
+                    }
+                    message.append("\n");
+                    assertTrue("Incorrect output for checkConvertInt2Ulong2" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                }
+            }
+        }
+    }
+
+    private void checkConvertInt3Ulong3() {
+        Allocation inV = createRandomIntegerAllocation(mRS, Element.DataType.SIGNED_32, 3, 0x2a55307b6ac345d4l, false, 31);
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_64, 3), INPUTSIZE);
+            script.forEach_testConvertUlong3Int3Ulong3(inV, out);
+            verifyResultsConvertInt3Ulong3(inV, out, false);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertUlong3Int3Ulong3: " + e.toString());
+        }
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_64, 3), INPUTSIZE);
+            scriptRelaxed.forEach_testConvertUlong3Int3Ulong3(inV, out);
+            verifyResultsConvertInt3Ulong3(inV, out, true);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertUlong3Int3Ulong3: " + e.toString());
+        }
+    }
+
+    private void verifyResultsConvertInt3Ulong3(Allocation inV, Allocation out, boolean relaxed) {
+        int[] arrayInV = new int[INPUTSIZE * 4];
+        inV.copyTo(arrayInV);
+        long[] arrayOut = new long[INPUTSIZE * 4];
+        out.copyTo(arrayOut);
+        for (int i = 0; i < INPUTSIZE; i++) {
+            for (int j = 0; j < 3 ; j++) {
+                // Extract the inputs.
+                ArgumentsIntUlong args = new ArgumentsIntUlong();
+                args.inV = arrayInV[i * 4 + j];
+                // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
+                CoreMathVerifier.computeConvert(args);
+                // Figure out what the outputs should have been.
+                boolean valid = true;
+                if (args.out != arrayOut[i * 4 + j]) {
+                    valid = false;
+                }
+                if (!valid) {
+                    StringBuilder message = new StringBuilder();
+                    message.append("Input inV: ");
+                    message.append(String.format("%d", args.inV));
+                    message.append("\n");
+                    message.append("Expected output out: ");
+                    message.append(String.format("0x%x", args.out));
+                    message.append("\n");
+                    message.append("Actual   output out: ");
+                    message.append(String.format("0x%x", arrayOut[i * 4 + j]));
+                    if (args.out != arrayOut[i * 4 + j]) {
+                        message.append(" FAIL");
+                    }
+                    message.append("\n");
+                    assertTrue("Incorrect output for checkConvertInt3Ulong3" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                }
+            }
+        }
+    }
+
+    private void checkConvertInt4Ulong4() {
+        Allocation inV = createRandomIntegerAllocation(mRS, Element.DataType.SIGNED_32, 4, 0x2a56f99660de66b2l, false, 31);
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_64, 4), INPUTSIZE);
+            script.forEach_testConvertUlong4Int4Ulong4(inV, out);
+            verifyResultsConvertInt4Ulong4(inV, out, false);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertUlong4Int4Ulong4: " + e.toString());
+        }
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_64, 4), INPUTSIZE);
+            scriptRelaxed.forEach_testConvertUlong4Int4Ulong4(inV, out);
+            verifyResultsConvertInt4Ulong4(inV, out, true);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertUlong4Int4Ulong4: " + e.toString());
+        }
+    }
+
+    private void verifyResultsConvertInt4Ulong4(Allocation inV, Allocation out, boolean relaxed) {
+        int[] arrayInV = new int[INPUTSIZE * 4];
+        inV.copyTo(arrayInV);
+        long[] arrayOut = new long[INPUTSIZE * 4];
+        out.copyTo(arrayOut);
+        for (int i = 0; i < INPUTSIZE; i++) {
+            for (int j = 0; j < 4 ; j++) {
+                // Extract the inputs.
+                ArgumentsIntUlong args = new ArgumentsIntUlong();
+                args.inV = arrayInV[i * 4 + j];
+                // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
+                CoreMathVerifier.computeConvert(args);
+                // Figure out what the outputs should have been.
+                boolean valid = true;
+                if (args.out != arrayOut[i * 4 + j]) {
+                    valid = false;
+                }
+                if (!valid) {
+                    StringBuilder message = new StringBuilder();
+                    message.append("Input inV: ");
+                    message.append(String.format("%d", args.inV));
+                    message.append("\n");
+                    message.append("Expected output out: ");
+                    message.append(String.format("0x%x", args.out));
+                    message.append("\n");
+                    message.append("Actual   output out: ");
+                    message.append(String.format("0x%x", arrayOut[i * 4 + j]));
+                    if (args.out != arrayOut[i * 4 + j]) {
+                        message.append(" FAIL");
+                    }
+                    message.append("\n");
+                    assertTrue("Incorrect output for checkConvertInt4Ulong4" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                }
+            }
+        }
+    }
+
+    public class ArgumentsUintUlong {
+        public int inV;
+        public long out;
+    }
+
+    private void checkConvertUint2Ulong2() {
+        Allocation inV = createRandomIntegerAllocation(mRS, Element.DataType.UNSIGNED_32, 2, 0xd1e120ae072a3177l, false, 32);
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_64, 2), INPUTSIZE);
+            script.forEach_testConvertUlong2Uint2Ulong2(inV, out);
+            verifyResultsConvertUint2Ulong2(inV, out, false);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertUlong2Uint2Ulong2: " + e.toString());
+        }
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_64, 2), INPUTSIZE);
+            scriptRelaxed.forEach_testConvertUlong2Uint2Ulong2(inV, out);
+            verifyResultsConvertUint2Ulong2(inV, out, true);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertUlong2Uint2Ulong2: " + e.toString());
+        }
+    }
+
+    private void verifyResultsConvertUint2Ulong2(Allocation inV, Allocation out, boolean relaxed) {
+        int[] arrayInV = new int[INPUTSIZE * 2];
+        inV.copyTo(arrayInV);
+        long[] arrayOut = new long[INPUTSIZE * 2];
+        out.copyTo(arrayOut);
+        for (int i = 0; i < INPUTSIZE; i++) {
+            for (int j = 0; j < 2 ; j++) {
+                // Extract the inputs.
+                ArgumentsUintUlong args = new ArgumentsUintUlong();
+                args.inV = arrayInV[i * 2 + j];
+                // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
+                CoreMathVerifier.computeConvert(args);
+                // Figure out what the outputs should have been.
+                boolean valid = true;
+                if (args.out != arrayOut[i * 2 + j]) {
+                    valid = false;
+                }
+                if (!valid) {
+                    StringBuilder message = new StringBuilder();
+                    message.append("Input inV: ");
+                    message.append(String.format("0x%x", args.inV));
+                    message.append("\n");
+                    message.append("Expected output out: ");
+                    message.append(String.format("0x%x", args.out));
+                    message.append("\n");
+                    message.append("Actual   output out: ");
+                    message.append(String.format("0x%x", arrayOut[i * 2 + j]));
+                    if (args.out != arrayOut[i * 2 + j]) {
+                        message.append(" FAIL");
+                    }
+                    message.append("\n");
+                    assertTrue("Incorrect output for checkConvertUint2Ulong2" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                }
+            }
+        }
+    }
+
+    private void checkConvertUint3Ulong3() {
+        Allocation inV = createRandomIntegerAllocation(mRS, Element.DataType.UNSIGNED_32, 3, 0xd1e2e9c8fd455255l, false, 32);
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_64, 3), INPUTSIZE);
+            script.forEach_testConvertUlong3Uint3Ulong3(inV, out);
+            verifyResultsConvertUint3Ulong3(inV, out, false);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertUlong3Uint3Ulong3: " + e.toString());
+        }
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_64, 3), INPUTSIZE);
+            scriptRelaxed.forEach_testConvertUlong3Uint3Ulong3(inV, out);
+            verifyResultsConvertUint3Ulong3(inV, out, true);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertUlong3Uint3Ulong3: " + e.toString());
+        }
+    }
+
+    private void verifyResultsConvertUint3Ulong3(Allocation inV, Allocation out, boolean relaxed) {
+        int[] arrayInV = new int[INPUTSIZE * 4];
+        inV.copyTo(arrayInV);
+        long[] arrayOut = new long[INPUTSIZE * 4];
+        out.copyTo(arrayOut);
+        for (int i = 0; i < INPUTSIZE; i++) {
+            for (int j = 0; j < 3 ; j++) {
+                // Extract the inputs.
+                ArgumentsUintUlong args = new ArgumentsUintUlong();
+                args.inV = arrayInV[i * 4 + j];
+                // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
+                CoreMathVerifier.computeConvert(args);
+                // Figure out what the outputs should have been.
+                boolean valid = true;
+                if (args.out != arrayOut[i * 4 + j]) {
+                    valid = false;
+                }
+                if (!valid) {
+                    StringBuilder message = new StringBuilder();
+                    message.append("Input inV: ");
+                    message.append(String.format("0x%x", args.inV));
+                    message.append("\n");
+                    message.append("Expected output out: ");
+                    message.append(String.format("0x%x", args.out));
+                    message.append("\n");
+                    message.append("Actual   output out: ");
+                    message.append(String.format("0x%x", arrayOut[i * 4 + j]));
+                    if (args.out != arrayOut[i * 4 + j]) {
+                        message.append(" FAIL");
+                    }
+                    message.append("\n");
+                    assertTrue("Incorrect output for checkConvertUint3Ulong3" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                }
+            }
+        }
+    }
+
+    private void checkConvertUint4Ulong4() {
+        Allocation inV = createRandomIntegerAllocation(mRS, Element.DataType.UNSIGNED_32, 4, 0xd1e4b2e3f3607333l, false, 32);
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_64, 4), INPUTSIZE);
+            script.forEach_testConvertUlong4Uint4Ulong4(inV, out);
+            verifyResultsConvertUint4Ulong4(inV, out, false);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertUlong4Uint4Ulong4: " + e.toString());
+        }
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_64, 4), INPUTSIZE);
+            scriptRelaxed.forEach_testConvertUlong4Uint4Ulong4(inV, out);
+            verifyResultsConvertUint4Ulong4(inV, out, true);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testConvertUlong4Uint4Ulong4: " + e.toString());
+        }
+    }
+
+    private void verifyResultsConvertUint4Ulong4(Allocation inV, Allocation out, boolean relaxed) {
+        int[] arrayInV = new int[INPUTSIZE * 4];
+        inV.copyTo(arrayInV);
+        long[] arrayOut = new long[INPUTSIZE * 4];
+        out.copyTo(arrayOut);
+        for (int i = 0; i < INPUTSIZE; i++) {
+            for (int j = 0; j < 4 ; j++) {
+                // Extract the inputs.
+                ArgumentsUintUlong args = new ArgumentsUintUlong();
+                args.inV = arrayInV[i * 4 + j];
+                // Figure out what the outputs should have been.
+                Floaty.setRelaxed(relaxed);
+                CoreMathVerifier.computeConvert(args);
+                // Figure out what the outputs should have been.
+                boolean valid = true;
+                if (args.out != arrayOut[i * 4 + j]) {
+                    valid = false;
+                }
+                if (!valid) {
+                    StringBuilder message = new StringBuilder();
+                    message.append("Input inV: ");
+                    message.append(String.format("0x%x", args.inV));
+                    message.append("\n");
+                    message.append("Expected output out: ");
+                    message.append(String.format("0x%x", args.out));
+                    message.append("\n");
+                    message.append("Actual   output out: ");
+                    message.append(String.format("0x%x", arrayOut[i * 4 + j]));
+                    if (args.out != arrayOut[i * 4 + j]) {
+                        message.append(" FAIL");
+                    }
+                    message.append("\n");
+                    assertTrue("Incorrect output for checkConvertUint4Ulong4" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                }
+            }
+        }
+    }
+
     public void testConvert() {
         checkConvertFloat2Float2();
         checkConvertFloat3Float3();
@@ -8848,5 +17902,158 @@ public class TestConvert extends RSBaseCompute {
         checkConvertUint2Uint2();
         checkConvertUint3Uint3();
         checkConvertUint4Uint4();
+        checkConvertDouble2Double2();
+        checkConvertDouble3Double3();
+        checkConvertDouble4Double4();
+        checkConvertLong2Double2();
+        checkConvertLong3Double3();
+        checkConvertLong4Double4();
+        checkConvertUlong2Double2();
+        checkConvertUlong3Double3();
+        checkConvertUlong4Double4();
+        checkConvertDouble2Long2();
+        checkConvertDouble3Long3();
+        checkConvertDouble4Long4();
+        checkConvertLong2Long2();
+        checkConvertLong3Long3();
+        checkConvertLong4Long4();
+        checkConvertUlong2Long2();
+        checkConvertUlong3Long3();
+        checkConvertUlong4Long4();
+        checkConvertDouble2Ulong2();
+        checkConvertDouble3Ulong3();
+        checkConvertDouble4Ulong4();
+        checkConvertLong2Ulong2();
+        checkConvertLong3Ulong3();
+        checkConvertLong4Ulong4();
+        checkConvertUlong2Ulong2();
+        checkConvertUlong3Ulong3();
+        checkConvertUlong4Ulong4();
+        checkConvertDouble2Float2();
+        checkConvertDouble3Float3();
+        checkConvertDouble4Float4();
+        checkConvertLong2Float2();
+        checkConvertLong3Float3();
+        checkConvertLong4Float4();
+        checkConvertUlong2Float2();
+        checkConvertUlong3Float3();
+        checkConvertUlong4Float4();
+        checkConvertDouble2Char2();
+        checkConvertDouble3Char3();
+        checkConvertDouble4Char4();
+        checkConvertLong2Char2();
+        checkConvertLong3Char3();
+        checkConvertLong4Char4();
+        checkConvertUlong2Char2();
+        checkConvertUlong3Char3();
+        checkConvertUlong4Char4();
+        checkConvertDouble2Uchar2();
+        checkConvertDouble3Uchar3();
+        checkConvertDouble4Uchar4();
+        checkConvertLong2Uchar2();
+        checkConvertLong3Uchar3();
+        checkConvertLong4Uchar4();
+        checkConvertUlong2Uchar2();
+        checkConvertUlong3Uchar3();
+        checkConvertUlong4Uchar4();
+        checkConvertDouble2Short2();
+        checkConvertDouble3Short3();
+        checkConvertDouble4Short4();
+        checkConvertLong2Short2();
+        checkConvertLong3Short3();
+        checkConvertLong4Short4();
+        checkConvertUlong2Short2();
+        checkConvertUlong3Short3();
+        checkConvertUlong4Short4();
+        checkConvertDouble2Ushort2();
+        checkConvertDouble3Ushort3();
+        checkConvertDouble4Ushort4();
+        checkConvertLong2Ushort2();
+        checkConvertLong3Ushort3();
+        checkConvertLong4Ushort4();
+        checkConvertUlong2Ushort2();
+        checkConvertUlong3Ushort3();
+        checkConvertUlong4Ushort4();
+        checkConvertDouble2Int2();
+        checkConvertDouble3Int3();
+        checkConvertDouble4Int4();
+        checkConvertLong2Int2();
+        checkConvertLong3Int3();
+        checkConvertLong4Int4();
+        checkConvertUlong2Int2();
+        checkConvertUlong3Int3();
+        checkConvertUlong4Int4();
+        checkConvertDouble2Uint2();
+        checkConvertDouble3Uint3();
+        checkConvertDouble4Uint4();
+        checkConvertLong2Uint2();
+        checkConvertLong3Uint3();
+        checkConvertLong4Uint4();
+        checkConvertUlong2Uint2();
+        checkConvertUlong3Uint3();
+        checkConvertUlong4Uint4();
+        checkConvertFloat2Double2();
+        checkConvertFloat3Double3();
+        checkConvertFloat4Double4();
+        checkConvertChar2Double2();
+        checkConvertChar3Double3();
+        checkConvertChar4Double4();
+        checkConvertUchar2Double2();
+        checkConvertUchar3Double3();
+        checkConvertUchar4Double4();
+        checkConvertShort2Double2();
+        checkConvertShort3Double3();
+        checkConvertShort4Double4();
+        checkConvertUshort2Double2();
+        checkConvertUshort3Double3();
+        checkConvertUshort4Double4();
+        checkConvertInt2Double2();
+        checkConvertInt3Double3();
+        checkConvertInt4Double4();
+        checkConvertUint2Double2();
+        checkConvertUint3Double3();
+        checkConvertUint4Double4();
+        checkConvertFloat2Long2();
+        checkConvertFloat3Long3();
+        checkConvertFloat4Long4();
+        checkConvertChar2Long2();
+        checkConvertChar3Long3();
+        checkConvertChar4Long4();
+        checkConvertUchar2Long2();
+        checkConvertUchar3Long3();
+        checkConvertUchar4Long4();
+        checkConvertShort2Long2();
+        checkConvertShort3Long3();
+        checkConvertShort4Long4();
+        checkConvertUshort2Long2();
+        checkConvertUshort3Long3();
+        checkConvertUshort4Long4();
+        checkConvertInt2Long2();
+        checkConvertInt3Long3();
+        checkConvertInt4Long4();
+        checkConvertUint2Long2();
+        checkConvertUint3Long3();
+        checkConvertUint4Long4();
+        checkConvertFloat2Ulong2();
+        checkConvertFloat3Ulong3();
+        checkConvertFloat4Ulong4();
+        checkConvertChar2Ulong2();
+        checkConvertChar3Ulong3();
+        checkConvertChar4Ulong4();
+        checkConvertUchar2Ulong2();
+        checkConvertUchar3Ulong3();
+        checkConvertUchar4Ulong4();
+        checkConvertShort2Ulong2();
+        checkConvertShort3Ulong3();
+        checkConvertShort4Ulong4();
+        checkConvertUshort2Ulong2();
+        checkConvertUshort3Ulong3();
+        checkConvertUshort4Ulong4();
+        checkConvertInt2Ulong2();
+        checkConvertInt3Ulong3();
+        checkConvertInt4Ulong4();
+        checkConvertUint2Ulong2();
+        checkConvertUint3Ulong3();
+        checkConvertUint4Ulong4();
     }
 }
