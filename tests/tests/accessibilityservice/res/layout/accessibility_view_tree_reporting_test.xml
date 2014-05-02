@@ -29,19 +29,22 @@
               android:id="@+id/firstTextView"
               android:layout_width="wrap_content"
               android:layout_height="wrap_content"
-              android:text="@string/firstTextView" />
+              android:text="@string/firstTextView"
+              android:textSize="10dip" />
 
           <EditText
               android:id="@+id/firstEditText"
-              android:layout_width="200dip"
+              android:layout_width="20dip"
               android:layout_height="wrap_content"
-              android:contentDescription="@string/firstEditText" />
+              android:contentDescription="@string/firstEditText"
+              android:textSize="10dip" />
 
           <Button
               android:id="@+id/firstButton"
               android:layout_width="wrap_content"
               android:layout_height="wrap_content"
-              android:text="@string/firstButton" />
+              android:text="@string/firstButton"
+              android:textSize="10dip" />
 
       </LinearLayout>
 
@@ -68,19 +71,22 @@
               android:id="@+id/secondTextView"
               android:layout_width="wrap_content"
               android:layout_height="wrap_content"
-              android:text="@string/secondTextView" />
+              android:text="@string/secondTextView"
+              android:textSize="10dip" />
 
           <EditText
               android:id="@+id/secondEditText"
-              android:layout_width="200dip"
+              android:layout_width="20dip"
               android:layout_height="wrap_content"
-              android:contentDescription="@string/secondEditText" />
+              android:contentDescription="@string/secondEditText"
+              android:textSize="10dip" />
 
           <Button
               android:id="@+id/secondButton"
               android:layout_width="wrap_content"
               android:layout_height="wrap_content"
-              android:text="@string/secondButton" />
+              android:text="@string/secondButton"
+              android:textSize="10dip" />
 
       </LinearLayout>
 
