@@ -18,7 +18,6 @@ package android.hardware.camera2.cts;
 
 import android.content.Context;
 import android.graphics.ImageFormat;
-import android.hardware.camera2.CameraCharacteristics;
 import android.hardware.camera2.CameraDevice;
 import android.hardware.camera2.CameraMetadata;
 import android.hardware.camera2.CaptureRequest;
@@ -38,14 +37,13 @@ public class CaptureResultTest extends Camera2AndroidTestCase {
     private static final String TAG = "CaptureResultTest";
     private static final boolean VERBOSE = Log.isLoggable(TAG, Log.VERBOSE);
     private static final int MAX_NUM_IMAGES = 5;
-    private static final int NUM_FRAMES_VERIFIED = 300;
+    private static final int NUM_FRAMES_VERIFIED = 30;
     private static final long WAIT_FOR_RESULT_TIMEOUT_MS = 3000;
 
     // List that includes all public keys from CaptureResult
     List<CameraMetadata.Key<?>> mAllKeys;
 
     // List tracking the failed test keys.
-    List<CameraMetadata.Key<?>> mFailedKeys = new ArrayList<CameraMetadata.Key<?>>();
 
     @Override
     public void setContext(Context context) {
@@ -56,7 +54,6 @@ public class CaptureResultTest extends Camera2AndroidTestCase {
     @Override
     protected void setUp() throws Exception {
         super.setUp();
-        mFailedKeys.clear();
     }
 
     @Override
@@ -89,28 +86,22 @@ public class CaptureResultTest extends Camera2AndroidTestCase {
         waiverkeys.add(CaptureResult.JPEG_THUMBNAIL_QUALITY);
         waiverkeys.add(CaptureResult.JPEG_THUMBNAIL_SIZE);
         waiverkeys.add(CaptureResult.SENSOR_TEMPERATURE);
+        waiverkeys.add(CaptureResult.SENSOR_PROFILE_HUE_SAT_MAP); // Will put @hide.
+        waiverkeys.add(CaptureResult.SENSOR_PROFILE_TONE_CURVE); // Not need for non raw capture.
 
-        String[] ids = mCameraManager.getCameraIdList();
-        for (int i = 0; i < ids.length; i++) {
-            CameraCharacteristics props = mCameraManager.getCameraCharacteristics(ids[i]);
-            assertNotNull("CameraCharacteristics shouldn't be null", props);
-            Integer hwLevel = props.get(CameraCharacteristics.INFO_SUPPORTED_HARDWARE_LEVEL);
-            if (hwLevel != CameraCharacteristics.INFO_SUPPORTED_HARDWARE_LEVEL_FULL) {
-                continue;
-            }
-            // TODO: check for LIMITED keys
-
+        for (String id : mCameraIds) {
             try {
-                // Create image reader and surface.
-                Size sz = getMaxPreviewSize(ids[i], mCameraManager);
-                createDefaultImageReader(sz, ImageFormat.YUV_420_888, MAX_NUM_IMAGES,
-                        new ImageDropperListener());
-                if (VERBOSE) {
-                    Log.v(TAG, "Testing camera " + ids[i] + "for size " + sz.toString());
+                openDevice(id);
+                if (!mStaticInfo.isHardwareLevelFull()) {
+                    Log.i(TAG, "Camera " + id + " is not a full mode device, skip the test");
+                    continue;
                 }
+                // TODO: check for LIMITED keys
 
-                // Open camera.
-                openDevice(ids[i]);
+                // Create image reader and surface.
+                Size size = mOrderedPreviewSizes.get(0);
+                createDefaultImageReader(size, ImageFormat.YUV_420_888, MAX_NUM_IMAGES,
+                        new ImageDropperListener());
 
                 // Configure output streams.
                 List<Surface> outputSurfaces = new ArrayList<Surface>(1);
@@ -123,17 +114,15 @@ public class CaptureResultTest extends Camera2AndroidTestCase {
                 requestBuilder.addTarget(mReaderSurface);
 
                 // Enable face detection if supported
-                byte[] faceModes = props.get(
-                        CameraCharacteristics.STATISTICS_INFO_AVAILABLE_FACE_DETECT_MODES);
-                assertNotNull("Available face detection modes shouldn't be null", faceModes);
-                for (int m = 0; m < faceModes.length; m++) {
-                    if (faceModes[m] == CameraMetadata.STATISTICS_FACE_DETECT_MODE_FULL) {
+                byte[] faceModes = mStaticInfo.getAvailableFaceDetectModesChecked();
+                for (int i = 0; i < faceModes.length; i++) {
+                    if (faceModes[i] == CameraMetadata.STATISTICS_FACE_DETECT_MODE_FULL) {
                         if (VERBOSE) {
                             Log.v(TAG, "testCameraCaptureResultAllKeys - " +
                                     "setting facedetection mode to full");
                         }
                         requestBuilder.set(CaptureRequest.STATISTICS_FACE_DETECT_MODE,
-                                (int)faceModes[m]);
+                                (int)faceModes[i]);
                     }
                 }
 
@@ -146,35 +135,67 @@ public class CaptureResultTest extends Camera2AndroidTestCase {
                 startCapture(requestBuilder.build(), /*repeating*/true, captureListener, mHandler);
 
                 // Verify results
-                validateCaptureResult(captureListener, waiverkeys, NUM_FRAMES_VERIFIED);
+                validateCaptureResult(captureListener, waiverkeys, requestBuilder,
+                        NUM_FRAMES_VERIFIED);
 
                 stopCapture(/*fast*/false);
             } finally {
-                closeDevice(ids[i]);
+                closeDevice(id);
                 closeDefaultImageReader();
             }
-
         }
     }
 
     private void validateCaptureResult(SimpleCaptureListener captureListener,
-            List<CameraMetadata.Key<?>> skippedKeys, int numFramesVerified) throws Exception {
+            List<CameraMetadata.Key<?>> skippedKeys, CaptureRequest.Builder requestBuilder,
+            int numFramesVerified) throws Exception {
         CaptureResult result = null;
         for (int i = 0; i < numFramesVerified; i++) {
+            String failMsg = "Failed capture result " + i + " test ";
             result = captureListener.getCaptureResult(WAIT_FOR_RESULT_TIMEOUT_MS);
             for (CameraMetadata.Key<?> key : mAllKeys) {
-                if (!skippedKeys.contains(key) && result.get(key) == null) {
-                    mFailedKeys.add(key);
+                if (!skippedKeys.contains(key)) {
+                    /**
+                     * Check the critical tags here.
+                     * TODO: Can use the same key for request and result when request/result
+                     * becomes symmetric (b/14059883). Then below check can be wrapped into
+                     * a generic function.
+                     */
+                    String msg = failMsg + "for key " + key.getName();
+                    if (key.equals(CaptureRequest.CONTROL_AE_MODE)) {
+                        mCollector.expectEquals(msg,
+                                requestBuilder.get(CaptureRequest.CONTROL_AE_MODE),
+                                result.get(CaptureResult.CONTROL_AE_MODE));
+                    } else if (key.equals(CaptureRequest.CONTROL_AF_MODE)) {
+                        mCollector.expectEquals(msg,
+                                requestBuilder.get(CaptureRequest.CONTROL_AF_MODE),
+                                result.get(CaptureResult.CONTROL_AF_MODE));
+                    } else if (key.equals(CaptureRequest.CONTROL_AWB_MODE)) {
+                        mCollector.expectEquals(msg,
+                                requestBuilder.get(CaptureRequest.CONTROL_AWB_MODE),
+                                result.get(CaptureResult.CONTROL_AWB_MODE));
+                    } else if (key.equals(CaptureRequest.CONTROL_MODE)) {
+                        mCollector.expectEquals(msg,
+                                requestBuilder.get(CaptureRequest.CONTROL_MODE),
+                                result.get(CaptureResult.CONTROL_MODE));
+                    } else if (key.equals(CaptureRequest.STATISTICS_FACE_DETECT_MODE)) {
+                        mCollector.expectEquals(msg,
+                                requestBuilder.get(CaptureRequest.STATISTICS_FACE_DETECT_MODE),
+                                result.get(CaptureResult.STATISTICS_FACE_DETECT_MODE));
+                    } else if (key.equals(CaptureRequest.NOISE_REDUCTION_MODE)) {
+                        mCollector.expectEquals(msg,
+                                requestBuilder.get(CaptureRequest.NOISE_REDUCTION_MODE),
+                                result.get(CaptureResult.NOISE_REDUCTION_MODE));
+                    } else if (key.equals(CaptureRequest.NOISE_REDUCTION_MODE)) {
+                        mCollector.expectEquals(msg,
+                                requestBuilder.get(CaptureRequest.NOISE_REDUCTION_MODE),
+                                result.get(CaptureResult.NOISE_REDUCTION_MODE));
+                    } else {
+                        // Only do non-null check for the rest of keys.
+                        mCollector.expectKeyValueNotNull(failMsg, result, key);
+                    }
                 }
             }
-
-            StringBuffer failedKeyNames = new StringBuffer("Below Keys have null values:\n");
-            for (CameraMetadata.Key<?> key : mFailedKeys) {
-                failedKeyNames.append(key.getName() + "\n");
-            }
-
-            assertTrue("Some keys have null values, " + failedKeyNames.toString(),
-                    mFailedKeys.isEmpty());
         }
     }
 
