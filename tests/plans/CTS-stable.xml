@@ -35,7 +35,6 @@
   <Entry uri="android.core.tests.libcore.package.tests"/>
   <Entry uri="android.core.vm-tests-tf"/>
   <Entry uri="android.database"/>
-  <Entry uri="android.display"/>
   <Entry uri="android.dpi"/>
   <Entry uri="android.dpi2"/>
   <Entry uri="android.dreams"/>
