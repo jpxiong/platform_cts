@@ -23,6 +23,8 @@ LOCAL_MODULE_PATH := $(TARGET_OUT_DATA_APPS)
 
 LOCAL_STATIC_JAVA_LIBRARIES := ctsdeviceutil ctstestserver ctstestrunner
 
+LOCAL_JNI_SHARED_LIBRARIES := libctsmediacodec_jni
+
 LOCAL_SRC_FILES := $(call all-java-files-under, src)
 
 LOCAL_PACKAGE_NAME := CtsMediaTestCases
@@ -32,3 +34,5 @@ LOCAL_PACKAGE_NAME := CtsMediaTestCases
 LOCAL_JAVA_LIBRARIES += android.test.runner
 
 include $(BUILD_CTS_PACKAGE)
+
+include $(call all-makefiles-under,$(LOCAL_PATH))
