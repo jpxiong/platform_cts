@@ -63,7 +63,7 @@ public class CtsDeviceJankOpenGl extends CtsJankTestBase {
         sb.append(String.format(START_CMD, COMPONENT));
         sb.append(String.format(INTENT_STRING_EXTRA, "benchmark_name", benchmark));
         sb.append(String.format(INTENT_BOOLEAN_EXTRA, "offscreen", false));
-        sb.append(String.format(INTENT_INTEGER_EXTRA, "num_frames", 400));
+        sb.append(String.format(INTENT_INTEGER_EXTRA, "num_frames", 1000));
         sb.append(String.format(INTENT_INTEGER_EXTRA, "num_iterations", 1));
         sb.append(String.format(INTENT_INTEGER_EXTRA, "timeout", 10000));
         final String startCommand = sb.toString();
