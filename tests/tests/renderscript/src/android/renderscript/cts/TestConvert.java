@@ -40,7 +40,7 @@ public class TestConvert extends RSBaseCompute {
     }
 
     private void checkConvertFloat2Float2() {
-        Allocation inV = createRandomFloatAllocation(mRS, Element.DataType.FLOAT_32, 2, 0xfb5215c44e1f6ac6l, -1.6163412429e+38, 1.6163412429e+38);
+        Allocation inV = createRandomFloatAllocation(mRS, Element.DataType.FLOAT_32, 2, 0xfb5215c44e1f6ac6l, -1.6163412428744576259e+38, 1.6163412428744576259e+38);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 2), INPUTSIZE);
             script.forEach_testConvertFloat2Float2Float2(inV, out);
@@ -99,7 +99,7 @@ public class TestConvert extends RSBaseCompute {
     }
 
     private void checkConvertFloat3Float3() {
-        Allocation inV = createRandomFloatAllocation(mRS, Element.DataType.FLOAT_32, 3, 0xfb53dedf443a8ba4l, -1.6163412429e+38, 1.6163412429e+38);
+        Allocation inV = createRandomFloatAllocation(mRS, Element.DataType.FLOAT_32, 3, 0xfb53dedf443a8ba4l, -1.6163412428744576259e+38, 1.6163412428744576259e+38);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 3), INPUTSIZE);
             script.forEach_testConvertFloat3Float3Float3(inV, out);
@@ -158,7 +158,7 @@ public class TestConvert extends RSBaseCompute {
     }
 
     private void checkConvertFloat4Float4() {
-        Allocation inV = createRandomFloatAllocation(mRS, Element.DataType.FLOAT_32, 4, 0xfb55a7fa3a55ac82l, -1.6163412429e+38, 1.6163412429e+38);
+        Allocation inV = createRandomFloatAllocation(mRS, Element.DataType.FLOAT_32, 4, 0xfb55a7fa3a55ac82l, -1.6163412428744576259e+38, 1.6163412428744576259e+38);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 4), INPUTSIZE);
             script.forEach_testConvertFloat4Float4Float4(inV, out);
@@ -1296,7 +1296,7 @@ public class TestConvert extends RSBaseCompute {
     }
 
     private void checkConvertFloat2Char2() {
-        Allocation inV = createRandomFloatAllocation(mRS, Element.DataType.FLOAT_32, 2, 0x239cb25829789662l, -1.2800000000e+02, 1.2700000000e+02);
+        Allocation inV = createRandomFloatAllocation(mRS, Element.DataType.FLOAT_32, 2, 0x239cb25829789662l, -1.2800000000000000000e+02, 1.2700000000000000000e+02);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_8, 2), INPUTSIZE);
             script.forEach_testConvertChar2Float2Char2(inV, out);
@@ -1354,7 +1354,7 @@ public class TestConvert extends RSBaseCompute {
     }
 
     private void checkConvertFloat3Char3() {
-        Allocation inV = createRandomFloatAllocation(mRS, Element.DataType.FLOAT_32, 3, 0x239cbcf988805b56l, -1.2800000000e+02, 1.2700000000e+02);
+        Allocation inV = createRandomFloatAllocation(mRS, Element.DataType.FLOAT_32, 3, 0x239cbcf988805b56l, -1.2800000000000000000e+02, 1.2700000000000000000e+02);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_8, 3), INPUTSIZE);
             script.forEach_testConvertChar3Float3Char3(inV, out);
@@ -1412,7 +1412,7 @@ public class TestConvert extends RSBaseCompute {
     }
 
     private void checkConvertFloat4Char4() {
-        Allocation inV = createRandomFloatAllocation(mRS, Element.DataType.FLOAT_32, 4, 0x239cc79ae788204al, -1.2800000000e+02, 1.2700000000e+02);
+        Allocation inV = createRandomFloatAllocation(mRS, Element.DataType.FLOAT_32, 4, 0x239cc79ae788204al, -1.2800000000000000000e+02, 1.2700000000000000000e+02);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_8, 4), INPUTSIZE);
             script.forEach_testConvertChar4Float4Char4(inV, out);
@@ -2531,7 +2531,7 @@ public class TestConvert extends RSBaseCompute {
     }
 
     private void checkConvertFloat2Uchar2() {
-        Allocation inV = createRandomFloatAllocation(mRS, Element.DataType.FLOAT_32, 2, 0xfb52b2f4fac15b79l, 0.0000000000e+00, 2.5500000000e+02);
+        Allocation inV = createRandomFloatAllocation(mRS, Element.DataType.FLOAT_32, 2, 0xfb52b2f4fac15b79l, 0.0000000000000000000e+00, 2.5500000000000000000e+02);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_8, 2), INPUTSIZE);
             script.forEach_testConvertUchar2Float2Uchar2(inV, out);
@@ -2589,7 +2589,7 @@ public class TestConvert extends RSBaseCompute {
     }
 
     private void checkConvertFloat3Uchar3() {
-        Allocation inV = createRandomFloatAllocation(mRS, Element.DataType.FLOAT_32, 3, 0xfb547c0ff0dc7c57l, 0.0000000000e+00, 2.5500000000e+02);
+        Allocation inV = createRandomFloatAllocation(mRS, Element.DataType.FLOAT_32, 3, 0xfb547c0ff0dc7c57l, 0.0000000000000000000e+00, 2.5500000000000000000e+02);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_8, 3), INPUTSIZE);
             script.forEach_testConvertUchar3Float3Uchar3(inV, out);
@@ -2647,7 +2647,7 @@ public class TestConvert extends RSBaseCompute {
     }
 
     private void checkConvertFloat4Uchar4() {
-        Allocation inV = createRandomFloatAllocation(mRS, Element.DataType.FLOAT_32, 4, 0xfb56452ae6f79d35l, 0.0000000000e+00, 2.5500000000e+02);
+        Allocation inV = createRandomFloatAllocation(mRS, Element.DataType.FLOAT_32, 4, 0xfb56452ae6f79d35l, 0.0000000000000000000e+00, 2.5500000000000000000e+02);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_8, 4), INPUTSIZE);
             script.forEach_testConvertUchar4Float4Uchar4(inV, out);
@@ -3766,7 +3766,7 @@ public class TestConvert extends RSBaseCompute {
     }
 
     private void checkConvertFloat2Short2() {
-        Allocation inV = createRandomFloatAllocation(mRS, Element.DataType.FLOAT_32, 2, 0xfb529ef98fcf2692l, -3.2768000000e+04, 3.2767000000e+04);
+        Allocation inV = createRandomFloatAllocation(mRS, Element.DataType.FLOAT_32, 2, 0xfb529ef98fcf2692l, -3.2768000000000000000e+04, 3.2767000000000000000e+04);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_16, 2), INPUTSIZE);
             script.forEach_testConvertShort2Float2Short2(inV, out);
@@ -3824,7 +3824,7 @@ public class TestConvert extends RSBaseCompute {
     }
 
     private void checkConvertFloat3Short3() {
-        Allocation inV = createRandomFloatAllocation(mRS, Element.DataType.FLOAT_32, 3, 0xfb54681485ea4770l, -3.2768000000e+04, 3.2767000000e+04);
+        Allocation inV = createRandomFloatAllocation(mRS, Element.DataType.FLOAT_32, 3, 0xfb54681485ea4770l, -3.2768000000000000000e+04, 3.2767000000000000000e+04);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_16, 3), INPUTSIZE);
             script.forEach_testConvertShort3Float3Short3(inV, out);
@@ -3882,7 +3882,7 @@ public class TestConvert extends RSBaseCompute {
     }
 
     private void checkConvertFloat4Short4() {
-        Allocation inV = createRandomFloatAllocation(mRS, Element.DataType.FLOAT_32, 4, 0xfb56312f7c05684el, -3.2768000000e+04, 3.2767000000e+04);
+        Allocation inV = createRandomFloatAllocation(mRS, Element.DataType.FLOAT_32, 4, 0xfb56312f7c05684el, -3.2768000000000000000e+04, 3.2767000000000000000e+04);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_16, 4), INPUTSIZE);
             script.forEach_testConvertShort4Float4Short4(inV, out);
@@ -5001,7 +5001,7 @@ public class TestConvert extends RSBaseCompute {
     }
 
     private void checkConvertFloat2Ushort2() {
-        Allocation inV = createRandomFloatAllocation(mRS, Element.DataType.FLOAT_32, 2, 0x36e4b950b708416fl, 0.0000000000e+00, 6.5535000000e+04);
+        Allocation inV = createRandomFloatAllocation(mRS, Element.DataType.FLOAT_32, 2, 0x36e4b950b708416fl, 0.0000000000000000000e+00, 6.5535000000000000000e+04);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_16, 2), INPUTSIZE);
             script.forEach_testConvertUshort2Float2Ushort2(inV, out);
@@ -5059,7 +5059,7 @@ public class TestConvert extends RSBaseCompute {
     }
 
     private void checkConvertFloat3Ushort3() {
-        Allocation inV = createRandomFloatAllocation(mRS, Element.DataType.FLOAT_32, 3, 0x373180d80d63d29bl, 0.0000000000e+00, 6.5535000000e+04);
+        Allocation inV = createRandomFloatAllocation(mRS, Element.DataType.FLOAT_32, 3, 0x373180d80d63d29bl, 0.0000000000000000000e+00, 6.5535000000000000000e+04);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_16, 3), INPUTSIZE);
             script.forEach_testConvertUshort3Float3Ushort3(inV, out);
@@ -5117,7 +5117,7 @@ public class TestConvert extends RSBaseCompute {
     }
 
     private void checkConvertFloat4Ushort4() {
-        Allocation inV = createRandomFloatAllocation(mRS, Element.DataType.FLOAT_32, 4, 0x377e485f63bf63c7l, 0.0000000000e+00, 6.5535000000e+04);
+        Allocation inV = createRandomFloatAllocation(mRS, Element.DataType.FLOAT_32, 4, 0x377e485f63bf63c7l, 0.0000000000000000000e+00, 6.5535000000000000000e+04);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_16, 4), INPUTSIZE);
             script.forEach_testConvertUshort4Float4Ushort4(inV, out);
@@ -6236,7 +6236,7 @@ public class TestConvert extends RSBaseCompute {
     }
 
     private void checkConvertFloat2Int2() {
-        Allocation inV = createRandomFloatAllocation(mRS, Element.DataType.FLOAT_32, 2, 0x8fb63fb7c069dd5dl, -2.1474836480e+09, 2.1474836470e+09);
+        Allocation inV = createRandomFloatAllocation(mRS, Element.DataType.FLOAT_32, 2, 0x8fb63fb7c069dd5dl, -2.1474835210000000000e+09, 2.1474835200000000000e+09);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_32, 2), INPUTSIZE);
             script.forEach_testConvertInt2Float2Int2(inV, out);
@@ -6294,7 +6294,7 @@ public class TestConvert extends RSBaseCompute {
     }
 
     private void checkConvertFloat3Int3() {
-        Allocation inV = createRandomFloatAllocation(mRS, Element.DataType.FLOAT_32, 3, 0x8fb63ff70a11ed93l, -2.1474836480e+09, 2.1474836470e+09);
+        Allocation inV = createRandomFloatAllocation(mRS, Element.DataType.FLOAT_32, 3, 0x8fb63ff70a11ed93l, -2.1474835210000000000e+09, 2.1474835200000000000e+09);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_32, 3), INPUTSIZE);
             script.forEach_testConvertInt3Float3Int3(inV, out);
@@ -6352,7 +6352,7 @@ public class TestConvert extends RSBaseCompute {
     }
 
     private void checkConvertFloat4Int4() {
-        Allocation inV = createRandomFloatAllocation(mRS, Element.DataType.FLOAT_32, 4, 0x8fb6403653b9fdc9l, -2.1474836480e+09, 2.1474836470e+09);
+        Allocation inV = createRandomFloatAllocation(mRS, Element.DataType.FLOAT_32, 4, 0x8fb6403653b9fdc9l, -2.1474835210000000000e+09, 2.1474835200000000000e+09);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_32, 4), INPUTSIZE);
             script.forEach_testConvertInt4Float4Int4(inV, out);
@@ -7471,7 +7471,7 @@ public class TestConvert extends RSBaseCompute {
     }
 
     private void checkConvertFloat2Uint2() {
-        Allocation inV = createRandomFloatAllocation(mRS, Element.DataType.FLOAT_32, 2, 0x239cb6cd424dca22l, 0.0000000000e+00, 4.2949672950e+09);
+        Allocation inV = createRandomFloatAllocation(mRS, Element.DataType.FLOAT_32, 2, 0x239cb6cd424dca22l, 0.0000000000000000000e+00, 4.2949670400000000000e+09);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_32, 2), INPUTSIZE);
             script.forEach_testConvertUint2Float2Uint2(inV, out);
@@ -7529,7 +7529,7 @@ public class TestConvert extends RSBaseCompute {
     }
 
     private void checkConvertFloat3Uint3() {
-        Allocation inV = createRandomFloatAllocation(mRS, Element.DataType.FLOAT_32, 3, 0x239cc16ea1558f16l, 0.0000000000e+00, 4.2949672950e+09);
+        Allocation inV = createRandomFloatAllocation(mRS, Element.DataType.FLOAT_32, 3, 0x239cc16ea1558f16l, 0.0000000000000000000e+00, 4.2949670400000000000e+09);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_32, 3), INPUTSIZE);
             script.forEach_testConvertUint3Float3Uint3(inV, out);
@@ -7587,7 +7587,7 @@ public class TestConvert extends RSBaseCompute {
     }
 
     private void checkConvertFloat4Uint4() {
-        Allocation inV = createRandomFloatAllocation(mRS, Element.DataType.FLOAT_32, 4, 0x239ccc10005d540al, 0.0000000000e+00, 4.2949672950e+09);
+        Allocation inV = createRandomFloatAllocation(mRS, Element.DataType.FLOAT_32, 4, 0x239ccc10005d540al, 0.0000000000000000000e+00, 4.2949670400000000000e+09);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_32, 4), INPUTSIZE);
             script.forEach_testConvertUint4Float4Uint4(inV, out);
