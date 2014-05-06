@@ -162,34 +162,36 @@ public class CaptureResultTest extends Camera2AndroidTestCase {
                      * a generic function.
                      */
                     String msg = failMsg + "for key " + key.getName();
-                    if (key.equals(CaptureRequest.CONTROL_AE_MODE)) {
+                    if (key.equals(CaptureResult.CONTROL_AE_MODE)) {
                         mCollector.expectEquals(msg,
                                 requestBuilder.get(CaptureRequest.CONTROL_AE_MODE),
                                 result.get(CaptureResult.CONTROL_AE_MODE));
-                    } else if (key.equals(CaptureRequest.CONTROL_AF_MODE)) {
+                    } else if (key.equals(CaptureResult.CONTROL_AF_MODE)) {
                         mCollector.expectEquals(msg,
                                 requestBuilder.get(CaptureRequest.CONTROL_AF_MODE),
                                 result.get(CaptureResult.CONTROL_AF_MODE));
-                    } else if (key.equals(CaptureRequest.CONTROL_AWB_MODE)) {
+                    } else if (key.equals(CaptureResult.CONTROL_AWB_MODE)) {
                         mCollector.expectEquals(msg,
                                 requestBuilder.get(CaptureRequest.CONTROL_AWB_MODE),
                                 result.get(CaptureResult.CONTROL_AWB_MODE));
-                    } else if (key.equals(CaptureRequest.CONTROL_MODE)) {
+                    } else if (key.equals(CaptureResult.CONTROL_MODE)) {
                         mCollector.expectEquals(msg,
                                 requestBuilder.get(CaptureRequest.CONTROL_MODE),
                                 result.get(CaptureResult.CONTROL_MODE));
-                    } else if (key.equals(CaptureRequest.STATISTICS_FACE_DETECT_MODE)) {
+                    } else if (key.equals(CaptureResult.STATISTICS_FACE_DETECT_MODE)) {
                         mCollector.expectEquals(msg,
                                 requestBuilder.get(CaptureRequest.STATISTICS_FACE_DETECT_MODE),
                                 result.get(CaptureResult.STATISTICS_FACE_DETECT_MODE));
-                    } else if (key.equals(CaptureRequest.NOISE_REDUCTION_MODE)) {
+                    } else if (key.equals(CaptureResult.NOISE_REDUCTION_MODE)) {
                         mCollector.expectEquals(msg,
                                 requestBuilder.get(CaptureRequest.NOISE_REDUCTION_MODE),
                                 result.get(CaptureResult.NOISE_REDUCTION_MODE));
-                    } else if (key.equals(CaptureRequest.NOISE_REDUCTION_MODE)) {
+                    } else if (key.equals(CaptureResult.NOISE_REDUCTION_MODE)) {
                         mCollector.expectEquals(msg,
                                 requestBuilder.get(CaptureRequest.NOISE_REDUCTION_MODE),
                                 result.get(CaptureResult.NOISE_REDUCTION_MODE));
+                    } else if (key.equals(CaptureResult.REQUEST_PIPELINE_DEPTH)) {
+
                     } else {
                         // Only do non-null check for the rest of keys.
                         mCollector.expectKeyValueNotNull(failMsg, result, key);
@@ -213,15 +215,27 @@ public class CaptureResultTest extends Camera2AndroidTestCase {
 
     private static List<CameraMetadata.Key<?>> getAllCaptureResultKeys() {
         ArrayList<CameraMetadata.Key<?>> resultKeys = new ArrayList<CameraMetadata.Key<?>>();
+        resultKeys.add(CaptureResult.COLOR_CORRECTION_MODE);
         resultKeys.add(CaptureResult.COLOR_CORRECTION_TRANSFORM);
         resultKeys.add(CaptureResult.COLOR_CORRECTION_GAINS);
+        resultKeys.add(CaptureResult.CONTROL_AE_ANTIBANDING_MODE);
+        resultKeys.add(CaptureResult.CONTROL_AE_EXPOSURE_COMPENSATION);
+        resultKeys.add(CaptureResult.CONTROL_AE_LOCK);
         resultKeys.add(CaptureResult.CONTROL_AE_MODE);
         resultKeys.add(CaptureResult.CONTROL_AE_REGIONS);
+        resultKeys.add(CaptureResult.CONTROL_AE_TARGET_FPS_RANGE);
+        resultKeys.add(CaptureResult.CONTROL_AE_PRECAPTURE_TRIGGER);
         resultKeys.add(CaptureResult.CONTROL_AF_MODE);
         resultKeys.add(CaptureResult.CONTROL_AF_REGIONS);
+        resultKeys.add(CaptureResult.CONTROL_AF_TRIGGER);
+        resultKeys.add(CaptureResult.CONTROL_AWB_LOCK);
         resultKeys.add(CaptureResult.CONTROL_AWB_MODE);
         resultKeys.add(CaptureResult.CONTROL_AWB_REGIONS);
+        resultKeys.add(CaptureResult.CONTROL_CAPTURE_INTENT);
+        resultKeys.add(CaptureResult.CONTROL_EFFECT_MODE);
         resultKeys.add(CaptureResult.CONTROL_MODE);
+        resultKeys.add(CaptureResult.CONTROL_SCENE_MODE);
+        resultKeys.add(CaptureResult.CONTROL_VIDEO_STABILIZATION_MODE);
         resultKeys.add(CaptureResult.CONTROL_AE_STATE);
         resultKeys.add(CaptureResult.CONTROL_AF_STATE);
         resultKeys.add(CaptureResult.CONTROL_AWB_STATE);
@@ -256,6 +270,7 @@ public class CaptureResultTest extends Camera2AndroidTestCase {
         resultKeys.add(CaptureResult.SENSOR_PROFILE_HUE_SAT_MAP);
         resultKeys.add(CaptureResult.SENSOR_PROFILE_TONE_CURVE);
         resultKeys.add(CaptureResult.SENSOR_GREEN_SPLIT);
+        resultKeys.add(CaptureResult.SENSOR_TEST_PATTERN_DATA);
         resultKeys.add(CaptureResult.SENSOR_TEST_PATTERN_MODE);
         resultKeys.add(CaptureResult.SHADING_MODE);
         resultKeys.add(CaptureResult.STATISTICS_FACE_DETECT_MODE);
@@ -263,6 +278,7 @@ public class CaptureResultTest extends Camera2AndroidTestCase {
         resultKeys.add(CaptureResult.STATISTICS_LENS_SHADING_MAP);
         resultKeys.add(CaptureResult.STATISTICS_SCENE_FLICKER);
         resultKeys.add(CaptureResult.STATISTICS_HOT_PIXEL_MAP);
+        resultKeys.add(CaptureResult.STATISTICS_LENS_SHADING_MAP_MODE);
         resultKeys.add(CaptureResult.TONEMAP_CURVE_BLUE);
         resultKeys.add(CaptureResult.TONEMAP_CURVE_GREEN);
         resultKeys.add(CaptureResult.TONEMAP_CURVE_RED);
