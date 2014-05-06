@@ -271,7 +271,7 @@ bool TaskProcess::parseParams(std::vector<TaskProcess::Param>& list, const char*
             list.push_back(param);
             LOGD(" val %s", param.getParamString().string());
         } else if (isInput && (StringUtil::compare(item[0], "consti") == 0)) {
-            long long value = atoll(item[1].string());
+            int64_t value = atoll(item[1].string());
             TaskCase::Value v(value);
             Param param(v);
             list.push_back(param);
