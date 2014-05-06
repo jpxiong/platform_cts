@@ -26,7 +26,7 @@ import android.util.Log;
  * Base RenderScript test class. This class provides a message handler and a
  * convenient way to wait for compute scripts to complete their execution.
  */
-class RSBaseCompute extends RSBase {
+public class RSBaseCompute extends RSBase {
     RenderScript mRS;
     protected int INPUTSIZE = 512;
 
