@@ -245,7 +245,7 @@ public class CoreMathVerifier {
     // Normalizes the n-dimensional vector, i.e. makes it length 1.
     static private void normalize(float[] in, Floaty[] out, int ulpFactor, int ulpRelaxedFactor) {
         Floaty l = length(in, ulpFactor, ulpRelaxedFactor);
-        boolean isZero = l.getValue() == 0f;
+        boolean isZero = l.getFloatValue() == 0f;
         for (int i = 0; i < in.length; i++) {
             out[i] = new Floaty(in[i], ulpFactor, ulpRelaxedFactor);
             if (!isZero) {
@@ -318,12 +318,12 @@ public class CoreMathVerifier {
         args.out = new Floaty(atan(args.inV) / (float) Math.PI, 5, 128);
     }
 
-	static public void computeAtan2(TestAtan2.ArgumentsFloatFloatFloat args) {
-		args.out = new Floaty(atan2(args.inY, args.inX), 6, 128);
-	}
+    static public void computeAtan2(TestAtan2.ArgumentsFloatFloatFloat args) {
+        args.out = new Floaty(atan2(args.inY, args.inX), 6, 128);
+    }
 
     static public void computeAtan2pi(TestAtan2pi.ArgumentsFloatFloatFloat args) {
-		args.out = new Floaty(atan2(args.inY, args.inX) / (float) Math.PI, 6, 128);
+        args.out = new Floaty(atan2(args.inY, args.inX) / (float) Math.PI, 6, 128);
     }
 
     static public void computeCbrt(TestCbrt.ArgumentsFloatFloat args) {
@@ -432,7 +432,7 @@ public class CoreMathVerifier {
     }
     /* TODO Not supporting double arguments currently
     static public void computeConvert(TestConvert.ArgumentsCharDouble args) {
-        args.out = convertCharToDouble(args.inV);
+        args.out = new Floaty(convertCharToDouble(args.inV), 0, 0);
     }
     */
 
@@ -467,7 +467,7 @@ public class CoreMathVerifier {
     }
     /* TODO Not supporting double arguments currently
     static public void computeConvert(TestConvert.ArgumentsUcharDouble args) {
-        args.out = convertUcharToDouble(args.inV);
+        args.out = new Floaty(convertUcharToDouble(args.inV), 0, 0);
     }
     */
 
@@ -502,7 +502,7 @@ public class CoreMathVerifier {
     }
     /* TODO Not supporting double arguments currently
     static public void computeConvert(TestConvert.ArgumentsShortDouble args) {
-        args.out = convertShortToDouble(args.inV);
+        args.out = new Floaty(convertShortToDouble(args.inV), 0, 0);
     }
     */
 
@@ -537,7 +537,7 @@ public class CoreMathVerifier {
     }
     /* TODO Not supporting double arguments currently
     static public void computeConvert(TestConvert.ArgumentsUshortDouble args) {
-        args.out = convertUshortToDouble(args.inV);
+        args.out = new Floaty(convertUshortToDouble(args.inV), 0, 0);
     }
     */
 
@@ -572,7 +572,7 @@ public class CoreMathVerifier {
     }
     /* TODO Not supporting double arguments currently
     static public void computeConvert(TestConvert.ArgumentsIntDouble args) {
-        args.out = convertIntToDouble(args.inV);
+        args.out = new Floaty(convertIntToDouble(args.inV), 0, 0);
     }
     */
 
@@ -607,7 +607,7 @@ public class CoreMathVerifier {
     }
     /* TODO Not supporting double arguments currently
     static public void computeConvert(TestConvert.ArgumentsUintDouble args) {
-        args.out = convertUintToDouble(args.inV);
+        args.out = new Floaty(convertUintToDouble(args.inV), 0, 0);
     }
     */
 
@@ -640,7 +640,7 @@ public class CoreMathVerifier {
         args.out = new Floaty(convertLongToFloat(args.inV), 1, 1);
     }
     static public void computeConvert(TestConvert.ArgumentsLongDouble args) {
-        args.out = convertLongToDouble(args.inV);
+        args.out = new Floaty(convertLongToDouble(args.inV), 1, 1);
     }
 
     static public void computeConvert(TestConvert.ArgumentsUlongChar args) {
@@ -671,7 +671,7 @@ public class CoreMathVerifier {
         args.out = new Floaty(convertUlongToFloat(args.inV), 1, 1);
     }
     static public void computeConvert(TestConvert.ArgumentsUlongDouble args) {
-        args.out = convertUlongToDouble(args.inV);
+        args.out = new Floaty(convertUlongToDouble(args.inV), 1, 1);
     }
     */
 
@@ -706,7 +706,7 @@ public class CoreMathVerifier {
     }
     /* TODO Not supporting double arguments currently
     static public void computeConvert(TestConvert.ArgumentsFloatDouble args) {
-        args.out = convertFloatToDouble(args.inV);
+        args.out = new Floaty(convertFloatToDouble(args.inV), 0, 0);
     }
     */
 
@@ -739,7 +739,7 @@ public class CoreMathVerifier {
         args.out = new Floaty(convertDoubleToFloat(args.inV), 1, 1);
     }
     static public void computeConvert(TestConvert.ArgumentsDoubleDouble args) {
-        args.out = convertDoubleToDouble(args.inV);
+        args.out = new Floaty(convertDoubleToDouble(args.inV), 0, 0);
     }
     */
 
@@ -891,12 +891,10 @@ public class CoreMathVerifier {
         args.outIptr = result.exponent;
     }
 
-    /* TODO enable once precision has been improved.
     static public void computeHalfRecip(TestHalfRecip.ArgumentsFloatFloat args) {
         // TODO we would like to use HALF_PRECISION, HALF_PRECISION
         args.out = new Floaty(1.0f / args.inV, 64000, 64000);
     }
-    */
 
     static public void computeHalfRsqrt(TestHalfRsqrt.ArgumentsFloatFloat args) {
         // TODO we would like to use HALF_PRECISION, HALF_PRECISION
@@ -938,7 +936,7 @@ public class CoreMathVerifier {
         args.outY = result.gammaSign;
     }
 
-	// TODO The relaxed ulf for the various log are taken from the old tests.
+    // TODO The relaxed ulf for the various log are taken from the old tests.
     // They are not consistent.
     static public void computeLog(TestLog.ArgumentsFloatFloat args) {
         args.out = new Floaty(log(args.in), 3, 16);
@@ -987,7 +985,16 @@ public class CoreMathVerifier {
     static public void computeMax(TestMax.ArgumentsUintUintUint args) {
         args.out = maxU32(args.inV1, args.inV2);
     }
-    // TODO we probably need a long version of max and min
+
+    /* TODO enable once precision has been improved.
+    static public void computeMax(TestMax.ArgumentsLongLongLong args) {
+        args.out = maxI64(args.inV1, args.inV2);
+    }
+
+    static public void computeMax(TestMax.ArgumentsUlongUlongUlong args) {
+        args.out = maxU64(args.inV1, args.inV2);
+    }
+    */
 
     static public void computeMax(TestMax.ArgumentsFloatFloatFloat args) {
         args.out = new Floaty(Math.max(args.in, args.in1), 0, 0);
@@ -1016,6 +1023,16 @@ public class CoreMathVerifier {
     static public void computeMin(TestMin.ArgumentsUintUintUint args) {
         args.out = minU32(args.inV1, args.inV2);
     }
+
+    /* TODO enable once precision has been improved.
+    static public void computeMin(TestMin.ArgumentsLongLongLong args) {
+        args.out = minI64(args.inV1, args.inV2);
+    }
+
+    static public void computeMin(TestMin.ArgumentsUlongUlongUlong args) {
+        args.out = minU64(args.inV1, args.inV2);
+    }
+    */
 
     static public void computeMin(TestMin.ArgumentsFloatFloatFloat args) {
         args.out = new Floaty(Math.min(args.in, args.in1), 0, 0);
