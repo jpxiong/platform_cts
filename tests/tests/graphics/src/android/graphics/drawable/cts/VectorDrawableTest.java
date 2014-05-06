@@ -65,28 +65,6 @@ public class VectorDrawableTest extends AndroidTestCase {
             R.drawable.vector_icon_repeated_a_2_golden,
     };
 
-    private int[] mAnimatedIconResIds = new int[] {
-            R.drawable.vector_animation_battery,
-            R.drawable.vector_animation_clip_circle,
-            R.drawable.vector_animation_clip_rect,
-            R.drawable.vector_animation_rotate_curve,
-            R.drawable.vector_animation_rotate_pie,
-            R.drawable.vector_animation_trim_path,
-            R.drawable.vector_animation_wifi,
-    };
-
-    // These golden images are capturing the snapshot of the animated vector drawables
-    // at 50% of the time interval.
-    private int[] mAnimatedGoldenImages = new int[] {
-            R.drawable.vector_animation_battery_golden,
-            R.drawable.vector_animation_clip_circle_golden,
-            R.drawable.vector_animation_clip_rect_golden,
-            R.drawable.vector_animation_rotate_curve_golden,
-            R.drawable.vector_animation_rotate_pie_golden,
-            R.drawable.vector_animation_trim_path_golden,
-            R.drawable.vector_animation_wifi_golden,
-    };
-
     private static final int IMAGE_WIDTH = 64;
     private static final int IMAGE_HEIGHT = 64;
     // A small value is actually making sure that the values are matching
@@ -124,10 +102,6 @@ public class VectorDrawableTest extends AndroidTestCase {
         verifyVectorDrawables(mIconResIds, mGoldenImages, 0);
     }
 
-    public void testAnimatedVectorDrawables() throws Exception {
-        verifyVectorDrawables(mAnimatedIconResIds, mAnimatedGoldenImages, 0.5f);
-    }
-
     private void verifyVectorDrawables(int[] resIds, int[] goldenImages, float fraction) throws Exception {
         for (int i = 0; i < resIds.length; i++) {
             // Setup VectorDrawable from xml file and draw into the bitmap.
@@ -137,7 +111,6 @@ public class VectorDrawableTest extends AndroidTestCase {
             AttributeSet attrs = Xml.asAttributeSet(xpp);
 
             mVectorDrawable.inflate(mResources, xpp, attrs);
-            mVectorDrawable.setAnimationFraction(fraction);
 
             mBitmap.eraseColor(0);
             mVectorDrawable.draw(mCanvas);
