@@ -19,13 +19,19 @@ package android.renderscript.cts;
 import android.util.Log;
 
 /**
- * This class keeps track of a float and the computation error that has accumulated in creating
- * this number.  We also provide the four basic arithmetic operators and sqrt that compute the
- * correct error of the result.
+ * This class keeps track of a floating point value and the computation error that has accumulated
+ * in creating this number.  We also provide the four basic arithmetic operators and sqrt that
+ * compute the correct error of the result.
  */
 public class Floaty {
-    private float mValue;  // The value this float reprensent.
-    private float mError;  // The real value should be between mValue - mError and mValue + mError.
+    private double mValue;  // The value this instance represent.
+    private double mError;  // The real value should be between mValue - mError and mValue + mError.
+    /* The number of bits the value should have, either 32 or 64.  It would have been nice to
+     * use generics, e.g. Floaty<float> and Floaty<double> but Java does not support generics
+     * of float and double.  Also, Java does not have a f16 type.  This can simulate it, although
+     * more work will be needed.
+     */
+    private int mNumberOfBits;
 
     static private boolean relaxed;  // Whether we are doing relaxed precision computations.
 
@@ -36,26 +42,52 @@ public class Floaty {
     public Floaty(Floaty a) {
         mValue = a.mValue;
         mError = a.mError;
+        mNumberOfBits = a.mNumberOfBits;
     }
 
     public Floaty(float a) {
         mValue = a;
+        mNumberOfBits = 32;
+        setErrorFromValue(1, 1);
+    }
+
+    public Floaty(double a) {
+        mValue = a;
+        mNumberOfBits = 64;
         setErrorFromValue(1, 1);
     }
 
     /** Sets the value and the error based on whether we're doing relaxed computations or not. */
     public Floaty(float v, int ulpFactor, int ulpRelaxedFactor) {
         mValue = v;
+        mNumberOfBits = 32;
         setErrorFromValue(ulpFactor, ulpRelaxedFactor);
     }
 
-    public float getValue() { return mValue; }
+    public Floaty(double v, int ulpFactor, int ulpRelaxedFactor) {
+        mValue = v;
+        mNumberOfBits = 64;
+        setErrorFromValue(ulpFactor, ulpRelaxedFactor);
+    }
 
-    public float getError() { return mError; }
+    public float getFloatValue() { return (float) mValue; }
+    public double getDoubleValue() { return mValue; }
+
+    public float getFloatError() { return (float) mError; }
+    public double getDoubleError() { return mError; }
 
     /** Returns the number we would need to multiply the ulp to get the current error. */
     public int getUlf() {
-        return (int) Math.abs(mError / Math.ulp(mValue));
+        return (int) Math.abs(mError / getUlp());
+    }
+
+    /** Returns the unit of least precision for the number we handle. */
+    private double getUlp() {
+        if (mNumberOfBits == 64) {
+            return Math.ulp(mValue);
+        } else {
+            return Math.ulp((float) mValue);
+        }
     }
 
     /**
@@ -64,36 +96,37 @@ public class Floaty {
      */
     private void setErrorFromValue(int ulpFactor, int ulpRelaxedFactor) {
         int factor = relaxed ? ulpRelaxedFactor : ulpFactor;
-        mError = Math.ulp(mValue) * factor;
+        mError = getUlp() * factor;
     }
 
     /**
      * Creates a new Floaty as the result of a computation.  The precision factor are those
      * associated with the operation just completed.
      */
-    public Floaty(float actual, float valueMinusError, float valuePlusError, int ulpFactor,
-            int ulpRelaxedFactor) {
+    private Floaty(double actual, double valueMinusError, double valuePlusError, int ulpFactor,
+            int ulpRelaxedFactor, int numberOfBits) {
         mValue = actual;
         mError = 0f;
         expandError(valueMinusError);
         expandError(valuePlusError);
         mError *= relaxed ? ulpRelaxedFactor : ulpFactor;
+        mNumberOfBits = numberOfBits;
     }
     
     /** If needed, increases the error so that the provided value is covered by the error range. */
-    private void expandError(float valueWithError) {
+    private void expandError(double valueWithError) {
         // We disregard NaN values that can be produced when testing close to a cliff.
         if (valueWithError != valueWithError) {
             return;
         }
-        float delta = Math.abs(valueWithError - mValue);
+        double delta = Math.abs(valueWithError - mValue);
         if (delta > mError) {
             mError = delta;
         }
     }
 
     /** Returns true if the number passed is within mError of our value. */
-    public boolean couldBe(float a) {
+    public boolean couldBe(double a) {
         return couldBe(a, 0.0);
     }
 
@@ -101,7 +134,7 @@ public class Floaty {
      * Returns true if the number passed is within mError of our value, or if it's whithin
      * minimumError of the value.
      */ 
-    public boolean couldBe(float a, double minimumError) {
+    public boolean couldBe(double a, double minimumError) {
         if (a != a && mValue != mValue) {
             return true;  // Both are NaN
         }
@@ -110,7 +143,7 @@ public class Floaty {
         if (a == mValue) {
             return true;
         }
-        float error = (float) Math.max(mError, minimumError);
+        double error = Math.max(mError, minimumError);
         boolean inRange = mValue - error <= a && a <= mValue + error;
 
         /* This is useful for debugging:
@@ -127,8 +160,8 @@ public class Floaty {
     }
 
     public String toString() {
-        return String.format("%14.9g (%8x) +- %14.9g ulf %d", mValue,
-                Float.floatToRawIntBits(mValue), mError, getUlf());
+        return String.format("%24.9g (%16x) +- %24.9g ulf %d (%d bits)", mValue,
+                Double.doubleToRawLongBits(mValue), mError, getUlf(), mNumberOfBits);
     }
 
     public boolean isNaN() {
@@ -157,8 +190,8 @@ public class Floaty {
     }
 
     public Floaty divide(Floaty a) {
-        float num = Math.abs(mValue);
-        float den = Math.abs(a.mValue);
+        double num = Math.abs(mValue);
+        double den = Math.abs(a.mValue);
         mError = (num * a.mError + den * mError) / (den * (den - a.mError));
         mValue /= a.mValue;
         return this;
@@ -188,10 +221,10 @@ public class Floaty {
 
     static public Floaty sqrt(Floaty a) {
         Floaty f = new Floaty(
-            (float) Math.sqrt(a.mValue),
-            (float) Math.sqrt(a.mValue - a.mError),
-            (float) Math.sqrt(a.mValue + a.mError),
-            3, 10);
+            Math.sqrt(a.mValue),
+            Math.sqrt(a.mValue - a.mError),
+            Math.sqrt(a.mValue + a.mError),
+            3, 10, a.mNumberOfBits);
         return f;
     }
 }
