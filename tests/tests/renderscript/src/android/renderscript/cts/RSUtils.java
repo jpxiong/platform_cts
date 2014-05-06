@@ -163,4 +163,17 @@ public class RSUtils {
             array[i] = (byte) longs[i];
         }
     }
+
+    // Compares two unsigned long.  Returns < 0 if a < b, 0 if a == b, > 0 if a > b.
+    public static long compareUnsignedLong(long a, long b) {
+        long aFirstFourBits = a >>> 60;
+        long bFirstFourBits = b >>> 60;
+        long firstFourBitsDiff = aFirstFourBits - bFirstFourBits;
+        if (firstFourBitsDiff != 0) {
+            return firstFourBitsDiff;
+        }
+        long aRest = a & 0x0fffffffffffffffl;
+        long bRest = b & 0x0fffffffffffffffl;
+        return aRest - bRest;
+    }
 }
