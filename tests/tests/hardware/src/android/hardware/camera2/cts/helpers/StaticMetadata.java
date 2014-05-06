@@ -592,6 +592,65 @@ public class StaticMetadata {
     }
 
     /**
+     * Get maxAnalogSensitivity for a camera device.
+     * <p>
+     * This is only available for FULL capability device, return 0 if it is unavailable.
+     * </p>
+     *
+     * @return maxAnalogSensitivity, 0 if it is not available.
+     */
+    public int getMaxAnalogSensitivityChecked() {
+        if (!isHardwareLevelFull()) {
+            return 0;
+        }
+
+        CameraMetadata.Key<Integer> key = CameraCharacteristics.SENSOR_MAX_ANALOG_SENSITIVITY;
+        Integer maxAnalogsensitivity = getValueFromKeyNonNull(key);
+        int minSensitivity = getSensitivityMinimumOrDefault();
+        int maxSensitivity = getSensitivityMaximumOrDefault();
+
+        if (maxAnalogsensitivity == null) {
+            return 0;
+        }
+
+        checkTrueForKey(key, " Max analog sensitivity " + maxAnalogsensitivity
+                + " should be no larger than max sensitivity " + maxSensitivity,
+                maxAnalogsensitivity <= maxSensitivity);
+        checkTrueForKey(key, " Max analog sensitivity " + maxAnalogsensitivity
+                + " should be larger than min sensitivity " + maxSensitivity,
+                maxAnalogsensitivity > minSensitivity);
+
+        return maxAnalogsensitivity;
+    }
+
+    /**
+     * Get hyperfocalDistance and do the sanity check.
+     * <p>
+     * Note that, this tag is optional, will return -1 if this tag is not
+     * available.
+     * </p>
+     *
+     * @return hyperfocalDistance of this device, -1 if this tag is not available.
+     */
+    public float getHyperfocalDistanceChecked() {
+        CameraMetadata.Key<Float> key = CameraCharacteristics.LENS_INFO_HYPERFOCAL_DISTANCE;
+        Float hyperfocalDistance = getValueFromKeyNonNull(key);
+        if (hyperfocalDistance == null) {
+            return -1;
+        }
+
+        if (hasFocuser()) {
+            float minFocusDistance = getMinimumFocusDistanceChecked();
+            checkTrueForKey(key, String.format(" hyperfocal distance %f should be in the range of"
+                    + " should be in the range of (%f, %f]", hyperfocalDistance, 0,
+                    minFocusDistance),
+                    hyperfocalDistance > 0 && hyperfocalDistance <= minFocusDistance);
+        }
+
+        return hyperfocalDistance;
+    }
+
+    /**
      * Get the minimum value for a sensitivity range from android.sensor.info.sensitivityRange.
      *
      * <p>If the camera is incorrectly reporting values, log a warning and return
@@ -1106,6 +1165,25 @@ public class StaticMetadata {
     }
 
     /**
+     * Get availableMaxDigitalZoom and do the sanity check.
+     *
+     * @return available max digitial zoom, default value (1.0) if it is not available.
+     */
+    public float getAvailableMaxDigitalZoomChecked() {
+        CameraMetadata.Key<Float> key =
+                CameraCharacteristics.SCALER_AVAILABLE_MAX_DIGITAL_ZOOM;
+        Float maxZoom = getValueFromKeyNonNull(key);
+        if (maxZoom == null) {
+            return 1.0f;
+        }
+
+        checkTrueForKey(key, " max digitial zoom should be no less than 1",
+                maxZoom > 1.0f && !Float.isNaN(maxZoom));
+
+        return maxZoom;
+    }
+
+    /**
      * Get the value in index for a fixed-size array from a given key.
      *
      * <p>If the camera device is incorrectly reporting values, log a warning and return
@@ -1208,6 +1286,13 @@ public class StaticMetadata {
         }
 
         return value;
+    }
+
+    private void checkArrayValuesInRange(Key<int[]> key, int[] array, int min, int max) {
+        for (int value : array) {
+            checkTrueForKey(key, String.format(" value is out of range [%d, %d]", min, max),
+                    value <= max && value >= min);
+        }
     }
 
     private void checkArrayValuesInRange(Key<byte[]> key, byte[] array, byte min, byte max) {

@@ -20,6 +20,8 @@ import static com.android.ex.camera2.blocking.BlockingStateListener.*;
 
 import android.graphics.BitmapFactory;
 import android.graphics.ImageFormat;
+import android.graphics.PointF;
+import android.graphics.Rect;
 import android.hardware.camera2.CameraAccessException;
 import android.hardware.camera2.CameraDevice;
 import android.hardware.camera2.CameraManager;
@@ -814,4 +816,72 @@ public class CameraTestUtils extends Assert {
         return value;
     }
 
+    /**
+     * Get a crop region for a given zoom factor and center position.
+     * <p>
+     * The center position is normalized position in range of [0, 1.0], where
+     * (0, 0) represents top left corner, (1.0. 1.0) represents bottom right
+     * corner. The center position could limit the effective minimal zoom
+     * factor, for example, if the center position is (0.75, 0.75), the
+     * effective minimal zoom position becomes 2.0. If the requested zoom factor
+     * is smaller than 2.0, a crop region with 2.0 zoom factor will be returned.
+     * </p>
+     * <p>
+     * The aspect ratio of the crop region is maintained the same as the aspect
+     * ratio of active array.
+     * </p>
+     *
+     * @param zoomFactor The zoom factor to generate the crop region, it must be
+     *            >= 1.0
+     * @param center The normalized zoom center point that is in the range of [0, 1].
+     * @param maxZoom The max zoom factor supported by this device.
+     * @param activeArray The active array size of this device.
+     * @return crop region for the given normalized center and zoom factor.
+     */
+    public static Rect getCropRegionForZoom(float zoomFactor, final PointF center,
+            final float maxZoom, final Rect activeArray) {
+        if (zoomFactor < 1.0) {
+            throw new IllegalArgumentException("zoom factor " + zoomFactor + " should be >= 1.0");
+        }
+        if (center.x > 1.0 || center.x < 0) {
+            throw new IllegalArgumentException("center.x " + center.x
+                    + " should be in range of [0, 1.0]");
+        }
+        if (center.y > 1.0 || center.y < 0) {
+            throw new IllegalArgumentException("center.y " + center.y
+                    + " should be in range of [0, 1.0]");
+        }
+        if (maxZoom < 1.0) {
+            throw new IllegalArgumentException("max zoom factor " + maxZoom + " should be >= 1.0");
+        }
+        if (activeArray == null) {
+            throw new IllegalArgumentException("activeArray must not be null");
+        }
+
+        float minCenterLength = Math.min(Math.min(center.x, 1.0f - center.x),
+                Math.min(center.y, 1.0f - center.y));
+        float minEffectiveZoom =  0.5f / minCenterLength;
+        if (minEffectiveZoom > maxZoom) {
+            throw new IllegalArgumentException("Requested center " + center.toString() +
+                    " has minimal zoomable factor " + minEffectiveZoom + ", which exceeds max"
+                            + " zoom factor " + maxZoom);
+        }
+
+        if (zoomFactor < minEffectiveZoom) {
+            Log.w(TAG, "Requested zoomFactor " + zoomFactor + " > minimal zoomable factor "
+                    + minEffectiveZoom + ". It will be overwritten by " + minEffectiveZoom);
+            zoomFactor = minEffectiveZoom;
+        }
+
+        int cropCenterX = (int)(activeArray.width() * center.x);
+        int cropCenterY = (int)(activeArray.height() * center.y);
+        int cropWidth = (int) (activeArray.width() / zoomFactor);
+        int cropHeight = (int) (activeArray.height() / zoomFactor);
+
+        return new Rect(
+                /*left*/cropCenterX - cropWidth / 2,
+                /*top*/cropCenterY - cropHeight / 2,
+                /*right*/ cropCenterX + cropWidth / 2 - 1,
+                /*bottom*/cropCenterY + cropHeight / 2 - 1);
+    }
 }

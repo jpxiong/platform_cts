@@ -20,6 +20,7 @@ import static android.hardware.camera2.cts.CameraTestUtils.*;
 import static android.hardware.camera2.CameraCharacteristics.*;
 
 import android.graphics.Point;
+import android.graphics.PointF;
 import android.graphics.Rect;
 import android.hardware.camera2.CameraCharacteristics;
 import android.hardware.camera2.CameraDevice;
@@ -467,6 +468,25 @@ public class CaptureRequestTest extends Camera2SurfaceViewTestCase {
         }
     }
 
+    /**
+     * Test digitalZoom (center wise and non-center wise), validate the returned crop regions.
+     */
+    public void testDigitalZoom() throws Exception {
+        for (String id : mCameraIds) {
+            try {
+                openDevice(id);
+                if (!mStaticInfo.isPerFrameControlSupported()) {
+                    Log.i(TAG, "Camera " + id + "Doesn't support per frame control");
+                    continue;
+                }
+
+                digitalZoomTestByCamera();
+            } finally {
+                closeDevice();
+            }
+        }
+    }
+
     // TODO: add 3A state machine test.
 
     private void noiseReductionModeTestByCamera() throws Exception {
@@ -522,6 +542,22 @@ public class CaptureRequestTest extends Camera2SurfaceViewTestCase {
         // Verify the monotonicity
         mCollector.checkArrayMonotonicityAndNotAllEqual(CameraTestUtils.toObject(resultDistances),
                 /*ascendingOrder*/true);
+
+        // Test hyperfocal distance optionally
+        float hyperFocalDistance = mStaticInfo.getHyperfocalDistanceChecked();
+        if (hyperFocalDistance > 0) {
+            requestBuilder.set(CaptureRequest.LENS_FOCUS_DISTANCE, hyperFocalDistance);
+            request = requestBuilder.build();
+            resultListener = new SimpleCaptureListener();
+            mCamera.setRepeatingRequest(request, resultListener, mHandler);
+
+            // Then wait for the lens.state to be stationary.
+            waitForResultValue(resultListener, CaptureResult.LENS_STATE,
+                    CaptureResult.LENS_STATE_STATIONARY, NUM_RESULTS_WAIT_TIMEOUT);
+            // Need exactly match.
+            verifyCaptureResultForKey(CaptureResult.LENS_FOCUS_DISTANCE, hyperFocalDistance,
+                    resultListener, NUM_FRAMES_VERIFIED);
+        }
     }
 
     /**
@@ -1408,6 +1444,53 @@ public class CaptureRequestTest extends Camera2SurfaceViewTestCase {
         stopPreview();
     }
 
+    private void digitalZoomTestByCamera() throws Exception {
+        final int ZOOM_STEPS = 30;
+        final PointF[] TEST_ZOOM_CENTERS = new PointF[] {
+                new PointF(0.5f, 0.5f),   // Center point
+                new PointF(0.25f, 0.25f), // top left corner zoom, minimal zoom: 2x
+                new PointF(0.75f, 0.25f), // top right corner zoom, minimal zoom: 2x
+                new PointF(0.25f, 0.75f), // bottom left corner zoom, minimal zoom: 2x
+                new PointF(0.75f, 0.75f), // bottom right corner zoom, minimal zoom: 2x
+        };
+        final float maxZoom = mStaticInfo.getAvailableMaxDigitalZoomChecked();
+        Size maxPreviewSize = mOrderedPreviewSizes.get(0);
+        CaptureRequest.Builder requestBuilder =
+                mCamera.createCaptureRequest(CameraDevice.TEMPLATE_PREVIEW);
+        SimpleCaptureListener listener = new SimpleCaptureListener();
+        startPreview(requestBuilder, maxPreviewSize, listener);
+        CaptureRequest[] requests = new CaptureRequest[ZOOM_STEPS];
+        Rect[] cropRegions = new Rect[ZOOM_STEPS];
+
+        for (PointF center : TEST_ZOOM_CENTERS) {
+            for (int i = 0; i < ZOOM_STEPS; i++) {
+                float zoomFactor = (float) (1.0f + (maxZoom - 1.0) * i / ZOOM_STEPS);
+                cropRegions[i] = getCropRegionForZoom(zoomFactor, center,
+                        mStaticInfo.getAvailableMaxDigitalZoomChecked(),
+                        mStaticInfo.getActiveArraySizeChecked());
+                if (VERBOSE) {
+                    Log.v(TAG, "Testing Zoom for factor " + zoomFactor + " and center " +
+                            center.toString() + " The cropRegion is " + cropRegions[i].toString());
+                }
+                requestBuilder.set(CaptureRequest.SCALER_CROP_REGION, cropRegions[i]);
+                requests[i] = requestBuilder.build();
+                mCamera.capture(requests[i], listener, mHandler);
+            }
+
+            // Validate capture result
+            CaptureResult result;
+            for (int i = 0; i < ZOOM_STEPS; i++) {
+                 result = listener.getCaptureResultForRequest(
+                         requests[i], NUM_RESULTS_WAIT_TIMEOUT);
+                 Rect cropRegion = getValueNotNull(result, CaptureResult.SCALER_CROP_REGION);
+                 mCollector.expectEquals(" Request and result crop region should match",
+                         cropRegions[i], cropRegion);
+            }
+        }
+
+        stopPreview();
+    }
+
     //----------------------------------------------------------------
     //---------Below are common functions for all tests.--------------
     //----------------------------------------------------------------
@@ -1418,6 +1501,10 @@ public class CaptureRequestTest extends Camera2SurfaceViewTestCase {
      */
     private void changeExposure(CaptureRequest.Builder requestBuilder,
             long expTime, int sensitivity) {
+        // Check if the max analog sensitivity is available and no larger than max sensitivity.
+        // The max analog sensitivity is not actually used here. This is only an extra sanity check.
+        mStaticInfo.getMaxAnalogSensitivityChecked();
+
         expTime = mStaticInfo.getExposureClampToRange(expTime);
         sensitivity = mStaticInfo.getSensitivityClampToRange(sensitivity);
 
