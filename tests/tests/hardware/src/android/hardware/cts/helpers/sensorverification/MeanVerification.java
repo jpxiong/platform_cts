@@ -108,7 +108,7 @@ public class MeanVerification extends AbstractMeanVerification {
         stats.addValue(SensorStats.MEAN_KEY, means);
 
         if (failed) {
-            Assert.fail(String.format("Mean out of range: mean=%s, expected=%s", meanSb.toString(),
+            Assert.fail(String.format("Mean out of range: mean=%s (expected %s)", meanSb.toString(),
                     expectedSb.toString()));
         }
     }

@@ -92,7 +92,7 @@ public class MagnitudeVerification extends AbstractSensorVerification {
         stats.addValue(SensorStats.MAGNITUDE_KEY, mean);
 
         if (failed) {
-            Assert.fail(String.format("Magnitude mean out of range: mean=%s, expected=%s+/-%s",
+            Assert.fail(String.format("Magnitude mean out of range: mean=%s (expected %s+/-%s)",
                     mean, mExpected, mThreshold));
         }
     }
