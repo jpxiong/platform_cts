@@ -15,23 +15,19 @@
  */
 package android.hardware.cts;
 
-import junit.framework.Test;
-import junit.framework.TestSuite;
-
 import android.content.Context;
-
 import android.hardware.Sensor;
 import android.hardware.SensorManager;
-
 import android.hardware.cts.helpers.SensorCtsHelper;
 import android.hardware.cts.helpers.SensorTestCase;
 import android.hardware.cts.helpers.SensorTestInformation;
-import android.hardware.cts.helpers.SensorTestOperation;
-
 import android.hardware.cts.helpers.sensorTestOperations.ParallelCompositeSensorTestOperation;
 import android.hardware.cts.helpers.sensorTestOperations.RepeatingSensorTestOperation;
 import android.hardware.cts.helpers.sensorTestOperations.SequentialCompositeSensorTestOperation;
-import android.hardware.cts.helpers.sensorTestOperations.VerifyEventOrderingOperation;
+import android.hardware.cts.helpers.sensorTestOperations.VerifySensorOperation;
+
+import junit.framework.Test;
+import junit.framework.TestSuite;
 
 import java.util.Random;
 
@@ -97,18 +93,22 @@ public class SensorIntegrationTests extends SensorTestCase {
 
         ParallelCompositeSensorTestOperation operation = new ParallelCompositeSensorTestOperation();
         for(int sensorType : sensorTypes) {
-            SensorTestOperation continuousOperation = new VerifyEventOrderingOperation(
+            VerifySensorOperation continuousOperation = new VerifySensorOperation(
                     context,
                     sensorType,
                     SensorManager.SENSOR_DELAY_NORMAL,
-                    0 /* reportLatencyInUs */);
+                    0 /* reportLatencyInUs */,
+                    100 /* event count */);
+            continuousOperation.verifyEventOrdering();
             operation.add(new RepeatingSensorTestOperation(continuousOperation, ITERATIONS));
 
-            SensorTestOperation batchingOperation = new VerifyEventOrderingOperation(
+            VerifySensorOperation batchingOperation = new VerifySensorOperation(
                     context,
                     sensorType,
                     SensorTestInformation.getMaxSamplingRateInUs(context, sensorType),
-                    SensorCtsHelper.getSecondsAsMicroSeconds(BATCHING_RATE_IN_SECONDS));
+                    SensorCtsHelper.getSecondsAsMicroSeconds(BATCHING_RATE_IN_SECONDS),
+                    100);
+            batchingOperation.verifyEventOrdering();
             operation.add(new RepeatingSensorTestOperation(batchingOperation, ITERATIONS));
         }
         operation.execute();
@@ -151,11 +151,13 @@ public class SensorIntegrationTests extends SensorTestCase {
                 SequentialCompositeSensorTestOperation sequentialOperation =
                         new SequentialCompositeSensorTestOperation();
                 for(int iteration = 0; iteration < ITERATIONS_TO_EXECUTE; ++iteration) {
-                    VerifyEventOrderingOperation sensorOperation = new VerifyEventOrderingOperation(
+                    VerifySensorOperation sensorOperation = new VerifySensorOperation(
                             this.getContext(),
                             sensorType,
                             this.generateSamplingRateInUs(sensorType),
-                            this.generateReportLatencyInUs());
+                            this.generateReportLatencyInUs(),
+                            100);
+                    sensorOperation.verifyEventOrdering();
                     sequentialOperation.add(sensorOperation);
                 }
                 operation.add(sequentialOperation);
@@ -212,18 +214,22 @@ public class SensorIntegrationTests extends SensorTestCase {
     public void testSensorStoppingInteraction() throws Throwable {
         Context context = this.getContext();
 
-        SensorTestOperation tester = new VerifyEventOrderingOperation(
+        VerifySensorOperation tester = new VerifySensorOperation(
                 context,
                 mSensorTypeTester,
                 SensorManager.SENSOR_DELAY_NORMAL,
-                0 /*reportLatencyInUs*/);
+                0 /*reportLatencyInUs*/,
+                100 /* event count */);
+        tester.verifyEventOrdering();
         tester.start();
 
-        SensorTestOperation testee = new VerifyEventOrderingOperation(
+        VerifySensorOperation testee = new VerifySensorOperation(
                 context,
                 mSensorTypeTestee,
                 SensorManager.SENSOR_DELAY_UI,
-                0 /*reportLatencyInUs*/);
+                0 /*reportLatencyInUs*/,
+                100 /* event count */);
+        testee.verifyEventOrdering();
         testee.start();
 
         testee.waitForCompletion();

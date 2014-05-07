@@ -18,7 +18,7 @@ package com.android.cts.verifier.sensors;
 
 import android.hardware.Sensor;
 import android.hardware.SensorManager;
-import android.hardware.cts.helpers.sensorTestOperations.VerifySignumOperation;
+import android.hardware.cts.helpers.sensorTestOperations.VerifySensorOperation;
 
 /**
  * Semi-automated test that focuses on characteristics associated with Accelerometer measurements.
@@ -96,12 +96,15 @@ public class GyroscopeMeasurementTestActivity extends BaseSensorSemiAutomatedTes
         waitForUser();
 
         Thread.sleep(500 /*ms*/);
-        VerifySignumOperation verifySignum = new VerifySignumOperation(
+        VerifySensorOperation verifySignum = new VerifySensorOperation(
                 getApplicationContext(),
                 Sensor.TYPE_GYROSCOPE,
                 SensorManager.SENSOR_DELAY_FASTEST,
+                0 /*reportLatencyInUs*/,
+                100 /* event count */);
+        verifySignum.verifySignum(
                 expectations,
-                0.2 /*noiseThreshold*/);
+                new float[]{0.2f, 0.2f, 0.2f} /*noiseThreshold*/);
         verifySignum.execute();
         logSuccess();
     }
