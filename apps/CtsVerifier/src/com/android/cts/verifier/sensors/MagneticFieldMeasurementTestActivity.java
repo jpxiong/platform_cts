@@ -21,7 +21,7 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorManager;
 import android.hardware.cts.helpers.SensorManagerTestVerifier;
-import android.hardware.cts.helpers.sensorTestOperations.VerifySensorOperation;
+import android.hardware.cts.helpers.sensoroperations.VerifySensorOperation;
 
 /**
  * Semi-automated test that focuses characteristics associated with Accelerometer measurements.
