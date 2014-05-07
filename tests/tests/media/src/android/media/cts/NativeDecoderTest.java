@@ -445,5 +445,11 @@ public class NativeDecoderTest extends MediaPlayerTestBase {
 
     private static native boolean testMuxerNative(int in, long inoffset, long insize,
             int out, boolean webm);
+
+    public void testFormat() throws Exception {
+        assertTrue("media format fail, see log for details", testFormatNative());
+    }
+
+    private static native boolean testFormatNative();
 }
 
