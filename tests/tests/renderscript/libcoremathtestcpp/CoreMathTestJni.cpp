@@ -274,7 +274,7 @@ Java_android_renderscript_cts_CoreMathVerifier_maxI8(JNIEnv*, jclass, jbyte x, j
 
 extern "C" JNIEXPORT jbyte JNICALL
 Java_android_renderscript_cts_CoreMathVerifier_maxU8(JNIEnv*, jclass, jbyte x, jbyte y) {
-    return std::max((unsigned char)x, (unsigned char)y);
+    return std::max((uint8_t)x, (uint8_t)y);
 }
 
 extern "C" JNIEXPORT jshort JNICALL
@@ -284,7 +284,7 @@ Java_android_renderscript_cts_CoreMathVerifier_maxI16(JNIEnv*, jclass, jshort x,
 
 extern "C" JNIEXPORT jshort JNICALL
 Java_android_renderscript_cts_CoreMathVerifier_maxU16(JNIEnv*, jclass, jshort x, jshort y) {
-    return std::max((unsigned short)x, (unsigned short)y);
+    return std::max((uint16_t)x, (uint16_t)y);
 }
 
 extern "C" JNIEXPORT jint JNICALL
@@ -294,7 +294,7 @@ Java_android_renderscript_cts_CoreMathVerifier_maxI32(JNIEnv*, jclass, jint x, j
 
 extern "C" JNIEXPORT jint JNICALL
 Java_android_renderscript_cts_CoreMathVerifier_maxU32(JNIEnv*, jclass, jint x, jint y) {
-    return std::max((unsigned int)x, (unsigned int)y);
+    return std::max((uint32_t)x, (uint32_t)y);
 }
 
 extern "C" JNIEXPORT jlong JNICALL
@@ -304,7 +304,7 @@ Java_android_renderscript_cts_CoreMathVerifier_maxI64(JNIEnv*, jclass, jlong x, 
 
 extern "C" JNIEXPORT jlong JNICALL
 Java_android_renderscript_cts_CoreMathVerifier_maxU64(JNIEnv*, jclass, jlong x, jlong y) {
-    return std::max((unsigned long)x, (unsigned long)y);
+    return std::max((uint64_t)x, (uint64_t)y);
 }
 
 extern "C" JNIEXPORT jbyte JNICALL
@@ -314,7 +314,7 @@ Java_android_renderscript_cts_CoreMathVerifier_minI8(JNIEnv*, jclass, jbyte x, j
 
 extern "C" JNIEXPORT jbyte JNICALL
 Java_android_renderscript_cts_CoreMathVerifier_minU8(JNIEnv*, jclass, jbyte x, jbyte y) {
-    return std::min((unsigned char)x, (unsigned char)y);
+    return std::min((uint8_t)x, (uint8_t)y);
 }
 
 extern "C" JNIEXPORT jshort JNICALL
@@ -324,7 +324,7 @@ Java_android_renderscript_cts_CoreMathVerifier_minI16(JNIEnv*, jclass, jshort x,
 
 extern "C" JNIEXPORT jshort JNICALL
 Java_android_renderscript_cts_CoreMathVerifier_minU16(JNIEnv*, jclass, jshort x, jshort y) {
-    return std::min((unsigned short)x, (unsigned short)y);
+    return std::min((uint16_t)x, (uint16_t)y);
 }
 
 extern "C" JNIEXPORT jint JNICALL
@@ -334,7 +334,7 @@ Java_android_renderscript_cts_CoreMathVerifier_minI32(JNIEnv*, jclass, jint x, j
 
 extern "C" JNIEXPORT jint JNICALL
 Java_android_renderscript_cts_CoreMathVerifier_minU32(JNIEnv*, jclass, jint x, jint y) {
-    return std::min((unsigned int)x, (unsigned int)y);
+    return std::min((uint32_t)x, (uint32_t)y);
 }
 
 extern "C" JNIEXPORT jlong JNICALL
@@ -344,7 +344,7 @@ Java_android_renderscript_cts_CoreMathVerifier_minI64(JNIEnv*, jclass, jlong x, 
 
 extern "C" JNIEXPORT jlong JNICALL
 Java_android_renderscript_cts_CoreMathVerifier_minU64(JNIEnv*, jclass, jlong x, jlong y) {
-    return std::min((unsigned long)x, (unsigned long)y);
+    return std::min((uint64_t)x, (uint64_t)y);
 }
 
 extern "C" JNIEXPORT jfloat JNICALL
@@ -409,363 +409,363 @@ Java_android_renderscript_cts_CoreMathVerifier_trunc(JNIEnv*, jclass, jfloat x) 
 
 extern "C" JNIEXPORT jbyte JNICALL
 Java_android_renderscript_cts_CoreMathVerifier_convertCharToChar(JNIEnv*, jclass, jbyte x) {
-    return (jbyte)(signed char)(signed char)x;
+    return (jbyte)(int8_t)(int8_t)x;
 }
 extern "C" JNIEXPORT jbyte JNICALL
 Java_android_renderscript_cts_CoreMathVerifier_convertCharToUchar(JNIEnv*, jclass, jbyte x) {
-    return (jbyte)(unsigned char)(signed char)x;
+    return (jbyte)(uint8_t)(int8_t)x;
 }
 extern "C" JNIEXPORT jshort JNICALL
 Java_android_renderscript_cts_CoreMathVerifier_convertCharToShort(JNIEnv*, jclass, jbyte x) {
-    return (jshort)(short)(signed char)x;
+    return (jshort)(int16_t)(int8_t)x;
 }
 extern "C" JNIEXPORT jshort JNICALL
 Java_android_renderscript_cts_CoreMathVerifier_convertCharToUshort(JNIEnv*, jclass, jbyte x) {
-    return (jshort)(unsigned short)(signed char)x;
+    return (jshort)(uint16_t)(int8_t)x;
 }
 extern "C" JNIEXPORT jint JNICALL
 Java_android_renderscript_cts_CoreMathVerifier_convertCharToInt(JNIEnv*, jclass, jbyte x) {
-    return (jint)(int)(signed char)x;
+    return (jint)(int32_t)(int8_t)x;
 }
 extern "C" JNIEXPORT jint JNICALL
 Java_android_renderscript_cts_CoreMathVerifier_convertCharToUint(JNIEnv*, jclass, jbyte x) {
-    return (jint)(unsigned int)(signed char)x;
+    return (jint)(uint32_t)(int8_t)x;
 }
 extern "C" JNIEXPORT jlong JNICALL
 Java_android_renderscript_cts_CoreMathVerifier_convertCharToLong(JNIEnv*, jclass, jbyte x) {
-    return (jlong)(long)(signed char)x;
+    return (jlong)(int64_t)(int8_t)x;
 }
 extern "C" JNIEXPORT jlong JNICALL
 Java_android_renderscript_cts_CoreMathVerifier_convertCharToUlong(JNIEnv*, jclass, jbyte x) {
-    return (jlong)(unsigned long)(signed char)x;
+    return (jlong)(uint64_t)(int8_t)x;
 }
 extern "C" JNIEXPORT jfloat JNICALL
 Java_android_renderscript_cts_CoreMathVerifier_convertCharToFloat(JNIEnv*, jclass, jbyte x) {
-    return (jfloat)(float)(signed char)x;
+    return (jfloat)(float)(int8_t)x;
 }
 extern "C" JNIEXPORT jdouble JNICALL
 Java_android_renderscript_cts_CoreMathVerifier_convertCharToDouble(JNIEnv*, jclass, jbyte x) {
-    return (jdouble)(double)(signed char)x;
+    return (jdouble)(double)(int8_t)x;
 }
 
 extern "C" JNIEXPORT jbyte JNICALL
 Java_android_renderscript_cts_CoreMathVerifier_convertUcharToChar(JNIEnv*, jclass, jbyte x) {
-    return (jbyte)(signed char)(unsigned char)x;
+    return (jbyte)(int8_t)(uint8_t)x;
 }
 extern "C" JNIEXPORT jbyte JNICALL
 Java_android_renderscript_cts_CoreMathVerifier_convertUcharToUchar(JNIEnv*, jclass, jbyte x) {
-    return (jbyte)(unsigned char)(unsigned char)x;
+    return (jbyte)(uint8_t)(uint8_t)x;
 }
 extern "C" JNIEXPORT jshort JNICALL
 Java_android_renderscript_cts_CoreMathVerifier_convertUcharToShort(JNIEnv*, jclass, jbyte x) {
-    return (jshort)(short)(unsigned char)x;
+    return (jshort)(int16_t)(uint8_t)x;
 }
 extern "C" JNIEXPORT jshort JNICALL
 Java_android_renderscript_cts_CoreMathVerifier_convertUcharToUshort(JNIEnv*, jclass, jbyte x) {
-    return (jshort)(unsigned short)(unsigned char)x;
+    return (jshort)(uint16_t)(uint8_t)x;
 }
 extern "C" JNIEXPORT jint JNICALL
 Java_android_renderscript_cts_CoreMathVerifier_convertUcharToInt(JNIEnv*, jclass, jbyte x) {
-    return (jint)(int)(unsigned char)x;
+    return (jint)(int32_t)(uint8_t)x;
 }
 extern "C" JNIEXPORT jint JNICALL
 Java_android_renderscript_cts_CoreMathVerifier_convertUcharToUint(JNIEnv*, jclass, jbyte x) {
-    return (jint)(unsigned int)(unsigned char)x;
+    return (jint)(uint32_t)(uint8_t)x;
 }
 extern "C" JNIEXPORT jlong JNICALL
 Java_android_renderscript_cts_CoreMathVerifier_convertUcharToLong(JNIEnv*, jclass, jbyte x) {
-    return (jlong)(long)(unsigned char)x;
+    return (jlong)(int64_t)(uint8_t)x;
 }
 extern "C" JNIEXPORT jlong JNICALL
 Java_android_renderscript_cts_CoreMathVerifier_convertUcharToUlong(JNIEnv*, jclass, jbyte x) {
-    return (jlong)(unsigned long)(unsigned char)x;
+    return (jlong)(uint64_t)(uint8_t)x;
 }
 extern "C" JNIEXPORT jfloat JNICALL
 Java_android_renderscript_cts_CoreMathVerifier_convertUcharToFloat(JNIEnv*, jclass, jbyte x) {
-    return (jfloat)(float)(unsigned char)x;
+    return (jfloat)(float)(uint8_t)x;
 }
 extern "C" JNIEXPORT jdouble JNICALL
 Java_android_renderscript_cts_CoreMathVerifier_convertUcharToDouble(JNIEnv*, jclass, jbyte x) {
-    return (jdouble)(double)(unsigned char)x;
+    return (jdouble)(double)(uint8_t)x;
 }
 
 extern "C" JNIEXPORT jbyte JNICALL
 Java_android_renderscript_cts_CoreMathVerifier_convertShortToChar(JNIEnv*, jclass, jshort x) {
-    return (jbyte)(signed char)(short)x;
+    return (jbyte)(int8_t)(int16_t)x;
 }
 extern "C" JNIEXPORT jbyte JNICALL
 Java_android_renderscript_cts_CoreMathVerifier_convertShortToUchar(JNIEnv*, jclass, jshort x) {
-    return (jbyte)(unsigned char)(short)x;
+    return (jbyte)(uint8_t)(int16_t)x;
 }
 extern "C" JNIEXPORT jshort JNICALL
 Java_android_renderscript_cts_CoreMathVerifier_convertShortToShort(JNIEnv*, jclass, jshort x) {
-    return (jshort)(short)(short)x;
+    return (jshort)(int16_t)(int16_t)x;
 }
 extern "C" JNIEXPORT jshort JNICALL
 Java_android_renderscript_cts_CoreMathVerifier_convertShortToUshort(JNIEnv*, jclass, jshort x) {
-    return (jshort)(unsigned short)(short)x;
+    return (jshort)(uint16_t)(int16_t)x;
 }
 extern "C" JNIEXPORT jint JNICALL
 Java_android_renderscript_cts_CoreMathVerifier_convertShortToInt(JNIEnv*, jclass, jshort x) {
-    return (jint)(int)(short)x;
+    return (jint)(int32_t)(int16_t)x;
 }
 extern "C" JNIEXPORT jint JNICALL
 Java_android_renderscript_cts_CoreMathVerifier_convertShortToUint(JNIEnv*, jclass, jshort x) {
-    return (jint)(unsigned int)(short)x;
+    return (jint)(uint32_t)(int16_t)x;
 }
 extern "C" JNIEXPORT jlong JNICALL
 Java_android_renderscript_cts_CoreMathVerifier_convertShortToLong(JNIEnv*, jclass, jshort x) {
-    return (jlong)(long)(short)x;
+    return (jlong)(int64_t)(int16_t)x;
 }
 extern "C" JNIEXPORT jlong JNICALL
 Java_android_renderscript_cts_CoreMathVerifier_convertShortToUlong(JNIEnv*, jclass, jshort x) {
-    return (jlong)(unsigned long)(short)x;
+    return (jlong)(uint64_t)(int16_t)x;
 }
 extern "C" JNIEXPORT jfloat JNICALL
 Java_android_renderscript_cts_CoreMathVerifier_convertShortToFloat(JNIEnv*, jclass, jshort x) {
-    return (jfloat)(float)(short)x;
+    return (jfloat)(float)(int16_t)x;
 }
 extern "C" JNIEXPORT jdouble JNICALL
 Java_android_renderscript_cts_CoreMathVerifier_convertShortToDouble(JNIEnv*, jclass, jshort x) {
-    return (jdouble)(double)(short)x;
+    return (jdouble)(double)(int16_t)x;
 }
 
 extern "C" JNIEXPORT jbyte JNICALL
 Java_android_renderscript_cts_CoreMathVerifier_convertUshortToChar(JNIEnv*, jclass, jshort x) {
-    return (jbyte)(signed char)(unsigned short)x;
+    return (jbyte)(int8_t)(uint16_t)x;
 }
 extern "C" JNIEXPORT jbyte JNICALL
 Java_android_renderscript_cts_CoreMathVerifier_convertUshortToUchar(JNIEnv*, jclass, jshort x) {
-    return (jbyte)(unsigned char)(unsigned short)x;
+    return (jbyte)(uint8_t)(uint16_t)x;
 }
 extern "C" JNIEXPORT jshort JNICALL
 Java_android_renderscript_cts_CoreMathVerifier_convertUshortToShort(JNIEnv*, jclass, jshort x) {
-    return (jshort)(short)(unsigned short)x;
+    return (jshort)(int16_t)(uint16_t)x;
 }
 extern "C" JNIEXPORT jshort JNICALL
 Java_android_renderscript_cts_CoreMathVerifier_convertUshortToUshort(JNIEnv*, jclass, jshort x) {
-    return (jshort)(unsigned short)(unsigned short)x;
+    return (jshort)(uint16_t)(uint16_t)x;
 }
 extern "C" JNIEXPORT jint JNICALL
 Java_android_renderscript_cts_CoreMathVerifier_convertUshortToInt(JNIEnv*, jclass, jshort x) {
-    return (jint)(int)(unsigned short)x;
+    return (jint)(int32_t)(uint16_t)x;
 }
 extern "C" JNIEXPORT jint JNICALL
 Java_android_renderscript_cts_CoreMathVerifier_convertUshortToUint(JNIEnv*, jclass, jshort x) {
-    return (jint)(unsigned int)(unsigned short)x;
+    return (jint)(uint32_t)(uint16_t)x;
 }
 extern "C" JNIEXPORT jlong JNICALL
 Java_android_renderscript_cts_CoreMathVerifier_convertUshortToLong(JNIEnv*, jclass, jshort x) {
-    return (jlong)(long)(unsigned short)x;
+    return (jlong)(int64_t)(uint16_t)x;
 }
 extern "C" JNIEXPORT jlong JNICALL
 Java_android_renderscript_cts_CoreMathVerifier_convertUshortToUlong(JNIEnv*, jclass, jshort x) {
-    return (jlong)(unsigned long)(unsigned short)x;
+    return (jlong)(uint64_t)(uint16_t)x;
 }
 extern "C" JNIEXPORT jfloat JNICALL
 Java_android_renderscript_cts_CoreMathVerifier_convertUshortToFloat(JNIEnv*, jclass, jshort x) {
-    return (jfloat)(float)(unsigned short)x;
+    return (jfloat)(float)(uint16_t)x;
 }
 extern "C" JNIEXPORT jdouble JNICALL
 Java_android_renderscript_cts_CoreMathVerifier_convertUshortToDouble(JNIEnv*, jclass, jshort x) {
-    return (jdouble)(double)(unsigned short)x;
+    return (jdouble)(double)(uint16_t)x;
 }
 
 extern "C" JNIEXPORT jbyte JNICALL
 Java_android_renderscript_cts_CoreMathVerifier_convertIntToChar(JNIEnv*, jclass, jint x) {
-    return (jbyte)(signed char)(int)x;
+    return (jbyte)(int8_t)(int32_t)x;
 }
 extern "C" JNIEXPORT jbyte JNICALL
 Java_android_renderscript_cts_CoreMathVerifier_convertIntToUchar(JNIEnv*, jclass, jint x) {
-    return (jbyte)(unsigned char)(int)x;
+    return (jbyte)(uint8_t)(int32_t)x;
 }
 extern "C" JNIEXPORT jshort JNICALL
 Java_android_renderscript_cts_CoreMathVerifier_convertIntToShort(JNIEnv*, jclass, jint x) {
-    return (jshort)(short)(int)x;
+    return (jshort)(int16_t)(int32_t)x;
 }
 extern "C" JNIEXPORT jshort JNICALL
 Java_android_renderscript_cts_CoreMathVerifier_convertIntToUshort(JNIEnv*, jclass, jint x) {
-    return (jshort)(unsigned short)(int)x;
+    return (jshort)(uint16_t)(int32_t)x;
 }
 extern "C" JNIEXPORT jint JNICALL
 Java_android_renderscript_cts_CoreMathVerifier_convertIntToInt(JNIEnv*, jclass, jint x) {
-    return (jint)(int)(int)x;
+    return (jint)(int32_t)(int32_t)x;
 }
 extern "C" JNIEXPORT jint JNICALL
 Java_android_renderscript_cts_CoreMathVerifier_convertIntToUint(JNIEnv*, jclass, jint x) {
-    return (jint)(unsigned int)(int)x;
+    return (jint)(uint32_t)(int32_t)x;
 }
 extern "C" JNIEXPORT jlong JNICALL
 Java_android_renderscript_cts_CoreMathVerifier_convertIntToLong(JNIEnv*, jclass, jint x) {
-    return (jlong)(long)(int)x;
+    return (jlong)(int64_t)(int32_t)x;
 }
 extern "C" JNIEXPORT jlong JNICALL
 Java_android_renderscript_cts_CoreMathVerifier_convertIntToUlong(JNIEnv*, jclass, jint x) {
-    return (jlong)(unsigned long)(int)x;
+    return (jlong)(uint64_t)(int32_t)x;
 }
 extern "C" JNIEXPORT jfloat JNICALL
 Java_android_renderscript_cts_CoreMathVerifier_convertIntToFloat(JNIEnv*, jclass, jint x) {
-    return (jfloat)(float)(int)x;
+    return (jfloat)(float)(int32_t)x;
 }
 extern "C" JNIEXPORT jdouble JNICALL
 Java_android_renderscript_cts_CoreMathVerifier_convertIntToDouble(JNIEnv*, jclass, jint x) {
-    return (jdouble)(double)(int)x;
+    return (jdouble)(double)(int32_t)x;
 }
 
 extern "C" JNIEXPORT jbyte JNICALL
 Java_android_renderscript_cts_CoreMathVerifier_convertUintToChar(JNIEnv*, jclass, jint x) {
-    return (jbyte)(signed char)(unsigned int)x;
+    return (jbyte)(int8_t)(uint32_t)x;
 }
 extern "C" JNIEXPORT jbyte JNICALL
 Java_android_renderscript_cts_CoreMathVerifier_convertUintToUchar(JNIEnv*, jclass, jint x) {
-    return (jbyte)(unsigned char)(unsigned int)x;
+    return (jbyte)(uint8_t)(uint32_t)x;
 }
 extern "C" JNIEXPORT jshort JNICALL
 Java_android_renderscript_cts_CoreMathVerifier_convertUintToShort(JNIEnv*, jclass, jint x) {
-    return (jshort)(short)(unsigned int)x;
+    return (jshort)(int16_t)(uint32_t)x;
 }
 extern "C" JNIEXPORT jshort JNICALL
 Java_android_renderscript_cts_CoreMathVerifier_convertUintToUshort(JNIEnv*, jclass, jint x) {
-    return (jshort)(unsigned short)(unsigned int)x;
+    return (jshort)(uint16_t)(uint32_t)x;
 }
 extern "C" JNIEXPORT jint JNICALL
 Java_android_renderscript_cts_CoreMathVerifier_convertUintToInt(JNIEnv*, jclass, jint x) {
-    return (jint)(int)(unsigned int)x;
+    return (jint)(int32_t)(uint32_t)x;
 }
 extern "C" JNIEXPORT jint JNICALL
 Java_android_renderscript_cts_CoreMathVerifier_convertUintToUint(JNIEnv*, jclass, jint x) {
-    return (jint)(unsigned int)(unsigned int)x;
+    return (jint)(uint32_t)(uint32_t)x;
 }
 extern "C" JNIEXPORT jlong JNICALL
 Java_android_renderscript_cts_CoreMathVerifier_convertUintToLong(JNIEnv*, jclass, jint x) {
-    return (jlong)(long)(unsigned int)x;
+    return (jlong)(int64_t)(uint32_t)x;
 }
 extern "C" JNIEXPORT jlong JNICALL
 Java_android_renderscript_cts_CoreMathVerifier_convertUintToUlong(JNIEnv*, jclass, jint x) {
-    return (jlong)(unsigned long)(unsigned int)x;
+    return (jlong)(uint64_t)(uint32_t)x;
 }
 extern "C" JNIEXPORT jfloat JNICALL
 Java_android_renderscript_cts_CoreMathVerifier_convertUintToFloat(JNIEnv*, jclass, jint x) {
-    return (jfloat)(float)(unsigned int)x;
+    return (jfloat)(float)(uint32_t)x;
 }
 extern "C" JNIEXPORT jdouble JNICALL
 Java_android_renderscript_cts_CoreMathVerifier_convertUintToDouble(JNIEnv*, jclass, jint x) {
-    return (jdouble)(double)(unsigned int)x;
+    return (jdouble)(double)(uint32_t)x;
 }
 
 extern "C" JNIEXPORT jbyte JNICALL
 Java_android_renderscript_cts_CoreMathVerifier_convertLongToChar(JNIEnv*, jclass, jlong x) {
-    return (jbyte)(signed char)(long)x;
+    return (jbyte)(int8_t)(int64_t)x;
 }
 extern "C" JNIEXPORT jbyte JNICALL
 Java_android_renderscript_cts_CoreMathVerifier_convertLongToUchar(JNIEnv*, jclass, jlong x) {
-    return (jbyte)(unsigned char)(long)x;
+    return (jbyte)(uint8_t)(int64_t)x;
 }
 extern "C" JNIEXPORT jshort JNICALL
 Java_android_renderscript_cts_CoreMathVerifier_convertLongToShort(JNIEnv*, jclass, jlong x) {
-    return (jshort)(short)(long)x;
+    return (jshort)(int16_t)(int64_t)x;
 }
 extern "C" JNIEXPORT jshort JNICALL
 Java_android_renderscript_cts_CoreMathVerifier_convertLongToUshort(JNIEnv*, jclass, jlong x) {
-    return (jshort)(unsigned short)(long)x;
+    return (jshort)(uint16_t)(int64_t)x;
 }
 extern "C" JNIEXPORT jint JNICALL
 Java_android_renderscript_cts_CoreMathVerifier_convertLongToInt(JNIEnv*, jclass, jlong x) {
-    return (jint)(int)(long)x;
+    return (jint)(int32_t)(int64_t)x;
 }
 extern "C" JNIEXPORT jint JNICALL
 Java_android_renderscript_cts_CoreMathVerifier_convertLongToUint(JNIEnv*, jclass, jlong x) {
-    return (jint)(unsigned int)(long)x;
+    return (jint)(uint32_t)(int64_t)x;
 }
 extern "C" JNIEXPORT jlong JNICALL
 Java_android_renderscript_cts_CoreMathVerifier_convertLongToLong(JNIEnv*, jclass, jlong x) {
-    return (jlong)(long)(long)x;
+    return (jlong)(int64_t)(int64_t)x;
 }
 extern "C" JNIEXPORT jlong JNICALL
 Java_android_renderscript_cts_CoreMathVerifier_convertLongToUlong(JNIEnv*, jclass, jlong x) {
-    return (jlong)(unsigned long)(long)x;
+    return (jlong)(uint64_t)(int64_t)x;
 }
 extern "C" JNIEXPORT jfloat JNICALL
 Java_android_renderscript_cts_CoreMathVerifier_convertLongToFloat(JNIEnv*, jclass, jlong x) {
-    return (jfloat)(float)(long)x;
+    return (jfloat)(float)(int64_t)x;
 }
 extern "C" JNIEXPORT jdouble JNICALL
 Java_android_renderscript_cts_CoreMathVerifier_convertLongToDouble(JNIEnv*, jclass, jlong x) {
-    return (jdouble)(double)(long)x;
+    return (jdouble)(double)(int64_t)x;
 }
 
 extern "C" JNIEXPORT jbyte JNICALL
 Java_android_renderscript_cts_CoreMathVerifier_convertUlongToChar(JNIEnv*, jclass, jlong x) {
-    return (jbyte)(signed char)(unsigned long)x;
+    return (jbyte)(int8_t)(uint64_t)x;
 }
 extern "C" JNIEXPORT jbyte JNICALL
 Java_android_renderscript_cts_CoreMathVerifier_convertUlongToUchar(JNIEnv*, jclass, jlong x) {
-    return (jbyte)(unsigned char)(unsigned long)x;
+    return (jbyte)(uint8_t)(uint64_t)x;
 }
 extern "C" JNIEXPORT jshort JNICALL
 Java_android_renderscript_cts_CoreMathVerifier_convertUlongToShort(JNIEnv*, jclass, jlong x) {
-    return (jshort)(short)(unsigned long)x;
+    return (jshort)(int16_t)(uint64_t)x;
 }
 extern "C" JNIEXPORT jshort JNICALL
 Java_android_renderscript_cts_CoreMathVerifier_convertUlongToUshort(JNIEnv*, jclass, jlong x) {
-    return (jshort)(unsigned short)(unsigned long)x;
+    return (jshort)(uint16_t)(uint64_t)x;
 }
 extern "C" JNIEXPORT jint JNICALL
 Java_android_renderscript_cts_CoreMathVerifier_convertUlongToInt(JNIEnv*, jclass, jlong x) {
-    return (jint)(int)(unsigned long)x;
+    return (jint)(int32_t)(uint64_t)x;
 }
 extern "C" JNIEXPORT jint JNICALL
 Java_android_renderscript_cts_CoreMathVerifier_convertUlongToUint(JNIEnv*, jclass, jlong x) {
-    return (jint)(unsigned int)(unsigned long)x;
+    return (jint)(uint32_t)(uint64_t)x;
 }
 extern "C" JNIEXPORT jlong JNICALL
 Java_android_renderscript_cts_CoreMathVerifier_convertUlongToLong(JNIEnv*, jclass, jlong x) {
-    return (jlong)(long)(unsigned long)x;
+    return (jlong)(int64_t)(uint64_t)x;
 }
 extern "C" JNIEXPORT jlong JNICALL
 Java_android_renderscript_cts_CoreMathVerifier_convertUlongToUlong(JNIEnv*, jclass, jlong x) {
-    return (jlong)(unsigned long)(unsigned long)x;
+    return (jlong)(uint64_t)(uint64_t)x;
 }
 extern "C" JNIEXPORT jfloat JNICALL
 Java_android_renderscript_cts_CoreMathVerifier_convertUlongToFloat(JNIEnv*, jclass, jlong x) {
-    return (jfloat)(float)(unsigned long)x;
+    return (jfloat)(float)(uint64_t)x;
 }
 extern "C" JNIEXPORT jdouble JNICALL
 Java_android_renderscript_cts_CoreMathVerifier_convertUlongToDouble(JNIEnv*, jclass, jlong x) {
-    return (jdouble)(double)(unsigned long)x;
+    return (jdouble)(double)(uint64_t)x;
 }
 
 extern "C" JNIEXPORT jbyte JNICALL
 Java_android_renderscript_cts_CoreMathVerifier_convertFloatToChar(JNIEnv*, jclass, jfloat x) {
-    return (jbyte)(signed char)(float)x;
+    return (jbyte)(int8_t)(float)x;
 }
 extern "C" JNIEXPORT jbyte JNICALL
 Java_android_renderscript_cts_CoreMathVerifier_convertFloatToUchar(JNIEnv*, jclass, jfloat x) {
-    return (jbyte)(unsigned char)(float)x;
+    return (jbyte)(uint8_t)(float)x;
 }
 extern "C" JNIEXPORT jshort JNICALL
 Java_android_renderscript_cts_CoreMathVerifier_convertFloatToShort(JNIEnv*, jclass, jfloat x) {
-    return (jshort)(short)(float)x;
+    return (jshort)(int16_t)(float)x;
 }
 extern "C" JNIEXPORT jshort JNICALL
 Java_android_renderscript_cts_CoreMathVerifier_convertFloatToUshort(JNIEnv*, jclass, jfloat x) {
-    return (jshort)(unsigned short)(float)x;
+    return (jshort)(uint16_t)(float)x;
 }
 extern "C" JNIEXPORT jint JNICALL
 Java_android_renderscript_cts_CoreMathVerifier_convertFloatToInt(JNIEnv*, jclass, jfloat x) {
-    return (jint)(int)(float)x;
+    return (jint)(int32_t)(float)x;
 }
 extern "C" JNIEXPORT jint JNICALL
 Java_android_renderscript_cts_CoreMathVerifier_convertFloatToUint(JNIEnv*, jclass, jfloat x) {
-    return (jint)(unsigned int)(float)x;
+    return (jint)(uint32_t)(float)x;
 }
 extern "C" JNIEXPORT jlong JNICALL
 Java_android_renderscript_cts_CoreMathVerifier_convertFloatToLong(JNIEnv*, jclass, jfloat x) {
-    return (jlong)(long)(float)x;
+    return (jlong)(int64_t)(float)x;
 }
 extern "C" JNIEXPORT jlong JNICALL
 Java_android_renderscript_cts_CoreMathVerifier_convertFloatToUlong(JNIEnv*, jclass, jfloat x) {
-    return (jlong)(unsigned long)(float)x;
+    return (jlong)(uint64_t)(float)x;
 }
 extern "C" JNIEXPORT jfloat JNICALL
 Java_android_renderscript_cts_CoreMathVerifier_convertFloatToFloat(JNIEnv*, jclass, jfloat x) {
@@ -778,35 +778,35 @@ Java_android_renderscript_cts_CoreMathVerifier_convertFloatToDouble(JNIEnv*, jcl
 
 extern "C" JNIEXPORT jbyte JNICALL
 Java_android_renderscript_cts_CoreMathVerifier_convertDoubleToChar(JNIEnv*, jclass, jdouble x) {
-    return (jbyte)(signed char)(double)x;
+    return (jbyte)(int8_t)(double)x;
 }
 extern "C" JNIEXPORT jbyte JNICALL
 Java_android_renderscript_cts_CoreMathVerifier_convertDoubleToUchar(JNIEnv*, jclass, jdouble x) {
-    return (jbyte)(unsigned char)(double)x;
+    return (jbyte)(uint8_t)(double)x;
 }
 extern "C" JNIEXPORT jshort JNICALL
 Java_android_renderscript_cts_CoreMathVerifier_convertDoubleToShort(JNIEnv*, jclass, jdouble x) {
-    return (jshort)(short)(double)x;
+    return (jshort)(int16_t)(double)x;
 }
 extern "C" JNIEXPORT jshort JNICALL
 Java_android_renderscript_cts_CoreMathVerifier_convertDoubleToUshort(JNIEnv*, jclass, jdouble x) {
-    return (jshort)(unsigned short)(double)x;
+    return (jshort)(uint16_t)(double)x;
 }
 extern "C" JNIEXPORT jint JNICALL
 Java_android_renderscript_cts_CoreMathVerifier_convertDoubleToInt(JNIEnv*, jclass, jdouble x) {
-    return (jint)(int)(double)x;
+    return (jint)(int32_t)(double)x;
 }
 extern "C" JNIEXPORT jint JNICALL
 Java_android_renderscript_cts_CoreMathVerifier_convertDoubleToUint(JNIEnv*, jclass, jdouble x) {
-    return (jint)(unsigned int)(double)x;
+    return (jint)(uint32_t)(double)x;
 }
 extern "C" JNIEXPORT jlong JNICALL
 Java_android_renderscript_cts_CoreMathVerifier_convertDoubleToLong(JNIEnv*, jclass, jdouble x) {
-    return (jlong)(long)(double)x;
+    return (jlong)(int64_t)(double)x;
 }
 extern "C" JNIEXPORT jlong JNICALL
 Java_android_renderscript_cts_CoreMathVerifier_convertDoubleToUlong(JNIEnv*, jclass, jdouble x) {
-    return (jlong)(unsigned long)(double)x;
+    return (jlong)(uint64_t)(double)x;
 }
 extern "C" JNIEXPORT jfloat JNICALL
 Java_android_renderscript_cts_CoreMathVerifier_convertDoubleToFloat(JNIEnv*, jclass, jdouble x) {
