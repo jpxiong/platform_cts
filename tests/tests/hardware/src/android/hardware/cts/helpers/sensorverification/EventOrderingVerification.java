@@ -18,6 +18,8 @@ package android.hardware.cts.helpers.sensorverification;
 
 import android.hardware.Sensor;
 import android.hardware.cts.helpers.SensorStats;
+import android.hardware.cts.helpers.SensorTestInformation;
+import android.hardware.cts.helpers.SensorTestInformation.SensorReportingMode;
 import android.hardware.cts.helpers.TestSensorEvent;
 
 import junit.framework.Assert;
@@ -31,12 +33,12 @@ import java.util.List;
 public class EventOrderingVerification extends AbstractSensorVerification {
     public static final String PASSED_KEY = "event_out_of_order_passed";
 
-    private static final int MESSAGE_LENGTH = 3;
+    // Number of indices to print in assert message before truncating
+    private static final int TRUNCATE_MESSAGE_LENGTH = 3;
 
     private Long mMaxTimestamp = null;
+    private final List<IndexedEventPair> mOutOfOrderEvents = new LinkedList<IndexedEventPair>();
     private TestSensorEvent mPreviousEvent = null;
-    private final List<EventInfo> mOutOfOrderEvents = new LinkedList<EventInfo>();
-    private int mCount = 0;
     private int mIndex = 0;
 
     /**
@@ -47,23 +49,12 @@ public class EventOrderingVerification extends AbstractSensorVerification {
      */
     @SuppressWarnings("deprecation")
     public static EventOrderingVerification getDefault(Sensor sensor) {
-        switch (sensor.getType()) {
-            case Sensor.TYPE_ACCELEROMETER:
-            case Sensor.TYPE_MAGNETIC_FIELD:
-            case Sensor.TYPE_ORIENTATION:
-            case Sensor.TYPE_GYROSCOPE:
-            case Sensor.TYPE_PRESSURE:
-            case Sensor.TYPE_GRAVITY:
-            case Sensor.TYPE_LINEAR_ACCELERATION:
-            case Sensor.TYPE_ROTATION_VECTOR:
-            case Sensor.TYPE_MAGNETIC_FIELD_UNCALIBRATED:
-            case Sensor.TYPE_GAME_ROTATION_VECTOR:
-            case Sensor.TYPE_GYROSCOPE_UNCALIBRATED:
-            case Sensor.TYPE_GEOMAGNETIC_ROTATION_VECTOR:
-                return new EventOrderingVerification();
-            default:
-                return null;
+        SensorReportingMode mode = SensorTestInformation.getReportingMode(sensor.getType());
+        if (!SensorReportingMode.CONTINUOUS.equals(mode)
+                && !SensorReportingMode.ON_CHANGE.equals(mode)) {
+            return null;
         }
+        return new EventOrderingVerification();
     }
 
     /**
@@ -75,25 +66,26 @@ public class EventOrderingVerification extends AbstractSensorVerification {
      */
     @Override
     public void verify(SensorStats stats) {
-        stats.addValue(PASSED_KEY, mCount == 0);
-        stats.addValue(SensorStats.EVENT_OUT_OF_ORDER_COUNT_KEY, mCount);
+        final int count = mOutOfOrderEvents.size();
+        stats.addValue(PASSED_KEY, count == 0);
+        stats.addValue(SensorStats.EVENT_OUT_OF_ORDER_COUNT_KEY, count);
 
-        int[] indices = new int[mOutOfOrderEvents.size()];
+        final int[] indices = new int[count];
         for (int i = 0; i < indices.length; i++) {
             indices[i] = mOutOfOrderEvents.get(i).index;
         }
         stats.addValue(SensorStats.EVENT_OUT_OF_ORDER_POSITIONS_KEY, indices);
 
-        if (mOutOfOrderEvents.size() > 0) {
+        if (count > 0) {
             StringBuilder sb = new StringBuilder();
-            sb.append(mCount).append(" events out of order: ");
-            for (int i = 0; i < Math.min(mOutOfOrderEvents.size(), MESSAGE_LENGTH); i++) {
-                EventInfo info = mOutOfOrderEvents.get(i);
+            sb.append(count).append(" events out of order: ");
+            for (int i = 0; i < Math.min(count, TRUNCATE_MESSAGE_LENGTH); i++) {
+                IndexedEventPair info = mOutOfOrderEvents.get(i);
                 sb.append(String.format("position=%d, previous=%d, timestamp=%d; ", info.index,
                         info.previousEvent.timestamp, info.event.timestamp));
             }
-            if (mOutOfOrderEvents.size() > MESSAGE_LENGTH) {
-                sb.append(mOutOfOrderEvents.size() - MESSAGE_LENGTH).append(" more");
+            if (count > TRUNCATE_MESSAGE_LENGTH) {
+                sb.append(count - TRUNCATE_MESSAGE_LENGTH).append(" more");
             } else {
                 // Delete the trailing "; "
                 sb.delete(sb.length() - 2, sb.length());
@@ -120,8 +112,7 @@ public class EventOrderingVerification extends AbstractSensorVerification {
             mMaxTimestamp = event.timestamp;
         } else {
             if (event.timestamp < mMaxTimestamp) {
-                mOutOfOrderEvents.add(new EventInfo(mIndex, event, mPreviousEvent));
-                mCount++;
+                mOutOfOrderEvents.add(new IndexedEventPair(mIndex, event, mPreviousEvent));
             } else if (event.timestamp > mMaxTimestamp) {
                 mMaxTimestamp = event.timestamp;
             }
@@ -129,17 +120,5 @@ public class EventOrderingVerification extends AbstractSensorVerification {
 
         mPreviousEvent = event;
         mIndex++;
-    }
-
-    private class EventInfo {
-        public final int index;
-        public final TestSensorEvent event;
-        public final TestSensorEvent previousEvent;
-
-        public EventInfo(int index, TestSensorEvent event, TestSensorEvent previousEvent) {
-            this.index = index;
-            this.event = event;
-            this.previousEvent = previousEvent;
-        }
     }
 }
