@@ -69,26 +69,32 @@ public class SensorVerificationHelperTest extends TestCase {
     }
 
     /**
-     * Test {@link SensorVerificationHelper#verifyFrequency(TestSensorEvent[], double, double)}.
+     * Test
+     * {@link SensorVerificationHelper#verifyFrequency(TestSensorEvent[], double, double, double)}.
      */
     public void testVerifyFrequency() {
         float[] values = {0, 1, 2, 3, 4};
         long[] timestamps = {0, 1000000, 2000000, 3000000, 4000000};  // 1000Hz
         TestSensorEvent[] events = getSensorEvents(timestamps, values);
 
-        VerificationResult result = SensorVerificationHelper.verifyFrequency(events, 1000.0, 1.0);
+        VerificationResult result = SensorVerificationHelper.verifyFrequency(events, 1000.0, 1.0,
+                1.0);
         assertFalse(result.isFailed());
         assertEquals(1000.0, (Double) result.getValue("frequency"), 0.01);
 
-        result = SensorVerificationHelper.verifyFrequency(events, 950.0, 100.0);
+        result = SensorVerificationHelper.verifyFrequency(events, 950.0, 100.0, 100.0);
         assertFalse(result.isFailed());
         assertEquals(1000.0, (Double) result.getValue("frequency"), 0.01);
 
-        result = SensorVerificationHelper.verifyFrequency(events, 1050.0, 100.0);
+        result = SensorVerificationHelper.verifyFrequency(events, 1050.0, 100.0, 100.0);
         assertFalse(result.isFailed());
         assertEquals(1000.0, (Double) result.getValue("frequency"), 0.01);
 
-        result = SensorVerificationHelper.verifyFrequency(events, 950.0, 25.0);
+        result = SensorVerificationHelper.verifyFrequency(events, 950.0, 100.0, 25.0);
+        assertTrue(result.isFailed());
+        assertEquals(1000.0, (Double) result.getValue("frequency"), 0.01);
+
+        result = SensorVerificationHelper.verifyFrequency(events, 1050.0, 25.0, 100.0);
         assertTrue(result.isFailed());
         assertEquals(1000.0, (Double) result.getValue("frequency"), 0.01);
     }

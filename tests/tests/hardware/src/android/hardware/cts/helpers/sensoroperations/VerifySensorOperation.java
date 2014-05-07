@@ -60,7 +60,8 @@ public class VerifySensorOperation extends AbstractSensorOperation {
 
     private boolean mVerifyFrequency = false;
     private double mFrequencyExpected = 0.0;
-    private double mFrequencyThreshold = 0.0;
+    private double mFrequencyLowerThreshold = 0.0;
+    private double mFrequencyUpperThreshold = 0.0;
 
     private boolean mVerifyJitter = false;
     private int mJitterExpected = 0;
@@ -169,13 +170,28 @@ public class VerifySensorOperation extends AbstractSensorOperation {
     /**
      * Enable the frequency verification.
      *
-     * @param expected the expected frequency in ns.
-     * @param threshold the threshold in ns.
+     * @param expected the expected frequency in Hz.
+     * @param threshold the threshold in Hz.
      */
     public void verifyFrequency(double expected, double threshold) {
         mVerifyFrequency = true;
         mFrequencyExpected = expected;
-        mFrequencyThreshold = threshold;
+        mFrequencyLowerThreshold = threshold;
+        mFrequencyUpperThreshold = threshold;
+    }
+
+    /**
+     * Enable the frequency verification.
+     *
+     * @param expected the expected frequency in Hz.
+     * @param lowerThreshold the lower threshold in Hz.
+     * @param upperThreshold the upper threshold in Hz.
+     */
+    public void verifyFrequency(double expected, double lowerThreshold, double upperThreshold) {
+        mVerifyFrequency = true;
+        mFrequencyExpected = expected;
+        mFrequencyLowerThreshold = lowerThreshold;
+        mFrequencyUpperThreshold = upperThreshold;
     }
 
     /**
@@ -193,21 +209,27 @@ public class VerifySensorOperation extends AbstractSensorOperation {
             return;
         }
 
-        // sensorType: threshold (% of expected frequency)
-        Map<Integer, Integer> defaults = new HashMap<Integer, Integer>(12);
+        // sensorType: lowerThreshold, upperThreshold (% of expected frequency)
+        Map<Integer, int[]> defaults = new HashMap<Integer, int[]>(12);
         // Sensors that we don't want to test at this time but still want to record the values.
-        defaults.put(Sensor.TYPE_ACCELEROMETER, Integer.MAX_VALUE);
-        defaults.put(Sensor.TYPE_MAGNETIC_FIELD, Integer.MAX_VALUE);
-        defaults.put(Sensor.TYPE_GYROSCOPE, Integer.MAX_VALUE);
-        defaults.put(Sensor.TYPE_ORIENTATION, Integer.MAX_VALUE);
-        defaults.put(Sensor.TYPE_PRESSURE, Integer.MAX_VALUE);
-        defaults.put(Sensor.TYPE_GRAVITY, Integer.MAX_VALUE);
-        defaults.put(Sensor.TYPE_LINEAR_ACCELERATION, Integer.MAX_VALUE);
-        defaults.put(Sensor.TYPE_ROTATION_VECTOR, Integer.MAX_VALUE);
-        defaults.put(Sensor.TYPE_MAGNETIC_FIELD_UNCALIBRATED, Integer.MAX_VALUE);
-        defaults.put(Sensor.TYPE_GAME_ROTATION_VECTOR, Integer.MAX_VALUE);
-        defaults.put(Sensor.TYPE_GYROSCOPE_UNCALIBRATED, Integer.MAX_VALUE);
-        defaults.put(Sensor.TYPE_GEOMAGNETIC_ROTATION_VECTOR, Integer.MAX_VALUE);
+        defaults.put(Sensor.TYPE_ACCELEROMETER, new int[]{Integer.MAX_VALUE, Integer.MAX_VALUE});
+        defaults.put(Sensor.TYPE_MAGNETIC_FIELD, new int[]{Integer.MAX_VALUE, Integer.MAX_VALUE});
+        defaults.put(Sensor.TYPE_GYROSCOPE, new int[]{Integer.MAX_VALUE, Integer.MAX_VALUE});
+        defaults.put(Sensor.TYPE_ORIENTATION, new int[]{Integer.MAX_VALUE, Integer.MAX_VALUE});
+        defaults.put(Sensor.TYPE_PRESSURE, new int[]{Integer.MAX_VALUE, Integer.MAX_VALUE});
+        defaults.put(Sensor.TYPE_GRAVITY, new int[]{Integer.MAX_VALUE, Integer.MAX_VALUE});
+        defaults.put(Sensor.TYPE_LINEAR_ACCELERATION,
+                new int[]{Integer.MAX_VALUE, Integer.MAX_VALUE});
+        defaults.put(Sensor.TYPE_ROTATION_VECTOR,
+                new int[]{Integer.MAX_VALUE, Integer.MAX_VALUE});
+        defaults.put(Sensor.TYPE_MAGNETIC_FIELD_UNCALIBRATED,
+                new int[]{Integer.MAX_VALUE, Integer.MAX_VALUE});
+        defaults.put(Sensor.TYPE_GAME_ROTATION_VECTOR,
+                new int[]{Integer.MAX_VALUE, Integer.MAX_VALUE});
+        defaults.put(Sensor.TYPE_GYROSCOPE_UNCALIBRATED,
+                new int[]{Integer.MAX_VALUE, Integer.MAX_VALUE});
+        defaults.put(Sensor.TYPE_GEOMAGNETIC_ROTATION_VECTOR,
+                new int[]{Integer.MAX_VALUE, Integer.MAX_VALUE});
 
         if (defaults.containsKey(mSensorType)) {
             // Expected frequency in Hz
@@ -215,8 +237,9 @@ public class VerifySensorOperation extends AbstractSensorOperation {
                     SensorCtsHelper.getDelay(mSensor.getUnderlyingSensor(), mRateUs),
                     TimeUnit.MICROSECONDS);
             // Expected frequency * threshold percentage
-            double threshold = expected * defaults.get(mSensorType) / 100;
-            verifyFrequency(expected, threshold);
+            double lowerThreshold = expected * defaults.get(mSensorType)[0] / 100;
+            double upperThreshold = expected * defaults.get(mSensorType)[1] / 100;
+            verifyFrequency(expected, lowerThreshold, upperThreshold);
         }
     }
 
@@ -478,7 +501,7 @@ public class VerifySensorOperation extends AbstractSensorOperation {
 
         if (mVerifyFrequency) {
             result = SensorVerificationHelper.verifyFrequency(events, mFrequencyExpected,
-                    mFrequencyThreshold);
+                    mFrequencyLowerThreshold, mFrequencyUpperThreshold);
             failed |= evaluateResults(result, sb);
         }
 
@@ -539,7 +562,8 @@ public class VerifySensorOperation extends AbstractSensorOperation {
             operation.verifyEventOrdering();
         }
         if (mVerifyFrequency) {
-            operation.verifyFrequency(mFrequencyExpected, mFrequencyThreshold);
+            operation.verifyFrequency(mFrequencyExpected, mFrequencyLowerThreshold,
+                    mFrequencyUpperThreshold);
         }
         if (mVerifyJitter) {
             operation.verifyJitter(mJitterExpected, mJitterThreshold);
