@@ -204,10 +204,22 @@ public class SingleSensorTests extends SensorTestCase {
      * Helper to setup the test and run it.
      */
     private void sensorTestHelper(int sensorType) throws Throwable {
-        VerifySensorOperation op = new VerifySensorOperation(this.getContext(), sensorType,
-                SensorManager.SENSOR_DELAY_FASTEST, 0, 100);
-        op.setDefaultVerifications();
-        op.execute();
-        SensorStats.logStats(TAG, op.getStats());
+        int minDelay = SensorCtsHelper.getSensor(mContext, sensorType).getMinDelay();
+        int[] rateUss = {
+                SensorManager.SENSOR_DELAY_FASTEST, // Should be the same as min delay
+                (int) (minDelay * 1.5),
+                minDelay * 2,
+                minDelay * 4,
+                minDelay * 5,
+                minDelay * 8,
+                minDelay * 16,
+        };
+        for (int rateUs : rateUss) {
+            VerifySensorOperation op = new VerifySensorOperation(this.getContext(), sensorType,
+                    rateUs, 0, 100);
+            op.setDefaultVerifications();
+            op.execute();
+            SensorStats.logStats(TAG, op.getStats());
+        }
     }
 }
