@@ -158,6 +158,11 @@ public class SensorManagerTestVerifier implements Closeable, SensorEventListener
         return this.collectEvents(eventCount, "");
     }
 
+    public TestSensorEvent[] collectEvents(long duration, TimeUnit timeUnit) {
+        // TODO: Allow this class to support duration as well as event count
+        throw new UnsupportedOperationException();
+    }
+
     public void startFlush() {
         String message = SensorCtsHelper.formatAssertionMessage(
                 "Flush",

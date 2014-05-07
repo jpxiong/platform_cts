@@ -19,12 +19,13 @@ import android.content.Context;
 import android.hardware.Sensor;
 import android.hardware.SensorManager;
 import android.hardware.cts.helpers.SensorCtsHelper;
+import android.hardware.cts.helpers.SensorStats;
 import android.hardware.cts.helpers.SensorTestCase;
 import android.hardware.cts.helpers.SensorTestInformation;
-import android.hardware.cts.helpers.sensorTestOperations.ParallelCompositeSensorTestOperation;
-import android.hardware.cts.helpers.sensorTestOperations.RepeatingSensorTestOperation;
-import android.hardware.cts.helpers.sensorTestOperations.SequentialCompositeSensorTestOperation;
-import android.hardware.cts.helpers.sensorTestOperations.VerifySensorOperation;
+import android.hardware.cts.helpers.sensoroperations.ParallelSensorOperation;
+import android.hardware.cts.helpers.sensoroperations.RepeatingSensorOperation;
+import android.hardware.cts.helpers.sensoroperations.SequentialSensorOperation;
+import android.hardware.cts.helpers.sensoroperations.VerifySensorOperation;
 
 import junit.framework.Test;
 import junit.framework.TestSuite;
@@ -39,6 +40,8 @@ import java.util.Random;
  *          -w com.android.cts.hardware/android.test.InstrumentationCtsTestRunner
  */
 public class SensorIntegrationTests extends SensorTestCase {
+    private static final String TAG = "SensorIntegrationTests";
+
     /**
      * Builder for the test suite.
      * This is the method that will build dynamically the set of test cases to execute.
@@ -91,7 +94,7 @@ public class SensorIntegrationTests extends SensorTestCase {
                 Sensor.TYPE_MAGNETIC_FIELD,
                 Sensor.TYPE_GYROSCOPE };
 
-        ParallelCompositeSensorTestOperation operation = new ParallelCompositeSensorTestOperation();
+        ParallelSensorOperation operation = new ParallelSensorOperation();
         for(int sensorType : sensorTypes) {
             VerifySensorOperation continuousOperation = new VerifySensorOperation(
                     context,
@@ -100,7 +103,7 @@ public class SensorIntegrationTests extends SensorTestCase {
                     0 /* reportLatencyInUs */,
                     100 /* event count */);
             continuousOperation.verifyEventOrdering();
-            operation.add(new RepeatingSensorTestOperation(continuousOperation, ITERATIONS));
+            operation.add(new RepeatingSensorOperation(continuousOperation, ITERATIONS));
 
             VerifySensorOperation batchingOperation = new VerifySensorOperation(
                     context,
@@ -109,9 +112,10 @@ public class SensorIntegrationTests extends SensorTestCase {
                     SensorCtsHelper.getSecondsAsMicroSeconds(BATCHING_RATE_IN_SECONDS),
                     100);
             batchingOperation.verifyEventOrdering();
-            operation.add(new RepeatingSensorTestOperation(batchingOperation, ITERATIONS));
+            operation.add(new RepeatingSensorOperation(batchingOperation, ITERATIONS));
         }
         operation.execute();
+        SensorStats.logStats(TAG, operation.getStats());
     }
 
     /**
@@ -140,7 +144,7 @@ public class SensorIntegrationTests extends SensorTestCase {
         final int INSTANCES_TO_USE = 5;
         final int ITERATIONS_TO_EXECUTE = 100;
 
-        ParallelCompositeSensorTestOperation operation = new ParallelCompositeSensorTestOperation();
+        ParallelSensorOperation operation = new ParallelSensorOperation();
         int sensorTypes[] = {
                 Sensor.TYPE_ACCELEROMETER,
                 Sensor.TYPE_MAGNETIC_FIELD,
@@ -148,8 +152,7 @@ public class SensorIntegrationTests extends SensorTestCase {
 
         for(int sensorType : sensorTypes) {
             for(int instance = 0; instance < INSTANCES_TO_USE; ++instance) {
-                SequentialCompositeSensorTestOperation sequentialOperation =
-                        new SequentialCompositeSensorTestOperation();
+                SequentialSensorOperation sequentialOperation = new SequentialSensorOperation();
                 for(int iteration = 0; iteration < ITERATIONS_TO_EXECUTE; ++iteration) {
                     VerifySensorOperation sensorOperation = new VerifySensorOperation(
                             this.getContext(),
@@ -165,6 +168,7 @@ public class SensorIntegrationTests extends SensorTestCase {
         }
 
         operation.execute();
+        SensorStats.logStats(TAG, operation.getStats());
     }
 
     /**
@@ -221,7 +225,6 @@ public class SensorIntegrationTests extends SensorTestCase {
                 0 /*reportLatencyInUs*/,
                 100 /* event count */);
         tester.verifyEventOrdering();
-        tester.start();
 
         VerifySensorOperation testee = new VerifySensorOperation(
                 context,
@@ -230,12 +233,15 @@ public class SensorIntegrationTests extends SensorTestCase {
                 0 /*reportLatencyInUs*/,
                 100 /* event count */);
         testee.verifyEventOrdering();
-        testee.start();
 
-        testee.waitForCompletion();
-        tester.waitForCompletion();
+        ParallelSensorOperation operation = new ParallelSensorOperation();
+        operation.add(tester, testee);
+        operation.execute();
+        SensorStats.logStats(TAG, operation.getStats());
 
+        testee = testee.clone();
         testee.execute();
+        SensorStats.logStats(TAG, testee.getStats());
     }
 
     /**

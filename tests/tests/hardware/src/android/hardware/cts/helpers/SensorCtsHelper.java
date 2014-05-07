@@ -18,6 +18,7 @@ package android.hardware.cts.helpers;
 import android.content.Context;
 import android.hardware.Sensor;
 import android.hardware.SensorManager;
+import android.hardware.cts.helpers.sensoroperations.ISensorOperation;
 import android.os.Environment;
 import android.util.Log;
 
@@ -359,7 +360,7 @@ public class SensorCtsHelper {
      */
     public static String formatAssertionMessage(
             String verificationName,
-            SensorTestOperation test,
+            ISensorOperation test,
             Sensor sensor,
             String format,
             Object ... params) {
