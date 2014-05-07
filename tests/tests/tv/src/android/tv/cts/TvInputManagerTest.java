@@ -23,6 +23,7 @@ import android.net.Uri;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.test.AndroidTestCase;
+import android.text.TextUtils;
 import android.tv.TvInputInfo;
 import android.tv.TvInputManager;
 import android.tv.TvInputManager.Session;
@@ -60,9 +61,11 @@ public class TvInputManagerTest extends AndroidTestCase {
     @Override
     public void setContext(Context context) {
         super.setContext(context);
-        if (MockTvInputService.sComponentName == null) {
-            MockTvInputService.sComponentName = new ComponentName(
+        if (TextUtils.isEmpty(MockTvInputService.sInputId)) {
+            ComponentName componentName = new ComponentName(
                     context.getPackageName(), MockTvInputService.class.getName());
+            // TODO: Do not directly generate an input id.
+            MockTvInputService.sInputId = componentName.flattenToShortString();
         }
         mManager = (TvInputManager) context.getSystemService(Context.TV_INPUT_SERVICE);
     }
@@ -82,7 +85,7 @@ public class TvInputManagerTest extends AndroidTestCase {
     @Override
     protected void tearDown() throws InterruptedException {
         if (mTvInputListener != null) {
-            mManager.unregisterListener(MockTvInputService.sComponentName, mTvInputListener);
+            mManager.unregisterListener(MockTvInputService.sInputId, mTvInputListener);
             mTvInputListener = null;
         }
         mCallbackThread.quit();
@@ -93,7 +96,7 @@ public class TvInputManagerTest extends AndroidTestCase {
         // Check if the returned list includes the mock tv input service.
         boolean mockServiceInstalled = false;
         for (TvInputInfo info : mManager.getTvInputList()) {
-            if (MockTvInputService.sComponentName.equals(info.getComponent())) {
+            if (MockTvInputService.sInputId.equals(info.getId())) {
                 mockServiceInstalled = true;
             }
         }
@@ -105,7 +108,7 @@ public class TvInputManagerTest extends AndroidTestCase {
     public void testCreateSession() throws Exception {
         mSessionCreationLatch = new CountDownLatch(1);
         // Make the mock service return a session on request.
-        mManager.createSession(MockTvInputService.sComponentName, mSessionCallback,
+        mManager.createSession(MockTvInputService.sInputId, mSessionCallback,
                 mCallbackHandler);
 
         // Verify the result.
@@ -118,7 +121,7 @@ public class TvInputManagerTest extends AndroidTestCase {
         mSessionCreationLatch = new CountDownLatch(1);
         // Make the mock service return {@code null} on request.
         MockTvInputService.sFailOnCreateSession = true;
-        mManager.createSession(MockTvInputService.sComponentName, mSessionCallback,
+        mManager.createSession(MockTvInputService.sInputId, mSessionCallback,
                 mCallbackHandler);
 
         // Verify the result.
@@ -130,7 +133,7 @@ public class TvInputManagerTest extends AndroidTestCase {
         // Register a listener for availability change.
         MockTvInputService.sInstanceLatch = new CountDownLatch(1);
         mTvInputListener = new MockTvInputListener();
-        mManager.registerListener(MockTvInputService.sComponentName, mTvInputListener,
+        mManager.registerListener(MockTvInputService.sInputId, mTvInputListener,
                 mCallbackHandler);
 
         // Make sure that the mock service is created.
@@ -140,7 +143,7 @@ public class TvInputManagerTest extends AndroidTestCase {
         }
 
         // Change the availability of the mock service.
-        mAvailability = mManager.getAvailability(MockTvInputService.sComponentName);
+        mAvailability = mManager.getAvailability(MockTvInputService.sInputId);
         boolean newAvailiability = !mAvailability;
         mAvailabilityChangeLatch = new CountDownLatch(1);
         MockTvInputService.sInstance.setAvailable(newAvailiability);
@@ -152,8 +155,8 @@ public class TvInputManagerTest extends AndroidTestCase {
 
     private class MockTvInputListener extends TvInputListener {
         @Override
-        public void onAvailabilityChanged(ComponentName name, boolean isAvailable) {
-            assertEquals(MockTvInputService.sComponentName, name);
+        public void onAvailabilityChanged(String inputId, boolean isAvailable) {
+            assertEquals(MockTvInputService.sInputId, inputId);
             mAvailability = isAvailable;
             if (mAvailabilityChangeLatch != null) {
                 mAvailabilityChangeLatch.countDown();
@@ -172,7 +175,7 @@ public class TvInputManagerTest extends AndroidTestCase {
     }
 
     public static class MockTvInputService extends TvInputService {
-        static ComponentName sComponentName;
+        static String sInputId;
         static CountDownLatch sInstanceLatch;
         static MockTvInputService sInstance;
         static TvInputSessionImpl sSession;
