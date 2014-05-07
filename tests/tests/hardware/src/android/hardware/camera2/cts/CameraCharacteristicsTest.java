@@ -1293,33 +1293,6 @@ public class CameraCharacteristicsTest extends AndroidTestCase {
         }
     }
 
-    public void testCameraCharacteristicsAndroidSensorProfileHueSatMapDimensions() throws Exception {
-        String[] ids = mCameraManager.getCameraIdList();
-        for (int i = 0; i < ids.length; i++) {
-            CameraCharacteristics props = mCameraManager.getCameraCharacteristics(ids[i]);
-            assertNotNull(String.format("Can't get camera characteristics from: ID %s", ids[i]),
-                                        props);
-
-            Integer hwLevel = props.get(CameraCharacteristics.INFO_SUPPORTED_HARDWARE_LEVEL);
-            assertNotNull("No hardware level reported! android.info.supportedHardwareLevel",
-                    hwLevel);
-            if (hwLevel == CameraCharacteristics.INFO_SUPPORTED_HARDWARE_LEVEL_FULL)
-            {
-
-                assertNotNull("Invalid property: android.sensor.profileHueSatMapDimensions",
-                        props.get(CameraCharacteristics.SENSOR_PROFILE_HUE_SAT_MAP_DIMENSIONS));
-
-                List<Key<?>> allKeys = props.getKeys();
-                assertNotNull(String.format("Can't get camera characteristics keys from: ID %s",
-                        ids[i], props));
-                assertTrue("Key not in keys list: android.sensor.profileHueSatMapDimensions", allKeys.contains(
-                        CameraCharacteristics.SENSOR_PROFILE_HUE_SAT_MAP_DIMENSIONS));
-
-            }
-
-        }
-    }
-
     public void testCameraCharacteristicsAndroidSensorAvailableTestPatternModes() throws Exception {
         String[] ids = mCameraManager.getCameraIdList();
         for (int i = 0; i < ids.length; i++) {
