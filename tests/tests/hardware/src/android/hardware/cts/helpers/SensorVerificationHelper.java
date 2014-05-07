@@ -129,22 +129,24 @@ public class SensorVerificationHelper {
      *
      * @param events The array of {@link TestSensorEvent}
      * @param expected The expected frequency in Hz
-     * @param threshold The acceptable margin of error in Hz
+     * @param lowerThreshold The acceptable margin of error in Hz for the lower bound
+     * @param upperThreshold The acceptable margin of error in Hz for the upper bound
      * @return a {@link VerificationResult} containing the verification info including the key
      *     "frequency" which is the computed frequency of the events in Hz.
      * @throws IllegalStateException if number of events less than 1.
      */
     public static VerificationResult verifyFrequency(TestSensorEvent[] events, double expected,
-            double threshold) {
+            double lowerThreshold, double upperThreshold) {
         VerificationResult result = new VerificationResult();
         List<Long> timestampDelayValues = SensorCtsHelper.getTimestampDelayValues(events);
         double frequency = SensorCtsHelper.getFrequency(
                 SensorCtsHelper.getMean(timestampDelayValues), TimeUnit.NANOSECONDS);
         result.putValue(FREQUENCY_KEY, frequency);
 
-        if (Math.abs(frequency - expected) > threshold) {
-            result.fail("Frequency out of range: frequency=%.2fHz, expected=%.2f+/-%.2fHz",
-                    frequency, expected, threshold);
+        if (frequency <= expected - lowerThreshold || frequency >= expected + upperThreshold) {
+            result.fail("Frequency out of range: frequency=%.2fHz, "
+                    + "expected=(%.2f-%.2fHz, %.2f+.%2f)", frequency, expected, lowerThreshold,
+                    expected, upperThreshold);
         }
         return result;
     }
