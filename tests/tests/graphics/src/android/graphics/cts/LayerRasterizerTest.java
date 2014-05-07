@@ -17,32 +17,44 @@
 package android.graphics.cts;
 
 import junit.framework.TestCase;
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
 import android.graphics.LayerRasterizer;
 import android.graphics.Paint;
+import android.graphics.Rasterizer;
 
 public class LayerRasterizerTest extends TestCase {
+    private final static int BITMAP_WIDTH = 16;
+    private final static int BITMAP_HEIGHT = 16;
+
+    private void exerciseRasterizer(Rasterizer rasterizer) {
+        Bitmap bm = Bitmap.createBitmap(BITMAP_WIDTH, BITMAP_HEIGHT, Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas(bm);
+        Paint paint = new Paint();
+
+        // just want to confirm that we don't crash or throw an exception
+        paint.setRasterizer(rasterizer);
+        canvas.drawCircle(BITMAP_WIDTH/2, BITMAP_WIDTH/2, BITMAP_WIDTH/2, paint);
+    }
 
     public void testConstructor() {
-
-        // new the LayerRasterizer instance
-        new LayerRasterizer();
+        exerciseRasterizer(new LayerRasterizer());
     }
 
     public void testAddLayer1() {
-        // new the LayerRasterizer instance
         LayerRasterizer layerRasterizer = new LayerRasterizer();
         Paint p = new Paint();
         layerRasterizer.addLayer(p);
-        // this function called a native function and this test just make sure
-        // it doesn't throw out any exception.
+        exerciseRasterizer(layerRasterizer);
     }
 
     public void testAddLayer2() {
-        // new the LayerRasterizer instance
         LayerRasterizer layerRasterizer = new LayerRasterizer();
         layerRasterizer.addLayer(new Paint(), 1.0f, 1.0f);
-        // this function called a native function and this test just make sure
-        // it doesn't throw out any exception.
+        exerciseRasterizer(layerRasterizer);
+        // explicitly add another layer and draw again
+        layerRasterizer.addLayer(new Paint(), 2.0f, 2.0f);
+        exerciseRasterizer(layerRasterizer);
     }
 
 }
