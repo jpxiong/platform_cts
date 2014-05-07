@@ -84,7 +84,9 @@ public class TestPackageXmlParser extends AbstractXmlParser {
                 mPackageDef.setTestType(getTestType(attributes));
                 mPackageDef.setJarPath(jarPath);
                 mPackageDef.setIsSignatureCheck(parseBoolean(signatureCheck));
-                mPackageDef.setTestPackageName(javaPackageFilter);
+                if (!"".equals(javaPackageFilter)) {
+                    mPackageDef.setTestPackageName(javaPackageFilter);
+                }
                 mPackageDef.setTargetBinaryName(targetBinaryName);
                 mPackageDef.setTargetNameSpace(targetNameSpace);
 
