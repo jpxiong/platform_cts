@@ -22,6 +22,7 @@ import android.hardware.cts.helpers.sensorverification.FrequencyVerificationTest
 import android.hardware.cts.helpers.sensorverification.JitterVerificationTest;
 import android.hardware.cts.helpers.sensorverification.MagnitudeVerificationTest;
 import android.hardware.cts.helpers.sensorverification.MeanVerificationTest;
+import android.hardware.cts.helpers.sensorverification.EventGapVerificationTest;
 import android.hardware.cts.helpers.sensorverification.SigNumVerificationTest;
 import android.hardware.cts.helpers.sensorverification.StandardDeviationVerificationTest;
 
@@ -46,6 +47,7 @@ public class FrameworkUnitTests extends TestSuite {
         addTestSuite(JitterVerificationTest.class);
         addTestSuite(MagnitudeVerificationTest.class);
         addTestSuite(MeanVerificationTest.class);
+        addTestSuite(EventGapVerificationTest.class);
         addTestSuite(SigNumVerificationTest.class);
         addTestSuite(StandardDeviationVerificationTest.class);
 
