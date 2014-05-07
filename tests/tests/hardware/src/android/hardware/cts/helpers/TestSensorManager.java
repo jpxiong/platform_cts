@@ -85,7 +85,8 @@ public class TestSensorManager {
         mTestSensorEventListener = listener != null ? listener : new TestSensorEventListener();
         mTestSensorEventListener.setSensorInfo(mSensor, mRateUs, mMaxBatchReportLatencyUs);
 
-        String message = SensorCtsHelper.formatAssertionMessage(mSensor, "registerListener");
+        String message = SensorCtsHelper.formatAssertionMessage(mSensor, "registerListener",
+                mRateUs, mMaxBatchReportLatencyUs);
         boolean result = mSensorManager.registerListener(mTestSensorEventListener, mSensor, mRateUs,
                 mMaxBatchReportLatencyUs);
         Assert.assertTrue(message, result);
@@ -139,7 +140,8 @@ public class TestSensorManager {
             return;
         }
 
-        String message = SensorCtsHelper.formatAssertionMessage(mSensor, "Flush");
+        String message = SensorCtsHelper.formatAssertionMessage(mSensor, "Flush", mRateUs,
+                mMaxBatchReportLatencyUs);
         Assert.assertTrue(message, mSensorManager.flush(mTestSensorEventListener));
     }
 
